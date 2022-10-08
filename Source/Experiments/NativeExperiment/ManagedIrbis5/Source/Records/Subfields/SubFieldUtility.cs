@@ -29,308 +29,305 @@ using AM.Linq;
 
 #nullable enable
 
-namespace ManagedIrbis
+namespace ManagedIrbis;
+
+/// <summary>
+/// Утилиты для работы с подполями.
+/// </summary>
+public static class SubFieldUtility
 {
+    #region Public methods
+
     /// <summary>
-    /// Утилиты для работы с подполями.
+    /// Первое вхождение подполя с указанным кодом.
     /// </summary>
-    public static class SubFieldUtility
+    public static SubField? GetFirstSubField
+        (
+            this IEnumerable<SubField> subFields,
+            char code
+        )
     {
-        #region Public methods
-
-        /// <summary>
-        /// Первое вхождение подполя с указанным кодом.
-        /// </summary>
-        public static SubField? GetFirstSubField
-            (
-                this IEnumerable<SubField> subFields,
-                char code
-            )
+        foreach (var subField in subFields)
         {
-            foreach (var subField in subFields)
+            if (subField.Code.SameChar (code))
             {
-                if (subField.Code.SameChar(code))
-                {
-                    return subField;
-                }
+                return subField;
             }
+        }
 
-            return null;
-        } // method GetFirstSubField
+        return null;
+    }
 
-        /// <summary>
-        /// Первое вхождение подполя с одним из указанных кодов.
-        /// </summary>
-        public static SubField? GetFirstSubField
-            (
-                this IEnumerable<SubField> subFields,
-                params char[] codes
-            )
+    /// <summary>
+    /// Первое вхождение подполя с одним из указанных кодов.
+    /// </summary>
+    public static SubField? GetFirstSubField
+        (
+            this IEnumerable<SubField> subFields,
+            params char[] codes
+        )
+    {
+        foreach (var subField in subFields)
         {
-            foreach (var subField in subFields)
+            if (codes.Contains (subField.Code))
             {
-                if (codes.Contains(subField.Code))
-                {
-                    return subField;
-                }
+                return subField;
             }
+        }
 
-            return null;
-        } // method GetFirstSubField
+        return null;
+    }
 
-        /// <summary>
-        /// Первое вхождение подполя с указанными кодом
-        /// и значением (с учётом регистра символов).
-        /// </summary>
-        public static SubField? GetFirstSubField
-            (
-                this IEnumerable<SubField> subFields,
-                char code,
-                string? value
-            )
+    /// <summary>
+    /// Первое вхождение подполя с указанными кодом
+    /// и значением (с учётом регистра символов).
+    /// </summary>
+    public static SubField? GetFirstSubField
+        (
+            this IEnumerable<SubField> subFields,
+            char code,
+            string? value
+        )
+    {
+        foreach (var subField in subFields)
         {
-            foreach (var subField in subFields)
+            if (subField.Code.SameChar (code)
+                && subField.Value.SameString (value))
             {
-                if (subField.Code.SameChar(code)
-                    && subField.Value.SameString(value))
-                {
-                    return subField;
-                }
+                return subField;
             }
+        }
 
-            return null;
-        } // method GetFirstSubField
+        return null;
+    }
 
-        // ==========================================================
+    // ==========================================================
 
-        /// <summary>
-        /// Фильтрация подполей.
-        /// </summary>
-        public static SubField[] GetSubField
-            (
-                this IEnumerable<SubField> subFields,
-                char code
-            )
+    /// <summary>
+    /// Фильтрация подполей.
+    /// </summary>
+    public static SubField[] GetSubField
+        (
+            this IEnumerable<SubField> subFields,
+            char code
+        )
+    {
+        List<SubField>? result = null;
+        foreach (var subField in subFields)
         {
-            List<SubField>? result = null;
-            foreach (var subField in subFields)
+            if (subField.Code.SameChar (code))
             {
-                if (subField.Code.SameChar(code))
-                {
-                    result ??= new List<SubField>();
-                    result.Add(subField);
-                }
+                result ??= new List<SubField>();
+                result.Add (subField);
             }
+        }
 
-            return ReferenceEquals(result, null)
-                ? Array.Empty<SubField>()
-                : result.ToArray();
-        } // method GetSubField
+        return ReferenceEquals (result, null)
+            ? Array.Empty<SubField>()
+            : result.ToArray();
+    }
 
-        /// <summary>
-        /// Фильтрация подполей.
-        /// </summary>
-        public static SubField[] GetSubField
-            (
-                this IEnumerable<SubField> subFields,
-                params char[] codes
-            )
+    /// <summary>
+    /// Фильтрация подполей.
+    /// </summary>
+    public static SubField[] GetSubField
+        (
+            this IEnumerable<SubField> subFields,
+            params char[] codes
+        )
+    {
+        List<SubField>? result = null;
+        foreach (var subField in subFields)
         {
-            List<SubField>? result = null;
-            foreach (var subField in subFields)
+            if (subField.Code.SameChar (codes))
             {
-                if (subField.Code.SameChar(codes))
-                {
-                    result ??= new();
-                    result.Add(subField);
-                }
+                result ??= new();
+                result.Add (subField);
             }
+        }
 
-            return ReferenceEquals(result, null)
-                ? Array.Empty<SubField>()
-                : result.ToArray();
-        } // method GetSubField
+        return ReferenceEquals (result, null)
+            ? Array.Empty<SubField>()
+            : result.ToArray();
+    }
 
-        /// <summary>
-        /// Выполнение неких действий над подполями.
-        /// </summary>
-        public static SubField[] GetSubField
-            (
-                this IEnumerable<SubField> subFields,
-                Action<SubField>? action
-            )
+    /// <summary>
+    /// Выполнение неких действий над подполями.
+    /// </summary>
+    public static SubField[] GetSubField
+        (
+            this IEnumerable<SubField> subFields,
+            Action<SubField>? action
+        )
+    {
+        var result = subFields.ToArray();
+
+        if (!ReferenceEquals (action, null))
         {
-            var result = subFields.ToArray();
-
-            if (!ReferenceEquals(action, null))
+            foreach (var subField in result)
             {
-                foreach (var subField in result)
-                {
-                    action(subField);
-                }
+                action (subField);
             }
+        }
 
-            return result;
-        } // method GetSubField
+        return result;
+    }
 
-        /// <summary>
-        /// Фильтрация подполей.
-        /// </summary>
-        public static SubField[] GetSubField
-            (
-                this IEnumerable<Field> fields,
-                Func<Field, bool> fieldPredicate,
-                Func<SubField, bool> subPredicate
-            )
+    /// <summary>
+    /// Фильтрация подполей.
+    /// </summary>
+    public static SubField[] GetSubField
+        (
+            this IEnumerable<Field> fields,
+            Func<Field, bool> fieldPredicate,
+            Func<SubField, bool> subPredicate
+        )
+    {
+        List<SubField>? result = null;
+        foreach (var field in fields)
         {
-            List<SubField>? result = null;
-            foreach (var field in fields)
+            if (fieldPredicate (field))
             {
-                if (fieldPredicate(field))
+                foreach (SubField subField in field.Subfields)
                 {
-                    foreach (SubField subField in field.Subfields)
+                    if (subPredicate (subField))
                     {
-                        if (subPredicate(subField))
-                        {
-                            result ??= new List<SubField>();
-                            result.Add(subField);
-                        }
+                        result ??= new List<SubField>();
+                        result.Add (subField);
                     }
                 }
             }
+        }
 
-            return ReferenceEquals(result, null)
-                ? Array.Empty<SubField>()
-                : result.ToArray();
-        } // method GetSubField
+        return ReferenceEquals (result, null)
+            ? Array.Empty<SubField>()
+            : result.ToArray();
+    }
 
-        /*
+    /*
 
-        /// <summary>
-        /// Фильтрация подполей.
-        /// </summary>
-        public static SubField[] GetSubField
-            (
-                this IEnumerable<Field> fields,
-                int[] tags,
-                char[] codes
-            )
+    /// <summary>
+    /// Фильтрация подполей.
+    /// </summary>
+    public static SubField[] GetSubField
+        (
+            this IEnumerable<Field> fields,
+            int[] tags,
+            char[] codes
+        )
+    {
+        Sure.NotNull (fields);
+        Sure.NotNull (tags);
+        Sure.NotNull (codes);
+
+        return fields
+            .GetField (tags)
+            .GetSubField(codes)
+            .ToArray();
+    }
+
+    */
+
+    // ==========================================================
+
+    /// <summary>
+    /// Получение значения подполя.
+    /// </summary>
+    public static string[] GetSubFieldValue
+        (
+            this IEnumerable<SubField> subFields
+        )
+    {
+        List<string>? result = null;
+        foreach (var subField in subFields.NonNullItems())
         {
-            Sure.NotNull(fields, nameof(fields));
-            Sure.NotNull(tags, nameof(tags));
-            Sure.NotNull(codes, nameof(codes));
-
-            return fields
-                .GetField(tags)
-                .GetSubField(codes)
-                .ToArray();
-        } // method GetSubField
-
-        */
-
-        // ==========================================================
-
-        /// <summary>
-        /// Получение значения подполя.
-        /// </summary>
-        public static string[] GetSubFieldValue
-            (
-                this IEnumerable<SubField> subFields
-            )
-        {
-            List<string>? result = null;
-            foreach (var subField in subFields.NonNullItems())
+            var value = subField.Value;
+            if (!string.IsNullOrEmpty (value))
             {
-                var value = subField.Value;
-                if (!string.IsNullOrEmpty(value))
-                {
-                    result ??= new List<string>();
-                    result.Add(value);
-                }
+                result ??= new List<string>();
+                result.Add (value);
             }
-
-            return ReferenceEquals(result, null)
-                ? Array.Empty<string>()
-                : result.ToArray();
-
-        } // method GetSubFieldValue
-
-        // ==========================================================
-
-        /*
-
-        /// <summary>
-        /// Convert the subfield to <see cref="JObject"/>.
-        /// </summary>
-        public static JObject ToJObject
-            (
-                this SubField subField
-            )
-        {
-            Sure.NotNull(subField, nameof(subField));
-
-            JObject result = JObject.FromObject(subField);
-
-            return result;
         }
 
-        /// <summary>
-        /// Convert the subfield to JSON.
-        /// </summary>
-        public static string ToJson
+        return ReferenceEquals (result, null)
+            ? Array.Empty<string>()
+            : result.ToArray();
+
+    }
+
+    // ==========================================================
+
+    /*
+
+    /// <summary>
+    /// Convert the subfield to <see cref="JObject"/>.
+    /// </summary>
+    public static JObject ToJObject
+        (
+            this SubField subField
+        )
+    {
+        Sure.NotNull (subField);
+
+        JObject result = JObject.FromObject (subField);
+
+        return result;
+    }
+
+    /// <summary>
+    /// Convert the subfield to JSON.
+    /// </summary>
+    public static string ToJson
+        (
+            this SubField subField
+        )
+    {
+        Sure.NotNull (subField);
+
+        string result = JsonUtility.SerializeShort (subField);
+        //JObject.FromObject(subField).ToString();
+
+        return result;
+    }
+
+    /// <summary>
+    /// Restore subfield from <see cref="JObject"/>.
+    /// </summary>
+    public static SubField FromJObject
+        (
+            JObject jObject
+        )
+    {
+        Sure.NotNull (jObject);
+
+        SubField result = new SubField
             (
-                this SubField subField
-            )
+                jObject["code"].ToString()[0]
+            );
+        JToken value = jObject["value"];
+        if (value != null)
         {
-            Sure.NotNull(subField, nameof(subField));
-
-            string result = JsonUtility.SerializeShort(subField);
-            //JObject.FromObject(subField).ToString();
-
-            return result;
+            result.Value = value.ToString();
         }
 
-        /// <summary>
-        /// Restore subfield from <see cref="JObject"/>.
-        /// </summary>
-        public static SubField FromJObject
-            (
-                JObject jObject
-            )
-        {
-            Sure.NotNull(jObject, nameof(jObject));
+        return result;
+    }
 
-            SubField result = new SubField
-                (
-                    jObject["code"].ToString()[0]
-                );
-            JToken value = jObject["value"];
-            if (value != null)
-            {
-                result.Value = value.ToString();
-            }
+    /// <summary>
+    /// Restore subfield from JSON.
+    /// </summary>
+    public static SubField FromJson
+        (
+            string text
+        )
+    {
+        Sure.NotNullNorEmpty (text);
 
-            return result;
-        }
+        SubField result = JsonConvert.DeserializeObject<SubField> (text);
 
-        /// <summary>
-        /// Restore subfield from JSON.
-        /// </summary>
-        public static SubField FromJson
-            (
-                string text
-            )
-        {
-            Sure.NotNullNorEmpty(text, nameof(text));
+        return result;
+    }
+    */
 
-            SubField result = JsonConvert.DeserializeObject<SubField>(text);
-
-            return result;
-        }
-        */
-
-        #endregion
-
-    } // class SubFieldUtility
-
-} // namespace ManagedIrbis
+    #endregion
+}

@@ -27,166 +27,158 @@ using ManagedIrbis.Providers;
 
 #nullable enable
 
-namespace ManagedIrbis
+namespace ManagedIrbis;
+
+/// <summary>
+/// Параметры запроса постингов.
+/// </summary>
+[XmlRoot ("postings")]
+public sealed class PostingParameters
+    : IHandmadeSerializable,
+    IVerifiable
 {
+    #region Properties
+
     /// <summary>
-    /// Параметры запроса постингов.
+    /// Имя базы данных.
     /// </summary>
-    [XmlRoot("postings")]
-    public sealed class PostingParameters
-        : IHandmadeSerializable,
-        IVerifiable
+    [XmlAttribute ("database")]
+    [JsonPropertyName ("database")]
+    public string? Database { get; set; }
+
+    /// <summary>
+    /// Номер первого постинга, который необходимо вернуть.
+    /// Нумерация с 1.
+    /// По умолчанию 1.
+    /// </summary>
+    [XmlAttribute ("first")]
+    [JsonPropertyName ("first")]
+    public int FirstPosting { get; set; } = 1;
+
+    /// <summary>
+    /// Опциональный формат.
+    /// </summary>
+    [XmlAttribute ("format")]
+    [JsonPropertyName ("format")]
+    public string? Format { get; set; }
+
+    /// <summary>
+    /// Количество постингов, которые необходимо вернуть.
+    /// По умолчанию 0 - все.
+    /// </summary>
+    [XmlAttribute ("number")]
+    [JsonPropertyName ("number")]
+    public int NumberOfPostings { get; set; }
+
+    /// <summary>
+    /// Массив терминов, для которых нужны постинги.
+    /// </summary>
+    [XmlAttribute ("term")]
+    [JsonPropertyName ("terms")]
+    public string[]? Terms { get; set; }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Clone the parameters.
+    /// </summary>
+    public PostingParameters Clone()
     {
-        #region Properties
-
-        /// <summary>
-        /// Имя базы данных.
-        /// </summary>
-        [XmlAttribute("database")]
-        [JsonPropertyName("database")]
-        public string? Database { get; set; }
-
-        /// <summary>
-        /// Номер первого постинга, который необходимо вернуть.
-        /// Нумерация с 1.
-        /// По умолчанию 1.
-        /// </summary>
-        [XmlAttribute("first")]
-        [JsonPropertyName("first")]
-        public int FirstPosting { get; set; } = 1;
-
-        /// <summary>
-        /// Опциональный формат.
-        /// </summary>
-        [XmlAttribute("format")]
-        [JsonPropertyName("format")]
-        public string? Format { get; set; }
-
-        /// <summary>
-        /// Количество постингов, которые необходимо вернуть.
-        /// По умолчанию 0 - все.
-        /// </summary>
-        [XmlAttribute("number")]
-        [JsonPropertyName("number")]
-        public int NumberOfPostings { get; set; }
-
-        /// <summary>
-        /// Массив терминов, для которых нужны постинги.
-        /// </summary>
-        [XmlAttribute("term")]
-        [JsonPropertyName("terms")]
-        public string[]? Terms { get; set; }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Clone the parameters.
-        /// </summary>
-        public PostingParameters Clone()
+        var result = (PostingParameters) MemberwiseClone();
+        if (Terms is not null)
         {
-            var result = (PostingParameters) MemberwiseClone();
-            if (Terms is not null)
-            {
-                result.Terms = (string[]?) Terms.Clone();
-            }
+            result.Terms = (string[]?)  Terms.Clone();
+        }
 
-            return result;
+        return result;
+    }
 
-        } // method Clone
+    /// <summary>
+    /// Кодирование параметров постингов для клиентского запроса.
+    /// </summary>
+    /// <param name="connection">Ссылка на подключение к серверу.</param>
+    /// <param name="query">Клиентский запрос.</param>
+    public void Encode<TQuery>
+        (
+            IIrbisProvider connection,
+            TQuery query
+        )
+        where TQuery: IQuery
+    {
+        var database = connection.EnsureDatabase(Database);
+        query.AddAnsi (database);
+        query.Add (NumberOfPostings);
+        query.Add (FirstPosting);
+        query.AddFormat (Format);
 
-        /// <summary>
-        /// Кодирование параметров постингов для клиентского запроса.
-        /// </summary>
-        /// <param name="connection">Ссылка на подключение к серверу.</param>
-        /// <param name="query">Клиентский запрос.</param>
-        public void Encode<TQuery>
+        foreach (var term in Terms.ThrowIfNull())
+        {
+            query.AddUtf(term);
+        }
+    }
+
+    #endregion
+
+    #region IHandmadeSerializable members
+
+    /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
+    public void RestoreFromStream
+        (
+            BinaryReader reader
+        )
+    {
+        Database = reader.ReadNullableString();
+        FirstPosting = reader.ReadPackedInt32();
+        Format = reader.ReadNullableString();
+        NumberOfPostings = reader.ReadPackedInt32();
+        Terms = reader.ReadNullableStringArray();
+    }
+
+    /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
+    public void SaveToStream
+        (
+            BinaryWriter writer
+        )
+    {
+        writer
+            .WriteNullable (Database)
+            .WritePackedInt32 (FirstPosting)
+            .WriteNullable (Format)
+            .WritePackedInt32 (NumberOfPostings)
+            .WriteNullableArray (Terms);
+    }
+
+    #endregion
+
+    #region IVerifiable members
+
+    /// <inheritdoc cref="IVerifiable.Verify" />
+    public bool Verify
+        (
+            bool throwOnError
+        )
+    {
+        var verifier = new Verifier<PostingParameters>
             (
-                IIrbisProvider connection,
-                TQuery query
-            )
-            where TQuery: IQuery
-        {
-            var database = connection.EnsureDatabase(Database);
-            query.AddAnsi(database);
-            query.Add(NumberOfPostings);
-            query.Add(FirstPosting);
-            query.AddFormat(Format);
+                this,
+                throwOnError
+            );
 
-            foreach (var term in Terms.ThrowIfNull())
-            {
-                query.AddUtf(term);
-            }
+        verifier
+            .Assert (FirstPosting >= 0)
+            .Assert (NumberOfPostings >= 0);
 
-        } // method Encode
-
-        #endregion
-
-        #region IHandmadeSerializable members
-
-        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
-        public void RestoreFromStream
+        verifier
+            .Assert
             (
-                BinaryReader reader
-            )
-        {
-            Database = reader.ReadNullableString();
-            FirstPosting = reader.ReadPackedInt32();
-            Format = reader.ReadNullableString();
-            NumberOfPostings = reader.ReadPackedInt32();
-            Terms = reader.ReadNullableStringArray();
+                !Terms.IsNullOrEmpty(),
+                nameof (Terms)
+            );
 
-        } // method RestoreFromStream
+        return verifier.Result;
+    }
 
-        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
-        public void SaveToStream
-            (
-                BinaryWriter writer
-            )
-        {
-            writer
-                .WriteNullable(Database)
-                .WritePackedInt32(FirstPosting)
-                .WriteNullable(Format)
-                .WritePackedInt32(NumberOfPostings)
-                .WriteNullableArray(Terms);
-
-        } // method SaveToStream
-
-        #endregion
-
-        #region IVerifiable members
-
-        /// <inheritdoc cref="IVerifiable.Verify" />
-        public bool Verify
-            (
-                bool throwOnError
-            )
-        {
-            var verifier = new Verifier<PostingParameters>
-                (
-                    this,
-                    throwOnError
-                );
-
-            verifier
-                .Assert(FirstPosting >= 0, "FirstPosting")
-                .Assert(NumberOfPostings >= 0, "NumberOfPostings");
-
-            verifier
-                .Assert
-                (
-                    !Terms.IsNullOrEmpty(),
-                    "Terms"
-                );
-
-            return verifier.Result;
-
-        } // method Verify
-
-        #endregion
-
-    } // class PostingParameters
-
-} // namespace ManagedIrbis
+    #endregion
+}
