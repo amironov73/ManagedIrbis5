@@ -30,142 +30,135 @@ using System.Threading.Tasks;
 
 #nullable enable
 
-namespace ManagedIrbis.Server.Sockets
+namespace ManagedIrbis.Server.Sockets;
+
+/// <summary>
+/// Простой серверный (обслуживающий подключенного клиента)
+/// сокет для TCP v4.
+/// Ничего не сжимает, не шифрует, не переиспользуется.
+/// </summary>
+public class Tcp4ServerSocket
+    : IAsyncServerSocket
 {
+    #region Construction
+
     /// <summary>
-    /// Простой серверный (обслуживающий подключенного клиента)
-    /// сокет для TCP v4.
-    /// Ничего не сжимает, не шифрует, не переиспользуется.
+    /// Конструктор.
     /// </summary>
-    public class Tcp4ServerSocket
-        : IAsyncServerSocket
+    public Tcp4ServerSocket
+        (
+            TcpClient client,
+            CancellationToken cancellationToken
+        )
     {
-        #region Construction
+        _client = client;
+        _cancellationToken = cancellationToken;
+    }
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public Tcp4ServerSocket
-            (
-                TcpClient client,
-                CancellationToken cancellationToken
-            )
+    #endregion
+
+    #region Private members
+
+    private readonly TcpClient _client;
+    private readonly CancellationToken _cancellationToken;
+
+    #endregion
+
+    #region IAsyncServerSocket members
+
+    /// <inheritdoc cref="IAsyncServerSocket.GetRemoteAddress"/>
+    public string GetRemoteAddress() =>
+        _client.Client.RemoteEndPoint?.ToString() ?? "(unknown)";
+
+    /// <inheritdoc cref="IAsyncServerSocket.ReceiveAllAsync"/>
+    public virtual async Task<MemoryStream?> ReceiveAllAsync()
+    {
+        if (_cancellationToken.IsCancellationRequested)
         {
-            _client = client;
-            _cancellationToken = cancellationToken;
+            return null;
+        }
 
-        } // constructor
+        var result = new MemoryStream();
+        NetworkStream stream = _client.GetStream();
+        var buffer = new byte[50 * 1024];
 
-        #endregion
-
-        #region Private members
-
-        private readonly TcpClient _client;
-        private readonly CancellationToken _cancellationToken;
-
-        #endregion
-
-        #region IAsyncServerSocket members
-
-        /// <inheritdoc cref="IAsyncServerSocket.GetRemoteAddress"/>
-        public string GetRemoteAddress() =>
-            _client.Client.RemoteEndPoint?.ToString() ?? "(unknown)";
-
-        /// <inheritdoc cref="IAsyncServerSocket.ReceiveAllAsync"/>
-        public virtual async Task<MemoryStream?> ReceiveAllAsync()
+        while (true)
         {
             if (_cancellationToken.IsCancellationRequested)
             {
                 return null;
             }
 
-            var result = new MemoryStream();
-            NetworkStream stream = _client.GetStream();
-            var buffer = new byte[50 * 1024];
-
-            while (true)
+            var read = await stream.ReadAsync
+                (
+                    buffer,
+                    0,
+                    buffer.Length,
+                    _cancellationToken
+                )
+                .ConfigureAwait (false);
+            if (read <= 0)
             {
-                if (_cancellationToken.IsCancellationRequested)
-                {
-                    return null;
-                }
-
-                var read = await stream.ReadAsync
-                    (
-                        buffer,
-                        0,
-                        buffer.Length,
-                        _cancellationToken
-                    )
-                    .ConfigureAwait (false);
-                if (read <= 0)
-                {
-                    break;
-                }
-
-                if (_cancellationToken.IsCancellationRequested)
-                {
-                    return null;
-                }
-
-                await result.WriteAsync
-                    (
-                        buffer,
-                        0,
-                        read,
-                        _cancellationToken
-                    )
-                    .ConfigureAwait (false);
+                break;
             }
 
-            result.Position = 0;
+            if (_cancellationToken.IsCancellationRequested)
+            {
+                return null;
+            }
 
-            return result;
+            await result.WriteAsync
+                (
+                    buffer,
+                    0,
+                    read,
+                    _cancellationToken
+                )
+                .ConfigureAwait (false);
+        }
 
-        } // method ReadAllAsync
+        result.Position = 0;
 
-        /// <inheritdoc cref="IAsyncServerSocket.SendAsync"/>
-        public virtual async Task<bool> SendAsync
-            (
-                IEnumerable<ReadOnlyMemory<byte>> data
-            )
+        return result;
+    }
+
+    /// <inheritdoc cref="IAsyncServerSocket.SendAsync"/>
+    public virtual async Task<bool> SendAsync
+        (
+            IEnumerable<ReadOnlyMemory<byte>> data
+        )
+    {
+        if (_cancellationToken.IsCancellationRequested)
+        {
+            return false;
+        }
+
+        var stream = _client.GetStream();
+
+        foreach (var unit in data)
         {
             if (_cancellationToken.IsCancellationRequested)
             {
                 return false;
             }
 
-            var stream = _client.GetStream();
+            await stream.WriteAsync (unit, _cancellationToken);
+        }
 
-            foreach (var unit in data)
-            {
-                if (_cancellationToken.IsCancellationRequested)
-                {
-                    return false;
-                }
+        return true;
+    }
 
-                await stream.WriteAsync (unit, _cancellationToken);
-            }
+    #endregion
 
-            return true;
+    #region IAsyncDisposable members
 
-        } // method SendAsync
+    /// <inheritdoc cref="IAsyncDisposable.DisposeAsync"/>
+    public ValueTask DisposeAsync()
+    {
+        _client.Dispose();
 
-        #endregion
+        return ValueTask.CompletedTask;
+    }
 
-        #region IAsyncDisposable members
-
-        /// <inheritdoc cref="IAsyncDisposable.DisposeAsync"/>
-        public ValueTask DisposeAsync()
-        {
-            _client.Dispose();
-
-            return ValueTask.CompletedTask;
-
-        } // method DisposeAsync
-
-        #endregion
-
-    } // class Tcp4ServerSocket
-
-} // namespace ManagedIrbis.Server.Sockets
+    #endregion
+}

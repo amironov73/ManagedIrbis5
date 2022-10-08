@@ -154,7 +154,7 @@ public sealed class ClientRequest
         }
 
         return result.ToArray();
-    } // method GetString
+    }
 
     /// <summary>
     /// Чтение из клиентского запроса строки с автоматическим определением кодировки

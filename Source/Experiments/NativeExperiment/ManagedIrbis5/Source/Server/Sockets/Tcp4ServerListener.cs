@@ -31,137 +31,129 @@ using AM;
 
 #nullable enable
 
-namespace ManagedIrbis.Server.Sockets
+namespace ManagedIrbis.Server.Sockets;
+
+/// <summary>
+/// Серверный слушатель для простого TCP v4.
+/// </summary>
+public class Tcp4ServerListener
+    : IAsyncServerListener
 {
+    #region Construction
+
     /// <summary>
-    /// Серверный слушатель для простого TCP v4.
+    /// Конструктор.
     /// </summary>
-    public class Tcp4ServerListener
-        : IAsyncServerListener
+    public Tcp4ServerListener
+        (
+            IPEndPoint endPoint,
+            CancellationToken cancellationToken
+        )
     {
-        #region Construction
+        _endPoint = endPoint;
+        _listener = new TcpListener (endPoint);
+        _cancellationToken = cancellationToken;
+        _cancellationToken.Register (_StopListener);
+    }
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public Tcp4ServerListener
-            (
-                IPEndPoint endPoint,
-                CancellationToken cancellationToken
-            )
+    #endregion
+
+    #region Private members
+
+    /// <summary>
+    /// Оконечная точка подключения.
+    /// </summary>
+    protected readonly IPEndPoint _endPoint;
+
+    /// <summary>
+    /// TCP-слушатель.
+    /// </summary>
+    protected readonly TcpListener _listener;
+
+    /// <summary>
+    /// Токен отметки.
+    /// </summary>
+    protected readonly CancellationToken _cancellationToken;
+
+    private bool _working;
+
+    private void _StopListener()
+    {
+        _listener.Stop();
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Создание слушателя для указанного порта.
+    /// </summary>
+    public static Tcp4ServerListener ForPort
+        (
+            int portNumber,
+            CancellationToken token
+        )
+    {
+        Sure.InRange (portNumber, 1, 65535);
+
+        var endPoint = new IPEndPoint (IPAddress.Any, portNumber);
+        var result = new Tcp4ServerListener (endPoint, token);
+
+        return result;
+    }
+
+    #endregion
+
+    #region IAsyncServerListener members
+
+    /// <inheritdoc cref="IAsyncServerListener.AcceptClientAsync"/>
+    public virtual async Task<IAsyncServerSocket?> AcceptClientAsync()
+    {
+        if (_cancellationToken.IsCancellationRequested)
         {
-            _endPoint = endPoint;
-            _listener = new TcpListener (endPoint);
-            _cancellationToken = cancellationToken;
-            _cancellationToken.Register (_StopListener);
-
-        } // constructor
-
-        #endregion
-
-        #region Private members
-
-        /// <summary>
-        /// Оконечная точка подключения.
-        /// </summary>
-        protected readonly IPEndPoint _endPoint;
-
-        /// <summary>
-        /// TCP-слушатель.
-        /// </summary>
-        protected readonly TcpListener _listener;
-
-        /// <summary>
-        /// Токен отметки.
-        /// </summary>
-        protected readonly CancellationToken _cancellationToken;
-
-        private bool _working;
-
-        private void _StopListener()
-        {
-            _listener.Stop();
+            return null;
         }
 
-        #endregion
+        var client = await _listener.AcceptTcpClientAsync().ConfigureAwait (false);
+        var result = new Tcp4ServerSocket (client, _cancellationToken);
 
-        #region Public methods
+        return result;
+    }
 
-        /// <summary>
-        /// Создание слушателя для указанного порта.
-        /// </summary>
-        public static Tcp4ServerListener ForPort
-            (
-                int portNumber,
-                CancellationToken token
-            )
+    /// <inheritdoc cref="IAsyncServerListener.GetLocalAddress"/>
+    public string GetLocalAddress() => _endPoint.ToString();
+
+    /// <inheritdoc cref="IAsyncServerListener.StartAsync"/>
+    public Task StartAsync()
+    {
+        if (!_working)
         {
-            Sure.InRange (portNumber, 1, 65535);
+            _listener.Start();
+            _working = true;
+        }
 
-            var endPoint = new IPEndPoint (IPAddress.Any, portNumber);
-            var result = new Tcp4ServerListener (endPoint, token);
+        return Task.CompletedTask;
+    }
 
-            return result;
-
-        } // method ForPort
-
-        #endregion
-
-        #region IAsyncServerListener members
-
-        /// <inheritdoc cref="IAsyncServerListener.AcceptClientAsync"/>
-        public virtual async Task<IAsyncServerSocket?> AcceptClientAsync()
+    /// <inheritdoc cref="IAsyncServerListener.StopAsync"/>
+    public Task StopAsync()
+    {
+        if (_working)
         {
-            if (_cancellationToken.IsCancellationRequested)
-            {
-                return null;
-            }
+            _listener.Stop();
+            _working = false;
+        }
 
-            var client = await _listener.AcceptTcpClientAsync().ConfigureAwait (false);
-            var result = new Tcp4ServerSocket (client, _cancellationToken);
+        return Task.CompletedTask;
+    }
 
-            return result;
+    #endregion
 
-        } // method AcceptClientAsync
+    #region IAsyncDisposable members
 
-        /// <inheritdoc cref="IAsyncServerListener.GetLocalAddress"/>
-        public string GetLocalAddress() => _endPoint.ToString();
+    /// <inheritdoc cref="IAsyncDisposable.DisposeAsync"/>
+    public async ValueTask DisposeAsync() => await StopAsync();
 
-        /// <inheritdoc cref="IAsyncServerListener.StartAsync"/>
-        public Task StartAsync()
-        {
-            if (!_working)
-            {
-                _listener.Start();
-                _working = true;
-            }
-
-            return Task.CompletedTask;
-
-        } // method StartAsync
-
-        /// <inheritdoc cref="IAsyncServerListener.StopAsync"/>
-        public Task StopAsync()
-        {
-            if (_working)
-            {
-                _listener.Stop();
-                _working = false;
-            }
-
-            return Task.CompletedTask;
-
-        } // method StopAsync
-
-        #endregion
-
-        #region IAsyncDisposable members
-
-        /// <inheritdoc cref="IAsyncDisposable.DisposeAsync"/>
-        public async ValueTask DisposeAsync() => await StopAsync();
-
-        #endregion
-
-    } // class Tcp4ServerListener
-
-} // namespace ManagedIrbis.Server.Sockets
+    #endregion
+}
