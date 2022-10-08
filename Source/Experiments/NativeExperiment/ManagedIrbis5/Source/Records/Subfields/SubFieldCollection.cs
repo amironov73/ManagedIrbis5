@@ -274,7 +274,7 @@ public sealed class SubFieldCollection
         /* SetModified(); */
 
         base.InsertItem (index, item);
-    } // method InsertItem
+    }
 
     /// <inheritdoc cref="Collection{T}.RemoveItem" />
     protected override void RemoveItem
@@ -293,7 +293,7 @@ public sealed class SubFieldCollection
         }
 
         base.RemoveItem (index);
-    } // method RemoveItem
+    }
 
     /// <inheritdoc cref="Collection{T}.SetItem" />
     protected override void SetItem

@@ -289,7 +289,7 @@ public static class FieldUtility
         }
 
         return result;
-    } // method GetField
+    }
 
     /// <summary>
     /// Выполнение неких действий над полями и подполями.
@@ -494,7 +494,7 @@ public static class FieldUtility
         }
 
         return result;
-    } // method GetFieldCount
+    }
 
     // ==========================================================
 
@@ -689,7 +689,7 @@ public static class FieldUtility
         }
 
         return null;
-    } // method GetFirstField
+    }
 
     /// <summary>
     /// Первое вхождение поля с указанным тегом.
@@ -711,7 +711,7 @@ public static class FieldUtility
         }
 
         return null;
-    } // method GetFirstField
+    }
 
     /// <summary>
     /// Первое вхождение поля с указанным тегом.
@@ -734,7 +734,7 @@ public static class FieldUtility
         }
 
         return null;
-    } // method GetFirstField
+    }
 
     /// <summary>
     /// Первое вхождение поля с любым из перечисленных тегов.
@@ -945,7 +945,7 @@ public static class FieldUtility
         return ReferenceEquals (result, null)
             ? Array.Empty<SubField>()
             : result.ToArray();
-    } // method GetSubField
+    }
 
     /// <summary>
     /// Получение подполей.
@@ -974,7 +974,7 @@ public static class FieldUtility
         return ReferenceEquals (result, null)
             ? Array.Empty<SubField>()
             : result.ToArray();
-    } // method GetSubField
+    }
 
     /// <summary>
     /// Получение подполей.
@@ -1005,7 +1005,7 @@ public static class FieldUtility
         return ReferenceEquals (result, null)
             ? Array.Empty<SubField>()
             : result.ToArray();
-    } // method GetSubField
+    }
 
     /// <summary>
     /// Получение подполя.
@@ -1046,7 +1046,7 @@ public static class FieldUtility
         }
 
         return null;
-    } // method GetSubField
+    }
 
     /// <summary>
     /// Получение подполя.
@@ -1081,7 +1081,7 @@ public static class FieldUtility
         }
 
         return null;
-    } // method GetSubField
+    }
 
     // ==========================================================
 
@@ -1299,7 +1299,7 @@ public static class FieldUtility
         }
 
         return true;
-    } // method HaveNotSubField
+    }
 
     /// <summary>
     /// Нет ни одного подполя с указанными кодами?

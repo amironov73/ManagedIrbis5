@@ -26,79 +26,75 @@ using AM;
 
 #nullable enable
 
-namespace ManagedIrbis.Infrastructure
+namespace ManagedIrbis.Infrastructure;
+
+/// <summary>
+/// JSON-конвертер для типа <see cref="SubField"/>,
+/// чтобы обойти ограничения <c>System.Text.Json.Serialization</c>.
+/// </summary>
+public sealed class SubFieldJsonConverter
+    : JsonConverter<SubField>
 {
-    /// <summary>
-    /// JSON-конвертер для типа <see cref="SubField"/>,
-    /// чтобы обойти ограничения <c>System.Text.Json.Serialization</c>.
-    /// </summary>
-    public sealed class SubFieldJsonConverter
-        : JsonConverter<SubField>
+    /// <inheritdoc cref="JsonConverter{T}.Read"/>
+    public override SubField Read
+        (
+            ref Utf8JsonReader reader,
+            Type typeToConvert,
+            JsonSerializerOptions options
+        )
     {
-        /// <inheritdoc cref="JsonConverter{T}.Read"/>
-        public override SubField Read
-            (
-                ref Utf8JsonReader reader,
-                Type typeToConvert,
-                JsonSerializerOptions options
-            )
+        var result = new SubField();
+
+        while (reader.Read())
         {
-            var result = new SubField();
-
-            while (reader.Read())
+            if (reader.TokenType == JsonTokenType.EndObject)
             {
-                if (reader.TokenType == JsonTokenType.EndObject)
-                {
-                    return result;
-                }
-
-                if (reader.TokenType != JsonTokenType.PropertyName)
-                {
-                    throw new JsonException("Unexpected token");
-                }
-
-                var propertyName = reader.GetString();
-                if (!reader.Read())
-                {
-                    throw new JsonException("Unexpected end");
-                }
-
-                var propertyValue = reader.GetString();
-
-                switch (propertyName)
-                {
-                    case "code":
-                        result.Code = propertyValue.FirstChar();
-                        break;
-
-                    case "value":
-                        result.Value = propertyValue;
-                        break;
-
-                    default:
-                        throw new JsonException("Unknown property name");
-                }
+                return result;
             }
 
-            throw new JsonException("Unexpected end");
+            if (reader.TokenType != JsonTokenType.PropertyName)
+            {
+                throw new JsonException ("Unexpected token");
+            }
 
-        } // method Read
+            var propertyName = reader.GetString();
+            if (!reader.Read())
+            {
+                throw new JsonException ("Unexpected end");
+            }
 
-        /// <inheritdoc cref="JsonConverter{T}.Write"/>
-        public override void Write
-            (
-                Utf8JsonWriter writer,
-                SubField value,
-                JsonSerializerOptions options
-            )
-        {
-            writer.WriteStartObject();
-            writer.WriteString("code", value.Code.ToString());
-            writer.WriteString("value", value.Value);
-            writer.WriteEndObject();
+            var propertyValue = reader.GetString();
 
-        } // method Write
+            switch (propertyName)
+            {
+                case "code":
+                    result.Code = propertyValue.FirstChar();
+                    break;
 
-    } // class SubFieldJsonConverter
+                case "value":
+                    result.Value = propertyValue;
+                    break;
 
-} // namespace ManagedIrbis.Infrastructure
+                default:
+                    throw new JsonException ("Unknown property name");
+            }
+        }
+
+        throw new JsonException ("Unexpected end");
+    }
+
+    /// <inheritdoc cref="JsonConverter{T}.Write"/>
+    public override void Write
+        (
+            Utf8JsonWriter writer,
+            SubField value,
+            JsonSerializerOptions options
+        )
+    {
+        writer.WriteStartObject();
+        writer.WriteString ("code", value.Code.ToString());
+        writer.WriteString ("value", value.Value);
+        writer.WriteEndObject();
+
+    }
+}
