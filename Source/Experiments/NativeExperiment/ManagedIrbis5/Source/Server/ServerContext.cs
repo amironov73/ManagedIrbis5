@@ -33,186 +33,184 @@ using AM.Runtime;
 
 #nullable enable
 
-namespace ManagedIrbis.Server
+namespace ManagedIrbis.Server;
+
+/// <summary>
+/// Серверный контекст, для подключенного клиента.
+/// </summary>
+[XmlRoot ("context")]
+public sealed class ServerContext
+    : IHandmadeSerializable,
+    IVerifiable
 {
+    #region Properties
+
     /// <summary>
-    /// Серверный контекст, для подключенного клиента.
+    /// Адрес клиента (без порта!).
     /// </summary>
-    [XmlRoot("context")]
-    public sealed class ServerContext
-        : IHandmadeSerializable,
-        IVerifiable
+    [XmlElement ("address")]
+    [JsonPropertyName ("address")]
+    public string? Address { get; set; }
+
+    /// <summary>
+    /// Количество выполненных команд от данного клиента.
+    /// </summary>
+    [XmlElement ("commandCount")]
+    [JsonPropertyName ("commandCount")]
+    public int CommandCount { get; set; }
+
+    /// <summary>
+    /// Момент подключения клиента к данному серверу.
+    /// </summary>
+    [XmlElement ("connected")]
+    [JsonPropertyName ("connected")]
+    public DateTime Connected { get; set; }
+
+    /// <summary>
+    /// Уникальный идентификатор клиента.
+    /// </summary>
+    [XmlElement ("id")]
+    [JsonPropertyName ("id")]
+    public string? Id { get; set; }
+
+    /// <summary>
+    /// Момент последней активности данного клиента.
+    /// </summary>
+    [XmlElement ("lastActivity")]
+    [JsonPropertyName ("lastActivity")]
+    public DateTime LastActivity { get; set; }
+
+    /// <summary>
+    /// Код последней выполенной команды от данного клиента.
+    /// </summary>
+    [XmlElement ("lastCommand")]
+    [JsonPropertyName ("lastCommand")]
+    public string? LastCommand { get;set; }
+
+    /// <summary>
+    /// Пароль пользователя.
+    /// </summary>
+    [XmlElement ("password")]
+    [JsonPropertyName ("password")]
+    public string? Password { get; set; }
+
+    /// <summary>
+    /// Логин пользователя.
+    /// </summary>
+    [XmlElement ("username")]
+    [JsonPropertyName ("username")]
+    public string? Username { get; set; }
+
+    /// <summary>
+    /// Код АРМ.
+    /// </summary>
+    [XmlElement ("workstation")]
+    [JsonPropertyName ("workstation")]
+    public string? Workstation { get; set; }
+
+    /// <summary>
+    /// Произвольные пользовательские данные,
+    /// сопоставленные с данным клиентом.
+    /// </summary>
+    [XmlIgnore]
+    [JsonIgnore]
+    public object? UserData { get; set; }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Should serialize the <see cref="CommandCount"/> field?
+    /// </summary>
+    [ExcludeFromCodeCoverage]
+    public bool ShouldSerializeCommandCount() => CommandCount != 0;
+
+    /// <summary>
+    /// Should serialize the <see cref="Connected"/> field?
+    /// </summary>
+    [ExcludeFromCodeCoverage]
+    public bool ShouldSerializeConnected() => Connected != DateTime.MinValue;
+
+    /// <summary>
+    /// Should serialize the <see cref="LastActivity"/> field?
+    /// </summary>
+    [ExcludeFromCodeCoverage]
+    public bool ShouldSerializeLastActivity() => LastActivity != DateTime.MinValue;
+
+    /// <summary>
+    /// Should serialize the <see cref="Workstation"/> field?
+    /// </summary>
+    [ExcludeFromCodeCoverage]
+    public bool ShouldSerializeWorkstation() => !string.IsNullOrEmpty(Workstation);
+
+    #endregion
+
+    #region IHandmadeSerializable members
+
+    /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
+    public void RestoreFromStream
+        (
+            BinaryReader reader
+        )
     {
-        #region Properties
+        Sure.NotNull (reader);
 
-        /// <summary>
-        /// Адрес клиента (без порта!).
-        /// </summary>
-        [XmlElement("address")]
-        [JsonPropertyName("address")]
-        public string? Address { get; set; }
+        Address = reader.ReadNullableString();
+        CommandCount = reader.ReadPackedInt32();
+        Connected = reader.ReadDateTime();
+        Id = reader.ReadNullableString();
+        LastActivity = reader.ReadDateTime();
+        LastCommand = reader.ReadNullableString();
+        Password = reader.ReadNullableString();
+        Username = reader.ReadNullableString();
+        Workstation = reader.ReadNullableString();
+    }
 
-        /// <summary>
-        /// Количество выполненных команд от данного клиента.
-        /// </summary>
-        [XmlElement("commandCount")]
-        [JsonPropertyName("commandCount")]
-        public int CommandCount { get; set; }
+    /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
+    public void SaveToStream
+        (
+            BinaryWriter writer
+        )
+    {
+        Sure.NotNull (writer);
 
-        /// <summary>
-        /// Момент подключения клиента к данному серверу.
-        /// </summary>
-        [XmlElement("connected")]
-        [JsonPropertyName("connected")]
-        public DateTime Connected { get; set; }
+        writer
+            .WriteNullable (Address)
+            .WritePackedInt32 (CommandCount)
+            .Write (Connected)
+            .WriteNullable (Id)
+            .Write (LastActivity)
+            .WriteNullable (LastCommand)
+            .WriteNullable (Password)
+            .WriteNullable (Username)
+            .WriteNullable (Workstation);
+    }
 
-        /// <summary>
-        /// Уникальный идентификатор клиента.
-        /// </summary>
-        [XmlElement("id")]
-        [JsonPropertyName("id")]
-        public string? Id { get; set; }
+    #endregion
 
-        /// <summary>
-        /// Момент последней активности данного клиента.
-        /// </summary>
-        [XmlElement("lastActivity")]
-        [JsonPropertyName("lastActivity")]
-        public DateTime LastActivity { get; set; }
+    #region IVerifiable members
 
-        /// <summary>
-        /// Код последней выполенной команды от данного клиента.
-        /// </summary>
-        [XmlElement("lastCommand")]
-        [JsonPropertyName("lastCommand")]
-        public string? LastCommand { get;set; }
+    /// <inheritdoc cref="IVerifiable.Verify" />
+    public bool Verify
+        (
+            bool throwOnError
+        )
+    {
+        var verifier = new Verifier<ServerContext> (this, throwOnError);
 
-        /// <summary>
-        /// Пароль пользователя.
-        /// </summary>
-        [XmlElement("password")]
-        [JsonPropertyName("password")]
-        public string? Password { get; set; }
+        verifier
+            .NotNullNorEmpty (Id);
 
-        /// <summary>
-        /// Логин пользователя.
-        /// </summary>
-        [XmlElement("username")]
-        [JsonPropertyName("username")]
-        public string? Username { get; set; }
+        return verifier.Result;
+    }
 
-        /// <summary>
-        /// Код АРМ.
-        /// </summary>
-        [XmlElement("workstation")]
-        [JsonPropertyName("workstation")]
-        public string? Workstation { get; set; }
+    #endregion
 
-        /// <summary>
-        /// Произвольные пользовательские данные,
-        /// сопоставленные с данным клиентом.
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        public object? UserData { get; set; }
+    #region Object members
 
-        #endregion
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString() => Id.ToVisibleString();
 
-        #region Public methods
-
-        /// <summary>
-        /// Should serialize the <see cref="CommandCount"/> field?
-        /// </summary>
-        [ExcludeFromCodeCoverage]
-        public bool ShouldSerializeCommandCount() => CommandCount != 0;
-
-        /// <summary>
-        /// Should serialize the <see cref="Connected"/> field?
-        /// </summary>
-        [ExcludeFromCodeCoverage]
-        public bool ShouldSerializeConnected() => Connected != DateTime.MinValue;
-
-        /// <summary>
-        /// Should serialize the <see cref="LastActivity"/> field?
-        /// </summary>
-        [ExcludeFromCodeCoverage]
-        public bool ShouldSerializeLastActivity() => LastActivity != DateTime.MinValue;
-
-        /// <summary>
-        /// Should serialize the <see cref="Workstation"/> field?
-        /// </summary>
-        [ExcludeFromCodeCoverage]
-        public bool ShouldSerializeWorkstation() => !string.IsNullOrEmpty(Workstation);
-
-        #endregion
-
-        #region IHandmadeSerializable members
-
-        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
-        public void RestoreFromStream
-            (
-                BinaryReader reader
-            )
-        {
-            Address = reader.ReadNullableString();
-            CommandCount = reader.ReadPackedInt32();
-            Connected = reader.ReadDateTime();
-            Id = reader.ReadNullableString();
-            LastActivity = reader.ReadDateTime();
-            LastCommand = reader.ReadNullableString();
-            Password = reader.ReadNullableString();
-            Username = reader.ReadNullableString();
-            Workstation = reader.ReadNullableString();
-
-        } // method RestoreFromStream
-
-        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
-        public void SaveToStream
-            (
-                BinaryWriter writer
-            )
-        {
-            writer
-                .WriteNullable(Address)
-                .WritePackedInt32(CommandCount)
-                .Write(Connected)
-                .WriteNullable(Id)
-                .Write(LastActivity)
-                .WriteNullable(LastCommand)
-                .WriteNullable(Password)
-                .WriteNullable(Username)
-                .WriteNullable(Workstation);
-
-        } // method SaveToStream
-
-        #endregion
-
-        #region IVerifiable members
-
-        /// <inheritdoc cref="IVerifiable.Verify" />
-        public bool Verify
-            (
-                bool throwOnError
-            )
-        {
-            var verifier = new Verifier<ServerContext>(this, throwOnError);
-
-            verifier
-                .NotNullNorEmpty(Id, "Id");
-
-            return verifier.Result;
-
-        } // method Verify
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString() => Id.ToVisibleString();
-
-        #endregion
-
-    } // class ServerContext
-
-} // namespace ManagedIrbis.Server
+    #endregion
+}

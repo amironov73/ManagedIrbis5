@@ -28,291 +28,290 @@ using ManagedIrbis.Server.Commands;
 
 #nullable enable
 
-namespace ManagedIrbis.Server
+namespace ManagedIrbis.Server;
+
+/// <summary>
+/// Отображает коды команд на собственно команды.
+/// </summary>
+public class CommandMapper // not sealed!
 {
+    #region Properties
+
     /// <summary>
-    /// Отображает коды команд на собственно команды.
+    /// Серверный движок.
     /// </summary>
-    public class CommandMapper // not sealed!
+    public ServerEngine Engine { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public CommandMapper
+        (
+            ServerEngine engine
+        )
     {
-        #region Properties
+        Sure.NotNull (engine);
 
-        /// <summary>
-        /// Серверный движок.
-        /// </summary>
-        public ServerEngine Engine { get; }
+        Engine = engine;
+    }
 
-        #endregion
+    #endregion
 
-        #region Construction
+    #region Public methods
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public CommandMapper
-            (
-                ServerEngine engine
-            )
+    /// <summary>
+    /// Выбрасывает исключение: обнаружена неизвестная команда.
+    /// </summary>
+    protected virtual ServerCommand UnknownCommand
+        (
+            WorkData _,
+            string commandCode
+        )
+    {
+        throw new IrbisException ("Unknown command: " + commandCode);
+
+    }
+
+    /// <summary>
+    /// Собственно отображение кода команды на команду движка.
+    /// </summary>
+    public virtual ServerCommand MapCommand
+        (
+            WorkData data
+        )
+    {
+        Sure.NotNull (data);
+
+        ServerCommand result;
+        var request = data.Request.ThrowIfNull();
+
+        if (string.IsNullOrEmpty (request.CommandCode1)
+            || string.CompareOrdinal (request.CommandCode1, request.CommandCode2) != 0)
         {
-            Engine = engine;
+            throw new IrbisException();
+        }
 
-        } // constructor
+        var commandCode = request.CommandCode1.ToUpperInvariant();
 
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Выбрасывает исключение: обнаружена неизвестная команда.
-        /// </summary>
-        protected virtual ServerCommand UnknownCommand
-            (
-                WorkData _,
-                string commandCode
-            )
+        switch (commandCode)
         {
-            throw new IrbisException ("Unknown command: " + commandCode);
+            case "!":
+                result = new ListFilesCommand (data);
+                break;
 
-        } // method UnknownCommand
+            case "#":
+                result = new GetDatabaseLockCommand (data);
+                break;
 
-        /// <summary>
-        /// Собственно отображение кода команды на команду движка.
-        /// </summary>
-        public virtual ServerCommand MapCommand
-            (
-                WorkData data
-            )
-        {
-            ServerCommand result;
-            var request = data.Request.ThrowIfNull();
+            case "+1":
+                result = new ServerStatCommand (data);
+                break;
 
-            if (string.IsNullOrEmpty (request.CommandCode1)
-                || string.CompareOrdinal (request.CommandCode1, request.CommandCode2) != 0)
-            {
-                throw new IrbisException();
-            }
+            // case "+2":
+            //     // ???
+            //     result = UnknownCommand(data, commandCode);
+            //     break;
 
-            var commandCode = request.CommandCode1.ToUpperInvariant();
+            case "+3":
+                result = new ListProcessesCommand (data);
+                break;
 
-            switch (commandCode)
-            {
-                case "!":
-                    result = new ListFilesCommand (data);
-                    break;
+            // case "+4":
+            // case "+5":
+            // case "+6":
+            //     // ???
+            //     result = UnknownCommand(data, commandCode);
+            //     break;
+            //
+            // case "+7":
+            //     result = new UpdateUserListCommand(data);
+            //     break;
 
-                case "#":
-                    result = new GetDatabaseLockCommand (data);
-                    break;
+            case "+8":
+                result = new RestartServerCommand(data);
+                break;
 
-                case "+1":
-                    result = new ServerStatCommand (data);
-                    break;
+            case "+9":
+                result = new ListUsersCommand (data);
+                break;
 
-                // case "+2":
-                //     // ???
-                //     result = UnknownCommand(data, commandCode);
-                //     break;
+            case "0":
+                result = new DatabaseInfoCommand (data);
+                break;
 
-                case "+3":
-                    result = new ListProcessesCommand (data);
-                    break;
+            // case "1":
+            //     result = new ServerVersionCommand(data);
+            //     break;
 
-                // case "+4":
-                // case "+5":
-                // case "+6":
-                //     // ???
-                //     result = UnknownCommand(data, commandCode);
-                //     break;
-                //
-                // case "+7":
-                //     result = new UpdateUserListCommand(data);
-                //     break;
+            case "2":
+                result = new DatabaseStatCommand (data);
+                break;
 
-                case "+8":
-                    result = new RestartServerCommand(data);
-                    break;
+            case "3":
+                result = new FormatIsoGroupCommand (data);
+                break;
 
-                case "+9":
-                    result = new ListUsersCommand (data);
-                    break;
+            case "4":
+                // ???
+                result = UnknownCommand (data, commandCode);
+                break;
 
-                case "0":
-                    result = new DatabaseInfoCommand (data);
-                    break;
+            case "5":
+                result = new GblCommand (data);
+                break;
 
-                // case "1":
-                //     result = new ServerVersionCommand(data);
-                //     break;
+            // case "6":
+            //     result = new WriteRecordsCommand(data);
+            //     break;
 
-                case "2":
-                    result = new DatabaseStatCommand (data);
-                    break;
+            case "7":
+                result = new PrintTableCommand (data);
+                break;
 
-                case "3":
-                    result = new FormatIsoGroupCommand (data);
-                    break;
+            // case "8":
+            //     result = new UpdateIniFileCommand(data);
+            //     break;
 
-                case "4":
-                    // ???
-                    result = UnknownCommand (data, commandCode);
-                    break;
+            case "9":
+                result = new ImportIsoCommand (data);
+                break;
 
-                case "5":
-                    result = new GblCommand (data);
-                    break;
+            case "A":
+                result = new ConnectCommand (data);
+                break;
 
-                // case "6":
-                //     result = new WriteRecordsCommand(data);
-                //     break;
+            case "B":
+                result = new DisconnectCommand (data);
+                break;
 
-                case "7":
-                    result = new PrintTableCommand (data);
-                    break;
+            case "C":
+                result = new ReadRecordCommand (data);
+                break;
 
-                // case "8":
-                //     result = new UpdateIniFileCommand(data);
-                //     break;
+            // case "D":
+            //     result = new WriteRecordCommand(data);
+            //     break;
+            //
+            // case "E":
+            //     // Альтернативная разблокировка записи
+            //     result = UnknownCommand(data, commandCode);
+            //     break;
 
-                case "9":
-                    result = new ImportIsoCommand (data);
-                    break;
+            case "F":
+                result = new ActualizeRecordCommand (data);
+                break;
 
-                case "A":
-                    result = new ConnectCommand (data);
-                    break;
+            case "G":
+                result = new FormatCommand (data);
+                break;
 
-                case "B":
-                    result = new DisconnectCommand (data);
-                    break;
+            case "H":
+                result = new ReadTermsCommand (data);
+                break;
 
-                case "C":
-                    result = new ReadRecordCommand (data);
-                    break;
+            case "I":
+                result = new ReadPostingsCommand (data);
+                break;
 
-                // case "D":
-                //     result = new WriteRecordCommand(data);
-                //     break;
-                //
-                // case "E":
-                //     // Альтернативная разблокировка записи
-                //     result = UnknownCommand(data, commandCode);
-                //     break;
+            case "J":
+                result = new GblVirtualCommand (data);
+                break;
 
-                case "F":
-                    result = new ActualizeRecordCommand (data);
-                    break;
+            case "K":
+                result = new SearchCommand (data);
+                break;
 
-                case "G":
-                    result = new FormatCommand (data);
-                    break;
+            case "L":
+                result = new ReadFileCommand (data);
+                break;
 
-                case "H":
-                    result = new ReadTermsCommand (data);
-                    break;
+            case "M":
+                result = new BackupCommand (data);
+                break;
 
-                case "I":
-                    result = new ReadPostingsCommand (data);
-                    break;
+            case "N":
+                result = new NopCommand (data);
+                break;
 
-                case "J":
-                    result = new GblVirtualCommand (data);
-                    break;
+            case "O":
+                result = new MaxMfnCommand (data);
+                break;
 
-                case "K":
-                    result = new SearchCommand (data);
-                    break;
+            case "P":
+                result = new ReadTermsCommand (data) { ReverseOrder = true };
+                break;
 
-                case "L":
-                    result = new ReadFileCommand (data);
-                    break;
+            // case "Q":
+            //     result = new UnlockRecordsCommand(data);
+            //     break;
+            //
+            case "R":
+                result = new FullTextSearchCommand (data);
+                break;
 
-                case "M":
-                    result = new BackupCommand (data);
-                    break;
+            // case "S":
+            //     result = new TruncateDatabaseCommand(data);
+            //     break;
 
-                case "N":
-                    result = new NopCommand (data);
-                    break;
+            case "T":
+                result = new CreateDatabaseCommand (data);
+                break;
 
-                case "O":
-                    result = new MaxMfnCommand (data);
-                    break;
+            // case "U":
+            //     result = new UnlockDatabaseCommand(data);
+            //     break;
+            //
+            case "V":
+                result = new RecordPostingsCommand (data);
+                break;
 
-                case "P":
-                    result = new ReadTermsCommand (data) { ReverseOrder = true };
-                    break;
+            case "W":
+                result = new DeleteDatabaseCommand (data);
+                break;
 
-                // case "Q":
-                //     result = new UnlockRecordsCommand(data);
-                //     break;
-                //
-                case "R":
-                    result = new FullTextSearchCommand (data);
-                    break;
+            case "X":
+                result = new ReloadMasterFileCommand(data);
+                break;
 
-                // case "S":
-                //     result = new TruncateDatabaseCommand(data);
-                //     break;
+            // case "Y":
+            //     result = new ReloadDictionaryCommand(data);
+            //     break;
 
-                case "T":
-                    result = new CreateDatabaseCommand (data);
-                    break;
+            case "Z":
+                result = new CreateDictionaryCommand (data);
+                break;
 
-                // case "U":
-                //     result = new UnlockDatabaseCommand(data);
-                //     break;
-                //
-                case "V":
-                    result = new RecordPostingsCommand (data);
-                    break;
+            //===================================================
 
-                case "W":
-                    result = new DeleteDatabaseCommand (data);
-                    break;
+            // Расширенные команды,
+            // не поддерживаемые стандартным сервером
 
-                case "X":
-                    result = new ReloadMasterFileCommand(data);
-                    break;
+            // case "STOP":
+            //     result = new StopServerCommand(data);
+            //     break;
 
-                // case "Y":
-                //     result = new ReloadDictionaryCommand(data);
-                //     break;
+            case "FLUSH":
+                result = new FlushServerCommand (data);
+                break;
 
-                case "Z":
-                    result = new CreateDictionaryCommand (data);
-                    break;
+            case "DUMP":
+                result = new DumpStateCommand (data);
+                break;
 
-                //===================================================
+            //===================================================
 
-                // Расширенные команды,
-                // не поддерживаемые стандартным сервером
+            default:
+                result = UnknownCommand (data, commandCode);
+                break;
 
-                // case "STOP":
-                //     result = new StopServerCommand(data);
-                //     break;
+        }
 
-                case "FLUSH":
-                    result = new FlushServerCommand (data);
-                    break;
+        return result;
+    }
 
-                case "DUMP":
-                    result = new DumpStateCommand (data);
-                    break;
-
-                //===================================================
-
-                default:
-                    result = UnknownCommand (data, commandCode);
-                    break;
-
-            } // switch
-
-            return result;
-
-        } // method MapCommand
-
-        #endregion
-
-    } // class CommandMapper
-
-} // namespace ManagedIrbis.Server
+    #endregion
+}

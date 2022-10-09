@@ -66,6 +66,8 @@ public sealed class ServerResponse
             ClientRequest request
         )
     {
+        Sure.NotNull (request);
+
         Memory = new MemoryStream();
 
         WriteAnsiString (request.CommandCode1).NewLine();
@@ -120,7 +122,7 @@ public sealed class ServerResponse
         result[3] = Memory.ToArray();
 
         return result;
-    } // method Encode
+    }
 
     /// <summary>
     /// Write line break.

@@ -159,7 +159,7 @@ public class ServerEngine
     public ValueTask DisposeAsync()
     {
         throw new NotImplementedException();
-    } // method DisposeAsync
+    }
 
     #endregion
 
@@ -173,6 +173,8 @@ public class ServerEngine
             ServerSetup setup
         )
     {
+        Sure.NotNull (setup);
+
         Magna.Logger.LogTrace (nameof (ServerEngine) + "::Constructor" + ": enter");
 
         if (setup.Break)
@@ -1050,7 +1052,7 @@ public class ServerEngine
     public void WaitForWorkers()
     {
         var tasks = Workers
-            .Select (worker => worker.Data.Task.ThrowIfNull (nameof (worker.Data.Task)))
+            .Select (worker => worker.Data.Task.ThrowIfNull())
             .ToArray();
 
         if (tasks.Length != 0)
