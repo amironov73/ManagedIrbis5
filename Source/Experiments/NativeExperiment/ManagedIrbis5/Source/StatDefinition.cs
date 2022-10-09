@@ -25,151 +25,149 @@ using ManagedIrbis.Providers;
 
 #nullable enable
 
-namespace ManagedIrbis
+namespace ManagedIrbis;
+
+/// <summary>
+/// Параметры для команды Stat.
+/// </summary>
+public sealed class StatDefinition
 {
+    #region Nested classes
+
     /// <summary>
-    /// Параметры для команды Stat.
+    /// Sort method.
     /// </summary>
-    public sealed class StatDefinition
+    public enum SortMethod
     {
-        #region Nested classes
+        /// <summary>
+        /// Don't sort.
+        /// </summary>
+        None = 0,
 
         /// <summary>
-        /// Sort method.
+        /// Ascending sort.
         /// </summary>
-        public enum SortMethod
-        {
-            /// <summary>
-            /// Don't sort.
-            /// </summary>
-            None = 0,
-
-            /// <summary>
-            /// Ascending sort.
-            /// </summary>
-            Ascending = 1,
-
-            /// <summary>
-            /// Descending sort.
-            /// </summary>
-            Descending = 2
-        }
+        Ascending = 1,
 
         /// <summary>
-        /// Stat item.
+        /// Descending sort.
         /// </summary>
-        public sealed class Item
-        {
-            #region Properties
+        Descending = 2
+    }
 
-            /// <summary>
-            /// Field (possibly with subfield) specification.
-            /// </summary>
-            public string? Field { get; set; }
-
-            /// <summary>
-            /// Maximum length of the value (truncation).
-            /// </summary>
-            public int Length { get; set; }
-
-            /// <summary>
-            /// Count of items to take.
-            /// </summary>
-            public int Count { get; set; }
-
-            /// <summary>
-            /// How to sort result.
-            /// </summary>
-            public SortMethod Sort { get; set; }
-
-            #endregion
-
-            #region Object members
-
-            /// <inheritdoc cref="object.ToString"/>
-            public override string ToString() => $"{Field},{Length},{Count},{(int)Sort}";
-
-            #endregion
-        }
-
-        #endregion
-
+    /// <summary>
+    /// Stat item.
+    /// </summary>
+    public sealed class Item
+    {
         #region Properties
 
         /// <summary>
-        /// Database name.
+        /// Field (possibly with subfield) specification.
         /// </summary>
-        public string? DatabaseName { get; set; }
+        public string? Field { get; set; }
 
         /// <summary>
-        /// Items.
+        /// Maximum length of the value (truncation).
         /// </summary>
-        public List<Item> Items { get; } = new();
+        public int Length { get; set; }
 
         /// <summary>
-        /// Search query specification.
+        /// Count of items to take.
         /// </summary>
-        public string? SearchQuery { get; set; }
+        public int Count { get; set; }
 
         /// <summary>
-        /// Minimal MFN.
+        /// How to sort result.
         /// </summary>
-        public int MinMfn { get; set; }
-
-        /// <summary>
-        /// Maximal MFN.
-        /// </summary>
-        public int MaxMfn { get; set; }
-
-        /// <summary>
-        /// Optional query for sequential search.
-        /// </summary>
-        public string? SequentialQuery { get; set; }
-
-        /// <summary>
-        /// List of MFN.
-        /// </summary>
-        public List<int> MfnList { get; } = new();
+        public SortMethod Sort { get; set; }
 
         #endregion
 
-        #region Public methods
+        #region Object members
 
-        /// <summary>
-        /// Кодирование в пользовательский запрос.
-        /// </summary>
-        public void Encode<T>
-            (
-                IIrbisProvider connection,
-                T query
-            )
-            where T: IQuery
-        {
-            // "2"               STAT
-            // "IBIS"            database
-            // "v200^a,10,100,1" field
-            // "T=A$"            search
-            // "0"               min
-            // "0"               max
-            // ""                sequential
-            // ""                mfn list
-
-            var items = string.Join(IrbisText.IrbisDelimiter, Items);
-            var mfns = string.Join(",", MfnList);
-            query.AddAnsi(connection.EnsureDatabase(DatabaseName));
-            query.AddAnsi(items);
-            query.AddUtf(SearchQuery);
-            query.Add(MinMfn);
-            query.Add(MaxMfn);
-            query.AddUtf(SequentialQuery);
-
-            // TODO: реализовать список MFN
-            query.AddAnsi(mfns);
-
-        } // method Encode
+        /// <inheritdoc cref="object.ToString"/>
+        public override string ToString() => $"{Field},{Length},{Count},{(int) Sort}";
 
         #endregion
+    }
 
-    } // class StatDefinition
+    #endregion
 
-} // namespace ManagedIrbis
+    #region Properties
+
+    /// <summary>
+    /// Database name.
+    /// </summary>
+    public string? DatabaseName { get; set; }
+
+    /// <summary>
+    /// Items.
+    /// </summary>
+    public List<Item> Items { get; } = new();
+
+    /// <summary>
+    /// Search query specification.
+    /// </summary>
+    public string? SearchQuery { get; set; }
+
+    /// <summary>
+    /// Minimal MFN.
+    /// </summary>
+    public int MinMfn { get; set; }
+
+    /// <summary>
+    /// Maximal MFN.
+    /// </summary>
+    public int MaxMfn { get; set; }
+
+    /// <summary>
+    /// Optional query for sequential search.
+    /// </summary>
+    public string? SequentialQuery { get; set; }
+
+    /// <summary>
+    /// List of MFN.
+    /// </summary>
+    public List<int> MfnList { get; } = new();
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Кодирование в пользовательский запрос.
+    /// </summary>
+    public void Encode<T>
+        (
+            IIrbisProvider connection,
+            T query
+        )
+        where T: IQuery
+    {
+        Sure.NotNull (connection);
+
+        // "2"               STAT
+        // "IBIS"            database
+        // "v200^a,10,100,1" field
+        // "T=A$"            search
+        // "0"               min
+        // "0"               max
+        // ""                sequential
+        // ""                mfn list
+
+        var items = string.Join (IrbisText.IrbisDelimiter, Items);
+        var mfns = string.Join (",", MfnList);
+        query.AddAnsi (connection.EnsureDatabase(DatabaseName));
+        query.AddAnsi (items);
+        query.AddUtf (SearchQuery);
+        query.Add (MinMfn);
+        query.Add (MaxMfn);
+        query.AddUtf (SequentialQuery);
+
+        // TODO: реализовать список MFN
+        query.AddAnsi (mfns);
+    }
+
+    #endregion
+}
