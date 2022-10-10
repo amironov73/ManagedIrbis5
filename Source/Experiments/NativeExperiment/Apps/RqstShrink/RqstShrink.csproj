@@ -3,19 +3,23 @@
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <ApplicationIcon>Shrink.ico</ApplicationIcon>
-        <SignAssembly>true</SignAssembly>
-        <AssemblyOriginatorKeyFile>ArsMagna.private.snk</AssemblyOriginatorKeyFile>
-        <DelaySign>false</DelaySign>
     </PropertyGroup>
 
     <PropertyGroup>
-        <!-- Generate native image -->
+        <!-- Native image -->
         <PublishAot>true</PublishAot>
         <StripSymbols>true</StripSymbols>
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\Libs\AM.Core5\AM.Core5.csproj" />
+      <ProjectReference Include="..\..\Libs\ManagedIrbis5\ManagedIrbis5.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="Microsoft.DotNet.ILCompiler" Version="7.0.0-rc.1.22426.10" />
+        <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0-rc.1.22426.10" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.0-rc.1.22426.10" />
         <PackageReference Include="System.CommandLine" Version="2.0.0-beta3.22114.1" />
     </ItemGroup>
 
@@ -25,5 +29,5 @@
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
     </ItemGroup>
-
+    
 </Project>

@@ -26,12 +26,14 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 using AM;
 using AM.Collections;
 using AM.IO;
+using AM.Linq;
 
 using ManagedIrbis.Gbl;
 using ManagedIrbis.Infrastructure;
@@ -206,12 +208,10 @@ public class SyncConnection
             Response? result;
             try
             {
-                /*
-                if (_debug)
-                {
-                    query.Debug(Console.Out);
-                }
-                */
+                //if (_debug)
+                //{
+                //    query.Debug (Console.Out);
+                //}
 
                 result = Socket.TransactSync (query);
             }
@@ -232,7 +232,7 @@ public class SyncConnection
             {
                 if (perfRecord is not null)
                 {
-                    perfRecord.ElapsedTime = (int)stopwatch!.ElapsedMilliseconds;
+                    perfRecord.ElapsedTime = (int) stopwatch!.ElapsedMilliseconds;
                     perfRecord.ErrorMessage = "No response";
                     _performanceCollector!.Collect (perfRecord);
                 }
@@ -240,12 +240,10 @@ public class SyncConnection
                 return null;
             }
 
-            /*
-            if (_debug)
-            {
-                result.Debug(Console.Out);
-            }
-            */
+            //if (_debug)
+            //{
+            //    result.Debug (Console.Out);
+            //}
 
             result.Parse();
             if (perfRecord is not null)
@@ -572,7 +570,7 @@ public class SyncConnection
 
         response.IsGood();
 
-        return response?.ReturnCode ?? LastError;
+        return response?.ReturnCode - 1 ?? LastError;
     }
 
     /// <inheritdoc cref="ISyncProvider.GetServerStat"/>
@@ -659,7 +657,7 @@ public class SyncConnection
         using var response = ExecuteSync (query);
 
         return response?.ReadRemainingUtfText();
-    }
+    } // method PrintTable
 
     /// <inheritdoc cref="ISyncProvider.ReadBinaryFile"/>
     public byte[]? ReadBinaryFile

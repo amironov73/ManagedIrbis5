@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\ManagedIrbis5\ManagedIrbis5.csproj" />
+    <ProjectReference Include="..\..\Libs\ManagedIrbis5\ManagedIrbis5.csproj" />
   </ItemGroup>
 
   <ItemGroup>

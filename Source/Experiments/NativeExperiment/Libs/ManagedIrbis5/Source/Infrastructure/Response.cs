@@ -132,7 +132,7 @@ public sealed class Response
         }
 
         return true;
-    }
+    } // method CheckReturnCode
 
     /// <summary>
     /// Проверка кода возврата.
@@ -301,10 +301,15 @@ public sealed class Response
                 break;
             }
 
-            if (one < ' ')
+            if (one is 0 or 10)
             {
                 break;
             }
+
+            // if (one < ' ')
+            // {
+            //     break;
+            // }
 
             result.WriteByte (one);
         }
@@ -401,6 +406,8 @@ public sealed class Response
                 writer.Write ($" {b:X2}");
             }
         }
+
+        writer.WriteLine();
     }
 
     /// <summary>
@@ -429,6 +436,8 @@ public sealed class Response
         {
             writer.Write (IrbisEncoding.Utf8.GetString (memory));
         }
+
+        writer.WriteLine();
     }
 
     /// <summary>
@@ -499,7 +508,7 @@ public sealed class Response
             int count
         )
     {
-        Sure.Positive (count);
+        Sure.Positive (count, nameof (count));
 
         var result = new List<string> (count);
         for (var i = 0; i < count; i++)
@@ -527,7 +536,7 @@ public sealed class Response
             int count
         )
     {
-        Sure.Positive (count);
+        Sure.Positive (count, nameof (count));
 
         var result = new List<string> (count);
         var index = 0;

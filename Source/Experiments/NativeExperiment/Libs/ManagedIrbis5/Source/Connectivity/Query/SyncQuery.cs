@@ -209,6 +209,8 @@ public readonly struct SyncQuery
         {
             writer.Write ($" {b:X2}");
         }
+
+        writer.WriteLine();
     }
 
     /// <summary>
@@ -235,6 +237,7 @@ public readonly struct SyncQuery
         writer ??= Console.Out;
 
         writer.WriteLine (IrbisEncoding.Utf8.GetString (_writer.WrittenSpan));
+        writer.WriteLine();
     }
 
     /// <summary>

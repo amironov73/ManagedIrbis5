@@ -18,6 +18,8 @@
 
 using System.Collections.Generic;
 
+using AM;
+
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Providers;
 

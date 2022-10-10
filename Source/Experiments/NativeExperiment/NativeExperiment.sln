@@ -3,11 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManagedIrbis5", "ManagedIrbis5\ManagedIrbis5.csproj", "{C9E20492-E5DE-42CD-B44B-498B0BEC35B9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManagedIrbis5", "Libs\ManagedIrbis5\ManagedIrbis5.csproj", "{C9E20492-E5DE-42CD-B44B-498B0BEC35B9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApplicationOne", "ApplicationOne\ApplicationOne.csproj", "{9D7ECB3D-5346-4CB3-806B-AD476285AFAF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApplicationOne", "Apps\ApplicationOne\ApplicationOne.csproj", "{9D7ECB3D-5346-4CB3-806B-AD476285AFAF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AM.Core5", "AM.Core5\AM.Core5.csproj", "{875B564A-0056-4F3C-AFD8-ECCFBA499E22}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AM.Core5", "Libs\AM.Core5\AM.Core5.csproj", "{875B564A-0056-4F3C-AFD8-ECCFBA499E22}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Apps", "Apps", "{4060B759-937E-4ED4-BDFD-2E1DBFD140E7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libs", "Libs", "{831480D6-94E6-4DC1-8222-7F823401D7BE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RqstShrink", "Apps\RqstShrink\RqstShrink.csproj", "{CBC08C34-930F-4DD7-9800-31C5192571E5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,5 +36,15 @@ Global
 		{875B564A-0056-4F3C-AFD8-ECCFBA499E22}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{875B564A-0056-4F3C-AFD8-ECCFBA499E22}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{875B564A-0056-4F3C-AFD8-ECCFBA499E22}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CBC08C34-930F-4DD7-9800-31C5192571E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CBC08C34-930F-4DD7-9800-31C5192571E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CBC08C34-930F-4DD7-9800-31C5192571E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CBC08C34-930F-4DD7-9800-31C5192571E5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{9D7ECB3D-5346-4CB3-806B-AD476285AFAF} = {4060B759-937E-4ED4-BDFD-2E1DBFD140E7}
+		{875B564A-0056-4F3C-AFD8-ECCFBA499E22} = {831480D6-94E6-4DC1-8222-7F823401D7BE}
+		{C9E20492-E5DE-42CD-B44B-498B0BEC35B9} = {831480D6-94E6-4DC1-8222-7F823401D7BE}
+		{CBC08C34-930F-4DD7-9800-31C5192571E5} = {4060B759-937E-4ED4-BDFD-2E1DBFD140E7}
 	EndGlobalSection
 EndGlobal

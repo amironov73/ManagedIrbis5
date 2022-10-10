@@ -3,6 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
 
 /* SearchParameters.cs -- параметры поискового запроса
  * Ars Magna project, http://arsmagna.ru
@@ -19,6 +20,7 @@ using AM.IO;
 using AM.Runtime;
 
 using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Providers;
 
 #endregion
 
@@ -31,7 +33,7 @@ namespace ManagedIrbis;
 /// </summary>
 public sealed class SearchParameters
     : IHandmadeSerializable,
-    IVerifiable
+      IVerifiable
 {
     #region Properties
 
@@ -126,9 +128,20 @@ public sealed class SearchParameters
             IConnectionSettings connection,
             TQuery query
         )
-        where TQuery: IQuery
+        where TQuery : IQuery
     {
-        var database = Database.ThrowIfNull();
+        Sure.NotNull (connection);
+
+        var database = Database;
+        if (string.IsNullOrEmpty (database))
+        {
+            if (connection is IIrbisProvider provider)
+            {
+                database = provider.EnsureDatabase();
+            }
+        }
+
+        Sure.NotNullNorEmpty (database);
 
         query.AddAnsi (database);
         query.AddUtf (Expression);
@@ -191,12 +204,12 @@ public sealed class SearchParameters
             bool throwOnError
         )
     {
-        var verifier = new Verifier<SearchParameters>(this, throwOnError);
+        var verifier = new Verifier<SearchParameters> (this, throwOnError);
 
         verifier.Assert
             (
-                !string.IsNullOrWhiteSpace(Expression)
-                || !string.IsNullOrWhiteSpace(Sequential),
+                !string.IsNullOrWhiteSpace (Expression)
+                || !string.IsNullOrWhiteSpace (Sequential),
                 "Expression and Sequential"
             );
 
