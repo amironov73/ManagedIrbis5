@@ -2,6 +2,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
+using System;
 using System.IO;
 
 using AM.Text;
@@ -117,7 +118,7 @@ public sealed class SyncQueryTest
         var dump = output.ToString();
         Assert.AreEqual
             (
-                " 41 0A 0A 41 0A 30 0A 30 0A 0A 0A 0A 0A 0A 48 65 6C 6C 6F 0A",
+                " 41 0A 0A 41 0A 30 0A 30 0A 0A 0A 0A 0A 0A 48 65 6C 6C 6F 0A" + Environment.NewLine,
                 dump
             );
     }
@@ -149,7 +150,7 @@ public sealed class SyncQueryTest
         var dump = output.ToString().DosToUnix();
         Assert.AreEqual
             (
-                "A\n\nA\n0\n0\n\n\n\n\n\nПривет\n\n",
+                "A\n\nA\n0\n0\n\n\n\n\n\nПривет\n\n\n",
                 dump
             );
     }

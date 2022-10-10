@@ -87,6 +87,14 @@ internal static class Program
                 }
 
                 var maxMfn = connection.GetMaxMfn();
+                if (maxMfn <= 0)
+                {
+                    WriteLine ("Empty database, no truncation needed");
+
+                    return 0;
+                }
+
+                WriteLine ($"Database length={maxMfn}");
 
                 var expression = config.GetValue<string> ("Expression");
                 var expressionValue = parseResult.GetValueForOption (exprOption);
@@ -102,8 +110,8 @@ internal static class Program
                 var goodRecords = BatchRecordReader.Search
                         (
                             connection,
-                            connection.Database!,
                             expression,
+                            connection.EnsureDatabase(),
                             1000,
                             batch => Write (".")
                         )
@@ -126,7 +134,7 @@ internal static class Program
                 using (var writer = new BatchRecordWriter
                            (
                                connection,
-                               connection.Database!,
+                               connection.EnsureDatabase(),
                                500
                            ))
                 {
