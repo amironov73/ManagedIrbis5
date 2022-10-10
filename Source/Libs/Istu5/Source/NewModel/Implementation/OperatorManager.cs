@@ -17,6 +17,8 @@
 using System;
 using System.Linq;
 
+using AM;
+
 using Istu.NewModel.Interfaces;
 
 using LinqToDB;
@@ -58,6 +60,8 @@ public sealed class OperatorManager
             Storehouse storehouse
         )
     {
+        Sure.NotNull (storehouse);
+
         Storehouse = storehouse;
     }
 
@@ -74,12 +78,26 @@ public sealed class OperatorManager
     #region IOperatorManager members
 
     /// <inheritdoc cref="IOperatorManager.GetOperatorByBarcode"/>
-    public Operator? GetOperatorByBarcode (string barcode) =>
-        Operators.FirstOrDefault (op => op.Barcode == barcode);
+    public Operator? GetOperatorByBarcode
+        (
+            string barcode
+        )
+    {
+        Sure.NotNullNorEmpty (barcode);
+
+        return Operators.FirstOrDefault (op => op.Barcode == barcode);
+    }
 
     /// <inheritdoc cref="IOperatorManager.GetOperatorByID"/>
-    public Operator? GetOperatorByID (int id) =>
-        Operators.FirstOrDefault (op => op.ID == id);
+    public Operator? GetOperatorByID
+        (
+            int id
+        )
+    {
+        Sure.Positive (id);
+
+        return Operators.FirstOrDefault (op => op.ID == id);
+    }
 
     /// <inheritdoc cref="IOperatorManager.ListAllOperators"/>
     public Operator[] ListAllOperators() => Operators.ToArray();
@@ -96,8 +114,7 @@ public sealed class OperatorManager
             _dataConnection.Dispose();
             _dataConnection = null;
         }
-
-    } // method Dispose
+    }
 
     #endregion
 }
