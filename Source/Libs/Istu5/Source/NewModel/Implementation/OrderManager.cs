@@ -18,6 +18,8 @@
 using System;
 using System.Linq;
 
+using AM;
+
 using Istu.NewModel.Interfaces;
 
 using LinqToDB;
@@ -59,6 +61,8 @@ public sealed class OrderManager
             Storehouse storehouse
         )
     {
+        Sure.NotNull (storehouse);
+
         Storehouse = storehouse;
     }
 
@@ -95,6 +99,8 @@ public sealed class OrderManager
             bool throwOnVerify = true
         )
     {
+        Sure.NotNull (order);
+
         if (order.Verify (throwOnVerify))
         {
             var db = _GetDb();
@@ -105,7 +111,7 @@ public sealed class OrderManager
 
         return false;
 
-    } // method CreateOrder
+    }
 
     /// <inheritdoc cref="IOrderManager.DeleteOrder"/>
     public int DeleteOrder (int id) => Orders.Delete (order => order.Id == id);
@@ -131,11 +137,19 @@ public sealed class OrderManager
 
         return result;
 
-    } // method SetOrderStatus
+    }
 
     /// <inheritdoc cref="IOrderManager.UpdateOrder"/>
-    public int UpdateOrder (Order order, bool throwOnVerify = true) =>
-        order.Verify (throwOnVerify) ? _GetDb().Update (order) : -1;
+    public int UpdateOrder
+        (
+            Order order,
+            bool throwOnVerify = true
+        )
+    {
+        Sure.NotNull (order);
+
+        return order.Verify (throwOnVerify) ? _GetDb().Update (order) : -1;
+    }
 
     #endregion
 
@@ -150,7 +164,7 @@ public sealed class OrderManager
             _dataConnection = null;
         }
 
-    } // method Dispose
+    }
 
     #endregion
 }
