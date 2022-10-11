@@ -47,7 +47,7 @@ public sealed class ByteNavigator
     /// <summary>
     /// Используемая кодировка.
     /// </summary>
-    public Encoding Encoding { get; private set; }
+    public Encoding Encoding { get; }
 
     /// <summary>
     /// Достигнут конец данных?
@@ -58,7 +58,7 @@ public sealed class ByteNavigator
     /// <summary>
     /// Длина массива.
     /// </summary>
-    public int Length { get; private set; }
+    public int Length { get; }
 
     /// <summary>
     /// Текущая позиция.
@@ -70,20 +70,22 @@ public sealed class ByteNavigator
     #region Construction
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор.
     /// </summary>
     public ByteNavigator
         (
             byte[] data
         )
     {
+        Sure.NotNull (data);
+
         _data = data;
         Length = data.Length;
         Encoding = Encoding.Default;
     }
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор.
     /// </summary>
     public ByteNavigator
         (
@@ -91,7 +93,8 @@ public sealed class ByteNavigator
             int length
         )
     {
-        Sure.NonNegative(length, nameof(length));
+        Sure.NotNull (data);
+        Sure.NonNegative (length);
 
         if (length > data.Length)
         {
@@ -104,7 +107,7 @@ public sealed class ByteNavigator
     }
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор.
     /// </summary>
     public ByteNavigator
         (
@@ -113,7 +116,9 @@ public sealed class ByteNavigator
             Encoding encoding
         )
     {
-        Sure.NonNegative(length, nameof(length));
+        Sure.NotNull (data);
+        Sure.NonNegative (length);
+        Sure.NotNull (encoding);
 
         if (length > data.Length)
         {
@@ -126,7 +131,7 @@ public sealed class ByteNavigator
     }
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор.
     /// </summary>
     public ByteNavigator
         (
@@ -136,8 +141,10 @@ public sealed class ByteNavigator
             Encoding encoding
         )
     {
-        Sure.NonNegative(offset, nameof(offset));
-        Sure.NonNegative(length, nameof(length));
+        Sure.NotNull (data);
+        Sure.NonNegative (offset);
+        Sure.NonNegative (length);
+        Sure.NotNull (encoding);
 
         if (length > data.Length)
         {
@@ -165,13 +172,8 @@ public sealed class ByteNavigator
     /// </summary>
     public ByteNavigator Clone()
     {
-        var result = new ByteNavigator
-            (
-                _data,
-                Length
-            )
+        var result = new ByteNavigator (_data, Length, Encoding)
             {
-                Encoding = Encoding,
                 Position = Position
             };
 
@@ -186,10 +188,10 @@ public sealed class ByteNavigator
             string fileName
         )
     {
-        Sure.NotNullNorEmpty(fileName, nameof(fileName));
+        Sure.NotNullNorEmpty (fileName);
 
-        var data = File.ReadAllBytes(fileName);
-        var result = new ByteNavigator(data);
+        var data = File.ReadAllBytes (fileName);
+        var result = new ByteNavigator (data);
 
         return result;
     }
@@ -204,8 +206,8 @@ public sealed class ByteNavigator
             return null;
         }
 
-        var result = new Span<byte>(_data)
-            .Slice(Position).ToArray();
+        var result = new Span<byte> (_data)
+            .Slice (Position).ToArray();
 
         return result;
     }
@@ -213,52 +215,52 @@ public sealed class ByteNavigator
     /// <summary>
     /// Управляющий символ?
     /// </summary>
-    public bool IsControl() => char.IsControl(PeekChar());
+    public bool IsControl() => char.IsControl (PeekChar());
 
     /// <summary>
     /// Цифра?
     /// </summary>
-    public bool IsDigit() => char.IsDigit(PeekChar());
+    public bool IsDigit() => char.IsDigit (PeekChar());
 
     /// <summary>
     /// Буква?
     /// </summary>
-    public bool IsLetter() => char.IsLetter(PeekChar());
+    public bool IsLetter() => char.IsLetter (PeekChar());
 
     /// <summary>
     /// Буква или цифра?
     /// </summary>
-    public bool IsLetterOrDigit() => char.IsLetterOrDigit(PeekChar());
+    public bool IsLetterOrDigit() => char.IsLetterOrDigit (PeekChar());
 
     /// <summary>
     /// Часть числа?
     /// </summary>
-    public bool IsNumber() => char.IsNumber(PeekChar());
+    public bool IsNumber() => char.IsNumber (PeekChar());
 
     /// <summary>
     /// Знак пунктуации?
     /// </summary>
-    public bool IsPunctuation() => char.IsPunctuation(PeekChar());
+    public bool IsPunctuation() => char.IsPunctuation (PeekChar());
 
     /// <summary>
     /// Разделитель?
     /// </summary>
-    public bool IsSeparator() => char.IsSeparator(PeekChar());
+    public bool IsSeparator() => char.IsSeparator (PeekChar());
 
     /// <summary>
     /// Суррогат?
     /// </summary>
-    public bool IsSurrogate() => char.IsSurrogate(PeekChar());
+    public bool IsSurrogate() => char.IsSurrogate (PeekChar());
 
     /// <summary>
     /// Символ?
     /// </summary>
-    public bool IsSymbol() => char.IsSymbol(PeekChar());
+    public bool IsSymbol() => char.IsSymbol (PeekChar());
 
     /// <summary>
     /// Пробельный символ?
     /// </summary>
-    public bool IsWhiteSpace() => char.IsWhiteSpace(PeekChar());
+    public bool IsWhiteSpace() => char.IsWhiteSpace (PeekChar());
 
     /// <summary>
     /// Абсолютное перемещение.
@@ -272,10 +274,12 @@ public sealed class ByteNavigator
         {
             position = Length;
         }
+
         if (position < 0)
         {
             position = 0;
         }
+
         Position = position;
     }
 
@@ -292,6 +296,7 @@ public sealed class ByteNavigator
         {
             Position = Length;
         }
+
         if (Position < 0)
         {
             Position = 0;
@@ -347,7 +352,7 @@ public sealed class ByteNavigator
             return '\0';
         }
 
-        var result = (char)_data[Position];
+        var result = (char) _data[Position];
         Position++;
 
         return result;
@@ -410,8 +415,9 @@ public sealed class ByteNavigator
             {
                 break;
             }
+
             c = ReadChar();
-            builder.Append(c);
+            builder.Append (c);
         }
 
         if (!IsEOF)
@@ -423,6 +429,7 @@ public sealed class ByteNavigator
                 ReadChar();
                 c = PeekChar();
             }
+
             if (c == '\n')
             {
                 ReadChar();
@@ -433,7 +440,7 @@ public sealed class ByteNavigator
     }
 
     /// <summary>
-    /// Пропускаем строку
+    /// Пропуск строки.
     /// </summary>
     public void SkipLine()
     {
@@ -449,6 +456,7 @@ public sealed class ByteNavigator
             {
                 break;
             }
+
             ReadChar();
         }
 
@@ -461,6 +469,7 @@ public sealed class ByteNavigator
                 ReadChar();
                 c = PeekChar();
             }
+
             if (c == '\n')
             {
                 ReadChar();
