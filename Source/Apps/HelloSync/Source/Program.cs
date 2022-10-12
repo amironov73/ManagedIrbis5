@@ -85,10 +85,7 @@ internal static class Program
             WriteLine ($"Database={connection.Database}, max MFN={maxMfn}");
 
             var dbInfo = connection.GetDatabaseInfo();
-            if (dbInfo is not null)
-            {
-                dbInfo.Write (Out);
-            }
+            dbInfo?.Write (Out);
 
             connection.NoOperation();
             WriteLine ("NOP");

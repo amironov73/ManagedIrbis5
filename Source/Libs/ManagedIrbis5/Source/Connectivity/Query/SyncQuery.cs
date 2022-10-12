@@ -19,8 +19,8 @@ using System.IO;
 
 using AM;
 
-using Microsoft.Toolkit.HighPerformance;
-using Microsoft.Toolkit.HighPerformance.Buffers;
+using CommunityToolkit.HighPerformance;
+using CommunityToolkit.HighPerformance.Buffers;
 
 #endregion
 
@@ -41,10 +41,6 @@ namespace ManagedIrbis.Infrastructure;
 // Оверхеда на копирование нет, т. к. копирование этой
 // структуры равноценно передаче простого указателя
 // на поток.
-//
-// Единственная беда -- вынужденное дублирование кода.
-// Его, насколько смог, победил с помощью класса
-// QueryStream.
 //
 
 /// <summary>
