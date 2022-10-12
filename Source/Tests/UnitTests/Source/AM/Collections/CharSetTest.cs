@@ -1,7 +1,12 @@
-﻿// ReSharper disable CheckNamespace
-// ReSharper disable ExpressionIsAlwaysNull
-// ReSharper disable EqualExpressionComparison
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable IdentifierTypo
+// ReSharper disable CommentTypo
 // ReSharper disable StringLiteralTypo
+
+#region Using directives
 
 using System;
 using System.Collections;
@@ -13,6 +18,8 @@ using AM.Collections;
 using AM.Runtime;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#endregion
 
 #nullable enable
 
@@ -93,7 +100,7 @@ public sealed class CharSetTest
     [ExpectedException (typeof (ArgumentException))]
     public void CharSet_Add_2a()
     {
-        var charSet = new CharSet { "a\\" };
+        _ = new CharSet { "a\\" };
     }
 
     [TestMethod]
@@ -110,7 +117,7 @@ public sealed class CharSetTest
     [ExpectedException (typeof (ArgumentException))]
     public void CharSet_Add_3a()
     {
-        var charSet = new CharSet { "a-" };
+        _ = new CharSet { "a-" };
     }
 
     [TestMethod]
@@ -190,7 +197,7 @@ public sealed class CharSetTest
     // [TestMethod]
     // public void CharSet_JsonSerialization_1()
     // {
-    //     var charSet = new CharSet("abcdef");
+    //     var charSet = new CharSet ("abcdef");
     //     var actual = JsonConvert.SerializeObject
     //         (
     //             charSet,
@@ -295,7 +302,10 @@ public sealed class CharSetTest
         Assert.IsTrue (first.Equals (second));
         Assert.IsTrue (first.Equals (first));
         Assert.IsTrue (second.Equals (first));
+
+        // ReSharper disable EqualExpressionComparison
         Assert.IsTrue (second.Equals (second));
+        // ReSharper restore EqualExpressionComparison
 
         second = new CharSet ("bcd");
         Assert.IsFalse (first.Equals (second));
