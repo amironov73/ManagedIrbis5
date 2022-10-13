@@ -1,15 +1,21 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 // ReSharper disable CheckNamespace
 // ReSharper disable CollectionNeverQueried.Local
 // ReSharper disable CollectionNeverUpdated.Local
 // ReSharper disable UseObjectOrCollectionInitializer
 
+#region Using directives
+
 using System;
 using System.Collections;
-using System.Collections.Generic;
 
 using AM.Collections;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#endregion
 
 #nullable enable
 
@@ -21,7 +27,7 @@ public sealed class ChunkedListTest
     [TestMethod]
     public void ChunkedList_Construction_1()
     {
-        ChunkedList<int> list = new ChunkedList<int>();
+        var list = new ChunkedList<int>();
         Assert.AreEqual (0, list.Count);
         Assert.AreEqual (0, list.Capacity);
     }
@@ -29,7 +35,7 @@ public sealed class ChunkedListTest
     [TestMethod]
     public void ChunkedList_Construction_2()
     {
-        ChunkedList<int> list = new ChunkedList<int> (1);
+        var list = new ChunkedList<int> (1);
         Assert.AreEqual (0, list.Count);
         Assert.AreEqual (ChunkedList<int>.ChunkSize, list.Capacity);
     }
@@ -37,8 +43,8 @@ public sealed class ChunkedListTest
     [TestMethod]
     public void ChunkedList_Construction_3()
     {
-        int chunkSize = ChunkedList<int>.ChunkSize;
-        ChunkedList<int> list = new ChunkedList<int> (chunkSize);
+        var chunkSize = ChunkedList<int>.ChunkSize;
+        var list = new ChunkedList<int> (chunkSize);
         Assert.AreEqual (0, list.Count);
         Assert.AreEqual (chunkSize, list.Capacity);
     }
@@ -46,7 +52,7 @@ public sealed class ChunkedListTest
     [TestMethod]
     public void ChunkedList_Construction_4()
     {
-        ChunkedList<int> list = new ChunkedList<int> (1025);
+        var list = new ChunkedList<int> (1025);
         Assert.AreEqual (0, list.Count);
         Assert.AreEqual (1536, list.Capacity);
     }
@@ -54,7 +60,7 @@ public sealed class ChunkedListTest
     [TestMethod]
     public void ChunkedList_Add_1()
     {
-        ChunkedList<int> list = new ChunkedList<int>();
+        var list = new ChunkedList<int>();
         list.Add (1);
         Assert.AreEqual (1, list.Count);
         Assert.AreEqual (ChunkedList<int>.ChunkSize, list.Capacity);
@@ -63,10 +69,10 @@ public sealed class ChunkedListTest
     [TestMethod]
     public void ChunkedList_Add_2()
     {
-        int chunkSize = ChunkedList<int>.ChunkSize;
-        ChunkedList<int> list = new ChunkedList<int>();
-        int desiredCount = chunkSize + 1;
-        for (int i = 0; i < desiredCount; i++)
+        var chunkSize = ChunkedList<int>.ChunkSize;
+        var list = new ChunkedList<int>();
+        var desiredCount = chunkSize + 1;
+        for (var i = 0; i < desiredCount; i++)
         {
             list.Add (i);
         }
@@ -78,8 +84,8 @@ public sealed class ChunkedListTest
     [TestMethod]
     public void ChunkedList_CopyTo_1()
     {
-        ChunkedList<int> list = new ChunkedList<int>();
-        int[] array = new int[3];
+        var list = new ChunkedList<int>();
+        var array = new int[3];
         list.CopyTo (array, 0);
         Assert.AreEqual (0, array[0]);
         Assert.AreEqual (0, array[1]);
@@ -89,9 +95,9 @@ public sealed class ChunkedListTest
     [TestMethod]
     public void ChunkedList_CopyTo_2()
     {
-        ChunkedList<int> list = new ChunkedList<int>();
+        var list = new ChunkedList<int>();
         list.Add (1);
-        int[] array = new int[3];
+        var array = new int[3];
         list.CopyTo (array, 0);
         Assert.AreEqual (1, array[0]);
         Assert.AreEqual (0, array[1]);
@@ -101,11 +107,11 @@ public sealed class ChunkedListTest
     [TestMethod]
     public void ChunkedList_CopyTo_3()
     {
-        ChunkedList<int> list = new ChunkedList<int>();
+        var list = new ChunkedList<int>();
         list.Add (1);
         list.Add (2);
         list.Add (3);
-        int[] array = new int[3];
+        var array = new int[3];
         list.CopyTo (array, 0);
         Assert.AreEqual (1, array[0]);
         Assert.AreEqual (2, array[1]);
@@ -115,16 +121,16 @@ public sealed class ChunkedListTest
     [TestMethod]
     public void ChunkedList_CopyTo_4()
     {
-        int count = 1025;
-        ChunkedList<int> list = new ChunkedList<int>();
-        for (int i = 0; i < count; i++)
+        var count = 1025;
+        var list = new ChunkedList<int>();
+        for (var i = 0; i < count; i++)
         {
             list.Add (i);
         }
 
-        int[] array = new int[count * 2];
+        var array = new int[count * 2];
         list.CopyTo (array, 0);
-        for (int i = 0; i < count; i++)
+        for (var i = 0; i < count; i++)
         {
             Assert.AreEqual (i, array[i]);
             Assert.AreEqual (0, array[count + i]);
@@ -134,8 +140,8 @@ public sealed class ChunkedListTest
     [TestMethod]
     public void ChunkedList_Clear_1()
     {
-        int chunkSize = ChunkedList<int>.ChunkSize;
-        ChunkedList<int> list = new ChunkedList<int>();
+        var chunkSize = ChunkedList<int>.ChunkSize;
+        var list = new ChunkedList<int>();
         list.Add (1);
         list.Clear();
         Assert.AreEqual (0, list.Count);
@@ -145,7 +151,7 @@ public sealed class ChunkedListTest
     [TestMethod]
     public void ChunkedList_Contains_1()
     {
-        ChunkedList<int> list = new ChunkedList<int>();
+        var list = new ChunkedList<int>();
         Assert.IsFalse (list.Contains (2));
         list.Add (1);
         Assert.IsFalse (list.Contains (2));
@@ -158,9 +164,9 @@ public sealed class ChunkedListTest
     [TestMethod]
     public void ChunkedList_Contains_2()
     {
-        ChunkedList<int> list = new ChunkedList<int>();
+        var list = new ChunkedList<int>();
         Assert.IsFalse (list.Contains (2));
-        for (int i = 0; i < 1025; i++)
+        for (var i = 0; i < 1025; i++)
         {
             list.Add (i);
         }
@@ -174,14 +180,14 @@ public sealed class ChunkedListTest
     [TestMethod]
     public void ChunkedList_IsReadOnly_1()
     {
-        ChunkedList<int> list = new ChunkedList<int>();
+        var list = new ChunkedList<int>();
         Assert.IsFalse (list.IsReadOnly);
     }
 
     [TestMethod]
     public void ChunkedList_IndexOf_1()
     {
-        ChunkedList<int> list = new ChunkedList<int>();
+        var list = new ChunkedList<int>();
         Assert.IsTrue (list.IndexOf (2) < 0);
 
         list.Add (1);
@@ -197,14 +203,14 @@ public sealed class ChunkedListTest
     [TestMethod]
     public void ChunkedList_IndexOf_2()
     {
-        int count = 1025;
-        ChunkedList<int> list = new ChunkedList<int>();
-        for (int i = 0; i < count; i++)
+        var count = 1025;
+        var list = new ChunkedList<int>();
+        for (var i = 0; i < count; i++)
         {
             list.Add (i);
         }
 
-        for (int i = 0; i < count; i++)
+        for (var i = 0; i < count; i++)
         {
             Assert.AreEqual (i, list.IndexOf (i));
         }
@@ -215,7 +221,7 @@ public sealed class ChunkedListTest
     [TestMethod]
     public void ChunkedList_Indexer_1()
     {
-        ChunkedList<int> list = new ChunkedList<int>();
+        var list = new ChunkedList<int>();
         list.Add (1);
         list.Add (2);
         list.Add (3);
@@ -227,14 +233,14 @@ public sealed class ChunkedListTest
     [TestMethod]
     public void ChunkedList_Indexer_2()
     {
-        int count = 1025;
-        ChunkedList<int> list = new ChunkedList<int>();
-        for (int i = 0; i < count; i++)
+        var count = 1025;
+        var list = new ChunkedList<int>();
+        for (var i = 0; i < count; i++)
         {
             list.Add (i);
         }
 
-        for (int i = 0; i < count; i++)
+        for (var i = 0; i < count; i++)
         {
             Assert.AreEqual (i, list[i]);
         }
@@ -243,7 +249,7 @@ public sealed class ChunkedListTest
     [TestMethod]
     public void ChunkedList_Indexer_3()
     {
-        ChunkedList<int> list = new ChunkedList<int>();
+        var list = new ChunkedList<int>();
         list.Add (0);
         list.Add (0);
         list.Add (0);
@@ -258,19 +264,19 @@ public sealed class ChunkedListTest
     [TestMethod]
     public void ChunkedList_Indexer_4()
     {
-        int count = 1025;
-        ChunkedList<int> list = new ChunkedList<int>();
-        for (int i = 0; i < count; i++)
+        var count = 1025;
+        var list = new ChunkedList<int>();
+        for (var i = 0; i < count; i++)
         {
             list.Add (0);
         }
 
-        for (int i = 0; i < count; i++)
+        for (var i = 0; i < count; i++)
         {
             list[i] = i;
         }
 
-        for (int i = 0; i < count; i++)
+        for (var i = 0; i < count; i++)
         {
             Assert.AreEqual (i, list[i]);
         }
@@ -280,7 +286,7 @@ public sealed class ChunkedListTest
     [ExpectedException (typeof (IndexOutOfRangeException))]
     public void ChunkedList_Indexer_5()
     {
-        ChunkedList<int> list = new ChunkedList<int>();
+        var list = new ChunkedList<int>();
         Assert.AreEqual (0, list[0]);
     }
 
@@ -288,7 +294,7 @@ public sealed class ChunkedListTest
     [ExpectedException (typeof (IndexOutOfRangeException))]
     public void ChunkedList_Indexer_6()
     {
-        ChunkedList<int> list = new ChunkedList<int>();
+        var list = new ChunkedList<int>();
         list[0] = 0;
     }
 
@@ -296,7 +302,7 @@ public sealed class ChunkedListTest
     [ExpectedException (typeof (IndexOutOfRangeException))]
     public void ChunkedList_Indexer_7()
     {
-        ChunkedList<int> list = new ChunkedList<int>();
+        var list = new ChunkedList<int>();
         list.Add (0);
         list.Add (0);
         list.Add (0);
@@ -307,7 +313,7 @@ public sealed class ChunkedListTest
     [ExpectedException (typeof (IndexOutOfRangeException))]
     public void ChunkedList_Indexer_8()
     {
-        ChunkedList<int> list = new ChunkedList<int>();
+        var list = new ChunkedList<int>();
         list.Add (0);
         list.Add (0);
         list.Add (0);
@@ -317,8 +323,8 @@ public sealed class ChunkedListTest
     [TestMethod]
     public void ChunkedList_GetEnumerator_1()
     {
-        ChunkedList<int> list = new ChunkedList<int>();
-        IEnumerator<int> enumerator = list.GetEnumerator();
+        var list = new ChunkedList<int>();
+        var enumerator = list.GetEnumerator();
         Assert.IsFalse (enumerator.MoveNext());
         enumerator.Dispose();
     }
@@ -326,11 +332,11 @@ public sealed class ChunkedListTest
     [TestMethod]
     public void ChunkedList_GetEnumerator_2()
     {
-        ChunkedList<int> list = new ChunkedList<int>();
+        var list = new ChunkedList<int>();
         list.Add (1);
         list.Add (2);
         list.Add (3);
-        IEnumerator<int> enumerator = list.GetEnumerator();
+        var enumerator = list.GetEnumerator();
         Assert.IsTrue (enumerator.MoveNext());
         Assert.AreEqual (1, enumerator.Current);
         Assert.IsTrue (enumerator.MoveNext());
@@ -344,15 +350,15 @@ public sealed class ChunkedListTest
     [TestMethod]
     public void ChunkedList_GetEnumerator_3()
     {
-        int count = 1025;
-        ChunkedList<int> list = new ChunkedList<int>();
-        for (int i = 0; i < count; i++)
+        var count = 1025;
+        var list = new ChunkedList<int>();
+        for (var i = 0; i < count; i++)
         {
             list.Add (i);
         }
 
-        IEnumerator<int> enumerator = list.GetEnumerator();
-        for (int i = 0; i < count; i++)
+        var enumerator = list.GetEnumerator();
+        for (var i = 0; i < count; i++)
         {
             Assert.IsTrue (enumerator.MoveNext());
             Assert.AreEqual (i, enumerator.Current);
@@ -366,7 +372,7 @@ public sealed class ChunkedListTest
     public void ChunkedList_GetEnumerator_4()
     {
         IEnumerable list = new ChunkedList<int>();
-        IEnumerator enumerator = list.GetEnumerator();
+        var enumerator = list.GetEnumerator();
         Assert.IsFalse (enumerator.MoveNext());
     }
 
@@ -374,7 +380,7 @@ public sealed class ChunkedListTest
     public void ChunkedList_GetEnumerator_5()
     {
         IEnumerable list = new ChunkedList<int> { 1, 2, 3 };
-        IEnumerator enumerator = list.GetEnumerator();
+        var enumerator = list.GetEnumerator();
         Assert.IsTrue (enumerator.MoveNext());
         Assert.AreEqual (1, enumerator.Current);
         Assert.IsTrue (enumerator.MoveNext());
@@ -387,7 +393,7 @@ public sealed class ChunkedListTest
     [TestMethod]
     public void ChunkedList_RemoveAt_1()
     {
-        ChunkedList<int> list = new ChunkedList<int>();
+        var list = new ChunkedList<int>();
         list.Add (1);
         list.Add (2);
         list.Add (3);
@@ -400,30 +406,31 @@ public sealed class ChunkedListTest
     [TestMethod]
     public void ChunkedList_RemoveAt_2()
     {
-        int count = 1025;
-        ChunkedList<int> list = new ChunkedList<int>();
-        for (int i = 0; i < count; i++)
+        var count = 1025;
+        var list = new ChunkedList<int>();
+        for (var i = 0; i < count; i++)
         {
             list.Add (i);
         }
 
         list.RemoveAt (100);
         Assert.AreEqual (count - 1, list.Count);
-        for (int i = 0; i < 100; i++)
+        for (var i = 0; i < 100; i++)
         {
             Assert.AreEqual (i, list[i]);
         }
 
-        for (int i = 100; i < count - 1; i++)
+        for (var i = 100; i < count - 1; i++)
         {
             Assert.AreEqual (i + 1, list[i]);
         }
     }
 
     [TestMethod]
+    [Description ("Удаление элемента с указанным значением")]
     public void ChunkedList_Remove_1()
     {
-        ChunkedList<int> list = new ChunkedList<int>();
+        var list = new ChunkedList<int>();
         Assert.IsFalse (list.Remove (2));
 
         list.Add (1);
@@ -436,9 +443,10 @@ public sealed class ChunkedListTest
     }
 
     [TestMethod]
+    [Description ("Вставка в начало")]
     public void ChunkedList_Insert_1()
     {
-        ChunkedList<int> list = new ChunkedList<int>();
+        var list = new ChunkedList<int>();
         list.Insert (0, 3);
         list.Insert (0, 2);
         list.Insert (0, 1);
@@ -449,9 +457,10 @@ public sealed class ChunkedListTest
     }
 
     [TestMethod]
+    [Description ("Вставка в середину")]
     public void ChunkedList_Insert_2()
     {
-        ChunkedList<int> list = new ChunkedList<int>();
+        var list = new ChunkedList<int>();
         list.Add (1);
         list.Add (5);
         list.Insert (1, 4);
@@ -466,10 +475,11 @@ public sealed class ChunkedListTest
     }
 
     [TestMethod]
+    [Description ("Преобразование в массив: без переполнения")]
     public void ChunkedList_ToArray_1()
     {
-        ChunkedList<int> list = new ChunkedList<int>();
-        int[] array = list.ToArray();
+        var list = new ChunkedList<int>();
+        var array = list.ToArray();
         Assert.AreEqual (0, array.Length);
 
         list.Add (1);
@@ -492,18 +502,19 @@ public sealed class ChunkedListTest
     }
 
     [TestMethod]
+    [Description ("Преобразование в массив: с переполнением")]
     public void ChunkedList_ToArray_2()
     {
-        int count = 1025;
-        ChunkedList<int> list = new ChunkedList<int>();
-        for (int i = 0; i < count; i++)
+        const int count = 1025;
+        var list = new ChunkedList<int>();
+        for (var i = 0; i < count; i++)
         {
             list.Add (i);
         }
 
-        int[] array = list.ToArray();
+        var array = list.ToArray();
         Assert.AreEqual (count, array.Length);
-        for (int i = 0; i < count; i++)
+        for (var i = 0; i < count; i++)
         {
             Assert.AreEqual (i, array[i]);
         }

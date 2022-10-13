@@ -59,7 +59,7 @@ class Program
         Console.WriteLine ($"Всего названий газет: {newspapers.Length}");
         newspapers = newspapers.OrderBy (n => n.Title!.Trim ('"')).ToArray();
 
-        var counter = new DictionaryCounterInt32<int>();
+        var counter = new DictionaryCounter<int, int>();
         foreach (var newspaper in newspapers)
         {
             var issues = manager.GetIssues (newspaper);

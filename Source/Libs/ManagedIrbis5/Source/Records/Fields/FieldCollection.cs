@@ -45,8 +45,8 @@ namespace ManagedIrbis;
 [Serializable]
 public sealed class FieldCollection
     : Collection<Field>,
-        IHandmadeSerializable,
-        IReadOnly<FieldCollection>
+    IHandmadeSerializable,
+    IReadOnly<FieldCollection>
 {
     #region Properties
 
@@ -63,6 +63,7 @@ public sealed class FieldCollection
     private List<Field> _GetInnerList()
     {
         // ReSharper disable SuspiciousTypeConversion.Global
+
         var result = (List<Field>) Items;
 
         // ReSharper restore SuspiciousTypeConversion.Global
@@ -79,7 +80,7 @@ public sealed class FieldCollection
             return;
         }
 
-        var seen = new DictionaryCounterInt32<int>();
+        var seen = new DictionaryCounter<int, int>();
 
         foreach (var field in this)
         {

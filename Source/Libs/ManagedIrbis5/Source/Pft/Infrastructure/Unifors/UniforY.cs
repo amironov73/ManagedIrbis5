@@ -26,101 +26,97 @@ using ManagedIrbis.Fields;
 
 #nullable enable
 
-namespace ManagedIrbis.Pft.Infrastructure.Unifors
+namespace ManagedIrbis.Pft.Infrastructure.Unifors;
+
+//
+// Возвращает данные обо всех свободных (не выданных) экземплярах по всем местах хранения – &uf('Y')
+// Вид функции: Y.
+// Назначение: Возвращает данные обо всех свободных(не выданных) экземплярах по всем местах хранения.
+// Формат(передаваемая строка):
+// нет
+//
+// Пример:
+//
+// &unifor('Y')
+//
+
+internal static class UniforY
 {
-    //
-    // Возвращает данные обо всех свободных (не выданных) экземплярах по всем местах хранения – &uf('Y')
-    // Вид функции: Y.
-    // Назначение: Возвращает данные обо всех свободных(не выданных) экземплярах по всем местах хранения.
-    // Формат(передаваемая строка):
-    // нет
-    //
-    // Пример:
-    //
-    // &unifor('Y')
-    //
+    #region Public methods
 
-    static class UniforY
+    /// <summary>
+    /// Вспомогательный метод.
+    /// </summary>
+    public static string FreeExemplars
+        (
+            Record record
+        )
     {
-        #region Public methods
+        Sure.NotNull (record);
 
-        /// <summary>
-        /// Вспомогательный метод.
-        /// </summary>
-        public static string FreeExemplars
-            (
-                Record record
-            )
+        var exemplars = ExemplarInfo.ParseRecord (record);
+        var counter = new DictionaryCounter<string, int>();
+        foreach (var exemplar in exemplars)
         {
-            var exemplars = ExemplarInfo.ParseRecord(record);
-            var counter
-                = new DictionaryCounterInt32<string>();
+            var place = exemplar.Place ?? string.Empty;
 
-            foreach (var exemplar in exemplars)
+            switch (exemplar.Status)
             {
-                var place = exemplar.Place ?? string.Empty;
-
-                switch (exemplar.Status)
-                {
-                    case ExemplarStatus.Summary:
-                    case ExemplarStatus.BiblioNet:
-                        var amountText = exemplar.Amount;
-                        if (Utility.TryParseInt32(amountText, out var amount))
+                case ExemplarStatus.Summary:
+                case ExemplarStatus.BiblioNet:
+                    var amountText = exemplar.Amount;
+                    if (Utility.TryParseInt32 (amountText, out var amount))
+                    {
+                        var onHandText = exemplar.OnHand;
+                        if (Utility.TryParseInt32 (onHandText, out var onHand))
                         {
-                            var onHandText = exemplar.OnHand;
-                            if (Utility.TryParseInt32(onHandText, out var onHand))
-                            {
-                                amount -= onHand;
-                            }
+                            amount -= onHand;
                         }
-                        counter.Augment(place, amount);
-                        break;
+                    }
 
-                    case ExemplarStatus.Free:
-                        counter.Augment(place, 1);
-                        break;
-                }
+                    counter.Augment (place, amount);
+                    break;
+
+                case ExemplarStatus.Free:
+                    counter.Augment (place, 1);
+                    break;
             }
-
-            var result = new StringBuilder();
-
-            var first = true;
-            foreach (var key in counter.Keys.OrderBy(_ => _))
-            {
-                var value = counter[key];
-                if (!first)
-                {
-                    result.Append(", ");
-                }
-                first = false;
-                result.AppendFormat
-                    (
-                        "{0}({1})",
-                        key,
-                        value
-                    );
-            }
-
-            return result.ToString();
         }
 
-        /// <summary>
-        /// Реализация &amp;uf('y').
-        /// </summary>
-        public static void FreeExemplars
-            (
-                PftContext context,
-                PftNode? node,
-                string expression
-            )
+        var result = new StringBuilder();
+
+        var first = true;
+        foreach (var key in counter.Keys.Order())
         {
-            if (!ReferenceEquals(context.Record, null))
+            var value = counter[key];
+            if (!first)
             {
-                var output = FreeExemplars(context.Record);
-                context.WriteAndSetFlag(node, output);
+                result.Append (", ");
             }
+
+            first = false;
+            result.Append ($"{key}({value})");
         }
 
-        #endregion
+        return result.ToString();
     }
+
+    /// <summary>
+    /// Реализация &amp;uf('y').
+    /// </summary>
+    public static void FreeExemplars
+        (
+            PftContext context,
+            PftNode? node,
+            string expression
+        )
+    {
+        if (context.Record is not null)
+        {
+            var output = FreeExemplars (context.Record);
+            context.WriteAndSetFlag (node, output);
+        }
+    }
+
+    #endregion
 }

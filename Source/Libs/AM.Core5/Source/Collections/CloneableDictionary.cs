@@ -33,7 +33,7 @@ namespace AM.Collections;
 [DebuggerDisplay ("Count={" + nameof (Count) + "}")]
 public class CloneableDictionary<TKey, TValue>
     : Dictionary<TKey, TValue>,
-        ICloneable
+    ICloneable
     where TKey : notnull
 {
     #region ICloneable members

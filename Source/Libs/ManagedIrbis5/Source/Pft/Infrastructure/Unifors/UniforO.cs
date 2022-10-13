@@ -25,99 +25,104 @@ using ManagedIrbis.Fields;
 
 #nullable enable
 
-namespace ManagedIrbis.Pft.Infrastructure.Unifors
+namespace ManagedIrbis.Pft.Infrastructure.Unifors;
+
+//
+// Вывод сведений обо всех экземплярах по всем местам хранения – &uf('O')
+// Вид функции: O.
+// Назначение: Вывод сведений обо всех экземплярах по всем местам хранения.
+// Формат(передаваемая строка):
+// нет
+//
+// Пример:
+//
+// &unifor('O')
+//
+
+internal static class UniforO
 {
-    //
-    // Вывод сведений обо всех экземплярах по всем местам хранения – &uf('O')
-    // Вид функции: O.
-    // Назначение: Вывод сведений обо всех экземплярах по всем местам хранения.
-    // Формат(передаваемая строка):
-    // нет
-    //
-    // Пример:
-    //
-    // &unifor('O')
-    //
+    #region Public methods
 
-    static class UniforO
+    /// <summary>
+    /// Вспомогательный метод.
+    /// </summary>
+    public static string AllExemplars
+        (
+            Record record
+        )
     {
-        #region Public methods
+        Sure.NotNull (record);
 
-        /// <summary>
-        /// Вспомогательный метод.
-        /// </summary>
-        public static string AllExemplars
-            (
-                Record record
-            )
+        var exemplars = ExemplarInfo.ParseRecord (record);
+        var counter = new DictionaryCounter<string, int>();
+
+        foreach (var exemplar in exemplars)
         {
-            var exemplars = ExemplarInfo.ParseRecord(record);
-            var counter = new DictionaryCounterInt32<string>();
+            var place = exemplar.Place ?? string.Empty;
 
-            foreach (var exemplar in exemplars)
+            switch (exemplar.Status)
             {
-                var place = exemplar.Place ?? string.Empty;
-
-                switch (exemplar.Status)
-                {
-                    case ExemplarStatus.Summary:
-                    case ExemplarStatus.BiblioNet:
-                        var amountText = exemplar.Amount;
-                        if (Utility.TryParseInt32
+                case ExemplarStatus.Summary:
+                case ExemplarStatus.BiblioNet:
+                    var amountText = exemplar.Amount;
+                    if (Utility.TryParseInt32
                             (
                                 amountText,
                                 out var amount
                             ))
-                        {
-                            counter.Augment(place, amount);
-                        }
-                        break;
+                    {
+                        counter.Augment (place, amount);
+                    }
 
-                    default:
-                        counter.Augment(place, 1);
-                        break;
-                }
+                    break;
+
+                default:
+                    counter.Augment (place, 1);
+                    break;
             }
-
-            var result = new StringBuilder();
-
-            var first = true;
-            foreach (var key in counter.Keys.OrderBy(_ => _))
-            {
-                var value = counter[key];
-                if (!first)
-                {
-                    result.Append(", ");
-                }
-                first = false;
-                result.AppendFormat
-                    (
-                        "{0}({1})",
-                        key,
-                        value
-                    );
-            }
-
-            return result.ToString();
         }
 
-        /// <summary>
-        /// Реализация &amp;uf('O').
-        /// </summary>
-        public static void AllExemplars
-            (
-                PftContext context,
-                PftNode? node,
-                string? expression
-            )
+        var result = new StringBuilder();
+
+        var first = true;
+        foreach (var key in counter.Keys.OrderBy (_ => _))
         {
-            if (!ReferenceEquals(context.Record, null))
+            var value = counter[key];
+            if (!first)
             {
-                var output = AllExemplars(context.Record);
-                context.WriteAndSetFlag(node, output);
+                result.Append (", ");
             }
+
+            first = false;
+            result.AppendFormat
+                (
+                    "{0}({1})",
+                    key,
+                    value
+                );
         }
 
-        #endregion
+        return result.ToString();
     }
+
+    /// <summary>
+    /// Реализация &amp;uf('O').
+    /// </summary>
+    public static void AllExemplars
+        (
+            PftContext context,
+            PftNode? node,
+            string? expression
+        )
+    {
+        Sure.NotNull (context);
+
+        if (context.Record is not null)
+        {
+            var output = AllExemplars (context.Record);
+            context.WriteAndSetFlag (node, output);
+        }
+    }
+
+    #endregion
 }
