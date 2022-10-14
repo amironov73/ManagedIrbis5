@@ -1,5 +1,13 @@
-﻿// ReSharper disable CheckNamespace
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CollectionNeverQueried.Local
+// ReSharper disable CollectionNeverUpdated.Local
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UseObjectOrCollectionInitializer
+
+#region Using directives
 
 using System.Collections.Generic;
 
@@ -7,6 +15,8 @@ using AM;
 using AM.Collections;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#endregion
 
 #nullable enable
 
@@ -35,10 +45,10 @@ public sealed class DictionaryMapperTest
     }
 
     [TestMethod]
-    [Description ("Простой случай")]
+    [Description ("Преобразование объекта в словарь: простой случай")]
     public void DictionaryMapper_FromObject_1()
     {
-        var person = new Person()
+        var person = new Person
         {
             Name = "Alexey Mironov",
             Age = 48,
@@ -53,7 +63,7 @@ public sealed class DictionaryMapperTest
     }
 
     [TestMethod]
-    [Description ("Простой случай")]
+    [Description ("Преобразование словаря в объект: простой случай")]
     public void DictionaryMapper_ToObject_1()
     {
         var dictionary = new Dictionary<string, object?>
