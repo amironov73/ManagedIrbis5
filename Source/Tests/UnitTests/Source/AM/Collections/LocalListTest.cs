@@ -21,7 +21,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace UnitTests.AM.Collections;
 
 [TestClass]
-public class LocalListTest
+public sealed class LocalListTest
 {
     [TestMethod]
     public void LocalList_Construction_1()

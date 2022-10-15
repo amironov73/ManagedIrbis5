@@ -1,6 +1,14 @@
-﻿// ReSharper disable CheckNamespace
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CollectionNeverQueried.Local
+// ReSharper disable CollectionNeverUpdated.Local
 // ReSharper disable ObjectCreationAsStatement
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UseObjectOrCollectionInitializer
+
+#region Using directives
 
 using System;
 
@@ -8,16 +16,18 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using AM.Collections;
 
+#endregion
+
 #nullable enable
 
 namespace UnitTests.AM.Collections;
 
 [TestClass]
-public class PooledListTest
+public sealed class PooledListTest
 {
     private static T[] Get<T> (ReadOnlySpan<char> span)
     {
-        T[] result = new T[span.Length];
+        var result = new T[span.Length];
         for (var i = 0; i < span.Length; i++)
         {
             result[i] = (T)Convert.ChangeType (span[i], typeof (T));

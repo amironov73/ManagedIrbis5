@@ -25,7 +25,7 @@ using AM.Collections;
 namespace UnitTests.AM.Collections;
 
 [TestClass]
-public class ListUtilityTest
+public sealed class ListUtilityTest
 {
     [TestMethod]
     public void ListUtility_IsNullOrEmpty_1()
