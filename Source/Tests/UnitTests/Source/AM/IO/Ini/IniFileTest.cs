@@ -28,7 +28,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace UnitTests.AM.IO.Ini;
 
 [TestClass]
-public class IniFileTest
+public sealed class IniFileTest
     : Common.CommonUnitTest
 {
     private void _TestSerialization

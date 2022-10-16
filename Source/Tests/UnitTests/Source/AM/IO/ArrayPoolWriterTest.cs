@@ -28,7 +28,7 @@ using AM.IO;
 namespace UnitTests.AM.IO;
 
 [TestClass]
-public class ArrayPoolWriterTest
+public sealed class ArrayPoolWriterTest
 {
     [TestMethod]
     [Description ("Свежесозданный буфер")]

@@ -28,7 +28,7 @@ using AM.Runtime;
 namespace UnitTests.AM.IO;
 
 [TestClass]
-public class BinaryReaderUtilityTest
+public sealed class BinaryReaderUtilityTest
 {
     private class Dummy
         : IHandmadeSerializable

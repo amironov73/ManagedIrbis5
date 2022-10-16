@@ -29,7 +29,7 @@ using AM.Runtime;
 namespace UnitTests.AM.IO;
 
 [TestClass]
-public class BinaryWriterUtilityTest
+public sealed class BinaryWriterUtilityTest
 {
     private class Dummy
         : IHandmadeSerializable
