@@ -1,6 +1,16 @@
-﻿// ReSharper disable CheckNamespace
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CollectionNeverQueried.Local
+// ReSharper disable CollectionNeverUpdated.Local
 // ReSharper disable ExpressionIsAlwaysNull
 // ReSharper disable InvokeAsExtensionMethod
+// ReSharper disable ObjectCreationAsStatement
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UseObjectOrCollectionInitializer
+
+#region Using directives
 
 using System;
 using System.IO;
@@ -11,73 +21,76 @@ using AM.Collections;
 using AM.IO;
 using AM.Runtime;
 
-namespace UnitTests.AM.IO
+#endregion
+
+#nullable enable
+
+namespace UnitTests.AM.IO;
+
+[TestClass]
+public class BinaryReaderUtilityTest
 {
-    [TestClass]
-    public class BinaryReaderUtilityTest
+    private class Dummy
+        : IHandmadeSerializable
     {
-        private class Dummy
-            : IHandmadeSerializable
+        public int Value { get; set; }
+
+        public void RestoreFromStream (BinaryReader reader)
         {
-            public int Value { get; set; }
-
-            public void RestoreFromStream (BinaryReader reader)
-            {
-                Value = reader.ReadInt32();
-            }
-
-            public void SaveToStream (BinaryWriter writer)
-            {
-                writer.Write (Value);
-            }
+            Value = reader.ReadInt32();
         }
 
-        // ==========================================================
-
-        [TestMethod]
-        public void BinaryReaderUtility_ReadCollectionT_1()
+        public void SaveToStream (BinaryWriter writer)
         {
-            var stream = new MemoryStream();
-            var writer = new BinaryWriter (stream);
-
-            var expected = new NonNullCollection<Dummy>
-            {
-                new() { Value = 123 },
-                new() { Value = 456 },
-                new() { Value = 789 }
-            };
-            BinaryWriterUtility.WriteCollection (writer, expected);
-
-            var bytes = stream.ToArray();
-            stream = new MemoryStream (bytes);
-            var reader = new BinaryReader (stream);
-
-            var actual = new NonNullCollection<Dummy>();
-            BinaryReaderUtility.ReadCollection (reader, actual);
-            Assert.AreEqual (expected.Count, actual.Count);
-            Assert.AreEqual (expected[0].Value, actual[0].Value);
-            Assert.AreEqual (expected[1].Value, actual[1].Value);
-            Assert.AreEqual (expected[2].Value, actual[2].Value);
+            writer.Write (Value);
         }
+    }
 
-        [TestMethod]
-        [ExpectedException (typeof (FormatException))]
-        public void BinaryReaderUtility_ReadPackedInt32_1()
+    // ==========================================================
+
+    [TestMethod]
+    public void BinaryReaderUtility_ReadCollectionT_1()
+    {
+        var stream = new MemoryStream();
+        var writer = new BinaryWriter (stream);
+
+        var expected = new NonNullCollection<Dummy>
         {
-            byte[] bytes = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
-            var stream = new MemoryStream (bytes);
-            var reader = new BinaryReader (stream);
-            BinaryReaderUtility.ReadPackedInt32 (reader);
-        }
+            new() { Value = 123 },
+            new() { Value = 456 },
+            new() { Value = 789 }
+        };
+        BinaryWriterUtility.WriteCollection (writer, expected);
 
-        [TestMethod]
-        public void BinaryReaderUtility_ReadString_1()
-        {
-            byte[] bytes = { 72, 101, 108, 108, 111 };
-            var stream = new MemoryStream (bytes);
-            var reader = new BinaryReader (stream);
-            var actual = BinaryReaderUtility.ReadString (reader, 5);
-            Assert.AreEqual ("Hello", actual);
-        }
+        var bytes = stream.ToArray();
+        stream = new MemoryStream (bytes);
+        var reader = new BinaryReader (stream);
+
+        var actual = new NonNullCollection<Dummy>();
+        BinaryReaderUtility.ReadCollection (reader, actual);
+        Assert.AreEqual (expected.Count, actual.Count);
+        Assert.AreEqual (expected[0].Value, actual[0].Value);
+        Assert.AreEqual (expected[1].Value, actual[1].Value);
+        Assert.AreEqual (expected[2].Value, actual[2].Value);
+    }
+
+    [TestMethod]
+    [ExpectedException (typeof (FormatException))]
+    public void BinaryReaderUtility_ReadPackedInt32_1()
+    {
+        byte[] bytes = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+        var stream = new MemoryStream (bytes);
+        var reader = new BinaryReader (stream);
+        BinaryReaderUtility.ReadPackedInt32 (reader);
+    }
+
+    [TestMethod]
+    public void BinaryReaderUtility_ReadString_1()
+    {
+        byte[] bytes = { 72, 101, 108, 108, 111 };
+        var stream = new MemoryStream (bytes);
+        var reader = new BinaryReader (stream);
+        var actual = BinaryReaderUtility.ReadString (reader, 5);
+        Assert.AreEqual ("Hello", actual);
     }
 }
