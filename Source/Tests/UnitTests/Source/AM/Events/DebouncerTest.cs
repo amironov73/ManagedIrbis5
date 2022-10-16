@@ -1,11 +1,21 @@
-﻿// ReSharper disable CheckNamespace
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CollectionNeverQueried.Local
+// ReSharper disable CollectionNeverUpdated.Local
 // ReSharper disable EventNeverSubscribedTo.Local
 // ReSharper disable ForCanBeConvertedToForeach
 // ReSharper disable IdentifierTypo
 // ReSharper disable InvokeAsExtensionMethod
+// ReSharper disable ObjectCreationAsStatement
 // ReSharper disable PropertyCanBeMadeInitOnly.Local
+// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMember.Local
+// ReSharper disable UseObjectOrCollectionInitializer
+
+#region Using directives
 
 using System;
 using System.Threading;
@@ -14,6 +24,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using AM.Events;
 
+#endregion
+
 #nullable enable
 
 namespace UnitTests.AM.Events;
@@ -21,7 +33,7 @@ namespace UnitTests.AM.Events;
 [TestClass]
 public sealed class DebouncerTest
 {
-    class DebouncingSample
+    private sealed class DebouncingSample
     {
         public static bool DebounceDuring100MsStatic()
         {
