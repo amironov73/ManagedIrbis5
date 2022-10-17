@@ -30,7 +30,7 @@ namespace AM.Memory;
 /// <summary>
 /// Простой менеджер для неуправляемой памяти.
 /// </summary>
-/// <typeparam name="T"></typeparam>
+/// <typeparam name="T">Неуправляемый тип, например, <c>byte</c></typeparam>
 public sealed unsafe class UnmanagedMemoryManager<T>
     : MemoryManager<T>
     where T : unmanaged
@@ -46,12 +46,11 @@ public sealed unsafe class UnmanagedMemoryManager<T>
     #region Construction
 
     /// <summary>
-    /// Create a new UnmanagedMemoryManager instance at the given
-    /// pointer and size.
+    /// Создание менеджера из указанного диапазона памяти.
     /// </summary>
     ///
-    /// <remarks>It is assumed that the span provided is already
-    /// unmanaged or externally pinned.</remarks>
+    /// <remarks>Предполагается, что предоставленный диапазон
+    /// уже неуправляемый или закреплен извне.</remarks>
     public UnmanagedMemoryManager
         (
             Span<T> span
@@ -67,19 +66,18 @@ public sealed unsafe class UnmanagedMemoryManager<T>
     }
 
     /// <summary>
-    /// Create a new UnmanagedMemoryManager instance
-    /// at the given pointer and size.
+    /// Создание менеджера из указателя и длины блока.
     /// </summary>
+    ///
+    /// <param name="pointer">Указатель на начало блока.</param>
+    /// <param name="length">Длина блока в элементах (а не байтах!).</param>
     public UnmanagedMemoryManager
         (
             T* pointer,
             int length
         )
     {
-        if (length < 0)
-        {
-            throw new ArgumentOutOfRangeException (nameof (length));
-        }
+        Sure.NonNegative (length);
 
         _pointer = pointer;
         _length = length;
@@ -87,22 +85,24 @@ public sealed unsafe class UnmanagedMemoryManager<T>
     }
 
     /// <summary>
-    /// Создает менеджер для указанного дескриптора неуправвляемой
+    /// Создание менеджера для указанного дескриптора неуправвляемой
     /// памяти, полученного от <c>Marshal.AllocHGlobal</c>.
     /// </summary>
-    /// <param name="handle"></param>
-    /// <param name="length"></param>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    ///
+    /// <param name="handle">Дескриптор неуправляемой памяти, полученный от
+    /// <see cref="Marshal.AllocHGlobal(int)"/>.</param>
+    /// <param name="length">Длина блока в элементах (а не байтах!).</param>
+    ///
+    /// <remarks>
+    /// При очистке менеджер сам освободит <paramref name="handle"/>.
+    /// </remarks>
     public UnmanagedMemoryManager
         (
             IntPtr handle,
             int length
         )
     {
-        if (length < 0)
-        {
-            throw new ArgumentOutOfRangeException (nameof (length));
-        }
+        Sure.NonNegative (length);
 
         _handle = handle;
         _pointer = (T*)_handle.ToPointer();
@@ -111,56 +111,48 @@ public sealed unsafe class UnmanagedMemoryManager<T>
     }
 
     /// <summary>
-    /// Создает менеджер для неуправляемой памяти, полученной
+    /// Создание менеджера для неуправляемой памяти, полученной
     /// от <c>Marshal.AllocHGlobal.</c>
     /// </summary>
-    /// <param name="length"></param>
+    ///
+    /// <param name="length">Длина блока в элементах.</param>
     public UnmanagedMemoryManager
         (
             int length
         )
         : this (Marshal.AllocHGlobal (length), length)
     {
+        // пустое тело конструктора
     }
 
     #endregion
 
     #region MemoryManager<T> members
 
-    /// <summary>
-    /// Obtains a span that represents the region
-    /// </summary>
+    /// <inheritdoc cref="MemoryManager{T}.GetSpan"/>
     public override Span<T> GetSpan()
     {
         return new (_pointer, _length);
     }
 
-    /// <summary>
-    /// Provides access to a pointer that represents the data (note: no actual pin occurs)
-    /// </summary>
+    /// <inheritdoc cref="MemoryManager{T}.Pin"/>
     public override MemoryHandle Pin
         (
             int elementIndex = 0
         )
     {
-        if (elementIndex < 0 || elementIndex >= _length)
-        {
-            throw new ArgumentOutOfRangeException (nameof (elementIndex));
-        }
+        Sure.InRange (elementIndex, 0, _length);
 
         return new MemoryHandle (_pointer + elementIndex);
     }
 
-    /// <summary>
-    /// Has no effect
-    /// </summary>
+    /// <inheritdoc cref="MemoryManager{T}.Unpin"/>
     public override void Unpin()
     {
+        // пустое тело метода
     }
 
-    /// <summary>
-    /// Releases all resources associated with this object
-    /// </summary>
+    /// <inheritdoc cref="MemoryManager{T}.Dispose"/>
     protected override void Dispose (bool disposing)
     {
         if (_handle != IntPtr.Zero)
