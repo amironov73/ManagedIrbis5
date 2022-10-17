@@ -75,7 +75,7 @@ public static class FileUtility
         using FileStream firstStream = File.OpenRead (first),
             secondStream = File.OpenRead (second);
 
-        return StreamUtility.CompareTo
+        return StreamUtility.Compare
             (
                 firstStream,
                 secondStream

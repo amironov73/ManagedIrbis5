@@ -1,45 +1,61 @@
-﻿using System.IO;
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CollectionNeverQueried.Local
+// ReSharper disable CollectionNeverUpdated.Local
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UseObjectOrCollectionInitializer
+
+#region Using directives
+
+using System.IO;
 using System.Text;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using AM.IO;
 
-// ReSharper disable CheckNamespace
+#endregion
 
-namespace UnitTests.AM.IO
+#nullable enable
+
+namespace UnitTests.AM.IO;
+
+[TestClass]
+public sealed class TextWriterUtilityTest
 {
-    [TestClass]
-    public class TextWriterUtilityTest
+    [TestMethod]
+    [Description ("Добавление текста в конец файл")]
+    public void TextWriterUtility_Append_1()
     {
-        [TestMethod]
-        public void TextWriterUtility_Append_1()
-        {
-            Encoding encoding = Encoding.ASCII;
+        var encoding = Encoding.ASCII;
 
-            string fileName = Path.GetTempFileName();
-            File.WriteAllText(fileName, "Hello, ", encoding);
-            using (TextWriter writer = TextWriterUtility.Append(fileName, encoding))
-            {
-                writer.Write("world!");
-            }
-            string actual = File.ReadAllText(fileName, encoding);
-            Assert.AreEqual("Hello, world!", actual);
+        var fileName = Path.GetTempFileName();
+        File.WriteAllText (fileName, "Hello, ", encoding);
+        using (var writer = TextWriterUtility.Append (fileName, encoding))
+        {
+            writer.Write ("world!");
         }
 
-        [TestMethod]
-        public void TextWriterUtility_Create_1()
+        var actual = File.ReadAllText (fileName, encoding);
+        Assert.AreEqual ("Hello, world!", actual);
+    }
+
+    [TestMethod]
+    [Description ("Создание файла в указанной кодировке")]
+    public void TextWriterUtility_Create_1()
+    {
+        const string expected = "Hello, world!";
+        var encoding = Encoding.ASCII;
+        var fileName = Path.GetTempFileName();
+        File.Delete (fileName);
+        using (var writer = TextWriterUtility.Create (fileName, encoding))
         {
-            string expected = "Hello, world!";
-            Encoding encoding = Encoding.ASCII;
-            string fileName = Path.GetTempFileName();
-            File.Delete(fileName);
-            using (TextWriter writer = TextWriterUtility.Create(fileName, encoding))
-            {
-                writer.Write(expected);
-            }
-            string actual = File.ReadAllText(fileName, encoding);
-            Assert.AreEqual(expected, actual);
+            writer.Write (expected);
         }
+
+        var actual = File.ReadAllText (fileName, encoding);
+        Assert.AreEqual (expected, actual);
     }
 }

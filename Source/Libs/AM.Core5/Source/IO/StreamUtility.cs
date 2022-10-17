@@ -72,7 +72,7 @@ public static class StreamUtility
     /// <summary>
     /// Compares two <see cref="Stream"/>'s from current position.
     /// </summary>
-    public static unsafe int CompareTo
+    public static unsafe int Compare
         (
             Stream firstStream,
             Stream secondStream
