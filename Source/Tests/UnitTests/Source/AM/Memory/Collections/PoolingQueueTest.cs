@@ -1,10 +1,21 @@
-﻿// ReSharper disable AccessToDisposedClosure
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable AccessToDisposedClosure
 // ReSharper disable CheckNamespace
+// ReSharper disable CollectionNeverQueried.Local
+// ReSharper disable CollectionNeverUpdated.Local
 // ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UseObjectOrCollectionInitializer
+
+#region Using directives
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using AM.Memory.Collections.Specialized;
+
+#endregion
 
 #nullable enable
 
@@ -37,7 +48,7 @@ public class PoolingQueueTests
     {
         using var list = new PoolingQueueRef<object>();
 
-        for (int i = 0; i < PoolsDefaults.DefaultPoolBucketSize; i++)
+        for (var i = 0; i < PoolsDefaults.DefaultPoolBucketSize; i++)
         {
             list.Enqueue (i * 10);
         }

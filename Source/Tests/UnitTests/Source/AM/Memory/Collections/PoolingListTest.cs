@@ -1,6 +1,15 @@
-﻿// ReSharper disable AccessToDisposedClosure
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable AccessToDisposedClosure
 // ReSharper disable CheckNamespace
+// ReSharper disable CollectionNeverQueried.Local
+// ReSharper disable CollectionNeverUpdated.Local
 // ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UseObjectOrCollectionInitializer
+
+#region Using directives
 
 using System;
 
@@ -8,12 +17,14 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using AM.Memory.Collections.Specialized;
 
+#endregion
+
 #nullable enable
 
 namespace UnitTests.AM.Memory.Collections.Specialized;
 
 [TestClass]
-public class PoolingListTests
+public sealed class PoolingListTests
 {
     [TestMethod]
     public void TestEmpty()

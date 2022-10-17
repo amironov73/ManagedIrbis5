@@ -272,6 +272,7 @@ public static class Sequence
             T? defaultValue
         )
     {
+
         foreach (var item in list)
         {
             return item;
