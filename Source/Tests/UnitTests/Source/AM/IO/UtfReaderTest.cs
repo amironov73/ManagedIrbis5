@@ -20,7 +20,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace UnitTests.AM.IO;
 
 [TestClass]
-public class UtfReaderTest
+public sealed class UtfReaderTest
 {
     private static void _CountChars (string text)
     {
