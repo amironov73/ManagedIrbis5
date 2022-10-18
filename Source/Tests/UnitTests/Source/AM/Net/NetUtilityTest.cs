@@ -1,14 +1,24 @@
-﻿// ReSharper disable CheckNamespace
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CollectionNeverQueried.Local
+// ReSharper disable CollectionNeverUpdated.Local
+// ReSharper disable ConvertToLocalFunction
 // ReSharper disable InvokeAsExtensionMethod
 // ReSharper disable ForCanBeConvertedToForeach
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UseObjectOrCollectionInitializer
 
-using System;
+#region Using directives
+
 using System.Net;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using AM.Net;
+
+#endregion
 
 #nullable enable
 
@@ -18,12 +28,12 @@ namespace UnitTests.AM.Net;
 public sealed class NetUtilityTest
 {
     [TestMethod]
-    [Description ("")]
+    [Description ("Получение локальных адресов")]
     public void NetUtility_GetLocalAddresses_1()
     {
         var localAddresses = NetUtility.GetLocalAdresses();
         var text = string.Join<IPAddress> (';', localAddresses);
-        Console.WriteLine (text);
+        // System.Console.WriteLine (text);
         Assert.IsNotNull (text);
     }
 
@@ -33,6 +43,7 @@ public sealed class NetUtilityTest
     {
         var localNetwork = NetUtility.GetLocalNetwork();
         var text = string.Join<IPRange> (';', localNetwork);
+        // System.Console.WriteLine (text);
         Assert.IsNotNull (text);
     }
 }

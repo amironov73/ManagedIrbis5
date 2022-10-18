@@ -1,12 +1,24 @@
-﻿// ReSharper disable CheckNamespace
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CollectionNeverQueried.Local
+// ReSharper disable CollectionNeverUpdated.Local
+// ReSharper disable ConvertToLocalFunction
+// ReSharper disable HeapView.ClosureAllocation
 // ReSharper disable InvokeAsExtensionMethod
 // ReSharper disable ForCanBeConvertedToForeach
+// ReSharper disable UseObjectOrCollectionInitializer
+
+#region Using directives
 
 using System;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using AM;
+
+#endregion
 
 namespace UnitTests.AM;
 
@@ -84,7 +96,7 @@ public class OneOfTest
     {
         var flag = false;
         var one = new OneOf<int, string> (1);
-        one.Switch (intValue => { flag = true; }, strValue => { flag = false; });
+        one.Switch (_ => { flag = true; }, _ => { flag = false; });
         Assert.IsTrue (flag);
     }
 
@@ -93,7 +105,7 @@ public class OneOfTest
     {
         var flag = true;
         var one = new OneOf<int, string> ("Hello");
-        one.Switch (intValue => { flag = true; }, strValue => { flag = false; });
+        one.Switch (_ => { flag = true; }, _ => { flag = false; });
         Assert.IsFalse (flag);
     }
 
@@ -108,7 +120,7 @@ public class OneOfTest
     public void OneOf2_Match_1()
     {
         var one = new OneOf<int, string> (1);
-        var value = one.Match (intValue => 123, textValue => 321);
+        var value = one.Match (_ => 123, _ => 321);
         Assert.AreEqual (123, value);
     }
 
@@ -116,7 +128,7 @@ public class OneOfTest
     public void OneOf2_Match_2()
     {
         var one = new OneOf<int, string> ("Hello");
-        var value = one.Match (intValue => 123, textValue => 321);
+        var value = one.Match (_ => 123, _ => 321);
         Assert.AreEqual (321, value);
     }
 
@@ -268,7 +280,7 @@ public class OneOfTest
     public void OneOf3_As_2()
     {
         var one = new OneOf<int, string, bool> (1);
-        one.As2();
+        var _ = one.As2();
     }
 
     [TestMethod]
@@ -276,7 +288,7 @@ public class OneOfTest
     public void OneOf3_As_3()
     {
         var one = new OneOf<int, string, bool> (1);
-        one.As3();
+        var _ = one.As3();
     }
 
     [TestMethod]
@@ -284,9 +296,9 @@ public class OneOfTest
     {
         var flag = false;
         var one = new OneOf<int, string, bool> (1);
-        one.Switch (intValue => { flag = true; },
-            strValue => { flag = false; },
-            boolValue => { flag = false; });
+        one.Switch (_ => { flag = true; },
+            _ => { flag = false; },
+            _ => { flag = false; });
         Assert.IsTrue (flag);
     }
 
@@ -295,9 +307,9 @@ public class OneOfTest
     {
         var flag = true;
         var one = new OneOf<int, string, bool> ("Hello");
-        one.Switch (intValue => { flag = true; },
-            strValue => { flag = false; },
-            boolValue => { flag = false; });
+        one.Switch (_ => { flag = true; },
+            _ => { flag = false; },
+            _ => { flag = false; });
         Assert.IsFalse (flag);
     }
 
@@ -306,9 +318,9 @@ public class OneOfTest
     {
         var flag = true;
         var one = new OneOf<int, string, bool> (true);
-        one.Switch (intValue => { flag = true; },
-            strValue => { flag = true; },
-            boolValue => { flag = false; });
+        one.Switch (_ => { flag = true; },
+            _ => { flag = true; },
+            _ => { flag = false; });
         Assert.IsFalse (flag);
     }
 
@@ -323,9 +335,9 @@ public class OneOfTest
     public void OneOf3_Match_1()
     {
         var one = new OneOf<int, string, bool> (1);
-        var value = one.Match (intValue => 123,
-            textValue => 321,
-            boolValue => 213);
+        var value = one.Match (_ => 123,
+            _ => 321,
+            _ => 213);
         Assert.AreEqual (123, value);
     }
 
@@ -333,9 +345,9 @@ public class OneOfTest
     public void OneOf3_Match_2()
     {
         var one = new OneOf<int, string, bool> ("Hello");
-        var value = one.Match (intValue => 123,
-            textValue => 321,
-            boolValue => 213);
+        var value = one.Match (_ => 123,
+            _ => 321,
+            _ => 213);
         Assert.AreEqual (321, value);
     }
 
