@@ -110,6 +110,16 @@ public static class UnicodeCharacter
     public const char PlusMinusSign = (char) 0xB1;
 
     /// <summary>
+    /// Paragraph sign.
+    /// </summary>
+    public const char ParagraphSign = (char) 0xB6;
+
+    /// <summary>
+    /// Interpunct, middle dot.
+    /// </summary>
+    public const char Interpunct = (char) 0xB7;
+
+    /// <summary>
     /// Multiplication sign, also known as the times sign
     /// or the dimension sign.
     /// </summary>
@@ -164,12 +174,32 @@ public static class UnicodeCharacter
     public const char Hyphen = (char) 0x2010;
 
     /// <summary>
-    ///
+    /// Non-breaking hyphen.
     /// </summary>
     /// <remarks>
     /// See https://en.wikipedia.org/wiki/Hyphen#Nonbreaking_hyphens
     /// </remarks>
     public const char NonBreakingHyphen = (char) 0x2011;
+
+    /// <summary>
+    /// Figure dash.
+    /// </summary>
+    public const char FigureDash = (char) 0x2012;
+
+    /// <summary>
+    /// En dash.
+    /// </summary>
+    public const char EnDash = (char) 0x2013;
+
+    /// <summary>
+    /// Em dash.
+    /// </summary>
+    public const char EmDash = (char) 0x2014;
+
+    /// <summary>
+    /// Bullet.
+    /// </summary>
+    public const char Bullet = (char) 0x2022;
 
     /// <summary>
     /// Series of dots (typically three, such as "…") that
@@ -281,6 +311,26 @@ public static class UnicodeCharacter
     public const char WordJoiner = (char) 0x2060;
 
     /// <summary>
+    /// Left arrow.
+    /// </summary>
+    public const char LeftArrow = (char) 0x2090;
+
+    /// <summary>
+    /// Up arrow.
+    /// </summary>
+    public const char UpArrow = (char) 0x2091;
+
+    /// <summary>
+    /// Right arrow.
+    /// </summary>
+    public const char RightArrow = (char) 0x2092;
+
+    /// <summary>
+    /// Down arrow.
+    /// </summary>
+    public const char DownArrow = (char) 0x2093;
+
+    /// <summary>
     /// Typographic abbreviation of the word number(s)
     /// indicating ordinal numeration, especially in names
     /// and titles.
@@ -300,6 +350,36 @@ public static class UnicodeCharacter
     /// See https://en.wikipedia.org/wiki/Trademark_symbol
     /// </remarks>
     public const char TradeMarkSign = (char) 0x2122;
+
+    /// <summary>
+    /// For all.
+    /// </summary>
+    public const char ForAll = (char) 0x2200;
+
+    /// <summary>
+    /// Exists.
+    /// </summary>
+    public const char Exists = (char) 0x2203;
+
+    /// <summary>
+    /// Nabla, backward difference, gradient.
+    /// </summary>
+    public const char Nabla = (char) 0x2207;
+
+    /// <summary>
+    /// N-ary summation.
+    /// </summary>
+    public const char Sum = (char) 0x2211;
+
+    /// <summary>
+    /// Infinity.
+    /// </summary>
+    public const char Infinity = (char) 0x221E;
+
+    /// <summary>
+    /// Integral.
+    /// </summary>
+    public const char Integral = (char) 0x222B;
 
     /// <summary>
     /// Series of dots (typically three, such as "…") that
@@ -322,6 +402,56 @@ public static class UnicodeCharacter
     /// See https://en.wikipedia.org/wiki/Ellipsis
     /// </remarks>
     public const char HorizontalMidlineEllipsis = (char) 0x22EF;
+
+    /// <summary>
+    /// Erase to the left (backspace) symbol.
+    /// </summary>
+    public const char Backspace = (char) 0x232B;
+
+    /// <summary>
+    /// Carriage return symbol.
+    /// </summary>
+    public const char CarriageReturn = (char) 0x23CE;
+
+    /// <summary>
+    /// Space symbol.
+    /// </summary>
+    public const char Space = (char) 0x2423;
+
+    /// <summary>
+    /// Black star.
+    /// </summary>
+    public const char BlackStar = (char) 0x2605;
+
+    /// <summary>
+    /// White star.
+    /// </summary>
+    public const char WhiteStar = (char) 0x2606;
+
+    /// <summary>
+    /// Ballot box.
+    /// </summary>
+    public const char BallotBox = (char) 0x2610;
+
+    /// <summary>
+    /// Ballot box with check.
+    /// </summary>
+    public const char BallotBoxWithCheck = (char) 0x2611;
+
+    /// <summary>
+    /// Ballot box with X.
+    /// </summary>
+    public const char BallotBoxWithX = (char) 0x2612;
+
+    /// <summary>
+    /// Check mark.
+    /// </summary>
+    public const char CheckMark = (char) 0x2713;
+
+    /// <summary>
+    /// Cross mark.
+    /// </summary>
+    public const char CrossMark = (char) 0x2717;
 
     #endregion
 }
