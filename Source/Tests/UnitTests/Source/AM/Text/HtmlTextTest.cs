@@ -1,15 +1,22 @@
-﻿// ReSharper disable CheckNamespace
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+
+#region Using directives
 
 using AM.Text;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#endregion
 
 #nullable enable
 
 namespace UnitTests.AM.Text;
 
 [TestClass]
-public class HtmlTextTest
+public sealed class HtmlTextTest
 {
     [TestMethod]
     public void HtmlText_Encode_1()
@@ -35,7 +42,7 @@ public class HtmlTextTest
     [TestMethod]
     public void HtmlText_ToPlainText_1()
     {
-        string html = string.Empty;
+        var html = string.Empty;
         Assert.AreEqual
             (
                 string.Empty,

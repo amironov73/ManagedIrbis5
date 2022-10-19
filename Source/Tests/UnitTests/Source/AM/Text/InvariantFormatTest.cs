@@ -1,15 +1,22 @@
-﻿// ReSharper disable CheckNamespace
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+
+#region Using directives
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using AM.Text;
+
+#endregion
 
 #nullable enable
 
 namespace UnitTests.AM.Text;
 
 [TestClass]
-public class InvariantFormatTest
+public sealed class InvariantFormatTest
 {
     [TestMethod]
     public void InvariantFormat_Format_1()
