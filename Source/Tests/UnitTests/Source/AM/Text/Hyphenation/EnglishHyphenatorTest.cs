@@ -1,74 +1,80 @@
-﻿// ReSharper disable CheckNamespace
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
+
+#region Using directives
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using AM.Text.Hyphenation;
 
+#endregion
+
 #nullable enable
 
-namespace UnitTests.AM.Text.Hyphenation
+namespace UnitTests.AM.Text.Hyphenation;
+
+[TestClass]
+public class EnglishHyphenatorTest
+    : HyphenatorTest
 {
-    [TestClass]
-    public class EnglishHyphenatorTest
-        : HyphenatorTest
+    [TestMethod]
+    public void EnglishHyphenator_Hyphenate_1()
     {
-        [TestMethod]
-        public void EnglishHyphenator_Hyphenate_1()
-        {
-            _TestHyphenate<EnglishHyphenator>("here", "he-re");
-            _TestHyphenate<EnglishHyphenator>("there", "the-re");
-            _TestHyphenate<EnglishHyphenator>("anywhere", "any-w-he-re");
-        }
+        _TestHyphenate<EnglishHyphenator> ("here", "he-re");
+        _TestHyphenate<EnglishHyphenator> ("there", "the-re");
+        _TestHyphenate<EnglishHyphenator> ("anywhere", "any-w-he-re");
+    }
 
-        [TestMethod]
-        [Description("Слова, состоящие из прописных букв, не разбиваются")]
-        public void EnglishHyphenator_Hyphenate_2()
-        {
-            _TestHyphenate<EnglishHyphenator>("HERE", "HERE");
-        }
+    [TestMethod]
+    [Description ("Слова, состоящие из прописных букв, не разбиваются")]
+    public void EnglishHyphenator_Hyphenate_2()
+    {
+        _TestHyphenate<EnglishHyphenator> ("HERE", "HERE");
+    }
 
-        [TestMethod]
-        public void EnglishHyphenator_Hyphenate_3()
-        {
-            _TestHyphenate<EnglishHyphenator>("The", "The");
-        }
+    [TestMethod]
+    public void EnglishHyphenator_Hyphenate_3()
+    {
+        _TestHyphenate<EnglishHyphenator> ("The", "The");
+    }
 
-        [TestMethod]
-        public void EnglishHyphenator_Hyphenate_4()
-        {
-            _TestHyphenate<EnglishHyphenator>("graffiti", "graf-fiti");
+    [TestMethod]
+    public void EnglishHyphenator_Hyphenate_4()
+    {
+        _TestHyphenate<EnglishHyphenator> ("graffiti", "graf-fiti");
 
-            // Должно быть con-ver-ter
-            _TestHyphenate<EnglishHyphenator>("converter", "co-n-ve-r-ter");
-        }
+        // Должно быть con-ver-ter
+        _TestHyphenate<EnglishHyphenator> ("converter", "co-n-ve-r-ter");
+    }
 
-        [TestMethod]
-        public void EnglishHyphenator_Hyphenate_5()
-        {
-            _TestHyphenate<EnglishHyphenator>("dislike", "dis-li-ke");
+    [TestMethod]
+    public void EnglishHyphenator_Hyphenate_5()
+    {
+        _TestHyphenate<EnglishHyphenator> ("dislike", "dis-li-ke");
 
-            // Должно быть treat-ment
-            _TestHyphenate<EnglishHyphenator>("treatment", "tre-a-t-ment");
+        // Должно быть treat-ment
+        _TestHyphenate<EnglishHyphenator> ("treatment", "tre-a-t-ment");
 
-            // Должно быть snow-man
-            _TestHyphenate<EnglishHyphenator>("snowman", "sno-w-man");
-        }
+        // Должно быть snow-man
+        _TestHyphenate<EnglishHyphenator> ("snowman", "sno-w-man");
+    }
 
-        [TestMethod]
-        public void EnglishHyphenator_Hyphenate_6()
-        {
-            // Должно быть poly-chro-me
-            _TestHyphenate<EnglishHyphenator>("polychrome", "po-lyc-hro-me");
-        }
+    [TestMethod]
+    public void EnglishHyphenator_Hyphenate_6()
+    {
+        // Должно быть poly-chro-me
+        _TestHyphenate<EnglishHyphenator> ("polychrome", "po-lyc-hro-me");
+    }
 
-        [TestMethod]
-        public void EnglishHyphenator_LanguageName_1()
-        {
-            var hyphenator = new EnglishHyphenator();
-            Assert.AreEqual("English", hyphenator.LanguageName);
-        }
+    [TestMethod]
+    public void EnglishHyphenator_LanguageName_1()
+    {
+        var hyphenator = new EnglishHyphenator();
+        Assert.AreEqual ("English", hyphenator.LanguageName);
     }
 }
