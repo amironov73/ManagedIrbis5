@@ -19,7 +19,7 @@ using AM.Text.Output;
 namespace UnitTests.AM.Text.Output;
 
 [TestClass]
-public class TextOutputTest
+public sealed class TextOutputTest
 {
     [TestMethod]
     public void TextOutput_Construction_1()

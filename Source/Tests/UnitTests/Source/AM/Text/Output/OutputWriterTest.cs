@@ -19,7 +19,7 @@ using AM.Text.Output;
 namespace UnitTests.AM.Text.Output;
 
 [TestClass]
-public class OutputWriterTest
+public sealed class OutputWriterTest
 {
     [TestMethod]
     public void OutputWriter_WriteLine_1()

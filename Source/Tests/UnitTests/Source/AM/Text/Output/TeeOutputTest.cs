@@ -19,7 +19,7 @@ using AM.Text.Output;
 namespace UnitTests.AM.Text.Output;
 
 [TestClass]
-public class TeeOutputTest
+public sealed class TeeOutputTest
 {
     [TestMethod]
     public void TeeOutput_Write_1()

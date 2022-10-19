@@ -1,7 +1,12 @@
-﻿// ReSharper disable CheckNamespace
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
+
+#region Using directives
 
 using System;
 using System.Linq;
@@ -10,12 +15,14 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using AM.Text.Ranges;
 
+#endregion
+
 #nullable enable
 
 namespace UnitTests.AM.Text.Ranges;
 
 [TestClass]
-public class NumberRangeCollectionTest
+public sealed class NumberRangeCollectionTest
 {
     [TestMethod]
     public void NumberRangeCollection_Parse_1()

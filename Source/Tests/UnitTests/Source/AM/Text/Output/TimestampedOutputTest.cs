@@ -19,7 +19,7 @@ using AM.Text.Output;
 namespace UnitTests.AM.Text.Output;
 
 [TestClass]
-public class TimestampedOutputTest
+public sealed class TimestampedOutputTest
 {
     [TestMethod]
     public void TimestampedOutput_ToString_1()
