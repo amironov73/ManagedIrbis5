@@ -1,38 +1,44 @@
-﻿// ReSharper disable CheckNamespace
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
+
+#region Using directives
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using AM.Text.Output;
 
+#endregion
+
 #nullable enable
 
-namespace UnitTests.AM.Text.Output
+namespace UnitTests.AM.Text.Output;
+
+[TestClass]
+public class TextOutputTest
 {
-    [TestClass]
-    public class TextOutputTest
+    [TestMethod]
+    public void TextOutput_Construction_1()
     {
-        [TestMethod]
-        public void TextOutput_Construction_1()
-        {
-            var output = new TextOutput();
+        var output = new TextOutput();
 
-            Assert.IsFalse(output.HaveError);
-        }
+        Assert.IsFalse (output.HaveError);
+    }
 
-        [TestMethod]
-        public void TextOutput_ToString_1()
-        {
-            const string expected = "Quick brown fox";
+    [TestMethod]
+    public void TextOutput_ToString_1()
+    {
+        const string expected = "Quick brown fox";
 
-            var output = new TextOutput();
-            output.Write(expected);
+        var output = new TextOutput();
+        output.Write (expected);
 
-            var actual = output.ToString();
+        var actual = output.ToString();
 
-            Assert.AreEqual(expected, actual);
-        }
+        Assert.AreEqual (expected, actual);
     }
 }
