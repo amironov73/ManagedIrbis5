@@ -19,7 +19,7 @@ using AM.Text.Hyphenation;
 namespace UnitTests.AM.Text.Hyphenation;
 
 [TestClass]
-public class EnglishHyphenatorTest
+public sealed class EnglishHyphenatorTest
     : HyphenatorTest
 {
     [TestMethod]
