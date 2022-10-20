@@ -1,10 +1,18 @@
-﻿// ReSharper disable CheckNamespace
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable StringLiteralTypo
+
+#region Using directives
 
 using System;
 
 using AM.Text;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#endregion
 
 namespace UnitTests.AM.Text;
 
@@ -98,7 +106,7 @@ public sealed class RichTextTest
     [TestMethod]
     public void RichText_Encode_3()
     {
-        UnicodeRange range = UnicodeRange.Cyrillic;
+        var range = UnicodeRange.Cyrillic;
         Assert.AreEqual ("Hello", RichText.Encode ("Hello", range));
         Assert.AreEqual ("Привет", RichText.Encode ("Привет", range));
     }
@@ -106,7 +114,7 @@ public sealed class RichTextTest
     [TestMethod]
     public void RichText_Encode_4()
     {
-        UnicodeRange range = UnicodeRange.LatinExtended;
+        var range = UnicodeRange.LatinExtended;
         Assert.AreEqual ("\\u1055?\\u1088?\\u1080?\\u1074?\\u1077?\\u1090?",
             RichText.Encode ("Привет", range));
     }
@@ -114,7 +122,7 @@ public sealed class RichTextTest
     [TestMethod]
     public void RichText_Encode_5()
     {
-        UnicodeRange range = UnicodeRange.Russian;
+        var range = UnicodeRange.Russian;
         Assert.AreEqual (null, RichText.Encode2 (null, range));
         Assert.AreEqual ("", RichText.Encode2 ("", range));
         Assert.AreEqual ("\\'09", RichText.Encode2 ("\t", range));
@@ -128,8 +136,8 @@ public sealed class RichTextTest
     [TestMethod]
     public void RichText_Encode_6()
     {
-        UnicodeRange range = UnicodeRange.Russian;
-        string fontSwitch = "\\f2";
+        var range = UnicodeRange.Russian;
+        var fontSwitch = "\\f2";
         Assert.AreEqual (null, RichText.Encode3 (null, range, fontSwitch));
         Assert.AreEqual ("", RichText.Encode3 ("", range, fontSwitch));
         Assert.AreEqual ("\\'09", RichText.Encode3 ("\t", range, fontSwitch));
