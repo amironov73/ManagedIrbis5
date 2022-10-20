@@ -1,10 +1,17 @@
-﻿// ReSharper disable CheckNamespace
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+
+#region Using directives
 
 using System;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using AM.Text;
+
+#endregion
 
 #nullable enable
 
@@ -20,7 +27,7 @@ public class NewLineTest
             string? argument
         )
     {
-        string? actual = func (argument);
+        var actual = func (argument);
 
         Assert.AreEqual (expected, actual);
     }
