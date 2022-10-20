@@ -20,3 +20,6 @@ var y = 2;
 var z = x + y;
 
 Console.WriteLine ($"{x} + {y} = {z}");
+
+Console.WriteLine ("Press <ENTER> to stop the application");
+Console.ReadLine();

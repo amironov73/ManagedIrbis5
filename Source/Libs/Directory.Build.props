@@ -5,6 +5,8 @@
     <!-- NuGet related stuff -->
     <PropertyGroup>
         <IsPackable>true</IsPackable>
+        <DebugType>portable</DebugType>
+        <EmbedAllSources>true</EmbedAllSources>
         <PackageIcon>arsmagna-icon.png</PackageIcon>
     </PropertyGroup>
 
