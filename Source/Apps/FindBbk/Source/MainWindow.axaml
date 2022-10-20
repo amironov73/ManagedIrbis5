@@ -21,7 +21,7 @@
             ColumnDefinitions="Auto,*,Auto"
             HorizontalAlignment="Stretch">
 
-            <Label>Искомое: </Label>
+            <Label VerticalAlignment="Center">Искомое:</Label>
             <TextBox
                 Grid.Column="1"
                 Text="{Binding LookingFor}"
@@ -30,6 +30,7 @@
                 />
             <Button
                 Grid.Column="2"
+                IsDefault="True"
                 Command="{Binding PerformSearch}"
                 >
                 Найти
@@ -37,18 +38,33 @@
 
         </Grid>
 
+        <Label
+            HorizontalAlignment="Center"
+            FontWeight="Bold"
+            Foreground="Red"
+            Content="{Binding ErrorMessage}"
+            />
+
         <ListBox
+            Name="BbkList"
             HorizontalAlignment="Stretch"
             Items="{Binding Found}"
             >
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel
-                        HorizontalAlignment="Stretch"
-                        Orientation="Horizontal">
-                        <Label FontWeight="Bold" Content="{Binding Index}" />
-                        <Label Content="{Binding Description}" />
-                    </StackPanel>
+                    <Grid
+                        PointerPressed="List_HandleClick"
+                        ColumnDefinitions="Auto, *"
+                        HorizontalAlignment="Stretch">
+                        <TextBlock
+                            FontWeight="Bold"
+                            Margin="0, 0, 10, 0"
+                            Text="{Binding Index}" />
+                        <TextBlock
+                            Grid.Column="1"
+                            TextWrapping="WrapWithOverflow"
+                            Text="{Binding Description}" />
+                    </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>

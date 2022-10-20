@@ -15,6 +15,10 @@ using System;
 using System.Threading.Tasks;
 
 using AM;
+using AM.Collections;
+
+using Avalonia.Controls;
+using Avalonia.Input;
 
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -36,10 +40,21 @@ public sealed class BbkModel
     #region Properties
 
     /// <summary>
-    /// Искомое
+    /// Окно.
+    /// </summary>
+    internal Window window = null!;
+
+    /// <summary>
+    /// Искомое понятие.
     /// </summary>
     [Reactive]
     public string? LookingFor { get; set; }
+
+    /// <summary>
+    /// Сообщение об ошибке.
+    /// </summary>
+    [Reactive]
+    public string? ErrorMessage { get; set; }
 
     /// <summary>
     /// Найденные записи в эталоне ББК.
@@ -54,21 +69,27 @@ public sealed class BbkModel
     /// <summary>
     /// Осуществление поиска.
     /// </summary>
-    public Task PerformSearch()
+    public async Task PerformSearch()
     {
+        ErrorMessage = null;
         Found = Array.Empty<BbkEntry>();
 
         var query = LookingFor.SafeTrim();
         if (string.IsNullOrEmpty (query))
         {
-            return Task.CompletedTask;
+            return;
         }
 
         var client = new EthalonBbkClient();
-        var html = client.GetRawHtml (query);
+        window.Cursor = new Cursor (StandardCursorType.Wait);
+        var html = await client.GetRawHtmlAsync (query);
         Found = client.ParseEntries (html);
+        if (Found.IsNullOrEmpty())
+        {
+            ErrorMessage = "Ничего не найдено";
+        }
 
-        return Task.CompletedTask;
+        window.Cursor = Cursor.Default;
     }
 
     #endregion
