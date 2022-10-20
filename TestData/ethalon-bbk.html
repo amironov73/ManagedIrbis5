@@ -1,0 +1,2427 @@
+
+
+
+
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+  
+  
+  
+  
+  
+<HEAD>
+  <TITLE>Поиск данных</TITLE>
+  <META http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="НИЦ РГБ">
+  <META http-equiv="keywords" content="">
+  <META http-equiv="description" content="Поиск данных">
+  <LINK href='/css/jquery-ui.css' rel='stylesheet' type='text/css'>
+  <LINK href='/css/main.css' rel='stylesheet' type='text/css'>
+  <LINK href='/css/user.css' rel='stylesheet' type='text/css'>
+  <style type="text/css">
+    body{
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+  </style>
+  <SCRIPT type='text/javascript' src='/jslibs/jquery.js'></SCRIPT>
+  <SCRIPT type='text/javascript' src='/jslibs/jquery-ui.js'></SCRIPT>
+  <SCRIPT type='text/javascript' src='/jslibs/pure.js'></SCRIPT>
+  <SCRIPT type='text/javascript' src='/js/common.js'></SCRIPT>
+  <SCRIPT type='text/javascript' src='/js/external-common.js'></SCRIPT>
+
+  <!--
+  <link rel="shortcut icon" href="/ico/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="/ico/apple-touch-icon-57-precomposed.png">
+     -->
+
+  <!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+    m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+  (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+  ym(623750, "init", {
+    clickmap:true,
+    trackLinks:true,
+    accurateTrackBounce:true,
+    webvisor:true
+  });
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/623750" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
+
+
+
+  
+    <LINK href='/css/search.css' rel='stylesheet' type='text/css'>
+    <script type="text/javascript" src="/js/bbk-tree-opener.js"></script>
+    <script type="text/javascript" src="/js/methodic-view.js"></script>
+    <script type="text/javascript" src="/jslibs/jquery.ui.datepicker-ru.js"></script>
+    <script type="text/javascript" src="/js/search.js"></script>
+    <script type="text/javascript">
+      $(function () {$('body').bind('cut copy paste', function (e) {e.preventDefault()})});
+      mainMenu.init("SEARCH");
+      $(function() {
+        bbkOpener.init({
+          block: "ETALON"
+        });
+        searchEditText.init();
+        search.init({
+          listValuesByField: {"LEVEL_CODING":[[" ","Полная запись"],["3","Частичная запись"],["n","Неизвестный уровень"]],"TYPE_INDEX":[["a","Отдельный индекс"],["b","Ряд индексов"],["c","Сводный ряд"],["n","Не применяется"]],"STATUS_RECORD":[["n","Новая запись"],["c","Откорректированная запись"],["d","Исключенная запись"],["a","Повышение уровня кодирования"]]},
+          dateFields: ["LAST_MODIFY","HISTORY_INFORMATION_DATE"],
+          muFields: ["METHODIC","LINKS"]
+        }, [{"searchField":"CAPTION","compare":"LIKE","value":"бетон","caseSens":false,"logicLink":"AND","deactivate":false},{"searchField":"HISTORY_INFORMATION_TEXT","compare":"EQ","value":"","caseSens":false,"logicLink":"AND","deactivate":false},{"searchField":"HISTORY_INFORMATION_TEXT","compare":"EQ","value":"","caseSens":false,"logicLink":"AND","deactivate":false}]);
+        methodicViewer.init('.link_in_methodic');
+      });
+    </script>
+  
+
+</HEAD>
+
+  
+<body oncopy="return false" oncut="return false" onpaste="return false">
+  
+    <div>
+      <IMG src='/images/rgbtop.gif'>
+    </div>
+  
+  <div class="main_menu" style="display: none;">
+    <INPUT type="checkbox" id='switch_checkbox' />
+    <LABEL for="switch_checkbox" style='margin-right: 10px;'
+        title="Если установить этот флаг - все окна будут открыватьcя поверх существующего">
+      В новом окне
+    </LABEL>
+    <div class="menu_items"></div>
+  </div>
+
+  
+    <form id="parameters" action="/external/search" method="POST">
+    <DIV class="centered">
+      <div id="search_parameters" style="display: none;">
+        <div class="detail_form_controls">
+            <INPUT type='submit' name="find" value="Искать">
+          </div>
+        <DIV class="centered" style="width: 90%;">
+          <div class="field_table_title">Условия для поиска</div>
+          <TABLE style="width: 100%;" cellspacing="0" cellpadding="0" border=1>
+            <thead class="search_table_header">
+              <TR>
+                <TH style="width: 25em;">Элементы записи<BR>для поиска</TH>
+                <TH style="width: 15em;" >
+                  Отношение<BR>
+                </TH>
+                <TH title="Здесь вы вводите значение, с которым будет сравниваться поле.
+Если выбранно отношение '=', то в тексте значения можно применять специальные символы :
+  % - означает любую последовательность символов
+  _ - означает любой символ"" >
+                  Значение<BR><button>?</button>
+                </TH>
+                <TH>Учет<BR>регистра<BR>букв</TH>
+                <TH title="'И' - логическое И
+'ИЛИ' - логическое ИЛИ" >
+                  Логическая<BR>связка<BR><button>?</button>
+                </TH>
+                <TH title="Вы можете временно отключать некоторые строки из списка критериев.
+Отключенные строки не будут приниматься в рассчет при поиске" >
+                  Откл.<BR><button>?</button>
+                </TH>
+                <TH>Пометка<BR>для<BR>удаления</TH>
+              </TR>
+            </thead>
+            <tbody id='criteria_table'>
+              <TR class="criterion">
+                <TD>
+                  <SELECT name="searchField" class='db_field_type' >
+                    
+                      <option value="INDEX">Индекс</option>
+                    
+                      <option value="CAPTION">Формулировка</option>
+                    
+                      <option value="METHODIC">Методические указания</option>
+                    
+                      <option value="LINKS">Cсылки</option>
+                    
+                      <option value="APU_TEXT">Данные для АПУ</option>
+                    
+                      <option value="STATUS_RECORD">Статус записи</option>
+                    
+                      <option value="LEVEL_CODING">Уровень кодирования</option>
+                    
+                      <option value="TYPE_INDEX">Тип индекса</option>
+                    
+                      <option value="LAST_MODIFY">Время последней корректировки</option>
+                    
+                      <option value="INSTRUCTIONS_SYSTEMATIZATION">Указание для систематизаторов</option>
+                    
+                      <option value="EXTEND_INFO_SYSTEMATIZATION">Доп. сведения для систематизаторов</option>
+                    
+                      <option value="HISTORY_INFORMATION_TEXT">Историческая справка (Текст)</option>
+                    
+                      <option value="HISTORY_INFORMATION_DATE">Историческая справка (Год)</option>
+                    
+                  </SELECT>
+                </TD>
+                <TD>
+                  <SELECT style='width: 100%;' name="compare">
+                    
+                      <option value="LIKE">содержит</option>
+                    
+                      <option value="EQ">равно</option>
+                    
+                      <option value="GT">больше</option>
+                    
+                      <option value="LT">меньше</option>
+                    
+                      <option value="NE">не равно</option>
+                    
+                      <option value="GE">больше или равно</option>
+                    
+                      <option value="LE">меньше или равно</option>
+                    
+                  </SELECT>
+                </TD>
+                <TD>
+                  <div style='white-space: nowrap;'>
+                    <INPUT style='width: 368px;' name='value' value='' />
+                    <INPUT type='button' value='...' style="width: 3em;" class='btn_builder' />
+                  </div>
+                </TD>
+                <TD align="center">
+                  
+<DIV class="logic_control" >
+  <INPUT type="checkbox" />
+  
+    
+      <input type="hidden" name="caseSens" value="false"/>
+    
+    
+  
+</DIV>
+                </TD>
+                <TD align="center">
+                  <SELECT style='width: 84px;' name='logicLink'>
+                    
+                      <option value="AND">И</option>
+                    
+                      <option value="OR">Или</option>
+                    
+                  </SELECT>
+                </TD>
+                <TD align="center">
+                  
+<DIV class="logic_control" >
+  <INPUT type="checkbox" />
+  
+    
+      <input type="hidden" name="deactivate" value="false"/>
+    
+    
+  
+</DIV>
+                </TD>
+                <TD align="center" style="white-space: nowrap;">
+                  
+<DIV class="logic_control" >
+  <INPUT type="checkbox" />
+  
+    
+      <input type="hidden" name="checkForDelete" value="false"/>
+    
+    
+  
+</DIV>
+                  <div style="display: none;" class="ui-state-default ui-corner-all delete_row" title=".ui-icon-closethick">
+                    <span class="ui-icon ui-icon-closethick"/>
+                  </div>
+                </TD>
+              </TR>
+            </TBODY>
+          </TABLE>
+          <div class="detail_form_controls">
+            <div>
+              <INPUT type="button" id="add_crit" value="Добавить условие">
+              <INPUT type="button" id="delete_selected_crit" value="Удалить выделенные">
+            </div>
+          </div>
+        </DIV>
+        
+          <input id="hidden_methodic_type_alter" name="mu[0]" class="hidden_methodic_type" type="hidden" value="true"/>
+        
+          <input id="hidden_methodic_type_lit" name="mu[1]" class="hidden_methodic_type" type="hidden" value="true"/>
+        
+          <input id="hidden_methodic_type_content" name="mu[2]" class="hidden_methodic_type" type="hidden" value="true"/>
+        
+          <input id="hidden_methodic_type_cond" name="mu[3]" class="hidden_methodic_type" type="hidden" value="true"/>
+        
+          <input id="hidden_methodic_type_mirror" name="mu[4]" class="hidden_methodic_type" type="hidden" value="true"/>
+        
+          <input id="hidden_methodic_type_divide" name="mu[5]" class="hidden_methodic_type" type="hidden" value="true"/>
+        
+          <input id="hidden_methodic_type_method" name="mu[6]" class="hidden_methodic_type" type="hidden" value="true"/>
+        
+          <input id="hidden_methodic_type_analog" name="mu[7]" class="hidden_methodic_type" type="hidden" value="true"/>
+        
+          <input id="hidden_methodic_type_clasif" name="mu[8]" class="hidden_methodic_type" type="hidden" value="true"/>
+        
+          <input id="hidden_methodic_type_indexrule" name="mu[9]" class="hidden_methodic_type" type="hidden" value="true"/>
+        
+          <input id="hidden_methodic_type_use" name="mu[10]" class="hidden_methodic_type" type="hidden" value="true"/>
+        
+          <input id="hidden_methodic_type_differ" name="mu[11]" class="hidden_methodic_type" type="hidden" value="true"/>
+        
+          <input id="hidden_methodic_type_alterindex" name="mu[12]" class="hidden_methodic_type" type="hidden" value="true"/>
+        
+          <input id="hidden_methodic_type_also" name="mu[13]" class="hidden_methodic_type" type="hidden" value="true"/>
+        
+          <input id="hidden_methodic_type_see" name="mu[14]" class="hidden_methodic_type" type="hidden" value="true"/>
+        
+          <input id="hidden_methodic_type_wording" name="mu[15]" class="hidden_methodic_type" type="hidden" value="true"/>
+        
+          <input id="hidden_methodic_type_limitation" name="mu[16]" class="hidden_methodic_type" type="hidden" value="true"/>
+        
+      </div>
+      <HR>
+      <A href="#find_result" name="find_result" id="find_result"></A>
+      
+          <span class='page_message error'></span>
+          
+            
+            
+              <HR>
+              
+            <span class='title'>Результаты поиска</span>
+            <span class='subtitle'>(Найдено записей: 99)</span>
+            <TABLE style='width: 100%; text-align: center;'>
+              <thead>
+                <TR>
+                  <Th><input type='checkbox' class='check_all' /></Th>
+                  
+                    <Th>Индекс</Th>
+                  
+                    <Th>Формулировка</Th>
+                  
+                  <Th>&nbsp;</Th>
+                </TR>
+                <TR>
+                  <Th colspan='4'><HR></Th>
+                </TR>
+              </thead>
+              <tbody style='vertical-align: top;'>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[0]" value='2305461' />
+                    </TD>
+                    
+                      <TD>Д348.423.5</TD>
+                    
+                      <TD>Сырье для получения легких заполнителей бетонов</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2305461" target='search_2305461'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[1]" value='2310333' />
+                    </TD>
+                    
+                      <TD>И141.24</TD>
+                    
+                      <TD>Крепление бетонными крепями</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2310333" target='search_2310333'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[2]" value='2310334' />
+                    </TD>
+                    
+                      <TD>И141.25</TD>
+                    
+                      <TD>Крепление железобетонными, чугунно-бетонными крепями</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2310334" target='search_2310334'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[3]" value='2312308' />
+                    </TD>
+                    
+                      <TD>Л411.3</TD>
+                    
+                      <TD>Силикатные лёгкие заполнители для бетона</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2312308" target='search_2312308'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[4]" value='2312334' />
+                    </TD>
+                    
+                      <TD>Л422.5</TD>
+                    
+                      <TD>Керамические пористые заполнители для бетона</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2312334" target='search_2312334'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[5]" value='2314007' />
+                    </TD>
+                    
+                      <TD>Н312.36</TD>
+                    
+                      <TD>Бетонные изделия</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314007" target='search_2314007'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[6]" value='2314015' />
+                    </TD>
+                    
+                      <TD>Н33</TD>
+                    
+                      <TD>Бетоны и строительные растворы</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314015" target='search_2314015'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[7]" value='2314016' />
+                    </TD>
+                    
+                      <TD>Н331</TD>
+                    
+                      <TD>Бетоны</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314016" target='search_2314016'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[8]" value='2314017' />
+                    </TD>
+                    
+                      <TD>Н331.001</TD>
+                    
+                      <TD>Состав бетона</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314017" target='search_2314017'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[9]" value='2314021' />
+                    </TD>
+                    
+                      <TD>Н331.006</TD>
+                    
+                      <TD>Свойства и качество бетона</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314021" target='search_2314021'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[10]" value='2314023' />
+                    </TD>
+                    
+                      <TD>Н331.01</TD>
+                    
+                      <TD>Бетоны по способу производства</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314023" target='search_2314023'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[11]" value='2314024' />
+                    </TD>
+                    
+                      <TD>Н331.2</TD>
+                    
+                      <TD>Бетоны по подвижности бетонной смеси</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314024" target='search_2314024'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[12]" value='2314025' />
+                    </TD>
+                    
+                      <TD>Н331.3</TD>
+                    
+                      <TD>Бетоны по виду вяжущих веществ</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314025" target='search_2314025'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[13]" value='2314026' />
+                    </TD>
+                    
+                      <TD>Н331.31</TD>
+                    
+                      <TD>Полимерные бетоны</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314026" target='search_2314026'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[14]" value='2314027' />
+                    </TD>
+                    
+                      <TD>Н331.34</TD>
+                    
+                      <TD>Известковые бетоны</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314027" target='search_2314027'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[15]" value='2314028' />
+                    </TD>
+                    
+                      <TD>Н331.35</TD>
+                    
+                      <TD>Цементные бетоны</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314028" target='search_2314028'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[16]" value='2314029' />
+                    </TD>
+                    
+                      <TD>Н331.36</TD>
+                    
+                      <TD>Бетоны на смешанных вяжущих веществах (смешанные бетоны)</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314029" target='search_2314029'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[17]" value='2314030' />
+                    </TD>
+                    
+                      <TD>Н331.37</TD>
+                    
+                      <TD>Грунтобетоны и глинобетоны</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314030" target='search_2314030'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[18]" value='2314031' />
+                    </TD>
+                    
+                      <TD>Н331.38</TD>
+                    
+                      <TD>Бетоны на вяжущих веществах из отходов промышленности</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314031" target='search_2314031'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[19]" value='2314032' />
+                    </TD>
+                    
+                      <TD>Н331.5</TD>
+                    
+                      <TD>Бетоны по виду заполнителей</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314032" target='search_2314032'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[20]" value='2314033' />
+                    </TD>
+                    
+                      <TD>Н331.51</TD>
+                    
+                      <TD>Тяжёлые бетоны (обычные бетоны)</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314033" target='search_2314033'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[21]" value='2314034' />
+                    </TD>
+                    
+                      <TD>Н331.52</TD>
+                    
+                      <TD>Мелкозернистые бетоны</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314034" target='search_2314034'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[22]" value='2314035' />
+                    </TD>
+                    
+                      <TD>Н331.53</TD>
+                    
+                      <TD>Бетоны на заполнителях из отходов промышленности</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314035" target='search_2314035'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[23]" value='2314036' />
+                    </TD>
+                    
+                      <TD>Н331.6</TD>
+                    
+                      <TD>Лёгкие бетоны</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314036" target='search_2314036'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[24]" value='2314037' />
+                    </TD>
+                    
+                      <TD>Н331.64</TD>
+                    
+                      <TD>Лёгкие бетоны по виду вяжущих веществ</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314037" target='search_2314037'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[25]" value='2314038' />
+                    </TD>
+                    
+                      <TD>Н331.65</TD>
+                    
+                      <TD>Лёгкие бетоны по виду заполнителей</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314038" target='search_2314038'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[26]" value='2314039' />
+                    </TD>
+                    
+                      <TD>Н331.651</TD>
+                    
+                      <TD>Бетоны на природных пористых заполнителях</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314039" target='search_2314039'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[27]" value='2314040' />
+                    </TD>
+                    
+                      <TD>Н331.652</TD>
+                    
+                      <TD>Лёгкие бетоны на искусственных пористых заполнителях</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314040" target='search_2314040'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[28]" value='2314041' />
+                    </TD>
+                    
+                      <TD>Н331.653</TD>
+                    
+                      <TD>Лёгкие бетоны на пористых минеральных отходах промышленности</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314041" target='search_2314041'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[29]" value='2314042' />
+                    </TD>
+                    
+                      <TD>Н331.656</TD>
+                    
+                      <TD>Лёгкие бетоны на органических заполнителях</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314042" target='search_2314042'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[30]" value='2314043' />
+                    </TD>
+                    
+                      <TD>Н331.7</TD>
+                    
+                      <TD>Ячеистые бетоны (особо лёгкие бетоны)</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314043" target='search_2314043'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[31]" value='2314044' />
+                    </TD>
+                    
+                      <TD>Н331.71</TD>
+                    
+                      <TD>Пенобетоны</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314044" target='search_2314044'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[32]" value='2314045' />
+                    </TD>
+                    
+                      <TD>Н331.72</TD>
+                    
+                      <TD>Газобетоны</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314045" target='search_2314045'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[33]" value='2314046' />
+                    </TD>
+                    
+                      <TD>Н331.9</TD>
+                    
+                      <TD>Бетоны особыми свойствами</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314046" target='search_2314046'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[34]" value='2314047' />
+                    </TD>
+                    
+                      <TD>Н331.91</TD>
+                    
+                      <TD>Жаростойкие (огнеупорные) бетоны</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314047" target='search_2314047'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[35]" value='2314048' />
+                    </TD>
+                    
+                      <TD>Н331.92</TD>
+                    
+                      <TD>Коррозионно-стойкие бетоны</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314048" target='search_2314048'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[36]" value='2314049' />
+                    </TD>
+                    
+                      <TD>Н331.93</TD>
+                    
+                      <TD>Радиационно-защитные бетоны</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314049" target='search_2314049'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[37]" value='2314050' />
+                    </TD>
+                    
+                      <TD>Н331.94</TD>
+                    
+                      <TD>Малоистираемые бетоны</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314050" target='search_2314050'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[38]" value='2314081' />
+                    </TD>
+                    
+                      <TD>Н423.3</TD>
+                    
+                      <TD>Бетонные и железобетонные ограждающие конструкции</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314081" target='search_2314081'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[39]" value='2314142' />
+                    </TD>
+                    
+                      <TD>Н53</TD>
+                    
+                      <TD>Бетонные и железобетонные конструкции</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314142" target='search_2314142'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[40]" value='2314143' />
+                    </TD>
+                    
+                      <TD>Н53-082.04</TD>
+                    
+                      <TD>Коррозия бетонных и железобетонных конструкций и защита от нее</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314143" target='search_2314143'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[41]" value='2314145' />
+                    </TD>
+                    
+                      <TD>Н533</TD>
+                    
+                      <TD>Бетонные и железобетонные конструкции по виду бетона</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314145" target='search_2314145'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[42]" value='2314146' />
+                    </TD>
+                    
+                      <TD>Н535</TD>
+                    
+                      <TD>Железобетонные конструкции по виду арматуры</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314146" target='search_2314146'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[43]" value='2314147' />
+                    </TD>
+                    
+                      <TD>Н536</TD>
+                    
+                      <TD>Бетонные и железобетонные конструкции по методам возведения</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314147" target='search_2314147'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[44]" value='2314148' />
+                    </TD>
+                    
+                      <TD>Н536.2</TD>
+                    
+                      <TD>Сборные бетонные и железобетонные конструкции</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314148" target='search_2314148'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[45]" value='2314149' />
+                    </TD>
+                    
+                      <TD>Н537</TD>
+                    
+                      <TD>Предварительно напряженные (напряженно армированные) железобетонные конструкции</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314149" target='search_2314149'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[46]" value='2314150' />
+                    </TD>
+                    
+                      <TD>Н539</TD>
+                    
+                      <TD>Железобетонные конструкции и их элементы по характеру расчётной схемы</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314150" target='search_2314150'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[47]" value='2314151' />
+                    </TD>
+                    
+                      <TD>Н539.1</TD>
+                    
+                      <TD>Железобетонные стержни (балки, брусья)</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314151" target='search_2314151'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[48]" value='2314152' />
+                    </TD>
+                    
+                      <TD>Н539.2</TD>
+                    
+                      <TD>Железобетонные фермы и рамы</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314152" target='search_2314152'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[49]" value='2314153' />
+                    </TD>
+                    
+                      <TD>Н539.3</TD>
+                    
+                      <TD>Железобетонные арки</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314153" target='search_2314153'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[50]" value='2314154' />
+                    </TD>
+                    
+                      <TD>Н539.4</TD>
+                    
+                      <TD>Железобетонные плиты и панели</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314154" target='search_2314154'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[51]" value='2314155' />
+                    </TD>
+                    
+                      <TD>Н539.5</TD>
+                    
+                      <TD>Железобетонные пространственные конструкции</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314155" target='search_2314155'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[52]" value='2314156' />
+                    </TD>
+                    
+                      <TD>Н539.6</TD>
+                    
+                      <TD>Тонкостенные железобетонные конструкции</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314156" target='search_2314156'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[53]" value='2314268' />
+                    </TD>
+                    
+                      <TD>Н626</TD>
+                    
+                      <TD>Бетонные и железобетонные работы</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314268" target='search_2314268'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[54]" value='2314269' />
+                    </TD>
+                    
+                      <TD>Н626.1</TD>
+                    
+                      <TD>Производство монолитных бетонных и железобетонных конструкций</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314269" target='search_2314269'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[55]" value='2314270' />
+                    </TD>
+                    
+                      <TD>Н626.10</TD>
+                    
+                      <TD>Отдельные процессы производства монолитных бетонных и железобетонных конструкций</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314270" target='search_2314270'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[56]" value='2314271' />
+                    </TD>
+                    
+                      <TD>Н626.102</TD>
+                    
+                      <TD>Приготовление бетонной смеси</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314271" target='search_2314271'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[57]" value='2314274' />
+                    </TD>
+                    
+                      <TD>Н626.102.1/Н626.102.9</TD>
+                    
+                      <TD>Технология производства отдельных видов бетона</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314274" target='search_2314274'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[58]" value='2314272' />
+                    </TD>
+                    
+                      <TD>Н626.102-4</TD>
+                    
+                      <TD>Бетонные заводы</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314272" target='search_2314272'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[59]" value='2314273' />
+                    </TD>
+                    
+                      <TD>Н626.102-5</TD>
+                    
+                      <TD>Оборудование для приготовления бетона</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314273" target='search_2314273'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[60]" value='2314277' />
+                    </TD>
+                    
+                      <TD>Н626.105</TD>
+                    
+                      <TD>Укладка, распределение, уплотнение и отделка бетона</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314277" target='search_2314277'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[61]" value='2314278' />
+                    </TD>
+                    
+                      <TD>Н626.105-5</TD>
+                    
+                      <TD>Оборудование для укладки, распределения и уплотнения бетона</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314278" target='search_2314278'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[62]" value='2314279' />
+                    </TD>
+                    
+                      <TD>Н626.106</TD>
+                    
+                      <TD>Уход за бетоном</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314279" target='search_2314279'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[63]" value='2314280' />
+                    </TD>
+                    
+                      <TD>Н626.109</TD>
+                    
+                      <TD>Производство бетонных и железобетонных работ в зимних условиях</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314280" target='search_2314280'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[64]" value='2314281' />
+                    </TD>
+                    
+                      <TD>Н626.14</TD>
+                    
+                      <TD>Бетонирование отдельных частей зданий и сооружений</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314281" target='search_2314281'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[65]" value='2314282' />
+                    </TD>
+                    
+                      <TD>Н626.17</TD>
+                    
+                      <TD>Бетонирование отдельных видов сооружений</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314282" target='search_2314282'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[66]" value='2314283' />
+                    </TD>
+                    
+                      <TD>Н626.2</TD>
+                    
+                      <TD>Производство сборных бетонных и железобетонных конструкций</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314283" target='search_2314283'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[67]" value='2314285' />
+                    </TD>
+                    
+                      <TD>Н626.20</TD>
+                    
+                      <TD>Отдельные процессы производства сборных бетонных и железобетонных конструкций</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314285" target='search_2314285'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[68]" value='2314286' />
+                    </TD>
+                    
+                      <TD>Н626.202</TD>
+                    
+                      <TD>Приготовление бетонной смеси</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314286" target='search_2314286'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[69]" value='2314290' />
+                    </TD>
+                    
+                      <TD>Н626.206</TD>
+                    
+                      <TD>Твердение бетона в отформованных изделиях</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314290" target='search_2314290'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[70]" value='2314293' />
+                    </TD>
+                    
+                      <TD>Н626.22</TD>
+                    
+                      <TD>Производство пустотных бетонных и железобетонных конструкций и труб</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314293" target='search_2314293'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[71]" value='2314294' />
+                    </TD>
+                    
+                      <TD>Н626.23</TD>
+                    
+                      <TD>Производство сборных бетонных и железобетонных конструкций из различных видов бетона</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314294" target='search_2314294'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[72]" value='2314284' />
+                    </TD>
+                    
+                      <TD>Н626.2-4</TD>
+                    
+                      <TD>Предприятия по производству бетонных и железобетонных конструкций</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314284" target='search_2314284'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[73]" value='2314295' />
+                    </TD>
+                    
+                      <TD>Н626.24</TD>
+                    
+                      <TD>Производство предварительно напряжённых железобетонных конструкций</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314295" target='search_2314295'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[74]" value='2314296' />
+                    </TD>
+                    
+                      <TD>Н626.27</TD>
+                    
+                      <TD>Производство сборных бетонных и железобетонных элементов и деталей зданий</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314296" target='search_2314296'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[75]" value='2314305' />
+                    </TD>
+                    
+                      <TD>Н626.28</TD>
+                    
+                      <TD>Производство сборных бетонных и железобетонных конструкций специального назначения</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314305" target='search_2314305'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[76]" value='2314306' />
+                    </TD>
+                    
+                      <TD>Н626.3</TD>
+                    
+                      <TD>Обработка бетона</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314306" target='search_2314306'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[77]" value='2314323' />
+                    </TD>
+                    
+                      <TD>Н638.3</TD>
+                    
+                      <TD>Монтаж бетонных и железобетонных конструкций</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314323" target='search_2314323'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[78]" value='2314382' />
+                    </TD>
+                    
+                      <TD>Н703.3</TD>
+                    
+                      <TD>Бетонные и железобетонные здания</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314382" target='search_2314382'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[79]" value='2314461' />
+                    </TD>
+                    
+                      <TD>Н728.503.3</TD>
+                    
+                      <TD>Бетонные и железобетонные резервуары</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314461" target='search_2314461'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[80]" value='2314596' />
+                    </TD>
+                    
+                      <TD>Н77-033</TD>
+                    
+                      <TD>Гидротехнические бетоны</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314596" target='search_2314596'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[81]" value='2314608' />
+                    </TD>
+                    
+                      <TD>Н772.3</TD>
+                    
+                      <TD>Бетонные и железобетонные сооружения</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314608" target='search_2314608'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[82]" value='2314707' />
+                    </TD>
+                    
+                      <TD>О112.252</TD>
+                    
+                      <TD>Бетонные мосты</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314707" target='search_2314707'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[83]" value='2314708' />
+                    </TD>
+                    
+                      <TD>О112.253</TD>
+                    
+                      <TD>Железобетонные мосты</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314708" target='search_2314708'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[84]" value='2314709' />
+                    </TD>
+                    
+                      <TD>О112.253.9</TD>
+                    
+                      <TD>Сборные железобетонные мосты</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314709" target='search_2314709'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[85]" value='2314720' />
+                    </TD>
+                    
+                      <TD>О112.352</TD>
+                    
+                      <TD>Бетонные трубы и лотки</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314720" target='search_2314720'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[86]" value='2314721' />
+                    </TD>
+                    
+                      <TD>О112.353</TD>
+                    
+                      <TD>Железобетонные трубы и лотки</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314721" target='search_2314721'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[87]" value='2314738' />
+                    </TD>
+                    
+                      <TD>О112.5-060.6</TD>
+                    
+                      <TD>Бетонные и железобетонные работы</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314738" target='search_2314738'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[88]" value='2314863' />
+                    </TD>
+                    
+                      <TD>О211.4</TD>
+                    
+                      <TD>Железнодорожный путь на железобетонных шпалах</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314863" target='search_2314863'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[89]" value='2314864' />
+                    </TD>
+                    
+                      <TD>О211.4-045.06</TD>
+                    
+                      <TD>Железобетонные шпалы</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314864" target='search_2314864'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[90]" value='2314865' />
+                    </TD>
+                    
+                      <TD>О211.5</TD>
+                    
+                      <TD>Железнодорожный путь на сплошном бетонном основании</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314865" target='search_2314865'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[91]" value='2314866' />
+                    </TD>
+                    
+                      <TD>О211.5-045.06</TD>
+                    
+                      <TD>Подрельсовые бетонные основания</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2314866" target='search_2314866'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[92]" value='2315200' />
+                    </TD>
+                    
+                      <TD>О311.45</TD>
+                    
+                      <TD>Асфальтобетонные и дёгтебетонные дороги</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2315200" target='search_2315200'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[93]" value='2315201' />
+                    </TD>
+                    
+                      <TD>О311.46</TD>
+                    
+                      <TD>Цементобетонные дороги</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2315201" target='search_2315201'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[94]" value='2315202' />
+                    </TD>
+                    
+                      <TD>О311.466</TD>
+                    
+                      <TD>Дороги из сборных бетонных и железобетонных плит</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2315202" target='search_2315202'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[95]" value='2315208' />
+                    </TD>
+                    
+                      <TD>О311.75</TD>
+                    
+                      <TD>Колеи из цементного бетона и металла</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2315208" target='search_2315208'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[96]" value='2315500' />
+                    </TD>
+                    
+                      <TD>О413-060.6</TD>
+                    
+                      <TD>Бетонные и железобетонные работы</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2315500" target='search_2315500'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[97]" value='2315583' />
+                    </TD>
+                    
+                      <TD>О421.5</TD>
+                    
+                      <TD>Железобетонные суда</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2315583" target='search_2315583'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+                  <TR style='text-align: left;'>
+                    <TD style='text-align: center;'>
+                      <input type='checkbox' class='cb_select' name="replace.id_select[98]" value='2316395' />
+                    </TD>
+                    
+                      <TD>О733</TD>
+                    
+                      <TD>Бетонные и железобетонные трубопроводы</TD>
+                    
+                    <TD style='text-align: center;'>
+                      
+                      <a href="bbk?block=ETALON&id=2316395" target='search_2316395'>=&gt;</a>
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD colspan='4'><HR></TD>
+                  </TR>
+                
+              </tbody>
+            </TABLE>
+            
+          
+        
+    </DIV>
+    </form>
+
+    <div style="display: none;" id="search_edit_form" title="Редактирование данного для поиска">
+      <div class="detail_form_controls">
+        <div>
+          <INPUT type="button" value="Любая послед-ть символов" id="regexp_any" >
+          <INPUT type="button" value="Один любой символ" id="regexp_one" >
+        </div>
+      </div>
+      <div class="centered" style="width: 90%;">
+        <TEXTAREA style="width: 100%;" cols="1" rows="16" id="textarea_value_edit"></TEXTAREA>
+      </div>
+      <TABLE class="dictionary_list" id="methodic_selection" style="border: 1px solid black;">
+        <thead style="text-align: center;">
+          <TR>
+            <TH><INPUT TYPE='checkbox' checked="checked" id='select_all_mu' /></TH>
+            <TH>МУ</TH>
+            <TH>Шаблон</TH>
+          </TR>
+        </thead>
+        <tbody style="text-align: left;">
+          
+          <TR>
+            <TD style="text-align: center;">
+              <INPUT class='check_mu' type='checkbox' name="alter" value='1'
+                   />
+            </TD>
+            <TD>Альтернатива(<span style="font-style: italic;">alter</span>):</TD>
+            <TD>
+              
+                Альтернатива. См.   <index></index> под типовым делением   <index></index>.<br>
+              
+                Альтернатива. См. <index></index> ... под делением <index></index> Плана расположения .<br>
+              
+                Альтернатива. См.   <index></index>.<br>
+              
+                Альтернатива. См. в соответствующих подразделениях классификации под ... типовым  делением <index></index>.<br>
+              
+            </TD>
+          </TR>
+          
+          <TR>
+            <TD style="text-align: center;">
+              <INPUT class='check_mu' type='checkbox' name="lit" value='1'
+                   />
+            </TD>
+            <TD>О характере и типе собираемой литературы(<span style="font-style: italic;">lit</span>):</TD>
+            <TD>
+              
+                Литература общего характера ...<br>
+              
+                ...<br>
+              
+            </TD>
+          </TR>
+          
+          <TR>
+            <TD style="text-align: center;">
+              <INPUT class='check_mu' type='checkbox' name="content" value='1'
+                   />
+            </TD>
+            <TD>О раскрытии содержания(<span style="font-style: italic;">content</span>):</TD>
+            <TD>
+              
+                Под индексом <index></index> и его подразделениями собирается литература ...<br>
+              
+                Под индексом   <index></index> и его подразделениями собирается литература ...<br>
+              
+                Под индексом <index></index> собирается литература ...<br>
+              
+                В подразделениях   <index></index> собирается литература ...<br>
+              
+                ...<br>
+              
+                Под индексом    <index></index> собирается литература ...<br>
+              
+            </TD>
+          </TR>
+          
+          <TR>
+            <TD style="text-align: center;">
+              <INPUT class='check_mu' type='checkbox' name="cond" value='1'
+                   />
+            </TD>
+            <TD>Об условности(<span style="font-style: italic;">cond</span>):</TD>
+            <TD>
+              
+                Под делением   <index></index> собирается также ...<br>
+              
+                Под индексом   <index></index> собирается также ...<br>
+              
+                В подразделениях   <index></index> собирается также ...<br>
+              
+                Под индексом   <index></index> и его подразделениями собирается также ...<br>
+              
+                Под делением   <index></index> и его подразделениями собирается также ...<br>
+              
+            </TD>
+          </TR>
+          
+          <TR>
+            <TD style="text-align: center;">
+              <INPUT class='check_mu' type='checkbox' name="mirror" value='1'
+                   />
+            </TD>
+            <TD>О повторном отражении(<span style="font-style: italic;">mirror</span>):</TD>
+            <TD>
+              
+                ... повторно отражается в подразделениях   <index></index> под типовым делением   <index></index>.<br>
+              
+                ... повторно отражается в подразделениях   <index></index> под делением   <index></index> Плана расположения.<br>
+              
+                Под индексом (делением)   <index></index> литература собирается за счет повторного отражения из соответствующих подразделений   <index></index>.<br>
+              
+                Под делением   <index></index> литература собирается за счет повторного отражения из соответствующих подразделений   <index></index>.<br>
+              
+            </TD>
+          </TR>
+          
+          <TR>
+            <TD style="text-align: center;">
+              <INPUT class='check_mu' type='checkbox' name="divide" value='1'
+                   />
+            </TD>
+            <TD>О применении типовых делений(<span style="font-style: italic;">divide</span>):</TD>
+            <TD>
+              
+                Подразделяется по «имя ВТ».<br>
+              
+            </TD>
+          </TR>
+          
+          <TR>
+            <TD style="text-align: center;">
+              <INPUT class='check_mu' type='checkbox' name="method" value='1'
+                   />
+            </TD>
+            <TD>Об отдельных приемах частной методики(<span style="font-style: italic;">method</span>):</TD>
+            <TD>
+              
+                ... в первую очередь по <extra_name_index></extra_name_index> ..., а если ...,  то по <extra_name_index></extra_name_index><br>
+              
+                ... в первую очередь по  ..., а если ... , то по ...<br>
+              
+                ...<br>
+              
+            </TD>
+          </TR>
+          
+          <TR>
+            <TD style="text-align: center;">
+              <INPUT class='check_mu' type='checkbox' name="analog" value='1'
+                   />
+            </TD>
+            <TD>О подразделении по аналогии(<span style="font-style: italic;">analog</span>):</TD>
+            <TD>
+              
+                Подразделяется по <extra_name_index></extra_name_index>, аналогично <index></index><br>
+              
+                Подразделяется ... аналогично <index></index> ... Индекс...  образуется путем присоединения к  <index></index> ...  последних цифр индекса <index></index> ...<br>
+              
+                Подразделяется ... аналогично <index></index><br>
+              
+                Подразделяется ... аналогично <index></index> ... Индекс образуется путем присоединения к ... <index></index> ...  окончаний подразделений индекса <index></index> ...<br>
+              
+            </TD>
+          </TR>
+          
+          <TR>
+            <TD style="text-align: center;">
+              <INPUT class='check_mu' type='checkbox' name="clasif" value='1'
+                   />
+            </TD>
+            <TD>О расположении материала в пределах классификационного деления(<span style="font-style: italic;">clasif</span>):</TD>
+            <TD>
+              
+                ...<br>
+              
+            </TD>
+          </TR>
+          
+          <TR>
+            <TD style="text-align: center;">
+              <INPUT class='check_mu' type='checkbox' name="indexrule" value='1'
+                   />
+            </TD>
+            <TD>О способах образования индекса при дальнейшей детализации(<span style="font-style: italic;">indexrule</span>):</TD>
+            <TD>
+              
+                Индекс образуется путем присоединения к <index></index> ... деления <internal_index></internal_index> Плана расположения.<br>
+              
+                Индекс ... образуется путем присоединения к <index></index> ... цифровых обозначений соответствующих делений классификации.<br>
+              
+                Индекс образуется путем присоединения к <index></index> ... типового деления . <internal_index></internal_index>.<br>
+              
+                Индекс ... образуется путем присоединения к <index></index> ... последних цифр индекса <index></index> (деления <external_index></external_index>).<br>
+              
+                Индекс ... образуется путем присоединения к <index></index> ...<br>
+              
+            </TD>
+          </TR>
+          
+          <TR>
+            <TD style="text-align: center;">
+              <INPUT class='check_mu' type='checkbox' name="use" value='1'
+                   />
+            </TD>
+            <TD>О факультативном использовании(<span style="font-style: italic;">use</span>):</TD>
+            <TD>
+              
+                ...<br>
+              
+            </TD>
+          </TR>
+          
+          <TR>
+            <TD style="text-align: center;">
+              <INPUT class='check_mu' type='checkbox' name="differ" value='1'
+                   />
+            </TD>
+            <TD>О размежевании(<span style="font-style: italic;">differ</span>):</TD>
+            <TD>
+              
+                ... см. в соответствующих подразделениях <index></index> под делением Плана расположения <internal_index></internal_index>.<br>
+              
+                ... см. в соответствующих подразделениях <index></index> под типовым делением <external_index></external_index>.<br>
+              
+                ... см. в соответствующих подразделениях <index></index> под типовым делением <internal_index></internal_index>.<br>
+              
+            </TD>
+          </TR>
+          
+          <TR>
+            <TD style="text-align: center;">
+              <INPUT class='check_mu' type='checkbox' name="alterindex" value='1'
+                   />
+            </TD>
+            <TD>Об альтернативах под действующим индексом(<span style="font-style: italic;">alterindex</span>):</TD>
+            <TD>
+              
+                ...<br>
+              
+                Альтернатива <index></index>.<br>
+              
+            </TD>
+          </TR>
+          
+          <TR>
+            <TD style="text-align: center;">
+              <INPUT class='check_mu' type='checkbox' name="also" value='1'
+                   />
+            </TD>
+            <TD>Ссылка "см. также"(<span style="font-style: italic;">also</span>):</TD>
+            <TD>
+              
+                См. также: <index></index> .<br>
+              
+                ... см. также: <index></index> .<br>
+              
+            </TD>
+          </TR>
+          
+          <TR>
+            <TD style="text-align: center;">
+              <INPUT class='check_mu' type='checkbox' name="see" value='1'
+                   />
+            </TD>
+            <TD>Ссылка "см."(<span style="font-style: italic;">see</span>):</TD>
+            <TD>
+              
+                ... см. <index></index><br>
+              
+            </TD>
+          </TR>
+          
+          <TR>
+            <TD style="text-align: center;">
+              <INPUT class='check_mu' type='checkbox' name="wording" value='1'
+                   />
+            </TD>
+            <TD>Об использовании формулировки(<span style="font-style: italic;">wording</span>):</TD>
+            <TD>
+              
+                ... используется в формулировке ...<br>
+              
+            </TD>
+          </TR>
+          
+          <TR>
+            <TD style="text-align: center;">
+              <INPUT class='check_mu' type='checkbox' name="limitation" value='1'
+                   />
+            </TD>
+            <TD>Об ограничении использования(<span style="font-style: italic;">limitation</span>):</TD>
+            <TD>
+              
+                Используется в подразделениях ...   <index></index> ...  <index></index>   <index></index>   <index></index><br>
+              
+                Не применяется для ...  <index></index> ...   <index></index>   <index></index>   <index></index><br>
+              
+                Используется в подразделениях ...<br>
+              
+                Не применяется для ...<br>
+              
+            </TD>
+          </TR>
+          
+        </tbody>
+      </TABLE>
+    </div>
+
+    <div style="display: none; white-space: pre-wrap; text-align: left;" id="help_info" title="Справка">
+
+    </div>
+  
+
+</body>
+
+
+</html>
