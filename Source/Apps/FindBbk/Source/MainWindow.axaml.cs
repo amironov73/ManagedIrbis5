@@ -7,6 +7,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable LocalizableElement
+// ReSharper disable PartialTypeWithSinglePart
 // ReSharper disable StringLiteralTypo
 
 /* BbkModel.cs -- модель для окна поиска в эталоне ББК
@@ -15,6 +16,7 @@
 
 #region Using directives
 
+using AM;
 using AM.Collections;
 
 using Avalonia;
@@ -44,9 +46,12 @@ public partial class MainWindow
     private void List_HandleClick
         (
             object? sender,
-            PointerPressedEventArgs e
+            PointerPressedEventArgs eventArgs
         )
     {
+        sender.NotUsed();
+        eventArgs.NotUsed();
+
         var model = (BbkModel?) DataContext;
         if (model is null)
         {

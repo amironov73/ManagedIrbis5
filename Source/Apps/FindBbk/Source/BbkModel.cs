@@ -15,10 +15,10 @@ using System;
 using System.Threading.Tasks;
 
 using AM;
+using AM.Avalonia;
 using AM.Collections;
 
 using Avalonia.Controls;
-using Avalonia.Input;
 
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -81,15 +81,19 @@ public sealed class BbkModel
         }
 
         var client = new EthalonBbkClient();
-        window.Cursor = new Cursor (StandardCursorType.Wait);
-        var html = await client.GetRawHtmlAsync (query);
+        var html = await WaitCursor.RunFuncAsync
+            (
+                window,
+                async (theClient, theQuery) => await theClient.GetRawHtmlAsync (theQuery),
+                client,
+                query
+            );
+
         Found = client.ParseEntries (html);
         if (Found.IsNullOrEmpty())
         {
             ErrorMessage = "Ничего не найдено";
         }
-
-        window.Cursor = Cursor.Default;
     }
 
     #endregion
