@@ -19,7 +19,7 @@ using AM.Text;
 namespace UnitTests.AM.Text;
 
 [TestClass]
-public class RichTextStripperTest
+public sealed class RichTextStripperTest
 {
     private void _TestStrip
         (

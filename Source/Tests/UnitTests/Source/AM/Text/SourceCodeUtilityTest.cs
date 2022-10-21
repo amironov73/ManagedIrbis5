@@ -21,7 +21,7 @@ using AM.Text;
 namespace UnitTests.AM.Text;
 
 [TestClass]
-public class SourceCodeUtilityTest
+public sealed class SourceCodeUtilityTest
 {
     [TestMethod]
     public void SourceCodeUtility_EncodeCharacter_1()

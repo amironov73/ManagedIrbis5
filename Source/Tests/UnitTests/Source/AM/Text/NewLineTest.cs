@@ -18,7 +18,7 @@ using AM.Text;
 namespace UnitTests.AM.Text;
 
 [TestClass]
-public class NewLineTest
+public sealed class NewLineTest
 {
     private void _Test
         (

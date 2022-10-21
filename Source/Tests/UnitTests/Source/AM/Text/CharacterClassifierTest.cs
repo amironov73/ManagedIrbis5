@@ -45,7 +45,7 @@ public sealed class CharacterClassifierTest
     [TestMethod]
     public void CharacterClassifier_DetectCharacterClasses_4()
     {
-        var text = "2128506";
+        const string text = "2128506";
         var classes
             = CharacterClassifier.DetectCharacterClasses (text);
         Assert.AreEqual (CharacterClass.Digit, classes);
@@ -54,7 +54,7 @@ public sealed class CharacterClassifierTest
     [TestMethod]
     public void CharacterClassifier_DetectCharacterClasses_5()
     {
-        var text = "\r\n";
+        const string text = "\r\n";
         var classes
             = CharacterClassifier.DetectCharacterClasses (text);
         Assert.AreEqual (CharacterClass.ControlCharacter, classes);
@@ -63,7 +63,7 @@ public sealed class CharacterClassifierTest
     [TestMethod]
     public void CharacterClassifier_DetectCharacterClasses_6()
     {
-        var text = "Hello, Привет, 2128506\r\n";
+        const string text = "Hello, Привет, 2128506\r\n";
         var classes
             = CharacterClassifier.DetectCharacterClasses (text);
         Assert.AreEqual

@@ -24,7 +24,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace UnitTests.AM.Text;
 
 [TestClass]
-public class NumberTextTest
+public sealed class NumberTextTest
 {
     [TestMethod]
     [Description ("Конструктор по умолчанию")]

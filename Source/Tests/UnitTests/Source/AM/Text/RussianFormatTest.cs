@@ -14,7 +14,7 @@ using AM.Text;
 namespace UnitTests.AM.Text;
 
 [TestClass]
-public class RussianFormatTest
+public sealed class RussianFormatTest
 {
     [TestMethod]
     public void RussianFormat_Format_1()
