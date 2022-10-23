@@ -2,12 +2,10 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* BucketsBasedCrossThreadsArrayPool.cs -- пул массивов
  * Ars Magna project, http://arsmagna.ru
@@ -43,6 +41,7 @@ public sealed class BucketsBasedCrossThreadsArrayPool<T>
 
     static BucketsBasedCrossThreadsArrayPool()
     {
+        _pool = new Queue<T[]>[24];
         for (var i = 0; i < _pool.Length; i++)
         {
             _pool[i] = new Queue<T[]>();
@@ -56,7 +55,7 @@ public sealed class BucketsBasedCrossThreadsArrayPool<T>
     [ThreadStatic]
     private static BucketsBasedCrossThreadsArrayPool<T>? _shared;
 
-    private static readonly Queue<T[]>[] _pool = new Queue<T[]>[24];
+    private static readonly Queue<T[]>[] _pool;
 
     #endregion
 
@@ -68,6 +67,8 @@ public sealed class BucketsBasedCrossThreadsArrayPool<T>
             int minimumLength
         )
     {
+        Sure.Positive (minimumLength);
+
         var queueIndex = MemoryUtility.GetBucket (minimumLength);
         var queue = _pool[queueIndex];
         T[] result;
@@ -91,6 +92,8 @@ public sealed class BucketsBasedCrossThreadsArrayPool<T>
             T[] array
         )
     {
+        Sure.NotNull (array);
+
         _pool[MemoryUtility.GetBucket (array.Length)].Enqueue (array);
     }
 }
