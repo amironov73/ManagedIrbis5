@@ -15,8 +15,13 @@
 
 #nullable enable
 
+using System;
+
 namespace AM.Memory.Collections.Specialized;
 
+/// <summary>
+///
+/// </summary>
 public static partial class AsSingleQueryList
 {
     private class EnumerableTyped<T>
@@ -51,7 +56,7 @@ public static partial class AsSingleQueryList
             : IPoolingEnumerator<T>
         {
             private PoolingList<T> _src;
-            private IPoolingEnumerator<T> _enumerator;
+            private IPoolingEnumerator<T>? _enumerator;
 
             public IPoolingEnumerator<T> Init
                 (
@@ -63,7 +68,7 @@ public static partial class AsSingleQueryList
                 return this;
             }
 
-            public bool MoveNext() => _enumerator.MoveNext();
+            public bool MoveNext() => _enumerator.ThrowIfNull().MoveNext();
 
             public void Reset()
             {
@@ -71,10 +76,11 @@ public static partial class AsSingleQueryList
                 _enumerator = _src.GetEnumerator();
             }
 
-            public T Current => _enumerator.Current;
+            public T Current => _enumerator.ThrowIfNull().Current;
 
             object IPoolingEnumerator.Current => Current;
 
+            /// <inheritdoc cref="IDisposable.Dispose"/>
             public void Dispose()
             {
                 _enumerator?.Dispose();

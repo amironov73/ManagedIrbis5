@@ -13,6 +13,12 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
+#region Using directives
+
+using System.Collections.Generic;
+
+#endregion
+
 #nullable enable
 
 namespace AM.Memory.Collections;
@@ -24,9 +30,6 @@ namespace AM.Memory.Collections;
 public interface IPoolingEnumerator<out T>
     : IPoolingEnumerator
 {
-    /// <summary>Gets the element in the collection
-    /// at the current position of the enumerator.</summary>
-    /// <returns>The element in the collection at the current
-    /// position of the enumerator.</returns>
+    /// <inheritdoc cref="IEnumerator{T}.Current"/>
     new T Current { get; }
 }

@@ -8,7 +8,6 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedParameter.Local
 
 /* NonDisposableCache.cs -- обертка вокруг IMemoryCache, предотвращающая его очистку
  * Ars Magna project, http://arsmagna.ru
@@ -65,7 +64,7 @@ public sealed class NonDisposableCache
     public bool TryGetValue
         (
             object key,
-            out object value
+            out object? value
         )
     {
         return _inner.TryGetValue (key, out value);
