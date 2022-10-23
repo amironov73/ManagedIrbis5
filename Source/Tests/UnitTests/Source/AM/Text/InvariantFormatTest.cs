@@ -19,40 +19,42 @@ namespace UnitTests.AM.Text;
 public sealed class InvariantFormatTest
 {
     [TestMethod]
+    [Description ("Расформатирование числа")]
     public void InvariantFormat_Format_1()
     {
         Assert.AreEqual
             (
                 "10000",
-                InvariantFormat.Format (10000)
+                InvariantFormat.Format (10_000)
             );
 
         Assert.AreEqual
             (
                 "10000.5",
-                InvariantFormat.Format (10000.5)
+                InvariantFormat.Format (10_000.5)
             );
 
         Assert.AreEqual
             (
                 "10000.5",
-                InvariantFormat.Format (10000.5m)
+                InvariantFormat.Format (10_000.5m)
             );
     }
 
     [TestMethod]
+    [Description ("Форматная строка и единственный аргумент")]
     public void InvariantFormat_Format_2()
     {
         Assert.AreEqual
             (
                 "Length=1000",
-                InvariantFormat.Format ("Length={0}", 1000)
+                InvariantFormat.Format ("Length={0}", 1_000)
             );
 
         Assert.AreEqual
             (
                 "Length=1000.5",
-                InvariantFormat.Format ("Length={0}", 1000.5)
+                InvariantFormat.Format ("Length={0}", 1_000.5)
             );
 
         Assert.AreEqual
@@ -61,12 +63,13 @@ public sealed class InvariantFormatTest
                 InvariantFormat.Format
                     (
                         "Length={0}",
-                        (object)1000.5
+                        (object)1_000.5
                     )
             );
     }
 
     [TestMethod]
+    [Description ("Форматная строка и два аргумента")]
     public void InvariantFormat_Format_3()
     {
         Assert.AreEqual
@@ -75,8 +78,8 @@ public sealed class InvariantFormatTest
                 InvariantFormat.Format
                     (
                         "Length={0}, Height={1}",
-                        1000,
-                        2000
+                        1_000,
+                        2_000
                     )
             );
 
@@ -86,13 +89,14 @@ public sealed class InvariantFormatTest
                 InvariantFormat.Format
                     (
                         "Length={0}, Height={1}",
-                        1000.5,
-                        2000.5
+                        1_000.5,
+                        2_000.5
                     )
             );
     }
 
     [TestMethod]
+    [Description ("Форматная строка и три аргумента")]
     public void InvariantFormat_Format_4()
     {
         Assert.AreEqual
@@ -101,9 +105,9 @@ public sealed class InvariantFormatTest
                 InvariantFormat.Format
                     (
                         "Length={0}, Height={1}, Width={2}",
-                        1000,
-                        2000,
-                        3000
+                        1_000,
+                        2_000,
+                        3_000
                     )
             );
 
@@ -113,14 +117,15 @@ public sealed class InvariantFormatTest
                 InvariantFormat.Format
                     (
                         "Length={0}, Height={1}, Width={2}",
-                        1000.5,
-                        2000.5,
-                        3000.5
+                        1_000.5,
+                        2_000.5,
+                        3_000.5
                     )
             );
     }
 
     [TestMethod]
+    [Description ("Форматная строка и четыре аргумента")]
     public void InvariantFormat_Format_5()
     {
         Assert.AreEqual
@@ -129,10 +134,10 @@ public sealed class InvariantFormatTest
                 InvariantFormat.Format
                     (
                         "Length={0}, Height={1}, Width={2}, Weight={3}",
-                        1000,
-                        2000,
-                        3000,
-                        4000
+                        1_000,
+                        2_000,
+                        3_000,
+                        4_000
                     )
             );
 
@@ -142,21 +147,22 @@ public sealed class InvariantFormatTest
                 InvariantFormat.Format
                     (
                         "Length={0}, Height={1}, Width={2}, Weight={3}",
-                        1000.5,
-                        2000.5,
-                        3000.5,
-                        4000.5
+                        1_000.5,
+                        2_000.5,
+                        3_000.5,
+                        4_000.5
                     )
             );
     }
 
     [TestMethod]
+    [Description ("Форматная строка и единственный аргумент денежного типа")]
     public void InvariantFormat_Format_6()
     {
         Assert.AreEqual
             (
                 "Length=1000.5",
-                InvariantFormat.Format ("Length={0}", 1000.5m)
+                InvariantFormat.Format ("Length={0}", 1_000.5m)
             );
     }
 }

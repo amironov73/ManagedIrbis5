@@ -19,6 +19,7 @@ namespace UnitTests.AM.Text;
 public sealed class CharacterClassifierTest
 {
     [TestMethod]
+    [Description ("Обработка пустой строки")]
     public void CharacterClassifier_DetectCharacterClasses_1()
     {
         var text = string.Empty;
@@ -27,6 +28,7 @@ public sealed class CharacterClassifierTest
     }
 
     [TestMethod]
+    [Description ("Только символы базовой латиницы")]
     public void CharacterClassifier_DetectCharacterClasses_2()
     {
         const string text = "Hello";
@@ -35,6 +37,7 @@ public sealed class CharacterClassifierTest
     }
 
     [TestMethod]
+    [Description ("Только символы кириллицы")]
     public void CharacterClassifier_DetectCharacterClasses_3()
     {
         const string text = "Привет";
@@ -43,6 +46,7 @@ public sealed class CharacterClassifierTest
     }
 
     [TestMethod]
+    [Description ("Только цифры")]
     public void CharacterClassifier_DetectCharacterClasses_4()
     {
         const string text = "2128506";
@@ -52,20 +56,20 @@ public sealed class CharacterClassifierTest
     }
 
     [TestMethod]
+    [Description ("Только управляющие символы")]
     public void CharacterClassifier_DetectCharacterClasses_5()
     {
         const string text = "\r\n";
-        var classes
-            = CharacterClassifier.DetectCharacterClasses (text);
+        var classes = CharacterClassifier.DetectCharacterClasses (text);
         Assert.AreEqual (CharacterClass.ControlCharacter, classes);
     }
 
     [TestMethod]
+    [Description ("Смесь базовой латиницы, управляющих символов, кириллицы и цифр")]
     public void CharacterClassifier_DetectCharacterClasses_6()
     {
         const string text = "Hello, Привет, 2128506\r\n";
-        var classes
-            = CharacterClassifier.DetectCharacterClasses (text);
+        var classes = CharacterClassifier.DetectCharacterClasses (text);
         Assert.AreEqual
             (
                 CharacterClass.BasicLatin
@@ -77,11 +81,11 @@ public sealed class CharacterClassifierTest
     }
 
     [TestMethod]
+    [Description ("Проверка на смесь кириллицы и латиницы")]
     public void CharacterClassifier_IsBothCyrillicAndLatin_1()
     {
         var text = "Hello, 2128506\r\n";
-        var classes
-            = CharacterClassifier.DetectCharacterClasses (text);
+        var classes = CharacterClassifier.DetectCharacterClasses (text);
         Assert.IsFalse (CharacterClassifier.IsBothCyrillicAndLatin (classes));
 
         text = "Привет, 2128506\r\n";

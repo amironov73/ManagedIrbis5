@@ -19,6 +19,7 @@ namespace UnitTests.AM.Text;
 public sealed class HtmlTextTest
 {
     [TestMethod]
+    [Description ("Кодирование HTML-символов")]
     public void HtmlText_Encode_1()
     {
         Assert.AreEqual (string.Empty, HtmlText.Encode (string.Empty));
@@ -40,6 +41,7 @@ public sealed class HtmlTextTest
     }
 
     [TestMethod]
+    [Description ("Очистка HTML от тегов")]
     public void HtmlText_ToPlainText_1()
     {
         var html = string.Empty;
