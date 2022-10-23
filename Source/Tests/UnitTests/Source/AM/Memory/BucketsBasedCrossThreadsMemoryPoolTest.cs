@@ -11,6 +11,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 #endregion
 
+#nullable enable
+
 namespace UnitTests.AM.Memory;
 
 [TestClass]
