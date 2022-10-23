@@ -2,10 +2,6 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable CollectionNeverQueried.Local
-// ReSharper disable CollectionNeverUpdated.Local
-// ReSharper disable ConvertToLocalFunction
-// ReSharper disable UseObjectOrCollectionInitializer
 
 #region Using directives
 
