@@ -242,6 +242,7 @@ public class UnsafeTextNavigatorTest
     }
 
     [TestMethod]
+    [Description ("Заглядывание вперед на одну позицию")]
     public void UnsafeTextNavigator_LookAhead_1()
     {
         const string text = "ABC";
@@ -256,6 +257,7 @@ public class UnsafeTextNavigatorTest
     }
 
     [TestMethod]
+    [Description ("Заглядывание вперед на две позиции")]
     public void UnsafeTextNavigator_LookAhead_2()
     {
         const string text = "ABC";
@@ -270,6 +272,7 @@ public class UnsafeTextNavigatorTest
     }
 
     [TestMethod]
+    [Description ("Заглядывание назад на одну позицию")]
     public void UnsafeTextNavigator_LookBehind_1()
     {
         const string text = "ABC";
@@ -287,6 +290,7 @@ public class UnsafeTextNavigatorTest
     }
 
     [TestMethod]
+    [Description ("Заглядывание назад на две позиции")]
     public void UnsafeTextNavigator_LookBehind_2()
     {
         const string text = "ABC";
@@ -304,6 +308,7 @@ public class UnsafeTextNavigatorTest
     }
 
     [TestMethod]
+    [Description ("Свободное передвижения по тексту")]
     public void UnsafeTextNavigator_Move_1()
     {
         const string text = "ABC";
@@ -315,6 +320,7 @@ public class UnsafeTextNavigatorTest
     }
 
     [TestMethod]
+    [Description ("Подглядывание следующего символа")]
     public void UnsafeTextNavigator_PeekChar_1()
     {
         const string text = "ABC";
@@ -329,6 +335,7 @@ public class UnsafeTextNavigatorTest
     }
 
     [TestMethod]
+    [Description ("Подглядывание строки заданной длины")]
     public void UnsafeTextNavigator_PeekString_1()
     {
         const string text = "ABC";
@@ -343,6 +350,7 @@ public class UnsafeTextNavigatorTest
     }
 
     [TestMethod]
+    [Description ("Подглядывание вплоть до указанного символа")]
     public void UnsafeTextNavigator_PeekTo_1()
     {
         const string text = "ABC]DEF";
@@ -360,6 +368,7 @@ public class UnsafeTextNavigatorTest
     }
 
     [TestMethod]
+    [Description ("Подглядывание вплоть до указанных символов")]
     public void UnsafeTextNavigator_PeekTo_2()
     {
         const string text = "ABC]DE+F";
@@ -380,6 +389,7 @@ public class UnsafeTextNavigatorTest
     }
 
     [TestMethod]
+    [Description ("Подглядывание вплоть до указанного символа")]
     public void UnsafeTextNavigator_PeekUntil_1()
     {
         const string text = "ABC]DEF";
@@ -397,6 +407,7 @@ public class UnsafeTextNavigatorTest
     }
 
     [TestMethod]
+    [Description ("Подглядывание вплоть до указанных символов")]
     public void UnsafeTextNavigator_PeekUntil_2()
     {
         const string text = "ABC]DE+F";
@@ -417,6 +428,7 @@ public class UnsafeTextNavigatorTest
     }
 
     [TestMethod]
+    [Description ("Считывание символов по одному")]
     public void UnsafeTextNavigator_ReadChar_1()
     {
         const string text = "ABC";
@@ -429,11 +441,12 @@ public class UnsafeTextNavigatorTest
     }
 
     [TestMethod]
+    [Description ("Считывание экранированной строки вплоть до указанного символа")]
     public void UnsafeTextNavigator_ReadEscapedUntil_1()
     {
         const string text = "AB[tC]D";
         var navigator = new UnsafeTextNavigator (text);
-        var expected = "ABtC";
+        const string expected = "ABtC";
         var actual = navigator.ReadEscapedUntil ('[', ']');
         Assert.AreEqual (expected, actual);
         Assert.AreEqual ('D', navigator.ReadChar());
@@ -441,11 +454,12 @@ public class UnsafeTextNavigatorTest
     }
 
     [TestMethod]
+    [Description ("Считывание экранированной строки вплоть до указанных символов")]
     public void UnsafeTextNavigator_ReadEscapedUntil_2()
     {
         const string text = "AB[tC";
         var navigator = new UnsafeTextNavigator (text);
-        var expected = "ABtC";
+        const string expected = "ABtC";
         var actual = navigator.ReadEscapedUntil ('[', ']');
         Assert.AreEqual (expected, actual);
         Assert.AreEqual (UnsafeTextNavigator.EOF, navigator.ReadChar());
@@ -453,6 +467,7 @@ public class UnsafeTextNavigatorTest
 
     [TestMethod]
     [ExpectedException (typeof (FormatException))]
+    [Description ("Считывание неправильно экранированной строки")]
     public void UnsafeTextNavigator_ReadEscapedUntil_3()
     {
         const string text = "AB[";
@@ -461,6 +476,7 @@ public class UnsafeTextNavigatorTest
     }
 
     [TestMethod]
+    [Description ("Считывание, начиная с указанного символа")]
     public void UnsafeTextNavigator_ReadFrom_1()
     {
         const string text1 = "'ABC'DEF";
@@ -484,6 +500,7 @@ public class UnsafeTextNavigatorTest
     }
 
     [TestMethod]
+    [Description ("Считывание, начиная с указанных символов")]
     public void UnsafeTextNavigator_ReadFrom_2()
     {
         const string text1 = "[ABC>DEF";
@@ -508,6 +525,7 @@ public class UnsafeTextNavigatorTest
     }
 
     [TestMethod]
+    [Description ("Чтение целого числа")]
     public void UnsafeTextNavigator_ReadInteger_1()
     {
         const string text1 = "314abc";
@@ -524,6 +542,7 @@ public class UnsafeTextNavigatorTest
     }
 
     [TestMethod]
+    [Description ("Чтение вплоть до перевода строки")]
     public void UnsafeTextNavigator_ReadLine_1()
     {
         const string text = "ABC\r\nDEF";
@@ -534,6 +553,7 @@ public class UnsafeTextNavigatorTest
     }
 
     [TestMethod]
+    [Description ("Чтение строки")]
     public void UnsafeTextNavigator_ReadString_1()
     {
         const string text = "ABCDEF";
@@ -544,6 +564,7 @@ public class UnsafeTextNavigatorTest
     }
 
     [TestMethod]
+    [Description ("Чтение вплоть до указанного символа")]
     public void UnsafeTextNavigator_ReadTo_1()
     {
         const string text1 = "'ABC'DEF";
@@ -563,6 +584,7 @@ public class UnsafeTextNavigatorTest
     }
 
     [TestMethod]
+    [Description ("Чтение вплоть до указанных символов")]
     public void UnsafeTextNavigator_ReadTo_2()
     {
         char[] stop = { ']', '>' };
@@ -574,6 +596,7 @@ public class UnsafeTextNavigatorTest
     }
 
     [TestMethod]
+    [Description ("Чтение вплоть до указанных символов")]
     public void UnsafeTextNavigator_ReadTo_3()
     {
         var navigator = new UnsafeTextNavigator ("314abc>>>hello");
@@ -591,6 +614,7 @@ public class UnsafeTextNavigatorTest
     }
 
     [TestMethod]
+    [Description ("Чтение вплоть до указанного символа")]
     public void UnsafeTextNavigator_ReadUntil_1()
     {
         const string text = "'ABC'DEF";
@@ -604,6 +628,7 @@ public class UnsafeTextNavigatorTest
     }
 
     [TestMethod]
+    [Description ("Чтение вплоть до указанных символов")]
     public void UnsafeTextNavigator_ReadUntil_2()
     {
         char[] openChars = { '(' };
@@ -644,6 +669,22 @@ public class UnsafeTextNavigatorTest
     }
 
     [TestMethod]
+    [Description ("Чтение вплоть до указанных символов")]
+    public void UnsafeTextNavigator_ReadUntil_3()
+    {
+        char[] stop = { ']', '>' };
+        var navigator = new UnsafeTextNavigator ("ABC>]DEF");
+        Assert.AreEqual ("ABC", navigator.ReadUntil (stop).ToString());
+        navigator.ReadChar();
+        Assert.AreEqual (string.Empty, navigator.ReadUntil (stop).ToString());
+        navigator.ReadChar();
+        Assert.AreEqual ("DEF", navigator.ReadUntil (stop).ToString());
+        navigator.ReadChar();
+        Assert.IsTrue (navigator.ReadUntil (stop).IsEmpty);
+    }
+
+    [TestMethod]
+    [Description ("Чтение вплоть до указанной строки")]
     public void UnsafeTextNavigator_ReadUntilString_1()
     {
         var navigator = new UnsafeTextNavigator ("12345<.>");
@@ -679,20 +720,7 @@ public class UnsafeTextNavigatorTest
     }
 
     [TestMethod]
-    public void UnsafeTextNavigator_ReadUntil_4()
-    {
-        char[] stop = { ']', '>' };
-        var navigator = new UnsafeTextNavigator ("ABC>]DEF");
-        Assert.AreEqual ("ABC", navigator.ReadUntil (stop).ToString());
-        navigator.ReadChar();
-        Assert.AreEqual (string.Empty, navigator.ReadUntil (stop).ToString());
-        navigator.ReadChar();
-        Assert.AreEqual ("DEF", navigator.ReadUntil (stop).ToString());
-        navigator.ReadChar();
-        Assert.IsTrue (navigator.ReadUntil (stop).IsEmpty);
-    }
-
-    [TestMethod]
+    [Description ("Чтение указанных символов")]
     public void UnsafeTextNavigator_ReadWhile_1()
     {
         var navigator = new UnsafeTextNavigator ("111234");
@@ -703,6 +731,7 @@ public class UnsafeTextNavigatorTest
     }
 
     [TestMethod]
+    [Description ("Чтение указанных символов")]
     public void UnsafeTextNavigator_ReadWhile_2()
     {
         const string text1 = "314abc";
@@ -715,6 +744,7 @@ public class UnsafeTextNavigatorTest
     }
 
     [TestMethod]
+    [Description ("Чтение слова")]
     public void UnsafeTextNavigator_ReadWord_1()
     {
         var navigator = new UnsafeTextNavigator ("Hello, world!");
@@ -728,6 +758,7 @@ public class UnsafeTextNavigatorTest
     }
 
     [TestMethod]
+    [Description ("Чтение слова")]
     public void UnsafeTextNavigator_ReadWord_2()
     {
         char[] additional = { '<', '>' };
@@ -742,6 +773,7 @@ public class UnsafeTextNavigatorTest
     }
 
     [TestMethod]
+    [Description ("Получение недавно считанного текста")]
     public void UnsafeTextNavigator_RecentText_1()
     {
         var navigator = new UnsafeTextNavigator ("Hello, world!");
@@ -757,6 +789,7 @@ public class UnsafeTextNavigatorTest
     }
 
     [TestMethod]
+    [Description ("Пропуск указаного символа")]
     public void UnsafeTextNavigator_SkipChar_1()
     {
         var navigator = new UnsafeTextNavigator ("111234");
@@ -768,6 +801,7 @@ public class UnsafeTextNavigatorTest
     }
 
     [TestMethod]
+    [Description ("Пропуск указанного количества символов")]
     public void UnsafeTextNavigator_SkipChar_2()
     {
         var navigator = new UnsafeTextNavigator ("123456");
@@ -778,6 +812,7 @@ public class UnsafeTextNavigatorTest
     }
 
     [TestMethod]
+    [Description ("Пропуск указанных символов")]
     public void UnsafeTextNavigator_SkipChar_3()
     {
         char[] allowed = { '1', '2' };
@@ -789,6 +824,7 @@ public class UnsafeTextNavigatorTest
     }
 
     [TestMethod]
+    [Description ("Пропуск управляющих символов")]
     public void UnsafeTextNavigator_SkipControl_1()
     {
         var navigator = new UnsafeTextNavigator ("\t\tABC");
@@ -799,6 +835,7 @@ public class UnsafeTextNavigatorTest
     }
 
     [TestMethod]
+    [Description ("Пропуск пунктуации")]
     public void UnsafeTextNavigator_SkipPunctuation_1()
     {
         var navigator = new UnsafeTextNavigator (".,ABC");
@@ -809,6 +846,7 @@ public class UnsafeTextNavigatorTest
     }
 
     [TestMethod]
+    [Description ("Пропуск не-словных символов")]
     public void UnsafeTextNavigator_SkipNonWord_1()
     {
         var navigator = new UnsafeTextNavigator (". (ABC");
@@ -817,6 +855,7 @@ public class UnsafeTextNavigatorTest
     }
 
     [TestMethod]
+    [Description ("Пропуск не-словных символов")]
     public void UnsafeTextNavigator_SkipNonWord_2()
     {
         var navigator = new UnsafeTextNavigator (". (<ABC");
@@ -825,6 +864,7 @@ public class UnsafeTextNavigatorTest
     }
 
     [TestMethod]
+    [Description ("Пропукск указанного диапазона символов")]
     public void UnsafeTextNavigator_SkipRange_1()
     {
         var navigator = new UnsafeTextNavigator ("123ABC");
@@ -835,6 +875,7 @@ public class UnsafeTextNavigatorTest
     }
 
     [TestMethod]
+    [Description ("Пропуск вплоть до указанного символа")]
     public void UnsafeTextNavigator_SkipTo_1()
     {
         var navigator = new UnsafeTextNavigator ("123ABC");
@@ -844,6 +885,7 @@ public class UnsafeTextNavigatorTest
     }
 
     [TestMethod]
+    [Description ("Пропуск символов, не входящих в заданное множество")]
     public void UnsafeTextNavigator_SkipWhileNot_1()
     {
         char[] good = { 'A', 'B' };
