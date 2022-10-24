@@ -26,6 +26,7 @@ using System.Reflection;
 using System.Text;
 
 using AM.Configuration;
+using AM.IO;
 
 using Microsoft.Extensions.Caching.Memory;
 
@@ -1106,7 +1107,10 @@ public sealed class StdLib
 
         try
         {
-            File.Move (oldName, newName, overwrite);
+            if (!FileUtility.TryMove (oldName, newName))
+            {
+                throw new IOException ($"Can't move {oldName} to {newName}");
+            }
         }
         catch (Exception exception)
         {

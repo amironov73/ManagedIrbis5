@@ -217,7 +217,7 @@ public static class FileUtility
         Sure.FileExists (sourceName);
         Sure.NotNullNorEmpty (targetName);
 
-        _CopyThenVerify(sourceName, targetName, overwrite);
+        _CopyThenVerify (sourceName, targetName, overwrite);
 
         // переносим времена с исходного файла
         var creationTime = File.GetCreationTime (sourceName);

@@ -179,7 +179,6 @@ public sealed class ClientRunner
 
     #endregion
 
-
     #region Public methods
 
     /// <summary>
@@ -228,7 +227,7 @@ public sealed class ClientRunner
                 WorkingDirectory,
                 copyIniName
             );
-        File.Copy (mainIniPath, _copyIniPath);
+        FileUtility.Copy (mainIniPath, _copyIniPath, true);
 
         using (var iniFile = new IniFile
                    (

@@ -382,6 +382,17 @@ class Loan
 
 Дополнительно в качестве имен интерфейсов можно использовать прилагательные, описывающие поведение класса, реализующего интерфейс. Например: `IPersistable` или `IFormatable`.
 
+## Записи
+
+Там, где это имеет смысл, вместо классов и структур следует применять записи, т. к. они избавляют от шаблонного кода и создают неизменяемые объекты.
+
+```csharp
+public record Person (string FirstName, string LastName);
+
+var alexey = new Person ("Alexey", "Mironov");
+var alexander = alexey with { Name = "Alexander" };
+```
+
 ## Члены типов
 
 Порядок следования членов типа должен быть следующим:
@@ -515,6 +526,14 @@ if (hoursWorked < minimumAllowed)
 
 Везде, где возможно, следует использовать `var` - автоматическое выведение типа локальной переменной.
 
+### Тело метода
+
+Короткое тело метода/свойства, особенно, возвращающего тривиальный результат, может быть записано в виде лямбды:
+
+```c#
+bool UsesExtendedNotation() => true;
+```
+
 ### Открытость/закрытость для наследования
 
 Класс не предназначен явно для наследования, если:
@@ -526,6 +545,37 @@ if (hoursWorked < minimumAllowed)
 Подобные классы следует снабжать модификатором `sealed`, чтобы подчеркнуть для прикладного программиста, что данный класс не проектировался как наследуемый.
 
 "Запечатывание" класса позволяет JIT применить оптимизации, которые положительно сказываются на производительности программы, поэтому следует "запечатывать" классы (или отдельные методы/свойства) везде, где это имеет смысл.
+
+### Модификатор readonly
+
+Методы, которые не меняют состояние объекта, должны быть помечены ключевым словом `readonly`
+
+```c#
+public struct Point
+{
+    public double X { get; set; }
+    public double Y { get; set; }
+    public readonly double Distance => Math.Sqrt(X * X + Y * Y);
+
+    public readonly override string ToString() =>
+        $"({X}, {Y}) is {Distance} from the origin";
+}
+```
+
+### Локальные функции
+
+По возможности локальные функции, не захватывающие контекст, следует снабжать модификатором `static`:
+
+```c#
+int Method()
+{
+    var y = 5;
+    var x = 7;
+    return Add (x, y);
+
+    static int Add (int left, int right) => left + right;
+}
+```
 
 ## Производные типы
 
@@ -772,7 +822,7 @@ using (var reader = new MarcIsoRecordReader (file))
 }
 ```
 
-Везде, где это имеет смысл, следует использовать `var`-объявление переменной. Кроме того, имеет смысл применять `using`-выражение, экономящее отступ:
+Везде, где это имеет смысл, следует использовать `var`-декларацию переменной. Кроме того, имеет смысл применять `using`-декларацию переменной, экономящую логический отступ:
 
 ```c#
 using var reader = new MarcIsoRecordReader (file);
@@ -860,6 +910,43 @@ public class MyClass
         {
             ...
         }
+    }
+}
+```
+
+#### Асинхронная очистка
+
+```c#
+public class SomeClass
+    : IAsyncDisposable
+{
+    protected virtual ValueTask DisposeAsyncCore()
+    {
+        // некие действия по очистке
+    }
+
+    protected virtual void Dispose (bool disposing)
+    {
+        if (disposing)
+        {
+            // освобождение managed-ресурсов
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        // Perform async cleanup.
+        await DisposeAsyncCore().ConfigureAwait (false);
+
+        // Dispose of unmanaged resources.
+        Dispose (false);
+
+        #pragma warning disable CA1816 // Dispose methods should call SuppressFinalize
+
+        // Suppress finalization.
+        GC.SuppressFinalize (this);
+
+        #pragma warning restore CA1816 // Dispose methods should call SuppressFinalize
     }
 }
 ```

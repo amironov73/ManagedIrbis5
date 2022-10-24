@@ -16,6 +16,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 
+using AM.IO;
+
 #endregion
 
 #nullable enable
@@ -226,7 +228,9 @@ public class FileTextSource
         //load first lines for calc width of the text
         var linesCount = Math.Min (lines.Count, CurrentTextBox.ClientRectangle.Height / CurrentTextBox.CharHeight);
         for (var i = 0; i < linesCount; i++)
+        {
             LoadLineFromSourceFile (i);
+        }
 
         //
         NeedRecalc (new TextChangedEventArgs (0, linesCount - 1));
@@ -387,11 +391,13 @@ public class FileTextSource
 
         //clear lines buffer
         for (var i = 0; i < Count; i++)
+        {
             lines[i] = null;
+        }
 
         //deattach from source file
         sr.Dispose();
-        _stream.Dispose();
+        _stream?.Dispose();
 
         //delete target file
         if (File.Exists (fileName))
@@ -400,7 +406,10 @@ public class FileTextSource
         }
 
         //rename temp file
-        File.Move (tempFileName, fileName);
+        if (!FileUtility.TryMove (tempFileName, fileName))
+        {
+            throw new IOException ($"Can't move {tempFileName} to {fileName}");
+        }
 
         //binding to new file
         _sourceFileLinePositions = newLinePos;

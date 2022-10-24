@@ -40,7 +40,11 @@ public sealed class FileRenumber
     /// <summary>
     /// Пара имен: старое и новое.
     /// </summary>
-    public record Bunch(string OldName, string NewName)
+    public record Bunch
+        (
+            string OldName,
+            string NewName
+        )
     {
         private string FullNewName
         {
@@ -104,6 +108,7 @@ public sealed class FileRenumber
             output?.WriteLine ($"{OldName} -> {fullName}");
             if (!dryRun)
             {
+                // Не надо FileUtility.Move, переименовываем в пределах одного диска
                 File.Move (OldName, fullName);
             }
         }

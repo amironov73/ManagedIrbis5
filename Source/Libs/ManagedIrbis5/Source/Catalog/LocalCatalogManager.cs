@@ -114,7 +114,7 @@ public sealed class LocalCatalogManager
                     catalogName,
                     extension
                 );
-            File.Copy
+            FileUtility.Copy
                 (
                     sourceFile,
                     targetFile,
@@ -293,7 +293,7 @@ public sealed class LocalCatalogManager
                     targetPath,
                     fileName
                 );
-            File.Copy (sourceFile, targetFile);
+            FileUtility.Copy (sourceFile, targetFile, true);
         }
 
         DirectUtility.CreateDatabase64
@@ -473,7 +473,7 @@ public sealed class LocalCatalogManager
                 }
 
                 var destinationName = Path.Combine (targetPath, originalName.ToLowerInvariant());
-                File.Copy (originalFile, destinationName);
+                FileUtility.Copy (originalFile, destinationName, true);
                 Output.Write ($" {originalName}");
             }
 
