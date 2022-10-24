@@ -1,5 +1,11 @@
-﻿// ReSharper disable AccessToDisposedClosure
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable AccessToDisposedClosure
 // ReSharper disable CheckNamespace
+// ReSharper disable ConvertToLocalFunction
+
+#region Using directives
 
 using System;
 using System.Collections.Generic;
@@ -7,6 +13,8 @@ using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using AM.Threading.Tasks;
+
+#endregion
 
 #nullable enable
 
@@ -25,7 +33,7 @@ public sealed class SimplestTaskProcessorTest
         {
             var number = i;
 
-            Action action = () =>
+            var action = () =>
             {
                 var item = "Hello " + number;
                 lock (lines)
@@ -56,7 +64,7 @@ public sealed class SimplestTaskProcessorTest
         {
             var number = i;
 
-            Action action = () =>
+            var action = () =>
             {
                 var item = "Hello " + number;
                 lock (lines)
@@ -79,6 +87,7 @@ public sealed class SimplestTaskProcessorTest
     }
 
     [TestMethod]
+    [Description ("Задание невозможной степени параллелизма")]
     [ExpectedException (typeof (ArgumentOutOfRangeException))]
     public void SimplestTaskProcessor_Construction_1()
     {

@@ -202,6 +202,7 @@ public sealed class NumberTextTest
     }
 
     [TestMethod]
+    [Description ("Инкремент на значение, отличное от единицы")]
     public void NumberText_Increment_6()
     {
         NumberText number = "hello002goodbye001";
@@ -210,6 +211,7 @@ public sealed class NumberTextTest
     }
 
     [TestMethod]
+    [Description ("Инкремент второго фрагмента на значение, отличное от единициы")]
     public void NumberText_Increment_7()
     {
         NumberText number = "hello002goodbye001";
@@ -218,6 +220,7 @@ public sealed class NumberTextTest
     }
 
     [TestMethod]
+    [Description ("Выбор максимального из двух текстов-чисел")]
     public void NumberText_Max_1()
     {
         NumberText first = "hello2";
@@ -227,6 +230,7 @@ public sealed class NumberTextTest
     }
 
     [TestMethod]
+    [Description ("Выбор минимального из двух текстов-чисел")]
     public void NumberText_Min_1()
     {
         NumberText first = "hello2";
@@ -236,6 +240,7 @@ public sealed class NumberTextTest
     }
 
     [TestMethod]
+    [Description ("Оператор равенства")]
     public void NumberText_EqualityOperator_1()
     {
         NumberText? left = "hello2";
@@ -253,6 +258,7 @@ public sealed class NumberTextTest
     }
 
     [TestMethod]
+    [Description ("Оператор равенства")]
     public void NumberText_EqualityOperator_2()
     {
         NumberText? left = "hello2";
@@ -268,6 +274,7 @@ public sealed class NumberTextTest
     }
 
     [TestMethod]
+    [Description ("Оператор равенства")]
     public void NumberText_EqualityOperator_3()
     {
         NumberText? left = "hello2";
@@ -283,6 +290,7 @@ public sealed class NumberTextTest
     }
 
     [TestMethod]
+    [Description ("Оператор равенства")]
     public void NumberText_EqualityOperator_4()
     {
         NumberText? left = "002";
@@ -294,6 +302,7 @@ public sealed class NumberTextTest
     }
 
     [TestMethod]
+    [Description ("Определение, содержит ли фрагмент только текст")]
     public void NumberText_TextOnly_1()
     {
         NumberText number = "Hello1";
@@ -307,6 +316,7 @@ public sealed class NumberTextTest
     }
 
     [TestMethod]
+    [Description ("Определение, содержит ли фрагмент только число")]
     public void NumberText_ValueOnly_1()
     {
         NumberText number = "Hello1";
@@ -320,6 +330,7 @@ public sealed class NumberTextTest
     }
 
     [TestMethod]
+    [Description ("Проверка наличия фрагмента с указанным индексом")]
     public void NumberText_HaveChunk_1()
     {
         NumberText number = "Hello1";
@@ -329,6 +340,7 @@ public sealed class NumberTextTest
     }
 
     [TestMethod]
+    [Description ("Добавление фрагмента в конец текста-числа")]
     public void NumberText_AppendChunk_1()
     {
         NumberText number = "Hello1";
@@ -337,6 +349,7 @@ public sealed class NumberTextTest
     }
 
     [TestMethod]
+    [Description ("Добавление фрагмента в конец текста-числа")]
     public void NumberText_AppendChunk_2()
     {
         NumberText number = "Hello1";
@@ -345,6 +358,7 @@ public sealed class NumberTextTest
     }
 
     [TestMethod]
+    [Description ("Добавление фрагмента в конец текста-числа")]
     public void NumberText_AppendChunk_3()
     {
         NumberText number = "Hello1";
@@ -353,6 +367,7 @@ public sealed class NumberTextTest
     }
 
     [TestMethod]
+    [Description ("Вычисление разности между двумя текстами-числами")]
     public void NumberText_GetDifference_1()
     {
         NumberText first = "Hello100";
@@ -362,6 +377,7 @@ public sealed class NumberTextTest
     }
 
     [TestMethod]
+    [Description ("Получение длины числа в указанном фрагменте")]
     public void NumberText_GetLength_1()
     {
         NumberText number = "Hello100";
@@ -370,6 +386,7 @@ public sealed class NumberTextTest
     }
 
     [TestMethod]
+    [Description ("Получение префикса указанного фрагмента")]
     public void NumberText_GetPrefix_1()
     {
         NumberText number = "Hello2";
@@ -378,6 +395,7 @@ public sealed class NumberTextTest
     }
 
     [TestMethod]
+    [Description ("Получение префикса указанного фрагмента")]
     public void NumberText_GetPrefix_2()
     {
         NumberText number = "Hello2";
@@ -386,6 +404,7 @@ public sealed class NumberTextTest
     }
 
     [TestMethod]
+    [Description ("Получение численного значения указанного фрагмента")]
     public void NumberText_GetValue_1()
     {
         NumberText number = "Hello001";
@@ -394,6 +413,7 @@ public sealed class NumberTextTest
     }
 
     [TestMethod]
+    [Description ("Получение численного значения указанного фрагмента")]
     public void NumberText_GetValue_2()
     {
         NumberText number = "Hello001";

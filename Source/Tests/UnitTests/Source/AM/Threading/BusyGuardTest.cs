@@ -1,5 +1,10 @@
-﻿// ReSharper disable AccessToDisposedClosure
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable AccessToDisposedClosure
 // ReSharper disable CheckNamespace
+
+#region Using directives
 
 using System.Threading.Tasks;
 
@@ -7,13 +12,17 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using AM.Threading;
 
+#endregion
+
+#nullable enable
+
 namespace UnitTests.AM.Threading;
 
 [TestClass]
 public sealed class BusyGuardTest
 {
-    //[Ignore]
     [TestMethod]
+    [Description ("Захват и освобождение BusyState")]
     public void BusyGuard_Construction_1()
     {
         var done = false;

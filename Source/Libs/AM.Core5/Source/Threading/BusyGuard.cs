@@ -8,6 +8,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
 /* BusyGuard.cs -- обертка для захвата и освобождения BusyState
@@ -49,7 +50,7 @@ public readonly struct BusyGuard
     #region Construction
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор.
     /// </summary>
     public BusyGuard
         (
@@ -63,7 +64,7 @@ public readonly struct BusyGuard
     }
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор.
     /// </summary>
     public BusyGuard
         (

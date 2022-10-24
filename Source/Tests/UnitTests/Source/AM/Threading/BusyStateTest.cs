@@ -1,8 +1,8 @@
-﻿// ReSharper disable AccessToDisposedClosure
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable AccessToDisposedClosure
 // ReSharper disable CheckNamespace
-// ReSharper disable ForCanBeConvertedToForeach
-// ReSharper disable InvokeAsExtensionMethod
-// ReSharper disable PropertyCanBeMadeInitOnly.Local
 
 using System;
 using System.Threading;
@@ -21,6 +21,7 @@ namespace UnitTests.AM.Threading;
 public sealed class BusyStateTest
 {
     [TestMethod]
+    [Description ("Конструктор по умолчанию")]
     public void BusyState_Construction_1()
     {
         using var state = new BusyState();
@@ -28,6 +29,7 @@ public sealed class BusyStateTest
     }
 
     [TestMethod]
+    [Description ("Отработка события")]
     public void BusyState_Event_1()
     {
         var flag = false;
@@ -46,6 +48,7 @@ public sealed class BusyStateTest
     }
 
     [TestMethod]
+    [Description ("Отработка события")]
     public void BusyState_Event_2()
     {
         var flag = false;
@@ -64,6 +67,7 @@ public sealed class BusyStateTest
     }
 
     [TestMethod]
+    [Description ("Установка состояния занятости")]
     public void BusyState_SetState_1()
     {
         using BusyState state = false;
@@ -71,6 +75,7 @@ public sealed class BusyStateTest
     }
 
     [TestMethod]
+    [Description ("Установка состояния занятости")]
     public void BusyState_SetState_2()
     {
         using BusyState state = true;
@@ -78,6 +83,7 @@ public sealed class BusyStateTest
     }
 
     [TestMethod]
+    [Description ("Установка состояния занятости")]
     public void BusyState_SetState_3()
     {
         using BusyState state = true;
@@ -98,6 +104,7 @@ public sealed class BusyStateTest
     }
 
     [TestMethod]
+    [Description ("Установка состояния занятости")]
     public void BusyState_SetState_4()
     {
         var flag = false;
@@ -119,6 +126,7 @@ public sealed class BusyStateTest
     }
 
     [TestMethod]
+    [Description ("Получение WaitHandle")]
     public void BusyState_WaitHandle_1()
     {
         using BusyState state = true;
@@ -138,6 +146,7 @@ public sealed class BusyStateTest
     }
 
     [TestMethod]
+    [Description ("Синхронный запуск кода с состоянием занятости")]
     public void BusyState_Run_1()
     {
         var flag = false;
@@ -157,6 +166,7 @@ public sealed class BusyStateTest
     }
 
     [TestMethod]
+    [Description ("Асинхронный запуск кода с состоянием занятости")]
     public void BusyState_RunAsync_1()
     {
         var flag = false;
@@ -176,13 +186,12 @@ public sealed class BusyStateTest
         Assert.IsFalse (state);
     }
 
-    private void _TestSerialization
+    private static void _TestSerialization
         (
             BusyState first
         )
     {
         var bytes = first.SaveToMemory();
-
         var second = bytes.RestoreObjectFromMemory<BusyState>()!;
 
         Assert.IsNotNull (second);
@@ -191,6 +200,7 @@ public sealed class BusyStateTest
     }
 
     [TestMethod]
+    [Description ("Сериализация")]
     public void BusyState_Serialization_1()
     {
         using var state = new BusyState();
@@ -204,6 +214,7 @@ public sealed class BusyStateTest
     }
 
     [TestMethod]
+    [Description ("Ожидание с последующим захватом")]
     public void BusyState_WaitAndGrab_1()
     {
         var flag = false;
@@ -231,6 +242,7 @@ public sealed class BusyStateTest
     }
 
     [TestMethod]
+    [Description ("Ожидание с последующим захватом")]
     public void BusyState_WaitAndGrab_2()
     {
         var flag = false;
@@ -259,6 +271,7 @@ public sealed class BusyStateTest
     }
 
     [TestMethod]
+    [Description ("Ожидание с последующим захватом")]
     public void BusyState_WaitAndGrab_3()
     {
         var flag = false;
@@ -286,6 +299,7 @@ public sealed class BusyStateTest
     }
 
     [TestMethod]
+    [Description ("Ожидание с последующим захватом")]
     public void BusyState_WaitAndGrab_4()
     {
         var flag = false;
@@ -314,6 +328,7 @@ public sealed class BusyStateTest
     }
 
     [TestMethod]
+    [Description ("Ожидание освобождения")]
     public void BusyState_Wait_1()
     {
         using BusyState state = false;
@@ -322,6 +337,7 @@ public sealed class BusyStateTest
     }
 
     [TestMethod]
+    [Description ("Ожидание освобождения")]
     public void BusyState_Wait_2()
     {
         using BusyState state = false;
@@ -330,6 +346,7 @@ public sealed class BusyStateTest
     }
 
     [TestMethod]
+    [Description ("Преобразование в текст")]
     public void BusyState_ToString_1()
     {
         using BusyState state = false;
@@ -337,6 +354,7 @@ public sealed class BusyStateTest
     }
 
     [TestMethod]
+    [Description ("Преобразование в текст")]
     public void BusyState_ToString_2()
     {
         using BusyState state = true;
