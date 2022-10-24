@@ -85,6 +85,7 @@ public sealed class NumberTextTest
     }
 
     [TestMethod]
+    [Description ("Перечисление пустого текста")]
     public void NumberText_Enumeration_1()
     {
         var number = new NumberText();
@@ -93,6 +94,7 @@ public sealed class NumberTextTest
     }
 
     [TestMethod]
+    [Description ("Перечисление текста из одного фрагмента")]
     public void NumberText_Enumeration_2()
     {
         var number = new NumberText ("hello1");
@@ -101,6 +103,7 @@ public sealed class NumberTextTest
     }
 
     [TestMethod]
+    [Description ("Перечисление текста из двух фрагментов")]
     public void NumberText_Enumeration_3()
     {
         var number = new NumberText ("hello1goodbye2");
@@ -109,6 +112,7 @@ public sealed class NumberTextTest
     }
 
     [TestMethod]
+    [Description ("Клонирование")]
     public void NumberText_Clone_1()
     {
         NumberText first = "Hello1";
@@ -117,6 +121,7 @@ public sealed class NumberTextTest
     }
 
     [TestMethod]
+    [Description ("Сравнение: без ведущих нулей")]
     public void NumberText_Comparison_1()
     {
         NumberText first = "hello2";
@@ -125,6 +130,7 @@ public sealed class NumberTextTest
     }
 
     [TestMethod]
+    [Description ("Сравнение: с ведущим нулем")]
     public void NumberText_Comparison_2()
     {
         NumberText first = "hello2";
@@ -133,6 +139,7 @@ public sealed class NumberTextTest
     }
 
     [TestMethod]
+    [Description ("Сравнение фрагментов без префиксов")]
     public void NumberText_Comparison_3()
     {
         NumberText first = "20";
@@ -141,6 +148,7 @@ public sealed class NumberTextTest
     }
 
     [TestMethod]
+    [Description ("Сравнение фрагментов без префикса: наоборот")]
     public void NumberText_Comparison_4()
     {
         NumberText first = "20";
@@ -149,6 +157,7 @@ public sealed class NumberTextTest
     }
 
     [TestMethod]
+    [Description ("Инкремент текста с одним фрагментом")]
     public void NumberText_Increment_1()
     {
         NumberText number = "hello2";
@@ -157,6 +166,7 @@ public sealed class NumberTextTest
     }
 
     [TestMethod]
+    [Description ("Инкремент текста с двумя фрагментами")]
     public void NumberText_Increment_2()
     {
         NumberText number = "hello2goodbye1";
@@ -165,6 +175,7 @@ public sealed class NumberTextTest
     }
 
     [TestMethod]
+    [Description ("Инкремент второго фрагмента")]
     public void NumberText_Increment_3()
     {
         NumberText number = "hello2goodbye1";
@@ -173,6 +184,7 @@ public sealed class NumberTextTest
     }
 
     [TestMethod]
+    [Description ("Инкремент фрагмента с ведущими нулями")]
     public void NumberText_Increment_4()
     {
         NumberText number = "hello002goodbye001";
@@ -181,6 +193,7 @@ public sealed class NumberTextTest
     }
 
     [TestMethod]
+    [Description ("Инкремент второго фрагмента с ведущими нулями")]
     public void NumberText_Increment_5()
     {
         NumberText number = "hello002goodbye001";
@@ -273,7 +286,7 @@ public sealed class NumberTextTest
     public void NumberText_EqualityOperator_4()
     {
         NumberText? left = "002";
-        var right = 2;
+        const int right = 2;
         Assert.IsTrue (left == right);
 
         left = null;
@@ -767,11 +780,11 @@ public sealed class NumberTextTest
     public void NumberText_Addition_1()
     {
         NumberText number = "Hello001";
-        number = number + 2;
+        number += 2;
         Assert.AreEqual ("Hello003", number.ToString());
 
         number = "Hello001Goodbye002";
-        number = number + 2;
+        number += 2;
         Assert.AreEqual ("Hello001Goodbye004", number.ToString());
     }
 
@@ -820,7 +833,7 @@ public sealed class NumberTextTest
     public void NumberText_NotEqual_3()
     {
         NumberText? left = "111";
-        var right = 112;
+        const int right = 112;
         Assert.IsTrue (left != right);
 
         left = null;
@@ -861,7 +874,7 @@ public sealed class NumberTextTest
     public void NumberText_GreaterThan_3()
     {
         NumberText? left = "112";
-        var right = 111;
+        const int right = 111;
         Assert.IsTrue (left > right);
 
         left = null;
@@ -917,7 +930,7 @@ public sealed class NumberTextTest
     public void NumberText_LessThan_3()
     {
         NumberText? left = "110";
-        var right = 111;
+        const int right = 111;
         Assert.IsTrue (left < right);
 
         left = null;

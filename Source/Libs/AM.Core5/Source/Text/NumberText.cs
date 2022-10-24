@@ -895,7 +895,7 @@ public sealed class NumberText
             NumberText? other
         )
     {
-        if (ReferenceEquals (other, null))
+        if (other is null)
         {
             return 1;
         }
