@@ -2,8 +2,6 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
 #region Using directives
@@ -37,7 +35,8 @@ public sealed class RichTextStripperTest
     }
 
     [TestMethod]
-    public void RichTextStripper_StripRichTextFormat()
+    [Description ("Удаление RTF-разметки из текста")]
+    public void RichTextStripper_StripRichTextFormat_1()
     {
         _TestStrip (null, null);
         _TestStrip (string.Empty, string.Empty);

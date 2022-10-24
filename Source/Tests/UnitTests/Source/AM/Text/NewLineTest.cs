@@ -33,7 +33,8 @@ public sealed class NewLineTest
     }
 
     [TestMethod]
-    public void NewLine_RemoveLineBreaks()
+    [Description ("Удаление переводов строки")]
+    public void NewLine_RemoveLineBreaks_1()
     {
         _Test (null, NewLine.RemoveLineBreaks, null);
         _Test ("", NewLine.RemoveLineBreaks, "");
@@ -42,7 +43,8 @@ public sealed class NewLineTest
     }
 
     [TestMethod]
-    public void NewLine_UnixToDos()
+    [Description ("Преобразование переводов строки Unix в DOS")]
+    public void NewLine_UnixToDos_1()
     {
         _Test (null, NewLine.UnixToDos, null);
         _Test ("", NewLine.UnixToDos, "");
@@ -51,7 +53,8 @@ public sealed class NewLineTest
     }
 
     [TestMethod]
-    public void NewLine_DosToUnix()
+    [Description ("Преобразование переводо строки DOS в Unixs")]
+    public void NewLine_DosToUnix_1()
     {
         _Test (null, NewLine.DosToUnix, null);
         _Test ("", NewLine.DosToUnix, "");
