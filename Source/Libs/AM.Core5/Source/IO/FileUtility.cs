@@ -18,6 +18,7 @@
 
 using System;
 using System.IO;
+using System.Security.Cryptography;
 
 using AM.Text;
 
@@ -56,6 +57,49 @@ public static class FileUtility
         "$Extend", "$Quota", "$ObjId", "$Reparse"
     };
 
+    /// <summary>
+    /// Копирование файла с верификацией.
+    /// </summary>
+    private static void _CopyThenVerify
+        (
+            string sourceName,
+            string targetName,
+            bool overwrite
+        )
+    {
+        var sourceMd5 = ComputeMd5Hash (sourceName);
+        File.Copy (sourceName, targetName, overwrite);
+        var targetMd5 = ComputeMd5Hash (targetName);
+
+        if (sourceMd5 != targetMd5)
+        {
+            throw new IOException ($"Hash mismatch for {sourceName} and {targetName}");
+        }
+    }
+
+    /// <summary>
+    /// Перемещение файла с верификацией.
+    /// </summary>
+    private static void _MoveThenVerify
+        (
+            string sourceName,
+            string targetName,
+            bool overwrite
+        )
+    {
+        var sourceMd5 = ComputeMd5Hash (sourceName);
+        File.Copy (sourceName, targetName, overwrite);
+        var targetMd5 = ComputeMd5Hash (targetName);
+
+        if (sourceMd5 != targetMd5)
+        {
+            File.Delete (targetName);
+            throw new IOException ($"Hash mismatch for {sourceName} and {targetName}");
+        }
+
+        File.Delete (sourceName);
+    }
+
     #endregion
 
     #region Public methods
@@ -80,6 +124,25 @@ public static class FileUtility
                 firstStream,
                 secondStream
             );
+    }
+
+    /// <summary>
+    /// Вычисление хеш-суммы для указанного файла.
+    /// </summary>
+    /// <param name="fileName">Имя файла.</param>
+    /// <returns>Хеш-сумма в формате base64.</returns>
+    public static string ComputeMd5Hash
+        (
+            string fileName
+        )
+    {
+        Sure.FileExists (fileName);
+
+        using var md5 = MD5.Create();
+        using var stream = File.OpenRead (fileName);
+        var hash = md5.ComputeHash (stream);
+
+        return Convert.ToBase64String (hash);
     }
 
     /// <summary>
@@ -154,7 +217,7 @@ public static class FileUtility
         Sure.FileExists (sourceName);
         Sure.NotNullNorEmpty (targetName);
 
-        File.Copy (sourceName, targetName, overwrite);
+        _CopyThenVerify(sourceName, targetName, overwrite);
 
         // переносим времена с исходного файла
         var creationTime = File.GetCreationTime (sourceName);
@@ -201,7 +264,7 @@ public static class FileUtility
             }
         }
 
-        File.Copy (sourcePath, targetPath, true);
+        _CopyThenVerify (sourcePath, targetPath, true);
 
         return true;
     }
@@ -228,7 +291,7 @@ public static class FileUtility
             result = CreateBackup (targetPath, true);
         }
 
-        File.Copy (sourcePath, targetPath, false);
+        _CopyThenVerify (sourcePath, targetPath, false);
 
         return result;
     }
@@ -255,11 +318,11 @@ public static class FileUtility
             );
         if (rename)
         {
-            File.Move (path, result);
+            _MoveThenVerify (path, result, false);
         }
         else
         {
-            File.Copy (path, result, false);
+            _CopyThenVerify (path, result, false);
         }
 
         return result;
@@ -489,7 +552,7 @@ public static class FileUtility
 
         try
         {
-            File.Move (sourceFileName, destinationFileName);
+            _MoveThenVerify (sourceFileName, destinationFileName, false);
 
             return true;
         }
