@@ -130,12 +130,16 @@ internal static class CssLayoutEngine
     /// <summary>
     /// Creates line boxes for the specified blockbox
     /// </summary>
-    /// <param name="g"></param>
+    /// <param name="graphics"></param>
     /// <param name="blockBox"></param>
-    public static void CreateLineBoxes (RGraphics g, CssBox blockBox)
+    public static void CreateLineBoxes
+        (
+            RGraphics graphics,
+            CssBox blockBox
+        )
     {
-        ArgChecker.AssertArgNotNull (g, "g");
-        ArgChecker.AssertArgNotNull (blockBox, "blockBox");
+        Sure.NotNull (graphics);
+        Sure.NotNull (blockBox);
 
         blockBox.LineBoxes.Clear();
 
@@ -155,7 +159,7 @@ internal static class CssLayoutEngine
         var line = new CssLineBox (blockBox);
 
         //Flow words and boxes
-        FlowBox (g, blockBox, blockBox, limitRight, 0, startx, ref line, ref curx, ref cury, ref maxRight,
+        FlowBox (graphics, blockBox, blockBox, limitRight, 0, startx, ref line, ref curx, ref cury, ref maxRight,
             ref maxBottom);
 
         // if width is not restricted we need to lower it to the actual width
@@ -167,10 +171,10 @@ internal static class CssLayoutEngine
         //Gets the rectangles for each line-box
         foreach (var linebox in blockBox.LineBoxes)
         {
-            ApplyHorizontalAlignment (g, linebox);
+            ApplyHorizontalAlignment (graphics, linebox);
             ApplyRightToLeft (blockBox, linebox);
             BubbleRectangles (blockBox, linebox);
-            ApplyVerticalAlignment (g, linebox);
+            ApplyVerticalAlignment (graphics, linebox);
             linebox.AssignRectanglesToBoxes();
         }
 
@@ -188,12 +192,16 @@ internal static class CssLayoutEngine
     /// <summary>
     /// Applies special vertical alignment for table-cells
     /// </summary>
-    /// <param name="g"></param>
+    /// <param name="graphics"></param>
     /// <param name="cell"></param>
-    public static void ApplyCellVerticalAlignment (RGraphics g, CssBox cell)
+    public static void ApplyCellVerticalAlignment
+        (
+            RGraphics graphics,
+            CssBox cell
+        )
     {
-        ArgChecker.AssertArgNotNull (g, "g");
-        ArgChecker.AssertArgNotNull (cell, "cell");
+        Sure.NotNull (graphics);
+        Sure.NotNull (cell);
 
         if (cell.VerticalAlign == CssConstants.Top || cell.VerticalAlign == CssConstants.Baseline)
             return;

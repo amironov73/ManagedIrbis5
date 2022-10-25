@@ -185,9 +185,12 @@ public sealed class HtmlContainerInt
     /// <summary>
     /// Init.
     /// </summary>
-    public HtmlContainerInt (RAdapter adapter)
+    public HtmlContainerInt
+        (
+            RAdapter adapter
+        )
     {
-        ArgChecker.AssertArgNotNull (adapter, "global");
+        Sure.NotNull (adapter);
 
         _adapter = adapter;
         _cssParser = new CssParser (adapter);

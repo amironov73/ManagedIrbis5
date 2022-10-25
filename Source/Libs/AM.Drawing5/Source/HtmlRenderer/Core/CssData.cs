@@ -133,15 +133,15 @@ public sealed class CssData
             _mediaBlocks.Add (media, mid);
         }
 
-        if (!mid.ContainsKey (cssBlock.Class))
+        if (!mid.ContainsKey (cssBlock.ClassName))
         {
             var list = new List<CssBlock> { cssBlock };
-            mid[cssBlock.Class] = list;
+            mid[cssBlock.ClassName] = list;
         }
         else
         {
             var merged = false;
-            var list = mid[cssBlock.Class];
+            var list = mid[cssBlock.ClassName];
             foreach (var block in list)
             {
                 if (block.EqualsSelector (cssBlock))

@@ -9,12 +9,6 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-#region Using directives
-
-using AM.Drawing.HtmlRenderer.Core.Utils;
-
-#endregion
-
 #nullable enable
 
 namespace AM.Drawing.HtmlRenderer.Core.Entities;
@@ -22,57 +16,40 @@ namespace AM.Drawing.HtmlRenderer.Core.Entities;
 /// <summary>
 /// Holds single class selector in css block hierarchical selection (p class1 > div.class2)
 /// </summary>
-public struct CssBlockSelectorItem
+public readonly struct CssBlockSelectorItem
 {
-    #region Fields and Consts
-
-    /// <summary>
-    /// the name of the css class of the block
-    /// </summary>
-    private readonly string _class;
-
-    /// <summary>
-    /// is the selector item has to be direct parent
-    /// </summary>
-    private readonly bool _directParent;
-
-    #endregion
-
-
     /// <summary>
     /// Creates a new block from the block's source
     /// </summary>
-    /// <param name="class">the name of the css class of the block</param>
+    /// <param name="className">the name of the css class of the block</param>
     /// <param name="directParent"> </param>
-    public CssBlockSelectorItem(string @class, bool directParent)
+    public CssBlockSelectorItem
+        (
+            string className,
+            bool directParent
+        )
     {
-        ArgChecker.AssertArgNotNullOrEmpty(@class, "@class");
+        Sure.NotNullNorEmpty (className);
 
-        _class = @class;
-        _directParent = directParent;
+        ClassName = className;
+        DirectParent = directParent;
     }
 
     /// <summary>
     /// the name of the css class of the block
     /// </summary>
-    public string Class
-    {
-        get { return _class; }
-    }
+    public string ClassName { get; }
 
     /// <summary>
     /// is the selector item has to be direct parent
     /// </summary>
-    public bool DirectParent
-    {
-        get { return _directParent; }
-    }
+    public bool DirectParent { get; }
 
     /// <summary>
     /// Returns a <see cref="T:System.String"/> that represents the current <see cref="T:System.Object"/>.
     /// </summary>
     public override string ToString()
     {
-        return _class + (_directParent ? " > " : string.Empty);
+        return ClassName + (DirectParent ? " > " : string.Empty);
     }
 }

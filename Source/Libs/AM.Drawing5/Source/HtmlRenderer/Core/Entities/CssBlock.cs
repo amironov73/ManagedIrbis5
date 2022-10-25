@@ -36,7 +36,7 @@ public sealed class CssBlock
     /// <summary>
     /// the name of the css class of the block
     /// </summary>
-    private readonly string? _class;
+    private readonly string? _className;
 
     /// <summary>
     /// the CSS block properties and values
@@ -54,22 +54,22 @@ public sealed class CssBlock
     /// <summary>
     /// Creates a new block from the block's source
     /// </summary>
-    /// <param name="class">the name of the css class of the block</param>
+    /// <param name="className">the name of the css class of the block</param>
     /// <param name="properties">the CSS block properties and values</param>
     /// <param name="selectors">optional: additional selectors to used in hierarchy</param>
     /// <param name="hover">optional: is the css block has :hover pseudo-class</param>
     public CssBlock
         (
-            string @class,
+            string className,
             Dictionary<string, string> properties,
             List<CssBlockSelectorItem>? selectors = null,
             bool hover = false
         )
     {
-        ArgChecker.AssertArgNotNullOrEmpty (@class, "@class");
-        ArgChecker.AssertArgNotNull (properties, "properties");
+        Sure.NotNullNorEmpty (className);
+        Sure.NotNull (properties);
 
-        _class = @class;
+        _className = className;
         _selectors = selectors;
         _properties = properties;
         Hover = hover;
@@ -78,7 +78,7 @@ public sealed class CssBlock
     /// <summary>
     /// the name of the css class of the block
     /// </summary>
-    public string? Class => _class;
+    public string? ClassName => _className;
 
     /// <summary>
     /// additional selectors to used in hierarchy (p className1 > className2)
@@ -121,7 +121,7 @@ public sealed class CssBlock
     /// <returns>new CssBlock with same data</returns>
     public CssBlock Clone()
     {
-        var className = _class.ThrowIfNullOrEmpty();
+        var className = _className.ThrowIfNullOrEmpty();
         return new CssBlock (className, new Dictionary<string, string> (_properties),
             _selectors != null ? new List<CssBlockSelectorItem> (_selectors) : null);
     }
@@ -143,7 +143,7 @@ public sealed class CssBlock
             return true;
         }
 
-        if (!Equals (other._class, _class))
+        if (!Equals (other._className, _className))
         {
             return false;
         }
@@ -215,7 +215,7 @@ public sealed class CssBlock
 
             for (int i = 0; i < _selectors.Count; i++)
             {
-                if (!Equals (other._selectors[i].Class, _selectors[i].Class))
+                if (!Equals (other._selectors[i].ClassName, _selectors[i].ClassName))
                 {
                     return false;
                 }
@@ -263,7 +263,7 @@ public sealed class CssBlock
     {
         unchecked
         {
-            return ((_class != null ? _class.GetHashCode() : 0) * 397) ^
+            return ((_className != null ? _className.GetHashCode() : 0) * 397) ^
                    (_properties != null ? _properties.GetHashCode() : 0);
         }
     }
@@ -273,7 +273,7 @@ public sealed class CssBlock
     /// </summary>
     public override string ToString()
     {
-        var str = _class + " { ";
+        var str = _className + " { ";
         foreach (var property in _properties)
         {
             str += string.Format ("{0}={1}; ", property.Key, property.Value);

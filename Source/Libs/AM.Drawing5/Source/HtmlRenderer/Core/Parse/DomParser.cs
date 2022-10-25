@@ -280,7 +280,7 @@ internal sealed class DomParser
         {
             assignable = IsBlockAssignableToBoxWithSelector(box, block);
         }
-        else if (box.HtmlTag.Name.Equals("a", StringComparison.OrdinalIgnoreCase) && block.Class.Equals("a", StringComparison.OrdinalIgnoreCase) && !box.HtmlTag.HasAttribute("href"))
+        else if (box.HtmlTag.Name.Equals("a", StringComparison.OrdinalIgnoreCase) && block.ClassName.Equals("a", StringComparison.OrdinalIgnoreCase) && !box.HtmlTag.HasAttribute("href"))
         {
             assignable = false;
         }
@@ -314,20 +314,20 @@ internal sealed class DomParser
                 if (box == null)
                     return false;
 
-                if (box.HtmlTag.Name.Equals(selector.Class, StringComparison.InvariantCultureIgnoreCase))
+                if (box.HtmlTag.Name.Equals(selector.ClassName, StringComparison.InvariantCultureIgnoreCase))
                     matched = true;
 
                 if (!matched && box.HtmlTag.HasAttribute("class"))
                 {
                     var className = box.HtmlTag.TryGetAttribute("class");
-                    if (selector.Class.Equals("." + className, StringComparison.InvariantCultureIgnoreCase) || selector.Class.Equals(box.HtmlTag.Name + "." + className, StringComparison.InvariantCultureIgnoreCase))
+                    if (selector.ClassName.Equals("." + className, StringComparison.InvariantCultureIgnoreCase) || selector.ClassName.Equals(box.HtmlTag.Name + "." + className, StringComparison.InvariantCultureIgnoreCase))
                         matched = true;
                 }
 
                 if (!matched && box.HtmlTag.HasAttribute("id"))
                 {
                     var id = box.HtmlTag.TryGetAttribute("id");
-                    if (selector.Class.Equals("#" + id, StringComparison.InvariantCultureIgnoreCase))
+                    if (selector.ClassName.Equals("#" + id, StringComparison.InvariantCultureIgnoreCase))
                         matched = true;
                 }
 
