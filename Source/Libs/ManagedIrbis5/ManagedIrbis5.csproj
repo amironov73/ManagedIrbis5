@@ -24,7 +24,7 @@
 
   <ItemGroup>
     <PackageReference Include="Ionic.Zip" Version="1.9.1.8" />
-    <PackageReference Include="MailKit" Version="3.3.0" />
+    <PackageReference Include="MailKit" Version="3.4.2" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.0.1" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="7.0.0-rc.2.22472.3" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0-rc.2.22472.3" />
