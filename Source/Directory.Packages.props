@@ -1,0 +1,35 @@
+<Project>
+
+    <PropertyGroup>
+        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    </PropertyGroup>
+
+    <!-- Централизованное управление пакетами -->
+    <ItemGroup>
+        <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.0.1"/>
+        <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="7.0.0-rc.2.22472.3"/>
+        <PackageVersion Include="Microsoft.Extensions.Configuration" Version="7.0.0-rc.2.22472.3"/>
+        <PackageVersion Include="Microsoft.Extensions.Configuration.UserSecrets" Version="7.0.0-rc.2.22472.3"/>
+        <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0-rc.2.22472.3"/>
+        <PackageVersion Include="Microsoft.Extensions.Hosting" Version="7.0.0-rc.2.22472.3"/>
+        <PackageVersion Include="Microsoft.Extensions.Localization" Version="7.0.0-rc.2.22476.2"/>
+        <PackageVersion Include="Microsoft.Extensions.Logging" Version="7.0.0-rc.2.22472.3"/>
+        <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="7.0.0-rc.2.22472.3"/>
+        <PackageVersion Include="Microsoft.Extensions.ObjectPool" Version="7.0.0-rc.2.22476.2"/>
+        <PackageVersion Include="Microsoft.Extensions.Options" Version="7.0.0-rc.2.22472.3"/>
+        <PackageVersion Include="Microsoft.IO.RecyclableMemoryStream" Version="2.2.0"/>
+        <PackageVersion Include="Newtonsoft.Json" Version="13.0.1"/>
+        <PackageVersion Include="NLog" Version="5.0.0"/>
+        <PackageVersion Include="NLog.Extensions.Logging" Version="5.0.0"/>
+        <PackageVersion Include="NLog.Schema" Version="5.0.0"/>
+        <PackageVersion Include="ReactiveUI" Version="18.0.10"/>
+        <PackageVersion Include="ReactiveUI.Fody" Version="18.0.10"/>
+        <PackageVersion Include="Rookout" Version="0.1.124"/>
+        <PackageVersion Include="System.CommandLine" Version="2.0.0-beta3.22114.1"/>
+        <PackageVersion Include="System.Configuration.ConfigurationManager" Version="7.0.0-rc.2.22472.3"/>
+        <PackageVersion Include="System.Memory" Version="4.5.5" />
+        <PackageVersion Include="System.Security.Cryptography.ProtectedData" Version="7.0.0-rc.2.22472.3"/>
+        <PackageVersion Include="System.Text.Encoding.CodePages" Version="6.0.0" />
+    </ItemGroup>
+
+</Project>

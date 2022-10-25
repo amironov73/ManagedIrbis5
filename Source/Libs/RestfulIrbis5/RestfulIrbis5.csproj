@@ -1,36 +1,41 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <IsPackable>true</IsPackable>
-  </PropertyGroup>
+    <PropertyGroup>
+        <IsPackable>true</IsPackable>
+    </PropertyGroup>
 
-  <PropertyGroup>
-    <RootNamespace>RestfulIrbis</RootNamespace>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
+    <PropertyGroup>
+        <RootNamespace>RestfulIrbis</RootNamespace>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
 
-  <PropertyGroup>
-    <Title>REST server and client for popular russian library automation system IRBIS64</Title>
-    <Description>REST server and client for popular russian library automation system IRBIS64</Description>
-  </PropertyGroup>
+    <PropertyGroup>
+        <Title>REST server and client for popular russian library automation system IRBIS64</Title>
+        <Description>REST server and client for popular russian library automation system IRBIS64</Description>
+    </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\RestfulIrbis5.xml</DocumentationFile>
-  </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <DocumentationFile>bin\Debug\RestfulIrbis5.xml</DocumentationFile>
+    </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\RestfulIrbis5.xml</DocumentationFile>
-  </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+        <DocumentationFile>bin\Release\RestfulIrbis5.xml</DocumentationFile>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.46" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="RestSharp" Version="106.15.0" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="HtmlAgilityPack" Version="1.11.46"/>
+        <PackageReference Include="RestSharp" Version="106.15.0"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
-    <ProjectReference Include="..\ManagedIrbis5\ManagedIrbis5.csproj" />
-  </ItemGroup>
+    <!-- Централизованное управление пакетами -->
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.Logging"/>
+        <PackageReference Include="Newtonsoft.Json"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\AM.Core5\AM.Core5.csproj"/>
+        <ProjectReference Include="..\ManagedIrbis5\ManagedIrbis5.csproj"/>
+    </ItemGroup>
 
 </Project>

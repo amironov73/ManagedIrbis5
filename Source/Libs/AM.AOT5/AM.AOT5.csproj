@@ -26,8 +26,9 @@
         <ProjectReference Include="..\AM.Core5\AM.Core5.csproj"/>
     </ItemGroup>
 
+    <!-- Централизованное управление пакетами -->
     <ItemGroup>
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.1"/>
+        <PackageReference Include="Newtonsoft.Json"/>
     </ItemGroup>
 
 </Project>
