@@ -1,45 +1,46 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <IsPackable>true</IsPackable>
-  </PropertyGroup>
+    <PropertyGroup>
+        <IsPackable>true</IsPackable>
+    </PropertyGroup>
 
-  <PropertyGroup>
-    <TargetFramework>net7.0-windows</TargetFramework>
-    <RootNamespace>AM.Drawing</RootNamespace>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net7.0-windows</TargetFramework>
+        <RootNamespace>AM.Drawing</RootNamespace>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
 
-  <PropertyGroup>
-    <Title>Ars Magna GDI+ drawing services</Title>
-    <Description>Ars Magna GDI+ drawing services</Description>
-  </PropertyGroup>
+    <PropertyGroup>
+        <Title>Ars Magna GDI+ drawing services</Title>
+        <Description>Ars Magna GDI+ drawing services</Description>
+    </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\AM.Drawing5.xml</DocumentationFile>
-    <DefineConstants>CONTRACTS_FULL;COREAPP;TRACE;TRACE;CORE;NETFX_CORE</DefineConstants>
-  </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <DocumentationFile>bin\Debug\AM.Drawing5.xml</DocumentationFile>
+        <DefineConstants>CONTRACTS_FULL;COREAPP;TRACE;TRACE;CORE;NETFX_CORE</DefineConstants>
+    </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\AM.Drawing5.xml</DocumentationFile>
-    <DefineConstants>COREAPP;CONTRACTS_FULL;TRACE;CORE;NETFX_CORE</DefineConstants>
-  </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+        <DocumentationFile>bin\Release\AM.Drawing5.xml</DocumentationFile>
+        <DefineConstants>COREAPP;CONTRACTS_FULL;TRACE;CORE;NETFX_CORE</DefineConstants>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\AM.Core5\AM.Core5.csproj"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Windows.Compatibility" Version="7.0.0-rc.2.22472.3" />
-    <PackageReference Include="System.Drawing.Common" Version="7.0.0-rc.2.22472.3" />
-    <PackageReference Include="System.Resources.Extensions" Version="7.0.0-rc.2.22472.3" />
-    <PackageReference Include="SharpZipLib" Version="1.3.3" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="2.1.3" />
-    <PackageReference Include="SixLabors.Fonts" Version="1.0.0-beta18" />
-  </ItemGroup>
+    <!-- Централизованное управление пакетами -->
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Windows.Compatibility"/>
+        <PackageReference Include="System.Drawing.Common"/>
+        <PackageReference Include="System.Resources.Extensions"/>
+        <PackageReference Include="SharpZipLib"/>
+        <PackageReference Include="SixLabors.ImageSharp"/>
+        <PackageReference Include="SixLabors.Fonts"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Source\Pdfing\Pdf\AcroForms\enums" />
-  </ItemGroup>
+    <ItemGroup>
+        <Folder Include="Source\Pdfing\Pdf\AcroForms\enums"/>
+    </ItemGroup>
 
 </Project>

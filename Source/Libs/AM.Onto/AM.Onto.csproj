@@ -1,29 +1,29 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <IsPackable>true</IsPackable>
-  </PropertyGroup>
+    <PropertyGroup>
+        <IsPackable>true</IsPackable>
+    </PropertyGroup>
 
-  <PropertyGroup>
-    <RootNamespace>AM.Onto</RootNamespace>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
+    <PropertyGroup>
+        <RootNamespace>AM.Onto</RootNamespace>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
 
-  <PropertyGroup>
-    <Description>Ontologt services for Ars Magna project</Description>
-    <Title>Ontology services for Ars Magna project</Title>
-  </PropertyGroup>
+    <PropertyGroup>
+        <Description>Ontologt services for Ars Magna project</Description>
+        <Title>Ontology services for Ars Magna project</Title>
+    </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\AM.Onto.xml</DocumentationFile>
-  </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <DocumentationFile>bin\Debug\AM.Onto.xml</DocumentationFile>
+    </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\AM.Onto.xml</DocumentationFile>
-  </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+        <DocumentationFile>bin\Release\AM.Onto.xml</DocumentationFile>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\AM.Core5\AM.Core5.csproj"/>
+    </ItemGroup>
 
 </Project>

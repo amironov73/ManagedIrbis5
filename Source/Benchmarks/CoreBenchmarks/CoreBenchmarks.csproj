@@ -4,8 +4,9 @@
         <OutputType>Exe</OutputType>
     </PropertyGroup>
 
+    <!-- Централизованное управление пакетами -->
     <ItemGroup>
-      <PackageReference Include="BenchmarkDotNet" Version="0.13.2" />
+        <PackageReference Include="BenchmarkDotNet"/>
     </ItemGroup>
 
 </Project>

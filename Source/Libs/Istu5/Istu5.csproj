@@ -1,40 +1,41 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <IsPackable>true</IsPackable>
-  </PropertyGroup>
+    <PropertyGroup>
+        <IsPackable>true</IsPackable>
+    </PropertyGroup>
 
-  <PropertyGroup>
-    <RootNamespace>Istu</RootNamespace>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
+    <PropertyGroup>
+        <RootNamespace>Istu</RootNamespace>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
 
-  <PropertyGroup>
-    <Title>INRTU-specific services</Title>
-    <Description>INTRTU-specific services</Description>
-  </PropertyGroup>
+    <PropertyGroup>
+        <Title>INRTU-specific services</Title>
+        <Description>INTRTU-specific services</Description>
+    </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\Istu5.xml</DocumentationFile>
-  </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <DocumentationFile>bin\Debug\Istu5.xml</DocumentationFile>
+    </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\Istu5.xml</DocumentationFile>
-  </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+        <DocumentationFile>bin\Release\Istu5.xml</DocumentationFile>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="linq2db" Version="3.7.0" />
-  </ItemGroup>
+    <!-- Централизованное управление пакетами -->
+    <ItemGroup>
+        <PackageReference Include="linq2db"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
-    <ProjectReference Include="..\ManagedIrbis5\ManagedIrbis5.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\AM.Core5\AM.Core5.csproj"/>
+        <ProjectReference Include="..\ManagedIrbis5\ManagedIrbis5.csproj"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <None Update="Scripts\kladovka.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+    <ItemGroup>
+        <None Update="Scripts\kladovka.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
 
 </Project>

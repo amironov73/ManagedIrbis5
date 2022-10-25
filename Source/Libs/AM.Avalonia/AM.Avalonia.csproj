@@ -26,28 +26,25 @@
         <ProjectReference Include="..\AM.Core5\AM.Core5.csproj"/>
     </ItemGroup>
 
-    <ItemGroup>
-        <PackageReference Include="Avalonia" Version="0.10.15"/>
-        <PackageReference Include="Avalonia.Controls.DataGrid" Version="0.10.15"/>
-        <PackageReference Include="Avalonia.Desktop" Version="0.10.15"/>
-        <PackageReference Include="Avalonia.Diagnostics" Version="0.10.15"/>
-        <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.13"/>
-        <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.13.3"/>
-        <PackageReference Include="Avalonia.Xaml.Interactions" Version="0.10.13.3"/>
-        <PackageReference Include="Avalonia.Xaml.Interactivity" Version="0.10.13.3"/>
-        <PackageReference Include="ReactiveUI" Version="18.0.10"/>
-        <PackageReference Include="DynamicData" Version="7.6.7"/>
-        <PackageReference Include="DynamicData.ReactiveUI" Version="6.11.0.2613"/>
-        <PackageReference Include="GridExtra.Avalonia" Version="0.9.1"/>
-        <PackageReference Include="ReactiveHistory" Version="0.10.7"/>
-        <PackageReference Include="SkiaSharp" Version="2.88.1-preview.1"/>
-        <PackageReference Include="XamlColorSchemeGenerator" Version="3.0.0.31"/>
-    </ItemGroup>
-
     <!-- Централизованное управление пакетами -->
     <ItemGroup>
+        <PackageReference Include="Avalonia"/>
+        <PackageReference Include="Avalonia.Controls.DataGrid"/>
+        <PackageReference Include="Avalonia.Desktop"/>
+        <PackageReference Include="Avalonia.Diagnostics"/>
+        <PackageReference Include="Avalonia.ReactiveUI"/>
+        <PackageReference Include="Avalonia.Xaml.Behaviors"/>
+        <PackageReference Include="Avalonia.Xaml.Interactions"/>
+        <PackageReference Include="Avalonia.Xaml.Interactivity"/>
+        <PackageReference Include="DynamicData"/>
+        <PackageReference Include="DynamicData.ReactiveUI"/>
+        <PackageReference Include="GridExtra.Avalonia"/>
         <PackageReference Include="Microsoft.Extensions.Logging"/>
         <PackageReference Include="Newtonsoft.Json"/>
+        <PackageReference Include="ReactiveHistory"/>
+        <PackageReference Include="ReactiveUI"/>
+        <PackageReference Include="SkiaSharp"/>
+        <PackageReference Include="XamlColorSchemeGenerator"/>
     </ItemGroup>
 
     <ItemGroup>

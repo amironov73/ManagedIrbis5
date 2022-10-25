@@ -1,42 +1,43 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <IsPackable>true</IsPackable>
-  </PropertyGroup>
+    <PropertyGroup>
+        <IsPackable>true</IsPackable>
+    </PropertyGroup>
 
-  <PropertyGroup>
-    <RootNamespace>ManagedIrbis.Grpc</RootNamespace>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
+    <PropertyGroup>
+        <RootNamespace>ManagedIrbis.Grpc</RootNamespace>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
 
-  <PropertyGroup>
-    <Description>GRPC services for ArsMagna project</Description>
-    <Title>GRPC services for ArsMagna project</Title>
-  </PropertyGroup>
+    <PropertyGroup>
+        <Description>GRPC services for ArsMagna project</Description>
+        <Title>GRPC services for ArsMagna project</Title>
+    </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\ManagedIrbis.Grpc.xml</DocumentationFile>
-  </PropertyGroup>
+        <DocumentationFile>bin\Debug\ManagedIrbis.Grpc.xml</DocumentationFile>
+    </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\ManagedIrbis.Grpc.xml</DocumentationFile>
-  </PropertyGroup>
+        <DocumentationFile>bin\Release\ManagedIrbis.Grpc.xml</DocumentationFile>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Google.Protobuf" Version="3.20.1" />
-    <PackageReference Include="Grpc.Tools" Version="2.45.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
+    <!-- Централизованное управление пакетами -->
+    <ItemGroup>
+        <PackageReference Include="Google.Protobuf"/>
+        <PackageReference Include="Grpc.Tools">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
-    <ProjectReference Include="..\ManagedIrbis5\ManagedIrbis5.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\AM.Core5\AM.Core5.csproj"/>
+        <ProjectReference Include="..\ManagedIrbis5\ManagedIrbis5.csproj"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <Protobuf Include="Protos\Record.proto" />
-  </ItemGroup>
+    <ItemGroup>
+        <Protobuf Include="Protos\Record.proto"/>
+    </ItemGroup>
 
 </Project>

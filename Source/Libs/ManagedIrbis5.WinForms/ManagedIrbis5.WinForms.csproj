@@ -1,59 +1,60 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <IsPackable>true</IsPackable>
-  </PropertyGroup>
+    <PropertyGroup>
+        <IsPackable>true</IsPackable>
+    </PropertyGroup>
 
-  <PropertyGroup>
-    <TargetFramework>net7.0-windows</TargetFramework>
-    <UseWindowsForms>true</UseWindowsForms>
-    <RootNamespace>ManagedIrbis.WinForms</RootNamespace>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net7.0-windows</TargetFramework>
+        <UseWindowsForms>true</UseWindowsForms>
+        <RootNamespace>ManagedIrbis.WinForms</RootNamespace>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
 
-  <PropertyGroup>
-    <Description>WinForms-based controls and dialogs for Ars Magna project</Description>
-    <Title>WinForms-based controls and dialogs for Ars Magna project</Title>
-  </PropertyGroup>
+    <PropertyGroup>
+        <Description>WinForms-based controls and dialogs for Ars Magna project</Description>
+        <Title>WinForms-based controls and dialogs for Ars Magna project</Title>
+    </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\ManagedIrbis.WinForms.xml</DocumentationFile>
-  </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <DocumentationFile>bin\Debug\ManagedIrbis.WinForms.xml</DocumentationFile>
+    </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\ManagedIrbis.WinForms.xml</DocumentationFile>
-  </PropertyGroup>
+        <DocumentationFile>bin\Release\ManagedIrbis.WinForms.xml</DocumentationFile>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
-    <ProjectReference Include="..\AM.Drawing5\AM.Drawing5.csproj" />
-    <ProjectReference Include="..\AM.Win32\AM.Win32.csproj" />
-    <ProjectReference Include="..\AM.Windows.Forms5\AM.Windows.Forms5.csproj" />
-    <ProjectReference Include="..\ManagedIrbis5\ManagedIrbis5.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\AM.Core5\AM.Core5.csproj"/>
+        <ProjectReference Include="..\AM.Drawing5\AM.Drawing5.csproj"/>
+        <ProjectReference Include="..\AM.Win32\AM.Win32.csproj"/>
+        <ProjectReference Include="..\AM.Windows.Forms5\AM.Windows.Forms5.csproj"/>
+        <ProjectReference Include="..\ManagedIrbis5\ManagedIrbis5.csproj"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="Properties\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
+    <ItemGroup>
+        <Compile Update="Properties\Resources.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Resources.resx</DependentUpon>
+        </Compile>
+    </ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
+    <ItemGroup>
+        <EmbeddedResource Update="Properties\Resources.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+    </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Source\AppServices" />
-  </ItemGroup>
+    <ItemGroup>
+        <Folder Include="Source\AppServices"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="ReactiveUI" Version="18.0.10" />
-    <PackageReference Include="ReactiveUI.Fody" Version="18.0.10" />
-  </ItemGroup>
+    <!-- Централизованное управление пакетами -->
+    <ItemGroup>
+        <PackageReference Include="ReactiveUI"/>
+        <PackageReference Include="ReactiveUI.Fody"/>
+    </ItemGroup>
 
 </Project>

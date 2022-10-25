@@ -5,11 +5,11 @@
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-      <DocumentationFile>bin\Debug\ChunkedExperiment.xml</DocumentationFile>
+        <DocumentationFile>bin\Debug\ChunkedExperiment.xml</DocumentationFile>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-      <DocumentationFile>bin\Release\ChunkedExperiment.xml</DocumentationFile>
+        <DocumentationFile>bin\Release\ChunkedExperiment.xml</DocumentationFile>
     </PropertyGroup>
 
 </Project>

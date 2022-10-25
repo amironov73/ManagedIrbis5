@@ -138,6 +138,7 @@ public class AvaloniaApplication
     {
         return 0;
     }
+
     /// <summary>
     /// Первоначальная инициализация.
     /// </summary>

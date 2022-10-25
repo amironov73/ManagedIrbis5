@@ -25,9 +25,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Pidgin" Version="3.1.0" />
-        <PackageReference Include="ReactiveUI" Version="18.0.10" />
-        <PackageReference Include="ReactiveUI.Fody" Version="18.0.10" />
+        <PackageReference Include="Pidgin"/>
+        <PackageReference Include="ReactiveUI"/>
+        <PackageReference Include="ReactiveUI.Fody"/>
     </ItemGroup>
 
     <ItemGroup>

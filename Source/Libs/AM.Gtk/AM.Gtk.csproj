@@ -1,34 +1,35 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <IsPackable>true</IsPackable>
-  </PropertyGroup>
+    <PropertyGroup>
+        <IsPackable>true</IsPackable>
+    </PropertyGroup>
 
-  <PropertyGroup>
-    <RootNamespace>AM.Gtk</RootNamespace>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
+    <PropertyGroup>
+        <RootNamespace>AM.Gtk</RootNamespace>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
 
-  <PropertyGroup>
-    <Description>GTK-based controls and dialogs for Ars Magna project</Description>
-    <Title>GTK-based controls and dialogs for Ars Magna project</Title>
-  </PropertyGroup>
+    <PropertyGroup>
+        <Description>GTK-based controls and dialogs for Ars Magna project</Description>
+        <Title>GTK-based controls and dialogs for Ars Magna project</Title>
+    </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\AM.Gtk.xml</DocumentationFile>
-  </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <DocumentationFile>bin\Debug\AM.Gtk.xml</DocumentationFile>
+    </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\AM.Gtk.xml</DocumentationFile>
-  </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+        <DocumentationFile>bin\Release\AM.Gtk.xml</DocumentationFile>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
-    <ProjectReference Include="..\AM.Skia\AM.Skia.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\AM.Core5\AM.Core5.csproj"/>
+        <ProjectReference Include="..\AM.Skia\AM.Skia.csproj"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="GtkSharp" Version="3.24.24.38" />
-  </ItemGroup>
+    <!-- Централизованное управление пакетами -->
+    <ItemGroup>
+        <PackageReference Include="GtkSharp"/>
+    </ItemGroup>
 
 </Project>

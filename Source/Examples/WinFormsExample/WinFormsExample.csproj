@@ -1,31 +1,31 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net7.0-windows</TargetFramework>
-    <UseWindowsForms>true</UseWindowsForms>
-    <ApplicationIcon>WinFormsExample.ico</ApplicationIcon>
-  </PropertyGroup>
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net7.0-windows</TargetFramework>
+        <UseWindowsForms>true</UseWindowsForms>
+        <ApplicationIcon>WinFormsExample.ico</ApplicationIcon>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\Libs\AM.Drawing5\AM.Drawing5.csproj" />
-    <ProjectReference Include="..\..\Libs\AM.Windows.Forms5\AM.Windows.Forms5.csproj" />
-    <ProjectReference Include="..\..\Libs\ManagedIrbis5.WinForms\ManagedIrbis5.WinForms.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\Libs\AM.Drawing5\AM.Drawing5.csproj"/>
+        <ProjectReference Include="..\..\Libs\AM.Windows.Forms5\AM.Windows.Forms5.csproj"/>
+        <ProjectReference Include="..\..\Libs\ManagedIrbis5.WinForms\ManagedIrbis5.WinForms.csproj"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="Properties\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
+    <ItemGroup>
+        <Compile Update="Properties\Resources.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Resources.resx</DependentUpon>
+        </Compile>
+    </ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
+    <ItemGroup>
+        <EmbeddedResource Update="Properties\Resources.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+    </ItemGroup>
 
 </Project>

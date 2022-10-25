@@ -1,36 +1,36 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <IsPackable>true</IsPackable>
-  </PropertyGroup>
+    <PropertyGroup>
+        <IsPackable>true</IsPackable>
+    </PropertyGroup>
 
-  <PropertyGroup>
-    <TargetFramework>net7.0-windows</TargetFramework>
-    <UseWindowsForms>true</UseWindowsForms>
-    <RootNamespace>ManagedIrbis.WinForms</RootNamespace>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net7.0-windows</TargetFramework>
+        <UseWindowsForms>true</UseWindowsForms>
+        <RootNamespace>ManagedIrbis.WinForms</RootNamespace>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
 
-  <PropertyGroup>
-    <Description>WinForms-based controls and dialogs for ISTU-related stuff</Description>
-    <Title>WinForms-based controls and dialogs for ISTU-related stuff</Title>
-  </PropertyGroup>
+    <PropertyGroup>
+        <Description>WinForms-based controls and dialogs for ISTU-related stuff</Description>
+        <Title>WinForms-based controls and dialogs for ISTU-related stuff</Title>
+    </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\ManagedIrbis.WinForms.xml</DocumentationFile>
-  </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <DocumentationFile>bin\Debug\ManagedIrbis.WinForms.xml</DocumentationFile>
+    </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\ManagedIrbis.WinForms.xml</DocumentationFile>
-  </PropertyGroup>
+        <DocumentationFile>bin\Release\ManagedIrbis.WinForms.xml</DocumentationFile>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
-    <ProjectReference Include="..\AM.Drawing5\AM.Drawing5.csproj" />
-    <ProjectReference Include="..\AM.Win32\AM.Win32.csproj" />
-    <ProjectReference Include="..\AM.Windows.Forms5\AM.Windows.Forms5.csproj" />
-    <ProjectReference Include="..\ManagedIrbis5\ManagedIrbis5.csproj" />
-    <ProjectReference Include="..\Istu5\Istu5.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\AM.Core5\AM.Core5.csproj"/>
+        <ProjectReference Include="..\AM.Drawing5\AM.Drawing5.csproj"/>
+        <ProjectReference Include="..\AM.Win32\AM.Win32.csproj"/>
+        <ProjectReference Include="..\AM.Windows.Forms5\AM.Windows.Forms5.csproj"/>
+        <ProjectReference Include="..\ManagedIrbis5\ManagedIrbis5.csproj"/>
+        <ProjectReference Include="..\Istu5\Istu5.csproj"/>
+    </ItemGroup>
 
 </Project>

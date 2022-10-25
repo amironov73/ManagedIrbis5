@@ -1,80 +1,81 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <IsPackable>true</IsPackable>
-  </PropertyGroup>
+    <PropertyGroup>
+        <IsPackable>true</IsPackable>
+    </PropertyGroup>
 
-  <PropertyGroup>
-    <TargetFramework>net7.0-windows</TargetFramework>
-    <UseWindowsForms>true</UseWindowsForms>
-    <RootNamespace>AM.Windows.Forms</RootNamespace>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net7.0-windows</TargetFramework>
+        <UseWindowsForms>true</UseWindowsForms>
+        <RootNamespace>AM.Windows.Forms</RootNamespace>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
 
-  <PropertyGroup>
-    <Title>WinForms general controls and dialogs for Ars Magna project</Title>
-    <Description>WinForms general controls and dialogs for Ars Magna project</Description>
-  </PropertyGroup>
+    <PropertyGroup>
+        <Title>WinForms general controls and dialogs for Ars Magna project</Title>
+        <Description>WinForms general controls and dialogs for Ars Magna project</Description>
+    </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\AM.Windows.Forms5.xml</DocumentationFile>
-  </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <DocumentationFile>bin\Debug\AM.Windows.Forms5.xml</DocumentationFile>
+    </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\AM.Windows.Forms5.xml</DocumentationFile>
-  </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+        <DocumentationFile>bin\Release\AM.Windows.Forms5.xml</DocumentationFile>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
-    <ProjectReference Include="..\AM.Drawing5\AM.Drawing5.csproj" />
-    <ProjectReference Include="..\AM.Win32\AM.Win32.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\AM.Core5\AM.Core5.csproj"/>
+        <ProjectReference Include="..\AM.Drawing5\AM.Drawing5.csproj"/>
+        <ProjectReference Include="..\AM.Win32\AM.Win32.csproj"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Localization" Version="7.0.0-rc.2.22476.2" />
-    <PackageReference Include="Microsoft.Windows.Compatibility" Version="7.0.0-rc.2.22472.3" />
-    <PackageReference Include="ReactiveUI" Version="18.0.10" />
-    <PackageReference Include="ReactiveUI.Fody" Version="18.0.10" />
-  </ItemGroup>
+    <!-- Централизованное управление пакетами -->
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.Localization"/>
+        <PackageReference Include="Microsoft.Windows.Compatibility"/>
+        <PackageReference Include="ReactiveUI"/>
+        <PackageReference Include="ReactiveUI.Fody"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <None Remove="Properties\XPThemes.manifest" />
-    <EmbeddedResource Include="Properties\XPThemes.manifest" />
-    <EmbeddedResource Update="Source\PictureViewForm.ru.resx">
-      <DependentUpon>PictureViewForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Source\PlainTextEditor.ru.resx">
-      <DependentUpon>PlainTextEditor.cs</DependentUpon>
-    </EmbeddedResource>
-  </ItemGroup>
+    <ItemGroup>
+        <EmbeddedResource Update="Properties\Resources.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <None Remove="Properties\XPThemes.manifest"/>
+        <EmbeddedResource Include="Properties\XPThemes.manifest"/>
+        <EmbeddedResource Update="Source\PictureViewForm.ru.resx">
+            <DependentUpon>PictureViewForm.cs</DependentUpon>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Source\PlainTextEditor.ru.resx">
+            <DependentUpon>PlainTextEditor.cs</DependentUpon>
+        </EmbeddedResource>
+    </ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="Properties\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Update="Source\BusyForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="Source\AppServices\MainForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-  </ItemGroup>
+    <ItemGroup>
+        <Compile Update="Properties\Resources.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Resources.resx</DependentUpon>
+        </Compile>
+        <Compile Update="Source\BusyForm.cs">
+            <SubType>Form</SubType>
+        </Compile>
+        <Compile Update="Source\AppServices\MainForm.cs">
+            <SubType>Form</SubType>
+        </Compile>
+    </ItemGroup>
 
-  <ItemGroup>
-    <None Remove="Images\BLD.BMP" />
-    <Resource Include="Images\BLD.BMP" />
-    <None Remove="Images\CLOSED.BMP" />
-    <Resource Include="Images\CLOSED.BMP" />
-    <None Remove="Images\COPY.BMP" />
-    <Resource Include="Images\COPY.BMP" />
-    <None Remove="Images\NEW.BMP" />
-    <Resource Include="Images\NEW.BMP" />
-  </ItemGroup>
+    <ItemGroup>
+        <None Remove="Images\BLD.BMP"/>
+        <Resource Include="Images\BLD.BMP"/>
+        <None Remove="Images\CLOSED.BMP"/>
+        <Resource Include="Images\CLOSED.BMP"/>
+        <None Remove="Images\COPY.BMP"/>
+        <Resource Include="Images\COPY.BMP"/>
+        <None Remove="Images\NEW.BMP"/>
+        <Resource Include="Images\NEW.BMP"/>
+    </ItemGroup>
 
 </Project>

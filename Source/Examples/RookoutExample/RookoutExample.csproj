@@ -8,8 +8,9 @@
         <DebugType>portable</DebugType>
     </PropertyGroup>
 
+    <!-- Централизованное управление пакетами -->
     <ItemGroup>
-      <PackageReference Include="Rookout" Version="0.1.124" />
+        <PackageReference Include="Rookout"/>
     </ItemGroup>
 
 </Project>

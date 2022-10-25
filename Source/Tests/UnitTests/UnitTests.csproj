@@ -1,29 +1,26 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+    <!-- Централизованное управление пакетами -->
     <ItemGroup>
-        <PackageReference Include="coverlet.msbuild" Version="3.1.2">
+        <PackageReference Include="coverlet.msbuild">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.0-preview-20220726-02"/>
-        <PackageReference Include="Moq" Version="4.18.2"/>
-        <PackageReference Include="MSTest.TestAdapter" Version="2.3.0-preview-20220810-02"/>
-        <PackageReference Include="MSTest.TestFramework" Version="2.3.0-preview-20220810-02"/>
-        <PackageReference Include="coverlet.collector" Version="3.1.2">
+        <PackageReference Include="coverlet.collector">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="System.CommandLine" Version="2.0.0-beta3.22114.1"/>
-        <PackageReference Include="System.Text.Encoding.CodePages" Version="7.0.0-rc.2.22472.3"/>
+        <PackageReference Include="Microsoft.NET.Test.Sdk"/>
+        <PackageReference Include="Moq"/>
+        <PackageReference Include="MSTest.TestAdapter"/>
+        <PackageReference Include="MSTest.TestFramework"/>
+        <PackageReference Include="System.CommandLine"/>
+        <PackageReference Include="System.Text.Encoding.CodePages"/>
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\..\Libs\AM.Linguistics\AM.Linguistics.csproj"/>
         <ProjectReference Include="..\..\Libs\AM.Scripting\AM.Scripting.csproj"/>
-    </ItemGroup>
-
-    <ItemGroup>
-        <Folder Include="Source\AM\Memory\Collections"/>
     </ItemGroup>
 
 </Project>

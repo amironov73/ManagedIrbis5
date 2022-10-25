@@ -4,12 +4,13 @@
         <OutputType>Exe</OutputType>
     </PropertyGroup>
 
+    <!-- Централизованное управление пакетами -->
     <ItemGroup>
-      <PackageReference Include="BenchmarkDotNet" Version="0.13.2" />
+        <PackageReference Include="BenchmarkDotNet"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Libs\AM.Scripting\AM.Scripting.csproj" />
+        <ProjectReference Include="..\..\Libs\AM.Scripting\AM.Scripting.csproj"/>
     </ItemGroup>
 
 </Project>

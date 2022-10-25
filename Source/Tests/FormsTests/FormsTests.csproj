@@ -1,33 +1,33 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-      <OutputType>WinExe</OutputType>
-      <TargetFramework>net7.0-windows</TargetFramework>
-      <LangVersion>11</LangVersion>
-      <UseWindowsForms>true</UseWindowsForms>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net7.0-windows</TargetFramework>
+        <LangVersion>11</LangVersion>
+        <UseWindowsForms>true</UseWindowsForms>
     </PropertyGroup>
 
     <ItemGroup>
-      <Compile Update="Source\MainForm.cs">
-        <SubType>Form</SubType>
-      </Compile>
+        <Compile Update="Source\MainForm.cs">
+            <SubType>Form</SubType>
+        </Compile>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Libs\AM.Drawing5\AM.Drawing5.csproj" />
-      <ProjectReference Include="..\..\Libs\AM.Windows.Forms5\AM.Windows.Forms5.csproj" />
-      <ProjectReference Include="..\..\Libs\ManagedIrbis5.WinForms\ManagedIrbis5.WinForms.csproj" />
+        <ProjectReference Include="..\..\Libs\AM.Drawing5\AM.Drawing5.csproj"/>
+        <ProjectReference Include="..\..\Libs\AM.Windows.Forms5\AM.Windows.Forms5.csproj"/>
+        <ProjectReference Include="..\..\Libs\ManagedIrbis5.WinForms\ManagedIrbis5.WinForms.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <None Remove="tests.json" />
-      <Content Include="tests.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <None Remove="Images\sherlock.jpg" />
-      <Content Include="Images\sherlock.jpg">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
+        <None Remove="tests.json"/>
+        <Content Include="tests.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <None Remove="Images\sherlock.jpg"/>
+        <Content Include="Images\sherlock.jpg">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
     </ItemGroup>
 
 </Project>
