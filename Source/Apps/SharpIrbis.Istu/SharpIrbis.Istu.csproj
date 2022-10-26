@@ -6,21 +6,22 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <None Update="appsettings.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="HelloIstu.is">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
+        <None Update="appsettings.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="HelloIstu.is">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Libs\Istu5\Istu5.csproj" />
+        <ProjectReference Include="..\..\Libs\Istu5\Istu5.csproj"/>
     </ItemGroup>
 
+    <!-- Централизованное управление пакетами -->
     <ItemGroup>
-      <PackageReference Include="linq2db" Version="3.7.0" />
-      <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
+        <PackageReference Include="linq2db"/>
+        <PackageReference Include="System.Data.SqlClient"/>
     </ItemGroup>
 
 </Project>

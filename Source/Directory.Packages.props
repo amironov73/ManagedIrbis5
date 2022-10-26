@@ -34,6 +34,8 @@
         <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.0.1"/>
         <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="7.0.0-rc.2.22472.3"/>
         <PackageVersion Include="Microsoft.Extensions.Configuration" Version="7.0.0-rc.2.22472.3"/>
+        <PackageVersion Include="Microsoft.Extensions.Configuration.CommandLine" Version="7.0.0-rc.2.22472.3"/>
+        <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0-rc.2.22472.3"/>
         <PackageVersion Include="Microsoft.Extensions.Configuration.UserSecrets" Version="7.0.0-rc.2.22472.3"/>
         <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0-rc.2.22472.3"/>
         <PackageVersion Include="Microsoft.Extensions.Hosting" Version="7.0.0-rc.2.22472.3"/>
@@ -73,6 +75,7 @@
         <PackageVersion Include="SkiaSharp" Version="2.88.2"/>
         <PackageVersion Include="SharpCompress" Version="0.31.0"/>
         <PackageVersion Include="SharpZipLib" Version="1.3.3"/>
+        <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.2.3"/>
         <PackageVersion Include="System.CodeDom" Version="7.0.0-rc.2.22472.3"/>
         <PackageVersion Include="System.CommandLine" Version="2.0.0-beta3.22114.1"/>
         <PackageVersion Include="System.Configuration.ConfigurationManager" Version="7.0.0-rc.2.22472.3"/>
@@ -84,6 +87,10 @@
         <PackageVersion Include="System.Text.Encoding.CodePages" Version="7.0.0-rc.2.22472.3" />
         <PackageVersion Include="XamlColorSchemeGenerator" Version="3.0.0.31"/>
         <PackageVersion Include="XamlNameReferenceGenerator" Version="1.3.4"/>
+        <PackageVersion Include="Telegram.Bot" Version="16.0.2" />
+        <PackageVersion Include="Telegram.Bot.Extensions.Polling" Version="0.2.0" />
+        <PackageVersion Include="Topshelf" Version="4.3.0" />
+        <PackageVersion Include="Topshelf.NLog" Version="4.3.0" />
     </ItemGroup>
 
 </Project>

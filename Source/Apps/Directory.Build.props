@@ -3,7 +3,7 @@
 <Project>
 
     <!-- Assembly version and strong name -->
-    <Import Project="..\Common\ArsMagna.targets" />
+    <!-- Import Project="..\Common\ArsMagna.targets" / -->
 
     <PropertyGroup>
         <TargetFramework>net7.0</TargetFramework>
@@ -26,11 +26,12 @@
         <ProjectReference Include="..\..\Libs\ManagedIrbis5\ManagedIrbis5.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
+    <!-- Простановка версии по Git-истории -->
+    <!-- ItemGroup>
        <PackageReference Include="Nerdbank.GitVersioning" Version="3.5.119">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
        </PackageReference>
-    </ItemGroup>
+    </ItemGroup -->
 
 </Project>

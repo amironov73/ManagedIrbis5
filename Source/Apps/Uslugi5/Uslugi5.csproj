@@ -7,20 +7,21 @@
         <UseWindowsForms>true</UseWindowsForms>
     </PropertyGroup>
 
+    <!-- Централизованное управление пакетами -->
     <ItemGroup>
-      <PackageReference Include="linq2db" Version="3.7.0" />
+        <PackageReference Include="linq2db"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Libs\Istu.UI\Istu.UI.csproj" />
-      <ProjectReference Include="..\..\Libs\Istu5\Istu5.csproj" />
+        <ProjectReference Include="..\..\Libs\Istu.UI\Istu.UI.csproj"/>
+        <ProjectReference Include="..\..\Libs\Istu5\Istu5.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <None Remove="uslugi.txt" />
-      <Content Include="uslugi.txt">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
+        <None Remove="uslugi.txt"/>
+        <Content Include="uslugi.txt">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
     </ItemGroup>
 
 </Project>

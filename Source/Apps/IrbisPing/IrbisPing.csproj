@@ -4,8 +4,9 @@
         <OutputType>Exe</OutputType>
     </PropertyGroup>
 
+    <!-- Централизованное управление пакетами -->
     <ItemGroup>
-      <PackageReference Include="System.CommandLine" Version="2.0.0-beta3.22114.1" />
+        <PackageReference Include="System.CommandLine"/>
     </ItemGroup>
 
 </Project>

@@ -77,9 +77,15 @@ public partial class AboutWindow
         AvaloniaXamlLoader.Load (this);
 
         ProductTitle = "Проект ARS MAGNA";
-        ProductVersion = ThisAssembly.AssemblyFileVersion;
-        GitCommit = ThisAssembly.GitCommitId;
-        ProductDate = ThisAssembly.GitCommitDate.ToString (CultureInfo.CurrentUICulture);
+        ProductVersion = "0.0.0.0";
+            // TODO восстановить
+            // ThisAssembly.AssemblyFileVersion;
+        GitCommit = "0.0.0.0";
+            // TODO восстановить
+            // ThisAssembly.GitCommitId;
+        ProductDate ="0.0.0.0";
+            // TODO восстановить
+            // ThisAssembly.GitCommitDate.ToString (CultureInfo.CurrentUICulture);
 
         DataContext = this;
 
