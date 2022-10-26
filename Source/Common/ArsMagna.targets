@@ -2,39 +2,39 @@
 
 <Project>
 
-  <!-- NuGet related stuff -->
+    <!-- NuGet related stuff -->
 
-  <PropertyGroup>
-    <IsPackable>false</IsPackable>
-    <Product>Ars Magna</Product>
-    <Company>Ars Magna Project</Company>
-    <Authors>Alexey Mironov</Authors>
-    <Copyright>Copyright Alexey Mironov 2006-2022</Copyright>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://arsmagna.ru</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/amironov73/ManagedIrbis5</RepositoryUrl>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-  </PropertyGroup>
+    <PropertyGroup>
+        <IsPackable>false</IsPackable>
+        <Product>Ars Magna</Product>
+        <Company>Ars Magna Project</Company>
+        <Authors>Alexey Mironov</Authors>
+        <Copyright>Copyright Alexey Mironov 2006-2022</Copyright>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://arsmagna.ru</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/amironov73/ManagedIrbis5</RepositoryUrl>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    </PropertyGroup>
 
-  <!-- Enable Microsoft SourceLink -->
+    <!-- Enable Microsoft SourceLink -->
 
-  <PropertyGroup>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <Deterministic>true</Deterministic>
-    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
-  </PropertyGroup>
+    <PropertyGroup>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <Deterministic>true</Deterministic>
+        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <!-- PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All"/ -->
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All"/>
+    </ItemGroup>
 
-  <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
-    <DelaySign>false</DelaySign>
-    <AssemblyOriginatorKeyFile>..\..\Common\ArsMagna.private.snk</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
+    <PropertyGroup>
+        <SignAssembly>true</SignAssembly>
+        <DelaySign>false</DelaySign>
+        <AssemblyOriginatorKeyFile>..\..\Common\ArsMagna.private.snk</AssemblyOriginatorKeyFile>
+    </PropertyGroup>
 
 </Project>

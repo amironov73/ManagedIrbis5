@@ -36,16 +36,12 @@ public sealed class Interpreter
     /// <summary>
     /// Версия API.
     /// </summary>
-    public static string AssemblyVersion = "0.0.0.0";
-        // TODO восстановить
-        // ThisAssembly.AssemblyVersion;
+    public static string AssemblyVersion = ThisAssembly.AssemblyVersion;
 
         /// <summary>
         /// Версия сборки.
         /// </summary>
-    public static string FileVersion = "0.0.0.0";
-        // TODO восстановить
-        // ThisAssembly.AssemblyFileVersion;
+    public static string FileVersion = ThisAssembly.AssemblyFileVersion;
 
     /// <summary>
     /// Контекст исполнения программы.

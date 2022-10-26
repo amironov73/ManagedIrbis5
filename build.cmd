@@ -19,7 +19,7 @@ dotnet pack    --no-restore --no-build --configuration Release --output NuGet   
 dotnet publish --no-restore --no-build --configuration Release --output Publish        Source\ManagedIrbis5-publish.sln
 dotnet publish --no-restore --no-build --configuration Release --output Publish        Source\Libs\TinyClient\TinyClient.csproj
 
-dotnet test    --no-restore --no-build --configuration Release /p:CollectCoverage=true Source\ManagedIrbis5-windows.sln
+dotnet test Source/ManagedIrbis5-windows.sln --no-restore --no-build --configuration Release --settings sequential.runsettings --collect "XPlat Code Coverage"
 dotnet run     --no-restore --no-build --configuration Release --project               Source\Tests\PftTests\PftTests.csproj
 
 echo ALL DONE
