@@ -58,22 +58,28 @@ public sealed partial class MainForm
     private void DiscoverSystem()
     {
         var systemGroup = _listView.Groups["System"];
-        AddLine (systemGroup, "Operating system", RuntimeInformation.OSDescription);
-        AddLine (systemGroup, "OS architecture", RuntimeInformation.OSArchitecture.ToString());
-        AddLine (systemGroup, "Framework", RuntimeInformation.FrameworkDescription);
-        AddLine (systemGroup, "Runtime", RuntimeInformation.RuntimeIdentifier);
-        AddLine (systemGroup, "Logged in user", Environment.UserName);
+        if (systemGroup is not null)
+        {
+            AddLine (systemGroup, "Operating system", RuntimeInformation.OSDescription);
+            AddLine (systemGroup, "OS architecture", RuntimeInformation.OSArchitecture.ToString());
+            AddLine (systemGroup, "Framework", RuntimeInformation.FrameworkDescription);
+            AddLine (systemGroup, "Runtime", RuntimeInformation.RuntimeIdentifier);
+            AddLine (systemGroup, "Logged in user", Environment.UserName);
+        }
     }
 
     private void DiscoverNetwork()
     {
         var hostEntry = Dns.GetHostEntry(Dns.GetHostName());
         var networkGroup = _listView.Groups["Network"];
-        AddLine (networkGroup, "Host name", hostEntry.HostName);
-
-        foreach (var address in hostEntry.AddressList)
+        if (networkGroup is not null)
         {
-            AddLine (networkGroup, "Address",  address.ToString()) ;
+            AddLine (networkGroup, "Host name", hostEntry.HostName);
+
+            foreach (var address in hostEntry.AddressList)
+            {
+                AddLine (networkGroup, "Address", address.ToString());
+            }
         }
     }
 
@@ -82,12 +88,24 @@ public sealed partial class MainForm
         const long megabyte = 1024 * 1024;
         var info = new ComputerInfo();
         var memoryGroup = _listView.Groups["Memory"];
-        AddLine (memoryGroup, "Total physical memory",
-            $"{(info.TotalPhysicalMemory / megabyte):N0} Mb");
-        AddLine (memoryGroup, "Available physical memory",
-            $"{(info.AvailablePhysicalMemory / megabyte):N0} Mb");
-        AddLine(memoryGroup, "Available virtual memory",
-            $"{(info.AvailableVirtualMemory / megabyte):N0} Mb");
+        if (memoryGroup is not null)
+        {
+            AddLine
+                (
+                    memoryGroup, "Total physical memory",
+                    $"{(info.TotalPhysicalMemory / megabyte):N0} Mb"
+                );
+            AddLine
+                (
+                    memoryGroup, "Available physical memory",
+                    $"{(info.AvailablePhysicalMemory / megabyte):N0} Mb"
+                );
+            AddLine
+                (
+                    memoryGroup, "Available virtual memory",
+                    $"{(info.AvailableVirtualMemory / megabyte):N0} Mb"
+                );
+        }
     }
 
     private void DiscoverDrives()
@@ -95,14 +113,17 @@ public sealed partial class MainForm
         const double gigabyte = 1024 * 1024 * 1024;
         var info = new ServerComputer();
         var driveGroup = _listView.Groups["Drives"];
-        foreach (var drive in info.FileSystem.Drives)
+        if (driveGroup is not null)
         {
-            if (drive.DriveType == DriveType.Fixed)
+            foreach (var drive in info.FileSystem.Drives)
             {
-                var driveName = drive.Name;
-                var driveDescription = $"Total: {(drive.TotalSize / gigabyte):N} Gb, " +
-                                       $"available: {(drive.AvailableFreeSpace / gigabyte):N} Gb";
-                AddLine (driveGroup, driveName, driveDescription);
+                if (drive.DriveType == DriveType.Fixed)
+                {
+                    var driveName = drive.Name;
+                    var driveDescription = $"Total: {(drive.TotalSize / gigabyte):N} Gb, " +
+                                           $"available: {(drive.AvailableFreeSpace / gigabyte):N} Gb";
+                    AddLine (driveGroup, driveName, driveDescription);
+                }
             }
         }
     }
@@ -110,7 +131,7 @@ public sealed partial class MainForm
     private void _listView_DoubleClick
         (
             object sender,
-            EventArgs e
+            EventArgs eventArgs
         )
     {
         Clipboard.SetText (GatherInformation());
