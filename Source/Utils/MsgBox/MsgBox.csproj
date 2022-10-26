@@ -7,4 +7,10 @@
         <ApplicationIcon>MsgBox.ico</ApplicationIcon>
     </PropertyGroup>
 
+    <PropertyGroup>
+        <!-- Native image -->
+        <PublishAot>false</PublishAot>
+        <StripSymbols>false</StripSymbols>
+    </PropertyGroup>
+
 </Project>
