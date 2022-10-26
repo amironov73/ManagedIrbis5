@@ -12,22 +12,23 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Libs\AM.Core5\AM.Core5.csproj" />
-      <ProjectReference Include="..\..\Libs\ManagedIrbis5\ManagedIrbis5.csproj" />
+        <ProjectReference Include="..\..\Libs\AM.Core5\AM.Core5.csproj"/>
+        <ProjectReference Include="..\..\Libs\ManagedIrbis5\ManagedIrbis5.csproj"/>
+    </ItemGroup>
+
+    <!-- Централизованное управление пакетами -->
+    <ItemGroup>
+        <PackageReference Include="Microsoft.DotNet.ILCompiler"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration"/>
+        <PackageReference Include="Microsoft.Extensions.Hosting"/>
+        <PackageReference Include="System.CommandLine"/>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.DotNet.ILCompiler" Version="7.0.0-rc.2.22472.3" />
-        <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0-rc.2.22472.3" />
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.0-rc.2.22472.3" />
-        <PackageReference Include="System.CommandLine" Version="2.0.0-beta3.22114.1" />
+        <None Remove="appsettings.json"/>
+        <Content Include="appsettings.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
     </ItemGroup>
 
-    <ItemGroup>
-      <None Remove="appsettings.json" />
-      <Content Include="appsettings.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-    </ItemGroup>
-    
 </Project>
