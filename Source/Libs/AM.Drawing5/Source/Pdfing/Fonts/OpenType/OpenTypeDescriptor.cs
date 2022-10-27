@@ -68,7 +68,7 @@ namespace PdfSharpCore.Fonts.OpenType
                 // Try to get real name form name table
                 if (idName.Contains("XPS-Font-") && FontFace._name != null && FontFace._name.Name.Length != 0)
                 {
-                    string tag = String.Empty;
+                    string tag = string.Empty;
                     if (idName.IndexOf('+') == 6)
                         tag = idName.Substring(0, 6);
                     idName = tag + "+" + FontFace._name.Name;

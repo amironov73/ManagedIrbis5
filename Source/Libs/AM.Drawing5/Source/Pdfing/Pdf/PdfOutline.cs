@@ -552,7 +552,7 @@ public sealed class PdfOutline
             case PdfPageDestinationType.Xyz:
                 dest = new PdfArray (Owner,
                     DestinationPage.Reference,
-                    new PdfLiteral (String.Format ("/XYZ {0} {1} {2}", Fd (Left), Fd (Top), Fd (Zoom))));
+                    new PdfLiteral (string.Format ("/XYZ {0} {1} {2}", Fd (Left), Fd (Top), Fd (Zoom))));
                 break;
 
             // [page /Fit]
@@ -564,20 +564,20 @@ public sealed class PdfOutline
             // [page /FitH top]
             case PdfPageDestinationType.FitH:
                 dest = new PdfArray (Owner,
-                    DestinationPage.Reference, new PdfLiteral (String.Format ("/FitH {0}", Fd (Top))));
+                    DestinationPage.Reference, new PdfLiteral (string.Format ("/FitH {0}", Fd (Top))));
                 break;
 
             // [page /FitV left]
             case PdfPageDestinationType.FitV:
                 dest = new PdfArray (Owner,
-                    DestinationPage.Reference, new PdfLiteral (String.Format ("/FitV {0}", Fd (Left))));
+                    DestinationPage.Reference, new PdfLiteral (string.Format ("/FitV {0}", Fd (Left))));
                 break;
 
             // [page /FitR left bottom right top]
             case PdfPageDestinationType.FitR:
                 dest = new PdfArray (Owner,
                     DestinationPage.Reference,
-                    new PdfLiteral (String.Format ("/FitR {0} {1} {2} {3}", Fd (Left), Fd (Bottom), Fd (Right),
+                    new PdfLiteral (string.Format ("/FitR {0} {1} {2} {3}", Fd (Left), Fd (Bottom), Fd (Right),
                         Fd (Top))));
                 break;
 
@@ -590,13 +590,13 @@ public sealed class PdfOutline
             // [page /FitBH top]
             case PdfPageDestinationType.FitBH:
                 dest = new PdfArray (Owner,
-                    DestinationPage.Reference, new PdfLiteral (String.Format ("/FitBH {0}", Fd (Top))));
+                    DestinationPage.Reference, new PdfLiteral (string.Format ("/FitBH {0}", Fd (Top))));
                 break;
 
             // [page /FitBV left]
             case PdfPageDestinationType.FitBV:
                 dest = new PdfArray (Owner,
-                    DestinationPage.Reference, new PdfLiteral (String.Format ("/FitBV {0}", Fd (Left))));
+                    DestinationPage.Reference, new PdfLiteral (string.Format ("/FitBV {0}", Fd (Left))));
                 break;
 
             default:
@@ -611,7 +611,7 @@ public sealed class PdfOutline
     /// </summary>
     string Fd (double value)
     {
-        return Double.IsNaN (value) ? "null" : value.ToString ("#.##", CultureInfo.InvariantCulture);
+        return double.IsNaN (value) ? "null" : value.ToString ("#.##", CultureInfo.InvariantCulture);
     }
 
     internal override void WriteObject (PdfWriter writer)

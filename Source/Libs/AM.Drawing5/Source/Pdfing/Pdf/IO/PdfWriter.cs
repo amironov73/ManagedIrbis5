@@ -465,7 +465,7 @@ internal class PdfWriter
 
     public void WriteRaw (string rawString)
     {
-        if (String.IsNullOrEmpty (rawString))
+        if (string.IsNullOrEmpty (rawString))
         {
             return;
         }
@@ -498,13 +498,13 @@ internal class PdfWriter
     {
         if (_layout == PdfWriterLayout.Verbose)
         {
-            WriteRaw (String.Format ("{0} {1} obj   % {2}\n",
+            WriteRaw (string.Format ("{0} {1} obj   % {2}\n",
                 value.ObjectID.ObjectNumber, value.ObjectID.GenerationNumber,
                 value.GetType().FullName));
         }
         else
         {
-            WriteRaw (String.Format ("{0} {1} obj\n", value.ObjectID.ObjectNumber,
+            WriteRaw (string.Format ("{0} {1} obj\n", value.ObjectID.ObjectNumber,
                 value.ObjectID.GenerationNumber));
         }
     }
@@ -519,7 +519,7 @@ internal class PdfWriter
 
         if (_layout == PdfWriterLayout.Verbose)
         {
-            WriteRaw (String.Format ("% PDFsharp Version {0} (verbose mode)\n", VersionInfo.Version));
+            WriteRaw (string.Format ("% PDFsharp Version {0} (verbose mode)\n", VersionInfo.Version));
 
             // Keep some space for later fix-up.
             _commentPosition = (int)_stream.Position + 2;

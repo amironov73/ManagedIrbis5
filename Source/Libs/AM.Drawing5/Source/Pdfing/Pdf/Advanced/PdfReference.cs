@@ -92,7 +92,7 @@ public sealed class PdfReference : PdfItem
         // PDFsharp does not yet support PDF 1.5 object streams.
 
         // Each line must be exactly 20 bytes long, otherwise Acrobat repairs the file.
-        var text = String.Format ("{0:0000000000} {1:00000} n\n",
+        var text = string.Format ("{0:0000000000} {1:00000} n\n",
             Position, _objectID.GenerationNumber); // InUse ? 'n' : 'f');
         writer.WriteRaw (text);
     }

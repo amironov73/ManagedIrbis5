@@ -334,7 +334,7 @@ public class PdfArray
             object obj = this[index];
             if (obj == null || obj is PdfNull)
             {
-                return String.Empty;
+                return string.Empty;
             }
 
             var str = obj as PdfString;
@@ -368,7 +368,7 @@ public class PdfArray
             object obj = this[index];
             if (obj == null || obj is PdfNull)
             {
-                return String.Empty;
+                return string.Empty;
             }
 
             var name = obj as PdfName;
@@ -621,7 +621,7 @@ public class PdfArray
     {
         get
         {
-            return String.Format (CultureInfo.InvariantCulture, "array({0},[{1}])", ObjectID.DebuggerDisplay,
+            return string.Format (CultureInfo.InvariantCulture, "array({0},[{1}])", ObjectID.DebuggerDisplay,
                 _elements == null ? 0 : _elements.Count);
         }
     }

@@ -233,7 +233,7 @@ internal sealed class Parser
 
             case Symbol.Boolean:
                 pdfObject = new PdfBooleanObject (_document,
-                    String.Compare (_lexer.Token, Boolean.TrueString, StringComparison.OrdinalIgnoreCase) == 0);
+                    string.Compare (_lexer.Token, bool.TrueString, StringComparison.OrdinalIgnoreCase) == 0);
                 pdfObject.SetObjectID (objectNumber, generationNumber);
                 if (!fromObjecStream)
                 {

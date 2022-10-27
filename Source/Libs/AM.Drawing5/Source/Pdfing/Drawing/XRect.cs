@@ -587,9 +587,9 @@ public struct XRect : IFormattable
         {
             var left = Math.Min (Left, rect.Left);
             var top = Math.Min (Top, rect.Top);
-            if (rect.Width == Double.PositiveInfinity || Width == Double.PositiveInfinity)
+            if (rect.Width == double.PositiveInfinity || Width == double.PositiveInfinity)
             {
-                _width = Double.PositiveInfinity;
+                _width = double.PositiveInfinity;
             }
             else
             {
@@ -597,9 +597,9 @@ public struct XRect : IFormattable
                 _width = Math.Max (right - left, 0.0);
             }
 
-            if (rect.Height == Double.PositiveInfinity || _height == Double.PositiveInfinity)
+            if (rect.Height == double.PositiveInfinity || _height == double.PositiveInfinity)
             {
-                _height = Double.PositiveInfinity;
+                _height = double.PositiveInfinity;
             }
             else
             {
@@ -835,7 +835,7 @@ public struct XRect : IFormattable
         get
         {
             const string format = Config.SignificantFigures10;
-            return String.Format (CultureInfo.InvariantCulture,
+            return string.Format (CultureInfo.InvariantCulture,
                 "rect=({0:" + format + "}, {1:" + format + "}, {2:" + format + "}, {3:" + format + "})",
                 _x, _y, _width, _height);
         }

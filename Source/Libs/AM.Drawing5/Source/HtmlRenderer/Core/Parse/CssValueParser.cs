@@ -269,7 +269,7 @@ internal sealed class CssValueParser
                 break;
             default:
                 hasUnit = false;
-                unit = defaultUnit ?? String.Empty;
+                unit = defaultUnit ?? string.Empty;
                 break;
         }
         return unit;

@@ -189,7 +189,7 @@ public class QRCodeGenerator
             }
         }
 
-        string modeIndicator = String.Empty;
+        string modeIndicator = string.Empty;
         if (eciMode != EciMode.Default)
         {
             modeIndicator = DecToBin((int)EncodingMode.ECI, 4);
@@ -1219,7 +1219,7 @@ public class QRCodeGenerator
         var bytes = Encoding.GetEncoding("ISO-8859-1").GetBytes(input);
         //var result = Encoding.GetEncoding("ISO-8859-1").GetString(bytes);
         var result = Encoding.GetEncoding("ISO-8859-1").GetString(bytes,0,bytes.Length);
-        return String.Equals(input, result);
+        return string.Equals(input, result);
     }
 
     private static string PlainTextToBinary(string plainText, EncodingMode encMode, EciMode eciMode, bool utf8BOM, bool forceUtf8)

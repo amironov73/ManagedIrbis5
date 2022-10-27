@@ -345,7 +345,7 @@ public struct XPoint : IFormattable
         get
         {
             const string format = Config.SignificantFigures10;
-            return String.Format (CultureInfo.InvariantCulture, "point=({0:" + format + "}, {1:" + format + "})",
+            return string.Format (CultureInfo.InvariantCulture, "point=({0:" + format + "}, {1:" + format + "})",
                 _x, _y);
         }
     }

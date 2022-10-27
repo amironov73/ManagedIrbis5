@@ -15,7 +15,6 @@ using System;
 using System.Collections.Generic;
 
 using AM.Drawing.HtmlRenderer.Adapters.Entities;
-using AM.Drawing.HtmlRenderer.Core.Utils;
 
 #endregion
 
@@ -32,7 +31,7 @@ namespace AM.Drawing.HtmlRenderer.Core.Entities;
 /// <param name="path">the path to the image to load (file path or URL)</param>
 /// <param name="image">the image to use</param>
 /// <param name="imageRectangle">optional: limit to specific rectangle in the loaded image</param>
-public delegate void HtmlImageLoadCallback(string path, Object image, RRect imageRectangle);
+public delegate void HtmlImageLoadCallback (string? path, object? image, RRect imageRectangle);
 
 /// <summary>
 /// Invoked when an image is about to be loaded by file path, URL or inline data in 'img' element or background-image CSS style.<br/>
@@ -43,25 +42,10 @@ public delegate void HtmlImageLoadCallback(string path, Object image, RRect imag
 /// provide file path to load the image from. Can also use the asynchronous image overwrite not to block HTML rendering is applicable.<br/>
 /// If no alternative data is provided the original source will be used.<br/>
 /// </summary>
-public sealed class HtmlImageLoadEventArgs 
+public sealed class HtmlImageLoadEventArgs
     : EventArgs
 {
     #region Fields and Consts
-
-    /// <summary>
-    /// use to cancel the image loading by html renderer, the provided image will be used.
-    /// </summary>
-    private bool _handled;
-
-    /// <summary>
-    /// the source of the image (file path or uri)
-    /// </summary>
-    private readonly string _src;
-
-    /// <summary>
-    /// collection of all the attributes that are defined on the image element
-    /// </summary>
-    private readonly Dictionary<string, string> _attributes;
 
     /// <summary>
     /// Callback used to allow setting image externally and async.
@@ -70,45 +54,34 @@ public sealed class HtmlImageLoadEventArgs
 
     #endregion
 
-
     /// <summary>
     /// Init.
     /// </summary>
     /// <param name="src">the source of the image (file path or Uri)</param>
     /// <param name="attributes">collection of all the attributes that are defined on the image element</param>
     /// <param name="callback">Callback used to allow setting image externally and async.</param>
-    internal HtmlImageLoadEventArgs(string src, Dictionary<string, string> attributes, HtmlImageLoadCallback callback)
+    internal HtmlImageLoadEventArgs (string src, Dictionary<string, string> attributes, HtmlImageLoadCallback callback)
     {
-        _src = src;
-        _attributes = attributes;
+        Src = src;
+        Attributes = attributes;
         _callback = callback;
     }
 
     /// <summary>
     /// the source of the image (file path, URL or inline data)
     /// </summary>
-    public string Src
-    {
-        get { return _src; }
-    }
+    public string Src { get; }
 
     /// <summary>
     /// collection of all the attributes that are defined on the image element or CSS style
     /// </summary>
-    public Dictionary<string, string> Attributes
-    {
-        get { return _attributes; }
-    }
+    public Dictionary<string, string> Attributes { get; }
 
     /// <summary>
     /// Indicate the image load is handled asynchronously.
     /// Cancel this image loading and overwrite the image asynchronously using callback method.<br/>
     /// </summary>
-    public bool Handled
-    {
-        get { return _handled; }
-        set { _handled = value; }
-    }
+    public bool Handled { get; set; }
 
     /// <summary>
     /// Callback to overwrite the loaded image with error image.<br/>
@@ -116,8 +89,8 @@ public sealed class HtmlImageLoadEventArgs
     /// </summary>
     public void Callback()
     {
-        _handled = true;
-        _callback(null, null, new RRect());
+        Handled = true;
+        _callback (null, null, new RRect());
     }
 
     /// <summary>
@@ -125,12 +98,15 @@ public sealed class HtmlImageLoadEventArgs
     /// Can be called directly from delegate handler or asynchronously after setting <see cref="Handled"/> to True.<br/>
     /// </summary>
     /// <param name="path">the path to the image to load (file path or URL)</param>
-    public void Callback(string path)
+    public void Callback
+        (
+            string path
+        )
     {
-        ArgChecker.AssertArgNotNullOrEmpty(path, "path");
+        Sure.NotNullNorEmpty (path);
 
-        _handled = true;
-        _callback(path, null, RRect.Empty);
+        Handled = true;
+        _callback (path, null, RRect.Empty);
     }
 
     /// <summary>
@@ -140,28 +116,41 @@ public sealed class HtmlImageLoadEventArgs
     /// the rectangle will be used for size and not the actual image size.<br/>
     /// </summary>
     /// <param name="path">the path to the image to load (file path or URL)</param>
-    /// <param name="imageRectangle">optional: limit to specific rectangle of the image and not all of it</param>
-    public void Callback(string path, double x, double y, double width, double height)
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <param name="width"></param>
+    /// <param name="height"></param>
+    public void Callback
+        (
+            string path,
+            double x,
+            double y,
+            double width,
+            double height
+        )
     {
-        ArgChecker.AssertArgNotNullOrEmpty(path, "path");
+        Sure.NotNullNorEmpty (path);
 
-        _handled = true;
-        _callback(path, null, new RRect(x, y, width, height));
+        Handled = true;
+        _callback (path, null, new RRect (x, y, width, height));
     }
 
     /// <summary>
     /// Callback to overwrite the loaded image with given image object.<br/>
     /// Can be called directly from delegate handler or asynchronously after setting <see cref="Handled"/> to True.<br/>
-    /// If <paramref name="imageRectangle"/> is given (not <see cref="RRect.Empty"/>) then only the specified rectangle will
+    /// If imageRectangle is given (not <see cref="RRect.Empty"/>) then only the specified rectangle will
     /// be used from the loaded image and not all of it, also the rectangle will be used for size and not the actual image size.<br/>
     /// </summary>
     /// <param name="image">the image to load</param>
-    public void Callback(Object image)
+    public void Callback
+        (
+            object image
+        )
     {
-        ArgChecker.AssertArgNotNull(image, "image");
+        Sure.NotNull (image);
 
-        _handled = true;
-        _callback(null, image, RRect.Empty);
+        Handled = true;
+        _callback (null, image, RRect.Empty);
     }
 
     /// <summary>
@@ -171,12 +160,22 @@ public sealed class HtmlImageLoadEventArgs
     /// the rectangle will be used for size and not the actual image size.<br/>
     /// </summary>
     /// <param name="image">the image to load</param>
-    /// <param name="imageRectangle">optional: limit to specific rectangle of the image and not all of it</param>
-    public void Callback(Object image, double x, double y, double width, double height)
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <param name="width"></param>
+    /// <param name="height"></param>
+    public void Callback
+        (
+            object image,
+            double x,
+            double y,
+            double width,
+            double height
+        )
     {
-        ArgChecker.AssertArgNotNull(image, "image");
+        Sure.NotNull (image);
 
-        _handled = true;
-        _callback(null, image, new RRect(x, y, width, height));
+        Handled = true;
+        _callback (null, image, new RRect (x, y, width, height));
     }
 }

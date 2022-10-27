@@ -202,7 +202,7 @@ public class Ascii85Decode
                     (uint)(data[idx++] - '!') * 85 +
                     (uint)(data[idx++] - '!');
 
-                if (value > UInt32.MaxValue)
+                if (value > uint.MaxValue)
                     throw new InvalidOperationException ("Value of group greater than 2 power 32 - 1.");
 
                 output[idxOut++] = (byte)(value >> 24);

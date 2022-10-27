@@ -307,7 +307,7 @@ public sealed class PdfStandardSecurityHandler : PdfSecurityHandler
         var dump = tag + ": ";
         for (var idx = 0; idx < bytes.Length; idx++)
         {
-            dump += String.Format ("{0:X2}", bytes[idx]);
+            dump += string.Format ("{0:X2}", bytes[idx]);
         }
 
         Debug.WriteLine (dump);
@@ -641,13 +641,13 @@ public sealed class PdfStandardSecurityHandler : PdfSecurityHandler
             rValue = new PdfInteger (2);
         }
 
-        if (String.IsNullOrEmpty (_userPassword))
+        if (string.IsNullOrEmpty (_userPassword))
         {
             _userPassword = "";
         }
 
         // Use user password twice if no owner password provided.
-        if (String.IsNullOrEmpty (_ownerPassword))
+        if (string.IsNullOrEmpty (_ownerPassword))
         {
             _ownerPassword = _userPassword;
         }

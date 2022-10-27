@@ -88,7 +88,7 @@ public class SlovenianUpnQr : Payload
     private string FormatAmount (double amount)
     {
         int _amt = (int)Math.Round (amount * 100.0);
-        return String.Format ("{0:00000000000}", _amt);
+        return string.Format ("{0:00000000000}", _amt);
     }
 
     private int CalculateChecksum()

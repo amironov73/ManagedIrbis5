@@ -426,7 +426,7 @@ internal static class CssLayoutEngine
     {
         if (box.Words.Count > 0)
         {
-            double x = Single.MaxValue, y = Single.MaxValue, r = Single.MinValue, b = Single.MinValue;
+            double x = float.MaxValue, y = float.MaxValue, r = float.MinValue, b = float.MinValue;
             var words = line.WordsOf (box);
 
             if (words.Count > 0)
@@ -567,7 +567,7 @@ internal static class CssLayoutEngine
     /// <param name="lineBox"></param>
     private static void ApplyVerticalAlignment (RGraphics g, CssLineBox lineBox)
     {
-        double baseline = Single.MinValue;
+        double baseline = float.MinValue;
         foreach (var box in lineBox.Rectangles.Keys)
         {
             baseline = Math.Max (baseline, lineBox.Rectangles[box].Top);

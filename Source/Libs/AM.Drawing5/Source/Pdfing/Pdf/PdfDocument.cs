@@ -439,7 +439,7 @@ namespace PdfSharpCore.Pdf
 
         internal bool HasVersion (string version)
         {
-            return String.Compare (Catalog.Version, version) >= 0;
+            return string.Compare (Catalog.Version, version) >= 0;
         }
 
         /// <summary>
@@ -533,7 +533,7 @@ namespace PdfSharpCore.Pdf
             get { return _fullPath; }
         }
 
-        internal string _fullPath = String.Empty; // TODO: make private
+        internal string _fullPath = string.Empty; // TODO: make private
 
         /// <summary>
         /// Gets a Guid that uniquely identifies this instance of PdfDocument.

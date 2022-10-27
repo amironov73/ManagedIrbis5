@@ -123,7 +123,7 @@ internal abstract class CssBoxProperties
         set
         {
             _borderBottomWidth = value;
-            _actualBorderBottomWidth = Single.NaN;
+            _actualBorderBottomWidth = float.NaN;
         }
     }
 
@@ -133,7 +133,7 @@ internal abstract class CssBoxProperties
         set
         {
             _borderLeftWidth = value;
-            _actualBorderLeftWidth = Single.NaN;
+            _actualBorderLeftWidth = float.NaN;
         }
     }
 
@@ -143,7 +143,7 @@ internal abstract class CssBoxProperties
         set
         {
             _borderRightWidth = value;
-            _actualBorderRightWidth = Single.NaN;
+            _actualBorderRightWidth = float.NaN;
         }
     }
 
@@ -153,7 +153,7 @@ internal abstract class CssBoxProperties
         set
         {
             _borderTopWidth = value;
-            _actualBorderTopWidth = Single.NaN;
+            _actualBorderTopWidth = float.NaN;
         }
     }
 

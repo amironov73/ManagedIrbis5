@@ -1438,7 +1438,7 @@ internal class CssBox
                         ActualCornerSw);
                 }
 
-                Object prevMode = null;
+                object prevMode = null;
                 if (HtmlContainer != null && !HtmlContainer.AvoidGeometryAntialias && IsRounded)
                 {
                     prevMode = g.SetAntiAliasSmoothingMode();

@@ -172,7 +172,7 @@ internal class XFontSource
         // The key is converted to a value a human can remember during debugging.
         get
         {
-            return String.Format (CultureInfo.InvariantCulture, "XFontSource: '{0}', keyhash={1}", FontName,
+            return string.Format (CultureInfo.InvariantCulture, "XFontSource: '{0}', keyhash={1}", FontName,
                 Key % 99991 /* largest prime number less than 100000 */);
         }
     }

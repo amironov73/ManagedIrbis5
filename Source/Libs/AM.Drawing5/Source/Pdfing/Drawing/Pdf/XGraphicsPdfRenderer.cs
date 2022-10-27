@@ -1349,7 +1349,7 @@ internal class XGraphicsPdfRenderer
         //}
     }
 
-    void AppendPath (XPoint[] points, Byte[] types)
+    void AppendPath (XPoint[] points, byte[] types)
     {
         const string format = Config.SignificantFigures4;
         var count = points.Length;

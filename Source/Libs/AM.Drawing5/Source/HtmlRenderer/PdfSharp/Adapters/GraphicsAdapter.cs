@@ -89,14 +89,14 @@ internal sealed class GraphicsAdapter
     public override void PushClipExclude(RRect rect)
     { }
 
-    public override Object SetAntiAliasSmoothingMode()
+    public override object SetAntiAliasSmoothingMode()
     {
         var prevMode = _g.SmoothingMode;
         _g.SmoothingMode = XSmoothingMode.AntiAlias;
         return prevMode;
     }
 
-    public override void ReturnPreviousSmoothingMode(Object prevMode)
+    public override void ReturnPreviousSmoothingMode(object prevMode)
     {
         if (prevMode != null)
         {

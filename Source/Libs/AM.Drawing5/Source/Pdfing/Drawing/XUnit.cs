@@ -511,7 +511,7 @@ public struct XUnit
         get
         {
             const string format = Config.SignificantFigures10;
-            return String.Format (CultureInfo.InvariantCulture, "unit=({0:" + format + "} {1})", _value, GetSuffix());
+            return string.Format (CultureInfo.InvariantCulture, "unit=({0:" + format + "} {1})", _value, GetSuffix());
         }
     }
 }

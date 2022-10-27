@@ -655,7 +655,7 @@ public class PdfDictionary
             {
                 //if (create)
                 //  this[key] = new Pdf();
-                return String.Empty;
+                return string.Empty;
             }
 
             if (obj is PdfReference reference)
@@ -1468,7 +1468,7 @@ public class PdfDictionary
         /// </summary>
         public void Add (string key, PdfItem value)
         {
-            if (String.IsNullOrEmpty (key))
+            if (string.IsNullOrEmpty (key))
             {
                 throw new ArgumentNullException (nameof (key));
             }
@@ -1746,7 +1746,7 @@ public class PdfDictionary
                         bytes = Filtering.Decode (_value, filter, decodeParms);
                         if (bytes == null)
                         {
-                            var message = String.Format ("«Cannot decode filter '{0}'»", filter);
+                            var message = string.Format ("«Cannot decode filter '{0}'»", filter);
                             bytes = PdfEncoders.RawEncoding.GetBytes (message);
                         }
                     }
@@ -1955,7 +1955,7 @@ public class PdfDictionary
         get
         {
 #if true
-            return String.Format (CultureInfo.InvariantCulture, "dictionary({0},[{1}])={2}",
+            return string.Format (CultureInfo.InvariantCulture, "dictionary({0},[{1}])={2}",
                 ObjectID.DebuggerDisplay,
                 Elements.Count,
                 _elements.DebuggerDisplay);

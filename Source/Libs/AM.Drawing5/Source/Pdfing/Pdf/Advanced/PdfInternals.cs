@@ -260,7 +260,7 @@ public class PdfInternals // TODO: PdfDocumentInternals... PdfPageInterals etc.
     /// </summary>
     public PdfObject[] GetClosure (PdfObject obj)
     {
-        return GetClosure (obj, Int32.MaxValue);
+        return GetClosure (obj, int.MaxValue);
     }
 
     /// <summary>

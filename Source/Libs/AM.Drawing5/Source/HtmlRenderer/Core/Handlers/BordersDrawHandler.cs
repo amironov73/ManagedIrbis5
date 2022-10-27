@@ -106,7 +106,7 @@ internal static class BordersDrawHandler
         if (borderPath != null)
         {
             // rounded border need special path
-            Object prevMode = null;
+            object prevMode = null;
             if (box.HtmlContainer != null && !box.HtmlContainer.AvoidGeometryAntialias && box.IsRounded)
                 prevMode = g.SetAntiAliasSmoothingMode();
 

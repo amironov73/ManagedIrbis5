@@ -179,7 +179,7 @@ internal sealed class DomParser
         }
 
         // cascade text decoration only to boxes that actually have text so it will be handled correctly.
-        if (box.TextDecoration != String.Empty && box.Text == null)
+        if (box.TextDecoration != string.Empty && box.Text == null)
         {
             foreach (var childBox in box.Boxes)
                 childBox.TextDecoration = box.TextDecoration;

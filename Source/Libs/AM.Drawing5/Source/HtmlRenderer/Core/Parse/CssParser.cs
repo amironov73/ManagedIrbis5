@@ -99,7 +99,7 @@ internal sealed class CssParser
     /// <param name="stylesheet">raw css stylesheet to parse</param>
     public void ParseStyleSheet(CssData cssData, string stylesheet)
     {
-        if (!String.IsNullOrEmpty(stylesheet))
+        if (!string.IsNullOrEmpty(stylesheet))
         {
             stylesheet = RemoveStylesheetComments(stylesheet);
 
@@ -215,7 +215,7 @@ internal sealed class CssParser
 
                 if (endIdx < stylesheet.Length)
                 {
-                    while (Char.IsWhiteSpace(stylesheet[startIdx]))
+                    while (char.IsWhiteSpace(stylesheet[startIdx]))
                         startIdx++;
                     var substring = stylesheet.Substring(startIdx, endIdx - startIdx + 1);
                     FeedStyleBlock(cssData, substring);
@@ -256,7 +256,7 @@ internal sealed class CssParser
                     //Scan media types
                     foreach (string t in media)
                     {
-                        if (!String.IsNullOrEmpty(t.Trim()))
+                        if (!string.IsNullOrEmpty(t.Trim()))
                         {
                             //Get blocks inside the at-rule
                             var insideBlocks = RegexParserUtils.Match(RegexParserUtils.CssBlocks, atrule);
@@ -292,7 +292,7 @@ internal sealed class CssParser
             foreach (string cls in classes)
             {
                 string className = cls.Trim(_cssClassTrimChars);
-                if (!String.IsNullOrEmpty(className))
+                if (!string.IsNullOrEmpty(className))
                 {
                     var newblock = ParseCssBlockImp(className, blockSource);
                     if (newblock != null)

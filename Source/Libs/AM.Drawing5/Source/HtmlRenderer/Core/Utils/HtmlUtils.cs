@@ -382,7 +382,7 @@ internal static class HtmlUtils
 
             string repl = string.Empty;
             if (num >= 0 && num <= 0x10ffff && !(num >= 0xd800 && num <= 0xdfff))
-                repl = Char.ConvertFromUtf32 ((int)num);
+                repl = char.ConvertFromUtf32 ((int)num);
 
             str = str.Remove (idx, endIdx - idx);
             str = str.Insert (idx, repl);
