@@ -29,6 +29,7 @@ using AM.Avalonia.Source;
 
 using Avalonia.Interactivity;
 using Avalonia.Layout;
+using Avalonia.Media;
 using Avalonia.Threading;
 
 using ManagedIrbis;
@@ -63,11 +64,12 @@ public sealed class MainWindow
     // Количество реально измененных экземпляров.
     private int _changeCount;
 
-
     public MainWindow()
     {
         Width = 600;
-        Height = 450;
+        MinWidth = 600;
+        Height = 350;
+        MinHeight = 350;
         Padding = new Thickness (10);
         Title = "Статус партии";
 
@@ -105,19 +107,24 @@ public sealed class MainWindow
         _busyStripe.SetValue (Grid.RowProperty, 2);
         _busyStripe.SetValue (Grid.ColumnSpanProperty, 5);
 
-        _logBox = new LogBox();
+        _logBox = new LogBox
+        {
+            FontFamily = new FontFamily ("Courier New"),
+            FontSize = 12.0
+        };
         _logBox.SetValue (Grid.RowProperty, 4);
         _logBox.SetValue (Grid.ColumnSpanProperty, 5);
 
         Content = new Grid
         {
             ColumnDefinitions = new ColumnDefinitions ("*, 5, *, 5, Auto"),
-            RowDefinitions = new RowDefinitions ("Auto, 5, 15, 5, *"),
+            RowDefinitions = new RowDefinitions ("Auto, 5, 20, 5, *"),
             Children =
             {
                 _numberBox,
                 _statusBox,
                 button,
+                _busyStripe,
                 _logBox
             }
         };
@@ -129,14 +136,14 @@ public sealed class MainWindow
         _logBox.Output.PrintSystemInformation();
 
         var testResult = await TestConnectionAsync();
-        await WriteLineAsync
+        WriteLine
             (
                 testResult
                     ? "Соединение с сервером успешно установлено"
                     : "Невозможно установить соединение с сервером"
             );
 
-        if (!ReferenceEquals (_menu, null))
+        if (_menu is not null)
         {
             _statusBox.Items = _menu.Entries.ToArray();
             if (_menu.Entries.Count != 0)
@@ -154,15 +161,16 @@ public sealed class MainWindow
         return result;
     }
 
-    private async Task WriteLineAsync
+    private void WriteLine
         (
             string format
         )
     {
-        await Dispatcher.UIThread.InvokeAsync
-            (
-                () => _logBox.Text += format + _logBox.NewLine
-            );
+        Dispatcher.UIThread.Post (() =>
+        {
+            _logBox.Text += format + _logBox.NewLine;
+            _logBox.CaretIndex = int.MaxValue;
+        });
     }
 
     private async Task Run
@@ -177,7 +185,7 @@ public sealed class MainWindow
         }
         catch (Exception exception)
         {
-            await WriteLineAsync ($"Exception: {exception}");
+            WriteLine ($"Exception: {exception}");
         }
         finally
         {
@@ -215,7 +223,7 @@ public sealed class MainWindow
         return result;
     }
 
-    private async Task ProcessMfn
+    private void ProcessMfn
         (
             ISyncProvider provider,
             string number,
@@ -223,8 +231,8 @@ public sealed class MainWindow
             string newStatus
         )
     {
-        await WriteLineAsync (string.Empty);
-        await WriteLineAsync ($"MFN={mfn}");
+        WriteLine (string.Empty);
+        WriteLine ($"MFN={mfn}");
 
         var record = provider.ReadRecord (mfn);
         if (ReferenceEquals (record, null))
@@ -251,7 +259,7 @@ public sealed class MainWindow
         var description = parameters.Result.AsSingle();
         if (!string.IsNullOrEmpty (description))
         {
-            await WriteLineAsync (description);
+            WriteLine (description);
         }
 
         foreach (var field in fields)
@@ -268,17 +276,17 @@ public sealed class MainWindow
             }
 
             var message = flag ? "[" + oldStatus + "]" : "НЕ";
-            await WriteLineAsync ($"{inventory}: {message} меняем");
+            WriteLine ($"{inventory}: {message} меняем");
         }
 
         if (record.Modified)
         {
-            await WriteLineAsync ("Сохраняем запись");
-            provider.WriteRecord (record);
+            WriteLine ("Сохраняем запись");
+            provider.WriteRecord (record, dontParse: true);
         }
     }
 
-    private async void ProcessNumber
+    private void ProcessNumber
         (
             string number,
             string status
@@ -291,28 +299,28 @@ public sealed class MainWindow
         var stopwatch = new Stopwatch();
         stopwatch.Start();
 
-        await using (var provider = GetProvider())
+        using (var provider = GetProvider())
         {
-            await WriteLineAsync ($"КСУ {number}");
+            WriteLine ($"КСУ {number}");
 
             var expression = $"\"NKSU={number}\"";
             var found = provider.Search (expression);
-            await WriteLineAsync ($"Найдено: {found.Length}");
+            WriteLine ($"Найдено: {found.Length}");
 
             foreach (var mfn in found)
             {
-                await ProcessMfn (provider, number, mfn, status);
+                ProcessMfn (provider, number, mfn, status);
             }
         }
 
-        await WriteLineAsync (new string ('=', 70));
+        WriteLine (new string ('=', 70));
         stopwatch.Stop();
         var elapsed = stopwatch.Elapsed;
-        await WriteLineAsync ($"Затрачено: {elapsed.ToMinuteString()}");
-        await WriteLineAsync ($"обработано названий: {_titleCount}");
-        await WriteLineAsync ($"экземпляров: {_exemplarCount}");
-        await WriteLineAsync ($"изменён статус: {_changeCount}");
-        await WriteLineAsync (string.Empty);
+        WriteLine ($"Затрачено: {elapsed.ToMinuteString()}");
+        WriteLine ($"обработано названий: {_titleCount}");
+        WriteLine ($"экземпляров: {_exemplarCount}");
+        WriteLine ($"изменён статус: {_changeCount}");
+        WriteLine (string.Empty);
     }
 
     private async void Button_Click
