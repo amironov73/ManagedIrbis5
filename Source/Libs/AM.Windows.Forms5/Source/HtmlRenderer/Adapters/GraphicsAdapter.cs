@@ -5,20 +5,25 @@
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
 
+#region Using directives
+
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+
 using AM.Drawing.HtmlRenderer.Adapters.Entities;
-using AM.Drawing.HtmlRenderer.Core.Utils;
 using AM.Drawing.HtmlRenderer.Adapters;
 using AM.Windows.Forms.HtmlRenderer.Utilities;
+
+#endregion
 
 namespace AM.Windows.Forms.HtmlRenderer.Adapters;
 
 /// <summary>
 /// Adapter for WinForms Graphics for core.
 /// </summary>
-internal sealed class GraphicsAdapter : RGraphics
+internal sealed class GraphicsAdapter
+    : RGraphics
 {
     #region Fields and Consts
 
@@ -50,19 +55,17 @@ internal sealed class GraphicsAdapter : RGraphics
     /// <summary>
     /// The wrapped WinForms graphics object
     /// </summary>
-    private readonly Graphics _g;
+    private readonly Graphics _graphics;
 
     /// <summary>
     /// Use GDI+ text rendering to measure/draw text.
     /// </summary>
     private readonly bool _useGdiPlusTextRendering;
 
-#if !MONO
     /// <summary>
     /// the initialized HDC used
     /// </summary>
     private IntPtr _hdc;
-#endif
 
     /// <summary>
     /// if to release the graphics object on dispose
@@ -76,124 +79,130 @@ internal sealed class GraphicsAdapter : RGraphics
 
     #endregion
 
-
     /// <summary>
     /// Init static resources.
     /// </summary>
     static GraphicsAdapter()
     {
-        _stringFormat = new StringFormat(StringFormat.GenericTypographic);
+        _stringFormat = new StringFormat (StringFormat.GenericTypographic);
         _stringFormat.FormatFlags = StringFormatFlags.NoClip | StringFormatFlags.MeasureTrailingSpaces;
 
-        _stringFormat2 = new StringFormat(StringFormat.GenericTypographic);
+        _stringFormat2 = new StringFormat (StringFormat.GenericTypographic);
     }
 
     /// <summary>
     /// Init.
     /// </summary>
-    /// <param name="g">the win forms graphics object to use</param>
+    /// <param name="graphics">the win forms graphics object to use</param>
     /// <param name="useGdiPlusTextRendering">Use GDI+ text rendering to measure/draw text</param>
     /// <param name="releaseGraphics">optional: if to release the graphics object on dispose (default - false)</param>
-    public GraphicsAdapter(Graphics g, bool useGdiPlusTextRendering, bool releaseGraphics = false)
-        : base(WinFormsAdapter.Instance, Utils.Convert(g.ClipBounds))
+    public GraphicsAdapter
+        (
+            Graphics graphics,
+            bool useGdiPlusTextRendering,
+            bool releaseGraphics = false
+        )
+        : base (WinFormsAdapter.Instance, Utils.Convert (graphics.ClipBounds))
     {
-        ArgChecker.AssertArgNotNull(g, "g");
+        Sure.NotNull (graphics);
 
-        _g = g;
+        _graphics = graphics;
         _releaseGraphics = releaseGraphics;
 
-#if MONO
-            _useGdiPlusTextRendering = true;
-#else
         _useGdiPlusTextRendering = useGdiPlusTextRendering;
-#endif
     }
 
     public override void PopClip()
     {
         ReleaseHdc();
         _clipStack.Pop();
-        _g.SetClip(Utils.Convert(_clipStack.Peek()), CombineMode.Replace);
+        _graphics.SetClip (Utils.Convert (_clipStack.Peek()), CombineMode.Replace);
     }
 
-    public override void PushClip(RRect rect)
+    public override void PushClip (RRect rect)
     {
         ReleaseHdc();
-        _clipStack.Push(rect);
-        _g.SetClip(Utils.Convert(rect), CombineMode.Replace);
+        _clipStack.Push (rect);
+        _graphics.SetClip (Utils.Convert (rect), CombineMode.Replace);
     }
 
-    public override void PushClipExclude(RRect rect)
+    public override void PushClipExclude (RRect rect)
     {
         ReleaseHdc();
-        _clipStack.Push(_clipStack.Peek());
-        _g.SetClip(Utils.Convert(rect), CombineMode.Exclude);
+        _clipStack.Push (_clipStack.Peek());
+        _graphics.SetClip (Utils.Convert (rect), CombineMode.Exclude);
     }
 
-    public override Object SetAntiAliasSmoothingMode()
+    public override object SetAntiAliasSmoothingMode()
     {
         ReleaseHdc();
-        var prevMode = _g.SmoothingMode;
-        _g.SmoothingMode = SmoothingMode.AntiAlias;
+        var prevMode = _graphics.SmoothingMode;
+        _graphics.SmoothingMode = SmoothingMode.AntiAlias;
         return prevMode;
     }
 
-    public override void ReturnPreviousSmoothingMode(Object prevMode)
+    public override void ReturnPreviousSmoothingMode
+        (
+            object? prevMode
+        )
     {
         if (prevMode != null)
         {
             ReleaseHdc();
-            _g.SmoothingMode = (SmoothingMode)prevMode;
+            _graphics.SmoothingMode = (SmoothingMode)prevMode;
         }
     }
 
-    public override RSize MeasureString(string str, RFont font)
+    public override RSize MeasureString
+        (
+            string str,
+            RFont font
+        )
     {
         if (_useGdiPlusTextRendering)
         {
             ReleaseHdc();
             var fontAdapter = (FontAdapter)font;
             var realFont = fontAdapter.Font;
-            _characterRanges[0] = new CharacterRange(0, str.Length);
-            _stringFormat.SetMeasurableCharacterRanges(_characterRanges);
-            var size = _g.MeasureCharacterRanges(str, realFont, RectangleF.Empty, _stringFormat)[0].GetBounds(_g).Size;
+            _characterRanges[0] = new CharacterRange (0, str.Length);
+            _stringFormat.SetMeasurableCharacterRanges (_characterRanges);
+            var size = _graphics.MeasureCharacterRanges (str, realFont, RectangleF.Empty, _stringFormat)[0].GetBounds (_graphics)
+                .Size;
 
             if (font.Height < 0)
             {
                 var height = realFont.Height;
-                var descent = realFont.Size * realFont.FontFamily.GetCellDescent(realFont.Style) / realFont.FontFamily.GetEmHeight(realFont.Style);
-#if !MONO
-                fontAdapter.SetMetrics(height, (int)Math.Round((height - descent + .5f)));
-#else
-                    fontAdapter.SetMetrics(height, (int)Math.Round((height - descent + 1f)));
-#endif
-
+                var descent = realFont.Size * realFont.FontFamily.GetCellDescent (realFont.Style) /
+                              realFont.FontFamily.GetEmHeight (realFont.Style);
+                fontAdapter.SetMetrics (height, (int)Math.Round ((height - descent + .5f)));
             }
 
-            return Utils.Convert(size);
+            return Utils.Convert (size);
         }
         else
         {
-#if !MONO
-            SetFont(font);
+            SetFont (font);
             var size = new Size();
-            Win32Utils.GetTextExtentPoint32(_hdc, str, str.Length, ref size);
+            Win32Utils.GetTextExtentPoint32 (_hdc, str, str.Length, ref size);
 
             if (font.Height < 0)
             {
-                TextMetric lptm;
-                Win32Utils.GetTextMetrics(_hdc, out lptm);
-                ((FontAdapter)font).SetMetrics(size.Height, lptm.tmHeight - lptm.tmDescent + lptm.tmUnderlined + 1);
+                Win32Utils.GetTextMetrics (_hdc, out var lptm);
+                ((FontAdapter)font).SetMetrics (size.Height, lptm.tmHeight - lptm.tmDescent + lptm.tmUnderlined + 1);
             }
 
-            return Utils.Convert(size);
-#else
-                throw new InvalidProgramException("Invalid Mono code");
-#endif
+            return Utils.Convert (size);
         }
     }
 
-    public override void MeasureString(string str, RFont font, double maxWidth, out int charFit, out double charFitWidth)
+    public override void MeasureString
+        (
+            string str,
+            RFont font,
+            double maxWidth,
+            out int charFit,
+            out double charFitWidth
+        )
     {
         charFit = 0;
         charFitWidth = 0;
@@ -201,12 +210,12 @@ internal sealed class GraphicsAdapter : RGraphics
         {
             ReleaseHdc();
 
-            var size = MeasureString(str, font);
+            var size = MeasureString (str, font);
 
-            for (int i = 1; i <= str.Length; i++)
+            for (var i = 1; i <= str.Length; i++)
             {
                 charFit = i - 1;
-                RSize pSize = MeasureString(str.Substring(0, i), font);
+                var pSize = MeasureString (str.Substring (0, i), font);
                 if (pSize.Height <= size.Height && pSize.Width < maxWidth)
                 {
                     charFitWidth = pSize.Width;
@@ -219,55 +228,61 @@ internal sealed class GraphicsAdapter : RGraphics
         }
         else
         {
-#if !MONO
-            SetFont(font);
+            SetFont (font);
 
             var size = new Size();
-            Win32Utils.GetTextExtentExPoint(_hdc, str, str.Length, (int)Math.Round(maxWidth), _charFit, _charFitWidth, ref size);
+            Win32Utils.GetTextExtentExPoint (_hdc, str, str.Length, (int)Math.Round (maxWidth), _charFit, _charFitWidth,
+                ref size);
             charFit = _charFit[0];
             charFitWidth = charFit > 0 ? _charFitWidth[charFit - 1] : 0;
-#endif
         }
     }
 
-    public override void DrawString(string str, RFont font, RColor color, RPoint point, RSize size, bool rtl)
+    public override void DrawString
+        (
+            string str,
+            RFont font,
+            RColor color,
+            RPoint point,
+            RSize size,
+            bool rtl
+        )
     {
         if (_useGdiPlusTextRendering)
         {
             ReleaseHdc();
-            SetRtlAlignGdiPlus(rtl);
-            var brush = ((BrushAdapter)_adapter.GetSolidBrush(color)).Brush;
-            _g.DrawString(str, ((FontAdapter)font).Font, brush, (int)(Math.Round(point.X) + (rtl ? size.Width : 0)), (int)Math.Round(point.Y), _stringFormat2);
+            SetRtlAlignGdiPlus (rtl);
+            var brush = ((BrushAdapter)_adapter.GetSolidBrush (color)).Brush;
+            _graphics.DrawString (str, ((FontAdapter)font).Font, brush, (int)(Math.Round (point.X) + (rtl ? size.Width : 0)),
+                (int)Math.Round (point.Y), _stringFormat2);
         }
         else
         {
-#if !MONO
-            var pointConv = Utils.ConvertRound(point);
-            var colorConv = Utils.Convert(color);
+            var pointConv = Utils.ConvertRound (point);
+            var colorConv = Utils.Convert (color);
 
             if (color.A == 255)
             {
-                SetFont(font);
-                SetTextColor(colorConv);
-                SetRtlAlignGdi(rtl);
+                SetFont (font);
+                SetTextColor (colorConv);
+                SetRtlAlignGdi (rtl);
 
-                Win32Utils.TextOut(_hdc, pointConv.X, pointConv.Y, str, str.Length);
+                Win32Utils.TextOut (_hdc, pointConv.X, pointConv.Y, str, str.Length);
             }
             else
             {
                 InitHdc();
-                SetRtlAlignGdi(rtl);
-                DrawTransparentText(_hdc, str, font, pointConv, Utils.ConvertRound(size), colorConv);
+                SetRtlAlignGdi (rtl);
+                DrawTransparentText (_hdc, str, font, pointConv, Utils.ConvertRound (size), colorConv);
             }
-#endif
         }
     }
 
-    public override RBrush GetTextureBrush(RImage image, RRect dstRect, RPoint translateTransformLocation)
+    public override RBrush GetTextureBrush (RImage image, RRect dstRect, RPoint translateTransformLocation)
     {
-        var brush = new TextureBrush(((ImageAdapter)image).Image, Utils.Convert(dstRect));
-        brush.TranslateTransform((float)translateTransformLocation.X, (float)translateTransformLocation.Y);
-        return new BrushAdapter(brush, true);
+        var brush = new TextureBrush (((ImageAdapter)image).Image, Utils.Convert (dstRect));
+        brush.TranslateTransform ((float)translateTransformLocation.X, (float)translateTransformLocation.Y);
+        return new BrushAdapter (brush, true);
     }
 
     public override RGraphicsPath GetGraphicsPath()
@@ -280,7 +295,7 @@ internal sealed class GraphicsAdapter : RGraphics
         ReleaseHdc();
         if (_releaseGraphics)
         {
-            _g.Dispose();
+            _graphics.Dispose();
         }
 
         if (_useGdiPlusTextRendering && _setRtl)
@@ -289,56 +304,98 @@ internal sealed class GraphicsAdapter : RGraphics
         }
     }
 
-
     #region Delegate graphics methods
 
-    public override void DrawLine(RPen pen, double x1, double y1, double x2, double y2)
+    public override void DrawLine
+        (
+            RPen pen,
+            double x1,
+            double y1,
+            double x2,
+            double y2
+        )
     {
         ReleaseHdc();
-        _g.DrawLine(((PenAdapter)pen).Pen, (float)x1, (float)y1, (float)x2, (float)y2);
+        _graphics.DrawLine (((PenAdapter)pen).Pen, (float)x1, (float)y1, (float)x2, (float)y2);
     }
 
-    public override void DrawRectangle(RPen pen, double x, double y, double width, double height)
+    public override void DrawRectangle
+        (
+            RPen pen,
+            double x,
+            double y,
+            double width,
+            double height
+        )
     {
         ReleaseHdc();
-        _g.DrawRectangle(((PenAdapter)pen).Pen, (float)x, (float)y, (float)width, (float)height);
+        _graphics.DrawRectangle (((PenAdapter)pen).Pen, (float)x, (float)y, (float)width, (float)height);
     }
 
-    public override void DrawRectangle(RBrush brush, double x, double y, double width, double height)
+    public override void DrawRectangle
+        (
+            RBrush brush,
+            double x,
+            double y,
+            double width,
+            double height
+        )
     {
         ReleaseHdc();
-        _g.FillRectangle(((BrushAdapter)brush).Brush, (float)x, (float)y, (float)width, (float)height);
+        _graphics.FillRectangle (((BrushAdapter)brush).Brush, (float)x, (float)y, (float)width, (float)height);
     }
 
-    public override void DrawImage(RImage image, RRect destRect, RRect srcRect)
+    public override void DrawImage
+        (
+            RImage image,
+            RRect destRect,
+            RRect srcRect
+        )
     {
         ReleaseHdc();
-        _g.DrawImage(((ImageAdapter)image).Image, Utils.Convert(destRect), Utils.Convert(srcRect), GraphicsUnit.Pixel);
+        _graphics.DrawImage (((ImageAdapter)image).Image, Utils.Convert (destRect), Utils.Convert (srcRect),
+            GraphicsUnit.Pixel);
     }
 
-    public override void DrawImage(RImage image, RRect destRect)
+    public override void DrawImage
+        (
+            RImage image,
+            RRect destRect
+        )
     {
         ReleaseHdc();
-        _g.DrawImage(((ImageAdapter)image).Image, Utils.Convert(destRect));
+        _graphics.DrawImage (((ImageAdapter)image).Image, Utils.Convert (destRect));
     }
 
-    public override void DrawPath(RPen pen, RGraphicsPath path)
+    public override void DrawPath
+        (
+            RPen pen,
+            RGraphicsPath path
+        )
     {
-        _g.DrawPath(((PenAdapter)pen).Pen, ((GraphicsPathAdapter)path).GraphicsPath);
+        _graphics.DrawPath (((PenAdapter)pen).Pen, ((GraphicsPathAdapter)path).GraphicsPath);
     }
 
-    public override void DrawPath(RBrush brush, RGraphicsPath path)
+    public override void DrawPath
+        (
+            RBrush brush,
+            RGraphicsPath path
+        )
     {
         ReleaseHdc();
-        _g.FillPath(((BrushAdapter)brush).Brush, ((GraphicsPathAdapter)path).GraphicsPath);
+        _graphics.FillPath (((BrushAdapter)brush).Brush, ((GraphicsPathAdapter)path).GraphicsPath);
     }
 
-    public override void DrawPolygon(RBrush brush, RPoint[] points)
+    public override void DrawPolygon
+        (
+            RBrush brush,
+            RPoint[]? points
+        )
     {
-        if (points != null && points.Length > 0)
+        if (points is { Length: > 0 })
         {
             ReleaseHdc();
-            _g.FillPolygon(((BrushAdapter)brush).Brush, Utils.Convert(points));
+            _graphics.FillPolygon (((BrushAdapter)brush).Brush, Utils.Convert (points));
         }
     }
 
@@ -352,17 +409,14 @@ internal sealed class GraphicsAdapter : RGraphics
     /// </summary>
     private void ReleaseHdc()
     {
-#if !MONO
         if (_hdc != IntPtr.Zero)
         {
-            Win32Utils.SelectClipRgn(_hdc, IntPtr.Zero);
-            _g.ReleaseHdc(_hdc);
+            Win32Utils.SelectClipRgn (_hdc, IntPtr.Zero);
+            _graphics.ReleaseHdc (_hdc);
             _hdc = IntPtr.Zero;
         }
-#endif
     }
 
-#if !MONO
     /// <summary>
     /// Init HDC for the current graphics object to be used to call GDI directly.
     /// </summary>
@@ -370,15 +424,15 @@ internal sealed class GraphicsAdapter : RGraphics
     {
         if (_hdc == IntPtr.Zero)
         {
-            var clip = _g.Clip.GetHrgn(_g);
+            var clip = _graphics.Clip.GetHrgn (_graphics);
 
-            _hdc = _g.GetHdc();
+            _hdc = _graphics.GetHdc();
             _setRtl = false;
-            Win32Utils.SetBkMode(_hdc, 1);
+            Win32Utils.SetBkMode (_hdc, 1);
 
-            Win32Utils.SelectClipRgn(_hdc, clip);
+            Win32Utils.SelectClipRgn (_hdc, clip);
 
-            Win32Utils.DeleteObject(clip);
+            Win32Utils.DeleteObject (clip);
         }
     }
 
@@ -386,38 +440,45 @@ internal sealed class GraphicsAdapter : RGraphics
     /// Set a resource (e.g. a font) for the specified device context.
     /// WARNING: Calling Font.ToHfont() many times without releasing the font handle crashes the app.
     /// </summary>
-    private void SetFont(RFont font)
+    private void SetFont (RFont font)
     {
         InitHdc();
-        Win32Utils.SelectObject(_hdc, ((FontAdapter)font).HFont);
+        Win32Utils.SelectObject (_hdc, ((FontAdapter)font).HFont);
     }
 
     /// <summary>
     /// Set the text color of the device context.
     /// </summary>
-    private void SetTextColor(Color color)
+    private void SetTextColor
+        (
+            Color color
+        )
     {
         InitHdc();
-        int rgb = (color.B & 0xFF) << 16 | (color.G & 0xFF) << 8 | color.R;
-        Win32Utils.SetTextColor(_hdc, rgb);
+        var rgb = (color.B & 0xFF) << 16 | (color.G & 0xFF) << 8 | color.R;
+        Win32Utils.SetTextColor (_hdc, rgb);
     }
 
     /// <summary>
     /// Change text align to Left-to-Right or Right-to-Left if required.
     /// </summary>
-    private void SetRtlAlignGdi(bool rtl)
+    private void SetRtlAlignGdi
+        (
+            bool rtl
+        )
     {
         if (_setRtl)
         {
             if (!rtl)
             {
-                Win32Utils.SetTextAlign(_hdc, Win32Utils.TextAlignDefault);
+                Win32Utils.SetTextAlign (_hdc, Win32Utils.TextAlignDefault);
             }
         }
         else if (rtl)
         {
-            Win32Utils.SetTextAlign(_hdc, Win32Utils.TextAlignRtl);
+            Win32Utils.SetTextAlign (_hdc, Win32Utils.TextAlignRtl);
         }
+
         _setRtl = rtl;
     }
 
@@ -428,37 +489,47 @@ internal sealed class GraphicsAdapter : RGraphics
     /// 3. Draw the text to in-memory DC<br/>
     /// 4. Copy the in-memory DC to the proper location with alpha blend<br/>
     /// </summary>
-    private static void DrawTransparentText(IntPtr hdc, string str, RFont font, Point point, Size size, Color color)
+    private static void DrawTransparentText
+        (
+            IntPtr hdc,
+            string str,
+            RFont font,
+            Point point,
+            Size size,
+            Color color
+        )
     {
-        IntPtr dib;
-        var memoryHdc = Win32Utils.CreateMemoryHdc(hdc, size.Width, size.Height, out dib);
+        var memoryHdc = Win32Utils.CreateMemoryHdc (hdc, size.Width, size.Height, out var dib);
 
         try
         {
             // copy target background to memory HDC so when copied back it will have the proper background
-            Win32Utils.BitBlt(memoryHdc, 0, 0, size.Width, size.Height, hdc, point.X, point.Y, Win32Utils.BitBltCopy);
+            Win32Utils.BitBlt (memoryHdc, 0, 0, size.Width, size.Height, hdc, point.X, point.Y, Win32Utils.BitBltCopy);
 
             // Create and select font
-            Win32Utils.SelectObject(memoryHdc, ((FontAdapter)font).HFont);
-            Win32Utils.SetTextColor(memoryHdc, (color.B & 0xFF) << 16 | (color.G & 0xFF) << 8 | color.R);
+            Win32Utils.SelectObject (memoryHdc, ((FontAdapter)font).HFont);
+            Win32Utils.SetTextColor (memoryHdc, (color.B & 0xFF) << 16 | (color.G & 0xFF) << 8 | color.R);
 
             // Draw text to memory HDC
-            Win32Utils.TextOut(memoryHdc, 0, 0, str, str.Length);
+            Win32Utils.TextOut (memoryHdc, 0, 0, str, str.Length);
 
             // copy from memory HDC to normal HDC with alpha blend so achieve the transparent text
-            Win32Utils.AlphaBlend(hdc, point.X, point.Y, size.Width, size.Height, memoryHdc, 0, 0, size.Width, size.Height, new BlendFunction(color.A));
+            Win32Utils.AlphaBlend (hdc, point.X, point.Y, size.Width, size.Height, memoryHdc, 0, 0, size.Width,
+                size.Height, new BlendFunction (color.A));
         }
         finally
         {
-            Win32Utils.ReleaseMemoryHdc(memoryHdc, dib);
+            Win32Utils.ReleaseMemoryHdc (memoryHdc, dib);
         }
     }
-#endif
 
     /// <summary>
     /// Change text align to Left-to-Right or Right-to-Left if required.
     /// </summary>
-    private void SetRtlAlignGdiPlus(bool rtl)
+    private void SetRtlAlignGdiPlus
+        (
+            bool rtl
+        )
     {
         if (_setRtl)
         {
@@ -471,6 +542,7 @@ internal sealed class GraphicsAdapter : RGraphics
         {
             _stringFormat2.FormatFlags |= StringFormatFlags.DirectionRightToLeft;
         }
+
         _setRtl = rtl;
     }
 
