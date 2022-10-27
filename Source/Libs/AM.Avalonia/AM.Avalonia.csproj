@@ -23,32 +23,32 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\AM.Core5\AM.Core5.csproj"/>
+        <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
     </ItemGroup>
 
     <!-- Централизованное управление пакетами -->
     <ItemGroup>
-        <PackageReference Include="Avalonia"/>
-        <PackageReference Include="Avalonia.Controls.DataGrid"/>
-        <PackageReference Include="Avalonia.Desktop"/>
-        <PackageReference Include="Avalonia.Diagnostics"/>
-        <PackageReference Include="Avalonia.ReactiveUI"/>
-        <PackageReference Include="Avalonia.Xaml.Behaviors"/>
-        <PackageReference Include="Avalonia.Xaml.Interactions"/>
-        <PackageReference Include="Avalonia.Xaml.Interactivity"/>
-        <PackageReference Include="DynamicData"/>
-        <PackageReference Include="DynamicData.ReactiveUI"/>
-        <PackageReference Include="GridExtra.Avalonia"/>
-        <PackageReference Include="Microsoft.Extensions.Logging"/>
-        <PackageReference Include="Newtonsoft.Json"/>
-        <PackageReference Include="ReactiveHistory"/>
-        <PackageReference Include="ReactiveUI"/>
-        <PackageReference Include="SkiaSharp"/>
-        <PackageReference Include="XamlColorSchemeGenerator"/>
+        <PackageReference Include="Avalonia" />
+        <PackageReference Include="Avalonia.Controls.DataGrid" />
+        <PackageReference Include="Avalonia.Desktop" />
+        <PackageReference Include="Avalonia.Diagnostics" />
+        <PackageReference Include="Avalonia.ReactiveUI" />
+        <PackageReference Include="Avalonia.Xaml.Behaviors" />
+        <PackageReference Include="Avalonia.Xaml.Interactions" />
+        <PackageReference Include="Avalonia.Xaml.Interactivity" />
+        <PackageReference Include="DynamicData" />
+        <PackageReference Include="DynamicData.ReactiveUI" />
+        <PackageReference Include="GridExtra.Avalonia" />
+        <PackageReference Include="Microsoft.Extensions.Logging" />
+        <PackageReference Include="Newtonsoft.Json" />
+        <PackageReference Include="ReactiveHistory" />
+        <PackageReference Include="ReactiveUI" />
+        <PackageReference Include="SkiaSharp" />
+        <PackageReference Include="XamlColorSchemeGenerator" />
     </ItemGroup>
 
     <ItemGroup>
-        <AvaloniaXaml Remove="Source\ExtendedToolkit\Styles\Themes\Theme.Template.axaml"/>
+        <AvaloniaXaml Remove="Source\ExtendedToolkit\Styles\Themes\Theme.Template.axaml" />
     </ItemGroup>
 
     <ItemGroup>
