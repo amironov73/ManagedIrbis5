@@ -34,7 +34,7 @@ foreach (book in books)
             {
                 field.SetSubFieldValue ('s', theDate)
                 field.SetSubFieldValue ('!', theFund)
-                modified.Add (one)
+                modified.Add (book)
             }
         }
     }

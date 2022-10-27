@@ -1,0 +1,41 @@
+﻿//
+// Пометка книг из коллекции Л. Н. Арсеньевой
+//
+
+connect("host=127.0.0.1;port=6666;user=librarian;password=secret;db=IBIS;")
+if (!is_connected())
+{
+    error ("Not connected")
+    exit()
+}
+
+//=================================
+
+ksuNumber = "2018/42"       // номер помечаемой партии
+collection = "В-Арсеньева"  // код коллекции
+
+expression = "NKSU=" + ksuNumber
+books = search_read (expression)
+println ("Books found: ", len (books))
+modified = []
+
+foreach (book in books)
+{
+    foreach (one in get_exemplars (book))
+    {
+        if (one.KsuNumber1 == ksuNumber)
+        {
+            println (one)
+            field = one.Field
+            field.SetSubFieldValue ('q', collection)
+            modified.Add (book)
+        }
+    }
+}
+
+batch_write (modified)
+
+//=================================
+
+disconnect()
+println ("THAT'S ALL, FOLKS!")
