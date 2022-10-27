@@ -12,10 +12,13 @@
 
 #region Using directives
 
+using System;
+
 using AM.Text.Output;
 
 using Avalonia.Controls;
 using Avalonia.Media;
+using Avalonia.Styling;
 
 #endregion
 
@@ -27,7 +30,7 @@ namespace AM.Avalonia.Controls;
 /// Текстовый бокс для вывода логов.
 /// </summary>
 public sealed class LogBox
-    : TextBox
+    : TextBox, IStyleable
 {
     #region Properties
 
@@ -50,6 +53,13 @@ public sealed class LogBox
 
         Output = new TextBoxOutput (this);
     }
+
+    #endregion
+
+    #region IStyleable members
+
+    /// <inheritdoc cref="IStyleable.StyleKey"/>
+    Type IStyleable.StyleKey => typeof (TextBox);
 
     #endregion
 

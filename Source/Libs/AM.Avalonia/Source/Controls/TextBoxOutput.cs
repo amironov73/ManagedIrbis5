@@ -67,7 +67,7 @@ public sealed class TextBoxOutput
     {
         if (!string.IsNullOrEmpty (text))
         {
-            Dispatcher.UIThread.Post (() => TextBox.Text += text + TextBox.NewLine);
+            Dispatcher.UIThread.Post (() => TextBox.Text += text);
         }
     }
 

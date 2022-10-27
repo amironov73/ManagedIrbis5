@@ -19,6 +19,11 @@
 #region Using directives
 
 using System;
+using System.Diagnostics;
+using System.IO;
+using System.Reflection;
+
+using AM.Text.Output;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -265,6 +270,79 @@ public static class AvaloniaUtility
         block.Padding = new Thickness (left, top, right, bottom);
 
         return block;
+    }
+
+    /// <summary>
+    /// Добавление в заголовок окна информации о версии сборки.
+    /// </summary>
+    public static void ShowVersionInfoInTitle
+        (
+            this Window window
+        )
+    {
+        Sure.NotNull (window);
+
+        var assembly = Assembly.GetEntryAssembly();
+        var location = assembly?.Location;
+        if (string.IsNullOrEmpty (location))
+        {
+            // TODO: в single-exe-application .Location возвращает string.Empty
+            // consider using the AppContext.BaseDirectory
+            return;
+        }
+
+        // TODO: в single-exe-application .Location возвращает string.Empty
+        // consider using the AppContext.BaseDirectory
+        var fvi = FileVersionInfo.GetVersionInfo (location);
+        var fi = new FileInfo (location);
+
+        window.Title += $": version {fvi.FileVersion} from {fi.LastWriteTime.ToShortDateString()}";
+    }
+
+    /// <summary>
+    /// Print system information in abstract output.
+    /// </summary>
+    public static void PrintSystemInformation
+        (
+            this AbstractOutput? output
+        )
+    {
+        if (output is not null)
+        {
+            output.WriteLine
+                (
+                    "OS version: {0}",
+                    Environment.OSVersion
+                );
+            output.WriteLine
+                (
+                    "Framework version: {0}",
+                    Environment.Version
+                );
+            var assembly = Assembly.GetEntryAssembly();
+            var vi = assembly?.GetName().Version;
+            if (assembly?.Location is null)
+            {
+                // TODO: в single-exe-application .Location возвращает string.Empty
+                // consider using the AppContext.BaseDirectory
+                return;
+            }
+
+            // TODO: в single-exe-application .Location возвращает string.Empty
+            // consider using the AppContext.BaseDirectory
+            var fi = new FileInfo (assembly.Location);
+            output.WriteLine
+                (
+                    "Application version: {0} ({1})",
+                    vi.ToVisibleString(),
+                    fi.LastWriteTime.ToShortDateString()
+                );
+            output.WriteLine
+                (
+                    "Memory: {0} Mb",
+                    GC.GetTotalMemory (false) / 1024
+                );
+        }
     }
 
     #endregion
