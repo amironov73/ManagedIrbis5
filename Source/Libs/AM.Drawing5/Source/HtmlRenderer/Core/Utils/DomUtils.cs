@@ -38,7 +38,11 @@ internal sealed class DomUtils
     /// <param name="box">the box to check</param>
     /// <param name="location">the location to check</param>
     /// <returns>true - location inside the box, false - otherwise</returns>
-    public static bool IsInBox (CssBox box, RPoint location)
+    public static bool IsInBox
+        (
+            CssBox box,
+            RPoint location
+        )
     {
         foreach (var line in box.Rectangles)
         {
@@ -64,11 +68,14 @@ internal sealed class DomUtils
     /// </summary>
     /// <param name="box">the box to check</param>
     /// <returns>true - only inline child boxes, false - otherwise</returns>
-    public static bool ContainsInlinesOnly (CssBox box)
+    public static bool ContainsInlinesOnly
+        (
+            CssBox box
+        )
     {
-        foreach (var b in box.Boxes)
+        foreach (var childBox in box.Boxes)
         {
-            if (!b.IsInline)
+            if (!childBox.IsInline)
             {
                 return false;
             }
@@ -254,7 +261,7 @@ internal sealed class DomUtils
     /// <returns>css link box if exists or null</returns>
     public static CssBox? GetCssBox
         (
-            CssBox box,
+            CssBox? box,
             RPoint location,
             bool visible = true
         )

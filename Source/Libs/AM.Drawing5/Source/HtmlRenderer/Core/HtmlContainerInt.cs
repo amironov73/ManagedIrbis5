@@ -99,11 +99,6 @@ public sealed class HtmlContainerInt
     private readonly CssParser _cssParser;
 
     /// <summary>
-    /// the root css box of the parsed html
-    /// </summary>
-    private CssBox _root;
-
-    /// <summary>
     /// list of all css boxes that have ":hover" selector on them
     /// </summary>
     private List<HoverBoxBlock> _hoverBoxes;
@@ -111,22 +106,12 @@ public sealed class HtmlContainerInt
     /// <summary>
     /// Handler for text selection in the html.
     /// </summary>
-    private SelectionHandler _selectionHandler;
+    private SelectionHandler? _selectionHandler;
 
     /// <summary>
     /// Handler for downloading of images in the html
     /// </summary>
-    private ImageDownloader _imageDownloader;
-
-    /// <summary>
-    /// the text fore color use for selected text
-    /// </summary>
-    private RColor _selectionForeColor;
-
-    /// <summary>
-    /// the back-color to use for selected text
-    /// </summary>
-    private RColor _selectionBackColor;
+    private ImageDownloader? _imageDownloader;
 
     /// <summary>
     /// the parsed stylesheet data used for handling the html
@@ -148,11 +133,6 @@ public sealed class HtmlContainerInt
     /// Set zero for unlimited.<br/>
     /// </summary>
     private RSize _maxSize;
-
-    /// <summary>
-    /// Gets or sets the scroll offset of the document for scroll controls
-    /// </summary>
-    private RPoint _scrollOffset;
 
     /// <summary>
     /// The actual size of the rendered html (after layout)
@@ -318,11 +298,7 @@ public sealed class HtmlContainerInt
     /// Element that is rendered at location (50,100) with offset of (0,200) will not be rendered as it
     /// will be at -100 therefore outside the client rectangle.
     /// </example>
-    public RPoint ScrollOffset
-    {
-        get { return _scrollOffset; }
-        set { _scrollOffset = value; }
-    }
+    public RPoint ScrollOffset { get; set; }
 
     /// <summary>
     /// The top-left most location of the rendered html.<br/>
@@ -352,10 +328,13 @@ public sealed class HtmlContainerInt
     /// </summary>
     public RSize ActualSize
     {
-        get { return _actualSize; }
-        set { _actualSize = value; }
+        get => _actualSize;
+        set => _actualSize = value;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public RSize PageSize { get; set; }
 
     /// <summary>
@@ -363,7 +342,7 @@ public sealed class HtmlContainerInt
     /// </summary>
     public int MarginTop
     {
-        get { return _marginTop; }
+        get => _marginTop;
         set
         {
             if (value > -1)
@@ -378,7 +357,7 @@ public sealed class HtmlContainerInt
     /// </summary>
     public int MarginBottom
     {
-        get { return _marginBottom; }
+        get => _marginBottom;
         set
         {
             if (value > -1)
@@ -433,44 +412,27 @@ public sealed class HtmlContainerInt
     /// <summary>
     /// Get the currently selected text segment in the html.
     /// </summary>
-    public string SelectedText
-    {
-        get { return _selectionHandler.GetSelectedText(); }
-    }
+    public string? SelectedText => _selectionHandler?.GetSelectedText();
 
     /// <summary>
     /// Copy the currently selected html segment with style.
     /// </summary>
-    public string SelectedHtml
-    {
-        get { return _selectionHandler.GetSelectedHtml(); }
-    }
+    public string? SelectedHtml => _selectionHandler?.GetSelectedHtml();
 
     /// <summary>
     /// the root css box of the parsed html
     /// </summary>
-    internal CssBox Root
-    {
-        get { return _root; }
-    }
+    internal CssBox? Root { get; private set; }
 
     /// <summary>
     /// the text fore color use for selected text
     /// </summary>
-    internal RColor SelectionForeColor
-    {
-        get { return _selectionForeColor; }
-        set { _selectionForeColor = value; }
-    }
+    internal RColor SelectionForeColor { get; set; }
 
     /// <summary>
     /// the back-color to use for selected text
     /// </summary>
-    internal RColor SelectionBackColor
-    {
-        get { return _selectionBackColor; }
-        set { _selectionBackColor = value; }
-    }
+    internal RColor SelectionBackColor { get; set; }
 
     /// <summary>
     /// Init with optional document and stylesheet.
@@ -489,11 +451,11 @@ public sealed class HtmlContainerInt
             _loadComplete = false;
             _cssData = baseCssData ?? _adapter.DefaultCssData;
 
-            DomParser parser = new DomParser (_cssParser);
-            _root = parser.GenerateCssTree (htmlSource, this, ref _cssData);
-            if (_root != null)
+            var parser = new DomParser (_cssParser);
+            Root = parser.GenerateCssTree (htmlSource, this, ref _cssData);
+            if (Root != null)
             {
-                _selectionHandler = new SelectionHandler (_root);
+                _selectionHandler = new SelectionHandler (Root);
                 _imageDownloader = new ImageDownloader();
             }
         }
@@ -504,10 +466,10 @@ public sealed class HtmlContainerInt
     /// </summary>
     public void Clear()
     {
-        if (_root != null)
+        if (Root != null)
         {
-            _root.Dispose();
-            _root = null;
+            Root.Dispose();
+            Root = null;
 
             if (_selectionHandler != null)
             {
@@ -546,7 +508,7 @@ public sealed class HtmlContainerInt
     /// <returns>generated html</returns>
     public string GetHtml (HtmlGenerationStyle styleGen = HtmlGenerationStyle.Inline)
     {
-        return DomUtils.GenerateHtml (_root, styleGen);
+        return DomUtils.GenerateHtml (Root, styleGen);
     }
 
     /// <summary>
@@ -556,11 +518,15 @@ public sealed class HtmlContainerInt
     /// <param name="location">the location to find the attribute at</param>
     /// <param name="attribute">the attribute key to get value by</param>
     /// <returns>found attribute value or null if not found</returns>
-    public string GetAttributeAt (RPoint location, string attribute)
+    public string? GetAttributeAt
+        (
+            RPoint location,
+            string attribute
+        )
     {
         ArgChecker.AssertArgNotNullOrEmpty (attribute, "attribute");
 
-        var cssBox = DomUtils.GetCssBox (_root, OffsetByScroll (location));
+        var cssBox = DomUtils.GetCssBox (Root, OffsetByScroll (location));
         return cssBox != null ? DomUtils.GetAttribute (cssBox, attribute) : null;
     }
 
@@ -571,7 +537,7 @@ public sealed class HtmlContainerInt
     public List<LinkElementData<RRect>> GetLinks()
     {
         var linkBoxes = new List<CssBox>();
-        DomUtils.GetAllLinkBoxes (_root, linkBoxes);
+        DomUtils.GetAllLinkBoxes (Root, linkBoxes);
 
         var linkElements = new List<LinkElementData<RRect>>();
         foreach (var box in linkBoxes)
@@ -590,7 +556,7 @@ public sealed class HtmlContainerInt
     /// <returns>css link href if exists or null</returns>
     public string GetLinkAt (RPoint location)
     {
-        var link = DomUtils.GetLinkBox (_root, OffsetByScroll (location));
+        var link = DomUtils.GetLinkBox (Root, OffsetByScroll (location));
         return link != null ? link.HrefLink : null;
     }
 
@@ -605,7 +571,7 @@ public sealed class HtmlContainerInt
     {
         ArgChecker.AssertArgNotNullOrEmpty (elementId, "elementId");
 
-        var box = DomUtils.GetBoxById (_root, elementId.ToLower());
+        var box = DomUtils.GetBoxById (Root, elementId.ToLower());
         return box != null ? CommonUtils.GetFirstValueOrDefault (box.Rectangles, box.Bounds) : (RRect?)null;
     }
 
@@ -618,25 +584,25 @@ public sealed class HtmlContainerInt
         ArgChecker.AssertArgNotNull (g, "g");
 
         _actualSize = RSize.Empty;
-        if (_root != null)
+        if (Root != null)
         {
             // if width is not restricted we set it to large value to get the actual later
-            _root.Size = new RSize (_maxSize.Width > 0 ? _maxSize.Width : 99999, 0);
-            _root.Location = _location;
-            _root.PerformLayout (g);
+            Root.Size = new RSize (_maxSize.Width > 0 ? _maxSize.Width : 99999, 0);
+            Root.Location = _location;
+            Root.PerformLayout (g);
 
             if (_maxSize.Width <= 0.1)
             {
                 // in case the width is not restricted we need to double layout, first will find the width so second can layout by it (center alignment)
-                _root.Size = new RSize ((int)Math.Ceiling (_actualSize.Width), 0);
+                Root.Size = new RSize ((int)Math.Ceiling (_actualSize.Width), 0);
                 _actualSize = RSize.Empty;
-                _root.PerformLayout (g);
+                Root.PerformLayout (g);
             }
 
             if (!_loadComplete)
             {
                 _loadComplete = true;
-                EventHandler handler = LoadComplete;
+                var handler = LoadComplete;
                 if (handler != null)
                 {
                     handler (this, EventArgs.Empty);
@@ -663,9 +629,9 @@ public sealed class HtmlContainerInt
             g.PushClip (new RRect (MarginLeft, MarginTop, PageSize.Width, PageSize.Height));
         }
 
-        if (_root != null)
+        if (Root != null)
         {
-            _root.Paint (g);
+            Root.Paint (g);
         }
 
         g.PopClip();
@@ -711,7 +677,7 @@ public sealed class HtmlContainerInt
                 if (!ignore && e.LeftButton)
                 {
                     var loc = OffsetByScroll (location);
-                    var link = DomUtils.GetLinkBox (_root, loc);
+                    var link = DomUtils.GetLinkBox (Root, loc);
                     if (link != null)
                     {
                         HandleLinkClicked (parent, location, link);
@@ -756,9 +722,13 @@ public sealed class HtmlContainerInt
     /// </summary>
     /// <param name="parent">the control hosting the html to set cursor and invalidate</param>
     /// <param name="location">the location of the mouse</param>
-    public void HandleMouseMove (RControl parent, RPoint location)
+    public void HandleMouseMove
+        (
+            RControl parent,
+            RPoint location
+        )
     {
-        ArgChecker.AssertArgNotNull (parent, "parent");
+        Sure.NotNull (parent);
 
         try
         {
@@ -857,7 +827,7 @@ public sealed class HtmlContainerInt
     {
         try
         {
-            EventHandler<HtmlStylesheetLoadEventArgs> handler = StylesheetLoad;
+            var handler = StylesheetLoad;
             if (handler != null)
             {
                 handler (this, args);
@@ -877,7 +847,7 @@ public sealed class HtmlContainerInt
     {
         try
         {
-            EventHandler<HtmlImageLoadEventArgs> handler = ImageLoad;
+            var handler = ImageLoad;
             if (handler != null)
             {
                 handler (this, args);
@@ -897,7 +867,7 @@ public sealed class HtmlContainerInt
     {
         try
         {
-            EventHandler<HtmlRefreshEventArgs> handler = Refresh;
+            var handler = Refresh;
             if (handler != null)
             {
                 handler (this, new HtmlRefreshEventArgs (layout));
@@ -938,9 +908,14 @@ public sealed class HtmlContainerInt
     /// <param name="parent">the control hosting the html to invalidate</param>
     /// <param name="location">the location of the mouse</param>
     /// <param name="link">the link that was clicked</param>
-    internal void HandleLinkClicked (RControl parent, RPoint location, CssBox link)
+    internal void HandleLinkClicked
+        (
+            RControl? parent,
+            RPoint location,
+            CssBox link
+        )
     {
-        EventHandler<HtmlLinkClickedEventArgs> clickHandler = LinkClicked;
+        var clickHandler = LinkClicked;
         if (clickHandler != null)
         {
             var args = new HtmlLinkClickedEventArgs (link.HrefLink, link.HtmlTag.Attributes);
@@ -963,7 +938,7 @@ public sealed class HtmlContainerInt
         {
             if (link.HrefLink.StartsWith ("#") && link.HrefLink.Length > 1)
             {
-                EventHandler<HtmlScrollEventArgs> scrollHandler = ScrollChange;
+                var scrollHandler = ScrollChange;
                 if (scrollHandler != null)
                 {
                     var rect = GetElementRectangle (link.HrefLink.Substring (1));
@@ -1060,12 +1035,12 @@ public sealed class HtmlContainerInt
             }
 
             _cssData = null;
-            if (_root != null)
+            if (Root != null)
             {
-                _root.Dispose();
+                Root.Dispose();
             }
 
-            _root = null;
+            Root = null;
             if (_selectionHandler != null)
             {
                 _selectionHandler.Dispose();

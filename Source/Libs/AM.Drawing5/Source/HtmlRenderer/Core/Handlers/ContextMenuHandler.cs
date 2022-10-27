@@ -29,7 +29,7 @@ namespace AM.Drawing.HtmlRenderer.Core.Handlers;
 /// <summary>
 /// Handle context menu.
 /// </summary>
-internal sealed class ContextMenuHandler 
+internal sealed class ContextMenuHandler
     : IDisposable
 {
     #region Fields and Consts
@@ -92,22 +92,22 @@ internal sealed class ContextMenuHandler
     /// <summary>
     /// the last context menu shown
     /// </summary>
-    private RContextMenu _contextMenu;
+    private RContextMenu? _contextMenu;
 
     /// <summary>
     /// the control that the context menu was shown on
     /// </summary>
-    private RControl _parentControl;
+    private RControl? _parentControl;
 
     /// <summary>
     /// the css rectangle that context menu shown on
     /// </summary>
-    private CssRect _currentRect;
+    private CssRect? _currentRect;
 
     /// <summary>
     /// the css link box that context menu shown on
     /// </summary>
-    private CssBox _currentLink;
+    private CssBox? _currentLink;
 
     #endregion
 
@@ -117,7 +117,7 @@ internal sealed class ContextMenuHandler
     /// </summary>
     static ContextMenuHandler()
     {
-        if (CultureInfo.CurrentUICulture.Name.StartsWith("fr", StringComparison.InvariantCultureIgnoreCase))
+        if (CultureInfo.CurrentUICulture.Name.StartsWith ("fr", StringComparison.InvariantCultureIgnoreCase))
         {
             _selectAll = "Tout sélectionner";
             _copy = "Copier";
@@ -129,7 +129,7 @@ internal sealed class ContextMenuHandler
             _openVideo = "Ouvrir la vidéo";
             _copyVideoUrl = "Copier l'URL de l'vidéo";
         }
-        else if (CultureInfo.CurrentUICulture.Name.StartsWith("de", StringComparison.InvariantCultureIgnoreCase))
+        else if (CultureInfo.CurrentUICulture.Name.StartsWith ("de", StringComparison.InvariantCultureIgnoreCase))
         {
             _selectAll = "Alle auswählen";
             _copy = "Kopieren";
@@ -141,7 +141,7 @@ internal sealed class ContextMenuHandler
             _openVideo = "Video öffnen";
             _copyVideoUrl = "Video-URL kopieren";
         }
-        else if (CultureInfo.CurrentUICulture.Name.StartsWith("it", StringComparison.InvariantCultureIgnoreCase))
+        else if (CultureInfo.CurrentUICulture.Name.StartsWith ("it", StringComparison.InvariantCultureIgnoreCase))
         {
             _selectAll = "Seleziona tutto";
             _copy = "Copia";
@@ -153,7 +153,7 @@ internal sealed class ContextMenuHandler
             _openVideo = "Apri il video";
             _copyVideoUrl = "Copia URL video";
         }
-        else if (CultureInfo.CurrentUICulture.Name.StartsWith("es", StringComparison.InvariantCultureIgnoreCase))
+        else if (CultureInfo.CurrentUICulture.Name.StartsWith ("es", StringComparison.InvariantCultureIgnoreCase))
         {
             _selectAll = "Seleccionar todo";
             _copy = "Copiar";
@@ -165,7 +165,7 @@ internal sealed class ContextMenuHandler
             _openVideo = "Abrir video";
             _copyVideoUrl = "Copiar URL de la video";
         }
-        else if (CultureInfo.CurrentUICulture.Name.StartsWith("ru", StringComparison.InvariantCultureIgnoreCase))
+        else if (CultureInfo.CurrentUICulture.Name.StartsWith ("ru", StringComparison.InvariantCultureIgnoreCase))
         {
             _selectAll = "Выбрать все";
             _copy = "Копировать";
@@ -177,7 +177,7 @@ internal sealed class ContextMenuHandler
             _openVideo = "Открыть видео";
             _copyVideoUrl = "Копировать адрес видео";
         }
-        else if (CultureInfo.CurrentUICulture.Name.StartsWith("sv", StringComparison.InvariantCultureIgnoreCase))
+        else if (CultureInfo.CurrentUICulture.Name.StartsWith ("sv", StringComparison.InvariantCultureIgnoreCase))
         {
             _selectAll = "Välj allt";
             _copy = "Kopiera";
@@ -189,7 +189,7 @@ internal sealed class ContextMenuHandler
             _openVideo = "Öppna video";
             _copyVideoUrl = "Kopiera video URL";
         }
-        else if (CultureInfo.CurrentUICulture.Name.StartsWith("hu", StringComparison.InvariantCultureIgnoreCase))
+        else if (CultureInfo.CurrentUICulture.Name.StartsWith ("hu", StringComparison.InvariantCultureIgnoreCase))
         {
             _selectAll = "Összes kiválasztása";
             _copy = "Másolás";
@@ -201,7 +201,7 @@ internal sealed class ContextMenuHandler
             _openVideo = "Videó megnyitása";
             _copyVideoUrl = "Videó URL másolása";
         }
-        else if (CultureInfo.CurrentUICulture.Name.StartsWith("cs", StringComparison.InvariantCultureIgnoreCase))
+        else if (CultureInfo.CurrentUICulture.Name.StartsWith ("cs", StringComparison.InvariantCultureIgnoreCase))
         {
             _selectAll = "Vybrat vše";
             _copy = "Kopírovat";
@@ -213,7 +213,7 @@ internal sealed class ContextMenuHandler
             _openVideo = "Otevřít video";
             _copyVideoUrl = "Kopírovat URL video";
         }
-        else if (CultureInfo.CurrentUICulture.Name.StartsWith("da", StringComparison.InvariantCultureIgnoreCase))
+        else if (CultureInfo.CurrentUICulture.Name.StartsWith ("da", StringComparison.InvariantCultureIgnoreCase))
         {
             _selectAll = "Vælg alt";
             _copy = "Kopiér";
@@ -225,7 +225,7 @@ internal sealed class ContextMenuHandler
             _openVideo = "Åbn video";
             _copyVideoUrl = "Kopier video-URL";
         }
-        else if (CultureInfo.CurrentUICulture.Name.StartsWith("nl", StringComparison.InvariantCultureIgnoreCase))
+        else if (CultureInfo.CurrentUICulture.Name.StartsWith ("nl", StringComparison.InvariantCultureIgnoreCase))
         {
             _selectAll = "Alles selecteren";
             _copy = "Kopiëren";
@@ -237,7 +237,7 @@ internal sealed class ContextMenuHandler
             _openVideo = "Video openen";
             _copyVideoUrl = "URL video kopiëren";
         }
-        else if (CultureInfo.CurrentUICulture.Name.StartsWith("fi", StringComparison.InvariantCultureIgnoreCase))
+        else if (CultureInfo.CurrentUICulture.Name.StartsWith ("fi", StringComparison.InvariantCultureIgnoreCase))
         {
             _selectAll = "Valitse kaikki";
             _copy = "Kopioi";
@@ -268,10 +268,14 @@ internal sealed class ContextMenuHandler
     /// </summary>
     /// <param name="selectionHandler">the selection handler linked to the context menu handler</param>
     /// <param name="htmlContainer">the html container the handler is on</param>
-    public ContextMenuHandler(SelectionHandler selectionHandler, HtmlContainerInt htmlContainer)
+    public ContextMenuHandler
+        (
+            SelectionHandler selectionHandler,
+            HtmlContainerInt htmlContainer
+        )
     {
-        ArgChecker.AssertArgNotNull(selectionHandler, "selectionHandler");
-        ArgChecker.AssertArgNotNull(htmlContainer, "htmlContainer");
+        Sure.NotNull (selectionHandler);
+        Sure.NotNull (htmlContainer);
 
         _selectionHandler = selectionHandler;
         _htmlContainer = htmlContainer;
@@ -283,7 +287,12 @@ internal sealed class ContextMenuHandler
     /// <param name="parent">the parent control to show the context menu on</param>
     /// <param name="rect">the rectangle that was clicked to show context menu</param>
     /// <param name="link">the link that was clicked to show context menu on</param>
-    public void ShowContextMenu(RControl parent, CssRect rect, CssBox link)
+    public void ShowContextMenu
+        (
+            RControl parent,
+            CssRect? rect,
+            CssBox? link
+        )
     {
         try
         {
@@ -300,46 +309,49 @@ internal sealed class ContextMenuHandler
                 if (link != null)
                 {
                     isVideo = link is CssBoxFrame && ((CssBoxFrame)link).IsVideo;
-                    var linkExist = !string.IsNullOrEmpty(link.HrefLink);
-                    _contextMenu.AddItem(isVideo ? _openVideo : _openLink, linkExist, OnOpenLinkClick);
+                    var linkExist = !string.IsNullOrEmpty (link.HrefLink);
+                    _contextMenu.AddItem (isVideo ? _openVideo : _openLink, linkExist, OnOpenLinkClick);
                     if (_htmlContainer.IsSelectionEnabled)
                     {
-                        _contextMenu.AddItem(isVideo ? _copyVideoUrl : _copyLink, linkExist, OnCopyLinkClick);
+                        _contextMenu.AddItem (isVideo ? _copyVideoUrl : _copyLink, linkExist, OnCopyLinkClick);
                     }
+
                     _contextMenu.AddDivider();
                 }
 
                 if (rect.IsImage && !isVideo)
                 {
-                    _contextMenu.AddItem(_saveImage, rect.Image != null, OnSaveImageClick);
+                    _contextMenu.AddItem (_saveImage, rect.Image != null, OnSaveImageClick);
                     if (_htmlContainer.IsSelectionEnabled)
                     {
-                        _contextMenu.AddItem(_copyImageLink, !string.IsNullOrEmpty(_currentRect.OwnerBox.GetAttribute("src")), OnCopyImageLinkClick);
-                        _contextMenu.AddItem(_copyImage, rect.Image != null, OnCopyImageClick);
+                        _contextMenu.AddItem (_copyImageLink,
+                            !string.IsNullOrEmpty (_currentRect.OwnerBox.GetAttribute ("src")), OnCopyImageLinkClick);
+                        _contextMenu.AddItem (_copyImage, rect.Image != null, OnCopyImageClick);
                     }
+
                     _contextMenu.AddDivider();
                 }
 
                 if (_htmlContainer.IsSelectionEnabled)
                 {
-                    _contextMenu.AddItem(_copy, rect.Selected, OnCopyClick);
+                    _contextMenu.AddItem (_copy, rect.Selected, OnCopyClick);
                 }
             }
 
             if (_htmlContainer.IsSelectionEnabled)
             {
-                _contextMenu.AddItem(_selectAll, true, OnSelectAllClick);
+                _contextMenu.AddItem (_selectAll, true, OnSelectAllClick);
             }
 
             if (_contextMenu.ItemsCount > 0)
             {
                 _contextMenu.RemoveLastDivider();
-                _contextMenu.Show(parent, parent.MouseLocation);
+                _contextMenu.Show (parent, parent.MouseLocation);
             }
         }
         catch (Exception ex)
         {
-            _htmlContainer.ReportError(HtmlRenderErrorType.ContextMenu, "Failed to show context menu", ex);
+            _htmlContainer.ReportError (HtmlRenderErrorType.ContextMenu, "Failed to show context menu", ex);
         }
     }
 
@@ -370,17 +382,22 @@ internal sealed class ContextMenuHandler
             _currentLink = null;
         }
         catch
-        { }
+        {
+        }
     }
 
     /// <summary>
     /// Handle link click.
     /// </summary>
-    private void OnOpenLinkClick(object sender, EventArgs eventArgs)
+    private void OnOpenLinkClick
+        (
+            object? sender,
+            EventArgs eventArgs
+        )
     {
         try
         {
-            _currentLink.HtmlContainer.HandleLinkClicked(_parentControl, _parentControl.MouseLocation, _currentLink);
+            _currentLink?.HtmlContainer?.HandleLinkClicked (_parentControl, _parentControl.MouseLocation, _currentLink);
         }
         catch (HtmlLinkClickedException)
         {
@@ -388,7 +405,7 @@ internal sealed class ContextMenuHandler
         }
         catch (Exception ex)
         {
-            _htmlContainer.ReportError(HtmlRenderErrorType.ContextMenu, "Failed to open link", ex);
+            _htmlContainer.ReportError (HtmlRenderErrorType.ContextMenu, "Failed to open link", ex);
         }
         finally
         {
@@ -399,15 +416,15 @@ internal sealed class ContextMenuHandler
     /// <summary>
     /// Copy the href of a link to clipboard.
     /// </summary>
-    private void OnCopyLinkClick(object sender, EventArgs eventArgs)
+    private void OnCopyLinkClick (object sender, EventArgs eventArgs)
     {
         try
         {
-            _htmlContainer.Adapter.SetToClipboard(_currentLink.HrefLink);
+            _htmlContainer.Adapter.SetToClipboard (_currentLink.HrefLink);
         }
         catch (Exception ex)
         {
-            _htmlContainer.ReportError(HtmlRenderErrorType.ContextMenu, "Failed to copy link url to clipboard", ex);
+            _htmlContainer.ReportError (HtmlRenderErrorType.ContextMenu, "Failed to copy link url to clipboard", ex);
         }
         finally
         {
@@ -418,16 +435,17 @@ internal sealed class ContextMenuHandler
     /// <summary>
     /// Open save as dialog to save the image
     /// </summary>
-    private void OnSaveImageClick(object sender, EventArgs eventArgs)
+    private void OnSaveImageClick (object sender, EventArgs eventArgs)
     {
         try
         {
-            var imageSrc = _currentRect.OwnerBox.GetAttribute("src");
-            _htmlContainer.Adapter.SaveToFile(_currentRect.Image, Path.GetFileName(imageSrc) ?? "image", Path.GetExtension(imageSrc) ?? "png");
+            var imageSrc = _currentRect.OwnerBox.GetAttribute ("src");
+            _htmlContainer.Adapter.SaveToFile (_currentRect.Image, Path.GetFileName (imageSrc) ?? "image",
+                Path.GetExtension (imageSrc) ?? "png");
         }
         catch (Exception ex)
         {
-            _htmlContainer.ReportError(HtmlRenderErrorType.ContextMenu, "Failed to save image", ex);
+            _htmlContainer.ReportError (HtmlRenderErrorType.ContextMenu, "Failed to save image", ex);
         }
         finally
         {
@@ -438,15 +456,15 @@ internal sealed class ContextMenuHandler
     /// <summary>
     /// Copy the image source to clipboard.
     /// </summary>
-    private void OnCopyImageLinkClick(object sender, EventArgs eventArgs)
+    private void OnCopyImageLinkClick (object sender, EventArgs eventArgs)
     {
         try
         {
-            _htmlContainer.Adapter.SetToClipboard(_currentRect.OwnerBox.GetAttribute("src"));
+            _htmlContainer.Adapter.SetToClipboard (_currentRect.OwnerBox.GetAttribute ("src"));
         }
         catch (Exception ex)
         {
-            _htmlContainer.ReportError(HtmlRenderErrorType.ContextMenu, "Failed to copy image url to clipboard", ex);
+            _htmlContainer.ReportError (HtmlRenderErrorType.ContextMenu, "Failed to copy image url to clipboard", ex);
         }
         finally
         {
@@ -457,15 +475,15 @@ internal sealed class ContextMenuHandler
     /// <summary>
     /// Copy image object to clipboard.
     /// </summary>
-    private void OnCopyImageClick(object sender, EventArgs eventArgs)
+    private void OnCopyImageClick (object sender, EventArgs eventArgs)
     {
         try
         {
-            _htmlContainer.Adapter.SetToClipboard(_currentRect.Image);
+            _htmlContainer.Adapter.SetToClipboard (_currentRect.Image);
         }
         catch (Exception ex)
         {
-            _htmlContainer.ReportError(HtmlRenderErrorType.ContextMenu, "Failed to copy image to clipboard", ex);
+            _htmlContainer.ReportError (HtmlRenderErrorType.ContextMenu, "Failed to copy image to clipboard", ex);
         }
         finally
         {
@@ -476,7 +494,7 @@ internal sealed class ContextMenuHandler
     /// <summary>
     /// Copy selected text.
     /// </summary>
-    private void OnCopyClick(object sender, EventArgs eventArgs)
+    private void OnCopyClick (object sender, EventArgs eventArgs)
     {
         try
         {
@@ -484,7 +502,7 @@ internal sealed class ContextMenuHandler
         }
         catch (Exception ex)
         {
-            _htmlContainer.ReportError(HtmlRenderErrorType.ContextMenu, "Failed to copy text to clipboard", ex);
+            _htmlContainer.ReportError (HtmlRenderErrorType.ContextMenu, "Failed to copy text to clipboard", ex);
         }
         finally
         {
@@ -495,15 +513,15 @@ internal sealed class ContextMenuHandler
     /// <summary>
     /// Select all text.
     /// </summary>
-    private void OnSelectAllClick(object sender, EventArgs eventArgs)
+    private void OnSelectAllClick (object sender, EventArgs eventArgs)
     {
         try
         {
-            _selectionHandler.SelectAll(_parentControl);
+            _selectionHandler.SelectAll (_parentControl);
         }
         catch (Exception ex)
         {
-            _htmlContainer.ReportError(HtmlRenderErrorType.ContextMenu, "Failed to select all text", ex);
+            _htmlContainer.ReportError (HtmlRenderErrorType.ContextMenu, "Failed to select all text", ex);
         }
         finally
         {
