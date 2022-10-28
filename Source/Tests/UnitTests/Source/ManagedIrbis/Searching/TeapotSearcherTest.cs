@@ -8,7 +8,9 @@
 #region Using directives
 
 using AM.ComponentModel;
+using AM.PlatformAbstraction;
 
+using ManagedIrbis.Direct;
 using ManagedIrbis.Searching;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -21,8 +23,24 @@ namespace UnitTests.ManagedIrbis.Search;
 
 [TestClass]
 public class TeapotSearcherTest
+    : Common.CommonUnitTest
 {
+    private DirectProvider _GetProvider()
+    {
+        var rootPath = Irbis64RootPath;
+        var result = new DirectProvider (rootPath)
+        {
+            Database = "IBIS",
+            PlatformAbstraction = new TestingPlatformAbstraction()
+        };
+
+        result.Connect();
+
+        return result;
+    }
+
     [TestMethod]
+    [Description ("Свежесозданный объект")]
     public void TeapotSearcher_Construction_1()
     {
         var serviceProvider = ServiceProviderUtility.CreateNullProvider();
@@ -34,6 +52,7 @@ public class TeapotSearcherTest
     }
 
     [TestMethod]
+    [Description ("Построение запроса по одному слову")]
     public void TeapotSearcher_BuildSearchExpression_1()
     {
         var serviceProvider = ServiceProviderUtility.CreateNullProvider();
@@ -49,6 +68,7 @@ public class TeapotSearcherTest
     }
 
     [TestMethod]
+    [Description ("Построение запроса по словосочетанию со стоп-словом")]
     public void TeapotSearcher_BuildSearchExpression_2()
     {
         var serviceProvider = ServiceProviderUtility.CreateNullProvider();
@@ -64,7 +84,24 @@ public class TeapotSearcherTest
     }
 
     [TestMethod]
+    [Description ("Построение запроса по словосочетанию, содержащему только стоп-слова")]
     public void TeapotSearcher_BuildSearchExpression_3()
+    {
+        var serviceProvider = ServiceProviderUtility.CreateNullProvider();
+        var searcher = new TeapotSearcher (serviceProvider);
+
+        var expression = searcher.BuildSearchExpression ("and or not");
+
+        Assert.AreEqual
+            (
+                "\"K=and or not$\" + \"A=and or not$\" + \"M=and or not$\" + \"T=and or not$\"",
+                expression
+            );
+    }
+
+    [TestMethod]
+    [Description ("Построение запроса по сочетанию чисел")]
+    public void TeapotSearcher_BuildSearchExpression_4()
     {
         var serviceProvider = ServiceProviderUtility.CreateNullProvider();
         var searcher = new TeapotSearcher (serviceProvider);
@@ -76,5 +113,53 @@ public class TeapotSearcherTest
                 """K=1941$ + A=1941$ + M=1941$ + T=1941$ + K=1941-1945$ + A=1941-1945$ + M=1941-1945$ + T=1941-1945$ + K=1945$ + A=1945$ + M=1945$ + T=1945$""",
                 expression
             );
+    }
+
+    [TestMethod]
+    [Description ("Построение запроса по пустой строке")]
+    public void TeapotSearcher_BuildSearchExpression_5()
+    {
+        var serviceProvider = ServiceProviderUtility.CreateNullProvider();
+        var searcher = new TeapotSearcher (serviceProvider);
+
+        var expression = searcher.BuildSearchExpression (string.Empty);
+
+        Assert.AreEqual
+            (
+                string.Empty,
+                expression
+            );
+    }
+
+    [TestMethod]
+    [Description ("Поиск без усечения")]
+    public void TeapotSearcher_Search_1()
+    {
+        using var provider = _GetProvider();
+        var serviceProvider = ServiceProviderUtility.CreateNullProvider();
+        var searcher = new TeapotSearcher (serviceProvider)
+        {
+            Suffix = string.Empty
+        };
+
+        var found = searcher.Search (provider, "Case");
+        Assert.IsNotNull (found);
+        Assert.AreEqual (2, found.Length);
+    }
+
+    [TestMethod]
+    [Description ("Поиск несуществующего")]
+    public void TeapotSearcher_Search_2()
+    {
+        using var provider = _GetProvider();
+        var serviceProvider = ServiceProviderUtility.CreateNullProvider();
+        var searcher = new TeapotSearcher (serviceProvider)
+        {
+            Suffix = string.Empty
+        };
+
+        var found = searcher.Search (provider, "ZZZZ QQQQ");
+        Assert.IsNotNull (found);
+        Assert.AreEqual (0, found.Length);
     }
 }

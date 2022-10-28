@@ -18,6 +18,7 @@
 #region Using directives
 
 using System;
+using System.Globalization;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -167,13 +168,13 @@ public sealed class BusyStripe
             var formatted = new FormattedText
                 (
                     _text,
+                    CultureInfo.InvariantCulture,
+                    FlowDirection.LeftToRight,
                     Typeface.Default,
                     12.0,
-                    TextAlignment.Center,
-                    TextWrapping.NoWrap,
-                    Bounds.Size
+                    null
                 );
-            context.DrawText (Brushes.White, new Point (0, 0), formatted);
+            context.DrawText (formatted, new Point (0, 0));
         }
     }
 

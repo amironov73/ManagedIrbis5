@@ -6,21 +6,22 @@
 
     <!-- Централизованное управление пакетами -->
     <ItemGroup>
-        <PackageVersion Include="Avalonia" Version="0.10.15"/>
-        <PackageVersion Include="Avalonia.Controls.DataGrid" Version="0.10.15"/>
-        <PackageVersion Include="Avalonia.Desktop" Version="0.10.15"/>
-        <PackageVersion Include="Avalonia.Diagnostics" Version="0.10.15"/>
-        <PackageVersion Include="Avalonia.ReactiveUI" Version="0.10.13"/>
-        <PackageVersion Include="Avalonia.Xaml.Behaviors" Version="0.10.13.3"/>
-        <PackageVersion Include="Avalonia.Xaml.Interactions" Version="0.10.13.3"/>
-        <PackageVersion Include="Avalonia.Xaml.Interactivity" Version="0.10.13.3"/>
+        <PackageVersion Include="Avalonia" Version="11.0.0-preview3"/>
+        <PackageVersion Include="Avalonia.Controls.DataGrid" Version="11.0.0-preview3"/>
+        <PackageVersion Include="Avalonia.Desktop" Version="11.0.0-preview3"/>
+        <PackageVersion Include="Avalonia.Diagnostics" Version="11.0.0-preview3"/>
+        <PackageVersion Include="Avalonia.ReactiveUI" Version="11.0.0-preview3"/>
+        <PackageVersion Include="Avalonia.Themes.Fluent" Version="11.0.0-preview3"/>
+        <PackageVersion Include="Avalonia.Xaml.Behaviors" Version="11.0.0-preview3"/>
+        <PackageVersion Include="Avalonia.Xaml.Interactions" Version="11.0.0-preview3"/>
+        <PackageVersion Include="Avalonia.Xaml.Interactivity" Version="11.0.0-preview3"/>
         <PackageVersion Include="BenchmarkDotNet" Version="0.13.2" />
         <PackageVersion Include="CommunityToolkit.Common" Version="8.0.0"/>
         <PackageVersion Include="CommunityToolkit.Diagnostics" Version="8.0.0"/>
         <PackageVersion Include="CommunityToolkit.HighPerformance" Version="8.0.0"/>
         <PackageVersion Include="coverlet.collector" Version="3.1.2"/>
         <PackageVersion Include="coverlet.msbuild" Version="3.1.2"/>
-        <PackageVersion Include="DynamicData" Version="7.6.7"/>
+        <PackageVersion Include="DynamicData" Version="7.12.1"/>
         <PackageVersion Include="DynamicData.ReactiveUI" Version="6.11.0.2613"/>
         <PackageVersion Include="Google.Protobuf" Version="3.20.1"/>
         <PackageVersion Include="Grpc.Tools" Version="2.45.0"/>
@@ -71,13 +72,13 @@
         <PackageVersion Include="Pidgin" Version="3.1.0"/>
         <PackageVersion Include="Polly" Version="7.2.3"/>
         <PackageVersion Include="ReactiveHistory" Version="0.10.7"/>
-        <PackageVersion Include="ReactiveUI" Version="18.0.10"/>
-        <PackageVersion Include="ReactiveUI.Fody" Version="18.0.10"/>
+        <PackageVersion Include="ReactiveUI" Version="18.3.1"/>
+        <PackageVersion Include="ReactiveUI.Fody" Version="18.3.1"/>
         <PackageVersion Include="RestSharp" Version="106.15.0"/>
         <PackageVersion Include="Rookout" Version="0.1.124"/>
         <PackageVersion Include="SixLabors.ImageSharp" Version="2.1.3"/>
         <PackageVersion Include="SixLabors.Fonts" Version="1.0.0-beta18"/>
-        <PackageVersion Include="SkiaSharp" Version="2.88.2"/>
+        <PackageVersion Include="SkiaSharp" Version="2.88.3"/>
         <PackageVersion Include="SharpCompress" Version="0.31.0"/>
         <PackageVersion Include="SharpZipLib" Version="1.3.3"/>
         <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.2.3"/>

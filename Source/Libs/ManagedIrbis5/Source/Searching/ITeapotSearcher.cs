@@ -38,4 +38,16 @@ public interface ITeapotSearcher
             IRelevanceEvaluator? evaluator = null,
             int limit = 500
         );
+
+    /// <summary>
+    /// Поиск записей, удовлетворяющих запросу на естественном языке.
+    /// </summary>
+    Record[] SearchRead
+        (
+            ISyncProvider connection,
+            string query,
+            string? database = null,
+            IRelevanceEvaluator? evaluator = null,
+            int limit = 500
+        );
 }

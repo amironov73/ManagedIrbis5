@@ -10,17 +10,17 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.NET.Test.Sdk"/>
-        <PackageReference Include="Moq"/>
-        <PackageReference Include="MSTest.TestAdapter"/>
-        <PackageReference Include="MSTest.TestFramework"/>
-        <PackageReference Include="System.CommandLine"/>
-        <PackageReference Include="System.Text.Encoding.CodePages"/>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" />
+        <PackageReference Include="Moq" />
+        <PackageReference Include="MSTest.TestAdapter" />
+        <PackageReference Include="MSTest.TestFramework" />
+        <PackageReference Include="System.CommandLine" />
+        <PackageReference Include="System.Text.Encoding.CodePages" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\Libs\AM.Linguistics\AM.Linguistics.csproj"/>
-        <ProjectReference Include="..\..\Libs\AM.Scripting\AM.Scripting.csproj"/>
+        <ProjectReference Include="..\..\Libs\AM.Linguistics\AM.Linguistics.csproj" />
+        <ProjectReference Include="..\..\Libs\AM.Scripting\AM.Scripting.csproj" />
     </ItemGroup>
 
 </Project>

@@ -208,5 +208,69 @@ public class TeapotSearcher
         return result;
     }
 
+    /// <inheritdoc cref="ITeapotSearcher.Search"/>
+    public Record[] SearchRead
+        (
+            ISyncProvider connection,
+            string query,
+            string? database = null,
+            IRelevanceEvaluator? evaluator = null,
+            int limit = 500
+        )
+    {
+        Sure.NotNull (connection);
+        connection.EnsureConnected();
+
+        database = connection.EnsureDatabase (database);
+        if (limit < 1)
+        {
+            limit = 500;
+        }
+
+        var expression = BuildSearchExpression (query);
+        if (string.IsNullOrWhiteSpace (expression))
+        {
+            return Array.Empty<Record>();
+        }
+
+        evaluator ??= ServiceProvider.GetService <IRelevanceEvaluator>()
+            ?? new StandardRelevanceEvaluator (ServiceProvider, expression);
+
+        var parameters = new SearchParameters
+        {
+            Database = database,
+            Expression = expression,
+            NumberOfRecords = limit * 2
+        };
+        var found = connection.Search (parameters);
+        if (found is null)
+        {
+            return Array.Empty<Record>();
+        }
+
+        var batch = FoundItem.ToMfn (found);
+        var records = connection.ReadRecords (database, batch);
+        if (records.IsNullOrEmpty())
+        {
+            return Array.Empty<Record>();
+        }
+
+        var pairs = new List<Pair<Record, double>>();
+        foreach (var record in records)
+        {
+            var relevance = evaluator.EvaluateRelevance (record);
+            var pair = new Pair<Record, double> (record, relevance);
+            pairs.Add (pair);
+        }
+
+        var result = pairs
+            .OrderByDescending (pair => pair.Second)
+            .Take (limit)
+            .Select (pair => pair.First!)
+            .ToArray();
+
+        return result;
+    }
+
     #endregion
 }

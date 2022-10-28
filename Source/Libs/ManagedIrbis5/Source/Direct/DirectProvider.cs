@@ -48,7 +48,7 @@ namespace ManagedIrbis.Direct;
 /// </summary>
 public class DirectProvider
     : ISyncProvider,
-        ISetLastError
+      ISetLastError
 {
     #region Events
 
@@ -1045,7 +1045,7 @@ public class DirectProvider
         var result = new List<FoundItem> (found.Length);
         foreach (var termLink in found)
         {
-            var item = new FoundItem()
+            var item = new FoundItem
             {
                 Mfn = termLink.Mfn,
                 Text = null // TODO: возвращать текст

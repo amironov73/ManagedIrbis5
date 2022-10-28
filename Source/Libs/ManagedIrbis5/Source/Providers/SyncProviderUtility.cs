@@ -29,6 +29,7 @@ using AM.Collections;
 using AM.IO;
 using AM.Linq;
 
+using ManagedIrbis.Direct;
 using ManagedIrbis.Fst;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Menus;
@@ -512,6 +513,22 @@ public static class SyncProviderUtility
         Sure.NotNull ((object?) batch);
         connection.EnsureConnected();
         database = connection.EnsureDatabase (database);
+
+        // TODO устранить хак
+        if (connection is DirectProvider direct)
+        {
+            var directResult = new List<Record>();
+            foreach (var mfn in batch)
+            {
+                var record = direct.ReadRecord (mfn);
+                if (record is not null)
+                {
+                    directResult.Add (record);
+                }
+            }
+
+            return directResult.ToArray();
+        }
 
         var mfns = batch as int[] ?? batch.ToArray();
         switch (mfns.Length)
