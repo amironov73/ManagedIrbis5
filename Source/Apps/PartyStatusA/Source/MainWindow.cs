@@ -27,6 +27,7 @@ using Avalonia.Controls;
 using AM.Avalonia.Controls;
 using AM.Avalonia.Source;
 
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
@@ -52,6 +53,7 @@ public sealed class MainWindow
     private LabeledTextBox _numberBox = null!;
     private LabeledComboBox _statusBox = null!;
     private LogBox _logBox = null!;
+    private Button _button = null!;
     private BusyStripe _busyStripe = null!;
     private MenuFile? _menu;
 
@@ -74,7 +76,15 @@ public sealed class MainWindow
         Title = "Статус партии";
 
         InitializeControls();
-        InitializeConnection().Forget();
+        InitializeConnectionAsync()
+            .ContinueWith (_ =>
+            {
+                Dispatcher.UIThread.InvokeAsync
+                    (
+                        () => _button.IsEnabled = _menu is not null
+                    );
+            })
+            .Forget();
     }
 
     private void InitializeControls()
@@ -90,27 +100,30 @@ public sealed class MainWindow
         };
         _statusBox.SetValue (Grid.ColumnProperty, 2);
 
-        var button = new Button
+        _button = new Button
         {
             Content = "Установить",
+            IsEnabled = false,
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Stretch,
             VerticalContentAlignment = VerticalAlignment.Center
         };
-        button.SetValue (Grid.ColumnProperty, 4);
-        button.Click += Button_Click;
+        _button.SetValue (Grid.ColumnProperty, 4);
+        _button.Click += Button_Click;
 
         _busyStripe = new BusyStripe
         {
-            Text = "Выполнение операции на сервере"
+            Text = "Выполнение операции на сервере",
+            Active = false
         };
         _busyStripe.SetValue (Grid.RowProperty, 2);
         _busyStripe.SetValue (Grid.ColumnSpanProperty, 5);
 
         _logBox = new LogBox
         {
-            FontFamily = new FontFamily ("Courier New"),
-            FontSize = 12.0
+            FontFamily = new FontFamily ("Courier"),
+            FontSize = 12.0,
+            IsReadOnly = true
         };
         _logBox.SetValue (Grid.RowProperty, 4);
         _logBox.SetValue (Grid.ColumnSpanProperty, 5);
@@ -123,42 +136,11 @@ public sealed class MainWindow
             {
                 _numberBox,
                 _statusBox,
-                button,
+                _button,
                 _busyStripe,
                 _logBox
             }
         };
-    }
-
-    private async Task InitializeConnection()
-    {
-        this.ShowVersionInfoInTitle();
-        _logBox.Output.PrintSystemInformation();
-
-        var testResult = await TestConnectionAsync();
-        WriteLine
-            (
-                testResult
-                    ? "Соединение с сервером успешно установлено"
-                    : "Невозможно установить соединение с сервером"
-            );
-
-        if (_menu is not null)
-        {
-            _statusBox.Items = _menu.Entries.ToArray();
-            if (_menu.Entries.Count != 0)
-            {
-                _statusBox.SelectedIndex = 0;
-            }
-        }
-    }
-
-    private ISyncProvider GetProvider()
-    {
-        var result = ConnectionUtility.GetConnectionFromConfig();
-        result.Connect();
-
-        return result;
     }
 
     private void WriteLine
@@ -166,43 +148,70 @@ public sealed class MainWindow
             string format
         )
     {
-        Dispatcher.UIThread.Post (() =>
-        {
-            _logBox.Text += format + _logBox.NewLine;
-            _logBox.CaretIndex = int.MaxValue;
-        });
+        Dispatcher.UIThread.InvokeAsync
+            (
+                () =>
+                {
+                    _logBox.Text += format + _logBox.NewLine;
+                    _logBox.CaretIndex = int.MaxValue;
+            })
+            .Forget();
     }
 
     private async Task Run
         (
-            Action action
+            Func<Task> function
         )
     {
-        await Dispatcher.UIThread.InvokeAsync(() => _busyStripe.Active = true);
+        await Dispatcher.UIThread.InvokeAsync (() =>
+        {
+            _button.IsEnabled = false;
+            Cursor = new Cursor (StandardCursorType.Wait);
+            return _busyStripe.Active = true;
+        });
         try
         {
-            await Task.Factory.StartNew (action);
+            await function();
         }
         catch (Exception exception)
         {
             WriteLine ($"Exception: {exception}");
         }
-        finally
+
+        await Dispatcher.UIThread.InvokeAsync (() =>
         {
-            await Dispatcher.UIThread.InvokeAsync(() => _busyStripe.Active = false);
+            Cursor = Cursor.Default;
+            _button.IsEnabled = true;
+            return _busyStripe.Active = false;
+        });
+    }
+
+    private async Task<IAsyncProvider> GetProviderAsync()
+    {
+        var connectionString = ConnectionUtility.GetStandardConnectionString();
+        if (string.IsNullOrEmpty (connectionString))
+        {
+            throw new IrbisException
+                (
+                    "Connection string not specified!"
+                );
         }
+
+        var result = ConnectionFactory.Shared.CreateAsyncConnection();
+        result.ParseConnectionString (connectionString);
+        await result.ConnectAsync();
+
+        return result;
     }
 
     private async Task<bool> TestConnectionAsync()
     {
-        var result = false;
-
-        await Run (() =>
+        try
         {
-            using var provider = GetProvider();
+            await using var provider = await GetProviderAsync();
             if (!provider.IsConnected)
             {
-                return;
+                return false;
             }
 
             var specification = new FileSpecification
@@ -211,21 +220,53 @@ public sealed class MainWindow
                 Database = provider.Database,
                 FileName = "ste.mnu"
             };
-            _menu = provider.ReadMenu (specification);
+            _menu = await provider.ReadMenuAsync (specification);
             if (_menu is null || !_menu.Verify (false))
             {
-                return;
+                return false;
             }
+        }
+        catch (Exception exception)
+        {
+            WriteLine (exception.Message);
+            return false;
+        }
 
-            result = true;
-        });
-
-        return result;
+        return true;
     }
 
-    private void ProcessMfn
+
+    private async Task InitializeConnectionAsync()
+    {
+        this.ShowVersionInfoInTitle();
+        _logBox.Output.PrintSystemInformation();
+
+        await Run (async () =>
+        {
+            var connected = await TestConnectionAsync();
+            WriteLine
+                (
+                    connected
+                        ? "Соединение с сервером успешно установлено"
+                        : "Невозможно установить соединение с сервером"
+                );
+
+            if (connected && _menu is not null)
+            {
+                _statusBox.Items = _menu.Entries.ToArray();
+                if (_menu.Entries.Count != 0)
+                {
+                    _statusBox.SelectedIndex = 0;
+                }
+
+                await Dispatcher.UIThread.InvokeAsync (() => { _button.IsEnabled = true; });
+            }
+        });
+    }
+
+    private async Task ProcessMfnAsync
         (
-            ISyncProvider provider,
+            IAsyncProvider provider,
             string number,
             int mfn,
             string newStatus
@@ -234,8 +275,13 @@ public sealed class MainWindow
         WriteLine (string.Empty);
         WriteLine ($"MFN={mfn}");
 
-        var record = provider.ReadRecord (mfn);
-        if (ReferenceEquals (record, null))
+        var recordParameters = new ReadRecordParameters
+        {
+            Database = provider.EnsureDatabase(),
+            Mfn = mfn
+        };
+        var record = await provider.ReadRecordAsync (recordParameters);
+        if (record is null)
         {
             return;
         }
@@ -250,18 +296,19 @@ public sealed class MainWindow
             return;
         }
 
-        var parameters = new FormatRecordParameters
+        var formatParameters = new FormatRecordParameters
         {
             Record = record,
             Format = "@sbrief"
         };
-        provider.FormatRecords (parameters);
-        var description = parameters.Result.AsSingle();
+        await provider.FormatRecordsAsync (formatParameters);
+        var description = formatParameters.Result.AsSingle();
         if (!string.IsNullOrEmpty (description))
         {
             WriteLine (description);
         }
 
+        record.NotModified();
         foreach (var field in fields)
         {
             _exemplarCount++;
@@ -271,6 +318,7 @@ public sealed class MainWindow
             if (!oldStatus.SameString (newStatus))
             {
                 _changeCount++;
+                record.MarkAsModified();
                 field.SetSubFieldValue ('a', newStatus);
                 flag = true;
             }
@@ -282,11 +330,11 @@ public sealed class MainWindow
         if (record.Modified)
         {
             WriteLine ("Сохраняем запись");
-            provider.WriteRecord (record, dontParse: true);
+            await provider.WriteRecordAsync (record, dontParse: true);
         }
     }
 
-    private void ProcessNumber
+    private async Task ProcessNumberAsync
         (
             string number,
             string status
@@ -299,21 +347,29 @@ public sealed class MainWindow
         var stopwatch = new Stopwatch();
         stopwatch.Start();
 
-        using (var provider = GetProvider())
+        await using (var provider = await GetProviderAsync())
         {
             WriteLine ($"КСУ {number}");
 
             var expression = $"\"NKSU={number}\"";
-            var found = provider.Search (expression);
-            WriteLine ($"Найдено: {found.Length}");
-
-            foreach (var mfn in found)
+            var searchParameters = new SearchParameters
             {
-                ProcessMfn (provider, number, mfn, status);
+                Database = provider.EnsureDatabase(),
+                Expression = expression
+            };
+            var found = await provider.SearchAsync (searchParameters);
+            if (found is not null)
+            {
+                WriteLine ($"Найдено: {found.Length}");
+
+                foreach (var item in found)
+                {
+                    await ProcessMfnAsync (provider, number, item.Mfn, status);
+                }
             }
         }
 
-        WriteLine (new string ('=', 70));
+        WriteLine (new string ('=', 50));
         stopwatch.Stop();
         var elapsed = stopwatch.Elapsed;
         WriteLine ($"Затрачено: {elapsed.ToMinuteString()}");
@@ -343,6 +399,6 @@ public sealed class MainWindow
 
         var status = entry.Code.ThrowIfNull();
 
-        await Run (() => { ProcessNumber (number, status); });
+        await Run (async () => { await ProcessNumberAsync (number, status); });
     }
 }

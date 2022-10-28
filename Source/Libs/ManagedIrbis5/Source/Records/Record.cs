@@ -429,6 +429,14 @@ public sealed class Record
     }
 
     /// <summary>
+    /// Установка признака "запись модифицирована".
+    /// </summary>
+    public void MarkAsModified()
+    {
+        Modified = true;
+    }
+
+    /// <summary>
     /// Создание глубокой копии записи.
     /// </summary>
     public Record Clone()
