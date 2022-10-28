@@ -475,7 +475,10 @@ public static class ApplicationUtility
             Form form
         )
     {
-        MoveToScreen (Screen.PrimaryScreen, form);
+        if (Screen.PrimaryScreen is { } primaryScreen)
+        {
+            MoveToScreen (primaryScreen, form);
+        }
     }
 
     /// <summary>
