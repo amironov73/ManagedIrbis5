@@ -1,48 +1,67 @@
-﻿using System;
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace AeroSuite.AnimationEngine
+#endregion
+
+#nullable enable
+
+namespace AeroSuite.AnimationEngine;
+
+public static partial class EasingMethods
 {
-    public static partial class EasingMethods
+    private static double radianFactor = Math.PI / 2;
+
+    /// <summary>
+    ///     <para>An easing method that accelerates from 0 to a velocity of 1.</para>
+    ///     <para>Function: f(p) = -cos(p) + 1</para>
+    ///     <para>Derivative: f'(p) = sin(p)</para>
+    /// </summary>
+    /// <param name="progress">The time progress of the animation.</param>
+    /// <returns>The value progress of the animation.</returns>
+    public static double SinusEaseIn (double progress)
     {
-        private static double radianFactor = Math.PI / 2;
+        return progress <= 0 ? 0 : progress >= 1 ? 1 : -Math.Cos (progress * radianFactor) + 1;
+    }
 
-        /// <summary>
-        ///     <para>An easing method that accelerates from 0 to a velocity of 1.</para>
-        ///     <para>Function: f(p) = -cos(p) + 1</para>
-        ///     <para>Derivative: f'(p) = sin(p)</para>
-        /// </summary>
-        /// <param name="progress">The time progress of the animation.</param>
-        /// <returns>The value progress of the animation.</returns>
-        public static double SinusEaseIn(double progress)
-        {
-            return progress <= 0 ? 0 : progress >= 1 ? 1 : -Math.Cos(progress * radianFactor) + 1;
-        }
+    /// <summary>
+    ///     <para>An easing method that decelerates from a velocity of 1 to 0.</para>
+    ///     <para>Function: f(p) = sin(p)</para>
+    ///     <para>Derivative: f'(p) = cos(p)</para>
+    /// </summary>
+    /// <param name="progress">The time progress of the animation.</param>
+    /// <returns>The value progress of the animation.</returns>
+    public static double SinusEaseOut (double progress)
+    {
+        return progress <= 0 ? 0 : progress >= 1 ? 1 : Math.Sin (progress * radianFactor);
+    }
 
-        /// <summary>
-        ///     <para>An easing method that decelerates from a velocity of 1 to 0.</para>
-        ///     <para>Function: f(p) = sin(p)</para>
-        ///     <para>Derivative: f'(p) = cos(p)</para>
-        /// </summary>
-        /// <param name="progress">The time progress of the animation.</param>
-        /// <returns>The value progress of the animation.</returns>
-        public static double SinusEaseOut(double progress)
-        {
-            return progress <= 0 ? 0 : progress >= 1 ? 1 : Math.Sin(progress * radianFactor);
-        }
+    private static readonly EasingMethod sinusEaseInOut = Chain (SinusEaseIn, SinusEaseOut);
 
-        private static readonly EasingMethod sinusEaseInOut = Chain(SinusEaseIn, SinusEaseOut);
-        /// <summary>
-        ///     <para>A combination of the <see cref="EasingMethods.SinusEaseIn"/> and <see cref="EasingMethods.SinusEaseOut"/> methods.</para>
-        ///     <para>It accelerates from 0 to a velocity of 1 and then decelerates back to a velocity of 0.</para>
-        /// </summary>
-        /// <param name="progress">The time progress of the animation.</param>
-        /// <returns>The value progress of the animation.</returns>
-        public static double SinusEaseInOut(double progress)
-        {
-            return sinusEaseInOut(progress);
-        }
+    /// <summary>
+    ///     <para>A combination of the <see cref="EasingMethods.SinusEaseIn"/> and <see cref="EasingMethods.SinusEaseOut"/> methods.</para>
+    ///     <para>It accelerates from 0 to a velocity of 1 and then decelerates back to a velocity of 0.</para>
+    /// </summary>
+    /// <param name="progress">The time progress of the animation.</param>
+    /// <returns>The value progress of the animation.</returns>
+    public static double SinusEaseInOut (double progress)
+    {
+        return sinusEaseInOut (progress);
     }
 }
