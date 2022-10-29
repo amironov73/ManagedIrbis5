@@ -14,9 +14,6 @@
 #region Using directives
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 #endregion
 
@@ -50,7 +47,7 @@ public static partial class EasingMethods
         return progress <= 0 ? 0 : progress >= 1 ? 1 : Math.Sqrt (1 - Math.Pow (progress - 1, 2));
     }
 
-    private static readonly EasingMethod circularEaseInOut = Chain (CircularEaseIn, CircularEaseOut);
+    private static readonly EasingMethod _circularEaseInOut = Chain (CircularEaseIn, CircularEaseOut);
 
     /// <summary>
     ///     <para>A combination of the <see cref="EasingMethods.CircularEaseIn"/> and <see cref="EasingMethods.CircularEaseOut"/> methods.</para>
@@ -60,6 +57,6 @@ public static partial class EasingMethods
     /// <returns>The value progress of the animation.</returns>
     public static double CircularEaseInOut (double progress)
     {
-        return circularEaseInOut (progress);
+        return _circularEaseInOut (progress);
     }
 }

@@ -11,15 +11,6 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-#region Using directives
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-#endregion
-
 #nullable enable
 
 namespace AeroSuite.AnimationEngine;
@@ -35,4 +26,4 @@ namespace AeroSuite.AnimationEngine;
 ///     same value as <c>1.0</c>.</para>
 /// </param>
 /// <returns>The value progress of the animation.</returns>
-public delegate double EasingMethod(double progress);
+public delegate double EasingMethod (double progress);
