@@ -35,7 +35,7 @@ public static partial class EasingMethods
     /// <returns>The value progress of the animation.</returns>
     public static double CubicEaseIn (double progress)
     {
-        return (progress <= 0) ? 0 : (progress >= 1) ? 1 : Math.Pow (progress, 3);
+        return progress <= 0 ? 0 : progress >= 1 ? 1 : Math.Pow (progress, 3);
     }
 
     /// <summary>
@@ -47,7 +47,7 @@ public static partial class EasingMethods
     /// <returns>The value progress of the animation.</returns>
     public static double CubicEaseOut (double progress)
     {
-        return (progress <= 0) ? 0 : (progress >= 1) ? 1 : Math.Pow (progress - 1, 3) + 1;
+        return progress <= 0 ? 0 : progress >= 1 ? 1 : Math.Pow (progress - 1, 3) + 1;
     }
 
     private static EasingMethod cubicEaseInOut = Chain (CubicEaseIn, CubicEaseOut);

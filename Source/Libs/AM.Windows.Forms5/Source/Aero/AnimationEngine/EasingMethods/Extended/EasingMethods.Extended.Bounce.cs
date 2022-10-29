@@ -40,7 +40,7 @@ public static partial class EasingMethods
         /// <returns>The value progress of the animation.</returns>
         public static double BounceEaseIn (double progress)
         {
-            return progress <= 0 ? 0 : progress >= 1 ? 1 : 1 - EasingMethods.Extended.BounceEaseOut (1 - progress);
+            return progress <= 0 ? 0 : progress >= 1 ? 1 : 1 - BounceEaseOut (1 - progress);
         }
 
         /// <summary>
