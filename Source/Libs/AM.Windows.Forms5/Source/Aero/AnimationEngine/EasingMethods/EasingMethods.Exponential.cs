@@ -7,16 +7,13 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/*
+/* EasingMethods.Exponential.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 #endregion
 
@@ -50,7 +47,7 @@ public static partial class EasingMethods
         return progress <= 0 ? 0 : progress >= 1 ? 1 : -Math.Pow (2, -10 * progress) + 1;
     }
 
-    private static readonly EasingMethod exponentialEaseInOut = Chain (ExponentialEaseIn, ExponentialEaseOut);
+    private static readonly EasingMethod _exponentialEaseInOut = Chain (ExponentialEaseIn, ExponentialEaseOut);
 
     /// <summary>
     ///     <para>A combination of the <see cref="EasingMethods.ExponentialEaseIn"/> and <see cref="EasingMethods.ExponentialEaseOut"/> methods.</para>
@@ -60,6 +57,6 @@ public static partial class EasingMethods
     /// <returns>The value progress of the animation.</returns>
     public static double ExponentialEaseInOut (double progress)
     {
-        return exponentialEaseInOut (progress);
+        return _exponentialEaseInOut (progress);
     }
 }

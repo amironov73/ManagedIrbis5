@@ -7,18 +7,9 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/*
+/* EasingMethods.Linear.cs --
  * Ars Magna project, http://arsmagna.ru
  */
-
-#region Using directives
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-#endregion
 
 #nullable enable
 

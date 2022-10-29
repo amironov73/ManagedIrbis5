@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/*
+/* EasingMethods.Extended.Bounce.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 

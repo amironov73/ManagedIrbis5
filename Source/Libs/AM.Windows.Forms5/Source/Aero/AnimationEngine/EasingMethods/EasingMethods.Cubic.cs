@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/*
+/* EasingMethods.Cubic.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
