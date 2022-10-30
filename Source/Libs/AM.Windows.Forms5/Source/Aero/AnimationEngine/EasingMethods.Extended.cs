@@ -7,18 +7,9 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/*
+/* EasingMethods.Extended.cs --
  * Ars Magna project, http://arsmagna.ru
  */
-
-#region Using directives
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-#endregion
 
 #nullable enable
 
@@ -35,6 +26,6 @@ public static partial class EasingMethods
     /// </remarks>
     public static partial class Extended
     {
-
+        // пустое тело класса, отдельные члены см. в соответствующих файлах
     }
 }

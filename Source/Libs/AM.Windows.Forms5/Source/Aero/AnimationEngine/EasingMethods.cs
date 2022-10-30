@@ -13,10 +13,7 @@
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using AM;
 
 #endregion
 
@@ -42,8 +39,14 @@ public static partial class EasingMethods
     /// <param name="first">The first easing method.</param>
     /// <param name="second">The second easing method.</param>
     /// <returns>An easing method that uses the first specified easing method for the first half of the animation and the second one for the second half of the animation.</returns>
-    public static EasingMethod Chain (this EasingMethod first, EasingMethod second)
+    public static EasingMethod Chain
+        (
+            this EasingMethod first,
+            EasingMethod second
+        )
     {
+        Sure.NotNull (first);
+
         return progress =>
             progress < 0.5 ? .5 * first (progress * 2) : .5 + .5 * second ((progress - .5) * 2);
     }
@@ -53,9 +56,14 @@ public static partial class EasingMethods
     /// </summary>
     /// <param name="method">The easing method that should be inverted.</param>
     /// <returns>An inverted version of the specified easing method.</returns>
-    public static EasingMethod Invert (this EasingMethod method)
+    public static EasingMethod Invert
+        (
+            this EasingMethod method
+        )
     {
-        return (double progress) => 1 - method (1 - progress);
+        Sure.NotNull (method);
+
+        return progress => 1 - method (1 - progress);
     }
 
     /// <summary>
@@ -63,9 +71,14 @@ public static partial class EasingMethods
     /// </summary>
     /// <param name="method">The easing method.</param>
     /// <returns>An upside down version of the specified easing method</returns>
-    public static EasingMethod UpsideDown (this EasingMethod method)
+    public static EasingMethod UpsideDown
+        (
+            this EasingMethod method
+        )
     {
-        return (double progress) => 1 - method (progress);
+        Sure.NotNull (method);
+
+        return progress => 1 - method (progress);
     }
 
     /// <summary>
@@ -73,8 +86,13 @@ public static partial class EasingMethods
     /// </summary>
     /// <param name="method">The easing method.</param>
     /// <returns>A reverse version of the specified easing method.</returns>
-    public static EasingMethod Reverse (this EasingMethod method)
+    public static EasingMethod Reverse
+        (
+            this EasingMethod method
+        )
     {
-        return (double progress) => method (1 - progress);
+        Sure.NotNull (method);
+
+        return progress => method (1 - progress);
     }
 }
