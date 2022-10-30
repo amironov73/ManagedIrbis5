@@ -10,7 +10,7 @@
 // ReSharper disable UnusedType.Global
 // ReSharper disable VirtualMemberCallInConstructor
 
-/*
+/* AeroTreeView.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
