@@ -38,7 +38,7 @@ namespace AeroSuite.Controls;
 [Description ("An aero-styled ListView.")]
 [ToolboxItem (true)]
 [ToolboxBitmap (typeof (ListView))]
-public class AeroListView
+public sealed class AeroListView
     : ListView
 {
     private const int LVS_EX_DOUBLEBUFFER = 0x10000;
@@ -48,24 +48,26 @@ public class AeroListView
     /// Initializes a new instance of the <see cref="AeroListView"/> class.
     /// </summary>
     public AeroListView()
-        : base()
     {
-        this.FullRowSelect = true;
+        FullRowSelect = true;
     }
 
 
     /// <summary>
     /// Raises the <see cref="E:HandleCreated" /> event.
     /// </summary>
-    /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
-    protected override void OnHandleCreated (EventArgs e)
+    /// <param name="eventArgs">The <see cref="EventArgs"/> instance containing the event data.</param>
+    protected override void OnHandleCreated
+        (
+            EventArgs eventArgs
+        )
     {
-        base.OnHandleCreated (e);
+        base.OnHandleCreated (eventArgs);
 
         if (PlatformHelper.VistaOrHigher)
         {
-            NativeMethods.SetWindowTheme (this.Handle, "explorer", null);
-            NativeMethods.SendMessage (this.Handle, LVM_SETEXTENDEDLISTVIEWSTYLE, new IntPtr (LVS_EX_DOUBLEBUFFER),
+            NativeMethods.SetWindowTheme (Handle, "explorer", null);
+            NativeMethods.SendMessage (Handle, LVM_SETEXTENDEDLISTVIEWSTYLE, new IntPtr (LVS_EX_DOUBLEBUFFER),
                 new IntPtr (LVS_EX_DOUBLEBUFFER));
         }
     }
