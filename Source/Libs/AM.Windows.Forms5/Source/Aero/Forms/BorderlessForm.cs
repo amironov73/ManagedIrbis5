@@ -27,13 +27,22 @@ using System.Windows.Forms;
 namespace AeroSuite.Forms;
 
 /// <summary>
-/// A <see cref="Form"/> base class which allows the creation of borderless windows which supports AeroSnap, AeroPeek, the system window context menu, optionally an Aero shadow, all of Windows' window animations and even windows-like dragging & resizing in specified areas.
+/// A <see cref="Form"/> base class which allows the creation of borderless
+/// windows which supports AeroSnap, AeroPeek, the system window context menu,
+/// optionally an Aero shadow, all of Windows' window animations and even
+/// windows-like dragging & resizing in specified areas.
 /// </summary>
 /// <remarks>
-/// The various features of this borderless form are implemented by using a normal window as a base and removing all of its "features" like the titlebar and borders visually and functionally during runtime by handling the appropriate windows messages.
-/// That makes this variant of a borderless window superior to just setting the border style to
-/// <see cref="System.Windows.Forms.FormBorderStyle.None"/> which lacks all of the features described in the summary.
-/// To implement the various areas for resizing & dragging, you have to override the <see cref="BorderlessForm.PerformHitTest(Point)"/>-method and check for the areas you desire.
+/// The various features of this borderless form are implemented by using
+/// a normal window as a base and removing all of its "features" like the
+/// titlebar and borders visually and functionally during runtime by handling
+/// the appropriate windows messages.
+/// That makes this variant of a borderless window superior to just setting
+/// the border style to <see cref="System.Windows.Forms.FormBorderStyle.None"/>
+/// which lacks all of the features described in the summary.
+/// To implement the various areas for resizing & dragging, you have
+/// to override the <see cref="BorderlessForm.PerformHitTest(Point)"/>-method
+/// and check for the areas you desire.
 /// </remarks>
 [DesignerCategory ("Code")]
 [DisplayName ("Borderless Form")]
@@ -165,7 +174,7 @@ public class BorderlessForm
         {
             if (PlatformHelper.VistaOrHigher && NativeMethods.DwmIsCompositionEnabled())
             {
-                return (uint) (WindowStyles.Overlapped | WindowStyles.ThickFrame | WindowStyles.Caption |
+                return (uint)(WindowStyles.Overlapped | WindowStyles.ThickFrame | WindowStyles.Caption |
                               WindowStyles.SysMenu | WindowStyles.MinimizeBox | WindowStyles.MaximizeBox);
             }
             else
@@ -176,7 +185,7 @@ public class BorderlessForm
         else
         {
             //return (uint)(WindowStyles.Popup | WindowStyles.ThickFrame | WindowStyles.Caption | WindowStyles.SysMenu | WindowStyles.MinimizeBox | WindowStyles.MaximizeBox);
-            return (uint) base.CreateParams.Style;
+            return (uint)base.CreateParams.Style;
         }
     }
 
