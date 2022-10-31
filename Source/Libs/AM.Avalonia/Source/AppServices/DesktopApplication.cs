@@ -20,24 +20,13 @@
 #region Using directives
 
 using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Text;
-using System.Threading.Tasks;
-
-using AM.AppServices;
-using AM.Interactivity;
+using System.Collections.Generic;
 
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Markup.Xaml.Styling;
 
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-
-using NLog.Extensions.Logging;
 
 #endregion
 
@@ -49,6 +38,7 @@ namespace AM.Avalonia.AppServices;
 /// Построитель десктопного приложения на Avalonia.
 /// </summary>
 public sealed class DesktopApplication
+    : IAvaloniaApplicationBuilder
 {
     #region Construction
 
@@ -60,6 +50,9 @@ public sealed class DesktopApplication
             string[] args
         )
     {
+        Sure.NotNull (args);
+
+        _instance = this;
         _args = args;
         _windowCreator = _ => new Window();
         _appBuilder = AppBuilder.Configure<AvaloniaApplication>()
@@ -71,9 +64,12 @@ public sealed class DesktopApplication
 
     #region Private members
 
-    private readonly AppBuilder _appBuilder;
     private readonly string[] _args;
+    internal static DesktopApplication _instance = null!;
+    internal static AppBuilder _appBuilder = null!;
+    internal List<Action<HostBuilderContext, IServiceCollection>> _configurationActions = new();
     private Func<AvaloniaApplication, Window> _windowCreator;
+
 
     #endregion
 
@@ -91,9 +87,24 @@ public sealed class DesktopApplication
     }
 
     /// <summary>
+    /// Конфигурирование сервисов.
+    /// </summary>
+    public DesktopApplication ConfigureServices
+        (
+            Action <HostBuilderContext, IServiceCollection> action
+        )
+    {
+        Sure.NotNull (action);
+
+        _configurationActions.Add (action);
+
+        return this;
+    }
+
+    /// <summary>
     /// Запуск приложения.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Код, который необходимо вернуть операционной системе</returns>
     public int Run()
     {
         _appBuilder.StartWithClassicDesktopLifetime (_args);
@@ -125,6 +136,21 @@ public sealed class DesktopApplication
         _windowCreator = _ => new TWindow();
 
         return this;
+    }
+
+    #endregion
+
+    #region IAvaloniaApplicationBuilder members
+
+    /// <inheritdoc cref="IAvaloniaApplicationBuilder.CreateMainWindow"/>
+    public Window CreateMainWindow
+        (
+            AvaloniaApplication application
+        )
+    {
+        Sure.NotNull (application);
+
+        return _windowCreator (application);
     }
 
     #endregion

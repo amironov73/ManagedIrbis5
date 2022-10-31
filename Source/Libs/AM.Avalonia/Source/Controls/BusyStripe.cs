@@ -20,6 +20,8 @@
 using System;
 using System.Globalization;
 
+using AM.Avalonia.Media;
+
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
@@ -172,9 +174,9 @@ public sealed class BusyStripe
                     FlowDirection.LeftToRight,
                     Typeface.Default,
                     12.0,
-                    null
+                    Brushes.White
                 );
-            context.DrawText (formatted, new Point (0, 0));
+            formatted.DrawCentered (context, Bounds);
         }
     }
 

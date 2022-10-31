@@ -9,7 +9,7 @@
 // ReSharper disable LocalizableElement
 // ReSharper disable StringLiteralTypo
 
-/* MainWindow.cs -- главное окно приложения
+/* Program.cs -- точка входа в приложение
  * Ars Magna project, http://arsmagna.ru
  */
 

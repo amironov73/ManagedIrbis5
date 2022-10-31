@@ -27,6 +27,7 @@ using AM.Text.Output;
 
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 
@@ -42,6 +43,41 @@ namespace AM.Avalonia.Source;
 public static class AvaloniaUtility
 {
     #region Public methods
+
+    /// <summary>
+    /// Выполнение произвольных побочных действий.
+    /// </summary>
+    public static TControl Also<TControl>
+        (
+            this TControl control,
+            Action<TControl> action
+        )
+        where TControl: Control
+    {
+        Sure.NotNull (control);
+        Sure.NotNull (action);
+
+        action (control);
+
+        return control;
+    }
+
+    /// <summary>
+    /// Присваивание указанной переменной.
+    /// </summary>
+    public static TControl Assign<TControl>
+        (
+            this TControl control,
+            out TControl variable
+        )
+        where TControl: Control
+    {
+        Sure.NotNull (control);
+
+        variable = control;
+
+        return control;
+    }
 
     /// <summary>
     /// Установка жирного начертания для текстового блока.
@@ -69,8 +105,6 @@ public static class AvaloniaUtility
         )
         where T: IContentControl
     {
-        ArgumentNullException.ThrowIfNull (control);
-
         control.HorizontalContentAlignment = HorizontalAlignment.Center;
         control.VerticalContentAlignment = VerticalAlignment.Center;
 
@@ -89,6 +123,38 @@ public static class AvaloniaUtility
         Sure.NotNull (control);
 
         control.HorizontalAlignment = HorizontalAlignment.Center;
+        control.VerticalAlignment = VerticalAlignment.Center;
+
+        return control;
+    }
+
+    /// <summary>
+    /// Центрирование контрола по горизонтали.
+    /// </summary>
+    public static T CenterHorizontally<T>
+        (
+            this T control
+        )
+        where T: Control
+    {
+        Sure.NotNull (control);
+
+        control.HorizontalAlignment = HorizontalAlignment.Center;
+
+        return control;
+    }
+
+    /// <summary>
+    /// Центрирование контрола по вертикали.
+    /// </summary>
+    public static T CenterVertically<T>
+        (
+            this T control
+        )
+        where T: Control
+    {
+        Sure.NotNull (control);
+
         control.VerticalAlignment = VerticalAlignment.Center;
 
         return control;
@@ -120,12 +186,28 @@ public static class AvaloniaUtility
         )
         where T: IContentControl
     {
-        ArgumentNullException.ThrowIfNull (control);
-
         control.HorizontalContentAlignment = HorizontalAlignment.Left;
         control.VerticalContentAlignment = VerticalAlignment.Center;
 
         return control;
+    }
+
+    /// <summary>
+    /// Установка обработчика событий.
+    /// </summary>
+    public static T OnClick<T>
+        (
+            this T button,
+            EventHandler<RoutedEventArgs> handler
+        )
+        where T: Button
+    {
+        Sure.NotNull (button);
+        Sure.NotNull (handler);
+
+        button.Click += handler;
+
+        return button;
     }
 
     /// <summary>
@@ -343,6 +425,69 @@ public static class AvaloniaUtility
                     GC.GetTotalMemory (false) / 1024
                 );
         }
+    }
+
+    /// <summary>
+    /// Растягивание контрола по горизонтали и по вертикали.
+    /// </summary>
+    public static T Stretch<T>
+        (
+            this T control
+        )
+        where T: Control
+    {
+        Sure.NotNull (control);
+        control.HorizontalAlignment = HorizontalAlignment.Stretch;
+        control.VerticalAlignment = VerticalAlignment.Stretch;
+
+        return control;
+    }
+
+    /// <summary>
+    /// Растягивание контрола по горизонтали.
+    /// </summary>
+    public static T StretchHorizontally<T>
+        (
+            this T control
+        )
+        where T: Control
+    {
+        Sure.NotNull (control);
+        control.HorizontalAlignment = HorizontalAlignment.Stretch;
+
+        return control;
+    }
+
+    /// <summary>
+    /// Растягивание контрола по вертикали.
+    /// </summary>
+    public static T StretchVertically<T>
+        (
+            this T control
+        )
+        where T: Control
+    {
+        Sure.NotNull (control);
+        control.VerticalAlignment = VerticalAlignment.Stretch;
+
+        return control;
+    }
+
+    /// <summary>
+    /// Добавление дочерних контролов в панель
+    /// </summary>
+    public static T WithChildren<T>
+        (
+            this T panel,
+            params Control[] children
+        )
+        where T: Panel
+    {
+        Sure.NotNull (panel);
+
+        panel.Children.AddRange (children);
+
+        return panel;
     }
 
     #endregion

@@ -20,17 +20,19 @@
 #region Using directives
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Threading.Tasks;
 
 using AM.AppServices;
+using AM.Avalonia.Dialogs;
 using AM.Interactivity;
 
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Markup.Xaml.Styling;
+using Avalonia.Themes.Fluent;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -52,6 +54,19 @@ public class AvaloniaApplication
     : Application,
     IMagnaApplication
 {
+    #region Properties
+
+    /// <summary>
+    /// Главное окно.
+    /// </summary>
+    public Window MainWindow { get; internal set; } = null!;
+
+    /// <summary>
+    /// Список активных окон.
+    /// </summary>
+    public List<Window> Windows { get; }
+
+    #endregion
 
     #region Construction
 
@@ -60,26 +75,19 @@ public class AvaloniaApplication
     /// </summary>
     public AvaloniaApplication()
     {
-        _builder = Host.CreateDefaultBuilder();
+        _hostBuilder = Host.CreateDefaultBuilder();
+        Windows = new List<Window>();
         Args = Array.Empty<string>();
-        // EarlyInitialization();
-        _windowCreator = _ => new Window();
-
-        // загрузка стилей Авалонии
-        // TODO: сделать настраиваемой
-        // Current!.Styles.Add (new StyleInclude (new Uri ("avares://AvaloniaExample/Styles"))
-        // {
-        //      Source = new Uri ("avares://Avalonia.Themes.Fluent/FluentLight.xaml")
-        // });
+        EarlyInitialization();
     }
 
     #endregion
 
     #region Private members
 
-    private readonly IHostBuilder _builder;
+    internal IAvaloniaApplicationBuilder _applicationBuilder = null!;
+    private readonly IHostBuilder _hostBuilder;
     private ServiceProvider? _preliminaryServices;
-    internal Func<AvaloniaApplication, Window> _windowCreator;
 
     /// <summary>
     /// Пометка экземпляра как проинициазированного.
@@ -171,7 +179,7 @@ public class AvaloniaApplication
             .AddCommandLine (Args)
             .Build();
 
-        _builder.ConfigureServices
+        _hostBuilder.ConfigureServices
             (
                 // TODO сделать соответствующий провайдер интерактивности
                 services => services.AddSingleton<IInteractivityProvider, ConsoleInteractivityProvider>()
@@ -196,22 +204,40 @@ public class AvaloniaApplication
         _preliminaryServices?.Dispose();
         _preliminaryServices = null;
 
-        _builder.ConfigureLogging (logging =>
+        _hostBuilder.ConfigureLogging (logging =>
         {
             logging.ClearProviders();
             logging.AddNLog (Configuration);
         });
-        _builder.ConfigureServices (services =>
+        _hostBuilder.ConfigureServices (services =>
         {
             services.AddOptions();
             services.AddLocalization();
         });
 
-        ApplicationHost = _builder.Build();
+        _hostBuilder.ConfigureServices (services =>
+        {
+            services.AddSingleton<IWindowFactory, StandardWindowFactory>();
+        });
+
+        // запускаем ранее заданные действия по настройке сервисов
+        var actions = (_applicationBuilder as DesktopApplication)
+            ?._configurationActions;
+        if (actions is not null)
+        {
+            foreach (var action in actions)
+            {
+                _hostBuilder.ConfigureServices (action);
+            }
+        }
+
+        ApplicationHost = _hostBuilder.Build();
         Magna.Host = ApplicationHost;
         MarkAsInitialized();
         Logger = ApplicationHost.Services.GetRequiredService<ILogger<MagnaApplication>>();
+        Magna.Logger = Logger;
         Configuration = ApplicationHost.Services.GetRequiredService<IConfiguration>();
+        Magna.Configuration = Configuration;
 
         Logger.LogInformation ("Final initialization done");
 
@@ -230,19 +256,30 @@ public class AvaloniaApplication
 
     #region Application members
 
+    /// <inheritdoc cref="Application.Initialize"/>
+    public override void Initialize()
+    {
+        Current!.Styles.Add (new FluentTheme (new Uri("avares://Avalonia.Themes.Fluent/FluentLight.xaml")));
+    }
+
     /// <inheritdoc cref="Application.OnFrameworkInitializationCompleted"/>
     public override void OnFrameworkInitializationCompleted()
     {
+        if (!FinalInitialization())
+        {
+            throw new ApplicationException ("Initialization failed");
+        }
+
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            var mainWindow = _windowCreator (this);
-            mainWindow.Closed += (_, _) =>
+            MainWindow = DesktopApplication._instance.CreateMainWindow (this);
+            MainWindow.Closed += (_, _) =>
             {
-                var lifetime = RequireService<IHostApplicationLifetime>();
+                var lifetime =  RequireService<IHostApplicationLifetime>();
                 lifetime.StopApplication();
             };
 
-            desktop.MainWindow = mainWindow;
+            desktop.MainWindow = MainWindow;
         }
 
         base.OnFrameworkInitializationCompleted();
@@ -252,14 +289,50 @@ public class AvaloniaApplication
 
     #region Public methods
 
+    /// <summary>
+    /// Создание окна указанного типа.
+    /// </summary>
+    public virtual TWindow CreateWindow<TWindow>()
+        where TWindow: Window, new()
+    {
+        CheckForgottenInitialization();
+        CheckForShutdown();
+
+        var factory = ApplicationHost.Services.GetService<IWindowFactory>();
+
+        return factory is not null
+            ? factory.CreateWindow<TWindow>()
+            : new TWindow();
+    }
+
+    /// <summary>
+    /// Уничтожение указанного окна.
+    /// Метод не занимается закрытием окна, его дело -- реагировать на это закрытие.
+    /// </summary>
+    public virtual void DestroyWindow
+        (
+            Window window
+        )
+    {
+        Sure.NotNull (window);
+
+        CheckForgottenInitialization();
+        CheckForShutdown();
+
+        var factory = ApplicationHost.Services.GetService<IWindowFactory>();
+        if (factory is not null)
+        {
+            factory.DestroyWindow (window);
+        }
+    }
+
     /// <inheritdoc cref="MagnaApplication.HandleException"/>
     public virtual void HandleException
         (
             Exception exception
         )
     {
-        exception.NotUsed();
-        // ShowException (exception);
+        ShowException (exception);
     }
 
     /// <summary>
@@ -275,9 +348,26 @@ public class AvaloniaApplication
     }
 
     /// <summary>
+    /// Показ исключения.
+    /// </summary>
+    public void ShowException
+        (
+            Exception exception
+        )
+    {
+        Task.Factory.StartNew
+            (
+                async () =>
+                await ExceptionDialog.Show (MainWindow, exception)
+            )
+            .Forget();
+
+    }
+
+    /// <summary>
     /// Визуальная инициализация.
     /// </summary>
-    public virtual void VisualInitialization()
+    protected virtual void VisualInitialization()
     {
         // перекрыть в потомке
     }
@@ -285,7 +375,7 @@ public class AvaloniaApplication
     /// <summary>
     /// Визуальная де-инициализация.
     /// </summary>
-    public virtual void VisualShutdown()
+    protected virtual void VisualShutdown()
     {
         // перекрыть в потомке
     }
@@ -301,7 +391,7 @@ public class AvaloniaApplication
     public bool IsShutdown { get; protected set; }
 
     /// <inheritdoc cref="IMagnaApplication.Args"/>
-    public string[] Args { get; protected set; }
+    public string[] Args { get; protected internal set; }
 
     /// <inheritdoc cref="IMagnaApplication.Configuration"/>
     [AllowNull]
@@ -338,14 +428,10 @@ public class AvaloniaApplication
 
             VisualInitialization();
 
-            // MainForm.FormClosed += (_, _) =>
-            // {
-            //     var lifetime = RequireService<IHostApplicationLifetime>();
-            //     lifetime.StopApplication();
-            // };
+            result = runDelegate (this);
 
             // TODO разобраться, когда вызывать VisualShutdown
-            // VisualShutdown();
+            VisualShutdown();
 
             ApplicationHost.WaitForShutdown();
             MarkAsShutdown();

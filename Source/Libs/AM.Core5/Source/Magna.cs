@@ -122,7 +122,7 @@ public sealed class Magna
     /// <summary>
     /// Общий логгер для всего приложения.
     /// </summary>
-    public static ILogger Logger { get; private set; } = new NullLogger<Magna>();
+    public static ILogger Logger { get; internal set; } = new NullLogger<Magna>();
 
     /// <summary>
     /// Общая конфигурация для всего приложения.

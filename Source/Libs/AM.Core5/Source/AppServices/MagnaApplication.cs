@@ -263,7 +263,9 @@ public class MagnaApplication
         Magna.Host = ApplicationHost;
         MarkAsInitialized();
         Logger = ApplicationHost.Services.GetRequiredService<ILogger<MagnaApplication>>();
+        Magna.Logger = Logger;
         Configuration = ApplicationHost.Services.GetRequiredService<IConfiguration>();
+        Magna.Configuration = Configuration;
 
         Logger.LogInformation ("Final initialization done");
 

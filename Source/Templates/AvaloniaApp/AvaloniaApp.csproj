@@ -10,6 +10,9 @@
 
     <ItemGroup>
         <None Remove=".gitignore" />
+        <None Update="NLog.config">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
     <ItemGroup>
@@ -25,18 +28,12 @@
         <PackageReference Include="Avalonia" />
         <PackageReference Include="Avalonia.Desktop" />
         <PackageReference Include="Avalonia.Diagnostics" />
+        <PackageReference Include="Avalonia.Themes.Fluent" />
         <PackageReference Include="XamlNameReferenceGenerator" />
     </ItemGroup>
 
     <ItemGroup>
-        <Compile Update="Source\MainWindow.axaml.cs">
-            <DependentUpon>MainWindow.axaml</DependentUpon>
-            <SubType>Code</SubType>
-        </Compile>
-    </ItemGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\..\Libs\ManagedIrbis5.Avalonia\ManagedIrbis5.Avalonia.csproj" />
+        <ProjectReference Include="..\..\Libs\AM.Avalonia\AM.Avalonia.csproj" />
     </ItemGroup>
 
 </Project>
