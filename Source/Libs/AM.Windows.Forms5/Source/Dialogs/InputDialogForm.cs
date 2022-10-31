@@ -22,53 +22,44 @@ using System.Windows.Forms.VisualStyles;
 
 namespace AM.Windows.Forms.Dialogs;
 
-partial class InputDialogForm : ExtendedForm
+partial class InputDialogForm
+    : ExtendedForm
 {
     private SizeF _textMargin = new SizeF (12, 9);
-    private string _mainInstruction;
-    private string _content;
 
-    public event EventHandler<OkButtonClickedEventArgs> OkButtonClicked;
+    public event EventHandler<OkButtonClickedEventArgs>? OkButtonClicked;
 
     public InputDialogForm()
     {
         InitializeComponent();
     }
 
-    public string MainInstruction
-    {
-        get { return _mainInstruction; }
-        set { _mainInstruction = value; }
-    }
+    public string MainInstruction { get; set; }
 
     [SuppressMessage ("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-    public string Content
-    {
-        get { return _content; }
-        set { _content = value; }
-    }
+    public string Content { get; set; }
 
     public string Input
     {
-        get { return _inputTextBox.Text; }
-        set { _inputTextBox.Text = value; }
+        get => _inputTextBox.Text;
+        set => _inputTextBox.Text = value;
     }
 
     public int MaxLength
     {
-        get { return _inputTextBox.MaxLength; }
-        set { _inputTextBox.MaxLength = value; }
+        get => _inputTextBox.MaxLength;
+        set => _inputTextBox.MaxLength = value;
     }
 
     public bool UsePasswordMasking
     {
-        get { return _inputTextBox.UseSystemPasswordChar; }
-        set { _inputTextBox.UseSystemPasswordChar = value; }
+        get => _inputTextBox.UseSystemPasswordChar;
+        set => _inputTextBox.UseSystemPasswordChar = value;
     }
 
     public bool Multiline
     {
-        get { return _inputTextBox.Multiline; }
+        get => _inputTextBox.Multiline;
         set
         {
             if (value == _inputTextBox.Multiline)

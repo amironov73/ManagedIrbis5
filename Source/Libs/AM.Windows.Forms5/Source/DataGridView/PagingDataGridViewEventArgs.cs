@@ -21,38 +21,35 @@ using System.Windows.Forms;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// EventArgs for <see cref="PagingDataGridView"/>.
+/// </summary>
+public sealed class PagingDataGridViewEventArgs
+    : EventArgs
 {
+    #region Properties
+
     /// <summary>
-    /// EventArgs for <see cref="PagingDataGridView"/>.
+    /// Current row.
     /// </summary>
-    public sealed class PagingDataGridViewEventArgs
-        : EventArgs
-    {
-        #region Properties
+    public DataGridViewRow? CurrentRow { get; set; }
 
-        /// <summary>
-        /// Current row.
-        /// </summary>
-        public DataGridViewRow? CurrentRow { get; set; }
+    /// <summary>
+    /// Initial call?
+    /// </summary>
+    public bool InitialCall { get; set; }
 
-        /// <summary>
-        /// Initial call?
-        /// </summary>
-        public bool InitialCall { get; set; }
+    /// <summary>
+    /// Scroll direction.
+    /// </summary>
+    public bool ScrollDown { get; set; }
 
-        /// <summary>
-        /// Scroll direction.
-        /// </summary>
-        public bool ScrollDown { get; set; }
+    /// <summary>
+    /// Success.
+    /// </summary>
+    public bool Success { get; set; }
 
-        /// <summary>
-        /// Success.
-        /// </summary>
-        public bool Success { get; set; }
-
-        #endregion
-
-    } // class PagingDataGridViewEventArgs
-
-} // namespace AM.Windows.Forms
+    #endregion
+}

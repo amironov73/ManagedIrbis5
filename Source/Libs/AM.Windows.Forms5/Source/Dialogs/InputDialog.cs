@@ -33,7 +33,8 @@ namespace AM.Windows.Forms.Dialogs;
 /// <threadsafety instance="false" static="true" />
 [DefaultProperty ("MainInstruction"), DefaultEvent ("ButtonClicked"),
  Description ("A dialog that allows the user to input a single text value.")]
-public partial class InputDialog : Component, IBindableComponent
+public partial class InputDialog
+    : Component, IBindableComponent
 {
     private string _mainInstruction;
     private string _content;
@@ -98,8 +99,8 @@ public partial class InputDialog : Component, IBindableComponent
      Editor (typeof (MultilineStringEditor), typeof (UITypeEditor))]
     public string MainInstruction
     {
-        get { return _mainInstruction ?? string.Empty; }
-        set { _mainInstruction = string.IsNullOrEmpty (value) ? null : value; }
+        get => _mainInstruction ?? string.Empty;
+        set => _mainInstruction = string.IsNullOrEmpty (value) ? null : value;
     }
 
     /// <summary>
@@ -112,8 +113,8 @@ public partial class InputDialog : Component, IBindableComponent
      Editor (typeof (MultilineStringEditor), typeof (UITypeEditor))]
     public string Content
     {
-        get { return _content ?? string.Empty; }
-        set { _content = string.IsNullOrEmpty (value) ? null : value; }
+        get => _content ?? string.Empty;
+        set => _content = string.IsNullOrEmpty (value) ? null : value;
     }
 
     /// <summary>
@@ -126,8 +127,8 @@ public partial class InputDialog : Component, IBindableComponent
      DefaultValue ("")]
     public string WindowTitle
     {
-        get { return _windowTitle ?? string.Empty; }
-        set { _windowTitle = string.IsNullOrEmpty (value) ? null : value; }
+        get => _windowTitle ?? string.Empty;
+        set => _windowTitle = string.IsNullOrEmpty (value) ? null : value;
     }
 
     /// <summary>
@@ -144,7 +145,7 @@ public partial class InputDialog : Component, IBindableComponent
      DefaultValue ("")]
     public string Input
     {
-        get { return _input ?? string.Empty; }
+        get => _input ?? string.Empty;
         set
         {
             _input = value = string.IsNullOrEmpty (value) ? null : value;
@@ -163,8 +164,8 @@ public partial class InputDialog : Component, IBindableComponent
      DefaultValue ((int)Int16.MaxValue)]
     public int MaxLength
     {
-        get { return _maxLength; }
-        set { _maxLength = value; }
+        get => _maxLength;
+        set => _maxLength = value;
     }
 
     /// <summary>
@@ -178,8 +179,8 @@ public partial class InputDialog : Component, IBindableComponent
      DefaultValue (false)]
     public bool UsePasswordMasking
     {
-        get { return _usePasswordMasking; }
-        set { _usePasswordMasking = value; }
+        get => _usePasswordMasking;
+        set => _usePasswordMasking = value;
     }
 
     /// <summary>
@@ -192,8 +193,8 @@ public partial class InputDialog : Component, IBindableComponent
      DefaultValue (false)]
     public bool Multiline
     {
-        get { return _multiLine; }
-        set { _multiLine = value; }
+        get => _multiLine;
+        set => _multiLine = value;
     }
 
     /// <summary>
@@ -277,8 +278,8 @@ public partial class InputDialog : Component, IBindableComponent
      EditorBrowsable (EditorBrowsableState.Advanced)]
     public BindingContext BindingContext
     {
-        get { return _context ?? (_context = new BindingContext()); }
-        set { _context = value; }
+        get => _context ?? (_context = new BindingContext());
+        set => _context = value;
     }
 
     private ControlBindingsCollection _bindings;
@@ -291,10 +292,7 @@ public partial class InputDialog : Component, IBindableComponent
     /// </value>
     [DesignerSerializationVisibility (DesignerSerializationVisibility.Content), Category ("Data"),
      RefreshProperties (RefreshProperties.All), ParenthesizePropertyName (true)]
-    public ControlBindingsCollection DataBindings
-    {
-        get { return _bindings ?? (_bindings = new ControlBindingsCollection (this)); }
-    }
+    public ControlBindingsCollection DataBindings => _bindings ?? (_bindings = new ControlBindingsCollection (this));
 
     #endregion
 }
