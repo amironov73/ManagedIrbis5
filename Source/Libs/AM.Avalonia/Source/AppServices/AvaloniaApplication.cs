@@ -32,7 +32,7 @@ using AM.Interactivity;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Themes.Fluent;
+using Avalonia.ThemeManager;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -57,6 +57,11 @@ public class AvaloniaApplication
     #region Properties
 
     /// <summary>
+    /// Менеджер тем.
+    /// </summary>
+    public IThemeManager ThemeManager { get; internal set; }
+
+    /// <summary>
     /// Главное окно.
     /// </summary>
     public Window MainWindow { get; internal set; } = null!;
@@ -78,6 +83,7 @@ public class AvaloniaApplication
         _hostBuilder = Host.CreateDefaultBuilder();
         Windows = new List<Window>();
         Args = Array.Empty<string>();
+        ThemeManager = null!;
         EarlyInitialization();
     }
 
@@ -259,7 +265,9 @@ public class AvaloniaApplication
     /// <inheritdoc cref="Application.Initialize"/>
     public override void Initialize()
     {
-        Current!.Styles.Add (new FluentTheme (new Uri("avares://Avalonia.Themes.Fluent/FluentLight.xaml")));
+        ThemeManager = new FluentThemeManager();
+        ThemeManager.Initialize (this);
+        // Current!.Styles.Add (new FluentTheme (new Uri("avares://Avalonia.Themes.Fluent/FluentLight.xaml")));
     }
 
     /// <inheritdoc cref="Application.OnFrameworkInitializationCompleted"/>
@@ -268,6 +276,12 @@ public class AvaloniaApplication
         if (!FinalInitialization())
         {
             throw new ApplicationException ("Initialization failed");
+        }
+
+        var darkMode = Configuration.GetValue ("dark-mode", false);
+        if (darkMode)
+        {
+            ThemeManager.Switch (1);
         }
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)

@@ -15,11 +15,9 @@
 
 #region Using directives
 
-using System;
-
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Themes.Fluent;
+using Avalonia.ThemeManager;
 
 #endregion
 
@@ -33,10 +31,13 @@ namespace AvaloniaApp;
 public sealed class App
     : Application
 {
+    public static IThemeManager? ThemeManager;
+    
     /// <inheritdoc cref="Application.Initialize"/>
     public override void Initialize()
     {
-        Current!.Styles.Add (new FluentTheme (new Uri ("avares://Avalonia.Themes.Fluent/FluentLight.xaml")));
+        ThemeManager = new FluentThemeManager();
+        ThemeManager.Initialize (this);
     }
 
     /// <inheritdoc cref="Application.OnFrameworkInitializationCompleted"/>

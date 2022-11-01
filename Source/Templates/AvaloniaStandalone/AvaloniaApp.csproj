@@ -9,6 +9,9 @@
         <Nullable>enable</Nullable>
         <!--Avalonia doesen't support TrimMode=link currently,but we are working on that https://github.com/AvaloniaUI/Avalonia/issues/6892 -->
         <TrimMode>copyused</TrimMode>
+        <TargetFramework>net7.0</TargetFramework>
+        <LangVersion>11</LangVersion>
+        <Nullable>enable</Nullable>
         <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     </PropertyGroup>
 
@@ -34,6 +37,7 @@
         <PackageReference Include="Avalonia.Desktop" Version="11.0.0-preview3"/>
         <PackageReference Include="Avalonia.Diagnostics" Version="11.0.0-preview3"/>
         <PackageReference Include="Avalonia.ReactiveUI" Version="11.0.0-preview3"/>
+        <PackageReference Include="Avalonia.ThemeManager" Version="11.0.0-preview2" />
         <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.0-preview3"/>
         <PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.0.0-preview3"/>
         <PackageReference Include="Avalonia.Xaml.Interactions" Version="11.0.0-preview3"/>
