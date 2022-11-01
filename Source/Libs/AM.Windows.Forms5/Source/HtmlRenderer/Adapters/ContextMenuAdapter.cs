@@ -5,21 +5,41 @@
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
 
+#region Using directives
+
 using System;
 using System.Windows.Forms;
+
 using AM.Drawing.HtmlRenderer.Adapters.Entities;
-using AM.Drawing.HtmlRenderer.Core.Utils;
 using AM.Drawing.HtmlRenderer.Adapters;
 using AM.Windows.Forms.HtmlRenderer.Utilities;
+
+#endregion
+
+#nullable enable
 
 namespace AM.Windows.Forms.HtmlRenderer.Adapters;
 
 /// <summary>
 /// Adapter for WinForms context menu for core.
 /// </summary>
-internal sealed class ContextMenuAdapter : RContextMenu
+internal sealed class ContextMenuAdapter
+    : RContextMenu
 {
-    #region Fields and Consts
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public ContextMenuAdapter()
+    {
+        _contextMenu = new ContextMenuStrip();
+        _contextMenu.ShowImageMargin = false;
+    }
+
+    #endregion
+
+    #region Private members
 
     /// <summary>
     /// the underline win forms context menu
@@ -28,50 +48,60 @@ internal sealed class ContextMenuAdapter : RContextMenu
 
     #endregion
 
+    #region RContextMenu members
 
-    /// <summary>
-    /// Init.
-    /// </summary>
-    public ContextMenuAdapter()
-    {
-        _contextMenu = new ContextMenuStrip();
-        _contextMenu.ShowImageMargin = false;
-    }
+    /// <inheritdoc cref="RContextMenu.ItemsCount"/>
+    public override int ItemsCount => _contextMenu.Items.Count;
 
-    public override int ItemsCount
-    {
-        get { return _contextMenu.Items.Count; }
-    }
-
+    /// <inheritdoc cref="RContextMenu.AddDivider"/>
     public override void AddDivider()
     {
-        _contextMenu.Items.Add("-");
+        _contextMenu.Items.Add ("-");
     }
 
-    public override void AddItem(string text, bool enabled, EventHandler onClick)
+    /// <inheritdoc cref="RContextMenu.AddItem"/>
+    public override void AddItem
+        (
+            string text,
+            bool enabled,
+            EventHandler onClick
+        )
     {
-        ArgChecker.AssertArgNotNullOrEmpty(text, "text");
-        ArgChecker.AssertArgNotNull(onClick, "onClick");
+        Sure.NotNullNorEmpty (text);
+        Sure.NotNull (onClick);
 
-        var item = _contextMenu.Items.Add(text, null, onClick);
+        var item = _contextMenu.Items.Add (text, null, onClick);
         item.Enabled = enabled;
     }
 
+    /// <inheritdoc cref="RContextMenu.RemoveLastDivider"/>
     public override void RemoveLastDivider()
     {
-        if (_contextMenu.Items[_contextMenu.Items.Count - 1].Text == string.Empty)
+        if (_contextMenu.Items[^1].Text.IsEmpty())
         {
-            _contextMenu.Items.RemoveAt(_contextMenu.Items.Count - 1);
+            _contextMenu.Items.RemoveAt (_contextMenu.Items.Count - 1);
         }
     }
 
-    public override void Show(RControl parent, RPoint location)
+    /// <inheritdoc cref="RContextMenu.Show"/>
+    public override void Show
+        (
+            RControl parent,
+            RPoint location
+        )
     {
-        _contextMenu.Show(((ControlAdapter)parent).Control, Utils.ConvertRound(location));
+        Sure.NotNull (parent);
+
+        var control = ((ControlAdapter)parent).Control;
+
+        _contextMenu.Show (control, Utils.ConvertRound (location));
     }
 
+    /// <inheritdoc cref="RContextMenu.Dispose"/>
     public override void Dispose()
     {
         _contextMenu.Dispose();
     }
+
+    #endregion
 }

@@ -5,94 +5,129 @@
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
 
+#region Using directives
+
 using System.Windows.Forms;
+
 using AM.Drawing.HtmlRenderer.Adapters.Entities;
-using AM.Drawing.HtmlRenderer.Core.Utils;
 using AM.Drawing.HtmlRenderer.Adapters;
 using AM.Windows.Forms.HtmlRenderer.Utilities;
+
+#endregion
+
+#nullable enable
 
 namespace AM.Windows.Forms.HtmlRenderer.Adapters;
 
 /// <summary>
 /// Adapter for WinForms Control for core.
 /// </summary>
-internal sealed class ControlAdapter : RControl
+internal sealed class ControlAdapter
+    : RControl
 {
+    #region Properties
+
     /// <summary>
-    /// the underline win forms control.
+    /// Get the underline win forms control
     /// </summary>
-    private readonly Control _control;
+    public Control Control { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public ControlAdapter
+        (
+            Control control,
+            bool useGdiPlusTextRendering
+        )
+        : base (WinFormsAdapter.Instance)
+    {
+        Sure.NotNull (control);
+
+        Control = control;
+        _useGdiPlusTextRendering = useGdiPlusTextRendering;
+    }
+
+    #endregion
+
+    #region Private members
 
     /// <summary>
     /// Use GDI+ text rendering to measure/draw text.
     /// </summary>
     private readonly bool _useGdiPlusTextRendering;
 
-    /// <summary>
-    /// Init.
-    /// </summary>
-    public ControlAdapter(Control control, bool useGdiPlusTextRendering)
-        : base(WinFormsAdapter.Instance)
-    {
-        ArgChecker.AssertArgNotNull(control, "control");
+    #endregion
 
-        _control = control;
-        _useGdiPlusTextRendering = useGdiPlusTextRendering;
-    }
+    #region RControl members
 
-    /// <summary>
-    /// Get the underline win forms control
-    /// </summary>
-    public Control Control
-    {
-        get { return _control; }
-    }
+    /// <inheritdoc cref="RControl.MouseLocation"/>
+    public override RPoint MouseLocation =>
+        Utils.Convert (Control.PointToClient (Control.MousePosition));
 
-    public override RPoint MouseLocation
-    {
-        get { return Utils.Convert(_control.PointToClient(Control.MousePosition)); }
-    }
+    /// <inheritdoc cref="RControl.LeftMouseButton"/>
+    public override bool LeftMouseButton =>
+        (Control.MouseButtons & MouseButtons.Left) != 0;
 
-    public override bool LeftMouseButton
-    {
-        get { return (Control.MouseButtons & MouseButtons.Left) != 0; }
-    }
+    /// <inheritdoc cref="RControl.RightMouseButton"/>
+    public override bool RightMouseButton =>
+        (Control.MouseButtons & MouseButtons.Right) != 0;
 
-    public override bool RightMouseButton
-    {
-        get { return (Control.MouseButtons & MouseButtons.Right) != 0; }
-    }
-
+    /// <inheritdoc cref="RControl.SetCursorDefault"/>
     public override void SetCursorDefault()
     {
-        _control.Cursor = Cursors.Default;
+        Control.Cursor = Cursors.Default;
     }
 
+    /// <inheritdoc cref="RControl.SetCursorHand"/>
     public override void SetCursorHand()
     {
-        _control.Cursor = Cursors.Hand;
+        Control.Cursor = Cursors.Hand;
     }
 
+    /// <inheritdoc cref="RControl.SetCursorIBeam"/>
     public override void SetCursorIBeam()
     {
-        _control.Cursor = Cursors.IBeam;
+        Control.Cursor = Cursors.IBeam;
     }
 
-    public override void DoDragDropCopy(object dragDropData)
+    /// <inheritdoc cref="RControl.DoDragDropCopy"/>
+    public override void DoDragDropCopy
+        (
+            object dragDropData
+        )
     {
-        _control.DoDragDrop(dragDropData, DragDropEffects.Copy);
+        Control.DoDragDrop (dragDropData, DragDropEffects.Copy);
     }
 
-    public override void MeasureString(string str, RFont font, double maxWidth, out int charFit, out double charFitWidth)
+    /// <inheritdoc cref="RControl.MeasureString"/>
+    public override void MeasureString
+        (
+            string str,
+            RFont font,
+            double maxWidth,
+            out int charFit,
+            out double charFitWidth
+        )
     {
-        using (var g = new GraphicsAdapter(_control.CreateGraphics(), _useGdiPlusTextRendering, true))
-        {
-            g.MeasureString(str, font, maxWidth, out charFit, out charFitWidth);
-        }
+        using var graphicsAdapter = new GraphicsAdapter
+            (
+                Control.CreateGraphics(),
+                _useGdiPlusTextRendering,
+                true
+            );
+        graphicsAdapter.MeasureString (str, font, maxWidth, out charFit, out charFitWidth);
     }
 
+    /// <inheritdoc cref="RControl.Invalidate"/>
     public override void Invalidate()
     {
-        _control.Invalidate();
+        Control.Invalidate();
     }
+
+    #endregion
 }

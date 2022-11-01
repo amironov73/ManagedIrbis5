@@ -3,22 +3,54 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable InconsistentNaming
+
+#region Using directives
 
 using System.Drawing;
+
 using AM.Drawing.HtmlRenderer.Adapters;
+
+#endregion
+
+#nullable enable
 
 namespace AM.Windows.Forms.HtmlRenderer.Adapters;
 
 /// <summary>
 /// Adapter for WinForms brushes objects for core.
 /// </summary>
-internal sealed class BrushAdapter : RBrush
+internal sealed class BrushAdapter
+    : RBrush
 {
+    #region Properties
+
     /// <summary>
     /// The actual WinForms brush instance.
     /// </summary>
-    private readonly Brush _brush;
+    public Brush Brush { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Init.
+    /// </summary>
+    public BrushAdapter
+        (
+            Brush brush,
+            bool dispose
+        )
+    {
+        Sure.NotNull (brush);
+
+        Brush = brush;
+        _dispose = dispose;
+    }
+
+    #endregion
+
+    #region Private members
 
     /// <summary>
     /// If to dispose the brush when <see cref="Dispose"/> is called.<br/>
@@ -26,28 +58,18 @@ internal sealed class BrushAdapter : RBrush
     /// </summary>
     private readonly bool _dispose;
 
-    /// <summary>
-    /// Init.
-    /// </summary>
-    public BrushAdapter(Brush brush, bool dispose)
-    {
-        _brush = brush;
-        _dispose = dispose;
-    }
+    #endregion
 
-    /// <summary>
-    /// The actual WinForms brush instance.
-    /// </summary>
-    public Brush Brush
-    {
-        get { return _brush; }
-    }
+    #region RBrush members
 
+    /// <inheritdoc cref="RBrush.Dispose"/>
     public override void Dispose()
     {
         if (_dispose)
         {
-            _brush.Dispose();
+            Brush.Dispose();
         }
     }
+
+    #endregion
 }
