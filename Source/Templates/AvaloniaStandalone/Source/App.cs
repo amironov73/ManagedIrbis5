@@ -25,7 +25,7 @@ using Avalonia.Themes.Fluent;
 
 #nullable enable
 
-namespace PartyStatusA;
+namespace AvaloniaApp;
 
 /// <summary>
 /// Класс приложения.

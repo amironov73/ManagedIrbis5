@@ -19,19 +19,17 @@ using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
-using AM;
-
 using Avalonia;
 using Avalonia.Controls;
-
-using AM.Avalonia.Controls;
-using AM.Avalonia.Source;
-
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
+
+using AM;
+using AM.Avalonia.Controls;
+using AM.Avalonia.Source;
 
 using ManagedIrbis;
 using ManagedIrbis.Infrastructure;
