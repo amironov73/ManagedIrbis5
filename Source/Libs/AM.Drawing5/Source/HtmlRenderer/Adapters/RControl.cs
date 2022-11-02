@@ -25,18 +25,7 @@ namespace AM.Drawing.HtmlRenderer.Adapters;
 /// </summary>
 public abstract class RControl
 {
-    /// <summary>
-    /// Init control with platform adapter.
-    /// </summary>
-    protected RControl
-        (
-            RAdapter adapter
-        )
-    {
-        Sure.NotNull (adapter);
-
-        Adapter = adapter;
-    }
+    #region Properties
 
     /// <summary>
     /// The platform adapter.
@@ -57,6 +46,27 @@ public abstract class RControl
     /// Get the current location of the mouse relative to the control
     /// </summary>
     public abstract RPoint MouseLocation { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Init control with platform adapter.
+    /// </summary>
+    protected RControl
+        (
+            RAdapter adapter
+        )
+    {
+        Sure.NotNull (adapter);
+
+        Adapter = adapter;
+    }
+
+    #endregion
+
+    #region Public methods
 
     /// <summary>
     /// Set the cursor over the control to default cursor
@@ -100,4 +110,6 @@ public abstract class RControl
     /// Invalidates the entire surface of the control and causes the control to be redrawn.
     /// </summary>
     public abstract void Invalidate();
+
+    #endregion
 }

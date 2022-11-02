@@ -28,10 +28,16 @@ namespace AM.Drawing.HtmlRenderer.Adapters;
 public abstract class RContextMenu
     : IDisposable
 {
+    #region Properties
+
     /// <summary>
     /// The total number of items in the context menu
     /// </summary>
     public abstract int ItemsCount { get; }
+
+    #endregion
+
+    #region Public methods
 
     /// <summary>
     /// Add divider item to the context menu.<br />
@@ -65,4 +71,6 @@ public abstract class RContextMenu
 
     /// <inheritdoc cref="IDisposable.Dispose"/>
     public abstract void Dispose();
+
+    #endregion
 }

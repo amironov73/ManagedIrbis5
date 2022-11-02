@@ -18,6 +18,8 @@ namespace AM.Drawing.HtmlRenderer.Adapters;
 /// </summary>
 public abstract class RFont
 {
+    #region Properties
+
     /// <summary>
     /// Gets the em-size of this Font measured in the units specified by the Unit property.
     /// </summary>
@@ -38,5 +40,16 @@ public abstract class RFont
     /// </summary>
     public abstract double LeftPadding { get; }
 
-    public abstract double GetWhitespaceWidth(RGraphics graphics);
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="graphics"></param>
+    /// <returns></returns>
+    public abstract double GetWhitespaceWidth (RGraphics graphics);
+
+    #endregion
 }

@@ -19,8 +19,12 @@ namespace AM.Drawing.HtmlRenderer.Adapters;
 /// </summary>
 public abstract class RFontFamily
 {
+    #region Properties
+
     /// <summary>
     /// Gets the name of this Font Family.
     /// </summary>
     public abstract string Name { get; }
+
+    #endregion
 }

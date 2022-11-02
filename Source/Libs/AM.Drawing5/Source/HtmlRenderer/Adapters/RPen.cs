@@ -24,6 +24,8 @@ namespace AM.Drawing.HtmlRenderer.Adapters;
 /// </summary>
 public abstract class RPen
 {
+    #region Properties
+
     /// <summary>
     /// Gets or sets the width of this Pen, in units of the Graphics object used for drawing.
     /// </summary>
@@ -33,4 +35,6 @@ public abstract class RPen
     /// Gets or sets the style used for dashed lines drawn with this Pen.
     /// </summary>
     public abstract RDashStyle DashStyle { set; }
+
+    #endregion
 }

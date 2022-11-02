@@ -75,6 +75,7 @@ public abstract class RAdapter
 
     #endregion
 
+    #region Construction
 
     /// <summary>
     /// Init.
@@ -83,6 +84,8 @@ public abstract class RAdapter
     {
         _fontsHandler = new FontsHandler (this);
     }
+
+    #endregion
 
     /// <summary>
     /// Get the default CSS stylesheet data.
@@ -347,7 +350,6 @@ public abstract class RAdapter
     {
         return CreateFontInt (family, size, style);
     }
-
 
     #region Private/Protected methods
 

@@ -23,8 +23,13 @@ namespace AM.Drawing.HtmlRenderer.Adapters;
 /// Adapter for platform specific brush objects - used to fill graphics (rectangles, polygons and paths).<br/>
 /// The brush can be solid color, gradient or image.
 /// </summary>
-public abstract class RBrush 
+public abstract class RBrush
     : IDisposable
 {
+    #region Public methods
+
+    /// <inheritdoc cref="IDisposable.Dispose"/>
     public abstract void Dispose();
+
+    #endregion
 }

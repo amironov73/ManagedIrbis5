@@ -22,9 +22,11 @@ namespace AM.Drawing.HtmlRenderer.Adapters;
 /// <summary>
 /// Adapter for platform specific image object - used to render images.
 /// </summary>
-public abstract class RImage 
+public abstract class RImage
     : IDisposable
 {
+    #region Public methods
+
     /// <summary>
     /// Get the width, in pixels, of the image.
     /// </summary>
@@ -35,5 +37,8 @@ public abstract class RImage
     /// </summary>
     public abstract double Height { get; }
 
+    /// <inheritdoc cref="IDisposable.Dispose"/>
     public abstract void Dispose();
+
+    #endregion
 }
