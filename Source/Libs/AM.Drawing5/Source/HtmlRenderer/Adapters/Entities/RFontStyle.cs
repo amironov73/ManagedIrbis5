@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
 
 /* RFontStyle.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -23,9 +24,28 @@ namespace AM.Drawing.HtmlRenderer.Adapters.Entities;
 [Flags]
 public enum RFontStyle
 {
+    /// <summary>
+    /// Обычное начертание.
+    /// </summary>
     Regular = 0,
+
+    /// <summary>
+    /// Полужирное начертание.
+    /// </summary>
     Bold = 1,
+
+    /// <summary>
+    /// Курсивное начертание.
+    /// </summary>
     Italic = 2,
+
+    /// <summary>
+    /// Подчеркивание.
+    /// </summary>
     Underline = 4,
+
+    /// <summary>
+    /// Зачеркивание.
+    /// </summary>
     Strikeout = 8,
 }

@@ -24,24 +24,24 @@ namespace AM.Drawing.HtmlRenderer.Adapters.Entities;
 /// </summary>
 public sealed class RMouseEvent
 {
-    /// <summary>
-    /// Is the left mouse button participated in the event
-    /// </summary>
-    private readonly bool _leftButton;
-
-    /// <summary>
-    /// Init.
-    /// </summary>
-    public RMouseEvent(bool leftButton)
-    {
-        _leftButton = leftButton;
-    }
+    #region Properties
 
     /// <summary>
     /// Is the left mouse button participated in the event
     /// </summary>
-    public bool LeftButton
+    public bool LeftButton { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public RMouseEvent (bool leftButton)
     {
-        get { return _leftButton; }
+        LeftButton = leftButton;
     }
+
+    #endregion
 }

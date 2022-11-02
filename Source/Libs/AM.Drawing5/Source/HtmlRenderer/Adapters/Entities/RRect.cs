@@ -34,6 +34,7 @@ public struct RRect
 
     #endregion
 
+    #region Construction
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="RRect" /> class with the specified location and size.
@@ -68,6 +69,8 @@ public struct RRect
         Width = size.Width;
         Height = size.Height;
     }
+
+    #endregion
 
     /// <summary>
     /// Gets or sets the coordinates of the upper-left corner of this <see cref="RRect" /> structure.
@@ -369,7 +372,7 @@ public struct RRect
     /// <param name="y">The amount to inflate the copy of the rectangle vertically. </param>
     public static RRect Inflate (RRect rect, double x, double y)
     {
-        RRect rectangleF = rect;
+        var rectangleF = rect;
         rectangleF.Inflate (x, y);
         return rectangleF;
     }
@@ -383,7 +386,7 @@ public struct RRect
     /// <param name="rect">The rectangle to intersect. </param>
     public void Intersect (RRect rect)
     {
-        RRect rectangleF = Intersect (rect, this);
+        var rectangleF = Intersect (rect, this);
         X = rectangleF.X;
         Y = rectangleF.Y;
         Width = rectangleF.Width;
@@ -403,10 +406,10 @@ public struct RRect
     /// <param name="b">A rectangle to intersect. </param>
     public static RRect Intersect (RRect a, RRect b)
     {
-        double x = Math.Max (a.X, b.X);
-        double num1 = Math.Min (a.X + a.Width, b.X + b.Width);
-        double y = Math.Max (a.Y, b.Y);
-        double num2 = Math.Min (a.Y + a.Height, b.Y + b.Height);
+        var x = Math.Max (a.X, b.X);
+        var num1 = Math.Min (a.X + a.Width, b.X + b.Width);
+        var y = Math.Max (a.Y, b.Y);
+        var num2 = Math.Min (a.Y + a.Height, b.Y + b.Height);
         if (num1 >= x && num2 >= y)
         {
             return new RRect (x, y, num1 - x, num2 - y);
@@ -442,10 +445,10 @@ public struct RRect
     /// <param name="b">A rectangle to union. </param>
     public static RRect Union (RRect a, RRect b)
     {
-        double x = Math.Min (a.X, b.X);
-        double num1 = Math.Max (a.X + a.Width, b.X + b.Width);
-        double y = Math.Min (a.Y, b.Y);
-        double num2 = Math.Max (a.Y + a.Height, b.Y + b.Height);
+        var x = Math.Min (a.X, b.X);
+        var num1 = Math.Max (a.X + a.Width, b.X + b.Width);
+        var y = Math.Min (a.Y, b.Y);
+        var num2 = Math.Max (a.Y + a.Height, b.Y + b.Height);
         return new RRect (x, y, num1 - x, num2 - y);
     }
 
@@ -469,6 +472,8 @@ public struct RRect
         Y += y;
     }
 
+    #region Object members
+
     /// <inheritdoc cref="ValueType.GetHashCode"/>
     public override int GetHashCode()
     {
@@ -482,4 +487,6 @@ public struct RRect
     {
         return "{X=" + X + ",Y=" + Y + ",Width=" + Width + ",Height=" + Height + "}";
     }
+
+    #endregion
 }

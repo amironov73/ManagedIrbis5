@@ -273,22 +273,7 @@ public struct RSize
         return new RSize (sz1.Width - sz2.Width, sz1.Height - sz2.Height);
     }
 
-    /// <summary>
-    ///     Tests to see whether the specified object is a <see cref="RSize" /> structure with the same dimensions as this
-    ///     <see
-    ///         cref="RSize" />
-    ///     structure.
-    /// </summary>
-    /// <returns>
-    ///     This method returns true if <paramref name="obj" /> is a <see cref="RSize" /> and has the same width and height as this
-    ///     <see
-    ///         cref="RSize" />
-    ///     ; otherwise, false.
-    /// </returns>
-    /// <param name="obj">
-    ///     The <see cref="T:System.Object" /> to test.
-    /// </param>
-    /// <filterpriority>1</filterpriority>
+    /// <inheritdoc cref="ValueType.Equals(object?)"/>
     public override bool Equals
         (
             object? obj
@@ -334,18 +319,7 @@ public struct RSize
         return (RPoint)this;
     }
 
-    /// <summary>
-    ///     Creates a human-readable string that represents this <see cref="RSize" /> structure.
-    /// </summary>
-    /// <returns>
-    ///     A string that represents this <see cref="RSize" /> structure.
-    /// </returns>
-    /// <filterpriority>1</filterpriority>
-    /// <PermissionSet>
-    ///     <IPermission
-    ///         class="System.Security.Permissions.SecurityPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
-    ///         version="1" Flags="UnmanagedCode" />
-    /// </PermissionSet>
+    /// <inheritdoc cref="ValueType.ToString"/>
     public override string ToString()
     {
         return "{Width=" + Width + ", Height=" + Height + "}";

@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable LocalizableElement
 
 /* RColor.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -24,96 +25,59 @@ namespace AM.Drawing.HtmlRenderer.Adapters.Entities;
 /// <summary>
 /// Represents an ARGB (alpha, red, green, blue) color.
 /// </summary>
-public struct RColor
+public readonly struct RColor
 {
-    #region Fields and Consts
+    #region Properties
 
     /// <summary>
-    ///     Represents a color that is null.
+    /// Пустой цвет.
     /// </summary>
-    /// <filterpriority>1</filterpriority>
-    public static readonly RColor Empty = new RColor();
-
-    private readonly long _value;
-
-    #endregion
-
-    private RColor (long value)
-    {
-        _value = value;
-    }
+    public static readonly RColor Empty = new ();
 
     /// <summary>
-    /// Gets a system-defined color.
+    /// Прозрачный цвет.
     /// </summary>
-    public static RColor Transparent
-    {
-        get { return new RColor (0); }
-    }
+    public static RColor Transparent => new (0);
 
     /// <summary>
     ///     Gets a system-defined color that has an ARGB value of #FF000000.
     /// </summary>
-    public static RColor Black
-    {
-        get { return FromArgb (0, 0, 0); }
-    }
+    public static RColor Black => FromArgb (0, 0, 0);
 
     /// <summary>
     /// Gets a system-defined color that has an ARGB value of #FFFFFFFF.
     /// </summary>
-    public static RColor White
-    {
-        get { return FromArgb (255, 255, 255); }
-    }
+    public static RColor White => FromArgb (255, 255, 255);
 
     /// <summary>
     /// Gets a system-defined color that has an ARGB value of #FFF5F5F5.
     /// </summary>
-    public static RColor WhiteSmoke
-    {
-        get { return FromArgb (245, 245, 245); }
-    }
+    public static RColor WhiteSmoke => FromArgb (245, 245, 245);
 
     /// <summary>
     /// Gets a system-defined color that has an ARGB value of #FFD3D3D3.
     /// </summary>
-    public static RColor LightGray
-    {
-        get { return FromArgb (211, 211, 211); }
-    }
+    public static RColor LightGray => FromArgb (211, 211, 211);
 
     /// <summary>
     ///     Gets the red component value of this <see cref="RColor" /> structure.
     /// </summary>
-    public byte R
-    {
-        get { return (byte)((ulong)(_value >> 16) & byte.MaxValue); }
-    }
+    public byte R => (byte)((ulong)(_value >> 16) & byte.MaxValue);
 
     /// <summary>
     ///     Gets the green component value of this <see cref="RColor" /> structure.
     /// </summary>
-    public byte G
-    {
-        get { return (byte)((ulong)(_value >> 8) & byte.MaxValue); }
-    }
+    public byte G => (byte)((ulong)(_value >> 8) & byte.MaxValue);
 
     /// <summary>
     ///     Gets the blue component value of this <see cref="RColor" /> structure.
     /// </summary>
-    public byte B
-    {
-        get { return (byte)((ulong)_value & byte.MaxValue); }
-    }
+    public byte B => (byte)((ulong)_value & byte.MaxValue);
 
     /// <summary>
     ///     Gets the alpha component value of this <see cref="RColor" /> structure.
     /// </summary>
-    public byte A
-    {
-        get { return (byte)((ulong)(_value >> 24) & byte.MaxValue); }
-    }
+    public byte A => (byte)((ulong)(_value >> 24) & byte.MaxValue);
 
     /// <summary>
     ///     Specifies whether this <see cref="RColor" /> structure is uninitialized.
@@ -121,11 +85,37 @@ public struct RColor
     /// <returns>
     ///     This property returns true if this color is uninitialized; otherwise, false.
     /// </returns>
-    /// <filterpriority>1</filterpriority>
-    public bool IsEmpty
+    public bool IsEmpty => _value == 0;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    private RColor (long value)
     {
-        get { return _value == 0; }
+        _value = value;
     }
+
+    #endregion
+
+    #region Private members
+
+    private readonly long _value;
+
+    private static void CheckByte (int value)
+    {
+        if (value is < 0 or > byte.MaxValue)
+        {
+            throw new ArgumentOutOfRangeException (nameof (value), "Color component");
+        }
+    }
+
+    #endregion
+
+    #region Operators
 
     /// <summary>
     ///     Tests whether two specified <see cref="RColor" /> structures are equivalent.
@@ -162,6 +152,10 @@ public struct RColor
     {
         return !(left == right);
     }
+
+    #endregion
+
+    #region Public methods
 
     /// <summary>
     ///     Creates a <see cref="RColor" /> structure from the four ARGB component (alpha, red, green, and blue) values. Although this method allows a 32-bit value to be passed for each component, the value of each component is limited to 8 bits.
@@ -210,6 +204,10 @@ public struct RColor
         return FromArgb (byte.MaxValue, red, green, blue);
     }
 
+    #endregion
+
+    #region Object members
+
     /// <inheritdoc cref="ValueType.Equals(object?)"/>
     public override bool Equals (object? obj)
     {
@@ -241,21 +239,13 @@ public struct RColor
             builder.Append (B);
         }
         else
+        {
             builder.Append ("Empty");
+        }
 
         builder.Append (']');
 
         return builder.ReturnShared();
-    }
-
-
-    #region Private methods
-
-    private static void CheckByte (int value)
-    {
-        if (value is >= 0 and <= byte.MaxValue)
-            return;
-        throw new ArgumentException ("InvalidEx2BoundArgument");
     }
 
     #endregion

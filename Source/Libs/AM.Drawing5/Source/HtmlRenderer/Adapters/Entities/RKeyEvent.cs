@@ -24,52 +24,41 @@ namespace AM.Drawing.HtmlRenderer.Adapters.Entities;
 /// </summary>
 public sealed class RKeyEvent
 {
-    /// <summary>
-    /// is control is pressed
-    /// </summary>
-    private readonly bool _control;
-
-    /// <summary>
-    /// is 'A' key is pressed
-    /// </summary>
-    private readonly bool _aKeyCode;
-
-    /// <summary>
-    /// is 'C' key is pressed
-    /// </summary>
-    private readonly bool _cKeyCode;
-
-    /// <summary>
-    /// Init.
-    /// </summary>
-    public RKeyEvent(bool control, bool aKeyCode, bool cKeyCode)
-    {
-        _control = control;
-        _aKeyCode = aKeyCode;
-        _cKeyCode = cKeyCode;
-    }
+    #region Properties
 
     /// <summary>
     /// is control is pressed
     /// </summary>
-    public bool Control
-    {
-        get { return _control; }
-    }
+    public bool Control { get; }
 
     /// <summary>
     /// is 'A' key is pressed
     /// </summary>
-    public bool AKeyCode
-    {
-        get { return _aKeyCode; }
-    }
+    public bool AKeyCode { get; }
 
     /// <summary>
     /// is 'C' key is pressed
     /// </summary>
-    public bool CKeyCode
+    public bool CKeyCode { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public RKeyEvent
+        (
+            bool control,
+            bool aKeyCode,
+            bool cKeyCode
+        )
     {
-        get { return _cKeyCode; }
+        Control = control;
+        AKeyCode = aKeyCode;
+        CKeyCode = cKeyCode;
     }
+
+    #endregion
 }

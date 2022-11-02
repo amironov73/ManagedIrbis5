@@ -25,26 +25,13 @@ namespace AM.Drawing.HtmlRenderer.Adapters.Entities;
 /// </summary>
 public struct RPoint
 {
+    #region Properties
+
     /// <summary>
     ///     Represents a new instance of the <see cref="RPoint" /> class with member data left uninitialized.
     /// </summary>
     /// <filterpriority>1</filterpriority>
-    public static readonly RPoint Empty = new RPoint();
-
-    static RPoint()
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="RPoint" /> class with the specified coordinates.
-    /// </summary>
-    /// <param name="x">The horizontal position of the point. </param>
-    /// <param name="y">The vertical position of the point. </param>
-    public RPoint (double x, double y)
-    {
-        X = x;
-        Y = y;
-    }
+    public static readonly RPoint Empty = new ();
 
     /// <summary>
     ///     Gets a value indicating whether this <see cref="RPoint" /> is empty.
@@ -61,9 +48,11 @@ public struct RPoint
         get
         {
             if (Math.Abs (X - 0.0) < 0.001)
+            {
                 return Math.Abs (Y - 0.0) < 0.001;
-            else
-                return false;
+            }
+
+            return false;
         }
     }
 
@@ -84,6 +73,25 @@ public struct RPoint
     /// </returns>
     /// <filterpriority>1</filterpriority>
     public double Y { get; set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="RPoint" /> class with the specified coordinates.
+    /// </summary>
+    /// <param name="x">The horizontal position of the point. </param>
+    /// <param name="y">The vertical position of the point. </param>
+    public RPoint (double x, double y)
+    {
+        X = x;
+        Y = y;
+    }
+
+    #endregion
+
+    #region Operators
 
     /// <summary>
     ///     Translates the <see cref="RPoint" /> by the specified
@@ -185,6 +193,10 @@ public struct RPoint
         return !(left == right);
     }
 
+    #endregion
+
+    #region Public methods
+
     /// <summary>
     ///     Translates a given <see cref="RPoint" /> by a specified
     ///     <see
@@ -228,37 +240,36 @@ public struct RPoint
         return new RPoint (pt.X - sz.Width, pt.Y - sz.Height);
     }
 
+    #endregion
+
+    #region Object members
+
     /// <inheritdoc cref="ValueType.Equals(object?)"/>
     public override bool Equals (object? obj)
     {
-        if (!(obj is RPoint))
+        if (obj is not RPoint pointF)
+        {
             return false;
-        var pointF = (RPoint)obj;
-        if (pointF.X == X && pointF.Y == Y)
-            return pointF.GetType().Equals (GetType());
-        else
-            return false;
+        }
+
+        return pointF.X == X && pointF.Y == Y;
     }
 
     /// <inheritdoc cref="ValueType.GetHashCode"/>
     public override int GetHashCode()
     {
+        // ReSharper disable BaseObjectGetHashCodeCallInGetHashCode
+
         return base.GetHashCode();
+
+        // ReSharper restore BaseObjectGetHashCodeCallInGetHashCode
     }
 
-    /// <summary>
-    ///     Converts this <see cref="RPoint" /> to a human readable string.
-    /// </summary>
-    /// <returns>
-    ///     A string that represents this <see cref="RPoint" />.
-    /// </returns>
-    /// <filterpriority>1</filterpriority>
+    /// <inheritdoc cref="ValueType.ToString"/>
     public override string ToString()
     {
-        return string.Format ("{{X={0}, Y={1}}}", new object[]
-        {
-            X,
-            Y
-        });
+        return $"{{X={X}, Y={Y}}}";
     }
+
+    #endregion
 }
