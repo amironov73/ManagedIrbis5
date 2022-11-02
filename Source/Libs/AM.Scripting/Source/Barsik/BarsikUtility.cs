@@ -588,6 +588,7 @@ public static class BarsikUtility
         {
             null => 0,
             string text => text.Length,
+            Array array => array.Length,
             IList list => list.Count,
             IDictionary dictionary => dictionary.Count,
             _ => 1

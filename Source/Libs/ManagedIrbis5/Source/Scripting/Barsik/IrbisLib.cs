@@ -812,7 +812,7 @@ public sealed class IrbisLib
     }
 
     /// <summary>
-    /// Форматирование записи.
+    /// Форматирование записи/записей.
     /// </summary>
     public static dynamic? FormatRecord
         (
@@ -837,6 +837,10 @@ public sealed class IrbisLib
             if (value is int mfn)
             {
                 parameters.Mfn = mfn;
+            }
+            else if (value is Record record)
+            {
+                parameters.Record = record;
             }
             else if (value is string format)
             {

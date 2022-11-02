@@ -1,0 +1,42 @@
+﻿//
+// Поиск книг на языках коренных и малых народов Севера
+//
+
+connect("host=192.168.3.2;port=6666;user=miron;password=miron;db=IBIS;")
+if (!is_connected())
+{
+    error ("Not connected")
+    exit()
+}
+
+//=================================
+
+xpression = "J=BUA + J=CHM + J=FIU + J=LAU + J=JUR + J=SAH + J=TUM"
+found = batch_search (xpression)
+excount = 0
+newcount = 0
+
+println ("Книги на языках КМНС")
+println ("============================================================")
+foreach (book in found)
+{
+    println (format_record (book.Mfn, "@brief"))
+    exemplars = get_exemplars (book)
+    excount += len (exemplars)
+    foreach (one in exemplars)
+    {
+        if (one.Date >= "2018")
+        {
+            newcount++
+        }
+    }
+}
+
+println ("============================================================")
+println ("Общее количество экземпляров изданий на языках КМНС: ", excount)
+println ("За последние 5 лет поступило экземпляров изданий на языках КМНС: ", newcount)
+
+//=================================
+
+disconnect()
+println ("THAT'S ALL, FOLKS!")
