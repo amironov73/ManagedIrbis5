@@ -19,6 +19,7 @@ using AM.Drawing.HtmlRenderer.Adapters.Entities;
 using AM.Drawing.HtmlRenderer.Core.Dom;
 using AM.Drawing.HtmlRenderer.Core.Entities;
 using AM.Drawing.HtmlRenderer.Core.Parse;
+using AM.Text;
 
 #endregion
 
@@ -107,6 +108,7 @@ internal sealed class DomUtils
         {
             return box.ParentBox ?? root;
         }
+
         return FindParent (root, tagName, box.ParentBox);
     }
 
@@ -237,18 +239,18 @@ internal sealed class DomUtils
     /// <returns>the value of the attribute or null if not found</returns>
     public static string? GetAttribute
         (
-            CssBox box,
+            CssBox? box,
             string attribute
         )
     {
-        string? value = null;
-        while (box != null && value == null)
+        string? result = null;
+        while (box is not null && result is null)
         {
-            value = box.GetAttribute (attribute, null);
+            result = box.GetAttribute (attribute, null);
             box = box.ParentBox;
         }
 
-        return value;
+        return result;
     }
 
     /// <summary>
@@ -435,7 +437,7 @@ internal sealed class DomUtils
     /// <param name="box">the box to start search from</param>
     /// <param name="location">the location to find the box at</param>
     /// <returns>css word box if exists or null</returns>
-    public static CssRect GetCssBoxWord
+    public static CssRect? GetCssBoxWord
         (
             CssBox? box,
             RPoint location
@@ -490,7 +492,7 @@ internal sealed class DomUtils
             {
                 // add word spacing to word width so sentence won't have hols in it when moving the mouse
                 var rect = word.Rectangle;
-                rect.Width += word.OwnerBox.ActualWordSpacing;
+                rect.Width += word.OwnerBox?.ActualWordSpacing ?? 0;
                 if (rect.Contains (location))
                 {
                     return word;
@@ -512,7 +514,7 @@ internal sealed class DomUtils
         )
     {
         var box = word.OwnerBox;
-        while (box.LineBoxes.Count == 0)
+        while (box is { LineBoxes.Count: 0 })
         {
             box = box.ParentBox;
         }
@@ -536,11 +538,18 @@ internal sealed class DomUtils
     /// </summary>
     /// <param name="root">the DOM box to get selected text from its sub-tree</param>
     /// <returns>the selected plain text string</returns>
-    public static string GetSelectedPlainText (CssBox root)
+    public static string GetSelectedPlainText
+        (
+            CssBox root
+        )
     {
-        var sb = new StringBuilder();
-        var lastWordIndex = GetSelectedPlainText (sb, root);
-        return sb.ToString (0, lastWordIndex).Trim();
+        var builder = StringBuilderPool.Shared.Get();
+        var lastWordIndex = GetSelectedPlainText (builder, root);
+
+        var result = builder.ToString (0, lastWordIndex).Trim();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     /// <summary>
@@ -559,11 +568,18 @@ internal sealed class DomUtils
         )
     {
         var sb = new StringBuilder();
-        if (root != null)
+        if (root is not null)
         {
             var selectedBoxes = onlySelected ? CollectSelectedBoxes (root) : null;
-            var selectionRoot = onlySelected ? GetSelectionRoot (root, selectedBoxes) : null;
-            WriteHtml (root.HtmlContainer.CssParser, sb, root, styleGen, selectedBoxes, selectionRoot);
+            var selectionRoot = selectedBoxes is null
+                ? null
+                : onlySelected ? GetSelectionRoot (root, selectedBoxes) : null;
+
+            var htmlContainer = root.HtmlContainer;
+            if (htmlContainer is not null)
+            {
+                WriteHtml (htmlContainer.CssParser, sb, root, styleGen, selectedBoxes, selectionRoot);
+            }
         }
 
         return sb.ToString();
@@ -802,13 +818,20 @@ internal sealed class DomUtils
     /// If <paramref name="selectedBoxes"/> are given write html only from those tags.
     /// </summary>
     /// <param name="cssParser">used to parse CSS data</param>
-    /// <param name="sb">the string builder to write html into</param>
+    /// <param name="builder">the string builder to write html into</param>
     /// <param name="box">the html sub-tree to write</param>
     /// <param name="styleGen">Controls the way styles are generated when html is generated</param>
     /// <param name="selectedBoxes">Control if to generate only selected boxes, if given only boxes found in hash will be generated</param>
     /// <param name="selectionRoot">the box the is the root of selected boxes (the first box to contain multiple selected boxes)</param>
-    private static void WriteHtml (CssParser cssParser, StringBuilder sb, CssBox box, HtmlGenerationStyle styleGen,
-        Dictionary<CssBox, bool> selectedBoxes, CssBox selectionRoot)
+    private static void WriteHtml
+        (
+            CssParser cssParser,
+            StringBuilder builder,
+            CssBox box,
+            HtmlGenerationStyle styleGen,
+            Dictionary<CssBox, bool>? selectedBoxes,
+            CssBox? selectionRoot
+        )
     {
         if (box.HtmlTag == null || selectedBoxes == null || selectedBoxes.ContainsKey (box))
         {
@@ -818,19 +841,19 @@ internal sealed class DomUtils
                     (!box.HtmlTag.Attributes["href"].StartsWith ("property") &&
                      !box.HtmlTag.Attributes["href"].StartsWith ("method")))
                 {
-                    WriteHtmlTag (cssParser, sb, box, styleGen);
+                    WriteHtmlTag (cssParser, builder, box, styleGen);
                     if (box == selectionRoot)
                     {
-                        sb.Append ("<!--StartFragment-->");
+                        builder.Append ("<!--StartFragment-->");
                     }
                 }
 
                 if (styleGen == HtmlGenerationStyle.InHeader && box.HtmlTag.Name == "html" &&
                     box.HtmlContainer.CssData != null)
                 {
-                    sb.AppendLine ("<head>");
-                    WriteStylesheet (sb, box.HtmlContainer.CssData);
-                    sb.AppendLine ("</head>");
+                    builder.AppendLine ("<head>");
+                    WriteStylesheet (builder, box.HtmlContainer.CssData);
+                    builder.AppendLine ("</head>");
                 }
             }
 
@@ -841,24 +864,24 @@ internal sealed class DomUtils
                     if (selectedBoxes == null || word.Selected)
                     {
                         var wordText = GetSelectedWord (word, selectedBoxes != null);
-                        sb.Append (HtmlUtils.EncodeHtml (wordText));
+                        builder.Append (HtmlUtils.EncodeHtml (wordText));
                     }
                 }
             }
 
             foreach (var childBox in box.Boxes)
             {
-                WriteHtml (cssParser, sb, childBox, styleGen, selectedBoxes, selectionRoot);
+                WriteHtml (cssParser, builder, childBox, styleGen, selectedBoxes, selectionRoot);
             }
 
             if (box.HtmlTag != null && !box.HtmlTag.IsSingle)
             {
                 if (box == selectionRoot)
                 {
-                    sb.Append ("<!--EndFragment-->");
+                    builder.Append ("<!--EndFragment-->");
                 }
 
-                sb.AppendFormat ("</{0}>", box.HtmlTag.Name);
+                builder.AppendFormat ("</{0}>", box.HtmlTag.Name);
             }
         }
     }
@@ -867,12 +890,18 @@ internal sealed class DomUtils
     /// Write the given html tag with all its attributes and styles.
     /// </summary>
     /// <param name="cssParser">used to parse CSS data</param>
-    /// <param name="sb">the string builder to write html into</param>
+    /// <param name="builder">the string builder to write html into</param>
     /// <param name="box">the css box with the html tag to write</param>
     /// <param name="styleGen">Controls the way styles are generated when html is generated</param>
-    private static void WriteHtmlTag (CssParser cssParser, StringBuilder sb, CssBox box, HtmlGenerationStyle styleGen)
+    private static void WriteHtmlTag
+        (
+            CssParser cssParser,
+            StringBuilder builder,
+            CssBox box,
+            HtmlGenerationStyle styleGen
+        )
     {
-        sb.AppendFormat ("<{0}", box.HtmlTag.Name);
+        builder.AppendFormat ("<{0}", box.HtmlTag.Name);
 
         // collect all element style properties including from stylesheet
         var tagStyles = new Dictionary<string, string>();
@@ -887,7 +916,7 @@ internal sealed class DomUtils
 
         if (box.HtmlTag.HasAttributes())
         {
-            sb.Append (" ");
+            builder.Append (" ");
             foreach (var att in box.HtmlTag.Attributes)
             {
                 // handle image tags by inserting the image using base64 data
@@ -912,11 +941,11 @@ internal sealed class DomUtils
                 }
                 else
                 {
-                    sb.AppendFormat ("{0}=\"{1}\" ", att.Key, att.Value);
+                    builder.AppendFormat ("{0}=\"{1}\" ", att.Key, att.Value);
                 }
             }
 
-            sb.Remove (sb.Length - 1, 1);
+            builder.Remove (builder.Length - 1, 1);
         }
 
         // if inline style insert the style tag with all collected style properties
@@ -925,15 +954,15 @@ internal sealed class DomUtils
             var cleanTagStyles = StripDefaultStyles (box, tagStyles);
             if (cleanTagStyles.Count > 0)
             {
-                sb.Append (" style=\"");
+                builder.Append (" style=\"");
                 foreach (var style in cleanTagStyles)
-                    sb.AppendFormat ("{0}: {1}; ", style.Key, style.Value);
-                sb.Remove (sb.Length - 1, 1);
-                sb.Append ("\"");
+                    builder.AppendFormat ("{0}: {1}; ", style.Key, style.Value);
+                builder.Remove (builder.Length - 1, 1);
+                builder.Append ("\"");
             }
         }
 
-        sb.AppendFormat ("{0}>", box.HtmlTag.IsSingle ? "/" : "");
+        builder.AppendFormat ("{0}>", box.HtmlTag.IsSingle ? "/" : "");
     }
 
     /// <summary>
@@ -943,7 +972,11 @@ internal sealed class DomUtils
     /// <param name="box">the box the styles apply to, used to know the default style</param>
     /// <param name="tagStyles">the collection of styles to clean</param>
     /// <returns>new cleaned styles collection</returns>
-    private static Dictionary<string, string> StripDefaultStyles (CssBox box, Dictionary<string, string> tagStyles)
+    private static Dictionary<string, string> StripDefaultStyles
+        (
+            CssBox box,
+            Dictionary<string, string> tagStyles
+        )
     {
         // ReSharper disable PossibleMultipleEnumeration
         var cleanTagStyles = new Dictionary<string, string>();
@@ -976,29 +1009,33 @@ internal sealed class DomUtils
     /// <summary>
     /// Write stylesheet data inline into the html.
     /// </summary>
-    /// <param name="sb">the string builder to write stylesheet into</param>
+    /// <param name="builder">the string builder to write stylesheet into</param>
     /// <param name="cssData">the css data to write to the head</param>
-    private static void WriteStylesheet (StringBuilder sb, CssData cssData)
+    private static void WriteStylesheet
+        (
+            StringBuilder builder,
+            CssData cssData
+        )
     {
-        sb.AppendLine ("<style type=\"text/css\">");
+        builder.AppendLine ("<style type=\"text/css\">");
         foreach (var cssBlocks in cssData.MediaBlocks["all"])
         {
-            sb.Append (cssBlocks.Key);
-            sb.Append (" { ");
+            builder.Append (cssBlocks.Key);
+            builder.Append (" { ");
             foreach (var cssBlock in cssBlocks.Value)
             {
                 foreach (var property in cssBlock.Properties)
                 {
                     // TODO:a handle selectors
-                    sb.AppendFormat ("{0}: {1};", property.Key, property.Value);
+                    builder.AppendFormat ("{0}: {1};", property.Key, property.Value);
                 }
             }
 
-            sb.Append (" }");
-            sb.AppendLine();
+            builder.Append (" }");
+            builder.AppendLine();
         }
 
-        sb.AppendLine ("</style>");
+        builder.AppendLine ("</style>");
     }
 
     /// <summary>
@@ -1039,7 +1076,12 @@ internal sealed class DomUtils
     /// <param name="box">the box to generate for</param>
     /// <param name="builder">the string builder to generate to</param>
     /// <param name="indent">the current indent level to set indent of generated text</param>
-    private static void GenerateBoxTree (CssBox box, StringBuilder builder, int indent)
+    private static void GenerateBoxTree
+        (
+            CssBox box,
+            StringBuilder builder,
+            int indent
+        )
     {
         builder.AppendFormat ("{0}<{1}", new string (' ', 2 * indent), box.Display);
         if (box.HtmlTag != null)

@@ -580,11 +580,11 @@ internal class CssBox
                     {
                         endIdx = startIdx;
                         while (endIdx < _text.Length && !char.IsWhiteSpace (_text[endIdx]) && _text[endIdx] != '-' &&
-                               WordBreak != CssConstants.BreakAll && !CommonUtils.IsAsianCharecter (_text[endIdx]))
+                               WordBreak != CssConstants.BreakAll && !CommonUtils.IsAsianCharacter (_text[endIdx]))
                             endIdx++;
 
                         if (endIdx < _text.Length && (_text[endIdx] == '-' || WordBreak == CssConstants.BreakAll ||
-                                                      CommonUtils.IsAsianCharecter (_text[endIdx])))
+                                                      CommonUtils.IsAsianCharacter (_text[endIdx])))
                         {
                             endIdx++;
                         }

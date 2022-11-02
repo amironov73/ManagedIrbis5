@@ -119,11 +119,11 @@ internal static class HtmlConstants
     //        public const string archive = "archive";
     //        public const string axis = "axis";
     public const string Background = "background";
-    public const string Bgcolor = "bgcolor";
+    public const string BackgroundColor = "bgcolor";
     public const string Border = "border";
-    public const string Bordercolor = "bordercolor";
-    public const string Cellpadding = "cellpadding";
-    public const string Cellspacing = "cellspacing";
+    public const string BorderColor = "bordercolor";
+    public const string CellPadding = "cellpadding";
+    public const string CellSpacing = "cellspacing";
     //        public const string char_ = "char";
     //        public const string charoff = "charoff";
     //        public const string charset = "charset";

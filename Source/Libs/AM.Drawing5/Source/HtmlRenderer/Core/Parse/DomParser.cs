@@ -434,7 +434,7 @@ internal sealed class DomParser
                     case HtmlConstants.Background:
                         box.BackgroundImage = value.ToLower();
                         break;
-                    case HtmlConstants.Bgcolor:
+                    case HtmlConstants.BackgroundColor:
                         box.BackgroundColor = value.ToLower();
                         break;
                     case HtmlConstants.Border:
@@ -452,13 +452,13 @@ internal sealed class DomParser
                             box.BorderTopStyle = box.BorderLeftStyle = box.BorderRightStyle = box.BorderBottomStyle = CssConstants.Solid;
                         }
                         break;
-                    case HtmlConstants.Bordercolor:
+                    case HtmlConstants.BorderColor:
                         box.BorderLeftColor = box.BorderTopColor = box.BorderRightColor = box.BorderBottomColor = value.ToLower();
                         break;
-                    case HtmlConstants.Cellspacing:
+                    case HtmlConstants.CellSpacing:
                         box.BorderSpacing = TranslateLength(value);
                         break;
-                    case HtmlConstants.Cellpadding:
+                    case HtmlConstants.CellPadding:
                         ApplyTablePadding(box, value);
                         break;
                     case HtmlConstants.Color:

@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
 
 /* HtmlUtils.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -27,7 +28,7 @@ internal static class HtmlUtils
     /// <summary>
     /// List of html tags that don't have content
     /// </summary>
-    private static readonly List<string> _list = new List<string> (
+    private static readonly List<string> _list = new (
             new[]
             {
                 "area", "base", "basefont", "br", "col",
@@ -39,7 +40,7 @@ internal static class HtmlUtils
     /// <summary>
     /// the html encode\decode pairs
     /// </summary>
-    private static readonly KeyValuePair<string, string>[] _encodeDecode = new[]
+    private static readonly KeyValuePair<string, string>[] _encodeDecode =
     {
         new KeyValuePair<string, string> ("&lt;", "<"),
         new KeyValuePair<string, string> ("&gt;", ">"),
@@ -51,7 +52,7 @@ internal static class HtmlUtils
     /// the html decode only pairs
     /// </summary>
     private static readonly Dictionary<string, char> _decodeOnly =
-        new Dictionary<string, char> (StringComparer.InvariantCultureIgnoreCase);
+        new (StringComparer.InvariantCultureIgnoreCase);
 
     #endregion
 
@@ -381,13 +382,13 @@ internal static class HtmlUtils
             endIdx += (endIdx < str.Length && str[endIdx] == ';') ? 1 : 0;
 
             string repl = string.Empty;
-            if (num >= 0 && num <= 0x10ffff && !(num >= 0xd800 && num <= 0xdfff))
+            if (num is >= 0 and <= 0x10ffff && !(num is >= 0xd800 and <= 0xdfff))
                 repl = char.ConvertFromUtf32 ((int)num);
 
             str = str.Remove (idx, endIdx - idx);
             str = str.Insert (idx, repl);
 
-            idx = str.IndexOf ("&#", idx + 1);
+            idx = str.IndexOf ("&#", idx + 1, StringComparison.Ordinal);
         }
 
         return str;
@@ -396,29 +397,32 @@ internal static class HtmlUtils
     /// <summary>
     /// Decode html special charecters encoded using char entity name (&amp;euro;)
     /// </summary>
-    /// <param name="str">the string to decode</param>
+    /// <param name="text">the string to decode</param>
     /// <returns>decoded string</returns>
-    private static string DecodeHtmlCharByName (string str)
+    private static string DecodeHtmlCharByName
+        (
+            string text
+        )
     {
-        var idx = str.IndexOf ('&');
+        var idx = text.IndexOf ('&');
         while (idx > -1)
         {
-            var endIdx = str.IndexOf (';', idx);
+            var endIdx = text.IndexOf (';', idx);
             if (endIdx > -1 && endIdx - idx < 8)
             {
-                var key = str.Substring (idx + 1, endIdx - idx - 1);
+                var key = text.Substring (idx + 1, endIdx - idx - 1);
                 char c;
                 if (_decodeOnly.TryGetValue (key, out c))
                 {
-                    str = str.Remove (idx, endIdx - idx + 1);
-                    str = str.Insert (idx, c.ToString());
+                    text = text.Remove (idx, endIdx - idx + 1);
+                    text = text.Insert (idx, c.ToString());
                 }
             }
 
-            idx = str.IndexOf ('&', idx + 1);
+            idx = text.IndexOf ('&', idx + 1);
         }
 
-        return str;
+        return text;
     }
 
     #endregion

@@ -102,7 +102,7 @@ internal static class CommonUtils
     /// </summary>
     /// <param name="ch">the character to check</param>
     /// <returns>true - Asian char, false - otherwise</returns>
-    public static bool IsAsianCharecter (char ch)
+    public static bool IsAsianCharacter (char ch)
     {
         return ch >= 0x4e00 && ch <= 0xFA2D;
     }
@@ -115,7 +115,7 @@ internal static class CommonUtils
     /// <returns>true - is digit, false - not a digit</returns>
     public static bool IsDigit (char ch, bool hex = false)
     {
-        return (ch >= '0' && ch <= '9') || (hex && ((ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F')));
+        return ch is >= '0' and <= '9' || (hex && (ch is >= 'a' and <= 'f' || ch is >= 'A' and <= 'F'));
     }
 
     /// <summary>
@@ -126,17 +126,17 @@ internal static class CommonUtils
     /// <returns>true - is digit, false - not a digit</returns>
     public static int ToDigit (char ch, bool hex = false)
     {
-        if (ch >= '0' && ch <= '9')
+        if (ch is >= '0' and <= '9')
         {
             return ch - '0';
         }
         else if (hex)
         {
-            if (ch >= 'a' && ch <= 'f')
+            if (ch is >= 'a' and <= 'f')
             {
                 return ch - 'a' + 10;
             }
-            else if (ch >= 'A' && ch <= 'F')
+            else if (ch is >= 'A' and <= 'F')
             {
                 return ch - 'A' + 10;
             }
