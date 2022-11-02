@@ -18,7 +18,6 @@ using System;
 using System.Linq;
 
 using AM;
-using AM.AppServices;
 
 using ManagedIrbis;
 using ManagedIrbis.AppServices;
@@ -48,11 +47,10 @@ internal sealed class Program
         )
         : base (args)
     {
-        // пустое тело метода
+        // пустое тело конструктора
     }
 
-    /// <inheritdoc cref="MagnaApplication.DoTheWork"/>
-    protected override int DoTheWork()
+    private int DoTheWork()
     {
         using var connection = (ISyncConnection)Connection;
         var database = connection.EnsureDatabase();
@@ -113,8 +111,13 @@ internal sealed class Program
             string[] args
         )
     {
-        return new Program (args)
-            .ConfigureCancelKey()
-            .Run();
+        var program = new Program (args);
+        program.ConfigureCancelKey();
+
+        program.Run();
+        var result = program.DoTheWork();
+        program.Shutdown();
+
+        return result;
     }
 }

@@ -16,7 +16,7 @@
 
 using System.Linq;
 
-using AM.AppServices;
+using AM;
 using AM.Text;
 
 using ManagedIrbis;
@@ -48,6 +48,7 @@ internal sealed class Program
         )
         : base (args)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -145,13 +146,12 @@ internal sealed class Program
         }
     }
 
-    /// <inheritdoc cref="MagnaApplication.DoTheWork"/>
-    protected override int DoTheWork()
+    private int DoTheWork()
     {
         Logger.LogInformation ("Прогоняем ночующих");
         var database = Connection.EnsureDatabase();
 
-        var searchExpression = Configuration["search"];
+        var searchExpression = Configuration["search"].ThrowIfNull();
         Logger.LogInformation ("Поисковое выражение: {Expression}", searchExpression);
 
         var maxMfn = Connection.GetMaxMfn();
@@ -184,8 +184,13 @@ internal sealed class Program
             string[] args
         )
     {
-        return new Program (args)
-            .ConfigureCancelKey()
-            .Run();
+        var program = new Program (args);
+        program.ConfigureCancelKey();
+        program.Run();
+
+        var result = program.DoTheWork();
+        program.Shutdown();
+
+        return result;
     }
 }

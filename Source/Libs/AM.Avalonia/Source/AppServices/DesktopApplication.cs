@@ -105,11 +105,11 @@ public sealed class DesktopApplication
     /// Запуск приложения.
     /// </summary>
     /// <returns>Код, который необходимо вернуть операционной системе</returns>
-    public int Run()
+    public AvaloniaApplication Run()
     {
         _appBuilder.StartWithClassicDesktopLifetime (_args);
 
-        return 0;
+        return (AvaloniaApplication) _appBuilder.Instance.ThrowIfNull();
     }
 
     /// <summary>

@@ -19,7 +19,6 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 
-using AM.AppServices;
 using AM.Windows.Forms;
 using AM.Windows.Forms.AppServices;
 using AM.Windows.Forms.MarkupExtensions;
@@ -53,8 +52,7 @@ internal sealed class Program
 
     #region WinFormsApplication members
 
-    /// <inheritdoc cref="MagnaApplication.DoTheWork"/>
-    protected override int DoTheWork()
+    private int DoTheWork()
     {
         MainForm.WriteLog ("Hello from WinFormsApp");
         MainForm.WriteLog ("Hello again");
@@ -184,7 +182,8 @@ internal sealed class Program
             string[] args
         )
     {
-        return new Program (args)
+        var program = new Program (args);
+        program
             .SetTitle ("Some WinForms Application")
             .PostConfigure (app =>
             {
@@ -201,8 +200,13 @@ internal sealed class Program
                 {
                     app.MainForm.WriteLog ($"Now: {DateTime.Now:hh:mm:ss}");
                 };
-            })
-            .Run();
+            });
+
+        program.Run();
+        var result = program.DoTheWork();
+        program.Shutdown();
+
+        return result;
     }
 
     #endregion

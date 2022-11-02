@@ -183,15 +183,6 @@ public class MagnaApplication
     }
 
     /// <summary>
-    /// Реальная работа приложения.
-    /// </summary>
-    /// <returns>Код завершения.</returns>
-    protected virtual int DoTheWork()
-    {
-        return 0;
-    }
-
-    /// <summary>
     /// Первоначальная инициализация.
     /// </summary>
     protected virtual void EarlyInitialization()
@@ -455,13 +446,14 @@ public class MagnaApplication
     /// <summary>
     /// Запуск приложения.
     /// </summary>
-    public int Run()
+    public void Run()
     {
-        // ReSharper disable ConvertToLocalFunction
-        Func<IMagnaApplication, int> func = self => DoTheWork();
-        // ReSharper restore ConvertToLocalFunction
+        if (!FinalInitialization())
+        {
+            throw new ArsMagnaException();
+        }
 
-        return Run (func);
+        ApplicationHost.Start();
     }
 
     /// <inheritdoc cref="IMagnaApplication.Run"/>
@@ -472,32 +464,21 @@ public class MagnaApplication
     {
         Sure.NotNull (runDelegate);
 
-        if (!FinalInitialization())
-        {
-            return int.MaxValue;
-        }
-
+        Run();
         var result = int.MaxValue;
         try
         {
-            ApplicationHost.Start();
-
             result = runDelegate (this);
 
             // ожидаем остановки хоста
             ApplicationHost.WaitForShutdown();
-            MarkAsShutdown();
         }
         catch (Exception exception)
         {
             HandleException (exception);
         }
 
-        Cleanup();
-
-        // глушим хост
-        ApplicationHost.Dispose();
-        MarkAsShutdown(); // повторяем для надежности
+        Shutdown();
 
         return result;
     }
@@ -552,10 +533,12 @@ public class MagnaApplication
             return;
         }
 
-        var application = ApplicationHost.Services
+        Cleanup();
+
+        var lifetime = ApplicationHost.Services
             .GetRequiredService<IHostApplicationLifetime>()
             .ThrowIfNull ();
-        application.StopApplication();
+        lifetime.StopApplication();
         MarkAsShutdown();
     }
 

@@ -2,7 +2,7 @@
 // Поиск книг на языках коренных и малых народов Севера
 //
 
-connect("host=192.168.3.2;port=6666;user=miron;password=miron;db=IBIS;")
+connect("host=127.0.0.1;port=6666;user=librarian;password=secret;db=IBIS;")
 if (!is_connected())
 {
     error ("Not connected")

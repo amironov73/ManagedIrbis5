@@ -28,12 +28,12 @@ namespace AvaloniaAppTests;
 internal sealed class Program
 {
     [STAThread]
-    public static int Main
+    public static void Main
         (
             string[] args
         )
     {
-        return DesktopApplication
+        DesktopApplication
             .BuildAvaloniaApp (args)
             .UseMainWindow<MainWindow>()
             .Run();

@@ -22,9 +22,6 @@
 
 #region Using directives
 
-using System;
-using System.Threading.Tasks;
-
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -84,18 +81,12 @@ public interface IMagnaApplication
     /// <summary>
     /// Запуск приложения.
     /// </summary>
-    int Run
-        (
-            Func<IMagnaApplication, int> runDelegate
-        );
+    void Run();
 
     /// <summary>
-    /// Запуск приложения.
+    /// Завершение приложения.
     /// </summary>
-    Task<int> RunAsync
-        (
-            Func<IMagnaApplication, Task<int>> runDelegate
-        );
+    void Shutdown();
 
     #endregion
 }

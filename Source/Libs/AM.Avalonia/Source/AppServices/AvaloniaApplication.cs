@@ -251,7 +251,7 @@ public class AvaloniaApplication
     }
 
     /// <summary>
-    /// Вызывается в конце <see cref="Run(Func{IMagnaApplication,int})"/> и <see cref="RunAsync"/>.
+    /// ???
     /// </summary>
     protected virtual void Cleanup()
     {
@@ -423,53 +423,41 @@ public class AvaloniaApplication
     public IHost ApplicationHost { get; protected set; }
 
     /// <inheritdoc cref="IMagnaApplication.Run"/>
-    public int Run
-        (
-            Func<IMagnaApplication, int> runDelegate
-        )
+    public void Run()
     {
-        Sure.NotNull (runDelegate);
 
         if (!FinalInitialization())
         {
-            return int.MaxValue;
+            throw new ArsMagnaException();
         }
 
-        var result = int.MaxValue;
         try
         {
             ApplicationHost.Start();
-
             VisualInitialization();
-
-            result = runDelegate (this);
-
-            // TODO разобраться, когда вызывать VisualShutdown
-            VisualShutdown();
-
-            ApplicationHost.WaitForShutdown();
-            MarkAsShutdown();
         }
         catch (Exception exception)
         {
             HandleException (exception);
         }
+    }
+
+    /// <inheritdoc cref="IMagnaApplication.Shutdown"/>
+    public void Shutdown()
+    {
+        if (IsShutdown || !IsInitialized)
+        {
+            return;
+        }
 
         Cleanup();
 
-        ApplicationHost.Dispose();
+        MainWindow?.Close();
+        var lifetime = ApplicationHost.Services
+            .GetRequiredService<IHostApplicationLifetime>()
+            .ThrowIfNull ();
+        lifetime.StopApplication();
         MarkAsShutdown();
-
-        return result;
-    }
-
-    /// <inheritdoc cref="RunAsync"/>
-    public Task<int> RunAsync
-        (
-            Func<IMagnaApplication, Task<int>> runDelegate
-        )
-    {
-        throw new NotImplementedException();
     }
 
     /// <summary>

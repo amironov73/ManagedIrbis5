@@ -19,7 +19,6 @@ using System.IO;
 using System.Linq;
 
 using AM;
-using AM.AppServices;
 
 using ManagedIrbis;
 using ManagedIrbis.AppServices;
@@ -52,8 +51,7 @@ internal sealed class Program
         // пустое тело конструктора
     }
 
-    /// <inheritdoc cref="MagnaApplication.DoTheWork"/>
-    protected override int DoTheWork()
+    private int DoTheWork()
     {
         var manager = new MagazineManager (Magna.Host, Connection);
         var magazineList = File.ReadLines ("magazine-list.txt");
@@ -98,8 +96,13 @@ internal sealed class Program
             string[] args
         )
     {
-        return new Program (args)
-            .ConfigureCancelKey()
-            .Run();
+        var program = new Program (args);
+        program.ConfigureCancelKey();
+
+        program.Run();
+        var result = program.DoTheWork();
+        program.Shutdown();
+
+        return result;
     }
 }
