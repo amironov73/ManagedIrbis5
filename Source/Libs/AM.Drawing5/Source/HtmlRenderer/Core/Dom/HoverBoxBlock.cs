@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
 
-/* HoverBoxBlock.cs --
+/* HoverBoxBlock.cs -- блоки CSS, у которых есть селектор ":hover"
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,42 +20,38 @@ using AM.Drawing.HtmlRenderer.Core.Entities;
 namespace AM.Drawing.HtmlRenderer.Core.Dom;
 
 /// <summary>
-/// CSS boxes that have ":hover" selector on them.
+/// Блоки CSS, у которых есть селектор ":hover".
 /// </summary>
 internal sealed class HoverBoxBlock
 {
-    /// <summary>
-    /// the box that has :hover css on
-    /// </summary>
-    private readonly CssBox _cssBox;
+    #region Properties
 
     /// <summary>
-    /// the :hover style block data
+    /// Поле с <c>:hover</c>.
     /// </summary>
-    private readonly CssBlock _cssBlock;
+    public CssBox CssBox { get; }
 
     /// <summary>
-    /// Init.
+    /// Данные блока стиля <c>:hover</c>.
     /// </summary>
-    public HoverBoxBlock(CssBox cssBox, CssBlock cssBlock)
+    public CssBlock CssBlock { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public HoverBoxBlock
+        (
+            CssBox cssBox,
+            CssBlock cssBlock
+        )
     {
-        _cssBox = cssBox;
-        _cssBlock = cssBlock;
+        CssBox = cssBox;
+        CssBlock = cssBlock;
     }
 
-    /// <summary>
-    /// the box that has :hover css on
-    /// </summary>
-    public CssBox CssBox
-    {
-        get { return _cssBox; }
-    }
-
-    /// <summary>
-    /// the :hover style block data
-    /// </summary>
-    public CssBlock CssBlock
-    {
-        get { return _cssBlock; }
-    }
+    #endregion
 }

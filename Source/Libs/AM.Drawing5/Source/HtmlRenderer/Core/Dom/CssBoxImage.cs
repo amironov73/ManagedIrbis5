@@ -76,8 +76,8 @@ internal sealed class CssBoxImage
     /// <summary>
     /// Paints the fragment
     /// </summary>
-    /// <param name="g">the device to draw to</param>
-    protected override void PaintImp (RGraphics g)
+    /// <param name="graphics">the device to draw to</param>
+    protected override void PaintImp (RGraphics graphics)
     {
         // load image if it is in visible rectangle
         if (_imageLoadHandler == null)
@@ -94,10 +94,10 @@ internal sealed class CssBoxImage
 
         rect.Offset (offset);
 
-        var clipped = RenderUtils.ClipGraphicsByOverflow (g, this);
+        var clipped = RenderUtils.ClipGraphicsByOverflow (graphics, this);
 
-        PaintBackground (g, rect, true, true);
-        BordersDrawHandler.DrawBoxBorders (g, this, rect, true, true);
+        PaintBackground (graphics, rect, true, true);
+        BordersDrawHandler.DrawBoxBorders (graphics, this, rect, true, true);
 
         RRect r = _imageWord.Rectangle;
         r.Offset (offset);
@@ -111,13 +111,13 @@ internal sealed class CssBoxImage
             if (r.Width > 0 && r.Height > 0)
             {
                 if (_imageWord.ImageRectangle == RRect.Empty)
-                    g.DrawImage (_imageWord.Image, r);
+                    graphics.DrawImage (_imageWord.Image, r);
                 else
-                    g.DrawImage (_imageWord.Image, r, _imageWord.ImageRectangle);
+                    graphics.DrawImage (_imageWord.Image, r, _imageWord.ImageRectangle);
 
                 if (_imageWord.Selected)
                 {
-                    g.DrawRectangle (GetSelectionBackBrush (g, true), _imageWord.Left + offset.X,
+                    graphics.DrawRectangle (GetSelectionBackBrush (graphics, true), _imageWord.Left + offset.X,
                         _imageWord.Top + offset.Y, _imageWord.Width + 2,
                         DomUtils.GetCssLineBoxByWord (_imageWord).LineHeight);
                 }
@@ -127,20 +127,20 @@ internal sealed class CssBoxImage
         {
             if (_imageLoadingComplete && r.Width > 19 && r.Height > 19)
             {
-                RenderUtils.DrawImageErrorIcon (g, HtmlContainer, r);
+                RenderUtils.DrawImageErrorIcon (graphics, HtmlContainer, r);
             }
         }
         else
         {
-            RenderUtils.DrawImageLoadingIcon (g, HtmlContainer, r);
+            RenderUtils.DrawImageLoadingIcon (graphics, HtmlContainer, r);
             if (r.Width > 19 && r.Height > 19)
             {
-                g.DrawRectangle (g.GetPen (RColor.LightGray), r.X, r.Y, r.Width, r.Height);
+                graphics.DrawRectangle (graphics.GetPen (RColor.LightGray), r.X, r.Y, r.Width, r.Height);
             }
         }
 
         if (clipped)
-            g.PopClip();
+            graphics.PopClip();
     }
 
     /// <summary>

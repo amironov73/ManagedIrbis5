@@ -233,7 +233,7 @@ public abstract class RGraphics
     /// <param name="point">the location to start string draw (top-left)</param>
     /// <param name="size">used to know the size of the rendered text for transparent text support</param>
     /// <param name="rtl">is to render the string right-to-left (true - RTL, false - LTR)</param>
-    public abstract void DrawString (string str, RFont font, RColor color, RPoint point, RSize size, bool rtl);
+    public abstract void DrawString (string? str, RFont font, RColor color, RPoint point, RSize size, bool rtl);
 
     /// <summary>
     /// Draws a line connecting the two points specified by the coordinate pairs.

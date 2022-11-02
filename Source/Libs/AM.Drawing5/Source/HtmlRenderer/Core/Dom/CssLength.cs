@@ -97,7 +97,7 @@ internal sealed class CssLength
                 _isRelative = true;
                 break;
             case CssConstants.Mm:
-                _unit = CssUnit.Milimeters;
+                _unit = CssUnit.Millimeters;
                 break;
             case CssConstants.Cm:
                 _unit = CssUnit.Centimeters;
@@ -249,7 +249,7 @@ internal sealed class CssLength
                 case CssUnit.Centimeters:
                     u = "cm";
                     break;
-                case CssUnit.Milimeters:
+                case CssUnit.Millimeters:
                     u = "mm";
                     break;
                 case CssUnit.Points:

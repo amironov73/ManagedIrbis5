@@ -202,7 +202,7 @@ internal class CssBox
     /// <summary>
     /// Get the href link of the box (by default get "href" attribute)
     /// </summary>
-    public virtual string HrefLink => GetAttribute (HtmlConstants.Href);
+    public virtual string? HrefLink => GetAttribute (HtmlConstants.Href);
 
     /// <summary>
     /// Gets the containing block-box of this box. (The nearest parent box with display=block)
@@ -271,7 +271,7 @@ internal class CssBox
     /// <summary>
     /// Gets or sets the inner text of the box
     /// </summary>
-    public SubString Text
+    public SubString? Text
     {
         get => _text;
         set
@@ -438,7 +438,7 @@ internal class CssBox
         }
         catch (Exception ex)
         {
-            HtmlContainer.ReportError (HtmlRenderErrorType.Layout, "Exception in box layout", ex);
+            HtmlContainer?.ReportError (HtmlRenderErrorType.Layout, "Exception in box layout", ex);
         }
     }
 
@@ -469,7 +469,10 @@ internal class CssBox
                     if (!IsFixed)
                     {
                         //rect.Offset(new RPoint(-HtmlContainer.Location.X, -HtmlContainer.Location.Y));
-                        rect.Offset (HtmlContainer.ScrollOffset);
+                        if (HtmlContainer is not null)
+                        {
+                            rect.Offset (HtmlContainer.ScrollOffset);
+                        }
                     }
 
                     clip.Intersect (rect);
@@ -494,7 +497,7 @@ internal class CssBox
         }
         catch (Exception ex)
         {
-            HtmlContainer.ReportError (HtmlRenderErrorType.Paint, "Exception in box paint", ex);
+            HtmlContainer?.ReportError (HtmlRenderErrorType.Paint, "Exception in box paint", ex);
         }
     }
 
@@ -550,63 +553,66 @@ internal class CssBox
         _boxWords.Clear();
 
         var startIdx = 0;
-        var preserveSpaces = WhiteSpace == CssConstants.Pre || WhiteSpace == CssConstants.PreWrap;
+        var preserveSpaces = WhiteSpace is CssConstants.Pre or CssConstants.PreWrap;
         var respoctNewline = preserveSpaces || WhiteSpace == CssConstants.PreLine;
-        while (startIdx < _text.Length)
+        if (_text is not null)
         {
-            while (startIdx < _text.Length && _text[startIdx] == '\r')
-                startIdx++;
-
-            if (startIdx < _text.Length)
+            while (startIdx < _text.Length)
             {
-                var endIdx = startIdx;
-                while (endIdx < _text.Length && char.IsWhiteSpace (_text[endIdx]) && _text[endIdx] != '\n')
-                    endIdx++;
+                while (startIdx < _text.Length && _text[startIdx] == '\r')
+                    startIdx++;
 
-                if (endIdx > startIdx)
+                if (startIdx < _text.Length)
                 {
-                    if (preserveSpaces)
-                    {
-                        _boxWords.Add (new CssRectWord (this,
-                            HtmlUtils.DecodeHtml (_text.Substring (startIdx, endIdx - startIdx)), false, false));
-                    }
-                }
-                else
-                {
-                    endIdx = startIdx;
-                    while (endIdx < _text.Length && !char.IsWhiteSpace (_text[endIdx]) && _text[endIdx] != '-' &&
-                           WordBreak != CssConstants.BreakAll && !CommonUtils.IsAsianCharecter (_text[endIdx]))
+                    var endIdx = startIdx;
+                    while (endIdx < _text.Length && char.IsWhiteSpace (_text[endIdx]) && _text[endIdx] != '\n')
                         endIdx++;
-
-                    if (endIdx < _text.Length && (_text[endIdx] == '-' || WordBreak == CssConstants.BreakAll ||
-                                                  CommonUtils.IsAsianCharecter (_text[endIdx])))
-                    {
-                        endIdx++;
-                    }
 
                     if (endIdx > startIdx)
                     {
-                        var hasSpaceBefore = !preserveSpaces && (startIdx > 0 && _boxWords.Count == 0 &&
-                                                                 char.IsWhiteSpace (_text[startIdx - 1]));
-                        var hasSpaceAfter = !preserveSpaces &&
-                                            (endIdx < _text.Length && char.IsWhiteSpace (_text[endIdx]));
-                        _boxWords.Add (new CssRectWord (this,
-                            HtmlUtils.DecodeHtml (_text.Substring (startIdx, endIdx - startIdx)), hasSpaceBefore,
-                            hasSpaceAfter));
+                        if (preserveSpaces)
+                        {
+                            _boxWords.Add (new CssRectWord (this,
+                                HtmlUtils.DecodeHtml (_text.Substring (startIdx, endIdx - startIdx)), false, false));
+                        }
                     }
-                }
-
-                // create new-line word so it will effect the layout
-                if (endIdx < _text.Length && _text[endIdx] == '\n')
-                {
-                    endIdx++;
-                    if (respoctNewline)
+                    else
                     {
-                        _boxWords.Add (new CssRectWord (this, "\n", false, false));
-                    }
-                }
+                        endIdx = startIdx;
+                        while (endIdx < _text.Length && !char.IsWhiteSpace (_text[endIdx]) && _text[endIdx] != '-' &&
+                               WordBreak != CssConstants.BreakAll && !CommonUtils.IsAsianCharecter (_text[endIdx]))
+                            endIdx++;
 
-                startIdx = endIdx;
+                        if (endIdx < _text.Length && (_text[endIdx] == '-' || WordBreak == CssConstants.BreakAll ||
+                                                      CommonUtils.IsAsianCharecter (_text[endIdx])))
+                        {
+                            endIdx++;
+                        }
+
+                        if (endIdx > startIdx)
+                        {
+                            var hasSpaceBefore = !preserveSpaces && (startIdx > 0 && _boxWords.Count == 0 &&
+                                                                     char.IsWhiteSpace (_text[startIdx - 1]));
+                            var hasSpaceAfter = !preserveSpaces &&
+                                                (endIdx < _text.Length && char.IsWhiteSpace (_text[endIdx]));
+                            _boxWords.Add (new CssRectWord (this,
+                                HtmlUtils.DecodeHtml (_text.Substring (startIdx, endIdx - startIdx)), hasSpaceBefore,
+                                hasSpaceAfter));
+                        }
+                    }
+
+                    // create new-line word so it will effect the layout
+                    if (endIdx < _text.Length && _text[endIdx] == '\n')
+                    {
+                        endIdx++;
+                        if (respoctNewline)
+                        {
+                            _boxWords.Add (new CssRectWord (this, "\n", false, false));
+                        }
+                    }
+
+                    startIdx = endIdx;
+                }
             }
         }
     }
@@ -641,8 +647,7 @@ internal class CssBox
             MeasureWordsSize (g);
         }
 
-        if (IsBlock || Display == CssConstants.ListItem || Display == CssConstants.Table ||
-            Display == CssConstants.InlineTable || Display == CssConstants.TableCell)
+        if (IsBlock || Display is CssConstants.ListItem or CssConstants.Table or CssConstants.InlineTable or CssConstants.TableCell)
         {
             // Because their width and height are set by CssTable
             if (Display != CssConstants.TableCell && Display != CssConstants.Table)
@@ -689,7 +694,7 @@ internal class CssBox
             }
 
             //If we're talking about a table here..
-            if (Display == CssConstants.Table || Display == CssConstants.InlineTable)
+            if (Display is CssConstants.Table or CssConstants.InlineTable)
             {
                 CssLayoutEngineTable.PerformLayout (g, this);
             }
@@ -731,7 +736,7 @@ internal class CssBox
 
         CreateListItemBox (g);
 
-        if (!IsFixed)
+        if (!IsFixed && HtmlContainer is { Root: not null })
         {
             var actualWidth = Math.Max (GetMinimumWidth() + GetWidthMarginDeep (this),
                 Size.Width < 90_999 ? ActualRight - HtmlContainer.Root.Location.X : 0);
@@ -1122,9 +1127,9 @@ internal class CssBox
             }
 
             // remove the last word padding
-            if (box.Words.Count > 0 && !box.Words[box.Words.Count - 1].HasSpaceAfter)
+            if (box.Words.Count > 0 && !box.Words[^1].HasSpaceAfter)
             {
-                maxSum -= box.Words[box.Words.Count - 1].ActualWordSpacing;
+                maxSum -= box.Words[^1].ActualWordSpacing;
             }
         }
         else
@@ -1266,12 +1271,12 @@ internal class CssBox
         if (ParentBox != null && ParentBox.Boxes.IndexOf (this) == ParentBox.Boxes.Count - 1 &&
             _parentBox.ActualMarginBottom < 0.1)
         {
-            var lastChildBottomMargin = Boxes[Boxes.Count - 1].ActualMarginBottom;
+            var lastChildBottomMargin = Boxes[^1].ActualMarginBottom;
             margin = Height == "auto" ? Math.Max (ActualMarginBottom, lastChildBottomMargin) : lastChildBottomMargin;
         }
 
         return Math.Max (ActualBottom,
-            Boxes[Boxes.Count - 1].ActualBottom + margin + ActualPaddingBottom + ActualBorderBottomWidth);
+            Boxes[^1].ActualBottom + margin + ActualPaddingBottom + ActualBorderBottomWidth);
     }
 
     /// <summary>
@@ -1310,18 +1315,18 @@ internal class CssBox
     /// <summary>
     /// Paints the fragment
     /// </summary>
-    /// <param name="g">the device to draw to</param>
-    protected virtual void PaintImp (RGraphics g)
+    /// <param name="graphics">the device to draw to</param>
+    protected virtual void PaintImp (RGraphics graphics)
     {
         if (Display != CssConstants.None &&
             (Display != CssConstants.TableCell || EmptyCells != CssConstants.Hide || !IsSpaceOrEmpty))
         {
-            var clipped = RenderUtils.ClipGraphicsByOverflow (g, this);
+            var clipped = RenderUtils.ClipGraphicsByOverflow (graphics, this);
 
             var areas = Rectangles.Count == 0
                 ? new List<RRect> (new[] { Bounds })
                 : new List<RRect> (Rectangles.Values);
-            var clip = g.GetClip();
+            var clip = graphics.GetClip();
             var rects = areas.ToArray();
             var offset = RPoint.Empty;
             if (!IsFixed)
@@ -1336,12 +1341,12 @@ internal class CssBox
 
                 if (IsRectVisible (actualRect, clip))
                 {
-                    PaintBackground (g, actualRect, i == 0, i == rects.Length - 1);
-                    BordersDrawHandler.DrawBoxBorders (g, this, actualRect, i == 0, i == rects.Length - 1);
+                    PaintBackground (graphics, actualRect, i == 0, i == rects.Length - 1);
+                    BordersDrawHandler.DrawBoxBorders (graphics, this, actualRect, i == 0, i == rects.Length - 1);
                 }
             }
 
-            PaintWords (g, offset);
+            PaintWords (graphics, offset);
 
             for (var i = 0; i < rects.Length; i++)
             {
@@ -1350,7 +1355,7 @@ internal class CssBox
 
                 if (IsRectVisible (actualRect, clip))
                 {
-                    PaintDecoration (g, actualRect, i == 0, i == rects.Length - 1);
+                    PaintDecoration (graphics, actualRect, i == 0, i == rects.Length - 1);
                 }
             }
 
@@ -1359,7 +1364,7 @@ internal class CssBox
             {
                 if (b.Position != CssConstants.Absolute && !b.IsFixed)
                 {
-                    b.Paint (g);
+                    b.Paint (graphics);
                 }
             }
 
@@ -1367,7 +1372,7 @@ internal class CssBox
             {
                 if (b.Position == CssConstants.Absolute)
                 {
-                    b.Paint (g);
+                    b.Paint (graphics);
                 }
             }
 
@@ -1375,16 +1380,16 @@ internal class CssBox
             {
                 if (b.IsFixed)
                 {
-                    b.Paint (g);
+                    b.Paint (graphics);
                 }
             }
 
             if (clipped)
             {
-                g.PopClip();
+                graphics.PopClip();
             }
 
-            _listItemBox?.Paint (g);
+            _listItemBox?.Paint (graphics);
         }
     }
 
@@ -1470,9 +1475,13 @@ internal class CssBox
     /// <summary>
     /// Paint all the words in the box.
     /// </summary>
-    /// <param name="g">the device to draw into</param>
+    /// <param name="graphics">the device to draw into</param>
     /// <param name="offset">the current scroll offset to offset the words</param>
-    private void PaintWords (RGraphics g, RPoint offset)
+    private void PaintWords
+        (
+            RGraphics graphics,
+            RPoint offset
+        )
     {
         if (Width.Length > 0)
         {
@@ -1481,7 +1490,7 @@ internal class CssBox
             {
                 if (!word.IsLineBreak)
                 {
-                    var clip = g.GetClip();
+                    var clip = graphics.GetClip();
                     var wordRect = word.Rectangle;
                     wordRect.Offset (offset);
                     clip.Intersect (wordRect);
@@ -1503,30 +1512,30 @@ internal class CssBox
                             var rect = new RRect (word.Left + offset.X + left, word.Top + offset.Y, width - left,
                                 wordLine.LineHeight);
 
-                            g.DrawRectangle (GetSelectionBackBrush (g, false), rect.X, rect.Y, rect.Width, rect.Height);
+                            graphics.DrawRectangle (GetSelectionBackBrush (graphics, false), rect.X, rect.Y, rect.Width, rect.Height);
 
                             if (HtmlContainer.SelectionForeColor != RColor.Empty &&
                                 (word.SelectedStartOffset > 0 || word.SelectedEndIndexOffset > -1))
                             {
-                                g.PushClipExclude (rect);
-                                g.DrawString (word.Text, ActualFont, ActualColor, wordPoint,
+                                graphics.PushClipExclude (rect);
+                                graphics.DrawString (word.Text, ActualFont, ActualColor, wordPoint,
                                     new RSize (word.Width, word.Height), isRtl);
-                                g.PopClip();
-                                g.PushClip (rect);
-                                g.DrawString (word.Text, ActualFont, GetSelectionForeBrush(), wordPoint,
+                                graphics.PopClip();
+                                graphics.PushClip (rect);
+                                graphics.DrawString (word.Text, ActualFont, GetSelectionForeBrush(), wordPoint,
                                     new RSize (word.Width, word.Height), isRtl);
-                                g.PopClip();
+                                graphics.PopClip();
                             }
                             else
                             {
-                                g.DrawString (word.Text, ActualFont, GetSelectionForeBrush(), wordPoint,
+                                graphics.DrawString (word.Text, ActualFont, GetSelectionForeBrush(), wordPoint,
                                     new RSize (word.Width, word.Height), isRtl);
                             }
                         }
                         else
                         {
                             //                            g.DrawRectangle(HtmlContainer.Adapter.GetPen(RColor.Black), wordPoint.X, wordPoint.Y, word.Width - 1, word.Height - 1);
-                            g.DrawString (word.Text, ActualFont, ActualColor, wordPoint,
+                            graphics.DrawString (word.Text, ActualFont, ActualColor, wordPoint,
                                 new RSize (word.Width, word.Height), isRtl);
                         }
                     }
@@ -1612,11 +1621,16 @@ internal class CssBox
     /// <param name="image">the image loaded or null if failed</param>
     /// <param name="rectangle">the source rectangle to draw in the image (empty - draw everything)</param>
     /// <param name="async">is the callback was called async to load image call</param>
-    private void OnImageLoadComplete (RImage image, RRect rectangle, bool async)
+    private void OnImageLoadComplete
+        (
+            RImage? image,
+            RRect rectangle,
+            bool async
+        )
     {
         if (image != null && async)
         {
-            HtmlContainer.RequestRefresh (false);
+            HtmlContainer?.RequestRefresh (false);
         }
     }
 
@@ -1625,7 +1639,14 @@ internal class CssBox
     /// </summary>
     protected RColor GetSelectionForeBrush()
     {
-        return HtmlContainer.SelectionForeColor != RColor.Empty ? HtmlContainer.SelectionForeColor : ActualColor;
+        if (HtmlContainer is null)
+        {
+            return RColor.Empty;
+        }
+
+        return HtmlContainer.SelectionForeColor != RColor.Empty
+            ? HtmlContainer.SelectionForeColor
+            : ActualColor;
     }
 
     /// <summary>
@@ -1635,7 +1656,7 @@ internal class CssBox
     /// <param name="forceAlpha">used for images so they will have alpha effect</param>
     protected RBrush GetSelectionBackBrush (RGraphics g, bool forceAlpha)
     {
-        var backColor = HtmlContainer.SelectionBackColor;
+        var backColor = HtmlContainer?.SelectionBackColor ?? RColor.Empty;
         if (backColor != RColor.Empty)
         {
             if (forceAlpha && backColor.A > 180)

@@ -119,7 +119,7 @@ internal sealed class CssBoxFrame
     /// <summary>
     /// Get the href link of the box (by default get "href" attribute)
     /// </summary>
-    public override string HrefLink => _videoLinkUrl ?? GetAttribute ("src");
+    public override string? HrefLink => _videoLinkUrl ?? GetAttribute ("src");
 
     /// <summary>
     /// is the iframe is of embeded video
@@ -142,14 +142,16 @@ internal sealed class CssBoxFrame
     /// <summary>
     /// Load YouTube video data (title, image, link) by calling YouTube API.
     /// </summary>
-    private void LoadYoutubeDataAsync (Uri uri)
+    private void LoadYoutubeDataAsync
+        (
+            Uri uri
+        )
     {
-        ThreadPool.QueueUserWorkItem (state =>
+        ThreadPool.QueueUserWorkItem (_ =>
         {
             try
             {
-                var apiUri = new Uri (string.Format ("http://gdata.youtube.com/feeds/api/videos/{0}?v=2&alt=json",
-                    uri.Segments[2]));
+                var apiUri = new Uri ($"http://gdata.youtube.com/feeds/api/videos/{uri.Segments[2]}?v=2&alt=json");
 
                 var client = new WebClient();
                 client.Encoding = Encoding.UTF8;
@@ -485,8 +487,8 @@ internal sealed class CssBoxFrame
     /// <summary>
     /// Paints the fragment
     /// </summary>
-    /// <param name="g">the device to draw to</param>
-    protected override void PaintImp (RGraphics g)
+    /// <param name="graphics">the device to draw to</param>
+    protected override void PaintImp (RGraphics graphics)
     {
         if (_videoImageUrl != null && _imageLoadHandler == null)
         {
@@ -499,11 +501,11 @@ internal sealed class CssBoxFrame
         RPoint offset = (HtmlContainer != null && !IsFixed) ? HtmlContainer.ScrollOffset : RPoint.Empty;
         rects.Offset (offset);
 
-        var clipped = RenderUtils.ClipGraphicsByOverflow (g, this);
+        var clipped = RenderUtils.ClipGraphicsByOverflow (graphics, this);
 
-        PaintBackground (g, rects, true, true);
+        PaintBackground (graphics, rects, true, true);
 
-        BordersDrawHandler.DrawBoxBorders (g, this, rects, true, true);
+        BordersDrawHandler.DrawBoxBorders (graphics, this, rects, true, true);
 
         var word = Words[0];
         var tmpRect = word.Rectangle;
@@ -514,14 +516,14 @@ internal sealed class CssBoxFrame
         tmpRect.Y = Math.Floor (tmpRect.Y);
         var rect = tmpRect;
 
-        DrawImage (g, offset, rect);
+        DrawImage (graphics, offset, rect);
 
-        DrawTitle (g, rect);
+        DrawTitle (graphics, rect);
 
-        DrawPlay (g, rect);
+        DrawPlay (graphics, rect);
 
         if (clipped)
-            g.PopClip();
+            graphics.PopClip();
     }
 
     /// <summary>

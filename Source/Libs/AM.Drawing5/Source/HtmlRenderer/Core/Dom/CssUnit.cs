@@ -3,29 +3,63 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable InconsistentNaming
 
-/* CssUnit.cs --
+/* CssUnit.cs -- всевозможные единицы длины CSS.
  * Ars Magna project, http://arsmagna.ru
  */
 
 namespace AM.Drawing.HtmlRenderer.Core.Dom;
 
 /// <summary>
-/// Represents the possible units of the CSS lengths
+/// Представляет всевозможные единицы длины CSS.
 /// </summary>
 /// <remarks>
 /// http://www.w3.org/TR/CSS21/syndata.html#length-units
 /// </remarks>
 internal enum CssUnit
 {
+    /// <summary>
+    /// Нет.
+    /// </summary>
     None,
+
+    /// <summary>
+    /// em
+    /// </summary>
     Ems,
+
+    /// <summary>
+    /// Пикселы.
+    /// </summary>
     Pixels,
+
+    /// <summary>
+    /// ex
+    /// </summary>
     Ex,
+
+    /// <summary>
+    /// Дюймы.
+    /// </summary>
     Inches,
+
+    /// <summary>
+    /// Сантиметры.
+    /// </summary>
     Centimeters,
-    Milimeters,
+
+    /// <summary>
+    /// Миллиметры.
+    /// </summary>
+    Millimeters,
+
+    /// <summary>
+    /// Точки.
+    /// </summary>
     Points,
+
+    /// <summary>
+    /// pica.
+    /// </summary>
     Picas
 }
