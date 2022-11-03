@@ -23,37 +23,59 @@ namespace PdfSharpCore.Drawing.BarCodes;
 public class Code2of5Interleaved
     : ThickThinBarCode
 {
+    #region Construction
+
     /// <summary>
-    /// Initializes a new instance of Interleaved2of5.
+    /// Конструктор по умолчанию.
     /// </summary>
     public Code2of5Interleaved()
         : base ("", XSize.Empty, CodeDirection.LeftToRight)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
-    /// Initializes a new instance of Interleaved2of5.
+    /// Конструктор.
     /// </summary>
-    public Code2of5Interleaved (string code)
+    public Code2of5Interleaved
+        (
+            string code
+        )
         : base (code, XSize.Empty, CodeDirection.LeftToRight)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
-    /// Initializes a new instance of Interleaved2of5.
+    /// Конструктор.
     /// </summary>
-    public Code2of5Interleaved (string code, XSize size)
+    public Code2of5Interleaved
+        (
+            string code,
+            XSize size
+        )
         : base (code, size, CodeDirection.LeftToRight)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
-    /// Initializes a new instance of Interleaved2of5.
+    /// Конструктор.
     /// </summary>
-    public Code2of5Interleaved (string code, XSize size, CodeDirection direction)
+    public Code2of5Interleaved
+        (
+            string code,
+            XSize size,
+            CodeDirection direction
+        )
         : base (code, size, direction)
     {
+        // пустое тело конструктора
     }
+
+    #endregion
+
+    #region Private members
 
     /// <summary>
     /// Returns an array of size 5 that represents the thick (true) and thin (false) lines or spaces
@@ -78,6 +100,74 @@ public class Code2of5Interleaved
         new[] { true, false, false, true, false },
         new[] { false, true, false, true, false },
     };
+
+    /// <inheritdoc cref="ThickThinBarCode.CalcThinBarWidth"/>
+    internal override void CalcThinBarWidth
+        (
+            BarCodeRenderInfo info
+        )
+    {
+        /*
+         * The total width is the sum of the following parts:
+         * Starting lines      = 4 * thin
+         *  +
+         * Code Representation = (2 * thick + 3 * thin) * code.Length
+         *  +
+         * Stopping lines      =  1 * thick + 2 * thin
+         *
+         * with r = relation ( = thick / thin), this results in
+         *
+         * Total width = (6 + r + (2 * r + 3) * text.Length) * thin
+         */
+        var thinLineAmount = 6 + WideNarrowRatio + (2 * WideNarrowRatio + 3) * Text.Length;
+        info.ThinBarWidth = Size.Width / thinLineAmount;
+    }
+
+    private void RenderStart
+        (
+            BarCodeRenderInfo info
+        )
+    {
+        RenderBar (info, false);
+        RenderGap (info, false);
+        RenderBar (info, false);
+        RenderGap (info, false);
+    }
+
+    private void RenderStop
+        (
+            BarCodeRenderInfo info
+        )
+    {
+        RenderBar (info, true);
+        RenderGap (info, false);
+        RenderBar (info, false);
+    }
+
+    /// <summary>
+    /// Renders the next digit pair as bar code element.
+    /// </summary>
+    private void RenderNextPair
+        (
+            BarCodeRenderInfo info
+        )
+    {
+        var digitForLines = int.Parse (Text[info.CurrentPositionInString].ToString());
+        var digitForGaps = int.Parse (Text[info.CurrentPositionInString + 1].ToString());
+        var linesArray = Lines[digitForLines];
+        var gapsArray = Lines[digitForGaps];
+        for (var idx = 0; idx < 5; ++idx)
+        {
+            RenderBar (info, linesArray[idx]);
+            RenderGap (info, gapsArray[idx]);
+        }
+
+        info.CurrentPositionInString += 2;
+    }
+
+    #endregion
+
+    #region BarCode members
 
     /// <inheritdoc cref="BarCode.Render"/>
     protected internal override void Render
@@ -122,61 +212,6 @@ public class Code2of5Interleaved
         graphics.Restore (state);
     }
 
-    /// <inheritdoc cref="ThickThinBarCode.CalcThinBarWidth"/>
-    internal override void CalcThinBarWidth
-        (
-            BarCodeRenderInfo info
-        )
-    {
-        /*
-         * The total width is the sum of the following parts:
-         * Starting lines      = 4 * thin
-         *  +
-         * Code Representation = (2 * thick + 3 * thin) * code.Length
-         *  +
-         * Stopping lines      =  1 * thick + 2 * thin
-         *
-         * with r = relation ( = thick / thin), this results in
-         *
-         * Total width = (6 + r + (2 * r + 3) * text.Length) * thin
-         */
-        var thinLineAmount = 6 + WideNarrowRatio + (2 * WideNarrowRatio + 3) * Text.Length;
-        info.ThinBarWidth = Size.Width / thinLineAmount;
-    }
-
-    private void RenderStart (BarCodeRenderInfo info)
-    {
-        RenderBar (info, false);
-        RenderGap (info, false);
-        RenderBar (info, false);
-        RenderGap (info, false);
-    }
-
-    private void RenderStop (BarCodeRenderInfo info)
-    {
-        RenderBar (info, true);
-        RenderGap (info, false);
-        RenderBar (info, false);
-    }
-
-    /// <summary>
-    /// Renders the next digit pair as bar code element.
-    /// </summary>
-    private void RenderNextPair (BarCodeRenderInfo info)
-    {
-        var digitForLines = int.Parse (Text[info.CurrentPositionInString].ToString());
-        var digitForGaps = int.Parse (Text[info.CurrentPositionInString + 1].ToString());
-        var linesArray = Lines[digitForLines];
-        var gapsArray = Lines[digitForGaps];
-        for (var idx = 0; idx < 5; ++idx)
-        {
-            RenderBar (info, linesArray[idx]);
-            RenderGap (info, gapsArray[idx]);
-        }
-
-        info.CurrentPositionInString += 2;
-    }
-
     /// <inheritdoc cref="CodeBase.CheckCode"/>
     protected override void CheckCode
         (
@@ -202,4 +237,6 @@ public class Code2of5Interleaved
       }
 #endif
     }
+
+    #endregion
 }

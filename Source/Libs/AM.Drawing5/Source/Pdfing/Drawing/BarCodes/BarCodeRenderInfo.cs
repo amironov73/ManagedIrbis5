@@ -10,6 +10,12 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
+#region Using directives
+
+using AM;
+
+#endregion
+
 #nullable enable
 
 namespace PdfSharpCore.Drawing.BarCodes;
@@ -67,6 +73,13 @@ class BarCodeRenderInfo
 
     #region Construction
 
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    /// <param name="graphics"></param>
+    /// <param name="brush"></param>
+    /// <param name="font"></param>
+    /// <param name="position"></param>
     public BarCodeRenderInfo
         (
             XGraphics graphics,
@@ -75,6 +88,8 @@ class BarCodeRenderInfo
             XPoint position
         )
     {
+        Sure.NotNull (graphics);
+
         Graphics = graphics;
         Brush = brush;
         Font = font;
