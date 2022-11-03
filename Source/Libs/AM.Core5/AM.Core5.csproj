@@ -23,7 +23,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <EmbeddedResource Include="..\..\Common\ArsMagnaSslSocket.cer"/>
+        <EmbeddedResource Include="..\..\Common\ArsMagnaSslSocket.cer" />
     </ItemGroup>
 
     <!-- Централизованное управление пакетами -->
