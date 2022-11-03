@@ -27,10 +27,72 @@ namespace PdfSharpCore.Drawing.BarCodes;
 public abstract class MatrixCode
     : CodeBase
 {
+    #region Properties
+
+    /// <summary>
+    /// docDaSt
+    /// </summary>
+    public int Columns
+    {
+        get => _columns;
+        set
+        {
+            _columns = value;
+            _matrixImage = null;
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets the encoding. docDaSt
+    /// </summary>
+    public string Encoding
+    {
+        get => _encoding;
+        set
+        {
+            _encoding = value;
+            _matrixImage = null;
+        }
+    }
+
+    internal XImage? MatrixImage
+    {
+        get => _matrixImage;
+        set => _matrixImage = value;
+    }
+
+    /// <summary>
+    /// docDaSt
+    /// </summary>
+    public int Rows
+    {
+        get => _rows;
+        set
+        {
+            _rows = value;
+            _matrixImage = null;
+        }
+    }
+
+    /// <summary>
+    /// docDaSt
+    /// </summary>
+    public new string Text
+    {
+        get => base.Text;
+        set
+        {
+            base.Text = value;
+            _matrixImage = null;
+        }
+    }
+
+    #endregion
+
     #region Construction
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="MatrixCode"/> class.
+    /// Конструктор.
     /// </summary>
     protected MatrixCode
         (
@@ -62,82 +124,35 @@ public abstract class MatrixCode
 
     #endregion
 
-    /// <summary>
-    /// Gets or sets the encoding. docDaSt
-    /// </summary>
-    public string Encoding
-    {
-        get => _encoding;
-        set
-        {
-            _encoding = value;
-            _matrixImage = null;
-        }
-    }
+    #region Private members
 
-    string _encoding;
-
-    /// <summary>
-    /// docDaSt
-    /// </summary>
-    public int Columns
-    {
-        get => _columns;
-        set
-        {
-            _columns = value;
-            _matrixImage = null;
-        }
-    }
-
-    int _columns;
-
-    /// <summary>
-    /// docDaSt
-    /// </summary>
-    public int Rows
-    {
-        get => _rows;
-        set
-        {
-            _rows = value;
-            _matrixImage = null;
-        }
-    }
-
-    int _rows;
-
-    /// <summary>
-    /// docDaSt
-    /// </summary>
-    public new string Text
-    {
-        get => base.Text;
-        set
-        {
-            base.Text = value;
-            _matrixImage = null;
-        }
-    }
-
-    internal XImage? MatrixImage
-    {
-        get => _matrixImage;
-        set => _matrixImage = value;
-    }
-
+    private int _columns;
+    private string _encoding;
     private XImage? _matrixImage;
+    private int _rows;
+
+    #endregion
+
+    #region BarCode members
+
+    /// <inheritdoc cref="CodeBase.CheckCode"/>
+    protected override void CheckCode
+        (
+            string text
+        )
+    {
+        // пустое тело метода
+    }
 
     /// <summary>
     /// When implemented in a derived class renders the 2D code.
     /// </summary>
-    protected internal abstract void Render (XGraphics graphics, XBrush brush, XPoint center);
+    protected internal abstract void Render
+        (
+            XGraphics graphics,
+            XBrush brush,
+            XPoint center
+        );
 
-    /// <summary>
-    /// Determines whether the specified string can be used as Text for this matrix code type.
-    /// </summary>
-    protected override void CheckCode (string text)
-    {
-        // пустое тело метода
-    }
+    #endregion
 }

@@ -7,14 +7,14 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-/* CodeType.cs --
+/* CodeType.cs -- тип штрих-кода
  * Ars Magna project, http://arsmagna.ru
  */
 
 namespace PdfSharpCore.Drawing.BarCodes;
 
 /// <summary>
-/// Specifies the type of the bar code.
+/// Тип штрих-кода.
 /// </summary>
 public enum CodeType
 {

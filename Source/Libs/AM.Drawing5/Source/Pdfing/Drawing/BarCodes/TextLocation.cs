@@ -5,41 +5,40 @@
 // ReSharper disable CommentTypo
 // ReSharper disable UnusedMember.Global
 
-/* TextLocation.cs --
+/* TextLocation.cs -- определяет, будет ли отображаться текст в штрих-коде и каким образом.
  * Ars Magna project, http://arsmagna.ru
  */
 
 namespace PdfSharpCore.Drawing.BarCodes;
 
 /// <summary>
-/// Specifies whether and how the text is displayed at the code.
+/// Определяет, будет ли отображаться текст в штрих-коде и каким образом.
 /// </summary>
 public enum TextLocation
 {
     /// <summary>
-    /// No text is drawn.
+    /// Текст не будет отображаться.
     /// </summary>
     None,
 
     /// <summary>
-    /// The text is located above the code.
+    /// Текст над штрих-кодом.
     /// </summary>
     Above,
 
     /// <summary>
-    /// The text is located below the code.
+    /// Текст под штрих-кодом.
     /// </summary>
     Below,
 
-
     /// <summary>
-    /// The text is located above within the code.
+    /// Текст над штрих-кодом, внутри него.
     /// </summary>
     AboveEmbedded,
 
 
     /// <summary>
-    /// The text is located below within the code.
+    /// Текст под штрих-кодом, внутри него.
     /// </summary>
     BelowEmbedded
 }

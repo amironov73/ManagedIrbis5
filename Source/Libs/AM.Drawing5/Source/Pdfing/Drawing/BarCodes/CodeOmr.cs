@@ -43,7 +43,7 @@ public class CodeOmr
     #region Construction
 
     /// <summary>
-    /// initializes a new OmrCode with the given data.
+    /// Конструктор.
     /// </summary>
     public CodeOmr
         (
@@ -234,7 +234,10 @@ public class CodeOmr
     //XUnit markLineWidth = 1;
 
     /// <inheritdoc cref="CodeBase.CheckCode"/>
-    protected override void CheckCode (string text)
+    protected override void CheckCode
+        (
+            string text
+        )
     {
         // пустое тело метода
     }

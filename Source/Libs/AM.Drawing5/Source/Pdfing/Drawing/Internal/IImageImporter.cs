@@ -91,7 +91,7 @@ internal class StreamReaderHelper
 
     private static void CopyStream (Stream input, Stream output)
     {
-        byte[] buffer = new byte[65536];
+        var buffer = new byte[65536];
         int read;
         while ((read = input.Read (buffer, 0, buffer.Length)) > 0)
         {
