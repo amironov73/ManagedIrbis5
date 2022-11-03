@@ -3,38 +3,36 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-/* BlockType.cs --
+/* BlockType.cs -- типы текстовых блоков
  * Ars Magna project, http://arsmagna.ru
  */
 
 namespace PdfSharpCore.Drawing.Layout;
 
 /// <summary>
-///
+/// Типы текстовых блоков.
 /// </summary>
 internal enum BlockType
 {
     /// <summary>
-    ///
+    /// Собственно текст.
     /// </summary>
     Text,
 
     /// <summary>
-    ///
+    /// Пробел.
     /// </summary>
     Space,
 
     /// <summary>
-    ///
+    /// Дефис.
     /// </summary>
     Hyphen,
 
     /// <summary>
-    ///
+    /// Разрыв строки.
     /// </summary>
     LineBreak
 }

@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-/* TextSegment.cs --
+/* TextSegment.cs -- текстовый сегмент
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -16,27 +16,27 @@
 namespace PdfSharpCore.Drawing.Layout;
 
 /// <summary>
-///
+/// Текстовый сегмент.
 /// </summary>
 public class TextSegment
 {
     /// <summary>
-    ///
+    /// Шрифт.
     /// </summary>
     public XFont? Font { get; set; }
 
     /// <summary>
-    ///
+    /// Кисть.
     /// </summary>
     public XBrush? Brush { get; set; }
 
     /// <summary>
-    ///
+    /// Собственно текст.
     /// </summary>
     public string? Text { get; set; }
 
     /// <summary>
-    ///
+    /// Отступ.
     /// </summary>
     public double LineIndent { get; set; }
 
@@ -46,7 +46,7 @@ public class TextSegment
     public bool SkipParagraphAlignment { get; set; }
 
     /// <summary>
-    ///
+    /// Промежуток между строками.
     /// </summary>
     public double LineSpace { get; set; }
 
@@ -61,7 +61,7 @@ public class TextSegment
     public double CyDescent { get; set; }
 
     /// <summary>
-    ///
+    /// Ширина пробела.
     /// </summary>
     public double SpaceWidth { get; set; }
 }

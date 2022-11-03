@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-/* FormatterEnvironment.cs --
+/* FormatterEnvironment.cs -- окружение для форматтера
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -16,24 +16,24 @@
 namespace PdfSharpCore.Drawing.Layout;
 
 /// <summary>
-///
+/// Окружение для форматтера.
 /// </summary>
 internal class FormatterEnvironment
 {
     #region Properties
 
     /// <summary>
-    ///
+    /// Шрифт.
     /// </summary>
     public XFont? Font { get; set; }
 
     /// <summary>
-    ///
+    /// Кисть.
     /// </summary>
     public XBrush? Brush { get; set; }
 
     /// <summary>
-    ///
+    /// Промежуток между строками.
     /// </summary>
     public double LineSpace { get; set; }
 
@@ -48,7 +48,7 @@ internal class FormatterEnvironment
     public double CyDescent { get; set; }
 
     /// <summary>
-    ///
+    /// Ширина пробела.
     /// </summary>
     public double SpaceWidth { get; set; }
 

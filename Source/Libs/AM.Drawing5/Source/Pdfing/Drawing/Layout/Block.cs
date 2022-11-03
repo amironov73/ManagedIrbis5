@@ -11,6 +11,12 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
+#region Using directives
+
+using AM;
+
+#endregion
+
 #nullable enable
 
 namespace PdfSharpCore.Drawing.Layout;
@@ -77,11 +83,11 @@ internal class Block
     #region Construction
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Block"/> class.
+    /// Конструктор.
     /// </summary>
-    /// <param name="text">The text of the block.</param>
-    /// <param name="type">The type of the block.</param>
-    /// <param name="width">The width of the text.</param>
+    /// <param name="text">Текст блока.</param>
+    /// <param name="type">Тип блока.</param>
+    /// <param name="width">Ширина текста.</param>
     public Block
         (
             string text,
@@ -89,20 +95,26 @@ internal class Block
             double width
         )
     {
+        Sure.Defined (type);
+
         Text = text;
         Type = type;
         Width = width;
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Block"/> class.
+    /// Конструктор.
     /// </summary>
-    /// <param name="type">The type.</param>
-    public Block (BlockType type)
+    /// <param name="type">Тип блока.</param>
+    public Block
+        (
+            BlockType type
+        )
     {
+        Sure.Defined (type);
+
         Type = type;
     }
 
     #endregion
-
 }

@@ -33,7 +33,16 @@ namespace PdfSharpCore.Drawing.Layout;
 /// </summary>
 public class XTextSegmentFormatter
 {
-    private readonly XGraphics _graphics;
+    #region Properties
+
+    /// <summary>
+    /// Gets or sets the alignment of the text.
+    /// </summary>
+    public XParagraphAlignment Alignment { get; set; }
+
+    #endregion
+
+    #region Construction
 
     /// <summary>
     /// Initializes a new instance of the <see cref="XTextSegmentFormatter"/> class.
@@ -48,190 +57,11 @@ public class XTextSegmentFormatter
         _graphics = graphics;
     }
 
-    /// <summary>
-    /// Gets or sets the alignment of the text.
-    /// </summary>
-    public XParagraphAlignment Alignment { get; set; }
+    #endregion
 
-    /// <summary>
-    /// Draws the text.
-    /// </summary>
-    /// <param name="text">The text to be drawn.</param>
-    /// <param name="font">The font.</param>
-    /// <param name="brush">The text brush.</param>
-    /// <param name="layoutRectangle">The layout rectangle.</param>
-    public void DrawString (string text, XFont font, XBrush brush, XRect layoutRectangle)
-    {
-        var textSegments = new List<TextSegment>
-        {
-            new TextSegment { Font = font, Brush = brush, Text = text }
-        };
+    #region Private members
 
-        DrawString (textSegments, layoutRectangle, XStringFormats.TopLeft);
-    }
-
-    /// <summary>
-    /// Draws the text.
-    /// </summary>
-    /// <param name="text">The text to be drawn.</param>
-    /// <param name="font">The font.</param>
-    /// <param name="brush">The text brush.</param>
-    /// <param name="layoutRectangle">The layout rectangle.</param>
-    /// <param name="format">The format. Must be <c>XStringFormat.TopLeft</c></param>
-    public void DrawString (string text, XFont font, XBrush brush, XRect layoutRectangle, XStringFormat format)
-    {
-        var textSegments = new List<TextSegment>
-        {
-            new TextSegment { Font = font, Brush = brush, Text = text }
-        };
-
-        DrawString (textSegments, layoutRectangle, format);
-    }
-
-    /// <summary>
-    /// Draws the text.
-    /// </summary>
-    /// <param name="textSegments">The texts to be drawn with font and color information</param>
-    /// <param name="layoutRectangle">The layout rectangle.</param>
-    public void DrawString (IEnumerable<TextSegment> textSegments, XRect layoutRectangle)
-    {
-        DrawString (textSegments, layoutRectangle, XStringFormats.TopLeft);
-    }
-
-    /// <summary>
-    /// Draws the text.
-    /// </summary>
-    /// <param name="textSegments">The texts to be drawn with font and color information.</param>
-    /// <param name="layoutRectangle">The layout rectangle.</param>
-    /// <param name="format">The format. Must be <c>XStringFormat.TopLeft</c></param>
-    public void DrawString (IEnumerable<TextSegment> textSegments, XRect layoutRectangle, XStringFormat format)
-    {
-        ProcessTextSegments (
-                textSegments,
-                layoutRectangle,
-                format,
-                (block, dx, dy) =>
-                {
-                    var environment = block.Environment.ThrowIfNull();
-                    _graphics.DrawString
-                        (
-                            block.Text.ThrowIfNull(),
-                            environment.Font.ThrowIfNull(),
-                            environment.Brush.ThrowIfNull(),
-                            dx + block.Location.X, dy + block.Location.Y
-                        );
-                },
-                false
-            );
-    }
-
-    /// <summary>
-    /// Calculates the size of the given text
-    /// </summary>
-    /// <param name="text">The text to be drawn.</param>
-    /// <param name="font">The font.</param>
-    /// <param name="brush">The text brush.</param>
-    /// <param name="width">Max text width</param>
-    /// <returns></returns>
-    public XSize CalculateTextSize
-        (
-            string text,
-            XFont font,
-            XBrush brush,
-            double width
-        )
-    {
-        return CalculateTextSize (text, font, brush, width, XStringFormats.TopLeft);
-    }
-
-    /// <summary>
-    /// Calculates the size of the given text
-    /// </summary>
-    /// <param name="text">The text to be drawn.</param>
-    /// <param name="font">The font.</param>
-    /// <param name="brush">The text brush.</param>
-    /// <param name="width">Max text width</param>
-    /// <param name="format">The format. Must be <c>XStringFormat.TopLeft</c></param>
-    /// <returns></returns>
-    public XSize CalculateTextSize
-        (
-            string text,
-            XFont font,
-            XBrush brush,
-            double width,
-            XStringFormat format
-        )
-    {
-        var textSegments = new List<TextSegment>
-        {
-            new() { Font = font, Brush = brush, Text = text }
-        };
-
-        return CalculateTextSize (textSegments, width, format);
-    }
-
-    /// <summary>
-    /// Calculates the size of the given text
-    /// </summary>
-    /// <param name="textSegments">The texts to be drawn with font and color information.</param>
-    /// <param name="width">Max text width</param>
-    /// <returns></returns>
-    public XSize CalculateTextSize (IEnumerable<TextSegment> textSegments, double width)
-    {
-        return CalculateTextSize (textSegments, width, XStringFormats.TopLeft);
-    }
-
-    /// <summary>
-    /// Calculates the size of the given text
-    /// </summary>
-    /// <param name="textSegments">The texts to be drawn with font and color information.</param>
-    /// <param name="width">Max text width</param>
-    /// <param name="format">The format. Must be <c>XStringFormat.TopLeft</c></param>
-    /// <returns></returns>
-    public XSize CalculateTextSize
-        (
-            IEnumerable<TextSegment> textSegments,
-            double width,
-            XStringFormat format
-        )
-    {
-        var layoutRectangle = new XRect (0, 0, width, 100000000);
-        var blocks = new List<Block>();
-
-        ProcessTextSegments
-            (
-                textSegments,
-                layoutRectangle,
-                format, (block, _, _) => blocks.Add (block),
-                true
-            );
-
-        var height = blocks.Any()
-            ? blocks.Max (b => b.Location.Y)
-            : 0;
-        var maxLineHeight = 0.0;
-        for (var i = blocks.Count - 1; i >= 0; i--)
-        {
-            if (blocks[i].Type == BlockType.LineBreak)
-            {
-                break;
-            }
-
-            var blockEnvironment = blocks[i].Environment.ThrowIfNull();
-            maxLineHeight = Math.Max (maxLineHeight, blockEnvironment.LineSpace);
-        }
-
-        var calculatedWith = blocks.Any()
-            ? blocks.Max (b => b.Location.X + b.Width)
-            : width;
-
-        if (width < calculatedWith)
-        {
-            calculatedWith = width;
-        }
-
-        return new XSize (calculatedWith, height + maxLineHeight);
-    }
+    private readonly XGraphics _graphics;
 
     private void ProcessTextSegments
         (
@@ -704,6 +534,192 @@ public class XTextSegmentFormatter
         segment.SpaceWidth = _graphics.MeasureString ("x x", segment.Font).Width;
         segment.SpaceWidth -= _graphics.MeasureString ("xx", segment.Font).Width;
     }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Draws the text.
+    /// </summary>
+    /// <param name="text">The text to be drawn.</param>
+    /// <param name="font">The font.</param>
+    /// <param name="brush">The text brush.</param>
+    /// <param name="layoutRectangle">The layout rectangle.</param>
+    public void DrawString (string text, XFont font, XBrush brush, XRect layoutRectangle)
+    {
+        var textSegments = new List<TextSegment>
+        {
+            new TextSegment { Font = font, Brush = brush, Text = text }
+        };
+
+        DrawString (textSegments, layoutRectangle, XStringFormats.TopLeft);
+    }
+
+    /// <summary>
+    /// Draws the text.
+    /// </summary>
+    /// <param name="text">The text to be drawn.</param>
+    /// <param name="font">The font.</param>
+    /// <param name="brush">The text brush.</param>
+    /// <param name="layoutRectangle">The layout rectangle.</param>
+    /// <param name="format">The format. Must be <c>XStringFormat.TopLeft</c></param>
+    public void DrawString (string text, XFont font, XBrush brush, XRect layoutRectangle, XStringFormat format)
+    {
+        var textSegments = new List<TextSegment>
+        {
+            new TextSegment { Font = font, Brush = brush, Text = text }
+        };
+
+        DrawString (textSegments, layoutRectangle, format);
+    }
+
+    /// <summary>
+    /// Draws the text.
+    /// </summary>
+    /// <param name="textSegments">The texts to be drawn with font and color information</param>
+    /// <param name="layoutRectangle">The layout rectangle.</param>
+    public void DrawString (IEnumerable<TextSegment> textSegments, XRect layoutRectangle)
+    {
+        DrawString (textSegments, layoutRectangle, XStringFormats.TopLeft);
+    }
+
+    /// <summary>
+    /// Draws the text.
+    /// </summary>
+    /// <param name="textSegments">The texts to be drawn with font and color information.</param>
+    /// <param name="layoutRectangle">The layout rectangle.</param>
+    /// <param name="format">The format. Must be <c>XStringFormat.TopLeft</c></param>
+    public void DrawString (IEnumerable<TextSegment> textSegments, XRect layoutRectangle, XStringFormat format)
+    {
+        ProcessTextSegments (
+                textSegments,
+                layoutRectangle,
+                format,
+                (block, dx, dy) =>
+                {
+                    var environment = block.Environment.ThrowIfNull();
+                    _graphics.DrawString
+                        (
+                            block.Text.ThrowIfNull(),
+                            environment.Font.ThrowIfNull(),
+                            environment.Brush.ThrowIfNull(),
+                            dx + block.Location.X, dy + block.Location.Y
+                        );
+                },
+                false
+            );
+    }
+
+    /// <summary>
+    /// Calculates the size of the given text
+    /// </summary>
+    /// <param name="text">The text to be drawn.</param>
+    /// <param name="font">The font.</param>
+    /// <param name="brush">The text brush.</param>
+    /// <param name="width">Max text width</param>
+    /// <returns></returns>
+    public XSize CalculateTextSize
+        (
+            string text,
+            XFont font,
+            XBrush brush,
+            double width
+        )
+    {
+        return CalculateTextSize (text, font, brush, width, XStringFormats.TopLeft);
+    }
+
+    /// <summary>
+    /// Calculates the size of the given text
+    /// </summary>
+    /// <param name="text">The text to be drawn.</param>
+    /// <param name="font">The font.</param>
+    /// <param name="brush">The text brush.</param>
+    /// <param name="width">Max text width</param>
+    /// <param name="format">The format. Must be <c>XStringFormat.TopLeft</c></param>
+    /// <returns></returns>
+    public XSize CalculateTextSize
+        (
+            string text,
+            XFont font,
+            XBrush brush,
+            double width,
+            XStringFormat format
+        )
+    {
+        var textSegments = new List<TextSegment>
+        {
+            new() { Font = font, Brush = brush, Text = text }
+        };
+
+        return CalculateTextSize (textSegments, width, format);
+    }
+
+    /// <summary>
+    /// Calculates the size of the given text
+    /// </summary>
+    /// <param name="textSegments">The texts to be drawn with font and color information.</param>
+    /// <param name="width">Max text width</param>
+    /// <returns></returns>
+    public XSize CalculateTextSize (IEnumerable<TextSegment> textSegments, double width)
+    {
+        return CalculateTextSize (textSegments, width, XStringFormats.TopLeft);
+    }
+
+    /// <summary>
+    /// Calculates the size of the given text
+    /// </summary>
+    /// <param name="textSegments">The texts to be drawn with font and color information.</param>
+    /// <param name="width">Max text width</param>
+    /// <param name="format">The format. Must be <c>XStringFormat.TopLeft</c></param>
+    /// <returns></returns>
+    public XSize CalculateTextSize
+        (
+            IEnumerable<TextSegment> textSegments,
+            double width,
+            XStringFormat format
+        )
+    {
+        var layoutRectangle = new XRect (0, 0, width, 100000000);
+        var blocks = new List<Block>();
+
+        ProcessTextSegments
+            (
+                textSegments,
+                layoutRectangle,
+                format, (block, _, _) => blocks.Add (block),
+                true
+            );
+
+        var height = blocks.Any()
+            ? blocks.Max (b => b.Location.Y)
+            : 0;
+        var maxLineHeight = 0.0;
+        for (var i = blocks.Count - 1; i >= 0; i--)
+        {
+            if (blocks[i].Type == BlockType.LineBreak)
+            {
+                break;
+            }
+
+            var blockEnvironment = blocks[i].Environment.ThrowIfNull();
+            maxLineHeight = Math.Max (maxLineHeight, blockEnvironment.LineSpace);
+        }
+
+        var calculatedWith = blocks.Any()
+            ? blocks.Max (b => b.Location.X + b.Width)
+            : width;
+
+        if (width < calculatedWith)
+        {
+            calculatedWith = width;
+        }
+
+        return new XSize (calculatedWith, height + maxLineHeight);
+    }
+
+    #endregion
 
     // TODO:
     // - more XStringFormat variations

@@ -51,7 +51,7 @@ public class XTextFormatter
 
     #endregion
 
-    readonly XGraphics _graphics;
+    private readonly XGraphics _graphics;
 
     /// <summary>
     /// Gets or sets the text.
@@ -74,24 +74,24 @@ public class XTextFormatter
         set
         {
             Sure.NotNull (value);
-            _font = value;
+            _font = value!;
 
             _lineSpace = _font.GetHeight(); // old: _font.GetHeight(_gfx);
             _cyAscent = _lineSpace * _font.CellAscent / _font.CellSpace;
             _cyDescent = _lineSpace * _font.CellDescent / _font.CellSpace;
 
             // HACK in XTextFormatter
-            _spaceWidth = _graphics.MeasureString ("x x", value).Width;
-            _spaceWidth -= _graphics.MeasureString ("xx", value).Width;
+            _spaceWidth = _graphics.MeasureString ("x x", _font).Width;
+            _spaceWidth -= _graphics.MeasureString ("xx", _font).Width;
         }
     }
 
     private XFont? _font;
 
-    double _lineSpace;
-    double _cyAscent;
-    double _cyDescent;
-    double _spaceWidth;
+    private double _lineSpace;
+    private double _cyAscent;
+    private double _cyDescent;
+    private double _spaceWidth;
 
     /// <summary>
     /// Gets or sets the bounding box of the layout.
@@ -102,7 +102,7 @@ public class XTextFormatter
         set => _layoutRectangle = value;
     }
 
-    XRect _layoutRectangle;
+    private XRect _layoutRectangle;
 
     /// <summary>
     /// Gets or sets the alignment of the text.
@@ -180,7 +180,7 @@ public class XTextFormatter
         }
     }
 
-    void CreateBlocks()
+    private void CreateBlocks()
     {
         _blocks.Clear();
         var length = _text.Length;
@@ -244,7 +244,7 @@ public class XTextFormatter
         }
     }
 
-    void CreateLayout()
+    private void CreateLayout()
     {
         var rectWidth = _layoutRectangle.Width;
         var rectHeight = _layoutRectangle.Height - _cyAscent - _cyDescent;
@@ -305,7 +305,7 @@ public class XTextFormatter
     /// <summary>
     /// Align center, right, or justify.
     /// </summary>
-    void AlignLine (int firstIndex, int lastIndex, double layoutWidth)
+    private void AlignLine (int firstIndex, int lastIndex, double layoutWidth)
     {
         var blockAlignment = _blocks[firstIndex].Alignment;
         if (Alignment == XParagraphAlignment.Left || blockAlignment == XParagraphAlignment.Left)
@@ -350,7 +350,7 @@ public class XTextFormatter
         }
     }
 
-    readonly List<Block> _blocks = new List<Block>();
+    private readonly List<Block> _blocks = new List<Block>();
 
     // TODO:
     // - more XStringFormat variations
