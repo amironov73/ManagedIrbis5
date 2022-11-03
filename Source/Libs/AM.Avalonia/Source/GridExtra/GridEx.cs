@@ -46,6 +46,11 @@ public class GridEx
         AffectsMeasure<GridEx> (TemplateAreaProperty);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <returns></returns>
     public static IList<NamedAreaDefinition> GetAreaDefinitions
         (
             AvaloniaObject obj
@@ -66,12 +71,12 @@ public class GridEx
     public static readonly AvaloniaProperty<IList<NamedAreaDefinition>> AreaDefinitionsProperty =
         AvaloniaProperty.RegisterAttached<GridEx, Control, IList<NamedAreaDefinition>> ("AreaDefinitions", null);
 
-    public static string GetTemplateArea
+    public static string? GetTemplateArea
         (
             AvaloniaObject obj
         )
     {
-        return (string)obj.GetValue (TemplateAreaProperty);
+        return (string?) obj.GetValue (TemplateAreaProperty);
     }
 
     public static void SetTemplateArea
@@ -85,13 +90,13 @@ public class GridEx
 
     private static void EvaluateTemplateArea
         (
-            object sender,
-            VisualTreeAttachmentEventArgs e
+            object? sender,
+            VisualTreeAttachmentEventArgs eventArgs
         )
     {
-        if (sender is Grid g)
+        if (sender is Grid grid)
         {
-            InitializeTemplateArea (g, (string)g.GetValue (TemplateAreaProperty));
+            InitializeTemplateArea (grid, (string?) grid.GetValue (TemplateAreaProperty));
         }
     }
 
@@ -128,7 +133,7 @@ public class GridEx
     private static void InitializeTemplateArea
         (
             Grid grid,
-            string param
+            string? param
         )
     {
         var columns = param.Split (new[] { '\n', '/' })

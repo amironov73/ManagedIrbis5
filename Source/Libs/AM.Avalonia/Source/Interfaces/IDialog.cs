@@ -25,20 +25,43 @@ using System.Threading.Tasks;
 
 #nullable enable
 
-namespace AM.Avalonia.Interfaces
+namespace AM.Avalonia.Interfaces;
+
+/// <summary>
+///
+/// </summary>
+public interface IDialog
+    : INotifyPropertyChanged
 {
-  public interface IDialog : INotifyPropertyChanged
-  {
+    /// <summary>
+    ///
+    /// </summary>
     string Title { get; set; }
 
+    /// <summary>
+    ///
+    /// </summary>
     string Description { get; set; }
 
+    /// <summary>
+    ///
+    /// </summary>
     IButtonCollection Buttons { get; }
 
+    /// <summary>
+    ///
+    /// </summary>
     ICollection<IDialogControl> Controls { get; }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     Task<IButton> ShowAsync();
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     Task CloseAsync();
-  }
 }

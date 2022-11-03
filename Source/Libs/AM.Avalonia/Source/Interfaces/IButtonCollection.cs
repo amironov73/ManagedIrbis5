@@ -27,20 +27,47 @@ using System.ComponentModel;
 
 namespace AM.Avalonia.Interfaces;
 
+/// <summary>
+///
+/// </summary>
 public interface IButtonCollection
     : INotifyPropertyChanged, IReadOnlyCollection<IButton>
 {
+    /// <summary>
+    ///
+    /// </summary>
     IButton DefaultButton { get; set; }
 
+    /// <summary>
+    ///
+    /// </summary>
     IButton CancelButton { get; set; }
 
+    /// <summary>
+    ///
+    /// </summary>
     IObservable<ButtonArgs> Clicked { get; }
 
-    void AddButton(IButton button);
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="button"></param>
+    void AddButton (IButton button);
 
-    IButton AddButton(string buttonName);
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="buttonName"></param>
+    /// <returns></returns>
+    IButton AddButton (string buttonName);
 
+    /// <summary>
+    ///
+    /// </summary>
     void AddOkCancel();
 
+    /// <summary>
+    ///
+    /// </summary>
     void AddCancel();
 }

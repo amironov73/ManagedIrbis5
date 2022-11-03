@@ -48,6 +48,7 @@ public partial class ResponsiveGrid
 
     #endregion
 
+    /// <inheritdoc cref="Grid.MeasureOverride"/>
     protected override Size MeasureOverride (Size availableSize)
     {
         var count = 0;
@@ -107,6 +108,12 @@ public partial class ResponsiveGrid
         return totalSize;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="element"></param>
+    /// <param name="width"></param>
+    /// <returns></returns>
     protected int GetSpan (Control element, double width)
     {
         var span = 0;
@@ -153,6 +160,12 @@ public partial class ResponsiveGrid
         ;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="element"></param>
+    /// <param name="width"></param>
+    /// <returns></returns>
     protected int GetOffset (Control element, double width)
     {
         var span = 0;
@@ -199,6 +212,12 @@ public partial class ResponsiveGrid
         ;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="element"></param>
+    /// <param name="width"></param>
+    /// <returns></returns>
     protected int GetPush (Control element, double width)
     {
         var span = 0;
@@ -245,6 +264,12 @@ public partial class ResponsiveGrid
         ;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="element"></param>
+    /// <param name="width"></param>
+    /// <returns></returns>
     protected int GetPull (Control element, double width)
     {
         var span = 0;
@@ -291,6 +316,7 @@ public partial class ResponsiveGrid
         ;
     }
 
+    /// <inheritdoc cref="Grid.ArrangeOverride"/>
     protected override Size ArrangeOverride (Size finalSize)
     {
         var columnWidth = finalSize.Width / MaxDivision;

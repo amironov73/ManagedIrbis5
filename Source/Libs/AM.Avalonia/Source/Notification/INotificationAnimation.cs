@@ -15,13 +15,6 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-#region Using directives
-
-using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
-
-#endregion
-
 #nullable enable
 
 namespace AM.Avalonia.Notification;

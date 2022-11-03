@@ -4,11 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable MemberCanBeProtected.Global
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedParameter.Local
 
 /* ButtonArgs.cs --
@@ -30,13 +25,36 @@ namespace AM.Avalonia;
 /// </summary>
 public sealed class ButtonArgs
 {
+    #region Properties
+
+    /// <summary>
+    ///
+    /// </summary>
     public bool CloseAfterClick { get; set; }
 
+    /// <summary>
+    ///
+    /// </summary>
     public IButton Button { get; }
 
-    public ButtonArgs(IButton button)
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    /// <param name="button">Кнопка.</param>
+    public ButtonArgs
+        (
+            IButton button
+        )
     {
+        Sure.NotNull (button);
+
         Button = button;
         CloseAfterClick = true;
     }
+
+    #endregion
 }

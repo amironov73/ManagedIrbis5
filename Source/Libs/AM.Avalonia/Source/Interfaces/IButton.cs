@@ -19,7 +19,6 @@
 
 using System;
 using System.ComponentModel;
-using System.Windows.Input;
 
 #endregion
 
@@ -27,20 +26,44 @@ using System.Windows.Input;
 
 namespace AM.Avalonia.Interfaces;
 
+/// <summary>
+///
+/// </summary>
 public interface IButton
     : INotifyPropertyChanged
 {
+    /// <summary>
+    ///
+    /// </summary>
     string Name { get; set; }
 
+    /// <summary>
+    ///
+    /// </summary>
     bool IsVisible { get; set; }
 
+    /// <summary>
+    ///
+    /// </summary>
     bool IsEnabled { get; set; }
 
+    /// <summary>
+    ///
+    /// </summary>
     bool IsDefault { get; set; }
 
+    /// <summary>
+    ///
+    /// </summary>
     bool IsCancel { get; set; }
 
+    /// <summary>
+    ///
+    /// </summary>
     IObservable<ButtonArgs> OnClick { get; }
 
+    /// <summary>
+    ///
+    /// </summary>
     IObservable<ButtonArgs> Clicked { get; }
 }

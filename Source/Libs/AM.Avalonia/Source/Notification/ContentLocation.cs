@@ -11,34 +11,34 @@
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedParameter.Local
 
-/* ContentLocation.cs --
+/* ContentLocation.cs -- места для расположение дополнительного контента
  * Ars Magna project, http://arsmagna.ru
  */
 
 namespace AM.Avalonia.Notification;
 
 /// <summary>
-/// The additional content location.
+/// Места для расположения дополнительного контента.
 /// </summary>
 public enum ContentLocation
 {
     /// <summary>
-    ///
+    /// Наверху.
     /// </summary>
     Top,
 
     /// <summary>
-    ///
+    /// Внизу.
     /// </summary>
     Bottom,
 
     /// <summary>
-    ///
+    /// Слева.
     /// </summary>
     Left,
 
     /// <summary>
-    ///
+    /// Справа.
     /// </summary>
     Right,
 
