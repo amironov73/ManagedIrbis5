@@ -433,8 +433,7 @@ public sealed class ReaderController
                 default:
                     return BadRequest("unknown operation");
             }
-
-        } // method Index
+        }
 
 */
 

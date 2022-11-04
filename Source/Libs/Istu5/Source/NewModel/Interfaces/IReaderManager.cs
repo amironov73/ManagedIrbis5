@@ -53,7 +53,7 @@ namespace Istu.NewModel.Interfaces
         /// <summary>
         /// Поиск читателя по идентификатору в MIRA.
         /// </summary>
-        Reader? GetReaderByIstuID (int id);
+        Reader? GetReaderByIstuID (int istuId);
 
         /// <summary>
         /// Поиск читателя по RFID.

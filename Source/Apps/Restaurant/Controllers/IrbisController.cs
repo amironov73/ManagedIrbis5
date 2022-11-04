@@ -1204,8 +1204,7 @@ public sealed class IrbisController
                 default:
                     return BadRequest("unknown operation");
             }
-
-        } // method Index
+        }
 
 */
 
