@@ -57,6 +57,8 @@ public sealed class AttendanceManager
             Storehouse storehouse
         )
     {
+        Sure.NotNull (storehouse);
+
         Storehouse = storehouse;
     }
 
@@ -78,6 +80,8 @@ public sealed class AttendanceManager
             Attendance info
         )
     {
+        Sure.NotNull (info);
+
         var db = _GetDb();
         db.Insert (info);
     }
@@ -88,6 +92,8 @@ public sealed class AttendanceManager
             IEnumerable<Attendance> attendances
         )
     {
+        Sure.NotNull ((object?) attendances);
+
         var database = _GetDb();
         database.BulkCopy (attendances);
     }
@@ -98,6 +104,8 @@ public sealed class AttendanceManager
             string ticket
         )
     {
+        Sure.NotNullNorEmpty (ticket);
+
         var database = _GetDb();
         var attendances = database.GetAttendances();
         var result = attendances
@@ -113,6 +121,8 @@ public sealed class AttendanceManager
             string ticket
         )
     {
+        Sure.NotNullNorEmpty (ticket);
+
         var db = _GetDb();
         var attendances = db.GetAttendances();
         var result = attendances
@@ -129,7 +139,7 @@ public sealed class AttendanceManager
             int howMany = 200
         )
     {
-        Sure.Positive (howMany, nameof (howMany));
+        Sure.Positive (howMany);
 
         var db = _GetDb();
         var attendances = db.GetAttendances();

@@ -82,15 +82,29 @@ public sealed class OrderManager
     public Order[] ListAllOrders() => Orders.ToArray();
 
     /// <inheritdoc cref="IOrderManager.ListOrdersByStatus"/>
-    public Order[] ListOrdersByStatus (string status) =>
-        Orders.Where (order => order.Status == status).ToArray();
+    public Order[] ListOrdersByStatus
+        (
+            string status
+        )
+    {
+        Sure.NotNullNorEmpty (status);
+
+        return Orders.Where (order => order.Status == status).ToArray();
+    }
 
     /// <inheritdoc cref="IOrderManager.ListNewOrders"/>
     public Order[] ListNewOrders() => ListOrdersByStatus (Order.NewOrder);
 
     /// <inheritdoc cref="IOrderManager.ListOrdersForReader"/>
-    public Order[] ListOrdersForReader (string ticket) =>
-        Orders.Where (order => order.Ticket == ticket).ToArray();
+    public Order[] ListOrdersForReader
+        (
+            string ticket
+        )
+    {
+        Sure.NotNullNorEmpty (ticket);
+
+        return Orders.Where (order => order.Ticket == ticket).ToArray();
+    }
 
     /// <inheritdoc cref="IOrderManager.CreateOrder"/>
     public bool CreateOrder
@@ -114,12 +128,20 @@ public sealed class OrderManager
     }
 
     /// <inheritdoc cref="IOrderManager.DeleteOrder"/>
-    public int DeleteOrder (int id) => Orders.Delete (order => order.Id == id);
+    public int DeleteOrder
+        (
+            int orderId
+        )
+    {
+        Sure.Positive (orderId);
+
+        return Orders.Delete (order => order.Id == orderId);
+    }
 
     /// <inheritdoc cref="IOrderManager.SetOrderStatus"/>
     public int SetOrderStatus
         (
-            int id,
+            int orderId,
             string status,
             bool sendEmail = false
         )
@@ -132,7 +154,7 @@ public sealed class OrderManager
             (
                 $"update [{orders.TableName}] set [status] = @status where [id] = @id",
                 new DataParameter ("status", status),
-                new DataParameter ("id", id)
+                new DataParameter ("id", orderId)
             );
 
         return result;
