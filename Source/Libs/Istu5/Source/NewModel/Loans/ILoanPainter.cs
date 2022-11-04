@@ -15,18 +15,19 @@
 
 #nullable enable
 
-namespace Istu.NewModel.Loans
+namespace Istu.NewModel.Loans;
+
+/// <summary>
+/// Интерфейс отрисовки выдачи.
+/// </summary>
+public interface ILoanPainter
 {
     /// <summary>
-    /// Интерфейс отрисовки выдачи.
+    /// Отрисовка выдачи.
     /// </summary>
-    public interface ILoanPainter
-    {
-        /// <summary>
-        /// Отрисовка выдачи.
-        /// </summary>
-        void PaintLoan (Loan loan, object cell);
-
-    } // interface ILoanPainter
-
-} // namespace Istu.NewModel.Loans
+    void PaintLoan
+        (
+            Loan loan,
+            object cell
+        );
+}

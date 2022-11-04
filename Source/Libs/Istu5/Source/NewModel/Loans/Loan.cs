@@ -18,6 +18,7 @@
 using System;
 using System.ComponentModel;
 
+using AM;
 using AM.Data;
 
 using LinqToDB;
@@ -225,6 +226,8 @@ public class Loan
             Attendance? attendance
         )
     {
+        Sure.NotNull (storehouse);
+
         if (attendance is not null)
         {
             //     bool disableCounting
@@ -247,8 +250,16 @@ public class Loan
     /// <summary>
     /// Можно ли выдавать документ при заданных условиях?
     /// </summary>
-    public virtual bool CanGive (Storehouse storehouse, Attendance? attendance) =>
-        attendance?.Ticket is not null;
+    public virtual bool CanGive
+        (
+            Storehouse storehouse,
+            Attendance? attendance
+        )
+    {
+        Sure.NotNull (storehouse);
+
+        return attendance?.Ticket is not null;
+    }
 
     /// <summary>
     /// Проверка, чтобы возврат документа производился строго
@@ -260,6 +271,8 @@ public class Loan
             Attendance? attendance
         )
     {
+        Sure.NotNull (storehouse);
+
         if (attendance is not null)
         {
             // if (ConfigurationUtility.GetBoolean("check-abonement-on-return", true))
@@ -291,6 +304,8 @@ public class Loan
             Attendance? attendance
         )
     {
+        Sure.NotNull (storehouse);
+
         // Метод должен быть переопределен в наследнике
     }
 
@@ -303,6 +318,8 @@ public class Loan
             Attendance? attendance
         )
     {
+        Sure.NotNull (storehouse);
+
         // Метод должен быть переопределен в наследнике
     }
 
@@ -315,6 +332,8 @@ public class Loan
             Attendance? attendance
         )
     {
+        Sure.NotNull (storehouse);
+
         // Метод должен быть переопределен в наследнике
     }
 
@@ -327,6 +346,8 @@ public class Loan
             Attendance? attendance
         )
     {
+        Sure.NotNull (storehouse);
+
         // Метод должен быть переопределен в наследнике
     }
 
@@ -339,6 +360,8 @@ public class Loan
             Attendance? attendance
         )
     {
+        Sure.NotNull (storehouse);
+
         // Метод должен быть переопределен в наследнике
     }
 
@@ -351,6 +374,8 @@ public class Loan
             Attendance? attendance
         )
     {
+        Sure.NotNull (storehouse);
+
         // Метод должен быть переопределен в наследнике
     }
 
@@ -361,7 +386,15 @@ public class Loan
     /// <c>null</c> означает, что предпочтений по возврату нет,
     /// документ можно выдавать на любой срок.
     /// </returns>
-    public virtual DateTime? GetPreferredDeadline (Attendance attendance) => null;
+    public virtual DateTime? GetPreferredDeadline
+        (
+            Attendance attendance
+        )
+    {
+        Sure.NotNull (attendance);
+
+        return null;
+    }
 
     #endregion
 

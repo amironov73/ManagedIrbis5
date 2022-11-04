@@ -26,17 +26,14 @@ using LinqToDB;
 
 #nullable enable
 
-namespace Istu.NewModel.Loans
+namespace Istu.NewModel.Loans;
+
+/// <summary>
+/// Книга фонда художественной литературы
+/// </summary>
+public sealed class HudLoan
 {
-    /// <summary>
-    /// Книга фонда художественной литературы
-    /// </summary>
-    public sealed class HudLoan
-    {
-        #region Loan members
+    #region Loan members
 
-        #endregion
-
-    } // class HudLoan
-
-} // namespace Istu.NewModel.Loans
+    #endregion
+}
