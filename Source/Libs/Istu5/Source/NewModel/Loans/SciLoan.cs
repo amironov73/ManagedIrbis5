@@ -16,9 +16,8 @@
 #region Using directives
 
 using System;
-using System.ComponentModel;
 
-using AM.Data;
+using AM;
 
 using LinqToDB;
 
@@ -26,94 +25,99 @@ using LinqToDB;
 
 #nullable enable
 
-namespace Istu.NewModel.Loans
+namespace Istu.NewModel.Loans;
+
+/// <summary>
+/// Книга научного фонда.
+/// </summary>
+public sealed class SciLoan
+    : Loan
 {
+    #region Public methods
+
     /// <summary>
-    /// Книга научного фонда.
+    /// Получение выдачи из DTO.
     /// </summary>
-    public sealed class SciLoan
-        : Loan
+    public void FromPodsob
+        (
+            Podsob podsob
+        )
     {
-        #region Public methods
+        Sure.NotNull (podsob);
 
-        /// <summary>
-        /// Получение выдачи из DTO.
-        /// </summary>
-        public void FromPodsob
-            (
-                Podsob podsob
-            )
+        // TODO implement
+    }
+
+    /// <summary>
+    /// Перекладывание данных в DTO.
+    /// </summary>
+    public void ToPodsob
+        (
+            Podsob podsob
+        )
+    {
+        Sure.NotNull (podsob);
+
+        // TODO implement
+    }
+
+    #endregion
+
+    #region Loan members
+
+    /// <inheritdoc cref="Loan.Give"/>
+    public override void Give
+        (
+            Storehouse storehouse,
+            Attendance? attendance
+        )
+    {
+        Sure.NotNull (storehouse);
+
+        // if (!ConfigurationUtility.GetBoolean("allow-give-scibook", true))
+        // {
+        //     throw new ApplicationException("Нельзя выдавать книги научного фонда");
+        // }
+
+        if (!IsFree)
         {
-            // TODO implement
+            throw new InvalidOperationException();
+        }
 
-        } // method FromPodsob
+        var podsob = new Podsob();
+        ToPodsob (podsob);
 
-        /// <summary>
-        /// Перекладывание данных в DTO.
-        /// </summary>
-        public void ToPodsob
-            (
-                Podsob podsob
-            )
+        using var kladovka = storehouse.GetKladovka();
+        kladovka.Insert (podsob);
+        RegisterAttendance (storehouse, attendance);
+    }
+
+    /// <inheritdoc cref="Loan.Return"/>
+    public override void Return
+        (
+            Storehouse storehouse,
+            Attendance? attendance
+        )
+    {
+        Sure.NotNull (storehouse);
+
+        if (IsFree)
         {
-            // TODO implement
+            throw new InvalidOperationException();
+        }
+    }
 
-        } // method ToPodsob
+    /// <inheritdoc cref="Loan.CanGive"/>
+    public override bool CanGive
+        (
+            Storehouse storehouse,
+            Attendance? attendance
+        )
+    {
+        Sure.NotNull (storehouse);
 
-        #endregion
+        return IsFree;
+    }
 
-        #region Loan members
-
-        /// <inheritdoc cref="Loan.Give"/>
-        public override void Give
-            (
-                Storehouse storehouse,
-                Attendance? attendance
-            )
-        {
-            // if (!ConfigurationUtility.GetBoolean("allow-give-scibook", true))
-            // {
-            //     throw new ApplicationException("Нельзя выдавать книги научного фонда");
-            // }
-
-            if (!IsFree)
-            {
-                throw new InvalidOperationException();
-            }
-
-            var podsob = new Podsob();
-            ToPodsob (podsob);
-
-            using var kladovka = storehouse.GetKladovka();
-            kladovka.Insert (podsob);
-            RegisterAttendance (storehouse, attendance);
-        } // method Give
-
-        /// <inheritdoc cref="Loan.Return"/>
-        public override void Return
-            (
-                Storehouse storehouse,
-                Attendance? attendance
-            )
-        {
-            if (IsFree)
-            {
-                throw new InvalidOperationException();
-            }
-        } // method Return
-
-        /// <inheritdoc cref="Loan.CanGive"/>
-        public override bool CanGive
-            (
-                Storehouse storehouse,
-                Attendance? attendance
-            )
-        {
-            return IsFree;
-        } // method CanGive
-
-        #endregion
-
-    } // class SciLoan
-
-} // namespace Istu.NewModel.Loans
+    #endregion
+}
