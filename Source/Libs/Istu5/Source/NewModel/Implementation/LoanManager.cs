@@ -280,7 +280,7 @@ public sealed class LoanManager
         (
             IEnumerable<Loan> loans,
             DateTime when,
-            int operatorID
+            int operatorId
         )
     {
         Sure.NotNull ((object?) loans);
