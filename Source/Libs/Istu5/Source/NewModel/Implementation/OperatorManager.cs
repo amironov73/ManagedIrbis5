@@ -88,15 +88,15 @@ public sealed class OperatorManager
         return Operators.FirstOrDefault (op => op.Barcode == barcode);
     }
 
-    /// <inheritdoc cref="IOperatorManager.GetOperatorByID"/>
-    public Operator? GetOperatorByID
+    /// <inheritdoc cref="IOperatorManager.GetOperatorById"/>
+    public Operator? GetOperatorById
         (
-            int id
+            int operatorId
         )
     {
-        Sure.Positive (id);
+        Sure.Positive (operatorId);
 
-        return Operators.FirstOrDefault (op => op.ID == id);
+        return Operators.FirstOrDefault (op => op.ID == operatorId);
     }
 
     /// <inheritdoc cref="IOperatorManager.ListAllOperators"/>

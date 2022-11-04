@@ -139,8 +139,8 @@ public sealed class ReaderManager
         return result;
     }
 
-    /// <inheritdoc cref="IReaderManager.GetReaderByIstuID"/>
-    public Reader? GetReaderByIstuID
+    /// <inheritdoc cref="IReaderManager.GetReaderByIstuId"/>
+    public Reader? GetReaderByIstuId
         (
             int istuId
         )
