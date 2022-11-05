@@ -4,10 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
 /* ReaderComparer.cs -- сравнивает читателей по их билетам
  * Ars Magna project, http://arsmagna.ru
@@ -21,28 +17,25 @@ using System.Collections.Generic;
 
 #nullable enable
 
-namespace Istu.NewModel
+namespace Istu.NewModel;
+
+/// <summary>
+/// Сравнивает читателей по их билетам.
+/// </summary>
+public sealed class ReaderComparer
+    : IEqualityComparer<Reader>
 {
-    /// <summary>
-    /// Сравнивает читателей по их билетам.
-    /// </summary>
-    public sealed class ReaderComparer
-        : IEqualityComparer<Reader>
+    #region IEqualityComparer<T> members
+
+    /// <inheritdoc cref="IEqualityComparer{T}.Equals(T,T)"/>
+    public bool Equals (Reader? x, Reader? y) =>
+        string.CompareOrdinal (x?.Ticket, y?.Ticket) == 0;
+
+    /// <inheritdoc cref="IEqualityComparer{T}.GetHashCode(T)"/>
+    public int GetHashCode (Reader obj)
     {
-        #region IEqualityComparer<T> members
+        return obj.Ticket?.GetHashCode() ?? 0;
+    }
 
-        /// <inheritdoc cref="IEqualityComparer{T}.Equals(T,T)"/>
-        public bool Equals (Reader? x, Reader? y) =>
-            string.CompareOrdinal (x?.Ticket, y?.Ticket) == 0;
-
-        /// <inheritdoc cref="IEqualityComparer{T}.GetHashCode(T)"/>
-        public int GetHashCode (Reader obj)
-        {
-            return obj.Ticket?.GetHashCode() ?? 0;
-        }
-
-        #endregion
-
-    } // class ReaderComparer
-
-} // namespace Istu.NewModel
+    #endregion
+}
