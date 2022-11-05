@@ -96,7 +96,7 @@ public sealed class OperatorManager
     {
         Sure.Positive (operatorId);
 
-        return Operators.FirstOrDefault (op => op.ID == operatorId);
+        return Operators.FirstOrDefault (op => op.Id == operatorId);
     }
 
     /// <inheritdoc cref="IOperatorManager.ListAllOperators"/>

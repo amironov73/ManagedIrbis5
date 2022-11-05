@@ -4,9 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UseNameofExpression
 
 /* Operator.cs -- оператор системы книговыдачи
  * Ars Magna project, http://arsmagna.ru
@@ -37,7 +35,7 @@ public sealed class Operator
     /// Идентификатор оператор.
     /// </summary>
     [Column (IsIdentity = true), PrimaryKey]
-    public int ID { get; set; }
+    public int Id { get; set; }
 
     /// <summary>
     /// Фамилия, имя, отчество оператора.
@@ -77,7 +75,7 @@ public sealed class Operator
     #region Object members
 
     /// <inheritdoc cref="object.ToString"/>
-    public override string ToString() => $"{ID}: {Name}";
+    public override string ToString() => $"{Id}: {Name}";
 
     #endregion
 }
