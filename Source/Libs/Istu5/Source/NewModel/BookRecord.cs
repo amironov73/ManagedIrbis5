@@ -4,11 +4,9 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
 // ReSharper disable NonReadonlyMemberInGetHashCode
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
 /* BookRecord.cs -- общая информация о книге по данным таблицы books
  * Ars Magna project, http://arsmagna.ru
@@ -216,16 +214,10 @@ public sealed class BookRecord
     }
 
     /// <inheritdoc cref="object.GetHashCode"/>
-    public override int GetHashCode()
-    {
-        return Id;
-    }
+    public override int GetHashCode() => Id;
 
     /// <inheritdoc cref="object.ToString"/>
-    public override string ToString()
-    {
-        return $"{Catalog}:{Number}:{Card}:{Place}:{Ticket}";
-    }
+    public override string ToString() => $"{Catalog}:{Number}:{Card}:{Place}:{Ticket}";
 
     #endregion
 }

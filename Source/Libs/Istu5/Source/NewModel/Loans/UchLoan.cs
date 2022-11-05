@@ -29,7 +29,7 @@ using LinqToDB;
 namespace Istu.NewModel.Loans;
 
 /// <summary>
-/// Книга учебноого фонда
+/// Книга учебноого фонда.
 /// </summary>
 public sealed class UchLoan
     : Loan
