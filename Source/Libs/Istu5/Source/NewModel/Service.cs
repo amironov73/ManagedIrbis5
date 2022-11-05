@@ -18,6 +18,8 @@
 using System.Collections.Generic;
 using System.IO;
 
+using AM;
+
 #endregion
 
 #nullable enable
@@ -58,6 +60,8 @@ public sealed class Service
             string fileName
         )
     {
+        Sure.FileExists (fileName);
+
         var result = new List<Service>();
 
         using (var reader = new StreamReader (fileName))
