@@ -4,10 +4,8 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
 /* IstuUtility.cs -- вспомогательные методы для работы с базой книговыдачи
  * Ars Magna project, http://arsmagna.ru
@@ -156,9 +154,7 @@ public static class IstuUtility
         '1' => "Регистрация",
         's' or 'S' => "СМС",
         _ => code.ToString()
-    }; // switch
+    };
 
     #endregion
-} // class IstuUtility
-
-// namespace Istu.NewModel
+}
