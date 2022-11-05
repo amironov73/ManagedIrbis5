@@ -20,8 +20,8 @@
         <PackageVersion Include="CommunityToolkit.Common" Version="8.0.0"/>
         <PackageVersion Include="CommunityToolkit.Diagnostics" Version="8.0.0"/>
         <PackageVersion Include="CommunityToolkit.HighPerformance" Version="8.0.0"/>
-        <PackageVersion Include="coverlet.collector" Version="3.1.2"/>
-        <PackageVersion Include="coverlet.msbuild" Version="3.1.2"/>
+        <PackageVersion Include="coverlet.collector" Version="3.2.0"/>
+        <PackageVersion Include="coverlet.msbuild" Version="3.2.0"/>
         <PackageVersion Include="DynamicData" Version="7.12.1"/>
         <PackageVersion Include="DynamicData.ReactiveUI" Version="6.11.0.2613"/>
         <PackageVersion Include="Google.Protobuf" Version="3.20.1"/>
@@ -59,9 +59,9 @@
         <PackageVersion Include="MSTest.TestFramework" Version="2.3.0-preview-20220810-02"/>
         <PackageVersion Include="Nerdbank.GitVersioning" Version="3.5.119" />
         <PackageVersion Include="Newtonsoft.Json" Version="13.0.1"/>
-        <PackageVersion Include="NLog" Version="5.0.4"/>
-        <PackageVersion Include="NLog.Extensions.Logging" Version="5.0.4"/>
-        <PackageVersion Include="NLog.Schema" Version="5.0.4"/>
+        <PackageVersion Include="NLog" Version="5.0.5"/>
+        <PackageVersion Include="NLog.Extensions.Logging" Version="5.1.0"/>
+        <PackageVersion Include="NLog.Schema" Version="5.0.5"/>
         <PackageVersion Include="NuGet.Common" Version="6.3.1" />
         <PackageVersion Include="NuGet.Configuration" Version="6.3.1" />
         <PackageVersion Include="NuGet.DependencyResolver.Core" Version="6.3.1" />
@@ -82,22 +82,22 @@
         <PackageVersion Include="SkiaSharp" Version="2.88.3"/>
         <PackageVersion Include="SharpCompress" Version="0.31.0"/>
         <PackageVersion Include="SharpZipLib" Version="1.3.3"/>
-        <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.2.3"/>
+        <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.4.0"/>
         <PackageVersion Include="System.CodeDom" Version="7.0.0-rc.2.22472.3"/>
         <PackageVersion Include="System.CommandLine" Version="2.0.0-beta3.22114.1"/>
         <PackageVersion Include="System.Configuration.ConfigurationManager" Version="7.0.0-rc.2.22472.3"/>
-        <PackageVersion Include="System.Data.SqlClient" Version="4.8.3"/>
+        <PackageVersion Include="System.Data.SqlClient" Version="4.8.4"/>
         <PackageVersion Include="System.Drawing.Common" Version="7.0.0-rc.2.22472.3"/>
         <PackageVersion Include="System.Memory" Version="4.5.5" />
         <PackageVersion Include="System.Resources.Extensions" Version="7.0.0-rc.2.22472.3"/>
         <PackageVersion Include="System.Security.Cryptography.ProtectedData" Version="7.0.0-rc.2.22472.3"/>
         <PackageVersion Include="System.Text.Encoding.CodePages" Version="7.0.0-rc.2.22472.3" />
-        <PackageVersion Include="XamlColorSchemeGenerator" Version="3.0.0.31"/>
-        <PackageVersion Include="XamlNameReferenceGenerator" Version="1.3.4"/>
         <PackageVersion Include="Telegram.Bot" Version="16.0.2" />
         <PackageVersion Include="Telegram.Bot.Extensions.Polling" Version="0.2.0" />
         <PackageVersion Include="Topshelf" Version="4.3.0" />
         <PackageVersion Include="Topshelf.NLog" Version="4.3.0" />
+        <PackageVersion Include="XamlColorSchemeGenerator" Version="3.0.0.31"/>
+        <PackageVersion Include="XamlNameReferenceGenerator" Version="1.4.1"/>
     </ItemGroup>
 
 </Project>
