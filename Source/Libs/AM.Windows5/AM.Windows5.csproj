@@ -25,8 +25,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\AM.Core5\AM.Core5.csproj"/>
-        <ProjectReference Include="..\AM.Drawing5\AM.Drawing5.csproj"/>
+        <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
+        <ProjectReference Include="..\AM.Drawing5\AM.Drawing5.csproj" />
     </ItemGroup>
 
 </Project>

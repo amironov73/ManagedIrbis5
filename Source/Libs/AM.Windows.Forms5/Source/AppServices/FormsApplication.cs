@@ -15,7 +15,7 @@
 // ReSharper disable UnusedParameter.Local
 // ReSharper disable VirtualMemberCallInConstructor
 
-/* WinFormsApplication.cs -- класс-приложение для WinForms
+/* FormsApplication.cs -- класс-приложение для WinForms
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,10 +24,12 @@
 using System;
 using System.ComponentModel;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
 using AM.Interactivity;
+using AM.Windows.Forms;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -47,7 +49,7 @@ namespace AM.AppServices;
 /// <summary>
 /// Класс-приложение для WinForms.
 /// </summary>
-public class WinFormsApplication
+public class FormsApplication
     : IMagnaApplication
 {
     #region Properties
@@ -80,7 +82,7 @@ public class WinFormsApplication
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public WinFormsApplication
+    public FormsApplication
         (
             IHostBuilder builder,
             string[]? args = null
@@ -97,7 +99,7 @@ public class WinFormsApplication
     /// Конструктор.
     /// </summary>
     /// <param name="args">Аргументы командной строки.</param>
-    public WinFormsApplication
+    public FormsApplication
         (
             string[] args
         )
@@ -115,6 +117,19 @@ public class WinFormsApplication
 
     private readonly IHostBuilder _builder;
     private ServiceProvider? _preliminaryServices;
+
+    /// <summary>
+    /// Вызывается при возникновении необработанного исключения
+    /// в потоке, отличном от пользовательского интерфейса.
+    /// </summary>
+    public virtual void HandleThreadException
+        (
+            object sender,
+            ThreadExceptionEventArgs e
+        )
+    {
+        ShowException (e.Exception);
+    }
 
     /// <summary>
     /// Пометка экземпляра как проинициазированного.
@@ -170,6 +185,11 @@ public class WinFormsApplication
     /// </summary>
     protected virtual void EarlyInitialization()
     {
+        Application.SetCompatibleTextRenderingDefault (false);
+        Application.SetHighDpiMode (HighDpiMode.SystemAware);
+        Application.EnableVisualStyles();
+        Application.ThreadException += HandleThreadException;
+
         Magna.Application = this;
         ApplicationHost = new HostBuilder().Build(); // это временный хост
         Magna.Host = ApplicationHost;
@@ -358,6 +378,7 @@ public class WinFormsApplication
                 exception,
                 nameof (MagnaApplication) + "::" + nameof (Run)
             );
+        ShowException (exception);
     }
 
     /// <summary>
@@ -426,6 +447,17 @@ public class WinFormsApplication
         Shutdown();
 
         return result;
+    }
+
+    /// <summary>
+    /// Вызывается при возникновении необработанного исключения.
+    /// </summary>
+    public virtual void ShowException
+        (
+            Exception exception
+        )
+    {
+        ExceptionBox.Show (exception);
     }
 
     /// <summary>
