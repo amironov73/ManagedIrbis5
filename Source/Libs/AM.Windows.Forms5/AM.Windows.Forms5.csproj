@@ -25,17 +25,17 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\AM.Core5\AM.Core5.csproj"/>
-        <ProjectReference Include="..\AM.Drawing5\AM.Drawing5.csproj"/>
-        <ProjectReference Include="..\AM.Win32\AM.Win32.csproj"/>
+        <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
+        <ProjectReference Include="..\AM.Drawing5\AM.Drawing5.csproj" />
+        <ProjectReference Include="..\AM.Win32\AM.Win32.csproj" />
     </ItemGroup>
 
     <!-- Централизованное управление пакетами -->
     <ItemGroup>
-        <PackageReference Include="Microsoft.Extensions.Localization"/>
-        <PackageReference Include="Microsoft.Windows.Compatibility"/>
-        <PackageReference Include="ReactiveUI"/>
-        <PackageReference Include="ReactiveUI.Fody"/>
+        <PackageReference Include="Microsoft.Extensions.Localization" />
+        <PackageReference Include="Microsoft.Windows.Compatibility" />
+        <PackageReference Include="ReactiveUI" />
+        <PackageReference Include="ReactiveUI.Fody" />
     </ItemGroup>
 
     <ItemGroup>
@@ -43,8 +43,8 @@
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>Resources.Designer.cs</LastGenOutput>
         </EmbeddedResource>
-        <None Remove="Properties\XPThemes.manifest"/>
-        <EmbeddedResource Include="Properties\XPThemes.manifest"/>
+        <None Remove="Properties\XPThemes.manifest" />
+        <EmbeddedResource Include="Properties\XPThemes.manifest" />
         <EmbeddedResource Update="Source\PictureViewForm.ru.resx">
             <DependentUpon>PictureViewForm.cs</DependentUpon>
         </EmbeddedResource>
@@ -68,14 +68,14 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Remove="Images\BLD.BMP"/>
-        <Resource Include="Images\BLD.BMP"/>
-        <None Remove="Images\CLOSED.BMP"/>
-        <Resource Include="Images\CLOSED.BMP"/>
-        <None Remove="Images\COPY.BMP"/>
-        <Resource Include="Images\COPY.BMP"/>
-        <None Remove="Images\NEW.BMP"/>
-        <Resource Include="Images\NEW.BMP"/>
+        <None Remove="Images\BLD.BMP" />
+        <Resource Include="Images\BLD.BMP" />
+        <None Remove="Images\CLOSED.BMP" />
+        <Resource Include="Images\CLOSED.BMP" />
+        <None Remove="Images\COPY.BMP" />
+        <Resource Include="Images\COPY.BMP" />
+        <None Remove="Images\NEW.BMP" />
+        <Resource Include="Images\NEW.BMP" />
     </ItemGroup>
 
 </Project>
