@@ -13,9 +13,9 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\Libs\AM.Core5\AM.Core5.csproj"/>
-        <ProjectReference Include="..\..\Libs\AM.Drawing5\AM.Drawing5.csproj"/>
-        <ProjectReference Include="..\..\Libs\AM.Windows.Forms5\AM.Windows.Forms5.csproj"/>
+        <ProjectReference Include="..\..\Libs\AM.Core5\AM.Core5.csproj" />
+        <ProjectReference Include="..\..\Libs\AM.Drawing5\AM.Drawing5.csproj" />
+        <ProjectReference Include="..\..\Libs\AM.Windows.Forms5\AM.Windows.Forms5.csproj" />
     </ItemGroup>
 
 </Project>

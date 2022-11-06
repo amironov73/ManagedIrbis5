@@ -5,11 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable PropertyCanBeMadeInitOnly.Global
-// ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 /* SiberianPalette.cs -- палитра цветов для отображения элементов грида
  * Ars Magna project, http://arsmagna.ru
@@ -24,116 +20,113 @@ using System.Text.Json.Serialization;
 
 #nullable enable
 
-namespace ManagedIrbis.WinForms.Grid
+namespace ManagedIrbis.WinForms.Grid;
+
+/// <summary>
+/// Палитра цветов для отображения элементов грида.
+/// </summary>
+public sealed class SiberianPalette
 {
+    #region Properties
+
     /// <summary>
-    /// Палитра цветов для отображения элементов грида.
+    /// Альтернативный фоновый цвет не выбранной строки.
+    /// Применяется к нечетным строкам.
     /// </summary>
-    public sealed class SiberianPalette
+    [JsonPropertyName ("alt-back-color")]
+    public Color AlternativeBackColor { get; set; }
+
+    /// <summary>
+    /// Альтернативный цвет переднего плана (текста) не выбранной строки.
+    /// Применяется к нечетным строкам.
+    /// </summary>
+    [JsonPropertyName ("alt-fore-color")]
+    public Color AlternativeForeColor { get; set; }
+
+    /// <summary>
+    /// Фоновый цвет обычной (не выбранной) строки.
+    /// Применяется к четным строкам.
+    /// </summary>
+    [JsonPropertyName ("back-color")]
+    public Color BackColor { get; set; }
+
+    /// <summary>
+    /// Фоновый цвет запрещенных (неактивных) элементов.
+    /// </summary>
+    [JsonPropertyName ("disabled-back-color")]
+    public Color DisabledBackColor { get; set; }
+
+    /// <summary>
+    /// Цвет переднего плана (текста) запрещенных (неактивных) элементов.
+    /// </summary>
+    [JsonPropertyName ("disabled-fore-color")]
+    public Color DisabledForeColor { get; set; }
+
+    /// <summary>
+    /// Цвет переднего плана (текста) выбранной строки.
+    /// Применяется к четным строкам.
+    /// </summary>
+    [JsonPropertyName ("fore-color")]
+    public Color ForeColor { get; set; }
+
+    /// <summary>
+    /// Цвет фона для заголовка колонки.
+    /// </summary>
+    [JsonPropertyName ("header-back-color")]
+    public Color HeaderBackColor { get; set; }
+
+    /// <summary>
+    /// Цвет текста для заголовка колонки.
+    /// </summary>
+    [JsonPropertyName ("header-fore-color")]
+    public Color HeaderForeColor { get; set; }
+
+    /// <summary>
+    /// Цвет линий, разделяющих ячейки.
+    /// </summary>
+    [JsonPropertyName ("line-color")]
+    public Color LineColor { get; set; }
+
+    /// <summary>
+    /// Имя палитры (произвольное).
+    /// </summary>
+    [JsonPropertyName ("name")]
+    public string? Name { get; set; }
+
+    /// <summary>
+    /// Цвет фона выбранной строки.
+    /// </summary>
+    [JsonPropertyName ("selected-back-color")]
+    public Color SelectedBackColor { get; set; }
+
+    /// <summary>
+    /// Цвет переднего плана (текста) выбранной строки.
+    /// </summary>
+    [JsonPropertyName ("selected-fore-color")]
+    public Color SelectedForeColor { get; set; }
+
+    /// <summary>
+    /// Палитра по умолчанию.
+    /// </summary>
+    public static SiberianPalette DefaultPalette { get; } = new ()
     {
-        #region Properties
+        Name = "Default",
 
-        /// <summary>
-        /// Альтернативный фоновый цвет не выбранной строки.
-        /// Применяется к нечетным строкам.
-        /// </summary>
-        [JsonPropertyName("alt-back-color")]
-        public Color AlternativeBackColor { get; set; }
+        AlternativeBackColor = Color.LightCyan,
+        BackColor = Color.White,
+        ForeColor = Color.Black,
 
-        /// <summary>
-        /// Альтернативный цвет переднего плана (текста) не выбранной строки.
-        /// Применяется к нечетным строкам.
-        /// </summary>
-        [JsonPropertyName("alt-fore-color")]
-        public Color AlternativeForeColor { get; set; }
+        HeaderBackColor = Color.LightGray,
+        HeaderForeColor = Color.Black,
 
-        /// <summary>
-        /// Фоновый цвет обычной (не выбранной) строки.
-        /// Применяется к четным строкам.
-        /// </summary>
-        [JsonPropertyName("back-color")]
-        public Color BackColor { get; set; }
+        LineColor = Color.Gray,
 
-        /// <summary>
-        /// Фоновый цвет запрещенных (неактивных) элементов.
-        /// </summary>
-        [JsonPropertyName("disabled-back-color")]
-        public Color DisabledBackColor { get; set; }
+        DisabledBackColor = Color.White,
+        DisabledForeColor = Color.DarkGray,
 
-        /// <summary>
-        /// Цвет переднего плана (текста) запрещенных (неактивных) элементов.
-        /// </summary>
-        [JsonPropertyName("disabled-fore-color")]
-        public Color DisabledForeColor { get; set; }
+        SelectedBackColor = Color.Blue,
+        SelectedForeColor = Color.White
+    };
 
-        /// <summary>
-        /// Цвет переднего плана (текста) выбранной строки.
-        /// Применяется к четным строкам.
-        /// </summary>
-        [JsonPropertyName("fore-color")]
-        public Color ForeColor { get; set; }
-
-        /// <summary>
-        /// Цвет фона для заголовка колонки.
-        /// </summary>
-        [JsonPropertyName("header-back-color")]
-        public Color HeaderBackColor { get; set; }
-
-        /// <summary>
-        /// Цвет текста для заголовка колонки.
-        /// </summary>
-        [JsonPropertyName("header-fore-color")]
-        public Color HeaderForeColor { get; set; }
-
-        /// <summary>
-        /// Цвет линий, разделяющих ячейки.
-        /// </summary>
-        [JsonPropertyName("line-color")]
-        public Color LineColor { get; set; }
-
-        /// <summary>
-        /// Имя палитры (произвольное).
-        /// </summary>
-        [JsonPropertyName("name")]
-        public string? Name { get; set; }
-
-        /// <summary>
-        /// Цвет фона выбранной строки.
-        /// </summary>
-        [JsonPropertyName("selected-back-color")]
-        public Color SelectedBackColor { get; set; }
-
-        /// <summary>
-        /// Цвет переднего плана (текста) выбранной строки.
-        /// </summary>
-        [JsonPropertyName("selected-fore-color")]
-        public Color SelectedForeColor { get; set; }
-
-        /// <summary>
-        /// Палитра по умолчанию.
-        /// </summary>
-        public static SiberianPalette DefaultPalette { get; } = new ()
-        {
-            Name = "Default",
-
-            AlternativeBackColor = Color.LightCyan,
-            BackColor = Color.White,
-            ForeColor = Color.Black,
-
-            HeaderBackColor = Color.LightGray,
-            HeaderForeColor = Color.Black,
-
-            LineColor = Color.Gray,
-
-            DisabledBackColor = Color.White,
-            DisabledForeColor = Color.DarkGray,
-
-            SelectedBackColor = Color.Blue,
-            SelectedForeColor = Color.White
-        };
-
-        #endregion
-
-    } // class SiberianPalette
-
-} // namespace ManagedIrbis.WinForms.Grid
+    #endregion
+}
