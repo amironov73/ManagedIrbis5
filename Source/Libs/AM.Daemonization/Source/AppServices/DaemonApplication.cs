@@ -1,4 +1,4 @@
-﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
@@ -9,23 +9,20 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable MemberCanBeProtected.Global
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnassignedGetOnlyAutoProperty
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 // ReSharper disable VirtualMemberCallInConstructor
 
-/* MagnaApplication.cs -- класс-приложение
+/* DaemonApplication.cs -- класс-приложение для демона
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
-using System.CommandLine;
-using System.CommandLine.Builder;
-using System.CommandLine.Parsing;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -42,23 +39,16 @@ using NLog.Extensions.Logging;
 
 #nullable enable
 
+#pragma warning disable CS8618 // nullable
+
 namespace AM.AppServices;
 
 /// <summary>
-/// Класс-приложение.
+/// Класс-приложение для демона, работающего под управлением Systemd..
 /// </summary>
-public class MagnaApplication
+public class DaemonApplication
     : IMagnaApplication
 {
-    #region Events
-
-    /// <summary>
-    /// Вызывается при возникновении исключения.
-    /// </summary>
-    public event EventHandler<UnhandledExceptionEventArgs>? ExceptionOccurs;
-
-    #endregion
-
     #region Properties
 
     /// <inheritdoc cref="IMagnaApplication.IsInitialized"/>
@@ -70,24 +60,16 @@ public class MagnaApplication
     /// <inheritdoc cref="IMagnaApplication.Args"/>
     public string[] Args { get; }
 
-    /// <summary>
-    /// Результат разбора командной строки.
-    /// </summary>
-    public ParseResult? CommandLineParseResult { get; protected set; }
-
     /// <inheritdoc cref="IMagnaApplication.Configuration"/>
-    [AllowNull]
     public IConfiguration Configuration { get; protected internal set; }
 
     /// <inheritdoc cref="IMagnaApplication.Logger"/>
-    [AllowNull]
-    public ILogger Logger { get; protected set; }
+    public ILogger Logger { get; protected internal set; }
 
     /// <inheritdoc cref="IMagnaApplication.Stop"/>
     public bool Stop { get; set; }
 
     /// <inheritdoc cref="IMagnaApplication.ApplicationHost"/>
-    [AllowNull]
     public IHost ApplicationHost { get; protected internal set; }
 
     #endregion
@@ -97,7 +79,7 @@ public class MagnaApplication
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public MagnaApplication
+    public DaemonApplication
         (
             IHostBuilder builder,
             string[]? args = null
@@ -114,7 +96,7 @@ public class MagnaApplication
     /// Конструктор.
     /// </summary>
     /// <param name="args">Аргументы командной строки.</param>
-    public MagnaApplication
+    public DaemonApplication
         (
             string[] args
         )
@@ -250,6 +232,9 @@ public class MagnaApplication
             services.AddLocalization();
         });
 
+        // конфигурируем демона
+        _builder.UseSystemd();
+
         ApplicationHost = _builder.Build();
         Magna.Host = ApplicationHost;
         MarkAsInitialized();
@@ -264,7 +249,7 @@ public class MagnaApplication
     }
 
     /// <summary>
-    /// Вызывается в конце <see cref="Run(Func{IMagnaApplication,int})"/> и <see cref="RunAsync"/>.
+    /// Вызывается в конце.
     /// </summary>
     protected virtual void Cleanup()
     {
@@ -274,6 +259,39 @@ public class MagnaApplication
     #endregion
 
     #region Public methods
+
+    /// <summary>
+    /// Добавление сервиса, выполняющегося в фоновом режиме.
+    /// </summary>
+    public void AddHostedService<TService>()
+        where TService: class, IHostedService
+    {
+        CheckForgottenInitialization();
+
+        _builder.ConfigureServices ((context, services) =>
+        {
+            services.AddHostedService<TService>();
+        });
+    }
+
+    /// <summary>
+    /// Добавление сервиса, выполняющегося в фоновом режиме.
+    /// </summary>
+    public void AddHostedService<TService>
+        (
+            Func<IServiceProvider, TService> factory
+        )
+        where TService: class, IHostedService
+    {
+        Sure.NotNull (factory);
+        CheckForgottenInitialization();
+
+        _builder.ConfigureServices ((context, services) =>
+        {
+            services.AddHostedService (factory);
+        });
+    }
+
 
     /// <summary>
     /// Настройка конфигурации для построения хоста приложения.
@@ -287,21 +305,6 @@ public class MagnaApplication
         CheckForLateInitialization();
 
         _builder.ConfigureAppConfiguration (configureDelegate);
-    }
-
-    /// <summary>
-    /// Настройка прекращения текущей операции по требованию пользователя.
-    /// </summary>
-    public virtual MagnaApplication ConfigureCancelKey()
-    {
-        Console.TreatControlCAsInput = false;
-        Console.CancelKeyPress += (_, eventArgs) =>
-        {
-            Stop = true;
-            eventArgs.Cancel = true;
-        };
-
-        return this;
     }
 
     /// <summary>
@@ -390,31 +393,6 @@ public class MagnaApplication
                 exception,
                 nameof (MagnaApplication) + "::" + nameof (Run)
             );
-
-        var handler = ExceptionOccurs;
-        if (handler is not null)
-        {
-            var eventArgs = new UnhandledExceptionEventArgs (exception, true);
-            handler (this, eventArgs);
-        }
-    }
-
-    /// <summary>
-    /// Разбор командной строки.
-    /// </summary>
-    public virtual void ParseCommandLine
-        (
-            Func<RootCommand> rootCommandDelegate
-        )
-    {
-        Sure.NotNull (rootCommandDelegate);
-        CheckForLateInitialization();
-
-        var rootCommand = rootCommandDelegate();
-        CommandLineParseResult = new CommandLineBuilder (rootCommand)
-            .UseDefaults()
-            .Build()
-            .Parse (Args);
     }
 
     /// <summary>
@@ -535,9 +513,7 @@ public class MagnaApplication
 
     #region IMagnaApplication members
 
-    /// <summary>
-    /// Запуск приложения.
-    /// </summary>
+    /// <inheritdoc cref="IMagnaApplication.Run"/>
     public void Run()
     {
         if (!FinalInitialization())
@@ -548,9 +524,7 @@ public class MagnaApplication
         ApplicationHost.Start();
     }
 
-    /// <summary>
-    /// Отправка хосту команды "пора завершаться".
-    /// </summary>
+    /// <inheritdoc cref="IMagnaApplication.Shutdown"/>
     public void Shutdown()
     {
         if (IsShutdown || !IsInitialized)
