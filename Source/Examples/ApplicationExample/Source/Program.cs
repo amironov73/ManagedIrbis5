@@ -24,11 +24,12 @@ internal static class Program
 {
     public static int Main (string[] args)
     {
-        return new MagnaApplication (args)
-            .ConfigureCancelKey()
-            .Run (application =>
+        var application = new MagnaApplication (args);
+        application.ConfigureCancelKey();
+
+        return application.Run (app =>
             {
-                var logger = application.Logger;
+                var logger = app.Logger;
 
                 logger.LogInformation ("Привет из приложения!");
 

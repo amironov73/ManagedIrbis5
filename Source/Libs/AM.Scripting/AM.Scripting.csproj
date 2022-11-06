@@ -24,16 +24,16 @@
 
     <!-- Централизованное управление пакетами -->
     <ItemGroup>
-        <PackageReference Include="Microsoft.Extensions.Logging"/>
-        <PackageReference Include="Microsoft.IO.RecyclableMemoryStream"/>
-        <PackageReference Include="Newtonsoft.Json"/>
-        <PackageReference Include="Pidgin"/>
-        <PackageReference Include="ReactiveUI"/>
-        <PackageReference Include="ReactiveUI.Fody"/>
+        <PackageReference Include="Microsoft.Extensions.Logging" />
+        <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" />
+        <PackageReference Include="Newtonsoft.Json" />
+        <PackageReference Include="Pidgin" />
+        <PackageReference Include="ReactiveUI" />
+        <PackageReference Include="ReactiveUI.Fody" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\AM.Core5\AM.Core5.csproj"/>
+        <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
     </ItemGroup>
 
 </Project>

@@ -14,7 +14,7 @@
 // ReSharper disable UnusedParameter.Local
 // ReSharper disable VirtualMemberCallInConstructor
 
-/* MagnaApplication.cs -- класс-приложение
+/* ScriptingApplication.cs -- класс-приложение
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -29,6 +29,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Threading.Tasks;
 
+using AM.AppServices;
 using AM.Interactivity;
 
 using Microsoft.Extensions.Configuration;
@@ -42,12 +43,12 @@ using NLog.Extensions.Logging;
 
 #nullable enable
 
-namespace AM.AppServices;
+namespace AM.Scripting.Barsik.AppServices;
 
 /// <summary>
 /// Класс-приложение.
 /// </summary>
-public class MagnaApplication
+public class ScriptingApplication
     : IMagnaApplication
 {
     #region Events
@@ -97,7 +98,7 @@ public class MagnaApplication
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public MagnaApplication
+    public ScriptingApplication
         (
             IHostBuilder builder,
             string[]? args = null
@@ -114,7 +115,7 @@ public class MagnaApplication
     /// Конструктор.
     /// </summary>
     /// <param name="args">Аргументы командной строки.</param>
-    public MagnaApplication
+    public ScriptingApplication
         (
             string[] args
         )
