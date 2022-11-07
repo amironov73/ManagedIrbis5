@@ -13,7 +13,7 @@
 // ReSharper disable UnusedParameter.Local
 // ReSharper disable VirtualMemberCallInConstructor
 
-/* DesktopApplication.cs -- построитель десктопного приложения
+/* ViewApplication.cs -- построитель приложения, запускающего View
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -35,9 +35,9 @@ using Microsoft.Extensions.Hosting;
 namespace AM.Avalonia.AppServices;
 
 /// <summary>
-/// Построитель десктопного приложения на Avalonia.
+/// Построитель приложения на Avalonia, запускающего View.
 /// </summary>
-public sealed class DesktopApplication
+public sealed class ViewApplication
     : IAvaloniaApplicationBuilder
 {
     #region Construction
@@ -45,7 +45,7 @@ public sealed class DesktopApplication
     /// <summary>
     /// Конструктор.
     /// </summary>
-    private DesktopApplication
+    private ViewApplication
         (
             string[] args
         )
@@ -54,7 +54,7 @@ public sealed class DesktopApplication
 
         _instance = this;
         _args = args;
-        _windowCreator = _ => new Window();
+        _viewCreator = _ => new UserControl();
         _appBuilder = AppBuilder.Configure<AvaloniaApplication>()
             .UsePlatformDetect()
             .LogToTrace();
@@ -65,10 +65,10 @@ public sealed class DesktopApplication
     #region Private members
 
     private readonly string[] _args;
-    internal static DesktopApplication _instance = null!;
+    internal static ViewApplication _instance = null!;
     internal static AppBuilder _appBuilder = null!;
     internal List<Action<HostBuilderContext, IServiceCollection>> _configurationActions = new();
-    private Func<AvaloniaApplication, Window> _windowCreator;
+    private Func<AvaloniaApplication, Control> _viewCreator;
 
     #endregion
 
@@ -77,18 +77,18 @@ public sealed class DesktopApplication
     /// <summary>
     /// Создание приложения.
     /// </summary>
-    public static DesktopApplication BuildAvaloniaApp
+    public static ViewApplication BuildAvaloniaApp
         (
             string[] args
         )
     {
-        return new DesktopApplication (args);
+        return new ViewApplication (args);
     }
 
     /// <summary>
     /// Конфигурирование сервисов.
     /// </summary>
-    public DesktopApplication ConfigureServices
+    public ViewApplication ConfigureServices
         (
             Action <HostBuilderContext, IServiceCollection> action
         )
@@ -112,16 +112,16 @@ public sealed class DesktopApplication
     }
 
     /// <summary>
-    /// Использовать указанное окно.
+    /// Использовать указанный View.
     /// </summary>
-    public DesktopApplication UseMainWindow
+    public ViewApplication UseMainView
         (
-            Func<AvaloniaApplication, Window> windowCreator
+            Func<AvaloniaApplication, UserControl> viewCreator
         )
     {
-        Sure.NotNull (windowCreator);
+        Sure.NotNull (viewCreator);
 
-        _windowCreator = windowCreator;
+        _viewCreator = viewCreator;
 
         return this;
     }
@@ -129,10 +129,10 @@ public sealed class DesktopApplication
     /// <summary>
     /// Использовать указанное окно.
     /// </summary>
-    public DesktopApplication UseMainWindow<TWindow>()
-        where TWindow: Window, new()
+    public ViewApplication UseMainView<TView>()
+        where TView: UserControl, new()
     {
-        _windowCreator = _ => new TWindow();
+        _viewCreator = _ => new TView();
 
         return this;
     }
@@ -149,10 +149,10 @@ public sealed class DesktopApplication
     {
         Sure.NotNull (application);
 
-        return _windowCreator (application);
+        throw new NotImplementedException();
     }
 
-    /// <inheritdoc cref="IAvaloniaApplicationBuilder.CreateMainView"/>
+    /// <inheritdoc cref="IAvaloniaApplicationBuilder.CreateMainWindow"/>
     public Control CreateMainView
         (
             AvaloniaApplication application
@@ -160,7 +160,7 @@ public sealed class DesktopApplication
     {
         Sure.NotNull (application);
 
-        throw new NotImplementedException();
+        return _viewCreator (application);
     }
 
     #endregion

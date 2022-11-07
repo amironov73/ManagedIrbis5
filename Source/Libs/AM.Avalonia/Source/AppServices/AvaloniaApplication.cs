@@ -67,6 +67,11 @@ public class AvaloniaApplication
     public Window MainWindow { get; internal set; } = null!;
 
     /// <summary>
+    /// Главный View.
+    /// </summary>
+    public Control MainView { get; internal set; } = null!;
+
+    /// <summary>
     /// Список активных окон.
     /// </summary>
     public List<Window> Windows { get; }
@@ -294,6 +299,17 @@ public class AvaloniaApplication
             };
 
             desktop.MainWindow = MainWindow;
+        }
+        else if (ApplicationLifetime is ISingleViewApplicationLifetime singleView)
+        {
+            MainView = ViewApplication._instance.CreateMainView (this);
+            MainView.Unloaded += (_, _) =>
+            {
+                var lifetime =  RequireService<IHostApplicationLifetime>();
+                lifetime.StopApplication();
+            };
+
+            singleView.MainView = MainView;
         }
 
         base.OnFrameworkInitializationCompleted();

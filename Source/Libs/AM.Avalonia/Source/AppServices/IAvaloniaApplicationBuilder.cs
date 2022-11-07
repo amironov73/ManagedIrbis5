@@ -29,4 +29,12 @@ public interface IAvaloniaApplicationBuilder
         (
             AvaloniaApplication application
         );
+
+    /// <summary>
+    /// Создание главного View для приложения.
+    /// </summary>
+    Control CreateMainView
+        (
+            AvaloniaApplication application
+        );
 }
