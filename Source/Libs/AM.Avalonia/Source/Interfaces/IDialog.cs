@@ -9,9 +9,10 @@
 // ReSharper disable MemberCanBeProtected.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
-/* IDialog.cs --
+/* IDialog.cs -- интерфейс диалога
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -28,39 +29,39 @@ using System.Threading.Tasks;
 namespace AM.Avalonia.Interfaces;
 
 /// <summary>
-///
+/// Интерфейс диалога.
 /// </summary>
 public interface IDialog
     : INotifyPropertyChanged
 {
     /// <summary>
-    ///
+    /// Заголовок.
     /// </summary>
     string Title { get; set; }
 
     /// <summary>
-    ///
+    /// Описание.
     /// </summary>
     string Description { get; set; }
 
     /// <summary>
-    ///
+    /// Коллекция кнопок.
     /// </summary>
     IButtonCollection Buttons { get; }
 
     /// <summary>
-    ///
+    /// Коллекция прочих контролов.
     /// </summary>
     ICollection<IDialogControl> Controls { get; }
 
     /// <summary>
-    ///
+    /// Показ диалога.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Нажатая кнопка.</returns>
     Task<IButton> ShowAsync();
 
     /// <summary>
-    ///
+    /// Закрытие диалога.
     /// </summary>
     /// <returns></returns>
     Task CloseAsync();

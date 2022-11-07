@@ -11,7 +11,7 @@
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedParameter.Local
 
-/* ButtonCollection.cs --
+/* ButtonCollection.cs -- коллекция кнопок
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -36,14 +36,17 @@ using AM.Avalonia.Interfaces;
 namespace AM.Avalonia.Buttons;
 
 /// <summary>
-///
+/// Коллекция кнопок.
 /// </summary>
 public class ButtonCollection
     : ReactiveObject, IButtonCollection
 {
     private readonly ICollection<IButton> buttons = new List<IButton>();
 
-    public IButton DefaultButton
+    /// <summary>
+    /// Кнопка по умолчанию.
+    /// </summary>
+    public IButton? DefaultButton
     {
         get { return buttons.SingleOrDefault(b => b.IsDefault); }
         set

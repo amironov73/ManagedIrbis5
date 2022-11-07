@@ -9,9 +9,11 @@
 // ReSharper disable MemberCanBeProtected.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMemberInSuper.Global
 // ReSharper disable UnusedParameter.Local
 
-/* IButtonCollection.cs --
+/* IButtonCollection.cs -- интерфейс коллекции кнопок
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -28,20 +30,20 @@ using System.ComponentModel;
 namespace AM.Avalonia.Interfaces;
 
 /// <summary>
-///
+/// Интерфейс коллекции кнопок.
 /// </summary>
 public interface IButtonCollection
     : INotifyPropertyChanged, IReadOnlyCollection<IButton>
 {
     /// <summary>
-    ///
+    /// Кнопка по умолчанию (срабатывает по <c>Enter</c>).
     /// </summary>
-    IButton DefaultButton { get; set; }
+    IButton? DefaultButton { get; set; }
 
     /// <summary>
-    ///
+    /// Кнопка, срабатывающая по <c>Esc</c>.
     /// </summary>
-    IButton CancelButton { get; set; }
+    IButton? CancelButton { get; set; }
 
     /// <summary>
     ///
