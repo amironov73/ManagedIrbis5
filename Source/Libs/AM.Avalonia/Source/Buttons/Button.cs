@@ -9,6 +9,7 @@
 // ReSharper disable MemberCanBeProtected.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
 /* Button.cs --
@@ -39,14 +40,20 @@ public class Button
 {
     #region IButton
 
-    public string Name
+    /// <summary>
+    /// Имя кнопки.
+    /// </summary>
+    public string? Name
     {
         get => name;
         set => this.RaiseAndSetIfChanged (ref name, value);
     }
 
-    private string name;
+    private string? name;
 
+    /// <summary>
+    /// Признак видимости.
+    /// </summary>
     public bool IsVisible
     {
         get => isVisible;
@@ -55,6 +62,9 @@ public class Button
 
     private bool isVisible;
 
+    /// <summary>
+    /// Кнопка разрешена?
+    /// </summary>
     public bool IsEnabled
     {
         get => isEnabled;
@@ -63,6 +73,9 @@ public class Button
 
     private bool isEnabled;
 
+    /// <summary>
+    /// Кнопка по умолчанию.
+    /// </summary>
     public bool IsDefault
     {
         get => isDefault;
@@ -71,6 +84,9 @@ public class Button
 
     private bool isDefault;
 
+    /// <summary>
+    /// Срабатывает по <c>Esc</c>?
+    /// </summary>
     public bool IsCancel
     {
         get => isCancel;
@@ -79,7 +95,14 @@ public class Button
 
     private bool isCancel;
 
+    /// <summary>
+    ///
+    /// </summary>
     public IObservable<ButtonArgs> OnClick => onClickSubject;
+
+    /// <summary>
+    ///
+    /// </summary>
     public IObservable<ButtonArgs> Clicked => clickedSubject;
 
     private readonly Subject<ButtonArgs> onClickSubject;
@@ -89,20 +112,35 @@ public class Button
 
     #region ICommand
 
-    public bool CanExecute (object parameter)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="parameter"></param>
+    /// <returns></returns>
+    public bool CanExecute (object? parameter)
     {
         return IsEnabled && IsVisible;
     }
 
-    public void Execute (object parameter)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="parameter"></param>
+    public void Execute (object? parameter)
     {
         var buttonArgs = new ButtonArgs (this);
         onClickSubject?.OnNext (buttonArgs);
         clickedSubject?.OnNext (buttonArgs);
     }
 
-    public event EventHandler CanExecuteChanged;
+    /// <summary>
+    ///
+    /// </summary>
+    public event EventHandler? CanExecuteChanged;
 
+    /// <summary>
+    ///
+    /// </summary>
     protected virtual void OnCanExecuteChanged()
     {
         CanExecuteChanged?.Invoke (this, EventArgs.Empty);
@@ -128,6 +166,12 @@ public class Button
         return GetType().GetHashCode() ^ Name.GetHashCode();
     }
 
+    /// <summary>
+    /// Оператор равенства.
+    /// </summary>
+    /// <param name="button1"></param>
+    /// <param name="button2"></param>
+    /// <returns></returns>
     public static bool operator == (Button button1, Button button2)
     {
         if (ReferenceEquals (button1, null))
@@ -138,6 +182,12 @@ public class Button
         return button1.Equals (button2);
     }
 
+    /// <summary>
+    /// Оператор неравенства.
+    /// </summary>
+    /// <param name="button1"></param>
+    /// <param name="button2"></param>
+    /// <returns></returns>
     public static bool operator != (Button button1, Button button2)
     {
         return !(button1 == button2);
@@ -145,6 +195,9 @@ public class Button
 
     #endregion
 
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
     public Button()
     {
         IsEnabled = true;

@@ -4,14 +4,8 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable MemberCanBeProtected.Global
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable UnusedParameter.Local
 
-/* IButton.cs --
+/* IButton.cs -- интерфейс кнопки.
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -27,43 +21,43 @@ using System.ComponentModel;
 namespace AM.Avalonia.Interfaces;
 
 /// <summary>
-///
+/// Интерфейс кнопки.
 /// </summary>
 public interface IButton
     : INotifyPropertyChanged
 {
     /// <summary>
-    ///
+    /// Имя кнопки.
     /// </summary>
-    string Name { get; set; }
+    string? Name { get; set; }
 
     /// <summary>
-    ///
+    /// Признак видимости.
     /// </summary>
     bool IsVisible { get; set; }
 
     /// <summary>
-    ///
+    /// Признак разрешения.
     /// </summary>
     bool IsEnabled { get; set; }
 
     /// <summary>
-    ///
+    /// Срабатывает по <c>Enter</c>?
     /// </summary>
     bool IsDefault { get; set; }
 
     /// <summary>
-    ///
+    /// Срабатывает по <c>Esc</c>?
     /// </summary>
     bool IsCancel { get; set; }
 
     /// <summary>
-    ///
+    /// Событие щелчка по кнопке.
     /// </summary>
     IObservable<ButtonArgs> OnClick { get; }
 
     /// <summary>
-    ///
+    /// Событие щелчка по кнопке.
     /// </summary>
     IObservable<ButtonArgs> Clicked { get; }
 }
