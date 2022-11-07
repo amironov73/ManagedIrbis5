@@ -14,7 +14,7 @@
 
 ## Один тип — один файл
 
-Каждый тип (класс, структура, перечисление, интерфейс или делегат) помещается в отдельный файл. Имя файла должно совпадать с именем типа. Таким образом, для имен файлов исходных текстов применяется те же правила именования, что и для классов (естественно, за исключением угловых скобок).
+Каждый тип (класс, структура, перечисление, интерфейс или делегат) помещается в отдельный файл. Имя файла должно совпадать с именем типа. Таким образом, для имен файлов исходных текстов применяется те же правила именования, что и для классов (естественно, за исключением угловых скобок). Расширение `.cs` всегда в нижнем регистре. Для дополнительных расширений (например, `.generated`) желательно также применять нижний регистр, кроме тех случаев, когда отступления от правила диктуются технологией.
 
 Для шаблонных классов может потребоваться указание количества типов-аргументов: "SomeClass.cs" означает отсутствие типов-аргументов, "SomeClass\`1.cs" означает один тип-аргумент, "SomeClass\`1.cs" -- два и т. д.
 
@@ -1066,6 +1066,178 @@ public virtual void SecondMethod()
 }
 
 ```
+
+# Файлы решений и проектов
+
+Имя файла решения подчиняется правилам для типов (см. выше), расширение строго в нижнем регистре.
+
+Файлы проектов -- `csproj`, `Directory.Build.props`, `targets` и прочие аналогичные -- оформляются согласно следующим положениям.
+
+Основное расширение всегда строго в нижнем регистре. Дополнительные расширения (например, `.Build`) в соответствии с применяемой технологией.
+
+Для содержимого файла используется кодировка UTF-8, отступы оформляются четырьмя пробелами, группы отделяются друг от друга пустой строкой.
+
+```msbuild
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\Libs\AM.Scripting\AM.Scripting.csproj" />
+        <ProjectReference Include="..\..\Libs\Istu5\Istu5.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Update="Scripts\HelloWorld.barsik">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+
+</Project>
+```
+
+Группы рекомендуется снабжать краткими комментариями, поясняющими их назначение:
+
+```msbuild
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <!-- NuGet related stuff -->
+    <PropertyGroup>
+        <IsPackable>false</IsPackable>
+        <Product>Ars Magna</Product>
+        <Company>Ars Magna Project</Company>
+        <Authors>Alexey Mironov</Authors>
+        <Copyright>Copyright Alexey Mironov 2006-2022</Copyright>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://arsmagna.ru</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/amironov73/ManagedIrbis5</RepositoryUrl>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    </PropertyGroup>
+
+    <!-- Enable Microsoft SourceLink -->
+    <PropertyGroup>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <Deterministic>true</Deterministic>
+        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    </PropertyGroup>
+
+</Project>
+```
+
+Общие элементы проектов выносятся в файл `Directory.Build.props`.
+
+В проекте Ars Magna применяется централизованный менеджмент NuGet-пакетов, поэтому рядом с файлом решения должен находится файл `Directory.Packages.props`
+
+```msbuild
+<Project>
+
+    <PropertyGroup>
+        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    </PropertyGroup>
+
+    <!-- Централизованное управление пакетами -->
+    <ItemGroup>
+        <PackageVersion Include="Avalonia" Version="11.0.0-preview3"/>
+        <PackageVersion Include="Avalonia.Controls.DataGrid" Version="11.0.0-preview3"/>
+        <PackageVersion Include="Avalonia.Desktop" Version="11.0.0-preview3"/>
+        <PackageVersion Include="XamlNameReferenceGenerator" Version="1.4.1"/>
+    </ItemGroup>
+
+</Project>
+```
+
+В файлах же самих проектов версия проекта не указывается:
+
+```msbuild
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <Nullable>enable</Nullable>
+        <TrimMode>copyused</TrimMode>
+        <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    </PropertyGroup>
+
+    <!-- Подключаем наши кастомные контролы -->
+    <ItemGroup>
+        <ProjectReference Include="..\..\Libs\AM.Avalonia\AM.Avalonia.csproj" />
+    </ItemGroup>
+
+    <!-- Централизованное управление пакетами -->
+    <ItemGroup>
+        <PackageReference Include="Avalonia"/>
+        <PackageReference Include="Avalonia.Desktop"/>
+        <PackageReference Include="XamlNameReferenceGenerator"/>
+    </ItemGroup>
+
+</Project>
+```
+
+# XAML-файлы
+
+Имена файлов, содержащих разметку пользовательского интерфейса, подчиняются тем же правилам, что и имена типов (см. выше), расширения (`.xaml`, `.axaml` и т. д.) строго в нижнем регистре.
+
+```xaml
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="using:AM.Avalonia.Dialogs"
+        Width="400" Height="150"
+        CanResize="False"
+        x:Class="AM.Avalonia.Dialogs.InputDialog"
+        Title="Введите значение">
+
+    <Design.DataContext>
+        <local:InputDialog />
+    </Design.DataContext>
+
+    <StackPanel
+        Margin="10"
+        Orientation="Vertical"
+        HorizontalAlignment="Stretch"
+        VerticalAlignment="Center">
+
+        <Label
+            HorizontalAlignment="Stretch"
+            Content="{Binding Prompt}"
+            />
+
+        <TextBox
+            Margin="0, 10, 0, 0"
+            HorizontalAlignment="Stretch"
+            Text="{Binding Value}"
+            />
+
+        <StackPanel
+            Margin="10"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
+
+            <Button
+                Name="OkButton"
+                Click="OkButton_OnClick"
+                >OK</Button>
+
+            <Button
+                Name="CancelButton"
+                Click="CancelButton_OnClick"
+                Margin="3, 0, 0, 0"
+                >Отмена</Button>
+
+        </StackPanel>
+
+    </StackPanel>
+
+</Window>
+```
+
+# Файлы ресурсов и прочих ассетов
+
+Имена файлов, содержащих ресурсы для пользовательского интерфейса (изображения, иконки, шрифты), подчиняются тем же правилам, что и имена типов (см. выше), расширения (`.bmp`, `.png` и т. д.) строго в нижнем регистре.
 
 # Документы, использованные при составлении Соглашения:
 
