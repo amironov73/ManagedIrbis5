@@ -1,0 +1,52 @@
+﻿//
+// Поиск книг на монгольском языке
+//
+
+connect("host=127.0.0.1;port=6666;user=librarian;password=secret;db=IBIS;")
+if (!is_connected())
+{
+    error ("Not connected")
+    exit()
+}
+
+//=================================
+
+xpression = "J=mon"
+found = batch_search (xpression)
+khcount = 0
+olcount = 0
+excount = 0
+nstaro = 0
+
+foreach (book in found)
+{
+    lprim = fm (book, 912) ~ "старо"
+    exemplars = get_exemplars (book)
+    excount += len (exemplars)
+    foreach (one in exemplars)
+    {
+        if (one.Place same "ФКХ")
+        {
+            khcount++
+        }
+        if (one.Place same "Ф404")
+        {
+            olcount++
+        }
+        if (lprim)
+        {
+            nstaro++
+        }
+    }
+}
+
+println ("============================================================")
+println ("Общее количество экземпляров изданий на монгольском языке: ", excount)
+println ("Количество экземпляров изданий на монгольском языке в ФКХ: ", khcount)
+println ("Количество экземпляров изданий на монгольском языке в Ф404: ", olcount)
+println ("Количество экземпляров изданий на старопечатном монгольском языке: ", nstaro)
+
+//=================================
+
+disconnect()
+println ("THAT'S ALL, FOLKS!")
