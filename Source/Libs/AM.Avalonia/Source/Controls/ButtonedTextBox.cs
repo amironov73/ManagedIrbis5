@@ -12,8 +12,11 @@
 
 #region Using directives
 
+using System;
+
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 
 #endregion
 
@@ -27,6 +30,25 @@ namespace AM.Avalonia.Controls;
 public class ButtonedTextBox
     : UserControl
 {
+    #region Events
+
+    /// <summary>
+    /// Описание события "Щелчок по кнопке".
+    /// </summary>
+    public static readonly RoutedEvent<RoutedEventArgs> ButtonClickEvent =
+        RoutedEvent.Register<ButtonedTextBox, RoutedEventArgs>(nameof (ButtonClick), RoutingStrategies.Bubble);
+
+    /// <summary>
+    /// Собственно событие "Щелчок по кнопке".
+    /// </summary>
+    public event EventHandler<RoutedEventArgs>? ButtonClick
+    {
+        add => AddHandler (ButtonClickEvent, value);
+        remove => RemoveHandler (ButtonClickEvent, value);
+    }
+
+    #endregion
+
     #region Properties
 
     /// <summary>
@@ -82,6 +104,7 @@ public class ButtonedTextBox
         TextBox = new TextBox();
         Button = new Button();
         Button.SetValue (Grid.ColumnProperty, 1);
+        Button.Click += Button_OnClick;
 
         Content = new Grid
         {
@@ -92,6 +115,23 @@ public class ButtonedTextBox
                 Button
             }
         };
+    }
+
+    #endregion
+
+    #region Private members
+
+    private void Button_OnClick
+        (
+            object? sender,
+            RoutedEventArgs eventArgs
+        )
+    {
+        sender.NotUsed();
+        eventArgs.NotUsed();
+
+        var e = new RoutedEventArgs (ButtonClickEvent);
+        RaiseEvent (e);
     }
 
     #endregion

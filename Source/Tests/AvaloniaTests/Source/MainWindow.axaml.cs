@@ -310,6 +310,20 @@ public partial class MainWindow
             RoutedEventArgs eventArgs
         )
     {
+        var counter = 0;
+        var messageLabel = new Label();
+
+        var textBox = new ButtonedTextBox
+        {
+            Text = "text in a box",
+            Caption = "..."
+        };
+        textBox.ButtonClick += (o, args) =>
+        {
+            var box = (ButtonedTextBox) o.ThrowIfNull();
+            messageLabel.Content = $"Нажато: {++counter}, текст: {box.Text}";
+        };
+
         var window = new Window
         {
             Title = "ButtonedTextBox control demo",
@@ -322,11 +336,8 @@ public partial class MainWindow
                 Margin = new Thickness (10),
                 Children =
                 {
-                    new ButtonedTextBox
-                    {
-                        Text = "text in a box",
-                        Caption = "..."
-                    }
+                    messageLabel,
+                    textBox
                 }
             }
         };
