@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using AM.Drawing.HtmlRenderer.Adapters;
 using AM.Drawing.HtmlRenderer.Core.Entities;
 using AM.Drawing.HtmlRenderer.Core.Parse;
-using AM.Drawing.HtmlRenderer.Core.Utils;
 
 #endregion
 
@@ -49,13 +48,16 @@ public sealed class CssData
 
     #endregion
 
-
     /// <summary>
-    /// Init.
+    /// Конструктор.
     /// </summary>
     internal CssData()
     {
-        _mediaBlocks.Add ("all", new Dictionary<string, List<CssBlock>> (StringComparer.InvariantCultureIgnoreCase));
+        _mediaBlocks.Add
+            (
+                "all",
+                new Dictionary<string, List<CssBlock>> (StringComparer.InvariantCultureIgnoreCase)
+            );
     }
 
     /// <summary>
@@ -68,7 +70,12 @@ public sealed class CssData
     /// <param name="stylesheet">the stylesheet source to parse</param>
     /// <param name="combineWithDefault">true - combine the parsed css data with default css data, false - return only the parsed css data</param>
     /// <returns>the parsed css data</returns>
-    public static CssData Parse (RAdapter adapter, string stylesheet, bool combineWithDefault = true)
+    public static CssData Parse
+        (
+            RAdapter adapter,
+            string stylesheet,
+            bool combineWithDefault = true
+        )
     {
         var parser = new CssParser (adapter);
         return parser.ParseStyleSheet (stylesheet, combineWithDefault);
@@ -85,7 +92,11 @@ public sealed class CssData
     /// <param name="className">the class selector to check for css blocks by</param>
     /// <param name="media">optional: the css media type (default - all)</param>
     /// <returns>true - has css blocks for the class, false - otherwise</returns>
-    public bool ContainsCssBlock (string className, string media = "all")
+    public bool ContainsCssBlock
+        (
+            string className,
+            string media = "all"
+        )
     {
         return _mediaBlocks.TryGetValue (media, out var mid) && mid.ContainsKey (className);
     }
@@ -100,7 +111,11 @@ public sealed class CssData
     /// <param name="className">the class selector to get css blocks by</param>
     /// <param name="media">optional: the css media type (default - all)</param>
     /// <returns>collection of css blocks, empty collection if no blocks exists (never null)</returns>
-    public IEnumerable<CssBlock> GetCssBlock (string className, string media = "all")
+    public IEnumerable<CssBlock> GetCssBlock
+        (
+            string className,
+            string media = "all"
+        )
     {
         List<CssBlock>? block = null;
         if (_mediaBlocks.TryGetValue (media, out var mid))
@@ -125,7 +140,11 @@ public sealed class CssData
     /// </remarks>
     /// <param name="media">the media type to add the CSS to</param>
     /// <param name="cssBlock">the css block to add</param>
-    public void AddCssBlock (string media, CssBlock cssBlock)
+    public void AddCssBlock
+        (
+            string media,
+            CssBlock cssBlock
+        )
     {
         if (!_mediaBlocks.TryGetValue (media, out var mid))
         {
@@ -133,35 +152,39 @@ public sealed class CssData
             _mediaBlocks.Add (media, mid);
         }
 
-        if (!mid.ContainsKey (cssBlock.ClassName))
+        var className = cssBlock.ClassName;
+        if (!string.IsNullOrEmpty (className))
         {
-            var list = new List<CssBlock> { cssBlock };
-            mid[cssBlock.ClassName] = list;
-        }
-        else
-        {
-            var merged = false;
-            var list = mid[cssBlock.ClassName];
-            foreach (var block in list)
+            if (!mid.ContainsKey (className))
             {
-                if (block.EqualsSelector (cssBlock))
-                {
-                    merged = true;
-                    block.Merge (cssBlock);
-                    break;
-                }
+                var list = new List<CssBlock> { cssBlock };
+                mid[className] = list;
             }
-
-            if (!merged)
+            else
             {
-                // general block must be first
-                if (cssBlock.Selectors == null)
+                var merged = false;
+                var list = mid[className];
+                foreach (var block in list)
                 {
-                    list.Insert (0, cssBlock);
+                    if (block.EqualsSelector (cssBlock))
+                    {
+                        merged = true;
+                        block.Merge (cssBlock);
+                        break;
+                    }
                 }
-                else
+
+                if (!merged)
                 {
-                    list.Add (cssBlock);
+                    // general block must be first
+                    if (cssBlock.Selectors == null)
+                    {
+                        list.Insert (0, cssBlock);
+                    }
+                    else
+                    {
+                        list.Add (cssBlock);
+                    }
                 }
             }
         }
@@ -172,9 +195,12 @@ public sealed class CssData
     /// Merge blocks if exists in both.
     /// </summary>
     /// <param name="other">the CSS data to combine with</param>
-    public void Combine (CssData other)
+    public void Combine
+        (
+            CssData other
+        )
     {
-        ArgChecker.AssertArgNotNull (other, "other");
+        Sure.NotNull (other);
 
         // for each media block
         foreach (var mediaBlock in other.MediaBlocks)

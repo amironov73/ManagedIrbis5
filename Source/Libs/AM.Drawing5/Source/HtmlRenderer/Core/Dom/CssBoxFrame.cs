@@ -136,7 +136,6 @@ internal sealed class CssBoxFrame
         base.Dispose();
     }
 
-
     #region Private methods
 
     /// <summary>
