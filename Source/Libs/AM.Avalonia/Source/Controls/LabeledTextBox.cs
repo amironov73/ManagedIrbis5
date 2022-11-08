@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
 
 /* LabeledTextBox.cs -- текстовый бокс с меткой
  * Ars Magna project, http://arsmagna.ru
@@ -11,6 +12,7 @@
 
 #region Using directives
 
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Layout;
 
@@ -27,6 +29,12 @@ public sealed class LabeledTextBox
     : UserControl
 {
     #region Properties
+
+    /// <summary>
+    /// Описание свойства "Текст".
+    /// </summary>
+    public static readonly StyledProperty<string?> TextProperty
+        = AvaloniaProperty.Register<LabeledTextBox, string?> (nameof (Text));
 
     /// <summary>
     /// Надпись на встроенной в контрол метке.

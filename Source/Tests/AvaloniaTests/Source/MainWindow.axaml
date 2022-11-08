@@ -68,6 +68,12 @@
             ExceptionDialog
         </Button>
 
+        <Button
+            Name="ButtonedTextBoxButton"
+            Click="ButtonedTextBoxButton_OnClick">
+            ButtonedTextBox
+        </Button>
+
     </WrapPanel>
 
 </Window>

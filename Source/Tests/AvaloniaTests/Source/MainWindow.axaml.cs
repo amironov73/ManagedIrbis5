@@ -303,4 +303,34 @@ public partial class MainWindow
         }
 
     }
+
+    private async void ButtonedTextBoxButton_OnClick
+        (
+            object? sender,
+            RoutedEventArgs eventArgs
+        )
+    {
+        var window = new Window
+        {
+            Title = "ButtonedTextBox control demo",
+            Width = 300,
+            Height = 150,
+            VerticalContentAlignment = VerticalAlignment.Center,
+            Content = new StackPanel
+            {
+                Orientation = Orientation.Vertical,
+                Margin = new Thickness (10),
+                Children =
+                {
+                    new ButtonedTextBox
+                    {
+                        Text = "text in a box",
+                        Caption = "..."
+                    }
+                }
+            }
+        };
+
+        await window.ShowDialog (this);
+    }
 }
