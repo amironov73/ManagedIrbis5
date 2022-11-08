@@ -74,6 +74,12 @@
             ButtonedTextBox
         </Button>
 
+        <Button
+            Name="AnalogClockButton"
+            Click="AnalogClockButton_OnClick">
+            AnalogClock
+        </Button>
+
     </WrapPanel>
 
 </Window>

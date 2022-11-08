@@ -344,4 +344,36 @@ public partial class MainWindow
 
         await window.ShowDialog (this);
     }
+
+    private async void AnalogClockButton_OnClick
+        (
+            object? sender,
+            RoutedEventArgs eventArgs
+        )
+    {
+        var clock = new AnalogClock
+        {
+            Width = 200,
+            Height = 200
+        };
+
+        var window = new Window
+        {
+            Title = "AnalogClock control demo",
+            Width = 300,
+            Height = 220,
+            VerticalContentAlignment = VerticalAlignment.Center,
+            Content = new StackPanel
+            {
+                Orientation = Orientation.Vertical,
+                Margin = new Thickness (10),
+                Children =
+                {
+                    clock
+                }
+            }
+        };
+
+        await window.ShowDialog (this);
+    }
 }
