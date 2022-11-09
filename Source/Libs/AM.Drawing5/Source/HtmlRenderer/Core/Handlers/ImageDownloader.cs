@@ -21,6 +21,8 @@ using System.Threading;
 using AM.Drawing.HtmlRenderer.Core.Utils;
 using AM.IO;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -34,7 +36,13 @@ namespace AM.Drawing.HtmlRenderer.Core.Handlers;
 /// <param name="filePath">the path to the downloaded file</param>
 /// <param name="error">the error if download failed</param>
 /// <param name="canceled">is the file download request was canceled</param>
-public delegate void DownloadFileAsyncCallback (Uri imageUri, string filePath, Exception error, bool canceled);
+public delegate void DownloadFileAsyncCallback
+    (
+        Uri imageUri,
+        string filePath,
+        Exception? error,
+        bool canceled
+    );
 
 /// <summary>
 /// Handler for downloading images from the web.<br/>
@@ -54,12 +62,14 @@ internal sealed class ImageDownloader
     /// <summary>
     /// dictionary of image cache path to callbacks of download to handle multiple requests to download the same image
     /// </summary>
-    private readonly Dictionary<string, List<DownloadFileAsyncCallback>> _imageDownloadCallbacks =
-        new Dictionary<string, List<DownloadFileAsyncCallback>>();
+    private readonly Dictionary<string, List<DownloadFileAsyncCallback>> _imageDownloadCallbacks = new ();
 
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
     public ImageDownloader()
     {
-        ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072;
+        ServicePointManager.SecurityProtocol = (SecurityProtocolType) 3072;
     }
 
     /// <summary>
@@ -69,13 +79,19 @@ internal sealed class ImageDownloader
     /// <param name="filePath">the path on disk to download the file to</param>
     /// <param name="async">is to download the file sync or async (true-async)</param>
     /// <param name="cachedFileCallback">This callback will be called with local file path. If something went wrong in the download it will return null.</param>
-    public void DownloadImage (Uri imageUri, string filePath, bool async, DownloadFileAsyncCallback cachedFileCallback)
+    public void DownloadImage
+        (
+            Uri imageUri,
+            string filePath,
+            bool async,
+            DownloadFileAsyncCallback cachedFileCallback
+        )
     {
-        ArgChecker.AssertArgNotNull (imageUri, "imageUri");
-        ArgChecker.AssertArgNotNull (cachedFileCallback, "cachedFileCallback");
+        Sure.NotNull (imageUri);
+        Sure.NotNull (cachedFileCallback);
 
         // to handle if the file is already been downloaded
-        bool download = true;
+        var download = true;
         lock (_imageDownloadCallbacks)
         {
             if (_imageDownloadCallbacks.ContainsKey (filePath))
@@ -93,10 +109,14 @@ internal sealed class ImageDownloader
         {
             var tempPath = Path.GetTempFileName();
             if (async)
+            {
                 ThreadPool.QueueUserWorkItem (DownloadImageFromUrlAsync,
                     new DownloadData (imageUri, tempPath, filePath));
+            }
             else
+            {
                 DownloadImageFromUrl (imageUri, tempPath, filePath);
+            }
         }
     }
 
@@ -108,23 +128,25 @@ internal sealed class ImageDownloader
         ReleaseObjects();
     }
 
-
     #region Private/Protected methods
 
     /// <summary>
     /// Download the requested file in the URI to the given file path.<br/>
     /// Use async sockets API to download from web, <see cref="OnDownloadImageAsyncCompleted"/>.
     /// </summary>
-    private void DownloadImageFromUrl (Uri source, string tempPath, string filePath)
+    private void DownloadImageFromUrl
+        (
+            Uri source,
+            string tempPath,
+            string filePath
+        )
     {
         try
         {
-            using (var client = new WebClient())
-            {
-                _clients.Add (client);
-                client.DownloadFile (source, tempPath);
-                OnDownloadImageCompleted (client, source, tempPath, filePath, null, false);
-            }
+            using var client = new WebClient();
+            _clients.Add (client);
+            client.DownloadFile (source, tempPath);
+            OnDownloadImageCompleted (client, source, tempPath, filePath, null, false);
         }
         catch (Exception ex)
         {
@@ -137,7 +159,10 @@ internal sealed class ImageDownloader
     /// Use async sockets API to download from web, <see cref="OnDownloadImageAsyncCompleted"/>.
     /// </summary>
     /// <param name="data">key value pair of URL and file info to download the file to</param>
-    private void DownloadImageFromUrlAsync (object data)
+    private void DownloadImageFromUrlAsync
+        (
+            object? data
+        )
     {
         var downloadData = (DownloadData)data;
         try
@@ -158,22 +183,38 @@ internal sealed class ImageDownloader
     /// On download image complete to local file.<br/>
     /// If the download canceled do nothing, if failed report error.
     /// </summary>
-    private void OnDownloadImageAsyncCompleted (object sender, AsyncCompletedEventArgs e)
+    private void OnDownloadImageAsyncCompleted
+        (
+            object? sender,
+            AsyncCompletedEventArgs eventArgs
+        )
     {
-        var downloadData = (DownloadData)e.UserState;
+        var downloadData = (DownloadData) eventArgs.UserState.ThrowIfNull();
         try
         {
-            using (var client = (WebClient)sender)
-            {
-                client.DownloadFileCompleted -= OnDownloadImageAsyncCompleted;
-                OnDownloadImageCompleted (client, downloadData._uri, downloadData._tempPath, downloadData._filePath,
-                    e.Error, e.Cancelled);
-            }
+            var client = (WebClient) sender.ThrowIfNull ();
+            client.DownloadFileCompleted -= OnDownloadImageAsyncCompleted;
+            OnDownloadImageCompleted
+                (
+                    client,
+                    downloadData._uri,
+                    downloadData._tempPath,
+                    downloadData._filePath,
+                    eventArgs.Error,
+                    eventArgs.Cancelled
+                );
         }
-        catch (Exception ex)
+        catch (Exception exception)
         {
-            OnDownloadImageCompleted (null, downloadData._uri, downloadData._tempPath, downloadData._filePath, ex,
-                false);
+            OnDownloadImageCompleted
+                (
+                    null,
+                    downloadData._uri,
+                    downloadData._tempPath,
+                    downloadData._filePath,
+                    exception,
+                    false
+                );
         }
     }
 
@@ -182,11 +223,11 @@ internal sealed class ImageDownloader
     /// </summary>
     private void OnDownloadImageCompleted
         (
-            WebClient client,
+            WebClient? client,
             Uri source,
             string tempPath,
             string filePath,
-            Exception error,
+            Exception? error,
             bool cancelled
         )
     {
@@ -224,11 +265,13 @@ internal sealed class ImageDownloader
             }
         }
 
-        List<DownloadFileAsyncCallback> callbacksList;
+        List<DownloadFileAsyncCallback>? callbacksList;
         lock (_imageDownloadCallbacks)
         {
             if (_imageDownloadCallbacks.TryGetValue (filePath, out callbacksList))
+            {
                 _imageDownloadCallbacks.Remove (filePath);
+            }
         }
 
         if (callbacksList != null)
@@ -239,8 +282,9 @@ internal sealed class ImageDownloader
                 {
                     cachedFileCallback (source, filePath, error, cancelled);
                 }
-                catch
+                catch (Exception exception)
                 {
+                    Magna.Logger.LogError (exception, nameof (OnDownloadImageCompleted));
                 }
             }
         }
@@ -261,8 +305,9 @@ internal sealed class ImageDownloader
                 client.Dispose();
                 _clients.RemoveAt (0);
             }
-            catch
+            catch (Exception exception)
             {
+                Magna.Logger.LogError (exception, nameof (ReleaseObjects));
             }
         }
     }
@@ -278,7 +323,12 @@ internal sealed class ImageDownloader
         public readonly string _tempPath;
         public readonly string _filePath;
 
-        public DownloadData (Uri uri, string tempPath, string filePath)
+        public DownloadData
+            (
+                Uri uri,
+                string tempPath,
+                string filePath
+            )
         {
             _uri = uri;
             _tempPath = tempPath;
