@@ -126,8 +126,8 @@ public sealed class ReaderManager
         return result;
     } // method GetReaderByBarcode
 
-    /// <inheritdoc cref="IReaderManager.GetReaderByIstuID"/>
-    public Reader? GetReaderByIstuID
+    /// <inheritdoc cref="IReaderManager.GetReaderByIstuId"/>
+    public Reader? GetReaderByIstuId
         (
             int id
         )

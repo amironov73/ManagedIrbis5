@@ -181,7 +181,7 @@ public sealed class ReaderController
         }
 
         using var readerManager = GetReaderManager();
-        var found = readerManager.GetReaderByIstuID (istuId);
+        var found = readerManager.GetReaderByIstuId (istuId);
 
         return Ok (found);
     }
