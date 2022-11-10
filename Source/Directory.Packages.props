@@ -97,8 +97,8 @@
         <PackageVersion Include="System.Resources.Extensions" Version="7.0.0"/>
         <PackageVersion Include="System.Security.Cryptography.ProtectedData" Version="7.0.0"/>
         <PackageVersion Include="System.Text.Encoding.CodePages" Version="7.0.0"/>
-        <PackageVersion Include="Telegram.Bot" Version="16.0.2"/>
-        <PackageVersion Include="Telegram.Bot.Extensions.Polling" Version="0.2.0"/>
+        <PackageVersion Include="Telegram.Bot" Version="18.0.0"/>
+        <PackageVersion Include="Telegram.Bot.Extensions.Polling" Version="1.0.2"/>
         <PackageVersion Include="Topshelf" Version="4.3.0"/>
         <PackageVersion Include="Topshelf.NLog" Version="4.3.0"/>
         <PackageVersion Include="XamlColorSchemeGenerator" Version="3.0.0.31"/>
