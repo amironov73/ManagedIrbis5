@@ -77,8 +77,8 @@ public sealed class OperatorManager
     public Operator? GetOperatorByBarcode (string barcode) =>
         Operators.FirstOrDefault (op => op.Barcode == barcode);
 
-    /// <inheritdoc cref="IOperatorManager.GetOperatorByID"/>
-    public Operator? GetOperatorByID (int id) =>
+    /// <inheritdoc cref="IOperatorManager.GetOperatorById"/>
+    public Operator? GetOperatorById (int id) =>
         Operators.FirstOrDefault (op => op.ID == id);
 
     /// <inheritdoc cref="IOperatorManager.ListAllOperators"/>

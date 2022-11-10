@@ -78,37 +78,59 @@ public interface IReaderManager
     /// <summary>
     /// Обновление данных читателя.
     /// </summary>
-    void UpdateReaderInfo (Reader reader);
+    void UpdateReaderInfo
+        (
+            Reader reader
+        );
 
     /// <summary>
     /// Перерегистрация читателя в текущем году.
     /// </summary>
-    void Reregister (string ticket);
+    void Reregister
+        (
+            string ticket
+        );
 
     /// <summary>
     /// Удаление читателя из базы.
     /// </summary>
-    void DeleteReader (string ticket);
+    void DeleteReader
+        (
+            string ticket
+        );
 
     /// <summary>
     /// Проверка существования читателя с указанным номером билета.
     /// </summary>
-    bool CheckExistence (string ticket);
+    bool CheckExistence
+        (
+            string ticket
+        );
 
     /// <summary>
     /// Проверка, что строка имеет верный синтаксис.
     /// </summary>
-    bool ValidateTicketString (string ticket);
+    bool ValidateTicketString
+        (
+            string ticket
+        );
 
     /// <summary>
     /// Проверка, что строка имеет верный синтаксис.
     /// </summary>
-    bool ValidateNameString (string name);
+    bool ValidateNameString
+        (
+            string name
+        );
 
     /// <summary>
     /// Проверка пароля (правильно введен или нет?).
     /// </summary>
-    bool VerifyPassword (string ticket, string password);
+    bool VerifyPassword
+        (
+            string ticket,
+            string password
+        );
 
     /// <summary>
     /// Поиск читателей с похожими фамилиями.
