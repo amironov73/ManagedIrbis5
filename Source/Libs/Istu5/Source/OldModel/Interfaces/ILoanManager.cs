@@ -29,7 +29,7 @@ public interface ILoanManager
     : IDisposable
 {
     /// <summary>
-    ///
+    /// Получение всех книг, числящихся за указанным читательским билетом.
     /// </summary>
     Loan[] GetLoans
         (
@@ -37,7 +37,7 @@ public interface ILoanManager
         );
 
     /// <summary>
-    ///
+    /// Получение книги научного фонда с указанным инвентарным номером.
     /// </summary>
     Loan GetSciLoan
         (
@@ -45,7 +45,7 @@ public interface ILoanManager
         );
 
     /// <summary>
-    ///
+    /// Получение книги учебного фонда с указанным штрих-кодом.
     /// </summary>
     Loan GetUchLoan
         (
@@ -53,7 +53,7 @@ public interface ILoanManager
         );
 
     /// <summary>
-    ///
+    /// Получение книги учебного фонда с указанной RFID-меткой.
     /// </summary>
     Loan GetUchLoanByRfid
         (
@@ -61,7 +61,7 @@ public interface ILoanManager
         );
 
     /// <summary>
-    ///
+    /// Выдача перечисленных книг.
     /// </summary>
     void GiveBooks
         (
@@ -70,7 +70,7 @@ public interface ILoanManager
         );
 
     /// <summary>
-    ///
+    /// Возврат перечисленных книг.
     /// </summary>
     void ReturnBooks
         (
@@ -79,7 +79,7 @@ public interface ILoanManager
         );
 
     /// <summary>
-    ///
+    /// Списание перечисленных книг.
     /// </summary>
     void WriteOffBooks
         (
@@ -87,7 +87,7 @@ public interface ILoanManager
         );
 
     /// <summary>
-    ///
+    /// Обновление информации об указанной выдаче.
     /// </summary>
     void Update
         (
@@ -95,7 +95,7 @@ public interface ILoanManager
         );
 
     /// <summary>
-    ///
+    /// Получение максимально возможного срока выдачи литературы.
     /// </summary>
     DateTime GetLongestLoan
         (
@@ -105,7 +105,7 @@ public interface ILoanManager
         );
 
     /// <summary>
-    ///
+    /// Получение максимально возможного количество выданных документов.
     /// </summary>
     int GetMaximumLoans
         (
@@ -115,15 +115,17 @@ public interface ILoanManager
         );
 
     /// <summary>
-    ///
+    /// Получение выданных книг научного фонда с инвентарными номерами
+    /// в указанном диапазоне.
     /// </summary>
     int[] GetLoanedInventories
         (
-            int from, int to
+            int from,
+            int to
         );
 
     /// <summary>
-    ///
+    /// Выдача "на руки" перечисленных изданий.
     /// </summary>
     void GiveToHands
         (
@@ -132,7 +134,7 @@ public interface ILoanManager
         );
 
     /// <summary>
-    ///
+    /// Возврат "с рук" перечисленных изданий.
     /// </summary>
     void ReturnFromHands
         (
@@ -146,9 +148,14 @@ public interface ILoanManager
     // void DeterminePilotCopy(Loan loan, IRemoteCatalog rc, int mfn, string inventory);
 
     /// <summary>
-    ///
+    /// Присвоение выданному документу сообщения,
+    /// которое будет показано оператору.
     /// </summary>
-    void SetAlert (Loan loan, string text);
+    void SetAlert
+        (
+            Loan loan,
+            string text
+        );
 
     // /// <summary>
     // ///
@@ -165,9 +172,13 @@ public interface ILoanManager
     // LoanInfo GetLoanInfo(string cardNumber);
 
     /// <summary>
-    /// Lists the loans for given card number.
+    /// Получение книг учебного фонда, числящихся за данным
+    /// номером учетной карточки.
     /// </summary>
-    Loan[] ListUchLoans (string cardNumber);
+    Loan[] ListUchLoans
+        (
+            string cardNumber
+        );
 
     /// <summary>
     /// Списание книг учебного фонда по номеру учетной карточки.
@@ -185,7 +196,7 @@ public interface ILoanManager
     // List<SingleInfo> GetExpiredSingles(DateTime expirationDate);
 
     /// <summary>
-    /// Sets the seen.
+    /// Маркировка перечисленных документов как прошедших инвентаризацию.
     /// </summary>
     void SetSeen
         (

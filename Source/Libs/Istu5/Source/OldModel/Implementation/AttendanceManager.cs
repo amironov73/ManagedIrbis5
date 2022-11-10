@@ -57,6 +57,8 @@ public sealed class AttendanceManager
             Storehouse storehouse
         )
     {
+        Sure.NotNull (storehouse);
+
         Storehouse = storehouse;
     }
 
@@ -78,10 +80,11 @@ public sealed class AttendanceManager
             Attendance info
         )
     {
+        Sure.NotNull (info);
+
         var db = _GetDb();
         db.Insert (info);
-
-    } // method RegisterAttendance
+    }
 
     /// <inheritdoc cref="IAttendanceManager.RegisterAttendances"/>
     public void RegisterAttendances
@@ -89,10 +92,11 @@ public sealed class AttendanceManager
             IEnumerable<Attendance> attendances
         )
     {
+        Sure.NotNull ((object?) attendances);
+
         var database = _GetDb();
         database.BulkCopy (attendances);
-
-    } // method RegisterAttendances
+    }
 
     /// <inheritdoc cref="IAttendanceManager.GetAttendances"/>
     public Attendance[] GetAttendances
@@ -100,6 +104,8 @@ public sealed class AttendanceManager
             string ticket
         )
     {
+        Sure.NotNullNorEmpty (ticket);
+
         var database = _GetDb();
         var attendances = database.GetAttendances();
         var result = attendances
@@ -107,8 +113,7 @@ public sealed class AttendanceManager
             .ToArray();
 
         return result;
-
-    } // method GetAttendances
+    }
 
     /// <inheritdoc cref="IAttendanceManager.GetLastAttendance"/>
     public Attendance? GetLastAttendance
@@ -116,6 +121,8 @@ public sealed class AttendanceManager
             string ticket
         )
     {
+        Sure.NotNullNorEmpty (ticket);
+
         var db = _GetDb();
         var attendances = db.GetAttendances();
         var result = attendances
@@ -124,8 +131,7 @@ public sealed class AttendanceManager
             .FirstOrDefault();
 
         return result;
-
-    } // method GetLastAttendance
+    }
 
     /// <inheritdoc cref="IAttendanceManager.GetLastReaders"/>
     public Reader[] GetLastReaders
@@ -133,7 +139,7 @@ public sealed class AttendanceManager
             int howMany = 200
         )
     {
-        Sure.Positive (howMany, nameof (howMany));
+        Sure.Positive (howMany);
 
         var db = _GetDb();
         var attendances = db.GetAttendances();
@@ -152,8 +158,7 @@ public sealed class AttendanceManager
             .ToArray();
 
         return result;
-
-    } // method GetLatestReaders
+    }
 
     #endregion
 
@@ -162,13 +167,9 @@ public sealed class AttendanceManager
     /// <inheritdoc cref="IDisposable.Dispose"/>
     public void Dispose()
     {
-        if (_dataConnection is not null)
-        {
-            _dataConnection.Dispose();
-            _dataConnection = null;
-        }
-
-    } // method Dispose
+        _dataConnection?.Dispose();
+        _dataConnection = null;
+    }
 
     #endregion
 }
