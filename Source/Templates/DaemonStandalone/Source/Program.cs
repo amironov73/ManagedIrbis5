@@ -74,6 +74,11 @@ internal sealed class Program
     {
         try
         {
+            if (Setup (args))
+            {
+                return 0;
+            }
+
             Initialize (args);
 
             ApplicationHost.Run();
@@ -153,6 +158,48 @@ internal sealed class Program
         // не забудьте настроить для своих нужд!
         configurationBuilder
             .AddUserSecrets (assembly);
+    }
+
+    /// <summary>
+    /// Регистрация демона в системе.
+    /// </summary>
+    private static bool Setup
+        (
+            string[] args
+        )
+    {
+        if (args.Length == 0)
+        {
+            return false;
+        }
+
+        var command = args[0].ToLowerInvariant();
+        switch (command)
+        {
+            case "create":
+            case "register":
+                ServiceControl.RegisterService();
+                return true;
+
+            case "delete":
+            case "unregister":
+                ServiceControl.UnregisterService();
+                return true;
+
+            case "start":
+                ServiceControl.StartService();
+                return true;
+
+            case "stop":
+                ServiceControl.StopService();
+                return true;
+
+            case "query":
+                ServiceControl.QueryServiceStatus();
+                return true;
+        }
+
+        return false;
     }
 
     /// <summary>
