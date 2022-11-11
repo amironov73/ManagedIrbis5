@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+    <!-- Отключаем централизованное управление пакетами -->
     <PropertyGroup>
         <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
     </PropertyGroup>
@@ -30,7 +31,6 @@
         <TrimmableAssembly Include="Avalonia.Themes.Default" />
     </ItemGroup>
 
-    <!-- Централизованное управление пакетами -->
     <ItemGroup>
         <PackageReference Include="Avalonia" Version="11.0.0-preview3"/>
         <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.0.0-preview3"/>
