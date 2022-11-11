@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Media;
 using System.Text;
@@ -111,7 +112,7 @@ public sealed class ConsoleControl
         {
             return new string (Character, 1);
         }
-    } // struct Cell
+    }
 
     #endregion
 
@@ -204,10 +205,7 @@ public sealed class ConsoleControl
         get => _windowHeight;
         set
         {
-            if (value < MinimalWindowHeight || value > MaximalWindowHeight)
-            {
-                throw new ArgumentOutOfRangeException (nameof (value));
-            }
+            Sure.InRange (value, MinimalWindowHeight, MaximalWindowHeight);
 
             _windowHeight = value;
             _SetupWindow();
@@ -1160,11 +1158,14 @@ public sealed class ConsoleControl
     }
 
     /// <inheritdoc cref="Control.Font" />
+    [AllowNull] // для совместимости с Control
     public override Font Font
     {
         get => _font.ThrowIfNull();
         set
         {
+            Sure.NotNull (value);
+
             _font = value;
             _SetupFont();
         }

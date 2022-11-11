@@ -4,10 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
 /* IrbisCatalog.cs -- реализация интерфейса электронного каталога
  * Ars Magna project, http://arsmagna.ru
@@ -16,6 +13,8 @@
 #region Using directives
 
 using System;
+
+using AM;
 
 using Istu.BookSupply.Interfaces;
 
@@ -42,7 +41,7 @@ public sealed class IrbisCatalog
     /// <summary>
     /// Синхронный провайдер.
     /// </summary>
-    public ISyncProvider Provider => _provider;
+    public ISyncProvider Provider { get; }
 
     #endregion
 
@@ -53,7 +52,7 @@ public sealed class IrbisCatalog
     /// </summary>
     public IrbisCatalog()
     {
-        _provider = ConnectionUtility.GetConnectionFromConfig();
+        Provider = ConnectionUtility.GetConnectionFromConfig();
     }
 
     /// <summary>
@@ -64,14 +63,8 @@ public sealed class IrbisCatalog
             ISyncProvider provider
         )
     {
-        _provider = provider;
+        Provider = provider;
     }
-
-    #endregion
-
-    #region Private members
-
-    private readonly ISyncProvider _provider;
 
     #endregion
 
@@ -80,32 +73,71 @@ public sealed class IrbisCatalog
     /// <summary>
     /// Получение интерфейса из провайдера.
     /// </summary>
-    public static ICatalog FromProvider (ISyncProvider provider) =>
-        new IrbisCatalog (provider);
+    public static ICatalog FromProvider
+        (
+            ISyncProvider provider
+        )
+    {
+        Sure.NotNull (provider);
+
+        return new IrbisCatalog (provider);
+    }
 
     #endregion
 
     #region ICatalog members
 
     /// <inheritdoc cref="ICatalog.FormatRecord"/>
-    public string? FormatRecord (int mfn, string? format = null) =>
-        _provider.FormatRecord (format ?? IrbisFormat.Brief, mfn);
+    public string? FormatRecord
+        (
+            int mfn,
+            string? format = null
+        )
+    {
+        Sure.Positive (mfn);
+
+        return Provider.FormatRecord (format ?? IrbisFormat.Brief, mfn);
+    }
 
     /// <inheritdoc cref="ICatalog.ListTerms"/>
-    public string[] ListTerms (string prefix) => throw new NotImplementedException();
+    public string[] ListTerms
+        (
+            string prefix
+        )
+    {
+        Sure.NotNullNorEmpty (prefix);
+
+        throw new NotImplementedException();
+    }
 
     /// <inheritdoc cref="ICatalog.ReadRecord"/>
-    public Record? ReadRecord (int mfn) => _provider.ReadRecord (mfn);
+    public Record? ReadRecord
+        (
+            int mfn
+        )
+    {
+        Sure.Positive (mfn);
+
+        return Provider.ReadRecord (mfn);
+    }
 
     /// <inheritdoc cref="ICatalog.SearchRecords"/>
-    public int[] SearchRecords (string expression) => _provider.Search (expression);
+    public int[] SearchRecords
+        (
+            string expression
+        )
+    {
+        Sure.NotNullNorEmpty (expression);
+
+        return Provider.Search (expression);
+    }
 
     #endregion
 
     #region IDisposable members
 
     /// <inheritdoc cref="IDisposable.Dispose"/>
-    public void Dispose() => _provider.Dispose();
+    public void Dispose() => Provider.Dispose();
 
     #endregion
 }

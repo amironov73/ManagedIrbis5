@@ -4,10 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
 /* ICatalog.cs -- интерфейс электронного каталога для подсистемы книгообеспеченности
  * Ars Magna project, http://arsmagna.ru
@@ -23,34 +19,44 @@ using ManagedIrbis;
 
 #nullable enable
 
-namespace Istu.BookSupply.Interfaces
+namespace Istu.BookSupply.Interfaces;
+
+/// <summary>
+/// Интерфейс электронного каталога для подсистемы книгообеспеченности.
+/// </summary>
+public interface ICatalog
+    : IDisposable
 {
     /// <summary>
-    /// Интерфейс электронного каталога для подсистемы книгообеспеченности.
+    /// Форматирование записи.
     /// </summary>
-    public interface ICatalog
-        : IDisposable
-    {
-        /// <summary>
-        /// Форматирование записи.
-        /// </summary>
-        string? FormatRecord (int mfn, string? format = null);
+    string? FormatRecord
+        (
+            int mfn,
+            string? format = null
+        );
 
-        /// <summary>
-        /// Перечисление терминов с указанным префиксом.
-        /// </summary>
-        string[] ListTerms (string prefix);
+    /// <summary>
+    /// Перечисление терминов с указанным префиксом.
+    /// </summary>
+    string[] ListTerms
+        (
+            string prefix
+        );
 
-        /// <summary>
-        /// Чтение записи по ее MFN.
-        /// </summary>
-        Record? ReadRecord (int mfn);
+    /// <summary>
+    /// Чтение записи по ее MFN.
+    /// </summary>
+    Record? ReadRecord
+        (
+            int mfn
+        );
 
-        /// <summary>
-        /// Прямой поиск записей (по поисковому словарю).
-        /// </summary>
-        int[] SearchRecords (string expression);
-
-    } // interface ICatalog
-
-} // namespace Istu.BookSupply.Interfaces
+    /// <summary>
+    /// Прямой поиск записей (по поисковому словарю).
+    /// </summary>
+    int[] SearchRecords
+        (
+            string expression
+        );
+}
