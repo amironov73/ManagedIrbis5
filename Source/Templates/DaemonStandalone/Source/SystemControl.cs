@@ -3,15 +3,12 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable CoVariantArrayConversion
+// ReSharper disable FieldCanBeMadeReadOnly.Global
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
 // ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedAutoPropertyAccessor.Global
 
-/* ServiceControl.cs -- управление сервисами под Windows
+/* SystemControl.cs -- простая обертка над systemctl
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,11 +18,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
-
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 #endregion
 
@@ -34,10 +26,19 @@ using Microsoft.Extensions.Logging;
 namespace DaemonStandalone;
 
 /// <summary>
-/// Управление сервисами под Windows.
+/// Простая обертка над <c>systemctl</c>.
 /// </summary>
-public static class ServiceControl
+public static class SystemControl
 {
+    #region Properties
+
+    /// <summary>
+    /// Директория, в которой хранятся описания сервисов для <c>systemd</c>.
+    /// </summary>
+    public static string UnitPrefix = "/lib/systemd/system";
+
+    #endregion
+
     #region Private members
 
     /// <summary>
@@ -52,47 +53,90 @@ public static class ServiceControl
     /// Запуск программы <c>sc</c>.
     /// </summary>
     /// <param name="args">Аргументы для <c>sc</c>.</param>
-    private static void RunSC
+    private static void RunSystemCtl
         (
             params string[] args
         )
     {
         if (args.Length != 0)
         {
-            Process.Start ("sc", args);
+            Process.Start ("systemctl", args);
         }
     }
 
     #endregion
 
-    #region Public methods
+    #region Public method
+
+    /// <summary>
+    /// Создание файла описания для
+    /// </summary>
+    public static string CreateUnit
+        (
+            string? name = null
+        )
+    {
+        var executable = GetExecutablePath();
+        name ??= Path.GetFileNameWithoutExtension (executable);
+        name += ".service";
+
+        using var stream = File.CreateText (name);
+        stream.WriteLine ("[Unit]");
+        stream.WriteLine ("Description=Ars Magna service");
+        stream.WriteLine();
+
+        stream.WriteLine ("[Service]");
+        stream.WriteLine ($"WorkingDirectory={Path.GetDirectoryName (executable)}");
+        stream.WriteLine ($"ExecStart={executable}");
+        stream.WriteLine ($"SyslogIdentifier={Path.GetFileNameWithoutExtension (name)}");
+        stream.WriteLine ("User=www-data"); // ???
+        stream.WriteLine ("Environment=ASPNETCORE_ENVIRONMENT=Production");
+        stream.WriteLine ("Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false");
+        stream.WriteLine();
+
+        stream.WriteLine ("[Install]");
+        stream.WriteLine ("WantedBy=multi-user.target");
+
+        return name;
+    }
 
     /// <summary>
     /// Регистрация сервиса в системе.
     /// </summary>
     /// <param name="name">Имя сервиса.</param>
-    /// <param name="start">Тип запуска.</param>
-    /// <param name="account">Учетная запись.</param>
     public static void RegisterService
         (
-            string? name = null,
-            string start = "delayed-auto",
-            string account = "NT Authority\\NetworkService"
+            string? name = null
         )
     {
         var executable = GetExecutablePath();
         name ??= Path.GetFileNameWithoutExtension (executable);
 
-        RunSC
+        try
+        {
+            var localName = name + ".service";
+            var globalName = Path.Combine (UnitPrefix, localName);
+            if (!File.Exists (globalName))
+            {
+                if (!File.Exists (localName))
+                {
+                    localName = CreateUnit (name);
+                }
+
+                File.Copy (localName, globalName);
+            }
+        }
+        catch (Exception exception)
+        {
+            Console.Error.WriteLine (exception);
+
+            return;
+        }
+
+        RunSystemCtl
             (
-                "create",
-                name,
-                "binpath=",
-                executable,
-                "start=",
-                start,
-                "obj=",
-                account
+                "enable",
+                name
             );
     }
 
@@ -108,7 +152,7 @@ public static class ServiceControl
         var executable = GetExecutablePath();
         name ??= Path.GetFileNameWithoutExtension (executable);
 
-        RunSC
+        RunSystemCtl
             (
                 "start",
                 name
@@ -127,7 +171,7 @@ public static class ServiceControl
         var executable = GetExecutablePath();
         name ??= Path.GetFileNameWithoutExtension (executable);
 
-        RunSC
+        RunSystemCtl
             (
                 "stop",
                 name
@@ -146,9 +190,9 @@ public static class ServiceControl
         var executable = GetExecutablePath();
         name ??= Path.GetFileNameWithoutExtension (executable);
 
-        RunSC
+        RunSystemCtl
             (
-                "query",
+                "status",
                 name
             );
     }
@@ -165,9 +209,9 @@ public static class ServiceControl
         var executable = GetExecutablePath();
         name ??= Path.GetFileNameWithoutExtension (executable);
 
-        RunSC
+        RunSystemCtl
             (
-                "delete",
+                "disable",
                 name
             );
     }

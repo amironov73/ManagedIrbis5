@@ -3,13 +3,10 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable CoVariantArrayConversion
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable LocalizableElement
-// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedAutoPropertyAccessor.Global
 
 /* Worker.cs -- фоновая функциональность
  * Ars Magna project, http://arsmagna.ru

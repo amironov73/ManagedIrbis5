@@ -3,13 +3,11 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable CoVariantArrayConversion
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable LocalizableElement
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedAutoPropertyAccessor.Global
 
 /* Program.cs -- точка входа в приложение
  * Ars Magna project, http://arsmagna.ru
@@ -74,7 +72,7 @@ internal sealed class Program
     {
         try
         {
-            if (Setup (args))
+            if (ServiceHelper.Setup (args))
             {
                 return 0;
             }
@@ -103,7 +101,7 @@ internal sealed class Program
         )
     {
         var builder = EarlyInitialization (args);
-        Demonize (builder);
+        Demonize (args, builder);
         FinalInitialization (builder);
 
         ApplicationHost = builder.Build();
@@ -161,57 +159,28 @@ internal sealed class Program
     }
 
     /// <summary>
-    /// Регистрация демона в системе.
-    /// </summary>
-    private static bool Setup
-        (
-            string[] args
-        )
-    {
-        if (args.Length == 0)
-        {
-            return false;
-        }
-
-        var command = args[0].ToLowerInvariant();
-        switch (command)
-        {
-            case "create":
-            case "register":
-                ServiceControl.RegisterService();
-                return true;
-
-            case "delete":
-            case "unregister":
-                ServiceControl.UnregisterService();
-                return true;
-
-            case "start":
-                ServiceControl.StartService();
-                return true;
-
-            case "stop":
-                ServiceControl.StopService();
-                return true;
-
-            case "query":
-                ServiceControl.QueryServiceStatus();
-                return true;
-        }
-
-        return false;
-    }
-
-    /// <summary>
     /// Настройка демона.
     /// </summary>
     private static void Demonize
         (
+            string[] args,
             IHostBuilder hostBuilder
         )
     {
         // под отладчиком запускаемся как обычное консольное приложение
-        if (!Debugger.IsAttached)
+        var needDemonize = !Debugger.IsAttached;
+
+        // при явном указании на запуск в консоли тоже запускаемся как обычно
+        if (args.Length != 0)
+        {
+            var command = args[0].ToLowerInvariant();
+            if (command == "console")
+            {
+                needDemonize = false;
+            }
+        }
+
+        if (needDemonize)
         {
             if (RuntimeInformation.IsOSPlatform (OSPlatform.Linux))
             {
@@ -223,7 +192,7 @@ internal sealed class Program
             }
             else
             {
-                throw new ApplicationException ("Unsupported operating system");
+                ServiceHelper.OperatingSystemIsNotSupported();
             }
         }
     }
