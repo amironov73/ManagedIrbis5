@@ -1,250 +1,217 @@
-﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable LocalizableElement
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
-/* Program.cs -- точка входа в программу
+/* Program.cs -- точка входа в демона
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
-
-using AM;
-using AM.Collections;
-
-using ManagedIrbis;
+using System.Diagnostics;
+using System.Reflection;
+using System.Runtime.InteropServices;
 
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
-using Telegram.Bot;
-using Telegram.Bot.Exceptions;
-using Telegram.Bot.Polling;
-using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
+using NLog.Extensions.Logging;
 
 #endregion
 
+#nullable enable
+
 namespace DirtyKesha;
 
-internal class Program
+/// <summary>
+/// Логика настройки и запуска демона.
+/// </summary>
+/// <remarks>Класс нельзя делать <c>static</c> из-за того,
+/// что тогда компилятор запрещает использовать на нём дженерики.
+/// </remarks>
+internal sealed class Program
 {
-    private static readonly string[] _goodTags = { "b", "/b", "i", "/i" };
+    #region Properties
 
-    private static string _Evaluator
-        (
-            Match match
-        )
-    {
-        var tag = match.Groups[1].Value.ToLowerInvariant();
-        if (Array.IndexOf (_goodTags, tag) < 0)
-        {
-            return string.Empty;
-        }
+    /// <summary>
+    /// Конфигурация приложения.
+    /// </summary>
+    public static IConfiguration Configuration { get; private set; } = null!;
 
-        return match.Value;
-    }
+    /// <summary>
+    /// Общий логгер.
+    /// </summary>
+    public static ILogger Logger { get; private set; } = null!;
 
-    private static string _CleanText
-        (
-            string text
-        )
-    {
-        var regex1 = new Regex ("<([A-Za-z/]+).*?>");
-        var regex2 = new Regex ("<[Aa][^>]*?>[^<]*?</[Aa]>");
+    /// <summary>
+    /// Хост приложения
+    /// </summary>
+    public static IHost ApplicationHost { get; private set; } = null!;
 
-        var result = text.Replace ("<br>", "\n")
-            .Replace ("<br/>", "\n")
-            .Replace ("<p>", "\n")
-            .Replace ("</div>", "\n");
-        result = regex2.Replace (result, string.Empty);
-        result = regex1.Replace (result, _Evaluator);
-        result = result.Replace ("()", string.Empty);
+    #endregion
 
-        return result;
-    }
-
-    private static async Task<string[]> GetBooks
-        (
-            string query
-        )
-    {
-        await using var connection = ConnectionFactory.Shared.CreateAsyncConnection();
-        var connectionString = Configuration["connection"].ThrowIfNullOrEmpty();
-        connection.ParseConnectionString (connectionString);
-        await connection.ConnectAsync();
-        if (!connection.IsConnected)
-        {
-            return Array.Empty<string>();
-        }
-
-        var expression = $"\"K={query}$\" + \"T={query}$\" + \"A={query}$\"";
-        var parameters = new SearchParameters
-        {
-            Database = connection.Database,
-            Expression = expression,
-            Format = "@",
-            NumberOfRecords = 20
-        };
-        var found = await connection.SearchAsync (parameters);
-        if (found is null || found.Length == 0)
-        {
-            return new[] { "Ничего не найдено" };
-        }
-
-        return found
-            .Select (item => item.Text)
-            .Where (line => !string.IsNullOrEmpty (line))
-            .Select (line => line.ThrowIfNull())
-            .Select (_CleanText)
-            .Where (line => !string.IsNullOrEmpty (line))
-            .OrderBy (line => line)
-            .ToArray();
-    }
-
-    private static IConfiguration Configuration = null!;
+    #region Program entry point
 
     /// <summary>
     /// Точка входа в программу.
     /// </summary>
-    static async Task<int> Main
+    internal static int Main
         (
             string[] args
         )
     {
-        Utility.RegisterEncodingProviders();
-
-        Configuration = new ConfigurationBuilder()
-            .SetBasePath (AppContext.BaseDirectory)
-            .AddJsonFile ("appsettings.json", true, true)
-            .AddEnvironmentVariables()
-            .AddCommandLine (args)
-            .Build();
-
-        var botToken = Configuration["token"].ThrowIfNullOrEmpty();
-        var botClient = new TelegramBotClient (botToken);
-        using var cancellationTokenSource = new CancellationTokenSource();
-
-        // StartReceiving does not block the caller thread.
-        // Receiving is done on the ThreadPool.
-        var receiverOptions = new ReceiverOptions
+        try
         {
-            AllowedUpdates = Array.Empty<UpdateType>() // receive all update types
-        };
-        botClient.StartReceiving
-            (
-                HandleUpdateAsync,
-                HandlePollingErrorAsync,
-                receiverOptions,
-                cancellationTokenSource.Token
-            );
+            if (ServiceHelper.Setup (args))
+            {
+                return 0;
+            }
 
-        var me = await botClient.GetMeAsync (cancellationTokenSource.Token);
+            Initialize (args);
 
-        Console.WriteLine ($"Start listening for @{me.Username}");
-        Console.ReadLine();
+            ApplicationHost.Run();
+        }
+        catch (Exception exception)
+        {
+            Console.Error.WriteLine (exception.ToString());
 
-        // Send cancellation request to stop bot
-        cancellationTokenSource.Cancel();
+            return 1;
+        }
 
         return 0;
     }
 
-    private static Task HandlePollingErrorAsync
+    #endregion
+
+    #region Private members
+
+    private static void Initialize
         (
-            ITelegramBotClient client,
-            Exception exception,
-            CancellationToken cancellationToken
+            string[] args
         )
     {
-        var ErrorMessage = exception switch
-        {
-            ApiRequestException apiRequestException
-                => $"Telegram API Error:\n[{apiRequestException.ErrorCode}]\n{apiRequestException.Message}",
+        var builder = EarlyInitialization (args);
+        Demonize (args, builder);
+        FinalInitialization (builder);
 
-            _ => exception.ToString()
-        };
-
-        Console.WriteLine (ErrorMessage);
-
-        return Task.CompletedTask;
+        ApplicationHost = builder.Build();
+        Logger = ApplicationHost.Services.GetRequiredService<ILogger<Program>>();
+        Logger.LogInformation ("Initialization complete");
     }
 
-    private static async Task HandleUpdateAsync
+    /// <summary>
+    /// Общая инициализация.
+    /// </summary>
+    private static IHostBuilder EarlyInitialization
         (
-            ITelegramBotClient client,
-            Update update,
-            CancellationToken token
+            string[] args
         )
     {
-        // Only process Message updates: https://core.telegram.org/bots/api#message
-        if (update.Message is not { } message)
+        var hostBuilder = Host.CreateDefaultBuilder (args);
+        var configurationBuilder = new ConfigurationBuilder()
+            .SetBasePath (AppContext.BaseDirectory)
+            .AddJsonFile ("appsettings.json", true, true)
+            .AddEnvironmentVariables()
+            .AddCommandLine (args);
+
+        ConfigureUserSecrets (configurationBuilder);
+
+        Configuration = configurationBuilder
+            .Build();
+
+        hostBuilder.ConfigureLogging (logging =>
         {
-            return;
+            logging.ClearProviders();
+            logging.AddNLog (Configuration);
+        });
+        hostBuilder.ConfigureServices (services =>
+        {
+            services.AddOptions();
+            services.AddLocalization();
+        });
+
+        return hostBuilder;
+    }
+
+    /// <summary>
+    /// Возня с полльзовательскими секретами.
+    /// </summary>
+    private static void ConfigureUserSecrets
+        (
+            IConfigurationBuilder configurationBuilder
+        )
+    {
+        var assembly = Assembly.GetEntryAssembly()!;
+
+        // не забудьте настроить для своих нужд!
+        configurationBuilder
+            .AddUserSecrets (assembly);
+    }
+
+    /// <summary>
+    /// Настройка демона.
+    /// </summary>
+    private static void Demonize
+        (
+            string[] args,
+            IHostBuilder hostBuilder
+        )
+    {
+        // под отладчиком запускаемся как обычное консольное приложение
+        var needDemonize = !Debugger.IsAttached;
+
+        // при явном указании на запуск в консоли тоже запускаемся как обычно
+        if (args.Length != 0)
+        {
+            var command = args[0].ToLowerInvariant();
+            if (command == "console")
+            {
+                needDemonize = false;
+            }
         }
 
-        // Only process text messages
-        if (message.Text is not { } messageText)
+        if (needDemonize)
         {
-            return;
-        }
-
-        var chatId = message.Chat.Id;
-
-        Console.WriteLine ($"Received a '{messageText}' message in chat {chatId}.");
-
-        if (messageText == "/start")
-        {
-            await client.SendTextMessageAsync
-                (
-                    chatId,
-                    "Введите ключевое слово, заглавие книги или фамилию автора",
-                    cancellationToken: token
-                );
-            return;
-        }
-
-        await client.SendChatActionAsync
-            (
-                message.Chat.Id,
-                ChatAction.Typing,
-                token
-            );
-
-        var found = await GetBooks (messageText);
-        Console.WriteLine ($"Found: {found.Length}");
-        if (found.IsNullOrEmpty())
-        {
-            await client.SendTextMessageAsync
-                (
-                    chatId,
-                    "К сожалению, ничего не найдено",
-                    cancellationToken: token
-                );
-            return;
-        }
-
-        foreach (var book in found)
-        {
-            await client.SendTextMessageAsync
-                (
-                    chatId,
-                    book,
-                    ParseMode.Html,
-                    cancellationToken: token
-                );
+            if (RuntimeInformation.IsOSPlatform (OSPlatform.Linux))
+            {
+                hostBuilder.UseSystemd();
+            }
+            else if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
+            {
+                hostBuilder.UseWindowsService();
+            }
+            else
+            {
+                ServiceHelper.OperatingSystemIsNotSupported();
+            }
         }
     }
+
+    /// <summary>
+    /// Специфичная для приложения инициализация.
+    /// </summary>
+    private static void FinalInitialization
+        (
+            IHostBuilder hostBuilder
+        )
+    {
+        hostBuilder.ConfigureServices (services =>
+        {
+            services.AddHostedService<Worker>();
+        });
+
+        // добавляйте свою инициализацию сюда
+    }
+
+    #endregion
 }
