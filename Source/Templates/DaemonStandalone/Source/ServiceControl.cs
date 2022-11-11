@@ -21,11 +21,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
-
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 #endregion
 
@@ -45,7 +40,12 @@ public static class ServiceControl
     /// </summary>
     private static string GetExecutablePath()
     {
-        return Assembly.GetEntryAssembly()!.Location;
+        // .NET подсовывает .dll, меняем на .exe
+        return Path.ChangeExtension
+            (
+                Assembly.GetEntryAssembly()!.Location,
+                ".exe"
+            );
     }
 
     /// <summary>
@@ -59,7 +59,27 @@ public static class ServiceControl
     {
         if (args.Length != 0)
         {
-            Process.Start ("sc", args);
+            var startInfo = new ProcessStartInfo ("sc")
+            {
+                UseShellExecute = false
+            };
+            foreach (var item in args)
+            {
+                startInfo.ArgumentList.Add (item);
+            }
+
+            var process = Process.Start (startInfo);
+            if (process is null)
+            {
+                Environment.FailFast ("Can't run sc");
+            }
+
+            process.WaitForExit();
+            var exitCode = process.ExitCode;
+            if (exitCode != 0)
+            {
+                Environment.FailFast ($"Error code from sc: {exitCode}");
+            }
         }
     }
 

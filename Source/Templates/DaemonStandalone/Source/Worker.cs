@@ -28,7 +28,7 @@ using Microsoft.Extensions.Logging;
 namespace DaemonStandalone;
 
 /// <summary>
-/// Фоновая функциональность
+/// Фоновая функциональность.
 /// </summary>
 public sealed class Worker
     : BackgroundService

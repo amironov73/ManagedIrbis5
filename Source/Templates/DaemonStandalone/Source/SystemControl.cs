@@ -60,7 +60,13 @@ public static class SystemControl
     {
         if (args.Length != 0)
         {
-            Process.Start ("systemctl", args);
+            var process = Process.Start ("systemctl", args);
+            process.WaitForExit();
+            var exitCode = process.ExitCode;
+            if (exitCode != 0)
+            {
+                Environment.FailFast ($"Error code from systemctl: {exitCode}");
+            }
         }
     }
 
@@ -124,6 +130,8 @@ public static class SystemControl
                 }
 
                 File.Copy (localName, globalName);
+
+                RunSystemCtl ("daemon-reload");
             }
         }
         catch (Exception exception)
