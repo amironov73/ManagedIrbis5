@@ -2,6 +2,7 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
+        <ApplicationIcon>airplane.ico</ApplicationIcon>
     </PropertyGroup>
 
     <ItemGroup>

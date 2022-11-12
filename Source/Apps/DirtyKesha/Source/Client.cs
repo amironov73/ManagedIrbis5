@@ -18,6 +18,8 @@
 
 using System;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -213,6 +215,33 @@ internal sealed class Client
     }
 
     /// <summary>
+    /// Создание клиента согласно настройкам.
+    /// </summary>
+    private static TelegramBotClient CreateClient()
+    {
+        var proxyAddress = Program.Configuration["http-proxy"];
+        var botToken = Program.Configuration["token"].ThrowIfNullOrEmpty();
+        TelegramBotClient result;
+
+        if (!string.IsNullOrEmpty (proxyAddress))
+        {
+            var proxyPort = Program.Configuration["proxy-port"].SafeToInt32 (8080);
+            var webProxy = new WebProxy (proxyAddress, proxyPort);
+            var httpClient = new HttpClient
+                (
+                    new HttpClientHandler { Proxy = webProxy, UseProxy = true }
+                );
+            result = new TelegramBotClient (botToken, httpClient);
+        }
+        else
+        {
+            result = new TelegramBotClient (botToken);
+        }
+
+        return result;
+    }
+
+    /// <summary>
     /// Запуск клиента.
     /// </summary>
     public static async void RunBot
@@ -220,8 +249,7 @@ internal sealed class Client
             CancellationToken cancellationToken
         )
     {
-        var botToken = Program.Configuration["token"].ThrowIfNullOrEmpty();
-        var botClient = new TelegramBotClient (botToken);
+        var botClient = CreateClient();
 
         // StartReceiving does not block the caller thread.
         // Receiving is done on the ThreadPool.
