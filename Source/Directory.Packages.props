@@ -67,14 +67,14 @@
         <PackageVersion Include="NLog" Version="5.0.5"/>
         <PackageVersion Include="NLog.Extensions.Logging" Version="5.1.0"/>
         <PackageVersion Include="NLog.Schema" Version="5.0.5"/>
-        <PackageVersion Include="NuGet.Common" Version="6.3.1"/>
-        <PackageVersion Include="NuGet.Configuration" Version="6.3.1"/>
-        <PackageVersion Include="NuGet.DependencyResolver.Core" Version="6.3.1"/>
-        <PackageVersion Include="NuGet.Frameworks" Version="6.3.1"/>
-        <PackageVersion Include="NuGet.LibraryModel" Version="6.3.1"/>
-        <PackageVersion Include="NuGet.Packaging" Version="6.3.1"/>
-        <PackageVersion Include="NuGet.ProjectModel" Version="6.3.1"/>
-        <PackageVersion Include="NuGet.Protocol" Version="6.3.1"/>
+        <PackageVersion Include="NuGet.Common" Version="6.4.0"/>
+        <PackageVersion Include="NuGet.Configuration" Version="6.4.0"/>
+        <PackageVersion Include="NuGet.DependencyResolver.Core" Version="6.4.0"/>
+        <PackageVersion Include="NuGet.Frameworks" Version="6.4.0"/>
+        <PackageVersion Include="NuGet.LibraryModel" Version="6.4.0"/>
+        <PackageVersion Include="NuGet.Packaging" Version="6.4.0"/>
+        <PackageVersion Include="NuGet.ProjectModel" Version="6.4.0"/>
+        <PackageVersion Include="NuGet.Protocol" Version="6.4.0"/>
         <PackageVersion Include="Pidgin" Version="3.1.0"/>
         <PackageVersion Include="Polly" Version="7.2.3"/>
         <PackageVersion Include="ReactiveHistory" Version="0.10.7"/>
