@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable LocalizableElement
 
 /* SubString.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -24,37 +25,59 @@ namespace AM.Drawing.HtmlRenderer.Core.Utils;
 /// </summary>
 internal sealed class SubString
 {
-    #region Fields and Consts
+    #region Properties
 
     /// <summary>
     /// the full string that this sub-string is part of
     /// </summary>
-    private readonly string _fullString;
+    public string FullString { get; }
 
     /// <summary>
     /// the start index of the sub-string
     /// </summary>
-    private readonly int _startIdx;
+    public int StartIdx { get; }
 
     /// <summary>
-    /// the length of the sub-string starting at <see cref="_startIdx"/>
+    /// the length of the sub-string starting at <see cref="StartIdx"/>
     /// </summary>
-    private readonly int _length;
+    public int Length { get; }
+
+    /// <summary>
+    /// Get string char at specific index.
+    /// </summary>
+    /// <param name="idx">the idx to get the char at</param>
+    /// <returns>char at index</returns>
+    public char this [int idx]
+    {
+        get
+        {
+            if (idx < 0 || idx > Length)
+            {
+                throw new ArgumentOutOfRangeException (nameof (idx), "must be within the string range");
+            }
+
+            return FullString[StartIdx + idx];
+        }
+    }
 
     #endregion
 
+    #region Construction
 
     /// <summary>
     /// Init sub-string that is the full string.
     /// </summary>
     /// <param name="fullString">the full string that this sub-string is part of</param>
-    public SubString(string fullString)
+    public SubString
+        (
+            string fullString
+        )
     {
-        ArgChecker.AssertArgNotNull(fullString, "fullString");
+        Sure.NotNull (fullString);
 
-        _fullString = fullString;
-        _startIdx = 0;
-        _length = fullString.Length;
+        FullString = fullString;
+        StartIdx = 0;
+        Length = fullString.Length;
     }
 
     /// <summary>
@@ -64,57 +87,24 @@ internal sealed class SubString
     /// <param name="startIdx">the start index of the sub-string</param>
     /// <param name="length">the length of the sub-string starting at <paramref name="startIdx"/></param>
     /// <exception cref="ArgumentNullException"><paramref name="fullString"/> is null</exception>
-    public SubString(string fullString, int startIdx, int length)
+    public SubString
+        (
+            string fullString,
+            int startIdx,
+            int length
+        )
     {
-        ArgChecker.AssertArgNotNull(fullString, "fullString");
-        if (startIdx < 0 || startIdx >= fullString.Length)
-            throw new ArgumentOutOfRangeException("startIdx", "Must within fullString boundries");
-        if (length < 0 || startIdx + length > fullString.Length)
-            throw new ArgumentOutOfRangeException("length", "Must within fullString boundries");
+        Sure.NotNull (fullString);
+        Sure.InRange (startIdx, 0, fullString.Length);
+        Sure.InRange (length, 0, fullString.Length - startIdx);
 
-        _fullString = fullString;
-        _startIdx = startIdx;
-        _length = length;
+        FullString = fullString;
+        StartIdx = startIdx;
+        Length = length;
     }
 
-    /// <summary>
-    /// the full string that this sub-string is part of
-    /// </summary>
-    public string FullString
-    {
-        get { return _fullString; }
-    }
+    #endregion
 
-    /// <summary>
-    /// the start index of the sub-string
-    /// </summary>
-    public int StartIdx
-    {
-        get { return _startIdx; }
-    }
-
-    /// <summary>
-    /// the length of the sub-string starting at <see cref="_startIdx"/>
-    /// </summary>
-    public int Length
-    {
-        get { return _length; }
-    }
-
-    /// <summary>
-    /// Get string char at specific index.
-    /// </summary>
-    /// <param name="idx">the idx to get the char at</param>
-    /// <returns>char at index</returns>
-    public char this[int idx]
-    {
-        get
-        {
-            if (idx < 0 || idx > _length)
-                throw new ArgumentOutOfRangeException("idx", "must be within the string range");
-            return _fullString[_startIdx + idx];
-        }
-    }
 
     /// <summary>
     /// Is the sub-string is empty string.
@@ -122,7 +112,7 @@ internal sealed class SubString
     /// <returns>true - empty string, false - otherwise</returns>
     public bool IsEmpty()
     {
-        return _length < 1;
+        return Length < 1;
     }
 
     /// <summary>
@@ -131,11 +121,14 @@ internal sealed class SubString
     /// <returns>true - empty or whitespace string, false - otherwise</returns>
     public bool IsEmptyOrWhitespace()
     {
-        for (int i = 0; i < _length; i++)
+        for (var i = 0; i < Length; i++)
         {
-            if (!char.IsWhiteSpace(_fullString, _startIdx + i))
+            if (!char.IsWhiteSpace (FullString, StartIdx + i))
+            {
                 return false;
+            }
         }
+
         return true;
     }
 
@@ -145,13 +138,19 @@ internal sealed class SubString
     /// <returns>true - empty or whitespace string, false - otherwise</returns>
     public bool IsWhitespace()
     {
-        if (_length < 1)
-            return false;
-        for (int i = 0; i < _length; i++)
+        if (Length < 1)
         {
-            if (!char.IsWhiteSpace(_fullString, _startIdx + i))
-                return false;
+            return false;
         }
+
+        for (var i = 0; i < Length; i++)
+        {
+            if (!char.IsWhiteSpace (FullString, StartIdx + i))
+            {
+                return false;
+            }
+        }
+
         return true;
     }
 
@@ -162,7 +161,7 @@ internal sealed class SubString
     /// <returns>new string that is the sub-string represented by this instance</returns>
     public string CutSubstring()
     {
-        return _length > 0 ? _fullString.Substring(_startIdx, _length) : string.Empty;
+        return Length > 0 ? FullString.Substring (StartIdx, Length) : string.Empty;
     }
 
     /// <summary>
@@ -172,20 +171,32 @@ internal sealed class SubString
     /// <param name="length">The number of characters in the substring. </param>
     /// <returns>A String equivalent to the substring of length length that begins at startIndex in this instance, or
     /// Empty if startIndex is equal to the length of this instance and length is zero. </returns>
-    public string Substring(int startIdx, int length)
+    public string Substring
+        (
+            int startIdx,
+            int length
+        )
     {
-        if (startIdx < 0 || startIdx > _length)
-            throw new ArgumentOutOfRangeException("startIdx");
-        if (length > _length)
-            throw new ArgumentOutOfRangeException("length");
-        if (startIdx + length > _length)
-            throw new ArgumentOutOfRangeException("length");
+        if (startIdx < 0 || startIdx > Length)
+        {
+            throw new ArgumentOutOfRangeException (nameof (startIdx));
+        }
 
-        return _fullString.Substring(_startIdx + startIdx, length);
+        if (length > Length)
+        {
+            throw new ArgumentOutOfRangeException (nameof (length));
+        }
+
+        if (startIdx + length > Length)
+        {
+            throw new ArgumentOutOfRangeException (nameof (length));
+        }
+
+        return FullString.Substring (StartIdx + startIdx, length);
     }
 
     public override string ToString()
     {
-        return string.Format("Sub-string: {0}", _length > 0 ? _fullString.Substring(_startIdx, _length) : string.Empty);
+        return $"Sub-string: {(Length > 0 ? FullString.Substring (StartIdx, Length) : string.Empty)}";
     }
 }
