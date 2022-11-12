@@ -196,27 +196,21 @@ public class GraphPane
     /// <value>A reference to a <see cref="CurveList"/> collection object</value>
     public CurveList CurveList
     {
-        get { return _curveList; }
-        set { _curveList = value; }
+        get => _curveList;
+        set => _curveList = value;
     }
 
     /// <summary>
     /// Accesses the <see cref="XAxis"/> for this graph
     /// </summary>
     /// <value>A reference to a <see cref="XAxis"/> object</value>
-    public XAxis XAxis
-    {
-        get { return _xAxis; }
-    }
+    public XAxis XAxis => _xAxis;
 
     /// <summary>
     /// Accesses the <see cref="X2Axis"/> for this graph
     /// </summary>
     /// <value>A reference to a <see cref="X2Axis"/> object</value>
-    public X2Axis X2Axis
-    {
-        get { return _x2Axis; }
-    }
+    public X2Axis? X2Axis => _x2Axis;
 
     /// <summary>
     /// Accesses the primary <see cref="YAxis"/> for this graph
@@ -224,10 +218,7 @@ public class GraphPane
     /// <value>A reference to a <see cref="YAxis"/> object</value>
     /// <seealso cref="YAxisList" />
     /// <seealso cref="Y2AxisList" />
-    public YAxis YAxis
-    {
-        get { return _yAxisList[0] as YAxis; }
-    }
+    public YAxis? YAxis => _yAxisList[0] as YAxis;
 
     /// <summary>
     /// Accesses the primary <see cref="Y2Axis"/> for this graph
@@ -235,43 +226,28 @@ public class GraphPane
     /// <value>A reference to a <see cref="Y2Axis"/> object</value>
     /// <seealso cref="YAxisList" />
     /// <seealso cref="Y2AxisList" />
-    public Y2Axis Y2Axis
-    {
-        get { return _y2AxisList[0] as Y2Axis; }
-    }
+    public Y2Axis? Y2Axis => _y2AxisList[0] as Y2Axis;
 
     /// <summary>
     /// Gets the collection of Y axes that belong to this <see cref="GraphPane" />.
     /// </summary>
-    public YAxisList YAxisList
-    {
-        get { return _yAxisList; }
-    }
+    public YAxisList YAxisList => _yAxisList;
 
     /// <summary>
     /// Gets the collection of Y2 axes that belong to this <see cref="GraphPane" />.
     /// </summary>
-    public Y2AxisList Y2AxisList
-    {
-        get { return _y2AxisList; }
-    }
+    public Y2AxisList Y2AxisList => _y2AxisList;
 
     /// <summary>
     /// Gets the <see cref="Chart" /> instance for this <see cref="GraphPane" />.
     /// </summary>
-    public Chart Chart
-    {
-        get { return _chart; }
-    }
+    public Chart Chart => _chart;
 
     /// <summary>
     /// Gets the <see cref="BarSettings" /> instance for this <see cref="GraphPane" />,
     /// which stores the global properties for bar type charts.
     /// </summary>
-    public BarSettings BarSettings
-    {
-        get { return _barSettings; }
-    }
+    public BarSettings BarSettings => _barSettings;
 
     #endregion
 
@@ -292,8 +268,8 @@ public class GraphPane
                   " or just the visible data points")]
     public bool IsIgnoreInitial
     {
-        get { return _isIgnoreInitial; }
-        set { _isIgnoreInitial = value; }
+        get => _isIgnoreInitial;
+        set => _isIgnoreInitial = value;
     }
 
     /// <summary> Gets or sets a boolean value that determines if the auto-scaled axis ranges will
@@ -305,8 +281,8 @@ public class GraphPane
     /// all data points when calculating scale ranges.</remarks>
     public bool IsBoundedRanges
     {
-        get { return _isBoundedRanges; }
-        set { _isBoundedRanges = value; }
+        get => _isBoundedRanges;
+        set => _isBoundedRanges = value;
     }
 
     /// <summary>Gets or sets a value that determines whether or not initial
@@ -319,8 +295,8 @@ public class GraphPane
     /// this value. </remarks>
     public bool IsIgnoreMissing
     {
-        get { return _isIgnoreMissing; }
-        set { _isIgnoreMissing = value; }
+        get => _isIgnoreMissing;
+        set => _isIgnoreMissing = value;
     }
 
     /// <summary>
@@ -335,8 +311,8 @@ public class GraphPane
     /// </remarks>
     public bool IsAlignGrids
     {
-        get { return _isAlignGrids; }
-        set { _isAlignGrids = value; }
+        get => _isAlignGrids;
+        set => _isAlignGrids = value;
     }
 
     /// <summary>Determines how the <see cref="LineItem"/>
@@ -346,8 +322,8 @@ public class GraphPane
     /// <seealso cref="Default.LineType"/>
     public LineType LineType
     {
-        get { return _lineType; }
-        set { _lineType = value; }
+        get => _lineType;
+        set => _lineType = value;
     }
 
     /// <summary>
@@ -355,18 +331,12 @@ public class GraphPane
     /// this <see cref="GraphPane" /> is empty.  Note that this value is only used for
     /// the <see cref="ZedGraphControl" />.
     /// </summary>
-    public bool IsZoomed
-    {
-        get { return !_zoomStack.IsEmpty; }
-    }
+    public bool IsZoomed => !_zoomStack.IsEmpty;
 
     /// <summary>
     /// Gets a reference to the <see cref="ZoomStateStack" /> for this <see cref="GraphPane" />.
     /// </summary>
-    public ZoomStateStack ZoomStack
-    {
-        get { return _zoomStack; }
-    }
+    public ZoomStateStack ZoomStack => _zoomStack;
 
     #endregion
 
@@ -697,10 +667,14 @@ public class GraphPane
         if (_isAlignGrids)
         {
             foreach (Axis axis in _yAxisList)
+            {
                 ForceNumTics (axis, maxTics);
+            }
 
             foreach (Axis axis in _y2AxisList)
+            {
                 ForceNumTics (axis, maxTics);
+            }
         }
     }
 
@@ -775,9 +749,14 @@ public class GraphPane
         _xAxis.Scale.SetupScaleData (this, _xAxis);
         _x2Axis.Scale.SetupScaleData (this, _x2Axis);
         foreach (Axis axis in _yAxisList)
+        {
             axis.Scale.SetupScaleData (this, axis);
+        }
+
         foreach (Axis axis in _y2AxisList)
+        {
             axis.Scale.SetupScaleData (this, axis);
+        }
 
         // Draw the GraphItems that are behind the Axis objects
         if (showGraf)
@@ -886,16 +865,20 @@ public class GraphPane
         var showGraf = _xAxis.Scale._min < _xAxis.Scale._max &&
                        _x2Axis.Scale._min < _x2Axis.Scale._max;
         foreach (Axis axis in _yAxisList)
+        {
             if (axis.Scale._min >= axis.Scale._max)
             {
                 showGraf = false;
             }
+        }
 
         foreach (Axis axis in _y2AxisList)
+        {
             if (axis.Scale._min >= axis.Scale._max)
             {
                 showGraf = false;
             }
+        }
 
         return showGraf;
     }
@@ -1096,9 +1079,14 @@ public class GraphPane
         _xAxis.SetMinSpaceBuffer (g, this, bufferFraction, isGrowOnly);
         _x2Axis.SetMinSpaceBuffer (g, this, bufferFraction, isGrowOnly);
         foreach (Axis axis in _yAxisList)
+        {
             axis.SetMinSpaceBuffer (g, this, bufferFraction, isGrowOnly);
+        }
+
         foreach (Axis axis in _y2AxisList)
+        {
             axis.SetMinSpaceBuffer (g, this, bufferFraction, isGrowOnly);
+        }
     }
 
     #endregion
@@ -1563,14 +1551,23 @@ public class GraphPane
     /// coordinate system in which the X,Y pair is defined.</param>
     /// <returns>A point in screen coordinates that corresponds to the
     /// specified user point.</returns>
-    public PointF GeneralTransform (PointF ptF, CoordType coord)
+    public PointF GeneralTransform
+        (
+            PointF ptF,
+            CoordType coord
+        )
     {
         // Setup the scaling data based on the chart rect
         _xAxis.Scale.SetupScaleData (this, _xAxis);
         foreach (Axis axis in _yAxisList)
+        {
             axis.Scale.SetupScaleData (this, axis);
+        }
+
         foreach (Axis axis in _y2AxisList)
+        {
             axis.Scale.SetupScaleData (this, axis);
+        }
 
         return TransformCoord (ptF.X, ptF.Y, coord);
     }
@@ -1598,9 +1595,14 @@ public class GraphPane
         // Setup the scaling data based on the chart rect
         _xAxis.Scale.SetupScaleData (this, _xAxis);
         foreach (Axis axis in _yAxisList)
+        {
             axis.Scale.SetupScaleData (this, axis);
+        }
+
         foreach (Axis axis in _y2AxisList)
+        {
             axis.Scale.SetupScaleData (this, axis);
+        }
 
         return TransformCoord (x, y, coord);
     }

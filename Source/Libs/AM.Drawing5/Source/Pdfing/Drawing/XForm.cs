@@ -425,7 +425,7 @@ namespace PdfSharpCore.Drawing
         /// </summary>
         internal PdfFormXObject? _pdfForm;  // TODO: make private
 
-        internal XGraphicsPdfRenderer PdfRenderer;
+        internal XGraphicsPdfRenderer? PdfRenderer;
 
     }
 }

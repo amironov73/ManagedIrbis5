@@ -21,6 +21,8 @@ using System.Text;
 
 using AM.Drawing.HtmlRenderer.Adapters.Entities;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -148,7 +150,11 @@ internal static class CommonUtils
     /// <summary>
     /// Get size that is max of <paramref name="size"/> and <paramref name="other"/> for width and height separately.
     /// </summary>
-    public static RSize Max (RSize size, RSize other)
+    public static RSize Max
+        (
+            RSize size,
+            RSize other
+        )
     {
         return new RSize (Math.Max (size.Width, other.Width), Math.Max (size.Height, other.Height));
     }
@@ -158,7 +164,10 @@ internal static class CommonUtils
     /// </summary>
     /// <param name="path">the path to get uri for</param>
     /// <returns>uri or null if not valid</returns>
-    public static Uri TryGetUri (string path)
+    public static Uri? TryGetUri
+        (
+            string path
+        )
     {
         try
         {
@@ -167,8 +176,9 @@ internal static class CommonUtils
                 return new Uri (path);
             }
         }
-        catch
+        catch (Exception exception)
         {
+            Magna.Logger.LogError (exception, nameof (TryGetUri));
         }
 
         return null;
