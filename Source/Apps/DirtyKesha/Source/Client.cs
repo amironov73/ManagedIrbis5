@@ -28,6 +28,7 @@ using AM;
 using AM.Collections;
 
 using ManagedIrbis;
+using ManagedIrbis.Searching;
 
 using Microsoft.Extensions.Logging;
 
@@ -59,6 +60,14 @@ internal sealed class Client
         return Array.IndexOf (_goodTags, tag) < 0
             ? string.Empty
             : match.Value;
+    }
+
+    private static string _GetDescription
+        (
+            string text
+        )
+    {
+        return text;
     }
 
     private static string _CleanText
@@ -94,22 +103,15 @@ internal sealed class Client
             return Array.Empty<string>();
         }
 
-        var expression = $"\"K={query}$\" + \"T={query}$\" + \"A={query}$\"";
-        var parameters = new SearchParameters
-        {
-            Database = connection.Database,
-            Expression = expression,
-            Format = "@",
-            NumberOfRecords = 20
-        };
-        var found = await connection.SearchAsync (parameters);
-        if (found is null || found.Length == 0)
+        var serviceProvider = Magna.Host.Services;
+        var teapot = new AsyncTeapotSearcher (serviceProvider);
+        var found = await teapot.SearchFormatAsync (connection, query);
+        if (found.IsNullOrEmpty())
         {
             return Array.Empty<string>();
         }
 
         return found
-            .Select (item => item.Text)
             .Where (line => !string.IsNullOrEmpty (line))
             .Select (line => line.ThrowIfNull())
             .ToArray();
@@ -123,6 +125,8 @@ internal sealed class Client
         var found = await SearchForBooks (query);
 
         return found
+            .Take (20)
+            .Select (_GetDescription)
             .Select (_CleanText)
             .Where (line => !string.IsNullOrEmpty (line))
             .OrderBy (line => line)
@@ -149,6 +153,9 @@ internal sealed class Client
         return Task.CompletedTask;
     }
 
+    /// <summary>
+    /// Ответ на запрос пользователя.
+    /// </summary>
     private static async Task HandleUpdateAsync
         (
             ITelegramBotClient client,

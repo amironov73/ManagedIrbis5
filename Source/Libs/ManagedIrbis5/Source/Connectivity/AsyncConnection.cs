@@ -560,7 +560,32 @@ public sealed class AsyncConnection
             return false;
         }
 
-        parameters.Result = response.ReadRemainingUtfLines();
+        var result = new List<string>();
+        var lines = response.ReadRemainingUtfLines();
+        if (!lines.IsNullOrEmpty())
+        {
+            result.Capacity = lines.Length;
+            foreach (var line in lines)
+            {
+                var item = line;
+                var index = item.IndexOf ('#');
+                if (index > 0)
+                {
+                    item = item.Substring (index + 1);
+                }
+
+                item = IrbisText.IrbisToWindows (item);
+                if (!string.IsNullOrEmpty (item))
+                {
+                    item = item.Trim();
+                }
+
+                item ??= string.Empty;
+                result.Add (item);
+            }
+        }
+
+        parameters.Result = result.ToArray();
 
         return true;
     }

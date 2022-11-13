@@ -25,6 +25,7 @@ using AM;
 using AM.Collections;
 using AM.Text;
 
+using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Providers;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -103,7 +104,7 @@ public class AsyncTeapotSearcher
             string query
         )
     {
-        _logger.LogTrace (nameof (BuildSearchExpressionAsync) + ": {Query}", query);
+        _logger.LogTrace ("{Query}", query);
 
         if (string.IsNullOrWhiteSpace (query))
         {
@@ -210,6 +211,90 @@ public class AsyncTeapotSearcher
             .ToArray();
 
         return result;
+    }
+
+    /// <inheritdoc cref="ITeapotSearcher.Search"/>
+    public async Task<string[]> SearchFormatAsync
+        (
+            IAsyncProvider connection,
+            string query,
+            string? database = null,
+            string? format = null,
+            IRelevanceEvaluator? evaluator = null,
+            int limit = 500
+        )
+    {
+        Sure.NotNull (connection);
+        connection.EnsureConnected();
+
+        database = connection.EnsureDatabase (database);
+        if (limit < 1)
+        {
+            limit = 500;
+        }
+
+        var expression = await BuildSearchExpressionAsync (query);
+        if (string.IsNullOrWhiteSpace (expression))
+        {
+            return Array.Empty<string>();
+        }
+
+        evaluator ??= ServiceProvider.GetService <IRelevanceEvaluator>()
+            ?? new StandardRelevanceEvaluator (ServiceProvider, expression);
+
+        var searchParameters = new SearchParameters
+        {
+            Database = database,
+            Expression = expression,
+            NumberOfRecords = limit * 2
+        };
+        var found = await connection.SearchAsync (searchParameters);
+        if (found is null)
+        {
+            return Array.Empty<string>();
+        }
+
+        var batch = FoundItem.ToMfn (found);
+        var records = await connection.ReadRecordsAsync (database, batch);
+        if (records.IsNullOrEmpty())
+        {
+            return Array.Empty<string>();
+        }
+
+        var pairs = new List<Pair<Record, double>>();
+        foreach (var record in records)
+        {
+            var relevance = evaluator.EvaluateRelevance (record);
+            var pair = new Pair<Record, double> (record, relevance);
+            pairs.Add (pair);
+        }
+
+        var mfns = pairs
+            .OrderByDescending (pair => pair.Second)
+            .Take (limit)
+            .Select (pair => pair.First!.Mfn)
+            .ToArray();
+        if (mfns.IsNullOrEmpty())
+        {
+            return Array.Empty<string>();
+        }
+
+        var formatParameters = new FormatRecordParameters
+        {
+            Database = connection.EnsureDatabase(),
+            Format = format ?? "@",
+            Mfns = mfns
+        };
+        if (!await connection.FormatRecordsAsync (formatParameters))
+        {
+            return Array.Empty<string>();
+        }
+
+        var result = formatParameters.Result.AsArray();
+
+        return found.IsNullOrEmpty()
+            ? Array.Empty<string>()
+            : result;
     }
 
     /// <inheritdoc cref="ITeapotSearcher.Search"/>

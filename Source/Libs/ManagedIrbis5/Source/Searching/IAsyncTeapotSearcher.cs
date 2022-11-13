@@ -4,8 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMemberInSuper.Global
 // ReSharper disable UnusedType.Global
@@ -44,6 +42,20 @@ public interface IAsyncTeapotSearcher
             IAsyncProvider connection,
             string query,
             string? database = null,
+            IRelevanceEvaluator? evaluator = null,
+            int limit = 500
+        );
+
+    /// <summary>
+    /// Поиск записей, удовлетворяющих запросу на естественном языке
+    /// с последующим расформатированием.
+    /// </summary>
+    Task<string[]> SearchFormatAsync
+        (
+            IAsyncProvider connection,
+            string query,
+            string? database = null,
+            string? format = null,
             IRelevanceEvaluator? evaluator = null,
             int limit = 500
         );
