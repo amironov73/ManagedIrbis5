@@ -2,14 +2,9 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMemberInSuper.Global
-// ReSharper disable UnusedParameter.Local
 
 /* IAsyncConnection.cs -- интерфейс асинхронного подключения
  * Ars Magna project, http://arsmagna.ru
@@ -28,25 +23,25 @@ using ManagedIrbis.Providers;
 
 #nullable enable
 
-namespace ManagedIrbis
+namespace ManagedIrbis;
+
+/// <summary>
+/// Интерфейс асинхронного подключения.
+/// </summary>
+public interface IAsyncConnection
+    : IAsyncProvider,
+    IConnectionSettings,
+    ISetLastError
 {
     /// <summary>
-    /// Интерфейс асинхронного подключения.
+    /// Обращение к серверу ИРБИС64 асинхронным образом.
     /// </summary>
-    public interface IAsyncConnection
-        : IAsyncProvider,
-        IConnectionSettings,
-        ISetLastError
-    {
-        /// <summary>
-        /// Обращение к серверу ИРБИС64 асинхронным образом.
-        /// </summary>
-        /// <param name="query">Запрос.</param>
-        /// <returns>Возвращенный сервером ответ
-        /// либо <c>null</c>, если произошла
-        /// ошибка сетевого обмена.</returns>
-        Task<Response?> ExecuteAsync(AsyncQuery query);
-
-    } // interface IAsyncConnection
-
-} // namespace ManagedIrbis
+    /// <param name="query">Запрос.</param>
+    /// <returns>Возвращенный сервером ответ
+    /// либо <c>null</c>, если произошла
+    /// ошибка сетевого обмена.</returns>
+    Task<Response?> ExecuteAsync
+        (
+            AsyncQuery query
+        );
+}

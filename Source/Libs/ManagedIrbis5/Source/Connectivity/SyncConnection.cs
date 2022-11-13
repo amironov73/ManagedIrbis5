@@ -2,15 +2,12 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable ReturnTypeCanBeNotNullable
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable UnusedAutoPropertyAccessor.Local
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
@@ -26,14 +23,12 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 using AM;
 using AM.Collections;
 using AM.IO;
-using AM.Linq;
 
 using ManagedIrbis.Gbl;
 using ManagedIrbis.Infrastructure;
@@ -217,6 +212,7 @@ public class SyncConnection
             }
             catch (Exception exception)
             {
+                _logger?.LogError (exception, nameof (ExecuteSync));
                 Debug.WriteLine (exception.Message);
                 if (perfRecord is not null)
                 {
@@ -509,10 +505,12 @@ public class SyncConnection
                 }
 
                 var parts = line.Split ('#', 2);
-                if (parts.Length > 1)
-                {
-                    result.Add (parts[1]);
-                }
+                result.Add
+                    (
+                        parts.Length > 1
+                            ? parts[1]
+                            : line
+                    );
             }
         }
 
