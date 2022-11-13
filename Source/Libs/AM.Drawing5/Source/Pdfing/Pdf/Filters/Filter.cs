@@ -87,7 +87,7 @@ public abstract class Filter
     public byte[] Decode
         (
             byte[] data,
-            PdfDictionary decodeParms
+            PdfDictionary? decodeParms
         )
     {
         return Decode (data, new FilterParms (decodeParms));
