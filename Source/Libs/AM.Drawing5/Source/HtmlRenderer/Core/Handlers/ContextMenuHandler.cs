@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
 
 /* ContextMenuHandler.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -18,7 +19,8 @@ using System.IO;
 using AM.Drawing.HtmlRenderer.Adapters;
 using AM.Drawing.HtmlRenderer.Core.Dom;
 using AM.Drawing.HtmlRenderer.Core.Entities;
-using AM.Drawing.HtmlRenderer.Core.Utils;
+
+using Microsoft.Extensions.Logging;
 
 #endregion
 
@@ -305,10 +307,10 @@ internal sealed class ContextMenuHandler
 
             if (rect != null)
             {
-                bool isVideo = false;
+                var isVideo = false;
                 if (link != null)
                 {
-                    isVideo = link is CssBoxFrame && ((CssBoxFrame)link).IsVideo;
+                    isVideo = link is CssBoxFrame { IsVideo: true };
                     var linkExist = !string.IsNullOrEmpty (link.HrefLink);
                     _contextMenu.AddItem (isVideo ? _openVideo : _openLink, linkExist, OnOpenLinkClick);
                     if (_htmlContainer.IsSelectionEnabled)
@@ -324,8 +326,16 @@ internal sealed class ContextMenuHandler
                     _contextMenu.AddItem (_saveImage, rect.Image != null, OnSaveImageClick);
                     if (_htmlContainer.IsSelectionEnabled)
                     {
-                        _contextMenu.AddItem (_copyImageLink,
-                            !string.IsNullOrEmpty (_currentRect.OwnerBox.GetAttribute ("src")), OnCopyImageLinkClick);
+                        if (_currentRect is { OwnerBox: not null })
+                        {
+                            _contextMenu.AddItem
+                                (
+                                    _copyImageLink,
+                                    !string.IsNullOrEmpty (_currentRect.OwnerBox.GetAttribute ("src")),
+                                    OnCopyImageLinkClick
+                                );
+                        }
+
                         _contextMenu.AddItem (_copyImage, rect.Image != null, OnCopyImageClick);
                     }
 
@@ -374,15 +384,15 @@ internal sealed class ContextMenuHandler
     {
         try
         {
-            if (_contextMenu != null)
-                _contextMenu.Dispose();
+            _contextMenu?.Dispose();
             _contextMenu = null;
             _parentControl = null;
             _currentRect = null;
             _currentLink = null;
         }
-        catch
+        catch (Exception exception)
         {
+            Magna.Logger.LogError (exception, nameof (DisposeContextMenu));
         }
     }
 
@@ -397,7 +407,10 @@ internal sealed class ContextMenuHandler
     {
         try
         {
-            _currentLink?.HtmlContainer?.HandleLinkClicked (_parentControl, _parentControl.MouseLocation, _currentLink);
+            if (_parentControl is not null)
+            {
+                _currentLink?.HtmlContainer?.HandleLinkClicked (_parentControl, _parentControl.MouseLocation, _currentLink);
+            }
         }
         catch (HtmlLinkClickedException)
         {
@@ -416,11 +429,18 @@ internal sealed class ContextMenuHandler
     /// <summary>
     /// Copy the href of a link to clipboard.
     /// </summary>
-    private void OnCopyLinkClick (object sender, EventArgs eventArgs)
+    private void OnCopyLinkClick
+        (
+            object? sender,
+            EventArgs eventArgs
+        )
     {
         try
         {
-            _htmlContainer.Adapter.SetToClipboard (_currentLink.HrefLink);
+            if (_currentLink is { HrefLink: not null })
+            {
+                _htmlContainer.Adapter.SetToClipboard (_currentLink.HrefLink);
+            }
         }
         catch (Exception ex)
         {
@@ -435,13 +455,24 @@ internal sealed class ContextMenuHandler
     /// <summary>
     /// Open save as dialog to save the image
     /// </summary>
-    private void OnSaveImageClick (object sender, EventArgs eventArgs)
+    private void OnSaveImageClick
+        (
+            object? sender,
+            EventArgs eventArgs
+        )
     {
         try
         {
-            var imageSrc = _currentRect.OwnerBox.GetAttribute ("src");
-            _htmlContainer.Adapter.SaveToFile (_currentRect.Image, Path.GetFileName (imageSrc) ?? "image",
-                Path.GetExtension (imageSrc) ?? "png");
+            if (_currentRect is { OwnerBox: not null, Image: not null })
+            {
+                var imageSrc = _currentRect.OwnerBox.GetAttribute ("src");
+                _htmlContainer.Adapter.SaveToFile
+                    (
+                        _currentRect.Image,
+                        Path.GetFileName (imageSrc) ?? "image",
+                        Path.GetExtension (imageSrc) ?? "png"
+                    );
+            }
         }
         catch (Exception ex)
         {
@@ -456,11 +487,22 @@ internal sealed class ContextMenuHandler
     /// <summary>
     /// Copy the image source to clipboard.
     /// </summary>
-    private void OnCopyImageLinkClick (object sender, EventArgs eventArgs)
+    private void OnCopyImageLinkClick
+        (
+            object? sender,
+            EventArgs eventArgs
+        )
     {
         try
         {
-            _htmlContainer.Adapter.SetToClipboard (_currentRect.OwnerBox.GetAttribute ("src"));
+            if (_currentRect is { OwnerBox: not null })
+            {
+                var src = _currentRect.OwnerBox.GetAttribute ("src");
+                if (!string.IsNullOrEmpty (src))
+                {
+                    _htmlContainer.Adapter.SetToClipboard (src);
+                }
+            }
         }
         catch (Exception ex)
         {
@@ -475,11 +517,18 @@ internal sealed class ContextMenuHandler
     /// <summary>
     /// Copy image object to clipboard.
     /// </summary>
-    private void OnCopyImageClick (object sender, EventArgs eventArgs)
+    private void OnCopyImageClick
+        (
+            object? sender,
+            EventArgs eventArgs
+        )
     {
         try
         {
-            _htmlContainer.Adapter.SetToClipboard (_currentRect.Image);
+            if (_currentRect is { Image: not null })
+            {
+                _htmlContainer.Adapter.SetToClipboard (_currentRect.Image);
+            }
         }
         catch (Exception ex)
         {
@@ -494,7 +543,11 @@ internal sealed class ContextMenuHandler
     /// <summary>
     /// Copy selected text.
     /// </summary>
-    private void OnCopyClick (object sender, EventArgs eventArgs)
+    private void OnCopyClick
+        (
+            object? sender,
+            EventArgs eventArgs
+        )
     {
         try
         {
@@ -513,11 +566,18 @@ internal sealed class ContextMenuHandler
     /// <summary>
     /// Select all text.
     /// </summary>
-    private void OnSelectAllClick (object sender, EventArgs eventArgs)
+    private void OnSelectAllClick
+        (
+            object? sender,
+            EventArgs eventArgs
+        )
     {
         try
         {
-            _selectionHandler.SelectAll (_parentControl);
+            if (_parentControl is not null)
+            {
+                _selectionHandler.SelectAll (_parentControl);
+            }
         }
         catch (Exception ex)
         {

@@ -52,13 +52,13 @@ internal sealed class SelectionHandler
     /// the starting word of html selection<br/>
     /// where the user started the selection, if the selection is backwards then it will be the last selected word.
     /// </summary>
-    private CssRect _selectionStart;
+    private CssRect? _selectionStart;
 
     /// <summary>
     /// the ending word of html selection<br/>
     /// where the user ended the selection, if the selection is backwards then it will be the first selected word.
     /// </summary>
-    private CssRect _selectionEnd;
+    private CssRect? _selectionEnd;
 
     /// <summary>
     /// the selection start index if the first selected word is partially selected (-1 if not selected or fully selected)
@@ -118,30 +118,35 @@ internal sealed class SelectionHandler
     /// <summary>
     /// used to know if drag &amp; drop was already started not to execute the same operation over
     /// </summary>
-    private object _dragDropData;
+    private object? _dragDropData;
 
     #endregion
-
 
     /// <summary>
     /// Init.
     /// </summary>
     /// <param name="root">the root of the handled html tree</param>
-    public SelectionHandler (CssBox root)
+    public SelectionHandler
+        (
+            CssBox root
+        )
     {
-        ArgChecker.AssertArgNotNull (root, "root");
+        Sure.NotNull (root);
 
         _root = root;
-        _contextMenuHandler = new ContextMenuHandler (this, root.HtmlContainer);
+        _contextMenuHandler = new ContextMenuHandler (this, root.HtmlContainer.ThrowIfNull());
     }
 
     /// <summary>
     /// Select all the words in the html.
     /// </summary>
     /// <param name="control">the control hosting the html to invalidate</param>
-    public void SelectAll (RControl control)
+    public void SelectAll
+        (
+            RControl control
+        )
     {
-        if (_root.HtmlContainer.IsSelectionEnabled)
+        if (_root.HtmlContainer.ThrowIfNull().IsSelectionEnabled)
         {
             ClearSelection();
             SelectAllWords (_root);
@@ -153,16 +158,20 @@ internal sealed class SelectionHandler
     /// Select the word at the given location if found.
     /// </summary>
     /// <param name="control">the control hosting the html to invalidate</param>
-    /// <param name="loc">the location to select word at</param>
-    public void SelectWord (RControl control, RPoint loc)
+    /// <param name="location">the location to select word at</param>
+    public void SelectWord
+        (
+            RControl control,
+            RPoint location
+        )
     {
-        if (_root.HtmlContainer.IsSelectionEnabled)
+        if (_root.HtmlContainer.ThrowIfNull().IsSelectionEnabled)
         {
-            var word = DomUtils.GetCssBoxWord (_root, loc);
+            var word = DomUtils.GetCssBoxWord (_root, location);
             if (word != null)
             {
                 word.Selection = this;
-                _selectionStartPoint = loc;
+                _selectionStartPoint = location;
                 _selectionStart = _selectionEnd = word;
                 control.Invalidate();
             }
@@ -173,11 +182,16 @@ internal sealed class SelectionHandler
     /// Handle mouse down to handle selection.
     /// </summary>
     /// <param name="parent">the control hosting the html to invalidate</param>
-    /// <param name="loc">the location of the mouse on the html</param>
+    /// <param name="location">the location of the mouse on the html</param>
     /// <param name="isMouseInContainer"> </param>
-    public void HandleMouseDown (RControl parent, RPoint loc, bool isMouseInContainer)
+    public void HandleMouseDown
+        (
+            RControl parent,
+            RPoint location,
+            bool isMouseInContainer
+        )
     {
-        bool clear = !isMouseInContainer;
+        var clear = !isMouseInContainer;
         if (isMouseInContainer)
         {
             _mouseDownInControl = true;
@@ -185,10 +199,11 @@ internal sealed class SelectionHandler
             _lastMouseDown = DateTime.Now;
             _mouseDownOnSelectedWord = false;
 
-            if (_root.HtmlContainer.IsSelectionEnabled && parent.LeftMouseButton)
+            var htmlContainerInt = _root.HtmlContainer.ThrowIfNull();
+            if (htmlContainerInt.IsSelectionEnabled && parent.LeftMouseButton)
             {
-                var word = DomUtils.GetCssBoxWord (_root, loc);
-                if (word != null && word.Selected)
+                var word = DomUtils.GetCssBoxWord (_root, location);
+                if (word is { Selected: true })
                 {
                     _mouseDownOnSelectedWord = true;
                 }
@@ -199,14 +214,14 @@ internal sealed class SelectionHandler
             }
             else if (parent.RightMouseButton)
             {
-                var rect = DomUtils.GetCssBoxWord (_root, loc);
-                var link = DomUtils.GetLinkBox (_root, loc);
-                if (_root.HtmlContainer.IsContextMenuEnabled)
+                var rect = DomUtils.GetCssBoxWord (_root, location);
+                var link = DomUtils.GetLinkBox (_root, location);
+                if (htmlContainerInt.IsContextMenuEnabled)
                 {
                     _contextMenuHandler.ShowContextMenu (parent, rect, link);
                 }
 
-                clear = rect == null || !rect.Selected;
+                clear = rect is not { Selected: true };
             }
         }
 
@@ -223,11 +238,15 @@ internal sealed class SelectionHandler
     /// <param name="parent">the control hosting the html to invalidate</param>
     /// <param name="leftMouseButton">is the left mouse button has been released</param>
     /// <returns>is the mouse up should be ignored</returns>
-    public bool HandleMouseUp (RControl parent, bool leftMouseButton)
+    public bool HandleMouseUp
+        (
+            RControl parent,
+            bool leftMouseButton
+        )
     {
-        bool ignore = false;
+        var ignore = false;
         _mouseDownInControl = false;
-        if (_root.HtmlContainer.IsSelectionEnabled)
+        if (_root.HtmlContainer.ThrowIfNull().IsSelectionEnabled)
         {
             ignore = _inSelection;
             if (!_inSelection && leftMouseButton && _mouseDownOnSelectedWord)
@@ -241,6 +260,7 @@ internal sealed class SelectionHandler
         }
 
         ignore = ignore || (DateTime.Now - _lastMouseDown > TimeSpan.FromSeconds (1));
+
         return ignore;
     }
 
@@ -248,20 +268,27 @@ internal sealed class SelectionHandler
     /// Handle mouse move to handle hover cursor and text selection.
     /// </summary>
     /// <param name="parent">the control hosting the html to set cursor and invalidate</param>
-    /// <param name="loc">the location of the mouse on the html</param>
-    public void HandleMouseMove (RControl parent, RPoint loc)
+    /// <param name="location">the location of the mouse on the html</param>
+    public void HandleMouseMove
+        (
+            RControl parent,
+            RPoint location
+        )
     {
-        if (_root.HtmlContainer.IsSelectionEnabled && _mouseDownInControl && parent.LeftMouseButton)
+        var rootHtmlContainer = _root.HtmlContainer.ThrowIfNull();
+        if (rootHtmlContainer.IsSelectionEnabled && _mouseDownInControl && parent.LeftMouseButton)
         {
             if (_mouseDownOnSelectedWord)
             {
                 // make sure not to start drag-drop on click but when it actually moves as it fucks mouse-up
                 if ((DateTime.Now - _lastMouseDown).TotalMilliseconds > 200)
+                {
                     StartDragDrop (parent);
+                }
             }
             else
             {
-                HandleSelection (parent, loc, !_isDoubleClickSelect);
+                HandleSelection (parent, location, !_isDoubleClickSelect);
                 _inSelection = _selectionStart != null && _selectionEnd != null &&
                                (_selectionStart != _selectionEnd || _selectionStartIndex != _selectionEndIndex);
             }
@@ -269,24 +296,29 @@ internal sealed class SelectionHandler
         else
         {
             // Handle mouse hover over the html to change the cursor depending if hovering word, link of other.
-            var link = DomUtils.GetLinkBox (_root, loc);
+            var link = DomUtils.GetLinkBox (_root, location);
             if (link != null)
             {
                 _cursorChanged = true;
                 parent.SetCursorHand();
             }
-            else if (_root.HtmlContainer.IsSelectionEnabled)
+            else if (rootHtmlContainer.IsSelectionEnabled)
             {
-                var word = DomUtils.GetCssBoxWord (_root, loc);
-                _cursorChanged = word != null && !word.IsImage && !(word.Selected &&
-                                                                    (word.SelectedStartIndex < 0 ||
-                                                                     word.Left + word.SelectedStartOffset <= loc.X) &&
-                                                                    (word.SelectedEndOffset < 0 ||
-                                                                     word.Left + word.SelectedEndOffset >= loc.X));
+                var word = DomUtils.GetCssBoxWord (_root, location);
+                _cursorChanged = word is { IsImage: false }
+                                 && !(word.Selected
+                                      && (word.SelectedStartIndex < 0
+                                          || word.Left + word.SelectedStartOffset <= location.X)
+                                      && (word.SelectedEndOffset < 0
+                                          || word.Left + word.SelectedEndOffset >= location.X));
                 if (_cursorChanged)
+                {
                     parent.SetCursorIBeam();
+                }
                 else
+                {
                     parent.SetCursorDefault();
+                }
             }
             else if (_cursorChanged)
             {
@@ -299,7 +331,10 @@ internal sealed class SelectionHandler
     /// On mouse leave change the cursor back to default.
     /// </summary>
     /// <param name="parent">the control hosting the html to set cursor and invalidate</param>
-    public void HandleMouseLeave (RControl parent)
+    public void HandleMouseLeave
+        (
+            RControl parent
+        )
     {
         if (_cursorChanged)
         {
@@ -314,29 +349,38 @@ internal sealed class SelectionHandler
     /// </summary>
     public void CopySelectedHtml()
     {
-        if (_root.HtmlContainer.IsSelectionEnabled)
+        var rootHtmlContainer = _root.HtmlContainer.ThrowIfNull();
+        if (rootHtmlContainer.IsSelectionEnabled)
         {
             var html = DomUtils.GenerateHtml (_root, HtmlGenerationStyle.Inline, true);
             var plainText = DomUtils.GetSelectedPlainText (_root);
             if (!string.IsNullOrEmpty (plainText))
-                _root.HtmlContainer.Adapter.SetToClipboard (html, plainText);
+            {
+                rootHtmlContainer.Adapter.SetToClipboard (html, plainText);
+            }
         }
     }
 
     /// <summary>
     /// Get the currently selected text segment in the html.<br/>
     /// </summary>
-    public string GetSelectedText()
+    public string? GetSelectedText()
     {
-        return _root.HtmlContainer.IsSelectionEnabled ? DomUtils.GetSelectedPlainText (_root) : null;
+        var rootHtmlContainer = _root.HtmlContainer.ThrowIfNull();
+
+        return rootHtmlContainer.IsSelectionEnabled
+            ? DomUtils.GetSelectedPlainText (_root)
+            : null;
     }
 
     /// <summary>
     /// Copy the currently selected html segment with style.<br/>
     /// </summary>
-    public string GetSelectedHtml()
+    public string? GetSelectedHtml()
     {
-        return _root.HtmlContainer.IsSelectionEnabled
+        var rootHtmlContainer = _root.HtmlContainer.ThrowIfNull();
+
+        return rootHtmlContainer.IsSelectionEnabled
             ? DomUtils.GenerateHtml (_root, HtmlGenerationStyle.Inline, true)
             : null;
     }
@@ -456,17 +500,17 @@ internal sealed class SelectionHandler
                 if (loc.Y > lineBox.LineBottom)
                 {
                     // under the line
-                    word = lineBox.Words[lineBox.Words.Count - 1];
+                    word = lineBox.Words[^1];
                 }
                 else if (loc.X < lineBox.Words[0].Left)
                 {
                     // before the line
                     word = lineBox.Words[0];
                 }
-                else if (loc.X > lineBox.Words[lineBox.Words.Count - 1].Right)
+                else if (loc.X > lineBox.Words[^1].Right)
                 {
                     // at the end of the line
-                    word = lineBox.Words[lineBox.Words.Count - 1];
+                    word = lineBox.Words[^1];
                 }
             }
 
@@ -479,13 +523,17 @@ internal sealed class SelectionHandler
                     _selectionStartPoint = loc;
                     _selectionStart = word;
                     if (allowPartialSelect)
+                    {
                         CalculateWordCharIndexAndOffset (control, word, loc, true);
+                    }
                 }
 
                 // always set selection end word
                 _selectionEnd = word;
                 if (allowPartialSelect)
+                {
                     CalculateWordCharIndexAndOffset (control, word, loc, false);
+                }
 
                 ClearSelection (_root);
                 if (CheckNonEmptySelection (loc, allowPartialSelect))
@@ -543,7 +591,10 @@ internal sealed class SelectionHandler
     /// Select all the words that are under <paramref name="box"/> DOM hierarchy.<br/>
     /// </summary>
     /// <param name="box">the box to start select all at</param>
-    public void SelectAllWords (CssBox box)
+    public void SelectAllWords
+        (
+            CssBox box
+        )
     {
         foreach (var word in box.Words)
         {
@@ -562,15 +613,23 @@ internal sealed class SelectionHandler
     /// <param name="loc"></param>
     /// <param name="allowPartialSelect">true - partial word selection allowed, false - only full words selection</param>
     /// <returns>true - is non empty selection, false - empty selection</returns>
-    private bool CheckNonEmptySelection (RPoint loc, bool allowPartialSelect)
+    private bool CheckNonEmptySelection
+        (
+            RPoint loc,
+            bool allowPartialSelect
+        )
     {
         // full word selection is never empty
         if (!allowPartialSelect)
+        {
             return true;
+        }
 
         // if end selection location is near starting location then the selection is empty
         if (Math.Abs (_selectionStartPoint.X - loc.X) <= 1 && Math.Abs (_selectionStartPoint.Y - loc.Y) < 5)
+        {
             return false;
+        }
 
         // selection is empty if on same word and same index
         return _selectionStart != _selectionEnd || _selectionStartIndex != _selectionEndIndex;
@@ -582,9 +641,14 @@ internal sealed class SelectionHandler
     /// <param name="root">the root of the DOM sub-tree the selection is in</param>
     /// <param name="selectionStart">selection start word limit</param>
     /// <param name="selectionEnd">selection end word limit</param>
-    private void SelectWordsInRange (CssBox root, CssRect selectionStart, CssRect selectionEnd)
+    private void SelectWordsInRange
+        (
+            CssBox root,
+            CssRect selectionStart,
+            CssRect selectionEnd
+        )
     {
-        bool inSelection = false;
+        var inSelection = false;
         SelectWordsInRange (root, selectionStart, selectionEnd, ref inSelection);
     }
 
@@ -596,7 +660,13 @@ internal sealed class SelectionHandler
     /// <param name="selectionEnd">selection end word limit</param>
     /// <param name="inSelection">used to know the traversal is currently in selected range</param>
     /// <returns></returns>
-    private bool SelectWordsInRange (CssBox box, CssRect selectionStart, CssRect selectionEnd, ref bool inSelection)
+    private bool SelectWordsInRange
+        (
+            CssBox box,
+            CssRect selectionStart,
+            CssRect selectionEnd,
+            ref bool inSelection
+        )
     {
         foreach (var boxWord in box.Words)
         {
@@ -633,13 +703,24 @@ internal sealed class SelectionHandler
     /// </summary>
     /// <param name="control">used to create graphics to measure string</param>
     /// <param name="word">the word to calculate its index and offset</param>
-    /// <param name="loc">the location to calculate for</param>
+    /// <param name="location">the location to calculate for</param>
     /// <param name="selectionStart">to set the starting or ending char and offset data</param>
-    private void CalculateWordCharIndexAndOffset (RControl control, CssRect word, RPoint loc, bool selectionStart)
+    private void CalculateWordCharIndexAndOffset
+        (
+            RControl control,
+            CssRect word,
+            RPoint location,
+            bool selectionStart
+        )
     {
-        int selectionIndex;
-        double selectionOffset;
-        CalculateWordCharIndexAndOffset (control, word, loc, selectionStart, out selectionIndex, out selectionOffset);
+        CalculateWordCharIndexAndOffset
+            (
+                control, word,
+                location,
+                selectionStart,
+                out var selectionIndex,
+                out var selectionOffset
+            );
 
         if (selectionStart)
         {
@@ -662,39 +743,48 @@ internal sealed class SelectionHandler
     /// </summary>
     /// <param name="control">used to create graphics to measure string</param>
     /// <param name="word">the word to calculate its index and offset</param>
-    /// <param name="loc">the location to calculate for</param>
+    /// <param name="location">the location to calculate for</param>
     /// <param name="inclusive">is to include the first character in the calculation</param>
     /// <param name="selectionIndex">return the index of the char under the location</param>
     /// <param name="selectionOffset">return the offset of the char under the location</param>
-    private static void CalculateWordCharIndexAndOffset (RControl control, CssRect word, RPoint loc, bool inclusive,
-        out int selectionIndex, out double selectionOffset)
+    private static void CalculateWordCharIndexAndOffset
+        (
+            RControl control,
+            CssRect word,
+            RPoint location,
+            bool inclusive,
+            out int selectionIndex,
+            out double selectionOffset
+        )
     {
         selectionIndex = 0;
         selectionOffset = 0f;
-        var offset = loc.X - word.Left;
+        var offset = location.X - word.Left;
         if (word.Text == null)
         {
             // not a text word - set full selection
             selectionIndex = -1;
             selectionOffset = -1;
         }
-        else if (offset > word.Width - word.OwnerBox.ActualWordSpacing ||
-                 loc.Y > DomUtils.GetCssLineBoxByWord (word).LineBottom)
+        else
         {
-            // mouse under the line, to the right of the word - set to the end of the word
-            selectionIndex = word.Text.Length;
-            selectionOffset = word.Width;
-        }
-        else if (offset > 0)
-        {
-            // calculate partial word selection
-            int charFit;
-            double charFitWidth;
-            var maxWidth = offset + (inclusive ? 0 : 1.5f * word.LeftGlyphPadding);
-            control.MeasureString (word.Text, word.OwnerBox.ActualFont, maxWidth, out charFit, out charFitWidth);
+            var ownerBox = word.OwnerBox.ThrowIfNull();
+            if (offset > word.Width - ownerBox.ActualWordSpacing ||
+                location.Y > DomUtils.GetCssLineBoxByWord (word).LineBottom)
+            {
+                // mouse under the line, to the right of the word - set to the end of the word
+                selectionIndex = word.Text.Length;
+                selectionOffset = word.Width;
+            }
+            else if (offset > 0)
+            {
+                // calculate partial word selection
+                var maxWidth = offset + (inclusive ? 0 : 1.5f * word.LeftGlyphPadding);
+                control.MeasureString (word.Text, ownerBox.ActualFont, maxWidth, out var charFit, out var charFitWidth);
 
-            selectionIndex = charFit;
-            selectionOffset = charFitWidth;
+                selectionIndex = charFit;
+                selectionOffset = charFitWidth;
+            }
         }
     }
 
@@ -704,6 +794,11 @@ internal sealed class SelectionHandler
     /// </summary>
     private void CheckSelectionDirection()
     {
+        if (_selectionStart is null || _selectionEnd is null)
+        {
+            return;
+        }
+
         if (_selectionStart == _selectionEnd)
         {
             _backwardSelection = _selectionStartIndex > _selectionEndIndex;

@@ -743,14 +743,18 @@ internal sealed class DomUtils
     /// <param name="root">the root of the boxes tree</param>
     /// <param name="selectedBoxes">the selected boxes to find selection root in</param>
     /// <returns>the box that is the root of selected boxes</returns>
-    private static CssBox GetSelectionRoot (CssBox root, Dictionary<CssBox, bool> selectedBoxes)
+    private static CssBox GetSelectionRoot
+        (
+            CssBox root,
+            Dictionary<CssBox, bool> selectedBoxes
+        )
     {
         var selectionRoot = root;
         var selectionRootRun = root;
         while (true)
         {
             var foundRoot = false;
-            CssBox selectedChild = null;
+            CssBox? selectedChild = null;
             foreach (var childBox in selectionRootRun.Boxes)
             {
                 if (selectedBoxes.ContainsKey (childBox))
@@ -784,7 +788,9 @@ internal sealed class DomUtils
         {
             selectionRootRun = selectionRoot.ParentBox;
             while (selectionRootRun.ParentBox != null && selectionRootRun.HtmlTag == null)
+            {
                 selectionRootRun = selectionRootRun.ParentBox;
+            }
 
             if (selectionRootRun.HtmlTag != null)
             {
@@ -1024,10 +1030,14 @@ internal sealed class DomUtils
             builder.Append (" { ");
             foreach (var cssBlock in cssBlocks.Value)
             {
-                foreach (var property in cssBlock.Properties)
+                var cssBlockProperties = cssBlock.Properties;
+                if (cssBlockProperties is not null)
                 {
-                    // TODO:a handle selectors
-                    builder.AppendFormat ("{0}: {1};", property.Key, property.Value);
+                    foreach (var property in cssBlockProperties)
+                    {
+                        // TODO:a handle selectors
+                        builder.AppendFormat ("{0}: {1};", property.Key, property.Value);
+                    }
                 }
             }
 
@@ -1049,24 +1059,30 @@ internal sealed class DomUtils
             bool selectedText
         )
     {
+        var rectText = rect.Text;
+        if (string.IsNullOrEmpty (rectText))
+        {
+            return string.Empty; // ???
+        }
+
         if (selectedText && rect.SelectedStartIndex > -1 && rect.SelectedEndIndexOffset > -1)
         {
-            return rect.Text.Substring (rect.SelectedStartIndex, rect.SelectedEndIndexOffset - rect.SelectedStartIndex);
+            return rectText.Substring (rect.SelectedStartIndex, rect.SelectedEndIndexOffset - rect.SelectedStartIndex);
         }
 
         if (selectedText && rect.SelectedStartIndex > -1)
         {
-            return rect.Text.Substring (rect.SelectedStartIndex) + (rect.HasSpaceAfter ? " " : "");
+            return rectText.Substring (rect.SelectedStartIndex) + (rect.HasSpaceAfter ? " " : "");
         }
         if (selectedText && rect.SelectedEndIndexOffset > -1)
         {
-            return rect.Text.Substring (0, rect.SelectedEndIndexOffset);
+            return rectText.Substring (0, rect.SelectedEndIndexOffset);
         }
         var whitespaceBefore = rect.OwnerBox.Words[0] == rect
             ? IsBoxHasWhitespace (rect.OwnerBox)
             : rect.HasSpaceBefore;
 
-        return (whitespaceBefore ? " " : "") + rect.Text + (rect.HasSpaceAfter ? " " : "");
+        return (whitespaceBefore ? " " : "") + rectText + (rect.HasSpaceAfter ? " " : "");
     }
 
     /// <summary>
