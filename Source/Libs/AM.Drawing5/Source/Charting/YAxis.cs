@@ -198,12 +198,13 @@ public class YAxis
 
         if (!CrossAuto)
         {
-            return pane.XAxis.Scale._minPix - pane.XAxis.Scale.Transform (effCross);
+            var xAxisScale = pane.XAxis.Scale;
+            return xAxisScale is null
+                ? 0
+                : xAxisScale._minPix - xAxisScale.Transform (effCross);
         }
-        else
-        {
-            return 0;
-        }
+
+        return 0;
     }
 
     /*

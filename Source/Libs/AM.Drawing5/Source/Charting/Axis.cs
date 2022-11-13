@@ -953,7 +953,7 @@ public abstract class Axis
         {
             // if it's the primary axis and the scale labels are on the inside, then we
             // don't need to save any room for the axis labels (they will be inside the chart rect)
-            if (IsPrimary (pane) && Scale._isLabelsInside)
+            if (IsPrimary (pane) && (Scale?._isLabelsInside ?? false))
             {
                 return 1.0f;
             }
@@ -1020,7 +1020,7 @@ public abstract class Axis
 
                 // if the scalelabels are on the inside, shift everything so the axis is drawn,
                 // for example, to the left side of the available space for a YAxis type
-                if (Scale._isLabelsInside)
+                if (Scale?._isLabelsInside ?? false)
                 {
                     shiftPos += _tmpSpace;
 
@@ -1095,14 +1095,14 @@ public abstract class Axis
         //fixedSpace = 0;
 
         //Typical character height for the scale font
-        var charHeight = Scale._fontSpec.GetHeight (scaleFactor);
+        var charHeight = Scale?._fontSpec.GetHeight (scaleFactor) ?? 0;
 
         // Scaled size (pixels) of a tic
         var ticSize = _majorTic.ScaledTic (scaleFactor);
 
         // Scaled size (pixels) of the axis gap
         var axisGap = _axisGap * scaleFactor;
-        var scaledLabelGap = Scale._labelGap * charHeight;
+        var scaledLabelGap = Scale?._labelGap * charHeight ?? 0;
         var scaledTitleGap = Title.GetScaledGap (scaleFactor);
 
         // The minimum amount of space to reserve for the NORMAL position of the axis.  This would
@@ -1157,8 +1157,8 @@ public abstract class Axis
             if (!string.IsNullOrEmpty (str) && Title.IsVisible)
             {
                 //tmpSpace += this.TitleFontSpec.BoundingBox( g, str, scaleFactor ).Height;
-                fixedSpace = Title.FontSpec.BoundingBox (graphics, str, scaleFactor).Height +
-                             scaledTitleGap;
+                fixedSpace = Title.FontSpec?.BoundingBox (graphics, str, scaleFactor).Height +
+                             scaledTitleGap ?? 0;
                 _tmpSpace += fixedSpace;
 
                 fixedSpace += scaledTitleGap;

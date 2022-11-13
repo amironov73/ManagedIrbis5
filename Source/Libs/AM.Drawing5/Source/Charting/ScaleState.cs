@@ -63,34 +63,43 @@ public class ScaleState
     /// </summary>
     /// <param name="axis">The <see cref="Axis"/> from which to collect the scale
     /// range settings.</param>
-    public ScaleState (Axis axis)
+    public ScaleState
+        (
+            Axis? axis
+        )
     {
-        _min = axis.Scale._min;
-        _minorStep = axis.Scale._minorStep;
-        _majorStep = axis.Scale._majorStep;
-        _max = axis.Scale._max;
-        _majorUnit = axis.Scale._majorUnit;
-        _minorUnit = axis.Scale._minorUnit;
+        if (axis is { Scale: not null })
+        {
+            _min = axis.Scale._min;
+            _minorStep = axis.Scale._minorStep;
+            _majorStep = axis.Scale._majorStep;
+            _max = axis.Scale._max;
+            _majorUnit = axis.Scale._majorUnit;
+            _minorUnit = axis.Scale._minorUnit;
 
-        _format = axis.Scale._format;
-        _mag = axis.Scale._mag;
+            _format = axis.Scale._format;
+            _mag = axis.Scale?._mag ?? 0;
 
-        //this.numDec = axis.NumDec;
+            //this.numDec = axis.NumDec;
 
-        _minAuto = axis.Scale._minAuto;
-        _majorStepAuto = axis.Scale._majorStepAuto;
-        _minorStepAuto = axis.Scale._minorStepAuto;
-        _maxAuto = axis.Scale._maxAuto;
+            _minAuto = axis.Scale!._minAuto;
+            _majorStepAuto = axis.Scale._majorStepAuto;
+            _minorStepAuto = axis.Scale._minorStepAuto;
+            _maxAuto = axis.Scale._maxAuto;
 
-        _formatAuto = axis.Scale._formatAuto;
-        _magAuto = axis.Scale._magAuto;
+            _formatAuto = axis.Scale._formatAuto;
+            _magAuto = axis.Scale._magAuto;
+        }
     }
 
     /// <summary>
     /// The Copy Constructor
     /// </summary>
     /// <param name="rhs">The <see cref="ScaleState"/> object from which to copy</param>
-    public ScaleState (ScaleState rhs)
+    public ScaleState
+        (
+            ScaleState rhs
+        )
     {
         _min = rhs._min;
         _majorStep = rhs._majorStep;
