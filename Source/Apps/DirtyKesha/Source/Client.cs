@@ -56,12 +56,9 @@ internal sealed class Client
         )
     {
         var tag = match.Groups[1].Value.ToLowerInvariant();
-        if (Array.IndexOf (_goodTags, tag) < 0)
-        {
-            return string.Empty;
-        }
-
-        return match.Value;
+        return Array.IndexOf (_goodTags, tag) < 0
+            ? string.Empty
+            : match.Value;
     }
 
     private static string _CleanText
@@ -83,7 +80,7 @@ internal sealed class Client
         return result;
     }
 
-    private static async Task<string[]> GetBooks
+    private static async Task<string[]> SearchForBooks
         (
             string query
         )
@@ -115,6 +112,17 @@ internal sealed class Client
             .Select (item => item.Text)
             .Where (line => !string.IsNullOrEmpty (line))
             .Select (line => line.ThrowIfNull())
+            .ToArray();
+    }
+
+    private static async Task<string[]> GetAndCleanDescriptions
+        (
+            string query
+        )
+    {
+        var found = await SearchForBooks (query);
+
+        return found
             .Select (_CleanText)
             .Where (line => !string.IsNullOrEmpty (line))
             .OrderBy (line => line)
@@ -187,7 +195,7 @@ internal sealed class Client
                 token
             );
 
-        var found = await GetBooks (messageText);
+        var found = await GetAndCleanDescriptions (messageText);
 
         Program.Logger.LogInformation ("Found: {Length}", found.Length);
 

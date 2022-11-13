@@ -9,7 +9,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* TeapotSearcher.cs -- синхронная реализация "поиска для чайников"
+/* AsyncTeapotSearcher.cs -- асинхронная реализация "поиска для чайников"
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 using AM;
 using AM.Collections;
@@ -36,12 +37,12 @@ using Microsoft.Extensions.Logging;
 namespace ManagedIrbis.Searching;
 
 /// <summary>
-/// Стандартная синхронная реализация "поиска для чайников".
+/// Стандартная асинхронная реализация "поиска для чайников".
 /// </summary>
-public class TeapotSearcher
-    : ITeapotSearcher
+public class AsyncTeapotSearcher
+    : IAsyncTeapotSearcher
 {
-    #region Properties
+   #region Properties
 
     /// <summary>
     /// Список применяемых префиксов.
@@ -66,7 +67,7 @@ public class TeapotSearcher
     /// Конструктор.
     /// </summary>
     /// <param name="serviceProvider">Провайдер сервисов</param>
-    public TeapotSearcher
+    public AsyncTeapotSearcher
         (
             IServiceProvider serviceProvider
         )
@@ -74,7 +75,7 @@ public class TeapotSearcher
         Sure.NotNull (serviceProvider);
 
         ServiceProvider = serviceProvider;
-        _logger = LoggingUtility.GetLogger (serviceProvider, typeof (TeapotSearcher));
+        _logger = LoggingUtility.GetLogger (serviceProvider, typeof (AsyncTeapotSearcher));
 
         Suffix = "$";
         Prefixes = new List<string>
@@ -97,16 +98,16 @@ public class TeapotSearcher
     #region ITeapotSearcher members
 
     /// <inheritdoc cref="ITeapotSearcher.BuildSearchExpression"/>
-    public string BuildSearchExpression
+    public Task<string> BuildSearchExpressionAsync
         (
             string query
         )
     {
-        _logger.LogTrace (nameof (BuildSearchExpression) + ": {Query}", query);
+        _logger.LogTrace (nameof (BuildSearchExpressionAsync) + ": {Query}", query);
 
         if (string.IsNullOrWhiteSpace (query))
         {
-            return string.Empty;
+            return Task.FromResult (string.Empty);
         }
 
         query = query.Trim();
@@ -142,13 +143,15 @@ public class TeapotSearcher
             }
         }
 
-        return builder.ReturnShared();
+        var result = builder.ReturnShared();
+
+        return Task.FromResult (result);
     }
 
     /// <inheritdoc cref="ITeapotSearcher.Search"/>
-    public int[] Search
+    public async Task<int[]> SearchAsync
         (
-            ISyncProvider connection,
+            IAsyncProvider connection,
             string query,
             string? database = null,
             IRelevanceEvaluator? evaluator = null,
@@ -164,7 +167,7 @@ public class TeapotSearcher
             limit = 500;
         }
 
-        var expression = BuildSearchExpression (query);
+        var expression = await BuildSearchExpressionAsync (query);
         if (string.IsNullOrWhiteSpace (expression))
         {
             return Array.Empty<int>();
@@ -179,14 +182,14 @@ public class TeapotSearcher
             Expression = expression,
             NumberOfRecords = limit * 2
         };
-        var found = connection.Search (parameters);
+        var found = await connection.SearchAsync (parameters);
         if (found is null)
         {
             return Array.Empty<int>();
         }
 
         var batch = FoundItem.ToMfn (found);
-        var records = connection.ReadRecords (database, batch);
+        var records = await connection.ReadRecordsAsync (database, batch);
         if (records.IsNullOrEmpty())
         {
             return Array.Empty<int>();
@@ -210,9 +213,9 @@ public class TeapotSearcher
     }
 
     /// <inheritdoc cref="ITeapotSearcher.Search"/>
-    public Record[] SearchRead
+    public async Task<Record[]> SearchReadAsync
         (
-            ISyncProvider connection,
+            IAsyncProvider connection,
             string query,
             string? database = null,
             IRelevanceEvaluator? evaluator = null,
@@ -228,7 +231,7 @@ public class TeapotSearcher
             limit = 500;
         }
 
-        var expression = BuildSearchExpression (query);
+        var expression = await BuildSearchExpressionAsync (query);
         if (string.IsNullOrWhiteSpace (expression))
         {
             return Array.Empty<Record>();
@@ -243,14 +246,14 @@ public class TeapotSearcher
             Expression = expression,
             NumberOfRecords = limit * 2
         };
-        var found = connection.Search (parameters);
+        var found = await connection.SearchAsync (parameters);
         if (found is null)
         {
             return Array.Empty<Record>();
         }
 
         var batch = FoundItem.ToMfn (found);
-        var records = connection.ReadRecords (database, batch);
+        var records = await connection.ReadRecordsAsync (database, batch);
         if (records.IsNullOrEmpty())
         {
             return Array.Empty<Record>();
