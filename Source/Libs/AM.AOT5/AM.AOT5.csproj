@@ -14,11 +14,11 @@
         <Title>Text processing support for Ars Magna project</Title>
     </PropertyGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PropertyGroup Condition="'$(Configuration)'=='Debug'">
         <DocumentationFile>bin\Debug\AM.AOT5.xml</DocumentationFile>
     </PropertyGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <PropertyGroup Condition="'$(Configuration)'=='Release'">
         <DocumentationFile>bin\Release\AM.AOT5.xml</DocumentationFile>
     </PropertyGroup>
 

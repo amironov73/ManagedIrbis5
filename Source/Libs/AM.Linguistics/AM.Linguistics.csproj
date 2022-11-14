@@ -7,7 +7,19 @@
     <PropertyGroup>
         <RootNamespace>AM.Linguistics</RootNamespace>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <Description>Ars Magna linguistics services</Description>
+        <Title>ArsMagna linguistics services</Title>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+        <DocumentationFile>bin\Debug\AM.Linguistics.xml</DocumentationFile>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)'=='Release'">
+        <DocumentationFile>bin\Release\AM.Linguistics.xml</DocumentationFile>
     </PropertyGroup>
 
     <ItemGroup>

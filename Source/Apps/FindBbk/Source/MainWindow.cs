@@ -42,16 +42,19 @@ public partial class MainWindow
         this.AttachDevTools();
 
         Width = 600;
+        MinWidth = 600;
         Height = 400;
+        MinHeight = 400;
         Title = "Поиск по эталону ББК";
 
         var model = new BbkModel { window = this };
 
         var bbkList = new ListBox
         {
-            VerticalAlignment = VerticalAlignment.Stretch,
+            Height = 320, // TODO разобраться, почему вылазит за границы по вертикали
+            // VerticalAlignment = VerticalAlignment.Stretch,
             HorizontalAlignment = HorizontalAlignment.Stretch,
-            [!ItemsControl.ItemsProperty] = new Binding(nameof (BbkModel.Found)),
+            [!ItemsControl.ItemsProperty] = new Binding (nameof (BbkModel.Found)),
             ItemTemplate = new FuncDataTemplate<BbkEntry> ((_, _) =>
             {
                 var firstBlock = new TextBlock
@@ -93,7 +96,7 @@ public partial class MainWindow
         {
             Margin = new Thickness (10, 0),
             HorizontalAlignment = HorizontalAlignment.Stretch,
-            [!TextBox.TextProperty] = new Binding(nameof (BbkModel.LookingFor))
+            [!TextBox.TextProperty] = new Binding (nameof (BbkModel.LookingFor))
         };
         textBox.SetValue (Grid.ColumnProperty, 1);
 
@@ -116,9 +119,9 @@ public partial class MainWindow
             {
                 new Grid
                 {
-                    RowDefinitions = new RowDefinitions("*"),
-                    ColumnDefinitions = new ColumnDefinitions("Auto,*,Auto"),
-                    VerticalAlignment = VerticalAlignment.Stretch,
+                    RowDefinitions = new RowDefinitions ("*"),
+                    ColumnDefinitions = new ColumnDefinitions ("Auto,*,Auto"),
+                    VerticalAlignment = VerticalAlignment.Top,
                     HorizontalAlignment = HorizontalAlignment.Stretch,
 
                     Children =
@@ -139,13 +142,12 @@ public partial class MainWindow
                     HorizontalAlignment = HorizontalAlignment.Center,
                     FontWeight = FontWeight.Bold,
                     Foreground = Brushes.Red,
-                    [!ContentProperty] = new Binding(nameof(BbkModel.ErrorMessage))
+                    [!ContentProperty] = new Binding (nameof (BbkModel.ErrorMessage))
                 },
 
                 bbkList
             }
         };
-
 
         DataContext = model;
     }

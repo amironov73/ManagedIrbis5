@@ -75,12 +75,12 @@ namespace AM.Linguistics.Hunspell
         {
             return unchecked ((value & mask) != default)
                    &&
-                   Array.BinarySearch (items, value) >= 0;
+                   Array.BinarySearch (_items, value) >= 0;
         }
 
 #if !NO_INLINE
         [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
-        public string GetCharactersAsString() => new (items);
+        public string GetCharactersAsString() => new (_items);
     }
 }

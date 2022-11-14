@@ -47,11 +47,11 @@ public sealed class CharacterConditionGroup : ArrayWrapper<CharacterCondition>
     {
     }
 
-    public bool AllowsAnySingleCharacter => items.Length == 1 && items[0].AllowsAny;
+    public bool AllowsAnySingleCharacter => _items.Length == 1 && _items[0].AllowsAny;
 
     public string GetEncoded()
     {
-        return string.Concat (items.Select (c => c.GetEncoded()));
+        return string.Concat (_items.Select (c => c.GetEncoded()));
     }
 
     public override string ToString()
@@ -66,10 +66,10 @@ public sealed class CharacterConditionGroup : ArrayWrapper<CharacterCondition>
     /// <returns>True when the start of the <paramref name="text"/> is matched by the conditions.</returns>
     public bool IsStartingMatch (string text)
     {
-        if (string.IsNullOrEmpty (text) || items.Length > text.Length) return false;
+        if (string.IsNullOrEmpty (text) || _items.Length > text.Length) return false;
 
-        for (var i = 0; i < items.Length; i++)
-            if (!items[i].IsMatch (text[i]))
+        for (var i = 0; i < _items.Length; i++)
+            if (!_items[i].IsMatch (text[i]))
                 return false;
 
         return true;
@@ -82,12 +82,12 @@ public sealed class CharacterConditionGroup : ArrayWrapper<CharacterCondition>
     /// <returns>True when the end of the <paramref name="text"/> is matched by the conditions.</returns>
     public bool IsEndingMatch (string text)
     {
-        if (items.Length > text.Length) return false;
+        if (_items.Length > text.Length) return false;
 
-        for (int conditionIndex = items.Length - 1, textIndex = text.Length - 1;
+        for (int conditionIndex = _items.Length - 1, textIndex = text.Length - 1;
              conditionIndex >= 0;
              conditionIndex--, textIndex--)
-            if (!items[conditionIndex].IsMatch (text[textIndex]))
+            if (!_items[conditionIndex].IsMatch (text[textIndex]))
                 return false;
 
         return true;
@@ -95,11 +95,11 @@ public sealed class CharacterConditionGroup : ArrayWrapper<CharacterCondition>
 
     public bool IsOnlyPossibleMatch (string text)
     {
-        if (string.IsNullOrEmpty (text) || items.Length != text.Length) return false;
+        if (string.IsNullOrEmpty (text) || _items.Length != text.Length) return false;
 
         for (var i = 0; i < text.Length; i++)
         {
-            var condition = items[i];
+            var condition = _items[i];
             if (!condition.PermitsSingleCharacter || condition.Characters[0] != text[i]) return false;
         }
 

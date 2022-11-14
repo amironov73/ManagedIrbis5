@@ -28,8 +28,8 @@ using Avalonia.Media;
 using Avalonia.Threading;
 
 using AM;
+using AM.Avalonia;
 using AM.Avalonia.Controls;
-using AM.Avalonia.Source;
 
 using ManagedIrbis;
 using ManagedIrbis.Infrastructure;

@@ -60,7 +60,7 @@ namespace AM.Linguistics.Hunspell
 
             var wordAfterPos = word.AsSpan (pos);
 
-            foreach (var patternEntry in items)
+            foreach (var patternEntry in _items)
                 if (
                         HunspellTextFunctions.IsSubset (patternEntry.Pattern2, wordAfterPos)
                         &&

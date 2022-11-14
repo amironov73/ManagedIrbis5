@@ -103,15 +103,25 @@ public class StemmerOperations
     /// </summary>
     protected bool InGrouping (char[] s, int min, int max)
     {
-        if (cursor >= limit) return false;
+        if (cursor >= limit)
+        {
+            return false;
+        }
 
         //           char ch = current.charAt(cursor);
         var ch = (int)current[cursor];
-        if (ch > max || ch < min) return false;
+        if (ch > max || ch < min)
+        {
+            return false;
+        }
 
         //           ch -= min;
         ch -= min;
-        if ((s[ch >> 3] & (0X1 << (ch & 0X7))) == 0) return false;
+        if ((s[ch >> 3] & (0X1 << (ch & 0X7))) == 0)
+        {
+            return false;
+        }
+
         cursor++;
         return true;
     }
@@ -121,13 +131,24 @@ public class StemmerOperations
     /// </summary>
     protected bool InGroupingB (char[] s, int min, int max)
     {
-        if (cursor <= limit_backward) return false;
+        if (cursor <= limit_backward)
+        {
+            return false;
+        }
 
         //           char ch = current.charAt(cursor - 1);
         var ch = (int)current[cursor - 1];
-        if (ch > max || ch < min) return false;
+        if (ch > max || ch < min)
+        {
+            return false;
+        }
+
         ch -= min;
-        if ((s[ch >> 3] & (0X1 << (ch & 0X7))) == 0) return false;
+        if ((s[ch >> 3] & (0X1 << (ch & 0X7))) == 0)
+        {
+            return false;
+        }
+
         cursor--;
         return true;
     }
@@ -137,7 +158,10 @@ public class StemmerOperations
     /// </summary>
     protected bool OutGrouping (char[] s, int min, int max)
     {
-        if (cursor >= limit) return false;
+        if (cursor >= limit)
+        {
+            return false;
+        }
 
         //           char ch = current.charAt(cursor);
         var ch = (int)current[cursor];
@@ -162,7 +186,10 @@ public class StemmerOperations
     /// </summary>
     protected bool OutGroupingB (char[] s, int min, int max)
     {
-        if (cursor <= limit_backward) return false;
+        if (cursor <= limit_backward)
+        {
+            return false;
+        }
 
         //           char ch = current.charAt(cursor - 1);
         var ch = (int)current[cursor - 1];
@@ -187,11 +214,18 @@ public class StemmerOperations
     /// </summary>
     protected bool InRange (int min, int max)
     {
-        if (cursor >= limit) return false;
+        if (cursor >= limit)
+        {
+            return false;
+        }
 
         //           char ch = current.charAt(cursor);
         var ch = (int)current[cursor];
-        if (ch > max || ch < min) return false;
+        if (ch > max || ch < min)
+        {
+            return false;
+        }
+
         cursor++;
         return true;
     }
@@ -201,11 +235,18 @@ public class StemmerOperations
     /// </summary>
     protected bool InRangeB (int min, int max)
     {
-        if (cursor <= limit_backward) return false;
+        if (cursor <= limit_backward)
+        {
+            return false;
+        }
 
         //           char ch = current.charAt(cursor - 1);
         var ch = (int)current[cursor - 1];
-        if (ch > max || ch < min) return false;
+        if (ch > max || ch < min)
+        {
+            return false;
+        }
+
         cursor--;
         return true;
     }
@@ -215,11 +256,18 @@ public class StemmerOperations
     /// </summary>
     protected bool OutRange (int min, int max)
     {
-        if (cursor >= limit) return false;
+        if (cursor >= limit)
+        {
+            return false;
+        }
 
         //           char ch = current.charAt(cursor);
         var ch = (int)current[cursor];
-        if (!(ch > max || ch < min)) return false;
+        if (!(ch > max || ch < min))
+        {
+            return false;
+        }
+
         cursor++;
         return true;
     }
@@ -229,11 +277,18 @@ public class StemmerOperations
     /// </summary>
     protected bool OutRangeB (int min, int max)
     {
-        if (cursor <= limit_backward) return false;
+        if (cursor <= limit_backward)
+        {
+            return false;
+        }
 
         //           char ch = current.charAt(cursor - 1);
         var ch = (int)current[cursor - 1];
-        if (!(ch > max || ch < min)) return false;
+        if (!(ch > max || ch < min))
+        {
+            return false;
+        }
+
         cursor--;
         return true;
     }
@@ -243,11 +298,18 @@ public class StemmerOperations
     /// </summary>
     protected bool eq_s (int s_size, string s)
     {
-        if (limit - cursor < s_size) return false;
+        if (limit - cursor < s_size)
+        {
+            return false;
+        }
+
         int i;
         for (i = 0; i != s_size; i++)
         {
-            if (current[cursor + i] != s[i]) return false;
+            if (current[cursor + i] != s[i])
+            {
+                return false;
+            }
 
             //               if (current[cursor + i] != s[i]) return false;
         }
@@ -261,12 +323,19 @@ public class StemmerOperations
     /// </summary>
     protected bool eq_s_b (int s_size, string s)
     {
-        if (cursor - limit_backward < s_size) return false;
+        if (cursor - limit_backward < s_size)
+        {
+            return false;
+        }
+
         int i;
         for (i = 0; i != s_size; i++)
         {
             //               if (current.charAt(cursor - s_size + i) != s.charAt(i)) return false;
-            if (current[cursor - s_size + i] != s[i]) return false;
+            if (current[cursor - s_size + i] != s[i])
+            {
+                return false;
+            }
         }
 
         cursor -= s_size;
@@ -322,7 +391,11 @@ public class StemmerOperations
                 }
 
                 diff = current[c + common] - w.s[i2];
-                if (diff != 0) break;
+                if (diff != 0)
+                {
+                    break;
+                }
+
                 common++;
             }
 
@@ -339,13 +412,24 @@ public class StemmerOperations
 
             if (j - i <= 1)
             {
-                if (i > 0) break; // v->s has been inspected
-                if (j == i) break; // only one item in v
+                if (i > 0)
+                {
+                    break; // v->s has been inspected
+                }
+
+                if (j == i)
+                {
+                    break; // only one item in v
+                }
 
                 // - but now we need to go round once more to get
                 // v->s inspected. This looks messy, but is actually
                 // the optimal approach.
-                if (first_key_inspected) break;
+                if (first_key_inspected)
+                {
+                    break;
+                }
+
                 first_key_inspected = true;
             }
         }
@@ -356,7 +440,10 @@ public class StemmerOperations
             if (common_i >= w.s_size)
             {
                 cursor = c + w.s_size;
-                if (w.method == null) return w.result;
+                if (w.method == null)
+                {
+                    return w.result;
+                }
 
                 //bool res;
                 //try
@@ -379,7 +466,10 @@ public class StemmerOperations
             }
 
             i = w.substring_i;
-            if (i < 0) return 0;
+            if (i < 0)
+            {
+                return 0;
+            }
         }
     }
 
@@ -411,7 +501,11 @@ public class StemmerOperations
 
                 //                   diff = current.charAt(c - 1 - common) - w.s[i2];
                 diff = current[c - 1 - common] - w.s[i2];
-                if (diff != 0) break;
+                if (diff != 0)
+                {
+                    break;
+                }
+
                 common++;
             }
 
@@ -428,9 +522,21 @@ public class StemmerOperations
 
             if (j - i <= 1)
             {
-                if (i > 0) break;
-                if (j == i) break;
-                if (first_key_inspected) break;
+                if (i > 0)
+                {
+                    break;
+                }
+
+                if (j == i)
+                {
+                    break;
+                }
+
+                if (first_key_inspected)
+                {
+                    break;
+                }
+
                 first_key_inspected = true;
             }
         }
@@ -441,7 +547,10 @@ public class StemmerOperations
             if (common_i >= w.s_size)
             {
                 cursor = c - w.s_size;
-                if (w.method == null) return w.result;
+                if (w.method == null)
+                {
+                    return w.result;
+                }
 
                 //boolean res;
                 //try
@@ -465,7 +574,10 @@ public class StemmerOperations
             }
 
             i = w.substring_i;
-            if (i < 0) return 0;
+            if (i < 0)
+            {
+                return 0;
+            }
         }
     }
 
@@ -486,8 +598,15 @@ public class StemmerOperations
         //           current.replace(c_bra, c_ket, s);
         current = StringBufferReplace (c_bra, c_ket, current, s);
         limit += adjustment;
-        if (cursor >= c_ket) cursor += adjustment;
-        else if (cursor > c_bra) cursor = c_bra;
+        if (cursor >= c_ket)
+        {
+            cursor += adjustment;
+        }
+        else if (cursor > c_bra)
+        {
+            cursor = c_bra;
+        }
+
         return adjustment;
     }
 
@@ -585,8 +704,15 @@ public class StemmerOperations
         )
     {
         var adjustment = ReplaceS (c_bra, c_ket, s);
-        if (c_bra <= bra) bra += adjustment;
-        if (c_bra <= ket) ket += adjustment;
+        if (c_bra <= bra)
+        {
+            bra += adjustment;
+        }
+
+        if (c_bra <= ket)
+        {
+            ket += adjustment;
+        }
     }
 
     /// <summary>

@@ -68,7 +68,7 @@ public sealed class BreakSet
         var nbr = 0;
 
         if (!string.IsNullOrEmpty (scw))
-            foreach (var breakEntry in items)
+            foreach (var breakEntry in _items)
             {
                 var pos = 0;
                 while ((pos = scw.IndexOf (breakEntry, pos, StringComparison.Ordinal)) >= 0)

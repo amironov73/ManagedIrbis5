@@ -23,47 +23,81 @@ using System.Collections.Generic;
 
 namespace AM.Linguistics.Hunspell.Infrastructure;
 
+/// <summary>
+///
+/// </summary>
+/// <typeparam name="T"></typeparam>
 public class ArrayWrapper<T>
     : IReadOnlyList<T>
 {
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="items"></param>
+    /// <exception cref="ArgumentNullException"></exception>
     protected ArrayWrapper (T[] items)
     {
-        this.items = items ?? throw new ArgumentNullException (nameof (items));
+        this._items = items ?? throw new ArgumentNullException (nameof (items));
         IsEmpty = items.Length == 0;
     }
 
-    internal readonly T[] items;
+    internal readonly T[] _items;
 
+    /// <summary>
+    ///
+    /// </summary>
     public bool IsEmpty { get; }
 
+    /// <summary>
+    ///
+    /// </summary>
     public bool HasItems => !IsEmpty;
 
-    public ref readonly T this [int index] => ref items[index];
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="index"></param>
+    public ref readonly T this [int index] => ref _items[index];
 
-    public int Count => items.Length;
+    /// <summary>
+    ///
+    /// </summary>
+    public int Count => _items.Length;
 
-    T IReadOnlyList<T>.this [int index] => items[index];
+    T IReadOnlyList<T>.this [int index] => _items[index];
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public ReadOnlySpan<T>.Enumerator GetEnumerator()
     {
-        return new ReadOnlySpan<T> (items).GetEnumerator();
+        return new ReadOnlySpan<T> (_items).GetEnumerator();
     }
 
     IEnumerator<T> IEnumerable<T>.GetEnumerator()
     {
-        return ((IEnumerable<T>)items).GetEnumerator();
+        return ((IEnumerable<T>)_items).GetEnumerator();
     }
 
     IEnumerator IEnumerable.GetEnumerator()
     {
-        return items.GetEnumerator();
+        return _items.GetEnumerator();
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <typeparam name="TValue"></typeparam>
+    /// <typeparam name="TCollection"></typeparam>
     public class ArrayWrapperComparer<TValue, TCollection> :
         IEqualityComparer<TCollection>
         where TCollection : ArrayWrapper<TValue>
         where TValue : IEquatable<TValue>
     {
+        /// <summary>
+        ///
+        /// </summary>
         public ArrayWrapperComparer()
         {
             arrayComparer = ArrayComparer<TValue>.Default;
@@ -71,17 +105,28 @@ public class ArrayWrapper<T>
 
         private readonly ArrayComparer<TValue> arrayComparer;
 
-        public bool Equals (TCollection x, TCollection y)
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
+        public bool Equals (TCollection? x, TCollection? y)
         {
             if (x == null) return y == null;
             if (y == null) return false;
 
-            return arrayComparer.Equals (x.items, y.items);
+            return arrayComparer.Equals (x._items, y._items);
         }
 
-        public int GetHashCode (TCollection obj)
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public int GetHashCode (TCollection? obj)
         {
-            return obj == null ? 0 : arrayComparer.GetHashCode (obj.items);
+            return obj == null ? 0 : arrayComparer.GetHashCode (obj._items);
         }
     }
 }

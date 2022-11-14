@@ -57,7 +57,7 @@ public sealed class CompoundRule : ArrayWrapper<FlagValue>
 
     internal bool ContainsRuleFlagForEntry (WordEntryDetail details)
     {
-        foreach (var flag in items)
+        foreach (var flag in _items)
             if (!flag.IsWildcard && details.ContainsFlag (flag))
                 return true;
 

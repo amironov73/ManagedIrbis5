@@ -72,21 +72,21 @@ namespace AM.Linguistics.Hunspell
 
         internal static FlagSet Union (FlagSet set, FlagValue value)
         {
-            var valueIndex = Array.BinarySearch (set.items, value);
+            var valueIndex = Array.BinarySearch (set._items, value);
             if (valueIndex >= 0) return set;
 
             valueIndex = ~valueIndex; // locate the best insertion point
 
-            var newItems = new FlagValue[set.items.Length + 1];
-            if (valueIndex >= set.items.Length)
+            var newItems = new FlagValue[set._items.Length + 1];
+            if (valueIndex >= set._items.Length)
             {
-                Array.Copy (set.items, newItems, set.items.Length);
-                newItems[set.items.Length] = value;
+                Array.Copy (set._items, newItems, set._items.Length);
+                newItems[set._items.Length] = value;
             }
             else
             {
-                Array.Copy (set.items, newItems, valueIndex);
-                Array.Copy (set.items, valueIndex, newItems, valueIndex + 1, set.items.Length - valueIndex);
+                Array.Copy (set._items, newItems, valueIndex);
+                Array.Copy (set._items, valueIndex, newItems, valueIndex + 1, set._items.Length - valueIndex);
                 newItems[valueIndex] = value;
             }
 
@@ -109,12 +109,12 @@ namespace AM.Linguistics.Hunspell
         public bool Contains (FlagValue value)
         {
             if (!value.HasValue || IsEmpty) return false;
-            if (items.Length == 1) return value.Equals (items[0]);
+            if (_items.Length == 1) return value.Equals (_items[0]);
 
             return unchecked (value & mask) != default
-                   && value >= items[0]
-                   && value <= items[items.Length - 1]
-                   && Array.BinarySearch (items, value) >= 0;
+                   && value >= _items[0]
+                   && value <= _items[_items.Length - 1]
+                   && Array.BinarySearch (_items, value) >= 0;
         }
 
 #if !NO_INLINE
@@ -143,7 +143,7 @@ namespace AM.Linguistics.Hunspell
                    &&
                    (
                        ReferenceEquals (this, other)
-                       || ArrayComparer<FlagValue>.Default.Equals (other.items, items)
+                       || ArrayComparer<FlagValue>.Default.Equals (other._items, _items)
                    );
         }
 
@@ -154,7 +154,7 @@ namespace AM.Linguistics.Hunspell
 
         public override int GetHashCode()
         {
-            return ArrayComparer<FlagValue>.Default.GetHashCode (items);
+            return ArrayComparer<FlagValue>.Default.GetHashCode (_items);
         }
     }
 }

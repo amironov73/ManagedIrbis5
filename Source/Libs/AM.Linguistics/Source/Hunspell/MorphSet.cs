@@ -57,7 +57,7 @@ public sealed class MorphSet : ArrayWrapper<string>, IEquatable<MorphSet>
 
     internal string Join (string seperator)
     {
-        return string.Join (seperator, items);
+        return string.Join (seperator, _items);
     }
 
     public bool Equals (MorphSet other)
@@ -66,7 +66,7 @@ public sealed class MorphSet : ArrayWrapper<string>, IEquatable<MorphSet>
                &&
                (
                    ReferenceEquals (this, other)
-                   || ArrayComparer<string>.Default.Equals (other.items, items)
+                   || ArrayComparer<string>.Default.Equals (other._items, _items)
                );
     }
 
@@ -77,6 +77,6 @@ public sealed class MorphSet : ArrayWrapper<string>, IEquatable<MorphSet>
 
     public override int GetHashCode()
     {
-        return ArrayComparer<string>.Default.GetHashCode (items);
+        return ArrayComparer<string>.Default.GetHashCode (_items);
     }
 }

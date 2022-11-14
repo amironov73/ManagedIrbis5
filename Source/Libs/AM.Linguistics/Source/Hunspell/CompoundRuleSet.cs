@@ -47,7 +47,7 @@ public sealed class CompoundRuleSet : ArrayWrapper<CompoundRule>
     internal bool EntryContainsRuleFlags (WordEntryDetail details)
     {
         if (details != null && details.HasFlags)
-            foreach (var rule in items)
+            foreach (var rule in _items)
                 if (rule.ContainsRuleFlagForEntry (details))
                     return true;
 
@@ -62,7 +62,7 @@ public sealed class CompoundRuleSet : ArrayWrapper<CompoundRule>
             new ()
         };
 
-        foreach (var compoundRule in items)
+        foreach (var compoundRule in _items)
         {
             var pp = 0; // pattern position
             var wp = 0; // "words" position

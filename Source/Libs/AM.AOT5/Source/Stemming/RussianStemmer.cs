@@ -21,180 +21,179 @@ namespace AM.AOT.Stemming;
 /// </summary>
 public sealed class RussianStemmer
     : StemmerOperations,
-        IStemmer
+    IStemmer
 {
-    private static readonly RussianStemmer methodObject
-        = new RussianStemmer();
+    private static readonly RussianStemmer methodObject = new ();
 
     private static readonly Among[] a_0 =
     {
-        new Among ("\u0432", -1, 1, null),
-        new Among ("\u0438\u0432", 0, 2, null),
-        new Among ("\u044B\u0432", 0, 2, null),
-        new Among ("\u0432\u0448\u0438", -1, 1, null),
-        new Among ("\u0438\u0432\u0448\u0438", 3, 2, null),
-        new Among ("\u044B\u0432\u0448\u0438", 3, 2, null),
-        new Among ("\u0432\u0448\u0438\u0441\u044C", -1, 1, null),
-        new Among ("\u0438\u0432\u0448\u0438\u0441\u044C", 6, 2, null),
-        new Among ("\u044B\u0432\u0448\u0438\u0441\u044C", 6, 2, null)
+        new ("\u0432", -1, 1, null),
+        new ("\u0438\u0432", 0, 2, null),
+        new ("\u044B\u0432", 0, 2, null),
+        new ("\u0432\u0448\u0438", -1, 1, null),
+        new ("\u0438\u0432\u0448\u0438", 3, 2, null),
+        new ("\u044B\u0432\u0448\u0438", 3, 2, null),
+        new ("\u0432\u0448\u0438\u0441\u044C", -1, 1, null),
+        new ("\u0438\u0432\u0448\u0438\u0441\u044C", 6, 2, null),
+        new ("\u044B\u0432\u0448\u0438\u0441\u044C", 6, 2, null)
     };
 
 
     private static readonly Among[] a_1 =
     {
-        new Among ("\u0435\u0435", -1, 1, null),
-        new Among ("\u0438\u0435", -1, 1, null),
-        new Among ("\u043E\u0435", -1, 1, null),
-        new Among ("\u044B\u0435", -1, 1, null),
-        new Among ("\u0438\u043C\u0438", -1, 1, null),
-        new Among ("\u044B\u043C\u0438", -1, 1, null),
-        new Among ("\u0435\u0439", -1, 1, null),
-        new Among ("\u0438\u0439", -1, 1, null),
-        new Among ("\u043E\u0439", -1, 1, null),
-        new Among ("\u044B\u0439", -1, 1, null),
-        new Among ("\u0435\u043C", -1, 1, null),
-        new Among ("\u0438\u043C", -1, 1, null),
-        new Among ("\u043E\u043C", -1, 1, null),
-        new Among ("\u044B\u043C", -1, 1, null),
-        new Among ("\u0435\u0433\u043E", -1, 1, null),
-        new Among ("\u043E\u0433\u043E", -1, 1, null),
-        new Among ("\u0435\u043C\u0443", -1, 1, null),
-        new Among ("\u043E\u043C\u0443", -1, 1, null),
-        new Among ("\u0438\u0445", -1, 1, null),
-        new Among ("\u044B\u0445", -1, 1, null),
-        new Among ("\u0435\u044E", -1, 1, null),
-        new Among ("\u043E\u044E", -1, 1, null),
-        new Among ("\u0443\u044E", -1, 1, null),
-        new Among ("\u044E\u044E", -1, 1, null),
-        new Among ("\u0430\u044F", -1, 1, null),
-        new Among ("\u044F\u044F", -1, 1, null)
+        new ("\u0435\u0435", -1, 1, null),
+        new ("\u0438\u0435", -1, 1, null),
+        new ("\u043E\u0435", -1, 1, null),
+        new ("\u044B\u0435", -1, 1, null),
+        new ("\u0438\u043C\u0438", -1, 1, null),
+        new ("\u044B\u043C\u0438", -1, 1, null),
+        new ("\u0435\u0439", -1, 1, null),
+        new ("\u0438\u0439", -1, 1, null),
+        new ("\u043E\u0439", -1, 1, null),
+        new ("\u044B\u0439", -1, 1, null),
+        new ("\u0435\u043C", -1, 1, null),
+        new ("\u0438\u043C", -1, 1, null),
+        new ("\u043E\u043C", -1, 1, null),
+        new ("\u044B\u043C", -1, 1, null),
+        new ("\u0435\u0433\u043E", -1, 1, null),
+        new ("\u043E\u0433\u043E", -1, 1, null),
+        new ("\u0435\u043C\u0443", -1, 1, null),
+        new ("\u043E\u043C\u0443", -1, 1, null),
+        new ("\u0438\u0445", -1, 1, null),
+        new ("\u044B\u0445", -1, 1, null),
+        new ("\u0435\u044E", -1, 1, null),
+        new ("\u043E\u044E", -1, 1, null),
+        new ("\u0443\u044E", -1, 1, null),
+        new ("\u044E\u044E", -1, 1, null),
+        new ("\u0430\u044F", -1, 1, null),
+        new ("\u044F\u044F", -1, 1, null)
     };
 
     private static readonly Among[] a_2 =
     {
-        new Among ("\u0435\u043C", -1, 1, null),
-        new Among ("\u043D\u043D", -1, 1, null),
-        new Among ("\u0432\u0448", -1, 1, null),
-        new Among ("\u0438\u0432\u0448", 2, 2, null),
-        new Among ("\u044B\u0432\u0448", 2, 2, null),
-        new Among ("\u0449", -1, 1, null),
-        new Among ("\u044E\u0449", 5, 1, null),
-        new Among ("\u0443\u044E\u0449", 6, 2, null)
+        new ("\u0435\u043C", -1, 1, null),
+        new ("\u043D\u043D", -1, 1, null),
+        new ("\u0432\u0448", -1, 1, null),
+        new ("\u0438\u0432\u0448", 2, 2, null),
+        new ("\u044B\u0432\u0448", 2, 2, null),
+        new ("\u0449", -1, 1, null),
+        new ("\u044E\u0449", 5, 1, null),
+        new ("\u0443\u044E\u0449", 6, 2, null)
     };
 
 
     private static readonly Among[] a_3 =
     {
-        new Among ("\u0441\u044C", -1, 1, null),
-        new Among ("\u0441\u044F", -1, 1, null)
+        new ("\u0441\u044C", -1, 1, null),
+        new ("\u0441\u044F", -1, 1, null)
     };
 
 
     private static readonly Among[] a_4 =
     {
-        new Among ("\u043B\u0430", -1, 1, null),
-        new Among ("\u0438\u043B\u0430", 0, 2, null),
-        new Among ("\u044B\u043B\u0430", 0, 2, null),
-        new Among ("\u043D\u0430", -1, 1, null),
-        new Among ("\u0435\u043D\u0430", 3, 2, null),
-        new Among ("\u0435\u0442\u0435", -1, 1, null),
-        new Among ("\u0438\u0442\u0435", -1, 2, null),
-        new Among ("\u0439\u0442\u0435", -1, 1, null),
-        new Among ("\u0435\u0439\u0442\u0435", 7, 2, null),
-        new Among ("\u0443\u0439\u0442\u0435", 7, 2, null),
-        new Among ("\u043B\u0438", -1, 1, null),
-        new Among ("\u0438\u043B\u0438", 10, 2, null),
-        new Among ("\u044B\u043B\u0438", 10, 2, null),
-        new Among ("\u0439", -1, 1, null),
-        new Among ("\u0435\u0439", 13, 2, null),
-        new Among ("\u0443\u0439", 13, 2, null),
-        new Among ("\u043B", -1, 1, null),
-        new Among ("\u0438\u043B", 16, 2, null),
-        new Among ("\u044B\u043B", 16, 2, null),
-        new Among ("\u0435\u043C", -1, 1, null),
-        new Among ("\u0438\u043C", -1, 2, null),
-        new Among ("\u044B\u043C", -1, 2, null),
-        new Among ("\u043D", -1, 1, null),
-        new Among ("\u0435\u043D", 22, 2, null),
-        new Among ("\u043B\u043E", -1, 1, null),
-        new Among ("\u0438\u043B\u043E", 24, 2, null),
-        new Among ("\u044B\u043B\u043E", 24, 2, null),
-        new Among ("\u043D\u043E", -1, 1, null),
-        new Among ("\u0435\u043D\u043E", 27, 2, null),
-        new Among ("\u043D\u043D\u043E", 27, 1, null),
-        new Among ("\u0435\u0442", -1, 1, null),
-        new Among ("\u0443\u0435\u0442", 30, 2, null),
-        new Among ("\u0438\u0442", -1, 2, null),
-        new Among ("\u044B\u0442", -1, 2, null),
-        new Among ("\u044E\u0442", -1, 1, null),
-        new Among ("\u0443\u044E\u0442", 34, 2, null),
-        new Among ("\u044F\u0442", -1, 2, null),
-        new Among ("\u043D\u044B", -1, 1, null),
-        new Among ("\u0435\u043D\u044B", 37, 2, null),
-        new Among ("\u0442\u044C", -1, 1, null),
-        new Among ("\u0438\u0442\u044C", 39, 2, null),
-        new Among ("\u044B\u0442\u044C", 39, 2, null),
-        new Among ("\u0435\u0448\u044C", -1, 1, null),
-        new Among ("\u0438\u0448\u044C", -1, 2, null),
-        new Among ("\u044E", -1, 2, null),
-        new Among ("\u0443\u044E", 44, 2, null)
+        new ("\u043B\u0430", -1, 1, null),
+        new ("\u0438\u043B\u0430", 0, 2, null),
+        new ("\u044B\u043B\u0430", 0, 2, null),
+        new ("\u043D\u0430", -1, 1, null),
+        new ("\u0435\u043D\u0430", 3, 2, null),
+        new ("\u0435\u0442\u0435", -1, 1, null),
+        new ("\u0438\u0442\u0435", -1, 2, null),
+        new ("\u0439\u0442\u0435", -1, 1, null),
+        new ("\u0435\u0439\u0442\u0435", 7, 2, null),
+        new ("\u0443\u0439\u0442\u0435", 7, 2, null),
+        new ("\u043B\u0438", -1, 1, null),
+        new ("\u0438\u043B\u0438", 10, 2, null),
+        new ("\u044B\u043B\u0438", 10, 2, null),
+        new ("\u0439", -1, 1, null),
+        new ("\u0435\u0439", 13, 2, null),
+        new ("\u0443\u0439", 13, 2, null),
+        new ("\u043B", -1, 1, null),
+        new ("\u0438\u043B", 16, 2, null),
+        new ("\u044B\u043B", 16, 2, null),
+        new ("\u0435\u043C", -1, 1, null),
+        new ("\u0438\u043C", -1, 2, null),
+        new ("\u044B\u043C", -1, 2, null),
+        new ("\u043D", -1, 1, null),
+        new ("\u0435\u043D", 22, 2, null),
+        new ("\u043B\u043E", -1, 1, null),
+        new ("\u0438\u043B\u043E", 24, 2, null),
+        new ("\u044B\u043B\u043E", 24, 2, null),
+        new ("\u043D\u043E", -1, 1, null),
+        new ("\u0435\u043D\u043E", 27, 2, null),
+        new ("\u043D\u043D\u043E", 27, 1, null),
+        new ("\u0435\u0442", -1, 1, null),
+        new ("\u0443\u0435\u0442", 30, 2, null),
+        new ("\u0438\u0442", -1, 2, null),
+        new ("\u044B\u0442", -1, 2, null),
+        new ("\u044E\u0442", -1, 1, null),
+        new ("\u0443\u044E\u0442", 34, 2, null),
+        new ("\u044F\u0442", -1, 2, null),
+        new ("\u043D\u044B", -1, 1, null),
+        new ("\u0435\u043D\u044B", 37, 2, null),
+        new ("\u0442\u044C", -1, 1, null),
+        new ("\u0438\u0442\u044C", 39, 2, null),
+        new ("\u044B\u0442\u044C", 39, 2, null),
+        new ("\u0435\u0448\u044C", -1, 1, null),
+        new ("\u0438\u0448\u044C", -1, 2, null),
+        new ("\u044E", -1, 2, null),
+        new ("\u0443\u044E", 44, 2, null)
     };
 
 
     private static readonly Among[] a_5 =
     {
-        new Among ("\u0430", -1, 1, null),
-        new Among ("\u0435\u0432", -1, 1, null),
-        new Among ("\u043E\u0432", -1, 1, null),
-        new Among ("\u0435", -1, 1, null),
-        new Among ("\u0438\u0435", 3, 1, null),
-        new Among ("\u044C\u0435", 3, 1, null),
-        new Among ("\u0438", -1, 1, null),
-        new Among ("\u0435\u0438", 6, 1, null),
-        new Among ("\u0438\u0438", 6, 1, null),
-        new Among ("\u0430\u043C\u0438", 6, 1, null),
-        new Among ("\u044F\u043C\u0438", 6, 1, null),
-        new Among ("\u0438\u044F\u043C\u0438", 10, 1, null),
-        new Among ("\u0439", -1, 1, null),
-        new Among ("\u0435\u0439", 12, 1, null),
-        new Among ("\u0438\u0435\u0439", 13, 1, null),
-        new Among ("\u0438\u0439", 12, 1, null),
-        new Among ("\u043E\u0439", 12, 1, null),
-        new Among ("\u0430\u043C", -1, 1, null),
-        new Among ("\u0435\u043C", -1, 1, null),
-        new Among ("\u0438\u0435\u043C", 18, 1, null),
-        new Among ("\u043E\u043C", -1, 1, null),
-        new Among ("\u044F\u043C", -1, 1, null),
-        new Among ("\u0438\u044F\u043C", 21, 1, null),
-        new Among ("\u043E", -1, 1, null),
-        new Among ("\u0443", -1, 1, null),
-        new Among ("\u0430\u0445", -1, 1, null),
-        new Among ("\u044F\u0445", -1, 1, null),
-        new Among ("\u0438\u044F\u0445", 26, 1, null),
-        new Among ("\u044B", -1, 1, null),
-        new Among ("\u044C", -1, 1, null),
-        new Among ("\u044E", -1, 1, null),
-        new Among ("\u0438\u044E", 30, 1, null),
-        new Among ("\u044C\u044E", 30, 1, null),
-        new Among ("\u044F", -1, 1, null),
-        new Among ("\u0438\u044F", 33, 1, null),
-        new Among ("\u044C\u044F", 33, 1, null)
+        new ("\u0430", -1, 1, null),
+        new ("\u0435\u0432", -1, 1, null),
+        new ("\u043E\u0432", -1, 1, null),
+        new ("\u0435", -1, 1, null),
+        new ("\u0438\u0435", 3, 1, null),
+        new ("\u044C\u0435", 3, 1, null),
+        new ("\u0438", -1, 1, null),
+        new ("\u0435\u0438", 6, 1, null),
+        new ("\u0438\u0438", 6, 1, null),
+        new ("\u0430\u043C\u0438", 6, 1, null),
+        new ("\u044F\u043C\u0438", 6, 1, null),
+        new ("\u0438\u044F\u043C\u0438", 10, 1, null),
+        new ("\u0439", -1, 1, null),
+        new ("\u0435\u0439", 12, 1, null),
+        new ("\u0438\u0435\u0439", 13, 1, null),
+        new ("\u0438\u0439", 12, 1, null),
+        new ("\u043E\u0439", 12, 1, null),
+        new ("\u0430\u043C", -1, 1, null),
+        new ("\u0435\u043C", -1, 1, null),
+        new ("\u0438\u0435\u043C", 18, 1, null),
+        new ("\u043E\u043C", -1, 1, null),
+        new ("\u044F\u043C", -1, 1, null),
+        new ("\u0438\u044F\u043C", 21, 1, null),
+        new ("\u043E", -1, 1, null),
+        new ("\u0443", -1, 1, null),
+        new ("\u0430\u0445", -1, 1, null),
+        new ("\u044F\u0445", -1, 1, null),
+        new ("\u0438\u044F\u0445", 26, 1, null),
+        new ("\u044B", -1, 1, null),
+        new ("\u044C", -1, 1, null),
+        new ("\u044E", -1, 1, null),
+        new ("\u0438\u044E", 30, 1, null),
+        new ("\u044C\u044E", 30, 1, null),
+        new ("\u044F", -1, 1, null),
+        new ("\u0438\u044F", 33, 1, null),
+        new ("\u044C\u044F", 33, 1, null)
     };
 
 
     private static readonly Among[] a_6 =
     {
-        new Among ("\u043E\u0441\u0442", -1, 1, null),
-        new Among ("\u043E\u0441\u0442\u044C", -1, 1, null)
+        new ("\u043E\u0441\u0442", -1, 1, null),
+        new ("\u043E\u0441\u0442\u044C", -1, 1, null)
     };
 
 
     private static readonly Among[] a_7 =
     {
-        new Among ("\u0435\u0439\u0448\u0435", -1, 1, null),
-        new Among ("\u043D", -1, 2, null),
-        new Among ("\u0435\u0439\u0448", -1, 1, null),
-        new Among ("\u044C", -1, 3, null)
+        new ("\u0435\u0439\u0448\u0435", -1, 1, null),
+        new ("\u043D", -1, 2, null),
+        new ("\u0435\u0439\u0448", -1, 1, null),
+        new ("\u044C", -1, 3, null)
     };
 
 
@@ -214,8 +213,8 @@ public sealed class RussianStemmer
 
     private bool r_mark_regions()
     {
-        bool root = false;
-        bool subroot = false;
+        var root = false;
+        var subroot = false;
         int v_1;
 
         // (, line 57
@@ -368,7 +367,7 @@ public sealed class RussianStemmer
 
     private bool r_perfective_gerund()
     {
-        bool subroot = false;
+        var subroot = false;
         int among_var;
         int v_1;
 
@@ -463,8 +462,8 @@ public sealed class RussianStemmer
 
     private bool r_adjectival()
     {
-        bool root = false;
-        bool subroot = false;
+        var root = false;
+        var subroot = false;
         int among_var;
         int v_1;
         int v_2;
@@ -569,6 +568,7 @@ public sealed class RussianStemmer
         {
             case 0:
                 return false;
+
             case 1:
                 // (, line 132
                 // delete, line 132
@@ -581,7 +581,7 @@ public sealed class RussianStemmer
 
     private bool r_verb()
     {
-        bool subroot = false;
+        var subroot = false;
         int among_var;
         int v_1;
 
@@ -783,8 +783,8 @@ public sealed class RussianStemmer
 
     private bool CanStem()
     {
-        bool root = false;
-        bool subroot = false;
+        var root = false;
+        var subroot = false;
         int v_1;
         int v_2;
         int v_3;
@@ -965,7 +965,8 @@ public sealed class RussianStemmer
             {
                 break;
             }
-        } while (false);
+        }
+        while (false);
 
         cursor = limit - v_10;
         limit_backward = v_3;

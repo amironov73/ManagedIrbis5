@@ -18,12 +18,10 @@
 using System;
 
 using AM;
-
-using Avalonia.Controls;
-
-using AM.Avalonia.Source;
+using AM.Avalonia;
 
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Themes.Fluent;
 
 using Microsoft.Extensions.Logging;

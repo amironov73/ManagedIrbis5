@@ -35,7 +35,7 @@ using Avalonia.Media;
 
 #nullable enable
 
-namespace AM.Avalonia.Source;
+namespace AM.Avalonia;
 
 /// <summary>
 /// Полезные расширения для Avalonia UI.

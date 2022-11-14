@@ -93,7 +93,7 @@ namespace AM.Linguistics.Hunspell
 
         internal Affix<TEntry>[] CreateAffixes()
         {
-            var source = Entries.items;
+            var source = Entries._items;
             var result = new Affix<TEntry>[source.Length];
             for (var i = 0; i < source.Length; i++) result[i] = Affix<TEntry>.Create (source[i], this);
 
