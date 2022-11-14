@@ -16,6 +16,7 @@ using System;
 using System.Text;
 
 using AM.Interactivity;
+using AM.Plugins;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -49,6 +50,9 @@ public class MagnaBackbone
     /// <inheritdoc cref="IMagnaBackbone.Configuration"/>
     public IConfiguration Configuration { get; internal set; }
 
+    /// <inheritdoc cref="IMagnaBackbone.PluginManager"/>
+    public IPluginManager PluginManager { get; internal set; }
+
     /// <inheritdoc cref="IMagnaBackbone.Logger"/>
     public ILogger Logger { get; internal set; }
 
@@ -69,6 +73,7 @@ public class MagnaBackbone
         ApplicationHost = null!;
         Configuration = null!;
         Logger = null!;
+        PluginManager = new NullPluginLoader();
 
         Args = args;
         _builder = Host.CreateDefaultBuilder (args);
@@ -90,6 +95,7 @@ public class MagnaBackbone
         ApplicationHost = null!;
         Configuration = null!;
         Logger = null!;
+        PluginManager = new NullPluginLoader();
 
         _builder = builder;
         Args = args;
@@ -277,6 +283,16 @@ public class MagnaBackbone
         Logger.LogInformation ("Final initialization done");
 
         MarkAsInitialized();
+    }
+
+    /// <inheritdoc cref="IMagnaBackbone.LoadPlugins"/>
+    public void LoadPlugins
+        (
+            IPluginManager? loader = null
+        )
+    {
+        loader ??= new StandardPluginManager();
+        loader.LoadPlugins();
     }
 
     /// <inheritdoc cref="IMagnaBackbone.Shutdown"/>

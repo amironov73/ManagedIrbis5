@@ -19,6 +19,10 @@
 
 using System;
 
+using AM.Plugins;
+
+using Autofac;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -47,6 +51,11 @@ public interface IMagnaBackbone
     /// Конфигурация приложения.
     /// </summary>
     public IConfiguration Configuration { get; }
+
+    /// <summary>
+    /// Менеджер плагинов.
+    /// </summary>
+    public IPluginManager PluginManager { get; }
 
     /// <summary>
     /// Централизованный логгер.
@@ -85,6 +94,14 @@ public interface IMagnaBackbone
     /// Инициализация хребта.
     /// </summary>
     void Initialize();
+
+    /// <summary>
+    /// Загрузка плагинов.
+    /// </summary>
+    void LoadPlugins
+        (
+            IPluginManager? loader = null
+        );
 
     /// <summary>
     /// Завершение работы хребта.

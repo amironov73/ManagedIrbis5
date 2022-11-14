@@ -5,13 +5,15 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* PliginInfo.cs -- информация о плагине
+/* IPluginLoader.cs -- интерфейс загрузчика плагинов
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
+using System.Collections.Generic;
+
+using Autofac;
 
 #endregion
 
@@ -20,26 +22,22 @@ using System;
 namespace AM.Plugins;
 
 /// <summary>
-/// Информация о плагине.
+/// Интерфейс загрузчика плагинов.
 /// </summary>
-public sealed class PluginInfo
+public interface IPluginManager
 {
-    #region Properties
+    /// <summary>
+    /// Загруженные плагины.
+    /// </summary>
+    public IReadOnlyDictionary<string, PluginDescription> Plugins { get; }
 
     /// <summary>
-    /// Имя плагина (произвольное, уникальное).
+    /// Контейнер для разрешения зависимостей.
     /// </summary>
-    public string? Name { get; set; }
+    public IContainer Container { get; }
 
     /// <summary>
-    /// Описание в произвольной форме.
+    /// Загрузка плагинов.
     /// </summary>
-    public string? Description { get; set; }
-
-    /// <summary>
-    /// Версия.
-    /// </summary>
-    public Version? Version { get; set; }
-
-    #endregion
+    void LoadPlugins();
 }
