@@ -27,7 +27,10 @@ namespace AM.Text;
 /// <summary>
 /// A UnicodeSequence is a combination of one or more codepoints.
 /// </summary>
-public struct UnicodeSequence : IComparable<UnicodeSequence>, IEquatable<UnicodeSequence>, IEquatable<string>
+public struct UnicodeSequence
+    : IComparable<UnicodeSequence>,
+    IEquatable<UnicodeSequence>,
+    IEquatable<string>
 {
     private static readonly char[] SequenceSplitChars = new[] { ',', ' ' };
 

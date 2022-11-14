@@ -7,6 +7,7 @@
 
 #region Using directives
 
+using AM.AOT.Stemming;
 using AM.ComponentModel;
 using AM.PlatformAbstraction;
 
@@ -116,8 +117,48 @@ public class TeapotSearcherTest
     }
 
     [TestMethod]
-    [Description ("Построение запроса по пустой строке")]
+    [Description ("Применение стеммера")]
     public void TeapotSearcher_BuildSearchExpression_5()
+    {
+        var serviceProvider = ServiceProviderUtility.CreateNullProvider();
+        var stemmer = new RussianStemmer();
+        var searcher = new TeapotSearcher (serviceProvider)
+        {
+            Stemmer = stemmer
+        };
+
+        var expression = searcher.BuildSearchExpression ("кошки");
+
+        Assert.AreEqual
+            (
+                "K=кошк$ + A=кошк$ + M=кошк$ + T=кошк$",
+                expression
+            );
+    }
+
+    [TestMethod]
+    [Description ("Применение стеммера")]
+    public void TeapotSearcher_BuildSearchExpression_6()
+    {
+        var serviceProvider = ServiceProviderUtility.CreateNullProvider();
+        var stemmer = new RussianStemmer();
+        var searcher = new TeapotSearcher (serviceProvider)
+        {
+            Stemmer = stemmer
+        };
+
+        var expression = searcher.BuildSearchExpression ("кошки и собака");
+
+        Assert.AreEqual
+            (
+                "K=кошк$ + A=кошк$ + M=кошк$ + T=кошк$ + \"K=кошки и собака$\" + \"A=кошки и собака$\" + \"M=кошки и собака$\" + \"T=кошки и собака$\" + K=собак$ + A=собак$ + M=собак$ + T=собак$",
+                expression
+            );
+    }
+
+    [TestMethod]
+    [Description ("Построение запроса по пустой строке")]
+    public void TeapotSearcher_BuildSearchExpression_7()
     {
         var serviceProvider = ServiceProviderUtility.CreateNullProvider();
         var searcher = new TeapotSearcher (serviceProvider);

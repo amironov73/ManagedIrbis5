@@ -22,6 +22,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 using AM;
+using AM.AOT.Stemming;
 using AM.Collections;
 using AM.Text;
 
@@ -43,7 +44,7 @@ namespace ManagedIrbis.Searching;
 public class AsyncTeapotSearcher
     : IAsyncTeapotSearcher
 {
-   #region Properties
+    #region Properties
 
     /// <summary>
     /// Список применяемых префиксов.
@@ -54,6 +55,11 @@ public class AsyncTeapotSearcher
     /// Суффикс, присоединяемый к терминам поискового запроса.
     /// </summary>
     public string? Suffix { get; set; }
+
+    /// <summary>
+    /// Стеммер (опционально).
+    /// </summary>
+    public IStemmer? Stemmer { get; set; }
 
     /// <summary>
     /// Провайдер сервисов.
@@ -94,6 +100,24 @@ public class AsyncTeapotSearcher
 
     private readonly ILogger _logger;
 
+    private string StemTheWordIfHasTheMeaning
+        (
+            string text
+        )
+    {
+        if (UnicodeUtility.TextContainsNonLatinNorCyrillicSymbols (text))
+        {
+            return text;
+        }
+
+        if (Stemmer is not null)
+        {
+            return Stemmer.Stem (text);
+        }
+
+        return text;
+    }
+
     #endregion
 
     #region ITeapotSearcher members
@@ -131,6 +155,7 @@ public class AsyncTeapotSearcher
                 continue;
             }
 
+            var item = StemTheWordIfHasTheMeaning (term);
             foreach (var prefix in Prefixes)
             {
                 if (!first)
@@ -138,7 +163,7 @@ public class AsyncTeapotSearcher
                     builder.Append (" + ");
                 }
 
-                builder.Append (Q.WrapIfNeeded (prefix + term + Suffix));
+                builder.Append (Q.WrapIfNeeded (prefix + item + Suffix));
 
                 first = false;
             }

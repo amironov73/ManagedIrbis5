@@ -14,11 +14,11 @@
         <Title>ArsMagna core services</Title>
     </PropertyGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PropertyGroup Condition="'$(Configuration)'=='Debug'">
         <DocumentationFile>bin\Debug\AM.Core5.xml</DocumentationFile>
     </PropertyGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <PropertyGroup Condition="'$(Configuration)'=='Release'">
         <DocumentationFile>bin\Release\AM.Core5.xml</DocumentationFile>
     </PropertyGroup>
 
@@ -28,6 +28,7 @@
 
     <!-- Централизованное управление пакетами -->
     <ItemGroup>
+        <PackageReference Include="Autofac" />
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" />
         <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
         <PackageReference Include="Microsoft.Extensions.Configuration" />

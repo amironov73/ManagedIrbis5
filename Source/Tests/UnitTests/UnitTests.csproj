@@ -19,6 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\Libs\AM.AOT5\AM.AOT5.csproj" />
         <ProjectReference Include="..\..\Libs\AM.Linguistics\AM.Linguistics.csproj" />
         <ProjectReference Include="..\..\Libs\AM.Scripting\AM.Scripting.csproj" />
     </ItemGroup>

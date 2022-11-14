@@ -17,6 +17,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 
 using AM;
+using AM.AOT.Stemming;
 using AM.Collections;
 using AM.Text;
 
@@ -48,6 +49,11 @@ public class TeapotSearcher
     /// Суффикс, присоединяемый к терминам поискового запроса.
     /// </summary>
     public string? Suffix { get; set; }
+
+    /// <summary>
+    /// Стеммер (опционально).
+    /// </summary>
+    public IStemmer? Stemmer { get; set; }
 
     /// <summary>
     /// Провайдер сервисов.
@@ -88,6 +94,24 @@ public class TeapotSearcher
 
     private readonly ILogger _logger;
 
+    private string StemTheWordIfHasTheMeaning
+        (
+            string text
+        )
+    {
+        if (UnicodeUtility.TextContainsNonLatinNorCyrillicSymbols (text))
+        {
+            return text;
+        }
+
+        if (Stemmer is not null)
+        {
+            return Stemmer.Stem (text);
+        }
+
+        return text;
+    }
+
     #endregion
 
     #region ITeapotSearcher members
@@ -125,6 +149,7 @@ public class TeapotSearcher
                 continue;
             }
 
+            var item = StemTheWordIfHasTheMeaning (term);
             foreach (var prefix in Prefixes)
             {
                 if (!first)
@@ -132,7 +157,7 @@ public class TeapotSearcher
                     builder.Append (" + ");
                 }
 
-                builder.Append (Q.WrapIfNeeded (prefix + term + Suffix));
+                builder.Append (Q.WrapIfNeeded (prefix + item + Suffix));
 
                 first = false;
             }
