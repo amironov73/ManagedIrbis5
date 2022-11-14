@@ -18,24 +18,30 @@ using System;
 
 #nullable enable
 
-namespace ManagedIrbis.Direct
+namespace ManagedIrbis.Direct;
+
+/// <summary>
+/// Интерфейс стратегии прямого доступа к базам данных.
+/// </summary>
+public interface IDirectAccess64Strategy
+    : IDisposable
 {
     /// <summary>
-    /// Интерфейс стратегии прямого доступа к базам данных.
+    /// Создание акцессора.
     /// </summary>
-    public interface IDirectAccess64Strategy
-        : IDisposable
-    {
-        /// <summary>
-        /// Создание акцессора.
-        /// </summary>
-        DirectAccessProxy64 CreateAccessor(DirectProvider provider, string? databaseName, IServiceProvider? serviceProvider);
+    DirectAccessProxy64 CreateAccessor
+        (
+            DirectProvider provider,
+            string? databaseName,
+            IServiceProvider? serviceProvider
+        );
 
-        /// <summary>
-        /// Временное освобождение акцессора.
-        /// </summary>
-        void ReleaseAccessor(DirectProvider? provider, DirectAccess64 accessor);
-
-    } // interface IDirectAccess64Strategy
-
-} // namespace ManagedIrbis.Direct
+    /// <summary>
+    /// Временное освобождение акцессора.
+    /// </summary>
+    void ReleaseAccessor
+        (
+            DirectProvider? provider,
+            DirectAccess64 accessor
+        );
+}
