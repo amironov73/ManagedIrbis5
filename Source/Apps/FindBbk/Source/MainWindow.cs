@@ -39,6 +39,8 @@ public partial class MainWindow
 {
     public MainWindow()
     {
+        this.AttachDevTools();
+
         Width = 600;
         Height = 400;
         Title = "Поиск по эталону ББК";
@@ -47,6 +49,7 @@ public partial class MainWindow
 
         var bbkList = new ListBox
         {
+            VerticalAlignment = VerticalAlignment.Stretch,
             HorizontalAlignment = HorizontalAlignment.Stretch,
             [!ItemsControl.ItemsProperty] = new Binding(nameof (BbkModel.Found)),
             ItemTemplate = new FuncDataTemplate<BbkEntry> ((_, _) =>
@@ -115,6 +118,7 @@ public partial class MainWindow
                 {
                     RowDefinitions = new RowDefinitions("*"),
                     ColumnDefinitions = new ColumnDefinitions("Auto,*,Auto"),
+                    VerticalAlignment = VerticalAlignment.Stretch,
                     HorizontalAlignment = HorizontalAlignment.Stretch,
 
                     Children =
