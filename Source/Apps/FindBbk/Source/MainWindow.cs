@@ -10,7 +10,7 @@
 // ReSharper disable PartialTypeWithSinglePart
 // ReSharper disable StringLiteralTypo
 
-/* BbkModel.cs -- модель для окна поиска в эталоне ББК
+/* MainWindow.cs -- главное окно для вывода результатов
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -34,7 +34,10 @@ using RestfulIrbis.RslServices;
 
 namespace FindBbk;
 
-public partial class MainWindow
+/// <summary>
+/// Главное окно для вывода результатов поиска по эталону ББК.
+/// </summary>
+public sealed class MainWindow
     : Window
 {
     public MainWindow()
@@ -51,18 +54,19 @@ public partial class MainWindow
 
         var bbkList = new ListBox
         {
-            Height = 320, // TODO разобраться, почему вылазит за границы по вертикали
-            // VerticalAlignment = VerticalAlignment.Stretch,
+            VerticalAlignment = VerticalAlignment.Stretch,
             HorizontalAlignment = HorizontalAlignment.Stretch,
             [!ItemsControl.ItemsProperty] = new Binding (nameof (BbkModel.Found)),
             ItemTemplate = new FuncDataTemplate<BbkEntry> ((_, _) =>
             {
                 var firstBlock = new TextBlock
                 {
+                    MinWidth = 100,
                     FontWeight = FontWeight.Bold,
                     Margin = new Thickness (0, 0, 10, 0),
                     [!TextBlock.TextProperty] = new Binding (nameof (BbkEntry.Index))
                 };
+                firstBlock.SetValue (DockPanel.DockProperty, Dock.Left);
                 firstBlock.PointerPressed += List_HandleItemClick;
 
                 var secondBlock = new TextBlock
@@ -70,15 +74,11 @@ public partial class MainWindow
                     TextWrapping = TextWrapping.WrapWithOverflow,
                     [!TextBlock.TextProperty] = new Binding (nameof (BbkEntry.Description))
                 };
-                secondBlock.SetValue (Grid.ColumnProperty, 1);
                 secondBlock.PointerPressed += List_HandleItemClick;
 
-                var result = new Grid
+                var result = new DockPanel
                 {
-                    RowDefinitions = new RowDefinitions ("*"),
-                    ColumnDefinitions = new ColumnDefinitions ("Auto,*"),
                     HorizontalAlignment = HorizontalAlignment.Stretch,
-
                     Children =
                     {
                         firstBlock,
@@ -92,13 +92,19 @@ public partial class MainWindow
             })
         };
 
+        var label = new Label
+        {
+            VerticalAlignment = VerticalAlignment.Center,
+            Content = "Искомое:"
+        };
+        label.SetValue (DockPanel.DockProperty, Dock.Left);
+
         var textBox = new TextBox
         {
             Margin = new Thickness (10, 0),
             HorizontalAlignment = HorizontalAlignment.Stretch,
             [!TextBox.TextProperty] = new Binding (nameof (BbkModel.LookingFor))
         };
-        textBox.SetValue (Grid.ColumnProperty, 1);
 
         var button = new Button
         {
@@ -106,45 +112,38 @@ public partial class MainWindow
             Content = "Найти",
             [!Button.CommandProperty] = new Binding (nameof (BbkModel.PerformSearch))
         };
-        button.SetValue (Grid.ColumnProperty, 2);
+        button.SetValue (DockPanel.DockProperty, Dock.Right);
 
-        Content = new StackPanel
+
+        var topDock = new DockPanel
+        {
+            Children =
+            {
+                label,
+                button,
+                textBox
+            }
+        };
+        topDock.SetValue (DockPanel.DockProperty, Dock.Top);
+
+        var errorLabel = new Label
+        {
+            HorizontalAlignment = HorizontalAlignment.Center,
+            FontWeight = FontWeight.Bold,
+            Foreground = Brushes.Red,
+            [!ContentProperty] = new Binding (nameof (BbkModel.ErrorMessage))
+        };
+        errorLabel.SetValue (DockPanel.DockProperty, Dock.Top);
+
+        Content = new DockPanel
         {
             Margin = new Thickness (10),
             HorizontalAlignment = HorizontalAlignment.Stretch,
             VerticalAlignment = VerticalAlignment.Stretch,
-            Orientation = Orientation.Vertical,
-            Spacing = 10,
             Children =
             {
-                new Grid
-                {
-                    RowDefinitions = new RowDefinitions ("*"),
-                    ColumnDefinitions = new ColumnDefinitions ("Auto,*,Auto"),
-                    VerticalAlignment = VerticalAlignment.Top,
-                    HorizontalAlignment = HorizontalAlignment.Stretch,
-
-                    Children =
-                    {
-                        new Label
-                        {
-                            VerticalAlignment = VerticalAlignment.Center,
-                            Content = "Искомое:"
-                        },
-
-                        textBox,
-                        button
-                    }
-                },
-
-                new Label
-                {
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    FontWeight = FontWeight.Bold,
-                    Foreground = Brushes.Red,
-                    [!ContentProperty] = new Binding (nameof (BbkModel.ErrorMessage))
-                },
-
+                topDock,
+                errorLabel,
                 bbkList
             }
         };

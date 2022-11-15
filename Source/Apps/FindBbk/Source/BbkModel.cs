@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable StringLiteralTypo
 
 /* BbkModel.cs -- модель для окна поиска в эталоне ББК
  * Ars Magna project, http://arsmagna.ru
