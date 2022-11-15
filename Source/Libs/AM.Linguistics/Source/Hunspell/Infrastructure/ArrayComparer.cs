@@ -29,55 +29,98 @@ internal sealed class ArrayComparer<T>
     public static readonly ArrayComparer<T> Default = new ();
 
     private static readonly StringComparer StringComparer =
-        typeof (T) == typeof (string) ? StringComparer.Ordinal : null;
+        typeof (T) == typeof (string) ? StringComparer.Ordinal : throw new Exception();
 
     private static readonly EqualityComparer<T> EqualityComparer = EqualityComparer<T>.Default;
 
-    public ArrayComparer()
+    /// <inheritdoc cref="IEqualityComparer{T}.Equals(T?,T?)"/>
+    public bool Equals
+        (
+            T[]? x,
+            T[]? y
+        )
     {
-    }
+        if (x is null)
+        {
+            return y == null;
+        }
 
-    public bool Equals (T[] x, T[] y)
-    {
-        if (x == null) return y == null;
+        if (y is null)
+        {
+            return false;
+        }
 
-        if (y == null) return false;
+        if (ReferenceEquals (x, y))
+        {
+            return true;
+        }
 
-        if (ReferenceEquals (x, y)) return true;
-
-        if (x.Length != y.Length) return false;
+        if (x.Length != y.Length)
+        {
+            return false;
+        }
 
         if (typeof (T) == typeof (char) || typeof (T) == typeof (FlagValue))
-            return x.AsSpan<T>().SequenceEqual (y.AsSpan<T>());
+        {
+            return x.AsSpan().SequenceEqual (y.AsSpan());
+        }
 
-        if (typeof (T) == typeof (string)) return CompareStrings ((string[])(object)x, (string[])(object)y);
+        if (typeof (T) == typeof (string))
+        {
+            return CompareStrings ((string[])(object)x, (string[])(object)y);
+        }
 
         return CompareAnything (x, y);
     }
 
-    private bool CompareStrings (string[] x, string[] y)
+    private bool CompareStrings
+        (
+            IReadOnlyList<string> x,
+            IReadOnlyList<string> y
+        )
     {
-        for (var i = 0; i < x.Length; i++)
+        for (var i = 0; i < x.Count; i++)
+        {
             if (!StringComparer.Equals (x[i], y[i]))
+            {
                 return false;
+            }
+        }
 
         return true;
     }
 
-    private bool CompareAnything (T[] x, T[] y)
+    private bool CompareAnything
+        (
+            IReadOnlyList<T> x,
+            IReadOnlyList<T> y
+        )
     {
-        for (var i = 0; i < x.Length; i++)
+        for (var i = 0; i < x.Count; i++)
+        {
             if (!EqualityComparer.Equals (x[i], y[i]))
+            {
                 return false;
+            }
+        }
 
         return true;
     }
 
-    public int GetHashCode (T[] obj)
+    public int GetHashCode
+        (
+            T[]? obj
+        )
     {
-        if (obj == null) return 0;
+        if (obj == null)
+        {
+            return 0;
+        }
 
-        if (obj.Length == 0) return 17;
+        if (obj.Length == 0)
+        {
+            return 17;
+        }
 
         unchecked
         {
@@ -87,9 +130,12 @@ internal sealed class ArrayComparer<T>
 
             if (obj.Length > 1)
             {
-                if (obj.Length > 2) hash = hash * 31 + obj[obj.Length / 2].GetHashCode();
+                if (obj.Length > 2)
+                {
+                    hash = hash * 31 + obj[obj.Length / 2].GetHashCode();
+                }
 
-                hash = hash * 31 + obj[obj.Length - 1].GetHashCode();
+                hash = hash * 31 + obj[^1].GetHashCode();
             }
 
             return hash;

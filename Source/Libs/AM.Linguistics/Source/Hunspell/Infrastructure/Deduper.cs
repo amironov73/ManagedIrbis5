@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 
-/* .cs --
+/* Deduper.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,7 +17,7 @@ using System.Collections.Generic;
 
 #endregion
 
-#nullable enable
+#nullable disable
 
 namespace AM.Linguistics.Hunspell.Infrastructure;
 
@@ -30,20 +30,24 @@ internal sealed class Deduper<T>
 
     private readonly Dictionary<T, T> lookup;
 
-    public T GetEqualOrAdd (T item)
+    public T GetEqualOrAdd
+        (
+            T item
+        )
     {
         if (lookup.TryGetValue (item, out var existing))
         {
             return existing;
         }
-        else
-        {
-            lookup[item] = item;
-            return item;
-        }
+
+        lookup[item] = item;
+        return item;
     }
 
-    public void Add (T item)
+    public void Add
+        (
+            T item
+        )
     {
         if (!lookup.ContainsKey (item)) lookup[item] = item;
     }
