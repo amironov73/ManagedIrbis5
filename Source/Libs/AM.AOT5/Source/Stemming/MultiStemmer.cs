@@ -23,7 +23,7 @@ namespace AM.AOT.Stemming;
 /// <summary>
 /// Комбинированный стеммер.
 /// </summary>
-public sealed class MultiStemmer
+public class MultiStemmer
     : IStemmer
 {
     #region Construction

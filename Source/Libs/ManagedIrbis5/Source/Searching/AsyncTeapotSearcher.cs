@@ -26,6 +26,7 @@ using AM.AOT.Stemming;
 using AM.Collections;
 using AM.Text;
 
+using ManagedIrbis.Identifiers;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Providers;
 
@@ -136,6 +137,11 @@ public class AsyncTeapotSearcher
         }
 
         query = query.Trim();
+
+        if (Isbn.Validate (query, false))
+        {
+            return Task.FromResult ($"\"B={query}\"");
+        }
 
         var terms = new CaseInsensitiveDictionary<object?>
         {

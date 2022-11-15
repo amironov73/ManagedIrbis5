@@ -21,6 +21,7 @@ using AM.AOT.Stemming;
 using AM.Collections;
 using AM.Text;
 
+using ManagedIrbis.Identifiers;
 using ManagedIrbis.Providers;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -138,6 +139,11 @@ public class TeapotSearcher
         foreach (Match match in Regex.Matches (query, @"\w+"))
         {
             terms[match.Value] = null;
+        }
+
+        if (Isbn.Validate (query, false))
+        {
+            return $"\"B={query}\"";
         }
 
         var builder = StringBuilderPool.Shared.Get();
