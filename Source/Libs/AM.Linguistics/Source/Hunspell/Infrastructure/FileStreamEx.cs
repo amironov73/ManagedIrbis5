@@ -5,9 +5,8 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
 
-/* .cs --
+/* FileStreamEx.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,15 +24,35 @@ internal static class FileStreamEx
 {
     private const int DefaultBufferSize = 4096;
 
-    public static FileStream OpenReadFileStream (string filePath)
+    public static FileStream OpenReadFileStream
+        (
+            string filePath
+        )
     {
-        return new (filePath, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultBufferSize,
-            FileOptions.SequentialScan);
+        return new
+            (
+                filePath,
+                FileMode.Open,
+                FileAccess.Read,
+                FileShare.Read,
+                DefaultBufferSize,
+                FileOptions.SequentialScan
+            );
     }
 
-    public static FileStream OpenAsyncReadFileStream (string filePath)
+    public static FileStream OpenAsyncReadFileStream
+        (
+            string filePath
+        )
     {
-        return new (filePath, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultBufferSize,
-            FileOptions.Asynchronous | FileOptions.SequentialScan);
+        return new
+            (
+                filePath,
+                FileMode.Open,
+                FileAccess.Read,
+                FileShare.Read,
+                DefaultBufferSize,
+                FileOptions.Asynchronous | FileOptions.SequentialScan
+            );
     }
 }
