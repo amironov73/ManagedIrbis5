@@ -1,6 +1,7 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable AccessToDisposedClosure
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable MemberCanBePrivate.Global
@@ -14,6 +15,8 @@
 
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
+using System.Threading;
 
 #endregion
 
@@ -27,6 +30,117 @@ namespace AM.Diagnostics;
 public static class ProcessUtility
 {
     #region Public methods
+
+    /// <summary>
+    /// Escape an argument for inclusion within a shell command.
+    /// </summary>
+    /// <param name="argument">The argument to escape.</param>
+    /// <param name="quote"></param>
+    /// <returns>An escapd string.</returns>
+    public static string Escape
+        (
+            string argument,
+            bool quote = false
+        )
+    {
+        Sure.NotNull (argument);
+
+        if (quote)
+        {
+            return "\""
+                + argument
+                    .Replace ("\\", "\\\\")
+                    .Replace ("\"", "\\\"")
+                    .Replace (";", "\\;")
+                + "\"";
+        }
+
+        return argument
+            .Replace ("\\", "\\\\")
+            .Replace ("\"", "\\\"")
+            .Replace (";", "\\;");
+    }
+
+    /// <summary>
+    ///     Execute a shell command.
+    /// </summary>
+    /// <param name="filename">The path to the executable.</param>
+    /// <param name="arguments">The arguments to add.</param>
+    /// <param name="timeout">The timeout for the command.</param>
+    /// <returns>The output of the shell command.</returns>
+    public static string ExecuteShellCommand
+        (
+            string filename,
+            string arguments,
+            int timeout = 9000
+        )
+    {
+        string result;
+        using var process = new Process();
+        process.StartInfo.FileName = filename;
+        process.StartInfo.Arguments = arguments;
+        process.StartInfo.UseShellExecute = false;
+
+        //set it to english
+        if (!process.StartInfo.EnvironmentVariables.ContainsKey ("LC_ALL"))
+        {
+            process.StartInfo.EnvironmentVariables.Add ("LC_ALL", "C");
+        }
+
+        process.StartInfo.RedirectStandardOutput = true;
+        process.StartInfo.RedirectStandardError = true;
+
+        var output = new StringBuilder();
+        var error = new StringBuilder();
+
+        using var outputWaitHandle = new AutoResetEvent (false);
+        using var errorWaitHandle = new AutoResetEvent (false);
+        process.OutputDataReceived += (_, eventArgs) =>
+        {
+            if (eventArgs.Data is null)
+            {
+                outputWaitHandle.Set();
+            }
+            else
+            {
+                output.AppendLine (eventArgs.Data);
+            }
+        };
+        process.ErrorDataReceived += (_, eventArgs) =>
+        {
+            if (eventArgs.Data == null)
+            {
+                errorWaitHandle.Set();
+            }
+            else
+            {
+                error.AppendLine (eventArgs.Data);
+            }
+        };
+        process.Start();
+        process.BeginOutputReadLine();
+        process.BeginErrorReadLine();
+        if (process.WaitForExit (timeout)
+            && outputWaitHandle.WaitOne (timeout)
+            && errorWaitHandle.WaitOne (timeout))
+        {
+            if (process.ExitCode == 0)
+            {
+                result = output.ToString();
+            }
+            else
+            {
+                throw new ArsMagnaException (error.ToString());
+            }
+        }
+        else
+        {
+            // Timed out.
+            throw new ArsMagnaException ("Timed out");
+        }
+
+        return result;
+    }
 
     /// <summary>
     /// Запуск процесса с перехватом всего консольного вывода

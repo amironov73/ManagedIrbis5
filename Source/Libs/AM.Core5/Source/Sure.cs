@@ -381,6 +381,30 @@ public static class Sure
     }
 
     /// <summary>
+    /// Проверка, что указатель <paramref name="argument"/> не <c>null</c>.
+    /// </summary>
+    [DebuggerHidden]
+    public static unsafe void NotNull<T>
+        (
+            T *argument,
+            [CallerArgumentExpression ("argument")]
+            string? argumentName = null
+        )
+        where T: unmanaged
+    {
+        if (argument == null)
+        {
+            if (!string.IsNullOrEmpty (argumentName))
+            {
+                // .NET 5 SDK подставляет в argumentName значение null, .NET 6 делает по-человечески
+                throw new ArgumentNullException (argumentName);
+            }
+
+            throw new ArgumentNullException();
+        }
+    }
+
+    /// <summary>
     /// Проверка, что указатель <paramref name="argument" /> не <c>null</c>.
     /// </summary>
     [DebuggerHidden]

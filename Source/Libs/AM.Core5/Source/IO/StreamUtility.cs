@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
+// ReSharper disable ForCanBeConvertedToForeach
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
@@ -120,6 +121,8 @@ public static class StreamUtility
             Stream stream
         )
     {
+        Sure.NotNull (stream);
+
         return stream.ReadByte() switch
         {
             0 => false,
@@ -163,6 +166,8 @@ public static class StreamUtility
             Stream stream
         )
     {
+        Sure.NotNull (stream);
+
         short value = default;
         var span = new Span<byte> ((byte*) &value, sizeof (short));
         ReadExact (stream, span);
@@ -177,6 +182,8 @@ public static class StreamUtility
             Stream stream
         )
     {
+        Sure.NotNull (stream);
+
         ushort value = default;
         var span = new Span<byte> ((byte*)&value, sizeof (ushort));
         ReadExact (stream, span);
@@ -191,6 +198,8 @@ public static class StreamUtility
             Stream stream
         )
     {
+        Sure.NotNull (stream);
+
         int value = default;
         var span = new Span<byte> ((byte*) &value, sizeof (int));
         ReadExact (stream, span);
@@ -205,6 +214,8 @@ public static class StreamUtility
             Stream stream
         )
     {
+        Sure.NotNull (stream);
+
         uint value = default;
         var span = new Span<byte> ((byte*) &value, sizeof (uint));
         ReadExact (stream, span);
@@ -219,6 +230,8 @@ public static class StreamUtility
             Stream stream
         )
     {
+        Sure.NotNull (stream);
+
         long value = default;
         var span = new Span<byte> ((byte*) &value, sizeof (long));
         ReadExact (stream, span);
@@ -233,6 +246,8 @@ public static class StreamUtility
             Stream stream
         )
     {
+        Sure.NotNull (stream);
+
         ulong value = default;
         var span = new Span<byte> ((byte*) &value, sizeof (ulong));
         ReadExact (stream, span);
@@ -247,6 +262,8 @@ public static class StreamUtility
             Stream stream
         )
     {
+        Sure.NotNull (stream);
+
         float value = default;
         var span = new Span<byte> ((byte*)&value, sizeof (float));
         ReadExact (stream, span);
@@ -261,6 +278,8 @@ public static class StreamUtility
             Stream stream
         )
     {
+        Sure.NotNull (stream);
+
         double value = default;
         var span = new Span<byte> ((byte*) &value, sizeof (double));
         ReadExact (stream, span);
@@ -278,6 +297,9 @@ public static class StreamUtility
             Encoding encoding
         )
     {
+        Sure.NotNull (stream);
+        Sure.NotNull (encoding);
+
         var count = ReadInt32 (stream);
         var bytes = ReadExact (stream, count);
         var result = encoding.GetString (bytes);
@@ -294,6 +316,8 @@ public static class StreamUtility
             Stream stream
         )
     {
+        Sure.NotNull (stream);
+
         return ReadString (stream, Encoding.UTF8);
     }
 
@@ -306,6 +330,8 @@ public static class StreamUtility
             Stream stream
         )
     {
+        Sure.NotNull (stream);
+
         var length = ReadInt32 (stream);
         var result = new short[length];
         for (var i = 0; i < length; i++)
@@ -325,6 +351,8 @@ public static class StreamUtility
             Stream stream
         )
     {
+        Sure.NotNull (stream);
+
         var length = ReadInt32 (stream);
         var result = new ushort[length];
         for (var i = 0; i < length; i++)
@@ -344,6 +372,8 @@ public static class StreamUtility
             Stream stream
         )
     {
+        Sure.NotNull (stream);
+
         var length = ReadInt32 (stream);
         var result = new int[length];
         for (var i = 0; i < length; i++)
@@ -363,6 +393,8 @@ public static class StreamUtility
             Stream stream
         )
     {
+        Sure.NotNull (stream);
+
         var length = ReadInt32 (stream);
         var result = new uint[length];
         for (var i = 0; i < length; i++)
@@ -383,6 +415,9 @@ public static class StreamUtility
             Encoding encoding
         )
     {
+        Sure.NotNull (stream);
+        Sure.NotNull (encoding);
+
         var length = ReadInt32 (stream);
         var result = new string[length];
         for (var i = 0; i < length; i++)
@@ -402,6 +437,8 @@ public static class StreamUtility
             Stream stream
         )
     {
+        Sure.NotNull (stream);
+
         return ReadStringArray (stream, Encoding.UTF8);
     }
 
@@ -414,6 +451,8 @@ public static class StreamUtility
             Stream stream
         )
     {
+        Sure.NotNull (stream);
+
         decimal value = default;
         var span = new Span<byte> ((byte*)&value, sizeof (decimal));
         ReadExact (stream, span);
@@ -429,6 +468,8 @@ public static class StreamUtility
             Stream stream
         )
     {
+        Sure.NotNull (stream);
+
         var binary = ReadInt64 (stream);
 
         return DateTime.FromBinary (binary);
@@ -443,6 +484,11 @@ public static class StreamUtility
             int length
         )
     {
+        // TODO заменить на стандарт stream.ReadExactly
+
+        Sure.NotNull (stream);
+        Sure.NonNegative (length);
+
         var buffer = new byte[length];
         if (length != 0 &&
             stream.Read (buffer, 0, length) != length)
@@ -468,6 +514,10 @@ public static class StreamUtility
             Span<byte> span
         )
     {
+        // TODO заменить на стандарт stream.ReadExactly
+
+        Sure.NotNull (stream);
+
         if (!span.IsEmpty &&
             stream.Read (span) != span.Length)
         {
@@ -490,6 +540,8 @@ public static class StreamUtility
             bool value
         )
     {
+        Sure.NotNull (stream);
+
         stream.WriteByte
             (
                 value
@@ -507,6 +559,8 @@ public static class StreamUtility
             short value
         )
     {
+        Sure.NotNull (stream);
+
         var span = new Span<byte> ((byte*)&value, sizeof (short));
         stream.Write (span);
     }
@@ -520,6 +574,8 @@ public static class StreamUtility
             ushort value
         )
     {
+        Sure.NotNull (stream);
+
         var span = new Span<byte> ((byte*)&value, sizeof (ushort));
         stream.Write (span);
     }
@@ -533,6 +589,8 @@ public static class StreamUtility
             int value
         )
     {
+        Sure.NotNull (stream);
+
         var span = new Span<byte> ((byte*)&value, sizeof (int));
         stream.Write (span);
     }
@@ -546,6 +604,8 @@ public static class StreamUtility
             uint value
         )
     {
+        Sure.NotNull (stream);
+
         var span = new Span<byte> ((byte*)&value, sizeof (uint));
         stream.Write (span);
     }
@@ -559,6 +619,8 @@ public static class StreamUtility
             long value
         )
     {
+        Sure.NotNull (stream);
+
         var span = new Span<byte> ((byte*)&value, sizeof (long));
         stream.Write (span);
     }
@@ -572,6 +634,8 @@ public static class StreamUtility
             ulong value
         )
     {
+        Sure.NotNull (stream);
+
         var span = new Span<byte> ((byte*)&value, sizeof (ulong));
         stream.Write (span);
     }
@@ -585,6 +649,8 @@ public static class StreamUtility
             float value
         )
     {
+        Sure.NotNull (stream);
+
         var span = new Span<byte> ((byte*)&value, sizeof (float));
         stream.Write (span);
     }
@@ -598,6 +664,8 @@ public static class StreamUtility
             double value
         )
     {
+        Sure.NotNull (stream);
+
         var span = new Span<byte> ((byte*)&value, sizeof (double));
         stream.Write (span);
     }
@@ -613,6 +681,10 @@ public static class StreamUtility
             Encoding encoding
         )
     {
+        Sure.NotNull (stream);
+        Sure.NotNull (value);
+        Sure.NotNull (encoding);
+
         var bytes = encoding.GetBytes (value);
         Write (stream, bytes.Length);
         stream.Write (bytes, 0, bytes.Length);
@@ -628,6 +700,9 @@ public static class StreamUtility
             string value
         )
     {
+        Sure.NotNull (stream);
+        Sure.NotNull (value);
+
         Write (stream, value, Encoding.UTF8);
     }
 
@@ -640,9 +715,13 @@ public static class StreamUtility
             short[] values
         )
     {
+        // TODO ReadOnlySpan<short> ???
+
+        Sure.NotNull (stream);
+        Sure.NotNull (values);
+
         Write (stream, values.Length);
 
-        // ReSharper disable once ForCanBeConvertedToForeach
         for (var i = 0; i < values.Length; i++)
         {
             Write (stream, values[i]);
@@ -658,9 +737,13 @@ public static class StreamUtility
             ushort[] values
         )
     {
+        // TODO ReadOnlySpan<ushort> ???
+
+        Sure.NotNull (stream);
+        Sure.NotNull (values);
+
         Write (stream, values.Length);
 
-        // ReSharper disable once ForCanBeConvertedToForeach
         for (var i = 0; i < values.Length; i++)
         {
             Write (stream, values[i]);
@@ -688,6 +771,9 @@ public static class StreamUtility
             int[] values
         )
     {
+        Sure.NotNull (stream);
+        Sure.NotNull (values);
+
         Write (stream, values.Length);
 
         // ReSharper disable once ForCanBeConvertedToForeach
@@ -718,6 +804,9 @@ public static class StreamUtility
             uint[] values
         )
     {
+        Sure.NotNull (stream);
+        Sure.NotNull (values);
+
         Write (stream, values.Length);
 
         // ReSharper disable once ForCanBeConvertedToForeach
@@ -751,6 +840,10 @@ public static class StreamUtility
             Encoding encoding
         )
     {
+        Sure.NotNull (stream);
+        Sure.NotNull (values);
+        Sure.NotNull (encoding);
+
         Write (stream, values.Length);
 
         // ReSharper disable once ForCanBeConvertedToForeach
@@ -781,6 +874,9 @@ public static class StreamUtility
             string[] values
         )
     {
+        Sure.NotNull (stream);
+        Sure.NotNull (values);
+
         Write (stream, values, Encoding.UTF8);
     }
 
@@ -802,6 +898,8 @@ public static class StreamUtility
             decimal value
         )
     {
+        Sure.NotNull (stream);
+
         var span = new Span<byte> ((byte*)&value, sizeof (decimal));
         stream.Write (span);
     }
@@ -816,6 +914,8 @@ public static class StreamUtility
             DateTime value
         )
     {
+        Sure.NotNull (stream);
+
         var span = new Span<byte> ((byte*)&value, sizeof (decimal));
         stream.Write (span);
     }
@@ -829,11 +929,13 @@ public static class StreamUtility
             int offset
         )
     {
+        Sure.NotNull (array);
+        Sure.InRange (offset, array);
+        Sure.InRange (offset + 1, array);
+
         if (BitConverter.IsLittleEndian)
         {
-            var temp = array[offset];
-            array[offset] = array[offset + 1];
-            array[offset + 1] = temp;
+            (array[offset], array[offset + 1]) = (array[offset + 1], array[offset]);
         }
     }
 
@@ -845,6 +947,8 @@ public static class StreamUtility
             byte* ptr
         )
     {
+        Sure.NotNull (ptr);
+
         if (BitConverter.IsLittleEndian)
         {
             var temp = *ptr;
@@ -862,6 +966,9 @@ public static class StreamUtility
             int offset
         )
     {
+        Sure.NotNull (array);
+        Sure.InRange (offset, array);
+
         if (BitConverter.IsLittleEndian)
         {
             var temp1 = array[offset];
@@ -900,6 +1007,8 @@ public static class StreamUtility
             byte* ptr
         )
     {
+        Sure.NotNull (ptr);
+
         if (BitConverter.IsLittleEndian)
         {
             var temp1 = *ptr;
@@ -947,6 +1056,8 @@ public static class StreamUtility
             byte* ptr
         )
     {
+        Sure.NotNull (ptr);
+
         NetworkToHost32 (ptr);
         NetworkToHost32 (ptr + 4);
     }
@@ -960,11 +1071,13 @@ public static class StreamUtility
             int offset
         )
     {
+        Sure.NotNull (array);
+        Sure.InRange (offset, array);
+        Sure.InRange (offset + 1, array);
+
         if (BitConverter.IsLittleEndian)
         {
-            var temp = array[offset];
-            array[offset] = array[offset + 1];
-            array[offset + 1] = temp;
+            (array[offset], array[offset + 1]) = (array[offset + 1], array[offset]);
         }
     }
 
@@ -976,6 +1089,8 @@ public static class StreamUtility
             byte* ptr
         )
     {
+        Sure.NotNull (ptr);
+
         if (BitConverter.IsLittleEndian)
         {
             var temp = *ptr;
@@ -993,6 +1108,9 @@ public static class StreamUtility
             int offset
         )
     {
+        Sure.NotNull (array);
+        Sure.InRange (offset, array);
+
         var temp1 = array[offset];
         var temp2 = array[offset + 1];
         array[offset] = array[offset + 3];
@@ -1009,6 +1127,8 @@ public static class StreamUtility
             byte* ptr
         )
     {
+        Sure.NotNull (ptr);
+
         if (BitConverter.IsLittleEndian)
         {
             var temp1 = *ptr;
@@ -1030,6 +1150,8 @@ public static class StreamUtility
             int offset
         )
     {
+        Sure.NotNull (array);
+
         HostToNetwork32 (array, offset);
         HostToNetwork32 (array, offset + 4);
     }
@@ -1043,6 +1165,8 @@ public static class StreamUtility
             byte* ptr
         )
     {
+        Sure.NotNull (ptr);
+
         HostToNetwork32 (ptr);
         HostToNetwork32 (ptr + 4);
     }
@@ -1055,6 +1179,8 @@ public static class StreamUtility
             this Stream stream
         )
     {
+        Sure.NotNull (stream);
+
         var buffer = stackalloc byte[sizeof (short)];
         var span = new Span<byte> (buffer, sizeof (short));
         ReadExact (stream, span);
@@ -1070,6 +1196,8 @@ public static class StreamUtility
             this Stream stream
         )
     {
+        Sure.NotNull (stream);
+
         var buffer = stackalloc byte[sizeof (short)];
         var span = new Span<byte> (buffer, sizeof (short));
         ReadExact (stream, span);
@@ -1084,9 +1212,12 @@ public static class StreamUtility
             this Stream stream
         )
     {
+        Sure.NotNull (stream);
+
         var buffer = stackalloc byte[sizeof (int)];
         var span = new Span<byte> (buffer, sizeof (int));
         ReadExact (stream, span);
+
         return IPAddress.NetworkToHostOrder (*(int*)buffer);
     }
 
@@ -1098,9 +1229,12 @@ public static class StreamUtility
             this Stream stream
         )
     {
+        Sure.NotNull (stream);
+
         var buffer = stackalloc byte[sizeof (int)];
         var span = new Span<byte> (buffer, sizeof (int));
         ReadExact (stream, span);
+
         return *(int*)buffer;
     }
 
@@ -1112,10 +1246,13 @@ public static class StreamUtility
             this Stream stream
         )
     {
+        Sure.NotNull (stream);
+
         var buffer = stackalloc byte[sizeof (long)];
         var span = new Span<byte> (buffer, sizeof (long));
         ReadExact (stream, span);
         NetworkToHost64 (buffer);
+
         return *(long*)buffer;
     }
 
@@ -1127,9 +1264,12 @@ public static class StreamUtility
             this Stream stream
         )
     {
+        Sure.NotNull (stream);
+
         var buffer = stackalloc byte[sizeof (long)];
         var span = new Span<byte> (buffer, sizeof (long));
         ReadExact (stream, span);
+
         return *(long*)buffer;
     }
 
@@ -1145,8 +1285,9 @@ public static class StreamUtility
             this Stream stream
         )
     {
-        var result = new MemoryStream(); //-V3114
+        Sure.NotNull (stream);
 
+        using var result = new MemoryStream(); //-V3114
         while (true)
         {
             var buffer = new byte[50 * 1024];
@@ -1171,8 +1312,10 @@ public static class StreamUtility
             short value
         )
     {
+        Sure.NotNull (stream);
+
         value = IPAddress.HostToNetworkOrder (value);
-        var ptr = (byte*)&value;
+        var ptr = (byte*) &value;
         var span = new Span<byte> (ptr, sizeof (short));
         stream.Write (span);
     }
@@ -1186,9 +1329,11 @@ public static class StreamUtility
             ushort value
         )
     {
+        Sure.NotNull (stream);
+
         unchecked
         {
-            value = (ushort)IPAddress.HostToNetworkOrder ((short) value);
+            value = (ushort) IPAddress.HostToNetworkOrder ((short) value);
             var ptr = (byte*) &value;
             var span = new Span<byte> (ptr, sizeof (ushort));
             stream.Write (span);
@@ -1204,6 +1349,8 @@ public static class StreamUtility
             int value
         )
     {
+        Sure.NotNull (stream);
+
         value = IPAddress.HostToNetworkOrder (value);
         var ptr = (byte*) &value;
         var span = new Span<byte> (ptr, sizeof (int));
@@ -1219,6 +1366,8 @@ public static class StreamUtility
             uint value
         )
     {
+        Sure.NotNull (stream);
+
         unchecked
         {
             value = (uint) IPAddress.HostToNetworkOrder ((int) value);
@@ -1237,6 +1386,8 @@ public static class StreamUtility
             long value
         )
     {
+        Sure.NotNull (stream);
+
         var ptr = (byte*) &value;
         HostToNetwork64 (ptr);
         var span = new Span<byte> (ptr, sizeof (long));
@@ -1252,6 +1403,8 @@ public static class StreamUtility
             ulong value
         )
     {
+        Sure.NotNull (stream);
+
         var ptr = (byte*) &value;
         HostToNetwork64 (ptr);
         var span = new Span<byte> (ptr, sizeof (ulong));
