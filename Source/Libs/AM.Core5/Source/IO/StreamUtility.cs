@@ -17,6 +17,7 @@
 #region Using directives
 
 using System;
+using System.Buffers;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -37,8 +38,8 @@ public static class StreamUtility
     #region Public methods
 
     /// <summary>
-    /// Appends one's stream contents (starting from current position)
-    /// to another stream.
+    /// Добавление содержимого первого потока (начиная с текущей позиции)
+    /// в конец второго потока.
     /// </summary>
     public static unsafe void AppendTo
         (
@@ -71,7 +72,8 @@ public static class StreamUtility
     }
 
     /// <summary>
-    /// Compares two <see cref="Stream"/>'s from current position.
+    /// Побайтовое сравнение двух потоков <see cref="Stream"/>,
+    /// начиная с текущей позиции.
     /// </summary>
     public static unsafe int Compare
         (
@@ -114,7 +116,8 @@ public static class StreamUtility
     }
 
     /// <summary>
-    /// Reads <see cref="Boolean"/> value from the <see cref="Stream"/>.
+    /// Считывание булевого <see cref="Boolean"/> значения из потока
+    /// <see cref="Stream"/> в текущей позиции.
     /// </summary>
     public static bool ReadBoolean
         (
@@ -132,7 +135,7 @@ public static class StreamUtility
     }
 
     /// <summary>
-    /// Read some bytes from the stream.
+    /// Считывание не более указанного количества байтов.
     /// </summary>
     public static byte[]? ReadBytes
         (
@@ -159,7 +162,8 @@ public static class StreamUtility
     }
 
     /// <summary>
-    /// Reads <see cref="Int16"/> value from the <see cref="Stream"/>.
+    /// Считывание значения типа <see cref="Int16"/> из потока <see cref="Stream"/>
+    /// в текущей позиции.
     /// </summary>
     public static unsafe short ReadInt16
         (
@@ -287,10 +291,9 @@ public static class StreamUtility
     }
 
     /// <summary>
-    /// Reads <see cref="String"/> value from the <see cref="Stream"/>
-    /// using specified <see cref="Encoding"/>.
+    /// Считывание строки в указанной кодировке из потока
+    /// в текущей позиции.
     /// </summary>
-    /// <seealso cref="Write(Stream,string,Encoding)"/>
     public static string ReadString
         (
             Stream stream,
@@ -308,8 +311,7 @@ public static class StreamUtility
     }
 
     /// <summary>
-    /// Reads <see cref="Boolean"/> value from the <see cref="Stream"/>
-    /// using UTF-8 <see cref="Encoding"/>.
+    /// Считывание строки в кодировке UTF-8 из потока в текущей позиции.
     /// </summary>
     public static string ReadString
         (
@@ -322,8 +324,8 @@ public static class StreamUtility
     }
 
     /// <summary>
-    /// Reads array of <see cref="Int16"/> values from the
-    /// <see cref="Stream"/>.
+    /// Чтение массива значений типа <see cref="Int16"/> из потока
+    /// в текущей позиции.
     /// </summary>
     public static short[] ReadInt16Array
         (
@@ -343,8 +345,8 @@ public static class StreamUtility
     }
 
     /// <summary>
-    /// Reads array of <see cref="UInt16"/> values from the
-    /// <see cref="Stream"/>.
+    /// Чтение массива значений типа <see cref="UInt16"/> из потока
+    /// в текущей позиции.
     /// </summary>
     public static ushort[] ReadUInt16Array
         (
@@ -364,8 +366,8 @@ public static class StreamUtility
     }
 
     /// <summary>
-    /// Reads array of <see cref="Int32"/> values from the
-    /// <see cref="Stream"/>.
+    /// Чтение массива значений типа <see cref="Int32"/> из потока
+    /// в текущей позиции.
     /// </summary>
     public static int[] ReadInt32Array
         (
@@ -385,8 +387,8 @@ public static class StreamUtility
     }
 
     /// <summary>
-    /// Reads array of <see cref="UInt32"/> values from the
-    /// <see cref="Stream"/>.
+    /// Чтение массива значений типа <see cref="UInt32"/> из потока
+    /// в текущей позиции.
     /// </summary>
     public static uint[] ReadUInt32Array
         (
@@ -406,8 +408,8 @@ public static class StreamUtility
     }
 
     /// <summary>
-    /// Reads array of <see cref="String"/>'s from the given stream until the end
-    /// of the stream using specified <see cref="Encoding"/>.
+    /// Чтение массива строк в указанной кодировке из потока
+    /// в текущей позиции.
     /// </summary>
     public static string[] ReadStringArray
         (
@@ -443,8 +445,8 @@ public static class StreamUtility
     }
 
     /// <summary>
-    /// Reads the <see cref="Decimal"/> from the specified
-    /// <see cref="Stream"/>.
+    /// Считывание значения типа <see cref="Decimal"/> из потока <see cref="Stream"/>
+    /// в текущей позиции.
     /// </summary>
     public static unsafe decimal ReadDecimal
         (
@@ -514,7 +516,7 @@ public static class StreamUtility
             Span<byte> span
         )
     {
-        // TODO заменить на стандарт stream.ReadExactly
+        // TODO заменить на стандартное stream.ReadExactly ???
 
         Sure.NotNull (stream);
 
@@ -532,7 +534,7 @@ public static class StreamUtility
     }
 
     /// <summary>
-    /// Writes the <see cref="Boolean"/> value to the <see cref="Stream"/>.
+    /// Вывод в поток значения типа <see cref="Boolean"/> в текущей позиции.
     /// </summary>
     public static void Write
         (
@@ -551,7 +553,7 @@ public static class StreamUtility
     }
 
     /// <summary>
-    /// Writes the <see cref="Int16"/> value to the <see cref="Stream"/>.
+    /// Вывод в поток значения типа <see cref="Int16"/> в текущей позиции.
     /// </summary>
     public static unsafe void Write
         (
@@ -566,7 +568,7 @@ public static class StreamUtility
     }
 
     /// <summary>
-    /// Writes the <see cref="UInt16"/> value to the <see cref="Stream"/>.
+    /// Вывод в поток значения типа <see cref="UInt16"/> в текущей позиции.
     /// </summary>
     public static unsafe void Write
         (
@@ -581,7 +583,7 @@ public static class StreamUtility
     }
 
     /// <summary>
-    /// Writes the <see cref="Int32"/> to the <see cref="Stream"/>.
+    /// Вывод в поток значения типа <see cref="Int32"/> в текущей позиции.
     /// </summary>
     public static unsafe void Write
         (
@@ -596,7 +598,7 @@ public static class StreamUtility
     }
 
     /// <summary>
-    /// Writes the <see cref="UInt32"/> to the <see cref="Stream"/>.
+    /// Вывод в поток значения типа <see cref="UInt32"/> в текущей позиции.
     /// </summary>
     public static unsafe void Write
         (
@@ -611,7 +613,7 @@ public static class StreamUtility
     }
 
     /// <summary>
-    /// Writes the <see cref="Int64"/> to the <see cref="Stream"/>.
+    /// Вывод в поток значения типа <see cref="Int64"/> в текущей позиции.
     /// </summary>
     public static unsafe void Write
         (
@@ -626,7 +628,7 @@ public static class StreamUtility
     }
 
     /// <summary>
-    /// Writes the <see cref="UInt64"/> to the <see cref="Stream"/>.
+    /// Вывод в поток значения типа <see cref="UInt64"/> в текущей позиции.
     /// </summary>
     public static unsafe void Write
         (
@@ -641,7 +643,7 @@ public static class StreamUtility
     }
 
     /// <summary>
-    /// Writes the <see cref="Single"/> to the <see cref="Stream"/>.
+    /// Вывод в поток значения типа <see cref="Single"/> в текущей позиции.
     /// </summary>
     public static unsafe void Write
         (
@@ -656,7 +658,7 @@ public static class StreamUtility
     }
 
     /// <summary>
-    /// Writes the <see cref="Double"/> to the <see cref="Stream"/>.
+    /// Вывод в поток значения типа <see cref="Double"/> в текущей позиции.
     /// </summary>
     public static unsafe void Write
         (
@@ -685,9 +687,12 @@ public static class StreamUtility
         Sure.NotNull (value);
         Sure.NotNull (encoding);
 
-        var bytes = encoding.GetBytes (value);
-        Write (stream, bytes.Length);
-        stream.Write (bytes, 0, bytes.Length);
+        var length = encoding.GetByteCount (value);
+        using var owner = MemoryPool<byte>.Shared.Rent (length);
+        var span = owner.Memory.Span[..length];
+        encoding.GetBytes (value, span);
+        Write (stream, length);
+        stream.Write (span);
     }
 
     /// <summary>

@@ -35,7 +35,7 @@ public static class UnsafeUtility
         (
             ref T value
         )
-        where T : struct
+        where T: struct
     {
         var size = Unsafe.SizeOf<T>();
 
