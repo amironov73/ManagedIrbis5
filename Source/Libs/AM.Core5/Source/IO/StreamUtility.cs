@@ -18,8 +18,10 @@
 
 using System;
 using System.Buffers;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Runtime.InteropServices;
 using System.Text;
 
 using Microsoft.Extensions.Logging;
@@ -175,11 +177,13 @@ public static class StreamUtility
         short value = default;
         var span = new Span<byte> ((byte*) &value, sizeof (short));
         ReadExact (stream, span);
+
         return value;
     }
 
     /// <summary>
-    /// Reads <see cref="UInt16"/> value from the <see cref="Stream"/>.
+    /// Считывание значения типа <see cref="UInt16"/> из потока <see cref="Stream"/>
+    /// в текущей позиции.
     /// </summary>
     public static unsafe ushort ReadUInt16
         (
@@ -189,13 +193,15 @@ public static class StreamUtility
         Sure.NotNull (stream);
 
         ushort value = default;
-        var span = new Span<byte> ((byte*)&value, sizeof (ushort));
+        var span = new Span<byte> ((byte*) &value, sizeof (ushort));
         ReadExact (stream, span);
+
         return value;
     }
 
     /// <summary>
-    /// Reads <see cref="Int32"/> value from the <see cref="Stream"/>.
+    /// Считывание значения типа <see cref="Int32"/> из потока <see cref="Stream"/>
+    /// в текущей позиции.
     /// </summary>
     public static unsafe int ReadInt32
         (
@@ -207,11 +213,13 @@ public static class StreamUtility
         int value = default;
         var span = new Span<byte> ((byte*) &value, sizeof (int));
         ReadExact (stream, span);
+
         return value;
     }
 
     /// <summary>
-    /// Reads <see cref="UInt32"/> value from the <see cref="Stream"/>.
+    /// Считывание значения типа <see cref="UInt32"/> из потока <see cref="Stream"/>
+    /// в текущей позиции.
     /// </summary>
     public static unsafe uint ReadUInt32
         (
@@ -227,7 +235,8 @@ public static class StreamUtility
     }
 
     /// <summary>
-    /// Reads <see cref="Int64"/> value from the <see cref="Stream"/>.
+    /// Считывание значения типа <see cref="Int64"/> из потока <see cref="Stream"/>
+    /// в текущей позиции.
     /// </summary>
     public static unsafe long ReadInt64
         (
@@ -239,11 +248,13 @@ public static class StreamUtility
         long value = default;
         var span = new Span<byte> ((byte*) &value, sizeof (long));
         ReadExact (stream, span);
+
         return value;
     }
 
     /// <summary>
-    /// Reads <see cref="UInt64"/> value from the <see cref="Stream"/>.
+    /// Считывание значения типа <see cref="UInt64"/> из потока <see cref="Stream"/>
+    /// в текущей позиции.
     /// </summary>
     public static unsafe ulong ReadUInt64
         (
@@ -259,7 +270,8 @@ public static class StreamUtility
     }
 
     /// <summary>
-    /// Reads <see cref="Single"/> value from the <see cref="Stream"/>.
+    /// Считывание значения типа <see cref="Single"/> из потока <see cref="Stream"/>
+    /// в текущей позиции.
     /// </summary>
     public static unsafe float ReadSingle
         (
@@ -269,13 +281,15 @@ public static class StreamUtility
         Sure.NotNull (stream);
 
         float value = default;
-        var span = new Span<byte> ((byte*)&value, sizeof (float));
+        var span = new Span<byte> ((byte*) &value, sizeof (float));
         ReadExact (stream, span);
+
         return value;
     }
 
     /// <summary>
-    /// Reads <see cref="Double"/> value from the <see cref="Stream"/>.
+    /// Считывание значения типа <see cref="Double"/> из потока <see cref="Stream"/>
+    /// в текущей позиции.
     /// </summary>
     public static unsafe double ReadDouble
         (
@@ -287,6 +301,25 @@ public static class StreamUtility
         double value = default;
         var span = new Span<byte> ((byte*) &value, sizeof (double));
         ReadExact (stream, span);
+
+        return value;
+    }
+
+    /// <summary>
+    /// Считывание значения типа <see cref="Half"/> из потока <see cref="Stream"/>
+    /// в текущей позиции.
+    /// </summary>
+    public static unsafe Half ReadHalf
+        (
+            Stream stream
+        )
+    {
+        Sure.NotNull (stream);
+
+        Half value = default;
+        var span = new Span<byte> ((byte*) &value, sizeof (Half));
+        ReadExact (stream, span);
+
         return value;
     }
 
@@ -456,15 +489,16 @@ public static class StreamUtility
         Sure.NotNull (stream);
 
         decimal value = default;
-        var span = new Span<byte> ((byte*)&value, sizeof (decimal));
+        var span = new Span<byte> ((byte*) &value, sizeof (decimal));
         ReadExact (stream, span);
+
         return value;
     }
 
     /// <summary>
-    /// Reads the date time.
+    /// Считывание значения типа <see cref="DateTime"/> из потока <see cref="Stream"/>
+    /// в текущей позиции.
     /// </summary>
-    /// <param name="stream">The stream.</param>
     public static DateTime ReadDateTime
         (
             Stream stream
@@ -478,9 +512,9 @@ public static class StreamUtility
     }
 
     /// <summary>
-    /// Reads the date.
+    /// Считывание значения типа <see cref="DateOnly"/> из потока <see cref="Stream"/>
+    /// в текущей позиции.
     /// </summary>
-    /// <param name="stream">The stream.</param>
     public static DateOnly ReadDateOnly
         (
             Stream stream
@@ -494,9 +528,9 @@ public static class StreamUtility
     }
 
     /// <summary>
-    /// Reads the time.
+    /// Считывание значения типа <see cref="TimeOnly"/> из потока <see cref="Stream"/>
+    /// в текущей позиции.
     /// </summary>
-    /// <param name="stream">The stream.</param>
     public static TimeOnly ReadTimeOnly
         (
             Stream stream
@@ -510,7 +544,7 @@ public static class StreamUtility
     }
 
     /// <summary>
-    /// Чтение точного числа байт.
+    /// Чтение точно указанного числа байт (либо выброс исключения).
     /// </summary>
     public static byte[] ReadExact
         (
@@ -540,7 +574,7 @@ public static class StreamUtility
     }
 
     /// <summary>
-    /// Чтение точного числа байт.
+    /// Чтение точно указанного числа байт (либо выброс исключения).
     /// </summary>
     public static void ReadExact
         (
@@ -705,8 +739,7 @@ public static class StreamUtility
     }
 
     /// <summary>
-    /// Writes the <see cref="String"/> to the <see cref="Stream"/>
-    /// using specified <see cref="Encoding"/>.
+    /// Вывод в поток строки в указанной кодировке в текущей позиции.
     /// </summary>
     public static void Write
         (
@@ -728,8 +761,7 @@ public static class StreamUtility
     }
 
     /// <summary>
-    /// Writes the <see cref="String"/> to the <see cref="Stream"/>
-    /// using UTF-8 <see cref="Encoding"/>.
+    /// Вывод в поток строки в кодировке UTF-8 в текущей позиции.
     /// </summary>
     public static void Write
         (
@@ -744,47 +776,89 @@ public static class StreamUtility
     }
 
     /// <summary>
-    /// Writes the array of <see cref="Int16"/> to the <see cref="Stream"/>.
+    /// Вывод в поток списка значений типа <see cref="Int16"/> в текущей позиции.
     /// </summary>
     public static void Write
         (
             Stream stream,
-            short[] values
+            IReadOnlyList<short> values
         )
     {
-        // TODO ReadOnlySpan<short> ???
-
         Sure.NotNull (stream);
         Sure.NotNull (values);
 
-        Write (stream, values.Length);
-
-        for (var i = 0; i < values.Length; i++)
+        Write (stream, values.Count);
+        if (Utility.TryGetSpan (values, out var span))
         {
-            Write (stream, values[i]);
+            var bytes = MemoryMarshal.AsBytes (span);
+            stream.Write (bytes);
+        }
+        else
+        {
+            for (var i = 0; i < values.Count; i++)
+            {
+                Write (stream, values[i]);
+            }
         }
     }
 
     /// <summary>
-    /// Writes the array of <see cref="UInt16"/> to the <see cref="Stream"/>.
+    /// Вывод в поток фрагмента памяти типа <see cref="Int16"/> в текущей позиции.
     /// </summary>
     public static void Write
         (
             Stream stream,
-            ushort[] values
+            ReadOnlySpan<short> values
         )
     {
-        // TODO ReadOnlySpan<ushort> ???
+        Sure.NotNull (stream);
 
+        Write (stream, values.Length);
+        var bytes = MemoryMarshal.AsBytes (values);
+        stream.Write (bytes);
+    }
+
+    /// <summary>
+    /// Вывод в поток списка значений типа <see cref="UInt16"/> в текущей позиции.
+    /// </summary>
+    public static void Write
+        (
+            Stream stream,
+            IReadOnlyList<ushort> values
+        )
+    {
         Sure.NotNull (stream);
         Sure.NotNull (values);
 
-        Write (stream, values.Length);
-
-        for (var i = 0; i < values.Length; i++)
+        Write (stream, values.Count);
+        if (Utility.TryGetSpan (values, out var span))
         {
-            Write (stream, values[i]);
+            var bytes = MemoryMarshal.AsBytes (span);
+            stream.Write (bytes);
         }
+        else
+        {
+            for (var i = 0; i < values.Count; i++)
+            {
+                Write (stream, values[i]);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Вывод в поток фрагмента памяти типа <see cref="UInt16"/> в текущей позиции.
+    /// </summary>
+    public static void Write
+        (
+            Stream stream,
+            ReadOnlySpan<ushort> values
+        )
+    {
+        Sure.NotNull (stream);
+
+        Write (stream, values.Length);
+        var bytes = MemoryMarshal.AsBytes (values);
+        stream.Write (bytes);
     }
 
     /// <summary>
@@ -800,22 +874,27 @@ public static class StreamUtility
     /// is <c>null</c>.</exception>
     /// <exception cref="IOException">An error during stream
     /// output happens.</exception>
-    /// <see cref="Write(Stream,uint[])"/>
-    /// <see cref="ReadInt32Array"/>
     public static void Write
         (
             Stream stream,
-            int[] values
+            IReadOnlyList<int> values
         )
     {
         Sure.NotNull (stream);
         Sure.NotNull (values);
 
-        Write (stream, values.Length);
-
-        for (var i = 0; i < values.Length; i++)
+        Write (stream, values.Count);
+        if (Utility.TryGetSpan (values, out var span))
         {
-            Write (stream, values[i]);
+            var bytes = MemoryMarshal.AsBytes (span);
+            stream.Write (bytes);
+        }
+        else
+        {
+            for (var i = 0; i < values.Count; i++)
+            {
+                Write (stream, values[i]);
+            }
         }
     }
 
@@ -832,20 +911,22 @@ public static class StreamUtility
     /// is <c>null</c>.</exception>
     /// <exception cref="IOException">An error during stream
     /// output happens.</exception>
-    /// <seealso cref="Write(Stream,int[])"/>
-    /// <see cref="ReadUInt32Array"/>
     public static void Write
         (
             Stream stream,
-            uint[] values
+            IReadOnlyList<uint> values
         )
     {
         Sure.NotNull (stream);
         Sure.NotNull (values);
 
-        Write (stream, values.Length);
-
-        for (var i = 0; i < values.Length; i++)
+        Write (stream, values.Count);
+        if (Utility.TryGetSpan (values, out var span))
+        {
+            var bytes = MemoryMarshal.AsBytes (span);
+            stream.Write (bytes);
+        }
+        for (var i = 0; i < values.Count; i++)
         {
             Write (stream, values[i]);
         }
@@ -866,12 +947,10 @@ public static class StreamUtility
     /// is <c>null</c>.</exception>
     /// <exception cref="IOException">An error during stream
     /// output happens.</exception>
-    /// <seealso cref="Write(Stream,string[])"/>
-    /// <see cref="ReadStringArray(Stream,Encoding)"/>
     public static void Write
         (
             Stream stream,
-            string[] values,
+            IReadOnlyList <string> values,
             Encoding encoding
         )
     {
@@ -879,10 +958,10 @@ public static class StreamUtility
         Sure.NotNull (values);
         Sure.NotNull (encoding);
 
-        Write (stream, values.Length);
+        Write (stream, values.Count);
 
         // ReSharper disable once ForCanBeConvertedToForeach
-        for (var i = 0; i < values.Length; i++)
+        for (var i = 0; i < values.Count; i++)
         {
             Write (stream, values[i], encoding);
         }
@@ -901,12 +980,10 @@ public static class StreamUtility
     /// is <c>null</c>.</exception>
     /// <exception cref="IOException">An error during stream
     /// output happens.</exception>
-    /// <seealso cref="Write(Stream,string[],Encoding)"/>
-    /// <seealso cref="ReadStringArray(Stream)"/>
     public static void Write
         (
             Stream stream,
-            string[] values
+            IReadOnlyList<string> values
         )
     {
         Sure.NotNull (stream);
@@ -987,6 +1064,22 @@ public static class StreamUtility
 
         var binary = value.ToTimeSpan().TotalMicroseconds;
         var span = new Span<byte> ((byte*) &binary, sizeof (double));
+        stream.Write (span);
+    }
+
+    /// <summary>
+    /// Writes the <see cref="Half"/> to the specified
+    /// <see cref="Stream"/>.
+    /// </summary>
+    public static unsafe void Write
+        (
+            Stream stream,
+            Half value
+        )
+    {
+        Sure.NotNull (stream);
+
+        var span = new Span<byte> ((byte*) &value, sizeof (Half));
         stream.Write (span);
     }
 
@@ -1169,6 +1262,22 @@ public static class StreamUtility
         var bytes = BitConverter.GetBytes (value);
         HostToNetwork64 (bytes);
         var result = BitConverter.ToInt64 (bytes);
+
+        return result;
+    }
+
+    /// <summary>
+    /// Network to host byte conversion.
+    /// </summary>
+    /// <remarks>IRBIS64-oriented!</remarks>
+    public static ulong HostToNetwork
+        (
+            ulong value
+        )
+    {
+        var bytes = BitConverter.GetBytes (value);
+        HostToNetwork64 (bytes);
+        var result = BitConverter.ToUInt64 (bytes);
 
         return result;
     }

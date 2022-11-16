@@ -243,7 +243,7 @@ public sealed class StreamUtilityTest
     {
         var stream = new MemoryStream();
         short[] expected = { 123, 234, 456 };
-        StreamUtility.Write (stream, expected);
+        StreamUtility.Write (stream, expected.AsSpan());
         var buffer = stream.ToArray();
         stream = new MemoryStream (buffer);
         var actual = StreamUtility.ReadInt16Array (stream);
@@ -255,7 +255,7 @@ public sealed class StreamUtilityTest
     {
         var stream = new MemoryStream();
         ushort[] expected = { 123, 234, 456 };
-        StreamUtility.Write (stream, expected);
+        StreamUtility.Write (stream, expected.AsSpan());
         var buffer = stream.ToArray();
         stream = new MemoryStream (buffer);
         var actual = StreamUtility.ReadUInt16Array (stream);

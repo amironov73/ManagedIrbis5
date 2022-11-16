@@ -6473,5 +6473,45 @@ public static class Utility
         };
     }
 
+        /// <summary>
+        /// Попытка получить <see cref="ReadOnlySpan{T}"/> от коллекции.
+        /// </summary>
+        /// <remarks>
+        /// Метрод выдран из исходников .NET 7.
+        /// </remarks>
+        public static bool TryGetSpan<TSource>
+            (
+                IEnumerable<TSource> source,
+                out ReadOnlySpan<TSource> span
+            )
+            where TSource : struct
+        {
+            Sure.NotNull ((object?) source);
+
+            // Use `GetType() == typeof(...)` rather than `is` to avoid cast helpers.  This is measurably cheaper
+            // but does mean we could end up missing some rare cases where we could get a span but don't (e.g. a uint[]
+            // masquerading as an int[]).  That's an acceptable tradeoff.  The Unsafe usage is only after we've
+            // validated the exact type; this could be changed to a cast in the future if the JIT starts to recognize it.
+            // We only pay the comparison/branching costs here for super common types we expect to be used frequently
+            // with LINQ methods.
+
+            var result = true;
+            if (source.GetType() == typeof (TSource[]))
+            {
+                span = Unsafe.As<TSource[]> (source);
+            }
+            else if (source.GetType() == typeof (List<TSource>))
+            {
+                span = CollectionsMarshal.AsSpan (Unsafe.As<List<TSource>> (source));
+            }
+            else
+            {
+                span = default;
+                result = false;
+            }
+
+            return result;
+        }
+
     #endregion
 }

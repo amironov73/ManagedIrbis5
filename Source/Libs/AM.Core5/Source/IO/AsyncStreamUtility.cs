@@ -1080,7 +1080,7 @@ public static class AsyncStreamUtility
     {
         Sure.NotNull (stream);
 
-        value = StreamUtility.NetworkToHost (value);
+        value = StreamUtility.HostToNetwork (value);
 
         return WriteAsync (stream, value);
     }
@@ -1100,7 +1100,7 @@ public static class AsyncStreamUtility
     {
         Sure.NotNull (stream);
 
-        value = StreamUtility.NetworkToHost (value);
+        value = StreamUtility.HostToNetwork (value);
 
         return WriteAsync (stream, value);
     }
@@ -1120,7 +1120,7 @@ public static class AsyncStreamUtility
     {
         Sure.NotNull (stream);
 
-        value = StreamUtility.NetworkToHost (value);
+        value = StreamUtility.HostToNetwork (value);
 
         return WriteAsync (stream, value);
     }
