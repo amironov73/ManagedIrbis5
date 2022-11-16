@@ -1049,7 +1049,7 @@ public static class StreamUtility
     /// Преобразование беззнакового 32-битного числа из сетевой формы
     /// в локальную.
     /// </summary>
-    public static uint NetworkToHost32
+    public static uint NetworkToHost
         (
             uint value
         )
@@ -1057,6 +1057,21 @@ public static class StreamUtility
         unchecked
         {
             return (uint) IPAddress.NetworkToHostOrder ((int) value);
+        }
+    }
+
+    /// <summary>
+    /// Преобразование беззнакового 32-битного числа из сетевой формы
+    /// в локальную.
+    /// </summary>
+    public static uint HostToNetwork
+        (
+            uint value
+        )
+    {
+        unchecked
+        {
+            return (uint) IPAddress.HostToNetworkOrder ((int) value);
         }
     }
 
@@ -1105,6 +1120,25 @@ public static class StreamUtility
     /// <summary>
     /// Network to host byte conversion.
     /// </summary>
+    public static void HostToNetwork32
+        (
+            Span<byte> span
+        )
+    {
+        if (BitConverter.IsLittleEndian)
+        {
+            var temp1 = span[0];
+            var temp2 = span[1];
+            span[0] = span[3];
+            span[1] = span[2];
+            span[3] = temp1;
+            span[2] = temp2;
+        }
+    }
+
+    /// <summary>
+    /// Network to host byte conversion.
+    /// </summary>
     public static unsafe void NetworkToHost32
         (
             byte* ptr
@@ -1127,7 +1161,23 @@ public static class StreamUtility
     /// Network to host byte conversion.
     /// </summary>
     /// <remarks>IRBIS64-oriented!</remarks>
-    public static long NetworkToHost64
+    public static long HostToNetwork
+        (
+            long value
+        )
+    {
+        var bytes = BitConverter.GetBytes (value);
+        HostToNetwork64 (bytes);
+        var result = BitConverter.ToInt64 (bytes);
+
+        return result;
+    }
+
+    /// <summary>
+    /// Network to host byte conversion.
+    /// </summary>
+    /// <remarks>IRBIS64-oriented!</remarks>
+    public static long NetworkToHost
         (
             long value
         )
@@ -1143,7 +1193,7 @@ public static class StreamUtility
     /// Network to host byte conversion.
     /// </summary>
     /// <remarks>IRBIS64-oriented!</remarks>
-    public static ulong NetworkToHost64
+    public static ulong NetworkToHost
         (
             ulong value
         )
@@ -1292,6 +1342,19 @@ public static class StreamUtility
     }
 
     /// <summary>
+    /// Network to host byte conversion.
+    /// </summary>
+    /// <remarks>IRBIS64-oriented!</remarks>
+    public static void HostToNetwork64
+        (
+            Span<byte> span
+        )
+    {
+        HostToNetwork32 (span);
+        HostToNetwork32 (span.Slice (4));
+    }
+
+    /// <summary>
     /// Host to network byte conversion.
     /// </summary>
     /// <remarks>IRBIS64-oriented!</remarks>
@@ -1409,12 +1472,12 @@ public static class StreamUtility
     }
 
     /// <summary>
-    /// Считывает из потока максимально возможное число байт.
+    /// Чтение потока до конца.
     /// </summary>
     /// <remarks>Полезно для считывания из сети (сервер высылает
     /// ответ, после чего закрывает соединение).</remarks>
     /// <param name="stream">Поток для чтения.</param>
-    /// <returns>Массив считанных байт.</returns>
+    /// <returns>Массив прочитанных байт.</returns>
     public static byte[] ReadToEnd
         (
             this Stream stream
@@ -1423,9 +1486,9 @@ public static class StreamUtility
         Sure.NotNull (stream);
 
         using var result = new MemoryStream(); //-V3114
+        var buffer = new byte[50 * 1024];
         while (true)
         {
-            var buffer = new byte[50 * 1024];
             var read = stream.Read (buffer, 0, buffer.Length);
             if (read <= 0)
             {

@@ -853,7 +853,40 @@ public static class AsyncStreamUtility
     }
 
     /// <summary>
-    /// Чтение из потока 16-битного целого в сетевом порядке байтов.
+    /// Чтение потока до конца.
+    /// </summary>
+    /// <remarks>Полезно для считывания из сети (сервер высылает
+    /// ответ, после чего закрывает соединение).</remarks>
+    /// <param name="stream">Поток для чтения.</param>
+    /// <param name="cancellationToken">Токен для отмены.</param>
+    /// <returns>Массив прочитанных байт.</returns>
+    public static async ValueTask<byte[]> ReadToEndAsync
+        (
+            this Stream stream,
+            CancellationToken cancellationToken = default
+        )
+    {
+        Sure.NotNull (stream);
+
+        using var result = new MemoryStream(); //-V3114
+        var buffer = new byte[50 * 1024];
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            var read = await stream.ReadAsync (buffer, 0, buffer.Length, cancellationToken);
+            if (read <= 0)
+            {
+                break;
+            }
+
+            result.Write (buffer, 0, read);
+        }
+
+        return result.ToArray();
+    }
+
+    /// <summary>
+    /// Чтение из потока 16-битного целого со знаком
+    /// в сетевом порядке байтов.
     /// </summary>
     public static async ValueTask<short> ReadInt16NetworkAsync
         (
@@ -868,7 +901,8 @@ public static class AsyncStreamUtility
     }
 
     /// <summary>
-    /// Чтение из потока 16-битного целого в сетевом порядке байтов.
+    /// Чтение из потока 16-битного целого без знака
+    /// в сетевом порядке байтов.
     /// </summary>
     public static async ValueTask<ushort> ReadUInt16NetworkAsync
         (
@@ -886,7 +920,8 @@ public static class AsyncStreamUtility
     }
 
     /// <summary>
-    /// Read integer in host byte order.
+    /// Чтение из потока 16-битного целого со знаком
+    /// в локальном порядке байтов.
     /// </summary>
     public static ValueTask<short> ReadInt16HostAsync
         (
@@ -899,7 +934,8 @@ public static class AsyncStreamUtility
     }
 
     /// <summary>
-    /// Чтение из потока 32-битного целого в сетевом порядке байтов.
+    /// Чтение из потока 32-битного целого со знаком
+    /// в сетевом порядке байтов.
     /// </summary>
     public static async ValueTask<int> ReadInt32NetworkAsync
         (
@@ -914,7 +950,8 @@ public static class AsyncStreamUtility
     }
 
     /// <summary>
-    /// Чтение из потока 32-битного целого в сетевом порядке байтов.
+    /// Чтение из потока 32-битного целого со знаком
+    /// в локальном порядке байтов.
     /// </summary>
     public static ValueTask<int> ReadInt32HostAsync
         (
@@ -927,7 +964,8 @@ public static class AsyncStreamUtility
     }
 
     /// <summary>
-    /// Чтение из потока 64-битного целого в сетевом порядке байтов.
+    /// Чтение из потока 64-битного целого со знаком
+    /// в сетевом порядке байтов.
     /// </summary>
     public static async ValueTask<long> ReadInt64NetworkAsync
         (
@@ -937,13 +975,14 @@ public static class AsyncStreamUtility
         Sure.NotNull (stream);
 
         var result = await ReadInt64Async (stream);
-        result = StreamUtility.NetworkToHost64 (result);
+        result = StreamUtility.NetworkToHost (result);
 
         return result;
     }
 
     /// <summary>
-    /// Чтение из потока 64-битного целого в сетевом порядке байтов.
+    /// Чтение из потока 64-битного целого без знака
+    /// в сетевом порядке байтов.
     /// </summary>
     public static async ValueTask<ulong> ReadUInt64NetworkAsync
         (
@@ -955,14 +994,15 @@ public static class AsyncStreamUtility
         unchecked
         {
             var result = await ReadUInt64Async (stream);
-            result = (ulong) StreamUtility.NetworkToHost64 ((long) result);
+            result = (ulong) StreamUtility.NetworkToHost ((long) result);
 
             return result;
         }
     }
 
     /// <summary>
-    /// Read integer in host byte order.
+    /// Чтение из потока 16-битного целого со знаком
+    /// в локальном порядке байтов.
     /// </summary>
     public static ValueTask<long> ReadInt64HostAsync
         (
@@ -975,7 +1015,8 @@ public static class AsyncStreamUtility
     }
 
     /// <summary>
-    /// Write 16-bit integer to the stream in network byte order.
+    /// Вывод в поток 16-битного целого со знаком
+    /// в сетевом порядке байтов.
     /// </summary>
     public static ValueTask WriteInt16NetworkAsync
         (
@@ -991,7 +1032,8 @@ public static class AsyncStreamUtility
     }
 
     /// <summary>
-    /// Write 16-bit integer to the stream in network byte order.
+    /// Вывод в поток 16-битного целого со знаком
+    /// в сетевом порядке байтов.
     /// </summary>
     public static ValueTask WriteUInt16NetworkAsync
         (
@@ -1010,7 +1052,8 @@ public static class AsyncStreamUtility
     }
 
     /// <summary>
-    /// Write 32-bit integer to the stream in network byte order.
+    /// Вывод в поток 32-битного целого со знаком
+    /// в сетевом порядке байтов.
     /// </summary>
     public static ValueTask WriteInt32NetworkAsync
         (
@@ -1026,7 +1069,8 @@ public static class AsyncStreamUtility
     }
 
     /// <summary>
-    /// Write 32-bit integer to the stream in network byte order.
+    /// Вывод в поток 32-битного целого без знака
+    /// в сетевом порядке байтов.
     /// </summary>
     public static ValueTask WriteUInt32NetworkAsync
         (
@@ -1036,14 +1080,18 @@ public static class AsyncStreamUtility
     {
         Sure.NotNull (stream);
 
-        value = StreamUtility.NetworkToHost32 (value);
+        value = StreamUtility.NetworkToHost (value);
 
         return WriteAsync (stream, value);
     }
 
     /// <summary>
-    /// Write 64-bit integer to the stream in network byte order.
+    /// Вывод в поток 64-битного целого со знаком
+    /// в сетевом порядке байтов.
     /// </summary>
+    /// <remarks>
+    /// Специфично для ИРБИС64.
+    /// </remarks>
     public static ValueTask WriteInt64NetworkAsync
         (
             Stream stream,
@@ -1052,14 +1100,18 @@ public static class AsyncStreamUtility
     {
         Sure.NotNull (stream);
 
-        value = StreamUtility.NetworkToHost64 (value);
+        value = StreamUtility.NetworkToHost (value);
 
         return WriteAsync (stream, value);
     }
 
     /// <summary>
-    /// Write 64-bit integer to the stream in network byte order.
+    /// Вывод в поток 64-битного целого без знака
+    /// в сетевом порядке байтов.
     /// </summary>
+    /// <remarks>
+    /// Специфично для ИРБИС64.
+    /// </remarks>
     public static ValueTask WriteUInt64NetworkAsync
         (
             Stream stream,
@@ -1068,7 +1120,7 @@ public static class AsyncStreamUtility
     {
         Sure.NotNull (stream);
 
-        value = StreamUtility.NetworkToHost64 (value);
+        value = StreamUtility.NetworkToHost (value);
 
         return WriteAsync (stream, value);
     }
