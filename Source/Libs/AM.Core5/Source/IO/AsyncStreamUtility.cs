@@ -21,13 +21,10 @@ using System;
 using System.Buffers;
 using System.IO;
 using System.Net;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-
-using AM.Memory;
 
 using Microsoft.Extensions.Logging;
 
@@ -754,12 +751,65 @@ public static class AsyncStreamUtility
     {
         Sure.NotNull (stream);
 
-
         using var owner = MemoryPool<byte>.Shared.Rent (16);
         var memory = owner.Memory[..sizeof (decimal)];
         MemoryMarshal.Write (memory.Span, ref value);
 
         await stream.WriteAsync (memory, cancellationToken);
+    }
+
+    /// <summary>
+    /// Вывод в поток значения типа <see cref="DateTime"/> в текущей позиции.
+    /// </summary>
+    public static async ValueTask WriteAsync
+        (
+            Stream stream,
+            DateTime value,
+            CancellationToken cancellationToken = default
+        )
+    {
+        Sure.NotNull (stream);
+
+        var binary = value.ToBinary();
+        using var owner = MemoryPool<byte>.Shared.Rent (16);
+        var memory = owner.Memory[..sizeof (long)];
+        MemoryMarshal.Write (memory.Span, ref binary);
+
+        await stream.WriteAsync (memory, cancellationToken);
+    }
+
+    /// <summary>
+    /// Вывод в поток значения типа <see cref="DateOnly"/> в текущей позиции.
+    /// </summary>
+    public static ValueTask WriteAsync
+        (
+            Stream stream,
+            DateOnly value,
+            CancellationToken cancellationToken = default
+        )
+    {
+        Sure.NotNull (stream);
+
+        var dayNumber = value.DayNumber;
+
+        return WriteAsync (stream, dayNumber, cancellationToken);
+    }
+
+    /// <summary>
+    /// Вывод в поток значения типа <see cref="TimeOnly"/> в текущей позиции.
+    /// </summary>
+    public static ValueTask WriteAsync
+        (
+            Stream stream,
+            TimeOnly value,
+            CancellationToken cancellationToken = default
+        )
+    {
+        Sure.NotNull (stream);
+
+        var microseconds = value.ToTimeSpan().TotalMicroseconds;
+
+        return WriteAsync (stream, microseconds, cancellationToken);
     }
 
     /// <summary>
@@ -800,6 +850,227 @@ public static class AsyncStreamUtility
         Sure.NotNull (value);
 
         return WriteAsync (stream, value, Encoding.UTF8, cancellationToken);
+    }
+
+    /// <summary>
+    /// Чтение из потока 16-битного целого в сетевом порядке байтов.
+    /// </summary>
+    public static async ValueTask<short> ReadInt16NetworkAsync
+        (
+            this Stream stream
+        )
+    {
+        Sure.NotNull (stream);
+
+        var result = await ReadInt16Async (stream);
+
+        return IPAddress.NetworkToHostOrder (result);
+    }
+
+    /// <summary>
+    /// Чтение из потока 16-битного целого в сетевом порядке байтов.
+    /// </summary>
+    public static async ValueTask<ushort> ReadUInt16NetworkAsync
+        (
+            this Stream stream
+        )
+    {
+        Sure.NotNull (stream);
+
+        unchecked
+        {
+            var result = await ReadUInt16Async (stream);
+
+            return (ushort) IPAddress.NetworkToHostOrder ((short) result);
+        }
+    }
+
+    /// <summary>
+    /// Read integer in host byte order.
+    /// </summary>
+    public static ValueTask<short> ReadInt16HostAsync
+        (
+            this Stream stream
+        )
+    {
+        Sure.NotNull (stream);
+
+        return ReadInt16Async (stream);
+    }
+
+    /// <summary>
+    /// Чтение из потока 32-битного целого в сетевом порядке байтов.
+    /// </summary>
+    public static async ValueTask<int> ReadInt32NetworkAsync
+        (
+            this Stream stream
+        )
+    {
+        Sure.NotNull (stream);
+
+        var result = await ReadInt32Async (stream);
+
+        return IPAddress.NetworkToHostOrder (result);
+    }
+
+    /// <summary>
+    /// Чтение из потока 32-битного целого в сетевом порядке байтов.
+    /// </summary>
+    public static ValueTask<int> ReadInt32HostAsync
+        (
+            this Stream stream
+        )
+    {
+        Sure.NotNull (stream);
+
+        return ReadInt32Async (stream);
+    }
+
+    /// <summary>
+    /// Чтение из потока 64-битного целого в сетевом порядке байтов.
+    /// </summary>
+    public static async ValueTask<long> ReadInt64NetworkAsync
+        (
+            this Stream stream
+        )
+    {
+        Sure.NotNull (stream);
+
+        var result = await ReadInt64Async (stream);
+        result = StreamUtility.NetworkToHost64 (result);
+
+        return result;
+    }
+
+    /// <summary>
+    /// Чтение из потока 64-битного целого в сетевом порядке байтов.
+    /// </summary>
+    public static async ValueTask<ulong> ReadUInt64NetworkAsync
+        (
+            this Stream stream
+        )
+    {
+        Sure.NotNull (stream);
+
+        unchecked
+        {
+            var result = await ReadUInt64Async (stream);
+            result = (ulong) StreamUtility.NetworkToHost64 ((long) result);
+
+            return result;
+        }
+    }
+
+    /// <summary>
+    /// Read integer in host byte order.
+    /// </summary>
+    public static ValueTask<long> ReadInt64HostAsync
+        (
+            this Stream stream
+        )
+    {
+        Sure.NotNull (stream);
+
+        return ReadInt64Async (stream);
+    }
+
+    /// <summary>
+    /// Write 16-bit integer to the stream in network byte order.
+    /// </summary>
+    public static ValueTask WriteInt16NetworkAsync
+        (
+            this Stream stream,
+            short value
+        )
+    {
+        Sure.NotNull (stream);
+
+        value = IPAddress.HostToNetworkOrder (value);
+
+        return WriteAsync (stream, value);
+    }
+
+    /// <summary>
+    /// Write 16-bit integer to the stream in network byte order.
+    /// </summary>
+    public static ValueTask WriteUInt16NetworkAsync
+        (
+            this Stream stream,
+            ushort value
+        )
+    {
+        Sure.NotNull (stream);
+
+        unchecked
+        {
+            value = (ushort) IPAddress.HostToNetworkOrder ((short) value);
+
+            return WriteAsync (stream, value);
+        }
+    }
+
+    /// <summary>
+    /// Write 32-bit integer to the stream in network byte order.
+    /// </summary>
+    public static ValueTask WriteInt32NetworkAsync
+        (
+            Stream stream,
+            int value
+        )
+    {
+        Sure.NotNull (stream);
+
+        value = IPAddress.HostToNetworkOrder (value);
+
+        return WriteAsync (stream, value);
+    }
+
+    /// <summary>
+    /// Write 32-bit integer to the stream in network byte order.
+    /// </summary>
+    public static ValueTask WriteUInt32NetworkAsync
+        (
+            Stream stream,
+            uint value
+        )
+    {
+        Sure.NotNull (stream);
+
+        value = StreamUtility.NetworkToHost32 (value);
+
+        return WriteAsync (stream, value);
+    }
+
+    /// <summary>
+    /// Write 64-bit integer to the stream in network byte order.
+    /// </summary>
+    public static ValueTask WriteInt64NetworkAsync
+        (
+            Stream stream,
+            long value
+        )
+    {
+        Sure.NotNull (stream);
+
+        value = StreamUtility.NetworkToHost64 (value);
+
+        return WriteAsync (stream, value);
+    }
+
+    /// <summary>
+    /// Write 64-bit integer to the stream in network byte order.
+    /// </summary>
+    public static ValueTask WriteUInt64NetworkAsync
+        (
+            Stream stream,
+            ulong value
+        )
+    {
+        Sure.NotNull (stream);
+
+        value = StreamUtility.NetworkToHost64 (value);
+
+        return WriteAsync (stream, value);
     }
 
     #endregion

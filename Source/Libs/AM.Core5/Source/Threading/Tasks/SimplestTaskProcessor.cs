@@ -41,7 +41,7 @@ public sealed class SimplestTaskProcessor
 {
     #region Nested classes
 
-    class ActionWrapper
+    internal sealed class ActionWrapper
     {
         public Task? Task { get; set; }
 
@@ -51,15 +51,20 @@ public sealed class SimplestTaskProcessor
 
         public void Worker()
         {
+            if (Processor!._source.IsCancellationRequested)
+            {
+                return;
+            }
+
             try
             {
                 Action!.Invoke();
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
                 lock (Processor!.Exceptions)
                 {
-                    Processor.Exceptions.Add (ex);
+                    Processor.Exceptions.Add (exception);
                 }
             }
 
@@ -106,7 +111,7 @@ public sealed class SimplestTaskProcessor
             Magna.Logger.LogError
                 (
                     nameof (SimplestTaskProcessor) + "::Constructor"
-                    + "parallelism={Parallelism}",
+                                                   + "parallelism={Parallelism}",
                     parallelism
                 );
 
@@ -117,6 +122,7 @@ public sealed class SimplestTaskProcessor
         _running = new NonNullCollection<ActionWrapper>();
         Exceptions = new NonNullCollection<Exception>();
         _semaphore = new SemaphoreSlim (parallelism, parallelism);
+        _source = new CancellationTokenSource();
 
         Task.Factory.StartNew (_MainWorker);
     }
@@ -127,6 +133,7 @@ public sealed class SimplestTaskProcessor
 
     private readonly BlockingCollection<Action> _queue;
     private readonly NonNullCollection<ActionWrapper> _running;
+    private readonly CancellationTokenSource _source;
 
     private readonly SemaphoreSlim _semaphore;
 
@@ -134,7 +141,7 @@ public sealed class SimplestTaskProcessor
     {
         while (!_queue.IsCompleted)
         {
-            _semaphore.Wait();
+            _semaphore.Wait (_source.Token);
 
             if (!_queue.TryTake (out var action))
             {
@@ -160,6 +167,15 @@ public sealed class SimplestTaskProcessor
     #endregion
 
     #region Public methods
+
+    /// <summary>
+    /// Прекращение выборки из очереди.
+    /// </summary>
+    public void Cancel()
+    {
+        _source.Cancel();
+        _queue.CompleteAdding();
+    }
 
     /// <summary>
     /// Задачи больше добавляться не будут.
@@ -193,7 +209,7 @@ public sealed class SimplestTaskProcessor
 
         while (!_queue.IsCompleted)
         {
-            Thread.SpinWait (100000);
+            Thread.SpinWait (100_000);
         }
 
         Task[] tasks;

@@ -161,6 +161,102 @@ public static class Sure
 
     /// <summary>
     /// Проверка, попадает ли <paramref name="argument"/> в диапазон
+    /// индексов, допустимых для данного фрагмента.
+    /// </summary>
+    public static void InRange<T>
+        (
+            int argument,
+            Memory<T> span,
+            [CallerArgumentExpression ("argument")]
+            string? argumentName = null
+        )
+    {
+        if (argument < 0 || argument >= span.Length)
+        {
+            if (!string.IsNullOrEmpty (argumentName))
+            {
+                // .NET 5 SDK подставляет в argumentName значение null, .NET 6 делает по-человечески
+                throw new ArgumentOutOfRangeException (argumentName);
+            }
+
+            throw new ArgumentOutOfRangeException();
+        }
+    }
+
+    /// <summary>
+    /// Проверка, попадает ли <paramref name="argument"/> в диапазон
+    /// индексов, допустимых для данного фрагмента.
+    /// </summary>
+    public static void InRange<T>
+        (
+            int argument,
+            ReadOnlyMemory<T> span,
+            [CallerArgumentExpression ("argument")]
+            string? argumentName = null
+        )
+    {
+        if (argument < 0 || argument >= span.Length)
+        {
+            if (!string.IsNullOrEmpty (argumentName))
+            {
+                // .NET 5 SDK подставляет в argumentName значение null, .NET 6 делает по-человечески
+                throw new ArgumentOutOfRangeException (argumentName);
+            }
+
+            throw new ArgumentOutOfRangeException();
+        }
+    }
+
+    /// <summary>
+    /// Проверка, попадает ли <paramref name="argument"/> в диапазон
+    /// индексов, допустимых для данного фрагмента.
+    /// </summary>
+    public static void InRange<T>
+        (
+            int argument,
+            Span<T> span,
+            [CallerArgumentExpression ("argument")]
+            string? argumentName = null
+        )
+    {
+        if (argument < 0 || argument >= span.Length)
+        {
+            if (!string.IsNullOrEmpty (argumentName))
+            {
+                // .NET 5 SDK подставляет в argumentName значение null, .NET 6 делает по-человечески
+                throw new ArgumentOutOfRangeException (argumentName);
+            }
+
+            throw new ArgumentOutOfRangeException();
+        }
+    }
+
+    /// <summary>
+    /// Проверка, попадает ли <paramref name="argument"/> в диапазон
+    /// индексов, допустимых для данного фрагмента.
+    /// </summary>
+    public static void InRange<T>
+        (
+            int argument,
+            ReadOnlySpan<T> span,
+            [CallerArgumentExpression ("argument")]
+            string? argumentName = null
+        )
+    {
+        if (argument < 0 || argument >= span.Length)
+        {
+            if (!string.IsNullOrEmpty (argumentName))
+            {
+                // .NET 5 SDK подставляет в argumentName значение null, .NET 6 делает по-человечески
+                throw new ArgumentOutOfRangeException (argumentName);
+            }
+
+            throw new ArgumentOutOfRangeException();
+        }
+    }
+
+    /// <summary>
+    /// Проверка, попадает ли <paramref name="argument"/> в диапазон
     /// индексов, допустимых для данного списка.
     /// </summary>
     public static void InRange<T>

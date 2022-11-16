@@ -478,6 +478,38 @@ public static class StreamUtility
     }
 
     /// <summary>
+    /// Reads the date.
+    /// </summary>
+    /// <param name="stream">The stream.</param>
+    public static DateOnly ReadDateOnly
+        (
+            Stream stream
+        )
+    {
+        Sure.NotNull (stream);
+
+        var dayNumber = ReadInt32 (stream);
+
+        return DateOnly.FromDayNumber (dayNumber);
+    }
+
+    /// <summary>
+    /// Reads the time.
+    /// </summary>
+    /// <param name="stream">The stream.</param>
+    public static TimeOnly ReadTimeOnly
+        (
+            Stream stream
+        )
+    {
+        Sure.NotNull (stream);
+
+        var microseconds = ReadDouble (stream);
+
+        return TimeOnly.FromTimeSpan (TimeSpan.FromMicroseconds (microseconds));
+    }
+
+    /// <summary>
     /// Чтение точного числа байт.
     /// </summary>
     public static byte[] ReadExact
@@ -781,7 +813,6 @@ public static class StreamUtility
 
         Write (stream, values.Length);
 
-        // ReSharper disable once ForCanBeConvertedToForeach
         for (var i = 0; i < values.Length; i++)
         {
             Write (stream, values[i]);
@@ -814,7 +845,6 @@ public static class StreamUtility
 
         Write (stream, values.Length);
 
-        // ReSharper disable once ForCanBeConvertedToForeach
         for (var i = 0; i < values.Length; i++)
         {
             Write (stream, values[i]);
@@ -905,7 +935,7 @@ public static class StreamUtility
     {
         Sure.NotNull (stream);
 
-        var span = new Span<byte> ((byte*)&value, sizeof (decimal));
+        var span = new Span<byte> ((byte*) &value, sizeof (decimal));
         stream.Write (span);
     }
 
@@ -921,7 +951,42 @@ public static class StreamUtility
     {
         Sure.NotNull (stream);
 
-        var span = new Span<byte> ((byte*)&value, sizeof (decimal));
+        var binary = value.ToBinary();
+        var span = new Span<byte> ((byte*) &binary, sizeof (long));
+        stream.Write (span);
+    }
+
+    /// <summary>
+    /// Writes the <see cref="DateOnly"/> to the specified
+    /// <see cref="Stream"/>.
+    /// </summary>
+    public static unsafe void Write
+        (
+            Stream stream,
+            DateOnly value
+        )
+    {
+        Sure.NotNull (stream);
+
+        var binary = value.DayNumber;
+        var span = new Span<byte> ((byte*) &binary, sizeof (int));
+        stream.Write (span);
+    }
+
+    /// <summary>
+    /// Writes the <see cref="TimeOnly"/> to the specified
+    /// <see cref="Stream"/>.
+    /// </summary>
+    public static unsafe void Write
+        (
+            Stream stream,
+            TimeOnly value
+        )
+    {
+        Sure.NotNull (stream);
+
+        var binary = value.ToTimeSpan().TotalMicroseconds;
+        var span = new Span<byte> ((byte*) &binary, sizeof (double));
         stream.Write (span);
     }
 
@@ -947,6 +1012,24 @@ public static class StreamUtility
     /// <summary>
     /// Network to host byte conversion.
     /// </summary>
+    public static void NetworkToHost16
+        (
+            Span<byte> array,
+            int offset
+        )
+    {
+        Sure.InRange (offset, array);
+        Sure.InRange (offset + 1, array);
+
+        if (BitConverter.IsLittleEndian)
+        {
+            (array[offset], array[offset + 1]) = (array[offset + 1], array[offset]);
+        }
+    }
+
+    /// <summary>
+    /// Network to host byte conversion.
+    /// </summary>
     public static unsafe void NetworkToHost16
         (
             byte* ptr
@@ -959,6 +1042,21 @@ public static class StreamUtility
             var temp = *ptr;
             *ptr = ptr[1];
             ptr[1] = temp;
+        }
+    }
+
+    /// <summary>
+    /// Преобразование беззнакового 32-битного числа из сетевой формы
+    /// в локальную.
+    /// </summary>
+    public static uint NetworkToHost32
+        (
+            uint value
+        )
+    {
+        unchecked
+        {
+            return (uint) IPAddress.NetworkToHostOrder ((int) value);
         }
     }
 
@@ -1023,6 +1121,38 @@ public static class StreamUtility
             ptr[3] = temp1;
             ptr[2] = temp2;
         }
+    }
+
+    /// <summary>
+    /// Network to host byte conversion.
+    /// </summary>
+    /// <remarks>IRBIS64-oriented!</remarks>
+    public static long NetworkToHost64
+        (
+            long value
+        )
+    {
+        var bytes = BitConverter.GetBytes (value);
+        NetworkToHost64 (bytes);
+        var result = BitConverter.ToInt64 (bytes);
+
+        return result;
+    }
+
+    /// <summary>
+    /// Network to host byte conversion.
+    /// </summary>
+    /// <remarks>IRBIS64-oriented!</remarks>
+    public static ulong NetworkToHost64
+        (
+            ulong value
+        )
+    {
+        var bytes = BitConverter.GetBytes (value);
+        NetworkToHost64 (bytes);
+        var result = BitConverter.ToUInt64 (bytes);
+
+        return result;
     }
 
     /// <summary>
