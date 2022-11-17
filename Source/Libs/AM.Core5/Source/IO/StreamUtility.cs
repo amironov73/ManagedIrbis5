@@ -1595,6 +1595,12 @@ public static class StreamUtility
         Sure.NotNull (stream);
 
         using var result = new MemoryStream(); //-V3114
+        if (stream.CanSeek)
+        {
+            var remaining = checked ((int) (stream.Length - stream.Position));
+            result.Capacity = remaining;
+        }
+
         var buffer = new byte[50 * 1024];
         while (true)
         {
