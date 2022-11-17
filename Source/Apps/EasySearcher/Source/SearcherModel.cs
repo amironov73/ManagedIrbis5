@@ -25,6 +25,8 @@ using AM.Collections;
 
 using Avalonia.Controls;
 
+using ManagedIrbis;
+
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
@@ -63,7 +65,7 @@ public sealed class SearcherModel
     /// Найденные записи в эталоне ББК.
     /// </summary>
     [Reactive]
-    public string[]? Found { get; set; }
+    public FoundItem[]? Found { get; set; }
 
     #endregion
 
@@ -75,7 +77,7 @@ public sealed class SearcherModel
     public async Task PerformSearch()
     {
         ErrorMessage = null;
-        Found = Array.Empty<string>();
+        Found = Array.Empty<FoundItem>();
 
         var query = LookingFor.SafeTrim();
         if (string.IsNullOrEmpty (query))

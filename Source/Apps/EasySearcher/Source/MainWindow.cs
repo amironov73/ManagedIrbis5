@@ -20,9 +20,12 @@ using AM.Avalonia;
 
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Templates;
 using Avalonia.Data;
 using Avalonia.Layout;
 using Avalonia.Media;
+
+using ManagedIrbis;
 
 #endregion
 
@@ -57,33 +60,7 @@ public sealed class MainWindow
             VerticalAlignment = VerticalAlignment.Stretch,
             Children =
             {
-                new DockPanel
-                    {
-                        Children =
-                        {
-                            new Label
-                                {
-                                    VerticalAlignment = VerticalAlignment.Center,
-                                    Content = "Искомое: "
-                                }
-                                .DockLeft(),
-
-                            new Button
-                                {
-                                    IsDefault = true,
-                                    Content = "Найти",
-                                    [!Button.CommandProperty] = new Binding (nameof (SearcherModel.PerformSearch))
-                                }
-                                .DockRight(),
-
-                            new TextBox
-                            {
-                                Margin = new Thickness (10, 0),
-                                HorizontalAlignment = HorizontalAlignment.Stretch,
-                                [!TextBox.TextProperty] = new Binding (nameof (SearcherModel.LookingFor))
-                            }
-                        }
-                    }
+                CreateTopPanel()
                     .DockTop(),
 
                 new Label
@@ -95,17 +72,85 @@ public sealed class MainWindow
                     }
                     .DockTop(),
 
-                new ListBox
-                {
-                    VerticalAlignment = VerticalAlignment.Stretch,
-                    HorizontalAlignment = HorizontalAlignment.Stretch,
-                    [!ItemsControl.ItemsProperty] = new Binding (nameof (SearcherModel.Found))
-                }
-
+                CreateListBox()
             }
         };
 
         DataContext = model;
+    }
+
+    #endregion
+
+    #region Private members
+
+    private static ListBox CreateListBox()
+    {
+        return new ListBox
+        {
+            VerticalAlignment = VerticalAlignment.Stretch,
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            [!ItemsControl.ItemsProperty] = new Binding (nameof (SearcherModel.Found)),
+            ItemTemplate = new FuncDataTemplate<FoundItem> ((_, _) =>
+            {
+                var firstBlock = new TextBlock
+                    {
+                        MinWidth = 100,
+                        FontWeight = FontWeight.Bold,
+                        Margin = new Thickness (0, 0, 10, 0),
+                        [!TextBlock.TextProperty] = new Binding (nameof (FoundItem.Mfn))
+                    }
+                    .DockLeft();
+
+                var secondBlock = new TextBlock
+                {
+                    TextWrapping = TextWrapping.WrapWithOverflow,
+                    [!TextBlock.TextProperty] = new Binding (nameof (FoundItem.Text))
+                };
+
+                var result = new DockPanel
+                {
+                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                    Children =
+                    {
+                        firstBlock,
+                        secondBlock
+                    }
+                };
+
+                return result;
+            })
+        };
+    }
+
+    private static DockPanel CreateTopPanel()
+    {
+        return new DockPanel
+        {
+            Children =
+            {
+                new Label
+                    {
+                        VerticalAlignment = VerticalAlignment.Center,
+                        Content = "Искомое: "
+                    }
+                    .DockLeft(),
+
+                new Button
+                    {
+                        IsDefault = true,
+                        Content = "Найти",
+                        [!Button.CommandProperty] = new Binding (nameof (SearcherModel.PerformSearch))
+                    }
+                    .DockRight(),
+
+                new TextBox
+                {
+                    Margin = new Thickness (10, 0),
+                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                    [!TextBox.TextProperty] = new Binding (nameof (SearcherModel.LookingFor))
+                }
+            }
+        };
     }
 
     #endregion

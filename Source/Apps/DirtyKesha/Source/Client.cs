@@ -62,14 +62,6 @@ internal sealed class Client
             : match.Value;
     }
 
-    private static string _GetDescription
-        (
-            string text
-        )
-    {
-        return text;
-    }
-
     private static string _CleanText
         (
             string text
@@ -126,7 +118,6 @@ internal sealed class Client
 
         return found
             .Take (20)
-            .Select (_GetDescription)
             .Select (_CleanText)
             .Where (line => !string.IsNullOrEmpty (line))
             .OrderBy (line => line)

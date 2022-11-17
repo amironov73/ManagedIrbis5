@@ -328,6 +328,105 @@ public class AsyncTeapotSearcher
             : result;
     }
 
+    /// <summary>
+    /// Поиск с MFN и расформатированием.
+    /// </summary>
+    public async Task<FoundItem[]> SearchItemsAsync
+        (
+            IAsyncProvider connection,
+            string query,
+            string? database = null,
+            string? format = null,
+            IRelevanceEvaluator? evaluator = null,
+            int limit = 500
+        )
+    {
+        Sure.NotNull (connection);
+        connection.EnsureConnected();
+
+        database = connection.EnsureDatabase (database);
+        if (limit < 1)
+        {
+            limit = 500;
+        }
+
+        var expression = await BuildSearchExpressionAsync (query);
+        if (string.IsNullOrWhiteSpace (expression))
+        {
+            return Array.Empty<FoundItem>();
+        }
+
+        evaluator ??= ServiceProvider.GetService <IRelevanceEvaluator>()
+            ?? new StandardRelevanceEvaluator (ServiceProvider, expression);
+
+        var searchParameters = new SearchParameters
+        {
+            Database = database,
+            Expression = expression,
+            NumberOfRecords = limit * 2
+        };
+        var found = await connection.SearchAsync (searchParameters);
+        if (found is null)
+        {
+            return Array.Empty<FoundItem>();
+        }
+
+        var batch = FoundItem.ToMfn (found);
+        var records = await connection.ReadRecordsAsync (database, batch);
+        if (records.IsNullOrEmpty())
+        {
+            return Array.Empty<FoundItem>();
+        }
+
+        var pairs = new List<Pair<Record, double>>();
+        foreach (var record in records)
+        {
+            var relevance = evaluator.EvaluateRelevance (record);
+            var pair = new Pair<Record, double> (record, relevance);
+            pairs.Add (pair);
+        }
+
+        var mfns = pairs
+            .OrderByDescending (pair => pair.Second)
+            .Take (limit)
+            .Select (pair => pair.First!.Mfn)
+            .ToArray();
+        if (mfns.IsNullOrEmpty())
+        {
+            return Array.Empty<FoundItem>();
+        }
+
+        var formatParameters = new FormatRecordParameters
+        {
+            Database = connection.EnsureDatabase(),
+            Format = format ?? "@",
+            Mfns = mfns
+        };
+        if (!await connection.FormatRecordsAsync (formatParameters))
+        {
+            return Array.Empty<FoundItem>();
+        }
+
+        var descriptions = formatParameters.Result.AsArray();
+        if (descriptions.IsNullOrEmpty())
+        {
+            return Array.Empty<FoundItem>();
+        }
+
+        var result = mfns.Zip
+            (
+                descriptions,
+                (mfn, description) => new FoundItem
+                {
+                    Mfn = mfn,
+                    Text = description
+                }
+            )
+            .ToArray();
+
+        return result;
+    }
+
     /// <inheritdoc cref="ITeapotSearcher.Search"/>
     public async Task<Record[]> SearchReadAsync
         (
