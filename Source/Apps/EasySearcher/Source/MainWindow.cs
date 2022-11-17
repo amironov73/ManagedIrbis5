@@ -94,7 +94,7 @@ public sealed class MainWindow
             {
                 var firstBlock = new TextBlock
                     {
-                        MinWidth = 100,
+                        MinWidth = 90,
                         FontWeight = FontWeight.Bold,
                         Margin = new Thickness (0, 0, 10, 0),
                         [!TextBlock.TextProperty] = new Binding (nameof (FoundItem.Mfn))

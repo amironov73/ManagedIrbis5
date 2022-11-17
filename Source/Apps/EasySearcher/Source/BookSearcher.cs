@@ -73,7 +73,7 @@ public sealed class BookSearcher
 
     #region Private members
 
-    delegate Task<FoundItem[]> SearchImplementation
+    private delegate Task<FoundItem[]> SearchImplementation
         (AsyncConnection connection, string query);
 
     private static SearchImplementation GetSearchStrategy
@@ -124,24 +124,18 @@ public sealed class BookSearcher
         var textKind = TextUtility.DetermineTextKind (text);
         if (textKind == TextKind.Html)
         {
-            result = Regex.Replace (text, @"<br\s*/>", "\n");
-            result = result.Replace ("<br>", "\n");
-            result = Regex.Replace (result, @"<p[^>]*?>", "\n");
-            result = result.Replace ("</div>", "\n");
+            result = text.Replace ('\x1F', ' ');
+            result = Regex.Replace (result, @"<br\s*/>", "\n");
+            result = result.Replace ("<br>", "\n", StringComparison.OrdinalIgnoreCase);
+            result = Regex.Replace (result, @"<p[^>]*?>", "\n", RegexOptions.IgnoreCase);
+            result = result.Replace ("</tr>", "\n", StringComparison.OrdinalIgnoreCase);
+            result = result.Replace ("</div>", "\n", StringComparison.OrdinalIgnoreCase);
+            result = Regex.Replace (result, "<[Aa][^>]*?>([^<]*?)</[Aa]>", "$1");
 
             result = HtmlText.ToPlainText (result)
                      ?? string.Empty;
 
             result = result.Trim();
-
-            // var regex1 = new Regex ("<([A-Za-z/]+).*?>");
-            //
-            // // var regex2 = new Regex ("<[Aa][^>]*?>[^<]*?</[Aa]>");
-            //
-            //
-            // // result = regex2.Replace (result, string.Empty);
-            // result = regex1.Replace (result, string.Empty);
-            // result = result.Replace ("()", string.Empty);
         }
         else if (textKind == TextKind.RichText)
         {
