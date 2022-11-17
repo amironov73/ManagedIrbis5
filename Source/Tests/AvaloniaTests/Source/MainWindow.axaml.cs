@@ -78,7 +78,10 @@ public partial class MainWindow
             RoutedEventArgs eventArgs
         )
     {
-        var window = new LoginWindow();
+        var window = new LoginWindow
+        {
+            Title = "Подключение к серверу 1.1.1.1"
+        };
         var result = await window.ShowDialog<bool> (this);
         Debug.WriteLine ($"Dialog result is {result}");
     }

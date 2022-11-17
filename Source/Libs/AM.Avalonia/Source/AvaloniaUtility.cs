@@ -261,7 +261,7 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
-    /// Установка обработчика событий.
+    /// Установка обработчика событий нажатия на кнопку.
     /// </summary>
     public static T OnClick<T>
         (

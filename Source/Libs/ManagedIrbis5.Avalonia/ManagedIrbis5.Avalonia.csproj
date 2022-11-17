@@ -23,31 +23,31 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\AM.Core5\AM.Core5.csproj"/>
-        <ProjectReference Include="..\ManagedIrbis5\ManagedIrbis5.csproj"/>
-        <ProjectReference Include="..\AM.Avalonia\AM.Avalonia.csproj"/>
+        <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
+        <ProjectReference Include="..\ManagedIrbis5\ManagedIrbis5.csproj" />
+        <ProjectReference Include="..\AM.Avalonia\AM.Avalonia.csproj" />
     </ItemGroup>
 
     <!-- Централизованное управление пакетами -->
     <ItemGroup>
-        <PackageReference Include="Avalonia"/>
-        <PackageReference Include="Avalonia.Controls.DataGrid"/>
-        <PackageReference Include="Avalonia.Desktop"/>
-        <PackageReference Include="Avalonia.Diagnostics"/>
-        <PackageReference Include="Avalonia.ReactiveUI"/>
-        <PackageReference Include="Avalonia.Xaml.Behaviors"/>
-        <PackageReference Include="Avalonia.Xaml.Interactions"/>
-        <PackageReference Include="Avalonia.Xaml.Interactivity"/>
-        <PackageReference Include="DynamicData"/>
-        <PackageReference Include="DynamicData.ReactiveUI"/>
-        <PackageReference Include="GridExtra.Avalonia"/>
-        <PackageReference Include="Newtonsoft.Json"/>
-        <PackageReference Include="ReactiveHistory"/>
-        <PackageReference Include="ReactiveUI"/>
-        <PackageReference Include="SkiaSharp"/>
-        <PackageReference Include="Microsoft.Extensions.Logging"/>
-        <PackageReference Include="XamlColorSchemeGenerator"/>
-        <PackageReference Include="XamlNameReferenceGenerator"/>
+        <PackageReference Include="Avalonia" />
+        <PackageReference Include="Avalonia.Controls.DataGrid" />
+        <PackageReference Include="Avalonia.Desktop" />
+        <PackageReference Include="Avalonia.Diagnostics" />
+        <PackageReference Include="Avalonia.ReactiveUI" />
+        <PackageReference Include="Avalonia.Xaml.Behaviors" />
+        <PackageReference Include="Avalonia.Xaml.Interactions" />
+        <PackageReference Include="Avalonia.Xaml.Interactivity" />
+        <PackageReference Include="DynamicData" />
+        <PackageReference Include="DynamicData.ReactiveUI" />
+        <PackageReference Include="GridExtra.Avalonia" />
+        <PackageReference Include="Newtonsoft.Json" />
+        <PackageReference Include="ReactiveHistory" />
+        <PackageReference Include="ReactiveUI" />
+        <PackageReference Include="SkiaSharp" />
+        <PackageReference Include="Microsoft.Extensions.Logging" />
+        <PackageReference Include="XamlColorSchemeGenerator" />
+        <PackageReference Include="XamlNameReferenceGenerator" />
     </ItemGroup>
 
     <ItemGroup>
