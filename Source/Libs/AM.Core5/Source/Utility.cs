@@ -983,7 +983,7 @@ public static class Utility
             this T? value,
             [CallerArgumentExpression ("value")] string? message = null
         )
-        where T : class
+        where T: class
     {
         if (value is null)
         {
@@ -1013,8 +1013,12 @@ public static class Utility
     /// </summary>
     [Pure]
     [DebuggerStepThrough]
-    public static T IfNull<T> (this T? value, T defaultValue)
-        where T : class
+    public static T IfNull<T>
+        (
+            this T? value,
+            T defaultValue
+        )
+        where T: class
     {
         return value ?? defaultValue;
     }
@@ -1024,7 +1028,11 @@ public static class Utility
     /// </summary>
     [Pure]
     [DebuggerStepThrough]
-    public static string IfEmpty (this string? value, string defaultValue)
+    public static string IfEmpty
+        (
+            this string? value,
+            string defaultValue
+        )
     {
         return string.IsNullOrEmpty (value)
             ? string.IsNullOrEmpty (defaultValue)
@@ -1106,7 +1114,7 @@ public static class Utility
             }
 
             throw new ArgumentException();
-        } // if
+        }
 
         return value;
     }
@@ -1157,7 +1165,7 @@ public static class Utility
             }
 
             throw new ArgumentException();
-        } // if
+        }
 
         return value;
     }

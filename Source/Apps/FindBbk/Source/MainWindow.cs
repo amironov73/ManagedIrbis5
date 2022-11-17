@@ -17,6 +17,7 @@
 #region Using directives
 
 using AM;
+using AM.Avalonia;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -44,10 +45,8 @@ public sealed class MainWindow
     {
         this.AttachDevTools();
 
-        Width = 600;
-        MinWidth = 600;
-        Height = 400;
-        MinHeight = 400;
+        Width = MinWidth = 600;
+        Height = MinHeight = 400;
         Title = "Поиск по эталону ББК";
 
         var model = new BbkModel { window = this };
@@ -92,49 +91,6 @@ public sealed class MainWindow
             })
         };
 
-        var label = new Label
-        {
-            VerticalAlignment = VerticalAlignment.Center,
-            Content = "Искомое:"
-        };
-        label.SetValue (DockPanel.DockProperty, Dock.Left);
-
-        var textBox = new TextBox
-        {
-            Margin = new Thickness (10, 0),
-            HorizontalAlignment = HorizontalAlignment.Stretch,
-            [!TextBox.TextProperty] = new Binding (nameof (BbkModel.LookingFor))
-        };
-
-        var button = new Button
-        {
-            IsDefault = true,
-            Content = "Найти",
-            [!Button.CommandProperty] = new Binding (nameof (BbkModel.PerformSearch))
-        };
-        button.SetValue (DockPanel.DockProperty, Dock.Right);
-
-
-        var topDock = new DockPanel
-        {
-            Children =
-            {
-                label,
-                button,
-                textBox
-            }
-        };
-        topDock.SetValue (DockPanel.DockProperty, Dock.Top);
-
-        var errorLabel = new Label
-        {
-            HorizontalAlignment = HorizontalAlignment.Center,
-            FontWeight = FontWeight.Bold,
-            Foreground = Brushes.Red,
-            [!ContentProperty] = new Binding (nameof (BbkModel.ErrorMessage))
-        };
-        errorLabel.SetValue (DockPanel.DockProperty, Dock.Top);
-
         Content = new DockPanel
         {
             Margin = new Thickness (10),
@@ -142,8 +98,44 @@ public sealed class MainWindow
             VerticalAlignment = VerticalAlignment.Stretch,
             Children =
             {
-                topDock,
-                errorLabel,
+                new DockPanel
+                    {
+                        Children =
+                        {
+                            new Label
+                                {
+                                    VerticalAlignment = VerticalAlignment.Center,
+                                    Content = "Искомое: "
+                                }
+                                .DockLeft(),
+
+                            new Button
+                                {
+                                    IsDefault = true,
+                                    Content = "Найти",
+                                    [!Button.CommandProperty] = new Binding (nameof (BbkModel.PerformSearch))
+                                }
+                                .DockRight(),
+
+                            new TextBox
+                            {
+                                Margin = new Thickness (10, 0),
+                                HorizontalAlignment = HorizontalAlignment.Stretch,
+                                [!TextBox.TextProperty] = new Binding (nameof (BbkModel.LookingFor))
+                            }
+                        }
+                    }
+                    .DockTop(),
+
+                new Label
+                    {
+                        HorizontalAlignment = HorizontalAlignment.Center,
+                        FontWeight = FontWeight.Bold,
+                        Foreground = Brushes.Red,
+                        [!ContentProperty] = new Binding (nameof (BbkModel.ErrorMessage))
+                    }
+                    .DockTop(),
+
                 bbkList
             }
         };

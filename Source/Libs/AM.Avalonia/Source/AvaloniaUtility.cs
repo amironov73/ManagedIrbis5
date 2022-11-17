@@ -161,6 +161,74 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
+    /// Размещение контрола внизу в <see cref="DockPanel"/>>.
+    /// </summary>
+    public static T DockBottom<T>
+        (
+            this T control
+
+        )
+        where T: Control
+    {
+        Sure.NotNull (control);
+
+        control.SetValue (DockPanel.DockProperty, Dock.Bottom);
+
+        return control;
+    }
+
+    /// <summary>
+    /// Размещение контрола слева в <see cref="DockPanel"/>>.
+    /// </summary>
+    public static T DockLeft<T>
+        (
+            this T control
+
+        )
+        where T: Control
+    {
+        Sure.NotNull (control);
+
+        control.SetValue (DockPanel.DockProperty, Dock.Left);
+
+        return control;
+    }
+
+    /// <summary>
+    /// Размещение контрола справа в <see cref="DockPanel"/>>.
+    /// </summary>
+    public static T DockRight<T>
+        (
+            this T control
+
+        )
+        where T: Control
+    {
+        Sure.NotNull (control);
+
+        control.SetValue (DockPanel.DockProperty, Dock.Right);
+
+        return control;
+    }
+
+    /// <summary>
+    /// Размещение контрола наверху в <see cref="DockPanel"/>>.
+    /// </summary>
+    public static T DockTop<T>
+        (
+            this T control
+
+        )
+        where T: Control
+    {
+        Sure.NotNull (control);
+
+        control.SetValue (DockPanel.DockProperty, Dock.Top);
+
+        return control;
+    }
+
+    /// <summary>
     /// Установка наклонного начертания для текстового блока.
     /// </summary>
     public static T Italic<T>
