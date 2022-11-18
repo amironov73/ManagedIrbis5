@@ -145,5 +145,8 @@ public enum AffixConfigOptions : short
     /// <seealso cref="AffixConfig.KeepCase"/>
     CheckSharps = 1 << 13,
 
+    /// <summary>
+    ///
+    /// </summary>
     SimplifiedCompound = 1 << 14
 }
