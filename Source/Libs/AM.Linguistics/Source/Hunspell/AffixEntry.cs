@@ -17,8 +17,6 @@
 using System.Runtime.CompilerServices;
 #endif
 
-using System;
-
 #endregion
 
 #nullable enable
@@ -123,15 +121,25 @@ namespace AM.Linguistics.Hunspell;
 /// <seealso cref="SuffixEntry"/>
 public abstract class AffixEntry
 {
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="strip"></param>
+    /// <param name="affixText"></param>
+    /// <param name="conditions"></param>
+    /// <param name="morph"></param>
+    /// <param name="contClass"></param>
 #if !NO_INLINE
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
-    protected AffixEntry (
-        string strip,
-        string affixText,
-        CharacterConditionGroup conditions,
-        MorphSet morph,
-        FlagSet contClass)
+    protected AffixEntry
+        (
+            string? strip,
+            string? affixText,
+            CharacterConditionGroup? conditions,
+            MorphSet? morph,
+            FlagSet? contClass
+        )
     {
         Strip = strip ?? string.Empty;
         Append = affixText ?? string.Empty;
@@ -167,20 +175,44 @@ public abstract class AffixEntry
     /// </remarks>
     public string Strip { get; }
 
+    /// <summary>
+    ///
+    /// </summary>
     public FlagSet ContClass { get; }
 
+    /// <summary>
+    ///
+    /// </summary>
     public abstract string Key { get; }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="flag"></param>
+    /// <returns></returns>
 #if !NO_INLINE
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
     public bool ContainsContClass (FlagValue flag) => ContClass.Contains (flag);
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
 #if !NO_INLINE
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
     public bool ContainsAnyContClass (FlagValue a, FlagValue b) => ContClass.ContainsAny (a, b);
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <param name="c"></param>
+    /// <returns></returns>
 #if !NO_INLINE
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
