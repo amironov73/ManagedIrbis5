@@ -17,18 +17,8 @@
 #region Using directives
 
 using System;
-using System.Reactive;
-using System.Threading.Tasks;
-
-using AM;
-using AM.Avalonia;
-using AM.Collections;
 
 using Avalonia.Controls;
-using Avalonia.Interactivity;
-using Avalonia.Threading;
-
-using ManagedIrbis;
 
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -68,20 +58,23 @@ public sealed class LoginModel
 
     #region Private members
 
-    internal void LoginButtonClicked
-        (
-            object? sender,
-            RoutedEventArgs eventArgs
-        )
+    internal void LoginClicked()
     {
         window.Close (true);
     }
 
-    internal void CancelButtonClicked
-        (
-            object? sender,
-            RoutedEventArgs eventArgs
-        )
+    internal IObservable<bool> CanLogin()
+    {
+        return this.WhenAnyValue
+            (
+                x => x.Username,
+                y => y.Password,
+                (x, y) => !string.IsNullOrEmpty (Username)
+                          && !string.IsNullOrEmpty (Password)
+            );
+    }
+
+    internal void CancelClicked()
     {
         window.Close (false);
     }

@@ -44,6 +44,7 @@
         <PackageReference Include="Newtonsoft.Json" />
         <PackageReference Include="ReactiveHistory" />
         <PackageReference Include="ReactiveUI" />
+        <PackageReference Include="ReactiveUI.Fody" />
         <PackageReference Include="SkiaSharp" />
         <PackageReference Include="Microsoft.Extensions.Logging" />
         <PackageReference Include="XamlColorSchemeGenerator" />

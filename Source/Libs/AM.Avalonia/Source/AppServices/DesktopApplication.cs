@@ -24,6 +24,7 @@ using System.Collections.Generic;
 
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.ReactiveUI;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -57,6 +58,7 @@ public sealed class DesktopApplication
         _windowCreator = _ => new Window();
         _appBuilder = AppBuilder.Configure<AvaloniaApplication>()
             .UsePlatformDetect()
+            .UseReactiveUI()
             .LogToTrace();
     }
 

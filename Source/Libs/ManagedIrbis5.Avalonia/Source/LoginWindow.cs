@@ -17,14 +17,15 @@
 
 #region Using directives
 
-using AM.Avalonia;
+using System;
+
 using AM.Avalonia.Controls;
 
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Layout;
-using Avalonia.Threading;
+using Avalonia.ReactiveUI;
 
 using ReactiveUI;
 
@@ -38,17 +39,8 @@ namespace ManagedIrbis.Avalonia;
 /// Окно для ввода логина и пароля при подключении к серверу ИРБИС64.
 /// </summary>
 public sealed class LoginWindow
-    : Window
+    : ReactiveWindow<LoginModel>
 {
-    #region Properties
-
-    /// <summary>
-    /// Модель с данными.
-    /// </summary>
-    public LoginModel Model { get; }
-
-    #endregion
-
     #region Construction
 
     /// <summary>
@@ -56,7 +48,8 @@ public sealed class LoginWindow
     /// </summary>
     public LoginWindow()
     {
-        Model = new LoginModel { window = this };
+        DataContext = new LoginModel { window = this };
+        var model = ViewModel!;
 
         Title = "Подключение к серверу ИРБИС64";
         Width = MinWidth = 350;
@@ -97,25 +90,41 @@ public sealed class LoginWindow
                         new Button
                             {
                                 Focusable = true,
-                                Content = "Вход"
-                            }
-                            .OnClick (Model.LoginButtonClicked),
+                                Content = "Вход",
+                                Command = ReactiveCommand.Create (OkClicked, OkEnabled())
+                            },
 
                         new Button
                             {
                                 Content = "Отмена",
+                                Command = ReactiveCommand.Create (model.CancelClicked)
                             }
-                            .OnClick (Model.CancelButtonClicked)
                     }
                 }
             }
         };
-
-        // loginButton.Click += Model.LoginButtonClicked;
-        // cancelButton.Click += Model.CancelButtonClicked;
-
-        DataContext = Model;
     }
+
+    #endregion
+
+    #region Private methods
+
+    private void OkClicked()
+    {
+        Close (true);
+    }
+
+    private IObservable<bool> OkEnabled()
+    {
+        return ViewModel!.WhenAnyValue
+            (
+                x => x.Username,
+                y => y.Password,
+                (x, y) => !string.IsNullOrEmpty (x)
+                          && !string.IsNullOrEmpty (y)
+            );
+    }
+
 
     #endregion
 }

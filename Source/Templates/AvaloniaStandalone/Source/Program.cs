@@ -28,6 +28,8 @@ using Microsoft.Extensions.Logging;
 
 using NLog.Extensions.Logging;
 
+using ReactiveUI;
+
 #endregion
 
 #nullable enable
@@ -85,6 +87,7 @@ internal sealed class Program
     {
         return AppBuilder.Configure<App>()
             .UsePlatformDetect()
+            .UseReactiveUI()
             .LogToTrace();
     }
 }
