@@ -2,13 +2,10 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedParameter.Local
 
 /* RepeatingGroup.cs -- повторяющаяся группа при форматировании записи
  * Ars Magna project, http://arsmagna.ru
@@ -27,29 +24,267 @@ using AM;
 
 #nullable enable
 
-namespace ManagedIrbis
+namespace ManagedIrbis;
+
+/// <summary>
+/// Повторяющаяся группа при форматировании записи.
+/// </summary>
+public sealed class RepeatingGroup
 {
+    #region Properties
+
     /// <summary>
-    /// Повторяющаяся группа при форматировании записи.
+    /// Библиографическая запись.
     /// </summary>
-    public sealed class RepeatingGroup
+    public Record Record { get; set; }
+
+    /// <summary>
+    /// Метки повторяющихся полей.
+    /// </summary>
+    public int[] Tags { get; set; }
+
+    /// <summary>
+    /// Количество повторений.
+    /// </summary>
+    public int Count { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public RepeatingGroup
+        (
+            Record record,
+            int tag
+        )
+        : this (record, new[] { tag })
+    {
+        // пустое тело конструктора.
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public RepeatingGroup
+        (
+            Record record,
+            int[] tags
+        )
+    {
+        Sure.NotNull (record);
+        Sure.NotNull (tags);
+
+        Record = record;
+        Tags = tags;
+
+        Count = 0;
+        foreach (var tag in tags)
+        {
+            var count = record.Count (tag);
+            if (count >= Count)
+            {
+                Count = count;
+            }
+        }
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Перечисление полей, входящих в повторяющуюся группу.
+    /// </summary>
+    public IEnumerable<Field> EnumerateFields()
+    {
+        foreach (var tag in Tags)
+        {
+            foreach (var field in Record.EnumerateField (tag))
+            {
+                yield return field;
+            }
+        }
+    }
+
+    /// <inheritdoc cref="IEnumerable{T}.GetEnumerator"/>
+    public Enumerator GetEnumerator() => new (this);
+
+    /// <summary>
+    /// Выполненение указанных действий для каждого повторения в группе.
+    /// </summary>
+    public RepeatingGroup ForEach
+        (
+            Action<Repeat> action
+        )
+    {
+        Sure.NotNull (action);
+
+        foreach (var repeat in this)
+        {
+            action (repeat);
+        }
+
+        return this;
+    }
+
+    /// <summary>
+    /// Установка значения подполя.
+    /// </summary>
+    public RepeatingGroup SetValue
+        (
+            char code,
+            string? newValue
+        )
+    {
+        foreach (var repeat in this)
+        {
+            repeat.SetValue (code, newValue);
+        }
+
+        return this;
+    }
+
+    /// <summary>
+    /// Замена значения подполя.
+    /// </summary>
+    public RepeatingGroup ReplaceValue
+        (
+            char code,
+            string? oldValue,
+            string? newValue
+        )
+    {
+        foreach (var repeat in this)
+        {
+            repeat.ReplaceValue (code, oldValue, newValue);
+        }
+
+        return this;
+    }
+
+    /// <summary>
+    /// Команда вывода значения поля до первого разделителя
+    /// или подполя с заданным кодом (с учетом повторяющихся групп).
+    /// </summary>
+    public static bool V
+        (
+            TextWriter output,
+            Record? record,
+            int tag,
+            char? code = null,
+            string? prefix = null,
+            string? before = null,
+            string? after = null,
+            string? suffix = null,
+            bool skipFirst = false,
+            bool skipLast = false
+        )
+    {
+        Sure.NotNull (output);
+
+        if (record is null)
+        {
+            return false;
+        }
+
+        var result = false;
+        var flag = false;
+        var count = record.Count (tag);
+        var index = 0;
+
+        foreach (var field in record.EnumerateField (tag))
+        {
+            var value = code is null
+                ? field.Value
+                : field.GetFirstSubFieldValue (code.Value);
+            if (!string.IsNullOrEmpty (value))
+            {
+                if (!flag)
+                {
+                    if (!string.IsNullOrEmpty (prefix))
+                    {
+                        output.Write (prefix);
+                    }
+
+                    flag = true;
+                }
+
+                if (!string.IsNullOrEmpty(before))
+                {
+                    if (index == 0)
+                    {
+                        if (!skipFirst)
+                        {
+                            output.Write (before);
+                        }
+                    }
+                    else
+                    {
+                        output.Write (before);
+                    }
+                }
+
+                output.Write (value);
+                result = true;
+
+                if (!string.IsNullOrEmpty (after))
+                {
+                    if (index == count - 1)
+                    {
+                        if (!skipLast)
+                        {
+                            output.Write (after);
+                        }
+                    }
+                    else
+                    {
+                        output.Write (after);
+                    }
+                }
+            }
+
+            ++index;
+        }
+
+        if (flag)
+        {
+            if (!string.IsNullOrEmpty (suffix))
+            {
+                output.Write (suffix);
+            }
+        }
+
+        return result;
+    }
+
+    #endregion
+
+    #region Repeat
+
+    /// <summary>
+    /// Одно повторение группы.
+    /// </summary>
+    public readonly struct Repeat
     {
         #region Properties
 
         /// <summary>
-        /// Библиографическая запись.
+        /// Ссылка на группу.
         /// </summary>
-        public Record Record { get; set; }
+        public RepeatingGroup Group { get; }
 
         /// <summary>
-        /// Метки повторяющихся полей.
+        /// Индекс повторения (нумерация с нуля).
         /// </summary>
-        public int[] Tags { get; set; }
+        public int Index { get; }
 
         /// <summary>
-        /// Количество повторений.
+        /// Признак последнего повторения.
         /// </summary>
-        public int Count { get; }
+        public bool IsLast => Index == Group.Count - 1;
 
         #endregion
 
@@ -58,37 +293,19 @@ namespace ManagedIrbis
         /// <summary>
         /// Конструктор.
         /// </summary>
-        public RepeatingGroup
+        public Repeat
             (
-                Record record,
-                int tag
+                RepeatingGroup group,
+                int index
             )
-            : this(record, new[] { tag }) { }
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public RepeatingGroup
-            (
-                Record record,
-                int[] tags
-            )
+            : this()
         {
-            Record = record;
-            Tags = tags;
+            Sure.NotNull (group);
+            Sure.NonNegative (index);
 
-            Count = 0;
-            foreach (var tag in tags)
-            {
-                var count = record.Count (tag);
-                if (count >= Count)
-                {
-                    Count = count;
-                }
-
-            } // foreach
-
-        } // constructor
+            Group = group;
+            Index = index;
+        }
 
         #endregion
 
@@ -99,347 +316,144 @@ namespace ManagedIrbis
         /// </summary>
         public IEnumerable<Field> EnumerateFields()
         {
-            foreach (var tag in Tags)
+            foreach (var tag in Group.Tags)
             {
-                foreach (var field in Record.EnumerateField (tag))
+                var field = Group.Record.GetField (tag, Index);
+                if (field is not null)
                 {
                     yield return field;
                 }
             }
-        } // method EnumerateFields
-
-        /// <inheritdoc cref="IEnumerable{T}.GetEnumerator"/>
-        public Enumerator GetEnumerator() => new (this);
+        }
 
         /// <summary>
-        /// Выполненение указанных действий для каждого повторения в группе.
+        /// Значение до разделителя первого поля, среди заданных при создании группы.
         /// </summary>
-        public RepeatingGroup ForEach
-            (
-                Action<Repeat> action
-            )
+        public string? FM()
         {
-            foreach (var repeat in this)
-            {
-                action (repeat);
-            }
-
-            return this;
-
-        } // method ForEach
+            return Group.Record.GetField (Group.Tags[0], Index)
+                ?.Value;
+        }
 
         /// <summary>
-        /// Установка значения подполя.
+        /// Значение до разделителя текущего повторения поля с указанной меткой.
         /// </summary>
-        public RepeatingGroup SetValue
+        public string? FM
             (
-                char code,
-                string? newValue
+                int tag
             )
         {
-            foreach (var repeat in this)
-            {
-                repeat.SetValue (code, newValue);
-            }
+            return Group.Record.GetField (tag, Index)?.Value;
+        }
 
-            return this;
+        /// <summary>
+        /// Значение подполя текущего повторения поля с указанными меткой и кодом.
+        /// </summary>
+        public string? FM
+            (
+                int tag,
+                char code
+            )
+        {
+            return Group.Record.GetField (tag, Index)
+                ?.GetFirstSubFieldValue (code);
+        }
 
-        } // method SetValue
+        /// <summary>
+        /// Значение подполя с указанным кодом текущего повторения первого поля,
+        /// заданного при создании группы.
+        /// </summary>
+        public string? FM
+            (
+                char code
+            )
+        {
+            return Group.Record.GetField (Group.Tags[0], Index)
+                ?.GetFirstSubFieldValue (code);
+        }
 
         /// <summary>
         /// Замена значения подполя.
         /// </summary>
-        public RepeatingGroup ReplaceValue
+        public Repeat ReplaceValue
             (
                 char code,
                 string? oldValue,
                 string? newValue
             )
         {
-            foreach (var repeat in this)
+            foreach (var field in EnumerateFields())
             {
-                repeat.ReplaceValue (code, oldValue, newValue);
-            }
-
-            return this;
-
-        } // method ReplaceValue
-
-        /// <summary>
-        /// Команда вывода значения поля до первого разделителя
-        /// или подполя с заданным кодом (с учетом повторяющихся групп).
-        /// </summary>
-        public static bool V
-            (
-                TextWriter output,
-                Record? record,
-                int tag,
-                char? code = null,
-                string? prefix = null,
-                string? before = null,
-                string? after = null,
-                string? suffix = null,
-                bool skipFirst = false,
-                bool skipLast = false
-            )
-        {
-            if (record is null)
-            {
-                return false;
-            }
-
-            var result = false;
-            var flag = false;
-            var count = record.Count (tag);
-            var index = 0;
-
-            foreach (var field in record.EnumerateField (tag))
-            {
-                var value = code is null
-                    ? field.Value
-                    : field.GetFirstSubFieldValue (code.Value);
-                if (!string.IsNullOrEmpty (value))
-                {
-                    if (!flag)
-                    {
-                        if (!string.IsNullOrEmpty (prefix))
-                        {
-                            output.Write (prefix);
-                        }
-
-                        flag = true;
-                    }
-
-                    if (!string.IsNullOrEmpty(before))
-                    {
-                        if (index == 0)
-                        {
-                            if (!skipFirst)
-                            {
-                                output.Write (before);
-                            }
-                        }
-                        else
-                        {
-                            output.Write (before);
-                        }
-                    }
-
-                    output.Write (value);
-                    result = true;
-
-                    if (!string.IsNullOrEmpty (after))
-                    {
-                        if (index == count - 1)
-                        {
-                            if (!skipLast)
-                            {
-                                output.Write (after);
-                            }
-                        }
-                        else
-                        {
-                            output.Write (after);
-                        }
-                    }
-                }
-
-                ++index;
-
-            } // foreach
-
-            if (flag)
-            {
-                if (!string.IsNullOrEmpty (suffix))
-                {
-                    output.Write (suffix);
-                }
-            }
-
-            return result;
-
-        } // method V
-
-        #endregion
-
-        #region Repeat
-
-        /// <summary>
-        /// Одно повторение группы.
-        /// </summary>
-        public readonly struct Repeat
-        {
-            #region Properties
-
-            /// <summary>
-            /// Ссылка на группу.
-            /// </summary>
-            public RepeatingGroup Group { get; }
-
-            /// <summary>
-            /// Индекс повторения (нумерация с нуля).
-            /// </summary>
-            public int Index { get; }
-
-            /// <summary>
-            /// Признак последнего повторения.
-            /// </summary>
-            public bool IsLast => Index == Group.Count - 1;
-
-            #endregion
-
-            #region Construction
-
-            /// <summary>
-            /// Конструктор.
-            /// </summary>
-            public Repeat
-                (
-                    RepeatingGroup group,
-                    int index
-                )
-                : this()
-            {
-                Group = group;
-                Index = index;
-
-            } // constructor
-
-            #endregion
-
-            #region Public methods
-
-            /// <summary>
-            /// Перечисление полей, входящих в повторяющуюся группу.
-            /// </summary>
-            public IEnumerable<Field> EnumerateFields()
-            {
-                foreach (var tag in Group.Tags)
-                {
-                    var field = Group.Record.GetField (tag, Index);
-                    if (field is not null)
-                    {
-                        yield return field;
-                    }
-
-                } // foreach
-
-            } // method EnumerateFields
-
-            /// <summary>
-            /// Значение до разделителя первого поля, среди заданных при создании группы.
-            /// </summary>
-            public string? FM() => Group.Record.GetField (Group.Tags[0], Index)?.Value;
-
-            /// <summary>
-            /// Значение до разделителя текущего повторения поля с указанной меткой.
-            /// </summary>
-            public string? FM (int tag) => Group.Record.GetField (tag, Index)?.Value;
-
-            /// <summary>
-            /// Значение подполя текущего повторения поля с указанными меткой и кодом.
-            /// </summary>
-            public string? FM (int tag, char code) =>
-                Group.Record.GetField (tag, Index)?.GetFirstSubFieldValue (code);
-
-            /// <summary>
-            /// Значение подполя с указанным кодом текущего повторения первого поля,
-            /// заданного при создании группы.
-            /// </summary>
-            public string? FM (char code) =>
-                Group.Record.GetField (Group.Tags[0], Index)?.GetFirstSubFieldValue (code);
-
-            /// <summary>
-            /// Замена значения подполя.
-            /// </summary>
-            public Repeat ReplaceValue
-                (
-                    char code,
-                    string? oldValue,
-                    string? newValue
-                )
-            {
-                foreach (var field in EnumerateFields())
-                {
-                    if (field.GetSubFieldValue (code).SameString (oldValue))
-                    {
-                        field.SetSubFieldValue (code, newValue);
-                    }
-
-                } // foreach
-
-                return this;
-
-            } // method ReplaceValue
-
-            /// <summary>
-            /// Установка значения подполя.
-            /// </summary>
-            public Repeat SetValue
-                (
-                    char code,
-                    string? newValue
-                )
-            {
-                foreach (var field in EnumerateFields())
+                if (field.GetSubFieldValue (code).SameString (oldValue))
                 {
                     field.SetSubFieldValue (code, newValue);
                 }
+            }
 
-                return this;
+            return this;
+        }
 
-            } // method SetValue
-
-            #endregion
-
-        } // struct Repeat
-
-        #endregion
-
-        #region Enumerator
-
-        /// <inheritdoc cref="IEnumerator{T}"/>
-        public struct Enumerator
+        /// <summary>
+        /// Установка значения подполя.
+        /// </summary>
+        public Repeat SetValue
+            (
+                char code,
+                string? newValue
+            )
         {
-            #region Construction
-
-            /// <summary>
-            /// Конструктор.
-            /// </summary>
-            public Enumerator
-                (
-                    RepeatingGroup group
-                )
-                : this()
+            foreach (var field in EnumerateFields())
             {
-                _group = group;
-                _index = -1;
+                field.SetSubFieldValue (code, newValue);
+            }
 
-            } // constructor
+            return this;
+        }
 
-            #endregion
+        #endregion
+    }
 
-            #region Private members
+    #endregion
 
-            private readonly RepeatingGroup _group;
-            private int _index;
+    #region Enumerator
 
-            #endregion
+    /// <inheritdoc cref="IEnumerator{T}"/>
+    public struct Enumerator
+    {
+        #region Construction
 
-            #region IEnumeator members
-
-            /// <inheritdoc cref="IEnumerator.MoveNext"/>
-            public bool MoveNext() => ++_index < _group.Count;
-
-            /// <inheritdoc cref="IEnumerator{T}.Current"/>
-            public Repeat Current => new (_group, _index);
-
-            #endregion
-
-        } // struct Enumerator
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        public Enumerator
+            (
+                RepeatingGroup group
+            )
+            : this()
+        {
+            _group = group;
+            _index = -1;
+        }
 
         #endregion
 
-    } // class RepeatingGroup
+        #region Private members
 
-} // namespace ManagedIrbis
+        private readonly RepeatingGroup _group;
+        private int _index;
+
+        #endregion
+
+        #region IEnumeator members
+
+        /// <inheritdoc cref="IEnumerator.MoveNext"/>
+        public bool MoveNext() => ++_index < _group.Count;
+
+        /// <inheritdoc cref="IEnumerator{T}.Current"/>
+        public Repeat Current => new (_group, _index);
+
+        #endregion
+    }
+
+    #endregion
+}

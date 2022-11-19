@@ -92,17 +92,17 @@ namespace ManagedIrbis;
 //          | расположение внешних объектов (поле 951)
 
 /// <summary>
-/// PAR files handling.
+/// Работа с PAR-файлами.
 /// </summary>
 [XmlRoot ("par")]
 public sealed class ParFile
     : IHandmadeSerializable,
-        IVerifiable
+    IVerifiable
 {
     #region Constants
 
     /// <summary>
-    /// Standard extension for PAR files.
+    /// Стандартное расширение для PAR-файлов.
     /// </summary>
     public const string Extension = ".par";
 
@@ -111,79 +111,79 @@ public sealed class ParFile
     #region Properties
 
     /// <summary>
-    /// Путь к файлу XRF
+    /// Путь к файлу XRF.
     /// </summary>
     [XmlAttribute ("xrf")]
     [JsonPropertyName ("xrf")]
     public string? XrfPath { get; set; }
 
     /// <summary>
-    /// Путь к файлу MST
+    /// Путь к файлу MST.
     /// </summary>
     [XmlAttribute ("mst")]
     [JsonPropertyName ("mst")]
     public string? MstPath { get; set; }
 
     /// <summary>
-    /// Путь к файлу CNT
+    /// Путь к файлу CNT.
     /// </summary>
     [XmlAttribute ("cnt")]
     [JsonPropertyName ("cnt")]
     public string? CntPath { get; set; }
 
     /// <summary>
-    /// Путь к файлу N01
+    /// Путь к файлу N01.
     /// </summary>
     [XmlAttribute ("n01")]
     [JsonPropertyName ("n01")]
     public string? N01Path { get; set; }
 
     /// <summary>
-    /// Путь к файлу N02
+    /// Путь к файлу N02.
     /// </summary>
     [XmlAttribute ("n02")]
     [JsonPropertyName ("n02")]
     public string? N02Path { get; set; }
 
     /// <summary>
-    /// Путь к файлу L01
+    /// Путь к файлу L01.
     /// </summary>
     [XmlAttribute ("l01")]
     [JsonPropertyName ("l01")]
     public string? L01Path { get; set; }
 
     /// <summary>
-    /// Путь к файлу L02
+    /// Путь к файлу L02.
     /// </summary>
     [XmlAttribute ("l02")]
     [JsonPropertyName ("l02")]
     public string? L02Path { get; set; }
 
     /// <summary>
-    /// Путь к файлу IFP
+    /// Путь к файлу IFP.
     /// </summary>
     [XmlAttribute ("ifp")]
     [JsonPropertyName ("ifp")]
     public string? IfpPath { get; set; }
 
     /// <summary>
-    /// Путь к файлу ANY
+    /// Путь к файлу ANY.
     /// </summary>
     [XmlAttribute ("any")]
     [JsonPropertyName ("any")]
     public string? AnyPath { get; set; }
 
     /// <summary>
-    /// Путь к файлам PFT
+    /// Путь к файлам PFT.
     /// </summary>
     [XmlAttribute ("pft")]
     [JsonPropertyName ("pft")]
     public string? PftPath { get; set; }
 
     /// <summary>
-    /// Расположение внешних объектов (поле 951)
+    /// Расположение внешних объектов (поле 951).
     /// </summary>
-    /// <remarks>Параметр появился в версии 2012</remarks>
+    /// <remarks>Параметр появился в версии 2012.</remarks>
     [XmlAttribute ("ext")]
     [JsonPropertyName ("ext")]
     public string? ExtPath { get; set; }
@@ -201,7 +201,7 @@ public sealed class ParFile
     }
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор, задающий общее значение для всех элементов.
     /// </summary>
     public ParFile
         (
@@ -294,7 +294,7 @@ public sealed class ParFile
     }
 
     /// <summary>
-    /// Разбор файла.
+    /// Разбор локального PAR-файла.
     /// </summary>
     public static ParFile ParseFile
         (
@@ -312,7 +312,7 @@ public sealed class ParFile
     }
 
     /// <summary>
-    /// Разбор текста.
+    /// Разбор текстового представления PAR-файла.
     /// </summary>
     public static ParFile ParseText
         (
@@ -367,7 +367,7 @@ public sealed class ParFile
     }
 
     /// <summary>
-    /// Запись в файл.
+    /// Сохранение в локальный PAR-файл.
     /// </summary>
     public void WriteFile
         (
