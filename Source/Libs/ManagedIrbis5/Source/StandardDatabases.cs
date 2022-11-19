@@ -13,35 +13,34 @@
 
 #nullable enable
 
-namespace ManagedIrbis
+namespace ManagedIrbis;
+
+/// <summary>
+/// Стандартные базы данных, включенные в поставку ИРБИС64.
+/// </summary>
+public static class StandardDatabases
 {
+    #region Constants
+
     /// <summary>
-    /// Стандартные базы данных, включенные в поставку ИРБИС64.
+    /// Электронный каталог.
     /// </summary>
-    public static class StandardDatabases
-    {
-        #region Constants
+    public const string ElectronicCatalog = "IBIS";
 
-        /// <summary>
-        /// Digital catalogue.
-        /// </summary>
-        public const string ElectronicCatalog = "IBIS";
+    /// <summary>
+    /// Комплектование.
+    /// </summary>
+    public const string Acquisition = "CMPL";
 
-        /// <summary>
-        /// Picking.
-        /// </summary>
-        public const string Acquisition = "CMPL";
+    /// <summary>
+    /// Читатели.
+    /// </summary>
+    public const string Readers = "RDR";
 
-        /// <summary>
-        /// Readers.
-        /// </summary>
-        public const string Readers = "RDR";
+    /// <summary>
+    /// Читальские заказы.
+    /// </summary>
+    public const string Requests = "RQST";
 
-        /// <summary>
-        /// Orders for books.
-        /// </summary>
-        public const string Requests = "RQST";
-
-        #endregion
-    }
+    #endregion
 }
