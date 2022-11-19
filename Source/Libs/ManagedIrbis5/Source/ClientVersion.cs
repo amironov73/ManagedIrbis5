@@ -4,17 +4,14 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
-/* ClientVersion.cs -- версия клиента
+/* ClientVersion.cs -- версия клиента (сборки, содержащей данный класс)
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
-using System.Reflection;
 
 #endregion
 
@@ -33,10 +30,11 @@ public static class ClientVersion
     /// Собственно версия клиента.
     /// </summary>
     public static readonly Version Version
-        = Assembly.GetExecutingAssembly()
+        = typeof (ClientVersion)
+            .Assembly
             .GetName()
             .Version
-            ?? throw new ApplicationException ("ClientVersion not defined");
+            ?? new Version();
 
     #endregion
 }

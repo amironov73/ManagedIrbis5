@@ -44,9 +44,9 @@ public sealed class DatabaseInfo
     #region Constants
 
     /// <summary>
-    /// Разделитель элементов
+    /// Разделитель элементов.
     /// </summary>
-    public const char ItemDelimiter = (char)0x1E;
+    public const char ItemDelimiter = (char) 0x1E;
 
     #endregion
 
@@ -60,21 +60,22 @@ public sealed class DatabaseInfo
     public string? Name { get; set; }
 
     /// <summary>
-    /// Описание базы данных в произвольной форме.
+    /// Описание базы данных в произвольной форме
+    /// (возможно, пустая строка).
     /// </summary>
     [XmlAttribute ("description")]
     [JsonPropertyName ("description")]
     public string? Description { get; set; }
 
     /// <summary>
-    /// Максимальный MFN.
+    /// Максимальный MFN в базе.
     /// </summary>
     [XmlAttribute ("maxMfn")]
     [JsonPropertyName ("maxMfn")]
     public int MaxMfn { get; set; }
 
     /// <summary>
-    /// Список логически удаленных записей.
+    /// Список логически удаленных записей (возможно, пустой).
     /// </summary>
     [XmlArrayItem ("mfn")]
     [XmlArray ("logicallyDeleted")]
@@ -82,7 +83,7 @@ public sealed class DatabaseInfo
     public int[]? LogicallyDeletedRecords { get; set; }
 
     /// <summary>
-    /// Список физически удаленных записей.
+    /// Список физически удаленных записей (возможно, пустой).
     /// </summary>
     [XmlArrayItem ("mfn")]
     [XmlArray ("physicallyDeleted")]
@@ -90,7 +91,7 @@ public sealed class DatabaseInfo
     public int[]? PhysicallyDeletedRecords { get; set; }
 
     /// <summary>
-    /// Список неактуализированных записей.
+    /// Список неактуализированных записей (возможно, пустой).
     /// </summary>
     [XmlArrayItem ("mfn")]
     [XmlArray ("nonActualizedRecords")]
@@ -98,7 +99,7 @@ public sealed class DatabaseInfo
     public int[]? NonActualizedRecords { get; set; }
 
     /// <summary>
-    /// Список заблокированных записей.
+    /// Список заблокированных записей (возможно, пустой).
     /// </summary>
     [XmlArrayItem ("mfn")]
     [XmlArray ("lockedRecords")]
@@ -113,7 +114,7 @@ public sealed class DatabaseInfo
     public bool DatabaseLocked { get; set; }
 
     /// <summary>
-    /// База данных только для чтения.
+    /// База данных доступна только для чтения.
     /// </summary>
     [XmlAttribute ("readOnly")]
     [JsonPropertyName ("readOnly")]
@@ -228,7 +229,7 @@ public sealed class DatabaseInfo
     }
 
     /// <summary>
-    /// Вывод сведений о базе данных.
+    /// Вывод сведений о базе данных в текстовый поток.
     /// </summary>
     public void Write
         (
@@ -294,9 +295,7 @@ public sealed class DatabaseInfo
     /// <inheritdoc cref="object.ToString" />
     public override string ToString()
     {
-        return string.IsNullOrEmpty (Description)
-            ? Name.ToVisibleString()
-            : $"{Name} - {Description}";
+        return Utility.JoinNonEmpty (" - ", Name, Description);
     }
 
     #endregion

@@ -10,12 +10,6 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-#region Using directives
-
-using System.Diagnostics;
-
-#endregion
-
 #nullable enable
 
 namespace ManagedIrbis;
@@ -24,62 +18,57 @@ namespace ManagedIrbis;
 /// Информация о клиенте, подключенном к серверу ИРБИС
 /// (не обязательно о текущем).
 /// </summary>
-[DebuggerDisplay ("{IPAddress} {Name} {Workstation}")]
 public sealed class ClientInfo
 {
     #region Properties
 
     /// <summary>
-    /// Номер
+    /// Порядковый номер.
     /// </summary>
     public string? Number { get; set; }
 
     /// <summary>
-    /// Адрес клиента
+    /// Адрес клиента.
     /// </summary>
-
-    // ReSharper disable once InconsistentNaming
     public string? IPAddress { get; set; }
 
     /// <summary>
-    /// Порт клиента
+    /// Порт клиента.
     /// </summary>
     public string? Port { get; set; }
 
     /// <summary>
-    /// Логин
+    /// Логин пользователя.
     /// </summary>
     public string? Name { get; set; }
 
     /// <summary>
-    /// Идентификатор клиентской программы
+    /// Идентификатор клиента.
     /// </summary>
-
-    // ReSharper disable once InconsistentNaming
     public string? ID { get; set; }
 
     /// <summary>
-    /// Клиентский АРМ
+    /// Вид клиентского АРМ.
     /// </summary>
     public string? Workstation { get; set; }
 
     /// <summary>
-    /// Время подключения к серверу
+    /// Время подключения данного клиента к серверу.
     /// </summary>
     public string? Registered { get; set; }
 
     /// <summary>
-    /// Последнее подтверждение
+    /// Время последнего подтверждения от данного клиента.
     /// </summary>
     public string? Acknowledged { get; set; }
 
     /// <summary>
-    /// Последняя команда
+    /// Последняя команда, принятая сервером от данного клиента.
     /// </summary>
     public string? LastCommand { get; set; }
 
     /// <summary>
-    /// Номер последней команды
+    /// Номер последней команды, отданной данным клиентом.
     /// </summary>
     public string? CommandNumber { get; set; }
 
