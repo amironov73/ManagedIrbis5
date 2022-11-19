@@ -2,12 +2,9 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* AlphabetTable.cs -- обертка над таблицей алфавитных символов ISISAC.TAB
  * Ars Magna project, http://arsmagna.ru
@@ -83,7 +80,7 @@ public class AlphabetTable
     #region Constructor
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор по умолчанию.
     /// </summary>
     public AlphabetTable()
     {
@@ -115,7 +112,7 @@ public class AlphabetTable
     }
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор с нестандартной таблицей.
     /// </summary>
     public AlphabetTable
         (
@@ -134,7 +131,7 @@ public class AlphabetTable
     }
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор, позволяющий загрузить таблицу с ИРБИС64.
     /// </summary>
     public AlphabetTable
         (
@@ -142,7 +139,9 @@ public class AlphabetTable
             string fileName = DefaultFileName
         )
     {
-        Sure.NotNullNorEmpty (fileName, nameof (fileName));
+        Sure.NotNull (client);
+        Sure.NotNullNorEmpty (fileName);
+        client.EnsureConnected();
 
         var specification = new FileSpecification
         {
@@ -173,8 +172,6 @@ public class AlphabetTable
     private Encoding _encoding;
 
     private byte[] _table;
-
-    //private char[] _characters;
 
     private void _BuildCharacters()
     {
@@ -238,14 +235,15 @@ public class AlphabetTable
     #region Public methods
 
     /// <summary>
-    /// Get global instance of the
-    /// <see cref="AlphabetTable"/>.
+    /// Получение глобального экземпляра таблицы <see cref="AlphabetTable"/>.
     /// </summary>
     public static AlphabetTable GetInstance
         (
             IAsyncProvider connection
         )
     {
+        Sure.NotNull (connection);
+
         lock (_lock)
         {
             if (ReferenceEquals (_instance, null))
@@ -261,8 +259,7 @@ public class AlphabetTable
     }
 
     /// <summary>
-    /// Determines whether the specified character is alpha
-    /// according to table.
+    /// Определение, является ли указанный символ принадлежащим слову.
     /// </summary>
     public bool IsAlpha
         (
@@ -273,31 +270,34 @@ public class AlphabetTable
     }
 
     /// <summary>
-    /// Парсим локальный файл.
+    /// Разбор локального файла.
     /// </summary>
     public static AlphabetTable ParseLocalFile
         (
             string fileName
         )
     {
-        Sure.NotNullNorEmpty (fileName, nameof (fileName));
+        Sure.NotNullNorEmpty (fileName);
 
         using var reader = TextReaderUtility.OpenRead
             (
                 fileName,
                 IrbisEncoding.Ansi
             );
+
         return ParseText (reader);
     }
 
     /// <summary>
-    /// Парсим таблицу из текстового представления.
+    /// Разбор таблицы из текстового представления.
     /// </summary>
     public static AlphabetTable ParseText
         (
             TextReader reader
         )
     {
+        Sure.NotNull (reader);
+
         var table = _ParseText (reader);
         var result = new AlphabetTable
             (
@@ -309,8 +309,7 @@ public class AlphabetTable
     }
 
     /// <summary>
-    /// Free global instance of
-    /// <see cref="AlphabetTable"/>.
+    /// Освобождение глобального экземпляра таблицы <see cref="AlphabetTable"/>.
     /// </summary>
     public static void ResetInstance()
     {
@@ -321,7 +320,7 @@ public class AlphabetTable
     }
 
     /// <summary>
-    /// Разбиваем текст на слова.
+    /// Разбивка текст на слова.
     /// </summary>
     public string[] SplitWords
         (
@@ -361,13 +360,15 @@ public class AlphabetTable
     }
 
     /// <summary>
-    /// Формируем исходный код с определением таблицы.
+    /// Формирование исходный код на C# с определением таблицы.
     /// </summary>
     public void ToSourceCode
         (
             TextWriter writer
         )
     {
+        Sure.NotNull (writer);
+
         var count = 0;
 
         writer.WriteLine ("new char[] {");
@@ -395,21 +396,23 @@ public class AlphabetTable
     }
 
     /// <summary>
-    /// Trim the text.
+    /// Обрезка текста (удаление начальных и конечных пробелов)
+    /// согласно текущей таблице.
     /// </summary>
     public string TrimText
         (
             string text
         )
     {
-        if (text.Length == 0
+        if (string.IsNullOrEmpty (text)
             || IsAlpha (text[0]) && IsAlpha (text[^1])
            )
         {
             return text;
         }
 
-        var builder = new StringBuilder (text);
+        var builder = StringBuilderPool.Shared.Get();
+        builder.Append (text);
 
         // Trim beginning of the text
         while (builder.Length != 0 && !IsAlpha (builder[0]))
@@ -423,11 +426,11 @@ public class AlphabetTable
             builder.Remove (builder.Length - 1, 1);
         }
 
-        return builder.ToString();
+        return builder.ReturnShared();
     }
 
     /// <summary>
-    /// Записываемся в файл.
+    /// Сохранение таблицы в файл в формате ИРБИС.
     /// </summary>
     public void WriteLocalFile
         (
@@ -445,7 +448,7 @@ public class AlphabetTable
     }
 
     /// <summary>
-    /// Записываемся в поток.
+    /// Сохранение таблицы в поток в формате ИРБИС.
     /// </summary>
     public void WriteTable
         (
