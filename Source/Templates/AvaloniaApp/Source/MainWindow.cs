@@ -16,14 +16,18 @@
 #region Using directives
 
 using System;
+using System.Reactive.Linq;
 
 using AM;
+using AM.Avalonia;
 
 using Avalonia.Controls;
+using Avalonia.Data;
+using Avalonia.Layout;
+using Avalonia.ReactiveUI;
 
-using AM.Avalonia.Source;
-
-using Microsoft.Extensions.Logging;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
 #endregion
 
@@ -35,41 +39,103 @@ namespace AvaloniaApp;
 /// Главное окно приложения
 /// </summary>
 public sealed class MainWindow
-    : Window
+    : ReactiveWindow<MainWindow.Model>
 {
-    #region Construction
+    #region View model
 
     /// <summary>
-    /// Конструктор
+    /// Модель данных.
     /// </summary>
-    public MainWindow()
+    public sealed class Model
+        : ReactiveObject
     {
-        Title = "Тестовое приложение Avalonia";
-        Width = 400;
-        Height = 250;
+        #region Properties
 
-        Content = new StackPanel()
-            .StretchHorizontally()
-            .CenterVertically()
-            .Also (panel => panel.Spacing = 5)
-            .WithChildren
-                (
-                    new Label { Content = "Метка № 1" }
-                        .CenterControl(),
+        /// <summary>
+        /// Первое слагаемое.
+        /// </summary>
+        [Reactive]
+        public double FirstTerm { get; set; }
 
-                    new Button { Content = "Кнопка № 1" }
-                        .CenterControl()
-                        .OnClick ((_, _) =>
-                        {
-                            Magna.Application.Logger.LogInformation ("Кнопка нажата {Moment}", DateTime.Now);
-                            Magna.Logger.LogInformation ("Нажата кнопка {Moment}", DateTime.Now);
+        /// <summary>
+        /// Второе слагаемое.
+        /// </summary>
+        [Reactive]
+        public double SecondTerm { get; set; }
 
-                        }),
+        /// <summary>
+        /// Сумма.
+        /// </summary>
+        [ObservableAsProperty]
+        public double Sum => 0;
 
-                    new Button { Content = "Кнопка № 2" }
-                        .CenterControl()
-                        .OnClick ((_, _) => throw new Exception())
-                );
+        #endregion
+
+        #region Construction
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        public Model()
+        {
+            this.WhenAnyValue
+                    (
+                        first => first.FirstTerm,
+                        second => second.SecondTerm
+                    )
+                .Select
+                    (
+                        data => data.Item1 + data.Item2
+                    )
+                .ToPropertyEx (this, vm => vm.Sum);
+        }
+
+        #endregion
+    }
+
+    #endregion
+
+    #region Window members
+
+    /// <summary>
+    /// Вызывается, когда окно проинициализировано фреймворком.
+    /// </summary>
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        Title = "Калькулятор Avalonia";
+        Width = MinWidth = 400;
+        Height = MinHeight = 250;
+
+        DataContext = new Model
+        {
+            FirstTerm = 123.45,
+            SecondTerm = 567.89
+        };
+
+        Content = new StackPanel
+        {
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
+            Spacing = 5,
+            Children =
+            {
+                CreateTextBox (nameof (Model.FirstTerm)),
+                CreateTextBox (nameof (Model.SecondTerm)),
+                CreateTextBox (nameof (Model.Sum), isReadOnly: true)
+            }
+        };
+
+        TextBox CreateTextBox (string propertyName, bool isReadOnly = false) =>
+            new()
+            {
+                Name = propertyName,
+                Width = 200,
+                IsReadOnly = isReadOnly,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                [!TextBox.TextProperty] = new Binding (propertyName)
+            };
     }
 
     #endregion
