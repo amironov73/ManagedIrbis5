@@ -32,16 +32,16 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="11.0.0-preview3"/>
-        <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.0.0-preview3"/>
-        <PackageReference Include="Avalonia.Desktop" Version="11.0.0-preview3"/>
-        <PackageReference Include="Avalonia.Diagnostics" Version="11.0.0-preview3"/>
-        <PackageReference Include="Avalonia.ReactiveUI" Version="11.0.0-preview3"/>
-        <PackageReference Include="Avalonia.ThemeManager" Version="11.0.0-preview2" />
-        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.0-preview3"/>
-        <PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.0.0-preview3"/>
-        <PackageReference Include="Avalonia.Xaml.Interactions" Version="11.0.0-preview3"/>
-        <PackageReference Include="Avalonia.Xaml.Interactivity" Version="11.0.0-preview3"/>
+        <PackageReference Include="Avalonia" Version="11.0.0-preview4"/>
+        <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.0.0-preview4"/>
+        <PackageReference Include="Avalonia.Desktop" Version="11.0.0-preview4"/>
+        <PackageReference Include="Avalonia.Diagnostics" Version="11.0.0-preview4"/>
+        <PackageReference Include="Avalonia.ReactiveUI" Version="11.0.0-preview4"/>
+        <PackageReference Include="Avalonia.ThemeManager" Version="11.0.0-preview3" />
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.0-preview4"/>
+        <PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.0.0-preview4"/>
+        <PackageReference Include="Avalonia.Xaml.Interactions" Version="11.0.0-preview4"/>
+        <PackageReference Include="Avalonia.Xaml.Interactivity" Version="11.0.0-preview4"/>
         <PackageReference Include="DynamicData" Version="7.12.1"/>
         <PackageReference Include="DynamicData.ReactiveUI" Version="6.11.0.2613"/>
         <PackageReference Include="GridExtra.Avalonia" Version="0.9.1"/>
@@ -58,11 +58,10 @@
         <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="7.0.0"/>
         <PackageReference Include="Microsoft.Extensions.Options" Version="7.0.0"/>
         <PackageReference Include="NLog" Version="5.0.5"/>
-        <PackageReference Include="NLog.Extensions.Logging" Version="5.0.5"/>
+        <PackageReference Include="NLog.Extensions.Logging" Version="5.1.0"/>
         <PackageReference Include="ReactiveHistory" Version="0.10.7"/>
         <PackageReference Include="ReactiveUI" Version="18.3.1"/>
         <PackageReference Include="ReactiveUI.Fody" Version="18.3.1"/>
-        <PackageReference Include="XamlColorSchemeGenerator" Version="3.0.0.31"/>
         <PackageReference Include="XamlNameReferenceGenerator" Version="1.4.2"/>
     </ItemGroup>
 

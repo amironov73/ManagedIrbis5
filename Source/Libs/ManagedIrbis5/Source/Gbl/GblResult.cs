@@ -2,14 +2,8 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable UnusedParameter.Local
 
 /* GblResult.cs -- результат исполнения глобальной корректировки
  * Ars Magna project, http://arsmagna.ru
@@ -29,135 +23,132 @@ using ManagedIrbis.Processing;
 
 #nullable enable
 
-namespace ManagedIrbis.Gbl
+namespace ManagedIrbis.Gbl;
+
+/// <summary>
+/// Результат исполнения глобальной корректировки.
+/// </summary>
+public sealed class GblResult
 {
+    #region Properties
+
     /// <summary>
-    /// Результат исполнения глобальной корректировки.
+    /// Момент начала обработки.
     /// </summary>
-    public sealed class GblResult
+    public DateTime TimeStarted { get; set; }
+
+    /// <summary>
+    /// Всего времени затрачено (с момента начала обработки).
+    /// </summary>
+    public TimeSpan TimeElapsed { get; set; }
+
+    /// <summary>
+    /// Отменено пользователем.
+    /// </summary>
+    public bool Canceled { get; set; }
+
+    /// <summary>
+    /// Исключение (если возникло).
+    /// </summary>
+    public Exception? Exception { get; set; }
+
+    /// <summary>
+    /// Предполагалось обработать записей.
+    /// </summary>
+    public int RecordsSupposed { get; set; }
+
+    /// <summary>
+    /// Обработано записей.
+    /// </summary>
+    public int RecordsProcessed { get; set; }
+
+    /// <summary>
+    /// Успешно обработано записей.
+    /// </summary>
+    public int RecordsSucceeded { get; set; }
+
+    /// <summary>
+    /// Ошибок при обработке записей.
+    /// </summary>
+    public int RecordsFailed { get; set; }
+
+    /// <summary>
+    /// Результаты для каждой записи.
+    /// </summary>
+    public ProtocolLine[]? Protocol { get; set; }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Пустой (начальный) результат GBL.
+    /// </summary>
+    public static GblResult GetEmptyResult()
     {
-        #region Properties
-
-        /// <summary>
-        /// Момент начала обработки.
-        /// </summary>
-        public DateTime TimeStarted { get; set; }
-
-        /// <summary>
-        /// Всего времени затрачено (с момента начала обработки).
-        /// </summary>
-        public TimeSpan TimeElapsed { get; set; }
-
-        /// <summary>
-        /// Отменено пользователем.
-        /// </summary>
-        public bool Canceled { get; set; }
-
-        /// <summary>
-        /// Исключение (если возникло).
-        /// </summary>
-        public Exception? Exception { get; set; }
-
-        /// <summary>
-        /// Предполагалось обработать записей.
-        /// </summary>
-        public int RecordsSupposed { get; set; }
-
-        /// <summary>
-        /// Обработано записей.
-        /// </summary>
-        public int RecordsProcessed { get; set; }
-
-        /// <summary>
-        /// Успешно обработано записей.
-        /// </summary>
-        public int RecordsSucceeded { get; set; }
-
-        /// <summary>
-        /// Ошибок при обработке записей.
-        /// </summary>
-        public int RecordsFailed { get; set; }
-
-        /// <summary>
-        /// Результаты для каждой записи.
-        /// </summary>
-        public ProtocolLine[]? Protocol { get; set; }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Get empty result.
-        /// </summary>
-        public static GblResult GetEmptyResult()
+        var result = new GblResult
         {
-            var result = new GblResult
-            {
-                TimeStarted = DateTime.Now,
-                TimeElapsed = new TimeSpan(0)
-            };
+            TimeStarted = DateTime.Now,
+            TimeElapsed = TimeSpan.Zero
+        };
 
-            return result;
+        return result;
+    }
 
-        } // method GetEmptyResult
+    /// <summary>
+    /// Слияние результатов GBL.
+    /// </summary>
+    public void MergeResult
+        (
+            GblResult intermediateResult
+        )
+    {
+        Sure.NotNull (intermediateResult);
 
-        /// <summary>
-        /// Merge result.
-        /// </summary>
-        public void MergeResult
+        if (intermediateResult.Canceled)
+        {
+            Canceled = intermediateResult.Canceled;
+        }
+
+        if (intermediateResult.Exception is not null)
+        {
+            Exception = intermediateResult.Exception;
+        }
+
+        RecordsProcessed += intermediateResult.RecordsProcessed;
+        RecordsFailed += intermediateResult.RecordsFailed;
+        RecordsSucceeded += intermediateResult.RecordsSucceeded;
+        Protocol ??= Array.Empty<ProtocolLine>();
+        var otherLines = intermediateResult.Protocol ?? Array.Empty<ProtocolLine>();
+        Protocol = ArrayUtility.Merge
             (
-                GblResult intermediateResult
-            )
-        {
-            if (intermediateResult.Canceled)
-            {
-                Canceled = intermediateResult.Canceled;
-            }
+                Protocol,
+                otherLines
+            );
+    }
 
-            if (!ReferenceEquals(intermediateResult.Exception, null))
-            {
-                Exception = intermediateResult.Exception;
-            }
+    /// <summary>
+    /// Разбор ответа сервера ИРБИС64.
+    /// </summary>
+    public void Parse
+        (
+            Response response
+        )
+    {
+        Sure.NotNull (response);
 
-            RecordsProcessed += intermediateResult.RecordsProcessed;
-            RecordsFailed += intermediateResult.RecordsFailed;
-            RecordsSucceeded += intermediateResult.RecordsSucceeded;
-            Protocol ??= Array.Empty<ProtocolLine>();
-            var otherLines
-                = intermediateResult.Protocol ?? Array.Empty<ProtocolLine>();
-            Protocol = ArrayUtility.Merge
-                (
-                    Protocol,
-                    otherLines
-                );
+        Protocol = ProtocolLine.Decode (response);
+        RecordsProcessed = Protocol.Length;
+        RecordsSucceeded = Protocol.Count (line => line.Success);
+    }
 
-        } // method MergeResult
+    #endregion
 
-        /// <summary>
-        /// Parse server response.
-        /// </summary>
-        public void Parse
-            (
-                Response response
-            )
-        {
-            Protocol = ProtocolLine.Decode(response);
-            RecordsProcessed = Protocol.Length;
-            RecordsSucceeded = Protocol.Count(line => line.Success);
+    #region Object members
 
-        } // method Parse
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString() =>
+        $"Records processed: {RecordsProcessed}, Canceled: {Canceled}";
 
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString() =>
-            $"Records processed: {RecordsProcessed}, Canceled: {Canceled}";  // method ToString
-
-        #endregion
-
-    } // class GblResult
-
-} // namespace ManagedIrbis.Gbl
+    #endregion
+}
