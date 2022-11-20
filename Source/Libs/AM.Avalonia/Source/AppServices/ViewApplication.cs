@@ -27,6 +27,7 @@ using Avalonia.Controls;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 #endregion
 
@@ -82,6 +83,8 @@ public sealed class ViewApplication
             string[] args
         )
     {
+        Magna.Initialize (args);
+
         return new ViewApplication (args);
     }
 
@@ -98,6 +101,35 @@ public sealed class ViewApplication
         _configurationActions.Add (action);
 
         return this;
+    }
+
+    /// <summary>
+    /// Запуск приложения в простейшей конфигурации
+    /// с указанным View.
+    /// </summary>
+    /// <param name="args">Аргументы командной строки.</param>
+    /// <typeparam name="TView">Класс View.</typeparam>
+    /// <returns>Код возврата.</returns>
+    public static int Run<TView>
+        (
+            string[] args
+        )
+        where TView: UserControl, new()
+    {
+        try
+        {
+            BuildAvaloniaApp (args)
+                .UseMainView<TView>()
+                .Run();
+        }
+        catch (Exception exception)
+        {
+            Magna.Logger.LogCritical (exception, "Can't run the application");
+
+            return 1;
+        }
+
+        return 0;
     }
 
     /// <summary>
