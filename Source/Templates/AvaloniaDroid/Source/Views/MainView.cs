@@ -1,12 +1,9 @@
-// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable CoVariantArrayConversion
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
 // ReSharper disable StringLiteralTypo
 
 /* MainView.cs -- главное View приложения
@@ -34,7 +31,7 @@ using ReactiveUI.Fody.Helpers;
 
 #nullable enable
 
-namespace AvaloniaViewApp;
+namespace AvaloniaDroid;
 
 /// <summary>
 /// Главное окно приложения
@@ -127,8 +124,7 @@ public sealed class MainView
             }
         };
 
-        TextBox CreateTextBox (string propertyName, bool isReadOnly = false) =>
-            new()
+        TextBox CreateTextBox (string propertyName, bool isReadOnly = false) => new()
             {
                 Name = propertyName,
                 Width = 200,
@@ -136,24 +132,6 @@ public sealed class MainView
                 HorizontalAlignment = HorizontalAlignment.Center,
                 [!TextBox.TextProperty] = new Binding (propertyName)
             };
-    }
-
-    #endregion
-
-    #region Program entry point
-
-    /// <summary>
-    /// Точка входа в программу.
-    /// </summary>
-    /// <param name="args">Аргументы командной строки.</param>
-    [STAThread]
-    public static void Main
-        (
-            string[] args
-        )
-    {
-        ViewApplication
-            .Run<MainView> (args);
     }
 
     #endregion

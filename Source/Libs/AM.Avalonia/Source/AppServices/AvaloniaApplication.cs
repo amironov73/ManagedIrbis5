@@ -395,6 +395,32 @@ public class AvaloniaApplication
     }
 
     /// <summary>
+    /// Установка главного View.
+    /// </summary>
+    protected virtual void SetMainView
+        (
+            UserControl mainView
+        )
+    {
+        Sure.NotNull (mainView);
+
+        MainView = mainView;
+    }
+
+    /// <summary>
+    /// Установка главного окна.
+    /// </summary>
+    protected virtual void SetMainWindow
+        (
+            Window mainWindow
+        )
+    {
+        Sure.NotNull (mainWindow);
+
+        MainWindow = mainWindow;
+    }
+
+    /// <summary>
     /// Визуальная инициализация.
     /// </summary>
     protected virtual void VisualInitialization()
