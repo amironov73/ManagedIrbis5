@@ -20,6 +20,7 @@ using System.Reactive.Linq;
 
 using AM;
 using AM.Avalonia;
+using AM.Avalonia.AppServices;
 
 using Avalonia.Controls;
 using Avalonia.Data;
@@ -136,6 +137,24 @@ public sealed class MainWindow
                 HorizontalAlignment = HorizontalAlignment.Center,
                 [!TextBox.TextProperty] = new Binding (propertyName)
             };
+    }
+
+    #endregion
+
+    #region Program entry point
+
+    /// <summary>
+    /// Точка входа в программу.
+    /// </summary>
+    /// <param name="args">Аргументы командной строки</param>
+    [STAThread]
+    public static void Main
+        (
+            string[] args
+        )
+    {
+        DesktopApplication
+            .Run<MainWindow> (args);
     }
 
     #endregion

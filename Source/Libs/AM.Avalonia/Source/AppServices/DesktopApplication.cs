@@ -28,6 +28,7 @@ using Avalonia.ReactiveUI;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 #endregion
 
@@ -84,6 +85,8 @@ public sealed class DesktopApplication
             string[] args
         )
     {
+        Magna.Initialize (args);
+
         return new DesktopApplication (args);
     }
 
@@ -100,6 +103,35 @@ public sealed class DesktopApplication
         _configurationActions.Add (action);
 
         return this;
+    }
+
+    /// <summary>
+    /// Запуск приложения в простейшей конфигурации
+    /// с указанным главным окном.
+    /// </summary>
+    /// <param name="args">Аргументы командной строки.</param>
+    /// <typeparam name="TWindow">Класс главного окна.</typeparam>
+    /// <returns>Код возврата.</returns>
+    public static int Run<TWindow>
+        (
+            string[] args
+        )
+        where TWindow: Window, new()
+    {
+        try
+        {
+            BuildAvaloniaApp (args)
+            .UseMainWindow<TWindow>()
+            .Run();
+        }
+        catch (Exception exception)
+        {
+            Magna.Logger.LogCritical (exception, "Can't run the application");
+
+            return 1;
+        }
+
+        return 0;
     }
 
     /// <summary>
