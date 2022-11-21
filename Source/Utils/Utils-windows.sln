@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PasteHtml", "PasteHtml\Past
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionCleaner", "SolutionCleaner\SolutionCleaner.csproj", "{A36FE5C1-3899-4B12-B72D-3E3D271F187B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NameSpacer", "NameSpacer\NameSpacer.csproj", "{F1F92DFB-DDF8-4979-8837-C059BA3666FE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +59,10 @@ Global
 		{A36FE5C1-3899-4B12-B72D-3E3D271F187B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A36FE5C1-3899-4B12-B72D-3E3D271F187B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A36FE5C1-3899-4B12-B72D-3E3D271F187B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1F92DFB-DDF8-4979-8837-C059BA3666FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1F92DFB-DDF8-4979-8837-C059BA3666FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1F92DFB-DDF8-4979-8837-C059BA3666FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1F92DFB-DDF8-4979-8837-C059BA3666FE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
