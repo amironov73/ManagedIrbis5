@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 
-/* .cs --
+/* SpellCheckResult.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -15,25 +15,63 @@
 
 namespace AM.Linguistics.Hunspell;
 
+/// <summary>
+/// /
+/// </summary>
 public struct SpellCheckResult
 {
-    public SpellCheckResult (bool correct)
+    #region Properties
+
+    /// <summary>
+    ///
+    /// </summary>
+    public string? Root { get; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public SpellCheckResultType Info { get; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public bool Correct { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    /// <param name="correct"></param>
+    public SpellCheckResult
+        (
+            bool correct
+        )
     {
         Root = null;
         Info = SpellCheckResultType.None;
         Correct = correct;
     }
 
-    public SpellCheckResult (string root, SpellCheckResultType info, bool correct)
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    /// <param name="root"></param>
+    /// <param name="info"></param>
+    /// <param name="correct"></param>
+    public SpellCheckResult
+        (
+            string root,
+            SpellCheckResultType info,
+            bool correct
+        )
     {
         Root = root;
         Info = info;
         Correct = correct;
     }
 
-    public string Root { get; }
-
-    public SpellCheckResultType Info { get; }
-
-    public bool Correct { get; }
+    #endregion
 }
