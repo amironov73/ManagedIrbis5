@@ -4,10 +4,8 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
 
-/* .cs --
+/* SuffixEntry.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,24 +21,40 @@ using System.Runtime.CompilerServices;
 
 #nullable enable
 
-namespace AM.Linguistics.Hunspell
+namespace AM.Linguistics.Hunspell;
+
+/// <summary>
+///
+/// </summary>
+public sealed class SuffixEntry
+    : AffixEntry
 {
-    public sealed class SuffixEntry : AffixEntry
-    {
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    /// <param name="strip"></param>
+    /// <param name="affixText"></param>
+    /// <param name="conditions"></param>
+    /// <param name="morph"></param>
+    /// <param name="contClass"></param>
 #if !NO_INLINE
-        [MethodImpl (MethodImplOptions.AggressiveInlining)]
+    [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
-        public SuffixEntry (
+    public SuffixEntry
+        (
             string strip,
             string affixText,
             CharacterConditionGroup conditions,
             MorphSet morph,
-            FlagSet contClass)
-            : base (strip, affixText, conditions, morph, contClass)
-        {
-            Key = affixText.GetReversed();
-        }
-
-        public sealed override string Key { get; }
+            FlagSet contClass
+        )
+        : base (strip, affixText, conditions, morph, contClass)
+    {
+        Key = affixText.GetReversed();
     }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public override string Key { get; }
 }

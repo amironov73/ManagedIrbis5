@@ -5,9 +5,9 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedMember.Global
 
-/* .cs --
+/* SpecialFlags.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -15,27 +15,63 @@
 
 namespace AM.Linguistics.Hunspell;
 
+/// <summary>
+///
+/// </summary>
 public static class SpecialFlags
 {
+    /// <summary>
+    ///
+    /// </summary>
     public static readonly FlagValue DefaultFlags = new (65510);
 
+    /// <summary>
+    ///
+    /// </summary>
     public static readonly FlagValue ForbiddenWord = new (65510);
 
+    /// <summary>
+    ///
+    /// </summary>
     public static readonly FlagValue OnlyUpcaseFlag = new (65511);
 
+    /// <summary>
+    ///
+    /// </summary>
     public static readonly FlagValue LetterF = new ('F');
 
+    /// <summary>
+    ///
+    /// </summary>
     public static readonly FlagValue LetterG = new ('G');
 
+    /// <summary>
+    ///
+    /// </summary>
     public static readonly FlagValue LetterH = new ('H');
 
+    /// <summary>
+    ///
+    /// </summary>
     public static readonly FlagValue LetterI = new ('I');
 
+    /// <summary>
+    ///
+    /// </summary>
     public static readonly FlagValue LetterJ = new ('J');
 
+    /// <summary>
+    ///
+    /// </summary>
     public static readonly FlagValue LetterXLower = new ('x');
 
+    /// <summary>
+    ///
+    /// </summary>
     public static readonly FlagValue LetterCLower = new ('c');
 
+    /// <summary>
+    ///
+    /// </summary>
     public static readonly FlagValue LetterPercent = new ('%');
 }
