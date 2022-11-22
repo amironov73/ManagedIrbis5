@@ -4,8 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 /* DbCommand.cs -- переключение на другую базу данных
  * Ars Magna project, http://arsmagna.ru
@@ -29,7 +27,7 @@ public sealed class DbCommand
     public DbCommand()
         : base ("db")
     {
-        // пустое тело класса
+        // пустое тело конструктора
     }
 
     #endregion
@@ -60,6 +58,7 @@ public sealed class DbCommand
 
         if (!string.IsNullOrEmpty (dbName))
         {
+            // TODO проверять на алиасы
             executive.Provider.Database = dbName;
         }
 
