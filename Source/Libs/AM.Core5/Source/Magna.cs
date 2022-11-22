@@ -41,7 +41,6 @@ using ILogger = Microsoft.Extensions.Logging.ILogger;
 #endregion
 
 #pragma warning disable CA2211 // поля, не являющиеся констрантами, не должны быть видны
-#pragma warning disable CA2254 // шаблон сообщения должен быть константой
 
 #nullable enable
 
@@ -145,10 +144,21 @@ public sealed class Magna
 
     #endregion
 
+    #region Private members
+
+    /// <summary>
+    /// Флаг: метод <see cref="Initialize"/> успешно отработал.
+    /// </summary>
+    private static bool _isInitialized;
+
+    #endregion
+
     #region Public methods
 
     /// <summary>
-    /// Инициализация.
+    /// Инициализация простейших сервисов.
+    /// Метод можно вызывать несколько раз,
+    /// второй и последующие вызовы будут проигнорированы.
     /// </summary>
     public static void Initialize
         (
@@ -156,6 +166,11 @@ public sealed class Magna
             Action<IHostBuilder>? configurationAction = null
         )
     {
+        if (_isInitialized)
+        {
+            return;
+        }
+
         Args = args;
 
         var builder = Microsoft.Extensions.Hosting.Host
@@ -165,6 +180,8 @@ public sealed class Magna
         Host = builder.Build();
         Factory = Host.Services.GetRequiredService<ILoggerFactory>();
         Logger = Factory.CreateLogger<Magna>();
+
+        _isInitialized = true;
     }
 
     /// <summary>
