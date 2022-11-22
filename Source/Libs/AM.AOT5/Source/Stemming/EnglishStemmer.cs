@@ -1974,7 +1974,10 @@ public sealed class EnglishStemmer
         return true;
     }
 
-
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public bool CanStem()
     {
         var returnn = true;
