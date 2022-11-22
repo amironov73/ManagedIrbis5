@@ -1,0 +1,10 @@
+﻿//
+// Перевод через Google Translate
+//
+
+load ("AM.AOT5")
+
+client = new "AM.AOT.SimplestGoogleTranslateClient" ()
+original = "Some text"
+translated = client.Translate ("en", "ru", "Some text")
+println (translated)

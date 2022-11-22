@@ -28,6 +28,7 @@
 
     <!-- Централизованное управление пакетами -->
     <ItemGroup>
+        <PackageReference Include="HtmlAgilityPack"/>
         <PackageReference Include="Newtonsoft.Json"/>
         <PackageReference Include="RestSharp"/>
     </ItemGroup>
