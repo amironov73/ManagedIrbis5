@@ -4,84 +4,80 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* DbCommand.cs --
+/* DbCommand.cs -- переключение на другую базу данных
  * Ars Magna project, http://arsmagna.ru
  */
 
 #nullable enable
 
-namespace ManagedIrbis.Mx.Commands
+namespace ManagedIrbis.Mx.Commands;
+
+/// <summary>
+/// Команда прееключения на другую базу данных.
+/// </summary>
+public sealed class DbCommand
+    : MxCommand
 {
+    #region Construction
+
     /// <summary>
-    ///
+    /// Конструктор по умолчанию.
     /// </summary>
-    public sealed class DbCommand
-        : MxCommand
+    public DbCommand()
+        : base ("db")
     {
-        #region Construction
+        // пустое тело класса
+    }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public DbCommand()
-            : base("db")
+    #endregion
+
+    #region MxCommand members
+
+    /// <inheritdoc cref="MxCommand.Execute" />
+    public override bool Execute
+        (
+            MxExecutive executive,
+            MxArgument[] arguments
+        )
+    {
+        OnBeforeExecute();
+
+        if (!executive.Provider.IsConnected)
         {
+            executive.WriteLine ("Not connected");
+            return false;
         }
 
-        #endregion
-
-        #region MxCommand members
-
-        /// <inheritdoc cref="MxCommand.Execute" />
-        public override bool Execute
-            (
-                MxExecutive executive,
-                MxArgument[] arguments
-            )
+        var saveDatabase = executive.Provider.Database;
+        string? dbName = null;
+        if (arguments.Length != 0)
         {
-            OnBeforeExecute();
-
-            if (!executive.Provider.IsConnected)
-            {
-                executive.WriteLine("Not connected");
-                return false;
-            }
-
-            var saveDatabase = executive.Provider.Database;
-            string? dbName = null;
-            if (arguments.Length != 0)
-            {
-                dbName = arguments[0].Text;
-            }
-
-            if (!string.IsNullOrEmpty(dbName))
-            {
-                executive.Provider.Database = dbName;
-            }
-
-            try
-            {
-                var maxMfn = executive.Provider.GetMaxMfn() - 1;
-                executive.WriteMessage($"DB={executive.Provider.Database}, Max MFN={maxMfn}");
-            }
-            catch
-            {
-                executive.WriteError($"Error changing DB, restoring to {saveDatabase}");
-                executive.Provider.Database = saveDatabase;
-            }
-
-            OnAfterExecute();
-
-            return true;
+            dbName = arguments[0].Text;
         }
 
-        #endregion
+        if (!string.IsNullOrEmpty (dbName))
+        {
+            executive.Provider.Database = dbName;
+        }
 
-    } // class DbCommand
+        try
+        {
+            var maxMfn = executive.Provider.GetMaxMfn() - 1;
+            executive.WriteMessage ($"DB={executive.Provider.Database}, Max MFN={maxMfn}");
+        }
+        catch
+        {
+            executive.WriteError ($"Error changing DB, restoring to {saveDatabase}");
+            executive.Provider.Database = saveDatabase;
+        }
 
-} // namespace ManagedIrbis.Mx.Commands
+        OnAfterExecute();
+
+        return true;
+    }
+
+    #endregion
+}
