@@ -23,6 +23,7 @@ using AM;
 using AM.Collections;
 using AM.IO;
 using AM.Runtime;
+using AM.Text;
 
 #endregion
 
@@ -49,9 +50,71 @@ public sealed class AliasCommand
 
     #endregion
 
+    #region Private members
+
+    private void ListAliases
+        (
+            MxExecutive executive
+        )
+    {
+        var aliases = executive.Aliases;
+        var keys = aliases.Keys.Order();
+        foreach (var alias in keys)
+        {
+            executive.WriteLine ($"{alias} => {aliases[alias]}");
+        }
+    }
+
+    private void ProcessOneArgument
+        (
+            MxExecutive executive,
+            MxArgument argument
+        )
+    {
+        var text = argument.Text;
+        if (string.IsNullOrWhiteSpace (text))
+        {
+            return;
+        }
+
+        var aliases = executive.Aliases;
+        var parts = text.Split ('=', 2);
+        if (parts.Length == 1)
+        {
+            if (!aliases.ContainsKey (text))
+            {
+                executive.WriteLine ("No such alias");
+            }
+            else
+            {
+                executive.WriteLine ($"{text} => {aliases[text]}");
+            }
+        }
+        else
+        {
+            var key = parts[0].Trim();
+            if (string.IsNullOrWhiteSpace (key))
+            {
+                return;
+            }
+
+            var value = parts[1].Trim();
+            if (string.IsNullOrEmpty (value))
+            {
+                aliases.Remove (key);
+            }
+            else
+            {
+                aliases[key] = value;
+            }
+        }
+    }
+
+    #endregion
+
     #region MxCommand members
 
-    /// <inheritdoc/>
+    /// <inheritdoc cref="MxCommand.Execute"/>
     public override bool Execute
         (
             MxExecutive executive,
@@ -60,7 +123,17 @@ public sealed class AliasCommand
     {
         OnBeforeExecute();
 
-        executive.WriteLine ("alias");
+        if (arguments.IsNullOrEmpty())
+        {
+            ListAliases (executive);
+        }
+        else
+        {
+            foreach (var argument in arguments)
+            {
+                ProcessOneArgument (executive, argument);
+            }
+        }
 
         OnAfterExecute();
 

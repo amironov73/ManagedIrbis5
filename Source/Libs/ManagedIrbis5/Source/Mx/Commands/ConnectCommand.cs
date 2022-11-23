@@ -9,7 +9,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* ConnectCommand.cs -- connect to the server
+/* ConnectCommand.cs -- подключение к серверу или локальной базе данных
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,83 +21,90 @@ using ManagedIrbis.Providers;
 
 #nullable enable
 
-namespace ManagedIrbis.Mx.Commands
+namespace ManagedIrbis.Mx.Commands;
+
+/// <summary>
+/// Подключение к серверу ИРБИС64 либо к локальной базе данных.
+/// </summary>
+public sealed class ConnectCommand
+    : MxCommand
 {
+    #region Construction
+
     /// <summary>
-    /// Connect to the server.
+    /// Конструктор по умолчанию.
     /// </summary>
-    public sealed class ConnectCommand
-        : MxCommand
+    public ConnectCommand()
+        : base ("connect")
     {
-        #region Construction
+        // пустое тело конструктора
+    }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public ConnectCommand()
-            : base("Connect")
+    #endregion
+
+    #region Private members
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Initialize the provider.
+    /// </summary>
+    public static ISyncProvider InitializeProvider
+        (
+            string argument
+        )
+    {
+        var result = ProviderManager.GetAndConfigureProvider (argument);
+
+        return result;
+    }
+
+    #endregion
+
+    #region MxCommand members
+
+    /// <inheritdoc cref="MxCommand.Execute" />
+    public override bool Execute
+        (
+            MxExecutive executive,
+            MxArgument[] arguments
+        )
+    {
+        OnBeforeExecute();
+
+        if (arguments.Length != 0)
         {
+            var argument = arguments[0].Text;
+            executive.Provider.Dispose();
+            executive.Provider = string.IsNullOrEmpty (argument)
+                ? ProviderManager.GetPreconfiguredProvider()
+                : InitializeProvider (argument);
         }
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Initialize the provider.
-        /// </summary>
-        public static ISyncProvider InitializeProvider
-            (
-                string argument
-            )
+        else
         {
-            var result = ProviderManager.GetAndConfigureProvider(argument);
-
-            return result;
-        }
-
-        #endregion
-
-        #region MxCommand members
-
-        /// <inheritdoc cref="MxCommand.Execute" />
-        public override bool Execute
-            (
-                MxExecutive executive,
-                MxArgument[] arguments
-            )
-        {
-            OnBeforeExecute();
-
-            if (arguments.Length != 0)
+            const string defaultAlias = "default";
+            var aliases = executive.Aliases;
+            if (!aliases.ContainsKey (defaultAlias))
             {
-                var argument = arguments[0].Text;
-                executive.Provider.Dispose();
-                if (string.IsNullOrEmpty(argument))
-                {
-                    executive.Provider = ProviderManager.GetPreconfiguredProvider();
-                }
-                else
-                {
-                    executive.Provider = InitializeProvider(argument);
-                }
-                executive.Context.SetProvider(executive.Provider);
-                executive.WriteMessage(string.Format
-                    (
-                        "Connected, current database: {0}",
-                        executive.Provider.Database
-                    ));
+                return false;
             }
 
-            OnAfterExecute();
-
-            return true;
+            var argument = aliases[defaultAlias];
+            executive.Provider.Dispose();
+            executive.Provider = string.IsNullOrEmpty (argument)
+                ? ProviderManager.GetPreconfiguredProvider()
+                : InitializeProvider (argument);
         }
 
-        #endregion
+        executive.Context.SetProvider (executive.Provider);
+        executive.WriteMessage ($"Connected, current database: {executive.Provider.Database}");
+
+        OnAfterExecute();
+
+        return true;
     }
+
+    #endregion
 }

@@ -58,14 +58,30 @@ public sealed class DbCommand
 
         if (!string.IsNullOrEmpty (dbName))
         {
-            // TODO проверять на алиасы
-            executive.Provider.Database = dbName;
+            var aliases = executive.Aliases;
+            if (aliases.ContainsKey (dbName))
+            {
+                var expanded = aliases[dbName];
+                if (expanded.Contains ('='))
+                {
+                    executive.Provider.ParseConnectionString (expanded);
+                }
+                else
+                {
+                    executive.Provider.Database = expanded;
+                }
+
+            }
+            else
+            {
+                executive.Provider.Database = dbName;
+            }
         }
 
         try
         {
             var maxMfn = executive.Provider.GetMaxMfn() - 1;
-            executive.WriteMessage ($"DB={executive.Provider.Database}, Max MFN={maxMfn}");
+            executive.WriteMessage ($"DB={executive.Provider.Database} max MFN={maxMfn}");
         }
         catch
         {

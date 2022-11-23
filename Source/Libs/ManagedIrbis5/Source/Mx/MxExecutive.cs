@@ -18,7 +18,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -61,6 +60,11 @@ public sealed class MxExecutive
     /// Console.
     /// </summary>
     public IMxConsole MxConsole { get; set; }
+
+    /// <summary>
+    /// Словарь алиасов.
+    /// </summary>
+    public IDictionary<string, string> Aliases { get; }
 
     /// <summary>
     /// Palette.
@@ -130,16 +134,7 @@ public sealed class MxExecutive
     /// <summary>
     /// Get version of the executive.
     /// </summary>
-    public static Version Version
-    {
-        get
-        {
-            var assembly = typeof (MxExecutive).Assembly;
-            var result = assembly.GetName().Version;
-
-            return result ?? new Version (0, 0);
-        }
-    } // property Version
+    public static Version Version => ClientVersion.Version;
 
     #endregion
 
@@ -155,6 +150,7 @@ public sealed class MxExecutive
         VerbosityLevel = 3;
         DescriptionFormat = "@brief";
 
+        Aliases = new CaseInsensitiveDictionary<string>();
         MxConsole = new MxConsole();
         Palette = MxPalette.GetDefaultPalette();
         Provider = new NullProvider();
@@ -402,7 +398,7 @@ public sealed class MxExecutive
     /// </summary>
     public void Banner()
     {
-        WriteMessage (string.Format ("mx64 version {0}", Version));
+        WriteMessage ($"mx64 version {Version}");
         WriteLine (string.Empty);
     }
 
@@ -488,16 +484,9 @@ public sealed class MxExecutive
         where T : MxCommand
     {
         var result = Commands.OfType<T>().FirstOrDefault();
-        if (ReferenceEquals (result, null))
+        if (result is null)
         {
-            throw new IrbisException
-                (
-                    string.Format
-                        (
-                            "Command {0} not found",
-                            typeof (T).Name
-                        )
-                );
+            throw new IrbisException ($"Command {typeof (T).Name} not found");
         }
 
         return result;
@@ -565,6 +554,18 @@ public sealed class MxExecutive
     }
 
     /// <summary>
+    /// Разбор аргументов командной строки.
+    /// </summary>
+    public void ParseCommandLine
+        (
+            string[] args
+        )
+
+    {
+        // TODO implement
+    }
+
+    /// <summary>
     /// Read one line.
     /// </summary>
     public string? ReadLine()
@@ -587,10 +588,7 @@ public sealed class MxExecutive
     public void Repl()
     {
         Console.CancelKeyPress += _CancelKeyPress;
-        Console.Title = string.Format
-            (
-                "mx64 v{0}", Version
-            );
+        Console.Title = $"mx64 v{Version}";
 
         while (!StopFlag)
         {

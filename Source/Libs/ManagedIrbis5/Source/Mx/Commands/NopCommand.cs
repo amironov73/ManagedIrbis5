@@ -4,57 +4,57 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
-/* NopCommand.cs --
+/* NopCommand.cs -- пустая команда
  * Ars Magna project, http://arsmagna.ru
  */
 
-#region Using directives
-
-#endregion
-
 #nullable enable
 
-namespace ManagedIrbis.Mx.Commands
+using AM;
+
+namespace ManagedIrbis.Mx.Commands;
+
+/// <summary>
+/// Пустая команда (может использоваться для поддержания
+/// сессии с сервером ИРБИС64).
+/// </summary>
+public sealed class NopCommand
+    : MxCommand
 {
+    #region Construction
+
     /// <summary>
-    ///
+    /// Конструктор по умолчанию.
     /// </summary>
-    public sealed class NopCommand
-        : MxCommand
+    public NopCommand()
+        : base("Nop")
     {
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public NopCommand()
-            : base("Nop")
-        {
-        }
-
-        #endregion
-
-        #region MxCommand members
-
-        /// <inheritdoc cref="MxCommand.Execute" />
-        public override bool Execute
-            (
-                MxExecutive executive,
-                MxArgument[] arguments
-            )
-        {
-            OnBeforeExecute();
-
-            executive.WriteMessage("Nop");
-
-            OnAfterExecute();
-
-            return true;
-        }
-
-        #endregion
+        // пустое тело конструктора
     }
+
+    #endregion
+
+    #region MxCommand members
+
+    /// <inheritdoc cref="MxCommand.Execute" />
+    public override bool Execute
+        (
+            MxExecutive executive,
+            MxArgument[] arguments
+        )
+    {
+        arguments.NotUsed ();
+
+        OnBeforeExecute();
+
+        executive.WriteLine ("NOP");
+        executive.Provider.NoOperation();
+
+        OnAfterExecute();
+
+        return true;
+    }
+
+    #endregion
 }
