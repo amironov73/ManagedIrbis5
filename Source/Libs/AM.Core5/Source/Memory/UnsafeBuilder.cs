@@ -11,7 +11,6 @@
 #region Using directives
 
 using System;
-using System.IO;
 using System.Runtime.CompilerServices;
 
 #endregion
@@ -56,6 +55,19 @@ public unsafe ref struct UnsafeBuilder<T>
     #region Public methods
 
     /// <summary>
+    /// Добавление одного элемента.
+    /// </summary>
+    public void Append (T value)
+    {
+        if (_position >= _length)
+        {
+            throw new ArsMagnaException();
+        }
+
+        _memory[_position++] = value;
+    }
+
+    /// <summary>
     /// Приклеивание очередного фрагмента памяти.
     /// </summary>
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
@@ -67,7 +79,7 @@ public unsafe ref struct UnsafeBuilder<T>
     {
         if (_position + count > _length)
         {
-            throw new InternalBufferOverflowException();
+            throw new ArsMagnaException();
         }
 
         var byteCount = unchecked ((uint) (sizeof (T) * count));

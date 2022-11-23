@@ -53,6 +53,22 @@ public ref struct SpanBuilder<T>
     #region Public methods
 
     /// <summary>
+    /// Добавление одного элемента.
+    /// </summary>
+    public void Append
+        (
+            T value
+        )
+    {
+        if (_position >= _memory.Length)
+        {
+            throw new ArsMagnaException();
+        }
+
+        _memory[_position++] = value;
+    }
+
+    /// <summary>
     /// Приклеивание очередного фрагмента памяти.
     /// </summary>
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
