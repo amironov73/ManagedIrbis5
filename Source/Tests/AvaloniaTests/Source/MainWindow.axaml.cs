@@ -18,8 +18,10 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 using AM;
+using AM.Avalonia;
 using AM.Avalonia.Controls;
 using AM.Avalonia.Dialogs;
 
@@ -31,6 +33,8 @@ using Avalonia.Layout;
 using ManagedIrbis;
 using ManagedIrbis.Avalonia;
 using ManagedIrbis.Workspace;
+
+using ReactiveUI;
 
 #endregion
 
@@ -376,6 +380,58 @@ public partial class MainWindow
                 }
             }
         };
+
+        await window.ShowDialog (this);
+    }
+
+    private async void BusyWindowButton_OnClick
+        (
+            object? sender,
+            RoutedEventArgs eventArgs
+        )
+    {
+        var button = new Button
+        {
+            Content = "Жмите!"
+        };
+
+        var window = new BusyWindow
+        {
+            Header = "Ждите ответа!",
+            Title = "BusyWindow demo",
+            Width = 300,
+            Height = 220,
+            WindowContent = new DockPanel
+            {
+                Margin = new Thickness (10),
+                Children =
+                {
+                    new Label { Content = "До кнопки" }
+                        .DockTop()
+                        .CenterContent(),
+
+                    new TextBox
+                        {
+                            Text = "У попа была собака",
+                            Width = 200,
+                        }
+                        .DockTop()
+                        .CenterHorizontally(),
+
+                    new Label { Content = "После кнопки" }
+                        .DockBottom()
+                        .CenterContent(),
+
+                    button.CenterHorizontally(),
+                }
+            }
+        };
+
+        button.Command = ReactiveCommand.CreateFromTask (async Task() =>
+        {
+            await window.Run (async Task() => await Task.Delay (1_500));
+        });
+
 
         await window.ShowDialog (this);
     }

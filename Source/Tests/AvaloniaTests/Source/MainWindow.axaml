@@ -80,6 +80,12 @@
             AnalogClock
         </Button>
 
+        <Button
+            Name="BusyWindowButton"
+            Click="BusyWindowButton_OnClick">
+            BusyWindow
+        </Button>
+
     </WrapPanel>
 
 </Window>
