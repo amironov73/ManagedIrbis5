@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* SearchCommand.cs --
+/* SearchCommand.cs -- поиск по словарю
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -32,102 +32,90 @@ using ManagedIrbis.Providers;
 
 #nullable enable
 
-namespace ManagedIrbis.Mx.Commands
+namespace ManagedIrbis.Mx.Commands;
+
+/// <summary>
+/// Поиск по словарю
+/// </summary>
+public sealed class SearchCommand
+    : MxCommand
 {
+    #region Construction
+
     /// <summary>
-    ///
+    /// Конструктор по умолчанию.
     /// </summary>
-    public sealed class SearchCommand
-        : MxCommand
+    public SearchCommand()
+        : base ("Search")
     {
-        #region Properties
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public SearchCommand()
-            : base("Search")
-        {
-        }
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
-        #region MxCommand members
-
-        /// <inheritdoc cref="MxCommand.Execute" />
-        public override bool Execute
-            (
-                MxExecutive executive,
-                MxArgument[] arguments
-            )
-        {
-            OnBeforeExecute();
-
-            if (!executive.Provider.IsConnected)
-            {
-                executive.WriteLine("Not connected");
-
-                return false;
-            }
-
-            if (arguments.Length != 0)
-            {
-                var argument = arguments[0].Text;
-                if (!string.IsNullOrEmpty(argument))
-                {
-                    var found = executive.Provider.Search(argument);
-                    var foundCount = found.Length;
-                    executive.WriteMessage($"Found: {found.Length}");
-
-                    if (executive.Limit > 0)
-                    {
-                        found = found.Take(executive.Limit).ToArray();
-                        if (found.Length < foundCount)
-                        {
-                            executive.WriteMessage(string.Format
-                                (
-                                    "Limited to {0} records",
-                                    found.Length
-                                ));
-                        }
-                    }
-                    executive.Records.Clear();
-                    for (var i = 0; i < found.Length; i++)
-                    {
-                        var mfn = found[i];
-                        var record = new MxRecord
-                        {
-                            Database = executive.Provider.Database,
-                            Mfn = mfn,
-                        };
-                        executive.Records.Add(record);
-                    }
-
-                    executive.History.Push(argument);
-                }
-            }
-
-            OnAfterExecute();
-
-            return true;
-        }
-
-        #endregion
-
-        #region Object members
-
-        #endregion
+        // пустое тело конструктора
     }
+
+    #endregion
+
+    #region MxCommand members
+
+    /// <inheritdoc cref="MxCommand.Execute" />
+    public override bool Execute
+        (
+            MxExecutive executive,
+            MxArgument[] arguments
+        )
+    {
+        OnBeforeExecute();
+
+        if (!executive.Provider.IsConnected)
+        {
+            executive.WriteError ("Not connected");
+
+            return false;
+        }
+
+        if (arguments.Length != 0)
+        {
+            var argument = arguments[0].Text;
+
+            Debug.WriteLine (argument);
+
+            if (!string.IsNullOrEmpty (argument))
+            {
+                var found = executive.Provider.Search (argument);
+                var foundCount = found.Length;
+                executive.WriteMessage ($"Found: {found.Length}");
+
+                if (executive.Limit > 0)
+                {
+                    found = found.Take (executive.Limit).ToArray();
+                    if (found.Length < foundCount)
+                    {
+                        executive.WriteMessage ($"Limited to {found.Length} records");
+                    }
+                }
+
+                executive.Records.Clear();
+                for (var i = 0; i < found.Length; i++)
+                {
+                    var mfn = found[i];
+                    var record = new MxRecord
+                    {
+                        Database = executive.Provider.Database,
+                        Mfn = mfn,
+                    };
+                    executive.Records.Add (record);
+                }
+
+                executive.History.Push (argument);
+            }
+        }
+
+        OnAfterExecute();
+
+        return true;
+    }
+
+    #endregion
+
+    #region Object members
+
+    #endregion
 }

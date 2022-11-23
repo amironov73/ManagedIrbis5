@@ -109,8 +109,9 @@ namespace ManagedIrbis.Mx
         }
 
         /// <summary>
-        /// Execute the command.
+        /// Выполнение команды.
         /// </summary>
+        /// <returns></returns>
         public virtual bool Execute
             (
                 MxExecutive executive,

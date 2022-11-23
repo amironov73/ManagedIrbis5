@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Reflection;
 
 using AM;
+using AM.Collections;
 using AM.Configuration;
 using AM.Parameters;
 
@@ -82,7 +83,7 @@ public static class ProviderManager
     /// <summary>
     /// Registry.
     /// </summary>
-    public static Dictionary<string, Type> Registry { get; private set; }
+    public static IDictionary<string, Type> Registry { get; private set; }
 
     /// <summary>
     /// Провайдер сервисов.
@@ -97,7 +98,7 @@ public static class ProviderManager
     {
         var serviceCollection = new ServiceCollection();
 
-        Registry = new Dictionary<string, Type>
+        Registry = new CaseInsensitiveDictionary<Type>()
         {
             { Null, typeof (NullProvider) },
             { Direct, typeof (DirectProvider) },
@@ -261,8 +262,15 @@ public static class ProviderManager
             return default;
         }
 
-        // var result = (ISyncProvider?)Activator.CreateInstance(type);
-        var result = (ISyncProvider?)ServiceProvider.GetService (providerType);
+        ISyncProvider? result = null;
+        if (providerType.IsInterface)
+        {
+            result = (ISyncProvider?) ServiceProvider.GetService (providerType);
+        }
+        else
+        {
+            result = (ISyncProvider?) Activator.CreateInstance (providerType);
+        }
 
         return result;
     }

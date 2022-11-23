@@ -12,38 +12,37 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 #nullable enable
 
-namespace UnitTests.ManagedIrbis.Mx.Commands
+namespace UnitTests.ManagedIrbis.Mx.Commands;
+
+[TestClass]
+public sealed class PrintCommandTest
+    : CommonMxCommandTest
 {
-    [TestClass]
-    public sealed class PrintCommandTest
-        : CommonMxCommandTest
+    [TestMethod]
+    [Description ("Конструктор по умолчанию")]
+    public void PrintCommand_Construction_1()
     {
-        [TestMethod]
-        [Description ("Конструктор по умолчанию")]
-        public void PrintCommand_Construction_1()
-        {
-            var command = new PrintCommand();
-            Assert.AreEqual ("Print", command.Name);
-        }
+        var command = new PrintCommand();
+        Assert.AreEqual ("print", command.Name);
+    }
 
-        [TestMethod]
-        [Description ("Выполнение команды")]
-        public void PrintCommand_Execute_1()
-        {
-            using var executive = GetExecutive();
-            using var command = new PrintCommand();
-            command.Initialize (executive);
+    [TestMethod]
+    [Description ("Выполнение команды")]
+    public void PrintCommand_Execute_1()
+    {
+        using var executive = GetExecutive();
+        using var command = new PrintCommand();
+        command.Initialize (executive);
 
-            var arguments = Array.Empty<MxArgument>();
-            command.Execute (executive, arguments);
-        }
+        var arguments = Array.Empty<MxArgument>();
+        command.Execute (executive, arguments);
+    }
 
-        [TestMethod]
-        [Description ("Плоское текстовое представление")]
-        public void PrintCommand_ToString_1()
-        {
-            var command = new PrintCommand();
-            Assert.AreEqual ("Print", command.ToString());
-        }
+    [TestMethod]
+    [Description ("Плоское текстовое представление")]
+    public void PrintCommand_ToString_1()
+    {
+        var command = new PrintCommand();
+        Assert.AreEqual ("print", command.ToString());
     }
 }

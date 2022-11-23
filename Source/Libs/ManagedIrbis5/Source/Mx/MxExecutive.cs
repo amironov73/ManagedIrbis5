@@ -323,14 +323,15 @@ public sealed class MxExecutive
             }
         }
 
-        MxArgument[] arguments =
-        {
-            new MxArgument
+        MxArgument[] arguments = commandArgument is null
+            ? Array.Empty<MxArgument>()
+            : new MxArgument[]
             {
-                Text = commandArgument
-            }
-        };
-
+                new MxArgument()
+                {
+                    Text = commandArgument
+                }
+            };
         var result = false;
 
         try
@@ -596,10 +597,16 @@ public sealed class MxExecutive
             ExecuteLine (line);
             WriteLine (string.Empty);
         }
+
+        if (Provider.IsConnected)
+        {
+            WriteMessage ("Disconnecting");
+            Provider.Disconnect();
+        }
     }
 
     /// <summary>
-    /// Write error message.
+    /// Вывод в консоль сообщения об ошибке.
     /// </summary>
     public void WriteError
         (

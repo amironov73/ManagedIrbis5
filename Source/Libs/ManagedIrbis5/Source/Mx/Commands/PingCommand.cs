@@ -7,143 +7,114 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* PingCommand.cs --
+/* PingCommand.cs -- пингование сервера
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Mx.Commands
+namespace ManagedIrbis.Mx.Commands;
+
+/// <summary>
+/// Пингование сервера ИРБИС64.
+/// </summary>
+public sealed class PingCommand
+    : MxCommand
 {
+    #region Construction
+
     /// <summary>
-    ///
+    /// Конструктор по умолчанию.
     /// </summary>
-    public sealed class PingCommand
-        : MxCommand
+    public PingCommand()
+        : base ("ping")
     {
-        #region Properties
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PingCommand()
-            : base("ping")
-        {
-        }
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Do one ping operation.
-        /// </summary>
-        public long DoPing
-            (
-                int number,
-                MxExecutive executive
-            )
-        {
-            long result = 0;
-
-            try
-            {
-
-                var stopwatch = new Stopwatch();
-                stopwatch.Start();
-                executive.Provider.NoOperation();
-                stopwatch.Stop();
-
-                result = stopwatch.ElapsedMilliseconds;
-
-                executive.WriteMessage(string.Format
-                    (
-                        "{0}: {1} ms",
-                        number,
-                        result
-                    ));
-            }
-            catch
-            {
-                executive.WriteError("ERROR");
-            }
-
-            return result;
-        }
-
-        #endregion
-
-        #region MxCommand members
-
-        /// <inheritdoc cref="MxCommand.Execute" />
-        public override bool Execute
-            (
-                MxExecutive executive,
-                MxArgument[] arguments
-            )
-        {
-            OnBeforeExecute();
-
-            if (!executive.Provider.IsConnected)
-            {
-                executive.WriteLine("Not connected");
-                return false;
-            }
-
-            long sum = 0;
-            var ntries = 4;
-            if (arguments.Length != 0)
-            {
-                var n = arguments[0].Text.SafeToInt32();
-                if (n > 1)
-                {
-                    ntries = n;
-                }
-            }
-            for (var i = 0; i < ntries; i++)
-            {
-                sum += DoPing(i + 1, executive);
-            }
-
-            executive.WriteMessage(string.Format
-                (
-                    "average = {0}", sum / ntries
-                ));
-
-            OnAfterExecute();
-
-            return true;
-        }
-
-        #endregion
-
-        #region Object members
-
-        #endregion
+        // пустое тело конструктора
     }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Do one ping operation.
+    /// </summary>
+    public long DoPing
+        (
+            int number,
+            MxExecutive executive
+        )
+    {
+        long result = 0;
+
+        try
+        {
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            executive.Provider.NoOperation();
+            stopwatch.Stop();
+
+            result = stopwatch.ElapsedMilliseconds;
+
+            executive.WriteMessage ($"{number}: {result} ms");
+        }
+        catch
+        {
+            executive.WriteError ("ERROR");
+        }
+
+        return result;
+    }
+
+    #endregion
+
+    #region MxCommand members
+
+    /// <inheritdoc cref="MxCommand.Execute" />
+    public override bool Execute
+        (
+            MxExecutive executive,
+            MxArgument[] arguments
+        )
+    {
+        OnBeforeExecute();
+
+        if (!executive.Provider.IsConnected)
+        {
+            executive.WriteLine ("Not connected");
+            return false;
+        }
+
+        long sum = 0;
+        var ntries = 4;
+        if (arguments.Length != 0)
+        {
+            var n = arguments[0].Text.SafeToInt32();
+            if (n > 1)
+            {
+                ntries = n;
+            }
+        }
+
+        for (var i = 0; i < ntries; i++)
+        {
+            sum += DoPing (i + 1, executive);
+        }
+
+        executive.WriteMessage ($"average = {sum / ntries}");
+
+        OnAfterExecute();
+
+        return true;
+    }
+
+    #endregion
 }

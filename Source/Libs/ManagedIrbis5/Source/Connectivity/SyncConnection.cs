@@ -65,12 +65,21 @@ public class SyncConnection
     #region Construction
 
     /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public SyncConnection()
+        : this (null, null)
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
     /// Конструктор.
     /// </summary>
     public SyncConnection
         (
-            ISyncClientSocket? socket = null,
-            IServiceProvider? serviceProvider = null
+            ISyncClientSocket? socket,
+            IServiceProvider? serviceProvider
         )
         : base (serviceProvider ?? Magna.Host.Services)
     {

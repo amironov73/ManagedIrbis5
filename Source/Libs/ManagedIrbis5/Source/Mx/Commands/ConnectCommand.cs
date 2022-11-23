@@ -86,12 +86,12 @@ public sealed class ConnectCommand
         {
             const string defaultAlias = "default";
             var aliases = executive.Aliases;
-            if (!aliases.ContainsKey (defaultAlias))
+            string? argument = null;
+            if (aliases.ContainsKey (defaultAlias))
             {
-                return false;
+                argument = aliases[defaultAlias];
             }
 
-            var argument = aliases[defaultAlias];
             executive.Provider.Dispose();
             executive.Provider = string.IsNullOrEmpty (argument)
                 ? ProviderManager.GetPreconfiguredProvider()
@@ -99,7 +99,9 @@ public sealed class ConnectCommand
         }
 
         executive.Context.SetProvider (executive.Provider);
-        executive.WriteMessage ($"Connected, current database: {executive.Provider.Database}");
+        executive.Provider.Connect();
+        var maxMfn = executive.Provider.GetMaxMfn();
+        executive.WriteMessage ($"Connected, database {executive.Provider.Database}, max MFN {maxMfn}");
 
         OnAfterExecute();
 
