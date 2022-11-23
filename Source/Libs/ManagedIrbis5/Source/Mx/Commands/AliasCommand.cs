@@ -4,12 +4,8 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
-/* AliasCommand.cs --
+/* AliasCommand.cs -- создание, удаление и прочая работа с алиасам
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -32,60 +28,50 @@ using AM.Runtime;
 
 #nullable enable
 
-namespace ManagedIrbis.Mx.Commands
+namespace ManagedIrbis.Mx.Commands;
+
+/// <summary>
+/// Создание, удаление и прочая работа работа с алиасами.
+/// </summary>
+public sealed class AliasCommand
+    : MxCommand
 {
+    #region Construction
+
     /// <summary>
-    ///
+    /// Конструктор по умолчанию.
     /// </summary>
-    public sealed class AliasCommand
-        : MxCommand
+    public AliasCommand()
+        : base ("alias")
     {
-        #region Properties
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public AliasCommand()
-            : base("Alias")
-        {
-        }
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
-        #region MxCommand members
-
-        /// <inheritdoc/>
-        public override bool Execute
-            (
-                MxExecutive executive,
-                MxArgument[] arguments
-            )
-        {
-            OnBeforeExecute();
-
-            executive.WriteLine("Alias");
-
-            OnAfterExecute();
-
-            return true;
-        }
-
-        #endregion
-
-        #region Object members
-
-        #endregion
+        // пустое тело конструктора
     }
+
+    #endregion
+
+    #region MxCommand members
+
+    /// <inheritdoc/>
+    public override bool Execute
+        (
+            MxExecutive executive,
+            MxArgument[] arguments
+        )
+    {
+        OnBeforeExecute();
+
+        executive.WriteLine ("alias");
+
+        OnAfterExecute();
+
+        return true;
+    }
+
+    /// <inheritdoc cref="MxCommand.GetShortHelp" />
+    public override string GetShortHelp()
+    {
+        return "Create or delete aliases";
+    }
+
+    #endregion
 }
