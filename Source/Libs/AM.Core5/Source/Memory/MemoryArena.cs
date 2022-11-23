@@ -42,6 +42,9 @@ public sealed class MemoryArena
             int alignment = 8
         )
     {
+        Sure.Positive (size);
+        Sure.Positive (alignment);
+
         _memory = new Memory<byte> (new byte[size]);
         _alingnemnt = alignment - 1;
         _offset = 0;
@@ -63,6 +66,8 @@ public sealed class MemoryArena
             int alingnemnt = 8
         )
     {
+        Sure.Positive (alingnemnt);
+
         _alingnemnt = alingnemnt - 1;
         _memory = memory;
 
@@ -106,6 +111,8 @@ public sealed class MemoryArena
             int size
         )
     {
+        Sure.Positive (size);
+
         if (_offset + size > _memory.Length)
         {
             throw new ApplicationException();

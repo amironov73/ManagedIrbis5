@@ -47,7 +47,6 @@
         <PackageReference Include="ReactiveUI.Fody" />
         <PackageReference Include="SkiaSharp" />
         <PackageReference Include="Microsoft.Extensions.Logging" />
-        <PackageReference Include="XamlColorSchemeGenerator" />
         <PackageReference Include="XamlNameReferenceGenerator" />
     </ItemGroup>
 

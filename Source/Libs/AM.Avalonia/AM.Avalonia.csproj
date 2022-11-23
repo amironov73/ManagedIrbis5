@@ -47,7 +47,6 @@
         <PackageReference Include="ReactiveUI" />
         <PackageReference Include="ReactiveUI.Fody" />
         <PackageReference Include="SkiaSharp" />
-        <PackageReference Include="XamlColorSchemeGenerator" />
     </ItemGroup>
 
     <ItemGroup>

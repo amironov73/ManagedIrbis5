@@ -107,7 +107,6 @@
     <PackageVersion Include="Telegram.Bot.Extensions.Polling" Version="1.0.2" />
     <PackageVersion Include="Topshelf" Version="4.3.0" />
     <PackageVersion Include="Topshelf.NLog" Version="4.3.0" />
-    <PackageVersion Include="XamlColorSchemeGenerator" Version="3.0.0.31" />
     <PackageVersion Include="XamlNameReferenceGenerator" Version="1.4.2" />
   </ItemGroup>
 </Project>

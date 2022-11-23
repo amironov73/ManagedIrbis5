@@ -36,7 +36,10 @@ public static class MemoryEx
     ///
     /// </summary>
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
-    public static int Length<T> (this IMemoryOwner<T> that)
+    public static int Length<T>
+        (
+            this IMemoryOwner<T> that
+        )
     {
         return that.Memory.Length;
     }
@@ -49,10 +52,19 @@ public static class MemoryEx
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
-    public static CountdownMemoryOwner<T> AsCountdown<T> (this CountdownMemoryOwner<T> that,
-        bool noDefaultOwner = false)
+    public static CountdownMemoryOwner<T> AsCountdown<T>
+        (
+            this CountdownMemoryOwner<T> that,
+            bool noDefaultOwner = false
+        )
     {
-        return Pool<CountdownMemoryOwner<T>>.Get().Init (that, 0, that.Memory.Length, noDefaultOwner);
+        return Pool<CountdownMemoryOwner<T>>.Get().Init
+            (
+                that,
+                0,
+                that.Memory.Length,
+                noDefaultOwner
+            );
     }
 
     /// <summary>
@@ -64,10 +76,20 @@ public static class MemoryEx
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
-    public static CountdownMemoryOwner<T> AsCountdown<T> (this CountdownMemoryOwner<T> that, int offset,
-        bool noDefaultOwner = false)
+    public static CountdownMemoryOwner<T> AsCountdown<T>
+        (
+            this CountdownMemoryOwner<T> that,
+            int offset,
+            bool noDefaultOwner = false
+        )
     {
-        return Pool<CountdownMemoryOwner<T>>.Get().Init (that, offset, that.Memory.Length - offset, noDefaultOwner);
+        return Pool<CountdownMemoryOwner<T>>.Get().Init
+            (
+                that,
+                offset,
+                that.Memory.Length - offset,
+                noDefaultOwner
+            );
     }
 
     /// <summary>
@@ -80,8 +102,13 @@ public static class MemoryEx
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
-    public static CountdownMemoryOwner<T> AsCountdown<T> (this CountdownMemoryOwner<T> that, int offset, int length,
-        bool noDefaultOwner = false)
+    public static CountdownMemoryOwner<T> AsCountdown<T>
+        (
+            this CountdownMemoryOwner<T> that,
+            int offset,
+            int length,
+            bool noDefaultOwner = false
+        )
     {
         return Pool<CountdownMemoryOwner<T>>.Get().Init (that, offset, length, noDefaultOwner);
     }
