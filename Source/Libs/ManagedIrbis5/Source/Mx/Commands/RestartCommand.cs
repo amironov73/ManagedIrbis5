@@ -7,90 +7,63 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* RestartCommand.cs --
+/* RestartCommand.cs -- перезапуск сервера ИРБИС64
  * Ars Magna project, http://arsmagna.ru
  */
 
-#region Using directives
-
-using System;
-using ManagedIrbis.Client;
-
-#endregion
-
 #nullable enable
 
-namespace ManagedIrbis.Mx.Commands
+namespace ManagedIrbis.Mx.Commands;
+
+/// <summary>
+/// Перезапуск сервера ИРБИС64.
+/// </summary>
+public sealed class RestartCommand
+    : MxCommand
 {
+    #region Construction
+
     /// <summary>
-    ///
+    /// Конструктор по умолчанию.
     /// </summary>
-    public sealed class RestartCommand
-        : MxCommand
+    public RestartCommand()
+        : base ("restart")
     {
-        #region Properties
+        // пустое тело конструктора
+    }
 
-        #endregion
+    #endregion
 
-        #region Construction
+    #region MxCommand members
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public RestartCommand()
-            : base("restart")
-        {
-        }
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
-        #region MxCommand members
-
-        /// <inheritdoc cref="MxCommand.Execute" />
-        public override bool Execute
+    /// <inheritdoc cref="MxCommand.Execute" />
+    public override bool Execute
         (
             MxExecutive executive,
             MxArgument[] arguments
         )
+    {
+        OnBeforeExecute();
+
+        var provider = executive.Provider;
+        if (!provider.IsConnected)
         {
-            OnBeforeExecute();
-
-            if (!executive.Provider.IsConnected)
-            {
-                executive.WriteLine("Not connected");
-                return false;
-            }
-
-            throw new NotImplementedException();
-
-            /*
-
-            ConnectedClient connected = executive.Provider as ConnectedClient;
-            if (!ReferenceEquals(connected, null))
-            {
-                IIrbisConnection connection = connected.Connection;
-                connection.RestartServer();
-                executive.WriteMessage("Server restarted");
-            }
-            OnAfterExecute();
-
-            return true;
-
-            */
+            executive.WriteError ("Not connected");
+            return false;
         }
 
-        #endregion
+        if (!provider.RestartServer())
+        {
+            executive.WriteError ("Can't restart the server");
+            return false;
+        }
 
-        #region Object members
+        executive.WriteOutput ("Server restarted successfully");
 
-        #endregion
+        OnAfterExecute();
+
+        return true;
     }
+
+    #endregion
 }

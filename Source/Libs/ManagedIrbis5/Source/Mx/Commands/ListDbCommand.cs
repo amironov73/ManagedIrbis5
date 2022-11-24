@@ -4,125 +4,93 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
+// ReSharper disable StringLiteralTypo
 
-/* ListDbCommand.cs --
+/* ListDbCommand.cs -- получение списка баз данных
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
-using AM;
 using AM.Collections;
-using AM.IO;
 using AM.Reflection;
-using AM.Runtime;
 
-using ManagedIrbis.Client;
+using ManagedIrbis.Providers;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Mx.Commands
+namespace ManagedIrbis.Mx.Commands;
+
+/// <summary>
+/// Получение списка баз данных.
+/// </summary>
+public sealed class ListDbCommand
+    : MxCommand
 {
+    #region Construction
+
     /// <summary>
-    ///
+    /// Конструктор по умолчанию.
     /// </summary>
-    public sealed class ListDbCommand
-        : MxCommand
+    public ListDbCommand()
+        : base ("listdb")
     {
-        #region Properties
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public ListDbCommand()
-            : base("listdb")
-        {
-        }
-
-        #endregion
-
-        #region MxCommand members
-
-        /// <inheritdoc cref="MxCommand.Execute" />
-        public override bool Execute
-            (
-                MxExecutive executive,
-                MxArgument[] arguments
-            )
-        {
-            OnBeforeExecute();
-
-            if (!executive.Provider.IsConnected)
-            {
-                executive.WriteLine("Not connected");
-                return false;
-            }
-
-            throw new NotImplementedException();
-
-            /*
-
-            string? pattern = null;
-            if (arguments.Length != 0)
-            {
-                pattern = arguments[0].Text;
-            }
-
-            var connected = executive.Provider as ConnectedClient;
-            if (!ReferenceEquals(connected, null))
-            {
-                var connection = connected.Connection;
-                var databases = connection.ListDatabases("dbnam1.mnu")
-                    .OrderBy(db => db.Name).ToArray();
-                var list = new List<DatabaseInfo>();
-                foreach (DatabaseInfo db in databases)
-                {
-                    if (!string.IsNullOrEmpty(pattern)
-                        && !string.IsNullOrEmpty(db.Name))
-                    {
-                        if (!Regex.IsMatch(db.Name, pattern, RegexOptions.IgnoreCase))
-                        {
-                            continue;
-                        }
-                    }
-
-                    list.Add(db);
-                }
-
-                var tablefier = new Tablefier();
-                var output = tablefier.Print(list, "Name", "Description")
-                    .TrimEnd();
-                executive.WriteLine(output);
-            }
-
-            OnAfterExecute();
-
-            return true;
-
-            */
-        }
-
-        #endregion
-
-        #region Object members
-
-        #endregion
+        // пустое тело конструктора
     }
+
+    #endregion
+
+    #region MxCommand members
+
+    /// <inheritdoc cref="MxCommand.Execute" />
+    public override bool Execute
+        (
+            MxExecutive executive,
+            MxArgument[] arguments
+        )
+    {
+        OnBeforeExecute();
+
+        var provider = executive.Provider;
+        if (!provider.IsConnected)
+        {
+            executive.WriteError ("Not connected");
+            return false;
+        }
+
+        // TODO брать имя списка из серверного INI-файла
+
+        const string defaultMenu = "dbnam1.mnu";
+        var menuName = defaultMenu;
+        if (arguments.Length != 0)
+        {
+            menuName = arguments[0].Text;
+        }
+
+        if (string.IsNullOrWhiteSpace (menuName))
+        {
+            menuName = defaultMenu;
+        }
+
+        var databases = provider.ListDatabases (menuName);
+        if (databases.IsNullOrEmpty())
+        {
+            executive.WriteError ("Can't get list of databases");
+            return false;
+        }
+
+        databases = databases.OrderBy (db => db.Name).ToArray();
+        var tablefier = new Tablefier();
+        var output = tablefier.Print (databases, "Name", "Description")
+                .TrimEnd();
+        executive.WriteOutput (output);
+
+        return true;
+    }
+
+    #endregion
 }
