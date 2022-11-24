@@ -21,36 +21,35 @@ using System;
 
 #nullable enable
 
-namespace ManagedIrbis.Mx.Infrastructrure
+namespace ManagedIrbis.Mx.Infrastructrure;
+
+/// <summary>
+/// Generic console for MX.
+/// </summary>
+public interface IMxConsole
 {
     /// <summary>
-    /// Generic console for MX.
+    /// Фон консоли.
     /// </summary>
-    public interface IMxConsole
-    {
-        /// <summary>
-        /// Фон консоли.
-        /// </summary>
-        ConsoleColor BackgroundColor { get; set; }
+    ConsoleColor BackgroundColor { get; set; }
 
-        /// <summary>
-        /// Цвет символов.
-        /// </summary>
-        ConsoleColor ForegroundColor { get; set; }
+    /// <summary>
+    /// Цвет символов.
+    /// </summary>
+    ConsoleColor ForegroundColor { get; set; }
 
-        /// <summary>
-        /// Вывод.
-        /// </summary>
-        void Write(string text);
+    /// <summary>
+    /// Вывод.
+    /// </summary>
+    void Write(string text);
 
-        /// <summary>
-        /// Вввод.
-        /// </summary>
-        string? ReadLine();
+    /// <summary>
+    /// Вввод.
+    /// </summary>
+    string? ReadLine();
 
-        /// <summary>
-        /// Очистка.
-        /// </summary>
-        void Clear();
-    }
+    /// <summary>
+    /// Очистка.
+    /// </summary>
+    void Clear();
 }

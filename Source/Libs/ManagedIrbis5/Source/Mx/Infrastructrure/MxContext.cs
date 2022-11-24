@@ -33,42 +33,40 @@ using AM.Text;
 
 #nullable enable
 
-namespace ManagedIrbis.Mx.Infrastructrure
+namespace ManagedIrbis.Mx.Infrastructrure;
+
+/// <summary>
+///
+/// </summary>
+public sealed class MxContext
 {
+    #region Properties
+
     /// <summary>
-    ///
+    /// Executive.
     /// </summary>
-    public sealed class MxContext
+    public MxExecutive Executive { get; private set; }
+
+    /// <summary>
+    /// Handlers.
+    /// </summary>
+    public List<HandlerInstance> Handlers { get; private set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public MxContext
+        (
+            MxExecutive executive
+        )
     {
-        #region Properties
-
-        /// <summary>
-        /// Executive.
-        /// </summary>
-        public MxExecutive Executive { get; private set; }
-
-        /// <summary>
-        /// Handlers.
-        /// </summary>
-        public List<HandlerInstance> Handlers { get; private set; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public MxContext
-            (
-                MxExecutive executive
-            )
-        {
-            Handlers = new List<HandlerInstance>();
-            Executive = executive;
-        }
-
-        #endregion
-
+        Handlers = new List<HandlerInstance>();
+        Executive = executive;
     }
+
+    #endregion
 }

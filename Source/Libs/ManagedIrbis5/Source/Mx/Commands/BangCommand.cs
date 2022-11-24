@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable StringLiteralTypo
 
 /* BangCommand.cs -- однократное выполнение барсика
  * Ars Magna project, http://arsmagna.ru
@@ -16,8 +17,6 @@ using System.Linq;
 
 using AM;
 using AM.Scripting.Barsik;
-
-using ManagedIrbis.Pft;
 
 #endregion
 
@@ -59,19 +58,51 @@ public sealed class BangCommand
             .SafeTrim().EmptyToNull();
 
         var interpreter = executive.Interpreter;
-        if (string.IsNullOrEmpty (source))
+        var foundScript = BarsikCommand.FindScript (source);
+        if (!string.IsNullOrEmpty (foundScript))
         {
-            new Repl(interpreter).Loop();
+            new BarsikCommand()
+                .Execute
+                    (
+                        executive,
+                        new [] { new MxArgument { Text = source } }
+                    );
         }
         else
         {
-            try
+            var repl = new Repl (interpreter);
+            if (string.IsNullOrEmpty (source))
             {
-                interpreter.Execute (source);
+                var executionResult = repl.Loop();
+                MxUtility.HandleExecutionResult (executive, executionResult);
             }
-            catch (Exception exception)
+            else
             {
-                executive.WriteError (exception.ToString());
+                try
+                {
+                    if (repl.Evaluate (source, out var result))
+                    {
+                        repl.Context.Variables["$$"] = result;
+                        if (repl.Echo)
+                        {
+                            BarsikUtility.PrintObject (repl.Output, result);
+                            repl.Output.WriteLine();
+                        }
+                    }
+                    else
+                    {
+                        repl.Output.ResetCounter();
+                        repl.Execute (source);
+                        if (repl.Output.Counter != 0)
+                        {
+                            repl.Output.WriteLine();
+                        }
+                    }
+                }
+                catch (Exception exception)
+                {
+                    executive.WriteError (exception.ToString());
+                }
             }
         }
 

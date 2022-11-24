@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -14,10 +15,10 @@
 #region Using directives
 
 using System;
+using System.IO;
 using System.Linq;
 
 using AM;
-using AM.Scripting.Barsik;
 
 #endregion
 
@@ -40,6 +41,63 @@ public sealed class BarsikCommand
         : base ("barsik")
     {
         // пустое тело конструктора
+    }
+
+    #endregion
+
+    #region Private members
+
+    internal static string? FindOnPath
+        (
+            string name,
+            params string[] directories
+        )
+    {
+        foreach (var directory in directories)
+        {
+            var candidate = Path.Combine (directory, name);
+            if (File.Exists (candidate))
+            {
+                return candidate;
+            }
+
+            candidate = Path.Combine (directory, name + ".barsik");
+            if (File.Exists (candidate))
+            {
+                return candidate;
+            }
+        }
+
+        return null;
+    }
+
+    internal static string? FindScript
+        (
+            string? name
+        )
+    {
+        if (string.IsNullOrEmpty (name))
+        {
+            return name;
+        }
+
+        if (Path.IsPathRooted (name))
+        {
+            if (File.Exists (name))
+            {
+                return name;
+            }
+
+            name += ".barsik";
+            if (File.Exists (name))
+            {
+                return name;
+            }
+
+            return null;
+        }
+
+        return FindOnPath (name, ".", "scripts");
     }
 
     #endregion
@@ -67,7 +125,15 @@ public sealed class BarsikCommand
         {
             try
             {
-                interpreter.ExecuteFile (fileName);
+                var foundScript = FindScript (fileName);
+                if (string.IsNullOrEmpty (foundScript))
+                {
+                    executive.WriteError ($"Can't find script '{fileName}'");
+                    return false;
+                }
+
+                var executionResult = interpreter.ExecuteFile (foundScript);
+                MxUtility.HandleExecutionResult (executive, executionResult);
             }
             catch (Exception exception)
             {
@@ -81,7 +147,7 @@ public sealed class BarsikCommand
     }
 
     /// <inheritdoc cref="MxCommand.GetShortHelp"/>
-    public override string? GetShortHelp()
+    public override string GetShortHelp()
     {
         return "Execute Barsik script";
     }

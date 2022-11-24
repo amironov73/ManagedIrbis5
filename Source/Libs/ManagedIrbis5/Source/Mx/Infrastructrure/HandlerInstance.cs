@@ -33,47 +33,46 @@ using AM.Text;
 
 #nullable enable
 
-namespace ManagedIrbis.Mx.Infrastructrure
+namespace ManagedIrbis.Mx.Infrastructrure;
+
+/// <summary>
+///
+/// </summary>
+public class HandlerInstance
 {
+    #region Properties
+
     /// <summary>
-    ///
+    /// Handler.
     /// </summary>
-    public class HandlerInstance
+    public MxHandler Handler { get; private set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public HandlerInstance
+        (
+            MxHandler handler
+        )
     {
-        #region Properties
-
-        /// <summary>
-        /// Handler.
-        /// </summary>
-        public MxHandler Handler { get; private set; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public HandlerInstance
-            (
-                MxHandler handler
-            )
-        {
-            Handler = handler;
-        }
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
-        #region Object members
-
-        #endregion
+        Handler = handler;
     }
+
+    #endregion
+
+    #region Private members
+
+    #endregion
+
+    #region Public methods
+
+    #endregion
+
+    #region Object members
+
+    #endregion
 }

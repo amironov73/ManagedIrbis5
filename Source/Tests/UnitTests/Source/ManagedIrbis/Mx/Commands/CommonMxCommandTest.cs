@@ -7,16 +7,15 @@ using ManagedIrbis.Mx;
 
 #nullable enable
 
-namespace UnitTests.ManagedIrbis.Mx.Commands
-{
-    public class CommonMxCommandTest
-        : Common.CommonUnitTest
-    {
-        protected MxExecutive GetExecutive()
-        {
-            var result = new MxExecutive();
+namespace UnitTests.ManagedIrbis.Mx.Commands;
 
-            return result;
-        }
+public class CommonMxCommandTest
+    : Common.CommonUnitTest
+{
+    protected MxExecutive GetExecutive()
+    {
+        var result = new MxExecutive();
+
+        return result;
     }
 }

@@ -7,12 +7,13 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* HistoryCommand.cs --
+/* HistoryCommand.cs -- история поиска, возвращение к предыдущему поиску
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
+using System.Globalization;
 using System.Linq;
 
 using AM;
@@ -21,103 +22,81 @@ using AM;
 
 #nullable enable
 
-namespace ManagedIrbis.Mx.Commands
+namespace ManagedIrbis.Mx.Commands;
+
+/// <summary>
+/// История поиска. Возвращение к предыдущему поиску.
+/// </summary>
+public sealed class HistoryCommand
+    : MxCommand
 {
+    #region Construction
+
     /// <summary>
-    ///
+    /// Конструктор.
     /// </summary>
-    public sealed class HistoryCommand
-        : MxCommand
+    public HistoryCommand()
+        : base ("history")
     {
-        #region Properties
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public HistoryCommand()
-            : base("history")
-        {
-        }
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
-        #region MxCommand members
-
-        /// <inheritdoc cref="MxCommand.Execute" />
-        public override bool Execute
-            (
-                MxExecutive executive,
-                MxArgument[] arguments
-            )
-        {
-            OnBeforeExecute();
-
-            string? command = null;
-            if (arguments.Length != 0)
-            {
-                command = arguments[0].Text;
-            }
-
-            var history = executive.History.ToArray();
-
-            if (string.IsNullOrEmpty(command))
-            {
-                for (var i = 0; i < history.Length; i++)
-                {
-                    executive.WriteMessage($"{i + 1}: {history[i]}");
-                }
-            }
-            else
-            {
-                if (int.TryParse(command, out var index))
-                {
-                    var argument = history.GetOccurrence
-                        (
-                            history.Length - index
-                        );
-                    if (string.IsNullOrEmpty(argument))
-                    {
-                        executive.WriteLine("No such entry");
-                    }
-                    else
-                    {
-                        var searchCommand = executive.Commands
-                            .OfType<SearchCommand>().FirstOrDefault();
-                        if (!ReferenceEquals(searchCommand, null))
-                        {
-                            executive.WriteLine(argument);
-                            MxArgument[] newArguments =
-                            {
-                                new MxArgument { Text = argument }
-                            };
-                            searchCommand.Execute(executive, newArguments);
-                            executive.History.Pop();
-                        }
-                    }
-                }
-            }
-
-            OnAfterExecute();
-
-            return true;
-        }
-
-        #endregion
-
-        #region Object members
-
-        #endregion
+        // пустое тело конструктора
     }
+
+    #endregion
+
+    #region MxCommand members
+
+    /// <inheritdoc cref="MxCommand.Execute" />
+    public override bool Execute
+        (
+            MxExecutive executive,
+            MxArgument[] arguments
+        )
+    {
+        OnBeforeExecute();
+
+        var command = arguments.FirstOrDefault()?.Text
+            .SafeTrim().EmptyToNull();
+
+        var history = executive.History.ToArray();
+
+        if (string.IsNullOrEmpty (command))
+        {
+            for (var i = 0; i < history.Length; i++)
+            {
+                executive.WriteOutput ($"{i + 1}: {history[i]}");
+            }
+        }
+        else
+        {
+            var invariant = CultureInfo.InvariantCulture;
+            if (int.TryParse (command, invariant, out var index))
+            {
+                var argument = history.GetOccurrence
+                    (
+                        history.Length - index
+                    );
+                if (string.IsNullOrEmpty (argument))
+                {
+                    executive.WriteError ("No such entry");
+                }
+                else
+                {
+                    var searchCommand = executive.GetCommand<SearchCommand>();
+                    executive.WriteLine (argument);
+                    var newArguments = new[]
+                    {
+                        new MxArgument { Text = argument }
+                    };
+                    searchCommand.Execute (executive, newArguments);
+                    executive.History.Pop();
+                }
+            }
+        }
+
+        OnAfterExecute();
+
+        return true;
+    }
+
+    #endregion
 }

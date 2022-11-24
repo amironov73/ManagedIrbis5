@@ -9,7 +9,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* FileWriteHandler.cs --
+/* FileWriteHandler.cs -- записывает результат в файл
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -35,144 +35,139 @@ using ManagedIrbis.Mx.Infrastructrure;
 
 #nullable enable
 
-namespace ManagedIrbis.Mx.Handlers
+namespace ManagedIrbis.Mx.Handlers;
+
+/// <summary>
+/// Записывает результат работы команды в файл.
+/// </summary>
+public class FileWriteHandler
+    : MxHandler
 {
+    #region Properties
+
     /// <summary>
-    ///
+    /// Имя файла.
     /// </summary>
-    public class FileWriteHandler
-        : MxHandler
+    public string? FileName { get; set; }
+
+    /// <inheritdoc cref= "MxHandler.Prefix" />
+    public override string Prefix => "|>";
+
+    /// <summary>
+    /// Кодировка.
+    /// </summary>
+    public Encoding? Encoding { get; set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public FileWriteHandler
+        (
+            MxExecutive executive
+        )
+        : base(executive)
     {
-        #region Properties
-
-        /// <summary>
-        /// File name.
-        /// </summary>
-        public string? FileName { get; set; }
-
-        /// <inheritdoc cref= "MxHandler.Prefix" />
-        public override string Prefix
-        {
-            get { return "|>"; }
-        }
-
-        /// <summary>
-        /// Encoding.
-        /// </summary>
-        public Encoding? Encoding { get; set; }
-
-        #endregion
-
-        #region Construction
-
-        #endregion
-
-        #region Private members
-
-        private StreamWriter? _writer;
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
-        #region MxHandler members
-
-        /// <inheritdoc cref="MxHandler.Initialize" />
-        public override void Initialize
-            (
-                MxExecutive executive
-            )
-        {
-            base.Initialize(executive);
-        }
-
-        /// <inheritdoc cref="MxHandler.Parse" />
-        public override void Parse
-            (
-                MxExecutive executive,
-                string? commandLine
-            )
-        {
-            // TODO Implement properly
-
-            FileName = commandLine;
-        }
-
-        /// <inheritdoc cref="MxHandler.BeginOutput" />
-        public override void BeginOutput
-            (
-                MxExecutive executive
-            )
-        {
-            base.BeginOutput(executive);
-
-            Encoding encoding = Encoding ?? Encoding.UTF8;
-
-            if (!ReferenceEquals(_writer, null))
-            {
-                _writer.Dispose();
-                _writer = null;
-            }
-
-            if (!string.IsNullOrEmpty(FileName))
-            {
-                _writer = TextWriterUtility.Create(FileName, encoding);
-            }
-        }
-
-        /// <inheritdoc cref="MxHandler.HandleOutput" />
-        public override void HandleOutput
-            (
-                MxExecutive executive,
-                string? output
-            )
-        {
-            if (!ReferenceEquals(_writer, null)
-                && !string.IsNullOrEmpty(output))
-            {
-                _writer.Write(output);
-            }
-        }
-
-        /// <inheritdoc cref="MxHandler.EndOutput" />
-        public override void EndOutput
-            (
-                MxExecutive executive
-            )
-        {
-            if (!ReferenceEquals(_writer, null))
-            {
-                string output = executive.GetOutput();
-                if (!string.IsNullOrEmpty(output))
-                {
-                    _writer.Write(output);
-                }
-
-                _writer.Dispose();
-                _writer = null;
-            }
-
-            base.EndOutput(executive);
-        }
-
-        /// <inheritdoc cref="MxHandler.Dispose" />
-        public override void Dispose()
-        {
-            if (!ReferenceEquals(_writer, null))
-            {
-                _writer.Dispose();
-                _writer = null;
-            }
-
-            base.Dispose();
-        }
-
-        #endregion
-
-        #region Object members
-
-        #endregion
+        // пустое тело конструктора
     }
+
+    #endregion
+
+    #region Private members
+
+    private StreamWriter? _writer;
+
+    #endregion
+
+    #region Public methods
+
+    #endregion
+
+    #region MxHandler members
+
+    /// <inheritdoc cref="MxHandler.Parse" />
+    public override void Parse
+        (
+            MxExecutive executive,
+            string? commandLine
+        )
+    {
+        // TODO Implement properly
+
+        FileName = commandLine;
+    }
+
+    /// <inheritdoc cref="MxHandler.BeginOutput" />
+    public override void BeginOutput
+        (
+            MxExecutive executive
+        )
+    {
+        base.BeginOutput (executive);
+
+        var encoding = Encoding ?? Encoding.UTF8;
+        _writer?.Dispose();
+        _writer = null;
+
+        if (!string.IsNullOrEmpty (FileName))
+        {
+            _writer = TextWriterUtility.Create (FileName, encoding);
+        }
+    }
+
+    /// <inheritdoc cref="MxHandler.HandleOutput" />
+    public override void HandleOutput
+        (
+            MxExecutive executive,
+            string? output
+        )
+    {
+        if (!ReferenceEquals (_writer, null)
+            && !string.IsNullOrEmpty (output))
+        {
+            _writer.Write (output);
+        }
+    }
+
+    /// <inheritdoc cref="MxHandler.EndOutput" />
+    public override void EndOutput
+        (
+            MxExecutive executive
+        )
+    {
+        if (!ReferenceEquals (_writer, null))
+        {
+            var output = executive.GetOutput();
+            if (!string.IsNullOrEmpty (output))
+            {
+                _writer.Write (output);
+            }
+
+            _writer.Dispose();
+            _writer = null;
+        }
+
+        base.EndOutput (executive);
+    }
+
+    /// <inheritdoc cref="MxHandler.Dispose" />
+    public override void Dispose()
+    {
+        if (!ReferenceEquals (_writer, null))
+        {
+            _writer.Dispose();
+            _writer = null;
+        }
+
+        base.Dispose();
+    }
+
+    #endregion
+
+    #region Object members
+
+    #endregion
 }

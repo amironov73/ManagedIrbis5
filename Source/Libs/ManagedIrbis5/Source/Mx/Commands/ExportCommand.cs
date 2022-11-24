@@ -4,17 +4,17 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
-/* ExportCommand.cs --
+/* ExportCommand.cs -- экспорт найденных записей
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
+using System.Linq;
+
+using AM;
+using AM.Collections;
 using AM.IO;
 
 using ManagedIrbis.Infrastructure;
@@ -24,79 +24,95 @@ using ManagedIrbis.Providers;
 
 #nullable enable
 
-namespace ManagedIrbis.Mx.Commands
+namespace ManagedIrbis.Mx.Commands;
+
+/// <summary>
+/// Экспорт найденных записей.
+/// </summary>
+public sealed class ExportCommand
+    : MxCommand
 {
+    #region Construction
+
     /// <summary>
-    ///
+    /// Конструктор.
     /// </summary>
-    public sealed class ExportCommand
-        : MxCommand
+    public ExportCommand()
+        : base ("export")
     {
-        #region Properties
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public ExportCommand()
-            : base("export")
-        {
-        }
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
-        #region MxCommand members
-
-        /// <inheritdoc cref="MxCommand.Execute" />
-        public override bool Execute
-            (
-                MxExecutive executive,
-                MxArgument[] arguments
-            )
-        {
-            OnBeforeExecute();
-
-            string? fileName = null;
-            if (arguments.Length != 0)
-            {
-                fileName = arguments[0].Text;
-            }
-
-            if (!string.IsNullOrEmpty(fileName))
-            {
-                using var writer = TextWriterUtility.Create(fileName, IrbisEncoding.Utf8);
-                foreach (var mxRecord in executive.Records)
-                {
-                    var record = executive.Provider.ReadRecord(mxRecord.Mfn);
-                    if (!ReferenceEquals(record, null))
-                    {
-                        var text = record.ToPlainText();
-                        writer.Write(text);
-                        writer.WriteLine("*****");
-                    }
-                }
-            }
-
-            OnAfterExecute();
-
-            return true;
-        }
-
-        #endregion
-
-        #region Object members
-
-        #endregion
+        // пустое тело конструктора
     }
+
+    #endregion
+
+    #region MxCommand members
+
+    /// <inheritdoc cref="MxCommand.Execute" />
+    public override bool Execute
+        (
+            MxExecutive executive,
+            MxArgument[] arguments
+        )
+    {
+        // TODO поддержка разных форматов: JSON, XML, ISO
+        // TODO поддержка кодировок: ANSI, KOI, UTF-8
+
+        OnBeforeExecute();
+
+        var provider = executive.Provider;
+        if (!provider.IsConnected)
+        {
+            executive.WriteError ("Not connected");
+            return false;
+        }
+
+        var fileName = arguments.FirstOrDefault()?.Text
+            .SafeTrim().EmptyToNull();
+
+        if (string.IsNullOrEmpty (fileName))
+        {
+            executive.WriteError ("File name required");
+            return false;
+        }
+
+        var records = executive.Records;
+        if (records.IsNullOrEmpty())
+        {
+            executive.WriteError ("No records");
+        }
+
+        var mfns = records.Select (x => x.Mfn);
+        var read = provider.ReadRecords
+            (
+                provider.EnsureDatabase(),
+                mfns
+            );
+        if (read.IsNullOrEmpty())
+        {
+            executive.WriteError ("Can't retrieve records");
+            return false;
+        }
+
+        using var writer = TextWriterUtility.Create (fileName, IrbisEncoding.Utf8);
+        foreach (var record in read)
+        {
+            var text = record.ToPlainText();
+            writer.Write (text);
+            writer.WriteLine ("*****");
+        }
+
+        executive.WriteMessage ($"Records exported {read.Length}");
+
+        OnAfterExecute();
+
+        return true;
+    }
+
+    /// <inheritdoc cref="MxCommand.GetShortHelp"/>
+    public override string GetShortHelp()
+    {
+        return "Export of the found records";
+    }
+
+    #endregion
 }

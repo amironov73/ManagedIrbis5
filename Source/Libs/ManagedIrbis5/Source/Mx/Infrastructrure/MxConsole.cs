@@ -23,51 +23,50 @@ using AM.ConsoleIO;
 
 #nullable enable
 
-namespace ManagedIrbis.Mx.Infrastructrure
+namespace ManagedIrbis.Mx.Infrastructrure;
+
+/// <summary>
+///
+/// </summary>
+public class MxConsole
+    : IMxConsole
 {
-    /// <summary>
-    ///
-    /// </summary>
-    public class MxConsole
-        : IMxConsole
+    #region IMxConsole members
+
+    /// <inheritdoc cref="IMxConsole.BackgroundColor" />
+    public ConsoleColor BackgroundColor
     {
-        #region IMxConsole members
-
-        /// <inheritdoc cref="IMxConsole.BackgroundColor" />
-        public ConsoleColor BackgroundColor
-        {
-            get => ConsoleInput.BackgroundColor;
-            set => ConsoleInput.BackgroundColor = value;
-        }
-
-        /// <inheritdoc cref="IMxConsole.ForegroundColor" />
-        public ConsoleColor ForegroundColor
-        {
-            get => ConsoleInput.ForegroundColor;
-            set => ConsoleInput.ForegroundColor = value;
-        }
-
-        /// <inheritdoc cref="IMxConsole.Write" />
-        public void Write
-            (
-                string text
-            )
-        {
-            ConsoleInput.Write(text);
-        }
-
-        /// <inheritdoc cref="IMxConsole.ReadLine" />
-        public string? ReadLine()
-        {
-            return ConsoleInput.ReadLine();
-        }
-
-        /// <inheritdoc cref="IMxConsole.Clear" />
-        public void Clear()
-        {
-            ConsoleInput.Clear();
-        }
-
-        #endregion
+        get => ConsoleInput.BackgroundColor;
+        set => ConsoleInput.BackgroundColor = value;
     }
+
+    /// <inheritdoc cref="IMxConsole.ForegroundColor" />
+    public ConsoleColor ForegroundColor
+    {
+        get => ConsoleInput.ForegroundColor;
+        set => ConsoleInput.ForegroundColor = value;
+    }
+
+    /// <inheritdoc cref="IMxConsole.Write" />
+    public void Write
+        (
+            string text
+        )
+    {
+        ConsoleInput.Write(text);
+    }
+
+    /// <inheritdoc cref="IMxConsole.ReadLine" />
+    public string? ReadLine()
+    {
+        return ConsoleInput.ReadLine();
+    }
+
+    /// <inheritdoc cref="IMxConsole.Clear" />
+    public void Clear()
+    {
+        ConsoleInput.Clear();
+    }
+
+    #endregion
 }

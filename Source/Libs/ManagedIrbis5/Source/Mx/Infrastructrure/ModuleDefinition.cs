@@ -21,39 +21,38 @@ using System.Text.Json.Serialization;
 
 #nullable enable
 
-namespace ManagedIrbis.Mx.Infrastructrure
+namespace ManagedIrbis.Mx.Infrastructrure;
+
+/// <summary>
+///
+/// </summary>
+public sealed class ModuleDefinition
 {
+    #region Properties
+
     /// <summary>
-    ///
+    /// Name.
     /// </summary>
-    public sealed class ModuleDefinition
-    {
-        #region Properties
+    [JsonPropertyName ("name")]
+    public string? Name { get; set; }
 
-        /// <summary>
-        /// Name.
-        /// </summary>
-        [JsonPropertyName("name")]
-        public string? Name { get; set; }
+    /// <summary>
+    /// Description.
+    /// </summary>
+    [JsonPropertyName ("description")]
+    public string? Description { get; set; }
 
-        /// <summary>
-        /// Description.
-        /// </summary>
-        [JsonPropertyName("description")]
-        public string? Description { get; set; }
+    /// <summary>
+    /// Class name.
+    /// </summary>
+    [JsonPropertyName ("class")]
+    public string? ClassName { get; set; }
 
-        /// <summary>
-        /// Class name.
-        /// </summary>
-        [JsonPropertyName("class")]
-        public string? ClassName { get; set; }
+    /// <summary>
+    /// Assembly path.
+    /// </summary>
+    [JsonPropertyName ("assembly")]
+    public string? AssemblyPath { get; set; }
 
-        /// <summary>
-        /// Assembly path.
-        /// </summary>
-        [JsonPropertyName("assembly")]
-        public string? AssemblyPath { get; set; }
-
-        #endregion
-    }
+    #endregion
 }

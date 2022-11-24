@@ -33,55 +33,54 @@ using AM.Text;
 
 #nullable enable
 
-namespace ManagedIrbis.Mx.Infrastructrure
+namespace ManagedIrbis.Mx.Infrastructrure;
+
+/// <summary>
+///
+/// </summary>
+public sealed class BuiltinModule
+    : MxModule
 {
-    /// <summary>
-    ///
-    /// </summary>
-    public sealed class BuiltinModule
-        : MxModule
+    #region Properties
+
+    #endregion
+
+    #region Construction
+
+    #endregion
+
+    #region Private members
+
+    #endregion
+
+    #region Public methods
+
+    #endregion
+
+    #region MxModule members
+
+    /// <inheritdoc cref="MxModule.Initialize" />
+    public override void Initialize
+        (
+            MxExecutive executive
+        )
     {
-        #region Properties
-
-        #endregion
-
-        #region Construction
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
-        #region MxModule members
-
-        /// <inheritdoc cref="MxModule.Initialize" />
-        public override void Initialize
-            (
-                MxExecutive executive
-            )
-        {
-            base.Initialize(executive);
-        }
-
-        #endregion
-
-        #region IDisposable members
-
-        /// <inheritdoc cref="IDisposable.Dispose" />
-        public override void Dispose()
-        {
-            base.Dispose();
-        }
-
-        #endregion
-
-        #region Object members
-
-        #endregion
+        base.Initialize(executive);
     }
+
+    #endregion
+
+    #region IDisposable members
+
+    /// <inheritdoc cref="IDisposable.Dispose" />
+    public override void Dispose()
+    {
+        base.Dispose();
+    }
+
+    #endregion
+
+    #region Object members
+
+    #endregion
 }

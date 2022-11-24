@@ -12,8 +12,10 @@
 #region Using directives
 
 using AM;
+using AM.Scripting.Barsik;
 
 using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Mx.Commands;
 
 #endregion
 
@@ -27,6 +29,30 @@ namespace ManagedIrbis.Mx;
 public static class MxUtility
 {
     #region Public methods
+
+    /// <summary>
+    /// Обработка результатов исполнения Барсик-скрипта.
+    /// </summary>
+    public static void HandleExecutionResult
+        (
+            MxExecutive executive,
+            ExecutionResult executionResult
+        )
+    {
+        if (executionResult.ExitRequested)
+        {
+            new ExitCommand().Execute
+                (
+                    executive,
+                    MxArgument.Empty
+                );
+        }
+
+        if (!string.IsNullOrEmpty (executionResult.Message))
+        {
+            executive.WriteError (executionResult.Message);
+        }
+    }
 
     /// <summary>
     /// Разбор файловой спецификации.

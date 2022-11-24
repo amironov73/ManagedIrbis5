@@ -22,64 +22,63 @@ using System.Text.Json.Serialization;
 
 #nullable enable
 
-namespace ManagedIrbis.Mx.Infrastructrure
+namespace ManagedIrbis.Mx.Infrastructrure;
+
+/// <summary>
+///
+/// </summary>
+public sealed class MxPalette
 {
+    #region Properties
+
     /// <summary>
-    ///
+    /// Фон.
     /// </summary>
-    public sealed class MxPalette
+    [JsonPropertyName("background")]
+    public ConsoleColor Background { get; set; }
+
+    /// <summary>
+    /// Цвет символов по умолчанию.
+    /// </summary>
+    [JsonPropertyName("foreground")]
+    public ConsoleColor Foreground { get; set; }
+
+    /// <summary>
+    /// Вводимые пользователем команды.
+    /// </summary>
+    [JsonPropertyName("command")]
+    public ConsoleColor Command { get; set; }
+
+    /// <summary>
+    /// Служебные сообщения.
+    /// </summary>
+    [JsonPropertyName("message")]
+    public ConsoleColor Message { get; set; }
+
+    /// <summary>
+    /// Сообщения об ошибках.
+    /// </summary>
+    [JsonPropertyName("error")]
+    public ConsoleColor Error { get; set; }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Палитра по умолчанию.
+    /// </summary>
+    public static MxPalette GetDefaultPalette()
     {
-        #region Properties
-
-        /// <summary>
-        /// Фон.
-        /// </summary>
-        [JsonPropertyName("background")]
-        public ConsoleColor Background { get; set; }
-
-        /// <summary>
-        /// Цвет символов по умолчанию.
-        /// </summary>
-        [JsonPropertyName("foreground")]
-        public ConsoleColor Foreground { get; set; }
-
-        /// <summary>
-        /// Вводимые пользователем команды.
-        /// </summary>
-        [JsonPropertyName("command")]
-        public ConsoleColor Command { get; set; }
-
-        /// <summary>
-        /// Служебные сообщения.
-        /// </summary>
-        [JsonPropertyName("message")]
-        public ConsoleColor Message { get; set; }
-
-        /// <summary>
-        /// Сообщения об ошибках.
-        /// </summary>
-        [JsonPropertyName("error")]
-        public ConsoleColor Error { get; set; }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Палитра по умолчанию.
-        /// </summary>
-        public static MxPalette GetDefaultPalette()
+        return new MxPalette
         {
-            return new MxPalette
-            {
-                Background = ConsoleColor.Black,
-                Foreground = ConsoleColor.Gray,
-                Command = ConsoleColor.White,
-                Message = ConsoleColor.Green,
-                Error = ConsoleColor.Red
-            };
-        }
-
-        #endregion
+            Background = ConsoleColor.Black,
+            Foreground = ConsoleColor.Gray,
+            Command = ConsoleColor.White,
+            Message = ConsoleColor.Green,
+            Error = ConsoleColor.Red
+        };
     }
+
+    #endregion
 }

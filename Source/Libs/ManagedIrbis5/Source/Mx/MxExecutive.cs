@@ -32,6 +32,7 @@ using AM.Text;
 
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Mx.Commands;
+using ManagedIrbis.Mx.Handlers;
 using ManagedIrbis.Mx.Infrastructrure;
 using ManagedIrbis.Pft.Infrastructure;
 using ManagedIrbis.Providers;
@@ -143,6 +144,11 @@ public sealed class MxExecutive
     /// </summary>
     public static Version Version => ClientVersion.Version;
 
+    /// <summary>
+    /// Приглашение.
+    /// </summary>
+    public string? Prompt { get; set; }
+
     #endregion
 
     #region Construction
@@ -157,6 +163,7 @@ public sealed class MxExecutive
         VerbosityLevel = 3;
         DescriptionFormat = "@brief";
 
+        Prompt = "$ ";
         Aliases = new CaseInsensitiveDictionary<string>();
         MxConsole = new MxConsole();
         Palette = MxPalette.GetDefaultPalette();
@@ -178,6 +185,7 @@ public sealed class MxExecutive
 
         _CreateStandardCommands();
         _InitializeCommands();
+        _CreateStandardHandlers();
     }
 
     #endregion
@@ -209,6 +217,7 @@ public sealed class MxExecutive
                     new CsCommand(),
                     new CsFileCommand(),
                     new DbCommand(),
+                    new DeleteCommand(),
                     new DirCommand(),
                     new DisconnectCommand(),
                     new ExitCommand(),
@@ -221,12 +230,14 @@ public sealed class MxExecutive
                     new ListCommand(),
                     new ListDbCommand(),
                     new ListUsersCommand(),
+                    new LockCommand(),
                     new ModuleCommand(),
                     new NopCommand(),
                     new PftCommand(),
                     new PingCommand(),
                     new PocketCommand(),
                     new PrintCommand(),
+                    new ReconnectCommand(),
                     new RefineCommand(),
                     new RestartCommand(),
                     new SearchCommand(),
@@ -237,6 +248,12 @@ public sealed class MxExecutive
                     new VerCommand()
                 }
             );
+    }
+
+    private void _CreateStandardHandlers()
+    {
+        Handlers.Add (new FileWriteHandler (this));
+        Handlers.Add (new FileWriteHandler (this));
     }
 
     private void _DisposeCommands()
@@ -461,7 +478,6 @@ public sealed class MxExecutive
         }
 
         var navigator = new TextNavigator (text);
-
         while (!navigator.IsEOF)
         {
             if (!_ExecuteLine (navigator))
@@ -516,6 +532,8 @@ public sealed class MxExecutive
             string name
         )
     {
+        Sure.NotNullNorEmpty (name);
+
         return Commands.FirstOrDefault (c => c.Name.SameString (name));
     }
 
@@ -608,6 +626,7 @@ public sealed class MxExecutive
 
         while (!StopFlag)
         {
+            Write (Prompt);
             var line = ReadLine();
             ExecuteLine (line);
             WriteLine (string.Empty);
@@ -641,6 +660,20 @@ public sealed class MxExecutive
     {
         MxConsole.Write (text);
         MxConsole.Write (Environment.NewLine);
+    }
+
+    /// <summary>
+    /// Вывод простого текста.
+    /// </summary>
+    public void Write
+        (
+            string? text
+        )
+    {
+        if (!string.IsNullOrEmpty (text))
+        {
+            MxConsole.Write (text);
+        }
     }
 
     /// <summary>

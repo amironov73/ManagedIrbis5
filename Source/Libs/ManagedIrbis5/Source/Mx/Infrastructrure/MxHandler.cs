@@ -33,95 +33,102 @@ using AM.Text;
 
 #nullable enable
 
-namespace ManagedIrbis.Mx.Infrastructrure
+namespace ManagedIrbis.Mx.Infrastructrure;
+
+/// <summary>
+///
+/// </summary>
+public abstract class MxHandler
+    : IDisposable
 {
+    #region Properties
+
     /// <summary>
-    ///
+    /// Исполняющая система.
     /// </summary>
-    public abstract class MxHandler
-        : IDisposable
+    public MxExecutive Executive { get; }
+
+    /// <summary>
+    /// Prefix.
+    /// </summary>
+    public abstract string Prefix { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    protected MxHandler
+        (
+            MxExecutive executive
+        )
     {
-        #region Properties
+        Sure.NotNull (executive);
 
-        /// <summary>
-        /// Prefix.
-        /// </summary>
-        public abstract string Prefix { get; }
-
-        #endregion
-
-        #region Construction
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Initialize the handler.
-        /// </summary>
-        public virtual void Initialize
-            (
-                MxExecutive executive
-            )
-        {
-        }
-
-        /// <summary>
-        /// Parse the command line.
-        /// </summary>
-        public abstract void Parse
-            (
-                MxExecutive executive,
-                string? commandLine
-            );
-
-        /// <summary>
-        /// Begin output.
-        /// </summary>
-        public virtual void BeginOutput
-            (
-                MxExecutive executive
-            )
-        {
-        }
-
-        /// <summary>
-        /// Handle output.
-        /// </summary>
-        public abstract void HandleOutput
-            (
-                MxExecutive executive,
-                string? output
-            );
-
-        /// <summary>
-        /// End output.
-        /// </summary>
-        public virtual void EndOutput
-            (
-                MxExecutive executive
-            )
-        {
-        }
-
-        #endregion
-
-        #region IDisposable members
-
-        /// <inheritdoc cref="IDisposable.Dispose" />
-        public virtual void Dispose()
-        {
-            // Nothing to do here
-        }
-
-        #endregion
-
-        #region Object members
-
-        #endregion
+        Executive = executive;
     }
+
+    #endregion
+
+    #region Private members
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Parse the command line.
+    /// </summary>
+    public abstract void Parse
+        (
+            MxExecutive executive,
+            string? commandLine
+        );
+
+    /// <summary>
+    /// Begin output.
+    /// </summary>
+    public virtual void BeginOutput
+        (
+            MxExecutive executive
+        )
+    {
+    }
+
+    /// <summary>
+    /// Handle output.
+    /// </summary>
+    public abstract void HandleOutput
+        (
+            MxExecutive executive,
+            string? output
+        );
+
+    /// <summary>
+    /// End output.
+    /// </summary>
+    public virtual void EndOutput
+        (
+            MxExecutive executive
+        )
+    {
+    }
+
+    #endregion
+
+    #region IDisposable members
+
+    /// <inheritdoc cref="IDisposable.Dispose" />
+    public virtual void Dispose()
+    {
+        // Nothing to do here
+    }
+
+    #endregion
+
+    #region Object members
+
+    #endregion
 }

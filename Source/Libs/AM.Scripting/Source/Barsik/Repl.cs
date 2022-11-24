@@ -75,7 +75,7 @@ public sealed class Repl
     /// <summary>
     /// Абстракция стандартного вывода.
     /// </summary>
-    public AttentiveWriter Output => (AttentiveWriter)Context.Output;
+    public AttentiveWriter Output => (AttentiveWriter) Context.Output;
 
     /// <summary>
     /// Абстракция потока ошибок.

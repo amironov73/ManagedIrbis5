@@ -21,36 +21,35 @@ using System;
 
 #nullable enable
 
-namespace ManagedIrbis.Mx.Infrastructrure
+namespace ManagedIrbis.Mx.Infrastructrure;
+
+/// <summary>
+///
+/// </summary>
+public abstract class MxModule
+    : IDisposable
 {
+    #region Public methods
+
     /// <summary>
-    ///
+    /// Initialize the module.
     /// </summary>
-    public abstract class MxModule
-        : IDisposable
+    public virtual void Initialize
+        (
+            MxExecutive executive
+        )
     {
-        #region Public methods
-
-        /// <summary>
-        /// Initialize the module.
-        /// </summary>
-        public virtual void Initialize
-            (
-                MxExecutive executive
-            )
-        {
-        }
-
-        #endregion
-
-        #region IDisposable members
-
-        /// <inheritdoc cref="IDisposable.Dispose" />
-        public virtual void Dispose()
-        {
-            // Nothing to do here
-        }
-
-        #endregion
     }
+
+    #endregion
+
+    #region IDisposable members
+
+    /// <inheritdoc cref="IDisposable.Dispose" />
+    public virtual void Dispose()
+    {
+        // Nothing to do here
+    }
+
+    #endregion
 }

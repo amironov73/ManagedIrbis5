@@ -28,40 +28,46 @@ using AM.Collections;
 using AM.IO;
 using AM.Runtime;
 
+using Google.Protobuf.WellKnownTypes;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Mx
+namespace ManagedIrbis.Mx;
+
+/// <summary>
+///
+/// </summary>
+public sealed class MxArgument
 {
+    #region Properties
+
     /// <summary>
-    ///
+    /// Пустой массив аргументов.
     /// </summary>
-    public sealed class MxArgument
-    {
-        #region Properties
+    public static readonly MxArgument[] Empty = Array.Empty<MxArgument>();
 
-        /// <summary>
-        /// Text of the argument.
-        /// </summary>
-        public string? Text { get; set; }
+    /// <summary>
+    /// Text of the argument.
+    /// </summary>
+    public string? Text { get; set; }
 
-        #endregion
+    #endregion
 
-        #region Construction
+    #region Construction
 
-        #endregion
+    #endregion
 
-        #region Private members
+    #region Private members
 
-        #endregion
+    #endregion
 
-        #region Public methods
+    #region Public methods
 
-        #endregion
+    #endregion
 
-        #region Object members
+    #region Object members
 
-        #endregion
-    }
+    #endregion
 }

@@ -35,76 +35,87 @@ using ManagedIrbis.Mx.Infrastructrure;
 
 #nullable enable
 
-namespace ManagedIrbis.Mx.Handlers
+namespace ManagedIrbis.Mx.Handlers;
+
+/// <summary>
+///
+/// </summary>
+public sealed class FileAppendHandler
+    : FileWriteHandler
 {
-    /// <summary>
-    ///
-    /// </summary>
-    public sealed class FileAppendHandler
-        : FileWriteHandler
+    #region Properties
+
+    /// <inheritdoc cref= "FileWriteHandler.Prefix" />
+    public override string Prefix
     {
-        #region Properties
-
-        /// <inheritdoc cref= "FileWriteHandler.Prefix" />
-        public override string Prefix
-        {
-            get { return "|>>"; }
-        }
-
-        #endregion
-
-        #region Construction
-
-        #endregion
-
-        #region Private members
-
-        private StreamWriter? _writer;
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
-        #region MxHandler members
-
-        /// <inheritdoc cref="FileWriteHandler.BeginOutput" />
-        public override void BeginOutput
-            (
-                MxExecutive executive
-            )
-        {
-            Encoding encoding = Encoding ?? Encoding.UTF8;
-
-            if (!ReferenceEquals(_writer, null))
-            {
-                _writer.Dispose();
-                _writer = null;
-            }
-
-            if (!string.IsNullOrEmpty(FileName))
-            {
-                _writer = TextWriterUtility.Append(FileName, encoding);
-            }
-        }
-
-        /// <inheritdoc cref="MxHandler.Dispose" />
-        public override void Dispose()
-        {
-            if (!ReferenceEquals(_writer, null))
-            {
-                _writer.Dispose();
-                _writer = null;
-            }
-
-            base.Dispose();
-        }
-
-        #endregion
-
-        #region Object members
-
-        #endregion
+        get { return "|>>"; }
     }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public FileAppendHandler
+        (
+            MxExecutive executive
+        )
+        : base (executive)
+    {
+        // пустое тело конструктора
+    }
+
+    #endregion
+
+    #region Private members
+
+    private StreamWriter? _writer;
+
+    #endregion
+
+    #region Public methods
+
+    #endregion
+
+    #region MxHandler members
+
+    /// <inheritdoc cref="FileWriteHandler.BeginOutput" />
+    public override void BeginOutput
+        (
+            MxExecutive executive
+        )
+    {
+        var encoding = Encoding ?? Encoding.UTF8;
+
+        if (!ReferenceEquals(_writer, null))
+        {
+            _writer.Dispose();
+            _writer = null;
+        }
+
+        if (!string.IsNullOrEmpty(FileName))
+        {
+            _writer = TextWriterUtility.Append(FileName, encoding);
+        }
+    }
+
+    /// <inheritdoc cref="MxHandler.Dispose" />
+    public override void Dispose()
+    {
+        if (!ReferenceEquals(_writer, null))
+        {
+            _writer.Dispose();
+            _writer = null;
+        }
+
+        base.Dispose();
+    }
+
+    #endregion
+
+    #region Object members
+
+    #endregion
 }
