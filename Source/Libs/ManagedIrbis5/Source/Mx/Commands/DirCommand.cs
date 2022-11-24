@@ -4,10 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 /* DirCommand.cs -- получение списка файлов на сервере по маске
  * Ars Magna project, http://arsmagna.ru
@@ -18,8 +14,6 @@
 using System;
 
 using AM.Collections;
-
-using ManagedIrbis.Infrastructure;
 
 #endregion
 
@@ -65,23 +59,12 @@ public sealed class DirCommand
 
         // TODO обрабатывать несколько спецификаций
 
-        var fileName = "*.*";
-        if (arguments.Length != 0)
+        var specification = MxUtility.ParseFileSpecification (executive, arguments);
+        if (specification is null)
         {
-            fileName = arguments[0].Text;
+            return false;
         }
 
-        if (string.IsNullOrEmpty (fileName))
-        {
-            fileName = "*.*";
-        }
-
-        if (!FileSpecification.TryParse (fileName, out _))
-        {
-            fileName = "2." + executive.Provider.Database + "." + fileName;
-        }
-
-        var specification = FileSpecification.Parse (fileName);
         var found = executive.Provider.ListFiles (specification);
         if (found.IsNullOrEmpty())
         {

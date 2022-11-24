@@ -4,43 +4,65 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
-/* MxUtility.cs --
+/* MxUtility.cs -- полезные методы для интерпретатора MX
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
+
+using ManagedIrbis.Infrastructure;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Mx
-{
-    /// <summary>
-    /// Utility methods for MX interpreter.
-    /// </summary>
-    public static class MxUtility
-    {
-        #region Properties
+namespace ManagedIrbis.Mx;
 
-        #endregion
+/// <summary>
+/// Полезные методы для интерпретатора MX.
+/// </summary>
+public static class MxUtility
+{
+    #region Public methods
+
+    /// <summary>
+    /// Разбор файловой спецификации.
+    /// </summary>
+    public static FileSpecification? ParseFileSpecification
+        (
+            MxExecutive executive,
+            MxArgument[] arguments
+        )
+
+    {
+        // TODO сделать поддержку множественной спецификации
+
+        Sure.NotNull (executive);
+        Sure.NotNull (arguments);
+
+        var fileName = "*.*";
+        if (arguments.Length != 0)
+        {
+            fileName = arguments[0].Text;
+        }
+
+        if (string.IsNullOrEmpty (fileName))
+        {
+            fileName = "*.*";
+        }
+
+        if (!FileSpecification.TryParse (fileName, out _))
+        {
+            fileName = "2." + executive.Provider.Database + "." + fileName;
+        }
+
+        var result = FileSpecification.Parse (fileName);
+
+        return result;
     }
+
+    #endregion
 }

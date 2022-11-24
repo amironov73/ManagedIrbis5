@@ -48,8 +48,15 @@ public sealed class NopCommand
 
         OnBeforeExecute();
 
+        var provider = executive.Provider;
+        if (!provider.IsConnected)
+        {
+            executive.WriteError ("Not connected");
+            return false;
+        }
+
         executive.WriteLine ("NOP");
-        executive.Provider.NoOperation();
+        provider.NoOperation();
 
         OnAfterExecute();
 

@@ -4,59 +4,55 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
-/* DisconnectCommand.cs --
+/* DisconnectCommand.cs -- отключение от сервера
  * Ars Magna project, http://arsmagna.ru
  */
 
-#region Using directives
-
-#endregion
-
 #nullable enable
 
-namespace ManagedIrbis.Mx.Commands
+namespace ManagedIrbis.Mx.Commands;
+
+/// <summary>
+/// Отключение от сервера.
+/// </summary>
+public sealed class DisconnectCommand
+    : MxCommand
 {
+    #region Construction
+
     /// <summary>
-    ///
+    /// Конструктор по умолчанию.
     /// </summary>
-    public sealed class DisconnectCommand
-        : MxCommand
+    public DisconnectCommand()
+        : base ("disconnect")
     {
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public DisconnectCommand()
-            : base("Disconnect")
-        {
-        }
-
-        #endregion
-
-        #region MxCommand members
-
-        /// <inheritdoc cref="MxCommand.Execute" />
-        public override bool Execute
-            (
-                MxExecutive executive,
-                MxArgument[] arguments
-            )
-        {
-            OnBeforeExecute();
-
-            executive.Provider.Dispose();
-            executive.WriteMessage("Disconnected");
-
-            OnAfterExecute();
-
-            return true;
-        }
-
-        #endregion
+        // пустое тело конструктора
     }
-}
 
+    #endregion
+
+    #region MxCommand members
+
+    /// <inheritdoc cref="MxCommand.Execute" />
+    public override bool Execute
+        (
+            MxExecutive executive,
+            MxArgument[] arguments
+        )
+    {
+        OnBeforeExecute();
+
+        if (executive.Provider.IsConnected)
+        {
+            executive.Provider.Dispose();
+            executive.WriteMessage ("disconnected");
+        }
+
+        OnAfterExecute();
+
+        return true;
+    }
+
+    #endregion
+}

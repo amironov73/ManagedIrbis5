@@ -7,104 +7,81 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* InfoCommand.cs --
+/* InfoCommand.cs -- получение информации о сервере: нагрузка и прочее
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using AM;
-using AM.Collections;
-using AM.IO;
 using AM.Reflection;
-using AM.Runtime;
-
-using ManagedIrbis.Client;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Mx.Commands
+namespace ManagedIrbis.Mx.Commands;
+
+/// <summary>
+/// Получение информации о сервере: нагрузка и прочее.
+/// </summary>
+public sealed class InfoCommand
+    : MxCommand
 {
+    #region Construction
+
     /// <summary>
-    ///
+    /// Конструктор по умолчанию.
     /// </summary>
-    public sealed class InfoCommand
-        : MxCommand
+    public InfoCommand()
+        : base ("info")
     {
-        #region Construction
+        // пустое тело конструктора
+    }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public InfoCommand()
-            : base("info")
+    #endregion
+
+    #region MxCommand members
+
+    /// <inheritdoc cref="MxCommand.Execute" />
+    public override bool Execute
+        (
+            MxExecutive executive,
+            MxArgument[] arguments
+        )
+    {
+        OnBeforeExecute();
+
+        var provider = executive.Provider;
+        if (!provider.IsConnected)
         {
+            executive.WriteError ("Not connected");
+            return false;
         }
 
-        #endregion
-
-        #region MxCommand members
-
-        /// <inheritdoc cref="MxCommand.Execute" />
-        public override bool Execute
-            (
-                MxExecutive executive,
-                MxArgument[] arguments
-            )
+        var serverStat = provider.GetServerStat();
+        if (serverStat is null)
         {
-            OnBeforeExecute();
+            executive.WriteError ("Can't get server info");
 
-            if (!executive.Provider.IsConnected)
-            {
-                executive.WriteLine("Not connected");
-                return false;
-            }
-
-            throw new NotImplementedException();
-
-            /*
-
-            var connected = executive.Provider as ConnectedClient;
-            if (!ReferenceEquals(connected, null))
-            {
-                IIrbisConnection connection = connected.Connection;
-                var serverStat = connection.GetServerStat();
-                //executive.WriteLine(serverStat.ToString());
-
-                var clients = serverStat.RunningClients;
-                if (clients is not null)
-                {
-                    var tablefier = new Tablefier();
-                    string[] properties =
-                    {
-                        "IPAddress", "Name", "ID", "Workstation", "Registered",
-                        "Acknowledged", "LastCommand", "CommandNumber"
-                    };
-                    var output = tablefier.Print(clients, properties)
-                        .TrimEnd();
-                    executive.WriteLine(output);
-                }
-            }
-
-            OnAfterExecute();
-
-            return true;
-
-            */
+            return false;
         }
 
-        #endregion
+        var clients = serverStat.RunningClients;
+        if (clients is not null)
+        {
+            var tablefier = new Tablefier();
+            string[] properties =
+            {
+                "IPAddress", "Name", "ID", "Workstation", "Registered",
+                "Acknowledged", "LastCommand", "CommandNumber"
+            };
+            var output = tablefier.Print (clients, properties)
+                .TrimEnd();
+            executive.WriteOutput (output);
+        }
 
-    } // class InfoCommand
+        return true;
+    }
 
-} // namespace ManagedIrbis.Mx.Commands
+    #endregion
+}

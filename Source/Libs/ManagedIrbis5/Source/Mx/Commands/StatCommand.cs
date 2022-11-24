@@ -40,7 +40,7 @@ public sealed class StatCommand
     /// Constructor.
     /// </summary>
     public StatCommand()
-        : base("stat")
+        : base ("stat")
     {
     }
 
@@ -59,7 +59,7 @@ public sealed class StatCommand
 
         if (!executive.Provider.IsConnected)
         {
-            executive.WriteLine("Not connected");
+            executive.WriteLine ("Not connected");
             return false;
         }
 

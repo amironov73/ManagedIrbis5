@@ -29,7 +29,7 @@ public sealed class ExitCommand
     /// Конструктор по умолчанию.
     /// </summary>
     public ExitCommand()
-        : base ("Exit")
+        : base ("exit")
     {
         // пустое тело конструктора
     }

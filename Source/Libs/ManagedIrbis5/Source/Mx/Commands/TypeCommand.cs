@@ -4,89 +4,65 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
-/* TypeCommand.cs --
+/* TypeCommand.cs -- вывод на экран содержимого файла
  * Ars Magna project, http://arsmagna.ru
  */
 
-#region Using directives
-
-using ManagedIrbis.Infrastructure;
-
-#endregion
-
 #nullable enable
 
-namespace ManagedIrbis.Mx.Commands
+namespace ManagedIrbis.Mx.Commands;
+
+/// <summary>
+/// Вывод на экран содержимого файла.
+/// </summary>
+public sealed class TypeCommand
+    : MxCommand
 {
+    #region Construction
+
     /// <summary>
-    ///
+    /// Конструктор по умолчанию.
     /// </summary>
-    public sealed class TypeCommand
-        : MxCommand
+    public TypeCommand()
+        : base ("type")
     {
-        #region Properties
+        // пустое тело конструктора
+    }
 
-        #endregion
+    #endregion
 
-        #region Construction
+    #region MxCommand members
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public TypeCommand()
-            : base("type")
-        {
-        }
-
-        #endregion
-
-        #region MxCommand members
-
-        /// <inheritdoc cref="MxCommand.Execute" />
-        public override bool Execute
+    /// <inheritdoc cref="MxCommand.Execute" />
+    public override bool Execute
         (
             MxExecutive executive,
             MxArgument[] arguments
         )
+    {
+        OnBeforeExecute();
+
+        if (!executive.Provider.IsConnected)
         {
-            OnBeforeExecute();
-
-            if (!executive.Provider.IsConnected)
-            {
-                executive.WriteLine("Not connected");
-                return false;
-            }
-
-            string? fileName = null;
-            if (arguments.Length != 0)
-            {
-                fileName = arguments[0].Text;
-            }
-
-            if (!string.IsNullOrEmpty(fileName))
-            {
-                var specification = new FileSpecification
-                {
-                    Database = executive.Provider.Database,
-                    Path = IrbisPath.MasterFile,
-                    FileName = fileName
-                };
-                var result = executive.Provider.ReadTextFile(specification)
-                    ?? string.Empty;
-                executive.WriteLine(result);
-            }
-
-            OnAfterExecute();
-
-            return true;
+            executive.WriteError ("Not connected");
+            return false;
         }
 
-        #endregion
+        var specification = MxUtility.ParseFileSpecification (executive, arguments);
+        if (specification is null)
+        {
+            return false;
+        }
 
+        var result = executive.Provider.ReadTextFile (specification)
+                     ?? "<EMPTY>";
+        executive.WriteOutput (result);
+
+        OnAfterExecute();
+
+        return true;
     }
+
+    #endregion
 }
