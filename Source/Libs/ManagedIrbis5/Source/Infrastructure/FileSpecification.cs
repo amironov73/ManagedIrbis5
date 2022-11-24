@@ -21,6 +21,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 
 using AM;
 using AM.IO;
@@ -168,6 +169,43 @@ public sealed class FileSpecification
         return result;
     }
 
+    /// <summary>
+    /// Попытка разобрать спецификацию файла.
+    /// </summary>
+    public static bool TryParse
+        (
+            string text,
+            out FileSpecification specification
+        )
+    {
+        specification = new FileSpecification();
+
+        if (string.IsNullOrWhiteSpace (text))
+        {
+            return false;
+        }
+
+        var navigator = new TextNavigator (text);
+        var path = navigator.ReadWhile ('0', '1', '2',
+                '3', '4', '5', '6', '7', '8', '9');
+        var invariant = CultureInfo.InvariantCulture;
+        if (!int.TryParse (path.Span, invariant, out var number))
+        {
+            return false;
+        }
+
+        var possibleValues = Enum.GetValues (typeof (IrbisPath))
+            .Cast<int>().ToArray();
+        if (!possibleValues.Contains (number))
+        {
+            return false;
+        }
+
+        specification = Parse (text);
+
+        return true;
+    }
+
     #endregion
 
     #region IHandmadeSerializable members
@@ -213,7 +251,7 @@ public sealed class FileSpecification
             bool throwOnError
         )
     {
-        Verifier<FileSpecification> verifier = new Verifier<FileSpecification>
+        var verifier = new Verifier<FileSpecification>
             (
                 this,
                 throwOnError
@@ -229,7 +267,7 @@ public sealed class FileSpecification
         }
 
         return verifier.Result;
-    } // method Verify
+    }
 
     #endregion
 
@@ -249,7 +287,7 @@ public sealed class FileSpecification
         return Path == other.Path
                && _CompareDatabases (Database, other.Database)
                && FileName.SameString (other.FileName);
-    } // method Equals
+    }
 
     /// <inheritdoc cref="object.Equals(object)" />
     public override bool Equals
@@ -268,7 +306,7 @@ public sealed class FileSpecification
         }
 
         return obj is FileSpecification other && Equals (other);
-    } // method Equals
+    }
 
     /// <inheritdoc cref="object.GetHashCode" />
     [ExcludeFromCodeCoverage]
@@ -282,7 +320,7 @@ public sealed class FileSpecification
 
             return hashCode;
         }
-    } // method GetHashCode
+    }
 
     /// <inheritdoc cref="object.ToString" />
     public override string ToString()

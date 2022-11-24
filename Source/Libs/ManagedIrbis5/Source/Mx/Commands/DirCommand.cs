@@ -9,112 +9,97 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* DirCommand.cs --
+/* DirCommand.cs -- получение списка файлов на сервере по маске
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-using AM;
 using AM.Collections;
-using AM.IO;
-using AM.Runtime;
 
-using ManagedIrbis.Client;
 using ManagedIrbis.Infrastructure;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Mx.Commands
+namespace ManagedIrbis.Mx.Commands;
+
+/// <summary>
+/// Получение списка файлов на сервере по маске.
+/// </summary>
+public sealed class DirCommand
+    : MxCommand
 {
+    #region Construction
+
     /// <summary>
-    ///
+    /// Конструктор.
     /// </summary>
-    public sealed class DirCommand
-        : MxCommand
+    public DirCommand()
+        : base ("dir")
     {
-        #region Construction
+        // пустое тело конструктора
+    }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public DirCommand()
-            : base("dir")
-        {
-        }
+    #endregion
 
-        #endregion
+    #region MxCommand members
 
-        #region MxCommand members
-
-        /// <inheritdoc cref="MxCommand.Execute" />
-        public override bool Execute
+    /// <inheritdoc cref="MxCommand.Execute" />
+    public override bool Execute
         (
             MxExecutive executive,
             MxArgument[] arguments
         )
+    {
+        OnBeforeExecute();
+
+        if (!executive.Provider.IsConnected)
         {
-            OnBeforeExecute();
-
-            if (!executive.Provider.IsConnected)
-            {
-                executive.WriteLine("Not connected");
-                return false;
-            }
-
-            var fileName = "*.*";
-            if (arguments.Length != 0)
-            {
-                fileName = arguments[0].Text;
-            }
-
-            if (string.IsNullOrEmpty(fileName))
-            {
-                fileName = "*.*";
-            }
-
-            throw new NotImplementedException();
-
-            /*
-
-            ConnectedClient connected = executive.Provider as ConnectedClient;
-            if (!ReferenceEquals(connected, null))
-            {
-                var connection = connected.Connection;
-                var specification = new FileSpecification
-                    {
-                        Path = IrbisPath.MasterFile,
-                        Database = connection.Database,
-                        FileName = fileName
-                    };
-                string[] list = connection.ListFiles(specification);
-                foreach (string file in list)
-                {
-                    executive.WriteLine(file);
-                }
-            }
-
-            OnAfterExecute();
-
-            return true;
-
-            */
+            executive.WriteError ("Not connected");
+            return false;
         }
 
-        #endregion
+        // TODO обрабатывать несколько спецификаций
 
-        #region Object members
+        var fileName = "*.*";
+        if (arguments.Length != 0)
+        {
+            fileName = arguments[0].Text;
+        }
 
-        #endregion
+        if (string.IsNullOrEmpty (fileName))
+        {
+            fileName = "*.*";
+        }
+
+        if (!FileSpecification.TryParse (fileName, out _))
+        {
+            fileName = "2." + executive.Provider.Database + "." + fileName;
+        }
+
+        var specification = FileSpecification.Parse (fileName);
+        var found = executive.Provider.ListFiles (specification);
+        if (found.IsNullOrEmpty())
+        {
+            executive.WriteError ("No files found");
+        }
+        else
+        {
+            Array.Sort (found);
+            foreach (var one in found)
+            {
+                executive.WriteOutput (one);
+            }
+        }
+
+        OnAfterExecute();
+
+        return true;
     }
+
+    #endregion
 }

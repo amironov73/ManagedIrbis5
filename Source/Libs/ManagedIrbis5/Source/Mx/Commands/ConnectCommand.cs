@@ -74,10 +74,11 @@ public sealed class ConnectCommand
     {
         OnBeforeExecute();
 
+        var provider = executive.Provider;
         if (arguments.Length != 0)
         {
             var argument = arguments[0].Text;
-            executive.Provider.Dispose();
+            provider.Dispose();
             executive.Provider = string.IsNullOrEmpty (argument)
                 ? ProviderManager.GetPreconfiguredProvider()
                 : InitializeProvider (argument);
@@ -92,16 +93,26 @@ public sealed class ConnectCommand
                 argument = aliases[defaultAlias];
             }
 
-            executive.Provider.Dispose();
+            provider.Dispose();
             executive.Provider = string.IsNullOrEmpty (argument)
                 ? ProviderManager.GetPreconfiguredProvider()
                 : InitializeProvider (argument);
         }
 
-        executive.Context.SetProvider (executive.Provider);
-        executive.Provider.Connect();
-        var maxMfn = executive.Provider.GetMaxMfn();
-        executive.WriteMessage ($"Connected, database {executive.Provider.Database}, max MFN {maxMfn}");
+        executive.Context.SetProvider (provider);
+        provider = executive.Provider;
+        provider.Connect();
+        if (!provider.IsConnected)
+        {
+            executive.WriteError ("Can't connect");
+            var errorDescription = IrbisException.GetErrorDescription (provider.LastError);
+            executive.WriteError (errorDescription);
+
+            return false;
+        }
+
+        var maxMfn = provider.GetMaxMfn();
+        executive.WriteMessage ($"Connected, database {provider.Database}, max MFN {maxMfn}");
 
         OnAfterExecute();
 

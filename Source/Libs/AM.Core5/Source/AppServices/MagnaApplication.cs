@@ -35,6 +35,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 using NLog.Extensions.Logging;
 
@@ -100,11 +101,13 @@ public class MagnaApplication
     public MagnaApplication
         (
             IHostBuilder builder,
-            string[]? args = null
+            string[]? args = null,
+            bool turnOffLogging = false
         )
     {
         Sure.NotNull (builder);
 
+        _turnOffLogging = turnOffLogging;
         _builder = builder;
         Args = args ?? Array.Empty<string>();
         EarlyInitialization();
@@ -114,13 +117,16 @@ public class MagnaApplication
     /// Конструктор.
     /// </summary>
     /// <param name="args">Аргументы командной строки.</param>
+    /// <param name="turnOffLogging">Отключение логирования.</param>
     public MagnaApplication
         (
-            string[] args
+            string[] args,
+            bool turnOffLogging = false
         )
     {
         Sure.NotNull (args);
 
+        _turnOffLogging = turnOffLogging;
         Args = args;
         _builder = Host.CreateDefaultBuilder (args);
         EarlyInitialization();
@@ -132,6 +138,7 @@ public class MagnaApplication
 
     private readonly IHostBuilder _builder;
     private ServiceProvider? _preliminaryServices;
+    private bool _turnOffLogging;
 
     /// <summary>
     /// Пометка экземпляра как проинициазированного.
@@ -204,7 +211,9 @@ public class MagnaApplication
             .BuildServiceProvider();
 
         // временный логгер
-        Logger = _preliminaryServices.GetRequiredService<ILogger<MagnaApplication>>();
+        Logger = _turnOffLogging
+            ? new NullLoggerFactory().CreateLogger<MagnaApplication> ()
+            : _preliminaryServices.GetRequiredService<ILogger<MagnaApplication>>();
         Logger.LogInformation ("Preliminary initialization started");
 
         Configuration = new ConfigurationBuilder()

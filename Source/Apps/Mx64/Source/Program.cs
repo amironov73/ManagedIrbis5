@@ -36,7 +36,7 @@ internal sealed class Program
         (
             string[] args
         )
-        : base (args)
+        : base (args, turnOffLogging: true)
     {
         // пустое тело конструктора
     }
