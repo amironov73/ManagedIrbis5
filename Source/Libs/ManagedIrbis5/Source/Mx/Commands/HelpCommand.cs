@@ -4,10 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 /* HelpCommand.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -19,93 +15,87 @@
 
 #nullable enable
 
-namespace ManagedIrbis.Mx.Commands
+using System.Linq;
+
+using AM;
+using AM.Reflection;
+
+namespace ManagedIrbis.Mx.Commands;
+
+/// <summary>
+///
+/// </summary>
+public sealed class HelpCommand
+    : MxCommand
 {
+    #region Construction
+
     /// <summary>
-    ///
+    /// Конструктор по умолчанию.
     /// </summary>
-    public sealed class HelpCommand
-        : MxCommand
+    public HelpCommand()
+        : base ("help")
     {
-        #region Properties
+        // пустое тело конструктора
+    }
 
-        #endregion
+    #endregion
 
-        #region Construction
+    #region MxCommand members
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public HelpCommand()
-            : base("help")
+    /// <inheritdoc cref="MxCommand.Execute" />
+    public override bool Execute
+        (
+            MxExecutive executive,
+            MxArgument[] arguments
+        )
+    {
+        OnBeforeExecute();
+
+        var commandName = arguments.FirstOrDefault()?.Text
+            .SafeTrim().EmptyToNull();
+
+        if (string.IsNullOrEmpty (commandName))
         {
+            var items = executive.Commands
+                .Select (x => new NameValue<string?>
+                    (
+                        x.Name,
+                        x.GetShortHelp()
+                    ))
+                .OrderBy (x => x.Name)
+                .ToArray();
+
+            var tablefier = new Tablefier();
+            var output = tablefier.Print (items, "Name", "Value");
+            executive.WriteOutput (output);
         }
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
-        #region MxCommand members
-
-        /// <inheritdoc cref="MxCommand.Execute" />
-        public override bool Execute
-            (
-                MxExecutive executive,
-                MxArgument[] arguments
-            )
+        else
         {
-            OnBeforeExecute();
-
-            if (!executive.Provider.IsConnected)
+            var command = executive.GetCommand (commandName);
+            if (ReferenceEquals (command, null))
             {
-                executive.WriteLine("Not connected");
-                return false;
-            }
-
-            string? name = null;
-            if (arguments.Length != 0)
-            {
-                name = arguments[0].Text;
-            }
-
-            if (string.IsNullOrEmpty(name))
-            {
-                foreach (var command in executive.Commands)
-                {
-                    executive.WriteMessage($"{command.Name} {command.GetShortHelp()}");
-                }
+                executive.WriteError ($"Unknown command '{commandName}'");
             }
             else
             {
-                var command = executive.GetCommand(name);
-                if (ReferenceEquals(command, null))
-                {
-                    executive.WriteError($"Unknown command '{name}'");
-                }
-                else
-                {
-                    executive.WriteMessage
-                        (
-                            command.GetLongHelp()
-                        );
-                }
+                executive.WriteMessage
+                    (
+                        command.GetLongHelp()
+                    );
             }
-
-            OnAfterExecute();
-
-            return true;
         }
 
-        #endregion
+        OnAfterExecute();
 
-        #region Object members
-
-        #endregion
+        return true;
     }
+
+    /// <inheritdoc cref="MxCommand.GetShortHelp"/>
+    public override string? GetShortHelp()
+    {
+        return "Get some help from the interpreter";
+    }
+
+    #endregion
 }

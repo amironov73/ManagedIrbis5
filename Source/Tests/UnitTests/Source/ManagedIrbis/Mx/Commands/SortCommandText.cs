@@ -23,7 +23,7 @@ namespace UnitTests.ManagedIrbis.Mx.Commands
         public void SortCommand_Construction_1()
         {
             var command = new SortCommand();
-            Assert.AreEqual ("Sort", command.Name);
+            Assert.AreEqual ("sort", command.Name);
         }
 
         [TestMethod]
@@ -43,7 +43,7 @@ namespace UnitTests.ManagedIrbis.Mx.Commands
         public void SortCommand_ToString_1()
         {
             var command = new SortCommand();
-            Assert.AreEqual ("Sort", command.ToString());
+            Assert.AreEqual ("sort", command.ToString());
         }
     }
 }

@@ -119,5 +119,11 @@ public sealed class ConnectCommand
         return true;
     }
 
+    /// <inheritdoc cref="MxCommand.GetShortHelp"/>
+    public override string? GetShortHelp()
+    {
+        return "Connect to the server";
+    }
+
     #endregion
 }

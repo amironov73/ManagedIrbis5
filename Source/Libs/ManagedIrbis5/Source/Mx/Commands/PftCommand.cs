@@ -13,82 +13,66 @@
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Mx.Commands
+namespace ManagedIrbis.Mx.Commands;
+
+/// <summary>
+///
+/// </summary>
+public sealed class PftCommand
+    : MxCommand
 {
+    #region Construction
+
     /// <summary>
-    ///
+    /// Конструктор по умолчанию.
     /// </summary>
-    public sealed class PftCommand
-        : MxCommand
+    public PftCommand()
+        : base ("pft")
     {
-        #region Construction
+        // пустое тело конструктора
+    }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftCommand()
-            : base("pft")
-        {
-        }
+    #endregion
 
-        #endregion
+    #region MxCommand members
 
-        #region MxCommand members
-
-        /// <inheritdoc cref="MxCommand.Execute" />
-        public override bool Execute
+    /// <inheritdoc cref="MxCommand.Execute" />
+    public override bool Execute
         (
             MxExecutive executive,
             MxArgument[] arguments
         )
+    {
+        OnBeforeExecute();
+
+        var provider = executive.Provider;
+        if (!provider.IsConnected)
         {
-            OnBeforeExecute();
+            executive.WriteError ("Not connected");
 
-            if (!executive.Provider.IsConnected)
-            {
-                executive.WriteError("Not connected");
-
-                return false;
-            }
-
-            string? source = null;
-            if (arguments.Length != 0)
-            {
-                source = arguments[0].Text;
-            }
-
-            if (!string.IsNullOrEmpty(source))
-            {
-                var text = executive.FormatRemote(source);
-                executive.WriteLine(text);
-            }
-
-            OnAfterExecute();
-
-            return true;
+            return false;
         }
 
-        #endregion
+        var source = arguments.FirstOrDefault()
+            ?.Text.SafeTrim().EmptyToNull();
+        if (!string.IsNullOrEmpty (source))
+        {
+            var text = executive.FormatRemote (source);
+            executive.WriteLine (text);
+        }
 
-        #region Object members
+        OnAfterExecute();
 
-        #endregion
+        return true;
     }
+
+    #endregion
 }

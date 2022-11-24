@@ -92,5 +92,11 @@ public sealed class ListDbCommand
         return true;
     }
 
+    /// <inheritdoc cref="MxCommand.GetShortHelp"/>
+    public override string? GetShortHelp()
+    {
+        return "List databases";
+    }
+
     #endregion
 }

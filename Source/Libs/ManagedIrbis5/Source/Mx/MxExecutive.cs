@@ -27,6 +27,7 @@ using AM;
 using AM.Collections;
 using AM.ConsoleIO;
 using AM.Json;
+using AM.Scripting.Barsik;
 using AM.Text;
 
 using ManagedIrbis.Infrastructure;
@@ -34,6 +35,7 @@ using ManagedIrbis.Mx.Commands;
 using ManagedIrbis.Mx.Infrastructrure;
 using ManagedIrbis.Pft.Infrastructure;
 using ManagedIrbis.Providers;
+using ManagedIrbis.Scripting.Barsik;
 
 using Microsoft.Extensions.Logging;
 
@@ -114,7 +116,7 @@ public sealed class MxExecutive
     /// <summary>
     /// Search history.
     /// </summary>
-    public Stack<string> History { get; }
+    public Stack<string?> History { get; }
 
     /// <summary>
     /// Stack of databases.
@@ -130,6 +132,11 @@ public sealed class MxExecutive
     /// List of handlers.
     /// </summary>
     public List<MxHandler> Handlers { get; }
+
+    /// <summary>
+    /// Интерпретатор Барсика.
+    /// </summary>
+    public Interpreter Interpreter { get; }
 
     /// <summary>
     /// Get version of the executive.
@@ -156,12 +163,18 @@ public sealed class MxExecutive
         Provider = new NullProvider();
         Context = new PftContext (null);
         Context.SetProvider (Provider);
-        Commands = new NonNullCollection<MxCommand>();
-        Records = new NonNullCollection<MxRecord>();
-        History = new Stack<string>();
+        Commands = new ();
+        Records = new ();
+        History = new ();
         Databases = new Stack<string>();
         Modules = new List<MxModule>();
         Handlers = new List<MxHandler>();
+
+        // инетрепретатор Барсика
+        Interpreter = new Interpreter().WithStdLib();
+        Interpreter.Context.AttachModule (new IrbisLib());
+        Interpreter.Context.Defines.Add ("MX", this);
+        // TODO добавить MxLib
 
         _CreateStandardCommands();
         _InitializeCommands();
@@ -190,6 +203,7 @@ public sealed class MxExecutive
                 {
                     new AliasCommand(),
                     new BangCommand(),
+                    new BarsikCommand(),
                     new ClsCommand(),
                     new ConnectCommand(),
                     new CsCommand(),
@@ -211,6 +225,7 @@ public sealed class MxExecutive
                     new NopCommand(),
                     new PftCommand(),
                     new PingCommand(),
+                    new PocketCommand(),
                     new PrintCommand(),
                     new RefineCommand(),
                     new RestartCommand(),

@@ -51,7 +51,8 @@ public sealed class DirCommand
     {
         OnBeforeExecute();
 
-        if (!executive.Provider.IsConnected)
+        var provider = executive.Provider;
+        if (!provider.IsConnected)
         {
             executive.WriteError ("Not connected");
             return false;
@@ -65,7 +66,7 @@ public sealed class DirCommand
             return false;
         }
 
-        var found = executive.Provider.ListFiles (specification);
+        var found = provider.ListFiles (specification);
         if (found.IsNullOrEmpty())
         {
             executive.WriteError ("No files found");
@@ -82,6 +83,12 @@ public sealed class DirCommand
         OnAfterExecute();
 
         return true;
+    }
+
+    /// <inheritdoc cref="MxCommand.GetShortHelp"/>
+    public override string? GetShortHelp()
+    {
+        return "List server files";
     }
 
     #endregion

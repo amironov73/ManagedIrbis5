@@ -55,5 +55,11 @@ public sealed class ExitCommand
         return true;
     }
 
+    /// <inheritdoc cref="MxCommand.GetShortHelp"/>
+    public override string? GetShortHelp()
+    {
+        return "Exit from the interpreter";
+    }
+
     #endregion
 }

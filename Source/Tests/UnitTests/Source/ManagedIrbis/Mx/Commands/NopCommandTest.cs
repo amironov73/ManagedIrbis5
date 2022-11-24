@@ -23,7 +23,7 @@ namespace UnitTests.ManagedIrbis.Mx.Commands
         public void NopCommand_Construction_1()
         {
             var command = new NopCommand();
-            Assert.AreEqual ("Nop", command.Name);
+            Assert.AreEqual ("nop", command.Name);
         }
 
         [TestMethod]
@@ -43,7 +43,7 @@ namespace UnitTests.ManagedIrbis.Mx.Commands
         public void NopCommand_ToString_1()
         {
             var command = new NopCommand();
-            Assert.AreEqual ("Nop", command.ToString());
+            Assert.AreEqual ("nop", command.ToString());
         }
     }
 }

@@ -13,6 +13,7 @@
 
 #region Using directives
 
+using System.Collections.Generic;
 using System.Linq;
 
 using AM;
@@ -55,11 +56,10 @@ public sealed class PrintCommand
     {
         OnBeforeExecute();
 
-        var records = executive.Records.ToArray();
-
-        if (records.Length == 0)
+        IReadOnlyList<MxRecord> records = executive.Records;
+        if (records.Count == 0)
         {
-            executive.WriteLine ("No records");
+            executive.WriteError ("No records");
         }
         else
         {
@@ -86,7 +86,7 @@ public sealed class PrintCommand
                 {
                     for (var i = 0; i < formatted.Length; i++)
                     {
-                        records[i].Order = formatted[i];
+                        records[i].Description = formatted[i];
                     }
                 }
             }

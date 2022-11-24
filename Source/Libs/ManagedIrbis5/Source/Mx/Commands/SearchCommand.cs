@@ -13,19 +13,6 @@
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
-
 using ManagedIrbis.Providers;
 
 #endregion
@@ -35,7 +22,7 @@ using ManagedIrbis.Providers;
 namespace ManagedIrbis.Mx.Commands;
 
 /// <summary>
-/// Поиск по словарю
+/// Прямой поиск по словарю.
 /// </summary>
 public sealed class SearchCommand
     : MxCommand
@@ -64,10 +51,10 @@ public sealed class SearchCommand
     {
         OnBeforeExecute();
 
-        if (!executive.Provider.IsConnected)
+        var provider = executive.Provider;
+        if (!provider.IsConnected)
         {
             executive.WriteError ("Not connected");
-
             return false;
         }
 
@@ -75,31 +62,34 @@ public sealed class SearchCommand
         {
             var argument = arguments[0].Text;
 
-            Debug.WriteLine (argument);
-
             if (!string.IsNullOrEmpty (argument))
             {
-                var found = executive.Provider.Search (argument);
-                var foundCount = found.Length;
-                executive.WriteMessage ($"Found: {found.Length}");
-
+                var parameters = new SearchParameters
+                {
+                    Database = provider.EnsureDatabase(),
+                    Expression = argument
+                };
                 if (executive.Limit > 0)
                 {
-                    found = found.Take (executive.Limit).ToArray();
-                    if (found.Length < foundCount)
-                    {
-                        executive.WriteMessage ($"Limited to {found.Length} records");
-                    }
+                    parameters.NumberOfRecords = executive.Limit;
                 }
 
+                var found = executive.Provider.Search (parameters);
+                if (found is null)
+                {
+                    executive.WriteError ("Error during search");
+                    return false;
+                }
+
+                executive.WriteMessage ($"Found: {found.Length}");
                 executive.Records.Clear();
                 for (var i = 0; i < found.Length; i++)
                 {
-                    var mfn = found[i];
+                    var item = found[i];
                     var record = new MxRecord
                     {
                         Database = executive.Provider.Database,
-                        Mfn = mfn,
+                        Mfn = item.Mfn,
                     };
                     executive.Records.Add (record);
                 }
@@ -112,10 +102,6 @@ public sealed class SearchCommand
 
         return true;
     }
-
-    #endregion
-
-    #region Object members
 
     #endregion
 }

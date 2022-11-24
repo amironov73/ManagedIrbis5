@@ -26,6 +26,7 @@ namespace UnitTests.ManagedIrbis.Mx.Commands
             Assert.AreEqual ("!", command.Name);
         }
 
+        [Ignore]
         [TestMethod]
         [Description ("Выполнение команды")]
         public void BangCommand_Execute_1()

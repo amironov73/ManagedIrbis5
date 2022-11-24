@@ -54,5 +54,11 @@ public sealed class DisconnectCommand
         return true;
     }
 
+    /// <inheritdoc cref="MxCommand.GetShortHelp"/>
+    public override string? GetShortHelp()
+    {
+        return "Disconnect from the server";
+    }
+
     #endregion
 }

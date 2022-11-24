@@ -108,5 +108,11 @@ public sealed class ListUsersCommand
         return true;
     }
 
+    /// <inheritdoc cref="MxCommand.GetShortHelp"/>
+    public override string? GetShortHelp()
+    {
+        return "List users";
+    }
+
     #endregion
 }

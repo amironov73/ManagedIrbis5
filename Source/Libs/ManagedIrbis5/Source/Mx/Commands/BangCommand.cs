@@ -5,11 +5,17 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* BangCommand.cs -- однократное выполнение форматирования
+/* BangCommand.cs -- однократное выполнение барсика
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
+
+using System;
+using System.Linq;
+
+using AM;
+using AM.Scripting.Barsik;
 
 using ManagedIrbis.Pft;
 
@@ -20,7 +26,7 @@ using ManagedIrbis.Pft;
 namespace ManagedIrbis.Mx.Commands;
 
 /// <summary>
-/// Команда однократного выполнения форматирования.
+/// Команда однократного выполнения барсика.
 /// </summary>
 public sealed class BangCommand
     : MxCommand
@@ -49,25 +55,35 @@ public sealed class BangCommand
     {
         OnBeforeExecute();
 
-        string? source = null;
-        if (arguments.Length != 0)
-        {
-            source = arguments[0].Text;
-        }
+        var source = arguments.FirstOrDefault()?.Text
+            .SafeTrim().EmptyToNull();
 
-        if (!string.IsNullOrEmpty (source))
+        var interpreter = executive.Interpreter;
+        if (string.IsNullOrEmpty (source))
         {
-            var context = executive.Context;
-            context.ClearAll();
-            var formatter = new PftFormatter (context);
-            formatter.ParseProgram (source);
-            var output = formatter.FormatRecord (new Record());
-            executive.WriteLine (output);
+            new Repl(interpreter).Loop();
+        }
+        else
+        {
+            try
+            {
+                interpreter.Execute (source);
+            }
+            catch (Exception exception)
+            {
+                executive.WriteError (exception.ToString());
+            }
         }
 
         OnAfterExecute();
 
         return true;
+    }
+
+    /// <inheritdoc cref="MxCommand.GetShortHelp"/>
+    public override string GetShortHelp()
+    {
+        return "Execute Barsik one-liner";
     }
 
     #endregion

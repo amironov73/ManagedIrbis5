@@ -23,70 +23,69 @@ using AM;
 
 #nullable enable
 
-namespace ManagedIrbis.Mx.Commands
+namespace ManagedIrbis.Mx.Commands;
+
+/// <summary>
+///
+/// </summary>
+public sealed class StoreCommand
+    : MxCommand
 {
+    #region Properties
+
+    #endregion
+
+    #region Construction
+
     /// <summary>
-    ///
+    /// Constructor.
     /// </summary>
-    public sealed class StoreCommand
-        : MxCommand
+    public StoreCommand()
+        : base("Store")
     {
-        #region Properties
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public StoreCommand()
-            : base("Store")
-        {
-        }
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
-        #region MxCommand members
-
-        /// <inheritdoc cref="MxCommand.Execute" />
-        public override bool Execute
-            (
-                MxExecutive executive,
-                MxArgument[] arguments
-            )
-        {
-            OnBeforeExecute();
-
-            var fileName = "output.txt";
-            if (arguments.Length != 0)
-            {
-                fileName = arguments[0].Text;
-            }
-
-            if (!string.IsNullOrEmpty(fileName))
-            {
-                using var writer = File.CreateText(fileName);
-                foreach (var record in executive.Records)
-                {
-                    writer.WriteLine(record.Mfn.ToInvariantString());
-                }
-            }
-
-            OnAfterExecute();
-
-            return true;
-        }
-
-        #endregion
-
     }
+
+    #endregion
+
+    #region Private members
+
+    #endregion
+
+    #region Public methods
+
+    #endregion
+
+    #region MxCommand members
+
+    /// <inheritdoc cref="MxCommand.Execute" />
+    public override bool Execute
+        (
+            MxExecutive executive,
+            MxArgument[] arguments
+        )
+    {
+        OnBeforeExecute();
+
+        var fileName = "output.txt";
+        if (arguments.Length != 0)
+        {
+            fileName = arguments[0].Text;
+        }
+
+        if (!string.IsNullOrEmpty(fileName))
+        {
+            using var writer = File.CreateText(fileName);
+            foreach (var record in executive.Records)
+            {
+                writer.WriteLine(record.Mfn.ToInvariantString());
+            }
+        }
+
+        OnAfterExecute();
+
+        return true;
+    }
+
+    #endregion
+
 }

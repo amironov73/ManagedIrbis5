@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* RefineCommand.cs --
+/* RefineCommand.cs -- уточнение предыдущего поиска
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -15,87 +15,80 @@
 
 using System.Linq;
 
+using AM;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Mx.Commands
+namespace ManagedIrbis.Mx.Commands;
+
+/// <summary>
+/// Уточнение предыдущего поиска.
+/// </summary>
+public sealed class RefineCommand
+    : MxCommand
 {
+    #region Construction
+
     /// <summary>
-    ///
+    /// Конструктор по умолчанию.
     /// </summary>
-    public sealed class RefineCommand
-        : MxCommand
+    public RefineCommand()
+        : base ("refine")
     {
-        #region Properties
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public RefineCommand()
-            : base("refine")
-        {
-        }
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
-        #region MxCommand members
-
-        /// <inheritdoc cref="MxCommand.Execute" />
-        public override bool Execute
-            (
-                MxExecutive executive,
-                MxArgument[] arguments
-            )
-        {
-            OnBeforeExecute();
-
-            if (!executive.Provider.IsConnected)
-            {
-                executive.WriteLine("Not connected");
-                return false;
-            }
-
-            if (arguments.Length != 0
-                && executive.History.Count != 0)
-            {
-                var argument = arguments[0].Text;
-                var previous = executive.History.Peek();
-                argument = string.Format("({0}) * ({1})", previous, argument);
-
-                if (!string.IsNullOrEmpty(argument))
-                {
-                    var searchCommand = executive.Commands
-                        .OfType<SearchCommand>().FirstOrDefault();
-                    if (!ReferenceEquals(searchCommand, null))
-                    {
-                        MxArgument[] newArguments =
-                        {
-                            new() { Text = argument }
-                        };
-                        searchCommand.Execute(executive, newArguments);
-                    }
-                }
-            }
-
-            OnAfterExecute();
-
-            return true;
-        }
-
-        #endregion
-
+        // пустое тело конструктора
     }
+
+    #endregion
+
+    #region MxCommand members
+
+    /// <inheritdoc cref="MxCommand.Execute" />
+    public override bool Execute
+        (
+            MxExecutive executive,
+            MxArgument[] arguments
+        )
+    {
+        OnBeforeExecute();
+
+        var provider = executive.Provider;
+        if (!provider.IsConnected)
+        {
+            executive.WriteError ("Not connected");
+            return false;
+        }
+
+        var history = executive.History;
+        var previous = history.Count == 0
+            ? null
+            : history.Peek();
+        var expression = arguments.FirstOrDefault()?.Text
+            .SafeTrim().EmptyToNull();
+
+        if (!string.IsNullOrEmpty (previous)
+            && !string.IsNullOrEmpty (expression))
+        {
+            expression = $"({previous}) * ({expression})";
+            var searchCommand = new SearchCommand();
+            var newArguments = new[]
+            {
+                new MxArgument { Text = expression }
+            };
+            searchCommand.Execute (executive, newArguments);
+        }
+
+        OnAfterExecute();
+
+        return true;
+    }
+
+    /// <inheritdoc cref="MxCommand.GetShortHelp"/>
+    public override string GetShortHelp()
+    {
+        return "Refine the last search";
+    }
+
+    #endregion
 }

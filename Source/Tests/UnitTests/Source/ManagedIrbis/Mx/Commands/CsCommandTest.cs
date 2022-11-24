@@ -12,38 +12,37 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 #nullable enable
 
-namespace UnitTests.ManagedIrbis.Mx.Commands
+namespace UnitTests.ManagedIrbis.Mx.Commands;
+
+[TestClass]
+public sealed class CsCommandTest
+    : CommonMxCommandTest
 {
-    [TestClass]
-    public sealed class CsCommandTest
-        : CommonMxCommandTest
+    [TestMethod]
+    [Description ("Конструктор по умолчанию")]
+    public void CsCommand_Construction_1()
     {
-        [TestMethod]
-        [Description ("Конструктор по умолчанию")]
-        public void CsCommand_Construction_1()
-        {
-            var command = new CsCommand();
-            Assert.AreEqual ("CS", command.Name);
-        }
+        var command = new CsCommand();
+        Assert.AreEqual ("cs", command.Name);
+    }
 
-        [TestMethod]
-        [Description ("Выполнение команлы")]
-        public void CsCommand_Execute_1()
-        {
-            using var executive = GetExecutive();
-            using var command = new CsCommand();
-            command.Initialize (executive);
+    [TestMethod]
+    [Description ("Выполнение команлы")]
+    public void CsCommand_Execute_1()
+    {
+        using var executive = GetExecutive();
+        using var command = new CsCommand();
+        command.Initialize (executive);
 
-            var arguments = Array.Empty<MxArgument>();
-            command.Execute (executive, arguments);
-        }
+        var arguments = Array.Empty<MxArgument>();
+        command.Execute (executive, arguments);
+    }
 
-        [TestMethod]
-        [Description ("Плоское текстовое представление")]
-        public void CsCommand_ToString_1()
-        {
-            var command = new CsCommand();
-            Assert.AreEqual ("CS", command.ToString());
-        }
+    [TestMethod]
+    [Description ("Плоское текстовое представление")]
+    public void CsCommand_ToString_1()
+    {
+        var command = new CsCommand();
+        Assert.AreEqual ("cs", command.ToString());
     }
 }

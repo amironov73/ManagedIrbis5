@@ -37,11 +37,12 @@ public sealed class StatCommand
     #region Construction
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор по умолчанию.
     /// </summary>
     public StatCommand()
         : base ("stat")
     {
+        // пустое тело конструктора
     }
 
     #endregion
@@ -57,9 +58,10 @@ public sealed class StatCommand
     {
         OnBeforeExecute();
 
-        if (!executive.Provider.IsConnected)
+        var provider = executive.Provider;
+        if (!provider.IsConnected)
         {
-            executive.WriteLine ("Not connected");
+            executive.WriteError ("Not connected");
             return false;
         }
 

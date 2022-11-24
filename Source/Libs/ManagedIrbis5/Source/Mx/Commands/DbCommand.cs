@@ -11,6 +11,12 @@
 
 #nullable enable
 
+using System.Linq;
+
+using AM;
+
+using ManagedIrbis.Providers;
+
 namespace ManagedIrbis.Mx.Commands;
 
 /// <summary>
@@ -43,18 +49,16 @@ public sealed class DbCommand
     {
         OnBeforeExecute();
 
-        if (!executive.Provider.IsConnected)
+        var provider = executive.Provider;
+        if (!provider.IsConnected)
         {
-            executive.WriteLine ("Not connected");
+            executive.WriteError ("Not connected");
             return false;
         }
 
-        var saveDatabase = executive.Provider.Database;
-        string? dbName = null;
-        if (arguments.Length != 0)
-        {
-            dbName = arguments[0].Text;
-        }
+        var saveDatabase = provider.EnsureDatabase();
+        var dbName = arguments.FirstOrDefault()?.Text
+            .SafeTrim().EmptyToNull();
 
         if (!string.IsNullOrEmpty (dbName))
         {
@@ -92,6 +96,12 @@ public sealed class DbCommand
         OnAfterExecute();
 
         return true;
+    }
+
+    /// <inheritdoc cref="MxCommand.GetShortHelp"/>
+    public override string? GetShortHelp()
+    {
+        return "Switch the current database";
     }
 
     #endregion

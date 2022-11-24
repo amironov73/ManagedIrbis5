@@ -28,7 +28,7 @@ public sealed class NopCommand
     /// Конструктор по умолчанию.
     /// </summary>
     public NopCommand()
-        : base("Nop")
+        : base("nop")
     {
         // пустое тело конструктора
     }

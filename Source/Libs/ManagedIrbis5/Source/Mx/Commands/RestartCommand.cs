@@ -4,8 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 /* RestartCommand.cs -- перезапуск сервера ИРБИС64
  * Ars Magna project, http://arsmagna.ru

@@ -9,92 +9,84 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* CsCommand.cs --
+/* CsCommand.cs -- выполнение однострочиника C#
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System.Reflection;
+using System;
+using System.Linq;
 
-using ManagedIrbis.Infrastructure;
+using AM;
+
+using ManagedIrbis.Scripting.Sharping;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Mx.Commands
+namespace ManagedIrbis.Mx.Commands;
+
+/// <summary>
+/// Выполнение однострочного скрипта на C#.
+/// </summary>
+public sealed class CsCommand
+    : MxCommand
 {
+    #region Construction
+
     /// <summary>
-    ///
+    /// Конструктор по умолчанию.
     /// </summary>
-    public sealed class CsCommand
-        : MxCommand
+    public CsCommand()
+        : base ("cs")
     {
-        #region Properties
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public CsCommand()
-            : base("CS")
-        {
-        }
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
-        #region MxCommand members
-
-        /// <inheritdoc/>
-        public override bool Execute
-            (
-                MxExecutive executive,
-                MxArgument[] arguments
-            )
-        {
-            OnBeforeExecute();
-
-#if CLASSIC || NETCORE
-
-            if (arguments.Length != 0)
-            {
-                string argument = arguments[0].Text;
-                if (!string.IsNullOrEmpty(argument))
-                {
-                    MethodInfo method = SharpRunner.CompileSnippet
-                        (
-                            argument,
-                            "MxExecutive executive",
-                            err => executive.WriteLine(err)
-                        );
-                    if (!ReferenceEquals(method, null))
-                    {
-                        method.Invoke(null, new object[]{executive});
-                    }
-                }
-            }
-
-#endif
-
-            OnAfterExecute();
-
-            return true;
-        }
-
-        #endregion
-
+        // пустое тело конструктора
     }
-}
 
+    #endregion
+
+    #region MxCommand members
+
+    /// <inheritdoc/>
+    public override bool Execute
+        (
+            MxExecutive executive,
+            MxArgument[] arguments
+        )
+    {
+        OnBeforeExecute();
+
+        var source = arguments.FirstOrDefault()?.Text
+            .SafeTrim().EmptyToNull();
+
+        if (!string.IsNullOrEmpty (source))
+        {
+            try
+            {
+                var compiler = new ScriptCompiler();
+                var options = compiler.ParseArguments (Array.Empty<string>());
+                var compilation = compiler.Compile (options);
+                var assembly = compiler.EmitAssemblyToMemory (compilation);
+                compiler.RunAssembly (assembly, Array.Empty<string>());
+            }
+            catch (Exception exception)
+            {
+                executive.WriteError (exception.ToString());
+            }
+        }
+
+        OnAfterExecute();
+
+        return true;
+    }
+
+    /// <inheritdoc cref="MxCommand.GetShortHelp"/>
+    public override string GetShortHelp()
+    {
+        return "Execute C# one-liner";
+    }
+
+    #endregion
+}

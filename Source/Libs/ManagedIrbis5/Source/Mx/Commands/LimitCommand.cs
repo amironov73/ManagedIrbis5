@@ -7,107 +7,74 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* LimitCommand.cs --
+/* LimitCommand.cs -- ограничение количества найденных записей
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
+using System.Globalization;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Mx.Commands
+namespace ManagedIrbis.Mx.Commands;
+
+/// <summary>
+/// Установка ограничения количества найденных записей.
+/// </summary>
+public sealed class LimitCommand
+    : MxCommand
 {
+    #region Construction
+
     /// <summary>
-    ///
+    /// Конструктор по умолчанию.
     /// </summary>
-    public sealed class LimitCommand
-        : MxCommand
+    public LimitCommand()
+        : base ("limit")
     {
-        #region Properties
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public LimitCommand()
-            : base("Limit")
-        {
-        }
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
-        #region MxCommand members
-
-        /// <inheritdoc/>
-        public override bool Execute
-            (
-                MxExecutive executive,
-                MxArgument[] arguments
-            )
-        {
-            OnBeforeExecute();
-
-            if (arguments.Length != 0)
-            {
-                var argument = arguments[0].Text;
-                if (!string.IsNullOrEmpty(argument))
-                {
-                    if (!int.TryParse(argument, out var newLimit))
-                    {
-                        executive.WriteLine("format error");
-                    }
-                    executive.Limit = newLimit;
-                    executive.WriteMessage(string.Format
-                        (
-                            "Limit changed to {0}",
-                            executive.Limit
-                        ));
-                }
-            }
-            else
-            {
-                executive.WriteMessage(string.Format
-                    (
-                        "Limit is: {0}",
-                        executive.Limit
-                    ));
-            }
-
-            OnAfterExecute();
-
-            return true;
-        }
-
-        #endregion
-
-        #region Object members
-
-        #endregion
+        // пустое тело конструктора
     }
+
+    #endregion
+
+    #region MxCommand members
+
+    /// <inheritdoc cref="MxCommand.Execute" />
+    public override bool Execute
+        (
+            MxExecutive executive,
+            MxArgument[] arguments
+        )
+    {
+        OnBeforeExecute();
+
+        if (arguments.Length != 0)
+        {
+            var argument = arguments[0].Text;
+            if (!string.IsNullOrEmpty (argument))
+            {
+                var invariant = CultureInfo.InvariantCulture;
+                if (!int.TryParse (argument, invariant, out var newLimit))
+                {
+                    executive.WriteError ("bad integer format");
+                }
+
+                executive.Limit = newLimit;
+                executive.WriteMessage ($"Limit changed to {executive.Limit}");
+            }
+        }
+        else
+        {
+            executive.WriteMessage ($"Limit is: {executive.Limit}");
+        }
+
+        OnAfterExecute();
+
+        return true;
+    }
+
+    #endregion
 }

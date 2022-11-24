@@ -4,20 +4,20 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
 
-/* SortCommand.cs -- установка сортировки
+/* BarsikCommand.cs -- работа со скриптами Барсика
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
+using System;
 using System.Linq;
 
 using AM;
-
-using ManagedIrbis.Infrastructure;
-
-using SyncProviderUtility = ManagedIrbis.Providers.SyncProviderUtility;
+using AM.Scripting.Barsik;
 
 #endregion
 
@@ -26,9 +26,9 @@ using SyncProviderUtility = ManagedIrbis.Providers.SyncProviderUtility;
 namespace ManagedIrbis.Mx.Commands;
 
 /// <summary>
-/// Установка сортировки.
+/// Работа со скриптами Барсика.
 /// </summary>
-public sealed class SortCommand
+public sealed class BarsikCommand
     : MxCommand
 {
     #region Construction
@@ -36,8 +36,8 @@ public sealed class SortCommand
     /// <summary>
     /// Конструктор по умолчанию.
     /// </summary>
-    public SortCommand()
-        : base ("sort")
+    public BarsikCommand()
+        : base ("barsik")
     {
         // пустое тело конструктора
     }
@@ -55,35 +55,35 @@ public sealed class SortCommand
     {
         OnBeforeExecute();
 
-        string? argument = null;
-        if (arguments.Length != 0)
-        {
-            argument = arguments[0].Text;
-        }
+        var fileName = arguments.FirstOrDefault()?.Text
+            .SafeTrim().EmptyToNull();
 
-        if (string.IsNullOrEmpty (argument))
+        var interpreter = executive.Interpreter;
+        if (string.IsNullOrEmpty (fileName))
         {
-            var sort = executive.OrderFormat;
-            if (string.IsNullOrEmpty (sort))
-            {
-                sort = "OFF";
-            }
-
-            executive.WriteMessage ($"SORT is: {sort}");
-        }
-        else if (argument.SameString ("off"))
-        {
-            executive.OrderFormat = null;
-            executive.WriteMessage ("SORT is OFF now");
+            executive.WriteError ("Barsik script name required");
         }
         else
         {
-            executive.OrderFormat = argument;
+            try
+            {
+                interpreter.ExecuteFile (fileName);
+            }
+            catch (Exception exception)
+            {
+                executive.WriteError (exception.ToString());
+            }
         }
 
         OnAfterExecute();
 
         return true;
+    }
+
+    /// <inheritdoc cref="MxCommand.GetShortHelp"/>
+    public override string? GetShortHelp()
+    {
+        return "Execute Barsik script";
     }
 
     #endregion

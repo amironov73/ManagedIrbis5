@@ -4,20 +4,16 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
 
-/* SortCommand.cs -- установка сортировки
+/* PocketCommand.cs -- работа с карманом
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System.Linq;
-
 using AM;
-
-using ManagedIrbis.Infrastructure;
-
-using SyncProviderUtility = ManagedIrbis.Providers.SyncProviderUtility;
 
 #endregion
 
@@ -26,9 +22,9 @@ using SyncProviderUtility = ManagedIrbis.Providers.SyncProviderUtility;
 namespace ManagedIrbis.Mx.Commands;
 
 /// <summary>
-/// Установка сортировки.
+/// Работа с карманом.
 /// </summary>
-public sealed class SortCommand
+public sealed class PocketCommand
     : MxCommand
 {
     #region Construction
@@ -36,8 +32,8 @@ public sealed class SortCommand
     /// <summary>
     /// Конструктор по умолчанию.
     /// </summary>
-    public SortCommand()
-        : base ("sort")
+    public PocketCommand()
+        : base ("pocket")
     {
         // пустое тело конструктора
     }
@@ -58,30 +54,42 @@ public sealed class SortCommand
         string? argument = null;
         if (arguments.Length != 0)
         {
-            argument = arguments[0].Text;
+            argument = arguments[0].Text.SafeTrim().EmptyToNull();
         }
 
-        if (string.IsNullOrEmpty (argument))
+        if (!string.IsNullOrEmpty (argument))
         {
-            var sort = executive.OrderFormat;
-            if (string.IsNullOrEmpty (sort))
-            {
-                sort = "OFF";
-            }
-
-            executive.WriteMessage ($"SORT is: {sort}");
-        }
-        else if (argument.SameString ("off"))
-        {
-            executive.OrderFormat = null;
-            executive.WriteMessage ("SORT is OFF now");
-        }
-        else
-        {
-            executive.OrderFormat = argument;
+            argument = argument.ToLowerInvariant();
         }
 
         OnAfterExecute();
+        switch (argument)
+        {
+            case "add":
+                break;
+
+            case "clear":
+                break;
+
+            case "exclude":
+                break;
+
+            case "export":
+                break;
+
+            case "format":
+                break;
+
+            case "load":
+                break;
+
+            case "save":
+                break;
+
+            case null:
+                break;
+        }
+
 
         return true;
     }
