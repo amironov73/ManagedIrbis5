@@ -86,6 +86,18 @@
             BusyWindow
         </Button>
 
+        <Button
+            Name="PlainTextEditorDialogButton"
+            Click="PlainTextEditorDialogButton_OnClick">
+            PlainTextEditorDialog
+        </Button>
+
+        <Button
+            Name="PlainTextViewerDialogButton"
+            Click="PlainTextViewerDialogButton_OnClick">
+            PlainTextViewerDialog
+        </Button>
+
     </WrapPanel>
 
 </Window>

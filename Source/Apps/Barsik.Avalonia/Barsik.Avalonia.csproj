@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <ApplicationIcon>barsik.ico</ApplicationIcon>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\Libs\AM.Scripting\AM.Scripting.csproj" />
+      <ProjectReference Include="..\..\Libs\AM.Scripting.Avalonia\AM.Scripting.Avalonia.csproj" />
+    </ItemGroup>
+
+</Project>

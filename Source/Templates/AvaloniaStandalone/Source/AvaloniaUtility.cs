@@ -27,7 +27,6 @@ using AM.Text.Output;
 
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
@@ -36,7 +35,7 @@ using Avalonia.Media;
 
 #nullable enable
 
-namespace AM.Avalonia;
+namespace AvaloniaApp;
 
 /// <summary>
 /// Полезные расширения для Avalonia UI.
@@ -55,9 +54,6 @@ public static class AvaloniaUtility
         )
         where TControl: Control
     {
-        Sure.NotNull (control);
-        Sure.NotNull (action);
-
         action (control);
 
         return control;
@@ -90,8 +86,6 @@ public static class AvaloniaUtility
         )
         where T: TextBlock
     {
-        Sure.NotNull (block);
-
         block.FontWeight = bold ? FontWeight.Bold : FontWeight.Regular;
 
         return block;
@@ -121,8 +115,6 @@ public static class AvaloniaUtility
         )
         where T: Control
     {
-        Sure.NotNull (control);
-
         control.HorizontalAlignment = HorizontalAlignment.Center;
         control.VerticalAlignment = VerticalAlignment.Center;
 
@@ -138,8 +130,6 @@ public static class AvaloniaUtility
         )
         where T: Control
     {
-        Sure.NotNull (control);
-
         control.HorizontalAlignment = HorizontalAlignment.Center;
 
         return control;
@@ -154,8 +144,6 @@ public static class AvaloniaUtility
         )
         where T: Control
     {
-        Sure.NotNull (control);
-
         control.VerticalAlignment = VerticalAlignment.Center;
 
         return control;
@@ -177,9 +165,6 @@ public static class AvaloniaUtility
             GridLength columnLength
         )
     {
-        Sure.Positive (rowCount);
-        Sure.Positive (columnCount);
-
         var result = new Grid
         {
             RowDefinitions = CreateGridRows (rowCount, rowLength),
@@ -201,8 +186,6 @@ public static class AvaloniaUtility
             GridLength length
         )
     {
-        Sure.Positive (count);
-
         var result = new ColumnDefinitions();
         for (var i = 0; i < count; i++)
         {
@@ -224,8 +207,6 @@ public static class AvaloniaUtility
             GridLength length
         )
     {
-        Sure.Positive (count);
-
         var result = new RowDefinitions();
         for (var i = 0; i < count; i++)
         {
@@ -245,8 +226,6 @@ public static class AvaloniaUtility
         )
         where T: Control
     {
-        Sure.NotNull (control);
-
         control.SetValue (DockPanel.DockProperty, Dock.Bottom);
 
         return control;
@@ -262,8 +241,6 @@ public static class AvaloniaUtility
         )
         where T: Control
     {
-        Sure.NotNull (control);
-
         control.SetValue (DockPanel.DockProperty, Dock.Left);
 
         return control;
@@ -279,8 +256,6 @@ public static class AvaloniaUtility
         )
         where T: Control
     {
-        Sure.NotNull (control);
-
         control.SetValue (DockPanel.DockProperty, Dock.Right);
 
         return control;
@@ -296,8 +271,6 @@ public static class AvaloniaUtility
         )
         where T: Control
     {
-        Sure.NotNull (control);
-
         control.SetValue (DockPanel.DockProperty, Dock.Top);
 
         return control;
@@ -326,8 +299,6 @@ public static class AvaloniaUtility
         )
         where T: TextBlock
     {
-        Sure.NotNull (block);
-
         block.FontStyle = italic ? FontStyle.Italic : FontStyle.Normal;
 
         return block;
@@ -358,9 +329,6 @@ public static class AvaloniaUtility
         )
         where T: Button
     {
-        Sure.NotNull (button);
-        Sure.NotNull (handler);
-
         button.Click += handler;
 
         return button;
@@ -381,10 +349,6 @@ public static class AvaloniaUtility
             VerticalAlignment verticalContentAlignment = VerticalAlignment.Center
         )
     {
-        Sure.NotNull (grid);
-        Sure.Positive (row);
-        Sure.Positive (column);
-
         var result = new Label
         {
             HorizontalAlignment = horizontalAlignment,
@@ -414,10 +378,6 @@ public static class AvaloniaUtility
             VerticalAlignment verticalAlignment = VerticalAlignment.Stretch
         )
     {
-        Sure.NotNull (grid);
-        Sure.Positive (row);
-        Sure.Positive (column);
-
         var result = new TextBlock
         {
             HorizontalAlignment = horizontalAlignment,
@@ -442,9 +402,6 @@ public static class AvaloniaUtility
         )
         where T: AvaloniaObject
     {
-        Sure.NotNull (obj);
-        Sure.Positive (column);
-
         obj.SetValue (Grid.ColumnProperty, column);
 
         return obj;
@@ -460,8 +417,6 @@ public static class AvaloniaUtility
         )
         where T: ContentControl
     {
-        Sure.NotNull (control);
-
         control.Margin = thickness;
 
         return control;
@@ -477,8 +432,6 @@ public static class AvaloniaUtility
         )
         where T: ContentControl
     {
-        Sure.NotNull (control);
-
         control.Margin = new Thickness (thickness);
 
         return control;
@@ -495,8 +448,6 @@ public static class AvaloniaUtility
         )
         where T: ContentControl
     {
-        Sure.NotNull (control);
-
         control.Margin = new Thickness (horizontal, vertical);
 
         return control;
@@ -515,8 +466,6 @@ public static class AvaloniaUtility
         )
         where T: ContentControl
     {
-        Sure.NotNull (control);
-
         control.Margin = new Thickness (left, top, right, bottom);
 
         return control;
@@ -532,8 +481,6 @@ public static class AvaloniaUtility
         )
         where T: TextBlock
     {
-        Sure.NotNull (block);
-
         block.Padding = thickness;
 
         return block;
@@ -549,8 +496,6 @@ public static class AvaloniaUtility
         )
         where T: TextBlock
     {
-        Sure.NotNull (block);
-
         block.Padding = new Thickness (thickness);
 
         return block;
@@ -567,8 +512,6 @@ public static class AvaloniaUtility
         )
         where T: TextBlock
     {
-        Sure.NotNull (block);
-
         block.Padding = new Thickness (horizontal, vertical);
 
         return block;
@@ -587,8 +530,6 @@ public static class AvaloniaUtility
         )
         where T: TextBlock
     {
-        Sure.NotNull (block);
-
         block.Padding = new Thickness (left, top, right, bottom);
 
         return block;
@@ -604,9 +545,6 @@ public static class AvaloniaUtility
         )
         where T: AvaloniaObject
     {
-        Sure.NotNull (obj);
-        Sure.Positive (row);
-
         obj.SetValue (Grid.RowProperty, row);
 
         return obj;
@@ -623,10 +561,6 @@ public static class AvaloniaUtility
         )
         where T: AvaloniaObject
     {
-        Sure.NotNull (obj);
-        Sure.Positive (row);
-        Sure.Positive (column);
-
         obj.SetValue (Grid.RowProperty, row);
         obj.SetValue (Grid.ColumnProperty, column);
 
@@ -641,8 +575,6 @@ public static class AvaloniaUtility
             this Window window
         )
     {
-        Sure.NotNull (window);
-
         var assembly = Assembly.GetEntryAssembly();
         var location = assembly?.Location;
         if (string.IsNullOrEmpty (location))
@@ -715,8 +647,6 @@ public static class AvaloniaUtility
         )
         where T: Control
     {
-        Sure.NotNull (control);
-
         control.HorizontalAlignment = HorizontalAlignment.Stretch;
         control.VerticalAlignment = VerticalAlignment.Stretch;
 
@@ -732,8 +662,6 @@ public static class AvaloniaUtility
         )
         where T: Control
     {
-        Sure.NotNull (control);
-
         control.HorizontalAlignment = HorizontalAlignment.Stretch;
 
         return control;
@@ -748,8 +676,6 @@ public static class AvaloniaUtility
         )
         where T: Control
     {
-        Sure.NotNull (control);
-
         control.VerticalAlignment = VerticalAlignment.Stretch;
 
         return control;
@@ -765,8 +691,6 @@ public static class AvaloniaUtility
         )
         where T: Panel
     {
-        Sure.NotNull (panel);
-
         panel.Children.AddRange (children);
 
         return panel;
