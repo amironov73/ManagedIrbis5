@@ -40,13 +40,11 @@ internal static class VersionUtils
     {
         var epubVersionType = typeof (EpubVersion);
         var fieldInfo = epubVersionType.GetRuntimeField (epubVersion.ToString());
-        if (fieldInfo != null)
+        if (fieldInfo is not null)
         {
             return fieldInfo.GetCustomAttribute<VersionStringAttribute>()?.Version ?? string.Empty;
         }
-        else
-        {
-            return epubVersion.ToString();
-        }
+
+        return epubVersion.ToString();
     }
 }

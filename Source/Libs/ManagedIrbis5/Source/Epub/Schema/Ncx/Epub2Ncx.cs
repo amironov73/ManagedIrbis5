@@ -2,14 +2,11 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
-/*
+/* Epub2Ncx.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,12 +20,38 @@ using System.Collections.Generic;
 
 namespace ManagedIrbis.Epub.Schema;
 
+/// <summary>
+///
+/// </summary>
 public class Epub2Ncx
 {
-    public Epub2NcxHead Head { get; set; }
-    public Epub2NcxDocTitle DocTitle { get; set; }
-    public List<Epub2NcxDocAuthor> DocAuthors { get; set; }
-    public Epub2NcxNavigationMap NavMap { get; set; }
-    public Epub2NcxPageList PageList { get; set; }
-    public List<Epub2NcxNavigationList> NavLists { get; set; }
+    /// <summary>
+    ///
+    /// </summary>
+    public Epub2NcxHead? Head { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public Epub2NcxDocTitle? DocTitle { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public List<Epub2NcxDocAuthor>? DocAuthors { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public Epub2NcxNavigationMap? NavMap { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public Epub2NcxPageList? PageList { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public List<Epub2NcxNavigationList>? NavLists { get; set; }
 }

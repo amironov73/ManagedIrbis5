@@ -7,7 +7,6 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* StructuralSemanticsProperty.cs --
  * Ars Magna project, http://arsmagna.ru

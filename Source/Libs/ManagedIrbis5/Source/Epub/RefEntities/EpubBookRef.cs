@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* EpubBookRef.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -28,12 +28,22 @@ using ManagedIrbis.Epub.Internal;
 
 namespace ManagedIrbis.Epub;
 
+/// <summary>
+///
+/// </summary>
 public class EpubBookRef
     : IDisposable
 {
     private bool isDisposed;
 
-    public EpubBookRef(IZipFile epubFile)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="epubFile"></param>
+    public EpubBookRef
+        (
+            IZipFile epubFile
+        )
     {
         EpubFile = epubFile;
         isDisposed = false;
@@ -41,60 +51,123 @@ public class EpubBookRef
 
     ~EpubBookRef()
     {
-        Dispose(false);
+        Dispose (false);
     }
 
-    public string FilePath { get; set; }
-    public string Title { get; set; }
-    public string Author { get; set; }
-    public List<string> AuthorList { get; set; }
-    public string Description { get; set; }
-    public EpubSchema Schema { get; set; }
-    public EpubContentRef Content { get; set; }
+    /// <summary>
+    ///
+    /// </summary>
+    public string? FilePath { get; set; }
 
-    internal IZipFile EpubFile { get; private set; }
+    /// <summary>
+    ///
+    /// </summary>
+    public string? Title { get; set; }
 
-    public byte[] ReadCover()
+    /// <summary>
+    ///
+    /// </summary>
+    public string? Author { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public List<string>? AuthorList { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public string? Description { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public EpubSchema? Schema { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public EpubContentRef? Content { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    internal IZipFile? EpubFile { get; private set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    public byte[]? ReadCover()
     {
         return ReadCoverAsync().Result;
     }
 
-    public async Task<byte[]> ReadCoverAsync()
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    public async Task<byte[]?> ReadCoverAsync()
     {
-        if (Content.Cover == null)
+        if (Content?.Cover is null)
         {
             return null;
         }
-        return await Content.Cover.ReadContentAsBytesAsync().ConfigureAwait(false);
+
+        return await Content.Cover.ReadContentAsBytesAsync().ConfigureAwait (false);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public List<EpubTextContentFileRef> GetReadingOrder()
     {
         return GetReadingOrderAsync().Result;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public async Task<List<EpubTextContentFileRef>> GetReadingOrderAsync()
     {
-        return await Task.Run(() => SpineReader.GetReadingOrder(this)).ConfigureAwait(false);
+        return await Task.Run (() => SpineReader.GetReadingOrder (this)).ConfigureAwait (false);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public List<EpubNavigationItemRef> GetNavigation()
     {
         return GetNavigationAsync().Result;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public async Task<List<EpubNavigationItemRef>> GetNavigationAsync()
     {
-        return await Task.Run(() => NavigationReader.GetNavigationItems(this)).ConfigureAwait(false);
+        return await Task.Run (() => NavigationReader.GetNavigationItems (this)).ConfigureAwait (false);
     }
 
+    /// <inheritdoc cref="IDisposable.Dispose"/>
     public void Dispose()
     {
-        Dispose(true);
-        GC.SuppressFinalize(this);
+        Dispose (true);
+        GC.SuppressFinalize (this);
     }
 
-    protected virtual void Dispose(bool disposing)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="disposing"></param>
+    protected virtual void Dispose
+        (
+            bool disposing
+        )
     {
         if (!isDisposed)
         {
@@ -102,6 +175,7 @@ public class EpubBookRef
             {
                 EpubFile?.Dispose();
             }
+
             isDisposed = true;
         }
     }
