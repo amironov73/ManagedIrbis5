@@ -6,6 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable LocalizableElement
 // ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
@@ -55,12 +56,12 @@ public sealed class MxExecutive
     #region Properties
 
     /// <summary>
-    /// Context.
+    /// Корневой контекст для PFT-форматтера.
     /// </summary>
     public PftContext Context { get; internal set; }
 
     /// <summary>
-    /// Console.
+    /// Консольный ввод-вывод.
     /// </summary>
     public IMxConsole MxConsole { get; set; }
 
@@ -70,22 +71,22 @@ public sealed class MxExecutive
     public IDictionary<string, string> Aliases { get; }
 
     /// <summary>
-    /// Palette.
+    /// Палитра цветов.
     /// </summary>
     public MxPalette Palette { get; set; }
 
     /// <summary>
-    /// Client.
+    /// Синхронное подключение к серверу ИРБИС64.
     /// </summary>
     public ISyncProvider Provider { get; internal set; }
 
     /// <summary>
-    /// Commands.
+    /// Словарь известных команд.
     /// </summary>
-    public NonNullCollection<MxCommand> Commands { get; private set; }
+    public NonNullCollection<MxCommand> Commands { get; }
 
     /// <summary>
-    /// Format.
+    /// Формат для библиографического описания.
     /// </summary>
     public string? DescriptionFormat { get; set; }
 
@@ -154,7 +155,7 @@ public sealed class MxExecutive
     #region Construction
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор по умолчанию.
     /// </summary>
     public MxExecutive()
     {
@@ -192,7 +193,7 @@ public sealed class MxExecutive
 
     #region Private members
 
-    private StringBuilder _output;
+    private readonly StringBuilder _output;
 
     private void _CancelKeyPress
         (
@@ -751,10 +752,6 @@ public sealed class MxExecutive
 
         Provider.Dispose();
     }
-
-    #endregion
-
-    #region Object members
 
     #endregion
 }

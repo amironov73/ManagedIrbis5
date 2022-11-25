@@ -4,31 +4,16 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
-/* MxArgument.cs --
+/* MxArgument.cs -- аргумент команды
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
-
-using Google.Protobuf.WellKnownTypes;
 
 #endregion
 
@@ -37,7 +22,7 @@ using Google.Protobuf.WellKnownTypes;
 namespace ManagedIrbis.Mx;
 
 /// <summary>
-///
+/// Аргумент MX-команды.
 /// </summary>
 public sealed class MxArgument
 {
@@ -49,25 +34,19 @@ public sealed class MxArgument
     public static readonly MxArgument[] Empty = Array.Empty<MxArgument>();
 
     /// <summary>
-    /// Text of the argument.
+    /// Текст аргумента.
     /// </summary>
     public string? Text { get; set; }
 
     #endregion
 
-    #region Construction
-
-    #endregion
-
-    #region Private members
-
-    #endregion
-
-    #region Public methods
-
-    #endregion
-
     #region Object members
+
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString()
+    {
+        return Text.ToVisibleString();
+    }
 
     #endregion
 }
