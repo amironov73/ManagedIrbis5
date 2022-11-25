@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* EpubReaderException.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,19 +23,49 @@ using System;
 
 namespace ManagedIrbis.Epub;
 
-public abstract class EpubReaderException : Exception
+/// <summary>
+///
+/// </summary>
+public abstract class EpubReaderException
+    : Exception
 {
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
     protected EpubReaderException()
     {
+        // пустое тело конструктора
     }
 
-    protected EpubReaderException(string message)
-        : base(message)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="message"></param>
+    protected EpubReaderException
+        (
+            string message
+        )
+        : base (message)
     {
+        // пустое тело конструктора
     }
 
-    protected EpubReaderException(string message, Exception innerException)
-        : base(message, innerException)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="message"></param>
+    /// <param name="innerException"></param>
+    protected EpubReaderException
+        (
+            string message,
+            Exception innerException
+        )
+        : base (message, innerException)
     {
+        // пустое тело конструктора
     }
+
+    #endregion
 }

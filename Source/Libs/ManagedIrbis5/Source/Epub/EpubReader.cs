@@ -172,7 +172,7 @@ public static class EpubReader
         (
             IZipFile zipFile,
             string filePath,
-            EpubReaderOptions epubReaderOptions
+            EpubReaderOptions? epubReaderOptions
         )
     {
         EpubBookRef? result = null;
@@ -182,8 +182,8 @@ public static class EpubReader
             result.FilePath = filePath;
             result.Schema = await SchemaReader.ReadSchemaAsync (zipFile, epubReaderOptions ?? new EpubReaderOptions())
                 .ConfigureAwait (false);
-            result.Title = result.Schema.Package.Metadata.Titles.FirstOrDefault() ?? String.Empty;
-            result.AuthorList = result.Schema.Package.Metadata.Creators.Select (creator => creator.Creator).ToList();
+            result.Title = result.Schema.Package?.Metadata.Titles.FirstOrDefault() ?? string.Empty;
+            result.AuthorList = result.Schema.Package?.Metadata.Creators.Select (creator => creator.Creator).ToList();
             result.Author = String.Join (", ", result.AuthorList);
             result.Description = result.Schema.Package.Metadata.Description;
             result.Content = await Task.Run (() => ContentReader.ParseContentMap (result)).ConfigureAwait (false);

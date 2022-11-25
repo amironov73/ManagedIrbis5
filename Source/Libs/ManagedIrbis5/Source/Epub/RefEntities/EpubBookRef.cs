@@ -28,7 +28,8 @@ using ManagedIrbis.Epub.Internal;
 
 namespace ManagedIrbis.Epub;
 
-public class EpubBookRef : IDisposable
+public class EpubBookRef
+    : IDisposable
 {
     private bool isDisposed;
 

@@ -2,14 +2,10 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
-/*
+/* EpubSchemaException.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,24 +19,62 @@ using System;
 
 namespace ManagedIrbis.Epub;
 
-public abstract class EpubSchemaException : EpubReaderException
+/// <summary>
+///
+/// </summary>
+public abstract class EpubSchemaException
+    : EpubReaderException
 {
-    protected EpubSchemaException(EpubSchemaFileType schemaFileType)
-    {
-        SchemaFileType = schemaFileType;
-    }
+    #region Properties
 
-    protected EpubSchemaException(string message, EpubSchemaFileType schemaFileType)
-        : base(message)
-    {
-        SchemaFileType = schemaFileType;
-    }
-
-    protected EpubSchemaException(string message, Exception innerException, EpubSchemaFileType schemaFileType)
-        : base(message, innerException)
-    {
-        SchemaFileType = schemaFileType;
-    }
-
+    /// <summary>
+    ///
+    /// </summary>
     public EpubSchemaFileType SchemaFileType { get; }
+
+    #endregion
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    /// <param name="schemaFileType"></param>
+    protected EpubSchemaException
+        (
+            EpubSchemaFileType schemaFileType
+        )
+    {
+        SchemaFileType = schemaFileType;
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    /// <param name="message"></param>
+    /// <param name="schemaFileType"></param>
+    protected EpubSchemaException
+        (
+            string message,
+            EpubSchemaFileType schemaFileType
+        )
+        : base (message)
+    {
+        SchemaFileType = schemaFileType;
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    /// <param name="message"></param>
+    /// <param name="innerException"></param>
+    /// <param name="schemaFileType"></param>
+    protected EpubSchemaException
+        (
+            string message,
+            Exception innerException,
+            EpubSchemaFileType schemaFileType
+        )
+        : base (message, innerException)
+    {
+        SchemaFileType = schemaFileType;
+    }
 }
