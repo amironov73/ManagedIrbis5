@@ -4,7 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedParameter.Local
 
 /* EpubNavigationItemType.cs --
  * Ars Magna project, http://arsmagna.ru

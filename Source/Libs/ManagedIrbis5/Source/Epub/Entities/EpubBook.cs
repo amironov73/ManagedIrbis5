@@ -5,10 +5,6 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedParameter.Local
 
 /* EpubBook.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -32,50 +28,50 @@ public class EpubBook
     /// <summary>
     ///
     /// </summary>
-    public string FilePath { get; set; }
+    public string? FilePath { get; set; }
 
     /// <summary>
     ///
     /// </summary>
-    public string Title { get; set; }
+    public string? Title { get; set; }
 
     /// <summary>
     ///
     /// </summary>
-    public string Author { get; set; }
+    public string? Author { get; set; }
 
     /// <summary>
     ///
     /// </summary>
-    public List<string> AuthorList { get; set; }
+    public List<string>? AuthorList { get; set; }
 
     /// <summary>
     ///
     /// </summary>
-    public byte[] CoverImage { get; set; }
+    public byte[]? CoverImage { get; set; }
 
     /// <summary>
     ///
     /// </summary>
-    public List<EpubTextContentFile> ReadingOrder { get; set; }
+    public List<EpubTextContentFile>? ReadingOrder { get; set; }
 
     /// <summary>
     ///
     /// </summary>
-    public List<EpubNavigationItem> Navigation { get; set; }
+    public List<EpubNavigationItem>? Navigation { get; set; }
 
     /// <summary>
     ///
     /// </summary>
-    public EpubContent Content { get; set; }
+    public EpubContent? Content { get; set; }
 
     /// <summary>
     ///
     /// </summary>
-    public EpubSchema Schema { get; set; }
+    public EpubSchema? Schema { get; set; }
 
     /// <summary>
     ///
     /// </summary>
-    public string Description { get; set; }
+    public string? Description { get; set; }
 }

@@ -5,10 +5,6 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedParameter.Local
 
 /* EpubContentFile.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -28,12 +24,12 @@ public abstract class EpubContentFile
     /// <summary>
     ///
     /// </summary>
-    public string FileName { get; set; }
+    public string? FileName { get; set; }
 
     /// <summary>
     ///
     /// </summary>
-    public string FilePathInEpubArchive { get; set; }
+    public string? FilePathInEpubArchive { get; set; }
 
     /// <summary>
     ///
@@ -43,7 +39,7 @@ public abstract class EpubContentFile
     /// <summary>
     ///
     /// </summary>
-    public string ContentMimeType { get; set; }
+    public string? ContentMimeType { get; set; }
 
     #endregion
 }

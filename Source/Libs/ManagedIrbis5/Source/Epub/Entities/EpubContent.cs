@@ -5,10 +5,6 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedParameter.Local
 
 /* EpubContent.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -32,35 +28,35 @@ public class EpubContent
     /// <summary>
     ///
     /// </summary>
-    public EpubByteContentFile Cover { get; set; }
+    public EpubByteContentFile? Cover { get; set; }
 
     /// <summary>
     ///
     /// </summary>
-    public EpubTextContentFile NavigationHtmlFile { get; set; }
+    public EpubTextContentFile? NavigationHtmlFile { get; set; }
 
     /// <summary>
     ///
     /// </summary>
-    public Dictionary<string, EpubTextContentFile> Html { get; set; }
+    public Dictionary<string, EpubTextContentFile>? Html { get; set; }
 
     /// <summary>
     ///
     /// </summary>
-    public Dictionary<string, EpubTextContentFile> Css { get; set; }
+    public Dictionary<string, EpubTextContentFile>? Css { get; set; }
 
     /// <summary>
     ///
     /// </summary>
-    public Dictionary<string, EpubByteContentFile> Images { get; set; }
+    public Dictionary<string, EpubByteContentFile>? Images { get; set; }
 
     /// <summary>
     ///
     /// </summary>
-    public Dictionary<string, EpubByteContentFile> Fonts { get; set; }
+    public Dictionary<string, EpubByteContentFile>? Fonts { get; set; }
 
     /// <summary>
     ///
     /// </summary>
-    public Dictionary<string, EpubContentFile> AllFiles { get; set; }
+    public Dictionary<string, EpubContentFile>? AllFiles { get; set; }
 }

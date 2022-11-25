@@ -41,22 +41,22 @@ public sealed class EpubNavigationItem
     /// <summary>
     ///
     /// </summary>
-    public string Title { get; set; }
+    public string? Title { get; set; }
 
     /// <summary>
     ///
     /// </summary>
-    public EpubNavigationItemLink Link { get; set; }
+    public EpubNavigationItemLink? Link { get; set; }
 
     /// <summary>
     ///
     /// </summary>
-    public EpubTextContentFile HtmlContentFile { get; set; }
+    public EpubTextContentFile? HtmlContentFile { get; set; }
 
     /// <summary>
     ///
     /// </summary>
-    public List<EpubNavigationItem> NestedItems { get; set; }
+    public List<EpubNavigationItem>? NestedItems { get; set; }
 
     #endregion
 
@@ -102,7 +102,7 @@ public sealed class EpubNavigationItem
     /// <inheritdoc cref="object.ToString"/>
     public override string ToString()
     {
-        return $"Type: {Type}, Title: {Title}, NestedItems.Count: {NestedItems.Count}";
+        return $"Type: {Type}, Title: {Title}, NestedItems.Count: {NestedItems?.Count}";
     }
 
     #endregion

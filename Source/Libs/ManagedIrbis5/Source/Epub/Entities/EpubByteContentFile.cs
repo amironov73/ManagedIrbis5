@@ -5,10 +5,6 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedParameter.Local
 
 /* EpubByteContentFile.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -27,5 +23,5 @@ public class EpubByteContentFile
     /// <summary>
     ///
     /// </summary>
-    public byte[] Content { get; set; }
+    public byte[]? Content { get; set; }
 }

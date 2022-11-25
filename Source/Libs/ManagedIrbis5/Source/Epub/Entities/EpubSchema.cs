@@ -5,9 +5,6 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* EpubSchema.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -33,22 +30,22 @@ public sealed class EpubSchema
     /// <summary>
     ///
     /// </summary>
-    public EpubPackage Package { get; set; }
+    public EpubPackage? Package { get; set; }
 
     /// <summary>
     ///
     /// </summary>
-    public Epub2Ncx Epub2Ncx { get; set; }
+    public Epub2Ncx? Epub2Ncx { get; set; }
 
     /// <summary>
     ///
     /// </summary>
-    public Epub3NavDocument Epub3NavDocument { get; set; }
+    public Epub3NavDocument? Epub3NavDocument { get; set; }
 
     /// <summary>
     ///
     /// </summary>
-    public string ContentDirectoryPath { get; set; }
+    public string? ContentDirectoryPath { get; set; }
 
     #endregion
 }
