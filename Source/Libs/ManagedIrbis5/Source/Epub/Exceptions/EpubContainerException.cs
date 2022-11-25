@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* EpubContainerException
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,7 +23,8 @@ using System;
 
 namespace ManagedIrbis.Epub;
 
-public class EpubContainerException : EpubSchemaException
+public class EpubContainerException
+    : EpubSchemaException
 {
     public EpubContainerException()
         : base(EpubSchemaFileType.META_INF_CONTAINER)

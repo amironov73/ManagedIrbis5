@@ -5,10 +5,6 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedParameter.Local
 
 /* Epub2NcxException.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -27,7 +23,7 @@ namespace ManagedIrbis.Epub;
 /// <summary>
 ///
 /// </summary>
-public class Epub2NcxException
+public sealed class Epub2NcxException
     : EpubSchemaException
 {
     #region Construction

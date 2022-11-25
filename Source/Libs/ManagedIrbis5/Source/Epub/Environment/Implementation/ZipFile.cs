@@ -33,28 +33,28 @@ internal class ZipFile
     private readonly ZipArchive zipArchive;
     private bool isDisposed;
 
-    public ZipFile(ZipArchive zipArchive)
+    public ZipFile (ZipArchive zipArchive)
     {
         this.zipArchive = zipArchive;
     }
 
     ~ZipFile()
     {
-        Dispose(false);
+        Dispose (false);
     }
 
-    public IZipFileEntry GetEntry(string entryName)
+    public IZipFileEntry GetEntry (string entryName)
     {
-        return new ZipFileEntry(zipArchive.GetEntry(entryName));
+        return new ZipFileEntry (zipArchive.GetEntry (entryName));
     }
 
     public void Dispose()
     {
-        Dispose(true);
-        GC.SuppressFinalize(this);
+        Dispose (true);
+        GC.SuppressFinalize (this);
     }
 
-    protected virtual void Dispose(bool disposing)
+    protected virtual void Dispose (bool disposing)
     {
         if (!isDisposed)
         {
@@ -62,6 +62,7 @@ internal class ZipFile
             {
                 zipArchive?.Dispose();
             }
+
             isDisposed = true;
         }
     }

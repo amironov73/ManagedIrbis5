@@ -32,7 +32,7 @@ internal class ZipFileEntry
 {
     private readonly ZipArchiveEntry zipArchiveEntry;
 
-    public ZipFileEntry(ZipArchiveEntry zipArchiveEntry)
+    public ZipFileEntry (ZipArchiveEntry zipArchiveEntry)
     {
         this.zipArchiveEntry = zipArchiveEntry;
     }

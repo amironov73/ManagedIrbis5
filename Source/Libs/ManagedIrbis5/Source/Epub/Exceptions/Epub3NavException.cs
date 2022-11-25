@@ -5,9 +5,6 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /*
  * Ars Magna project, http://arsmagna.ru
@@ -23,20 +20,39 @@ using System;
 
 namespace ManagedIrbis.Epub;
 
-public class Epub3NavException : EpubSchemaException
+/// <summary>
+///
+/// </summary>
+public sealed class Epub3NavException
+    : EpubSchemaException
 {
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
     public Epub3NavException()
-        : base(EpubSchemaFileType.EPUB3_NAV_DOCUMENT)
+        : base (EpubSchemaFileType.EPUB3_NAV_DOCUMENT)
     {
+        // пустое тело конструктора
     }
 
-    public Epub3NavException(string message)
-        : base(message, EpubSchemaFileType.EPUB3_NAV_DOCUMENT)
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    /// <param name="message"></param>
+    public Epub3NavException (string message)
+        : base (message, EpubSchemaFileType.EPUB3_NAV_DOCUMENT)
     {
+        // пустое тело конструктора
     }
 
-    public Epub3NavException(string message, Exception innerException)
-        : base(message, innerException, EpubSchemaFileType.EPUB3_NAV_DOCUMENT)
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    /// <param name="message"></param>
+    /// <param name="innerException"></param>
+    public Epub3NavException (string message, Exception innerException)
+        : base (message, innerException, EpubSchemaFileType.EPUB3_NAV_DOCUMENT)
     {
+        // пустое тело конструктора
     }
 }
