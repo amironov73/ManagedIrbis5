@@ -1,17 +1,16 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable BuiltInTypeReferenceStyle
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable FieldCanBeMadeReadOnly.Global
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMember.Local
-// ReSharper disable UnusedType.Global
+
+#pragma warning disable CA1401 // метод с DllImport не должен быть видимым
 
 /* User32.cs -- wrapper for USER32.DLL API.
    Ars Magna project, http://arsmagna.ru */
@@ -38,46 +37,46 @@ public static class User32
     /// <summary>
     /// Default window position for CreateWindow().
     /// </summary>
-    const int CW_USEDEFAULT = unchecked ((int)0x80000000);
+    public const int CW_USEDEFAULT = unchecked ((int)0x80000000);
 
     /// <summary>
     /// Default value for TrackMouseEvent().
     /// </summary>
-    const uint HOVER_DEFAULT = 0xFFFFFFFF;
+    public const uint HOVER_DEFAULT = 0xFFFFFFFF;
 
     /// <summary>
     /// Allow set foreground window for all processes
     /// (see AllowSetForegroundWindow function).
     /// </summary>
-    const uint ASFW_ANY = 0xFFFFFFFF;
+    public const uint ASFW_ANY = 0xFFFFFFFF;
 
     /// <summary>
     /// Disables calls to SetForegroundWindow
     /// (see LockSetForegroundWindow).
     /// </summary>
-    const int LSFW_LOCK = 1;
+    public const int LSFW_LOCK = 1;
 
     /// <summary>
     /// Enables calls to SetForegroundWindow
     /// (see LockSetForegroundWindow).
     /// </summary>
-    const int LSFW_UNLOCK = 2;
+    public const int LSFW_UNLOCK = 2;
 
     /// <summary>
     /// Broadcast window.
     /// </summary>
-    public static readonly IntPtr HWND_BROADCAST = new IntPtr (0xffff);
+    public static readonly IntPtr HWND_BROADCAST = new (0xffff);
 
     /// <summary>
     /// Message-only window.
     /// </summary>
-    public static readonly IntPtr HWND_MESSAGE = new IntPtr (-3);
+    public static readonly IntPtr HWND_MESSAGE = new (-3);
 
     /// <summary>
     /// Places the window at the top of the Z order
     /// (see DeferWindowPos function).
     /// </summary>
-    public static readonly IntPtr HWND_TOP = new IntPtr (0);
+    public static readonly IntPtr HWND_TOP = IntPtr.Zero;
 
     /// <summary>
     /// Places the window at the bottom of the Z order.
@@ -85,14 +84,14 @@ public static class User32
     /// the window loses its topmost status and is placed at the
     /// bottom of all other windows (see DeferWindowPos function).
     /// </summary>
-    public static readonly IntPtr HWND_BOTTOM = new IntPtr (1);
+    public static readonly IntPtr HWND_BOTTOM = new (1);
 
     /// <summary>
     /// Places the window above all non-topmost windows. The window
     /// maintains its topmost position even when it is deactivated
     /// (see DeferWindowPos function).
     /// </summary>
-    public static readonly IntPtr HWND_TOPMOST = new IntPtr (-1);
+    public static readonly IntPtr HWND_TOPMOST = new (-1);
 
     /// <summary>
     /// Places the window above all non-topmost windows (that is,
@@ -100,7 +99,7 @@ public static class User32
     /// the window is already a non-topmost window (see
     /// DeferWindowPos function).
     /// </summary>
-    public static readonly IntPtr HWND_NOTOPMOST = new IntPtr (-2);
+    public static readonly IntPtr HWND_NOTOPMOST = new (-2);
 
     /// <summary>
     /// Infinite wait interval.
@@ -127,7 +126,7 @@ public static class User32
     /// nonzero.</returns>
     /// <remarks><para>Included in: Windows NT/XP/2000/2003.</para>
     /// </remarks>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool AbortSystemShutdown
         (
             string lpMachineName
@@ -725,7 +724,7 @@ public static class User32
     /// is a handle to the new window.</para>
     /// <para>If the function fails, the return value is NULL.</para>
     /// </returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern IntPtr CreateWindowEx
         (
             ExtendedWindowStyle dwExStyle,
@@ -1191,7 +1190,7 @@ public static class User32
     /// used and should be set to zero. </param>
     /// <returns>If the function succeeds, the return value
     /// is nonzero.</returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool EnumDisplayDevices
         (
             string lpDevice,
@@ -1223,7 +1222,7 @@ public static class User32
     /// used and should be set to zero. </param>
     /// <returns>If the function succeeds, the return value
     /// is nonzero.</returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool EnumDisplayDevices
         (
             string lpDevice,
@@ -1257,7 +1256,7 @@ public static class User32
     /// driver data.</param>
     /// <returns>If the function succeeds, the return value is nonzero.
     /// </returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool EnumDisplaySettings
         (
             string lpszDeviceName,
@@ -1290,7 +1289,7 @@ public static class User32
     /// driver data.</param>
     /// <returns>If the function succeeds, the return value is nonzero.
     /// </returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool EnumDisplaySettings
         (
             string lpszDeviceName,
@@ -1470,7 +1469,7 @@ public static class User32
     /// handle to the window that has the specified class name and
     /// window name. If the function fails, the return value is NULL.
     /// </returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern IntPtr FindWindow
         (
             string lpClassName,
@@ -1520,7 +1519,7 @@ public static class User32
     /// a handle to the window that has the specified class and
     /// window names. If the function fails, the return value
     /// is NULL.</returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern IntPtr FindWindowEx
         (
             IntPtr hwndParent,
@@ -1568,7 +1567,7 @@ public static class User32
     /// pszItemText buffer.</param>
     /// <returns>If the function succeeds, the return value is nonzero.
     /// </returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool GetAltTabInfo
         (
             IntPtr hwnd,
@@ -1632,7 +1631,7 @@ public static class User32
     /// <returns>If the function succeeds, the return value is the
     /// number of TCHAR copied to the specified buffer.
     /// If the function fails, the return value is zero.</returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern int GetClassName
         (
             IntPtr hWnd,
@@ -2348,7 +2347,7 @@ public static class User32
     /// bar is empty, or if the window or control handle is invalid, the
     /// return value is zero. To get extended error information, call
     /// GetLastError.</returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern int GetWindowText
         (
             IntPtr hWnd,
@@ -2389,7 +2388,7 @@ public static class User32
     /// <returns>If the function succeeds, the return value is the
     /// newly created atom. If the function fails, the return value
     /// is zero.</returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern short GlobalAddAtom
         (
             string lpString
@@ -2520,7 +2519,7 @@ public static class User32
     /// output function returned zero, or there was insufficient
     /// memory to create a memory bitmap for graying, the return
     /// value is zero.</returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool GrayString
         (
             IntPtr hDC,
@@ -2583,7 +2582,7 @@ public static class User32
     /// computers.</para>
     /// <para>Included in: Windows NT/XP/2000/2003.</para>
     /// </remarks>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool InitiateSystemShutdown
         (
             string lpMachineName,
@@ -2925,7 +2924,7 @@ public static class User32
     /// word. Use the MAKEINTRESOURCE macro to create this value.
     /// </param>
     /// <returns></returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern IntPtr LoadIcon
         (
             IntPtr hInstance,
@@ -2969,7 +2968,7 @@ public static class User32
     /// <returns>If the function succeeds, the return value is
     /// the handle of the newly loaded image. If the function fails,
     /// the return value is NULL.</returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern IntPtr LoadImage
         (
             IntPtr hinst,
@@ -3084,7 +3083,7 @@ public static class User32
     /// <param name="uType">Specifies the contents and behavior of the
     /// dialog box.</param>
     /// <returns></returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern MessageBoxResult MessageBox
         (
             IntPtr hWnd,
@@ -3499,7 +3498,7 @@ public static class User32
     /// <returns>If the message is successfully registered, the return
     /// value is a message identifier in the range 0xC000 through 0xFFFF.
     /// If the function fails, the return value is zero.</returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern int RegisterWindowMessage
         (
             string lpString
@@ -3767,7 +3766,7 @@ public static class User32
     /// <param name="wParam"></param>
     /// <param name="lParam"></param>
     /// <returns></returns>
-    [DllImport (DllName, SetLastError = false)]
+    [DllImport (DllName, SetLastError = false, CharSet = CharSet.Unicode)]
     public static extern int SendMessage
         (
             IntPtr hWnd,
@@ -4227,7 +4226,7 @@ public static class User32
     /// characters (ASCII code 0x09). Tab characters are displayed
     /// as vertical bar (|) characters.</para>
     /// </remarks>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool SetWindowText
         (
             IntPtr hWnd,
