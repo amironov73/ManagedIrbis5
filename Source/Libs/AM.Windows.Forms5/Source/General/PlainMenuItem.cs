@@ -22,38 +22,35 @@ using System;
 
 #nullable enable
 
-namespace AM.Windows.Forms.General
+namespace AM.Windows.Forms.General;
+
+/// <summary>
+/// Простой элемент меню, реализованный
+/// стандартными компонентами WinForms.
+/// </summary>
+public class PlainMenuItem
+    : IGeneralItem
 {
+    #region IGeneralItem members
+
+    /// <inheritdoc cref="IGeneralItem.Id"/>
+    public string Id => throw new NotImplementedException();
+
+    /// <inheritdoc cref="IGeneralItem.Caption"/>
+    public string Caption => throw new NotImplementedException();
+
+    /// <inheritdoc cref="IGeneralItem.Enabled"/>
+    public bool Enabled => throw new NotImplementedException();
+
     /// <summary>
-    /// Простой элемент меню, реализованный
-    /// стандартными компонентами WinForms.
+    /// Основное действие.
     /// </summary>
-    public class PlainMenuItem
-        : IGeneralItem
-    {
-        #region IGeneralItem members
+    public event EventHandler? Execute;
 
-        /// <inheritdoc cref="IGeneralItem.Id"/>
-        public string Id => throw new NotImplementedException();
+    /// <summary>
+    /// Обновление состояния.
+    /// </summary>
+    public event EventHandler? Update;
 
-        /// <inheritdoc cref="IGeneralItem.Caption"/>
-        public string Caption => throw new NotImplementedException();
-
-        /// <inheritdoc cref="IGeneralItem.Enabled"/>
-        public bool Enabled => throw new NotImplementedException();
-
-        /// <summary>
-        /// Основное действие.
-        /// </summary>
-        public event EventHandler? Execute;
-
-        /// <summary>
-        /// Обновление состояния.
-        /// </summary>
-        public event EventHandler? Update;
-
-        #endregion
-
-    } // class PlainMenuItem
-
-} // namespace AM.Windows.Forms.General
+    #endregion
+}

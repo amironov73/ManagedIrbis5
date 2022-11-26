@@ -20,34 +20,31 @@ using System.Windows.Forms;
 
 #nullable enable
 
-namespace AM.Windows.Forms.General
+namespace AM.Windows.Forms.General;
+
+/// <summary>
+/// Контейнер с элементами пользовательского интерфейса.
+/// Например, форма.
+/// </summary>
+public interface IGeneralContainer
 {
     /// <summary>
-    /// Контейнер с элементами пользовательского интерфейса.
-    /// Например, форма.
+    /// Тулбары.
     /// </summary>
-    public interface IGeneralContainer
-    {
-        /// <summary>
-        /// Тулбары.
-        /// </summary>
-        IGeneralItemList Toolbars { get; }
+    IGeneralItemList Toolbars { get; }
 
-        /// <summary>
-        /// Главное меню.
-        /// </summary>
-        IGeneralItem MainMenu { get; }
+    /// <summary>
+    /// Главное меню.
+    /// </summary>
+    IGeneralItem MainMenu { get; }
 
-        /// <summary>
-        /// Строка статуса.
-        /// </summary>
-        IGeneralItem StatusBar { get; }
+    /// <summary>
+    /// Строка статуса.
+    /// </summary>
+    IGeneralItem StatusBar { get; }
 
-        /// <summary>
-        /// Рабочая область.
-        /// </summary>
-        Control? WorkingArea { get; }
-
-    } // interface IGeneralContainer
-
-} // namespace AM.Windows.Forms.General
+    /// <summary>
+    /// Рабочая область.
+    /// </summary>
+    Control? WorkingArea { get; }
+}

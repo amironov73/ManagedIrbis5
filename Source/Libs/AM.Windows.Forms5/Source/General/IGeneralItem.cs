@@ -20,39 +20,36 @@ using System;
 
 #nullable enable
 
-namespace AM.Windows.Forms.General
+namespace AM.Windows.Forms.General;
+
+/// <summary>
+/// Некий элемент пользовательского интерфейса,
+/// например, кнопка или элемент меню.
+/// </summary>
+public interface IGeneralItem
 {
     /// <summary>
-    /// Некий элемент пользовательского интерфейса,
-    /// например, кнопка или элемент меню.
+    /// Уникальный идентификатор (в пределах контейнера).
     /// </summary>
-    public interface IGeneralItem
-    {
-        /// <summary>
-        /// Уникальный идентификатор (в пределах контейнера).
-        /// </summary>
-        string Id { get; }
+    string Id { get; }
 
-        /// <summary>
-        /// Текст на кнопке или элементе меню.
-        /// </summary>
-        string Caption { get; }
+    /// <summary>
+    /// Текст на кнопке или элементе меню.
+    /// </summary>
+    string Caption { get; }
 
-        /// <summary>
-        /// Разрешено в настоящий момент?
-        /// </summary>
-        bool Enabled { get; }
+    /// <summary>
+    /// Разрешено в настоящий момент?
+    /// </summary>
+    bool Enabled { get; }
 
-        /// <summary>
-        /// Основное действие.
-        /// </summary>
-        event EventHandler? Execute;
+    /// <summary>
+    /// Основное действие.
+    /// </summary>
+    event EventHandler? Execute;
 
-        /// <summary>
-        /// Обновление состояния.
-        /// </summary>
-        event EventHandler? Update;
-
-    } // interface IGeneralItem
-
-} // namespace AM.Windows.Forms.General
+    /// <summary>
+    /// Обновление состояния.
+    /// </summary>
+    event EventHandler? Update;
+}

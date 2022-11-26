@@ -22,67 +22,64 @@ using System;
 
 #nullable enable
 
-namespace AM.Windows.Forms.General
+namespace AM.Windows.Forms.General;
+
+/// <summary>
+/// Простой тулбар, реализованный целиком средствами
+/// стандартных компонентов WinForms.
+/// </summary>
+public class PlainToolbar
+    : IGeneralItem,
+    IGeneralItemList
 {
+    #region IGeneralItem members
+
+    /// <inheritdoc cref="IGeneralItem.Id"/>
+    public string Id => throw new NotImplementedException();
+
+    /// <inheritdoc cref="IGeneralItem.Caption"/>
+    public string Caption => throw new NotImplementedException();
+
+    /// <inheritdoc cref="IGeneralItem.Enabled"/>
+    public bool Enabled => throw new NotImplementedException();
+
     /// <summary>
-    /// Простой тулбар, реализованный целиком средствами
-    /// стандартных компонентов WinForms.
+    /// Основное действие.
     /// </summary>
-    public class PlainToolbar
-        : IGeneralItem,
-        IGeneralItemList
-    {
-        #region IGeneralItem members
+    public event EventHandler? Execute;
 
-        /// <inheritdoc cref="IGeneralItem.Id"/>
-        public string Id => throw new NotImplementedException();
+    /// <summary>
+    /// Обновление состояния.
+    /// </summary>
+    public event EventHandler? Update;
 
-        /// <inheritdoc cref="IGeneralItem.Caption"/>
-        public string Caption => throw new NotImplementedException();
+    #endregion
 
-        /// <inheritdoc cref="IGeneralItem.Enabled"/>
-        public bool Enabled => throw new NotImplementedException();
+    #region IGeneralItemList members
 
-        /// <summary>
-        /// Основное действие.
-        /// </summary>
-        public event EventHandler? Execute;
+    /// <inheritdoc cref="IGeneralItemList.Count"/>
+    public int Count => throw new NotImplementedException();
 
-        /// <summary>
-        /// Обновление состояния.
-        /// </summary>
-        public event EventHandler? Update;
+    /// <inheritdoc cref="IGeneralItemList.this[int]"/>
+    public IGeneralItem this [int index] => throw new NotImplementedException();
 
-        #endregion
+    /// <inheritdoc cref="IGeneralItemList.this[string]"/>
+    public IGeneralItem this [string id] => throw new NotImplementedException();
 
-        #region IGeneralItemList members
+    /// <inheritdoc cref="IGeneralItemList.Add"/>
+    public void Add (IGeneralItem item) => throw new NotImplementedException();
 
-        /// <inheritdoc cref="IGeneralItemList.Count"/>
-        public int Count => throw new NotImplementedException();
+    /// <inheritdoc cref="IGeneralItemList.Clear"/>
+    public void Clear() => throw new NotImplementedException();
 
-        /// <inheritdoc cref="IGeneralItemList.this[int]"/>
-        public IGeneralItem this[int index] => throw new NotImplementedException();
+    /// <inheritdoc cref="IGeneralItemList.CreateItem"/>
+    public IGeneralItem CreateItem (string id, string caption) => throw new NotImplementedException();
 
-        /// <inheritdoc cref="IGeneralItemList.this[string]"/>
-        public IGeneralItem this[string id] => throw new NotImplementedException();
+    /// <inheritdoc cref="IGeneralItemList.Contains"/>
+    public bool Contains (IGeneralItem item) => throw new NotImplementedException();
 
-        /// <inheritdoc cref="IGeneralItemList.Add"/>
-        public void Add(IGeneralItem item) => throw new NotImplementedException();
+    /// <inheritdoc cref="IGeneralItemList.Remove"/>
+    public void Remove (IGeneralItem item) => throw new NotImplementedException();
 
-        /// <inheritdoc cref="IGeneralItemList.Clear"/>
-        public void Clear() => throw new NotImplementedException();
-
-        /// <inheritdoc cref="IGeneralItemList.CreateItem"/>
-        public IGeneralItem CreateItem(string id, string caption) => throw new NotImplementedException();
-
-        /// <inheritdoc cref="IGeneralItemList.Contains"/>
-        public bool Contains(IGeneralItem item) => throw new NotImplementedException();
-
-        /// <inheritdoc cref="IGeneralItemList.Remove"/>
-        public void Remove(IGeneralItem item) => throw new NotImplementedException();
-
-        #endregion
-
-    } // class PlainToolbar
-
-} // namespace AM.Windows.Forms.General
+    #endregion
+}

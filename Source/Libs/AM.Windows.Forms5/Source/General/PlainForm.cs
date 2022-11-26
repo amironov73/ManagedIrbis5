@@ -21,31 +21,28 @@ using System.Windows.Forms;
 
 #nullable enable
 
-namespace AM.Windows.Forms.General
+namespace AM.Windows.Forms.General;
+
+/// <summary>
+/// Простая форма, реализованная целиком
+/// стандартными средствами WinForms.
+/// </summary>
+public class PlainForm
+    : IGeneralContainer
 {
-    /// <summary>
-    /// Простая форма, реализованная целиком
-    /// стандартными средствами WinForms.
-    /// </summary>
-    public class PlainForm
-        : IGeneralContainer
-    {
-        #region IGeneralContainer members
+    #region IGeneralContainer members
 
-        /// <inheritdoc cref="IGeneralContainer.Toolbars"/>
-        public IGeneralItemList Toolbars => throw new NotImplementedException();
+    /// <inheritdoc cref="IGeneralContainer.Toolbars"/>
+    public IGeneralItemList Toolbars => throw new NotImplementedException();
 
-        /// <inheritdoc cref="IGeneralContainer.MainMenu"/>
-        public IGeneralItem MainMenu => throw new NotImplementedException();
+    /// <inheritdoc cref="IGeneralContainer.MainMenu"/>
+    public IGeneralItem MainMenu => throw new NotImplementedException();
 
-        /// <inheritdoc cref="IGeneralContainer.StatusBar"/>
-        public IGeneralItem StatusBar => throw new NotImplementedException();
+    /// <inheritdoc cref="IGeneralContainer.StatusBar"/>
+    public IGeneralItem StatusBar => throw new NotImplementedException();
 
-        /// <inheritdoc cref="IGeneralContainer.WorkingArea"/>
-        public Control WorkingArea => throw new NotImplementedException();
+    /// <inheritdoc cref="IGeneralContainer.WorkingArea"/>
+    public Control WorkingArea => throw new NotImplementedException();
 
-        #endregion
-
-    } // class PlainForm
-
-} // namespace AM.Windows.Forms.General
+    #endregion
+}
