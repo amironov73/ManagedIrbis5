@@ -1,6 +1,7 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable BuiltInTypeReferenceStyle
 // ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
@@ -12,7 +13,9 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* Kernel32.cs -- kernel32.dll interop
+#pragma warning disable CA1401 // метод с DllImport не должен быть видимым
+
+/* Kernel32.cs -- методы из kernel32.dll
    Ars Magna project, http://arsmagna.ru */
 
 #region Using directives
@@ -28,7 +31,7 @@ using System.Text;
 namespace AM.Win32;
 
 /// <summary>
-/// Kernel32.dll interop.
+/// Метод kernel32.dll.
 /// </summary>
 public static class Kernel32
 {
@@ -42,7 +45,7 @@ public static class Kernel32
     /// <summary>
     /// Invalid handle value.
     /// </summary>
-    public static readonly IntPtr INVALID_HANDLE_VALUE = new IntPtr (-1);
+    public static readonly IntPtr INVALID_HANDLE_VALUE = new (-1);
 
     /// <summary>
     /// Null handle.
@@ -83,7 +86,7 @@ public static class Kernel32
     /// the console alias is to be defined.</param>
     /// <returns>If the function succeeds, the return value
     /// is TRUE.</returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool AddConsoleAlias
         (
             string Source,
@@ -211,7 +214,7 @@ public static class Kernel32
     /// <returns>If the function succeeds, the return value is nonzero.
     /// </returns>
     /// <remarks>Included in Windows XP SP1.</remarks>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool CheckNameLegalDOS8Dot3
         (
             string lpName,
@@ -302,7 +305,7 @@ public static class Kernel32
     /// existing file and succeeds.</param>
     /// <returns>If the function succeeds, the return value is nonzero.
     /// </returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool CopyFile
         (
             string lpExistingFileName,
@@ -352,7 +355,7 @@ public static class Kernel32
     /// <para>This function fails with ERROR_ACCESS_DENIED if the
     /// destination file already exists and has the FILE_ATTRIBUTE_HIDDEN
     /// or FILE_ATTRIBUTE_READONLY attribute set.</para></remarks>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool CopyFileEx
         (
             string lpExistingFileName,
@@ -429,7 +432,7 @@ public static class Kernel32
     /// global or session name space. The remainder of the name
     /// can contain any character except the backslash character
     /// (\).</remarks>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern IntPtr CreateEvent
         (
             IntPtr lpEventAttributes,
@@ -469,7 +472,7 @@ public static class Kernel32
     /// to GetLastError returns ERROR_ALREADY_EXISTS (even though the function
     /// has succeeded). If the file does not exist before the call, GetLastError
     /// returns zero.</returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern IntPtr CreateFile
         (
             string lpFileName,
@@ -534,7 +537,7 @@ public static class Kernel32
     /// explicitly create the object in the global or session name
     /// space. The remainder of the name can contain any character
     /// except the backslash character (\).</remarks>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern IntPtr CreateFileMapping
         (
             IntPtr hFile,
@@ -558,7 +561,7 @@ public static class Kernel32
     /// </param>
     /// <returns>If the function succeeds, the return value is nonzero.
     /// </returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool CreateHardLink
         (
             string lpFileName,
@@ -655,7 +658,7 @@ public static class Kernel32
     /// handle to the server end of a named pipe instance. If the
     /// function fails, the return value is INVALID_HANDLE_VALUE.
     /// </returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern IntPtr CreateNamedPipe
         (
             string lpName,
@@ -779,7 +782,7 @@ public static class Kernel32
     /// <param name="dwReserved">Reserved; must be zero.</param>
     /// <returns>If the function succeeds, the return value is nonzero.
     /// </returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool DecryptFile
         (
             string lpFileName,
@@ -803,7 +806,7 @@ public static class Kernel32
     /// in which case this string is a path string.</param>
     /// <returns>If the function succeeds, the return value is nonzero.
     /// </returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool DefineDosDevice
         (
             DosDeviceFlags dwFlags,
@@ -826,7 +829,7 @@ public static class Kernel32
     /// is nonzero.</returns>
     /// <remarks>If an application attempts to delete a file that
     /// does not exist, the DeleteFile function fails.</remarks>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool DeleteFile
         (
             string lpFileName
@@ -842,7 +845,7 @@ public static class Kernel32
     /// A trailing backslash is required.</param>
     /// <returns>If the function succeeds, the return value is nonzero.
     /// </returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool DeleteVolumeMountPoint
         (
             string lpszVolumeMountPoint
@@ -949,7 +952,7 @@ public static class Kernel32
     /// access rights.</para></param>
     /// <returns>If the function succeeds, the return value is nonzero.
     /// </returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool EncryptFile
         (
             string lpFileName
@@ -1003,7 +1006,7 @@ public static class Kernel32
     /// <param name="uAction">Reserved; must be zero.</param>
     /// <param name="lpMessageText">Pointer to a null-terminated
     /// string that is displayed in the message box.</param>
-    [DllImport (DllName, SetLastError = false)]
+    [DllImport (DllName, SetLastError = false, CharSet = CharSet.Unicode)]
     public static extern void FatalAppExit
         (
             uint uAction,
@@ -1152,7 +1155,7 @@ public static class Kernel32
     /// handle used in a subsequent call to FindNextFile or FindClose.
     /// If the function fails, the return value is INVALID_HANDLE_VALUE.
     /// </returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern IntPtr FindFirstFile
         (
             string lpFileName,
@@ -1174,7 +1177,7 @@ public static class Kernel32
     /// FindVolumeClose functions. If the function fails to find any
     /// volumes, the return value is the INVALID_HANDLE_VALUE error code.
     /// </returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern IntPtr FindFirstVolume
         (
             StringBuilder lpszVolumeName,
@@ -1200,7 +1203,7 @@ public static class Kernel32
     /// If the function fails to find a volume mount point on the volume,
     /// the return value is the INVALID_HANDLE_VALUE error code.
     /// </returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern IntPtr FindFirstVolumeMountPoint
         (
             string lpszRootPathName,
@@ -1240,7 +1243,7 @@ public static class Kernel32
     /// the name, in TCHARs. </param>
     /// <returns>If the function succeeds, the return value is nonzero.
     /// </returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool FindNextVolume
         (
             IntPtr hFindVolume,
@@ -1263,7 +1266,7 @@ public static class Kernel32
     /// receives the names, in TCHARs.</param>
     /// <returns>If the function succeeds, the return value is nonzero.
     /// </returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool FindNextVolumeMountPoint
         (
             IntPtr hFindVolumeMountPoint,
@@ -1284,8 +1287,7 @@ public static class Kernel32
     /// </param>
     /// <param name="lpType">Specifies the resource type.</param>
     /// <returns></returns>
-    [DllImport (DllName, SetLastError = true,
-        CharSet = CharSet.Ansi, EntryPoint = "FindResourceA")]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode, EntryPoint = "FindResourceA")]
     public static extern IntPtr FindResource
         (
             IntPtr hModule,
@@ -1306,8 +1308,7 @@ public static class Kernel32
     /// </param>
     /// <param name="lpType">Specifies the resource type.</param>
     /// <returns></returns>
-    [DllImport (DllName, SetLastError = true,
-        CharSet = CharSet.Auto)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern IntPtr FindResource
         (
             IntPtr hModule,
@@ -1511,7 +1512,7 @@ public static class Kernel32
     /// the number of TCHARs stored in the output buffer,
     /// excluding the terminating null character. If the function
     /// fails, the return value is zero.</returns>
-    [DllImport (DllName, SetLastError = false)]
+    [DllImport (DllName, SetLastError = false, CharSet = CharSet.Unicode)]
     public static extern uint FormatMessage
         (
             FormatMessageFlags dwFlags,
@@ -1608,7 +1609,7 @@ public static class Kernel32
     /// by lpApplicationName.</param>
     /// <returns>If the file is executable, the return value is nonzero.
     /// </returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool GetBinaryType
         (
             string lpApplicationName,
@@ -1641,7 +1642,7 @@ public static class Kernel32
     /// actual file size for noncompressed files.
     /// If the function fails, and lpFileSizeHigh is NULL, the return
     /// value is INVALID_FILE_SIZE.</returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern uint GetCompressedFileSize
         (
             string lpFileName,
@@ -1663,7 +1664,7 @@ public static class Kernel32
     /// that specifies the name of the executable file.</param>
     /// <returns>If the function succeeds, the return value is nonzero.
     /// </returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern int GetConsoleAlias
         (
             string lpSource,
@@ -1684,7 +1685,7 @@ public static class Kernel32
     /// the executable file whose aliases are to be retrieved.</param>
     /// <returns>If the function succeeds, the return value is nonzero.
     /// </returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern int GetConsoleAliases
         (
             byte[] lpAliasBuffer,
@@ -1701,7 +1702,7 @@ public static class Kernel32
     /// <returns>Size of the buffer required to store all console
     /// aliases defined for this executable file, in bytes.
     /// </returns>
-    [DllImport (DllName, SetLastError = false)]
+    [DllImport (DllName, SetLastError = false, CharSet = CharSet.Unicode)]
     public static extern int GetConsoleAliasesLength
         (
             string lpExeName
@@ -1900,7 +1901,7 @@ public static class Kernel32
     /// <returns>If the function succeeds, the return value is the
     /// length of the string copied to the buffer, in TCHARs.
     /// If the function fails, the return value is zero.</returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern int GetConsoleTitle
         (
             StringBuilder lpConsoleTitle,
@@ -2028,7 +2029,7 @@ public static class Kernel32
     /// </param>
     /// <returns>If the function succeeds, the return value
     /// is nonzero.</returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool GetDiskFreeSpace
         (
             string lpRootPathName,
@@ -2072,7 +2073,7 @@ public static class Kernel32
     /// This parameter can be NULL.</param>
     /// <returns>If the function succeeds, the return value
     /// is nonzero.</returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool GetDiskFreeSpaceEx
         (
             string lpDirectoryName,
@@ -2098,7 +2099,7 @@ public static class Kernel32
     /// If the function fails, the return value is zero.
     /// </returns>
     /// <remarks>Requires Windows XP SP1.</remarks>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern int GetDllDirectory
         (
             int nBufferLength,
@@ -2115,7 +2116,7 @@ public static class Kernel32
     /// parameter is NULL, the function uses the root of the current
     /// directory.</param>
     /// <returns>The return value specifies the type of drive.</returns>
-    [DllImport (DllName, SetLastError = false)]
+    [DllImport (DllName, SetLastError = false, CharSet = CharSet.Unicode)]
     public static extern DRIVETYPE GetDriveType
         (
             string lpRootPathName
@@ -2342,7 +2343,7 @@ public static class Kernel32
     /// <returns>If the function succeeds, the return value is a
     /// handle to the specified module. If the function fails, the
     /// return value is NULL.</returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern IntPtr GetModuleHandle
         (
             string? lpModuleName
@@ -2369,7 +2370,7 @@ public static class Kernel32
     /// buffer is too small to hold the module name, the string is
     /// truncated to nSize, and the function returns nSize. If the
     /// function fails, the return value is zero.</returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern uint GetModuleFileName
         (
             IntPtr hModule,
@@ -2422,7 +2423,7 @@ public static class Kernel32
     /// ignored if lpUserName is NULL.</param>
     /// <returns>If the function succeeds, the return value
     /// is nonzero.</returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool GetNamedPipeHandleState
         (
             IntPtr hNamedPipe,
@@ -2551,7 +2552,7 @@ public static class Kernel32
     /// the key name and value pairs associated with the named
     /// section, the return value is equal to nSize minus two.
     /// </returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern int GetPrivateProfileSection
         (
             string lpAppName,
@@ -2583,7 +2584,7 @@ public static class Kernel32
     /// all the section names associated with the specified
     /// initialization file, the return value is equal to the size
     /// specified by nSize minus two.</returns>
-    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Ansi)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern int GetPrivateProfileSectionNames
         (
             [MarshalAs (UnmanagedType.LPArray)] byte[] lpszReturnBuffer,
@@ -2644,7 +2645,7 @@ public static class Kernel32
     /// strings, the last string is truncated and followed by two
     /// null characters. In this case, the return value is equal to
     /// nSize minus two.</para></returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern int GetPrivateProfileString
         (
             string lpAppName,
@@ -2673,7 +2674,7 @@ public static class Kernel32
     /// by lpProcName must be identical to that in the EXPORTS
     /// statement of the source DLL's module-definition (.def)
     /// file.</remarks>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern IntPtr GetProcAddress
         (
             IntPtr hModule,
@@ -2789,7 +2790,7 @@ public static class Kernel32
     /// a buffer that is large enough to hold the path.
     /// If the function fails for any other reason, the return value
     /// is zero.</returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern int GetShortPathName
         (
             string lpszLongPath,
@@ -2962,7 +2963,7 @@ public static class Kernel32
     /// the largest possible volume name is 50 characters.</param>
     /// <returns>If the function succeeds, the return value is nonzero.
     /// </returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool GetVolumeNameForVolumeMountPoint
         (
             string lpszVolumeMountPoint,
@@ -2983,7 +2984,7 @@ public static class Kernel32
     /// in TCHARs.</param>
     /// <returns>If the function succeeds, the return value is nonzero.
     /// </returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool GetVolumePathName
         (
             string lpszFileName,
@@ -3034,7 +3035,7 @@ public static class Kernel32
     /// system name buffer is not supplied.</param>
     /// <returns>If all the requested information is retrieved, the
     /// return value is nonzero.</returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool GetVolumeInformation
         (
             string lpRootPathName,
@@ -3591,7 +3592,7 @@ public static class Kernel32
     /// keyword in the module-definition (.def) file.</param>
     /// <returns>If the function succeeds, the return value is a handle to
     /// the module.</returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern IntPtr LoadLibrary
         (
             string lpFileName
@@ -3635,7 +3636,7 @@ public static class Kernel32
     /// <returns>If the function succeeds, the return value is a
     /// handle to the mapped executable module. If the function
     /// fails, the return value is NULL.</returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern IntPtr LoadLibraryEx
         (
             string lpFileName,
@@ -3894,7 +3895,7 @@ public static class Kernel32
     /// MAX_PATH characters.</para></param>
     /// <returns>If the function succeeds, the return value is nonzero.
     /// </returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool MoveFile
         (
             string lpExistingFileName,
@@ -3933,7 +3934,7 @@ public static class Kernel32
     /// <param name="dwFlags">Move options.</param>
     /// <returns>If the function succeeds, the return value is nonzero.
     /// </returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool MoveFileEx
         (
             string lpExistingFileName,
@@ -3987,7 +3988,7 @@ public static class Kernel32
     /// <param name="dwFlags">Move options.</param>
     /// <returns>If the function succeeds, the return value is nonzero.
     /// </returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool MoveFileWithProgress
         (
             string lpExistingFileName,
@@ -4014,7 +4015,7 @@ public static class Kernel32
     /// "Local\" prefix to explicitly open an object in the global
     /// or session name space. The remainder of the name can contain
     /// any character except the backslash character (\).</remarks>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern IntPtr OpenEvent
         (
             uint dwDesiredAccess,
@@ -4038,7 +4039,7 @@ public static class Kernel32
     /// "Local\" prefix to explicitly open an object in the global
     /// or session name space. The remainder of the name can contain
     /// any character except the backslash character (\).</remarks>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern IntPtr OpenFileMapping
         (
             FileMappingFlags dwDesiredAccess,
@@ -4073,7 +4074,7 @@ public static class Kernel32
     /// </summary>
     /// <param name="lpOutputString">Pointer to the null-terminated
     /// string to be displayed.</param>
-    [DllImport (DllName, SetLastError = false)]
+    [DllImport (DllName, SetLastError = false, CharSet = CharSet.Unicode)]
     public static extern void OutputDebugString
         (
             string lpOutputString
@@ -4201,7 +4202,7 @@ public static class Kernel32
     /// <returns>If the function succeeds, the return value is the
     /// number of TCHARs stored into the buffer pointed to by lpTargetPath.
     /// If the function fails, the return value is zero.</returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern int QueryDosDevice
         (
             string lpDeviceName,
@@ -4399,7 +4400,7 @@ public static class Kernel32
     /// <param name="lpReserved">Reserved for future use.</param>
     /// <returns>If the function succeeds, the return value is nonzero.
     /// </returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool ReplaceFile
         (
             string lpReplacedFileName,
@@ -4463,7 +4464,7 @@ public static class Kernel32
     /// value is greater than nBufferLength, the value returned is
     /// the size of the buffer required to hold the path.
     /// If the function fails, the return value is zero.</returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern int SearchPath
         (
             string lpPath,
@@ -4660,7 +4661,7 @@ public static class Kernel32
     /// 64K.</param>
     /// <returns>If the function succeeds, the return value is nonzero.
     /// </returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool SetConsoleTitle
         (
             string lpConsoleTitle
@@ -4697,7 +4698,7 @@ public static class Kernel32
     /// <returns>If the function succeeds, the return value is nonzero.
     /// </returns>
     /// <remarks>Requires Windows XP SP1.</remarks>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool SetDllDirectory
         (
             string lpPathName
@@ -5042,7 +5043,7 @@ public static class Kernel32
     /// the label from the specified volume.</param>
     /// <returns>If the function succeeds, the return value is nonzero.
     /// </returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool SetVolumeLabel
         (
             string lpRootPathName,
@@ -5066,7 +5067,7 @@ public static class Kernel32
     /// "C:\myworld\private".</param>
     /// <returns>If the function succeeds, the return value is nonzero.
     /// </returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool SetVolumeMountPoint
         (
             string lpszVolumeMountPoint,
@@ -5511,7 +5512,7 @@ public static class Kernel32
     /// function will wait for an instance of the named pipe to be
     /// available.</param>
     /// <returns></returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool WaitNamedPipe
         (
             string lpNamedPipeName,
@@ -5615,7 +5616,7 @@ public static class Kernel32
     /// </param>
     /// <returns>If the function succeeds, the return value
     /// is nonzero.</returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool WritePrivateProfileSection
         (
             string lpAppName,
@@ -5651,7 +5652,7 @@ public static class Kernel32
     /// <returns>If the function successfully copies the string to
     /// the initialization file, the return value is nonzero.
     /// </returns>
-    [DllImport (DllName, SetLastError = true)]
+    [DllImport (DllName, SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool WritePrivateProfileString
         (
             string lpAppName,
