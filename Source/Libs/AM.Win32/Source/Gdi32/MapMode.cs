@@ -9,75 +9,76 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 
-/* MapMode.cs -- specifies the GDI mapping mode.
+/* MapMode.cs -- указывает режим сопоставления GDI
    Ars Magna project, http://arsmagna.ru */
 
 namespace AM.Win32;
 
 /// <summary>
-/// Specifies the GDI mapping mode.
+/// Указывает режим сопоставления GDI.
 /// </summary>
 public enum MapMode
 {
     /// <summary>
-    /// For FXCop.
+    /// Для FXCop.
     /// </summary>
     None = 0,
 
     /// <summary>
-    /// Each logical unit is mapped to one device pixel.
-    /// Positive x is to the right; positive y is down.
+    /// Каждая логическая единица сопоставляется с одним пикселем устройства.
+    /// Положительный x справа; положительный y вниз.
     /// </summary>
     MM_TEXT = 1,
 
     /// <summary>
-    /// Each logical unit is mapped to 0.1 millimeter.
-    /// Positive x is to the right; positive y is up.
+    /// Каждая логическая единица отображается на 0,1 миллиметра.
+    /// Положительный x справа; положительный y вверх.
     /// </summary>
     MM_LOMETRIC = 2,
 
     /// <summary>
-    /// Each logical unit is mapped to 0.01 millimeter.
-    /// Positive x is to the right; positive y is up.
+    /// Каждая логическая единица сопоставляется с 0,01 миллиметра.
+    /// Положительный x справа; положительный y вверх.
     /// </summary>
     MM_HIMETRIC = 3,
 
     /// <summary>
-    /// Each logical unit is mapped to 0.01 inch.
-    /// Positive x is to the right; positive y is up.
+    /// Каждая логическая единица соответствует 0,01 дюйма.
+    /// Положительный x справа; положительный y вверх.
     /// </summary>
     MM_LOENGLISH = 4,
 
     /// <summary>
-    /// Each logical unit is mapped to 0.001 inch.
-    /// Positive x is to the right; positive y is up.
+    /// Каждая логическая единица соответствует 0,001 дюйма.
+    /// Положительный x справа; положительный y вверх.
     /// </summary>
     MM_HIENGLISH = 5,
 
     /// <summary>
-    /// Each logical unit is mapped to one twentieth of
-    /// a printer's point (1/1440 inch, also called a twip).
-    /// Positive x is to the right; positive y is up.
+    /// Каждая логическая единица сопоставляется с одной двадцатой
+    /// точки принтера (11440 дюймов, также называемой твипом).
+    /// Положительный x справа; положительный y вверх.
     /// </summary>
     MM_TWIPS = 6,
 
     /// <summary>
-    /// Logical units are mapped to arbitrary units with equally
-    /// scaled axes; that is, one unit along the x-axis is equal
-    /// to one unit along the y-axis. Use the SetWindowExtEx and
-    /// SetViewportExtEx functions to specify the units and the
-    /// orientation of the axes. Graphics device interface (GDI)
-    /// makes adjustments as necessary to ensure the x and y units
-    /// remain the same size (When the window extent is set, the
-    /// viewport will be adjusted to keep the units isotropic).
+    /// Логические единицы сопоставляются с произвольными единицами
+    /// с одинаково масштабируемыми осями; то есть одна единица
+    /// по оси x равна одной единице по оси y. Используйте функции
+    /// SetWindowExtEx и SetViewportExtEx, чтобы указать единицы
+    /// измерения и ориентацию осей. Интерфейс графического
+    /// устройства (GDI) вносит коррективы, необходимые для обеспечения
+    /// того, чтобы единицы измерения x и y оставались одного размера
+    /// (когда установлен размер окна, область просмотра будет настроена
+    /// так, чтобы единицы измерения оставались изотропными).
     /// </summary>
     MM_ISOTROPIC = 7,
 
     /// <summary>
-    /// Logical units are mapped to arbitrary units
-    /// with arbitrarily scaled axes. Use the SetWindowExtEx
-    /// and SetViewportExtEx functions to specify the units,
-    /// orientation, and scaling.
+    /// Логические единицы сопоставляются с произвольными единицами
+    /// с произвольно масштабируемыми осями. Используйте функции
+    /// SetWindowExtEx и SetViewportExtEx, чтобы задать единицы
+    /// измерения, ориентацию и масштабирование.
     /// </summary>
     MM_ANISOTROPIC = 8
 }

@@ -2,53 +2,48 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable FieldCanBeMadeReadOnly.Global
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
-/* HatchStyle.cs -- specifies the orientation of the lines used to create the hatch
+/* HatchStyle.cs -- ориентация линий, используемых для создания штриховки
    Ars Magna project, http://arsmagna.ru */
 
 namespace AM.Win32;
 
 /// <summary>
-/// Specifies the orientation of the lines used to create the hatch.
+/// Указывает ориентацию линий, используемых для создания штриховки.
 /// </summary>
 public enum HatchStyle
 {
     /// <summary>
-    /// Horizontal hatch. -----
+    /// Горизонтальная штриховка. -----
     /// </summary>
     HS_HORIZONTAL = 0,
 
     /// <summary>
-    /// Vertical hatch. |||||
+    /// Вертикальная штриховка. |||||
     /// </summary>
     HS_VERTICAL = 1,
 
     /// <summary>
-    /// A 45-degree downward, left-to-right hatch. \\\\\
+    /// Наклонная штриховка слева направо сверху вниз. \\\\\
     /// </summary>
     HS_FDIAGONAL = 2,
 
     /// <summary>
-    /// A 45-degree upward, left-to-right hatch. /////
+    /// Наклонная штриховка слева направо снизу вверх. /////
     /// </summary>
     HS_BDIAGONAL = 3,
 
     /// <summary>
-    /// Horizontal and vertical cross-hatch. +++++
+    /// Вертикальные и горизонтальные перекрестные линии. +++++
     /// </summary>
     HS_CROSS = 4,
 
     /// <summary>
-    /// 45-degree crosshatch. xxxxx
+    /// Наклонные перекрестные линии. xxxxx
     /// </summary>
     HS_DIAGCROSS = 5
 }

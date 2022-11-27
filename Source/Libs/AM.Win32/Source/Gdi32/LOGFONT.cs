@@ -11,7 +11,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 
-/* LOGFONT.cs -- defines the attributes of a font
+/* LOGFONT.cs -- определяет атрибуты шрифта
    Ars Magna project, http://arsmagna.ru */
 
 #region Using directives
@@ -25,121 +25,117 @@ using System.Runtime.InteropServices;
 namespace AM.Win32;
 
 /// <summary>
-/// The LOGFONT structure defines the attributes of a font.
+/// Структура LOGFONT определяет атрибуты шрифта.
 /// </summary>
 [StructLayout (LayoutKind.Sequential, CharSet = CharSet.Ansi)]
 public struct LOGFONT
 {
     /// <summary>
-    /// The height, in logical units, of the font's character
-    /// cell or character. The character height value
-    /// (also known as the em height) is the character cell
-    /// height value minus the internal-leading value.
-    /// The font mapper interprets the value specified
-    /// in lfHeight in the following manner.
-    ///
-    /// &gt; 0 The font mapper transforms this value into
-    /// device units and matches it against the cell height
-    /// of the available fonts.
-    /// 0 The font mapper uses a default height value when
-    /// it searches for a match.
-    /// &lt; 0 The font mapper transforms this value into device
-    /// units and matches its absolute value against
-    /// the character height of the available fonts.
-    ///
-    /// For all height comparisons, the font mapper looks
-    /// for the largest font that does not exceed the requested size.
-    /// This mapping occurs when the font is used for the first time.
+    /// <para>
+    /// Высота в логических единицах символьной ячейки или символа шрифта.
+    /// Значение высоты символа (также известное как высота em) представляет
+    /// собой значение высоты символьной ячейки за вычетом внутреннего
+    /// начального значения. Преобразователь шрифтов интерпретирует значение,
+    /// указанное в lfHeight, следующим образом.
+    /// </para>
+    /// <para>
+    /// &gt; 0 Преобразователь шрифтов преобразует это значение в единицы
+    /// устройства и сопоставляет его с высотой ячейки доступных шрифтов.
+    /// 0 Средство сопоставления шрифтов использует значение высоты
+    /// по умолчанию при поиске соответствия. &lt; 0 Преобразователь шрифтов
+    /// преобразует это значение в единицы устройства и сопоставляет
+    /// его абсолютное значение с высотой символов доступных шрифтов.
+    /// </para>
+    /// <para>
+    /// Для всех сравнений высоты средство сопоставления шрифтов ищет
+    /// самый большой шрифт, который не превышает запрошенного размера.
+    /// Это сопоставление происходит, когда шрифт используется в первый раз.
+    /// </para>
     /// </summary>
     public int lfHeight;
 
     /// <summary>
-    /// The average width, in logical units, of characters in the font.
-    /// If lfWidth is zero, the aspect ratio of the device
-    /// is matched against the digitization aspect ratio
-    /// of the available fonts to find the closest match,
-    /// determined by the absolute value of the difference.
+    /// Средняя ширина символов шрифта в логических единицах.
+    /// Если lfWidth равен нулю, соотношение сторон устройства сопоставляется
+    /// с соотношением сторон оцифровки доступных шрифтов, чтобы найти
+    /// наиболее близкое совпадение, определяемое абсолютным значением разницы.
     /// </summary>
     public int lfWidth;
 
     /// <summary>
-    /// The angle, in tenths of degrees, between the escapement
-    /// vector and the x-axis of the device. The escapement vector
-    /// is parallel to the base line of a row of text.
-    /// When the graphics mode is set to GM_ADVANCED,
-    /// you can specify the escapement angle of the string
-    /// independently of the orientation angle of the string's characters.
-    /// When the graphics mode is set to GM_COMPATIBLE,
-    /// lfEscapement specifies both the escapement and orientation.
-    /// You should set lfEscapement and lfOrientation to the same value.
+    /// Угол в десятых долях градуса между вектором спуска и осью X устройства.
+    /// Вектор спуска параллелен базовой линии строки текста. Когда
+    /// графический режим установлен на GM_ADVANCED, вы можете указать
+    /// угол спуска строки независимо от угла ориентации символов строки.
+    /// Когда графический режим установлен на GM_COMPATIBLE, lfEscapement
+    /// указывает и спуск, и ориентацию. Вы должны установить для lfEscapement
+    /// и lfOrientation одно и то же значение.
     /// </summary>
     public int lfEscapement;
 
     /// <summary>
-    /// The angle, in tenths of degrees, between each character's
-    /// base line and the x-axis of the device.
+    /// Угол в десятых долях градуса между базовой линией каждого
+    /// символа и осью X устройства.
     /// </summary>
     public int lfOrientation;
 
     /// <summary>
-    /// The weight of the font in the range 0 through 1000.
-    /// For example,  400 is normal and 700 is bold.
-    /// If this value is zero, a default weight is used.
+    /// Толщина шрифта в диапазоне от 0 до 1000. Например,
+    /// 400 — обычный шрифт, а 700 — полужирный. Если это значение
+    /// равно нулю, используется вес по умолчанию.
     /// </summary>
     public int lfWeight;
 
     /// <summary>
-    /// An italic font if set to TRUE.
+    /// Курсивный шрифт, если установлено значение TRUE.
     /// </summary>
     public byte lfItalic;
 
     /// <summary>
-    /// An underlined font if set to TRUE.
+    /// Подчеркнутый шрифт, если установлено значение TRUE.
     /// </summary>
     public byte lfUnderline;
 
     /// <summary>
-    /// A strikeout font if set to TRUE.
+    /// Зачеркнутый шрифт, если установлено значение TRUE.
     /// </summary>
     public byte lfStrikeOut;
 
     /// <summary>
-    /// The character set.
+    /// Набор символов.
     /// </summary>
     public byte lfCharSet;
 
     /// <summary>
-    /// The output precision. The output precision defines
-    /// how closely the output must match the requested
-    /// font's height, width, character orientation,
-    /// escapement, pitch, and font type.
+    /// Точность вывода. Точность вывода определяет, насколько точно
+    /// вывод должен соответствовать высоте, ширине, ориентации символов,
+    /// спуску, шагу и типу шрифта запрошенного шрифта.
     /// </summary>
     public byte lfOutPrecision;
 
     /// <summary>
-    /// The clipping precision. The clipping precision defines
-    /// how to clip characters that are partially outside
-    /// the clipping region.
+    /// Точность отсечения. Точность отсечения определяет, как обрезать
+    /// символы, частично находящиеся за пределами области отсечения.
     /// </summary>
     public byte lfClipPrecision;
 
     /// <summary>
-    /// The output quality. The output quality defines
-    /// how carefully the graphics device interface (GDI)
-    /// must attempt to match the logical-font attributes
-    /// to those of an actual physical font.
+    /// Качество вывода. Качество вывода определяет, насколько
+    /// тщательно интерфейс графического устройства (GDI) должен
+    /// пытаться сопоставить атрибуты логического шрифта с атрибутами
+    /// реального физического шрифта.
     /// </summary>
     public byte lfQuality;
 
     /// <summary>
-    /// The pitch and family of the font.
+    /// Шаг и семейство шрифта.
     /// </summary>
     public byte lfPitchAndFamily;
 
     /// <summary>
-    /// A null-terminated string that specifies the typeface
-    /// name of the font. The length of this string must
-    /// not exceed 32 TCHAR values, including the terminating NULL.
+    /// Строка с завершающим нулем, указывающая имя гарнитуры шрифта.
+    /// Длина этой строки не должна превышать 32 значений TCHAR,
+    /// включая завершающий NULL.
     /// </summary>
     [MarshalAs (UnmanagedType.ByValTStr, SizeConst = 32)]
     public string? lfFaceName;
