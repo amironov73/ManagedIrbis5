@@ -2,15 +2,11 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable FieldCanBeMadeReadOnly.Global
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 /* DISPLAY_DEVICE.cs -- information about display device
    Ars Magna project, http://arsmagna.ru */
@@ -24,6 +20,8 @@ using System.Runtime.InteropServices;
 
 namespace AM.Win32;
 
+// Не фурычит, падла!
+
 /// <summary>
 /// Receives information about the display device specified
 /// by the iDevNum parameter of the EnumDisplayDevices function.
@@ -33,8 +31,6 @@ namespace AM.Win32;
 /// The four string members are set based on the parameters passed
 /// to EnumDisplayDevices. If the lpDevice param is NULL, then DISPLAY_DEVICE is filled in with information about the display adapter(s). If it is a valid device name, then it is filled in with information about the monitor(s) for that device.
 /// </remarks>
-
-// Не фурычит, падла!
 [Serializable]
 [StructLayout (LayoutKind.Sequential, Size = SIZE,
     CharSet = CharSet.Unicode)]

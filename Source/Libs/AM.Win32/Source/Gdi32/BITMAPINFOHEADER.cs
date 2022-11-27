@@ -2,12 +2,9 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
 
 /* BITMAPINFOHEADER.cs -- contains information about the dimensions and color format of a DIB
    Ars Magna project, http://arsmagna.ru */

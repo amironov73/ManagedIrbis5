@@ -2,13 +2,10 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 /* ClippingPrecision.cs -- the clipping precision
    Ars Magna project, http://arsmagna.ru */

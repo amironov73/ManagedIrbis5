@@ -7,6 +7,8 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
+#pragma warning disable CA1069 // элемент перечисления имеет то же значение, что и другой элемент
+
 /* DeviceOrientation.cs -- ориентация изображений или бумаге при выводе
    Ars Magna project, http://arsmagna.ru */
 

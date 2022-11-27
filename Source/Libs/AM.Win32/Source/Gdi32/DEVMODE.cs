@@ -2,15 +2,10 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable FieldCanBeMadeReadOnly.Global
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 /* DEVMODE.cs -- information about printer or display device
    Ars Magna project, http://arsmagna.ru */
@@ -277,7 +272,7 @@ public struct DEVMODEW_DISPLAY
 
     //[FieldOffset ( 216 )]
     public int dmPanningHeight;
-} // struct DEVMODEW_DISPLAY
+}
 
 /// <summary>
 /// The DEVMODE data structure contains information about

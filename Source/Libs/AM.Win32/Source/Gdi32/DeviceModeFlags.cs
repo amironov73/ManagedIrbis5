@@ -2,15 +2,10 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable FieldCanBeMadeReadOnly.Global
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 /* DeviceModeFlags.cs -- specifies whether certain members of the DEVMODE structure have been initialized
    Ars Magna project, http://arsmagna.ru */

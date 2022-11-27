@@ -52,7 +52,7 @@ public enum BoundsRectFlags
     /// <summary>
     /// Объединение флагов DCB_RESET и DCB_ACCUMULATE.
     /// </summary>
-    DCB_SET = (DCB_RESET | DCB_ACCUMULATE),
+    DCB_SET = DCB_RESET | DCB_ACCUMULATE,
 
     /// <summary>
     /// Включает накопление границ, которое по умолчанию отключено.
