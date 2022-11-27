@@ -31,6 +31,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Avalonia.Platform;
 
 #endregion
 
@@ -364,6 +365,34 @@ public static class AvaloniaUtility
         button.Click += handler;
 
         return button;
+    }
+
+    /// <summary>
+    /// Добыча ассетов из ресурсов Avalonia.
+    /// </summary>
+    public static Stream? OpenAssetStream
+        (
+            string assetName
+        )
+    {
+        Sure.NotNullNorEmpty (assetName);
+
+        var assets = AvaloniaLocator.Current.GetService<IAssetLoader>();
+        if (assets is not null)
+        {
+                var assembly = Assembly.GetEntryAssembly();
+                if (assembly is not null)
+                {
+                    var name = assembly.GetName().Name;
+                    if (!string.IsNullOrEmpty (name))
+                    {
+                        var uri = "avares://" + name + "/" + assetName;
+                        return assets.Open (new Uri (uri));
+                    }
+                }
+        }
+
+        return null;
     }
 
     /// <summary>
@@ -753,6 +782,28 @@ public static class AvaloniaUtility
         control.VerticalAlignment = VerticalAlignment.Stretch;
 
         return control;
+    }
+
+    /// <summary>
+    /// Добавление ячейки в грид.
+    /// </summary>
+    public static Grid WithCell
+        (
+            this Grid grid,
+            int row,
+            int column,
+            Control control
+        )
+    {
+        Sure.NotNull (grid);
+        Sure.InRange (row, grid.RowDefinitions);
+        Sure.InRange (column, grid.ColumnDefinitions);
+
+        control.SetValue (Grid.RowProperty, row);
+        control.SetValue (Grid.ColumnProperty, column);
+        grid.Children.Add (control);
+
+        return grid;
     }
 
     /// <summary>
