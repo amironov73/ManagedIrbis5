@@ -2,17 +2,15 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable FieldCanBeMadeReadOnly.Global
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* FontPitchAndFamily.cs -- the pitch and family of the font for CreateFont method
+#pragma warning disable CA1069 // элемент перечисления имеет то же значение, что и другой элемент
+
+/* FontPitchAndFamily.cs -- шаг и семейство шрифта для метода CreateFont
    Ars Magna project, http://arsmagna.ru */
 
 #region Using directives
@@ -24,7 +22,7 @@ using System;
 namespace AM.Win32;
 
 /// <summary>
-/// The pitch and family of the font for CreateFont method.
+/// Шаг и семейство шрифта для метода CreateFont.
 /// </summary>
 [Flags]
 public enum FontPitchAndFamily

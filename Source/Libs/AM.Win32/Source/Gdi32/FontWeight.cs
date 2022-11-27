@@ -2,17 +2,12 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable FieldCanBeMadeReadOnly.Global
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
-/* FontWeight.cs -- weight of the font
+/* FontWeight.cs -- вес шрифта
    Ars Magna project, http://arsmagna.ru */
 
 #region Using directives
@@ -24,85 +19,84 @@ using System;
 namespace AM.Win32;
 
 /// <summary>
-/// The weight of the font in the range 0 through 1000.
-/// For example, 400 is normal and 700 is bold.
-/// If this value is zero, a default weight is used.
+/// Вес (толщина) шрифта в диапазоне от 0 до 1000. Например, 400 — обычный шрифт,
+/// а 700 — полужирный. Если это значение равно нулю, используется вес по умолчанию.
 /// </summary>
 [Flags]
 public enum FontWeight
 {
     /// <summary>
-    /// Default weight is used.
+    /// Используется вес по умолчанию.
     /// </summary>
     FW_DONTCARE = 0,
 
     /// <summary>
-    /// Thin.
+    /// Тонкий.
     /// </summary>
     FW_THIN = 100,
 
     /// <summary>
-    /// Extra-light.
+    /// Сверхлегкий.
     /// </summary>
     FW_EXTRALIGHT = 200,
 
     /// <summary>
-    /// Light.
+    /// Легкий.
     /// </summary>
     FW_LIGHT = 300,
 
     /// <summary>
-    /// Normal.
+    /// Нормальный.
     /// </summary>
     FW_NORMAL = 400,
 
     /// <summary>
-    /// Medium.
+    /// Средний.
     /// </summary>
     FW_MEDIUM = 500,
 
     /// <summary>
-    /// Semi-bold.
+    /// Полужирный.
     /// </summary>
     FW_SEMIBOLD = 600,
 
     /// <summary>
-    /// Bold.
+    /// Жирный.
     /// </summary>
     FW_BOLD = 700,
 
     /// <summary>
-    /// Extra-bold.
+    /// Сверхжирный.
     /// </summary>
     FW_EXTRABOLD = 800,
 
     /// <summary>
-    /// Heavy.
+    /// Тяжелый.
     /// </summary>
     FW_HEAVY = 900,
 
     /// <summary>
-    /// Ultra-light.
+    /// Сверхлегкий.
     /// </summary>
     FW_ULTRALIGHT = FW_EXTRALIGHT,
 
     /// <summary>
-    /// Regular.
+    /// Обычный.
     /// </summary>
     FW_REGULAR = FW_NORMAL,
 
     /// <summary>
-    /// Demi-bold.
+    /// Полуж ирный.
     /// </summary>
     FW_DEMIBOLD = FW_SEMIBOLD,
 
     /// <summary>
-    /// Ultra-bold.
+    /// Сверхтяжелый.
     /// </summary>
     FW_ULTRABOLD = FW_EXTRABOLD,
 
     /// <summary>
-    /// Black.
+    /// Черный.
     /// </summary>
     FW_BLACK = FW_HEAVY
 }
