@@ -1,11 +1,11 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable BuiltInTypeReferenceStyle
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable UnusedMember.Global
 
 /* MSG.cs -- message information from a thread's message queue
    Ars Magna project, http://arsmagna.ru */

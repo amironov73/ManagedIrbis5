@@ -1,10 +1,9 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable BuiltInTypeReferenceStyle
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 /* GdiPlusUtility.cs -- some useful methods from GDI+
    Ars Magna project, http://arsmagna.ru */

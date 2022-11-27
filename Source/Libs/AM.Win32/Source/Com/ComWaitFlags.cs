@@ -43,5 +43,4 @@ public enum ComWaitFlags
     /// even if no handle has been signaled.
     /// </summary>
     COWAIT_ALERTABLE = 0x00000002
-
 }
