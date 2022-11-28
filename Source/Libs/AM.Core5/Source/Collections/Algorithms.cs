@@ -670,9 +670,9 @@ public static class Algorithms
 
         void IDisposable.Dispose()
         {
-            if (wrappedEnumerator is IDisposable)
+            if (wrappedEnumerator is IDisposable disposable)
             {
-                ((IDisposable)wrappedEnumerator).Dispose();
+                disposable.Dispose();
             }
         }
 
@@ -794,7 +794,7 @@ public static class Algorithms
             IEqualityComparer<T> equalityComparer = EqualityComparer<T>.Default;
             foreach (var obj in wrappedCollection)
             {
-                if (obj is T && equalityComparer.Equals (item, (T)obj))
+                if (obj is T obj1 && equalityComparer.Equals (item, obj1))
                 {
                     return true;
                 }
@@ -842,18 +842,17 @@ public static class Algorithms
     /// items of type <typeparamref  name="T"/> or a type derived from it. </param>
     /// <returns>A generic ICollection&lt;T&gt; wrapper around <paramref name="untypedCollection"/>.
     /// If <paramref name="untypedCollection"/> is null, then null is returned.</returns>
-    public static ICollection<T> TypedAs<T> (ICollection untypedCollection)
+    public static ICollection<T>? TypedAs<T>
+        (
+        ICollection? untypedCollection
+        )
     {
-        if (untypedCollection == null)
+        return untypedCollection switch
         {
-            return null;
-        }
-
-        if (untypedCollection is ICollection<T>)
-        {
-            return (ICollection<T>)untypedCollection;
-        }
-        return new TypedCollection<T> (untypedCollection);
+            null => null,
+            ICollection<T> collection => collection,
+            _ => new TypedCollection<T> (untypedCollection)
+        };
     }
 
     /// <summary>
@@ -965,18 +964,17 @@ public static class Algorithms
     /// items of type <typeparamref name="T"/> or a type derived from it. </param>
     /// <returns>A generic IList&lt;T&gt; wrapper around <paramref name="untypedList"/>.
     /// If <paramref name="untypedList"/> is null, then null is returned.</returns>
-    public static IList<T> TypedAs<T> (IList untypedList)
+    public static IList<T>? TypedAs<T>
+        (
+        IList? untypedList
+        )
     {
-        if (untypedList == null)
+        return untypedList switch
         {
-            return null;
-        }
-
-        if (untypedList is IList<T>)
-        {
-            return (IList<T>)untypedList;
-        }
-        return new TypedList<T> (untypedList);
+            null => null,
+            IList<T> list => list,
+            _ => new TypedList<T> (untypedList)
+        };
     }
 
     /// <summary>
@@ -984,7 +982,8 @@ public static class Algorithms
     /// view onto a typed ICollection&lt;T&gt; interface.
     /// </summary>
     [Serializable]
-    private class UntypedCollection<T> : ICollection
+    private class UntypedCollection<T>
+        : ICollection
     {
         private readonly ICollection<T> wrappedCollection;
 
@@ -1073,9 +1072,9 @@ public static class Algorithms
             return null;
         }
 
-        if (typedCollection is ICollection)
+        if (typedCollection is ICollection collection)
         {
-            return (ICollection)typedCollection;
+            return collection;
         }
         return new UntypedCollection<T> (typedCollection);
     }
@@ -1132,9 +1131,9 @@ public static class Algorithms
 
         public bool Contains (object? value)
         {
-            if (value is T)
+            if (value is T value1)
             {
-                return wrappedList.Contains ((T)value);
+                return wrappedList.Contains (value1);
             }
 
             return false;
@@ -1142,9 +1141,9 @@ public static class Algorithms
 
         public int IndexOf (object? value)
         {
-            if (value is T)
+            if (value is T value1)
             {
-                return wrappedList.IndexOf ((T)value);
+                return wrappedList.IndexOf (value1);
             }
 
             return -1;
@@ -1167,9 +1166,9 @@ public static class Algorithms
 
         public void Remove (object? value)
         {
-            if (value is T)
+            if (value is T value1)
             {
-                wrappedList.Remove ((T)value);
+                wrappedList.Remove (value1);
             }
         }
 
@@ -1251,18 +1250,17 @@ public static class Algorithms
     /// <param name="typedList">A typed list to wrap.</param>
     /// <returns>A non-generic IList wrapper around <paramref name="typedList"/>.
     /// If <paramref name="typedList"/> is null, then null is returned.</returns>
-    public static IList Untyped<T> (IList<T> typedList)
+    public static IList? Untyped<T>
+        (
+            IList<T>? typedList
+        )
     {
-        if (typedList == null)
+        return typedList switch
         {
-            return null;
-        }
-
-        if (typedList is IList)
-        {
-            return (IList)typedList;
-        }
-        return new UntypedList<T> (typedList);
+            null => null,
+            IList list => list,
+            _ => new UntypedList<T> (typedList)
+        };
     }
 
     /// <summary>
@@ -1271,7 +1269,8 @@ public static class Algorithms
     /// to fall off, deletions replace the last item with the default value.
     /// </summary>
     [Serializable]
-    private class ArrayWrapper<T> : ListBase<T>, IList
+    private class ArrayWrapper<T>
+        : ListBase<T>, IList
     {
         private readonly T[] wrappedArray;
 
@@ -1293,7 +1292,9 @@ public static class Algorithms
         {
             var count = wrappedArray.Length;
             for (var i = 0; i < count; ++i)
+            {
                 wrappedArray[i] = default (T);
+            }
         }
 
         public override void Insert (int index, T item)
@@ -1549,9 +1550,9 @@ public static class Algorithms
             throw new ArgumentNullException (nameof (equalityComparer));
         }
 
-        if (list is T[])
+        if (list is T[] list1)
         {
-            list = new ArrayWrapper<T> ((T[])list);
+            list = new ArrayWrapper<T> (list1);
         }
 
         if (list.IsReadOnly)
@@ -1591,9 +1592,9 @@ public static class Algorithms
             throw new ArgumentNullException (nameof (predicate));
         }
 
-        if (list is T[])
+        if (list is T[] list1)
         {
-            list = new ArrayWrapper<T> ((T[])list);
+            list = new ArrayWrapper<T> (list1);
         }
 
         if (list.IsReadOnly)
@@ -1661,7 +1662,11 @@ public static class Algorithms
     /// <c>first</c> is the first item in the group of "duplicate" items.</param>
     /// <returns>An new collection with the items from <paramref name="collection"/>, in the same order,
     /// with consecutive "duplicates" removed.</returns>
-    public static IEnumerable<T> RemoveDuplicates<T> (IEnumerable<T> collection, BinaryPredicate<T> predicate)
+    public static IEnumerable<T> RemoveDuplicates<T>
+        (
+            IEnumerable<T> collection,
+            BinaryPredicate<T> predicate
+        )
     {
         if (collection == null)
         {
@@ -1679,7 +1684,7 @@ public static class Algorithms
         foreach (var item in collection)
         {
             // Is the new item different from the current item?
-            if (atBeginning || !predicate (current, item))
+            if (atBeginning || !predicate (current!, item))
             {
                 current = item;
                 yield return item;
@@ -1746,9 +1751,9 @@ public static class Algorithms
             throw new ArgumentNullException (nameof (predicate));
         }
 
-        if (list is T[])
+        if (list is T[] list1)
         {
-            list = new ArrayWrapper<T> ((T[])list);
+            list = new ArrayWrapper<T> (list1);
         }
 
         if (list.IsReadOnly)
@@ -1782,11 +1787,13 @@ public static class Algorithms
         if (i < listCount)
         {
             // remove items from the end.
-            if (list is ArrayWrapper<T> || list is IList && ((IList)list).IsFixedSize)
+            if (list is ArrayWrapper<T> || list is IList list2 && list2.IsFixedSize)
             {
                 // An array or similar. Null out the last elements.
                 while (i < listCount)
+                {
                     list[i++] = default (T);
+                }
             }
             else
             {
@@ -3421,9 +3428,9 @@ public static class Algorithms
             {
                 builder.Append ("null");
             }
-            else if (recursive && item is IEnumerable && !(item is string))
+            else if (recursive && item is IEnumerable enumerable && !(enumerable is string))
             {
-                builder.Append (ToString (TypedAs<object> ((IEnumerable)item), recursive, start,
+                builder.Append (ToString (TypedAs<object> (enumerable), recursive, start,
                     separator, end));
             }
             else
@@ -3474,9 +3481,9 @@ public static class Algorithms
             {
                 builder.Append ("null");
             }
-            else if (pair.Key is IEnumerable && !(pair.Key is string))
+            else if (pair.Key is IEnumerable key && !(key is string))
             {
-                builder.Append (ToString (TypedAs<object> ((IEnumerable)pair.Key), true, "{", ",",
+                builder.Append (ToString (TypedAs<object> (key), true, "{", ",",
                     "}"));
             }
             else
@@ -3490,9 +3497,9 @@ public static class Algorithms
             {
                 builder.Append ("null");
             }
-            else if (pair.Value is IEnumerable && !(pair.Value is string))
+            else if (pair.Value is IEnumerable value && !(value is string))
             {
-                builder.Append (ToString (TypedAs<object> ((IEnumerable)pair.Value), true, "{",
+                builder.Append (ToString (TypedAs<object> (value), true, "{",
                     ",", "}"));
             }
             else
@@ -3512,7 +3519,7 @@ public static class Algorithms
 
     #region Shuffles and Permutations
 
-    private static volatile Random myRandomGenerator;
+    private static volatile Random? myRandomGenerator;
 
     /// <summary>
     /// Return a private random number generator to use if the user
@@ -3577,9 +3584,7 @@ public static class Algorithms
             var j = randomGenerator.Next (i + 1);
 
             // Swap array[i] and array[j]
-            var temp = array[i];
-            array[i] = array[j];
-            array[j] = temp;
+            (array[i], array[j]) = (array[j], array[i]);
         }
 
         return array;
@@ -3603,7 +3608,11 @@ public static class Algorithms
     /// will work correctly and modify an array passed as <paramref name="list"/>.</remarks>
     /// <param name="list">The list or array to shuffle.</param>
     /// <param name="randomGenerator">The random number generator to use to select the random order.</param>
-    public static void RandomShuffleInPlace<T> (IList<T> list, Random randomGenerator)
+    public static void RandomShuffleInPlace<T>
+        (
+            IList<T> list,
+            Random randomGenerator
+        )
     {
         if (list == null)
         {
@@ -3615,9 +3624,9 @@ public static class Algorithms
             throw new ArgumentNullException (nameof (randomGenerator));
         }
 
-        if (list is T[])
+        if (list is T[] list1)
         {
-            list = new ArrayWrapper<T> ((T[])list);
+            list = new ArrayWrapper<T> (list1);
         }
 
         if (list.IsReadOnly)
@@ -3886,7 +3895,9 @@ public static class Algorithms
             // Find the last item in the tail less than key.
             swap = length - 1;
             while (comparer.Compare (array[swap], array[key]) <= 0)
+            {
                 --swap;
+            }
 
             // Swap it with the key.
             temp = array[key];
@@ -4329,9 +4340,9 @@ public static class Algorithms
 
         // If we have an array, use the built-in array sort (faster than going through IList accessors
         // with virtual calls).
-        if (list is T[])
+        if (list is T[] list1)
         {
-            Array.Sort ((T[])list, comparer);
+            Array.Sort (list1, comparer);
             return;
         }
 
@@ -4595,9 +4606,9 @@ public static class Algorithms
             throw new ArgumentNullException (nameof (comparer));
         }
 
-        if (list is T[])
+        if (list is T[] list1)
         {
-            list = new ArrayWrapper<T> ((T[])list);
+            list = new ArrayWrapper<T> (list1);
         }
 
         if (list.IsReadOnly)
@@ -4610,7 +4621,9 @@ public static class Algorithms
         // as a secondary compare when the primary compare returns equal.
         var order = new int[list.Count];
         for (var x = 0; x < order.Length; ++x)
+        {
             order[x] = x;
+        }
 
         // Instead of a recursive procedure, we use an explicit stack to hold
         // ranges that we still need to sort.
@@ -5202,9 +5215,9 @@ public static class Algorithms
 
         public override bool Equals (object obj)
         {
-            if (obj is LexicographicalComparerClass<T>)
+            if (obj is LexicographicalComparerClass<T> @class)
             {
-                return itemComparer.Equals (((LexicographicalComparerClass<T>)obj).itemComparer);
+                return itemComparer.Equals (@class.itemComparer);
             }
 
             return false;
@@ -5293,9 +5306,9 @@ public static class Algorithms
 
         public override bool Equals (object? obj)
         {
-            if (obj is ReverseComparerClass<T>)
+            if (obj is ReverseComparerClass<T> @class)
             {
-                return comparer.Equals (((ReverseComparerClass<T>)obj).comparer);
+                return comparer.Equals (@class.comparer);
             }
 
             return false;
@@ -5715,9 +5728,9 @@ public static class Algorithms
             throw new ArgumentNullException (nameof (predicate));
         }
 
-        if (collection is T[])
+        if (collection is T[] collection1)
         {
-            collection = new ArrayWrapper<T> ((T[])collection);
+            collection = new ArrayWrapper<T> (collection1);
         }
 
         if (collection.IsReadOnly)
@@ -5758,11 +5771,13 @@ public static class Algorithms
             if (i < listCount)
             {
                 // remove items from the end.
-                if (list is IList && ((IList)list).IsFixedSize)
+                if (list is IList list1 && list1.IsFixedSize)
                 {
                     // An array or similar. Null out the last elements.
                     while (i < listCount)
+                    {
                         list[i++] = default (T);
+                    }
                 }
                 else
                 {
@@ -5912,9 +5927,9 @@ public static class Algorithms
             throw new ArgumentNullException (nameof (predicate));
         }
 
-        if (list is T[])
+        if (list is T[] list1)
         {
-            list = new ArrayWrapper<T> ((T[])list);
+            list = new ArrayWrapper<T> (list1);
         }
 
         if (list.IsReadOnly)
@@ -5927,9 +5942,14 @@ public static class Algorithms
         for (;;)
         {
             while (i <= j && predicate (list[i]))
+            {
                 ++i;
+            }
+
             while (i <= j && !predicate (list[j]))
+            {
                 --j;
+            }
 
             if (i > j)
             {
@@ -5972,9 +5992,9 @@ public static class Algorithms
             throw new ArgumentNullException (nameof (predicate));
         }
 
-        if (list is T[])
+        if (list is T[] list1)
         {
-            list = new ArrayWrapper<T> ((T[])list);
+            list = new ArrayWrapper<T> (list1);
         }
 
         if (list.IsReadOnly)
@@ -6014,7 +6034,9 @@ public static class Algorithms
 
         j = listCount - 1;
         while (index < listCount)
+        {
             list[index++] = temp[j--];
+        }
 
         return i;
     }
@@ -6234,9 +6256,9 @@ public static class Algorithms
         }
 
         // If it's really an ICollection, use that Count property as it is much faster.
-        if (collection is ICollection<T>)
+        if (collection is ICollection<T> collection1)
         {
-            return ((ICollection<T>)collection).Count;
+            return collection1.Count;
         }
 
         // Traverse the collection and count the elements.
@@ -6766,10 +6788,10 @@ public static class Algorithms
             count = sourceCount - sourceIndex;
         }
 
-        if (source is T[])
+        if (source is T[] source1)
         {
             // Array.Copy is probably faster, and also handles any overlapping issues.
-            Array.Copy ((T[])source, sourceIndex, dest, destIndex, count);
+            Array.Copy (source1, sourceIndex, dest, destIndex, count);
         }
         else
         {
@@ -6797,7 +6819,9 @@ public static class Algorithms
         }
 
         for (var i = source.Count - 1; i >= 0; --i)
+        {
             yield return source[i];
+        }
     }
 
     /// <summary>
@@ -6815,9 +6839,9 @@ public static class Algorithms
             throw new ArgumentNullException (nameof (list));
         }
 
-        if (list is T[])
+        if (list is T[] list1)
         {
-            list = new ArrayWrapper<T> ((T[])list);
+            list = new ArrayWrapper<T> (list1);
         }
 
         if (list.IsReadOnly)
@@ -6865,9 +6889,14 @@ public static class Algorithms
 
             // Do it in two parts.
             for (var i = amountToRotate; i < count; ++i)
+            {
                 yield return source[i];
+            }
+
             for (var i = 0; i < amountToRotate; ++i)
+            {
                 yield return source[i];
+            }
         }
     }
 
@@ -6888,9 +6917,9 @@ public static class Algorithms
             throw new ArgumentNullException (nameof (list));
         }
 
-        if (list is T[])
+        if (list is T[] list1)
         {
-            list = new ArrayWrapper<T> ((T[])list);
+            list = new ArrayWrapper<T> (list1);
         }
 
         if (list.IsReadOnly)

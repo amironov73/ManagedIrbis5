@@ -5,7 +5,9 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable LocalizableElement
 // ReSharper disable NonReadonlyMemberInGetHashCode
+// ReSharper disable StaticMemberInGenericType
 
 /* BigList.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -80,7 +82,7 @@ public class BigList<T> : ListBase<T>, ICloneable
 
 
     // If null, the BigList is empty. If non-null, the list has at least one item.
-    private Node root;
+    private Node? root;
 
     // Holds the change stamp for the collection.
     private int changeStamp;
@@ -129,7 +131,7 @@ public class BigList<T> : ListBase<T>, ICloneable
     {
         if (collection == null)
         {
-            throw new ArgumentNullException ("collection");
+            throw new ArgumentNullException (nameof (collection));
         }
 
         root = NodeFromEnumerable (collection);
@@ -145,11 +147,15 @@ public class BigList<T> : ListBase<T>, ICloneable
     /// <param name="collection">The collection used to initialize the BigList. </param>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="copies"/> is negative.</exception>
     /// <exception cref="ArgumentNullException"><paramref name="collection"/> is null.</exception>
-    public BigList (IEnumerable<T> collection, int copies)
+    public BigList
+        (
+            IEnumerable<T>? collection,
+            int copies
+        )
     {
         if (collection == null)
         {
-            throw new ArgumentNullException ("collection");
+            throw new ArgumentNullException (nameof (collection));
         }
 
         root = NCopiesOfNode (copies, NodeFromEnumerable (collection));
@@ -168,7 +174,7 @@ public class BigList<T> : ListBase<T>, ICloneable
     {
         if (list == null)
         {
-            throw new ArgumentNullException ("list");
+            throw new ArgumentNullException (nameof (list));
         }
 
         if (list.root == null)
@@ -196,7 +202,7 @@ public class BigList<T> : ListBase<T>, ICloneable
     {
         if (list == null)
         {
-            throw new ArgumentNullException ("list");
+            throw new ArgumentNullException (nameof (list));
         }
 
         if (list.root == null)
@@ -214,9 +220,12 @@ public class BigList<T> : ListBase<T>, ICloneable
     /// Creates a new BigList from the indicated Node.
     /// </summary>
     /// <param name="node">Node that becomes the new root. If null, the new BigList is empty.</param>
-    private BigList (Node node)
+    private BigList
+        (
+            Node? node
+        )
     {
-        this.root = node;
+        root = node;
         CheckBalance();
     }
 
@@ -262,7 +271,7 @@ public class BigList<T> : ListBase<T>, ICloneable
 
             if (root == null || index < 0 || index >= root.Count)
             {
-                throw new ArgumentOutOfRangeException ("index");
+                throw new ArgumentOutOfRangeException (nameof (index));
             }
 
             var current = root;
@@ -295,7 +304,7 @@ public class BigList<T> : ListBase<T>, ICloneable
 
             if (root == null || index < 0 || index >= root.Count)
             {
-                throw new ArgumentOutOfRangeException ("index");
+                throw new ArgumentOutOfRangeException (nameof (index));
             }
 
             // Like List<T>, we stop enumerations after a set operation. This could be made
@@ -337,7 +346,7 @@ public class BigList<T> : ListBase<T>, ICloneable
                 curConcat = current as ConcatNode;
             }
 
-            var curLeaf = (LeafNode)current;
+            var curLeaf = (LeafNode) current!;
             curLeaf.items[index] = value;
         }
     }
@@ -387,7 +396,7 @@ public class BigList<T> : ListBase<T>, ICloneable
             }
             else
             {
-                throw new ArgumentOutOfRangeException ("index");
+                throw new ArgumentOutOfRangeException (nameof (index));
             }
         }
         else
@@ -423,13 +432,17 @@ public class BigList<T> : ListBase<T>, ICloneable
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is
     /// less than zero or greater than Count.</exception>
     /// <exception cref="ArgumentNullException"><paramref name="collection"/> is null.</exception>
-    public void InsertRange (int index, IEnumerable<T> collection)
+    public void InsertRange
+        (
+            int index,
+            IEnumerable<T> collection
+        )
     {
         StopEnumerations();
 
         if (collection == null)
         {
-            throw new ArgumentNullException ("collection");
+            throw new ArgumentNullException (nameof (collection));
         }
 
         if (index <= 0 || index >= Count)
@@ -444,7 +457,7 @@ public class BigList<T> : ListBase<T>, ICloneable
             }
             else
             {
-                throw new ArgumentOutOfRangeException ("index");
+                throw new ArgumentOutOfRangeException (nameof (index));
             }
         }
         else
@@ -497,7 +510,7 @@ public class BigList<T> : ListBase<T>, ICloneable
 
         if (list == null)
         {
-            throw new ArgumentNullException ("list");
+            throw new ArgumentNullException (nameof (list));
         }
 
         if ((uint)Count + (uint)list.Count > MAXITEMS)
@@ -517,7 +530,7 @@ public class BigList<T> : ListBase<T>, ICloneable
             }
             else
             {
-                throw new ArgumentOutOfRangeException ("index");
+                throw new ArgumentOutOfRangeException (nameof (index));
             }
         }
         else
@@ -529,7 +542,7 @@ public class BigList<T> : ListBase<T>, ICloneable
 
             if (root == null)
             {
-                list.root.MarkShared();
+                list.root!.MarkShared();
                 root = list.root;
             }
             else
@@ -539,7 +552,7 @@ public class BigList<T> : ListBase<T>, ICloneable
                     root.MarkShared(); // make sure inserting into itself works.
                 }
 
-                var newRoot = root.InsertInPlace (index, list.root, false);
+                var newRoot = root.InsertInPlace (index, list.root!, false);
                 if (newRoot != root)
                 {
                     root = newRoot;
@@ -589,17 +602,17 @@ public class BigList<T> : ListBase<T>, ICloneable
 
         if (index < 0 || index >= Count)
         {
-            throw new ArgumentOutOfRangeException ("index");
+            throw new ArgumentOutOfRangeException (nameof (index));
         }
 
         if (count < 0 || count > Count - index)
         {
-            throw new ArgumentOutOfRangeException ("count");
+            throw new ArgumentOutOfRangeException (nameof (count));
         }
 
         StopEnumerations();
 
-        var newRoot = root.RemoveRangeInPlace (index, index + count - 1);
+        var newRoot = root!.RemoveRangeInPlace (index, index + count - 1);
         if (newRoot != root)
         {
             root = newRoot;
@@ -680,7 +693,7 @@ public class BigList<T> : ListBase<T>, ICloneable
     {
         if (collection == null)
         {
-            throw new ArgumentNullException ("collection");
+            throw new ArgumentNullException (nameof (collection));
         }
 
         StopEnumerations();
@@ -724,7 +737,7 @@ public class BigList<T> : ListBase<T>, ICloneable
     {
         if (collection == null)
         {
-            throw new ArgumentNullException ("collection");
+            throw new ArgumentNullException (nameof (collection));
         }
 
         StopEnumerations();
@@ -805,8 +818,7 @@ public class BigList<T> : ListBase<T>, ICloneable
         }
         else
         {
-            bool itemIsValueType;
-            if (!Util.IsCloneableType (typeof (T), out itemIsValueType))
+            if (!Util.IsCloneableType (typeof (T), out var itemIsValueType))
             {
                 throw new InvalidOperationException ("Type  does not implement ICloneable");
             }
@@ -821,7 +833,7 @@ public class BigList<T> : ListBase<T>, ICloneable
             {
                 if (item == null)
                 {
-                    return default (T); // Really null, because we know T is a reference type
+                    return default!; // Really null, because we know T is a reference type
                 }
                 else
                 {
@@ -846,7 +858,7 @@ public class BigList<T> : ListBase<T>, ICloneable
     {
         if (list == null)
         {
-            throw new ArgumentNullException ("list");
+            throw new ArgumentNullException (nameof (list));
         }
 
         if ((uint)Count + (uint)list.Count > MAXITEMS)
@@ -863,12 +875,12 @@ public class BigList<T> : ListBase<T>, ICloneable
 
         if (root == null)
         {
-            list.root.MarkShared();
+            list.root!.MarkShared();
             root = list.root;
         }
         else
         {
-            var newRoot = root.AppendInPlace (list.root, false);
+            var newRoot = root.AppendInPlace (list.root!, false);
             if (newRoot != root)
             {
                 root = newRoot;
@@ -892,7 +904,7 @@ public class BigList<T> : ListBase<T>, ICloneable
     {
         if (list == null)
         {
-            throw new ArgumentNullException ("list");
+            throw new ArgumentNullException (nameof (list));
         }
 
         if ((uint)Count + (uint)list.Count > MAXITEMS)
@@ -909,12 +921,12 @@ public class BigList<T> : ListBase<T>, ICloneable
 
         if (root == null)
         {
-            list.root.MarkShared();
+            list.root!.MarkShared();
             root = list.root;
         }
         else
         {
-            var newRoot = root.PrependInPlace (list.root, false);
+            var newRoot = root.PrependInPlace (list.root!, false);
             if (newRoot != root)
             {
                 root = newRoot;
@@ -939,12 +951,12 @@ public class BigList<T> : ListBase<T>, ICloneable
     {
         if (first == null)
         {
-            throw new ArgumentNullException ("first");
+            throw new ArgumentNullException (nameof (first));
         }
 
         if (second == null)
         {
-            throw new ArgumentNullException ("second");
+            throw new ArgumentNullException (nameof (second));
         }
 
         if ((uint)first.Count + (uint)second.Count > MAXITEMS)
@@ -962,7 +974,7 @@ public class BigList<T> : ListBase<T>, ICloneable
         }
         else
         {
-            var result = new BigList<T> (first.root.Append (second.root, false));
+            var result = new BigList<T> (first.root!.Append (second.root!, false));
             result.CheckBalance();
             return result;
         }
@@ -981,7 +993,11 @@ public class BigList<T> : ListBase<T>, ICloneable
     /// <param name="count">The number of items in the sub-range. If this is zero,
     /// the returned list is empty.</param>
     /// <returns>A new list with the <paramref name="count"/> items that start at <paramref name="index"/>.</returns>
-    public BigList<T> GetRange (int index, int count)
+    public BigList<T> GetRange
+        (
+            int index,
+            int count
+        )
     {
         if (count == 0)
         {
@@ -990,15 +1006,15 @@ public class BigList<T> : ListBase<T>, ICloneable
 
         if (index < 0 || index >= Count)
         {
-            throw new ArgumentOutOfRangeException ("index");
+            throw new ArgumentOutOfRangeException (nameof (index));
         }
 
         if (count < 0 || count > Count - index)
         {
-            throw new ArgumentOutOfRangeException ("count");
+            throw new ArgumentOutOfRangeException (nameof (count));
         }
 
-        return new BigList<T> (root.Subrange (index, index + count - 1));
+        return new BigList<T> (root!.Subrange (index, index + count - 1));
     }
 
     /// <summary>
@@ -1020,14 +1036,14 @@ public class BigList<T> : ListBase<T>, ICloneable
     /// size of this list.</exception>
     public sealed override IList<T> Range (int index, int count)
     {
-        if (index < 0 || index > this.Count || (index == this.Count && count != 0))
+        if (index < 0 || index > Count || (index == Count && count != 0))
         {
-            throw new ArgumentOutOfRangeException ("index");
+            throw new ArgumentOutOfRangeException (nameof (index));
         }
 
-        if (count < 0 || count > this.Count || count + index > this.Count)
+        if (count < 0 || count > Count || count + index > Count)
         {
-            throw new ArgumentOutOfRangeException ("count");
+            throw new ArgumentOutOfRangeException (nameof (count));
         }
 
         return new BigListRange (this, index, count);
@@ -1058,8 +1074,7 @@ public class BigList<T> : ListBase<T>, ICloneable
             var leftStack = new bool[root.Depth];
             int stackPtr = 0, startIndex = 0;
             var current = root;
-            LeafNode currentLeaf;
-            ConcatNode currentConcat;
+            ConcatNode? currentConcat;
 
             if (start != 0)
             {
@@ -1067,7 +1082,7 @@ public class BigList<T> : ListBase<T>, ICloneable
                 // the index within that node.
                 if (start < 0 || start >= root.Count)
                 {
-                    throw new ArgumentOutOfRangeException ("start");
+                    throw new ArgumentOutOfRangeException (nameof (start));
                 }
 
                 currentConcat = current as ConcatNode;
@@ -1106,7 +1121,7 @@ public class BigList<T> : ListBase<T>, ICloneable
                 }
 
                 // Iterate the leaf.
-                currentLeaf = (LeafNode)current;
+                LeafNode currentLeaf = (LeafNode)current;
 
                 var limit = currentLeaf.Count;
                 if (limit > startIndex + maxItems)
@@ -1134,13 +1149,12 @@ public class BigList<T> : ListBase<T>, ICloneable
                 // we didn't just come from.
                 for (;;)
                 {
-                    ConcatNode parent;
                     if (stackPtr == 0)
                     {
                         yield break; // iteration is complete.
                     }
 
-                    parent = stack[--stackPtr];
+                    ConcatNode parent = stack[--stackPtr];
                     if (leftStack[stackPtr])
                     {
                         leftStack[stackPtr] = false;
@@ -1182,13 +1196,15 @@ public class BigList<T> : ListBase<T>, ICloneable
     /// <returns>Returns a Node, not shared or with any shared children,
     /// with the items from the collection. If the collection was empty,
     /// null is returned.</returns>
-    private static Node NodeFromEnumerable (IEnumerable<T> collection)
+    private static Node? NodeFromEnumerable
+        (
+            IEnumerable<T> collection
+        )
     {
-        Node node = null;
-        LeafNode leaf;
+        Node? node = null;
         var enumerator = collection.GetEnumerator();
 
-        while ((leaf = LeafFromEnumerator (enumerator)) != null)
+        while (LeafFromEnumerator (enumerator) is { } leaf)
         {
             if (node == null)
             {
@@ -1214,10 +1230,13 @@ public class BigList<T> : ListBase<T>, ICloneable
     /// </summary>
     /// <param name="enumerator">The enumerator to take items from.</param>
     /// <returns>A LeafNode with items taken from the enumerator. </returns>
-    private static LeafNode LeafFromEnumerator (IEnumerator<T> enumerator)
+    private static LeafNode? LeafFromEnumerator
+        (
+            IEnumerator<T> enumerator
+        )
     {
         var i = 0;
-        T[] items = null;
+        T[]? items = null;
 
         while (i < MAXLEAF && enumerator.MoveNext())
         {
@@ -1250,7 +1269,11 @@ public class BigList<T> : ListBase<T>, ICloneable
     /// <returns>null if node is null or copies is 0. Otherwise, a node consisting of <paramref name="copies"/> copies
     /// of node.</returns>
     /// <exception cref="ArgumentOutOfRangeException">copies is negative.</exception>
-    private static Node NCopiesOfNode (int copies, Node node)
+    private static Node? NCopiesOfNode
+        (
+            int copies,
+            Node? node
+        )
     {
         if (copies < 0)
         {
@@ -1275,7 +1298,7 @@ public class BigList<T> : ListBase<T>, ICloneable
 
         // Build up the copies by powers of two.
         var n = 1;
-        Node power = node, builder = null;
+        Node? power = node, builder = null;
         while (copies > 0)
         {
             power.MarkShared();
@@ -1284,14 +1307,7 @@ public class BigList<T> : ListBase<T>, ICloneable
             {
                 // This power of two is used in the final result.
                 copies -= n;
-                if (builder == null)
-                {
-                    builder = power;
-                }
-                else
-                {
-                    builder = builder.Append (power, false);
-                }
+                builder = builder == null ? power : builder.Append (power, false);
             }
 
             n *= 2;
@@ -1308,9 +1324,8 @@ public class BigList<T> : ListBase<T>, ICloneable
     /// </summary>
     private void CheckBalance()
     {
-        if (root != null &&
-            (root.Depth > BALANCEFACTOR && !(root.Depth - BALANCEFACTOR <= MAXFIB &&
-                                             Count >= FIBONACCI[root.Depth - BALANCEFACTOR])))
+        if (root is { Depth: > BALANCEFACTOR } && !(root.Depth - BALANCEFACTOR <= MAXFIB &&
+                                                    Count >= FIBONACCI[root.Depth - BALANCEFACTOR]))
         {
             Rebalance();
         }
@@ -1326,7 +1341,6 @@ public class BigList<T> : ListBase<T>, ICloneable
     /// </remarks>
     internal void Rebalance()
     {
-        Node[] rebalanceArray;
         int slots;
 
         // The basic rebalancing algorithm is add nodes to a rabalance array, where a node at index K in the
@@ -1345,37 +1359,32 @@ public class BigList<T> : ListBase<T>, ICloneable
 
         // How many slots does the rebalance array need?
         for (slots = 0; slots <= MAXFIB; ++slots)
+        {
             if (root.Count < FIBONACCI[slots])
             {
                 break;
             }
+        }
 
-        rebalanceArray = new Node[slots];
+        Node?[] rebalanceArray = new Node[slots];
 
         // Add all the nodes to the rebalance array.
         AddNodeToRebalanceArray (rebalanceArray, root, false);
 
         // Concatinate all the node in the rebalance array.
-        Node result = null;
+        Node? result = null;
         for (var slot = 0; slot < slots; ++slot)
         {
             var n = rebalanceArray[slot];
             if (n != null)
             {
-                if (result == null)
-                {
-                    result = n;
-                }
-                else
-                {
-                    result = result.PrependInPlace (n, !n.Shared);
-                }
+                result = result == null ? n : result.PrependInPlace (n, !n.Shared);
             }
         }
 
         // And we're done. Check that it worked!
         root = result;
-        Debug.Assert (root.Depth <= 1 || (root.Depth - 2 <= MAXFIB && Count >= FIBONACCI[root.Depth - 2]));
+        Debug.Assert (root!.Depth <= 1 || (root.Depth - 2 <= MAXFIB && Count >= FIBONACCI[root.Depth - 2]));
     }
 
     /// <summary>
@@ -1386,7 +1395,12 @@ public class BigList<T> : ListBase<T>, ICloneable
     /// <param name="node">Node to add.</param>
     /// <param name="shared">If true, mark the node as shared before adding, because one
     /// of its parents was shared.</param>
-    private void AddNodeToRebalanceArray (Node[] rebalanceArray, Node node, bool shared)
+    private void AddNodeToRebalanceArray
+        (
+            Node?[] rebalanceArray,
+            Node node,
+            bool shared
+        )
     {
         if (node.Shared)
         {
@@ -1415,29 +1429,24 @@ public class BigList<T> : ListBase<T>, ICloneable
     /// </summary>
     /// <param name="rebalanceArray">Rebalance array to insert into.</param>
     /// <param name="balancedNode">Node to add.</param>
-    private static void AddBalancedNodeToRebalanceArray (Node[] rebalanceArray, Node balancedNode)
+    private static void AddBalancedNodeToRebalanceArray
+        (
+            Node?[] rebalanceArray,
+            Node balancedNode
+        )
     {
-        int slot;
-        int count;
-        Node accum = null;
+        Node? accum = null;
         Debug.Assert (balancedNode.IsBalanced());
 
-        count = balancedNode.Count;
-        slot = 0;
+        var count = balancedNode.Count;
+        var slot = 0;
         while (count >= FIBONACCI[slot + 1])
         {
             var n = rebalanceArray[slot];
             if (n != null)
             {
                 rebalanceArray[slot] = null;
-                if (accum == null)
-                {
-                    accum = n;
-                }
-                else
-                {
-                    accum = accum.PrependInPlace (n, !n.Shared);
-                }
+                accum = accum == null ? n : accum.PrependInPlace (n, !n.Shared);
             }
 
             ++slot;
@@ -1475,7 +1484,7 @@ public class BigList<T> : ListBase<T>, ICloneable
         {
             if (rebalanceArray[i] != null)
             {
-                Debug.Assert (rebalanceArray[i].IsAlmostBalanced());
+                Debug.Assert (rebalanceArray[i]!.IsAlmostBalanced());
             }
         }
 #endif //DEBUG
@@ -1581,9 +1590,7 @@ public class BigList<T> : ListBase<T>, ICloneable
     /// larger than <paramref name="item"/>, the bitwise complement of Count is returned.</returns>
     public int BinarySearch (T item, IComparer<T> comparer)
     {
-        int count, index;
-
-        count = Algorithms.BinarySearch (this, item, comparer, out index);
+        var count = Algorithms.BinarySearch (this, item, comparer, out var index);
         if (count == 0)
         {
             return (~index);
@@ -1644,7 +1651,7 @@ public class BigList<T> : ListBase<T>, ICloneable
 
             Console.WriteLine();
             Console.WriteLine ("TREE:");
-            root.Print ("      ", "      ");
+            root?.Print ("      ", "      ");
         }
 
         Console.WriteLine();
@@ -1673,10 +1680,7 @@ public class BigList<T> : ListBase<T>, ICloneable
         /// The number of items stored in the node (or below it).
         /// </summary>
         /// <value>The number of items in the node or below.</value>
-        public int Count
-        {
-            get { return count; }
-        }
+        public int Count => count;
 
         /// <summary>
         /// Is this node shared by more that one list (or within a single)
@@ -1685,10 +1689,7 @@ public class BigList<T> : ListBase<T>, ICloneable
         /// true.
         /// </summary>
         /// <value></value>
-        public bool Shared
-        {
-            get { return shared; }
-        }
+        public bool Shared => shared;
 
         /// <summary>
         /// Marks this node as shared by setting the shared variable.
@@ -1722,7 +1723,7 @@ public class BigList<T> : ListBase<T>, ICloneable
         /// <param name="first">Inclusive first element, relative to this node.</param>
         /// <param name="last">Inclusize last element, relative to this node.</param>
         /// <returns>Node with the given sub-range.</returns>
-        public abstract Node Subrange (int first, int last);
+        public abstract Node? Subrange (int first, int last);
 
         // Any operation that could potentially modify a node exists
         // in two forms -- the "in place" form that possibly modifies the
@@ -1799,7 +1800,7 @@ public class BigList<T> : ListBase<T>, ICloneable
         /// <param name="last">Inclusize index of last item in sub-range, relative
         /// to this node.</param>
         /// <returns>A new node with the sub-range removed.</returns>
-        public abstract Node RemoveRange (int first, int last);
+        public abstract Node? RemoveRange (int first, int last);
 
         /// <summary>
         /// Remove a range of items from this node. May change this node, or returns
@@ -1815,7 +1816,7 @@ public class BigList<T> : ListBase<T>, ICloneable
         /// to this node.</param>
         /// <returns>A node with the sub-range removed. If done in-place, returns
         /// "this".</returns>
-        public abstract Node RemoveRangeInPlace (int first, int last);
+        public abstract Node? RemoveRangeInPlace (int first, int last);
 
         /// <summary>
         /// Inserts a node inside this node. Never changes this node, but returns
@@ -1883,7 +1884,11 @@ public class BigList<T> : ListBase<T>, ICloneable
         /// if convenient. If false, the given node is in use. It should be marked
         /// as shared if is is used within the return value.</param>
         /// <returns>A new node with the give node prepended to this node.</returns>
-        public Node Prepend (Node node, bool nodeIsUnused)
+        public Node Prepend
+            (
+                Node node,
+                bool nodeIsUnused
+            )
         {
             if (nodeIsUnused)
             {
@@ -1906,15 +1911,19 @@ public class BigList<T> : ListBase<T>, ICloneable
         /// as shared if is is used within the return value.</param>
         /// <returns>A node with the give node prepended to this node. May be a new
         /// node or the current node.</returns>
-        public Node PrependInPlace (Node node, bool nodeIsUnused)
+        public Node PrependInPlace
+            (
+                Node node,
+                bool nodeIsUnused
+            )
         {
             if (nodeIsUnused)
             {
-                return node.AppendInPlace (this, !this.shared);
+                return node.AppendInPlace (this, !shared);
             }
             else
             {
-                return node.Append (this, !this.shared);
+                return node.Append (this, !shared);
             }
         }
 
@@ -1926,7 +1935,7 @@ public class BigList<T> : ListBase<T>, ICloneable
         /// <param name="item">Item to prepend.</param>
         /// <returns>A node with the given item prepended to this node. May be a new
         /// node or the current node.</returns>
-        public abstract Node PrependInPlace (T item);
+        public abstract Node? PrependInPlace (T item);
 
         /// <summary>
         /// Determine if this node is balanced. A node is balanced if the number
@@ -1993,10 +2002,7 @@ public class BigList<T> : ListBase<T>, ICloneable
             items = newItems;
         }
 
-        public override int Depth
-        {
-            get { return 0; }
-        }
+        public override int Depth => 0;
 
         /// <summary>
         /// Returns the items at the given index in this node.
@@ -2051,9 +2057,8 @@ public class BigList<T> : ListBase<T>, ICloneable
         private bool MergeLeafInPlace (Node other)
         {
             Debug.Assert (!shared);
-            var otherLeaf = (other as LeafNode);
             int newCount;
-            if (otherLeaf != null && (newCount = otherLeaf.Count + this.count) <= MAXLEAF)
+            if (other is LeafNode otherLeaf && (newCount = otherLeaf.Count + count) <= MAXLEAF)
             {
                 // Combine the two leaf nodes into one.
                 if (newCount > items.Length)
@@ -2080,11 +2085,10 @@ public class BigList<T> : ListBase<T>, ICloneable
         /// <param name="other">Other node to possible merge.</param>
         /// <returns>If the nodes could be merged, returns the new node. Otherwise
         /// returns null.</returns>
-        private Node MergeLeaf (Node other)
+        private Node? MergeLeaf (Node? other)
         {
-            var otherLeaf = (other as LeafNode);
             int newCount;
-            if (otherLeaf != null && (newCount = otherLeaf.Count + this.count) <= MAXLEAF)
+            if (other is LeafNode otherLeaf && (newCount = otherLeaf.Count + count) <= MAXLEAF)
             {
                 // Combine the two leaf nodes into one.
                 var newItems = new T[MAXLEAF];
@@ -2104,7 +2108,10 @@ public class BigList<T> : ListBase<T>, ICloneable
         /// <param name="item">Item to prepend.</param>
         /// <returns>A node with the given item prepended to this node. May be a new
         /// node or the current node.</returns>
-        public override Node PrependInPlace (T item)
+        public override Node PrependInPlace
+            (
+                T item
+            )
         {
             if (shared)
             {
@@ -2196,8 +2203,7 @@ public class BigList<T> : ListBase<T>, ICloneable
             }
 
             // If we're appending a tree with a left leaf node, try to merge them if possible.
-            var otherConcat = (node as ConcatNode);
-            if (otherConcat != null && MergeLeafInPlace (otherConcat.left))
+            if (node is ConcatNode otherConcat && MergeLeafInPlace (otherConcat.left))
             {
                 if (!nodeIsUnused)
                 {
@@ -2218,7 +2224,7 @@ public class BigList<T> : ListBase<T>, ICloneable
 
         public override Node Append (Node node, bool nodeIsUnused)
         {
-            Node result;
+            Node? result;
 
             // If we're appending a leaf, try to merge them if possible.
             if ((result = MergeLeaf (node)) != null)
@@ -2227,8 +2233,7 @@ public class BigList<T> : ListBase<T>, ICloneable
             }
 
             // If we're appending a concat with a left leaf, try to merge them if possible.
-            var otherConcat = (node as ConcatNode);
-            if (otherConcat != null && (result = MergeLeaf (otherConcat.left)) != null)
+            if (node is ConcatNode otherConcat && (result = MergeLeaf (otherConcat.left)) != null)
             {
                 if (!nodeIsUnused)
                 {
@@ -2344,10 +2349,9 @@ public class BigList<T> : ListBase<T>, ICloneable
                 return Insert (index, node, nodeIsUnused); // Can't update a shared node in place.
             }
 
-            var otherLeaf = (node as LeafNode);
             int newCount;
 
-            if (otherLeaf != null && (newCount = otherLeaf.Count + this.count) <= MAXLEAF)
+            if (node is LeafNode otherLeaf && (newCount = otherLeaf.Count + count) <= MAXLEAF)
             {
                 // Combine the two leaf nodes into one.
                 if (newCount > items.Length)
@@ -2409,10 +2413,9 @@ public class BigList<T> : ListBase<T>, ICloneable
         /// <returns>A new node with the give node inserted.</returns>
         public override Node Insert (int index, Node node, bool nodeIsUnused)
         {
-            var otherLeaf = (node as LeafNode);
             int newCount;
 
-            if (otherLeaf != null && (newCount = otherLeaf.Count + this.count) <= MAXLEAF)
+            if (node is LeafNode otherLeaf && (newCount = otherLeaf.Count + count) <= MAXLEAF)
             {
                 // Combine the two leaf nodes into one.
                 var newItems = new T[MAXLEAF];
@@ -2463,7 +2466,11 @@ public class BigList<T> : ListBase<T>, ICloneable
         /// to this node.</param>
         /// <returns>A node with the sub-range removed. If done in-place, returns
         /// "this".</returns>
-        public override Node RemoveRangeInPlace (int first, int last)
+        public override Node? RemoveRangeInPlace
+            (
+                int first,
+                int last
+            )
         {
             if (shared)
             {
@@ -2495,7 +2502,10 @@ public class BigList<T> : ListBase<T>, ICloneable
             }
 
             for (var i = newCount; i < count; ++i)
-                items[i] = default (T);
+            {
+                items[i] = default!;
+            }
+
             count = newCount;
             return this;
         }
@@ -2513,7 +2523,11 @@ public class BigList<T> : ListBase<T>, ICloneable
         /// <param name="last">Inclusize index of last item in sub-range, relative
         /// to this node.</param>
         /// <returns>A new node with the sub-range removed.</returns>
-        public override Node RemoveRange (int first, int last)
+        public override Node? RemoveRange
+            (
+                int first,
+                int last
+            )
         {
             Debug.Assert (first <= last);
             Debug.Assert (last >= 0);
@@ -2611,7 +2625,10 @@ public class BigList<T> : ListBase<T>, ICloneable
         {
             Console.Write ("{0}LEAF {1} count={2}/{3} ", prefixNode, shared ? "S" : " ", count, items.Length);
             for (var i = 0; i < count; ++i)
+            {
                 Console.Write ("{0} ", items[i]);
+            }
+
             Console.WriteLine();
         }
 #endif //DEBUG
@@ -2642,29 +2659,30 @@ public class BigList<T> : ListBase<T>, ICloneable
         /// depth in 1.
         /// </summary>
         /// <value>The depth of this node.</value>
-        public override int Depth
-        {
-            get { return depth; }
-        }
+        public override int Depth => depth;
 
         /// <summary>
         /// Create a new ConcatNode with the given children.
         /// </summary>
         /// <param name="left">The left child. May not be null.</param>
         /// <param name="right">The right child. May not be null.</param>
-        public ConcatNode (Node left, Node right)
+        public ConcatNode
+            (
+                Node? left,
+                Node? right
+            )
         {
             Debug.Assert (left != null && right != null);
             this.left = left;
             this.right = right;
-            this.count = left.Count + right.Count;
+            count = left.Count + right.Count;
             if (left.Depth > right.Depth)
             {
-                this.depth = (short)(left.Depth + 1);
+                depth = (short)(left.Depth + 1);
             }
             else
             {
-                this.depth = (short)(right.Depth + 1);
+                depth = (short)(right.Depth + 1);
             }
         }
 
@@ -2682,7 +2700,11 @@ public class BigList<T> : ListBase<T>, ICloneable
         /// <param name="newRight">New right child.</param>
         /// <returns>New node with the given children. Returns null if and only if both
         /// new children are null.</returns>
-        private Node NewNode (Node newLeft, Node newRight)
+        private Node NewNode
+            (
+                Node? newLeft,
+                Node? newRight
+            )
         {
             if (left == newLeft)
             {
@@ -2706,7 +2728,7 @@ public class BigList<T> : ListBase<T>, ICloneable
 
             if (newLeft == null)
             {
-                return newRight;
+                return newRight!;
             }
             else if (newRight == null)
             {
@@ -2726,13 +2748,17 @@ public class BigList<T> : ListBase<T>, ICloneable
         /// <param name="newRight">New right child.</param>
         /// <returns>Node with the given children. Usually, but not always, this. Returns
         /// null if and only if both new children are null.</returns>
-        private Node NewNodeInPlace (Node newLeft, Node newRight)
+        private Node NewNodeInPlace
+            (
+                Node? newLeft,
+                Node? newRight
+            )
         {
             Debug.Assert (!shared);
 
             if (newLeft == null)
             {
-                return newRight;
+                return newRight!;
             }
             else if (newRight == null)
             {
@@ -2780,7 +2806,11 @@ public class BigList<T> : ListBase<T>, ICloneable
         /// <param name="item">New item to place at the given index.</param>
         /// <returns>A node with the give item changed. If it can be done in place
         /// then "this" is returned.</returns>
-        public override Node SetAtInPlace (int index, T item)
+        public override Node SetAtInPlace
+            (
+                int index,
+                T item
+            )
         {
             if (shared)
             {
@@ -2822,7 +2852,11 @@ public class BigList<T> : ListBase<T>, ICloneable
         /// <param name="index">Index, relative to this node, to change.</param>
         /// <param name="item">New item to place at the given index.</param>
         /// <returns>A new node with the given item changed.</returns>
-        public override Node SetAt (int index, T item)
+        public override Node SetAt
+            (
+                int index,
+                T item
+            )
         {
             var leftCount = left.Count;
 
@@ -2851,8 +2885,8 @@ public class BigList<T> : ListBase<T>, ICloneable
                 return Prepend (new LeafNode (item), true); // Can't update a shared node in place.
             }
 
-            LeafNode leftLeaf;
-            if (left.Count < MAXLEAF && !left.Shared && (leftLeaf = left as LeafNode) != null)
+            LeafNode? leftLeaf;
+            if (left is { Count: < MAXLEAF, Shared: false } && (leftLeaf = left as LeafNode) != null)
             {
                 // Prepend the item to the left leaf. This keeps repeated prepends from creating
                 // single item nodes.
@@ -2870,7 +2904,7 @@ public class BigList<T> : ListBase<T>, ICloneable
 
                 leftLeaf.items[0] = item;
                 leftLeaf.count += 1;
-                this.count += 1;
+                count += 1;
                 return this;
             }
             else
@@ -2894,8 +2928,8 @@ public class BigList<T> : ListBase<T>, ICloneable
                 return Append (new LeafNode (item), true); // Can't update a shared node in place.
             }
 
-            LeafNode rightLeaf;
-            if (right.Count < MAXLEAF && !right.Shared && (rightLeaf = right as LeafNode) != null)
+            LeafNode? rightLeaf;
+            if (right is { Count: < MAXLEAF, Shared: false } && (rightLeaf = right as LeafNode) != null)
             {
                 var c = rightLeaf.Count;
                 if (c == rightLeaf.items.Length)
@@ -2908,7 +2942,7 @@ public class BigList<T> : ListBase<T>, ICloneable
 
                 rightLeaf.items[c] = item;
                 rightLeaf.count += 1;
-                this.count += 1;
+                count += 1;
                 return this;
             }
             else
@@ -2928,7 +2962,11 @@ public class BigList<T> : ListBase<T>, ICloneable
         /// as shared if is is used within the return value.</param>
         /// <returns>A node with the give node appended to this node. May be a new
         /// node or the current node.</returns>
-        public override Node AppendInPlace (Node node, bool nodeIsUnused)
+        public override Node AppendInPlace
+            (
+                Node node,
+                bool nodeIsUnused
+            )
         {
             if (shared)
             {
@@ -2957,7 +2995,7 @@ public class BigList<T> : ListBase<T>, ICloneable
             }
 
             // Concatinate with this node.
-            this.MarkShared();
+            MarkShared();
             if (!nodeIsUnused)
             {
                 node.MarkShared();
@@ -3007,7 +3045,12 @@ public class BigList<T> : ListBase<T>, ICloneable
         /// as shared if is is used within the return value.</param>
         /// <returns>A node with the given item inserted. If done in-place, returns
         /// "this".</returns>
-        public override Node InsertInPlace (int index, Node node, bool nodeIsUnused)
+        public override Node InsertInPlace
+            (
+                int index,
+                Node node,
+                bool nodeIsUnused
+            )
         {
             if (shared)
             {
@@ -3064,7 +3107,11 @@ public class BigList<T> : ListBase<T>, ICloneable
         /// to this node.</param>
         /// <returns>A node with the sub-range removed. If done in-place, returns
         /// "this".</returns>
-        public override Node RemoveRangeInPlace (int first, int last)
+        public override Node? RemoveRangeInPlace
+            (
+                int first,
+                int last
+            )
         {
             if (shared)
             {
@@ -3080,7 +3127,7 @@ public class BigList<T> : ListBase<T>, ICloneable
             }
 
             var leftCount = left.Count;
-            Node newLeft = left, newRight = right;
+            Node? newLeft = left, newRight = right;
 
             // Is part of the left being removed?
             if (first < leftCount)
@@ -3110,7 +3157,11 @@ public class BigList<T> : ListBase<T>, ICloneable
         /// <param name="last">Inclusize index of last item in sub-range, relative
         /// to this node.</param>
         /// <returns>A new node with the sub-range removed.</returns>
-        public override Node RemoveRange (int first, int last)
+        public override Node? RemoveRange
+            (
+                int first,
+                int last
+            )
         {
             Debug.Assert (first < count);
             Debug.Assert (last >= 0);
@@ -3121,7 +3172,7 @@ public class BigList<T> : ListBase<T>, ICloneable
             }
 
             var leftCount = left.Count;
-            Node newLeft = left, newRight = right;
+            Node? newLeft = left, newRight = right;
 
             // Is part of the left being removed?
             if (first < leftCount)
@@ -3148,7 +3199,11 @@ public class BigList<T> : ListBase<T>, ICloneable
         /// <param name="first">Inclusive first element, relative to this node.</param>
         /// <param name="last">Inclusize last element, relative to this node.</param>
         /// <returns>Node with the given sub-range.</returns>
-        public override Node Subrange (int first, int last)
+        public override Node? Subrange
+            (
+                int first,
+                int last
+            )
         {
             Debug.Assert (first < count);
             Debug.Assert (last >= 0);
@@ -3161,7 +3216,7 @@ public class BigList<T> : ListBase<T>, ICloneable
             }
 
             var leftCount = left.Count;
-            Node leftPart = null, rightPart = null;
+            Node? leftPart = null, rightPart = null;
 
             // Is part of the left included?
             if (first < leftCount)
@@ -3254,10 +3309,7 @@ public class BigList<T> : ListBase<T>, ICloneable
             this.count = count;
         }
 
-        public override int Count
-        {
-            get { return Math.Min (count, wrappedList.Count - start); }
-        }
+        public override int Count => Math.Min (count, wrappedList.Count - start);
 
         public override void Clear()
         {
@@ -3277,7 +3329,7 @@ public class BigList<T> : ListBase<T>, ICloneable
         {
             if (index < 0 || index > count)
             {
-                throw new ArgumentOutOfRangeException ("index");
+                throw new ArgumentOutOfRangeException (nameof (index));
             }
 
             wrappedList.Insert (start + index, item);
@@ -3288,7 +3340,7 @@ public class BigList<T> : ListBase<T>, ICloneable
         {
             if (index < 0 || index >= count)
             {
-                throw new ArgumentOutOfRangeException ("index");
+                throw new ArgumentOutOfRangeException (nameof (index));
             }
 
             wrappedList.RemoveAt (start + index);
@@ -3301,7 +3353,7 @@ public class BigList<T> : ListBase<T>, ICloneable
             {
                 if (index < 0 || index >= count)
                 {
-                    throw new ArgumentOutOfRangeException ("index");
+                    throw new ArgumentOutOfRangeException (nameof (index));
                 }
 
                 return wrappedList[start + index];
@@ -3310,7 +3362,7 @@ public class BigList<T> : ListBase<T>, ICloneable
             {
                 if (index < 0 || index >= count)
                 {
-                    throw new ArgumentOutOfRangeException ("index");
+                    throw new ArgumentOutOfRangeException (nameof (index));
                 }
 
                 wrappedList[start + index] = value;
