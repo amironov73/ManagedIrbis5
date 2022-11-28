@@ -47,7 +47,12 @@ public class HttpRequest
     /// <param name="method">HTTP method</param>
     /// <param name="url">Requested URL</param>
     /// <param name="protocol">Protocol version (default is "HTTP/1.1")</param>
-    public HttpRequest (string method, string url, string protocol = "HTTP/1.1")
+    public HttpRequest
+        (
+            string method,
+            string url,
+            string protocol = "HTTP/1.1"
+        )
     {
         SetBegin (method, url, protocol);
     }
@@ -55,7 +60,7 @@ public class HttpRequest
     /// <summary>
     /// Is the HTTP request empty?
     /// </summary>
-    public bool IsEmpty => (_cache.Size == 0);
+    public bool IsEmpty => _cache.Size == 0;
 
     /// <summary>
     /// Is the HTTP request error flag set?
@@ -65,103 +70,70 @@ public class HttpRequest
     /// <summary>
     /// Get the HTTP request method
     /// </summary>
-    public string Method { get; private set; }
+    public string? Method { get; private set; }
 
     /// <summary>
     /// Get the HTTP request URL
     /// </summary>
-    public string Url
-    {
-        get { return _url; }
-    }
+    public string? Url { get; private set; }
 
     /// <summary>
     /// Get the HTTP request protocol version
     /// </summary>
-    public string Protocol
-    {
-        get { return _protocol; }
-    }
+    public string? Protocol { get; private set; }
 
     /// <summary>
     /// Get the HTTP request headers count
     /// </summary>
-    public long Headers
-    {
-        get { return _headers.Count; }
-    }
+    public long Headers => _headers.Count;
 
     /// <summary>
     /// Get the HTTP request header by index
     /// </summary>
     public (string, string) Header (int i)
     {
-        Debug.Assert ((i < _headers.Count), "Index out of bounds!");
-        if (i >= _headers.Count)
-            return ("", "");
-
-        return _headers[i];
+        Debug.Assert (i < _headers.Count, "Index out of bounds!");
+        return i >= _headers.Count ? ("", "") : _headers[i];
     }
 
     /// <summary>
     /// Get the HTTP request cookies count
     /// </summary>
-    public long Cookies
-    {
-        get { return _cookies.Count; }
-    }
+    public long Cookies => _cookies.Count;
 
     /// <summary>
     /// Get the HTTP request cookie by index
     /// </summary>
     public (string, string) Cookie (int i)
     {
-        Debug.Assert ((i < _cookies.Count), "Index out of bounds!");
-        if (i >= _cookies.Count)
-            return ("", "");
-
-        return _cookies[i];
+        Debug.Assert (i < _cookies.Count, "Index out of bounds!");
+        return i >= _cookies.Count ? ("", "") : _cookies[i];
     }
 
     /// <summary>
     /// Get the HTTP request body as string
     /// </summary>
-    public string Body
-    {
-        get { return _cache.ExtractString (_bodyIndex, _bodySize); }
-    }
+    public string Body => _cache.ExtractString (_bodyIndex, _bodySize);
 
     /// <summary>
     /// Get the HTTP request body as byte array
     /// </summary>
-    public byte[] BodyBytes
-    {
-        get { return _cache.Data[_bodyIndex..(_bodyIndex + _bodySize)]; }
-    }
+    public byte[] BodyBytes => _cache.Data[_bodyIndex..(_bodyIndex + _bodySize)];
 
     /// <summary>
     /// Get the HTTP request body as byte span
     /// </summary>
-    public Span<byte> BodySpan
-    {
-        get { return new Span<byte> (_cache.Data, _bodyIndex, _bodySize); }
-    }
+    public Span<byte> BodySpan => new Span<byte> (_cache.Data, _bodyIndex, _bodySize);
 
     /// <summary>
     /// Get the HTTP request body length
     /// </summary>
-    public long BodyLength
-    {
-        get { return _bodyLength; }
-    }
+    public long BodyLength => _bodyLength;
 
     /// <summary>
     /// Get the HTTP request cache content
     /// </summary>
-    public Buffer Cache
-    {
-        get { return _cache; }
-    }
+    public Buffer Cache => _cache;
 
     /// <summary>
     /// Get string from the current HTTP request
@@ -192,8 +164,8 @@ public class HttpRequest
     {
         IsErrorSet = false;
         Method = "";
-        _url = "";
-        _protocol = "";
+        Url = "";
+        Protocol = "";
         _headers.Clear();
         _cookies.Clear();
         _bodyIndex = 0;
@@ -225,13 +197,13 @@ public class HttpRequest
 
         // Append the HTTP request URL
         _cache.Append (url);
-        _url = url;
+        Url = url;
 
         _cache.Append (" ");
 
         // Append the HTTP request protocol version
         _cache.Append (protocol);
-        _protocol = protocol;
+        Protocol = protocol;
 
         _cache.Append ("\r\n");
         return this;
@@ -429,7 +401,10 @@ public class HttpRequest
         Clear();
         SetBegin ("POST", url);
         if (!string.IsNullOrEmpty (contentType))
+        {
             SetHeader ("Content-Type", contentType);
+        }
+
         SetBody (content);
         return this;
     }
@@ -445,7 +420,10 @@ public class HttpRequest
         Clear();
         SetBegin ("POST", url);
         if (!string.IsNullOrEmpty (contentType))
+        {
             SetHeader ("Content-Type", contentType);
+        }
+
         SetBody (content);
         return this;
     }
@@ -461,7 +439,10 @@ public class HttpRequest
         Clear();
         SetBegin ("POST", url);
         if (!string.IsNullOrEmpty (contentType))
+        {
             SetHeader ("Content-Type", contentType);
+        }
+
         SetBody (content);
         return this;
     }
@@ -477,7 +458,10 @@ public class HttpRequest
         Clear();
         SetBegin ("PUT", url);
         if (!string.IsNullOrEmpty (contentType))
+        {
             SetHeader ("Content-Type", contentType);
+        }
+
         SetBody (content);
         return this;
     }
@@ -493,7 +477,10 @@ public class HttpRequest
         Clear();
         SetBegin ("PUT", url);
         if (!string.IsNullOrEmpty (contentType))
+        {
             SetHeader ("Content-Type", contentType);
+        }
+
         SetBody (content);
         return this;
     }
@@ -509,7 +496,10 @@ public class HttpRequest
         Clear();
         SetBegin ("PUT", url);
         if (!string.IsNullOrEmpty (contentType))
+        {
             SetHeader ("Content-Type", contentType);
+        }
+
         SetBody (content);
         return this;
     }
@@ -553,10 +543,8 @@ public class HttpRequest
     // HTTP request method
 
     // HTTP request URL
-    private string _url;
 
     // HTTP request protocol
-    private string _protocol;
 
     // HTTP request headers
     private readonly List<(string, string)> _headers = new ();
@@ -571,18 +559,18 @@ public class HttpRequest
     private bool _bodyLengthProvided;
 
     // HTTP request cache
-    private Buffer _cache = new Buffer();
+    private readonly Buffer _cache = new ();
     private int _cacheSize;
 
     // Is pending parts of HTTP request
     internal bool IsPendingHeader()
     {
-        return (!IsErrorSet && (_bodyIndex == 0));
+        return !IsErrorSet && _bodyIndex == 0;
     }
 
     internal bool IsPendingBody()
     {
-        return (!IsErrorSet && (_bodyIndex > 0) && (_bodySize > 0));
+        return !IsErrorSet && _bodyIndex > 0 && _bodySize > 0;
     }
 
     internal bool ReceiveHeader
@@ -599,12 +587,14 @@ public class HttpRequest
         for (var i = _cacheSize; i < (int)_cache.Size; i++)
         {
             // Check for the request cache out of bounds
-            if ((i + 3) >= (int)_cache.Size)
+            if (i + 3 >= (int)_cache.Size)
+            {
                 break;
+            }
 
             // Check for the header separator
-            if ((_cache[i + 0] == '\r') && (_cache[i + 1] == '\n') && (_cache[i + 2] == '\r') &&
-                (_cache[i + 3] == '\n'))
+            if (_cache[i + 0] == '\r' && _cache[i + 1] == '\n' && _cache[i + 2] == '\r' &&
+                _cache[i + 3] == '\n')
             {
                 var index = 0;
 
@@ -619,12 +609,17 @@ public class HttpRequest
                     methodSize++;
                     index++;
                     if (index >= (int)_cache.Size)
+                    {
                         return false;
+                    }
                 }
 
                 index++;
                 if (index >= (int)_cache.Size)
+                {
                     return false;
+                }
+
                 Method = _cache.ExtractString (methodIndex, methodSize);
 
                 // Parse URL
@@ -635,13 +630,18 @@ public class HttpRequest
                     urlSize++;
                     index++;
                     if (index >= (int)_cache.Size)
+                    {
                         return false;
+                    }
                 }
 
                 index++;
                 if (index >= (int)_cache.Size)
+                {
                     return false;
-                _url = _cache.ExtractString (urlIndex, urlSize);
+                }
+
+                Url = _cache.ExtractString (urlIndex, urlSize);
 
                 // Parse protocol version
                 var protocolIndex = index;
@@ -651,19 +651,27 @@ public class HttpRequest
                     protocolSize++;
                     index++;
                     if (index >= (int)_cache.Size)
+                    {
                         return false;
+                    }
                 }
 
                 index++;
-                if ((index >= (int)_cache.Size) || (_cache[index] != '\n'))
+                if (index >= (int)_cache.Size || _cache[index] != '\n')
+                {
                     return false;
+                }
+
                 index++;
                 if (index >= (int)_cache.Size)
+                {
                     return false;
-                _protocol = _cache.ExtractString (protocolIndex, protocolSize);
+                }
+
+                Protocol = _cache.ExtractString (protocolIndex, protocolSize);
 
                 // Parse headers
-                while ((index < (int)_cache.Size) && (index < i))
+                while (index < (int)_cache.Size && index < i)
                 {
                     // Parse header name
                     var headerNameIndex = index;
@@ -673,25 +681,40 @@ public class HttpRequest
                         headerNameSize++;
                         index++;
                         if (index >= i)
+                        {
                             break;
+                        }
+
                         if (index >= (int)_cache.Size)
+                        {
                             return false;
+                        }
                     }
 
                     index++;
                     if (index >= i)
+                    {
                         break;
+                    }
+
                     if (index >= (int)_cache.Size)
+                    {
                         return false;
+                    }
 
                     // Skip all prefix space characters
                     while (char.IsWhiteSpace ((char)_cache[index]))
                     {
                         index++;
                         if (index >= i)
+                        {
                             break;
+                        }
+
                         if (index >= (int)_cache.Size)
+                        {
                             return false;
+                        }
                     }
 
                     // Parse header value
@@ -702,21 +725,33 @@ public class HttpRequest
                         headerValueSize++;
                         index++;
                         if (index >= i)
+                        {
                             break;
+                        }
+
                         if (index >= (int)_cache.Size)
+                        {
                             return false;
+                        }
                     }
 
                     index++;
-                    if ((index >= (int)_cache.Size) || (_cache[index] != '\n'))
+                    if (index >= (int)_cache.Size || _cache[index] != '\n')
+                    {
                         return false;
+                    }
+
                     index++;
                     if (index >= (int)_cache.Size)
+                    {
                         return false;
+                    }
 
                     // Validate header name and value (sometimes value can be empty)
                     if (headerNameSize == 0)
+                    {
                         return false;
+                    }
 
                     // Add a new header
                     var headerName = _cache.ExtractString (headerNameIndex, headerNameSize);
@@ -727,10 +762,13 @@ public class HttpRequest
                     if (string.Compare (headerName, "Content-Length", StringComparison.OrdinalIgnoreCase) == 0)
                     {
                         _bodyLength = 0;
-                        for (var j = headerValueIndex; j < (headerValueIndex + headerValueSize); j++)
+                        for (var j = headerValueIndex; j < headerValueIndex + headerValueSize; j++)
                         {
-                            if ((_cache[j] < '0') || (_cache[j] > '9'))
+                            if (_cache[j] < '0' || _cache[j] > '9')
+                            {
                                 return false;
+                            }
+
                             _bodyLength *= 10;
                             _bodyLength += _cache[j] - '0';
                             _bodyLengthProvided = true;
@@ -747,7 +785,7 @@ public class HttpRequest
                         var nameSize = 0;
                         var cookieIndex = index;
                         var cookieSize = 0;
-                        for (var j = headerValueIndex; j < (headerValueIndex + headerValueSize); j++)
+                        for (var j = headerValueIndex; j < headerValueIndex + headerValueSize; j++)
                         {
                             if (_cache[j] == ' ')
                             {
@@ -806,7 +844,7 @@ public class HttpRequest
                                     }
 
                                     // Validate the cookie
-                                    if ((nameSize > 0) && (cookieSize > 0))
+                                    if (nameSize > 0 && cookieSize > 0)
                                     {
                                         // Add the cookie to the corresponding collection
                                         _cookies.Add ((_cache.ExtractString (nameIndex, nameSize),
@@ -847,7 +885,7 @@ public class HttpRequest
                             }
 
                             // Validate the cookie
-                            if ((nameSize > 0) && (cookieSize > 0))
+                            if (nameSize > 0 && cookieSize > 0)
                             {
                                 // Add the cookie to the corresponding collection
                                 _cookies.Add ((_cache.ExtractString (nameIndex, nameSize),
@@ -872,7 +910,7 @@ public class HttpRequest
         }
 
         // Update the parsed cache size
-        _cacheSize = ((int)_cache.Size >= 3) ? ((int)_cache.Size - 3) : 0;
+        _cacheSize = (int)_cache.Size >= 3 ? (int)_cache.Size - 3 : 0;
 
         return false;
     }
@@ -906,8 +944,8 @@ public class HttpRequest
         else
         {
             // HEAD/GET/DELETE/OPTIONS/TRACE request might have no body
-            if ((Method == "HEAD") || (Method == "GET") || (Method == "DELETE") || (Method == "OPTIONS") ||
-                (Method == "TRACE"))
+            if (Method == "HEAD" || Method == "GET" || Method == "DELETE" || Method == "OPTIONS" ||
+                Method == "TRACE")
             {
                 _bodyLength = 0;
                 _bodySize = 0;
@@ -920,8 +958,8 @@ public class HttpRequest
                 var index = _bodyIndex + _bodySize - 4;
 
                 // Was the body fully received?
-                if ((_cache[index + 0] == '\r') && (_cache[index + 1] == '\n') && (_cache[index + 2] == '\r') &&
-                    (_cache[index + 3] == '\n'))
+                if (_cache[index + 0] == '\r' && _cache[index + 1] == '\n' && _cache[index + 2] == '\r' &&
+                    _cache[index + 3] == '\n')
                 {
                     _bodyLength = _bodySize;
                     return true;
