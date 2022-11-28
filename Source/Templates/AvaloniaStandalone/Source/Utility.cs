@@ -34,23 +34,14 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-
-using AM.Collections;
-using AM.IO;
-using AM.PlatformAbstraction;
-using AM.Reflection;
-using AM.Text;
-
-using Microsoft.Extensions.Logging;
 
 #endregion
 
 #nullable enable
 
-namespace AM;
+namespace AvaloniaApp;
 
 /// <summary>
 /// Сборник простых вспомогательных методов.
@@ -65,22 +56,10 @@ public static class Utility
     [DebuggerStepThrough]
     public static void NotUsed<T>
         (
-            this T variable,
-            [CallerArgumentExpression ("variable")]
-            string? variableName = null,
-            [CallerMemberName] string? member = null,
-            [CallerFilePath] string? file = null,
-            [CallerLineNumber] int line = 0
+            this T variable
         )
     {
-        Magna.Logger.LogDebug
-            (
-                "variable {VariableName} ({Member} on {File}: {Line}) not used",
-                variableName,
-                member,
-                file,
-                line
-            );
+        // пустое тело метода
     }
 
     /// <summary>
@@ -162,89 +141,6 @@ public static class Utility
             action();
         }
     }
-
-    /// <summary>
-    /// Помещение объекта в список для очистки вместе с другими.
-    /// </summary>
-    public static T DisposeWith<T>
-        (
-            this T disposable,
-            DisposableCollection<T> disposables
-        )
-        where T: IDisposable
-    {
-        disposables.Add(disposable);
-
-        return disposable;
-    }
-
-    /// <summary>
-    /// Первый день следующего месяца.
-    /// </summary>
-    [Pure]
-    public static DateTime BeginningOfNextMonth => BeginningOfTheMonth.AddMonths (1);
-
-    /// <summary>
-    /// Первый день следующего года.
-    /// </summary>
-    [Pure]
-    public static DateTime BeginningOfNextYear => BeginningOfTheYear.AddYears (1);
-
-    /// <summary>
-    /// Первый день предыдущего месяца.
-    /// </summary>
-    [Pure]
-    public static DateTime BeginningOfPreviousMonth => BeginningOfTheMonth.AddMonths (-1);
-
-    /// <summary>
-    /// Первый день предыдущего года.
-    /// </summary>
-    [Pure]
-    public static DateTime BeginningOfPreviousYear => BeginningOfTheYear.AddYears (-1);
-
-    /// <summary>
-    /// Первый день текущего месяца.
-    /// </summary>
-    [Pure]
-    public static DateTime BeginningOfTheMonth
-    {
-        [DebuggerStepThrough]
-        get
-        {
-            var today = PlatformAbstractionLayer.Current.Today();
-
-            return new DateTime (today.Year, today.Month, 1);
-        }
-    }
-
-    /// <summary>
-    /// Первый день текущего года.
-    /// </summary>
-    [Pure]
-    public static DateTime BeginningOfTheYear => new
-        (
-            PlatformAbstractionLayer.Current.Today().Year,
-            1,
-            1
-        );
-
-    /// <summary>
-    /// Сегодняшний день.
-    /// </summary>
-    [Pure]
-    public static DateTime Today => PlatformAbstractionLayer.Current.Today();
-
-    /// <summary>
-    /// Завтрашний день.
-    /// </summary>
-    [Pure]
-    public static DateTime Tomorrow => Today.AddDays (1.0);
-
-    /// <summary>
-    /// Вчерашний день.
-    /// </summary>
-    [Pure]
-    public static DateTime Yesterday => Today.AddDays (-1.0);
 
     /// <summary>
     /// Длительность: одни сутки.
@@ -713,46 +609,6 @@ public static class Utility
     }
 
     /// <summary>
-    /// Кодирование строки в формат URL.
-    /// </summary>
-    public static string? UrlEncode
-        (
-            string? text,
-            Encoding encoding
-        )
-    {
-        char _IntToHex (int n) => n <= 9 ? (char)(n + '0') : (char)(n - 10 + 'A');
-
-        if (string.IsNullOrEmpty (text))
-        {
-            return text;
-        }
-
-        var bytes = encoding.GetBytes (text);
-        var builder = StringBuilderPool.Shared.Get();
-        foreach (var b in bytes)
-        {
-            var c = (char) b;
-            if (IsUrlSafeChar (c))
-            {
-                builder.Append (c);
-            }
-            else if (c == ' ')
-            {
-                builder.Append ('+');
-            }
-            else
-            {
-                builder.Append ('%');
-                builder.Append (_IntToHex ((b >> 4) & 0x0F));
-                builder.Append (_IntToHex (b & 0x0F));
-            }
-        }
-
-        return builder.ReturnShared();
-    }
-
-    /// <summary>
     /// Проверка строго на цифры от <c>0</c> до <c>9</c> включительно,
     /// различные "расширенные цифры" не рассматриваются.
     /// Is digit from 0 to 9?
@@ -919,17 +775,8 @@ public static class Utility
         {
             if (!string.IsNullOrEmpty (message))
             {
-                // .NET 5 SDK подставляет в message значение null, .NET 6 делает по-человечески
-                Magna.Logger.LogError
-                    (
-                        nameof (Utility) + "::" + nameof (ThrowIfEmpty) + ": {Message}",
-                        message
-                    );
-
                 throw new ArgumentException (message);
             }
-
-            Magna.Logger.LogError (nameof (Utility) + "::" + nameof (ThrowIfEmpty));
 
             throw new ArgumentException();
         }
@@ -953,18 +800,8 @@ public static class Utility
         {
             if (!string.IsNullOrEmpty (message))
             {
-                // .NET 5 SDK подставляет в message значение null, .NET 6 делает по-человечески
-                Magna.Logger.LogError
-                    (
-                        nameof (Utility) + "::" + nameof (ThrowIfEmpty)
-                        + ": {Message}",
-                        message
-                    );
-
                 throw new ArgumentException (message);
             }
-
-            Magna.Logger.LogError (nameof (Utility) + "::" + nameof (ThrowIfEmpty));
 
             throw new ArgumentException();
         }
@@ -989,18 +826,8 @@ public static class Utility
         {
             if (!string.IsNullOrEmpty (message))
             {
-                // .NET 5 SDK подставляет в message значение null, .NET 6 делает по-человечески
-                Magna.Logger.LogError
-                    (
-                        nameof (Utility) + "::" + nameof (ThrowIfNull)
-                        + ": {Message}",
-                        message
-                    );
-
                 throw new ArgumentException (message);
             }
-
-            Magna.Logger.LogError (nameof (Utility) + "::" + nameof (ThrowIfNull));
 
             throw new ArgumentException();
         }
@@ -1705,14 +1532,14 @@ public static class Utility
             string? third
         )
     {
-        var builder = StringBuilderPool.Shared.Get();
+        var builder = new StringBuilder();
 
         builder
             .AppendWithDelimiter (first, separator)
             .AppendWithDelimiter (second, separator)
             .AppendWithDelimiter (third, separator);
 
-        return builder.ReturnShared();
+        return builder.ToString();
     }
 
     /// <summary>
@@ -1727,7 +1554,7 @@ public static class Utility
             string? fourth
         )
     {
-        var builder = StringBuilderPool.Shared.Get();
+        var builder = new StringBuilder();
 
         builder
             .AppendWithDelimiter (first, separator)
@@ -1735,7 +1562,7 @@ public static class Utility
             .AppendWithDelimiter (third, separator)
             .AppendWithDelimiter (fourth, separator);
 
-        return builder.ReturnShared();
+        return builder.ToString();
     }
 
     /// <summary>
@@ -1747,14 +1574,14 @@ public static class Utility
             IEnumerable<string> strings
         )
     {
-        var builder = StringBuilderPool.Shared.Get();
+        var builder = new StringBuilder();
 
         foreach (var t in strings)
         {
             builder.AppendWithDelimiter (t, separator);
         }
 
-        return builder.ReturnShared();
+        return builder.ToString();
     }
 
     /// <summary>
@@ -1766,14 +1593,14 @@ public static class Utility
             params string?[] strings
         )
     {
-        var builder = StringBuilderPool.Shared.Get();
+        var builder = new StringBuilder();
 
         foreach (var t in strings)
         {
             builder.AppendWithDelimiter (t, separator);
         }
 
-        return builder.ReturnShared();
+        return builder.ToString();
     }
 
     /// <summary>
@@ -4789,7 +4616,7 @@ public static class Utility
             return (T)converterTo.ConvertFrom (value)!;
         }
 
-        throw new ArsMagnaException();
+        throw new Exception();
     }
 
     /// <summary>
@@ -4850,17 +4677,7 @@ public static class Utility
             return converted is not null && (bool)converted;
         }
 
-        Magna.Logger.LogError
-            (
-                nameof (Utility) + "::" + nameof (ToBoolean)
-                + "bad value={Value}",
-                value
-            );
-
-        throw new FormatException
-            (
-                "Bad value: " + value
-            );
+        throw new FormatException ("Bad value: " + value);
     }
 
     /// <summary>
@@ -5104,7 +4921,7 @@ public static class Utility
             return text;
         }
 
-        var builder = StringBuilderPool.Shared.Get();
+        var builder = new StringBuilder();
         builder.EnsureCapacity (text.Length);
 
         foreach (var c in text)
@@ -5115,7 +4932,7 @@ public static class Utility
                 );
         }
 
-        return builder.ReturnShared();
+        return builder.ToString();
     }
 
     /// <summary>
@@ -5151,7 +4968,7 @@ public static class Utility
             return text;
         }
 
-        var builder = StringBuilderPool.Shared.Get();
+        var builder = new StringBuilder();
         builder.EnsureCapacity (text.Length + found);
         foreach (var c in text)
         {
@@ -5163,7 +4980,7 @@ public static class Utility
             builder.Append (c);
         }
 
-        return builder.ReturnShared();
+        return builder.ToString();
     }
 
     /// <summary>
@@ -5562,7 +5379,7 @@ public static class Utility
             string defaultValue = "(none)"
         )
     {
-        if (array.IsNullOrEmpty())
+        if (array is null or { Length: 0 })
         {
             return defaultValue;
         }
@@ -5765,7 +5582,7 @@ public static class Utility
             int length
         )
     {
-        var builder = StringBuilderPool.Shared.Get();
+        var builder = new StringBuilder();
         builder.EnsureCapacity (length);
 
         if (length > 0)
@@ -5778,7 +5595,7 @@ public static class Utility
             builder.Append (RandomSymbols[_random.Next (RandomSymbols.Length)]);
         }
 
-        return builder.ReturnShared();
+        return builder.ToString();
     }
 
     /// <summary>
@@ -5793,19 +5610,7 @@ public static class Utility
         if (exception is AggregateException aggregate)
         {
             aggregate = aggregate.Flatten();
-            aggregate.Handle
-                (
-                    ex =>
-                    {
-                        Magna.Logger.LogError
-                            (
-                                ex,
-                                nameof (Utility) + "::" + nameof (Unwrap)
-                            );
-
-                        return true;
-                    }
-                );
+            aggregate.Handle (ex => true);
 
             return aggregate.InnerExceptions[0];
         }
@@ -5990,23 +5795,6 @@ public static class Utility
     }
 
     /// <summary>
-    /// Чтение 64-битного целого в сетевой раскладке по указанному смещению.
-    /// </summary>
-    [Pure]
-    public static unsafe long ReadNetworkInt64
-        (
-            this ReadOnlySpan<byte> span,
-            int offset
-        )
-    {
-        var buffer = stackalloc byte[sizeof (long)];
-        *(long*) buffer = MemoryMarshal.Read<long> (span[offset..]);
-        StreamUtility.NetworkToHost64 (buffer);
-
-        return *(long*) buffer;
-    }
-
-    /// <summary>
     /// Запись структуры по указанному смещению.
     /// Метод предназначен для мелких структур, например, System.Int32.
     /// </summary>
@@ -6083,21 +5871,6 @@ public static class Utility
             long value
         )
     {
-        Write (span, offset, value);
-    }
-
-    /// <summary>
-    /// Запись 64-битного целого по указанному адресу в сетевой раскладке.
-    /// </summary>
-    public static unsafe void WriteNetworkInt64
-        (
-            this Span<byte> span,
-            int offset,
-            long value
-        )
-    {
-        var ptr = (byte*) &value;
-        StreamUtility.HostToNetwork64 (ptr);
         Write (span, offset, value);
     }
 
@@ -6219,32 +5992,6 @@ public static class Utility
     }
 
     /// <summary>
-    /// Получение ссылочного перечислителя.
-    /// </summary>
-    [Pure]
-    [DebuggerStepThrough]
-    public static RefEnumerable<T> AsRefEnumerable<T>
-        (
-            this Span<T> data
-        )
-    {
-        return new (data);
-    }
-
-    /// <summary>
-    /// Получение ссылочного перечислителя.
-    /// </summary>
-    [Pure]
-    [DebuggerStepThrough]
-    public static RefEnumerable<T> AsRefEnumerable<T>
-        (
-            this T[] data
-        )
-    {
-        return new (data.AsSpan());
-    }
-
-    /// <summary>
     /// "Запустить и забыть".
     /// </summary>
     /// <remarks>
@@ -6291,66 +6038,6 @@ public static class Utility
     }
 
     /// <summary>
-    /// Проверка, установлен ли флаг в перечислении.
-    /// </summary>
-    /// <remarks>
-    /// Ну и не забываем, что <see cref="Enum.HasFlag"/>
-    /// с .NET6 теперь считается интринсиком и разворачивается джитом
-    /// в эффективный код, если на момент компиляции известен тип.
-    /// </remarks>
-    public static unsafe bool IsAnyFlagMatch<T>
-        (
-            this T value,
-            T flag
-        )
-        where T : unmanaged, Enum
-    {
-        if (TypeHelper<T>.TypeCode == TypeCode.Byte)
-        {
-            var v = (int) Unsafe.As<T, byte> (ref value);
-            var f = (int) Unsafe.As<T, byte> (ref flag);
-            return (v & f) != 0;
-        }
-
-        if (TypeHelper<T>.TypeCode == TypeCode.SByte)
-        {
-            var v = (int) Unsafe.As<T, sbyte> (ref value);
-            var f = (int) Unsafe.As<T, sbyte> (ref flag);
-            return (v & f) != 0;
-        }
-
-        if (TypeHelper<T>.TypeCode == TypeCode.Int16)
-        {
-            var v = (int) Unsafe.As<T, short> (ref value);
-            var f = (int) Unsafe.As<T, short> (ref flag);
-            return (v & f) != 0;
-        }
-
-        if (TypeHelper<T>.TypeCode == TypeCode.UInt16)
-        {
-            var v = (int) Unsafe.As<T, ushort> (ref value);
-            var f = (int) Unsafe.As<T, ushort> (ref flag);
-            return (v & f) != 0;
-        }
-
-        if (sizeof(T) == 4)
-        {
-            var v = Unsafe.As<T, int> (ref value);
-            var f = Unsafe.As<T, int> (ref flag);
-            return (v & f) != 0;
-        }
-
-        if (sizeof(T) == 8)
-        {
-            var v = Unsafe.As<T, long> (ref value);
-            var f = Unsafe.As<T, long> (ref flag);
-            return (v & f) != 0;
-        }
-
-        return false;
-    }
-
-    /// <summary>
     /// Ожидание завершения задачи с таймаутом или отменой по токену.
     /// </summary>
     public static async Task<TResult> WithTimeout<TResult>
@@ -6371,114 +6058,6 @@ public static class Utility
         }
 
         throw new TimeoutException();
-    }
-
-    /// <summary>
-    /// Распечатка свойств объекта в соответствии с шаблоном.
-    /// </summary>
-    /// <example>
-    /// <code>
-    /// person.ToPropertyString ("{FirstName} {LastName} has {Children.Count} children.");
-    /// </code>
-    /// </example>
-    public static string ToPropertyString
-        (
-            this object obj,
-            string format,
-            IFormatProvider? formatProvider = null
-        )
-    {
-        Sure.NotNull (format);
-
-        formatProvider ??= CultureInfo.InvariantCulture;
-
-        var builder = StringBuilderPool.Shared.Get();
-        var reg = new Regex (@"{([^}]+)}", RegexOptions.IgnoreCase);
-        var matches = reg.Matches (format);
-
-        var startIndex = 0;
-        foreach (Match match in matches)
-        {
-            var group = match.Groups[1];
-
-            // Append everything before the "{"
-            var length = group.Index - startIndex - 1;
-            builder.Append (format.Substring (startIndex, length));
-
-            string? propertyChain;
-            string? formatString = null;
-            var formatIndex = group.Value.IndexOf
-                (
-                    ":",
-                    StringComparison.InvariantCulture
-                );
-            if (formatIndex == -1)
-            {
-                propertyChain = group.Value;
-            }
-            else
-            {
-                propertyChain = group.Value[..formatIndex];
-                formatString = group.Value[(formatIndex + 1)..];
-            }
-
-            var value = ObjectStringFlector.GetValue (obj, propertyChain);
-            if (value is not null)
-            {
-                object[]? invokeArgs = null;
-
-                if (formatString != null)
-                {
-                    invokeArgs = new object[] { formatString, formatProvider };
-                }
-
-                var result = (string?)value.GetType().InvokeMember
-                    (
-                        "ToString",
-                        BindingFlags.Public | BindingFlags.Instance | BindingFlags.InvokeMethod,
-                        null,
-                        value,
-                        invokeArgs
-                    );
-
-                builder.Append (result);
-            }
-
-            startIndex = group.Index + group.Length + 1;
-        }
-
-        // Include the rest of the string.
-        if (startIndex < format.Length)
-        {
-            builder.Append (format.Substring (startIndex));
-        }
-
-        return builder.ReturnShared();
-    }
-
-    /// <summary>
-    /// Материализация коллекции.
-    /// </summary>
-    public static IReadOnlyCollection<T> ReifyCollection<T>
-        (
-            IEnumerable<T> source
-        )
-    {
-        Sure.NotNull ((object?) source);
-
-        return source switch
-        {
-            IReadOnlyCollection<T> readOnlyCollection =>
-                readOnlyCollection,
-
-            ICollection<T> genericCollection =>
-                new CollectionWrapper<T> (genericCollection),
-
-            ICollection nongenericCollection =>
-                new NongenericCollectionWrapper<T> (nongenericCollection),
-
-            _ => new List<T> (source)
-        };
     }
 
     /// <summary>

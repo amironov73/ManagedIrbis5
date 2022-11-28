@@ -23,13 +23,13 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 
-using AM.Text.Output;
-
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Avalonia.Platform;
 
 #endregion
 
@@ -54,6 +54,9 @@ public static class AvaloniaUtility
         )
         where TControl: Control
     {
+        Sure.NotNull (control);
+        Sure.NotNull (action);
+
         action (control);
 
         return control;
@@ -86,6 +89,8 @@ public static class AvaloniaUtility
         )
         where T: TextBlock
     {
+        Sure.NotNull (block);
+
         block.FontWeight = bold ? FontWeight.Bold : FontWeight.Regular;
 
         return block;
@@ -115,6 +120,8 @@ public static class AvaloniaUtility
         )
         where T: Control
     {
+        Sure.NotNull (control);
+
         control.HorizontalAlignment = HorizontalAlignment.Center;
         control.VerticalAlignment = VerticalAlignment.Center;
 
@@ -130,6 +137,8 @@ public static class AvaloniaUtility
         )
         where T: Control
     {
+        Sure.NotNull (control);
+
         control.HorizontalAlignment = HorizontalAlignment.Center;
 
         return control;
@@ -144,6 +153,8 @@ public static class AvaloniaUtility
         )
         where T: Control
     {
+        Sure.NotNull (control);
+
         control.VerticalAlignment = VerticalAlignment.Center;
 
         return control;
@@ -165,6 +176,9 @@ public static class AvaloniaUtility
             GridLength columnLength
         )
     {
+        Sure.Positive (rowCount);
+        Sure.Positive (columnCount);
+
         var result = new Grid
         {
             RowDefinitions = CreateGridRows (rowCount, rowLength),
@@ -186,6 +200,8 @@ public static class AvaloniaUtility
             GridLength length
         )
     {
+        Sure.Positive (count);
+
         var result = new ColumnDefinitions();
         for (var i = 0; i < count; i++)
         {
@@ -207,6 +223,8 @@ public static class AvaloniaUtility
             GridLength length
         )
     {
+        Sure.Positive (count);
+
         var result = new RowDefinitions();
         for (var i = 0; i < count; i++)
         {
@@ -226,6 +244,8 @@ public static class AvaloniaUtility
         )
         where T: Control
     {
+        Sure.NotNull (control);
+
         control.SetValue (DockPanel.DockProperty, Dock.Bottom);
 
         return control;
@@ -241,6 +261,8 @@ public static class AvaloniaUtility
         )
         where T: Control
     {
+        Sure.NotNull (control);
+
         control.SetValue (DockPanel.DockProperty, Dock.Left);
 
         return control;
@@ -256,6 +278,8 @@ public static class AvaloniaUtility
         )
         where T: Control
     {
+        Sure.NotNull (control);
+
         control.SetValue (DockPanel.DockProperty, Dock.Right);
 
         return control;
@@ -271,6 +295,8 @@ public static class AvaloniaUtility
         )
         where T: Control
     {
+        Sure.NotNull (control);
+
         control.SetValue (DockPanel.DockProperty, Dock.Top);
 
         return control;
@@ -299,6 +325,8 @@ public static class AvaloniaUtility
         )
         where T: TextBlock
     {
+        Sure.NotNull (block);
+
         block.FontStyle = italic ? FontStyle.Italic : FontStyle.Normal;
 
         return block;
@@ -329,9 +357,40 @@ public static class AvaloniaUtility
         )
         where T: Button
     {
+        Sure.NotNull (button);
+        Sure.NotNull (handler);
+
         button.Click += handler;
 
         return button;
+    }
+
+    /// <summary>
+    /// Добыча ассетов из ресурсов Avalonia.
+    /// </summary>
+    public static Stream? OpenAssetStream
+        (
+            string assetName
+        )
+    {
+        Sure.NotNullNorEmpty (assetName);
+
+        var assets = AvaloniaLocator.Current.GetService<IAssetLoader>();
+        if (assets is not null)
+        {
+                var assembly = Assembly.GetEntryAssembly();
+                if (assembly is not null)
+                {
+                    var name = assembly.GetName().Name;
+                    if (!string.IsNullOrEmpty (name))
+                    {
+                        var uri = "avares://" + name + "/" + assetName;
+                        return assets.Open (new Uri (uri));
+                    }
+                }
+        }
+
+        return null;
     }
 
     /// <summary>
@@ -349,6 +408,10 @@ public static class AvaloniaUtility
             VerticalAlignment verticalContentAlignment = VerticalAlignment.Center
         )
     {
+        Sure.NotNull (grid);
+        Sure.Positive (row);
+        Sure.Positive (column);
+
         var result = new Label
         {
             HorizontalAlignment = horizontalAlignment,
@@ -378,6 +441,10 @@ public static class AvaloniaUtility
             VerticalAlignment verticalAlignment = VerticalAlignment.Stretch
         )
     {
+        Sure.NotNull (grid);
+        Sure.Positive (row);
+        Sure.Positive (column);
+
         var result = new TextBlock
         {
             HorizontalAlignment = horizontalAlignment,
@@ -402,6 +469,9 @@ public static class AvaloniaUtility
         )
         where T: AvaloniaObject
     {
+        Sure.NotNull (obj);
+        Sure.Positive (column);
+
         obj.SetValue (Grid.ColumnProperty, column);
 
         return obj;
@@ -417,6 +487,8 @@ public static class AvaloniaUtility
         )
         where T: ContentControl
     {
+        Sure.NotNull (control);
+
         control.Margin = thickness;
 
         return control;
@@ -432,6 +504,8 @@ public static class AvaloniaUtility
         )
         where T: ContentControl
     {
+        Sure.NotNull (control);
+
         control.Margin = new Thickness (thickness);
 
         return control;
@@ -448,6 +522,8 @@ public static class AvaloniaUtility
         )
         where T: ContentControl
     {
+        Sure.NotNull (control);
+
         control.Margin = new Thickness (horizontal, vertical);
 
         return control;
@@ -466,6 +542,8 @@ public static class AvaloniaUtility
         )
         where T: ContentControl
     {
+        Sure.NotNull (control);
+
         control.Margin = new Thickness (left, top, right, bottom);
 
         return control;
@@ -481,6 +559,8 @@ public static class AvaloniaUtility
         )
         where T: TextBlock
     {
+        Sure.NotNull (block);
+
         block.Padding = thickness;
 
         return block;
@@ -496,6 +576,8 @@ public static class AvaloniaUtility
         )
         where T: TextBlock
     {
+        Sure.NotNull (block);
+
         block.Padding = new Thickness (thickness);
 
         return block;
@@ -512,6 +594,8 @@ public static class AvaloniaUtility
         )
         where T: TextBlock
     {
+        Sure.NotNull (block);
+
         block.Padding = new Thickness (horizontal, vertical);
 
         return block;
@@ -530,6 +614,8 @@ public static class AvaloniaUtility
         )
         where T: TextBlock
     {
+        Sure.NotNull (block);
+
         block.Padding = new Thickness (left, top, right, bottom);
 
         return block;
@@ -545,6 +631,9 @@ public static class AvaloniaUtility
         )
         where T: AvaloniaObject
     {
+        Sure.NotNull (obj);
+        Sure.Positive (row);
+
         obj.SetValue (Grid.RowProperty, row);
 
         return obj;
@@ -561,6 +650,10 @@ public static class AvaloniaUtility
         )
         where T: AvaloniaObject
     {
+        Sure.NotNull (obj);
+        Sure.Positive (row);
+        Sure.Positive (column);
+
         obj.SetValue (Grid.RowProperty, row);
         obj.SetValue (Grid.ColumnProperty, column);
 
@@ -575,6 +668,8 @@ public static class AvaloniaUtility
             this Window window
         )
     {
+        Sure.NotNull (window);
+
         var assembly = Assembly.GetEntryAssembly();
         var location = assembly?.Location;
         if (string.IsNullOrEmpty (location))
@@ -593,52 +688,6 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
-    /// Print system information in abstract output.
-    /// </summary>
-    public static void PrintSystemInformation
-        (
-            this AbstractOutput? output
-        )
-    {
-        if (output is not null)
-        {
-            output.WriteLine
-                (
-                    "OS version: {0}",
-                    Environment.OSVersion
-                );
-            output.WriteLine
-                (
-                    "Framework version: {0}",
-                    Environment.Version
-                );
-            var assembly = Assembly.GetEntryAssembly();
-            var vi = assembly?.GetName().Version;
-            if (assembly?.Location is null)
-            {
-                // TODO: в single-exe-application .Location возвращает string.Empty
-                // consider using the AppContext.BaseDirectory
-                return;
-            }
-
-            // TODO: в single-exe-application .Location возвращает string.Empty
-            // consider using the AppContext.BaseDirectory
-            var fi = new FileInfo (assembly.Location);
-            output.WriteLine
-                (
-                    "Application version: {0} ({1})",
-                    vi.ToVisibleString(),
-                    fi.LastWriteTime.ToShortDateString()
-                );
-            output.WriteLine
-                (
-                    "Memory: {0} Mb",
-                    GC.GetTotalMemory (false) / 1024
-                );
-        }
-    }
-
-    /// <summary>
     /// Растягивание контрола по горизонтали и по вертикали.
     /// </summary>
     public static T Stretch<T>
@@ -647,6 +696,8 @@ public static class AvaloniaUtility
         )
         where T: Control
     {
+        Sure.NotNull (control);
+
         control.HorizontalAlignment = HorizontalAlignment.Stretch;
         control.VerticalAlignment = VerticalAlignment.Stretch;
 
@@ -662,6 +713,8 @@ public static class AvaloniaUtility
         )
         where T: Control
     {
+        Sure.NotNull (control);
+
         control.HorizontalAlignment = HorizontalAlignment.Stretch;
 
         return control;
@@ -676,9 +729,33 @@ public static class AvaloniaUtility
         )
         where T: Control
     {
+        Sure.NotNull (control);
+
         control.VerticalAlignment = VerticalAlignment.Stretch;
 
         return control;
+    }
+
+    /// <summary>
+    /// Добавление ячейки в грид.
+    /// </summary>
+    public static Grid WithCell
+        (
+            this Grid grid,
+            int row,
+            int column,
+            Control control
+        )
+    {
+        Sure.NotNull (grid);
+        Sure.InRange (row, grid.RowDefinitions);
+        Sure.InRange (column, grid.ColumnDefinitions);
+
+        control.SetValue (Grid.RowProperty, row);
+        control.SetValue (Grid.ColumnProperty, column);
+        grid.Children.Add (control);
+
+        return grid;
     }
 
     /// <summary>
@@ -691,6 +768,8 @@ public static class AvaloniaUtility
         )
         where T: Panel
     {
+        Sure.NotNull (panel);
+
         panel.Children.AddRange (children);
 
         return panel;
