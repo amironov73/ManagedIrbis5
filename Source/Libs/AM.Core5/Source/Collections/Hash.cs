@@ -5,6 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable LocalizableElement
 // ReSharper disable NonReadonlyMemberInGetHashCode
 
 /* Hash.cs --
@@ -35,7 +36,8 @@ namespace AM.Collections;
 /// hashes compares items to hash items into the table.
 ///</remarks>
 [Serializable]
-internal class Hash<T> : IEnumerable<T>, ISerializable, IDeserializationCallback
+internal class Hash<T>
+    : IEnumerable<T>, ISerializable, IDeserializationCallback
 {
     // NOTE: If you add new member variables, you very well may need to change the serialization
     // code to serialize that member.
@@ -53,7 +55,7 @@ internal class Hash<T> : IEnumerable<T>, ISerializable, IDeserializationCallback
     private int hashMask; // Mask to convert hash values to the size of the table.
     private int secondaryShift; // Shift to get the secondary skip value.
 
-    private Slot[] table; // The hash table.
+    private Slot[]? table; // The hash table.
 
     private int changeStamp; // An integer that is changed every time the table structurally changes.
 
@@ -62,7 +64,7 @@ internal class Hash<T> : IEnumerable<T>, ISerializable, IDeserializationCallback
 
     private const int MINSIZE = 16; // minimum number of slots.
 
-    private SerializationInfo serializationInfo; // Info used during deserialization.
+    private SerializationInfo? serializationInfo; // Info used during deserialization.
 
     /// <summary>
     /// The structure that has each slot in the hash table. Each slot has three parts:
@@ -82,7 +84,7 @@ internal class Hash<T> : IEnumerable<T>, ISerializable, IDeserializationCallback
         /// </summary>
         public int HashValue
         {
-            get { return (int)(hash_collision & 0x7FFFFFFF); }
+            get => (int)(hash_collision & 0x7FFFFFFF);
             set
             {
                 Debug.Assert ((value & 0x80000000) == 0); // make sure sign bit isn't set.
@@ -93,10 +95,7 @@ internal class Hash<T> : IEnumerable<T>, ISerializable, IDeserializationCallback
         /// <summary>
         /// Is this slot empty?
         /// </summary>
-        public bool Empty
-        {
-            get { return HashValue == 0; }
-        }
+        public bool Empty => HashValue == 0;
 
         /// <summary>
         /// Clear this slot, leaving the collision bit alone.
@@ -104,7 +103,7 @@ internal class Hash<T> : IEnumerable<T>, ISerializable, IDeserializationCallback
         public void Clear()
         {
             HashValue = 0;
-            item = default (T); // Done to avoid keeping things alive that shouldn't be.
+            item = default!; // Done to avoid keeping things alive that shouldn't be.
         }
 
         /// <summary>
@@ -113,7 +112,7 @@ internal class Hash<T> : IEnumerable<T>, ISerializable, IDeserializationCallback
         /// </summary>
         public bool Collision
         {
-            get { return (hash_collision & 0x80000000) != 0; }
+            get => (hash_collision & 0x80000000) != 0;
             set
             {
                 if (value)
@@ -132,10 +131,16 @@ internal class Hash<T> : IEnumerable<T>, ISerializable, IDeserializationCallback
     /// Constructor. Create a new hash table.
     /// </summary>
     /// <param name="equalityComparer">The comparer to use to compare items. </param>
-    public Hash (IEqualityComparer<T> equalityComparer)
+    public Hash
+        (
+            IEqualityComparer<T> equalityComparer
+        )
     {
+        table = null;
+        serializationInfo = null;
+
         this.equalityComparer = equalityComparer;
-        this.loadFactor = 0.70F; // default load factor.
+        loadFactor = 0.70F; // default load factor.
     }
 
     /// <summary>
@@ -179,9 +184,7 @@ internal class Hash<T> : IEnumerable<T>, ISerializable, IDeserializationCallback
     /// <returns>The full hash code. It is never zero.</returns>
     private int GetFullHash (T item)
     {
-        uint hash;
-
-        hash = (uint)Util.GetHashCode (item, equalityComparer);
+        var hash = (uint) Util.GetHashCode (item, equalityComparer);
 
         // The .NET framework tends to produce pretty bad hash codes.
         // Scramble them up to be much more random!
@@ -242,9 +245,8 @@ internal class Hash<T> : IEnumerable<T>, ISerializable, IDeserializationCallback
         if (usedSlots + additionalItems > thresholdGrow)
         {
             // We need to expand the table. Figure out to what size.
-            int newSize;
 
-            newSize = Math.Max (totalSlots, MINSIZE);
+            var newSize = Math.Max (totalSlots, MINSIZE);
             while ((int)(newSize * loadFactor) < usedSlots + additionalItems)
             {
                 newSize *= 2;
@@ -328,23 +330,14 @@ internal class Hash<T> : IEnumerable<T>, ISerializable, IDeserializationCallback
 
         hashMask = newSize - 1;
         secondaryShift = GetSecondaryShift (newSize);
-        if (totalSlots > 0)
-        {
-            table = new Slot[totalSlots];
-        }
-        else
-        {
-            table = null;
-        }
+        table = totalSlots > 0 ? new Slot[totalSlots] : null;
 
         if (oldTable != null && table != null)
         {
             foreach (var oldSlot in oldTable)
             {
-                int hash, bucket, skip;
-
-                hash = oldSlot.HashValue;
-                GetHashValuesFromFullHash (hash, out bucket, out skip);
+                var hash = oldSlot.HashValue;
+                GetHashValuesFromFullHash (hash, out var bucket, out var skip);
 
                 // Find an empty bucket.
                 while (!table[bucket].Empty)
@@ -367,20 +360,14 @@ internal class Hash<T> : IEnumerable<T>, ISerializable, IDeserializationCallback
     /// Get the number of items in the hash table.
     /// </summary>
     /// <value>The number of items stored in the hash table.</value>
-    public int ElementCount
-    {
-        get { return count; }
-    }
+    public int ElementCount => count;
 
     /// <summary>
     /// Get the number of slots in the hash table. Exposed internally
     /// for testing purposes.
     /// </summary>
     /// <value>The number of slots in the hash table.</value>
-    internal int SlotCount
-    {
-        get { return totalSlots; }
-    }
+    internal int SlotCount => totalSlots;
 
     /// <summary>
     /// Get or change the load factor. Changing the load factor may cause
@@ -389,13 +376,13 @@ internal class Hash<T> : IEnumerable<T>, ISerializable, IDeserializationCallback
     /// <value></value>
     public float LoadFactor
     {
-        get { return loadFactor; }
+        get => loadFactor;
         set
         {
             // Don't allow hopelessly inefficient load factors.
             if (value < 0.25 || value > 0.95)
             {
-                throw new ArgumentOutOfRangeException ("value", value, "The load factor must be between 0.25 and 0.95");
+                throw new ArgumentOutOfRangeException (nameof (value), value, "The load factor must be between 0.25 and 0.95");
             }
 
             StopEnumerations();
@@ -432,15 +419,24 @@ internal class Hash<T> : IEnumerable<T>, ISerializable, IDeserializationCallback
     /// is done if a duplicate already exists.</param>
     /// <param name="previous">If a duplicate was found, returns it (whether replaced or not).</param>
     /// <returns>True if no duplicate existed, false if a duplicate was found.</returns>
-    public bool Insert (T item, bool replaceOnDuplicate, out T previous)
+    public bool Insert
+        (
+            T item,
+            bool replaceOnDuplicate,
+            out T previous
+        )
     {
-        int hash, bucket, skip;
         var emptyBucket = -1; // If >= 0, an empty bucket we can use for a true insert
         var duplicateMightExist = true; // If true, still the possibility that a duplicate exists.
 
         EnsureEnoughSlots (1); // Ensure enough room to insert. Also stops enumerations.
 
-        hash = GetHashValues (item, out bucket, out skip);
+        var hash = GetHashValues (item, out var bucket, out var skip);
+
+        if (table is null)
+        {
+            throw new ArsMagnaException();
+        }
 
         for (;;)
         {
@@ -504,7 +500,7 @@ internal class Hash<T> : IEnumerable<T>, ISerializable, IDeserializationCallback
             ++usedSlots;
         }
 
-        previous = default (T);
+        previous = default!;
         return true;
     }
 
@@ -517,17 +513,19 @@ internal class Hash<T> : IEnumerable<T>, ISerializable, IDeserializationCallback
     /// <returns>True if item was found and deleted, false if item wasn't found.</returns>
     public bool Delete (T item, out T itemDeleted)
     {
-        int hash, bucket, skip;
-
         StopEnumerations();
 
         if (count == 0)
         {
-            itemDeleted = default (T);
+            itemDeleted = default!;
             return false;
         }
 
-        hash = GetHashValues (item, out bucket, out skip);
+        var hash = GetHashValues (item, out var bucket, out var skip);
+        if (table is null)
+        {
+            throw new ArsMagnaException();
+        }
 
         for (;;)
         {
@@ -548,7 +546,7 @@ internal class Hash<T> : IEnumerable<T>, ISerializable, IDeserializationCallback
             else if (!table[bucket].Collision)
             {
                 // No collision bit, so we can stop searching. No such element.
-                itemDeleted = default (T);
+                itemDeleted = default!;
                 return false;
             }
 
@@ -567,15 +565,17 @@ internal class Hash<T> : IEnumerable<T>, ISerializable, IDeserializationCallback
     /// <returns>True if the item was found, false otherwise.</returns>
     public bool Find (T find, bool replace, out T item)
     {
-        int hash, bucket, skip;
-
         if (count == 0)
         {
-            item = default (T);
+            item = default!;
             return false;
         }
 
-        hash = GetHashValues (find, out bucket, out skip);
+        var hash = GetHashValues (find, out var bucket, out var skip);
+        if (table is null)
+        {
+            throw new ArsMagnaException();
+        }
 
         for (;;)
         {
@@ -593,7 +593,7 @@ internal class Hash<T> : IEnumerable<T>, ISerializable, IDeserializationCallback
             else if (!table[bucket].Collision)
             {
                 // No collision bit, so we can stop searching. No such element.
-                item = default (T);
+                item = default!;
                 return false;
             }
 
@@ -613,12 +613,15 @@ internal class Hash<T> : IEnumerable<T>, ISerializable, IDeserializationCallback
         {
             var startStamp = changeStamp;
 
-            foreach (var slot in table)
+            if (table is not null)
             {
-                if (!slot.Empty)
+                foreach (var slot in table)
                 {
-                    yield return slot.item;
-                    CheckEnumerationStamp (startStamp);
+                    if (!slot.Empty)
+                    {
+                        yield return slot.item;
+                        CheckEnumerationStamp (startStamp);
+                    }
                 }
             }
         }
@@ -641,17 +644,22 @@ internal class Hash<T> : IEnumerable<T>, ISerializable, IDeserializationCallback
     /// <param name="cloneItem">If non-null, this function is applied to each item when cloning. It must be the
     /// case that this function does not modify the hash code or equality function.</param>
     /// <returns>A shallow clone that contains the same items.</returns>
-    public Hash<T> Clone (Converter<T, T> cloneItem)
+    public Hash<T> Clone
+        (
+            Converter<T, T>? cloneItem
+        )
     {
-        var clone = new Hash<T> (equalityComparer);
-        clone.count = this.count;
-        clone.usedSlots = this.usedSlots;
-        clone.totalSlots = this.totalSlots;
-        clone.loadFactor = this.loadFactor;
-        clone.thresholdGrow = this.thresholdGrow;
-        clone.thresholdShrink = this.thresholdShrink;
-        clone.hashMask = this.hashMask;
-        clone.secondaryShift = this.secondaryShift;
+        var clone = new Hash<T> (equalityComparer)
+        {
+            count = count,
+            usedSlots = usedSlots,
+            totalSlots = totalSlots,
+            loadFactor = loadFactor,
+            thresholdGrow = thresholdGrow,
+            thresholdShrink = thresholdShrink,
+            hashMask = hashMask,
+            secondaryShift = secondaryShift
+        };
         if (table != null)
         {
             clone.table = (Slot[])table.Clone();
@@ -680,18 +688,23 @@ internal class Hash<T> : IEnumerable<T>, ISerializable, IDeserializationCallback
     {
         if (info == null)
         {
-            throw new ArgumentNullException ("info");
+            throw new ArgumentNullException (nameof (info));
         }
 
         info.AddValue ("equalityComparer", equalityComparer, typeof (IEqualityComparer<T>));
         info.AddValue ("loadFactor", loadFactor, typeof (float));
         var items = new T[count];
         var i = 0;
-        foreach (var slot in table)
-            if (!slot.Empty)
+        if (table is not null)
+        {
+            foreach (var slot in table)
             {
-                items[i++] = slot.item;
+                if (!slot.Empty)
+                {
+                    items[i++] = slot.item;
+                }
             }
+        }
 
         info.AddValue ("items", items, typeof (T[]));
     }
@@ -700,8 +713,14 @@ internal class Hash<T> : IEnumerable<T>, ISerializable, IDeserializationCallback
     /// Called on deserialization. We cannot deserialize now, because hash codes
     /// might not be correct now. We do real deserialization in the OnDeserialization call.
     /// </summary>
-    protected Hash (SerializationInfo serInfo, StreamingContext context)
+    protected Hash
+        (
+            SerializationInfo serInfo,
+            StreamingContext context
+        )
     {
+        equalityComparer = null!;
+
         // Save away the serialization info for use later. We can't be sure of hash codes
         // being stable until the entire object graph is deserialized, so we wait until then
         // to deserialize.
@@ -720,15 +739,15 @@ internal class Hash<T> : IEnumerable<T>, ISerializable, IDeserializationCallback
         }
 
         loadFactor = serializationInfo.GetSingle ("loadFactor");
-        equalityComparer =
-            (IEqualityComparer<T>)serializationInfo.GetValue ("equalityComparer", typeof (IEqualityComparer<T>));
+        equalityComparer = (IEqualityComparer<T>) serializationInfo.GetValue ("equalityComparer", typeof (IEqualityComparer<T>))!;
 
-        var items = (T[])serializationInfo.GetValue ("items", typeof (T[]));
-        T dummy;
+        var items = (T[])serializationInfo.GetValue ("items", typeof (T[]))!;
 
         EnsureEnoughSlots (items.Length);
         foreach (var item in items)
-            Insert (item, true, out dummy);
+        {
+            Insert (item, true, out var dummy);
+        }
 
         serializationInfo = null;
     }
@@ -758,10 +777,16 @@ internal class Hash<T> : IEnumerable<T>, ISerializable, IDeserializationCallback
     internal void Print()
     {
         PrintStats();
-        for (var i = 0; i < totalSlots; ++i)
-            Console.WriteLine ("Slot {0,4:X}: {1} {2,8:X} {3}", i, table[i].Collision ? "C" : " ",
-                table[i].HashValue, table[i].Empty ? "<empty>" : table[i].item.ToString());
-        Console.WriteLine();
+        if (table is not null)
+        {
+            for (var i = 0; i < totalSlots; ++i)
+            {
+                Console.WriteLine ("Slot {0,4:X}: {1} {2,8:X} {3}", i, table[i].Collision ? "C" : " ",
+                    table[i].HashValue, table[i].Empty ? "<empty>" : table[i].item?.ToString());
+            }
+
+            Console.WriteLine();
+        }
     }
 
     /// <summary>
@@ -785,6 +810,11 @@ internal class Hash<T> : IEnumerable<T>, ISerializable, IDeserializationCallback
 
         if (totalSlots > 0)
         {
+            if (table is null)
+            {
+                throw new ArsMagnaException();
+            }
+
             Debug.Assert ((totalSlots & (totalSlots - 1)) == 0); // totalSlots is a power of two.
             Debug.Assert (totalSlots - 1 == hashMask);
             Debug.Assert (GetSecondaryShift (totalSlots) == secondaryShift);
@@ -793,7 +823,7 @@ internal class Hash<T> : IEnumerable<T>, ISerializable, IDeserializationCallback
 
         // Traverse the table. Make sure that count and usedSlots are right, and that
         // each slot looks reasonable.
-        int expectedCount = 0, expectedUsed = 0, initialBucket, skip;
+        int expectedCount = 0, expectedUsed = 0;
         if (table != null)
         {
             for (var i = 0; i < totalSlots; ++i)
@@ -807,7 +837,7 @@ internal class Hash<T> : IEnumerable<T>, ISerializable, IDeserializationCallback
                         ++expectedUsed;
                     }
 
-                    Debug.Assert (object.Equals (default (T), slot.item));
+                    Debug.Assert (Equals (default (T), slot.item));
                 }
                 else
                 {
@@ -815,7 +845,7 @@ internal class Hash<T> : IEnumerable<T>, ISerializable, IDeserializationCallback
                     ++expectedCount;
                     ++expectedUsed;
                     Debug.Assert (slot.HashValue != 0);
-                    Debug.Assert (GetHashValues (slot.item, out initialBucket, out skip) == slot.HashValue);
+                    Debug.Assert (GetHashValues (slot.item, out var initialBucket, out _) == slot.HashValue);
                     if (initialBucket != i)
                     {
                         Debug.Assert (table[initialBucket].Collision);

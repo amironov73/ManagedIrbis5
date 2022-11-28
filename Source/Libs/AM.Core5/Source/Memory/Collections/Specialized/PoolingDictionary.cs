@@ -34,8 +34,8 @@ namespace AM.Memory.Collections.Specialized;
 /// These chunks are reusable btw all Pooling* collections. All operations have O(1) complexity.
 /// Primary rets IPoolingEnumerable. But you can cast to IEnumerable to work in common manner.
 /// </summary>
-public partial class PoolingDictionary<TKey, TValue> :
-    IDictionary<TKey, TValue>,
+public partial class PoolingDictionary<TKey, TValue>
+    : IDictionary<TKey, TValue>,
     IReadOnlyDictionary<TKey, TValue>,
     IPoolingEnumerable<KeyValuePair<TKey, TValue>>,
     IDisposable
@@ -63,7 +63,13 @@ public partial class PoolingDictionary<TKey, TValue> :
     /// <summary>
     /// Конструктор по умолчанию.
     /// </summary>
-    public PoolingDictionary() => Init();
+    public PoolingDictionary()
+    {
+        _comparer = null!;
+        _entries = null!;
+
+        Init();
+    }
 
     /// <summary>
     /// Инициализация словаря.
@@ -103,10 +109,15 @@ public partial class PoolingDictionary<TKey, TValue> :
             return true;
         }
 
-        value = default;
+        value = default!;
         return false;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="key"></param>
+    /// <exception cref="KeyNotFoundException"></exception>
     public TValue this [TKey key]
     {
         get
@@ -122,9 +133,11 @@ public partial class PoolingDictionary<TKey, TValue> :
 
     IEnumerable<TValue> IReadOnlyDictionary<TKey, TValue>.Values => Values;
 
+    /// <inheritdoc cref="IDictionary{TKey,TValue}.Keys"/>
     public ICollection<TKey> Keys =>
         throw new NotImplementedException(); // _keys ??= Pool<KeysCollection>.Get().Init(this);
 
+    /// <inheritdoc cref="IDictionary{TKey,TValue}.Values"/>
     public ICollection<TValue> Values =>
         throw new NotImplementedException(); // _values ??= Pool<ValuesCollection>.Get().Init(this);
 
@@ -181,7 +194,7 @@ public partial class PoolingDictionary<TKey, TValue> :
 
         if (_buckets == null) Init (PoolsDefaults.DefaultPoolBucketSize);
         var hashCode = key!.GetHashCode() & 0x7FFFFFFF;
-        var targetBucket = hashCode % _buckets.Count;
+        var targetBucket = hashCode % _buckets!.Count;
         var complexity = 0;
 
         for (var i = _buckets[targetBucket]; i >= 0; i = _entries[i].next)
@@ -263,7 +276,7 @@ public partial class PoolingDictionary<TKey, TValue> :
                 if (_entries[i].hashCode != -1)
                 {
                     var entry = _entries[i];
-                    entry.hashCode = _entries[i].key.GetHashCode() & 0x7FFFFFFF;
+                    entry.hashCode = _entries[i].key!.GetHashCode() & 0x7FFFFFFF;
                     _entries[i] = entry;
                 }
             }
@@ -281,7 +294,7 @@ public partial class PoolingDictionary<TKey, TValue> :
             }
         }
 
-        _buckets.Dispose();
+        _buckets!.Dispose();
         Pool<PoolingList<int>>.Return (_buckets);
         _buckets = newBuckets;
     }
@@ -294,10 +307,10 @@ public partial class PoolingDictionary<TKey, TValue> :
             _version++;
         }
 
-        _buckets?.Dispose();
+        _buckets!.Dispose();
         Pool<PoolingList<int>>.Return (_buckets);
 
-        _entries?.Dispose();
+        _entries.Dispose();
         Pool<PoolingList<Entry>>.Return (_entries);
 
         _buckets = default;
@@ -361,13 +374,17 @@ public partial class PoolingDictionary<TKey, TValue> :
         throw new NotImplementedException();
     }
 
+    /// <inheritdoc cref="ICollection{T}.Count"/>
     public int Count => _count;
+
+    /// <inheritdoc cref="ICollection{T}.IsReadOnly"/>
     public bool IsReadOnly => false;
 
-    internal class Enumerator : IEnumerator<KeyValuePair<TKey, TValue>>,
+    internal class Enumerator
+        : IEnumerator<KeyValuePair<TKey, TValue>>,
         IPoolingEnumerator<KeyValuePair<TKey, TValue>>
     {
-        private PoolingDictionary<TKey, TValue> _src;
+        private PoolingDictionary<TKey, TValue>? _src;
         private int _pos;
         private int _ver;
 
@@ -381,7 +398,7 @@ public partial class PoolingDictionary<TKey, TValue> :
 
         public bool MoveNext()
         {
-            if (_pos >= _src.Count) return false;
+            if (_pos >= _src!.Count) return false;
             if (_ver != _src._version)
             {
                 throw new InvalidOperationException ("Version of collection was changed while enumeration");
@@ -393,7 +410,7 @@ public partial class PoolingDictionary<TKey, TValue> :
 
         public void Reset()
         {
-            _ver = _src._version;
+            _ver = _src!._version;
             _pos = -1;
         }
 
@@ -403,7 +420,7 @@ public partial class PoolingDictionary<TKey, TValue> :
         {
             get
             {
-                if (_ver != _src._version)
+                if (_ver != _src!._version)
                 {
                     throw new InvalidOperationException ("Version of collection was changed while enumeration");
                 }

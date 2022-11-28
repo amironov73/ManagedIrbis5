@@ -4,6 +4,8 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
+#pragma warning disable CS9080 // use of variable may expose referenced variables outside of their declaration scope
+
 /* BuilderUtility.cs -- полезные методы для SpanBuilder
  * Ars Magna project, http://arsmagna.ru
  */

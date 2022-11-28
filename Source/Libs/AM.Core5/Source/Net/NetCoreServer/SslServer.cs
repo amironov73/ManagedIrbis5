@@ -32,7 +32,8 @@ namespace NetCoreServer;
 /// SSL server is used to connect, disconnect and manage SSL sessions
 /// </summary>
 /// <remarks>Thread-safe</remarks>
-public class SslServer : IDisposable
+public class SslServer
+    : IDisposable
 {
     /// <summary>
     /// Initialize SSL server with a given IP address and port number
@@ -40,8 +41,15 @@ public class SslServer : IDisposable
     /// <param name="context">SSL context</param>
     /// <param name="address">IP address</param>
     /// <param name="port">Port number</param>
-    public SslServer (SslContext context, IPAddress address, int port) : this (context, new IPEndPoint (address, port))
+    public SslServer
+        (
+            SslContext context,
+            IPAddress address,
+            int port
+        )
+        : this (context, new IPEndPoint (address, port))
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -50,9 +58,15 @@ public class SslServer : IDisposable
     /// <param name="context">SSL context</param>
     /// <param name="address">IP address</param>
     /// <param name="port">Port number</param>
-    public SslServer (SslContext context, string address, int port) : this (context,
-        new IPEndPoint (IPAddress.Parse (address), port))
+    public SslServer
+        (
+            SslContext context,
+            string address,
+            int port
+        )
+        : this (context, new IPEndPoint (IPAddress.Parse (address), port))
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -60,9 +74,14 @@ public class SslServer : IDisposable
     /// </summary>
     /// <param name="context">SSL context</param>
     /// <param name="endpoint">DNS endpoint</param>
-    public SslServer (SslContext context, DnsEndPoint endpoint) : this (context, endpoint as EndPoint, endpoint.Host,
-        endpoint.Port)
+    public SslServer
+        (
+            SslContext context,
+            DnsEndPoint endpoint
+        )
+        : this (context, endpoint, endpoint.Host, endpoint.Port)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -70,9 +89,14 @@ public class SslServer : IDisposable
     /// </summary>
     /// <param name="context">SSL context</param>
     /// <param name="endpoint">IP endpoint</param>
-    public SslServer (SslContext context, IPEndPoint endpoint) : this (context, endpoint as EndPoint,
-        endpoint.Address.ToString(), endpoint.Port)
+    public SslServer
+        (
+            SslContext context,
+            IPEndPoint endpoint
+        )
+        : this (context, endpoint, endpoint.Address.ToString(), endpoint.Port)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -82,8 +106,17 @@ public class SslServer : IDisposable
     /// <param name="endpoint">Endpoint</param>
     /// <param name="address">Server address</param>
     /// <param name="port">Server port</param>
-    private SslServer (SslContext context, EndPoint endpoint, string address, int port)
+    private SslServer
+        (
+            SslContext context,
+            EndPoint endpoint,
+            string address,
+            int port
+        )
     {
+        _acceptorSocket = null!;
+        _acceptorEventArg = null!;
+
         Id = Guid.NewGuid();
         Address = address;
         Port = port;
@@ -267,7 +300,7 @@ public class SslServer : IDisposable
         _acceptorSocket.Bind (Endpoint);
 
         // Refresh the endpoint property based on the actual endpoint created
-        Endpoint = _acceptorSocket.LocalEndPoint;
+        Endpoint = _acceptorSocket.LocalEndPoint!;
 
         // Call the server starting handler
         OnStarting();
@@ -394,7 +427,7 @@ public class SslServer : IDisposable
             RegisterSession (session);
 
             // Connect new session
-            session.Connect (e.AcceptSocket);
+            session.Connect (e.AcceptSocket!);
         }
         else
         {
@@ -467,10 +500,10 @@ public class SslServer : IDisposable
     /// </summary>
     /// <param name="id">Session Id</param>
     /// <returns>Session with a given Id or null if the session it not connected</returns>
-    public SslSession FindSession (Guid id)
+    public SslSession? FindSession (Guid id)
     {
         // Try to find the required session
-        return Sessions.TryGetValue (id, out SslSession result) ? result : null;
+        return Sessions.TryGetValue (id, out SslSession? result) ? result : null;
     }
 
     /// <summary>

@@ -5,6 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable InconsistentlySynchronizedField
 // ReSharper disable NonReadonlyMemberInGetHashCode
 // ReSharper disable UnusedMember.Global
 
@@ -234,7 +235,13 @@ public class WsClient
     /// <summary>
     ///
     /// </summary>
-    public long SendClose (int status, byte[] buffer, long offset, long size)
+    public long SendClose
+        (
+            int status,
+            byte[]? buffer,
+            long offset,
+            long size
+        )
     {
         lock (WebSocket.WsSendLock)
         {
@@ -259,7 +266,13 @@ public class WsClient
     /// <summary>
     ///
     /// </summary>
-    public bool SendCloseAsync (int status, byte[] buffer, long offset, long size)
+    public bool SendCloseAsync
+        (
+            int status,
+            byte[]? buffer,
+            long offset,
+            long size
+        )
     {
         lock (WebSocket.WsSendLock)
         {
@@ -568,7 +581,6 @@ public class WsClient
         if (!WebSocket.PerformClientUpgrade (response, Id))
         {
             base.OnReceivedResponseHeader (response);
-            return;
         }
     }
 
