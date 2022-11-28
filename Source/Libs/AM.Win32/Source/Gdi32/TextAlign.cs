@@ -2,17 +2,14 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable FieldCanBeMadeReadOnly.Global
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
-/* TextAlign.cs -- text alignment by using a mask of the values
+#pragma warning disable CA1069 // некоторые элементы перечисления имеют повторяющиеся значения
+
+/* TextAlign.cs -- выравнивание текста по маске значений
    Ars Magna project, http://arsmagna.ru */
 
 #region Using directives
@@ -24,67 +21,66 @@ using System;
 namespace AM.Win32;
 
 /// <summary>
-/// The text alignment by using a mask of the values in the following list.
-/// Only one flag can be chosen from those that affect horizontal
-/// and vertical alignment. In addition, only one of the two flags
-/// that alter the current position can be chosen.
+/// Выравнивание текста с использованием маски значений.
+/// Можно выбрать только один флаг из тех, которые влияют
+/// на горизонтальное и вертикальное выравнивание. Кроме того,
+/// можно выбрать только один из двух флагов, изменяющих текущую позицию.
 /// </summary>
 [Flags]
 public enum TextAlign
 {
     /// <summary>
-    /// The current position is not updated after each text output call.
-    /// The reference point is passed to the text output function.
+    /// Текущая позиция не обновляется после каждого вызова текстового
+    /// вывода. Контрольная точка передается в функцию вывода текста.
     /// </summary>
     TA_NOUPDATECP = 0,
 
     /// <summary>
-    /// The current position is updated after each text output call.
-    /// The current position is used as the reference point.
+    /// Текущая позиция обновляется после каждого вызова текстового вывода.
+    /// Текущее положение используется в качестве точки отсчета.
     /// </summary>
     TA_UPDATECP = 1,
 
     /// <summary>
-    /// The reference point will be on the left edge
-    /// of the bounding rectangle.
+    /// Контрольная точка будет на левом краю ограничивающего прямоугольника.
     /// </summary>
     TA_LEFT = 0,
 
     /// <summary>
-    /// The reference point will be on the right edge
-    /// of the bounding rectangle.
+    /// Контрольная точка будет находиться на правом краю
+    /// ограничивающего прямоугольника.
     /// </summary>
     TA_RIGHT = 2,
 
     /// <summary>
-    /// The reference point will be aligned horizontally
-    /// with the center of the bounding rectangle.
+    /// Контрольная точка будет выровнена по горизонтали с центром
+    /// ограничивающего прямоугольника.
     /// </summary>
     TA_CENTER = 6,
 
     /// <summary>
-    /// The reference point will be on the top edge
-    /// of the bounding rectangle.
+    /// Контрольная точка будет находиться на верхнем краю
+    /// ограничивающего прямоугольника.
     /// </summary>
     TA_TOP = 0,
 
     /// <summary>
-    /// The reference point will be on the bottom edge
-    /// of the bounding rectangle.
+    /// Контрольная точка будет находиться на нижнем краю
+    /// ограничивающего прямоугольника.
     /// </summary>
     TA_BOTTOM = 8,
 
     /// <summary>
-    /// The reference point will be on the base line of the text.
+    /// Контрольная точка будет находиться на базовой линии текста.
     /// </summary>
     TA_BASELINE = 24,
 
     /// <summary>
-    /// Middle East language edition of Windows: The text is laid
-    /// out in right to left reading order, as opposed
-    /// to the default left to right order.
-    /// This applies only when the font selected into the device context
-    /// is either Hebrew or Arabic.
+    /// Редакция Windows на ближневосточном языке: текст располагается
+    /// справа налево в порядке чтения, в отличие от порядка чтения слева
+    /// направо по умолчанию. Это применимо только в том случае,
+    /// если шрифт, выбранный в контексте устройства, является либо ивритом,
+    /// либо арабским.
     /// </summary>
     TA_RTLREADING = 256,
 
@@ -94,7 +90,7 @@ public enum TextAlign
     TA_MASK = TA_BASELINE + TA_CENTER + TA_UPDATECP + TA_RTLREADING,
 
     /// <summary>
-    /// The reference point will be on the base line of the text.
+    /// Контрольная точка будет находиться на базовой линии текста.
     /// </summary>
     VTA_BASELINE = TA_BASELINE,
 
@@ -109,7 +105,7 @@ public enum TextAlign
     VTA_RIGHT = TA_TOP,
 
     /// <summary>
-    ///
+    /// ???
     /// </summary>
     VTA_CENTER = TA_CENTER,
 

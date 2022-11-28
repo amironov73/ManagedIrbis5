@@ -2,17 +2,11 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable FieldCanBeMadeReadOnly.Global
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
-/* TEXTMETRIC.cs -- basic information about a physical font
+/* TEXTMETRIC.cs -- базовая информация о физическом шрифте
    Ars Magna project, http://arsmagna.ru */
 
 #region Using directives
@@ -25,140 +19,141 @@ using System.Runtime.InteropServices;
 namespace AM.Win32;
 
 /// <summary>
-/// The TEXTMETRIC structure contains basic information about a
-/// physical font. All sizes are specified in logical units; that is,
-/// they depend on the current mapping mode of the display context.
+/// Структура TEXTMETRIC содержит базовую информацию о физическом шрифте.
+/// Все размеры указаны в логических единицах; то есть они зависят
+/// от текущего режима отображения контекста отображения.
 /// </summary>
 [Serializable]
 [StructLayout (LayoutKind.Sequential)]
 public struct TEXTMETRIC
 {
     /// <summary>
-    /// Specifies the height (ascent + descent) of characters.
+    /// Определяет высоту (восхождение + спуск) символов.
     /// </summary>
     public int tmHeight;
 
     /// <summary>
-    /// Specifies the ascent (units above the base line) of characters.
+    /// Определяет восхождение (единицы над базовой линией) символов.
     /// </summary>
     public int tmAscent;
 
     /// <summary>
-    /// Specifies the descent (units below the base line) of characters.
+    /// Определяет спуск (единицы ниже базовой линии) символов.
     /// </summary>
     public int tmDescent;
 
     /// <summary>
-    /// Specifies the amount of leading (space) inside the bounds
-    /// set by the tmHeight member. Accent marks and other diacritical
-    /// characters may occur in this area. The designer may set this
-    /// member to zero.
+    /// Определяет величину интерлиньяжа (пробела) внутри границ,
+    /// установленных элементом tmHeight. В этой области могут
+    /// встречаться знаки ударения и другие диакритические знаки.
+    /// Разработчик может установить этот элемент равным нулю.
     /// </summary>
     public int tmInternalLeading;
 
     /// <summary>
-    /// Specifies the amount of extra leading (space) that the application
-    /// adds between rows. Since this area is outside the font, it
-    /// contains no marks and is not altered by text output calls
-    /// in either OPAQUE or TRANSPARENT mode. The designer may set
-    /// this member to zero.
+    /// Указывает количество дополнительного интерлиньяжа (пробела),
+    /// которое приложение добавляет между строками. Поскольку
+    /// эта область находится за пределами шрифта, она не содержит
+    /// меток и не изменяется вызовами вывода текста ни в режиме
+    /// OPAQUE, ни в режиме TRANSPARENT. Разработчик может установить
+    /// этот элемент равным нулю.
     /// </summary>
     public int tmExternalLeading;
 
     /// <summary>
-    /// Specifies the average width of characters in the font
-    /// (generally defined as the width of the letter x).
-    /// This value does not include the overhang required
-    /// for bold or italic characters.
+    /// Указывает среднюю ширину символов шрифта (обычно определяется
+    /// как ширина буквы x). Это значение не включает выступ,
+    /// необходимый для жирного шрифта или курсива.
     /// </summary>
     public int tmAveCharWidth;
 
     /// <summary>
-    /// Specifies the width of the widest character in the font.
+    /// Определяет ширину самого широкого символа в шрифте.
     /// </summary>
     public int tmMaxCharWidth;
 
     /// <summary>
-    /// Specifies the weight of the font.
+    /// Определяет вес шрифта.
     /// </summary>
     public int tmWeight;
 
     /// <summary>
-    /// Specifies the extra width per string that may be added to
-    /// some synthesized fonts. When synthesizing some attributes,
-    /// such as bold or italic, graphics device interface (GDI)
-    /// or a device may have to add width to a string on both a
-    /// per-character and per-string basis. For example, GDI makes
-    /// a string bold by expanding the spacing of each character
-    /// and overstriking by an offset value; it italicizes a font
-    /// by shearing the string. In either case, there is an overhang
-    /// past the basic string. For bold strings, the overhang is the
-    /// distance by which the overstrike is offset. For italic strings,
-    /// the overhang is the amount the top of the font is sheared past
-    /// the bottom of the font.
+    /// Задает дополнительную ширину строки, которая может быть добавлена
+    /// к некоторым синтезированным шрифтам. При синтезе некоторых
+    /// атрибутов, таких как жирный шрифт или курсив, интерфейсу
+    /// графического устройства (GDI) или устройству может потребоваться
+    /// добавить ширину к строке как для каждого символа, так и для
+    /// каждой строки. Например, GDI делает строку полужирной,
+    /// увеличивая интервал между каждым символом и зачеркивая значение
+    /// смещения; он выделяет шрифт курсивом, разрезая строку.
+    /// В любом случае за основной струной остается выступ.
+    /// Для строк, выделенных жирным шрифтом, выступ представляет
+    /// собой расстояние, на которое смещается забастовка. Для курсивных
+    /// строк выступ представляет собой величину, на которую верхняя
+    /// часть шрифта сдвигается за нижнюю часть шрифта.
     /// </summary>
     public int tmOverhang;
 
     /// <summary>
-    /// Specifies the horizontal aspect of the device for which
-    /// the font was designed.
+    /// Определяет горизонтальную сторону устройства, для которого
+    /// был разработан шрифт.
     /// </summary>
     public int tmDigitizedAspectX;
 
     /// <summary>
-    /// Specifies the vertical aspect of the device for which the font
-    /// was designed. The ratio of the tmDigitizedAspectX and
-    /// tmDigitizedAspectY members is the aspect ratio of the device
-    /// for which the font was designed.
+    /// Определяет вертикальный аспект устройства, для которого
+    /// был разработан шрифт. Соотношение членов tmDigitizedAspectX
+    /// и tmDigitizedAspectY — это соотношение сторон устройства,
+    /// для которого был разработан шрифт.
     /// </summary>
     public int tmDigitizedAspectY;
 
     /// <summary>
-    /// Specifies the value of the first character defined in the font.
+    /// Указывает значение первого символа, определенного в шрифте.
     /// </summary>
     public char tmFirstChar;
 
     /// <summary>
-    /// Specifies the value of the character to be substituted for
-    /// characters not in the font.
+    /// Задает значение символа, заменяемого символами,
+    /// которых нет в шрифте.
     /// </summary>
     public char tmLastChar;
 
     /// <summary>
-    /// Specifies the value of the character that will be used to define
-    /// word breaks for text justification.
+    /// Указывает значение символа, который будет использоваться
+    /// для определения разрывов слов для выравнивания текста.
     /// </summary>
     public char tmDefaultChar;
 
     /// <summary>
-    /// Specifies an italic font if it is nonzero.
+    /// Указывает курсивный шрифт, если он не равен нулю.
     /// </summary>
     public char tmBreakChar;
 
     /// <summary>
-    /// Specifies an italic font if it is nonzero.
+    /// Указывает курсивный шрифт, если он не равен нулю.
     /// </summary>
     public byte tmItalic;
 
     /// <summary>
-    /// Specifies a strikeout font if it is nonzero.
+    /// Задает зачеркнутый шрифт, если он не равен нулю.
     /// </summary>
     public byte tmUnderlined;
 
     /// <summary>
-    /// Specifies a strikeout font if it is nonzero.
+    /// Задает зачеркнутый шрифт, если он не равен нулю.
     /// </summary>
     public byte tmStruckOut;
 
     /// <summary>
-    /// Specifies information about the pitch, the technology,
-    /// and the family of a physical font.
+    /// Указывает информацию о шаге, технологии и семействе
+    /// физического шрифта.
     /// </summary>
     public byte tmPitchAndFamily;
 
     /// <summary>
-    /// Specifies the character set of the font. The character
-    /// set can be one of the following values.
+    /// Определяет набор символов шрифта. Набор символов может быть
+    /// одним из значений <see cref="FontCharset"/>.
     /// </summary>
     public byte tmCharSet;
 }
