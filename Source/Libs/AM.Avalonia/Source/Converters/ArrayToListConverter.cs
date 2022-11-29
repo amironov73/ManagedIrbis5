@@ -3,6 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
 /* ArrayToListConverter.cs -- преобразует массив в строку
@@ -14,7 +15,6 @@
 using Avalonia.Data.Converters;
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 
@@ -22,17 +22,26 @@ using System.Globalization;
 
 #nullable enable
 
-namespace TheNude;
+namespace AM.Avalonia.Converters;
 
 /// <summary>
 /// Преобразует массив в строку.
 /// </summary>
-internal sealed class ArrayToListConverter
+public sealed class ArrayToListConverter
     : IValueConverter
 {
+    /// <summary>
+    /// Общий экземпляр конвертера.
+    /// </summary>
     public static readonly IValueConverter Instance = new ArrayToListConverter();
 
-    public object? Convert (object? value, Type targetType, object? parameter, CultureInfo culture)
+    /// <inheritdoc cref="IValueConverter.Convert"/>
+    public object? Convert
+        (
+            object? value,
+            Type targetType,
+            object? parameter, CultureInfo culture
+        )
     {
         if (value is IEnumerable<string> enumerable)
         {
@@ -42,7 +51,14 @@ internal sealed class ArrayToListConverter
         return null;
     }
 
-    public object? ConvertBack (object? value, Type targetType, object? parameter, CultureInfo culture)
+    /// <inheritdoc cref="IValueConverter.ConvertBack"/>
+    public object? ConvertBack
+        (
+            object? value,
+            Type targetType,
+            object? parameter,
+            CultureInfo culture
+        )
     {
         return null;
     }

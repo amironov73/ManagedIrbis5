@@ -12,10 +12,7 @@
 #region Using directives
 
 using System;
-using System.Threading.Tasks;
 
-using AM;
-using AM.AOT;
 using AM.Avalonia;
 using AM.Avalonia.AppServices;
 
@@ -28,12 +25,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.ReactiveUI;
 
-using HtmlAgilityPack;
-
-using Microsoft.Extensions.Logging;
-
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 
 #endregion
 
@@ -60,15 +52,7 @@ public sealed class MainWindow
         Width = MinWidth = 600;
         Height = MinHeight = 400;
 
-        if (OperatingSystem.IsWindows())
-        {
-            using var stream = AvaloniaUtility.OpenAssetStream ("nude.ico");
-            if (stream is not null)
-            {
-                Icon = new WindowIcon (stream);
-            }
-        }
-
+        this.SetWindowIcon ("nude.ico");
         DataContext = new GalleryInfo();
         Content = new DockPanel
         {
@@ -100,7 +84,7 @@ public sealed class MainWindow
                             new CheckBox
                             {
                                 Content = "точно",
-                                [!CheckBox.IsCheckedProperty] = new Binding (nameof (ViewModel.Exact))
+                                [!ToggleButton.IsCheckedProperty] = new Binding (nameof (ViewModel.Exact))
                             },
 
                             new Button

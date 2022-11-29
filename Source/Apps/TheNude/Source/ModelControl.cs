@@ -12,6 +12,8 @@
 #region Using directives
 
 using AM.Avalonia;
+using AM.Avalonia.Controls;
+using AM.Avalonia.Converters;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -68,15 +70,12 @@ public class ModelControl
                 .DockBottom(),
 
                 // картинка
-                new Image
+                new LeisurelyImage
                     {
                         MaxWidth = 100,
                         Margin = new Thickness (5),
                         HorizontalAlignment = HorizontalAlignment.Center,
-                        [!Image.SourceProperty] = new Binding (nameof (ViewModel.Thumbnail))
-                        {
-                            Converter = StringToImageConverter.Instance
-                        },
+                        [!LeisurelyImage.PathProperty] = new Binding (nameof (ViewModel.Thumbnail)),
                     }
                     .Also (control =>
                     {

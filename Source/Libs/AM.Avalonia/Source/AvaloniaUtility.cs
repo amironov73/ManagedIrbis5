@@ -54,7 +54,7 @@ public static class AvaloniaUtility
             this TControl control,
             Action<TControl> action
         )
-        where TControl: Control
+        where TControl : Control
     {
         Sure.NotNull (control);
         Sure.NotNull (action);
@@ -72,7 +72,7 @@ public static class AvaloniaUtility
             this TControl control,
             out TControl variable
         )
-        where TControl: Control
+        where TControl : Control
     {
         Sure.NotNull (control);
 
@@ -89,7 +89,7 @@ public static class AvaloniaUtility
             this T block,
             bool bold = true
         )
-        where T: TextBlock
+        where T : TextBlock
     {
         Sure.NotNull (block);
 
@@ -105,7 +105,7 @@ public static class AvaloniaUtility
         (
             this T control
         )
-        where T: IContentControl
+        where T : IContentControl
     {
         control.HorizontalContentAlignment = HorizontalAlignment.Center;
         control.VerticalContentAlignment = VerticalAlignment.Center;
@@ -120,7 +120,7 @@ public static class AvaloniaUtility
         (
             this T control
         )
-        where T: Control
+        where T : Control
     {
         Sure.NotNull (control);
 
@@ -137,7 +137,7 @@ public static class AvaloniaUtility
         (
             this T control
         )
-        where T: Control
+        where T : Control
     {
         Sure.NotNull (control);
 
@@ -153,7 +153,7 @@ public static class AvaloniaUtility
         (
             this T control
         )
-        where T: Control
+        where T : Control
     {
         Sure.NotNull (control);
 
@@ -242,9 +242,8 @@ public static class AvaloniaUtility
     public static T DockBottom<T>
         (
             this T control
-
         )
-        where T: Control
+        where T : Control
     {
         Sure.NotNull (control);
 
@@ -259,9 +258,8 @@ public static class AvaloniaUtility
     public static T DockLeft<T>
         (
             this T control
-
         )
-        where T: Control
+        where T : Control
     {
         Sure.NotNull (control);
 
@@ -276,9 +274,8 @@ public static class AvaloniaUtility
     public static T DockRight<T>
         (
             this T control
-
         )
-        where T: Control
+        where T : Control
     {
         Sure.NotNull (control);
 
@@ -293,9 +290,8 @@ public static class AvaloniaUtility
     public static T DockTop<T>
         (
             this T control
-
         )
-        where T: Control
+        where T : Control
     {
         Sure.NotNull (control);
 
@@ -325,7 +321,7 @@ public static class AvaloniaUtility
             this T block,
             bool italic = true
         )
-        where T: TextBlock
+        where T : TextBlock
     {
         Sure.NotNull (block);
 
@@ -341,7 +337,7 @@ public static class AvaloniaUtility
         (
             this T control
         )
-        where T: IContentControl
+        where T : IContentControl
     {
         control.HorizontalContentAlignment = HorizontalAlignment.Left;
         control.VerticalContentAlignment = VerticalAlignment.Center;
@@ -357,7 +353,7 @@ public static class AvaloniaUtility
             this T button,
             EventHandler<RoutedEventArgs> handler
         )
-        where T: Button
+        where T : Button
     {
         Sure.NotNull (button);
         Sure.NotNull (handler);
@@ -372,24 +368,23 @@ public static class AvaloniaUtility
     /// </summary>
     public static Stream? OpenAssetStream
         (
+            Type type,
             string assetName
         )
     {
+        Sure.NotNull (type);
         Sure.NotNullNorEmpty (assetName);
 
         var assets = AvaloniaLocator.Current.GetService<IAssetLoader>();
         if (assets is not null)
         {
-                var assembly = Assembly.GetEntryAssembly();
-                if (assembly is not null)
-                {
-                    var name = assembly.GetName().Name;
-                    if (!string.IsNullOrEmpty (name))
-                    {
-                        var uri = "avares://" + name + "/" + assetName;
-                        return assets.Open (new Uri (uri));
-                    }
-                }
+            var assembly = type.Assembly;
+            var name = assembly.GetName().Name;
+            if (!string.IsNullOrEmpty (name))
+            {
+                var uri = "avares://" + name + "/" + assetName;
+                return assets.Open (new Uri (uri));
+            }
         }
 
         return null;
@@ -469,7 +464,7 @@ public static class AvaloniaUtility
             this T obj,
             int column
         )
-        where T: AvaloniaObject
+        where T : AvaloniaObject
     {
         Sure.NotNull (obj);
         Sure.Positive (column);
@@ -487,7 +482,7 @@ public static class AvaloniaUtility
             this T control,
             Thickness thickness
         )
-        where T: ContentControl
+        where T : ContentControl
     {
         Sure.NotNull (control);
 
@@ -504,7 +499,7 @@ public static class AvaloniaUtility
             this T control,
             double thickness
         )
-        where T: ContentControl
+        where T : ContentControl
     {
         Sure.NotNull (control);
 
@@ -522,7 +517,7 @@ public static class AvaloniaUtility
             double horizontal,
             double vertical
         )
-        where T: ContentControl
+        where T : ContentControl
     {
         Sure.NotNull (control);
 
@@ -542,7 +537,7 @@ public static class AvaloniaUtility
             double right,
             double bottom
         )
-        where T: ContentControl
+        where T : ContentControl
     {
         Sure.NotNull (control);
 
@@ -559,7 +554,7 @@ public static class AvaloniaUtility
             this T block,
             Thickness thickness
         )
-        where T: TextBlock
+        where T : TextBlock
     {
         Sure.NotNull (block);
 
@@ -576,7 +571,7 @@ public static class AvaloniaUtility
             this T block,
             double thickness
         )
-        where T: TextBlock
+        where T : TextBlock
     {
         Sure.NotNull (block);
 
@@ -594,7 +589,7 @@ public static class AvaloniaUtility
             double horizontal,
             double vertical
         )
-        where T: TextBlock
+        where T : TextBlock
     {
         Sure.NotNull (block);
 
@@ -614,7 +609,7 @@ public static class AvaloniaUtility
             double right,
             double bottom
         )
-        where T: TextBlock
+        where T : TextBlock
     {
         Sure.NotNull (block);
 
@@ -631,7 +626,7 @@ public static class AvaloniaUtility
             this T obj,
             int row
         )
-        where T: AvaloniaObject
+        where T : AvaloniaObject
     {
         Sure.NotNull (obj);
         Sure.Positive (row);
@@ -650,7 +645,7 @@ public static class AvaloniaUtility
             int row,
             int column
         )
-        where T: AvaloniaObject
+        where T : AvaloniaObject
     {
         Sure.NotNull (obj);
         Sure.Positive (row);
@@ -660,6 +655,28 @@ public static class AvaloniaUtility
         obj.SetValue (Grid.ColumnProperty, column);
 
         return obj;
+    }
+
+    /// <summary>
+    /// Установка иконки для окна.
+    /// </summary>
+    public static void SetWindowIcon
+        (
+            this Window window,
+            string iconName
+        )
+    {
+        Sure.NotNull (window);
+        Sure.NotNullNorEmpty (iconName);
+
+        if (OperatingSystem.IsWindows())
+        {
+            using var stream = OpenAssetStream (window.GetType(), iconName);
+            if (stream is not null)
+            {
+                window.Icon = new WindowIcon (stream);
+            }
+        }
     }
 
     /// <summary>
@@ -742,7 +759,7 @@ public static class AvaloniaUtility
         (
             this T control
         )
-        where T: Control
+        where T : Control
     {
         Sure.NotNull (control);
 
@@ -759,7 +776,7 @@ public static class AvaloniaUtility
         (
             this T control
         )
-        where T: Control
+        where T : Control
     {
         Sure.NotNull (control);
 
@@ -775,7 +792,7 @@ public static class AvaloniaUtility
         (
             this T control
         )
-        where T: Control
+        where T : Control
     {
         Sure.NotNull (control);
 
@@ -814,7 +831,7 @@ public static class AvaloniaUtility
             this T panel,
             params Control[] children
         )
-        where T: Panel
+        where T : Panel
     {
         Sure.NotNull (panel);
 
