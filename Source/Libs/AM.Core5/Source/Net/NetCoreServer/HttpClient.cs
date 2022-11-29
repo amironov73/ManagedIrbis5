@@ -300,15 +300,22 @@ public class HttpClient
 /// HTTP extended client make requests to HTTP Web server with returning Task as a synchronization primitive.
 /// </summary>
 /// <remarks>Thread-safe.</remarks>
-public class HttpClientEx : HttpClient
+public class HttpClientEx
+    : HttpClient
 {
     /// <summary>
     /// Initialize HTTP client with a given IP address and port number
     /// </summary>
     /// <param name="address">IP address</param>
     /// <param name="port">Port number</param>
-    public HttpClientEx (IPAddress address, int port) : base (address, port)
+    public HttpClientEx
+        (
+        IPAddress address,
+        int port
+        )
+        : base (address, port)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -316,24 +323,40 @@ public class HttpClientEx : HttpClient
     /// </summary>
     /// <param name="address">IP address</param>
     /// <param name="port">Port number</param>
-    public HttpClientEx (string address, int port) : base (address, port)
+    public HttpClientEx
+        (
+            string address,
+            int port
+        )
+        : base (address, port)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
     /// Initialize HTTP client with a given DNS endpoint
     /// </summary>
     /// <param name="endpoint">DNS endpoint</param>
-    public HttpClientEx (DnsEndPoint endpoint) : base (endpoint)
+    public HttpClientEx
+        (
+            DnsEndPoint endpoint
+        )
+        : base (endpoint)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
     /// Initialize HTTP client with a given IP endpoint
     /// </summary>
     /// <param name="endpoint">IP endpoint</param>
-    public HttpClientEx (IPEndPoint endpoint) : base (endpoint)
+    public HttpClientEx
+        (
+            IPEndPoint endpoint
+        )
+        : base (endpoint)
     {
+        // пустое тело конструктора
     }
 
     #region Send request
@@ -552,14 +575,20 @@ public class HttpClientEx : HttpClient
     private TaskCompletionSource<HttpResponse> _tcs = new ();
     private Timer? _timer;
 
-    private void SetPromiseValue (HttpResponse response)
+    private void SetPromiseValue
+        (
+            HttpResponse response
+        )
     {
         Response = new HttpResponse();
         _tcs.SetResult (response);
         Request.Clear();
     }
 
-    private void SetPromiseError (string error)
+    private void SetPromiseError
+        (
+            string error
+        )
     {
         _tcs.SetException (new Exception (error));
         Request.Clear();
