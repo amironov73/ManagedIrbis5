@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* Where.WithContextEnumerable.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,11 +23,12 @@ using System;
 
 namespace AM.Memory.Collections.Linq;
 
-internal class WhereExprWithContextEnumerable<T, TContext> : IPoolingEnumerable<T>
+internal class WhereExprWithContextEnumerable<T, TContext>
+    : IPoolingEnumerable<T>
 {
     private int _count;
-    private IPoolingEnumerable<T> _src;
-    private Func<TContext, T, bool> _condition;
+    private IPoolingEnumerable<T>? _src;
+    private Func<TContext, T, bool>? _condition;
     private TContext _context;
 
     public WhereExprWithContextEnumerable<T, TContext> Init (IPoolingEnumerable<T> src, TContext context,
@@ -43,7 +44,13 @@ internal class WhereExprWithContextEnumerable<T, TContext> : IPoolingEnumerable<
     public IPoolingEnumerator<T> GetEnumerator()
     {
         _count++;
-        return Pool<WhereExprWithContextEnumerator>.Get().Init (_src.GetEnumerator(), this, _context, _condition);
+        return Pool<WhereExprWithContextEnumerator>.Get().Init
+            (
+                _src!.GetEnumerator(),
+                this,
+                _context,
+                _condition!
+            );
     }
 
     private void Dispose()
@@ -52,17 +59,18 @@ internal class WhereExprWithContextEnumerable<T, TContext> : IPoolingEnumerable<
         _count--;
         if (_count == 0)
         {
-            (_condition, _context, _src) = (default, default, default);
+            (_condition, _context, _src) = (default, default!, default);
             Pool<WhereExprWithContextEnumerable<T, TContext>>.Return (this);
         }
     }
 
-    internal class WhereExprWithContextEnumerator : IPoolingEnumerator<T>
+    internal class WhereExprWithContextEnumerator
+        : IPoolingEnumerator<T>
     {
         private TContext _context;
-        private Func<TContext, T, bool> _condition;
-        private IPoolingEnumerator<T> _src;
-        private WhereExprWithContextEnumerable<T, TContext> _parent;
+        private Func<TContext, T, bool>? _condition;
+        private IPoolingEnumerator<T>? _src;
+        private WhereExprWithContextEnumerable<T, TContext>? _parent;
 
         public WhereExprWithContextEnumerator Init (
             IPoolingEnumerator<T> src,
@@ -81,21 +89,21 @@ internal class WhereExprWithContextEnumerable<T, TContext> : IPoolingEnumerable<
         {
             do
             {
-                var next = _src.MoveNext();
+                var next = _src!.MoveNext();
                 if (!next) return false;
-            } while (!_condition (_context, _src.Current));
+            } while (!_condition! (_context, _src.Current));
 
             return true;
         }
 
         public void Reset()
         {
-            _src.Reset();
+            _src?.Reset();
         }
 
-        object IPoolingEnumerator.Current => Current;
+        object IPoolingEnumerator.Current => Current!;
 
-        public T Current => _src.Current;
+        public T Current => _src!.Current;
 
         public void Dispose()
         {
@@ -103,7 +111,7 @@ internal class WhereExprWithContextEnumerable<T, TContext> : IPoolingEnumerable<
             _parent = null;
             _src?.Dispose();
             _src = default;
-            _context = default;
+            _context = default!;
             Pool<WhereExprWithContextEnumerator>.Return (this);
         }
     }

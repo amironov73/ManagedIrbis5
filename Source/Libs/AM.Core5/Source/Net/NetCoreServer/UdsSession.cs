@@ -36,8 +36,18 @@ public class UdsSession
     /// Initialize the session with a given server
     /// </summary>
     /// <param name="server">Unix Domain Socket server</param>
-    public UdsSession (UdsServer server)
+    public UdsSession
+        (
+            UdsServer server
+        )
     {
+        Socket = null!;
+        _receiveEventArg = null!;
+        _receiveBuffer = null!;
+        _sendBufferMain = null!;
+        _sendBufferFlush = null!;
+        _sendEventArg = null!;
+
         Id = Guid.NewGuid();
         Server = server;
         OptionReceiveBufferSize = server.OptionReceiveBufferSize;
@@ -110,7 +120,10 @@ public class UdsSession
     /// Connect the session
     /// </summary>
     /// <param name="socket">Session socket</param>
-    internal void Connect (Socket socket)
+    internal void Connect
+        (
+            Socket socket
+        )
     {
         Socket = socket;
 

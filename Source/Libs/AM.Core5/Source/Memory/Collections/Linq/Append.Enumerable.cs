@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* Append.Enumerable.cs
+/* Append.Enumerable.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -40,7 +40,12 @@ internal sealed class AppendExprEnumerable<T>
     public IPoolingEnumerator<T> GetEnumerator()
     {
         _count++;
-        return Pool<AppendExprEnumerator>.Get().Init (_src.GetEnumerator(), this, _element);
+        return Pool<AppendExprEnumerator>.Get().Init
+            (
+                _src!.GetEnumerator(),
+                this,
+                _element
+            );
     }
 
     private void Dispose()
@@ -83,7 +88,7 @@ internal sealed class AppendExprEnumerable<T>
 
         public bool MoveNext()
         {
-            if (!_src.MoveNext())
+            if (!_src!.MoveNext())
             {
                 if (_overcount == 0)
                 {
@@ -101,12 +106,12 @@ internal sealed class AppendExprEnumerable<T>
         public void Reset()
         {
             _overcount = 0;
-            _src.Reset();
+            _src!.Reset();
         }
 
-        object IPoolingEnumerator.Current => Current;
+        object IPoolingEnumerator.Current => Current!;
 
-        public T Current => _overcount == 1 ? _element : (T)_src.Current;
+        public T Current => _overcount == 1 ? _element : (T)_src!.Current;
 
         public void Dispose()
         {

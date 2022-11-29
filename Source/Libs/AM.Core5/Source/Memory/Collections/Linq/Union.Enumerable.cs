@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* Union.Enumerable.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,10 +25,11 @@ using AM.Memory.Collections.Specialized;
 
 namespace AM.Memory.Collections.Linq;
 
-internal class UnionExprEnumerable<T> : IPoolingEnumerable<T>
+internal class UnionExprEnumerable<T>
+    : IPoolingEnumerable<T>
 {
     private int _count;
-    private PoolingDictionary<T, int> _src;
+    private PoolingDictionary<T, int>? _src;
 
     public UnionExprEnumerable<T> Init (PoolingDictionary<T, int> src)
     {
@@ -40,7 +41,7 @@ internal class UnionExprEnumerable<T> : IPoolingEnumerable<T>
     public IPoolingEnumerator<T> GetEnumerator()
     {
         _count++;
-        return Pool<UnionExprEnumerator>.Get().Init (this, _src.GetEnumerator());
+        return Pool<UnionExprEnumerator>.Get().Init (this, _src!.GetEnumerator());
     }
 
     private void Dispose()
@@ -50,17 +51,18 @@ internal class UnionExprEnumerable<T> : IPoolingEnumerable<T>
         if (_count == 0)
         {
             _src?.Dispose();
-            Pool<PoolingDictionary<T, int>>.Return (_src);
+            Pool<PoolingDictionary<T, int>>.Return (_src!);
             _src = default;
 
             Pool<UnionExprEnumerable<T>>.Return (this);
         }
     }
 
-    internal class UnionExprEnumerator : IPoolingEnumerator<T>
+    internal class UnionExprEnumerator
+        : IPoolingEnumerator<T>
     {
-        private UnionExprEnumerable<T> _parent;
-        private IPoolingEnumerator<KeyValuePair<T, int>> _src;
+        private UnionExprEnumerable<T>? _parent;
+        private IPoolingEnumerator<KeyValuePair<T, int>>? _src;
 
         public UnionExprEnumerator Init (UnionExprEnumerable<T> parent,
             IPoolingEnumerator<KeyValuePair<T, int>> src)
@@ -70,13 +72,13 @@ internal class UnionExprEnumerable<T> : IPoolingEnumerable<T>
             return this;
         }
 
-        public bool MoveNext() => _src.MoveNext();
+        public bool MoveNext() => _src!.MoveNext();
 
-        public void Reset() => _src.Reset();
+        public void Reset() => _src!.Reset();
 
-        object IPoolingEnumerator.Current => Current;
+        object IPoolingEnumerator.Current => Current!;
 
-        public T Current => _src.Current.Key;
+        public T Current => _src!.Current.Key;
 
         public void Dispose()
         {

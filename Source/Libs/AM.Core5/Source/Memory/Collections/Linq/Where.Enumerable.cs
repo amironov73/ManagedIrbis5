@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* Where.Enumerable.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -26,8 +26,8 @@ namespace AM.Memory.Collections.Linq;
 internal class WhereExprEnumerable<T> : IPoolingEnumerable<T>
 {
     private int _count;
-    private IPoolingEnumerable<T> _src;
-    private Func<T, bool> _condition;
+    private IPoolingEnumerable<T>? _src;
+    private Func<T, bool>? _condition;
 
     public WhereExprEnumerable<T> Init (IPoolingEnumerable<T> src, Func<T, bool> condition)
     {
@@ -40,7 +40,12 @@ internal class WhereExprEnumerable<T> : IPoolingEnumerable<T>
     public IPoolingEnumerator<T> GetEnumerator()
     {
         _count++;
-        return Pool<WhereExprEnumerator>.Get().Init (_src.GetEnumerator(), this, _condition);
+        return Pool<WhereExprEnumerator>.Get().Init
+            (
+                _src!.GetEnumerator(),
+                this,
+                _condition!
+            );
     }
 
     private void Dispose()
@@ -59,9 +64,9 @@ internal class WhereExprEnumerable<T> : IPoolingEnumerable<T>
 
     internal class WhereExprEnumerator : IPoolingEnumerator<T>
     {
-        private Func<T, bool> _mutator;
-        private IPoolingEnumerator<T> _src;
-        private WhereExprEnumerable<T> _parent;
+        private Func<T, bool>? _mutator;
+        private IPoolingEnumerator<T>? _src;
+        private WhereExprEnumerable<T>? _parent;
 
         public WhereExprEnumerator Init (IPoolingEnumerator<T> src, WhereExprEnumerable<T> parent,
             Func<T, bool> mutator)
@@ -76,21 +81,21 @@ internal class WhereExprEnumerable<T> : IPoolingEnumerable<T>
         {
             do
             {
-                var next = _src.MoveNext();
+                var next = _src!.MoveNext();
                 if (!next) return false;
-            } while (!_mutator (_src.Current));
+            } while (!_mutator! (_src.Current));
 
             return true;
         }
 
         public void Reset()
         {
-            _src.Reset();
+            _src!.Reset();
         }
 
-        object IPoolingEnumerator.Current => Current;
+        object IPoolingEnumerator.Current => Current!;
 
-        public T Current => _src.Current;
+        public T Current => _src!.Current;
 
         public void Dispose()
         {
