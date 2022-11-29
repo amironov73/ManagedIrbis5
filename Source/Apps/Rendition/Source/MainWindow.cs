@@ -193,15 +193,7 @@ public sealed class MainWindow
         Width = MinWidth = 560;
         Height = MinHeight = 300;
 
-        if (OperatingSystem.IsWindows())
-        {
-            using var stream = AvaloniaUtility.OpenAssetStream ("translate.ico");
-            if (stream is not null)
-            {
-                Icon = new WindowIcon (stream);
-            }
-        }
-
+        this.SetWindowIcon ("translate.ico");
         DataContext = new Model
         {
             FromLanguage = "en",

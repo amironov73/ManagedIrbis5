@@ -39,20 +39,25 @@ public sealed class LeisurelyImage
     #region Properties
 
     /// <summary>
-    /// Описание свойства "Активность".
+    /// Описание свойства "Путь к картинке".
     /// </summary>
-    public static readonly StyledProperty<string?> PathProperty
-        = AvaloniaProperty.Register<LeisurelyImage, string?> (nameof (Path));
+    public static readonly DirectProperty<LeisurelyImage, string?> ImagePathProperty
+        = AvaloniaProperty.RegisterDirect<LeisurelyImage, string?>
+        (
+            nameof (ImagePath),
+            o => o.ImagePath,
+            (o, v) => o.ImagePath = v
+        );
 
     /// <summary>
     /// Путь к картинке.
     /// </summary>
-    public string? Path
+    public string? ImagePath
     {
-        get => _path;
+        get => _imagePath;
         set
         {
-            SetAndRaise (PathProperty, ref _path, value);
+            SetAndRaise (ImagePathProperty, ref _imagePath, value);
             // ThreadPool.QueueUserWorkItem (SlowLoading, this, true);
             _imageLoader ??= new ActionBlock<LeisurelyImage> (SlowLoading);
             _imageLoader.Post (this);
@@ -65,7 +70,8 @@ public sealed class LeisurelyImage
 
     static LeisurelyImage()
     {
-        AffectsRender<LeisurelyImage> (PathProperty);
+        AffectsMeasure<LeisurelyImage> (ImagePathProperty, SourceProperty);
+        AffectsRender<LeisurelyImage> (ImagePathProperty, SourceProperty);
     }
 
     #endregion
@@ -77,20 +83,19 @@ public sealed class LeisurelyImage
     /// <summary>
     /// Путь к картинке
     /// </summary>
-    private string? _path;
-
+    private string? _imagePath;
 
     private static void SlowLoading
         (
             LeisurelyImage image
         )
     {
-        if (!string.IsNullOrEmpty (image._path))
+        if (!string.IsNullOrEmpty (image._imagePath))
         {
             try
             {
                 var client = new HttpClient();
-                var bytes = client.GetByteArrayAsync (image._path).Result;
+                var bytes = client.GetByteArrayAsync (image._imagePath).Result;
                 var stream = new MemoryStream (bytes);
                 var bitmap = new Bitmap (stream);
                 Dispatcher.UIThread.Post (() => { image.Source = bitmap; });

@@ -72,10 +72,11 @@ public class ModelControl
                 // картинка
                 new LeisurelyImage
                     {
-                        MaxWidth = 100,
+                        Stretch = Stretch.Uniform,
+                        MaxHeight = 200,
                         Margin = new Thickness (5),
                         HorizontalAlignment = HorizontalAlignment.Center,
-                        [!LeisurelyImage.PathProperty] = new Binding (nameof (ViewModel.Thumbnail)),
+                        [!LeisurelyImage.ImagePathProperty] = new Binding (nameof (ViewModel.Thumbnail)),
                     }
                     .Also (control =>
                     {
