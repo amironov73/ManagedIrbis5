@@ -32,88 +32,7 @@ namespace NetCoreServer;
 public class TcpClient
     : IDisposable
 {
-    /// <summary>
-    /// Initialize TCP client with a given server IP address and port number
-    /// </summary>
-    /// <param name="address">IP address</param>
-    /// <param name="port">Port number</param>
-    public TcpClient
-        (
-            IPAddress address,
-            int port
-        )
-        : this (new IPEndPoint (address, port))
-    {
-        // пустое тело конструктора
-    }
-
-    /// <summary>
-    /// Initialize TCP client with a given server IP address and port number
-    /// </summary>
-    /// <param name="address">IP address</param>
-    /// <param name="port">Port number</param>
-    public TcpClient
-        (
-            string address,
-            int port
-        )
-        : this (new IPEndPoint (IPAddress.Parse (address), port))
-    {
-        // пустое тело конструктора
-    }
-
-    /// <summary>
-    /// Initialize TCP client with a given DNS endpoint
-    /// </summary>
-    /// <param name="endpoint">DNS endpoint</param>
-    public TcpClient
-        (
-            DnsEndPoint endpoint
-        )
-        : this (endpoint, endpoint.Host, endpoint.Port)
-    {
-        // пустое тело конструктора
-    }
-
-    /// <summary>
-    /// Initialize TCP client with a given IP endpoint
-    /// </summary>
-    /// <param name="endpoint">IP endpoint</param>
-    public TcpClient
-        (
-            IPEndPoint endpoint
-        )
-        : this (endpoint, endpoint.Address.ToString(), endpoint.Port)
-    {
-        // пустое тело конструктора
-    }
-
-    /// <summary>
-    /// Initialize TCP client with a given endpoint, address and port
-    /// </summary>
-    /// <param name="endpoint">Endpoint</param>
-    /// <param name="address">Server address</param>
-    /// <param name="port">Server port</param>
-    private TcpClient
-        (
-            EndPoint endpoint,
-            string address,
-            int port
-        )
-    {
-        Socket = null!;
-        _connectEventArg = null!;
-        _receiveBuffer = null!;
-        _receiveEventArg = null!;
-        _sendBufferMain = null!;
-        _sendBufferFlush = null!;
-        _sendEventArg = null!;
-
-        Id = Guid.NewGuid();
-        Address = address;
-        Port = port;
-        Endpoint = endpoint;
-    }
+    #region Properties
 
     /// <summary>
     /// Client Id
@@ -204,6 +123,95 @@ public class TcpClient
     /// Option: send buffer size
     /// </summary>
     public int OptionSendBufferSize { get; set; } = 8192;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Initialize TCP client with a given server IP address and port number
+    /// </summary>
+    /// <param name="address">IP address</param>
+    /// <param name="port">Port number</param>
+    public TcpClient
+        (
+            IPAddress address,
+            int port
+        )
+        : this (new IPEndPoint (address, port))
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
+    /// Initialize TCP client with a given server IP address and port number
+    /// </summary>
+    /// <param name="address">IP address</param>
+    /// <param name="port">Port number</param>
+    public TcpClient
+        (
+            string address,
+            int port
+        )
+        : this (new IPEndPoint (IPAddress.Parse (address), port))
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
+    /// Initialize TCP client with a given DNS endpoint
+    /// </summary>
+    /// <param name="endpoint">DNS endpoint</param>
+    public TcpClient
+        (
+            DnsEndPoint endpoint
+        )
+        : this (endpoint, endpoint.Host, endpoint.Port)
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
+    /// Initialize TCP client with a given IP endpoint
+    /// </summary>
+    /// <param name="endpoint">IP endpoint</param>
+    public TcpClient
+        (
+            IPEndPoint endpoint
+        )
+        : this (endpoint, endpoint.Address.ToString(), endpoint.Port)
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
+    /// Initialize TCP client with a given endpoint, address and port
+    /// </summary>
+    /// <param name="endpoint">Endpoint</param>
+    /// <param name="address">Server address</param>
+    /// <param name="port">Server port</param>
+    private TcpClient
+        (
+            EndPoint endpoint,
+            string address,
+            int port
+        )
+    {
+        Socket = null!;
+        _connectEventArg = null!;
+        _receiveBuffer = null!;
+        _receiveEventArg = null!;
+        _sendBufferMain = null!;
+        _sendBufferFlush = null!;
+        _sendEventArg = null!;
+
+        Id = Guid.NewGuid();
+        Address = address;
+        Port = port;
+        Endpoint = endpoint;
+    }
+
+    #endregion
 
     #region Connect/Disconnect client
 

@@ -35,94 +35,7 @@ namespace NetCoreServer;
 public class SslServer
     : IDisposable
 {
-    /// <summary>
-    /// Initialize SSL server with a given IP address and port number
-    /// </summary>
-    /// <param name="context">SSL context</param>
-    /// <param name="address">IP address</param>
-    /// <param name="port">Port number</param>
-    public SslServer
-        (
-            SslContext context,
-            IPAddress address,
-            int port
-        )
-        : this (context, new IPEndPoint (address, port))
-    {
-        // пустое тело конструктора
-    }
-
-    /// <summary>
-    /// Initialize SSL server with a given IP address and port number
-    /// </summary>
-    /// <param name="context">SSL context</param>
-    /// <param name="address">IP address</param>
-    /// <param name="port">Port number</param>
-    public SslServer
-        (
-            SslContext context,
-            string address,
-            int port
-        )
-        : this (context, new IPEndPoint (IPAddress.Parse (address), port))
-    {
-        // пустое тело конструктора
-    }
-
-    /// <summary>
-    /// Initialize SSL server with a given DNS endpoint
-    /// </summary>
-    /// <param name="context">SSL context</param>
-    /// <param name="endpoint">DNS endpoint</param>
-    public SslServer
-        (
-            SslContext context,
-            DnsEndPoint endpoint
-        )
-        : this (context, endpoint, endpoint.Host, endpoint.Port)
-    {
-        // пустое тело конструктора
-    }
-
-    /// <summary>
-    /// Initialize SSL server with a given IP endpoint
-    /// </summary>
-    /// <param name="context">SSL context</param>
-    /// <param name="endpoint">IP endpoint</param>
-    public SslServer
-        (
-            SslContext context,
-            IPEndPoint endpoint
-        )
-        : this (context, endpoint, endpoint.Address.ToString(), endpoint.Port)
-    {
-        // пустое тело конструктора
-    }
-
-    /// <summary>
-    /// Initialize SSL server with a given SSL context, endpoint, address and port
-    /// </summary>
-    /// <param name="context">SSL context</param>
-    /// <param name="endpoint">Endpoint</param>
-    /// <param name="address">Server address</param>
-    /// <param name="port">Server port</param>
-    private SslServer
-        (
-            SslContext context,
-            EndPoint endpoint,
-            string address,
-            int port
-        )
-    {
-        _acceptorSocket = null!;
-        _acceptorEventArg = null!;
-
-        Id = Guid.NewGuid();
-        Address = address;
-        Port = port;
-        Context = context;
-        Endpoint = endpoint;
-    }
+    #region Properties
 
     /// <summary>
     /// Server Id
@@ -227,6 +140,101 @@ public class SslServer
     /// Option: send buffer size
     /// </summary>
     public int OptionSendBufferSize { get; set; } = 8192;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Initialize SSL server with a given IP address and port number
+    /// </summary>
+    /// <param name="context">SSL context</param>
+    /// <param name="address">IP address</param>
+    /// <param name="port">Port number</param>
+    public SslServer
+        (
+            SslContext context,
+            IPAddress address,
+            int port
+        )
+        : this (context, new IPEndPoint (address, port))
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
+    /// Initialize SSL server with a given IP address and port number
+    /// </summary>
+    /// <param name="context">SSL context</param>
+    /// <param name="address">IP address</param>
+    /// <param name="port">Port number</param>
+    public SslServer
+        (
+            SslContext context,
+            string address,
+            int port
+        )
+        : this (context, new IPEndPoint (IPAddress.Parse (address), port))
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
+    /// Initialize SSL server with a given DNS endpoint
+    /// </summary>
+    /// <param name="context">SSL context</param>
+    /// <param name="endpoint">DNS endpoint</param>
+    public SslServer
+        (
+            SslContext context,
+            DnsEndPoint endpoint
+        )
+        : this (context, endpoint, endpoint.Host, endpoint.Port)
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
+    /// Initialize SSL server with a given IP endpoint
+    /// </summary>
+    /// <param name="context">SSL context</param>
+    /// <param name="endpoint">IP endpoint</param>
+    public SslServer
+        (
+            SslContext context,
+            IPEndPoint endpoint
+        )
+        : this (context, endpoint, endpoint.Address.ToString(), endpoint.Port)
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
+    /// Initialize SSL server with a given SSL context, endpoint, address and port
+    /// </summary>
+    /// <param name="context">SSL context</param>
+    /// <param name="endpoint">Endpoint</param>
+    /// <param name="address">Server address</param>
+    /// <param name="port">Server port</param>
+    private SslServer
+        (
+            SslContext context,
+            EndPoint endpoint,
+            string address,
+            int port
+        )
+    {
+        _acceptorSocket = null!;
+        _acceptorEventArg = null!;
+
+        Id = Guid.NewGuid();
+        Address = address;
+        Port = port;
+        Context = context;
+        Endpoint = endpoint;
+    }
+
+    #endregion
 
     #region Start/Stop server
 

@@ -29,28 +29,10 @@ namespace NetCoreServer;
 /// SSL session is used to read and write data from the connected SSL client
 /// </summary>
 /// <remarks>Thread-safe</remarks>
-public class SslSession : IDisposable
+public class SslSession
+    : IDisposable
 {
-    /// <summary>
-    /// Initialize the session with a given server
-    /// </summary>
-    /// <param name="server">SSL server</param>
-    public SslSession
-        (
-            SslServer server
-        )
-    {
-        Socket = null!;
-        _sslStream = null!;
-        _receiveBuffer = null!;
-        _sendBufferMain = null!;
-        _sendBufferFlush = null!;
-
-        Id = Guid.NewGuid();
-        Server = server;
-        OptionReceiveBufferSize = server.OptionReceiveBufferSize;
-        OptionSendBufferSize = server.OptionSendBufferSize;
-    }
+    #region Properties
 
     /// <summary>
     /// Session Id
@@ -106,6 +88,33 @@ public class SslSession : IDisposable
     /// Option: send buffer size
     /// </summary>
     public int OptionSendBufferSize { get; set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Initialize the session with a given server
+    /// </summary>
+    /// <param name="server">SSL server</param>
+    public SslSession
+        (
+            SslServer server
+        )
+    {
+        Socket = null!;
+        _sslStream = null!;
+        _receiveBuffer = null!;
+        _sendBufferMain = null!;
+        _sendBufferFlush = null!;
+
+        Id = Guid.NewGuid();
+        Server = server;
+        OptionReceiveBufferSize = server.OptionReceiveBufferSize;
+        OptionSendBufferSize = server.OptionSendBufferSize;
+    }
+
+    #endregion
 
     #region Connect/Disconnect session
 
