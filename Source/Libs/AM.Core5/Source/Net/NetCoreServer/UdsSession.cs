@@ -32,27 +32,7 @@ namespace NetCoreServer;
 public class UdsSession
     : IDisposable
 {
-    /// <summary>
-    /// Initialize the session with a given server
-    /// </summary>
-    /// <param name="server">Unix Domain Socket server</param>
-    public UdsSession
-        (
-            UdsServer server
-        )
-    {
-        Socket = null!;
-        _receiveEventArg = null!;
-        _receiveBuffer = null!;
-        _sendBufferMain = null!;
-        _sendBufferFlush = null!;
-        _sendEventArg = null!;
-
-        Id = Guid.NewGuid();
-        Server = server;
-        OptionReceiveBufferSize = server.OptionReceiveBufferSize;
-        OptionSendBufferSize = server.OptionSendBufferSize;
-    }
+    #region Properties
 
     /// <summary>
     /// Session Id
@@ -108,6 +88,34 @@ public class UdsSession
     /// Option: send buffer size
     /// </summary>
     public int OptionSendBufferSize { get; set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Initialize the session with a given server
+    /// </summary>
+    /// <param name="server">Unix Domain Socket server</param>
+    public UdsSession
+        (
+            UdsServer server
+        )
+    {
+        Socket = null!;
+        _receiveEventArg = null!;
+        _receiveBuffer = null!;
+        _sendBufferMain = null!;
+        _sendBufferFlush = null!;
+        _sendEventArg = null!;
+
+        Id = Guid.NewGuid();
+        Server = server;
+        OptionReceiveBufferSize = server.OptionReceiveBufferSize;
+        OptionSendBufferSize = server.OptionSendBufferSize;
+    }
+
+    #endregion
 
     #region Connect/Disconnect session
 

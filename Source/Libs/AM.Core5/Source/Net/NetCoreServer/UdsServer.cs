@@ -37,23 +37,7 @@ namespace NetCoreServer;
 public class UdsServer
     : IDisposable
 {
-    /// <summary>
-    /// Initialize Unix Domain Socket server with a given socket path
-    /// </summary>
-    /// <param name="path">Socket path</param>
-    public UdsServer (string path) : this (new UnixDomainSocketEndPoint (path))
-    {
-    }
-
-    /// <summary>
-    /// Initialize Unix Domain Socket server with a given Unix Domain Socket endpoint
-    /// </summary>
-    /// <param name="endpoint">Unix Domain Socket endpoint</param>
-    public UdsServer (UnixDomainSocketEndPoint endpoint)
-    {
-        Id = Guid.NewGuid();
-        Endpoint = endpoint;
-    }
+    #region Properties
 
     /// <summary>
     /// Server Id
@@ -102,6 +86,41 @@ public class UdsServer
     /// Option: send buffer size
     /// </summary>
     public int OptionSendBufferSize { get; set; } = 8192;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Initialize Unix Domain Socket server with a given socket path
+    /// </summary>
+    /// <param name="path">Socket path</param>
+    public UdsServer
+        (
+            string path
+        )
+        : this (new UnixDomainSocketEndPoint (path))
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
+    /// Initialize Unix Domain Socket server with a given Unix Domain Socket endpoint
+    /// </summary>
+    /// <param name="endpoint">Unix Domain Socket endpoint</param>
+    public UdsServer
+        (
+            UnixDomainSocketEndPoint endpoint
+        )
+    {
+        _acceptorSocket = null!;
+        _acceptorEventArg = null!;
+
+        Id = Guid.NewGuid();
+        Endpoint = endpoint;
+    }
+
+    #endregion
 
     #region Start/Stop server
 

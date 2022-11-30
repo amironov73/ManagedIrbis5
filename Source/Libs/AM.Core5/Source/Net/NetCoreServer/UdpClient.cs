@@ -27,90 +27,10 @@ namespace NetCoreServer;
 /// UDP client is used to read/write data from/into the connected UDP server
 /// </summary>
 /// <remarks>Thread-safe</remarks>
-public class UdpClient : IDisposable
+public class UdpClient
+    : IDisposable
 {
-    /// <summary>
-    /// Initialize UDP client with a given server IP address and port number
-    /// </summary>
-    /// <param name="address">IP address</param>
-    /// <param name="port">Port number</param>
-    public UdpClient
-        (
-            IPAddress address,
-            int port
-        )
-        : this (new IPEndPoint (address, port))
-    {
-        // пустое тело конструктора
-    }
-
-    /// <summary>
-    /// Initialize UDP client with a given server IP address and port number
-    /// </summary>
-    /// <param name="address">IP address</param>
-    /// <param name="port">Port number</param>
-    public UdpClient
-        (
-            string address,
-            int port
-        )
-        : this (new IPEndPoint (IPAddress.Parse (address), port))
-    {
-        // пустое тело конструктора
-    }
-
-    /// <summary>
-    /// Initialize UDP client with a given DNS endpoint
-    /// </summary>
-    /// <param name="endpoint">DNS endpoint</param>
-    public UdpClient
-        (
-            DnsEndPoint endpoint
-        )
-        : this (endpoint, endpoint.Host, endpoint.Port)
-    {
-        // пустое тело конструктора
-    }
-
-    /// <summary>
-    /// Initialize UDP client with a given IP endpoint
-    /// </summary>
-    /// <param name="endpoint">IP endpoint</param>
-    public UdpClient
-        (
-            IPEndPoint endpoint
-        )
-        : this (endpoint, endpoint.Address.ToString(), endpoint.Port)
-    {
-        // пустое тело конструктора
-    }
-
-    /// <summary>
-    /// Initialize UDP client with a given endpoint, address and port
-    /// </summary>
-    /// <param name="endpoint">Endpoint</param>
-    /// <param name="address">Server address</param>
-    /// <param name="port">Server port</param>
-    private UdpClient
-        (
-            EndPoint endpoint,
-            string address,
-            int port
-        )
-    {
-        Socket = null!;
-        _sendEndpoint = null!;
-        _sendBuffer = null!;
-        _receiveEndpoint = null!;
-        _receiveBuffer = null!;
-        _sendEventArg = null!;
-        _receiveEventArg = null!;
-
-        Id = Guid.NewGuid();
-        Address = address;
-        Port = port;
-        Endpoint = endpoint;
-    }
+    #region Properties
 
     /// <summary>
     /// Client Id
@@ -216,6 +136,95 @@ public class UdpClient : IDisposable
     /// Option: send buffer size
     /// </summary>
     public int OptionSendBufferSize { get; set; } = 8192;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Initialize UDP client with a given server IP address and port number
+    /// </summary>
+    /// <param name="address">IP address</param>
+    /// <param name="port">Port number</param>
+    public UdpClient
+        (
+            IPAddress address,
+            int port
+        )
+        : this (new IPEndPoint (address, port))
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
+    /// Initialize UDP client with a given server IP address and port number
+    /// </summary>
+    /// <param name="address">IP address</param>
+    /// <param name="port">Port number</param>
+    public UdpClient
+        (
+            string address,
+            int port
+        )
+        : this (new IPEndPoint (IPAddress.Parse (address), port))
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
+    /// Initialize UDP client with a given DNS endpoint
+    /// </summary>
+    /// <param name="endpoint">DNS endpoint</param>
+    public UdpClient
+        (
+            DnsEndPoint endpoint
+        )
+        : this (endpoint, endpoint.Host, endpoint.Port)
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
+    /// Initialize UDP client with a given IP endpoint
+    /// </summary>
+    /// <param name="endpoint">IP endpoint</param>
+    public UdpClient
+        (
+            IPEndPoint endpoint
+        )
+        : this (endpoint, endpoint.Address.ToString(), endpoint.Port)
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
+    /// Initialize UDP client with a given endpoint, address and port
+    /// </summary>
+    /// <param name="endpoint">Endpoint</param>
+    /// <param name="address">Server address</param>
+    /// <param name="port">Server port</param>
+    private UdpClient
+        (
+            EndPoint endpoint,
+            string address,
+            int port
+        )
+    {
+        Socket = null!;
+        _sendEndpoint = null!;
+        _sendBuffer = null!;
+        _receiveEndpoint = null!;
+        _receiveBuffer = null!;
+        _sendEventArg = null!;
+        _receiveEventArg = null!;
+
+        Id = Guid.NewGuid();
+        Address = address;
+        Port = port;
+        Endpoint = endpoint;
+    }
+
+    #endregion
 
     #region Connect/Disconnect client
 

@@ -30,22 +30,10 @@ namespace NetCoreServer;
 /// TCP session is used to read and write data from the connected TCP client
 /// </summary>
 /// <remarks>Thread-safe</remarks>
-public class TcpSession : IDisposable
+public class TcpSession
+    : IDisposable
 {
-    /// <summary>
-    /// Initialize the session with a given server
-    /// </summary>
-    /// <param name="server">TCP server</param>
-    public TcpSession
-        (
-            TcpServer server
-        )
-    {
-        Id = Guid.NewGuid();
-        Server = server;
-        OptionReceiveBufferSize = server.OptionReceiveBufferSize;
-        OptionSendBufferSize = server.OptionSendBufferSize;
-    }
+    #region Properties
 
     /// <summary>
     /// Session Id
@@ -101,6 +89,27 @@ public class TcpSession : IDisposable
     /// Option: send buffer size
     /// </summary>
     public int OptionSendBufferSize { get; set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Initialize the session with a given server
+    /// </summary>
+    /// <param name="server">TCP server</param>
+    public TcpSession
+        (
+            TcpServer server
+        )
+    {
+        Id = Guid.NewGuid();
+        Server = server;
+        OptionReceiveBufferSize = server.OptionReceiveBufferSize;
+        OptionSendBufferSize = server.OptionSendBufferSize;
+    }
+
+    #endregion
 
     #region Connect/Disconnect session
 

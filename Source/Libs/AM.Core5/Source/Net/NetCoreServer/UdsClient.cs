@@ -31,39 +31,7 @@ namespace NetCoreServer;
 public class UdsClient
     : IDisposable
 {
-    /// <summary>
-    /// Initialize Unix Domain Socket client with a given socket path
-    /// </summary>
-    /// <param name="path">Socket path</param>
-    public UdsClient
-        (
-            string path
-        )
-        : this (new UnixDomainSocketEndPoint (path))
-    {
-        // пустое тело конструктора
-    }
-
-    /// <summary>
-    /// Initialize Unix Domain Socket client with a given Unix Domain Socket endpoint
-    /// </summary>
-    /// <param name="endpoint">Unix Domain Socket endpoint</param>
-    public UdsClient
-        (
-            UnixDomainSocketEndPoint endpoint
-        )
-    {
-        Socket = null!;
-        _connectEventArg = null!;
-        _receiveBuffer = null!;
-        _receiveEventArg = null!;
-        _sendBufferMain = null!;
-        _sendBufferFlush = null!;
-        _sendEventArg = null!;
-
-        Id = Guid.NewGuid();
-        Endpoint = endpoint;
-    }
+    #region Properties
 
     /// <summary>
     /// Client Id
@@ -119,6 +87,46 @@ public class UdsClient
     /// Option: send buffer size
     /// </summary>
     public int OptionSendBufferSize { get; set; } = 8192;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Initialize Unix Domain Socket client with a given socket path
+    /// </summary>
+    /// <param name="path">Socket path</param>
+    public UdsClient
+        (
+            string path
+        )
+        : this (new UnixDomainSocketEndPoint (path))
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
+    /// Initialize Unix Domain Socket client with a given Unix Domain Socket endpoint
+    /// </summary>
+    /// <param name="endpoint">Unix Domain Socket endpoint</param>
+    public UdsClient
+        (
+            UnixDomainSocketEndPoint endpoint
+        )
+    {
+        Socket = null!;
+        _connectEventArg = null!;
+        _receiveBuffer = null!;
+        _receiveEventArg = null!;
+        _sendBufferMain = null!;
+        _sendBufferFlush = null!;
+        _sendEventArg = null!;
+
+        Id = Guid.NewGuid();
+        Endpoint = endpoint;
+    }
+
+    #endregion
 
     #region Connect/Disconnect client
 
