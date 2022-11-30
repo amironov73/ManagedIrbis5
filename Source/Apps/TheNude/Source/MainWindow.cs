@@ -34,7 +34,7 @@ using ReactiveUI;
 namespace TheNude;
 
 /// <summary>
-/// Главное окно приложения
+/// Главное окно приложения.
 /// </summary>
 public sealed class MainWindow
     : ReactiveWindow<GalleryInfo>
@@ -99,6 +99,12 @@ public sealed class MainWindow
                 new ListBox
                 {
                     Margin = new Thickness (5),
+
+                    ItemsPanel = new FuncTemplate<IPanel>
+                    (
+                        () => new WrapPanel { Orientation = Orientation.Horizontal }
+                    ),
+
                     ItemTemplate = new FuncDataTemplate<ModelInfo> ((_, _) =>
                     {
                         var border = new Border
