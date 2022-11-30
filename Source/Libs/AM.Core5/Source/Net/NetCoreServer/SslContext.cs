@@ -27,6 +27,35 @@ namespace NetCoreServer;
 /// </summary>
 public class SslContext
 {
+    #region Properties
+
+    /// <summary>
+    /// SSL protocols
+    /// </summary>
+    public SslProtocols Protocols { get; set; }
+    /// <summary>
+    /// SSL certificate
+    /// </summary>
+    public X509Certificate? Certificate { get; set; }
+    /// <summary>
+    /// SSL certificates collection
+    /// </summary>
+    public X509Certificate2Collection? Certificates { get; set; }
+    /// <summary>
+    /// SSL certificate validation callback
+    /// </summary>
+    public RemoteCertificateValidationCallback? CertificateValidationCallback { get; set; }
+
+    /// <summary>
+    /// Is the client is asked for a certificate for authentication.
+    /// Note that this is only a request - if no certificate is provided, the server still accepts the connection request.
+    /// </summary>
+    public bool ClientCertificateRequired { get; set; }
+
+    #endregion
+
+    #region Construction
+
     /// <summary>
     /// Initialize SSL context with default protocols
     /// </summary>
@@ -112,26 +141,5 @@ public class SslContext
         CertificateValidationCallback = certificateValidationCallback;
     }
 
-    /// <summary>
-    /// SSL protocols
-    /// </summary>
-    public SslProtocols Protocols { get; set; }
-    /// <summary>
-    /// SSL certificate
-    /// </summary>
-    public X509Certificate? Certificate { get; set; }
-    /// <summary>
-    /// SSL certificates collection
-    /// </summary>
-    public X509Certificate2Collection? Certificates { get; set; }
-    /// <summary>
-    /// SSL certificate validation callback
-    /// </summary>
-    public RemoteCertificateValidationCallback? CertificateValidationCallback { get; set; }
-
-    /// <summary>
-    /// Is the client is asked for a certificate for authentication.
-    /// Note that this is only a request - if no certificate is provided, the server still accepts the connection request.
-    /// </summary>
-    public bool ClientCertificateRequired { get; set; }
+    #endregion
 }
