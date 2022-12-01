@@ -22,7 +22,6 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
 using Avalonia.Layout;
-using Avalonia.Media;
 using Avalonia.ReactiveUI;
 
 using ReactiveUI;
@@ -49,7 +48,7 @@ public sealed class MainWindow
         base.OnInitialized();
 
         Title = "Клиент TheNude.com";
-        Width = MinWidth = 600;
+        Width = MinWidth = 700;
         Height = MinHeight = 400;
 
         this.SetWindowIcon ("nude.ico");
@@ -99,25 +98,11 @@ public sealed class MainWindow
                 new ListBox
                 {
                     Margin = new Thickness (5),
-
                     ItemsPanel = new FuncTemplate<IPanel>
-                    (
-                        () => new WrapPanel { Orientation = Orientation.Horizontal }
-                    ),
-
-                    ItemTemplate = new FuncDataTemplate<ModelInfo> ((_, _) =>
-                    {
-                        var border = new Border
-                        {
-                            BorderThickness = new Thickness (1),
-                            BorderBrush = Brushes.Blue,
-                            Margin = new Thickness (5),
-                            Child = new ModelControl()
-                        };
-
-                        return border;
-                    }),
-
+                        (
+                            () => new WrapPanel { Orientation = Orientation.Horizontal }
+                        ),
+                    ItemTemplate = new FuncDataTemplate<ModelInfo> ((_, _) => new ModelControl()),
                     [!ItemsRepeater.ItemsProperty] = new Binding (nameof (ViewModel.Models))
                 },
             }

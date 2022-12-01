@@ -11,12 +11,7 @@
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reactive.Linq;
-
-using HtmlAgilityPack;
+using AM.Collections;
 
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -71,6 +66,13 @@ public class GalleryInfo
             var client = new NudeClient();
             var document = client.FindModel (name, Exact);
             Models = client.ParseModels (document);
+            if (!Models.IsNullOrEmpty())
+            {
+                foreach (var model in Models)
+                {
+                    model.EnqueueSlowLoading();
+                }
+            }
         }
     }
 

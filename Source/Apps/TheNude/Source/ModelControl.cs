@@ -12,7 +12,6 @@
 #region Using directives
 
 using AM.Avalonia;
-using AM.Avalonia.Controls;
 using AM.Avalonia.Converters;
 
 using Avalonia;
@@ -21,8 +20,6 @@ using Avalonia.Data;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.ReactiveUI;
-
-using ReactiveUI;
 
 #endregion
 
@@ -41,50 +38,50 @@ public class ModelControl
     protected override void OnInitialized()
     {
         base.OnInitialized();
-
-        var gotoModelPage = ReactiveCommand.Create (ViewModel!.GotoModelPage);
-        Content = new DockPanel
+        Content = new Border
         {
-            Children =
+            BorderThickness = new Thickness (1),
+            Padding = new Thickness (5),
+            BorderBrush = Brushes.Blue,
+            Width = MaxWidth = 300,
+            Height = MaxHeight = 215,
+            Margin = new Thickness (5),
+            Child = new DockPanel
             {
-                // имя модели
-                new Label
+                Children =
                 {
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    HorizontalContentAlignment = HorizontalAlignment.Center,
-                    FontWeight = FontWeight.Bold,
-                    [!ContentProperty] = new Binding (nameof (ViewModel.Name))
-                }
-                .DockTop(),
-
-                // псевдонимы
-                new Label
-                {
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    HorizontalContentAlignment = HorizontalAlignment.Center,
-                    [!ContentProperty] = new Binding (nameof (ViewModel.Aka))
-                    {
-                        Converter = ArrayToListConverter.Instance
-                    }
-                }
-                .DockBottom(),
-
-                // картинка
-                new LeisurelyImage
-                    {
-                        Stretch = Stretch.Uniform,
-                        MaxHeight = 200,
-                        Margin = new Thickness (5),
-                        HorizontalAlignment = HorizontalAlignment.Center,
-                        [!LeisurelyImage.ImagePathProperty] = new Binding (nameof (ViewModel.Thumbnail)),
-                    }
-                    .Also (control =>
-                    {
-                        control.PointerPressed += ((_, _) =>
+                    // картинка
+                    new Image
                         {
-                            ViewModel.GotoModelPage();
-                        });
-                    }),
+                            Stretch = Stretch.Uniform,
+                            Height = 200,
+                            Margin = new Thickness (5),
+                            HorizontalAlignment = HorizontalAlignment.Center,
+                            [!Image.SourceProperty] = new Binding (nameof (ViewModel.ThumbnailBitmap)),
+                        }
+                        .DockLeft()
+                        .Also (control => control.PointerPressed += (_, _) => ViewModel!.GotoModelPage()),
+
+                    // имя модели
+                    new Label
+                        {
+                            HorizontalAlignment = HorizontalAlignment.Center,
+                            HorizontalContentAlignment = HorizontalAlignment.Center,
+                            FontWeight = FontWeight.Bold,
+                            [!ContentProperty] = new Binding (nameof (ViewModel.Name))
+                        }
+                        .DockTop(),
+
+                    // псевдонимы
+                    new TextBlock
+                    {
+                        TextWrapping = TextWrapping.Wrap,
+                        [!TextBlock.TextProperty] = new Binding (nameof (ViewModel.Aka))
+                        {
+                            Converter = ArrayToListConverter.Instance
+                        }
+                    },
+                }
             }
         };
     }

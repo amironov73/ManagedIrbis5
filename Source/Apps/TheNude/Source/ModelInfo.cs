@@ -11,8 +11,14 @@
 
 #region Using directives
 
+using System;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks.Dataflow;
+
+using Avalonia.Media.Imaging;
 
 using HtmlAgilityPack;
 
@@ -49,7 +55,13 @@ public class ModelInfo
     /// Ссылка на уменьшенную картинку.
     /// </summary>
     [Reactive]
-    public string? Thumbnail { get; set; }
+    public string? ThumbnailUrl { get; set; }
+
+    /// <summary>
+    /// Уменьшенная картинка.
+    /// </summary>
+    [Reactive]
+    public Bitmap? ThumbnailBitmap { get; set; }
 
     /// <summary>
     /// Страница модели.
@@ -60,6 +72,32 @@ public class ModelInfo
     #endregion
 
     #region Private methods
+
+    private static ActionBlock<ModelInfo>? _backgroundLoader;
+
+    private static void _SlowLoading
+        (
+            ModelInfo info
+        )
+    {
+        var url = info.ThumbnailUrl;
+        if (!string.IsNullOrEmpty (url))
+        {
+            try
+            {
+                var client = new HttpClient();
+                var bytes = client.GetByteArrayAsync (url).Result;
+                var stream = new MemoryStream (bytes);
+                var bitmap = new Bitmap (stream);
+                info.ThumbnailBitmap = bitmap;
+            }
+            catch (Exception exception)
+            {
+                Debug.WriteLine (exception.Message);
+            }
+        }
+    }
+
 
     private static string[]? ParseAka
         (
@@ -84,6 +122,12 @@ public class ModelInfo
     #endregion
 
     #region Public methods
+
+    public void EnqueueSlowLoading()
+    {
+        _backgroundLoader ??= new ActionBlock<ModelInfo> (_SlowLoading);
+        _backgroundLoader.Post (this);
+    }
 
     public void GotoModelPage()
     {
@@ -112,7 +156,7 @@ public class ModelInfo
             ?.InnerText;
         Page = figure.Descendants ("a").FirstOrDefault()
             ?.Attributes["href"].Value;
-        Thumbnail = figure.Descendants ("img").FirstOrDefault()
+        ThumbnailUrl = figure.Descendants ("img").FirstOrDefault()
             ?.Attributes["src"].Value;
         Aka = ParseAka (figure.Descendants ("figcaption")
             .FirstOrDefault()
