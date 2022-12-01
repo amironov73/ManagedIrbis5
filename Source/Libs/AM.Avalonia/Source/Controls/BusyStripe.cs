@@ -37,7 +37,7 @@ namespace AM.Avalonia.Controls;
 /// Полоска "приложение занято чем-то важным" с бегающим градиентом.
 /// </summary>
 public sealed class BusyStripe
-    : Control
+    : Control, IBusyState
 {
     #region Properties
 
@@ -58,6 +58,17 @@ public sealed class BusyStripe
     /// </summary>
     public static readonly StyledProperty<string?> TextProperty
         = AvaloniaProperty.Register<BusyStripe, string?> (nameof (Text));
+
+    /// <summary>
+    /// Описание свойства "Состояние".
+    /// </summary>
+    public static readonly DirectProperty<BusyStripe, IBusyState> StatePropery
+        = AvaloniaProperty.RegisterDirect<BusyStripe, IBusyState>
+            (
+                nameof (State),
+                x => x.State,
+                (x, v) => { /* Do nothing */ }
+            );
 
     /// <summary>
     /// Позиция.
@@ -91,6 +102,11 @@ public sealed class BusyStripe
         }
     }
 
+    /// <summary>
+    /// Состояние.
+    /// </summary>
+    public IBusyState State => this;
+
     #endregion
 
     #region Construction
@@ -100,6 +116,7 @@ public sealed class BusyStripe
     /// </summary>
     static BusyStripe()
     {
+        AffectsArrange<BusyStripe> (ActiveProperty);
         AffectsRender<BusyStripe> (PositionProperty, TextProperty);
     }
 
@@ -125,6 +142,11 @@ public sealed class BusyStripe
     private string? _text;
     private readonly DispatcherTimer _timer;
 
+    private async void SetActiveState (bool value)
+    {
+        await Dispatcher.UIThread.InvokeAsync(() => IsVisible = Active = value);
+    }
+
     private void _Advance
         (
             object? sender,
@@ -137,6 +159,17 @@ public sealed class BusyStripe
         }
 
         Position = _position + _delta;
+    }
+
+    #endregion
+
+    #region IBusyState members
+
+    /// <inheritdoc cref="IBusyState.IsBusy"/>
+    bool IBusyState.IsBusy
+    {
+        get => Active;
+        set => SetActiveState (value);
     }
 
     #endregion

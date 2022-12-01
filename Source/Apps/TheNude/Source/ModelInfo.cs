@@ -18,6 +18,8 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks.Dataflow;
 
+using AM.Collections;
+
 using Avalonia.Media.Imaging;
 
 using HtmlAgilityPack;
@@ -87,9 +89,12 @@ public class ModelInfo
             {
                 var client = new HttpClient();
                 var bytes = client.GetByteArrayAsync (url).Result;
-                var stream = new MemoryStream (bytes);
-                var bitmap = new Bitmap (stream);
-                info.ThumbnailBitmap = bitmap;
+                if (!bytes.IsNullOrEmpty())
+                {
+                    var stream = new MemoryStream (bytes);
+                    var bitmap = new Bitmap (stream);
+                    info.ThumbnailBitmap = bitmap;
+                }
             }
             catch (Exception exception)
             {
@@ -125,7 +130,14 @@ public class ModelInfo
 
     public void EnqueueSlowLoading()
     {
-        _backgroundLoader ??= new ActionBlock<ModelInfo> (_SlowLoading);
+        _backgroundLoader ??= new ActionBlock<ModelInfo>
+            (
+                _SlowLoading,
+                new ExecutionDataflowBlockOptions
+                {
+                    MaxDegreeOfParallelism = 3
+                }
+            );
         _backgroundLoader.Post (this);
     }
 

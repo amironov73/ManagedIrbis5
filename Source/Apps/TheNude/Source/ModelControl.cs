@@ -17,6 +17,7 @@ using AM.Avalonia.Converters;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data;
+using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.ReactiveUI;
@@ -43,6 +44,7 @@ public class ModelControl
             BorderThickness = new Thickness (1),
             Padding = new Thickness (5),
             BorderBrush = Brushes.Blue,
+            Background = Brushes.AliceBlue,
             Width = MaxWidth = 300,
             Height = MaxHeight = 215,
             Margin = new Thickness (5),
@@ -56,7 +58,7 @@ public class ModelControl
                             Stretch = Stretch.Uniform,
                             Height = 200,
                             Margin = new Thickness (5),
-                            HorizontalAlignment = HorizontalAlignment.Center,
+                            Cursor = new Cursor (StandardCursorType.Hand),
                             [!Image.SourceProperty] = new Binding (nameof (ViewModel.ThumbnailBitmap)),
                         }
                         .DockLeft()

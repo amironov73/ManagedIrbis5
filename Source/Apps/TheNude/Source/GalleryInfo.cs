@@ -11,6 +11,9 @@
 
 #region Using directives
 
+using System.Threading.Tasks;
+
+using AM.Avalonia.Controls;
 using AM.Collections;
 
 using ReactiveUI;
@@ -31,11 +34,15 @@ public class GalleryInfo
     #region Properties
 
     /// <summary>
+    /// Интерфейс занятости.
+    /// </summary>
+    public IBusyState? Busy { get; set; }
+
+    /// <summary>
     /// Имя модели для поиска.
     /// </summary>
     [Reactive]
     public string? Name { get; set; } = "Jeff Milton";
-
 
     /// <summary>
     /// Требуется точное совпадение имени.
@@ -49,6 +56,35 @@ public class GalleryInfo
     [Reactive]
     public ModelInfo[]? Models { get; set; }
 
+    /// <summary>
+    /// Количество найденных моделей.
+    /// </summary>
+    [Reactive]
+    public int ModelCount { get; set; }
+
+    #endregion
+
+    #region Private members
+
+    private ModelInfo[]? SearchCore
+        (
+            string name
+        )
+    {
+        var client = new NudeClient();
+        var document = client.FindModel(name, Exact);
+        var result = client.ParseModels(document);
+        if (!result.IsNullOrEmpty())
+        {
+            foreach (var model in result)
+            {
+                model.EnqueueSlowLoading();
+            }
+        }
+
+        return result;
+    }
+
     #endregion
 
     #region Public methods
@@ -56,21 +92,30 @@ public class GalleryInfo
     /// <summary>
     /// Разбор сведений о найденных моделях.
     /// </summary>
-    public void Search()
+    public async void Search()
     {
         Models = null;
+        ModelCount = 0;
 
         var name = Name?.Trim();
         if (!string.IsNullOrEmpty (name))
         {
-            var client = new NudeClient();
-            var document = client.FindModel (name, Exact);
-            Models = client.ParseModels (document);
-            if (!Models.IsNullOrEmpty())
+            try
             {
-                foreach (var model in Models)
+                if (Busy is not null)
                 {
-                    model.EnqueueSlowLoading();
+                    Busy.IsBusy = true;
+                }
+
+                var task = Task.Run (() => SearchCore (name));
+                Models = await task;
+                ModelCount = Models?.Length ?? 0;
+            }
+            finally
+            {
+                if (Busy is not null)
+                {
+                    Busy.IsBusy = false;
                 }
             }
         }

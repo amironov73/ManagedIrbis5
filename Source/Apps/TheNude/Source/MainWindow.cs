@@ -15,6 +15,7 @@ using System;
 
 using AM.Avalonia;
 using AM.Avalonia.AppServices;
+using AM.Avalonia.Controls;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -22,6 +23,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
 using Avalonia.Layout;
+using Avalonia.Media;
 using Avalonia.ReactiveUI;
 
 using ReactiveUI;
@@ -52,48 +54,90 @@ public sealed class MainWindow
         Height = MinHeight = 400;
 
         this.SetWindowIcon ("nude.ico");
-        DataContext = new GalleryInfo();
+        var busyStripe = new BusyStripe
+            {
+                IsVisible = false,
+                Height = 20,
+                Text = "Обращение к серверу",
+            }
+            .DockTop();
+        var statusBar = new Border
+            {
+                BorderBrush = Brushes.Black,
+                BorderThickness = new Thickness (0, 1, 0, 0),
+                Padding = new Thickness (5),
+                Background = Brushes.AliceBlue,
+                Child = new StackPanel
+                {
+                    Spacing = 5,
+                    Orientation = Orientation.Horizontal,
+                    Children =
+                    {
+                        new Label
+                        {
+                            [!ContentProperty] = new Binding (nameof (ViewModel.ModelCount))
+                            {
+                                StringFormat = "Всего найдено: {0}"
+                            }
+                        }
+                    }
+                }
+            }
+            .DockBottom();
+
+        DataContext = new GalleryInfo { Busy = busyStripe };
         Content = new DockPanel
         {
             HorizontalAlignment = HorizontalAlignment.Stretch,
             VerticalAlignment = VerticalAlignment.Stretch,
             Children =
             {
-                new StackPanel
+                new Border
                     {
-                        Spacing = 5,
-                        Margin = new Thickness (5),
-                        Orientation = Orientation.Horizontal,
-                        HorizontalAlignment = HorizontalAlignment.Center,
+                        BorderBrush = Brushes.Black,
+                        Background = Brushes.AliceBlue,
+                        BorderThickness = new Thickness (0,0, 0, 1),
 
-                        Children =
-                        {
-                            new Label
+                        Child =
+                            new StackPanel
                             {
-                                Content = "Модель",
-                                VerticalContentAlignment = VerticalAlignment.Center
-                            },
+                                Spacing = 5,
+                                Margin = new Thickness (5),
+                                Orientation = Orientation.Horizontal,
+                                HorizontalAlignment = HorizontalAlignment.Stretch,
 
-                            new TextBox
-                            {
-                                Width = 200,
-                                [!TextBox.TextProperty] = new Binding (nameof (ViewModel.Name))
-                            },
+                                Children =
+                                {
+                                    new Label
+                                    {
+                                        Content = "Модель",
+                                        VerticalContentAlignment = VerticalAlignment.Center
+                                    },
 
-                            new CheckBox
-                            {
-                                Content = "точно",
-                                [!ToggleButton.IsCheckedProperty] = new Binding (nameof (ViewModel.Exact))
-                            },
+                                    new TextBox
+                                    {
+                                        Width = 200,
+                                        [!TextBox.TextProperty] = new Binding (nameof (ViewModel.Name))
+                                    },
 
-                            new Button
-                            {
-                                Content = "Найти",
-                                Command = ReactiveCommand.Create (ViewModel!.Search)
+                                    new CheckBox
+                                    {
+                                        Content = "точно",
+                                        [!ToggleButton.IsCheckedProperty] = new Binding (nameof (ViewModel.Exact))
+                                    },
+
+                                    new Button
+                                    {
+                                        Content = "Найти",
+                                        Command = ReactiveCommand.Create (ViewModel!.Search)
+                                    }
+                                }
                             }
-                        }
                     }
                     .DockTop(),
+
+                busyStripe,
+                statusBar,
 
                 new ListBox
                 {
