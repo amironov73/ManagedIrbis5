@@ -12,7 +12,10 @@
 #region Using directives
 
 using System;
+using System.ComponentModel;
+using System.Threading.Tasks;
 
+using AM;
 using AM.Avalonia;
 using AM.Avalonia.AppServices;
 using AM.Avalonia.Controls;
@@ -48,6 +51,9 @@ public sealed class MainWindow
     protected override void OnInitialized()
     {
         base.OnInitialized();
+
+        Task.Run (() => ThumbnailLoader.Instance.LoadThumbnails())
+            .NotUsed();
 
         Title = "Клиент TheNude.com";
         Width = MinWidth = 700;
@@ -151,6 +157,17 @@ public sealed class MainWindow
                 },
             }
         };
+    }
+
+    /// <inheritdoc cref="Window.OnClosing"/>
+    protected override void OnClosing
+        (
+            CancelEventArgs eventArgs
+        )
+    {
+        base.OnClosing (eventArgs);
+
+        ThumbnailLoader.Instance.SaveThumbnails();
     }
 
     #endregion

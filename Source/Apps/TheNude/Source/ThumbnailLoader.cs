@@ -15,6 +15,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
+using System.Text.Json;
 
 using AM.Collections;
 
@@ -50,7 +51,7 @@ public class ThumbnailLoader
     public ThumbnailLoader()
     {
         var options = new MemoryCacheOptions();
-        _memoryCache = new MemoryCache (options);
+        _memoryCache = new KeyedMemoryCache (options);
 
         _handler = new HttpClientHandler();
     }
@@ -59,15 +60,71 @@ public class ThumbnailLoader
 
     #region Private members
 
-    private readonly IMemoryCache _memoryCache;
+    private readonly KeyedMemoryCache _memoryCache;
     private readonly HttpClientHandler _handler;
+
+    private static byte[]? BitmapToBytes
+        (
+            Bitmap bitmap
+        )
+    {
+        try
+        {
+            var stream = new MemoryStream();
+            bitmap.Save (stream);
+            return stream.ToArray();
+        }
+        catch (Exception exception)
+        {
+            Debug.WriteLine (exception.Message);
+        }
+
+        return null;
+    }
+
+    private static Bitmap? BytesToBitmap (byte[] bytes)
+    {
+        if (!bytes.IsNullOrEmpty())
+        {
+            try
+            {
+                var stream = new MemoryStream (bytes);
+                return new Bitmap (stream);
+            }
+            catch (Exception exception)
+            {
+                Debug.WriteLine (exception.Message);
+            }
+        }
+
+        return null;
+    }
 
     #endregion
 
     #region Public methods
 
-    public Bitmap? GetThumbnail (string url)
+    /// <summary>
+    /// Очиска кеша.
+    /// </summary>
+    public void Clear()
     {
+        _memoryCache.Clear();
+    }
+
+    /// <summary>
+    /// Получение картинки по URL.
+    /// </summary>
+    public Bitmap? GetThumbnail
+        (
+            string url
+        )
+    {
+        if (string.IsNullOrEmpty (url))
+        {
+            return null;
+        }
+
         if (_memoryCache.TryGetValue (url, out Bitmap? result))
         {
             return result;
@@ -77,13 +134,11 @@ public class ThumbnailLoader
         {
             var client = new HttpClient (_handler);
             var bytes = client.GetByteArrayAsync (url).Result;
-            if (!bytes.IsNullOrEmpty())
+            result = BytesToBitmap (bytes);
+            if (result is not null)
             {
-                var stream = new MemoryStream (bytes);
-                result = new Bitmap (stream);
                 _memoryCache.Set (url, result);
             }
-
         }
         catch (Exception exception)
         {
@@ -91,6 +146,94 @@ public class ThumbnailLoader
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// Загрузка ранее сохраненных картинок.
+    /// </summary>
+    public void LoadThumbnails()
+    {
+        // C:\Users\amiro\AppData\Local
+        var appData = Environment.GetFolderPath (Environment.SpecialFolder.LocalApplicationData);
+        var folder = Path.Combine (appData, Constants.ApplicationName);
+        Directory.CreateDirectory (folder);
+
+        var fileName = Path.Combine (folder, Constants.ThumbnailsFileName);
+        if (!File.Exists (fileName))
+        {
+            return;
+        }
+
+        try
+        {
+            var text = File.ReadAllBytes (fileName);
+            var reader = new Utf8JsonReader (text);
+            while (reader.Read())
+            {
+                if (reader.TokenType == JsonTokenType.PropertyName)
+                {
+                    var url = reader.GetString();
+                    if (!reader.Read())
+                    {
+                        break;
+                    }
+
+                    var byteString = reader.GetString();
+                    if (!string.IsNullOrEmpty (url)
+                        && !string.IsNullOrEmpty (byteString))
+                    {
+                        var bytes = Convert.FromBase64String (byteString);
+                        var bitmap = BytesToBitmap (bytes);
+                        if (bitmap is not null)
+                        {
+                            _memoryCache.Set (url, bitmap);
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception exception)
+        {
+            Debug.WriteLine (exception.Message);
+        }
+    }
+
+    /// <summary>
+    /// Сохренение картинок на будущее.
+    /// </summary>
+    public void SaveThumbnails()
+    {
+        // C:\Users\amiro\AppData\Local
+        var appData = Environment.GetFolderPath (Environment.SpecialFolder.LocalApplicationData);
+        var folder = Path.Combine (appData, Constants.ApplicationName);
+        Directory.CreateDirectory (folder);
+
+        var fileName = Path.Combine (folder, Constants.ThumbnailsFileName);
+        File.Delete (fileName);
+
+        var options = new JsonWriterOptions { Indented = true };
+        using var stream = File.Create (fileName);
+        using var writer = new Utf8JsonWriter (stream, options);
+        writer.WriteStartObject();
+
+        var keys = _memoryCache.GetKeys();
+        foreach (var key in keys)
+        {
+            var bitmap = _memoryCache.Get<Bitmap> (key);
+            if (bitmap is not null)
+            {
+                var bytes = BitmapToBytes (bitmap);
+                if (!bytes.IsNullOrEmpty())
+                {
+                    writer.WriteString
+                        (
+                            key,
+                            Convert.ToBase64String (bytes)
+                        );
+                }
+            }
+        }
+        writer.WriteEndObject();
     }
 
     #endregion

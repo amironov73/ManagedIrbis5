@@ -17,6 +17,7 @@ using System.Linq;
 using System.Net;
 
 using AM;
+using AM.Collections;
 
 using HtmlAgilityPack;
 
@@ -33,6 +34,24 @@ namespace TheNude;
 /// </summary>
 public sealed class NudeClient
 {
+    #region Private members
+
+    /// <summary>
+    /// Не найдено ни одной модели.
+    /// </summary>
+    /// <returns></returns>
+    private static ModelInfo[] NothingFound()
+    {
+        return new ModelInfo[]
+        {
+            new () { Name = "Ничего не найдено" }
+        };
+    }
+
+    #endregion
+
+    #region Public methods
+
     /// <summary>
     /// Получение HTML-документа.
     /// </summary>
@@ -107,10 +126,7 @@ public sealed class NudeClient
     {
         if (document is null)
         {
-            return new ModelInfo[]
-            {
-                new () { Name = "Nothing Found" }
-            };
+            return NothingFound();
         }
 
         var list = new List<ModelInfo>();
@@ -120,7 +136,7 @@ public sealed class NudeClient
             .FirstOrDefault (x => x.HasClass ("missed-models"));
         if (models is null)
         {
-            return null;
+            return NothingFound();
         }
 
         var figures = models
@@ -134,6 +150,13 @@ public sealed class NudeClient
             }
         }
 
+        if (list.IsNullOrEmpty())
+        {
+            return NothingFound();
+        }
+
         return list.ToArray();
     }
+
+    #endregion
 }
