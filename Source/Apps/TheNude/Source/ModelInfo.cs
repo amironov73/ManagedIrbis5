@@ -13,12 +13,8 @@
 
 using System;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks.Dataflow;
-
-using AM.Collections;
 
 using Avalonia.Media.Imaging;
 
@@ -87,14 +83,7 @@ public class ModelInfo
         {
             try
             {
-                var client = new HttpClient();
-                var bytes = client.GetByteArrayAsync (url).Result;
-                if (!bytes.IsNullOrEmpty())
-                {
-                    var stream = new MemoryStream (bytes);
-                    var bitmap = new Bitmap (stream);
-                    info.ThumbnailBitmap = bitmap;
-                }
+                info.ThumbnailBitmap = ThumbnailLoader.Instance.GetThumbnail (url);
             }
             catch (Exception exception)
             {

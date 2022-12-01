@@ -74,10 +74,10 @@ public sealed class NudeClient
 
         request.AddParameter ("page", "search");
         request.AddParameter ("action", "searchModels");
-        request.AddParameter ("__form_name", "model_search");
+        //request.AddParameter ("__form_name", "model_search");
 
-        // request.AddParameter ("__form_name", "filtering_form");
-        // request.AddParameter ("filter_per_page", "all");
+        request.AddParameter ("__form_name", "filtering_form");
+        request.AddParameter ("filter_per_page", "all");
         // request.AddParameter ("filter_sort", "newest");
         request.AddParameter ("m_name", modelName);
         request.AddParameter ("m_has_any_tattoos", "1");
