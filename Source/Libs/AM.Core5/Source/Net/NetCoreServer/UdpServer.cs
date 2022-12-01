@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-/* UdpServer.cs --
+/* UdpServer.cs -- UDP-сервер
    Ars Magna project, http://arsmagna.ru */
 
 #region Using directives
@@ -25,7 +25,8 @@ using System.Text;
 namespace NetCoreServer;
 
 /// <summary>
-/// UDP server is used to send or multicast datagrams to UDP endpoints
+/// UDP-сервер используется для отправки или многоадресной рассылки
+/// дейтаграмм на конечные точки UDP.
 /// </summary>
 /// <remarks>Thread-safe</remarks>
 public class UdpServer
@@ -239,7 +240,8 @@ public class UdpServer
     /// Create a new socket object
     /// </summary>
     /// <remarks>
-    /// Method may be override if you need to prepare some specific socket object in your implementation.
+    /// Method may be override if you need to prepare some specific
+    /// socket object in your implementation.
     /// </remarks>
     /// <returns>Socket object</returns>
     protected virtual Socket CreateSocket()
@@ -250,7 +252,8 @@ public class UdpServer
     /// <summary>
     /// Start the server (synchronous)
     /// </summary>
-    /// <returns>'true' if the server was successfully started, 'false' if the server failed to start</returns>
+    /// <returns>'true' if the server was successfully started,
+    /// 'false' if the server failed to start</returns>
     public virtual bool Start()
     {
         Debug.Assert (!IsStarted, "UDP server is already started!");
@@ -298,8 +301,13 @@ public class UdpServer
         OnStarting();
 
         // Prepare receive endpoint
-        _receiveEndpoint =
-            new IPEndPoint ((Endpoint.AddressFamily == AddressFamily.InterNetworkV6) ? IPAddress.IPv6Any : IPAddress.Any, 0);
+        _receiveEndpoint = new IPEndPoint
+            (
+                Endpoint.AddressFamily == AddressFamily.InterNetworkV6
+                    ? IPAddress.IPv6Any
+                    : IPAddress.Any,
+                port: 0
+            );
 
         // Prepare receive & send buffers
         _receiveBuffer.Reserve (OptionReceiveBufferSize);
@@ -326,8 +334,13 @@ public class UdpServer
     /// </summary>
     /// <param name="multicastAddress">Multicast IP address</param>
     /// <param name="multicastPort">Multicast port number</param>
-    /// <returns>'true' if the server was successfully started, 'false' if the server failed to start</returns>
-    public virtual bool Start (IPAddress multicastAddress, int multicastPort)
+    /// <returns>'true' if the server was successfully started,
+    /// 'false' if the server failed to start</returns>
+    public virtual bool Start
+        (
+            IPAddress multicastAddress,
+            int multicastPort
+        )
     {
         return Start (new IPEndPoint (multicastAddress, multicastPort));
     }
@@ -337,18 +350,31 @@ public class UdpServer
     /// </summary>
     /// <param name="multicastAddress">Multicast IP address</param>
     /// <param name="multicastPort">Multicast port number</param>
-    /// <returns>'true' if the server was successfully started, 'false' if the server failed to start</returns>
-    public virtual bool Start (string multicastAddress, int multicastPort)
+    /// <returns>'true' if the server was successfully started,
+    /// 'false' if the server failed to start</returns>
+    public virtual bool Start
+        (
+            string multicastAddress,
+            int multicastPort
+        )
     {
-        return Start (new IPEndPoint (IPAddress.Parse (multicastAddress), multicastPort));
+        return Start (new IPEndPoint
+                (
+                    IPAddress.Parse (multicastAddress),
+                    multicastPort
+                ));
     }
 
     /// <summary>
     /// Start the server with a given multicast endpoint (synchronous)
     /// </summary>
     /// <param name="multicastEndpoint">Multicast endpoint</param>
-    /// <returns>'true' if the server was successfully started, 'false' if the server failed to start</returns>
-    public virtual bool Start (EndPoint multicastEndpoint)
+    /// <returns>'true' if the server was successfully started, '
+    /// false' if the server failed to start</returns>
+    public virtual bool Start
+        (
+            EndPoint multicastEndpoint
+        )
     {
         MulticastEndpoint = multicastEndpoint;
         return Start();
@@ -357,7 +383,8 @@ public class UdpServer
     /// <summary>
     /// Stop the server (synchronous)
     /// </summary>
-    /// <returns>'true' if the server was successfully stopped, 'false' if the server is already stopped</returns>
+    /// <returns>'true' if the server was successfully stopped,
+    /// 'false' if the server is already stopped</returns>
     public virtual bool Stop()
     {
         Debug.Assert (IsStarted, "UDP server is not started!");
@@ -411,7 +438,8 @@ public class UdpServer
     /// <summary>
     /// Restart the server (synchronous)
     /// </summary>
-    /// <returns>'true' if the server was successfully restarted, 'false' if the server failed to restart</returns>
+    /// <returns>'true' if the server was successfully restarted,
+    /// 'false' if the server failed to restart</returns>
     public virtual bool Restart()
     {
         if (!Stop())
@@ -447,7 +475,10 @@ public class UdpServer
     /// </summary>
     /// <param name="buffer">Datagram buffer to multicast</param>
     /// <returns>Size of multicasted datagram</returns>
-    public virtual long Multicast (byte[] buffer)
+    public virtual long Multicast
+        (
+            byte[] buffer
+        )
     {
         return Multicast (buffer, 0, buffer.Length);
     }
@@ -459,7 +490,12 @@ public class UdpServer
     /// <param name="offset">Datagram buffer offset</param>
     /// <param name="size">Datagram buffer size</param>
     /// <returns>Size of multicasted datagram</returns>
-    public virtual long Multicast (byte[] buffer, long offset, long size)
+    public virtual long Multicast
+        (
+            byte[] buffer,
+            long offset,
+            long size
+        )
     {
         return Send (MulticastEndpoint, buffer, offset, size);
     }
@@ -469,7 +505,10 @@ public class UdpServer
     /// </summary>
     /// <param name="text">Text string to multicast</param>
     /// <returns>Size of multicasted datagram</returns>
-    public virtual long Multicast (string text)
+    public virtual long Multicast
+        (
+            string text
+        )
     {
         return Multicast (Encoding.UTF8.GetBytes (text));
     }
@@ -478,8 +517,12 @@ public class UdpServer
     /// Multicast datagram to the prepared mulicast endpoint (asynchronous)
     /// </summary>
     /// <param name="buffer">Datagram buffer to multicast</param>
-    /// <returns>'true' if the datagram was successfully multicasted, 'false' if the datagram was not multicasted</returns>
-    public virtual bool MulticastAsync (byte[] buffer)
+    /// <returns>'true' if the datagram was successfully multicasted,
+    /// 'false' if the datagram was not multicasted</returns>
+    public virtual bool MulticastAsync
+        (
+            byte[] buffer
+        )
     {
         return MulticastAsync (buffer, 0, buffer.Length);
     }
@@ -490,8 +533,14 @@ public class UdpServer
     /// <param name="buffer">Datagram buffer to multicast</param>
     /// <param name="offset">Datagram buffer offset</param>
     /// <param name="size">Datagram buffer size</param>
-    /// <returns>'true' if the datagram was successfully multicasted, 'false' if the datagram was not multicasted</returns>
-    public virtual bool MulticastAsync (byte[] buffer, long offset, long size)
+    /// <returns>'true' if the datagram was successfully multicasted,
+    /// 'false' if the datagram was not multicasted</returns>
+    public virtual bool MulticastAsync
+        (
+            byte[] buffer,
+            long offset,
+            long size
+        )
     {
         return SendAsync (MulticastEndpoint, buffer, offset, size);
     }
@@ -500,8 +549,12 @@ public class UdpServer
     /// Multicast text to the prepared mulicast endpoint (asynchronous)
     /// </summary>
     /// <param name="text">Text string to multicast</param>
-    /// <returns>'true' if the text was successfully multicasted, 'false' if the text was not multicasted</returns>
-    public virtual bool MulticastAsync (string text)
+    /// <returns>'true' if the text was successfully multicasted,
+    /// 'false' if the text was not multicasted</returns>
+    public virtual bool MulticastAsync
+        (
+            string text
+        )
     {
         return MulticastAsync (Encoding.UTF8.GetBytes (text));
     }
@@ -511,9 +564,12 @@ public class UdpServer
     /// </summary>
     /// <param name="buffer">Datagram buffer to send</param>
     /// <returns>Size of sent datagram</returns>
-    public virtual long Send (byte[] buffer)
+    public virtual long Send
+        (
+            byte[] buffer
+        )
     {
-        return Send (buffer, 0, buffer.Length);
+        return Send (buffer, offset: 0, size: buffer.Length);
     }
 
     /// <summary>
@@ -523,7 +579,12 @@ public class UdpServer
     /// <param name="offset">Datagram buffer offset</param>
     /// <param name="size">Datagram buffer size</param>
     /// <returns>Size of sent datagram</returns>
-    public virtual long Send (byte[] buffer, long offset, long size)
+    public virtual long Send
+        (
+            byte[] buffer,
+            long offset,
+            long size
+        )
     {
         return Send (Endpoint, buffer, offset, size);
     }
@@ -533,7 +594,10 @@ public class UdpServer
     /// </summary>
     /// <param name="text">Text string to send</param>
     /// <returns>Size of sent datagram</returns>
-    public virtual long Send (string text)
+    public virtual long Send
+        (
+            string text
+        )
     {
         return Send (Encoding.UTF8.GetBytes (text));
     }
@@ -544,9 +608,13 @@ public class UdpServer
     /// <param name="endpoint">Endpoint to send</param>
     /// <param name="buffer">Datagram buffer to send</param>
     /// <returns>Size of sent datagram</returns>
-    public virtual long Send (EndPoint endpoint, byte[] buffer)
+    public virtual long Send
+        (
+            EndPoint endpoint,
+            byte[] buffer
+        )
     {
-        return Send (endpoint, buffer, 0, buffer.Length);
+        return Send (endpoint, buffer, offset: 0, size: buffer.Length);
     }
 
     /// <summary>
@@ -557,7 +625,13 @@ public class UdpServer
     /// <param name="offset">Datagram buffer offset</param>
     /// <param name="size">Datagram buffer size</param>
     /// <returns>Size of sent datagram</returns>
-    public virtual long Send (EndPoint endpoint, byte[] buffer, long offset, long size)
+    public virtual long Send
+        (
+            EndPoint endpoint,
+            byte[] buffer,
+            long offset,
+            long size
+        )
     {
         if (!IsStarted)
         {
@@ -572,7 +646,13 @@ public class UdpServer
         try
         {
             // Sent datagram to the client
-            int sent = Socket.SendTo (buffer, (int)offset, (int)size, SocketFlags.None, endpoint);
+            var sent = Socket.SendTo
+                (
+                    buffer,
+                    (int) offset,
+                    (int) size,
+                    SocketFlags.None, endpoint
+                );
             if (sent > 0)
             {
                 // Update statistic
@@ -585,13 +665,15 @@ public class UdpServer
 
             return sent;
         }
-        catch (ObjectDisposedException)
+        catch (ObjectDisposedException exception)
         {
+            Debug.WriteLine (exception.Message);
+
             return 0;
         }
-        catch (SocketException ex)
+        catch (SocketException exception)
         {
-            SendError (ex.SocketErrorCode);
+            SendError (exception.SocketErrorCode);
             return 0;
         }
     }
@@ -602,7 +684,11 @@ public class UdpServer
     /// <param name="endpoint">Endpoint to send</param>
     /// <param name="text">Text string to send</param>
     /// <returns>Size of sent datagram</returns>
-    public virtual long Send (EndPoint endpoint, string text)
+    public virtual long Send
+        (
+            EndPoint endpoint,
+            string text
+        )
     {
         return Send (endpoint, Encoding.UTF8.GetBytes (text));
     }
@@ -612,8 +698,13 @@ public class UdpServer
     /// </summary>
     /// <param name="endpoint">Endpoint to send</param>
     /// <param name="buffer">Datagram buffer to send</param>
-    /// <returns>'true' if the datagram was successfully sent, 'false' if the datagram was not sent</returns>
-    public virtual bool SendAsync (EndPoint endpoint, byte[] buffer)
+    /// <returns>'true' if the datagram was successfully sent,
+    /// 'false' if the datagram was not sent</returns>
+    public virtual bool SendAsync
+        (
+            EndPoint endpoint,
+            byte[] buffer
+        )
     {
         return SendAsync (endpoint, buffer, 0, buffer.Length);
     }
@@ -625,8 +716,15 @@ public class UdpServer
     /// <param name="buffer">Datagram buffer to send</param>
     /// <param name="offset">Datagram buffer offset</param>
     /// <param name="size">Datagram buffer size</param>
-    /// <returns>'true' if the datagram was successfully sent, 'false' if the datagram was not sent</returns>
-    public virtual bool SendAsync (EndPoint endpoint, byte[] buffer, long offset, long size)
+    /// <returns>'true' if the datagram was successfully sent,
+    /// 'false' if the datagram was not sent</returns>
+    public virtual bool SendAsync
+        (
+            EndPoint endpoint,
+            byte[] buffer,
+            long offset,
+            long size
+        )
     {
         if (_sending)
         {
@@ -644,7 +742,7 @@ public class UdpServer
         }
 
         // Check the send buffer limit
-        if (((_sendBuffer.Size + size) > OptionSendBufferLimit) && (OptionSendBufferLimit > 0))
+        if (_sendBuffer.Size + size > OptionSendBufferLimit && OptionSendBufferLimit > 0)
         {
             SendError (SocketError.NoBufferSpaceAvailable);
             return false;
@@ -670,8 +768,13 @@ public class UdpServer
     /// </summary>
     /// <param name="endpoint">Endpoint to send</param>
     /// <param name="text">Text string to send</param>
-    /// <returns>'true' if the text was successfully sent, 'false' if the text was not sent</returns>
-    public virtual bool SendAsync (EndPoint endpoint, string text)
+    /// <returns>'true' if the text was successfully sent,
+    /// 'false' if the text was not sent</returns>
+    public virtual bool SendAsync
+        (
+            EndPoint endpoint,
+            string text
+        )
     {
         return SendAsync (endpoint, Encoding.UTF8.GetBytes (text));
     }
@@ -682,7 +785,11 @@ public class UdpServer
     /// <param name="endpoint">Endpoint to receive from</param>
     /// <param name="buffer">Datagram buffer to receive</param>
     /// <returns>Size of received datagram</returns>
-    public virtual long Receive (ref EndPoint endpoint, byte[] buffer)
+    public virtual long Receive
+        (
+            ref EndPoint endpoint,
+            byte[] buffer
+        )
     {
         return Receive (ref endpoint, buffer, 0, buffer.Length);
     }
@@ -695,7 +802,13 @@ public class UdpServer
     /// <param name="offset">Datagram buffer offset</param>
     /// <param name="size">Datagram buffer size</param>
     /// <returns>Size of received datagram</returns>
-    public virtual long Receive (ref EndPoint endpoint, byte[] buffer, long offset, long size)
+    public virtual long Receive
+        (
+            ref EndPoint endpoint,
+            byte[] buffer,
+            long offset,
+            long size
+        )
     {
         if (!IsStarted)
         {
@@ -710,7 +823,14 @@ public class UdpServer
         try
         {
             // Receive datagram from the client
-            int received = Socket.ReceiveFrom (buffer, (int)offset, (int)size, SocketFlags.None, ref endpoint);
+            var received = Socket.ReceiveFrom
+                (
+                    buffer,
+                    (int) offset,
+                    (int) size,
+                    SocketFlags.None,
+                    ref endpoint
+                );
 
             // Update statistic
             DatagramsReceived++;
@@ -738,7 +858,11 @@ public class UdpServer
     /// <param name="endpoint">Endpoint to receive from</param>
     /// <param name="size">Text size to receive</param>
     /// <returns>Received text</returns>
-    public virtual string Receive (ref EndPoint endpoint, long size)
+    public virtual string Receive
+        (
+            ref EndPoint endpoint,
+            long size
+        )
     {
         var buffer = new byte[size];
         var length = Receive (ref endpoint, buffer);
@@ -774,14 +898,20 @@ public class UdpServer
             // Async receive with the receive handler
             _receiving = true;
             _receiveEventArg.RemoteEndPoint = _receiveEndpoint;
-            _receiveEventArg.SetBuffer (_receiveBuffer.Data, 0, (int)_receiveBuffer.Capacity);
+            _receiveEventArg.SetBuffer
+                (
+                    _receiveBuffer.Data,
+                    offset: 0,
+                    count: (int)_receiveBuffer.Capacity
+                );
             if (!Socket.ReceiveFromAsync (_receiveEventArg))
             {
                 ProcessReceiveFrom (_receiveEventArg);
             }
         }
-        catch (ObjectDisposedException)
+        catch (ObjectDisposedException exception)
         {
+            Debug.WriteLine (exception.Message);
         }
     }
 
@@ -805,14 +935,15 @@ public class UdpServer
             // Async write with the write handler
             _sending = true;
             _sendEventArg.RemoteEndPoint = _sendEndpoint;
-            _sendEventArg.SetBuffer (_sendBuffer.Data, 0, (int)(_sendBuffer.Size));
+            _sendEventArg.SetBuffer (_sendBuffer.Data, 0, (int)_sendBuffer.Size);
             if (!Socket.SendToAsync (_sendEventArg))
             {
                 ProcessSendTo (_sendEventArg);
             }
         }
-        catch (ObjectDisposedException)
+        catch (ObjectDisposedException exception)
         {
+            Debug.WriteLine (exception.Message);
         }
     }
 
@@ -903,7 +1034,7 @@ public class UdpServer
         if (_receiveBuffer.Capacity == size)
         {
             // Check the receive buffer limit
-            if (((2 * size) > OptionReceiveBufferLimit) && (OptionReceiveBufferLimit > 0))
+            if (2 * size > OptionReceiveBufferLimit && OptionReceiveBufferLimit > 0)
             {
                 SendError (SocketError.NoBufferSpaceAvailable);
 
@@ -920,7 +1051,10 @@ public class UdpServer
     /// <summary>
     /// This method is invoked when an asynchronous send to operation completes
     /// </summary>
-    private void ProcessSendTo (SocketAsyncEventArgs e)
+    private void ProcessSendTo
+        (
+            SocketAsyncEventArgs eventArgs
+        )
     {
         _sending = false;
 
@@ -930,9 +1064,9 @@ public class UdpServer
         }
 
         // Check for error
-        if (e.SocketError != SocketError.Success)
+        if (eventArgs.SocketError != SocketError.Success)
         {
-            SendError (e.SocketError);
+            SendError (eventArgs.SocketError);
 
             // Call the buffer sent zero handler
             OnSent (_sendEndpoint, 0);
@@ -940,7 +1074,7 @@ public class UdpServer
             return;
         }
 
-        long sent = e.BytesTransferred;
+        long sent = eventArgs.BytesTransferred;
 
         // Send some data to the client
         if (sent > 0)
@@ -966,6 +1100,7 @@ public class UdpServer
     /// </summary>
     protected virtual void OnStarting()
     {
+        // пустое тело метода
     }
 
     /// <summary>
@@ -973,6 +1108,7 @@ public class UdpServer
     /// </summary>
     protected virtual void OnStarted()
     {
+        // пустое тело метода
     }
 
     /// <summary>
@@ -980,6 +1116,7 @@ public class UdpServer
     /// </summary>
     protected virtual void OnStopping()
     {
+        // пустое тело метода
     }
 
     /// <summary>
@@ -987,6 +1124,7 @@ public class UdpServer
     /// </summary>
     protected virtual void OnStopped()
     {
+        // пустое тело метода
     }
 
     /// <summary>
@@ -999,8 +1137,15 @@ public class UdpServer
     /// <remarks>
     /// Notification is called when another datagram was received from some endpoint
     /// </remarks>
-    protected virtual void OnReceived (EndPoint endpoint, byte[] buffer, long offset, long size)
+    protected virtual void OnReceived
+        (
+            EndPoint endpoint,
+            byte[] buffer,
+            long offset,
+            long size
+        )
     {
+        // пустое тело метода
     }
 
     /// <summary>
@@ -1010,18 +1155,28 @@ public class UdpServer
     /// <param name="sent">Size of sent datagram buffer</param>
     /// <remarks>
     /// Notification is called when a datagram was sent to the client.
-    /// This handler could be used to send another datagram to the client for instance when the pending size is zero.
+    /// This handler could be used to send another datagram to the
+    /// client for instance when the pending size is zero.
     /// </remarks>
-    protected virtual void OnSent (EndPoint endpoint, long sent)
+    protected virtual void OnSent
+        (
+            EndPoint endpoint,
+            long sent
+        )
     {
+        // пустое тело метода
     }
 
     /// <summary>
     /// Handle error notification
     /// </summary>
     /// <param name="error">Socket error code</param>
-    protected virtual void OnError (SocketError error)
+    protected virtual void OnError
+        (
+            SocketError error
+        )
     {
+        // пустое тело метода
     }
 
     #endregion
@@ -1032,14 +1187,19 @@ public class UdpServer
     /// Send error notification
     /// </summary>
     /// <param name="error">Socket error code</param>
-    private void SendError (SocketError error)
+    private void SendError
+        (
+            SocketError error
+        )
     {
         // Skip disconnect errors
-        if ((error == SocketError.ConnectionAborted) ||
-            (error == SocketError.ConnectionRefused) ||
-            (error == SocketError.ConnectionReset) ||
-            (error == SocketError.OperationAborted) ||
-            (error == SocketError.Shutdown))
+        if (
+                error is SocketError.ConnectionAborted
+                    or SocketError.ConnectionRefused
+                    or SocketError.ConnectionReset
+                    or SocketError.OperationAborted
+                    or SocketError.Shutdown
+           )
         {
             return;
         }
