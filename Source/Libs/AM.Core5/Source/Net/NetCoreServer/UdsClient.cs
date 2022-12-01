@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-/* TcpSession.cs --
+/* UdsClient.cs -- клиент Unix Domain Socket
    Ars Magna project, http://arsmagna.ru */
 
 #region Using directives
@@ -25,7 +25,8 @@ using System.Threading;
 namespace NetCoreServer;
 
 /// <summary>
-/// Unix Domain Socket client is used to read/write data from/into the connected Unix Domain Socket server
+/// Клиент Unix Domain Socket используется для чтения и записи данных
+/// с подключенного сервера Unix Domain Socket.
 /// </summary>
 /// <remarks>Thread-safe</remarks>
 public class UdsClient
@@ -146,7 +147,8 @@ public class UdsClient
     /// Create a new socket object
     /// </summary>
     /// <remarks>
-    /// Method may be override if you need to prepare some specific socket object in your implementation.
+    /// Method may be override if you need to prepare some specific
+    /// socket object in your implementation.
     /// </remarks>
     /// <returns>Socket object</returns>
     protected virtual Socket CreateSocket()
@@ -161,7 +163,8 @@ public class UdsClient
     /// Please note that synchronous connect will not receive data automatically!
     /// You should use Receive() or ReceiveAsync() method manually after successful connection.
     /// </remarks>
-    /// <returns>'true' if the client was successfully connected, 'false' if the client failed to connect</returns>
+    /// <returns>'true' if the client was successfully connected,
+    /// 'false' if the client failed to connect</returns>
     public virtual bool Connect()
     {
         if (IsConnected || IsConnecting)
@@ -256,7 +259,8 @@ public class UdsClient
     /// <summary>
     /// Disconnect the client (synchronous)
     /// </summary>
-    /// <returns>'true' if the client was successfully disconnected, 'false' if the client is already disconnected</returns>
+    /// <returns>'true' if the client was successfully disconnected,
+    /// 'false' if the client is already disconnected</returns>
     public virtual bool Disconnect()
     {
         if (!IsConnected && !IsConnecting)
@@ -326,7 +330,8 @@ public class UdsClient
     /// <summary>
     /// Reconnect the client (synchronous)
     /// </summary>
-    /// <returns>'true' if the client was successfully reconnected, 'false' if the client is already reconnected</returns>
+    /// <returns>'true' if the client was successfully reconnected,
+    /// 'false' if the client is already reconnected</returns>
     public virtual bool Reconnect()
     {
         if (!Disconnect())
@@ -340,7 +345,8 @@ public class UdsClient
     /// <summary>
     /// Connect the client (asynchronous)
     /// </summary>
-    /// <returns>'true' if the client was successfully connected, 'false' if the client failed to connect</returns>
+    /// <returns>'true' if the client was successfully connected,
+    /// 'false' if the client failed to connect</returns>
     public virtual bool ConnectAsync()
     {
         if (IsConnected || IsConnecting)
@@ -386,7 +392,8 @@ public class UdsClient
     /// <summary>
     /// Disconnect the client (asynchronous)
     /// </summary>
-    /// <returns>'true' if the client was successfully disconnected, 'false' if the client is already disconnected</returns>
+    /// <returns>'true' if the client was successfully disconnected,
+    /// 'false' if the client is already disconnected</returns>
     public virtual bool DisconnectAsync()
     {
         return Disconnect();
@@ -395,7 +402,8 @@ public class UdsClient
     /// <summary>
     /// Reconnect the client (asynchronous)
     /// </summary>
-    /// <returns>'true' if the client was successfully reconnected, 'false' if the client is already reconnected</returns>
+    /// <returns>'true' if the client was successfully reconnected,
+    /// 'false' if the client is already reconnected</returns>
     public virtual bool ReconnectAsync()
     {
         if (!DisconnectAsync())
@@ -420,7 +428,7 @@ public class UdsClient
     private SocketAsyncEventArgs _receiveEventArg;
 
     // Send buffer
-    private readonly object _sendLock = new object();
+    private readonly object _sendLock = new ();
     private bool _sending;
     private Buffer _sendBufferMain;
     private Buffer _sendBufferFlush;
@@ -432,7 +440,10 @@ public class UdsClient
     /// </summary>
     /// <param name="buffer">Buffer to send</param>
     /// <returns>Size of sent data</returns>
-    public virtual long Send (byte[] buffer)
+    public virtual long Send
+        (
+            byte[] buffer
+        )
     {
         return Send (buffer, 0, buffer.Length);
     }
@@ -444,7 +455,12 @@ public class UdsClient
     /// <param name="offset">Buffer offset</param>
     /// <param name="size">Buffer size</param>
     /// <returns>Size of sent data</returns>
-    public virtual long Send (byte[] buffer, long offset, long size)
+    public virtual long Send
+        (
+            byte[] buffer,
+            long offset,
+            long size
+        )
     {
         if (!IsConnected)
         {
@@ -457,7 +473,14 @@ public class UdsClient
         }
 
         // Sent data to the server
-        long sent = Socket.Send (buffer, (int)offset, (int)size, SocketFlags.None, out SocketError ec);
+        long sent = Socket.Send
+            (
+                buffer,
+                (int) offset,
+                (int) size,
+                SocketFlags.None,
+                out var ec
+            );
         if (sent > 0)
         {
             // Update statistic
@@ -491,7 +514,8 @@ public class UdsClient
     /// Send data to the server (asynchronous)
     /// </summary>
     /// <param name="buffer">Buffer to send</param>
-    /// <returns>'true' if the data was successfully sent, 'false' if the client is not connected</returns>
+    /// <returns>'true' if the data was successfully sent,
+    /// 'false' if the client is not connected</returns>
     public virtual bool SendAsync (byte[] buffer)
     {
         return SendAsync (buffer, 0, buffer.Length);
@@ -503,8 +527,14 @@ public class UdsClient
     /// <param name="buffer">Buffer to send</param>
     /// <param name="offset">Buffer offset</param>
     /// <param name="size">Buffer size</param>
-    /// <returns>'true' if the data was successfully sent, 'false' if the client is not connected</returns>
-    public virtual bool SendAsync (byte[] buffer, long offset, long size)
+    /// <returns>'true' if the data was successfully sent,
+    /// 'false' if the client is not connected</returns>
+    public virtual bool SendAsync
+        (
+            byte[] buffer,
+            long offset,
+            long size
+        )
     {
         if (!IsConnected)
         {
@@ -519,7 +549,7 @@ public class UdsClient
         lock (_sendLock)
         {
             // Check the send buffer limit
-            if (((_sendBufferMain.Size + size) > OptionSendBufferLimit) && (OptionSendBufferLimit > 0))
+            if (_sendBufferMain.Size + size > OptionSendBufferLimit && OptionSendBufferLimit > 0)
             {
                 SendError (SocketError.NoBufferSpaceAvailable);
                 return false;
@@ -552,7 +582,8 @@ public class UdsClient
     /// Send text to the server (asynchronous)
     /// </summary>
     /// <param name="text">Text string to send</param>
-    /// <returns>'true' if the text was successfully sent, 'false' if the client is not connected</returns>
+    /// <returns>'true' if the text was successfully sent,
+    /// 'false' if the client is not connected</returns>
     public virtual bool SendAsync (string text)
     {
         return SendAsync (Encoding.UTF8.GetBytes (text));
@@ -563,7 +594,10 @@ public class UdsClient
     /// </summary>
     /// <param name="buffer">Buffer to receive</param>
     /// <returns>Size of received data</returns>
-    public virtual long Receive (byte[] buffer)
+    public virtual long Receive
+        (
+            byte[] buffer
+        )
     {
         return Receive (buffer, 0, buffer.Length);
     }
@@ -575,7 +609,12 @@ public class UdsClient
     /// <param name="offset">Buffer offset</param>
     /// <param name="size">Buffer size</param>
     /// <returns>Size of received data</returns>
-    public virtual long Receive (byte[] buffer, long offset, long size)
+    public virtual long Receive
+        (
+            byte[] buffer,
+            long offset,
+            long size
+        )
     {
         if (!IsConnected)
         {
@@ -588,7 +627,14 @@ public class UdsClient
         }
 
         // Receive data from the server
-        long received = Socket.Receive (buffer, (int)offset, (int)size, SocketFlags.None, out SocketError ec);
+        long received = Socket.Receive
+            (
+                buffer,
+                (int) offset,
+                (int) size,
+                SocketFlags.None,
+                out var ec
+            );
         if (received > 0)
         {
             // Update statistic
@@ -613,7 +659,10 @@ public class UdsClient
     /// </summary>
     /// <param name="size">Text size to receive</param>
     /// <returns>Received text</returns>
-    public virtual string Receive (long size)
+    public virtual string Receive
+        (
+            long size
+        )
     {
         var buffer = new byte[size];
         var length = Receive (buffer);
@@ -644,7 +693,7 @@ public class UdsClient
             return;
         }
 
-        bool process = true;
+        var process = true;
 
         while (process)
         {
@@ -676,8 +725,8 @@ public class UdsClient
             return;
         }
 
-        bool empty = false;
-        bool process = true;
+        var empty = false;
+        var process = true;
 
         while (process)
         {
@@ -785,6 +834,7 @@ public class UdsClient
                 }
 
                 break;
+
             case SocketAsyncOperation.Send:
                 if (ProcessSend (eventArgs))
                 {
@@ -792,13 +842,14 @@ public class UdsClient
                 }
 
                 break;
+
             default:
                 throw new ArgumentException ("The last operation completed on the socket was not a receive or send");
         }
     }
 
     /// <summary>
-    /// This method is invoked when an asynchronous connect operation completes
+    /// This method is invoked when an asynchronous connect operation completes.
     /// </summary>
     private void ProcessConnect
         (
@@ -852,14 +903,17 @@ public class UdsClient
     /// <summary>
     /// This method is invoked when an asynchronous receive operation completes
     /// </summary>
-    private bool ProcessReceive (SocketAsyncEventArgs e)
+    private bool ProcessReceive
+        (
+            SocketAsyncEventArgs eventArgs
+        )
     {
         if (!IsConnected)
         {
             return false;
         }
 
-        long size = e.BytesTransferred;
+        long size = eventArgs.BytesTransferred;
 
         // Received some data from the server
         if (size > 0)
@@ -874,7 +928,7 @@ public class UdsClient
             if (_receiveBuffer.Capacity == size)
             {
                 // Check the receive buffer limit
-                if (((2 * size) > OptionReceiveBufferLimit) && (OptionReceiveBufferLimit > 0))
+                if (2 * size > OptionReceiveBufferLimit && OptionReceiveBufferLimit > 0)
                 {
                     SendError (SocketError.NoBufferSpaceAvailable);
                     DisconnectAsync();
@@ -888,7 +942,7 @@ public class UdsClient
         _receiving = false;
 
         // Try to receive again if the client is valid
-        if (e.SocketError == SocketError.Success)
+        if (eventArgs.SocketError == SocketError.Success)
         {
             // If zero is returned from a read operation, the remote end has closed the connection
             if (size > 0)
@@ -902,7 +956,7 @@ public class UdsClient
         }
         else
         {
-            SendError (e.SocketError);
+            SendError (eventArgs.SocketError);
             DisconnectAsync();
         }
 
@@ -912,14 +966,17 @@ public class UdsClient
     /// <summary>
     /// This method is invoked when an asynchronous send operation completes
     /// </summary>
-    private bool ProcessSend (SocketAsyncEventArgs e)
+    private bool ProcessSend
+        (
+            SocketAsyncEventArgs eventArgs
+        )
     {
         if (!IsConnected)
         {
             return false;
         }
 
-        long size = e.BytesTransferred;
+        long size = eventArgs.BytesTransferred;
 
         // Send some data to the server
         if (size > 0)
@@ -944,13 +1001,13 @@ public class UdsClient
         }
 
         // Try to send again if the client is valid
-        if (e.SocketError == SocketError.Success)
+        if (eventArgs.SocketError == SocketError.Success)
         {
             return true;
         }
         else
         {
-            SendError (e.SocketError);
+            SendError (eventArgs.SocketError);
             DisconnectAsync();
             return false;
         }
@@ -965,6 +1022,7 @@ public class UdsClient
     /// </summary>
     protected virtual void OnConnecting()
     {
+        // пустое тело метода
     }
 
     /// <summary>
@@ -972,6 +1030,7 @@ public class UdsClient
     /// </summary>
     protected virtual void OnConnected()
     {
+        // пустое тело метода
     }
 
     /// <summary>
@@ -979,6 +1038,7 @@ public class UdsClient
     /// </summary>
     protected virtual void OnDisconnecting()
     {
+        // пустое тело метода
     }
 
     /// <summary>
@@ -986,6 +1046,7 @@ public class UdsClient
     /// </summary>
     protected virtual void OnDisconnected()
     {
+        // пустое тело метода
     }
 
     /// <summary>
@@ -995,10 +1056,17 @@ public class UdsClient
     /// <param name="offset">Received buffer offset</param>
     /// <param name="size">Received buffer size</param>
     /// <remarks>
-    /// Notification is called when another chunk of buffer was received from the server
+    /// Notification is called when another chunk of buffer
+    /// was received from the server
     /// </remarks>
-    protected virtual void OnReceived (byte[] buffer, long offset, long size)
+    protected virtual void OnReceived
+        (
+            byte[] buffer,
+            long offset,
+            long size
+        )
     {
+        // пустое тело метода
     }
 
     /// <summary>
@@ -1007,30 +1075,43 @@ public class UdsClient
     /// <param name="sent">Size of sent buffer</param>
     /// <param name="pending">Size of pending buffer</param>
     /// <remarks>
-    /// Notification is called when another chunk of buffer was sent to the server.
-    /// This handler could be used to send another buffer to the server for instance when the pending size is zero.
+    /// Notification is called when another chunk of buffer
+    /// was sent to the server.
+    /// This handler could be used to send another buffer
+    /// to the server for instance when the pending size is zero.
     /// </remarks>
-    protected virtual void OnSent (long sent, long pending)
+    protected virtual void OnSent
+        (
+            long sent,
+            long pending
+        )
     {
+        // пустое тело метода
     }
 
     /// <summary>
     /// Handle empty send buffer notification
     /// </summary>
     /// <remarks>
-    /// Notification is called when the send buffer is empty and ready for a new data to send.
+    /// Notification is called when the send buffer is empty
+    /// and ready for a new data to send.
     /// This handler could be used to send another buffer to the server.
     /// </remarks>
     protected virtual void OnEmpty()
     {
+        // пустое тело метода
     }
 
     /// <summary>
     /// Handle error notification
     /// </summary>
     /// <param name="error">Socket error code</param>
-    protected virtual void OnError (SocketError error)
+    protected virtual void OnError
+        (
+            SocketError error
+        )
     {
+        // пустое тело метода
     }
 
     #endregion
@@ -1044,11 +1125,13 @@ public class UdsClient
     private void SendError (SocketError error)
     {
         // Skip disconnect errors
-        if ((error == SocketError.ConnectionAborted) ||
-            (error == SocketError.ConnectionRefused) ||
-            (error == SocketError.ConnectionReset) ||
-            (error == SocketError.OperationAborted) ||
-            (error == SocketError.Shutdown))
+        if (
+                error is SocketError.ConnectionAborted
+                    or SocketError.ConnectionRefused
+                    or SocketError.ConnectionReset
+                    or SocketError.OperationAborted
+                    or SocketError.Shutdown
+            )
         {
             return;
         }

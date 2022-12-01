@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-/* TcpSession.cs --
+/* TcpSession.cs -- TCP-сессия
    Ars Magna project, http://arsmagna.ru */
 
 #region Using directives
@@ -27,7 +27,7 @@ using AM;
 namespace NetCoreServer;
 
 /// <summary>
-/// TCP session is used to read and write data from the connected TCP client
+/// Сеанс TCP используется для чтения и записи данных от подключенного клиента TCP.
 /// </summary>
 /// <remarks>Thread-safe</remarks>
 public class TcpSession
