@@ -7,6 +7,8 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable LocalizableElement
 // ReSharper disable NonReadonlyMemberInGetHashCode
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UseNullableAnnotationInsteadOfAttribute
 
 /* Algorithms.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -17,6 +19,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 #endregion
 
@@ -35,7 +38,7 @@ namespace AM.Collections;
 /// <param name="item1">The first item.</param>
 /// <param name="item2">The second item.</param>
 /// <returns>Whether item1 and item2 satisfy the relationship that the BinaryPredicate defines.</returns>
-public delegate bool BinaryPredicate<in T> (T item1, T item2);
+public delegate bool BinaryPredicate<in T> ([AllowNull]T item1, T item2);
 
 /// <summary>
 /// Algorithms contains a number of static methods that implement
@@ -259,10 +262,17 @@ public static class Algorithms
 
             if (i < wrappedArray.Length - 1)
             {
-                Array.Copy (wrappedArray, i + 1, wrappedArray, i, wrappedArray.Length - i - 1);
+                Array.Copy
+                    (
+                        sourceArray: wrappedArray,
+                        sourceIndex: i + 1,
+                        destinationArray: wrappedArray,
+                        destinationIndex: i,
+                        length: wrappedArray.Length - i - 1
+                    );
             }
 
-            wrappedArray[wrappedArray.Length - 1] = default (T);
+            wrappedArray[^1] = default!;
 
             --count;
         }
@@ -308,12 +318,14 @@ public static class Algorithms
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="start"/> or <paramref name="count"/> is negative.</exception>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="start"/> + <paramref name="count"/> is greater than the
     /// size of <paramref name="array"/>.</exception>
-    public static IList<T> Range<T> (T[] array, int start, int count)
+    public static IList<T> Range<T>
+        (
+            T[] array,
+            int start,
+            int count
+        )
     {
-        if (array == null)
-        {
-            throw new ArgumentOutOfRangeException (nameof (array));
-        }
+        Sure.NotNull (array);
 
         if (start < 0 || start > array.Length || start == array.Length && count != 0)
         {
@@ -334,7 +346,8 @@ public static class Algorithms
     /// modify are fowarded through to the wrapped collection.
     /// </summary>
     [Serializable]
-    private class ReadOnlyCollection<T> : ICollection<T>
+    private class ReadOnlyCollection<T>
+        : ICollection<T>
     {
         private readonly ICollection<T> wrappedCollection; // The collection we are wrapping (never null).
 
@@ -473,7 +486,7 @@ public static class Algorithms
         public T this [int index]
         {
             get => wrappedList[index];
-            set { MethodModifiesCollection(); }
+            set => MethodModifiesCollection();
         }
 
         public void Add (T item)
@@ -516,9 +529,12 @@ public static class Algorithms
     /// <param name="list">The list to wrap.</param>
     /// <returns>A read-only view onto <paramref name="list"/>. Returns null if <paramref name="list"/> is null.
     /// If <paramref name="list"/> is already read-only, returns <paramref name="list"/>.</returns>
-    public static IList<T>? ReadOnly<T> (IList<T>? list)
+    public static IList<T>? ReadOnly<T>
+        (
+            IList<T>? list
+        )
     {
-        if (list == null)
+        if (list is null)
         {
             return null;
         }
@@ -568,24 +584,34 @@ public static class Algorithms
 
         public ICollection<TValue> Values => ReadOnly (wrappedDictionary.Values)!;
 
-        public bool Remove (TKey key)
+        public bool Remove
+            (
+                TKey key
+            )
         {
             MethodModifiesCollection();
             return false; // never reached
         }
 
-        public bool TryGetValue (TKey key, out TValue value)
+        public bool TryGetValue
+            (
+                TKey key,
+                out TValue value
+            )
         {
-            return wrappedDictionary.TryGetValue (key, out value);
+            return wrappedDictionary.TryGetValue (key, out value!);
         }
 
         public TValue this [TKey key]
         {
-            get { return wrappedDictionary[key]; }
-            set { MethodModifiesCollection(); }
+            get => wrappedDictionary[key];
+            set => MethodModifiesCollection();
         }
 
-        public void Add (KeyValuePair<TKey, TValue> item)
+        public void Add
+            (
+                KeyValuePair<TKey, TValue> item
+            )
         {
             MethodModifiesCollection();
         }
@@ -595,7 +621,10 @@ public static class Algorithms
             MethodModifiesCollection();
         }
 
-        public bool Contains (KeyValuePair<TKey, TValue> item)
+        public bool Contains
+            (
+                KeyValuePair<TKey, TValue> item
+            )
         {
             return wrappedDictionary.Contains (item);
         }
@@ -609,7 +638,10 @@ public static class Algorithms
 
         public bool IsReadOnly => true;
 
-        public bool Remove (KeyValuePair<TKey, TValue> item)
+        public bool Remove
+            (
+                KeyValuePair<TKey, TValue> item
+            )
         {
             MethodModifiesCollection();
             return false; // never reached
@@ -637,7 +669,10 @@ public static class Algorithms
     /// <param name="dictionary">The dictionary to wrap.</param>
     /// <returns>A read-only view onto <paramref name="dictionary"/>. Returns null if <paramref name="dictionary"/> is null.
     /// If <paramref name="dictionary"/> is already read-only, returns <paramref name="dictionary"/>.</returns>
-    public static IDictionary<TKey, TValue>? ReadOnly<TKey, TValue> (IDictionary<TKey, TValue>? dictionary)
+    public static IDictionary<TKey, TValue>? ReadOnly<TKey, TValue>
+        (
+            IDictionary<TKey, TValue>? dictionary
+        )
     {
         if (dictionary == null)
         {
@@ -666,7 +701,7 @@ public static class Algorithms
             this.wrappedEnumerator = wrappedEnumerator;
         }
 
-        T IEnumerator<T>.Current => (T)wrappedEnumerator.Current;
+        T IEnumerator<T>.Current => (T) wrappedEnumerator.Current!;
 
         void IDisposable.Dispose()
         {
@@ -676,7 +711,7 @@ public static class Algorithms
             }
         }
 
-        object IEnumerator.Current => wrappedEnumerator.Current;
+        object IEnumerator.Current => wrappedEnumerator.Current!;
 
         bool IEnumerator.MoveNext()
         {
@@ -694,7 +729,8 @@ public static class Algorithms
     /// onto an untyped IEnumerable interface.
     /// </summary>
     [Serializable]
-    private class TypedEnumerable<T> : IEnumerable<T>
+    private class TypedEnumerable<T>
+        : IEnumerable<T>
     {
         private readonly IEnumerable wrappedEnumerable;
 
@@ -703,7 +739,10 @@ public static class Algorithms
         /// onto an untyped IEnumerable interface.
         /// </summary>
         /// <param name="wrappedEnumerable">IEnumerable interface to wrap.</param>
-        public TypedEnumerable (IEnumerable wrappedEnumerable)
+        public TypedEnumerable
+            (
+                IEnumerable wrappedEnumerable
+            )
         {
             this.wrappedEnumerable = wrappedEnumerable;
         }
@@ -735,7 +774,10 @@ public static class Algorithms
     /// items of type <typeparamref name="T"/> or a type derived from it. </param>
     /// <returns>A generic IEnumerable&lt;T&gt; wrapper around <paramref name="untypedCollection"/>.
     /// If <paramref name="untypedCollection"/> is null, then null is returned.</returns>
-    public static IEnumerable<T>? TypedAs<T> (IEnumerable? untypedCollection)
+    public static IEnumerable<T>? TypedAs<T>
+        (
+            IEnumerable? untypedCollection
+        )
     {
         return untypedCollection switch
         {
@@ -760,7 +802,10 @@ public static class Algorithms
         /// onto an untyped ICollection interface.
         /// </summary>
         /// <param name="wrappedCollection">ICollection interface to wrap.</param>
-        public TypedCollection (ICollection wrappedCollection)
+        public TypedCollection
+            (
+                ICollection wrappedCollection
+            )
         {
             this.wrappedCollection = wrappedCollection;
         }
@@ -789,7 +834,10 @@ public static class Algorithms
             return false;
         }
 
-        public bool Contains (T item)
+        public bool Contains
+            (
+                T item
+            )
         {
             IEqualityComparer<T> equalityComparer = EqualityComparer<T>.Default;
             foreach (var obj in wrappedCollection)
@@ -844,7 +892,7 @@ public static class Algorithms
     /// If <paramref name="untypedCollection"/> is null, then null is returned.</returns>
     public static ICollection<T>? TypedAs<T>
         (
-        ICollection? untypedCollection
+            ICollection? untypedCollection
         )
     {
         return untypedCollection switch
@@ -860,7 +908,8 @@ public static class Algorithms
     /// an untype IList interface.
     /// </summary>
     [Serializable]
-    private class TypedList<T> : IList<T>
+    private class TypedList<T>
+        : IList<T>
     {
         private readonly IList wrappedList;
 
@@ -873,7 +922,6 @@ public static class Algorithms
         {
             this.wrappedList = wrappedList;
         }
-
 
         public IEnumerator<T> GetEnumerator()
         {
@@ -922,19 +970,13 @@ public static class Algorithms
 
         public T this [int index]
         {
-            get { return (T)wrappedList[index]; }
-            set { wrappedList[index] = value; }
+            get => (T) wrappedList[index]!;
+            set => wrappedList[index] = value;
         }
 
-        public int Count
-        {
-            get { return wrappedList.Count; }
-        }
+        public int Count => wrappedList.Count;
 
-        public bool IsReadOnly
-        {
-            get { return wrappedList.IsReadOnly; }
-        }
+        public bool IsReadOnly => wrappedList.IsReadOnly;
 
         public bool Remove (T item)
         {
@@ -998,12 +1040,13 @@ public static class Algorithms
         }
 
 
-        public void CopyTo (Array array, int index)
+        public void CopyTo
+            (
+                Array array,
+                int index
+            )
         {
-            if (array == null)
-            {
-                throw new ArgumentNullException (nameof (array));
-            }
+            Sure.NotNull (array);
 
             var i = 0;
             var count = wrappedCollection.Count;
@@ -1031,20 +1074,11 @@ public static class Algorithms
             }
         }
 
-        public int Count
-        {
-            get { return wrappedCollection.Count; }
-        }
+        public int Count => wrappedCollection.Count;
 
-        public bool IsSynchronized
-        {
-            get { return false; }
-        }
+        public bool IsSynchronized => false;
 
-        public object SyncRoot
-        {
-            get { return this; }
-        }
+        public object SyncRoot => this;
 
         public IEnumerator GetEnumerator()
         {
@@ -1065,18 +1099,17 @@ public static class Algorithms
     /// <param name="typedCollection">A typed collection to wrap.</param>
     /// <returns>A non-generic ICollection wrapper around <paramref name="typedCollection"/>.
     /// If <paramref name="typedCollection"/> is null, then null is returned.</returns>
-    public static ICollection? Untyped<T> (ICollection<T>? typedCollection)
+    public static ICollection? Untyped<T>
+        (
+            ICollection<T>? typedCollection
+        )
     {
-        if (typedCollection == null)
+        return typedCollection switch
         {
-            return null;
-        }
-
-        if (typedCollection is ICollection collection)
-        {
-            return collection;
-        }
-        return new UntypedCollection<T> (typedCollection);
+            null => null,
+            ICollection collection => collection,
+            _ => new UntypedCollection<T> (typedCollection)
+        };
     }
 
     /// <summary>
@@ -1104,11 +1137,15 @@ public static class Algorithms
         /// </summary>
         /// <param name="name">parameter name</param>
         /// <param name="value">parameter value</param>
-        private static T ConvertToItemType (string name, object value)
+        private static T ConvertToItemType
+            (
+                string name,
+                object? value
+            )
         {
             try
             {
-                return (T)value;
+                return (T) value!;
             }
             catch (InvalidCastException)
             {
@@ -1154,15 +1191,9 @@ public static class Algorithms
             wrappedList.Insert (index, ConvertToItemType ("value", value));
         }
 
-        public bool IsFixedSize
-        {
-            get { return false; }
-        }
+        public bool IsFixedSize => false;
 
-        public bool IsReadOnly
-        {
-            get { return wrappedList.IsReadOnly; }
-        }
+        public bool IsReadOnly => wrappedList.IsReadOnly;
 
         public void Remove (object? value)
         {
@@ -1179,8 +1210,8 @@ public static class Algorithms
 
         public object this [int index]
         {
-            get { return wrappedList[index]; }
-            set { wrappedList[index] = ConvertToItemType ("value", value); }
+            get => wrappedList[index]!;
+            set => wrappedList[index] = ConvertToItemType ("value", value);
         }
 
         public void CopyTo (Array array, int index)
@@ -1216,20 +1247,11 @@ public static class Algorithms
             }
         }
 
-        public int Count
-        {
-            get { return wrappedList.Count; }
-        }
+        public int Count => wrappedList.Count;
 
-        public bool IsSynchronized
-        {
-            get { return false; }
-        }
+        public bool IsSynchronized => false;
 
-        public object SyncRoot
-        {
-            get { return this; }
-        }
+        public object SyncRoot => this;
 
         public IEnumerator GetEnumerator()
         {
@@ -1283,17 +1305,14 @@ public static class Algorithms
             this.wrappedArray = wrappedArray;
         }
 
-        public override int Count
-        {
-            get { return wrappedArray.Length; }
-        }
+        public override int Count => wrappedArray.Length;
 
         public override void Clear()
         {
             var count = wrappedArray.Length;
             for (var i = 0; i < count; ++i)
             {
-                wrappedArray[i] = default (T);
+                wrappedArray[i] = default!;
             }
         }
 
@@ -1306,7 +1325,14 @@ public static class Algorithms
 
             if (index + 1 < wrappedArray.Length)
             {
-                Array.Copy (wrappedArray, index, wrappedArray, index + 1, wrappedArray.Length - index - 1);
+                Array.Copy
+                    (
+                        sourceArray: wrappedArray,
+                        sourceIndex: index,
+                        destinationArray: wrappedArray,
+                        destinationIndex: index + 1,
+                        length: wrappedArray.Length - index - 1
+                    );
             }
 
             if (index < wrappedArray.Length)
@@ -1324,10 +1350,17 @@ public static class Algorithms
 
             if (index < wrappedArray.Length - 1)
             {
-                Array.Copy (wrappedArray, index + 1, wrappedArray, index, wrappedArray.Length - index - 1);
+                Array.Copy
+                    (
+                        sourceArray: wrappedArray,
+                        sourceIndex: index + 1,
+                        destinationArray: wrappedArray,
+                        destinationIndex: index,
+                        length: wrappedArray.Length - index - 1
+                    );
             }
 
-            wrappedArray[wrappedArray.Length - 1] = default (T);
+            wrappedArray[^1] = default!;
         }
 
         public override T this [int index]
@@ -1352,12 +1385,13 @@ public static class Algorithms
             }
         }
 
-        public override void CopyTo (T[] array, int arrayIndex)
+        public override void CopyTo
+            (
+                T[] array,
+                int arrayIndex
+            )
         {
-            if (array == null)
-            {
-                throw new ArgumentNullException (nameof (array));
-            }
+            Sure.NotNull (array);
 
             if (array.Length < wrappedArray.Length)
             {
@@ -1390,10 +1424,7 @@ public static class Algorithms
         /// <summary>
         /// Return true, to indicate that the list is fixed size.
         /// </summary>
-        bool IList.IsFixedSize
-        {
-            get { return true; }
-        }
+        bool IList.IsFixedSize => true;
     }
 
     /// <summary>
@@ -1411,12 +1442,12 @@ public static class Algorithms
     /// the list causes all the items to be replaced with a default value.</remarks>
     /// <param name="array">The array to wrap.</param>
     /// <returns>An IList&lt;T&gt; wrapper onto <paramref name="array"/>.</returns>
-    public static IList<T> ReadWriteList<T> (T[] array)
+    public static IList<T> ReadWriteList<T>
+        (
+            T[] array
+        )
     {
-        if (array == null)
-        {
-            throw new ArgumentNullException (nameof (array));
-        }
+        Sure.NotNull (array);
 
         return new ArrayWrapper<T> (array);
     }
@@ -1435,7 +1466,12 @@ public static class Algorithms
     /// <param name="replaceWith">The new value to replace with.</param>
     /// <returns>An new collection with the items from <paramref name="collection"/>, in the same order,
     /// with the appropriate replacements made.</returns>
-    public static IEnumerable<T> Replace<T> (IEnumerable<T> collection, T itemFind, T replaceWith)
+    public static IEnumerable<T> Replace<T>
+        (
+            IEnumerable<T> collection,
+            T itemFind,
+            T replaceWith
+        )
     {
         return Replace (collection, itemFind, replaceWith, EqualityComparer<T>.Default);
     }
@@ -1450,18 +1486,16 @@ public static class Algorithms
     /// <param name="equalityComparer">The IEqualityComparer&lt;T&gt; used to compare items for equality. Only the Equals method will be called.</param>
     /// <returns>An new collection with the items from <paramref name="collection"/>, in the same order,
     /// with the appropriate replacements made.</returns>
-    public static IEnumerable<T> Replace<T> (IEnumerable<T> collection, T itemFind, T replaceWith,
-        IEqualityComparer<T> equalityComparer)
+    public static IEnumerable<T> Replace<T>
+        (
+            IEnumerable<T> collection,
+            T itemFind,
+            T replaceWith,
+            IEqualityComparer<T> equalityComparer
+        )
     {
-        if (collection == null)
-        {
-            throw new ArgumentNullException (nameof (collection));
-        }
-
-        if (equalityComparer == null)
-        {
-            throw new ArgumentNullException (nameof (equalityComparer));
-        }
+        Sure.NotNull ((object?) collection);
+        Sure.NotNull (equalityComparer);
 
         foreach (var item in collection)
         {
@@ -1485,17 +1519,15 @@ public static class Algorithms
     /// <param name="replaceWith">The new value to replace with.</param>
     /// <returns>An new collection with the items from <paramref name="collection"/>, in the same order,
     /// with the appropriate replacements made.</returns>
-    public static IEnumerable<T> Replace<T> (IEnumerable<T> collection, Predicate<T> predicate, T replaceWith)
+    public static IEnumerable<T> Replace<T>
+        (
+            IEnumerable<T> collection,
+            Predicate<T> predicate,
+            T replaceWith
+        )
     {
-        if (collection == null)
-        {
-            throw new ArgumentNullException (nameof (collection));
-        }
-
-        if (predicate == null)
-        {
-            throw new ArgumentNullException (nameof (predicate));
-        }
+        Sure.NotNull ((object?) collection);
+        Sure.NotNull (predicate);
 
         foreach (var item in collection)
         {
@@ -1739,7 +1771,11 @@ public static class Algorithms
     /// will work correctly and modify an array passed as <paramref name="list"/>.</para></remarks>
     /// <param name="list">The list or array to process.</param>
     /// <param name="predicate">The BinaryPredicate used to compare items for "equality". </param>
-    public static void RemoveDuplicatesInPlace<T> (IList<T> list, BinaryPredicate<T> predicate)
+    public static void RemoveDuplicatesInPlace<T>
+        (
+            IList<T> list,
+            BinaryPredicate<T> predicate
+        )
     {
         if (list == null)
         {
@@ -2026,7 +2062,7 @@ public static class Algorithms
         }
 
         // didn't find any item that matches.
-        foundItem = default (T);
+        foundItem = default!;
         return false;
     }
 
@@ -2067,7 +2103,12 @@ public static class Algorithms
     /// <param name="foundItem">Outputs the last item in the collection that matches the condition, if the method returns true.</param>
     /// <returns>True if an item satisfying the condition was found. False if no such item exists in the collection.</returns>
     /// <seealso cref="FindLastWhere{T}"/>
-    public static bool TryFindLastWhere<T> (IEnumerable<T> collection, Predicate<T> predicate, out T foundItem)
+    public static bool TryFindLastWhere<T>
+        (
+            IEnumerable<T> collection,
+            Predicate<T> predicate,
+            out T foundItem
+        )
     {
         if (collection == null)
         {
@@ -2079,8 +2120,7 @@ public static class Algorithms
             throw new ArgumentNullException (nameof (predicate));
         }
 
-        var list = collection as IList<T>;
-        if (list != null)
+        if (collection is IList<T> list)
         {
             // If it's a list, we can iterate in reverse.
             for (var index = list.Count - 1; index >= 0; --index)
@@ -2094,13 +2134,13 @@ public static class Algorithms
             }
 
             // didn't find any item that matches.
-            foundItem = default (T);
+            foundItem = default!;
             return false;
         }
 
         // Otherwise, iterate the whole thing and remember the last matching one.
         var found = false;
-        foundItem = default (T);
+        foundItem = default!;
 
         foreach (var item in collection)
         {
@@ -2449,22 +2489,16 @@ public static class Algorithms
     /// <returns>The index of the first item "equal" to any of the items in the collection <paramref name="itemsToLookFor"/>, using
     /// <paramtype name="BinaryPredicate{T}"/> as the test for equality.
     /// -1 if no such item exists in the list.</returns>
-    public static int FirstIndexOfMany<T> (IList<T> list, IEnumerable<T> itemsToLookFor, BinaryPredicate<T> predicate)
+    public static int FirstIndexOfMany<T>
+        (
+            IList<T> list,
+            IEnumerable<T> itemsToLookFor,
+            BinaryPredicate<T> predicate
+        )
     {
-        if (list == null)
-        {
-            throw new ArgumentNullException (nameof (list));
-        }
-
-        if (itemsToLookFor == null)
-        {
-            throw new ArgumentNullException (nameof (itemsToLookFor));
-        }
-
-        if (predicate == null)
-        {
-            throw new ArgumentNullException (nameof (predicate));
-        }
+        Sure.NotNull (list);
+        Sure.NotNull ((object?) itemsToLookFor);
+        Sure.NotNull (predicate);
 
         // Scan the list for the items.
         var index = 0;
@@ -2494,7 +2528,11 @@ public static class Algorithms
     /// <param name="itemsToLookFor">The items to search for.</param>
     /// <returns>The index of the last item equal to any of the items in the collection <paramref name="itemsToLookFor"/>.
     /// -1 if no such item exists in the list.</returns>
-    public static int LastIndexOfMany<T> (IList<T> list, IEnumerable<T> itemsToLookFor)
+    public static int LastIndexOfMany<T>
+        (
+            IList<T> list,
+            IEnumerable<T> itemsToLookFor
+        )
     {
         return LastIndexOfMany (list, itemsToLookFor, EqualityComparer<T>.Default);
     }
@@ -2508,23 +2546,16 @@ public static class Algorithms
     /// <param name="equalityComparer">The IEqualityComparer&lt;T&gt; used to compare items for equality.</param>
     /// <returns>The index of the last item equal to any of the items in the collection <paramref name="itemsToLookFor"/>.
     /// -1 if no such item exists in the list.</returns>
-    public static int LastIndexOfMany<T> (IList<T> list, IEnumerable<T> itemsToLookFor,
-        IEqualityComparer<T> equalityComparer)
+    public static int LastIndexOfMany<T>
+        (
+            IList<T> list,
+            IEnumerable<T> itemsToLookFor,
+            IEqualityComparer<T> equalityComparer
+        )
     {
-        if (list == null)
-        {
-            throw new ArgumentNullException (nameof (list));
-        }
-
-        if (itemsToLookFor == null)
-        {
-            throw new ArgumentNullException (nameof (itemsToLookFor));
-        }
-
-        if (equalityComparer == null)
-        {
-            throw new ArgumentNullException (nameof (equalityComparer));
-        }
+        Sure.NotNull (list);
+        Sure.NotNull ((object?) itemsToLookFor);
+        Sure.NotNull (equalityComparer);
 
         // Create a set of the items we are looking for, for efficient lookup.
         var setToLookFor = new Set<T> (itemsToLookFor, equalityComparer);
@@ -2554,22 +2585,16 @@ public static class Algorithms
     /// <returns>The index of the last item "equal" to any of the items in the collection <paramref name="itemsToLookFor"/>, using
     /// <paramtype name="BinaryPredicate"/> as the test for equality.
     /// -1 if no such item exists in the list.</returns>
-    public static int LastIndexOfMany<T> (IList<T> list, IEnumerable<T> itemsToLookFor, BinaryPredicate<T> predicate)
+    public static int LastIndexOfMany<T>
+        (
+            IList<T> list,
+            IEnumerable<T> itemsToLookFor,
+            BinaryPredicate<T> predicate
+        )
     {
-        if (list == null)
-        {
-            throw new ArgumentNullException (nameof (list));
-        }
-
-        if (itemsToLookFor == null)
-        {
-            throw new ArgumentNullException (nameof (itemsToLookFor));
-        }
-
-        if (predicate == null)
-        {
-            throw new ArgumentNullException (nameof (predicate));
-        }
+        Sure.NotNull (list);
+        Sure.NotNull ((object?) itemsToLookFor);
+        Sure.NotNull (predicate);
 
         // Scan the list
         for (var index = list.Count - 1; index >= 0; --index)
@@ -2610,23 +2635,16 @@ public static class Algorithms
     /// <param name="equalityComparer">The IEqualityComparer&lt;T&gt; used to compare items for equality. </param>
     /// <returns>An IEnumerable&lt;T&gt; that enumerates the indices of items equal to
     /// any of the items in the collection <paramref name="itemsToLookFor"/>. </returns>
-    public static IEnumerable<int> IndicesOfMany<T> (IList<T> list, IEnumerable<T> itemsToLookFor,
-        IEqualityComparer<T> equalityComparer)
+    public static IEnumerable<int> IndicesOfMany<T>
+        (
+            IList<T> list,
+            IEnumerable<T> itemsToLookFor,
+            IEqualityComparer<T> equalityComparer
+        )
     {
-        if (list == null)
-        {
-            throw new ArgumentNullException (nameof (list));
-        }
-
-        if (itemsToLookFor == null)
-        {
-            throw new ArgumentNullException (nameof (itemsToLookFor));
-        }
-
-        if (equalityComparer == null)
-        {
-            throw new ArgumentNullException (nameof (equalityComparer));
-        }
+        Sure.NotNull (list);
+        Sure.NotNull ((object?) itemsToLookFor);
+        Sure.NotNull (equalityComparer);
 
         // Create a set of the items we are looking for, for efficient lookup.
         var setToLookFor = new Set<T> (itemsToLookFor, equalityComparer);
@@ -3387,8 +3405,14 @@ public static class Algorithms
     /// <returns>The string representation of the collection. If <paramref name="collection"/> is null, then the string "null" is returned.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="start"/>, <paramref name="separator"/>, or <paramref name="end"/>
     ///  is null.</exception>
-    public static string ToString<T> (IEnumerable<T> collection, bool recursive, string start, string separator,
-        string end)
+    public static string ToString<T>
+        (
+            IEnumerable<T>? collection,
+            bool recursive,
+            string start,
+            string separator,
+            string end
+        )
     {
         if (start == null)
         {
@@ -5484,7 +5508,6 @@ public static class Algorithms
     /// </example>
     /// <returns>IEqualityComparer&lt;IEnumerable&lt;T&gt;&gt; implementation suitable for
     /// comparing collections of T for equality.</returns>
-    /// <seealso cref="Algorithms.EqualCollections{T}"/>
     public static IEqualityComparer<IEnumerable<T>> GetCollectionEqualityComparer<T>()
     {
         return GetCollectionEqualityComparer (EqualityComparer<T>.Default);
@@ -5508,14 +5531,12 @@ public static class Algorithms
     /// <param name="equalityComparer">An IEqualityComparer&lt;T&gt; implementation used to compare individual T's.</param>
     /// <returns>IEqualityComparer&lt;IEnumerable&lt;T&gt;&gt; implementation suitable for
     /// comparing collections of T for equality.</returns>
-    /// <seealso cref="Algorithms.EqualCollections{T}"/>
-    public static IEqualityComparer<IEnumerable<T>> GetCollectionEqualityComparer<T> (
-        IEqualityComparer<T> equalityComparer)
+    public static IEqualityComparer<IEnumerable<T>> GetCollectionEqualityComparer<T>
+        (
+            IEqualityComparer<T> equalityComparer
+        )
     {
-        if (equalityComparer == null)
-        {
-            throw new ArgumentNullException (nameof (equalityComparer));
-        }
+        Sure.NotNull (equalityComparer);
 
         return new CollectionEqualityComparer<T> (equalityComparer);
     }
@@ -5570,7 +5591,6 @@ public static class Algorithms
     /// </example>
     /// <returns>IEqualityComparer&lt;IEnumerable&lt;T&gt;&gt; implementation suitable for
     /// comparing collections of T for equality, without regard to order.</returns>
-    /// <seealso cref="Algorithms.EqualSets{T}"/>
     public static IEqualityComparer<IEnumerable<T>> GetSetEqualityComparer<T>()
     {
         return GetSetEqualityComparer (EqualityComparer<T>.Default);
@@ -5593,13 +5613,12 @@ public static class Algorithms
     /// <param name="equalityComparer">An IEqualityComparer&lt;T&gt; implementation used to compare individual T's.</param>
     /// <returns>IEqualityComparer&lt;IEnumerable&lt;T&gt;&gt; implementation suitable for
     /// comparing collections of T for equality, without regard to order.</returns>
-    /// <seealso cref="Algorithms.EqualSets"/>
-    public static IEqualityComparer<IEnumerable<T>> GetSetEqualityComparer<T> (IEqualityComparer<T> equalityComparer)
+    public static IEqualityComparer<IEnumerable<T>> GetSetEqualityComparer<T>
+        (
+            IEqualityComparer<T> equalityComparer
+        )
     {
-        if (equalityComparer == null)
-        {
-            throw new ArgumentNullException (nameof (equalityComparer));
-        }
+        Sure.NotNull (equalityComparer);
 
         return new SetEqualityComparer<T> (equalityComparer);
     }

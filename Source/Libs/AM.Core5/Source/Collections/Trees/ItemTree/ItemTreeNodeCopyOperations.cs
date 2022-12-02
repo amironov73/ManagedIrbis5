@@ -167,13 +167,19 @@ public abstract partial class ItemTreeNode<TNode, TItem>
     /// <param name="allowNext">Predicate determining eligibility of source node and its descendants</param>
     /// <param name="mapToDestItem">Map source node to destination item</param>
     /// <param name="maxRelativeDepth">Max depth of traversal (relative to this node)</param>
-    public void MapCopyTo<TDestNode, TDestItem> (TDestNode destParent,
-        Func<TNode, bool> allowNext,
-        Func<TNode, TDestItem> mapToDestItem,
-        int? maxRelativeDepth = null)
+    public void MapCopyTo<TDestNode, TDestItem>
+        (
+            TDestNode destParent,
+            Func<TNode, bool>? allowNext,
+            Func<TNode, TDestItem> mapToDestItem,
+            int? maxRelativeDepth = null
+            )
         where TDestNode : ItemTreeNode<TDestNode, TDestItem>
     {
-        if (maxRelativeDepth <= 0) return;
+        if (maxRelativeDepth <= 0)
+        {
+            return;
+        }
 
         if (allowNext == null)
         {
@@ -181,7 +187,11 @@ public abstract partial class ItemTreeNode<TNode, TItem>
         }
         else
         {
-            if (!allowNext (This)) return;
+            if (!allowNext (This))
+            {
+                return;
+            }
+
             FilteredMapCopyTo (This, destParent, allowNext, mapToDestItem, 0, maxRelativeDepth ?? int.MaxValue);
         }
     }
@@ -202,7 +212,10 @@ public abstract partial class ItemTreeNode<TNode, TItem>
 
         destParent.Build (destValues);
 
-        if (++curDepth == maxRelativeDepth) return;
+        if (++curDepth == maxRelativeDepth)
+        {
+            return;
+        }
 
         var childPairs =
             sourceParent.Children
@@ -231,7 +244,10 @@ public abstract partial class ItemTreeNode<TNode, TItem>
 
         destParent.Build (destValues);
 
-        if (++curDepth == maxRelativeDepth) return;
+        if (++curDepth == maxRelativeDepth)
+        {
+            return;
+        }
 
         var childPairs =
             sourceParent.Children
