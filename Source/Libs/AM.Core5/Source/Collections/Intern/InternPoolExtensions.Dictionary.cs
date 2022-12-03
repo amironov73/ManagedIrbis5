@@ -7,6 +7,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
 /* InternPoolExtensions.Dictionary.cs --
@@ -32,12 +33,20 @@ namespace AM.Collections.Intern;
 /// </summary>
 public static partial class InternPoolExtensions
 {
-    public static string[] ToInternedArray (this string[] array)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="array"></param>
+    /// <returns></returns>
+    public static string[] ToInternedArray
+        (
+            this string[] array
+        )
     {
         var pool = InternPool.Shared;
 
         var newArray = new string[array.Length];
-        for (int i = 0; i < array.Length; i++)
+        for (var i = 0; i < array.Length; i++)
         {
             newArray[i] = pool.Intern (array[i]);
         }
@@ -45,9 +54,17 @@ public static partial class InternPoolExtensions
         return newArray;
     }
 
-    public static string Intern (this StringBuilder sb)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <returns></returns>
+    public static string Intern
+        (
+            this StringBuilder builder
+        )
     {
-        var count = sb.Length;
+        var count = builder.Length;
         char[]? array = null;
 #if NET5_0 || NETCOREAPP3_1
             if (count > InternPool.StackAllocThresholdChars)
@@ -63,9 +80,9 @@ public static partial class InternPoolExtensions
             span = span.Slice(0, count);
 #else
         array = ArrayPool<char>.Shared.Rent (count);
-        sb.CopyTo (0, array, 0, count);
+        builder.CopyTo (0, array, 0, count);
 
-        Span<char> span = array.AsSpan (0, count);
+        var span = array.AsSpan (0, count);
 #endif
         var result = InternPool.Shared.Intern (span);
         if (array != null)
@@ -76,13 +93,21 @@ public static partial class InternPoolExtensions
         return result;
     }
 
-    public static List<string> ToInternedList (this List<string> list)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="list"></param>
+    /// <returns></returns>
+    public static List<string> ToInternedList
+        (
+            this List<string> list
+        )
     {
         var pool = InternPool.Shared;
 
         var internedList = new List<string> (list.Count);
         var count = list.Count;
-        for (int i = 0; i < count; i++)
+        for (var i = 0; i < count; i++)
         {
             internedList.Add (pool.Intern (list[i]));
         }
@@ -90,13 +115,21 @@ public static partial class InternPoolExtensions
         return internedList;
     }
 
-    public static List<string> ToInternedList (this IList<string> list)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="list"></param>
+    /// <returns></returns>
+    public static List<string> ToInternedList
+        (
+            this IList<string> list
+        )
     {
         var pool = InternPool.Shared;
 
         var internedList = new List<string> (list.Count);
         var count = list.Count;
-        for (int i = 0; i < count; i++)
+        for (var i = 0; i < count; i++)
         {
             internedList.Add (pool.Intern (list[i]));
         }
@@ -104,7 +137,15 @@ public static partial class InternPoolExtensions
         return internedList;
     }
 
-    public static List<string> ToInternedList (this ICollection<string> collection)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="collection"></param>
+    /// <returns></returns>
+    public static List<string> ToInternedList
+        (
+            this ICollection<string> collection
+        )
     {
         var pool = InternPool.Shared;
 
@@ -117,7 +158,15 @@ public static partial class InternPoolExtensions
         return internedList;
     }
 
-    public static Dictionary<string, string> ToInternedDictionary (this Dictionary<string, string> dict)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="dict"></param>
+    /// <returns></returns>
+    public static Dictionary<string, string> ToInternedDictionary
+        (
+            this Dictionary<string, string> dict
+        )
     {
         var pool = InternPool.Shared;
 
@@ -130,7 +179,16 @@ public static partial class InternPoolExtensions
         return internedDict;
     }
 
-    public static Dictionary<string, TValue> ToInternedDictionary<TValue> (this Dictionary<string, TValue> dict)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="dict"></param>
+    /// <typeparam name="TValue"></typeparam>
+    /// <returns></returns>
+    public static Dictionary<string, TValue> ToInternedDictionary<TValue>
+        (
+            this Dictionary<string, TValue> dict
+        )
     {
         var pool = InternPool.Shared;
 
@@ -143,7 +201,16 @@ public static partial class InternPoolExtensions
         return internedDict;
     }
 
-    public static Dictionary<TKey, string> ToInternedDictionary<TKey> (this Dictionary<TKey, string> dict)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="dict"></param>
+    /// <typeparam name="TKey"></typeparam>
+    /// <returns></returns>
+    public static Dictionary<TKey, string> ToInternedDictionary<TKey>
+        (
+            this Dictionary<TKey, string> dict
+        )
         where TKey : notnull
     {
         var pool = InternPool.Shared;
@@ -157,8 +224,17 @@ public static partial class InternPoolExtensions
         return internedDict;
     }
 
-    public static Dictionary<string, string> ToInternedDictionary (this IDictionary<string, string> dict,
-        IEqualityComparer<string> comparer)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="dict"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static Dictionary<string, string> ToInternedDictionary
+        (
+            this IDictionary<string, string> dict,
+            IEqualityComparer<string> comparer
+        )
     {
         var pool = InternPool.Shared;
 
@@ -171,8 +247,18 @@ public static partial class InternPoolExtensions
         return internedDict;
     }
 
-    public static Dictionary<string, TValue> ToInternedDictionary<TValue> (this IDictionary<string, TValue> dict,
-        IEqualityComparer<string> comparer)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="dict"></param>
+    /// <param name="comparer"></param>
+    /// <typeparam name="TValue"></typeparam>
+    /// <returns></returns>
+    public static Dictionary<string, TValue> ToInternedDictionary<TValue>
+        (
+            this IDictionary<string, TValue> dict,
+            IEqualityComparer<string> comparer
+        )
     {
         var pool = InternPool.Shared;
 
@@ -185,9 +271,19 @@ public static partial class InternPoolExtensions
         return internedDict;
     }
 
-    public static Dictionary<TKey, string> ToInternedDictionary<TKey> (this IDictionary<TKey, string> dict,
-        IEqualityComparer<TKey> comparer)
-        where TKey : notnull
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="dict"></param>
+    /// <param name="comparer"></param>
+    /// <typeparam name="TKey"></typeparam>
+    /// <returns></returns>
+    public static Dictionary<TKey, string> ToInternedDictionary<TKey>
+        (
+            this IDictionary<TKey, string> dict,
+            IEqualityComparer<TKey> comparer
+        )
+        where TKey: notnull
     {
         var pool = InternPool.Shared;
 
@@ -200,8 +296,15 @@ public static partial class InternPoolExtensions
         return internedDict;
     }
 
-    public static ConcurrentDictionary<string, string> ToInternedConcurrentDictionary (
-        this Dictionary<string, string> dict)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="dict"></param>
+    /// <returns></returns>
+    public static ConcurrentDictionary<string, string> ToInternedConcurrentDictionary
+        (
+            this Dictionary<string, string> dict
+        )
     {
         var pool = InternPool.Shared;
 
@@ -214,8 +317,16 @@ public static partial class InternPoolExtensions
         return internedDict;
     }
 
-    public static ConcurrentDictionary<string, TValue> ToInternedConcurrentDictionary<TValue> (
-        this Dictionary<string, TValue> dict)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="dict"></param>
+    /// <typeparam name="TValue"></typeparam>
+    /// <returns></returns>
+    public static ConcurrentDictionary<string, TValue> ToInternedConcurrentDictionary<TValue>
+        (
+            this Dictionary<string, TValue> dict
+        )
     {
         var pool = InternPool.Shared;
 
@@ -228,9 +339,17 @@ public static partial class InternPoolExtensions
         return internedDict;
     }
 
-    public static ConcurrentDictionary<TKey, string> ToInternedConcurrentDictionary<TKey> (
-        this Dictionary<TKey, string> dict)
-        where TKey : notnull
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="dict"></param>
+    /// <typeparam name="TKey"></typeparam>
+    /// <returns></returns>
+    public static ConcurrentDictionary<TKey, string> ToInternedConcurrentDictionary<TKey>
+        (
+            this Dictionary<TKey, string> dict
+        )
+        where TKey: notnull
     {
         var pool = InternPool.Shared;
 
@@ -243,8 +362,17 @@ public static partial class InternPoolExtensions
         return internedDict;
     }
 
-    public static ConcurrentDictionary<string, string> ToInternedConcurrentDictionary (
-        this IDictionary<string, string> dict, IEqualityComparer<string> comparer)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="dict"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static ConcurrentDictionary<string, string> ToInternedConcurrentDictionary
+        (
+            this IDictionary<string, string> dict,
+            IEqualityComparer<string> comparer
+        )
     {
         var pool = InternPool.Shared;
 
@@ -257,8 +385,18 @@ public static partial class InternPoolExtensions
         return internedDict;
     }
 
-    public static ConcurrentDictionary<string, TValue> ToInternedConcurrentDictionary<TValue> (
-        this IDictionary<string, TValue> dict, IEqualityComparer<string> comparer)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="dict"></param>
+    /// <param name="comparer"></param>
+    /// <typeparam name="TValue"></typeparam>
+    /// <returns></returns>
+    public static ConcurrentDictionary<string, TValue> ToInternedConcurrentDictionary<TValue>
+        (
+            this IDictionary<string, TValue> dict,
+            IEqualityComparer<string> comparer
+        )
     {
         var pool = InternPool.Shared;
 
@@ -271,8 +409,18 @@ public static partial class InternPoolExtensions
         return internedDict;
     }
 
-    public static ConcurrentDictionary<TKey, string> ToInternedConcurrentDictionary<TKey> (
-        this IDictionary<TKey, string> dict, IEqualityComparer<TKey> comparer)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="dict"></param>
+    /// <param name="comparer"></param>
+    /// <typeparam name="TKey"></typeparam>
+    /// <returns></returns>
+    public static ConcurrentDictionary<TKey, string> ToInternedConcurrentDictionary<TKey>
+        (
+            this IDictionary<TKey, string> dict,
+            IEqualityComparer<TKey> comparer
+        )
         where TKey : notnull
     {
         var pool = InternPool.Shared;

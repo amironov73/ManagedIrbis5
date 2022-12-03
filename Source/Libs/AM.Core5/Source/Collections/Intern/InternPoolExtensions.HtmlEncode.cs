@@ -33,7 +33,17 @@ public static partial class InternPoolExtensions
     // 32bit hex entity &#xffff0000;
     internal const int MaxCharExpansionSize = 10;
 
-    public static string HtmlEncode (this IInternPool pool, string input)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="pool"></param>
+    /// <param name="input"></param>
+    /// <returns></returns>
+    public static string HtmlEncode
+        (
+            this IInternPool pool,
+            string input
+        )
         => HtmlEncode (pool, input.AsSpan());
 
 #if NET5_0
@@ -59,7 +69,19 @@ public static partial class InternPoolExtensions
 
         public static string HtmlEncodeSlower(this IInternPool pool, ReadOnlySpan<char> input)
 #else
-    public static string HtmlEncode (this IInternPool pool, ReadOnlySpan<char> input)
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="pool"></param>
+    /// <param name="input"></param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public static string HtmlEncode
+        (
+            this IInternPool pool,
+            ReadOnlySpan<char> input
+        )
 #endif
     {
         // Need largest size, can't do multiple rounds of encoding due to https://github.com/dotnet/runtime/issues/45994

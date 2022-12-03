@@ -27,7 +27,8 @@ using System.Threading;
 
 namespace AM.Collections.Intern;
 
-public partial class SharedInternPool : IInternPool
+public partial class SharedInternPool
+    : IInternPool
 {
     private const int NumberOfPools = 32;
     private const int NumberOfPoolsMask = NumberOfPools - 1;
@@ -36,15 +37,28 @@ public partial class SharedInternPool : IInternPool
     private readonly InternPool?[] _pools = new InternPool[NumberOfPools];
     private int _callbackCreated;
 
-    public bool Contains (string item)
+    /// <inheritdoc cref="IInternPool.Contains"/>
+    public bool Contains
+        (
+            string item
+        )
     {
-        if (string.IsNullOrEmpty (item)) return true;
+        if (string.IsNullOrEmpty (item))
+        {
+            return true;
+        }
 
-        if (item.Length > MaxLength) return false;
+        if (item.Length > MaxLength)
+        {
+            return false;
+        }
 
         var pool = _pools[item[0]];
 
-        if (pool is null) return false;
+        if (pool is null)
+        {
+            return false;
+        }
 
         lock (pool)
         {
@@ -52,10 +66,25 @@ public partial class SharedInternPool : IInternPool
         }
     }
 
-    public string Intern (ReadOnlySpan<char> value)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public string Intern
+        (
+            ReadOnlySpan<char> value
+        )
     {
-        if (value.Length == 0) return string.Empty;
-        if (value.Length > MaxLength) return value.ToString();
+        if (value.Length == 0)
+        {
+            return string.Empty;
+        }
+
+        if (value.Length > MaxLength)
+        {
+            return value.ToString();
+        }
 
         var firstChar = value[0];
         var pool = GetPool (firstChar);
@@ -66,15 +95,31 @@ public partial class SharedInternPool : IInternPool
         return InternSynchronized (pool, hashCode, randomisedHash, value);
     }
 
-#if !NETSTANDARD2_0
-    [return: NotNullIfNotNull ("value")]
-#endif
-    public string? Intern (string? value)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    [return: NotNullIfNotNull (nameof (value))]
+    public string? Intern
+        (
+            string? value
+        )
     {
-        if (value is null) return null;
-        if (value.Length == 0) return string.Empty;
+        if (value is null)
+        {
+            return null;
+        }
 
-        if (value.Length > MaxLength) return value;
+        if (value.Length == 0)
+        {
+            return string.Empty;
+        }
+
+        if (value.Length > MaxLength)
+        {
+            return value;
+        }
 
         var firstChar = value[0];
         var pool = GetPool (firstChar);
@@ -86,11 +131,25 @@ public partial class SharedInternPool : IInternPool
         return InternSynchronized (pool, hashCode, randomisedHash, span);
     }
 
-    public unsafe string InternAscii (ReadOnlySpan<byte> asciiValue)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="asciiValue"></param>
+    /// <returns></returns>
+    public unsafe string InternAscii
+        (
+            ReadOnlySpan<byte> asciiValue
+        )
     {
-        if (asciiValue.Length == 0) return string.Empty;
+        if (asciiValue.Length == 0)
+        {
+            return string.Empty;
+        }
 #if !NETSTANDARD2_0
-        if (asciiValue.Length > MaxLength) return Encoding.ASCII.GetString (asciiValue);
+        if (asciiValue.Length > MaxLength)
+        {
+            return Encoding.ASCII.GetString (asciiValue);
+        }
 #else
             fixed (byte* pValue = &MemoryMarshal.GetReference(asciiValue))
             {
@@ -107,16 +166,38 @@ public partial class SharedInternPool : IInternPool
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="value"></param>
+    /// <param name="encoding"></param>
+    /// <returns></returns>
     public string Intern (byte[]? value, Encoding encoding)
         => Intern (value.AsSpan(), encoding);
 
 #if !NETSTANDARD2_0
-    public string Intern (ReadOnlySpan<byte> value, Encoding encoding)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="value"></param>
+    /// <param name="encoding"></param>
+    /// <returns></returns>
+    public string Intern
+        (
+            ReadOnlySpan<byte> value,
+            Encoding encoding
+        )
     {
-        if (value.Length == 0) return string.Empty;
+        if (value.Length == 0)
+        {
+            return string.Empty;
+        }
+
         int count = encoding.GetMaxCharCount (value.Length);
         if (count > MaxLength)
+        {
             return encoding.GetString (value);
+        }
 
         char[]? array = null;
 
@@ -190,12 +271,26 @@ public partial class SharedInternPool : IInternPool
 #endif
 
 #if !NETSTANDARD2_0
-    public string InternUtf8 (ReadOnlySpan<byte> utf8Value)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="utf8Value"></param>
+    /// <returns></returns>
+    public string InternUtf8
+        (
+            ReadOnlySpan<byte> utf8Value
+        )
     {
-        if (utf8Value.Length == 0) return string.Empty;
+        if (utf8Value.Length == 0)
+        {
+            return string.Empty;
+        }
+
         int count = utf8Value.Length * 2; // 2 x length for invalid sequence encoding
         if (count > MaxLength)
+        {
             return Encoding.UTF8.GetString (utf8Value);
+        }
 
         char[]? array = null;
 
