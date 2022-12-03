@@ -15,7 +15,7 @@ namespace TreeCollections
         {
             if (!OnAddCanProceed())
             {
-                return null;
+                return null!;
             }
 
             var newNode = Create (item, This);

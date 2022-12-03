@@ -38,7 +38,7 @@ namespace TreeCollections
 
         private void SetSiblingErrors()
         {
-            TNode[] siblings = null;
+            TNode[] siblings = null!;
 
             if (CheckOptions.HasFlag (ErrorCheckOptions.SiblingIdDuplicates))
             {

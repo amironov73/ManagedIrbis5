@@ -41,15 +41,19 @@ public partial class DictionarySlim<TKey, TValue>
         {
             _map = map;
             index = -1;
-            _current = default (KeyValuePair<TKey, TValue>);
+            _current = default;
         }
 
+        /// <inheritdoc cref="IEnumerator{T}.Current"/>
         public KeyValuePair<TKey, TValue> Current => _current;
 
+        /// <inheritdoc cref="IEnumerator.MoveNext"/>
         public bool MoveNext() => _map.TryGetNext (ref index, out _current);
 
+        /// <inheritdoc cref="IDisposable.Dispose"/>
         public void Dispose()
         {
+            // пустое тело метода
         }
 
         object IEnumerator.Current => _current;

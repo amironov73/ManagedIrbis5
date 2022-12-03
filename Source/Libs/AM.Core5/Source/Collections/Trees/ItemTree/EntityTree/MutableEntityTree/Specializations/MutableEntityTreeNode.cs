@@ -57,6 +57,10 @@ namespace TreeCollections
             UpdateSiblingAliasErrors();
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="name"></param>
         protected abstract void SetItemName (TName name);
 
         private void UpdateSiblingAliasErrors()
