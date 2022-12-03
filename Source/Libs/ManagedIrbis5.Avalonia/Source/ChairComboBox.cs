@@ -1,12 +1,15 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable AutoPropertyCanBeMadeGetOnly.Global
 // ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable CoVariantArrayConversion
 // ReSharper disable IdentifierTypo
+// ReSharper disable LocalizableElement
+// ReSharper disable PartialTypeWithSinglePart
+// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 /* ChairComboBox.cs -- выпадающий список кафедр обслуживания
  * Ars Magna project, http://arsmagna.ru
@@ -14,9 +17,12 @@
 
 #region Using directives
 
-using System.Windows.Forms;
+using System;
 
 using AM;
+
+using Avalonia.Controls;
+using Avalonia.Styling;
 
 using ManagedIrbis.Providers;
 using ManagedIrbis.Readers;
@@ -25,14 +31,13 @@ using ManagedIrbis.Readers;
 
 #nullable enable
 
-namespace ManagedIrbis.WinForms;
+namespace ManagedIrbis.Avalonia;
 
 /// <summary>
 /// Выпадающий список кафедр обслуживания.
 /// </summary>
-[System.ComponentModel.DesignerCategory ("Code")]
 public sealed class ChairComboBox
-    : ComboBox
+    : ComboBox, IStyleable
 {
     #region Properties
 
@@ -40,18 +45,6 @@ public sealed class ChairComboBox
     /// Выбранная кафедра.
     /// </summary>
     public ChairInfo? SelectedChair => SelectedItem as ChairInfo;
-
-    #endregion
-
-    #region Construction
-
-    /// <summary>
-    /// Конструктор по умолчанию.
-    /// </summary>
-    public ChairComboBox()
-    {
-        DropDownStyle = ComboBoxStyle.DropDownList;
-    }
 
     #endregion
 
@@ -69,14 +62,12 @@ public sealed class ChairComboBox
         Sure.NotNull (connection);
         connection.EnsureConnected();
 
-        var chairs = ChairInfo.Read
+        Items = ChairInfo.Read
             (
                 connection,
                 ChairInfo.ChairMenu,
                 addAllItem
             );
-        Items.Clear();
-        Items.AddRange (chairs);
     }
 
     /// <summary>
@@ -91,15 +82,20 @@ public sealed class ChairComboBox
         Sure.NotNull (connection);
         connection.EnsureConnected();
 
-        var chairs = ChairInfo.Read
+        Items = ChairInfo.Read
             (
                 connection,
                 ChairInfo.PlacesMenu,
                 addAllItem
             );
-        Items.Clear();
-        Items.AddRange (chairs);
     }
+
+    #endregion
+
+    #region Private members
+
+    /// <inheritdoc cref="IStyleable.StyleKey"/>
+    Type IStyleable.StyleKey => typeof (ComboBox);
 
     #endregion
 }

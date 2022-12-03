@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable AutoPropertyCanBeMadeGetOnly.Global
 // ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable CoVariantArrayConversion
 // ReSharper disable IdentifierTypo
+// ReSharper disable LocalizableElement
+// ReSharper disable PartialTypeWithSinglePart
+// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 
 /* DatabaseComboBox.cs -- выпадающий список баз данных
@@ -13,9 +17,12 @@
 
 #region Using directives
 
-using System.Windows.Forms;
+using System;
 
 using AM;
+
+using Avalonia.Controls;
+using Avalonia.Styling;
 
 using ManagedIrbis.Providers;
 
@@ -23,14 +30,13 @@ using ManagedIrbis.Providers;
 
 #nullable enable
 
-namespace ManagedIrbis.WinForms;
+namespace ManagedIrbis.Avalonia;
 
 /// <summary>
 /// Выпадающий список баз данных.
 /// </summary>
-[System.ComponentModel.DesignerCategory ("Code")]
 public sealed class DatabaseComboBox
-    : ComboBox
+    : ComboBox, IStyleable
 {
     #region Properties
 
@@ -38,18 +44,6 @@ public sealed class DatabaseComboBox
     /// Выбранная пользователем база данных.
     /// </summary>
     public DatabaseInfo? SelectedDatabase => SelectedItem as DatabaseInfo;
-
-    #endregion
-
-    #region Construction
-
-    /// <summary>
-    /// Конструктор по умолчанию.
-    /// </summary>
-    public DatabaseComboBox()
-    {
-        DropDownStyle = ComboBoxStyle.DropDownList;
-    }
 
     #endregion
 
@@ -68,10 +62,15 @@ public sealed class DatabaseComboBox
         Sure.NotNullNorEmpty (listFile);
         connection.EnsureConnected();
 
-        var databases = connection.ListDatabases (listFile);
-        Items.Clear();
-        Items.AddRange (databases);
+        Items = connection.ListDatabases (listFile);
     }
+
+    #endregion
+
+    #region Private members
+
+    /// <inheritdoc cref="IStyleable.StyleKey"/>
+    Type IStyleable.StyleKey => typeof (ComboBox);
 
     #endregion
 }
