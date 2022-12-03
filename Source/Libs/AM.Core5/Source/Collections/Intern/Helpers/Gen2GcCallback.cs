@@ -30,7 +30,8 @@ namespace AM.Collections.Intern;
 /// Schedules a callback roughly every gen 2 GC (you may see a Gen 0 an Gen 1 but only once)
 /// (We can fix this by capturing the Gen 2 count at startup and testing, but I mostly don't care)
 /// </summary>
-internal sealed class Gen2GcCallback : CriticalFinalizerObject
+internal sealed class Gen2GcCallback
+    : CriticalFinalizerObject
 {
     private readonly Func<bool>? _callback0;
     private readonly Func<object, bool>? _callback1;
@@ -41,7 +42,11 @@ internal sealed class Gen2GcCallback : CriticalFinalizerObject
         _callback0 = callback;
     }
 
-    private Gen2GcCallback (Func<object, bool> callback, object targetObj)
+    private Gen2GcCallback
+        (
+            Func<object, bool> callback,
+            object targetObj
+        )
     {
         _callback1 = callback;
         _weakTargetObj = GCHandle.Alloc (targetObj, GCHandleType.Weak);
@@ -51,10 +56,13 @@ internal sealed class Gen2GcCallback : CriticalFinalizerObject
     /// Schedule 'callback' to be called in the next GC.  If the callback returns true it is
     /// rescheduled for the next Gen 2 GC.  Otherwise the callbacks stop.
     /// </summary>
-    public static void Register (Func<bool> callback)
+    public static void Register
+        (
+            Func<bool> callback
+        )
     {
         // Create a unreachable object that remembers the callback function and target object.
-        new Gen2GcCallback (callback);
+        new Gen2GcCallback (callback).NotUsed();
     }
 
     /// <summary>
@@ -64,10 +72,14 @@ internal sealed class Gen2GcCallback : CriticalFinalizerObject
     /// NOTE: This callback will be kept alive until either the callback function returns false,
     /// or the target object dies.
     /// </summary>
-    public static void Register (Func<object, bool> callback, object targetObj)
+    public static void Register
+        (
+            Func<object, bool> callback,
+            object targetObj
+        )
     {
         // Create a unreachable object that remembers the callback function and target object.
-        new Gen2GcCallback (callback, targetObj);
+        new Gen2GcCallback (callback, targetObj).NotUsed();
     }
 
     ~Gen2GcCallback()

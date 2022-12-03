@@ -37,20 +37,25 @@ namespace AM.Collections.Intern;
 ///
 /// </summary>
 [DebuggerDisplay ("Count = {Count}")]
-public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadOnlyCollection<string>
+public class InternPool
+    : IInternPool, ICollection<string>,
+        ISet<string>,
+        IReadOnlyCollection<string>
 #if NET5_0
         , IReadOnlySet<string>
 #endif
 {
     private static SharedInternPool? s_shared;
 
+    /// <summary>
+    ///
+    /// </summary>
     public static SharedInternPool Shared
     {
         get
         {
             var shared = s_shared;
-            if (shared != null) return shared;
-            return CreateSharedPool();
+            return shared ?? CreateSharedPool();
         }
     }
 
@@ -122,6 +127,9 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
     /// </summary>
     public long Added => _adds;
 
+    /// <summary>
+    ///
+    /// </summary>
     public long Evicted => _evicted;
 
     private long GetFirstUse() => _lastUse;
@@ -147,7 +155,11 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
     /// and is unbounded.
     /// </summary>
     /// <param name="capacity">The initial size of the <see cref="InternPool"/></param>
-    public InternPool (int capacity) : this()
+    public InternPool
+        (
+            int capacity
+        )
+        : this()
     {
         if (capacity < 0)
         {
@@ -168,14 +180,19 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
     /// <param name="capacity">The initial size of the <see cref="InternPool"/></param>
     /// <param name="maxCount">The max size of the <see cref="InternPool"/>;
     /// least recently used entries are evicted when max size is reached and a new item is added.</param>
-    public InternPool (int capacity, int maxCount) : this()
+    public InternPool
+        (
+            int capacity,
+            int maxCount
+        )
+        : this()
     {
         if (capacity < 0)
         {
             ThrowHelper.ThrowArgumentOutOfRangeException (ExceptionArgument.capacity);
         }
 
-        if (maxCount < -1 || maxCount == 0)
+        if (maxCount is < -1 or 0)
         {
             ThrowHelper.ThrowArgumentOutOfRangeException (ExceptionArgument.maxSize);
         }
@@ -192,7 +209,18 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
         }
     }
 
-    public InternPool (int capacity, int maxCount, int maxLength)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="capacity"></param>
+    /// <param name="maxCount"></param>
+    /// <param name="maxLength"></param>
+    public InternPool
+        (
+            int capacity,
+            int maxCount,
+            int maxLength
+        )
         : this (capacity, maxCount)
     {
         if (maxLength < 1)
@@ -209,8 +237,13 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
     /// and is unbounded.
     /// </summary>
     /// <param name="collection">The collection whose elements are copied to the new set.</param>
-    public InternPool (IEnumerable<string> collection) : this (collection, maxCount: -1)
+    public InternPool
+        (
+            IEnumerable<string> collection
+        )
+        : this (collection, maxCount: -1)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -221,14 +254,16 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
     /// <param name="collection">The collection whose elements are copied to the new set.</param>
     /// <param name="maxCount">The max size of the <see cref="InternPool"/>;
     /// least recently used entries are evicted when max size is reached and a new item is added.</param>
-    public InternPool (IEnumerable<string> collection, int maxCount) : this()
+    public InternPool
+        (
+            IEnumerable<string> collection,
+            int maxCount
+        )
+        : this()
     {
-        if (collection == null)
-        {
-            ThrowHelper.ThrowArgumentNullException (ExceptionArgument.collection);
-        }
+        Sure.NotNull ((object?) collection);
 
-        if (maxCount < -1 || maxCount == 0)
+        if (maxCount is < -1 or 0)
         {
             ThrowHelper.ThrowArgumentOutOfRangeException (ExceptionArgument.maxSize);
         }
@@ -245,7 +280,7 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
             // contain duplicates, so call TrimExcess if resulting InternPool is larger than the threshold.
             if (collection is ICollection<string> coll)
             {
-                int count = coll.Count;
+                var count = coll.Count;
                 if (count > 0)
                 {
                     Initialize (count);
@@ -262,16 +297,22 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
     }
 
     /// <summary>Adds the specified ASCII string to the intern pool if it's not already contained.</summary>
-    /// <param name="value">The byte sequence to add to the intern pool.</param>
+    /// <param name="asciiValue">The byte sequence to add to the intern pool.</param>
     /// <returns>The interned string.</returns>
-    public string InternAscii (byte[] asciiValue)
+    public string InternAscii
+        (
+            byte[] asciiValue
+        )
         => InternAscii (new ReadOnlySpan<byte> (asciiValue));
 
     /// <summary>Adds the specified ASCII string to the intern pool if it's not already contained.</summary>
-    /// <param name="value">The element to add to the intern pool.</param>
+    /// <param name="asciiValue">The element to add to the intern pool.</param>
     /// <returns>The interned string.</returns>
 #if !NETSTANDARD2_0
-    public string InternAscii (ReadOnlySpan<byte> asciiValue)
+    public string InternAscii
+        (
+            ReadOnlySpan<byte> asciiValue
+        )
     {
         if (asciiValue.Length == 0)
         {
@@ -293,13 +334,13 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
 #if NET5_0
             Span<char> span = array is null ? stackalloc char[StackAllocThresholdChars] : array;
 #else
-        Span<char> span = array is null ? stackalloc char[asciiValue.Length] : array;
+        var span = array ?? stackalloc char[asciiValue.Length];
 #endif
 
-        int count = Encoding.ASCII.GetChars (asciiValue, span);
+        var count = Encoding.ASCII.GetChars (asciiValue, span);
         span = span.Slice (0, count);
 
-        string value = Intern (span);
+        var value = Intern (span);
 
         if (array != null)
         {
@@ -363,7 +404,11 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
     /// <param name="encoding">The specific encoding to use.</param>
     /// <returns>The interned string.</returns>
 #if !NETSTANDARD2_0
-    public string Intern (ReadOnlySpan<byte> value, Encoding encoding)
+    public string Intern
+        (
+            ReadOnlySpan<byte> value,
+            Encoding encoding
+        )
     {
         if (value.Length == 0)
         {
@@ -378,7 +423,7 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
 
         char[]? array = null;
 
-        int count = encoding.GetCharCount (value);
+        var count = encoding.GetCharCount (value);
         if (count > _maxLength)
         {
             return encoding.GetString (value);
@@ -392,13 +437,13 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
 #if NET5_0
             Span<char> span = array is null ? stackalloc char[StackAllocThresholdChars] : array;
 #else
-        Span<char> span = array is null ? stackalloc char[count] : array;
+        var span = array ?? stackalloc char[count];
 #endif
 
         count = encoding.GetChars (value, span);
         span = span.Slice (0, count);
 
-        string strValue = Intern (span);
+        var strValue = Intern (span);
 
         if (array != null)
         {
@@ -457,13 +502,16 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
 #endif
 
     /// <summary>Adds the specified UTF8 string to the intern pool if it's not already contained.</summary>
-    /// <param name="value">The byte sequence to add to the intern pool.</param>
+    /// <param name="utf8Value">The byte sequence to add to the intern pool.</param>
     /// <returns>The interned string.</returns>
-    public string InternUtf8 (byte[] utf8Value)
+    public string InternUtf8
+        (
+            byte[] utf8Value
+        )
         => InternUtf8 (new ReadOnlySpan<byte> (utf8Value));
 
     /// <summary>Adds the specified UTF8 string to the intern pool if it's not already contained.</summary>
-    /// <param name="value">The byte sequence to add to the intern pool.</param>
+    /// <param name="utf8Value">The byte sequence to add to the intern pool.</param>
     /// <returns>The interned string.</returns>
 #if NET5_0 || NETCOREAPP3_1
         public string InternUtf8(ReadOnlySpan<byte> utf8Value)
@@ -506,7 +554,10 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
             return value;
         }
 #else
-    public unsafe string InternUtf8 (ReadOnlySpan<byte> utf8Value)
+    public unsafe string InternUtf8
+        (
+            ReadOnlySpan<byte> utf8Value
+        )
     {
         if (utf8Value.Length == 0)
         {
@@ -523,7 +574,7 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
 
             char[]? array = null;
 
-            int count = Encoding.UTF8.GetCharCount (pValue, utf8Value.Length);
+            var count = Encoding.UTF8.GetCharCount (pValue, utf8Value.Length);
             if (count > _maxLength)
             {
                 return Encoding.UTF8.GetString (pValue, utf8Value.Length);
@@ -534,7 +585,7 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
                 array = ArrayPool<char>.Shared.Rent (count);
             }
 
-            Span<char> span = array is null ? stackalloc char[count] : array;
+            var span = array ?? stackalloc char[count];
 
             fixed (char* pOutput = &MemoryMarshal.GetReference (span))
             {
@@ -543,7 +594,7 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
 
             span = span.Slice (0, count);
 
-            string value = Intern (span);
+            var value = Intern (span);
 
             if (array != null)
             {
@@ -554,16 +605,27 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
         }
     }
 #endif
-    internal int GetHashCode (ReadOnlySpan<char> value, out bool randomisedHash)
+    internal int GetHashCode
+        (
+            ReadOnlySpan<char> value,
+            out bool randomisedHash
+        )
     {
         randomisedHash = _randomisedHash;
         return randomisedHash ? value.GetRandomizedHashCode() : value.GetNonRandomizedHashCode();
     }
 
     /// <summary>Adds the specified element to the intern pool if it's not already contained.</summary>
+    /// <param name="randomisedHash"></param>
     /// <param name="value">The char sequence to add to the intern pool.</param>
+    /// <param name="hashCode"></param>
     /// <returns>The interned string.</returns>
-    internal string Intern (int hashCode, bool randomisedHash, ReadOnlySpan<char> value)
+    internal string Intern
+        (
+            int hashCode,
+            bool randomisedHash,
+            ReadOnlySpan<char> value
+        )
     {
         _lastUse += 2;
         if (value.Length == 0) return string.Empty;
@@ -576,11 +638,11 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
 
         Debug.Assert (_buckets != null);
 
-        Entry[]? entries = _entries;
+        var entries = _entries;
         Debug.Assert (entries != null, "expected entries to be non-null");
 
         uint collisionCount = 0;
-        ref int bucket = ref Unsafe.NullRef<int>();
+        ref var bucket = ref Unsafe.NullRef<int>();
 
         if (randomisedHash != _randomisedHash)
         {
@@ -589,11 +651,11 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
         }
 
         bucket = ref GetBucketRef (hashCode);
-        int i = bucket - 1; // Value in _buckets is 1-based
+        var i = bucket - 1; // Value in _buckets is 1-based
 
         while (i >= 0)
         {
-            ref Entry entry = ref entries[i];
+            ref var entry = ref entries[i];
             if (entry.HashCode == hashCode && value.SequenceEqual (entry.Value.AsSpan()))
             {
                 if (entry.LastUse < 0)
@@ -621,13 +683,19 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
     /// <summary>Adds the specified element to the intern pool if it's not already contained.</summary>
     /// <param name="value">The char sequence to add to the intern pool.</param>
     /// <returns>The interned string.</returns>
-    public string Intern (char[] value)
+    public string Intern
+        (
+            char[] value
+        )
         => Intern (new ReadOnlySpan<char> (value));
 
     /// <summary>Adds the specified element to the intern pool if it's not already contained.</summary>
     /// <param name="value">The char sequence to add to the intern pool.</param>
     /// <returns>The interned string.</returns>
-    public string Intern (ReadOnlySpan<char> value)
+    public string Intern
+        (
+            ReadOnlySpan<char> value
+        )
     {
         _lastUse += 2;
         if (value.Length == 0) return string.Empty;
@@ -640,21 +708,21 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
 
         Debug.Assert (_buckets != null);
 
-        Entry[]? entries = _entries;
+        var entries = _entries;
         Debug.Assert (entries != null, "expected entries to be non-null");
 
         int hashCode;
 
         uint collisionCount = 0;
-        ref int bucket = ref Unsafe.NullRef<int>();
+        ref var bucket = ref Unsafe.NullRef<int>();
 
         hashCode = _randomisedHash ? value.GetRandomizedHashCode() : value.GetNonRandomizedHashCode();
         bucket = ref GetBucketRef (hashCode);
-        int i = bucket - 1; // Value in _buckets is 1-based
+        var i = bucket - 1; // Value in _buckets is 1-based
 
         while (i >= 0)
         {
-            ref Entry entry = ref entries[i];
+            ref var entry = ref entries[i];
             if (entry.HashCode == hashCode && value.SequenceEqual (entry.Value.AsSpan()))
             {
                 if (entry.LastUse < 0)
@@ -699,21 +767,21 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
 
         Debug.Assert (_buckets != null);
 
-        Entry[]? entries = _entries;
+        var entries = _entries;
         Debug.Assert (entries != null, "expected entries to be non-null");
 
         int hashCode;
 
         uint collisionCount = 0;
-        ref int bucket = ref Unsafe.NullRef<int>();
+        ref var bucket = ref Unsafe.NullRef<int>();
 
         hashCode = _randomisedHash ? value.GetRandomizedHashCode() : value.GetNonRandomizedHashCode();
         bucket = ref GetBucketRef (hashCode);
-        int i = bucket - 1; // Value in _buckets is 1-based
+        var i = bucket - 1; // Value in _buckets is 1-based
 
         while (i >= 0)
         {
-            ref Entry entry = ref entries[i];
+            ref var entry = ref entries[i];
             if (entry.HashCode == hashCode && entry.Value == value)
             {
                 if (entry.LastUse < 0)
@@ -739,7 +807,10 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
     }
 
     /// <summary>Initializes the InternPool from another InternPool with the same element type and equality comparer.</summary>
-    private void ConstructFrom (InternPool source)
+    private void ConstructFrom
+        (
+            InternPool source
+        )
     {
         if (source.Count == 0)
         {
@@ -749,8 +820,8 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
             return;
         }
 
-        int capacity = source._buckets!.Length;
-        int threshold = HashHelpers.ExpandPrime (source.Count + 1);
+        var capacity = source._buckets!.Length;
+        var threshold = HashHelpers.ExpandPrime (source.Count + 1);
 
         if (threshold >= capacity)
         {
@@ -769,10 +840,10 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
         {
             Initialize (source.Count);
 
-            Entry[]? entries = source._entries;
-            for (int i = 0; i < source._count; i++)
+            var entries = source._entries;
+            for (var i = 0; i < source._count; i++)
             {
-                ref Entry entry = ref entries![i];
+                ref var entry = ref entries![i];
                 if (entry.Next >= -1)
                 {
                     Intern (entry.Value);
@@ -794,7 +865,7 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
     /// <summary>Removes all elements from the <see cref="InternPool"/> object.</summary>
     public void Clear()
     {
-        int count = _count;
+        var count = _count;
         if (count > 0)
         {
             Debug.Assert (_buckets != null, "_buckets should be non-null");
@@ -811,30 +882,39 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
     /// <summary>Determines whether the <see cref="InternPool"/> contains the specified element.</summary>
     /// <param name="item">The element to locate in the <see cref="InternPool"/> object.</param>
     /// <returns>true if the <see cref="InternPool"/> object contains the specified element; otherwise, false.</returns>
-    public bool Contains (string item)
+    public bool Contains
+        (
+            string item
+        )
     {
-        if (item is null || item.Length == 0) return true;
+        if (string.IsNullOrEmpty (item))
+        {
+            return true;
+        }
 
         return FindItemIndex (item) >= 0;
     }
 
     /// <summary>Gets the index of the item in <see cref="_entries"/>, or -1 if it's not in the set.</summary>
-    private int FindItemIndex (string item)
+    private int FindItemIndex
+        (
+            string item
+        )
     {
-        int[]? buckets = _buckets;
+        var buckets = _buckets;
         if (buckets != null)
         {
-            Entry[]? entries = _entries;
+            var entries = _entries;
             Debug.Assert (entries != null, "Expected _entries to be initialized");
 
             uint collisionCount = 0;
 
-            int hashCode = _randomisedHash ? item.GetRandomizedHashCode() : item.GetNonRandomizedHashCode();
+            var hashCode = _randomisedHash ? item.GetRandomizedHashCode() : item.GetNonRandomizedHashCode();
 
-            int i = GetBucketRef (hashCode) - 1; // Value in _buckets is 1-based
+            var i = GetBucketRef (hashCode) - 1; // Value in _buckets is 1-based
             while (i >= 0)
             {
-                ref Entry entry = ref entries[i];
+                ref var entry = ref entries[i];
                 if (entry.HashCode == hashCode && entry.Value == item)
                 {
                     return i;
@@ -856,9 +936,12 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
 
     /// <summary>Gets a reference to the specified hashcode's bucket, containing an index into <see cref="_entries"/>.</summary>
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
-    private ref int GetBucketRef (int hashCode)
+    private ref int GetBucketRef
+        (
+            int hashCode
+        )
     {
-        int[] buckets = _buckets!;
+        var buckets = _buckets!;
         if (IntPtr.Size == 8)
         {
             return ref buckets[HashHelpers.FastMod ((uint)hashCode, (uint)buckets.Length, _fastModMultiplier)];
@@ -867,28 +950,40 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
         return ref buckets[(uint)hashCode % (uint)buckets.Length];
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
     public bool Remove (string value)
         => Remove (value, isEviction: false);
 
-    private bool Remove (string value, bool isEviction)
+    private bool Remove
+        (
+            string value,
+            bool isEviction
+        )
     {
-        if (value is null || value.Length == 0) return false;
+        if (string.IsNullOrEmpty (value))
+        {
+            return false;
+        }
 
         if (_buckets != null)
         {
-            Entry[]? entries = _entries;
+            var entries = _entries;
             Debug.Assert (entries != null, "entries should be non-null");
 
             uint collisionCount = 0;
-            int last = -1;
-            int hashCode = _randomisedHash ? value.GetRandomizedHashCode() : value.GetNonRandomizedHashCode();
+            var last = -1;
+            var hashCode = _randomisedHash ? value.GetRandomizedHashCode() : value.GetNonRandomizedHashCode();
 
-            ref int bucket = ref GetBucketRef (hashCode);
-            int i = bucket - 1; // Value in buckets is 1-based
+            ref var bucket = ref GetBucketRef (hashCode);
+            var i = bucket - 1; // Value in buckets is 1-based
 
             while (i >= 0)
             {
-                ref Entry entry = ref entries[i];
+                ref var entry = ref entries[i];
 
                 if (entry.HashCode == hashCode && entry.Value == value)
                 {
@@ -935,6 +1030,7 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
 
     bool ICollection<string>.IsReadOnly => false;
 
+    /// <inheritdoc cref="IEnumerable{T}.GetEnumerator"/>
     public Enumerator GetEnumerator() => new Enumerator (this);
 
     IEnumerator<string> IEnumerable<string>.GetEnumerator() => GetEnumerator();
@@ -943,14 +1039,14 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
 
     /// <summary>Modifies the current <see cref="InternPool"/> object to contain all elements that are present in itself, the specified collection, or both.</summary>
     /// <param name="other">The collection to compare to the current <see cref="InternPool"/> object.</param>
-    void ISet<string>.UnionWith (IEnumerable<string> other)
+    void ISet<string>.UnionWith
+        (
+            IEnumerable<string> other
+        )
     {
-        if (other == null)
-        {
-            ThrowHelper.ThrowArgumentNullException (ExceptionArgument.other);
-        }
+        Sure.NotNull ((object?) other);
 
-        foreach (string item in other)
+        foreach (var item in other)
         {
             Intern (item);
         }
@@ -958,16 +1054,16 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
 
     /// <summary>Modifies the current <see cref="InternPool"/> object to contain only elements that are present in that object and in the specified collection.</summary>
     /// <param name="other">The collection to compare to the current <see cref="InternPool"/> object.</param>
-    void ISet<string>.IntersectWith (IEnumerable<string> other)
+    void ISet<string>.IntersectWith
+        (
+            IEnumerable<string> other
+        )
     {
-        if (other == null)
-        {
-            ThrowHelper.ThrowArgumentNullException (ExceptionArgument.other);
-        }
+        Sure.NotNull ((object?) other);
 
         // Intersection of anything with empty set is empty set, so return if count is 0.
         // Same if the set intersecting with itself is the same set.
-        if (Count == 0 || other == this)
+        if (Count == 0 || ReferenceEquals (other, this))
         {
             return;
         }
@@ -995,12 +1091,12 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
 
     /// <summary>Removes all elements in the specified collection from the current <see cref="InternPool"/> object.</summary>
     /// <param name="other">The collection to compare to the current <see cref="InternPool"/> object.</param>
-    void ISet<string>.ExceptWith (IEnumerable<string> other)
+    void ISet<string>.ExceptWith
+        (
+            IEnumerable<string> other
+        )
     {
-        if (other == null)
-        {
-            ThrowHelper.ThrowArgumentNullException (ExceptionArgument.other);
-        }
+        Sure.NotNull ((object?) other);
 
         // This is already the empty set; return.
         if (Count == 0)
@@ -1009,14 +1105,14 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
         }
 
         // Special case if other is this; a set minus itself is the empty set.
-        if (other == this)
+        if (ReferenceEquals (other, this))
         {
             Clear();
             return;
         }
 
         // Remove every element in other from this.
-        foreach (string element in other)
+        foreach (var element in other)
         {
             Remove (element);
         }
@@ -1024,12 +1120,12 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
 
     /// <summary>Modifies the current <see cref="InternPool"/> object to contain only elements that are present either in that object or in the specified collection, but not both.</summary>
     /// <param name="other">The collection to compare to the current <see cref="InternPool"/> object.</param>
-    void ISet<string>.SymmetricExceptWith (IEnumerable<string> other)
+    void ISet<string>.SymmetricExceptWith
+        (
+            IEnumerable<string> other
+        )
     {
-        if (other == null)
-        {
-            ThrowHelper.ThrowArgumentNullException (ExceptionArgument.other);
-        }
+        Sure.NotNull ((object?) other);
 
         // If set is empty, then symmetric difference is other.
         if (Count == 0)
@@ -1039,7 +1135,7 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
         }
 
         // Special-case this; the symmetric difference of a set with itself is the empty set.
-        if (other == this)
+        if (ReferenceEquals (other, this))
         {
             Clear();
             return;
@@ -1063,16 +1159,16 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
     /// <summary>Determines whether a <see cref="InternPool"/> object is a subset of the specified collection.</summary>
     /// <param name="other">The collection to compare to the current <see cref="InternPool"/> object.</param>
     /// <returns>true if the <see cref="InternPool"/> object is a subset of <paramref name="other"/>; otherwise, false.</returns>
-    bool ISet<string>.IsSubsetOf (IEnumerable<string> other)
+    bool ISet<string>.IsSubsetOf
+        (
+            IEnumerable<string> other
+        )
     {
-        if (other == null)
-        {
-            ThrowHelper.ThrowArgumentNullException (ExceptionArgument.other);
-        }
+        Sure.NotNull ((object?) other);
 
         // The empty set is a subset of any set, and a set is a subset of itself.
         // Set is always a subset of itself
-        if (Count == 0 || other == this)
+        if (Count == 0 || ReferenceEquals (other, this))
         {
             return true;
         }
@@ -1092,22 +1188,22 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
             return IsSubsetOfInternPool (otherAsSet);
         }
 
-        (int uniqueCount, int unfoundCount) = CheckUniqueAndUnfoundElements (other, returnIfUnfound: false);
+        (var uniqueCount, var unfoundCount) = CheckUniqueAndUnfoundElements (other, returnIfUnfound: false);
         return uniqueCount == Count && unfoundCount >= 0;
     }
 
     /// <summary>Determines whether a <see cref="InternPool"/> object is a proper subset of the specified collection.</summary>
     /// <param name="other">The collection to compare to the current <see cref="InternPool"/> object.</param>
     /// <returns>true if the <see cref="InternPool"/> object is a proper subset of <paramref name="other"/>; otherwise, false.</returns>
-    bool ISet<string>.IsProperSubsetOf (IEnumerable<string> other)
+    bool ISet<string>.IsProperSubsetOf
+        (
+            IEnumerable<string> other
+        )
     {
-        if (other == null)
-        {
-            ThrowHelper.ThrowArgumentNullException (ExceptionArgument.other);
-        }
+        Sure.NotNull ((object?) other);
 
         // No set is a proper subset of itself.
-        if (other == this)
+        if (ReferenceEquals (other, this))
         {
             return false;
         }
@@ -1140,22 +1236,22 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
             }
         }
 
-        (int uniqueCount, int unfoundCount) = CheckUniqueAndUnfoundElements (other, returnIfUnfound: false);
+        (var uniqueCount, var unfoundCount) = CheckUniqueAndUnfoundElements (other, returnIfUnfound: false);
         return uniqueCount == Count && unfoundCount > 0;
     }
 
     /// <summary>Determines whether a <see cref="InternPool"/> object is a proper superset of the specified collection.</summary>
     /// <param name="other">The collection to compare to the current <see cref="InternPool"/> object.</param>
     /// <returns>true if the <see cref="InternPool"/> object is a superset of <paramref name="other"/>; otherwise, false.</returns>
-    bool ISet<string>.IsSupersetOf (IEnumerable<string> other)
+    bool ISet<string>.IsSupersetOf
+        (
+            IEnumerable<string> other
+        )
     {
-        if (other == null)
-        {
-            ThrowHelper.ThrowArgumentNullException (ExceptionArgument.other);
-        }
+        Sure.NotNull ((object?) other);
 
         // A set is always a superset of itself.
-        if (other == this)
+        if (ReferenceEquals (other, this))
         {
             return true;
         }
@@ -1183,15 +1279,15 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
     /// <summary>Determines whether a <see cref="InternPool"/> object is a proper superset of the specified collection.</summary>
     /// <param name="other">The collection to compare to the current <see cref="InternPool"/> object.</param>
     /// <returns>true if the <see cref="InternPool"/> object is a proper superset of <paramref name="other"/>; otherwise, false.</returns>
-    bool ISet<string>.IsProperSupersetOf (IEnumerable<string> other)
+    bool ISet<string>.IsProperSupersetOf
+        (
+            IEnumerable<string> other
+        )
     {
-        if (other == null)
-        {
-            ThrowHelper.ThrowArgumentNullException (ExceptionArgument.other);
-        }
+        Sure.NotNull ((object?) other);
 
         // The empty set isn't a proper superset of any set, and a set is never a strict superset of itself.
-        if (Count == 0 || other == this)
+        if (Count == 0 || ReferenceEquals (other, this))
         {
             return false;
         }
@@ -1219,19 +1315,19 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
         }
 
         // Couldn't fall out in the above cases; do it the long way
-        (int uniqueCount, int unfoundCount) = CheckUniqueAndUnfoundElements (other, returnIfUnfound: true);
+        (var uniqueCount, var unfoundCount) = CheckUniqueAndUnfoundElements (other, returnIfUnfound: true);
         return uniqueCount < Count && unfoundCount == 0;
     }
 
     /// <summary>Determines whether the current <see cref="InternPool"/> object and a specified collection share common elements.</summary>
     /// <param name="other">The collection to compare to the current <see cref="InternPool"/> object.</param>
     /// <returns>true if the <see cref="InternPool"/> object and <paramref name="other"/> share at least one common element; otherwise, false.</returns>
-    bool ISet<string>.Overlaps (IEnumerable<string> other)
+    bool ISet<string>.Overlaps
+        (
+            IEnumerable<string> other
+        )
     {
-        if (other == null)
-        {
-            ThrowHelper.ThrowArgumentNullException (ExceptionArgument.other);
-        }
+        Sure.NotNull ((object?) other);
 
         if (Count == 0)
         {
@@ -1239,12 +1335,12 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
         }
 
         // Set overlaps itself
-        if (other == this)
+        if (ReferenceEquals (other, this))
         {
             return true;
         }
 
-        foreach (string element in other)
+        foreach (var element in other)
         {
             if (Contains (element))
             {
@@ -1258,15 +1354,15 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
     /// <summary>Determines whether a <see cref="InternPool"/> object and the specified collection contain the same elements.</summary>
     /// <param name="other">The collection to compare to the current <see cref="InternPool"/> object.</param>
     /// <returns>true if the <see cref="InternPool"/> object is equal to <paramref name="other"/>; otherwise, false.</returns>
-    bool ISet<string>.SetEquals (IEnumerable<string> other)
+    bool ISet<string>.SetEquals
+        (
+            IEnumerable<string> other
+        )
     {
-        if (other == null)
-        {
-            ThrowHelper.ThrowArgumentNullException (ExceptionArgument.other);
-        }
+        Sure.NotNull ((object?) other);
 
         // A set is equal to itself.
-        if (other == this)
+        if (ReferenceEquals (other, this))
         {
             return true;
         }
@@ -1295,11 +1391,15 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
                 return false;
             }
 
-            (int uniqueCount, int unfoundCount) = CheckUniqueAndUnfoundElements (other, returnIfUnfound: true);
+            (var uniqueCount, var unfoundCount) = CheckUniqueAndUnfoundElements (other, returnIfUnfound: true);
             return uniqueCount == Count && unfoundCount == 0;
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="array"></param>
     public void CopyTo (string[] array) => CopyTo (array, 0, Count);
 
     /// <summary>Copies the elements of a <see cref="InternPool"/> object to an array, starting at the specified array index.</summary>
@@ -1307,12 +1407,15 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
     /// <param name="arrayIndex">The zero-based index in array at which copying begins.</param>
     public void CopyTo (string[] array, int arrayIndex) => CopyTo (array, arrayIndex, Count);
 
-    public void CopyTo (string[] array, int arrayIndex, int count)
+    /// <inheritdoc cref="CopyTo(string[])"/>
+    public void CopyTo
+        (
+            string[] array,
+            int arrayIndex,
+            int count
+        )
     {
-        if (array == null)
-        {
-            ThrowHelper.ThrowArgumentNullException (ExceptionArgument.array);
-        }
+        Sure.NotNull (array);
 
         // Check array index valid index into array.
         if (arrayIndex < 0)
@@ -1334,10 +1437,10 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
             ThrowHelper.ThrowArgumentException_ArrayPlusOffTooSmall();
         }
 
-        Entry[]? entries = _entries;
-        for (int i = 0; i < _count && count != 0; i++)
+        var entries = _entries;
+        for (var i = 0; i < _count && count != 0; i++)
         {
-            ref Entry entry = ref entries![i];
+            ref var entry = ref entries![i];
             if (entry.Next >= -1)
             {
                 array[arrayIndex++] = entry.Value;
@@ -1347,22 +1450,22 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
     }
 
     /// <summary>Removes all elements that match the conditions defined by the specified predicate from a <see cref="InternPool"/> collection.</summary>
-    public int RemoveWhere (Predicate<string> match)
+    public int RemoveWhere
+        (
+            Predicate<string> match
+        )
     {
-        if (match == null)
-        {
-            ThrowHelper.ThrowArgumentNullException (ExceptionArgument.match);
-        }
+        Sure.NotNull (match);
 
-        Entry[]? entries = _entries;
-        int numRemoved = 0;
-        for (int i = 0; i < _count; i++)
+        var entries = _entries;
+        var numRemoved = 0;
+        for (var i = 0; i < _count; i++)
         {
-            ref Entry entry = ref entries![i];
+            ref var entry = ref entries![i];
             if (entry.Next >= -1)
             {
                 // Cache value in case delegate removes it
-                string value = entry.Value;
+                var value = entry.Value;
                 if (match (value))
                 {
                     // Check again that remove actually removed it.
@@ -1378,14 +1481,17 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
     }
 
     /// <summary>Ensures that this hash set can hold the specified number of elements without growing.</summary>
-    public int EnsureCapacity (int capacity)
+    public int EnsureCapacity
+        (
+            int capacity
+        )
     {
         if (capacity < 0)
         {
             ThrowHelper.ThrowArgumentOutOfRangeException (ExceptionArgument.capacity);
         }
 
-        int currentCapacity = _entries == null ? 0 : _entries.Length;
+        var currentCapacity = _entries == null ? 0 : _entries.Length;
         if (currentCapacity >= capacity)
         {
             return currentCapacity;
@@ -1396,30 +1502,34 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
             return Initialize (capacity);
         }
 
-        int newSize = HashHelpers.GetPrime (capacity);
+        var newSize = HashHelpers.GetPrime (capacity);
         Resize (newSize, forceNewHashCodes: false);
         return newSize;
     }
 
     private void Resize() => Resize (HashHelpers.ExpandPrime (_count), forceNewHashCodes: false);
 
-    private void Resize (int newSize, bool forceNewHashCodes)
+    private void Resize
+        (
+            int newSize,
+            bool forceNewHashCodes
+        )
     {
         Debug.Assert (_entries != null, "_entries should be non-null");
         Debug.Assert (newSize >= _entries.Length);
 
         var entries = new Entry[newSize];
 
-        int count = _count;
+        var count = _count;
         Array.Copy (_entries, entries, count);
 
         if (forceNewHashCodes)
         {
             _randomisedHash = true;
 
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
-                ref Entry entry = ref entries[i];
+                ref var entry = ref entries[i];
                 if (entry.Next >= -1)
                 {
                     entry.HashCode = entry.Value.GetRandomizedHashCode();
@@ -1434,12 +1544,12 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
             _fastModMultiplier = HashHelpers.GetFastModMultiplier ((uint)newSize);
         }
 
-        for (int i = 0; i < count; i++)
+        for (var i = 0; i < count; i++)
         {
-            ref Entry entry = ref entries[i];
+            ref var entry = ref entries[i];
             if (entry.Next >= -1)
             {
-                ref int bucket = ref GetBucketRef (entry.HashCode);
+                ref var bucket = ref GetBucketRef (entry.HashCode);
                 entry.Next = bucket - 1; // Value in _buckets is 1-based
                 bucket = i + 1;
             }
@@ -1454,29 +1564,29 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
     /// </summary>
     public void TrimExcess()
     {
-        int capacity = Count;
+        var capacity = Count;
 
-        int newSize = HashHelpers.GetPrime (capacity);
-        Entry[]? oldEntries = _entries;
-        int currentCapacity = oldEntries == null ? 0 : oldEntries.Length;
+        var newSize = HashHelpers.GetPrime (capacity);
+        var oldEntries = _entries;
+        var currentCapacity = oldEntries == null ? 0 : oldEntries.Length;
         if (newSize >= currentCapacity)
         {
             return;
         }
 
-        int oldCount = _count;
+        var oldCount = _count;
         _version++;
         Initialize (newSize);
-        Entry[]? entries = _entries;
-        int count = 0;
-        for (int i = 0; i < oldCount; i++)
+        var entries = _entries;
+        var count = 0;
+        for (var i = 0; i < oldCount; i++)
         {
-            int hashCode = oldEntries![i].HashCode; // At this point, we know we have entries.
+            var hashCode = oldEntries![i].HashCode; // At this point, we know we have entries.
             if (oldEntries[i].Next >= -1)
             {
-                ref Entry entry = ref entries![count];
+                ref var entry = ref entries![count];
                 entry = oldEntries[i];
-                ref int bucket = ref GetBucketRef (hashCode);
+                ref var bucket = ref GetBucketRef (hashCode);
                 entry.Next = bucket - 1; // Value in _buckets is 1-based
                 bucket = count + 1;
                 count++;
@@ -1491,9 +1601,12 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
     /// Initializes buckets and slots arrays. Uses suggested capacity by finding next prime
     /// greater than or equal to capacity.
     /// </summary>
-    private int Initialize (int capacity)
+    private int Initialize
+        (
+            int capacity
+        )
     {
-        int size = HashHelpers.GetPrime (capacity);
+        var size = HashHelpers.GetPrime (capacity);
         var buckets = new int[size];
         var entries = new Entry[size];
 
@@ -1509,7 +1622,14 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
         return size;
     }
 
-    private string AddNewEntry (string value, ref Entry[] entries, int hashCode, uint collisionCount, ref int bucket)
+    private string AddNewEntry
+        (
+            string value,
+            ref Entry[] entries,
+            int hashCode,
+            uint collisionCount,
+            ref int bucket
+        )
     {
         if ((uint)Count + 1 > (uint)_maxCount)
         {
@@ -1527,7 +1647,7 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
         }
         else
         {
-            int count = _count;
+            var count = _count;
             if (count == entries.Length)
             {
                 Resize();
@@ -1542,7 +1662,7 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
         }
 
         {
-            ref Entry entry = ref entries[index];
+            ref var entry = ref entries[index];
             entry.HashCode = hashCode;
             entry.Next = bucket - 1; // Value in _buckets is 1-based
             entry.Value = value;
@@ -1561,12 +1681,15 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
         return value;
     }
 
-    internal void Trim (TrimLevel trim)
+    internal void Trim
+        (
+            TrimLevel trim
+        )
     {
         var currentUse = _lastUse;
 
         long max0Distance;
-        long max1Distance = long.MaxValue;
+        var max1Distance = long.MaxValue;
 
         switch (trim)
         {
@@ -1587,29 +1710,29 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
 
         _gen0Pool?.Clear();
         _gen1Pool?.Clear();
-        Entry[]? entries = _entries;
+        var entries = _entries;
         if (entries == null)
         {
             return;
         }
 
-        int count = _count;
+        var count = _count;
         var buckets = _buckets!;
         Array.Clear (buckets, 0, buckets.Length);
 
         var last = 0;
         var evicted = 0;
 
-        for (int i = 0; i < count; i++)
+        for (var i = 0; i < count; i++)
         {
-            ref Entry entry = ref entries[i];
+            ref var entry = ref entries[i];
             if (entry.Next < -1)
             {
                 continue;
             }
 
             var lastUse = entry.LastUse;
-            bool discard = false;
+            var discard = false;
 
             var distance = currentUse - lastUse;
             var gen = GetGeneration (lastUse);
@@ -1641,7 +1764,7 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
                     entry = ref entries[last];
                 }
 
-                ref int bucket = ref GetBucketRef (entry.HashCode);
+                ref var bucket = ref GetBucketRef (entry.HashCode);
 
                 // Value in _buckets is 1-based
                 entry.Next = bucket - 1;
@@ -1663,7 +1786,7 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
 
     private void RemoveLeastRecentlyUsed()
     {
-        List<(long lastUse, string value)> genPool =
+        var genPool =
             (_gen0Pool ??= new List<(long lastUse, string value)> (ChurnPoolSize));
 
         //List<(long lastUse, string value)> churnPool = (_gen0Pool ??= new List<(long lastUse, string value)>(ChurnPoolSize));
@@ -1715,22 +1838,22 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
 
         var entries = _entries!;
 
-        long current0High = long.MinValue;
-        long current0Low = long.MaxValue;
+        var current0High = long.MinValue;
+        var current0Low = long.MaxValue;
 
-        long current1High = long.MinValue;
-        long current1Low = long.MaxValue;
+        var current1High = long.MinValue;
+        var current1Low = long.MaxValue;
 
         if (gen1Pool.Count > 0)
         {
             current1Low = gen1Pool[0].lastUse;
-            current1High = gen1Pool[gen1Pool.Count - 1].lastUse;
+            current1High = gen1Pool[^1].lastUse;
         }
 
         var count = _count;
-        for (int i = 0; i < count; i++)
+        for (var i = 0; i < count; i++)
         {
-            ref Entry entry = ref entries[i];
+            ref var entry = ref entries[i];
             if (entry.Next >= -1)
             {
                 var gen = GetGeneration (entry.LastUse);
@@ -1740,8 +1863,8 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
                     continue;
                 }
 
-                ref long currentHigh = ref gen == 0 ? ref current0High : ref current1High;
-                ref long currentLow = ref gen == 0 ? ref current0Low : ref current1Low;
+                ref var currentHigh = ref gen == 0 ? ref current0High : ref current1High;
+                ref var currentLow = ref gen == 0 ? ref current0Low : ref current1Low;
                 var genPool = gen == 0 ? gen0Pool : gen1Pool;
 
                 var lastUse = entry.LastUse;
@@ -1786,9 +1909,9 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
                             (long use, _) = span[index];
 #else
                     var length = genPool.Count;
-                    for (int index = 0; index < length; index++)
+                    for (var index = 0; index < length; index++)
                     {
-                        (long use, _) = genPool[index];
+                        (var use, _) = genPool[index];
 #endif
                         if (use < lastUse) continue;
 
@@ -1811,15 +1934,15 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
             {
 #else
 
-        for (int i = 0; i < gen0Pool.Count; i++)
+        for (var i = 0; i < gen0Pool.Count; i++)
         {
-            (long lastUse, string value) = gen0Pool[i];
+            (var lastUse, var value) = gen0Pool[i];
 #endif
             var index = FindItemIndex (value);
             Debug.Assert (index >= 0);
 
 
-            ref Entry entry = ref entries[index];
+            ref var entry = ref entries[index];
             Debug.Assert (entry.LastUse == lastUse);
 
             // Negate lastuse to flag it as in the churn pool
@@ -1831,15 +1954,15 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
             {
 #else
 
-        for (int i = 0; i < gen1Pool.Count; i++)
+        for (var i = 0; i < gen1Pool.Count; i++)
         {
-            (long lastUse, string value) = gen1Pool[i];
+            (var lastUse, var value) = gen1Pool[i];
 #endif
             var index = FindItemIndex (value);
             Debug.Assert (index >= 0);
 
 
-            ref Entry entry = ref entries[index];
+            ref var entry = ref entries[index];
             Debug.Assert (Math.Abs (entry.LastUse) == lastUse);
 
             if (entry.LastUse >= 0)
@@ -1850,9 +1973,13 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
         }
     }
 
-    private void RemoveFromChurnPool (string value, long lastUse)
+    private void RemoveFromChurnPool
+        (
+            string value,
+            long lastUse
+        )
     {
-        int generation = GetGeneration (lastUse);
+        var generation = GetGeneration (lastUse);
         Debug.Assert (lastUse < 0);
 
         var churnPool = GetPool (generation)!;
@@ -1868,9 +1995,12 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
     /// returns false as soon as it finds an element in other that's not in this.
     /// Used by SupersetOf, ProperSupersetOf, and SetEquals.
     /// </summary>
-    private bool ContainsAllElements (IEnumerable<string> other)
+    private bool ContainsAllElements
+        (
+            IEnumerable<string> other
+        )
     {
-        foreach (string element in other)
+        foreach (var element in other)
         {
             if (!Contains (element))
             {
@@ -1891,9 +2021,12 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
     ///
     /// If callers are concerned about whether this is a proper subset, they take care of that.
     /// </summary>
-    private bool IsSubsetOfInternPool (InternPool other)
+    private bool IsSubsetOfInternPool
+        (
+            InternPool other
+        )
     {
-        foreach (string item in this)
+        foreach (var item in this)
         {
             if (!other.Contains (item))
             {
@@ -1908,15 +2041,18 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
     /// If other is a hashset that uses same equality comparer, intersect is much faster
     /// because we can use other's Contains
     /// </summary>
-    private void IntersectWithInternPool (InternPool other)
+    private void IntersectWithInternPool
+        (
+            InternPool other
+        )
     {
-        Entry[]? entries = _entries;
-        for (int i = 0; i < _count; i++)
+        var entries = _entries;
+        for (var i = 0; i < _count; i++)
         {
-            ref Entry entry = ref entries![i];
+            ref var entry = ref entries![i];
             if (entry.Next >= -1)
             {
-                string item = entry.Value;
+                var item = entry.Value;
                 if (!other.Contains (item))
                 {
                     Remove (item);
@@ -1931,26 +2067,29 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
     ///
     /// This attempts to allocate on the stack, if below StackAllocThreshold.
     /// </summary>
-    private unsafe void IntersectWithEnumerable (IEnumerable<string> other)
+    private unsafe void IntersectWithEnumerable
+        (
+            IEnumerable<string> other
+        )
     {
         Debug.Assert (_buckets != null, "_buckets shouldn't be null; callers should check first");
 
         // Keep track of current last index; don't want to move past the end of our bit array
         // (could happen if another thread is modifying the collection).
-        int originalCount = _count;
-        int intArrayLength = BitHelper.ToIntArrayLength (originalCount);
+        var originalCount = _count;
+        var intArrayLength = BitHelper.ToIntArrayLength (originalCount);
 
         Span<int> span = stackalloc int[StackAllocThresholdInts];
-        BitHelper bitHelper = intArrayLength <= StackAllocThresholdInts
+        var bitHelper = intArrayLength <= StackAllocThresholdInts
             ? new BitHelper (span.Slice (0, intArrayLength), clear: true)
             : new BitHelper (new int[intArrayLength], clear: false);
 
         // Mark if contains: find index of in slots array and mark corresponding element in bit array.
-        foreach (string item in other)
+        foreach (var item in other)
         {
             if (item is null || item.Length == 0) continue;
 
-            int index = FindItemIndex (item);
+            var index = FindItemIndex (item);
             if (index >= 0)
             {
                 bitHelper.MarkBit (index);
@@ -1959,9 +2098,9 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
 
         // If anything unmarked, remove it. Perf can be optimized here if BitHelper had a
         // FindFirstUnmarked method.
-        for (int i = 0; i < originalCount; i++)
+        for (var i = 0; i < originalCount; i++)
         {
-            ref Entry entry = ref _entries![i];
+            ref var entry = ref _entries![i];
             if (entry.Next >= -1 && !bitHelper.IsMarked (i))
             {
                 Remove (entry.Value);
@@ -1979,7 +2118,7 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
     /// <param name="other"></param>
     private void SymmetricExceptWithUniqueInternPool (InternPool other)
     {
-        foreach (string item in other)
+        foreach (var item in other)
         {
             if (!Remove (item))
             {
@@ -2005,27 +2144,30 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
     ///
     /// </summary>
     /// <param name="other"></param>
-    private unsafe void SymmetricExceptWithEnumerable (IEnumerable<string> other)
+    private unsafe void SymmetricExceptWithEnumerable
+        (
+            IEnumerable<string> other
+        )
     {
-        int originalCount = _count;
-        int intArrayLength = BitHelper.ToIntArrayLength (originalCount);
+        var originalCount = _count;
+        var intArrayLength = BitHelper.ToIntArrayLength (originalCount);
 
         Span<int> itemsToRemoveSpan = stackalloc int[StackAllocThresholdInts / 2];
-        BitHelper itemsToRemove = intArrayLength <= StackAllocThresholdInts / 2
+        var itemsToRemove = intArrayLength <= StackAllocThresholdInts / 2
             ? new BitHelper (itemsToRemoveSpan.Slice (0, intArrayLength), clear: true)
             : new BitHelper (new int[intArrayLength], clear: false);
 
         Span<int> itemsAddedFromOtherSpan = stackalloc int[StackAllocThresholdInts / 2];
-        BitHelper itemsAddedFromOther = intArrayLength <= StackAllocThresholdInts / 2
+        var itemsAddedFromOther = intArrayLength <= StackAllocThresholdInts / 2
             ? new BitHelper (itemsAddedFromOtherSpan.Slice (0, intArrayLength), clear: true)
             : new BitHelper (new int[intArrayLength], clear: false);
 
-        foreach (string item in other)
+        foreach (var item in other)
         {
             if (item is null || item.Length == 0) continue;
 
-            string value = Intern (item);
-            int location = FindItemIndex (value);
+            var value = Intern (item);
+            var location = FindItemIndex (value);
 
             if (ReferenceEquals (value, item))
             {
@@ -2050,7 +2192,7 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
         }
 
         // if anything marked, remove it
-        for (int i = 0; i < originalCount; i++)
+        for (var i = 0; i < originalCount; i++)
         {
             if (itemsToRemove.IsMarked (i))
             {
@@ -2082,14 +2224,17 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
     /// <param name="other"></param>
     /// <param name="returnIfUnfound">Allows us to finish faster for equals and proper superset
     /// because unfoundCount must be 0.</param>
-    private unsafe (int UniqueCount, int UnfoundCount) CheckUniqueAndUnfoundElements (IEnumerable<string> other,
-        bool returnIfUnfound)
+    private unsafe (int UniqueCount, int UnfoundCount) CheckUniqueAndUnfoundElements
+        (
+            IEnumerable<string> other,
+            bool returnIfUnfound
+        )
     {
         // Need special case in case this has no elements.
         if (_count == 0)
         {
-            int numElementsInOther = 0;
-            foreach (string item in other)
+            var numElementsInOther = 0;
+            foreach (var item in other)
             {
                 numElementsInOther++;
                 break; // break right away, all we want to know is whether other has 0 or 1 elements
@@ -2100,20 +2245,20 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
 
         Debug.Assert ((_buckets != null) && (_count > 0), "_buckets was null but count greater than 0");
 
-        int originalCount = _count;
-        int intArrayLength = BitHelper.ToIntArrayLength (originalCount);
+        var originalCount = _count;
+        var intArrayLength = BitHelper.ToIntArrayLength (originalCount);
 
         Span<int> span = stackalloc int[StackAllocThresholdInts];
-        BitHelper bitHelper = intArrayLength <= StackAllocThresholdInts
+        var bitHelper = intArrayLength <= StackAllocThresholdInts
             ? new BitHelper (span.Slice (0, intArrayLength), clear: true)
             : new BitHelper (new int[intArrayLength], clear: false);
 
-        int unfoundCount = 0; // count of items in other not found in this
-        int uniqueFoundCount = 0; // count of unique items in other found in this
+        var unfoundCount = 0; // count of items in other not found in this
+        var uniqueFoundCount = 0; // count of unique items in other found in this
 
-        bool hasNull = false;
-        bool hasEmpty = false;
-        foreach (string item in other)
+        var hasNull = false;
+        var hasEmpty = false;
+        foreach (var item in other)
         {
             if (item is null)
             {
@@ -2127,7 +2272,7 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
                 continue;
             }
 
-            int index = FindItemIndex (item);
+            var index = FindItemIndex (item);
             if (index >= 0)
             {
                 if (!bitHelper.IsMarked (index))
@@ -2197,7 +2342,11 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
         Max = Major
     }
 
-    public struct Enumerator : IEnumerator<string>
+    /// <summary>
+    ///
+    /// </summary>
+    public struct Enumerator
+        : IEnumerator<string>
     {
         private readonly InternPool _hashSet;
         private readonly int _version;
@@ -2212,6 +2361,7 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
             _current = default!;
         }
 
+        /// <inheritdoc cref="IEnumerator.MoveNext"/>
         public bool MoveNext()
         {
             if (_version != _hashSet._version)
@@ -2223,7 +2373,7 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
             // dictionary.count+1 could be negative if dictionary.count is int.MaxValue
             while ((uint)_index < (uint)_hashSet._count)
             {
-                ref Entry entry = ref _hashSet._entries![_index++];
+                ref var entry = ref _hashSet._entries![_index++];
                 if (entry.Next >= -1)
                 {
                     _current = entry.Value;
@@ -2236,8 +2386,10 @@ public class InternPool : IInternPool, ICollection<string>, ISet<string>, IReadO
             return false;
         }
 
+        /// <inheritdoc cref="IEnumerator{T}.Current"/>
         public string Current => _current;
 
+        /// <inheritdoc cref="IDisposable.Dispose"/>
         public void Dispose()
         {
         }
