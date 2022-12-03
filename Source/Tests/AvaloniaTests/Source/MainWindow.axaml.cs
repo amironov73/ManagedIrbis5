@@ -29,6 +29,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
+using Avalonia.Media;
 
 using ManagedIrbis;
 using ManagedIrbis.Avalonia;
@@ -506,5 +507,65 @@ public partial class MainWindow
             "политики – когда высшая власть была слаба).";
 
         await PlainTextViewerDialog.Show (this, title, text);
+    }
+
+    private sealed class FieldPainterControl : Control
+    {
+        private readonly string _text;
+        private readonly FieldPainter _painter;
+
+        public FieldPainterControl (string text)
+        {
+            _text = text;
+            _painter = new FieldPainter();
+        }
+
+        public override void Render
+            (
+                DrawingContext context
+            )
+        {
+            context.FillRectangle
+                (
+                    Brushes.Aqua,
+                    new Rect (new Point (), Bounds.Size)
+                );
+            _painter.Paint (context, Bounds, _text);
+        }
+    }
+
+    private async void FieldPainterButton_OnClick
+        (
+            object? sender,
+            RoutedEventArgs eventArgs
+        )
+    {
+        var text = "У попа была^aсобака^bОн ее^cлюбил";
+        var window = new Window
+        {
+            Title = "FieldPainter control demo",
+            Width = 300,
+            Height = 150,
+            HorizontalContentAlignment = HorizontalAlignment.Stretch,
+            VerticalContentAlignment = VerticalAlignment.Stretch,
+            Content = new StackPanel
+            {
+                Orientation = Orientation.Vertical,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                Margin = new Thickness (10),
+                Children =
+                {
+                    new FieldPainterControl (text)
+                    {
+                        HorizontalAlignment = HorizontalAlignment.Stretch,
+                        Width = 270,
+                        Height = 50
+                    }
+                }
+            }
+        };
+
+        await window.ShowDialog (this);
+
     }
 }

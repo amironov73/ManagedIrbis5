@@ -98,6 +98,12 @@
             PlainTextViewerDialog
         </Button>
 
+        <Button
+            Name="FieldPainterButton"
+            Click="FieldPainterButton_OnClick">
+            FieldPainter
+        </Button>
+
     </WrapPanel>
 
 </Window>
