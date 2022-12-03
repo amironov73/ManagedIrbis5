@@ -33,6 +33,9 @@ public partial class SharedInternPool
     private long _totalDeduped = 0;
     private long _totalEvictedCount = 0;
 
+    /// <summary>
+    ///
+    /// </summary>
     public StatsSnapshot Stats
     {
         get
@@ -61,6 +64,9 @@ public partial class SharedInternPool
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public long Added
     {
         get
@@ -81,6 +87,9 @@ public partial class SharedInternPool
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public long Considered
     {
         get
@@ -101,6 +110,9 @@ public partial class SharedInternPool
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public int Count
     {
         get
@@ -121,6 +133,9 @@ public partial class SharedInternPool
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public long Deduped
     {
         get
@@ -141,6 +156,9 @@ public partial class SharedInternPool
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public long Evicted
     {
         get
@@ -161,6 +179,9 @@ public partial class SharedInternPool
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public readonly struct StatsSnapshot
     {
         internal StatsSnapshot (long added, long considered, int count, long deduped, long evicted)
@@ -172,10 +193,29 @@ public partial class SharedInternPool
             Evicted = evicted;
         }
 
+        /// <summary>
+        ///
+        /// </summary>
         public long Added { get; }
+
+        /// <summary>
+        ///
+        /// </summary>
         public long Considered { get; }
+
+        /// <summary>
+        ///
+        /// </summary>
         public int Count { get; }
+
+        /// <summary>
+        ///
+        /// </summary>
         public long Deduped { get; }
+
+        /// <summary>
+        ///
+        /// </summary>
         public long Evicted { get; }
     }
 }

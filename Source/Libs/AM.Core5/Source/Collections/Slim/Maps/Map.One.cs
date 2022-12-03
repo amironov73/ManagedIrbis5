@@ -26,7 +26,8 @@ namespace AM.Collections.Slim;
 internal abstract partial class Map<TKey, TValue>
 {
     // Instance with one key/value pair.
-    private sealed class OneElementKeyedMap : Map<TKey, TValue>
+    private sealed class OneElementKeyedMap
+        : Map<TKey, TValue>
     {
         private readonly TKey _key1;
         private TValue _value1;
@@ -63,7 +64,7 @@ internal abstract partial class Map<TKey, TValue>
             }
             else
             {
-                value = default (TValue);
+                value = default!;
                 return false;
             }
         }

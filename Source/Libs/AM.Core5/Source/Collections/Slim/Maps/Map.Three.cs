@@ -26,7 +26,8 @@ namespace AM.Collections.Slim;
 internal abstract partial class Map<TKey, TValue>
 {
     // Instance with three key/value pairs.
-    private sealed class ThreeElementKeyedMap : Map<TKey, TValue>
+    private sealed class ThreeElementKeyedMap
+        : Map<TKey, TValue>
     {
         private readonly TKey _key1, _key2, _key3;
         private TValue _value1, _value2, _value3;
@@ -92,7 +93,7 @@ internal abstract partial class Map<TKey, TValue>
             }
             else
             {
-                value = default (TValue);
+                value = default!;
                 return false;
             }
         }

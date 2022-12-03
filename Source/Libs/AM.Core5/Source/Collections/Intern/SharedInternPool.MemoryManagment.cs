@@ -26,7 +26,8 @@ using System.Threading;
 
 namespace AM.Collections.Intern;
 
-public partial class SharedInternPool : IInternPool
+public partial class SharedInternPool
+    : IInternPool
 {
     private class InternPoolCleaner
 #if NET5_0 || NETCOREAPP3_1

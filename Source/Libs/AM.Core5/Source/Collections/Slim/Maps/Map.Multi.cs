@@ -28,10 +28,11 @@ namespace AM.Collections.Slim;
 internal abstract partial class Map<TKey, TValue>
 {
     // Instance with up to 16 key/value pairs.
-    private sealed class MultiElementKeyedMap : Map<TKey, TValue>
+    private sealed class MultiElementKeyedMap
+        : Map<TKey, TValue>
     {
         internal const int MaxMultiElements = 16;
-        private KeyValuePair<TKey, TValue>[] _keyValues;
+        private readonly KeyValuePair<TKey, TValue>[] _keyValues;
 
         public override int Count => _keyValues.Length;
 
@@ -94,7 +95,7 @@ internal abstract partial class Map<TKey, TValue>
                 }
             }
 
-            value = default (TValue);
+            value = default!;
             return false;
         }
 
@@ -149,7 +150,7 @@ internal abstract partial class Map<TKey, TValue>
 
             if ((uint)index >= (uint)_keyValues.Length)
             {
-                value = default (KeyValuePair<TKey, TValue>);
+                value = default;
                 return false;
             }
 

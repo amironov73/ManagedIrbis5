@@ -24,6 +24,7 @@ using System.Collections.Generic;
 namespace AM.Collections.Slim;
 
 internal abstract partial class Map<TKey, TValue>
+    where TKey: notnull
 {
     private static readonly EqualityComparer<TKey> Comparer = EqualityComparer<TKey>.Default;
 

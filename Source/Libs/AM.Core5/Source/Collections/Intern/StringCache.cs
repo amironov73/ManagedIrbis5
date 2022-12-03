@@ -51,9 +51,7 @@ public static class StringCache
     /// </summary>
     /// <param name="value">The string to add to the intern pool.</param>
     /// <returns>The interned string.</returns>
-#if !NETSTANDARD2_0
     [return: NotNullIfNotNull ("value")]
-#endif
     public static string? Intern (string? value)
         => InternPool.Shared.Intern (value);
 

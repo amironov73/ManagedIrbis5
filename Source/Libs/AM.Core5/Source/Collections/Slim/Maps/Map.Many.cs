@@ -28,9 +28,10 @@ namespace AM.Collections.Slim;
 internal abstract partial class Map<TKey, TValue>
 {
     // Instance with any number of key/value pairs.
-    private sealed class ManyElementKeyedMap : Map<TKey, TValue>
+    private sealed class ManyElementKeyedMap
+        : Map<TKey, TValue>
     {
-        private Dictionary<TKey, TValue> _dictionary;
+        private readonly Dictionary<TKey, TValue> _dictionary;
 
         public override int Count => _dictionary.Count;
 
@@ -45,9 +46,13 @@ internal abstract partial class Map<TKey, TValue>
             return this;
         }
 
-        public override Map<TKey, TValue> TryRemove (TKey key, out bool success)
+        public override Map<TKey, TValue> TryRemove
+            (
+                TKey key,
+                out bool success
+            )
         {
-            int count = _dictionary.Count;
+            var count = _dictionary.Count;
 
             // If the key is contained in this map, we're going to create a new map that's one pair smaller.
             if (_dictionary.ContainsKey (key))
@@ -58,7 +63,7 @@ internal abstract partial class Map<TKey, TValue>
                 if (count == MultiElementKeyedMap.MaxMultiElements + 1)
                 {
                     var multi = new MultiElementKeyedMap (MultiElementKeyedMap.MaxMultiElements);
-                    int index = 0;
+                    var index = 0;
                     foreach (KeyValuePair<TKey, TValue> pair in _dictionary)
                     {
                         if (!Comparer.Equals (key, pair.Key))
@@ -94,7 +99,8 @@ internal abstract partial class Map<TKey, TValue>
             return this;
         }
 
-        public override bool TryGetValue (TKey key, out TValue value) => _dictionary.TryGetValue (key, out value);
+        public override bool TryGetValue (TKey key, out TValue value) =>
+            _dictionary.TryGetValue (key, out value!);
 
         public TValue this [TKey key]
         {

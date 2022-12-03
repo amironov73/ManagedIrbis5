@@ -15,6 +15,7 @@
 
 #region Using directives
 
+using System;
 using System.Collections.Generic;
 
 #endregion
@@ -39,7 +40,7 @@ internal abstract partial class Map<TKey, TValue>
         public override bool TryGetValue (TKey key, out TValue value)
         {
             // Nothing here
-            value = default (TValue);
+            value = default!;
             return false;
         }
 
@@ -52,12 +53,12 @@ internal abstract partial class Map<TKey, TValue>
 
         public override bool TryGetNext (ref int index, out KeyValuePair<TKey, TValue> value)
         {
-            value = default (KeyValuePair<TKey, TValue>);
+            value = default;
             return false;
         }
 
-        public override ICollection<TKey> Keys => new TKey[0];
+        public override ICollection<TKey> Keys => Array.Empty<TKey>();
 
-        public override ICollection<TValue> Values => new TValue[0];
+        public override ICollection<TValue> Values => Array.Empty<TValue>();
     }
 }
