@@ -1,84 +1,104 @@
-﻿using System;
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable NonReadonlyMemberInGetHashCode
+// ReSharper disable UnusedMember.Global
+
+/* DetachOperations.cs --
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
-// ReSharper disable UnusedTypeParameter
+#endregion
 
-namespace TreeCollections
+#nullable enable
+
+namespace TreeCollections;
+
+public abstract partial class MutableEntityTreeNode<TNode, TId, TItem>
 {
-    public abstract partial class MutableEntityTreeNode<TNode, TId, TItem>
+    /// <summary>
+    /// Detach this node from the tree
+    /// </summary>
+    public virtual void Detach()
     {
-        /// <summary>
-        /// Detach this node from the tree
-        /// </summary>
-        public virtual void Detach()
+        if (IsRoot)
         {
-            if (IsRoot)
-            {
-                throw new InvalidOperationException ("Cannot detach a root");
-            }
-
-            OnNodeDetaching();
-
-            UpdateErrorsBeforeDetachingThis();
-
-            var oldParent = Parent;
-
-            Root = This;
-            Parent = null;
-            Level = 0;
-            PreviousSibling = null;
-            NextSibling = null;
-
-            oldParent.ChildrenList.Remove (This);
-
-            oldParent.SetChildrenSiblingReferences();
-
-            foreach (var n in SelectDescendants())
-            {
-                n.Level = n.Parent.Level + 1;
-                n.Root = This;
-                n.TreeIdMap = TreeIdMap;
-            }
-
-            OnNodeDetached (oldParent);
+            throw new InvalidOperationException ("Cannot detach a root");
         }
 
-        /// <summary>
-        /// Detach nodes from the tree that satisfy the specified predicate.
-        /// Nodes in scope of this operation include this node and all descendants.
-        /// Returns sequence of detached nodes.
-        /// </summary>
-        /// <param name="satisfiesCondition">Filtering predicate</param>
-        public virtual IEnumerable<TNode> DetachWhere (Func<TNode, bool> satisfiesCondition)
+        OnNodeDetaching();
+
+        UpdateErrorsBeforeDetachingThis();
+
+        var oldParent = Parent;
+
+        Root = This;
+        Parent = null;
+        Level = 0;
+        PreviousSibling = null;
+        NextSibling = null;
+
+        oldParent!.ChildrenList.Remove (This);
+
+        oldParent.SetChildrenSiblingReferences();
+
+        foreach (var n in SelectDescendants())
         {
-            var nodesToRemove = this.Where (satisfiesCondition).OrderBy (n => n.Level).ToList();
-
-            while (nodesToRemove.Count > 0)
-            {
-                var cur = nodesToRemove[0];
-
-                if (!cur.IsRoot)
-                {
-                    cur.Detach();
-                    yield return cur;
-                }
-
-                nodesToRemove.Remove (cur);
-            }
+            n.Level = n.Parent!.Level + 1;
+            n.Root = This;
+            n.TreeIdMap = TreeIdMap;
         }
 
-        /// <summary>
-        /// Detach this node's children from the tree. Returns sequence of detached nodes.
-        /// </summary>
-        public virtual IEnumerable<TNode> DetachChildren()
+        OnNodeDetached (oldParent);
+    }
+
+    /// <summary>
+    /// Detach nodes from the tree that satisfy the specified predicate.
+    /// Nodes in scope of this operation include this node and all descendants.
+    /// Returns sequence of detached nodes.
+    /// </summary>
+    /// <param name="satisfiesCondition">Filtering predicate</param>
+    public virtual IEnumerable<TNode> DetachWhere
+        (
+            Func<TNode, bool> satisfiesCondition
+        )
+    {
+        var nodesToRemove = this.Where (satisfiesCondition).OrderBy (n => n.Level).ToList();
+
+        while (nodesToRemove.Count > 0)
         {
-            while (ChildrenList.Count > 0)
+            var cur = nodesToRemove[0];
+
+            if (!cur.IsRoot)
             {
-                var child = ChildrenList[0];
-                child.Detach();
-                yield return child;
+                cur.Detach();
+                yield return cur;
             }
+
+            nodesToRemove.Remove (cur);
+        }
+    }
+
+    /// <summary>
+    /// Detach this node's children from the tree. Returns sequence of detached nodes.
+    /// </summary>
+    public virtual IEnumerable<TNode> DetachChildren()
+    {
+        while (ChildrenList.Count > 0)
+        {
+            var child = ChildrenList[0];
+            child.Detach();
+            yield return child;
         }
     }
 }

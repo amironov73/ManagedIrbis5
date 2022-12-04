@@ -1,111 +1,136 @@
-﻿using System;
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable NonReadonlyMemberInGetHashCode
+// ReSharper disable UnusedMember.Global
+
+/* MoveOperations.cs --
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
+using System;
 using System.Linq;
 
-// ReSharper disable UnusedTypeParameter
+#endregion
 
-namespace TreeCollections
+#nullable enable
+
+namespace TreeCollections;
+
+public abstract partial class MutableEntityTreeNode<TNode, TId, TItem>
 {
-    public abstract partial class MutableEntityTreeNode<TNode, TId, TItem>
+    /// <summary>
+    /// Move this node from its current position to new parent in the same tree
+    /// </summary>
+    /// <param name="parentId">Target parent entity Id</param>
+    /// <param name="insertIndex">Child position at which to insert</param>
+    public virtual void MoveToParent
+        (
+            TId parentId,
+            int? insertIndex = null
+        )
     {
-        /// <summary>
-        /// Move this node from its current position to new parent in the same tree
-        /// </summary>
-        /// <param name="parentId">Target parent entity Id</param>
-        /// <param name="insertIndex">Child position at which to insert</param>
-        public virtual void MoveToParent (TId parentId, int? insertIndex = null)
+        var targetParent = Root[parentId];
+
+        if (targetParent!.Equals (Parent))
         {
-            var targetParent = Root[parentId];
-
-            if (targetParent.Equals (Parent))
+            if (!insertIndex.HasValue || insertIndex.Value > Parent.Children.Count - 1)
             {
-                if (!insertIndex.HasValue || insertIndex.Value > Parent.Children.Count - 1)
-                {
-                    MoveToSiblingAdjacentPosition (Parent.Children.Last(), Adjacency.After);
-                }
-                else
-                {
-                    MoveToSiblingAdjacentPosition (Parent.Children[insertIndex.Value], Adjacency.After);
-                }
-
-                return;
-            }
-
-            if (targetParent.Equals (this) || IsAncestorOf (targetParent))
-            {
-                throw new InvalidOperationException ("Cannot move to self or a descendant");
-            }
-
-            OnNodeReparenting (targetParent);
-
-            Detach();
-            targetParent.AttachChildOnMove (This, insertIndex);
-        }
-
-        /// <summary>
-        /// Move this node from its current position to a position adjacent to a specified node in the same tree.
-        /// </summary>
-        /// <param name="targetId">Target entity Id</param>
-        /// <param name="adjacency">Specifies which side to place the node</param>
-        public virtual void MoveToAdjacentPosition (TId targetId, Adjacency adjacency)
-        {
-            var targetNode = Root[targetId];
-
-            if (targetNode.Equals (this))
-            {
-                // already here!
-                return;
-            }
-
-            if (targetNode.IsRoot)
-            {
-                throw new InvalidOperationException ("Cannot move to root level");
-            }
-
-            if (IsAncestorOf (targetNode))
-            {
-                throw new InvalidOperationException ("Cannot move to a descendant");
-            }
-
-            if (IsSiblingOf (targetNode))
-            {
-                MoveToSiblingAdjacentPosition (targetNode, adjacency);
+                MoveToSiblingAdjacentPosition (Parent.Children.Last(), Adjacency.After);
             }
             else
             {
-                MoveToNonSiblingAdjacentPosition (targetNode, adjacency);
+                MoveToSiblingAdjacentPosition (Parent.Children[insertIndex.Value], Adjacency.After);
             }
+
+            return;
         }
 
-        /// <summary>
-        /// Move this node from its current position to the adjacent position before a specified node in the same tree.
-        /// </summary>
-        /// <param name="targetId">Target entity Id</param>
-        public void MoveToPositionBefore (TId targetId) => MoveToAdjacentPosition (targetId, Adjacency.Before);
-
-        /// <summary>
-        /// Move this node from its current position to the adjacent position after a specified node in the same tree.
-        /// </summary>
-        /// <param name="targetId"></param>
-        public void MoveToPositionAfter (TId targetId) => MoveToAdjacentPosition (targetId, Adjacency.After);
-
-        /// <summary>
-        /// Move this node "forward" to the next sibling position.  Has no effect if no siblings exist.
-        /// </summary>
-        public virtual void IncrementSiblingPosition()
+        if (targetParent.Equals (this) || IsAncestorOf (targetParent))
         {
-            if (NextSibling == null) return;
-
-            MoveToSiblingAdjacentPosition (NextSibling, Adjacency.After);
+            throw new InvalidOperationException ("Cannot move to self or a descendant");
         }
 
-        /// <summary>
-        /// Move this node "backward" to the previous sibling position.  Has no effect if no siblings exist.
-        /// </summary>
-        public virtual void DecrementSiblingPosition()
+        OnNodeReparenting (targetParent);
+
+        Detach();
+        targetParent.AttachChildOnMove (This, insertIndex);
+    }
+
+    /// <summary>
+    /// Move this node from its current position to a position adjacent to a specified node in the same tree.
+    /// </summary>
+    /// <param name="targetId">Target entity Id</param>
+    /// <param name="adjacency">Specifies which side to place the node</param>
+    public virtual void MoveToAdjacentPosition
+        (
+            TId targetId,
+            Adjacency adjacency
+        )
+    {
+        var targetNode = Root[targetId];
+
+        if (targetNode!.Equals (this))
         {
-            if (PreviousSibling == null) return;
-
-            MoveToSiblingAdjacentPosition (PreviousSibling, Adjacency.Before);
+            // already here!
+            return;
         }
+
+        if (targetNode.IsRoot)
+        {
+            throw new InvalidOperationException ("Cannot move to root level");
+        }
+
+        if (IsAncestorOf (targetNode))
+        {
+            throw new InvalidOperationException ("Cannot move to a descendant");
+        }
+
+        if (IsSiblingOf (targetNode))
+        {
+            MoveToSiblingAdjacentPosition (targetNode, adjacency);
+        }
+        else
+        {
+            MoveToNonSiblingAdjacentPosition (targetNode, adjacency);
+        }
+    }
+
+    /// <summary>
+    /// Move this node from its current position to the adjacent position before a specified node in the same tree.
+    /// </summary>
+    /// <param name="targetId">Target entity Id</param>
+    public void MoveToPositionBefore (TId targetId) => MoveToAdjacentPosition (targetId, Adjacency.Before);
+
+    /// <summary>
+    /// Move this node from its current position to the adjacent position after a specified node in the same tree.
+    /// </summary>
+    /// <param name="targetId"></param>
+    public void MoveToPositionAfter (TId targetId) => MoveToAdjacentPosition (targetId, Adjacency.After);
+
+    /// <summary>
+    /// Move this node "forward" to the next sibling position.  Has no effect if no siblings exist.
+    /// </summary>
+    public virtual void IncrementSiblingPosition()
+    {
+        if (NextSibling == null) return;
+
+        MoveToSiblingAdjacentPosition (NextSibling, Adjacency.After);
+    }
+
+    /// <summary>
+    /// Move this node "backward" to the previous sibling position.  Has no effect if no siblings exist.
+    /// </summary>
+    public virtual void DecrementSiblingPosition()
+    {
+        if (PreviousSibling == null) return;
+
+        MoveToSiblingAdjacentPosition (PreviousSibling, Adjacency.Before);
     }
 }

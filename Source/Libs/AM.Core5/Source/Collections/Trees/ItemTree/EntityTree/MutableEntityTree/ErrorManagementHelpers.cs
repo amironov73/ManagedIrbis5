@@ -1,216 +1,234 @@
-﻿using System.Collections.Generic;
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable NonReadonlyMemberInGetHashCode
+// ReSharper disable UnusedMember.Global
+
+/* ErrorManagementHelpers.cs --
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
+using System.Collections.Generic;
 using System.Linq;
 
-namespace TreeCollections
+#endregion
+
+#nullable enable
+
+namespace TreeCollections;
+
+public abstract partial class MutableEntityTreeNode<TNode, TId, TItem>
 {
-    // ReSharper disable once UnusedTypeParameter
-    public abstract partial class MutableEntityTreeNode<TNode, TId, TItem>
+    private void SetErrorsAfterAddingThis()
     {
-        private void SetErrorsAfterAddingThis()
+        SetSiblingErrors();
+
+        if (CheckOptions.HasFlag (ErrorCheckOptions.CyclicIdDuplicates))
         {
-            SetSiblingErrors();
+            SetCyclicIdErrors();
+        }
 
-            if (CheckOptions.HasFlag (ErrorCheckOptions.CyclicIdDuplicates))
-            {
-                SetCyclicIdErrors();
-            }
+        if (IdentityTrackingIsTreeScope)
+        {
+            SetTreeScopeIdErrors();
+        }
+    }
 
-            if (IdentityTrackingIsTreeScope)
+    private void SetErrorsAfterMovingThis()
+    {
+        SetSiblingErrors();
+
+        if (CheckOptions.HasFlag (ErrorCheckOptions.CyclicIdDuplicates))
+        {
+            SetCyclicIdErrorsForEach();
+        }
+
+        if (IdentityTrackingIsTreeScope)
+        {
+            SetTreeScopeIdErrorsForEach();
+        }
+    }
+
+    private void SetSiblingErrors()
+    {
+        TNode[]? siblings = null;
+
+        if (CheckOptions.HasFlag (ErrorCheckOptions.SiblingIdDuplicates))
+        {
+            siblings = SelectSiblings().ToArray();
+
+            var existingIdMatch = siblings.FirstOrDefault (HasSameIdentityAs);
+
+            if (existingIdMatch != null)
             {
-                SetTreeScopeIdErrors();
+                Error |= IdentityError.SiblingIdDuplicate;
+                existingIdMatch.Error |= IdentityError.SiblingIdDuplicate;
             }
         }
 
-        private void SetErrorsAfterMovingThis()
+        if (!CheckOptions.HasFlag (ErrorCheckOptions.SiblingAliasDuplicates)) return;
+
+        siblings ??= SelectSiblings().ToArray();
+
+        var existingAliasMatch = siblings.FirstOrDefault (HasSameAliasAs);
+
+        if (existingAliasMatch != null)
         {
-            SetSiblingErrors();
+            Error |= IdentityError.SiblingAliasDuplicate;
+            existingAliasMatch.Error |= IdentityError.SiblingAliasDuplicate;
+        }
+    }
 
-            if (CheckOptions.HasFlag (ErrorCheckOptions.CyclicIdDuplicates))
-            {
-                SetCyclicIdErrorsForEach();
-            }
+    private void SetCyclicIdErrorsForEach()
+    {
+        this.ForEach (n => n.SetCyclicIdErrors());
+    }
 
-            if (IdentityTrackingIsTreeScope)
-            {
-                SetTreeScopeIdErrorsForEach();
-            }
+    private void SetCyclicIdErrors()
+    {
+        var existingMatch =
+            SelectAncestorsUpward()
+                .FirstOrDefault (HasSameIdentityAs);
+
+        if (existingMatch == null) return;
+
+        Error |= IdentityError.CyclicIdDuplicate;
+        existingMatch.Error |= IdentityError.CyclicIdDuplicate;
+    }
+
+    private void SetTreeScopeIdErrorsForEach()
+    {
+        // TODO: could optimize
+
+        this.ForEach (n => n.SetTreeScopeIdErrors());
+    }
+
+    private void SetTreeScopeIdErrors()
+    {
+        if (!TreeIdMap!.Contains (Id))
+        {
+            TreeIdMap.Add (Id);
+            return;
         }
 
-        private void SetSiblingErrors()
+        var duplicates = Root.Where (n => n.HasEquivalentId (Id));
+
+        duplicates.ForEach (dup => dup.Error |= IdentityError.TreeScopeIdDuplicate);
+    }
+
+    private void UpdateErrorsBeforeDetachingThis()
+    {
+        if (CheckOptions.HasFlag (ErrorCheckOptions.CyclicIdDuplicates))
         {
-            TNode[] siblings = null!;
-
-            if (CheckOptions.HasFlag (ErrorCheckOptions.SiblingIdDuplicates))
-            {
-                siblings = SelectSiblings().ToArray();
-
-                var existingIdMatch = siblings.FirstOrDefault (HasSameIdentityAs);
-
-                if (existingIdMatch != null)
-                {
-                    Error |= IdentityError.SiblingIdDuplicate;
-                    existingIdMatch.Error |= IdentityError.SiblingIdDuplicate;
-                }
-            }
-
-            if (!CheckOptions.HasFlag (ErrorCheckOptions.SiblingAliasDuplicates)) return;
-
-            siblings = siblings ?? SelectSiblings().ToArray();
-
-            var existingAliasMatch = siblings.FirstOrDefault (HasSameAliasAs);
-
-            if (existingAliasMatch != null)
-            {
-                Error |= IdentityError.SiblingAliasDuplicate;
-                existingAliasMatch.Error |= IdentityError.SiblingAliasDuplicate;
-            }
+            UpdateCyclicIdErrorsBeforeDetachingThis();
         }
 
-        private void SetCyclicIdErrorsForEach()
+        if (CheckOptions.HasFlag (ErrorCheckOptions.SiblingAliasDuplicates) &&
+            Error.HasFlag (IdentityError.SiblingAliasDuplicate))
         {
-            this.ForEach (n => n.SetCyclicIdErrors());
+            UpdateSiblingAliasErrorsBeforeDetachingThis();
         }
 
-        private void SetCyclicIdErrors()
+        if (CheckOptions.HasFlag (ErrorCheckOptions.SiblingIdDuplicates) &&
+            Error.HasFlag (IdentityError.SiblingIdDuplicate))
         {
-            var existingMatch =
-                SelectAncestorsUpward()
-                    .FirstOrDefault (HasSameIdentityAs);
-
-            if (existingMatch == null) return;
-
-            Error |= IdentityError.CyclicIdDuplicate;
-            existingMatch.Error |= IdentityError.CyclicIdDuplicate;
+            UpdateSiblingIdErrorsBeforeDetachingThis();
         }
 
-        private void SetTreeScopeIdErrorsForEach()
+        if (IdentityTrackingIsTreeScope)
         {
+            UpdateTreeScopeIdErrorsBeforeDetachingThis();
+        }
+    }
+
+    private void UpdateCyclicIdErrorsBeforeDetachingThis()
+    {
+        var nodesWithCycles = SelectDescendants().Where (n => n.Error.HasFlag (IdentityError.CyclicIdDuplicate));
+
+        foreach (var node in nodesWithCycles)
+        {
+            var path = node.SelectPathUpward().ToArray();
+
             // TODO: could optimize
 
-            this.ForEach (n => n.SetTreeScopeIdErrors());
-        }
+            var duplicatesAboveThis = path.Where (n => n.Level < Level && node.HasSameIdentityAs (n)).ToArray();
+            var containedDuplicates = path.Where (n => n.Level >= Level && node.HasSameIdentityAs (n)).ToArray();
 
-        private void SetTreeScopeIdErrors()
+            if (duplicatesAboveThis.Length == 1)
+            {
+                duplicatesAboveThis[0].Error &= ~IdentityError.CyclicIdDuplicate;
+            }
+
+            if (containedDuplicates.Length == 1)
+            {
+                node.Error &= ~IdentityError.CyclicIdDuplicate;
+            }
+        }
+    }
+
+    private void UpdateSiblingIdErrorsBeforeDetachingThis()
+    {
+        Error &= ~IdentityError.SiblingIdDuplicate;
+
+        var siblingDuplicates = SelectSiblings().Where (HasSameIdentityAs).ToArray();
+
+        if (siblingDuplicates.Length == 1)
         {
-            if (!TreeIdMap.Contains (Id))
-            {
-                TreeIdMap.Add (Id);
-                return;
-            }
-
-            var duplicates = Root.Where (n => n.HasEquivalentId (Id));
-
-            duplicates.ForEach (dup => dup.Error |= IdentityError.TreeScopeIdDuplicate);
+            siblingDuplicates[0].Error &= ~IdentityError.SiblingIdDuplicate;
         }
+    }
 
-        private void UpdateErrorsBeforeDetachingThis()
+    private void UpdateSiblingAliasErrorsBeforeDetachingThis()
+    {
+        Error &= ~IdentityError.SiblingAliasDuplicate;
+
+        var siblingDuplicates = SelectSiblings().Where (HasSameAliasAs).ToArray();
+
+        if (siblingDuplicates.Length == 1)
         {
-            if (CheckOptions.HasFlag (ErrorCheckOptions.CyclicIdDuplicates))
-            {
-                UpdateCyclicIdErrorsBeforeDetachingThis();
-            }
-
-            if (CheckOptions.HasFlag (ErrorCheckOptions.SiblingAliasDuplicates) &&
-                Error.HasFlag (IdentityError.SiblingAliasDuplicate))
-            {
-                UpdateSiblingAliasErrorsBeforeDetachingThis();
-            }
-
-            if (CheckOptions.HasFlag (ErrorCheckOptions.SiblingIdDuplicates) &&
-                Error.HasFlag (IdentityError.SiblingIdDuplicate))
-            {
-                UpdateSiblingIdErrorsBeforeDetachingThis();
-            }
-
-            if (IdentityTrackingIsTreeScope)
-            {
-                UpdateTreeScopeIdErrorsBeforeDetachingThis();
-            }
+            siblingDuplicates[0].Error &= ~IdentityError.SiblingAliasDuplicate;
         }
+    }
 
-        private void UpdateCyclicIdErrorsBeforeDetachingThis()
+    private void UpdateTreeScopeIdErrorsBeforeDetachingThis()
+    {
+        var treeIdGroups = Root.ToLookup (n => n.Id);
+
+        foreach (var grp in treeIdGroups)
         {
-            var nodesWithCycles = SelectDescendants().Where (n => n.Error.HasFlag (IdentityError.CyclicIdDuplicate));
+            var id = grp.Key;
 
-            foreach (var node in nodesWithCycles)
+            var enumerated = grp.ToArray();
+            var insiders = enumerated.Where (n => n.Equals (This) || n.IsDescendantOf (This)).ToArray();
+
+            if (insiders.Length == 0) continue;
+
+            if (enumerated.Length == insiders.Length)
             {
-                var path = node.SelectPathUpward().ToArray();
+                TreeIdMap!.Remove (id);
+                continue;
+            }
 
-                // TODO: could optimize
+            var outsiders = enumerated.Except (insiders).ToArray();
 
-                var duplicatesAboveThis = path.Where (n => n.Level < Level && node.HasSameIdentityAs (n)).ToArray();
-                var containedDuplicates = path.Where (n => n.Level >= Level && node.HasSameIdentityAs (n)).ToArray();
+            if (outsiders.Length == 1)
+            {
+                outsiders[0].Error &= ~IdentityError.TreeScopeIdDuplicate;
+            }
 
-                if (duplicatesAboveThis.Length == 1)
-                {
-                    duplicatesAboveThis[0].Error &= ~IdentityError.CyclicIdDuplicate;
-                }
-
-                if (containedDuplicates.Length == 1)
-                {
-                    node.Error &= ~IdentityError.CyclicIdDuplicate;
-                }
+            if (insiders.Length == 1)
+            {
+                insiders[0].Error &= ~IdentityError.TreeScopeIdDuplicate;
             }
         }
 
-        private void UpdateSiblingIdErrorsBeforeDetachingThis()
-        {
-            Error &= ~IdentityError.SiblingIdDuplicate;
-
-            var siblingDuplicates = SelectSiblings().Where (HasSameIdentityAs).ToArray();
-
-            if (siblingDuplicates.Length == 1)
-            {
-                siblingDuplicates[0].Error &= ~IdentityError.SiblingIdDuplicate;
-            }
-        }
-
-        private void UpdateSiblingAliasErrorsBeforeDetachingThis()
-        {
-            Error &= ~IdentityError.SiblingAliasDuplicate;
-
-            var siblingDuplicates = SelectSiblings().Where (HasSameAliasAs).ToArray();
-
-            if (siblingDuplicates.Length == 1)
-            {
-                siblingDuplicates[0].Error &= ~IdentityError.SiblingAliasDuplicate;
-            }
-        }
-
-        private void UpdateTreeScopeIdErrorsBeforeDetachingThis()
-        {
-            var treeIdGroups = Root.ToLookup (n => n.Id);
-
-            foreach (var grp in treeIdGroups)
-            {
-                var id = grp.Key;
-
-                var enumerated = grp.ToArray();
-                var insiders = enumerated.Where (n => n.Equals (This) || n.IsDescendantOf (This)).ToArray();
-
-                if (insiders.Length == 0) continue;
-
-                if (enumerated.Length == insiders.Length)
-                {
-                    TreeIdMap.Remove (id);
-                    continue;
-                }
-
-                var outsiders = enumerated.Except (insiders).ToArray();
-
-                if (outsiders.Length == 1)
-                {
-                    outsiders[0].Error &= ~IdentityError.TreeScopeIdDuplicate;
-                }
-
-                if (insiders.Length == 1)
-                {
-                    insiders[0].Error &= ~IdentityError.TreeScopeIdDuplicate;
-                }
-            }
-
-            TreeIdMap = new HashSet<TId> (Definition.IdEqualityComparer);
-            this.Select (n => n.Id).ForEach (id => TreeIdMap.Add (id));
-        }
+        TreeIdMap = new HashSet<TId> (Definition.IdEqualityComparer);
+        this.Select (n => n.Id).ForEach (id => TreeIdMap.Add (id));
     }
 }
