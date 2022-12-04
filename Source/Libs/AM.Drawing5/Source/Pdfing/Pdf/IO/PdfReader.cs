@@ -3,11 +3,12 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable ForCanBeConvertedToForeach
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-/*
+/* PdfReader.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,6 +18,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+
+using AM;
 
 using PdfSharpCore.Exceptions;
 using PdfSharpCore.Internal;
@@ -60,25 +63,26 @@ public static class PdfReader
     /// number as integer (e.g. 14 for PDF 1.4). If the file header is invalid or inaccessible
     /// for any reason, 0 is returned. The function never throws an exception.
     /// </summary>
-    public static int TestPdfFile (string path)
+    public static int TestPdfFile
+        (
+            string path
+        )
     {
         FileStream? stream = null;
         try
         {
-            int pageNumber;
-            var realPath = Drawing.XPdfForm.ExtractPageNumber (path, out pageNumber);
+            var realPath = Drawing.XPdfForm.ExtractPageNumber (path, out _);
             if (File.Exists (realPath)) // prevent unwanted exceptions during debugging
             {
                 stream = new FileStream (realPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 var bytes = new byte[1024];
-                stream.Read (bytes, 0, 1024);
+                stream.Read (bytes, 0, 1024).NotUsed();
                 return GetPdfFileVersion (bytes);
             }
         }
-
-        // ReSharper disable once EmptyGeneralCatchClause
-        catch
+        catch (Exception exception)
         {
+            Debug.WriteLine (exception.Message);
         }
         finally
         {
@@ -89,10 +93,9 @@ public static class PdfReader
                     stream.Dispose();
                 }
             }
-
-            // ReSharper disable once EmptyGeneralCatchClause
-            catch
+            catch (Exception exception)
             {
+                Debug.WriteLine (exception.Message);
             }
         }
 
@@ -105,20 +108,22 @@ public static class PdfReader
     /// number as integer (e.g. 14 for PDF 1.4). If the data is invalid or inaccessible
     /// for any reason, 0 is returned. The function never throws an exception.
     /// </summary>
-    public static int TestPdfFile (Stream stream)
+    public static int TestPdfFile
+        (
+            Stream stream
+        )
     {
         long pos = -1;
         try
         {
             pos = stream.Position;
             var bytes = new byte[1024];
-            stream.Read (bytes, 0, 1024);
+            stream.Read (bytes, 0, 1024).NotUsed();
             return GetPdfFileVersion (bytes);
         }
-
-        // ReSharper disable once EmptyGeneralCatchClause
-        catch
+        catch (Exception exception)
         {
+            Debug.WriteLine (exception.Message);
         }
         finally
         {
@@ -129,10 +134,9 @@ public static class PdfReader
                     stream.Position = pos;
                 }
             }
-
-            // ReSharper disable once EmptyGeneralCatchClause
-            catch
+            catch (Exception exception)
             {
+                Debug.WriteLine (exception.Message);
             }
         }
 
@@ -145,7 +149,10 @@ public static class PdfReader
     /// number as integer (e.g. 14 for PDF 1.4). If the data is invalid or inaccessible
     /// for any reason, 0 is returned. The function never throws an exception.
     /// </summary>
-    public static int TestPdfFile (byte[] data)
+    public static int TestPdfFile
+        (
+            byte[] data
+        )
     {
         return GetPdfFileVersion (data);
     }
@@ -154,13 +161,16 @@ public static class PdfReader
     /// Implements scanning the PDF file version.
     /// </summary>
     ///
-    internal static int GetPdfFileVersion (byte[] bytes)
+    internal static int GetPdfFileVersion
+        (
+            byte[] bytes
+        )
     {
         try
         {
             // Acrobat accepts headers like «%!PS-Adobe-N.n PDF-M.m»...
-            var header =
-                PdfEncoders.RawEncoding.GetString (bytes, 0, bytes.Length); // Encoding.ASCII.GetString(bytes);
+            var header = PdfEncoders.RawEncoding.GetString
+                (bytes, 0, bytes.Length); // Encoding.ASCII.GetString(bytes);
             if (header[0] == '%' || header.IndexOf ("%PDF", StringComparison.Ordinal) >= 0)
             {
                 var ich = header.IndexOf ("PDF-", StringComparison.Ordinal);
@@ -168,17 +178,16 @@ public static class PdfReader
                 {
                     var major = header[ich + 4];
                     var minor = header[ich + 6];
-                    if (major >= '1' && major < '2' && minor >= '0' && minor <= '9')
+                    if (major is >= '1' and < '2' && minor is >= '0' and <= '9')
                     {
                         return (major - '0') * 10 + (minor - '0');
                     }
                 }
             }
         }
-
-        // ReSharper disable once EmptyGeneralCatchClause
-        catch
+        catch (Exception exception)
         {
+            Debug.WriteLine (exception.Message);
         }
 
         // If it doesn't work with the specified encoding ...
@@ -193,17 +202,16 @@ public static class PdfReader
                 {
                     var major = header[ich + 4];
                     var minor = header[ich + 6];
-                    if (major >= '1' && major < '2' && minor >= '0' && minor <= '9')
+                    if (major is >= '1' and < '2' && minor is >= '0' and <= '9')
                     {
                         return (major - '0') * 10 + (minor - '0');
                     }
                 }
             }
         }
-
-        // ReSharper disable once EmptyGeneralCatchClause
-        catch
+        catch (Exception exception)
         {
+            Debug.WriteLine (exception.Message);
         }
 
         return 0;
@@ -212,7 +220,11 @@ public static class PdfReader
     /// <summary>
     /// Opens an existing PDF document.
     /// </summary>
-    public static PdfDocument Open (string path, PdfDocumentOpenMode openmode)
+    public static PdfDocument? Open
+        (
+            string path,
+            PdfDocumentOpenMode openmode
+        )
     {
         return Open (path, null, openmode, null, PdfReadAccuracy.Strict);
     }
@@ -220,7 +232,12 @@ public static class PdfReader
     /// <summary>
     /// Opens an existing PDF document.
     /// </summary>
-    public static PdfDocument Open (string path, PdfDocumentOpenMode openmode, PdfReadAccuracy accuracy)
+    public static PdfDocument? Open
+        (
+            string path,
+            PdfDocumentOpenMode openmode,
+            PdfReadAccuracy accuracy
+        )
     {
         return Open (path, null, openmode, null, accuracy);
     }
@@ -228,7 +245,12 @@ public static class PdfReader
     /// <summary>
     /// Opens an existing PDF document.
     /// </summary>
-    public static PdfDocument Open (string path, PdfDocumentOpenMode openmode, PdfPasswordProvider provider)
+    public static PdfDocument? Open
+        (
+            string path,
+            PdfDocumentOpenMode openmode,
+            PdfPasswordProvider provider
+        )
     {
         return Open (path, null, openmode, provider, PdfReadAccuracy.Strict);
     }
@@ -236,8 +258,13 @@ public static class PdfReader
     /// <summary>
     /// Opens an existing PDF document.
     /// </summary>
-    public static PdfDocument Open (string path, PdfDocumentOpenMode openmode, PdfPasswordProvider provider,
-        PdfReadAccuracy accuracy)
+    public static PdfDocument? Open
+        (
+            string path,
+            PdfDocumentOpenMode openmode,
+            PdfPasswordProvider provider,
+            PdfReadAccuracy accuracy
+        )
     {
         return Open (path, null, openmode, provider, accuracy);
     }
@@ -245,7 +272,12 @@ public static class PdfReader
     /// <summary>
     /// Opens an existing PDF document.
     /// </summary>
-    public static PdfDocument Open (string path, string password, PdfDocumentOpenMode openmode)
+    public static PdfDocument? Open
+        (
+            string path,
+            string? password,
+            PdfDocumentOpenMode openmode
+        )
     {
         return Open (path, password, openmode, null, PdfReadAccuracy.Strict);
     }
@@ -253,8 +285,13 @@ public static class PdfReader
     /// <summary>
     /// Opens an existing PDF document.
     /// </summary>
-    public static PdfDocument Open (string path, string password, PdfDocumentOpenMode openmode,
-        PdfReadAccuracy accuracy)
+    public static PdfDocument? Open
+        (
+            string path,
+            string? password,
+            PdfDocumentOpenMode openmode,
+            PdfReadAccuracy accuracy
+        )
     {
         return Open (path, password, openmode, null, accuracy);
     }
@@ -262,8 +299,13 @@ public static class PdfReader
     /// <summary>
     /// Opens an existing PDF document.
     /// </summary>
-    public static PdfDocument Open (string path, string password, PdfDocumentOpenMode openmode,
-        PdfPasswordProvider provider)
+    public static PdfDocument? Open
+        (
+            string path,
+            string? password,
+            PdfDocumentOpenMode openmode,
+            PdfPasswordProvider? provider
+        )
     {
         return Open (path, password, openmode, provider, PdfReadAccuracy.Strict);
     }
@@ -271,11 +313,17 @@ public static class PdfReader
     /// <summary>
     /// Opens an existing PDF document.
     /// </summary>
-    public static PdfDocument Open (string path, string password, PdfDocumentOpenMode openmode,
-        PdfPasswordProvider provider, PdfReadAccuracy accuracy)
+    public static PdfDocument? Open
+        (
+            string path,
+            string? password,
+            PdfDocumentOpenMode openmode,
+            PdfPasswordProvider? provider,
+            PdfReadAccuracy accuracy
+        )
     {
-        PdfDocument document;
-        Stream stream = null;
+        PdfDocument? document;
+        Stream? stream = null;
         try
         {
             stream = new FileStream (path, FileMode.Open, FileAccess.Read);
@@ -299,7 +347,10 @@ public static class PdfReader
     /// <summary>
     /// Opens an existing PDF document.
     /// </summary>
-    public static PdfDocument Open (string path)
+    public static PdfDocument? Open
+        (
+            string path
+        )
     {
         return Open (path, null, PdfDocumentOpenMode.Modify, null, PdfReadAccuracy.Strict);
     }
@@ -307,7 +358,11 @@ public static class PdfReader
     /// <summary>
     /// Opens an existing PDF document.
     /// </summary>
-    public static PdfDocument Open (string path, PdfReadAccuracy accuracy)
+    public static PdfDocument? Open
+        (
+            string path,
+            PdfReadAccuracy accuracy
+        )
     {
         return Open (path, null, PdfDocumentOpenMode.Modify, null, accuracy);
     }
@@ -315,7 +370,11 @@ public static class PdfReader
     /// <summary>
     /// Opens an existing PDF document.
     /// </summary>
-    public static PdfDocument Open (string path, string password)
+    public static PdfDocument? Open
+        (
+            string path,
+            string? password
+        )
     {
         return Open (path, password, PdfDocumentOpenMode.Modify, null, PdfReadAccuracy.Strict);
     }
@@ -323,7 +382,12 @@ public static class PdfReader
     /// <summary>
     /// Opens an existing PDF document.
     /// </summary>
-    public static PdfDocument Open (string path, string password, PdfReadAccuracy accuracy)
+    public static PdfDocument? Open
+        (
+            string path,
+            string? password,
+            PdfReadAccuracy accuracy
+        )
     {
         return Open (path, password, PdfDocumentOpenMode.Modify, null, accuracy);
     }
@@ -331,7 +395,11 @@ public static class PdfReader
     /// <summary>
     /// Opens an existing PDF document.
     /// </summary>
-    public static PdfDocument Open (Stream stream, PdfDocumentOpenMode openmode)
+    public static PdfDocument? Open
+        (
+            Stream stream,
+            PdfDocumentOpenMode openmode
+        )
     {
         return Open (stream, null, openmode, PdfReadAccuracy.Strict);
     }
@@ -339,7 +407,12 @@ public static class PdfReader
     /// <summary>
     /// Opens an existing PDF document.
     /// </summary>
-    public static PdfDocument Open (Stream stream, PdfDocumentOpenMode openmode, PdfReadAccuracy accuracy)
+    public static PdfDocument? Open
+        (
+            Stream stream,
+            PdfDocumentOpenMode openmode,
+            PdfReadAccuracy accuracy
+        )
     {
         return Open (stream, null, openmode, accuracy);
     }
@@ -347,7 +420,12 @@ public static class PdfReader
     /// <summary>
     /// Opens an existing PDF document.
     /// </summary>
-    public static PdfDocument Open (Stream stream, PdfDocumentOpenMode openmode, PdfPasswordProvider passwordProvider)
+    public static PdfDocument? Open
+        (
+            Stream stream,
+            PdfDocumentOpenMode openmode,
+            PdfPasswordProvider passwordProvider
+        )
     {
         return Open (stream, null, openmode, passwordProvider, PdfReadAccuracy.Strict);
     }
@@ -355,8 +433,13 @@ public static class PdfReader
     /// <summary>
     /// Opens an existing PDF document.
     /// </summary>
-    public static PdfDocument Open (Stream stream, PdfDocumentOpenMode openmode, PdfPasswordProvider passwordProvider,
-        PdfReadAccuracy accuracy)
+    public static PdfDocument? Open
+        (
+            Stream stream,
+            PdfDocumentOpenMode openmode,
+            PdfPasswordProvider passwordProvider,
+            PdfReadAccuracy accuracy
+        )
     {
         return Open (stream, null, openmode, passwordProvider, accuracy);
     }
@@ -364,7 +447,12 @@ public static class PdfReader
     /// <summary>
     /// Opens an existing PDF document.
     /// </summary>
-    public static PdfDocument Open (Stream stream, string password, PdfDocumentOpenMode openmode)
+    public static PdfDocument? Open
+        (
+            Stream stream,
+            string? password,
+            PdfDocumentOpenMode openmode
+        )
     {
         return Open (stream, password, openmode, null, PdfReadAccuracy.Strict);
     }
@@ -372,8 +460,13 @@ public static class PdfReader
     /// <summary>
     /// Opens an existing PDF document.
     /// </summary>
-    public static PdfDocument Open (Stream stream, string password, PdfDocumentOpenMode openmode,
-        PdfReadAccuracy accuracy)
+    public static PdfDocument? Open
+        (
+            Stream stream,
+            string? password,
+            PdfDocumentOpenMode openmode,
+            PdfReadAccuracy accuracy
+        )
     {
         return Open (stream, password, openmode, null, accuracy);
     }
@@ -381,8 +474,13 @@ public static class PdfReader
     /// <summary>
     /// Opens an existing PDF document.
     /// </summary>
-    public static PdfDocument Open (Stream stream, string password, PdfDocumentOpenMode openmode,
-        PdfPasswordProvider passwordProvider)
+    public static PdfDocument? Open
+        (
+            Stream stream,
+            string? password,
+            PdfDocumentOpenMode openmode,
+            PdfPasswordProvider passwordProvider
+        )
     {
         return Open (stream, password, openmode, passwordProvider, PdfReadAccuracy.Strict);
     }
@@ -390,8 +488,14 @@ public static class PdfReader
     /// <summary>
     /// Opens an existing PDF document.
     /// </summary>
-    public static PdfDocument Open (Stream stream, string password, PdfDocumentOpenMode openmode,
-        PdfPasswordProvider passwordProvider, PdfReadAccuracy accuracy)
+    public static PdfDocument? Open
+        (
+            Stream stream,
+            string? password,
+            PdfDocumentOpenMode openmode,
+            PdfPasswordProvider? passwordProvider,
+            PdfReadAccuracy accuracy
+        )
     {
         PdfDocument document;
         try
@@ -405,7 +509,7 @@ public static class PdfReader
             // Get file version.
             var header = new byte[1024];
             stream.Position = 0;
-            stream.Read (header, 0, 1024);
+            stream.Read (header, 0, 1024).NotUsed();
             document._version = GetPdfFileVersion (header);
             if (document._version == 0)
             {
@@ -427,7 +531,7 @@ public static class PdfReader
             document._irefTable.IsUnderConstruction = false;
 
             // Is document encrypted?
-            var xrefEncrypt = document._trailer.Elements[PdfTrailer.Keys.Encrypt] as PdfReference;
+            var xrefEncrypt = document._trailer!.Elements[PdfTrailer.Keys.Encrypt] as PdfReference;
             if (xrefEncrypt != null)
             {
                 //xrefEncrypt.Value = parser.ReadObject(null, xrefEncrypt.ObjectID, false);
@@ -437,7 +541,7 @@ public static class PdfReader
                 xrefEncrypt.Value = encrypt;
                 var securityHandler = document.SecurityHandler;
                 TryAgain:
-                var validity = securityHandler.ValidatePassword (password);
+                var validity = securityHandler!.ValidatePassword (password);
                 if (validity == PasswordValidity.Invalid)
                 {
                     if (passwordProvider != null)
@@ -497,12 +601,11 @@ public static class PdfReader
             var count2 = irefs2.Length;
 
             // 3rd: Create iRefs for all compressed objects.
-            var objectStreams = new Dictionary<int, object>();
+            var objectStreams = new Dictionary<int, object?>();
             for (var idx = 0; idx < count2; idx++)
             {
                 var iref = irefs2[idx];
-                var xrefStream = iref.Value as PdfCrossReferenceStream;
-                if (xrefStream != null)
+                if (iref.Value is PdfCrossReferenceStream xrefStream)
                 {
                     for (var idx2 = 0; idx2 < xrefStream.Entries.Count; idx2++)
                     {
@@ -529,8 +632,7 @@ public static class PdfReader
             for (var idx = 0; idx < count2; idx++)
             {
                 var iref = irefs2[idx];
-                var xrefStream = iref.Value as PdfCrossReferenceStream;
-                if (xrefStream != null)
+                if (iref.Value is PdfCrossReferenceStream xrefStream)
                 {
                     for (var idx2 = 0; idx2 < xrefStream.Entries.Count; idx2++)
                     {
@@ -539,8 +641,12 @@ public static class PdfReader
                         // Is type xref to compressed object?
                         if (item.Type == 2)
                         {
-                            var irefNew = parser.ReadCompressedObject (new PdfObjectID ((int)item.Field2),
-                                (int)item.Field3);
+                            var irefNew = parser.ReadCompressedObject
+                                (
+                                    new PdfObjectID ((int)item.Field2),
+                                    (int)item.Field3
+                                );
+                            irefNew.NotUsed();
                             Debug.Assert (document._irefTable.Contains (iref.ObjectID));
 
                             //document._irefTable.Add(irefNew);
@@ -557,7 +663,7 @@ public static class PdfReader
             for (var idx = 0; idx < count; idx++)
             {
                 var iref = irefs[idx];
-                if (iref.Value == null)
+                if (iref.Value == null!)
                 {
 #if DEBUG_
                         if (iref.ObjectNumber == 1074)
@@ -603,7 +709,7 @@ public static class PdfReader
             // Encrypt all objects.
             if (xrefEncrypt != null)
             {
-                document.SecurityHandler.EncryptDocument();
+                document.SecurityHandler!.EncryptDocument();
             }
 
             // Fix references of trailer values and then objects and irefs are consistent.
@@ -664,7 +770,10 @@ public static class PdfReader
     /// <summary>
     /// Opens an existing PDF document.
     /// </summary>
-    public static PdfDocument Open (Stream stream)
+    public static PdfDocument? Open
+        (
+            Stream stream
+        )
     {
         return Open (stream, PdfDocumentOpenMode.Modify, PdfReadAccuracy.Strict);
     }
@@ -672,7 +781,11 @@ public static class PdfReader
     /// <summary>
     /// Opens an existing PDF document.
     /// </summary>
-    public static PdfDocument Open (Stream stream, PdfReadAccuracy accuracy)
+    public static PdfDocument? Open
+        (
+            Stream stream,
+            PdfReadAccuracy accuracy
+        )
     {
         return Open (stream, PdfDocumentOpenMode.Modify, accuracy);
     }

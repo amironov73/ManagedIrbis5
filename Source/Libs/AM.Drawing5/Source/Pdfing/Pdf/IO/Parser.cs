@@ -120,8 +120,13 @@ internal sealed class Parser
     /// <param name="includeReferences">If true, specifies that all indirect objects
     /// are included recursively.</param>
     /// <param name="fromObjecStream">If true, the objects is parsed from an object stream.</param>
-    public PdfObject ReadObject (PdfObject pdfObject, PdfObjectID objectID, bool includeReferences,
-        bool fromObjecStream)
+    public PdfObject ReadObject
+        (
+            PdfObject? pdfObject,
+            PdfObjectID objectID,
+            bool includeReferences,
+            bool fromObjecStream
+        )
     {
 #if DEBUG_
             Debug.WriteLine("ReadObject: " + objectID);
