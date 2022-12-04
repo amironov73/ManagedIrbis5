@@ -566,6 +566,14 @@ public partial class MainWindow
         };
 
         await window.ShowDialog (this);
+    }
 
+    private void DataGridButton_OnClick
+        (
+            object? sender,
+            RoutedEventArgs eventArgs
+        )
+    {
+        new DataGridDemo().Show (this);
     }
 }

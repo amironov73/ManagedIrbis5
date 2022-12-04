@@ -32,6 +32,7 @@ using AM.Interactivity;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Markup.Xaml.Styling;
 using Avalonia.ThemeManager;
 
 using Microsoft.Extensions.Configuration;
@@ -288,6 +289,14 @@ public class AvaloniaApplication
         {
             ThemeManager.Switch (1);
         }
+
+        // стили для датагрида
+        var uri = new Uri ("avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml");
+        var include = new StyleInclude (uri)
+        {
+            Source = uri
+        };
+        Styles.Add (include);
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {

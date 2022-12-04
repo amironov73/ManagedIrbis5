@@ -19,6 +19,7 @@ using System;
 
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Themes.Fluent;
 
 #endregion
@@ -36,7 +37,15 @@ public sealed class App
     /// <inheritdoc cref="Application.Initialize"/>
     public override void Initialize()
     {
-        Current!.Styles.Add (new FluentTheme (new Uri("avares://Avalonia.Themes.Fluent/FluentLight.xaml")));
+        Styles.Add (new FluentTheme (new Uri("avares://Avalonia.Themes.Fluent/FluentLight.xaml")));
+
+        // стили для датагрида
+        var uri = new Uri ("avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml");
+        var include = new StyleInclude (uri)
+        {
+            Source = uri
+        };
+        Styles.Add (include);
     }
 
     /// <inheritdoc cref="Application.OnFrameworkInitializationCompleted"/>

@@ -104,6 +104,12 @@
             FieldPainter
         </Button>
 
+        <Button
+            Name="DataGridButton"
+            Click="DataGridButton_OnClick">
+            DataGrid
+        </Button>
+
     </WrapPanel>
 
 </Window>

@@ -47,10 +47,6 @@
         </EmbeddedResource>
     </ItemGroup>
 
-    <ItemGroup>
-        <Folder Include="Source\AppServices"/>
-    </ItemGroup>
-
     <!-- Централизованное управление пакетами -->
     <ItemGroup>
         <PackageReference Include="ReactiveUI"/>
