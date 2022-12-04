@@ -25,7 +25,7 @@ using PdfSharpCore.Pdf.Advanced;
 
 #pragma warning disable 1587
 
-namespace PdfSharpCore.Drawing  // #??? aufräumen
+namespace PdfSharpCore.Drawing  // #??? aufrï¿½umen
 {
     /// <summary>
     /// Holds information about the current state of the XGraphics object.
@@ -113,7 +113,7 @@ namespace PdfSharpCore.Drawing  // #??? aufräumen
         {
             if (size == null)
                 throw new ArgumentNullException("size");
-            
+
 
             _gsStack = new GraphicsStateStack(this);
             _pageSizePoints = new XSize(size.Width, size.Height);
@@ -523,7 +523,7 @@ namespace PdfSharpCore.Drawing  // #??? aufräumen
 
         // ----- DrawBezier ---------------------------------------------------------------------------
         /// <summary>
-        /// Draws a Bézier spline defined by four points.
+        /// Draws a Bï¿½zier spline defined by four points.
         /// </summary>
         public void DrawBezier(XPen pen, XPoint pt1, XPoint pt2, XPoint pt3, XPoint pt4)
         {
@@ -531,7 +531,7 @@ namespace PdfSharpCore.Drawing  // #??? aufräumen
         }
 
         /// <summary>
-        /// Draws a Bézier spline defined by four points.
+        /// Draws a Bï¿½zier spline defined by four points.
         /// </summary>
         public void DrawBezier(XPen pen, double x1, double y1, double x2, double y2,
           double x3, double y3, double x4, double y4)
@@ -547,7 +547,7 @@ namespace PdfSharpCore.Drawing  // #??? aufräumen
         // ----- DrawBeziers --------------------------------------------------------------------------
 
         /// <summary>
-        /// Draws a series of Bézier splines from an array of points.
+        /// Draws a series of Bï¿½zier splines from an array of points.
         /// </summary>
         public void DrawBeziers(XPen pen, XPoint[] points)
         {
@@ -587,7 +587,7 @@ namespace PdfSharpCore.Drawing  // #??? aufräumen
         }
 
         /// <summary>
-        /// Draws a cardinal spline through a specified array of points using a specified tension. 
+        /// Draws a cardinal spline through a specified array of points using a specified tension.
         /// </summary>
         public void DrawCurve(XPen pen, XPoint[] points, double tension)
         {
@@ -1435,7 +1435,7 @@ namespace PdfSharpCore.Drawing  // #??? aufräumen
         }
 
         /// <summary>
-        /// Restores the state of this XGraphics object to the state represented by the specified 
+        /// Restores the state of this XGraphics object to the state represented by the specified
         /// XGraphicsState object.
         /// </summary>
         public void Restore(XGraphicsState state)
@@ -1460,7 +1460,7 @@ namespace PdfSharpCore.Drawing  // #??? aufräumen
         }
 
         /// <summary>
-        /// Saves a graphics container with the current state of this XGraphics and 
+        /// Saves a graphics container with the current state of this XGraphics and
         /// opens and uses a new graphics container.
         /// </summary>
         public XGraphicsContainer BeginContainer()
@@ -1469,7 +1469,7 @@ namespace PdfSharpCore.Drawing  // #??? aufräumen
         }
 
         /// <summary>
-        /// Saves a graphics container with the current state of this XGraphics and 
+        /// Saves a graphics container with the current state of this XGraphics and
         /// opens and uses a new graphics container.
         /// </summary>
         public XGraphicsContainer BeginContainer(XRect dstrect, XRect srcrect, XGraphicsUnit unit)
@@ -1501,7 +1501,7 @@ namespace PdfSharpCore.Drawing  // #??? aufräumen
         }
 
         /// <summary>
-        /// Closes the current graphics container and restores the state of this XGraphics 
+        /// Closes the current graphics container and restores the state of this XGraphics
         /// to the state saved by a call to the BeginContainer method.
         /// </summary>
         public void EndContainer(XGraphicsContainer container)
@@ -1555,7 +1555,7 @@ namespace PdfSharpCore.Drawing  // #??? aufräumen
         #region Transformation
 
         /// <summary>
-        /// Applies the specified translation operation to the transformation matrix of this object by 
+        /// Applies the specified translation operation to the transformation matrix of this object by
         /// prepending it to the object's transformation matrix.
         /// </summary>
         public void TranslateTransform(double dx, double dy)
@@ -1575,7 +1575,7 @@ namespace PdfSharpCore.Drawing  // #??? aufräumen
         }
 
         /// <summary>
-        /// Applies the specified scaling operation to the transformation matrix of this object by 
+        /// Applies the specified scaling operation to the transformation matrix of this object by
         /// prepending it to the object's transformation matrix.
         /// </summary>
         public void ScaleTransform(double scaleX, double scaleY)
@@ -1595,7 +1595,7 @@ namespace PdfSharpCore.Drawing  // #??? aufräumen
         }
 
         /// <summary>
-        /// Applies the specified scaling operation to the transformation matrix of this object by 
+        /// Applies the specified scaling operation to the transformation matrix of this object by
         /// prepending it to the object's transformation matrix.
         /// </summary>
         // ReSharper disable once InconsistentNaming
@@ -1615,7 +1615,7 @@ namespace PdfSharpCore.Drawing  // #??? aufräumen
         }
 
         /// <summary>
-        /// Applies the specified scaling operation to the transformation matrix of this object by 
+        /// Applies the specified scaling operation to the transformation matrix of this object by
         /// prepending it to the object's transformation matrix.
         /// </summary>
         public void ScaleAtTransform(double scaleX, double scaleY, double centerX, double centerY)
@@ -1624,7 +1624,7 @@ namespace PdfSharpCore.Drawing  // #??? aufräumen
         }
 
         /// <summary>
-        /// Applies the specified scaling operation to the transformation matrix of this object by 
+        /// Applies the specified scaling operation to the transformation matrix of this object by
         /// prepending it to the object's transformation matrix.
         /// </summary>
         public void ScaleAtTransform(double scaleX, double scaleY, XPoint center)
@@ -1633,7 +1633,7 @@ namespace PdfSharpCore.Drawing  // #??? aufräumen
         }
 
         /// <summary>
-        /// Applies the specified rotation operation to the transformation matrix of this object by 
+        /// Applies the specified rotation operation to the transformation matrix of this object by
         /// prepending it to the object's transformation matrix.
         /// </summary>
         public void RotateTransform(double angle)
@@ -1653,7 +1653,7 @@ namespace PdfSharpCore.Drawing  // #??? aufräumen
         }
 
         /// <summary>
-        /// Applies the specified rotation operation to the transformation matrix of this object by 
+        /// Applies the specified rotation operation to the transformation matrix of this object by
         /// prepending it to the object's transformation matrix.
         /// </summary>
         public void RotateAtTransform(double angle, XPoint point)
@@ -1662,7 +1662,7 @@ namespace PdfSharpCore.Drawing  // #??? aufräumen
         }
 
         /// <summary>
-        /// Applies the specified rotation operation to the transformation matrix of this object by 
+        /// Applies the specified rotation operation to the transformation matrix of this object by
         /// prepending it to the object's transformation matrix.
         /// </summary>
         public void RotateAtTransform(double angle, XPoint point, XMatrixOrder order)
@@ -1671,7 +1671,7 @@ namespace PdfSharpCore.Drawing  // #??? aufräumen
         }
 
         /// <summary>
-        /// Applies the specified shearing operation to the transformation matrix of this object by 
+        /// Applies the specified shearing operation to the transformation matrix of this object by
         /// prepending it to the object's transformation matrix.
         /// ShearTransform is a synonym for SkewAtTransform.
         /// Parameter shearX specifies the horizontal skew which is measured in degrees counterclockwise from the y-axis.
@@ -1695,7 +1695,7 @@ namespace PdfSharpCore.Drawing  // #??? aufräumen
         }
 
         /// <summary>
-        /// Applies the specified shearing operation to the transformation matrix of this object by 
+        /// Applies the specified shearing operation to the transformation matrix of this object by
         /// prepending it to the object's transformation matrix.
         /// ShearTransform is a synonym for SkewAtTransform.
         /// Parameter shearX specifies the horizontal skew which is measured in degrees counterclockwise from the y-axis.
@@ -1707,7 +1707,7 @@ namespace PdfSharpCore.Drawing  // #??? aufräumen
         }
 
         /// <summary>
-        /// Applies the specified shearing operation to the transformation matrix of this object by 
+        /// Applies the specified shearing operation to the transformation matrix of this object by
         /// prepending it to the object's transformation matrix.
         /// ShearTransform is a synonym for SkewAtTransform.
         /// Parameter shearX specifies the horizontal skew which is measured in degrees counterclockwise from the y-axis.
@@ -1765,7 +1765,7 @@ namespace PdfSharpCore.Drawing  // #??? aufräumen
         #region Clipping
 
         /// <summary>
-        /// Updates the clip region of this XGraphics to the intersection of the 
+        /// Updates the clip region of this XGraphics to the intersection of the
         /// current clip region and the specified rectangle.
         /// </summary>
         public void IntersectClip(XRect rect)
@@ -1776,7 +1776,7 @@ namespace PdfSharpCore.Drawing  // #??? aufräumen
         }
 
         /// <summary>
-        /// Updates the clip region of this XGraphics to the intersection of the 
+        /// Updates the clip region of this XGraphics to the intersection of the
         /// current clip region and the specified graphical path.
         /// </summary>
         public void IntersectClip(XGraphicsPath path)

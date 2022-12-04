@@ -54,7 +54,7 @@ namespace PdfSharpCore.Drawing
 
                 Debug.Assert (descriptor.Ascender > 0);
 
-                var symbol = descriptor.FontFace._cmap.symbol;
+                var symbol = descriptor.FontFace._cmap!.symbol;
                 var length = text.Length;
                 var adjustedLength = length;
                 var height = singleLineHeight;
@@ -95,7 +95,7 @@ namespace PdfSharpCore.Drawing
                     if (symbol)
                     {
                         // Remap ch for symbol fonts.
-                        ch = (char)(ch | (descriptor.FontFace._os2.usFirstCharIndex & 0xFF00)); // @@@ refactor
+                        ch = (char)(ch | (descriptor.FontFace._os2!.usFirstCharIndex & 0xFF00)); // @@@ refactor
 
                         // Used | instead of + because of: http://PdfSharpCore.codeplex.com/workitem/15954
                     }

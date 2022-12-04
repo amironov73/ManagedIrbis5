@@ -269,7 +269,7 @@ public abstract class Axis
     /// Default constructor for <see cref="Axis"/> that sets all axis properties
     /// to default values as defined in the <see cref="Default"/> class.
     /// </summary>
-    public Axis()
+    protected Axis()
     {
         Scale = new LinearScale (this);
 
@@ -300,7 +300,7 @@ public abstract class Axis
                 Default.TitleFontUnderline,
                 Default.TitleFontItalic
             );
-        Title.FontSpec.Fill = new Fill
+        Title.FontSpec!.Fill = new Fill
             (
                 Default.TitleFillColor,
                 Default.TitleFillBrush,
@@ -319,7 +319,7 @@ public abstract class Axis
     /// except for the <see cref="Title"/>.
     /// </summary>
     /// <param name="title">A string containing the axis title</param>
-    public Axis (string title)
+    protected Axis (string title)
         : this()
     {
         Title.Text = title;
@@ -329,7 +329,7 @@ public abstract class Axis
     /// The Copy Constructor.
     /// </summary>
     /// <param name="rhs">The Axis object from which to copy</param>
-    public Axis (Axis rhs)
+    protected Axis (Axis rhs)
     {
         Scale = rhs.Scale?.Clone (this);
 
@@ -1174,12 +1174,12 @@ public abstract class Axis
         // and last X axis scale label
         if (IsPrimary (pane) && (
                 this is YAxis && (
-                    !pane.XAxis.Scale._isSkipFirstLabel &&
+                    !pane.XAxis.Scale!._isSkipFirstLabel &&
                     !pane.XAxis.Scale._isReverse ||
                     !pane.XAxis.Scale._isSkipLastLabel &&
                     pane.XAxis.Scale._isReverse) ||
                 this is Y2Axis && (
-                    !pane.XAxis.Scale._isSkipFirstLabel &&
+                    !pane.XAxis.Scale!._isSkipFirstLabel &&
                     pane.XAxis.Scale._isReverse ||
                     !pane.XAxis.Scale._isSkipLastLabel &&
                     !pane.XAxis.Scale._isReverse)) &&
@@ -1234,12 +1234,11 @@ public abstract class Axis
     {
         // restore the zero line if needed (since the fill tends to cover it up)
         if (IsVisible && _majorGrid.IsZeroLine &&
-            Scale._min < 0.0 && Scale._max > 0.0)
+            Scale!._min < 0.0 && Scale._max > 0.0)
         {
             var zeroPix = Scale.Transform (0.0);
 
-            using (var zeroPen = new Pen (_color,
-                       pane.ScaledPenWidth (_majorGrid._penWidth, scaleFactor)))
+            using (var zeroPen = new Pen (_color, pane.ScaledPenWidth (_majorGrid._penWidth, scaleFactor)))
             {
                 graphics.DrawLine (zeroPen, left, zeroPix, right, zeroPix);
 
@@ -1291,7 +1290,7 @@ public abstract class Axis
              MinorTic._isCrossOutside || MinorTic._isCrossInside || _minorGrid._isVisible)
             && IsVisible)
         {
-            double tMajor = Scale._majorStep * Scale.MajorUnitMultiplier,
+            double tMajor = Scale!._majorStep * Scale.MajorUnitMultiplier,
                 tMinor = Scale._minorStep * Scale.MinorUnitMultiplier;
 
             if (Scale.IsLog || tMinor < tMajor)
@@ -1306,7 +1305,6 @@ public abstract class Axis
                     last = Scale._maxLinTemp;
 
                 var dVal = first;
-                float pixVal;
 
                 var iTic = Scale.CalcMinorStart (baseVal);
                 var MajorTic = 0;
@@ -1333,7 +1331,7 @@ public abstract class Axis
                              Math.Abs (dVal) > 1e-20 && Math.Abs ((dVal - majorVal) / dVal) > 1e-10) &&
                             dVal >= first && dVal <= last)
                         {
-                            pixVal = Scale.LocalTransform (dVal);
+                            var pixVal = Scale.LocalTransform (dVal);
 
                             _minorGrid.Draw (graphics, minorGridPen, pixVal, topPix);
 
@@ -1385,7 +1383,7 @@ public abstract class Axis
         //if ( _isVisible && _title._isVisible && str.Length > 0 )
         if (IsVisible && Title.IsVisible && !string.IsNullOrEmpty (str))
         {
-            var hasTic = Scale._isLabelsInside
+            var hasTic = Scale!._isLabelsInside
                 ? MajorTic.IsInside || MajorTic._isCrossInside ||
                   MinorTic.IsInside || MinorTic._isCrossInside
                 : MajorTic.IsOutside || MajorTic._isCrossOutside || MinorTic.IsOutside ||
@@ -1406,7 +1404,7 @@ public abstract class Axis
             // rely on ChartRect).
 
             var gap = scaledTic * (hasTic ? 1.0f : 0.0f) +
-                      Title.FontSpec.BoundingBox (graphics, str, scaleFactor).Height / 2.0F;
+                      Title.FontSpec!.BoundingBox (graphics, str, scaleFactor).Height / 2.0F;
             var y = Scale._isVisible
                 ? Scale.GetScaleMaxSpace (graphics, pane, scaleFactor, true).Height
                   + scaledLabelGap
@@ -1439,10 +1437,7 @@ public abstract class Axis
 
     private string MakeTitle()
     {
-        if (Title.Text == null)
-        {
-            Title.Text = "";
-        }
+        Title.Text ??= string.Empty;
 
         // Allow customization of the modified title when the scale is very large
         // The event handler can edit the full label.  If the handler returns
@@ -1458,9 +1453,9 @@ public abstract class Axis
 
         // If the Mag is non-zero and IsOmitMag == false, and IsLog == false,
         // then add the mag indicator to the title.
-        if (Scale._mag != 0 && !Title.IsOmitMag && !Scale.IsLog)
+        if (Scale!._mag != 0 && !Title.IsOmitMag && !Scale.IsLog)
         {
-            return Title.Text + string.Format (" (10^{0})", Scale._mag);
+            return Title.Text + $" (10^{Scale._mag})";
         }
 
         return Title.Text;

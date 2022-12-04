@@ -429,8 +429,8 @@ internal class ImagePrivateDataBitmap : ImagePrivateData
             ImageDataBitmap dest
         )
     {
-        var width = (int)Image.Information.Width;
-        var height = (int)Image.Information.Height;
+        var width = (int) Image!.Information.Width;
+        var height = (int) Image.Information.Height;
 
         var logicalComponents = components;
         if (components == 4)
@@ -454,7 +454,7 @@ internal class ImagePrivateDataBitmap : ImagePrivateData
                 var nOffsetWriteAlpha = 0;
                 if (hasAlpha)
                 {
-                    mask.StartLine (y);
+                    mask!.StartLine (y);
                     nOffsetWriteAlpha = (height - 1 - y) * width;
                 }
 
@@ -465,8 +465,8 @@ internal class ImagePrivateDataBitmap : ImagePrivateData
                     imageData[nOffsetWrite + 2] = Data[nFileOffset + nOffsetRead];
                     if (hasAlpha)
                     {
-                        mask.AddPel (Data[nFileOffset + nOffsetRead + 3]);
-                        alphaMask[nOffsetWriteAlpha] = Data[nFileOffset + nOffsetRead + 3];
+                        mask!.AddPel (Data[nFileOffset + nOffsetRead + 3]);
+                        alphaMask![nOffsetWriteAlpha] = Data[nFileOffset + nOffsetRead + 3];
                         if (!hasMask || !hasAlphaMask)
                         {
                             if (Data[nFileOffset + nOffsetRead + 3] != 255)
@@ -515,7 +515,7 @@ internal class ImagePrivateDataBitmap : ImagePrivateData
         var segmentedColorMask = false;
 
         var bytesColorPaletteOffset =
-            ((ImagePrivateDataBitmap)Image.Data)
+            ((ImagePrivateDataBitmap) Image!.Data)
             .ColorPaletteOffset; // GDI+ always returns Windows bitmaps: sizeof BITMAPFILEHEADER + sizeof BITMAPINFOHEADER
 
         var bytesFileOffset = ((ImagePrivateDataBitmap)Image.Data).Offset;
@@ -715,7 +715,7 @@ internal class ImagePrivateDataBitmap : ImagePrivateData
         //    dest.AlphaMaskLength = alphaMask.Length;
         //}
 
-        if (mask != null && firstMaskColor != -1)
+        if (mask != null! && firstMaskColor != -1)
         {
             dest.BitmapMask = mask.MaskData;
             dest.BitmapMaskLength = mask.MaskData.Length;

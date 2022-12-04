@@ -62,9 +62,9 @@ internal class XGraphicsPdfRenderer
         var document = page._document.ThrowIfNull();
         _colorMode = document.Options.ColorMode;
         PageOptions = options;
-        _graphics = graphics;
+        Graphics = graphics;
         _content = new StringBuilder();
-        page.RenderContent._pdfRenderer = this;
+        page.RenderContent!._pdfRenderer = this;
         _gfxState = new PdfGraphicsState (this);
     }
 
@@ -81,7 +81,7 @@ internal class XGraphicsPdfRenderer
     {
         _form = form;
         _colorMode = form.Owner.Options.ColorMode;
-        _graphics = graphics;
+        Graphics = graphics;
         _content = new StringBuilder();
         form.PdfRenderer = this;
         _gfxState = new PdfGraphicsState (this);
@@ -105,17 +105,17 @@ internal class XGraphicsPdfRenderer
         if (_page != null)
         {
             var content2 = _page.RenderContent;
-            content2.CreateStream (PdfEncoders.RawEncoding.GetBytes (GetContent()));
+            content2!.CreateStream (PdfEncoders.RawEncoding.GetBytes (GetContent()));
 
-            _graphics = null;
-            _page.RenderContent._pdfRenderer = null;
+            Graphics = null;
+            _page.RenderContent!._pdfRenderer = null;
             _page.RenderContent = null;
             _page = null;
         }
         else if (_form != null)
         {
-            _form._pdfForm.CreateStream (PdfEncoders.RawEncoding.GetBytes (GetContent()));
-            _graphics = null;
+            _form._pdfForm!.CreateStream (PdfEncoders.RawEncoding.GetBytes (GetContent()));
+            Graphics = null;
             _form.PdfRenderer = null;
             _form = null;
         }
@@ -132,9 +132,16 @@ internal class XGraphicsPdfRenderer
     /// <summary>
     /// Strokes a single connection of two points.
     /// </summary>
-    public void DrawLine (XPen pen, double x1, double y1, double x2, double y2)
+    public void DrawLine
+        (
+            XPen pen,
+            double x1,
+            double y1,
+            double x2,
+            double y2
+        )
     {
-        DrawLines (pen, new XPoint[] { new XPoint (x1, y1), new XPoint (x2, y2) });
+        DrawLines (pen, new XPoint[] { new (x1, y1), new (x2, y2) });
     }
 
     // ----- DrawLines ----------------------------------------------------------------------------
@@ -142,17 +149,14 @@ internal class XGraphicsPdfRenderer
     /// <summary>
     /// Strokes a series of connected points.
     /// </summary>
-    public void DrawLines (XPen pen, XPoint[] points)
+    public void DrawLines
+        (
+            XPen pen,
+            XPoint[] points
+        )
     {
-        if (pen == null)
-        {
-            throw new ArgumentNullException ("pen");
-        }
-
-        if (points == null)
-        {
-            throw new ArgumentNullException ("points");
-        }
+        Sure.NotNull (pen);
+        Sure.NotNull (points);
 
         var count = points.Length;
         if (count == 0)
@@ -165,32 +169,45 @@ internal class XGraphicsPdfRenderer
         const string format = Config.SignificantFigures4;
         AppendFormatPoint ("{0:" + format + "} {1:" + format + "} m\n", points[0].X, points[0].Y);
         for (var idx = 1; idx < count; idx++)
+        {
             AppendFormatPoint ("{0:" + format + "} {1:" + format + "} l\n", points[idx].X, points[idx].Y);
+        }
+
         _content.Append ("S\n");
     }
 
     // ----- DrawBezier ---------------------------------------------------------------------------
 
-    public void DrawBezier (XPen pen, double x1, double y1, double x2, double y2, double x3, double y3, double x4,
-        double y4)
+    public void DrawBezier
+        (
+            XPen pen,
+            double x1,
+            double y1,
+            double x2,
+            double y2,
+            double x3,
+            double y3,
+            double x4,
+            double y4
+        )
     {
-        DrawBeziers (pen,
-            new XPoint[] { new XPoint (x1, y1), new XPoint (x2, y2), new XPoint (x3, y3), new XPoint (x4, y4) });
+        DrawBeziers
+            (
+                pen,
+                new XPoint[] { new (x1, y1), new (x2, y2), new (x3, y3), new (x4, y4) }
+            );
     }
 
     // ----- DrawBeziers --------------------------------------------------------------------------
 
-    public void DrawBeziers (XPen pen, XPoint[] points)
+    public void DrawBeziers
+        (
+            XPen pen,
+            XPoint[] points
+        )
     {
-        if (pen == null)
-        {
-            throw new ArgumentNullException ("pen");
-        }
-
-        if (points == null)
-        {
-            throw new ArgumentNullException ("points");
-        }
+        Sure.NotNull (pen);
+        Sure.NotNull (points);
 
         var count = points.Length;
         if (count == 0)
@@ -201,7 +218,7 @@ internal class XGraphicsPdfRenderer
         if ((count - 1) % 3 != 0)
         {
             throw new ArgumentException ("Invalid number of points for bezier curves. Number must fulfil 4+3n.",
-                "points");
+                nameof (points));
         }
 
         Realize (pen);
@@ -209,29 +226,29 @@ internal class XGraphicsPdfRenderer
         const string format = Config.SignificantFigures4;
         AppendFormatPoint ("{0:" + format + "} {1:" + format + "} m\n", points[0].X, points[0].Y);
         for (var idx = 1; idx < count; idx += 3)
+        {
             AppendFormat3Points (
                 "{0:" + format + "} {1:" + format + "} {2:" + format + "} {3:" + format + "} {4:" + format +
                 "} {5:" + format + "} c\n",
                 points[idx].X, points[idx].Y,
                 points[idx + 1].X, points[idx + 1].Y,
                 points[idx + 2].X, points[idx + 2].Y);
+        }
 
         AppendStrokeFill (pen, null, XFillMode.Alternate, false);
     }
 
     // ----- DrawCurve ----------------------------------------------------------------------------
 
-    public void DrawCurve (XPen pen, XPoint[] points, double tension)
+    public void DrawCurve
+        (
+            XPen pen,
+            XPoint[] points,
+            double tension
+        )
     {
-        if (pen == null)
-        {
-            throw new ArgumentNullException ("pen");
-        }
-
-        if (points == null)
-        {
-            throw new ArgumentNullException ("points");
-        }
+        Sure.NotNull (pen);
+        Sure.NotNull (points);
 
         var count = points.Length;
         if (count == 0)
@@ -241,7 +258,7 @@ internal class XGraphicsPdfRenderer
 
         if (count < 2)
         {
-            throw new ArgumentException ("Not enough points", "points");
+            throw new ArgumentException ("Not enough points", nameof (points));
         }
 
         // See http://pubpages.unh.edu/~cs770/a5/cardinal.html  // Link is down...
@@ -260,7 +277,10 @@ internal class XGraphicsPdfRenderer
         {
             AppendCurveSegment (points[0], points[0], points[1], points[2], tension);
             for (var idx = 1; idx < count - 2; idx++)
+            {
                 AppendCurveSegment (points[idx - 1], points[idx], points[idx + 1], points[idx + 2], tension);
+            }
+
             AppendCurveSegment (points[count - 3], points[count - 2], points[count - 1], points[count - 1],
                 tension);
         }
@@ -270,12 +290,20 @@ internal class XGraphicsPdfRenderer
 
     // ----- DrawArc ------------------------------------------------------------------------------
 
-    public void DrawArc (XPen pen, double x, double y, double width, double height, double startAngle,
-        double sweepAngle)
+    public void DrawArc
+        (
+            XPen pen,
+            double x,
+            double y,
+            double width,
+            double height,
+            double startAngle,
+            double sweepAngle
+        )
     {
         if (pen == null)
         {
-            throw new ArgumentNullException ("pen");
+            throw new ArgumentNullException (nameof (pen));
         }
 
         Realize (pen);
@@ -286,9 +314,17 @@ internal class XGraphicsPdfRenderer
 
     // ----- DrawRectangle ------------------------------------------------------------------------
 
-    public void DrawRectangle (XPen pen, XBrush brush, double x, double y, double width, double height)
+    public void DrawRectangle
+        (
+            XPen pen,
+            XBrush brush,
+            double x,
+            double y,
+            double width,
+            double height
+        )
     {
-        if (pen == null && brush == null)
+        if (pen is null && brush is null)
         {
             throw new ArgumentNullException ("pen and brush");
         }
@@ -317,7 +353,12 @@ internal class XGraphicsPdfRenderer
 
     // ----- DrawRectangles -----------------------------------------------------------------------
 
-    public void DrawRectangles (XPen pen, XBrush brush, XRect[] rects)
+    public void DrawRectangles
+        (
+            XPen pen,
+            XBrush brush,
+            XRect[] rects
+        )
     {
         var count = rects.Length;
         for (var idx = 0; idx < count; idx++)
@@ -329,8 +370,17 @@ internal class XGraphicsPdfRenderer
 
     // ----- DrawRoundedRectangle -----------------------------------------------------------------
 
-    public void DrawRoundedRectangle (XPen pen, XBrush brush, double x, double y, double width, double height,
-        double ellipseWidth, double ellipseHeight)
+    public void DrawRoundedRectangle
+        (
+            XPen pen,
+            XBrush brush,
+            double x,
+            double y,
+            double width,
+            double height,
+            double ellipseWidth,
+            double ellipseHeight
+        )
     {
         var path = new XGraphicsPath();
         path.AddRoundedRectangle (x, y, width, height, ellipseWidth, ellipseHeight);
@@ -339,7 +389,15 @@ internal class XGraphicsPdfRenderer
 
     // ----- DrawEllipse --------------------------------------------------------------------------
 
-    public void DrawEllipse (XPen pen, XBrush brush, double x, double y, double width, double height)
+    public void DrawEllipse
+        (
+            XPen pen,
+            XBrush brush,
+            double x,
+            double y,
+            double width,
+            double height
+        )
     {
         Realize (pen, brush);
 
@@ -378,7 +436,13 @@ internal class XGraphicsPdfRenderer
 
     // ----- DrawPolygon --------------------------------------------------------------------------
 
-    public void DrawPolygon (XPen pen, XBrush brush, XPoint[] points, XFillMode fillmode)
+    public void DrawPolygon
+        (
+            XPen pen,
+            XBrush brush,
+            XPoint[] points,
+            XFillMode fillmode
+        )
     {
         Realize (pen, brush);
 
@@ -391,15 +455,26 @@ internal class XGraphicsPdfRenderer
         const string format = Config.SignificantFigures4;
         AppendFormatPoint ("{0:" + format + "} {1:" + format + "} m\n", points[0].X, points[0].Y);
         for (var idx = 1; idx < count; idx++)
+        {
             AppendFormatPoint ("{0:" + format + "} {1:" + format + "} l\n", points[idx].X, points[idx].Y);
+        }
 
         AppendStrokeFill (pen, brush, fillmode, true);
     }
 
     // ----- DrawPie ------------------------------------------------------------------------------
 
-    public void DrawPie (XPen pen, XBrush brush, double x, double y, double width, double height,
-        double startAngle, double sweepAngle)
+    public void DrawPie
+        (
+            XPen pen,
+            XBrush brush,
+            double x,
+            double y,
+            double width,
+            double height,
+            double startAngle,
+            double sweepAngle
+        )
     {
         Realize (pen, brush);
 
@@ -411,7 +486,14 @@ internal class XGraphicsPdfRenderer
 
     // ----- DrawClosedCurve ----------------------------------------------------------------------
 
-    public void DrawClosedCurve (XPen pen, XBrush brush, XPoint[] points, double tension, XFillMode fillmode)
+    public void DrawClosedCurve
+        (
+            XPen pen,
+            XBrush brush,
+            XPoint[] points,
+            double tension,
+            XFillMode fillmode
+        )
     {
         var count = points.Length;
         if (count == 0)
@@ -421,7 +503,7 @@ internal class XGraphicsPdfRenderer
 
         if (count < 2)
         {
-            throw new ArgumentException ("Not enough points.", "points");
+            throw new ArgumentException ("Not enough points.", nameof (points));
         }
 
         // Simply tried out. Not proofed why it is correct.
@@ -440,7 +522,10 @@ internal class XGraphicsPdfRenderer
         {
             AppendCurveSegment (points[count - 1], points[0], points[1], points[2], tension);
             for (var idx = 1; idx < count - 2; idx++)
+            {
                 AppendCurveSegment (points[idx - 1], points[idx], points[idx + 1], points[idx + 2], tension);
+            }
+
             AppendCurveSegment (points[count - 3], points[count - 2], points[count - 1], points[0], tension);
             AppendCurveSegment (points[count - 2], points[count - 1], points[0], points[1], tension);
         }
@@ -450,11 +535,16 @@ internal class XGraphicsPdfRenderer
 
     // ----- DrawPath -----------------------------------------------------------------------------
 
-    public void DrawPath (XPen pen, XBrush brush, XGraphicsPath path)
+    public void DrawPath
+        (
+            XPen pen,
+            XBrush brush,
+            XGraphicsPath path
+        )
     {
-        if (pen == null && brush == null)
+        if (pen is null && brush is null)
         {
-            throw new ArgumentNullException ("pen");
+            throw new ArgumentNullException (nameof (pen));
         }
 
         Realize (pen, brush);
@@ -464,7 +554,14 @@ internal class XGraphicsPdfRenderer
 
     // ----- DrawString ---------------------------------------------------------------------------
 
-    public void DrawString (string s, XFont font, XBrush brush, XRect rect, XStringFormat format)
+    public void DrawString
+        (
+            string s,
+            XFont font,
+            XBrush brush,
+            XRect rect,
+            XStringFormat format
+        )
     {
         var x = rect.X;
         var y = rect.Y;
@@ -472,7 +569,7 @@ internal class XGraphicsPdfRenderer
         var lineSpace = font.GetHeight();
         var cyAscent = lineSpace * font.CellAscent / font.CellSpace;
         var cyDescent = lineSpace * font.CellDescent / font.CellSpace;
-        var width = _graphics.MeasureString (s, font).Width;
+        var width = Graphics!.MeasureString (s, font).Width;
 
         //bool bold = (font.Style & XFontStyle.Bold) != 0;
         //bool italic = (font.Style & XFontStyle.Italic) != 0;
@@ -550,18 +647,18 @@ internal class XGraphicsPdfRenderer
         const string format2 = Config.SignificantFigures4;
         var descriptor = realizedFont.FontDescriptor._descriptor;
 
-        string text = null;
+        string? text;
         if (font.Unicode)
         {
             var sb = new StringBuilder();
-            var isSymbolFont = descriptor.FontFace._cmap.symbol;
+            var isSymbolFont = descriptor.FontFace._cmap!.symbol;
             for (var idx = 0; idx < s.Length; idx++)
             {
                 var ch = s[idx];
                 if (isSymbolFont)
                 {
                     // Remap ch for symbol fonts.
-                    ch = (char)(ch | (descriptor.FontFace._os2.usFirstCharIndex & 0xFF00)); // @@@ refactor
+                    ch = (char)(ch | (descriptor.FontFace._os2!.usFirstCharIndex & 0xFF00)); // @@@ refactor
                 }
 
                 var glyphID = descriptor.CharCodeToGlyphIndex (ch);
@@ -696,14 +793,21 @@ internal class XGraphicsPdfRenderer
     //public void DrawImage(Image image, Rectangle destRect, int srcX, int srcY, int srcWidth, int srcHeight, GraphicsUnit srcUnit, ImageAttributes imageAttrs, DrawImageAbort callback, IntPtr callbackData);
     //public void DrawImage(Image image, Rectangle destRect, float srcX, float srcY, float srcWidth, float srcHeight, GraphicsUnit srcUnit, ImageAttributes
 
-    public void DrawImage (XImage image, double x, double y, double width, double height)
+    public void DrawImage
+        (
+            XImage image,
+            double x,
+            double y,
+            double width,
+            double height
+        )
     {
         const string format = Config.SignificantFigures4;
 
         var name = Realize (image);
-        if (!(image is XForm))
+        if (image is not XForm)
         {
-            if (_graphics.PageDirection == XPageDirection.Downwards)
+            if (Graphics!.PageDirection == XPageDirection.Downwards)
             {
                 AppendFormatImage (
                     "q {2:" + format + "} 0 0 {3:" + format + "} {0:" + format + "} {1:" + format +
@@ -725,7 +829,7 @@ internal class XGraphicsPdfRenderer
             var form = (XForm)image;
             form.Finish();
 
-            var pdfForm = Owner.FormTable.GetForm (form);
+            var pdfForm = Owner!.FormTable.GetForm (form);
 
             var cx = width / image.PointWidth;
             var cy = height / image.PointHeight;
@@ -733,7 +837,7 @@ internal class XGraphicsPdfRenderer
             if (cx != 0 && cy != 0)
             {
                 var xForm = image as XPdfForm;
-                if (_graphics.PageDirection == XPageDirection.Downwards)
+                if (Graphics!.PageDirection == XPageDirection.Downwards)
                 {
                     // If we have an XPdfForm, then we take the MediaBox into account.
                     var xDraw = x;
@@ -763,7 +867,13 @@ internal class XGraphicsPdfRenderer
     }
 
     // TODO: incomplete - srcRect not used
-    public void DrawImage (XImage image, XRect destRect, XRect srcRect, XGraphicsUnit srcUnit)
+    public void DrawImage
+        (
+            XImage image,
+            XRect destRect,
+            XRect srcRect,
+            XGraphicsUnit srcUnit
+        )
     {
         const string format = Config.SignificantFigures4;
 
@@ -773,9 +883,9 @@ internal class XGraphicsPdfRenderer
         var height = destRect.Height;
 
         var name = Realize (image);
-        if (!(image is XForm))
+        if (image is not XForm)
         {
-            if (_graphics.PageDirection == XPageDirection.Downwards)
+            if (Graphics!.PageDirection == XPageDirection.Downwards)
             {
                 AppendFormatImage (
                     "q {2:" + format + "} 0 0 {3:" + format + "} {0:" + format + "} {1:" + format +
@@ -797,7 +907,7 @@ internal class XGraphicsPdfRenderer
             var form = (XForm)image;
             form.Finish();
 
-            var pdfForm = Owner.FormTable.GetForm (form);
+            var pdfForm = Owner!.FormTable.GetForm (form);
 
             var cx = width / image.PointWidth;
             var cy = height / image.PointHeight;
@@ -805,7 +915,7 @@ internal class XGraphicsPdfRenderer
             if (cx != 0 && cy != 0)
             {
                 var xForm = image as XPdfForm;
-                if (_graphics.PageDirection == XPageDirection.Downwards)
+                if (Graphics!.PageDirection == XPageDirection.Downwards)
                 {
                     var xDraw = x;
                     var yDraw = y;
@@ -842,7 +952,10 @@ internal class XGraphicsPdfRenderer
     /// <summary>
     /// Clones the current graphics state and push it on a stack.
     /// </summary>
-    public void Save (XGraphicsState state)
+    public void Save
+        (
+            XGraphicsState state
+        )
     {
         // Before saving, the current transformation matrix must be completely realized.
         BeginGraphicMode();
@@ -853,13 +966,22 @@ internal class XGraphicsPdfRenderer
         SaveState();
     }
 
-    public void Restore (XGraphicsState state)
+    public void Restore
+        (
+            XGraphicsState state
+        )
     {
         BeginGraphicMode();
         RestoreState (state.InternalState);
     }
 
-    public void BeginContainer (XGraphicsContainer container, XRect dstrect, XRect srcrect, XGraphicsUnit unit)
+    public void BeginContainer
+        (
+            XGraphicsContainer container,
+            XRect dstrect,
+            XRect srcrect,
+            XGraphicsUnit unit
+        )
     {
         // Before saving, the current transformation matrix must be completely realized.
         BeginGraphicMode();
@@ -868,7 +990,10 @@ internal class XGraphicsPdfRenderer
         SaveState();
     }
 
-    public void EndContainer (XGraphicsContainer container)
+    public void EndContainer
+        (
+            XGraphicsContainer container
+        )
     {
         BeginGraphicMode();
         RestoreState (container.InternalState);
@@ -912,7 +1037,11 @@ internal class XGraphicsPdfRenderer
 
     #region Clipping
 
-    public void SetClip (XGraphicsPath path, XCombineMode combineMode)
+    public void SetClip
+        (
+            XGraphicsPath path,
+            XCombineMode combineMode
+        )
     {
         if (path == null)
         {
@@ -1010,7 +1139,10 @@ internal class XGraphicsPdfRenderer
     /// <summary>
     /// Writes a comment to the PDF content stream. May be useful for debugging purposes.
     /// </summary>
-    public void WriteComment (string comment)
+    public void WriteComment
+        (
+            string comment
+        )
     {
         comment = comment.Replace ("\n", "\n% ");
 
@@ -1027,8 +1159,17 @@ internal class XGraphicsPdfRenderer
     /// <summary>
     /// Appends one or up to five Bézier curves that interpolate the arc.
     /// </summary>
-    void AppendPartialArc (double x, double y, double width, double height, double startAngle, double sweepAngle,
-        PathStart pathStart, XMatrix matrix)
+    void AppendPartialArc
+        (
+            double x,
+            double y,
+            double width,
+            double height,
+            double startAngle,
+            double sweepAngle,
+            PathStart pathStart,
+            XMatrix matrix
+        )
     {
         // Normalize the angles
         var α = startAngle;
@@ -1128,16 +1269,21 @@ internal class XGraphicsPdfRenderer
     /// Gets the quadrant (0 through 3) of the specified angle. If the angle lies on an edge
     /// (0, 90, 180, etc.) the result depends on the details how the angle is used.
     /// </summary>
-    int Quadrant (double φ, bool start, bool clockwise)
+    int Quadrant
+        (
+            double phi,
+            bool start,
+            bool clockwise
+        )
     {
-        Debug.Assert (φ >= 0);
-        if (φ > 360)
+        Debug.Assert (phi >= 0);
+        if (phi > 360)
         {
-            φ = φ - Math.Floor (φ / 360) * 360;
+            phi = phi - Math.Floor (phi / 360) * 360;
         }
 
-        var quadrant = (int)(φ / 90);
-        if (quadrant * 90 == φ)
+        var quadrant = (int)(phi / 90);
+        if (quadrant * 90 == phi)
         {
             if ((start && !clockwise) || (!start && clockwise))
             {
@@ -1146,7 +1292,7 @@ internal class XGraphicsPdfRenderer
         }
         else
         {
-            quadrant = clockwise ? ((int)Math.Floor (φ / 90)) % 4 : (int)Math.Floor (φ / 90);
+            quadrant = clockwise ? ((int)Math.Floor (phi / 90)) % 4 : (int)Math.Floor (phi / 90);
         }
 
         return quadrant;
@@ -1155,17 +1301,26 @@ internal class XGraphicsPdfRenderer
     /// <summary>
     /// Appends a Bézier curve for an arc within a quadrant.
     /// </summary>
-    void AppendPartialArcQuadrant (double x, double y, double width, double height, double α, double β,
-        PathStart pathStart, XMatrix matrix)
+    void AppendPartialArcQuadrant
+        (
+            double x,
+            double y,
+            double width,
+            double height,
+            double alpha,
+            double beta,
+            PathStart pathStart,
+            XMatrix matrix
+        )
     {
-        Debug.Assert (α >= 0 && α <= 360);
-        Debug.Assert (β >= 0);
-        if (β > 360)
+        Debug.Assert (alpha >= 0 && alpha <= 360);
+        Debug.Assert (beta >= 0);
+        if (beta > 360)
         {
-            β = β - Math.Floor (β / 360) * 360;
+            beta = beta - Math.Floor (beta / 360) * 360;
         }
 
-        Debug.Assert (Math.Abs (α - β) <= 90);
+        Debug.Assert (Math.Abs (alpha - beta) <= 90);
 
         // Scanling factor
         var δx = width / 2;
@@ -1185,10 +1340,10 @@ internal class XGraphicsPdfRenderer
         // resulting curve is reflected at the center. This algorithm works as expected (simply tried out).
         // There may be a mathematically more elegant solution...
         var reflect = false;
-        if (α >= 180 && β >= 180)
+        if (alpha >= 180 && beta >= 180)
         {
-            α -= 180;
-            β -= 180;
+            alpha -= 180;
+            beta -= 180;
             reflect = true;
         }
 
@@ -1196,32 +1351,32 @@ internal class XGraphicsPdfRenderer
         if (width == height)
         {
             // Circular arc needs no correction.
-            α = α * Calc.Deg2Rad;
-            β = β * Calc.Deg2Rad;
+            alpha = alpha * Calc.Deg2Rad;
+            beta = beta * Calc.Deg2Rad;
         }
         else
         {
             // Elliptic arc needs the angles to be adjusted such that the scaling transformation is compensated.
-            α = α * Calc.Deg2Rad;
-            sinα = Math.Sin (α);
+            alpha = alpha * Calc.Deg2Rad;
+            sinα = Math.Sin (alpha);
             if (Math.Abs (sinα) > 1E-10)
             {
-                α = Math.PI / 2 - Math.Atan (δy * Math.Cos (α) / (δx * sinα));
+                alpha = Math.PI / 2 - Math.Atan (δy * Math.Cos (alpha) / (δx * sinα));
             }
 
-            β = β * Calc.Deg2Rad;
-            sinβ = Math.Sin (β);
+            beta = beta * Calc.Deg2Rad;
+            sinβ = Math.Sin (beta);
             if (Math.Abs (sinβ) > 1E-10)
             {
-                β = Math.PI / 2 - Math.Atan (δy * Math.Cos (β) / (δx * sinβ));
+                beta = Math.PI / 2 - Math.Atan (δy * Math.Cos (beta) / (δx * sinβ));
             }
         }
 
-        var κ = 4 * (1 - Math.Cos ((α - β) / 2)) / (3 * Math.Sin ((β - α) / 2));
-        sinα = Math.Sin (α);
-        var cosα = Math.Cos (α);
-        sinβ = Math.Sin (β);
-        var cosβ = Math.Cos (β);
+        var κ = 4 * (1 - Math.Cos ((alpha - beta) / 2)) / (3 * Math.Sin ((beta - alpha) / 2));
+        sinα = Math.Sin (alpha);
+        var cosα = Math.Cos (alpha);
+        sinβ = Math.Sin (beta);
+        var cosβ = Math.Cos (beta);
 
         const string format = Config.SignificantFigures3;
         XPoint pt1, pt2, pt3;
@@ -1284,7 +1439,14 @@ internal class XGraphicsPdfRenderer
     /// <summary>
     /// Appends a Bézier curve for a cardinal spline through pt1 and pt2.
     /// </summary>
-    void AppendCurveSegment (XPoint pt0, XPoint pt1, XPoint pt2, XPoint pt3, double tension3)
+    void AppendCurveSegment
+        (
+            XPoint pt0,
+            XPoint pt1,
+            XPoint pt2,
+            XPoint pt3,
+            double tension3
+        )
     {
         const string format = Config.SignificantFigures4;
         AppendFormat3Points (
@@ -1298,7 +1460,10 @@ internal class XGraphicsPdfRenderer
     /// <summary>
     /// Appends the content of a GraphicsPath object.
     /// </summary>
-    internal void AppendPath (CoreGraphicsPath path)
+    internal void AppendPath
+        (
+            CoreGraphicsPath path
+        )
     {
         AppendPath (path.PathPoints, path.PathTypes);
 
@@ -1349,10 +1514,14 @@ internal class XGraphicsPdfRenderer
         //}
     }
 
-    void AppendPath (XPoint[] points, byte[] types)
+    private void AppendPath
+        (
+            IReadOnlyList<XPoint> points,
+            IReadOnlyList<byte> types
+        )
     {
         const string format = Config.SignificantFigures4;
-        var count = points.Length;
+        var count = points.Count;
         if (count == 0)
         {
             return;
@@ -1411,18 +1580,25 @@ internal class XGraphicsPdfRenderer
         }
     }
 
-    internal void Append (string value)
+    internal void Append
+        (
+            string value
+        )
     {
         _content.Append (value);
     }
 
-    internal void AppendFormatArgs (string format, params object[] args)
+    internal void AppendFormatArgs
+        (
+            string format,
+            params object[] args
+        )
     {
         _content.AppendFormat (CultureInfo.InvariantCulture, format, args);
 #if DEBUG
         var dummy = _content.ToString();
         dummy = dummy.Substring (Math.Max (0, dummy.Length - 100));
-        dummy.GetType();
+        dummy.GetType().NotUsed();
 #endif
     }
 
@@ -1468,25 +1644,49 @@ internal class XGraphicsPdfRenderer
             point3.X, point3.Y);
     }
 
-    internal void AppendFormat (string format, XPoint point)
+    internal void AppendFormat
+        (
+            string format,
+            XPoint point
+        )
     {
         var result = WorldToView (point);
         _content.AppendFormat (CultureInfo.InvariantCulture, format, result.X, result.Y);
     }
 
-    internal void AppendFormat (string format, double x, double y, string s)
+    internal void AppendFormat
+        (
+        string format,
+        double x,
+        double y,
+        string s
+        )
     {
         var result = WorldToView (new XPoint (x, y));
         _content.AppendFormat (CultureInfo.InvariantCulture, format, result.X, result.Y, s);
     }
 
-    internal void AppendFormatImage (string format, double x, double y, double width, double height, string name)
+    internal void AppendFormatImage
+        (
+            string format,
+            double x,
+            double y,
+            double width,
+            double height,
+            string name
+        )
     {
         var result = WorldToView (new XPoint (x, y));
         _content.AppendFormat (CultureInfo.InvariantCulture, format, result.X, result.Y, width, height, name);
     }
 
-    void AppendStrokeFill (XPen pen, XBrush brush, XFillMode fillMode, bool closePath)
+    void AppendStrokeFill
+        (
+            XPen pen,
+            XBrush? brush,
+            XFillMode fillMode,
+            bool closePath
+        )
     {
         if (closePath)
         {
@@ -1554,7 +1754,7 @@ internal class XGraphicsPdfRenderer
             // In PDFsharp 1.4 I implement a revised technique that does not need text mirroring any more.
 
             DefaultViewMatrix = new XMatrix();
-            if (_graphics.PageDirection == XPageDirection.Downwards)
+            if (Graphics!.PageDirection == XPageDirection.Downwards)
             {
                 // Take TrimBox into account.
                 PageHeightPt = Size.Height;
@@ -1566,7 +1766,7 @@ internal class XGraphicsPdfRenderer
                 }
 
                 // Scale with page units.
-                switch (_graphics.PageUnit)
+                switch (Graphics.PageUnit)
                 {
                     case XGraphicsUnit.Point:
                         // Factor is 1.
@@ -1592,7 +1792,7 @@ internal class XGraphicsPdfRenderer
 
                 if (trimOffset != new XPoint())
                 {
-                    Debug.Assert (_graphics.PageUnit == XGraphicsUnit.Point,
+                    Debug.Assert (Graphics.PageUnit == XGraphicsUnit.Point,
                         "With TrimMargins set the page units must be Point. Ohter cases nyi.");
                     DefaultViewMatrix.TranslatePrepend (trimOffset.X, -trimOffset.Y);
                 }
@@ -1622,7 +1822,7 @@ internal class XGraphicsPdfRenderer
             else
             {
                 // Scale with page units.
-                switch (_graphics.PageUnit)
+                switch (Graphics.PageUnit)
                 {
                     case XGraphicsUnit.Point:
                         // Factor is 1.
@@ -1712,18 +1912,18 @@ internal class XGraphicsPdfRenderer
     /// <summary>
     /// Makes the specified pen and brush to the current graphics objects.
     /// </summary>
-    private void Realize (XPen pen, XBrush brush)
+    private void Realize (XPen? pen, XBrush? brush)
     {
         BeginPage();
         BeginGraphicMode();
         RealizeTransform();
 
-        if (pen != null)
+        if (pen is not null)
         {
             _gfxState.RealizePen (pen, _colorMode); // page.document.Options.ColorMode);
         }
 
-        if (brush != null)
+        if (brush is not null)
         {
             // Render mode is 0 except for bold simulation.
             _gfxState.RealizeBrush (brush, _colorMode, 0, 0); // page.document.Options.ColorMode);
@@ -1749,7 +1949,12 @@ internal class XGraphicsPdfRenderer
     /// <summary>
     /// Makes the specified font and brush to the current graphics objects.
     /// </summary>
-    void Realize (XFont font, XBrush brush, int renderingMode)
+    void Realize
+        (
+            XFont font,
+            XBrush brush,
+            int renderingMode
+        )
     {
         BeginPage();
         RealizeTransform();
@@ -1764,7 +1969,12 @@ internal class XGraphicsPdfRenderer
     /// <param name="pos">The absolute text position.</param>
     /// <param name="dy">The dy.</param>
     /// <param name="adjustSkew">true if skewing for italic simulation is currently on.</param>
-    void AdjustTdOffset (ref XPoint pos, double dy, bool adjustSkew)
+    void AdjustTdOffset
+        (
+            ref XPoint pos,
+            double dy,
+            bool adjustSkew
+        )
     {
         pos.Y += dy;
 
@@ -1772,7 +1982,7 @@ internal class XGraphicsPdfRenderer
         var posSave = pos;
 
         // Map from absolute to relative position.
-        pos = pos - new XVector (_gfxState.RealizedTextPosition.X, _gfxState.RealizedTextPosition.Y);
+        pos -= new XVector (_gfxState.RealizedTextPosition.X, _gfxState.RealizedTextPosition.Y);
         if (adjustSkew)
         {
             // In case that italic simulation is on X must be adjusted according to Y offset. Weird but works :-)
@@ -1785,7 +1995,10 @@ internal class XGraphicsPdfRenderer
     /// <summary>
     /// Makes the specified image to the current graphics object.
     /// </summary>
-    string Realize (XImage image)
+    string Realize
+        (
+            XImage image
+        )
     {
         BeginPage();
         BeginGraphicMode();
@@ -1794,8 +2007,7 @@ internal class XGraphicsPdfRenderer
         // The transparency set for a brush also applies to images. Set opacity to 100% so image will be drawn without transparency.
         _gfxState.RealizeNonStrokeTransparency (1, _colorMode);
 
-        var form = image as XForm;
-        return form != null ? GetFormName (form) : GetImageName (image);
+        return image is XForm form ? GetFormName (form) : GetImageName (image);
     }
 
     /// <summary>
@@ -1822,7 +2034,10 @@ internal class XGraphicsPdfRenderer
     /// <summary>
     /// Convert a point from Windows world space to PDF world space.
     /// </summary>
-    internal XPoint WorldToView (XPoint point)
+    internal XPoint WorldToView
+        (
+            XPoint point
+        )
     {
         // If EffectiveCtm is not yet realized InverseEffectiveCtm is invalid.
         Debug.Assert (_gfxState.UnrealizedCtm.IsIdentity, "Somewhere a RealizeTransform is missing.");
@@ -1865,7 +2080,7 @@ internal class XGraphicsPdfRenderer
     /// <summary>
     /// Gets the owning PdfDocument of this page or form.
     /// </summary>
-    internal PdfDocument Owner
+    internal PdfDocument? Owner
     {
         get
         {
@@ -1874,14 +2089,11 @@ internal class XGraphicsPdfRenderer
                 return _page.Owner;
             }
 
-            return _form.Owner;
+            return _form!.Owner;
         }
     }
 
-    internal XGraphics Graphics
-    {
-        get { return _graphics; }
-    }
+    internal XGraphics? Graphics { get; private set; }
 
     /// <summary>
     /// Gets the PdfResources of this page or form.
@@ -1895,7 +2107,7 @@ internal class XGraphicsPdfRenderer
                 return _page.Resources;
             }
 
-            return _form.Resources;
+            return _form!.Resources;
         }
     }
 
@@ -1911,7 +2123,7 @@ internal class XGraphicsPdfRenderer
                 return new XSize (_page.Width, _page.Height);
             }
 
-            return _form.Size;
+            return _form!.Size;
         }
     }
 
@@ -1925,7 +2137,7 @@ internal class XGraphicsPdfRenderer
             return _page.GetFontName (font, out pdfFont);
         }
 
-        return _form.GetFontName (font, out pdfFont);
+        return _form!.GetFontName (font, out pdfFont);
     }
 
     /// <summary>
@@ -1938,7 +2150,7 @@ internal class XGraphicsPdfRenderer
             return _page.GetImageName (image);
         }
 
-        return _form.GetImageName (image);
+        return _form!.GetImageName (image);
     }
 
     /// <summary>
@@ -1954,7 +2166,6 @@ internal class XGraphicsPdfRenderer
     internal PdfPage? _page;
     internal XForm? _form;
     internal PdfColorMode _colorMode;
-    private XGraphics? _graphics;
     private readonly StringBuilder _content;
 
     /// <summary>
