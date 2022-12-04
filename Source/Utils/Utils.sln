@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionCleaner", "Solution
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NameSpacer", "NameSpacer\NameSpacer.csproj", "{4A15DEF1-DC81-4DA3-B5BA-DDCE1BE065D3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IrbisCeptor", "IrbisCeptor\IrbisCeptor.csproj", "{EC6C76EB-549E-4E55-B9EB-84F03E9A2A8F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,5 +50,9 @@ Global
 		{4A15DEF1-DC81-4DA3-B5BA-DDCE1BE065D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4A15DEF1-DC81-4DA3-B5BA-DDCE1BE065D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4A15DEF1-DC81-4DA3-B5BA-DDCE1BE065D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC6C76EB-549E-4E55-B9EB-84F03E9A2A8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC6C76EB-549E-4E55-B9EB-84F03E9A2A8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC6C76EB-549E-4E55-B9EB-84F03E9A2A8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC6C76EB-549E-4E55-B9EB-84F03E9A2A8F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

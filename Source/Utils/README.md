@@ -6,4 +6,5 @@
 * [**MsgBox**](MsgBox/README.md) - демонстрирует пользователю окно с сообщением;
 * [**PatchVersion**](PatchVersion/README.md) - патчит версию в файле проекта;
 * [**SolutionCleaner**](SolutionCleaner/README.md) - очищает решение от объектных файлов;
-* [**UniCall**](UniCall/README.md) - вызывает метод из .NET-сборки.
+* [**UniCall**](UniCall/README.md) - вызывает метод из .NET-сборки;
+* [**IrbisCeptor**](IrbisCeptor/README.md) - перехватчик сетевого протокола ИРБИС64.
