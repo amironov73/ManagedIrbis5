@@ -152,7 +152,7 @@ internal sealed class DomUtils
         )
     {
         var conBlock = box;
-        var index = conBlock.ParentBox.Boxes.IndexOf (conBlock);
+        var index = conBlock.ParentBox!.Boxes.IndexOf (conBlock);
         while (conBlock.ParentBox != null && index < 1 && conBlock.Display != CssConstants.Block &&
                conBlock.Display != CssConstants.Table && conBlock.Display != CssConstants.TableCell &&
                conBlock.Display != CssConstants.ListItem)
@@ -191,7 +191,7 @@ internal sealed class DomUtils
         if (!box.Words[0].IsImage && box.Words[0].HasSpaceBefore && box.IsInline)
         {
             var sib = GetPreviousContainingBlockSibling (box);
-            if (sib != null && sib.IsInline)
+            if (sib is { IsInline: true })
             {
                 return true;
             }
@@ -299,7 +299,7 @@ internal sealed class DomUtils
     {
         if (box != null)
         {
-            if (box.IsClickable && box.Visibility == CssConstants.Visible)
+            if (box is { IsClickable: true, Visibility: CssConstants.Visible })
             {
                 linkBoxes.Add (box);
             }
@@ -326,7 +326,7 @@ internal sealed class DomUtils
     {
         if (box != null)
         {
-            if (box.IsClickable && box.Visibility == CssConstants.Visible)
+            if (box is { IsClickable: true, Visibility: CssConstants.Visible })
             {
                 if (IsInBox (box, location))
                 {
@@ -443,7 +443,7 @@ internal sealed class DomUtils
             RPoint location
         )
     {
-        if (box != null && box.Visibility == CssConstants.Visible)
+        if (box is { Visibility: CssConstants.Visible })
         {
             if (box.LineBoxes.Count > 0)
             {
@@ -519,7 +519,7 @@ internal sealed class DomUtils
             box = box.ParentBox;
         }
 
-        foreach (var lineBox in box.LineBoxes)
+        foreach (var lineBox in box!.LineBoxes)
         {
             foreach (var lineWord in lineBox.Words)
             {
@@ -640,9 +640,9 @@ internal sealed class DomUtils
         if (sb.Length > 0)
         {
             // convert hr to line of dashes
-            if (box.HtmlTag != null && box.HtmlTag.Name == "hr")
+            if (box.HtmlTag is { Name: "hr" })
             {
-                if (sb.Length > 1 && sb[sb.Length - 1] != '\n')
+                if (sb.Length > 1 && sb[^1] != '\n')
                 {
                     sb.AppendLine();
                 }
@@ -654,7 +654,7 @@ internal sealed class DomUtils
             if (box.Display == CssConstants.Block || box.Display == CssConstants.ListItem ||
                 box.Display == CssConstants.TableRow)
             {
-                if (!(box.IsBrElement && sb.Length > 1 && sb[sb.Length - 1] == '\n'))
+                if (!(box.IsBrElement && sb.Length > 1 && sb[^1] == '\n'))
                 {
                     sb.AppendLine();
                 }
@@ -667,7 +667,7 @@ internal sealed class DomUtils
             }
 
             // paragraphs has additional newline for nice formatting
-            if (box.HtmlTag != null && box.HtmlTag.Name == "p")
+            if (box.HtmlTag is { Name: "p" })
             {
                 var newlines = 0;
                 for (var i = sb.Length - 1; i >= 0 && char.IsWhiteSpace (sb[i]); i--)
@@ -787,7 +787,7 @@ internal sealed class DomUtils
         if (!ContainsNamedBox (selectionRoot))
         {
             selectionRootRun = selectionRoot.ParentBox;
-            while (selectionRootRun.ParentBox != null && selectionRootRun.HtmlTag == null)
+            while (selectionRootRun!.ParentBox != null && selectionRootRun.HtmlTag == null)
             {
                 selectionRootRun = selectionRootRun.ParentBox;
             }
@@ -843,7 +843,7 @@ internal sealed class DomUtils
         {
             if (box.HtmlTag != null)
             {
-                if (box.HtmlTag.Name != "link" || !box.HtmlTag.Attributes.ContainsKey ("href") ||
+                if (box.HtmlTag.Name != "link" || !box.HtmlTag.Attributes!.ContainsKey ("href") ||
                     (!box.HtmlTag.Attributes["href"].StartsWith ("property") &&
                      !box.HtmlTag.Attributes["href"].StartsWith ("method")))
                 {
@@ -855,7 +855,7 @@ internal sealed class DomUtils
                 }
 
                 if (styleGen == HtmlGenerationStyle.InHeader && box.HtmlTag.Name == "html" &&
-                    box.HtmlContainer.CssData != null)
+                    box.HtmlContainer!.CssData != null)
                 {
                     builder.AppendLine ("<head>");
                     WriteStylesheet (builder, box.HtmlContainer.CssData);
@@ -880,14 +880,14 @@ internal sealed class DomUtils
                 WriteHtml (cssParser, builder, childBox, styleGen, selectedBoxes, selectionRoot);
             }
 
-            if (box.HtmlTag != null && !box.HtmlTag.IsSingle)
+            if (box.HtmlTag is { IsSingle: false })
             {
                 if (box == selectionRoot)
                 {
                     builder.Append ("<!--EndFragment-->");
                 }
 
-                builder.AppendFormat ("</{0}>", box.HtmlTag.Name);
+                builder.Append ($"</{box.HtmlTag.Name}>");
             }
         }
     }
@@ -907,47 +907,47 @@ internal sealed class DomUtils
             HtmlGenerationStyle styleGen
         )
     {
-        builder.AppendFormat ("<{0}", box.HtmlTag.Name);
+        builder.Append ($"<{box.HtmlTag!.Name}");
 
         // collect all element style properties including from stylesheet
         var tagStyles = new Dictionary<string, string>();
-        var tagCssBlock = box.HtmlContainer.CssData.GetCssBlock (box.HtmlTag.Name);
-        if (tagCssBlock != null)
+        var tagCssBlock = box.HtmlContainer!.CssData!.GetCssBlock (box.HtmlTag.Name);
+        if (tagCssBlock != null!)
         {
             // TODO:a handle selectors
             foreach (var cssBlock in tagCssBlock)
-            foreach (var prop in cssBlock.Properties)
+            foreach (var prop in cssBlock.Properties!)
                 tagStyles[prop.Key] = prop.Value;
         }
 
         if (box.HtmlTag.HasAttributes())
         {
             builder.Append (" ");
-            foreach (var att in box.HtmlTag.Attributes)
+            foreach (var att in box.HtmlTag.Attributes!)
             {
                 // handle image tags by inserting the image using base64 data
                 if (styleGen == HtmlGenerationStyle.Inline && att.Key == HtmlConstants.Style)
                 {
                     // if inline style add the styles to the collection
-                    var block = cssParser.ParseCssBlock (box.HtmlTag.Name, box.HtmlTag.TryGetAttribute ("style"));
-                    foreach (var prop in block.Properties)
+                    var block = cssParser.ParseCssBlock (box.HtmlTag.Name, box.HtmlTag.TryGetAttribute ("style")!);
+                    foreach (var prop in block.Properties!)
                         tagStyles[prop.Key] = prop.Value;
                 }
                 else if (styleGen == HtmlGenerationStyle.Inline && att.Key == HtmlConstants.Class)
                 {
                     // if inline style convert the style class to actual properties and add to collection
                     var cssBlocks = box.HtmlContainer.CssData.GetCssBlock ("." + att.Value);
-                    if (cssBlocks != null)
+                    if (cssBlocks != null!)
                     {
                         // TODO:a handle selectors
                         foreach (var cssBlock in cssBlocks)
-                        foreach (var prop in cssBlock.Properties)
+                        foreach (var prop in cssBlock.Properties!)
                             tagStyles[prop.Key] = prop.Value;
                     }
                 }
                 else
                 {
-                    builder.AppendFormat ("{0}=\"{1}\" ", att.Key, att.Value);
+                    builder.Append ($"{att.Key}=\"{att.Value}\" ");
                 }
             }
 
@@ -962,13 +962,13 @@ internal sealed class DomUtils
             {
                 builder.Append (" style=\"");
                 foreach (var style in cleanTagStyles)
-                    builder.AppendFormat ("{0}: {1}; ", style.Key, style.Value);
+                    builder.Append ($"{style.Key}: {style.Value}; ");
                 builder.Remove (builder.Length - 1, 1);
                 builder.Append ("\"");
             }
         }
 
-        builder.AppendFormat ("{0}>", box.HtmlTag.IsSingle ? "/" : "");
+        builder.Append ($"{(box.HtmlTag.IsSingle ? "/" : "")}>");
     }
 
     /// <summary>
@@ -986,14 +986,13 @@ internal sealed class DomUtils
     {
         // ReSharper disable PossibleMultipleEnumeration
         var cleanTagStyles = new Dictionary<string, string>();
-        var defaultBlocks = box.HtmlContainer.Adapter.DefaultCssData.GetCssBlock (box.HtmlTag.Name);
+        var defaultBlocks = box.HtmlContainer!.Adapter.DefaultCssData.GetCssBlock (box.HtmlTag!.Name);
         foreach (var style in tagStyles)
         {
             var isDefault = false;
             foreach (var defaultBlock in defaultBlocks)
             {
-                string value;
-                if (defaultBlock.Properties.TryGetValue (style.Key, out value) &&
+                if (defaultBlock.Properties!.TryGetValue (style.Key, out var value) &&
                     value.Equals (style.Value, StringComparison.OrdinalIgnoreCase))
                 {
                     isDefault = true;
@@ -1036,7 +1035,7 @@ internal sealed class DomUtils
                     foreach (var property in cssBlockProperties)
                     {
                         // TODO:a handle selectors
-                        builder.AppendFormat ("{0}: {1};", property.Key, property.Value);
+                        builder.Append ($"{property.Key}: {property.Value};");
                     }
                 }
             }
@@ -1065,7 +1064,7 @@ internal sealed class DomUtils
             return string.Empty; // ???
         }
 
-        if (selectedText && rect.SelectedStartIndex > -1 && rect.SelectedEndIndexOffset > -1)
+        if (selectedText && rect is { SelectedStartIndex: > -1, SelectedEndIndexOffset: > -1 })
         {
             return rectText.Substring (rect.SelectedStartIndex, rect.SelectedEndIndexOffset - rect.SelectedStartIndex);
         }
@@ -1078,7 +1077,7 @@ internal sealed class DomUtils
         {
             return rectText.Substring (0, rect.SelectedEndIndexOffset);
         }
-        var whitespaceBefore = rect.OwnerBox.Words[0] == rect
+        var whitespaceBefore = rect.OwnerBox!.Words[0] == rect
             ? IsBoxHasWhitespace (rect.OwnerBox)
             : rect.HasSpaceBefore;
 
@@ -1099,18 +1098,18 @@ internal sealed class DomUtils
             int indent
         )
     {
-        builder.AppendFormat ("{0}<{1}", new string (' ', 2 * indent), box.Display);
+        builder.Append ($"{new string (' ', 2 * indent)}<{box.Display}");
         if (box.HtmlTag != null)
         {
-            builder.AppendFormat (" element=\"{0}\"", box.HtmlTag != null ? box.HtmlTag.Name : string.Empty);
+            builder.Append ($" element=\"{(box.HtmlTag != null ? box.HtmlTag.Name : string.Empty)}\"");
         }
 
         if (box.Words.Count > 0)
         {
-            builder.AppendFormat (" words=\"{0}\"", box.Words.Count);
+            builder.Append ($" words=\"{box.Words.Count}\"");
         }
 
-        builder.AppendFormat ("{0}>\r\n", box.Boxes.Count > 0 ? "" : "/");
+        builder.Append ($"{(box.Boxes.Count > 0 ? "" : "/")}>\r\n");
         if (box.Boxes.Count > 0)
         {
             foreach (var childBox in box.Boxes)
@@ -1118,7 +1117,7 @@ internal sealed class DomUtils
                 GenerateBoxTree (childBox, builder, indent + 1);
             }
 
-            builder.AppendFormat ("{0}</{1}>\r\n", new string (' ', 2 * indent), box.Display);
+            builder.Append ($"{new string (' ', 2 * indent)}</{box.Display}>\r\n");
         }
     }
 

@@ -56,36 +56,20 @@ public enum SampleType
 /// </summary>
 public class Sample
 {
-    private DateTime _time;
-    private double _position;
-    private double _velocity;
-
     /// <summary>
     /// The time of the sample
     /// </summary>
-    public DateTime Time
-    {
-        get { return _time; }
-        set { _time = value; }
-    }
+    public DateTime Time { get; set; }
 
     /// <summary>
     /// The position at sample time
     /// </summary>
-    public double Position
-    {
-        get { return _position; }
-        set { _position = value; }
-    }
+    public double Position { get; set; }
 
     /// <summary>
     /// The instantaneous velocity at sample time
     /// </summary>
-    public double Velocity
-    {
-        get { return _velocity; }
-        set { _velocity = value; }
-    }
+    public double Velocity { get; set; }
 }
 
 /// <summary>
@@ -119,8 +103,8 @@ public class SamplePointList
     {
         get
         {
-            PointPair pt = new PointPair();
-            Sample sample = (Sample)list[index];
+            var pt = new PointPair();
+            var sample = (Sample) list[index]!;
             pt.X = GetValue (sample, XType);
             pt.Y = GetValue (sample, YType);
             return pt;
@@ -130,10 +114,7 @@ public class SamplePointList
     /// <summary>
     /// Gets the number of samples in the collection
     /// </summary>
-    public int Count
-    {
-        get { return list.Count; }
-    }
+    public int Count => list.Count;
 
     /// <summary>
     /// Get the specified data type from the specified sample
@@ -147,19 +128,22 @@ public class SamplePointList
         {
             case SampleType.Position:
                 return sample.Position;
+
             case SampleType.Time:
                 return sample.Time.ToOADate();
+
             case SampleType.TimeDiff:
-                return sample.Time.ToOADate() - ((Sample)list[0]).Time.ToOADate();
+                return sample.Time.ToOADate() - ((Sample)list[0]!).Time.ToOADate();
+
             case SampleType.VelocityAvg:
-                double timeDiff = sample.Time.ToOADate() - ((Sample)list[0]).Time.ToOADate();
+                var timeDiff = sample.Time.ToOADate() - ((Sample)list[0]!).Time.ToOADate();
                 if (timeDiff <= 0)
                 {
                     return PointPairBase.Missing;
                 }
                 else
                 {
-                    return (sample.Position - ((Sample)list[0]).Position) / timeDiff;
+                    return (sample.Position - ((Sample)list[0]!).Position) / timeDiff;
                 }
             case SampleType.VelocityInst:
                 return sample.Velocity;

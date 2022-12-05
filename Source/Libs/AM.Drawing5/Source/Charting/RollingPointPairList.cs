@@ -93,7 +93,9 @@ public class RollingPointPairList
         if (preLoad)
         {
             for (var i = 0; i < capacity; i++)
+            {
                 _mBuffer[i] = new PointPair();
+            }
         }
     }
 
@@ -123,10 +125,7 @@ public class RollingPointPairList
     /// <summary>
     /// Gets the capacity of the rolling buffer.
     /// </summary>
-    public int Capacity
-    {
-        get { return _mBuffer.Length; }
-    }
+    public int Capacity => _mBuffer!.Length;
 
     /// <summary>
     /// Gets the count of items within the rolling buffer. Note that this may be less than
@@ -148,7 +147,7 @@ public class RollingPointPairList
 
             if (_tailIdx > _headIdx)
             {
-                return (_mBuffer.Length - _tailIdx) + _headIdx + 1;
+                return (_mBuffer!.Length - _tailIdx) + _headIdx + 1;
             }
 
             return 1;
@@ -159,10 +158,7 @@ public class RollingPointPairList
     /// Gets a bolean that indicates if the buffer is empty.
     /// Alternatively you can test Count==0.
     /// </summary>
-    public bool IsEmpty
-    {
-        get { return _headIdx == -1; }
-    }
+    public bool IsEmpty => _headIdx == -1;
 
     /// <summary>
     /// Gets or sets the <see cref="PointPair" /> at the specified index in the buffer.
@@ -181,7 +177,7 @@ public class RollingPointPairList
             }
 
             index += _tailIdx;
-            if (index >= _mBuffer.Length)
+            if (index >= _mBuffer!.Length)
             {
                 index -= _mBuffer.Length;
             }
@@ -196,7 +192,7 @@ public class RollingPointPairList
             }
 
             index += _tailIdx;
-            if (index >= _mBuffer.Length)
+            if (index >= _mBuffer!.Length)
             {
                 index -= _mBuffer.Length;
             }
@@ -253,7 +249,7 @@ public class RollingPointPairList
         else
         {
             // Determine the index to write to.
-            if (++_headIdx == _mBuffer.Length)
+            if (++_headIdx == _mBuffer!.Length)
             {
                 // Wrap around.
                 _headIdx = 0;
@@ -280,7 +276,7 @@ public class RollingPointPairList
     /// <param name="item">The <see cref="PointPair" /> to be added.</param>
     public void Add (PointPair item)
     {
-        _mBuffer[GetNextIndex()] = item;
+        _mBuffer![GetNextIndex()] = item;
     }
 
     /// <summary>
@@ -293,7 +289,9 @@ public class RollingPointPairList
         // A slightly more efficient approach would be to determine where the new points should placed within
         // the buffer and to then copy them in directly - updating the head and tail indexes appropriately.
         for (var i = 0; i < pointList.Count; i++)
+        {
             Add (pointList[i]);
+        }
     }
 
     /// <summary>
@@ -311,7 +309,7 @@ public class RollingPointPairList
             throw new InvalidOperationException ("buffer is empty.");
         }
 
-        var o = _mBuffer[_tailIdx];
+        var o = _mBuffer![_tailIdx];
 
         if (_tailIdx == _headIdx)
         {
@@ -352,7 +350,7 @@ public class RollingPointPairList
         // shift all the items that lie after index back by 1
         for (var i = index + _tailIdx; i < _tailIdx + count - 1; i++)
         {
-            i = (i >= _mBuffer.Length) ? 0 : i;
+            i = (i >= _mBuffer!.Length) ? 0 : i;
             var j = i + 1;
             j = (j >= _mBuffer.Length) ? 0 : j;
             _mBuffer[i] = _mBuffer[j];
@@ -386,7 +384,9 @@ public class RollingPointPairList
         }
 
         for (var i = 0; i < count; i++)
+        {
             RemoveAt (index);
+        }
     }
 
     /// <summary>
@@ -401,7 +401,7 @@ public class RollingPointPairList
             throw new InvalidOperationException ("buffer is empty.");
         }
 
-        var o = _mBuffer[_headIdx];
+        var o = _mBuffer![_headIdx];
 
         if (_tailIdx == _headIdx)
         {
@@ -433,7 +433,7 @@ public class RollingPointPairList
             throw new InvalidOperationException ("buffer is empty.");
         }
 
-        return _mBuffer[_headIdx];
+        return _mBuffer![_headIdx];
     }
 
     #endregion
@@ -459,12 +459,12 @@ public class RollingPointPairList
     /// <param name="y">The Y value</param>
     /// <param name="z">The Z value</param>
     /// <param name="tag">The Tag value for the PointPair</param>
-    public void Add (double x, double y, double z, object tag)
+    public void Add (double x, double y, double z, object? tag)
     {
         // advance the rolling list
         GetNextIndex();
 
-        if (_mBuffer[_headIdx] == null)
+        if (_mBuffer![_headIdx] == null!)
         {
             _mBuffer[_headIdx] = new PointPair (x, y, z, tag);
         }

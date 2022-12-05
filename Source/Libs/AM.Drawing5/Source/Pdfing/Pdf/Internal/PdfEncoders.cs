@@ -86,10 +86,10 @@ internal static class PdfEncoders
     /// </summary>
     public static Encoding UnicodeEncoding
     {
-        get { return _unicodeEncoding ?? (_unicodeEncoding = Encoding.Unicode); }
+        get { return _unicodeEncoding ??= Encoding.Unicode; }
     }
 
-    static Encoding _unicodeEncoding;
+    static Encoding? _unicodeEncoding;
 
     ///// <summary>
     ///// Encodes a string from a byte array. Each character gets the code of the corresponding byte.
@@ -196,11 +196,17 @@ internal static class PdfEncoders
     /// <summary>
     /// Converts a raw string into a raw string literal, possibly encrypted.
     /// </summary>
-    public static string ToStringLiteral (string text, PdfStringEncoding encoding,
-        PdfStandardSecurityHandler securityHandler)
+    public static string ToStringLiteral
+        (
+            string text,
+            PdfStringEncoding encoding,
+            PdfStandardSecurityHandler? securityHandler
+        )
     {
         if (string.IsNullOrEmpty (text))
+        {
             return "()";
+        }
 
         byte[] bytes;
         switch (encoding)
@@ -232,10 +238,17 @@ internal static class PdfEncoders
     /// <summary>
     /// Converts a raw string into a raw string literal, possibly encrypted.
     /// </summary>
-    public static string ToStringLiteral (byte[] bytes, bool unicode, PdfStandardSecurityHandler securityHandler)
+    public static string ToStringLiteral
+        (
+            byte[]? bytes,
+            bool unicode,
+            PdfStandardSecurityHandler? securityHandler
+        )
     {
         if (bytes == null || bytes.Length == 0)
+        {
             return "()";
+        }
 
         var temp = FormatStringLiteral (bytes, unicode, true, false, securityHandler);
         return RawEncoding.GetString (temp, 0, temp.Length);
@@ -244,11 +257,17 @@ internal static class PdfEncoders
     /// <summary>
     /// Converts a raw string into a raw hexadecimal string literal, possibly encrypted.
     /// </summary>
-    public static string ToHexStringLiteral (string text, PdfStringEncoding encoding,
-        PdfStandardSecurityHandler securityHandler)
+    public static string ToHexStringLiteral
+        (
+            string text,
+            PdfStringEncoding encoding,
+            PdfStandardSecurityHandler? securityHandler
+        )
     {
         if (string.IsNullOrEmpty (text))
+        {
             return "<>";
+        }
 
         byte[] bytes;
         switch (encoding)
@@ -281,10 +300,17 @@ internal static class PdfEncoders
     /// <summary>
     /// Converts a raw string into a raw hexadecimal string literal, possibly encrypted.
     /// </summary>
-    public static string ToHexStringLiteral (byte[] bytes, bool unicode, PdfStandardSecurityHandler securityHandler)
+    public static string ToHexStringLiteral
+        (
+            byte[]? bytes,
+            bool unicode,
+            PdfStandardSecurityHandler? securityHandler
+        )
     {
         if (bytes == null || bytes.Length == 0)
+        {
             return "<>";
+        }
 
         var agTemp = FormatStringLiteral (bytes, unicode, true, true, securityHandler);
         return RawEncoding.GetString (agTemp, 0, agTemp.Length);
@@ -299,11 +325,19 @@ internal static class PdfEncoders
     /// <param name="hex">Indicates whether to create a hexadecimal string literal.</param>
     /// <param name="securityHandler">Encrypts the bytes if specified.</param>
     /// <returns>The PDF bytes.</returns>
-    public static byte[] FormatStringLiteral (byte[] bytes, bool unicode, bool prefix, bool hex,
-        PdfStandardSecurityHandler securityHandler)
+    public static byte[] FormatStringLiteral
+        (
+            byte[]? bytes,
+            bool unicode,
+            bool prefix,
+            bool hex,
+            PdfStandardSecurityHandler? securityHandler
+        )
     {
         if (bytes == null || bytes.Length == 0)
+        {
             return hex ? new byte[] { (byte)'<', (byte)'>' } : new byte[] { (byte)'(', (byte)')' };
+        }
 
         Debug.Assert (!unicode || bytes.Length % 2 == 0, "Odd number of bytes in Unicode string.");
 
@@ -315,7 +349,7 @@ internal static class PdfEncoders
             encrypted = true;
         }
 
-        var count = bytes.Length;
+        var count = bytes!.Length;
         var pdf = new StringBuilder();
         if (!unicode)
         {
@@ -361,7 +395,9 @@ internal static class PdfEncoders
                                     pdf.Append ((char)(ch / 8 + '0'));
                                 }
                                 else
+                                {
                                     pdf.Append (ch);
+                                }
 
                                 break;
                         }
@@ -409,7 +445,9 @@ internal static class PdfEncoders
                 {
                     pdf.AppendFormat ("{0:X2}{1:X2}", bytes[idx], bytes[idx + 1]);
                     if (idx != 0 && (idx % 48) == 0)
+                    {
                         pdf.Append ("\n");
+                    }
                 }
 
                 pdf.Append (">");
@@ -590,13 +628,20 @@ internal static class PdfEncoders
     /// <summary>
     /// Converts an XColor into a string with up to 3 decimal digits and a decimal point.
     /// </summary>
-    public static string ToString (XColor color, PdfColorMode colorMode, bool withAlpha = false)
+    public static string ToString
+        (
+            XColor color,
+            PdfColorMode colorMode,
+            bool withAlpha = false
+        )
     {
         const string format = Config.SignificantFigures3;
 
         // If not defined let color decide
         if (colorMode == PdfColorMode.Undefined)
+        {
             colorMode = color.ColorSpace == XColorSpace.Cmyk ? PdfColorMode.Cmyk : PdfColorMode.Rgb;
+        }
 
         switch (colorMode)
         {
@@ -608,13 +653,17 @@ internal static class PdfEncoders
             default:
             {
                 if (withAlpha)
+                {
                     return string.Format (CultureInfo.InvariantCulture,
                         "{0:" + format + "} {1:" + format + "} {2:" + format + "} {3:" + format + "}", color.R / 255.0,
                         color.G / 255.0, color.B / 255.0, color.A);
+                }
                 else
+                {
                     return string.Format (CultureInfo.InvariantCulture,
                         "{0:" + format + "} {1:" + format + "} {2:" + format + "}", color.R / 255.0, color.G / 255.0,
                         color.B / 255.0);
+                }
             }
         }
     }
@@ -622,7 +671,10 @@ internal static class PdfEncoders
     /// <summary>
     /// Converts an XMatrix into a string with up to 4 decimal digits and a decimal point.
     /// </summary>
-    public static string ToString (XMatrix matrix)
+    public static string ToString
+        (
+            XMatrix matrix
+        )
     {
         const string format = Config.SignificantFigures4;
         return string.Format (CultureInfo.InvariantCulture,

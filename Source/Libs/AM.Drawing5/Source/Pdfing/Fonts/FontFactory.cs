@@ -76,14 +76,14 @@ internal static class FontFactory
 
             // Is there a custom font resolver available?
             var customFontResolver = GlobalFontSettings.FontResolver;
-            if (customFontResolver != null)
+            if (customFontResolver != null!)
             {
                 // Case: Use custom font resolver.
                 fontResolverInfo = customFontResolver.ResolveTypeface (familyName, fontResolvingOptions.IsBold,
                     fontResolvingOptions.IsItalic);
 
                 // If resolved by custom font resolver register info and font source.
-                if (fontResolverInfo != null && !(fontResolverInfo is PlatformFontResolverInfo))
+                if (fontResolverInfo != null! && !(fontResolverInfo is PlatformFontResolverInfo))
                 {
                     var resolverInfoKey = fontResolverInfo.Key;
                     if (FontResolverInfosByName.TryGetValue (resolverInfoKey, out var existingFontResolverInfo))
@@ -109,7 +109,7 @@ internal static class FontFactory
                         FontResolverInfosByName.Add (resolverInfoKey, fontResolverInfo);
 
                         // Create font source if not yet exists.
-                        if (FontSourcesByName.TryGetValue (fontResolverInfo.FaceName, out var previousFontSource))
+                        if (FontSourcesByName.TryGetValue (fontResolverInfo.FaceName, out _))
                         {
                             // Case: The font source exists, because a previous font resolver info comes
                             // with the same face name, but was different in style simulation flags.
@@ -278,7 +278,7 @@ internal static class FontFactory
             }
 
             FontSourcesByKey.Add (fontSource.Key, fontSource);
-            FontSourcesByName.Add (fontSource.FontName, fontSource);
+            FontSourcesByName.Add (fontSource.FontName!, fontSource);
             return fontSource;
         }
         finally
@@ -332,7 +332,7 @@ internal static class FontFactory
         }
 
         FontSourcesByName.Add (typefaceKey, fontSource);
-        FontSourcesByName.Add (fontSource.FontName, fontSource);
+        FontSourcesByName.Add (fontSource.FontName!, fontSource);
         FontSourcesByKey.Add (fontSource.Key, fontSource);
 
         return fontSource;
@@ -354,15 +354,13 @@ internal static class FontFactory
     internal static string GetFontCachesState()
     {
         var state = new StringBuilder();
-        string[] keys;
-        int count;
 
         // FontResolverInfo by name.
         state.Append ("====================\n");
         state.Append ("Font resolver info by name\n");
         var keyCollection = FontResolverInfosByName.Keys;
-        count = keyCollection.Count;
-        keys = new string[count];
+        var count = keyCollection.Count;
+        var keys = new string[count];
         keyCollection.CopyTo (keys, 0);
         Array.Sort (keys, StringComparer.OrdinalIgnoreCase);
         foreach (var key in keys)
@@ -375,7 +373,7 @@ internal static class FontFactory
         count = fontSourceKeys.Count;
         var ulKeys = new ulong[count];
         fontSourceKeys.CopyTo (ulKeys, 0);
-        Array.Sort (ulKeys, delegate (ulong x, ulong y) { return x == y ? 0 : (x > y ? 1 : -1); });
+        Array.Sort (ulKeys, (x, y) => x == y ? 0 : (x > y ? 1 : -1));
         foreach (var ul in ulKeys)
             state.AppendFormat ("  {0}: {1}\n", ul, FontSourcesByKey[ul].DebuggerDisplay);
         var fontSourceNames = FontSourcesByName.Keys;

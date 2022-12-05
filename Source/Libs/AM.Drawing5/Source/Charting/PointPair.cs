@@ -42,8 +42,7 @@ public class PointPair
     /// A tag object for use by the user.  This can be used to store additional
     /// information associated with the <see cref="PointPair"/>.  ZedGraph never
     /// modifies this value, but if it is a <see cref="String"/> type, it
-    /// may be displayed in a <see cref="System.Windows.Forms.ToolTip"/>
-    /// within the <see cref="ZedGraphControl"/> object.
+    /// may be displayed in a <c>ToolTip</c> within the <c>ZedGraphControl</c> object.
     /// </summary>
     /// <remarks>
     /// Note that, if you are going to Serialize ZedGraph data, then any type
@@ -122,7 +121,7 @@ public class PointPair
     /// <param name="y">This pair's y coordinate.</param>
     /// <param name="z">This pair's z or lower dependent coordinate.</param>
     /// <param name="tag">This pair's <see cref="Tag"/> property</param>
-    public PointPair (double x, double y, double z, object tag)
+    public PointPair (double x, double y, double z, object? tag)
         : base (x, y)
     {
         Z = z;
@@ -148,9 +147,9 @@ public class PointPair
     {
         Z = rhs.Z;
 
-        if (rhs.Tag is ICloneable)
+        if (rhs.Tag is ICloneable cloneableTag)
         {
-            Tag = ((ICloneable)rhs.Tag).Clone();
+            Tag = cloneableTag.Clone();
         }
         else
         {
@@ -318,7 +317,7 @@ public class PointPair
     /// </summary>
     public class PointPairComparer : IComparer<PointPair>
     {
-        private SortType sortType;
+        private readonly SortType sortType;
 
         /// <summary>
         /// Constructor for PointPairComparer.
@@ -355,13 +354,13 @@ public class PointPair
 
             if (sortType == SortType.XValues)
             {
-                lVal = left.X;
-                rVal = right.X;
+                lVal = left!.X;
+                rVal = right!.X;
             }
             else
             {
-                lVal = left.Y;
-                rVal = right.Y;
+                lVal = left!.Y;
+                rVal = right!.Y;
             }
 
             if (lVal == Missing || double.IsInfinity (lVal) || double.IsNaN (lVal))
