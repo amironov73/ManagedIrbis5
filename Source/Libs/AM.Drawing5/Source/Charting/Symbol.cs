@@ -3,6 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable CompareOfFloatsByEqualityOperator
 // ReSharper disable InconsistentNaming
 
 /* Symbol.cs --
@@ -347,11 +348,11 @@ public class Symbol
         var sch = info.GetInt32 ("schema");
 
         _size = info.GetSingle ("size");
-        _type = (SymbolType)info.GetValue ("type", typeof (SymbolType));
+        _type = (SymbolType) info.GetValue ("type", typeof (SymbolType))!;
         _isAntiAlias = info.GetBoolean ("isAntiAlias");
         _isVisible = info.GetBoolean ("isVisible");
-        _fill = (Fill)info.GetValue ("fill", typeof (Fill));
-        _border = (Border)info.GetValue ("border", typeof (Border));
+        _fill = (Fill) info.GetValue ("fill", typeof (Fill))!;
+        _border = (Border) info.GetValue ("border", typeof (Border))!;
 
         if (sch >= 11)
         {
@@ -415,8 +416,8 @@ public class Symbol
         // Only draw if the symbol is visible
         if (_isVisible &&
             Type != SymbolType.None &&
-            x < 100000 && x > -100000 &&
-            y < 100000 && y > -100000)
+            x is < 100000 and > -100000 &&
+            y is < 100000 and > -100000)
         {
             var saveMatrix = graphics.Transform;
             graphics.TranslateTransform (x, y);
@@ -478,17 +479,11 @@ public class Symbol
             PointPair? dataValue
         )
     {
-        var source = this;
-        if (isSelected)
-        {
-            source = Selection.Symbol;
-        }
-
         // Only draw if the symbol is visible
         if (_isVisible &&
             Type != SymbolType.None &&
-            x < 100000 && x > -100000 &&
-            y < 100000 && y > -100000)
+            x is < 100000 and > -100000 &&
+            y is < 100000 and > -100000)
         {
             var sModeSave = graphics.SmoothingMode;
             if (_isAntiAlias)
@@ -597,9 +592,9 @@ public class Symbol
                 break;
 
             case SymbolType.UserDefined:
-                path = _userSymbol.Clone() as GraphicsPath;
+                path = _userSymbol!.Clone() as GraphicsPath;
                 var scaleTransform = new Matrix (scaledSize, 0.0f, 0.0f, scaledSize, 0.0f, 0.0f);
-                path.Transform (scaleTransform);
+                path!.Transform (scaleTransform);
                 break;
         }
 
@@ -658,7 +653,7 @@ public class Symbol
         // (Dale-a-b) we'll set an element to true when it has been drawn
         var isPixelDrawn = new bool[maxX + 1, maxY + 1];
 
-        double curX, curY, lowVal;
+        double curX, curY;
         var points = curve.Points;
 
         if (points != null && (_border.IsVisible || _fill.IsVisible))
@@ -684,8 +679,8 @@ public class Symbol
                     var xScale = curve.GetXAxis (pane).Scale;
                     var yScale = curve.GetYAxis (pane).Scale;
 
-                    var xIsLog = xScale.IsLog;
-                    var yIsLog = yScale.IsLog;
+                    var xIsLog = xScale!.IsLog;
+                    var yIsLog = yScale!.IsLog;
                     var xIsOrdinal = xScale.IsAnyOrdinal;
 
                     var xMin = xScale.Min;
@@ -698,7 +693,7 @@ public class Symbol
                         // use the valueHandler only for stacked types
                         if (pane.LineType == LineType.Stack)
                         {
-                            valueHandler.GetValues (curve, i, out curX, out lowVal, out curY);
+                            valueHandler.GetValues (curve, i, out curX, out _, out curY);
                         }
 
                         // otherwise, just access the values directly.  Avoiding the valueHandler for

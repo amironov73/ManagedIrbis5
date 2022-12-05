@@ -153,7 +153,7 @@ public class TextObj
     /// The <see cref="TextObj"/> to be displayed.  This text can be multi-line by
     /// including newline ('\n') characters between the lines.
     /// </summary>
-    public string Text
+    public string? Text
     {
         get => _text;
         set => _text = value;
@@ -172,12 +172,7 @@ public class TextObj
     public FontSpec FontSpec
     {
         get => _fontSpec;
-        set
-        {
-            Sure.NotNull (value);
-
-            _fontSpec = value;
-        }
+        set => _fontSpec = value;
     }
 
     #endregion
@@ -199,27 +194,29 @@ public class TextObj
     /// <see cref="Location.CoordinateFrame"/> property.  The text will be
     /// aligned to this position based on the
     /// <see cref="AlignV"/> property.</param>
-    public TextObj (string text, double x, double y)
+    public TextObj
+        (
+            string text,
+            double x,
+            double y
+        )
         : base (x, y)
     {
+        _fontSpec = null!;
+
         Init (text);
     }
 
-    private void Init (string text)
+    private void Init (string? text)
     {
-        if (text != null)
-        {
-            _text = text;
-        }
-        else
-        {
-            text = "Text";
-        }
+        _text = text ?? "Text";
 
-        _fontSpec = new FontSpec (
-            Default.FontFamily, Default.FontSize,
-            Default.FontColor, Default.FontBold,
-            Default.FontItalic, Default.FontUnderline);
+        _fontSpec = new FontSpec
+            (
+                Default.FontFamily, Default.FontSize,
+                Default.FontColor, Default.FontBold,
+                Default.FontItalic, Default.FontUnderline
+            );
 
         //this.isWrapped = Default.IsWrapped ;
         _layoutArea = new SizeF (0, 0);
@@ -243,9 +240,16 @@ public class TextObj
     /// <param name="coordType">The <see cref="CoordType"/> enum value that
     /// indicates what type of coordinate system the x and y parameters are
     /// referenced to.</param>
-    public TextObj (string text, double x, double y, CoordType coordType)
+    public TextObj
+        (
+            string text,
+            double x,
+            double y,
+            CoordType coordType
+        )
         : base (x, y, coordType)
     {
+        _fontSpec = null!;
         Init (text);
     }
 
@@ -271,9 +275,18 @@ public class TextObj
     /// the horizontal alignment of the object with respect to the (x,y) location</param>
     /// <param name="alignV">The <see cref="AlignV"/> enum that specifies
     /// the vertical alignment of the object with respect to the (x,y) location</param>
-    public TextObj (string text, double x, double y, CoordType coordType, AlignH alignH, AlignV alignV)
+    public TextObj
+        (
+            string text,
+            double x,
+            double y,
+            CoordType coordType,
+            AlignH alignH,
+            AlignV alignV
+        )
         : base (x, y, coordType, alignH, alignV)
     {
+        _fontSpec = null!;
         Init (text);
     }
 
@@ -282,7 +295,8 @@ public class TextObj
     /// </summary>
     public TextObj() : base (0, 0)
     {
-        Init ("");
+        _fontSpec = null!;
+        Init (string.Empty);
     }
 
     /// <summary>
@@ -342,10 +356,10 @@ public class TextObj
         info.GetInt32 ("schema2").NotUsed();
 
         _text = info.GetString ("text");
-        _fontSpec = (FontSpec) info.GetValue ("fontSpec", typeof (FontSpec));
+        _fontSpec = (FontSpec) info.GetValue ("fontSpec", typeof (FontSpec))!;
 
         //isWrapped = info.GetBoolean ("isWrapped") ;
-        _layoutArea = (SizeF)info.GetValue ("layoutArea", typeof (SizeF));
+        _layoutArea = (SizeF) info.GetValue ("layoutArea", typeof (SizeF))!;
     }
 
     /// <inheritdoc cref="ISerializable.GetObjectData"/>
@@ -388,7 +402,7 @@ public class TextObj
             //	this.FontSpec.Draw( g, pane.IsPenWidthScaled, this.text, pix.X, pix.Y,
             //		this.location.AlignH, this.location.AlignV, scaleFactor );
             //else
-            FontSpec.Draw (graphics, pane, _text, pix.X, pix.Y,
+            FontSpec.Draw (graphics, pane, _text!, pix.X, pix.Y,
                 _location.AlignH, _location.AlignV, scaleFactor, _layoutArea);
         }
     }
@@ -411,7 +425,7 @@ public class TextObj
         // coordinate frame to the screen pixel location
         var pix = _location.Transform (pane);
 
-        return _fontSpec.PointInBox (point, graphics, _text, pix.X, pix.Y,
+        return _fontSpec.PointInBox (point, graphics, _text!, pix.X, pix.Y,
             _location.AlignH, _location.AlignV, scaleFactor, LayoutArea);
     }
 
@@ -429,7 +443,7 @@ public class TextObj
         // coordinate frame to the screen pixel location
         var pix = _location.Transform (pane);
 
-        var pts = _fontSpec.GetBox (graphics, _text, pix.X, pix.Y, _location.AlignH,
+        var pts = _fontSpec.GetBox (graphics, _text!, pix.X, pix.Y, _location.AlignH,
             _location.AlignV, scaleFactor, new SizeF());
 
         shape = "poly";

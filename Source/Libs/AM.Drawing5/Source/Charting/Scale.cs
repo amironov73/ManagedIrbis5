@@ -3,6 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable CompareOfFloatsByEqualityOperator
 // ReSharper disable InconsistentNaming
 
 /* Scale.cs --
@@ -14,7 +15,6 @@
 using System;
 using System.Drawing;
 using System.Runtime.Serialization;
-using System.Security.Permissions;
 
 #endregion
 
@@ -96,7 +96,7 @@ public abstract class Scale
     /// <summary> Private <see cref="System.Collections.ArrayList"/> field for the <see cref="Axis"/> array of text labels.
     /// This property is only used if <see cref="Type"/> is set to
     /// <see cref="AxisType.Text"/> </summary>
-    internal string[] _textLabels = null;
+    internal string[]? _textLabels = null;
 
     /// <summary> Private field for the format of the <see cref="Axis"/> tic labels.
     /// Use the public property <see cref="Format"/> for access to this value. </summary>
@@ -180,8 +180,8 @@ public abstract class Scale
     /// </remarks>
     internal double _minLinearized
     {
-        get { return Linearize (_min); }
-        set { _min = DeLinearize (value); }
+        get => Linearize (_min);
+        set => _min = DeLinearize (value);
     }
 
     /// <summary>
@@ -193,8 +193,8 @@ public abstract class Scale
     /// </remarks>
     internal double _maxLinearized
     {
-        get { return Linearize (_max); }
-        set { _max = DeLinearize (value); }
+        get => Linearize (_max);
+        set => _max = DeLinearize (value);
     }
 
     /// <summary>
@@ -311,7 +311,7 @@ public abstract class Scale
         /// code will select <see cref="MajorUnit"/> = <see cref="DateUnit.Year"/>
         /// and <see cref="MinorUnit"/> = <see cref="DateUnit.Year"/>.
         /// This value normally defaults to 1825 days (5 years).
-        /// This value is used by the <see cref="DateScale.CalcDateStepSize"/> method.
+        /// This value is used by the <see cref="DateScale.CalcDateStepSize(double,double)"/> method.
         /// </summary>
         public static double RangeYearYear = 1825; // 5 years
 
@@ -322,7 +322,7 @@ public abstract class Scale
         /// code will select <see cref="MajorUnit"/> = <see cref="DateUnit.Year"/>
         /// and <see cref="MinorUnit"/> = <see cref="DateUnit.Month"/>.
         /// This value normally defaults to 730 days (2 years).
-        /// This value is used by the <see cref="DateScale.CalcDateStepSize"/> method.
+        /// This value is used by the <see cref="DateScale.CalcDateStepSize(double,double)"/> method.
         /// </summary>
         public static double RangeYearMonth = 730; // 2 years
 
@@ -333,7 +333,7 @@ public abstract class Scale
         /// code will select <see cref="MajorUnit"/> = <see cref="DateUnit.Month"/>
         /// and <see cref="MinorUnit"/> = <see cref="DateUnit.Month"/>.
         /// This value normally defaults to 300 days (10 months).
-        /// This value is used by the <see cref="DateScale.CalcDateStepSize"/> method.
+        /// This value is used by the <see cref="DateScale.CalcDateStepSize(double,double)"/> method.
         /// </summary>
         public static double RangeMonthMonth = 300; // 10 months
 
@@ -344,7 +344,7 @@ public abstract class Scale
         /// code will select <see cref="MajorUnit"/> = <see cref="DateUnit.Day"/>
         /// and <see cref="MinorUnit"/> = <see cref="DateUnit.Day"/>.
         /// This value normally defaults to 10 days.
-        /// This value is used by the <see cref="DateScale.CalcDateStepSize"/> method.
+        /// This value is used by the <see cref="DateScale.CalcDateStepSize(double,double)"/> method.
         /// </summary>
         public static double RangeDayDay = 10; // 10 days
 
@@ -355,7 +355,7 @@ public abstract class Scale
         /// code will select <see cref="MajorUnit"/> = <see cref="DateUnit.Day"/>
         /// and <see cref="MinorUnit"/> = <see cref="DateUnit.Hour"/>.
         /// This value normally defaults to 3 days.
-        /// This value is used by the <see cref="DateScale.CalcDateStepSize"/> method.
+        /// This value is used by the <see cref="DateScale.CalcDateStepSize(double,double)"/> method.
         /// </summary>
         public static double RangeDayHour = 3; // 3 days
 
@@ -366,7 +366,7 @@ public abstract class Scale
         /// code will select <see cref="MajorUnit"/> = <see cref="DateUnit.Hour"/>
         /// and <see cref="MinorUnit"/> = <see cref="DateUnit.Hour"/>.
         /// This value normally defaults to 0.4167 days (10 hours).
-        /// This value is used by the <see cref="DateScale.CalcDateStepSize"/> method.
+        /// This value is used by the <see cref="DateScale.CalcDateStepSize(double,double)"/> method.
         /// </summary>
         public static double RangeHourHour = 0.4167; // 10 hours
 
@@ -377,7 +377,7 @@ public abstract class Scale
         /// code will select <see cref="MajorUnit"/> = <see cref="DateUnit.Hour"/>
         /// and <see cref="MinorUnit"/> = <see cref="DateUnit.Minute"/>.
         /// This value normally defaults to 0.125 days (3 hours).
-        /// This value is used by the <see cref="DateScale.CalcDateStepSize"/> method.
+        /// This value is used by the <see cref="DateScale.CalcDateStepSize(double,double)"/> method.
         /// </summary>
         public static double RangeHourMinute = 0.125; // 3 hours
 
@@ -388,7 +388,7 @@ public abstract class Scale
         /// code will select <see cref="MajorUnit"/> = <see cref="DateUnit.Minute"/>
         /// and <see cref="MinorUnit"/> = <see cref="DateUnit.Minute"/>.
         /// This value normally defaults to 6.94e-3 days (10 minutes).
-        /// This value is used by the <see cref="DateScale.CalcDateStepSize"/> method.
+        /// This value is used by the <see cref="DateScale.CalcDateStepSize(double,double)"/> method.
         /// </summary>
         public static double RangeMinuteMinute = 6.94e-3; // 10 Minutes
 
@@ -399,7 +399,7 @@ public abstract class Scale
         /// code will select <see cref="MajorUnit"/> = <see cref="DateUnit.Minute"/>
         /// and <see cref="MinorUnit"/> = <see cref="DateUnit.Second"/>.
         /// This value normally defaults to 2.083e-3 days (3 minutes).
-        /// This value is used by the <see cref="DateScale.CalcDateStepSize"/> method.
+        /// This value is used by the <see cref="DateScale.CalcDateStepSize(double,double)"/> method.
         /// </summary>
         public static double RangeMinuteSecond = 2.083e-3; // 3 Minutes
 
@@ -410,7 +410,7 @@ public abstract class Scale
         /// code will select <see cref="MajorUnit"/> = <see cref="DateUnit.Second"/>
         /// and <see cref="MinorUnit"/> = <see cref="DateUnit.Second"/>.
         /// This value normally defaults to 3.472e-5 days (3 seconds).
-        /// This value is used by the <see cref="DateScale.CalcDateStepSize"/> method.
+        /// This value is used by the <see cref="DateScale.CalcDateStepSize(double,double)"/> method.
         /// </summary>
         public static double RangeSecondSecond = 3.472e-5; // 3 Seconds
 
@@ -421,7 +421,7 @@ public abstract class Scale
         /// selects a <see cref="Format"/> of <see cref="DateUnit.Year"/>
         /// for <see cref="MajorUnit"/> and <see cref="DateUnit.Year"/> for
         /// for <see cref="MinorUnit"/>.
-        /// This value is used by the <see cref="DateScale.CalcDateStepSize"/> method.
+        /// This value is used by the <see cref="DateScale.CalcDateStepSize(double,double)"/> method.
         /// </summary>
         /// <seealso cref="System.Globalization.DateTimeFormatInfo"/>
         public static string FormatYearYear = "yyyy";
@@ -433,7 +433,7 @@ public abstract class Scale
         /// selects a <see cref="Format"/> of <see cref="DateUnit.Year"/>
         /// for <see cref="MajorUnit"/> and <see cref="DateUnit.Month"/> for
         /// for <see cref="MinorUnit"/>.
-        /// This value is used by the <see cref="DateScale.CalcDateStepSize"/> method.
+        /// This value is used by the <see cref="DateScale.CalcDateStepSize(double,double)"/> method.
         /// </summary>
         /// <seealso cref="System.Globalization.DateTimeFormatInfo"/>
         public static string FormatYearMonth = "MMM-yyyy";
@@ -445,7 +445,7 @@ public abstract class Scale
         /// selects a <see cref="Format"/> of <see cref="DateUnit.Month"/>
         /// for <see cref="MajorUnit"/> and <see cref="DateUnit.Month"/> for
         /// for <see cref="MinorUnit"/>.
-        /// This value is used by the <see cref="DateScale.CalcDateStepSize"/> method.
+        /// This value is used by the <see cref="DateScale.CalcDateStepSize(double,double)"/> method.
         /// </summary>
         /// <seealso cref="System.Globalization.DateTimeFormatInfo"/>
         public static string FormatMonthMonth = "MMM-yyyy";
@@ -457,7 +457,7 @@ public abstract class Scale
         /// selects a <see cref="Format"/> of <see cref="DateUnit.Day"/>
         /// for <see cref="MajorUnit"/> and <see cref="DateUnit.Day"/> for
         /// for <see cref="MinorUnit"/>.
-        /// This value is used by the <see cref="DateScale.CalcDateStepSize"/> method.
+        /// This value is used by the <see cref="DateScale.CalcDateStepSize(double,double)"/> method.
         /// </summary>
         /// <seealso cref="System.Globalization.DateTimeFormatInfo"/>
         public static string FormatDayDay = "d-MMM";
@@ -469,7 +469,7 @@ public abstract class Scale
         /// selects a <see cref="Format"/> of <see cref="DateUnit.Day"/>
         /// for <see cref="MajorUnit"/> and <see cref="DateUnit.Hour"/> for
         /// for <see cref="MinorUnit"/>.
-        /// This value is used by the <see cref="DateScale.CalcDateStepSize"/> method.
+        /// This value is used by the <see cref="DateScale.CalcDateStepSize(double,double)"/> method.
         /// </summary>
         /// <seealso cref="System.Globalization.DateTimeFormatInfo"/>
         public static string FormatDayHour = "d-MMM HH:mm";
@@ -481,7 +481,7 @@ public abstract class Scale
         /// selects a <see cref="Format"/> of <see cref="DateUnit.Hour"/>
         /// for <see cref="MajorUnit"/> and <see cref="DateUnit.Hour"/> for
         /// for <see cref="MinorUnit"/>.
-        /// This value is used by the <see cref="DateScale.CalcDateStepSize"/> method.
+        /// This value is used by the <see cref="DateScale.CalcDateStepSize(double,double)"/> method.
         /// </summary>
         /// <seealso cref="System.Globalization.DateTimeFormatInfo"/>
         public static string FormatHourHour = "HH:mm";
@@ -493,7 +493,7 @@ public abstract class Scale
         /// selects a <see cref="Format"/> of <see cref="DateUnit.Hour"/>
         /// for <see cref="MajorUnit"/> and <see cref="DateUnit.Minute"/> for
         /// for <see cref="MinorUnit"/>.
-        /// This value is used by the <see cref="DateScale.CalcDateStepSize"/> method.
+        /// This value is used by the <see cref="DateScale.CalcDateStepSize(double,double)"/> method.
         /// </summary>
         /// <seealso cref="System.Globalization.DateTimeFormatInfo"/>
         public static string FormatHourMinute = "HH:mm";
@@ -505,7 +505,7 @@ public abstract class Scale
         /// selects a <see cref="Format"/> of <see cref="DateUnit.Minute"/>
         /// for <see cref="MajorUnit"/> and <see cref="DateUnit.Minute"/> for
         /// for <see cref="MinorUnit"/>.
-        /// This value is used by the <see cref="DateScale.CalcDateStepSize"/> method.
+        /// This value is used by the <see cref="DateScale.CalcDateStepSize(double,double)"/> method.
         /// </summary>
         /// <seealso cref="System.Globalization.DateTimeFormatInfo"/>
         public static string FormatMinuteMinute = "HH:mm";
@@ -517,7 +517,7 @@ public abstract class Scale
         /// selects a <see cref="Format"/> of <see cref="DateUnit.Minute"/>
         /// for <see cref="MajorUnit"/> and <see cref="DateUnit.Second"/> for
         /// for <see cref="MinorUnit"/>.
-        /// This value is used by the <see cref="DateScale.CalcDateStepSize"/> method.
+        /// This value is used by the <see cref="DateScale.CalcDateStepSize(double,double)"/> method.
         /// </summary>
         /// <seealso cref="System.Globalization.DateTimeFormatInfo"/>
         public static string FormatMinuteSecond = "mm:ss";
@@ -529,7 +529,7 @@ public abstract class Scale
         /// selects a <see cref="Format"/> of <see cref="DateUnit.Second"/>
         /// for <see cref="MajorUnit"/> and <see cref="DateUnit.Second"/> for
         /// for <see cref="MinorUnit"/>.
-        /// This value is used by the <see cref="DateScale.CalcDateStepSize"/> method.
+        /// This value is used by the <see cref="DateScale.CalcDateStepSize(double,double)"/> method.
         /// </summary>
         /// <seealso cref="System.Globalization.DateTimeFormatInfo"/>
         public static string FormatSecondSecond = "mm:ss";
@@ -541,7 +541,7 @@ public abstract class Scale
         /// selects a <see cref="Format"/> of <see cref="DateUnit.Millisecond"/>
         /// for <see cref="MajorUnit"/> and <see cref="DateUnit.Millisecond"/> for
         /// for <see cref="MinorUnit"/>.
-        /// This value is used by the <see cref="DateScale.CalcDateStepSize"/> method.
+        /// This value is used by the <see cref="DateScale.CalcDateStepSize(double,double)"/> method.
         /// </summary>
         /// <seealso cref="System.Globalization.DateTimeFormatInfo"/>
         public static string FormatMillisecond = "ss.fff";
@@ -626,7 +626,7 @@ public abstract class Scale
         /// The default custom brush for filling in the scale text background
         /// (see <see cref="Fill.Brush"/> property).
         /// </summary>
-        public static Brush FillBrush = null;
+        public static Brush FillBrush = null!;
 
         /// <summary>
         /// The default fill mode for filling in the scale text background
@@ -679,7 +679,7 @@ public abstract class Scale
     /// </summary>
     /// <param name="ownerAxis">The <see cref="Axis" /> object that is the owner of this
     /// <see cref="Scale" /> instance.</param>
-    public Scale (Axis ownerAxis)
+    protected Scale (Axis ownerAxis)
     {
         _ownerAxis = ownerAxis;
 
@@ -719,12 +719,18 @@ public abstract class Scale
         _align = Default.Align;
         _alignH = Default.AlignH;
 
-        _fontSpec = new FontSpec (
-            Default.FontFamily, Default.FontSize,
-            Default.FontColor, Default.FontBold,
-            Default.FontUnderline, Default.FontItalic,
-            Default.FillColor, Default.FillBrush,
-            Default.FillType);
+        _fontSpec = new FontSpec
+            (
+                Default.FontFamily,
+                Default.FontSize,
+                Default.FontColor,
+                Default.FontBold,
+                Default.FontItalic,
+                Default.FontUnderline,
+                Default.FillColor,
+                Default.FillBrush,
+                Default.FillType
+            );
 
         _fontSpec.Border.IsVisible = false;
         _labelGap = Default.LabelGap;
@@ -737,7 +743,7 @@ public abstract class Scale
     /// <param name="rhs">The <see cref="Scale" /> object to be copied.</param>
     /// <param name="owner">The <see cref="Axis" /> object that will own the
     /// new instance of <see cref="Scale" /></param>
-    public Scale (Scale rhs, Axis owner)
+    protected Scale (Scale rhs, Axis owner)
     {
         _ownerAxis = owner;
 
@@ -777,7 +783,7 @@ public abstract class Scale
         _align = rhs._align;
         _alignH = rhs._alignH;
 
-        _fontSpec = (FontSpec)rhs._fontSpec.Clone();
+        _fontSpec = rhs._fontSpec.Clone();
 
         _labelGap = rhs._labelGap;
 
@@ -840,27 +846,18 @@ public abstract class Scale
     /// <returns>The new <see cref="Scale"/> object.</returns>
     public Scale MakeNewScale (Scale oldScale, AxisType type)
     {
-        switch (type)
+        return type switch
         {
-            case AxisType.Linear:
-                return new LinearScale (oldScale, _ownerAxis);
-            case AxisType.Date:
-                return new DateScale (oldScale, _ownerAxis);
-            case AxisType.Log:
-                return new LogScale (oldScale, _ownerAxis);
-            case AxisType.Exponent:
-                return new ExponentScale (oldScale, _ownerAxis);
-            case AxisType.Ordinal:
-                return new OrdinalScale (oldScale, _ownerAxis);
-            case AxisType.Text:
-                return new TextScale (oldScale, _ownerAxis);
-            case AxisType.DateAsOrdinal:
-                return new DateAsOrdinalScale (oldScale, _ownerAxis);
-            case AxisType.LinearAsOrdinal:
-                return new LinearAsOrdinalScale (oldScale, _ownerAxis);
-            default:
-                throw new Exception ("Implementation Error: Invalid AxisType");
-        }
+            AxisType.Linear => new LinearScale (oldScale, _ownerAxis),
+            AxisType.Date => new DateScale (oldScale, _ownerAxis),
+            AxisType.Log => new LogScale (oldScale, _ownerAxis),
+            AxisType.Exponent => new ExponentScale (oldScale, _ownerAxis),
+            AxisType.Ordinal => new OrdinalScale (oldScale, _ownerAxis),
+            AxisType.Text => new TextScale (oldScale, _ownerAxis),
+            AxisType.DateAsOrdinal => new DateAsOrdinalScale (oldScale, _ownerAxis),
+            AxisType.LinearAsOrdinal => new LinearAsOrdinalScale (oldScale, _ownerAxis),
+            _ => throw new Exception ("Implementation Error: Invalid AxisType")
+        };
     }
 
     #endregion
@@ -883,9 +880,12 @@ public abstract class Scale
     /// </param>
     protected Scale (SerializationInfo info, StreamingContext context)
     {
+        _ownerAxis = null!;
+
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
         var sch = info.GetInt32 ("schema");
+        sch.NotUsed();
 
         _min = info.GetDouble ("min");
         _max = info.GetDouble ("max");
@@ -918,20 +918,20 @@ public abstract class Scale
         _isSkipLastLabel = info.GetBoolean ("isSkipLastLabel");
         _isSkipCrossLabel = info.GetBoolean ("isSkipCrossLabel");
 
-        _textLabels = (string[])info.GetValue ("textLabels", typeof (string[]));
+        _textLabels = (string[])info.GetValue ("textLabels", typeof (string[]))!;
         _format = info.GetString ("format");
 
-        _majorUnit = (DateUnit)info.GetValue ("majorUnit", typeof (DateUnit));
-        _minorUnit = (DateUnit)info.GetValue ("minorUnit", typeof (DateUnit));
+        _majorUnit = (DateUnit)info.GetValue ("majorUnit", typeof (DateUnit))!;
+        _minorUnit = (DateUnit)info.GetValue ("minorUnit", typeof (DateUnit))!;
 
         _isLabelsInside = info.GetBoolean ("isLabelsInside");
-        _align = (AlignP)info.GetValue ("align", typeof (AlignP));
+        _align = (AlignP)info.GetValue ("align", typeof (AlignP))!;
         if (schema >= 11)
         {
-            _alignH = (AlignH)info.GetValue ("alignH", typeof (AlignH));
+            _alignH = (AlignH)info.GetValue ("alignH", typeof (AlignH))!;
         }
 
-        _fontSpec = (FontSpec)info.GetValue ("fontSpec", typeof (FontSpec));
+        _fontSpec = (FontSpec)info.GetValue ("fontSpec", typeof (FontSpec))!;
         _labelGap = info.GetSingle ("labelGap");
     }
 
@@ -985,7 +985,7 @@ public abstract class Scale
 
     #endregion
 
-    #region properties
+    #region Properties
 
     /// <summary>
     /// Get an <see cref="AxisType" /> enumeration that indicates the type of this scale.
@@ -995,34 +995,22 @@ public abstract class Scale
     /// <summary>
     /// True if this scale is <see cref="AxisType.Log" />, false otherwise.
     /// </summary>
-    public bool IsLog
-    {
-        get { return this is LogScale; }
-    }
+    public bool IsLog => this is LogScale;
 
     /// <summary>
     /// True if this scale is <see cref="AxisType.Exponent" />, false otherwise.
     /// </summary>
-    public bool IsExponent
-    {
-        get { return this is ExponentScale; }
-    }
+    public bool IsExponent => this is ExponentScale;
 
     /// <summary>
     /// True if this scale is <see cref="AxisType.Date" />, false otherwise.
     /// </summary>
-    public bool IsDate
-    {
-        get { return this is DateScale; }
-    }
+    public bool IsDate => this is DateScale;
 
     /// <summary>
     /// True if this scale is <see cref="AxisType.Text" />, false otherwise.
     /// </summary>
-    public bool IsText
-    {
-        get { return this is TextScale; }
-    }
+    public bool IsText => this is TextScale;
 
     /// <summary>
     /// True if this scale is <see cref="AxisType.Ordinal" />, false otherwise.
@@ -1034,10 +1022,7 @@ public abstract class Scale
     /// or <see cref="AxisType.DateAsOrdinal" />.  Use the <see cref="IsAnyOrdinal" />
     /// as a "catchall" for all ordinal type axes.
     /// </remarks>
-    public bool IsOrdinal
-    {
-        get { return this is OrdinalScale; }
-    }
+    public bool IsOrdinal => this is OrdinalScale;
 
     /// <summary>
     /// Gets a value that indicates if this <see cref="Scale" /> is of any of the
@@ -1095,7 +1080,7 @@ public abstract class Scale
     /// <seealso cref="MinAuto"/>
     public virtual double Min
     {
-        get { return _min; }
+        get => _min;
         set
         {
             _min = value;
@@ -1124,7 +1109,7 @@ public abstract class Scale
     /// <seealso cref="MaxAuto"/>
     public virtual double Max
     {
-        get { return _max; }
+        get => _max;
         set
         {
             _max = value;
@@ -1155,7 +1140,7 @@ public abstract class Scale
     /// <seealso cref="Default.MaxTextLabels"/>
     public double MajorStep
     {
-        get { return _majorStep; }
+        get => _majorStep;
         set
         {
             if (value < 1e-300)
@@ -1188,7 +1173,7 @@ public abstract class Scale
     /// <seealso cref="MinorStepAuto"/>
     public double MinorStep
     {
-        get { return _minorStep; }
+        get => _minorStep;
         set
         {
             if (value < 1e-300)
@@ -1216,8 +1201,8 @@ public abstract class Scale
     /// <seealso cref="Default.MaxTextLabels"/>
     public double Exponent
     {
-        get { return _exponent; }
-        set { _exponent = value; }
+        get => _exponent;
+        set => _exponent = value;
     }
 
     /// <summary>
@@ -1245,8 +1230,8 @@ public abstract class Scale
     /// <seealso cref="Axis.Cross"/>
     public double BaseTic
     {
-        get { return _baseTic; }
-        set { _baseTic = value; }
+        get => _baseTic;
+        set => _baseTic = value;
     }
 
     /// <summary>
@@ -1265,8 +1250,8 @@ public abstract class Scale
     /// <seealso cref="MajorStepAuto"/>
     public DateUnit MajorUnit
     {
-        get { return _majorUnit; }
-        set { _majorUnit = value; }
+        get => _majorUnit;
+        set => _majorUnit = value;
     }
 
     /// <summary>
@@ -1285,8 +1270,8 @@ public abstract class Scale
     /// <seealso cref="MinorStepAuto"/>
     public DateUnit MinorUnit
     {
-        get { return _minorUnit; }
-        set { _minorUnit = value; }
+        get => _minorUnit;
+        set => _minorUnit = value;
     }
 
     /// <summary>
@@ -1297,10 +1282,7 @@ public abstract class Scale
     /// and <see cref="Max" />.  This reflects the setting of
     /// <see cref="MajorUnit" />.
     /// </remarks>
-    internal virtual double MajorUnitMultiplier
-    {
-        get { return 1.0; }
-    }
+    internal virtual double MajorUnitMultiplier => 1.0;
 
     /// <summary>
     /// Gets the minor unit multiplier for this scale type, if any.
@@ -1310,10 +1292,7 @@ public abstract class Scale
     /// and <see cref="Max" />.  This reflects the setting of
     /// <see cref="MinorUnit" />.
     /// </remarks>
-    internal virtual double MinorUnitMultiplier
-    {
-        get { return 1.0; }
-    }
+    internal virtual double MinorUnitMultiplier => 1.0;
 
     /// <summary>
     /// Gets or sets a value that determines whether or not the minimum scale value <see cref="Min"/>
@@ -1327,8 +1306,8 @@ public abstract class Scale
     /// <seealso cref="Min"/>
     public bool MinAuto
     {
-        get { return _minAuto; }
-        set { _minAuto = value; }
+        get => _minAuto;
+        set => _minAuto = value;
     }
 
     /// <summary>
@@ -1343,8 +1322,8 @@ public abstract class Scale
     /// <seealso cref="Max"/>
     public bool MaxAuto
     {
-        get { return _maxAuto; }
-        set { _maxAuto = value; }
+        get => _maxAuto;
+        set => _maxAuto = value;
     }
 
     /// <summary>
@@ -1359,8 +1338,8 @@ public abstract class Scale
     /// <seealso cref="MajorStep"/>
     public bool MajorStepAuto
     {
-        get { return _majorStepAuto; }
-        set { _majorStepAuto = value; }
+        get => _majorStepAuto;
+        set => _majorStepAuto = value;
     }
 
     /// <summary>
@@ -1375,8 +1354,8 @@ public abstract class Scale
     /// <seealso cref="MinorStep"/>
     public bool MinorStepAuto
     {
-        get { return _minorStepAuto; }
-        set { _minorStepAuto = value; }
+        get => _minorStepAuto;
+        set => _minorStepAuto = value;
     }
 
     /// <summary>
@@ -1394,8 +1373,8 @@ public abstract class Scale
     /// <seealso cref="FontSpec"/>
     public bool FormatAuto
     {
-        get { return _formatAuto; }
-        set { _formatAuto = value; }
+        get => _formatAuto;
+        set => _formatAuto = value;
     }
 
     /// <summary>
@@ -1414,11 +1393,9 @@ public abstract class Scale
     /// <seealso cref="Mag"/>
     /// <seealso cref="FormatAuto"/>
     /// <seealso cref="FontSpec"/>
-
-    // /// <seealso cref="NumDec"/>
-    public string Format
+    public string? Format
     {
-        get { return _format; }
+        get => _format;
         set
         {
             _format = value;
@@ -1444,11 +1421,9 @@ public abstract class Scale
     /// <seealso cref="Axis.Title"/>
     /// <seealso cref="Format"/>
     /// <seealso cref="FontSpec"/>
-
-    // /// <seealso cref="NumDec"/>
     public int Mag
     {
-        get { return _mag; }
+        get => _mag;
         set
         {
             _mag = value;
@@ -1471,8 +1446,8 @@ public abstract class Scale
     /// <seealso cref="Mag"/>
     public bool MagAuto
     {
-        get { return _magAuto; }
-        set { _magAuto = value; }
+        get => _magAuto;
+        set => _magAuto = value;
     }
 
     /// <summary> Gets or sets the "grace" value applied to the minimum data range.
@@ -1489,8 +1464,8 @@ public abstract class Scale
     /// <seealso cref="MaxGrace"/>
     public double MinGrace
     {
-        get { return _minGrace; }
-        set { _minGrace = value; }
+        get => _minGrace;
+        set => _minGrace = value;
     }
 
     /// <summary> Gets or sets the "grace" value applied to the maximum data range.
@@ -1508,8 +1483,8 @@ public abstract class Scale
     /// <seealso cref="MinGrace"/>
     public double MaxGrace
     {
-        get { return _maxGrace; }
-        set { _maxGrace = value; }
+        get => _maxGrace;
+        set => _maxGrace = value;
     }
 
     /// <summary> Controls the alignment of the <see cref="Axis"/> tic labels.
@@ -1520,8 +1495,8 @@ public abstract class Scale
     /// </remarks>
     public AlignP Align
     {
-        get { return _align; }
-        set { _align = value; }
+        get => _align;
+        set => _align = value;
     }
 
     /// <summary> Controls the alignment of the <see cref="Axis"/> tic labels.
@@ -1532,8 +1507,8 @@ public abstract class Scale
     /// </remarks>
     public AlignH AlignH
     {
-        get { return _alignH; }
-        set { _alignH = value; }
+        get => _alignH;
+        set => _alignH = value;
     }
 
     /// <summary>
@@ -1548,13 +1523,10 @@ public abstract class Scale
     /// <seealso cref="Default.FontItalic"/>
     public FontSpec FontSpec
     {
-        get { return _fontSpec; }
+        get => _fontSpec;
         set
         {
-            if (value == null)
-            {
-                throw new ArgumentNullException ("Uninitialized FontSpec in Scale");
-            }
+            Sure.NotNull (FontSpec);
 
             _fontSpec = value;
         }
@@ -1565,8 +1537,8 @@ public abstract class Scale
     /// </summary>
     public float LabelGap
     {
-        get { return _labelGap; }
-        set { _labelGap = value; }
+        get => _labelGap;
+        set => _labelGap = value;
     }
 
     /// <summary>
@@ -1585,8 +1557,8 @@ public abstract class Scale
     /// <seealso cref="Axis.Cross"/>
     public bool IsLabelsInside
     {
-        get { return _isLabelsInside; }
-        set { _isLabelsInside = value; }
+        get => _isLabelsInside;
+        set => _isLabelsInside = value;
     }
 
     /// <summary>
@@ -1602,8 +1574,8 @@ public abstract class Scale
     /// </remarks>
     public bool IsSkipFirstLabel
     {
-        get { return _isSkipFirstLabel; }
-        set { _isSkipFirstLabel = value; }
+        get => _isSkipFirstLabel;
+        set => _isSkipFirstLabel = value;
     }
 
     /// <summary>
@@ -1619,8 +1591,8 @@ public abstract class Scale
     /// </remarks>
     public bool IsSkipLastLabel
     {
-        get { return _isSkipLastLabel; }
-        set { _isSkipLastLabel = value; }
+        get => _isSkipLastLabel;
+        set => _isSkipLastLabel = value;
     }
 
     /// <summary>
@@ -1634,8 +1606,8 @@ public abstract class Scale
     /// </remarks>
     public bool IsSkipCrossLabel
     {
-        get { return _isSkipCrossLabel; }
-        set { _isSkipCrossLabel = value; }
+        get => _isSkipCrossLabel;
+        set => _isSkipCrossLabel = value;
     }
 
     /// <summary>
@@ -1646,8 +1618,8 @@ public abstract class Scale
     /// <seealso cref="Default.IsReverse"/>.
     public bool IsReverse
     {
-        get { return _isReverse; }
-        set { _isReverse = value; }
+        get => _isReverse;
+        set => _isReverse = value;
     }
 
     /// <summary>
@@ -1662,8 +1634,8 @@ public abstract class Scale
     /// show a regular numeric value (e.g., "0.01", "10", "1000")</value>
     public bool IsUseTenPower
     {
-        get { return _isUseTenPower; }
-        set { _isUseTenPower = value; }
+        get => _isUseTenPower;
+        set => _isUseTenPower = value;
     }
 
     /// <summary>
@@ -1678,8 +1650,8 @@ public abstract class Scale
     /// <value> boolean value; true to check for overlap, false otherwise</value>
     public bool IsPreventLabelOverlap
     {
-        get { return _isPreventLabelOverlap; }
-        set { _isPreventLabelOverlap = value; }
+        get => _isPreventLabelOverlap;
+        set => _isPreventLabelOverlap = value;
     }
 
     /// <summary>
@@ -1689,8 +1661,8 @@ public abstract class Scale
     /// <seealso cref="Axis.IsVisible"/>.
     public bool IsVisible
     {
-        get { return _isVisible; }
-        set { _isVisible = value; }
+        get => _isVisible;
+        set => _isVisible = value;
     }
 
     /// <summary>
@@ -1700,10 +1672,10 @@ public abstract class Scale
     /// This property is only
     /// applicable if <see cref="Type"/> is set to <see cref="AxisType.Text"/>.
     /// </remarks>
-    public string[] TextLabels
+    public string[]? TextLabels
     {
-        get { return _textLabels; }
-        set { _textLabels = value; }
+        get => _textLabels;
+        set => _textLabels = value;
     }
 
     #endregion
@@ -1871,17 +1843,19 @@ public abstract class Scale
     /// and text (<see cref="IsText"/>) type axes.
     /// </param>
     /// <returns>The resulting value label as a <see cref="string" /></returns>
-    internal virtual string MakeLabel (GraphPane pane, int index, double dVal)
+    internal virtual string MakeLabel
+        (
+            GraphPane pane,
+            int index,
+            double dVal
+        )
     {
-        if (_format == null)
-        {
-            _format = Default.Format;
-        }
+        _format ??= Default.Format;
 
         // linear or ordinal is the default behavior
         // this method is overridden for other Scale types
 
-        var scaleMult = Math.Pow ((double)10.0, _mag);
+        var scaleMult = Math.Pow (10.0, _mag);
 
         return (dVal / scaleMult).ToString (_format);
     }
@@ -1916,8 +1890,7 @@ public abstract class Scale
     {
         if (_isVisible)
         {
-            double dVal,
-                scaleMult = Math.Pow ((double)10.0, _mag);
+            double dVal, scaleMult = Math.Pow (10.0, _mag);
             int i;
 
             var saveAngle = _fontSpec.Angle;
@@ -1993,7 +1966,7 @@ public abstract class Scale
     internal virtual double CalcMajorTicValue (double baseVal, double tic)
     {
         // Default behavior is a normal linear scale (also works for ordinal types)
-        return baseVal + (double)_majorStep * tic;
+        return baseVal + _majorStep * tic;
     }
 
     /// <summary>
@@ -2016,7 +1989,7 @@ public abstract class Scale
     internal virtual double CalcMinorTicValue (double baseVal, int iTic)
     {
         // default behavior is a linear axis (works for ordinal types too
-        return baseVal + (double)_minorStep * (double)iTic;
+        return baseVal + _minorStep * iTic;
     }
 
     /// <summary>
@@ -2063,8 +2036,7 @@ public abstract class Scale
         {
             // default behavior is linear or ordinal type
             // go to the nearest even multiple of the step size
-            return Math.Ceiling ((double)_min / (double)_majorStep - 0.00000001)
-                   * (double)_majorStep;
+            return Math.Ceiling (_min / _majorStep - 0.00000001) * _majorStep;
         }
     }
 
@@ -2111,7 +2083,7 @@ public abstract class Scale
         float pixVal, pixVal2;
         var scaledTic = tic.ScaledTic (scaleFactor);
 
-        var scaleMult = Math.Pow ((double)10.0, _mag);
+        var scaleMult = Math.Pow (10.0, _mag);
 
         using (var ticPen = tic.GetPen (pane, scaleFactor))
 
@@ -2173,7 +2145,7 @@ public abstract class Scale
                         }
                     }
 
-                    dVal2 = CalcMajorTicValue (baseVal, (double)i + 0.5);
+                    dVal2 = CalcMajorTicValue (baseVal, i + 0.5);
                     if (dVal2 > _maxLinTemp)
                     {
                         break;
@@ -2291,7 +2263,7 @@ public abstract class Scale
                         }
                     }
 
-                    dVal2 = CalcMajorTicValue (baseVal, (double)i + 0.5);
+                    dVal2 = CalcMajorTicValue (baseVal, i + 0.5);
                     if (dVal2 > _maxLinTemp)
                     {
                         break;
@@ -2797,7 +2769,7 @@ public abstract class Scale
 
         // Get the magnitude of the step size
         var mag = Math.Floor (Math.Log10 (tempStep));
-        var magPow = Math.Pow ((double)10.0, mag);
+        var magPow = Math.Pow (10.0, mag);
 
         // Calculate most significant digit of the new step size
         double magMsd = ((int)(tempStep / magPow + .5));
@@ -2841,7 +2813,7 @@ public abstract class Scale
 
         // Get the magnitude of the step size
         var mag = Math.Floor (Math.Log10 (tempStep));
-        var magPow = Math.Pow ((double)10.0, mag);
+        var magPow = Math.Pow (10.0, mag);
 
         // Calculate most significant digit of the new step size
         var magMsd = Math.Ceiling (tempStep / magPow);
@@ -2921,7 +2893,7 @@ public abstract class Scale
         {
             // If this is a Y axis, and the main Y axis is valid, use it for defaults
             if (axis != pane.XAxis && axis != pane.X2Axis &&
-                pane.YAxis.Scale._rangeMin < double.MaxValue && pane.YAxis.Scale._rangeMax > double.MinValue)
+                pane.YAxis!.Scale!._rangeMin < double.MaxValue && pane.YAxis.Scale._rangeMax > double.MinValue)
             {
                 _rangeMin = pane.YAxis.Scale._rangeMin;
                 _rangeMax = pane.YAxis.Scale._rangeMax;
@@ -2929,7 +2901,7 @@ public abstract class Scale
 
             // Otherwise, if this is a Y axis, and the main Y2 axis is valid, use it for defaults
             else if (axis != pane.XAxis && axis != pane.X2Axis &&
-                     pane.Y2Axis.Scale._rangeMin < double.MaxValue && pane.Y2Axis.Scale._rangeMax > double.MinValue)
+                     pane.Y2Axis!.Scale!._rangeMin < double.MaxValue && pane.Y2Axis.Scale._rangeMax > double.MinValue)
             {
                 _rangeMin = pane.Y2Axis.Scale._rangeMin;
                 _rangeMax = pane.Y2Axis.Scale._rangeMax;
@@ -3057,7 +3029,7 @@ public abstract class Scale
         // ordinal types ignore the X value, and just use the ordinal position
         if (IsAnyOrdinal && i >= 0 && !isOverrideOrdinal)
         {
-            x = (double)i + 1.0;
+            x = i + 1.0;
         }
 
         return Transform (x);
@@ -3088,13 +3060,13 @@ public abstract class Scale
         // see if the sign of the equation needs to be reversed
         if ((_isReverse) == (_ownerAxis is XAxis || _ownerAxis is X2Axis))
         {
-            val = (double)(pixVal - _maxPix)
+            val = (pixVal - _maxPix)
                 / (double)(_minPix - _maxPix)
                 * (_maxLinTemp - _minLinTemp) + _minLinTemp;
         }
         else
         {
-            val = (double)(pixVal - _minPix)
+            val = (pixVal - _minPix)
                 / (double)(_maxPix - _minPix)
                 * (_maxLinTemp - _minLinTemp) + _minLinTemp;
         }
