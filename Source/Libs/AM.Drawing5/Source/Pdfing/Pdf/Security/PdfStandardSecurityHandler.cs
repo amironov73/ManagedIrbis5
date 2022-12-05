@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-/*
+/* PdfStandardSecurityHandler.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -61,7 +61,7 @@ public sealed class PdfStandardSecurityHandler : PdfSecurityHandler
     {
         set
         {
-            if (_document._securitySettings.DocumentSecurityLevel == PdfDocumentSecurityLevel.None)
+            if (_document!._securitySettings.DocumentSecurityLevel == PdfDocumentSecurityLevel.None)
             {
                 _document._securitySettings.DocumentSecurityLevel = PdfDocumentSecurityLevel.Encrypted128Bit;
             }
@@ -81,7 +81,7 @@ public sealed class PdfStandardSecurityHandler : PdfSecurityHandler
     {
         set
         {
-            if (_document._securitySettings.DocumentSecurityLevel == PdfDocumentSecurityLevel.None)
+            if (_document!._securitySettings.DocumentSecurityLevel == PdfDocumentSecurityLevel.None)
             {
                 _document._securitySettings.DocumentSecurityLevel = PdfDocumentSecurityLevel.Encrypted128Bit;
             }
@@ -138,7 +138,7 @@ public sealed class PdfStandardSecurityHandler : PdfSecurityHandler
 #if DEBUG
         if (value.ObjectID.ObjectNumber == 10)
         {
-            GetType();
+            GetType().NotUsed();
         }
 #endif
 
@@ -238,7 +238,7 @@ public sealed class PdfStandardSecurityHandler : PdfSecurityHandler
     /// <summary>
     /// Encrypts an array.
     /// </summary>
-    internal byte[] EncryptBytes (byte[] bytes)
+    internal byte[]? EncryptBytes (byte[]? bytes)
     {
         if (bytes != null && bytes.Length != 0)
         {
@@ -307,7 +307,7 @@ public sealed class PdfStandardSecurityHandler : PdfSecurityHandler
         var dump = tag + ": ";
         for (var idx = 0; idx < bytes.Length; idx++)
         {
-            dump += string.Format ("{0:X2}", bytes[idx]);
+            dump += $"{bytes[idx]:X2}";
         }
 
         Debug.WriteLine (dump);
@@ -436,12 +436,12 @@ public sealed class PdfStandardSecurityHandler : PdfSecurityHandler
         {
             for (var idx = 0; idx < 50; idx++)
             {
-                digest = _md5.ComputeHash (digest);
+                digest = _md5.ComputeHash (digest!);
                 _md5.Initialize();
             }
         }
 
-        Array.Copy (digest, 0, _encryptionKey, 0, _encryptionKey.Length);
+        Array.Copy (digest!, 0, _encryptionKey, 0, _encryptionKey.Length);
     }
 
     /// <summary>
@@ -449,13 +449,13 @@ public sealed class PdfStandardSecurityHandler : PdfSecurityHandler
     /// </summary>
     void SetupUserKey (byte[] documentId)
     {
-        if (_encryptionKey.Length == 16)
+        if (_encryptionKey!.Length == 16)
         {
             _md5.TransformBlock (PasswordPadding, 0, PasswordPadding.Length, PasswordPadding, 0);
             _md5.TransformFinalBlock (documentId, 0, documentId.Length);
             var digest = _md5.Hash;
             _md5.Initialize();
-            Array.Copy (digest, 0, _userKey, 0, 16);
+            Array.Copy (digest!, 0, _userKey, 0, 16);
             for (var idx = 16; idx < 32; idx++)
             {
                 _userKey[idx] = 0;
@@ -466,7 +466,7 @@ public sealed class PdfStandardSecurityHandler : PdfSecurityHandler
             {
                 for (var j = 0; j < _encryptionKey.Length; j++)
                 {
-                    digest[j] = (byte)(_encryptionKey[j] ^ i);
+                    digest![j] = (byte)(_encryptionKey[j] ^ i);
                 }
 
                 PrepareRC4Key (digest, 0, _encryptionKey.Length);
@@ -485,7 +485,7 @@ public sealed class PdfStandardSecurityHandler : PdfSecurityHandler
     /// </summary>
     void PrepareKey()
     {
-        PrepareRC4Key (_key, 0, _keySize);
+        PrepareRC4Key (_key!, 0, _keySize);
     }
 
     /// <summary>
@@ -602,7 +602,7 @@ public sealed class PdfStandardSecurityHandler : PdfSecurityHandler
         objectId[2] = (byte)(id.ObjectNumber >> 16);
         objectId[3] = (byte)id.GenerationNumber;
         objectId[4] = (byte)(id.GenerationNumber >> 8);
-        _md5.TransformBlock (_encryptionKey, 0, _encryptionKey.Length, _encryptionKey, 0);
+        _md5.TransformBlock (_encryptionKey!, 0, _encryptionKey!.Length, _encryptionKey, 0);
         _md5.TransformFinalBlock (objectId, 0, objectId.Length);
         _key = _md5.Hash;
         _md5.Initialize();
@@ -619,7 +619,7 @@ public sealed class PdfStandardSecurityHandler : PdfSecurityHandler
     public void PrepareEncryption()
     {
         //#if !SILVERLIGHT
-        Debug.Assert (_document._securitySettings.DocumentSecurityLevel != PdfDocumentSecurityLevel.None);
+        Debug.Assert (_document!._securitySettings.DocumentSecurityLevel != PdfDocumentSecurityLevel.None);
         var permissions = (int)Permission;
         var strongEncryption = _document._securitySettings.DocumentSecurityLevel ==
                                PdfDocumentSecurityLevel.Encrypted128Bit;
@@ -729,7 +729,8 @@ public sealed class PdfStandardSecurityHandler : PdfSecurityHandler
     /// <summary>
     /// Predefined keys of this dictionary.
     /// </summary>
-    internal new sealed class Keys : PdfSecurityHandler.Keys
+    internal new sealed class Keys
+        : PdfSecurityHandler.Keys
     {
         /// <summary>
         /// (Required) A number specifying which revision of the standard security handler
@@ -780,19 +781,16 @@ public sealed class PdfStandardSecurityHandler : PdfSecurityHandler
         /// </summary>
         public static DictionaryMeta Meta
         {
-            get { return _meta ?? (_meta = CreateMeta (typeof (Keys))); }
+            get { return _meta ??= CreateMeta (typeof (Keys)); }
         }
 
-        static DictionaryMeta _meta;
+        static DictionaryMeta? _meta;
     }
 
     /// <summary>
     /// Gets the KeysMeta of this dictionary type.
     /// </summary>
-    internal override DictionaryMeta Meta
-    {
-        get { return Keys.Meta; }
-    }
+    internal override DictionaryMeta Meta => Keys.Meta;
 
     #endregion
 }

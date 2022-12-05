@@ -52,7 +52,7 @@ public sealed class HtmlContainer
     /// </summary>
     public HtmlContainer()
     {
-        _htmlContainerInt = new HtmlContainerInt(PdfSharpAdapter.Instance);
+        _htmlContainerInt = new HtmlContainerInt (PdfSharpAdapter.Instance);
         _htmlContainerInt.AvoidAsyncImagesLoading = true;
         _htmlContainerInt.AvoidImagesLateLoading = true;
     }
@@ -63,8 +63,8 @@ public sealed class HtmlContainer
     /// </summary>
     public event EventHandler LoadComplete
     {
-        add { _htmlContainerInt.LoadComplete += value; }
-        remove { _htmlContainerInt.LoadComplete -= value; }
+        add => _htmlContainerInt.LoadComplete += value;
+        remove => _htmlContainerInt.LoadComplete -= value;
     }
 
     /// <summary>
@@ -75,8 +75,8 @@ public sealed class HtmlContainer
     /// </remarks>
     public event EventHandler<HtmlRenderErrorEventArgs> RenderError
     {
-        add { _htmlContainerInt.RenderError += value; }
-        remove { _htmlContainerInt.RenderError -= value; }
+        add => _htmlContainerInt.RenderError += value;
+        remove => _htmlContainerInt.RenderError -= value;
     }
 
     /// <summary>
@@ -86,8 +86,8 @@ public sealed class HtmlContainer
     /// </summary>
     public event EventHandler<HtmlStylesheetLoadEventArgs> StylesheetLoad
     {
-        add { _htmlContainerInt.StylesheetLoad += value; }
-        remove { _htmlContainerInt.StylesheetLoad -= value; }
+        add => _htmlContainerInt.StylesheetLoad += value;
+        remove => _htmlContainerInt.StylesheetLoad -= value;
     }
 
     /// <summary>
@@ -96,33 +96,27 @@ public sealed class HtmlContainer
     /// </summary>
     public event EventHandler<HtmlImageLoadEventArgs> ImageLoad
     {
-        add { _htmlContainerInt.ImageLoad += value; }
-        remove { _htmlContainerInt.ImageLoad -= value; }
+        add => _htmlContainerInt.ImageLoad += value;
+        remove => _htmlContainerInt.ImageLoad -= value;
     }
 
     /// <summary>
     /// The internal core html container
     /// </summary>
-    internal HtmlContainerInt HtmlContainerInt
-    {
-        get { return _htmlContainerInt; }
-    }
+    internal HtmlContainerInt HtmlContainerInt => _htmlContainerInt;
 
     /// <summary>
     /// the parsed stylesheet data used for handling the html
     /// </summary>
-    public CssData CssData
-    {
-        get { return _htmlContainerInt.CssData; }
-    }
+    public CssData CssData => _htmlContainerInt.CssData!;
 
     /// <summary>
     /// Gets or sets a value indicating if anti-aliasing should be avoided for geometry like backgrounds and borders (default - false).
     /// </summary>
     public bool AvoidGeometryAntialias
     {
-        get { return _htmlContainerInt.AvoidGeometryAntialias; }
-        set { _htmlContainerInt.AvoidGeometryAntialias = value; }
+        get => _htmlContainerInt.AvoidGeometryAntialias;
+        set => _htmlContainerInt.AvoidGeometryAntialias = value;
     }
 
     /// <summary>
@@ -135,8 +129,8 @@ public sealed class HtmlContainer
     /// </example>
     public XPoint ScrollOffset
     {
-        get { return Utils.Convert(_htmlContainerInt.ScrollOffset); }
-        set { _htmlContainerInt.ScrollOffset = Utils.Convert(value); }
+        get => Utils.Convert (_htmlContainerInt.ScrollOffset);
+        set => _htmlContainerInt.ScrollOffset = Utils.Convert (value);
     }
 
     /// <summary>
@@ -145,8 +139,8 @@ public sealed class HtmlContainer
     /// </summary>
     public XPoint Location
     {
-        get { return Utils.Convert(_htmlContainerInt.Location); }
-        set { _htmlContainerInt.Location = Utils.Convert(value); }
+        get => Utils.Convert (_htmlContainerInt.Location);
+        set => _htmlContainerInt.Location = Utils.Convert (value);
     }
 
     /// <summary>
@@ -158,8 +152,8 @@ public sealed class HtmlContainer
     /// </summary>
     public XSize MaxSize
     {
-        get { return Utils.Convert(_htmlContainerInt.MaxSize); }
-        set { _htmlContainerInt.MaxSize = Utils.Convert(value); }
+        get => Utils.Convert (_htmlContainerInt.MaxSize);
+        set => _htmlContainerInt.MaxSize = Utils.Convert (value);
     }
 
     /// <summary>
@@ -167,19 +161,17 @@ public sealed class HtmlContainer
     /// </summary>
     public XSize ActualSize
     {
-        get { return Utils.Convert(_htmlContainerInt.ActualSize); }
-        internal set { _htmlContainerInt.ActualSize = Utils.Convert(value); }
+        get => Utils.Convert (_htmlContainerInt.ActualSize);
+        internal set => _htmlContainerInt.ActualSize = Utils.Convert (value);
     }
 
-    public XSize PageSize {
-        get
-        {
-            return new XSize(_htmlContainerInt.PageSize.Width, _htmlContainerInt.PageSize.Height);
-        }
-        set
-        {
-            _htmlContainerInt.PageSize = new RSize(value.Width, value.Height);
-        }
+    /// <summary>
+    ///
+    /// </summary>
+    public XSize PageSize
+    {
+        get => new XSize (_htmlContainerInt.PageSize.Width, _htmlContainerInt.PageSize.Height);
+        set => _htmlContainerInt.PageSize = new RSize (value.Width, value.Height);
     }
 
     /// <summary>
@@ -187,11 +179,13 @@ public sealed class HtmlContainer
     /// </summary>
     public int MarginTop
     {
-        get { return _htmlContainerInt.MarginTop; }
+        get => _htmlContainerInt.MarginTop;
         set
         {
             if (value > -1)
+            {
                 _htmlContainerInt.MarginTop = value;
+            }
         }
     }
 
@@ -200,11 +194,13 @@ public sealed class HtmlContainer
     /// </summary>
     public int MarginBottom
     {
-        get { return _htmlContainerInt.MarginBottom; }
+        get => _htmlContainerInt.MarginBottom;
         set
         {
             if (value > -1)
+            {
                 _htmlContainerInt.MarginBottom = value;
+            }
         }
     }
 
@@ -213,11 +209,13 @@ public sealed class HtmlContainer
     /// </summary>
     public int MarginLeft
     {
-        get { return _htmlContainerInt.MarginLeft; }
+        get => _htmlContainerInt.MarginLeft;
         set
         {
             if (value > -1)
+            {
                 _htmlContainerInt.MarginLeft = value;
+            }
         }
     }
 
@@ -226,11 +224,13 @@ public sealed class HtmlContainer
     /// </summary>
     public int MarginRight
     {
-        get { return _htmlContainerInt.MarginRight; }
+        get => _htmlContainerInt.MarginRight;
         set
         {
             if (value > -1)
+            {
                 _htmlContainerInt.MarginRight = value;
+            }
         }
     }
 
@@ -238,27 +238,23 @@ public sealed class HtmlContainer
     /// Set all 4 margins to the given value.
     /// </summary>
     /// <param name="value"></param>
-    public void SetMargins(int value)
+    public void SetMargins (int value)
     {
         if (value > -1)
-            _htmlContainerInt.SetMargins(value);
+        {
+            _htmlContainerInt.SetMargins (value);
+        }
     }
 
     /// <summary>
     /// Get the currently selected text segment in the html.
     /// </summary>
-    public string SelectedText
-    {
-        get { return _htmlContainerInt.SelectedText; }
-    }
+    public string SelectedText => _htmlContainerInt.SelectedText!;
 
     /// <summary>
     /// Copy the currently selected html segment with style.
     /// </summary>
-    public string SelectedHtml
-    {
-        get { return _htmlContainerInt.SelectedHtml; }
-    }
+    public string SelectedHtml => _htmlContainerInt.SelectedHtml!;
 
     /// <summary>
     /// Init with optional document and stylesheet.
@@ -271,7 +267,7 @@ public sealed class HtmlContainer
             CssData? baseCssData = null
         )
     {
-        _htmlContainerInt.SetHtml(htmlSource, baseCssData);
+        _htmlContainerInt.SetHtml (htmlSource, baseCssData);
     }
 
     /// <summary>
@@ -279,9 +275,9 @@ public sealed class HtmlContainer
     /// </summary>
     /// <param name="styleGen">Optional: controls the way styles are generated when html is generated (default: <see cref="HtmlGenerationStyle.Inline"/>)</param>
     /// <returns>generated html</returns>
-    public string GetHtml(HtmlGenerationStyle styleGen = HtmlGenerationStyle.Inline)
+    public string GetHtml (HtmlGenerationStyle styleGen = HtmlGenerationStyle.Inline)
     {
-        return _htmlContainerInt.GetHtml(styleGen);
+        return _htmlContainerInt.GetHtml (styleGen);
     }
 
     /// <summary>
@@ -291,9 +287,9 @@ public sealed class HtmlContainer
     /// <param name="location">the location to find the attribute at</param>
     /// <param name="attribute">the attribute key to get value by</param>
     /// <returns>found attribute value or null if not found</returns>
-    public string GetAttributeAt(XPoint location, string attribute)
+    public string GetAttributeAt (XPoint location, string attribute)
     {
-        return _htmlContainerInt.GetAttributeAt(Utils.Convert(location), attribute);
+        return _htmlContainerInt.GetAttributeAt (Utils.Convert (location), attribute)!;
     }
 
     /// <summary>
@@ -305,8 +301,9 @@ public sealed class HtmlContainer
         var linkElements = new List<LinkElementData<XRect>>();
         foreach (var link in HtmlContainerInt.GetLinks())
         {
-            linkElements.Add(new LinkElementData<XRect>(link.Id, link.Href, Utils.Convert(link.Rectangle)));
+            linkElements.Add (new LinkElementData<XRect> (link.Id, link.Href, Utils.Convert (link.Rectangle)));
         }
+
         return linkElements;
     }
 
@@ -315,9 +312,9 @@ public sealed class HtmlContainer
     /// </summary>
     /// <param name="location">the location to find the link at</param>
     /// <returns>css link href if exists or null</returns>
-    public string GetLinkAt(XPoint location)
+    public string GetLinkAt (XPoint location)
     {
-        return _htmlContainerInt.GetLinkAt(Utils.Convert(location));
+        return _htmlContainerInt.GetLinkAt (Utils.Convert (location))!;
     }
 
     /// <summary>
@@ -327,34 +324,34 @@ public sealed class HtmlContainer
     /// </summary>
     /// <param name="elementId">the id of the element to get its rectangle</param>
     /// <returns>the rectangle of the element or null if not found</returns>
-    public XRect? GetElementRectangle(string elementId)
+    public XRect? GetElementRectangle (string elementId)
     {
-        var r = _htmlContainerInt.GetElementRectangle(elementId);
-        return r.HasValue ? Utils.Convert(r.Value) : null;
+        var r = _htmlContainerInt.GetElementRectangle (elementId);
+        return r.HasValue ? Utils.Convert (r.Value) : null;
     }
 
     /// <summary>
     /// Measures the bounds of box and children, recursively.
     /// </summary>
     /// <param name="g">Device context to draw</param>
-    public void PerformLayout(XGraphics g)
+    public void PerformLayout (XGraphics g)
     {
-        ArgChecker.AssertArgNotNull(g, "g");
+        ArgChecker.AssertArgNotNull (g, "g");
 
-        using var ig = new GraphicsAdapter(g);
-        _htmlContainerInt.PerformLayout(ig);
+        using var ig = new GraphicsAdapter (g);
+        _htmlContainerInt.PerformLayout (ig);
     }
 
     /// <summary>
     /// Render the html using the given device.
     /// </summary>
     /// <param name="g">the device to use to render</param>
-    public void PerformPaint(XGraphics g)
+    public void PerformPaint (XGraphics g)
     {
-        ArgChecker.AssertArgNotNull(g, "g");
+        ArgChecker.AssertArgNotNull (g, "g");
 
-        using var ig = new GraphicsAdapter(g);
-        _htmlContainerInt.PerformPaint(ig);
+        using var ig = new GraphicsAdapter (g);
+        _htmlContainerInt.PerformPaint (ig);
     }
 
     /// <inheritdoc cref="IDisposable.Dispose"/>

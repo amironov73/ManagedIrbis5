@@ -3,6 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable CompareOfFloatsByEqualityOperator
 // ReSharper disable InconsistentNaming
 // ReSharper disable VirtualMemberCallInConstructor
 
@@ -73,6 +74,7 @@ public class StockPoint
     /// </summary>
     public StockPoint() : this (0, 0, 0, 0, 0, 0, null)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -87,6 +89,7 @@ public class StockPoint
     public StockPoint (double date, double high, double low, double open, double close, double vol)
         : this (date, high, low, open, close, vol, null)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -132,9 +135,9 @@ public class StockPoint
         Vol = rhs.Vol;
         ColorValue = rhs.ColorValue;
 
-        if (rhs.Tag is ICloneable)
+        if (rhs.Tag is ICloneable cloneableTag)
         {
-            Tag = ((ICloneable)rhs.Tag).Clone();
+            Tag = cloneableTag.Clone();
         }
         else
         {
@@ -149,13 +152,12 @@ public class StockPoint
     public StockPoint (PointPair rhs)
         : base (rhs)
     {
-        if (rhs is StockPoint)
+        if (rhs is StockPoint stockPoint)
         {
-            StockPoint pt = rhs as StockPoint;
-            Open = pt.Open;
-            Close = pt.Close;
-            Vol = pt.Vol;
-            ColorValue = rhs.ColorValue;
+            Open = stockPoint.Open;
+            Close = stockPoint.Close;
+            Vol = stockPoint.Vol;
+            ColorValue = stockPoint.ColorValue;
         }
         else
         {
@@ -223,8 +225,8 @@ public class StockPoint
     /// </summary>
     public double Date
     {
-        get { return X; }
-        set { X = value; }
+        get => X;
+        set => X = value;
     }
 
     /// <summary>
@@ -232,8 +234,8 @@ public class StockPoint
     /// </summary>
     public double High
     {
-        get { return Y; }
-        set { Y = value; }
+        get => Y;
+        set => Y = value;
     }
 
     /// <summary>
@@ -241,8 +243,8 @@ public class StockPoint
     /// </summary>
     public double Low
     {
-        get { return Z; }
-        set { Z = value; }
+        get => Z;
+        set => Z = value;
     }
 
     /// <summary>
@@ -251,8 +253,8 @@ public class StockPoint
     /// </summary>
     public override double ColorValue
     {
-        get { return _colorValue; }
-        set { _colorValue = value; }
+        get => _colorValue;
+        set => _colorValue = value;
     }
 
     /// <summary>
@@ -262,27 +264,22 @@ public class StockPoint
     /// Infinity, or NaN.
     /// </summary>
     /// <returns>true if any value is invalid</returns>
-    public bool IsInvalid5D
-    {
-        get
-        {
-            return Date == Missing ||
-                   Close == Missing ||
-                   Open == Missing ||
-                   High == Missing ||
-                   Low == Missing ||
-                   double.IsInfinity (Date) ||
-                   double.IsInfinity (Close) ||
-                   double.IsInfinity (Open) ||
-                   double.IsInfinity (High) ||
-                   double.IsInfinity (Low) ||
-                   double.IsNaN (Date) ||
-                   double.IsNaN (Close) ||
-                   double.IsNaN (Open) ||
-                   double.IsNaN (High) ||
-                   double.IsNaN (Low);
-        }
-    }
+    public bool IsInvalid5D =>
+        Date == Missing ||
+        Close == Missing ||
+        Open == Missing ||
+        High == Missing ||
+        Low == Missing ||
+        double.IsInfinity (Date) ||
+        double.IsInfinity (Close) ||
+        double.IsInfinity (Open) ||
+        double.IsInfinity (High) ||
+        double.IsInfinity (Low) ||
+        double.IsNaN (Date) ||
+        double.IsNaN (Close) ||
+        double.IsNaN (Open) ||
+        double.IsNaN (High) ||
+        double.IsNaN (Low);
 
     #endregion
 

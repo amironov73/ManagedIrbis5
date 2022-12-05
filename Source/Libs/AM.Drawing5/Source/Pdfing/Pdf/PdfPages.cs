@@ -5,9 +5,10 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable LocalizableElement
 // ReSharper disable UnusedMember.Global
 
-/*
+/* PdfPages.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -68,7 +69,7 @@ public sealed class PdfPages
         {
             if (index < 0 || index >= Count)
             {
-                throw new ArgumentOutOfRangeException ("index", index, PSSR.PageIndexOutOfRange);
+                throw new ArgumentOutOfRangeException (nameof (index), index, PSSR.PageIndexOutOfRange);
             }
 
             var dict = (PdfDictionary)((PdfReference)PagesArray.Elements[index]).Value;
@@ -84,16 +85,14 @@ public sealed class PdfPages
     /// <summary>
     /// Finds a page by its id. Transforms it to PdfPage if necessary.
     /// </summary>
-    internal PdfPage FindPage (PdfObjectID id) // TODO: public?
+    internal PdfPage? FindPage (PdfObjectID id) // TODO: public?
     {
-        PdfPage page = null;
+        PdfPage? page = null;
         foreach (var item in PagesArray)
         {
-            var reference = item as PdfReference;
-            if (reference != null)
+            if (item is PdfReference reference)
             {
-                var dictionary = reference.Value as PdfDictionary;
-                if (dictionary != null && dictionary.ObjectID == id)
+                if (reference.Value is PdfDictionary dictionary && dictionary.ObjectID == id)
                 {
                     page = dictionary as PdfPage ?? new PdfPage (dictionary);
                     break;
@@ -142,7 +141,7 @@ public sealed class PdfPages
     {
         if (page == null)
         {
-            throw new ArgumentNullException ("page");
+            throw new ArgumentNullException (nameof (page));
         }
 
         // Is the page already owned by this document?
@@ -163,11 +162,11 @@ public sealed class PdfPages
             // TODO: check this case
             // Because the owner of the inserted page is this document we assume that the page was former part of it
             // and it is therefore well-defined.
-            Owner._irefTable.Add (page);
+            Owner!._irefTable.Add (page);
             Debug.Assert (page.Owner == Owner);
 
             // Insert page in array.
-            PagesArray.Elements.Insert (index, page.Reference);
+            PagesArray.Elements.Insert (index, page.Reference!);
 
             // Update page count.
             Elements.SetInteger (Keys.Count, PagesArray.Elements.Count);
@@ -181,9 +180,9 @@ public sealed class PdfPages
             // Case: New page was newly created and inserted now.
             page.Document = Owner;
 
-            Owner._irefTable.Add (page);
+            Owner!._irefTable.Add (page);
             Debug.Assert (page.Owner == Owner);
-            PagesArray.Elements.Insert (index, page.Reference);
+            PagesArray.Elements.Insert (index, page.Reference!);
             Elements.SetInteger (Keys.Count, PagesArray.Elements.Count);
         }
         else
@@ -191,13 +190,13 @@ public sealed class PdfPages
             // Case: Page is from an external document -> import it.
             var importPage = page;
             page = ImportExternalPage (importPage, annotationCopying);
-            Owner._irefTable.Add (page);
+            Owner!._irefTable.Add (page);
 
             // Add page substitute to importedObjectTable.
             var importedObjectTable = Owner.FormTable.GetImportedObjectTable (importPage);
-            importedObjectTable.Add (importPage.ObjectID, page.Reference);
+            importedObjectTable.Add (importPage.ObjectID, page.Reference!);
 
-            PagesArray.Elements.Insert (index, page.Reference);
+            PagesArray.Elements.Insert (index, page.Reference!);
             Elements.SetInteger (Keys.Count, PagesArray.Elements.Count);
             PdfAnnotations.FixImportedAnnotation (page);
         }
@@ -223,24 +222,24 @@ public sealed class PdfPages
     {
         if (document == null)
         {
-            throw new ArgumentNullException ("document");
+            throw new ArgumentNullException (nameof (document));
         }
 
         if (index < 0 || index > Count)
         {
-            throw new ArgumentOutOfRangeException ("index", "Argument 'index' out of range.");
+            throw new ArgumentOutOfRangeException (nameof (index), "Argument 'index' out of range.");
         }
 
         var importDocumentPageCount = document.PageCount;
 
         if (startIndex < 0 || startIndex + pageCount > importDocumentPageCount)
         {
-            throw new ArgumentOutOfRangeException ("startIndex", "Argument 'startIndex' out of range.");
+            throw new ArgumentOutOfRangeException (nameof (startIndex), "Argument 'startIndex' out of range.");
         }
 
         if (pageCount > importDocumentPageCount)
         {
-            throw new ArgumentOutOfRangeException ("pageCount", "Argument 'pageCount' out of range.");
+            throw new ArgumentOutOfRangeException (nameof (pageCount), "Argument 'pageCount' out of range.");
         }
 
         var insertPages = new PdfPage[pageCount];
@@ -256,13 +255,13 @@ public sealed class PdfPages
             insertPages[idx] = page;
             importPages[idx] = importPage;
 
-            Owner._irefTable.Add (page);
+            Owner!._irefTable.Add (page);
 
             // Add page substitute to importedObjectTable.
             var importedObjectTable = Owner.FormTable.GetImportedObjectTable (importPage);
-            importedObjectTable.Add (importPage.ObjectID, page.Reference);
+            importedObjectTable.Add (importPage.ObjectID, page.Reference!);
 
-            PagesArray.Elements.Insert (insertIndex, page.Reference);
+            PagesArray.Elements.Insert (insertIndex, page.Reference!);
 
             if (Owner.Settings.TrimMargins.AreSet)
             {
@@ -284,20 +283,20 @@ public sealed class PdfPages
             var annots = importPage.Elements.GetArray (PdfPage.Keys.Annots);
             if (annots != null)
             {
-                var annotations = new PdfAnnotations (Owner);
+                var annotations = new PdfAnnotations (Owner!);
 
                 // Loop through annotations.
                 var count = annots.Elements.Count;
                 for (var idxAnnotation = 0; idxAnnotation < count; idxAnnotation++)
                 {
                     var annot = annots.Elements.GetDictionary (idxAnnotation);
-                    if (annot != null)
+                    if (annot != null!)
                     {
                         var subtype = annot.Elements.GetString (PdfAnnotation.Keys.Subtype);
                         if (subtype == "/Link")
                         {
                             var addAnnotation = false;
-                            var newAnnotation = new PdfLinkAnnotation (Owner);
+                            var newAnnotation = new PdfLinkAnnotation (Owner!);
 
                             var importAnnotationKeyNames = annot.Elements.KeyNames;
                             foreach (var pdfItem in importAnnotationKeyNames)
@@ -310,19 +309,19 @@ public sealed class PdfPages
                                         break;
 
                                     case "/F": // /F 4
-                                        impItem = annot.Elements.GetValue ("/F");
+                                        impItem = annot.Elements.GetValue ("/F")!;
                                         Debug.Assert (impItem is PdfInteger);
                                         newAnnotation.Elements.Add ("/F", impItem.Clone());
                                         break;
 
                                     case "/Rect": // /Rect [68.6 681.08 145.71 702.53]
-                                        impItem = annot.Elements.GetValue ("/Rect");
+                                        impItem = annot.Elements.GetValue ("/Rect")!;
                                         Debug.Assert (impItem is PdfArray);
                                         newAnnotation.Elements.Add ("/Rect", impItem.Clone());
                                         break;
 
                                     case "/StructParent": // /StructParent 3
-                                        impItem = annot.Elements.GetValue ("/StructParent");
+                                        impItem = annot.Elements.GetValue ("/StructParent")!;
                                         Debug.Assert (impItem is PdfInteger);
                                         newAnnotation.Elements.Add ("/StructParent", impItem.Clone());
                                         break;
@@ -331,23 +330,18 @@ public sealed class PdfPages
                                         break;
 
                                     case "/Dest": // /Dest [30 0 R /XYZ 68 771 0]
-                                        impItem = annot.Elements.GetValue ("/Dest");
+                                        impItem = annot.Elements.GetValue ("/Dest")!;
                                         impItem = impItem.Clone();
 
                                         // Is value an array with 5 elements where the first one is an iref?
-                                        var destArray = impItem as PdfArray;
-                                        if (destArray != null && destArray.Elements.Count == 5)
+                                        if (impItem is PdfArray { Elements: [PdfReference iref, _, _, _, _] } destArray)
                                         {
-                                            var iref = destArray.Elements[0] as PdfReference;
-                                            if (iref != null)
+                                            iref = RemapReference (insertPages, importPages, iref)!;
+                                            if (iref != null!)
                                             {
-                                                iref = RemapReference (insertPages, importPages, iref);
-                                                if (iref != null)
-                                                {
-                                                    destArray.Elements[0] = iref;
-                                                    newAnnotation.Elements.Add ("/Dest", destArray);
-                                                    addAnnotation = true;
-                                                }
+                                                destArray.Elements[0] = iref;
+                                                newAnnotation.Elements.Add ("/Dest", destArray);
+                                                addAnnotation = true;
                                             }
                                         }
 
@@ -391,7 +385,7 @@ public sealed class PdfPages
     {
         if (document == null)
         {
-            throw new ArgumentNullException ("document");
+            throw new ArgumentNullException (nameof (document));
         }
 
         InsertRange (index, document, 0, document.PageCount, annotationCopying);
@@ -409,7 +403,7 @@ public sealed class PdfPages
     {
         if (document == null)
         {
-            throw new ArgumentNullException ("document");
+            throw new ArgumentNullException (nameof (document));
         }
 
         InsertRange (index, document, startIndex, document.PageCount - startIndex, annotationCopying);
@@ -420,7 +414,7 @@ public sealed class PdfPages
     /// </summary>
     public void Remove (PdfPage page)
     {
-        PagesArray.Elements.Remove (page.Reference);
+        PagesArray.Elements.Remove (page.Reference!);
         Elements.SetInteger (Keys.Count, PagesArray.Elements.Count);
     }
 
@@ -449,7 +443,7 @@ public sealed class PdfPages
         }
 
         //PdfPage page = (PdfPage)pagesArray.Elements[oldIndex];
-        var page = (PdfReference) _pagesArray.Elements[oldIndex];
+        var page = (PdfReference) _pagesArray!.Elements[oldIndex];
         _pagesArray.Elements.RemoveAt (oldIndex);
         _pagesArray.Elements.Insert (newIndex, page);
     }
@@ -466,13 +460,13 @@ public sealed class PdfPages
             AnnotationCopyingType annotationCopying = AnnotationCopyingType.DoNotCopy
         )
     {
-        if (importPage.Owner._openMode != PdfDocumentOpenMode.Import)
+        if (importPage.Owner!._openMode != PdfDocumentOpenMode.Import)
         {
             throw new InvalidOperationException (
                 "A PDF document must be opened with PdfDocumentOpenMode.Import to import pages from it.");
         }
 
-        var page = new PdfPage (_document);
+        var page = new PdfPage (_document!);
 
         // ReSharper disable AccessToStaticMemberViaDerivedType for a better code readability.
         CloneElement (page, importPage, PdfPage.Keys.Resources, false);
@@ -520,22 +514,21 @@ public sealed class PdfPages
             PdfImportedObjectTable? importedObjectTable = null;
             if (!deepcopy)
             {
-                importedObjectTable = Owner.FormTable.GetImportedObjectTable (importPage);
+                importedObjectTable = Owner!.FormTable.GetImportedObjectTable (importPage);
             }
 
             // The item can be indirect. If so, replace it by its value.
-            if (item is PdfReference)
+            if (item is PdfReference reference)
             {
-                item = ((PdfReference)item).Value;
+                item = reference.Value;
             }
 
-            if (item is PdfObject)
+            if (item is PdfObject root)
             {
-                var root = (PdfObject)item;
                 if (deepcopy)
                 {
                     Debug.Assert (root.Owner != null, "See 'else' case for details");
-                    root = DeepCopyClosure (_document, root);
+                    root = DeepCopyClosure (_document!, root);
                 }
                 else
                 {
@@ -545,7 +538,7 @@ public sealed class PdfPages
                         root.Document = importPage.Owner;
                     }
 
-                    root = ImportClosure (importedObjectTable, page.Owner, root);
+                    root = ImportClosure (importedObjectTable!, page.Owner!, root);
                 }
 
                 if (root.Reference == null)
@@ -608,17 +601,17 @@ public sealed class PdfPages
         // Promote inheritable values down the page tree
         var values = new PdfPage.InheritedValues();
         PdfPage.InheritValues (this, ref values);
-        var pages = GetKids (Reference, values, null);
+        var pages = GetKids (Reference!, values, null);
 
         // Replace /Pages in catalog by this object
         // xrefRoot.Value = this;
 
-        var array = new PdfArray (Owner);
+        var array = new PdfArray (Owner!);
         foreach (var page in pages)
         {
             // Fix the parent
             page.Elements[PdfPage.Keys.Parent] = Reference;
-            array.Elements.Add (page.Reference);
+            array.Elements.Add (page.Reference!);
         }
 
         Elements.SetName (Keys.Type, "/Pages");
@@ -637,7 +630,12 @@ public sealed class PdfPages
     /// <summary>
     /// Recursively converts the page tree into a flat array.
     /// </summary>
-    PdfDictionary[] GetKids (PdfReference iref, PdfPage.InheritedValues values, PdfDictionary parent)
+    PdfDictionary[] GetKids
+        (
+            PdfReference iref,
+            PdfPage.InheritedValues values,
+            PdfDictionary? parent
+        )
     {
         // TODO: inherit inheritable keys...
         var kid = (PdfDictionary)iref.Value;
@@ -669,16 +667,18 @@ public sealed class PdfPages
         Debug.Assert (kid.Elements.GetName (Keys.Type) == "/Pages");
         PdfPage.InheritValues (kid, ref values);
         var list = new List<PdfDictionary>();
-        var kids = kid.Elements["/Kids"] as PdfArray;
 
-        if (kids == null)
+        if (kid.Elements["/Kids"] is not PdfArray kids)
         {
             var xref3 = kid.Elements["/Kids"] as PdfReference;
-            kids = xref3.Value as PdfArray;
+            kids = (xref3!.Value as PdfArray)!;
         }
 
         foreach (PdfReference xref2 in kids)
+        {
             list.AddRange (GetKids (xref2, values, kid));
+        }
+
         var count = list.Count;
         Debug.Assert (count == kid.Elements.GetInteger ("/Count"));
         return list.ToArray();
@@ -695,7 +695,7 @@ public sealed class PdfPages
         // Arrays have a limit of 8192 entries, but I successfully tested documents
         // with 50000 pages and no page tree.
         // ==> wait for bug report.
-        var count = _pagesArray.Elements.Count;
+        var count = _pagesArray!.Elements.Count;
         for (var idx = 0; idx < count; idx++)
         {
             var page = this[idx];
@@ -749,7 +749,7 @@ public sealed class PdfPages
                     throw new InvalidOperationException (PSSR.ListEnumCurrentOutOfRange);
                 }
 
-                return _currentElement;
+                return _currentElement!;
             }
         }
 
