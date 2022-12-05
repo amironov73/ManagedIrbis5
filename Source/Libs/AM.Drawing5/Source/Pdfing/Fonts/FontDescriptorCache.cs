@@ -13,7 +13,6 @@
 
 #region Using directives
 
-using System;
 using System.Collections.Generic;
 
 using AM;
@@ -73,8 +72,7 @@ internal sealed class FontDescriptorCache
         try
         {
             Lock.EnterFontFactory();
-            FontDescriptor descriptor;
-            if (!Singleton._cache.TryGetValue (fontDescriptorKey, out descriptor))
+            if (!Singleton._cache.TryGetValue (fontDescriptorKey, out var descriptor))
             {
                 descriptor = new OpenTypeDescriptor (fontDescriptorKey, font);
                 Singleton._cache.Add (fontDescriptorKey, descriptor);
@@ -105,14 +103,13 @@ internal sealed class FontDescriptorCache
         try
         {
             Lock.EnterFontFactory();
-            FontDescriptor descriptor;
-            if (!Singleton._cache.TryGetValue (fontDescriptorKey, out descriptor))
+            if (!Singleton._cache.TryGetValue (fontDescriptorKey, out var descriptor))
             {
                 var font = new XFont (fontFamilyName, 10, style);
                 descriptor = GetOrCreateDescriptorFor (font);
                 if (Singleton._cache.ContainsKey (fontDescriptorKey))
                 {
-                    Singleton.GetType();
+                    Singleton.GetType().NotUsed();
                 }
                 else
                 {
@@ -135,8 +132,7 @@ internal sealed class FontDescriptorCache
         try
         {
             Lock.EnterFontFactory();
-            FontDescriptor descriptor;
-            if (!Singleton._cache.TryGetValue (fontDescriptorKey, out descriptor))
+            if (!Singleton._cache.TryGetValue (fontDescriptorKey, out var descriptor))
             {
                 descriptor = GetOrCreateOpenTypeDescriptor (fontDescriptorKey, idName, fontData);
                 Singleton._cache.Add (fontDescriptorKey, descriptor);
@@ -172,10 +168,7 @@ internal sealed class FontDescriptorCache
                 try
                 {
                     Lock.EnterFontFactory();
-                    if (_singleton == null)
-                    {
-                        _singleton = new FontDescriptorCache();
-                    }
+                    _singleton ??= new FontDescriptorCache();
                 }
                 finally
                 {

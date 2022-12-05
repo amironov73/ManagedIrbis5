@@ -3,6 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable CompareOfFloatsByEqualityOperator
 // ReSharper disable InconsistentNaming
 
 /* ValueHandler.cs --
@@ -137,16 +138,16 @@ public class ValueHandler
             foreach (var tmpCurve in pane.CurveList)
             {
                 // Sum the value for the current curve only if it is a bar
-                if (tmpCurve.IsBar && tmpCurve.IsVisible)
+                if (tmpCurve is { IsBar: true, IsVisible: true })
                 {
                     curVal = PointPairBase.Missing;
 
                     // For non-ordinal curves, find a matching base value (must match exactly)
-                    if (curve.IsOverrideOrdinal || !baseAxis.Scale.IsAnyOrdinal)
+                    if (curve.IsOverrideOrdinal || !baseAxis.Scale!.IsAnyOrdinal)
                     {
                         var points = tmpCurve.Points;
 
-                        for (var i = 0; i < points.Count; i++)
+                        for (var i = 0; i < points!.Count; i++)
                         {
                             if (baseAxis is XAxis or X2Axis && points[i].X == baseVal)
                             {
@@ -162,7 +163,7 @@ public class ValueHandler
                     }
 
                     // otherwise, it's an ordinal type so use the value at the same ordinal position
-                    else if (iPt < tmpCurve.Points.Count)
+                    else if (iPt < tmpCurve.Points!.Count)
                     {
                         // Get the value for the appropriate value axis
                         if (baseAxis is XAxis or X2Axis)
@@ -271,11 +272,11 @@ public class ValueHandler
                     curVal = PointPairBase.Missing;
 
                     // For non-ordinal curves, find a matching base value (must match exactly)
-                    if (curve.IsOverrideOrdinal || !baseAxis.Scale.IsAnyOrdinal)
+                    if (curve.IsOverrideOrdinal || !baseAxis.Scale!.IsAnyOrdinal)
                     {
                         var points = tmpCurve.Points;
 
-                        for (var i = 0; i < points.Count; i++)
+                        for (var i = 0; i < points!.Count; i++)
                         {
                             if (points[i].X == baseVal)
                             {
@@ -286,7 +287,7 @@ public class ValueHandler
                     }
 
                     // otherwise, it's an ordinal type so use the value at the same ordinal position
-                    else if (iPt < tmpCurve.Points.Count)
+                    else if (iPt < tmpCurve.Points!.Count)
                     {
                         // For line types, the Y axis is always the value axis
                         curVal = tmpCurve.Points[iPt].Y;
@@ -358,7 +359,7 @@ public class ValueHandler
 
         // Special Exception: Bars on log scales should always plot from the Min value upwards,
         // since they can never be zero
-        if (curve is BarItem && valueAxis.Scale.IsLog && lowVal == 0)
+        if (curve is BarItem && valueAxis.Scale!.IsLog && lowVal == 0)
         {
             lowVal = valueAxis.Scale._min;
         }
@@ -399,7 +400,7 @@ public class ValueHandler
         var baseAxis = curve.BaseAxis (_pane);
         if (curve is ErrorBarItem or HiLowBarItem or OHLCBarItem or JapaneseCandleStickItem)
         {
-            if (baseAxis.Scale.IsAnyOrdinal && iCluster >= 0 && !curve.IsOverrideOrdinal)
+            if (baseAxis.Scale!.IsAnyOrdinal && iCluster >= 0 && !curve.IsOverrideOrdinal)
             {
                 return (double)iCluster + 1.0;
             }
@@ -419,7 +420,7 @@ public class ValueHandler
                 iOrdinal = 0;
             }
 
-            var centerPix = baseAxis.Scale.Transform (curve.IsOverrideOrdinal, iCluster, val)
+            var centerPix = baseAxis.Scale!.Transform (curve.IsOverrideOrdinal, iCluster, val)
                             - clusterWidth / 2.0F + clusterGap / 2.0F +
                             iOrdinal * (barWidth + barGap) + 0.5F * barWidth;
             return baseAxis.Scale.ReverseTransform (centerPix);

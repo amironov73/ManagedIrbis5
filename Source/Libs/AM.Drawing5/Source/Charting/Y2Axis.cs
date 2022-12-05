@@ -76,12 +76,15 @@ public class Y2Axis
     /// for the axis title
     /// </summary>
     /// <param name="title">The <see cref="Axis.Title"/> for this axis</param>
-    public Y2Axis (string title)
+    public Y2Axis
+        (
+            string title
+        )
         : base (title)
     {
         IsVisible = Default.IsVisible;
         _majorGrid.IsZeroLine = Default.IsZeroLine;
-        Scale._fontSpec.Angle = -90.0F;
+        Scale!._fontSpec.Angle = -90.0F;
     }
 
     /// <summary>
@@ -188,12 +191,10 @@ public class Y2Axis
 
         if (!CrossAuto)
         {
-            return pane.XAxis.Scale.Transform (effCross) - pane.XAxis.Scale._maxPix;
+            return pane.XAxis.Scale!.Transform (effCross) - pane.XAxis.Scale._maxPix;
         }
-        else
-        {
-            return 0;
-        }
+
+        return 0;
     }
 
     /*

@@ -95,11 +95,14 @@ public class ZoomState
             {
                 case StateType.Pan:
                     return "Pan";
+
                 case StateType.WheelZoom:
                     return "WheelZoom";
+
                 case StateType.Zoom:
                 default:
                     return "Zoom";
+
                 case StateType.Scroll:
                     return "Scroll";
             }
@@ -115,7 +118,11 @@ public class ZoomState
     /// </param>
     /// <param name="type">A <see cref="StateType"/> enumeration that indicates whether
     /// this saved state is from a pan or zoom.</param>
-    public ZoomState (GraphPane pane, StateType type)
+    public ZoomState
+        (
+            GraphPane pane,
+            StateType type
+        )
     {
         _xAxis = new ScaleState (pane.XAxis);
         _x2Axis = new ScaleState (pane.X2Axis);
@@ -128,7 +135,10 @@ public class ZoomState
     /// The Copy Constructor
     /// </summary>
     /// <param name="rhs">The <see cref="ZoomState"/> object from which to copy</param>
-    public ZoomState (ZoomState rhs)
+    public ZoomState
+        (
+            ZoomState rhs
+        )
     {
         _xAxis = new ScaleState (rhs._xAxis);
         _x2Axis = new ScaleState (rhs._x2Axis);
@@ -164,7 +174,7 @@ public class ZoomState
     public void ApplyState (GraphPane pane)
     {
         _xAxis.ApplyScale (pane.XAxis);
-        _x2Axis.ApplyScale (pane.X2Axis);
+        _x2Axis.ApplyScale (pane.X2Axis!);
         _yAxis.ApplyScale (pane.YAxisList);
         _y2Axis.ApplyScale (pane.Y2AxisList);
     }
@@ -178,7 +188,7 @@ public class ZoomState
     public bool IsChanged (GraphPane pane)
     {
         return _xAxis.IsChanged (pane.XAxis) ||
-               _x2Axis.IsChanged (pane.X2Axis) ||
+               _x2Axis.IsChanged (pane.X2Axis!) ||
                _yAxis.IsChanged (pane.YAxisList) ||
                _y2Axis.IsChanged (pane.Y2AxisList);
     }

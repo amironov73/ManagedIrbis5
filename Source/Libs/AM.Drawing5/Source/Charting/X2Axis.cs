@@ -81,8 +81,8 @@ public class X2Axis
     {
         IsVisible = Default.IsVisible;
         _majorGrid.IsZeroLine = Default.IsZeroLine;
-        Scale._fontSpec.Angle = 180F;
-        Title.FontSpec.Angle = 180F;
+        Scale!._fontSpec.Angle = 180F;
+        Title.FontSpec!.Angle = 180F;
     }
 
     /// <summary>
@@ -225,12 +225,10 @@ public class X2Axis
 
         if (!CrossAuto)
         {
-            return pane.YAxis.Scale.Transform (effCross) - pane.YAxis.Scale._maxPix;
+            return pane.YAxis!.Scale!.Transform (effCross) - pane.YAxis.Scale._maxPix;
         }
-        else
-        {
-            return 0;
-        }
+
+        return 0;
     }
 
     /*
@@ -256,7 +254,7 @@ public class X2Axis
     /// </param>
     public override Axis GetCrossAxis (GraphPane pane)
     {
-        return pane.YAxis;
+        return pane.YAxis!;
     }
 
     //		override internal float GetMinPix( GraphPane pane )

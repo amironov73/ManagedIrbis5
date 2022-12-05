@@ -187,12 +187,10 @@ public class XAxis
 
         if (!CrossAuto)
         {
-            return pane.YAxis.Scale.Transform (effCross) - pane.YAxis.Scale._maxPix;
+            return pane.YAxis!.Scale!.Transform (effCross) - pane.YAxis.Scale._maxPix;
         }
-        else
-        {
-            return 0;
-        }
+
+        return 0;
     }
 
     /*
@@ -208,7 +206,7 @@ public class XAxis
             GraphPane pane
         )
     {
-        return pane.YAxis;
+        return pane.YAxis!;
     }
 
 //		override internal float GetMinPix( GraphPane pane )
