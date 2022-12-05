@@ -576,4 +576,13 @@ public partial class MainWindow
     {
         new DataGridDemo().Show (this);
     }
+
+    private void PropertyGridButton_OnClick
+        (
+            object? sender,
+            RoutedEventArgs eventArgs
+        )
+    {
+        new PropertyGridDemo().Show (this);
+    }
 }

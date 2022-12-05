@@ -44,20 +44,35 @@ public sealed class BusyStripe
     /// <summary>
     /// Описание свойства "Активность".
     /// </summary>
-    public static readonly StyledProperty<bool> ActiveProperty
-        = AvaloniaProperty.Register<BusyStripe, bool> (nameof (Active));
+    public static readonly DirectProperty<BusyStripe, bool> ActiveProperty
+        = AvaloniaProperty.RegisterDirect<BusyStripe, bool>
+            (
+                nameof (Active),
+                x => x.Active,
+                (x, v) => x.Active = v
+            );
 
     /// <summary>
     /// Описание свойства "Позиция".
     /// </summary>
-    public static readonly StyledProperty<double> PositionProperty
-        = AvaloniaProperty.Register<BusyStripe, double> (nameof (Position));
+    public static readonly DirectProperty<BusyStripe, double> PositionProperty
+        = AvaloniaProperty.RegisterDirect<BusyStripe, double>
+            (
+                nameof (Position),
+                x => x.Position,
+                (x, v) => x.Position = v
+            );
 
     /// <summary>
     /// Описание свойства "Текст".
     /// </summary>
-    public static readonly StyledProperty<string?> TextProperty
-        = AvaloniaProperty.Register<BusyStripe, string?> (nameof (Text));
+    public static readonly DirectProperty<BusyStripe, string?> TextProperty
+        = AvaloniaProperty.RegisterDirect<BusyStripe, string?>
+            (
+                nameof (Text),
+                x => x.Text,
+                (x, v) => x.Text = v
+            );
 
     /// <summary>
     /// Описание свойства "Состояние".

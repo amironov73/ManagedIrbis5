@@ -7,6 +7,7 @@
 
   <PropertyGroup>
     <AvaloniaVersion>11.0.0-preview4</AvaloniaVersion>
+    <CommunityToolkitVersion>8.1.0-preview1</CommunityToolkitVersion>
   </PropertyGroup>
 
   <!-- Централизованное управление пакетами -->
@@ -26,9 +27,10 @@
     <PackageVersion Include="Avalonia.Xaml.Interactions" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Xaml.Interactivity" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="BenchmarkDotNet" Version="0.13.2" />
-    <PackageVersion Include="CommunityToolkit.Common" Version="8.0.0" />
-    <PackageVersion Include="CommunityToolkit.Diagnostics" Version="8.0.0" />
-    <PackageVersion Include="CommunityToolkit.HighPerformance" Version="8.1.0-preview1" />
+    <PackageVersion Include="CommunityToolkit.Common" Version="$(CommunityToolkitVersion)" />
+    <PackageVersion Include="CommunityToolkit.Diagnostics" Version="$(CommunityToolkitVersion)" />
+    <PackageVersion Include="CommunityToolkit.HighPerformance" Version="$(CommunityToolkitVersion)" />
+    <PackageVersion Include="CommunityToolkit.Mvvm" Version="$(CommunityToolkitVersion)" />
     <PackageVersion Include="coverlet.collector" Version="3.2.0" />
     <PackageVersion Include="coverlet.msbuild" Version="3.2.0" />
     <PackageVersion Include="DynamicData" Version="7.12.1" />

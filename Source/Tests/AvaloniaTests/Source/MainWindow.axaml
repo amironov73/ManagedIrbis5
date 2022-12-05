@@ -110,6 +110,12 @@
             DataGrid
         </Button>
 
+        <Button
+            Name="PropertyGridButton"
+            Click="PropertyGridButton_OnClick">
+            PropertyGrid
+        </Button>
+
     </WrapPanel>
 
 </Window>

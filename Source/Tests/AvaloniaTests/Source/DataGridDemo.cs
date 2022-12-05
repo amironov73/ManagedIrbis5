@@ -1,11 +1,10 @@
-﻿using Avalonia;
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Layout;
 
 namespace AvaloniaTests;
 
-public class DataGridDemo
+public sealed class DataGridDemo
 {
     public sealed class People
     {
@@ -61,18 +60,8 @@ public class DataGridDemo
             HorizontalContentAlignment = HorizontalAlignment.Stretch,
             VerticalContentAlignment = VerticalAlignment.Stretch,
             Content = dataGrid
-            //     new DockPanel
-            // {
-            //     HorizontalAlignment = HorizontalAlignment.Stretch,
-            //     Margin = new Thickness (10),
-            //     Children =
-            //     {
-            //         dataGrid
-            //     }
-            // }
         };
 
         await window.ShowDialog (owner);
-
     }
 }
