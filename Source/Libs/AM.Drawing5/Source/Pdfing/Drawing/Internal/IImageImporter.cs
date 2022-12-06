@@ -5,7 +5,10 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable LocalizableElement
+// ReSharper disable NotAccessedField.Local
 // ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMember.Local
 
 /* IImageImporter.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -16,6 +19,8 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+
+using AM;
 
 using PdfSharpCore.Pdf;
 
@@ -61,7 +66,7 @@ internal class StreamReaderHelper
 
         Length = (int)OriginalStream.Length;
         Data = new byte[Length];
-        OriginalStream.Read (Data, 0, Length);
+        OriginalStream.Read (Data, 0, Length).NotUsed();
     }
 
     internal byte GetByte (int offset)
@@ -155,10 +160,7 @@ internal abstract class ImportedImage
     /// <summary>
     /// Gets a value indicating whether image data for the PDF file was already prepared.
     /// </summary>
-    public bool HasImageData
-    {
-        get { return _imageData != null; }
-    }
+    public bool HasImageData => _imageData != null;
 
     /// <summary>
     /// Gets the image data needed for the PDF file.
@@ -172,12 +174,12 @@ internal abstract class ImportedImage
                 _imageData = PrepareImageData();
             }
 
-            return _imageData;
+            return _imageData!;
         }
-        private set { _imageData = value; }
+        private set => _imageData = value;
     }
 
-    private ImageData _imageData;
+    private ImageData? _imageData;
 
     internal virtual ImageData PrepareImageData()
     {

@@ -19,70 +19,80 @@ using System;
 
 #nullable enable
 
-namespace PdfSharpCore.Drawing
+namespace PdfSharpCore.Drawing;
+
+/// <summary>
+/// Defines a single color object used to fill shapes and draw text.
+/// </summary>
+public sealed class XSolidBrush
+    : XBrush
 {
     /// <summary>
-    /// Defines a single color object used to fill shapes and draw text.
+    /// Initializes a new instance of the <see cref="XSolidBrush"/> class.
     /// </summary>
-    public sealed class XSolidBrush : XBrush
+    public XSolidBrush()
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="XSolidBrush"/> class.
-        /// </summary>
-        public XSolidBrush()
-        { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="XSolidBrush"/> class.
-        /// </summary>
-        public XSolidBrush(XColor color)
-            : this(color, false)
-        { }
-
-        internal XSolidBrush(XColor color, bool immutable)
-        {
-            _color = color;
-            _immutable = immutable;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="XSolidBrush"/> class.
-        /// </summary>
-        public XSolidBrush(XSolidBrush brush)
-        {
-            _color = brush.Color;
-        }
-
-        /// <summary>
-        /// Gets or sets the color of this brush.
-        /// </summary>
-        public XColor Color
-        {
-            get { return _color; }
-            set
-            {
-                if (_immutable)
-                    throw new ArgumentException(PSSR.CannotChangeImmutableObject("XSolidBrush"));
-                _color = value;
-            }
-        }
-        internal XColor _color;
-
-        /// <summary>
-        /// Gets or sets a value indicating whether the brush enables overprint when used in a PDF document.
-        /// Experimental, takes effect only on CMYK color mode.
-        /// </summary>
-        public bool Overprint
-        {
-            get { return _overprint; }
-            set
-            {
-                if (_immutable)
-                    throw new ArgumentException(PSSR.CannotChangeImmutableObject("XSolidBrush"));
-                _overprint = value;
-            }
-        }
-        internal bool _overprint;
-        readonly bool _immutable;
     }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="XSolidBrush"/> class.
+    /// </summary>
+    public XSolidBrush (XColor color)
+        : this (color, false)
+    {
+    }
+
+    internal XSolidBrush (XColor color, bool immutable)
+    {
+        _color = color;
+        _immutable = immutable;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="XSolidBrush"/> class.
+    /// </summary>
+    public XSolidBrush (XSolidBrush brush)
+    {
+        _color = brush.Color;
+    }
+
+    /// <summary>
+    /// Gets or sets the color of this brush.
+    /// </summary>
+    public XColor Color
+    {
+        get => _color;
+        set
+        {
+            if (_immutable)
+            {
+                throw new ArgumentException (PSSR.CannotChangeImmutableObject ("XSolidBrush"));
+            }
+
+            _color = value;
+        }
+    }
+
+    internal XColor _color;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the brush enables overprint when used in a PDF document.
+    /// Experimental, takes effect only on CMYK color mode.
+    /// </summary>
+    public bool Overprint
+    {
+        get => _overprint;
+        set
+        {
+            if (_immutable)
+            {
+                throw new ArgumentException (PSSR.CannotChangeImmutableObject ("XSolidBrush"));
+            }
+
+            _overprint = value;
+        }
+    }
+
+    internal bool _overprint;
+    readonly bool _immutable;
 }

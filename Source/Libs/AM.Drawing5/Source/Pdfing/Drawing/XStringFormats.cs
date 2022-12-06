@@ -13,201 +13,221 @@
 
 #nullable enable
 
-namespace PdfSharpCore.Drawing
+namespace PdfSharpCore.Drawing;
+
+/// <summary>
+/// Represents predefined text layouts.
+/// </summary>
+public static class XStringFormats
 {
     /// <summary>
-    /// Represents predefined text layouts.
+    /// Gets a new XStringFormat object that aligns the text left on the base line.
+    /// This is the same as BaseLineLeft.
     /// </summary>
-    public static class XStringFormats
+    public static XStringFormat Default => BaseLineLeft;
+
+    /// <summary>
+    /// Gets a new XStringFormat object that aligns the text left on the base line.
+    /// This is the same as Default.
+    /// </summary>
+    public static XStringFormat BaseLineLeft
     {
-        /// <summary>
-        /// Gets a new XStringFormat object that aligns the text left on the base line.
-        /// This is the same as BaseLineLeft.
-        /// </summary>
-        public static XStringFormat Default
+        get
         {
-            get { return BaseLineLeft; }
-        }
-
-        /// <summary>
-        /// Gets a new XStringFormat object that aligns the text left on the base line.
-        /// This is the same as Default.
-        /// </summary>
-        public static XStringFormat BaseLineLeft
-        {
-            get
+            // Create new format to allow changes.
+            var format = new XStringFormat
             {
-                // Create new format to allow changes.
-                XStringFormat format = new XStringFormat();
-                format.Alignment = XStringAlignment.Near;
-                format.LineAlignment = XLineAlignment.BaseLine;
-                return format;
-            }
+                Alignment = XStringAlignment.Near,
+                LineAlignment = XLineAlignment.BaseLine
+            };
+            return format;
         }
+    }
 
-        /// <summary>
-        /// Gets a new XStringFormat object that aligns the text top left of the layout rectangle.
-        /// </summary>
-        public static XStringFormat TopLeft
+    /// <summary>
+    /// Gets a new XStringFormat object that aligns the text top left of the layout rectangle.
+    /// </summary>
+    public static XStringFormat TopLeft
+    {
+        get
         {
-            get
+            // Create new format to allow changes.
+            var format = new XStringFormat
             {
-                // Create new format to allow changes.
-                XStringFormat format = new XStringFormat();
-                format.Alignment = XStringAlignment.Near;
-                format.LineAlignment = XLineAlignment.Near;
-                return format;
-            }
+                Alignment = XStringAlignment.Near,
+                LineAlignment = XLineAlignment.Near
+            };
+            return format;
         }
+    }
 
-        /// <summary>
-        /// Gets a new XStringFormat object that aligns the text center left of the layout rectangle.
-        /// </summary>
-        public static XStringFormat CenterLeft
+    /// <summary>
+    /// Gets a new XStringFormat object that aligns the text center left of the layout rectangle.
+    /// </summary>
+    public static XStringFormat CenterLeft
+    {
+        get
         {
-            get
+            // Create new format to allow changes.
+            var format = new XStringFormat
             {
-                // Create new format to allow changes.
-                XStringFormat format = new XStringFormat();
-                format.Alignment = XStringAlignment.Near;
-                format.LineAlignment = XLineAlignment.Center;
-                return format;
-            }
+                Alignment = XStringAlignment.Near,
+                LineAlignment = XLineAlignment.Center
+            };
+            return format;
         }
+    }
 
-        /// <summary>
-        /// Gets a new XStringFormat object that aligns the text bottom left of the layout rectangle.
-        /// </summary>
-        public static XStringFormat BottomLeft
+    /// <summary>
+    /// Gets a new XStringFormat object that aligns the text bottom left of the layout rectangle.
+    /// </summary>
+    public static XStringFormat BottomLeft
+    {
+        get
         {
-            get
+            // Create new format to allow changes.
+            var format = new XStringFormat
             {
-                // Create new format to allow changes.
-                XStringFormat format = new XStringFormat();
-                format.Alignment = XStringAlignment.Near;
-                format.LineAlignment = XLineAlignment.Far;
-                return format;
-            }
+                Alignment = XStringAlignment.Near,
+                LineAlignment = XLineAlignment.Far
+            };
+            return format;
         }
+    }
 
-        /// <summary>
-        /// Gets a new XStringFormat object that centers the text in the middle of the base line.
-        /// </summary>
-        public static XStringFormat BaseLineCenter
+    /// <summary>
+    /// Gets a new XStringFormat object that centers the text in the middle of the base line.
+    /// </summary>
+    public static XStringFormat BaseLineCenter
+    {
+        get
         {
-            get
+            // Create new format to allow changes.
+            var format = new XStringFormat
             {
-                // Create new format to allow changes.
-                XStringFormat format = new XStringFormat();
-                format.Alignment = XStringAlignment.Center;
-                format.LineAlignment = XLineAlignment.BaseLine;
-                return format;
-            }
+                Alignment = XStringAlignment.Center,
+                LineAlignment = XLineAlignment.BaseLine
+            };
+            return format;
         }
+    }
 
-        /// <summary>
-        /// Gets a new XStringFormat object that centers the text at the top of the layout rectangle.
-        /// </summary>
-        public static XStringFormat TopCenter
+    /// <summary>
+    /// Gets a new XStringFormat object that centers the text at the top of the layout rectangle.
+    /// </summary>
+    public static XStringFormat TopCenter
+    {
+        get
         {
-            get
+            // Create new format to allow changes.
+            var format = new XStringFormat
             {
-                // Create new format to allow changes.
-                XStringFormat format = new XStringFormat();
-                format.Alignment = XStringAlignment.Center;
-                format.LineAlignment = XLineAlignment.Near;
-                return format;
-            }
+                Alignment = XStringAlignment.Center,
+                LineAlignment = XLineAlignment.Near
+            };
+            return format;
         }
+    }
 
-        /// <summary>
-        /// Gets a new XStringFormat object that centers the text in the middle of the layout rectangle.
-        /// </summary>
-        public static XStringFormat Center
+    /// <summary>
+    /// Gets a new XStringFormat object that centers the text in the middle of the layout rectangle.
+    /// </summary>
+    public static XStringFormat Center
+    {
+        get
         {
-            get
+            // Create new format to allow changes.
+            var format = new XStringFormat
             {
-                // Create new format to allow changes.
-                XStringFormat format = new XStringFormat();
-                format.Alignment = XStringAlignment.Center;
-                format.LineAlignment = XLineAlignment.Center;
-                return format;
-            }
+                Alignment = XStringAlignment.Center,
+                LineAlignment = XLineAlignment.Center
+            };
+            return format;
         }
+    }
 
-        /// <summary>
-        /// Gets a new XStringFormat object that centers the text at the bottom of the layout rectangle.
-        /// </summary>
-        public static XStringFormat BottomCenter
+    /// <summary>
+    /// Gets a new XStringFormat object that centers the text at the bottom of the layout rectangle.
+    /// </summary>
+    public static XStringFormat BottomCenter
+    {
+        get
         {
-            get
+            // Create new format to allow changes.
+            var format = new XStringFormat
             {
-                // Create new format to allow changes.
-                XStringFormat format = new XStringFormat();
-                format.Alignment = XStringAlignment.Center;
-                format.LineAlignment = XLineAlignment.Far;
-                return format;
-            }
+                Alignment = XStringAlignment.Center,
+                LineAlignment = XLineAlignment.Far
+            };
+            return format;
         }
+    }
 
-        /// <summary>
-        /// Gets a new XStringFormat object that aligns the text in right on the base line.
-        /// </summary>
-        public static XStringFormat BaseLineRight
+    /// <summary>
+    /// Gets a new XStringFormat object that aligns the text in right on the base line.
+    /// </summary>
+    public static XStringFormat BaseLineRight
+    {
+        get
         {
-            get
+            // Create new format to allow changes.
+            var format = new XStringFormat
             {
-                // Create new format to allow changes.
-                XStringFormat format = new XStringFormat();
-                format.Alignment = XStringAlignment.Far;
-                format.LineAlignment = XLineAlignment.BaseLine;
-                return format;
-            }
+                Alignment = XStringAlignment.Far,
+                LineAlignment = XLineAlignment.BaseLine
+            };
+            return format;
         }
+    }
 
-        /// <summary>
-        /// Gets a new XStringFormat object that aligns the text top right of the layout rectangle.
-        /// </summary>
-        public static XStringFormat TopRight
+    /// <summary>
+    /// Gets a new XStringFormat object that aligns the text top right of the layout rectangle.
+    /// </summary>
+    public static XStringFormat TopRight
+    {
+        get
         {
-            get
+            // Create new format to allow changes.
+            var format = new XStringFormat
             {
-                // Create new format to allow changes.
-                XStringFormat format = new XStringFormat();
-                format.Alignment = XStringAlignment.Far;
-                format.LineAlignment = XLineAlignment.Near;
-                return format;
-            }
+                Alignment = XStringAlignment.Far,
+                LineAlignment = XLineAlignment.Near
+            };
+            return format;
         }
+    }
 
-        /// <summary>
-        /// Gets a new XStringFormat object that aligns the text center right of the layout rectangle.
-        /// </summary>
-        public static XStringFormat CenterRight
+    /// <summary>
+    /// Gets a new XStringFormat object that aligns the text center right of the layout rectangle.
+    /// </summary>
+    public static XStringFormat CenterRight
+    {
+        get
         {
-            get
+            // Create new format to allow changes.
+            var format = new XStringFormat
             {
-                // Create new format to allow changes.
-                XStringFormat format = new XStringFormat();
-                format.Alignment = XStringAlignment.Far;
-                format.LineAlignment = XLineAlignment.Center;
-                return format;
-            }
+                Alignment = XStringAlignment.Far,
+                LineAlignment = XLineAlignment.Center
+            };
+            return format;
         }
+    }
 
-        /// <summary>
-        /// Gets a new XStringFormat object that aligns the text at the bottom right of the layout rectangle.
-        /// </summary>
-        public static XStringFormat BottomRight
+    /// <summary>
+    /// Gets a new XStringFormat object that aligns the text at the bottom right of the layout rectangle.
+    /// </summary>
+    public static XStringFormat BottomRight
+    {
+        get
         {
-            get
+            // Create new format to allow changes.
+            var format = new XStringFormat
             {
-                // Create new format to allow changes.
-                XStringFormat format = new XStringFormat();
-                format.Alignment = XStringAlignment.Far;
-                format.LineAlignment = XLineAlignment.Far;
-                return format;
-            }
+                Alignment = XStringAlignment.Far,
+                LineAlignment = XLineAlignment.Far
+            };
+            return format;
         }
     }
 }

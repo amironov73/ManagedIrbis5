@@ -15,6 +15,8 @@
 
 using System;
 
+using AM;
+
 using PdfSharpCore.Pdf;
 
 #endregion
@@ -97,6 +99,7 @@ internal class ImageImporterJpeg
                 if (blockLength >= 16)
                 {
                     int version = stream.GetWord (9, true);
+                    version.NotUsed();
                     int units = stream.GetByte (11);
                     int densityX = stream.GetWord (12, true);
                     int densityY = stream.GetWord (14, true);

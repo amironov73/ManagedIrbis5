@@ -264,7 +264,7 @@ public struct XRect : IFormattable
     /// </summary>
     public XPoint Location
     {
-        get { return new XPoint (_x, _y); }
+        get => new XPoint (_x, _y);
         set
         {
             if (IsEmpty)
@@ -320,7 +320,7 @@ public struct XRect : IFormattable
     /// </summary>
     public double X
     {
-        get { return _x; }
+        get => _x;
         set
         {
             if (IsEmpty)
@@ -341,7 +341,7 @@ public struct XRect : IFormattable
     /// </summary>
     public double Y
     {
-        get { return _y; }
+        get => _y;
         set
         {
             if (IsEmpty)
@@ -362,7 +362,7 @@ public struct XRect : IFormattable
     /// </summary>
     public double Width
     {
-        get { return _width; }
+        get => _width;
         set
         {
             if (IsEmpty)
@@ -390,7 +390,7 @@ public struct XRect : IFormattable
     /// </summary>
     public double Height
     {
-        get { return _height; }
+        get => _height;
         set
         {
             if (IsEmpty)
@@ -416,18 +416,12 @@ public struct XRect : IFormattable
     /// <summary>
     /// Gets the x-axis value of the left side of the rectangle.
     /// </summary>
-    public double Left
-    {
-        get { return _x; }
-    }
+    public double Left => _x;
 
     /// <summary>
     /// Gets the y-axis value of the top side of the rectangle.
     /// </summary>
-    public double Top
-    {
-        get { return _y; }
-    }
+    public double Top => _y;
 
     /// <summary>
     /// Gets the x-axis value of the right side of the rectangle.
@@ -464,44 +458,29 @@ public struct XRect : IFormattable
     /// <summary>
     /// Gets the position of the top-left corner of the rectangle.
     /// </summary>
-    public XPoint TopLeft
-    {
-        get { return new XPoint (Left, Top); }
-    }
+    public XPoint TopLeft => new XPoint (Left, Top);
 
     /// <summary>
     /// Gets the position of the top-right corner of the rectangle.
     /// </summary>
-    public XPoint TopRight
-    {
-        get { return new XPoint (Right, Top); }
-    }
+    public XPoint TopRight => new XPoint (Right, Top);
 
     /// <summary>
     /// Gets the position of the bottom-left corner of the rectangle.
     /// </summary>
-    public XPoint BottomLeft
-    {
-        get { return new XPoint (Left, Bottom); }
-    }
+    public XPoint BottomLeft => new XPoint (Left, Bottom);
 
     /// <summary>
     /// Gets the position of the bottom-right corner of the rectangle.
     /// </summary>
-    public XPoint BottomRight
-    {
-        get { return new XPoint (Right, Bottom); }
-    }
+    public XPoint BottomRight => new XPoint (Right, Bottom);
 
     /// <summary>
     /// Gets the center of the rectangle.
     /// </summary>
 
     //[Browsable(false)]
-    public XPoint Center
-    {
-        get { return new XPoint (_x + _width / 2, _y + _height / 2); }
-    }
+    public XPoint Center => new XPoint (_x + _width / 2, _y + _height / 2);
 
     /// <summary>
     /// Indicates whether the rectangle contains the specified point.
@@ -809,11 +788,13 @@ public struct XRect : IFormattable
 
     static XRect CreateEmptyRect()
     {
-        var rect = new XRect();
-        rect._x = double.PositiveInfinity;
-        rect._y = double.PositiveInfinity;
-        rect._width = double.NegativeInfinity;
-        rect._height = double.NegativeInfinity;
+        var rect = new XRect
+        {
+            _x = double.PositiveInfinity,
+            _y = double.PositiveInfinity,
+            _width = double.NegativeInfinity,
+            _height = double.NegativeInfinity
+        };
         return rect;
     }
 
