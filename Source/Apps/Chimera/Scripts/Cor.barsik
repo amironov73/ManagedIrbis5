@@ -1,0 +1,44 @@
+﻿//
+// Количество экземпляров в фондах ИЗО и ЦОР
+//
+
+connect ("host=127.0.0.1;port=6666;user=librarian;password=secret;db=IBIS;")
+if (!is_connected())
+{
+    error ("Not connected")
+    exit()
+}
+
+//=================================
+
+FOND="ЦОР"
+totalBooks = 0
+totalExemplars = 0
+
+//=================================
+
+expression = "MHR=" + FOND
+found = batch_search (expression)
+
+foreach (book in found)
+{
+    totalBooks++
+    foreach (one in get_exemplars (book))
+    {
+        if (one.Place same FOND)
+        {
+            totalExemplars++
+            println (one)
+        }
+    }
+}
+
+println ("=============================")
+println ("Фонд: ", FOND)
+println ("Названий: ", totalBooks)
+println ("Экземпляров: ", totalExemplars)
+
+//=================================
+
+disconnect()
+println ("THAT'S ALL, FOLKS!")
