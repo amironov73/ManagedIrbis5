@@ -3,6 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable CompareOfFloatsByEqualityOperator
 // ReSharper disable InconsistentNaming
 
 /* FontSpec.cs --
@@ -16,7 +17,6 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 using System.Runtime.Serialization;
-using System.Security.Permissions;
 
 #endregion
 
@@ -213,7 +213,7 @@ public class FontSpec
         /// The default custom brush for filling in this <see cref="FontSpec"/>
         /// (<see cref="Fill.Brush"/> property).
         /// </summary>
-        public static Brush FillBrush = null;
+        public static Brush FillBrush = null!;
 
         /// <summary>
         /// The default fill mode for this <see cref="FontSpec"/>
@@ -514,9 +514,22 @@ public class FontSpec
     /// <param name="isBold">true for a bold typeface, false otherwise</param>
     /// <param name="isItalic">true for an italic typeface, false otherwise</param>
     /// <param name="isUnderline">true for an underlined font, false otherwise</param>
-    public FontSpec (string family, float size, Color color, bool isBold,
-        bool isItalic, bool isUnderline)
+    public FontSpec
+        (
+            string family,
+            float size,
+            Color color,
+            bool isBold,
+            bool isItalic,
+            bool isUnderline
+        )
     {
+        _family = null!;
+        _fill = null!;
+        _border = null!;
+        _font = null!;
+        _superScriptFont = null!;
+
         Init (family, size, color, isBold, isItalic, isUnderline,
             Default.FillColor, Default.FillBrush, Default.FillType);
     }
@@ -552,6 +565,12 @@ public class FontSpec
             FillType fillType
         )
     {
+        _family = null!;
+        _fill = null!;
+        _border = null!;
+        _font = null!;
+        _superScriptFont = null!;
+
         Init (family, size, color, isBold, isItalic, isUnderline,
             fillColor, fillBrush, fillType);
     }
@@ -597,6 +616,12 @@ public class FontSpec
     /// <param name="rhs">The FontSpec object from which to copy</param>
     public FontSpec (FontSpec rhs)
     {
+        _family = null!;
+        _fill = null!;
+        _border = null!;
+        _font = null!;
+        _superScriptFont = null!;
+
         _fontColor = rhs.FontColor;
         _family = rhs.Family;
         _isBold = rhs.IsBold;
@@ -663,30 +688,33 @@ public class FontSpec
             StreamingContext context
         )
     {
+        _superScriptFont = null!;
+
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
         var sch = info.GetInt32 ("schema");
+        sch.NotUsed();
 
-        _fontColor = (Color) info.GetValue ("fontColor", typeof (Color));
-        _family = info.GetString ("family");
+        _fontColor = (Color) info.GetValue ("fontColor", typeof (Color))!;
+        _family = info.GetString ("family")!;
         _isBold = info.GetBoolean ("isBold");
         _isItalic = info.GetBoolean ("isItalic");
         _isUnderline = info.GetBoolean ("isUnderline");
         _isAntiAlias = info.GetBoolean ("isAntiAlias");
 
-        _fill = (Fill)info.GetValue ("fill", typeof (Fill));
-        _border = (Border)info.GetValue ("border", typeof (Border));
+        _fill = (Fill)info.GetValue ("fill", typeof (Fill))!;
+        _border = (Border)info.GetValue ("border", typeof (Border))!;
         _angle = info.GetSingle ("angle");
-        _stringAlignment = (StringAlignment)info.GetValue ("stringAlignment", typeof (StringAlignment));
+        _stringAlignment = (StringAlignment)info.GetValue ("stringAlignment", typeof (StringAlignment))!;
         _size = info.GetSingle ("size");
 
         _isDropShadow = info.GetBoolean ("isDropShadow");
-        _dropShadowColor = (Color)info.GetValue ("dropShadowColor", typeof (Color));
+        _dropShadowColor = (Color)info.GetValue ("dropShadowColor", typeof (Color))!;
         _dropShadowAngle = info.GetSingle ("dropShadowAngle");
         _dropShadowOffset = info.GetSingle ("dropShadowOffset");
 
         _scaledSize = -1;
-        Remake (1.0F, _size, ref _scaledSize, ref _font);
+        Remake (1.0F, _size, ref _scaledSize, ref _font!);
     }
 
     /// <summary>
@@ -742,7 +770,7 @@ public class FontSpec
     {
         var newSize = size * scaleFactor;
 
-        var oldSize = (font == null) ? 0.0f : font.Size;
+        var oldSize = (font == null!) ? 0.0f : font.Size;
 
         // Regenerate the font only if the size has changed significantly
         if (font == null ||
@@ -757,7 +785,7 @@ public class FontSpec
                     (_isItalic ? FontStyle.Italic : style) |
                     (_isUnderline ? FontStyle.Underline : style);
 
-            scaledSize = size * (float)scaleFactor;
+            scaledSize = size * scaleFactor;
             font = new Font (_family, scaledSize, style, GraphicsUnit.World);
         }
     }

@@ -3,6 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable CompareOfFloatsByEqualityOperator
 // ReSharper disable InconsistentNaming
 
 /* Fill.cs --
@@ -177,12 +178,12 @@ public class Fill
         _rangeMin = 0.0;
         _rangeMax = 1.0;
         _rangeDefault = double.MaxValue;
-        _gradientBM = null;
+        _gradientBM = null!;
 
         _colorList = null;
-        _positionList = null;
+        _positionList = null!;
         _angle = 0;
-        _image = null;
+        _image = null!;
         _wrapMode = WrapMode.Tile;
     }
 
@@ -191,6 +192,10 @@ public class Fill
     /// </summary>
     public Fill()
     {
+        _gradientBM = null!;
+        _image = null!;
+        _positionList = null!;
+
         Init();
     }
 
@@ -208,6 +213,10 @@ public class Fill
             FillType type
         )
     {
+        _gradientBM = null!;
+        _image = null!;
+        _positionList = null!;
+
         Init();
         _color = color;
         _brush = brush;
@@ -222,6 +231,10 @@ public class Fill
     /// <param name="color">The color of the solid fill</param>
     public Fill (Color color)
     {
+        _gradientBM = null!;
+        _image = null!;
+        _positionList = null!;
+
         Init();
         _color = color;
         if (color != Color.Empty)
@@ -239,14 +252,26 @@ public class Fill
     /// <param name="angle">The angle (degrees) of the gradient fill</param>
     public Fill (Color color1, Color color2, float angle)
     {
+        _gradientBM = null!;
+        _image = null!;
+        _positionList = null!;
+
         Init();
         _color = color2;
 
-        var blend = new ColorBlend (2);
-        blend.Colors[0] = color1;
-        blend.Colors[1] = color2;
-        blend.Positions[0] = 0.0f;
-        blend.Positions[1] = 1.0f;
+        var blend = new ColorBlend (2)
+        {
+            Colors =
+            {
+                [0] = color1,
+                [1] = color2
+            },
+            Positions =
+            {
+                [0] = 0.0f,
+                [1] = 1.0f
+            }
+        };
         _type = FillType.Brush;
 
         CreateBrushFromBlend (blend, angle);
@@ -260,6 +285,7 @@ public class Fill
     /// <param name="color2">The second color for the gradient fill</param>
     public Fill (Color color1, Color color2) : this (color1, color2, 0.0F)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -273,6 +299,7 @@ public class Fill
     public Fill (Color color1, Color color2, Color color3) :
         this (color1, color2, color3, 0.0f)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -286,16 +313,28 @@ public class Fill
     /// <param name="angle">The angle (degrees) of the gradient fill</param>
     public Fill (Color color1, Color color2, Color color3, float angle)
     {
+        _gradientBM = null!;
+        _image = null!;
+        _positionList = null!;
+
         Init();
         _color = color3;
 
-        var blend = new ColorBlend (3);
-        blend.Colors[0] = color1;
-        blend.Colors[1] = color2;
-        blend.Colors[2] = color3;
-        blend.Positions[0] = 0.0f;
-        blend.Positions[1] = 0.5f;
-        blend.Positions[2] = 1.0f;
+        var blend = new ColorBlend (3)
+        {
+            Colors =
+            {
+                [0] = color1,
+                [1] = color2,
+                [2] = color3
+            },
+            Positions =
+            {
+                [0] = 0.0f,
+                [1] = 0.5f,
+                [2] = 1.0f
+            }
+        };
         _type = FillType.Brush;
 
         CreateBrushFromBlend (blend, angle);
@@ -312,6 +351,7 @@ public class Fill
     public Fill (ColorBlend blend) :
         this (blend, 0.0F)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -325,6 +365,10 @@ public class Fill
     /// <param name="angle">The angle (degrees) of the gradient fill</param>
     public Fill (ColorBlend blend, float angle)
     {
+        _gradientBM = null!;
+        _image = null!;
+        _positionList = null!;
+
         Init();
         _type = FillType.Brush;
         CreateBrushFromBlend (blend, angle);
@@ -343,6 +387,7 @@ public class Fill
     public Fill (Color[] colors) :
         this (colors, 0.0F)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -358,15 +403,24 @@ public class Fill
     /// <param name="angle">The angle (degrees) of the gradient fill</param>
     public Fill (Color[] colors, float angle)
     {
-        Init();
-        _color = colors[colors.Length - 1];
+        _gradientBM = null!;
+        _image = null!;
+        _positionList = null!;
 
-        var blend = new ColorBlend();
-        blend.Colors = colors;
-        blend.Positions = new float[colors.Length];
+        Init();
+        _color = colors[^1];
+
+        var blend = new ColorBlend
+        {
+            Colors = colors,
+            Positions = new float[colors.Length]
+        };
         blend.Positions[0] = 0.0F;
         for (var i = 1; i < colors.Length; i++)
+        {
             blend.Positions[i] = (float)i / (float)(colors.Length - 1);
+        }
+
         _type = FillType.Brush;
 
         CreateBrushFromBlend (blend, angle);
@@ -387,6 +441,7 @@ public class Fill
     public Fill (Color[] colors, float[] positions) :
         this (colors, positions, 0.0F)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -404,12 +459,18 @@ public class Fill
     /// <param name="angle">The angle (degrees) of the gradient fill</param>
     public Fill (Color[] colors, float[] positions, float angle)
     {
-        Init();
-        _color = colors[colors.Length - 1];
+        _gradientBM = null!;
+        _image = null!;
+        _positionList = null!;
 
-        var blend = new ColorBlend();
-        blend.Colors = colors;
-        blend.Positions = positions;
+        Init();
+        _color = colors[^1];
+
+        var blend = new ColorBlend
+        {
+            Colors = colors,
+            Positions = positions
+        };
         _type = FillType.Brush;
 
         CreateBrushFromBlend (blend, angle);
@@ -423,6 +484,10 @@ public class Fill
     /// <param name="wrapMode">The <see cref="WrapMode"/> class that controls the image wrapping properties</param>
     public Fill (Image image, WrapMode wrapMode)
     {
+        _gradientBM = null!;
+        _image = null!;
+        _positionList = null!;
+
         Init();
         _color = Color.White;
         _brush = new TextureBrush (image, wrapMode);
@@ -440,6 +505,7 @@ public class Fill
     /// be a <see cref="LinearGradientBrush"/> or a <see cref="TextureBrush"/> class</param>
     public Fill (Brush brush) : this (brush, Default.IsScaled)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -453,6 +519,10 @@ public class Fill
     /// of the destination object.  true to scale it, false to leave it unscaled</param>
     public Fill (Brush brush, bool isScaled)
     {
+        _gradientBM = null!;
+        _image = null!;
+        _positionList = null!;
+
         Init();
         _isScaled = isScaled;
         _color = Color.White;
@@ -474,6 +544,10 @@ public class Fill
     /// (see <see cref="AlignV"/></param>
     public Fill (Brush brush, AlignH alignH, AlignV alignV)
     {
+        _gradientBM = null!;
+        _image = null!;
+        _positionList = null!;
+
         Init();
         _alignH = alignH;
         _alignV = alignV;
@@ -489,6 +563,10 @@ public class Fill
     /// <param name="rhs">The Fill object from which to copy</param>
     public Fill (Fill rhs)
     {
+        _gradientBM = null!;
+        _image = null!;
+        _positionList = null!;
+
         _color = rhs._color;
         _secondaryValueGradientColor = rhs._color;
 
@@ -508,7 +586,6 @@ public class Fill
         _rangeMin = rhs._rangeMin;
         _rangeMax = rhs._rangeMax;
         _rangeDefault = rhs._rangeDefault;
-        _gradientBM = null;
 
         if (rhs._colorList != null)
         {
@@ -519,22 +596,22 @@ public class Fill
             _colorList = null;
         }
 
-        if (rhs._positionList != null)
+        if (rhs._positionList != null!)
         {
             _positionList = (float[])rhs._positionList.Clone();
         }
         else
         {
-            _positionList = null;
+            _positionList = null!;
         }
 
-        if (rhs._image != null)
+        if (rhs._image != null!)
         {
             _image = (Image)rhs._image.Clone();
         }
         else
         {
-            _image = null;
+            _image = null!;
         }
 
         _angle = rhs._angle;
@@ -597,41 +674,47 @@ public class Fill
             StreamingContext context
         )
     {
+        _gradientBM = null!;
+        _image = null!;
+        _positionList = null!;
+
         Init();
 
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
         info.GetInt32 ("schema").NotUsed();
 
-        _color = (Color)info.GetValue ("color", typeof (Color));
-        _secondaryValueGradientColor = (Color)info.GetValue ("secondaryValueGradientColor", typeof (Color));
+        _color = (Color)info.GetValue ("color", typeof (Color))!;
+        _secondaryValueGradientColor = (Color)info.GetValue ("secondaryValueGradientColor", typeof (Color))!;
 
         //brush = (Brush) info.GetValue( "brush", typeof(Brush) );
         //brushHolder = (BrushHolder) info.GetValue( "brushHolder", typeof(BrushHolder) );
-        _type = (FillType)info.GetValue ("type", typeof (FillType));
+        _type = (FillType)info.GetValue ("type", typeof (FillType))!;
         _isScaled = info.GetBoolean ("isScaled");
-        _alignH = (AlignH)info.GetValue ("alignH", typeof (AlignH));
-        _alignV = (AlignV)info.GetValue ("alignV", typeof (AlignV));
+        _alignH = (AlignH)info.GetValue ("alignH", typeof (AlignH))!;
+        _alignV = (AlignV)info.GetValue ("alignV", typeof (AlignV))!;
         _rangeMin = info.GetDouble ("rangeMin");
         _rangeMax = info.GetDouble ("rangeMax");
 
         //BrushHolder brushHolder = (BrushHolder) info.GetValue( "brushHolder", typeof( BrushHolder ) );
         //brush = brush;
 
-        _colorList = (Color[])info.GetValue ("colorList", typeof (Color[]));
-        _positionList = (float[])info.GetValue ("positionList", typeof (float[]));
+        _colorList = (Color[])info.GetValue ("colorList", typeof (Color[]))!;
+        _positionList = (float[])info.GetValue ("positionList", typeof (float[]))!;
         _angle = info.GetSingle ("angle");
-        _image = (Image)info.GetValue ("image", typeof (Image));
-        _wrapMode = (WrapMode)info.GetValue ("wrapMode", typeof (WrapMode));
+        _image = (Image)info.GetValue ("image", typeof (Image))!;
+        _wrapMode = (WrapMode)info.GetValue ("wrapMode", typeof (WrapMode))!;
 
-        if (_colorList != null && _positionList != null)
+        if (_colorList != null && _positionList != null!)
         {
-            var blend = new ColorBlend();
-            blend.Colors = _colorList;
-            blend.Positions = _positionList;
+            var blend = new ColorBlend
+            {
+                Colors = _colorList,
+                Positions = _positionList
+            };
             CreateBrushFromBlend (blend, _angle);
         }
-        else if (_image != null)
+        else if (_image != null!)
         {
             _brush = new TextureBrush (_image, _wrapMode);
         }
@@ -687,8 +770,8 @@ public class Fill
     /// <seealso cref="Type"/>
     public Color Color
     {
-        get { return _color; }
-        set { _color = value; }
+        get => _color;
+        set => _color = value;
     }
 
     /// <summary>
@@ -707,8 +790,8 @@ public class Fill
     /// </remarks>
     public Color SecondaryValueGradientColor
     {
-        get { return _secondaryValueGradientColor; }
-        set { _secondaryValueGradientColor = value; }
+        get => _secondaryValueGradientColor;
+        set => _secondaryValueGradientColor = value;
     }
 
     /// <summary>
@@ -719,8 +802,8 @@ public class Fill
     /// </summary>
     public Brush Brush
     {
-        get { return _brush; }
-        set { _brush = value; }
+        get => _brush!;
+        set => _brush = value;
     }
 
     /// <summary>
@@ -732,8 +815,8 @@ public class Fill
     /// <seealso cref="Fill.Color"/>
     public FillType Type
     {
-        get { return _type; }
-        set { _type = value; }
+        get => _type;
+        set => _type = value;
     }
 
     /// <summary>
@@ -753,8 +836,8 @@ public class Fill
     /// <seealso cref="Type"/>
     public bool IsVisible
     {
-        get { return _type != FillType.None; }
-        set { _type = value ? (_type == FillType.None ? FillType.Brush : _type) : FillType.None; }
+        get => _type != FillType.None;
+        set => _type = value ? (_type == FillType.None ? FillType.Brush : _type) : FillType.None;
     }
 
     /// <summary>
@@ -765,8 +848,8 @@ public class Fill
     /// </summary>
     public bool IsScaled
     {
-        get { return _isScaled; }
-        set { _isScaled = value; }
+        get => _isScaled;
+        set => _isScaled = value;
     }
 
     /// <summary>
@@ -777,8 +860,8 @@ public class Fill
     /// <seealso cref="AlignV"/>
     public AlignH AlignH
     {
-        get { return _alignH; }
-        set { _alignH = value; }
+        get => _alignH;
+        set => _alignH = value;
     }
 
     /// <summary>
@@ -789,8 +872,8 @@ public class Fill
     /// <seealso cref="AlignH"/>
     public AlignV AlignV
     {
-        get { return _alignV; }
-        set { _alignV = value; }
+        get => _alignV;
+        set => _alignV = value;
     }
 
     /// <summary>
@@ -816,14 +899,9 @@ public class Fill
     /// <seealso cref="FillType.GradientByX"/>
     /// <seealso cref="FillType.GradientByY"/>
     /// <seealso cref="FillType.GradientByZ"/>
-    public bool IsGradientValueType
-    {
-        get
-        {
-            return _type == FillType.GradientByX || _type == FillType.GradientByY ||
-                   _type == FillType.GradientByZ || _type == FillType.GradientByColorValue;
-        }
-    }
+    public bool IsGradientValueType =>
+        _type == FillType.GradientByX || _type == FillType.GradientByY ||
+        _type == FillType.GradientByZ || _type == FillType.GradientByColorValue;
 
     /// <summary>
     /// The minimum user-scale value for the gradient-by-value determination.  This defines
@@ -838,8 +916,8 @@ public class Fill
     /// <value>A double value, in user scale unit</value>
     public double RangeMin
     {
-        get { return _rangeMin; }
-        set { _rangeMin = value; }
+        get => _rangeMin;
+        set => _rangeMin = value;
     }
 
     /// <summary>
@@ -855,8 +933,8 @@ public class Fill
     /// <value>A double value, in user scale unit</value>
     public double RangeMax
     {
-        get { return _rangeMax; }
-        set { _rangeMax = value; }
+        get => _rangeMax;
+        set => _rangeMax = value;
     }
 
     /// <summary>
@@ -879,8 +957,8 @@ public class Fill
     /// <value>A double value, in user scale unit</value>
     public double RangeDefault
     {
-        get { return _rangeDefault; }
-        set { _rangeDefault = value; }
+        get => _rangeDefault;
+        set => _rangeDefault = value;
     }
 
     #endregion
@@ -943,7 +1021,7 @@ public class Fill
             //Brush	brush;
             if (_type == FillType.Brush)
             {
-                return ScaleBrush (rect, _brush, _isScaled);
+                return ScaleBrush (rect, _brush!, _isScaled);
             }
             else if (IsGradientValueType)
             {
@@ -979,7 +1057,7 @@ public class Fill
                 }
                 else
                 {
-                    return ScaleBrush (rect, _brush, true);
+                    return ScaleBrush (rect, _brush!, true);
                 }
             }
             else
@@ -996,7 +1074,7 @@ public class Fill
     {
         double val;
 
-        if (dataValue == null)
+        if (dataValue == null!)
         {
             val = _rangeDefault;
         }
@@ -1047,13 +1125,13 @@ public class Fill
             valueFraction = 1.0;
         }
 
-        if (_gradientBM == null)
+        if (_gradientBM == null!)
         {
             var rect = new RectangleF (0, 0, 100, 1);
             _gradientBM = new Bitmap (100, 1);
             var gBM = Graphics.FromImage (_gradientBM);
 
-            var tmpBrush = ScaleBrush (rect, _brush, true);
+            var tmpBrush = ScaleBrush (rect, _brush!, true);
             gBM.FillRectangle (tmpBrush, rect);
         }
 
@@ -1062,7 +1140,7 @@ public class Fill
 
     private Brush ScaleBrush (RectangleF rect, Brush brush, bool isScaled)
     {
-        if (brush != null)
+        if (brush != null!)
         {
             if (brush is SolidBrush)
             {

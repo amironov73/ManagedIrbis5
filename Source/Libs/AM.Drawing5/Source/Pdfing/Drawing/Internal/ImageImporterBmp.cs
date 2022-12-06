@@ -15,6 +15,8 @@
 
 using System;
 
+using AM;
+
 using PdfSharpCore.Pdf;
 using PdfSharpCore.Pdf.Advanced;
 
@@ -106,6 +108,7 @@ internal class ImageImporterBmp
             var yPelsPerMeter = (int)stream.GetDWord (28, false);
             var colorsUsed = stream.GetDWord (32, false);
             var colorsImportant = stream.GetDWord (36, false);
+            colorsImportant.NotUsed();
 
             // TODO Integrity and plausibility checks.
             if (sizeImage != 0 && sizeImage + offset > stream.Length)
@@ -225,100 +228,46 @@ internal class ImageDataBitmap
 {
     internal ImageDataBitmap (PdfDocument document)
     {
+        Data = null!;
+        DataFax = null!;
+        AlphaMask = null!;
+        BitmapMask = null!;
+        PaletteData = null!;
+
         _document = document;
     }
 
     /// <summary>
     /// Gets the data.
     /// </summary>
-    public byte[] Data
-    {
-        get { return _data; }
-        internal set { _data = value; }
-    }
-
-    private byte[] _data;
+    public byte[] Data { get; internal set; }
 
     /// <summary>
     /// Gets the length.
     /// </summary>
-    public int Length
-    {
-        get { return _length; }
-        internal set { _length = value; }
-    }
-
-    private int _length;
+    public int Length { get; internal set; }
 
     /// <summary>
     /// Gets the data.
     /// </summary>
-    public byte[] DataFax
-    {
-        get { return _dataFax; }
-        internal set { _dataFax = value; }
-    }
-
-    private byte[] _dataFax;
+    public byte[] DataFax { get; internal set; }
 
     /// <summary>
     /// Gets the length.
     /// </summary>
-    public int LengthFax
-    {
-        get { return _lengthFax; }
-        internal set { _lengthFax = value; }
-    }
+    public int LengthFax { get; internal set; }
 
-    private int _lengthFax;
+    public byte[] AlphaMask { get; internal set; }
 
-    public byte[] AlphaMask
-    {
-        get { return _alphaMask; }
-        internal set { _alphaMask = value; }
-    }
+    public int AlphaMaskLength { get; internal set; }
 
-    private byte[] _alphaMask;
+    public byte[] BitmapMask { get; internal set; }
 
-    public int AlphaMaskLength
-    {
-        get { return _alphaMaskLength; }
-        internal set { _alphaMaskLength = value; }
-    }
+    public int BitmapMaskLength { get; internal set; }
 
-    private int _alphaMaskLength;
+    public byte[] PaletteData { get; set; }
 
-    public byte[] BitmapMask
-    {
-        get { return _bitmapMask; }
-        internal set { _bitmapMask = value; }
-    }
-
-    private byte[] _bitmapMask;
-
-    public int BitmapMaskLength
-    {
-        get { return _bitmapMaskLength; }
-        internal set { _bitmapMaskLength = value; }
-    }
-
-    private int _bitmapMaskLength;
-
-    public byte[] PaletteData
-    {
-        get { return _paletteData; }
-        set { _paletteData = value; }
-    }
-
-    private byte[] _paletteData;
-
-    public int PaletteDataLength
-    {
-        get { return _paletteDataLength; }
-        set { _paletteDataLength = value; }
-    }
-
-    private int _paletteDataLength;
+    public int PaletteDataLength { get; set; }
 
     public bool SegmentedColorMask;
 
@@ -341,8 +290,8 @@ internal class ImagePrivateDataBitmap : ImagePrivateData
     /// </summary>
     public ImagePrivateDataBitmap (byte[] data, int length)
     {
-        _data = data;
-        _length = length;
+        Data = data;
+        Length = length;
     }
 
     /// <summary>
@@ -350,24 +299,20 @@ internal class ImagePrivateDataBitmap : ImagePrivateData
     /// </summary>
     public byte[] Data
     {
-        get { return _data; }
+        get;
 
         //internal set { _data = value; }
     }
-
-    private readonly byte[] _data;
 
     /// <summary>
     /// Gets the length.
     /// </summary>
     public int Length
     {
-        get { return _length; }
+        get;
 
         //internal set { _length = value; }
     }
-
-    private readonly int _length;
 
     /// <summary>
     /// True if first line is the top line, false if first line is the bottom line of the image. When needed, lines will be reversed while converting data into PDF format.
@@ -386,7 +331,7 @@ internal class ImagePrivateDataBitmap : ImagePrivateData
 
     internal void CopyBitmap (ImageDataBitmap dest)
     {
-        switch (Image.Information.ImageFormat)
+        switch (Image!.Information.ImageFormat)
         {
             case ImageInformation.ImageFormats.ARGB32:
                 CopyTrueColorMemoryBitmap (3, 8, true, dest);
@@ -429,6 +374,8 @@ internal class ImagePrivateDataBitmap : ImagePrivateData
             ImageDataBitmap dest
         )
     {
+        bits.NotUsed();
+
         var width = (int) Image!.Information.Width;
         var height = (int) Image.Information.Height;
 
@@ -490,7 +437,7 @@ internal class ImagePrivateDataBitmap : ImagePrivateData
         else if (components == 1)
         {
             // Grayscale
-            throw new NotImplementedException ("Image format not supported (grayscales).");
+            throw new NotImplementedException ("Image format not supported (grayscale).");
         }
 
         dest.Data = imageData;
@@ -581,7 +528,6 @@ internal class ImagePrivateDataBitmap : ImagePrivateData
         // if (segmentedColorMask = true)
         // { ... }
 
-        var isFaxEncoding = false;
         var imageData = new byte[((width * bits + 7) / 8) * height];
         byte[]? imageDataFax = null;
         var k = 0;
@@ -605,7 +551,7 @@ internal class ImagePrivateDataBitmap : ImagePrivateData
             var ccittSizeG4 =
                 PdfImage.DoFaxEncodingGroup4 (ref tempG4, Data, (uint)bytesFileOffset, (uint)width, (uint)height);
 
-            isFaxEncoding = /*ccittSize > 0 ||*/ ccittSizeG4 > 0;
+            var isFaxEncoding = ccittSizeG4 > 0;
             if (isFaxEncoding)
             {
                 //if (ccittSize == 0)

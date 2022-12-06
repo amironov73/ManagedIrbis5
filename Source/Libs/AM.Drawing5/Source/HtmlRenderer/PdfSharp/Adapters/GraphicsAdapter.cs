@@ -54,9 +54,11 @@ internal sealed class GraphicsAdapter
 
     static GraphicsAdapter()
     {
-        _stringFormat = new XStringFormat();
-        _stringFormat.Alignment = XStringAlignment.Near;
-        _stringFormat.LineAlignment = XLineAlignment.Near;
+        _stringFormat = new XStringFormat
+        {
+            Alignment = XStringAlignment.Near,
+            LineAlignment = XLineAlignment.Near
+        };
     }
 
     /// <summary>
@@ -98,7 +100,7 @@ internal sealed class GraphicsAdapter
 
     public override void ReturnPreviousSmoothingMode(object prevMode)
     {
-        if (prevMode != null)
+        if (prevMode != null!)
         {
             _g.SmoothingMode = (XSmoothingMode)prevMode;
         }
@@ -126,10 +128,10 @@ internal sealed class GraphicsAdapter
         throw new NotSupportedException();
     }
 
-    public override void DrawString(string str, RFont font, RColor color, RPoint point, RSize size, bool rtl)
+    public override void DrawString(string? str, RFont font, RColor color, RPoint point, RSize size, bool rtl)
     {
         var xBrush = ((BrushAdapter)_adapter.GetSolidBrush(color)).Brush;
-        _g.DrawString(str, ((FontAdapter)font).Font, (XBrush)xBrush, point.X, point.Y, _stringFormat);
+        _g.DrawString(str!, ((FontAdapter)font).Font, (XBrush)xBrush, point.X, point.Y, _stringFormat);
     }
 
     public override RBrush GetTextureBrush(RImage image, RRect dstRect, RPoint translateTransformLocation)
@@ -164,8 +166,7 @@ internal sealed class GraphicsAdapter
     public override void DrawRectangle(RBrush brush, double x, double y, double width, double height)
     {
         var xBrush = ((BrushAdapter)brush).Brush;
-        var xTextureBrush = xBrush as XTextureBrush;
-        if (xTextureBrush != null)
+        if (xBrush is XTextureBrush xTextureBrush)
         {
             xTextureBrush.DrawRectangle(_g, x, y, width, height);
         }
@@ -201,7 +202,7 @@ internal sealed class GraphicsAdapter
 
     public override void DrawPolygon(RBrush brush, RPoint[] points)
     {
-        if (points != null && points.Length > 0)
+        if (points is { Length: > 0 })
         {
             _g.DrawPolygon((XBrush)((BrushAdapter)brush).Brush, Utils.Convert(points), XFillMode.Winding);
         }
