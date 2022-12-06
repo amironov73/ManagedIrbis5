@@ -212,7 +212,7 @@ public static class Filtering
         byte[]? result = null;
         if (filterItem is PdfName && (decodeParms == null || decodeParms is PdfDictionary))
         {
-            var filter = GetFilter (filterItem.ToString());
+            var filter = GetFilter (filterItem.ToString()!);
             if (filter != null)
             {
                 result = filter.Decode (data, decodeParms as PdfDictionary);
@@ -232,7 +232,7 @@ public static class Filtering
             {
                 var item = itemArray.Elements[i];
                 var parms = decodeArray?.Elements[i];
-                data = Decode (data, item, parms);
+                data = Decode (data!, item, parms)!;
             }
 
             result = data;

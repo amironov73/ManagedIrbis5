@@ -51,9 +51,8 @@ internal class ThreadLocalStorage // #???
     {
         Debug.Assert (path.StartsWith ("*") || Path.IsPathRooted (path), "Path must be full qualified.");
 
-        PdfDocument document = null;
-        PdfDocument.DocumentHandle handle;
-        if (_importedDocuments.TryGetValue (path, out handle))
+        PdfDocument? document = null;
+        if (_importedDocuments.TryGetValue (path, out var handle))
         {
             document = handle.Target;
             if (document == null)
@@ -65,7 +64,7 @@ internal class ThreadLocalStorage // #???
         if (document == null)
         {
             document = PdfReader.Open (path, PdfDocumentOpenMode.Import, accuracy);
-            _importedDocuments.Add (path, document.Handle);
+            _importedDocuments.Add (path, document!.Handle);
         }
 
         return document;
@@ -80,7 +79,7 @@ internal class ThreadLocalStorage // #???
             {
                 if (handle.IsAlive)
                 {
-                    list.Add (handle.Target);
+                    list.Add (handle.Target!);
                 }
             }
 

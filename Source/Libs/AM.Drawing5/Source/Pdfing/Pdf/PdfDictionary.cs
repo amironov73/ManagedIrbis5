@@ -5,7 +5,9 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable LocalizableElement
 // ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMember.Local
 
 /* PdfDictionary.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -128,8 +130,7 @@ public class PdfDictionary
             var names = dict._elements.KeyNames;
             foreach (var name in names)
             {
-                var obj = dict._elements[name] as PdfObject;
-                if (obj != null)
+                if (dict._elements[name] is PdfObject obj)
                 {
                     obj = obj.Clone();
 
@@ -254,15 +255,15 @@ public class PdfDictionary
 #if DEBUG
 
         // TODO: simplify PDFsharp
-        if (item is PdfObject && ((PdfObject)item).IsIndirect)
+        if (item is PdfObject { IsIndirect: true } pdfObject)
         {
             // Replace an indirect object by its Reference.
-            item = ((PdfObject)item).Reference;
+            item = pdfObject.Reference;
             Debug.Assert (false, "Check when we come here.");
         }
 #endif
         key.WriteObject (writer);
-        item.WriteObject (writer);
+        item!.WriteObject (writer);
         writer.NewLine();
     }
 
@@ -313,14 +314,14 @@ public class PdfDictionary
     {
         internal DictionaryElements (PdfDictionary ownerDictionary)
         {
-            _elements = new Dictionary<string, PdfItem>();
+            _elements = new Dictionary<string, PdfItem?>();
             Owner = ownerDictionary;
         }
 
         object ICloneable.Clone()
         {
             var dictionaryElements = (DictionaryElements)MemberwiseClone();
-            dictionaryElements._elements = new Dictionary<string, PdfItem> (dictionaryElements._elements);
+            dictionaryElements._elements = new Dictionary<string, PdfItem?> (dictionaryElements._elements);
             dictionaryElements.Owner = null;
             return dictionaryElements;
         }
@@ -650,7 +651,7 @@ public class PdfDictionary
         /// </summary>
         public string GetName (string key)
         {
-            object obj = this[key];
+            object? obj = this[key];
             if (obj == null)
             {
                 //if (create)
@@ -705,7 +706,7 @@ public class PdfDictionary
         public PdfRectangle GetRectangle (string key, bool create)
         {
             var value = new PdfRectangle();
-            object obj = this[key];
+            object? obj = this[key];
             if (obj == null)
             {
                 if (create)
@@ -716,13 +717,12 @@ public class PdfDictionary
                 return value;
             }
 
-            if (obj is PdfReference)
+            if (obj is PdfReference reference)
             {
-                obj = ((PdfReference)obj).Value;
+                obj = reference.Value;
             }
 
-            var array = obj as PdfArray;
-            if (array != null && array.Elements.Count == 4)
+            if (obj is PdfArray { Elements.Count: 4 } array)
             {
                 value = new PdfRectangle (array.Elements.GetReal (0), array.Elements.GetReal (1),
                     array.Elements.GetReal (2), array.Elements.GetReal (3));
@@ -760,7 +760,7 @@ public class PdfDictionary
         public XMatrix GetMatrix (string key, bool create)
         {
             var value = new XMatrix();
-            object obj = this[key];
+            object? obj = this[key];
             if (obj == null)
             {
                 if (create)
@@ -776,7 +776,7 @@ public class PdfDictionary
                 obj = reference.Value;
             }
 
-            if (obj is PdfArray array && array.Elements.Count == 6)
+            if (obj is PdfArray { Elements.Count: 6 } array)
             {
                 value = new XMatrix (array.Elements.GetReal (0), array.Elements.GetReal (1), array.Elements.GetReal (2),
                     array.Elements.GetReal (3), array.Elements.GetReal (4), array.Elements.GetReal (5));
@@ -816,7 +816,7 @@ public class PdfDictionary
         /// </summary>
         public DateTime GetDateTime (string key, DateTime defaultValue)
         {
-            object obj = this[key];
+            object? obj = this[key];
             if (obj == null)
             {
                 return defaultValue;
@@ -855,13 +855,10 @@ public class PdfDictionary
                 {
                     defaultValue = Parser.ParseDateTime (strDate, defaultValue);
                 }
-
-                // ReSharper disable EmptyGeneralCatchClause
-                catch
+                catch (Exception exception)
                 {
+                    Debug.WriteLine (exception.Message);
                 }
-
-                // ReSharper restore EmptyGeneralCatchClause
             }
 
             return defaultValue;
@@ -887,7 +884,7 @@ public class PdfDictionary
             {
                 if (create)
                 {
-                    this[key] = new PdfName (defaultValue.ToString());
+                    this[key] = new PdfName (defaultValue.ToString()!);
                 }
 
                 // ReSharper disable once PossibleInvalidCastException because Enum objects can always be casted to int.
@@ -895,7 +892,7 @@ public class PdfDictionary
             }
 
             Debug.Assert (obj is Enum);
-            return (int)Enum.Parse (defaultValue.GetType(), obj.ToString().Substring (1), false);
+            return (int)Enum.Parse (defaultValue.GetType(), obj.ToString()!.Substring (1), false);
         }
 
         internal int GetEnumFromName (string key, object defaultValue)
@@ -918,10 +915,6 @@ public class PdfDictionary
         /// </summary>
         public PdfItem? GetValue (string key, VCF options)
         {
-            PdfObject obj;
-            PdfDictionary dict;
-            PdfArray array;
-            PdfReference iref;
             var value = this[key];
             if (value == null)
             {
@@ -933,6 +926,7 @@ public class PdfDictionary
                         // Rewritten WinRT style.
                         var typeInfo = type.GetTypeInfo();
                         Debug.Assert (typeof (PdfItem).GetTypeInfo().IsAssignableFrom (typeInfo), "Type not allowed.");
+                        PdfObject obj;
                         if (typeof (PdfDictionary).GetTypeInfo().IsAssignableFrom (typeInfo))
                         {
                             value = obj = CreateDictionary (type, null);
@@ -948,7 +942,7 @@ public class PdfDictionary
 
                         if (options == VCF.CreateIndirect)
                         {
-                            Owner.Owner._irefTable.Add (obj);
+                            Owner!.Owner!._irefTable.Add (obj);
                             this[key] = obj.Reference;
                         }
                         else
@@ -966,6 +960,7 @@ public class PdfDictionary
             {
                 // The value exists and can be returned. But for imported documents check for necessary
                 // object type transformation.
+                PdfReference? iref;
                 if ((iref = value as PdfReference) != null)
                 {
                     // Case: value is an indirect reference.
@@ -984,7 +979,7 @@ public class PdfDictionary
 
                         // Rewritten WinRT style.
                         var typeInfo = type.GetTypeInfo();
-                        if (type != null && type != value.GetType())
+                        if (type != null! && type != value.GetType())
                         {
                             if (typeof (PdfDictionary).GetTypeInfo().IsAssignableFrom (typeInfo))
                             {
@@ -1012,6 +1007,7 @@ public class PdfDictionary
                 if (true) // || _owner.Document.IsImported)
                 {
                     // Case: value is a direct object
+                    PdfDictionary? dict;
                     if ((dict = value as PdfDictionary) != null)
                     {
                         Debug.Assert (!dict.IsIndirect);
@@ -1027,6 +1023,7 @@ public class PdfDictionary
                         return dict;
                     }
 
+                    PdfArray? array;
                     if ((array = value as PdfArray) != null)
                     {
                         Debug.Assert (!array.IsIndirect);
@@ -1035,7 +1032,7 @@ public class PdfDictionary
 
                         // This is more complicated. If type is null do nothing
                         //Debug.Assert(type != null, "No value type specified in meta information. Please send this file to PDFsharp support.");
-                        if (type != null && type != array.GetType())
+                        if (type != null! && type != array.GetType())
                         {
                             array = CreateArray (type, array);
                         }
@@ -1059,10 +1056,10 @@ public class PdfDictionary
         /// <summary>
         /// Returns the type of the object to be created as value of the specified key.
         /// </summary>
-        Type GetValueType (string key) // TODO: move to PdfObject
+        Type? GetValueType (string key) // TODO: move to PdfObject
         {
             Type? type = null;
-            var meta = Owner.Meta;
+            var meta = Owner!.Meta;
             if (meta != null)
             {
                 var kd = meta[key];
@@ -1101,7 +1098,7 @@ public class PdfDictionary
                     var parameters = ctorInfo.GetParameters();
                     if (parameters.Length == 1 && parameters[0].ParameterType == typeof (PdfDocument))
                     {
-                        array = ctorInfo.Invoke (new object[] { Owner.Owner }) as PdfArray;
+                        array = ctorInfo.Invoke (new object[] { Owner!.Owner! }) as PdfArray;
                         break;
                     }
                 }
@@ -1153,7 +1150,7 @@ public class PdfDictionary
                     var parameters = ctorInfo.GetParameters();
                     if (parameters.Length == 1 && parameters[0].ParameterType == typeof (PdfDocument))
                     {
-                        dict = ctorInfo.Invoke (new object[] { Owner.Owner }) as PdfDictionary;
+                        dict = ctorInfo.Invoke (new object[] { Owner!.Owner! }) as PdfDictionary;
                         break;
                     }
                 }
@@ -1184,7 +1181,7 @@ public class PdfDictionary
         PdfItem CreateValue (Type type, PdfDictionary oldValue)
         {
             // Rewritten WinRT style.
-            PdfObject obj = null;
+            PdfObject? obj = null;
             var ctorInfos =
                 type.GetTypeInfo()
                     .DeclaredConstructors; // GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new Type[] { typeof(PdfDocument) }, null);
@@ -1193,16 +1190,16 @@ public class PdfDictionary
                 var parameters = ctorInfo.GetParameters();
                 if (parameters.Length == 1 && parameters[0].ParameterType == typeof (PdfDocument))
                 {
-                    obj = ctorInfo.Invoke (new object[] { Owner.Owner }) as PdfObject;
+                    obj = ctorInfo.Invoke (new object[] { Owner!.Owner! }) as PdfObject;
                     break;
                 }
             }
 
             Debug.Assert (obj != null, "No appropriate constructor found for type: " + type.Name);
-            if (oldValue != null)
+            if (oldValue != null!)
             {
                 obj.Reference = oldValue.Reference;
-                obj.Reference.Value = obj;
+                obj.Reference!.Value = obj;
                 if (obj is PdfDictionary dict)
                 {
                     dict._elements = oldValue._elements;
@@ -1217,7 +1214,7 @@ public class PdfDictionary
         /// </summary>
         public void SetValue (string key, PdfItem value)
         {
-            Debug.Assert ((value is PdfObject && ((PdfObject)value).Reference == null) | !(value is PdfObject),
+            Debug.Assert (value is PdfObject { Reference: null } | value is not PdfObject,
                 "You try to set an indirect object directly into a dictionary.");
 
             // HACK?
@@ -1324,10 +1321,7 @@ public class PdfDictionary
         /// <summary>
         /// Gets a value indicating whether the <see cref="T:System.Collections.IDictionary"></see> object is read-only.
         /// </summary>
-        public bool IsReadOnly
-        {
-            get { return false; }
-        }
+        public bool IsReadOnly => false;
 
         /// <summary>
         /// Returns an <see cref="T:System.Collections.IDictionaryEnumerator"></see> object for the <see cref="T:System.Collections.IDictionary"></see> object.
@@ -1395,13 +1389,9 @@ public class PdfDictionary
                 Sure.NotNull (value);
 
 #if DEBUG
-                if (value is PdfDictionary dictionary)
+                if (value is PdfDictionary { Stream: { } } dictionary)
                 {
-                    var dict = dictionary;
-                    if (dict.Stream != null)
-                    {
-                        throw new ArgumentException ("A dictionary with stream cannot be a direct value.");
-                    }
+                    throw new ArgumentException ("A dictionary with stream cannot be a direct value.");
                 }
 #endif
 
@@ -1481,7 +1471,7 @@ public class PdfDictionary
             // If object is indirect automatically convert value to reference.
             if (value is PdfObject { IsIndirect: true } obj)
             {
-                value = obj.Reference;
+                value = obj.Reference!;
             }
 
             _elements.Add (key, value);
@@ -1534,7 +1524,7 @@ public class PdfDictionary
         /// </summary>
         public bool TryGetValue (string key, out PdfItem value)
         {
-            return _elements.TryGetValue (key, out value);
+            return _elements.TryGetValue (key, out value!);
         }
 
         /// <summary>
@@ -1557,10 +1547,7 @@ public class PdfDictionary
         /// <summary>
         /// Return false.
         /// </summary>
-        public bool IsFixedSize
-        {
-            get { return false; }
-        }
+        public bool IsFixedSize => false;
 
         #endregion
 
@@ -1569,18 +1556,12 @@ public class PdfDictionary
         /// <summary>
         /// Return false.
         /// </summary>
-        public bool IsSynchronized
-        {
-            get { return false; }
-        }
+        public bool IsSynchronized => false;
 
         /// <summary>
         /// Gets the number of elements contained in the dictionary.
         /// </summary>
-        public int Count
-        {
-            get { return _elements.Count; }
-        }
+        public int Count => _elements.Count;
 
         /// <summary>
         /// Copies the elements of the dictionary to an array, starting at a particular index.
@@ -1593,10 +1574,7 @@ public class PdfDictionary
         /// <summary>
         /// The current implementation returns null.
         /// </summary>
-        public object? SyncRoot
-        {
-            get { return null; }
-        }
+        public object? SyncRoot => null;
 
         #endregion
 
@@ -1668,11 +1646,11 @@ public class PdfDictionary
         public PdfStream Clone()
         {
             var stream = (PdfStream)MemberwiseClone();
-            stream._ownerDictionary = null;
+            stream._ownerDictionary = null!;
             if (stream._value != null)
             {
                 stream._value = new byte[stream._value.Length];
-                _value.CopyTo (stream._value, 0);
+                _value!.CopyTo (stream._value, 0);
             }
 
             return stream;
@@ -1683,7 +1661,7 @@ public class PdfDictionary
         /// </summary>
         internal void ChangeOwner (PdfDictionary dict)
         {
-            if (_ownerDictionary != null)
+            if (_ownerDictionary != null!)
             {
                 // ???
             }
@@ -1703,10 +1681,7 @@ public class PdfDictionary
         /// <summary>
         /// Gets the length of the stream, i.e. the actual number of bytes in the stream.
         /// </summary>
-        public int Length
-        {
-            get { return _value != null ? _value.Length : 0; }
-        }
+        public int Length => _value?.Length ?? 0;
 
         /// <summary>
         /// Get or sets the bytes of the stream as they are, i.e. if one or more filters exist the bytes are
@@ -1714,7 +1689,7 @@ public class PdfDictionary
         /// </summary>
         public byte[] Value
         {
-            get { return _value; }
+            get => _value!;
             set
             {
                 if (value == null)
@@ -1746,7 +1721,7 @@ public class PdfDictionary
                         bytes = Filtering.Decode (_value, filter, decodeParms);
                         if (bytes == null)
                         {
-                            var message = string.Format ("«Cannot decode filter '{0}'»", filter);
+                            var message = $"«Cannot decode filter '{filter}'»";
                             bytes = PdfEncoders.RawEncoding.GetBytes (message);
                         }
                     }
@@ -1757,7 +1732,7 @@ public class PdfDictionary
                     }
                 }
 
-                return bytes ?? new byte[0];
+                return bytes ?? Array.Empty<byte>();
             }
         }
 
@@ -1807,7 +1782,7 @@ public class PdfDictionary
 
             if (!_ownerDictionary.Elements.ContainsKey (Keys.Filter))
             {
-                _value = Filtering.FlateDecode.Encode (_value, _ownerDictionary._document.Options.FlateEncodeMode);
+                _value = Filtering.FlateDecode.Encode (_value, _ownerDictionary._document!.Options.FlateEncodeMode);
                 _ownerDictionary.Elements[Keys.Filter] = new PdfName ("/FlateDecode");
                 _ownerDictionary.Elements[Keys.Length] = new PdfInteger (_value.Length);
             }
@@ -1958,7 +1933,7 @@ public class PdfDictionary
             return string.Format (CultureInfo.InvariantCulture, "dictionary({0},[{1}])={2}",
                 ObjectID.DebuggerDisplay,
                 Elements.Count,
-                _elements.DebuggerDisplay);
+                _elements!.DebuggerDisplay);
 #else
                 return String.Format(CultureInfo.InvariantCulture, "dictionary({0},[{1}])=", ObjectID.DebuggerDisplay, _elements.DebuggerDisplay);
 #endif

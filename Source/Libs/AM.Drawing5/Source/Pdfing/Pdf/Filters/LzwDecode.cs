@@ -187,8 +187,8 @@ public class LzwDecode
     }
 
     readonly int[] _andTable = { 511, 1023, 2047, 4095 };
-    byte[][] _stringTable;
-    byte[] _data;
+    private byte[][] _stringTable = null!;
+    byte[] _data = null!;
     int _tableIndex, _bitsToGet = 9;
     int _bytePointer;
     int _nextData = 0;
