@@ -1121,7 +1121,6 @@ public sealed class IrbisLib
         if (firstArg is Record record2)
         {
             record = record2;
-            index = 2;
         }
         else
         {

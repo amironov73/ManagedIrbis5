@@ -1,6 +1,11 @@
-﻿using Avalonia.Controls;
+﻿using AM.Avalonia;
+
+using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Data;
 using Avalonia.Layout;
+using Avalonia.Media;
+using Avalonia.Styling;
 
 namespace AvaloniaTests;
 
@@ -20,12 +25,22 @@ public sealed class DataGridDemo
         };
     }
 
-
     public async void Show
         (
             Window owner
         )
     {
+        var grayBackground = AvaloniaUtility.CreateControlTheme
+            (
+                typeof (DataGridCell),
+                typeof (DataGridCell)
+            );
+        grayBackground?.Setters.Add (new Setter
+            (
+                TemplatedControl.BackgroundProperty,
+                Brushes.LightGray
+            ));
+
         var dataGrid = new DataGrid
         {
             HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -39,7 +54,8 @@ public sealed class DataGridDemo
                     Header = "Имя",
                     Binding = new Binding (nameof (People.FirstName)),
                     Width = DataGridLength.Auto,
-                    IsReadOnly = true
+                    IsReadOnly = true,
+                    CellTheme = grayBackground
                 },
 
                 new DataGridTextColumn

@@ -27,6 +27,7 @@ using Avalonia.Data;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.ReactiveUI;
+using Avalonia.Styling;
 
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -79,6 +80,17 @@ public class PropertyGrid
     /// </summary>
     public PropertyGrid()
     {
+        var grayBackground = AvaloniaUtility.CreateControlTheme
+            (
+                typeof (DataGridCell),
+                typeof (DataGridCell)
+            );
+        grayBackground?.Setters.Add (new Setter
+            (
+                BackgroundProperty,
+                Brushes.LightGray
+            ));
+
         _dataGrid = new DataGrid
         {
             IsReadOnly = true,
@@ -93,7 +105,8 @@ public class PropertyGrid
                     HeaderTemplate = BoldLabel(),
                     FontWeight = FontWeight.Bold,
                     Width = new DataGridLength (2, DataGridLengthUnitType.Star),
-                    Binding = new Binding (nameof (PropertyModel.Name))
+                    Binding = new Binding (nameof (PropertyModel.Name)),
+                    CellTheme = grayBackground
                 },
 
                 new DataGridTextColumn
@@ -102,7 +115,8 @@ public class PropertyGrid
                     IsReadOnly = true,
                     HeaderTemplate = BoldLabel(),
                     Width = new DataGridLength (2, DataGridLengthUnitType.Star),
-                    Binding = new Binding (nameof (PropertyModel.Type))
+                    Binding = new Binding (nameof (PropertyModel.Type)),
+                    CellTheme = grayBackground
                 },
 
                 new DataGridTextColumn

@@ -32,6 +32,7 @@ using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Platform;
+using Avalonia.Styling;
 
 #endregion
 
@@ -160,6 +161,33 @@ public static class AvaloniaUtility
         control.VerticalAlignment = VerticalAlignment.Center;
 
         return control;
+    }
+
+    /// <summary>
+    /// Создание темы для контрола, основанной на теме для указанного типа.
+    /// </summary>
+    /// <returns></returns>
+    public static ControlTheme? CreateControlTheme
+        (
+            Type baseControlType,
+            Type actualControlType
+        )
+    {
+        Sure.NotNull (baseControlType);
+        Sure.NotNull (actualControlType);
+
+        var basedOn = GetControlTheme (baseControlType);
+        if (basedOn is null)
+        {
+            return null;
+        }
+
+        var result = new ControlTheme (actualControlType)
+        {
+            BasedOn = basedOn
+        };
+
+        return result;
     }
 
     /// <summary>
@@ -298,6 +326,35 @@ public static class AvaloniaUtility
         control.SetValue (DockPanel.DockProperty, Dock.Top);
 
         return control;
+    }
+
+    /// <summary>
+    /// Получение темы для контрола указанного типа.
+    /// </summary>
+    public static ControlTheme? GetControlTheme
+        (
+            Type controlType
+        )
+    {
+        Sure.NotNull (controlType);
+
+        while (controlType.IsAssignableTo (typeof (Control)))
+        {
+            if (Application.Current!.Styles.TryGetResource (controlType, out var result))
+            {
+                return result as ControlTheme;
+            }
+
+            var baseType = controlType.BaseType;
+            if (baseType is null)
+            {
+                break;
+            }
+
+            controlType = baseType;
+        }
+
+        return null;
     }
 
     /// <summary>

@@ -1,5 +1,5 @@
 ﻿//
-// Количество экземпляров научного фонда в фондах ИЗО и ЦОР
+// Количество экземпляров учебного фонда в фондах ИЗО и ЦОР
 //
 
 connect ("host=127.0.0.1;port=6666;user=librarian;password=secret;db=IBIS;")
@@ -17,18 +17,21 @@ totalExemplars = 0
 
 //=================================
 
-expression = "MHR=" + FOND
+expression = "\"ME=^A" + FOND + "^C$" + chr(34)
 found = batch_search (expression)
 
 foreach (book in found)
 {
     totalBooks++
-    foreach (one in get_exemplars (book))
+    foreach (one in get_fields (book, 2010))
     {
-        if (one.Place same FOND)
+        // поле 2010: "Распределение учебного фонда"
+        // подполе A: "Место"
+        if (sub_field (one, 'a') same FOND)
         {
-            totalExemplars++
-            println (one)
+            // подполе C: "Количество экземпляров"
+            n = (int) sub_field (one, 'c')
+            totalExemplars += n
         }
     }
 }
