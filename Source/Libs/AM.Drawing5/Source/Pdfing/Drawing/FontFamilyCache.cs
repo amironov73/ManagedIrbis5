@@ -91,10 +91,7 @@ internal sealed class FontFamilyCache
                 try
                 {
                     Lock.EnterFontFactory();
-                    if (_singleton == null)
-                    {
-                        _singleton = new FontFamilyCache();
-                    }
+                    _singleton ??= new FontFamilyCache();
                 }
                 finally
                 {

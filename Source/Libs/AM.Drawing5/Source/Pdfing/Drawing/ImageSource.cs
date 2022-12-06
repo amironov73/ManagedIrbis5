@@ -14,54 +14,122 @@
 #region Using directives
 
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 #endregion
 
 #nullable enable
 
-namespace MigraDocCore.DocumentObjectModel.MigraDoc.DocumentObjectModel.Shapes
+namespace MigraDocCore.DocumentObjectModel.MigraDoc.DocumentObjectModel.Shapes;
+
+/// <summary>
+///
+/// </summary>
+public abstract class ImageSource
 {
+    /// <summary>
+    /// Gets or sets the image source implementation to use for reading images.
+    /// </summary>
+    /// <value>The image source impl.</value>
+    public static ImageSource ImageSourceImpl { get; set; } = null!;
 
-
-    public abstract class ImageSource
+    /// <summary>
+    ///
+    /// </summary>
+    public interface IImageSource
     {
         /// <summary>
-        /// Gets or sets the image source implementation to use for reading images.
+        ///
         /// </summary>
-        /// <value>The image source impl.</value>
-        public static ImageSource ImageSourceImpl { get; set; }
+        int Width { get; }
 
-        public interface IImageSource
-        {
-            int Width { get; }
-            int Height { get; }
-            string Name { get; }
-            void SaveAsJpeg(MemoryStream ms);
-            bool Transparent { get; }
-            void SaveAsPdfBitmap(MemoryStream ms);
-        }
+        /// <summary>
+        ///
+        /// </summary>
+        int Height { get; }
 
-        protected abstract IImageSource FromFileImpl(string path, int quality = 75);
-        protected abstract IImageSource FromBinaryImpl(string name, Func<byte[]> imageSource, int quality = 75);
-        protected abstract IImageSource FromStreamImpl(string name, Func<Stream> imageStream, int quality = 75);
+        /// <summary>
+        ///
+        /// </summary>
+        string Name { get; }
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="ms"></param>
+        void SaveAsJpeg (MemoryStream ms);
+
+        /// <summary>
+        ///
+        /// </summary>
+        bool Transparent { get; }
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="ms"></param>
+        void SaveAsPdfBitmap (MemoryStream ms);
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="path"></param>
+    /// <param name="quality"></param>
+    /// <returns></returns>
+    protected abstract IImageSource FromFileImpl (string path, int quality = 75);
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="imageSource"></param>
+    /// <param name="quality"></param>
+    /// <returns></returns>
+    protected abstract IImageSource FromBinaryImpl (string name, Func<byte[]> imageSource, int quality = 75);
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="imageStream"></param>
+    /// <param name="quality"></param>
+    /// <returns></returns>
+    protected abstract IImageSource FromStreamImpl (string name, Func<Stream> imageStream, int quality = 75);
 
 
-        public static IImageSource FromFile(string path, int quality = 75)
-        {
-            return ImageSourceImpl.FromFileImpl(path, quality);
-        }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="path"></param>
+    /// <param name="quality"></param>
+    /// <returns></returns>
+    public static IImageSource FromFile (string path, int quality = 75)
+    {
+        return ImageSourceImpl.FromFileImpl (path, quality);
+    }
 
-        public static IImageSource FromBinary(string name, Func<byte[]> imageSource, int quality = 75)
-        {
-            return ImageSourceImpl.FromBinaryImpl(name, imageSource, quality);
-        }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="imageSource"></param>
+    /// <param name="quality"></param>
+    /// <returns></returns>
+    public static IImageSource FromBinary (string name, Func<byte[]> imageSource, int quality = 75)
+    {
+        return ImageSourceImpl.FromBinaryImpl (name, imageSource, quality);
+    }
 
-        public static IImageSource FromStream(string name, Func<Stream> imageStream, int quality = 75)
-        {
-            return ImageSourceImpl.FromStreamImpl(name, imageStream, quality);
-        }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="imageStream"></param>
+    /// <param name="quality"></param>
+    /// <returns></returns>
+    public static IImageSource FromStream (string name, Func<Stream> imageStream, int quality = 75)
+    {
+        return ImageSourceImpl.FromStreamImpl (name, imageStream, quality);
     }
 }

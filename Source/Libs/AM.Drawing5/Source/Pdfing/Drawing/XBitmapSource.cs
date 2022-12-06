@@ -13,35 +13,34 @@
 
 #nullable enable
 
-namespace PdfSharpCore.Drawing
+namespace PdfSharpCore.Drawing;
+
+/// <summary>
+/// Defines an abstract base class for pixel based images.
+/// </summary>
+public abstract class XBitmapSource : XImage
 {
+    // TODO: Move code from XImage to this class.
+
     /// <summary>
-    /// Defines an abstract base class for pixel based images.
+    /// Gets the width of the image in pixels.
     /// </summary>
-    public abstract class XBitmapSource : XImage
+    public override int PixelWidth
     {
-        // TODO: Move code from XImage to this class.
-
-        /// <summary>
-        /// Gets the width of the image in pixels.
-        /// </summary>
-        public override int PixelWidth
+        get
         {
-            get
-            {
-                return PixelWidth;
-            }
+            return PixelWidth;
         }
+    }
 
-        /// <summary>
-        /// Gets the height of the image in pixels.
-        /// </summary>
-        public override int PixelHeight
+    /// <summary>
+    /// Gets the height of the image in pixels.
+    /// </summary>
+    public override int PixelHeight
+    {
+        get
         {
-            get
-            {
-                return PixelHeight;
-            }
+            return PixelHeight;
         }
     }
 }

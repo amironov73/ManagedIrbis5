@@ -13,28 +13,32 @@
 
 #nullable enable
 
-namespace PdfSharpCore.Drawing
-{
-    /// <summary>
-    /// Provides functionality to load a bitmap image encoded in a specific format.
-    /// </summary>
-    public class XBitmapDecoder
-    {
-        internal XBitmapDecoder()
-        { }
+namespace PdfSharpCore.Drawing;
 
-        /// <summary>
-        /// Gets a new instance of the PNG image decoder.
-        /// </summary>
-        public static XBitmapDecoder GetPngDecoder()
-        {
-            return new XPngBitmapDecoder();
-        }
+/// <summary>
+/// Provides functionality to load a bitmap image encoded in a specific format.
+/// </summary>
+public class XBitmapDecoder
+{
+    internal XBitmapDecoder()
+    {
+        // пустое тело конструктора
     }
 
-    internal sealed class XPngBitmapDecoder : XBitmapDecoder
+    /// <summary>
+    /// Gets a new instance of the PNG image decoder.
+    /// </summary>
+    public static XBitmapDecoder GetPngDecoder()
     {
-        internal XPngBitmapDecoder()
-        { }
+        return new XPngBitmapDecoder();
+    }
+}
+
+internal sealed class XPngBitmapDecoder
+    : XBitmapDecoder
+{
+    internal XPngBitmapDecoder()
+    {
+        // пустое тело конструктора
     }
 }

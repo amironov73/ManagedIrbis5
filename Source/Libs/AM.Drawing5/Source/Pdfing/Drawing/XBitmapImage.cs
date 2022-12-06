@@ -13,29 +13,35 @@
 
 #nullable enable
 
-namespace PdfSharpCore.Drawing
+using AM;
+
+namespace PdfSharpCore.Drawing;
+
+/// <summary>
+/// Defines a pixel based bitmap image.
+/// </summary>
+public sealed class XBitmapImage
+    : XBitmapSource
 {
+    // TODO: Move code from XImage to this class.
+
     /// <summary>
-    /// Defines a pixel based bitmap image.
+    /// Initializes a new instance of the <see cref="XBitmapImage"/> class.
     /// </summary>
-    public sealed class XBitmapImage : XBitmapSource
+    internal XBitmapImage (int width, int height)
     {
-        // TODO: Move code from XImage to this class.
+        width.NotUsed();
+        height.NotUsed();
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="XBitmapImage"/> class.
-        /// </summary>
-        internal XBitmapImage(int width, int height)
-        {
-        }
+        // пустое тело конструктора
+    }
 
-        /// <summary>
-        /// Creates a default 24 bit ARGB bitmap with the specified pixel size.
-        /// </summary>
-        public static XBitmapSource CreateBitmap(int width, int height)
-        {
-            // Create a default 24 bit ARGB bitmap.
-            return new XBitmapImage(width, height);
-        }
+    /// <summary>
+    /// Creates a default 24 bit ARGB bitmap with the specified pixel size.
+    /// </summary>
+    public static XBitmapSource CreateBitmap (int width, int height)
+    {
+        // Create a default 24 bit ARGB bitmap.
+        return new XBitmapImage (width, height);
     }
 }

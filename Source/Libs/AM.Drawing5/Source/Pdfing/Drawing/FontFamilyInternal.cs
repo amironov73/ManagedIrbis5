@@ -15,6 +15,9 @@
 
 using System.Diagnostics;
 using System.Globalization;
+
+using AM;
+
 using PdfSharpCore.Internal;
 
 #endregion
@@ -40,6 +43,8 @@ internal class FontFamilyInternal
 
     FontFamilyInternal(string familyName, bool createPlatformObjects)
     {
+        createPlatformObjects.NotUsed();
+
         SourceName = Name = familyName;
     }
 
@@ -81,5 +86,5 @@ internal class FontFamilyInternal
     /// Gets the DebuggerDisplayAttribute text.
     /// </summary>
     // ReSha rper disable UnusedMember.Local
-    internal string DebuggerDisplay => string.Format(CultureInfo.InvariantCulture, "FontFamiliy: '{0}'", Name); // ReShar per restore UnusedMember.Local
+    internal string DebuggerDisplay => string.Format(CultureInfo.InvariantCulture, "FontFamily: '{0}'", Name); // ReShar per restore UnusedMember.Local
 }

@@ -11,14 +11,13 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-namespace PdfSharpCore.Drawing
+namespace PdfSharpCore.Drawing;
+
+/// <summary>
+/// Classes derived from this abstract base class define objects used to fill the
+/// interiors of paths.
+/// </summary>
+public abstract class XBrush
 {
-    /// <summary>
-    /// Classes derived from this abstract base class define objects used to fill the
-    /// interiors of paths.
-    /// </summary>
-    public abstract class XBrush
-    {
-        // пустое тело класса
-    }
+    // пустое тело класса
 }

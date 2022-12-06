@@ -3,6 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable EmptyConstructor
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
@@ -20,55 +21,56 @@ using System.IO;
 
 #nullable enable
 
-namespace PdfSharpCore.Drawing
+namespace PdfSharpCore.Drawing;
+
+/// <summary>
+/// Provides functionality to save a bitmap image in a specific format.
+/// </summary>
+public abstract class XBitmapEncoder
 {
-    /// <summary>
-    /// Provides functionality to save a bitmap image in a specific format.
-    /// </summary>
-    public abstract class XBitmapEncoder
+    internal XBitmapEncoder()
     {
-        internal XBitmapEncoder()
-        {
-            // Prevent external deriving.
-        }
+        // Prevent external deriving.
 
-        /// <summary>
-        /// Gets a new instance of the PNG image encoder.
-        /// </summary>
-        public static XBitmapEncoder GetPngEncoder()
-        {
-            return new XPngBitmapEncoder();
-        }
-
-        /// <summary>
-        /// Gets or sets the bitmap source to be encoded.
-        /// </summary>
-        public XBitmapSource Source
-        {
-            get { return _source; }
-            set { _source = value; }
-        }
-        XBitmapSource _source;
-
-        /// <summary>
-        /// When overridden in a derived class saves the image on the specified stream
-        /// in the respective format.
-        /// </summary>
-        public abstract void Save(Stream stream);
+        Source = null!;
     }
 
-    internal sealed class XPngBitmapEncoder : XBitmapEncoder
+    /// <summary>
+    /// Gets a new instance of the PNG image encoder.
+    /// </summary>
+    public static XBitmapEncoder GetPngEncoder()
     {
-        internal XPngBitmapEncoder()
-        { }
+        return new XPngBitmapEncoder();
+    }
 
-        /// <summary>
-        /// Saves the image on the specified stream in PNG format.
-        /// </summary>
-        public override void Save(Stream stream)
+    /// <summary>
+    /// Gets or sets the bitmap source to be encoded.
+    /// </summary>
+    public XBitmapSource Source { get; set; }
+
+    /// <summary>
+    /// When overridden in a derived class saves the image on the specified stream
+    /// in the respective format.
+    /// </summary>
+    public abstract void Save(Stream stream);
+}
+
+internal sealed class XPngBitmapEncoder
+    : XBitmapEncoder
+{
+    internal XPngBitmapEncoder()
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
+    /// Saves the image on the specified stream in PNG format.
+    /// </summary>
+    public override void Save(Stream stream)
+    {
+        if (Source is null)
         {
-            if (Source == null)
-                throw new InvalidOperationException("No image source.");
+            throw new InvalidOperationException("No image source.");
         }
     }
 }
