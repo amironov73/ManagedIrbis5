@@ -34,6 +34,7 @@
         <PackageReference Include="Avalonia.Controls.DataGrid" />
         <PackageReference Include="Avalonia.Desktop" />
         <PackageReference Include="Avalonia.Diagnostics" />
+        <PackageReference Include="Avalonia.Markup.Xaml.Loader" />
         <PackageReference Include="Avalonia.ReactiveUI" />
         <PackageReference Include="Avalonia.Xaml.Behaviors" />
         <PackageReference Include="Avalonia.Xaml.Interactions" />

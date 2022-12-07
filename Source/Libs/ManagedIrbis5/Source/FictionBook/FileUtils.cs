@@ -10,7 +10,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* FileUtils.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -45,17 +45,12 @@ internal sealed class FB2EncoderFallbackBuffer : EncoderFallbackBuffer
 
     int fallbackIndex = -1;
 
-    // Construction
-    public FB2EncoderFallbackBuffer()
-    {
-    }
-
     // Fallback Methods
     public override bool Fallback (char charUnknown, int index)
     {
         // If we had a buffer already we're being recursive, throw, it's probably at the suspect
         // character in our array.
-        if (this.fallbackCount >= 1)
+        if (fallbackCount >= 1)
 
             // Presumably you'd want a prettier exception:
         {
@@ -63,11 +58,11 @@ internal sealed class FB2EncoderFallbackBuffer : EncoderFallbackBuffer
         }
 
         // Go ahead and get our fallback
-        this.strFallback = string.Format ("&#{0};", (int)charUnknown);
-        this.fallbackCount = strFallback.Length;
-        this.fallbackIndex = -1;
+        strFallback = $"&#{(int)charUnknown};";
+        fallbackCount = strFallback.Length;
+        fallbackIndex = -1;
 
-        return this.fallbackCount != 0;
+        return fallbackCount != 0;
     }
 
     public override bool Fallback (char charUnknownHigh, char charUnknownLow, int index)
@@ -76,7 +71,7 @@ internal sealed class FB2EncoderFallbackBuffer : EncoderFallbackBuffer
 
         // If we had a buffer already we're being recursive, throw, it's probably at the suspect
         // character in our array.
-        if (this.fallbackCount >= 1)
+        if (fallbackCount >= 1)
 
             // Presumably you'd want a prettier exception:
         {
@@ -87,37 +82,37 @@ internal sealed class FB2EncoderFallbackBuffer : EncoderFallbackBuffer
         // Note that we're doing this 2X, once for each char.  That won't effect the
         // EncoderNumberFallback.MaxCharCount though because it is counting per char,
         // and although we're 2X that here, we also have 2x chars.
-        this.strFallback = string.Format ("&#{0};&#{1};", (int)charUnknownHigh, (int)charUnknownLow);
-        this.fallbackCount = strFallback.Length;
-        this.fallbackIndex = -1;
+        strFallback = $"&#{(int)charUnknownHigh};&#{(int)charUnknownLow};";
+        fallbackCount = strFallback.Length;
+        fallbackIndex = -1;
 
-        return this.fallbackCount != 0;
+        return fallbackCount != 0;
     }
 
     public override char GetNextChar()
     {
         // We want it to get < 0 because == 0 means that the current/last character is a fallback
         // and we need to detect recursion.  We could have a flag but we already have this counter.
-        this.fallbackCount--;
-        this.fallbackIndex++;
+        fallbackCount--;
+        fallbackIndex++;
 
         // Do we have anything left? 0 is now last fallback char, negative is nothing left
-        if (this.fallbackCount < 0)
+        if (fallbackCount < 0)
         {
             return (char)0;
         }
 
         // Need to get it out of the buffer.
-        return this.strFallback[this.fallbackIndex];
+        return strFallback[fallbackIndex];
     }
 
     public override bool MovePrevious()
     {
         // Back up one, only if we just processed the last character (or earlier)
-        if (this.fallbackCount >= -1 && this.fallbackIndex >= 0)
+        if (fallbackCount >= -1 && fallbackIndex >= 0)
         {
-            this.fallbackIndex--;
-            this.fallbackCount++;
+            fallbackIndex--;
+            fallbackCount++;
             return true;
         }
 
@@ -131,30 +126,29 @@ internal sealed class FB2EncoderFallbackBuffer : EncoderFallbackBuffer
         get
         {
             // Our count is 0 for 1 character left.
-            return (this.fallbackCount < 0) ? 0 : this.fallbackCount;
+            return (fallbackCount < 0) ? 0 : fallbackCount;
         }
     }
 
     #endregion
 }
 
-public class FBEncoderFallback : EncoderFallback
+/// <summary>
+///
+/// </summary>
+public class FBEncoderFallback
+    : EncoderFallback
 {
     #region FBEncoderFallback
 
+    /// <inheritdoc cref="EncoderFallback.CreateFallbackBuffer"/>
     public override EncoderFallbackBuffer CreateFallbackBuffer()
     {
         return new FB2EncoderFallbackBuffer();
     }
 
-    public override int MaxCharCount
-    {
-        get { return 8; }
-    }
-
-    public FBEncoderFallback()
-    {
-    }
+    /// <inheritdoc cref="EncoderFallback.MaxCharCount"/>
+    public override int MaxCharCount => 8;
 
     #endregion
 }
@@ -168,20 +162,20 @@ internal static class NativeMethods
     [StructLayout (LayoutKind.Sequential, CharSet = CharSet.Auto)]
     private struct WIN32_FIND_DATA
     {
-        public uint dwFileAttributes;
-        public System.Runtime.InteropServices.ComTypes.FILETIME ftCreationTime;
-        public System.Runtime.InteropServices.ComTypes.FILETIME ftLastAccessTime;
-        public System.Runtime.InteropServices.ComTypes.FILETIME ftLastWriteTime;
-        public uint nFileSizeHigh;
-        public uint nFileSizeLow;
-        public uint dwReserved0;
-        public uint dwReserved1;
+        private uint dwFileAttributes;
+        private System.Runtime.InteropServices.ComTypes.FILETIME ftCreationTime;
+        private System.Runtime.InteropServices.ComTypes.FILETIME ftLastAccessTime;
+        private System.Runtime.InteropServices.ComTypes.FILETIME ftLastWriteTime;
+        private uint nFileSizeHigh;
+        private uint nFileSizeLow;
+        private uint dwReserved0;
+        private uint dwReserved1;
 
         [MarshalAs (UnmanagedType.ByValTStr, SizeConst = 260)]
         public string cFileName;
 
         [MarshalAs (UnmanagedType.ByValTStr, SizeConst = 14)]
-        public string cAlternateFileName;
+        private string cAlternateFileName;
     }
 
     [DllImport ("kernel32.dll", CharSet = CharSet.Unicode, ThrowOnUnmappableChar = true)]
@@ -244,59 +238,206 @@ internal static class NativeMethods
     }
 }
 
+/// <summary>
+///
+/// </summary>
 public class FileProperties
 {
+    /// <summary>
+    ///
+    /// </summary>
     public bool AuthorFirstNameChange { get; set; }
-    public string AuthorFirstName { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public string? AuthorFirstName { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public bool AuthorLastNameChange { get; set; }
-    public string AuthorLastName { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public string? AuthorLastName { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public bool AuthorMiddleNameChange { get; set; }
-    public string AuthorMiddleName { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public string? AuthorMiddleName { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public bool GengeChange { get; set; }
-    public string Genre { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public string? Genre { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public bool SeriesChange { get; set; }
-    public string Series { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public string? Series { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public bool NumberChange { get; set; }
-    public string Number { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public string? Number { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public bool TitleChange { get; set; }
-    public string Title { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public string? Title { get; set; }
 }
 
+/// <summary>
+///
+/// </summary>
 public class FileOperationResult
 {
-    public string NewFullName { get; set; }
-    public string NewFileName { get; set; }
+    /// <summary>
+    ///
+    /// </summary>
+    public string? NewFullName { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public string? NewFileName { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public bool Skipped { get; set; }
 }
 
+/// <summary>
+///
+/// </summary>
 public enum DescriptionElements
 {
     #region DescriptionElements elements
 
+    /// <summary>
+    ///
+    /// </summary>
     Genre,
+
+    /// <summary>
+    ///
+    /// </summary>
     Title,
+
+    /// <summary>
+    ///
+    /// </summary>
     SequenceName,
+
+    /// <summary>
+    ///
+    /// </summary>
     SequenceNr,
+
+    /// <summary>
+    ///
+    /// </summary>
     Version,
 
+    /// <summary>
+    ///
+    /// </summary>
     AuthorFirstName,
+
+    /// <summary>
+    ///
+    /// </summary>
     AuthorMiddleName,
+
+    /// <summary>
+    ///
+    /// </summary>
     AuthorLastName,
+
+    /// <summary>
+    ///
+    /// </summary>
     AuthorFirstName1,
+
+    /// <summary>
+    ///
+    /// </summary>
     AuthorMiddleName1,
+
+    /// <summary>
+    ///
+    /// </summary>
     AuthorLastName1,
 
+    /// <summary>
+    ///
+    /// </summary>
     TranslatorFirstName,
+
+    /// <summary>
+    ///
+    /// </summary>
     TranslatorMiddleName,
+
+    /// <summary>
+    ///
+    /// </summary>
     TranslatorLastName,
+
+    /// <summary>
+    ///
+    /// </summary>
     TranslatorFirstName1,
+
+    /// <summary>
+    ///
+    /// </summary>
     TranslatorMiddleName1,
+
+    /// <summary>
+    ///
+    /// </summary>
     TranslatorLastName1,
+
+    /// <summary>
+    ///
+    /// </summary>
     Lang
 
     #endregion
 }
 
+/// <summary>
+///
+/// </summary>
 public class FileMetadata
 {
     #region Private
@@ -334,11 +475,18 @@ public class FileMetadata
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="description"></param>
     protected void SetDescription (string description)
     {
         _description = description;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected virtual void InternalInitialize()
     {
         if (_initialized)
@@ -348,21 +496,34 @@ public class FileMetadata
 
         _initialized = true;
         var elements = Enum.GetValues (typeof (DescriptionElements)) as DescriptionElements[];
-        foreach (var element in elements)
+        foreach (var element in elements!)
         {
             AddMetadata (element, string.Empty);
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="description"></param>
     protected virtual void InternalParseDescription (string description)
     {
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="description"></param>
     protected void ParseDescription (string description)
     {
         InternalParseDescription (description);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="part"></param>
+    /// <returns></returns>
     protected virtual bool CheckRequiredAttribute (string part)
     {
         foreach (var item in Metadata)
@@ -380,6 +541,11 @@ public class FileMetadata
         return true;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="s"></param>
+    /// <returns></returns>
     protected string NormalizeString (string s)
     {
         if (string.IsNullOrEmpty (s))
@@ -392,18 +558,29 @@ public class FileMetadata
         return new string (a);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="key"></param>
+    /// <param name="index"></param>
+    /// <param name="value"></param>
     public void AddMetadata (DescriptionElements key, int index, string value)
     {
         var name = Enum.GetName (typeof (DescriptionElements), key);
         if (index == 0)
         {
-            InternalAddMetadata (name, value);
+            InternalAddMetadata (name!, value);
         }
 
         name = name + Convert.ToString (index + 1);
         InternalAddMetadata (name, value);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="key"></param>
+    /// <param name="value"></param>
     public void AddMetadata (DescriptionElements key, string value)
     {
         var name = Enum.GetName (typeof (DescriptionElements), key);
@@ -718,17 +895,17 @@ public class FB2File : IComparable
             throw new InvalidCastException();
         }
 
-        var result = string.Compare (this.BookAuthorLastName, fc.BookAuthorLastName,
+        var result = string.Compare (BookAuthorLastName, fc.BookAuthorLastName,
             StringComparison.InvariantCultureIgnoreCase);
         if (result == 0)
         {
-            result = string.Compare (this.BookAuthorFirstName, fc.BookAuthorFirstName,
+            result = string.Compare (BookAuthorFirstName, fc.BookAuthorFirstName,
                 StringComparison.InvariantCultureIgnoreCase);
         }
 
         if (result == 0)
         {
-            result = string.Compare (this.BookSequenceName, fc.BookSequenceName,
+            result = string.Compare (BookSequenceName, fc.BookSequenceName,
                 StringComparison.InvariantCultureIgnoreCase);
         }
 
@@ -739,7 +916,7 @@ public class FB2File : IComparable
 
         if (result == 0)
         {
-            result = string.Compare (this.BookTitle, fc.BookTitle, StringComparison.InvariantCultureIgnoreCase);
+            result = string.Compare (BookTitle, fc.BookTitle, StringComparison.InvariantCultureIgnoreCase);
         }
 
         return result;
@@ -832,7 +1009,7 @@ public class FB2File : IComparable
             var zipEncoding = Encoding.GetEncoding (FB2Config.Current.Encodings.CompressionEncoding);
             var options = new ReadOptions();
             options.Encoding = zipEncoding;
-            using (var zip = Ionic.Zip.ZipFile.Read (fileName, options))
+            using (var zip = ZipFile.Read (fileName, options))
             {
                 if (zip.Count <= 0)
                 {
@@ -1174,9 +1351,9 @@ public class FB2File : IComparable
             var zipEncoding = Encoding.GetEncoding (FB2Config.Current.Encodings.CompressionEncoding);
             var options = new ReadOptions();
             options.Encoding = zipEncoding;
-            using (Ionic.Zip.ZipFile zip = Ionic.Zip.ZipFile.Read (FileInformation.FullName, options))
+            using (ZipFile zip = ZipFile.Read (FileInformation.FullName, options))
             {
-                zip[0].Extract (FileInformation.Directory.FullName, ExtractExistingFileAction.Throw);
+                zip[0].Extract (FileInformation.Directory!.FullName, ExtractExistingFileAction.Throw);
                 fileName = Path.Combine (FileInformation.Directory.FullName, zip[0].FileName);
             }
 
@@ -1350,7 +1527,7 @@ public class FB2File : IComparable
             fileName = fileName.Substring (0, fileName.Length - FB2Config.Current.FB2Extension.Length) +
                        FB2Config.Current.FB2ZIPExtension;
             var zipEncoding = Encoding.GetEncoding (FB2Config.Current.Encodings.CompressionEncoding);
-            using (Ionic.Zip.ZipFile zip = new Ionic.Zip.ZipFile (fileName, zipEncoding))
+            using (ZipFile zip = new ZipFile (fileName, zipEncoding))
             {
                 zip.AddFile (FileInformation.FullName, string.Empty);
                 zip.Save();
@@ -1556,12 +1733,12 @@ public class FB2File : IComparable
             var zipEncoding = Encoding.GetEncoding (FB2Config.Current.Encodings.CompressionEncoding);
             var options = new ReadOptions();
             options.Encoding = zipEncoding;
-            using (Ionic.Zip.ZipFile zip = Ionic.Zip.ZipFile.Read (FileInformation.FullName, options))
+            using (ZipFile zip = ZipFile.Read (FileInformation.FullName, options))
             {
                 inZipFileName = zip[0].FileName;
             }
 
-            using (Ionic.Zip.ZipFile zip = new Ionic.Zip.ZipFile (zipEncoding))
+            using (ZipFile zip = new ZipFile (zipEncoding))
             {
                 var memStream = new MemoryStream();
                 var writer = new XmlTextWriter (memStream, Encoding.GetEncoding (BookInternalEncoding));
@@ -1618,12 +1795,12 @@ public class FB2File : IComparable
             var zipEncoding = Encoding.GetEncoding (FB2Config.Current.Encodings.CompressionEncoding);
             var options = new ReadOptions();
             options.Encoding = zipEncoding;
-            using (Ionic.Zip.ZipFile zip = Ionic.Zip.ZipFile.Read (FileInformation.FullName, options))
+            using (ZipFile zip = ZipFile.Read (FileInformation.FullName, options))
             {
                 inZipFileName = zip[0].FileName;
             }
 
-            using (Ionic.Zip.ZipFile zip = new Ionic.Zip.ZipFile (zipEncoding))
+            using (ZipFile zip = new ZipFile (zipEncoding))
             {
                 var memStream = new MemoryStream();
                 var writer = new XmlTextWriter (memStream, enc);

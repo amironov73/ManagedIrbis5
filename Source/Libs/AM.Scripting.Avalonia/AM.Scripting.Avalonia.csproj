@@ -27,12 +27,13 @@
         <ProjectReference Include="..\AM.Scripting\AM.Scripting.csproj" />
     </ItemGroup>
 
-    <!-- Öåíòðàëèçîâàííîå óïðàâëåíèå ïàêåòàìè -->
+    <!-- Ð¦ÐµÐ½Ñ‚Ñ€Ð°Ð»Ð¸Ð·Ð¾Ð²Ð°Ð½Ð½Ð¾Ðµ ÑƒÐ¿Ñ€Ð°Ð²Ð»ÐµÐ½Ð¸Ðµ Ð¿Ð°ÐºÐµÑ‚Ð°Ð¼Ð¸ -->
     <ItemGroup>
         <PackageReference Include="Avalonia" />
         <PackageReference Include="Avalonia.Controls.DataGrid" />
         <PackageReference Include="Avalonia.Desktop" />
         <PackageReference Include="Avalonia.Diagnostics" />
+        <PackageReference Include="Avalonia.Markup.Xaml.Loader" />
         <PackageReference Include="Avalonia.ReactiveUI" />
         <PackageReference Include="Avalonia.ThemeManager" />
         <PackageReference Include="Avalonia.Themes.Fluent" />
