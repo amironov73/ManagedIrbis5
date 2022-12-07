@@ -6,6 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedMember.Global
 
 /* Verbs.cs -- глаголы
  * Ars Magna project, http://arsmagna.ru
@@ -36,7 +37,11 @@ public static class Verbs
     private static readonly List<VerbRaw> items = new ();
     internal static readonly Schemas schemas = new ();
     private static readonly List<Pair> imperfectToPerfect = new ();
-    public static event EventHandler<CustomWordsNeededEventArgs> CustomWordsNeeded;
+
+    /// <summary>
+    ///
+    /// </summary>
+    public static event EventHandler<CustomWordsNeededEventArgs>? CustomWordsNeeded;
     private static bool Initialized;
 
     private static Predicate<VerbRaw> PrepareFilter
@@ -101,7 +106,7 @@ public static class Verbs
     /// <summary>
     /// Глагол 'быть'
     /// </summary>
-    public static Verb ToBe { get; private set; }
+    public static Verb? ToBe { get; private set; }
 
     /// <summary>
     /// Инициализация словаря.
@@ -122,7 +127,7 @@ public static class Verbs
         var resourceName = "AM.Linguistics.Dict.verb.bin";
 
         using (var stream = assembly.GetManifestResourceStream (resourceName))
-        using (var zip = new GZipStream (stream, CompressionMode.Decompress))
+        using (var zip = new GZipStream (stream!, CompressionMode.Decompress))
         using (var reader = new StreamReader (zip, Utility.Windows1251))
         {
             while (!reader.EndOfStream)
@@ -144,6 +149,7 @@ public static class Verbs
             var comparer = new StringReverseComparer<VerbRaw>();
 
             foreach (var line in ea.CustomWords)
+            {
                 if (!string.IsNullOrEmpty (line))
                 {
                     var v = ParseVerb (line);
@@ -159,6 +165,7 @@ public static class Verbs
                         items.Insert (i, v);
                     }
                 }
+            }
         }
 
         schemas.EndInit();
@@ -167,7 +174,7 @@ public static class Verbs
         resourceName = "AM.Linguistics.Dict.imperfect.bin";
 
         using (var stream = assembly.GetManifestResourceStream (resourceName))
-        using (var zip = new GZipStream (stream, CompressionMode.Decompress))
+        using (var zip = new GZipStream (stream!, CompressionMode.Decompress))
         using (var sr = new StreamReader (zip, Encoding.GetEncoding (1251)))
             while (sr.Peek() >= 0)
             {
@@ -186,7 +193,7 @@ public static class Verbs
     /// <summary>
     /// Поиск по точному или приблизительному совпадению
     /// </summary>
-    public static Verb FindSimilar
+    public static Verb? FindSimilar
         (
             string sourceForm,
             VerbAspect aspect = VerbAspect.Undefined
@@ -213,14 +220,17 @@ public static class Verbs
     /// <summary>
     /// Поиск по точному или приблизительному совпадению
     /// </summary>
-    public static Verb FindSimilar (string sourceForm, Predicate<Verb> filter)
+    public static Verb? FindSimilar (string sourceForm, Predicate<Verb> filter)
     {
         var searchWord = PrepareWord (sourceForm);
 
         var res = items.FindSimilar (new VerbRaw() { Word = searchWord }, new StringReverseComparer<VerbRaw>(),
-            item => filter (new Verb (item, item.Word)));
+            item => filter (new Verb (item, item.Word!)));
         if (res.Word == null)
+        {
             return null;
+        }
+
         return new Verb
             { Word = sourceForm, SchemaIndex = res.SchemaIndex, Aspect = res.Aspect, Inexact = res.Word != searchWord };
     }
@@ -228,14 +238,17 @@ public static class Verbs
     /// <summary>
     /// Поиск одного точного совпадения. Null - если не найдено.
     /// </summary>
-    public static Verb FindOne (string sourceForm, VerbAspect aspect = VerbAspect.Undefined)
+    public static Verb? FindOne (string sourceForm, VerbAspect aspect = VerbAspect.Undefined)
     {
         var searchWord = PrepareWord (sourceForm);
 
         var res = items.FindOne (new VerbRaw() { Word = searchWord }, new StringReverseComparer<VerbRaw>(),
             PrepareFilter (aspect));
         if (res.Word == null)
+        {
             return null;
+        }
+
         return new Verb (res, sourceForm);
     }
 
@@ -247,9 +260,16 @@ public static class Verbs
         var searchWord = PrepareWord (sourceForm);
 
         foreach (var res in items.FindAll (new VerbRaw() { Word = searchWord }, new StringReverseComparer<VerbRaw>()))
+        {
             yield return new Verb (res, sourceForm);
+        }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="sourceFormImperfect"></param>
+    /// <returns></returns>
     public static IEnumerable<Verb> FindPerfects (string sourceFormImperfect)
     {
         var searchWord = PrepareWord (sourceFormImperfect);
@@ -265,7 +285,10 @@ public static class Verbs
             {
                 var perf = imperfectToPerfect[i].Item2;
                 foreach (var res in FindAll (perf.ToUpper (sourceFormImperfect)))
+                {
                     yield return res;
+                }
+
                 i++;
             }
         }
@@ -279,28 +302,37 @@ public static class Verbs
         Init();
         foreach (var raw in items)
         {
-            yield return new Verb (raw, raw.Word);
+            yield return new Verb (raw, raw.Word!);
         }
     }
 
     #endregion
 }
 
+/// <summary>
+///
+/// </summary>
 public class CustomWordsNeededEventArgs
     : EventArgs
 {
-    public List<string> CustomWords { get; set; }
+    /// <summary>
+    ///
+    /// </summary>
+    public List<string>? CustomWords { get; set; }
 }
 
+/// <summary>
+///
+/// </summary>
 internal struct VerbRaw
 {
-    public string Word;
+    public string? Word;
     public int SchemaIndex;
     public VerbAspect Aspect;
 
     public override string ToString()
     {
-        return Word;
+        return Word.ToVisibleString();
     }
 }
 
@@ -340,15 +372,10 @@ public class Verb
     /// <summary>
     /// Транзитивность глагола
     /// </summary>
-    public VerbTransition Transition
-    {
-        get
-        {
-            return this[Voice.Passive, Person.First, Number.Singular] == null
-                ? VerbTransition.Intransitive
-                : VerbTransition.Transitive;
-        }
-    }
+    public VerbTransition Transition =>
+        this[Voice.Passive, Person.First, Number.Singular] == null!
+            ? VerbTransition.Intransitive
+            : VerbTransition.Transitive;
 
     internal Verb (VerbRaw raw, string word)
     {
@@ -360,8 +387,12 @@ public class Verb
         }
     }
 
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
     public Verb()
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -418,7 +449,12 @@ public class Verb
     /// <summary>
     /// Будущее время глагола - со вспомогательным словом (спряжение по залогу, лицу и числу)
     /// </summary>
-    public string Future (Voice voice, Person person, Number number)
+    public string? Future
+        (
+            Voice voice,
+            Person person,
+            Number number
+        )
     {
         switch (Aspect)
         {
@@ -426,9 +462,13 @@ public class Verb
             case VerbAspect.Imperfect:
             case VerbAspect.PerfectImperfect:
                 if (Transition == VerbTransition.Transitive || voice == Voice.Active)
-                    return Verbs.ToBe[Voice.Active, person, number].ToUpper (Word) + " " + Infinitive (voice).ToLower();
+                {
+                    return Verbs.ToBe![Voice.Active, person, number].ToUpper (Word) + " " + Infinitive (voice)!.ToLower();
+                }
                 else
+                {
                     return null;
+                }
         }
 
         return null;
@@ -437,7 +477,7 @@ public class Verb
     /// <summary>
     /// Будущее время глагола - в виде глагла совершенного вида (спряжение по залогу, лицу и числу)
     /// </summary>
-    public string FuturePerfect (Voice voice, Person person, Number number)
+    public string? FuturePerfect (Voice voice, Person person, Number number)
     {
         switch (Aspect)
         {
@@ -446,10 +486,7 @@ public class Verb
             case VerbAspect.PerfectImperfect:
             {
                 var perf = Perfect (voice);
-                if (perf != null)
-                    return perf[voice, person, number];
-                else
-                    return null;
+                return perf != null ? perf[voice, person, number] : null;
             }
         }
 
@@ -459,16 +496,14 @@ public class Verb
     /// <summary>
     /// Неопределенная форма (по залогу)
     /// </summary>
-    public string Infinitive (Voice voice)
+    public string? Infinitive (Voice voice)
     {
-        switch (voice)
+        return voice switch
         {
-            case Voice.Active: return Word;
-            case Voice.Passive:
-                return Transition == VerbTransition.Transitive ? Word + "ся" : null;
-            default:
-                return null;
-        }
+            Voice.Active => Word,
+            Voice.Passive => Transition == VerbTransition.Transitive ? Word + "ся" : null,
+            _ => null
+        };
     }
 
     /// <summary>
@@ -488,10 +523,12 @@ public class Verb
     /// <summary>
     /// Совершенная форма глагола
     /// </summary>
-    public Verb Perfect (Voice voice)
+    public Verb? Perfect (Voice voice)
     {
         foreach (var perf in Perfects (voice))
+        {
             return perf;
+        }
 
         return null;
     }
@@ -502,13 +539,19 @@ public class Verb
     public IEnumerable<Verb> Perfects (Voice voice)
     {
         if (Aspect == VerbAspect.Perfect)
+        {
             yield return this;
+        }
         else
         {
             var word = Infinitive (voice);
             if (word != null)
+            {
                 foreach (var res in Verbs.FindPerfects (word))
+                {
                     yield return res;
+                }
+            }
         }
     }
 }

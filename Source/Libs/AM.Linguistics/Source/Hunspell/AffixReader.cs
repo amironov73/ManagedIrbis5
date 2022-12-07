@@ -17,7 +17,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -104,8 +103,10 @@ public sealed class AffixReader
 
     private async Task ReadToEndAsync()
     {
-        string line;
-        while ((line = await Reader.ReadLineAsync().ConfigureAwait (false)) != null) ParseLine (line);
+        while (await Reader.ReadLineAsync().ConfigureAwait (false) is { } line)
+        {
+            ParseLine (line);
+        }
     }
 
     private async Task ReadAsync()
@@ -138,8 +139,10 @@ public sealed class AffixReader
 
     private void ReadToEnd()
     {
-        string line;
-        while ((line = Reader.ReadLine()) != null) ParseLine (line);
+        while (Reader.ReadLine() is { } line)
+        {
+            ParseLine (line);
+        }
     }
 
     private void Read()
@@ -249,7 +252,7 @@ public sealed class AffixReader
         var commandStartIndex = 0;
         for (; commandStartIndex < line.Length && line[commandStartIndex].IsTabOrSpace(); commandStartIndex++)
         {
-            Debug.WriteLine ("Empty control statement body");
+            // пустое тело цикла
         }
 
         if (commandStartIndex == line.Length || IsCommentPrefix (line[commandStartIndex]))
@@ -261,14 +264,14 @@ public sealed class AffixReader
         var lineEndIndex = line.Length - 1;
         for (; lineEndIndex > commandStartIndex && line[lineEndIndex].IsTabOrSpace(); lineEndIndex--)
         {
-            Debug.WriteLine ("Empty control statement body");
+            // пустое тело цикла
         }
 
         // find the end of the command
         var commandEndIndex = commandStartIndex;
         for (; commandEndIndex <= lineEndIndex && !line[commandEndIndex].IsTabOrSpace(); commandEndIndex++)
         {
-            Debug.WriteLine ("Empty control statement body");
+            // пустое тело цикла
         }
 
         // first command exists between [lineStartIndex,commandEndIndex)
@@ -278,7 +281,7 @@ public sealed class AffixReader
                 parameterStartIndex++
             )
         {
-            Debug.WriteLine ("Empty operator");
+            // пустое тело цикла
         }
 
         var command = line.AsSpan (commandStartIndex, commandEndIndex - commandStartIndex);
@@ -478,8 +481,8 @@ public sealed class AffixReader
                 }
 
                 return parseAsPrefix
-                    ? TryParseAffixIntoList (parameters, ref Builder.Prefixes)
-                    : TryParseAffixIntoList (parameters, ref Builder.Suffixes);
+                    ? TryParseAffixIntoList (parameters, ref Builder.Prefixes!)
+                    : TryParseAffixIntoList (parameters, ref Builder.Suffixes!);
             case AffixReaderCommandKind.AliasF:
                 return TryParseStandardListItem (EntryListType.AliasF, parameters, ref Builder.AliasF!,
                     TryParseAliasF);
@@ -1287,7 +1290,7 @@ public sealed class AffixReader
         var firstNonDigitIndex = 0;
         for (; firstNonDigitIndex < text.Length && char.IsDigit (text[firstNonDigitIndex]); firstNonDigitIndex++)
         {
-            Debug.WriteLine ("Empty control statement body");
+            // пустое тело цикла
         }
 
         return firstNonDigitIndex < text.Length

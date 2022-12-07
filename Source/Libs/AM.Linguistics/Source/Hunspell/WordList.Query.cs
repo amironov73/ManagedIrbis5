@@ -536,7 +536,7 @@ public partial class WordList
                                     scpd++
                                 )
                             {
-                                Debug.WriteLine ("Empty operator");
+                                // пустое тело цикла
                             }
 
                             if (scpd > Affix.CompoundPatterns.Count)

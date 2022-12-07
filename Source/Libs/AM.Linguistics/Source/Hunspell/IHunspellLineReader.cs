@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 
-/* .cs --
+/* IHunspellLineReader.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -33,13 +33,13 @@ public interface IHunspellLineReader
     /// Reads the next line from a stream.
     /// </summary>
     /// <returns>A task that represents the asynchronous read operation. The reult value will contain the contents of the next line as a string or the value <c>null</c> indicating there are no more lines to be read.</returns>
-    Task<string> ReadLineAsync();
+    Task<string?> ReadLineAsync();
 
     /// <summary>
     /// Reads the next line from a stream.
     /// </summary>
     /// <returns></returns>
-    string ReadLine();
+    string? ReadLine();
 
     /// <summary>
     /// Gets the current encoding that the reader is using to decode text.
@@ -47,25 +47,50 @@ public interface IHunspellLineReader
     Encoding CurrentEncoding { get; }
 }
 
+/// <summary>
+///
+/// </summary>
 public static class HunspellLineReaderExtensions
 {
-    public static async Task<IEnumerable<string>> ReadLinesAsync (this IHunspellLineReader reader)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="reader"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    public static async Task<IEnumerable<string>> ReadLinesAsync
+        (
+            this IHunspellLineReader reader
+        )
     {
-        if (reader == null) throw new ArgumentNullException (nameof (reader));
+        Sure.NotNull (reader);
 
         var lines = new List<string>();
 
-        string line;
-        while ((line = await reader.ReadLineAsync().ConfigureAwait (false)) != null) lines.Add (line);
+        while (await reader.ReadLineAsync().ConfigureAwait (false) is { } line)
+        {
+            lines.Add (line);
+        }
 
         return lines;
     }
 
-    public static IEnumerable<string> ReadLines (this IHunspellLineReader reader)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="reader"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    public static IEnumerable<string> ReadLines
+        (
+            this IHunspellLineReader reader
+        )
     {
-        if (reader == null) throw new ArgumentNullException (nameof (reader));
+        Sure.NotNull (reader);
 
-        string line;
-        while ((line = reader.ReadLine()) != null) yield return line;
+        while (reader.ReadLine() is { } line)
+        {
+            yield return line;
+        }
     }
 }

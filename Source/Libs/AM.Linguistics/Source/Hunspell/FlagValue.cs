@@ -6,8 +6,9 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedMember.Global
 
-/* .cs --
+/* FlagValue.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,262 +20,285 @@ using System.Globalization;
 
 using AM.Linguistics.Hunspell.Infrastructure;
 
-#if !NO_INLINE
-using System.Runtime.CompilerServices;
-#endif
-
 #endregion
 
 #nullable enable
 
-namespace AM.Linguistics.Hunspell
+namespace AM.Linguistics.Hunspell;
+
+/// <summary>
+///
+/// </summary>
+public readonly struct FlagValue
+    : IEquatable<FlagValue>,
+    IEquatable<int>,
+    IEquatable<char>,
+    IComparable<FlagValue>,
+    IComparable<int>,
+    IComparable<char>
 {
-    public readonly struct FlagValue :
-        IEquatable<FlagValue>,
-        IEquatable<int>,
-        IEquatable<char>,
-        IComparable<FlagValue>,
-        IComparable<int>,
-        IComparable<char>
+    private const char ZeroValue = '\0';
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="flag"></param>
+    /// <returns></returns>
+    public static implicit operator int (FlagValue flag) => flag.value;
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="flag"></param>
+    /// <returns></returns>
+    public static implicit operator char (FlagValue flag) => flag.value;
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
+    public static bool operator != (FlagValue a, FlagValue b) => a.value != b.value;
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
+    public static bool operator == (FlagValue a, FlagValue b) => a.value == b.value;
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
+    public static bool operator >= (FlagValue a, FlagValue b) => a.value >= b.value;
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
+    public static bool operator <= (FlagValue a, FlagValue b) => a.value <= b.value;
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
+    public static bool operator > (FlagValue a, FlagValue b) => a.value > b.value;
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
+    public static bool operator < (FlagValue a, FlagValue b) => a.value < b.value;
+
+    internal static FlagValue Create (char high, char low) => new (unchecked ((char)((high << 8) | low)));
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="text"></param>
+    /// <param name="mode"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static bool TryParseFlag (string text, FlagMode mode, out FlagValue value) =>
+        TryParseFlag (text.AsSpan(), mode, out value);
+
+    internal static bool TryParseFlag (ReadOnlySpan<char> text, FlagMode mode, out FlagValue value)
     {
-        private const char ZeroValue = '\0';
-
-#if !NO_INLINE
-        [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
-        public static implicit operator int (FlagValue flag) => flag.value;
-
-#if !NO_INLINE
-        [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
-        public static implicit operator char (FlagValue flag) => flag.value;
-
-#if !NO_INLINE
-        [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
-        public static bool operator != (FlagValue a, FlagValue b) => a.value != b.value;
-
-#if !NO_INLINE
-        [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
-        public static bool operator == (FlagValue a, FlagValue b) => a.value == b.value;
-
-#if !NO_INLINE
-        [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
-        public static bool operator >= (FlagValue a, FlagValue b) => a.value >= b.value;
-
-#if !NO_INLINE
-        [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
-        public static bool operator <= (FlagValue a, FlagValue b) => a.value <= b.value;
-
-#if !NO_INLINE
-        [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
-        public static bool operator > (FlagValue a, FlagValue b) => a.value > b.value;
-
-#if !NO_INLINE
-        [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
-        public static bool operator < (FlagValue a, FlagValue b) => a.value < b.value;
-
-#if !NO_INLINE
-        [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
-        internal static FlagValue Create (char high, char low) => new (unchecked ((char)((high << 8) | low)));
-
-#if !NO_INLINE
-        [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
-        public static bool TryParseFlag (string text, FlagMode mode, out FlagValue value) =>
-            TryParseFlag (text.AsSpan(), mode, out value);
-
-        internal static bool TryParseFlag (ReadOnlySpan<char> text, FlagMode mode, out FlagValue value)
+        if (text.IsEmpty)
         {
-            if (text.IsEmpty)
-            {
-                value = default;
-                return false;
-            }
-
-            switch (mode)
-            {
-                case FlagMode.Char:
-                    value = new FlagValue (text[0]);
-                    return true;
-                case FlagMode.Long:
-                    var a = text[0];
-                    value = text.Length >= 2
-                        ? Create (a, text[1])
-                        : new FlagValue (a);
-                    return true;
-                case FlagMode.Num:
-                    return TryParseNumberFlag (text, out value);
-                case FlagMode.Uni:
-                default:
-                    throw new NotSupportedException();
-            }
-        }
-
-        private static bool TryParseNumberFlag (ReadOnlySpan<char> text, out FlagValue value)
-        {
-            if (!text.IsEmpty && IntEx.TryParseInvariant (text, out var integerValue) &&
-                integerValue >= char.MinValue && integerValue <= char.MaxValue)
-            {
-                value = new FlagValue (unchecked ((char)integerValue));
-                return true;
-            }
-
             value = default;
             return false;
         }
 
-        internal static FlagValue[] ParseFlagsInOrder (ReadOnlySpan<char> text, FlagMode mode)
+        switch (mode)
         {
-            switch (mode)
-            {
-                case FlagMode.Char: return text.IsEmpty ? Array.Empty<FlagValue>() : ConvertCharsToFlagsInOrder (text);
-                case FlagMode.Long: return ParseLongFlagsInOrder (text);
-                case FlagMode.Num: return ParseNumberFlagsInOrder (text).ToArray();
-                default: throw new NotSupportedException();
-            }
-        }
-
-        public static FlagSet ParseFlags (string text, FlagMode mode)
-        {
-            return ParseFlags (text.AsSpan(), mode);
-        }
-
-#if !NO_INLINE
-        [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
-        internal static FlagSet ParseFlags (ReadOnlySpan<char> text, FlagMode mode) =>
-            FlagSet.TakeArray (ParseFlagsInOrder (text, mode));
-
-        private static FlagValue[] ParseLongFlagsInOrder (ReadOnlySpan<char> text)
-        {
-            if (text.IsEmpty) return Array.Empty<FlagValue>();
-
-            var flags = new FlagValue[(text.Length + 1) / 2];
-            var flagWriteIndex = 0;
-            var lastIndex = text.Length - 1;
-            for (var i = 0; i < lastIndex; i += 2, flagWriteIndex++)
-                flags[flagWriteIndex] = Create (text[i], text[i + 1]);
-
-            if (flagWriteIndex < flags.Length) flags[flagWriteIndex] = new FlagValue (text[lastIndex]);
-
-            return flags;
-        }
-
-        private static List<FlagValue> ParseNumberFlagsInOrder (ReadOnlySpan<char> text)
-        {
-            if (text.IsEmpty) return new List<FlagValue> (0);
-
-            var flags = new List<FlagValue>();
-            text.Split (',', (part, _) =>
-            {
-                if (TryParseNumberFlag (part, out var value)) flags.Add (value);
-
+            case FlagMode.Char:
+                value = new FlagValue (text[0]);
                 return true;
-            });
 
-            return flags;
+            case FlagMode.Long:
+                var a = text[0];
+                value = text.Length >= 2
+                    ? Create (a, text[1])
+                    : new FlagValue (a);
+                return true;
+
+            case FlagMode.Num:
+                return TryParseNumberFlag (text, out value);
+
+            case FlagMode.Uni:
+            default:
+                throw new NotSupportedException();
         }
+    }
 
-        private static FlagValue[] ConvertCharsToFlagsInOrder (ReadOnlySpan<char> text)
+    private static bool TryParseNumberFlag (ReadOnlySpan<char> text, out FlagValue value)
+    {
+        if (!text.IsEmpty && IntEx.TryParseInvariant (text, out var integerValue) &&
+            integerValue is >= char.MinValue and <= char.MaxValue)
         {
-            var values = new FlagValue[text.Length];
-            for (var i = 0; i < values.Length; i++) values[i] = new FlagValue (text[i]);
-
-            return values;
+            value = new FlagValue (unchecked ((char)integerValue));
+            return true;
         }
 
-#if !NO_INLINE
-        [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
-        public FlagValue (char value) =>
-            this.value = value;
+        value = default;
+        return false;
+    }
 
-#if !NO_INLINE
-        [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
-        public FlagValue (int value) =>
-            this.value = checked ((char)value);
-
-        private readonly char value;
-
-        public bool HasValue
+    internal static FlagValue[] ParseFlagsInOrder (ReadOnlySpan<char> text, FlagMode mode)
+    {
+        return mode switch
         {
-#if !NO_INLINE
-            [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
-            get => value != ZeroValue;
-        }
+            FlagMode.Char => text.IsEmpty ? Array.Empty<FlagValue>() : ConvertCharsToFlagsInOrder (text),
+            FlagMode.Long => ParseLongFlagsInOrder (text),
+            FlagMode.Num => ParseNumberFlagsInOrder (text).ToArray(),
+            _ => throw new NotSupportedException()
+        };
+    }
 
-        public bool IsZero
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="text"></param>
+    /// <param name="mode"></param>
+    /// <returns></returns>
+    public static FlagSet ParseFlags (string text, FlagMode mode)
+    {
+        return ParseFlags (text.AsSpan(), mode);
+    }
+
+    internal static FlagSet ParseFlags (ReadOnlySpan<char> text, FlagMode mode) =>
+        FlagSet.TakeArray (ParseFlagsInOrder (text, mode));
+
+    private static FlagValue[] ParseLongFlagsInOrder (ReadOnlySpan<char> text)
+    {
+        if (text.IsEmpty) return Array.Empty<FlagValue>();
+
+        var flags = new FlagValue[(text.Length + 1) / 2];
+        var flagWriteIndex = 0;
+        var lastIndex = text.Length - 1;
+        for (var i = 0; i < lastIndex; i += 2, flagWriteIndex++)
+            flags[flagWriteIndex] = Create (text[i], text[i + 1]);
+
+        if (flagWriteIndex < flags.Length) flags[flagWriteIndex] = new FlagValue (text[lastIndex]);
+
+        return flags;
+    }
+
+    private static List<FlagValue> ParseNumberFlagsInOrder (ReadOnlySpan<char> text)
+    {
+        if (text.IsEmpty) return new List<FlagValue> (0);
+
+        var flags = new List<FlagValue>();
+        text.Split (',', (part, _) =>
         {
-#if !NO_INLINE
-            [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
-            get => value == ZeroValue;
-        }
+            if (TryParseNumberFlag (part, out var value)) flags.Add (value);
 
-        public bool IsWildcard
+            return true;
+        });
+
+        return flags;
+    }
+
+    private static FlagValue[] ConvertCharsToFlagsInOrder (ReadOnlySpan<char> text)
+    {
+        var values = new FlagValue[text.Length];
+        for (var i = 0; i < values.Length; i++) values[i] = new FlagValue (text[i]);
+
+        return values;
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="value"></param>
+    public FlagValue (char value) => this.value = value;
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="value"></param>
+    public FlagValue (int value) => this.value = checked ((char)value);
+
+    private readonly char value;
+
+    /// <summary>
+    ///
+    /// </summary>
+    public bool HasValue => value != ZeroValue;
+
+    /// <summary>
+    ///
+    /// </summary>
+    public bool IsZero => value == ZeroValue;
+
+    /// <summary>
+    ///
+    /// </summary>
+    public bool IsWildcard => value is '*' or '?';
+
+    /// <inheritdoc cref="IEquatable{T}.Equals(T?)"/>
+    public bool Equals (FlagValue other) => other.value == value;
+
+    /// <inheritdoc cref="IEquatable{T}.Equals(T?)"/>
+    public bool Equals (int other) => other == value;
+
+    /// <inheritdoc cref="IEquatable{T}.Equals(T?)"/>
+    public bool Equals (char other) => other == value;
+
+    /// <inheritdoc cref="ValueType.Equals(object?)"/>
+    public override bool Equals
+        (
+            object? obj
+        )
+    {
+        return obj switch
         {
-#if !NO_INLINE
-            [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
-            get => value == '*' || value == '?';
-        }
+            FlagValue flagValue => Equals (flagValue),
+            int intValue => Equals (intValue),
+            char charValue => Equals (charValue),
+            _ => false
+        };
+    }
 
-#if !NO_INLINE
-        [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
-        public bool Equals (FlagValue other) => other.value == value;
+    /// <inheritdoc cref="ValueType.GetHashCode"/>
+    public override int GetHashCode()
+    {
+        return value.GetHashCode();
+    }
 
-#if !NO_INLINE
-        [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
-        public bool Equals (int other) => other == value;
+    /// <inheritdoc cref="IComparable{T}.CompareTo"/>
+    public int CompareTo (FlagValue other)
+    {
+        return value.CompareTo (other.value);
+    }
 
-#if !NO_INLINE
-        [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
-        public bool Equals (char other) => other == value;
+    /// <inheritdoc cref="IComparable{T}.CompareTo"/>
+    public int CompareTo (int other)
+    {
+        return ((int)value).CompareTo (other);
+    }
 
-        public override bool Equals (object obj)
-        {
-            if (obj is FlagValue flagValue) return Equals (flagValue);
-            if (obj is int intValue) return Equals (intValue);
-            if (obj is char charValue) return Equals (charValue);
+    /// <inheritdoc cref="IComparable{T}.CompareTo"/>
+    public int CompareTo (char other)
+    {
+        return value.CompareTo (other);
+    }
 
-            return false;
-        }
-
-        public override int GetHashCode()
-        {
-            return value.GetHashCode();
-        }
-
-        public int CompareTo (FlagValue other)
-        {
-            return value.CompareTo (other.value);
-        }
-
-        public int CompareTo (int other)
-        {
-            return ((int)value).CompareTo (other);
-        }
-
-        public int CompareTo (char other)
-        {
-            return value.CompareTo (other);
-        }
-
-        public override string ToString()
-        {
-            return ((int)value).ToString (CultureInfo.InvariantCulture);
-        }
+    /// <inheritdoc cref="ValueType.ToString"/>
+    public override string ToString()
+    {
+        return ((int)value).ToString (CultureInfo.InvariantCulture);
     }
 }
