@@ -14,7 +14,6 @@
 #region Using directives
 
 using System;
-using System.Linq;
 
 using AM.Linguistics.Hunspell.Infrastructure;
 
@@ -26,11 +25,13 @@ namespace AM.Linguistics.Hunspell;
 
 public partial class WordList
 {
-    private sealed class QueryCheck : Query
+    private sealed class QueryCheck
+        : Query
     {
         public QueryCheck (WordList wordList)
             : base (wordList)
         {
+            // пустое тело конструктора
         }
 
         public bool Check (string word)
@@ -58,7 +59,7 @@ public partial class WordList
             }
 
             // input conversion
-            if (!Affix.InputConversions.HasReplacements ||
+            if (!Affix.InputConversions!.HasReplacements ||
                 !Affix.InputConversions.TryConvert (word, out var convertedWord))
             {
                 convertedWord = word;
@@ -78,8 +79,8 @@ public partial class WordList
             }
 
             var resultType = SpellCheckResultType.None;
-            string root = null;
-            WordEntry rv = null;
+            string? root = null;
+            WordEntry? rv = null;
 
             if (capType == CapitalizationType.Huh || capType == CapitalizationType.HuhInit ||
                 capType == CapitalizationType.None)
@@ -90,7 +91,7 @@ public partial class WordList
                 }
 
                 rv = CheckWord (scw, ref resultType, out root);
-                if (abbv != 0 && rv == null)
+                if (abbv != 0 && rv is null)
                 {
                     rv = CheckWord (scw + ".", ref resultType, out root);
                 }
@@ -100,12 +101,12 @@ public partial class WordList
                 rv = CheckDetailsAllCap (abbv, ref scw, ref resultType, out root);
             }
 
-            if (capType == CapitalizationType.Init || capType == CapitalizationType.All && rv == null)
+            if (capType == CapitalizationType.Init || capType == CapitalizationType.All && rv is null)
             {
                 rv = CheckDetailsInitCap (abbv, capType, ref scw, ref resultType, out root);
             }
 
-            if (rv != null)
+            if (rv is not null)
             {
                 if (rv.ContainsFlag (Affix.Warn))
                 {
@@ -121,7 +122,7 @@ public partial class WordList
             }
 
             // recursive breaking at break points
-            if (Affix.BreakPoints.HasItems && !EnumEx.HasFlag (resultType, SpellCheckResultType.Forbidden))
+            if (Affix.BreakPoints!.HasItems && !EnumEx.HasFlag (resultType, SpellCheckResultType.Forbidden))
             {
                 // calculate break points for recursion limit
                 if (Affix.BreakPoints.FindRecursionLimit (scw) >= 10)
@@ -232,12 +233,17 @@ public partial class WordList
             return new SpellCheckResult (root, resultType, false);
         }
 
-        private WordEntry CheckDetailsAllCap (int abbv, ref string scw, ref SpellCheckResultType resultType,
-            out string root)
+        private WordEntry? CheckDetailsAllCap
+            (
+                int abbv,
+                ref string scw,
+                ref SpellCheckResultType resultType,
+                out string? root
+            )
         {
             resultType |= SpellCheckResultType.OrigCap;
             var rv = CheckWord (scw, ref resultType, out root);
-            if (rv != null)
+            if (rv is not null)
             {
                 return rv;
             }
@@ -245,7 +251,7 @@ public partial class WordList
             if (abbv != 0)
             {
                 rv = CheckWord (scw + ".", ref resultType, out root);
-                if (rv != null)
+                if (rv is not null)
                 {
                     return rv;
                 }
@@ -265,14 +271,14 @@ public partial class WordList
                     scw = StringEx.ConcatString (scw, 0, apos + 1,
                         HunspellTextFunctions.MakeInitCap (scw.AsSpan (apos + 1), textInfo));
                     rv = CheckWord (scw, ref resultType, out root);
-                    if (rv != null)
+                    if (rv is not null)
                     {
                         return rv;
                     }
 
                     scw = HunspellTextFunctions.MakeInitCap (scw, textInfo);
                     rv = CheckWord (scw, ref resultType, out root);
-                    if (rv != null)
+                    if (rv is not null)
                     {
                         return rv;
                     }
@@ -284,17 +290,17 @@ public partial class WordList
                 scw = HunspellTextFunctions.MakeAllSmall (scw, textInfo);
                 var u8buffer = scw;
                 rv = SpellSharps (ref u8buffer, ref resultType, out root);
-                if (rv == null)
+                if (rv is null)
                 {
                     scw = HunspellTextFunctions.MakeInitCap (scw, textInfo);
                     rv = SpellSharps (ref scw, ref resultType, out root);
                 }
 
-                if (abbv != 0 && rv == null)
+                if (abbv != 0 && rv is null)
                 {
                     u8buffer += ".";
                     rv = SpellSharps (ref u8buffer, ref resultType, out root);
-                    if (rv == null)
+                    if (rv is null)
                     {
                         u8buffer = scw + ".";
                         rv = SpellSharps (ref u8buffer, ref resultType, out root);
@@ -305,8 +311,14 @@ public partial class WordList
             return rv;
         }
 
-        private WordEntry CheckDetailsInitCap (int abbv, CapitalizationType capType, ref string scw,
-            ref SpellCheckResultType resultType, out string root)
+        private WordEntry? CheckDetailsInitCap
+            (
+                int abbv,
+                CapitalizationType capType,
+                ref string scw,
+                ref SpellCheckResultType resultType,
+                out string? root
+            )
         {
             var u8buffer = HunspellTextFunctions.MakeAllSmall (scw, TextInfo);
             scw = HunspellTextFunctions.MakeInitCap (u8buffer, TextInfo);
@@ -334,23 +346,23 @@ public partial class WordList
                 return rv;
             }
 
-            if (capType == CapitalizationType.All && rv != null && IsKeepCase (rv))
+            if (capType == CapitalizationType.All && rv is not null && IsKeepCase (rv))
             {
                 rv = null;
             }
 
-            if (rv != null || !Affix.CultureUsesDottedI && scw.StartsWith ('İ'))
+            if (rv is not null || !Affix.CultureUsesDottedI && scw.StartsWith ('İ'))
             {
                 return rv;
             }
 
             rv = CheckWord (u8buffer, ref resultType, out root);
 
-            if (abbv != 0 && rv == null)
+            if (abbv != 0 && rv is null)
             {
                 u8buffer += ".";
                 rv = CheckWord (u8buffer, ref resultType, out root);
-                if (rv == null)
+                if (rv is null)
                 {
                     u8buffer = scw + ".";
                     if (capType == CapitalizationType.Init)
@@ -365,7 +377,7 @@ public partial class WordList
                         resultType &= ~SpellCheckResultType.InitCap;
                     }
 
-                    if (capType == CapitalizationType.All && rv != null && IsKeepCase (rv))
+                    if (capType == CapitalizationType.All && rv is not null && IsKeepCase (rv))
                     {
                         rv = null;
                     }
@@ -375,7 +387,7 @@ public partial class WordList
             }
 
             if (
-                    rv != null
+                    rv is not null
                     &&
                     IsKeepCase (rv)
                     &&
@@ -424,7 +436,7 @@ public partial class WordList
                 @base = baseBuilder.ToString();
 
                 var h = SpellSharps (ref @base, pos + 1, n + 1, repNum + 1, ref info, out root);
-                if (h != null)
+                if (h is not null)
                 {
                     return h;
                 }
@@ -436,7 +448,7 @@ public partial class WordList
                 @base = StringBuilderPool.GetStringAndReturn (baseBuilder);
 
                 h = SpellSharps (ref @base, pos + 2, n + 1, repNum, ref info, out root);
-                if (h != null)
+                if (h is not null)
                 {
                     return h;
                 }

@@ -6,8 +6,9 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Local
 
-/* .cs --
+/* CulturedStringComparer.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,7 +26,8 @@ namespace AM.Linguistics.Hunspell.Infrastructure;
 /// <summary>
 /// Provides the ability to compare text using a configured culture.
 /// </summary>
-internal sealed class CulturedStringComparer : StringComparer
+internal sealed class CulturedStringComparer
+    : StringComparer
 {
     public CulturedStringComparer (CultureInfo culture)
     {
@@ -37,12 +39,12 @@ internal sealed class CulturedStringComparer : StringComparer
 
     private CompareInfo CompareInfo { get; }
 
-    public override int Compare (string x, string y)
+    public override int Compare (string? x, string? y)
     {
         return CompareInfo.Compare (x, y);
     }
 
-    public override bool Equals (string x, string y)
+    public override bool Equals (string? x, string? y)
     {
         return Compare (x, y) == 0;
     }

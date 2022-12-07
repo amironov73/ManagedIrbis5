@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 
-/* .cs --
+/* PatternSet.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,26 +19,40 @@ using System.Linq;
 
 using AM.Linguistics.Hunspell.Infrastructure;
 
-#if !NO_INLINE
-using System.Runtime.CompilerServices;
-#endif
-
 #endregion
 
 #nullable enable
 
 namespace AM.Linguistics.Hunspell
 {
-    public class PatternSet : ArrayWrapper<PatternEntry>
+    /// <summary>
+    ///
+    /// </summary>
+    public class PatternSet
+        : ArrayWrapper<PatternEntry>
     {
+        /// <summary>
+        ///
+        /// </summary>
         public static readonly PatternSet Empty = TakeArray (Array.Empty<PatternEntry>());
 
-        public static PatternSet Create (IEnumerable<PatternEntry> patterns)
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="patterns"></param>
+        /// <returns></returns>
+        public static PatternSet Create
+            (
+                IEnumerable<PatternEntry>? patterns
+            )
         {
-            return patterns == null ? Empty : TakeArray (patterns.ToArray());
+            return patterns is null ? Empty : TakeArray (patterns.ToArray());
         }
 
-        internal static PatternSet TakeArray (PatternEntry[] patterns)
+        internal static PatternSet TakeArray
+            (
+                PatternEntry[]? patterns
+            )
         {
             return patterns == null ? Empty : new PatternSet (patterns);
         }
@@ -51,16 +65,21 @@ namespace AM.Linguistics.Hunspell
         /// <summary>
         /// Forbid compoundings when there are special patterns at word bound.
         /// </summary>
-        internal bool Check (string word, int pos, WordEntry r1, WordEntry r2, bool affixed)
+        internal bool Check
+            (
+                string word,
+                int pos,
+                WordEntry r1,
+                WordEntry r2,
+                bool affixed
+            )
         {
-#if DEBUG
-            if (r1 == null) throw new ArgumentNullException (nameof (r1));
-            if (r2 == null) throw new ArgumentNullException (nameof (r2));
-#endif
+            Sure.NotNull (r1);
+            Sure.NotNull (r2);
 
             var wordAfterPos = word.AsSpan (pos);
-
             foreach (var patternEntry in _items)
+            {
                 if (
                         HunspellTextFunctions.IsSubset (patternEntry.Pattern2, wordAfterPos)
                         &&
@@ -87,13 +106,11 @@ namespace AM.Linguistics.Hunspell
                         )
                     )
                     return true;
+            }
 
             return false;
         }
 
-#if !NO_INLINE
-        [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
         private static bool PatternWordCheck (string word, int pos, string other) =>
             other.Length <= pos
             && word.AsSpan (pos - other.Length).StartsWith (other.AsSpan());

@@ -63,7 +63,7 @@ public struct SpellCheckResult
     /// <param name="correct"></param>
     public SpellCheckResult
         (
-            string root,
+            string? root,
             SpellCheckResultType info,
             bool correct
         )
