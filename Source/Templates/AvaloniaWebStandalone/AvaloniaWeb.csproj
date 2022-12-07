@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <RuntimeIdentifier>browser-wasm</RuntimeIdentifier>
+        <WasmMainJSPath>AppBundle\main.js</WasmMainJSPath>
+        <OutputType>Exe</OutputType>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <WasmExtraFilesToDeploy Include="AppBundle\**" />
+    </ItemGroup>
+
+     <PropertyGroup>
+         <AvaloniaVersion>11.0.0-preview4</AvaloniaVersion>
+     </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
+        <PackageReference Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaVersion)" />
+        <PackageReference Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)" />
+        <PackageReference Include="Avalonia.ReactiveUI" Version="$(AvaloniaVersion)" />
+        <PackageReference Include="Avalonia.ThemeManager" Version="$(AvaloniaVersion)" />
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
+        <PackageReference Include="Avalonia.Web" Version="$(AvaloniaVersion)" />
+        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="7.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="7.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="7.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Localization" Version="7.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="7.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="7.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Options" Version="7.0.0"/>
+        <PackageReference Include="NLog" Version="5.1.0"/>
+        <PackageReference Include="NLog.Extensions.Logging" Version="5.2.0"/>
+        <PackageReference Include="ReactiveUI" Version="18.4.1" />
+        <PackageReference Include="ReactiveUI.Fody" Version="18.4.1" />
+        <PackageReference Include="XamlNameReferenceGenerator" Version="1.4.2" />
+    </ItemGroup>
+
+</Project>
