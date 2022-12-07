@@ -30,14 +30,33 @@ namespace AM.Linguistics.Hunspell;
 public sealed class MultiReplacementEntry
     : ReplacementEntry
 {
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="pattern"></param>
     public MultiReplacementEntry (string pattern)
         : base (pattern)
     {
+        med = null!;
+        ini = null!;
+        fin = null!;
+        isol = null!;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="pattern"></param>
+    /// <param name="type"></param>
+    /// <param name="value"></param>
     public MultiReplacementEntry (string pattern, ReplacementValueType type, string value)
         : base (pattern)
     {
+        med = null!;
+        ini = null!;
+        fin = null!;
+        isol = null!;
+
         Set (type, value);
     }
 
@@ -46,14 +65,31 @@ public sealed class MultiReplacementEntry
     private string fin;
     private string isol;
 
+    /// <summary>
+    ///
+    /// </summary>
     public override string Med => med;
 
+    /// <summary>
+    ///
+    /// </summary>
     public override string Ini => ini;
 
+    /// <summary>
+    ///
+    /// </summary>
     public override string Fin => fin;
 
+    /// <summary>
+    ///
+    /// </summary>
     public override string Isol => isol;
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="type"></param>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
     public override string this [ReplacementValueType type]
     {
         get
@@ -69,6 +105,12 @@ public sealed class MultiReplacementEntry
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
     public MultiReplacementEntry With (ReplacementValueType type, string value)
     {
         var result = Clone();

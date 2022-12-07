@@ -228,6 +228,134 @@ public sealed class ParFile
     #region Public methods
 
     /// <summary>
+    /// Проверка существования файла, соответствующего компоненту.
+    /// </summary>
+    /// <param name="number">Номер компонента.</param>
+    /// <param name="componentPath">Значение компонента PAR-файла.</param>
+    /// <param name="databaseName">Имя базы данных.</param>
+    /// <param name="componentExtension">Соответствующее расширение.</param>
+    /// <param name="basePath">Базовый путь до всего этого.</param>
+    /// <param name="output">Поток для вывода ошибок.</param>
+    /// <returns><c>true</c>, если удается найти файл, соответствующий
+    /// заданному компоненту.</returns>
+    public bool CheckComponent
+        (
+            string number,
+            string? componentPath,
+            string databaseName,
+            string? componentExtension,
+            string basePath,
+            TextWriter output
+        )
+    {
+        Sure.NotNullNorEmpty (number);
+        Sure.NotNullNorEmpty (databaseName);
+        Sure.NotNullNorEmpty (basePath);
+        Sure.NotNull (output);
+
+        if (string.IsNullOrEmpty (componentPath))
+        {
+            output.WriteLine ($"Component {number} for database {databaseName} not specified");
+            return false;
+        }
+
+        componentPath = componentPath.Trim();
+        if (string.IsNullOrEmpty (componentPath))
+        {
+            output.WriteLine ($"Component {number} for database {databaseName} contains of whitespace only");
+            return false;
+        }
+
+        var combinedPath = Path.Combine
+            (
+                basePath.ConvertSlashes(),
+                componentPath.ConvertSlashes()
+            );
+
+        combinedPath = Path.GetFullPath (combinedPath);
+
+        if (!Unix.DirectoryExists (combinedPath))
+        {
+            output.WriteLine ($"Path '{combinedPath}' for component {number} for database {databaseName} doesn't exist");
+            return false;
+        }
+
+        if (string.IsNullOrEmpty (componentExtension))
+        {
+            // если расширение не задано, значит
+            // требуется проверить только существование пути
+            return true;
+        }
+
+        combinedPath = Path.Combine
+            (
+                combinedPath,
+                databaseName + componentExtension
+            );
+
+        if (!Unix.FileExists (combinedPath))
+        {
+            output.WriteLine ($"File '{combinedPath}' for component {number} for database {databaseName} doesn't exist");
+            return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Проверка компонентов на существование файлов.
+    /// </summary>
+    /// <param name="databaseName">Имя базы данных.</param>
+    /// <param name="basePath">Базовый путь до всего этого.</param>
+    /// <param name="output">Поток для вывода ошибок.</param>
+    /// <returns><c>true</c>, если все компоненты прошли проверку.
+    /// </returns>
+    public bool CheckComponents
+        (
+            string databaseName,
+            string basePath,
+            TextWriter output
+        )
+    {
+        Sure.NotNullNorEmpty (databaseName);
+        Sure.NotNullNorEmpty (basePath);
+        Sure.NotNull (output);
+
+        var result = CheckComponent ("1", XrfPath, databaseName, ".xrf", basePath, output);
+        if (!CheckComponent ("2", MstPath, databaseName, ".mst", basePath, output))
+        {
+            result = false;
+        }
+
+        if (!CheckComponent ("4", N01Path, databaseName, ".n01", basePath, output))
+        {
+            result = false;
+        }
+
+        if (!CheckComponent ("6", L01Path, databaseName, ".l01", basePath, output))
+        {
+            result = false;
+        }
+
+        if (!CheckComponent ("8", IfpPath, databaseName, ".ifp", basePath, output))
+        {
+            result = false;
+        }
+
+        if (!CheckComponent ("10", IfpPath, databaseName, null, basePath, output))
+        {
+            result = false;
+        }
+
+        if (!CheckComponent ("11", IfpPath, databaseName, null, basePath, output))
+        {
+            result = false;
+        }
+
+        return result;
+    }
+
+    /// <summary>
     /// Разбор PAR-файла на строчки вида 1=.\datai\ibis.
     /// </summary>
     public static Dictionary<int, string> ReadDictionary

@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Xml;
 using System.IO;
@@ -30,6 +31,8 @@ using System.Xml.Schema;
 using System.Xml.XPath;
 
 using AM;
+
+using Exception = System.Exception;
 
 #endregion
 
@@ -121,14 +124,10 @@ internal sealed class FB2EncoderFallbackBuffer : EncoderFallbackBuffer
     }
 
     // How many characters left to output?
-    public override int Remaining
-    {
-        get
-        {
-            // Our count is 0 for 1 character left.
-            return (fallbackCount < 0) ? 0 : fallbackCount;
-        }
-    }
+    public override int Remaining =>
+
+        // Our count is 0 for 1 character left.
+        (fallbackCount < 0) ? 0 : fallbackCount;
 
     #endregion
 }
@@ -584,9 +583,14 @@ public class FileMetadata
     public void AddMetadata (DescriptionElements key, string value)
     {
         var name = Enum.GetName (typeof (DescriptionElements), key);
-        InternalAddMetadata (name, value);
+        InternalAddMetadata (name!, value);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
     public string GetMetadata (DescriptionElements key)
     {
         var name = Enum.GetName (typeof (DescriptionElements), key);
@@ -594,6 +598,11 @@ public class FileMetadata
         return Metadata[_key];
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="part"></param>
+    /// <returns></returns>
     public string SubstitutePart (string part)
     {
         if (CheckRequiredAttribute (part))
@@ -610,17 +619,17 @@ public class FileMetadata
         return string.Empty;
     }
 
-    public string Description
-    {
-        get { return _description; }
-    }
-
-    public FileMetadata()
-    {
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    public string Description => _description;
 }
 
-public class FB2Metadata : FileMetadata
+/// <summary>
+///
+/// </summary>
+public class FB2Metadata
+    : FileMetadata
 {
     #region Private
 
@@ -636,7 +645,7 @@ public class FB2Metadata : FileMetadata
         {
             while (reader.Read())
             {
-                if ((reader.NodeType == XmlNodeType.Element) && (reader.Name == "first-name"))
+                if (reader is { NodeType: XmlNodeType.Element, Name: "first-name" })
                 {
                     var bookAuthorFirstName = reader.ReadString();
                     if (FB2Config.Current.NormalizeNames)
@@ -650,7 +659,7 @@ public class FB2Metadata : FileMetadata
                             ? string.Empty
                             : bookAuthorFirstName[0].ToString());
                 }
-                else if ((reader.NodeType == XmlNodeType.Element) && (reader.Name == "last-name"))
+                else if (reader is { NodeType: XmlNodeType.Element, Name: "last-name" })
                 {
                     var bookAuthorLastName = reader.ReadString();
                     if (FB2Config.Current.NormalizeNames)
@@ -664,7 +673,7 @@ public class FB2Metadata : FileMetadata
                             ? string.Empty
                             : bookAuthorLastName[0].ToString());
                 }
-                else if ((reader.NodeType == XmlNodeType.Element) && (reader.Name == "middle-name"))
+                else if (reader is { NodeType: XmlNodeType.Element, Name: "middle-name" })
                 {
                     var bookAuthorMiddleName = reader.ReadString();
                     if (FB2Config.Current.NormalizeNames)
@@ -688,7 +697,7 @@ public class FB2Metadata : FileMetadata
         {
             while (reader.Read())
             {
-                if ((reader.NodeType == XmlNodeType.Element) && (reader.Name == "first-name"))
+                if (reader is { NodeType: XmlNodeType.Element, Name: "first-name" })
                 {
                     var bookTranslatorFirstName = reader.ReadString();
                     if (FB2Config.Current.NormalizeNames)
@@ -703,7 +712,7 @@ public class FB2Metadata : FileMetadata
                             ? string.Empty
                             : bookTranslatorFirstName[0].ToString());
                 }
-                else if ((reader.NodeType == XmlNodeType.Element) && (reader.Name == "last-name"))
+                else if (reader is { NodeType: XmlNodeType.Element, Name: "last-name" })
                 {
                     var bookTranslatorLastName = reader.ReadString();
                     if (FB2Config.Current.NormalizeNames)
@@ -718,7 +727,7 @@ public class FB2Metadata : FileMetadata
                             ? string.Empty
                             : bookTranslatorLastName[0].ToString());
                 }
-                else if ((reader.NodeType == XmlNodeType.Element) && (reader.Name == "middle-name"))
+                else if (reader is { NodeType: XmlNodeType.Element, Name: "middle-name" })
                 {
                     var bookTranslatorMiddleName = reader.ReadString();
                     if (FB2Config.Current.NormalizeNames)
@@ -743,7 +752,7 @@ public class FB2Metadata : FileMetadata
         {
             while (reader.Read())
             {
-                if ((reader.NodeType == XmlNodeType.Element) && (reader.Name == "author"))
+                if (reader is { NodeType: XmlNodeType.Element, Name: "author" })
                 {
                     var author = reader.ReadOuterXml();
                     author = author.Trim();
@@ -751,7 +760,7 @@ public class FB2Metadata : FileMetadata
                     bookTitleAuthor++;
                 }
 
-                if ((reader.NodeType == XmlNodeType.Element) && (reader.Name == "translator"))
+                if (reader is { NodeType: XmlNodeType.Element, Name: "translator" })
                 {
                     var translator = reader.ReadOuterXml();
                     translator = translator.Trim();
@@ -759,12 +768,12 @@ public class FB2Metadata : FileMetadata
                     bookTitleTranslator++;
                 }
 
-                if ((reader.NodeType == XmlNodeType.Element) && (reader.Name == "book-title"))
+                if (reader is { NodeType: XmlNodeType.Element, Name: "book-title" })
                 {
                     var bookTitle = reader.ReadString();
                     AddMetadata (DescriptionElements.Title, bookTitle);
                 }
-                else if ((reader.NodeType == XmlNodeType.Element) && (reader.Name == "genre"))
+                else if (reader is { NodeType: XmlNodeType.Element, Name: "genre" })
                 {
                     var bookGenre = reader.ReadString();
                     bookGenre = FB2Config.Current.GenreSubstitutions.FindSubstitution (bookGenre);
@@ -776,25 +785,26 @@ public class FB2Metadata : FileMetadata
                     AddMetadata (DescriptionElements.Genre, bookTitleGenre, bookGenre);
                     bookTitleGenre++;
                 }
-                else if ((reader.NodeType == XmlNodeType.Element) && (reader.Name == "sequence"))
+                else if (reader is { NodeType: XmlNodeType.Element, Name: "sequence" })
                 {
                     var bookSequenceName = reader.GetAttribute ("name");
-                    bookSequenceName = bookSequenceName.Trim();
+                    bookSequenceName = bookSequenceName!.Trim();
                     AddMetadata (DescriptionElements.SequenceName, bookSequenceName);
                     var tmp = reader.GetAttribute ("number");
                     try
                     {
-                        var tmpi = int.Parse (tmp);
+                        var tmpi = int.Parse (tmp!);
                         if ((tmpi > 0) && !string.IsNullOrEmpty (bookSequenceName))
                         {
                             AddMetadata (DescriptionElements.SequenceNr, Convert.ToString (tmpi));
                         }
                     }
-                    catch
+                    catch (Exception exception)
                     {
+                        Debug.WriteLine (exception.Message);
                     }
                 }
-                else if ((reader.NodeType == XmlNodeType.Element) && (reader.Name == "lang"))
+                else if (reader is { NodeType: XmlNodeType.Element, Name: "lang" })
                 {
                     var bookLang = reader.ReadString();
                     AddMetadata (DescriptionElements.Lang, bookLang);
@@ -809,7 +819,7 @@ public class FB2Metadata : FileMetadata
         {
             while (reader.Read())
             {
-                if ((reader.NodeType == XmlNodeType.Element) && (reader.Name == "version"))
+                if (reader is { NodeType: XmlNodeType.Element, Name: "version" })
                 {
                     var bookVersion = reader.ReadString();
                     AddMetadata (DescriptionElements.Version, bookVersion);
@@ -819,6 +829,7 @@ public class FB2Metadata : FileMetadata
         }
     }
 
+    /// <inheritdoc cref="FileMetadata.InternalParseDescription"/>
     protected override void InternalParseDescription (string description)
     {
         base.InternalParseDescription (description);
@@ -827,14 +838,14 @@ public class FB2Metadata : FileMetadata
         {
             while (reader.Read())
             {
-                if ((reader.NodeType == XmlNodeType.Element) && (reader.Name == "title-info"))
+                if (reader is { NodeType: XmlNodeType.Element, Name: "title-info" })
                 {
                     var titleInfo = reader.ReadOuterXml();
                     titleInfo = titleInfo.Trim();
                     ParseTitleInfo (titleInfo);
                 }
 
-                if ((reader.NodeType == XmlNodeType.Element) && (reader.Name == "document-info"))
+                if (reader is { NodeType: XmlNodeType.Element, Name: "document-info" })
                 {
                     var documentInfo = reader.ReadOuterXml();
                     documentInfo = documentInfo.Trim();
@@ -849,6 +860,7 @@ public class FB2Metadata : FileMetadata
         }
     }
 
+    /// <inheritdoc cref="FileMetadata.InternalInitialize"/>
     protected override void InternalInitialize()
     {
         bookTitleAuthor = 0;
@@ -857,11 +869,17 @@ public class FB2Metadata : FileMetadata
         base.InternalInitialize();
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public FB2Metadata()
-        : base()
     {
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="description"></param>
     public FB2Metadata (string description)
         : this()
     {
@@ -869,7 +887,11 @@ public class FB2Metadata : FileMetadata
     }
 }
 
-public class FB2File : IComparable
+/// <summary>
+///
+/// </summary>
+public class FB2File
+    : IComparable
 {
     #region Private
 
@@ -878,16 +900,18 @@ public class FB2File : IComparable
     private FileMetadata _metadata = new FileMetadata();
     private string _errors = string.Empty;
     private List<string> validationSchemaErrors = new List<string>();
-    private static XmlSchema FictionBook { get; set; }
-    private static XmlSchema FictionBookGenres { get; set; }
-    private static XmlSchema FictionBookLang { get; set; }
-    private static XmlSchema FictionBookLinks { get; set; }
+
+    private static XmlSchema? FictionBook { get; set; }
+    private static XmlSchema? FictionBookGenres { get; set; }
+    private static XmlSchema? FictionBookLang { get; set; }
+    private static XmlSchema? FictionBookLinks { get; set; }
 
     #endregion
 
     #region IComparable Members
 
-    public int CompareTo (object obj)
+    /// <inheritdoc cref="IComparable.CompareTo"/>
+    public int CompareTo (object? obj)
     {
         var fc = obj as FB2File;
         if (fc == null)
@@ -945,7 +969,7 @@ public class FB2File : IComparable
     {
         using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream (resourceName))
         {
-            return XmlSchema.Read (stream, null);
+            return XmlSchema.Read (stream!, null)!;
         }
     }
 
@@ -960,8 +984,9 @@ public class FB2File : IComparable
                 var enc = Encoding.GetEncoding (encoding);
                 BookEncoding = enc.EncodingName;
             }
-            catch
+            catch (Exception exception)
             {
+                Debug.WriteLine (exception.Message);
             }
         }
     }
@@ -978,10 +1003,10 @@ public class FB2File : IComparable
             {
                 if (reader.NodeType == XmlNodeType.XmlDeclaration)
                 {
-                    ParseEncoding (reader.GetAttribute ("encoding"));
+                    ParseEncoding (reader.GetAttribute ("encoding")!);
                 }
 
-                if ((reader.NodeType == XmlNodeType.Element) && (reader.Name == "description"))
+                if (reader is { NodeType: XmlNodeType.Element, Name: "description" })
                 {
                     var description = reader.ReadOuterXml();
                     description = description.Trim();
@@ -989,7 +1014,7 @@ public class FB2File : IComparable
                     break;
                 }
 
-                if ((reader.NodeType == XmlNodeType.Element) && (reader.Name == "body"))
+                if (reader is { NodeType: XmlNodeType.Element, Name: "body" })
                 {
                     break;
                 }
@@ -1007,8 +1032,10 @@ public class FB2File : IComparable
         else if (fileName.ToLower().EndsWith (FB2Config.Current.FB2ZIPExtension))
         {
             var zipEncoding = Encoding.GetEncoding (FB2Config.Current.Encodings.CompressionEncoding);
-            var options = new ReadOptions();
-            options.Encoding = zipEncoding;
+            var options = new ReadOptions
+            {
+                Encoding = zipEncoding
+            };
             using (var zip = ZipFile.Read (fileName, options))
             {
                 if (zip.Count <= 0)
@@ -1083,10 +1110,7 @@ public class FB2File : IComparable
         BookInternalEncoding = string.Empty;
     }
 
-    internal bool IsValid
-    {
-        get { return _isValid; }
-    }
+    internal bool IsValid => _isValid;
 
     internal string Error()
     {
@@ -1100,12 +1124,23 @@ public class FB2File : IComparable
             UpdateFileInfo (FileInformation.FullName);
             ParseFile (FileInformation.FullName);
         }
-        catch
+        catch (Exception exception)
         {
+            Debug.WriteLine (exception.Message);
         }
     }
 
-    protected string SubstituteCharacters (CharacterSubstitutionCollection substitutionCollection, string value)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="substitutionCollection"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    protected string SubstituteCharacters
+        (
+            CharacterSubstitutionCollection? substitutionCollection,
+            string value
+        )
     {
         if (substitutionCollection == null)
         {
@@ -1126,7 +1161,17 @@ public class FB2File : IComparable
         return value;
     }
 
-    protected string CalculateNewFileName (RenameProfileElement profile, bool useTranslit)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="profile"></param>
+    /// <param name="useTranslit"></param>
+    /// <returns></returns>
+    protected string CalculateNewFileName
+        (
+            RenameProfileElement profile,
+            bool useTranslit
+        )
     {
         var fn = string.Empty;
         var extension = string.Empty;
@@ -1161,6 +1206,12 @@ public class FB2File : IComparable
         return fn;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="profile"></param>
+    /// <param name="useTranslit"></param>
+    /// <returns></returns>
     protected string CalculateNewPath (RenameProfileElement profile, bool useTranslit)
     {
         var fn = string.Empty;
@@ -1179,7 +1230,14 @@ public class FB2File : IComparable
         return fn;
     }
 
-    protected void RemoveFolder (DirectoryInfo folder)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="folder"></param>
+    protected void RemoveFolder
+        (
+            DirectoryInfo? folder
+        )
     {
         try
         {
@@ -1197,70 +1255,91 @@ public class FB2File : IComparable
                 }
             }
         }
-        catch
+        catch (Exception exception)
         {
+            Debug.WriteLine (exception.Message);
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public bool IsZIP()
     {
         return IsZIP (FileInformation.FullName);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="fileName"></param>
+    /// <returns></returns>
     public bool IsZIP (string fileName)
     {
         return fileName.ToLower().EndsWith (FB2Config.Current.FB2ZIPExtension);
     }
 
-    public string BookSizeText
-    {
-        get
-        {
-            // return string.Format(Properties.Resources.FileSizeText, FileInformation.Length / 1024);
-            return (FileInformation.Length / 1024).ToInvariantString();
-        }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    public string BookSizeText =>
+        // return string.Format(Properties.Resources.FileSizeText, FileInformation.Length / 1024);
+        (FileInformation.Length / 1024).ToInvariantString();
 
+    /// <summary>
+    ///
+    /// </summary>
     public FileInfo FileInformation { get; private set; }
 
-    public string BookAuthorFirstName
-    {
-        get { return Metadata.GetMetadata (DescriptionElements.AuthorFirstName); }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    public string BookAuthorFirstName => Metadata.GetMetadata (DescriptionElements.AuthorFirstName);
 
-    public string BookAuthorLastName
-    {
-        get { return Metadata.GetMetadata (DescriptionElements.AuthorLastName); }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    public string BookAuthorLastName => Metadata.GetMetadata (DescriptionElements.AuthorLastName);
 
-    public string BookAuthorMiddleName
-    {
-        get { return Metadata.GetMetadata (DescriptionElements.AuthorMiddleName); }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    public string BookAuthorMiddleName => Metadata.GetMetadata (DescriptionElements.AuthorMiddleName);
 
-    public string BookGenre
-    {
-        get { return Metadata.GetMetadata (DescriptionElements.Genre); }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    public string BookGenre => Metadata.GetMetadata (DescriptionElements.Genre);
 
+    /// <summary>
+    ///
+    /// </summary>
     public string BookEncoding { get; private set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     protected internal string BookInternalEncoding { get; private set; }
 
-    public string BookTitle
-    {
-        get { return Metadata.GetMetadata (DescriptionElements.Title); }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    public string BookTitle => Metadata.GetMetadata (DescriptionElements.Title);
 
-    public string BookSequenceName
-    {
-        get { return Metadata.GetMetadata (DescriptionElements.SequenceName); }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    public string BookSequenceName => Metadata.GetMetadata (DescriptionElements.SequenceName);
 
-    public string BookVersion
-    {
-        get { return Metadata.GetMetadata (DescriptionElements.Version); }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    public string BookVersion => Metadata.GetMetadata (DescriptionElements.Version);
 
+    /// <summary>
+    ///
+    /// </summary>
     public int? BookSequenceNr
     {
         get
@@ -1275,16 +1354,22 @@ public class FB2File : IComparable
         }
     }
 
-    public string BookLang
-    {
-        get { return Metadata.GetMetadata (DescriptionElements.Lang); }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    public string BookLang => Metadata.GetMetadata (DescriptionElements.Lang);
 
-    public FileMetadata Metadata
-    {
-        get { return _metadata; }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    public FileMetadata Metadata => _metadata;
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="newFullName"></param>
+    /// <param name="newFileName"></param>
+    /// <returns></returns>
     public bool IsSkipFile (string newFullName, string newFileName)
     {
         var skip = false;
@@ -1298,6 +1383,13 @@ public class FB2File : IComparable
         return skip;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="targetFolder"></param>
+    /// <param name="profile"></param>
+    /// <param name="useTranslit"></param>
+    /// <returns></returns>
     public FileOperationResult MoveTo (string targetFolder, RenameProfileElement profile, bool useTranslit)
     {
         var newPath = CalculateNewPath (profile, useTranslit);
@@ -1306,8 +1398,11 @@ public class FB2File : IComparable
         var newFullName = Path.Combine (newPath, newFileName);
         Directory.CreateDirectory (newPath);
         var di = FileInformation.Directory;
-        var result = new FileOperationResult() { NewFileName = newFileName, NewFullName = newFullName };
-        result.Skipped = IsSkipFile (newFullName, newFileName);
+        var result = new FileOperationResult
+        {
+            NewFileName = newFileName, NewFullName = newFullName,
+            Skipped = IsSkipFile (newFullName, newFileName)
+        };
         if (!result.Skipped)
         {
             if (File.Exists (newFullName))
@@ -1323,6 +1418,13 @@ public class FB2File : IComparable
         return result;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="targetFolder"></param>
+    /// <param name="profile"></param>
+    /// <param name="useTranslit"></param>
+    /// <returns></returns>
     public FileOperationResult CopyTo (string targetFolder, RenameProfileElement profile, bool useTranslit)
     {
         var newPath = CalculateNewPath (profile, useTranslit);
@@ -1330,8 +1432,11 @@ public class FB2File : IComparable
         var newFileName = CalculateNewFileName (profile, useTranslit);
         var newFullName = Path.Combine (newPath, newFileName);
         Directory.CreateDirectory (newPath);
-        var result = new FileOperationResult() { NewFileName = newFileName, NewFullName = newFullName };
-        result.Skipped = IsSkipFile (newFullName, newFileName);
+        var result = new FileOperationResult
+        {
+            NewFileName = newFileName, NewFullName = newFullName,
+            Skipped = IsSkipFile (newFullName, newFileName)
+        };
         if (!result.Skipped)
         {
             FileInformation.CopyTo (newFullName, true);
@@ -1341,6 +1446,10 @@ public class FB2File : IComparable
         return result;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public bool Extract()
     {
         var fileName = FileInformation.FullName;
@@ -1349,8 +1458,10 @@ public class FB2File : IComparable
             fileName = fileName.Substring (0, fileName.Length - FB2Config.Current.FB2ZIPExtension.Length) +
                        FB2Config.Current.FB2Extension;
             var zipEncoding = Encoding.GetEncoding (FB2Config.Current.Encodings.CompressionEncoding);
-            var options = new ReadOptions();
-            options.Encoding = zipEncoding;
+            var options = new ReadOptions
+            {
+                Encoding = zipEncoding
+            };
             using (ZipFile zip = ZipFile.Read (FileInformation.FullName, options))
             {
                 zip[0].Extract (FileInformation.Directory!.FullName, ExtractExistingFileAction.Throw);
@@ -1373,7 +1484,7 @@ public class FB2File : IComparable
         while (iterator.MoveNext())
         {
             var curr = iterator.Current;
-            if (!curr.HasChildren && !curr.Name.EndsWith ("empty-line") && !curr.Name.EndsWith ("image") &&
+            if (!curr!.HasChildren && !curr.Name.EndsWith ("empty-line") && !curr.Name.EndsWith ("image") &&
                 !curr.Name.EndsWith ("sequence") && string.IsNullOrEmpty (curr.Value))
             {
                 var info = curr as IXmlLineInfo;
@@ -1404,7 +1515,7 @@ public class FB2File : IComparable
             var id = curr.GetAttribute ("id", string.Empty);
             if (!idList.ContainsKey (id))
             {
-                idList.Add (id, string.Format ("{0}|{1}", info.LineNumber, info.LinePosition));
+                idList.Add (id, string.Format ("{0}|{1}", info!.LineNumber, info.LinePosition));
             }
             else
             {
@@ -1419,7 +1530,7 @@ public class FB2File : IComparable
         {
             var curr = iterator.Current;
             var error = string.Empty;
-            var href = curr.GetAttribute ("href", defaultNamespace);
+            var href = curr!.GetAttribute ("href", defaultNamespace);
             var type = curr.GetAttribute ("type", defaultNamespace);
             if (string.IsNullOrEmpty (href))
             {
@@ -1486,20 +1597,26 @@ public class FB2File : IComparable
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public List<string> ValidateSchema()
     {
         validationSchemaErrors.Clear();
         LoadSchemas();
         using (var stream = GetFileReadStream (FileInformation.FullName))
         {
-            var settings = new XmlReaderSettings();
-            settings.CheckCharacters = true;
-            settings.ValidationEventHandler += new ValidationEventHandler (SchemaValidation);
+            var settings = new XmlReaderSettings
+            {
+                CheckCharacters = true
+            };
+            settings.ValidationEventHandler += new ValidationEventHandler (SchemaValidation!);
             settings.ValidationType = ValidationType.Schema;
-            settings.Schemas.Add (FictionBook);
-            settings.Schemas.Add (FictionBookGenres);
-            settings.Schemas.Add (FictionBookLang);
-            settings.Schemas.Add (FictionBookLinks);
+            settings.Schemas.Add (FictionBook!);
+            settings.Schemas.Add (FictionBookGenres!);
+            settings.Schemas.Add (FictionBookLang!);
+            settings.Schemas.Add (FictionBookLinks!);
             var reader = XmlReader.Create (stream, settings);
             while (reader.Read())
             {
@@ -1519,6 +1636,10 @@ public class FB2File : IComparable
         return validationSchemaErrors;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public bool Compress()
     {
         var fileName = FileInformation.FullName;
@@ -1542,10 +1663,16 @@ public class FB2File : IComparable
         return false;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="profile"></param>
+    /// <param name="useTranslit"></param>
+    /// <returns></returns>
     public FileOperationResult RenameTo (RenameProfileElement profile, bool useTranslit)
     {
         var newFileName = CalculateNewFileName (profile, useTranslit);
-        var newFullName = Path.Combine (FileInformation.Directory.FullName, newFileName);
+        var newFullName = Path.Combine (FileInformation.Directory!.FullName, newFileName);
         var result = new FileOperationResult() { NewFileName = newFileName, NewFullName = newFullName };
 
         // Skip renaming if it is the same file
@@ -1570,11 +1697,19 @@ public class FB2File : IComparable
         return result;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="fileName"></param>
     public void UpdateFileInfo (string fileName)
     {
         FileInformation = new FileInfo (fileName);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="props"></param>
     public void UpdateProperties (FileProperties props)
     {
         var stream = GetFileReadStream (FileInformation.FullName);
@@ -1595,7 +1730,7 @@ public class FB2File : IComparable
         if (author == null)
         {
             author = doc.CreateElement ("author", fb2xmlns);
-            titleInfo.AppendChild (author);
+            titleInfo!.AppendChild (author);
         }
 
         if (props.AuthorLastNameChange)
@@ -1609,7 +1744,7 @@ public class FB2File : IComparable
                 author.AppendChild (lastName);
             }
 
-            lastName.InnerText = props.AuthorLastName;
+            lastName.InnerText = props.AuthorLastName!;
         }
 
         if (props.AuthorFirstNameChange)
@@ -1623,7 +1758,7 @@ public class FB2File : IComparable
                 author.AppendChild (firstName);
             }
 
-            firstName.InnerText = props.AuthorFirstName;
+            firstName.InnerText = props.AuthorFirstName!;
         }
 
         if (props.AuthorMiddleNameChange)
@@ -1637,7 +1772,7 @@ public class FB2File : IComparable
                 author.AppendChild (middleName);
             }
 
-            middleName.InnerText = props.AuthorMiddleName;
+            middleName.InnerText = props.AuthorMiddleName!;
         }
 
         // <sequence name="100 великих" number="0" />
@@ -1648,32 +1783,32 @@ public class FB2File : IComparable
             if (sequence == null)
             {
                 sequence = doc.CreateElement ("sequence", fb2xmlns);
-                titleInfo.AppendChild (sequence);
+                titleInfo!.AppendChild (sequence);
             }
 
-            var nameA = (sequence as XmlElement).Attributes["name"];
-            var numberA = (sequence as XmlElement).Attributes["number"];
+            var nameA = (sequence as XmlElement)?.Attributes["name"];
+            var numberA = (sequence as XmlElement)?.Attributes["number"];
             if (nameA == null)
             {
                 nameA = doc.CreateAttribute ("name");
-                (sequence as XmlElement).Attributes.Append (nameA);
+                (sequence as XmlElement)?.Attributes.Append (nameA);
             }
 
             if (numberA == null)
             {
                 numberA = doc.CreateAttribute ("number");
-                (sequence as XmlElement).Attributes.Append (numberA);
+                (sequence as XmlElement)?.Attributes.Append (numberA);
             }
 
             if (props.SeriesChange)
             {
-                nameA.InnerText = props.Series;
+                nameA.InnerText = props.Series!;
             }
 
             //(sequence as XmlElement).SetAttribute("name", props.Series);
             if (props.NumberChange)
             {
-                numberA.InnerText = props.Number;
+                numberA.InnerText = props.Number!;
             }
 
             //(sequence as XmlElement).SetAttribute("number", props.Number);
@@ -1686,10 +1821,10 @@ public class FB2File : IComparable
             if (genre == null)
             {
                 genre = doc.CreateElement ("genre", fb2xmlns);
-                titleInfo.AppendChild (genre);
+                titleInfo!.AppendChild (genre);
             }
 
-            genre.InnerText = props.Genre;
+            genre.InnerText = props.Genre!;
         }
 
         if (props.TitleChange)
@@ -1699,10 +1834,10 @@ public class FB2File : IComparable
             if (title == null)
             {
                 title = doc.CreateElement ("book-title", fb2xmlns);
-                titleInfo.AppendChild (title);
+                titleInfo!.AppendChild (title);
             }
 
-            title.InnerText = props.Title;
+            title.InnerText = props.Title!;
         }
 
 
@@ -1731,8 +1866,10 @@ public class FB2File : IComparable
         {
             var inZipFileName = string.Empty;
             var zipEncoding = Encoding.GetEncoding (FB2Config.Current.Encodings.CompressionEncoding);
-            var options = new ReadOptions();
-            options.Encoding = zipEncoding;
+            var options = new ReadOptions
+            {
+                Encoding = zipEncoding
+            };
             using (ZipFile zip = ZipFile.Read (FileInformation.FullName, options))
             {
                 inZipFileName = zip[0].FileName;
@@ -1759,6 +1896,10 @@ public class FB2File : IComparable
         Reload();
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="enc"></param>
     public void EncodeTo (Encoding enc)
     {
         var stream = GetFileReadStream (FileInformation.FullName);
@@ -1793,8 +1934,10 @@ public class FB2File : IComparable
         {
             var inZipFileName = string.Empty;
             var zipEncoding = Encoding.GetEncoding (FB2Config.Current.Encodings.CompressionEncoding);
-            var options = new ReadOptions();
-            options.Encoding = zipEncoding;
+            var options = new ReadOptions
+            {
+                Encoding = zipEncoding
+            };
             using (ZipFile zip = ZipFile.Read (FileInformation.FullName, options))
             {
                 inZipFileName = zip[0].FileName;
@@ -1821,13 +1964,21 @@ public class FB2File : IComparable
         Reload();
     }
 
+    /// <inheritdoc cref="object.ToString"/>
     public override string ToString()
     {
         return FileInformation.Name;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="fileName"></param>
     public FB2File (string fileName)
     {
+        BookEncoding = null!;
+        BookInternalEncoding = null!;
+
         ClearFields();
         FileInformation = new FileInfo (fileName);
         ParseFile (fileName);

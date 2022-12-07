@@ -6,6 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedMember.Global
 
 /* Analyzer.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -22,6 +23,9 @@ using System.Collections.Generic;
 
 namespace AM.Linguistics;
 
+/// <summary>
+///
+/// </summary>
 public static class Analyzer
 {
     static readonly List<WordForm> Items = new ();
@@ -48,6 +52,11 @@ public static class Analyzer
         Items.Sort();
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="form"></param>
+    /// <returns></returns>
     public static IEnumerable<WordForm> FindAllSourceForm
         (
             string form
@@ -57,6 +66,12 @@ public static class Analyzer
         return BinarySearcher.FindAll (Items, wordForm, new StringReverseComparer<WordForm>());
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="form"></param>
+    /// <param name="filter"></param>
+    /// <returns></returns>
     public static WordForm FindSimilarSourceForm
         (
             string form,
@@ -98,28 +113,63 @@ public static class Analyzer
         s2 = s2.Substring (0, s2.Length - i + 1);
     }
 
-    public struct WordForm : IComparable<WordForm>
+    /// <summary>
+    ///
+    /// </summary>
+    public struct WordForm
+        : IComparable<WordForm>
     {
+        /// <summary>
+        ///
+        /// </summary>
         public WordType Type;
+
+        /// <summary>
+        ///
+        /// </summary>
         public string Form;
+
+        /// <summary>
+        ///
+        /// </summary>
         public string SourceForm;
 
+        /// <inheritdoc cref="IComparable{T}.CompareTo"/>
         public int CompareTo (WordForm other)
         {
             return StringReverseComparer<string>.CompareStrings (Form, other.Form);
         }
 
+        /// <inheritdoc cref="ValueType.ToString"/>
         public override string ToString()
         {
             return Form;
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public enum WordType
     {
+        /// <summary>
+        ///
+        /// </summary>
         Verb,
+
+        /// <summary>
+        ///
+        /// </summary>
         Noun,
+
+        /// <summary>
+        ///
+        /// </summary>
         Adjective,
+
+        /// <summary>
+        ///
+        /// </summary>
         Pronoun
     }
 }

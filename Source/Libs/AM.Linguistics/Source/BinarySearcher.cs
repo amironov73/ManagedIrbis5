@@ -14,10 +14,7 @@
 #region Using directives
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 #endregion
 
@@ -25,8 +22,20 @@ using System.Text;
 
 namespace AM.Linguistics;
 
+/// <summary>
+///
+/// </summary>
 public static class BinarySearcher
 {
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="items"></param>
+    /// <param name="item"></param>
+    /// <param name="comparer"></param>
+    /// <param name="filter"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
     public static T FindOne<T>
         (
             this List<T> items,
@@ -38,7 +47,7 @@ public static class BinarySearcher
         var i = items.BinarySearch (item, comparer);
         if (i < 0 || i > items.Count - 1)
         {
-            return default (T);
+            return default!;
         }
 
         while (i > 0 && comparer.Compare (items[i - 1], item) == 0)
@@ -58,9 +67,17 @@ public static class BinarySearcher
             i++;
         }
 
-        return default (T);
+        return default!;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="items"></param>
+    /// <param name="item"></param>
+    /// <param name="comparer"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
     public static IEnumerable<T> FindAll<T> (this List<T> items, T item, IComparer<T> comparer)
     {
         var i = items.BinarySearch (item, comparer);
@@ -81,6 +98,15 @@ public static class BinarySearcher
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="items"></param>
+    /// <param name="item"></param>
+    /// <param name="comparer"></param>
+    /// <param name="filter"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
     public static T? FindSimilar<T>
         (
             this List<T> items,

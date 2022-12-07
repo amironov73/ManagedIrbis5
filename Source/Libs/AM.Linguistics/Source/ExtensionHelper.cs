@@ -15,6 +15,9 @@
 
 namespace AM.Linguistics;
 
+/// <summary>
+///
+/// </summary>
 public static class ExtensionHelper
 {
     /// <summary>
@@ -30,6 +33,7 @@ public static class ExtensionHelper
             case Gender.NA:
             case Gender.PA:
                 return Linguistics.Animacy.Animate;
+
             default:
                 return Linguistics.Animacy.Inanimate;
         }
@@ -46,15 +50,19 @@ public static class ExtensionHelper
             case Gender.FA:
             case Gender.MAFA:
                 return Gender.F;
+
             case Gender.M:
             case Gender.MA:
                 return Gender.M;
+
             case Gender.N:
             case Gender.NA:
                 return Gender.N;
+
             case Gender.P:
             case Gender.PA:
                 return Gender.P;
+
             default:
                 return Gender.Undefined;
         }
@@ -70,11 +78,18 @@ public static class ExtensionHelper
             case Gender.P:
             case Gender.PA:
                 return Linguistics.Number.Plural;
+
             default:
                 return Linguistics.Number.Singular;
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="case"></param>
+    /// <param name="gender"></param>
+    /// <returns></returns>
     public static int IndexWithAnimate (this Case @case, Gender gender)
     {
         var i = 0;
@@ -83,21 +98,27 @@ public static class ExtensionHelper
             case Case.Nominative:
                 i = 0;
                 break;
+
             case Case.Genitive:
                 i = 1;
                 break;
+
             case Case.Dative:
                 i = 2;
                 break;
+
             case Case.Accusative:
                 i = gender.Animacy() == Linguistics.Animacy.Animate ? 4 : 3;
                 break;
+
             case Case.Instrumental:
                 i = 5;
                 break;
+
             case Case.Locative:
                 i = 6;
                 break;
+
             case Case.Short:
                 i = 7;
                 break;
@@ -106,18 +127,28 @@ public static class ExtensionHelper
         return i;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="s"></param>
+    /// <param name="sample"></param>
+    /// <returns></returns>
     public static string ToUpper (this string s, string sample)
     {
-        if (char.IsUpper (sample[0]))
-            return char.ToUpper (s[0]) + s.Substring (1).ToLower();
-        return s.ToLower();
+        return char.IsUpper (sample[0])
+            ? char.ToUpper (s[0]) + s.Substring (1).ToLower()
+            : s.ToLower();
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="s"></param>
+    /// <returns></returns>
     public static string ToUpperFirst (this string s)
     {
-        if (!string.IsNullOrEmpty (s))
-            return char.ToUpper (s[0]) + s.Substring (1);
-
-        return s;
+        return !string.IsNullOrEmpty (s)
+            ? char.ToUpper (s[0]) + s.Substring (1)
+            : s;
     }
 }

@@ -21,10 +21,6 @@ using System.Text;
 
 using AM.Linguistics.Hunspell.Infrastructure;
 
-#if !NO_INLINE
-using System.Runtime.CompilerServices;
-#endif
-
 #endregion
 
 #nullable enable
@@ -33,6 +29,9 @@ namespace AM.Linguistics.Hunspell;
 
 public partial class AffixConfig
 {
+    /// <summary>
+    ///
+    /// </summary>
     public sealed class Builder
     {
         private const int DefaultCompoundMinLength = 3;
@@ -56,6 +55,27 @@ public partial class AffixConfig
         /// </summary>
         public Builder()
         {
+            KeyString = null!;
+            TryString = null!;
+            Language = null!;
+            Culture = null!;
+            CompoundSyllableNum = null!;
+            Replacements = null!;
+            Suffixes = null!;
+            Prefixes = null!;
+            AliasM = null!;
+            CompoundPatterns = null!;
+            CompoundRules = null!;
+            BreakPoints = null!;
+            InputConversions = null!;
+            OutputConversions = null!;
+            RelatedCharacterMap = null!;
+            Phone = null!;
+            CompoundVowels = null!;
+            WordChars = null!;
+            IgnoredChars = null!;
+            Version = null!;
+
             FlagSetDeduper = new Deduper<FlagSet> (FlagSet.DefaultComparer);
             FlagSetDeduper.Add (FlagSet.Empty);
             MorphSetDeduper = new Deduper<MorphSet> (MorphSet.DefaultComparer);
@@ -84,25 +104,25 @@ public partial class AffixConfig
         /// A string of text representing a keyboard layout.
         /// </summary>
         /// <seealso cref="AffixConfig.KeyString"/>
-        public string KeyString;
+        public string? KeyString;
 
         /// <summary>
         /// Characters used to permit some suggestions.
         /// </summary>
         /// <seealso cref="AffixConfig.TryString"/>
-        public string TryString;
+        public string? TryString;
 
         /// <summary>
         /// The language code used for language specific functions.
         /// </summary>
         /// <seealso cref="AffixConfig.Language"/>
-        public string Language;
+        public string? Language;
 
         /// <summary>
         /// The culture associated with the language.
         /// </summary>
         /// <seealso cref="AffixConfig.Culture"/>
-        public CultureInfo Culture;
+        public CultureInfo? Culture;
 
         /// <summary>
         /// Flag indicating that a word may be in compound words.
@@ -287,7 +307,7 @@ public partial class AffixConfig
         /// Values used for morphological alias compression.
         /// </summary>
         /// <seealso cref="AffixConfig.AliasM"/>
-        public List<MorphSet> AliasM;
+        public List<MorphSet>? AliasM;
 
         /// <summary>
         /// Indicates if any <see cref="AliasM"/> entries have been defined.
@@ -348,20 +368,20 @@ public partial class AffixConfig
         /// Voewls for calculating syllables.
         /// </summary>
         /// <seealso cref="AffixConfig.CompoundVowels"/>
-        public CharacterSet CompoundVowels { get; set; }
+        public CharacterSet? CompoundVowels { get; set; }
 
         /// <summary>
         /// Extra word characters.
         /// </summary>
         /// <seealso cref="AffixConfig.WordChars"/>
-        public CharacterSet WordChars { get; set; }
+        public CharacterSet? WordChars { get; set; }
 
         /// <summary>
         /// Ignored characters (for example, Arabic optional diacretics characters)
         /// for dictionary words, affixes and input words.
         /// </summary>
         /// <seealso cref="AffixConfig.IgnoredChars"/>
-        public CharacterSet IgnoredChars { get; set; }
+        public CharacterSet? IgnoredChars { get; set; }
 
         /// <summary>
         /// Affix and dictionary file version string.
@@ -416,20 +436,20 @@ public partial class AffixConfig
                 TryString = Dedup (TryString ?? string.Empty),
                 Language = Dedup (Language ?? string.Empty),
                 Culture = culture,
-                IsHungarian = string.Equals (culture?.TwoLetterISOLanguageName, "HU",
+                IsHungarian = string.Equals (culture.TwoLetterISOLanguageName, "HU",
                     StringComparison.OrdinalIgnoreCase),
-                IsGerman = string.Equals (culture?.TwoLetterISOLanguageName, "DE",
+                IsGerman = string.Equals (culture.TwoLetterISOLanguageName, "DE",
                     StringComparison.OrdinalIgnoreCase),
                 IsLanguageWithDashUsage =
                     !string.IsNullOrEmpty (TryString) && TryString.AsSpan().ContainsAny ('-', 'a'),
                 CultureUsesDottedI =
-                    string.Equals (culture?.TwoLetterISOLanguageName, "AZ", StringComparison.OrdinalIgnoreCase)
-                    || string.Equals (culture?.TwoLetterISOLanguageName, "TR", StringComparison.OrdinalIgnoreCase)
+                    string.Equals (culture.TwoLetterISOLanguageName, "AZ", StringComparison.OrdinalIgnoreCase)
+                    || string.Equals (culture.TwoLetterISOLanguageName, "TR", StringComparison.OrdinalIgnoreCase)
 #if !NO_ISO3_LANG
-                    || string.Equals (culture?.ThreeLetterISOLanguageName, "CRH",
+                    || string.Equals (culture.ThreeLetterISOLanguageName, "CRH",
                         StringComparison.OrdinalIgnoreCase)
 #endif
-                    || string.Equals (culture?.TwoLetterISOLanguageName, "CRH",
+                    || string.Equals (culture.TwoLetterISOLanguageName, "CRH",
                         StringComparison.OrdinalIgnoreCase), // wikipedia says: this is an ISO2 code
                 StringComparer = new CulturedStringComparer (culture),
                 CompoundFlag = CompoundFlag,
@@ -461,7 +481,7 @@ public partial class AffixConfig
                 CompoundVowels = CompoundVowels ?? CharacterSet.Empty,
                 WordChars = WordChars ?? CharacterSet.Empty,
                 IgnoredChars = IgnoredChars ?? CharacterSet.Empty,
-                Version = Version == null ? null : Dedup (Version),
+                Version = Version == null! ? null : Dedup (Version),
                 BreakPoints = BreakSet.Create (BreakPoints),
                 CompoundRules = CompoundRuleSet.Create (CompoundRules),
                 Replacements = SingleReplacementSet.Create (Replacements),
@@ -481,7 +501,7 @@ public partial class AffixConfig
                 config.aliasF = AliasF ?? new List<FlagSet>();
                 AliasF = null;
                 config.aliasM = AliasM ?? new List<MorphSet>();
-                AliasM = null;
+                AliasM = null!;
             }
             else
             {
@@ -505,72 +525,105 @@ public partial class AffixConfig
         /// Enables the given <paramref name="options"/> bits.
         /// </summary>
         /// <param name="options">Various bit options to enable.</param>
-#if !NO_INLINE
-        [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
         public void EnableOptions (AffixConfigOptions options) =>
             Options |= options;
 
-#if !NO_INLINE
-        [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="values"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
         public FlagSet Dedup (FlagSet values)
         {
-#if DEBUG
-            if (values == null) throw new ArgumentNullException (nameof (values));
-#endif
+            Sure.NotNull (values);
+
             return FlagSetDeduper.GetEqualOrAdd (values);
         }
 
-#if !NO_INLINE
-        [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
         internal string Dedup (ReadOnlySpan<char> value) =>
             StringDeduper.GetEqualOrAdd (value.ToString());
 
-#if !NO_INLINE
-        [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
         public string Dedup (string value)
         {
-#if DEBUG
-            if (value == null) throw new ArgumentNullException (nameof (value));
-#endif
+            Sure.NotNull (value);
+
             return StringDeduper.GetEqualOrAdd (value);
         }
 
-        public string[] DedupInPlace (string[] values)
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="values"></param>
+        /// <returns></returns>
+        public string[]? DedupInPlace (string[]? values)
         {
             if (values != null)
+            {
                 for (var i = 0; i < values.Length; i++)
                 {
                     ref var value = ref values[i];
-                    if (value != null) value = StringDeduper.GetEqualOrAdd (value);
+                    if (value != null!)
+                    {
+                        value = StringDeduper.GetEqualOrAdd (value);
+                    }
                 }
+            }
 
             return values;
         }
 
-        internal string[] DedupIntoArray (List<string> values)
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="values"></param>
+        /// <returns></returns>
+        internal string[] DedupIntoArray (List<string>? values)
         {
-            if (values == null || values.Count == 0) return Array.Empty<string>();
+            if (values == null || values.Count == 0)
+            {
+                return Array.Empty<string>();
+            }
 
             var result = new string[values.Count];
-            for (var i = 0; i < result.Length; i++) result[i] = StringDeduper.GetEqualOrAdd (values[i]);
+            for (var i = 0; i < result.Length; i++)
+            {
+                result[i] = StringDeduper.GetEqualOrAdd (values[i]);
+            }
 
             return result;
         }
 
-        public MorphSet Dedup (MorphSet value)
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public MorphSet? Dedup (MorphSet? value)
         {
             return value == null ? null : MorphSetDeduper.GetEqualOrAdd (value);
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public CharacterConditionGroup Dedup (CharacterConditionGroup value)
         {
             return CharacterConditionGroupDeduper.GetEqualOrAdd (value);
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="warning"></param>
         public void LogWarning (string warning)
         {
             Warnings.Add (warning);

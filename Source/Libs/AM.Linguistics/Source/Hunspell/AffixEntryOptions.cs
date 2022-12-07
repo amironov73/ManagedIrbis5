@@ -21,10 +21,16 @@ using System;
 
 namespace AM.Linguistics.Hunspell;
 
+/// <summary>
+///
+/// </summary>
 [Flags]
 public enum AffixEntryOptions
     : byte
 {
+    /// <summary>
+    ///
+    /// </summary>
     None = 0,
 
     /// <summary>
@@ -32,11 +38,23 @@ public enum AffixEntryOptions
     /// </summary>
     CrossProduct = 1 << 0,
 
+    /// <summary>
+    ///
+    /// </summary>
     Utf8 = 1 << 1,
 
+    /// <summary>
+    ///
+    /// </summary>
     AliasF = 1 << 2,
 
+    /// <summary>
+    ///
+    /// </summary>
     AliasM = 1 << 3,
 
+    /// <summary>
+    ///
+    /// </summary>
     LongCond = 1 << 4
 }

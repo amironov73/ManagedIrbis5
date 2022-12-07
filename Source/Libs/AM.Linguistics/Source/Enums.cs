@@ -183,13 +183,37 @@ public enum Comparability : byte
 /// <summary>
 /// Степени сравнения
 /// </summary>
-public enum Comparison : byte
+public enum Comparison
+    : byte
 {
+    /// <summary>
+    ///
+    /// </summary>
     Comparative1 = 0,
+
+    /// <summary>
+    ///
+    /// </summary>
     Comparative2 = 1,
+
+    /// <summary>
+    ///
+    /// </summary>
     Comparative3 = 2,
+
+    /// <summary>
+    ///
+    /// </summary>
     Comparative4 = 3,
+
+    /// <summary>
+    ///
+    /// </summary>
     Comparative5 = 4,
+
+    /// <summary>
+    ///
+    /// </summary>
     Undefined = 255
 }
 

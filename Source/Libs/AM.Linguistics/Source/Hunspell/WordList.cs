@@ -193,12 +193,12 @@ public sealed partial class WordList
     /// <summary>
     ///
     /// </summary>
-    public IEnumerable<string> RootWords => EntriesByRoot.Keys;
+    public IEnumerable<string> RootWords => EntriesByRoot!.Keys;
 
     /// <summary>
     ///
     /// </summary>
-    public bool HasEntries => EntriesByRoot.Count != 0;
+    public bool HasEntries => EntriesByRoot!.Count != 0;
 
     /// <summary>
     ///
@@ -210,7 +210,7 @@ public sealed partial class WordList
             string? rootWord
         )
     {
-        return rootWord != null && EntriesByRoot.ContainsKey (rootWord);
+        return rootWord != null && EntriesByRoot!.ContainsKey (rootWord);
     }
 
     /// <summary>
@@ -312,7 +312,7 @@ public sealed partial class WordList
             throw new ArgumentNullException (nameof (rootWord));
         }
 #endif
-        return rootWord == null || !EntriesByRoot.TryGetValue (rootWord, out var details)
+        return rootWord == null! || !EntriesByRoot!.TryGetValue (rootWord, out var details)
             ? Array.Empty<WordEntryDetail>()
             : details;
     }
@@ -359,7 +359,7 @@ public sealed partial class WordList
 
         public Enumerator GetEnumerator()
         {
-            return new (wordList.EntriesByRoot, wordList.NGramRestrictedDetails, rootKeyFilter);
+            return new (wordList.EntriesByRoot!, wordList.NGramRestrictedDetails, rootKeyFilter);
         }
 
         IEnumerator<KeyValuePair<string, WordEntryDetail[]>> IEnumerable<KeyValuePair<string, WordEntryDetail[]>>.
@@ -383,7 +383,7 @@ public sealed partial class WordList
                 this.entriesByRoot = entriesByRoot;
                 this.nGramRestrictedDetails = nGramRestrictedDetails;
                 this.rootKeyFilter = rootKeyFilter;
-                requiresNGramFiltering = nGramRestrictedDetails != null && nGramRestrictedDetails.Count != 0;
+                requiresNGramFiltering = nGramRestrictedDetails != null! && nGramRestrictedDetails.Count != 0;
             }
 
             private Dictionary<string, WordEntryDetail[]>.Enumerator coreEnumerator;

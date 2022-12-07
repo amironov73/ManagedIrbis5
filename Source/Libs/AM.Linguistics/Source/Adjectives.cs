@@ -6,6 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedMember.Global
 
 /* Adjectives.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -24,229 +25,273 @@ using System.Text;
 
 #nullable enable
 
-namespace AM.Linguistics
+namespace AM.Linguistics;
+
+/// <summary>
+/// Словарь прилагательных
+/// </summary>
+public static class Adjectives
 {
-    /// <summary>
-    /// Словарь прилагательных
-    /// </summary>
-    public static class Adjectives
+    private static readonly List<AdjectiveRaw> items = new ();
+    internal static readonly Schemas schemas = new ();
+
+    static Adjectives()
     {
-        private readonly static List<AdjectiveRaw> items = new List<AdjectiveRaw>();
-        internal readonly static Schemas schemas = new Schemas();
+        schemas.BeginInit();
+        items.Clear();
 
-        static Adjectives()
-        {
-            schemas.BeginInit();
-            items.Clear();
+        var assembly = Assembly.GetExecutingAssembly();
+        var resourceName = "AM.Linguistics.Dict.adjective.bin";
 
-            var assembly = Assembly.GetExecutingAssembly();
-            var resourceName = "AM.Linguistics.Dict.adjective.bin";
-
-            using (var stream = assembly.GetManifestResourceStream (resourceName))
-            using (var zip = new GZipStream (stream, CompressionMode.Decompress))
-            using (var sr = new StreamReader (zip, Encoding.GetEncoding (1251)))
-                while (sr.Peek() >= 0)
+        using (var stream = assembly.GetManifestResourceStream (resourceName))
+        using (var zip = new GZipStream (stream!, CompressionMode.Decompress))
+        using (var sr = new StreamReader (zip, Encoding.GetEncoding (1251)))
+            while (sr.Peek() >= 0)
+            {
+                var line = sr.ReadLine();
+                if (!string.IsNullOrEmpty (line))
                 {
-                    var line = sr.ReadLine();
-                    if (!string.IsNullOrEmpty (line))
-                        items.Add (ParseAdjective (line));
+                    items.Add (ParseAdjective (line));
                 }
+            }
 
-            schemas.EndInit();
-        }
-
-        static AdjectiveRaw ParseAdjective (string line)
-        {
-            var parts = line.Split ('\t');
-
-            var wordStr = parts[0];
-            var schemaStr = parts[1];
-
-            var res = new AdjectiveRaw();
-            res.Word = wordStr;
-            res.SchemaIndex = schemas.GetOrAddSchemaId (schemaStr);
-
-            return res;
-        }
-
-        /// <summary>
-        /// Поиск по точному или приблизительному совпадению
-        /// </summary>
-        public static Adjective FindSimilar (string sourceForm, Comparability comparability = Comparability.Undefined)
-        {
-            var searchWord = PrepareWord (sourceForm);
-
-            var res = items.FindSimilar (new AdjectiveRaw() { Word = searchWord },
-                new StringReverseComparer<AdjectiveRaw>(), PrepareFilter (comparability));
-            if (res.Word == null)
-                return null;
-            return new Adjective { Word = sourceForm, SchemaIndex = res.SchemaIndex, Inexact = res.Word != searchWord };
-        }
-
-        /// <summary>
-        /// Поиск по точному или приблизительному совпадению
-        /// </summary>
-        public static Adjective FindSimilar (string sourceForm, Predicate<Adjective> filter)
-        {
-            var searchWord = PrepareWord (sourceForm);
-
-            var res = items.FindSimilar (new AdjectiveRaw() { Word = searchWord },
-                new StringReverseComparer<AdjectiveRaw>(), (item) => filter (new Adjective (item, item.Word)));
-            if (res.Word == null)
-                return null;
-            return new Adjective { Word = sourceForm, SchemaIndex = res.SchemaIndex, Inexact = res.Word != searchWord };
-        }
-
-        /// <summary>
-        /// Поиск одного точного совпадения. Null - если не найдено.
-        /// </summary>
-        public static Adjective FindOne (string sourceForm, Comparability comparability = Comparability.Undefined)
-        {
-            var searchWord = PrepareWord (sourceForm);
-
-            var res = items.FindOne (new AdjectiveRaw() { Word = searchWord },
-                new StringReverseComparer<AdjectiveRaw>(), PrepareFilter (comparability));
-            if (res.Word == null)
-                return null;
-            return new Adjective (res, sourceForm);
-        }
-
-        /// <summary>
-        /// Поиск всех точных совпадений(омонимов).
-        /// </summary>
-        public static IEnumerable<Adjective> FindAll (string sourceForm)
-        {
-            var searchWord = PrepareWord (sourceForm);
-
-            foreach (var res in items.FindAll (new AdjectiveRaw() { Word = searchWord },
-                         new StringReverseComparer<AdjectiveRaw>()))
-                yield return new Adjective (res, sourceForm);
-        }
-
-        private static Predicate<AdjectiveRaw> PrepareFilter (Comparability comp)
-        {
-            if (comp == Comparability.Undefined) return (item) => true;
-            return (item) => item.Comparability == comp;
-        }
-
-        private static string PrepareWord (string sourceForm)
-        {
-            var searchWord = sourceForm.ToLowerInvariant();
-            return searchWord;
-        }
-
-        /// <summary>
-        /// Возвращает все слова
-        /// </summary>
-        public static IEnumerable<Adjective> GetAll()
-        {
-            foreach (var raw in items)
-                yield return new Adjective (raw, raw.Word);
-        }
+        schemas.EndInit();
     }
 
-    internal struct AdjectiveRaw
+    static AdjectiveRaw ParseAdjective (string line)
     {
-        public string Word;
-        public int SchemaIndex;
+        var parts = line.Split ('\t');
 
-        public Comparability Comparability
-        {
-            get
-            {
-                if (Adjectives.schemas[SchemaIndex].GetForm (Word, 32) != null)
-                    return Comparability.Comparable;
-                else
-                    return Comparability.Incomparable;
-            }
-        }
+        var wordStr = parts[0];
+        var schemaStr = parts[1];
 
-        public override string ToString()
+        var res = new AdjectiveRaw
         {
-            return Word;
-        }
+            Word = wordStr,
+            SchemaIndex = schemas.GetOrAddSchemaId (schemaStr)
+        };
+
+        return res;
     }
 
     /// <summary>
-    /// Прилагательное и его словоформы
+    /// Поиск по точному или приблизительному совпадению
     /// </summary>
-    public class Adjective
+    public static Adjective? FindSimilar
+        (
+            string sourceForm,
+            Comparability comparability = Comparability.Undefined
+        )
     {
-        internal int SchemaIndex;
+        var searchWord = PrepareWord (sourceForm);
 
-        /// <summary>
-        /// Исходная форма
-        /// </summary>
-        public string Word { get; internal set; }
-
-        /// <summary>
-        /// Результат не точен и был получен по похожему слову
-        /// </summary>
-        public bool Inexact { get; internal set; }
-
-        /// <summary>
-        /// Разряд прилагательного
-        /// </summary>
-        public Comparability Comparability
+        var res = items.FindSimilar (new AdjectiveRaw() { Word = searchWord },
+            new StringReverseComparer<AdjectiveRaw>(), PrepareFilter (comparability));
+        if (res.Word == null)
         {
-            get
+            return null;
+        }
+
+        return new Adjective { Word = sourceForm, SchemaIndex = res.SchemaIndex, Inexact = res.Word != searchWord };
+    }
+
+    /// <summary>
+    /// Поиск по точному или приблизительному совпадению
+    /// </summary>
+    public static Adjective? FindSimilar
+        (
+            string sourceForm,
+            Predicate<Adjective> filter
+        )
+    {
+        var searchWord = PrepareWord (sourceForm);
+
+        var res = items.FindSimilar (new AdjectiveRaw() { Word = searchWord },
+            new StringReverseComparer<AdjectiveRaw>(), item => filter (new Adjective (item, item.Word)));
+        if (res.Word == null)
+        {
+            return null;
+        }
+
+        return new Adjective { Word = sourceForm, SchemaIndex = res.SchemaIndex, Inexact = res.Word != searchWord };
+    }
+
+    /// <summary>
+    /// Поиск одного точного совпадения. Null - если не найдено.
+    /// </summary>
+    public static Adjective? FindOne
+        (
+            string sourceForm,
+            Comparability comparability = Comparability.Undefined
+        )
+    {
+        var searchWord = PrepareWord (sourceForm);
+
+        var res = items.FindOne (new AdjectiveRaw() { Word = searchWord },
+            new StringReverseComparer<AdjectiveRaw>(), PrepareFilter (comparability));
+        if (res.Word == null!)
+        {
+            return null;
+        }
+
+        return new Adjective (res, sourceForm);
+    }
+
+    /// <summary>
+    /// Поиск всех точных совпадений(омонимов).
+    /// </summary>
+    public static IEnumerable<Adjective> FindAll (string sourceForm)
+    {
+        var searchWord = PrepareWord (sourceForm);
+
+        foreach (var res in items.FindAll (new AdjectiveRaw() { Word = searchWord },
+                     new StringReverseComparer<AdjectiveRaw>()))
+            yield return new Adjective (res, sourceForm);
+    }
+
+    private static Predicate<AdjectiveRaw> PrepareFilter (Comparability comp)
+    {
+        if (comp == Comparability.Undefined)
+        {
+            return _ => true;
+        }
+
+        return item => item.Comparability == comp;
+    }
+
+    private static string PrepareWord (string sourceForm)
+    {
+        var searchWord = sourceForm.ToLowerInvariant();
+        return searchWord;
+    }
+
+    /// <summary>
+    /// Возвращает все слова
+    /// </summary>
+    public static IEnumerable<Adjective> GetAll()
+    {
+        foreach (var raw in items)
+            yield return new Adjective (raw, raw.Word);
+    }
+}
+
+internal struct AdjectiveRaw
+{
+    public string Word;
+    public int SchemaIndex;
+
+    public Comparability Comparability
+    {
+        get
+        {
+            if (Adjectives.schemas[SchemaIndex].GetForm (Word, 32) != null!)
             {
-                if (Adjectives.schemas[SchemaIndex].GetForm (Word, 32) != null)
-                    return Comparability.Comparable;
-                else
-                    return Comparability.Incomparable;
+                return Comparability.Comparable;
+            }
+            else
+            {
+                return Comparability.Incomparable;
             }
         }
+    }
 
-        internal Adjective (AdjectiveRaw raw, string word)
+    public override string ToString()
+    {
+        return Word;
+    }
+}
+
+/// <summary>
+/// Прилагательное и его словоформы
+/// </summary>
+public class Adjective
+{
+    internal int SchemaIndex;
+
+    /// <summary>
+    /// Исходная форма
+    /// </summary>
+    public string Word { get; internal set; }
+
+    /// <summary>
+    /// Результат не точен и был получен по похожему слову
+    /// </summary>
+    public bool Inexact { get; internal set; }
+
+    /// <summary>
+    /// Разряд прилагательного
+    /// </summary>
+    public Comparability Comparability
+    {
+        get
         {
-            this.Word = word;
-            if (raw.Word != null)
+            if (Adjectives.schemas[SchemaIndex].GetForm (Word, 32) != null!)
             {
-                SchemaIndex = raw.SchemaIndex;
+                return Comparability.Comparable;
+            }
+            else
+            {
+                return Comparability.Incomparable;
             }
         }
+    }
 
-        public Adjective()
+    internal Adjective (AdjectiveRaw raw, string word)
+    {
+        Word = word;
+        if (raw.Word != null!)
         {
+            SchemaIndex = raw.SchemaIndex;
         }
+    }
 
-        /// <summary>
-        /// Словоформы по падежам, родам и числам
-        /// </summary>
-        public string this [Case @case, Gender gender]
+    /// <summary>
+    ///
+    /// </summary>
+    public Adjective()
+    {
+        Word = null!;
+    }
+
+    /// <summary>
+    /// Словоформы по падежам, родам и числам
+    /// </summary>
+    public string this [Case @case, Gender gender]
+    {
+        get
         {
-            get
-            {
-                var i = @case.IndexWithAnimate (gender);
-                i += 8 * (int)gender.Gen();
+            var i = @case.IndexWithAnimate (gender);
+            i += 8 * (int)gender.Gen();
 
-                return Adjectives.schemas[SchemaIndex].GetForm (Word, i);
+            return Adjectives.schemas[SchemaIndex].GetForm (Word, i);
+        }
+    }
+
+    /// <summary>
+    /// Сравнительные степени прилагательного
+    /// </summary>
+    public string this [Comparison comparsion]
+    {
+        get
+        {
+            if ((int)comparsion > 3)
+            {
+                return "";
             }
-        }
 
-        /// <summary>
-        /// Сравнительные степени прилагательного
-        /// </summary>
-        public string this [Comparison comparsion]
-        {
-            get
+            var res = Adjectives.schemas[SchemaIndex].GetForm (Word, 32 + (int)comparsion / 2);
+            if (string.IsNullOrEmpty (res))
             {
-                if ((int)comparsion > 3)
-                    return "";
+                return "";
+            }
 
-                var res = Adjectives.schemas[SchemaIndex].GetForm (Word, 32 + (int)comparsion / 2);
-                if (string.IsNullOrEmpty (res))
-                    return "";
-
-                switch (comparsion)
-                {
-                    case Comparison.Comparative2:
-                    case Comparison.Comparative4:
-                        return Char.IsUpper (res[0]) ? "По" + res.ToLowerInvariant() : "по" + res;
-                    default:
-                        return res;
-                }
+            switch (comparsion)
+            {
+                case Comparison.Comparative2:
+                case Comparison.Comparative4:
+                    return Char.IsUpper (res[0]) ? "По" + res.ToLowerInvariant() : "по" + res;
+                default:
+                    return res;
             }
         }
     }
