@@ -3,12 +3,13 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable ForCanBeConvertedToForeach
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable NonReadonlyMemberInGetHashCode
 // ReSharper disable UnusedMember.Global
 
-/*
+/* HtmlDocument.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,7 +22,11 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
 
+using AM;
+
 #endregion
+
+#pragma warning disable CS0618 // obsolete types
 
 #nullable enable
 
@@ -62,7 +67,7 @@ public partial class HtmlDocument
     }
 
     /// <summary>Default builder to use in the HtmlDocument constructor</summary>
-    public static Action<HtmlDocument> DefaultBuilder { get; set; }
+    public static Action<HtmlDocument>? DefaultBuilder { get; set; }
 
     /// <summary>Action to execute before the Parse is executed</summary>
     public Action<HtmlDocument> ParseExecuting { get; set; }
@@ -71,21 +76,16 @@ public partial class HtmlDocument
 
     #region Fields
 
-    /// <summary>
-    /// Defines the max level we would go deep into the html document
-    /// </summary>
-    private static int _maxDepthLevel = int.MaxValue;
-
     private int _c;
     private Crc32 _crc32;
-    private HtmlAttribute _currentattribute;
-    private HtmlNode _currentnode;
-    private Encoding? _declaredencoding;
+    private HtmlAttribute _currentAttribute;
+    private HtmlNode _currentNode;
+    private Encoding? _declaredEncoding;
     private HtmlNode _documentnode;
     private bool _fullcomment;
     private int _index;
     internal Dictionary<string, HtmlNode> Lastnodes = new ();
-    private HtmlNode _lastparentnode;
+    private HtmlNode _lastParentNode;
     private int _line;
     private int _lineposition, _maxlineposition;
     internal Dictionary<string, HtmlNode> Nodesid;
@@ -96,7 +96,7 @@ public partial class HtmlDocument
     private string _remainder;
     private int _remainderOffset;
     private ParseState _state;
-    private Encoding _streamencoding;
+    private Encoding _streamEncoding;
     private bool _useHtmlEncodingForStream;
 
     /// <summary>The HtmlDocument Text. Careful if you modify it.</summary>
@@ -256,17 +256,24 @@ public partial class HtmlDocument
     /// </summary>
     public HtmlDocument()
     {
-        if (DefaultBuilder != null)
+        _crc32 = null!;
+        _currentAttribute = null!;
+        _currentNode = null!;
+        _lastParentNode = null!;
+        _remainder = null!;
+        _streamEncoding = null!;
+        ParseExecuting = null!;
+        Nodesid = null!;
+        Text = null!;
+        OptionStopperNodeName = null!;
+
+        if (DefaultBuilder != null!)
         {
             DefaultBuilder (this);
         }
 
         _documentnode = CreateNode (HtmlNodeType.Document, 0);
-#if SILVERLIGHT || METRO || NETSTANDARD1_3 || NETSTANDARD1_6
-            OptionDefaultStreamEncoding = Encoding.UTF8;
-#else
-        OptionDefaultStreamEncoding = Encoding.Default;
-#endif
+        OptionDefaultStreamEncoding = Encoding.UTF8;
     }
 
     #endregion
@@ -275,87 +282,56 @@ public partial class HtmlDocument
 
     /// <summary>Gets the parsed text.</summary>
     /// <value>The parsed text.</value>
-    public string ParsedText
-    {
-        get { return Text; }
-    }
+    public string ParsedText => Text;
 
     /// <summary>
     /// Defines the max level we would go deep into the html document. If this depth level is exceeded, and exception is
     /// thrown.
     /// </summary>
-    public static int MaxDepthLevel
-    {
-        get { return _maxDepthLevel; }
-        set { _maxDepthLevel = value; }
-    }
+    public static int MaxDepthLevel { get; set; } = int.MaxValue;
 
     /// <summary>
     /// Gets the document CRC32 checksum if OptionComputeChecksum was set to true before parsing, 0 otherwise.
     /// </summary>
-    public int CheckSum
-    {
-        get { return _crc32 == null ? 0 : (int)_crc32.CheckSum; }
-    }
+    public int CheckSum => _crc32 == null! ? 0 : (int)_crc32.CheckSum;
 
     /// <summary>
     /// Gets the document's declared encoding.
     /// Declared encoding is determined using the meta http-equiv="content-type" content="text/html;charset=XXXXX" html node (pre-HTML5) or the meta charset="XXXXX" html node (HTML5).
     /// </summary>
-    public Encoding DeclaredEncoding
-    {
-        get { return _declaredencoding; }
-    }
+    public Encoding DeclaredEncoding => _declaredEncoding!;
 
     /// <summary>
     /// Gets the root node of the document.
     /// </summary>
-    public HtmlNode DocumentNode
-    {
-        get { return _documentnode; }
-    }
+    public HtmlNode DocumentNode => _documentnode;
 
     /// <summary>
     /// Gets the document's output encoding.
     /// </summary>
-    public Encoding Encoding
-    {
-        get { return GetOutEncoding(); }
-    }
+    public Encoding Encoding => GetOutEncoding();
 
     /// <summary>
     /// Gets a list of parse errors found in the document.
     /// </summary>
-    public IEnumerable<HtmlParseError> ParseErrors
-    {
-        get { return _parseerrors; }
-    }
+    public IEnumerable<HtmlParseError> ParseErrors => _parseerrors;
 
     /// <summary>
     /// Gets the remaining text.
     /// Will always be null if OptionStopperNodeName is null.
     /// </summary>
-    public string Remainder
-    {
-        get { return _remainder; }
-    }
+    public string Remainder => _remainder;
 
     /// <summary>
     /// Gets the offset of Remainder in the original Html text.
     /// If OptionStopperNodeName is null, this will return the length of the original Html text.
     /// </summary>
-    public int RemainderOffset
-    {
-        get { return _remainderOffset; }
-    }
+    public int RemainderOffset => _remainderOffset;
 
     /// <summary>
     /// Gets the document's stream encoding.
     /// </summary>
-    public Encoding StreamEncoding
-    {
-        get { return _streamencoding; }
-    }
+    public Encoding StreamEncoding => _streamEncoding;
 
     #endregion
 
@@ -371,10 +347,13 @@ public partial class HtmlDocument
         return GetXmlName (name, false, false);
     }
 
-#if !METRO
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="tagName"></param>
     public void UseAttributeOriginalName (string tagName)
     {
-        foreach (var nod in this.DocumentNode.SelectNodes ("//" + tagName))
+        foreach (var nod in this.DocumentNode.SelectNodes ("//" + tagName)!)
         {
             foreach (var attribut in nod.Attributes)
             {
@@ -382,7 +361,6 @@ public partial class HtmlDocument
             }
         }
     }
-#endif
 
     public static string GetXmlName (string name, bool isAttribute, bool preserveXmlNamespaces)
     {
@@ -392,20 +370,20 @@ public partial class HtmlDocument
         {
             // names are lcase
             // note: we are very limited here, too much?
-            if (((name[i] >= 'a') && (name[i] <= 'z')) ||
-                ((name[i] >= 'A') && (name[i] <= 'Z')) ||
-                ((name[i] >= '0') && (name[i] <= '9')) ||
-                ((isAttribute || preserveXmlNamespaces) && name[i] == ':') ||
+            if (name[i] >= 'a' && name[i] <= 'z' ||
+                name[i] >= 'A' && name[i] <= 'Z' ||
+                name[i] >= '0' && name[i] <= '9' ||
+                (isAttribute || preserveXmlNamespaces) && name[i] == ':' ||
 
                 //                    (name[i]==':') || (name[i]=='_') || (name[i]=='-') || (name[i]=='.')) // these are bads in fact
-                (name[i] == '_') || (name[i] == '-') || (name[i] == '.'))
+                name[i] == '_' || name[i] == '-' || name[i] == '.')
             {
                 xmlname += name[i];
             }
             else
             {
                 nameisok = false;
-                var bytes = Encoding.UTF8.GetBytes (new char[] { name[i] });
+                var bytes = Encoding.UTF8.GetBytes (new[] { name[i] });
                 for (var j = 0; j < bytes.Length; j++)
                 {
                     xmlname += bytes[j].ToString ("x2");
@@ -435,10 +413,7 @@ public partial class HtmlDocument
 
     internal static string HtmlEncodeWithCompatibility (string html, bool backwardCompatibility = true)
     {
-        if (html == null)
-        {
-            throw new ArgumentNullException ("html");
-        }
+        Sure.NotNull (html);
 
         // replace & by &amp; but only once!
 
@@ -470,10 +445,7 @@ public partial class HtmlDocument
     /// <returns>The new HTML attribute.</returns>
     public HtmlAttribute CreateAttribute (string name)
     {
-        if (name == null)
-        {
-            throw new ArgumentNullException ("name");
-        }
+        Sure.NotNull (name);
 
         var att = CreateAttribute();
         att.Name = name;
@@ -488,10 +460,7 @@ public partial class HtmlDocument
     /// <returns>The new HTML attribute.</returns>
     public HtmlAttribute CreateAttribute (string name, string value)
     {
-        if (name == null)
-        {
-            throw new ArgumentNullException ("name");
-        }
+        Sure.NotNull (name);
 
         var att = CreateAttribute (name);
         att.Value = value;
@@ -514,10 +483,7 @@ public partial class HtmlDocument
     /// <returns>The new HTML comment node.</returns>
     public HtmlCommentNode CreateComment (string comment)
     {
-        if (comment == null)
-        {
-            throw new ArgumentNullException ("comment");
-        }
+        Sure.NotNull (comment);
 
         var c = CreateComment();
         c.Comment = comment;
@@ -531,10 +497,7 @@ public partial class HtmlDocument
     /// <returns>The new HTML node.</returns>
     public HtmlNode CreateElement (string name)
     {
-        if (name == null)
-        {
-            throw new ArgumentNullException ("name");
-        }
+        Sure.NotNull (name);
 
         var node = CreateNode (HtmlNodeType.Element);
         node.Name = name;
@@ -557,10 +520,7 @@ public partial class HtmlDocument
     /// <returns>The new HTML text node.</returns>
     public HtmlTextNode CreateTextNode (string text)
     {
-        if (text == null)
-        {
-            throw new ArgumentNullException ("text");
-        }
+        Sure.NotNull (text);
 
         var t = CreateTextNode();
         t.Text = text;
@@ -585,12 +545,9 @@ public partial class HtmlDocument
     /// <returns>The detected encoding.</returns>
     public Encoding DetectEncoding (Stream stream, bool checkHtml)
     {
-        _useHtmlEncodingForStream = checkHtml;
+        Sure.NotNull (stream);
 
-        if (stream == null)
-        {
-            throw new ArgumentNullException ("stream");
-        }
+        _useHtmlEncodingForStream = checkHtml;
 
         return DetectEncoding (new StreamReader (stream));
     }
@@ -603,10 +560,7 @@ public partial class HtmlDocument
     /// <returns>The detected encoding.</returns>
     public Encoding DetectEncoding (TextReader reader)
     {
-        if (reader == null)
-        {
-            throw new ArgumentNullException ("reader");
-        }
+        Sure.NotNull (reader);
 
         _onlyDetectEncoding = true;
         if (OptionCheckSyntax)
@@ -624,19 +578,19 @@ public partial class HtmlDocument
         }
         else
         {
-            Nodesid = null;
+            Nodesid = null!;
         }
 
         var sr = reader as StreamReader;
         if (sr != null && !_useHtmlEncodingForStream)
         {
             Text = sr.ReadToEnd();
-            _streamencoding = sr.CurrentEncoding;
-            return _streamencoding;
+            _streamEncoding = sr.CurrentEncoding;
+            return _streamEncoding;
         }
 
-        _streamencoding = null;
-        _declaredencoding = null;
+        _streamEncoding = null!;
+        _declaredEncoding = null;
 
         Text = reader.ReadToEnd();
         _documentnode = CreateNode (HtmlNodeType.Document, 0);
@@ -651,7 +605,7 @@ public partial class HtmlDocument
             return ex.Encoding;
         }
 
-        return _streamencoding;
+        return _streamEncoding;
     }
 
 
@@ -662,10 +616,7 @@ public partial class HtmlDocument
     /// <returns>The detected encoding.</returns>
     public Encoding DetectEncodingHtml (string html)
     {
-        if (html == null)
-        {
-            throw new ArgumentNullException ("html");
-        }
+        Sure.NotNull (html);
 
         using (var sr = new StringReader (html))
         {
@@ -679,12 +630,9 @@ public partial class HtmlDocument
     /// </summary>
     /// <param name="id">The attribute id to match. May not be null.</param>
     /// <returns>The HTML node with the matching id or null if not found.</returns>
-    public HtmlNode GetElementbyId (string id)
+    public HtmlNode? GetElementbyId (string id)
     {
-        if (id == null)
-        {
-            throw new ArgumentNullException ("id");
-        }
+        Sure.NotNull (id);
 
         if (Nodesid == null)
         {
@@ -754,10 +702,7 @@ public partial class HtmlDocument
     public void Load (TextReader reader)
     {
         // all Load methods pass down to this one
-        if (reader == null)
-        {
-            throw new ArgumentNullException ("reader");
-        }
+        Sure.NotNull (reader);
 
         _onlyDetectEncoding = false;
 
@@ -776,11 +721,10 @@ public partial class HtmlDocument
         }
         else
         {
-            Nodesid = null;
+            Nodesid = null!;
         }
 
-        var sr = reader as StreamReader;
-        if (sr != null)
+        if (reader is StreamReader sr)
         {
             try
             {
@@ -796,14 +740,14 @@ public partial class HtmlDocument
                 // void on purpose
             }
 
-            _streamencoding = sr.CurrentEncoding;
+            _streamEncoding = sr.CurrentEncoding;
         }
         else
         {
-            _streamencoding = null;
+            _streamEncoding = null!;
         }
 
-        _declaredencoding = null;
+        _declaredEncoding = null;
 
         Text = reader.ReadToEnd();
         _documentnode = CreateNode (HtmlNodeType.Document, 0);
@@ -824,7 +768,7 @@ public partial class HtmlDocument
             string html;
             if (OptionExtractErrorSourceText)
             {
-                html = node.OuterHtml;
+                html = node.OuterHtml!;
                 if (html.Length > OptionExtractErrorSourceTextMaxLength)
                 {
                     html = html.Substring (0, OptionExtractErrorSourceTextMaxLength);
@@ -852,10 +796,7 @@ public partial class HtmlDocument
     /// <param name="html">String containing the HTML document to load. May not be null.</param>
     public void LoadHtml (string html)
     {
-        if (html == null)
-        {
-            throw new ArgumentNullException ("html");
-        }
+        Sure.NotNull (html);
 
         using (var sr = new StringReader (html))
         {
@@ -880,15 +821,8 @@ public partial class HtmlDocument
     /// <param name="encoding">The character encoding to use. May not be null.</param>
     public void Save (Stream outStream, Encoding encoding)
     {
-        if (outStream == null)
-        {
-            throw new ArgumentNullException ("outStream");
-        }
-
-        if (encoding == null)
-        {
-            throw new ArgumentNullException ("encoding");
-        }
+        Sure.NotNull (outStream);
+        Sure.NotNull (encoding);
 
         var sw = new StreamWriter (outStream, encoding);
         Save (sw);
@@ -910,10 +844,7 @@ public partial class HtmlDocument
     /// <param name="writer">The TextWriter to which you want to save. May not be null.</param>
     public void Save (TextWriter writer)
     {
-        if (writer == null)
-        {
-            throw new ArgumentNullException ("writer");
-        }
+        Sure.NotNull (writer);
 
         DocumentNode.WriteTo (writer);
         writer.Flush();
@@ -961,17 +892,17 @@ public partial class HtmlDocument
     internal Encoding GetOutEncoding()
     {
         // when unspecified, use the stream encoding first
-        return _declaredencoding ?? (_streamencoding ?? OptionDefaultStreamEncoding);
+        return _declaredEncoding ?? (_streamEncoding ?? OptionDefaultStreamEncoding);
     }
 
-    internal HtmlNode GetXmlDeclaration()
+    internal HtmlNode? GetXmlDeclaration()
     {
         if (!_documentnode.HasChildNodes)
         {
             return null;
         }
 
-        foreach (var node in _documentnode._childrenNodes)
+        foreach (var node in _documentnode._childrenNodes!)
             if (node.Name == "?xml") // it's ok, names are case sensitive
             {
                 return node;
@@ -987,12 +918,12 @@ public partial class HtmlDocument
             return;
         }
 
-        if ((Nodesid == null) || (id == null))
+        if (Nodesid == null! || id == null!)
         {
             return;
         }
 
-        if (node == null)
+        if (node == null!)
         {
             Nodesid.Remove (id);
         }
@@ -1006,15 +937,15 @@ public partial class HtmlDocument
     {
         do
         {
-            if (_lastparentnode.Closed)
+            if (_lastParentNode.Closed)
             {
-                _lastparentnode = _lastparentnode.ParentNode;
+                _lastParentNode = _lastParentNode.ParentNode!;
             }
-        } while ((_lastparentnode != null) && (_lastparentnode.Closed));
+        } while (_lastParentNode != null! && _lastParentNode.Closed);
 
-        if (_lastparentnode == null)
+        if (_lastParentNode == null)
         {
-            _lastparentnode = _documentnode;
+            _lastParentNode = _documentnode;
         }
     }
 
@@ -1032,34 +963,34 @@ public partial class HtmlDocument
 
     private void CloseCurrentNode()
     {
-        if (_currentnode.Closed) // text or document are by def closed
+        if (_currentNode.Closed) // text or document are by def closed
         {
             return;
         }
 
         var error = false;
-        var prev = Utilities.GetDictionaryValueOrDefault (Lastnodes, _currentnode.Name);
+        var prev = Utilities.GetDictionaryValueOrDefault (Lastnodes, _currentNode.Name);
 
         // find last node of this kind
         if (prev == null)
         {
-            if (HtmlNode.IsClosedElement (_currentnode.Name))
+            if (HtmlNode.IsClosedElement (_currentNode.Name))
             {
                 // </br> will be seen as <br>
-                _currentnode.CloseNode (_currentnode);
+                _currentNode.CloseNode (_currentNode);
 
                 // add to parent node
-                if (_lastparentnode != null)
+                if (_lastParentNode != null!)
                 {
-                    HtmlNode foundNode = null;
+                    HtmlNode? foundNode = null;
                     var futureChild = new Stack<HtmlNode>();
 
-                    if (!_currentnode.Name.Equals ("br"))
+                    if (!_currentNode.Name.Equals ("br"))
                     {
-                        for (var node = _lastparentnode.LastChild; node != null; node = node.PreviousSibling)
+                        for (var node = _lastParentNode.LastChild; node != null; node = node.PreviousSibling)
                         {
                             // br node never can contains other nodes.
-                            if ((node.Name == _currentnode.Name) && (!node.HasChildNodes))
+                            if (node.Name == _currentNode.Name && !node.HasChildNodes)
                             {
                                 foundNode = node;
                                 break;
@@ -1075,13 +1006,13 @@ public partial class HtmlDocument
                         while (futureChild.Count != 0)
                         {
                             var node = futureChild.Pop();
-                            _lastparentnode.RemoveChild (node);
+                            _lastParentNode.RemoveChild (node);
                             foundNode.AppendChild (node);
                         }
                     }
                     else
                     {
-                        _lastparentnode.AppendChild (_currentnode);
+                        _lastParentNode.AppendChild (_currentNode);
                     }
                 }
             }
@@ -1090,35 +1021,35 @@ public partial class HtmlDocument
                 // node has no parent
                 // node is not a closed node
 
-                if (HtmlNode.CanOverlapElement (_currentnode.Name))
+                if (HtmlNode.CanOverlapElement (_currentNode.Name))
                 {
                     // this is a hack: add it as a text node
-                    var closenode = CreateNode (HtmlNodeType.Text, _currentnode._outerstartindex);
-                    closenode._outerlength = _currentnode._outerlength;
+                    var closenode = CreateNode (HtmlNodeType.Text, _currentNode._outerstartindex);
+                    closenode._outerlength = _currentNode._outerlength;
                     ((HtmlTextNode)closenode).Text = ((HtmlTextNode)closenode).Text.ToLowerInvariant();
-                    if (_lastparentnode != null)
+                    if (_lastParentNode != null!)
                     {
-                        _lastparentnode.AppendChild (closenode);
+                        _lastParentNode.AppendChild (closenode);
                     }
                 }
                 else
                 {
-                    if (HtmlNode.IsEmptyElement (_currentnode.Name))
+                    if (HtmlNode.IsEmptyElement (_currentNode.Name))
                     {
                         AddError (
                             HtmlParseErrorCode.EndTagNotRequired,
-                            _currentnode.Line, _currentnode.LinePosition,
-                            _currentnode._streamPosition, _currentnode.OuterHtml,
-                            "End tag </" + _currentnode.Name + "> is not required");
+                            _currentNode.Line, _currentNode.LinePosition,
+                            _currentNode._streamPosition, _currentNode.OuterHtml!,
+                            "End tag </" + _currentNode.Name + "> is not required");
                     }
                     else
                     {
                         // node cannot overlap, node is not empty
                         AddError (
                             HtmlParseErrorCode.TagNotOpened,
-                            _currentnode.Line, _currentnode.LinePosition,
-                            _currentnode._streamPosition, _currentnode.OuterHtml,
-                            "Start tag <" + _currentnode.Name + "> was not found");
+                            _currentNode.Line, _currentNode.LinePosition,
+                            _currentNode._streamPosition, _currentNode.OuterHtml!,
+                            "Start tag <" + _currentNode.Name + "> was not found");
                         error = true;
                     }
                 }
@@ -1128,21 +1059,21 @@ public partial class HtmlDocument
         {
             if (OptionFixNestedTags)
             {
-                if (FindResetterNodes (prev, GetResetters (_currentnode.Name)))
+                if (FindResetterNodes (prev, GetResetters (_currentNode.Name)))
                 {
                     AddError (
                         HtmlParseErrorCode.EndTagInvalidHere,
-                        _currentnode.Line, _currentnode.LinePosition,
-                        _currentnode._streamPosition, _currentnode.OuterHtml,
-                        "End tag </" + _currentnode.Name + "> invalid here");
+                        _currentNode.Line, _currentNode.LinePosition,
+                        _currentNode._streamPosition, _currentNode.OuterHtml!,
+                        "End tag </" + _currentNode.Name + "> invalid here");
                     error = true;
                 }
             }
 
             if (!error)
             {
-                Lastnodes[_currentnode.Name] = prev._prevwithsamename;
-                prev.CloseNode (_currentnode);
+                Lastnodes[_currentNode.Name] = prev._prevWithSameName;
+                prev.CloseNode (_currentNode);
             }
         }
 
@@ -1150,9 +1081,9 @@ public partial class HtmlDocument
         // we close this node, get grandparent
         if (!error)
         {
-            if ((_lastparentnode != null) &&
-                ((!HtmlNode.IsClosedElement (_currentnode.Name)) ||
-                 (_currentnode._startTag)))
+            if (_lastParentNode != null &&
+                (!HtmlNode.IsClosedElement (_currentNode.Name) ||
+                 _currentNode._startTag))
             {
                 UpdateLastParentNode();
             }
@@ -1161,7 +1092,7 @@ public partial class HtmlDocument
 
     private string CurrentNodeName()
     {
-        return Text.Substring (_currentnode._namestartindex, _currentnode._namelength);
+        return Text.Substring (_currentNode._namestartindex, _currentNode._namelength);
     }
 
 
@@ -1237,10 +1168,10 @@ public partial class HtmlDocument
             return;
         }
 
-        var prev = Utilities.GetDictionaryValueOrDefault (Lastnodes, _currentnode.Name);
+        var prev = Utilities.GetDictionaryValueOrDefault (Lastnodes, _currentNode.Name);
 
         // if we find a previous unclosed same name node, without a resetter node between, we must close it
-        if (prev == null || (Lastnodes[name].Closed))
+        if (prev == null || Lastnodes[name].Closed)
         {
             return;
         }
@@ -1261,7 +1192,7 @@ public partial class HtmlDocument
     private void FixNestedTags()
     {
         // we are only interested by start tags, not closing tags
-        if (!_currentnode._startTag)
+        if (!_currentNode._startTag)
         {
             return;
         }
@@ -1270,9 +1201,9 @@ public partial class HtmlDocument
         FixNestedTag (name, GetResetters (name));
     }
 
-    private string[] GetResetters (string name)
+    private string[]? GetResetters (string name)
     {
-        string[] resetters;
+        string[]? resetters;
 
         if (!HtmlResetters.TryGetValue (name, out resetters))
         {
@@ -1284,7 +1215,7 @@ public partial class HtmlDocument
 
     private void IncrementPosition()
     {
-        if (_crc32 != null)
+        if (_crc32 != null!)
         {
             // REVIEW: should we add some checksum code in DecrementPosition too?
             _crc32.AddToCRC32 (_c);
@@ -1357,7 +1288,7 @@ public partial class HtmlDocument
         }
 
         _state = ParseState.WhichTag;
-        if ((_index - 1) <= (Text.Length - 2))
+        if (_index - 1 <= Text.Length - 2)
         {
             if (Text[_index] == '!' || Text[_index] == '?')
             {
@@ -1365,10 +1296,10 @@ public partial class HtmlDocument
                 PushNodeNameStart (true, _index);
                 PushNodeNameEnd (_index + 1);
                 _state = ParseState.Comment;
-                if (_index < (Text.Length - 2))
+                if (_index < Text.Length - 2)
                 {
-                    if ((Text[_index + 1] == '-') &&
-                        (Text[_index + 2] == '-'))
+                    if (Text[_index + 1] == '-' &&
+                        Text[_index + 2] == '-')
                     {
                         _fullcomment = true;
                     }
@@ -1388,7 +1319,7 @@ public partial class HtmlDocument
 
     private void Parse()
     {
-        if (ParseExecuting != null)
+        if (ParseExecuting != null!)
         {
             ParseExecuting (this);
         }
@@ -1413,9 +1344,9 @@ public partial class HtmlDocument
         _documentnode._outerlength = Text.Length;
         _remainderOffset = Text.Length;
 
-        _lastparentnode = _documentnode;
-        _currentnode = CreateNode (HtmlNodeType.Text, 0);
-        _currentattribute = null;
+        _lastParentNode = _documentnode;
+        _currentNode = CreateNode (HtmlNodeType.Text, 0);
+        _currentAttribute = null!;
 
         _index = 0;
         PushNodeStart (HtmlNodeType.Text, 0, _lineposition);
@@ -1610,7 +1541,7 @@ public partial class HtmlDocument
                         continue;
                     }
 
-                    _currentattribute._isFromParse = true;
+                    _currentAttribute._isFromParse = true;
 
                     if (IsWhiteSpace (_c))
                     {
@@ -1622,7 +1553,7 @@ public partial class HtmlDocument
                     if (_c == '=')
                     {
                         PushAttributeNameEnd (_index - 1);
-                        _currentattribute._hasEqual = true;
+                        _currentAttribute._hasEqual = true;
                         _state = ParseState.AttributeAfterEquals;
                         continue;
                     }
@@ -1681,7 +1612,7 @@ public partial class HtmlDocument
 
                     if (_c == '=')
                     {
-                        _currentattribute._hasEqual = true;
+                        _currentAttribute._hasEqual = true;
                         _state = ParseState.AttributeAfterEquals;
                         continue;
                     }
@@ -1796,10 +1727,10 @@ public partial class HtmlDocument
                     {
                         if (_fullcomment)
                         {
-                            if (((Text[_index - 2] != '-') || (Text[_index - 3] != '-'))
+                            if ((Text[_index - 2] != '-' || Text[_index - 3] != '-')
                                 &&
-                                ((Text[_index - 2] != '!') || (Text[_index - 3] != '-') ||
-                                 (Text[_index - 4] != '-')))
+                                (Text[_index - 2] != '!' || Text[_index - 3] != '-' ||
+                                 Text[_index - 4] != '-'))
                             {
                                 continue;
                             }
@@ -1859,32 +1790,32 @@ public partial class HtmlDocument
                     // look for </tag + 1 char
 
                     // check buffer end
-                    if ((_currentnode._namelength + 3) <= (Text.Length - (_index - 1)))
+                    if (_currentNode._namelength + 3 <= Text.Length - (_index - 1))
                     {
-                        if (string.Compare (Text.Substring (_index - 1, _currentnode._namelength + 2),
-                                "</" + _currentnode.Name, StringComparison.OrdinalIgnoreCase) == 0)
+                        if (string.Compare (Text.Substring (_index - 1, _currentNode._namelength + 2),
+                                "</" + _currentNode.Name, StringComparison.OrdinalIgnoreCase) == 0)
                         {
-                            int c = Text[_index - 1 + 2 + _currentnode.Name.Length];
-                            if ((c == '>') || (IsWhiteSpace (c)))
+                            int c = Text[_index - 1 + 2 + _currentNode.Name.Length];
+                            if (c == '>' || IsWhiteSpace (c))
                             {
                                 // add the script as a text node
                                 var script = CreateNode (HtmlNodeType.Text,
-                                    _currentnode._outerstartindex +
-                                    _currentnode._outerlength);
+                                    _currentNode._outerstartindex +
+                                    _currentNode._outerlength);
                                 script._outerlength = _index - 1 - script._outerstartindex;
                                 script._streamPosition = script._outerstartindex;
-                                script.Line = _currentnode.Line;
-                                script.LinePosition = _currentnode.LinePosition + _currentnode._namelength + 2;
+                                script.Line = _currentNode.Line;
+                                script.LinePosition = _currentNode.LinePosition + _currentNode._namelength + 2;
 
-                                _currentnode.AppendChild (script);
+                                _currentNode.AppendChild (script);
 
                                 // https://www.w3schools.com/jsref/prop_node_innertext.asp
                                 // textContent returns the text content of all elements, while innerText returns the content of all elements, except for <script> and <style> elements.
                                 // innerText will not return the text of elements that are hidden with CSS (textContent will). ==> The parser do not support that.
-                                if (_currentnode.Name.ToLowerInvariant().Equals ("script") ||
-                                    _currentnode.Name.ToLowerInvariant().Equals ("style"))
+                                if (_currentNode.Name.ToLowerInvariant().Equals ("script") ||
+                                    _currentNode.Name.ToLowerInvariant().Equals ("style"))
                                 {
-                                    _currentnode._isHideInnerText = true;
+                                    _currentNode._isHideInnerText = true;
                                 }
 
                                 PushNodeStart (HtmlNodeType.Element, _index - 1, _lineposition - 1);
@@ -1903,7 +1834,7 @@ public partial class HtmlDocument
 
 
         // finish the current work
-        if (_currentnode._namestartindex > 0)
+        if (_currentNode._namestartindex > 0)
         {
             PushNodeNameEnd (_index);
         }
@@ -1916,30 +1847,30 @@ public partial class HtmlDocument
 
     // In this moment, we don't have value.
     // Potential: "\"", "'", "[", "]", "<", ">", "-", "|", "/", "\\"
-    private static List<string> BlockAttributes = new () { "\"", "'" };
+    private static readonly List<string> BlockAttributes = new () { "\"", "'" };
 
     private void PushAttributeNameEnd (int index)
     {
-        _currentattribute._namelength = index - _currentattribute._namestartindex;
+        _currentAttribute._namelength = index - _currentAttribute._namestartindex;
 
-        if (_currentattribute.Name != null && !BlockAttributes.Contains (_currentattribute.Name))
+        if (_currentAttribute.Name != null! && !BlockAttributes.Contains (_currentAttribute.Name))
         {
-            _currentnode.Attributes.Append (_currentattribute);
+            _currentNode.Attributes.Append (_currentAttribute);
         }
     }
 
     private void PushAttributeNameStart (int index, int lineposition)
     {
-        _currentattribute = CreateAttribute();
-        _currentattribute._namestartindex = index;
-        _currentattribute.Line = _line;
-        _currentattribute._lineposition = lineposition;
-        _currentattribute._streamposition = index;
+        _currentAttribute = CreateAttribute();
+        _currentAttribute._namestartindex = index;
+        _currentAttribute.Line = _line;
+        _currentAttribute._lineposition = lineposition;
+        _currentAttribute._streamposition = index;
     }
 
     private void PushAttributeValueEnd (int index)
     {
-        _currentattribute._valuelength = index - _currentattribute._valuestartindex;
+        _currentAttribute._valuelength = index - _currentAttribute._valuestartindex;
     }
 
     private void PushAttributeValueStart (int index)
@@ -1951,7 +1882,7 @@ public partial class HtmlDocument
     {
         var hasNodeToClose = true;
 
-        while (hasNodeToClose && !_lastparentnode.Closed)
+        while (hasNodeToClose && !_lastParentNode.Closed)
         {
             hasNodeToClose = false;
 
@@ -1983,14 +1914,14 @@ public partial class HtmlDocument
     private bool IsParentImplicitEnd()
     {
         // MUST be a start tag
-        if (!_currentnode._startTag)
+        if (!_currentNode._startTag)
         {
             return false;
         }
 
         var isImplicitEnd = false;
-        var parent = _lastparentnode.Name;
-        var nodeName = Text.Substring (_currentnode._namestartindex, _index - _currentnode._namestartindex - 1)
+        var parent = _lastParentNode.Name;
+        var nodeName = Text.Substring (_currentNode._namestartindex, _index - _currentNode._namestartindex - 1)
             .ToLowerInvariant();
 
         switch (parent)
@@ -2034,14 +1965,14 @@ public partial class HtmlDocument
     private bool IsParentExplicitEnd()
     {
         // MUST be a start tag
-        if (!_currentnode._startTag)
+        if (!_currentNode._startTag)
         {
             return false;
         }
 
         var isExplicitEnd = false;
-        var parent = _lastparentnode.Name;
-        var nodeName = Text.Substring (_currentnode._namestartindex, _index - _currentnode._namestartindex - 1)
+        var parent = _lastParentNode.Name;
+        var nodeName = Text.Substring (_currentNode._namestartindex, _index - _currentNode._namestartindex - 1)
             .ToLowerInvariant();
 
         switch (parent)
@@ -2128,75 +2059,75 @@ public partial class HtmlDocument
 
     private void CloseParentImplicitEnd()
     {
-        var close = new HtmlNode (_lastparentnode.NodeType, this, -1);
+        var close = new HtmlNode (_lastParentNode.NodeType, this, -1);
         close._endNode = close;
         close._isImplicitEnd = true;
-        _lastparentnode._isImplicitEnd = true;
-        _lastparentnode.CloseNode (close);
+        _lastParentNode._isImplicitEnd = true;
+        _lastParentNode.CloseNode (close);
     }
 
     private void CloseParentExplicitEnd()
     {
-        var close = new HtmlNode (_lastparentnode.NodeType, this, -1);
+        var close = new HtmlNode (_lastParentNode.NodeType, this, -1);
         close._endNode = close;
-        _lastparentnode.CloseNode (close);
+        _lastParentNode.CloseNode (close);
     }
 
     private void PushAttributeValueStart (int index, int quote)
     {
-        _currentattribute._valuestartindex = index;
+        _currentAttribute._valuestartindex = index;
         if (quote == '\'')
         {
-            _currentattribute.QuoteType = AttributeValueQuote.SingleQuote;
+            _currentAttribute.QuoteType = AttributeValueQuote.SingleQuote;
         }
 
-        _currentattribute.InternalQuoteType = _currentattribute.QuoteType;
+        _currentAttribute.InternalQuoteType = _currentAttribute.QuoteType;
 
         if (quote == 0)
         {
-            _currentattribute.InternalQuoteType = AttributeValueQuote.None;
+            _currentAttribute.InternalQuoteType = AttributeValueQuote.None;
         }
     }
 
     private bool PushNodeEnd (int index, bool close)
     {
-        _currentnode._outerlength = index - _currentnode._outerstartindex;
+        _currentNode._outerlength = index - _currentNode._outerstartindex;
 
-        if (_currentnode._nodetype is HtmlNodeType.Text or HtmlNodeType.Comment)
+        if (_currentNode._nodeType is HtmlNodeType.Text or HtmlNodeType.Comment)
         {
             // forget about void nodes
-            if (_currentnode._outerlength > 0)
+            if (_currentNode._outerlength > 0)
             {
-                _currentnode._innerlength = _currentnode._outerlength;
-                _currentnode._innerstartindex = _currentnode._outerstartindex;
-                if (_lastparentnode != null)
+                _currentNode._innerlength = _currentNode._outerlength;
+                _currentNode._innerstartindex = _currentNode._outerstartindex;
+                if (_lastParentNode != null!)
                 {
-                    _lastparentnode.AppendChild (_currentnode);
+                    _lastParentNode.AppendChild (_currentNode);
                 }
             }
         }
         else
         {
-            if ((_currentnode._startTag) && (_lastparentnode != _currentnode))
+            if (_currentNode._startTag && _lastParentNode != _currentNode)
             {
                 // add to parent node
-                if (_lastparentnode != null)
+                if (_lastParentNode != null!)
                 {
-                    _lastparentnode.AppendChild (_currentnode);
+                    _lastParentNode.AppendChild (_currentNode);
                 }
 
-                ReadDocumentEncoding (_currentnode);
+                ReadDocumentEncoding (_currentNode);
 
                 // remember last node of this kind
-                var prev = Utilities.GetDictionaryValueOrDefault (Lastnodes, _currentnode.Name);
+                var prev = Utilities.GetDictionaryValueOrDefault (Lastnodes, _currentNode.Name);
 
-                _currentnode._prevwithsamename = prev;
-                Lastnodes[_currentnode.Name] = _currentnode;
+                _currentNode._prevWithSameName = prev!;
+                Lastnodes[_currentNode.Name] = _currentNode;
 
                 // change parent?
-                if (_currentnode.NodeType is HtmlNodeType.Document or HtmlNodeType.Element)
+                if (_currentNode.NodeType is HtmlNodeType.Document or HtmlNodeType.Element)
                 {
-                    _lastparentnode = _currentnode;
+                    _lastParentNode = _currentNode;
                 }
 
                 if (HtmlNode.IsCDataElement (CurrentNodeName()))
@@ -2205,18 +2136,18 @@ public partial class HtmlDocument
                     return true;
                 }
 
-                if ((HtmlNode.IsClosedElement (_currentnode.Name)) ||
-                    (HtmlNode.IsEmptyElement (_currentnode.Name)))
+                if (HtmlNode.IsClosedElement (_currentNode.Name) ||
+                    HtmlNode.IsEmptyElement (_currentNode.Name))
                 {
                     close = true;
                 }
             }
         }
 
-        if ((close) || (!_currentnode._startTag))
+        if (close || !_currentNode._startTag)
         {
-            if ((OptionStopperNodeName != null) && (_remainder == null) &&
-                (string.Compare (_currentnode.Name, OptionStopperNodeName, StringComparison.OrdinalIgnoreCase) == 0))
+            if (OptionStopperNodeName != null! && _remainder == null! &&
+                string.Compare (_currentNode.Name, OptionStopperNodeName, StringComparison.OrdinalIgnoreCase) == 0)
             {
                 _remainderOffset = index;
                 _remainder = Text.Substring (_remainderOffset);
@@ -2232,7 +2163,7 @@ public partial class HtmlDocument
 
     private void PushNodeNameEnd (int index)
     {
-        _currentnode._namelength = index - _currentnode._namestartindex;
+        _currentNode._namelength = index - _currentNode._namestartindex;
         if (OptionFixNestedTags)
         {
             FixNestedTags();
@@ -2241,16 +2172,16 @@ public partial class HtmlDocument
 
     private void PushNodeNameStart (bool starttag, int index)
     {
-        _currentnode._startTag = starttag;
-        _currentnode._namestartindex = index;
+        _currentNode._startTag = starttag;
+        _currentNode._namestartindex = index;
     }
 
     private void PushNodeStart (HtmlNodeType type, int index, int lineposition)
     {
-        _currentnode = CreateNode (type, index);
-        _currentnode.Line = _line;
-        _currentnode.LinePosition = lineposition;
-        _currentnode._streamPosition = index;
+        _currentNode = CreateNode (type, index);
+        _currentNode.Line = _line;
+        _currentNode.LinePosition = lineposition;
+        _currentNode._streamPosition = index;
     }
 
     private void ReadDocumentEncoding (HtmlNode node)
@@ -2274,7 +2205,7 @@ public partial class HtmlDocument
             return;
         }
 
-        string charset = null;
+        string? charset = null;
         var att = node.Attributes["http-equiv"];
         if (att != null)
         {
@@ -2308,31 +2239,31 @@ public partial class HtmlDocument
 
             try
             {
-                _declaredencoding = Encoding.GetEncoding (charset);
+                _declaredEncoding = Encoding.GetEncoding (charset);
             }
             catch (ArgumentException)
             {
-                _declaredencoding = null;
+                _declaredEncoding = null;
             }
 
             if (_onlyDetectEncoding)
             {
-                throw new EncodingFoundException (_declaredencoding);
+                throw new EncodingFoundException (_declaredEncoding!);
             }
 
-            if (_streamencoding != null)
+            if (_streamEncoding != null!)
             {
-                if (_declaredencoding != null)
+                if (_declaredEncoding != null)
                 {
-                    if (_declaredencoding.CodePage != _streamencoding.CodePage)
+                    if (_declaredEncoding.CodePage != _streamEncoding.CodePage)
                     {
                         AddError (
                             HtmlParseErrorCode.CharsetMismatch,
                             _line, _lineposition,
-                            _index, node.OuterHtml,
+                            _index, node.OuterHtml!,
                             "Encoding mismatch between StreamEncoding: " +
-                            _streamencoding.WebName + " and DeclaredEncoding: " +
-                            _declaredencoding.WebName);
+                            _streamEncoding.WebName + " and DeclaredEncoding: " +
+                            _declaredEncoding.WebName);
                     }
                 }
             }

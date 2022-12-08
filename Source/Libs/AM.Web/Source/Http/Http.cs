@@ -47,7 +47,7 @@ public static class Http
     #region Private members
 
     private static readonly FieldInfo stackTraceString =
-        typeof (Exception).GetField ("_stackTraceString", BindingFlags.Instance | BindingFlags.NonPublic);
+        typeof (Exception).GetField ("_stackTraceString", BindingFlags.Instance | BindingFlags.NonPublic)!;
 
     internal static async Task<HttpCallResponse<T>> SendAsync<T>
         (
@@ -88,8 +88,8 @@ public static class Http
                         !builder.Inner.IgnoredResponseStatuses.Contains (response.StatusCode))
                     {
                         exception = new HttpClientException (
-                            $"Response code was {(int)response.StatusCode} ({response.StatusCode}) from {response.RequestMessage.RequestUri}: {response.ReasonPhrase}",
-                            response.StatusCode, response.RequestMessage.RequestUri);
+                            $"Response code was {(int)response.StatusCode} ({response.StatusCode}) from {response.RequestMessage!.RequestUri}: {response.ReasonPhrase}",
+                            response.StatusCode, response.RequestMessage.RequestUri!);
                         stackTraceString.SetValue (exception, new StackTrace (true).ToString());
                     }
                     else
@@ -104,10 +104,10 @@ public static class Http
         {
             exception = cancellationToken.IsCancellationRequested
                 ? new HttpClientException ("HttpClient request cancelled by token request.",
-                    builder.Inner.Message.RequestUri, ex)
+                    builder.Inner.Message.RequestUri!, ex)
                 : new HttpClientException (
                     "HttpClient request timed out. Timeout: " +
-                    builder.Inner.Timeout.TotalMilliseconds.ToString ("N0") + "ms", builder.Inner.Message.RequestUri,
+                    builder.Inner.Timeout.TotalMilliseconds.ToString ("N0") + "ms", builder.Inner.Message.RequestUri!,
                     ex);
         }
         catch (Exception ex)

@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 
-/*
+/* HtmlNode.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -51,14 +51,14 @@ public partial class HtmlNode
     internal HtmlNode? _endNode;
 
     private bool _changed;
-    internal string _innerhtml;
+    internal string _innerHtml;
     internal int _innerlength;
     internal int _innerstartindex;
     private string? _name;
     internal int _namelength;
     internal int _namestartindex;
     internal HtmlNode? _nextNode;
-    internal HtmlNodeType _nodetype;
+    internal HtmlNodeType _nodeType;
     internal string? _outerHtml;
     internal int _outerlength;
     internal int _outerstartindex;
@@ -66,7 +66,7 @@ public partial class HtmlNode
     internal HtmlDocument _ownerDocument;
     internal HtmlNode? _parentNode;
     internal HtmlNode? _prevNode;
-    internal HtmlNode _prevwithsamename;
+    internal HtmlNode _prevWithSameName;
     internal bool _startTag;
     internal int _streamPosition;
     internal bool _isImplicitEnd;
@@ -164,7 +164,10 @@ public partial class HtmlNode
             int index
         )
     {
-        _nodetype = type;
+        _innerHtml = null!;
+        _prevWithSameName = null!;
+
+        _nodeType = type;
         _ownerDocument = ownerDocument;
         _outerstartindex = index;
 
@@ -247,17 +250,17 @@ public partial class HtmlNode
     /// <summary>
     /// Gets the collection of HTML attributes for the closing tag. May not be null.
     /// </summary>
-    public HtmlAttributeCollection ClosingAttributes => !HasClosingAttributes ? new HtmlAttributeCollection (this) : _endNode.Attributes;
+    public HtmlAttributeCollection ClosingAttributes => !HasClosingAttributes ? new HtmlAttributeCollection (this) : _endNode!.Attributes;
 
     /// <summary>
     /// Gets the closing tag of the node, null if the node is self-closing.
     /// </summary>
-    public HtmlNode EndNode => _endNode;
+    public HtmlNode EndNode => _endNode!;
 
     /// <summary>
     /// Gets the first child of the node.
     /// </summary>
-    public HtmlNode FirstChild => !HasChildNodes ? null : _childrenNodes[0];
+    public HtmlNode FirstChild => !HasChildNodes ? null! : _childrenNodes![0];
 
     /// <summary>
     /// Gets a value indicating whether the current node has any attributes.
@@ -348,10 +351,7 @@ public partial class HtmlNode
                 throw new Exception (HtmlDocument.HtmlExceptionUseIdAttributeFalse);
             }
 
-            if (value == null)
-            {
-                throw new ArgumentNullException ("value");
-            }
+            Sure.NotNull (value);
 
             SetId (value);
         }
@@ -367,12 +367,12 @@ public partial class HtmlNode
             if (_changed)
             {
                 UpdateHtml();
-                return _innerhtml;
+                return _innerHtml;
             }
 
-            if (_innerhtml != null)
+            if (_innerHtml != null!)
             {
-                return _innerhtml;
+                return _innerHtml;
             }
 
             if (_innerstartindex < 0 || _innerlength < 0)
@@ -403,7 +403,7 @@ public partial class HtmlNode
             var depthLevel = 0;
             var name = Name;
 
-            if (name != null)
+            if (name != null!)
             {
                 name = name.ToLowerInvariant();
 
@@ -441,14 +441,14 @@ public partial class HtmlNode
             return;
         }
 
-        if (_nodetype == HtmlNodeType.Text)
+        if (_nodeType == HtmlNodeType.Text)
         {
             sb.Append (((HtmlTextNode)this).Text);
             return;
         }
 
         // Don't display comment or comment child nodes
-        if (_nodetype == HtmlNodeType.Comment)
+        if (_nodeType == HtmlNodeType.Comment)
         {
             return;
         }
@@ -480,13 +480,13 @@ public partial class HtmlNode
             return GetCurrentNodeText();
         }
 
-        if (_nodetype == HtmlNodeType.Text)
+        if (_nodeType == HtmlNodeType.Text)
         {
             return ((HtmlTextNode)this).Text;
         }
 
         // Don't display comment or comment child nodes
-        if (_nodetype == HtmlNodeType.Comment)
+        if (_nodeType == HtmlNodeType.Comment)
         {
             return "";
         }
@@ -499,7 +499,7 @@ public partial class HtmlNode
         var s = new StringBuilder();
         foreach (var node in ChildNodes)
         {
-            if (node._nodetype == HtmlNodeType.Text)
+            if (node._nodeType == HtmlNodeType.Text)
             {
                 s.Append (((HtmlTextNode)node).Text);
             }
@@ -510,11 +510,11 @@ public partial class HtmlNode
 
     internal string GetCurrentNodeText()
     {
-        if (_nodetype == HtmlNodeType.Text)
+        if (_nodeType == HtmlNodeType.Text)
         {
             var s = ((HtmlTextNode)this).Text;
 
-            if (ParentNode.Name != "pre")
+            if (ParentNode!.Name != "pre")
             {
                 // Make some test...
                 s = s.Replace ("\n", "").Replace ("\r", "").Replace ("\t", "");
@@ -528,7 +528,7 @@ public partial class HtmlNode
 
     internal void AppendDirectInnerText (StringBuilder sb)
     {
-        if (_nodetype == HtmlNodeType.Text)
+        if (_nodeType == HtmlNodeType.Text)
         {
             sb.Append (GetCurrentNodeText());
         }
@@ -542,13 +542,11 @@ public partial class HtmlNode
         {
             sb.Append (node.GetCurrentNodeText());
         }
-
-        return;
     }
 
     internal void AppendInnerText (StringBuilder sb, bool isShowHideInnerText)
     {
-        if (_nodetype == HtmlNodeType.Text)
+        if (_nodeType == HtmlNodeType.Text)
         {
             sb.Append (GetCurrentNodeText());
         }
@@ -567,7 +565,7 @@ public partial class HtmlNode
     /// <summary>
     /// Gets the last child of the node.
     /// </summary>
-    public HtmlNode LastChild => !HasChildNodes ? null : _childrenNodes[^1];
+    public HtmlNode LastChild => !HasChildNodes ? null! : _childrenNodes![^1];
 
     /// <summary>
     /// Gets the line number of this node in the document.
@@ -597,7 +595,7 @@ public partial class HtmlNode
     /// <summary>
     /// Gets the length of the entire node, opening and closing tag included.
     /// </summary>
-    public int OuterLength => OuterHtml.Length;
+    public int OuterLength => OuterHtml!.Length;
 
     /// <summary>
     /// Gets or sets this node's name.
@@ -650,14 +648,14 @@ public partial class HtmlNode
     /// </summary>
     public HtmlNodeType NodeType
     {
-        get => _nodetype;
-        internal set => _nodetype = value;
+        get => _nodeType;
+        internal set => _nodeType = value;
     }
 
     /// <summary>
     /// The original unaltered name of the tag
     /// </summary>
-    public string OriginalName => _name;
+    public string OriginalName => _name!;
 
     /// <summary>
     /// Gets or Sets the object and its content in HTML.
@@ -692,7 +690,7 @@ public partial class HtmlNode
     public HtmlDocument? OwnerDocument
     {
         get => _ownerDocument;
-        internal set => _ownerDocument = value;
+        internal set => _ownerDocument = value!;
     }
 
     /// <summary>
@@ -817,10 +815,7 @@ public partial class HtmlNode
     /// <returns>true if the name is the name of a CDATA element node, false otherwise.</returns>
     public static bool IsCDataElement (string name)
     {
-        if (name == null)
-        {
-            throw new ArgumentNullException ("name");
-        }
+        Sure.NotNull (name);
 
         if (!ElementsFlags.TryGetValue (name, out var flag))
         {
@@ -837,10 +832,7 @@ public partial class HtmlNode
     /// <returns>true if the name is the name of a closed element node, false otherwise.</returns>
     public static bool IsClosedElement (string name)
     {
-        if (name == null)
-        {
-            throw new ArgumentNullException ("name");
-        }
+        Sure.NotNull (name);
 
         if (!ElementsFlags.TryGetValue (name, out var flag))
         {
@@ -857,10 +849,7 @@ public partial class HtmlNode
     /// <returns>true if the name is the name of an empty element node, false otherwise.</returns>
     public static bool IsEmptyElement (string name)
     {
-        if (name == null)
-        {
-            throw new ArgumentNullException ("name");
-        }
+        Sure.NotNull (name);
 
         if (name.Length == 0)
         {
@@ -894,10 +883,7 @@ public partial class HtmlNode
     /// <returns>true or false.</returns>
     public static bool IsOverlappedClosingElement (string text)
     {
-        if (text == null)
-        {
-            throw new ArgumentNullException ("text");
-        }
+        Sure.NotNull (text);
 
         // min is </x>: 4
         if (text.Length <= 4)
@@ -981,10 +967,7 @@ public partial class HtmlNode
     /// <returns>The node added.</returns>
     public HtmlNode AppendChild (HtmlNode newChild)
     {
-        if (newChild == null)
-        {
-            throw new ArgumentNullException ("newChild");
-        }
+        Sure.NotNull (newChild);
 
         ChildNodes.Append (newChild);
         _ownerDocument.SetIdForNode (newChild, newChild.GetId());
@@ -1011,10 +994,7 @@ public partial class HtmlNode
     /// <param name="newChildren">The node list to add. May not be null.</param>
     public void AppendChildren (HtmlNodeCollection newChildren)
     {
-        if (newChildren == null)
-        {
-            throw new ArgumentNullException ("newChildren");
-        }
+        Sure.NotNull (newChildren);
 
         foreach (var newChild in newChildren)
         {
@@ -1059,10 +1039,7 @@ public partial class HtmlNode
     /// <returns>The cloned node.</returns>
     public HtmlNode CloneNode (string newName, bool deep)
     {
-        if (newName == null)
-        {
-            throw new ArgumentNullException ("newName");
-        }
+        Sure.NotNull (newName);
 
         var node = CloneNode (deep);
         node.Name = newName;
@@ -1076,10 +1053,10 @@ public partial class HtmlNode
     /// <returns>The cloned node.</returns>
     public HtmlNode CloneNode (bool deep)
     {
-        var node = _ownerDocument.CreateNode (_nodetype);
+        var node = _ownerDocument.CreateNode (_nodeType);
         node.Name = OriginalName;
 
-        switch (_nodetype)
+        switch (_nodeType)
         {
             case HtmlNodeType.Comment:
                 ((HtmlCommentNode)node).Comment = ((HtmlCommentNode)this).Comment;
@@ -1093,7 +1070,7 @@ public partial class HtmlNode
         // attributes
         if (HasAttributes)
         {
-            foreach (var att in _attributes)
+            foreach (var att in _attributes!)
             {
                 var newatt = att.Clone();
                 node.Attributes.Append (newatt);
@@ -1103,11 +1080,11 @@ public partial class HtmlNode
         // closing attributes
         if (HasClosingAttributes)
         {
-            node._endNode = _endNode.CloneNode (false);
-            foreach (var att in _endNode._attributes)
+            node._endNode = _endNode!.CloneNode (false);
+            foreach (var att in _endNode._attributes!)
             {
                 var newatt = att.Clone();
-                node._endNode._attributes.Append (newatt);
+                node._endNode._attributes!.Append (newatt);
             }
         }
 
@@ -1122,7 +1099,7 @@ public partial class HtmlNode
         }
 
         // child nodes
-        foreach (var child in _childrenNodes)
+        foreach (var child in _childrenNodes!)
         {
             var newchild = child.CloneNode (deep);
             node.AppendChild (newchild);
@@ -1147,10 +1124,7 @@ public partial class HtmlNode
     /// <param name="deep">true to recursively clone the subtree under the specified node, false to clone only the node itself.</param>
     public void CopyFrom (HtmlNode node, bool deep)
     {
-        if (node == null)
-        {
-            throw new ArgumentNullException ("node");
-        }
+        Sure.NotNull (node);
 
         Attributes.RemoveAll();
         if (node.HasAttributes)
@@ -1267,7 +1241,7 @@ public partial class HtmlNode
         foreach (var n in Descendants())
         {
             var el = n;
-            if (el != null)
+            if (el != null!)
             {
                 yield return el;
             }
@@ -1295,7 +1269,7 @@ public partial class HtmlNode
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
-    public HtmlNode Element (string name)
+    public HtmlNode? Element (string name)
     {
         foreach (var node in ChildNodes)
             if (node.Name == name)
@@ -1360,7 +1334,7 @@ public partial class HtmlNode
 
         foreach (var name in attributeNames)
         {
-            list.Add (Attributes[name]);
+            list.Add (Attributes[name]!);
         }
 
         return list;
@@ -1484,10 +1458,7 @@ public partial class HtmlNode
     /// <returns>The value of the attribute if found, the default value if not found.</returns>
     public T GetAttributeValue<T> (string name, T def)
     {
-        if (name == null)
-        {
-            throw new ArgumentNullException ("name");
-        }
+        Sure.NotNull (name);
 
         if (!HasAttributes)
         {
@@ -1502,7 +1473,7 @@ public partial class HtmlNode
 
         try
         {
-            return (T)att.Value.To (typeof (T));
+            return (T)att.Value.To (typeof (T))!;
         }
         catch
         {
@@ -1519,15 +1490,8 @@ public partial class HtmlNode
     /// <returns>The node being inserted.</returns>
     public HtmlNode InsertAfter (HtmlNode newChild, HtmlNode refChild)
     {
-        if (newChild == null)
-        {
-            throw new ArgumentNullException ("newChild");
-        }
-
-        if (refChild == null)
-        {
-            return PrependChild (newChild);
-        }
+        Sure.NotNull (newChild);
+        Sure.NotNull (refChild);
 
         if (newChild == refChild)
         {
@@ -1565,15 +1529,8 @@ public partial class HtmlNode
     /// <returns>The node being inserted.</returns>
     public HtmlNode InsertBefore (HtmlNode newChild, HtmlNode refChild)
     {
-        if (newChild == null)
-        {
-            throw new ArgumentNullException ("newChild");
-        }
-
-        if (refChild == null)
-        {
-            return AppendChild (newChild);
-        }
+        Sure.NotNull (newChild);
+        Sure.NotNull (refChild);
 
         if (newChild == refChild)
         {
@@ -1610,10 +1567,7 @@ public partial class HtmlNode
     /// <returns>The node added.</returns>
     public HtmlNode PrependChild (HtmlNode newChild)
     {
-        if (newChild == null)
-        {
-            throw new ArgumentNullException ("newChild");
-        }
+        Sure.NotNull (newChild);
 
         ChildNodes.Prepend (newChild);
         _ownerDocument.SetIdForNode (newChild, newChild.GetId());
@@ -1628,10 +1582,7 @@ public partial class HtmlNode
     /// <param name="newChildren">The node list to add. May not be <c>null</c>.</param>
     public void PrependChildren (HtmlNodeCollection newChildren)
     {
-        if (newChildren == null)
-        {
-            throw new ArgumentNullException ("newChildren");
-        }
+        Sure.NotNull (newChildren);
 
         for (var i = newChildren.Count - 1; i >= 0; i--)
         {
@@ -1659,7 +1610,7 @@ public partial class HtmlNode
 
         if (HasAttributes)
         {
-            _attributes.Clear();
+            _attributes!.Clear();
         }
 
         if ((_endNode != null) && (_endNode != this))
@@ -1686,14 +1637,14 @@ public partial class HtmlNode
         if (_ownerDocument.OptionUseIdAttribute)
         {
             // remove nodes from id list
-            foreach (var node in _childrenNodes)
+            foreach (var node in _childrenNodes!)
             {
-                _ownerDocument.SetIdForNode (null, node.GetId());
+                _ownerDocument.SetIdForNode (null!, node.GetId());
                 RemoveAllIDforNode (node);
             }
         }
 
-        _childrenNodes.Clear();
+        _childrenNodes!.Clear();
         SetChanged();
     }
 
@@ -1703,7 +1654,7 @@ public partial class HtmlNode
     {
         foreach (var nodeChildNode in node.ChildNodes)
         {
-            _ownerDocument.SetIdForNode (null, nodeChildNode.GetId());
+            _ownerDocument.SetIdForNode (null!, nodeChildNode.GetId());
             RemoveAllIDforNode (nodeChildNode);
         }
     }
@@ -1770,10 +1721,7 @@ public partial class HtmlNode
     /// <returns>The node removed.</returns>
     public HtmlNode RemoveChild (HtmlNode oldChild)
     {
-        if (oldChild == null)
-        {
-            throw new ArgumentNullException ("oldChild");
-        }
+        Sure.NotNull (oldChild);
 
         var index = -1;
 
@@ -1792,7 +1740,7 @@ public partial class HtmlNode
             _childrenNodes.Remove (index);
         }
 
-        _ownerDocument.SetIdForNode (null, oldChild.GetId());
+        _ownerDocument.SetIdForNode (null!, oldChild.GetId());
         RemoveAllIDforNode (oldChild);
         SetChanged();
         return oldChild;
@@ -1806,10 +1754,7 @@ public partial class HtmlNode
     /// <returns>The node removed.</returns>
     public HtmlNode RemoveChild (HtmlNode oldChild, bool keepGrandChildren)
     {
-        if (oldChild == null)
-        {
-            throw new ArgumentNullException ("oldChild");
-        }
+        Sure.NotNull (oldChild);
 
         if ((oldChild._childrenNodes != null) && keepGrandChildren)
         {
@@ -1819,7 +1764,7 @@ public partial class HtmlNode
             // reroute grand children to ourselves
             foreach (var grandchild in oldChild._childrenNodes)
             {
-                prev = InsertAfter (grandchild, prev);
+                prev = InsertAfter (grandchild, prev!);
             }
         }
 
@@ -1836,15 +1781,8 @@ public partial class HtmlNode
     /// <returns>The node replaced.</returns>
     public HtmlNode ReplaceChild (HtmlNode newChild, HtmlNode oldChild)
     {
-        if (newChild == null)
-        {
-            return RemoveChild (oldChild);
-        }
-
-        if (oldChild == null)
-        {
-            return AppendChild (newChild);
-        }
+        Sure.NotNull (newChild);
+        Sure.NotNull (oldChild);
 
         var index = -1;
 
@@ -1863,7 +1801,7 @@ public partial class HtmlNode
             _childrenNodes.Replace (index, newChild);
         }
 
-        _ownerDocument.SetIdForNode (null, oldChild.GetId());
+        _ownerDocument.SetIdForNode (null!, oldChild.GetId());
         RemoveAllIDforNode (oldChild);
 
         _ownerDocument.SetIdForNode (newChild, newChild.GetId());
@@ -1881,10 +1819,7 @@ public partial class HtmlNode
     /// <returns>The corresponding attribute instance.</returns>
     public HtmlAttribute SetAttributeValue (string name, string value)
     {
-        if (name == null)
-        {
-            throw new ArgumentNullException ("name");
-        }
+        Sure.NotNull (name);
 
         var att = Attributes[name];
         if (att == null)
@@ -1939,7 +1874,7 @@ public partial class HtmlNode
     public virtual void WriteTo (TextWriter outText, int level = 0)
     {
         string html;
-        switch (_nodetype)
+        switch (_nodeType)
         {
             case HtmlNodeType.Comment:
                 html = ((HtmlCommentNode)this).Comment;
@@ -1953,7 +1888,7 @@ public partial class HtmlNode
                     }
                     else
                     {
-                        if (OwnerDocument.OptionXmlForceOriginalComment)
+                        if (OwnerDocument!.OptionXmlForceOriginalComment)
                         {
                             outText.Write (commentNode.Comment);
                         }
@@ -1983,7 +1918,7 @@ public partial class HtmlNode
                     // check there is a root element
                     if (_ownerDocument.DocumentNode.HasChildNodes)
                     {
-                        var rootnodes = _ownerDocument.DocumentNode._childrenNodes.Count;
+                        var rootnodes = _ownerDocument.DocumentNode._childrenNodes!.Count;
                         if (rootnodes > 0)
                         {
                             var xml = _ownerDocument.GetXmlDeclaration();
@@ -2147,7 +2082,7 @@ public partial class HtmlNode
     /// <param name="writer">The XmlWriter to which you want to save.</param>
     public void WriteTo (XmlWriter writer)
     {
-        switch (_nodetype)
+        switch (_nodeType)
         {
             case HtmlNodeType.Comment:
                 writer.WriteComment (GetXmlComment ((HtmlCommentNode)this));
@@ -2222,13 +2157,13 @@ public partial class HtmlNode
     /// </summary>
     public void SetParent (HtmlNode parent)
     {
-        if (parent == null)
+        if (parent == null!)
         {
             return;
         }
 
         ParentNode = parent;
-        if (OwnerDocument.OptionMaxNestedChildNodes > 0)
+        if (OwnerDocument!.OptionMaxNestedChildNodes > 0)
         {
             Depth = parent.Depth + 1;
             if (Depth > OwnerDocument.OptionMaxNestedChildNodes)
@@ -2255,7 +2190,7 @@ public partial class HtmlNode
 
     private void UpdateHtml()
     {
-        _innerhtml = WriteContentTo();
+        _innerHtml = WriteContentTo();
         _outerHtml = WriteTo();
         _changed = false;
     }
@@ -2284,7 +2219,7 @@ public partial class HtmlNode
     internal void UpdateLastNode()
     {
         HtmlNode? newLast = null;
-        if (_prevwithsamename == null || !_prevwithsamename._startTag)
+        if (_prevWithSameName == null! || !_prevWithSameName._startTag)
         {
             if (_ownerDocument.Openednodes != null)
             {
@@ -2307,7 +2242,7 @@ public partial class HtmlNode
         }
         else
         {
-            newLast = _prevwithsamename;
+            newLast = _prevWithSameName;
         }
 
 
@@ -2397,19 +2332,19 @@ public partial class HtmlNode
 
     internal void WriteAttribute (TextWriter outText, HtmlAttribute att)
     {
-        if (att.Value == null)
+        if (att.Value == null!)
         {
             // null value attribute are not written
             return;
         }
 
-        var quoteType = OwnerDocument.GlobalAttributeValueQuote ?? att.QuoteType;
+        var quoteType = OwnerDocument!.GlobalAttributeValueQuote ?? att.QuoteType;
         var isWithoutValue = quoteType == AttributeValueQuote.WithoutValue
-                             || (quoteType == AttributeValueQuote.Initial && att._isFromParse && !att._hasEqual &&
+                             || (quoteType == AttributeValueQuote.Initial && att is { _isFromParse: true, _hasEqual: false } &&
                                  string.IsNullOrEmpty (att.XmlValue));
 
         if (quoteType == AttributeValueQuote.Initial &&
-            !(att._isFromParse && !att._hasEqual && string.IsNullOrEmpty (att.XmlValue)))
+            !(att is { _isFromParse: true, _hasEqual: false } && string.IsNullOrEmpty (att.XmlValue)))
         {
             quoteType = att.InternalQuoteType;
         }
@@ -2627,7 +2562,7 @@ public partial class HtmlNode
             foreach (var att in classAttributes)
             {
                 // Check class solo, check class in First with other class, check Class no first.
-                if (att.Value != null && att.Value.Split (' ').ToList().Any (x => x.Equals (name)))
+                if (att.Value != null! && att.Value.Split (' ').ToList().Any (x => x.Equals (name)))
                 {
                     if (throwError)
                     {
@@ -2699,7 +2634,7 @@ public partial class HtmlNode
         {
             foreach (var att in classAttributes)
             {
-                if (att.Value == null)
+                if (att.Value == null!)
                 {
                     continue;
                 }
@@ -2708,7 +2643,7 @@ public partial class HtmlNode
                 {
                     Attributes.Remove (att);
                 }
-                else if (att.Value != null && att.Value.Split (' ').ToList().Any (x => x.Equals (name)))
+                else if (att.Value != null! && att.Value.Split (' ').ToList().Any (x => x.Equals (name)))
                 {
                     var classNames = att.Value.Split (' ');
 
@@ -2778,7 +2713,7 @@ public partial class HtmlNode
 
         foreach (var att in classAttributes)
         {
-            if (att.Value == null)
+            if (att.Value == null!)
             {
                 continue;
             }

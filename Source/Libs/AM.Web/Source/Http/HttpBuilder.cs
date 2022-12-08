@@ -25,6 +25,8 @@ using System.Threading.Tasks;
 
 #endregion
 
+#pragma warning disable SYSLIB0014 // obsolete types warning
+
 #nullable enable
 
 namespace AM.Web;
@@ -105,7 +107,7 @@ internal class HttpBuilder
         };
         Settings = settings;
         Timeout = (settings ?? Http.DefaultSettings).DefaultTimeout;
-        Proxy = (settings ?? Http.DefaultSettings).DefaultProxyFactory?.Invoke();
+        Proxy = (settings ?? Http.DefaultSettings).DefaultProxyFactory.Invoke();
         _callerName = callerName;
         _callerFile = callerFile;
         _callerLine = callerLine;
@@ -130,8 +132,8 @@ internal class HttpBuilder
 
         try
         {
-            var servicePoint = ServicePointManager.FindServicePoint (Message.RequestUri);
-            if (servicePoint != null)
+            var servicePoint = ServicePointManager.FindServicePoint (Message.RequestUri!);
+            if (servicePoint != null!)
             {
                 ex.AddLoggedData ("ServicePoint.ConnectionLimit", servicePoint.ConnectionLimit)
                     .AddLoggedData ("ServicePoint.CurrentConnections", servicePoint.CurrentConnections)
