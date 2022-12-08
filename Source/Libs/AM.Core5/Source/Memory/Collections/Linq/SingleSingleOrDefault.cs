@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* SingleOrDefault.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,6 +25,13 @@ namespace AM.Memory.Collections.Linq;
 
 public static partial class PoolingEnumerable
 {
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="source"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
     public static T Single<T> (this IPoolingEnumerable<T> source)
     {
         var wasFound = false;
@@ -43,9 +50,17 @@ public static partial class PoolingEnumerable
         }
 
         enumerator.Dispose();
-        return element;
+        return element!;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="condition"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
     public static T Single<T> (this IPoolingEnumerable<T> source, Func<T, bool> condition)
     {
         var wasFound = false;
@@ -67,9 +82,19 @@ public static partial class PoolingEnumerable
         }
 
         enumerator.Dispose();
-        return element;
+        return element!;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="context"></param>
+    /// <param name="condition"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="TContext"></typeparam>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
     public static T Single<T, TContext> (this IPoolingEnumerable<T> source, TContext context,
         Func<TContext, T, bool> condition)
     {
@@ -92,9 +117,15 @@ public static partial class PoolingEnumerable
         }
 
         enumerator.Dispose();
-        return element;
+        return element!;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="source"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
     public static T SingleOrDefault<T> (this IPoolingEnumerable<T> source)
     {
         var wasFound = false;
@@ -105,7 +136,7 @@ public static partial class PoolingEnumerable
             if (wasFound)
             {
                 enumerator.Dispose();
-                return default;
+                return default!;
             }
 
             wasFound = true;
@@ -113,9 +144,16 @@ public static partial class PoolingEnumerable
         }
 
         enumerator.Dispose();
-        return element;
+        return element!;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="condition"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
     public static T SingleOrDefault<T> (this IPoolingEnumerable<T> source, Func<T, bool> condition)
     {
         var wasFound = false;
@@ -128,7 +166,7 @@ public static partial class PoolingEnumerable
                 if (wasFound)
                 {
                     enumerator.Dispose();
-                    return default;
+                    return default!;
                 }
 
                 wasFound = true;
@@ -137,9 +175,18 @@ public static partial class PoolingEnumerable
         }
 
         enumerator.Dispose();
-        return element;
+        return element!;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="context"></param>
+    /// <param name="condition"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="TContext"></typeparam>
+    /// <returns></returns>
     public static T SingleOrDefault<T, TContext> (this IPoolingEnumerable<T> source, TContext context,
         Func<TContext, T, bool> condition)
     {
@@ -153,7 +200,7 @@ public static partial class PoolingEnumerable
                 if (wasFound)
                 {
                     enumerator.Dispose();
-                    return default;
+                    return default!;
                 }
 
                 wasFound = true;
@@ -162,6 +209,6 @@ public static partial class PoolingEnumerable
         }
 
         enumerator.Dispose();
-        return element;
+        return element!;
     }
 }

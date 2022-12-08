@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* SelectMany.ExprWithContextEnumerable.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,10 +25,10 @@ namespace AM.Memory.Collections.Linq;
 
 internal class SelectManyExprWithContextEnumerable<T, TR, TContext> : IPoolingEnumerable<TR>
 {
-    private IPoolingEnumerable<T> _src;
-    private Func<T, TContext, IPoolingEnumerable<TR>> _mutator;
+    private IPoolingEnumerable<T>? _src;
+    private Func<T, TContext, IPoolingEnumerable<TR>>? _mutator;
     private int _count;
-    private TContext _context;
+    private TContext? _context;
 
     public SelectManyExprWithContextEnumerable<T, TR, TContext> Init (
         IPoolingEnumerable<T> src,
@@ -46,7 +46,7 @@ internal class SelectManyExprWithContextEnumerable<T, TR, TContext> : IPoolingEn
     {
         _count++;
         return Pool<SelectManyExprWithContextEnumerator>.Get()
-            .Init (this, _src.GetEnumerator(), _mutator, _context);
+            .Init (this, _src!.GetEnumerator(), _mutator!, _context!);
     }
 
     private void Dispose()
@@ -65,11 +65,11 @@ internal class SelectManyExprWithContextEnumerable<T, TR, TContext> : IPoolingEn
 
     internal class SelectManyExprWithContextEnumerator : IPoolingEnumerator<TR>
     {
-        private TContext _context;
-        private Func<T, TContext, IPoolingEnumerable<TR>> _mutator;
-        private SelectManyExprWithContextEnumerable<T, TR, TContext> _parent;
-        private IPoolingEnumerator<T> _src;
-        private IPoolingEnumerator<TR> _currentEnumerator;
+        private TContext? _context;
+        private Func<T, TContext, IPoolingEnumerable<TR>>? _mutator;
+        private SelectManyExprWithContextEnumerable<T, TR, TContext>? _parent;
+        private IPoolingEnumerator<T>? _src;
+        private IPoolingEnumerator<TR>? _currentEnumerator;
         private bool _finished;
 
         public SelectManyExprWithContextEnumerator Init (
@@ -92,27 +92,27 @@ internal class SelectManyExprWithContextEnumerable<T, TR, TContext> : IPoolingEn
             if (_finished) return false;
             if (_currentEnumerator == default)
             {
-                if (!_src.MoveNext())
+                if (!_src!.MoveNext())
                 {
                     _finished = true;
                     return false;
                 }
 
-                _currentEnumerator = _mutator (_src.Current, _context).GetEnumerator();
+                _currentEnumerator = _mutator! (_src.Current, _context!).GetEnumerator();
             }
 
             do
             {
                 var hasValue = _currentEnumerator.MoveNext();
                 if (hasValue) return true;
-                if (!_src.MoveNext())
+                if (!_src!.MoveNext())
                 {
                     _finished = true;
                     return false;
                 }
 
                 _currentEnumerator?.Dispose();
-                _currentEnumerator = _mutator (_src.Current, _context).GetEnumerator();
+                _currentEnumerator = _mutator! (_src.Current, _context!).GetEnumerator();
             } while (true);
         }
 
@@ -120,12 +120,12 @@ internal class SelectManyExprWithContextEnumerable<T, TR, TContext> : IPoolingEn
         {
             _currentEnumerator?.Dispose();
             _currentEnumerator = default;
-            _src.Reset();
+            _src!.Reset();
         }
 
         object IPoolingEnumerator.Current => Current;
 
-        public TR Current => _currentEnumerator.Current;
+        public TR Current => _currentEnumerator!.Current;
 
         public void Dispose()
         {
@@ -135,7 +135,7 @@ internal class SelectManyExprWithContextEnumerable<T, TR, TContext> : IPoolingEn
             _parent?.Dispose();
             _parent = default;
 
-            _src.Dispose();
+            _src!.Dispose();
             _src = default;
 
             Pool<SelectManyExprWithContextEnumerator>.Return (this);

@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* Zip.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,6 +19,13 @@ namespace AM.Memory.Collections.Linq;
 
 public static partial class PoolingEnumerable
 {
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="second"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
     public static IPoolingEnumerable<(T, T)> Zip<T> (this IPoolingEnumerable<T> source,
         IPoolingEnumerable<T> second) =>
         Pool<ZipExprEnumerable<T>>.Get().Init (source, second);

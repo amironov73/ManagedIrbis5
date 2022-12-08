@@ -22,97 +22,93 @@ using System.IO;
 
 #nullable enable
 
-namespace ManagedIrbis.Direct
+namespace ManagedIrbis.Direct;
+
+/// <summary>
+/// Справочник в N01/L01 является таблицей, определяющей
+/// поисковый термин. Каждый ключ переменной длины, который
+/// есть в записи, представлен в справочнике одним входом,
+/// формат которого описывает следующая структура
+/// </summary>
+[DebuggerDisplay ("Length={Length}, KeyOffset={KeyOffset}, Text={Text}")]
+public sealed class NodeItem64
 {
+    #region Properties
+
     /// <summary>
-    /// Справочник в N01/L01 является таблицей, определяющей
-    /// поисковый термин. Каждый ключ переменной длины, который
-    /// есть в записи, представлен в справочнике одним входом,
-    /// формат которого описывает следующая структура
+    /// Длина ключа
     /// </summary>
-    [DebuggerDisplay("Length={Length}, KeyOffset={KeyOffset}, Text={Text}")]
-    public sealed class NodeItem64
+    public short Length { get; set; }
+
+    /// <summary>
+    /// Смещение ключа от начала записи
+    /// </summary>
+    public short KeyOffset { get; set; }
+
+    /// <summary>
+    /// Младшее слово смещения
+    /// </summary>
+    public int LowOffset { get; set; }
+
+    /// <summary>
+    /// Старшее слово смещения
+    /// </summary>
+    public int HighOffset { get; set; }
+
+    /// <summary>
+    /// Полное смещение
+    /// </summary>
+    public long FullOffset => unchecked (((long)HighOffset << 32) + LowOffset);
+
+    /// <summary>
+    /// Ссылается на лист?
+    /// </summary>
+    public bool RefersToLeaf => LowOffset < 0;
+
+    /// <summary>
+    /// Текстовое значение ключа
+    /// </summary>
+    public string? Text { get; set; }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Dump the item.
+    /// </summary>
+    public void Dump
+        (
+            TextWriter writer
+        )
     {
-        #region Properties
+        writer.WriteLine ("LEN : {0}", Length);
+        writer.WriteLine ("KEY : {0}", KeyOffset);
+        writer.WriteLine ("HIGH: {0}", HighOffset);
+        writer.WriteLine ("LOW : {0}", LowOffset);
+        writer.WriteLine ("TEXT: {0}", Text);
+    }
 
-        /// <summary>
-        /// Длина ключа
-        /// </summary>
-        public short Length { get; set; }
+    #endregion
 
-        /// <summary>
-        /// Смещение ключа от начала записи
-        /// </summary>
-        public short KeyOffset { get; set; }
+    #region Object members
 
-        /// <summary>
-        /// Младшее слово смещения
-        /// </summary>
-        public int LowOffset { get; set; }
-
-        /// <summary>
-        /// Старшее слово смещения
-        /// </summary>
-        public int HighOffset { get; set; }
-
-        /// <summary>
-        /// Полное смещение
-        /// </summary>
-        public long FullOffset => unchecked(((long)HighOffset << 32) + LowOffset);
-
-        /// <summary>
-        /// Ссылается на лист?
-        /// </summary>
-        public bool RefersToLeaf => LowOffset < 0;
-
-        /// <summary>
-        /// Текстовое значение ключа
-        /// </summary>
-        public string? Text { get; set; }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Dump the item.
-        /// </summary>
-        public void Dump
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+        => string.Format
             (
-                TextWriter writer
-            )
-        {
-            writer.WriteLine("LEN : {0}", Length);
-            writer.WriteLine("KEY : {0}", KeyOffset);
-            writer.WriteLine("HIGH: {0}", HighOffset);
-            writer.WriteLine("LOW : {0}", LowOffset);
-            writer.WriteLine("TEXT: {0}", Text);
+                "Length: {0}, KeyOffset: {1}, "
+                + "LowOffset: {2}, HighOffset: {3}, "
+                + "FullOffset: {4}, RefersToLeaf: {5}, "
+                + "Text: {6}",
+                Length,
+                KeyOffset,
+                LowOffset,
+                HighOffset,
+                FullOffset,
+                RefersToLeaf,
+                Text
+            );
 
-        } // method Dump
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-            => string.Format
-                (
-                    "Length: {0}, KeyOffset: {1}, "
-                    + "LowOffset: {2}, HighOffset: {3}, "
-                    + "FullOffset: {4}, RefersToLeaf: {5}, "
-                    + "Text: {6}",
-                    Length,
-                    KeyOffset,
-                    LowOffset,
-                    HighOffset,
-                    FullOffset,
-                    RefersToLeaf,
-                    Text
-                );
-
-        #endregion
-
-    } // class NodeItem64
-
-} // namespace ManagedIrbis.Direct
+    #endregion
+}

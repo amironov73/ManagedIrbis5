@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* Zip.Enumerable.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,7 +19,7 @@ namespace AM.Memory.Collections;
 
 internal class ZipExprEnumerable<T> : IPoolingEnumerable<(T, T)>
 {
-    private IPoolingEnumerable<T> _src, _second;
+    private IPoolingEnumerable<T>? _src, _second;
     private int _count;
 
     public ZipExprEnumerable<T> Init (IPoolingEnumerable<T> src, IPoolingEnumerable<T> second)
@@ -33,7 +33,7 @@ internal class ZipExprEnumerable<T> : IPoolingEnumerable<(T, T)>
     public IPoolingEnumerator<(T, T)> GetEnumerator()
     {
         _count++;
-        return Pool<ZipExprEnumerator>.Get().Init (this, _src.GetEnumerator(), _second.GetEnumerator());
+        return Pool<ZipExprEnumerator>.Get().Init (this, _src!.GetEnumerator(), _second!.GetEnumerator());
     }
 
     private void Dispose()
@@ -50,8 +50,8 @@ internal class ZipExprEnumerable<T> : IPoolingEnumerable<(T, T)>
 
     internal class ZipExprEnumerator : IPoolingEnumerator<(T, T)>
     {
-        private ZipExprEnumerable<T> _parent;
-        private IPoolingEnumerator<T> _src, _second;
+        private ZipExprEnumerable<T>? _parent;
+        private IPoolingEnumerator<T>? _src, _second;
         private bool _hasResult;
 
         public ZipExprEnumerator Init (
@@ -66,19 +66,19 @@ internal class ZipExprEnumerable<T> : IPoolingEnumerable<(T, T)>
 
         public bool MoveNext()
         {
-            _hasResult = _src.MoveNext() && _second.MoveNext();
+            _hasResult = _src!.MoveNext() && _second!.MoveNext();
             return _hasResult;
         }
 
         public void Reset()
         {
-            _src.Reset();
-            _second.Reset();
+            _src!.Reset();
+            _second!.Reset();
         }
 
         object IPoolingEnumerator.Current => Current;
 
-        public (T, T) Current => _hasResult ? (_src.Current, _second.Current) : default;
+        public (T, T) Current => _hasResult ? (_src!.Current, _second!.Current) : default;
 
         public void Dispose()
         {

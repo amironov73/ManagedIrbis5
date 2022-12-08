@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* Union.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -27,6 +27,13 @@ namespace AM.Memory.Collections.Linq;
 
 public static partial class PoolingEnumerable
 {
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="second"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
     public static IPoolingEnumerable<T> Union<T> (this IPoolingEnumerable<T> source, IPoolingEnumerable<T> second)
     {
         var set = Pool<PoolingDictionary<T, int>>.Get().Init (0);
@@ -36,6 +43,14 @@ public static partial class PoolingEnumerable
         return Pool<UnionExprEnumerable<T>>.Get().Init (set);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="second"></param>
+    /// <param name="comparer"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
     public static IPoolingEnumerable<T> Union<T> (this IPoolingEnumerable<T> source, IPoolingEnumerable<T> second,
         IEqualityComparer<T> comparer)
     {

@@ -18,33 +18,30 @@ using System;
 
 #nullable enable
 
-namespace ManagedIrbis.Direct
+namespace ManagedIrbis.Direct;
+
+/// <summary>
+/// Стратегия кеширования текстовых файлов.
+/// </summary>
+public interface IContextCachingStrategy
 {
     /// <summary>
-    /// Стратегия кеширования текстовых файлов.
+    /// Полная очистка кеша.
     /// </summary>
-    public interface IContextCachingStrategy
-    {
-        /// <summary>
-        /// Полная очистка кеша.
-        /// </summary>
-        void ClearFileCache();
+    void ClearFileCache();
 
-        /// <summary>
-        /// Получение из кеша файла с указанным именем.
-        /// </summary>
-        string? GetCachedFile(ISyncProvider provider, string fileName);
+    /// <summary>
+    /// Получение из кеша файла с указанным именем.
+    /// </summary>
+    string? GetCachedFile (ISyncProvider provider, string fileName);
 
-        /// <summary>
-        /// Помещение файла в кеш.
-        /// </summary>
-        void StoreFile(string fileName, string content);
+    /// <summary>
+    /// Помещение файла в кеш.
+    /// </summary>
+    void StoreFile (string fileName, string content);
 
-        /// <summary>
-        /// Удаление файла из кеша.
-        /// </summary>
-        void ForgetFile(string fileName);
-
-    } // interface IDirectCachingStrategy
-
-} // namespace ManagedIrbis.Direct
+    /// <summary>
+    /// Удаление файла из кеша.
+    /// </summary>
+    void ForgetFile (string fileName);
+}

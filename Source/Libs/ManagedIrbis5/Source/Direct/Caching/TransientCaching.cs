@@ -18,39 +18,36 @@ using System.Collections.Concurrent;
 
 #nullable enable
 
-namespace ManagedIrbis.Direct
+namespace ManagedIrbis.Direct;
+
+/// <summary>
+/// Создание кеша "на каждый чих".
+/// </summary>
+public sealed class TransientCaching
+    : IContextCachingStrategy
 {
-    /// <summary>
-    /// Создание кеша "на каждый чих".
-    /// </summary>
-    public sealed class TransientCaching
-        : IContextCachingStrategy
-    {
-        #region Private members
+    #region Private members
 
-        private readonly ConcurrentDictionary<string, string> _dictionary
-            = new (StringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentDictionary<string, string> _dictionary
+        = new (StringComparer.OrdinalIgnoreCase);
 
-        #endregion
+    #endregion
 
-        #region IContextCachingStrategy
+    #region IContextCachingStrategy
 
-        /// <inheritdoc cref="IContextCachingStrategy.ClearFileCache"/>
-        public void ClearFileCache() => _dictionary.Clear();
+    /// <inheritdoc cref="IContextCachingStrategy.ClearFileCache"/>
+    public void ClearFileCache() => _dictionary.Clear();
 
-        /// <inheritdoc cref="IContextCachingStrategy.GetCachedFile"/>
-        public string? GetCachedFile (ISyncProvider provider, string fileName) =>
-            _dictionary.TryGetValue(fileName, out var content) ? content : default;
+    /// <inheritdoc cref="IContextCachingStrategy.GetCachedFile"/>
+    public string? GetCachedFile (ISyncProvider provider, string fileName) =>
+        _dictionary.TryGetValue (fileName, out var content) ? content : default;
 
-        /// <inheritdoc cref="IContextCachingStrategy.StoreFile"/>
-        public void StoreFile (string fileName, string content) =>
-            _dictionary[fileName] = content;
+    /// <inheritdoc cref="IContextCachingStrategy.StoreFile"/>
+    public void StoreFile (string fileName, string content) =>
+        _dictionary[fileName] = content;
 
-        /// <inheritdoc cref="IContextCachingStrategy.ForgetFile"/>
-        public void ForgetFile(string fileName) => _dictionary.TryRemove(fileName, out _);
+    /// <inheritdoc cref="IContextCachingStrategy.ForgetFile"/>
+    public void ForgetFile (string fileName) => _dictionary.TryRemove (fileName, out _);
 
-        #endregion
-
-    } // class TransientCaching
-
-} // namespace ManagedIrbis.Direct
+    #endregion
+}

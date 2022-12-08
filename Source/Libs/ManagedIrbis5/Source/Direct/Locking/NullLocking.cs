@@ -12,27 +12,24 @@
 
 #nullable enable
 
-namespace ManagedIrbis.Direct
+namespace ManagedIrbis.Direct;
+
+/// <summary>
+/// Игнорирование блокировок базы данных.
+/// </summary>
+public sealed class NullLocking
+    : IDirectLockingStrategy
 {
-    /// <summary>
-    /// Игнорирование блокировок базы данных.
-    /// </summary>
-    public sealed class NullLocking
-        : IDirectLockingStrategy
-    {
-        #region IDirectLockingStrategy members
+    #region IDirectLockingStrategy members
 
-        /// <inheritdoc cref="IDirectLockingStrategy.IsDatabaseLocked"/>
-        public bool IsDatabaseLocked(DirectProvider provider, string databaseName) => false;
+    /// <inheritdoc cref="IDirectLockingStrategy.IsDatabaseLocked"/>
+    public bool IsDatabaseLocked (DirectProvider provider, string databaseName) => false;
 
-        /// <inheritdoc cref="IDirectLockingStrategy.LockDatabase"/>
-        public bool LockDatabase(DirectProvider provider, string databaseName) => true;
+    /// <inheritdoc cref="IDirectLockingStrategy.LockDatabase"/>
+    public bool LockDatabase (DirectProvider provider, string databaseName) => true;
 
-        /// <inheritdoc cref="IDirectLockingStrategy.UnlockDatabase"/>
-        public bool UnlockDatabase(DirectProvider provider, string databaseName) => true;
+    /// <inheritdoc cref="IDirectLockingStrategy.UnlockDatabase"/>
+    public bool UnlockDatabase (DirectProvider provider, string databaseName) => true;
 
-        #endregion
-
-    } // class NullLocking
-
-} // namespace ManagedIrbis.Direct
+    #endregion
+}

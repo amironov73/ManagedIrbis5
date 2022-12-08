@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* SkipTake.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,11 +19,25 @@ namespace AM.Memory.Collections.Linq;
 
 public static partial class PoolingEnumerable
 {
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="count"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
     public static IPoolingEnumerable<T> Skip<T> (this IPoolingEnumerable<T> source, int count)
     {
         return Pool<SkipTakeExprPoolingEnumerable<T>>.Get().Init (source, false, count);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="count"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
     public static IPoolingEnumerable<T> Take<T> (this IPoolingEnumerable<T> source, int count)
     {
         return Pool<SkipTakeExprPoolingEnumerable<T>>.Get().Init (source, true, count);

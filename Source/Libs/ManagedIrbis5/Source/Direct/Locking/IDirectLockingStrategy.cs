@@ -12,28 +12,25 @@
 
 #nullable enable
 
-namespace ManagedIrbis.Direct
+namespace ManagedIrbis.Direct;
+
+/// <summary>
+/// Стратегия блокирования базы данных.
+/// </summary>
+public interface IDirectLockingStrategy
 {
     /// <summary>
-    /// Стратегия блокирования базы данных.
+    /// Проверка, не заблокирвоана ли база данных.
     /// </summary>
-    public interface IDirectLockingStrategy
-    {
-        /// <summary>
-        /// Проверка, не заблокирвоана ли база данных.
-        /// </summary>
-        bool IsDatabaseLocked(DirectProvider provider, string databaseName);
+    bool IsDatabaseLocked (DirectProvider provider, string databaseName);
 
-        /// <summary>
-        /// Блокировка базы данных.
-        /// </summary>
-        bool LockDatabase(DirectProvider provider, string databaseName);
+    /// <summary>
+    /// Блокировка базы данных.
+    /// </summary>
+    bool LockDatabase (DirectProvider provider, string databaseName);
 
-        /// <summary>
-        /// Разблокирование базы данных.
-        /// </summary>
-        bool UnlockDatabase(DirectProvider provider, string databaseName);
-
-    } // interface IDirectLockingStrategy
-
-} // namespace ManagedIrbis.Direct
+    /// <summary>
+    /// Разблокирование базы данных.
+    /// </summary>
+    bool UnlockDatabase (DirectProvider provider, string databaseName);
+}

@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* SimpleExpressions.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -26,31 +26,70 @@ namespace AM.Memory.Collections.Linq;
 
 public static partial class PoolingEnumerable
 {
+    /// <summary>
+    ///
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
     public static IPoolingEnumerable<T> Empty<T>() => Range (0, 0).Select (x => (T)(object)x);
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="startIndex"></param>
+    /// <param name="count"></param>
+    /// <returns></returns>
     public static IPoolingEnumerable<int> Range (int startIndex, int count)
     {
         return Pool<RangeExprEnumerable>.Get().Init (startIndex, count);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="count"></param>
+    /// <returns></returns>
     public static IPoolingEnumerable<int> Range (int count)
     {
         return Pool<RangeExprEnumerable>.Get().Init (0, count);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="element"></param>
+    /// <param name="count"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
     public static IPoolingEnumerable<T> Repeat<T> (T element, int count) =>
         Range (0, count).Select (element, (item, x) => item);
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="self"></param>
+    /// <param name="element"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
     public static bool Contains<T> (this IPoolingEnumerable<T> self, T element)
     {
         foreach (var item in self)
         {
-            if (item.Equals (element)) return true;
+            if (item!.Equals (element))
+            {
+                return true;
+            }
         }
 
         return false;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="self"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
     public static int Count<T> (this IPoolingEnumerable<T> self)
     {
         var count = 0;
@@ -62,6 +101,12 @@ public static partial class PoolingEnumerable
         return count;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="self"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
     public static long LongCount<T> (this IPoolingEnumerable<T> self)
     {
         long count = 0;
@@ -73,18 +118,37 @@ public static partial class PoolingEnumerable
         return count;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="self"></param>
+    /// <param name="position"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
     public static T ElementAt<T> (this IPoolingEnumerable<T> self, int position)
     {
         var i = 0;
         foreach (var item in self)
         {
-            if (i == position) return item;
+            if (i == position)
+            {
+                return item;
+            }
+
             i++;
         }
 
         throw new InvalidOperationException ("Sequence is too small. Index not found");
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="self"></param>
+    /// <param name="other"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
     public static bool SequenceEqual<T> (this IPoolingEnumerable<T> self, IPoolingEnumerable<T> other)
     {
         var comparer = EqualityComparer<T>.Default;
@@ -99,7 +163,10 @@ public static partial class PoolingEnumerable
                 rightHas = right.MoveNext();
                 equals = comparer.Equals (left.Current, right.Current);
 
-                if (leftHas != rightHas || !equals) return false;
+                if (leftHas != rightHas || !equals)
+                {
+                    return false;
+                }
             } while (leftHas && rightHas);
 
             return !leftHas && !rightHas;
@@ -129,7 +196,11 @@ internal class RangeExprEnumerable : IPoolingEnumerable<int>
 
     private void Dispose()
     {
-        if (_count == 0) return;
+        if (_count == 0)
+        {
+            return;
+        }
+
         _count--;
         if (_count == 0)
         {
@@ -157,7 +228,11 @@ internal class RangeExprEnumerable : IPoolingEnumerable<int>
 
         public bool MoveNext()
         {
-            if (_current == 0) return false;
+            if (_current == 0)
+            {
+                return false;
+            }
+
             if (_current == -1)
             {
                 _current = _workCount;
@@ -174,11 +249,12 @@ internal class RangeExprEnumerable : IPoolingEnumerable<int>
 
         public int Current => _start + (_workCount - _current);
 
+        /// <inheritdoc cref="IDisposable.Dispose"/>
         public void Dispose()
         {
             _current = -1;
             _parent?.Dispose();
-            _parent = default;
+            _parent = default!;
             Pool<RangeExprEnumerator>.Return (this);
         }
     }

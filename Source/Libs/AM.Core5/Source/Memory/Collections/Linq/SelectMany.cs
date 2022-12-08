@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* SelectMany.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,6 +25,14 @@ namespace AM.Memory.Collections.Linq;
 
 public static partial class PoolingEnumerable
 {
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="mutator"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="TR"></typeparam>
+    /// <returns></returns>
     public static IPoolingEnumerable<TR> SelectMany<T, TR> (
         this IPoolingEnumerable<T> source,
         Func<T, IPoolingEnumerable<TR>> mutator)
@@ -32,6 +40,16 @@ public static partial class PoolingEnumerable
         return Pool<SelectManyExprEnumerable<T, TR>>.Get().Init (source, mutator);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="context"></param>
+    /// <param name="mutator"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="TR"></typeparam>
+    /// <typeparam name="TContext"></typeparam>
+    /// <returns></returns>
     public static IPoolingEnumerable<TR> SelectMany<T, TR, TContext> (
         this IPoolingEnumerable<T> source,
         TContext context,

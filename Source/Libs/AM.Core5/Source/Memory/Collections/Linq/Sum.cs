@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* Sum.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,6 +25,12 @@ namespace AM.Memory.Collections.Linq;
 
 public static partial class PoolingEnumerable
 {
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentNullException"></exception>
     public static int Sum (this IPoolingEnumerable<int> source)
     {
         if (source == null) throw new ArgumentNullException (nameof (source));
@@ -37,6 +43,12 @@ public static partial class PoolingEnumerable
         return sum;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentNullException"></exception>
     public static int? Sum (this IPoolingEnumerable<int?> source)
     {
         if (source == null) throw new ArgumentNullException (nameof (source));
@@ -52,6 +64,12 @@ public static partial class PoolingEnumerable
         return sum;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentNullException"></exception>
     public static long Sum (this IPoolingEnumerable<long> source)
     {
         if (source == null) throw new ArgumentNullException (nameof (source));
@@ -64,6 +82,12 @@ public static partial class PoolingEnumerable
         return sum;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentNullException"></exception>
     public static long? Sum (this IPoolingEnumerable<long?> source)
     {
         if (source == null) throw new ArgumentNullException (nameof (source));
@@ -79,6 +103,12 @@ public static partial class PoolingEnumerable
         return sum;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentNullException"></exception>
     public static float Sum (this IPoolingEnumerable<float> source)
     {
         if (source == null) throw new ArgumentNullException (nameof (source));
@@ -87,6 +117,12 @@ public static partial class PoolingEnumerable
         return (float)sum;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentNullException"></exception>
     public static float? Sum (this IPoolingEnumerable<float?> source)
     {
         if (source == null) throw new ArgumentNullException (nameof (source));
@@ -99,6 +135,12 @@ public static partial class PoolingEnumerable
         return (float)sum;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentNullException"></exception>
     public static double Sum (this IPoolingEnumerable<double> source)
     {
         if (source == null) throw new ArgumentNullException (nameof (source));
@@ -107,6 +149,12 @@ public static partial class PoolingEnumerable
         return sum;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentNullException"></exception>
     public static double? Sum (this IPoolingEnumerable<double?> source)
     {
         if (source == null) throw new ArgumentNullException (nameof (source));
@@ -119,6 +167,12 @@ public static partial class PoolingEnumerable
         return sum;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentNullException"></exception>
     public static decimal Sum (this IPoolingEnumerable<decimal> source)
     {
         if (source == null) throw new ArgumentNullException (nameof (source));
@@ -127,6 +181,12 @@ public static partial class PoolingEnumerable
         return sum;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentNullException"></exception>
     public static decimal? Sum (this IPoolingEnumerable<decimal?> source)
     {
         if (source == null) throw new ArgumentNullException (nameof (source));
@@ -139,33 +199,103 @@ public static partial class PoolingEnumerable
         return sum;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="selector"></param>
+    /// <typeparam name="TSource"></typeparam>
+    /// <returns></returns>
     public static int Sum<TSource> (this IPoolingEnumerable<TSource> source, Func<TSource, int> selector) =>
         Sum (source.Select (selector));
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="selector"></param>
+    /// <typeparam name="TSource"></typeparam>
+    /// <returns></returns>
     public static int? Sum<TSource> (this IPoolingEnumerable<TSource> source, Func<TSource, int?> selector) =>
         Sum (source.Select (selector));
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="selector"></param>
+    /// <typeparam name="TSource"></typeparam>
+    /// <returns></returns>
     public static long Sum<TSource> (this IPoolingEnumerable<TSource> source, Func<TSource, long> selector) =>
         Sum (source.Select (selector));
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="selector"></param>
+    /// <typeparam name="TSource"></typeparam>
+    /// <returns></returns>
     public static long? Sum<TSource> (this IPoolingEnumerable<TSource> source, Func<TSource, long?> selector) =>
         Sum (source.Select (selector));
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="selector"></param>
+    /// <typeparam name="TSource"></typeparam>
+    /// <returns></returns>
     public static float Sum<TSource> (this IPoolingEnumerable<TSource> source, Func<TSource, float> selector) =>
         Sum (source.Select (selector));
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="selector"></param>
+    /// <typeparam name="TSource"></typeparam>
+    /// <returns></returns>
     public static float? Sum<TSource> (this IPoolingEnumerable<TSource> source, Func<TSource, float?> selector) =>
         Sum (source.Select (selector));
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="selector"></param>
+    /// <typeparam name="TSource"></typeparam>
+    /// <returns></returns>
     public static double Sum<TSource> (this IPoolingEnumerable<TSource> source, Func<TSource, double> selector) =>
         Sum (source.Select (selector));
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="selector"></param>
+    /// <typeparam name="TSource"></typeparam>
+    /// <returns></returns>
     public static double? Sum<TSource> (this IPoolingEnumerable<TSource> source, Func<TSource, double?> selector) =>
         Sum (source.Select (selector));
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="selector"></param>
+    /// <typeparam name="TSource"></typeparam>
+    /// <returns></returns>
     public static decimal Sum<TSource> (this IPoolingEnumerable<TSource> source, Func<TSource, decimal> selector) =>
         Sum (source.Select (selector));
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="selector"></param>
+    /// <typeparam name="TSource"></typeparam>
+    /// <returns></returns>
     public static decimal? Sum<TSource> (this IPoolingEnumerable<TSource> source,
         Func<TSource, decimal?> selector) =>
         Sum (source.Select (selector));

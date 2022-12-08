@@ -22,51 +22,48 @@ using AM.Collections;
 
 #nullable enable
 
-namespace ManagedIrbis.Biblio
+namespace ManagedIrbis.Biblio;
+
+/// <summary>
+/// Коллекция библиографических записей для главы указателя.
+/// </summary>
+public sealed class RecordCollection
+    : NonNullCollection<Record>,
+    IVerifiable
 {
+    #region Public methods
+
     /// <summary>
-    /// Коллекция библиографических записей для главы указателя.
+    /// Sort the records.
     /// </summary>
-    public sealed class RecordCollection
-        : NonNullCollection<Record>,
-        IVerifiable
+    public void SortRecords()
     {
-        #region Public methods
+        var records = ToArray();
 
-        /// <summary>
-        /// Sort the records.
-        /// </summary>
-        public void SortRecords()
+        Array.Sort (records, RecordComparer.BySortKey());
+        Clear();
+        AddRange (records);
+    }
+
+    #endregion
+
+    #region IVerifiable members
+
+    /// <inheritdoc cref="IVerifiable.Verify" />
+    public bool Verify
+        (
+            bool throwOnError
+        )
+    {
+        var verifier = new Verifier<RecordCollection> (this, throwOnError);
+
+        foreach (var record in this)
         {
-            var records = ToArray();
+            verifier.VerifySubObject (record);
+        }
 
-            Array.Sort(records, RecordComparer.BySortKey());
-            Clear();
-            AddRange(records);
-        } // method SortRecords
+        return verifier.Result;
+    }
 
-        #endregion
-
-        #region IVerifiable members
-
-        /// <inheritdoc cref="IVerifiable.Verify" />
-        public bool Verify
-            (
-                bool throwOnError
-            )
-        {
-            var verifier = new Verifier<RecordCollection>(this, throwOnError);
-
-            foreach (var record in this)
-            {
-                verifier.VerifySubObject(record, "record");
-            }
-
-            return verifier.Result;
-        } // method Verify
-
-        #endregion
-
-    } // class RecordCollection
-
-} // namespace ManagedIrbis.Biblio
+    #endregion
+}

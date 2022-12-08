@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* SkipTake.ExprPoolingEnumerable.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,7 +22,7 @@ internal sealed class SkipTakeExprPoolingEnumerable<T> : IPoolingEnumerable<T>
     private bool _take;
     private int _workCount;
     private int _count;
-    private IPoolingEnumerable<T> _source;
+    private IPoolingEnumerable<T> _source = null!;
 
     public SkipTakeExprPoolingEnumerable<T> Init (IPoolingEnumerable<T> source, bool take, int count)
     {
@@ -45,7 +45,7 @@ internal sealed class SkipTakeExprPoolingEnumerable<T> : IPoolingEnumerable<T>
         _count--;
         if (_count == 0)
         {
-            _source = null;
+            _source = null!;
             _take = default;
             Pool<SkipTakeExprPoolingEnumerable<T>>.Return (this);
         }
@@ -55,8 +55,8 @@ internal sealed class SkipTakeExprPoolingEnumerable<T> : IPoolingEnumerable<T>
 
     internal sealed class SkipTakeExprPoolingEnumerator : IPoolingEnumerator<T>
     {
-        private IPoolingEnumerator<T> _source;
-        private SkipTakeExprPoolingEnumerable<T> _parent;
+        private IPoolingEnumerator<T>? _source;
+        private SkipTakeExprPoolingEnumerable<T>? _parent;
         private bool _take;
         private int _pos, _workCount;
 
@@ -78,7 +78,7 @@ internal sealed class SkipTakeExprPoolingEnumerable<T> : IPoolingEnumerable<T>
                 if (_pos < _workCount)
                 {
                     _pos++;
-                    return _source.MoveNext();
+                    return _source!.MoveNext();
                 }
 
                 return false;
@@ -87,21 +87,21 @@ internal sealed class SkipTakeExprPoolingEnumerable<T> : IPoolingEnumerable<T>
             while (_pos < _workCount)
             {
                 _pos++;
-                _source.MoveNext();
+                _source!.MoveNext();
             }
 
-            return _source.MoveNext();
+            return _source!.MoveNext();
         }
 
         public void Reset()
         {
             _pos = 0;
-            _source.Reset();
+            _source!.Reset();
         }
 
         object IPoolingEnumerator.Current => Current;
 
-        public T Current => _source.Current;
+        public T Current => _source!.Current;
 
         public void Dispose()
         {
