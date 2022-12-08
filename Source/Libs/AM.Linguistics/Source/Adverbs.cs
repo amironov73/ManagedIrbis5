@@ -6,19 +6,11 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedMember.Global
 
 /* Adverbs.cs -- наречия
  * Ars Magna project, http://arsmagna.ru
  */
-
-#region Using directives
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-#endregion
 
 #nullable enable
 
@@ -29,6 +21,11 @@ namespace AM.Linguistics;
 /// </summary>
 public static class Adverbs
 {
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="sourceForm"></param>
+    /// <returns></returns>
     public static Adverb FindOne (string sourceForm)
     {
         return new Adverb { Word = sourceForm };
@@ -40,23 +37,20 @@ public static class Adverbs
 /// </summary>
 public class Adverb
 {
-    public string Word { get; internal set; }
+    /// <summary>
+    ///
+    /// </summary>
+    public string Word { get; internal set; } = null!;
 
     /// <summary>
     /// Разряд наречия
     /// </summary>
-    public Comparability Comparability
-    {
-        get
-        {
-            if (Word[Word.Length - 1] == 'о')
-                return Comparability.Comparable;
-            else
-                return Comparability.Incomparable;
-        }
-    }
+    public Comparability Comparability =>
+        Word[^1] == 'о'
+            ? Comparability.Comparable
+            : Comparability.Incomparable;
 
-//долго-дольше
+    //долго-дольше
 //круто-круче
 //свято-свяче
 //легко-легче
@@ -69,12 +63,16 @@ public class Adverb
 //далеко-дальше
 //трудно-труднее трудней
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="comp"></param>
     public string this [Comparison comp]
     {
         get
         {
-            var c = Word[Word.Length - 1];
-            var @base = Word.Substring (0, Word.Length - 1);
+            var c = Word[^1];
+            var @base = Word[..^1];
             var po = "по";
             if (char.IsUpper (@base[0]))
             {
@@ -85,16 +83,16 @@ public class Adverb
             switch (c)
             {
                 case 'о':
-                    switch (comp)
+                    return comp switch
                     {
-                        case Comparison.Comparative1: return @base + "ее";
-                        case Comparison.Comparative2: return po + @base + "ее";
-                        case Comparison.Comparative3: return @base + "ей";
-                        case Comparison.Comparative4: return po + @base + "ей";
-                        case Comparison.Comparative5: return "более " + @base;
-                    }
+                        Comparison.Comparative1 => @base + "ее",
+                        Comparison.Comparative2 => po + @base + "ее",
+                        Comparison.Comparative3 => @base + "ей",
+                        Comparison.Comparative4 => po + @base + "ей",
+                        Comparison.Comparative5 => "более " + @base,
+                        _ => ""
+                    };
 
-                    return "";
                 default:
                     return "";
             }

@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 
-/* .cs --
+/* CompoundRule.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,30 +25,58 @@ using AM.Linguistics.Hunspell.Infrastructure;
 
 namespace AM.Linguistics.Hunspell;
 
-public sealed class CompoundRule : ArrayWrapper<FlagValue>
+/// <summary>
+///
+/// </summary>
+public sealed class CompoundRule
+    : ArrayWrapper<FlagValue>
 {
+    /// <summary>
+    ///
+    /// </summary>
     public static readonly CompoundRule Empty = TakeArray (Array.Empty<FlagValue>());
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="values"></param>
+    /// <returns></returns>
     public static CompoundRule Create (List<FlagValue> values)
     {
-        return values == null ? Empty : TakeArray (values.ToArray());
+        return values == null! ? Empty : TakeArray (values.ToArray());
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="values"></param>
+    /// <returns></returns>
     public static CompoundRule Create (IEnumerable<FlagValue> values)
     {
-        return values == null ? Empty : TakeArray (values.ToArray());
+        return values == null! ? Empty : TakeArray (values.ToArray());
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="values"></param>
+    /// <returns></returns>
     internal static CompoundRule TakeArray (FlagValue[] values)
     {
-        return values == null ? Empty : new CompoundRule (values);
+        return values == null! ? Empty : new CompoundRule (values);
     }
 
     private CompoundRule (FlagValue[] values)
         : base (values)
     {
+        // пустое тело конструктора
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="index"></param>
+    /// <returns></returns>
     public bool IsWildcard (int index)
     {
         var value = this[index];

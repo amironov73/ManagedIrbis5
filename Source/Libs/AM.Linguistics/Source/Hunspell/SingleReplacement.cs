@@ -7,51 +7,66 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 
-/* .cs --
+/* SingleReplacement.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
-#region Using directives
-
-using System;
-
-#if !NO_INLINE
-using System.Runtime.CompilerServices;
-#endif
-
-#endregion
-
 #nullable enable
 
-namespace AM.Linguistics.Hunspell
+namespace AM.Linguistics.Hunspell;
+
+/// <summary>
+///
+/// </summary>
+public sealed class SingleReplacement
+    : ReplacementEntry
 {
-    public sealed class SingleReplacement : ReplacementEntry
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="pattern"></param>
+    /// <param name="outString"></param>
+    /// <param name="type"></param>
+    public SingleReplacement (string pattern, string outString, ReplacementValueType type)
+        : base (pattern)
     {
-        public SingleReplacement (string pattern, string outString, ReplacementValueType type)
-            : base (pattern)
-        {
-            OutString = outString;
-            Type = type;
-        }
-
-        public string OutString { get; }
-
-        public ReplacementValueType Type { get; }
-
-        public override string Med => this[ReplacementValueType.Med];
-
-        public override string Ini => this[ReplacementValueType.Ini];
-
-        public override string Fin => this[ReplacementValueType.Fin];
-
-        public override string Isol => this[ReplacementValueType.Isol];
-
-        public override string this [ReplacementValueType type]
-        {
-#if !NO_INLINE
-            [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
-            get => Type == type ? OutString : null;
-        }
+        OutString = outString;
+        Type = type;
     }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public string OutString { get; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public ReplacementValueType Type { get; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public override string Med => this[ReplacementValueType.Med];
+
+    /// <summary>
+    ///
+    /// </summary>
+    public override string Ini => this[ReplacementValueType.Ini];
+
+    /// <summary>
+    ///
+    /// </summary>
+    public override string Fin => this[ReplacementValueType.Fin];
+
+    /// <summary>
+    ///
+    /// </summary>
+    public override string Isol => this[ReplacementValueType.Isol];
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="type"></param>
+    public override string this [ReplacementValueType type] => Type == type ? OutString : null!;
 }

@@ -7,43 +7,43 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 
-/* .cs --
+/* PrefixEntry.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
-#region Using directives
-
-#if !NO_INLINE
-using System.Runtime.CompilerServices;
-#endif
-
-#endregion
-
 #nullable enable
 
-namespace AM.Linguistics.Hunspell
+namespace AM.Linguistics.Hunspell;
+
+/// <summary>
+///
+/// </summary>
+public sealed class PrefixEntry
+    : AffixEntry
 {
-    public sealed class PrefixEntry : AffixEntry
-    {
-#if !NO_INLINE
-        [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
-        public PrefixEntry (
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="strip"></param>
+    /// <param name="affixText"></param>
+    /// <param name="conditions"></param>
+    /// <param name="morph"></param>
+    /// <param name="contClass"></param>
+    public PrefixEntry
+        (
             string strip,
             string affixText,
             CharacterConditionGroup conditions,
             MorphSet morph,
-            FlagSet contClass)
-            : base (strip, affixText, conditions, morph, contClass)
-        {
-        }
-
-        public sealed override string Key
-        {
-#if !NO_INLINE
-            [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
-            get => Append;
-        }
+            FlagSet contClass
+        )
+        : base (strip, affixText, conditions, morph, contClass)
+    {
+        // пустое тело конструктора
     }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public override string Key => Append;
 }

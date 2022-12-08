@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 
-/* .cs --
+/* MapEntry.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,22 +25,40 @@ using AM.Linguistics.Hunspell.Infrastructure;
 
 namespace AM.Linguistics.Hunspell;
 
-public sealed class MapEntry : ArrayWrapper<string>
+/// <summary>
+///
+/// </summary>
+public sealed class MapEntry
+    : ArrayWrapper<string>
 {
+    /// <summary>
+    ///
+    /// </summary>
     public static readonly MapEntry Empty = TakeArray (Array.Empty<string>());
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="values"></param>
+    /// <returns></returns>
     public static MapEntry Create (IEnumerable<string> values)
     {
-        return values == null ? Empty : TakeArray (values.ToArray());
+        return values == null! ? Empty : TakeArray (values.ToArray());
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="values"></param>
+    /// <returns></returns>
     internal static MapEntry TakeArray (string[] values)
     {
-        return values == null ? Empty : new MapEntry (values);
+        return values == null! ? Empty : new MapEntry (values);
     }
 
     private MapEntry (string[] values)
         : base (values)
     {
+        // пустое тело конструктора
     }
 }

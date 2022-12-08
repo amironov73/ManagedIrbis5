@@ -25,27 +25,55 @@ using AM.Linguistics.Hunspell.Infrastructure;
 
 namespace AM.Linguistics.Hunspell;
 
-public sealed class AffixEntryCollection<TEntry> : ArrayWrapper<TEntry>
+/// <summary>
+///
+/// </summary>
+/// <typeparam name="TEntry"></typeparam>
+public sealed class AffixEntryCollection<TEntry>
+    : ArrayWrapper<TEntry>
     where TEntry : AffixEntry
 {
+    /// <summary>
+    ///
+    /// </summary>
     public static readonly AffixEntryCollection<TEntry> Empty = TakeArray (Array.Empty<TEntry>());
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="entries"></param>
+    /// <returns></returns>
     public static AffixEntryCollection<TEntry> Create (List<TEntry> entries)
     {
-        return entries == null ? Empty : TakeArray (entries.ToArray());
+        return entries == null! ? Empty : TakeArray (entries.ToArray());
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="entries"></param>
+    /// <returns></returns>
     public static AffixEntryCollection<TEntry> Create (IEnumerable<TEntry> entries)
     {
-        return entries == null ? Empty : TakeArray (entries.ToArray());
+        return entries == null! ? Empty : TakeArray (entries.ToArray());
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="entries"></param>
+    /// <returns></returns>
     internal static AffixEntryCollection<TEntry> TakeArray (TEntry[] entries)
     {
-        return entries == null ? Empty : new AffixEntryCollection<TEntry> (entries);
+        return entries == null! ? Empty : new AffixEntryCollection<TEntry> (entries);
     }
 
-    private AffixEntryCollection (TEntry[] entries) : base (entries)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="entries"></param>
+    private AffixEntryCollection (TEntry[] entries)
+        : base (entries)
     {
     }
 }

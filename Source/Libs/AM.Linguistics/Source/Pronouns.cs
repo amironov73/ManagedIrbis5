@@ -6,6 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedMember.Global
 
 /* Pronouns.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -13,11 +14,9 @@
 
 #region Using directives
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -32,7 +31,7 @@ namespace AM.Linguistics;
 /// </summary>
 public static class Pronouns
 {
-    internal static readonly List<string[]> Items = new List<string[]>();
+    internal static readonly List<string[]> Items = new ();
 
     static Pronouns()
     {
@@ -40,18 +39,20 @@ public static class Pronouns
         var resourceName = "AM.Linguistics.Dict.pronoun.bin";
 
         using (var stream = assembly.GetManifestResourceStream (resourceName))
-        using (var zip = new GZipStream (stream, CompressionMode.Decompress))
+        using (var zip = new GZipStream (stream!, CompressionMode.Decompress))
         using (var sr = new StreamReader (zip, Encoding.GetEncoding (1251)))
             while (sr.Peek() >= 0)
             {
                 var line = sr.ReadLine();
-                Items.Add (line.Split ('\t'));
+                Items.Add (line!.Split ('\t'));
             }
     }
 
     /// <summary>
     /// Личные местоимения (я, ты, он, она, они, и т.д.)
     /// </summary>
+    /// <param name="case"></param>
+    /// <param name="person"></param>
     /// <param name="gender">Род только для 3 лица</param>
     /// <param name="preposition">С предлогом</param>
     public static string Personal (Case @case, Person person, Gender gender = Gender.M, bool preposition = false)
@@ -60,8 +61,11 @@ public static class Pronouns
         var col = 0;
 
         if (gen == Gender.P)
+        {
             col = 5 + (int)person;
+        }
         else
+        {
             switch (person)
             {
                 case Person.First:
@@ -74,6 +78,7 @@ public static class Pronouns
                     col = 2 + (int)gen;
                     break;
             }
+        }
 
         var row = 0 + 2 * (int)@case + (preposition ? 1 : 0);
 
@@ -91,14 +96,15 @@ public static class Pronouns
     /// <summary>
     /// Притяжательные местоимения (мой, твой, его, и т.д.)
     /// </summary>
+    /// <param name="case"></param>
     /// <param name="person">Лицо говорящего. Не используется для number = Number.Plural</param>
+    /// <param name="gender"></param>
     /// <param name="number">Число (ед: мой твой его, множ: ваш)</param>
     public static string Possessive (Case @case, Person person, Gender gender, Number number = Number.Singular)
     {
         var gen = gender.Gen();
         var col = (int)gen;
         var row = 20 + 8 * (number == Number.Singular ? (int)person : 3) + @case.IndexWithAnimate (gender);
-        ;
 
         return Items[row][col];
     }
