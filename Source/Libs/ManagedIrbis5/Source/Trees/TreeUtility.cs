@@ -2,15 +2,8 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedParameter.Local
-// ReSharper disable UnusedType.Global
 
 /* TreeUtility.cs -- работа с TRE-файлами
  * Ars Magna project, http://arsmagna.ru
@@ -23,6 +16,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
+using AM;
+
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Menus;
 
@@ -30,125 +25,137 @@ using ManagedIrbis.Menus;
 
 #nullable enable
 
-namespace ManagedIrbis.Trees
+namespace ManagedIrbis.Trees;
+
+/// <summary>
+/// Работа с TRE-файлами.
+/// </summary>
+public static class TreeUtility
 {
+    #region Public methods
+
     /// <summary>
-    /// Работа с TRE-файлами.
+    /// Чтение локального TRE-файла.
     /// </summary>
-    public static class TreeUtility
+    public static TreeFile ReadLocalFile
+        (
+            string fileName,
+            Encoding? encoding = default
+        )
     {
-        #region Public methods
+        Sure.FileExists (fileName);
 
-        /// <summary>
-        /// Read local file.
-        /// </summary>
-        public static TreeFile ReadLocalFile
-            (
-                string fileName,
-                Encoding? encoding = default
-            )
+        encoding ??= IrbisEncoding.Ansi;
+
+        using var reader = new StreamReader (fileName, encoding);
+        var result = TreeFile.ParseStream (reader);
+        result.FileName = Path.GetFileName (fileName);
+
+        return result;
+    }
+
+    /// <summary>
+    /// Сохранение дерева в локальный TRE-файл.
+    /// </summary>
+    public static void SaveToLocalFile
+        (
+            this TreeFile tree,
+            string fileName,
+            Encoding? encoding = default
+        )
+    {
+        Sure.NotNull (tree);
+        Sure.NotNullNorEmpty (fileName);
+
+        encoding ??= IrbisEncoding.Ansi;
+
+        using var writer = new StreamWriter (fileName, false, encoding);
+        tree.Save (writer);
+    }
+
+    /// <summary>
+    /// Преобразование узла с подузлами в массив элементов меню.
+    /// </summary>
+    public static MenuEntry[] ToMenu
+        (
+            this TreeLine line
+        )
+    {
+        Sure.NotNull (line);
+
+        var result = new List<MenuEntry>
         {
-            encoding ??= IrbisEncoding.Ansi;
-
-            using var reader = new StreamReader(fileName, encoding);
-            var result = TreeFile.ParseStream(reader);
-            result.FileName = Path.GetFileName(fileName);
-
-            return result;
-        } // method ReadLocalFile
-
-        /// <summary>
-        /// Save to local file.
-        /// </summary>
-        public static void SaveToLocalFile
-            (
-                this TreeFile file,
-                string fileName,
-                Encoding? encoding = default
-            )
-        {
-            encoding ??= IrbisEncoding.Ansi;
-
-            using var writer = new StreamWriter(fileName, false, encoding);
-            file.Save(writer);
-        } // method SaveToLocalFile
-
-        /// <summary>
-        /// Convert to array of menu items.
-        /// </summary>
-        public static MenuEntry[] ToMenu
-            (
-                this TreeLine line
-            )
-        {
-            var result = new List<MenuEntry>
+            new()
             {
-                new MenuEntry
-                {
-                    Code = line.Prefix,
-                    Comment = line.Suffix
-                }
-            };
-
-            foreach (var child in line.Children)
-            {
-                result.AddRange(child.ToMenu());
+                Code = line.Prefix,
+                Comment = line.Suffix
             }
+        };
 
-            return result.ToArray();
-        } // method ToMenu
-
-        /// <summary>
-        /// Convert tree to menu.
-        /// </summary>
-        public static MenuFile ToMenu
-            (
-                this TreeFile file
-            )
+        foreach (var child in line.Children)
         {
-            var result = new MenuFile();
+            result.AddRange (child.ToMenu());
+        }
 
-            foreach (var root in file.Roots)
-            {
-                result.Entries.AddRange(root.ToMenu());
-            }
+        return result.ToArray();
+    }
 
-            return result;
-        } // method ToMenu
+    /// <summary>
+    /// Преобразование TRE- в MNU-файл.
+    /// </summary>
+    public static MenuFile ToMenu
+        (
+            this TreeFile file
+        )
+    {
+        Sure.NotNull (file);
 
-        /// <summary>
-        /// Walk over the tree.
-        /// </summary>
-        public static void Walk
-            (
-                this TreeLine line,
-                Action<TreeLine> action
-            )
+        var result = new MenuFile();
+
+        foreach (var root in file.Roots)
         {
-            action(line);
-            foreach (var child in line.Children)
-            {
-                child.Walk(action);
-            }
-        } // method Walk
+            result.Entries.AddRange (root.ToMenu());
+        }
 
-        /// <summary>
-        /// Walk over the tree.
-        /// </summary>
-        public static void Walk
-            (
-                this TreeFile file,
-                Action<TreeLine> action
-            )
+        return result;
+    }
+
+    /// <summary>
+    /// Проход по дереву, начиная с указанного узла.
+    /// </summary>
+    public static void Walk
+        (
+            this TreeLine line,
+            Action<TreeLine> action
+        )
+    {
+        Sure.NotNull (line);
+        Sure.NotNull (action);
+
+        action (line);
+        foreach (var child in line.Children)
         {
-            foreach (var child in file.Roots)
-            {
-                child.Walk(action);
-            }
-        } // method Walk
+            child.Walk (action);
+        }
+    }
 
-        #endregion
+    /// <summary>
+    /// Проход по дереву, начиная с корня.
+    /// </summary>
+    public static void Walk
+        (
+            this TreeFile file,
+            Action<TreeLine> action
+        )
+    {
+        Sure.NotNull (file);
+        Sure.NotNull (action);
 
-    } // class TreeUtility
+        foreach (var child in file.Roots)
+        {
+            child.Walk (action);
+        }
+    }
 
-} // namespace ManagedIrbis.Trees
+    #endregion
+}

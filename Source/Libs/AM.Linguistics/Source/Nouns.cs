@@ -358,7 +358,7 @@ public class Noun
     /// Словоформы по падежам и числам
     /// </summary>
     public string this [Case @case, Number number = Number.Singular] =>
-        Nouns.schemas[SchemaIndex].GetForm (Word, (int)@case + 6 * (int)number);
+        Nouns.schemas[SchemaIndex].GetForm (Word, (int)@case + 6 * (int)number)!;
 }
 
 /// <summary>

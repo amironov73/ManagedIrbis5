@@ -20,10 +20,6 @@ using System.Text;
 
 using AM.Linguistics.Hunspell.Infrastructure;
 
-#if !NO_INLINE
-using System.Runtime.CompilerServices;
-#endif
-
 #endregion
 
 #nullable enable
@@ -606,13 +602,7 @@ public sealed partial class AffixConfig
     /// <summary>
     /// Inidicates if any <see cref="AliasF"/> entries have been defined.
     /// </summary>
-    public bool IsAliasF
-    {
-#if !NO_INLINE
-        [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
-        get => aliasF != null && aliasF.Count != 0;
-    }
+    public bool IsAliasF => aliasF != null && aliasF.Count != 0;
 
     private List<MorphSet>? aliasM;
 
@@ -624,13 +614,7 @@ public sealed partial class AffixConfig
     /// <summary>
     /// Indicates if any <see cref="AliasM"/> entries have been defined.
     /// </summary>
-    public bool IsAliasM
-    {
-#if !NO_INLINE
-        [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
-        get => aliasM != null && aliasM.Count != 0;
-    }
+    public bool IsAliasM => aliasM != null && aliasM.Count != 0;
 
     /// <summary>
     /// Defines custom compound patterns with a regex-like syntax.
@@ -882,14 +866,9 @@ public sealed partial class AffixConfig
     /// <summary>
     ///
     /// </summary>
-    public bool HasCompound
-    {
-#if !NO_INLINE
-        [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
-        get => CompoundFlag.HasValue || CompoundBegin.HasValue
-            || (CompoundRules?.HasItems ?? false);
-    }
+    public bool HasCompound => CompoundFlag.HasValue
+        || CompoundBegin.HasValue
+        || (CompoundRules?.HasItems ?? false);
 
     /// <summary>
     ///

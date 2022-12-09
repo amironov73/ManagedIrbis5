@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 
-/* .cs --
+/* PhoneTable.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,22 +25,35 @@ using AM.Linguistics.Hunspell.Infrastructure;
 
 namespace AM.Linguistics.Hunspell;
 
-public sealed class PhoneTable : ArrayWrapper<PhoneticEntry>
+/// <summary>
+///
+/// </summary>
+public sealed class PhoneTable
+    : ArrayWrapper<PhoneticEntry>
 {
+    /// <summary>
+    ///
+    /// </summary>
     public static readonly PhoneTable Empty = TakeArray (Array.Empty<PhoneticEntry>());
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="entries"></param>
+    /// <returns></returns>
     public static PhoneTable Create (IEnumerable<PhoneticEntry> entries)
     {
-        return entries == null ? Empty : TakeArray (entries.ToArray());
+        return entries == null! ? Empty : TakeArray (entries.ToArray());
     }
 
     internal static PhoneTable TakeArray (PhoneticEntry[] entries)
     {
-        return entries == null ? Empty : new PhoneTable (entries);
+        return entries == null! ? Empty : new PhoneTable (entries);
     }
 
     private PhoneTable (PhoneticEntry[] entries)
         : base (entries)
     {
+        // пустое тело конструктора
     }
 }

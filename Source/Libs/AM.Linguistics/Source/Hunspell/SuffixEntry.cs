@@ -13,10 +13,6 @@
 
 using AM.Linguistics.Hunspell.Infrastructure;
 
-#if !NO_INLINE
-using System.Runtime.CompilerServices;
-#endif
-
 #endregion
 
 #nullable enable
@@ -37,9 +33,6 @@ public sealed class SuffixEntry
     /// <param name="conditions"></param>
     /// <param name="morph"></param>
     /// <param name="contClass"></param>
-#if !NO_INLINE
-    [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
     public SuffixEntry
         (
             string strip,
@@ -50,7 +43,7 @@ public sealed class SuffixEntry
         )
         : base (strip, affixText, conditions, morph, contClass)
     {
-        Key = affixText.GetReversed();
+        Key = affixText.GetReversed()!;
     }
 
     /// <summary>

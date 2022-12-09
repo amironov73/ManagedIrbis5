@@ -6,6 +6,8 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Local
+// ReSharper disable UnusedAutoPropertyAccessor.Local
 // ReSharper disable UnusedMember.Global
 
 /* WordList.cs --
@@ -145,10 +147,7 @@ public sealed partial class WordList
             AffixConfig? affix
         )
     {
-        if (words == null)
-        {
-            words = Enumerable.Empty<string>();
-        }
+        words ??= Enumerable.Empty<string>();
 
         var wordListBuilder = new Builder (affix ?? new AffixConfig.Builder().MoveToImmutable());
 
@@ -177,6 +176,8 @@ public sealed partial class WordList
     /// <param name="affix"></param>
     private WordList (AffixConfig affix)
     {
+        NGramRestrictedDetails = null!;
+
         Affix = affix;
     }
 

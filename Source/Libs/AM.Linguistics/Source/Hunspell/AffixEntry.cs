@@ -11,14 +11,6 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-#region Using directives
-
-#if !NO_INLINE
-using System.Runtime.CompilerServices;
-#endif
-
-#endregion
-
 #nullable enable
 
 namespace AM.Linguistics.Hunspell;
@@ -129,9 +121,6 @@ public abstract class AffixEntry
     /// <param name="conditions"></param>
     /// <param name="morph"></param>
     /// <param name="contClass"></param>
-#if !NO_INLINE
-    [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
     protected AffixEntry
         (
             string? strip,
@@ -190,9 +179,6 @@ public abstract class AffixEntry
     /// </summary>
     /// <param name="flag"></param>
     /// <returns></returns>
-#if !NO_INLINE
-    [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
     public bool ContainsContClass (FlagValue flag) => ContClass.Contains (flag);
 
     /// <summary>
@@ -201,9 +187,6 @@ public abstract class AffixEntry
     /// <param name="a"></param>
     /// <param name="b"></param>
     /// <returns></returns>
-#if !NO_INLINE
-    [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
     public bool ContainsAnyContClass (FlagValue a, FlagValue b) => ContClass.ContainsAny (a, b);
 
     /// <summary>
@@ -213,8 +196,5 @@ public abstract class AffixEntry
     /// <param name="b"></param>
     /// <param name="c"></param>
     /// <returns></returns>
-#if !NO_INLINE
-    [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
     public bool ContainsAnyContClass (FlagValue a, FlagValue b, FlagValue c) => ContClass.ContainsAny (a, b, c);
 }

@@ -17,10 +17,6 @@ using System;
 using System.Runtime.InteropServices;
 using System.Text;
 
-#if !NO_INLINE
-using System.Runtime.CompilerServices;
-#endif
-
 #endregion
 
 #nullable enable
@@ -29,19 +25,21 @@ namespace AM.Linguistics.Hunspell.Infrastructure
 {
     internal static class StringBuilderEx
     {
-#if !NO_INLINE
-        [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
         public static void Swap (this StringBuilder @this, int indexA, int indexB)
         {
 #if DEBUG
-            if (indexA < 0 || indexA > @this.Length) throw new ArgumentOutOfRangeException (nameof (indexA));
-            if (indexB < 0 || indexB > @this.Length) throw new ArgumentOutOfRangeException (nameof (indexB));
+            if (indexA < 0 || indexA > @this.Length)
+            {
+                throw new ArgumentOutOfRangeException (nameof (indexA));
+            }
+
+            if (indexB < 0 || indexB > @this.Length)
+            {
+                throw new ArgumentOutOfRangeException (nameof (indexB));
+            }
 #endif
 
-            var temp = @this[indexA];
-            @this[indexA] = @this[indexB];
-            @this[indexB] = temp;
+            (@this[indexA], @this[indexB]) = (@this[indexB], @this[indexA]);
         }
 
         public static string ToStringTerminated (this StringBuilder @this)
@@ -55,7 +53,10 @@ namespace AM.Linguistics.Hunspell.Infrastructure
         public static string ToStringTerminated (this StringBuilder @this, int startIndex)
         {
             var terminatedIndex = @this.IndexOfNullChar (startIndex);
-            if (terminatedIndex < 0) terminatedIndex = @this.Length;
+            if (terminatedIndex < 0)
+            {
+                terminatedIndex = @this.Length;
+            }
 
             return @this.ToString (startIndex, terminatedIndex - startIndex);
         }
@@ -64,7 +65,9 @@ namespace AM.Linguistics.Hunspell.Infrastructure
         {
             for (var i = 0; i < @this.Length; i++)
                 if (@this[i] == '\0')
+                {
                     return i;
+                }
 
             return -1;
         }
@@ -73,14 +76,13 @@ namespace AM.Linguistics.Hunspell.Infrastructure
         {
             for (; offset < @this.Length; offset++)
                 if (@this[offset] == '\0')
+                {
                     return offset;
+                }
 
             return -1;
         }
 
-#if !NO_INLINE
-        [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
         public static char GetCharOrTerminator (this StringBuilder @this, int index) =>
             index < @this.Length ? @this[index] : '\0';
 
@@ -102,7 +104,10 @@ namespace AM.Linguistics.Hunspell.Infrastructure
 
         public static void Reverse (this StringBuilder @this)
         {
-            if (@this == null || @this.Length <= 1) return;
+            if (@this == null! || @this.Length <= 1)
+            {
+                return;
+            }
 
             var swapOtherIndexOffset = @this.Length - 1;
             var stopIndex = @this.Length / 2;
@@ -116,7 +121,9 @@ namespace AM.Linguistics.Hunspell.Infrastructure
                 for (var i = 0; i < replacement.Length; i++) @this[index + i] = replacement[i];
 
                 if (replacement.Length != removeCount)
+                {
                     @this.Remove (index + replacement.Length, removeCount - replacement.Length);
+                }
             }
             else
             {
@@ -132,17 +139,26 @@ namespace AM.Linguistics.Hunspell.Infrastructure
 
         public static bool EndsWith (this StringBuilder builder, char c)
         {
-            return builder.Length != 0 && builder[builder.Length - 1] == c;
+            return builder.Length != 0 && builder[^1] == c;
         }
 
         public static string ToStringWithInsert (this StringBuilder builder, int index, char value)
         {
 #if DEBUG
-            if (index < 0 || index > builder.Length) throw new ArgumentOutOfRangeException (nameof (index));
+            if (index < 0 || index > builder.Length)
+            {
+                throw new ArgumentOutOfRangeException (nameof (index));
+            }
 #endif
-            if (index == 0) return value.ToString() + builder.ToString();
+            if (index == 0)
+            {
+                return value.ToString() + builder.ToString();
+            }
 
-            if (index == builder.Length) return builder.ToString() + value.ToString();
+            if (index == builder.Length)
+            {
+                return builder.ToString() + value.ToString();
+            }
 
             return builder.ToString (0, index)
                    + value.ToString()
@@ -152,7 +168,10 @@ namespace AM.Linguistics.Hunspell.Infrastructure
         public static StringBuilder Append (this StringBuilder builder, ReadOnlySpan<char> value)
         {
 #if DEBUG
-            if (builder == null) throw new ArgumentNullException (nameof (builder));
+            if (builder == null)
+            {
+                throw new ArgumentNullException (nameof (builder));
+            }
 #endif
 
             if (!value.IsEmpty)

@@ -25,24 +25,40 @@ using AM.Linguistics.Hunspell.Infrastructure;
 
 namespace AM.Linguistics.Hunspell;
 
+/// <summary>
+///
+/// </summary>
 public sealed class BreakSet
     : ArrayWrapper<string>
 {
+    /// <summary>
+    ///
+    /// </summary>
     public static readonly BreakSet Empty = TakeArray (Array.Empty<string>());
 
     internal static BreakSet TakeArray (string[] breaks)
     {
-        return breaks == null ? Empty : new BreakSet (breaks);
+        return breaks == null! ? Empty : new BreakSet (breaks);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="breaks"></param>
+    /// <returns></returns>
     public static BreakSet Create (List<string> breaks)
     {
-        return breaks == null ? Empty : TakeArray (breaks.ToArray());
+        return breaks == null! ? Empty : TakeArray (breaks.ToArray());
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="breaks"></param>
+    /// <returns></returns>
     public static BreakSet Create (IEnumerable<string> breaks)
     {
-        return breaks == null ? Empty : TakeArray (breaks.ToArray());
+        return breaks == null! ? Empty : TakeArray (breaks.ToArray());
     }
 
     #region Constructions

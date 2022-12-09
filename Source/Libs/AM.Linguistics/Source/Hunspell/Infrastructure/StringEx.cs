@@ -16,10 +16,6 @@ using System.Buffers;
 
 using AM.Text;
 
-#if !NO_INLINE
-using System.Runtime.CompilerServices;
-#endif
-
 #endregion
 
 #nullable enable
@@ -30,9 +26,6 @@ internal static class StringEx
 {
     private static readonly char[] _spaceOrTab = { ' ', '\t' };
 
-#if !NO_INLINE
-    [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
     public static string[] SplitOnTabOrSpace
         (
             this string that
@@ -47,9 +40,6 @@ internal static class StringEx
         return that.Split (_spaceOrTab, StringSplitOptions.RemoveEmptyEntries);
     }
 
-#if !NO_INLINE
-    [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
     public static bool IsTabOrSpace (this char c) => c is ' ' or '\t';
 
     public static string? GetReversed
@@ -88,9 +78,6 @@ internal static class StringEx
         return builder.ReturnShared();
     }
 
-#if !NO_INLINE
-    [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
     public static char GetCharOrTerminator
         (
             this string that,
@@ -213,9 +200,6 @@ internal static class StringEx
         return builder.ReturnShared();
     }
 
-#if !NO_INLINE
-    [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
     public static bool IsLineBreakChar (this char c) => c is '\n' or '\r';
 
     public static string WithoutIndex

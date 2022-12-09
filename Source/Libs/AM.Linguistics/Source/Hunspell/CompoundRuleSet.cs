@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 
-/* .cs --
+/* CompoundRuleSet.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,18 +25,30 @@ using AM.Linguistics.Hunspell.Infrastructure;
 
 namespace AM.Linguistics.Hunspell;
 
-public sealed class CompoundRuleSet : ArrayWrapper<CompoundRule>
+/// <summary>
+///
+/// </summary>
+public sealed class CompoundRuleSet
+    : ArrayWrapper<CompoundRule>
 {
+    /// <summary>
+    ///
+    /// </summary>
     public static readonly CompoundRuleSet Empty = TakeArray (Array.Empty<CompoundRule>());
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="rules"></param>
+    /// <returns></returns>
     public static CompoundRuleSet Create (IEnumerable<CompoundRule> rules)
     {
-        return rules == null ? Empty : TakeArray (rules.ToArray());
+        return rules == null! ? Empty : TakeArray (rules.ToArray());
     }
 
     internal static CompoundRuleSet TakeArray (CompoundRule[] rules)
     {
-        return rules == null ? Empty : new CompoundRuleSet (rules);
+        return rules == null! ? Empty : new CompoundRuleSet (rules);
     }
 
     private CompoundRuleSet (CompoundRule[] rules)
@@ -46,10 +58,16 @@ public sealed class CompoundRuleSet : ArrayWrapper<CompoundRule>
 
     internal bool EntryContainsRuleFlags (WordEntryDetail details)
     {
-        if (details != null && details.HasFlags)
+        if (details != null! && details.HasFlags)
+        {
             foreach (var rule in _items)
+            {
                 if (rule.ContainsRuleFlagForEntry (details))
+                {
                     return true;
+                }
+            }
+        }
 
         return false;
     }
@@ -90,7 +108,10 @@ public sealed class CompoundRuleSet : ArrayWrapper<CompoundRule>
                             wp++;
                         }
 
-                        if (wp <= words.WNum) ok2 = false;
+                        if (wp <= words.WNum)
+                        {
+                            ok2 = false;
+                        }
 
                         btinfo[bt].btnum = wp - btinfo[bt].btwp;
 
@@ -100,7 +121,10 @@ public sealed class CompoundRuleSet : ArrayWrapper<CompoundRule>
                             btinfo.Add (new MetacharData());
                         }
 
-                        if (ok2) break;
+                        if (ok2)
+                        {
+                            break;
+                        }
                     }
                     else
                     {
@@ -114,7 +138,10 @@ public sealed class CompoundRuleSet : ArrayWrapper<CompoundRule>
                         pp++;
                         wp++;
 
-                        if (compoundRule.Count == pp && wp <= words.WNum) ok = false;
+                        if (compoundRule.Count == pp && wp <= words.WNum)
+                        {
+                            ok = false;
+                        }
                     }
 
                 if (ok && ok2)
@@ -129,11 +156,15 @@ public sealed class CompoundRuleSet : ArrayWrapper<CompoundRule>
                         )
                         r += 2;
 
-                    if (compoundRule.Count <= r) return true;
+                    if (compoundRule.Count <= r)
+                    {
+                        return true;
+                    }
                 }
 
                 // backtrack
                 if (bt != 0)
+                {
                     do
                     {
                         ok = true;
@@ -141,6 +172,7 @@ public sealed class CompoundRuleSet : ArrayWrapper<CompoundRule>
                         pp = btinfo[bt - 1].btpp;
                         wp = btinfo[bt - 1].btwp + btinfo[bt - 1].btnum;
                     } while (btinfo[bt - 1].btnum < 0 && --bt != 0);
+                }
             } while (bt != 0);
 
             if (
@@ -154,7 +186,9 @@ public sealed class CompoundRuleSet : ArrayWrapper<CompoundRule>
                         compoundRule.Count <= pp
                     )
                 )
+            {
                 return true;
+            }
 
             // check zero ending
             while (
@@ -175,7 +209,9 @@ public sealed class CompoundRuleSet : ArrayWrapper<CompoundRule>
                     &&
                     compoundRule.Count <= pp
                 )
+            {
                 return true;
+            }
         }
 
         return false;

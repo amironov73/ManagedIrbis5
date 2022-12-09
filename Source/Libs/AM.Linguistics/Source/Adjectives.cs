@@ -263,7 +263,7 @@ public class Adjective
             var i = @case.IndexWithAnimate (gender);
             i += 8 * (int)gender.Gen();
 
-            return Adjectives.schemas[SchemaIndex].GetForm (Word, i);
+            return Adjectives.schemas[SchemaIndex].GetForm (Word, i)!;
         }
     }
 

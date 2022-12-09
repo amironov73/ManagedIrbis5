@@ -7,17 +7,9 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 
-/* .cs --
+/* ReferenceHelpers.cs --
  * Ars Magna project, http://arsmagna.ru
  */
-
-#region Using directives
-
-#if !NO_INLINE
-using System.Runtime.CompilerServices;
-#endif
-
-#endregion
 
 #nullable enable
 
@@ -25,23 +17,15 @@ namespace AM.Linguistics.Hunspell.Infrastructure
 {
     internal static class ReferenceHelpers
     {
-#if !NO_INLINE
-        [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
         public static void Swap<T> (ref T a, ref T b)
         {
-            var tmp = a;
-            a = b;
-            b = tmp;
+            (a, b) = (b, a);
         }
 
-#if !NO_INLINE
-        [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
         public static T Steal<T> (ref T item) where T : class
         {
             var value = item;
-            item = null;
+            item = default!;
             return value;
         }
     }

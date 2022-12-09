@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 
-/* .cs --
+/* StaticEncodingLineReader.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,65 +22,96 @@ using System.Threading.Tasks;
 
 using AM.Linguistics.Hunspell.Infrastructure;
 
-#if !NO_INLINE
-using System.Runtime.CompilerServices;
-#endif
-
 #endregion
 
 #nullable enable
 
-namespace AM.Linguistics.Hunspell
+namespace AM.Linguistics.Hunspell;
+
+/// <summary>
+///
+/// </summary>
+public sealed class StaticEncodingLineReader
+    : IHunspellLineReader, IDisposable
 {
-    public sealed class StaticEncodingLineReader : IHunspellLineReader, IDisposable
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="stream"></param>
+    /// <param name="encoding"></param>
+    /// <exception cref="ArgumentNullException"></exception>
+    public StaticEncodingLineReader
+        (
+            Stream stream,
+            Encoding? encoding
+        )
     {
-        public StaticEncodingLineReader (Stream stream, Encoding encoding)
+        Sure.NotNull (stream);
+
+        this.stream = stream ?? throw new ArgumentNullException (nameof (stream));
+        reader = new StreamReader (stream, encoding ?? Encoding.UTF8, true);
+    }
+
+    private readonly Stream stream;
+    private readonly StreamReader reader;
+
+    /// <summary>
+    ///
+    /// </summary>
+    public Encoding CurrentEncoding => reader.CurrentEncoding;
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="filePath"></param>
+    /// <param name="encoding"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    public static List<string> ReadLines (string filePath, Encoding encoding)
+    {
+        if (filePath == null) throw new ArgumentNullException (nameof (filePath));
+
+        using (var stream = FileStreamEx.OpenReadFileStream (filePath))
+        using (var reader = new StaticEncodingLineReader (stream, encoding))
         {
-            this.stream = stream ?? throw new ArgumentNullException (nameof (stream));
-            reader = new StreamReader (stream, encoding ?? Encoding.UTF8, true);
+            return reader.ReadLines().ToList();
         }
+    }
 
-        private readonly Stream stream;
-        private readonly StreamReader reader;
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="filePath"></param>
+    /// <param name="encoding"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    public static async Task<IEnumerable<string>> ReadLinesAsync (string filePath, Encoding encoding)
+    {
+        if (filePath == null) throw new ArgumentNullException (nameof (filePath));
 
-        public Encoding CurrentEncoding => reader.CurrentEncoding;
-
-        public static List<string> ReadLines (string filePath, Encoding encoding)
+        using (var stream = FileStreamEx.OpenAsyncReadFileStream (filePath))
+        using (var reader = new StaticEncodingLineReader (stream, encoding))
         {
-            if (filePath == null) throw new ArgumentNullException (nameof (filePath));
-
-            using (var stream = FileStreamEx.OpenReadFileStream (filePath))
-            using (var reader = new StaticEncodingLineReader (stream, encoding))
-            {
-                return reader.ReadLines().ToList();
-            }
+            return await reader.ReadLinesAsync().ConfigureAwait (false);
         }
+    }
 
-        public static async Task<IEnumerable<string>> ReadLinesAsync (string filePath, Encoding encoding)
-        {
-            if (filePath == null) throw new ArgumentNullException (nameof (filePath));
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    public string? ReadLine() => reader.ReadLine();
 
-            using (var stream = FileStreamEx.OpenAsyncReadFileStream (filePath))
-            using (var reader = new StaticEncodingLineReader (stream, encoding))
-            {
-                return await reader.ReadLinesAsync().ConfigureAwait (false);
-            }
-        }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    public Task<string?> ReadLineAsync() => reader.ReadLineAsync();
 
-#if !NO_INLINE
-        [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
-        public string ReadLine() => reader.ReadLine();
-
-#if !NO_INLINE
-        [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
-        public Task<string> ReadLineAsync() => reader.ReadLineAsync();
-
-        public void Dispose()
-        {
-            reader.Dispose();
-            stream.Dispose();
-        }
+    /// <inheritdoc cref="IDisposable.Dispose"/>
+    public void Dispose()
+    {
+        reader.Dispose();
+        stream.Dispose();
     }
 }

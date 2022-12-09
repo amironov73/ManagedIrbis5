@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 
-/* .cs --
+/* StringValueLineReader.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,35 +24,67 @@ using AM.Linguistics.Hunspell.Infrastructure;
 
 namespace AM.Linguistics.Hunspell;
 
-public sealed class StringValueLineReader : IHunspellLineReader
+/// <summary>
+///
+/// </summary>
+public sealed class StringValueLineReader
+    : IHunspellLineReader
 {
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="text"></param>
     public StringValueLineReader (string text)
     {
         content = text;
     }
 
+    #endregion
+
     private readonly string content;
 
-    private int position = 0;
+    private int position;
 
+    /// <summary>
+    ///
+    /// </summary>
     public Encoding CurrentEncoding => Encoding.Unicode;
 
-    public string ReadLine()
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    public string? ReadLine()
     {
-        if (content == null || position >= content.Length) return null;
+        if (content == null! || position >= content.Length)
+        {
+            return null;
+        }
 
         var startPosition = position;
 
-        for (; position < content.Length && !content[position].IsLineBreakChar(); ++position) ;
+        for (; position < content.Length && !content[position].IsLineBreakChar(); ++position)
+        {
+            // пустое тело цикла
+        }
 
         var result = content.Substring (startPosition, position - startPosition);
 
-        for (; position < content.Length && content[position].IsLineBreakChar(); position++) ;
+        for (; position < content.Length && content[position].IsLineBreakChar(); position++)
+        {
+            // пустое тело цикла
+        }
 
         return result;
     }
 
-    public Task<string> ReadLineAsync()
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    public Task<string?> ReadLineAsync()
     {
         return Task.FromResult (ReadLine());
     }

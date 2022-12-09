@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 
-/* .cs --
+/* StringReplacementSet.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,22 +25,35 @@ using AM.Linguistics.Hunspell.Infrastructure;
 
 namespace AM.Linguistics.Hunspell;
 
-public sealed class SingleReplacementSet : ArrayWrapper<SingleReplacement>
+/// <summary>
+///
+/// </summary>
+public sealed class SingleReplacementSet
+    : ArrayWrapper<SingleReplacement>
 {
+    /// <summary>
+    ///
+    /// </summary>
     public static readonly SingleReplacementSet Empty = TakeArray (Array.Empty<SingleReplacement>());
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="replacements"></param>
+    /// <returns></returns>
     public static SingleReplacementSet Create (IEnumerable<SingleReplacement> replacements)
     {
-        return replacements == null ? Empty : TakeArray (replacements.ToArray());
+        return replacements == null! ? Empty : TakeArray (replacements.ToArray());
     }
 
     internal static SingleReplacementSet TakeArray (SingleReplacement[] replacements)
     {
-        return replacements == null ? Empty : new SingleReplacementSet (replacements);
+        return replacements == null! ? Empty : new SingleReplacementSet (replacements);
     }
 
     private SingleReplacementSet (SingleReplacement[] replacements)
         : base (replacements)
     {
+        // пустое тело конструктора
     }
 }

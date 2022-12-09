@@ -248,13 +248,25 @@ public readonly struct FlagValue
     /// </summary>
     public bool IsWildcard => value is '*' or '?';
 
-    /// <inheritdoc cref="IEquatable{T}.Equals(T?)"/>
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
     public bool Equals (FlagValue other) => other.value == value;
 
-    /// <inheritdoc cref="IEquatable{T}.Equals(T?)"/>
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
     public bool Equals (int other) => other == value;
 
-    /// <inheritdoc cref="IEquatable{T}.Equals(T?)"/>
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
     public bool Equals (char other) => other == value;
 
     /// <inheritdoc cref="ValueType.Equals(object?)"/>

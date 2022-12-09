@@ -117,7 +117,7 @@ public partial class WordList
                 string word
             )
         {
-            if (!EntryDetailsByRoot.TryGetValue (word, out var details))
+            if (!EntryDetailsByRoot!.TryGetValue (word, out var details))
             {
                 details = new List<WordEntryDetail> (2);
                 EntryDetailsByRoot.Add (word, details);
@@ -186,7 +186,7 @@ public partial class WordList
             if (PhoneticReplacements != null && PhoneticReplacements.Count != 0)
             {
                 // store ph: field of a morphological description in reptable
-                if (result.AllReplacements.IsEmpty)
+                if (result.AllReplacements!.IsEmpty)
                 {
                     result.AllReplacements = SingleReplacementSet.Create (PhoneticReplacements);
                 }
@@ -205,7 +205,7 @@ public partial class WordList
                 details.Clear();
                 foreach (var entry in rootSet.Value)
                 {
-                    if (nGramRestrictedFlags.ContainsAny (entry.Flags))
+                    if (nGramRestrictedFlags!.ContainsAny (entry.Flags))
                     {
                         details.Add (entry);
                     }

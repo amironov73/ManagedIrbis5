@@ -25,9 +25,17 @@ using AM.Linguistics.Hunspell.Infrastructure;
 
 namespace AM.Linguistics.Hunspell;
 
-public sealed class AffixEntryGroupCollection<TEntry> : ArrayWrapper<AffixEntryGroup<TEntry>>
+/// <summary>
+///
+/// </summary>
+/// <typeparam name="TEntry"></typeparam>
+public sealed class AffixEntryGroupCollection<TEntry>
+    : ArrayWrapper<AffixEntryGroup<TEntry>>
     where TEntry : AffixEntry
 {
+    /// <summary>
+    ///
+    /// </summary>
     public static readonly AffixEntryGroupCollection<TEntry> Empty = TakeArray (Array.Empty<AffixEntryGroup<TEntry>>());
 
     private AffixEntryGroupCollection (AffixEntryGroup<TEntry>[] entries) : base (entries)
@@ -36,11 +44,16 @@ public sealed class AffixEntryGroupCollection<TEntry> : ArrayWrapper<AffixEntryG
 
     internal static AffixEntryGroupCollection<TEntry> TakeArray (AffixEntryGroup<TEntry>[] entries)
     {
-        return entries == null ? Empty : new AffixEntryGroupCollection<TEntry> (entries);
+        return entries == null! ? Empty : new AffixEntryGroupCollection<TEntry> (entries);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="entries"></param>
+    /// <returns></returns>
     public static AffixEntryGroupCollection<TEntry> Create (IEnumerable<AffixEntryGroup<TEntry>> entries)
     {
-        return entries == null ? Empty : TakeArray (entries.ToArray());
+        return entries == null! ? Empty : TakeArray (entries.ToArray());
     }
 }

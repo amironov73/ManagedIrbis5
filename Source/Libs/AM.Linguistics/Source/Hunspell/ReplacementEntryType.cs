@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 
-/* .cs --
+/* ReplacementValueType.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,6 +19,9 @@ using System;
 
 namespace AM.Linguistics.Hunspell;
 
+/// <summary>
+///
+/// </summary>
 [Flags]
 public enum ReplacementValueType : byte
 {

@@ -3,6 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable ForCanBeConvertedToForeach
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
@@ -244,7 +245,11 @@ public sealed class FlagSet
         return HasItems && (Contains (a) || Contains (b) || Contains (c) || Contains (d));
     }
 
-    /// <inheritdoc cref="IEquatable{T}.Equals(T?)"/>
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
     public bool Equals (FlagSet? other)
     {
         return !ReferenceEquals (other, null)

@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 
-/* .cs --
+/* IntEx.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -15,10 +15,6 @@
 
 using System;
 using System.Globalization;
-
-#if !NO_INLINE
-using System.Runtime.CompilerServices;
-#endif
 
 #endregion
 
@@ -57,7 +53,7 @@ namespace AM.Linguistics.Hunspell.Infrastructure
                 return false;
             }
 
-            if (!TryParseInvariant (text[text.Length - 1], out value)) return false;
+            if (!TryParseInvariant (text[^1], out value)) return false;
 
             for (int i = text.Length - 2, multiplier = 10; i >= 0; i--, multiplier *= 10)
             {
@@ -76,9 +72,6 @@ namespace AM.Linguistics.Hunspell.Infrastructure
             return TryParseInvariant (text, out var value) ? value : default (int?);
         }
 
-#if !NO_INLINE
-        [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
         public static bool InversePostfixIncrement (ref bool b)
         {
             if (b)
@@ -94,7 +87,7 @@ namespace AM.Linguistics.Hunspell.Infrastructure
 
         private static bool TryParseInvariant (char character, out int value)
         {
-            if (character >= '0' && character <= '9')
+            if (character is >= '0' and <= '9')
             {
                 value = character - '0';
                 return true;

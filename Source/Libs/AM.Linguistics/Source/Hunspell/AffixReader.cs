@@ -26,10 +26,6 @@ using System.Threading.Tasks;
 
 using AM.Linguistics.Hunspell.Infrastructure;
 
-#if !NO_INLINE
-using System.Runtime.CompilerServices;
-#endif
-
 #endregion
 
 #nullable enable
@@ -724,7 +720,7 @@ public sealed class AffixReader
             return true;
         });
 
-        entries.Add (Builder.Dedup (MorphSet.TakeArray (Builder.DedupIntoArray (parts))));
+        entries.Add (Builder.Dedup (MorphSet.TakeArray (Builder.DedupIntoArray (parts)))!);
 
         return true;
     }
@@ -941,7 +937,7 @@ public sealed class AffixReader
                 if (Builder.IsAliasM)
                 {
                     if (IntEx.TryParseInvariant (morphAffixText, out var morphNumber) && morphNumber > 0 &&
-                        morphNumber <= Builder.AliasM.Count)
+                        morphNumber <= Builder.AliasM!.Count)
                     {
                         morph = Builder.AliasM[morphNumber - 1];
                     }
@@ -957,8 +953,10 @@ public sealed class AffixReader
                         morphAffixText = morphAffixText.GetReversed();
                     }
 
-                    morph = Builder.Dedup (
-                        MorphSet.TakeArray (Builder.DedupInPlace (morphAffixText!.SplitOnTabOrSpace())));
+                    morph = Builder.Dedup
+                        (
+                            MorphSet.TakeArray (Builder.DedupInPlace (morphAffixText!.SplitOnTabOrSpace()))
+                        )!;
                 }
             }
             else
@@ -991,9 +989,6 @@ public sealed class AffixReader
         return LogWarning ("Affix line not fully parsed: " + parameterText);
     }
 
-#if !NO_INLINE
-    [MethodImpl (MethodImplOptions.AggressiveInlining)]
-#endif
     private static TEntry CreateEntry<TEntry> (string strip,
         string affixText,
         CharacterConditionGroup conditions,

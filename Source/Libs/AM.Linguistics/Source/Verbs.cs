@@ -343,7 +343,7 @@ internal struct Pair : IComparable<Pair>
 
     public int CompareTo (Pair other)
     {
-        return Item1.CompareTo (other.Item1);
+        return string.Compare (Item1, other.Item1, StringComparison.Ordinal);
     }
 }
 
@@ -392,13 +392,13 @@ public class Verb
     /// </summary>
     public Verb()
     {
-        // пустое тело конструктора
+        Word = null!;
     }
 
     /// <summary>
     /// Словоформы глагола по залогу, лицу и числу
     /// </summary>
-    public string this [Voice voice, Person person, Number number]
+    public string? this [Voice voice, Person person, Number number]
     {
         get
         {
@@ -412,7 +412,7 @@ public class Verb
     /// <summary>
     /// Деепричастие (спряжение по времени)
     /// </summary>
-    public string Gerund (Tense tense)
+    public string? Gerund (Tense tense)
     {
         var i = tense == Tense.Present ? 6 : 11;
         return Verbs.schemas[SchemaIndex].GetForm (Word, i);
@@ -421,7 +421,7 @@ public class Verb
     /// <summary>
     /// Указательная форма глагола (спряжение по залогу и числу)
     /// </summary>
-    public string Imperative (Voice voice, Number number)
+    public string? Imperative (Voice voice, Number number)
     {
         var i = (int)voice * 78;
         i += 12 + (int)number;
@@ -431,7 +431,7 @@ public class Verb
     /// <summary>
     /// Прошедшее время глагола (спряжение по залогу и роду)
     /// </summary>
-    public string Past (Voice voice, Gender gender)
+    public string? Past (Voice voice, Gender gender)
     {
         var i = (int)voice * 78;
         i += 7 + (int)(gender.Gen());
@@ -461,14 +461,9 @@ public class Verb
             case VerbAspect.Perfect: return this[voice, person, number];
             case VerbAspect.Imperfect:
             case VerbAspect.PerfectImperfect:
-                if (Transition == VerbTransition.Transitive || voice == Voice.Active)
-                {
-                    return Verbs.ToBe![Voice.Active, person, number].ToUpper (Word) + " " + Infinitive (voice)!.ToLower();
-                }
-                else
-                {
-                    return null;
-                }
+                return Transition == VerbTransition.Transitive || voice == Voice.Active
+                    ? Verbs.ToBe![Voice.Active, person, number]!.ToUpper (Word) + " " + Infinitive (voice)!.ToLower()
+                    : null;
         }
 
         return null;
@@ -486,7 +481,7 @@ public class Verb
             case VerbAspect.PerfectImperfect:
             {
                 var perf = Perfect (voice);
-                return perf != null ? perf[voice, person, number] : null;
+                return perf != null! ? perf[voice, person, number] : null;
             }
         }
 
@@ -509,7 +504,7 @@ public class Verb
     /// <summary>
     /// Причастие (спряжение по залогу, падежу, роду и времени)
     /// </summary>
-    public string Participle (Voice voice, Case @case, Gender gender, Tense tense)
+    public string? Participle (Voice voice, Case @case, Gender gender, Tense tense)
     {
         var i = @case.IndexWithAnimate (gender);
         i += (int)voice * 78;

@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 
-/* .cs --
+/* MapTable.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,22 +25,35 @@ using AM.Linguistics.Hunspell.Infrastructure;
 
 namespace AM.Linguistics.Hunspell;
 
-public sealed class MapTable : ArrayWrapper<MapEntry>
+/// <summary>
+///
+/// </summary>
+public sealed class MapTable
+    : ArrayWrapper<MapEntry>
 {
+    /// <summary>
+    ///
+    /// </summary>
     public static readonly MapTable Empty = TakeArray (Array.Empty<MapEntry>());
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="entries"></param>
+    /// <returns></returns>
     public static MapTable Create (IEnumerable<MapEntry> entries)
     {
-        return entries == null ? Empty : TakeArray (entries.ToArray());
+        return entries == null! ? Empty : TakeArray (entries.ToArray());
     }
 
     internal static MapTable TakeArray (MapEntry[] entries)
     {
-        return entries == null ? Empty : new MapTable (entries);
+        return entries == null! ? Empty : new MapTable (entries);
     }
 
     private MapTable (MapEntry[] entries)
         : base (entries)
     {
+        // пустое тело конструктора
     }
 }

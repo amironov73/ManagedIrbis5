@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 
-/* .cs --
+/* CharacterConditionGroup.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,14 +24,32 @@ using AM.Linguistics.Hunspell.Infrastructure;
 
 namespace AM.Linguistics.Hunspell;
 
-public sealed class CharacterConditionGroup : ArrayWrapper<CharacterCondition>
+/// <summary>
+///
+/// </summary>
+public sealed class CharacterConditionGroup
+    : ArrayWrapper<CharacterCondition>
 {
+    /// <summary>
+    ///
+    /// </summary>
     public static readonly CharacterConditionGroup Empty = TakeArray (Array.Empty<CharacterCondition>());
 
+    /// <summary>
+    ///
+    /// </summary>
     public static readonly CharacterConditionGroup AllowAnySingleCharacter = Create (CharacterCondition.AllowAny);
 
+    /// <summary>
+    ///
+    /// </summary>
     public static readonly ArrayWrapperComparer<CharacterCondition, CharacterConditionGroup> DefaultComparer = new ();
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="condition"></param>
+    /// <returns></returns>
     public static CharacterConditionGroup Create (CharacterCondition condition)
     {
         return TakeArray (new[] { condition });
@@ -39,21 +57,30 @@ public sealed class CharacterConditionGroup : ArrayWrapper<CharacterCondition>
 
     internal static CharacterConditionGroup TakeArray (CharacterCondition[] conditions)
     {
-        return conditions == null ? Empty : new CharacterConditionGroup (conditions);
+        return conditions == null! ? Empty : new CharacterConditionGroup (conditions);
     }
 
     private CharacterConditionGroup (CharacterCondition[] conditions)
         : base (conditions)
     {
+        // пустое тело конструктора
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public bool AllowsAnySingleCharacter => _items.Length == 1 && _items[0].AllowsAny;
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public string GetEncoded()
     {
         return string.Concat (_items.Select (c => c.GetEncoded()));
     }
 
+    /// <inheritdoc cref="object.ToString"/>
     public override string ToString()
     {
         return GetEncoded();
@@ -66,11 +93,18 @@ public sealed class CharacterConditionGroup : ArrayWrapper<CharacterCondition>
     /// <returns>True when the start of the <paramref name="text"/> is matched by the conditions.</returns>
     public bool IsStartingMatch (string text)
     {
-        if (string.IsNullOrEmpty (text) || _items.Length > text.Length) return false;
+        if (string.IsNullOrEmpty (text) || _items.Length > text.Length)
+        {
+            return false;
+        }
 
         for (var i = 0; i < _items.Length; i++)
+        {
             if (!_items[i].IsMatch (text[i]))
+            {
                 return false;
+            }
+        }
 
         return true;
     }
@@ -82,25 +116,43 @@ public sealed class CharacterConditionGroup : ArrayWrapper<CharacterCondition>
     /// <returns>True when the end of the <paramref name="text"/> is matched by the conditions.</returns>
     public bool IsEndingMatch (string text)
     {
-        if (_items.Length > text.Length) return false;
+        if (_items.Length > text.Length)
+        {
+            return false;
+        }
 
         for (int conditionIndex = _items.Length - 1, textIndex = text.Length - 1;
              conditionIndex >= 0;
              conditionIndex--, textIndex--)
+        {
             if (!_items[conditionIndex].IsMatch (text[textIndex]))
+            {
                 return false;
+            }
+        }
 
         return true;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="text"></param>
+    /// <returns></returns>
     public bool IsOnlyPossibleMatch (string text)
     {
-        if (string.IsNullOrEmpty (text) || _items.Length != text.Length) return false;
+        if (string.IsNullOrEmpty (text) || _items.Length != text.Length)
+        {
+            return false;
+        }
 
         for (var i = 0; i < text.Length; i++)
         {
             var condition = _items[i];
-            if (!condition.PermitsSingleCharacter || condition.Characters[0] != text[i]) return false;
+            if (!condition.PermitsSingleCharacter || condition.Characters[0] != text[i])
+            {
+                return false;
+            }
         }
 
         return true;

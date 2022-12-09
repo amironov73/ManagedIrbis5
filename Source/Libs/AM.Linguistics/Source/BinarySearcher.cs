@@ -63,7 +63,10 @@ public static class BinarySearcher
         while (i < items.Count && comparer.Compare (items[i - 1], item) == 0)
         {
             if (filter (items[i]))
+            {
                 return items[i];
+            }
+
             i++;
         }
 
@@ -123,7 +126,9 @@ public static class BinarySearcher
         if (i >= 0 && i < items.Count)
         {
             if (filter (items[i]))
+            {
                 return FindOne (items, item, comparer, filter);
+            }
         }
         else
         {
@@ -131,7 +136,7 @@ public static class BinarySearcher
         }
 
         //go top
-        int candidate1 = -1;
+        var candidate1 = -1;
         var j = i - 1;
         while (j >= 0)
         {
@@ -145,7 +150,7 @@ public static class BinarySearcher
         }
 
         //go down
-        int candidate2 = -1;
+        var candidate2 = -1;
         while (i < items.Count)
         {
             if (filter (items[i]))
@@ -159,22 +164,18 @@ public static class BinarySearcher
 
         //choose better
         if (candidate1 == -1 && candidate2 == -1)
-            return default (T);
+        {
+            return default;
+        }
 
         if (candidate1 == -1)
         {
-            if (Math.Abs (comparer.Compare (items[candidate2], item)) > 1)
-                return items[candidate2];
-            else
-                return default (T);
+            return Math.Abs (comparer.Compare (items[candidate2], item)) > 1 ? items[candidate2] : default;
         }
 
         if (candidate2 == -1)
         {
-            if (Math.Abs (comparer.Compare (items[candidate1], item)) > 1)
-                return items[candidate1];
-            else
-                return default (T);
+            return Math.Abs (comparer.Compare (items[candidate1], item)) > 1 ? items[candidate1] : default;
         }
 
         var like1 = Math.Abs (comparer.Compare (items[candidate1], item));
@@ -182,11 +183,6 @@ public static class BinarySearcher
 
         var candidate = like1 > like2 ? candidate1 : candidate2;
 
-        if (Math.Max (like1, like2) > 1)
-            return items[candidate];
-        else
-            return default (T);
-
-        return default (T);
+        return Math.Max (like1, like2) > 1 ? items[candidate] : default;
     }
 }

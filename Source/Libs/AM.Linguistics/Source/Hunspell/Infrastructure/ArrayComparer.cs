@@ -33,7 +33,12 @@ internal sealed class ArrayComparer<T>
 
     private static readonly EqualityComparer<T> EqualityComparer = EqualityComparer<T>.Default;
 
-    /// <inheritdoc cref="IEqualityComparer{T}.Equals(T?,T?)"/>
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <returns></returns>
     public bool Equals
         (
             T[]? x,

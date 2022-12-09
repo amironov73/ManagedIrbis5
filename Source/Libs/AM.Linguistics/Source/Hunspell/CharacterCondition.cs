@@ -229,7 +229,11 @@ public readonly struct CharacterCondition
         return GetEncoded();
     }
 
-    /// <inheritdoc cref="IEquatable{T}.Equals(T?)"/>
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
     public bool Equals (CharacterCondition other)
     {
         return Restricted == other.Restricted && CharacterSet.DefaultComparer.Equals (Characters, other.Characters);

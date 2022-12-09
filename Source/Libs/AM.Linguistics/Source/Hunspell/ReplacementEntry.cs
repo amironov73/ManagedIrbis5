@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 
-/* .cs --
+/* ReplacementEntry.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -15,13 +15,16 @@
 
 namespace AM.Linguistics.Hunspell;
 
+/// <summary>
+///
+/// </summary>
 public abstract class ReplacementEntry
 {
-    protected ReplacementEntry (string pattern)
-    {
-        Pattern = pattern ?? string.Empty;
-    }
+    #region Properties
 
+    /// <summary>
+    ///
+    /// </summary>
     public string Pattern { get; }
 
     /// <seealso cref="ReplacementValueType.Med"/>
@@ -36,6 +39,28 @@ public abstract class ReplacementEntry
     /// <seealso cref="ReplacementValueType.Isol"/>
     public abstract string Isol { get; }
 
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="pattern"></param>
+    protected ReplacementEntry
+        (
+            string? pattern
+        )
+    {
+        Pattern = pattern ?? string.Empty;
+    }
+
+    #endregion
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="type"></param>
     public abstract string this [ReplacementValueType type] { get; }
 
     internal string ExtractReplacementText (int remainingCharactersToReplace, bool atStart)
@@ -44,10 +69,15 @@ public abstract class ReplacementEntry
             ? ReplacementValueType.Fin
             : ReplacementValueType.Med;
 
-        if (atStart) type |= ReplacementValueType.Ini;
+        if (atStart)
+        {
+            type |= ReplacementValueType.Ini;
+        }
 
         while (type != ReplacementValueType.Med && string.IsNullOrEmpty (this[type]))
+        {
             type = type == ReplacementValueType.Fin && !atStart ? ReplacementValueType.Med : type - 1;
+        }
 
         return this[type];
     }

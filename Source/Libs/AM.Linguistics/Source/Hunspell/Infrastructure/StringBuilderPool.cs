@@ -27,7 +27,7 @@ internal static class StringBuilderPool
 {
     private const int MaxCachedBuilderCapacity = WordList.MaxWordLen;
 
-    private static StringBuilder Cache;
+    private static StringBuilder Cache = null!;
 
     public static StringBuilder Get()
     {
@@ -82,16 +82,16 @@ internal static class StringBuilderPool
 
     private static StringBuilder GetClearedBuilder()
     {
-        var taken = Interlocked.Exchange (ref Cache, null);
-        return taken != null
+        var taken = Interlocked.Exchange (ref Cache!, null);
+        return taken != null!
             ? taken.Clear()
             : new StringBuilder();
     }
 
     private static StringBuilder GetClearedBuilderWithCapacity (int minimumCapacity)
     {
-        var taken = Interlocked.Exchange (ref Cache, null);
-        return taken != null && taken.Capacity >= minimumCapacity
+        var taken = Interlocked.Exchange (ref Cache!, null);
+        return taken != null! && taken.Capacity >= minimumCapacity
             ? taken.Clear()
             : new StringBuilder (minimumCapacity);
     }

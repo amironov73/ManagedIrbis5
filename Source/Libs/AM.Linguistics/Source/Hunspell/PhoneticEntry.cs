@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 
-/* .cs --
+/* PhoneticEntry.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -15,15 +15,41 @@
 
 namespace AM.Linguistics.Hunspell;
 
+/// <summary>
+///
+/// </summary>
 public sealed class PhoneticEntry
 {
-    public PhoneticEntry (string rule, string replace)
+    #region Properties
+
+    /// <summary>
+    ///
+    /// </summary>
+    public string Rule { get; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public string Replace { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="rule"></param>
+    /// <param name="replace"></param>
+    public PhoneticEntry
+        (
+            string? rule,
+            string? replace
+        )
     {
         Rule = rule ?? string.Empty;
         Replace = replace ?? string.Empty;
     }
 
-    public string Rule { get; }
-
-    public string Replace { get; }
+    #endregion
 }
