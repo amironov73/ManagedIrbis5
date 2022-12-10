@@ -29,23 +29,9 @@ namespace AM.Drawing.Charting;
 /// </summary>
 [Serializable]
 public class BoxObj
-    : GraphObj, ICloneable, ISerializable
+    : GraphObj, ICloneable
 {
     #region Fields
-
-    /// <summary>
-    /// Private field that stores the <see cref="Charting.Fill"/> data for this
-    /// <see cref="BoxObj"/>.  Use the public property <see cref="Fill"/> to
-    /// access this value.
-    /// </summary>
-    protected Fill _fill;
-
-    /// <summary>
-    /// Private field that determines the properties of the border around this
-    /// <see cref="BoxObj"/>
-    /// Use the public property <see cref="Border"/> to access this value.
-    /// </summary>
-    protected Border _border;
 
     #endregion
 
@@ -84,22 +70,14 @@ public class BoxObj
     /// Gets or sets the <see cref="Charting.Fill"/> data for this
     /// <see cref="BoxObj"/>.
     /// </summary>
-    public Fill Fill
-    {
-        get { return _fill; }
-        set { _fill = value; }
-    }
+    public Fill Fill { get; set; }
 
     /// <summary>
     /// Gets or sets the <see cref="Charting.Border"/> object, which
     /// determines the properties of the border around this
     /// <see cref="BoxObj"/>
     /// </summary>
-    public Border Border
-    {
-        get { return _border; }
-        set { _border = value; }
-    }
+    public Border Border { get; set; }
 
     #endregion
 
@@ -142,8 +120,7 @@ public class BoxObj
     /// <param name="height">The height of this <see cref="BoxObj" />.  This will be in units determined by
     /// <see cref="Location.CoordinateFrame" />.</param>
     public BoxObj (double x, double y, double width, double height)
-        :
-        base (x, y, width, height)
+        : base (x, y, width, height)
     {
         Border = new Border (Default.BorderColor, Default.PenWidth);
         Fill = new Fill (Default.FillColor);
@@ -155,6 +132,7 @@ public class BoxObj
     /// </summary>
     public BoxObj() : this (0, 0, 1, 1)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -177,8 +155,8 @@ public class BoxObj
     /// <param name="height">The height of this <see cref="BoxObj" />.  This will be in units determined by
     /// <see cref="Location.CoordinateFrame" />.</param>
     public BoxObj (double x, double y, double width, double height, Color borderColor,
-        Color fillColor1, Color fillColor2) :
-        base (x, y, width, height)
+        Color fillColor1, Color fillColor2)
+        : base (x, y, width, height)
     {
         Border = new Border (borderColor, Default.PenWidth);
         Fill = new Fill (fillColor1, fillColor2);
@@ -188,7 +166,8 @@ public class BoxObj
     /// The Copy Constructor
     /// </summary>
     /// <param name="rhs">The <see cref="BoxObj"/> object from which to copy</param>
-    public BoxObj (BoxObj rhs) : base (rhs)
+    public BoxObj (BoxObj rhs)
+        : base (rhs)
     {
         Border = rhs.Border.Clone();
         Fill = rhs.Fill.Clone();
@@ -240,8 +219,8 @@ public class BoxObj
         // backwards compatible as new member variables are added to classes
         info.GetInt32 ("schema2").NotUsed();
 
-        _fill = (Fill) info.GetValue ("fill", typeof (Fill)).ThrowIfNull ();
-        _border = (Border) info.GetValue ("border", typeof (Border)).ThrowIfNull ();
+        Fill = (Fill) info.GetValue ("fill", typeof (Fill)).ThrowIfNull ();
+        Border = (Border) info.GetValue ("border", typeof (Border)).ThrowIfNull ();
     }
 
     /// <inheritdoc cref="ISerializable.GetObjectData"/>
@@ -253,8 +232,8 @@ public class BoxObj
     {
         base.GetObjectData (info, context);
         info.AddValue ("schema2", schema2);
-        info.AddValue ("fill", _fill);
-        info.AddValue ("border", _border);
+        info.AddValue ("fill", Fill);
+        info.AddValue ("border", Border);
     }
 
     #endregion
@@ -284,10 +263,10 @@ public class BoxObj
             Math.Abs (pixRect.Bottom) < 100000)
         {
             // If the box is to be filled, fill it
-            _fill.Draw (graphics, pixRect);
+            Fill.Draw (graphics, pixRect);
 
             // Draw the border around the box if required
-            _border.Draw (graphics, pane, scaleFactor, pixRect);
+            Border.Draw (graphics, pane, scaleFactor, pixRect);
         }
     }
 

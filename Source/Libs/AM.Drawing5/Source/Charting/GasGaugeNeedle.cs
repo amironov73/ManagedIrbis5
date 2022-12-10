@@ -104,6 +104,8 @@ public class GasGaugeNeedle
         )
         : base (label)
     {
+        _fill = null!;
+
         NeedleValue = val;
         NeedleColor = color;
         NeedleWidth = Default.NeedleWidth;
@@ -121,6 +123,8 @@ public class GasGaugeNeedle
     public GasGaugeNeedle (GasGaugeNeedle ggn)
         : base (ggn)
     {
+        _fill = null!;
+
         NeedleValue = ggn.NeedleValue;
         NeedleColor = ggn.NeedleColor;
         NeedleWidth = ggn.NeedleWidth;
@@ -174,7 +178,7 @@ public class GasGaugeNeedle
     /// <summary>
     /// Gets or Sets the SlicePath of this <see cref="GasGaugeNeedle"/>
     /// </summary>
-    public GraphicsPath SlicePath => _slicePath;
+    public GraphicsPath SlicePath => _slicePath!;
 
     /// <summary>
     /// Gets or Sets the LableDetail of this <see cref="GasGaugeNeedle"/>
@@ -260,15 +264,16 @@ public class GasGaugeNeedle
         // The schema value is just a file version parameter. You can use it to make future versions
         // backwards compatible as new member variables are added to classes
         var sch = info.GetInt32 ("schema2");
+        sch.NotUsed();
 
-        _labelDetail = (TextObj)info.GetValue ("labelDetail", typeof (TextObj));
-        _fill = (Fill)info.GetValue ("fill", typeof (Fill));
-        _border = (Border)info.GetValue ("border", typeof (Border));
+        _labelDetail = (TextObj)info.GetValue ("labelDetail", typeof (TextObj))!;
+        _fill = (Fill)info.GetValue ("fill", typeof (Fill))!;
+        _border = (Border)info.GetValue ("border", typeof (Border))!;
         _needleValue = info.GetDouble ("needleValue");
-        _boundingRectangle = (RectangleF)info.GetValue ("boundingRectangle", typeof (RectangleF));
-        _slicePath = (GraphicsPath)info.GetValue ("slicePath", typeof (GraphicsPath));
+        _boundingRectangle = (RectangleF)info.GetValue ("boundingRectangle", typeof (RectangleF))!;
+        _slicePath = (GraphicsPath)info.GetValue ("slicePath", typeof (GraphicsPath))!;
         _sweepAngle = (float)info.GetDouble ("sweepAngle");
-        _color = (Color)info.GetValue ("color", typeof (Color));
+        _color = (Color)info.GetValue ("color", typeof (Color))!;
     }
 
     /// <inheritdoc cref="ISerializable.GetObjectData"/>
@@ -338,7 +343,7 @@ public class GasGaugeNeedle
         /// The default custom brush for filling in the GasGaugeNeedle.
         /// (<see cref="Fill.Brush"/> property).
         /// </summary>
-        public static Brush FillBrush = null;
+        public static Brush FillBrush = null!;
 
         /// <summary>
         ///Default value for controlling <see cref="GasGaugeNeedle"/> display.
@@ -371,7 +376,7 @@ public class GasGaugeNeedle
             float scaleFactor
         )
     {
-        if (pane.Chart._rect.Width <= 0 && pane.Chart._rect.Height <= 0)
+        if (pane.Chart._rect is { Width: <= 0, Height: <= 0 })
         {
             _slicePath = null;
         }
@@ -388,7 +393,7 @@ public class GasGaugeNeedle
 
             var tRect = _boundingRectangle;
 
-            if (tRect.Width >= 1 && tRect.Height >= 1)
+            if (tRect is { Width: >= 1, Height: >= 1 })
             {
                 var sMode = graphics.SmoothingMode;
                 graphics.SmoothingMode = SmoothingMode.AntiAlias;
@@ -475,26 +480,24 @@ public class GasGaugeNeedle
         var minVal = double.MaxValue;
         var maxVal = double.MinValue;
         foreach (var curve in pane.CurveList)
-            if (curve is GasGaugeRegion)
+            if (curve is GasGaugeRegion region)
             {
-                var ggr = (GasGaugeRegion)curve;
-                if (maxVal < ggr.MaxValue)
+                if (maxVal < region.MaxValue)
                 {
-                    maxVal = ggr.MaxValue;
+                    maxVal = region.MaxValue;
                 }
 
-                if (minVal > ggr.MinValue)
+                if (minVal > region.MinValue)
                 {
-                    minVal = ggr.MinValue;
+                    minVal = region.MinValue;
                 }
             }
 
         //Set Needle Sweep angle values here based on the min and max values of the GasGuage
         foreach (var curve in pane.CurveList)
         {
-            if (curve is GasGaugeNeedle)
+            if (curve is GasGaugeNeedle ggn)
             {
-                var ggn = (GasGaugeNeedle)curve;
                 var sweep = ((float)ggn.NeedleValue - (float)minVal) /
                     ((float)maxVal - (float)minVal) * 180.0f;
                 ggn.SweepAngle = sweep;
@@ -547,15 +550,14 @@ public class GasGaugeNeedle
         //Align Horizontally
         nonExpRect.X += xDelta;
 
-        nonExpRect.Inflate (-(float)0.05F * nonExpRect.Height, -(float)0.05 * nonExpRect.Width);
+        nonExpRect.Inflate (-0.05f * nonExpRect.Height, -(float)0.05 * nonExpRect.Width);
 
         CalculateGasGaugeParameters (pane);
 
         foreach (var curve in pane.CurveList)
         {
-            if (curve is GasGaugeNeedle)
+            if (curve is GasGaugeNeedle ggn)
             {
-                var ggn = (GasGaugeNeedle)curve;
                 ggn._boundingRectangle = nonExpRect;
             }
         }

@@ -109,18 +109,19 @@ public class GasGaugeRegion
     {
         // The schema value is just a file version parameter. You can use it to make future versions
         // backwards compatible as new member variables are added to classes
-        int sch = info.GetInt32 ("schema2");
+        var sch = info.GetInt32 ("schema2");
+        sch.NotUsed();
 
-        _labelDetail = (TextObj)info.GetValue ("labelDetail", typeof (TextObj));
-        _fill = (Fill)info.GetValue ("fill", typeof (Fill));
-        _border = (Border)info.GetValue ("border", typeof (Border));
-        _color = (Color)info.GetValue ("color", typeof (Color));
+        _labelDetail = (TextObj)info.GetValue ("labelDetail", typeof (TextObj))!;
+        _fill = (Fill)info.GetValue ("fill", typeof (Fill))!;
+        _border = (Border)info.GetValue ("border", typeof (Border))!;
+        _color = (Color)info.GetValue ("color", typeof (Color))!;
         _minValue = info.GetDouble ("minValue");
         _maxValue = info.GetDouble ("maxValue");
         _startAngle = (float)info.GetDouble ("startAngle");
         _sweepAngle = (float)info.GetDouble ("sweepAngle");
-        _boundingRectangle = (RectangleF)info.GetValue ("boundingRectangle", typeof (RectangleF));
-        _slicePath = (GraphicsPath)info.GetValue ("slicePath", typeof (GraphicsPath));
+        _boundingRectangle = (RectangleF)info.GetValue ("boundingRectangle", typeof (RectangleF))!;
+        _slicePath = (GraphicsPath)info.GetValue ("slicePath", typeof (GraphicsPath))!;
     }
 
     /// <inheritdoc cref="ISerializable.GetObjectData"/>
@@ -164,6 +165,7 @@ public class GasGaugeRegion
         )
         : base (label)
     {
+        _fill = null!;
         MinValue = minVal;
         MaxValue = maxVal;
         RegionColor = color;
@@ -182,6 +184,7 @@ public class GasGaugeRegion
     public GasGaugeRegion (GasGaugeRegion ggr)
         : base (ggr)
     {
+        _fill = null!;
         _minValue = ggr._minValue;
         _maxValue = ggr._maxValue;
         _color = ggr._color;
@@ -242,7 +245,7 @@ public class GasGaugeRegion
     /// </summary>
     public Color RegionColor
     {
-        get { return _color; }
+        get => _color;
         set
         {
             _color = value;
@@ -344,7 +347,7 @@ public class GasGaugeRegion
         /// <summary>
         /// The default value for the fill brush of the <see cref="GasGaugeRegion"/>
         /// </summary>
-        public static Brush FillBrush = null;
+        public static Brush FillBrush = null!;
 
         /// <summary>
         /// The default value for the visibility of the <see cref="GasGaugeRegion"/> fill.
@@ -372,7 +375,7 @@ public class GasGaugeRegion
             float scaleFactor
         )
     {
-        if (pane.Chart._rect.Width <= 0 && pane.Chart._rect.Height <= 0)
+        if (pane.Chart._rect is { Width: <= 0, Height: <= 0 })
         {
             _slicePath = null;
         }
@@ -387,11 +390,11 @@ public class GasGaugeRegion
                 return;
             }
 
-            RectangleF tRect = _boundingRectangle;
+            var tRect = _boundingRectangle;
 
-            if (tRect.Width >= 1 && tRect.Height >= 1)
+            if (tRect is { Width: >= 1, Height: >= 1 })
             {
-                SmoothingMode sMode = graphics.SmoothingMode;
+                var sMode = graphics.SmoothingMode;
                 graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
                 _slicePath.AddPie (tRect.X, tRect.Y, tRect.Width, tRect.Height,
@@ -402,7 +405,7 @@ public class GasGaugeRegion
 
                 if (Border.IsVisible)
                 {
-                    Pen borderPen = _border.GetPen (pane, scaleFactor);
+                    var borderPen = _border.GetPen (pane, scaleFactor);
                     graphics.DrawPie (borderPen, tRect.X, tRect.Y, tRect.Width, tRect.Height,
                         -0.0f, -180.0f);
                     borderPen.Dispose();
@@ -431,7 +434,7 @@ public class GasGaugeRegion
         if (_fill.IsVisible)
         {
             // just avoid height/width being less than 0.1 so GDI+ doesn't cry
-            using (Brush brush = _fill.MakeBrush (rect))
+            using (var brush = _fill.MakeBrush (rect))
             {
                 graphics.FillRectangle (brush, rect);
 
@@ -468,38 +471,38 @@ public class GasGaugeRegion
     public static void CalculateGasGuageParameters (GraphPane pane)
     {
         //loop thru slices and get total value and maxDisplacement
-        double minVal = double.MaxValue;
-        double maxVal = double.MinValue;
-        foreach (CurveItem curve in pane.CurveList)
-            if (curve is GasGaugeRegion)
+        var minVal = double.MaxValue;
+        var maxVal = double.MinValue;
+        foreach (var curve in pane.CurveList)
+        {
+            if (curve is GasGaugeRegion region)
             {
-                GasGaugeRegion ggr = (GasGaugeRegion)curve;
-                if (maxVal < ggr.MaxValue)
+                if (maxVal < region.MaxValue)
                 {
-                    maxVal = ggr.MaxValue;
+                    maxVal = region.MaxValue;
                 }
 
-                if (minVal > ggr.MinValue)
+                if (minVal > region.MinValue)
                 {
-                    minVal = ggr.MinValue;
+                    minVal = region.MinValue;
                 }
             }
+        }
 
         //Calculate start and sweep angles for each of the GasGaugeRegion based on teh min and max value
-        foreach (CurveItem curve in pane.CurveList)
+        foreach (var curve in pane.CurveList)
         {
-            if (curve is GasGaugeRegion)
+            if (curve is GasGaugeRegion region)
             {
-                GasGaugeRegion ggr = (GasGaugeRegion)curve;
-                float start = ((float)ggr.MinValue - (float)minVal) / ((float)maxVal - (float)minVal) * 180.0f;
-                float sweep = ((float)ggr.MaxValue - (float)minVal) / ((float)maxVal - (float)minVal) * 180.0f;
+                var start = ((float)region.MinValue - (float)minVal) / ((float)maxVal - (float)minVal) * 180.0f;
+                var sweep = ((float)region.MaxValue - (float)minVal) / ((float)maxVal - (float)minVal) * 180.0f;
                 sweep = sweep - start;
 
-                Fill f = new Fill (Color.White, ggr.RegionColor, -(sweep / 2f));
-                ggr.Fill = f;
+                var f = new Fill (Color.White, region.RegionColor, -(sweep / 2f));
+                region.Fill = f;
 
-                ggr.StartAngle = start;
-                ggr.SweepAngle = sweep;
+                region.StartAngle = start;
+                region.SweepAngle = sweep;
             }
         }
     }
@@ -529,12 +532,12 @@ public class GasGaugeRegion
     /// <returns></returns>
     public static RectangleF CalcRectangle (Graphics g, GraphPane pane, float scaleFactor, RectangleF chartRect)
     {
-        RectangleF nonExpRect = chartRect;
+        var nonExpRect = chartRect;
 
         if ((2 * nonExpRect.Height) > nonExpRect.Width)
         {
             //Scale based on width
-            float percentS = ((nonExpRect.Height * 2) - nonExpRect.Width) / (nonExpRect.Height * 2);
+            var percentS = ((nonExpRect.Height * 2) - nonExpRect.Width) / (nonExpRect.Height * 2);
             nonExpRect.Height = ((nonExpRect.Height * 2) - ((nonExpRect.Height * 2) * percentS));
         }
         else
@@ -544,7 +547,7 @@ public class GasGaugeRegion
 
         nonExpRect.Width = nonExpRect.Height;
 
-        float xDelta = (chartRect.Width / 2) - (nonExpRect.Width / 2);
+        var xDelta = (chartRect.Width / 2) - (nonExpRect.Width / 2);
 
         //Align Horizontally
         nonExpRect.X += xDelta;
@@ -552,16 +555,15 @@ public class GasGaugeRegion
         //nonExpRect.Y += -(float)0.025F * nonExpRect.Height;
         //nonExpRect.Y += ((chartRect.Height) - (nonExpRect.Height / 2)) - 10.0f;
 
-        nonExpRect.Inflate (-(float)0.05F * nonExpRect.Height, -(float)0.05 * nonExpRect.Width);
+        nonExpRect.Inflate (-0.05F * nonExpRect.Height, -(float)0.05 * nonExpRect.Width);
 
         CalculateGasGuageParameters (pane);
 
-        foreach (CurveItem curve in pane.CurveList)
+        foreach (var curve in pane.CurveList)
         {
-            if (curve is GasGaugeRegion)
+            if (curve is GasGaugeRegion region)
             {
-                GasGaugeRegion gg = (GasGaugeRegion)curve;
-                gg._boundingRectangle = nonExpRect;
+                region._boundingRectangle = nonExpRect;
             }
         }
 

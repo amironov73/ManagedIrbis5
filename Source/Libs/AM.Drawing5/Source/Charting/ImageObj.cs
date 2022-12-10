@@ -167,8 +167,14 @@ public class ImageObj
     /// <param name="height">The height of the rectangle that defines the
     /// <see cref="ImageObj"/> location.  The units of this position are specified by the
     /// <see cref="Location.CoordinateFrame"/> property.</param>
-    public ImageObj (Image image, double left, double top,
-        double width, double height) :
+    public ImageObj
+        (
+            Image? image,
+            double left,
+            double top,
+            double width,
+            double height
+        ) :
         base (left, top, width, height)
     {
         _image = image;
@@ -225,8 +231,9 @@ public class ImageObj
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
         int sch = info.GetInt32 ("schema2");
+        sch.NotUsed();
 
-        _image = (Image)info.GetValue ("image", typeof (Image));
+        _image = (Image) info.GetValue ("image", typeof (Image))!;
         _isScaled = info.GetBoolean ("isScaled");
     }
 

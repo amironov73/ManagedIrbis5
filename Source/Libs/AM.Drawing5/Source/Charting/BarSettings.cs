@@ -3,6 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable CompareOfFloatsByEqualityOperator
 // ReSharper disable InconsistentNaming
 
 /* BarSettings.cs -- обрабатывает глобальные настройки гистограмм
@@ -309,7 +310,7 @@ public class BarSettings
         var baseAxis = BarBaseAxis();
 
         // First, calculate the clusterScaleWidth for BarItem objects
-        if (_clusterScaleWidthAuto && !baseAxis.Scale.IsAnyOrdinal)
+        if (_clusterScaleWidthAuto && !baseAxis.Scale!.IsAnyOrdinal)
         {
             var minStep = double.MaxValue;
 
@@ -319,7 +320,7 @@ public class BarSettings
 
                 if (curve is BarItem)
                 {
-                    var step = GetMinStepSize (curve.Points, baseAxis);
+                    var step = GetMinStepSize (curve.Points!, baseAxis);
                     minStep = step < minStep ? step : minStep;
                 }
             }
@@ -344,16 +345,14 @@ public class BarSettings
 //								GetMinStepSize( list, baseAxis );
 //				}
 //				else if ( curve is JapaneseCandleStickItem &&
-            if (curve is OHLCBarItem && (curve as OHLCBarItem).Bar.IsAutoSize)
+            if (curve is OHLCBarItem { Bar.IsAutoSize: true } item)
             {
-                (curve as OHLCBarItem).Bar._userScaleSize = GetMinStepSize (list, baseAxis);
+                item.Bar._userScaleSize = GetMinStepSize (list!, baseAxis!);
             }
 
-            if (curve is JapaneseCandleStickItem &&
-                (curve as JapaneseCandleStickItem).Stick.IsAutoSize)
+            if (curve is JapaneseCandleStickItem { Stick.IsAutoSize: true } stickItem)
             {
-                (curve as JapaneseCandleStickItem).Stick._userScaleSize =
-                    GetMinStepSize (list, baseAxis);
+                stickItem.Stick._userScaleSize = GetMinStepSize (list!, baseAxis!);
             }
         }
     }
@@ -373,7 +372,7 @@ public class BarSettings
     {
         var minStep = double.MaxValue;
 
-        if (list.Count <= 0 || baseAxis.Scale.IsAnyOrdinal)
+        if (list.Count <= 0 || baseAxis.Scale!.IsAnyOrdinal)
         {
             return 1.0;
         }
@@ -434,7 +433,7 @@ public class BarSettings
     /// <returns>The width of each bar cluster, in pixel units</returns>
     public float GetClusterWidth()
     {
-        return BarBaseAxis().Scale.GetClusterWidth (_ownerPane);
+        return BarBaseAxis()!.Scale!.GetClusterWidth (_ownerPane);
     }
 
     /// <summary>
@@ -445,27 +444,15 @@ public class BarSettings
     /// <seealso cref="BarSettings.Base"/>
     /// <seealso cref="Scale.GetClusterWidth(GraphPane)"/>
     /// <returns>The <see cref="Axis"/> class for the axis from which the bars are based</returns>
-    public Axis BarBaseAxis()
+    public Axis? BarBaseAxis()
     {
-        Axis barAxis;
-        if (_base == BarBase.Y)
+        return _base switch
         {
-            barAxis = _ownerPane.YAxis;
-        }
-        else if (_base == BarBase.Y2)
-        {
-            barAxis = _ownerPane.Y2Axis;
-        }
-        else if (_base == BarBase.X2)
-        {
-            barAxis = _ownerPane.X2Axis;
-        }
-        else
-        {
-            barAxis = _ownerPane.XAxis;
-        }
-
-        return barAxis;
+            BarBase.Y => _ownerPane.YAxis,
+            BarBase.Y2 => _ownerPane.Y2Axis,
+            BarBase.X2 => _ownerPane.X2Axis,
+            _ => _ownerPane.XAxis
+        };
     }
 
     #endregion

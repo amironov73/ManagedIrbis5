@@ -190,15 +190,15 @@ public class EllipseObj
             Math.Abs (pixRect.Right) < 100000 &&
             Math.Abs (pixRect.Bottom) < 100000)
         {
-            if (_fill.IsVisible)
+            if (Fill.IsVisible)
             {
-                using var brush = _fill.MakeBrush (pixRect);
+                using var brush = Fill.MakeBrush (pixRect);
                 graphics.FillEllipse (brush, pixRect);
             }
 
-            if (_border.IsVisible)
+            if (Border.IsVisible)
             {
-                using var pen = _border.GetPen (pane, scaleFactor);
+                using var pen = Border.GetPen (pane, scaleFactor);
                 graphics.DrawEllipse (pen, pixRect);
             }
         }

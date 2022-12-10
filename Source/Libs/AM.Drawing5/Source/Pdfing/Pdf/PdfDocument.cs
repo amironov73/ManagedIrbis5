@@ -274,7 +274,7 @@ public sealed class PdfDocument
         if (_outStream != null)
         {
             // Get security handler if document gets encrypted
-            PdfStandardSecurityHandler securityHandler = null;
+            PdfStandardSecurityHandler? securityHandler = null;
             if (SecuritySettings.DocumentSecurityLevel != PdfDocumentSecurityLevel.None)
             {
                 securityHandler = SecuritySettings.SecurityHandler;
@@ -345,7 +345,7 @@ public sealed class PdfDocument
         }
         finally
         {
-            if (stream != null)
+            if (stream != null!)
             {
                 if (closeStream)
                 {
@@ -394,12 +394,14 @@ public sealed class PdfDocument
         try
         {
             // HACK: Remove XRefTrailer
-            if (_trailer is PdfCrossReferenceStream)
+            if (_trailer is PdfCrossReferenceStream stream)
             {
                 // HACK^2: Preserve the SecurityHandler.
                 var securityHandler = _securitySettings.SecurityHandler;
-                _trailer = new PdfTrailer ((PdfCrossReferenceStream)_trailer);
-                _trailer._securityHandler = securityHandler;
+                _trailer = new PdfTrailer (stream)
+                {
+                    _securityHandler = securityHandler
+                };
             }
 
             var encrypt = _securitySettings.DocumentSecurityLevel != PdfDocumentSecurityLevel.None;
@@ -415,11 +417,11 @@ public sealed class PdfDocument
                     Debug.Assert (_irefTable.Contains (securityHandler.ObjectID));
                 }
 
-                _trailer.Elements[PdfTrailer.Keys.Encrypt] = _securitySettings.SecurityHandler.Reference;
+                _trailer!.Elements[PdfTrailer.Keys.Encrypt] = _securitySettings.SecurityHandler.Reference;
             }
             else
             {
-                _trailer.Elements.Remove (PdfTrailer.Keys.Encrypt);
+                _trailer!.Elements.Remove (PdfTrailer.Keys.Encrypt);
             }
 
             PrepareForSave();
@@ -458,7 +460,7 @@ public sealed class PdfDocument
         }
         finally
         {
-            if (writer != null)
+            if (writer != null!)
             {
                 writer.Stream.Flush();
 
@@ -506,7 +508,7 @@ public sealed class PdfDocument
         info.Elements.SetString (PdfDocumentInformation.Keys.Producer, producer);
 
         // Prepare used fonts.
-        if (_fontTable != null)
+        if (_fontTable != null!)
         {
             _fontTable.PrepareForSave();
         }
@@ -542,7 +544,7 @@ public sealed class PdfDocument
 
     internal bool HasVersion (string version)
     {
-        return string.Compare (Catalog.Version, version) >= 0;
+        return string.CompareOrdinal (Catalog.Version, version) >= 0;
     }
 
     /// <summary>
@@ -552,7 +554,7 @@ public sealed class PdfDocument
     {
         get
         {
-            if (_options == null)
+            if (_options == null!)
             {
                 _options = new PdfDocumentOptions (this);
             }
@@ -570,7 +572,7 @@ public sealed class PdfDocument
     {
         get
         {
-            if (_settings == null)
+            if (_settings == null!)
             {
                 _settings = new PdfDocumentSettings (this);
             }
@@ -602,7 +604,7 @@ public sealed class PdfDocument
 
             if (value < 12 || value > 17) // TODO not really implemented
             {
-                throw new ArgumentException (PSSR.InvalidVersionNumber, "value");
+                throw new ArgumentException (PSSR.InvalidVersionNumber, nameof (value));
             }
 
             _version = value;
@@ -624,7 +626,7 @@ public sealed class PdfDocument
             }
 
             // PdfOpenMode is InformationOnly
-            var pageTreeRoot = (PdfDictionary)Catalog.Elements.GetObject (PdfCatalog.Keys.Pages);
+            var pageTreeRoot = (PdfDictionary)Catalog.Elements.GetObject (PdfCatalog.Keys.Pages)!;
             return pageTreeRoot.Elements.GetInteger (PdfPages.Keys.Count);
         }
     }
@@ -646,15 +648,13 @@ public sealed class PdfDocument
     /// <summary>
     /// Gets a Guid that uniquely identifies this instance of PdfDocument.
     /// </summary>
-    public Guid Guid => _guid;
-
-    private Guid _guid = Guid.NewGuid();
+    public Guid Guid { get; } = Guid.NewGuid();
 
     internal DocumentHandle Handle
     {
         get
         {
-            if (_handle == null)
+            if (_handle == null!)
             {
                 _handle = new DocumentHandle (this);
             }
@@ -688,9 +688,9 @@ public sealed class PdfDocument
     {
         get
         {
-            if (_info == null)
+            if (_info == null!)
             {
-                _info = _trailer.Info;
+                _info = _trailer!.Info;
             }
 
             return _info;
@@ -706,7 +706,7 @@ public sealed class PdfDocument
     {
         get
         {
-            if (_customValues == null)
+            if (_customValues == null!)
             {
                 _customValues = PdfCustomValues.Get (Catalog.Elements);
             }
@@ -721,7 +721,7 @@ public sealed class PdfDocument
             }
 
             PdfCustomValues.Remove (Catalog.Elements);
-            _customValues = null;
+            _customValues = null!;
         }
     }
 
@@ -734,7 +734,7 @@ public sealed class PdfDocument
     {
         get
         {
-            if (_pages == null)
+            if (_pages == null!)
             {
                 _pages = Catalog.Pages;
             }
@@ -809,32 +809,21 @@ public sealed class PdfDocument
     /// <summary>
     /// Gets the security settings of this document.
     /// </summary>
-    public PdfSecuritySettings SecuritySettings => _securitySettings ?? (_securitySettings = new PdfSecuritySettings (this));
+    public PdfSecuritySettings SecuritySettings => _securitySettings ??= new PdfSecuritySettings (this);
 
-    internal PdfSecuritySettings _securitySettings;
+    internal PdfSecuritySettings? _securitySettings;
 
     /// <summary>
     /// Gets the document font table that holds all fonts used in the current document.
     /// </summary>
     internal PdfFontTable FontTable => _fontTable ??= new PdfFontTable (this);
 
-    private PdfFontTable _fontTable;
+    private PdfFontTable? _fontTable;
 
     /// <summary>
     /// Gets the document image table that holds all images used in the current document.
     /// </summary>
-    internal PdfImageTable ImageTable
-    {
-        get
-        {
-            if (_imageTable == null)
-            {
-                _imageTable = new PdfImageTable (this);
-            }
-
-            return _imageTable;
-        }
-    }
+    internal PdfImageTable ImageTable => _imageTable ??= new PdfImageTable (this);
 
     private PdfImageTable? _imageTable;
 
@@ -843,29 +832,29 @@ public sealed class PdfDocument
     /// </summary>
     internal PdfFormXObjectTable FormTable => _formTable ??= new PdfFormXObjectTable (this); // TODO: Rename to ExternalDocumentTable.
 
-    private PdfFormXObjectTable _formTable;
+    private PdfFormXObjectTable? _formTable;
 
     /// <summary>
     /// Gets the document ExtGState table that holds all form state objects used in the current document.
     /// </summary>
     internal PdfExtGStateTable ExtGStateTable => _extGStateTable ??= new PdfExtGStateTable (this);
 
-    private PdfExtGStateTable _extGStateTable;
+    private PdfExtGStateTable? _extGStateTable;
 
     /// <summary>
     /// Gets the PdfCatalog of the current document.
     /// </summary>
-    internal PdfCatalog Catalog => _catalog ??= _trailer.Root;
+    internal PdfCatalog Catalog => _catalog ??= _trailer!.Root;
 
-    private PdfCatalog _catalog; // never changes if once created
+    private PdfCatalog? _catalog; // never changes if once created
 
     /// <summary>
     /// Gets the PdfInternals object of this document, that grants access to some internal structures
     /// which are not part of the public interface of PdfDocument.
     /// </summary>
-    public new PdfInternals Internals => _internals ?? (_internals = new PdfInternals (this));
+    public new PdfInternals Internals => _internals ??= new PdfInternals (this);
 
-    private PdfInternals _internals;
+    private PdfInternals? _internals;
 
     /// <summary>
     /// Creates a new page and adds it to this document.
@@ -946,7 +935,7 @@ public sealed class PdfDocument
     /// </summary>
     internal void OnExternalDocumentFinalized (DocumentHandle handle)
     {
-        if (tls != null)
+        if (tls != null!)
         {
             //PdfDocument[] documents = tls.Documents;
             tls.DetachDocument (handle);
@@ -964,9 +953,9 @@ public sealed class PdfDocument
     /// Gets the ThreadLocalStorage object. It is used for caching objects that should created
     /// only once.
     /// </summary>
-    internal static ThreadLocalStorage Tls => tls ?? (tls = new ThreadLocalStorage());
+    internal static ThreadLocalStorage Tls => tls ??= new ThreadLocalStorage();
 
-    [ThreadStatic] private static ThreadLocalStorage tls;
+    [ThreadStatic] private static ThreadLocalStorage? tls;
 
     [DebuggerDisplay ("(ID={ID}, alive={IsAlive})")]
     internal class DocumentHandle
@@ -974,7 +963,7 @@ public sealed class PdfDocument
         public DocumentHandle (PdfDocument document)
         {
             _weakRef = new WeakReference (document);
-            ID = document._guid.ToString ("B").ToUpper();
+            ID = document.Guid.ToString ("B").ToUpper();
         }
 
         public bool IsAlive => _weakRef.IsAlive;

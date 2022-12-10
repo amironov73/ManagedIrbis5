@@ -19,6 +19,8 @@ using System.Diagnostics;
 using System.Globalization;
 using System.ComponentModel;
 
+using AM;
+
 using PdfSharpCore.Fonts;
 using PdfSharpCore.Fonts.OpenType;
 using PdfSharpCore.Pdf;
@@ -96,6 +98,10 @@ public sealed class XFont
             XPdfFontOptions pdfOptions
         )
     {
+        _fontMetrics = null!;
+        GlyphTypeface = null!;
+        Descriptor = null!;
+
         FamilyName = familyName;
         _emSize = emSize;
         _style = style;
@@ -120,6 +126,10 @@ public sealed class XFont
             XStyleSimulations styleSimulations
         )
     {
+        _fontMetrics = null!;
+        GlyphTypeface = null!;
+        Descriptor = null!;
+
         FamilyName = familyName;
         _emSize = emSize;
         _style = style;
@@ -140,7 +150,7 @@ public sealed class XFont
 #if DEBUG
         if (FamilyName == "Segoe UI Semilight" && (_style & XFontStyle.BoldItalic) == XFontStyle.Italic)
         {
-            GetType();
+            GetType().NotUsed();
         }
 #endif
 
@@ -169,7 +179,7 @@ public sealed class XFont
         Descriptor =
             (OpenTypeDescriptor)FontDescriptorCache
                 .GetOrCreateDescriptorFor (this); //_familyName, _style, _glyphTypeface.Fontface);
-        _fontMetrics = new XFontMetrics (Descriptor.FontName, Descriptor.UnitsPerEm, Descriptor.Ascender,
+        _fontMetrics = new XFontMetrics (Descriptor.FontName!, Descriptor.UnitsPerEm, Descriptor.Ascender,
             Descriptor.Descender,
             Descriptor.Leading, Descriptor.LineSpacing, Descriptor.CapHeight, Descriptor.XHeight, Descriptor.StemV,
             0, 0, 0,
@@ -196,10 +206,7 @@ public sealed class XFont
     /// Gets the XFontFamily object associated with this XFont object.
     /// </summary>
     [Browsable (false)]
-    public XFontFamily FontFamily
-    {
-        get { return GlyphTypeface.FontFamily; }
-    }
+    public XFontFamily FontFamily => GlyphTypeface.FontFamily;
 
     /// <summary>
     /// WRONG: Gets the face name of this Font object.
@@ -207,23 +214,14 @@ public sealed class XFont
     /// </summary>
 
     // [Obsolete("This function returns the font family name, not the face name. Use xxx.FontFamily.Name or xxx.FaceName")]
-    public string Name
-    {
-        get { return GlyphTypeface.FontFamily.Name; }
-    }
+    public string Name => GlyphTypeface.FontFamily.Name;
 
-    internal string FaceName
-    {
-        get { return GlyphTypeface.FaceName; }
-    }
+    internal string FaceName => GlyphTypeface.FaceName;
 
     /// <summary>
     /// Gets the em-size of this font measured in the unit of this font object.
     /// </summary>
-    public double Size
-    {
-        get { return _emSize; }
-    }
+    public double Size => _emSize;
 
     readonly double _emSize;
 
@@ -231,44 +229,29 @@ public sealed class XFont
     /// Gets style information for this Font object.
     /// </summary>
     [Browsable (false)]
-    public XFontStyle Style
-    {
-        get { return _style; }
-    }
+    public XFontStyle Style => _style;
 
     readonly XFontStyle _style;
 
     /// <summary>
     /// Indicates whether this XFont object is bold.
     /// </summary>
-    public bool Bold
-    {
-        get { return (_style & XFontStyle.Bold) == XFontStyle.Bold; }
-    }
+    public bool Bold => (_style & XFontStyle.Bold) == XFontStyle.Bold;
 
     /// <summary>
     /// Indicates whether this XFont object is italic.
     /// </summary>
-    public bool Italic
-    {
-        get { return (_style & XFontStyle.Italic) == XFontStyle.Italic; }
-    }
+    public bool Italic => (_style & XFontStyle.Italic) == XFontStyle.Italic;
 
     /// <summary>
     /// Indicates whether this XFont object is stroke out.
     /// </summary>
-    public bool Strikeout
-    {
-        get { return (_style & XFontStyle.Strikeout) == XFontStyle.Strikeout; }
-    }
+    public bool Strikeout => (_style & XFontStyle.Strikeout) == XFontStyle.Strikeout;
 
     /// <summary>
     /// Indicates whether this XFont object is underlined.
     /// </summary>
-    public bool Underline
-    {
-        get { return (_style & XFontStyle.Underline) == XFontStyle.Underline; }
-    }
+    public bool Underline => (_style & XFontStyle.Underline) == XFontStyle.Underline;
 
     /// <summary>
     /// Temporary HACK for XPS to PDF converter.
@@ -289,10 +272,7 @@ public sealed class XFont
     /// <summary>
     /// Indicates whether this XFont is encoded as Unicode.
     /// </summary>
-    internal bool Unicode
-    {
-        get { return _pdfOptions != null && _pdfOptions.FontEncoding == PdfFontEncoding.Unicode; }
-    }
+    internal bool Unicode => _pdfOptions is { FontEncoding: PdfFontEncoding.Unicode };
 
     /// <summary>
     /// Gets the cell space for the font. The CellSpace is the line spacing, the sum of CellAscent and CellDescent and optionally some extra space.
@@ -346,11 +326,10 @@ public sealed class XFont
     /// Gets the line spacing of this font.
     /// </summary>
     [Browsable (false)]
-    public int Height
-    {
+    public int Height =>
+
         // Implementation from System.Drawing.Font.cs
-        get { return (int)Math.Ceiling (GetHeight()); }
-    }
+        (int)Math.Ceiling (GetHeight());
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -386,10 +365,5 @@ public sealed class XFont
     /// </summary>
 
     // ReSharper disable UnusedMember.Local
-    string DebuggerDisplay
-
-        // ReSharper restore UnusedMember.Local
-    {
-        get { return string.Format (CultureInfo.InvariantCulture, "font=('{0}' {1:0.##})", Name, Size); }
-    }
+    string DebuggerDisplay => string.Format (CultureInfo.InvariantCulture, "font=('{0}' {1:0.##})", Name, Size); // ReSharper restore UnusedMember.Local
 }

@@ -93,7 +93,7 @@ public class GraphObjList
     /// <param name="tag">The <see cref="String"/> type tag to search for.</param>
     /// <value>A <see cref="GraphObj"/> object reference.</value>
     /// <seealso cref="IndexOfTag"/>
-    public GraphObj this [string tag]
+    public GraphObj? this [string tag]
     {
         get
         {
@@ -152,8 +152,8 @@ public class GraphObjList
         int index = 0;
         foreach (GraphObj p in this)
         {
-            if (p.Tag is string &&
-                string.Compare ((string)p.Tag, tag, true) == 0)
+            if (p.Tag is string pTag &&
+                string.Compare (pTag, tag, StringComparison.OrdinalIgnoreCase) == 0)
             {
                 return index;
             }
@@ -218,7 +218,7 @@ public class GraphObjList
     /// <remarks>This method is normally only called by the Draw method
     /// of the parent <see cref="GraphPane"/> object.
     /// </remarks>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -237,8 +237,13 @@ public class GraphObjList
     /// graphic objects.  The order of <see cref="GraphObj"/>'s with the
     /// same <see cref="ZOrder"/> value is control by their order in
     /// this <see cref="GraphObjList"/>.</param>
-    public void Draw (Graphics g, PaneBase pane, float scaleFactor,
-        ZOrder zOrder)
+    public void Draw
+        (
+            Graphics graphics,
+            PaneBase pane,
+            float scaleFactor,
+            ZOrder zOrder
+        )
     {
         // Draw the items in reverse order, so the last items in the
         // list appear behind the first items (consistent with
@@ -248,18 +253,18 @@ public class GraphObjList
             GraphObj item = this[i];
             if (item.ZOrder == zOrder && item.IsVisible)
             {
-                Region region = null;
-                if (item.IsClippedToChartRect && pane is GraphPane)
+                Region? region = null;
+                if (item.IsClippedToChartRect && pane is GraphPane graphPane)
                 {
-                    region = g.Clip.Clone();
-                    g.SetClip (((GraphPane)pane).Chart._rect);
+                    region = graphics.Clip.Clone();
+                    graphics.SetClip (graphPane.Chart._rect);
                 }
 
-                item.Draw (g, pane, scaleFactor);
+                item.Draw (graphics, pane, scaleFactor);
 
                 if (item.IsClippedToChartRect && pane is GraphPane)
                 {
-                    g.Clip = region;
+                    graphics.Clip = region!;
                 }
             }
         }

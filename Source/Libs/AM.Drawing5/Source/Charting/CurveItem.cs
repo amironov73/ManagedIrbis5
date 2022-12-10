@@ -3,6 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable CompareOfFloatsByEqualityOperator
 // ReSharper disable InconsistentNaming
 
 /* CurveItem.cs -- отдельная кривая на панели графика
@@ -79,7 +80,7 @@ public abstract class CurveItem
     /// the dependent (Y axis) values for this curve</param>
     public CurveItem
         (
-            string label,
+            string? label,
             double[] x,
             double[] y
         )
@@ -105,7 +106,7 @@ public abstract class CurveItem
     /// the X and Y values for this curve</param>
     public CurveItem
         (
-            string label,
+            string? label,
             IPointList? points
         )
     {
@@ -318,7 +319,7 @@ public abstract class CurveItem
     /// A <see cref="Label" /> instance that represents the <see cref="Legend"/>
     /// entry for the this <see cref="CurveItem"/> object
     /// </summary>
-    public Label Label { get; set; }
+    public Label? Label { get; set; }
 
     /// <summary>
     /// The <see cref="Line"/>/<see cref="Symbol"/>/<see cref="Bar"/>
@@ -396,11 +397,8 @@ public abstract class CurveItem
     public bool IsSelected
     {
         get => _isSelected;
-        set
-        {
-            _isSelected = value;
-
-            /*
+        set => _isSelected = value;
+        /*
             if ( this is BarItem )
             {
                 ( (BarItem)this ).Bar.Fill.UseInactiveColor = !value;
@@ -416,7 +414,6 @@ public abstract class CurveItem
             else if ( this is PieItem )
                 ( (PieItem)this ).Fill.UseInactiveColor = !value;
             */
-        }
     }
 
     /// <summary>
@@ -552,10 +549,10 @@ public abstract class CurveItem
     /// </summary>
 
     // /// <seealso cref="ZedGraph.Web.IsImageMap" />
-    public Link Link
+    public Link? Link
     {
-        get { return _link; }
-        set { _link = value; }
+        get => _link;
+        set => _link = value;
     }
 
     #endregion
@@ -708,7 +705,7 @@ public abstract class CurveItem
     {
         if (IsX2Axis)
         {
-            return pane.X2Axis;
+            return pane.X2Axis!;
         }
 
         return pane.XAxis;
@@ -737,18 +734,18 @@ public abstract class CurveItem
         {
             if (YAxisIndex < pane.Y2AxisList.Count)
             {
-                return pane.Y2AxisList[YAxisIndex];
+                return pane.Y2AxisList[YAxisIndex]!;
             }
 
-            return pane.Y2AxisList[0];
+            return pane.Y2AxisList[0]!;
         }
 
         if (YAxisIndex < pane.YAxisList.Count)
         {
-            return pane.YAxisList[YAxisIndex];
+            return pane.YAxisList[YAxisIndex]!;
         }
 
-        return pane.YAxisList[0];
+        return pane.YAxisList[0]!;
     }
 
     /// <summary>
@@ -888,7 +885,7 @@ public abstract class CurveItem
 
         // Loop over each point in the arrays
         //foreach ( PointPair point in this.Points )
-        for (var i = 0; i < Points.Count; i++)
+        for (var i = 0; i < Points!.Count; i++)
         {
             var point = Points[i];
 
@@ -999,13 +996,13 @@ public abstract class CurveItem
 
         if (barBase == BarBase.X2)
         {
-            return pane.X2Axis;
+            return pane.X2Axis!;
         }
         if (barBase == BarBase.Y)
         {
-            return pane.YAxis;
+            return pane.YAxis!;
         }
-        return pane.Y2Axis;
+        return pane.Y2Axis!;
     }
 
     /// <summary>Returns a reference to the <see cref="Axis"/> object that is the "value"

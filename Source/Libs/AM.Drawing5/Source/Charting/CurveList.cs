@@ -3,6 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable CompareOfFloatsByEqualityOperator
 // ReSharper disable InconsistentNaming
 
 /* CurveList.cs --
@@ -40,10 +41,7 @@ public class CurveList
     /// Read only value for the maximum number of points in any of the curves
     /// in the list.
     /// </summary>
-    public int MaxPts
-    {
-        get { return maxPts; }
-    }
+    public int MaxPts => maxPts;
 
     /// <summary>
     /// Read only property that returns the number of curves in the list that are of
@@ -149,7 +147,7 @@ public class CurveList
     {
         foreach (var curve in this)
         {
-            if (curve.Points.Count > 0)
+            if (curve.Points!.Count > 0)
             {
                 return true;
             }
@@ -257,7 +255,7 @@ public class CurveList
     /// <param name="label">The string label of the
     /// <see cref="CurveItem"/> object to be accessed.</param>
     /// <value>A <see cref="CurveItem"/> object reference.</value>
-    public CurveItem this [string label]
+    public CurveItem? this [string label]
     {
         get
         {
@@ -326,7 +324,7 @@ public class CurveList
         var index = 0;
         foreach (var p in this)
         {
-            if (string.Compare (p.Label.Text, label, true) == 0)
+            if (String.Compare (p.Label.Text, label, StringComparison.OrdinalIgnoreCase) == 0)
             {
                 return index;
             }
@@ -354,7 +352,7 @@ public class CurveList
         foreach (var p in this)
         {
             if (p.Tag is string &&
-                string.Compare ((string)p.Tag, tag, true) == 0)
+                String.Compare ((string)p.Tag, tag, StringComparison.OrdinalIgnoreCase) == 0)
             {
                 return index;
             }
@@ -457,14 +455,18 @@ public class CurveList
             tYMinVal,
             tYMaxVal;
 
-        InitScale (pane.XAxis.Scale, isBoundedRanges);
-        InitScale (pane.X2Axis.Scale, isBoundedRanges);
+        InitScale (pane.XAxis.Scale!, isBoundedRanges);
+        InitScale (pane.X2Axis!.Scale!, isBoundedRanges);
 
         foreach (var axis in pane.YAxisList)
-            InitScale (axis.Scale, isBoundedRanges);
+        {
+            InitScale (axis.Scale!, isBoundedRanges);
+        }
 
         foreach (var axis in pane.Y2AxisList)
-            InitScale (axis.Scale, isBoundedRanges);
+        {
+            InitScale (axis.Scale!, isBoundedRanges);
+        }
 
         maxPts = 1;
 
@@ -494,10 +496,10 @@ public class CurveList
                 var yScale = curve.GetYAxis (pane).Scale;
 
                 var xScale = curve.GetXAxis (pane).Scale;
-                var isYOrd = yScale.IsAnyOrdinal;
+                var isYOrd = yScale!.IsAnyOrdinal;
 
                 // isXOrd is true if the X axis is an ordinal type
-                var isXOrd = xScale.IsAnyOrdinal;
+                var isXOrd = xScale!.IsAnyOrdinal;
 
                 // For ordinal Axes, the data range is just 1 to Npts
                 if (isYOrd && !curve.IsOverrideOrdinal)
@@ -597,13 +599,18 @@ public class CurveList
             }
         }
 
-        pane.XAxis.Scale.SetRange (pane, pane.XAxis);
-        pane.X2Axis.Scale.SetRange (pane, pane.X2Axis);
+        pane.XAxis.Scale!.SetRange (pane, pane.XAxis);
+        pane.X2Axis.Scale!.SetRange (pane, pane.X2Axis);
 
         foreach (var axis in pane.YAxisList)
-            axis.Scale.SetRange (pane, axis);
+        {
+            axis.Scale!.SetRange (pane, axis);
+        }
+
         foreach (var axis in pane.Y2AxisList)
-            axis.Scale.SetRange (pane, axis);
+        {
+            axis.Scale!.SetRange (pane, axis);
+        }
     }
 
     private void InitScale (Scale scale, bool isBoundedRanges)
@@ -645,7 +652,7 @@ public class CurveList
 
         double lowVal, baseVal, hiVal;
 
-        for (var i = 0; i < curve.Points.Count; i++)
+        for (var i = 0; i < curve.Points!.Count; i++)
         {
             valueHandler.GetValues (curve, i, out baseVal, out lowVal, out hiVal);
             var x = isXBase ? baseVal : hiVal;
@@ -736,10 +743,12 @@ public class CurveList
             // First, create a new curveList with references (not clones) of the curves
             var tempList = new CurveList();
             foreach (var curve in this)
+            {
                 if (curve.IsBar)
                 {
                     tempList.Add ((CurveItem)curve);
                 }
+            }
 
             // Loop through the bars, graphing each ordinal position separately
             for (var i = 0; i < maxPts; i++)
@@ -748,11 +757,14 @@ public class CurveList
                 tempList.Sort (pane._barSettings.Base == BarBase.X ? SortType.YValues : SortType.XValues, i);
 
                 // plot the bars for the current ordinal position, in sorted order
-                foreach (BarItem barItem in tempList)
-                    barItem.Bar.DrawSingleBar (g, pane, barItem,
-                        ((BarItem)barItem).BaseAxis (pane),
-                        ((BarItem)barItem).ValueAxis (pane),
+                foreach (var curveItem in tempList)
+                {
+                    var barItem = (BarItem)curveItem;
+                    barItem.Bar!.DrawSingleBar (g, pane, barItem,
+                        barItem.BaseAxis (pane),
+                        barItem.ValueAxis (pane),
                         0, i, ((BarItem)barItem).GetBarWidth (pane), scaleFactor);
+                }
             }
         }
 

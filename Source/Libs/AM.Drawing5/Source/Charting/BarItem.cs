@@ -31,7 +31,7 @@ namespace AM.Drawing.Charting;
 /// </remarks>
 [Serializable]
 public class BarItem
-    : CurveItem, ICloneable, ISerializable
+    : CurveItem, ICloneable
 {
     #region Fields
 
@@ -130,7 +130,7 @@ public class BarItem
         : base (rhs)
     {
         //bar = new Bar( rhs.Bar );
-        Bar = rhs.Bar.Clone();
+        Bar = rhs.Bar!.Clone();
     }
 
     /// <summary>
@@ -330,10 +330,10 @@ public class BarItem
                 // Make the gap between the bars and the labels = 1.5% of the axis range
 
                 var scale = curve.ValueAxis (pane).Scale;
-                var labelOffset = (float)(scale._max - scale._min) * 0.015f;
+                var labelOffset = (float)(scale!._max - scale._min) * 0.015f;
 
                 // Loop through each point in the BarItem
-                for (var i = 0; i < points.Count; i++)
+                for (var i = 0; i < points!.Count; i++)
                 {
                     // Get the high, low and base values for the current bar
                     // note that this method will automatically calculate the "effective"
@@ -366,8 +366,7 @@ public class BarItem
                     }
 
                     // Create the new TextObj
-                    TextObj label;
-                    label = isVertical
+                    var label = isVertical
                         ? new TextObj (barLabelText, centerVal, position)
                         : new TextObj (barLabelText, position, centerVal);
 
@@ -411,7 +410,7 @@ public class BarItem
     {
         coords = string.Empty;
 
-        if (i < 0 || i >= Points.Count)
+        if (i < 0 || i >= Points!.Count)
         {
             return false;
         }
@@ -444,25 +443,20 @@ public class BarItem
         if (!Points[i].IsInvalid3D)
         {
             // calculate a pixel value for the top of the bar on value axis
-            pixLowVal = valueAxis.Scale.Transform (IsOverrideOrdinal, i, curLowVal);
+            pixLowVal = valueAxis.Scale!.Transform (IsOverrideOrdinal, i, curLowVal);
             pixHiVal = valueAxis.Scale.Transform (IsOverrideOrdinal, i, curHiVal);
 
             // calculate a pixel value for the center of the bar on the base axis
-            pixBase = baseAxis.Scale.Transform (IsOverrideOrdinal, i, curBase);
+            pixBase = baseAxis.Scale!.Transform (IsOverrideOrdinal, i, curBase);
 
             // Calculate the pixel location for the side of the bar (on the base axis)
             var pixSide = pixBase - clusterWidth / 2.0F + clusterGap / 2.0F +
                           pane.CurveList.GetBarItemPos (pane, this) * (barWidth + barGap);
 
             // Draw the bar
-            if (baseAxis is XAxis or X2Axis)
-            {
-                coords = $"{pixSide:f0},{pixLowVal:f0},{pixSide + barWidth:f0},{pixHiVal:f0}";
-            }
-            else
-            {
-                coords = $"{pixLowVal:f0},{pixSide:f0},{pixHiVal:f0},{pixSide + barWidth:f0}";
-            }
+            coords = baseAxis is XAxis or X2Axis
+                ? $"{pixSide:f0},{pixLowVal:f0},{pixSide + barWidth:f0},{pixHiVal:f0}"
+                : $"{pixLowVal:f0},{pixSide:f0},{pixHiVal:f0},{pixSide + barWidth:f0}";
 
             return true;
         }

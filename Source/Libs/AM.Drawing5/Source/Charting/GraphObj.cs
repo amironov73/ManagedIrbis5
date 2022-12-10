@@ -14,7 +14,6 @@
 using System;
 using System.Drawing;
 using System.Runtime.Serialization;
-using System.Security.Permissions;
 
 #endregion
 
@@ -63,7 +62,7 @@ public abstract class GraphObj
     /// that you store in <see cref="Tag"/> must be a serializable type (or
     /// it will cause an exception).
     /// </remarks>
-    public object Tag;
+    public object? Tag;
 
     /// <summary>
     /// Internal field that determines the z-order "depth" of this
@@ -129,8 +128,8 @@ public abstract class GraphObj
     /// </summary>
     public Location Location
     {
-        get { return _location; }
-        set { _location = value; }
+        get => _location;
+        set => _location = value;
     }
 
     /// <summary>
@@ -146,8 +145,8 @@ public abstract class GraphObj
     /// objects having the same <see cref="Charting.ZOrder"/> value.</remarks>
     public ZOrder ZOrder
     {
-        get { return _zOrder; }
-        set { _zOrder = value; }
+        get => _zOrder;
+        set => _zOrder = value;
     }
 
     /// <summary>
@@ -156,8 +155,8 @@ public abstract class GraphObj
     /// </summary>
     public bool IsVisible
     {
-        get { return _isVisible; }
-        set { _isVisible = value; }
+        get => _isVisible;
+        set => _isVisible = value;
     }
 
     /// <summary>
@@ -168,8 +167,8 @@ public abstract class GraphObj
     /// false to leave it unclipped.</value>
     public bool IsClippedToChartRect
     {
-        get { return _isClippedToChartRect; }
-        set { _isClippedToChartRect = value; }
+        get => _isClippedToChartRect;
+        set => _isClippedToChartRect = value;
     }
 
     /// <summary>
@@ -179,23 +178,18 @@ public abstract class GraphObj
     // /// <seealso cref="ZedGraph.Web.IsImageMap" />
     public Link Link
     {
-        get { return _link; }
-        set { _link = value; }
+        get => _link;
+        set => _link = value;
     }
 
     /// <summary>
     /// true if the <see cref="ZOrder" /> of this object is set to put it in front
     /// of the <see cref="CurveItem" /> data points.
     /// </summary>
-    public bool IsInFrontOfData
-    {
-        get
-        {
-            return _zOrder == ZOrder.A_InFront ||
-                   _zOrder == ZOrder.B_BehindLegend ||
-                   _zOrder == ZOrder.C_BehindChartBorder;
-        }
-    }
+    public bool IsInFrontOfData =>
+        _zOrder == ZOrder.A_InFront ||
+        _zOrder == ZOrder.B_BehindLegend ||
+        _zOrder == ZOrder.C_BehindChartBorder;
 
     #endregion
 
@@ -208,9 +202,10 @@ public abstract class GraphObj
     /// Default constructor that sets all <see cref="GraphObj"/> properties to default
     /// values as defined in the <see cref="Default"/> class.
     /// </summary>
-    public GraphObj() :
-        this (0, 0, Default.CoordFrame, Default.AlignH, Default.AlignV)
+    protected GraphObj()
+        : this (0, 0, Default.CoordFrame, Default.AlignH, Default.AlignV)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -227,9 +222,10 @@ public abstract class GraphObj
     /// <see cref="Charting.Location.CoordinateFrame"/> property.  The text will be
     /// aligned to this position based on the
     /// <see cref="AlignV"/> property.</param>
-    public GraphObj (double x, double y) :
-        this (x, y, Default.CoordFrame, Default.AlignH, Default.AlignV)
+    public GraphObj (double x, double y)
+        : this (x, y, Default.CoordFrame, Default.AlignH, Default.AlignV)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -249,9 +245,10 @@ public abstract class GraphObj
     /// <param name="y">The y position of the item.</param>
     /// <param name="x2">The x2 position of the item.</param>
     /// <param name="y2">The x2 position of the item.</param>
-    public GraphObj (double x, double y, double x2, double y2) :
-        this (x, y, x2, y2, Default.CoordFrame, Default.AlignH, Default.AlignV)
+    public GraphObj (double x, double y, double x2, double y2)
+        : this (x, y, x2, y2, Default.CoordFrame, Default.AlignH, Default.AlignV)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -273,9 +270,10 @@ public abstract class GraphObj
     /// <param name="coordType">The <see cref="CoordType"/> enum value that
     /// indicates what type of coordinate system the x and y parameters are
     /// referenced to.</param>
-    public GraphObj (double x, double y, CoordType coordType) :
-        this (x, y, coordType, Default.AlignH, Default.AlignV)
+    public GraphObj (double x, double y, CoordType coordType)
+        : this (x, y, coordType, Default.AlignH, Default.AlignV)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -303,7 +301,14 @@ public abstract class GraphObj
     /// the horizontal alignment of the object with respect to the (x,y) location</param>
     /// <param name="alignV">The <see cref="AlignV"/> enum that specifies
     /// the vertical alignment of the object with respect to the (x,y) location</param>
-    public GraphObj (double x, double y, CoordType coordType, AlignH alignH, AlignV alignV)
+    public GraphObj
+        (
+            double x,
+            double y,
+            CoordType coordType,
+            AlignH alignH,
+            AlignV alignV
+        )
     {
         _isVisible = true;
         _isClippedToChartRect = Default.IsClippedToChartRect;
@@ -425,14 +430,15 @@ public abstract class GraphObj
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
         var sch = info.GetInt32 ("schema");
+        sch.NotUsed();
 
-        _location = (Location) info.GetValue ("location", typeof (Location));
+        _location = (Location) info.GetValue ("location", typeof (Location))!;
         _isVisible = info.GetBoolean ("isVisible");
-        Tag = info.GetValue ("Tag", typeof (object));
-        _zOrder = (ZOrder)info.GetValue ("zOrder", typeof (ZOrder));
+        Tag = info.GetValue ("Tag", typeof (object))!;
+        _zOrder = (ZOrder)info.GetValue ("zOrder", typeof (ZOrder))!;
 
         _isClippedToChartRect = info.GetBoolean ("isClippedToChartRect");
-        _link = (Link)info.GetValue ("link", typeof (Link));
+        _link = (Link)info.GetValue ("link", typeof (Link))!;
     }
 
     /// <summary>

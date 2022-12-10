@@ -256,15 +256,15 @@ public class PolyObj
             using var path = MakePath (pane);
 
             // Fill or draw the symbol as required
-            if (_fill.IsVisible)
+            if (Fill.IsVisible)
             {
                 using var brush = Fill.MakeBrush (path.GetBounds());
                 graphics.FillPath (brush, path);
             }
 
-            if (_border.IsVisible)
+            if (Border.IsVisible)
             {
-                using var pen = _border.GetPen (pane, scaleFactor);
+                using var pen = Border.GetPen (pane, scaleFactor);
                 graphics.DrawPath (pen, path);
             }
         }

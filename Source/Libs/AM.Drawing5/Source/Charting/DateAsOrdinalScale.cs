@@ -3,6 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable CompareOfFloatsByEqualityOperator
 // ReSharper disable InconsistentNaming
 
 /* DateAndOrdinalScale.cs --
@@ -160,24 +161,24 @@ class DateAsOrdinalScale
         {
             double range = 10;
 
-            if (pane.CurveList.Count > 0 && pane.CurveList[0].Points.Count > 1)
+            if (pane.CurveList.Count > 0 && pane.CurveList[0].Points!.Count > 1)
             {
                 double val1, val2;
 
-                PointPair pt1 = pane.CurveList[0].Points[0];
-                PointPair pt2 = pane.CurveList[0].Points[pane.CurveList[0].Points.Count - 1];
-                int p1 = 1;
-                int p2 = pane.CurveList[0].Points.Count;
+                var pt1 = pane.CurveList[0].Points![0];
+                var pt2 = pane.CurveList[0].Points![pane.CurveList[0].Points!.Count - 1];
+                var p1 = 1;
+                var p2 = pane.CurveList[0].Points!.Count;
                 if (pane.IsBoundedRanges)
                 {
-                    p1 = (int)Math.Floor (_ownerAxis.Scale.Min);
+                    p1 = (int)Math.Floor (_ownerAxis.Scale!.Min);
                     p2 = (int)Math.Ceiling (_ownerAxis.Scale.Max);
-                    p1 = Math.Min (Math.Max (p1, 1), pane.CurveList[0].Points.Count);
-                    p2 = Math.Min (Math.Max (p2, 1), pane.CurveList[0].Points.Count);
+                    p1 = Math.Min (Math.Max (p1, 1), pane.CurveList[0].Points!.Count);
+                    p2 = Math.Min (Math.Max (p2, 1), pane.CurveList[0].Points!.Count);
                     if (p2 > p1)
                     {
-                        pt1 = pane.CurveList[0].Points[p1 - 1];
-                        pt2 = pane.CurveList[0].Points[p2 - 1];
+                        pt1 = pane.CurveList[0].Points![p1 - 1];
+                        pt2 = pane.CurveList[0].Points![p2 - 1];
                     }
                 }
 
@@ -259,24 +260,21 @@ class DateAsOrdinalScale
             double dVal
         )
     {
-        if (_format == null)
-        {
-            _format = Default.Format;
-        }
+        _format ??= Default.Format;
 
         double val;
 
-        int tmpIndex = (int)dVal - 1;
+        var tmpIndex = (int)dVal - 1;
 
-        if (pane.CurveList.Count > 0 && pane.CurveList[0].Points.Count > tmpIndex)
+        if (pane.CurveList.Count > 0 && pane.CurveList[0].Points!.Count > tmpIndex)
         {
-            if (_ownerAxis is XAxis || _ownerAxis is X2Axis)
+            if (_ownerAxis is XAxis or X2Axis)
             {
-                val = pane.CurveList[0].Points[tmpIndex].X;
+                val = pane.CurveList[0].Points![tmpIndex].X;
             }
             else
             {
-                val = pane.CurveList[0].Points[tmpIndex].Y;
+                val = pane.CurveList[0].Points![tmpIndex].Y;
             }
 
             return XDate.ToString (val, _format);
