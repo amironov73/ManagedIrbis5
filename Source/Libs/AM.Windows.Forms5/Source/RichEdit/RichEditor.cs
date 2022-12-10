@@ -274,7 +274,7 @@ public partial class RichEditor
             {
                 newFont = new Font
                     (
-                        e.ClickedItem.Text,
+                        e.ClickedItem!.Text,
                         selectionFont.Size,
                         selectionFont.Style
                     );
@@ -285,7 +285,7 @@ public partial class RichEditor
                 {
                     newFont = new Font
                         (
-                            e.ClickedItem.Text,
+                            e.ClickedItem!.Text,
                             selectionFont.Size
                         );
                 }
@@ -308,7 +308,7 @@ public partial class RichEditor
                 {
                     newFont = new Font
                         (
-                            e.ClickedItem.Text,
+                            e.ClickedItem!.Text,
                             fontSize
                         );
                 }
@@ -336,7 +336,7 @@ public partial class RichEditor
             ToolStripItemClickedEventArgs e
         )
     {
-        var newColor = Color.FromName ( e.ClickedItem.Text );
+        var newColor = Color.FromName ( e.ClickedItem!.Text );
         rtfBox.SelectionColor = newColor;
         _Refresh ();
     }
@@ -362,7 +362,7 @@ public partial class RichEditor
                  (
                      "Find text",
                      "Specify what to find",
-                     ref _textToFind
+                     ref _textToFind!
                  )
              == DialogResult.OK )
         {

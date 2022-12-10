@@ -3,6 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable ForCanBeConvertedToForeach
 // ReSharper disable UnusedMember.Global
 
 /* DockPane.cs --
@@ -481,10 +482,9 @@ public partial class DockPane
             }
 
             var rectWindow = DisplayingRectangle;
-            int x, y, width;
-            x = rectWindow.X;
-            y = rectWindow.Y;
-            width = rectWindow.Width;
+            var x = rectWindow.X;
+            var y = rectWindow.Y;
+            var width = rectWindow.Width;
             var height = CaptionControl.MeasureHeight();
 
             return new Rectangle (x, y, width, height);
@@ -575,7 +575,7 @@ public partial class DockPane
             var width = rectWindow.Width;
             var height = TabStripControl.MeasureHeight();
 
-            var y = 0;
+            int y;
             if (DockPanel.DocumentTabStripLocation == DocumentTabStripLocation.Bottom)
             {
                 y = rectWindow.Height - height;
@@ -833,6 +833,7 @@ public partial class DockPane
         }
     }
 
+    /// <inheritdoc cref="ContainerControl.OnLayout"/>
     protected override void OnLayout (LayoutEventArgs e)
     {
         SetIsHidden (DisplayingContents.Count == 0);
@@ -1486,7 +1487,7 @@ public partial class DockPane
     public DockPane? DockTo
         (
             INestedPanesContainer container,
-            DockPane previousPane,
+            DockPane? previousPane,
             DockAlignment alignment,
             double proportion
         )
@@ -1551,8 +1552,13 @@ public partial class DockPane
         }
     }
 
-    private void InternalAddToDockList (INestedPanesContainer container, DockPane prevPane, DockAlignment alignment,
-        double proportion)
+    private void InternalAddToDockList
+        (
+            INestedPanesContainer container,
+            DockPane? prevPane,
+            DockAlignment alignment,
+            double proportion
+        )
     {
         if (container.DockState == DockState.Float != IsFloat)
         {
@@ -1684,8 +1690,6 @@ public partial class DockPane
     public void RestoreToPanel()
     {
         DockPanel.SuspendLayout (true);
-
-        var activeContent = DockPanel.ActiveContent;
 
         for (var i = DisplayingContents.Count - 1; i >= 0; i--)
         {

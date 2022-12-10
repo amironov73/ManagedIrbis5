@@ -436,14 +436,14 @@ public class DockContent
 
     #region IDockContent Members
 
-    void IDockContent.OnActivated (EventArgs e)
+    void IDockContent.OnActivated (EventArgs eventArgs)
     {
-        OnActivated (e);
+        OnActivated (eventArgs);
     }
 
-    void IDockContent.OnDeactivate (EventArgs e)
+    void IDockContent.OnDeactivate (EventArgs eventArgs)
     {
-        OnDeactivate (e);
+        OnDeactivate (eventArgs);
     }
 
     #endregion

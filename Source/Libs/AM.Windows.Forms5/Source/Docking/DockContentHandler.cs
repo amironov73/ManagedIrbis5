@@ -124,12 +124,12 @@ public class DockContentHandler
     /// <summary>
     ///
     /// </summary>
-    public IDockContent PreviousActive { get; internal set; }
+    public IDockContent? PreviousActive { get; internal set; }
 
     /// <summary>
     ///
     /// </summary>
-    public IDockContent NextActive { get; internal set; }
+    public IDockContent? NextActive { get; internal set; }
 
     private EventHandlerList Events { get; }
 

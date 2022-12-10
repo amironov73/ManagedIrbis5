@@ -3,8 +3,10 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable VirtualMemberCallInConstructor
 
-/* 
+/* DockWindow.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,48 +26,54 @@ namespace AM.Windows.Forms.Docking;
 /// Dock window base class.
 /// </summary>
 [ToolboxItem (false)]
-public partial class DockWindow : Panel, INestedPanesContainer, ISplitterHost
+public class DockWindow
+    : Panel, INestedPanesContainer, ISplitterHost
 {
-    private DockPanel m_dockPanel;
-    private DockState m_dockState;
-    private SplitterBase m_splitter;
-    private NestedPaneCollection m_nestedPanes;
+    private readonly SplitterBase? _splitter;
 
-    protected internal DockWindow (DockPanel dockPanel, DockState dockState)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="dockPanel"></param>
+    /// <param name="dockState"></param>
+    protected internal DockWindow
+        (
+            DockPanel dockPanel,
+            DockState dockState
+        )
     {
-        m_nestedPanes = new NestedPaneCollection (this);
-        m_dockPanel = dockPanel;
-        m_dockState = dockState;
+        NestedPanes = new NestedPaneCollection (this);
+        DockPanel = dockPanel;
+        DockState = dockState;
         Visible = false;
 
         SuspendLayout();
 
-        if (DockState == DockState.DockLeft || DockState == DockState.DockRight ||
-            DockState == DockState.DockTop || DockState == DockState.DockBottom)
+        if (DockState is DockState.DockLeft or DockState.DockRight or DockState.DockTop or DockState.DockBottom)
         {
-            m_splitter = DockPanel.Theme.Extender.WindowSplitterControlFactory.CreateSplitterControl (this);
-            Controls.Add (m_splitter);
+            _splitter = DockPanel.Theme.Extender.WindowSplitterControlFactory.CreateSplitterControl (this);
+            Controls.Add (_splitter);
         }
 
         if (DockState == DockState.DockLeft)
         {
             Dock = DockStyle.Left;
-            m_splitter.Dock = DockStyle.Right;
+            _splitter!.Dock = DockStyle.Right;
         }
         else if (DockState == DockState.DockRight)
         {
             Dock = DockStyle.Right;
-            m_splitter.Dock = DockStyle.Left;
+            _splitter!.Dock = DockStyle.Left;
         }
         else if (DockState == DockState.DockTop)
         {
             Dock = DockStyle.Top;
-            m_splitter.Dock = DockStyle.Bottom;
+            _splitter!.Dock = DockStyle.Bottom;
         }
         else if (DockState == DockState.DockBottom)
         {
             Dock = DockStyle.Bottom;
-            m_splitter.Dock = DockStyle.Top;
+            _splitter!.Dock = DockStyle.Top;
         }
         else if (DockState == DockState.Document)
         {
@@ -75,46 +83,49 @@ public partial class DockWindow : Panel, INestedPanesContainer, ISplitterHost
         ResumeLayout();
     }
 
-    public bool IsDockWindow
-    {
-        get { return true; }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    public bool IsDockWindow => true;
 
-    public VisibleNestedPaneCollection VisibleNestedPanes
-    {
-        get { return NestedPanes.VisibleNestedPanes; }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    public VisibleNestedPaneCollection VisibleNestedPanes => NestedPanes.VisibleNestedPanes;
 
-    public NestedPaneCollection NestedPanes
-    {
-        get { return m_nestedPanes; }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    public NestedPaneCollection NestedPanes { get; }
 
-    public DockPanel DockPanel
-    {
-        get { return m_dockPanel; }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    public DockPanel DockPanel { get; }
 
-    public DockState DockState
-    {
-        get { return m_dockState; }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    public DockState DockState { get; }
 
-    public bool IsFloat
-    {
-        get { return DockState == DockState.Float; }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    public bool IsFloat => DockState == DockState.Float;
 
-    internal DockPane DefaultPane
-    {
-        get { return VisibleNestedPanes.Count == 0 ? null : VisibleNestedPanes[0]; }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    internal DockPane? DefaultPane => VisibleNestedPanes.Count == 0 ? null : VisibleNestedPanes[0];
 
+    /// <summary>
+    ///
+    /// </summary>
     public virtual Rectangle DisplayingRectangle
     {
         get
         {
-            Rectangle rect = ClientRectangle;
+            var rect = ClientRectangle;
 
             // if DockWindow is document, exclude the border
             if (DockState == DockState.Document)
@@ -149,6 +160,7 @@ public partial class DockWindow : Panel, INestedPanesContainer, ISplitterHost
         }
     }
 
+    /// <inheritdoc cref="ScrollableControl.OnLayout"/>
     protected override void OnLayout (LayoutEventArgs levent)
     {
         VisibleNestedPanes.Refresh();
@@ -178,32 +190,21 @@ public partial class DockWindow : Panel, INestedPanesContainer, ISplitterHost
     {
     }
 
-    bool ISplitterDragSource.IsVertical
-    {
-        get { return (DockState == DockState.DockLeft || DockState == DockState.DockRight); }
-    }
+    bool ISplitterDragSource.IsVertical => DockState is DockState.DockLeft or DockState.DockRight;
 
     Rectangle ISplitterDragSource.DragLimitBounds
     {
         get
         {
-            Rectangle rectLimit = DockPanel.DockArea;
-            Point location;
-            if ((Control.ModifierKeys & Keys.Shift) == 0)
-            {
-                location = Location;
-            }
-            else
-            {
-                location = DockPanel.DockArea.Location;
-            }
+            var rectLimit = DockPanel.DockArea;
+            var location = (ModifierKeys & Keys.Shift) == 0 ? Location : DockPanel.DockArea.Location;
 
             if (((ISplitterDragSource)this).IsVertical)
             {
                 rectLimit.X += MeasurePane.MinSize;
                 rectLimit.Width -= 2 * MeasurePane.MinSize;
                 rectLimit.Y = location.Y;
-                if ((Control.ModifierKeys & Keys.Shift) == 0)
+                if ((ModifierKeys & Keys.Shift) == 0)
                 {
                     rectLimit.Height = Height;
                 }
@@ -213,7 +214,7 @@ public partial class DockWindow : Panel, INestedPanesContainer, ISplitterHost
                 rectLimit.Y += MeasurePane.MinSize;
                 rectLimit.Height -= 2 * MeasurePane.MinSize;
                 rectLimit.X = location.X;
-                if ((Control.ModifierKeys & Keys.Shift) == 0)
+                if ((ModifierKeys & Keys.Shift) == 0)
                 {
                     rectLimit.Width = Width;
                 }
@@ -225,12 +226,12 @@ public partial class DockWindow : Panel, INestedPanesContainer, ISplitterHost
 
     void ISplitterDragSource.MoveSplitter (int offset)
     {
-        if ((Control.ModifierKeys & Keys.Shift) != 0)
+        if ((ModifierKeys & Keys.Shift) != 0)
         {
             SendToBack();
         }
 
-        Rectangle rectDockArea = DockPanel.DockArea;
+        var rectDockArea = DockPanel.DockArea;
         if (DockState == DockState.DockLeft && rectDockArea.Width > 0)
         {
             if (DockPanel.DockLeftPortion > 1)
@@ -239,7 +240,7 @@ public partial class DockWindow : Panel, INestedPanesContainer, ISplitterHost
             }
             else
             {
-                DockPanel.DockLeftPortion += ((double)offset) / (double)rectDockArea.Width;
+                DockPanel.DockLeftPortion += offset / (double)rectDockArea.Width;
             }
         }
         else if (DockState == DockState.DockRight && rectDockArea.Width > 0)
@@ -250,7 +251,7 @@ public partial class DockWindow : Panel, INestedPanesContainer, ISplitterHost
             }
             else
             {
-                DockPanel.DockRightPortion -= ((double)offset) / (double)rectDockArea.Width;
+                DockPanel.DockRightPortion -= offset / (double)rectDockArea.Width;
             }
         }
         else if (DockState == DockState.DockBottom && rectDockArea.Height > 0)
@@ -261,7 +262,7 @@ public partial class DockWindow : Panel, INestedPanesContainer, ISplitterHost
             }
             else
             {
-                DockPanel.DockBottomPortion -= ((double)offset) / (double)rectDockArea.Height;
+                DockPanel.DockBottomPortion -= offset / (double)rectDockArea.Height;
             }
         }
         else if (DockState == DockState.DockTop && rectDockArea.Height > 0)
@@ -272,17 +273,14 @@ public partial class DockWindow : Panel, INestedPanesContainer, ISplitterHost
             }
             else
             {
-                DockPanel.DockTopPortion += ((double)offset) / (double)rectDockArea.Height;
+                DockPanel.DockTopPortion += offset / (double)rectDockArea.Height;
             }
         }
     }
 
     #region IDragSource Members
 
-    Control IDragSource.DragControl
-    {
-        get { return this; }
-    }
+    Control IDragSource.DragControl => this;
 
     #endregion
 

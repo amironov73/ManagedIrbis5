@@ -33,11 +33,12 @@ public class FoldedBlockStyle
     public FoldedBlockStyle
         (
             Brush foreBrush,
-            Brush backgroundBrush,
+            Brush? backgroundBrush,
             FontStyle fontStyle
         )
         : base (foreBrush, backgroundBrush, fontStyle)
     {
+        // пустое тело конструктора
     }
 
     #endregion
@@ -80,7 +81,7 @@ public class FoldedBlockStyle
             //draw '...'
             using (var f = new Font (range._textBox.Font, FontStyle))
             {
-                graphics.DrawString ("...", f, ForeBrush, range._textBox.LeftIndent, position.Y - 2);
+                graphics.DrawString ("...", f, ForeBrush!, range._textBox.LeftIndent, position.Y - 2);
             }
 
             //create marker

@@ -5,6 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable LocalizableElement
 
 /* FloatWindow.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -34,16 +35,20 @@ public class FloatWindow
     /// <summary>
     /// Конструктор.
     /// </summary>
-    internal protected FloatWindow (DockPanel dockPanel, DockPane pane)
+    protected internal FloatWindow (DockPanel dockPanel, DockPane pane)
     {
+        DockPanel = null!;
+
         InternalConstruct (dockPanel, pane, false, Rectangle.Empty);
     }
 
     /// <summary>
     /// Конструктор.
     /// </summary>
-    internal protected FloatWindow (DockPanel dockPanel, DockPane pane, Rectangle bounds)
+    protected internal FloatWindow (DockPanel dockPanel, DockPane pane, Rectangle bounds)
     {
+        DockPanel = null!;
+
         InternalConstruct (dockPanel, pane, true, bounds);
     }
 
@@ -83,7 +88,7 @@ public class FloatWindow
         DockPanel = dockPanel;
         Owner = DockPanel.FindForm();
         DockPanel.AddFloatWindow (this);
-        if (pane != null)
+        if (pane != null!)
         {
             pane.FloatWindow = this;
         }
@@ -101,12 +106,12 @@ public class FloatWindow
     {
         if (disposing)
         {
-            if (DockPanel != null)
+            if (DockPanel != null!)
             {
                 DockPanel.RemoveFloatWindow (this);
             }
 
-            DockPanel = null;
+            DockPanel = null!;
         }
 
         base.Dispose (disposing);
@@ -125,12 +130,12 @@ public class FloatWindow
     /// <summary>
     ///
     /// </summary>
-    public NestedPaneCollection NestedPanes { get; private set; }
+    public NestedPaneCollection? NestedPanes { get; private set; }
 
     /// <summary>
     ///
     /// </summary>
-    public VisibleNestedPaneCollection VisibleNestedPanes => NestedPanes.VisibleNestedPanes;
+    public VisibleNestedPaneCollection VisibleNestedPanes => NestedPanes!.VisibleNestedPanes;
 
     /// <summary>
     ///
@@ -149,9 +154,9 @@ public class FloatWindow
 
     internal bool IsDockStateValid (DockState dockState)
     {
-        foreach (DockPane pane in NestedPanes)
+        foreach (var pane in NestedPanes!)
         {
-            foreach (IDockContent content in pane.Contents)
+            foreach (var content in pane.Contents)
             {
                 if (!DockHelper.IsDockStateValid (dockState, content.DockHandler.DockAreas))
                 {
@@ -170,9 +175,9 @@ public class FloatWindow
         base.OnActivated (e);
 
         // Propagate the Activated event to the visible panes content objects
-        foreach (DockPane pane in VisibleNestedPanes)
+        foreach (var pane in VisibleNestedPanes)
         {
-            foreach (IDockContent content in pane.Contents)
+            foreach (var content in pane.Contents)
             {
                 content.OnActivated (e);
             }
@@ -185,9 +190,9 @@ public class FloatWindow
         base.OnDeactivate (e);
 
         // Propagate the Deactivate event to the visible panes content objects
-        foreach (DockPane pane in VisibleNestedPanes)
+        foreach (var pane in VisibleNestedPanes)
         {
-            foreach (IDockContent content in pane.Contents)
+            foreach (var content in pane.Contents)
             {
                 content.OnDeactivate (e);
             }
@@ -224,9 +229,10 @@ public class FloatWindow
         }
     }
 
+    /// <inheritdoc cref="Form.SetBoundsCore"/>
     protected override void SetBoundsCore (int x, int y, int width, int height, BoundsSpecified specified)
     {
-        Rectangle rectWorkArea = SystemInformation.VirtualScreen;
+        var rectWorkArea = SystemInformation.VirtualScreen;
 
         if (y + height > rectWorkArea.Bottom)
         {
@@ -253,7 +259,7 @@ public class FloatWindow
                     return;
                 }
 
-                uint result = Win32Helper.IsRunningOnMono
+                var result = Win32Helper.IsRunningOnMono
                     ? 0
                     : Win32.NativeMethods.SendMessage (this.Handle, (int)Win32.Msgs.WM_NCHITTEST, 0,
                         (uint)m.LParam);
@@ -271,14 +277,14 @@ public class FloatWindow
             }
             case (int)Win32.Msgs.WM_NCRBUTTONDOWN:
             {
-                uint result = Win32Helper.IsRunningOnMono
+                var result = Win32Helper.IsRunningOnMono
                     ? Win32Helper.HitTestCaption (this)
                     : Win32.NativeMethods.SendMessage (this.Handle, (int)Win32.Msgs.WM_NCHITTEST, 0,
                         (uint)m.LParam);
                 if (result == 2) // HITTEST_CAPTION
                 {
-                    DockPane theOnlyPane = (VisibleNestedPanes.Count == 1) ? VisibleNestedPanes[0] : null;
-                    if (theOnlyPane != null && theOnlyPane.ActiveContent != null)
+                    var theOnlyPane = (VisibleNestedPanes.Count == 1) ? VisibleNestedPanes[0] : null;
+                    if (theOnlyPane is { ActiveContent: { } })
                     {
                         theOnlyPane.ShowTabPageContextMenu (this, PointToClient (Control.MousePosition));
                         return;
@@ -289,18 +295,18 @@ public class FloatWindow
                 return;
             }
             case (int)Win32.Msgs.WM_CLOSE:
-                if (NestedPanes.Count == 0)
+                if (NestedPanes!.Count == 0)
                 {
                     base.WndProc (ref m);
                     return;
                 }
 
-                for (int i = NestedPanes.Count - 1; i >= 0; i--)
+                for (var i = NestedPanes.Count - 1; i >= 0; i--)
                 {
-                    DockContentCollection contents = NestedPanes[i].Contents;
-                    for (int j = contents.Count - 1; j >= 0; j--)
+                    var contents = NestedPanes[i].Contents;
+                    for (var j = contents.Count - 1; j >= 0; j--)
                     {
-                        IDockContent content = contents[j];
+                        var content = contents[j];
                         if (content.DockHandler.DockState != DockState.Float)
                         {
                             continue;
@@ -325,7 +331,7 @@ public class FloatWindow
                 return;
             case (int)Win32.Msgs.WM_NCLBUTTONDBLCLK:
             {
-                uint result = !DoubleClickTitleBarToDock || Win32Helper.IsRunningOnMono
+                var result = !DoubleClickTitleBarToDock || Win32Helper.IsRunningOnMono
                     ? Win32Helper.HitTestCaption (this)
                     : Win32.NativeMethods.SendMessage (this.Handle, (int)Win32.Msgs.WM_NCHITTEST, 0,
                         (uint)m.LParam);
@@ -339,7 +345,7 @@ public class FloatWindow
                 DockPanel.SuspendLayout (true);
 
                 // Restore to panel
-                foreach (DockPane pane in NestedPanes)
+                foreach (var pane in NestedPanes!)
                 {
                     if (pane.DockState != DockState.Float)
                     {
@@ -354,7 +360,7 @@ public class FloatWindow
                 return;
             }
             case WM_CHECKDISPOSE:
-                if (NestedPanes.Count == 0)
+                if (NestedPanes!.Count == 0)
                 {
                     Dispose();
                 }
@@ -378,18 +384,18 @@ public class FloatWindow
             return;
         }
 
-        for (int i = VisibleNestedPanes.Count - 1; i >= 0; i--)
+        for (var i = VisibleNestedPanes.Count - 1; i >= 0; i--)
         {
-            DockContentCollection contents = VisibleNestedPanes[i].Contents;
-            for (int j = contents.Count - 1; j >= 0; j--)
+            var contents = VisibleNestedPanes[i].Contents;
+            for (var j = contents.Count - 1; j >= 0; j--)
             {
-                IDockContent content = contents[j];
+                var content = contents[j];
                 if (content.DockHandler.DockState != DockState.Float)
                 {
                     continue;
                 }
 
-                if (content.DockHandler.CloseButton && content.DockHandler.CloseButtonVisible)
+                if (content.DockHandler is { CloseButton: true, CloseButtonVisible: true })
                 {
                     ControlBox = true;
                     return;
@@ -405,23 +411,23 @@ public class FloatWindow
         }
     }
 
-    public virtual Rectangle DisplayingRectangle
-    {
-        get { return ClientRectangle; }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    public virtual Rectangle DisplayingRectangle => ClientRectangle;
 
     internal void TestDrop (IDockDragSource dragSource, DockOutlineBase dockOutline)
     {
         if (VisibleNestedPanes.Count == 1)
         {
-            DockPane pane = VisibleNestedPanes[0];
+            var pane = VisibleNestedPanes[0];
             if (!dragSource.CanDockTo (pane))
             {
                 return;
             }
 
-            Point ptMouse = Control.MousePosition;
-            uint lParam = Win32Helper.MakeLong (ptMouse.X, ptMouse.Y);
+            var ptMouse = Control.MousePosition;
+            var lParam = Win32Helper.MakeLong (ptMouse.X, ptMouse.Y);
             if (!Win32Helper.IsRunningOnMono)
             {
                 if (Win32.NativeMethods.SendMessage (Handle, (int)Win32.Msgs.WM_NCHITTEST, 0, lParam) ==
@@ -437,10 +443,7 @@ public class FloatWindow
 
     #region IDragSource Members
 
-    Control IDragSource.DragControl
-    {
-        get { return this; }
-    }
+    Control IDragSource.DragControl => this;
 
     #endregion
 
@@ -485,21 +488,23 @@ public class FloatWindow
         Win32.NativeMethods.SendMessage (this.Handle, (int)Win32.Msgs.WM_NCPAINT, 1, 0);
     }
 
+    /// <inheritdoc cref="IDockDragSource.FloatAt"/>
     public void FloatAt (Rectangle floatWindowBounds)
     {
         Bounds = floatWindowBounds;
     }
 
+    /// <inheritdoc cref="IDockDragSource.DockTo(AM.Windows.Forms.Docking.DockPane,System.Windows.Forms.DockStyle,int)"/>
     public void DockTo (DockPane pane, DockStyle dockStyle, int contentIndex)
     {
         if (dockStyle == DockStyle.Fill)
         {
-            for (int i = NestedPanes.Count - 1; i >= 0; i--)
+            for (var i = NestedPanes!.Count - 1; i >= 0; i--)
             {
-                DockPane paneFrom = NestedPanes[i];
-                for (int j = paneFrom.Contents.Count - 1; j >= 0; j--)
+                var paneFrom = NestedPanes[i];
+                for (var j = paneFrom.Contents.Count - 1; j >= 0; j--)
                 {
-                    IDockContent c = paneFrom.Contents[j];
+                    var c = paneFrom.Contents[j];
                     c.DockHandler.Pane = pane;
                     if (contentIndex != -1)
                     {
@@ -512,7 +517,7 @@ public class FloatWindow
         }
         else
         {
-            DockAlignment alignment = DockAlignment.Left;
+            var alignment = DockAlignment.Left;
             if (dockStyle == DockStyle.Left)
             {
                 alignment = DockAlignment.Left;
@@ -530,18 +535,24 @@ public class FloatWindow
                 alignment = DockAlignment.Bottom;
             }
 
-            MergeNestedPanes (VisibleNestedPanes, pane.NestedPanesContainer.NestedPanes, pane, alignment, 0.5);
+            MergeNestedPanes (VisibleNestedPanes, pane.NestedPanesContainer!.NestedPanes!, pane, alignment, 0.5);
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="panel"></param>
+    /// <param name="dockStyle"></param>
+    /// <exception cref="ArgumentException"></exception>
     public void DockTo (DockPanel panel, DockStyle dockStyle)
     {
         if (panel != DockPanel)
         {
-            throw new ArgumentException (Strings.IDockDragSource_DockTo_InvalidPanel, "panel");
+            throw new ArgumentException (Strings.IDockDragSource_DockTo_InvalidPanel, nameof (panel));
         }
 
-        NestedPaneCollection nestedPanesTo = null;
+        NestedPaneCollection? nestedPanesTo = null;
 
         if (dockStyle == DockStyle.Top)
         {
@@ -564,14 +575,14 @@ public class FloatWindow
             nestedPanesTo = DockPanel.DockWindows[DockState.Document].NestedPanes;
         }
 
-        DockPane prevPane = null;
-        for (int i = nestedPanesTo.Count - 1; i >= 0; i--)
+        DockPane? prevPane = null;
+        for (var i = nestedPanesTo!.Count - 1; i >= 0; i--)
             if (nestedPanesTo[i] != VisibleNestedPanes[0])
             {
                 prevPane = nestedPanesTo[i];
             }
 
-        MergeNestedPanes (VisibleNestedPanes, nestedPanesTo, prevPane, DockAlignment.Left, 0.5);
+        MergeNestedPanes (VisibleNestedPanes, nestedPanesTo, prevPane!, DockAlignment.Left, 0.5);
     }
 
     private static void MergeNestedPanes (VisibleNestedPaneCollection nestedPanesFrom,
@@ -582,30 +593,30 @@ public class FloatWindow
             return;
         }
 
-        int count = nestedPanesFrom.Count;
-        DockPane[] panes = new DockPane[count];
-        DockPane[] prevPanes = new DockPane[count];
-        DockAlignment[] alignments = new DockAlignment[count];
-        double[] proportions = new double[count];
+        var count = nestedPanesFrom.Count;
+        var panes = new DockPane[count];
+        var prevPanes = new DockPane[count];
+        var alignments = new DockAlignment[count];
+        var proportions = new double[count];
 
-        for (int i = 0; i < count; i++)
+        for (var i = 0; i < count; i++)
         {
             panes[i] = nestedPanesFrom[i];
-            prevPanes[i] = nestedPanesFrom[i].NestedDockingStatus.PreviousPane;
+            prevPanes[i] = nestedPanesFrom[i].NestedDockingStatus.PreviousPane!;
             alignments[i] = nestedPanesFrom[i].NestedDockingStatus.Alignment;
             proportions[i] = nestedPanesFrom[i].NestedDockingStatus.Proportion;
         }
 
-        DockPane pane = panes[0].DockTo (nestedPanesTo.Container, prevPane, alignment, proportion);
+        var pane = panes[0].DockTo (nestedPanesTo.Container, prevPane, alignment, proportion);
         panes[0].DockState = nestedPanesTo.DockState;
 
-        for (int i = 1; i < count; i++)
+        for (var i = 1; i < count; i++)
         {
-            for (int j = i; j < count; j++)
+            for (var j = i; j < count; j++)
             {
                 if (prevPanes[j] == panes[i - 1])
                 {
-                    prevPanes[j] = pane;
+                    prevPanes[j] = pane!;
                 }
             }
 
