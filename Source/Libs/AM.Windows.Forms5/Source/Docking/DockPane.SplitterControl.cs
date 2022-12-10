@@ -159,11 +159,11 @@ partial class DockPane
         #endregion
     }
 
-    private SplitterControlBase m_splitter;
+    private SplitterControlBase _splitter;
 
     private SplitterControlBase Splitter
     {
-        get { return m_splitter; }
+        get { return _splitter; }
     }
 
     internal Rectangle SplitterBounds

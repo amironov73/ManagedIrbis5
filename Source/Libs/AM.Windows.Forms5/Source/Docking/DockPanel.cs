@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
 
 /* DockPanel.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -27,7 +28,7 @@ using System.Collections.Generic;
 // #2 Use "resfinder" in the toolbox bitmap attribute instead of the control name.
 // #3 use the "<default namespace>.<resourcename>" string to locate the resource.
 // See: http://www.bobpowell.net/toolboxbitmap.htm
-internal class resfinder
+internal class ResFinder
 {
 }
 
@@ -51,7 +52,7 @@ namespace AM.Windows.Forms.Docking
     /// </summary>
     [LocalizedDescription ("DockPanel_Description")]
     [Designer ("System.Windows.Forms.Design.ControlDesigner, System.Design")]
-    [ToolboxBitmap (typeof (resfinder), "WeifenLuo.WinFormsUI.Docking.DockPanel.bmp")]
+    [ToolboxBitmap (typeof (ResFinder), "WeifenLuo.WinFormsUI.Docking.DockPanel.bmp")]
     [DefaultProperty ("DocumentStyle")]
     [DefaultEvent ("ActiveContentChanged")]
     public partial class DockPanel : Panel
@@ -69,6 +70,8 @@ namespace AM.Windows.Forms.Docking
         /// </summary>
         public DockPanel()
         {
+            m_dockWindows = null!;
+
             ShowAutoHideContentOnHover = true;
 
             m_focusManager = new FocusManagerImpl (this);
@@ -120,7 +123,7 @@ namespace AM.Windows.Forms.Docking
                       "For Backgroundimages: Set your prefered Image, then set the DockBackColor and the BackColor to the same Color (Control).")]
         public Color DockBackColor
         {
-            get { return !m_BackColor.IsEmpty ? m_BackColor : base.BackColor; }
+            get => !m_BackColor.IsEmpty ? m_BackColor : base.BackColor;
 
             set
             {
@@ -195,11 +198,11 @@ namespace AM.Windows.Forms.Docking
             if (!m_disposed && disposing)
             {
                 m_focusManager.Dispose();
-                if (m_mdiClientController != null)
+                if (m_mdiClientController != null!)
                 {
-                    m_mdiClientController.HandleAssigned -= new EventHandler (MdiClientHandleAssigned);
-                    m_mdiClientController.MdiChildActivate -= new EventHandler (ParentFormMdiChildActivate);
-                    m_mdiClientController.Layout -= new LayoutEventHandler (MdiClient_Layout);
+                    m_mdiClientController.HandleAssigned -= MdiClientHandleAssigned;
+                    m_mdiClientController.MdiChildActivate -= ParentFormMdiChildActivate;
+                    m_mdiClientController.Layout -= MdiClient_Layout;
                     m_mdiClientController.Dispose();
                 }
 
@@ -226,6 +229,10 @@ namespace AM.Windows.Forms.Docking
 
         private bool m_allowEndUserDocking = !Win32Helper.IsRunningOnMono;
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <exception cref="InvalidOperationException"></exception>
         [LocalizedCategory ("Category_Docking")]
         [LocalizedDescription ("DockPanel_AllowEndUserDocking_Description")]
         [DefaultValue (true)]
@@ -254,6 +261,10 @@ namespace AM.Windows.Forms.Docking
 
         private bool m_allowEndUserNestedDocking = !Win32Helper.IsRunningOnMono;
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <exception cref="InvalidOperationException"></exception>
         [LocalizedCategory ("Category_Docking")]
         [LocalizedDescription ("DockPanel_AllowEndUserNestedDocking_Description")]
         [DefaultValue (true)]
@@ -281,27 +292,27 @@ namespace AM.Windows.Forms.Docking
             }
         }
 
-        private DockContentCollection m_contents = new DockContentCollection();
+        private readonly DockContentCollection _contents = new ();
 
+        /// <summary>
+        ///
+        /// </summary>
         [Browsable (false)]
-        public DockContentCollection Contents
-        {
-            get { return m_contents; }
-        }
+        public DockContentCollection Contents => _contents;
 
-        internal DockContent DummyContent
-        {
-            get { return m_dummyContent; }
-        }
+        internal DockContent DummyContent => m_dummyContent;
 
-        private bool m_rightToLeftLayout = false;
+        private bool m_rightToLeftLayout;
 
+        /// <summary>
+        ///
+        /// </summary>
         [DefaultValue (false)]
         [LocalizedCategory ("Appearance")]
         [LocalizedDescription ("DockPanel_RightToLeftLayout_Description")]
         public bool RightToLeftLayout
         {
-            get { return m_rightToLeftLayout; }
+            get => m_rightToLeftLayout;
 
             set
             {
@@ -318,6 +329,10 @@ namespace AM.Windows.Forms.Docking
             }
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="e"></param>
         protected override void OnRightToLeftChanged (EventArgs e)
         {
             base.OnRightToLeftChanged (e);
@@ -327,14 +342,17 @@ namespace AM.Windows.Forms.Docking
             }
         }
 
-        private bool m_showDocumentIcon = false;
+        private bool m_showDocumentIcon;
 
+        /// <summary>
+        ///
+        /// </summary>
         [DefaultValue (false)]
         [LocalizedCategory ("Category_Docking")]
         [LocalizedDescription ("DockPanel_ShowDocumentIcon_Description")]
         public bool ShowDocumentIcon
         {
-            get { return m_showDocumentIcon; }
+            get => m_showDocumentIcon;
             set
             {
                 if (m_showDocumentIcon == value)
@@ -347,44 +365,47 @@ namespace AM.Windows.Forms.Docking
             }
         }
 
+        /// <summary>
+        ///
+        /// </summary>
         [DefaultValue (DocumentTabStripLocation.Top)]
         [LocalizedCategory ("Category_Docking")]
         [LocalizedDescription ("DockPanel_DocumentTabStripLocation")]
         public DocumentTabStripLocation DocumentTabStripLocation { get; set; } = DocumentTabStripLocation.Top;
 
+        /// <summary>
+        ///
+        /// </summary>
         [Browsable (false)]
         [Obsolete ("Use Theme.Extender instead.")]
-        public DockPanelExtender Extender
-        {
-            get { return null; }
-        }
+        public DockPanelExtender? Extender => null;
 
+        /// <summary>
+        ///
+        /// </summary>
         [Browsable (false)]
         [Obsolete ("Use Theme.Extender instead.")]
-        public DockPanelExtender.IDockPaneFactory DockPaneFactory
-        {
-            get { return null; }
-        }
+        public DockPanelExtender.IDockPaneFactory? DockPaneFactory => null;
 
+        /// <summary>
+        ///
+        /// </summary>
         [Browsable (false)]
         [Obsolete ("Use Theme.Extender instead.")]
-        public DockPanelExtender.IFloatWindowFactory FloatWindowFactory
-        {
-            get { return null; }
-        }
+        public DockPanelExtender.IFloatWindowFactory? FloatWindowFactory => null;
 
+        /// <summary>
+        ///
+        /// </summary>
         [Browsable (false)]
         [Obsolete ("Use Theme.Extender instead.")]
-        public DockPanelExtender.IDockWindowFactory DockWindowFactory
-        {
-            get { return null; }
-        }
+        public DockPanelExtender.IDockWindowFactory DockWindowFactory => null!;
 
+        /// <summary>
+        ///
+        /// </summary>
         [Browsable (false)]
-        public DockPaneCollection Panes
-        {
-            get { return m_panes; }
-        }
+        public DockPaneCollection Panes => m_panes;
 
         /// <summary>
         /// Dock area.
@@ -398,15 +419,10 @@ namespace AM.Windows.Forms.Docking
         ///
         /// Therefore, all dock contents mainly fall into this area (except auto hide window, which might slightly move beyond this area).
         /// </remarks>
-        public Rectangle DockArea
-        {
-            get
-            {
-                return new Rectangle (DockPadding.Left, DockPadding.Top,
-                    ClientRectangle.Width - DockPadding.Left - DockPadding.Right,
-                    ClientRectangle.Height - DockPadding.Top - DockPadding.Bottom);
-            }
-        }
+        public Rectangle DockArea =>
+            new (DockPadding.Left, DockPadding.Top,
+                ClientRectangle.Width - DockPadding.Left - DockPadding.Right,
+                ClientRectangle.Height - DockPadding.Top - DockPadding.Bottom);
 
         private double m_dockBottomPortion = 0.25;
 
@@ -415,7 +431,7 @@ namespace AM.Windows.Forms.Docking
         [DefaultValue (0.25)]
         public double DockBottomPortion
         {
-            get { return m_dockBottomPortion; }
+            get => m_dockBottomPortion;
 
             set
             {
@@ -450,7 +466,7 @@ namespace AM.Windows.Forms.Docking
         [DefaultValue (0.25)]
         public double DockLeftPortion
         {
-            get { return m_dockLeftPortion; }
+            get => m_dockLeftPortion;
 
             set
             {
@@ -485,7 +501,7 @@ namespace AM.Windows.Forms.Docking
         [DefaultValue (0.25)]
         public double DockRightPortion
         {
-            get { return m_dockRightPortion; }
+            get => m_dockRightPortion;
 
             set
             {
@@ -520,7 +536,7 @@ namespace AM.Windows.Forms.Docking
         [DefaultValue (0.25)]
         public double DockTopPortion
         {
-            get { return m_dockTopPortion; }
+            get => m_dockTopPortion;
 
             set
             {
@@ -549,10 +565,7 @@ namespace AM.Windows.Forms.Docking
         }
 
         [Browsable (false)]
-        public DockWindowCollection DockWindows
-        {
-            get { return m_dockWindows; }
-        }
+        public DockWindowCollection DockWindows => m_dockWindows;
 
         public void UpdateDockWindowZOrder (DockStyle dockStyle, bool fullPanelEdge)
         {
@@ -602,6 +615,9 @@ namespace AM.Windows.Forms.Docking
             }
         }
 
+        /// <summary>
+        ///
+        /// </summary>
         [Browsable (false)]
         public int DocumentsCount
         {
@@ -631,6 +647,9 @@ namespace AM.Windows.Forms.Docking
             return documents;
         }
 
+        /// <summary>
+        ///
+        /// </summary>
         [Browsable (false)]
         public IEnumerable<IDockContent> Documents
         {
@@ -646,20 +665,20 @@ namespace AM.Windows.Forms.Docking
             }
         }
 
-        private Control DummyControl
-        {
-            get { return m_dummyControl; }
-        }
+        private Control DummyControl => m_dummyControl;
 
+        /// <summary>
+        ///
+        /// </summary>
         [Browsable (false)]
-        public FloatWindowCollection FloatWindows
-        {
-            get { return m_floatWindows; }
-        }
+        public FloatWindowCollection FloatWindows => m_floatWindows;
 
+        /// <summary>
+        ///
+        /// </summary>
         [Category ("Layout")]
         [LocalizedDescription ("DockPanel_DefaultFloatWindowSize_Description")]
-        public Size DefaultFloatWindowSize { get; set; } = new Size (300, 300);
+        public Size DefaultFloatWindowSize { get; set; } = new (300, 300);
 
         private bool ShouldSerializeDefaultFloatWindowSize()
         {
@@ -673,12 +692,16 @@ namespace AM.Windows.Forms.Docking
 
         private DocumentStyle m_documentStyle = DocumentStyle.DockingWindow;
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <exception cref="InvalidEnumArgumentException"></exception>
         [LocalizedCategory ("Category_Docking")]
         [LocalizedDescription ("DockPanel_DocumentStyle_Description")]
         [DefaultValue (DocumentStyle.DockingWindow)]
         public DocumentStyle DocumentStyle
         {
-            get { return m_documentStyle; }
+            get => m_documentStyle;
             set
             {
                 if (value == m_documentStyle)
@@ -718,6 +741,9 @@ namespace AM.Windows.Forms.Docking
             }
         }
 
+        /// <summary>
+        ///
+        /// </summary>
         [LocalizedCategory ("Category_Performance")]
         [LocalizedDescription ("DockPanel_SupportDeeplyNestedContent_Description")]
         [DefaultValue (false)]
@@ -795,6 +821,10 @@ namespace AM.Windows.Forms.Docking
             return 0;
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="levent"></param>
         protected override void OnLayout (LayoutEventArgs levent)
         {
             SuspendLayout (true);
@@ -814,8 +844,8 @@ namespace AM.Windows.Forms.Docking
 
             if (ReferenceEquals (documentDockWindow.Parent, AutoHideWindow.Parent))
             {
-                AutoHideWindow.Parent.Controls.SetChildIndex (AutoHideWindow, 0);
-                documentDockWindow.Parent.Controls.SetChildIndex (documentDockWindow, 1);
+                AutoHideWindow.Parent!.Controls.SetChildIndex (AutoHideWindow, 0);
+                documentDockWindow.Parent!.Controls.SetChildIndex (documentDockWindow, 1);
             }
             else
             {
@@ -843,6 +873,7 @@ namespace AM.Windows.Forms.Docking
             return AutoHideStripControl.GetTabStripRectangle (dockState);
         }
 
+        /// <inheritdoc cref="Control.OnPaint"/>
         protected override void OnPaint (PaintEventArgs e)
         {
             base.OnPaint (e);
@@ -953,7 +984,7 @@ namespace AM.Windows.Forms.Docking
                 return;
             }
 
-            if (ParentForm == null)
+            if (ParentForm == null!)
             {
                 return;
             }
@@ -1002,6 +1033,10 @@ namespace AM.Windows.Forms.Docking
             }
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="allWindows"></param>
         public void SuspendLayout (bool allWindows)
         {
             FocusManager.SuspendFocusTracking();
@@ -1012,6 +1047,11 @@ namespace AM.Windows.Forms.Docking
             }
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="performLayout"></param>
+        /// <param name="allWindows"></param>
         public void ResumeLayout (bool performLayout, bool allWindows)
         {
             FocusManager.ResumeFocusTracking();
@@ -1031,7 +1071,7 @@ namespace AM.Windows.Forms.Docking
                     throw new InvalidOperationException (Strings.DockPanel_ParentForm_Invalid);
                 }
 
-                return GetMdiClientController().ParentForm;
+                return GetMdiClientController().ParentForm!;
             }
         }
 
@@ -1049,26 +1089,25 @@ namespace AM.Windows.Forms.Docking
 
             return (MdiClientExists);
         }
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="e"></param>
 
         protected override void OnParentChanged (EventArgs e)
         {
             SetAutoHideWindowParent();
-            GetMdiClientController().ParentForm = (this.Parent as Form);
+            GetMdiClientController().ParentForm = (Parent as Form);
             base.OnParentChanged (e);
         }
 
         private void SetAutoHideWindowParent()
         {
-            Control parent;
-            if (DocumentStyle == DocumentStyle.DockingMdi ||
-                DocumentStyle == DocumentStyle.SystemMdi)
-            {
-                parent = this.Parent;
-            }
-            else
-            {
-                parent = this;
-            }
+            Control? parent;
+            parent = DocumentStyle == DocumentStyle.DockingMdi ||
+                     DocumentStyle == DocumentStyle.SystemMdi
+                ? Parent
+                : this;
 
             if (AutoHideWindow.Parent != parent)
             {
@@ -1077,6 +1116,7 @@ namespace AM.Windows.Forms.Docking
             }
         }
 
+        /// <inheritdoc cref="ScrollableControl.OnVisibleChanged"/>
         protected override void OnVisibleChanged (EventArgs e)
         {
             base.OnVisibleChanged (e);
@@ -1101,6 +1141,9 @@ namespace AM.Windows.Forms.Docking
             }
         }
 
+        /// <summary>
+        ///
+        /// </summary>
         public Rectangle DocumentWindowBounds
         {
             get
@@ -1132,7 +1175,7 @@ namespace AM.Windows.Forms.Docking
             }
         }
 
-        private PaintEventHandler m_dummyControlPaintEventHandler = null;
+        private PaintEventHandler? m_dummyControlPaintEventHandler;
 
         private void InvalidateWindowRegion()
         {
@@ -1141,16 +1184,16 @@ namespace AM.Windows.Forms.Docking
                 return;
             }
 
-            if (m_dummyControlPaintEventHandler == null)
+            if (m_dummyControlPaintEventHandler == null!)
             {
-                m_dummyControlPaintEventHandler = new PaintEventHandler (DummyControl_Paint);
+                m_dummyControlPaintEventHandler = DummyControl_Paint;
             }
 
             DummyControl.Paint += m_dummyControlPaintEventHandler;
             DummyControl.Invalidate();
         }
 
-        void DummyControl_Paint (object sender, PaintEventArgs e)
+        void DummyControl_Paint (object? sender, PaintEventArgs eventArgs)
         {
             DummyControl.Paint -= m_dummyControlPaintEventHandler;
             UpdateWindowRegion();
@@ -1158,16 +1201,16 @@ namespace AM.Windows.Forms.Docking
 
         private void UpdateWindowRegion()
         {
-            if (this.DocumentStyle == DocumentStyle.DockingMdi)
+            if (DocumentStyle == DocumentStyle.DockingMdi)
             {
                 UpdateWindowRegion_ClipContent();
             }
-            else if (this.DocumentStyle == DocumentStyle.DockingSdi ||
-                     this.DocumentStyle == DocumentStyle.DockingWindow)
+            else if (DocumentStyle == DocumentStyle.DockingSdi ||
+                     DocumentStyle == DocumentStyle.DockingWindow)
             {
                 UpdateWindowRegion_FullDocumentArea();
             }
-            else if (this.DocumentStyle == DocumentStyle.SystemMdi)
+            else if (DocumentStyle == DocumentStyle.SystemMdi)
             {
                 UpdateWindowRegion_EmptyDocumentArea();
             }
@@ -1187,7 +1230,7 @@ namespace AM.Windows.Forms.Docking
         private void UpdateWindowRegion_ClipContent()
         {
             var count = 0;
-            foreach (var pane in this.Panes)
+            foreach (var pane in Panes)
             {
                 if (!pane.Visible || pane.DockState != DockState.Document)
                 {
@@ -1205,7 +1248,7 @@ namespace AM.Windows.Forms.Docking
 
             var rects = new Rectangle[count];
             var i = 0;
-            foreach (var pane in this.Panes)
+            foreach (var pane in Panes)
             {
                 if (!pane.Visible || pane.DockState != DockState.Document)
                 {
@@ -1219,25 +1262,28 @@ namespace AM.Windows.Forms.Docking
             SetRegion (rects);
         }
 
-        private Rectangle[] m_clipRects = null;
+        private Rectangle[]? _clipRects;
 
-        private void SetRegion (Rectangle[] clipRects)
+        private void SetRegion
+            (
+                Rectangle[]? clipRects
+            )
         {
             if (!IsClipRectsChanged (clipRects))
             {
                 return;
             }
 
-            m_clipRects = clipRects;
+            _clipRects = clipRects;
 
-            if (m_clipRects == null || m_clipRects.GetLength (0) == 0)
+            if (_clipRects == null || _clipRects.GetLength (0) == 0)
             {
                 Region = null;
             }
             else
             {
-                var region = new Region (new Rectangle (0, 0, this.Width, this.Height));
-                foreach (var rect in m_clipRects)
+                var region = new Region (new Rectangle (0, 0, Width, Height));
+                foreach (var rect in _clipRects)
                 {
                     region.Exclude (rect);
                 }
@@ -1251,21 +1297,21 @@ namespace AM.Windows.Forms.Docking
             }
         }
 
-        private bool IsClipRectsChanged (Rectangle[] clipRects)
+        private bool IsClipRectsChanged (Rectangle[]? clipRects)
         {
-            if (clipRects == null && m_clipRects == null)
+            if (clipRects == null && _clipRects == null)
             {
                 return false;
             }
-            else if ((clipRects == null) != (m_clipRects == null))
+            else if ((clipRects == null) != (_clipRects == null))
             {
                 return true;
             }
 
-            foreach (var rect in clipRects)
+            foreach (var rect in clipRects!)
             {
                 var matched = false;
-                foreach (var rect2 in m_clipRects)
+                foreach (var rect2 in _clipRects!)
                 {
                     if (rect == rect2)
                     {
@@ -1280,7 +1326,7 @@ namespace AM.Windows.Forms.Docking
                 }
             }
 
-            foreach (var rect2 in m_clipRects)
+            foreach (var rect2 in _clipRects!)
             {
                 var matched = false;
                 foreach (var rect in clipRects)
@@ -1301,14 +1347,17 @@ namespace AM.Windows.Forms.Docking
             return false;
         }
 
-        private static readonly object ActiveAutoHideContentChangedEvent = new object();
+        private static readonly object ActiveAutoHideContentChangedEvent = new ();
 
+        /// <summary>
+        ///
+        /// </summary>
         [LocalizedCategory ("Category_DockingNotification")]
         [LocalizedDescription ("DockPanel_ActiveAutoHideContentChanged_Description")]
         public event EventHandler ActiveAutoHideContentChanged
         {
-            add { Events.AddHandler (ActiveAutoHideContentChangedEvent, value); }
-            remove { Events.RemoveHandler (ActiveAutoHideContentChangedEvent, value); }
+            add => Events.AddHandler (ActiveAutoHideContentChangedEvent, value);
+            remove => Events.RemoveHandler (ActiveAutoHideContentChangedEvent, value);
         }
 
         /// <summary>
@@ -1316,7 +1365,7 @@ namespace AM.Windows.Forms.Docking
         /// </summary>
         protected virtual void OnActiveAutoHideContentChanged (EventArgs e)
         {
-            var handler = (EventHandler)Events[ActiveAutoHideContentChangedEvent];
+            var handler = (EventHandler?) Events[ActiveAutoHideContentChangedEvent];
             if (handler != null)
             {
                 handler (this, e);
@@ -1333,42 +1382,58 @@ namespace AM.Windows.Forms.Docking
         }
 
 
-        private static readonly object ContentAddedEvent = new object();
+        private static readonly object ContentAddedEvent = new ();
 
+        /// <summary>
+        ///
+        /// </summary>
         [LocalizedCategory ("Category_DockingNotification")]
         [LocalizedDescription ("DockPanel_ContentAdded_Description")]
         public event EventHandler<DockContentEventArgs> ContentAdded
         {
-            add { Events.AddHandler (ContentAddedEvent, value); }
-            remove { Events.RemoveHandler (ContentAddedEvent, value); }
+            add => Events.AddHandler (ContentAddedEvent, value);
+            remove => Events.RemoveHandler (ContentAddedEvent, value);
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="e"></param>
         protected virtual void OnContentAdded (DockContentEventArgs e)
         {
-            var handler = (EventHandler<DockContentEventArgs>)Events[ContentAddedEvent];
+            var handler = (EventHandler<DockContentEventArgs>?) Events[ContentAddedEvent];
             if (handler != null)
             {
                 handler (this, e);
             }
         }
 
-        private static readonly object ContentRemovedEvent = new object();
+        private static readonly object ContentRemovedEvent = new ();
 
+        /// <summary>
+        ///
+        /// </summary>
         [LocalizedCategory ("Category_DockingNotification")]
         [LocalizedDescription ("DockPanel_ContentRemoved_Description")]
         public event EventHandler<DockContentEventArgs> ContentRemoved
         {
-            add { Events.AddHandler (ContentRemovedEvent, value); }
-            remove { Events.RemoveHandler (ContentRemovedEvent, value); }
+            add => Events.AddHandler (ContentRemovedEvent, value);
+            remove => Events.RemoveHandler (ContentRemovedEvent, value);
         }
 
-        protected virtual void OnContentRemoved (DockContentEventArgs e)
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="eventArgs"></param>
+        protected virtual void OnContentRemoved
+            (
+                DockContentEventArgs eventArgs
+            )
         {
-            var
-                handler = (EventHandler<DockContentEventArgs>)Events[ContentRemovedEvent];
+            var handler = (EventHandler<DockContentEventArgs>?) Events[ContentRemovedEvent];
             if (handler != null)
             {
-                handler (this, e);
+                handler (this, eventArgs);
             }
         }
 
@@ -1407,7 +1472,7 @@ namespace AM.Windows.Forms.Docking
             m_autoHideWindow.Visible = false;
             SetAutoHideWindowParent();
 
-            old.Visible = false;
+            old!.Visible = false;
             old.Parent = null;
             old.Dispose();
         }

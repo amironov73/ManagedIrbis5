@@ -3,8 +3,9 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable UnusedMember.Global
 
-/* 
+/* DockOutlineBase.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,10 +20,19 @@ using System.Windows.Forms;
 
 namespace AM.Windows.Forms.Docking;
 
+/// <summary>
+///
+/// </summary>
 public abstract class DockOutlineBase
 {
-    public DockOutlineBase()
+    /// <summary>
+    ///
+    /// </summary>
+    protected DockOutlineBase()
     {
+        _oldDockTo = null!;
+        _dockTo = null!;
+
         Init();
     }
 
@@ -32,118 +42,128 @@ public abstract class DockOutlineBase
         SaveOldValues();
     }
 
-    private Rectangle m_oldFloatWindowBounds;
+    private Rectangle _oldFloatWindowBounds;
 
-    protected Rectangle OldFloatWindowBounds
-    {
-        get { return m_oldFloatWindowBounds; }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    protected Rectangle OldFloatWindowBounds => _oldFloatWindowBounds;
 
-    private Control m_oldDockTo;
+    private Control _oldDockTo;
 
-    protected Control OldDockTo
-    {
-        get { return m_oldDockTo; }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    protected Control OldDockTo => _oldDockTo;
 
-    private DockStyle m_oldDock;
+    private DockStyle _oldDock;
 
-    protected DockStyle OldDock
-    {
-        get { return m_oldDock; }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    protected DockStyle OldDock => _oldDock;
 
-    private int m_oldContentIndex;
+    private int _oldContentIndex;
 
-    protected int OldContentIndex
-    {
-        get { return m_oldContentIndex; }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    protected int OldContentIndex => _oldContentIndex;
 
-    protected bool SameAsOldValue
-    {
-        get
-        {
-            return FloatWindowBounds == OldFloatWindowBounds &&
-                   DockTo == OldDockTo &&
-                   Dock == OldDock &&
-                   ContentIndex == OldContentIndex;
-        }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    protected bool SameAsOldValue =>
+        FloatWindowBounds == OldFloatWindowBounds &&
+        DockTo == OldDockTo &&
+        Dock == OldDock &&
+        ContentIndex == OldContentIndex;
 
-    private Rectangle m_floatWindowBounds;
+    private Rectangle _floatWindowBounds;
 
-    public Rectangle FloatWindowBounds
-    {
-        get { return m_floatWindowBounds; }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    public Rectangle FloatWindowBounds => _floatWindowBounds;
 
-    private Control m_dockTo;
+    private Control _dockTo;
 
-    public Control DockTo
-    {
-        get { return m_dockTo; }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    public Control DockTo => _dockTo;
 
-    private DockStyle m_dock;
+    private DockStyle _dock;
 
-    public DockStyle Dock
-    {
-        get { return m_dock; }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    public DockStyle Dock => _dock;
 
-    private int m_contentIndex;
+    private int _contentIndex;
 
-    public int ContentIndex
-    {
-        get { return m_contentIndex; }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    public int ContentIndex => _contentIndex;
 
-    public bool FlagFullEdge
-    {
-        get { return m_contentIndex != 0; }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    public bool FlagFullEdge => _contentIndex != 0;
 
-    private bool m_flagTestDrop = false;
-
-    public bool FlagTestDrop
-    {
-        get { return m_flagTestDrop; }
-        set { m_flagTestDrop = value; }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    public bool FlagTestDrop { get; set; }
 
     private void SaveOldValues()
     {
-        m_oldDockTo = m_dockTo;
-        m_oldDock = m_dock;
-        m_oldContentIndex = m_contentIndex;
-        m_oldFloatWindowBounds = m_floatWindowBounds;
+        _oldDockTo = _dockTo;
+        _oldDock = _dock;
+        _oldContentIndex = _contentIndex;
+        _oldFloatWindowBounds = _floatWindowBounds;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected abstract void OnShow();
 
+    /// <summary>
+    ///
+    /// </summary>
     protected abstract void OnClose();
 
-    private void SetValues (Rectangle floatWindowBounds, Control dockTo, DockStyle dock, int contentIndex)
+    private void SetValues
+        (
+            Rectangle floatWindowBounds,
+            Control? dockTo,
+            DockStyle dock,
+            int contentIndex
+        )
     {
-        m_floatWindowBounds = floatWindowBounds;
-        m_dockTo = dockTo;
-        m_dock = dock;
-        m_contentIndex = contentIndex;
+        _floatWindowBounds = floatWindowBounds;
+        _dockTo = dockTo!;
+        _dock = dock;
+        _contentIndex = contentIndex;
         FlagTestDrop = true;
     }
 
     private void TestChange()
     {
-        if (m_floatWindowBounds != m_oldFloatWindowBounds ||
-            m_dockTo != m_oldDockTo ||
-            m_dock != m_oldDock ||
-            m_contentIndex != m_oldContentIndex)
+        if (_floatWindowBounds != _oldFloatWindowBounds ||
+            _dockTo != _oldDockTo ||
+            _dock != _oldDock ||
+            _contentIndex != _oldContentIndex)
         {
             OnShow();
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public void Show()
     {
         SaveOldValues();
@@ -151,6 +171,11 @@ public abstract class DockOutlineBase
         TestChange();
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="pane"></param>
+    /// <param name="dock"></param>
     public void Show (DockPane pane, DockStyle dock)
     {
         SaveOldValues();
@@ -158,6 +183,11 @@ public abstract class DockOutlineBase
         TestChange();
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="pane"></param>
+    /// <param name="contentIndex"></param>
     public void Show (DockPane pane, int contentIndex)
     {
         SaveOldValues();
@@ -165,6 +195,12 @@ public abstract class DockOutlineBase
         TestChange();
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="dockPanel"></param>
+    /// <param name="dock"></param>
+    /// <param name="fullPanelEdge"></param>
     public void Show (DockPanel dockPanel, DockStyle dock, bool fullPanelEdge)
     {
         SaveOldValues();
@@ -172,6 +208,10 @@ public abstract class DockOutlineBase
         TestChange();
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="floatWindowBounds"></param>
     public void Show (Rectangle floatWindowBounds)
     {
         SaveOldValues();
@@ -179,6 +219,9 @@ public abstract class DockOutlineBase
         TestChange();
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public void Close()
     {
         OnClose();

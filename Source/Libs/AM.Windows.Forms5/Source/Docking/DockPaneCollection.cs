@@ -4,7 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
-/* 
+/* DockPaneCollection.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,7 +19,11 @@ using System.Collections.Generic;
 
 namespace AM.Windows.Forms.Docking;
 
-public class DockPaneCollection : ReadOnlyCollection<DockPane>
+/// <summary>
+///
+/// </summary>
+public class DockPaneCollection
+    : ReadOnlyCollection<DockPane>
 {
     internal DockPaneCollection()
         : base (new List<DockPane>())
