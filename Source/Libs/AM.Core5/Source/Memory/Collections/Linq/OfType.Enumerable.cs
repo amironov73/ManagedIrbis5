@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*  OfType.Enumerable.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,13 +17,17 @@
 
 namespace AM.Memory.Collections.Linq;
 
-internal class OfTypeExprEnumerable<T> : IPoolingEnumerable<T>
+internal class OfTypeExprEnumerable<T>
+    : IPoolingEnumerable<T>
 {
     private int _count;
 
-    private IPoolingEnumerable _src;
+    private IPoolingEnumerable _src = default!;
 
-    public OfTypeExprEnumerable<T> Init (IPoolingEnumerable src)
+    public OfTypeExprEnumerable<T> Init
+        (
+            IPoolingEnumerable src
+        )
     {
         _src = src;
         _count = 0;
@@ -38,21 +42,30 @@ internal class OfTypeExprEnumerable<T> : IPoolingEnumerable<T>
 
     private void Dispose()
     {
-        if (_count == 0) return;
+        if (_count == 0)
+        {
+            return;
+        }
+
         _count--;
         if (_count == 0)
         {
-            _src = default;
+            _src = default!;
             Pool<OfTypeExprEnumerable<T>>.Return (this);
         }
     }
 
-    internal class OfTypeExprEnumerator : IPoolingEnumerator<T>
+    internal class OfTypeExprEnumerator
+        : IPoolingEnumerator<T>
     {
-        private IPoolingEnumerator _src;
-        private OfTypeExprEnumerable<T> _parent;
+        private IPoolingEnumerator _src = default!;
+        private OfTypeExprEnumerable<T> _parent = default!;
 
-        public OfTypeExprEnumerator Init (IPoolingEnumerator src, OfTypeExprEnumerable<T> parent)
+        public OfTypeExprEnumerator Init
+            (
+                IPoolingEnumerator src,
+                OfTypeExprEnumerable<T> parent
+            )
         {
             _src = src;
             _parent = parent;
@@ -64,8 +77,11 @@ internal class OfTypeExprEnumerable<T> : IPoolingEnumerable<T>
             do
             {
                 var next = _src.MoveNext();
-                if (!next) return false;
-            } while (!(_src.Current is T));
+                if (!next)
+                {
+                    return false;
+                }
+            } while (_src.Current is not T);
 
             return true;
         }
@@ -82,9 +98,9 @@ internal class OfTypeExprEnumerable<T> : IPoolingEnumerable<T>
         public void Dispose()
         {
             _parent?.Dispose();
-            _parent = null;
+            _parent = default!;
             _src?.Dispose();
-            _src = default;
+            _src = default!;
             Pool<OfTypeExprEnumerator>.Return (this);
         }
     }

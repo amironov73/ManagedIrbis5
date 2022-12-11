@@ -6,10 +6,11 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable NonReadonlyMemberInGetHashCode
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* IdealHashObjectBase.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,9 +18,16 @@
 
 namespace AM.Memory.Collections.Specialized;
 
+/// <summary>
+///
+/// </summary>
 public abstract class IdealHashObjectBase
 {
     internal int IdealHashCode { get; set; }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public override int GetHashCode() => IdealHashCode;
 }

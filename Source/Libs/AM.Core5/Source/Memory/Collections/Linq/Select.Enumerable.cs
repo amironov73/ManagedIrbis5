@@ -30,7 +30,11 @@ internal class SelectExprEnumerable<T, TR>
     private Func<T, TR>? _mutator;
     private int _count;
 
-    public SelectExprEnumerable<T, TR> Init (IPoolingEnumerable<T> src, Func<T, TR> mutator)
+    public SelectExprEnumerable<T, TR> Init
+        (
+            IPoolingEnumerable<T> src,
+            Func<T, TR> mutator
+        )
     {
         _src = src;
         _count = 0;
@@ -57,14 +61,19 @@ internal class SelectExprEnumerable<T, TR>
         }
     }
 
-    internal class SelectExprEnumerator : IPoolingEnumerator<TR>
+    internal class SelectExprEnumerator
+        : IPoolingEnumerator<TR>
     {
         private Func<T, TR>? _mutator;
         private SelectExprEnumerable<T, TR>? _parent;
         private IPoolingEnumerator<T>? _src;
 
-        public SelectExprEnumerator Init (SelectExprEnumerable<T, TR> parent, IPoolingEnumerator<T> src,
-            Func<T, TR> mutator)
+        public SelectExprEnumerator Init
+            (
+                SelectExprEnumerable<T, TR> parent,
+                IPoolingEnumerator<T> src,
+                Func<T, TR> mutator
+            )
         {
             _src = src;
             _parent = parent;

@@ -26,7 +26,12 @@ public static partial class PoolingEnumerable
     /// <param name="second"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    public static IPoolingEnumerable<(T, T)> Zip<T> (this IPoolingEnumerable<T> source,
-        IPoolingEnumerable<T> second) =>
-        Pool<ZipExprEnumerable<T>>.Get().Init (source, second);
+    public static IPoolingEnumerable<(T, T)> Zip<T>
+        (
+            this IPoolingEnumerable<T> source,
+            IPoolingEnumerable<T> second
+        )
+    {
+        return Pool<ZipExprEnumerable<T>>.Get().Init (source, second);
+    }
 }

@@ -31,7 +31,8 @@ public static partial class PoolingEnumerable
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    public static IPoolingEnumerable<T> Empty<T>() => Range (0, 0).Select (x => (T)(object)x);
+    public static IPoolingEnumerable<T> Empty<T>() =>
+        Range (0, 0).Select (x => (T)(object)x);
 
     /// <summary>
     ///
@@ -39,7 +40,11 @@ public static partial class PoolingEnumerable
     /// <param name="startIndex"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public static IPoolingEnumerable<int> Range (int startIndex, int count)
+    public static IPoolingEnumerable<int> Range
+        (
+            int startIndex,
+            int count
+        )
     {
         return Pool<RangeExprEnumerable>.Get().Init (startIndex, count);
     }
@@ -71,7 +76,11 @@ public static partial class PoolingEnumerable
     /// <param name="element"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    public static bool Contains<T> (this IPoolingEnumerable<T> self, T element)
+    public static bool Contains<T>
+        (
+            this IPoolingEnumerable<T> self,
+            T element
+        )
     {
         foreach (var item in self)
         {
@@ -155,13 +164,13 @@ public static partial class PoolingEnumerable
         using (var left = self.GetEnumerator())
         using (var right = other.GetEnumerator())
         {
-            bool equals, leftHas, rightHas;
+            bool leftHas, rightHas;
 
             do
             {
                 leftHas = left.MoveNext();
                 rightHas = right.MoveNext();
-                equals = comparer.Equals (left.Current, right.Current);
+                var equals = comparer.Equals (left.Current, right.Current);
 
                 if (leftHas != rightHas || !equals)
                 {
@@ -215,7 +224,7 @@ internal class RangeExprEnumerable : IPoolingEnumerable<int>
         private int _start;
         private int _current;
         private int _workCount;
-        private RangeExprEnumerable _parent;
+        private RangeExprEnumerable _parent = default!;
 
         public RangeExprEnumerator Init (RangeExprEnumerable parent, int start, int workCount)
         {

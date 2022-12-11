@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* PoolingDictionary.KeysCollection.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -27,9 +27,10 @@ namespace AM.Memory.Collections.Specialized;
 
 public partial class PoolingDictionary<TKey, TValue>
 {
-    internal class KeysCollection : ICollection<TKey>
+    internal class KeysCollection
+        : ICollection<TKey>
     {
-        private PoolingDictionary<TKey, TValue> _src;
+        private PoolingDictionary<TKey, TValue>? _src;
 
         public KeysCollection Init (PoolingDictionary<TKey, TValue> src)
         {
@@ -39,17 +40,17 @@ public partial class PoolingDictionary<TKey, TValue>
 
         public IEnumerator<TKey> GetEnumerator()
         {
-            return Pool<Enumerator>.Get().Init (_src);
+            return Pool<Enumerator>.Get().Init (_src!);
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         public void Add (TKey item) => throw new NotImplementedException();
         public void Clear() => throw new NotImplementedException();
-        public bool Contains (TKey item) => _src.FindEntry (item) >= 0;
+        public bool Contains (TKey item) => _src!.FindEntry (item) >= 0;
 
         public void CopyTo (TKey[] array, int arrayIndex)
         {
-            if (array.Length - arrayIndex < _src._entries.Count)
+            if (array.Length - arrayIndex < _src!._entries.Count)
             {
                 throw new IndexOutOfRangeException ("Cannot copy keys into array. Target array is too small.");
             }
@@ -62,12 +63,12 @@ public partial class PoolingDictionary<TKey, TValue>
         }
 
         public bool Remove (TKey item) => throw new NotImplementedException ("Removal ops are disallowed.");
-        public int Count => _src.Count;
-        public bool IsReadOnly => _src.IsReadOnly;
+        public int Count => _src!.Count;
+        public bool IsReadOnly => _src!.IsReadOnly;
 
         private class Enumerator : IEnumerator<TKey>
         {
-            private PoolingDictionary<TKey, TValue> _src;
+            private PoolingDictionary<TKey, TValue>? _src;
             private int _pos;
 
             public Enumerator Init (PoolingDictionary<TKey, TValue> src)
@@ -79,7 +80,7 @@ public partial class PoolingDictionary<TKey, TValue>
 
             public bool MoveNext()
             {
-                if (_pos >= _src.Count) return false;
+                if (_pos >= _src!.Count) return false;
                 _pos++;
                 return _pos < _src.Count;
             }
@@ -89,7 +90,7 @@ public partial class PoolingDictionary<TKey, TValue>
                 _pos = -1;
             }
 
-            public TKey Current => _src._entries[_pos].key;
+            public TKey Current => _src!._entries[_pos].key;
 
             object IEnumerator.Current => Current;
 

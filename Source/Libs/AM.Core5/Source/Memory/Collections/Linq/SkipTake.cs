@@ -26,9 +26,14 @@ public static partial class PoolingEnumerable
     /// <param name="count"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    public static IPoolingEnumerable<T> Skip<T> (this IPoolingEnumerable<T> source, int count)
+    public static IPoolingEnumerable<T> Skip<T>
+        (
+            this IPoolingEnumerable<T> source,
+            int count
+        )
     {
-        return Pool<SkipTakeExprPoolingEnumerable<T>>.Get().Init (source, false, count);
+        return Pool<SkipTakeExprPoolingEnumerable<T>>.Get()
+            .Init (source, false, count);
     }
 
     /// <summary>
@@ -38,8 +43,13 @@ public static partial class PoolingEnumerable
     /// <param name="count"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    public static IPoolingEnumerable<T> Take<T> (this IPoolingEnumerable<T> source, int count)
+    public static IPoolingEnumerable<T> Take<T>
+        (
+            this IPoolingEnumerable<T> source,
+            int count
+        )
     {
-        return Pool<SkipTakeExprPoolingEnumerable<T>>.Get().Init (source, true, count);
+        return Pool<SkipTakeExprPoolingEnumerable<T>>.Get()
+            .Init (source, true, count);
     }
 }

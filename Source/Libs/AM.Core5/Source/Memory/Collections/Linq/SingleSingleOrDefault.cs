@@ -7,6 +7,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
 /* SingleOrDefault.cs --
@@ -32,7 +33,10 @@ public static partial class PoolingEnumerable
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
-    public static T Single<T> (this IPoolingEnumerable<T> source)
+    public static T Single<T>
+        (
+            this IPoolingEnumerable<T> source
+        )
     {
         var wasFound = false;
         var element = default (T);
@@ -61,7 +65,11 @@ public static partial class PoolingEnumerable
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
-    public static T Single<T> (this IPoolingEnumerable<T> source, Func<T, bool> condition)
+    public static T Single<T>
+        (
+            this IPoolingEnumerable<T> source,
+            Func<T, bool> condition
+        )
     {
         var wasFound = false;
         var element = default (T);
@@ -95,8 +103,12 @@ public static partial class PoolingEnumerable
     /// <typeparam name="TContext"></typeparam>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
-    public static T Single<T, TContext> (this IPoolingEnumerable<T> source, TContext context,
-        Func<TContext, T, bool> condition)
+    public static T Single<T, TContext>
+        (
+            this IPoolingEnumerable<T> source,
+            TContext context,
+            Func<TContext, T, bool> condition
+        )
     {
         var wasFound = false;
         var element = default (T);
@@ -126,7 +138,10 @@ public static partial class PoolingEnumerable
     /// <param name="source"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    public static T SingleOrDefault<T> (this IPoolingEnumerable<T> source)
+    public static T SingleOrDefault<T>
+        (
+            this IPoolingEnumerable<T> source
+        )
     {
         var wasFound = false;
         var element = default (T);
@@ -154,7 +169,11 @@ public static partial class PoolingEnumerable
     /// <param name="condition"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    public static T SingleOrDefault<T> (this IPoolingEnumerable<T> source, Func<T, bool> condition)
+    public static T SingleOrDefault<T>
+        (
+            this IPoolingEnumerable<T> source,
+            Func<T, bool> condition
+        )
     {
         var wasFound = false;
         var element = default (T);
@@ -187,8 +206,12 @@ public static partial class PoolingEnumerable
     /// <typeparam name="T"></typeparam>
     /// <typeparam name="TContext"></typeparam>
     /// <returns></returns>
-    public static T SingleOrDefault<T, TContext> (this IPoolingEnumerable<T> source, TContext context,
-        Func<TContext, T, bool> condition)
+    public static T SingleOrDefault<T, TContext>
+        (
+            this IPoolingEnumerable<T> source,
+            TContext context,
+            Func<TContext, T, bool> condition
+        )
     {
         var wasFound = false;
         var element = default (T);

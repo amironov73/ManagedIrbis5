@@ -33,7 +33,11 @@ public static partial class PoolingEnumerable
     /// <typeparam name="T"></typeparam>
     /// <typeparam name="TR"></typeparam>
     /// <returns></returns>
-    public static IPoolingEnumerable<TR> Select<T, TR> (this IPoolingEnumerable<T> source, Func<T, TR> mutator)
+    public static IPoolingEnumerable<TR> Select<T, TR>
+        (
+            this IPoolingEnumerable<T> source,
+            Func<T, TR> mutator
+        )
     {
         return Pool<SelectExprEnumerable<T, TR>>.Get().Init (source, mutator);
     }
@@ -48,8 +52,12 @@ public static partial class PoolingEnumerable
     /// <typeparam name="TR"></typeparam>
     /// <typeparam name="TContext"></typeparam>
     /// <returns></returns>
-    public static IPoolingEnumerable<TR> Select<T, TR, TContext> (this IPoolingEnumerable<T> source,
-        TContext context, Func<TContext, T, TR> mutator)
+    public static IPoolingEnumerable<TR> Select<T, TR, TContext>
+        (
+            this IPoolingEnumerable<T> source,
+            TContext context,
+            Func<TContext, T, TR> mutator
+        )
     {
         return Pool<SelectExprWithContextEnumerable<T, TR, TContext>>.Get().Init (source, context, mutator);
     }

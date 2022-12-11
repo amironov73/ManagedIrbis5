@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* PoolingDictionary.ValuesCollection.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -27,9 +27,10 @@ namespace AM.Memory.Collections.Specialized;
 
 public partial class PoolingDictionary<TKey, TValue>
 {
-    internal class ValuesCollection : ICollection<TValue>
+    internal class ValuesCollection
+        : ICollection<TValue>
     {
-        private PoolingDictionary<TKey, TValue> _src;
+        private PoolingDictionary<TKey, TValue> _src = default!;
 
         public ValuesCollection Init (PoolingDictionary<TKey, TValue> src)
         {
@@ -76,9 +77,10 @@ public partial class PoolingDictionary<TKey, TValue>
         public int Count => _src.Count;
         public bool IsReadOnly => _src.IsReadOnly;
 
-        private class Enumerator : IEnumerator<TValue>
+        private class Enumerator
+            : IEnumerator<TValue>
         {
-            private PoolingDictionary<TKey, TValue> _src;
+            private PoolingDictionary<TKey, TValue> _src = default!;
             private int _pos;
 
             public Enumerator Init (PoolingDictionary<TKey, TValue> src)
@@ -106,7 +108,7 @@ public partial class PoolingDictionary<TKey, TValue>
 
             public void Dispose()
             {
-                _src = default;
+                _src = default!;
                 Pool<Enumerator>.Return (this);
             }
         }

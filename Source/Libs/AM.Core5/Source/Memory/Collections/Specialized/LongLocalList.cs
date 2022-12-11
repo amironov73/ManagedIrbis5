@@ -33,8 +33,16 @@ public struct LongLocalList<T>
 
     private (T, T, T, T, T, T, T, T) _items;
 
+    /// <summary>
+    ///
+    /// </summary>
     public const int Capacity = 8;
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="item"></param>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
     public void Add (T item)
     {
         Count++;
@@ -43,22 +51,40 @@ public struct LongLocalList<T>
         this[Count - 1] = item;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public void Clear()
     {
         Count = 0;
         _items = default;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
     public bool Contains (T item)
     {
         return IndexOf (item) >= 0;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="array"></param>
+    /// <param name="arrayIndex"></param>
     public void CopyTo (T[] array, int arrayIndex)
     {
         for (var i = 0; i < Capacity; i++) array[i] = this[i];
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
     public bool Remove (T item)
     {
         var i = 0;
@@ -74,10 +100,21 @@ public struct LongLocalList<T>
         return j != i;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public int Count { get; private set; }
 
+    /// <summary>
+    ///
+    /// </summary>
     public bool IsReadOnly => false;
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
     public int IndexOf (T item)
     {
         for (var i = 0; i < Capacity; i++)
@@ -86,6 +123,11 @@ public struct LongLocalList<T>
         return -1;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="index"></param>
+    /// <exception cref="IndexOutOfRangeException"></exception>
     public T this [int index]
     {
         get
@@ -154,6 +196,11 @@ public struct LongLocalList<T>
         return obj is LongLocalList<T> other && Equals (other);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
     public bool Equals (LongLocalList<T> other)
     {
         return _items.Equals (other._items);

@@ -23,13 +23,18 @@ using System;
 
 namespace AM.Memory.Collections.Linq;
 
-internal class SelectManyExprEnumerable<T, TR> : IPoolingEnumerable<TR>
+internal class SelectManyExprEnumerable<T, TR>
+    : IPoolingEnumerable<TR>
 {
     private IPoolingEnumerable<T>? _src;
     private Func<T, IPoolingEnumerable<TR>>? _mutator;
     private int _count;
 
-    public SelectManyExprEnumerable<T, TR> Init (IPoolingEnumerable<T> src, Func<T, IPoolingEnumerable<TR>> mutator)
+    public SelectManyExprEnumerable<T, TR> Init
+        (
+            IPoolingEnumerable<T> src,
+            Func<T, IPoolingEnumerable<TR>> mutator
+        )
     {
         _src = src;
         _count = 0;
@@ -40,7 +45,8 @@ internal class SelectManyExprEnumerable<T, TR> : IPoolingEnumerable<TR>
     public IPoolingEnumerator<TR> GetEnumerator()
     {
         _count++;
-        return Pool<SelectManyExprEnumerator>.Get().Init (this, _src!.GetEnumerator(), _mutator!);
+        return Pool<SelectManyExprEnumerator>.Get()
+            .Init (this, _src!.GetEnumerator(), _mutator!);
     }
 
     private void Dispose()
@@ -56,7 +62,8 @@ internal class SelectManyExprEnumerable<T, TR> : IPoolingEnumerable<TR>
         }
     }
 
-    internal class SelectManyExprEnumerator : IPoolingEnumerator<TR>
+    internal class SelectManyExprEnumerator
+        : IPoolingEnumerator<TR>
     {
         private Func<T, IPoolingEnumerable<TR>>? _mutator;
         private SelectManyExprEnumerable<T, TR>? _parent;
@@ -64,10 +71,12 @@ internal class SelectManyExprEnumerable<T, TR> : IPoolingEnumerable<TR>
         private IPoolingEnumerator<TR>? _currentEnumerator;
         private bool _finished;
 
-        public SelectManyExprEnumerator Init (
-            SelectManyExprEnumerable<T, TR> parent,
-            IPoolingEnumerator<T> src,
-            Func<T, IPoolingEnumerable<TR>> mutator)
+        public SelectManyExprEnumerator Init
+            (
+                SelectManyExprEnumerable<T, TR> parent,
+                IPoolingEnumerator<T> src,
+                Func<T, IPoolingEnumerable<TR>> mutator
+            )
         {
             _src = src;
             _finished = false;

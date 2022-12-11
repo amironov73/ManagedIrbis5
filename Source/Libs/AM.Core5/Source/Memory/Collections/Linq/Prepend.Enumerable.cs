@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* Prepend.Enumerable.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,14 +17,18 @@
 
 namespace AM.Memory.Collections.Linq;
 
-internal class PrependExprEnumerable<T> : IPoolingEnumerable<T>
+internal class PrependExprEnumerable<T>
+    : IPoolingEnumerable<T>
 {
     private int _count;
 
-    private IPoolingEnumerable<T> _src;
-    private T _element;
+    private IPoolingEnumerable<T> _src = default!;
+    private T _element = default!;
 
-    public PrependExprEnumerable<T> Init (IPoolingEnumerable<T> src, T element)
+    public PrependExprEnumerable<T> Init
+        (
+            IPoolingEnumerable<T> src, T element
+        )
     {
         _src = src;
         _count = 0;
@@ -40,21 +44,26 @@ internal class PrependExprEnumerable<T> : IPoolingEnumerable<T>
 
     private void Dispose()
     {
-        if (_count == 0) return;
+        if (_count == 0)
+        {
+            return;
+        }
+
         _count--;
         if (_count == 0)
         {
-            _src = default;
-            _element = default;
+            _src = default!;
+            _element = default!;
             Pool<PrependExprEnumerable<T>>.Return (this);
         }
     }
 
-    internal class PrependExprEnumerator : IPoolingEnumerator<T>
+    internal class PrependExprEnumerator
+        : IPoolingEnumerator<T>
     {
-        private IPoolingEnumerator _src;
-        private PrependExprEnumerable<T> _parent;
-        private T _element;
+        private IPoolingEnumerator _src = default!;
+        private PrependExprEnumerable<T> _parent = default!;
+        private T _element = default!;
         private bool _first, _shouldReturnElement;
 
         public PrependExprEnumerator Init (IPoolingEnumerator src, PrependExprEnumerable<T> parent, T element)
@@ -92,9 +101,9 @@ internal class PrependExprEnumerable<T> : IPoolingEnumerable<T>
         public void Dispose()
         {
             _parent?.Dispose();
-            _parent = null;
+            _parent = default!;
             _src?.Dispose();
-            _src = default;
+            _src = default!;
             _first = _shouldReturnElement = false;
             Pool<PrependExprEnumerator>.Return (this);
         }

@@ -40,12 +40,12 @@ public static partial class AsSingleQueryList
         public IPoolingEnumerator<T> GetEnumerator()
         {
             _count++;
-            return Pool<EnumeratorRef>.Get().Init (this, _src);
+            return Pool<EnumeratorRef>.Get().Init (this, _src!);
         }
 
         #region Private members
 
-        private PoolingListCanon<T> _src;
+        private PoolingListCanon<T>? _src;
 
         IPoolingEnumerator IPoolingEnumerable.GetEnumerator() => GetEnumerator();
 
@@ -69,7 +69,11 @@ public static partial class AsSingleQueryList
             private IPoolingEnumerator<T>? _enumerator;
             private EnumerableShared<T>? _parent;
 
-            public IPoolingEnumerator<T> Init (EnumerableShared<T> parent, IPoolingEnumerable<T> src)
+            public IPoolingEnumerator<T> Init
+                (
+                    EnumerableShared<T> parent,
+                    IPoolingEnumerable<T> src
+                )
             {
                 _parent = parent;
                 _enumerator = src.GetEnumerator();

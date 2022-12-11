@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* Reverse.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -28,7 +28,10 @@ public static partial class PoolingEnumerable
     /// <summary>
     /// Returns sequence with backward direction. Complexity = 2 * O(N) (collect + return)
     /// </summary>
-    public static IPoolingEnumerable<T> Reverse<T> (this IPoolingEnumerable<T> source)
+    public static IPoolingEnumerable<T> Reverse<T>
+        (
+            this IPoolingEnumerable<T> source
+        )
     {
         var list = Pool<PoolingList<T>>.Get().Init();
         foreach (var item in source)

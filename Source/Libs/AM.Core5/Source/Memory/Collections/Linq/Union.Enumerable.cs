@@ -31,7 +31,10 @@ internal class UnionExprEnumerable<T>
     private int _count;
     private PoolingDictionary<T, int>? _src;
 
-    public UnionExprEnumerable<T> Init (PoolingDictionary<T, int> src)
+    public UnionExprEnumerable<T> Init
+        (
+            PoolingDictionary<T, int> src
+        )
     {
         _src = src;
         _count = 0;

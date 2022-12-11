@@ -32,8 +32,14 @@ public static partial class PoolingEnumerable
     /// <param name="condition"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    public static IPoolingEnumerable<T> Where<T> (this IPoolingEnumerable<T> source, Func<T, bool> condition) =>
-        Pool<WhereExprEnumerable<T>>.Get().Init (source, condition);
+    public static IPoolingEnumerable<T> Where<T>
+        (
+            this IPoolingEnumerable<T> source,
+            Func<T, bool> condition
+        )
+    {
+        return Pool<WhereExprEnumerable<T>>.Get().Init (source, condition);
+    }
 
     /// <summary>
     ///
@@ -44,7 +50,13 @@ public static partial class PoolingEnumerable
     /// <typeparam name="T"></typeparam>
     /// <typeparam name="TContext"></typeparam>
     /// <returns></returns>
-    public static IPoolingEnumerable<T> Where<T, TContext> (this IPoolingEnumerable<T> source, TContext context,
-        Func<TContext, T, bool> condition) =>
-        Pool<WhereExprWithContextEnumerable<T, TContext>>.Get().Init (source, context, condition);
+    public static IPoolingEnumerable<T> Where<T, TContext>
+        (
+            this IPoolingEnumerable<T> source,
+            TContext context,
+            Func<TContext, T, bool> condition
+        )
+    {
+        return Pool<WhereExprWithContextEnumerable<T, TContext>>.Get().Init (source, context, condition);
+    }
 }

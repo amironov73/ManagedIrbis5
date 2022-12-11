@@ -7,6 +7,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
 /* SelectMany.cs --
@@ -33,9 +34,11 @@ public static partial class PoolingEnumerable
     /// <typeparam name="T"></typeparam>
     /// <typeparam name="TR"></typeparam>
     /// <returns></returns>
-    public static IPoolingEnumerable<TR> SelectMany<T, TR> (
-        this IPoolingEnumerable<T> source,
-        Func<T, IPoolingEnumerable<TR>> mutator)
+    public static IPoolingEnumerable<TR> SelectMany<T, TR>
+        (
+            this IPoolingEnumerable<T> source,
+            Func<T, IPoolingEnumerable<TR>> mutator
+        )
     {
         return Pool<SelectManyExprEnumerable<T, TR>>.Get().Init (source, mutator);
     }
@@ -50,11 +53,14 @@ public static partial class PoolingEnumerable
     /// <typeparam name="TR"></typeparam>
     /// <typeparam name="TContext"></typeparam>
     /// <returns></returns>
-    public static IPoolingEnumerable<TR> SelectMany<T, TR, TContext> (
-        this IPoolingEnumerable<T> source,
-        TContext context,
-        Func<T, TContext, IPoolingEnumerable<TR>> mutator)
+    public static IPoolingEnumerable<TR> SelectMany<T, TR, TContext>
+        (
+            this IPoolingEnumerable<T> source,
+            TContext context,
+            Func<T, TContext, IPoolingEnumerable<TR>> mutator
+        )
     {
-        return Pool<SelectManyExprWithContextEnumerable<T, TR, TContext>>.Get().Init (source, mutator, context);
+        return Pool<SelectManyExprWithContextEnumerable<T, TR, TContext>>.Get()
+            .Init (source, mutator, context);
     }
 }

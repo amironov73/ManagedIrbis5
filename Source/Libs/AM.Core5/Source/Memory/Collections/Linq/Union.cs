@@ -34,11 +34,23 @@ public static partial class PoolingEnumerable
     /// <param name="second"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    public static IPoolingEnumerable<T> Union<T> (this IPoolingEnumerable<T> source, IPoolingEnumerable<T> second)
+    public static IPoolingEnumerable<T> Union<T>
+        (
+            this IPoolingEnumerable<T> source,
+            IPoolingEnumerable<T> second
+        )
     {
-        var set = Pool<PoolingDictionary<T, int>>.Get().Init (0);
-        foreach (var item in source) set[item] = 1;
-        foreach (var item in second) set[item] = 1;
+        var set = Pool<PoolingDictionary<T, int>>.Get()
+            .Init (0);
+        foreach (var item in source)
+        {
+            set[item] = 1;
+        }
+
+        foreach (var item in second)
+        {
+            set[item] = 1;
+        }
 
         return Pool<UnionExprEnumerable<T>>.Get().Init (set);
     }
@@ -51,12 +63,24 @@ public static partial class PoolingEnumerable
     /// <param name="comparer"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    public static IPoolingEnumerable<T> Union<T> (this IPoolingEnumerable<T> source, IPoolingEnumerable<T> second,
-        IEqualityComparer<T> comparer)
+    public static IPoolingEnumerable<T> Union<T>
+        (
+            this IPoolingEnumerable<T> source,
+            IPoolingEnumerable<T> second,
+            IEqualityComparer<T> comparer
+        )
     {
-        var set = Pool<PoolingDictionary<T, int>>.Get().Init (0, comparer);
-        foreach (var item in source) set[item] = 1;
-        foreach (var item in second) set[item] = 1;
+        var set = Pool<PoolingDictionary<T, int>>.Get()
+            .Init (0, comparer);
+        foreach (var item in source)
+        {
+            set[item] = 1;
+        }
+
+        foreach (var item in second)
+        {
+            set[item] = 1;
+        }
 
         return Pool<UnionExprEnumerable<T>>.Get().Init (set);
     }

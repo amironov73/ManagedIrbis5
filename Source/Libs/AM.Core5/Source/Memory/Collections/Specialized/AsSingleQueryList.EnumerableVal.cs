@@ -41,12 +41,12 @@ public static partial class AsSingleQueryList
             var src = _src;
             _src = default;
             Pool<EnumerableTyped<T>>.Return (this);
-            return Pool<EnumeratorVal>.Get().Init (src);
+            return Pool<EnumeratorVal>.Get().Init (src!);
         }
 
         #region Private members
 
-        private PoolingList<T> _src;
+        private PoolingList<T>? _src;
 
         IPoolingEnumerator IPoolingEnumerable.GetEnumerator() => GetEnumerator();
 
@@ -55,7 +55,7 @@ public static partial class AsSingleQueryList
         private class EnumeratorVal
             : IPoolingEnumerator<T>
         {
-            private PoolingList<T> _src;
+            private PoolingList<T>? _src;
             private IPoolingEnumerator<T>? _enumerator;
 
             public IPoolingEnumerator<T> Init
@@ -73,7 +73,7 @@ public static partial class AsSingleQueryList
             public void Reset()
             {
                 _enumerator?.Dispose();
-                _enumerator = _src.GetEnumerator();
+                _enumerator = _src!.GetEnumerator();
             }
 
             public T Current => _enumerator.ThrowIfNull().Current;

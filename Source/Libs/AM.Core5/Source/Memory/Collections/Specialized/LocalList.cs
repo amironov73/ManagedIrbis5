@@ -42,6 +42,10 @@ public struct LocalList<T>
     private static readonly IList<T> LengthIs2 = new List<T> { default!, default! };
 
     private const int DefaultListCapacity = 8;
+
+    /// <summary>
+    ///
+    /// </summary>
     public const int LocalStoreCapacity = 2;
 
     /// <inheritdoc cref="IEnumerable{T}.GetEnumerator"/>
@@ -323,7 +327,7 @@ public struct LocalList<T>
                 return _other[index];
             }
 
-            if (_other.Count > 0 && index == 0)
+            if (_other!.Count > 0 && index == 0)
             {
                 return _items.Item1;
             }

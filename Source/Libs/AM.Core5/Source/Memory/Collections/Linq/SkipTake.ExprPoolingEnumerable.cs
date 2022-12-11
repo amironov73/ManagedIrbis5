@@ -17,14 +17,20 @@
 
 namespace AM.Memory.Collections.Linq;
 
-internal sealed class SkipTakeExprPoolingEnumerable<T> : IPoolingEnumerable<T>
+internal sealed class SkipTakeExprPoolingEnumerable<T>
+    : IPoolingEnumerable<T>
 {
     private bool _take;
     private int _workCount;
     private int _count;
     private IPoolingEnumerable<T> _source = null!;
 
-    public SkipTakeExprPoolingEnumerable<T> Init (IPoolingEnumerable<T> source, bool take, int count)
+    public SkipTakeExprPoolingEnumerable<T> Init
+        (
+            IPoolingEnumerable<T> source,
+            bool take,
+            int count
+        )
     {
         _count = 0;
         _workCount = count;
@@ -36,7 +42,8 @@ internal sealed class SkipTakeExprPoolingEnumerable<T> : IPoolingEnumerable<T>
     public IPoolingEnumerator<T> GetEnumerator()
     {
         _count++;
-        return Pool<SkipTakeExprPoolingEnumerator>.Get().Init (this, _source.GetEnumerator(), _take, _workCount);
+        return Pool<SkipTakeExprPoolingEnumerator>.Get()
+            .Init (this, _source.GetEnumerator(), _take, _workCount);
     }
 
     private void Dispose()
@@ -60,8 +67,13 @@ internal sealed class SkipTakeExprPoolingEnumerable<T> : IPoolingEnumerable<T>
         private bool _take;
         private int _pos, _workCount;
 
-        public SkipTakeExprPoolingEnumerator Init (SkipTakeExprPoolingEnumerable<T> parent,
-            IPoolingEnumerator<T> source, bool take, int workCount)
+        public SkipTakeExprPoolingEnumerator Init
+            (
+                SkipTakeExprPoolingEnumerable<T> parent,
+                IPoolingEnumerator<T> source,
+                bool take,
+                int workCount
+            )
         {
             _pos = 0;
             _take = take;

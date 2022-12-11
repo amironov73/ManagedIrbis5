@@ -23,17 +23,20 @@ using System;
 
 namespace AM.Memory.Collections.Linq;
 
-internal class SelectManyExprWithContextEnumerable<T, TR, TContext> : IPoolingEnumerable<TR>
+internal class SelectManyExprWithContextEnumerable<T, TR, TContext>
+    : IPoolingEnumerable<TR>
 {
     private IPoolingEnumerable<T>? _src;
     private Func<T, TContext, IPoolingEnumerable<TR>>? _mutator;
     private int _count;
     private TContext? _context;
 
-    public SelectManyExprWithContextEnumerable<T, TR, TContext> Init (
-        IPoolingEnumerable<T> src,
-        Func<T, TContext, IPoolingEnumerable<TR>> mutator,
-        TContext context)
+    public SelectManyExprWithContextEnumerable<T, TR, TContext> Init
+        (
+            IPoolingEnumerable<T> src,
+            Func<T, TContext, IPoolingEnumerable<TR>> mutator,
+            TContext context
+        )
     {
         _src = src;
         _count = 0;
@@ -72,11 +75,13 @@ internal class SelectManyExprWithContextEnumerable<T, TR, TContext> : IPoolingEn
         private IPoolingEnumerator<TR>? _currentEnumerator;
         private bool _finished;
 
-        public SelectManyExprWithContextEnumerator Init (
-            SelectManyExprWithContextEnumerable<T, TR, TContext> parent,
-            IPoolingEnumerator<T> src,
-            Func<T, TContext, IPoolingEnumerable<TR>> mutator,
-            TContext context)
+        public SelectManyExprWithContextEnumerator Init
+            (
+                SelectManyExprWithContextEnumerable<T, TR, TContext> parent,
+                IPoolingEnumerator<T> src,
+                Func<T, TContext, IPoolingEnumerable<TR>> mutator,
+                TContext context
+            )
         {
             _src = src;
             _finished = false;

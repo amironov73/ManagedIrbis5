@@ -23,13 +23,18 @@ using System;
 
 namespace AM.Memory.Collections.Linq;
 
-internal class WhereExprEnumerable<T> : IPoolingEnumerable<T>
+internal class WhereExprEnumerable<T>
+    : IPoolingEnumerable<T>
 {
     private int _count;
     private IPoolingEnumerable<T>? _src;
     private Func<T, bool>? _condition;
 
-    public WhereExprEnumerable<T> Init (IPoolingEnumerable<T> src, Func<T, bool> condition)
+    public WhereExprEnumerable<T> Init
+        (
+            IPoolingEnumerable<T> src,
+            Func<T, bool> condition
+        )
     {
         _count = 0;
         _src = src;
@@ -50,7 +55,10 @@ internal class WhereExprEnumerable<T> : IPoolingEnumerable<T>
 
     private void Dispose()
     {
-        if (_count == 0) return;
+        if (_count == 0)
+        {
+            return;
+        }
 
         _count--;
 
@@ -62,14 +70,19 @@ internal class WhereExprEnumerable<T> : IPoolingEnumerable<T>
         }
     }
 
-    internal class WhereExprEnumerator : IPoolingEnumerator<T>
+    internal class WhereExprEnumerator
+        : IPoolingEnumerator<T>
     {
         private Func<T, bool>? _mutator;
         private IPoolingEnumerator<T>? _src;
         private WhereExprEnumerable<T>? _parent;
 
-        public WhereExprEnumerator Init (IPoolingEnumerator<T> src, WhereExprEnumerable<T> parent,
-            Func<T, bool> mutator)
+        public WhereExprEnumerator Init
+            (
+                IPoolingEnumerator<T> src,
+                WhereExprEnumerable<T> parent,
+                Func<T, bool> mutator
+            )
         {
             _src = src;
             _mutator = mutator;
@@ -82,7 +95,10 @@ internal class WhereExprEnumerable<T> : IPoolingEnumerable<T>
             do
             {
                 var next = _src!.MoveNext();
-                if (!next) return false;
+                if (!next)
+                {
+                    return false;
+                }
             } while (!_mutator! (_src.Current));
 
             return true;

@@ -7,9 +7,10 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* IdefalHashDictionary.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,7 +25,8 @@ using System;
 namespace AM.Memory.Collections.Specialized;
 
 /// <summary>
-/// Represents ideal dictionary with extra fast access to its items. Items should inherit IdealHashObjectBase to be
+/// Represents ideal dictionary with extra fast access to its items.
+/// Items should inherit IdealHashObjectBase to be
 /// able to set hashcode.
 /// </summary>
 /// <typeparam name="TK">Key of dictionary</typeparam>
@@ -37,6 +39,11 @@ public class IdealHashDictionary<TK, TV> :
     readonly PoolingListCanon<TV> _list = Pool<PoolingListCanon<TV>>.Get().Init();
     readonly PoolingQueue<int> _freeNodes = new PoolingQueueVal<int>();
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="key"></param>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
     public TV this [TK key]
     {
         get
@@ -48,17 +55,27 @@ public class IdealHashDictionary<TK, TV> :
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="key"></param>
+    /// <param name="value"></param>
     public void Add (TK key, TV value)
     {
         var index = AcquireHashCode (value);
         key.IdealHashCode = index;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
     public bool Remove (TK key)
     {
         var index = key.IdealHashCode;
         _freeNodes.Enqueue (index);
-        _list[index] = default;
+        _list[index] = default!;
         return true;
     }
 
@@ -73,6 +90,7 @@ public class IdealHashDictionary<TK, TV> :
         return _list.Count - 1;
     }
 
+    /// <inheritdoc cref="IDisposable.Dispose"/>
     public void Dispose()
     {
         _list.Clear();

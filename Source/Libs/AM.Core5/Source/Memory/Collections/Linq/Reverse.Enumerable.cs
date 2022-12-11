@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* Reverse.Enumerable.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,12 +23,16 @@ using AM.Memory.Collections.Specialized;
 
 namespace AM.Memory.Collections.Linq;
 
-internal class ReverseExprEnumerable<T> : IPoolingEnumerable<T>
+internal class ReverseExprEnumerable<T>
+    : IPoolingEnumerable<T>
 {
     private int _count;
-    private PoolingList<T> _src;
+    private PoolingList<T> _src = default!;
 
-    public ReverseExprEnumerable<T> Init (PoolingList<T> src)
+    public ReverseExprEnumerable<T> Init
+        (
+            PoolingList<T> src
+        )
     {
         _src = src;
         _count = 0;
@@ -49,18 +53,23 @@ internal class ReverseExprEnumerable<T> : IPoolingEnumerable<T>
         {
             _src?.Dispose();
             Pool<PoolingList<T>>.Return (_src);
-            _src = default;
+            _src = default!;
             Pool<ReverseExprEnumerable<T>>.Return (this);
         }
     }
 
-    internal class ReverseExprEnumerator : IPoolingEnumerator<T>
+    internal class ReverseExprEnumerator
+        : IPoolingEnumerator<T>
     {
-        private PoolingList<T> _src;
-        private ReverseExprEnumerable<T> _parent;
+        private PoolingList<T> _src = default!;
+        private ReverseExprEnumerable<T> _parent = default!;
         private int _position;
 
-        public ReverseExprEnumerator Init (PoolingList<T> src, ReverseExprEnumerable<T> parent)
+        public ReverseExprEnumerator Init
+            (
+                PoolingList<T> src,
+                ReverseExprEnumerable<T> parent
+            )
         {
             _position = src.Count;
             _src = src;
@@ -84,8 +93,8 @@ internal class ReverseExprEnumerable<T> : IPoolingEnumerable<T>
         public void Dispose()
         {
             _parent?.Dispose();
-            _parent = default;
-            _src = default;
+            _parent = default!;
+            _src = default!;
             _position = default;
 
             Pool<ReverseExprEnumerator>.Return (this);

@@ -31,8 +31,12 @@ internal class SelectExprWithContextEnumerable<T, TR, TContext>
     private TContext? _context;
     private int _count;
 
-    public SelectExprWithContextEnumerable<T, TR, TContext> Init (IPoolingEnumerable<T> src, TContext context,
-        Func<TContext, T, TR> condition)
+    public SelectExprWithContextEnumerable<T, TR, TContext> Init
+        (
+            IPoolingEnumerable<T> src,
+            TContext context,
+            Func<TContext, T, TR> condition
+        )
     {
         _src = src;
         _count = 0;
@@ -44,7 +48,8 @@ internal class SelectExprWithContextEnumerable<T, TR, TContext>
     public IPoolingEnumerator<TR> GetEnumerator()
     {
         _count++;
-        return Pool<SelectExprWithContextEnumerator>.Get().Init (this, _src!.GetEnumerator(), _context!, _condition!);
+        return Pool<SelectExprWithContextEnumerator>.Get()
+            .Init (this, _src!.GetEnumerator(), _context!, _condition!);
     }
 
     private void Dispose()
@@ -61,18 +66,21 @@ internal class SelectExprWithContextEnumerable<T, TR, TContext>
         }
     }
 
-    internal class SelectExprWithContextEnumerator : IPoolingEnumerator<TR>
+    internal class SelectExprWithContextEnumerator
+        : IPoolingEnumerator<TR>
     {
         private TContext? _context;
         private Func<TContext, T, TR>? _condition;
         private IPoolingEnumerator<T>? _src;
         private SelectExprWithContextEnumerable<T, TR, TContext>? _parent;
 
-        public SelectExprWithContextEnumerator Init (
-            SelectExprWithContextEnumerable<T, TR, TContext> parent,
-            IPoolingEnumerator<T> src,
-            TContext context,
-            Func<TContext, T, TR> condition)
+        public SelectExprWithContextEnumerator Init
+            (
+                SelectExprWithContextEnumerable<T, TR, TContext> parent,
+                IPoolingEnumerator<T> src,
+                TContext context,
+                Func<TContext, T, TR> condition
+            )
         {
             _src = src;
             _parent = parent;

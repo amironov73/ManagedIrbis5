@@ -17,12 +17,17 @@
 
 namespace AM.Memory.Collections;
 
-internal class ZipExprEnumerable<T> : IPoolingEnumerable<(T, T)>
+internal class ZipExprEnumerable<T>
+    : IPoolingEnumerable<(T, T)>
 {
     private IPoolingEnumerable<T>? _src, _second;
     private int _count;
 
-    public ZipExprEnumerable<T> Init (IPoolingEnumerable<T> src, IPoolingEnumerable<T> second)
+    public ZipExprEnumerable<T> Init
+        (
+            IPoolingEnumerable<T> src,
+            IPoolingEnumerable<T> second
+        )
     {
         _src = src;
         _count = 0;
@@ -33,7 +38,8 @@ internal class ZipExprEnumerable<T> : IPoolingEnumerable<(T, T)>
     public IPoolingEnumerator<(T, T)> GetEnumerator()
     {
         _count++;
-        return Pool<ZipExprEnumerator>.Get().Init (this, _src!.GetEnumerator(), _second!.GetEnumerator());
+        return Pool<ZipExprEnumerator>.Get()
+            .Init (this, _src!.GetEnumerator(), _second!.GetEnumerator());
     }
 
     private void Dispose()
@@ -48,14 +54,19 @@ internal class ZipExprEnumerable<T> : IPoolingEnumerable<(T, T)>
         }
     }
 
-    internal class ZipExprEnumerator : IPoolingEnumerator<(T, T)>
+    internal class ZipExprEnumerator :
+        IPoolingEnumerator<(T, T)>
     {
         private ZipExprEnumerable<T>? _parent;
         private IPoolingEnumerator<T>? _src, _second;
         private bool _hasResult;
 
-        public ZipExprEnumerator Init (
-            ZipExprEnumerable<T> parent, IPoolingEnumerator<T> src, IPoolingEnumerator<T> second)
+        public ZipExprEnumerator Init
+            (
+                ZipExprEnumerable<T> parent,
+                IPoolingEnumerator<T> src,
+                IPoolingEnumerator<T> second
+            )
         {
             _parent = parent;
             _src = src;

@@ -29,10 +29,13 @@ internal class WhereExprWithContextEnumerable<T, TContext>
     private int _count;
     private IPoolingEnumerable<T>? _src;
     private Func<TContext, T, bool>? _condition;
-    private TContext _context;
+    private TContext _context = default!;
 
-    public WhereExprWithContextEnumerable<T, TContext> Init (IPoolingEnumerable<T> src, TContext context,
-        Func<TContext, T, bool> condition)
+    public WhereExprWithContextEnumerable<T, TContext> Init
+        (
+            IPoolingEnumerable<T> src, TContext context,
+            Func<TContext, T, bool> condition
+        )
     {
         _count = 0;
         _src = src;
@@ -67,16 +70,18 @@ internal class WhereExprWithContextEnumerable<T, TContext>
     internal class WhereExprWithContextEnumerator
         : IPoolingEnumerator<T>
     {
-        private TContext _context;
+        private TContext _context = default!;
         private Func<TContext, T, bool>? _condition;
         private IPoolingEnumerator<T>? _src;
         private WhereExprWithContextEnumerable<T, TContext>? _parent;
 
-        public WhereExprWithContextEnumerator Init (
-            IPoolingEnumerator<T> src,
-            WhereExprWithContextEnumerable<T, TContext> parent,
-            TContext context,
-            Func<TContext, T, bool> condition)
+        public WhereExprWithContextEnumerator Init
+            (
+                IPoolingEnumerator<T> src,
+                WhereExprWithContextEnumerable<T, TContext> parent,
+                TContext context,
+                Func<TContext, T, bool> condition
+            )
         {
             _src = src;
             _parent = parent;
