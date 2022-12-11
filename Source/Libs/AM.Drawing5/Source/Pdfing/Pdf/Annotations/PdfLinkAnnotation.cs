@@ -5,9 +5,11 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable LocalizableElement
+// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 
-/*
+/* PdfLinkAnnotation.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -67,9 +69,11 @@ public sealed class PdfLinkAnnotation
     {
         if (destinationPage < 1)
         {
-            throw new ArgumentException (
-                "Invalid destination page in call to CreateDocumentLink: page number is one-based and must be 1 or higher.",
-                "destinationPage");
+            throw new ArgumentException
+                (
+                    "Invalid destination page in call to CreateDocumentLink: page number is one-based and must be 1 or higher.",
+                    nameof (destinationPage)
+                );
         }
 
         var link = new PdfLinkAnnotation
@@ -122,8 +126,6 @@ public sealed class PdfLinkAnnotation
 
     internal override void WriteObject (PdfWriter writer)
     {
-        PdfPage? dest = null;
-
         //pdf.AppendFormat(CultureInfo.InvariantCulture,
         //  "{0} 0 obj\n<<\n/Type/Annot\n/Subtype/Link\n" +
         //  "/Rect[{1} {2} {3} {4}]\n/BS<</Type/Border>>\n/Border[0 0 0]\n/C[0 0 0]\n",
@@ -147,13 +149,13 @@ public sealed class PdfLinkAnnotation
             case LinkType.Document:
                 // destIndex > Owner.PageCount can happen when rendering pages using PDFsharp directly.
                 var destIndex = _destPage;
-                if (destIndex > Owner.PageCount)
+                if (destIndex > Owner!.PageCount)
                 {
                     destIndex = Owner.PageCount;
                 }
 
                 destIndex--;
-                dest = Owner.Pages[destIndex];
+                var dest = Owner.Pages[destIndex];
 
                 //pdf.AppendFormat("/Dest[{0} 0 R/XYZ null null 0]\n", dest.ObjectID);
                 Elements[Keys.Dest] = new PdfLiteral ("[{0} 0 R/XYZ null null 0]", dest.ObjectNumber);
@@ -163,7 +165,7 @@ public sealed class PdfLinkAnnotation
                 //pdf.AppendFormat("/A<</S/URI/URI{0}>>\n", PdfEncoders.EncodeAsLiteral(url));
                 Elements[PdfAnnotation.Keys.A] = new PdfLiteral (
                     "<</S/URI/URI{0}>>", //PdfEncoders.EncodeAsLiteral(url));
-                    PdfEncoders.ToStringLiteral (_url, PdfStringEncoding.WinAnsiEncoding, writer.SecurityHandler));
+                    PdfEncoders.ToStringLiteral (_url!, PdfStringEncoding.WinAnsiEncoding, writer.SecurityHandler));
                 break;
 
             case LinkType.File:
@@ -172,7 +174,7 @@ public sealed class PdfLinkAnnotation
                 Elements[PdfAnnotation.Keys.A] = new PdfLiteral ("<</Type/Action/S/Launch/F<</Type/Filespec/F{0}>> >>",
 
                     //PdfEncoders.EncodeAsLiteral(url));
-                    PdfEncoders.ToStringLiteral (_url, PdfStringEncoding.WinAnsiEncoding, writer.SecurityHandler));
+                    PdfEncoders.ToStringLiteral (_url!, PdfStringEncoding.WinAnsiEncoding, writer.SecurityHandler));
                 break;
         }
 

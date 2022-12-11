@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-/*
+/* OpCodeName.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 

@@ -58,7 +58,7 @@ public sealed class PdfCatalog
     /// </summary>
     public string Version
     {
-        get { return _version; }
+        get => _version;
         set
         {
             switch (value)
@@ -96,7 +96,7 @@ public sealed class PdfCatalog
             {
                 _pages = (PdfPages) Elements.GetValue (Keys.Pages, VCF.CreateIndirect)
                     .ThrowIfNull();
-                if (Owner.IsImported)
+                if (Owner!.IsImported)
                 {
                     _pages.FlattenPageTree();
                 }
@@ -113,8 +113,8 @@ public sealed class PdfCatalog
     /// </summary>
     internal PdfPageLayout PageLayout
     {
-        get { return (PdfPageLayout)Elements.GetEnumFromName (Keys.PageLayout, PdfPageLayout.SinglePage); }
-        set { Elements.SetEnumAsName (Keys.PageLayout, value); }
+        get => (PdfPageLayout)Elements.GetEnumFromName (Keys.PageLayout, PdfPageLayout.SinglePage);
+        set => Elements.SetEnumAsName (Keys.PageLayout, value);
     }
 
     /// <summary>
@@ -122,26 +122,17 @@ public sealed class PdfCatalog
     /// </summary>
     internal PdfPageMode PageMode
     {
-        get { return (PdfPageMode)Elements.GetEnumFromName (Keys.PageMode, PdfPageMode.UseNone); }
-        set { Elements.SetEnumAsName (Keys.PageMode, value); }
+        get => (PdfPageMode)Elements.GetEnumFromName (Keys.PageMode, PdfPageMode.UseNone);
+        set => Elements.SetEnumAsName (Keys.PageMode, value);
     }
 
     /// <summary>
     /// Implementation of PdfDocument.ViewerPreferences.
     /// </summary>
-    internal PdfViewerPreferences ViewerPreferences
-    {
-        get
-        {
-            if (_viewerPreferences == null)
-            {
-                _viewerPreferences = (PdfViewerPreferences) Elements.GetValue (Keys.ViewerPreferences, VCF.CreateIndirect)
-                    .ThrowIfNull();
-            }
-
-            return _viewerPreferences;
-        }
-    }
+    internal PdfViewerPreferences ViewerPreferences =>
+        _viewerPreferences ??= (PdfViewerPreferences)Elements
+            .GetValue (Keys.ViewerPreferences, VCF.CreateIndirect)
+            .ThrowIfNull();
 
     private PdfViewerPreferences? _viewerPreferences;
 
@@ -174,7 +165,7 @@ public sealed class PdfCatalog
     /// </summary>
     public PdfAcroForm AcroForm
     {
-        get { return (PdfAcroForm)Elements.GetValue (Keys.AcroForm); }
+        get => (PdfAcroForm) Elements.GetValue (Keys.AcroForm)!;
         set
         {
             if (Elements.ContainsKey (Keys.AcroForm))
@@ -194,10 +185,10 @@ public sealed class PdfCatalog
     /// </summary>
     public string Language
     {
-        get { return Elements.GetString (Keys.Lang); }
+        get => Elements.GetString (Keys.Lang);
         set
         {
-            if (value == null)
+            if (value == null!)
             {
                 Elements.Remove (Keys.Lang);
             }
@@ -454,8 +445,5 @@ public sealed class PdfCatalog
     /// <summary>
     /// Gets the KeysMeta of this dictionary type.
     /// </summary>
-    internal override DictionaryMeta Meta
-    {
-        get { return Keys.Meta; }
-    }
+    internal override DictionaryMeta Meta => Keys.Meta;
 }

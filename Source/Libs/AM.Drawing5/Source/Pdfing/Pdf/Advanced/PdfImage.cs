@@ -6,6 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMember.Local
 
 /* PdfImage.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -16,6 +17,8 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+
+using AM;
 
 using PdfSharpCore.Drawing;
 using PdfSharpCore.Pdf.Filters;
@@ -29,7 +32,8 @@ namespace PdfSharpCore.Pdf.Advanced;
 /// <summary>
 /// Represents an image.
 /// </summary>
-public sealed partial class PdfImage : PdfXObject
+public sealed partial class PdfImage
+    : PdfXObject
 {
     #region Construction
 
@@ -42,12 +46,12 @@ public sealed partial class PdfImage : PdfXObject
         Elements.SetName (Keys.Type, "/XObject");
         Elements.SetName (Keys.Subtype, "/Image");
 
-        _image = image;
+        Image = image;
 
         ////// TODO: identify multiple used images. If the image already exists use the same XRef.
         ////_defaultName = PdfImageTable.NextImageName;
 
-        switch (_image.Format.Guid.ToString ("B").ToUpper())
+        switch (Image.Format.Guid.ToString ("B").ToUpper())
         {
             // Pdf supports Jpeg, therefore we can write what we've read:
             case "{B96B3CAE-0728-11D3-9D7B-0000F81EF32E}": //XImageFormat.Jpeg
@@ -79,12 +83,7 @@ public sealed partial class PdfImage : PdfXObject
     /// <summary>
     /// Gets the underlying XImage object.
     /// </summary>
-    public XImage Image
-    {
-        get { return _image; }
-    }
-
-    readonly XImage _image;
+    public XImage Image { get; }
 
     /// <summary>
     /// Returns 'Image'.
@@ -101,23 +100,23 @@ public sealed partial class PdfImage : PdfXObject
     {
         byte[]? imageBits;
 
-        using (var memory = _image.AsJpeg())
+        using (var memory = Image.AsJpeg())
         {
             imageBits = memory.ToArray();
         }
 
         var tryFlateDecode =
-            _document.Options.UseFlateDecoderForJpegImages == PdfUseFlateDecoderForJpegImages.Automatic;
+            _document!.Options.UseFlateDecoderForJpegImages == PdfUseFlateDecoderForJpegImages.Automatic;
         var useFlateDecode = _document.Options.UseFlateDecoderForJpegImages == PdfUseFlateDecoderForJpegImages.Always;
 
         var fd = new FlateDecode();
         var imageDataCompressed = (useFlateDecode || tryFlateDecode)
             ? fd.Encode (imageBits, _document.Options.FlateEncodeMode)
             : null;
-        if (useFlateDecode || tryFlateDecode && imageDataCompressed.Length < imageBits.Length)
+        if (useFlateDecode || tryFlateDecode && imageDataCompressed!.Length < imageBits.Length)
         {
-            Stream = new PdfStream (imageDataCompressed, this);
-            Elements[PdfStream.Keys.Length] = new PdfInteger (imageDataCompressed.Length);
+            Stream = new PdfStream (imageDataCompressed!, this);
+            Elements[PdfStream.Keys.Length] = new PdfInteger (imageDataCompressed!.Length);
             var arrayFilters = new PdfArray (_document);
             arrayFilters.Elements.Add (new PdfName ("/FlateDecode"));
             arrayFilters.Elements.Add (new PdfName ("/DCTDecode"));
@@ -130,10 +129,10 @@ public sealed partial class PdfImage : PdfXObject
             Elements[PdfStream.Keys.Filter] = new PdfName ("/DCTDecode");
         }
 
-        if (_image.Interpolate)
+        if (Image.Interpolate)
             Elements[Keys.Interpolate] = PdfBoolean.True;
-        Elements[Keys.Width] = new PdfInteger (_image.PixelWidth);
-        Elements[Keys.Height] = new PdfInteger (_image.PixelHeight);
+        Elements[Keys.Width] = new PdfInteger (Image.PixelWidth);
+        Elements[Keys.Height] = new PdfInteger (Image.PixelHeight);
         Elements[Keys.BitsPerComponent] = new PdfInteger (8);
         Elements[Keys.ColorSpace] = new PdfName ("/DeviceRGB");
     }
@@ -164,23 +163,21 @@ public sealed partial class PdfImage : PdfXObject
     /// <param name="hasAlpha">true (ARGB), false (RGB)</param>
     private void ReadTrueColorMemoryBitmap (int components, int bits, bool hasAlpha)
     {
-        var pdfVersion = Owner.Version;
-        var memory = new MemoryStream();
-        memory = _image.AsBitmap();
+        var pdfVersion = Owner!.Version;
+        var memory = Image.AsBitmap();
 
         // THHO4THHO Use ImageImporterBMP here to avoid redundant code.
-
         var streamLength = (int)memory.Length;
         Debug.Assert (streamLength > 0, "Bitmap image encoding failed.");
         if (streamLength > 0)
         {
             var imageBits = new byte[streamLength];
             memory.Seek (0, SeekOrigin.Begin);
-            memory.Read (imageBits, 0, streamLength);
+            memory.Read (imageBits, 0, streamLength).NotUsed();
             memory.Dispose();
 
-            var height = _image.PixelHeight;
-            var width = _image.PixelWidth;
+            var height = Image.PixelHeight;
+            var width = Image.PixelWidth;
 
             // TODO: we could define structures for
             //   BITMAPFILEHEADER
@@ -188,7 +185,6 @@ public sealed partial class PdfImage : PdfXObject
             //   BITMAPINFOHEADER
             // to avoid ReadWord and ReadDWord ... (but w/o pointers this doesn't help much)
 
-            var bigHeader = false;
             if (ReadWord (imageBits, 0) != 0x4d42 || // "BM"
                 ReadDWord (imageBits, 2) != streamLength ||
                 ReadDWord (imageBits, 18) != width ||
@@ -203,7 +199,7 @@ public sealed partial class PdfImage : PdfXObject
                 throw new NotImplementedException ("ReadTrueColorMemoryBitmap: unsupported format #2");
             }
 
-            bigHeader = infoHeaderSize == 108;
+            var bigHeader = infoHeaderSize == 108;
             if (ReadWord (imageBits, 26) != 1 ||
                 (!hasAlpha && ReadWord (imageBits, bigHeader ? 30 : 28) != components * bits ||
                  hasAlpha && ReadWord (imageBits, bigHeader ? 30 : 28) != (components + 1) * bits) ||
@@ -235,7 +231,7 @@ public sealed partial class PdfImage : PdfXObject
                     var nOffsetWriteAlpha = 0;
                     if (hasAlpha)
                     {
-                        mask.StartLine (y);
+                        mask!.StartLine (y);
                         nOffsetWriteAlpha = (height - 1 - y) * width;
                     }
 
@@ -246,8 +242,8 @@ public sealed partial class PdfImage : PdfXObject
                         imageData[nOffsetWrite + 2] = imageBits[nFileOffset + nOffsetRead];
                         if (hasAlpha)
                         {
-                            mask.AddPel (imageBits[nFileOffset + nOffsetRead + 3]);
-                            alphaMask[nOffsetWriteAlpha] = imageBits[nFileOffset + nOffsetRead + 3];
+                            mask!.AddPel (imageBits[nFileOffset + nOffsetRead + 3]);
+                            alphaMask![nOffsetWriteAlpha] = imageBits[nFileOffset + nOffsetRead + 3];
                             if (!hasMask || !hasAlphaMask)
                             {
                                 if (imageBits[nFileOffset + nOffsetRead + 3] != 255)
@@ -271,7 +267,7 @@ public sealed partial class PdfImage : PdfXObject
             else if (components == 1)
             {
                 // Grayscale
-                throw new NotImplementedException ("Image format not supported (grayscales).");
+                throw new NotImplementedException ("Image format not supported (grayscale).");
             }
 
             var fd = new FlateDecode();
@@ -279,7 +275,7 @@ public sealed partial class PdfImage : PdfXObject
             {
                 // monochrome mask is either sufficient or
                 // provided for compatibility with older reader versions
-                var maskDataCompressed = fd.Encode (mask.MaskData, _document.Options.FlateEncodeMode);
+                var maskDataCompressed = fd.Encode (mask!.MaskData, _document!.Options.FlateEncodeMode);
                 var pdfMask = new PdfDictionary (_document);
                 pdfMask.Elements.SetName (Keys.Type, "/XObject");
                 pdfMask.Elements.SetName (Keys.Subtype, "/Image");
@@ -298,7 +294,7 @@ public sealed partial class PdfImage : PdfXObject
             if (hasMask && hasAlphaMask && pdfVersion >= 14)
             {
                 // The image provides an alpha mask (requires Arcrobat 5.0 or higher)
-                var alphaMaskCompressed = fd.Encode (alphaMask, _document.Options.FlateEncodeMode);
+                var alphaMaskCompressed = fd.Encode (alphaMask!, _document!.Options.FlateEncodeMode);
                 var smask = new PdfDictionary (_document);
                 smask.Elements.SetName (Keys.Type, "/XObject");
                 smask.Elements.SetName (Keys.Subtype, "/Image");
@@ -314,7 +310,7 @@ public sealed partial class PdfImage : PdfXObject
                 Elements[Keys.SMask] = smask.Reference;
             }
 
-            var imageDataCompressed = fd.Encode (imageData, _document.Options.FlateEncodeMode);
+            var imageDataCompressed = fd.Encode (imageData, _document!.Options.FlateEncodeMode);
 
             Stream = new PdfStream (imageDataCompressed, this);
             Elements[PdfStream.Keys.Length] = new PdfInteger (imageDataCompressed.Length);
@@ -325,7 +321,7 @@ public sealed partial class PdfImage : PdfXObject
 
             // TODO: CMYK
             Elements[Keys.ColorSpace] = new PdfName ("/DeviceRGB");
-            if (_image.Interpolate)
+            if (Image.Interpolate)
                 Elements[Keys.Interpolate] = PdfBoolean.True;
         }
     }
@@ -348,7 +344,7 @@ public sealed partial class PdfImage : PdfXObject
 
     private void ReadIndexedMemoryBitmap (int bits /*, ref bool hasAlpha*/)
     {
-        var pdfVersion = Owner.Version;
+        var pdfVersion = Owner!.Version;
         int firstMaskColor = -1, lastMaskColor = -1;
         var segmentedColorMask = false;
 
@@ -362,11 +358,11 @@ public sealed partial class PdfImage : PdfXObject
         {
             var imageBits = new byte[streamLength];
             memory.Seek (0, SeekOrigin.Begin);
-            memory.Read (imageBits, 0, streamLength);
+            memory.Read (imageBits, 0, streamLength).NotUsed();
             memory.Dispose();
 
-            var height = _image.PixelHeight;
-            var width = _image.PixelWidth;
+            var height = Image.PixelHeight;
+            var width = Image.PixelWidth;
 
             if (ReadWord (imageBits, 0) != 0x4d42 || // "BM"
                 ReadDWord (imageBits, 2) != streamLength ||
@@ -461,7 +457,7 @@ public sealed partial class PdfImage : PdfXObject
 
             var isFaxEncoding = false;
             var imageData = new byte[((width * bits + 7) / 8) * height];
-            byte[] imageDataFax = null;
+            byte[]? imageDataFax = null;
             var k = 0;
 
             if (bits == 1)
@@ -578,7 +574,7 @@ public sealed partial class PdfImage : PdfXObject
                 //if (!segmentedColorMask && pdfVersion >= 13)
                 if (!segmentedColorMask && pdfVersion >= 13 && !isGray)
                 {
-                    var array = new PdfArray (_document);
+                    var array = new PdfArray (_document!);
                     array.Elements.Add (new PdfInteger (firstMaskColor));
                     array.Elements.Add (new PdfInteger (lastMaskColor));
                     Elements[Keys.Mask] = array;
@@ -586,7 +582,7 @@ public sealed partial class PdfImage : PdfXObject
                 else
                 {
                     // Monochrome mask
-                    var maskDataCompressed = fd.Encode (mask.MaskData, _document.Options.FlateEncodeMode);
+                    var maskDataCompressed = fd.Encode (mask.MaskData, _document!.Options.FlateEncodeMode);
                     var pdfMask = new PdfDictionary (_document);
                     pdfMask.Elements.SetName (Keys.Type, "/XObject");
                     pdfMask.Elements.SetName (Keys.Subtype, "/Image");
@@ -603,14 +599,14 @@ public sealed partial class PdfImage : PdfXObject
                 }
             }
 
-            var imageDataCompressed = fd.Encode (imageData, _document.Options.FlateEncodeMode);
+            var imageDataCompressed = fd.Encode (imageData, _document!.Options.FlateEncodeMode);
             var imageDataFaxCompressed =
-                isFaxEncoding ? fd.Encode (imageDataFax, _document.Options.FlateEncodeMode) : null;
+                isFaxEncoding ? fd.Encode (imageDataFax!, _document.Options.FlateEncodeMode) : null;
 
             var usesCcittEncoding = false;
             if (isFaxEncoding &&
-                (imageDataFax.Length < imageDataCompressed.Length ||
-                 imageDataFaxCompressed.Length < imageDataCompressed.Length))
+                (imageDataFax!.Length < imageDataCompressed.Length ||
+                 imageDataFaxCompressed!.Length < imageDataCompressed.Length))
             {
                 // /CCITTFaxDecode creates the smaller file (with or without /FlateDecode):
                 usesCcittEncoding = true;
@@ -636,7 +632,7 @@ public sealed partial class PdfImage : PdfXObject
                 }
                 else
                 {
-                    Stream = new PdfStream (imageDataFaxCompressed, this);
+                    Stream = new PdfStream (imageDataFaxCompressed!, this);
                     Elements[PdfStream.Keys.Length] = new PdfInteger (imageDataFaxCompressed.Length);
                     var arrayFilters = new PdfArray (_document);
                     arrayFilters.Elements.Add (new PdfName ("/FlateDecode"));
@@ -681,8 +677,7 @@ public sealed partial class PdfImage : PdfXObject
             if ((usesCcittEncoding && isBitonal == 0) ||
                 (!usesCcittEncoding && isBitonal <= 0 && !isGray))
             {
-                PdfDictionary colorPalette = null;
-                colorPalette = new PdfDictionary (_document);
+                var colorPalette = new PdfDictionary (_document);
                 var packedPaletteData = paletteData.Length >= 48
                     ? fd.Encode (paletteData, _document.Options.FlateEncodeMode)
                     : null; // don't compress small palettes
@@ -708,7 +703,7 @@ public sealed partial class PdfImage : PdfXObject
                 arrayColorSpace.Elements.Add (new PdfName ("/Indexed"));
                 arrayColorSpace.Elements.Add (new PdfName ("/DeviceRGB"));
                 arrayColorSpace.Elements.Add (new PdfInteger (paletteColors - 1));
-                arrayColorSpace.Elements.Add (colorPalette.Reference);
+                arrayColorSpace.Elements.Add (colorPalette.Reference!);
                 Elements[Keys.ColorSpace] = arrayColorSpace;
             }
             else
@@ -716,7 +711,7 @@ public sealed partial class PdfImage : PdfXObject
                 Elements[Keys.ColorSpace] = new PdfName ("/DeviceGray");
             }
 
-            if (_image.Interpolate)
+            if (Image.Interpolate)
                 Elements[Keys.Interpolate] = PdfBoolean.True;
         }
     }
@@ -724,7 +719,7 @@ public sealed partial class PdfImage : PdfXObject
     /// <summary>
     /// Common keys for all streams.
     /// </summary>
-    public sealed new class Keys : PdfXObject.Keys
+    public new sealed class Keys : PdfXObject.Keys
     {
         // ReSharper disable InconsistentNaming
 
@@ -917,10 +912,7 @@ class MonochromeMask
     /// <summary>
     /// Returns the bitmap mask that will be written to PDF.
     /// </summary>
-    public byte[] MaskData
-    {
-        get { return _maskData; }
-    }
+    public byte[] MaskData => _maskData;
 
     private readonly byte[] _maskData;
 

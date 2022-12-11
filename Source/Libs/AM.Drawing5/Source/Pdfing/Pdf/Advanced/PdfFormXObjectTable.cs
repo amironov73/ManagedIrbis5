@@ -110,7 +110,7 @@ internal sealed class PdfFormXObjectTable
         var selector = new Selector (page);
         if (!_forms.TryGetValue (selector, out var importedObjectTable))
         {
-            importedObjectTable = new PdfImportedObjectTable (Owner, page.Owner);
+            importedObjectTable = new PdfImportedObjectTable (Owner, page.Owner!);
             _forms[selector] = importedObjectTable;
         }
 
@@ -124,7 +124,7 @@ internal sealed class PdfFormXObjectTable
     {
         if (document == null)
         {
-            throw new ArgumentNullException ("document");
+            throw new ArgumentNullException (nameof (document));
         }
 
         // Is the external PDF file from which is imported already known for the current document?
@@ -188,7 +188,7 @@ internal sealed class PdfFormXObjectTable
         public Selector (XForm form)
         {
             // HACK: just use full path to identify
-            _path = form._path.ToLowerInvariant();
+            _path = form._path!.ToLowerInvariant();
         }
 
         /// <summary>
@@ -197,7 +197,7 @@ internal sealed class PdfFormXObjectTable
         public Selector (PdfPage page)
         {
             var owner = page.Owner;
-            _path = "*" + owner.Guid.ToString ("B");
+            _path = "*" + owner!.Guid.ToString ("B");
             _path = _path.ToLowerInvariant();
         }
 

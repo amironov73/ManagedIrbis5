@@ -86,7 +86,7 @@ public sealed class PdfFormXObject
 
         if (form.IsTemplate)
         {
-            Debug.Assert (importedObjectTable == null);
+            Debug.Assert (importedObjectTable == null!);
 
             // TODO more initialization here???
             return;
@@ -97,10 +97,10 @@ public sealed class PdfFormXObject
         var pdfForm = form;
 
         // Get import page
-        var importPages = importedObjectTable.ExternalDocument.Pages;
+        var importPages = importedObjectTable.ExternalDocument!.Pages;
         if (pdfForm.PageNumber < 1 || pdfForm.PageNumber > importPages.Count)
         {
-            PSSR.ImportPageNumberOutOfRange (pdfForm.PageNumber, importPages.Count, form._path);
+            PSSR.ImportPageNumberOutOfRange (pdfForm.PageNumber, importPages.Count, form._path!);
         }
 
         var importPage = importPages[pdfForm.PageNumber - 1];
@@ -113,9 +113,9 @@ public sealed class PdfFormXObject
 
             // Get root object
             PdfObject root;
-            if (res is PdfReference)
+            if (res is PdfReference reference)
             {
-                root = ((PdfReference)res).Value;
+                root = reference.Value;
             }
             else
             {
@@ -261,7 +261,7 @@ public sealed class PdfFormXObject
 
         // (no cloning needed because the bytes keep untouched)
         Stream = content.Stream; // new PdfStream(bytes, this);
-        Elements.SetInteger ("/Length", content.Stream.Value.Length);
+        Elements.SetInteger ("/Length", content.Stream!.Value.Length);
     }
 
     /// <summary>
@@ -276,9 +276,9 @@ public sealed class PdfFormXObject
 
     internal string GetFontName (XFont font, out PdfFont pdfFont)
     {
-        pdfFont = _document.FontTable.GetFont (font);
+        pdfFont = _document!.FontTable.GetFont (font);
         Debug.Assert (pdfFont != null);
-        var name = Resources.AddFont (pdfFont);
+        var name = Resources!.AddFont (pdfFont);
         return name;
     }
 
@@ -292,9 +292,9 @@ public sealed class PdfFormXObject
     /// </summary>
     internal string GetFontName (string idName, byte[] fontData, out PdfFont pdfFont)
     {
-        pdfFont = _document.FontTable.GetFont (idName, fontData);
+        pdfFont = _document!.FontTable.GetFont (idName, fontData);
         Debug.Assert (pdfFont != null);
-        var name = Resources.AddFont (pdfFont);
+        var name = Resources!.AddFont (pdfFont);
         return name;
     }
 
@@ -501,8 +501,5 @@ public sealed class PdfFormXObject
     /// <summary>
     /// Gets the KeysMeta of this dictionary type.
     /// </summary>
-    internal override DictionaryMeta Meta
-    {
-        get { return Keys.Meta; }
-    }
+    internal override DictionaryMeta Meta => Keys.Meta;
 }

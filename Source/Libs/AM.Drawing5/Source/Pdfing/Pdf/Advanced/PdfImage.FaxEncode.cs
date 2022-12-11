@@ -6,6 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMember.Local
 
 /* PdfImage.FaxEncode.cs --
  * Ars Magna project, http://arsmagna.ru

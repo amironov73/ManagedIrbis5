@@ -5,6 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 
 /* PdfContents.cs --
@@ -58,7 +59,7 @@ public sealed class PdfContents
         {
             // Convert the references from PdfDictionary to PdfContent
             var item = Elements[idx];
-            if (item is PdfReference iref && iref.Value is PdfDictionary dictionary)
+            if (item is PdfReference { Value: PdfDictionary dictionary })
             {
                 // The following line is correct!
                 new PdfContent (dictionary);
@@ -108,21 +109,19 @@ public sealed class PdfContents
     /// </summary>
     public PdfContent CreateSingleContent()
     {
-        var bytes = new byte[0];
-        byte[] bytes1;
-        byte[] bytes2;
+        var bytes = Array.Empty<byte>();
         foreach (var iref in Elements)
         {
             var cont = (PdfDictionary)((PdfReference)iref).Value;
-            bytes1 = bytes;
-            bytes2 = cont.Stream.UnfilteredValue;
+            var bytes1 = bytes;
+            var bytes2 = cont.Stream!.UnfilteredValue;
             bytes = new byte[bytes1.Length + bytes2.Length + 1];
             bytes1.CopyTo (bytes, 0);
             bytes[bytes1.Length] = (byte)'\n';
             bytes2.CopyTo (bytes, bytes1.Length + 1);
         }
 
-        var content = new PdfContent (Owner);
+        var content = new PdfContent (Owner!);
         content.Stream = new PdfDictionary.PdfStream (bytes, content);
         return content;
     }
@@ -153,7 +152,7 @@ public sealed class PdfContents
 
         Owner._irefTable.Add (content);
         Elements.Clear();
-        Elements.Add (content.Reference);
+        Elements.Add (content.Reference!);
 
         return content;
     }
@@ -176,7 +175,7 @@ public sealed class PdfContents
                 byte[] value;
                 int length;
                 var content = (PdfContent?)((PdfReference)Elements[0]).Value;
-                if (content != null && content.Stream != null)
+                if (content is { Stream: { } })
                 {
                     length = content.Stream.Length;
                     value = new byte[length + 2];
@@ -253,10 +252,7 @@ public sealed class PdfContents
             _index = -1;
         }
 
-        object? IEnumerator.Current
-        {
-            get { return Current; }
-        }
+        object? IEnumerator.Current => Current;
 
         public PdfContent? Current
         {

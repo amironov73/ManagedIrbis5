@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-/*
+/* PdfTextAnnotation.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -83,12 +83,18 @@ public sealed class PdfTextAnnotation
     {
         get
         {
-            string value = Elements.GetName (Keys.Name);
+            var value = Elements.GetName (Keys.Name);
             if (value == "")
+            {
                 return PdfTextAnnotationIcon.NoIcon;
+            }
+
             value = value.Substring (1);
             if (!Enum.IsDefined (typeof (PdfTextAnnotationIcon), value))
+            {
                 return PdfTextAnnotationIcon.NoIcon;
+            }
+
             return (PdfTextAnnotationIcon)Enum.Parse (typeof (PdfTextAnnotationIcon), value, false);
         }
         set
@@ -99,7 +105,9 @@ public sealed class PdfTextAnnotation
                 Elements.SetName (Keys.Name, "/" + value.ToString());
             }
             else
+            {
                 Elements.Remove (Keys.Name);
+            }
         }
     }
 

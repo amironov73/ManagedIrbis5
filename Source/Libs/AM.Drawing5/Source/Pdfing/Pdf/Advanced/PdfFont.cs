@@ -15,7 +15,6 @@
 
 using System;
 using System.Diagnostics;
-using System.Text;
 
 using AM.Text;
 
@@ -53,7 +52,7 @@ public class PdfFont
             Debug.Assert (_fontDescriptor != null);
             return _fontDescriptor;
         }
-        set { _fontDescriptor = value; }
+        set => _fontDescriptor = value;
     }
 
     PdfFontDescriptor? _fontDescriptor;
@@ -63,10 +62,7 @@ public class PdfFont
     /// <summary>
     /// Gets a value indicating whether this instance is symbol font.
     /// </summary>
-    public bool IsSymbolFont
-    {
-        get { return _fontDescriptor.IsSymbolFont; }
-    }
+    public bool IsSymbolFont => _fontDescriptor!.IsSymbolFont;
 
     internal void AddChars (string text)
     {
@@ -87,13 +83,12 @@ public class PdfFont
     /// <summary>
     /// Gets or sets the CMapInfo.
     /// </summary>
-    internal CMapInfo CMapInfo { get; set; }
+    internal CMapInfo? CMapInfo { get; set; }
 
     /// <summary>
     /// Gets or sets ToUnicodeMap.
     /// </summary>
-    internal PdfToUnicodeMap ToUnicodeMap { get; set; }
-
+    internal PdfToUnicodeMap? ToUnicodeMap { get; set; }
 
     /// <summary>
     /// Adds a tag of exactly six uppercase letters to the font name

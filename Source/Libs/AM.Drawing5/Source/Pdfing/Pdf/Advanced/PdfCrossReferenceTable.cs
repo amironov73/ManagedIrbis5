@@ -5,6 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 
 /* PdfCrossReferenceTable.cs --
@@ -17,6 +18,8 @@ using System;
 using System.Diagnostics;
 using System.Collections;
 using System.Collections.Generic;
+
+using AM;
 
 using PdfSharpCore.Pdf.IO;
 
@@ -62,7 +65,7 @@ internal sealed class PdfCrossReferenceTable // Must not be derive from PdfObjec
 #if DEBUG
         if (iref.ObjectID.ObjectNumber == 948)
         {
-            GetType();
+            GetType().NotUsed();
         }
 #endif
         if (iref.ObjectID.IsEmpty)
@@ -106,7 +109,7 @@ internal sealed class PdfCrossReferenceTable // Must not be derive from PdfObjec
 
         // throw new InvalidOperationException("Object already in table.");
 
-        ObjectTable.Add (value.ObjectID, value.Reference);
+        ObjectTable.Add (value.ObjectID, value.Reference!);
     }
 
     public void Remove (PdfReference iref)
@@ -231,7 +234,7 @@ internal sealed class PdfCrossReferenceTable // Must not be derive from PdfObjec
 
         //CheckConsistence();
         // TODO: Is this really so easy?
-        var irefs = TransitiveClosure (_document._trailer);
+        var irefs = TransitiveClosure (_document._trailer!);
 
 #if DEBUG
 
@@ -261,15 +264,15 @@ internal sealed class PdfCrossReferenceTable // Must not be derive from PdfObjec
         {
             if (!refs.ContainsKey (value))
             {
-                value.GetType();
+                value.GetType().NotUsed();
             }
         }
 
         foreach (var iref in ObjectTable.Values)
         {
-            if (iref.Value == null)
+            if (iref.Value == null!)
             {
-                GetType();
+                GetType().NotUsed();
             }
 
             Debug.Assert (iref.Value != null);
@@ -279,14 +282,14 @@ internal sealed class PdfCrossReferenceTable // Must not be derive from PdfObjec
         {
             if (!ObjectTable.ContainsKey (iref.ObjectID))
             {
-                GetType();
+                GetType().NotUsed();
             }
 
             Debug.Assert (ObjectTable.ContainsKey (iref.ObjectID));
 
-            if (iref.Value == null)
+            if (iref.Value == null!)
             {
-                GetType();
+                GetType().NotUsed();
             }
 
             Debug.Assert (iref.Value != null);
@@ -341,7 +344,7 @@ internal sealed class PdfCrossReferenceTable // Must not be derive from PdfObjec
     [Conditional ("DEBUG_")]
     public void CheckConsistence()
     {
-        var ht1 = new Dictionary<PdfReference, object>();
+        var ht1 = new Dictionary<PdfReference, object?>();
         foreach (var iref in ObjectTable.Values)
         {
             Debug.Assert (!ht1.ContainsKey (iref), "Duplicate iref.");
@@ -349,7 +352,7 @@ internal sealed class PdfCrossReferenceTable // Must not be derive from PdfObjec
             ht1.Add (iref, null);
         }
 
-        var ht2 = new Dictionary<PdfObjectID, object>();
+        var ht2 = new Dictionary<PdfObjectID, object?>();
         foreach (var iref in ObjectTable.Values)
         {
             Debug.Assert (!ht2.ContainsKey (iref.ObjectID), "Duplicate iref.");
@@ -372,7 +375,7 @@ internal sealed class PdfCrossReferenceTable // Must not be derive from PdfObjec
                 Debug.Assert (!Equals (irefs[i].ObjectID, irefs[j].Value.ObjectID));
                 Debug.Assert (irefs[i].ObjectNumber != irefs[j].Value.ObjectNumber);
                 Debug.Assert (ReferenceEquals (irefs[i].Document, irefs[j].Document));
-                GetType();
+                GetType().NotUsed();
             }
 #endif
     }
@@ -458,11 +461,11 @@ internal sealed class PdfCrossReferenceTable // Must not be derive from PdfObjec
     }
 
     static int _nestingLevel;
-    Dictionary<PdfItem, object> _overflow = new Dictionary<PdfItem, object>();
+    Dictionary<PdfItem, object?> _overflow = new ();
 
     void TransitiveClosureImplementation
         (
-            Dictionary<PdfItem, object> objects,
+            Dictionary<PdfItem, object?> objects,
             PdfObject pdfObject /*, ref int depth*/
         )
     {
@@ -491,9 +494,9 @@ internal sealed class PdfCrossReferenceTable // Must not be derive from PdfObjec
                 //  GetType();
 #endif
 
-            IEnumerable enumerable = null; //(IEnumerator)pdfObject;
-            PdfDictionary dict;
-            PdfArray array;
+            IEnumerable? enumerable = null; //(IEnumerator)pdfObject;
+            PdfDictionary? dict;
+            PdfArray? array;
             if ((dict = pdfObject as PdfDictionary) != null)
             {
                 enumerable = dict.Elements.Values;
@@ -507,12 +510,11 @@ internal sealed class PdfCrossReferenceTable // Must not be derive from PdfObjec
                 Debug.Assert (false, "Should not come here.");
             }
 
-            if (enumerable != null)
+            if (enumerable != null!)
             {
                 foreach (PdfItem item in enumerable)
                 {
-                    var iref = item as PdfReference;
-                    if (iref != null)
+                    if (item is PdfReference iref)
                     {
                         // Is this an indirect reference to an object that does not exist?
                         //if (iref.Document == null)
@@ -532,7 +534,7 @@ internal sealed class PdfCrossReferenceTable // Must not be derive from PdfObjec
 
                         if (!ReferenceEquals (iref.Document, _document))
                         {
-                            GetType();
+                            GetType().NotUsed();
                             Debug.WriteLine ($"Bad iref: {iref.ObjectID.ToString()}");
                         }
 
@@ -550,7 +552,7 @@ internal sealed class PdfCrossReferenceTable // Must not be derive from PdfObjec
                             if (iref.Document != null)
                             {
                                 // ... from trailer hack
-                                if (value == null)
+                                if (value == null!)
                                 {
                                     iref = ObjectTable[iref.ObjectID];
                                     Debug.Assert (iref.Value != null);
@@ -596,7 +598,7 @@ internal sealed class PdfCrossReferenceTable // Must not be derive from PdfObjec
     /// <summary>
     /// Gets the cross reference to an objects used for undefined indirect references.
     /// </summary>
-    public PdfReference DeadObject
+    public PdfReference? DeadObject
     {
         get
         {

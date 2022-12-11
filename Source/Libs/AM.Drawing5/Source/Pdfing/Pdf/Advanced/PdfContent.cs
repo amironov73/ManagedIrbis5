@@ -48,7 +48,7 @@ public sealed class PdfContent
     /// Initializes a new instance of the <see cref="PdfContent"/> class.
     /// </summary>
     internal PdfContent (PdfPage? page)
-        : base (page != null ? page.Owner : null)
+        : base (page?.Owner)
     {
         //_pageContent = new PageContent(page);
     }
@@ -78,7 +78,7 @@ public sealed class PdfContent
                 var filter = Elements[PdfStream.Keys.Filter];
                 if (filter == null)
                 {
-                    var bytes = Filtering.FlateDecode.Encode (Stream.Value, _document.Options.FlateEncodeMode);
+                    var bytes = Filtering.FlateDecode.Encode (Stream!.Value, _document!.Options.FlateEncodeMode);
                     Stream.Value = bytes;
                     Elements.SetInteger (PdfStream.Keys.Length, Stream.Length);
                     Elements.SetName (PdfStream.Keys.Filter, "/FlateDecode");
@@ -151,9 +151,9 @@ public sealed class PdfContent
         if (Stream != null)
         {
             //if (Owner.Options.CompressContentStreams)
-            if (Owner.Options.CompressContentStreams && Elements.GetName ("/Filter").Length == 0)
+            if (Owner!.Options.CompressContentStreams && Elements.GetName ("/Filter").Length == 0)
             {
-                Stream.Value = Filtering.FlateDecode.Encode (Stream.Value, _document.Options.FlateEncodeMode);
+                Stream.Value = Filtering.FlateDecode.Encode (Stream.Value, _document!.Options.FlateEncodeMode);
 
                 //Elements["/Filter"] = new PdfName("/FlateDecode");
                 Elements.SetName ("/Filter", "/FlateDecode");
@@ -183,11 +183,6 @@ public sealed class PdfContent
         static DictionaryMeta? _meta;
     }
 
-    /// <summary>
-    /// Gets the KeysMeta of this dictionary type.
-    /// </summary>
-    internal override DictionaryMeta Meta
-    {
-        get { return Keys.Meta; }
-    }
+    /// <inheritdoc cref="PdfDictionary.Meta"/>
+    internal override DictionaryMeta Meta => Keys.Meta;
 }

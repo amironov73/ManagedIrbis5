@@ -7,10 +7,9 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-/*
+/* PdfWidgetAnnotation.cs --
  * Ars Magna project, http://arsmagna.ru
  */
-
 
 namespace PdfSharpCore.Pdf.Annotations;
 

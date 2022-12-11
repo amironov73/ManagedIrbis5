@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-/*
+/* PdfAnnotationFlags.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 

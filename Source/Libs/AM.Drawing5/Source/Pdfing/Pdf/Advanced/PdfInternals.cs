@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-/*
+/* PdfInternals.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -16,7 +16,6 @@
 using System;
 using System.Diagnostics;
 using System.Reflection;
-using System.Text;
 using System.IO;
 
 using AM.Text;
@@ -47,28 +46,28 @@ public class PdfInternals // TODO: PdfDocumentInternals... PdfPageInterals etc.
     /// </summary>
     public string FirstDocumentID
     {
-        get => _document._trailer.GetDocumentID (0);
-        set => _document._trailer.SetDocumentID (0, value);
+        get => _document._trailer!.GetDocumentID (0);
+        set => _document._trailer!.SetDocumentID (0, value);
     }
 
     /// <summary>
     /// Gets the first document identifier as GUID.
     /// </summary>
-    public Guid FirstDocumentGuid => GuidFromString (_document._trailer.GetDocumentID (0));
+    public Guid FirstDocumentGuid => GuidFromString (_document._trailer!.GetDocumentID (0));
 
     /// <summary>
     /// Gets or sets the second document identifier.
     /// </summary>
     public string SecondDocumentID
     {
-        get => _document._trailer.GetDocumentID (1);
-        set => _document._trailer.SetDocumentID (1, value);
+        get => _document._trailer!.GetDocumentID (1);
+        set => _document._trailer!.SetDocumentID (1, value);
     }
 
     /// <summary>
     /// Gets the first document identifier as GUID.
     /// </summary>
-    public Guid SecondDocumentGuid => GuidFromString (_document._trailer.GetDocumentID (0));
+    public Guid SecondDocumentGuid => GuidFromString (_document._trailer!.GetDocumentID (0));
 
     Guid GuidFromString (string? id)
     {
@@ -101,31 +100,31 @@ public class PdfInternals // TODO: PdfDocumentInternals... PdfPageInterals etc.
     /// </summary>
     public PdfObject GetObject (PdfObjectID objectID)
     {
-        return _document._irefTable[objectID].Value;
+        return _document._irefTable[objectID]!.Value;
     }
 
     /// <summary>
     /// Maps the specified external object to the substitute object in this document.
     /// Returns null if no such object exists.
     /// </summary>
-    public PdfObject MapExternalObject (PdfObject externalObject)
+    public PdfObject? MapExternalObject (PdfObject externalObject)
     {
         var table = _document.FormTable;
-        var iot = table.GetImportedObjectTable (externalObject.Owner);
+        var iot = table.GetImportedObjectTable (externalObject.Owner!);
         var reference = iot[externalObject.ObjectID];
 
-        return reference == null ? null : reference.Value;
+        return reference == null! ? null : reference.Value;
     }
 
     /// <summary>
     /// Returns the PdfReference of the specified object, or null, if the object is not in the
     /// document's object table.
     /// </summary>
-    public static PdfReference GetReference (PdfObject obj)
+    public static PdfReference? GetReference (PdfObject obj)
     {
         if (obj == null)
         {
-            throw new ArgumentNullException ("obj");
+            throw new ArgumentNullException (nameof (obj));
         }
 
         return obj.Reference;
@@ -138,7 +137,7 @@ public class PdfInternals // TODO: PdfDocumentInternals... PdfPageInterals etc.
     {
         if (obj == null)
         {
-            throw new ArgumentNullException ("obj");
+            throw new ArgumentNullException (nameof (obj));
         }
 
         return obj.ObjectID;
@@ -151,7 +150,7 @@ public class PdfInternals // TODO: PdfDocumentInternals... PdfPageInterals etc.
     {
         if (obj == null)
         {
-            throw new ArgumentNullException ("obj");
+            throw new ArgumentNullException (nameof (obj));
         }
 
         return obj.ObjectNumber;
@@ -164,7 +163,7 @@ public class PdfInternals // TODO: PdfDocumentInternals... PdfPageInterals etc.
     {
         if (obj == null)
         {
-            throw new ArgumentNullException ("obj");
+            throw new ArgumentNullException (nameof (obj));
         }
 
         return obj.GenerationNumber;
@@ -192,8 +191,8 @@ public class PdfInternals // TODO: PdfDocumentInternals... PdfPageInterals etc.
     /// </summary>
     public T CreateIndirectObject<T>() where T : PdfObject
     {
-        T result = null;
-        ConstructorInfo ctorInfo = null; // TODO
+        T? result = default;
+        ConstructorInfo? ctorInfo = null; // TODO
         if (ctorInfo != null)
         {
             result = (T)ctorInfo.Invoke (new object[] { _document });
@@ -213,7 +212,7 @@ public class PdfInternals // TODO: PdfDocumentInternals... PdfPageInterals etc.
     {
         if (obj == null)
         {
-            throw new ArgumentNullException ("obj");
+            throw new ArgumentNullException (nameof (obj));
         }
 
         if (obj.Owner == null)
@@ -235,7 +234,7 @@ public class PdfInternals // TODO: PdfDocumentInternals... PdfPageInterals etc.
     {
         if (obj == null)
         {
-            throw new ArgumentNullException ("obj");
+            throw new ArgumentNullException (nameof (obj));
         }
 
         if (obj.Reference == null)
@@ -289,8 +288,10 @@ public class PdfInternals // TODO: PdfDocumentInternals... PdfPageInterals etc.
     public void WriteObject (Stream stream, PdfItem item)
     {
         // Never write an encrypted object
-        var writer = new PdfWriter (stream, null);
-        writer.Options = PdfWriterOptions.OmitStream;
+        var writer = new PdfWriter (stream, null)
+        {
+            Options = PdfWriterOptions.OmitStream
+        };
         item.WriteObject (writer);
     }
 

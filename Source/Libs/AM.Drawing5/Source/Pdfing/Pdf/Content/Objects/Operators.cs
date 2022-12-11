@@ -3,11 +3,13 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable ForCanBeConvertedToForeach
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 
-/*
+/* Operators.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -102,7 +104,7 @@ public static class OpCodes
     {
         COperator? op = null;
         var opcode = StringToOpCode[name];
-        if (opcode != null)
+        if (opcode != null!)
         {
             op = new COperator (opcode);
         }

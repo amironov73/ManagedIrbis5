@@ -5,6 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 
 /* PdfFileSpecification
@@ -83,7 +84,7 @@ public class PdfFileSpecification
             {
                 if (!value.IsIndirect)
                 {
-                    Owner._irefTable.Add (value);
+                    Owner!._irefTable.Add (value);
                 }
 
                 embeddedFileDictionary.Elements.SetReference (Keys.F, value);

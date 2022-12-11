@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-/*
+/* PdfAnnotations.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -31,7 +31,8 @@ namespace PdfSharpCore.Pdf.Annotations;
 /// <summary>
 /// Represents the annotations array of a page.
 /// </summary>
-public sealed class PdfAnnotations : PdfArray
+public sealed class PdfAnnotations
+    : PdfArray
 {
     #region Construction
 
@@ -64,7 +65,7 @@ public sealed class PdfAnnotations : PdfArray
     public void Add (PdfAnnotation annotation)
     {
         annotation.Document = Owner;
-        Owner._irefTable.Add (annotation);
+        Owner!._irefTable.Add (annotation);
         Elements.Add (annotation.Reference.ThrowIfNull());
     }
 
@@ -112,7 +113,7 @@ public sealed class PdfAnnotations : PdfArray
     {
         get
         {
-            PdfReference iref;
+            PdfReference? iref;
             PdfDictionary dict;
             var item = Elements[index];
             if ((iref = item as PdfReference) != null)
@@ -173,7 +174,7 @@ public sealed class PdfAnnotations : PdfArray
             for (var idx = 0; idx < count; idx++)
             {
                 var annot = annots.Elements.GetDictionary (idx);
-                if (annot != null && annot.Elements.ContainsKey ("/P"))
+                if (annot != null! && annot.Elements.ContainsKey ("/P"))
                 {
                     annot.Elements["/P"] = page.Reference;
                 }

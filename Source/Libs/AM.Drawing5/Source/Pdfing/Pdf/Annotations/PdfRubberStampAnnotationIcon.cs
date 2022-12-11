@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-/*
+/* PdfRubberStampAnnotationIcon.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 

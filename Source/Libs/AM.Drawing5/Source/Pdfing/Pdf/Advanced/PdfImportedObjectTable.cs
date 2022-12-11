@@ -39,7 +39,7 @@ internal sealed class PdfImportedObjectTable
         Sure.NotNull (owner);
         Sure.NotNull (externalDocument);
 
-        _owner = owner;
+        Owner = owner;
         _externalDocumentHandle = externalDocument.Handle;
         _xObjects = new PdfFormXObject[externalDocument.PageCount];
     }
@@ -49,9 +49,7 @@ internal sealed class PdfImportedObjectTable
     /// <summary>
     /// Gets the document this table belongs to.
     /// </summary>
-    public PdfDocument Owner => _owner;
-
-    readonly PdfDocument _owner;
+    public PdfDocument Owner { get; }
 
     /// <summary>
     /// Gets the external document, or null, if the external document is garbage collected.
@@ -60,7 +58,7 @@ internal sealed class PdfImportedObjectTable
 
     readonly PdfDocument.DocumentHandle _externalDocumentHandle;
 
-    public PdfFormXObject? GetXObject (int pageNumber)
+    public PdfFormXObject GetXObject (int pageNumber)
     {
         return _xObjects[pageNumber - 1];
     }

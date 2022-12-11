@@ -3,11 +3,12 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable ForCanBeConvertedToForeach
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-/*
+/* CObject.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -309,7 +310,7 @@ public class CSequence : CObject, IList<CObject> // , ICollection<CObject>, IEnu
         stream.Position = 0;
         var count = (int)stream.Length;
         var bytes = new byte[count];
-        stream.Read (bytes, 0, count);
+        stream.Read (bytes, 0, count).NotUsed();
         stream.Dispose();
         return bytes;
     }
@@ -826,7 +827,7 @@ public class COperator
     /// </summary>
     protected COperator()
     {
-        // пустое тело конструктора
+        OpCode = default!;
     }
 
     internal COperator (OpCode opcode)
@@ -871,7 +872,6 @@ public class COperator
     /// </summary>
     public OpCode OpCode { get; }
 
-
     /// <summary>
     /// Returns a string that represents the current operator.
     /// </summary>
@@ -886,7 +886,7 @@ public class COperator
         for (var idx = 0; idx < count; idx++)
         {
             // ReSharper disable once PossibleNullReferenceException because the loop is not entered if _sequence is null
-            _seqence[idx].WriteObject (writer);
+            _seqence![idx].WriteObject (writer);
         }
 
         writer.WriteLineRaw (ToString());

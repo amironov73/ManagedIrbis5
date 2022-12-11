@@ -36,7 +36,7 @@ public abstract class PdfDictionaryWithContentStream
     /// <summary>
     /// Initializes a new instance of the <see cref="PdfDictionaryWithContentStream"/> class.
     /// </summary>
-    public PdfDictionaryWithContentStream()
+    protected PdfDictionaryWithContentStream()
     {
         // пустое тело конструктора
     }
@@ -45,7 +45,7 @@ public abstract class PdfDictionaryWithContentStream
     /// Initializes a new instance of the <see cref="PdfDictionaryWithContentStream"/> class.
     /// </summary>
     /// <param name="document">The document.</param>
-    public PdfDictionaryWithContentStream (PdfDocument document)
+    protected PdfDictionaryWithContentStream (PdfDocument document)
         : base (document)
     {
         // пустое тело конструктора

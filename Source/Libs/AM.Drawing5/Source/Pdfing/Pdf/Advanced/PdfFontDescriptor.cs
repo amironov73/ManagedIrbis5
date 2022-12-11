@@ -150,7 +150,7 @@ public sealed class PdfFontDescriptor
     PdfFontDescriptorFlags FlagsFromDescriptor (OpenTypeDescriptor descriptor)
     {
         PdfFontDescriptorFlags flags = 0;
-        _isSymbolFont = descriptor.FontFace._cmap.symbol;
+        _isSymbolFont = descriptor.FontFace._cmap!.symbol;
         flags |= descriptor.FontFace._cmap.symbol ? PdfFontDescriptorFlags.Symbolic : PdfFontDescriptorFlags.Nonsymbolic;
         return flags;
     }
@@ -332,17 +332,9 @@ public sealed class PdfFontDescriptor
         /// <summary>
         /// Gets the KeysMeta for these keys.
         /// </summary>
-        internal static DictionaryMeta Meta
-        {
-            get
-            {
-                if (_meta == null)
-                    _meta = CreateMeta (typeof (Keys));
-                return _meta;
-            }
-        }
+        internal static DictionaryMeta Meta => _meta ??= CreateMeta (typeof (Keys));
 
-        static DictionaryMeta _meta;
+        private static DictionaryMeta? _meta;
     }
 
     /// <summary>
