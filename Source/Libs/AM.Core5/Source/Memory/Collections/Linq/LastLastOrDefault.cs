@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* LastLastOrDefault.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,10 +25,20 @@ namespace AM.Memory.Collections.Linq;
 
 public static partial class PoolingEnumerable
 {
-    public static T Last<T> (this IPoolingEnumerable<T> source)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="source"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public static T Last<T>
+        (
+            this IPoolingEnumerable<T> source
+        )
     {
         var enumerator = source.GetEnumerator();
-        T element = default;
+        T element = default!;
         var hasItems = false;
         while (enumerator.MoveNext())
         {
@@ -40,10 +50,22 @@ public static partial class PoolingEnumerable
         return hasItems ? element : throw new InvalidOperationException ("Sequence is empty");
     }
 
-    public static T Last<T> (this IPoolingEnumerable<T> source, Func<T, bool> condition)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="condition"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public static T Last<T>
+        (
+            this IPoolingEnumerable<T> source,
+            Func<T, bool> condition
+        )
     {
         var enumerator = source.GetEnumerator();
-        T element = default;
+        T element = default!;
         var hasItems = false;
         while (enumerator.MoveNext())
         {
@@ -57,11 +79,25 @@ public static partial class PoolingEnumerable
         return hasItems ? element : throw new InvalidOperationException ("Sequence is empty");
     }
 
-    public static T Last<T, TContext> (this IPoolingEnumerable<T> source, TContext context,
-        Func<TContext, T, bool> condition)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="context"></param>
+    /// <param name="condition"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="TContext"></typeparam>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public static T Last<T, TContext>
+        (
+            this IPoolingEnumerable<T> source,
+            TContext context,
+            Func<TContext, T, bool> condition
+        )
     {
         var enumerator = source.GetEnumerator();
-        T element = default;
+        T element = default!;
         var hasItems = false;
         while (enumerator.MoveNext())
         {
@@ -75,10 +111,19 @@ public static partial class PoolingEnumerable
         return hasItems ? element : throw new InvalidOperationException ("Sequence is empty");
     }
 
-    public static T LastOrDefault<T> (this IPoolingEnumerable<T> source)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="source"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static T LastOrDefault<T>
+        (
+            this IPoolingEnumerable<T> source
+        )
     {
         var enumerator = source.GetEnumerator();
-        T element = default;
+        T element = default!;
         var hasItems = false;
         while (enumerator.MoveNext())
         {
@@ -87,13 +132,24 @@ public static partial class PoolingEnumerable
         }
 
         enumerator.Dispose();
-        return hasItems ? element : default;
+        return hasItems ? element : default!;
     }
 
-    public static T LastOrDefault<T> (this IPoolingEnumerable<T> source, Func<T, bool> condition)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="condition"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static T LastOrDefault<T>
+        (
+            this IPoolingEnumerable<T> source,
+            Func<T, bool> condition
+        )
     {
         var enumerator = source.GetEnumerator();
-        T element = default;
+        T element = default!;
         var hasItems = false;
         while (enumerator.MoveNext())
         {
@@ -104,14 +160,27 @@ public static partial class PoolingEnumerable
         }
 
         enumerator.Dispose();
-        return hasItems ? element : default;
+        return hasItems ? element : default!;
     }
 
-    public static T LastOrDefault<T, TContext> (this IPoolingEnumerable<T> source, TContext context,
-        Func<TContext, T, bool> condition)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="context"></param>
+    /// <param name="condition"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="TContext"></typeparam>
+    /// <returns></returns>
+    public static T LastOrDefault<T, TContext>
+        (
+            this IPoolingEnumerable<T> source,
+            TContext context,
+            Func<TContext, T, bool> condition
+        )
     {
         var enumerator = source.GetEnumerator();
-        T element = default;
+        T element = default!;
         var hasItems = false;
         while (enumerator.MoveNext())
         {
@@ -122,6 +191,6 @@ public static partial class PoolingEnumerable
         }
 
         enumerator.Dispose();
-        return hasItems ? element : default;
+        return hasItems ? element : default!;
     }
 }

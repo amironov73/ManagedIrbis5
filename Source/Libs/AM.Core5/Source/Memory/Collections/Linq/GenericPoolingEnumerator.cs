@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* GenericPoolingEnumerator.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,9 +24,10 @@ using System.Collections.Generic;
 
 namespace AM.Memory.Collections.Linq;
 
-internal sealed class GenericPoolingEnumerator<T> : IPoolingEnumerator<T>
+internal sealed class GenericPoolingEnumerator<T>
+    : IPoolingEnumerator<T>
 {
-    private IEnumerator<T> _source;
+    private IEnumerator<T> _source = default!;
 
     public GenericPoolingEnumerator<T> Init (IEnumerator<T> source)
     {
@@ -45,14 +46,14 @@ internal sealed class GenericPoolingEnumerator<T> : IPoolingEnumerator<T>
     public void Dispose()
     {
         _source.Dispose();
-        _source = default;
+        _source = default!;
         Pool<GenericPoolingEnumerator<T>>.Return (this);
     }
 }
 
 internal sealed class GenericEnumerator<T> : IEnumerator<T>
 {
-    private IPoolingEnumerator<T> _source;
+    private IPoolingEnumerator<T> _source = default!;
 
     public GenericEnumerator<T> Init (IPoolingEnumerator<T> source)
     {
@@ -71,7 +72,7 @@ internal sealed class GenericEnumerator<T> : IEnumerator<T>
     public void Dispose()
     {
         _source.Dispose();
-        _source = default;
+        _source = default!;
         Pool<GenericEnumerator<T>>.Return (this);
     }
 }

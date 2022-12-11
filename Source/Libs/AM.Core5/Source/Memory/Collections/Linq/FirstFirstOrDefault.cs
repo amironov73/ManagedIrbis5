@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* FirstFirstOrDefault.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -93,7 +93,7 @@ public static partial class PoolingEnumerable
         var item = hasItem ? enumerator.Current : default;
         enumerator.Dispose();
 
-        return item;
+        return item!;
     }
 
     /// <summary>
@@ -112,7 +112,7 @@ public static partial class PoolingEnumerable
         }
 
         enumerator.Dispose();
-        return default;
+        return default!;
     }
 
     /// <summary>
@@ -132,6 +132,6 @@ public static partial class PoolingEnumerable
         }
 
         enumerator.Dispose();
-        return default;
+        return default!;
     }
 }

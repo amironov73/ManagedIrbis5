@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* IntersectEnumerable.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,12 +25,13 @@ using AM.Memory.Collections.Specialized;
 
 namespace AM.Memory.Collections.Linq;
 
-internal class IntersectExprEnumerable<T> : IPoolingEnumerable<T>
+internal class IntersectExprEnumerable<T>
+    : IPoolingEnumerable<T>
 {
     private int _count;
-    private IPoolingEnumerable<T> _src;
-    private IEqualityComparer<T> _comparer;
-    private PoolingDictionary<T, int> _second;
+    private IPoolingEnumerable<T> _src = default!;
+    private IEqualityComparer<T> _comparer = default!;
+    private PoolingDictionary<T, int> _second = default!;
 
     public IntersectExprEnumerable<T> Init
         (
@@ -58,23 +59,28 @@ internal class IntersectExprEnumerable<T> : IPoolingEnumerable<T>
         _count--;
         if (_count == 0)
         {
-            _src = default;
+            _src = default!;
             _second?.Dispose();
             Pool<PoolingDictionary<T, int>>.Return (_second);
 
-            _second = default;
+            _second = default!;
             Pool<IntersectExprEnumerable<T>>.Return (this);
         }
     }
 
-    internal class IntersectExprEnumerator : IPoolingEnumerator<T>
+    internal class IntersectExprEnumerator
+        : IPoolingEnumerator<T>
     {
-        private IntersectExprEnumerable<T> _parent;
-        private IPoolingEnumerator<T> _src;
-        private PoolingDictionary<T, int> _alreadyDoneItems;
+        private IntersectExprEnumerable<T> _parent = default!;
+        private IPoolingEnumerator<T> _src = default!;
+        private PoolingDictionary<T, int> _alreadyDoneItems = default!;
 
-        public IntersectExprEnumerator Init (IntersectExprEnumerable<T> parent, IPoolingEnumerator<T> src,
-            IEqualityComparer<T> comparer)
+        public IntersectExprEnumerator Init
+            (
+                IntersectExprEnumerable<T> parent,
+                IPoolingEnumerator<T> src,
+                IEqualityComparer<T> comparer
+            )
         {
             _src = src;
             _parent = parent;
@@ -106,14 +112,14 @@ internal class IntersectExprEnumerable<T> : IPoolingEnumerable<T>
         public void Dispose()
         {
             _src?.Dispose();
-            _src = null;
+            _src = default!;
 
             _alreadyDoneItems?.Dispose();
             Pool<PoolingDictionary<T, int>>.Return (_alreadyDoneItems);
-            _alreadyDoneItems = default;
+            _alreadyDoneItems = default!;
 
             _parent?.Dispose();
-            _parent = default;
+            _parent = default!;
 
             Pool<IntersectExprEnumerator>.Return (this);
         }

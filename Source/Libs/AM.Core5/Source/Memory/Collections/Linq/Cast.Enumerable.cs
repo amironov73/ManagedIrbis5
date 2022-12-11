@@ -17,7 +17,8 @@
 
 namespace AM.Memory.Collections.Linq;
 
-internal class CastExprEnumerable<T> : IPoolingEnumerable<T>
+internal class CastExprEnumerable<T>
+    : IPoolingEnumerable<T>
 {
     private int _count;
 

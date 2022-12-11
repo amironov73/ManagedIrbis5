@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* Concat.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,9 +20,15 @@ namespace AM.Memory.Collections.Linq;
 public static partial class PoolingEnumerable
 {
     /// <summary>
-    /// Returns all elements from <paramref name="source"/> and all -- from <paramref name="second"/>. Complexity = O(N+M)
+    /// Returns all elements from <paramref name="source"/> and all --
+    /// from <paramref name="second"/>. Complexity = O(N+M)
     /// </summary>
-    public static IPoolingEnumerable<T>
-        Concat<T> (this IPoolingEnumerable<T> source, IPoolingEnumerable<T> second) =>
-        Pool<ConcatExprEnumerable<T>>.Get().Init (source, second);
+    public static IPoolingEnumerable<T> Concat<T>
+        (
+            this IPoolingEnumerable<T> source,
+            IPoolingEnumerable<T> second
+        )
+    {
+        return Pool<ConcatExprEnumerable<T>>.Get().Init (source, second);
+    }
 }

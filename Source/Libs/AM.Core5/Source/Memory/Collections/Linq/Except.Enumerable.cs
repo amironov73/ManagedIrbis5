@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* Except.Enumerable.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -28,9 +28,9 @@ namespace AM.Memory.Collections.Linq;
 internal class ExceptExprEnumerable<T> : IPoolingEnumerable<T>
 {
     private int _count;
-    private IPoolingEnumerable<T> _src;
+    private IPoolingEnumerable<T> _src = default!;
     private IEqualityComparer<T>? _comparer;
-    private PoolingDictionary<T, int> _except;
+    private PoolingDictionary<T, int> _except = default!;
 
     public ExceptExprEnumerable<T> Init
         (
@@ -58,18 +58,18 @@ internal class ExceptExprEnumerable<T> : IPoolingEnumerable<T>
         _count--;
         if (_count == 0)
         {
-            _src = default;
+            _src = default!;
             _except?.Dispose();
             Pool<PoolingDictionary<T, int>>.Return (_except);
-            _except = default;
+            _except = default!;
             Pool<ExceptExprEnumerable<T>>.Return (this);
         }
     }
 
     internal class ExceptExprEnumerator : IPoolingEnumerator<T>
     {
-        private ExceptExprEnumerable<T> _parent;
-        private IPoolingEnumerator<T> _src;
+        private ExceptExprEnumerable<T> _parent = default!;
+        private IPoolingEnumerator<T> _src = default!;
 
         public ExceptExprEnumerator Init (ExceptExprEnumerable<T> parent, IPoolingEnumerator<T> src)
         {
@@ -98,10 +98,10 @@ internal class ExceptExprEnumerable<T> : IPoolingEnumerable<T>
         public void Dispose()
         {
             _src?.Dispose();
-            _src = null;
+            _src = default!;
 
             _parent?.Dispose();
-            _parent = default;
+            _parent = default!;
 
             Pool<ExceptExprEnumerator>.Return (this);
         }

@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* Intersect.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -27,8 +27,18 @@ namespace AM.Memory.Collections.Linq;
 
 public static partial class PoolingEnumerable
 {
-    public static IPoolingEnumerable<T> Intersect<T> (this IPoolingEnumerable<T> source,
-        IPoolingEnumerable<T> intersectWith)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="intersectWith"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static IPoolingEnumerable<T> Intersect<T>
+        (
+            this IPoolingEnumerable<T> source,
+            IPoolingEnumerable<T> intersectWith
+        )
     {
         var second = Pool<PoolingDictionary<T, int>>.Get().Init (0);
         foreach (var item in intersectWith) second[item] = 1;
@@ -36,8 +46,20 @@ public static partial class PoolingEnumerable
         return Pool<IntersectExprEnumerable<T>>.Get().Init (source, second);
     }
 
-    public static IPoolingEnumerable<T> Intersect<T> (this IPoolingEnumerable<T> source,
-        IPoolingEnumerable<T> intersectWith, IEqualityComparer<T> comparer)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="intersectWith"></param>
+    /// <param name="comparer"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static IPoolingEnumerable<T> Intersect<T>
+        (
+            this IPoolingEnumerable<T> source,
+            IPoolingEnumerable<T> intersectWith,
+            IEqualityComparer<T> comparer
+        )
     {
         var second = Pool<PoolingDictionary<T, int>>.Get().Init (0);
         foreach (var item in intersectWith) second[item] = 1;

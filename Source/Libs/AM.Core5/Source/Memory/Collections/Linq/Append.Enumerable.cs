@@ -23,7 +23,7 @@ internal sealed class AppendExprEnumerable<T>
     private int _count;
 
     private IPoolingEnumerable<T>? _src;
-    private T _element;
+    private T _element = default!;
 
     public AppendExprEnumerable<T> Init
         (
@@ -69,7 +69,7 @@ internal sealed class AppendExprEnumerable<T>
     {
         private IPoolingEnumerator? _src;
         private AppendExprEnumerable<T>? _parent;
-        private T _element;
+        private T _element = default!;
         private int _overcount;
 
         public AppendExprEnumerator Init

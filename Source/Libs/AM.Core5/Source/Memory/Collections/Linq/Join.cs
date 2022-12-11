@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* Join.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,10 +20,10 @@ namespace AM.Memory.Collections.Linq;
 public static partial class PoolingEnumerable
 {
     // public static IPoolingEnumerable<TResult> Join<TOuter, TInner, TKey, TResult>(
-    //     this IPoolingEnumerable<TOuter> outer, 
-    //     IPoolingEnumerable<TInner> inner, 
-    //     Func<TOuter, TKey> outerKeySelector, 
-    //     Func<TInner, TKey> innerKeySelector, 
+    //     this IPoolingEnumerable<TOuter> outer,
+    //     IPoolingEnumerable<TInner> inner,
+    //     Func<TOuter, TKey> outerKeySelector,
+    //     Func<TInner, TKey> innerKeySelector,
     //     Func<TOuter, TInner, TResult> resultSelector)
     // {
     //     if (outer == null)
@@ -91,7 +91,7 @@ public static partial class PoolingEnumerable
     // }
 
     // private static IPoolingEnumerable<TResult> JoinIterator<TOuter, TInner, TKey, TResult>(
-    //     IPoolingEnumerable<TOuter> outer, 
+    //     IPoolingEnumerable<TOuter> outer,
     //     IEnumerable<TInner> inner,
     //     Func<TOuter, TKey> outerKeySelector,
     //     Func<TInner, TKey> innerKeySelector,

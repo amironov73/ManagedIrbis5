@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* Except.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -27,7 +27,18 @@ namespace AM.Memory.Collections.Linq;
 
 public static partial class PoolingEnumerable
 {
-    public static IPoolingEnumerable<T> Except<T> (this IPoolingEnumerable<T> source, IPoolingEnumerable<T> except)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="except"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static IPoolingEnumerable<T> Except<T>
+        (
+            this IPoolingEnumerable<T> source,
+            IPoolingEnumerable<T> except
+        )
     {
         var exceptDict = Pool<PoolingDictionary<T, int>>.Get().Init (0);
         foreach (var item in except) exceptDict[item] = 1;
@@ -35,8 +46,20 @@ public static partial class PoolingEnumerable
         return Pool<ExceptExprEnumerable<T>>.Get().Init (source, exceptDict);
     }
 
-    public static IPoolingEnumerable<T> Except<T> (this IPoolingEnumerable<T> source, IPoolingEnumerable<T> except,
-        IEqualityComparer<T> comparer)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="except"></param>
+    /// <param name="comparer"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static IPoolingEnumerable<T> Except<T>
+        (
+            this IPoolingEnumerable<T> source,
+            IPoolingEnumerable<T> except,
+            IEqualityComparer<T> comparer
+        )
     {
         var exceptDict = Pool<PoolingDictionary<T, int>>.Get().Init (0);
         foreach (var item in except) exceptDict[item] = 1;

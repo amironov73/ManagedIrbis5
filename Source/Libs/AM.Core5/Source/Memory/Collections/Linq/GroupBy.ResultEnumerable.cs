@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* GroupBy.ResultEnumerable.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -26,19 +26,22 @@ using AM.Memory.Collections.Specialized;
 
 namespace AM.Memory.Collections.Linq;
 
-internal sealed class GroupedResultEnumerable<TSource, TKey, TResult> : IPoolingEnumerable<TResult>
+internal sealed class GroupedResultEnumerable<TSource, TKey, TResult>
+    : IPoolingEnumerable<TResult>
 {
-    private IPoolingEnumerable<TSource> _source;
-    private Func<TSource, TKey> _keySelector;
-    private Func<TKey, IPoolingEnumerable<TSource>, TResult> _resultSelector;
-    private IEqualityComparer<TKey> _comparer;
+    private IPoolingEnumerable<TSource> _source = default!;
+    private Func<TSource, TKey> _keySelector = default!;
+    private Func<TKey, IPoolingEnumerable<TSource>, TResult> _resultSelector = default!;
+    private IEqualityComparer<TKey> _comparer = default!;
     private int _count;
 
-    public GroupedResultEnumerable<TSource, TKey, TResult> Init (
-        IPoolingEnumerable<TSource> source,
-        Func<TSource, TKey> keySelector,
-        Func<TKey, IPoolingEnumerable<TSource>, TResult> resultSelector,
-        IEqualityComparer<TKey> comparer)
+    public GroupedResultEnumerable<TSource, TKey, TResult> Init
+        (
+            IPoolingEnumerable<TSource> source,
+            Func<TSource, TKey> keySelector,
+            Func<TKey, IPoolingEnumerable<TSource>, TResult> resultSelector,
+            IEqualityComparer<TKey> comparer
+        )
     {
         _source = source ?? throw new ArgumentNullException (nameof (source));
         _keySelector = keySelector ?? throw new ArgumentNullException (nameof (keySelector));
@@ -50,7 +53,8 @@ internal sealed class GroupedResultEnumerable<TSource, TKey, TResult> : IPooling
 
     public IPoolingEnumerator<TResult> GetEnumerator()
     {
-        var tmpDict = Pool<PoolingDictionary<TKey, PoolingGrouping>>.Get().Init (0, _comparer);
+        var tmpDict = Pool<PoolingDictionary<TKey, PoolingGrouping>>.Get()
+            .Init (0, _comparer);
 
         PoolingGrouping grp;
         foreach (var item in _source)
@@ -75,20 +79,21 @@ internal sealed class GroupedResultEnumerable<TSource, TKey, TResult> : IPooling
 
         if (_count == 0)
         {
-            _comparer = default;
-            _resultSelector = default;
-            _keySelector = default;
+            _comparer = default!;
+            _resultSelector = default!;
+            _keySelector = default!;
             Pool<GroupedResultEnumerable<TSource, TKey, TResult>>.Return (this);
         }
     }
 
     IPoolingEnumerator IPoolingEnumerable.GetEnumerator() => GetEnumerator();
 
-    internal class GroupedResultEnumerator : IPoolingEnumerator<TResult>
+    internal class GroupedResultEnumerator
+        : IPoolingEnumerator<TResult>
     {
-        private PoolingDictionary<TKey, PoolingGrouping> _src;
-        private GroupedResultEnumerable<TSource, TKey, TResult> _parent;
-        private IPoolingEnumerator<KeyValuePair<TKey, PoolingGrouping>> _enumerator;
+        private PoolingDictionary<TKey, PoolingGrouping> _src = default!;
+        private GroupedResultEnumerable<TSource, TKey, TResult> _parent = default!;
+        private IPoolingEnumerator<KeyValuePair<TKey, PoolingGrouping>> _enumerator = default!;
 
         public GroupedResultEnumerator Init (
             GroupedResultEnumerable<TSource, TKey, TResult> parent,
@@ -112,13 +117,13 @@ internal sealed class GroupedResultEnumerable<TSource, TKey, TResult> : IPooling
             // cleanup collection
             _src?.Dispose();
             Pool<PoolingDictionary<TKey, PoolingGrouping>>.Return (_src);
-            _src = default;
+            _src = default!;
 
             _enumerator?.Dispose();
-            _enumerator = default;
+            _enumerator = default!;
 
             _parent?.Dispose();
-            _parent = default;
+            _parent = default!;
 
             Pool<GroupedResultEnumerator>.Return (this);
         }
@@ -133,9 +138,10 @@ internal sealed class GroupedResultEnumerable<TSource, TKey, TResult> : IPooling
         object IPoolingEnumerator.Current => Current;
     }
 
-    internal class PoolingGrouping : IPoolingGrouping<TKey, TSource>, IDisposable
+    internal class PoolingGrouping
+        : IPoolingGrouping<TKey, TSource>, IDisposable
     {
-        private PoolingList<TSource> _elements;
+        private PoolingList<TSource> _elements = default!;
 
         public PoolingGrouping Init (TKey key)
         {
@@ -156,9 +162,9 @@ internal sealed class GroupedResultEnumerable<TSource, TKey, TResult> : IPooling
         {
             _elements?.Dispose();
             Pool<PoolingList<TSource>>.Return (_elements);
-            _elements = null;
+            _elements = default!;
 
-            Key = default;
+            Key = default!;
         }
     }
 }

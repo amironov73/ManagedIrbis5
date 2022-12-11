@@ -52,12 +52,16 @@ internal sealed class DistinctExprEnumerable<T, TItem>
     public IPoolingEnumerator<T> GetEnumerator()
     {
         _count++;
-        return Pool<DistinctExprEnumerator>.Get().Init (this, _parent, _selector, _comparer);
+        return Pool<DistinctExprEnumerator>.Get().Init (this, _parent!, _selector!, _comparer);
     }
 
     private void Dispose()
     {
-        if (_count == 0) return;
+        if (_count == 0)
+        {
+            return;
+        }
+
         _count--;
         if (_count == 0)
         {
@@ -72,7 +76,7 @@ internal sealed class DistinctExprEnumerable<T, TItem>
         : IPoolingEnumerator<T>
     {
         private IPoolingEnumerator<T>? _src;
-        private Func<T, TItem> _selector;
+        private Func<T, TItem> _selector = default!;
         private PoolingDictionary<TItem, int>? _hashset;
         private DistinctExprEnumerable<T, TItem>? _parent;
 
@@ -94,10 +98,13 @@ internal sealed class DistinctExprEnumerable<T, TItem>
 
         public bool MoveNext()
         {
-            while (_src.MoveNext())
+            while (_src!.MoveNext())
             {
                 var key = _selector (_src.Current);
-                if (_hashset.ContainsKey (key)) continue;
+                if (_hashset!.ContainsKey (key))
+                {
+                    continue;
+                }
 
                 _hashset[key] = 1;
                 return true;
@@ -106,11 +113,11 @@ internal sealed class DistinctExprEnumerable<T, TItem>
             return false;
         }
 
-        public void Reset() => _src.Reset();
+        public void Reset() => _src!.Reset();
 
         object IPoolingEnumerator.Current => Current;
 
-        public T Current => _src.Current;
+        public T Current => _src!.Current;
 
         public void Dispose()
         {
@@ -121,7 +128,7 @@ internal sealed class DistinctExprEnumerable<T, TItem>
             _hashset = default;
 
             _src = default;
-            _selector = default;
+            _selector = default!;
             Pool<DistinctExprEnumerator>.Return (this);
         }
     }
