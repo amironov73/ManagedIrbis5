@@ -85,7 +85,8 @@ public sealed class BucketsBasedCrossThreadsMemoryPool<T>
             int minBufferSize = -1
         )
     {
-        return Pool<CountdownMemoryOwner<T>>.Get().Init (_arraysPool.Rent (minBufferSize), minBufferSize);
+        return Pool<CountdownMemoryOwner<T>>.Get()
+            .Init (_arraysPool.Rent (minBufferSize), minBufferSize);
     }
 
     #endregion

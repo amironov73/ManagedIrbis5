@@ -8,7 +8,7 @@
 // ReSharper disable InconsistentlySynchronizedField
 // ReSharper disable UnusedMember.Global
 
-/*
+/* WssSession.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -35,7 +35,10 @@ public class WssSession : HttpsSession, IWebSocket
     ///
     /// </summary>
     /// <param name="server"></param>
-    public WssSession (WssServer server)
+    public WssSession
+        (
+            WssServer server
+        )
         : base (server)
     {
         WebSocket = new WebSocket (this);
@@ -47,7 +50,10 @@ public class WssSession : HttpsSession, IWebSocket
     /// </summary>
     /// <param name="status"></param>
     /// <returns></returns>
-    public virtual bool Close (int status)
+    public virtual bool Close
+        (
+            int status
+        )
     {
         SendCloseAsync (status, null, 0, 0);
         base.Disconnect();
@@ -72,7 +78,14 @@ public class WssSession : HttpsSession, IWebSocket
     {
         lock (WebSocket.WsSendLock)
         {
-            WebSocket.PrepareSendFrame (WebSocket.WS_FIN | WebSocket.WS_TEXT, false, buffer, offset, size);
+            WebSocket.PrepareSendFrame
+                (
+                    opcode: WebSocket.WS_FIN | WebSocket.WS_TEXT,
+                    mask: false,
+                    buffer,
+                    offset,
+                    size
+                );
             return base.Send (WebSocket.WsSendBuffer.ToArray());
         }
     }
@@ -82,12 +95,21 @@ public class WssSession : HttpsSession, IWebSocket
     /// </summary>
     /// <param name="text"></param>
     /// <returns></returns>
-    public long SendText (string text)
+    public long SendText
+        (
+            string text
+        )
     {
         lock (WebSocket.WsSendLock)
         {
             var data = Encoding.UTF8.GetBytes (text);
-            WebSocket.PrepareSendFrame (WebSocket.WS_FIN | WebSocket.WS_TEXT, false, data, 0, data.Length);
+            WebSocket.PrepareSendFrame
+                (
+                    WebSocket.WS_FIN | WebSocket.WS_TEXT,
+                    mask: false, data,
+                    offset: 0,
+                    data.Length
+                );
             return base.Send (WebSocket.WsSendBuffer.ToArray());
         }
     }
@@ -108,7 +130,14 @@ public class WssSession : HttpsSession, IWebSocket
     {
         lock (WebSocket.WsSendLock)
         {
-            WebSocket.PrepareSendFrame (WebSocket.WS_FIN | WebSocket.WS_TEXT, false, buffer, offset, size);
+            WebSocket.PrepareSendFrame
+                (
+                    opcode: WebSocket.WS_FIN | WebSocket.WS_TEXT,
+                    mask: false,
+                    buffer,
+                    offset,
+                    size
+                );
             return base.SendAsync (WebSocket.WsSendBuffer.ToArray());
         }
     }
@@ -123,7 +152,13 @@ public class WssSession : HttpsSession, IWebSocket
         lock (WebSocket.WsSendLock)
         {
             var data = Encoding.UTF8.GetBytes (text);
-            WebSocket.PrepareSendFrame (WebSocket.WS_FIN | WebSocket.WS_TEXT, false, data, 0, data.Length);
+            WebSocket.PrepareSendFrame
+                (
+                    opcode: WebSocket.WS_FIN | WebSocket.WS_TEXT,
+                    mask: false,
+                    data, offset: 0,
+                    data.Length
+                );
             return base.SendAsync (WebSocket.WsSendBuffer.ToArray());
         }
     }
@@ -139,11 +174,23 @@ public class WssSession : HttpsSession, IWebSocket
     /// <param name="offset"></param>
     /// <param name="size"></param>
     /// <returns></returns>
-    public long SendBinary (byte[] buffer, long offset, long size)
+    public long SendBinary
+        (
+            byte[] buffer,
+            long offset,
+            long size
+        )
     {
         lock (WebSocket.WsSendLock)
         {
-            WebSocket.PrepareSendFrame (WebSocket.WS_FIN | WebSocket.WS_BINARY, false, buffer, offset, size);
+            WebSocket.PrepareSendFrame
+                (
+                    opcode: WebSocket.WS_FIN | WebSocket.WS_BINARY,
+                    mask: false,
+                    buffer,
+                    offset,
+                    size
+                );
             return base.Send (WebSocket.WsSendBuffer.ToArray());
         }
     }
@@ -158,7 +205,14 @@ public class WssSession : HttpsSession, IWebSocket
         lock (WebSocket.WsSendLock)
         {
             var data = Encoding.UTF8.GetBytes (text);
-            WebSocket.PrepareSendFrame (WebSocket.WS_FIN | WebSocket.WS_BINARY, false, data, 0, data.Length);
+            WebSocket.PrepareSendFrame
+                (
+                    opcode: WebSocket.WS_FIN | WebSocket.WS_BINARY,
+                    mask: false,
+                    data,
+                    offset: 0,
+                    data.Length
+                );
             return base.Send (WebSocket.WsSendBuffer.ToArray());
         }
     }
@@ -174,7 +228,14 @@ public class WssSession : HttpsSession, IWebSocket
     {
         lock (WebSocket.WsSendLock)
         {
-            WebSocket.PrepareSendFrame (WebSocket.WS_FIN | WebSocket.WS_BINARY, false, buffer, offset, size);
+            WebSocket.PrepareSendFrame
+                (
+                    opcode: WebSocket.WS_FIN | WebSocket.WS_BINARY,
+                    mask: false,
+                    buffer,
+                    offset,
+                    size
+                );
             return base.SendAsync (WebSocket.WsSendBuffer.ToArray());
         }
     }
@@ -189,7 +250,14 @@ public class WssSession : HttpsSession, IWebSocket
         lock (WebSocket.WsSendLock)
         {
             var data = Encoding.UTF8.GetBytes (text);
-            WebSocket.PrepareSendFrame (WebSocket.WS_FIN | WebSocket.WS_BINARY, false, data, 0, data.Length);
+            WebSocket.PrepareSendFrame
+                (
+                    opcode: WebSocket.WS_FIN | WebSocket.WS_BINARY,
+                    mask: false,
+                    data,
+                    offset: 0,
+                    data.Length
+                );
             return base.SendAsync (WebSocket.WsSendBuffer.ToArray());
         }
     }
@@ -210,7 +278,15 @@ public class WssSession : HttpsSession, IWebSocket
     {
         lock (WebSocket.WsSendLock)
         {
-            WebSocket.PrepareSendFrame (WebSocket.WS_FIN | WebSocket.WS_CLOSE, false, buffer, offset, size, status);
+            WebSocket.PrepareSendFrame
+                (
+                    opcode: WebSocket.WS_FIN | WebSocket.WS_CLOSE,
+                    mask: false,
+                    buffer,
+                    offset,
+                    size,
+                    status
+                );
             return base.Send (WebSocket.WsSendBuffer.ToArray());
         }
     }
@@ -226,7 +302,15 @@ public class WssSession : HttpsSession, IWebSocket
         lock (WebSocket.WsSendLock)
         {
             var data = Encoding.UTF8.GetBytes (text);
-            WebSocket.PrepareSendFrame (WebSocket.WS_FIN | WebSocket.WS_CLOSE, false, data, 0, data.Length, status);
+            WebSocket.PrepareSendFrame
+                (
+                    opcode: WebSocket.WS_FIN | WebSocket.WS_CLOSE,
+                    mask: false,
+                    data,
+                    offset: 0,
+                    data.Length,
+                    status
+                );
             return base.Send (WebSocket.WsSendBuffer.ToArray());
         }
     }
@@ -249,7 +333,15 @@ public class WssSession : HttpsSession, IWebSocket
     {
         lock (WebSocket.WsSendLock)
         {
-            WebSocket.PrepareSendFrame (WebSocket.WS_FIN | WebSocket.WS_CLOSE, false, buffer, offset, size, status);
+            WebSocket.PrepareSendFrame
+                (
+                    opcode: WebSocket.WS_FIN | WebSocket.WS_CLOSE,
+                    mask: false,
+                    buffer,
+                    offset,
+                    size,
+                    status
+                );
             return base.SendAsync (WebSocket.WsSendBuffer.ToArray());
         }
     }
@@ -260,12 +352,24 @@ public class WssSession : HttpsSession, IWebSocket
     /// <param name="status"></param>
     /// <param name="text"></param>
     /// <returns></returns>
-    public bool SendCloseAsync (int status, string text)
+    public bool SendCloseAsync
+        (
+            int status,
+            string text
+        )
     {
         lock (WebSocket.WsSendLock)
         {
             var data = Encoding.UTF8.GetBytes (text);
-            WebSocket.PrepareSendFrame (WebSocket.WS_FIN | WebSocket.WS_CLOSE, false, data, 0, data.Length, status);
+            WebSocket.PrepareSendFrame
+                (
+                    opcode: WebSocket.WS_FIN | WebSocket.WS_CLOSE,
+                    mask: false,
+                    data,
+                    offset: 0,
+                    data.Length,
+                    status
+                );
             return base.SendAsync (WebSocket.WsSendBuffer.ToArray());
         }
     }
@@ -281,11 +385,23 @@ public class WssSession : HttpsSession, IWebSocket
     /// <param name="offset"></param>
     /// <param name="size"></param>
     /// <returns></returns>
-    public long SendPing (byte[] buffer, long offset, long size)
+    public long SendPing
+        (
+            byte[] buffer,
+            long offset,
+            long size
+        )
     {
         lock (WebSocket.WsSendLock)
         {
-            WebSocket.PrepareSendFrame (WebSocket.WS_FIN | WebSocket.WS_PING, false, buffer, offset, size);
+            WebSocket.PrepareSendFrame
+                (
+                    opcode: WebSocket.WS_FIN | WebSocket.WS_PING,
+                    mask: false,
+                    buffer,
+                    offset,
+                    size
+                );
             return base.Send (WebSocket.WsSendBuffer.ToArray());
         }
     }
@@ -295,12 +411,22 @@ public class WssSession : HttpsSession, IWebSocket
     /// </summary>
     /// <param name="text"></param>
     /// <returns></returns>
-    public long SendPing (string text)
+    public long SendPing
+        (
+            string text
+        )
     {
         lock (WebSocket.WsSendLock)
         {
             var data = Encoding.UTF8.GetBytes (text);
-            WebSocket.PrepareSendFrame (WebSocket.WS_FIN | WebSocket.WS_PING, false, data, 0, data.Length);
+            WebSocket.PrepareSendFrame
+                (
+                    opcode: WebSocket.WS_FIN | WebSocket.WS_PING,
+                    mask: false,
+                    data,
+                    offset: 0,
+                    data.Length
+                );
             return base.Send (WebSocket.WsSendBuffer.ToArray());
         }
     }
@@ -312,11 +438,23 @@ public class WssSession : HttpsSession, IWebSocket
     /// <param name="offset"></param>
     /// <param name="size"></param>
     /// <returns></returns>
-    public bool SendPingAsync (byte[] buffer, long offset, long size)
+    public bool SendPingAsync
+        (
+            byte[] buffer,
+            long offset,
+            long size
+        )
     {
         lock (WebSocket.WsSendLock)
         {
-            WebSocket.PrepareSendFrame (WebSocket.WS_FIN | WebSocket.WS_PING, false, buffer, offset, size);
+            WebSocket.PrepareSendFrame
+                (
+                    opcode: WebSocket.WS_FIN | WebSocket.WS_PING,
+                    mask: false,
+                    buffer,
+                    offset,
+                    size
+                );
             return base.SendAsync (WebSocket.WsSendBuffer.ToArray());
         }
     }
@@ -331,7 +469,14 @@ public class WssSession : HttpsSession, IWebSocket
         lock (WebSocket.WsSendLock)
         {
             var data = Encoding.UTF8.GetBytes (text);
-            WebSocket.PrepareSendFrame (WebSocket.WS_FIN | WebSocket.WS_PING, false, data, 0, data.Length);
+            WebSocket.PrepareSendFrame
+                (
+                    opcode: WebSocket.WS_FIN | WebSocket.WS_PING,
+                    mask: false,
+                    data,
+                    offset: 0,
+                    data.Length
+                );
             return base.SendAsync (WebSocket.WsSendBuffer.ToArray());
         }
     }
@@ -347,11 +492,23 @@ public class WssSession : HttpsSession, IWebSocket
     /// <param name="offset"></param>
     /// <param name="size"></param>
     /// <returns></returns>
-    public long SendPong (byte[] buffer, long offset, long size)
+    public long SendPong
+        (
+            byte[] buffer,
+            long offset,
+            long size
+        )
     {
         lock (WebSocket.WsSendLock)
         {
-            WebSocket.PrepareSendFrame (WebSocket.WS_FIN | WebSocket.WS_PONG, false, buffer, offset, size);
+            WebSocket.PrepareSendFrame
+                (
+                    opcode: WebSocket.WS_FIN | WebSocket.WS_PONG,
+                    mask: false,
+                    buffer,
+                    offset,
+                    size
+                );
             return base.Send (WebSocket.WsSendBuffer.ToArray());
         }
     }
@@ -361,12 +518,21 @@ public class WssSession : HttpsSession, IWebSocket
     /// </summary>
     /// <param name="text"></param>
     /// <returns></returns>
-    public long SendPong (string text)
+    public long SendPong
+        (
+            string text
+        )
     {
         lock (WebSocket.WsSendLock)
         {
             var data = Encoding.UTF8.GetBytes (text);
-            WebSocket.PrepareSendFrame (WebSocket.WS_FIN | WebSocket.WS_PONG, false, data, 0, data.Length);
+            WebSocket.PrepareSendFrame
+                (
+                    opcode: WebSocket.WS_FIN | WebSocket.WS_PONG,
+                    mask: false, data,
+                    offset: 0,
+                    data.Length
+                );
             return base.Send (WebSocket.WsSendBuffer.ToArray());
         }
     }
@@ -378,11 +544,23 @@ public class WssSession : HttpsSession, IWebSocket
     /// <param name="offset"></param>
     /// <param name="size"></param>
     /// <returns></returns>
-    public bool SendPongAsync (byte[] buffer, long offset, long size)
+    public bool SendPongAsync
+        (
+            byte[] buffer,
+            long offset,
+            long size
+        )
     {
         lock (WebSocket.WsSendLock)
         {
-            WebSocket.PrepareSendFrame (WebSocket.WS_FIN | WebSocket.WS_PONG, false, buffer, offset, size);
+            WebSocket.PrepareSendFrame
+                (
+                    opcode: WebSocket.WS_FIN | WebSocket.WS_PONG,
+                    mask: false,
+                    buffer,
+                    offset,
+                    size
+                );
             return base.SendAsync (WebSocket.WsSendBuffer.ToArray());
         }
     }
@@ -392,12 +570,21 @@ public class WssSession : HttpsSession, IWebSocket
     /// </summary>
     /// <param name="text"></param>
     /// <returns></returns>
-    public bool SendPongAsync (string text)
+    public bool SendPongAsync
+        (
+            string text
+        )
     {
         lock (WebSocket.WsSendLock)
         {
             var data = Encoding.UTF8.GetBytes (text);
-            WebSocket.PrepareSendFrame (WebSocket.WS_FIN | WebSocket.WS_PONG, false, data, 0, data.Length);
+            WebSocket.PrepareSendFrame
+                (
+                    opcode: WebSocket.WS_FIN | WebSocket.WS_PONG,
+                    mask: false, data,
+                    offset: 0,
+                    data.Length
+                );
             return base.SendAsync (WebSocket.WsSendBuffer.ToArray());
         }
     }
@@ -444,7 +631,12 @@ public class WssSession : HttpsSession, IWebSocket
         }
 
         // Copy WebSocket frame data
-        result.Append (WebSocket.WsReceiveFinalBuffer.ToArray(), 0, WebSocket.WsReceiveFinalBuffer.Count);
+        result.Append
+            (
+                WebSocket.WsReceiveFinalBuffer.ToArray(),
+                offset: 0,
+                size: WebSocket.WsReceiveFinalBuffer.Count
+            );
         WebSocket.PrepareReceiveFrame (null, 0, 0);
         return result.ExtractString (0, result.Data.Length);
     }
@@ -487,7 +679,12 @@ public class WssSession : HttpsSession, IWebSocket
         }
 
         // Copy WebSocket frame data
-        result.Append (WebSocket.WsReceiveFinalBuffer.ToArray(), 0, WebSocket.WsReceiveFinalBuffer.Count);
+        result.Append
+            (
+                WebSocket.WsReceiveFinalBuffer.ToArray(),
+                offset: 0,
+                size: WebSocket.WsReceiveFinalBuffer.Count
+            );
         WebSocket.PrepareReceiveFrame (null, 0, 0);
         return result;
     }
@@ -536,7 +733,12 @@ public class WssSession : HttpsSession, IWebSocket
     /// <param name="buffer"></param>
     /// <param name="offset"></param>
     /// <param name="size"></param>
-    protected override void OnReceived (byte[] buffer, long offset, long size)
+    protected override void OnReceived
+        (
+            byte[] buffer,
+            long offset,
+            long size
+        )
     {
         // Check for WebSocket handshaked status
         if (WebSocket.WsHandshaked)
@@ -553,7 +755,10 @@ public class WssSession : HttpsSession, IWebSocket
     ///
     /// </summary>
     /// <param name="request"></param>
-    protected override void OnReceivedRequestHeader (HttpRequest request)
+    protected override void OnReceivedRequestHeader
+        (
+            HttpRequest request
+        )
     {
         // Check for WebSocket handshaked status
         if (WebSocket.WsHandshaked)
@@ -572,7 +777,10 @@ public class WssSession : HttpsSession, IWebSocket
     ///
     /// </summary>
     /// <param name="request"></param>
-    protected override void OnReceivedRequest (HttpRequest request)
+    protected override void OnReceivedRequest
+        (
+            HttpRequest request
+        )
     {
         // Check for WebSocket handshaked status
         if (WebSocket.WsHandshaked)
@@ -592,7 +800,11 @@ public class WssSession : HttpsSession, IWebSocket
     /// </summary>
     /// <param name="request"></param>
     /// <param name="error"></param>
-    protected override void OnReceivedRequestError (HttpRequest request, string error)
+    protected override void OnReceivedRequestError
+        (
+            HttpRequest request,
+            string error
+        )
     {
         // Check for WebSocket handshaked status
         if (WebSocket.WsHandshaked)
@@ -612,7 +824,10 @@ public class WssSession : HttpsSession, IWebSocket
     ///
     /// </summary>
     /// <param name="request"></param>
-    public virtual void OnWsConnecting (HttpRequest request)
+    public virtual void OnWsConnecting
+        (
+            HttpRequest request
+        )
     {
         // пустое тело метода
     }
@@ -621,7 +836,10 @@ public class WssSession : HttpsSession, IWebSocket
     ///
     /// </summary>
     /// <param name="response"></param>
-    public virtual void OnWsConnected (HttpResponse response)
+    public virtual void OnWsConnected
+        (
+            HttpResponse response
+        )
     {
         // пустое тело метода
     }
@@ -632,7 +850,11 @@ public class WssSession : HttpsSession, IWebSocket
     /// <param name="request"></param>
     /// <param name="response"></param>
     /// <returns></returns>
-    public virtual bool OnWsConnecting (HttpRequest request, HttpResponse response)
+    public virtual bool OnWsConnecting
+        (
+            HttpRequest request,
+            HttpResponse response
+        )
     {
         return true;
     }
@@ -641,7 +863,10 @@ public class WssSession : HttpsSession, IWebSocket
     ///
     /// </summary>
     /// <param name="request"></param>
-    public virtual void OnWsConnected (HttpRequest request)
+    public virtual void OnWsConnected
+        (
+            HttpRequest request
+        )
     {
         // пустое тело метода
     }
@@ -668,7 +893,12 @@ public class WssSession : HttpsSession, IWebSocket
     /// <param name="buffer"></param>
     /// <param name="offset"></param>
     /// <param name="size"></param>
-    public virtual void OnWsReceived (byte[] buffer, long offset, long size)
+    public virtual void OnWsReceived
+        (
+            byte[] buffer,
+            long offset,
+            long size
+        )
     {
         // пустое тело метода
     }
@@ -679,7 +909,12 @@ public class WssSession : HttpsSession, IWebSocket
     /// <param name="buffer"></param>
     /// <param name="offset"></param>
     /// <param name="size"></param>
-    public virtual void OnWsClose (byte[] buffer, long offset, long size)
+    public virtual void OnWsClose
+        (
+            byte[] buffer,
+            long offset,
+            long size
+        )
     {
         Close (1000);
     }
@@ -690,7 +925,12 @@ public class WssSession : HttpsSession, IWebSocket
     /// <param name="buffer"></param>
     /// <param name="offset"></param>
     /// <param name="size"></param>
-    public virtual void OnWsPing (byte[] buffer, long offset, long size)
+    public virtual void OnWsPing
+        (
+            byte[] buffer,
+            long offset,
+            long size
+        )
     {
         SendPongAsync (buffer, offset, size);
     }
@@ -701,7 +941,12 @@ public class WssSession : HttpsSession, IWebSocket
     /// <param name="buffer"></param>
     /// <param name="offset"></param>
     /// <param name="size"></param>
-    public virtual void OnWsPong (byte[] buffer, long offset, long size)
+    public virtual void OnWsPong
+        (
+            byte[] buffer,
+            long offset,
+            long size
+        )
     {
         // пустое тело метода
     }
@@ -710,7 +955,10 @@ public class WssSession : HttpsSession, IWebSocket
     ///
     /// </summary>
     /// <param name="error"></param>
-    public virtual void OnWsError (string error)
+    public virtual void OnWsError
+        (
+            string error
+        )
     {
         OnError (SocketError.SocketError);
     }
@@ -719,7 +967,10 @@ public class WssSession : HttpsSession, IWebSocket
     ///
     /// </summary>
     /// <param name="error"></param>
-    public virtual void OnWsError (SocketError error)
+    public virtual void OnWsError
+        (
+            SocketError error
+        )
     {
         OnError (error);
     }
@@ -728,7 +979,10 @@ public class WssSession : HttpsSession, IWebSocket
     ///
     /// </summary>
     /// <param name="response"></param>
-    public void SendUpgrade (HttpResponse response)
+    public void SendUpgrade
+        (
+            HttpResponse response
+        )
     {
         SendResponseAsync (response);
     }

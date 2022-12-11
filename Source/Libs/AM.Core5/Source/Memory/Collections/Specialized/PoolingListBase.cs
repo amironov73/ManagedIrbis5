@@ -39,7 +39,7 @@ public abstract class PoolingListBase<T>
     /// <summary>
     /// Указатель на корневую ноду.
     /// </summary>
-    protected IMemoryOwner<IPoolingNode<T>> _root;
+    protected IMemoryOwner<IPoolingNode<T>> _root = default!;
 
     /// <summary>
     /// Количество элементов.
@@ -87,14 +87,14 @@ public abstract class PoolingListBase<T>
     {
         for (int i = 0, len = _root.Memory.Span.Length; i < len; i++)
         {
-            if (_root.Memory.Span[i] == null)
+            if (_root.Memory.Span[i] == null!)
             {
                 break;
             }
 
             _root.Memory.Span[i].Clear();
             _root.Memory.Span[i].Dispose();
-            _root.Memory.Span[i] = default;
+            _root.Memory.Span[i] = default!;
         }
 
         _count = default;
@@ -146,7 +146,7 @@ public abstract class PoolingListBase<T>
             var btn = j >> PoolsDefaults.DefaultPoolBucketDegree;
             var bti = j & PoolsDefaults.DefaultPoolBucketMask;
 
-            if (!_root.Memory.Span[bfn][bfi].Equals (item))
+            if (!_root.Memory.Span[bfn][bfi]!.Equals (item))
             {
                 _root.Memory.Span[btn][bti] = _root.Memory.Span[bfn][bfi];
                 j++;
@@ -178,7 +178,7 @@ public abstract class PoolingListBase<T>
         for (var i = 0; i <= PoolsDefaults.DefaultPoolBucketSize; i++)
         for (var j = 0; j < PoolsDefaults.DefaultPoolBucketSize && len < _count; j++, len++)
         {
-            if (item.Equals (_root.Memory.Span[i][j]))
+            if (item!.Equals (_root.Memory.Span[i][j]))
             {
                 return len;
             }
@@ -262,13 +262,13 @@ public abstract class PoolingListBase<T>
             for (var bn = sbn + 1; bn <= cbn; bn++)
             {
                 _root.Memory.Span[bn].Dispose();
-                _root.Memory.Span[bn] = default;
+                _root.Memory.Span[bn] = default!;
             }
 
             var span = _root.Memory.Span[sbn];
             for (var i = sbi; i <= PoolsDefaults.DefaultPoolBucketSize; i++)
             {
-                span[i] = default;
+                span[i] = default!;
             }
 
             _count = size;
@@ -343,13 +343,13 @@ public abstract class PoolingListBase<T>
     {
         Clear();
         _root?.Dispose();
-        _root = default;
+        _root = default!;
     }
 
     private class Enumerator
         : IPoolingEnumerator<T>
     {
-        private PoolingListBase<T> _src;
+        private PoolingListBase<T> _src = default!;
         private int _bucket, _index, _ver;
 
         public Enumerator Init (PoolingListBase<T> src)

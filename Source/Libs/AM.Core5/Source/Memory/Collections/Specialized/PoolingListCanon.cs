@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* PoolingListCanon.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -18,14 +18,24 @@
 namespace AM.Memory.Collections.Specialized;
 
 /// <summary>
-/// 	List of elements (should be disposed to avoid memory traffic). Max size = 128*128 = 16,384 elements.
-/// 	The best for scenarios, where you need to collect list of elements, use them and forget (w/out removal or inserts).
-/// 	Add: O(1), Insert, Removal: O(N)
+/// List of elements (should be disposed to avoid memory traffic).
+/// Max size = 128*128 = 16,384 elements.
+/// The best for scenarios, where you need to collect list of elements,
+/// use them and forget (w/out removal or inserts).
+/// Add: O(1), Insert, Removal: O(N)
 /// </summary>
-public sealed class PoolingListCanon<T> : PoolingListBase<T> where T : class
+public sealed class PoolingListCanon<T>
+    : PoolingListBase<T> where T : class
 {
+    /// <summary>
+    ///
+    /// </summary>
     public PoolingListCanon() => Init();
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public PoolingListCanon<T> Init()
     {
         _root = Pool.GetBuffer<IPoolingNode<T>> (PoolsDefaults.DefaultPoolBucketSize);
@@ -33,8 +43,10 @@ public sealed class PoolingListCanon<T> : PoolingListBase<T> where T : class
         return this;
     }
 
+    /// <inheritdoc cref="PoolingListBase{T}.CreateNodeHolder"/>
     protected override IPoolingNode<T> CreateNodeHolder()
     {
-        return (IPoolingNode<T>)Pool<PoolingNodeCanon<T>>.Get().Init (PoolsDefaults.DefaultPoolBucketSize);
+        return (IPoolingNode<T>)Pool<PoolingNodeCanon<T>>.Get()
+            .Init (PoolsDefaults.DefaultPoolBucketSize);
     }
 }

@@ -28,7 +28,8 @@ namespace NetCoreServer;
 /// </summary>
 /// <remarks> WebSocket session is used to read and write data from
 /// the connected WebSocket client. Thread-safe.</remarks>
-public class WsSession : HttpSession, IWebSocket
+public class WsSession
+    : HttpSession, IWebSocket
 {
     internal readonly WebSocket WebSocket;
 
@@ -438,6 +439,10 @@ public class WsSession : HttpSession, IWebSocket
         return result.ExtractString (0, result.Data.Length);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public Buffer ReceiveBinary()
     {
         var result = new Buffer();
@@ -481,6 +486,7 @@ public class WsSession : HttpSession, IWebSocket
 
     #region Session handlers
 
+    /// <inheritdoc cref="TcpSession.OnDisconnecting"/>
     protected override void OnDisconnecting()
     {
         if (WebSocket.WsHandshaked)
@@ -489,6 +495,7 @@ public class WsSession : HttpSession, IWebSocket
         }
     }
 
+    /// <inheritdoc cref="HttpSession.OnDisconnected"/>
     protected override void OnDisconnected()
     {
         // Disconnect WebSocket
@@ -509,7 +516,13 @@ public class WsSession : HttpSession, IWebSocket
         WebSocket.InitWsNonce();
     }
 
-    protected override void OnReceived (byte[] buffer, long offset, long size)
+    /// <inheritdoc cref="HttpSession.OnReceived"/>
+    protected override void OnReceived
+        (
+            byte[] buffer,
+            long offset,
+            long size
+        )
     {
         // Check for WebSocket handshaked status
         if (WebSocket.WsHandshaked)
@@ -522,7 +535,11 @@ public class WsSession : HttpSession, IWebSocket
         base.OnReceived (buffer, offset, size);
     }
 
-    protected override void OnReceivedRequestHeader (HttpRequest request)
+    /// <inheritdoc cref="HttpSession.OnReceivedRequestHeader"/>
+    protected override void OnReceivedRequestHeader
+        (
+            HttpRequest request
+        )
     {
         // Check for WebSocket handshaked status
         if (WebSocket.WsHandshaked)
@@ -534,11 +551,14 @@ public class WsSession : HttpSession, IWebSocket
         if (!WebSocket.PerformServerUpgrade (request, Response))
         {
             base.OnReceivedRequestHeader (request);
-            return;
         }
     }
 
-    protected override void OnReceivedRequest (HttpRequest request)
+    /// <inheritdoc cref="HttpSession.OnReceivedRequest"/>
+    protected override void OnReceivedRequest
+        (
+            HttpRequest request
+        )
     {
         // Check for WebSocket handshaked status
         if (WebSocket.WsHandshaked)
@@ -553,7 +573,12 @@ public class WsSession : HttpSession, IWebSocket
         base.OnReceivedRequest (request);
     }
 
-    protected override void OnReceivedRequestError (HttpRequest request, string error)
+    /// <inheritdoc cref="HttpSession.OnReceivedRequestError"/>
+    protected override void OnReceivedRequestError
+        (
+            HttpRequest request,
+            string error
+        )
     {
         // Check for WebSocket handshaked status
         if (WebSocket.WsHandshaked)
@@ -612,7 +637,10 @@ public class WsSession : HttpSession, IWebSocket
     ///
     /// </summary>
     /// <param name="request"></param>
-    public virtual void OnWsConnected (HttpRequest request)
+    public virtual void OnWsConnected
+        (
+            HttpRequest request
+        )
     {
         // пустое тело метода
     }
@@ -639,8 +667,14 @@ public class WsSession : HttpSession, IWebSocket
     /// <param name="buffer"></param>
     /// <param name="offset"></param>
     /// <param name="size"></param>
-    public virtual void OnWsReceived (byte[] buffer, long offset, long size)
+    public virtual void OnWsReceived
+        (
+            byte[] buffer,
+            long offset,
+            long size
+        )
     {
+        // пустое тело метода
     }
 
     /// <summary>
@@ -649,7 +683,12 @@ public class WsSession : HttpSession, IWebSocket
     /// <param name="buffer"></param>
     /// <param name="offset"></param>
     /// <param name="size"></param>
-    public virtual void OnWsClose (byte[] buffer, long offset, long size)
+    public virtual void OnWsClose
+        (
+            byte[] buffer,
+            long offset,
+            long size
+        )
     {
         Close (1000);
     }
@@ -660,7 +699,12 @@ public class WsSession : HttpSession, IWebSocket
     /// <param name="buffer"></param>
     /// <param name="offset"></param>
     /// <param name="size"></param>
-    public virtual void OnWsPing (byte[] buffer, long offset, long size)
+    public virtual void OnWsPing
+        (
+            byte[] buffer,
+            long offset,
+            long size
+        )
     {
         SendPongAsync (buffer, offset, size);
     }
@@ -671,7 +715,12 @@ public class WsSession : HttpSession, IWebSocket
     /// <param name="buffer"></param>
     /// <param name="offset"></param>
     /// <param name="size"></param>
-    public virtual void OnWsPong (byte[] buffer, long offset, long size)
+    public virtual void OnWsPong
+        (
+            byte[] buffer,
+            long offset,
+            long size
+        )
     {
         // пустое тело метода
     }
@@ -680,7 +729,10 @@ public class WsSession : HttpSession, IWebSocket
     ///
     /// </summary>
     /// <param name="error"></param>
-    public virtual void OnWsError (string error)
+    public virtual void OnWsError
+        (
+            string error
+        )
     {
         OnError (SocketError.SocketError);
     }
@@ -689,7 +741,10 @@ public class WsSession : HttpSession, IWebSocket
     ///
     /// </summary>
     /// <param name="error"></param>
-    public virtual void OnWsError (SocketError error)
+    public virtual void OnWsError
+        (
+            SocketError error
+        )
     {
         OnError (error);
     }
@@ -698,7 +753,10 @@ public class WsSession : HttpSession, IWebSocket
     ///
     /// </summary>
     /// <param name="response"></param>
-    public void SendUpgrade (HttpResponse response)
+    public void SendUpgrade
+        (
+            HttpResponse response
+        )
     {
         SendResponseAsync (response);
     }

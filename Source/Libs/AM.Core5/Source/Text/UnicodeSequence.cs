@@ -35,8 +35,16 @@ public struct UnicodeSequence
     private static readonly char[] SequenceSplitChars = new[] { ',', ' ' };
 
     private readonly Codepoint[] _codepoints;
+    /// <summary>
+    ///
+    /// </summary>
     public IReadOnlyList<Codepoint> Codepoints => _codepoints;
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="sequence"></param>
+    /// <exception cref="InvalidRangeException"></exception>
     public UnicodeSequence (string sequence)
     {
         if (sequence.Contains ("-"))
@@ -70,6 +78,10 @@ public struct UnicodeSequence
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="codepoints"></param>
     // The usage of `params` here should hopefully allocate on the stack for short lengths,
     // making this the most optimized version of the routine.
     public UnicodeSequence (params Codepoint[] codepoints)
@@ -77,16 +89,29 @@ public struct UnicodeSequence
         _codepoints = codepoints;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="codepoints"></param>
     public UnicodeSequence (IEnumerable<Codepoint> codepoints)
     {
         _codepoints = codepoints.ToArray();
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="codepoint"></param>
+    /// <returns></returns>
     public bool Contains (Codepoint codepoint)
     {
         return _codepoints.Contains (codepoint);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public IEnumerable<uint> AsUtf32()
     {
         foreach (var cp in _codepoints)
@@ -95,6 +120,10 @@ public struct UnicodeSequence
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public IEnumerable<byte> AsUtf32Bytes()
     {
         foreach (var u32 in AsUtf32())
@@ -107,6 +136,10 @@ public struct UnicodeSequence
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public IEnumerable<UInt16> AsUtf16()
     {
 #if NETSTANDARD2_1_OR_GREATER
@@ -130,6 +163,10 @@ public struct UnicodeSequence
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     // Little Endian byte order
     public IEnumerable<byte> AsUtf16Bytes()
     {
@@ -152,6 +189,10 @@ public struct UnicodeSequence
 #endif
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public IEnumerable<byte> AsUtf8()
     {
         foreach (var cp in _codepoints)
@@ -163,56 +204,98 @@ public struct UnicodeSequence
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public string AsString()
     {
         return Encoding.Unicode.GetString (AsUtf16Bytes().ToArray());
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
     public int CompareTo (UnicodeSequence other)
     {
         return MemoryExtensions.SequenceCompareTo<Codepoint> (_codepoints, other._codepoints);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
     public bool Equals (UnicodeSequence other)
     {
         return MemoryExtensions.SequenceEqual<Codepoint> (_codepoints, other._codepoints);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
     public static bool operator == (UnicodeSequence a, UnicodeSequence b)
     {
         return a.Equals (b);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
     public static bool operator != (UnicodeSequence a, UnicodeSequence b)
     {
         return !a.Equals (b);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
     public static bool operator < (UnicodeSequence a, UnicodeSequence b)
     {
         return a.CompareTo (b) < 0;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
     public static bool operator > (UnicodeSequence a, UnicodeSequence b)
     {
         return a.CompareTo (b) > 0;
     }
 
+    /// <inheritdoc cref="ValueType.Equals(object?)"/>
     public override bool Equals (object? b)
     {
         return b is UnicodeSequence other && Equals (other);
     }
 
+    /// <inheritdoc cref="ValueType.GetHashCode"/>
     public override int GetHashCode()
     {
         return _codepoints.GetHashCode();
     }
 
+    /// <inheritdoc cref="IEquatable{T}.Equals(T?)"/>
     public bool Equals (string? other)
     {
         return other is not null && other.Codepoints().SequenceEqual (_codepoints);
     }
 
+    /// <inheritdoc cref="ValueType.ToString"/>
     public override string ToString()
     {
         return string.Join (" ", Codepoints);

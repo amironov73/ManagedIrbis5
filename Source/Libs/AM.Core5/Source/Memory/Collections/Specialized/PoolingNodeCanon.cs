@@ -18,7 +18,8 @@
 namespace AM.Memory.Collections.Specialized;
 
 internal sealed class PoolingNodeCanon<T>
-    : PoolingNodeBase<object>, IPoolingNode<T> where T : class
+    : PoolingNodeBase<object>, IPoolingNode<T>
+    where T : class
 {
     IPoolingNode<T>? IPoolingNode<T>.Next
     {
@@ -28,8 +29,8 @@ internal sealed class PoolingNodeCanon<T>
 
     T IPoolingNode<T>.this [int index]
     {
-        get => (T)_buf.Memory.Span[index];
-        set => _buf.Memory.Span[index] = value;
+        get => (T)_buf!.Memory.Span[index];
+        set => _buf!.Memory.Span[index] = value;
     }
 
     IPoolingNode<T> IPoolingNode<T>.Init (int capacity)

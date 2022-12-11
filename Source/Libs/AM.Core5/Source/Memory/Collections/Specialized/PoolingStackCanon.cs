@@ -7,9 +7,10 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* PoolingStackCannon.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,10 +21,14 @@ namespace AM.Memory.Collections.Specialized;
 /// <summary>
 /// Collection, which is working on shared btw all Pooling* collections buckets
 /// </summary>
-public class PoolingStackCanon<T> : PoolingStackBase<T> where T : class
+public class PoolingStackCanon<T>
+    : PoolingStackBase<T>
+    where T : class
 {
+    /// <inheritdoc cref="PoolingStackBase{T}.CreateNodeHolder"/>
     protected override IPoolingNode<T> CreateNodeHolder()
     {
-        return (IPoolingNode<T>)Pool<PoolingNodeCanon<T>>.Get().Init (PoolsDefaults.DefaultPoolBucketSize);
+        return (IPoolingNode<T>)Pool<PoolingNodeCanon<T>>.Get()
+            .Init (PoolsDefaults.DefaultPoolBucketSize);
     }
 }

@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* PoolingQueueRef.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,10 +17,18 @@
 
 namespace AM.Memory.Collections.Specialized;
 
-public sealed class PoolingQueueRef<T> : PoolingQueue<T> where T : class
+/// <summary>
+///
+/// </summary>
+/// <typeparam name="T"></typeparam>
+public sealed class PoolingQueueRef<T>
+    : PoolingQueue<T>
+    where T : class
 {
+    /// <inheritdoc cref="PoolingQueue{T}.CreateNodeHolder"/>
     protected override IPoolingNode<T> CreateNodeHolder()
     {
-        return (IPoolingNode<T>)Pool<PoolingNodeCanon<T>>.Get().Init (PoolsDefaults.DefaultPoolBucketSize);
+        return (IPoolingNode<T>)Pool<PoolingNodeCanon<T>>.Get()
+            .Init (PoolsDefaults.DefaultPoolBucketSize);
     }
 }

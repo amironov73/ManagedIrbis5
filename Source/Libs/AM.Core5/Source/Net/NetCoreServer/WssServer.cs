@@ -26,8 +26,10 @@ namespace NetCoreServer;
 /// <summary>
 /// WebSocket secure server
 /// </summary>
-/// <remarks> WebSocket secure server is used to communicate with clients using WebSocket protocol. Thread-safe.</remarks>
-public class WssServer : HttpsServer, IWebSocket
+/// <remarks> WebSocket secure server is used to communicate with
+/// clients using WebSocket protocol. Thread-safe.</remarks>
+public class WssServer
+    : HttpsServer, IWebSocket
 {
     internal readonly WebSocket WebSocket;
 
@@ -37,7 +39,13 @@ public class WssServer : HttpsServer, IWebSocket
     /// <param name="context">SSL context</param>
     /// <param name="address">IP address</param>
     /// <param name="port">Port number</param>
-    public WssServer (SslContext context, IPAddress address, int port) : base (context, address, port)
+    public WssServer
+        (
+            SslContext context,
+            IPAddress address,
+            int port
+        )
+        : base (context, address, port)
     {
         WebSocket = new WebSocket (this);
     }
@@ -48,7 +56,13 @@ public class WssServer : HttpsServer, IWebSocket
     /// <param name="context">SSL context</param>
     /// <param name="address">IP address</param>
     /// <param name="port">Port number</param>
-    public WssServer (SslContext context, string address, int port) : base (context, address, port)
+    public WssServer
+        (
+            SslContext context,
+            string address,
+            int port
+        )
+        : base (context, address, port)
     {
         WebSocket = new WebSocket (this);
     }
@@ -58,7 +72,12 @@ public class WssServer : HttpsServer, IWebSocket
     /// </summary>
     /// <param name="context">SSL context</param>
     /// <param name="endpoint">DNS endpoint</param>
-    public WssServer (SslContext context, DnsEndPoint endpoint) : base (context, endpoint)
+    public WssServer
+        (
+            SslContext context,
+            DnsEndPoint endpoint
+        )
+        : base (context, endpoint)
     {
         WebSocket = new WebSocket (this);
     }
@@ -68,7 +87,12 @@ public class WssServer : HttpsServer, IWebSocket
     /// </summary>
     /// <param name="context">SSL context</param>
     /// <param name="endpoint">IP endpoint</param>
-    public WssServer (SslContext context, IPEndPoint endpoint) : base (context, endpoint)
+    public WssServer
+        (
+            SslContext context,
+            IPEndPoint endpoint
+        )
+        : base (context, endpoint)
     {
         WebSocket = new WebSocket (this);
     }
@@ -76,24 +100,36 @@ public class WssServer : HttpsServer, IWebSocket
     /// <summary>
     ///
     /// </summary>
-    public virtual bool CloseAll (int status)
+    public virtual bool CloseAll
+        (
+            int status
+        )
     {
         lock (WebSocket.WsSendLock)
         {
-            WebSocket.PrepareSendFrame (WebSocket.WS_FIN | WebSocket.WS_CLOSE, false, null, 0, 0, status);
-            if (!Multicast (WebSocket.WsSendBuffer.ToArray()))
-            {
-                return false;
-            }
+            WebSocket.PrepareSendFrame
+                (
+                    opcode: WebSocket.WS_FIN | WebSocket.WS_CLOSE,
+                    mask: false,
+                    buffer: null,
+                    offset: 0,
+                    size: 0,
+                    status
+                );
 
-            return base.DisconnectAll();
+            return Multicast (WebSocket.WsSendBuffer.ToArray()) && base.DisconnectAll();
         }
     }
 
     /// <summary>
     ///
     /// </summary>
-    public override bool Multicast (byte[] buffer, long offset, long size)
+    public override bool Multicast
+        (
+            byte[] buffer,
+            long offset,
+            long size
+        )
     {
         if (!IsStarted)
         {
@@ -108,12 +144,9 @@ public class WssServer : HttpsServer, IWebSocket
         // Multicast data to all WebSocket sessions
         foreach (var session in Sessions.Values)
         {
-            if (session is WssSession wssSession)
+            if (session is WssSession { WebSocket.WsHandshaked: true } wssSession)
             {
-                if (wssSession.WebSocket.WsHandshaked)
-                {
-                    wssSession.SendAsync (buffer, offset, size);
-                }
+                wssSession.SendAsync (buffer, offset, size);
             }
         }
 
@@ -122,21 +155,55 @@ public class WssServer : HttpsServer, IWebSocket
 
     #region WebSocket multicast text methods
 
-    public bool MulticastText (byte[] buffer, long offset, long size)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="buffer"></param>
+    /// <param name="offset"></param>
+    /// <param name="size"></param>
+    /// <returns></returns>
+    public bool MulticastText
+        (
+            byte[] buffer,
+            long offset,
+            long size
+        )
     {
         lock (WebSocket.WsSendLock)
         {
-            WebSocket.PrepareSendFrame (WebSocket.WS_FIN | WebSocket.WS_TEXT, false, buffer, offset, size);
+            WebSocket.PrepareSendFrame
+                (
+                    opcode: WebSocket.WS_FIN | WebSocket.WS_TEXT,
+                    mask: false,
+                    buffer,
+                    offset,
+                    size
+                );
             return Multicast (WebSocket.WsSendBuffer.ToArray());
         }
     }
 
-    public bool MulticastText (string text)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="text"></param>
+    /// <returns></returns>
+    public bool MulticastText
+        (
+            string text
+        )
     {
         lock (WebSocket.WsSendLock)
         {
             var data = Encoding.UTF8.GetBytes (text);
-            WebSocket.PrepareSendFrame (WebSocket.WS_FIN | WebSocket.WS_TEXT, false, data, 0, data.Length);
+            WebSocket.PrepareSendFrame
+                (
+                    opcode: WebSocket.WS_FIN | WebSocket.WS_TEXT,
+                    mask: false,
+                    data,
+                    offset: 0,
+                    data.Length
+                );
             return Multicast (WebSocket.WsSendBuffer.ToArray());
         }
     }
@@ -145,21 +212,55 @@ public class WssServer : HttpsServer, IWebSocket
 
     #region WebSocket multicast binary methods
 
-    public bool MulticastBinary (byte[] buffer, long offset, long size)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="buffer"></param>
+    /// <param name="offset"></param>
+    /// <param name="size"></param>
+    /// <returns></returns>
+    public bool MulticastBinary
+        (
+            byte[] buffer,
+            long offset,
+            long size
+        )
     {
         lock (WebSocket.WsSendLock)
         {
-            WebSocket.PrepareSendFrame (WebSocket.WS_FIN | WebSocket.WS_BINARY, false, buffer, offset, size);
+            WebSocket.PrepareSendFrame
+                (
+                    opcode: WebSocket.WS_FIN | WebSocket.WS_BINARY,
+                    mask: false,
+                    buffer,
+                    offset,
+                    size
+                );
             return Multicast (WebSocket.WsSendBuffer.ToArray());
         }
     }
 
-    public bool MulticastBinary (string text)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="text"></param>
+    /// <returns></returns>
+    public bool MulticastBinary
+        (
+            string text
+        )
     {
         lock (WebSocket.WsSendLock)
         {
             var data = Encoding.UTF8.GetBytes (text);
-            WebSocket.PrepareSendFrame (WebSocket.WS_FIN | WebSocket.WS_BINARY, false, data, 0, data.Length);
+            WebSocket.PrepareSendFrame
+                (
+                    opcode: WebSocket.WS_FIN | WebSocket.WS_BINARY,
+                    mask: false,
+                    data,
+                    offset: 0,
+                    data.Length
+                );
             return Multicast (WebSocket.WsSendBuffer.ToArray());
         }
     }
@@ -168,21 +269,55 @@ public class WssServer : HttpsServer, IWebSocket
 
     #region WebSocket multicast ping methods
 
-    public bool SendPing (byte[] buffer, long offset, long size)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="buffer"></param>
+    /// <param name="offset"></param>
+    /// <param name="size"></param>
+    /// <returns></returns>
+    public bool SendPing
+        (
+            byte[] buffer,
+            long offset,
+            long size
+        )
     {
         lock (WebSocket.WsSendLock)
         {
-            WebSocket.PrepareSendFrame (WebSocket.WS_FIN | WebSocket.WS_PING, false, buffer, offset, size);
+            WebSocket.PrepareSendFrame
+                (
+                    opcode: WebSocket.WS_FIN | WebSocket.WS_PING,
+                    mask: false,
+                    buffer,
+                    offset,
+                    size
+                );
             return Multicast (WebSocket.WsSendBuffer.ToArray());
         }
     }
 
-    public bool SendPing (string text)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="text"></param>
+    /// <returns></returns>
+    public bool SendPing
+        (
+            string text
+        )
     {
         lock (WebSocket.WsSendLock)
         {
             var data = Encoding.UTF8.GetBytes (text);
-            WebSocket.PrepareSendFrame (WebSocket.WS_FIN | WebSocket.WS_PING, false, data, 0, data.Length);
+            WebSocket.PrepareSendFrame
+                (
+                    opcode: WebSocket.WS_FIN | WebSocket.WS_PING,
+                    mask: false,
+                    data,
+                    offset: 0,
+                    data.Length
+                );
             return Multicast (WebSocket.WsSendBuffer.ToArray());
         }
     }
@@ -191,21 +326,52 @@ public class WssServer : HttpsServer, IWebSocket
 
     #region WebSocket multicast pong methods
 
-    public bool SendPong (byte[] buffer, long offset, long size)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="buffer"></param>
+    /// <param name="offset"></param>
+    /// <param name="size"></param>
+    /// <returns></returns>
+    public bool SendPong
+        (
+            byte[] buffer,
+            long offset,
+            long size
+        )
     {
         lock (WebSocket.WsSendLock)
         {
-            WebSocket.PrepareSendFrame (WebSocket.WS_FIN | WebSocket.WS_PONG, false, buffer, offset, size);
+            WebSocket.PrepareSendFrame
+                (
+                    opcode: WebSocket.WS_FIN | WebSocket.WS_PONG,
+                    mask: false, buffer, offset, size
+                );
             return Multicast (WebSocket.WsSendBuffer.ToArray());
         }
     }
 
-    public bool SendPong (string text)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="text"></param>
+    /// <returns></returns>
+    public bool SendPong
+        (
+            string text
+        )
     {
         lock (WebSocket.WsSendLock)
         {
             var data = Encoding.UTF8.GetBytes (text);
-            WebSocket.PrepareSendFrame (WebSocket.WS_FIN | WebSocket.WS_PONG, false, data, 0, data.Length);
+            WebSocket.PrepareSendFrame
+                (
+                    opcode: WebSocket.WS_FIN | WebSocket.WS_PONG,
+                    mask: false,
+                    data,
+                    offset: 0,
+                    data.Length
+                );
             return Multicast (WebSocket.WsSendBuffer.ToArray());
         }
     }

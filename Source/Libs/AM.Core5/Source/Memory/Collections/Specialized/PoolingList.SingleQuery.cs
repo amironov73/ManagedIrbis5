@@ -7,9 +7,10 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* PoolingList.SingleQuery
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,7 +26,16 @@ namespace AM.Memory.Collections.Specialized;
 
 public static partial class AsSingleQueryList
 {
-    public static IPoolingEnumerable<T> AsSingleEnumerableList<T> (this IEnumerable<T> src)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="src"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static IPoolingEnumerable<T> AsSingleEnumerableList<T>
+        (
+            this IEnumerable<T> src
+        )
     {
         var list = Pool<PoolingList<T>>.Get().Init();
         foreach (var item in src)
@@ -36,7 +46,17 @@ public static partial class AsSingleQueryList
         return Pool<EnumerableTyped<T>>.Get().Init (list);
     }
 
-    public static IPoolingEnumerable<T> AsSingleEnumerableSharedList<T> (this IEnumerable<T> src) where T : class
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="src"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static IPoolingEnumerable<T> AsSingleEnumerableSharedList<T>
+        (
+            this IEnumerable<T> src
+        )
+        where T : class
     {
         var list = Pool<PoolingListCanon<T>>.Get().Init();
         foreach (var item in src)
@@ -47,7 +67,16 @@ public static partial class AsSingleQueryList
         return Pool<EnumerableShared<T>>.Get().Init (list);
     }
 
-    public static IPoolingEnumerable<T> AsSingleEnumerableList<T> (this IPoolingEnumerable<T> src)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="src"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static IPoolingEnumerable<T> AsSingleEnumerableList<T>
+        (
+            this IPoolingEnumerable<T> src
+        )
     {
         var list = Pool<PoolingList<T>>.Get().Init();
         foreach (var item in src)
@@ -58,7 +87,16 @@ public static partial class AsSingleQueryList
         return Pool<EnumerableTyped<T>>.Get().Init (list);
     }
 
-    public static IPoolingEnumerable<T> AsSingleEnumerableSharedList<T> (this IPoolingEnumerable<T> src)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="src"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static IPoolingEnumerable<T> AsSingleEnumerableSharedList<T>
+        (
+            this IPoolingEnumerable<T> src
+        )
         where T : class
     {
         var list = Pool<PoolingListCanon<T>>.Get().Init();
