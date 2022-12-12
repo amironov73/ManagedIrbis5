@@ -676,7 +676,7 @@ public sealed class Deque<TItem>
             IReadOnlyCollection<TItem> collection
         )
     {
-        Sure.NotNull ((object?) collection);
+        Sure.NotNull (collection);
 
         var collectionCount = collection.Count;
 
@@ -825,7 +825,7 @@ public sealed class Deque<TItem>
             IEnumerable<TItem> collection
         )
     {
-        Sure.NotNull ((object?) collection);
+        Sure.NotNull (collection);
 
         CheckNewIndexArgument (Count, index);
         var source = Utility.ReifyCollection (collection);

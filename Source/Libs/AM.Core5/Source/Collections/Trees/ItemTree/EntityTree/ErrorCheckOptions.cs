@@ -1,37 +1,64 @@
-﻿using System;
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-namespace TreeCollections
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable NonReadonlyMemberInGetHashCode
+// ReSharper disable UnusedMember.Global
+
+/* ErrorCheckOptions.cs --
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
+using System;
+
+#endregion
+
+namespace TreeCollections;
+
+/// <summary>
+///
+/// </summary>
+[Flags]
+public enum ErrorCheckOptions
 {
-    [Flags]
-    public enum ErrorCheckOptions
-    {
-        /// <summary>
-        /// No error checks
-        /// </summary>
-        None = 0,
+    /// <summary>
+    /// No error checks
+    /// </summary>
+    None = 0,
 
-        /// <summary>
-        /// Check for Id cycles (duplicate Ids in single paths)
-        /// </summary>
-        CyclicIdDuplicates = 0x1,
+    /// <summary>
+    /// Check for Id cycles (duplicate Ids in single paths)
+    /// </summary>
+    CyclicIdDuplicates = 0x1,
 
-        /// <summary>
-        /// Check for Id duplicates among siblings
-        /// </summary>
-        SiblingIdDuplicates = 0x2,
+    /// <summary>
+    /// Check for Id duplicates among siblings
+    /// </summary>
+    SiblingIdDuplicates = 0x2,
 
-        /// <summary>
-        /// Check for alias (name) duplicates among siblings
-        /// </summary>
-        SiblingAliasDuplicates = 0x4,
+    /// <summary>
+    /// Check for alias (name) duplicates among siblings
+    /// </summary>
+    SiblingAliasDuplicates = 0x4,
 
-        /// <summary>
-        /// Check for Id duplicates across entire tree.
-        /// If this flag is set, CyclicIdDuplicates and SiblingIdDuplicates are ignored because both of these checks will be covered.
-        /// </summary>
-        TreeScopeIdDuplicates = 0x8,
+    /// <summary>
+    /// Check for Id duplicates across entire tree.
+    /// If this flag is set, CyclicIdDuplicates and SiblingIdDuplicates are ignored because both of these checks will be covered.
+    /// </summary>
+    TreeScopeIdDuplicates = 0x8,
 
-        Default = 0x4 | 0x8,
-        All = 0x1 | 0x2 | 0x4 | 0x8
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    Default = 0x4 | 0x8,
+
+    /// <summary>
+    ///
+    /// </summary>
+    All = 0x1 | 0x2 | 0x4 | 0x8
 }

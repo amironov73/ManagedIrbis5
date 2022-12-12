@@ -66,7 +66,7 @@ public sealed class AsnTokenList
             IEnumerable<AsnToken> tokens
         )
     {
-        Sure.NotNull ((object?) tokens);
+        Sure.NotNull (tokens);
 
         _tokens = tokens.ToArray();
         _position = 0;

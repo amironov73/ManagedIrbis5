@@ -30,8 +30,11 @@ public abstract partial class ItemTreeNode<TNode, TItem>
     /// </summary>
     /// <param name="destParent">Parent/root destination node</param>
     /// <param name="maxRelativeDepth">Max depth of traversal (relative to this node)</param>
-    public void CopyTo (TNode destParent,
-        int? maxRelativeDepth = null)
+    public void CopyTo
+        (
+            TNode destParent,
+            int? maxRelativeDepth = null
+        )
     {
         MapCopyTo<TNode, TItem> (destParent, null, node => node.Item, maxRelativeDepth);
     }
@@ -42,9 +45,12 @@ public abstract partial class ItemTreeNode<TNode, TItem>
     /// <param name="destParent">Parent/root destination node</param>
     /// <param name="mapToDestItem">Map source node to destination item</param>
     /// <param name="maxRelativeDepth">Max depth of traversal (relative to this node)</param>
-    public void CopyTo (TNode destParent,
-        Func<TNode, TItem> mapToDestItem,
-        int? maxRelativeDepth = null)
+    public void CopyTo
+        (
+            TNode destParent,
+            Func<TNode, TItem> mapToDestItem,
+            int? maxRelativeDepth = null
+        )
     {
         MapCopyTo<TNode, TItem> (destParent, null, mapToDestItem, maxRelativeDepth);
     }
@@ -56,9 +62,12 @@ public abstract partial class ItemTreeNode<TNode, TItem>
     /// <param name="destParent">Parent/root destination node</param>
     /// <param name="allowNext">Predicate determining eligibility of source node and its descendants</param>
     /// <param name="maxRelativeDepth">Max depth of traversal (relative to this node)</param>
-    public void CopyTo (TNode destParent,
-        Func<TNode, bool> allowNext,
-        int? maxRelativeDepth = null)
+    public void CopyTo
+        (
+            TNode destParent,
+            Func<TNode, bool> allowNext,
+            int? maxRelativeDepth = null
+        )
     {
         MapCopyTo<TNode, TItem> (destParent, allowNext, node => node.Item, maxRelativeDepth);
     }
@@ -71,10 +80,13 @@ public abstract partial class ItemTreeNode<TNode, TItem>
     /// <param name="allowNext">Predicate determining eligibility of source node and its descendants</param>
     /// <param name="mapToDestItem">Map source node to destination item</param>
     /// <param name="maxRelativeDepth">Max depth of traversal (relative to this node)</param>
-    public void CopyTo (TNode destParent,
-        Func<TNode, bool> allowNext,
-        Func<TNode, TItem> mapToDestItem,
-        int? maxRelativeDepth = null)
+    public void CopyTo
+        (
+            TNode destParent,
+            Func<TNode, bool> allowNext,
+            Func<TNode, TItem> mapToDestItem,
+            int? maxRelativeDepth = null
+        )
     {
         MapCopyTo<TNode, TItem> (destParent, allowNext, mapToDestItem, maxRelativeDepth);
     }
@@ -85,8 +97,11 @@ public abstract partial class ItemTreeNode<TNode, TItem>
     /// <typeparam name="TDestNode"></typeparam>
     /// <param name="destParent">Parent/root destination node</param>
     /// <param name="maxRelativeDepth">Max depth of traversal (relative to this node)</param>
-    public void MapCopyTo<TDestNode> (TDestNode destParent,
-        int? maxRelativeDepth = null)
+    public void MapCopyTo<TDestNode>
+        (
+            TDestNode destParent,
+            int? maxRelativeDepth = null
+        )
         where TDestNode : ItemTreeNode<TDestNode, TItem>
     {
         MapCopyTo<TDestNode, TItem> (destParent, null, node => node.Item, maxRelativeDepth);
@@ -99,9 +114,12 @@ public abstract partial class ItemTreeNode<TNode, TItem>
     /// <param name="destParent">Parent/root destination node</param>
     /// <param name="mapToDestItem">Map source node to destination item</param>
     /// <param name="maxRelativeDepth">Max depth of traversal (relative to this node)</param>
-    public void MapCopyTo<TDestNode> (TDestNode destParent,
-        Func<TNode, TItem> mapToDestItem,
-        int? maxRelativeDepth = null)
+    public void MapCopyTo<TDestNode>
+        (
+            TDestNode destParent,
+            Func<TNode, TItem> mapToDestItem,
+            int? maxRelativeDepth = null
+        )
         where TDestNode : ItemTreeNode<TDestNode, TItem>
     {
         MapCopyTo<TDestNode, TItem> (destParent, null, mapToDestItem, maxRelativeDepth);
@@ -115,9 +133,12 @@ public abstract partial class ItemTreeNode<TNode, TItem>
     /// <param name="destParent">Parent/root destination node</param>
     /// <param name="allowNext">Predicate determining eligibility of source node and its descendants</param>
     /// <param name="maxRelativeDepth">Max depth of traversal (relative to this node)</param>
-    public void MapCopyTo<TDestNode> (TDestNode destParent,
-        Func<TNode, bool> allowNext,
-        int? maxRelativeDepth = null)
+    public void MapCopyTo<TDestNode>
+        (
+            TDestNode destParent,
+            Func<TNode, bool> allowNext,
+            int? maxRelativeDepth = null
+        )
         where TDestNode : ItemTreeNode<TDestNode, TItem>
     {
         MapCopyTo<TDestNode, TItem> (destParent, allowNext, node => node.Item, maxRelativeDepth);
@@ -132,10 +153,13 @@ public abstract partial class ItemTreeNode<TNode, TItem>
     /// <param name="allowNext">Predicate determining eligibility of source node and its descendants</param>
     /// <param name="mapToDestItem">Map source node to destination item</param>
     /// <param name="maxRelativeDepth">Max depth of traversal (relative to this node)</param>
-    public void MapCopyTo<TDestNode> (TDestNode destParent,
-        Func<TNode, bool> allowNext,
-        Func<TNode, TItem> mapToDestItem,
-        int? maxRelativeDepth = null)
+    public void MapCopyTo<TDestNode>
+        (
+            TDestNode destParent,
+            Func<TNode, bool> allowNext,
+            Func<TNode, TItem> mapToDestItem,
+            int? maxRelativeDepth = null
+        )
         where TDestNode : ItemTreeNode<TDestNode, TItem>
     {
         MapCopyTo<TDestNode, TItem> (destParent, allowNext, mapToDestItem, maxRelativeDepth);
@@ -149,10 +173,13 @@ public abstract partial class ItemTreeNode<TNode, TItem>
     /// <param name="destParent">Parent/root destination node</param>
     /// <param name="mapToDestItem">Map source node to destination item</param>
     /// <param name="maxRelativeDepth">Max depth of traversal (relative to this node)</param>
-    public void MapCopyTo<TDestNode, TDestItem> (TDestNode destParent,
-        Func<TNode, TDestItem> mapToDestItem,
-        int? maxRelativeDepth = null)
-        where TDestNode : ItemTreeNode<TDestNode, TDestItem>
+    public void MapCopyTo<TDestNode, TDestItem>
+        (
+            TDestNode destParent,
+            Func<TNode, TDestItem> mapToDestItem,
+            int? maxRelativeDepth = null
+        )
+        where TDestNode: ItemTreeNode<TDestNode, TDestItem>
     {
         MapCopyTo (destParent, null, mapToDestItem, maxRelativeDepth);
     }
@@ -173,7 +200,7 @@ public abstract partial class ItemTreeNode<TNode, TItem>
             Func<TNode, bool>? allowNext,
             Func<TNode, TDestItem> mapToDestItem,
             int? maxRelativeDepth = null
-            )
+        )
         where TDestNode : ItemTreeNode<TDestNode, TDestItem>
     {
         if (maxRelativeDepth <= 0)
@@ -196,13 +223,16 @@ public abstract partial class ItemTreeNode<TNode, TItem>
         }
     }
 
-    private static void FilteredMapCopyTo<TDestNode, TDestItem> (TNode sourceParent,
-        TDestNode destParent,
-        Func<TNode, bool> allowNext,
-        Func<TNode, TDestItem> mapToDestItem,
-        int curDepth,
-        int maxRelativeDepth)
-        where TDestNode : ItemTreeNode<TDestNode, TDestItem>
+    private static void FilteredMapCopyTo<TDestNode, TDestItem>
+        (
+            TNode sourceParent,
+            TDestNode destParent,
+            Func<TNode, bool> allowNext,
+            Func<TNode, TDestItem> mapToDestItem,
+            int curDepth,
+            int maxRelativeDepth
+        )
+        where TDestNode: ItemTreeNode<TDestNode, TDestItem>
     {
         var destValues =
             sourceParent.Children
@@ -230,12 +260,15 @@ public abstract partial class ItemTreeNode<TNode, TItem>
     }
 
 
-    private static void NonFilteredMapCopyTo<TDestNode, TDestItem> (TNode sourceParent,
-        TDestNode destParent,
-        Func<TNode, TDestItem> mapToDestItem,
-        int curDepth,
-        int maxRelativeDepth)
-        where TDestNode : ItemTreeNode<TDestNode, TDestItem>
+    private static void NonFilteredMapCopyTo<TDestNode, TDestItem>
+        (
+            TNode sourceParent,
+            TDestNode destParent,
+            Func<TNode, TDestItem> mapToDestItem,
+            int curDepth,
+            int maxRelativeDepth
+        )
+        where TDestNode: ItemTreeNode<TDestNode, TDestItem>
     {
         var destValues =
             sourceParent.Children

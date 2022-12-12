@@ -8,7 +8,8 @@
 // ReSharper disable UnusedMember.Global
 
 /* TreeNode.cs --
-   Ars Magna project, http://arsmagna.ru */
+ * Ars Magna project, http://arsmagna.ru
+ */
 
 #region Using directives
 
@@ -31,7 +32,7 @@ namespace TreeCollections;
 /// <typeparam name="TNode"></typeparam>
 public abstract partial class TreeNode<TNode>
     : IEnumerable<TNode>, ITreeNode
-    where TNode : TreeNode<TNode>
+    where TNode: TreeNode<TNode>
 {
     private protected readonly List<TNode> ChildrenList;
     private readonly Lazy<HierarchyPosition> _hierarchyId;
@@ -109,7 +110,7 @@ public abstract partial class TreeNode<TNode>
     /// <returns></returns>
     public IEnumerable<TNode> PreOrder (int? maxRelativeDepth = null)
     {
-        return new EnumeratorHost<TNode> (new PreOrderEnumerator<TNode> (This, maxRelativeDepth));
+        return new EnumeratorHost<TNode> (new PreOrderEnumerator<TNode> (This, maxRelativeDepth)!);
     }
 
     /// <summary>
@@ -121,8 +122,10 @@ public abstract partial class TreeNode<TNode>
     /// <returns></returns>
     public IEnumerable<TNode> PreOrder (Func<TNode, bool> allowNext, int? maxRelativeDepth = null)
     {
-        return new EnumeratorHost<TNode> (
-            new PreOrderFilteringEnumerator<TNode> (This, allowNext, maxRelativeDepth));
+        return new EnumeratorHost<TNode>
+            (
+                new PreOrderFilteringEnumerator<TNode> (This, allowNext, maxRelativeDepth)!
+            );
     }
 
     /// <summary>
@@ -132,7 +135,10 @@ public abstract partial class TreeNode<TNode>
     /// <returns></returns>
     public IEnumerable<TNode> LevelOrder (int? maxRelativeDepth = null)
     {
-        return new EnumeratorHost<TNode> (new LevelOrderEnumerator<TNode> (This, maxRelativeDepth));
+        return new EnumeratorHost<TNode>
+            (
+                new LevelOrderEnumerator<TNode> (This, maxRelativeDepth)!
+            );
     }
 
     /// <summary>
@@ -151,7 +157,7 @@ public abstract partial class TreeNode<TNode>
     /// <returns></returns>
     public IEnumerator<TNode> GetEnumerator()
     {
-        return new PreOrderEnumerator<TNode> (This);
+        return new PreOrderEnumerator<TNode> (This)!;
     }
 
     IEnumerator IEnumerable.GetEnumerator()

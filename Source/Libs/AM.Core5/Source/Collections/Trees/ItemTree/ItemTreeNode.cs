@@ -33,7 +33,7 @@ namespace TreeCollections;
 /// <typeparam name="TItem"></typeparam>
 public abstract partial class ItemTreeNode<TNode, TItem>
     : TreeNode<TNode>, IItemTreeNode<TItem>
-    where TNode : ItemTreeNode<TNode, TItem>
+    where TNode: ItemTreeNode<TNode, TItem>
 {
     private bool _isBuilt;
 

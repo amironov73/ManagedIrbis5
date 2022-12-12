@@ -5,6 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable LocalizableElement
 // ReSharper disable NonReadonlyMemberInGetHashCode
 
 /* SearchDictionary.cs --
@@ -144,7 +145,7 @@ public class SearchDictionary<TValue>
         Sure.NotNullNorEmpty (key);
 
         var node = Tree.GetNodeWithValue (root, key);
-        return node != null && node.HasValue;
+        return node is { HasValue: true };
     }
 
     /// <summary>
@@ -158,7 +159,7 @@ public class SearchDictionary<TValue>
 
         var node = Tree.GetNodeWithValue (root, item.Key);
 
-        return node != null && node.HasValue && EqualityComparer<TValue>.Default.Equals (node.Value, item.Value);
+        return node is { HasValue: true } && EqualityComparer<TValue>.Default.Equals (node.Value, item.Value);
     }
 
     /// <summary>
@@ -270,21 +271,24 @@ public class SearchDictionary<TValue>
         Count = 0;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public void Optimize()
     {
-        foreach (var node in Tree.GetEqualNodes (root))
+        foreach (var node in Tree.GetEqualNodes (root!))
         {
-            var newEqualNode = Tree.OptimizeEqualNode (node.EqualNode);
+            var newEqualNode = Tree.OptimizeEqualNode (node.EqualNode!);
             node.EqualNode = newEqualNode;
         }
 
-        root = Tree.OptimizeEqualNode (root);
+        root = Tree.OptimizeEqualNode (root!);
     }
 
     private void RemoveInternal (string key)
     {
-        Tree.RemoveNode (root, key, 0);
-        if (root.CanBeRemoved)
+        Tree.RemoveNode (root!, key, 0);
+        if (root!.CanBeRemoved)
         {
             root = null;
         }

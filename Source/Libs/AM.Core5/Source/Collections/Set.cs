@@ -176,7 +176,7 @@ public class Set<T> : CollectionBase<T>, ICollection<T>, ICloneable
             {
                 if (item == null)
                 {
-                    itemClone = default (T); // Really null, because we know T is a reference type
+                    itemClone = default!; // Really null, because we know T is a reference type
                 }
                 else
                 {
@@ -199,20 +199,14 @@ public class Set<T> : CollectionBase<T>, ICollection<T>, ICloneable
     /// </summary>
     /// <value>If the set was created using a comparer, that comparer is returned. Otherwise
     /// the default comparer for T (EqualityComparer&lt;T&gt;.Default) is returned.</value>
-    public IEqualityComparer<T> Comparer
-    {
-        get { return this.equalityComparer; }
-    }
+    public IEqualityComparer<T> Comparer => this.equalityComparer;
 
     /// <summary>
     /// Returns the number of items in the set.
     /// </summary>
     /// <remarks>The size of the set is returned in constant time.</remarks>
     /// <value>The number of items in the set.</value>
-    public sealed override int Count
-    {
-        get { return hash.ElementCount; }
-    }
+    public sealed override int Count => hash.ElementCount;
 
     /// <summary>
     /// Returns an enumerator that enumerates all the items in the set.
@@ -320,7 +314,7 @@ public class Set<T> : CollectionBase<T>, ICollection<T>, ICloneable
     {
         if (collection == null)
         {
-            throw new ArgumentNullException ("collection");
+            throw new ArgumentNullException (nameof (collection));
         }
 
         // If we're adding ourselves, then there is nothing to do.
@@ -366,14 +360,11 @@ public class Set<T> : CollectionBase<T>, ICollection<T>, ICloneable
     /// <exception cref="ArgumentNullException"><paramref name="collection"/> is null.</exception>
     public int RemoveMany (IEnumerable<T> collection)
     {
-        if (collection == null)
-        {
-            throw new ArgumentNullException ("collection");
-        }
+        Sure.NotNull (collection);
 
         var count = 0;
 
-        if (collection == this)
+        if (Equals (collection, this))
         {
             count = Count;
             Clear(); // special case, otherwise we will throw.
@@ -416,12 +407,9 @@ public class Set<T> : CollectionBase<T>, ICollection<T>, ICloneable
     /// <exception cref="InvalidOperationException">If otherSet and this set don't use the same method for comparing items.</exception>
     private void CheckConsistentComparison (Set<T> otherSet)
     {
-        if (otherSet == null)
-        {
-            throw new ArgumentNullException ("otherSet");
-        }
+        Sure.NotNull (otherSet);
 
-        if (!object.Equals (equalityComparer, otherSet.equalityComparer))
+        if (!Equals (equalityComparer, otherSet.equalityComparer))
         {
             throw new InvalidOperationException (
                 "The two collections cannot be combined because they use different comparison operations");
@@ -616,7 +604,7 @@ public class Set<T> : CollectionBase<T>, ICollection<T>, ICloneable
     public Set<T> Union (Set<T> otherSet)
     {
         CheckConsistentComparison (otherSet);
-        Set<T> smaller, larger, result;
+        Set<T> smaller, larger;
         if (otherSet.Count > this.Count)
         {
             smaller = this;
@@ -628,7 +616,7 @@ public class Set<T> : CollectionBase<T>, ICollection<T>, ICloneable
             larger = this;
         }
 
-        result = larger.Clone();
+        Set<T> result = larger.Clone();
         result.AddMany (smaller);
         return result;
     }
@@ -693,7 +681,7 @@ public class Set<T> : CollectionBase<T>, ICollection<T>, ICloneable
     public Set<T> Intersection (Set<T> otherSet)
     {
         CheckConsistentComparison (otherSet);
-        Set<T> smaller, larger, result;
+        Set<T> smaller, larger;
         if (otherSet.Count > this.Count)
         {
             smaller = this;
@@ -705,7 +693,7 @@ public class Set<T> : CollectionBase<T>, ICollection<T>, ICloneable
             larger = this;
         }
 
-        result = new Set<T> (equalityComparer);
+        Set<T> result = new (equalityComparer);
         foreach (var item in smaller)
         {
             if (larger.Contains (item))

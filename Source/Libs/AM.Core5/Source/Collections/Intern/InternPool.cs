@@ -261,7 +261,7 @@ public class InternPool
         )
         : this()
     {
-        Sure.NotNull ((object?) collection);
+        Sure.NotNull (collection);
 
         if (maxCount is < -1 or 0)
         {
@@ -1044,7 +1044,7 @@ public class InternPool
             IEnumerable<string> other
         )
     {
-        Sure.NotNull ((object?) other);
+        Sure.NotNull (other);
 
         foreach (var item in other)
         {
@@ -1059,7 +1059,7 @@ public class InternPool
             IEnumerable<string> other
         )
     {
-        Sure.NotNull ((object?) other);
+        Sure.NotNull (other);
 
         // Intersection of anything with empty set is empty set, so return if count is 0.
         // Same if the set intersecting with itself is the same set.
@@ -1096,7 +1096,7 @@ public class InternPool
             IEnumerable<string> other
         )
     {
-        Sure.NotNull ((object?) other);
+        Sure.NotNull (other);
 
         // This is already the empty set; return.
         if (Count == 0)
@@ -1125,7 +1125,7 @@ public class InternPool
             IEnumerable<string> other
         )
     {
-        Sure.NotNull ((object?) other);
+        Sure.NotNull (other);
 
         // If set is empty, then symmetric difference is other.
         if (Count == 0)
@@ -1164,7 +1164,7 @@ public class InternPool
             IEnumerable<string> other
         )
     {
-        Sure.NotNull ((object?) other);
+        Sure.NotNull (other);
 
         // The empty set is a subset of any set, and a set is a subset of itself.
         // Set is always a subset of itself
@@ -1200,7 +1200,7 @@ public class InternPool
             IEnumerable<string> other
         )
     {
-        Sure.NotNull ((object?) other);
+        Sure.NotNull (other);
 
         // No set is a proper subset of itself.
         if (ReferenceEquals (other, this))
@@ -1248,7 +1248,7 @@ public class InternPool
             IEnumerable<string> other
         )
     {
-        Sure.NotNull ((object?) other);
+        Sure.NotNull (other);
 
         // A set is always a superset of itself.
         if (ReferenceEquals (other, this))
@@ -1284,7 +1284,7 @@ public class InternPool
             IEnumerable<string> other
         )
     {
-        Sure.NotNull ((object?) other);
+        Sure.NotNull (other);
 
         // The empty set isn't a proper superset of any set, and a set is never a strict superset of itself.
         if (Count == 0 || ReferenceEquals (other, this))
@@ -1327,7 +1327,7 @@ public class InternPool
             IEnumerable<string> other
         )
     {
-        Sure.NotNull ((object?) other);
+        Sure.NotNull (other);
 
         if (Count == 0)
         {
@@ -1359,7 +1359,7 @@ public class InternPool
             IEnumerable<string> other
         )
     {
-        Sure.NotNull ((object?) other);
+        Sure.NotNull (other);
 
         // A set is equal to itself.
         if (ReferenceEquals (other, this))

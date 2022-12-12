@@ -48,7 +48,7 @@ internal sealed class LevelBuilderEqualityComparer<TPayload>
             IEqualityComparer<TPayload> payloadComparer
         )
     {
-        Sure.NotNull ((object?) payloadComparer);
+        Sure.NotNull (payloadComparer);
 
         _payloadComparer = payloadComparer;
     }
@@ -117,9 +117,12 @@ internal sealed class LevelBuilderEqualityComparer<TPayload>
         return !ye.MoveNext();
     }
 
-    private int ComputeHashCode (Node<TPayload> node)
+    private int ComputeHashCode
+        (
+            Node<TPayload> node
+        )
     {
-        var hashCode = _payloadComparer.GetHashCode (node.Payload);
+        var hashCode = _payloadComparer.GetHashCode (node.Payload!);
 
         foreach (var pair in node.Children)
         {

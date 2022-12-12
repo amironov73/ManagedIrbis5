@@ -22,6 +22,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -552,7 +554,7 @@ public static class Sure
     [DebuggerHidden]
     public static void NotNull<T>
         (
-            T? argument,
+            [NoEnumeration] T? argument,
             [CallerArgumentExpression ("argument")]
             string? argumentName = null
         )

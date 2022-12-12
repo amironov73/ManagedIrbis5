@@ -34,7 +34,7 @@ namespace TreeCollections;
 public abstract partial class EntityTreeNode<TNode, TId, TItem>
     : ItemTreeNode<TNode, TItem>,
     IEntityTreeNode<TId, TItem>
-    where TNode : EntityTreeNode<TNode, TId, TItem>
+    where TNode: EntityTreeNode<TNode, TId, TItem>
 {
     /// <summary>
     /// Root constructor

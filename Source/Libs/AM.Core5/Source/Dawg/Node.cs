@@ -38,13 +38,22 @@ internal sealed class Node<TPayload>
 {
     readonly Dictionary<char, Node<TPayload>> _children;
 
+    /// <summary>
+    ///
+    /// </summary>
     public Node()
     {
+        Payload = default!;
         _children = new Dictionary<char, Node<TPayload>>();
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="children"></param>
     internal Node (Dictionary<char, Node<TPayload>> children)
     {
+        Payload = default!;
         _children = children;
     }
 

@@ -49,7 +49,7 @@ internal sealed class MatrixDawg<TPayload>
 
                 if (childIndexPlusOne == 0)
                 {
-                    return default;
+                    return default!;
                 }
 
                 node_i = childIndexPlusOne - 1;
@@ -57,10 +57,10 @@ internal sealed class MatrixDawg<TPayload>
 
             if (node_i == -1)
             {
-                return default;
+                return default!;
             }
 
-            return node_i < payloads.Length ? payloads[node_i] : default;
+            return node_i < payloads.Length ? payloads[node_i] : default!;
         }
     }
 
@@ -242,8 +242,21 @@ internal sealed class MatrixDawg<TPayload>
     private readonly char firstChar;
     private readonly char lastChar;
 
-    public MatrixDawg (BinaryReader reader, Func<BinaryReader, TPayload> readPayload)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="reader"></param>
+    /// <param name="readPayload"></param>
+    public MatrixDawg
+        (
+            BinaryReader reader,
+            Func<BinaryReader,
+                TPayload> readPayload
+        )
     {
+        charToIndexPlusOne = null!;
+
+
         // The nodes are grouped by (has payload, has children).
         nodeCount = reader.ReadInt32();
 
@@ -253,7 +266,7 @@ internal sealed class MatrixDawg<TPayload>
 
         indexToChar = reader.ReadArray (r => r.ReadChar());
 
-        charToIndexPlusOne = CharToIndexPlusOneMap.Get (indexToChar);
+        charToIndexPlusOne = CharToIndexPlusOneMap.Get (indexToChar)!;
 
         children1 = ReadChildren (reader, indexToChar);
         children0 = ReadChildren (reader, indexToChar);

@@ -48,7 +48,7 @@ public static class TreeStringSerializationExtensions
         )
         where TNode : TreeNode<TNode>
     {
-        Sure.NotNull ((object?) sequence);
+        Sure.NotNull (sequence);
         Sure.NotNull (toTextLine);
         Sure.NonNegative (indention);
 
@@ -78,7 +78,7 @@ public static class TreeStringSerializationExtensions
         )
         where TNode : TreeNode<TNode>
     {
-        Sure.NotNull ((object?) sequence);
+        Sure.NotNull (sequence);
         Sure.NotNull (appendLine);
         Sure.NonNegative (indention);
 

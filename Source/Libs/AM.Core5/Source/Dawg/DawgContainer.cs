@@ -183,7 +183,7 @@ public sealed class DawgContainer<TPayload>
     {
         get
         {
-            Sure.NotNull ((object?) word);
+            Sure.NotNull (word);
 
             return _dawg[word];
         }
@@ -197,7 +197,7 @@ public sealed class DawgContainer<TPayload>
             IEnumerable<char> word
         )
     {
-        Sure.NotNull ((object?) word);
+        Sure.NotNull (word);
 
         return _dawg.GetLongestCommonPrefixLength (word);
     }
@@ -210,7 +210,7 @@ public sealed class DawgContainer<TPayload>
             IEnumerable<char> prefix
         )
     {
-        Sure.NotNull ((object?) prefix);
+        Sure.NotNull (prefix);
 
         return _dawg.MatchPrefix (prefix);
     }
@@ -223,7 +223,7 @@ public sealed class DawgContainer<TPayload>
             IEnumerable<char> word
         )
     {
-        Sure.NotNull ((object?) word);
+        Sure.NotNull (word);
 
         return _dawg.GetPrefixes (word);
     }

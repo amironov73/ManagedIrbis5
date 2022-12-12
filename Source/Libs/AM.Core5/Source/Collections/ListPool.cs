@@ -91,7 +91,7 @@ public sealed class ListPool<T>
              IEnumerable<T> source
          )
     {
-        Sure.NotNull ((object?) source);
+        Sure.NotNull (source);
 
         if (source is ICollection<T> collection)
         {
@@ -429,7 +429,7 @@ public sealed class ListPool<T>
             IEnumerable<T> items
         )
     {
-        Sure.NotNull ((object?) items);
+        Sure.NotNull (items);
 
         var count = Count;
         var buffer = _items;

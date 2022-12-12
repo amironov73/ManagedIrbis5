@@ -283,7 +283,7 @@ public sealed class CharSet
         )
         : this()
     {
-        Sure.NotNull ((object?) characters);
+        Sure.NotNull (characters);
 
         foreach (var c in characters)
         {

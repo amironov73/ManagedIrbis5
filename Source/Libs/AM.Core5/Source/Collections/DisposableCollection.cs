@@ -62,7 +62,7 @@ public class DisposableCollection<T>
             IEnumerable<T?> list
         )
     {
-        Sure.NotNull ((object?) list);
+        Sure.NotNull (list);
 
         foreach (var disposable in list)
         {
@@ -82,7 +82,7 @@ public class DisposableCollection<T>
             IEnumerable<T?> list
         )
     {
-        Sure.NotNull ((object?) list);
+        Sure.NotNull (list);
 
         foreach (var disposable in list)
         {

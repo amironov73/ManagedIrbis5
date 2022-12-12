@@ -28,6 +28,8 @@ using AM.Text;
 
 #nullable enable
 
+#pragma warning disable SYSLIB0041 // использование устаревших типов
+
 namespace AM.Security;
 
 /// <summary>

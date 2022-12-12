@@ -92,7 +92,7 @@ public static class ListUtility
         )
     {
         Sure.NotNull (list);
-        Sure.NotNull ((object?) values);
+        Sure.NotNull (values);
         Sure.NotNull (comparer);
 
         var allAdded = true;
@@ -136,7 +136,7 @@ public static class ListUtility
         where T: class
     {
         Sure.NotNull (list);
-        Sure.NotNull ((object?) values);
+        Sure.NotNull (values);
 
         foreach (var value in values)
         {
@@ -262,7 +262,7 @@ public static class ListUtility
             IEqualityComparer<TSource> comparer
         )
     {
-        Sure.NotNull ((object?) source);
+        Sure.NotNull (source);
         Sure.NotNull (comparer);
 
         foreach (var local in source)
@@ -285,7 +285,7 @@ public static class ListUtility
             Func<T, bool> predicate
         )
     {
-        Sure.NotNull ((object?) collection);
+        Sure.NotNull (collection);
         Sure.NotNull (predicate);
 
         var index = 0;

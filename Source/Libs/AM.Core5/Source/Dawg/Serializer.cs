@@ -83,7 +83,7 @@ static class Serializer
     {
         var groups = root
             .GetAllDistinctNodes()
-            .GroupBy (n => n.Payload?.Count ?? 0)
+            .GroupBy (n => n.Payload.Count)
             .OrderByDescending (g => g.Key)
             .Select (g => new { PayloadCount = g.Key, Nodes = g.ToList() })
             .ToList();
@@ -146,7 +146,7 @@ static class Serializer
         for (var c = 0; c < 2; ++c)
         {
             var key = new { HasPayload = p != 0, HasChildren = c != 0 };
-            cube[p, c] = nodeGroups.TryGetValue (key, out var arr) ? arr : new Node<TPayload>[0];
+            cube[p, c] = nodeGroups.TryGetValue (key, out var arr) ? arr : Array.Empty<Node<TPayload>>();
         }
 
         var nodesWithPayloads = cube[1, 1].Concat (cube[1, 0]).ToArray();
@@ -200,7 +200,7 @@ static class Serializer
 
             foreach (var child in node.Children.OrderBy (c => c.Key))
             {
-                var charIndex = charToIndexPlusOne[child.Key - firstChar] - 1;
+                var charIndex = charToIndexPlusOne![child.Key - firstChar] - 1;
 
                 WriteInt (writer, charIndex, allChars.Length);
 

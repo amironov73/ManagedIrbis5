@@ -9,6 +9,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable MemberCanBeProtected.Global
+// ReSharper disable StaticMemberInGenericType
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
@@ -40,16 +41,28 @@ public sealed class MultiDawgBuilder<TPayload>
     : DawgBuilder<IList<TPayload>>
 {
     private const int Version = 0;
+
+    /// <summary>
+    ///
+    /// </summary>
     private static readonly int Signature = BitConverter.ToInt32 (Encoding.UTF8.GetBytes ("MDWG"), 0);
 
+    /// <summary>
+    ///
+    /// </summary>
     public MultiDawgBuilder()
     {
+        // пустое тело конструктора
     }
 
     internal MultiDawgBuilder (Node<IList<TPayload>> root) : base (root)
     {
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public MultiDawg<TPayload> BuildMultiDawg()
     {
         FuseEnds();
@@ -61,11 +74,20 @@ public sealed class MultiDawgBuilder<TPayload>
         return LoadFrom (stream);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public void FuseEnds()
     {
         new LevelBuilder<IList<TPayload>> (new SequenceEqualityComparer<TPayload>()).MergeEnds (_root);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="stream"></param>
+    /// <returns></returns>
+    /// <exception cref="Exception"></exception>
     public static MultiDawg<TPayload> LoadFrom (Stream stream)
     {
         var reader = BuiltinTypeIO.TryGetReader<TPayload>()
@@ -74,6 +96,13 @@ public sealed class MultiDawgBuilder<TPayload>
         return LoadFrom (stream, reader);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="stream"></param>
+    /// <param name="readPayload"></param>
+    /// <returns></returns>
+    /// <exception cref="Exception"></exception>
     public static MultiDawg<TPayload> LoadFrom (Stream stream, Func<BinaryReader, TPayload> readPayload)
     {
         var reader = new BinaryReader (stream);
@@ -97,10 +126,14 @@ public sealed class MultiDawgBuilder<TPayload>
         var charToIndexPlusOne = CharToIndexPlusOneMap.Get (indexToChar);
 
         YaleReader.ReadChildren (indexToChar, nodeCount, reader, out var firstChildForNode, out var children);
-        var yaleGraph = new YaleGraph (children, firstChildForNode, charToIndexPlusOne, rootNodeIndex, indexToChar);
+        var yaleGraph = new YaleGraph (children, firstChildForNode, charToIndexPlusOne!, rootNodeIndex, indexToChar);
         return new MultiDawg<TPayload> (yaleGraph, payloads);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="stream"></param>
     public void SaveTo (Stream stream)
     {
         var writer = new BinaryWriter (stream);

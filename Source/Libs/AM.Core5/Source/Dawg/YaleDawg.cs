@@ -59,7 +59,7 @@ internal sealed class YaleDawg<TPayload>
         var charToIndexPlusOne = CharToIndexPlusOneMap.Get (_indexToChar);
         YaleReader.ReadChildren (_indexToChar, _nodeCount, reader, out _firstChildForNode, out _children);
 
-        _yaleGraph = new YaleGraph (_children, _firstChildForNode, charToIndexPlusOne, _rootNodeIndex, _indexToChar);
+        _yaleGraph = new YaleGraph (_children, _firstChildForNode, charToIndexPlusOne!, _rootNodeIndex, _indexToChar);
     }
 
     #endregion
@@ -81,7 +81,7 @@ internal sealed class YaleDawg<TPayload>
 
             if (node_i == -1)
             {
-                return default;
+                return default!;
             }
 
             return GetPayload (node_i);
@@ -90,7 +90,7 @@ internal sealed class YaleDawg<TPayload>
 
     private TPayload GetPayload (int node_i)
     {
-        return node_i < _payloads.Length ? _payloads[node_i] : default;
+        return node_i < _payloads.Length ? _payloads[node_i] : default!;
     }
 
     IEnumerable<int> GetPath (IEnumerable<char> word)

@@ -184,7 +184,7 @@ public class DawgBuilder<TPayload>
             TPayload value
         )
     {
-        Sure.NotNull ((object?) key);
+        Sure.NotNull (key);
 
         if (key is string strKey)
         {
@@ -205,7 +205,7 @@ public class DawgBuilder<TPayload>
             out TPayload value
         )
     {
-        Sure.NotNull ((object?) key);
+        Sure.NotNull (key);
 
         value = default!;
 

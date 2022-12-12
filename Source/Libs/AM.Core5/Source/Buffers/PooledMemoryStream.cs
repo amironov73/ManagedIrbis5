@@ -395,7 +395,7 @@ public sealed class PooledMemoryStream
             long capacity = 0;
             while (true)
             {
-                if (value <= head.RunningIndex + head.Length)
+                if (value <= head!.RunningIndex + head.Length)
                 {
                     head.Length = (int)(value - head.RunningIndex);
                     capacity += head.Capacity;
@@ -642,7 +642,6 @@ public sealed class PooledMemoryStream
         var buffer = new byte[_length];
 
         // currentAvailable represents the existing byte count in the current segment.
-        var readCount = 0;
         var currentAvailable = current.Length;
 
         // Loop until the data in the current segment is sufficient.
@@ -650,7 +649,6 @@ public sealed class PooledMemoryStream
         {
             // Copy the data from current segment.
             Buffer.BlockCopy (current.Array, 0, buffer, offset, currentAvailable);
-            readCount += currentAvailable;
             offset += currentAvailable;
             count -= currentAvailable;
 
@@ -964,7 +962,7 @@ public sealed class PooledMemoryStream
         public MemoryStreamAdapter (PooledMemoryStream innerStream, bool leaveOpen)
         {
             Debug.Assert (innerStream != null);
-            _innerStream = innerStream!;
+            _innerStream = innerStream;
             _leaveOpen = leaveOpen;
         }
 

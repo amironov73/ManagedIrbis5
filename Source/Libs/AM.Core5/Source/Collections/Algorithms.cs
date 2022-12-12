@@ -486,7 +486,11 @@ public static class Algorithms
         public T this [int index]
         {
             get => wrappedList[index];
-            set => MethodModifiesCollection();
+            set
+            {
+                value.NotUsed();
+                MethodModifiesCollection();
+            }
         }
 
         public void Add (T item)
@@ -605,7 +609,11 @@ public static class Algorithms
         public TValue this [TKey key]
         {
             get => wrappedDictionary[key];
-            set => MethodModifiesCollection();
+            set
+            {
+                value.NotUsed();
+                MethodModifiesCollection();
+            }
         }
 
         public void Add
@@ -1208,10 +1216,10 @@ public static class Algorithms
             wrappedList.RemoveAt (index);
         }
 
-        public object this [int index]
+        public object? this [int index]
         {
             get => wrappedList[index]!;
-            set => wrappedList[index] = ConvertToItemType ("value", value);
+            set => wrappedList[index] = ConvertToItemType (nameof (value), value);
         }
 
         public void CopyTo (Array array, int index)
@@ -1494,7 +1502,7 @@ public static class Algorithms
             IEqualityComparer<T> equalityComparer
         )
     {
-        Sure.NotNull ((object?) collection);
+        Sure.NotNull (collection);
         Sure.NotNull (equalityComparer);
 
         foreach (var item in collection)
@@ -1526,7 +1534,7 @@ public static class Algorithms
             T replaceWith
         )
     {
-        Sure.NotNull ((object?) collection);
+        Sure.NotNull (collection);
         Sure.NotNull (predicate);
 
         foreach (var item in collection)
@@ -1798,14 +1806,13 @@ public static class Algorithms
         }
 
         var current = default (T);
-        T item;
         int i = -1, j = 0;
         var listCount = list.Count;
 
         // Remove duplicates, compressing items to lower in the list.
         while (j < listCount)
         {
-            item = list[j];
+            var item = list[j];
             if (i < 0 || !predicate (current, item))
             {
                 current = item;
@@ -1823,12 +1830,12 @@ public static class Algorithms
         if (i < listCount)
         {
             // remove items from the end.
-            if (list is ArrayWrapper<T> || list is IList list2 && list2.IsFixedSize)
+            if (list is ArrayWrapper<T> or IList { IsFixedSize: true })
             {
                 // An array or similar. Null out the last elements.
                 while (i < listCount)
                 {
-                    list[i++] = default (T);
+                    list[i++] = default!;
                 }
             }
             else
@@ -2022,13 +2029,12 @@ public static class Algorithms
     /// <seealso cref="Algorithms.TryFindFirstWhere{T}"/>
     public static T FindFirstWhere<T> (IEnumerable<T> collection, Predicate<T> predicate)
     {
-        T retval;
-        if (TryFindFirstWhere (collection, predicate, out retval))
+        if (TryFindFirstWhere (collection, predicate, out var retval))
         {
             return retval;
         }
 
-        return default (T);
+        return default!;
     }
 
     /// <summary>
@@ -2083,13 +2089,12 @@ public static class Algorithms
     /// <seealso cref="TryFindLastWhere{T}"/>
     public static T FindLastWhere<T> (IEnumerable<T> collection, Predicate<T> predicate)
     {
-        T retval;
-        if (TryFindLastWhere (collection, predicate, out retval))
+        if (TryFindLastWhere (collection, predicate, out var retval))
         {
             return retval;
         }
 
-        return default (T);
+        return default!;
     }
 
     /// <summary>
@@ -2497,7 +2502,7 @@ public static class Algorithms
         )
     {
         Sure.NotNull (list);
-        Sure.NotNull ((object?) itemsToLookFor);
+        Sure.NotNull (itemsToLookFor);
         Sure.NotNull (predicate);
 
         // Scan the list for the items.
@@ -2554,7 +2559,7 @@ public static class Algorithms
         )
     {
         Sure.NotNull (list);
-        Sure.NotNull ((object?) itemsToLookFor);
+        Sure.NotNull (itemsToLookFor);
         Sure.NotNull (equalityComparer);
 
         // Create a set of the items we are looking for, for efficient lookup.
@@ -2593,7 +2598,7 @@ public static class Algorithms
         )
     {
         Sure.NotNull (list);
-        Sure.NotNull ((object?) itemsToLookFor);
+        Sure.NotNull (itemsToLookFor);
         Sure.NotNull (predicate);
 
         // Scan the list
@@ -2643,7 +2648,7 @@ public static class Algorithms
         )
     {
         Sure.NotNull (list);
-        Sure.NotNull ((object?) itemsToLookFor);
+        Sure.NotNull (itemsToLookFor);
         Sure.NotNull (equalityComparer);
 
         // Create a set of the items we are looking for, for efficient lookup.
@@ -3368,8 +3373,12 @@ public static class Algorithms
         }
 
         foreach (var itemFirst in first)
-        foreach (var itemSecond in second)
-            yield return new Pair<TFirst, TSecond> (itemFirst, itemSecond);
+        {
+            foreach (var itemSecond in second)
+            {
+                yield return new Pair<TFirst, TSecond> (itemFirst, itemSecond);
+            }
+        }
     }
 
     #endregion Set operations
@@ -3480,7 +3489,10 @@ public static class Algorithms
     /// <param name="dictionary">A dictionary to get the string representation of.</param>
     /// <returns>The string representation of the collection, or "null"
     /// if <paramref name="dictionary"/> is null.</returns>
-    public static string ToString<TKey, TValue> (IDictionary<TKey, TValue> dictionary)
+    public static string ToString<TKey, TValue>
+        (
+            IDictionary<TKey, TValue>? dictionary
+        )
     {
         var firstItem = true;
 
@@ -3557,10 +3569,7 @@ public static class Algorithms
         {
             lock (typeof (Algorithms))
             {
-                if (myRandomGenerator == null)
-                {
-                    myRandomGenerator = new Random();
-                }
+                myRandomGenerator ??= new Random();
             }
         }
 
@@ -3665,9 +3674,7 @@ public static class Algorithms
             var j = randomGenerator.Next (i + 1);
 
             // Swap list[i] and list[j]
-            var temp = list[i];
-            list[i] = list[j];
-            list[j] = temp;
+            (list[i], list[j]) = (list[j], list[i]);
         }
     }
 
@@ -3714,11 +3721,7 @@ public static class Algorithms
 
         // We need random access to the items in the collection. If it's not already an
         // IList<T>, copy to a temporary list.
-        var list = collection as IList<T>;
-        if (list == null)
-        {
-            list = new List<T> (collection);
-        }
+        var list = collection as IList<T> ?? new List<T> (collection);
 
         var listCount = list.Count;
         if (count < 0 || count > listCount)
@@ -3732,12 +3735,11 @@ public static class Algorithms
         for (var i = 0; i < count; ++i)
         {
             // Set j to the index of the item to swap with, and value to the value to swap with.
-            T value;
             var j = randomGenerator.Next (listCount - i) + i;
 
             // Swap values of i and j in the list. The list isn't actually changed; instead,
             // swapped values are stored in the dictionary swappedValues.
-            if (!swappedValues.TryGetValue (j, out value))
+            if (!swappedValues.TryGetValue (j, out var value))
             {
                 value = list[j];
             }
@@ -4025,7 +4027,7 @@ public static class Algorithms
             throw new InvalidOperationException ("The collection is empty");
         }
 
-        return maxSoFar;
+        return maxSoFar!;
     }
 
     /// <summary>
@@ -4101,7 +4103,7 @@ public static class Algorithms
             throw new InvalidOperationException ("The collection is empty");
         }
 
-        return minSoFar;
+        return minSoFar!;
     }
 
     /// <summary>
@@ -4293,8 +4295,6 @@ public static class Algorithms
     /// <returns>An array containing the sorted version of the collection.</returns>
     public static T[] Sort<T> (IEnumerable<T> collection, IComparer<T> comparer)
     {
-        T[] array;
-
         if (collection == null)
         {
             throw new ArgumentNullException (nameof (collection));
@@ -4305,7 +4305,7 @@ public static class Algorithms
             throw new ArgumentNullException (nameof (comparer));
         }
 
-        array = ToArray (collection);
+        var array = ToArray (collection);
 
         Array.Sort (array, comparer);
         return array;
@@ -4382,7 +4382,6 @@ public static class Algorithms
 
         var l = 0; // the inclusive left edge of the current range we are sorting.
         var r = list.Count - 1; // the inclusive right edge of the current range we are sorting.
-        T partition; // The partition value.
 
         // Loop until we have nothing left to sort. On each iteration, l and r contains the bounds
         // of something to sort (unless r <= l), and leftStack/rightStack have a stack of unsorted
@@ -4444,6 +4443,7 @@ public static class Algorithms
                     // Put the smallest at the left, largest in the middle, and the median at the right (which is the partitioning value)
                     list[l] = e1;
                     list[m] = e3;
+                    T partition; // The partition value.
                     list[r] = partition = e2;
 
                     // Partition into three parts, items <= partition, items == partition, and items >= partition
@@ -4556,21 +4556,16 @@ public static class Algorithms
     /// <param name="comparer">The comparer instance used to compare items in the collection. Only
     /// the Compare method is used.</param>
     /// <returns>An array containing the sorted version of the collection.</returns>
-    public static T[] StableSort<T> (IEnumerable<T> collection, IComparer<T> comparer)
+    public static T[] StableSort<T>
+        (
+            IEnumerable<T> collection,
+            IComparer<T> comparer
+        )
     {
-        T[] array;
+        Sure.NotNull (collection);
+        Sure.NotNull (comparer);
 
-        if (collection == null)
-        {
-            throw new ArgumentNullException (nameof (collection));
-        }
-
-        if (comparer == null)
-        {
-            throw new ArgumentNullException (nameof (comparer));
-        }
-
-        array = ToArray (collection);
+        var array = ToArray (collection);
 
         StableSortInPlace (ReadWriteList (array), comparer);
         return array;
@@ -5818,13 +5813,17 @@ public static class Algorithms
             var removed = new List<T>();
 
             foreach (var item in collection)
+            {
                 if (predicate (item))
                 {
                     removed.Add (item);
                 }
+            }
 
             foreach (var item in removed)
+            {
                 collection.Remove (item);
+            }
 
             return removed;
         }
@@ -5856,7 +5855,9 @@ public static class Algorithms
         }
 
         foreach (var sourceItem in sourceCollection)
+        {
             yield return converter (sourceItem);
+        }
     }
 
     /// <summary>
@@ -5920,7 +5921,9 @@ public static class Algorithms
         }
 
         foreach (var item in collection)
+        {
             action (item);
+        }
     }
 
     /// <summary>
@@ -6081,7 +6084,9 @@ public static class Algorithms
         foreach (var coll in collections)
         {
             foreach (var item in coll)
+            {
                 yield return item;
+            }
         }
     }
 
@@ -6284,7 +6289,9 @@ public static class Algorithms
         var count = 0;
 
         foreach (var item in collection)
+        {
             ++count;
+        }
 
         return count;
     }

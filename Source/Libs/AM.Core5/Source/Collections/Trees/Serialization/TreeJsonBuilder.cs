@@ -27,7 +27,8 @@ namespace TreeCollections;
 /// Builder for representing a tree as JSON
 /// </summary>
 /// <typeparam name="TNode"></typeparam>
-public class TreeJsonBuilder<TNode> where TNode : TreeNode<TNode>
+public class TreeJsonBuilder<TNode> where TNode
+    : TreeNode<TNode>
 {
     private readonly Func<TNode, Dictionary<string, string>> _toProperties;
     private readonly string _childrenPropertyName;

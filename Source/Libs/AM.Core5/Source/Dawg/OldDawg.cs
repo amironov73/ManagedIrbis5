@@ -54,7 +54,7 @@ internal sealed class OldDawg<TPayload>
         {
             var node = FindNode (word);
 
-            return node == null ? default : node.Payload;
+            return (node == null ? default : node.Payload)!;
         }
     }
 
