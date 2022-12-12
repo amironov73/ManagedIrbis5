@@ -9,6 +9,7 @@
 // ReSharper disable MemberCanBeProtected.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Local
 // ReSharper disable UnusedParameter.Local
 
 /* GridEx.cs -- грид с удобной разметкой.
@@ -56,7 +57,7 @@ public class GridEx
             AvaloniaObject obj
         )
     {
-        return (IList<NamedAreaDefinition>) obj.GetValue (AreaDefinitionsProperty);
+        return (IList<NamedAreaDefinition>) obj.GetValue (AreaDefinitionsProperty)!;
     }
 
     private static void SetAreaDefinitions
@@ -68,9 +69,17 @@ public class GridEx
         obj.SetValue (AreaDefinitionsProperty, value);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public static readonly AvaloniaProperty<IList<NamedAreaDefinition>> AreaDefinitionsProperty =
-        AvaloniaProperty.RegisterAttached<GridEx, Control, IList<NamedAreaDefinition>> ("AreaDefinitions", null);
+        AvaloniaProperty.RegisterAttached<GridEx, Control, IList<NamedAreaDefinition>> ("AreaDefinitions");
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <returns></returns>
     public static string? GetTemplateArea
         (
             AvaloniaObject obj
@@ -79,6 +88,11 @@ public class GridEx
         return (string?) obj.GetValue (TemplateAreaProperty);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <param name="value"></param>
     public static void SetTemplateArea
         (
             AvaloniaObject obj,
@@ -100,8 +114,11 @@ public class GridEx
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public static readonly AvaloniaProperty<string> TemplateAreaProperty =
-        AvaloniaProperty.RegisterAttached<GridEx, Control, string> ("TemplateArea", null);
+        AvaloniaProperty.RegisterAttached<GridEx, Control, string> ("TemplateArea");
 
     private static void OnTemplateAreaChanged
         (
@@ -136,12 +153,13 @@ public class GridEx
             string? param
         )
     {
-        var columns = param.Split (new[] { '\n', '/' })
+        var columns = param!.Split (new[] { '\n', '/' })
             .Select (o => o.Trim())
             .Where (o => !string.IsNullOrWhiteSpace (o))
-            .Select (o => o.Split (new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries));
+            .Select (o => o.Split (new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries))
+            .ToArray();
 
-        var num = columns.FirstOrDefault().Count();
+        var num = columns.FirstOrDefault()!.Count();
         var isValidRowColumn = columns.All (o => o.Count() == num);
         if (!isValidRowColumn)
         {
@@ -163,8 +181,9 @@ public class GridEx
         var areaList = ParseAreaDefinition (columns);
         SetAreaDefinitions (grid, areaList);
 
-        foreach (Control child in grid.Children)
+        foreach (var control in grid.Children)
         {
+            var child = (Control) control;
             UpdateItemPosition (child);
         }
     }
@@ -218,12 +237,11 @@ public class GridEx
         var min = m.Groups[2].Value;
         var max = m.Groups[3].Value;
 
-        double temp;
         var result = new GridLengthDefinition()
         {
             GridLength = StringToGridLength (length),
-            Min = double.TryParse (min, out temp) ? temp : (double?)null,
-            Max = double.TryParse (max, out temp) ? temp : (double?)null
+            Min = double.TryParse (min, out var temp) ? temp : null,
+            Max = double.TryParse (max, out temp) ? temp : null
         };
 
         return result;
@@ -236,9 +254,14 @@ public class GridEx
     {
         var glc = TypeDescriptor.GetConverter (typeof (GridLength));
 
-        return (GridLength) glc.ConvertFromString (source);
+        return (GridLength) glc.ConvertFromString (source)!;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <returns></returns>
     public static string? GetAreaName
         (
             AvaloniaObject obj
@@ -247,6 +270,11 @@ public class GridEx
         return (string?) obj.GetValue (AreaNameProperty);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <param name="value"></param>
     public static void SetAreaName
         (
             AvaloniaObject obj,
@@ -256,6 +284,9 @@ public class GridEx
         obj.SetValue (AreaNameProperty, value);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public static readonly AvaloniaProperty<string> AreaNameProperty =
         AvaloniaProperty.RegisterAttached<GridEx, Control, string> ("AreaName");
 
@@ -277,14 +308,24 @@ public class GridEx
         UpdateItemPosition (ctrl);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <returns></returns>
     public static string GetArea
         (
             AvaloniaObject obj
         )
     {
-        return (string) obj.GetValue (AreaProperty);
+        return (string) obj.GetValue (AreaProperty)!;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <param name="value"></param>
     public static void SetArea
         (
             AvaloniaObject obj,
@@ -294,8 +335,11 @@ public class GridEx
         obj.SetValue (AreaProperty, value);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public static readonly AvaloniaProperty<string> AreaProperty =
-        AvaloniaProperty.RegisterAttached<GridEx, Control, string> ("Area", null);
+        AvaloniaProperty.RegisterAttached<GridEx, Control, string> ("Area");
 
     private static void OnAreaChanged
         (
@@ -340,7 +384,7 @@ public class GridEx
         }
 
         var areaList = GetAreaDefinitions (grid);
-        if (areaList == null)
+        if (areaList == null!)
         {
             return null;
         }
@@ -360,18 +404,18 @@ public class GridEx
         )
     {
         var param = GetArea (element);
-        if (param == null)
+        if (param == null!)
         {
             return null;
         }
 
         var list = param.Split (',')
             .Select (o => o.Trim())
-            .Select (o => int.Parse (o))
+            .Select (int.Parse)
             .ToList();
 
         // Row, Column, RowSpan, ColumnSpan
-        if (list.Count() != 4)
+        if (list.Count != 4)
         {
             return null;
         }
