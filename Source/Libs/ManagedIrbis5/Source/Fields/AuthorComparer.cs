@@ -2,12 +2,8 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* AuthorComparer.cs -- сравнивает авторов для сортировки
  * Ars Magna project, http://arsmagna.ru
@@ -21,75 +17,72 @@ using System.Collections.Generic;
 
 #nullable enable
 
-namespace ManagedIrbis.Fields
+namespace ManagedIrbis.Fields;
+
+/// <summary>
+/// Сравнивает авторов для сортировки.
+/// </summary>
+public static class AuthorComparer
 {
-    /// <summary>
-    /// Сравнивает авторов для сортировки.
-    /// </summary>
-    public static class AuthorComparer
+    #region Nested classes
+
+    private sealed class FullNameComparer
+        : IComparer<AuthorInfo>
     {
-        #region Nested classes
+        #region IComparer<T> members
 
-        class FullNameComparer
-            : IComparer<AuthorInfo>
+        public int Compare
+            (
+                AuthorInfo? x,
+                AuthorInfo? y
+            )
         {
-            #region IComparer<T> members
-
-            public int Compare
+            return string.CompareOrdinal
                 (
-                    AuthorInfo? x,
-                    AuthorInfo? y
-                )
-            {
-                return string.CompareOrdinal
-                    (
-                        x?.FullName,
-                        y?.FullName
-                    );
-            }
-
-            #endregion
-        }
-
-        class FamilyNameComparer
-            : IComparer<AuthorInfo>
-        {
-            #region IComparer<T> members
-
-            public int Compare
-                (
-                    AuthorInfo? x,
-                    AuthorInfo? y
-                )
-            {
-                return string.CompareOrdinal
-                    (
-                        x?.FamilyName,
-                        y?.FamilyName
-                    );
-            }
-
-            #endregion
+                    x?.FullName,
+                    y?.FullName
+                );
         }
 
         #endregion
+    }
 
-        #region Public methods
+    private sealed class FamilyNameComparer
+        : IComparer<AuthorInfo>
+    {
+        #region IComparer<T> members
 
-        /// <summary>
-        /// Compare <see cref="AuthorInfo"/>
-        /// by <see cref="AuthorInfo.FamilyName"/> field.
-        /// </summary>
-        public static IComparer<AuthorInfo> FamilyName() => new FamilyNameComparer();
-
-        /// <summary>
-        /// Compare <see cref="AuthorInfo"/>
-        /// by <see cref="AuthorInfo.FullName"/> field.
-        /// </summary>
-        public static IComparer<AuthorInfo> FullName() => new FullNameComparer();
+        public int Compare
+            (
+                AuthorInfo? x,
+                AuthorInfo? y
+            )
+        {
+            return string.CompareOrdinal
+                (
+                    x?.FamilyName,
+                    y?.FamilyName
+                );
+        }
 
         #endregion
+    }
 
-    } // class AuthorComparer
+    #endregion
 
-} // namespace ManagedIrbis.Fields
+    #region Public methods
+
+    /// <summary>
+    /// Сравнение авторов <see cref="AuthorInfo"/>
+    /// по полю <see cref="AuthorInfo.FamilyName"/> (только фамилия).
+    /// </summary>
+    public static IComparer<AuthorInfo> FamilyName() => new FamilyNameComparer();
+
+    /// <summary>
+    /// Сравнение авторов <see cref="AuthorInfo"/>
+    /// по полю <see cref="AuthorInfo.FullName"/> (ФИО полностью).
+    /// </summary>
+    public static IComparer<AuthorInfo> FullName() => new FullNameComparer();
+
+    #endregion
+}

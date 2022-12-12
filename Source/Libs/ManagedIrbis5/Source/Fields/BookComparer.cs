@@ -4,9 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 /* BookComparer.cs -- сравнение описаний книг BookInfo
  * Ars Magna project, http://arsmagna.ru
@@ -20,86 +18,82 @@ using System.Collections.Generic;
 
 #nullable enable
 
-namespace ManagedIrbis.Fields
+namespace ManagedIrbis.Fields;
+
+/// <summary>
+/// Сравнение описаний книг <see cref="BookInfo"/>.
+/// </summary>
+public static class BookComparer
 {
+    #region Nested classes
+
     /// <summary>
-    /// Сравнение описаний книг <see cref="BookInfo"/>.
+    /// Сравнение по автору, затем по заглавию.
     /// </summary>
-    public static class BookComparer
+    private sealed class AuthorAndTitleComparer
+        : IComparer<BookInfo>
     {
-        #region Nested classes
+        #region IComparer<T> members
 
-        /// <summary>
-        /// Сравнение по автору, затем по заглавию.
-        /// </summary>
-        class AuthorAndTitleComparer
-            : IComparer<BookInfo>
+        public int Compare
+            (
+                BookInfo? x,
+                BookInfo? y
+            )
         {
-            #region IComparer<T> members
+            var authorX = x?.FirstAuthor;
+            var authorY = y?.FirstAuthor;
 
-                public int Compare
-                    (
-                        BookInfo? x,
-                        BookInfo? y
-                    )
+            if (authorX is null)
             {
-                var authorX = x?.FirstAuthor;
-                var authorY = y?.FirstAuthor;
-
-                if (authorX is null)
+                if (authorY is not null)
                 {
-                    if (authorY is not null)
-                    {
-                        return -1;
-                    }
+                    return -1;
                 }
-                else
+            }
+            else
+            {
+                if (authorY is null)
                 {
-                    if (authorY is null)
-                    {
-                        return 1;
-                    }
-
-                    var result = Author.Compare(authorX, authorY);
-                    if (result != 0)
-                    {
-                        return result;
-                    }
+                    return 1;
                 }
 
-                return Title.Compare(x?.Title, y?.Title);
-            } // method Compare
+                var result = Author.Compare (authorX, authorY);
+                if (result != 0)
+                {
+                    return result;
+                }
+            }
 
-            #endregion
-        } // class AuthorAndTitleComparer
-
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// Сравнивает <see cref="AuthorInfo"/> по ФИО.
-        /// </summary>
-        public static IComparer<AuthorInfo> Author { get; } = AuthorComparer.FamilyName();
-
-        /// <summary>
-        /// Сравнивает <see cref="TitleInfo"/> по полному заголовку.
-        /// </summary>
-        public static IComparer<TitleInfo> Title { get; } = TitleComparer.FullTitle();
+            return Title.Compare (x?.Title, y?.Title);
+        }
 
         #endregion
+    }
 
-        #region Public methods
+    #endregion
 
-        /// <summary>
-        /// Сравнение <see cref="BookInfo"/>
-        /// по авторам, затем по заглавиям.
-        /// </summary>
-        public static IComparer<BookInfo> AuthorAndTitle() =>
-            new AuthorAndTitleComparer();
+    #region Properties
 
-        #endregion
+    /// <summary>
+    /// Сравнивает <see cref="AuthorInfo"/> по ФИО.
+    /// </summary>
+    public static IComparer<AuthorInfo> Author { get; } = AuthorComparer.FamilyName();
 
-    } // class BookComparer
+    /// <summary>
+    /// Сравнивает <see cref="TitleInfo"/> по полному заголовку.
+    /// </summary>
+    public static IComparer<TitleInfo> Title { get; } = TitleComparer.FullTitle();
 
-} // namespace ManagedIrbis.Fields
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Сравнение <see cref="BookInfo"/>
+    /// по авторам, затем по заглавиям.
+    /// </summary>
+    public static IComparer<BookInfo> AuthorAndTitle() => new AuthorAndTitleComparer();
+
+    #endregion
+}
