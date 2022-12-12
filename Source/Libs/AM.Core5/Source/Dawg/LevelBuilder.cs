@@ -38,17 +38,17 @@ internal sealed class LevelBuilder<TPayload>
 {
     #region Nested classes
 
-    class StackFrame
+    private sealed class StackFrame
     {
         /// <summary>
         ///
         /// </summary>
-        public Node<TPayload> Node;
+        public Node<TPayload>? Node;
 
         /// <summary>
         ///
         /// </summary>
-        public IEnumerator<KeyValuePair<char, Node<TPayload>>> ChildIterator;
+        public IEnumerator<KeyValuePair<char, Node<TPayload>>>? ChildIterator;
 
         /// <summary>
         ///
@@ -108,10 +108,10 @@ internal sealed class LevelBuilder<TPayload>
 
         while (stack.Count > 0)
         {
-            if (stack.Peek().ChildIterator.MoveNext())
+            if (stack.Peek().ChildIterator!.MoveNext())
             {
                 // depth first
-                Push (stack, stack.Peek().ChildIterator.Current.Value);
+                Push (stack, stack.Peek().ChildIterator!.Current.Value);
                 continue;
             }
 
@@ -132,13 +132,13 @@ internal sealed class LevelBuilder<TPayload>
             var level = levels[current.Level];
             var currentNode = current.Node;
 
-            if (level.TryGetValue (currentNode, out var existing))
+            if (level.TryGetValue (currentNode!, out var existing))
             {
-                parent.Node.Children[parent.ChildIterator.Current.Key] = existing;
+                parent.Node!.Children[parent.ChildIterator!.Current.Key] = existing;
             }
             else
             {
-                level.Add (currentNode, currentNode);
+                level.Add (currentNode!, currentNode!);
             }
 
             var parentLevel = current.Level + 1;

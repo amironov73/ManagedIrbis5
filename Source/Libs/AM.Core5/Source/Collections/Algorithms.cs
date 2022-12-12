@@ -3362,15 +3362,8 @@ public static class Algorithms
     public static IEnumerable<Pair<TFirst, TSecond>> CartesianProduct<TFirst, TSecond> (IEnumerable<TFirst> first,
         IEnumerable<TSecond> second)
     {
-        if (first == null)
-        {
-            throw new ArgumentNullException (nameof (first));
-        }
-
-        if (second == null)
-        {
-            throw new ArgumentNullException (nameof (second));
-        }
+        Sure.NotNull (first);
+        Sure.NotNull (second);
 
         foreach (var itemFirst in first)
         {
@@ -3804,9 +3797,9 @@ public static class Algorithms
         // This is not optimal in terms of number of swaps, but
         // is still O(1), and shorter and clearer to understand.
         var i = 0;
-        T temp;
         for (;;)
         {
+            T temp;
             if (state[i] < i + 1)
             {
                 if (state[i] > 0)
@@ -4651,7 +4644,6 @@ public static class Algorithms
 
         var l = 0; // the inclusive left edge of the current range we are sorting.
         var r = list.Count - 1; // the inclusive right edge of the current range we are sorting.
-        T partition; // The partition value.
         int order_partition; // The order of the partition value;
         int c; // holds the result of a comparison temporarily.
 
@@ -4736,6 +4728,7 @@ public static class Algorithms
                     order[l] = o1;
                     list[m] = e3;
                     order[m] = o3;
+                    T partition; // The partition value.
                     list[r] = partition = e2;
                     order[r] = order_partition = o2;
 
@@ -5020,7 +5013,7 @@ public static class Algorithms
             // Get enumerators from each collection, and advance to the first element.
             for (var i = 0; i < collections.Length; ++i)
             {
-                if (collections[i] != null)
+                if (collections[i] != null!)
                 {
                     enumerators[i] = collections[i].GetEnumerator();
                     more[i] = enumerators[i].MoveNext();
@@ -5051,7 +5044,7 @@ public static class Algorithms
                 }
 
                 // Yield the smallest item.
-                yield return smallestItem;
+                yield return smallestItem!;
 
                 // Advance the enumerator it came from.
                 more[smallestItemIndex] = enumerators[smallestItemIndex].MoveNext();
@@ -5062,7 +5055,7 @@ public static class Algorithms
             // Dispose all enumerators.
             foreach (var e in enumerators)
             {
-                if (e != null)
+                if (e != null!)
                 {
                     e.Dispose();
                 }
@@ -5224,15 +5217,15 @@ public static class Algorithms
             this.itemComparer = itemComparer;
         }
 
-        public int Compare (IEnumerable<T> x, IEnumerable<T> y)
+        public int Compare (IEnumerable<T>? x, IEnumerable<T>? y)
         {
-            return LexicographicalCompare (x, y, itemComparer);
+            return LexicographicalCompare (x!, y!, itemComparer);
         }
 
 
         // For comparing this comparer to others.
 
-        public override bool Equals (object obj)
+        public override bool Equals (object? obj)
         {
             if (obj is LexicographicalComparerClass<T> @class)
             {
@@ -5416,7 +5409,7 @@ public static class Algorithms
             throw new ArgumentNullException (nameof (comparison));
         }
 
-        return delegate (T x, T y) { return -comparison (x, y); };
+        return (x, y) => -comparison (x, y);
     }
 
     /// <summary>
@@ -5470,7 +5463,7 @@ public static class Algorithms
 
         public bool Equals (IEnumerable<T>? x, IEnumerable<T>? y)
         {
-            return EqualCollections (x, y, equalityComparer);
+            return EqualCollections (x!, y!, equalityComparer);
         }
 
         public int GetHashCode (IEnumerable<T> obj)
@@ -5752,10 +5745,8 @@ public static class Algorithms
             throw new ArgumentException ("The list may not be read only", nameof (collection));
         }
 
-        var list = collection as IList<T>;
-        if (list != null)
+        if (collection is IList<T> list)
         {
-            T item;
             int i = -1, j = 0;
             var listCount = list.Count;
             var removed = new List<T>();
@@ -5764,7 +5755,7 @@ public static class Algorithms
             // efficient than the naive algorithm that uses IList<T>.Remove().
             while (j < listCount)
             {
-                item = list[j];
+                var item = list[j];
                 if (predicate (item))
                 {
                     removed.Add (item);
@@ -5785,12 +5776,12 @@ public static class Algorithms
             if (i < listCount)
             {
                 // remove items from the end.
-                if (list is IList list1 && list1.IsFixedSize)
+                if (list is IList { IsFixedSize: true })
                 {
                     // An array or similar. Null out the last elements.
                     while (i < listCount)
                     {
-                        list[i++] = default (T);
+                        list[i++] = default!;
                     }
                 }
                 else
@@ -5870,7 +5861,7 @@ public static class Algorithms
     /// <returns>A delegate to a method that converts keys to values. </returns>
     public static Converter<TKey, TValue> GetDictionaryConverter<TKey, TValue> (IDictionary<TKey, TValue> dictionary)
     {
-        return GetDictionaryConverter (dictionary, default (TValue));
+        return GetDictionaryConverter (dictionary, default);
     }
 
     /// <summary>
@@ -5893,8 +5884,7 @@ public static class Algorithms
 
         return delegate (TKey key)
         {
-            TValue value;
-            if (dictionary.TryGetValue (key, out value))
+            if (dictionary.TryGetValue (key, out var value))
             {
                 return value;
             }
@@ -5978,9 +5968,7 @@ public static class Algorithms
                 break;
             }
 
-            var temp = list[i];
-            list[i] = list[j];
-            list[j] = temp;
+            (list[i], list[j]) = (list[j], list[i]);
             ++i;
             --j;
         }
@@ -6117,8 +6105,12 @@ public static class Algorithms
     /// <returns>True if the collections have equal items in the same order. If both collections are empty, true is returned.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="collection1"/>, <paramref name="collection2"/>, or
     /// <paramref name="equalityComparer"/> is null.</exception>
-    public static bool EqualCollections<T> (IEnumerable<T> collection1, IEnumerable<T> collection2,
-        IEqualityComparer<T> equalityComparer)
+    public static bool EqualCollections<T>
+        (
+            IEnumerable<T> collection1,
+            IEnumerable<T> collection2,
+            IEqualityComparer<T> equalityComparer
+        )
     {
         if (collection1 == null)
         {
@@ -6243,8 +6235,7 @@ public static class Algorithms
             throw new ArgumentNullException (nameof (collection));
         }
 
-        var coll = collection as ICollection<T>;
-        if (coll != null)
+        if (collection is ICollection<T> coll)
         {
             // Use ICollection methods to do it more efficiently.
             var array = new T[coll.Count];
@@ -6288,7 +6279,7 @@ public static class Algorithms
         // Traverse the collection and count the elements.
         var count = 0;
 
-        foreach (var item in collection)
+        foreach (var _ in collection)
         {
             ++count;
         }
@@ -6726,7 +6717,7 @@ public static class Algorithms
             count = sourceCount - sourceIndex;
         }
 
-        if (source == dest && sourceIndex > destIndex)
+        if (ReferenceEquals (source, dest) && sourceIndex > destIndex)
         {
             while (count > 0)
             {
@@ -6880,9 +6871,7 @@ public static class Algorithms
         j = list.Count - 1;
         while (i < j)
         {
-            var temp = list[i];
-            list[i] = list[j];
-            list[j] = temp;
+            (list[i], list[j]) = (list[j], list[i]);
             i++;
             j--;
         }

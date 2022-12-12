@@ -38,7 +38,7 @@ public static partial class PoolingEnumerable
             this IPoolingEnumerable<int> source
         )
     {
-        Sure.NotNull ((object?) source);
+        Sure.NotNull (source);
 
         var value = 0;
         var hasValue = false;
@@ -77,7 +77,7 @@ public static partial class PoolingEnumerable
             this IPoolingEnumerable<int?> source
         )
     {
-        Sure.NotNull ((object?) source);
+        Sure.NotNull (source);
 
         int? value = null;
         foreach (var x in source)
@@ -103,7 +103,7 @@ public static partial class PoolingEnumerable
             this IPoolingEnumerable<long> source
         )
     {
-        Sure.NotNull ((object?) source);
+        Sure.NotNull (source);
 
         long value = 0;
         var hasValue = false;
@@ -142,7 +142,7 @@ public static partial class PoolingEnumerable
             this IPoolingEnumerable<long?> source
         )
     {
-        Sure.NotNull ((object?) source);
+        Sure.NotNull (source);
 
         long? value = null;
         foreach (var x in source)
@@ -168,7 +168,7 @@ public static partial class PoolingEnumerable
             this IPoolingEnumerable<float> source
         )
     {
-        Sure.NotNull ((object?) source);
+        Sure.NotNull (source);
 
         float value = 0;
         var hasValue = false;
@@ -213,7 +213,7 @@ public static partial class PoolingEnumerable
             this IPoolingEnumerable<float?> source
         )
     {
-        Sure.NotNull ((object?) source);
+        Sure.NotNull (source);
 
         float? value = null;
         foreach (var x in source)
@@ -244,7 +244,7 @@ public static partial class PoolingEnumerable
             this IPoolingEnumerable<double> source
         )
     {
-        Sure.NotNull ((object?) source);
+        Sure.NotNull (source);
 
         double value = 0;
         var hasValue = false;
@@ -283,7 +283,7 @@ public static partial class PoolingEnumerable
             this IPoolingEnumerable<double?> source
         )
     {
-        Sure.NotNull ((object?) source);
+        Sure.NotNull (source);
 
         double? value = null;
         foreach (var x in source)
@@ -314,7 +314,7 @@ public static partial class PoolingEnumerable
             this IPoolingEnumerable<decimal> source
         )
     {
-        Sure.NotNull ((object?) source);
+        Sure.NotNull (source);
 
         decimal value = 0;
         var hasValue = false;
@@ -353,7 +353,7 @@ public static partial class PoolingEnumerable
             this IPoolingEnumerable<decimal?> source
         )
     {
-        Sure.NotNull ((object?) source);
+        Sure.NotNull (source);
 
         decimal? value = null;
         foreach (var x in source)
@@ -380,7 +380,7 @@ public static partial class PoolingEnumerable
             this IPoolingEnumerable<TSource> source
         )
     {
-        Sure.NotNull ((object?) source);
+        Sure.NotNull (source);
 
         var comparer = Comparer<TSource>.Default;
         var value = default (TSource);
@@ -603,7 +603,7 @@ public static partial class PoolingEnumerable
             this IPoolingEnumerable<int> source
         )
     {
-        Sure.NotNull ((object?) source);
+        Sure.NotNull (source);
 
         var value = 0;
         var hasValue = false;
@@ -642,7 +642,7 @@ public static partial class PoolingEnumerable
             this IPoolingEnumerable<int?> source
         )
     {
-        Sure.NotNull ((object?) source);
+        Sure.NotNull (source);
 
         int? value = null;
         foreach (var x in source)
@@ -668,7 +668,7 @@ public static partial class PoolingEnumerable
             this IPoolingEnumerable<long> source
         )
     {
-        Sure.NotNull ((object?) source);
+        Sure.NotNull (source);
 
         long value = 0;
         var hasValue = false;
@@ -707,7 +707,7 @@ public static partial class PoolingEnumerable
             this IPoolingEnumerable<long?> source
         )
     {
-        Sure.NotNull ((object?) source);
+        Sure.NotNull (source);
 
         long? value = null;
         foreach (var x in source)
@@ -733,7 +733,7 @@ public static partial class PoolingEnumerable
             this IPoolingEnumerable<double> source
         )
     {
-        Sure.NotNull ((object?) source);
+        Sure.NotNull (source);
 
         double value = 0;
         var hasValue = false;
@@ -772,7 +772,7 @@ public static partial class PoolingEnumerable
             this IPoolingEnumerable<double?> source
         )
     {
-        Sure.NotNull ((object?) source);
+        Sure.NotNull (source);
 
         double? value = null;
         foreach (var x in source)
@@ -803,7 +803,7 @@ public static partial class PoolingEnumerable
             this IPoolingEnumerable<float> source
         )
     {
-        Sure.NotNull ((object?) source);
+        Sure.NotNull (source);
 
         float value = 0;
         var hasValue = false;
@@ -842,7 +842,7 @@ public static partial class PoolingEnumerable
             this IPoolingEnumerable<float?> source
         )
     {
-        Sure.NotNull ((object?) source);
+        Sure.NotNull (source);
 
         float? value = null;
         foreach (var x in source)
@@ -873,7 +873,7 @@ public static partial class PoolingEnumerable
             this IPoolingEnumerable<decimal> source
         )
     {
-        Sure.NotNull ((object?) source);
+        Sure.NotNull (source);
 
         decimal value = 0;
         var hasValue = false;
@@ -912,7 +912,7 @@ public static partial class PoolingEnumerable
             this IPoolingEnumerable<decimal?> source
         )
     {
-        Sure.NotNull ((object?) source);
+        Sure.NotNull (source);
 
         decimal? value = null;
         foreach (var x in source)
@@ -939,7 +939,7 @@ public static partial class PoolingEnumerable
             this IPoolingEnumerable<TSource> source
         )
     {
-        Sure.NotNull ((object?) source);
+        Sure.NotNull (source);
 
         var comparer = Comparer<TSource>.Default;
         TSource value = default!;

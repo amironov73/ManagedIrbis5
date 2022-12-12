@@ -156,7 +156,7 @@ internal sealed class YaleGraph
             IEnumerable<char> word
         )
     {
-        Sure.NotNull ((object?) word);
+        Sure.NotNull (word);
 
         var node_i = _rootNodeIndex;
 
@@ -189,7 +189,7 @@ internal sealed class YaleGraph
             IEnumerable<IEnumerable<char>> tree
         )
     {
-        Sure.NotNull ((object?) tree);
+        Sure.NotNull (tree);
 
         var node_i = _rootNodeIndex;
         var stack = new Stack<Frame>();

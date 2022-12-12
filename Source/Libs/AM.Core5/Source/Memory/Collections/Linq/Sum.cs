@@ -36,7 +36,7 @@ public static partial class PoolingEnumerable
             this IPoolingEnumerable<int> source
         )
     {
-        Sure.NotNull ((object?) source);
+        Sure.NotNull (source);
         var sum = 0;
         checked
         {
@@ -60,7 +60,7 @@ public static partial class PoolingEnumerable
             this IPoolingEnumerable<int?> source
         )
     {
-        Sure.NotNull ((object?) source);
+        Sure.NotNull (source);
         var sum = 0;
         checked
         {
@@ -87,7 +87,7 @@ public static partial class PoolingEnumerable
             this IPoolingEnumerable<long> source
         )
     {
-        Sure.NotNull ((object?) source);
+        Sure.NotNull (source);
 
         long sum = 0;
         checked
@@ -112,7 +112,7 @@ public static partial class PoolingEnumerable
             this IPoolingEnumerable<long?> source
         )
     {
-        Sure.NotNull ((object?) source);
+        Sure.NotNull (source);
 
         long sum = 0;
         checked
@@ -140,7 +140,7 @@ public static partial class PoolingEnumerable
             this IPoolingEnumerable<float> source
         )
     {
-        Sure.NotNull ((object?) source);
+        Sure.NotNull (source);
 
         double sum = 0;
         foreach (var v in source)
@@ -162,7 +162,7 @@ public static partial class PoolingEnumerable
             this IPoolingEnumerable<float?> source
         )
     {
-        Sure.NotNull ((object?) source);
+        Sure.NotNull (source);
 
         double sum = 0;
         foreach (var v in source)
@@ -187,7 +187,7 @@ public static partial class PoolingEnumerable
             this IPoolingEnumerable<double> source
         )
     {
-        Sure.NotNull ((object?) source);
+        Sure.NotNull (source);
 
         double sum = 0;
         foreach (var v in source)
@@ -209,7 +209,7 @@ public static partial class PoolingEnumerable
             this IPoolingEnumerable<double?> source
         )
     {
-        Sure.NotNull ((object?) source);
+        Sure.NotNull (source);
 
         double sum = 0;
         foreach (var v in source)
@@ -234,7 +234,7 @@ public static partial class PoolingEnumerable
             this IPoolingEnumerable<decimal> source
         )
     {
-        Sure.NotNull ((object?) source);
+        Sure.NotNull (source);
 
         decimal sum = 0;
         foreach (var v in source)
@@ -256,7 +256,7 @@ public static partial class PoolingEnumerable
             this IPoolingEnumerable<decimal?> source
         )
     {
-        Sure.NotNull ((object?) source);
+        Sure.NotNull (source);
 
         decimal sum = 0;
         foreach (var v in source)

@@ -41,10 +41,12 @@ public static class Sure
     /// Проверка состояния объекта.
     /// </summary>
     [DebuggerHidden]
+    [AssertionMethod]
+    [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public static void AssertState
         (
             bool condition,
-            [CallerArgumentExpression ("condition")]
+            [CallerArgumentExpression (nameof (condition))]
             string? message = null
         )
     {
@@ -64,10 +66,13 @@ public static class Sure
     /// Проверка, определено ли значение <paramref name="value"/> в перечислении.
     /// </summary>
     [DebuggerHidden]
+    [AssertionMethod]
+    [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public static void Defined<T>
         (
             T value,
-            [CallerArgumentExpression ("value")] string? argumentName = null
+            [CallerArgumentExpression ("value")]
+            string? argumentName = null
         )
         where T : struct
     {
@@ -87,11 +92,13 @@ public static class Sure
     /// Проверка существования директории с указанным именем.
     /// </summary>
     [DebuggerHidden]
+    [AssertionMethod]
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public static void DirectoryExists
         (
             string? path,
-            [CallerArgumentExpression ("path")] string? argumentName = null
+            [CallerArgumentExpression ("path")]
+            string? argumentName = null
         )
     {
         if (string.IsNullOrEmpty (path))
@@ -126,11 +133,13 @@ public static class Sure
     /// Проверка существования файла с указанным именем.
     /// </summary>
     [DebuggerHidden]
+    [AssertionMethod]
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public static void FileExists
         (
             string? path,
-            [CallerArgumentExpression ("path")] string? argumentName = null
+            [CallerArgumentExpression ("path")]
+            string? argumentName = null
         )
     {
         if (string.IsNullOrEmpty (path))
@@ -165,6 +174,9 @@ public static class Sure
     /// Проверка, попадает ли <paramref name="argument"/> в диапазон
     /// индексов, допустимых для данного фрагмента.
     /// </summary>
+    [DebuggerHidden]
+    [AssertionMethod]
+    [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public static void InRange<T>
         (
             int argument,
@@ -189,6 +201,9 @@ public static class Sure
     /// Проверка, попадает ли <paramref name="argument"/> в диапазон
     /// индексов, допустимых для данного фрагмента.
     /// </summary>
+    [DebuggerHidden]
+    [AssertionMethod]
+    [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public static void InRange<T>
         (
             int argument,
@@ -213,6 +228,9 @@ public static class Sure
     /// Проверка, попадает ли <paramref name="argument"/> в диапазон
     /// индексов, допустимых для данного фрагмента.
     /// </summary>
+    [DebuggerHidden]
+    [AssertionMethod]
+    [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public static void InRange<T>
         (
             int argument,
@@ -237,6 +255,9 @@ public static class Sure
     /// Проверка, попадает ли <paramref name="argument"/> в диапазон
     /// индексов, допустимых для данного фрагмента.
     /// </summary>
+    [DebuggerHidden]
+    [AssertionMethod]
+    [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public static void InRange<T>
         (
             int argument,
@@ -261,11 +282,14 @@ public static class Sure
     /// Проверка, попадает ли <paramref name="argument"/> в диапазон
     /// индексов, допустимых для данного списка.
     /// </summary>
+    [DebuggerHidden]
+    [AssertionMethod]
+    [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public static void InRange<T>
         (
             int argument,
             IReadOnlyList<T> list,
-            [CallerArgumentExpression ("argument")]
+            [CallerArgumentExpression (nameof (argument))]
             string? argumentName = null
         )
     {
@@ -288,11 +312,16 @@ public static class Sure
     /// и <param name="count"></param> в допустимые диапазоны
     /// для данного списка.
     /// </summary>
+    [DebuggerHidden]
+    [AssertionMethod]
+    [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public static void InRange<T>
         (
             int index,
             int count,
-            IReadOnlyList<T> list
+            IReadOnlyList<T> list,
+            [CallerArgumentExpression (nameof (index))]
+            string? argumentName = null
         )
     {
         NotNull (list);
@@ -300,6 +329,12 @@ public static class Sure
         if (index < 0 || index >= list.Count || count < 0 || count >= list.Count
             || (list.Count - index < count))
         {
+            if (!string.IsNullOrEmpty (argumentName))
+            {
+                // .NET 5 SDK подставляет в argumentName значение null, .NET 6 делает по-человечески
+                throw new ArgumentOutOfRangeException (argumentName);
+            }
+
             throw new ArgumentOutOfRangeException();
         }
     }
@@ -310,12 +345,14 @@ public static class Sure
     /// до <paramref name="toValue"/> (включительно).
     /// </summary>
     [DebuggerHidden]
+    [AssertionMethod]
+    [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public static void InRange
         (
             int argument,
             int fromValue,
             int toValue,
-            [CallerArgumentExpression ("argument")]
+            [CallerArgumentExpression (nameof (argument))]
             string? argumentName = null
         )
     {
@@ -337,12 +374,14 @@ public static class Sure
     /// до <paramref name="toValue"/> (включительно).
     /// </summary>
     [DebuggerHidden]
+    [AssertionMethod]
+    [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public static void InRange
         (
             long argument,
             long fromValue,
             long toValue,
-            [CallerArgumentExpression ("argument")]
+            [CallerArgumentExpression (nameof (argument))]
             string? argumentName = null
         )
     {
@@ -364,13 +403,14 @@ public static class Sure
     /// до <paramref name="toValue"/> (включительно).
     /// </summary>
     [DebuggerHidden]
+    [AssertionMethod]
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public static void InRange
         (
             double argument,
             double fromValue,
             double toValue,
-            [CallerArgumentExpression ("argument")]
+            [CallerArgumentExpression (nameof (argument))]
             string? argumentName = null
         )
     {
@@ -390,10 +430,12 @@ public static class Sure
     /// Проверка, что <paramref name="argument"/> не является отрицательным числом.
     /// </summary>
     [DebuggerHidden]
+    [AssertionMethod]
+    [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public static void NonNegative
         (
             int argument,
-            [CallerArgumentExpression ("argument")]
+            [CallerArgumentExpression (nameof (argument))]
             string? argumentName = null
         )
     {
@@ -413,10 +455,12 @@ public static class Sure
     /// Проверка, что <paramref name="argument"/> не является отрицательным числом.
     /// </summary>
     [DebuggerHidden]
+    [AssertionMethod]
+    [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public static void NonNegative
         (
             long argument,
-            [CallerArgumentExpression ("argument")]
+            [CallerArgumentExpression (nameof (argument))]
             string? argumentName = null
         )
     {
@@ -436,10 +480,12 @@ public static class Sure
     /// Проверка, что <paramref name="argument"/> не является отрицательным числом.
     /// </summary>
     [DebuggerHidden]
+    [AssertionMethod]
+    [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public static void NonNegative
         (
             double argument,
-            [CallerArgumentExpression ("argument")]
+            [CallerArgumentExpression (nameof (argument))]
             string? argumentName = null
         )
     {
@@ -459,10 +505,13 @@ public static class Sure
     /// Проверка, что переданный в качестве аргумента фрагмент не пустой.
     /// </summary>
     [DebuggerHidden]
+    [AssertionMethod]
+    [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public static void NotEmpty<T>
         (
             ReadOnlySpan<T> span,
-            [CallerArgumentExpression ("span")] string? argumentName = null
+            [CallerArgumentExpression (nameof (span))]
+            string? argumentName = null
         )
         where T : struct
     {
@@ -482,10 +531,12 @@ public static class Sure
     /// Проверка, что указатель <paramref name="argument"/> не <c>null</c>.
     /// </summary>
     [DebuggerHidden]
+    [AssertionMethod]
+    [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public static unsafe void NotNull<T>
         (
             T *argument,
-            [CallerArgumentExpression ("argument")]
+            [CallerArgumentExpression (nameof (argument))]
             string? argumentName = null
         )
         where T: unmanaged
@@ -506,10 +557,12 @@ public static class Sure
     /// Проверка, что указатель <paramref name="argument"/> не <c>null</c>.
     /// </summary>
     [DebuggerHidden]
+    [AssertionMethod]
+    [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public static void NotNull
         (
             IntPtr argument,
-            [CallerArgumentExpression ("argument")]
+            [CallerArgumentExpression (nameof (argument))]
             string? argumentName = null
         )
     {
@@ -529,10 +582,12 @@ public static class Sure
     /// Проверка, что указатель <paramref name="argument"/> не <c>null</c>.
     /// </summary>
     [DebuggerHidden]
+    [AssertionMethod]
+    [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public static void NotNull
         (
             UIntPtr argument,
-            [CallerArgumentExpression ("argument")]
+            [CallerArgumentExpression (nameof (argument))]
             string? argumentName = null
         )
     {
@@ -552,10 +607,12 @@ public static class Sure
     /// Проверка, что указатель <paramref name="argument" /> не <c>null</c>.
     /// </summary>
     [DebuggerHidden]
+    [AssertionMethod]
+    [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public static void NotNull<T>
         (
             [NoEnumeration] T? argument,
-            [CallerArgumentExpression ("argument")]
+            [CallerArgumentExpression (nameof (argument))]
             string? argumentName = null
         )
         where T : class
@@ -576,10 +633,12 @@ public static class Sure
     /// Проверка, что указатель <paramref name="argument" /> не <c>null</c>.
     /// </summary>
     [DebuggerHidden]
+    [AssertionMethod]
+    [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public static void NotNull<T>
         (
             T? argument,
-            [CallerArgumentExpression ("argument")]
+            [CallerArgumentExpression (nameof (argument))]
             string? argumentName = null
         )
         where T : struct
@@ -601,10 +660,12 @@ public static class Sure
     /// не <c>null</c> и не пустая.
     /// </summary>
     [DebuggerHidden]
+    [AssertionMethod]
+    [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public static void NotNullNorEmpty
         (
             string? argument,
-            [CallerArgumentExpression ("argument")]
+            [CallerArgumentExpression (nameof (argument))]
             string? argumentName = null
         )
     {
@@ -624,10 +685,12 @@ public static class Sure
     /// Проверка, что число <paramref name="argument"/> положительное.
     /// </summary>
     [DebuggerHidden]
+    [AssertionMethod]
+    [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public static void Positive
         (
             int argument,
-            [CallerArgumentExpression ("argument")]
+            [CallerArgumentExpression (nameof (argument))]
             string? argumentName = null
         )
     {
@@ -647,10 +710,12 @@ public static class Sure
     /// Проверка, что число <paramref name="argument"/> положительное.
     /// </summary>
     [DebuggerHidden]
+    [AssertionMethod]
+    [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public static void Positive
         (
             long argument,
-            [CallerArgumentExpression ("argument")]
+            [CallerArgumentExpression (nameof (argument))]
             string? argumentName = null
         )
     {
@@ -670,10 +735,12 @@ public static class Sure
     /// Проверка, что число <paramref name="argument"/> положительное.
     /// </summary>
     [DebuggerHidden]
+    [AssertionMethod]
+    [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public static void Positive
         (
             double argument,
-            [CallerArgumentExpression ("argument")]
+            [CallerArgumentExpression (nameof (argument))]
             string? argumentName = null
         )
     {
@@ -692,26 +759,38 @@ public static class Sure
     /// <summary>
     /// Верификация структуры.
     /// </summary>
+    [DebuggerHidden]
+    [AssertionMethod]
+    [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public static void Verify<T>
         (
-            T verifiable
+            T verifiable,
+            [CallerArgumentExpression (nameof (verifiable))]
+            string? argumentName = null
         )
-        where T : struct, IVerifiable
+        where T: struct, IVerifiable
     {
+        // TODO пробрасывать имя аргумента
         verifiable.Verify (true);
     }
 
     /// <summary>
     /// Верификация объекта.
     /// </summary>
+    [DebuggerHidden]
+    [AssertionMethod]
+    [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public static void VerifyNotNull<T>
         (
-            T verifiable
+            T verifiable,
+            [CallerArgumentExpression (nameof (verifiable))]
+            string? argumentName = null
         )
-        where T : class, IVerifiable
+        where T: class, IVerifiable
     {
-        NotNull (verifiable);
+        NotNull (verifiable, argumentName);
 
+        // TODO пробрасывать имя аргумента
         verifiable.Verify (true);
     }
 

@@ -40,7 +40,7 @@ public static class EnumerableEx
             this IEnumerable<T> source
         )
     {
-        Sure.NotNull ((object?) source);
+        Sure.NotNull (source);
 
         return Pool<GenericPoolingEnumerable<T>>.Get().Init (source);
     }
@@ -53,7 +53,7 @@ public static class EnumerableEx
             this IPoolingEnumerable<T> source
         )
     {
-        Sure.NotNull ((object?) source);
+        Sure.NotNull (source);
 
         return Pool<GenericEnumerable<T>>.Get().Init (source);
     }
