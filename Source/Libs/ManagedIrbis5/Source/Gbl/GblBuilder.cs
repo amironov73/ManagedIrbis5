@@ -385,7 +385,7 @@ public sealed class GblBuilder
     {
         Sure.NotNull (connection);
         Sure.NotNullNorEmpty (database);
-        Sure.NotNull ((object?) recordset);
+        Sure.NotNull (recordset);
 
         return new GlobalCorrector
                 (
@@ -410,7 +410,7 @@ public sealed class GblBuilder
         )
     {
         Sure.NotNull (connection);
-        Sure.NotNull ((object?) recordset);
+        Sure.NotNull (recordset);
 
         return new GlobalCorrector
                 (

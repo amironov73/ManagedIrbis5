@@ -13,6 +13,7 @@
 #region Using directives
 
 using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Runtime.Serialization;
@@ -319,10 +320,10 @@ public class Line
 
         //if ( sch >= 14 )
         //	_color = (Color) info.GetValue( "color", typeof( Color ) );
-        _stepType = (StepType)info.GetValue ("stepType", typeof (StepType));
+        _stepType = (StepType)info.GetValue ("stepType", typeof (StepType))!;
         _isSmooth = info.GetBoolean ("isSmooth");
         _smoothTension = info.GetSingle ("smoothTension");
-        _fill = (Fill)info.GetValue ("fill", typeof (Fill));
+        _fill = (Fill)info.GetValue ("fill", typeof (Fill))!;
 
         if (sch >= 13)
         {
@@ -395,7 +396,7 @@ public class Line
             //	GraphPane.Default.SelectedLine.
 
             var sModeSave = graphics.SmoothingMode;
-            if (_isAntiAlias)
+            if (IsAntiAlias)
             {
                 graphics.SmoothingMode = SmoothingMode.HighQuality;
             }
@@ -454,7 +455,7 @@ public class Line
             float scaleFactor
         )
     {
-        if (_isVisible && !Color.IsEmpty)
+        if (IsVisible && !Color.IsEmpty)
         {
             using var pen = GetPen (pane, scaleFactor);
             graphics.DrawLine (pen, x1, y1, x2, y2);
@@ -498,10 +499,10 @@ public class Line
         var yAxis = curve.GetYAxis (pane);
         var xAxis = curve.GetXAxis (pane);
 
-        var basePix = yAxis.Scale.Transform (0.0);
+        var basePix = yAxis.Scale!.Transform (0.0);
         using (var pen = source.GetPen (pane, scaleFactor))
         {
-            for (var i = 0; i < curve.Points.Count; i++)
+            for (var i = 0; i < curve.Points!.Count; i++)
             {
                 var pt = curve.Points[i];
 
@@ -511,7 +512,7 @@ public class Line
                     !double.IsNaN (pt.Y) &&
                     !double.IsInfinity (pt.X) &&
                     !double.IsInfinity (pt.Y) &&
-                    (!xAxis.Scale.IsLog || pt.X > 0.0) &&
+                    (!xAxis.Scale!.IsLog || pt.X > 0.0) &&
                     (!yAxis.Scale.IsLog || pt.Y > 0.0))
                 {
                     var pixY = yAxis.Scale.Transform (curve.IsOverrideOrdinal, i, pt.Y);
@@ -529,10 +530,12 @@ public class Line
                             pixY = pane.Chart._rect.Top;
                         }
 
-                        if (!curve.IsSelected && _gradientFill.IsGradientValueType)
+                        if (!curve.IsSelected && GradientFill.IsGradientValueType)
                         {
                             using (var tPen = GetPen (pane, scaleFactor, pt))
+                            {
                                 graphics.DrawLine (tPen, pixX, pixY, pixX, basePix);
+                            }
                         }
                         else
                         {
@@ -597,10 +600,10 @@ public class Line
 
                 using (var path = new GraphicsPath (FillMode.Winding))
                 {
-                    path.AddCurve (arrPoints, 0, count - 2, tension);
+                    path.AddCurve (arrPoints!, 0, count - 2, tension);
 
-                    var yMin = yAxis.Scale._min < 0 ? 0.0 : yAxis.Scale._min;
-                    CloseCurve (pane, curve, arrPoints, count, yMin, path);
+                    var yMin = yAxis.Scale!._min < 0 ? 0.0 : yAxis.Scale._min;
+                    CloseCurve (pane, curve, arrPoints!, count, yMin, path);
 
                     var rect = path.GetBounds();
                     using (var brush = source._fill.MakeBrush (rect))
@@ -639,7 +642,7 @@ public class Line
                 using (var pen = GetPen (pane, scaleFactor))
                 {
                     // Stroke the curve
-                    graphics.DrawCurve (pen, arrPoints, 0, count - 2, tension);
+                    graphics.DrawCurve (pen, arrPoints!, 0, count - 2, tension);
 
                     //pen.Dispose();
                 }
@@ -727,8 +730,8 @@ public class Line
         var yAxis = curve.GetYAxis (pane);
         var xAxis = curve.GetXAxis (pane);
 
-        var xIsLog = xAxis.Scale.IsLog;
-        var yIsLog = yAxis.Scale.IsLog;
+        var xIsLog = xAxis.Scale!.IsLog;
+        var yIsLog = yAxis.Scale!.IsLog;
 
         // switch to int to optimize drawing speed (per Dale-a-b)
         var minX = (int)pane.Chart.Rect.Left;
@@ -746,7 +749,7 @@ public class Line
                 var isOptDraw = _isOptimizedDraw && points.Count > 1000;
 
                 // (Dale-a-b) we'll set an element to true when it has been drawn
-                bool[,] isPixelDrawn = null;
+                bool[,] isPixelDrawn = null!;
 
                 if (isOptDraw)
                 {
@@ -828,7 +831,7 @@ public class Line
                                 }
                                 else if (!isOut)
                                 {
-                                    if (!curve.IsSelected && _gradientFill.IsGradientValueType)
+                                    if (!curve.IsSelected && GradientFill.IsGradientValueType)
                                     {
                                         using (var tPen = GetPen (pane, scaleFactor, lastPt))
                                         {
@@ -954,8 +957,8 @@ public class Line
         var yAxis = curve.GetYAxis (pane);
         var xAxis = curve.GetXAxis (pane);
 
-        var xIsLog = xAxis.Scale.IsLog;
-        var yIsLog = yAxis.Scale.IsLog;
+        var xIsLog = xAxis.Scale!.IsLog;
+        var yIsLog = yAxis.Scale!.IsLog;
 
         var minX = pane.Chart.Rect.Left;
         var maxX = pane.Chart.Rect.Right;
@@ -1030,7 +1033,7 @@ public class Line
                                 }
                                 else if (!isOut)
                                 {
-                                    if (!curve.IsSelected && _gradientFill.IsGradientValueType)
+                                    if (!curve.IsSelected && GradientFill.IsGradientValueType)
                                     {
                                         using (var tPen = GetPen (pane, scaleFactor, lastPt))
                                         {
@@ -1190,7 +1193,7 @@ public class Line
             else 		// non-step
                 g.DrawLine( pen, lastX, lastY, tmpX, tmpY );
             */
-            if (!curve.IsSelected && _gradientFill.IsGradientValueType)
+            if (!curve.IsSelected && GradientFill.IsGradientValueType)
             {
                 using (var tPen = GetPen (pane, scaleFactor, lastPt))
                 {
@@ -1245,8 +1248,9 @@ public class Line
             }
         }
 
-        catch
+        catch (Exception exception)
         {
+            Debug.WriteLine (exception.Message);
         }
     }
 
@@ -1320,9 +1324,9 @@ public class Line
 
                     // Transform the user scale values to pixel locations
                     var xAxis = curve.GetXAxis (pane);
-                    curX = xAxis.Scale.Transform (curve.IsOverrideOrdinal, i, x);
+                    curX = xAxis.Scale!.Transform (curve.IsOverrideOrdinal, i, x);
                     var yAxis = curve.GetYAxis (pane);
-                    curY = yAxis.Scale.Transform (curve.IsOverrideOrdinal, i, y);
+                    curY = yAxis.Scale!.Transform (curve.IsOverrideOrdinal, i, y);
 
                     if (curX < -1000000 || curY < -1000000 || curX > 1000000 || curY > 1000000)
                     {
@@ -1443,9 +1447,9 @@ public class Line
 
                     // Transform the user scale values to pixel locations
                     var xAxis = curve.GetXAxis (pane);
-                    curX = xAxis.Scale.Transform (curve.IsOverrideOrdinal, i, x);
+                    curX = xAxis.Scale!.Transform (curve.IsOverrideOrdinal, i, x);
                     var yAxis = curve.GetYAxis (pane);
-                    curY = yAxis.Scale.Transform (curve.IsOverrideOrdinal, i, y);
+                    curY = yAxis.Scale!.Transform (curve.IsOverrideOrdinal, i, y);
 
                     // Add the pixel value pair into the points array
                     // Two points are added for step type curves
@@ -1527,7 +1531,7 @@ public class Line
             // the X axis crosses)
             float yBase;
             var yAxis = curve.GetYAxis (pane);
-            yBase = yAxis.Scale.Transform (yMin);
+            yBase = yAxis.Scale!.Transform (yMin);
 
             // Add three points to the path to move from the end of the curve (as defined by
             // arrPoints) to the X axis, from there to the start of the curve at the X axis,
@@ -1554,9 +1558,9 @@ public class Line
                 for (var i = index - 1; i >= 0; i--)
                 {
                     tmpCurve = pane.CurveList[i];
-                    if (tmpCurve is LineItem)
+                    if (tmpCurve is LineItem item)
                     {
-                        tension = ((LineItem)tmpCurve).Line.IsSmooth ? ((LineItem)tmpCurve).Line.SmoothTension : 0f;
+                        tension = item.Line.IsSmooth ? item.Line.SmoothTension : 0f;
                         break;
                     }
                 }
@@ -1564,7 +1568,7 @@ public class Line
 
             // Build another points array consisting of the low points (which are actually the points for
             // the curve below the current curve)
-            BuildLowPointsArray (pane, curve, out arrPoints2, out count2);
+            BuildLowPointsArray (pane, curve, out arrPoints2!, out count2);
 
             // Add the new points to the GraphicsPath
             path.AddCurve (arrPoints2, 0, count2 - 2, tension);

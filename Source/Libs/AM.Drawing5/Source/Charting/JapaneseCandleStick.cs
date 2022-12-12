@@ -426,7 +426,7 @@ public class JapaneseCandleStick
 
             var tColor = _color;
             var tFallingColor = _fallingColor;
-            var tPenWidth = _width;
+            var tPenWidth = Width;
             var tRisingFill = _risingFill;
             var tFallingFill = _fallingFill;
             var tRisingBorder = _risingBorder;
@@ -492,7 +492,7 @@ public class JapaneseCandleStick
                             pixClose = valueAxis.Scale.Transform (curve.IsOverrideOrdinal, i, close);
                         }
 
-                        if (!curve.IsSelected && _gradientFill.IsGradientValueType)
+                        if (!curve.IsSelected && GradientFill.IsGradientValueType)
                         {
                             using (var tPen = GetPen (pane, scaleFactor, pt))
                                 Draw (graphics, pane, baseAxis is XAxis || baseAxis is X2Axis,

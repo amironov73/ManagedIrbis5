@@ -49,7 +49,7 @@ internal sealed class DefinitionNode
         : base (position)
     {
         Sure.NotNullNorEmpty (theName);
-        Sure.NotNull ((object?) body);
+        Sure.NotNull (body);
 
         this.Name = theName;
         theArguments = new ();

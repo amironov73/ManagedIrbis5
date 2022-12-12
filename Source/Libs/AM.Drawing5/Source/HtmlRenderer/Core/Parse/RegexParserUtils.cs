@@ -81,7 +81,8 @@ internal static class RegexParserUtils
     /// <summary>
     /// Exracts font sizes: xx-small, larger, small, 34pt, 30%, 2em
     /// </summary>
-    public const string CssFontSize = "(" + CssLength + "|" + CssPercentage + "|xx-small|x-small|small|medium|large|x-large|xx-large|larger|smaller)";
+    public const string CssFontSize = "(" + CssLength + "|" + CssPercentage +
+                                      "|xx-small|x-small|small|medium|large|x-large|xx-large|larger|smaller)";
 
     /// <summary>
     /// Gets the font-size[/line-height]? on the font shorthand property.
@@ -103,13 +104,17 @@ internal static class RegexParserUtils
     /// <param name="stylesheet">the stylesheet data to retrieve the rule from</param>
     /// <param name="startIdx">the index to start the search for the rule, on return will be the value of the end of the found rule</param>
     /// <returns>the found at rule or null if not exists</returns>
-    public static string GetCssAtRules(string stylesheet, ref int startIdx)
+    public static string? GetCssAtRules
+        (
+            string stylesheet,
+            ref int startIdx
+        )
     {
-        startIdx = stylesheet.IndexOf('@', startIdx);
+        startIdx = stylesheet.IndexOf ('@', startIdx);
         if (startIdx > -1)
         {
-            int count = 1;
-            int endIdx = stylesheet.IndexOf('{', startIdx);
+            var count = 1;
+            var endIdx = stylesheet.IndexOf ('{', startIdx);
             if (endIdx > -1)
             {
                 while (count > 0 && endIdx < stylesheet.Length)
@@ -124,14 +129,16 @@ internal static class RegexParserUtils
                         count--;
                     }
                 }
+
                 if (endIdx < stylesheet.Length)
                 {
-                    var atrule = stylesheet.Substring(startIdx, endIdx - startIdx + 1);
+                    var atrule = stylesheet.Substring (startIdx, endIdx - startIdx + 1);
                     startIdx = endIdx;
                     return atrule;
                 }
             }
         }
+
         return null;
     }
 
@@ -141,10 +148,10 @@ internal static class RegexParserUtils
     /// <param name="regex">Regular expression to extract matches</param>
     /// <param name="source">Source to extract matches</param>
     /// <returns>Collection of matches</returns>
-    public static MatchCollection Match(string regex, string source)
+    public static MatchCollection Match (string regex, string source)
     {
-        var r = GetRegex(regex);
-        return r.Matches(source);
+        var r = GetRegex (regex);
+        return r.Matches (source);
     }
 
     /// <summary>
@@ -153,10 +160,9 @@ internal static class RegexParserUtils
     /// <param name="regex"></param>
     /// <param name="source"></param>
     /// <returns></returns>
-    public static string Search(string regex, string source)
+    public static string? Search (string regex, string source)
     {
-        int position;
-        return Search(regex, source, out position);
+        return Search (regex, source, out _);
     }
 
     /// <summary>
@@ -166,9 +172,9 @@ internal static class RegexParserUtils
     /// <param name="source"></param>
     /// <param name="position"> </param>
     /// <returns></returns>
-    public static string Search(string regex, string source, out int position)
+    public static string? Search (string regex, string source, out int position)
     {
-        MatchCollection matches = Match(regex, source);
+        var matches = Match (regex, source);
 
         if (matches.Count > 0)
         {
@@ -188,14 +194,14 @@ internal static class RegexParserUtils
     /// </summary>
     /// <param name="regex">the regex string to use</param>
     /// <returns>the regex instance</returns>
-    private static Regex GetRegex(string regex)
+    private static Regex GetRegex (string regex)
     {
-        Regex r;
-        if (!_regexes.TryGetValue(regex, out r))
+        if (!_regexes.TryGetValue (regex, out var r))
         {
-            r = new Regex(regex, RegexOptions.IgnoreCase | RegexOptions.Singleline);
+            r = new Regex (regex, RegexOptions.IgnoreCase | RegexOptions.Singleline);
             _regexes[regex] = r;
         }
+
         return r;
     }
 }

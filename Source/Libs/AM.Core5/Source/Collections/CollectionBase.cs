@@ -5,6 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable LocalizableElement
 // ReSharper disable NonReadonlyMemberInGetHashCode
 
 /* CollectionBase.cs --
@@ -136,10 +137,7 @@ public abstract class CollectionBase<T> : ICollection<T>, ICollection
             return;
         }
 
-        if (array == null)
-        {
-            throw new ArgumentNullException ("array");
-        }
+        Sure.NotNull (array);
 
         if (count < 0)
         {
@@ -148,7 +146,7 @@ public abstract class CollectionBase<T> : ICollection<T>, ICollection
 
         if (arrayIndex < 0)
         {
-            throw new ArgumentOutOfRangeException ("arrayIndex", arrayIndex,
+            throw new ArgumentOutOfRangeException (nameof (arrayIndex), arrayIndex,
                 "The argument may not be less than zero");
         }
 
@@ -195,10 +193,7 @@ public abstract class CollectionBase<T> : ICollection<T>, ICollection
     /// Indicates whether the collection is read-only. Always returns false.
     /// </summary>
     /// <value>Always returns false.</value>
-    bool ICollection<T>.IsReadOnly
-    {
-        get { return false; }
-    }
+    bool ICollection<T>.IsReadOnly => false;
 
     /// <summary>
     /// Provides a read-only view of this collection. The returned ICollection&lt;T&gt; provides
@@ -209,7 +204,7 @@ public abstract class CollectionBase<T> : ICollection<T>, ICollection
     /// <returns>An ICollection&lt;T&gt; that provides read-only access to the collection.</returns>
     public virtual ICollection<T> AsReadOnly()
     {
-        return Algorithms.ReadOnly (this);
+        return Algorithms.ReadOnly (this)!;
     }
 
     #endregion
@@ -228,7 +223,7 @@ public abstract class CollectionBase<T> : ICollection<T>, ICollection
     {
         if (predicate == null)
         {
-            throw new ArgumentNullException ("predicate");
+            throw new ArgumentNullException (nameof (predicate));
         }
 
         return Algorithms.Exists (this, predicate);
@@ -246,7 +241,7 @@ public abstract class CollectionBase<T> : ICollection<T>, ICollection
     {
         if (predicate == null)
         {
-            throw new ArgumentNullException ("predicate");
+            throw new ArgumentNullException (nameof (predicate));
         }
 
         return Algorithms.TrueForAll (this, predicate);
@@ -262,7 +257,7 @@ public abstract class CollectionBase<T> : ICollection<T>, ICollection
     {
         if (predicate == null)
         {
-            throw new ArgumentNullException ("predicate");
+            throw new ArgumentNullException (nameof (predicate));
         }
 
         return Algorithms.CountWhere (this, predicate);
@@ -278,7 +273,7 @@ public abstract class CollectionBase<T> : ICollection<T>, ICollection
     {
         if (predicate == null)
         {
-            throw new ArgumentNullException ("predicate");
+            throw new ArgumentNullException (nameof (predicate));
         }
 
         return Algorithms.FindWhere (this, predicate);
@@ -294,7 +289,7 @@ public abstract class CollectionBase<T> : ICollection<T>, ICollection
     {
         if (predicate == null)
         {
-            throw new ArgumentNullException ("predicate");
+            throw new ArgumentNullException (nameof (predicate));
         }
 
         return Algorithms.RemoveWhere (this, predicate);
@@ -308,7 +303,7 @@ public abstract class CollectionBase<T> : ICollection<T>, ICollection
     {
         if (action == null)
         {
-            throw new ArgumentNullException ("action");
+            throw new ArgumentNullException (nameof (action));
         }
 
         Algorithms.ForEach (this, action);
@@ -328,7 +323,7 @@ public abstract class CollectionBase<T> : ICollection<T>, ICollection
     {
         if (converter == null)
         {
-            throw new ArgumentNullException ("converter");
+            throw new ArgumentNullException (nameof (converter));
         }
 
         return Algorithms.Convert (this, converter);
@@ -365,14 +360,11 @@ public abstract class CollectionBase<T> : ICollection<T>, ICollection
             return;
         }
 
-        if (array == null)
-        {
-            throw new ArgumentNullException ("array");
-        }
+        Sure.NotNull (array);
 
         if (index < 0)
         {
-            throw new ArgumentOutOfRangeException ("index", index, "The argument may not be less than zero");
+            throw new ArgumentOutOfRangeException (nameof (index), index, "The argument may not be less than zero");
         }
 
         if (index >= array.Length || count > array.Length - index)
@@ -400,19 +392,13 @@ public abstract class CollectionBase<T> : ICollection<T>, ICollection
     /// Indicates whether the collection is synchronized.
     /// </summary>
     /// <value>Always returns false, indicating that the collection is not synchronized.</value>
-    bool ICollection.IsSynchronized
-    {
-        get { return false; }
-    }
+    bool ICollection.IsSynchronized => false;
 
     /// <summary>
     /// Indicates the synchronization object for this collection.
     /// </summary>
     /// <value>Always returns this.</value>
-    object ICollection.SyncRoot
-    {
-        get { return this; }
-    }
+    object ICollection.SyncRoot => this;
 
     #endregion
 

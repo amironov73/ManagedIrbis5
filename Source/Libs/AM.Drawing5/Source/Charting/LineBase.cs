@@ -35,60 +35,12 @@ public class LineBase
     #region Fields
 
     /// <summary>
-    /// Private field that stores the pen width for this line.
-    /// Use the public property <see cref="Width"/> to access this value.
-    /// </summary>
-    internal float _width;
-
-    /// <summary>
-    /// Private field that stores the <see cref="DashStyle"/> for this
-    /// line.  Use the public
-    /// property <see cref="Style"/> to access this value.
-    /// </summary>
-    internal DashStyle _style;
-
-    /// <summary>
-    /// private field that stores the "Dash On" length for drawing the line.  Use the
-    /// public property <see cref="DashOn" /> to access this value.
-    /// </summary>
-    internal float _dashOn;
-
-    /// <summary>
-    /// private field that stores the "Dash Off" length for drawing the line.  Use the
-    /// public property <see cref="DashOff" /> to access this value.
-    /// </summary>
-    internal float _dashOff;
-
-    /// <summary>
-    /// Private field that stores the visibility of this line.  Use the public
-    /// property <see cref="IsVisible"/> to access this value.
-    /// </summary>
-    internal bool _isVisible;
-
-    /// <summary>
-    /// private field that determines if the line is drawn using
-    /// Anti-Aliasing capabilities from the <see cref="Graphics" /> class.
-    /// Use the public property <see cref="IsAntiAlias" /> to access
-    /// this value.
-    /// </summary>
-    internal bool _isAntiAlias;
-
-    /// <summary>
     /// Private field that stores the color of this line.  Use the public
     /// property <see cref="Color"/> to access this value.  If this value is
     /// false, the line will not be shown (but the <see cref="Symbol"/> may
     /// still be shown).
     /// </summary>
     internal Color _color;
-
-    /// <summary>
-    /// Internal field that stores a custom <see cref="Fill" /> class.  This
-    /// fill is used strictly for <see cref="FillType.GradientByX" />,
-    /// <see cref="FillType.GradientByY" />, <see cref="FillType.GradientByZ" />,
-    /// and <see cref="FillType.GradientByColorValue" /> calculations to determine
-    /// the color of the line.
-    /// </summary>
-    internal Fill _gradientFill;
 
     #endregion
 
@@ -168,11 +120,7 @@ public class LineBase
     /// <seealso cref="Default.Style"/>
     /// <seealso cref="DashOn" />
     /// <seealso cref="DashOff" />
-    public DashStyle Style
-    {
-        get => _style;
-        set => _style = value;
-    }
+    public DashStyle Style { get; set; }
 
     /// <summary>
     /// The "Dash On" mode for drawing the line.
@@ -186,11 +134,7 @@ public class LineBase
     /// <seealso cref="DashOff"/>
     /// <seealso cref="IsVisible"/>
     /// <seealso cref="Default.DashOn"/>.
-    public float DashOn
-    {
-        get { return _dashOn; }
-        set { _dashOn = value; }
-    }
+    public float DashOn { get; set; }
 
     /// <summary>
     /// The "Dash Off" mode for drawing the line.
@@ -204,32 +148,20 @@ public class LineBase
     /// <seealso cref="DashOn"/>
     /// <seealso cref="IsVisible"/>
     /// <seealso cref="Default.DashOff"/>.
-    public float DashOff
-    {
-        get { return _dashOff; }
-        set { _dashOff = value; }
-    }
+    public float DashOff { get; set; }
 
     /// <summary>
     /// The pen width used to draw the <see cref="Line"/>, in points (1/72 inch)
     /// </summary>
     /// <seealso cref="Default.Width"/>
-    public float Width
-    {
-        get { return _width; }
-        set { _width = value; }
-    }
+    public float Width { get; set; }
 
     /// <summary>
     /// Gets or sets a property that shows or hides the <see cref="Line"/>.
     /// </summary>
     /// <value>true to show the line, false to hide it</value>
     /// <seealso cref="Default.IsVisible"/>
-    public bool IsVisible
-    {
-        get { return _isVisible; }
-        set { _isVisible = value; }
-    }
+    public bool IsVisible { get; set; }
 
     /// <summary>
     /// Gets or sets a value that determines if the lines are drawn using
@@ -241,11 +173,7 @@ public class LineBase
     /// this <see cref="Line" /> is drawn.  A value of false will leave the value of
     /// <see cref="Graphics.SmoothingMode" /> unchanged.
     /// </remarks>
-    public bool IsAntiAlias
-    {
-        get { return _isAntiAlias; }
-        set { _isAntiAlias = value; }
-    }
+    public bool IsAntiAlias { get; set; }
 
     /// <summary>
     /// Gets or sets a custom <see cref="Fill" /> class.
@@ -257,11 +185,7 @@ public class LineBase
     /// one of the above <see cref="FillType" /> values are selected.
     /// </remarks>
     /// <seealso cref="Color"/>
-    public Fill GradientFill
-    {
-        get { return _gradientFill; }
-        set { _gradientFill = value; }
-    }
+    public Fill GradientFill { get; set; }
 
     #endregion
 
@@ -284,15 +208,17 @@ public class LineBase
     /// <param name="color">The color to assign to this new Line object</param>
     public LineBase (Color color)
     {
-        _width = Default.Width;
-        _style = Default.Style;
-        _dashOn = Default.DashOn;
-        _dashOff = Default.DashOff;
-        _isVisible = Default.IsVisible;
+        Width = Default.Width;
+        Style = Default.Style;
+        DashOn = Default.DashOn;
+        DashOff = Default.DashOff;
+        IsVisible = Default.IsVisible;
         _color = color.IsEmpty ? Default.Color : color;
-        _isAntiAlias = Default.IsAntiAlias;
-        _gradientFill = new Fill (Color.Red, Color.White);
-        _gradientFill.Type = FillType.None;
+        IsAntiAlias = Default.IsAntiAlias;
+        GradientFill = new Fill (Color.Red, Color.White)
+        {
+            Type = FillType.None
+        };
     }
 
     /// <summary>
@@ -301,16 +227,16 @@ public class LineBase
     /// <param name="rhs">The LineBase object from which to copy</param>
     public LineBase (LineBase rhs)
     {
-        _width = rhs._width;
-        _style = rhs._style;
-        _dashOn = rhs._dashOn;
-        _dashOff = rhs._dashOff;
+        Width = rhs.Width;
+        Style = rhs.Style;
+        DashOn = rhs.DashOn;
+        DashOff = rhs.DashOff;
 
-        _isVisible = rhs._isVisible;
+        IsVisible = rhs.IsVisible;
         _color = rhs._color;
 
-        _isAntiAlias = rhs._isAntiAlias;
-        _gradientFill = new Fill (rhs._gradientFill);
+        IsAntiAlias = rhs.IsAntiAlias;
+        GradientFill = new Fill (rhs.GradientFill);
     }
 
     /// <summary>
@@ -369,15 +295,16 @@ public class LineBase
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
         var sch = info.GetInt32 ("schema0");
+        sch.NotUsed();
 
-        _width = info.GetSingle ("width");
-        _style = (DashStyle)info.GetValue ("style", typeof (DashStyle));
-        _dashOn = info.GetSingle ("dashOn");
-        _dashOff = info.GetSingle ("dashOff");
-        _isVisible = info.GetBoolean ("isVisible");
-        _isAntiAlias = info.GetBoolean ("isAntiAlias");
-        _color = (Color)info.GetValue ("color", typeof (Color));
-        _gradientFill = (Fill)info.GetValue ("gradientFill", typeof (Fill));
+        Width = info.GetSingle ("width");
+        Style = (DashStyle)info.GetValue ("style", typeof (DashStyle))!;
+        DashOn = info.GetSingle ("dashOn");
+        DashOff = info.GetSingle ("dashOff");
+        IsVisible = info.GetBoolean ("isVisible");
+        IsAntiAlias = info.GetBoolean ("isAntiAlias");
+        _color = (Color)info.GetValue ("color", typeof (Color))!;
+        GradientFill = (Fill)info.GetValue ("gradientFill", typeof (Fill))!;
     }
 
     /// <summary>
@@ -396,14 +323,14 @@ public class LineBase
     {
         info.AddValue ("schema0", schema0);
 
-        info.AddValue ("width", _width);
-        info.AddValue ("style", _style);
-        info.AddValue ("dashOn", _dashOn);
-        info.AddValue ("dashOff", _dashOff);
-        info.AddValue ("isVisible", _isVisible);
-        info.AddValue ("isAntiAlias", _isAntiAlias);
+        info.AddValue ("width", Width);
+        info.AddValue ("style", Style);
+        info.AddValue ("dashOn", DashOn);
+        info.AddValue ("dashOff", DashOff);
+        info.AddValue ("isVisible", IsVisible);
+        info.AddValue ("isAntiAlias", IsAntiAlias);
         info.AddValue ("color", _color);
-        info.AddValue ("gradientFill", _gradientFill);
+        info.AddValue ("gradientFill", GradientFill);
     }
 
     #endregion
@@ -454,23 +381,23 @@ public class LineBase
     public Pen GetPen (PaneBase pane, float scaleFactor, PointPair? dataValue)
     {
         var color = _color;
-        if (_gradientFill.IsGradientValueType)
+        if (GradientFill.IsGradientValueType)
         {
-            color = _gradientFill.GetGradientColor (dataValue);
+            color = GradientFill.GetGradientColor (dataValue!);
         }
 
-        var pen = new Pen (color, pane.ScaledPenWidth (_width, scaleFactor));
+        var pen = new Pen (color, pane.ScaledPenWidth (Width, scaleFactor));
 
-        pen.DashStyle = _style;
+        pen.DashStyle = Style;
 
-        if (_style == DashStyle.Custom)
+        if (Style == DashStyle.Custom)
         {
-            if (_dashOff > 1e-10 && _dashOn > 1e-10)
+            if (DashOff > 1e-10 && DashOn > 1e-10)
             {
                 pen.DashStyle = DashStyle.Custom;
                 var pattern = new float[2];
-                pattern[0] = _dashOn;
-                pattern[1] = _dashOff;
+                pattern[0] = DashOn;
+                pattern[1] = DashOff;
                 pen.DashPattern = pattern;
             }
             else

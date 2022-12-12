@@ -166,7 +166,7 @@ public class PftFormatter
             IEnumerable<int> mfns
         )
     {
-        Sure.NotNull ((object?) mfns);
+        Sure.NotNull (mfns);
 
         var result = new List<string>();
 

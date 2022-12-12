@@ -154,6 +154,9 @@ internal sealed class GroupedEnumerable<TSource, TKey, TElement>
 
         IPoolingEnumerator IPoolingEnumerable.GetEnumerator() => GetEnumerator();
 
+        /// <summary>
+        ///
+        /// </summary>
         public TKey Key { get; private set; }
 
         public void Dispose()

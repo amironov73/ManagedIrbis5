@@ -18,6 +18,8 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 
+using AM;
+
 using PdfSharpCore.Drawing;
 using PdfSharpCore.Pdf.Actions;
 using PdfSharpCore.Pdf.Advanced;
@@ -45,6 +47,8 @@ public sealed class PdfOutline
     /// </summary>
     public PdfOutline()
     {
+        DestinationPage = null!;
+
         // Create _outlines on demand.
         //_outlines = new PdfOutlineCollection(this);
     }
@@ -56,6 +60,8 @@ public sealed class PdfOutline
     internal PdfOutline (PdfDocument document)
         : base (document)
     {
+        DestinationPage = null!;
+
         // Create _outlines on demand.
         //_outlines = new PdfOutlineCollection(this);
     }
@@ -69,6 +75,8 @@ public sealed class PdfOutline
         )
         : base (dict)
     {
+        DestinationPage = null!;
+
         Initialize();
     }
 
@@ -265,7 +273,7 @@ public sealed class PdfOutline
     /// <summary>
     /// Gets the outline collection of this node.
     /// </summary>
-    public PdfOutlineCollection Outlines => _outlines ??= new PdfOutlineCollection (Owner, this);
+    public PdfOutlineCollection Outlines => _outlines ??= new PdfOutlineCollection (Owner!, this);
 
     private PdfOutlineCollection? _outlines;
 
@@ -276,23 +284,19 @@ public sealed class PdfOutline
     {
         if (Elements.TryGetString (Keys.Title, out var title))
         {
-            Title = title;
+            Title = title!;
         }
 
         var parentRef = Elements.GetReference (Keys.Parent);
-        if (parentRef != null)
+        if (parentRef?.Value is PdfOutline parent)
         {
-            var parent = parentRef.Value as PdfOutline;
-            if (parent != null)
-            {
-                Parent = parent;
-            }
+            Parent = parent;
         }
 
         Count = Elements.GetInteger (Keys.Count);
 
         var colors = Elements.GetArray (Keys.C);
-        if (colors != null && colors.Elements.Count == 3)
+        if (colors is { Elements.Count: 3 })
         {
             var r = colors.Elements.GetReal (0);
             var g = colors.Elements.GetReal (1);
@@ -320,8 +324,7 @@ public sealed class PdfOutline
         else if (a != null)
         {
             // The dictionary should be a GoTo action.
-            var action = a as PdfDictionary;
-            if (action != null && action.Elements.GetName (PdfAction.Keys.S) == "/GoTo")
+            if (a is PdfDictionary action && action.Elements.GetName (PdfAction.Keys.S) == "/GoTo")
             {
                 dest = action.Elements[PdfGoToAction.Keys.D];
                 if (dest is PdfArray destArray)
@@ -363,8 +366,7 @@ public sealed class PdfOutline
 
         // The destination page may not yet transformed to PdfPage.
         var destPage = (PdfDictionary)((PdfReference)(destination.Elements[0])).Value;
-        var page = destPage as PdfPage;
-        if (page == null)
+        if (destPage is not PdfPage page)
         {
             page = new PdfPage (destPage);
         }
@@ -436,6 +438,7 @@ public sealed class PdfOutline
     {
         var firstRef = Elements.GetReference (Keys.First);
         var lastRef = Elements.GetReference (Keys.Last);
+        lastRef.NotUsed();
         var current = firstRef;
         while (current != null)
         {
@@ -471,9 +474,9 @@ public sealed class PdfOutline
             {
                 // Case: This is the outline dictionary (the root).
                 // Reference: TABLE 8.3  Entries in the outline dictionary / Page 585
-                Debug.Assert (_outlines != null && _outlines.Count > 0 && _outlines[0] != null);
+                Debug.Assert (_outlines is { Count: > 0 } && _outlines[0] != null!);
                 Elements[Keys.First] = _outlines[0].Reference;
-                Elements[Keys.Last] = _outlines[_outlines.Count - 1].Reference;
+                Elements[Keys.Last] = _outlines[^1].Reference;
 
                 // TODO: /Count - the meaning is not completely clear to me.
                 // Get PDFs created with Acrobat and analyse what to implement.
@@ -488,12 +491,12 @@ public sealed class PdfOutline
                 // Reference: TABLE 8.4  Entries in the outline item dictionary / Page 585
                 Elements[Keys.Parent] = Parent.Reference;
 
-                var count = Parent._outlines.Count;
+                var count = Parent._outlines!.Count;
                 var index = Parent._outlines.IndexOf (this);
                 Debug.Assert (index != -1);
 
                 // Has destination?
-                if (DestinationPage != null)
+                if (DestinationPage != null!)
 
                     //Elements[Keys.Dest] = new PdfArray(Owner, DestinationPage.Reference, new PdfLiteral("/XYZ null null 0"));
                 {
@@ -514,8 +517,8 @@ public sealed class PdfOutline
 
                 if (hasKids)
                 {
-                    Elements[Keys.First] = _outlines[0].Reference;
-                    Elements[Keys.Last] = _outlines[_outlines.Count - 1].Reference;
+                    Elements[Keys.First] = _outlines![0].Reference;
+                    Elements[Keys.Last] = _outlines[^1].Reference;
                 }
 
                 // TODO: /Count - the meaning is not completely clear to me
@@ -524,7 +527,7 @@ public sealed class PdfOutline
                     Elements[Keys.Count] = new PdfInteger ((_opened ? 1 : -1) * OpenCount);
                 }
 
-                if (TextColor != XColor.Empty && Owner.HasVersion ("1.4"))
+                if (TextColor != XColor.Empty && Owner!.HasVersion ("1.4"))
                 {
                     Elements[Keys.C] = new PdfLiteral ("[{0}]", PdfEncoders.ToString (TextColor, PdfColorMode.Rgb));
                 }
@@ -537,71 +540,49 @@ public sealed class PdfOutline
             // Prepare child elements.
             if (hasKids)
             {
-                foreach (var outline in _outlines)
+                foreach (var outline in _outlines!)
+                {
                     outline.PrepareForSave();
+                }
             }
         }
     }
 
     PdfArray CreateDestArray()
     {
-        PdfArray dest = null;
-        switch (PageDestinationType)
+        PdfArray dest = PageDestinationType switch
         {
             // [page /XYZ left top zoom]
-            case PdfPageDestinationType.Xyz:
-                dest = new PdfArray (Owner,
-                    DestinationPage.Reference,
-                    new PdfLiteral (string.Format ("/XYZ {0} {1} {2}", Fd (Left), Fd (Top), Fd (Zoom))));
-                break;
+            PdfPageDestinationType.Xyz => new PdfArray (Owner!, DestinationPage.Reference!,
+                new PdfLiteral ($"/XYZ {Fd (Left)} {Fd (Top)} {Fd (Zoom)}")),
 
             // [page /Fit]
-            case PdfPageDestinationType.Fit:
-                dest = new PdfArray (Owner,
-                    DestinationPage.Reference, new PdfLiteral ("/Fit"));
-                break;
+            PdfPageDestinationType.Fit => new PdfArray (Owner!, DestinationPage.Reference!, new PdfLiteral ("/Fit")),
 
             // [page /FitH top]
-            case PdfPageDestinationType.FitH:
-                dest = new PdfArray (Owner,
-                    DestinationPage.Reference, new PdfLiteral (string.Format ("/FitH {0}", Fd (Top))));
-                break;
+            PdfPageDestinationType.FitH => new PdfArray (Owner!, DestinationPage.Reference!,
+                new PdfLiteral ($"/FitH {Fd (Top)}")),
 
             // [page /FitV left]
-            case PdfPageDestinationType.FitV:
-                dest = new PdfArray (Owner,
-                    DestinationPage.Reference, new PdfLiteral (string.Format ("/FitV {0}", Fd (Left))));
-                break;
+            PdfPageDestinationType.FitV => new PdfArray (Owner!, DestinationPage.Reference!,
+                new PdfLiteral ($"/FitV {Fd (Left)}")),
 
             // [page /FitR left bottom right top]
-            case PdfPageDestinationType.FitR:
-                dest = new PdfArray (Owner,
-                    DestinationPage.Reference,
-                    new PdfLiteral (string.Format ("/FitR {0} {1} {2} {3}", Fd (Left), Fd (Bottom), Fd (Right),
-                        Fd (Top))));
-                break;
+            PdfPageDestinationType.FitR => new PdfArray (Owner!, DestinationPage.Reference!,
+                new PdfLiteral ($"/FitR {Fd (Left)} {Fd (Bottom)} {Fd (Right)} {Fd (Top)}")),
 
             // [page /FitB]
-            case PdfPageDestinationType.FitB:
-                dest = new PdfArray (Owner,
-                    DestinationPage.Reference, new PdfLiteral ("/FitB"));
-                break;
+            PdfPageDestinationType.FitB => new PdfArray (Owner!, DestinationPage.Reference!, new PdfLiteral ("/FitB")),
 
             // [page /FitBH top]
-            case PdfPageDestinationType.FitBH:
-                dest = new PdfArray (Owner,
-                    DestinationPage.Reference, new PdfLiteral (string.Format ("/FitBH {0}", Fd (Top))));
-                break;
+            PdfPageDestinationType.FitBH => new PdfArray (Owner!, DestinationPage.Reference!,
+                new PdfLiteral ($"/FitBH {Fd (Top)}")),
 
             // [page /FitBV left]
-            case PdfPageDestinationType.FitBV:
-                dest = new PdfArray (Owner,
-                    DestinationPage.Reference, new PdfLiteral (string.Format ("/FitBV {0}", Fd (Left))));
-                break;
-
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
+            PdfPageDestinationType.FitBV => new PdfArray (Owner!, DestinationPage.Reference!,
+                new PdfLiteral ($"/FitBV {Fd (Left)}")),
+            _ => throw new ArgumentOutOfRangeException()
+        };
 
         return dest;
     }
@@ -642,7 +623,10 @@ public sealed class PdfOutline
     {
         var result = new StringBuilder();
         foreach (var ch in text)
+        {
             result.Append ((uint)ch < 256 ? ch : '?');
+        }
+
         return result.ToString();
     }
 #endif

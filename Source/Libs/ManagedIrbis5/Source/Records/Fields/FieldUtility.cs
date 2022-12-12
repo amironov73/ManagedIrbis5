@@ -58,7 +58,7 @@ public static class FieldUtility
             int tag
         )
     {
-        Sure.NotNull ((object?) fields);
+        Sure.NotNull (fields);
 
         var list = new ValueList<Field>();
         foreach (var field in fields)
@@ -89,7 +89,7 @@ public static class FieldUtility
             string? value
         )
     {
-        Sure.NotNull ((object?) fields);
+        Sure.NotNull (fields);
 
         var list = new ValueList<Field>();
 
@@ -117,7 +117,7 @@ public static class FieldUtility
             int occurrence
         )
     {
-        Sure.NotNull ((object?) fields);
+        Sure.NotNull (fields);
 
         foreach (var field in fields)
         {
@@ -173,7 +173,7 @@ public static class FieldUtility
             IReadOnlyList<int> tags
         )
     {
-        Sure.NotNull ((object?) fields);
+        Sure.NotNull (fields);
         Sure.NotNull (tags);
 
         var list = new ValueList<Field>();
@@ -1125,7 +1125,7 @@ public static class FieldUtility
             char code
         )
     {
-        Sure.NotNull ((object?)fields);
+        Sure.NotNull (fields);
 
         var result = new List<string>();
         foreach (var field in fields)

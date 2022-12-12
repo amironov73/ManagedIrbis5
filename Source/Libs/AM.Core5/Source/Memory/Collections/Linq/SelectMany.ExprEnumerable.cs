@@ -122,7 +122,7 @@ internal class SelectManyExprEnumerable<T, TR>
             _src!.Reset();
         }
 
-        object IPoolingEnumerator.Current => Current;
+        object IPoolingEnumerator.Current => Current!;
 
         public TR Current => _currentEnumerator!.Current;
 

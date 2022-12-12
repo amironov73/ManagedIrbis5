@@ -138,7 +138,7 @@ public sealed class Tablefier
             Column[] columns
         )
     {
-        Sure.NotNull ((object?) items);
+        Sure.NotNull (items);
         Sure.NotNull (columns);
 
         var result = new List<string[]>();
@@ -289,7 +289,7 @@ public sealed class Tablefier
         )
     {
         Sure.NotNull (writer);
-        Sure.NotNull ((object?) items);
+        Sure.NotNull (items);
 
         var type = typeof (T);
         var columns = GetColumns (type);
@@ -309,7 +309,7 @@ public sealed class Tablefier
         )
     {
         Sure.NotNull (writer);
-        Sure.NotNull ((object?) items);
+        Sure.NotNull (items);
         Sure.NotNull (properties);
 
         if (properties.Length == 0)
@@ -348,7 +348,7 @@ public sealed class Tablefier
             params string[]? properties
         )
     {
-        Sure.NotNull ((object?) items);
+        Sure.NotNull (items);
 
         var result = new StringWriter();
         if (properties.IsNullOrEmpty())

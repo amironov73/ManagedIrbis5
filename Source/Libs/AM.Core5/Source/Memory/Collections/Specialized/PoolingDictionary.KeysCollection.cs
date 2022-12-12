@@ -92,7 +92,7 @@ public partial class PoolingDictionary<TKey, TValue>
 
             public TKey Current => _src!._entries[_pos].key;
 
-            object IEnumerator.Current => Current;
+            object IEnumerator.Current => Current!;
 
             public void Dispose()
             {

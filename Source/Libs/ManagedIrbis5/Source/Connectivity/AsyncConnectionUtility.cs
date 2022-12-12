@@ -498,7 +498,7 @@ public static class AsyncConnectionUtility
         )
     {
         Sure.NotNull (connection);
-        Sure.NotNull ((object?) records);
+        Sure.NotNull (records);
 
         // TODO: сделать IRecord
 
@@ -555,7 +555,7 @@ public static class AsyncConnectionUtility
         )
     {
         Sure.NotNull (connection);
-        Sure.NotNull ((object?) specifications);
+        Sure.NotNull (specifications);
 
         if (!connection.CheckProviderState())
         {

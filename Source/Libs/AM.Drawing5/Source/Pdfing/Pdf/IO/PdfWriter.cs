@@ -5,9 +5,10 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 
-/*
+/* PdfWriter.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -52,12 +53,12 @@ internal class PdfWriter
 
     public void Close (bool closeUnderlyingStream)
     {
-        if (_stream != null && closeUnderlyingStream)
+        if (_stream != null! && closeUnderlyingStream)
         {
             _stream.Dispose();
         }
 
-        _stream = null;
+        _stream = null!;
     }
 
     public void Close()
@@ -65,26 +66,23 @@ internal class PdfWriter
         Close (true);
     }
 
-    public long Position
-    {
-        get { return _stream.Position; }
-    }
+    public long Position => _stream.Position;
 
     /// <summary>
     /// Gets or sets the kind of layout.
     /// </summary>
     public PdfWriterLayout Layout
     {
-        get { return _layout; }
-        set { _layout = value; }
+        get => _layout;
+        set => _layout = value;
     }
 
     PdfWriterLayout _layout;
 
     public PdfWriterOptions Options
     {
-        get { return _options; }
-        set { _options = value; }
+        get => _options;
+        set => _options = value;
     }
 
     PdfWriterOptions _options;
@@ -443,13 +441,13 @@ internal class PdfWriter
         }
         else
         {
-            byte[] bytes = value.Stream.Value;
+            byte[] bytes = value.Stream!.Value;
             if (bytes.Length != 0)
             {
                 if (SecurityHandler != null)
                 {
                     bytes = (byte[])bytes.Clone();
-                    bytes = SecurityHandler.EncryptBytes (bytes);
+                    bytes = SecurityHandler.EncryptBytes (bytes)!;
                 }
 
                 Write (bytes);
@@ -566,8 +564,8 @@ internal class PdfWriter
     /// </summary>
     internal int Indent
     {
-        get { return _indent; }
-        set { _indent = value; }
+        get => _indent;
+        set => _indent = value;
     }
 
     int _indent = 2;
@@ -600,10 +598,7 @@ internal class PdfWriter
     /// <summary>
     /// Gets an indent string of current indent.
     /// </summary>
-    string IndentBlanks
-    {
-        get { return new string (' ', _writeIndent); }
-    }
+    string IndentBlanks => new string (' ', _writeIndent);
 
     void WriteIndent()
     {
@@ -683,10 +678,7 @@ internal class PdfWriter
     /// <summary>
     /// Gets the underlying stream.
     /// </summary>
-    internal Stream Stream
-    {
-        get { return _stream; }
-    }
+    internal Stream Stream => _stream;
 
     Stream _stream;
 

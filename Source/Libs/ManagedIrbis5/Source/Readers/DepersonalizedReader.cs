@@ -171,7 +171,7 @@ public sealed class DepersonalizedReader
             IEnumerable<VisitInfo> visits
         )
     {
-        Sure.NotNull ((object?) visits);
+        Sure.NotNull (visits);
 
         foreach (var visit in visits)
         {

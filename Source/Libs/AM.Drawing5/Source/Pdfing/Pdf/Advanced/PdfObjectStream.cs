@@ -7,13 +7,15 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-/*
+/* PdfObjectStream.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System.IO;
+
+using AM;
 
 using PdfSharpCore.Pdf.IO;
 
@@ -38,6 +40,7 @@ public class PdfObjectStream
     public PdfObjectStream (PdfDocument document)
         : base (document)
     {
+        _header = null!;
     }
 
     /// <summary>
@@ -48,9 +51,9 @@ public class PdfObjectStream
     {
         var n = Elements.GetInteger (Keys.N);
         var first = Elements.GetInteger (Keys.First);
-        Stream.TryUnfilter();
+        Stream!.TryUnfilter();
 
-        var parser = new Parser (null, new MemoryStream (Stream.Value));
+        var parser = new Parser (null!, new MemoryStream (Stream.Value));
         _header = parser.ReadObjectStreamHeader (n, first);
     }
 
@@ -78,7 +81,7 @@ public class PdfObjectStream
             }
             else
             {
-                GetType();
+                GetType().NotUsed();
             }
         }
     }
@@ -88,7 +91,7 @@ public class PdfObjectStream
     /// </summary>
     internal PdfReference ReadCompressedObject (int index)
     {
-        var parser = new Parser (_document, new MemoryStream (Stream.Value));
+        var parser = new Parser (_document!, new MemoryStream (Stream!.Value));
         var objectNumber = _header[index][0];
         var offset = _header[index][1];
         return parser.ReadCompressedObject (objectNumber, offset);

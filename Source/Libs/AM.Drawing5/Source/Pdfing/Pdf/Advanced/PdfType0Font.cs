@@ -29,7 +29,8 @@ namespace PdfSharpCore.Pdf.Advanced;
 /// <summary>
 /// Represents a composite font. Used for Unicode encoding.
 /// </summary>
-internal sealed class PdfType0Font : PdfFont
+internal sealed class PdfType0Font
+    : PdfFont
 {
     #region Construction
 
@@ -84,8 +85,8 @@ internal sealed class PdfType0Font : PdfFont
         _descendantFont.BaseFont = BaseFont;
 
         var descendantFonts = new PdfArray (document);
-        Owner._irefTable.Add (_descendantFont);
-        descendantFonts.Elements.Add (_descendantFont.Reference);
+        Owner!._irefTable.Add (_descendantFont);
+        descendantFonts.Elements.Add (_descendantFont.Reference!);
         Elements[Keys.DescendantFonts] = descendantFonts;
     }
 
@@ -108,8 +109,10 @@ internal sealed class PdfType0Font : PdfFont
         Debug.Assert (_fontOptions != null);
 
         CMapInfo = new CMapInfo (ttDescriptor);
-        _descendantFont = new PdfCIDFont (document, FontDescriptor, fontData);
-        _descendantFont.CMapInfo = CMapInfo;
+        _descendantFont = new PdfCIDFont (document, FontDescriptor, fontData)
+        {
+            CMapInfo = CMapInfo
+        };
 
         // Create ToUnicode map
         ToUnicodeMap = new PdfToUnicodeMap (document, CMapInfo);
@@ -117,7 +120,7 @@ internal sealed class PdfType0Font : PdfFont
         Elements.Add (Keys.ToUnicode, ToUnicodeMap);
 
         //BaseFont = ttDescriptor.FontName.Replace(" ", "");
-        BaseFont = ttDescriptor.FontName;
+        BaseFont = ttDescriptor.FontName!;
 
         // CID fonts are always embedded
         if (!BaseFont.Contains ("+")) // HACK in PdfType0Font
@@ -129,8 +132,8 @@ internal sealed class PdfType0Font : PdfFont
         _descendantFont.BaseFont = BaseFont;
 
         var descendantFonts = new PdfArray (document);
-        Owner._irefTable.Add (_descendantFont);
-        descendantFonts.Elements.Add (_descendantFont.Reference);
+        Owner!._irefTable.Add (_descendantFont);
+        descendantFonts.Elements.Add (_descendantFont.Reference!);
         Elements[Keys.DescendantFonts] = descendantFonts;
     }
 
@@ -180,7 +183,7 @@ internal sealed class PdfType0Font : PdfFont
         }
 
         _descendantFont.PrepareForSave();
-        ToUnicodeMap.PrepareForSave();
+        ToUnicodeMap!.PrepareForSave();
     }
 
     /// <summary>

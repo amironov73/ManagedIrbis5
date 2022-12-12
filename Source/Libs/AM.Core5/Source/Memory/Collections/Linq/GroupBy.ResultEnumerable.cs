@@ -135,7 +135,7 @@ internal sealed class GroupedResultEnumerable<TSource, TKey, TResult>
         public TResult Current =>
             _parent._resultSelector (_enumerator.Current.Key, _enumerator.Current.Value.InternalList);
 
-        object IPoolingEnumerator.Current => Current;
+        object IPoolingEnumerator.Current => Current!;
     }
 
     internal class PoolingGrouping
@@ -156,6 +156,9 @@ internal sealed class GroupedResultEnumerable<TSource, TKey, TResult>
 
         IPoolingEnumerator IPoolingEnumerable.GetEnumerator() => GetEnumerator();
 
+        /// <summary>
+        ///
+        /// </summary>
         public TKey Key { get; private set; }
 
         public void Dispose()

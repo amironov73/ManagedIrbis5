@@ -94,7 +94,7 @@ public sealed class TreeGridDataCollection
             IEnumerable range
         )
     {
-        Sure.NotNull ((object?) range);
+        Sure.NotNull (range);
 
         foreach (var item in range)
         {

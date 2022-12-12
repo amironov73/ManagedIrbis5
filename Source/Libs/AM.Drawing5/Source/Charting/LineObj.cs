@@ -165,7 +165,7 @@ public class LineObj
         // backwards compatible as new member variables are added to classes
         info.GetInt32 ("schema2").NotUsed();
 
-        Line = (LineBase) info.GetValue ("line", typeof (LineBase));
+        Line = (LineBase) info.GetValue ("line", typeof (LineBase))!;
     }
 
     /// <inheritdoc cref="ISerializable.GetObjectData"/>
@@ -198,8 +198,8 @@ public class LineObj
         var pix1 = Location.TransformTopLeft (pane);
         var pix2 = Location.TransformBottomRight (pane);
 
-        if (pix1.X > -10000 && pix1.X < 100000 && pix1.Y > -100000 && pix1.Y < 100000 &&
-            pix2.X > -10000 && pix2.X < 100000 && pix2.Y > -100000 && pix2.Y < 100000)
+        if (pix1.X > -10000 && pix1 is { X: < 100000, Y: > -100000 and < 100000 } &&
+            pix2.X > -10000 && pix2 is { X: < 100000, Y: > -100000 and < 100000 })
         {
             // calculate the length and the angle of the arrow "vector"
             double dy = pix2.Y - pix1.Y;

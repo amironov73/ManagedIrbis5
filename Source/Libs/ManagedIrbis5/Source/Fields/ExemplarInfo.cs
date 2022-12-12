@@ -679,7 +679,7 @@ public sealed class ExemplarInfo
             params ExemplarInfo[]?[] arrays
         )
     {
-        Sure.NotNull ((object?) arrays);
+        Sure.NotNull (arrays);
 
         var result = new Dictionary<string, ExemplarInfo>();
         foreach (var array in arrays)

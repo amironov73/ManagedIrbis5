@@ -145,7 +145,7 @@ public sealed class DataCollection
             IEnumerable range
         )
     {
-        Sure.NotNull ((object?) range);
+        Sure.NotNull (range);
 
         foreach (var item in range)
         {

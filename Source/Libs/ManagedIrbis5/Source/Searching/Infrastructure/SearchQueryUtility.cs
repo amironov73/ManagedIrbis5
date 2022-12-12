@@ -126,7 +126,7 @@ public static class SearchQueryUtility
             IEnumerable<SearchTerm> terms
         )
     {
-        Sure.NotNull ((object?) terms);
+        Sure.NotNull (terms);
 
         var result = terms
             .Select (term => term.Term)

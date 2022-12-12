@@ -1036,7 +1036,7 @@ public sealed class AsyncConnection
             string? databaseName = default
         )
     {
-        Sure.NotNull ((object?) mfnList);
+        Sure.NotNull (mfnList);
 
         var query = new AsyncQuery (this, CommandCode.UnlockRecords);
         query.AddAnsi (EnsureDatabase (databaseName));
@@ -1063,7 +1063,7 @@ public sealed class AsyncConnection
             IEnumerable<string> lines
         )
     {
-        Sure.NotNull ((object?) lines);
+        Sure.NotNull (lines);
 
         var query = new AsyncQuery (this, CommandCode.UpdateIniFile);
         var counter = 0;
@@ -1092,7 +1092,7 @@ public sealed class AsyncConnection
             IEnumerable<UserInfo> users
         )
     {
-        Sure.NotNull ((object?) users);
+        Sure.NotNull (users);
 
         if (!CheckProviderState())
         {
@@ -1123,7 +1123,7 @@ public sealed class AsyncConnection
             WriteRecordParameters parameters
         )
     {
-        Sure.NotNull ((object?) parameters);
+        Sure.NotNull (parameters);
 
         var record = parameters.Record;
         if (record is not null)

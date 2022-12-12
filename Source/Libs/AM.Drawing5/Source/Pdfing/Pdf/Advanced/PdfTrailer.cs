@@ -5,9 +5,10 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable LocalizableElement
 // ReSharper disable UnusedMember.Global
 
-/*
+/* PdfTrailer.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -68,7 +69,7 @@ internal class PdfTrailer
             Elements.SetReference (Keys.Info, iref);
         }
 
-        Elements.SetReference (Keys.Root, trailer.Elements.GetReference (Keys.Root));
+        Elements.SetReference (Keys.Root, trailer.Elements.GetReference (Keys.Root)!);
 
         Elements.SetInteger (Keys.Size, trailer.Elements.GetInteger (Keys.Size));
 
@@ -111,7 +112,7 @@ internal class PdfTrailer
     {
         if (index is < 0 or > 1)
         {
-            throw new ArgumentOutOfRangeException ("index", index, "Index must be 0 or 1.");
+            throw new ArgumentOutOfRangeException (nameof (index), index, "Index must be 0 or 1.");
         }
 
         if (Elements[Keys.ID] is not PdfArray array || array.Elements.Count < 2)
@@ -135,7 +136,7 @@ internal class PdfTrailer
     {
         if (index is < 0 or > 1)
         {
-            throw new ArgumentOutOfRangeException ("index", index, "Index must be 0 or 1.");
+            throw new ArgumentOutOfRangeException (nameof (index), index, "Index must be 0 or 1.");
         }
 
         if (Elements[Keys.ID] is not PdfArray array || array.Elements.Count < 2)
@@ -179,7 +180,7 @@ internal class PdfTrailer
     {
         // Delete /XRefStm entry, if any.
         // HACK:
-        _elements.Remove (Keys.XRefStm);
+        _elements!.Remove (Keys.XRefStm);
 
         // Don't encrypt myself
         var securityHandler = writer.SecurityHandler;
@@ -197,34 +198,34 @@ internal class PdfTrailer
         var irefTable = document._irefTable.ThrowIfNull();
 
         // /Root
-        if (document._trailer.Elements[Keys.Root] is PdfReference iref && iref.Value == null)
+        if (document._trailer!.Elements[Keys.Root] is PdfReference iref && iref.Value == null!)
         {
-            iref = irefTable[iref.ObjectID];
+            iref = irefTable[iref.ObjectID]!;
             Debug.Assert (iref.Value != null);
             document._trailer.Elements[Keys.Root] = iref;
         }
 
         // /Info
-        iref = document._trailer.Elements[Keys.Info] as PdfReference;
-        if (iref != null && iref.Value == null)
+        iref = (document._trailer.Elements[Keys.Info] as PdfReference)!;
+        if (iref is { Value: null })
         {
-            iref = irefTable[iref.ObjectID];
+            iref = irefTable[iref.ObjectID]!;
             Debug.Assert (iref.Value != null);
             document._trailer.Elements[Keys.Info] = iref;
         }
 
         // /Encrypt
-        iref = document._trailer.Elements[Keys.Encrypt] as PdfReference;
-        if (iref != null)
+        iref = (document._trailer.Elements[Keys.Encrypt] as PdfReference)!;
+        if (iref != null!)
         {
-            iref = irefTable[iref.ObjectID];
+            iref = irefTable[iref.ObjectID]!;
             Debug.Assert (iref.Value != null);
             document._trailer.Elements[Keys.Encrypt] = iref;
 
             // The encryption dictionary (security handler) was read in before the XRefTable construction
             // was completed. The next lines fix that state (it took several hours to find these bugs...).
-            iref.Value = _document._trailer._securityHandler;
-            _document._trailer._securityHandler.Reference = iref;
+            iref.Value = _document!._trailer!._securityHandler!;
+            _document._trailer._securityHandler!.Reference = iref;
             iref.Value.Reference = iref;
         }
 

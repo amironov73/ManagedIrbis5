@@ -33,12 +33,12 @@ namespace AM.Collections;
 /// to the constructor to use to compare items.</p>
 /// <p>Set is implemented as a hash table. Inserting, deleting, and looking up an
 /// an element all are done in approximately constant time, regardless of the number of items in the Set.</p>
-/// <p><see cref="OrderedSet&lt;T&gt;"/> is similar, but uses comparison instead of hashing, and does maintains
+/// <p>OrderedSet&lt;T&gt; is similar, but uses comparison instead of hashing, and does maintains
 /// the items in sorted order.</p>
 ///</remarks>
-///<seealso cref="OrderedSet&lt;T&gt;"/>
 [Serializable]
-public class Set<T> : CollectionBase<T>, ICollection<T>, ICloneable
+public class Set<T>
+    : CollectionBase<T>, ICollection<T>, ICloneable
 {
     // The comparer used to hash/compare items.
     private readonly IEqualityComparer<T> equalityComparer;

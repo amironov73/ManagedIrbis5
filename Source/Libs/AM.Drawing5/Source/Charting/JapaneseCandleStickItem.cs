@@ -223,7 +223,7 @@ public class JapaneseCandleStickItem
         //float halfSize = _stick.GetBarWidth( pane, baseAxis, scaleFactor );
         var halfSize = 2 * scaleFactor;
 
-        using var pen = new Pen (Stick.Color, Stick._width);
+        using var pen = new Pen (Stick.Color, Stick.Width);
         Stick.Draw
             (
                 graphics,

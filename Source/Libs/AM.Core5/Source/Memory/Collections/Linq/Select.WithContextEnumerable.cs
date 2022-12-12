@@ -92,7 +92,7 @@ internal class SelectExprWithContextEnumerable<T, TR, TContext>
         public bool MoveNext() => _src!.MoveNext();
 
         public void Reset() => _src!.Reset();
-        object IPoolingEnumerator.Current => Current;
+        object IPoolingEnumerator.Current => Current!;
 
         public TR Current => _condition! (_context!, _src!.Current);
 

@@ -510,7 +510,7 @@ public static class SyncProviderUtility
         )
     {
         Sure.NotNull (connection);
-        Sure.NotNull ((object?) batch);
+        Sure.NotNull (batch);
         connection.EnsureConnected();
         database = connection.EnsureDatabase (database);
 

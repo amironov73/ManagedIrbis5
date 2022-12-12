@@ -103,7 +103,7 @@ public sealed class IrbisMonitor
         )
     {
         Sure.NotNull (connection);
-        Sure.NotNull ((object?) databases);
+        Sure.NotNull (databases);
 
         Connection = connection;
         Databases = new ();

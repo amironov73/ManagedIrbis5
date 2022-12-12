@@ -678,7 +678,7 @@ public static class PftUtility
         )
     {
         Sure.NotNull (builder);
-        Sure.NotNull ((object?) fields);
+        Sure.NotNull (fields);
 
         var first = true;
         foreach (var field in fields.NonNullItems())
@@ -1337,7 +1337,7 @@ public static class PftUtility
             IEnumerable<PftNode> nodes
         )
     {
-        Sure.NotNull ((object?) nodes);
+        Sure.NotNull (nodes);
 
         var result = nodes.Any (IsComplexExpression);
 
@@ -1410,7 +1410,7 @@ public static class PftUtility
         )
     {
         Sure.NotNull (builder);
-        Sure.NotNull ((object?) nodes);
+        Sure.NotNull (nodes);
 
         var first = true;
         foreach (var node in nodes.NonNullItems())
@@ -1434,7 +1434,7 @@ public static class PftUtility
             IEnumerable<PftNode> nodes
         )
     {
-        Sure.NotNull ((object?) nodes);
+        Sure.NotNull (nodes);
 
         var first = true;
         foreach (var node in nodes.NonNullItems())
@@ -1462,7 +1462,7 @@ public static class PftUtility
         )
     {
         Sure.NotNull (builder);
-        Sure.NotNull ((object?) nodes);
+        Sure.NotNull (nodes);
 
         var first = true;
         foreach (var node in nodes.NonNullItems())
@@ -1550,7 +1550,7 @@ public static class PftUtility
             IEnumerable<PftNode> nodes
         )
     {
-        Sure.NotNull ((object?) nodes);
+        Sure.NotNull (nodes);
 
         var result = nodes.Any (RequiresConnection);
 

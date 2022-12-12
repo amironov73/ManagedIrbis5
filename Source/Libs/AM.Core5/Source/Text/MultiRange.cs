@@ -15,7 +15,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 #endregion
 
@@ -23,11 +22,22 @@ using System.Linq;
 
 namespace AM.Text;
 
+/// <summary>
+///
+/// </summary>
 public class MultiRange
 {
     private readonly SortedList<CodepointRange, object?> _ranges = new ();
+
+    /// <summary>
+    ///
+    /// </summary>
     public IReadOnlyList<CodepointRange> Ranges => (IReadOnlyList<CodepointRange>) _ranges;
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="ranges"></param>
     public MultiRange (params string[] ranges)
     {
         foreach (var range in ranges)
@@ -37,6 +47,10 @@ public class MultiRange
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="ranges"></param>
     public MultiRange (params CodepointRange[] ranges)
     {
         foreach (var range in ranges)
@@ -46,6 +60,10 @@ public class MultiRange
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="ranges"></param>
     public MultiRange (IEnumerable<CodepointRange> ranges)
     {
         foreach (var range in ranges)
@@ -54,6 +72,12 @@ public class MultiRange
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="codepoint"></param>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
     public bool Contains (Codepoint codepoint)
     {
         var index = _ranges.IndexOfKey (new CodepointRange (codepoint));

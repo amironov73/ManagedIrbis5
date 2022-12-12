@@ -129,7 +129,7 @@ public sealed class FieldCollection
             IEnumerable<Field> fields
         )
     {
-        Sure.NotNull ((object?) fields);
+        Sure.NotNull (fields);
 
         ThrowIfReadOnly();
 

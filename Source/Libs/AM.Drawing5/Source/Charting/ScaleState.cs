@@ -3,6 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable CompareOfFloatsByEqualityOperator
 // ReSharper disable InconsistentNaming
 
 /* ScaleState.cs --
@@ -68,6 +69,8 @@ public class ScaleState
             Axis? axis
         )
     {
+        _format = null!;
+
         if (axis is { Scale: not null })
         {
             _min = axis.Scale._min;
@@ -77,7 +80,7 @@ public class ScaleState
             _majorUnit = axis.Scale._majorUnit;
             _minorUnit = axis.Scale._minorUnit;
 
-            _format = axis.Scale._format;
+            _format = axis.Scale._format!;
             _mag = axis.Scale?._mag ?? 0;
 
             //this.numDec = axis.NumDec;
@@ -146,7 +149,7 @@ public class ScaleState
     /// copied</param>
     public void ApplyScale (Axis axis)
     {
-        axis.Scale._min = _min;
+        axis.Scale!._min = _min;
         axis.Scale._majorStep = _majorStep;
         axis.Scale._minorStep = _minorStep;
         axis.Scale._max = _max;
@@ -175,7 +178,7 @@ public class ScaleState
     /// <returns>true if the states are different, false otherwise</returns>
     public bool IsChanged (Axis axis)
     {
-        return axis.Scale._min != _min ||
+        return axis.Scale!._min != _min ||
                axis.Scale._majorStep != _majorStep ||
                axis.Scale._minorStep != _minorStep ||
                axis.Scale._max != _max ||

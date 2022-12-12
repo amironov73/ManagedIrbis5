@@ -78,7 +78,7 @@ public static partial class AsSingleQueryList
 
             public T Current => _enumerator.ThrowIfNull().Current;
 
-            object IPoolingEnumerator.Current => Current;
+            object IPoolingEnumerator.Current => Current!;
 
             /// <inheritdoc cref="IDisposable.Dispose"/>
             public void Dispose()

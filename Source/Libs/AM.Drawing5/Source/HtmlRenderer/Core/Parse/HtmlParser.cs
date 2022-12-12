@@ -32,13 +32,13 @@ internal static class HtmlParser
     /// Parses the source html to css boxes tree structure.
     /// </summary>
     /// <param name="source">the html source to parse</param>
-    public static CssBox ParseDocument(string source)
+    public static CssBox? ParseDocument(string source)
     {
         var root = CssBox.CreateBlock();
         var curBox = root;
 
-        int endIdx = 0;
-        int startIdx = 0;
+        var endIdx = 0;
+        var startIdx = 0;
         while (startIdx >= 0)
         {
             var tagIdx = source.IndexOf('<', startIdx);
@@ -72,7 +72,9 @@ internal static class HtmlParser
                         var endIdxS = endIdx;
                         endIdx = source.IndexOf("</style>", endIdx, StringComparison.OrdinalIgnoreCase);
                         if (endIdx > -1)
+                        {
                             AddTextBox(source, endIdxS, endIdx, ref curBox);
+                        }
                     }
                 }
             }
@@ -188,7 +190,7 @@ internal static class HtmlParser
             isClosing = true;
         }
 
-        int spaceIdx = idx;
+        var spaceIdx = idx;
         while (spaceIdx < idx + length && !char.IsWhiteSpace(source, spaceIdx))
             spaceIdx++;
 
@@ -215,7 +217,7 @@ internal static class HtmlParser
     {
         attributes = null;
 
-        int startIdx = idx;
+        var startIdx = idx;
         while (startIdx < idx + length)
         {
             while (startIdx < idx + length && char.IsWhiteSpace(source, startIdx))
@@ -234,10 +236,10 @@ internal static class HtmlParser
                 while (startIdx < idx + length && (char.IsWhiteSpace(source, startIdx) || source[startIdx] == '='))
                     startIdx++;
 
-                bool hasPChar = false;
+                var hasPChar = false;
                 if (startIdx < idx + length)
                 {
-                    char pChar = source[startIdx];
+                    var pChar = source[startIdx];
                     if (pChar == '"' || pChar == '\'')
                     {
                         hasPChar = true;
@@ -255,7 +257,10 @@ internal static class HtmlParser
                 if (key.Length != 0)
                 {
                     if (attributes == null)
+                    {
                         attributes = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
+                    }
+
                     attributes[key.ToLower()] = value;
                 }
 

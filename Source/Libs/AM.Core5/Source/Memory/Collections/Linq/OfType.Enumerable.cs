@@ -91,7 +91,7 @@ internal class OfTypeExprEnumerable<T>
             _src.Reset();
         }
 
-        object IPoolingEnumerator.Current => Current;
+        object IPoolingEnumerator.Current => Current!;
 
         public T Current => (T)_src.Current;
 

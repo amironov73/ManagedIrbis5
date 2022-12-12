@@ -116,7 +116,7 @@ public abstract class ListBase<T>
     /// <returns>An IList&lt;T&gt; that provides read-only access to the list.</returns>
     public new virtual IList<T> AsReadOnly()
     {
-        return Algorithms.ReadOnly (this);
+        return Algorithms.ReadOnly (this)!;
     }
 
     /// <summary>

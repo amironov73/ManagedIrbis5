@@ -84,7 +84,7 @@ public sealed class PdfPage
         {
             Size = RegionInfo.CurrentRegion.IsMetric ? PageSize.A4 : PageSize.Letter;
         }
-        catch (System.NotImplementedException)
+        catch (NotImplementedException)
         {
             // https://github.com/ststeiger/PdfSharpCore/issues/46
             // { System.NotImplementedException: Neutral region info
@@ -272,14 +272,9 @@ public sealed class PdfPage
         set
         {
             var rect = MediaBox;
-            if (_orientation == PageOrientation.Portrait)
-            {
-                MediaBox = new PdfRectangle (rect.X1, 0, rect.X2, value);
-            }
-            else
-            {
-                MediaBox = new PdfRectangle (0, rect.Y1, value, rect.Y2);
-            }
+            MediaBox = _orientation == PageOrientation.Portrait
+                ? new PdfRectangle (rect.X1, 0, rect.X2, value)
+                : new PdfRectangle (0, rect.Y1, value, rect.Y2);
 
             _pageSize = PageSize.Undefined;
         }
@@ -299,14 +294,9 @@ public sealed class PdfPage
         set
         {
             var rect = MediaBox;
-            if (_orientation == PageOrientation.Portrait)
-            {
-                MediaBox = new PdfRectangle (0, rect.Y1, value, rect.Y2);
-            }
-            else
-            {
-                MediaBox = new PdfRectangle (rect.X1, 0, rect.X2, value);
-            }
+            MediaBox = _orientation == PageOrientation.Portrait
+                ? new PdfRectangle (0, rect.Y1, value, rect.Y2)
+                : new PdfRectangle (rect.X1, 0, rect.X2, value);
 
             _pageSize = PageSize.Undefined;
         }
@@ -321,7 +311,7 @@ public sealed class PdfPage
     /// </summary>
     public int Rotate
     {
-        get => _elements.GetInteger (InheritablePageKeys.Rotate);
+        get => _elements!.GetInteger (InheritablePageKeys.Rotate);
         set
         {
             if (value / 90 * 90 != value)
@@ -329,7 +319,7 @@ public sealed class PdfPage
                 throw new ArgumentException ("Value must be a multiple of 90.");
             }
 
-            _elements.SetInteger (InheritablePageKeys.Rotate, value);
+            _elements!.SetInteger (InheritablePageKeys.Rotate, value);
         }
     }
 
@@ -356,19 +346,18 @@ public sealed class PdfPage
                     var item = Elements[Keys.Contents];
                     if (item == null)
                     {
-                        _contents = new PdfContents (Owner);
+                        _contents = new PdfContents (Owner!);
 
                         //Owner.irefTable.Add(_contents);
                     }
                     else
                     {
-                        if (item is PdfReference)
+                        if (item is PdfReference reference)
                         {
-                            item = ((PdfReference)item).Value;
+                            item = reference.Value;
                         }
 
-                        var array = item as PdfArray;
-                        if (array != null)
+                        if (item is PdfArray array)
                         {
                             // It is already an array of content streams.
                             if (array.IsIndirect)
@@ -384,11 +373,11 @@ public sealed class PdfPage
                         else
                         {
                             // Only one content stream -> create array
-                            _contents = new PdfContents (Owner);
+                            _contents = new PdfContents (Owner!);
 
                             //Owner.irefTable.Add(_contents);
                             var content = new PdfContent ((PdfDictionary)item);
-                            _contents.Elements.Add (content.Reference);
+                            _contents.Elements.Add (content.Reference!);
                         }
                     }
                 }
@@ -523,19 +512,9 @@ public sealed class PdfPage
     /// <summary>
     /// Gets the PdfResources object of this page.
     /// </summary>
-    public PdfResources Resources
-    {
-        get
-        {
-            if (_resources == null)
-            {
-                _resources = (PdfResources) Elements.GetValue (Keys.Resources, VCF.Create)
-                    .ThrowIfNull(); //VCF.CreateIndirect
-            }
-
-            return _resources;
-        }
-    }
+    public PdfResources Resources =>
+        _resources ?? (_resources = (PdfResources)Elements.GetValue (Keys.Resources, VCF.Create)
+            .ThrowIfNull()); //VCF.CreateIndirect
 
     private PdfResources? _resources;
 
@@ -576,7 +555,7 @@ public sealed class PdfPage
         pdfFont = _document.ThrowIfNull()
             .FontTable.TryGetFont (idName);
         string? name = null;
-        if (pdfFont != null)
+        if (pdfFont != null!)
         {
             name = Resources.AddFont (pdfFont);
         }
@@ -676,18 +655,15 @@ public sealed class PdfPage
         // we respect this and skip the transparency group.
         TransparencyUsed = true; // TODO: check XObjects
         if (TransparencyUsed && !Elements.ContainsKey (Keys.Group) &&
-            _document.Options.ColorMode != PdfColorMode.Undefined)
+            _document!.Options.ColorMode != PdfColorMode.Undefined)
         {
             var group = new PdfDictionary();
-            _elements["/Group"] = group;
-            if (_document.Options.ColorMode != PdfColorMode.Cmyk)
-            {
-                group.Elements.SetName ("/CS", "/DeviceRGB");
-            }
-            else
-            {
-                group.Elements.SetName ("/CS", "/DeviceCMYK");
-            }
+            _elements!["/Group"] = group;
+            group.Elements.SetName
+                (
+                    "/CS",
+                    _document.Options.ColorMode != PdfColorMode.Cmyk ? "/DeviceRGB" : "/DeviceCMYK"
+                );
 
             group.Elements.SetName ("/S", "/Transparency");
 
@@ -720,21 +696,21 @@ public sealed class PdfPage
     internal static void InheritValues (PdfDictionary page, InheritedValues values)
     {
         // HACK: I'M ABSOLUTELY NOT SURE WHETHER THIS CODE COVERS ALL CASES.
-        if (values.Resources != null)
+        if (values.Resources != null!)
         {
             PdfDictionary resources;
             var res = page.Elements[InheritablePageKeys.Resources];
-            if (res is PdfReference)
+            if (res is PdfReference reference)
             {
-                resources = (PdfDictionary)((PdfReference)res).Value.Clone();
+                resources = (PdfDictionary)reference.Value.Clone();
                 resources.Document = page.Owner;
             }
             else
             {
-                resources = (PdfDictionary)res;
+                resources = (PdfDictionary)res!;
             }
 
-            if (resources == null)
+            if (resources == null!)
             {
                 resources = values.Resources.Clone();
                 resources.Document = page.Owner;
@@ -752,23 +728,23 @@ public sealed class PdfPage
                             item = item.Clone();
                         }
 
-                        resources.Elements.Add (name.ToString(), item);
+                        resources.Elements.Add (name.ToString(), item!);
                     }
                 }
             }
         }
 
-        if (values.MediaBox != null && page.Elements[InheritablePageKeys.MediaBox] == null)
+        if (values.MediaBox != null! && page.Elements[InheritablePageKeys.MediaBox] == null)
         {
             page.Elements[InheritablePageKeys.MediaBox] = values.MediaBox;
         }
 
-        if (values.CropBox != null && page.Elements[InheritablePageKeys.CropBox] == null)
+        if (values.CropBox != null! && page.Elements[InheritablePageKeys.CropBox] == null)
         {
             page.Elements[InheritablePageKeys.CropBox] = values.CropBox;
         }
 
-        if (values.Rotate != null && page.Elements[InheritablePageKeys.Rotate] == null)
+        if (values.Rotate != null! && page.Elements[InheritablePageKeys.Rotate] == null)
         {
             page.Elements[InheritablePageKeys.Rotate] = values.Rotate;
         }
@@ -782,8 +758,7 @@ public sealed class PdfPage
         var item = page.Elements[InheritablePageKeys.Resources];
         if (item != null)
         {
-            var reference = item as PdfReference;
-            if (reference != null)
+            if (item is PdfReference reference)
             {
                 values.Resources = (PdfDictionary)(reference.Value);
             }
@@ -808,9 +783,9 @@ public sealed class PdfPage
         item = page.Elements[InheritablePageKeys.Rotate];
         if (item != null)
         {
-            if (item is PdfReference)
+            if (item is PdfReference reference)
             {
-                item = ((PdfReference)item).Value;
+                item = reference.Value;
             }
 
             values.Rotate = (PdfInteger)item;
@@ -819,7 +794,7 @@ public sealed class PdfPage
 
     internal override void PrepareForSave()
     {
-        if (_trimMargins.AreSet)
+        if (_trimMargins!.AreSet)
         {
             // These are the values InDesign set for an A4 page with 3mm crop margin at each edge.
             // (recall that PDF rect are two points and NOT a point and a width)
@@ -1047,9 +1022,9 @@ public sealed class PdfPage
         /// <summary>
         /// Gets the KeysMeta for these keys.
         /// </summary>
-        internal static DictionaryMeta Meta => _meta ?? (_meta = CreateMeta (typeof (Keys)));
+        internal static DictionaryMeta Meta => _meta ??= CreateMeta (typeof (Keys));
 
-        static DictionaryMeta _meta;
+        static DictionaryMeta? _meta;
     }
 
     /// <summary>

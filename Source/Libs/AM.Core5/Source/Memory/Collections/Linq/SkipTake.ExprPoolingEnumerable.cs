@@ -111,7 +111,7 @@ internal sealed class SkipTakeExprPoolingEnumerable<T>
             _source!.Reset();
         }
 
-        object IPoolingEnumerator.Current => Current;
+        object IPoolingEnumerator.Current => Current!;
 
         public T Current => _source!.Current;
 

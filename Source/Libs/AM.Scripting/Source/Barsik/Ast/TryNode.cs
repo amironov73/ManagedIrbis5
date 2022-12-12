@@ -40,7 +40,7 @@ internal sealed class TryNode
         )
         : base (position)
     {
-        Sure.NotNull ((object?) tryBlock);
+        Sure.NotNull (tryBlock);
 
         _tryBlock = new (tryBlock);
         _catchBlock = new ();

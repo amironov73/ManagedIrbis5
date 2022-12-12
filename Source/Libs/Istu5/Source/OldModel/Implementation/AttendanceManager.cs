@@ -92,7 +92,7 @@ public sealed class AttendanceManager
             IEnumerable<Attendance> attendances
         )
     {
-        Sure.NotNull ((object?) attendances);
+        Sure.NotNull (attendances);
 
         var database = _GetDb();
         database.BulkCopy (attendances);

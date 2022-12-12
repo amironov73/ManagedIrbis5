@@ -38,12 +38,12 @@ namespace AM.Collections;
 /// If equal items can be distinguished, this may be noticable. For example, if a case-insensitive
 /// comparer is used with a Bag&lt;string&gt;, and both "hello", and "HELLO" are added to the bag, then the
 /// bag will appear to contain two copies of "hello" (the representative item).</p>
-/// <p><see cref="OrderedBag&lt;T&gt;"/> is similar, but uses comparison instead of hashing, maintain
+/// <p>OrderedBag&lt;T&gt; is similar, but uses comparison instead of hashing, maintain
 /// the items in sorted order, and stores distinct copies of items that compare equal.</p>
 ///</remarks>
-///<seealso cref="OrderedBag&lt;T&gt;"/>
 [Serializable]
-public class Bag<T> : CollectionBase<T>, ICloneable
+public class Bag<T>
+    : CollectionBase<T>, ICloneable
 {
     // The comparer used to compare KeyValuePairs. Equals and GetHashCode are used.
     private readonly IEqualityComparer<KeyValuePair<T, int>> equalityComparer;

@@ -64,7 +64,7 @@ public sealed class PngByteQRCode
     public byte[] GetGraphic(int pixelsPerModule, bool drawQuietZones = true)
     {
         using var png = new PngBuilder();
-        var size = (QrCodeData.ModuleMatrix.Count - (drawQuietZones ? 0 : 8)) * pixelsPerModule;
+        var size = (QrCodeData!.ModuleMatrix!.Count - (drawQuietZones ? 0 : 8)) * pixelsPerModule;
         png.WriteHeader(size, size, 1, PngBuilder.ColorType.Greyscale);
         png.WriteScanlines(DrawScanlines(pixelsPerModule, drawQuietZones));
         png.WriteEnd();
@@ -78,7 +78,7 @@ public sealed class PngByteQRCode
     public byte[] GetGraphic(int pixelsPerModule, byte[] darkColorRgba, byte[] lightColorRgba, bool drawQuietZones = true)
     {
         using var png = new PngBuilder();
-        var size = (QrCodeData.ModuleMatrix.Count - (drawQuietZones ? 0 : 8)) * pixelsPerModule;
+        var size = (QrCodeData!.ModuleMatrix!.Count - (drawQuietZones ? 0 : 8)) * pixelsPerModule;
         png.WriteHeader(size, size, 1, PngBuilder.ColorType.Indexed);
         png.WritePalette(darkColorRgba, lightColorRgba);
         png.WriteScanlines(DrawScanlines(pixelsPerModule, drawQuietZones));
@@ -92,8 +92,8 @@ public sealed class PngByteQRCode
     /// </summary>
     private byte[] DrawScanlines(int pixelsPerModule, bool drawQuietZones)
     {
-        var moduleMatrix = QrCodeData.ModuleMatrix;
-        var matrixSize = moduleMatrix.Count - (drawQuietZones ? 0 : 8);
+        var moduleMatrix = QrCodeData!.ModuleMatrix;
+        var matrixSize = moduleMatrix!.Count - (drawQuietZones ? 0 : 8);
         var quietZoneOffset = (drawQuietZones ? 0 : 4);
         var bytesPerScanline = (matrixSize * pixelsPerModule + 7) / 8 + 1; // A monochrome scanline is one byte for filter type then one bit per pixel.
         var scanlines = new byte[bytesPerScanline * matrixSize * pixelsPerModule];

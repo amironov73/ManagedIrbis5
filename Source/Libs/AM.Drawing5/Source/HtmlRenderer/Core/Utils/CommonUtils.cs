@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
 
 /* CommonUtils.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -94,7 +95,7 @@ internal static class CommonUtils
     /// <summary>
     /// the temp path to use for local files
     /// </summary>
-    public static string _tempPath;
+    public static string? _tempPath;
 
     #endregion
 
@@ -233,13 +234,13 @@ internal static class CommonUtils
     /// </summary>
     /// <param name="client">the web client to get the response content type from</param>
     /// <returns>response content type or null</returns>
-    public static string GetResponseContentType (WebClient client)
+    public static string? GetResponseContentType (WebClient client)
     {
-        foreach (string header in client.ResponseHeaders)
+        foreach (string header in client.ResponseHeaders!)
         {
             if (header.Equals ("Content-Type", StringComparison.InvariantCultureIgnoreCase))
             {
-                return client.ResponseHeaders[header];
+                return client.ResponseHeaders[header]!;
             }
         }
 
@@ -251,7 +252,7 @@ internal static class CommonUtils
     /// </summary>
     /// <param name="imageUri">The online image uri.</param>
     /// <returns>The path of the file on the disk.</returns>
-    public static FileInfo GetLocalfileName (Uri imageUri)
+    public static FileInfo? GetLocalfileName (Uri imageUri)
     {
         var fileNameBuilder = new StringBuilder();
         var absoluteUri = imageUri.AbsoluteUri;

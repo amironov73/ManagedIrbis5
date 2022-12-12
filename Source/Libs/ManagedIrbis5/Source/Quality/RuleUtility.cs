@@ -123,7 +123,7 @@ public static class RuleUtility
             string? oneSpec
         )
     {
-        Sure.NotNull ((object?) fields);
+        Sure.NotNull (fields);
 
         if (string.IsNullOrEmpty (oneSpec))
         {
@@ -151,7 +151,7 @@ public static class RuleUtility
             string allSpec
         )
     {
-        Sure.NotNull ((object?) fields);
+        Sure.NotNull (fields);
 
         var result = new List<Field>();
         var parts = allSpec.Split
@@ -181,7 +181,7 @@ public static class RuleUtility
             string? allSpec
         )
     {
-        Sure.NotNull ((object?) fields);
+        Sure.NotNull (fields);
 
         /*
 
@@ -295,7 +295,7 @@ public static class RuleUtility
         )
     {
         Sure.NotNull (record);
-        Sure.NotNull ((object?) fields);
+        Sure.NotNull (fields);
 
         var seen = new List<int>();
 

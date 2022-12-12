@@ -42,7 +42,7 @@ internal sealed class WithNode
         : base (startPosition)
     {
         Sure.NotNull (center);
-        Sure.NotNull ((object?) statements);
+        Sure.NotNull (statements);
 
         _center = center;
         _statements = new List<StatementNode> (statements);

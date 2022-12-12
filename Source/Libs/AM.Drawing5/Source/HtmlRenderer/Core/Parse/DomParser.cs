@@ -44,9 +44,9 @@ internal sealed class DomParser
     /// <summary>
     /// Init.
     /// </summary>
-    public DomParser(CssParser cssParser)
+    public DomParser (CssParser cssParser)
     {
-        ArgChecker.AssertArgNotNull(cssParser, "cssParser");
+        ArgChecker.AssertArgNotNull (cssParser, "cssParser");
 
         _cssParser = cssParser;
     }
@@ -58,33 +58,34 @@ internal sealed class DomParser
     /// <param name="htmlContainer">the html container to use for reference resolve</param>
     /// <param name="cssData">the css data to use</param>
     /// <returns>the root of the generated tree</returns>
-    public CssBox GenerateCssTree(string html, HtmlContainerInt htmlContainer, ref CssData cssData)
+    public CssBox? GenerateCssTree (string html, HtmlContainerInt htmlContainer, ref CssData cssData)
     {
-        var root = HtmlParser.ParseDocument(html);
+        var root = HtmlParser.ParseDocument (html);
         if (root != null)
         {
             root.HtmlContainer = htmlContainer;
 
-            bool cssDataChanged = false;
-            CascadeParseStyles(root, htmlContainer, ref cssData, ref cssDataChanged);
+            var cssDataChanged = false;
+            CascadeParseStyles (root, htmlContainer, ref cssData, ref cssDataChanged);
 
-            CascadeApplyStyles(root, cssData);
+            CascadeApplyStyles (root, cssData);
 
-            SetTextSelectionStyle(htmlContainer, cssData);
+            SetTextSelectionStyle (htmlContainer, cssData);
 
-            CorrectTextBoxes(root);
+            CorrectTextBoxes (root);
 
-            CorrectImgBoxes(root);
+            CorrectImgBoxes (root);
 
-            bool followingBlock = true;
-            CorrectLineBreaksBlocks(root, ref followingBlock);
+            var followingBlock = true;
+            CorrectLineBreaksBlocks (root, ref followingBlock);
 
-            CorrectInlineBoxesParent(root);
+            CorrectInlineBoxesParent (root);
 
-            CorrectBlockInsideInline(root);
+            CorrectBlockInsideInline (root);
 
-            CorrectInlineBoxesParent(root);
+            CorrectInlineBoxesParent (root);
         }
+
         return root;
     }
 
@@ -100,36 +101,40 @@ internal sealed class DomParser
     /// <param name="htmlContainer">the html container to use for reference resolve</param>
     /// <param name="cssData">the style data to fill with found styles</param>
     /// <param name="cssDataChanged">check if the css data has been modified by the handled html not to change the base css data</param>
-    private void CascadeParseStyles(CssBox box, HtmlContainerInt htmlContainer, ref CssData cssData, ref bool cssDataChanged)
+    private void CascadeParseStyles (CssBox box, HtmlContainerInt htmlContainer, ref CssData cssData,
+        ref bool cssDataChanged)
     {
         if (box.HtmlTag != null)
         {
             // Check for the <link rel=stylesheet> tag
-            if (box.HtmlTag.Name.Equals("link", StringComparison.CurrentCultureIgnoreCase) &&
-                box.GetAttribute("rel", string.Empty).Equals("stylesheet", StringComparison.CurrentCultureIgnoreCase))
+            if (box.HtmlTag.Name.Equals ("link", StringComparison.CurrentCultureIgnoreCase) &&
+                box.GetAttribute ("rel", string.Empty)!.Equals ("stylesheet", StringComparison.CurrentCultureIgnoreCase))
             {
-                CloneCssData(ref cssData, ref cssDataChanged);
-                string stylesheet;
-                CssData stylesheetData;
-                StylesheetLoadHandler.LoadStylesheet(htmlContainer, box.GetAttribute("href", string.Empty), box.HtmlTag.Attributes, out stylesheet, out stylesheetData);
+                CloneCssData (ref cssData, ref cssDataChanged);
+                StylesheetLoadHandler.LoadStylesheet (htmlContainer, box.GetAttribute ("href", string.Empty)!,
+                    box.HtmlTag.Attributes!, out var stylesheet, out var stylesheetData);
                 if (stylesheet != null)
-                    _cssParser.ParseStyleSheet(cssData, stylesheet);
+                {
+                    _cssParser.ParseStyleSheet (cssData, stylesheet);
+                }
                 else if (stylesheetData != null)
-                    cssData.Combine(stylesheetData);
+                {
+                    cssData.Combine (stylesheetData);
+                }
             }
 
             // Check for the <style> tag
-            if (box.HtmlTag.Name.Equals("style", StringComparison.CurrentCultureIgnoreCase) && box.Boxes.Count > 0)
+            if (box.HtmlTag.Name.Equals ("style", StringComparison.CurrentCultureIgnoreCase) && box.Boxes.Count > 0)
             {
-                CloneCssData(ref cssData, ref cssDataChanged);
+                CloneCssData (ref cssData, ref cssDataChanged);
                 foreach (var child in box.Boxes)
-                    _cssParser.ParseStyleSheet(cssData, child.Text.CutSubstring());
+                    _cssParser.ParseStyleSheet (cssData, child.Text!.CutSubstring());
             }
         }
 
         foreach (var childBox in box.Boxes)
         {
-            CascadeParseStyles(childBox, htmlContainer, ref cssData, ref cssDataChanged);
+            CascadeParseStyles (childBox, htmlContainer, ref cssData, ref cssDataChanged);
         }
     }
 
@@ -142,39 +147,41 @@ internal sealed class DomParser
     /// </summary>
     /// <param name="box">the box to apply the style to</param>
     /// <param name="cssData">the style data for the html</param>
-    private void CascadeApplyStyles(CssBox box, CssData cssData)
+    private void CascadeApplyStyles (CssBox box, CssData cssData)
     {
         box.InheritStyle();
 
         if (box.HtmlTag != null)
         {
             // try assign style using all wildcard
-            AssignCssBlocks(box, cssData, "*");
+            AssignCssBlocks (box, cssData, "*");
 
             // try assign style using the html element tag
-            AssignCssBlocks(box, cssData, box.HtmlTag.Name);
+            AssignCssBlocks (box, cssData, box.HtmlTag.Name);
 
             // try assign style using the "class" attribute of the html element
-            if (box.HtmlTag.HasAttribute("class"))
+            if (box.HtmlTag.HasAttribute ("class"))
             {
-                AssignClassCssBlocks(box, cssData);
+                AssignClassCssBlocks (box, cssData);
             }
 
             // try assign style using the "id" attribute of the html element
-            if (box.HtmlTag.HasAttribute("id"))
+            if (box.HtmlTag.HasAttribute ("id"))
             {
-                var id = box.HtmlTag.TryGetAttribute("id");
-                AssignCssBlocks(box, cssData, "#" + id);
+                var id = box.HtmlTag.TryGetAttribute ("id");
+                AssignCssBlocks (box, cssData, "#" + id);
             }
 
-            TranslateAttributes(box.HtmlTag, box);
+            TranslateAttributes (box.HtmlTag, box);
 
             // Check for the style="" attribute
-            if (box.HtmlTag.HasAttribute("style"))
+            if (box.HtmlTag.HasAttribute ("style"))
             {
-                var block = _cssParser.ParseCssBlock(box.HtmlTag.Name, box.HtmlTag.TryGetAttribute("style"));
-                if (block != null)
-                    AssignCssBlock(box, block);
+                var block = _cssParser.ParseCssBlock (box.HtmlTag.Name, box.HtmlTag.TryGetAttribute ("style")!);
+                if (block != null!)
+                {
+                    AssignCssBlock (box, block);
+                }
             }
         }
 
@@ -188,7 +195,7 @@ internal sealed class DomParser
 
         foreach (var childBox in box.Boxes)
         {
-            CascadeApplyStyles(childBox, cssData);
+            CascadeApplyStyles (childBox, cssData);
         }
     }
 
@@ -197,20 +204,25 @@ internal sealed class DomParser
     /// </summary>
     /// <param name="htmlContainer"> </param>
     /// <param name="cssData">the style data</param>
-    private void SetTextSelectionStyle(HtmlContainerInt htmlContainer, CssData cssData)
+    private void SetTextSelectionStyle (HtmlContainerInt htmlContainer, CssData cssData)
     {
         htmlContainer.SelectionForeColor = RColor.Empty;
         htmlContainer.SelectionBackColor = RColor.Empty;
 
-        if (cssData.ContainsCssBlock("::selection"))
+        if (cssData.ContainsCssBlock ("::selection"))
         {
-            var blocks = cssData.GetCssBlock("::selection");
+            var blocks = cssData.GetCssBlock ("::selection");
             foreach (var block in blocks)
             {
-                if (block.Properties.ContainsKey("color"))
-                    htmlContainer.SelectionForeColor = _cssParser.ParseColor(block.Properties["color"]);
-                if (block.Properties.ContainsKey("background-color"))
-                    htmlContainer.SelectionBackColor = _cssParser.ParseColor(block.Properties["background-color"]);
+                if (block.Properties!.ContainsKey ("color"))
+                {
+                    htmlContainer.SelectionForeColor = _cssParser.ParseColor (block.Properties["color"]);
+                }
+
+                if (block.Properties.ContainsKey ("background-color"))
+                {
+                    htmlContainer.SelectionBackColor = _cssParser.ParseColor (block.Properties["background-color"]);
+                }
             }
         }
     }
@@ -221,26 +233,30 @@ internal sealed class DomParser
     /// </summary>
     /// <param name="box">the css box to assign css to</param>
     /// <param name="cssData">the css data to use to get the matching css blocks</param>
-    private static void AssignClassCssBlocks(CssBox box, CssData cssData)
+    private static void AssignClassCssBlocks (CssBox box, CssData cssData)
     {
-        var classes = box.HtmlTag.TryGetAttribute("class");
+        var classes = box.HtmlTag!.TryGetAttribute ("class");
 
         var startIdx = 0;
-        while (startIdx < classes.Length)
+        while (startIdx < classes!.Length)
         {
             while (startIdx < classes.Length && classes[startIdx] == ' ')
+            {
                 startIdx++;
+            }
 
             if (startIdx < classes.Length)
             {
-                var endIdx = classes.IndexOf(' ', startIdx);
+                var endIdx = classes.IndexOf (' ', startIdx);
 
                 if (endIdx < 0)
+                {
                     endIdx = classes.Length;
+                }
 
-                var cls = "." + classes.Substring(startIdx, endIdx - startIdx);
-                AssignCssBlocks(box, cssData, cls);
-                AssignCssBlocks(box, cssData, box.HtmlTag.Name + cls);
+                var cls = "." + classes.Substring (startIdx, endIdx - startIdx);
+                AssignCssBlocks (box, cssData, cls);
+                AssignCssBlocks (box, cssData, box.HtmlTag.Name + cls);
 
                 startIdx = endIdx + 1;
             }
@@ -253,14 +269,14 @@ internal sealed class DomParser
     /// <param name="box">the css box to assign css to</param>
     /// <param name="cssData">the css data to use to get the matching css blocks</param>
     /// <param name="className">the class selector to search for css blocks</param>
-    private static void AssignCssBlocks(CssBox box, CssData cssData, string className)
+    private static void AssignCssBlocks (CssBox box, CssData cssData, string className)
     {
-        var blocks = cssData.GetCssBlock(className);
+        var blocks = cssData.GetCssBlock (className);
         foreach (var block in blocks)
         {
-            if (IsBlockAssignableToBox(box, block))
+            if (IsBlockAssignableToBox (box, block))
             {
-                AssignCssBlock(box, block);
+                AssignCssBlock (box, block);
             }
         }
     }
@@ -273,21 +289,22 @@ internal sealed class DomParser
     /// <param name="box">the box to check assign to</param>
     /// <param name="block">the block to check assign of</param>
     /// <returns>true - the block is assignable to the box, false - otherwise</returns>
-    private static bool IsBlockAssignableToBox(CssBox box, CssBlock block)
+    private static bool IsBlockAssignableToBox (CssBox box, CssBlock block)
     {
-        bool assignable = true;
+        var assignable = true;
         if (block.Selectors != null)
         {
-            assignable = IsBlockAssignableToBoxWithSelector(box, block);
+            assignable = IsBlockAssignableToBoxWithSelector (box, block);
         }
-        else if (box.HtmlTag.Name.Equals("a", StringComparison.OrdinalIgnoreCase) && block.ClassName.Equals("a", StringComparison.OrdinalIgnoreCase) && !box.HtmlTag.HasAttribute("href"))
+        else if (box.HtmlTag!.Name.Equals ("a", StringComparison.OrdinalIgnoreCase) &&
+                 block.ClassName!.Equals ("a", StringComparison.OrdinalIgnoreCase) && !box.HtmlTag.HasAttribute ("href"))
         {
             assignable = false;
         }
 
         if (assignable && block.Hover)
         {
-            box.HtmlContainer.AddHoverBox(box, block);
+            box.HtmlContainer!.AddHoverBox (box, block);
             assignable = false;
         }
 
@@ -300,41 +317,56 @@ internal sealed class DomParser
     /// <param name="box">the box to check assign to</param>
     /// <param name="block">the block to check assign of</param>
     /// <returns>true - the block is assignable to the box, false - otherwise</returns>
-    private static bool IsBlockAssignableToBoxWithSelector(CssBox box, CssBlock block)
+    private static bool IsBlockAssignableToBoxWithSelector (CssBox box, CssBlock block)
     {
-        foreach (var selector in block.Selectors)
+        foreach (var selector in block.Selectors!)
         {
-            bool matched = false;
+            var matched = false;
             while (!matched)
             {
-                box = box.ParentBox;
-                while (box != null && box.HtmlTag == null)
-                    box = box.ParentBox;
-
-                if (box == null)
-                    return false;
-
-                if (box.HtmlTag.Name.Equals(selector.ClassName, StringComparison.InvariantCultureIgnoreCase))
-                    matched = true;
-
-                if (!matched && box.HtmlTag.HasAttribute("class"))
+                box = box.ParentBox!;
+                while (box is { HtmlTag: null })
                 {
-                    var className = box.HtmlTag.TryGetAttribute("class");
-                    if (selector.ClassName.Equals("." + className, StringComparison.InvariantCultureIgnoreCase) || selector.ClassName.Equals(box.HtmlTag.Name + "." + className, StringComparison.InvariantCultureIgnoreCase))
-                        matched = true;
+                    box = box.ParentBox!;
                 }
 
-                if (!matched && box.HtmlTag.HasAttribute("id"))
+                if (box == null!)
                 {
-                    var id = box.HtmlTag.TryGetAttribute("id");
-                    if (selector.ClassName.Equals("#" + id, StringComparison.InvariantCultureIgnoreCase))
+                    return false;
+                }
+
+                if (box.HtmlTag.Name.Equals (selector.ClassName, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    matched = true;
+                }
+
+                if (!matched && box.HtmlTag.HasAttribute ("class"))
+                {
+                    var className = box.HtmlTag.TryGetAttribute ("class");
+                    if (selector.ClassName.Equals ("." + className, StringComparison.InvariantCultureIgnoreCase) ||
+                        selector.ClassName.Equals (box.HtmlTag.Name + "." + className,
+                            StringComparison.InvariantCultureIgnoreCase))
+                    {
                         matched = true;
+                    }
+                }
+
+                if (!matched && box.HtmlTag.HasAttribute ("id"))
+                {
+                    var id = box.HtmlTag.TryGetAttribute ("id");
+                    if (selector.ClassName.Equals ("#" + id, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        matched = true;
+                    }
                 }
 
                 if (!matched && selector.DirectParent)
+                {
                     return false;
+                }
             }
         }
+
         return true;
     }
 
@@ -343,18 +375,19 @@ internal sealed class DomParser
     /// </summary>
     /// <param name="box">the css box to assign css to</param>
     /// <param name="block">the css block to assign</param>
-    private static void AssignCssBlock(CssBox box, CssBlock block)
+    private static void AssignCssBlock (CssBox box, CssBlock block)
     {
-        foreach (var prop in block.Properties)
+        foreach (var prop in block.Properties!)
         {
             var value = prop.Value;
             if (prop.Value == CssConstants.Inherit && box.ParentBox != null)
             {
-                value = CssUtils.GetPropertyValue(box.ParentBox, prop.Key);
+                value = CssUtils.GetPropertyValue (box.ParentBox, prop.Key);
             }
-            if (IsStyleOnElementAllowed(box, prop.Key, value))
+
+            if (IsStyleOnElementAllowed (box, prop.Key, value!))
             {
-                CssUtils.SetPropertyValue(box, prop.Key, value);
+                CssUtils.SetPropertyValue (box, prop.Key, value!);
             }
         }
     }
@@ -367,7 +400,7 @@ internal sealed class DomParser
     /// <param name="key">the style key to cehck</param>
     /// <param name="value">the style value to check</param>
     /// <returns>true - style allowed, false - not allowed</returns>
-    private static bool IsStyleOnElementAllowed(CssBox box, string key, string value)
+    private static bool IsStyleOnElementAllowed (CssBox box, string key, string value)
     {
         if (box.HtmlTag != null && key == HtmlConstants.Display)
         {
@@ -394,6 +427,7 @@ internal sealed class DomParser
                     return value == CssConstants.TableCaption;
             }
         }
+
         return true;
     }
 
@@ -401,7 +435,7 @@ internal sealed class DomParser
     /// Clone css data if it has not already been cloned.<br/>
     /// Used to preserve the base css data used when changed by style inside html.
     /// </summary>
-    private static void CloneCssData(ref CssData cssData, ref bool cssDataChanged)
+    private static void CloneCssData (ref CssData cssData, ref bool cssDataChanged)
     {
         if (!cssDataChanged)
         {
@@ -415,21 +449,27 @@ internal sealed class DomParser
     /// </summary>
     /// <param name="tag"></param>
     /// <param name="box"></param>
-    private void TranslateAttributes(HtmlTag tag, CssBox box)
+    private void TranslateAttributes (HtmlTag tag, CssBox box)
     {
         if (tag.HasAttributes())
         {
-            foreach (string att in tag.Attributes.Keys)
+            foreach (var att in tag.Attributes!.Keys)
             {
-                string value = tag.Attributes[att];
+                var value = tag.Attributes[att];
 
                 switch (att)
                 {
                     case HtmlConstants.Align:
-                        if (value == HtmlConstants.Left || value == HtmlConstants.Center || value == HtmlConstants.Right || value == HtmlConstants.Justify)
+                        if (value == HtmlConstants.Left || value == HtmlConstants.Center ||
+                            value == HtmlConstants.Right || value == HtmlConstants.Justify)
+                        {
                             box.TextAlign = value.ToLower();
+                        }
                         else
+                        {
                             box.VerticalAlign = value.ToLower();
+                        }
+
                         break;
                     case HtmlConstants.Background:
                         box.BackgroundImage = value.ToLower();
@@ -438,28 +478,38 @@ internal sealed class DomParser
                         box.BackgroundColor = value.ToLower();
                         break;
                     case HtmlConstants.Border:
-                        if (!string.IsNullOrEmpty(value) && value != "0")
-                            box.BorderLeftStyle = box.BorderTopStyle = box.BorderRightStyle = box.BorderBottomStyle = CssConstants.Solid;
-                        box.BorderLeftWidth = box.BorderTopWidth = box.BorderRightWidth = box.BorderBottomWidth = TranslateLength(value);
+                        if (!string.IsNullOrEmpty (value) && value != "0")
+                        {
+                            box.BorderLeftStyle = box.BorderTopStyle =
+                                box.BorderRightStyle = box.BorderBottomStyle = CssConstants.Solid;
+                        }
+
+                        box.BorderLeftWidth = box.BorderTopWidth =
+                            box.BorderRightWidth = box.BorderBottomWidth = TranslateLength (value);
 
                         if (tag.Name == HtmlConstants.Table)
                         {
                             if (value != "0")
-                                ApplyTableBorder(box, "1px");
+                            {
+                                ApplyTableBorder (box, "1px");
+                            }
                         }
                         else
                         {
-                            box.BorderTopStyle = box.BorderLeftStyle = box.BorderRightStyle = box.BorderBottomStyle = CssConstants.Solid;
+                            box.BorderTopStyle = box.BorderLeftStyle =
+                                box.BorderRightStyle = box.BorderBottomStyle = CssConstants.Solid;
                         }
+
                         break;
                     case HtmlConstants.BorderColor:
-                        box.BorderLeftColor = box.BorderTopColor = box.BorderRightColor = box.BorderBottomColor = value.ToLower();
+                        box.BorderLeftColor = box.BorderTopColor =
+                            box.BorderRightColor = box.BorderBottomColor = value.ToLower();
                         break;
                     case HtmlConstants.CellSpacing:
-                        box.BorderSpacing = TranslateLength(value);
+                        box.BorderSpacing = TranslateLength (value);
                         break;
                     case HtmlConstants.CellPadding:
-                        ApplyTablePadding(box, value);
+                        ApplyTablePadding (box, value);
                         break;
                     case HtmlConstants.Color:
                         box.Color = value.ToLower();
@@ -468,31 +518,36 @@ internal sealed class DomParser
                         box.Direction = value.ToLower();
                         break;
                     case HtmlConstants.Face:
-                        box.FontFamily = _cssParser.ParseFontFamily(value);
+                        box.FontFamily = _cssParser.ParseFontFamily (value);
                         break;
                     case HtmlConstants.Height:
-                        box.Height = TranslateLength(value);
+                        box.Height = TranslateLength (value);
                         break;
                     case HtmlConstants.Hspace:
-                        box.MarginRight = box.MarginLeft = TranslateLength(value);
+                        box.MarginRight = box.MarginLeft = TranslateLength (value);
                         break;
                     case HtmlConstants.Nowrap:
                         box.WhiteSpace = CssConstants.NoWrap;
                         break;
                     case HtmlConstants.Size:
-                        if (tag.Name.Equals(HtmlConstants.Hr, StringComparison.OrdinalIgnoreCase))
-                            box.Height = TranslateLength(value);
-                        else if (tag.Name.Equals(HtmlConstants.Font, StringComparison.OrdinalIgnoreCase))
+                        if (tag.Name.Equals (HtmlConstants.Hr, StringComparison.OrdinalIgnoreCase))
+                        {
+                            box.Height = TranslateLength (value);
+                        }
+                        else if (tag.Name.Equals (HtmlConstants.Font, StringComparison.OrdinalIgnoreCase))
+                        {
                             box.FontSize = value;
+                        }
+
                         break;
                     case HtmlConstants.Valign:
                         box.VerticalAlign = value.ToLower();
                         break;
                     case HtmlConstants.Vspace:
-                        box.MarginTop = box.MarginBottom = TranslateLength(value);
+                        box.MarginTop = box.MarginBottom = TranslateLength (value);
                         break;
                     case HtmlConstants.Width:
-                        box.Width = TranslateLength(value);
+                        box.Width = TranslateLength (value);
                         break;
                 }
             }
@@ -504,13 +559,13 @@ internal sealed class DomParser
     /// </summary>
     /// <param name="htmlLength"></param>
     /// <returns></returns>
-    private static string TranslateLength(string htmlLength)
+    private static string TranslateLength (string htmlLength)
     {
-        CssLength len = new CssLength(htmlLength);
+        var len = new CssLength (htmlLength);
 
         if (len.HasError)
         {
-            return string.Format(NumberFormatInfo.InvariantInfo, "{0}px", htmlLength);
+            return string.Format (NumberFormatInfo.InvariantInfo, "{0}px", htmlLength);
         }
 
         return htmlLength;
@@ -521,11 +576,12 @@ internal sealed class DomParser
     /// </summary>
     /// <param name="table"></param>
     /// <param name="border"></param>
-    private static void ApplyTableBorder(CssBox table, string border)
+    private static void ApplyTableBorder (CssBox table, string border)
     {
-        SetForAllCells(table, cell =>
+        SetForAllCells (table, cell =>
         {
-            cell.BorderLeftStyle = cell.BorderTopStyle = cell.BorderRightStyle = cell.BorderBottomStyle = CssConstants.Solid;
+            cell.BorderLeftStyle =
+                cell.BorderTopStyle = cell.BorderRightStyle = cell.BorderBottomStyle = CssConstants.Solid;
             cell.BorderLeftWidth = cell.BorderTopWidth = cell.BorderRightWidth = cell.BorderBottomWidth = border;
         });
     }
@@ -535,10 +591,11 @@ internal sealed class DomParser
     /// </summary>
     /// <param name="table"></param>
     /// <param name="padding"></param>
-    private static void ApplyTablePadding(CssBox table, string padding)
+    private static void ApplyTablePadding (CssBox table, string padding)
     {
-        var length = TranslateLength(padding);
-        SetForAllCells(table, cell => cell.PaddingLeft = cell.PaddingTop = cell.PaddingRight = cell.PaddingBottom = length);
+        var length = TranslateLength (padding);
+        SetForAllCells (table,
+            cell => cell.PaddingLeft = cell.PaddingTop = cell.PaddingRight = cell.PaddingBottom = length);
     }
 
     /// <summary>
@@ -547,21 +604,21 @@ internal sealed class DomParser
     /// </summary>
     /// <param name="table">the table element</param>
     /// <param name="action">the action to execute</param>
-    private static void SetForAllCells(CssBox table, ActionInt<CssBox> action)
+    private static void SetForAllCells (CssBox table, ActionInt<CssBox> action)
     {
         foreach (var l1 in table.Boxes)
         {
             foreach (var l2 in l1.Boxes)
             {
-                if (l2.HtmlTag != null && l2.HtmlTag.Name == "td")
+                if (l2.HtmlTag is { Name: "td" })
                 {
-                    action(l2);
+                    action (l2);
                 }
                 else
                 {
                     foreach (var l3 in l2.Boxes)
                     {
-                        action(l3);
+                        action (l3);
                     }
                 }
             }
@@ -574,9 +631,9 @@ internal sealed class DomParser
     /// the rendered html.
     /// </summary>
     /// <param name="box">the current box to correct its sub-tree</param>
-    private static void CorrectTextBoxes(CssBox box)
+    private static void CorrectTextBoxes (CssBox box)
     {
-        for (int i = box.Boxes.Count - 1; i >= 0; i--)
+        for (var i = box.Boxes.Count - 1; i >= 0; i--)
         {
             var childBox = box.Boxes[i];
             if (childBox.Text != null)
@@ -585,16 +642,20 @@ internal sealed class DomParser
                 var keepBox = !childBox.Text.IsEmptyOrWhitespace();
 
                 // is the box is pre-formatted
-                keepBox = keepBox || childBox.WhiteSpace == CssConstants.Pre || childBox.WhiteSpace == CssConstants.PreWrap;
+                keepBox = keepBox || childBox.WhiteSpace == CssConstants.Pre ||
+                          childBox.WhiteSpace == CssConstants.PreWrap;
 
                 // is the box is only one in the parent
                 keepBox = keepBox || box.Boxes.Count == 1;
 
                 // is it a whitespace between two inline boxes
-                keepBox = keepBox || (i > 0 && i < box.Boxes.Count - 1 && box.Boxes[i - 1].IsInline && box.Boxes[i + 1].IsInline);
+                keepBox = keepBox || (i > 0 && i < box.Boxes.Count - 1 && box.Boxes[i - 1].IsInline &&
+                                      box.Boxes[i + 1].IsInline);
 
                 // is first/last box where is in inline box and it's next/previous box is inline
-                keepBox = keepBox || (i == 0 && box.Boxes.Count > 1 && box.Boxes[1].IsInline && box.IsInline) || (i == box.Boxes.Count - 1 && box.Boxes.Count > 1 && box.Boxes[i - 1].IsInline && box.IsInline);
+                keepBox = keepBox || (i == 0 && box.Boxes.Count > 1 && box.Boxes[1].IsInline && box.IsInline) ||
+                          (i == box.Boxes.Count - 1 && box.Boxes.Count > 1 && box.Boxes[i - 1].IsInline &&
+                           box.IsInline);
 
                 if (keepBox)
                 {
@@ -604,13 +665,13 @@ internal sealed class DomParser
                 else
                 {
                     // remove text box that has no
-                    childBox.ParentBox.Boxes.RemoveAt(i);
+                    childBox.ParentBox!.Boxes.RemoveAt (i);
                 }
             }
             else
             {
                 // recursive
-                CorrectTextBoxes(childBox);
+                CorrectTextBoxes (childBox);
             }
         }
     }
@@ -619,21 +680,21 @@ internal sealed class DomParser
     /// Go over all image boxes and if its display style is set to block, put it inside another block but set the image to inline.
     /// </summary>
     /// <param name="box">the current box to correct its sub-tree</param>
-    private static void CorrectImgBoxes(CssBox box)
+    private static void CorrectImgBoxes (CssBox box)
     {
-        for (int i = box.Boxes.Count - 1; i >= 0; i--)
+        for (var i = box.Boxes.Count - 1; i >= 0; i--)
         {
             var childBox = box.Boxes[i];
             if (childBox is CssBoxImage && childBox.Display == CssConstants.Block)
             {
-                var block = CssBox.CreateBlock(childBox.ParentBox, null, childBox);
+                var block = CssBox.CreateBlock (childBox.ParentBox!, null, childBox);
                 childBox.ParentBox = block;
                 childBox.Display = CssConstants.Inline;
             }
             else
             {
                 // recursive
-                CorrectImgBoxes(childBox);
+                CorrectImgBoxes (childBox);
             }
         }
     }
@@ -646,21 +707,21 @@ internal sealed class DomParser
     /// <param name="box">the current box to correct its sub-tree</param>
     /// <param name="followingBlock">used to know if the br is following a box so it should create an empty line or not so it only
     /// move to a new line</param>
-    private static void CorrectLineBreaksBlocks(CssBox box, ref bool followingBlock)
+    private static void CorrectLineBreaksBlocks (CssBox box, ref bool followingBlock)
     {
         followingBlock = followingBlock || box.IsBlock;
         foreach (var childBox in box.Boxes)
         {
-            CorrectLineBreaksBlocks(childBox, ref followingBlock);
+            CorrectLineBreaksBlocks (childBox, ref followingBlock);
             followingBlock = childBox.Words.Count == 0 && (followingBlock || childBox.IsBlock);
         }
 
-        int lastBr = -1;
-        CssBox brBox;
+        var lastBr = -1;
+        CssBox? brBox;
         do
         {
             brBox = null;
-            for (int i = 0; i < box.Boxes.Count && brBox == null; i++)
+            for (var i = 0; i < box.Boxes.Count && brBox == null; i++)
             {
                 if (i > lastBr && box.Boxes[i].IsBrElement)
                 {
@@ -681,7 +742,9 @@ internal sealed class DomParser
             {
                 brBox.Display = CssConstants.Block;
                 if (followingBlock)
+                {
                     brBox.Height = ".95em"; // TODO:a check the height to min-height when it is supported
+                }
             }
         } while (brBox != null);
     }
@@ -691,37 +754,40 @@ internal sealed class DomParser
     /// Need to rearrange the tree so block box will be only the child of other block box.
     /// </summary>
     /// <param name="box">the current box to correct its sub-tree</param>
-    private static void CorrectBlockInsideInline(CssBox box)
+    private static void CorrectBlockInsideInline (CssBox box)
     {
         try
         {
-            if (DomUtils.ContainsInlinesOnly(box) && !ContainsInlinesOnlyDeep(box))
+            if (DomUtils.ContainsInlinesOnly (box) && !ContainsInlinesOnlyDeep (box))
             {
-                var tempRightBox = CorrectBlockInsideInlineImp(box);
+                var tempRightBox = CorrectBlockInsideInlineImp (box);
                 while (tempRightBox != null)
                 {
                     // loop on the created temp right box for the fixed box until no more need (optimization remove recursion)
-                    CssBox newTempRightBox = null;
-                    if (DomUtils.ContainsInlinesOnly(tempRightBox) && !ContainsInlinesOnlyDeep(tempRightBox))
-                        newTempRightBox = CorrectBlockInsideInlineImp(tempRightBox);
+                    CssBox? newTempRightBox = null;
+                    if (DomUtils.ContainsInlinesOnly (tempRightBox) && !ContainsInlinesOnlyDeep (tempRightBox))
+                    {
+                        newTempRightBox = CorrectBlockInsideInlineImp (tempRightBox);
+                    }
 
-                    tempRightBox.ParentBox.SetAllBoxes(tempRightBox);
+                    tempRightBox.ParentBox!.SetAllBoxes (tempRightBox);
                     tempRightBox.ParentBox = null;
                     tempRightBox = newTempRightBox;
                 }
             }
 
-            if (!DomUtils.ContainsInlinesOnly(box))
+            if (!DomUtils.ContainsInlinesOnly (box))
             {
                 foreach (var childBox in box.Boxes)
                 {
-                    CorrectBlockInsideInline(childBox);
+                    CorrectBlockInsideInline (childBox);
                 }
             }
         }
         catch (Exception ex)
         {
-            box.HtmlContainer.ReportError(HtmlRenderErrorType.HtmlParsing, "Failed in block inside inline box correction", ex);
+            box.HtmlContainer!.ReportError (HtmlRenderErrorType.HtmlParsing,
+                "Failed in block inside inline box correction", ex);
         }
     }
 
@@ -729,35 +795,44 @@ internal sealed class DomParser
     /// Rearrange the DOM of the box to have block box with boxes before the inner block box and after.
     /// </summary>
     /// <param name="box">the box that has the problem</param>
-    private static CssBox CorrectBlockInsideInlineImp(CssBox box)
+    private static CssBox? CorrectBlockInsideInlineImp (CssBox box)
     {
         if (box.Display == CssConstants.Inline)
+        {
             box.Display = CssConstants.Block;
+        }
 
         if (box.Boxes.Count > 1 || box.Boxes[0].Boxes.Count > 1)
         {
-            var leftBlock = CssBox.CreateBlock(box);
+            var leftBlock = CssBox.CreateBlock (box);
 
-            while (ContainsInlinesOnlyDeep(box.Boxes[0]))
+            while (ContainsInlinesOnlyDeep (box.Boxes[0]))
+            {
                 box.Boxes[0].ParentBox = leftBlock;
-            leftBlock.SetBeforeBox(box.Boxes[0]);
+            }
+
+            leftBlock.SetBeforeBox (box.Boxes[0]);
 
             var splitBox = box.Boxes[1];
             splitBox.ParentBox = null;
 
-            CorrectBlockSplitBadBox(box, splitBox, leftBlock);
+            CorrectBlockSplitBadBox (box, splitBox, leftBlock);
 
             // remove block that did not get any inner elements
             if (leftBlock.Boxes.Count < 1)
+            {
                 leftBlock.ParentBox = null;
+            }
 
-            int minBoxes = leftBlock.ParentBox != null ? 2 : 1;
+            var minBoxes = leftBlock.ParentBox != null ? 2 : 1;
             if (box.Boxes.Count > minBoxes)
             {
                 // create temp box to handle the tail elements and then get them back so no deep hierarchy is created
-                var tempRightBox = CssBox.CreateBox(box, null, box.Boxes[minBoxes]);
+                var tempRightBox = CssBox.CreateBox (box, null, box.Boxes[minBoxes]);
                 while (box.Boxes.Count > minBoxes + 1)
+                {
                     box.Boxes[minBoxes + 1].ParentBox = tempRightBox;
+                }
 
                 return tempRightBox;
             }
@@ -777,24 +852,25 @@ internal sealed class DomParser
     /// <param name="parentBox">the parent box that has the problem</param>
     /// <param name="badBox">the box to split into different boxes</param>
     /// <param name="leftBlock">the left block box that is created for the split</param>
-    private static void CorrectBlockSplitBadBox(CssBox parentBox, CssBox badBox, CssBox leftBlock)
+    private static void CorrectBlockSplitBadBox (CssBox parentBox, CssBox badBox, CssBox leftBlock)
     {
-        CssBox leftbox = null;
-        while (badBox.Boxes[0].IsInline && ContainsInlinesOnlyDeep(badBox.Boxes[0]))
+        CssBox? leftBox = null;
+        while (badBox.Boxes[0].IsInline && ContainsInlinesOnlyDeep (badBox.Boxes[0]))
         {
-            if (leftbox == null)
+            if (leftBox == null)
             {
                 // if there is no elements in the left box there is no reason to keep it
-                leftbox = CssBox.CreateBox(leftBlock, badBox.HtmlTag);
-                leftbox.InheritStyle(badBox, true);
+                leftBox = CssBox.CreateBox (leftBlock, badBox.HtmlTag);
+                leftBox.InheritStyle (badBox, true);
             }
-            badBox.Boxes[0].ParentBox = leftbox;
+
+            badBox.Boxes[0].ParentBox = leftBox;
         }
 
         var splitBox = badBox.Boxes[0];
-        if (!ContainsInlinesOnlyDeep(splitBox))
+        if (!ContainsInlinesOnlyDeep (splitBox))
         {
-            CorrectBlockSplitBadBox(parentBox, splitBox, leftBlock);
+            CorrectBlockSplitBadBox (parentBox, splitBox, leftBlock);
             splitBox.ParentBox = null;
         }
         else
@@ -807,27 +883,34 @@ internal sealed class DomParser
             CssBox rightBox;
             if (splitBox.ParentBox != null || parentBox.Boxes.Count < 3)
             {
-                rightBox = CssBox.CreateBox(parentBox, badBox.HtmlTag);
-                rightBox.InheritStyle(badBox, true);
+                rightBox = CssBox.CreateBox (parentBox, badBox.HtmlTag);
+                rightBox.InheritStyle (badBox, true);
 
                 if (parentBox.Boxes.Count > 2)
-                    rightBox.SetBeforeBox(parentBox.Boxes[1]);
+                {
+                    rightBox.SetBeforeBox (parentBox.Boxes[1]);
+                }
 
                 if (splitBox.ParentBox != null)
-                    splitBox.SetBeforeBox(rightBox);
+                {
+                    splitBox.SetBeforeBox (rightBox);
+                }
             }
             else
             {
                 rightBox = parentBox.Boxes[2];
             }
 
-            rightBox.SetAllBoxes(badBox);
+            rightBox.SetAllBoxes (badBox);
         }
         else if (splitBox.ParentBox != null && parentBox.Boxes.Count > 1)
         {
-            splitBox.SetBeforeBox(parentBox.Boxes[1]);
-            if (splitBox.HtmlTag != null && splitBox.HtmlTag.Name == "br" && (leftbox != null || leftBlock.Boxes.Count > 1))
+            splitBox.SetBeforeBox (parentBox.Boxes[1]);
+            if (splitBox.HtmlTag is { Name: "br" } &&
+                (leftBox != null || leftBlock.Boxes.Count > 1))
+            {
                 splitBox.Display = CssConstants.Inline;
+            }
         }
     }
 
@@ -838,28 +921,28 @@ internal sealed class DomParser
     /// only inline siblings.
     /// </summary>
     /// <param name="box">the current box to correct its sub-tree</param>
-    private static void CorrectInlineBoxesParent(CssBox box)
+    private static void CorrectInlineBoxesParent (CssBox box)
     {
-        if (ContainsVariantBoxes(box))
+        if (ContainsVariantBoxes (box))
         {
-            for (int i = 0; i < box.Boxes.Count; i++)
+            for (var i = 0; i < box.Boxes.Count; i++)
             {
                 if (box.Boxes[i].IsInline)
                 {
-                    var newbox = CssBox.CreateBlock(box, null, box.Boxes[i++]);
+                    var newBox = CssBox.CreateBlock (box, null, box.Boxes[i++]);
                     while (i < box.Boxes.Count && box.Boxes[i].IsInline)
                     {
-                        box.Boxes[i].ParentBox = newbox;
+                        box.Boxes[i].ParentBox = newBox;
                     }
                 }
             }
         }
 
-        if (!DomUtils.ContainsInlinesOnly(box))
+        if (!DomUtils.ContainsInlinesOnly (box))
         {
             foreach (var childBox in box.Boxes)
             {
-                CorrectInlineBoxesParent(childBox);
+                CorrectInlineBoxesParent (childBox);
             }
         }
     }
@@ -869,11 +952,11 @@ internal sealed class DomParser
     /// </summary>
     /// <param name="box">the box to check</param>
     /// <returns>true - only inline child boxes, false - otherwise</returns>
-    private static bool ContainsInlinesOnlyDeep(CssBox box)
+    private static bool ContainsInlinesOnlyDeep (CssBox box)
     {
         foreach (var childBox in box.Boxes)
         {
-            if (!childBox.IsInline || !ContainsInlinesOnlyDeep(childBox))
+            if (!childBox.IsInline || !ContainsInlinesOnlyDeep (childBox))
             {
                 return false;
             }
@@ -887,11 +970,11 @@ internal sealed class DomParser
     /// </summary>
     /// <param name="box">the box to check</param>
     /// <returns>true - has variant child boxes, false - otherwise</returns>
-    private static bool ContainsVariantBoxes(CssBox box)
+    private static bool ContainsVariantBoxes (CssBox box)
     {
-        bool hasBlock = false;
-        bool hasInline = false;
-        for (int i = 0; i < box.Boxes.Count && (!hasBlock || !hasInline); i++)
+        var hasBlock = false;
+        var hasInline = false;
+        for (var i = 0; i < box.Boxes.Count && (!hasBlock || !hasInline); i++)
         {
             var isBlock = !box.Boxes[i].IsInline;
             hasBlock = hasBlock || isBlock;

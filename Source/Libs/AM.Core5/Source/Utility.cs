@@ -6464,7 +6464,7 @@ public static class Utility
             IEnumerable<T> source
         )
     {
-        Sure.NotNull ((object?) source);
+        Sure.NotNull (source);
 
         return source switch
         {
@@ -6494,7 +6494,7 @@ public static class Utility
         )
         where TSource : struct
     {
-        Sure.NotNull ((object?) source);
+        Sure.NotNull (source);
 
         // Use `GetType() == typeof(...)` rather than `is` to avoid cast helpers.  This is measurably cheaper
         // but does mean we could end up missing some rare cases where we could get a span but don't (e.g. a uint[]

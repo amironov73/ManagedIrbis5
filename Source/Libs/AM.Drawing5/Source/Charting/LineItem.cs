@@ -31,13 +31,6 @@ public class LineItem
 {
     #region Fields
 
-    /// <summary>
-    /// Private field that stores a reference to the <see cref="Charting.Line"/>
-    /// class defined for this <see cref="LineItem"/>.  Use the public
-    /// property <see cref="Line"/> to access this value.
-    /// </summary>
-    protected Line _line;
-
     #endregion
 
     #region Properties
@@ -52,11 +45,7 @@ public class LineItem
     /// Gets or sets the <see cref="Charting.Line"/> class instance defined
     /// for this <see cref="LineItem"/>.
     /// </summary>
-    public Line Line
-    {
-        get { return _line; }
-        set { _line = value; }
-    }
+    public Line Line { get; set; }
 
     /// <inheritdoc cref="CurveItem.IsZIncluded"/>
     internal override bool IsZIncluded (GraphPane pane)
@@ -82,7 +71,7 @@ public class LineItem
         : base (label)
     {
         Symbol = new Symbol();
-        _line = new Line();
+        Line = new Line();
     }
 
     /// <summary>
@@ -168,14 +157,14 @@ public class LineItem
         )
         : base (label, points)
     {
-        _line = new Line (color);
+        Line = new Line (color);
         if (lineWidth == 0)
         {
-            _line.IsVisible = false;
+            Line.IsVisible = false;
         }
         else
         {
-            _line.Width = lineWidth;
+            Line.Width = lineWidth;
         }
 
         Symbol = new Symbol (symbolType, color);
@@ -216,7 +205,7 @@ public class LineItem
         : base (rhs)
     {
         Symbol = new Symbol (rhs.Symbol);
-        _line = new Line (rhs.Line);
+        Line = new Line (rhs.Line);
     }
 
     #endregion
@@ -261,8 +250,8 @@ public class LineItem
         // backwards compatible as new member variables are added to classes
         info.GetInt32 ("schema2").NotUsed();
 
-        Symbol = (Symbol)info.GetValue ("symbol", typeof (Symbol));
-        _line = (Line)info.GetValue ("line", typeof (Line));
+        Symbol = (Symbol)info.GetValue ("symbol", typeof (Symbol))!;
+        Line = (Line)info.GetValue ("line", typeof (Line))!;
     }
 
     /// <inheritdoc cref="ISerializable.GetObjectData"/>
@@ -275,7 +264,7 @@ public class LineItem
         base.GetObjectData (info, context);
         info.AddValue ("schema2", schema2);
         info.AddValue ("symbol", Symbol);
-        info.AddValue ("line", _line);
+        info.AddValue ("line", Line);
     }
 
     #endregion
@@ -316,9 +305,9 @@ public class LineItem
         //rect2.Y = yMid;
         //rect2.Height = rect.Height / 2.0f;
 
-        _line.Fill.Draw (graphics, rect);
+        Line.Fill.Draw (graphics, rect);
 
-        _line.DrawSegment (graphics, pane, rect.Left, yMid, rect.Right, yMid, scaleFactor);
+        Line.DrawSegment (graphics, pane, rect.Left, yMid, rect.Right, yMid, scaleFactor);
 
         // Draw a sample symbol to the left of the label text
         Symbol.DrawSymbol (graphics, pane, xMid, yMid, scaleFactor, false, null);
@@ -344,7 +333,7 @@ public class LineItem
     {
         coords = string.Empty;
 
-        if (i < 0 || i >= Points.Count)
+        if (i < 0 || i >= Points!.Count)
         {
             return false;
         }
@@ -355,15 +344,14 @@ public class LineItem
             return false;
         }
 
-        double x, y, z;
         var valueHandler = new ValueHandler (pane, false);
-        valueHandler.GetValues (this, i, out x, out z, out y);
+        valueHandler.GetValues (this, i, out var x, out _, out var y);
 
         var yAxis = GetYAxis (pane);
         var xAxis = GetXAxis (pane);
 
-        var pixPt = new PointF (xAxis.Scale.Transform (IsOverrideOrdinal, i, x),
-            yAxis.Scale.Transform (IsOverrideOrdinal, i, y));
+        var pixPt = new PointF (xAxis.Scale!.Transform (IsOverrideOrdinal, i, x),
+            yAxis.Scale!.Transform (IsOverrideOrdinal, i, y));
 
         if (!pane.Chart.Rect.Contains (pixPt))
         {

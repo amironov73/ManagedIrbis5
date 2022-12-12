@@ -71,6 +71,15 @@ public static class DawgParallelExtensions
 
     #region Public methods
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="enumerable"></param>
+    /// <param name="key"></param>
+    /// <param name="payload"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="TPayload"></typeparam>
+    /// <returns></returns>
     public static DawgContainer<TPayload> ToDawgParallel<T, TPayload>
         (
             this IEnumerable<T> enumerable,

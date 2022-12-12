@@ -91,7 +91,7 @@ internal class ExceptExprEnumerable<T> : IPoolingEnumerable<T>
 
         public void Reset() => _src.Reset();
 
-        object IPoolingEnumerator.Current => Current;
+        object IPoolingEnumerator.Current => Current!;
 
         public T Current => _src.Current;
 

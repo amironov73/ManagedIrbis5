@@ -354,7 +354,7 @@ public class OHLCBar
             var halfSize = GetBarWidth (pane, baseAxis, scaleFactor);
 
             using var pen = !curve.IsSelected
-                ? new Pen (_color, _width)
+                ? new Pen (_color, Width)
                 : new Pen (Selection.Border.Color, Selection.Border.Width);
 
             // Loop over each defined point
@@ -404,7 +404,7 @@ public class OHLCBar
                         pixClose = valueAxis.Scale.Transform (curve.IsOverrideOrdinal, i, close);
                     }
 
-                    if (!curve.IsSelected && _gradientFill.IsGradientValueType)
+                    if (!curve.IsSelected && GradientFill.IsGradientValueType)
                     {
                         using var tPen = GetPen (pane, scaleFactor, pt);
                         Draw

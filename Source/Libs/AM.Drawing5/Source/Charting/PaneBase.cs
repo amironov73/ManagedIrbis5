@@ -185,8 +185,8 @@ public abstract class PaneBase
     /// <seealso cref="ReSize"/>
     public RectangleF Rect
     {
-        get { return _rect; }
-        set { _rect = value; }
+        get => _rect;
+        set => _rect = value;
     }
 
     /// <summary>
@@ -240,8 +240,8 @@ public abstract class PaneBase
     /// <value>A reference to a <see cref="GraphObjList"/> collection object</value>
     public GraphObjList GraphObjList
     {
-        get { return _graphObjList; }
-        set { _graphObjList = value; }
+        get => _graphObjList;
+        set => _graphObjList = value;
     }
 
     /// <summary>
@@ -326,6 +326,8 @@ public abstract class PaneBase
             RectangleF paneRect
         )
     {
+        Tag = null!;
+
         _rect = paneRect;
 
         Legend = new Legend();
@@ -343,12 +345,10 @@ public abstract class PaneBase
         _title = new GapLabel (title, Default.FontFamily,
             Default.FontSize, Default.FontColor, Default.FontBold,
             Default.FontItalic, Default.FontUnderline);
-        _title.FontSpec.Fill.IsVisible = false;
+        _title.FontSpec!.Fill.IsVisible = false;
         _title.FontSpec.Border.IsVisible = false;
 
         _graphObjList = new GraphObjList();
-
-        Tag = null;
     }
 
     /// <summary>
@@ -438,9 +438,9 @@ public abstract class PaneBase
         // backwards compatible as new member variables are added to classes
         info.GetInt32 ("schema").NotUsed();
 
-        _rect = (RectangleF) info.GetValue ("rect", typeof (RectangleF));
-        Legend = (Legend) info.GetValue ("legend", typeof (Legend));
-        _title = (GapLabel) info.GetValue ("title", typeof (GapLabel));
+        _rect = (RectangleF) info.GetValue ("rect", typeof (RectangleF))!;
+        Legend = (Legend) info.GetValue ("legend", typeof (Legend))!;
+        _title = (GapLabel) info.GetValue ("title", typeof (GapLabel))!;
 
         //this.isShowTitle = info.GetBoolean( "isShowTitle" );
         IsFontsScaled = info.GetBoolean ("isFontsScaled");
@@ -448,13 +448,13 @@ public abstract class PaneBase
 
         //this.fontSpec = (FontSpec) info.GetValue( "fontSpec" , typeof(FontSpec) );
         TitleGap = info.GetSingle ("titleGap");
-        Fill = (Fill) info.GetValue ("fill", typeof (Fill));
-        Border = (Border) info.GetValue ("border", typeof (Border));
+        Fill = (Fill) info.GetValue ("fill", typeof (Fill))!;
+        Border = (Border) info.GetValue ("border", typeof (Border))!;
         BaseDimension = info.GetSingle ("baseDimension");
-        Margin = (Margin) info.GetValue ("margin", typeof (Margin));
-        _graphObjList = (GraphObjList) info.GetValue ("graphObjList", typeof (GraphObjList));
+        Margin = (Margin) info.GetValue ("margin", typeof (Margin))!;
+        _graphObjList = (GraphObjList) info.GetValue ("graphObjList", typeof (GraphObjList))!;
 
-        Tag = info.GetValue ("tag", typeof (object));
+        Tag = info.GetValue ("tag", typeof (object))!;
     }
 
     /// <inheritdoc cref="ISerializable.GetObjectData"/>
@@ -556,7 +556,7 @@ public abstract class PaneBase
     {
         // get scaled values for the paneGap and character height
         //float scaledOuterGap = (float) ( Default.OuterPaneGap * scaleFactor );
-        var charHeight = _title.FontSpec.GetHeight (scaleFactor);
+        var charHeight = _title.FontSpec!.GetHeight (scaleFactor);
 
         // chart rect starts out at the full pane rect.  It gets reduced to make room for the legend,
         // scales, titles, etc.
@@ -569,7 +569,7 @@ public abstract class PaneBase
         // Leave room for the title
         if (_title.IsVisible && _title.Text != string.Empty)
         {
-            var titleSize = _title.FontSpec.BoundingBox (graphics, _title.Text, scaleFactor);
+            var titleSize = _title.FontSpec.BoundingBox (graphics, _title.Text!, scaleFactor);
 
             // Leave room for the title height, plus a line spacing of charHeight * _titleGap
             innerRect.Y += titleSize.Height + charHeight * TitleGap;
@@ -633,11 +633,11 @@ public abstract class PaneBase
         // only draw the title if it's required
         if (_title.IsVisible)
         {
-            var size = _title.FontSpec.BoundingBox (graphics, _title.Text, scaleFactor);
+            var size = _title.FontSpec!.BoundingBox (graphics, _title.Text!, scaleFactor);
 
             // use the internal fontSpec class to draw the text using user-specified and/or
             // default attributes.
-            _title.FontSpec.Draw (graphics, this, _title.Text,
+            _title.FontSpec.Draw (graphics, this, _title.Text!,
                 (_rect.Left + _rect.Right) / 2,
                 _rect.Top + Margin.Top * (float)scaleFactor + size.Height / 2.0F,
                 AlignH.Center, AlignV.Center, scaleFactor);
@@ -1108,7 +1108,7 @@ public abstract class PaneBase
         if (this is GraphPane)
         {
             gPane = this as GraphPane;
-            chartRect = gPane.Chart._rect;
+            chartRect = gPane!.Chart._rect;
         }
 
         var ptPix = new PointF();
@@ -1120,28 +1120,28 @@ public abstract class PaneBase
         }
         else if (coord == CoordType.AxisXYScale)
         {
-            ptPix.X = gPane.XAxis.Scale.Transform (x);
-            ptPix.Y = gPane.YAxis.Scale.Transform (y);
+            ptPix.X = gPane!.XAxis.Scale!.Transform (x);
+            ptPix.Y = gPane!.YAxis!.Scale!.Transform (y);
         }
         else if (coord == CoordType.AxisXY2Scale)
         {
-            ptPix.X = gPane.XAxis.Scale.Transform (x);
-            ptPix.Y = gPane.Y2Axis.Scale.Transform (y);
+            ptPix.X = gPane!.XAxis.Scale!.Transform (x);
+            ptPix.Y = gPane!.Y2Axis!.Scale!.Transform (y);
         }
         else if (coord == CoordType.XScaleYChartFraction)
         {
-            ptPix.X = gPane.XAxis.Scale.Transform (x);
+            ptPix.X = gPane!.XAxis.Scale!.Transform (x);
             ptPix.Y = (float)(chartRect.Top + y * chartRect.Height);
         }
         else if (coord == CoordType.XChartFractionYScale)
         {
             ptPix.X = (float)(chartRect.Left + x * chartRect.Width);
-            ptPix.Y = gPane.YAxis.Scale.Transform (y);
+            ptPix.Y = gPane!.YAxis!.Scale!.Transform (y);
         }
         else if (coord == CoordType.XChartFractionY2Scale)
         {
             ptPix.X = (float)(chartRect.Left + x * chartRect.Width);
-            ptPix.Y = gPane.Y2Axis.Scale.Transform (y);
+            ptPix.Y = gPane!.Y2Axis!.Scale!.Transform (y);
         }
         else if (coord == CoordType.XChartFractionYPaneFraction)
         {

@@ -90,6 +90,10 @@ public readonly struct Codepoint
 
     #endregion
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public uint AsUtf32() => Value;
 
     /// <summary>
@@ -108,6 +112,11 @@ public readonly struct Codepoint
         yield return b4;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="dest"></param>
+    /// <exception cref="ArgumentException"></exception>
     public void AsUtf32Bytes (Span<byte> dest)
     {
         if (dest.Length < 4)
@@ -122,6 +131,11 @@ public readonly struct Codepoint
         dest[3] = (byte)utf32;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    /// <exception cref="UnsupportedCodepointException"></exception>
     // Reference: https://en.wikipedia.org/wiki/UTF-16
     public IEnumerable<ushort> AsUtf16()
     {
@@ -132,7 +146,7 @@ public readonly struct Codepoint
         }
 
         // U+10000 to U+10FFFF
-        else if (Value >= 0x10000 && Value <= 0x10_FFFF)
+        else if (Value is >= 0x10000 and <= 0x10_FFFF)
         {
             var newVal = Value - 0x010000; // leaving 20 bits
             var high = (ushort)((newVal >> 10) + 0xD800);
@@ -149,6 +163,12 @@ public readonly struct Codepoint
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="dest"></param>
+    /// <returns></returns>
+    /// <exception cref="UnsupportedCodepointException"></exception>
     public int AsUtf16 (Span<ushort> dest)
     {
         // U+0000 to U+D7FF and U+E000 to U+FFFF
@@ -224,6 +244,11 @@ public readonly struct Codepoint
         throw new UnsupportedCodepointException();
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    /// <exception cref="UnsupportedCodepointException"></exception>
     // https://en.wikipedia.org/wiki/UTF-8
     public IEnumerable<byte> AsUtf8()
     {
@@ -264,6 +289,11 @@ public readonly struct Codepoint
         throw new UnsupportedCodepointException();
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
     public Codepoint FromUtf32 (uint value)
     {
         return new Codepoint (value);
@@ -272,8 +302,18 @@ public readonly struct Codepoint
     private static readonly Range Utf16SurrogateHigh = new Range (0xD800, 0xDBFF);
     private static readonly Range Utf16SurrogateLow = new Range (0xDC00, 0xDFFF);
 
+    /// <summary>
+    ///
+    /// </summary>
     public int Utf16ByteCount => Value <= 0xFFFF ? 2 : 4;
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="word1"></param>
+    /// <param name="word2"></param>
+    /// <returns></returns>
+    /// <exception cref="UnsupportedCodepointException"></exception>
     public Codepoint FromUtf16 (ushort word1, ushort word2 = 0)
     {
         if (word1 >= 0xD800 && word1 <= 0xDBFF)
@@ -308,76 +348,151 @@ public readonly struct Codepoint
         return new Codepoint (codepoint);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
     public int CompareTo (Codepoint other)
     {
         return Value.CompareTo (other.Value);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
     public int CompareTo (uint other)
     {
         return Value.CompareTo (other);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
     public bool Equals (Codepoint other)
     {
         return Value == other.Value;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <returns></returns>
     public override bool Equals (object? obj)
     {
         return obj is Codepoint other && Equals (other);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public override int GetHashCode()
     {
         return Value.GetHashCode();
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
     public static bool operator == (Codepoint a, Codepoint b)
     {
         return a.Value == b.Value;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
     public static bool operator != (Codepoint a, Codepoint b)
     {
         return a.Value != b.Value;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
     public static bool operator < (Codepoint a, Codepoint b)
     {
         return a.Value < b.Value;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
     public static bool operator > (Codepoint a, Codepoint b)
     {
         return a.Value > b.Value;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
     public static bool operator >= (Codepoint a, Codepoint b)
     {
         return a.Value >= b.Value;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
     public static bool operator <= (Codepoint a, Codepoint b)
     {
         return a.Value <= b.Value;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="codepoint"></param>
+    /// <returns></returns>
     public static implicit operator uint (Codepoint codepoint)
     {
         return codepoint.Value;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
     public static implicit operator Codepoint (uint value)
     {
         return new Codepoint (value);
     }
 
+    /// <inheritdoc cref="ValueType.ToString"/>
     public override string ToString()
     {
-        return $"U+{Value.ToString ("X")}";
+        return $"U+{Value:X}";
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public string AsString()
     {
         Span<byte> bytes = stackalloc byte[4];

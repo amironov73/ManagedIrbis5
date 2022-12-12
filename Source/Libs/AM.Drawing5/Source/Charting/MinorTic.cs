@@ -108,8 +108,8 @@ public class MinorTic
     /// <seealso cref="Axis.IsVisible"/>
     public Color Color
     {
-        get { return _color; }
-        set { _color = value; }
+        get => _color;
+        set => _color = value;
     }
 
     /// <summary>
@@ -127,8 +127,8 @@ public class MinorTic
     /// <seealso cref="Color"/>
     public float Size
     {
-        get { return _size; }
-        set { _size = value; }
+        get => _size;
+        set => _size = value;
     }
 
     /// <summary>
@@ -193,8 +193,8 @@ public class MinorTic
     /// <seealso cref="IsCrossOutside"/>
     public bool IsOutside
     {
-        get { return _isOutside; }
-        set { _isOutside = value; }
+        get => _isOutside;
+        set => _isOutside = value;
     }
 
     /// <summary>
@@ -214,8 +214,8 @@ public class MinorTic
     /// <seealso cref="IsCrossOutside"/>
     public bool IsInside
     {
-        get { return _isInside; }
-        set { _isInside = value; }
+        get => _isInside;
+        set => _isInside = value;
     }
 
     /// <summary>
@@ -236,8 +236,8 @@ public class MinorTic
     /// <seealso cref="IsCrossOutside"/>
     public bool IsOpposite
     {
-        get { return _isOpposite; }
-        set { _isOpposite = value; }
+        get => _isOpposite;
+        set => _isOpposite = value;
     }
 
     /// <summary>
@@ -258,8 +258,8 @@ public class MinorTic
     /// <value>true to show the major cross tic marks, false otherwise</value>
     public bool IsCrossOutside
     {
-        get { return _isCrossOutside; }
-        set { _isCrossOutside = value; }
+        get => _isCrossOutside;
+        set => _isCrossOutside = value;
     }
 
     /// <summary>
@@ -280,8 +280,8 @@ public class MinorTic
     /// <value>true to show the major cross tic marks, false otherwise</value>
     public bool IsCrossInside
     {
-        get { return _isCrossInside; }
-        set { _isCrossInside = value; }
+        get => _isCrossInside;
+        set => _isCrossInside = value;
     }
 
     /// <summary>
@@ -294,8 +294,8 @@ public class MinorTic
     /// <seealso cref="Color"/>
     public float PenWidth
     {
-        get { return _penWidth; }
-        set { _penWidth = value; }
+        get => _penWidth;
+        set => _penWidth = value;
     }
 
     #endregion
@@ -324,7 +324,7 @@ public class MinorTic
         // backwards compatible as new member variables are added to classes
         info.GetInt32 ("schema").NotUsed();
 
-        _color = (Color)info.GetValue ("color", typeof (Color));
+        _color = (Color)info.GetValue ("color", typeof (Color))!;
         _size = info.GetSingle ("size");
         _penWidth = info.GetSingle ("penWidth");
 

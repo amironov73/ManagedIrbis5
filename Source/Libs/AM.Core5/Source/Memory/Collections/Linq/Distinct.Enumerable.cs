@@ -115,7 +115,7 @@ internal sealed class DistinctExprEnumerable<T, TItem>
 
         public void Reset() => _src!.Reset();
 
-        object IPoolingEnumerator.Current => Current;
+        object IPoolingEnumerator.Current => Current!;
 
         public T Current => _src!.Current;
 

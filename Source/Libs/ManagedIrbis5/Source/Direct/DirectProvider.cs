@@ -1087,7 +1087,7 @@ public class DirectProvider
             string? databaseName = default
         )
     {
-        Sure.NotNull ((object?)mfnList);
+        Sure.NotNull (mfnList);
 
         using var accessProxy = GetAccessor (databaseName);
         foreach (var mfn in mfnList)
@@ -1104,7 +1104,7 @@ public class DirectProvider
             IEnumerable<string> lines
         )
     {
-        Sure.NotNull ((object?)lines);
+        Sure.NotNull (lines);
 
         throw new NotImplementedException();
     }
@@ -1115,7 +1115,7 @@ public class DirectProvider
             IEnumerable<UserInfo> users
         )
     {
-        Sure.NotNull ((object?)users);
+        Sure.NotNull (users);
 
         throw new NotImplementedException();
     }

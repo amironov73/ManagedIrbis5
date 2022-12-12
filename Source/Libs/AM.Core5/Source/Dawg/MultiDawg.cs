@@ -166,10 +166,22 @@ public sealed class MultiDawg<TPayload>
 
     private bool HasPayload (int node_i) => _payloads.Length > 0 && node_i < _payloads[0].Length;
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public int GetNodeCount() => _yaleGraph.NodeCount;
 
+    /// <summary>
+    ///
+    /// </summary>
     public int MaxPayloads => _payloads.Length;
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="tree"></param>
+    /// <returns></returns>
     public IEnumerable<KeyValuePair<string, IEnumerable<TPayload>>> MatchTree
         (
             IEnumerable<IEnumerable<char>> tree

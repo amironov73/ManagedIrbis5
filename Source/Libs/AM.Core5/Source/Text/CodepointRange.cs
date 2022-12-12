@@ -33,6 +33,7 @@ public class CodepointRange
     /// The first codepoint in the range, inclusive.
     /// </summary>
     public readonly Codepoint Begin;
+
     /// <summary>
     /// The last codepoint in the range, inclusive.
     /// </summary>
@@ -43,7 +44,7 @@ public class CodepointRange
     /// values may be the same, but <paramref name="begin"/> must be less than or
     /// equal to <paramref name="end"/>
     /// </summary>
-    public CodepointRange(Codepoint begin, Codepoint end)
+    public CodepointRange (Codepoint begin, Codepoint end)
     {
         Begin = begin;
         End = end;
@@ -52,18 +53,24 @@ public class CodepointRange
     /// <summary>
     /// Create a range constituting a single codepoint (<c>Begin == End</c>).
     /// </summary>
-    public CodepointRange(Codepoint value)
+    public CodepointRange (Codepoint value)
     {
         Begin = value;
         End = value;
     }
 
-    public bool Contains(Codepoint codepoint)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="codepoint"></param>
+    /// <returns></returns>
+    public bool Contains (Codepoint codepoint)
     {
         return codepoint >= Begin && codepoint <= End;
     }
 
     static readonly string[] RangeSplit = new[] { "-", "–", "—", ".." };
+
     // Either a single hex codepoint or two separated by a hyphen
 
     /// <summary>
@@ -74,11 +81,11 @@ public class CodepointRange
     /// Examples of valid ranges: <c>CodepointRange("0030..0039")</c>, <c>CodepointRange("0040")</c>,
     /// and <c>CodepointRange("0600–06FF")</c>
     /// </summary>
-    public CodepointRange(string range)
+    public CodepointRange (string range)
     {
         // These are all different hyphens used on Wikipedia and in the UTR
-        var values = range.Split(RangeSplit, StringSplitOptions.RemoveEmptyEntries);
-        Begin = UInt32.Parse(values[0], System.Globalization.NumberStyles.HexNumber);
+        var values = range.Split (RangeSplit, StringSplitOptions.RemoveEmptyEntries);
+        Begin = UInt32.Parse (values[0], System.Globalization.NumberStyles.HexNumber);
 
         if (values.Length == 1)
         {
@@ -86,7 +93,7 @@ public class CodepointRange
         }
         else if (values.Length == 2)
         {
-            End = UInt32.Parse(values[1], System.Globalization.NumberStyles.HexNumber);
+            End = UInt32.Parse (values[1], System.Globalization.NumberStyles.HexNumber);
         }
         else
         {
@@ -94,24 +101,30 @@ public class CodepointRange
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public IEnumerable<UInt32> AsUtf32Sequence
     {
         get
         {
             for (UInt32 i = 0; Begin + i <= End; ++i)
             {
-                yield return new Codepoint(Begin + i).AsUtf32();
+                yield return new Codepoint (Begin + i).AsUtf32();
             }
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public IEnumerable<UInt16> AsUtf16Sequence
     {
         get
         {
             for (var i = 0; Begin + i <= End; ++i)
             {
-                foreach (var utf16 in new Codepoint(Begin + i).AsUtf16())
+                foreach (var utf16 in new Codepoint (Begin + i).AsUtf16())
                 {
                     yield return utf16;
                 }
@@ -119,13 +132,16 @@ public class CodepointRange
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public IEnumerable<byte> AsUtf8Sequence
     {
         get
         {
             for (var i = 0; Begin + i <= End; ++i)
             {
-                foreach (var utf8 in new Codepoint(Begin + i).AsUtf8())
+                foreach (var utf8 in new Codepoint (Begin + i).AsUtf8())
                 {
                     yield return utf8;
                 }
@@ -133,7 +149,12 @@ public class CodepointRange
         }
     }
 
-    public int CompareTo(CodepointRange? other)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
+    public int CompareTo (CodepointRange? other)
     {
         if (other is null)
         {
@@ -146,41 +167,61 @@ public class CodepointRange
             return compare;
         }
 
-        return End.CompareTo(other.End);
+        return End.CompareTo (other.End);
     }
 
-    public bool Equals(CodepointRange? other)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
+    public bool Equals (CodepointRange? other)
     {
-        return other is CodepointRange range
+        return other is { } range
                && Begin == range.Begin
                && End == range.End;
     }
 
-    public override bool Equals(Object? obj)
+    /// <inheritdoc cref="Equals(object?)"/>
+    public override bool Equals (object? obj)
     {
-        return obj is CodepointRange other && Equals(other);
+        return obj is CodepointRange other && Equals (other);
     }
 
+    /// <inheritdoc cref="object.GetHashCode"/>
     public override int GetHashCode()
     {
         return Begin.GetHashCode() ^ End.GetHashCode();
     }
 
-    public static bool operator ==(CodepointRange? lhs, CodepointRange? rhs)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="lhs"></param>
+    /// <param name="rhs"></param>
+    /// <returns></returns>
+    public static bool operator == (CodepointRange? lhs, CodepointRange? rhs)
     {
         if (lhs is null || rhs is null)
         {
-            return object.Equals(lhs, rhs);
+            return Equals (lhs, rhs);
         }
 
-        return lhs.Equals(rhs);
+        return lhs.Equals (rhs);
     }
 
-    public static bool operator !=(CodepointRange? lhs, CodepointRange? rhs)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="lhs"></param>
+    /// <param name="rhs"></param>
+    /// <returns></returns>
+    public static bool operator != (CodepointRange? lhs, CodepointRange? rhs)
     {
         return !(lhs == rhs);
     }
 
+    /// <inheritdoc cref="object.ToString"/>
     public override string ToString()
     {
         return $"{Begin}..{End}";

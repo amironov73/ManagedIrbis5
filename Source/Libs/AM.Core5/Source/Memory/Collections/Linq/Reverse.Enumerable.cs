@@ -86,7 +86,7 @@ internal class ReverseExprEnumerable<T>
 
         public void Reset() => _position = _src.Count;
 
-        object IPoolingEnumerator.Current => Current;
+        object IPoolingEnumerator.Current => Current!;
 
         public T Current => _src[_position];
 

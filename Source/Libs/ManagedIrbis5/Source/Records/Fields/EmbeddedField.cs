@@ -53,7 +53,7 @@ public static class EmbeddedField
             char sign = DefaultCode
         )
     {
-        Sure.NotNull ((object?) subfields);
+        Sure.NotNull (subfields);
 
         var result = new List<Field>();
         Field? found = null;

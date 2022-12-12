@@ -195,7 +195,7 @@ public sealed class GblSettings
         )
         : this (connection)
     {
-        Sure.NotNull ((object?) statements);
+        Sure.NotNull (statements);
 
         Statements.AddRange (statements);
     }
@@ -309,7 +309,7 @@ public sealed class GblSettings
         Sure.NotNull (connection);
         Sure.NonNegative (minMfn);
         Sure.NonNegative (maxMfn);
-        Sure.NotNull ((object?) statements);
+        Sure.NotNull (statements);
 
         var result = new GblSettings (connection, statements)
         {
@@ -336,7 +336,7 @@ public sealed class GblSettings
         Sure.NotNull (connection);
         Sure.NonNegative (minMfn);
         Sure.NonNegative (maxMfn);
-        Sure.NotNull ((object?) statements);
+        Sure.NotNull (statements);
 
         var result = new GblSettings (connection, statements)
         {
@@ -360,8 +360,8 @@ public sealed class GblSettings
         )
     {
         Sure.NotNull (connection);
-        Sure.NotNull ((object?) mfnList);
-        Sure.NotNull ((object?) statements);
+        Sure.NotNull (mfnList);
+        Sure.NotNull (statements);
 
         var result = new GblSettings (connection, statements)
         {
@@ -384,8 +384,8 @@ public sealed class GblSettings
         )
     {
         Sure.NotNull (connection);
-        Sure.NotNull ((object?) mfnList);
-        Sure.NotNull ((object?) statements);
+        Sure.NotNull (mfnList);
+        Sure.NotNull (statements);
 
         var result = new GblSettings (connection, statements)
         {
@@ -408,7 +408,7 @@ public sealed class GblSettings
         )
     {
         Sure.NotNull (connection);
-        Sure.NotNull ((object?) mfnList);
+        Sure.NotNull (mfnList);
 
         var result = new GblSettings (connection)
         {
@@ -431,7 +431,7 @@ public sealed class GblSettings
         )
     {
         Sure.NotNull (connection);
-        Sure.NotNull ((object?) statements);
+        Sure.NotNull (statements);
 
         var result = new GblSettings (connection, statements)
         {
@@ -454,7 +454,7 @@ public sealed class GblSettings
         )
     {
         Sure.NotNull (connection);
-        Sure.NotNull ((object?) statements);
+        Sure.NotNull (statements);
 
         var result = new GblSettings (connection, statements)
         {

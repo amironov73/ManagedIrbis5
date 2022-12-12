@@ -42,7 +42,7 @@ sealed class UsingNode
     {
         Sure.NotNullNorEmpty (variableName);
         Sure.NotNull (initialization);
-        Sure.NotNull ((object?) body);
+        Sure.NotNull (body);
 
         _variableName = variableName;
         _initialization = initialization;

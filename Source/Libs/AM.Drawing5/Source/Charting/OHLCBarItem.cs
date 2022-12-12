@@ -160,7 +160,7 @@ public class OHLCBarItem
         // backwards compatible as new member variables are added to classes
         info.GetInt32 ("schema2").NotUsed();
 
-        Bar = (OHLCBar)info.GetValue ("stick", typeof (OHLCBar));
+        Bar = (OHLCBar)info.GetValue ("stick", typeof (OHLCBar))!;
     }
 
     /// <inheritdoc cref="ISerializable.GetObjectData"/>
@@ -232,7 +232,7 @@ public class OHLCBarItem
         }
 
         var halfSize = 2.0f * scaleFactor;
-        using var pen = new Pen (Bar.Color, Bar._width);
+        using var pen = new Pen (Bar.Color, Bar.Width);
         Bar.Draw
             (
                 graphics,
@@ -274,12 +274,12 @@ public class OHLCBarItem
         var low = pt.Z;
 
         if (!pt.IsInvalid3D &&
-            (date > 0 || !baseAxis.Scale.IsLog) &&
-            ((high > 0 && low > 0) || !valueAxis.Scale.IsLog))
+            (date > 0 || !baseAxis.Scale!.IsLog) &&
+            ((high > 0 && low > 0) || !valueAxis.Scale!.IsLog))
         {
             float pixBase, pixHigh, pixLow;
-            pixBase = baseAxis.Scale.Transform (IsOverrideOrdinal, i, date);
-            pixHigh = valueAxis.Scale.Transform (IsOverrideOrdinal, i, high);
+            pixBase = baseAxis.Scale!.Transform (IsOverrideOrdinal, i, date);
+            pixHigh = valueAxis.Scale!.Transform (IsOverrideOrdinal, i, high);
             pixLow = valueAxis.Scale.Transform (IsOverrideOrdinal, i, low);
 
             // Calculate the pixel location for the side of the bar (on the base axis)

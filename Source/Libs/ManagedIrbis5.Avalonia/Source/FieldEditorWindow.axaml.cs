@@ -94,7 +94,7 @@ public partial class FieldEditorWindow
             IEnumerable<FieldLine> lines
         )
     {
-        Sure.NotNull ((object?) lines);
+        Sure.NotNull (lines);
 
         FieldGrid.Items = _lines = lines;
     }

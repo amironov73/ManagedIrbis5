@@ -15,9 +15,6 @@
 
 #region Using directives
 
-using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Text;
 using System.Threading;
 
 #endregion
@@ -27,7 +24,6 @@ using System.Threading;
 namespace AM.Collections.Intern;
 
 public partial class SharedInternPool
-    : IInternPool
 {
     private class InternPoolCleaner
 #if NET5_0 || NETCOREAPP3_1
@@ -35,8 +31,8 @@ public partial class SharedInternPool
 #endif
     {
         private SharedInternPool _pool;
-        private int _isTrimming = 0;
-        private long _collections = 0;
+        private int _isTrimming;
+        private long _collections;
 
         public long Collections => Volatile.Read (ref _collections);
 
@@ -74,7 +70,7 @@ public partial class SharedInternPool
 #if NET5_0 || NETCOREAPP3_1
             ThreadPool.UnsafeQueueUserWorkItem(cleaner, preferLocal: false);
 #else
-        ThreadPool.UnsafeQueueUserWorkItem ((o) => ((InternPoolCleaner)o).Execute(), cleaner);
+        ThreadPool.UnsafeQueueUserWorkItem ((o) => ((InternPoolCleaner) o!).Execute(), cleaner);
 #endif
         return true;
     }

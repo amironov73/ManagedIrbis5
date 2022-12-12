@@ -3,6 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable CompareOfFloatsByEqualityOperator
 // ReSharper disable InconsistentNaming
 
 /* PointPairBase.cs --

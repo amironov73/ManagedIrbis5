@@ -456,7 +456,7 @@ public static class IrbisUtility
             string? value
         )
     {
-        Sure.NotNull ((object?) fields);
+        Sure.NotNull (fields);
 
         Field? targetField = null;
         foreach (var field in fields)

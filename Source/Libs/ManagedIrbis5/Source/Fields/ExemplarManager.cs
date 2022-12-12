@@ -210,7 +210,7 @@ public sealed class ExemplarManager
             IEnumerable<ExemplarInfo> exemplars
         )
     {
-        Sure.NotNull ((object?) exemplars);
+        Sure.NotNull (exemplars);
 
         foreach (var exemplar in exemplars)
         {

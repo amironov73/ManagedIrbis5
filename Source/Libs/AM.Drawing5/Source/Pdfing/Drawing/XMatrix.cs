@@ -18,6 +18,8 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
 
+using AM;
+
 using PdfSharpCore.Internal;
 
 #endregion
@@ -64,10 +66,7 @@ namespace PdfSharpCore.Drawing
         /// <summary>
         /// Gets the identity matrix.
         /// </summary>
-        public static XMatrix Identity
-        {
-            get { return s_identity; }
-        }
+        public static XMatrix Identity => s_identity;
 
         /// <summary>
         /// Sets this matrix into an identity matrix.
@@ -121,7 +120,7 @@ namespace PdfSharpCore.Drawing
                 return new double[] { 1, 0, 0, 1, 0, 0 };
             }
 
-            return new double[] { _m11, _m12, _m21, _m22, _offsetX, _offsetY };
+            return new[] { _m11, _m12, _m21, _m22, _offsetX, _offsetY };
         }
 
         /// <summary>
@@ -169,12 +168,12 @@ namespace PdfSharpCore.Drawing
             }
 
             // Must use properties, the fields can be invalid if the matrix is identity matrix.
-            double t11 = M11;
-            double t12 = M12;
-            double t21 = M21;
-            double t22 = M22;
-            double tdx = OffsetX;
-            double tdy = OffsetY;
+            var t11 = M11;
+            var t12 = M12;
+            var t21 = M21;
+            var t22 = M22;
+            var tdx = OffsetX;
+            var tdy = OffsetY;
 
             if (order == XMatrixOrder.Append)
             {
@@ -458,16 +457,16 @@ namespace PdfSharpCore.Drawing
             }
 
             angle = angle * Const.Deg2Rad;
-            double cos = Math.Cos (angle);
-            double sin = Math.Sin (angle);
+            var cos = Math.Cos (angle);
+            var sin = Math.Sin (angle);
             if (order == XMatrixOrder.Append)
             {
-                double t11 = _m11;
-                double t12 = _m12;
-                double t21 = _m21;
-                double t22 = _m22;
-                double tdx = _offsetX;
-                double tdy = _offsetY;
+                var t11 = _m11;
+                var t12 = _m12;
+                var t21 = _m21;
+                var t22 = _m22;
+                var tdx = _offsetX;
+                var tdy = _offsetY;
                 _m11 = t11 * cos - t12 * sin;
                 _m12 = t11 * sin + t12 * cos;
                 _m21 = t21 * cos - t22 * sin;
@@ -477,10 +476,10 @@ namespace PdfSharpCore.Drawing
             }
             else
             {
-                double t11 = _m11;
-                double t12 = _m12;
-                double t21 = _m21;
-                double t22 = _m22;
+                var t11 = _m11;
+                var t12 = _m12;
+                var t21 = _m21;
+                var t22 = _m22;
                 _m11 = t11 * cos + t21 * sin;
                 _m12 = t12 * cos + t22 * sin;
                 _m21 = -t11 * sin + t21 * cos;
@@ -612,12 +611,12 @@ namespace PdfSharpCore.Drawing
                 this = CreateIdentity();
             }
 
-            double t11 = _m11;
-            double t12 = _m12;
-            double t21 = _m21;
-            double t22 = _m22;
-            double tdx = _offsetX;
-            double tdy = _offsetY;
+            var t11 = _m11;
+            var t12 = _m12;
+            var t21 = _m21;
+            var t22 = _m22;
+            var tdx = _offsetX;
+            var tdy = _offsetY;
             if (order == XMatrixOrder.Append)
             {
                 _m11 += shearX * t12;
@@ -677,8 +676,8 @@ namespace PdfSharpCore.Drawing
         /// </summary>
         public XPoint Transform (XPoint point)
         {
-            double x = point.X;
-            double y = point.Y;
+            var x = point.X;
+            var y = point.Y;
             MultiplyPoint (ref x, ref y);
             return new XPoint (x, y);
         }
@@ -688,13 +687,13 @@ namespace PdfSharpCore.Drawing
         /// </summary>
         public void Transform (XPoint[] points)
         {
-            if (points != null)
+            if (points != null!)
             {
-                int count = points.Length;
-                for (int idx = 0; idx < count; idx++)
+                var count = points.Length;
+                for (var idx = 0; idx < count; idx++)
                 {
-                    double x = points[idx].X;
-                    double y = points[idx].Y;
+                    var x = points[idx].X;
+                    var y = points[idx].Y;
                     MultiplyPoint (ref x, ref y);
                     points[idx].X = x;
                     points[idx].Y = y;
@@ -707,21 +706,18 @@ namespace PdfSharpCore.Drawing
         /// </summary>
         public void TransformPoints (XPoint[] points)
         {
-            if (points == null)
-            {
-                throw new ArgumentNullException ("points");
-            }
+            Sure.NotNull (points);
 
             if (IsIdentity)
             {
                 return;
             }
 
-            int count = points.Length;
-            for (int idx = 0; idx < count; idx++)
+            var count = points.Length;
+            for (var idx = 0; idx < count; idx++)
             {
-                double x = points[idx].X;
-                double y = points[idx].Y;
+                var x = points[idx].X;
+                var y = points[idx].Y;
                 points[idx].X = x * _m11 + y * _m21 + _offsetX;
                 points[idx].Y = x * _m12 + y * _m22 + _offsetY;
             }
@@ -732,8 +728,8 @@ namespace PdfSharpCore.Drawing
         /// </summary>
         public XVector Transform (XVector vector)
         {
-            double x = vector.X;
-            double y = vector.Y;
+            var x = vector.X;
+            var y = vector.Y;
             MultiplyVector (ref x, ref y);
             return new XVector (x, y);
         }
@@ -741,15 +737,15 @@ namespace PdfSharpCore.Drawing
         /// <summary>
         /// Transforms the specified vectors by this matrix.
         /// </summary>
-        public void Transform (XVector[] vectors)
+        public void Transform (XVector[]? vectors)
         {
             if (vectors != null)
             {
-                int count = vectors.Length;
-                for (int idx = 0; idx < count; idx++)
+                var count = vectors.Length;
+                for (var idx = 0; idx < count; idx++)
                 {
-                    double x = vectors[idx].X;
-                    double y = vectors[idx].Y;
+                    var x = vectors[idx].X;
+                    var y = vectors[idx].Y;
                     MultiplyVector (ref x, ref y);
                     vectors[idx].X = x;
                     vectors[idx].Y = y;
@@ -782,17 +778,14 @@ namespace PdfSharpCore.Drawing
         /// <summary>
         /// Gets a value that indicates whether this matrix is invertible.
         /// </summary>
-        public bool HasInverse
-        {
-            get { return !DoubleUtil.IsZero (Determinant); }
-        }
+        public bool HasInverse => !DoubleUtil.IsZero (Determinant);
 
         /// <summary>
         /// Inverts the matrix.
         /// </summary>
         public void Invert()
         {
-            double determinant = Determinant;
+            var determinant = Determinant;
             if (DoubleUtil.IsZero (determinant))
             {
                 throw
@@ -824,7 +817,7 @@ namespace PdfSharpCore.Drawing
 
                 default:
                 {
-                    double detInvers = 1.0 / determinant;
+                    var detInvers = 1.0 / determinant;
                     SetMatrix (_m22 * detInvers, -_m12 * detInvers, -_m21 * detInvers, _m11 * detInvers,
                         (_m21 * _offsetY - _offsetX * _m22) * detInvers,
                         (_offsetX * _m12 - _m11 * _offsetY) * detInvers, XMatrixTypes.Unknown);
@@ -1090,9 +1083,9 @@ namespace PdfSharpCore.Drawing
         public static XMatrix Parse (string source)
         {
             IFormatProvider cultureInfo = CultureInfo.InvariantCulture; //.GetCultureInfo("en-us");
-            TokenizerHelper helper = new TokenizerHelper (source, cultureInfo);
-            string str = helper.NextTokenRequired();
-            XMatrix identity = str == "Identity"
+            var helper = new TokenizerHelper (source, cultureInfo);
+            var str = helper.NextTokenRequired()!;
+            var identity = str == "Identity"
                 ? Identity
                 : new XMatrix (
                     Convert.ToDouble (str, cultureInfo),
@@ -1129,14 +1122,18 @@ namespace PdfSharpCore.Drawing
             return ConvertToString (format, provider);
         }
 
-        internal string ConvertToString (string format, IFormatProvider provider)
+        internal string ConvertToString
+            (
+                string? format,
+                IFormatProvider? provider
+            )
         {
             if (IsIdentity)
             {
                 return "Identity";
             }
 
-            char numericListSeparator = TokenizerHelper.GetNumericListSeparator (provider);
+            var numericListSeparator = TokenizerHelper.GetNumericListSeparator (provider!);
             provider = provider ?? CultureInfo.InvariantCulture;
 
             // ReSharper disable FormatStringProblem
@@ -1163,8 +1160,8 @@ namespace PdfSharpCore.Drawing
                     return;
             }
 
-            double d1 = y * _m21;
-            double d2 = x * _m12;
+            var d1 = y * _m21;
+            var d2 = x * _m12;
             x *= _m11;
             x += d1;
             y *= _m22;
@@ -1196,8 +1193,8 @@ namespace PdfSharpCore.Drawing
                     return;
             }
 
-            double d1 = (y * _m21) + _offsetX;
-            double d2 = (x * _m12) + _offsetY;
+            var d1 = (y * _m21) + _offsetX;
+            var d2 = (x * _m12) + _offsetY;
             x *= _m11;
             x += d1;
             y *= _m22;
@@ -1206,7 +1203,7 @@ namespace PdfSharpCore.Drawing
 
         internal static XMatrix CreateTranslation (double offsetX, double offsetY)
         {
-            XMatrix matrix = new XMatrix();
+            var matrix = new XMatrix();
             matrix.SetMatrix (1, 0, 0, 1, offsetX, offsetY, XMatrixTypes.Translation);
             return matrix;
         }
@@ -1218,25 +1215,25 @@ namespace PdfSharpCore.Drawing
 
         internal static XMatrix CreateRotationRadians (double angle, double centerX, double centerY)
         {
-            XMatrix matrix = new XMatrix();
-            double sin = Math.Sin (angle);
-            double cos = Math.Cos (angle);
-            double offsetX = (centerX * (1.0 - cos)) + (centerY * sin);
-            double offsetY = (centerY * (1.0 - cos)) - (centerX * sin);
+            var matrix = new XMatrix();
+            var sin = Math.Sin (angle);
+            var cos = Math.Cos (angle);
+            var offsetX = (centerX * (1.0 - cos)) + (centerY * sin);
+            var offsetY = (centerY * (1.0 - cos)) - (centerX * sin);
             matrix.SetMatrix (cos, sin, -sin, cos, offsetX, offsetY, XMatrixTypes.Unknown);
             return matrix;
         }
 
         internal static XMatrix CreateScaling (double scaleX, double scaleY)
         {
-            XMatrix matrix = new XMatrix();
+            var matrix = new XMatrix();
             matrix.SetMatrix (scaleX, 0, 0, scaleY, 0, 0, XMatrixTypes.Scaling);
             return matrix;
         }
 
         internal static XMatrix CreateScaling (double scaleX, double scaleY, double centerX, double centerY)
         {
-            XMatrix matrix = new XMatrix();
+            var matrix = new XMatrix();
             matrix.SetMatrix (scaleX, 0, 0, scaleY, centerX - scaleX * centerX, centerY - scaleY * centerY,
                 XMatrixTypes.Scaling | XMatrixTypes.Translation);
             return matrix;
@@ -1244,7 +1241,7 @@ namespace PdfSharpCore.Drawing
 
         internal static XMatrix CreateSkewRadians (double skewX, double skewY, double centerX, double centerY)
         {
-            XMatrix matrix = new XMatrix();
+            var matrix = new XMatrix();
             matrix.Append (CreateTranslation (-centerX, -centerY));
             matrix.Append (new XMatrix (1, Math.Tan (skewY), Math.Tan (skewX), 1, 0, 0));
             matrix.Append (CreateTranslation (centerX, centerY));
@@ -1253,14 +1250,14 @@ namespace PdfSharpCore.Drawing
 
         internal static XMatrix CreateSkewRadians (double skewX, double skewY)
         {
-            XMatrix matrix = new XMatrix();
+            var matrix = new XMatrix();
             matrix.SetMatrix (1, Math.Tan (skewY), Math.Tan (skewX), 1, 0, 0, XMatrixTypes.Unknown);
             return matrix;
         }
 
         static XMatrix CreateIdentity()
         {
-            XMatrix matrix = new XMatrix();
+            var matrix = new XMatrix();
             matrix.SetMatrix (1, 0, 0, 1, 0, 0, XMatrixTypes.Identity);
             return matrix;
         }
@@ -1309,10 +1306,7 @@ namespace PdfSharpCore.Drawing
             // ReSharper restore CompareOfFloatsByEqualityOperator
         }
 
-        bool IsDistinguishedIdentity
-        {
-            get { return (_type == XMatrixTypes.Identity); }
-        }
+        bool IsDistinguishedIdentity => (_type == XMatrixTypes.Identity);
 
         // Keep the fields private and force using the properties.
         // This prevents using m11 and m22 by mistake when the matrix is identity.
@@ -1333,8 +1327,8 @@ namespace PdfSharpCore.Drawing
             // Fast mutiplication taking matrix type into account. Reflectored from WPF.
             internal static void MultiplyMatrix (ref XMatrix matrix1, ref XMatrix matrix2)
             {
-                XMatrixTypes type1 = matrix1._type;
-                XMatrixTypes type2 = matrix2._type;
+                var type1 = matrix1._type;
+                var type2 = matrix2._type;
                 if (type2 != XMatrixTypes.Identity)
                 {
                     if (type1 == XMatrixTypes.Identity)
@@ -1352,8 +1346,8 @@ namespace PdfSharpCore.Drawing
                     }
                     else if (type1 == XMatrixTypes.Translation)
                     {
-                        double num = matrix1._offsetX;
-                        double num2 = matrix1._offsetY;
+                        var num = matrix1._offsetX;
+                        var num2 = matrix1._offsetY;
                         matrix1 = matrix2;
                         matrix1._offsetX = num * matrix2._m11 + num2 * matrix2._m21 + matrix2._offsetX;
                         matrix1._offsetY = num * matrix2._m12 + num2 * matrix2._m22 + matrix2._offsetY;
@@ -1421,8 +1415,10 @@ namespace PdfSharpCore.Drawing
             {
                 if (matrix._type == XMatrixTypes.Identity)
                 {
-                    matrix = new XMatrix (1, 0, 0, 1, offsetX, offsetY);
-                    matrix._type = XMatrixTypes.Translation;
+                    matrix = new XMatrix (1, 0, 0, 1, offsetX, offsetY)
+                    {
+                        _type = XMatrixTypes.Translation
+                    };
                 }
                 else
                 {
@@ -1439,7 +1435,7 @@ namespace PdfSharpCore.Drawing
             {
                 if (!rect.IsEmpty)
                 {
-                    XMatrixTypes type = matrix._type;
+                    var type = matrix._type;
                     if (type != XMatrixTypes.Identity)
                     {
                         if ((type & XMatrixTypes.Scaling) != XMatrixTypes.Identity)
@@ -1469,10 +1465,10 @@ namespace PdfSharpCore.Drawing
 
                         if (type == XMatrixTypes.Unknown)
                         {
-                            XPoint point1 = matrix.Transform (rect.TopLeft);
-                            XPoint point2 = matrix.Transform (rect.TopRight);
-                            XPoint point3 = matrix.Transform (rect.BottomRight);
-                            XPoint point4 = matrix.Transform (rect.BottomLeft);
+                            var point1 = matrix.Transform (rect.TopLeft);
+                            var point2 = matrix.Transform (rect.TopRight);
+                            var point3 = matrix.Transform (rect.BottomRight);
+                            var point4 = matrix.Transform (rect.BottomLeft);
                             rect.X = Math.Min (Math.Min (point1.X, point2.X), Math.Min (point3.X, point4.X));
                             rect.Y = Math.Min (Math.Min (point1.Y, point2.Y), Math.Min (point3.Y, point4.Y));
                             rect.Width = Math.Max (Math.Max (point1.X, point2.X), Math.Max (point3.X, point4.X)) -
@@ -1505,8 +1501,8 @@ namespace PdfSharpCore.Drawing
                 const string format = Config.SignificantFigures7;
 
                 // Calculate the angle in degrees.
-                XPoint point = new XMatrix (_m11, _m12, _m21, _m22, 0, 0).Transform (new XPoint (1, 0));
-                double φ = Math.Atan2 (point.Y, point.X) / Const.Deg2Rad;
+                var point = new XMatrix (_m11, _m12, _m21, _m22, 0, 0).Transform (new XPoint (1, 0));
+                var φ = Math.Atan2 (point.Y, point.X) / Const.Deg2Rad;
                 return string.Format (CultureInfo.InvariantCulture,
                     "matrix=({0:" + format + "}, {1:" + format + "}, {2:" + format + "}, {3:" + format + "}, {4:" +
                     format + "}, {5:" + format + "}), φ={6:0.0#########}°",

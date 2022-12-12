@@ -180,7 +180,7 @@ public struct LocalList<T>
 
         if (ReferenceEquals (_other, LengthIs2))
         {
-            var done = false;
+            // var done = false;
             if (ItemComparer.Equals (_items.Item2, item))
             {
                 _items.Item2 = default!;

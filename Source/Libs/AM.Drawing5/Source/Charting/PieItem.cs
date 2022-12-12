@@ -322,11 +322,11 @@ public class PieItem
             _labelType = value;
             if (value == PieLabelType.None)
             {
-                LabelDetail.IsVisible = false;
+                LabelDetail!.IsVisible = false;
             }
             else
             {
-                LabelDetail.IsVisible = true;
+                LabelDetail!.IsVisible = true;
             }
         }
     }
@@ -425,12 +425,19 @@ public class PieItem
         )
         : base (label)
     {
+        _labelStr = null!;
+
         _pieValue = pieValue;
         _fill = new Fill (color.IsEmpty ? _rotator.NextColor : color);
         _displacement = displacement;
         _border = new Border (Default.BorderColor, Default.BorderWidth);
-        _labelDetail = new TextObj();
-        _labelDetail.FontSpec.Size = Default.FontSize;
+        _labelDetail = new TextObj
+        {
+            FontSpec =
+            {
+                Size = Default.FontSize
+            }
+        };
         _labelType = Default.LabelType;
         _valueDecimalDigits = Default.ValueDecimalDigits;
         _percentDecimalDigits = Default.PercentDecimalDigits;
@@ -455,11 +462,14 @@ public class PieItem
     public PieItem (PieItem rhs)
         : base (rhs)
     {
+        _labelStr = null!;
+        _border = null!;
+
         _pieValue = rhs._pieValue;
         _fill = rhs._fill.Clone();
         Border = rhs._border.Clone();
         _displacement = rhs._displacement;
-        _labelDetail = rhs._labelDetail.Clone();
+        _labelDetail = rhs._labelDetail!.Clone();
         _labelType = rhs._labelType;
         _valueDecimalDigits = rhs._valueDecimalDigits;
         _percentDecimalDigits = rhs._percentDecimalDigits;
@@ -512,21 +522,21 @@ public class PieItem
         info.GetInt32 ("schema2").NotUsed();
 
         _displacement = info.GetDouble ("displacement");
-        _labelDetail = (TextObj) info.GetValue ("labelDetail", typeof (TextObj));
-        _fill = (Fill)info.GetValue ("fill", typeof (Fill));
-        _border = (Border)info.GetValue ("border", typeof (Border));
+        _labelDetail = (TextObj) info.GetValue ("labelDetail", typeof (TextObj))!;
+        _fill = (Fill)info.GetValue ("fill", typeof (Fill))!;
+        _border = (Border)info.GetValue ("border", typeof (Border))!;
         _pieValue = info.GetDouble ("pieValue");
-        _labelType = (PieLabelType)info.GetValue ("labelType", typeof (PieLabelType));
-        _intersectionPoint = (PointF)info.GetValue ("intersectionPoint", typeof (PointF));
-        _boundingRectangle = (RectangleF)info.GetValue ("boundingRectangle", typeof (RectangleF));
-        _pivotPoint = (PointF)info.GetValue ("pivotPoint", typeof (PointF));
-        _endPoint = (PointF)info.GetValue ("endPoint", typeof (PointF));
+        _labelType = (PieLabelType)info.GetValue ("labelType", typeof (PieLabelType))!;
+        _intersectionPoint = (PointF)info.GetValue ("intersectionPoint", typeof (PointF))!;
+        _boundingRectangle = (RectangleF)info.GetValue ("boundingRectangle", typeof (RectangleF))!;
+        _pivotPoint = (PointF)info.GetValue ("pivotPoint", typeof (PointF))!;
+        _endPoint = (PointF)info.GetValue ("endPoint", typeof (PointF))!;
 
         // _slicePath = (GraphicsPath)info.GetValue( "slicePath", typeof( GraphicsPath ) );
         _startAngle = (float)info.GetDouble ("startAngle");
         _sweepAngle = (float)info.GetDouble ("sweepAngle");
         _midAngle = (float)info.GetDouble ("midAngle");
-        _labelStr = info.GetString ("labelStr");
+        _labelStr = info.GetString ("labelStr")!;
         _valueDecimalDigits = info.GetInt32 ("valueDecimalDigits");
         _percentDecimalDigits = info.GetInt32 ("percentDecimalDigits");
     }
@@ -573,7 +583,7 @@ public class PieItem
             float scaleFactor
         )
     {
-        if (pane.Chart._rect.Width <= 0 && pane.Chart._rect.Height <= 0)
+        if (pane.Chart._rect is { Width: <= 0, Height: <= 0 })
         {
             //pane.PieRect = RectangleF.Empty;
             SlicePath = null;
@@ -592,7 +602,7 @@ public class PieItem
 
             var tRect = _boundingRectangle;
 
-            if (tRect.Width >= 1 && tRect.Height >= 1)
+            if (tRect is { Width: >= 1, Height: >= 1 })
             {
                 var sMode = graphics.SmoothingMode;
                 graphics.SmoothingMode = SmoothingMode.AntiAlias;
@@ -668,7 +678,6 @@ public class PieItem
         //Where ChartRect is almost a square - low Aspect Ratio -, need to contract pieRect so that there's some
         //room for labels, if they're visible.
         double maxDisplacement = 0;
-        RectangleF tempRect; //= new RectangleF(0,0,0,0);
 
         var nonExplRect = chartRect;
 
@@ -723,7 +732,7 @@ public class PieItem
                 //if exploded, need to re-calculate rectangle for slice
                 if (slice.Displacement != 0)
                 {
-                    tempRect = nonExplRect;
+                    var tempRect = nonExplRect; //= new RectangleF(0,0,0,0);
                     slice.CalcExplodedRect (ref tempRect);
                     slice._boundingRectangle = tempRect;
                 }
@@ -758,8 +767,6 @@ public class PieItem
     /// <param name="maxDisplacement">maximum slice displacement</param>
     private static void CalculatePieChartParams (GraphPane pane, ref double maxDisplacement)
     {
-        var lblStr = " ";
-
         //loop thru slices and get total value and maxDisplacement
         double pieTotalValue = 0;
         foreach (PieItem curve in pane.CurveList)
@@ -777,7 +784,6 @@ public class PieItem
         //now loop thru and calculate the various angle values
         foreach (PieItem curve in pane.CurveList)
         {
-            lblStr = curve._labelStr;
             curve.StartAngle = (float)nextStartAngle;
             curve.SweepAngle = (float)(360 * curve.Value / pieTotalValue);
             curve.MidAngle = curve.StartAngle + curve.SweepAngle / 2;
@@ -806,7 +812,7 @@ public class PieItem
     /// </param>
     public void DrawLabel (Graphics g, GraphPane pane, RectangleF rect, float scaleFactor)
     {
-        if (!_labelDetail.IsVisible)
+        if (!_labelDetail!.IsVisible)
         {
             return;
         }
@@ -845,7 +851,7 @@ public class PieItem
     /// </param>
     public void DesignLabel (Graphics g, GraphPane pane, RectangleF rect, float scaleFactor)
     {
-        if (!_labelDetail.IsVisible)
+        if (!_labelDetail!.IsVisible)
         {
             return;
         }
@@ -868,7 +874,7 @@ public class PieItem
         //Left - 135 -> 225
         //Top - 225 -> 315
         var chartRect = pane.Chart._rect;
-        float fill = 0;
+        float fill;
         if (_midAngle > 315 || _midAngle <= 45)
         {
             //correct by wrapping text
@@ -880,7 +886,7 @@ public class PieItem
             }
         }
 
-        if (_midAngle > 45 && _midAngle <= 135)
+        if (_midAngle is > 45 and <= 135)
         {
             //correct by moving radial line toward one or the other end of the range
             fill = chartRect.Y + chartRect.Height - _endPoint.Y - 5;
@@ -900,7 +906,7 @@ public class PieItem
             }
         }
 
-        if (_midAngle > 135 && _midAngle <= 225)
+        if (_midAngle is > 135 and <= 225)
         {
             //wrap text
             fill = _endPoint.X - chartRect.X - 5;
@@ -912,7 +918,7 @@ public class PieItem
             }
         }
 
-        if (_midAngle > 225 && _midAngle <= 315)
+        if (_midAngle is > 225 and <= 315)
         {
             //correct by moving radial line toward one or the other end of the range
             fill = _endPoint.Y - 5 - chartRect.Y;
@@ -964,12 +970,12 @@ public class PieItem
         if (_pivotPoint.X >= rectCenter.X) //goes to right
         {
             _endPoint = new PointF ((float)(_pivotPoint.X + .05 * rect.Width), _pivotPoint.Y);
-            _labelDetail.Location.AlignH = AlignH.Left;
+            _labelDetail!.Location.AlignH = AlignH.Left;
         }
         else
         {
             _endPoint = new PointF ((float)(_pivotPoint.X - .05 * rect.Width), _pivotPoint.Y);
-            _labelDetail.Location.AlignH = AlignH.Right;
+            _labelDetail!.Location.AlignH = AlignH.Right;
         }
 
         _midAngle = (float)midAngle;
@@ -1000,20 +1006,20 @@ public class PieItem
                 break;
 
             case PieLabelType.Name_Value:
-                curve._labelStr = curve.Label.Text + ": " + curve._pieValue.ToString ("F", labelFormat);
+                curve._labelStr = curve.Label!.Text + ": " + curve._pieValue.ToString ("F", labelFormat);
                 break;
 
             case PieLabelType.Name_Percent:
-                curve._labelStr = curve.Label.Text + ": " + (curve._sweepAngle / 360).ToString ("P", labelFormat);
+                curve._labelStr = curve.Label!.Text + ": " + (curve._sweepAngle / 360).ToString ("P", labelFormat);
                 break;
 
             case PieLabelType.Name_Value_Percent:
-                curve._labelStr = curve.Label.Text + ": " + curve._pieValue.ToString ("F", labelFormat) +
+                curve._labelStr = curve.Label!.Text + ": " + curve._pieValue.ToString ("F", labelFormat) +
                                   " (" + (curve._sweepAngle / 360).ToString ("P", labelFormat) + ")";
                 break;
 
             case PieLabelType.Name:
-                curve._labelStr = curve.Label.Text;
+                curve._labelStr = curve.Label!.Text;
                 break;
 
             case PieLabelType.None:

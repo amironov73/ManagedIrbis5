@@ -85,7 +85,7 @@ internal class SelectExprEnumerable<T, TR>
 
         public void Reset() => _src!.Reset();
 
-        object IPoolingEnumerator.Current => Current;
+        object IPoolingEnumerator.Current => Current!;
 
         public TR Current => _mutator! (_src!.Current);
 

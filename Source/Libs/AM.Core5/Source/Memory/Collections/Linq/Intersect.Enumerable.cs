@@ -105,7 +105,7 @@ internal class IntersectExprEnumerable<T>
 
         public void Reset() => _src.Reset();
 
-        object IPoolingEnumerator.Current => Current;
+        object IPoolingEnumerator.Current => Current!;
 
         public T Current => _src.Current;
 

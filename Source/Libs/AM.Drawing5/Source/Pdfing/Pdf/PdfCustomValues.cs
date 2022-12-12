@@ -78,16 +78,21 @@ public class PdfCustomValues
     /// <summary>
     /// This function is intended for empira internal use only.
     /// </summary>
-    public PdfCustomValue this [string key]
+    public PdfCustomValue? this [string key]
     {
         get
         {
             var dict = Elements.GetDictionary (key);
             if (dict == null)
+            {
                 return null;
-            var cust = dict as PdfCustomValue;
-            if (cust == null)
+            }
+
+            if (dict is not PdfCustomValue cust)
+            {
                 cust = new PdfCustomValue (dict);
+            }
+
             return cust;
         }
         set
@@ -98,7 +103,7 @@ public class PdfCustomValues
             }
             else
             {
-                Owner.Internals.AddObject (value);
+                Owner!.Internals.AddObject (value);
                 Elements.SetReference (key, value);
             }
         }
@@ -138,10 +143,10 @@ public class PdfCustomValues
     /// </summary>
     public static void ClearAllCustomValues (PdfDocument document)
     {
-        document.CustomValues = null;
+        document.CustomValues = null!;
         foreach (var page in document.Pages)
         {
-            page.CustomValues = null;
+            page.CustomValues = null!;
         }
     }
 
@@ -149,7 +154,7 @@ public class PdfCustomValues
 
     internal static PdfCustomValues Get (DictionaryElements elem)
     {
-        var key = elem.Owner.Owner.Internals.CustomValueKey;
+        var key = elem.Owner!.Owner.Internals.CustomValueKey;
         PdfCustomValues customValues;
         var dict = elem.GetDictionary (key);
         if (dict == null)
@@ -168,6 +173,6 @@ public class PdfCustomValues
 
     internal static void Remove (DictionaryElements elem)
     {
-        elem.Remove (elem.Owner.Owner.Internals.CustomValueKey);
+        elem.Remove (elem.Owner!.Owner!.Internals.CustomValueKey);
     }
 }

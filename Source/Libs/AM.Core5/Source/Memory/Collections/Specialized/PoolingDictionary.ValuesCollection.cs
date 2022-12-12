@@ -104,7 +104,7 @@ public partial class PoolingDictionary<TKey, TValue>
 
             public TValue Current => _src._entries[_pos].value;
 
-            object IEnumerator.Current => Current;
+            object IEnumerator.Current => Current!;
 
             public void Dispose()
             {

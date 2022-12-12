@@ -106,7 +106,7 @@ public sealed class SubFieldCollection
         )
     {
         ThrowIfReadOnly();
-        Sure.NotNull ((object?) subFields);
+        Sure.NotNull (subFields);
 
         foreach (var subField in subFields)
         {

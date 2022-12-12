@@ -3,6 +3,8 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable CompareOfFloatsByEqualityOperator
+// ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 
 /* GraphPane.cs -- панель графика
@@ -81,7 +83,7 @@ public class GraphPane
     /// <summary>
     /// private value that contains a <see cref="ZoomStateStack"/>, which stores prior
     /// <see cref="ZoomState"/> objects containing scale range information.  This enables
-    /// zooming and panning functionality for the <see cref="ZedGraphControl"/>.
+    /// zooming and panning functionality for the ZedGraphControl.
     /// </summary>
     private ZoomStateStack _zoomStack;
 
@@ -329,7 +331,7 @@ public class GraphPane
     /// <summary>
     /// Gets a value that indicates whether or not the <see cref="ZoomStateStack" /> for
     /// this <see cref="GraphPane" /> is empty.  Note that this value is only used for
-    /// the <see cref="ZedGraphControl" />.
+    /// the ZedGraphControl.
     /// </summary>
     public bool IsZoomed => !_zoomStack.IsEmpty;
 
@@ -418,7 +420,7 @@ public class GraphPane
 
         // copy all the reference types with deep copies
         _xAxis = new XAxis (rhs.XAxis);
-        _x2Axis = new X2Axis (rhs.X2Axis);
+        _x2Axis = new X2Axis (rhs.X2Axis!);
 
         _yAxisList = new YAxisList (rhs._yAxisList);
         _y2AxisList = new Y2AxisList (rhs._y2AxisList);
@@ -474,24 +476,24 @@ public class GraphPane
         // backwards compatible as new member variables are added to classes
         var sch = info.GetInt32 ("schema2");
 
-        _xAxis = (XAxis)info.GetValue ("xAxis", typeof (XAxis));
+        _xAxis = (XAxis)info.GetValue ("xAxis", typeof (XAxis))!;
         if (sch >= 11)
         {
-            _x2Axis = (X2Axis)info.GetValue ("x2Axis", typeof (X2Axis));
+            _x2Axis = (X2Axis)info.GetValue ("x2Axis", typeof (X2Axis))!;
         }
         else
         {
             _x2Axis = new X2Axis ("");
         }
 
-        _yAxisList = (YAxisList)info.GetValue ("yAxisList", typeof (YAxisList));
-        _y2AxisList = (Y2AxisList)info.GetValue ("y2AxisList", typeof (Y2AxisList));
+        _yAxisList = (YAxisList)info.GetValue ("yAxisList", typeof (YAxisList))!;
+        _y2AxisList = (Y2AxisList)info.GetValue ("y2AxisList", typeof (Y2AxisList))!;
 
-        _curveList = (CurveList)info.GetValue ("curveList", typeof (CurveList));
+        _curveList = (CurveList)info.GetValue ("curveList", typeof (CurveList))!;
 
-        _chart = (Chart)info.GetValue ("chart", typeof (Chart));
+        _chart = (Chart)info.GetValue ("chart", typeof (Chart))!;
 
-        _barSettings = (BarSettings)info.GetValue ("barSettings", typeof (BarSettings));
+        _barSettings = (BarSettings)info.GetValue ("barSettings", typeof (BarSettings))!;
         _barSettings._ownerPane = this;
 
         _isIgnoreInitial = info.GetBoolean ("isIgnoreInitial");
@@ -499,7 +501,7 @@ public class GraphPane
         _isIgnoreMissing = info.GetBoolean ("isIgnoreMissing");
         _isAlignGrids = info.GetBoolean ("isAlignGrids");
 
-        _lineType = (LineType)info.GetValue ("lineType", typeof (LineType));
+        _lineType = (LineType)info.GetValue ("lineType", typeof (LineType))!;
 
         _zoomStack = new ZoomStateStack();
     }
@@ -548,7 +550,7 @@ public class GraphPane
     /// a scale minimum, maximum, and step size for each axis based on the current curve data.
     /// Only the axis attributes (min, max, step) that are set to auto-range
     /// (<see cref="Scale.MinAuto"/>, <see cref="Scale.MaxAuto"/>, <see cref="Scale.MajorStepAuto"/>)
-    /// will be modified.  You must call <see cref="Control.Invalidate()"/> after calling
+    /// will be modified.  You must call <c>Control.Invalidate()</c> after calling
     /// AxisChange to make sure the display gets updated.<br />
     /// This overload of AxisChange just uses a throw-away bitmap as Graphics.
     /// If you have a Graphics instance available from your Windows Form, you should use
@@ -557,8 +559,12 @@ public class GraphPane
     public void AxisChange()
     {
         using (var img = new Bitmap ((int)Rect.Width, (int)Rect.Height))
-        using (var g = Graphics.FromImage (img))
-            AxisChange (g);
+        {
+            using (var g = Graphics.FromImage (img))
+            {
+                AxisChange (g);
+            }
+        }
     }
 
     /// <summary>
@@ -573,13 +579,13 @@ public class GraphPane
     /// Only the axis attributes (min, max, step) that are set to auto-range
     /// (<see cref="Scale.MinAuto"/>, <see cref="Scale.MaxAuto"/>, <see cref="Scale.MajorStepAuto"/>)
     /// will be modified.  You must call
-    /// <see cref="Control.Invalidate()"/> after calling AxisChange to make sure the display gets updated.
+    /// <c>Control.Invalidate()</c> after calling AxisChange to make sure the display gets updated.
     /// </remarks>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
-    public void AxisChange (Graphics g)
+    public void AxisChange (Graphics graphics)
     {
         //double	xMin, xMax, yMin, yMax, y2Min, y2Max;
 
@@ -596,9 +602,9 @@ public class GraphPane
         {
             //don't want to display axis or border if there's only pies
             XAxis.IsVisible = false;
-            X2Axis.IsVisible = false;
-            YAxis.IsVisible = false;
-            Y2Axis.IsVisible = false;
+            X2Axis!.IsVisible = false;
+            YAxis!.IsVisible = false;
+            Y2Axis!.IsVisible = false;
             _chart.Border.IsVisible = false;
 
             //this.Legend.Position = LegendPos.TopCenter;
@@ -617,15 +623,15 @@ public class GraphPane
         // then let the scales re-calculate to make sure that the assumption was ok
         if (_chart._isRectAuto)
         {
-            PickScale (g, scaleFactor);
+            PickScale (graphics, scaleFactor);
 
-            _chart._rect = CalcChartRect (g);
+            _chart._rect = CalcChartRect (graphics);
 
             //this.pieRect = PieItem.CalcPieRect( g, this, scaleFactor, this.chartRect );
         }
 
         // Pick new scales based on the range
-        PickScale (g, scaleFactor);
+        PickScale (graphics, scaleFactor);
 
         // Set the ClusterScaleWidth, if needed
         _barSettings.CalcClusterScaleWidth();
@@ -641,12 +647,12 @@ public class GraphPane
     {
         var maxTics = 0;
 
-        _xAxis.Scale.PickScale (this, g, scaleFactor);
-        _x2Axis.Scale.PickScale (this, g, scaleFactor);
+        _xAxis.Scale!.PickScale (this, g, scaleFactor);
+        _x2Axis.Scale!.PickScale (this, g, scaleFactor);
 
         foreach (Axis axis in _yAxisList)
         {
-            axis.Scale.PickScale (this, g, scaleFactor);
+            axis.Scale!.PickScale (this, g, scaleFactor);
             if (axis.Scale.MaxAuto)
             {
                 var nTics = axis.Scale.CalcNumTics();
@@ -656,7 +662,7 @@ public class GraphPane
 
         foreach (Axis axis in _y2AxisList)
         {
-            axis.Scale.PickScale (this, g, scaleFactor);
+            axis.Scale!.PickScale (this, g, scaleFactor);
             if (axis.Scale.MaxAuto)
             {
                 var nTics = axis.Scale.CalcNumTics();
@@ -680,7 +686,7 @@ public class GraphPane
 
     private void ForceNumTics (Axis axis, int numTics)
     {
-        if (axis.Scale.MaxAuto)
+        if (axis.Scale!.MaxAuto)
         {
             var nTics = axis.Scale.CalcNumTics();
             if (nTics < numTics)
@@ -746,16 +752,16 @@ public class GraphPane
         // the GraphObj's are drawn so that the Transform functions are
         // ready.  Also, this should be done before CalcChartRect so that the
         // Axis.Cross - shift parameter can be calculated.
-        _xAxis.Scale.SetupScaleData (this, _xAxis);
-        _x2Axis.Scale.SetupScaleData (this, _x2Axis);
+        _xAxis.Scale!.SetupScaleData (this, _xAxis);
+        _x2Axis.Scale!.SetupScaleData (this, _x2Axis);
         foreach (Axis axis in _yAxisList)
         {
-            axis.Scale.SetupScaleData (this, axis);
+            axis.Scale!.SetupScaleData (this, axis);
         }
 
         foreach (Axis axis in _y2AxisList)
         {
-            axis.Scale.SetupScaleData (this, axis);
+            axis.Scale!.SetupScaleData (this, axis);
         }
 
         // Draw the GraphItems that are behind the Axis objects
@@ -862,11 +868,11 @@ public class GraphPane
 
     private bool AxisRangesValid()
     {
-        var showGraf = _xAxis.Scale._min < _xAxis.Scale._max &&
-                       _x2Axis.Scale._min < _x2Axis.Scale._max;
+        var showGraf = _xAxis.Scale!._min < _xAxis.Scale._max &&
+                       _x2Axis.Scale!._min < _x2Axis.Scale._max;
         foreach (Axis axis in _yAxisList)
         {
-            if (axis.Scale._min >= axis.Scale._max)
+            if (axis.Scale!._min >= axis.Scale._max)
             {
                 showGraf = false;
             }
@@ -874,7 +880,7 @@ public class GraphPane
 
         foreach (Axis axis in _y2AxisList)
         {
-            if (axis.Scale._min >= axis.Scale._max)
+            if (axis.Scale!._min >= axis.Scale._max)
             {
                 showGraf = false;
             }
@@ -1558,15 +1564,15 @@ public class GraphPane
         )
     {
         // Setup the scaling data based on the chart rect
-        _xAxis.Scale.SetupScaleData (this, _xAxis);
+        _xAxis.Scale!.SetupScaleData (this, _xAxis);
         foreach (Axis axis in _yAxisList)
         {
-            axis.Scale.SetupScaleData (this, axis);
+            axis.Scale!.SetupScaleData (this, axis);
         }
 
         foreach (Axis axis in _y2AxisList)
         {
-            axis.Scale.SetupScaleData (this, axis);
+            axis.Scale!.SetupScaleData (this, axis);
         }
 
         return TransformCoord (ptF.X, ptF.Y, coord);
@@ -1593,15 +1599,15 @@ public class GraphPane
     public PointF GeneralTransform (double x, double y, CoordType coord)
     {
         // Setup the scaling data based on the chart rect
-        _xAxis.Scale.SetupScaleData (this, _xAxis);
+        _xAxis.Scale!.SetupScaleData (this, _xAxis);
         foreach (Axis axis in _yAxisList)
         {
-            axis.Scale.SetupScaleData (this, axis);
+            axis.Scale!.SetupScaleData (this, axis);
         }
 
         foreach (Axis axis in _y2AxisList)
         {
-            axis.Scale.SetupScaleData (this, axis);
+            axis.Scale!.SetupScaleData (this, axis);
         }
 
         return TransformCoord (x, y, coord);
@@ -1625,10 +1631,10 @@ public class GraphPane
     public void ReverseTransform (PointF ptF, out double x, out double y)
     {
         // Setup the scaling data based on the chart rect
-        _xAxis.Scale.SetupScaleData (this, _xAxis);
-        YAxis.Scale.SetupScaleData (this, YAxis);
+        _xAxis.Scale!.SetupScaleData (this, _xAxis);
+        YAxis!.Scale!.SetupScaleData (this, YAxis);
 
-        x = XAxis.Scale.ReverseTransform (ptF.X);
+        x = XAxis.Scale!.ReverseTransform (ptF.X);
         y = YAxis.Scale.ReverseTransform (ptF.Y);
     }
 
@@ -1654,13 +1660,13 @@ public class GraphPane
         out double y2)
     {
         // Setup the scaling data based on the chart rect
-        _xAxis.Scale.SetupScaleData (this, _xAxis);
-        _x2Axis.Scale.SetupScaleData (this, _x2Axis);
-        YAxis.Scale.SetupScaleData (this, YAxis);
-        Y2Axis.Scale.SetupScaleData (this, Y2Axis);
+        _xAxis.Scale!.SetupScaleData (this, _xAxis);
+        _x2Axis.Scale!.SetupScaleData (this, _x2Axis);
+        YAxis!.Scale!.SetupScaleData (this, YAxis);
+        Y2Axis!.Scale!.SetupScaleData (this, Y2Axis);
 
-        x = XAxis.Scale.ReverseTransform (ptF.X);
-        x2 = X2Axis.Scale.ReverseTransform (ptF.X);
+        x = XAxis.Scale!.ReverseTransform (ptF.X);
+        x2 = X2Axis!.Scale!.ReverseTransform (ptF.X);
         y = YAxis.Scale.ReverseTransform (ptF.Y);
         y2 = Y2Axis.Scale.ReverseTransform (ptF.Y);
     }
@@ -1696,10 +1702,10 @@ public class GraphPane
             xAxis = _x2Axis;
         }
 
-        xAxis.Scale.SetupScaleData (this, xAxis);
+        xAxis.Scale!.SetupScaleData (this, xAxis);
         x = xAxis.Scale.ReverseTransform (ptF.X);
 
-        Axis yAxis = null;
+        Axis? yAxis = null;
         if (isY2Axis && Y2AxisList.Count > yAxisIndex)
         {
             yAxis = Y2AxisList[yAxisIndex];
@@ -1711,7 +1717,7 @@ public class GraphPane
 
         if (yAxis != null)
         {
-            yAxis.Scale.SetupScaleData (this, yAxis);
+            yAxis.Scale!.SetupScaleData (this, yAxis);
             y = yAxis.Scale.ReverseTransform (ptF.Y);
         }
         else
@@ -1746,25 +1752,25 @@ public class GraphPane
         out double[] y2)
     {
         // Setup the scaling data based on the chart rect
-        _xAxis.Scale.SetupScaleData (this, _xAxis);
-        x = XAxis.Scale.ReverseTransform (ptF.X);
-        _x2Axis.Scale.SetupScaleData (this, _x2Axis);
-        x2 = X2Axis.Scale.ReverseTransform (ptF.X);
+        _xAxis.Scale!.SetupScaleData (this, _xAxis);
+        x = XAxis.Scale!.ReverseTransform (ptF.X);
+        _x2Axis.Scale!.SetupScaleData (this, _x2Axis);
+        x2 = X2Axis!.Scale!.ReverseTransform (ptF.X);
 
         y = new double[_yAxisList.Count];
         y2 = new double[_y2AxisList.Count];
 
         for (var i = 0; i < _yAxisList.Count; i++)
         {
-            Axis axis = _yAxisList[i];
-            axis.Scale.SetupScaleData (this, axis);
+            Axis? axis = _yAxisList[i];
+            axis!.Scale!.SetupScaleData (this, axis);
             y[i] = axis.Scale.ReverseTransform (ptF.Y);
         }
 
         for (var i = 0; i < _y2AxisList.Count; i++)
         {
-            Axis axis = _y2AxisList[i];
-            axis.Scale.SetupScaleData (this, axis);
+            Axis axis = _y2AxisList[i]!;
+            axis.Scale!.SetupScaleData (this, axis);
             y2[i] = axis.Scale.ReverseTransform (ptF.Y);
         }
     }
@@ -1783,11 +1789,19 @@ public class GraphPane
     /// <returns>the ordinal position (index) in the <see cref="YAxisList" />.</returns>
     public int AddYAxis (string title)
     {
-        var axis = new YAxis (title);
-        axis.MajorTic.IsOpposite = false;
-        axis.MinorTic.IsOpposite = false;
-        axis.MajorTic.IsInside = false;
-        axis.MinorTic.IsInside = false;
+        var axis = new YAxis (title)
+        {
+            MajorTic =
+            {
+                IsOpposite = false,
+                IsInside = false
+            },
+            MinorTic =
+            {
+                IsOpposite = false,
+                IsInside = false
+            }
+        };
         _yAxisList.Add (axis);
         return _yAxisList.Count - 1;
     }
@@ -1806,11 +1820,19 @@ public class GraphPane
     /// <returns>the ordinal position (index) in the <see cref="Y2AxisList" />.</returns>
     public int AddY2Axis (string title)
     {
-        var axis = new Y2Axis (title);
-        axis.MajorTic.IsOpposite = false;
-        axis.MinorTic.IsOpposite = false;
-        axis.MajorTic.IsInside = false;
-        axis.MinorTic.IsInside = false;
+        var axis = new Y2Axis (title)
+        {
+            MajorTic =
+            {
+                IsOpposite = false,
+                IsInside = false
+            },
+            MinorTic =
+            {
+                IsOpposite = false,
+                IsInside = false
+            }
+        };
         _y2AxisList.Add (axis);
         return _y2AxisList.Count - 1;
     }
@@ -1895,7 +1917,7 @@ public class GraphPane
             }
 
             // See if the point is in the Pane Title
-            var paneTitleBox = _title.FontSpec.BoundingBox (graphics, _title.Text, scaleFactor);
+            var paneTitleBox = _title.FontSpec!.BoundingBox (graphics, _title.Text!, scaleFactor);
             if (saveZOrder <= ZOrder.H_BehindAll && _title.IsVisible)
             {
                 tmpRect = new RectangleF ((_rect.Left + _rect.Right - paneTitleBox.Width) / 2,
@@ -1913,8 +1935,8 @@ public class GraphPane
             // See if the point is in one of the Y Axes
             for (var yIndex = 0; yIndex < _yAxisList.Count; yIndex++)
             {
-                Axis yAxis = _yAxisList[yIndex];
-                var width = yAxis._tmpSpace;
+                Axis yAxis = _yAxisList[yIndex]!;
+                var width = yAxis!._tmpSpace;
                 if (width > 0)
                 {
                     tmpRect = new RectangleF (left - width, tmpChartRect.Top,
@@ -1935,7 +1957,7 @@ public class GraphPane
             // See if the point is in one of the Y2 Axes
             for (var yIndex = 0; yIndex < _y2AxisList.Count; yIndex++)
             {
-                Axis y2Axis = _y2AxisList[yIndex];
+                Axis y2Axis = _y2AxisList[yIndex]!;
                 var width = y2Axis._tmpSpace;
                 if (width > 0)
                 {
@@ -2032,7 +2054,7 @@ public class GraphPane
             (
                 mousePt,
                 targetCurveList,
-                out nearestCurve,
+                out nearestCurve!,
                 out iNearest
             );
     }
@@ -2066,7 +2088,7 @@ public class GraphPane
         )
     {
         return FindNearestPoint (mousePt, _curveList,
-            out nearestCurve, out iNearest);
+            out nearestCurve!, out iNearest);
     }
 
     /// <summary>
@@ -2135,12 +2157,12 @@ public class GraphPane
         foreach (var curve in targetCurveList)
         {
             //test for pie first...if it's a pie rest of method superfluous
-            if (curve is PieItem && curve.IsVisible)
+            if (curve is PieItem { IsVisible: true } item)
             {
-                if (((PieItem)curve).SlicePath != null &&
-                    ((PieItem)curve).SlicePath.IsVisible (mousePt))
+                if (item.SlicePath != null &&
+                    item.SlicePath!.IsVisible (mousePt))
                 {
-                    nearestBar = curve;
+                    nearestBar = item;
                     iNearestBar = 0;
                 }
 
@@ -2155,19 +2177,19 @@ public class GraphPane
                 if (curve.IsY2Axis)
                 {
                     yAct = y2[yIndex];
-                    yMinAct = _y2AxisList[yIndex].Scale._min;
-                    yMaxAct = _y2AxisList[yIndex].Scale._max;
+                    yMinAct = _y2AxisList[yIndex]!.Scale!._min;
+                    yMaxAct = _y2AxisList[yIndex]!.Scale!._max;
                 }
                 else
                 {
                     yAct = y[yIndex];
-                    yMinAct = _yAxisList[yIndex].Scale._min;
-                    yMaxAct = _yAxisList[yIndex].Scale._max;
+                    yMinAct = _yAxisList[yIndex]!.Scale!._min;
+                    yMaxAct = _yAxisList[yIndex]!.Scale!._max;
                 }
 
                 yPixPerUnitAct = _chart._rect.Height / (yMaxAct - yMinAct);
 
-                var xPixPerUnit = _chart._rect.Width / (xAxis.Scale._max - xAxis.Scale._min);
+                var xPixPerUnit = _chart._rect.Width / (xAxis.Scale!._max - xAxis.Scale._min);
                 xAct = xAxis is XAxis ? x : x2;
 
                 var points = curve.Points;
@@ -2199,7 +2221,7 @@ public class GraphPane
                         }
 
                         // yVal is the user scale Y value of the current point
-                        if (yAxis.Scale.IsAnyOrdinal && !curve.IsOverrideOrdinal)
+                        if (yAxis.Scale!.IsAnyOrdinal && !curve.IsOverrideOrdinal)
                         {
                             yVal = (double)iPt + 1.0;
                         }
@@ -2220,9 +2242,7 @@ public class GraphPane
 
                                 if (lowVal > hiVal)
                                 {
-                                    var tmpVal = lowVal;
-                                    lowVal = hiVal;
-                                    hiVal = tmpVal;
+                                    (lowVal, hiVal) = (hiVal, lowVal);
                                 }
 
                                 if (isXBaseAxis)
@@ -2288,9 +2308,9 @@ public class GraphPane
             }
         }
 
-        if (nearestCurve is LineItem)
+        if (nearestCurve is LineItem lineItem)
         {
-            var halfSymbol = (float)(((LineItem)nearestCurve).Symbol.Size *
+            var halfSymbol = (float)(lineItem.Symbol.Size *
                 CalcScaleFactor() / 2);
             minDist -= halfSymbol * halfSymbol;
             if (minDist < 0)
@@ -2367,7 +2387,7 @@ public class GraphPane
         {
             link = curve._link;
 
-            if (link.IsActive)
+            if (link!.IsActive)
             {
                 if (FindNearestPoint (mousePt, curve, out var nearestCurve, out index))
                 {
@@ -2419,7 +2439,7 @@ public class GraphPane
 
         foreach (var ci in CurveList)
         {
-            for (var i = 0; i < ci.Points.Count; i++)
+            for (var i = 0; i < ci.Points!.Count; i++)
             {
                 if (ci.Points[i].X > rectF.Left &&
                     ci.Points[i].X < rectF.Right &&

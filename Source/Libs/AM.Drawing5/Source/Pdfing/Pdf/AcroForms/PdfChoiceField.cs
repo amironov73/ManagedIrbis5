@@ -60,12 +60,14 @@ public abstract class PdfChoiceField
 #if DEBUG // Check with //R080317 implemention
         PdfArray? opt2 = null;
         if (Elements[Keys.Opt] is PdfArray)
+        {
             opt2 = Elements[Keys.Opt] as PdfArray;
+        }
         else if (Elements[Keys.Opt] is Advanced.PdfReference)
         {
             //falls das Array nicht direkt am Element h�ngt,
             //das Array aus dem referenzierten Element holen
-            opt2 = ((Advanced.PdfReference)Elements[Keys.Opt]).Value as PdfArray;
+            opt2 = ((Advanced.PdfReference)Elements[Keys.Opt]!).Value as PdfArray;
         }
 
         Debug.Assert (ReferenceEquals (opt, opt2));
@@ -80,15 +82,18 @@ public abstract class PdfChoiceField
                 if (item is PdfString)
                 {
                     if (item.ToString() == value)
+                    {
                         return idx;
+                    }
                 }
-                else if (item is PdfArray)
+                else if (item is PdfArray array)
                 {
-                    var array = (PdfArray)item;
                     if (array.Elements.Count != 0)
                     {
                         if (array.Elements[0].ToString() == value)
+                        {
                             return idx;
+                        }
                     }
                 }
             }
@@ -107,17 +112,23 @@ public abstract class PdfChoiceField
         {
             var count = opt.Elements.Count;
             if (index < 0 || index >= count)
-                throw new ArgumentOutOfRangeException ("index");
+            {
+                throw new ArgumentOutOfRangeException (nameof (index));
+            }
 
             var item = opt.Elements[index];
             if (item is PdfString)
-                return item.ToString();
+            {
+                return item.ToString()!;
+            }
 
             if (item is PdfArray)
             {
                 var array = (PdfArray)item;
                 if (array.Elements.Count != 0)
-                    return array.Elements[0].ToString();
+                {
+                    return array.Elements[0].ToString()!;
+                }
             }
         }
 
@@ -163,12 +174,9 @@ public abstract class PdfChoiceField
         /// <summary>
         /// Gets the KeysMeta for these keys.
         /// </summary>
-        internal static DictionaryMeta Meta
-        {
-            get { return _meta ?? (_meta = CreateMeta (typeof (Keys))); }
-        }
+        internal static DictionaryMeta Meta => _meta ??= CreateMeta (typeof (Keys));
 
-        static DictionaryMeta _meta;
+        static DictionaryMeta? _meta;
 
         // ReSharper restore InconsistentNaming
     }

@@ -206,7 +206,7 @@ public sealed class RecordReference
         )
     {
         Sure.NotNull (connection);
-        Sure.NotNull ((object?) references);
+        Sure.NotNull (references);
 
         var result = new List<Record>();
         foreach (var reference in references)

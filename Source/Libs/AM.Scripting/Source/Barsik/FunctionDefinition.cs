@@ -39,8 +39,8 @@ sealed class FunctionDefinition
         )
     {
         Sure.NotNull (name);
-        Sure.NotNull ((object?) arguments);
-        Sure.NotNull ((object?) body);
+        Sure.NotNull (arguments);
+        Sure.NotNull (body);
 
         _name = name;
         _arguments = arguments.ToArray();

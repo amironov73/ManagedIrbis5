@@ -59,7 +59,7 @@ sealed class CatchNode
         )
     {
         Sure.NotNullNorEmpty (variableName);
-        Sure.NotNull ((object?) block);
+        Sure.NotNull (block);
 
         StartPosition = position;
         VariableName = variableName;

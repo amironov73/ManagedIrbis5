@@ -94,7 +94,7 @@ internal class PrependExprEnumerable<T>
             _src.Reset();
         }
 
-        object IPoolingEnumerator.Current => Current;
+        object IPoolingEnumerator.Current => Current!;
 
         public T Current => _shouldReturnElement ? _element : (T)_src.Current;
 

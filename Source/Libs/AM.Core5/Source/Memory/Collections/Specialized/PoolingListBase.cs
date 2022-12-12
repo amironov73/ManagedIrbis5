@@ -408,7 +408,7 @@ public abstract class PoolingListBase<T>
             }
         }
 
-        object IPoolingEnumerator.Current => Current;
+        object IPoolingEnumerator.Current => Current!;
 
         /// <inheritdoc cref="IDisposable.Dispose"/>
         public void Dispose()

@@ -61,7 +61,7 @@ public static class RecordUtility
         )
     {
         Sure.NotNull (record);
-        Sure.NotNull ((object?)newFields);
+        Sure.NotNull (newFields);
 
         record.RemoveField (tag);
         record.Fields.AddRange (newFields);

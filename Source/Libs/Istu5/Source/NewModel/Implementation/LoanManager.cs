@@ -134,7 +134,7 @@ public sealed class LoanManager
         )
     {
         Sure.NotNull (attendance);
-        Sure.NotNull ((object?) loans);
+        Sure.NotNull (loans);
 
         throw new NotImplementedException();
     }
@@ -147,7 +147,7 @@ public sealed class LoanManager
         )
     {
         Sure.NotNull (attendance);
-        Sure.NotNull ((object?) loans);
+        Sure.NotNull (loans);
 
         throw new NotImplementedException();
     }
@@ -158,7 +158,7 @@ public sealed class LoanManager
             IEnumerable<Loan> loans
         )
     {
-        Sure.NotNull ((object?) loans);
+        Sure.NotNull (loans);
 
         throw new NotImplementedException();
     }
@@ -223,7 +223,7 @@ public sealed class LoanManager
         )
     {
         Sure.NotNull (attendance);
-        Sure.NotNull ((object?) loans);
+        Sure.NotNull (loans);
 
         throw new NotImplementedException();
     }
@@ -236,7 +236,7 @@ public sealed class LoanManager
         )
     {
         Sure.NotNull (attendance);
-        Sure.NotNull ((object?) loans);
+        Sure.NotNull (loans);
 
         throw new NotImplementedException();
     }
@@ -245,7 +245,7 @@ public sealed class LoanManager
     public void SetAlert
         (
             Loan loan,
-            string text
+            string? text
         )
     {
         Sure.NotNull (loan);
@@ -283,7 +283,7 @@ public sealed class LoanManager
             int operatorId
         )
     {
-        Sure.NotNull ((object?) loans);
+        Sure.NotNull (loans);
 
         throw new NotImplementedException();
     }

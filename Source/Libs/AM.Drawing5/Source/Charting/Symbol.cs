@@ -745,7 +745,7 @@ public class Symbol
 
                             // If the fill type for this symbol is a Gradient by value type,
                             // the make a brush corresponding to the appropriate current value
-                            if (_fill.IsGradientValueType || _border._gradientFill.IsGradientValueType)
+                            if (_fill.IsGradientValueType || _border.GradientFill.IsGradientValueType)
                             {
                                 using (var tBrush = _fill.MakeBrush (rect, points[i]))
                                 using (var tPen = _border.GetPen (pane, scaleFactor, points[i]))

@@ -337,7 +337,7 @@ public sealed class PftContext
             IEnumerable<PftNode> items
         )
     {
-        Sure.NotNull ((object?) items);
+        Sure.NotNull (items);
 
         Magna.Logger.LogTrace (nameof (PftContext) + "::" + nameof (Evaluate));
 
@@ -361,7 +361,7 @@ public sealed class PftContext
             IEnumerable<PftNode>? nodes
         )
     {
-        Sure.NotNull ((object?) nodes);
+        Sure.NotNull (nodes);
 
         Magna.Logger.LogTrace (nameof (PftContext) + "::" + nameof (Execute));
 

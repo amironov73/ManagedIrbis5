@@ -323,7 +323,7 @@ public sealed class GlobalCorrector
             GblStatement[] statements
         )
     {
-        Sure.NotNull ((object?)recordset);
+        Sure.NotNull (recordset);
         Sure.NotNull (statements);
 
         if (statements.Length == 0)
@@ -451,7 +451,7 @@ public sealed class GlobalCorrector
             IEnumerable<GblStatement> statements
         )
     {
-        Sure.NotNull ((object?)statements);
+        Sure.NotNull (statements);
 
         var result = new GblSettings
             (

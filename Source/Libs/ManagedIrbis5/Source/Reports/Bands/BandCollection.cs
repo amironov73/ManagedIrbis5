@@ -135,7 +135,7 @@ public sealed class BandCollection<T>
             IEnumerable<T> bands
         )
     {
-        Sure.NotNull ((object?) bands);
+        Sure.NotNull (bands);
 
         ThrowIfReadOnly();
 

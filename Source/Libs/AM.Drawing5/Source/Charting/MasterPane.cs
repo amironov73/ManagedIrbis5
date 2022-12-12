@@ -357,7 +357,7 @@ public class MasterPane
         // backwards compatible as new member variables are added to classes
         var sch = info.GetInt32 ("schema2");
 
-        _paneList = (PaneList) info.GetValue ("paneList", typeof (PaneList));
+        _paneList = (PaneList) info.GetValue ("paneList", typeof (PaneList))!;
 
         //_paneLayoutMgr = (PaneLayoutMgr) info.GetValue( "paneLayoutMgr", typeof(PaneLayoutMgr) );
         _innerPaneGap = info.GetSingle ("innerPaneGap");
@@ -365,11 +365,11 @@ public class MasterPane
         _isUniformLegendEntries = info.GetBoolean ("isUniformLegendEntries");
         _isCommonScaleFactor = info.GetBoolean ("isCommonScaleFactor");
 
-        _paneLayout = (PaneLayout)info.GetValue ("paneLayout", typeof (PaneLayout));
-        _countList = (int[])info.GetValue ("countList", typeof (int[]));
+        _paneLayout = (PaneLayout)info.GetValue ("paneLayout", typeof (PaneLayout))!;
+        _countList = (int[])info.GetValue ("countList", typeof (int[]))!;
 
         _isColumnSpecified = info.GetBoolean ("isColumnSpecified");
-        _prop = (float[])info.GetValue ("prop", typeof (float[]));
+        _prop = (float[])info.GetValue ("prop", typeof (float[]))!;
 
         if (sch >= 11)
         {
