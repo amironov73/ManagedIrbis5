@@ -22,10 +22,9 @@ using System.Diagnostics;
 using System.Text;
 using System.Xml;
 using System.IO;
+using System.IO.Compression;
 using System.Reflection;
 using System.Runtime.InteropServices;
-
-using Ionic.Zip; // TODO избавиться от Ionic.Zip
 
 using System.Xml.Schema;
 using System.Xml.XPath;
@@ -441,9 +440,9 @@ public class FileMetadata
 {
     #region Private
 
-    private Dictionary<string, string> _metadataItems = new Dictionary<string, string>();
+    private readonly Dictionary<string, string> _metadataItems = new ();
     private string _description = string.Empty;
-    private bool _initialized = false;
+    private bool _initialized;
 
     #endregion
 
@@ -527,8 +526,7 @@ public class FileMetadata
     {
         foreach (var item in Metadata)
         {
-            if (part.Contains (string.Format ("({0})", item.Key)) ||
-                part.Contains (string.Format ("[{0}]", item.Key)))
+            if (part.Contains ($"({item.Key})") || part.Contains ($"[{item.Key}]"))
             {
                 if (string.IsNullOrEmpty (item.Value))
                 {
@@ -594,7 +592,7 @@ public class FileMetadata
     public string GetMetadata (DescriptionElements key)
     {
         var name = Enum.GetName (typeof (DescriptionElements), key);
-        var _key = string.Format ("{0}", name);
+        var _key = $"{name}";
         return Metadata[_key];
     }
 
@@ -609,8 +607,8 @@ public class FileMetadata
         {
             foreach (var item in Metadata)
             {
-                part = part.Replace (string.Format ("({0})", item.Key), item.Value);
-                part = part.Replace (string.Format ("[{0}]", item.Key), string.Empty);
+                part = part.Replace ($"({item.Key})", item.Value);
+                part = part.Replace ($"[{item.Key}]", string.Empty);
             }
 
             return part;
@@ -633,9 +631,9 @@ public class FB2Metadata
 {
     #region Private
 
-    private int bookTitleAuthor = 0;
-    private int bookTitleTranslator = 0;
-    private int bookTitleGenre = 0;
+    private int bookTitleAuthor;
+    private int bookTitleTranslator;
+    private int bookTitleGenre;
 
     #endregion
 
@@ -897,9 +895,9 @@ public class FB2File
 
     private const string fb2xmlns = "http://www.gribuser.ru/xml/fictionbook/2.0";
     private bool _isValid = true;
-    private FileMetadata _metadata = new FileMetadata();
+    private FileMetadata _metadata = new ();
     private string _errors = string.Empty;
-    private List<string> validationSchemaErrors = new List<string>();
+    private readonly List<string> validationSchemaErrors = new ();
 
     private static XmlSchema? FictionBook { get; set; }
     private static XmlSchema? FictionBookGenres { get; set; }
@@ -1032,33 +1030,37 @@ public class FB2File
         else if (fileName.ToLower().EndsWith (FB2Config.Current.FB2ZIPExtension))
         {
             var zipEncoding = Encoding.GetEncoding (FB2Config.Current.Encodings.CompressionEncoding);
-            var options = new ReadOptions
+            // var options = new ReadOptions
+            // {
+            //     Encoding = zipEncoding
+            // };
+            using (var zip = ZipFile.Open (fileName, ZipArchiveMode.Read, zipEncoding))
+                   //ZipFile.Read (fileName, options))
             {
-                Encoding = zipEncoding
-            };
-            using (var zip = ZipFile.Read (fileName, options))
-            {
-                if (zip.Count <= 0)
+                if (zip.Entries.Count <= 0)
                 {
                     // throw new Exception(Properties.Resources.ZipErrorNoFiles);
                     throw new Exception();
                 }
 
-                if (zip.Count > 1)
+                if (zip.Entries.Count > 1)
                 {
                     // throw new Exception(Properties.Resources.ZipErrorMoreThanOneFile);
                     throw new Exception();
                 }
 
-                if (!zip[0].FileName.ToLower().EndsWith (FB2Config.Current.FB2Extension))
+                if (!zip.Entries[0].Name.ToLower().EndsWith (FB2Config.Current.FB2Extension))
                 {
                     // throw new Exception(Properties.Resources.ZipErrorNoFB2);
                     throw new Exception();
                 }
 
-                foreach (var entry in zip)
+                foreach (var entry in zip.Entries)
                 {
-                    entry.Extract (stream);
+                    using var zipStream = entry.Open();
+                    using var fileStream = File.Create (entry.Name);
+                    zipStream.CopyTo (fileStream);
+                    // entry.Extract (stream);
                 }
             }
         }
@@ -1372,15 +1374,7 @@ public class FB2File
     /// <returns></returns>
     public bool IsSkipFile (string newFullName, string newFileName)
     {
-        var skip = false;
-        if (File.Exists (newFullName))
-        {
-            // OverwriteDialog dialog = new OverwriteDialog(newFullName);
-            // skip = dialog.CheckSkip();
-            skip = true;
-        }
-
-        return skip;
+        return File.Exists (newFullName);
     }
 
     /// <summary>
@@ -1458,14 +1452,19 @@ public class FB2File
             fileName = fileName.Substring (0, fileName.Length - FB2Config.Current.FB2ZIPExtension.Length) +
                        FB2Config.Current.FB2Extension;
             var zipEncoding = Encoding.GetEncoding (FB2Config.Current.Encodings.CompressionEncoding);
-            var options = new ReadOptions
+            //var options = new ReadOptions
+            //{
+            //    Encoding = zipEncoding
+            //};
+            using (var zip = ZipFile.Open (fileName, ZipArchiveMode.Read, zipEncoding))
+                //(ZipFile zip = ZipFile.Read (FileInformation.FullName, options))
             {
-                Encoding = zipEncoding
-            };
-            using (ZipFile zip = ZipFile.Read (FileInformation.FullName, options))
-            {
-                zip[0].Extract (FileInformation.Directory!.FullName, ExtractExistingFileAction.Throw);
-                fileName = Path.Combine (FileInformation.Directory.FullName, zip[0].FileName);
+                var zipEntry = zip.Entries[0];
+                //zip[0].Extract (FileInformation.Directory!.FullName, ExtractExistingFileAction.Throw);
+                fileName = Path.Combine (FileInformation.Directory!.FullName, zipEntry.Name);
+                using var zipStream = zipEntry.Open();
+                using var fileSteam = File.Create (zipEntry.Name);
+                zipStream.CopyTo (fileSteam);
             }
 
             FileInformation.Delete();
@@ -1648,10 +1647,15 @@ public class FB2File
             fileName = fileName.Substring (0, fileName.Length - FB2Config.Current.FB2Extension.Length) +
                        FB2Config.Current.FB2ZIPExtension;
             var zipEncoding = Encoding.GetEncoding (FB2Config.Current.Encodings.CompressionEncoding);
-            using (ZipFile zip = new ZipFile (fileName, zipEncoding))
+            using (var zip = ZipFile.Open (fileName, ZipArchiveMode.Update, zipEncoding))
+            //(ZipFile zip = new ZipFile (fileName, zipEncoding))
             {
-                zip.AddFile (FileInformation.FullName, string.Empty);
-                zip.Save();
+                var entry = zip.CreateEntry (FileInformation.Name);
+                using var zipStream = entry.Open();
+                using var fileStream = File.OpenRead (FileInformation.FullName);
+                fileStream.CopyTo (zipStream);
+                //zip.AddFile (FileInformation.FullName, string.Empty);
+                //zip.Save();
             }
 
             FileInformation.Delete();
@@ -1866,16 +1870,18 @@ public class FB2File
         {
             var inZipFileName = string.Empty;
             var zipEncoding = Encoding.GetEncoding (FB2Config.Current.Encodings.CompressionEncoding);
-            var options = new ReadOptions
+            //var options = new ReadOptions
+            //{
+            //    Encoding = zipEncoding
+            //};
+            using (var zip = ZipFile.Open (FileInformation.FullName, ZipArchiveMode.Read, zipEncoding))
+                // (ZipFile zip = ZipFile.Read (FileInformation.FullName, options))
             {
-                Encoding = zipEncoding
-            };
-            using (ZipFile zip = ZipFile.Read (FileInformation.FullName, options))
-            {
-                inZipFileName = zip[0].FileName;
+                inZipFileName = zip.Entries[0].Name;
             }
 
-            using (ZipFile zip = new ZipFile (zipEncoding))
+            using (var zip = ZipFile.Open (FileInformation.FullName, ZipArchiveMode.Create))
+                // (ZipFile zip = new ZipFile (zipEncoding))
             {
                 var memStream = new MemoryStream();
                 var writer = new XmlTextWriter (memStream, Encoding.GetEncoding (BookInternalEncoding));
@@ -1887,8 +1893,9 @@ public class FB2File
                 doc.Save (writer);
                 writer.Flush();
                 memStream.Position = 0;
-                ZipEntry e = zip.AddEntry (inZipFileName, memStream);
-                zip.Save (FileInformation.FullName);
+                var entry = zip.CreateEntry(inZipFileName);
+                using var zipStream = entry.Open();
+                memStream.CopyTo (zipStream);
                 writer.Close();
             }
         }
@@ -1934,16 +1941,18 @@ public class FB2File
         {
             var inZipFileName = string.Empty;
             var zipEncoding = Encoding.GetEncoding (FB2Config.Current.Encodings.CompressionEncoding);
-            var options = new ReadOptions
+            //var options = new ReadOptions
+            //{
+            //    Encoding = zipEncoding
+            //};
+            using (var zip = ZipFile.Open (FileInformation.FullName, ZipArchiveMode.Read, zipEncoding))
+                // (ZipFile zip = ZipFile.Read (FileInformation.FullName, options))
             {
-                Encoding = zipEncoding
-            };
-            using (ZipFile zip = ZipFile.Read (FileInformation.FullName, options))
-            {
-                inZipFileName = zip[0].FileName;
+                inZipFileName = zip.Entries[0].Name;
             }
 
-            using (ZipFile zip = new ZipFile (zipEncoding))
+            using (var zip = ZipFile.Open (FileInformation.FullName, ZipArchiveMode.Update, zipEncoding))
+                // (ZipFile zip = new ZipFile (zipEncoding))
             {
                 var memStream = new MemoryStream();
                 var writer = new XmlTextWriter (memStream, enc);
@@ -1955,8 +1964,9 @@ public class FB2File
                 doc.Save (writer);
                 writer.Flush();
                 memStream.Position = 0;
-                ZipEntry e = zip.AddEntry (inZipFileName, memStream);
-                zip.Save (FileInformation.FullName);
+                var entry = zip.CreateEntry (inZipFileName);
+                using var zipStream = entry.Open();
+                memStream.CopyTo (zipStream);
                 writer.Close();
             }
         }

@@ -10,7 +10,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* IBookManager.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -27,10 +27,50 @@ using ManagedIrbis.FictionBook.Entities;
 
 namespace ManagedIrbis.FictionBook.Managers;
 
+/// <summary>
+///
+/// </summary>
 public interface IBookManager
 {
-    IBook LoadBook(string fileName);
-    FileOperationResult CopyTo(IBook book, string targetFolder, RenameProfileElement profile, bool useTranslit, bool deleteOriginal = false);
-    void EncodeTo(IBook book, Encoding enc);
-    List<string> ValidateSchema(IBook book);
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="fileName"></param>
+    /// <returns></returns>
+    IBook LoadBook
+        (
+            string fileName
+        );
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="book"></param>
+    /// <param name="targetFolder"></param>
+    /// <param name="profile"></param>
+    /// <param name="useTranslit"></param>
+    /// <param name="deleteOriginal"></param>
+    /// <returns></returns>
+    FileOperationResult CopyTo
+        (
+            IBook book,
+            string targetFolder,
+            RenameProfileElement profile,
+            bool useTranslit,
+            bool deleteOriginal = false
+        );
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="book"></param>
+    /// <param name="enc"></param>
+    void EncodeTo (IBook book, Encoding enc);
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="book"></param>
+    /// <returns></returns>
+    List<string> ValidateSchema (IBook book);
 }

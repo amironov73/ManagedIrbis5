@@ -37,7 +37,7 @@ namespace ManagedIrbis.Fields;
 [XmlRoot ("izd")]
 public sealed class Izd
     : IHandmadeSerializable,
-        IVerifiable
+    IVerifiable
 {
     #region Properties
 

@@ -36,7 +36,7 @@ public class FB2Book
     /// <summary>
     ///
     /// </summary>
-    public int CompareTo (object obj)
+    public int CompareTo (object? obj)
     {
         if (obj is not IBook fc)
         {
@@ -72,21 +72,74 @@ public class FB2Book
 
     #endregion
 
+    /// <summary>
+    ///
+    /// </summary>
     public string BookAuthorFirstName { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public string BookAuthorLastName { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public string BookAuthorMiddleName { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public string BookGenre { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public string BookEncoding { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public string BookTitle { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public string BookSequenceName { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public string BookVersion { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public int? BookSequenceNr { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public string BookLang { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public string BookSizeText { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public string BookFile { get; set; }
 
+    /// <summary>
+    ///
+    /// </summary>
     public FB2Book()
     {
+        BookGenre = string.Empty;
+        BookVersion = string.Empty;
+        BookSizeText = string.Empty;
         BookFile = string.Empty;
         BookAuthorFirstName = string.Empty;
         BookAuthorLastName = string.Empty;

@@ -8,18 +8,16 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMemberInSuper.Global
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* IBook.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
 
 #endregion
 
@@ -27,19 +25,69 @@ using System.Text;
 
 namespace ManagedIrbis.FictionBook.Entities;
 
+/// <summary>
+///
+/// </summary>
 public interface IBook:
     IComparable
 {
+    /// <summary>
+    ///
+    /// </summary>
     string BookFile { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     string BookAuthorFirstName { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     string BookAuthorLastName { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     string BookAuthorMiddleName { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     string BookGenre { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     string BookEncoding { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     string BookTitle { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     string BookSequenceName { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     string BookVersion { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     int? BookSequenceNr { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     string BookLang { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     string BookSizeText { get; set; }
 }

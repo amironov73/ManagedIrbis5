@@ -1,10 +1,3 @@
-// Description: Html Agility Pack - HTML Parsers, selectors, traversors, manupulators.
-// Website & Documentation: http://html-agility-pack.net
-// Forum & Issues: https://github.com/zzzprojects/html-agility-pack
-// License: https://github.com/zzzprojects/html-agility-pack/blob/master/LICENSE
-// More projects: http://www.zzzprojects.com/
-// Copyright © ZZZ Projects Inc. 2014 - 2017. All rights reserved.
-
 using System.Xml;
 
 namespace HtmlAgilityPack
@@ -13,42 +6,42 @@ namespace HtmlAgilityPack
     {
         #region Fields
 
-        private NameTable _nametable = new NameTable();
+        private readonly NameTable _nametable = new NameTable();
 
         #endregion
 
         #region Public Methods
 
-        public override string Add(string array)
+        public override string Add (string array)
         {
-            return _nametable.Add(array);
+            return _nametable.Add (array);
         }
 
-        public override string Add(char[] array, int offset, int length)
+        public override string Add (char[] array, int offset, int length)
         {
-            return _nametable.Add(array, offset, length);
+            return _nametable.Add (array, offset, length);
         }
 
-        public override string Get(string array)
+        public override string? Get (string array)
         {
-            return _nametable.Get(array);
+            return _nametable.Get (array);
         }
 
-        public override string Get(char[] array, int offset, int length)
+        public override string? Get (char[] array, int offset, int length)
         {
-            return _nametable.Get(array, offset, length);
+            return _nametable.Get (array, offset, length);
         }
 
         #endregion
 
         #region Internal Methods
 
-        internal string GetOrAdd(string array)
+        internal string GetOrAdd (string array)
         {
-            string s = Get(array);
+            var s = Get (array);
             if (s == null)
             {
-                return Add(array);
+                return Add (array);
             }
 
             return s;

@@ -7,6 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable NonReadonlyMemberInGetHashCode
 // ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMember.Local
 
 /* HtmlWeb.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -38,7 +39,7 @@ public partial class HtmlWeb
     /// <summary>
     /// Represents the method that will handle the PostResponse event.
     /// </summary>
-    public delegate void PostResponseHandler(HttpWebRequest request, HttpWebResponse response);
+    public delegate void PostResponseHandler (HttpWebRequest request, HttpWebResponse response);
 #endif
 
 #if NET45 || NETSTANDARD1_3 || NETSTANDARD1_6
@@ -50,13 +51,13 @@ public partial class HtmlWeb
     /// <summary>
     /// Represents the method that will handle the PreHandleDocument event.
     /// </summary>
-    public delegate void PreHandleDocumentHandler(HtmlDocument document);
+    public delegate void PreHandleDocumentHandler (HtmlDocument document);
 
 #if !(NETSTANDARD1_3 || NETSTANDARD1_6)
     /// <summary>
     /// Represents the method that will handle the PreRequest event.
     /// </summary>
-    public delegate bool PreRequestHandler(HttpWebRequest request);
+    public delegate bool PreRequestHandler (HttpWebRequest request);
 #endif
 #if NET45 || NETSTANDARD1_3 || NETSTANDARD1_6
 /// <summary>
@@ -69,42 +70,41 @@ public partial class HtmlWeb
 
     #region Fields
 
-    private bool _autoDetectEncoding = true;
     private bool _cacheOnly;
 
-    private string _cachePath;
+    private string _cachePath = null!;
     private bool _fromCache;
     private int _requestDuration;
-    private Uri _responseUri;
+    private Uri _responseUri = null!;
     private HttpStatusCode _statusCode = HttpStatusCode.OK;
     private int _streamBufferSize = 1024;
     private bool _useCookies;
     private bool _usingCache;
     private bool _usingCacheAndLoad;
     private bool _usingCacheIfExists;
-    private string _userAgent = "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:x.x.x) Gecko/20041107 Firefox/x.x";
 
     /// <summary>
     /// Occurs after an HTTP request has been executed.
     /// </summary>
-    public PostResponseHandler PostResponse;
+    public PostResponseHandler? PostResponse;
 
     /// <summary>
     /// Occurs before an HTML document is handled.
     /// </summary>
-    public PreHandleDocumentHandler PreHandleDocument;
+    public PreHandleDocumentHandler? PreHandleDocument;
 
     /// <summary>
     /// Occurs before an HTTP request is executed.
     /// </summary>
-    public PreRequestHandler PreRequest;
+    public PreRequestHandler? PreRequest;
 
     #endregion
 
     #region Static Members
 
 #if FX45 || NETSTANDARD
-        internal static ConcurrentDictionary<string, HttpClient> SharedHttpClient = new ConcurrentDictionary<string, HttpClient>();
+        internal static ConcurrentDictionary<string, HttpClient> SharedHttpClient =
+ new ConcurrentDictionary<string, HttpClient>();
 
 
         internal static HttpClient GetSharedHttpClient(string userAgent)
@@ -789,22 +789,12 @@ public partial class HtmlWeb
     /// <summary>
     /// Gets or Sets a value indicating if document encoding must be automatically detected.
     /// </summary>
-    public bool AutoDetectEncoding
-    {
-        get { return _autoDetectEncoding; }
-        set { _autoDetectEncoding = value; }
-    }
-
-    private Encoding _encoding;
+    public bool AutoDetectEncoding { get; set; } = true;
 
     /// <summary>
     /// Gets or sets the Encoding used to override the response stream from any web request
     /// </summary>
-    public Encoding OverrideEncoding
-    {
-        get { return _encoding; }
-        set { _encoding = value; }
-    }
+    public Encoding? OverrideEncoding { get; set; }
 
     /// <summary>
     /// Gets or Sets a value indicating whether to get document only from the cache.
@@ -812,12 +802,12 @@ public partial class HtmlWeb
     /// </summary>
     public bool CacheOnly
     {
-        get { return _cacheOnly; }
+        get => _cacheOnly;
         set
         {
-            if ((value) && !UsingCache)
+            if (value && !UsingCache)
             {
-                throw new HtmlWebException("Cache is not enabled. Set UsingCache to true first.");
+                throw new HtmlWebException ("Cache is not enabled. Set UsingCache to true first.");
             }
 
             _cacheOnly = value;
@@ -830,8 +820,8 @@ public partial class HtmlWeb
     /// </summary>
     public bool UsingCacheIfExists
     {
-        get { return _usingCacheIfExists; }
-        set { _usingCacheIfExists = value; }
+        get => _usingCacheIfExists;
+        set => _usingCacheIfExists = value;
     }
 
     /// <summary>
@@ -839,53 +829,41 @@ public partial class HtmlWeb
     /// </summary>
     public string CachePath
     {
-        get { return _cachePath; }
-        set { _cachePath = value; }
+        get => _cachePath;
+        set => _cachePath = value;
     }
 
     /// <summary>
     /// Gets a value indicating if the last document was retrieved from the cache.
     /// </summary>
-    public bool FromCache
-    {
-        get { return _fromCache; }
-    }
+    public bool FromCache => _fromCache;
 
     /// <summary>
     /// Gets the last request duration in milliseconds.
     /// </summary>
-    public int RequestDuration
-    {
-        get { return _requestDuration; }
-    }
+    public int RequestDuration => _requestDuration;
 
     /// <summary>
     /// Gets the URI of the Internet resource that actually responded to the request.
     /// </summary>
-    public Uri ResponseUri
-    {
-        get { return _responseUri; }
-    }
+    public Uri ResponseUri => _responseUri;
 
     /// <summary>
     /// Gets the last request status.
     /// </summary>
-    public HttpStatusCode StatusCode
-    {
-        get { return _statusCode; }
-    }
+    public HttpStatusCode StatusCode => _statusCode;
 
     /// <summary>
     /// Gets or Sets the size of the buffer used for memory operations.
     /// </summary>
     public int StreamBufferSize
     {
-        get { return _streamBufferSize; }
+        get => _streamBufferSize;
         set
         {
             if (_streamBufferSize <= 0)
             {
-                throw new ArgumentException("Size must be greater than zero.");
+                throw new ArgumentException ("Size must be greater than zero.");
             }
 
             _streamBufferSize = value;
@@ -897,8 +875,8 @@ public partial class HtmlWeb
     /// </summary>
     public bool UseCookies
     {
-        get { return _useCookies; }
-        set { _useCookies = value; }
+        get => _useCookies;
+        set => _useCookies = value;
     }
 
     /// <summary>Gets or sets a value indicating whether redirect should be captured instead of the current location.</summary>
@@ -908,23 +886,19 @@ public partial class HtmlWeb
     /// <summary>
     /// Gets or Sets the User Agent HTTP 1.1 header sent on any webrequest
     /// </summary>
-    public string UserAgent
-    {
-        get { return _userAgent; }
-        set { _userAgent = value; }
-    }
+    public string UserAgent { get; set; } = "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:x.x.x) Gecko/20041107 Firefox/x.x";
 
     /// <summary>
     /// Gets or Sets a value indicating whether the caching mechanisms should be used or not.
     /// </summary>
     public bool UsingCache
     {
-        get { return _cachePath != null && _usingCache; }
+        get => _cachePath != null! && _usingCache;
         set
         {
-            if ((value) && (_cachePath == null))
+            if (value && _cachePath == null)
             {
-                throw new HtmlWebException("You need to define a CachePath first.");
+                throw new HtmlWebException ("You need to define a CachePath first.");
             }
 
             _usingCache = value;
@@ -942,24 +916,22 @@ public partial class HtmlWeb
     /// <param name="extension">The input path extension.</param>
     /// <param name="def">The default content type to return if any error occurs.</param>
     /// <returns>The path extension's MIME content type.</returns>
-    public static string GetContentTypeForExtension(string extension, string def)
+    public static string GetContentTypeForExtension (string extension, string def)
     {
-        if (string.IsNullOrEmpty(extension))
+        if (string.IsNullOrEmpty (extension))
         {
             return def;
         }
 
-        string contentType = "";
-        if (!extension.StartsWith("."))
+        if (!extension.StartsWith ("."))
         {
             extension = "." + extension;
         }
 
-        if (!MimeTypeMap.Mappings.TryGetValue(extension, out contentType))
+        if (!MimeTypeMap.Mappings.TryGetValue (extension, out var contentType))
         {
             contentType = def;
         }
-
 
 
         return contentType;
@@ -971,21 +943,19 @@ public partial class HtmlWeb
     /// <param name="contentType">The input MIME content type.</param>
     /// <param name="def">The default path extension to return if any error occurs.</param>
     /// <returns>The MIME content type's path extension.</returns>
-    public static string GetExtensionForContentType(string contentType, string def)
+    public static string GetExtensionForContentType (string contentType, string def)
     {
-        if (string.IsNullOrEmpty(contentType))
+        if (string.IsNullOrEmpty (contentType))
         {
             return def;
         }
 
-        if (contentType.StartsWith("."))
+        if (contentType.StartsWith ("."))
         {
-            throw new ArgumentException("Requested mime type is not valid: " + contentType);
+            throw new ArgumentException ("Requested mime type is not valid: " + contentType);
         }
 
-        string ext = "";
-
-        if (!MimeTypeMap.Mappings.TryGetValue(contentType, out ext))
+        if (!MimeTypeMap.Mappings.TryGetValue (contentType, out var ext))
         {
             ext = def;
         }
@@ -994,18 +964,15 @@ public partial class HtmlWeb
     }
 
 
-
-
-
     /// <summary>
     /// Creates an instance of the given type from the specified Internet resource.
     /// </summary>
     /// <param name="url">The requested URL, such as "http://Myserver/Mypath/Myfile.asp".</param>
     /// <param name="type">The requested type.</param>
     /// <returns>An newly created instance.</returns>
-    public object CreateInstance(string url, Type type)
+    public object CreateInstance (string url, Type type)
     {
-        return CreateInstance(url, null, null, type);
+        return CreateInstance (url, null!, null!, type);
     }
 #endif
 
@@ -1015,9 +982,9 @@ public partial class HtmlWeb
     /// </summary>
     /// <param name="url">The requested URL, such as "http://Myserver/Mypath/Myfile.asp".</param>
     /// <param name="path">The location of the file where you want to save the document.</param>
-    public void Get(string url, string path)
+    public void Get (string url, string path)
     {
-        Get(url, path, "GET");
+        Get (url, path, "GET");
     }
 
 #if !(NETSTANDARD1_3 || NETSTANDARD1_6)
@@ -1028,9 +995,9 @@ public partial class HtmlWeb
     /// <param name="path">The location of the file where you want to save the document.</param>
     /// <param name="proxy"></param>
     /// <param name="credentials"></param>
-    public void Get(string url, string path, WebProxy proxy, NetworkCredential credentials)
+    public void Get (string url, string path, WebProxy proxy, NetworkCredential credentials)
     {
-        Get(url, path, proxy, credentials, "GET");
+        Get (url, path, proxy, credentials, "GET");
     }
 #endif
 #if NET45 || NETSTANDARD1_3 || NETSTANDARD1_6
@@ -1053,23 +1020,23 @@ public partial class HtmlWeb
     /// <param name="url">The requested URL, such as "http://Myserver/Mypath/Myfile.asp".</param>
     /// <param name="path">The location of the file where you want to save the document.</param>
     /// <param name="method">The HTTP method used to open the connection, such as GET, POST, PUT, or PROPFIND.</param>
-    public void Get(string url, string path, string method)
+    public void Get (string url, string path, string method)
     {
-        var uri = new Uri(url);
+        var uri = new Uri (url);
 #if !(NETSTANDARD1_3 || NETSTANDARD1_6)
-        if ((uri.Scheme == Uri.UriSchemeHttps) ||
-            (uri.Scheme == Uri.UriSchemeHttp))
+        if (uri.Scheme == Uri.UriSchemeHttps ||
+            uri.Scheme == Uri.UriSchemeHttp)
 #else
 // TODO: Check if UriSchemeHttps is still internal in NETSTANDARD 2.0
             if ((uri.Scheme == "https") ||
                 (uri.Scheme == "http"))
 #endif
         {
-            Get(uri, method, path, null, null, null);
+            Get (uri, method, path, null!, null, null!);
         }
         else
         {
-            throw new HtmlWebException("Unsupported uri scheme: '" + uri.Scheme + "'.");
+            throw new HtmlWebException ("Unsupported uri scheme: '" + uri.Scheme + "'.");
         }
     }
 
@@ -1082,17 +1049,17 @@ public partial class HtmlWeb
     /// <param name="credentials"></param>
     /// <param name="method">The HTTP method used to open the connection, such as GET, POST, PUT, or PROPFIND.</param>
     /// <param name="proxy"></param>
-    public void Get(string url, string path, WebProxy proxy, NetworkCredential credentials, string method)
+    public void Get (string url, string path, WebProxy proxy, NetworkCredential credentials, string method)
     {
-        var uri = new Uri(url);
-        if ((uri.Scheme == Uri.UriSchemeHttps) ||
-            (uri.Scheme == Uri.UriSchemeHttp))
+        var uri = new Uri (url);
+        if (uri.Scheme == Uri.UriSchemeHttps ||
+            uri.Scheme == Uri.UriSchemeHttp)
         {
-            Get(uri, method, path, null, proxy, credentials);
+            Get (uri, method, path, null!, proxy, credentials);
         }
         else
         {
-            throw new HtmlWebException("Unsupported uri scheme: '" + uri.Scheme + "'.");
+            throw new HtmlWebException ("Unsupported uri scheme: '" + uri.Scheme + "'.");
         }
     }
 #endif
@@ -1132,42 +1099,40 @@ public partial class HtmlWeb
     /// </summary>
     /// <param name="uri">The url fo which to retrieve the cache path. May not be null.</param>
     /// <returns>The cache file path.</returns>
-    public string GetCachePath(Uri uri)
+    public string GetCachePath (Uri uri)
     {
-        if (uri == null)
-        {
-            throw new ArgumentNullException("uri");
-        }
+        Sure.NotNull (uri);
 
         if (!UsingCache)
         {
-            throw new HtmlWebException("Cache is not enabled. Set UsingCache to true first.");
+            throw new HtmlWebException ("Cache is not enabled. Set UsingCache to true first.");
         }
 
         string cachePath;
         if (uri.AbsolutePath == "/")
         {
-            cachePath = Path.Combine(_cachePath, ".htm");
+            cachePath = Path.Combine (_cachePath, ".htm");
         }
         else
         {
-
             var absolutePathWithoutBadChar = uri.AbsolutePath;
 
-            var invalid = new string(Path.GetInvalidFileNameChars()) + new string(Path.GetInvalidPathChars());
+            var invalid = new string (Path.GetInvalidFileNameChars()) + new string (Path.GetInvalidPathChars());
 
             foreach (var c in invalid)
             {
-                absolutePathWithoutBadChar = absolutePathWithoutBadChar.Replace(c.ToString(), "");
+                absolutePathWithoutBadChar = absolutePathWithoutBadChar.Replace (c.ToString(), "");
             }
 
-            if (uri.AbsolutePath[uri.AbsolutePath.Length - 1] == Path.AltDirectorySeparatorChar)
+            if (uri.AbsolutePath[^1] == Path.AltDirectorySeparatorChar)
             {
-                cachePath = Path.Combine(_cachePath, (uri.Host + absolutePathWithoutBadChar.TrimEnd(Path.AltDirectorySeparatorChar)).Replace('/', '\\') + ".htm");
+                cachePath = Path.Combine (_cachePath,
+                    (uri.Host + absolutePathWithoutBadChar.TrimEnd (Path.AltDirectorySeparatorChar))
+                    .Replace ('/', '\\') + ".htm");
             }
             else
             {
-                cachePath = Path.Combine(_cachePath, (uri.Host + absolutePathWithoutBadChar.Replace('/', '\\')));
+                cachePath = Path.Combine (_cachePath, uri.Host + absolutePathWithoutBadChar.Replace ('/', '\\'));
             }
         }
 
@@ -1179,9 +1144,9 @@ public partial class HtmlWeb
     /// </summary>
     /// <param name="url">The requested URL, such as "http://Myserver/Mypath/Myfile.asp".</param>
     /// <returns>A new HTML document.</returns>
-    public HtmlDocument Load(string url)
+    public HtmlDocument Load (string url)
     {
-        return Load(url, "GET");
+        return Load (url, "GET");
     }
 
     /// <summary>
@@ -1189,9 +1154,9 @@ public partial class HtmlWeb
     /// </summary>
     /// <param name="uri">The requested Uri, such as new Uri("http://Myserver/Mypath/Myfile.asp").</param>
     /// <returns>A new HTML document.</returns>
-    public HtmlDocument Load(Uri uri)
+    public HtmlDocument Load (Uri uri)
     {
-        return Load(uri, "GET");
+        return Load (uri, "GET");
     }
 
 #if !(NETSTANDARD1_3 || NETSTANDARD1_6)
@@ -1204,24 +1169,28 @@ public partial class HtmlWeb
     /// <param name="userId">User Id for Authentication</param>
     /// <param name="password">Password for Authentication</param>
     /// <returns>A new HTML document.</returns>
-    public HtmlDocument Load(string url, string proxyHost, int proxyPort, string userId, string password)
+    public HtmlDocument Load (string url, string proxyHost, int proxyPort, string userId, string password)
     {
         //Create my proxy
-        var myProxy = new WebProxy(proxyHost, proxyPort);
-        myProxy.BypassProxyOnLocal = true;
+        var myProxy = new WebProxy (proxyHost, proxyPort)
+        {
+            BypassProxyOnLocal = true
+        };
 
         //Create my credentials
-        NetworkCredential myCreds = null;
-        if ((userId != null) && (password != null))
+        NetworkCredential? myCreds = null;
+        if (userId != null! && password != null!)
         {
-            myCreds = new NetworkCredential(userId, password);
-            var credCache = new CredentialCache();
-            //Add the creds
-            credCache.Add(myProxy.Address, "Basic", myCreds);
-            credCache.Add(myProxy.Address, "Digest", myCreds);
+            myCreds = new NetworkCredential (userId, password);
+            var credCache = new CredentialCache
+            {
+                //Add the creds
+                { myProxy.Address!, "Basic", myCreds },
+                { myProxy.Address!, "Digest", myCreds }
+            };
         }
 
-        return Load(url, "GET", myProxy, myCreds);
+        return Load (url, "GET", myProxy, myCreds!);
     }
 #endif
 
@@ -1235,24 +1204,28 @@ public partial class HtmlWeb
     /// <param name="userId">User Id for Authentication</param>
     /// <param name="password">Password for Authentication</param>
     /// <returns>A new HTML document.</returns>
-    public HtmlDocument Load(Uri uri, string proxyHost, int proxyPort, string userId, string password)
+    public HtmlDocument Load (Uri uri, string proxyHost, int proxyPort, string userId, string password)
     {
         //Create my proxy
-        var myProxy = new WebProxy(proxyHost, proxyPort);
-        myProxy.BypassProxyOnLocal = true;
+        var myProxy = new WebProxy (proxyHost, proxyPort)
+        {
+            BypassProxyOnLocal = true
+        };
 
         //Create my credentials
-        NetworkCredential myCreds = null;
-        if ((userId != null) && (password != null))
+        NetworkCredential? myCreds = null;
+        if (userId != null! && password != null!)
         {
-            myCreds = new NetworkCredential(userId, password);
-            var credCache = new CredentialCache();
-            //Add the creds
-            credCache.Add(myProxy.Address, "Basic", myCreds);
-            credCache.Add(myProxy.Address, "Digest", myCreds);
+            myCreds = new NetworkCredential (userId, password);
+            var credCache = new CredentialCache
+            {
+                //Add the creds
+                { myProxy.Address!, "Basic", myCreds },
+                { myProxy.Address!, "Digest", myCreds }
+            };
         }
 
-        return Load(uri, "GET", myProxy, myCreds);
+        return Load (uri, "GET", myProxy, myCreds!);
     }
 #endif
 
@@ -1262,11 +1235,11 @@ public partial class HtmlWeb
     /// <param name="url">The requested URL, such as "http://Myserver/Mypath/Myfile.asp".</param>
     /// <param name="method">The HTTP method used to open the connection, such as GET, POST, PUT, or PROPFIND.</param>
     /// <returns>A new HTML document.</returns>
-    public HtmlDocument Load(string url, string method)
+    public HtmlDocument Load (string url, string method)
     {
-        var uri = new Uri(url);
+        var uri = new Uri (url);
 
-        return Load(uri, method);
+        return Load (uri, method);
     }
 
     /// <summary>
@@ -1275,7 +1248,7 @@ public partial class HtmlWeb
     /// <param name="uri">The requested URL, such as new Uri("http://Myserver/Mypath/Myfile.asp").</param>
     /// <param name="method">The HTTP method used to open the connection, such as GET, POST, PUT, or PROPFIND.</param>
     /// <returns>A new HTML document.</returns>
-    public HtmlDocument Load(Uri uri, string method)
+    public HtmlDocument Load (Uri uri, string method)
     {
         if (UsingCache)
         {
@@ -1284,15 +1257,15 @@ public partial class HtmlWeb
 
         HtmlDocument doc;
 #if !(NETSTANDARD1_3 || NETSTANDARD1_6)
-        if ((uri.Scheme == Uri.UriSchemeHttps) ||
-            (uri.Scheme == Uri.UriSchemeHttp))
+        if (uri.Scheme == Uri.UriSchemeHttps ||
+            uri.Scheme == Uri.UriSchemeHttp)
 #else
 // TODO: Check if UriSchemeHttps is still internal in NETSTANDARD 2.0
             if ((uri.Scheme == "https") ||
                 (uri.Scheme == "http"))
 #endif
         {
-            doc = LoadUrl(uri, method, null, null);
+            doc = LoadUrl (uri, method, null!, null!);
         }
         else
         {
@@ -1303,23 +1276,29 @@ public partial class HtmlWeb
                 if (uri.Scheme == "file")
 #endif
             {
-                doc = new HtmlDocument();
-                doc.OptionAutoCloseOnEnd = false;
+                doc = new HtmlDocument
+                {
+                    OptionAutoCloseOnEnd = false
+                };
                 doc.OptionAutoCloseOnEnd = true;
-                if (OverrideEncoding != null)
-                    doc.Load(uri.OriginalString, OverrideEncoding);
+                if (OverrideEncoding != null!)
+                {
+                    doc.Load (uri.OriginalString, OverrideEncoding);
+                }
                 else
-                    doc.DetectEncodingAndLoad(uri.OriginalString, _autoDetectEncoding);
+                {
+                    doc.DetectEncodingAndLoad (uri.OriginalString, AutoDetectEncoding);
+                }
             }
             else
             {
-                throw new HtmlWebException("Unsupported uri scheme: '" + uri.Scheme + "'.");
+                throw new HtmlWebException ("Unsupported uri scheme: '" + uri.Scheme + "'.");
             }
         }
 
-        if (PreHandleDocument != null)
+        if (PreHandleDocument != null!)
         {
-            PreHandleDocument(doc);
+            PreHandleDocument (doc);
         }
 
         return doc;
@@ -1334,11 +1313,11 @@ public partial class HtmlWeb
     /// <param name="proxy">Proxy to use with this request</param>
     /// <param name="credentials">Credentials to use when authenticating</param>
     /// <returns>A new HTML document.</returns>
-    public HtmlDocument Load(string url, string method, WebProxy proxy, NetworkCredential credentials)
+    public HtmlDocument Load (string url, string method, WebProxy proxy, NetworkCredential credentials)
     {
-        var uri = new Uri(url);
+        var uri = new Uri (url);
 
-        return Load(uri, method, proxy, credentials);
+        return Load (uri, method, proxy, credentials);
     }
 #endif
 
@@ -1351,7 +1330,7 @@ public partial class HtmlWeb
     /// <param name="proxy">Proxy to use with this request</param>
     /// <param name="credentials">Credentials to use when authenticating</param>
     /// <returns>A new HTML document.</returns>
-    public HtmlDocument Load(Uri uri, string method, WebProxy proxy, NetworkCredential credentials)
+    public HtmlDocument Load (Uri uri, string method, WebProxy proxy, NetworkCredential credentials)
     {
         if (UsingCache)
         {
@@ -1359,29 +1338,31 @@ public partial class HtmlWeb
         }
 
         HtmlDocument doc;
-        if ((uri.Scheme == Uri.UriSchemeHttps) ||
-            (uri.Scheme == Uri.UriSchemeHttp))
+        if (uri.Scheme == Uri.UriSchemeHttps ||
+            uri.Scheme == Uri.UriSchemeHttp)
         {
-            doc = LoadUrl(uri, method, proxy, credentials);
+            doc = LoadUrl (uri, method, proxy, credentials);
         }
         else
         {
             if (uri.Scheme == Uri.UriSchemeFile)
             {
-                doc = new HtmlDocument();
-                doc.OptionAutoCloseOnEnd = false;
+                doc = new HtmlDocument
+                {
+                    OptionAutoCloseOnEnd = false
+                };
                 doc.OptionAutoCloseOnEnd = true;
-                doc.DetectEncodingAndLoad(uri.OriginalString, _autoDetectEncoding);
+                doc.DetectEncodingAndLoad (uri.OriginalString, AutoDetectEncoding);
             }
             else
             {
-                throw new HtmlWebException("Unsupported uri scheme: '" + uri.Scheme + "'.");
+                throw new HtmlWebException ("Unsupported uri scheme: '" + uri.Scheme + "'.");
             }
         }
 
-        if (PreHandleDocument != null)
+        if (PreHandleDocument != null!)
         {
-            PreHandleDocument(doc);
+            PreHandleDocument (doc);
         }
 
         return doc;
@@ -1461,10 +1442,10 @@ public partial class HtmlWeb
     /// </summary>
     /// <param name="htmlUrl">The requested URL, such as "http://Myserver/Mypath/Myfile.asp".</param>
     /// <param name="writer">The XmlTextWriter to which you want to save to.</param>
-    public void LoadHtmlAsXml(string htmlUrl, XmlTextWriter writer)
+    public void LoadHtmlAsXml (string htmlUrl, XmlTextWriter writer)
     {
-        var doc = Load(htmlUrl);
-        doc.Save(writer);
+        var doc = Load (htmlUrl);
+        doc.Save (writer);
     }
 #endif
 #if NET45 || NETSTANDARD1_3 || NETSTANDARD1_6
@@ -1484,57 +1465,58 @@ public partial class HtmlWeb
 
     #region Private Methods
 
-    private static void FilePreparePath(string target)
+    private static void FilePreparePath (string target)
     {
-        if (File.Exists(target))
+        if (File.Exists (target))
         {
-            var atts = File.GetAttributes(target);
-            File.SetAttributes(target, atts & ~FileAttributes.ReadOnly);
+            var atts = File.GetAttributes (target);
+            File.SetAttributes (target, atts & ~FileAttributes.ReadOnly);
         }
         else
         {
-            var dir = Path.GetDirectoryName(target);
-            if (!Directory.Exists(dir))
+            var dir = Path.GetDirectoryName (target);
+            if (!Directory.Exists (dir))
             {
-                Directory.CreateDirectory(dir);
+                Directory.CreateDirectory (dir!);
             }
         }
     }
 
 
-    private static DateTime RemoveMilliseconds(DateTime t)
+    private static DateTime RemoveMilliseconds (DateTime t)
     {
-        return new DateTime(t.Year, t.Month, t.Day, t.Hour, t.Minute, t.Second, 0);
+        return new DateTime (t.Year, t.Month, t.Day, t.Hour, t.Minute, t.Second, 0);
     }
 
-    private static DateTime RemoveMilliseconds(DateTimeOffset? offset)
+    private static DateTime RemoveMilliseconds (DateTimeOffset? offset)
     {
         var t = offset ?? DateTimeOffset.Now;
-        return new DateTime(t.Year, t.Month, t.Day, t.Hour, t.Minute, t.Second, 0);
+        return new DateTime (t.Year, t.Month, t.Day, t.Hour, t.Minute, t.Second, 0);
     }
 
     // ReSharper disable UnusedMethodReturnValue.Local
-    private static long SaveStream(Stream stream, string path, DateTime touchDate, int streamBufferSize)
+    private static long SaveStream (Stream stream, string path, DateTime touchDate, int streamBufferSize)
+
         // ReSharper restore UnusedMethodReturnValue.Local
     {
-        FilePreparePath(path);
+        FilePreparePath (path);
 
         long len = 0;
 
-        using (var fs = new FileStream(path, FileMode.Create, FileAccess.Write))
+        using (var fs = new FileStream (path, FileMode.Create, FileAccess.Write))
         {
-            using (var br = new BinaryReader(stream))
+            using (var br = new BinaryReader (stream))
             {
-                using (var bw = new BinaryWriter(fs))
+                using (var bw = new BinaryWriter (fs))
                 {
                     byte[] buffer;
                     do
                     {
-                        buffer = br.ReadBytes(streamBufferSize);
+                        buffer = br.ReadBytes (streamBufferSize);
                         len += buffer.Length;
                         if (buffer.Length > 0)
                         {
-                            bw.Write(buffer);
+                            bw.Write (buffer);
                         }
                     } while (buffer.Length > 0);
 
@@ -1543,7 +1525,7 @@ public partial class HtmlWeb
             }
         }
 
-        File.SetLastWriteTime(path, touchDate);
+        File.SetLastWriteTime (path, touchDate);
         return len;
     }
 
@@ -1561,7 +1543,7 @@ public partial class HtmlWeb
         string? cachePath = null;
         var oldFile = false;
 
-        var req = (WebRequest.Create(uri) as HttpWebRequest).ThrowIfNull();
+        var req = (WebRequest.Create (uri) as HttpWebRequest).ThrowIfNull();
         req.Method = method;
         req.UserAgent = UserAgent;
         req.AutomaticDecompression = AutomaticDecompression;
@@ -1573,7 +1555,7 @@ public partial class HtmlWeb
 
         if (proxy != null)
         {
-            if (creds != null)
+            if (creds != null!)
             {
                 proxy.Credentials = creds;
                 req.Credentials = creds;
@@ -1593,32 +1575,35 @@ public partial class HtmlWeb
 
         if (UsingCache)
         {
-            cachePath = GetCachePath(req.RequestUri);
-            if (File.Exists(cachePath))
+            cachePath = GetCachePath (req.RequestUri);
+            if (File.Exists (cachePath))
             {
-                req.IfModifiedSince = File.GetLastAccessTime(cachePath);
+                req.IfModifiedSince = File.GetLastAccessTime (cachePath);
                 oldFile = true;
             }
         }
 
         if (_cacheOnly || _usingCacheIfExists)
         {
-            if (File.Exists(cachePath))
+            if (File.Exists (cachePath))
             {
                 if (path != null)
                 {
-                    IOLibrary.CopyAlways(cachePath, path);
+                    IOLibrary.CopyAlways (cachePath, path);
+
                     // touch the file
-                    if (cachePath != null) File.SetLastWriteTime(path, File.GetLastWriteTime(cachePath));
+                    if (cachePath != null!)
+                    {
+                        File.SetLastWriteTime (path, File.GetLastWriteTime (cachePath));
+                    }
                 }
 
                 _fromCache = true;
                 return HttpStatusCode.NotModified;
-
             }
             else if (_cacheOnly)
             {
-                throw new HtmlWebException("File was not found at cache path: '" + cachePath + "'");
+                throw new HtmlWebException ("File was not found at cache path: '" + cachePath + "'");
             }
         }
 
@@ -1630,7 +1615,7 @@ public partial class HtmlWeb
         if (PreRequest != null)
         {
             // allow our user to change the request at will
-            if (!PreRequest(req))
+            if (!PreRequest (req))
             {
                 return HttpStatusCode.ResetContent;
             }
@@ -1649,21 +1634,22 @@ public partial class HtmlWeb
 
         try
         {
-            resp = req.GetResponse() as HttpWebResponse;
+            resp = (req.GetResponse() as HttpWebResponse)!;
         }
         catch (WebException we)
         {
             _requestDuration = Environment.TickCount - tc;
-            resp = (HttpWebResponse) we.Response;
+            resp = (HttpWebResponse)we.Response!;
             if (resp == null)
             {
                 if (oldFile)
                 {
                     if (path != null)
                     {
-                        IOLibrary.CopyAlways(cachePath, path);
+                        IOLibrary.CopyAlways (cachePath!, path);
+
                         // touch the file
-                        File.SetLastWriteTime(path, File.GetLastWriteTime(cachePath));
+                        File.SetLastWriteTime (path, File.GetLastWriteTime (cachePath));
                     }
 
                     return HttpStatusCode.NotModified;
@@ -1681,14 +1667,14 @@ public partial class HtmlWeb
         // allow our user to get some info from the response
         if (PostResponse != null)
         {
-            PostResponse(req, resp);
+            PostResponse (req, resp);
         }
 
         _requestDuration = Environment.TickCount - tc;
         _responseUri = resp.ResponseUri;
         var statusCode = resp.StatusCode;
-        var html = IsHtmlContent(resp.ContentType);
-        var isUnknown = string.IsNullOrEmpty(resp.ContentType);
+        var html = IsHtmlContent (resp.ContentType);
+        var isUnknown = string.IsNullOrEmpty (resp.ContentType);
 
         // keep old code because logic on  ReadDocumentEncoding(HtmlNode node), now use resp.CharacterSet here.
         // for futur maybe harmonise.
@@ -1697,18 +1683,18 @@ public partial class HtmlWeb
         // : null;
 
         var characterSet = "";
-        if (!string.IsNullOrEmpty(resp.CharacterSet))
+        if (!string.IsNullOrEmpty (resp.CharacterSet))
         {
             // Example : "\"utf-8\"", no utf or other have " so, just remove...
-            characterSet = resp.CharacterSet.Replace("\"","");
+            characterSet = resp.CharacterSet.Replace ("\"", "");
         }
 
         Encoding? respenc = null;
 
         try
         {
-            respenc = !string.IsNullOrEmpty(html ? characterSet : resp.ContentEncoding)
-                ? Encoding.GetEncoding(html ? characterSet : resp.ContentEncoding)
+            respenc = !string.IsNullOrEmpty (html ? characterSet : resp.ContentEncoding)
+                ? Encoding.GetEncoding (html ? characterSet : resp.ContentEncoding)
                 : null;
         }
         catch (Exception exception)
@@ -1716,8 +1702,10 @@ public partial class HtmlWeb
             Debug.WriteLine (exception.Message);
         }
 
-        if (OverrideEncoding != null)
+        if (OverrideEncoding != null!)
+        {
             respenc = OverrideEncoding;
+        }
 
         if (CaptureRedirect)
         {
@@ -1725,15 +1713,14 @@ public partial class HtmlWeb
             if (resp.StatusCode == HttpStatusCode.Found)
             {
                 var location = resp.Headers["Location"];
-                Uri locationUri;
 
                 // Do the redirection after we've eaten all the cookies...
-                if (!Uri.TryCreate(location, UriKind.Absolute, out locationUri))
+                if (!Uri.TryCreate (location, UriKind.Absolute, out var locationUri))
                 {
-                    locationUri = new Uri(uri, location);
+                    locationUri = new Uri (uri, location);
                 }
 
-                return Get(locationUri, "GET", path, doc, proxy, creds);
+                return Get (locationUri, "GET", path, doc, proxy, creds!);
             }
         }
 
@@ -1745,53 +1732,54 @@ public partial class HtmlWeb
                 _fromCache = true;
                 if (path != null)
                 {
-                    IOLibrary.CopyAlways(cachePath, path);
+                    IOLibrary.CopyAlways (cachePath!, path);
+
                     // touch the file
-                    File.SetLastWriteTime(path, File.GetLastWriteTime(cachePath));
+                    File.SetLastWriteTime (path, File.GetLastWriteTime (cachePath!));
                 }
 
                 return resp.StatusCode;
             }
 
             // this should *never* happen...
-            throw new HtmlWebException("Server has send a NotModifed code, without cache enabled.");
+            throw new HtmlWebException ("Server has send a NotModifed code, without cache enabled.");
         }
 
         var s = resp.GetResponseStream();
-        if (s != null)
+        if (s != null!)
         {
             if (UsingCache)
             {
                 // NOTE: LastModified does not contain milliseconds, so we remove them to the file
-                SaveStream(s, cachePath, RemoveMilliseconds(resp.LastModified), _streamBufferSize);
+                SaveStream (s, cachePath, RemoveMilliseconds (resp.LastModified), _streamBufferSize);
 
                 // save headers
-                SaveCacheHeaders(req.RequestUri, resp);
+                SaveCacheHeaders (req.RequestUri, resp);
 
                 if (path != null)
                 {
                     // copy and touch the file
-                    IOLibrary.CopyAlways(cachePath, path);
-                    File.SetLastWriteTime(path, File.GetLastWriteTime(cachePath));
+                    IOLibrary.CopyAlways (cachePath, path);
+                    File.SetLastWriteTime (path, File.GetLastWriteTime (cachePath));
                 }
 
                 if (_usingCacheAndLoad)
                 {
-                    doc.Load(cachePath);
+                    doc.Load (cachePath);
                 }
             }
             else
             {
                 // try to work in-memory
-                if (doc != null && html)
+                if (doc != null! && html)
                 {
                     if (respenc == null)
                     {
-                        doc.Load(s, true);
+                        doc.Load (s, true);
                     }
                     else
                     {
-                        doc.Load(s, respenc);
+                        doc.Load (s, respenc);
                     }
                 }
 
@@ -1801,11 +1789,11 @@ public partial class HtmlWeb
                     {
                         if (respenc == null)
                         {
-                            doc.Load(s, true);
+                            doc.Load (s, true);
                         }
                         else
                         {
-                            doc.Load(s, respenc);
+                            doc.Load (s, respenc);
                         }
                     }
                     catch
@@ -2049,7 +2037,7 @@ public partial class HtmlWeb
         }
 #endif
 
-    private string GetCacheHeader(Uri requestUri, string name, string def)
+    private string GetCacheHeader (Uri requestUri, string name, string def)
     {
         // note: some headers are collection (ex: www-authenticate)
         // we don't handle that here
@@ -2057,55 +2045,57 @@ public partial class HtmlWeb
 #if NETSTANDARD1_3 || NETSTANDARD1_6
             doc.Load(File.OpenRead(GetCacheHeadersPath(requestUri)));
 #else
-        doc.Load(GetCacheHeadersPath(requestUri));
+        doc.Load (GetCacheHeadersPath (requestUri));
 #endif
         var node =
-            doc.SelectSingleNode("//h[translate(@n, 'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')='" +
-                                 name.ToUpperInvariant() + "']");
+            doc.SelectSingleNode ("//h[translate(@n, 'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')='" +
+                                  name.ToUpperInvariant() + "']");
         if (node == null)
         {
             return def;
         }
 
         // attribute should exist
-        return node.Attributes[name].Value;
+        return node.Attributes![name]!.Value;
     }
 
-    private string GetCacheHeadersPath(Uri uri)
+    private string GetCacheHeadersPath (Uri uri)
     {
         //return Path.Combine(GetCachePath(uri), ".h.xml");
-        return GetCachePath(uri) + ".h.xml";
+        return GetCachePath (uri) + ".h.xml";
     }
 
 #if !(NETSTANDARD1_3 || NETSTANDARD1_6)
-    private bool IsCacheHtmlContent(string path)
+    private bool IsCacheHtmlContent (string path)
     {
-        var ct = GetContentTypeForExtension(Path.GetExtension(path), null);
-        return IsHtmlContent(ct);
+        var ct = GetContentTypeForExtension (Path.GetExtension (path), null!);
+        return IsHtmlContent (ct);
     }
 #endif
 
-    private bool IsHtmlContent(string contentType)
+    private bool IsHtmlContent (string contentType)
     {
-        return contentType.ToLowerInvariant().StartsWith("text/html");
+        return contentType.ToLowerInvariant().StartsWith ("text/html");
     }
 
-    private bool IsGZipEncoding(string contentEncoding)
+    private bool IsGZipEncoding (string contentEncoding)
     {
-        return contentEncoding.ToLowerInvariant().StartsWith("gzip");
+        return contentEncoding.ToLowerInvariant().StartsWith ("gzip");
     }
 
 #if !(NETSTANDARD1_3 || NETSTANDARD1_6)
-    private HtmlDocument LoadUrl(Uri uri, string method, WebProxy proxy, NetworkCredential creds)
+    private HtmlDocument LoadUrl (Uri uri, string method, WebProxy proxy, NetworkCredential creds)
     {
-        var doc = new HtmlDocument();
-        doc.OptionAutoCloseOnEnd = false;
-        doc.OptionFixNestedTags = true;
-        _statusCode = Get(uri, method, null, doc, proxy, creds);
+        var doc = new HtmlDocument
+        {
+            OptionAutoCloseOnEnd = false,
+            OptionFixNestedTags = true
+        };
+        _statusCode = Get (uri, method, null, doc, proxy, creds);
         if (_statusCode == HttpStatusCode.NotModified)
         {
             // read cached encoding
-            doc.DetectEncodingAndLoad(GetCachePath(uri));
+            doc.DetectEncodingAndLoad (GetCachePath (uri));
         }
 
         return doc;
@@ -2128,28 +2118,28 @@ public partial class HtmlWeb
         }
 #endif
 #if !(NETSTANDARD1_3 || NETSTANDARD1_6)
-    private void SaveCacheHeaders(Uri requestUri, HttpWebResponse resp)
+    private void SaveCacheHeaders (Uri requestUri, HttpWebResponse resp)
     {
         // we cache the original headers aside the cached document.
-        var file = GetCacheHeadersPath(requestUri);
+        var file = GetCacheHeadersPath (requestUri);
         var doc = new XmlDocument();
-        doc.LoadXml("<c></c>");
+        doc.LoadXml ("<c></c>");
         var cache = doc.FirstChild;
         foreach (string header in resp.Headers)
         {
-            XmlNode entry = doc.CreateElement("h");
-            var att = doc.CreateAttribute("n");
+            XmlNode entry = doc.CreateElement ("h");
+            var att = doc.CreateAttribute ("n");
             att.Value = header;
-            entry.Attributes.Append(att);
+            entry.Attributes!.Append (att);
 
-            att = doc.CreateAttribute("v");
+            att = doc.CreateAttribute ("v");
             att.Value = resp.Headers[header];
-            entry.Attributes.Append(att);
+            entry.Attributes.Append (att);
 
-            cache.AppendChild(entry);
+            cache!.AppendChild (entry);
         }
 
-        doc.Save(file);
+        doc.Save (file);
     }
 #endif
 
@@ -2458,7 +2448,8 @@ public partial class HtmlWeb
 			var documentProperty = webBrowser.GetType().GetProperty("Document");
             var document = documentProperty.GetValue(webBrowser, null);
 
-            var getElementsByTagNameMethod = document.GetType().GetMethod("GetElementsByTagName", new Type[] {typeof(string)});
+            var getElementsByTagNameMethod =
+ document.GetType().GetMethod("GetElementsByTagName", new Type[] {typeof(string)});
             var getElementsByTagName = getElementsByTagNameMethod.Invoke(document, new[] {"HTML"});
 
             var indexerProperty = getElementsByTagName.GetType().GetProperty("Item", new Type[] {typeof(int)});
@@ -2495,14 +2486,16 @@ public partial class HtmlWeb
         /// <returns>A new HTML document.</returns>
         public HtmlDocument LoadFromBrowser(string url, Func<object, bool> isBrowserScriptCompleted = null)
         {
-            var system_windows_forms = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(x => x.GetName().Name == "System.Windows.Forms");
+            var system_windows_forms =
+ AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(x => x.GetName().Name == "System.Windows.Forms");
 
             if (system_windows_forms == null)
             {
                 // TRY to load id
                 try
                 {
-                    var system = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(x => x.GetName().Name == "System");
+                    var system =
+ AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(x => x.GetName().Name == "System");
 
                     if (system != null)
                     {
@@ -2515,7 +2508,8 @@ public partial class HtmlWeb
                     // Silence catch
                 }
 
-                system_windows_forms = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(x => x.GetName().Name == "System.Windows.Forms");
+                system_windows_forms =
+ AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(x => x.GetName().Name == "System.Windows.Forms");
 
                 if (system_windows_forms == null)
                 {
@@ -2531,7 +2525,8 @@ public partial class HtmlWeb
 
             Uri uri = new Uri(url);
             HtmlDocument doc = new HtmlDocument();
-            string timeoutError = "WebBrowser Execution Timeout Expired. The timeout period elapsed prior to completion of the operation. To avoid this error, increase the WebBrowserTimeout value or set it to 0 (unlimited).";
+            string timeoutError =
+ "WebBrowser Execution Timeout Expired. The timeout period elapsed prior to completion of the operation. To avoid this error, increase the WebBrowserTimeout value or set it to 0 (unlimited).";
 
             using (var webBrowser = (IDisposable) webBrowserConstructor.Invoke(new object[0]))
             {
@@ -2543,8 +2538,10 @@ public partial class HtmlWeb
                     var newWindowEvent = webBrowser.GetType().GetEvent("NewWindow");
                     if(newWindowEvent != null)
                     {
-                        var newWindowHandler = this.GetType().GetMethod("Web_NewWindow", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-                        Delegate newWindowDelegate = Delegate.CreateDelegate(newWindowEvent.EventHandlerType, null, newWindowHandler);
+                        var newWindowHandler =
+ this.GetType().GetMethod("Web_NewWindow", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                        Delegate newWindowDelegate =
+ Delegate.CreateDelegate(newWindowEvent.EventHandlerType, null, newWindowHandler);
                         newWindowEvent.AddEventHandler(webBrowser, newWindowDelegate);
                     }
                 }

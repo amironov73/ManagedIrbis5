@@ -24,7 +24,6 @@
 
     <!-- Централизованное управление пакетами -->
     <ItemGroup>
-        <PackageReference Include="Ionic.Zip" />
         <PackageReference Include="MailKit" />
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" />
         <PackageReference Include="Microsoft.Extensions.Caching.Memory" />

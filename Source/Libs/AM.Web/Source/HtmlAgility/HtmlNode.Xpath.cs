@@ -8,13 +8,12 @@
 // ReSharper disable NonReadonlyMemberInGetHashCode
 // ReSharper disable UnusedMember.Global
 
-/*
+/* HtmlNode.Xpath.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
 using System.Xml.XPath;
 
 #endregion
@@ -34,7 +33,7 @@ public partial class HtmlNode
     /// <returns>An XPathNavigator object. The XPathNavigator is positioned on the node from which the method was called. It is not positioned on the root of the document.</returns>
     public XPathNavigator CreateNavigator()
     {
-        return new HtmlNodeNavigator (OwnerDocument, this);
+        return new HtmlNodeNavigator (OwnerDocument!, this);
     }
 
     /// <summary>
@@ -43,7 +42,7 @@ public partial class HtmlNode
     /// <returns></returns>
     public XPathNavigator CreateRootNavigator()
     {
-        return new HtmlNodeNavigator (OwnerDocument, OwnerDocument.DocumentNode);
+        return new HtmlNodeNavigator (OwnerDocument!, OwnerDocument!.DocumentNode);
     }
 
     /// <summary>
@@ -55,15 +54,15 @@ public partial class HtmlNode
     {
         var list = new HtmlNodeCollection (null);
 
-        var nav = new HtmlNodeNavigator (OwnerDocument, this);
+        var nav = new HtmlNodeNavigator (OwnerDocument!, this);
         var it = nav.Select (xpath);
         while (it.MoveNext())
         {
-            var n = (HtmlNodeNavigator)it.Current;
+            var n = (HtmlNodeNavigator)it.Current!;
             list.Add (n.CurrentNode, false);
         }
 
-        if (list.Count == 0 && !OwnerDocument.OptionEmptyCollection)
+        if (list.Count == 0 && !OwnerDocument!.OptionEmptyCollection)
         {
             return null;
         }
@@ -80,15 +79,15 @@ public partial class HtmlNode
     {
         var list = new HtmlNodeCollection (null);
 
-        var nav = new HtmlNodeNavigator (OwnerDocument, this);
+        var nav = new HtmlNodeNavigator (OwnerDocument!, this);
         var it = nav.Select (xpath);
         while (it.MoveNext())
         {
-            var n = (HtmlNodeNavigator)it.Current;
+            var n = (HtmlNodeNavigator)it.Current!;
             list.Add (n.CurrentNode, false);
         }
 
-        if (list.Count == 0 && !OwnerDocument.OptionEmptyCollection)
+        if (list.Count == 0 && !OwnerDocument!.OptionEmptyCollection)
         {
             return null;
         }
@@ -108,14 +107,14 @@ public partial class HtmlNode
     {
         Sure.NotNull (xpath);
 
-        var nav = new HtmlNodeNavigator (OwnerDocument, this);
+        var nav = new HtmlNodeNavigator (OwnerDocument!, this);
         var it = nav.Select (xpath);
         if (!it.MoveNext())
         {
             return null;
         }
 
-        var node = (HtmlNodeNavigator)it.Current;
+        var node = (HtmlNodeNavigator)it.Current!;
         return node.CurrentNode;
     }
 
@@ -124,21 +123,21 @@ public partial class HtmlNode
     /// </summary>
     /// <param name="xpath">The XPath expression.</param>
     /// <returns>An <see cref="HtmlNodeCollection"/> containing a collection of nodes matching the <see cref="XPath"/> query, or <c>null</c> if no node matched the XPath expression.</returns>
-    public HtmlNode SelectSingleNode
+    public HtmlNode? SelectSingleNode
         (
             XPathExpression xpath
         )
     {
         Sure.NotNull (xpath);
 
-        var nav = new HtmlNodeNavigator (OwnerDocument, this);
+        var nav = new HtmlNodeNavigator (OwnerDocument!, this);
         var it = nav.Select (xpath);
         if (!it.MoveNext())
         {
             return null;
         }
 
-        var node = (HtmlNodeNavigator)it.Current;
+        var node = (HtmlNodeNavigator)it.Current!;
         return node.CurrentNode;
     }
 }

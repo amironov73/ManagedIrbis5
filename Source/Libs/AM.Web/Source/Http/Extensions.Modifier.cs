@@ -20,7 +20,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Net;
-using System.Net.Http;
 using System.Net.Http.Headers;
 
 #endregion
@@ -145,7 +144,7 @@ public static partial class ExtensionsForHttp
             catch (Exception e)
             {
                 var wrapper = new HttpClientException ("Unable to set header: " + name + " to '" + value + "'",
-                    builder.Message.RequestUri, e);
+                    builder.Message.RequestUri!, e);
                 builder.GetSettings().OnException (builder, new HttpExceptionArgs (builder, wrapper));
             }
         }
@@ -172,7 +171,7 @@ public static partial class ExtensionsForHttp
             catch (Exception e)
             {
                 var wrapper = new HttpClientException ("Unable to set header using: " + name + " to '" + value + "'",
-                    builder.Message.RequestUri, e);
+                    builder.Message.RequestUri!, e);
                 builder.GetSettings().OnException (builder, new HttpExceptionArgs (builder, wrapper));
             }
         }
@@ -186,9 +185,16 @@ public static partial class ExtensionsForHttp
     /// <param name="builder">The builder we're working on.</param>
     /// <param name="headers">The headers to add to this request.</param>
     /// <returns>The request builder for chaining.</returns>
-    public static IRequestBuilder AddHeaders (this IRequestBuilder builder, IDictionary<string, string> headers)
+    public static IRequestBuilder AddHeaders
+        (
+            this IRequestBuilder builder,
+            IDictionary<string, string>? headers
+        )
     {
-        if (headers == null) return builder;
+        if (headers == null)
+        {
+            return builder;
+        }
 
         var pHeaders = builder.Message.Headers;
         foreach (var kv in headers)
@@ -208,7 +214,7 @@ public static partial class ExtensionsForHttp
                     //    case "Proxy-Connection": break;
                     //    case "Content-Length": break;
                     case "Content-Type":
-                        builder.Message.Content.Headers.ContentType = new MediaTypeHeaderValue (kv.Value);
+                        builder.Message.Content!.Headers.ContentType = new MediaTypeHeaderValue (kv.Value);
                         break;
 
                     //    case "Host": break;
@@ -223,7 +229,7 @@ public static partial class ExtensionsForHttp
             catch (Exception e)
             {
                 var wrapper = new HttpClientException ("Unable to set header: " + kv.Key + " to '" + kv.Value + "'",
-                    builder.Message.RequestUri, e);
+                    builder.Message.RequestUri!, e);
                 builder.GetSettings().OnException (builder, new HttpExceptionArgs (builder, wrapper));
             }
         }

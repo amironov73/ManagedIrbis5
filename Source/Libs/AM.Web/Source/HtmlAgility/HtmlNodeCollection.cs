@@ -3,12 +3,14 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable ForCanBeConvertedToForeach
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable LocalizableElement
 // ReSharper disable NonReadonlyMemberInGetHashCode
 // ReSharper disable UnusedMember.Global
 
-/*
+/* HtmlNodeCollection.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -27,7 +29,8 @@ namespace HtmlAgilityPack;
 /// <summary>
 /// Represents a combined list and collection of HTML nodes.
 /// </summary>
-public class HtmlNodeCollection : IList<HtmlNode>
+public class HtmlNodeCollection
+    : IList<HtmlNode>
 {
     #region Fields
 
@@ -66,7 +69,7 @@ public class HtmlNodeCollection : IList<HtmlNode>
             var index = GetNodeIndex (node);
             if (index == -1)
             {
-                throw new ArgumentOutOfRangeException ("node",
+                throw new ArgumentOutOfRangeException (nameof (node),
                     "Node \"" + node.CloneNode (false).OuterHtml +
                     "\" was not found in the collection");
             }
@@ -80,7 +83,7 @@ public class HtmlNodeCollection : IList<HtmlNode>
     /// </summary>
     /// <param name="nodeName"></param>
     /// <returns></returns>
-    public HtmlNode this [string nodeName]
+    public HtmlNode? this [string nodeName]
     {
         get
         {
@@ -250,7 +253,7 @@ public class HtmlNodeCollection : IList<HtmlNode>
         }
 
         node._nextNode = next;
-        node.SetParent (ParentNode);
+        node.SetParent (ParentNode!);
     }
 
     /// <summary>
@@ -271,8 +274,8 @@ public class HtmlNodeCollection : IList<HtmlNode>
     /// <param name="index"></param>
     public void RemoveAt (int index)
     {
-        HtmlNode next = null;
-        HtmlNode prev = null;
+        HtmlNode? next = null;
+        HtmlNode? prev = null;
         var oldnode = _items[index];
 
         // KEEP a reference since it will be set to null
@@ -364,7 +367,7 @@ public class HtmlNodeCollection : IList<HtmlNode>
         _items.Add (node);
         node._prevNode = last;
         node._nextNode = null;
-        node.SetParent (ParentNode);
+        node.SetParent (ParentNode!);
         if (last == null)
         {
             return;
@@ -385,7 +388,7 @@ public class HtmlNodeCollection : IList<HtmlNode>
     /// <returns></returns>
     public HtmlNode FindFirst (string name)
     {
-        return FindFirst (this, name);
+        return FindFirst (this, name)!;
     }
 
     /// <summary>
@@ -413,7 +416,7 @@ public class HtmlNodeCollection : IList<HtmlNode>
     /// <param name="node"></param>
     public void Prepend (HtmlNode node)
     {
-        HtmlNode first = null;
+        HtmlNode? first = null;
         if (_items.Count > 0)
         {
             first = _items[0];
@@ -428,7 +431,7 @@ public class HtmlNodeCollection : IList<HtmlNode>
 
         node._nextNode = first;
         node._prevNode = null;
-        node.SetParent (ParentNode);
+        node.SetParent (ParentNode!);
 
         if (first != null)
         {
@@ -454,8 +457,8 @@ public class HtmlNodeCollection : IList<HtmlNode>
     /// <param name="node"></param>
     public void Replace (int index, HtmlNode node)
     {
-        HtmlNode next = null;
-        HtmlNode prev = null;
+        HtmlNode? next = null;
+        HtmlNode? prev = null;
         var oldnode = _items[index];
 
         if (index > 0)
@@ -493,7 +496,7 @@ public class HtmlNodeCollection : IList<HtmlNode>
         }
 
         node._nextNode = next;
-        node.SetParent (ParentNode);
+        node.SetParent (ParentNode!);
 
         oldnode._prevNode = null;
         oldnode._nextNode = null;

@@ -8,7 +8,7 @@
 // ReSharper disable NonReadonlyMemberInGetHashCode
 // ReSharper disable UnusedMember.Global
 
-/*
+/* HtmlNodeNavigator.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -68,7 +68,7 @@ public class HtmlNodeNavigator : XPathNavigator
             throw new ArgumentException (HtmlDocument.HtmlExceptionRefNotChild);
         }
 
-        if (document == null)
+        if (document == null!)
         {
             // keep in message, currentNode.OwnerDocument also null.
             throw new Exception ("Oops! The HtmlDocument cannot be null.");
@@ -86,10 +86,8 @@ public class HtmlNodeNavigator : XPathNavigator
 
     private HtmlNodeNavigator (HtmlNodeNavigator nav)
     {
-        if (nav == null)
-        {
-            throw new ArgumentNullException ("nav");
-        }
+        Sure.NotNull (nav);
+
 #if TRACE_NAVIGATOR
             InternalTrace(null);
 #endif
@@ -269,18 +267,12 @@ public class HtmlNodeNavigator : XPathNavigator
     /// <summary>
     /// Gets the current HTML document.
     /// </summary>
-    public HtmlDocument CurrentDocument
-    {
-        get { return _document; }
-    }
+    public HtmlDocument CurrentDocument => _document;
 
     /// <summary>
     /// Gets the current HTML node.
     /// </summary>
-    public HtmlNode CurrentNode
-    {
-        get { return _currentNode; }
-    }
+    public HtmlNode CurrentNode => _currentNode!;
 
     /// <summary>
     /// Gets a value indicating whether the current node has child nodes.
@@ -292,7 +284,7 @@ public class HtmlNodeNavigator : XPathNavigator
 #if TRACE_NAVIGATOR
                 InternalTrace(">" + (_currentnode.Attributes.Count > 0));
 #endif
-            return (_currentNode.Attributes.Count > 0);
+            return (_currentNode!.Attributes.Count > 0);
         }
     }
 
@@ -306,7 +298,7 @@ public class HtmlNodeNavigator : XPathNavigator
 #if TRACE_NAVIGATOR
                 InternalTrace(">" + (_currentnode.ChildNodes.Count > 0));
 #endif
-            return (_currentNode.ChildNodes.Count > 0);
+            return (_currentNode!.ChildNodes.Count > 0);
         }
     }
 
@@ -338,13 +330,13 @@ public class HtmlNodeNavigator : XPathNavigator
 #if TRACE_NAVIGATOR
                     InternalTrace("att>" + _currentnode.Attributes[_attindex].Name);
 #endif
-                return _nametable.GetOrAdd (_currentNode.Attributes[_attindex].Name);
+                return _nametable.GetOrAdd (_currentNode!.Attributes[_attindex].Name);
             }
 
 #if TRACE_NAVIGATOR
                 InternalTrace("node>" + _currentnode.Name);
 #endif
-            return _nametable.GetOrAdd (_currentNode.Name);
+            return _nametable.GetOrAdd (_currentNode!.Name);
         }
     }
 
@@ -358,7 +350,7 @@ public class HtmlNodeNavigator : XPathNavigator
 #if TRACE_NAVIGATOR
                 InternalTrace(">" + _currentnode.Name);
 #endif
-            return _nametable.GetOrAdd (_currentNode.Name);
+            return _nametable.GetOrAdd (_currentNode!.Name);
         }
     }
 
@@ -398,7 +390,7 @@ public class HtmlNodeNavigator : XPathNavigator
     {
         get
         {
-            switch (_currentNode.NodeType)
+            switch (_currentNode!.NodeType)
             {
                 case HtmlNodeType.Comment:
 #if TRACE_NAVIGATOR
@@ -466,7 +458,7 @@ public class HtmlNodeNavigator : XPathNavigator
 #if TRACE_NAVIGATOR
                 InternalTrace("nt=" + _currentnode.NodeType);
 #endif
-            switch (_currentNode.NodeType)
+            switch (_currentNode!.NodeType)
             {
                 case HtmlNodeType.Comment:
 #if TRACE_NAVIGATOR
@@ -548,13 +540,13 @@ public class HtmlNodeNavigator : XPathNavigator
 #if TRACE_NAVIGATOR
             InternalTrace("localName=" + localName + ", namespaceURI=" + namespaceURI);
 #endif
-        HtmlAttribute att = _currentNode.Attributes[localName];
+        HtmlAttribute? att = _currentNode!.Attributes[localName];
         if (att == null)
         {
 #if TRACE_NAVIGATOR
                 InternalTrace(">null");
 #endif
-            return null;
+            return null!;
         }
 
 #if TRACE_NAVIGATOR
@@ -584,7 +576,7 @@ public class HtmlNodeNavigator : XPathNavigator
     /// <returns>true if the two navigators have the same position, otherwise, false.</returns>
     public override bool IsSamePosition (XPathNavigator other)
     {
-        HtmlNodeNavigator nav = other as HtmlNodeNavigator;
+        HtmlNodeNavigator? nav = other as HtmlNodeNavigator;
         if (nav == null)
         {
 #if TRACE_NAVIGATOR
@@ -606,7 +598,7 @@ public class HtmlNodeNavigator : XPathNavigator
     /// <returns>true if successful, otherwise false. If false, the position of the navigator is unchanged.</returns>
     public override bool MoveTo (XPathNavigator other)
     {
-        HtmlNodeNavigator nav = other as HtmlNodeNavigator;
+        HtmlNodeNavigator? nav = other as HtmlNodeNavigator;
         if (nav == null)
         {
 #if TRACE_NAVIGATOR
@@ -649,7 +641,7 @@ public class HtmlNodeNavigator : XPathNavigator
 #if TRACE_NAVIGATOR
             InternalTrace("localName=" + localName + ", namespaceURI=" + namespaceURI);
 #endif
-        int index = _currentNode.Attributes.GetAttributeIndex (localName);
+        int index = _currentNode!.Attributes.GetAttributeIndex (localName);
         if (index == -1)
         {
 #if TRACE_NAVIGATOR
@@ -671,7 +663,7 @@ public class HtmlNodeNavigator : XPathNavigator
     /// <returns>true if the navigator is successful moving to the first sibling node, false if there is no first sibling or if the navigator is currently positioned on an attribute node.</returns>
     public override bool MoveToFirst()
     {
-        if (_currentNode.ParentNode == null)
+        if (_currentNode!.ParentNode == null)
         {
 #if TRACE_NAVIGATOR
                 InternalTrace(">false");
@@ -679,7 +671,7 @@ public class HtmlNodeNavigator : XPathNavigator
             return false;
         }
 
-        if (_currentNode.ParentNode.FirstChild == null)
+        if (_currentNode.ParentNode.FirstChild == null!)
         {
 #if TRACE_NAVIGATOR
                 InternalTrace(">false");
@@ -721,7 +713,7 @@ public class HtmlNodeNavigator : XPathNavigator
     /// <returns>true if there is a first child node, otherwise false.</returns>
     public override bool MoveToFirstChild()
     {
-        if (!_currentNode.HasChildNodes)
+        if (!_currentNode!.HasChildNodes)
         {
 #if TRACE_NAVIGATOR
                 InternalTrace(">false");
@@ -760,7 +752,7 @@ public class HtmlNodeNavigator : XPathNavigator
 #if TRACE_NAVIGATOR
             InternalTrace("id=" + id);
 #endif
-        HtmlNode node = _document.GetElementbyId (id);
+        HtmlNode? node = _document.GetElementbyId (id);
         if (node == null)
         {
 #if TRACE_NAVIGATOR
@@ -796,7 +788,7 @@ public class HtmlNodeNavigator : XPathNavigator
     /// <returns>true if the navigator is successful moving to the next sibling node, false if there are no more siblings or if the navigator is currently positioned on an attribute node. If false, the position of the navigator is unchanged.</returns>
     public override bool MoveToNext()
     {
-        if (_currentNode.NextSibling == null)
+        if (_currentNode!.NextSibling == null)
         {
 #if TRACE_NAVIGATOR
                 InternalTrace(">false");
@@ -824,7 +816,7 @@ public class HtmlNodeNavigator : XPathNavigator
 #if TRACE_NAVIGATOR
             InternalTrace(null);
 #endif
-        if (_attindex >= (_currentNode.Attributes.Count - 1))
+        if (_attindex >= (_currentNode!.Attributes.Count - 1))
         {
 #if TRACE_NAVIGATOR
                 InternalTrace(">false");
@@ -859,7 +851,7 @@ public class HtmlNodeNavigator : XPathNavigator
     /// <returns>true if there is a parent node, otherwise false.</returns>
     public override bool MoveToParent()
     {
-        if (_currentNode.ParentNode == null)
+        if (_currentNode!.ParentNode == null)
         {
 #if TRACE_NAVIGATOR
                 InternalTrace(">false");
@@ -880,7 +872,7 @@ public class HtmlNodeNavigator : XPathNavigator
     /// <returns>true if the navigator is successful moving to the previous sibling node, false if there is no previous sibling or if the navigator is currently positioned on an attribute node.</returns>
     public override bool MoveToPrevious()
     {
-        if (_currentNode.PreviousSibling == null)
+        if (_currentNode!.PreviousSibling == null)
         {
 #if TRACE_NAVIGATOR
                 InternalTrace(">false");

@@ -1870,7 +1870,7 @@ public partial class HtmlDocument
 
     private void PushAttributeValueEnd (int index)
     {
-        _currentAttribute._valuelength = index - _currentAttribute._valuestartindex;
+        _currentAttribute.ValueLength = index - _currentAttribute.ValueStartIndex;
     }
 
     private void PushAttributeValueStart (int index)
@@ -2075,7 +2075,7 @@ public partial class HtmlDocument
 
     private void PushAttributeValueStart (int index, int quote)
     {
-        _currentAttribute._valuestartindex = index;
+        _currentAttribute.ValueStartIndex = index;
         if (quote == '\'')
         {
             _currentAttribute.QuoteType = AttributeValueQuote.SingleQuote;

@@ -3,12 +3,13 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable ForCanBeConvertedToForeach
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable NonReadonlyMemberInGetHashCode
 // ReSharper disable UnusedMember.Global
 
-/*
+/* HtmlEntity.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -18,6 +19,8 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+
+using AM;
 
 #endregion
 
@@ -38,24 +41,18 @@ public class HtmlEntity
 #endif
 
     private static readonly int _maxEntitySize;
-    private static Dictionary<int, string> _entityName;
-    private static Dictionary<string, int> _entityValue;
+    private static readonly Dictionary<int, string> _entityName;
+    private static readonly Dictionary<string, int> _entityValue;
 
     /// <summary>
     /// A collection of entities indexed by name.
     /// </summary>
-    public static Dictionary<int, string> EntityName
-    {
-        get { return _entityName; }
-    }
+    public static Dictionary<int, string> EntityName => _entityName;
 
     /// <summary>
     /// A collection of entities indexed by value.
     /// </summary>
-    public static Dictionary<string, int> EntityValue
-    {
-        get { return _entityValue; }
-    }
+    public static Dictionary<string, int> EntityValue => _entityValue;
 
     #endregion
 
@@ -601,19 +598,26 @@ public class HtmlEntity
     /// </summary>
     /// <param name="text">The source text.</param>
     /// <returns>The result text.</returns>
-    public static string DeEntitize(string text)
+    public static string? DeEntitize
+        (
+            string? text
+        )
     {
         if (text == null)
+        {
             return null;
+        }
 
         if (text.Length == 0)
+        {
             return text;
+        }
 
-        StringBuilder sb = new StringBuilder(text.Length);
-        ParseState state = ParseState.Text;
-        StringBuilder entity = new StringBuilder(10);
+        var sb = new StringBuilder(text.Length);
+        var state = ParseState.Text;
+        var entity = new StringBuilder(10);
 
-        for (int i = 0; i < text.Length; i++)
+        for (var i = 0; i < text.Length; i++)
         {
             switch (state)
             {
@@ -643,10 +647,10 @@ public class HtmlEntity
                             {
                                 if (entity[0] == '#')
                                 {
-                                    string e = entity.ToString();
+                                    var e = entity.ToString();
                                     try
                                     {
-                                        string codeStr = e.Substring(1).Trim();
+                                        var codeStr = e.Substring(1).Trim();
                                         int fromBase;
                                         if (codeStr.StartsWith("x", StringComparison.OrdinalIgnoreCase))
                                         {
@@ -658,7 +662,7 @@ public class HtmlEntity
                                             fromBase = 10;
                                         }
 
-                                        int code = Convert.ToInt32(codeStr, fromBase);
+                                        var code = Convert.ToInt32(codeStr, fromBase);
                                         sb.Append(Convert.ToChar(code));
                                     }
                                     catch
@@ -669,8 +673,7 @@ public class HtmlEntity
                                 else
                                 {
                                     // named entity?
-                                    int code;
-                                    if (!_entityValue.TryGetValue(entity.ToString(), out code))
+                                    if (!_entityValue.TryGetValue(entity.ToString(), out var code))
                                     {
                                         // nope
                                         sb.Append("&" + entity + ";");
@@ -727,14 +730,13 @@ public class HtmlEntity
     /// <returns>An entitized cloned node.</returns>
     public static HtmlNode Entitize(HtmlNode node)
     {
-        if (node == null)
-        {
-            throw new ArgumentNullException("node");
-        }
+        Sure.NotNull (node);
 
-        HtmlNode result = node.CloneNode(true);
+        var result = node.CloneNode(true);
         if (result.HasAttributes)
+        {
             Entitize(result.Attributes);
+        }
 
         if (result.HasChildNodes)
         {
@@ -744,7 +746,7 @@ public class HtmlEntity
         {
             if (result.NodeType == HtmlNodeType.Text)
             {
-                ((HtmlTextNode) result).Text = Entitize(((HtmlTextNode) result).Text, true, true);
+                ((HtmlTextNode) result).Text = Entitize(((HtmlTextNode) result).Text, true, true)!;
             }
         }
 
@@ -770,7 +772,7 @@ public class HtmlEntity
     /// <returns>The result text.</returns>
     public static string Entitize(string text, bool useNames)
     {
-        return Entitize(text, useNames, false);
+        return Entitize(text, useNames, false)!;
     }
 
     /// <summary>
@@ -782,7 +784,7 @@ public class HtmlEntity
     /// <returns>The result text</returns>
     public static string? Entitize
         (
-            string text,
+            string? text,
             bool useNames,
             bool entitizeQuotAmpAndLtGt
         )
@@ -796,17 +798,21 @@ public class HtmlEntity
 //        _entityName.Add(62, "gt");
     {
         if (text == null)
+        {
             return null;
+        }
 
         if (text.Length == 0)
+        {
             return text;
+        }
 
-        StringBuilder sb = new StringBuilder(text.Length);
+        var sb = new StringBuilder(text.Length);
 
 #if !FX20 && !FX35
         if (UseWebUtility)
         {
-            TextElementEnumerator enumerator = StringInfo.GetTextElementEnumerator(text);
+            var enumerator = StringInfo.GetTextElementEnumerator(text);
             while (enumerator.MoveNext())
             {
                 sb.Append(System.Net.WebUtility.HtmlEncode(enumerator.GetTextElement()));
@@ -815,13 +821,13 @@ public class HtmlEntity
         else
         {
 #endif
-            for (int i = 0; i < text.Length; i++)
+            for (var i = 0; i < text.Length; i++)
             {
                 int code = text[i];
                 if ((code > 127) ||
                     (entitizeQuotAmpAndLtGt && ((code == 34) || (code == 38) || (code == 60) || (code == 62))))
                 {
-                    string entity = null;
+                    string? entity = null;
 
                     if (useNames)
                     {
@@ -855,7 +861,7 @@ public class HtmlEntity
 
     private static void Entitize(HtmlAttributeCollection collection)
     {
-        foreach (HtmlAttribute at in collection)
+        foreach (var at in collection)
         {
             if (at.Value == null)
             {
@@ -868,10 +874,12 @@ public class HtmlEntity
 
     private static void Entitize(HtmlNodeCollection collection)
     {
-        foreach (HtmlNode node in collection)
+        foreach (var node in collection)
         {
             if (node.HasAttributes)
+            {
                 Entitize(node.Attributes);
+            }
 
             if (node.HasChildNodes)
             {
@@ -881,7 +889,7 @@ public class HtmlEntity
             {
                 if (node.NodeType == HtmlNodeType.Text)
                 {
-                    ((HtmlTextNode) node).Text = Entitize(((HtmlTextNode) node).Text, true, true);
+                    ((HtmlTextNode) node).Text = Entitize(((HtmlTextNode) node).Text, true, true)!;
                 }
             }
         }

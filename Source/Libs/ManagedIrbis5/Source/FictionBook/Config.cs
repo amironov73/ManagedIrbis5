@@ -10,18 +10,16 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* Config.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Configuration;
-using System.Reflection;
-using System.IO;
+
+using AM;
 
 #endregion
 
@@ -35,31 +33,40 @@ namespace ManagedIrbis.FictionBook;
 public class GenreSubstitutionElement
     : ConfigurationElement, IComparable
 {
+    /// <summary>
+    ///
+    /// </summary>
     [ConfigurationProperty ("from", IsRequired = true)]
     public string From
     {
-        get { return (string)this["from"]; }
-        set { this["from"] = value; }
+        get => (string)this["from"];
+        set => this["from"] = value;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     [ConfigurationProperty ("to", DefaultValue = "Unknown")]
     public string To
     {
-        get { return (string)this["to"]; }
-        set { this["to"] = value; }
+        get => (string)this["to"];
+        set => this["to"] = value;
     }
 
+    /// <inheritdoc cref="object.ToString"/>
     public override string ToString()
     {
-        return string.Format ("{0} ({1})", To, From);
+        return $"{To} ({From})";
     }
 
-    public int CompareTo (object obj)
+    /// <inheritdoc cref="IComparable.CompareTo"/>
+    public int CompareTo
+        (
+            object? obj
+        )
     {
-        if (obj is GenreSubstitutionElement)
-            return this.ToString().CompareTo (obj.ToString());
-        else
-            return 0;
+        return obj is GenreSubstitutionElement
+            ? String.Compare (ToString(), obj.ToString(), StringComparison.Ordinal) : 0;
     }
 }
 
@@ -69,11 +76,14 @@ public class GenreSubstitutionElement
 public class EncodingElement
     : ConfigurationElement
 {
+    /// <summary>
+    ///
+    /// </summary>
     [ConfigurationProperty ("name", IsRequired = true)]
     public string Name
     {
-        get { return (string)this["name"]; }
-        set { this["name"] = value; }
+        get => (string)this["name"];
+        set => this["name"] = value;
     }
 }
 
@@ -82,299 +92,420 @@ public class EncodingElement
 /// </summary>
 public class RenameProfileElement : ConfigurationElement
 {
+    /// <summary>
+    ///
+    /// </summary>
     [ConfigurationProperty ("name", IsRequired = true)]
     public string Name
     {
-        get { return (string)this["name"]; }
-        set { this["name"] = value; }
+        get => (string)this["name"];
+        set => this["name"] = value;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     [ConfigurationProperty ("path", IsRequired = true)]
     public string Path
     {
-        get { return (string)this["path"]; }
-        set { this["path"] = value; }
+        get => (string)this["path"];
+        set => this["path"] = value;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     [ConfigurationProperty ("fileName", IsRequired = true)]
     public string FileName
     {
-        get { return (string)this["fileName"]; }
-        set { this["fileName"] = value; }
+        get => (string)this["fileName"];
+        set => this["fileName"] = value;
     }
+    /// <summary>
+    ///
+    /// </summary>
 
     [ConfigurationProperty ("characterSubstitution", IsDefaultCollection = true, IsRequired = false)]
-    public CharacterSubstitutionCollection CharacterSubstitution
-    {
-        get { return (CharacterSubstitutionCollection)this["characterSubstitution"]; }
-    }
+    public CharacterSubstitutionCollection CharacterSubstitution =>
+        (CharacterSubstitutionCollection)this["characterSubstitution"];
 }
 
-public class CharacterSubstitutionElement : ConfigurationElement
+/// <summary>
+///
+/// </summary>
+public class CharacterSubstitutionElement
+    : ConfigurationElement
 {
+    /// <summary>
+    ///
+    /// </summary>
     [ConfigurationProperty ("from", IsRequired = true)]
     [StringValidator (InvalidCharacters = "\\")]
     public string From
     {
-        get { return (string)this["from"]; }
-        set { this["from"] = value; }
+        get => (string)this["from"];
+        set => this["from"] = value;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     [ConfigurationProperty ("to", DefaultValue = "")]
     public string To
     {
-        get { return (string)this["to"]; }
-        set { this["to"] = value; }
+        get => (string)this["to"];
+        set => this["to"] = value;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     [ConfigurationProperty ("repeat", DefaultValue = 1)]
     [IntegerValidator (MinValue = 1, MaxValue = 50)]
     public int Repeat
     {
-        get { return (int)this["repeat"]; }
-        set { this["repeat"] = value; }
+        get => (int)this["repeat"];
+        set => this["repeat"] = value;
     }
 }
 
-public class CommandTypeElement : ConfigurationElement
+/// <summary>
+///
+/// </summary>
+public class CommandTypeElement
+    : ConfigurationElement
 {
+    /// <summary>
+    ///
+    /// </summary>
     [ConfigurationProperty ("checkedFiles", IsDefaultCollection = true, IsRequired = true)]
-    public CommandsCollection CheckedFilesCommands
-    {
-        get { return (CommandsCollection)this["checkedFiles"]; }
-    }
+    public CommandsCollection CheckedFilesCommands => (CommandsCollection) this["checkedFiles"];
 
+    /// <summary>
+    ///
+    /// </summary>
     [ConfigurationProperty ("focusedFile", IsDefaultCollection = true, IsRequired = true)]
-    public CommandsCollection FocusedFileCommand
-    {
-        get { return (CommandsCollection)this["focusedFile"]; }
-    }
+    public CommandsCollection FocusedFileCommand => (CommandsCollection) this["focusedFile"];
 }
 
-public class CommandElement : ConfigurationElement
+/// <summary>
+///
+/// </summary>
+public class CommandElement
+    : ConfigurationElement
 {
+    /// <summary>
+    ///
+    /// </summary>
     [ConfigurationProperty ("name", IsRequired = true)]
     public string Name
     {
-        get { return (string)this["name"]; }
-        set { this["name"] = value; }
+        get => (string)this["name"];
+        set => this["name"] = value;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     [ConfigurationProperty ("fileName", IsRequired = true)]
     public string FileName
     {
-        get { return (string)this["fileName"]; }
-        set { this["fileName"] = value; }
+        get => (string)this["fileName"];
+        set => this["fileName"] = value;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     [ConfigurationProperty ("arguments", IsRequired = false, DefaultValue = "")]
     public string Arguments
     {
-        get { return (string)this["arguments"]; }
-        set { this["arguments"] = value; }
+        get => (string)this["arguments"];
+        set => this["arguments"] = value;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     [ConfigurationProperty ("createNoWindow", IsRequired = false, DefaultValue = false)]
     public bool CreateNoWindow
     {
-        get { return (bool)this["createNoWindow"]; }
-        set { this["createNoWindow"] = value; }
+        get => (bool)this["createNoWindow"];
+        set => this["createNoWindow"] = value;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     [ConfigurationProperty ("onlyWithExtension", IsRequired = false, DefaultValue = "")]
     public string OnlyWithExtension
     {
-        get { return (string)this["onlyWithExtension"]; }
-        set { this["onlyWithExtension"] = value; }
+        get => (string)this["onlyWithExtension"];
+        set => this["onlyWithExtension"] = value;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     [ConfigurationProperty ("waitAndReload", IsRequired = false, DefaultValue = true)]
     public bool WaitAndReload
     {
-        get { return (bool)this["waitAndReload"]; }
-        set { this["waitAndReload"] = value; }
+        get => (bool)this["waitAndReload"];
+        set => this["waitAndReload"] = value;
     }
 }
+/// <summary>
+///
+/// </summary>
 
 [ConfigurationCollection (typeof (CommandElement), CollectionType = ConfigurationElementCollectionType.BasicMap,
     AddItemName = "command")]
-public class CommandsCollection : ConfigurationElementCollection
+public class CommandsCollection
+    : ConfigurationElementCollection
 {
+    /// <inheritdoc cref="ConfigurationElementCollection.CreateNewElement()"/>
     protected override ConfigurationElement CreateNewElement()
     {
         return new CommandElement();
     }
 
+    /// <inheritdoc cref="ConfigurationElementCollection.GetElementKey"/>
     protected override object GetElementKey (ConfigurationElement element)
     {
-        return (element as CommandElement).Name;
+        return (element as CommandElement)!.Name;
     }
 }
 
+/// <summary>
+///
+/// </summary>
 [ConfigurationCollection (typeof (CharacterSubstitutionElement),
     CollectionType = ConfigurationElementCollectionType.BasicMap, AddItemName = "char")]
-public class CharacterSubstitutionCollection : ConfigurationElementCollection
+public class CharacterSubstitutionCollection
+    : ConfigurationElementCollection
 {
+    /// <inheritdoc cref="ConfigurationElementCollection.CreateNewElement()"/>
     protected override ConfigurationElement CreateNewElement()
     {
         return new CharacterSubstitutionElement();
     }
 
-    protected override object GetElementKey (ConfigurationElement element)
+    /// <inheritdoc cref="ConfigurationElementCollection.GetElementKey"/>
+    protected override object GetElementKey
+        (
+            ConfigurationElement element
+        )
     {
-        return (element as CharacterSubstitutionElement).From;
+        return (element as CharacterSubstitutionElement)!.From;
     }
 }
 
+/// <summary>
+///
+/// </summary>
 [ConfigurationCollection (typeof (GenreSubstitutionElement),
     CollectionType = ConfigurationElementCollectionType.BasicMap, AddItemName = "genre")]
-public class GenresCollection : ConfigurationElementCollection
+public class GenresCollection
+    : ConfigurationElementCollection
 {
+    /// <inheritdoc cref="ConfigurationElementCollection.CreateNewElement()"/>
     protected override ConfigurationElement CreateNewElement()
     {
         return new GenreSubstitutionElement();
     }
 
+    /// <inheritdoc cref="ConfigurationElementCollection.GetElementKey"/>
     protected override object GetElementKey (ConfigurationElement element)
     {
-        return (element as GenreSubstitutionElement).From;
+        return (element as GenreSubstitutionElement)!.From;
     }
 
-    public string FindSubstitution (string genreName)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="genreName"></param>
+    /// <returns></returns>
+    public string FindSubstitution
+        (
+            string genreName
+        )
     {
         if (string.IsNullOrEmpty (genreName))
+        {
             return string.Empty;
+        }
+
         foreach (GenreSubstitutionElement gs in this)
-            if (gs.From.ToUpperInvariant() == genreName.ToUpperInvariant())
+        {
+            if (String.Equals (gs.From, genreName, StringComparison.InvariantCultureIgnoreCase))
+            {
                 return gs.To;
+            }
+        }
+
         return genreName;
     }
 }
 
+/// <summary>
+///
+/// </summary>
 [ConfigurationCollection (typeof (EncodingElement), CollectionType = ConfigurationElementCollectionType.BasicMap,
     AddItemName = "encoding")]
-public class EncodingsCollection : ConfigurationElementCollection
+public class EncodingsCollection
+    : ConfigurationElementCollection
 {
+    /// <inheritdoc cref="ConfigurationElementCollection.CreateNewElement()"/>
     protected override ConfigurationElement CreateNewElement()
     {
         return new EncodingElement();
     }
 
+    /// <inheritdoc cref="ConfigurationElementCollection.GetElementKey"/>
     protected override object GetElementKey (ConfigurationElement element)
     {
-        return (element as EncodingElement).Name;
+        return (element as EncodingElement)!.Name;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     [ConfigurationProperty ("translateEncodings", DefaultValue = true)]
     public bool TranslateEncodings
     {
-        get { return (bool)this["translateEncodings"]; }
-        set { this["translateEncodings"] = value; }
+        get => (bool)this["translateEncodings"];
+        set => this["translateEncodings"] = value;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     [ConfigurationProperty ("indentedFormatting", DefaultValue = true)]
     public bool IndentFile
     {
-        get { return (bool)this["indentedFormatting"]; }
-        set { this["indentedFormatting"] = value; }
+        get => (bool)this["indentedFormatting"];
+        set => this["indentedFormatting"] = value;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     [ConfigurationProperty ("compressionEncoding", IsRequired = false, DefaultValue = "utf-8")]
     public string CompressionEncoding
     {
-        get { return (string)this["compressionEncoding"]; }
-        set { this["compressionEncoding"] = value; }
+        get => (string)this["compressionEncoding"];
+        set => this["compressionEncoding"] = value;
     }
 }
 
+/// <summary>
+///
+/// </summary>
 [ConfigurationCollection (typeof (RenameProfileElement), CollectionType = ConfigurationElementCollectionType.BasicMap,
     AddItemName = "profile")]
-public class RenameProfilesCollection : ConfigurationElementCollection
+public class RenameProfilesCollection
+    : ConfigurationElementCollection
 {
+    /// <summary>
+    ///
+    /// </summary>
     [ConfigurationProperty ("globalTranslit", IsDefaultCollection = true, IsRequired = false)]
-    public CharacterSubstitutionCollection GlobalTranslit
-    {
-        get { return (CharacterSubstitutionCollection)this["globalTranslit"]; }
-    }
+    public CharacterSubstitutionCollection GlobalTranslit => (CharacterSubstitutionCollection)this["globalTranslit"];
 
+    /// <summary>
+    ///
+    /// </summary>
     [ConfigurationProperty ("globalCharacterSubstitution", IsDefaultCollection = true, IsRequired = false)]
-    public CharacterSubstitutionCollection GlobalCharacterSubstitution
-    {
-        get { return (CharacterSubstitutionCollection)this["globalCharacterSubstitution"]; }
-    }
+    public CharacterSubstitutionCollection GlobalCharacterSubstitution => (CharacterSubstitutionCollection)this["globalCharacterSubstitution"];
 
+    /// <inheritdoc cref="ConfigurationElementCollection.CreateNewElement()"/>
     protected override ConfigurationElement CreateNewElement()
     {
         return new RenameProfileElement();
     }
 
+    /// <inheritdoc cref="ConfigurationElementCollection.GetElementKey"/>
     protected override object GetElementKey (ConfigurationElement element)
     {
-        return (element as RenameProfileElement).Name;
+        return (element as RenameProfileElement)!.Name;
     }
 }
 
-public class FB2ConfigurationSection : ConfigurationSection
+/// <summary>
+///
+/// </summary>
+public class FB2ConfigurationSection
+    : ConfigurationSection
 {
+    /// <summary>
+    ///
+    /// </summary>
     [ConfigurationProperty ("normalizeNames", IsRequired = false, DefaultValue = true)]
     public bool NormalizeNames
     {
-        get { return (bool)this["normalizeNames"]; }
-        set { this["normalizeNames"] = value; }
+        get => (bool)this["normalizeNames"];
+        set => this["normalizeNames"] = value;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     [ConfigurationProperty ("fb2Extension", IsRequired = false, DefaultValue = ".fb2")]
     public string FB2Extension
     {
-        get { return (string)this["fb2Extension"]; }
-        set { this["fb2Extension"] = value; }
+        get => (string)this["fb2Extension"];
+        set => this["fb2Extension"] = value;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     [ConfigurationProperty ("fb2zipExtension", IsRequired = false, DefaultValue = ".fb2.zip")]
     public string FB2ZIPExtension
     {
-        get { return (string)this["fb2zipExtension"]; }
-        set { this["fb2zipExtension"] = value; }
+        get => (string)this["fb2zipExtension"];
+        set => this["fb2zipExtension"] = value;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     [ConfigurationProperty ("genreSubstitution", IsDefaultCollection = true, IsRequired = true)]
-    public GenresCollection GenreSubstitutions
-    {
-        get { return (GenresCollection)this["genreSubstitution"]; }
-    }
+    public GenresCollection GenreSubstitutions => (GenresCollection)this["genreSubstitution"];
 
+    /// <summary>
+    ///
+    /// </summary>
     [ConfigurationProperty ("encodings", IsDefaultCollection = true, IsRequired = true)]
-    public EncodingsCollection Encodings
-    {
-        get { return (EncodingsCollection)this["encodings"]; }
-    }
+    public EncodingsCollection Encodings => (EncodingsCollection)this["encodings"];
 
+    /// <summary>
+    ///
+    /// </summary>
     [ConfigurationProperty ("renameProfiles", IsDefaultCollection = true, IsRequired = true)]
-    public RenameProfilesCollection RenameProfiles
-    {
-        get { return (RenameProfilesCollection)this["renameProfiles"]; }
-    }
+    public RenameProfilesCollection RenameProfiles => (RenameProfilesCollection)this["renameProfiles"];
 
+    /// <summary>
+    ///
+    /// </summary>
     [ConfigurationProperty ("commands", IsRequired = true)]
     public CommandTypeElement Commands
     {
-        get { return (CommandTypeElement)this["commands"]; }
-        set { this["commands"] = value; }
+        get => (CommandTypeElement)this["commands"];
+        set => this["commands"] = value;
     }
 }
 
+/// <summary>
+///
+/// </summary>
 public class FB2Config
 {
-    private static FB2ConfigurationSection _fb2Configuration = null;
+    private static FB2ConfigurationSection? _fb2Configuration;
 
-    public static FB2ConfigurationSection Current
-    {
-        get
-        {
-            if (_fb2Configuration == null)
-                _fb2Configuration =
-                    System.Configuration.ConfigurationManager.GetSection ("FB2") as FB2ConfigurationSection;
-            return _fb2Configuration;
-        }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    public static FB2ConfigurationSection Current =>
+        _fb2Configuration ??= (ConfigurationManager.GetSection ("FB2") as FB2ConfigurationSection).ThrowIfNull();
 }

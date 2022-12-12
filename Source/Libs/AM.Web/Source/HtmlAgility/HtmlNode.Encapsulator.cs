@@ -5,10 +5,11 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable LocalizableElement
 // ReSharper disable NonReadonlyMemberInGetHashCode
 // ReSharper disable UnusedMember.Global
 
-/*
+/* HtmlNode.Encapsulator.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -46,7 +47,7 @@ public partial class HtmlNode
     /// <exception cref="Exception">Why it's thrown.</exception>
     public T GetEncapsulatedData<T>()
     {
-        return (T)GetEncapsulatedData (typeof (T), null);
+        return (T)GetEncapsulatedData (typeof (T), null!);
     }
 
 
@@ -102,23 +103,22 @@ public partial class HtmlNode
         if (targetType.IsInstantiable() ==
             false) // if it can not create instance of T because of lack of constructor in type T.
         {
-            throw new MissingMethodException ("Parameterless Constructor excpected for " + targetType.FullName);
+            throw new MissingMethodException ("Parameterless Constructor expected for " + targetType.FullName);
         }
         else
         {
-            targetObject = Activator.CreateInstance (targetType);
+            targetObject = Activator.CreateInstance (targetType)!;
         }
 
         #endregion SettingPrerequisite
 
         #region targetObject_Defined_XPath
 
-        if (targetType.IsDefinedAttribute (typeof (HasXPathAttribute)) ==
-            true) // Object has xpath attribute (Defined HasXPath)
+        if (targetType.IsDefinedAttribute (typeof (HasXPathAttribute))) // Object has xpath attribute (Defined HasXPath)
         {
             // Store list of properties that defined xpath attribute
             var validProperties = targetType.GetPropertiesDefinedXPath();
-            if (validProperties.CountOfIEnumerable() ==
+            if (validProperties!.CountOfIEnumerable() ==
                 0) // if no XPath property exist in type T while T defined HasXpath attribute.
             {
                 throw new MissingXPathException ("Type " + targetType.FullName +
@@ -138,14 +138,13 @@ public partial class HtmlNode
 
                     #region Property_IsNOT_IEnumerable
 
+                    HtmlNode? htmlNode;
                     if (propertyInfo.IsIEnumerable() == false) // Property is None-IEnumerable
                     {
-                        HtmlNode htmlNode = null;
-
                         // try to fill htmlNode based on XPath given
                         try
                         {
-                            htmlNode = source.DocumentNode.SelectSingleNode (xPathAttribute.XPath);
+                            htmlNode = source!.DocumentNode.SelectSingleNode (xPathAttribute!.XPath);
                         }
                         catch (XPathException ex) // if it can not select node based on given xpath
                         {
@@ -163,7 +162,7 @@ public partial class HtmlNode
 
                         if (htmlNode == null) // If Encapsulator could not find Node.
                         {
-                            if (propertyInfo.IsDefined (typeof (SkipNodeNotFoundAttribute), false) == true)
+                            if (propertyInfo.IsDefined (typeof (SkipNodeNotFoundAttribute), false))
                             {
                                 // set default value.
                                 //throw new Exception("Okey !");
@@ -180,7 +179,7 @@ public partial class HtmlNode
                             #region Property_Is_HasXPath_UserDefinedClass
 
                             // Property is None-IEnumerable HasXPath-user-defined class
-                            if (propertyInfo.PropertyType.IsDefinedAttribute (typeof (HasXPathAttribute)) == true)
+                            if (propertyInfo.PropertyType.IsDefinedAttribute (typeof (HasXPathAttribute)))
                             {
                                 var innerHtmlDocument = new HtmlDocument();
 
@@ -199,16 +198,16 @@ public partial class HtmlNode
                             // AND does not deifned xpath and shouldn't have property that defined xpath.
                             else
                             {
-                                var result = string.Empty;
+                                string result;
 
-                                if (xPathAttribute.AttributeName == null) // It target value of HTMLTag
+                                if (xPathAttribute.AttributeName == null!) // It target value of HTMLTag
                                 {
                                     result = Tools.GetNodeValueBasedOnXPathReturnType<string> (htmlNode,
                                         xPathAttribute);
                                 }
                                 else // It target attribute of HTMLTag
                                 {
-                                    result = htmlNode.GetAttributeValue (xPathAttribute.AttributeName, null);
+                                    result = htmlNode.GetAttributeValue (xPathAttribute.AttributeName, null!);
                                 }
 
                                 if (result == null)
@@ -271,7 +270,7 @@ public partial class HtmlNode
                             // try to fill nodeCollection based on given xpath.
                             try
                             {
-                                nodeCollection = source.DocumentNode.SelectNodes (xPathAttribute.XPath);
+                                nodeCollection = source!.DocumentNode.SelectNodes (xPathAttribute!.XPath)!;
                             }
                             catch (XPathException ex)
                             {
@@ -288,9 +287,9 @@ public partial class HtmlNode
                             }
 
 
-                            if (nodeCollection == null || nodeCollection.Count == 0)
+                            if (nodeCollection == null! || nodeCollection.Count == 0)
                             {
-                                if (propertyInfo.IsDefined (typeof (SkipNodeNotFoundAttribute), false) == true)
+                                if (propertyInfo.IsDefined (typeof (SkipNodeNotFoundAttribute), false))
                                 {
                                     // set default value.
                                     //throw new Exception("Okey !");
@@ -308,8 +307,7 @@ public partial class HtmlNode
 
                                 #region Property_Is_IEnumerable<HasXPath-UserDefinedClass>
 
-                                if (T_Types[0].IsDefinedAttribute (typeof (HasXPathAttribute)) ==
-                                    true) // T is IEnumerable HasXPath-user-defined class (T type Defined XPath properties)
+                                if (T_Types[0].IsDefinedAttribute (typeof (HasXPathAttribute))) // T is IEnumerable HasXPath-user-defined class (T type Defined XPath properties)
                                 {
                                     foreach (var node in nodeCollection)
                                     {
@@ -328,7 +326,7 @@ public partial class HtmlNode
 
                                 else // T is value-type or .Net class or user-defined class ( without xpath )
                                 {
-                                    if (xPathAttribute.AttributeName == null) // It target value
+                                    if (xPathAttribute.AttributeName == null!) // It target value
                                     {
                                         try
                                         {
@@ -351,7 +349,7 @@ public partial class HtmlNode
                                         foreach (var node in nodeCollection)
                                         {
                                             var nodeAttributeValue =
-                                                node.GetAttributeValue (xPathAttribute.AttributeName, null);
+                                                node.GetAttributeValue (xPathAttribute.AttributeName, null!);
                                             if (nodeAttributeValue == null)
                                             {
                                                 throw new NodeAttributeNotFoundException ("Can not find " +
@@ -436,18 +434,18 @@ internal static class Tools
     {
         if (type == null)
         {
-            throw new ArgumentNullException (
+            throw new ArgumentNullException (nameof (type),
                 "Parameter type is null when checking type defined attributeType or not.");
         }
 
         if (attributeType == null)
         {
-            throw new ArgumentNullException (
+            throw new ArgumentNullException (nameof (attributeType),
                 "Parameter attributeType is null when checking type defined attributeType or not.");
         }
 
 #if !(NETSTANDARD1_3 || NETSTANDARD1_6)
-        if (type.IsDefined (attributeType, false) == true)
+        if (type.IsDefined (attributeType, false))
         {
             return true;
         }
@@ -483,11 +481,11 @@ internal static class Tools
     {
         if (type == null)
         {
-            throw new ArgumentNullException (
+            throw new ArgumentNullException (nameof (type),
                 "Parameter type is null while retrieving properties defined XPathAttribute of Type type.");
         }
 
-        PropertyInfo[] properties = null;
+        PropertyInfo[] properties = null!;
 
 
 #if !(NETSTANDARD1_3 || NETSTANDARD1_6)
@@ -500,7 +498,7 @@ internal static class Tools
 #endif
 
 
-        return properties.HAPWhere (x => x.IsDefined (typeof (XPathAttribute), false) == true);
+        return properties.HAPWhere (x => x.IsDefined (typeof (XPathAttribute), false));
 
         throw new Exception (
             "Can't Target any platform while retrieving properties defined XPathAttribute of Type type.");
@@ -518,7 +516,7 @@ internal static class Tools
 
         if (propertyInfo == null)
         {
-            throw new ArgumentNullException (
+            throw new ArgumentNullException (nameof (propertyInfo),
                 "Parameter propertyInfo is null while checking propertyInfo for being IEnumerable or not.");
         }
 
@@ -553,7 +551,7 @@ internal static class Tools
     {
         if (propertyInfo == null)
         {
-            throw new ArgumentNullException (
+            throw new ArgumentNullException (nameof (propertyInfo),
                 "Parameter propertyInfo is null while Getting generic types of Property.");
         }
 
@@ -580,15 +578,17 @@ internal static class Tools
     {
         if (type == null)
         {
-            throw new ArgumentNullException ("Parameter type is null while Getting method from it.");
+            throw new ArgumentNullException (nameof (type),
+                "Parameter type is null while Getting method from it.");
         }
 
         if (methodName == null || methodName == "")
         {
-            throw new ArgumentNullException ("Parameter methodName is null while Getting method from Type type.");
+            throw new ArgumentNullException (nameof(methodName),
+                "Parameter methodName is null while Getting method from Type type.");
         }
 
-        return type.GetMethod (methodName);
+        return type.GetMethod (methodName)!;
     }
 
     /// <summary>
@@ -620,15 +620,15 @@ internal static class Tools
     {
         if (htmlNode == null)
         {
-            throw new ArgumentNullException ("parameter html node is null");
+            throw new ArgumentNullException (nameof (htmlNode), "parameter html node is null");
         }
 
         if (xPathAttribute == null)
         {
-            throw new ArgumentNullException ("parameter xpathAttribute is null");
+            throw new ArgumentNullException (nameof (xPathAttribute), "parameter xpathAttribute is null");
         }
 
-        object result;
+        object? result;
         var TType = typeof (T);
 
         switch (xPathAttribute.NodeReturnType)
@@ -655,7 +655,7 @@ internal static class Tools
             default: throw new Exception();
         }
 
-        return (T)result;
+        return (T) result!;
     }
 
 
@@ -671,12 +671,12 @@ internal static class Tools
     {
         if (htmlNodeCollection == null || htmlNodeCollection.Count == 0)
         {
-            throw new ArgumentNullException ("parameter htmlNodeCollection is null or empty.");
+            throw new ArgumentNullException (nameof (htmlNodeCollection), "parameter htmlNodeCollection is null or empty.");
         }
 
         if (xPathAttribute == null)
         {
-            throw new ArgumentNullException ("parameter xpathAttribute is null");
+            throw new ArgumentNullException (nameof (xPathAttribute), "parameter xpathAttribute is null");
         }
 
 
@@ -757,7 +757,7 @@ internal static class Tools
     {
         if (type == null)
         {
-            throw new ArgumentNullException ("type is null");
+            throw new ArgumentNullException (nameof (type), "type is null");
         }
 
 
@@ -801,7 +801,7 @@ internal static class Tools
     {
         if (source == null)
         {
-            throw new ArgumentNullException ("Parameter source is null while counting the IEnumerable");
+            throw new ArgumentNullException (nameof (source), "Parameter source is null while counting the IEnumerable");
         }
 
         var counter = 0;
