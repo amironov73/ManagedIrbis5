@@ -2,14 +2,11 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
-/*
+/* Epub2NcxReader.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -214,9 +210,12 @@ internal static class Epub2NcxReader
         {
             if (navigationPointNode.CompareNameTo ("navPoint"))
             {
-                var navigationPoint =
-                    ReadNavigationPoint (navigationPointNode, epub2NcxReaderOptions);
-                if (navigationPoint != null)
+                var navigationPoint = ReadNavigationPoint
+                    (
+                        navigationPointNode,
+                        epub2NcxReaderOptions
+                    );
+                if (navigationPoint != null!)
                 {
                     result.Add (navigationPoint);
                 }
@@ -226,8 +225,11 @@ internal static class Epub2NcxReader
         return result;
     }
 
-    private static Epub2NcxNavigationPoint ReadNavigationPoint (XElement navigationPointNode,
-        Epub2NcxReaderOptions epub2NcxReaderOptions)
+    private static Epub2NcxNavigationPoint? ReadNavigationPoint
+        (
+            XElement navigationPointNode,
+            Epub2NcxReaderOptions epub2NcxReaderOptions
+        )
     {
         var result = new Epub2NcxNavigationPoint();
         foreach (var navigationPointNodeAttribute in navigationPointNode.Attributes())
@@ -238,9 +240,11 @@ internal static class Epub2NcxReader
                 case "id":
                     result.Id = attributeValue;
                     break;
+
                 case "class":
                     result.Class = attributeValue;
                     break;
+
                 case "playorder":
                     result.PlayOrder = attributeValue;
                     break;
@@ -262,14 +266,19 @@ internal static class Epub2NcxReader
                     var navigationLabel = ReadNavigationLabel (navigationPointChildNode);
                     result.NavigationLabels.Add (navigationLabel);
                     break;
+
                 case "content":
                     var content = ReadNavigationContent (navigationPointChildNode);
                     result.Content = content;
                     break;
+
                 case "navpoint":
-                    var childNavigationPoint =
-                        ReadNavigationPoint (navigationPointChildNode, epub2NcxReaderOptions);
-                    if (childNavigationPoint != null)
+                    var childNavigationPoint = ReadNavigationPoint
+                        (
+                            navigationPointChildNode,
+                            epub2NcxReaderOptions
+                        );
+                    if (childNavigationPoint != null!)
                     {
                         result.ChildNavigationPoints.Add (childNavigationPoint);
                     }
@@ -280,8 +289,10 @@ internal static class Epub2NcxReader
 
         if (!result.NavigationLabels.Any())
         {
-            throw new Epub2NcxException (
-                $"EPUB parsing error: navigation point {result.Id} should contain at least one navigation label.");
+            throw new Epub2NcxException
+                (
+                    $"EPUB parsing error: navigation point {result.Id} should contain at least one navigation label."
+                );
         }
 
         if (result.Content == null)
@@ -292,8 +303,10 @@ internal static class Epub2NcxReader
             }
             else
             {
-                throw new Epub2NcxException (
-                    $"EPUB parsing error: navigation point {result.Id} should contain content.");
+                throw new Epub2NcxException
+                    (
+                        $"EPUB parsing error: navigation point {result.Id} should contain content."
+                    );
             }
         }
 
@@ -324,6 +337,7 @@ internal static class Epub2NcxReader
                 case "id":
                     result.Id = attributeValue;
                     break;
+
                 case "src":
                     result.Source = attributeValue;
                     break;
@@ -364,24 +378,21 @@ internal static class Epub2NcxReader
                 case "id":
                     result.Id = attributeValue;
                     break;
+
                 case "value":
                     result.Value = attributeValue;
                     break;
+
                 case "type":
-                    Epub2NcxPageTargetType type;
-                    if (Enum.TryParse (attributeValue, true, out type))
-                    {
-                        result.Type = type;
-                    }
-                    else
-                    {
-                        result.Type = Epub2NcxPageTargetType.UNKNOWN;
-                    }
+                    result.Type = Enum.TryParse (attributeValue, true, out Epub2NcxPageTargetType type)
+                        ? type
+                        : Epub2NcxPageTargetType.UNKNOWN;
 
                     break;
                 case "class":
                     result.Class = attributeValue;
                     break;
+
                 case "playorder":
                     result.PlayOrder = attributeValue;
                     break;
@@ -441,16 +452,17 @@ internal static class Epub2NcxReader
             {
                 case "navlabel":
                     var navigationLabel = ReadNavigationLabel (navigationListChildNode);
-                    result.NavigationLabels.Add (navigationLabel);
+                    result.NavigationLabels!.Add (navigationLabel);
                     break;
+
                 case "navTarget":
                     var navigationTarget = ReadNavigationTarget (navigationListChildNode);
-                    result.NavigationTargets.Add (navigationTarget);
+                    result.NavigationTargets!.Add (navigationTarget);
                     break;
             }
         }
 
-        if (!result.NavigationLabels.Any())
+        if (!result.NavigationLabels!.Any())
         {
             throw new Epub2NcxException (
                 "Incorrect EPUB navigation page target: at least one navLabel element is required.");
@@ -493,8 +505,9 @@ internal static class Epub2NcxReader
             {
                 case "navlabel":
                     var navigationLabel = ReadNavigationLabel (navigationTargetChildNode);
-                    result.NavigationLabels.Add (navigationLabel);
+                    result.NavigationLabels!.Add (navigationLabel);
                     break;
+
                 case "content":
                     var content = ReadNavigationContent (navigationTargetChildNode);
                     result.Content = content;
@@ -502,7 +515,7 @@ internal static class Epub2NcxReader
             }
         }
 
-        if (!result.NavigationLabels.Any())
+        if (!result.NavigationLabels!.Any())
         {
             throw new Epub2NcxException (
                 "Incorrect EPUB navigation target: at least one navLabel element is required.");

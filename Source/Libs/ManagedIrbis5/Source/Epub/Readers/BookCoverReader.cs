@@ -2,12 +2,8 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* BookCoverReader.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -37,14 +33,11 @@ internal static class BookCoverReader
         )
     {
         EpubByteContentFileRef? result;
-        if (epubSchema.Package.EpubVersion == EpubVersion.EPUB_3 ||
+        if (epubSchema.Package!.EpubVersion == EpubVersion.EPUB_3 ||
             epubSchema.Package.EpubVersion == EpubVersion.EPUB_3_1)
         {
-            result = ReadEpub3Cover (epubSchema, imageContentRefs);
-            if (result == null)
-            {
-                result = ReadEpub2Cover (epubSchema, imageContentRefs);
-            }
+            result = ReadEpub3Cover (epubSchema, imageContentRefs)
+                     ?? ReadEpub2Cover (epubSchema, imageContentRefs);
         }
         else
         {
@@ -60,11 +53,8 @@ internal static class BookCoverReader
             IReadOnlyDictionary<string, EpubByteContentFileRef> imageContentRefs
         )
     {
-        var result = ReadEpub2CoverFromMetadata (epubSchema, imageContentRefs);
-        if (result == null)
-        {
-            result = ReadEpub2CoverFromGuide (epubSchema, imageContentRefs);
-        }
+        var result = ReadEpub2CoverFromMetadata (epubSchema, imageContentRefs)
+                     ?? ReadEpub2CoverFromGuide (epubSchema, imageContentRefs);
 
         return result;
     }
@@ -75,8 +65,8 @@ internal static class BookCoverReader
             IReadOnlyDictionary<string, EpubByteContentFileRef> imageContentRefs
         )
     {
-        var metaItems = epubSchema.Package.Metadata.MetaItems;
-        if (metaItems == null || !metaItems.Any())
+        var metaItems = epubSchema.Package!.Metadata.MetaItems;
+        if (metaItems == null! || !metaItems.Any())
         {
             return null;
         }
@@ -100,7 +90,7 @@ internal static class BookCoverReader
                 $"Incorrect EPUB manifest: item with ID = \"{coverMetaItem.Content}\" is missing.");
         }
 
-        if (coverManifestItem.Href == null)
+        if (coverManifestItem.Href == null!)
         {
             return null;
         }
@@ -119,7 +109,7 @@ internal static class BookCoverReader
             IReadOnlyDictionary<string, EpubByteContentFileRef> imageContentRefs
         )
     {
-        foreach (var guideReference in epubSchema.Package.Guide)
+        foreach (var guideReference in epubSchema.Package!.Guide)
         {
             if (guideReference.Type.ToLowerInvariant() == "cover" && imageContentRefs.TryGetValue (guideReference.Href,
                     out var coverImageContentFileRef))
@@ -137,9 +127,10 @@ internal static class BookCoverReader
             IReadOnlyDictionary<string, EpubByteContentFileRef> imageContentRefs
         )
     {
-        var coverManifestItem = epubSchema.Package.Manifest.FirstOrDefault (manifestItem =>
-                manifestItem.Properties != null && manifestItem.Properties.Contains (ManifestProperty.COVER_IMAGE));
-        if (coverManifestItem == null || coverManifestItem.Href == null)
+        var coverManifestItem = epubSchema.Package!.Manifest.FirstOrDefault (manifestItem =>
+                manifestItem.Properties != null!
+                && manifestItem.Properties.Contains (ManifestProperty.COVER_IMAGE));
+        if (coverManifestItem == null || coverManifestItem.Href == null!)
         {
             return null;
         }

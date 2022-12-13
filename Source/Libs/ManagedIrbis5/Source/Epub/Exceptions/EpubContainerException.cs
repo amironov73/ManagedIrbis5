@@ -2,14 +2,10 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
-/* EpubContainerException
+/* EpubContainerException.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,21 +19,46 @@ using System;
 
 namespace ManagedIrbis.Epub;
 
+/// <summary>
+///
+/// </summary>
 public class EpubContainerException
     : EpubSchemaException
 {
+    /// <summary>
+    ///
+    /// </summary>
     public EpubContainerException()
-        : base(EpubSchemaFileType.META_INF_CONTAINER)
+        : base (EpubSchemaFileType.META_INF_CONTAINER)
     {
+        // пустое тело конструктора
     }
 
-    public EpubContainerException(string message)
-        : base(message, EpubSchemaFileType.META_INF_CONTAINER)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="message"></param>
+    public EpubContainerException
+        (
+            string message
+        )
+        : base (message, EpubSchemaFileType.META_INF_CONTAINER)
     {
+        // пустое тело конструктора
     }
 
-    public EpubContainerException(string message, Exception innerException)
-        : base(message, innerException, EpubSchemaFileType.META_INF_CONTAINER)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="message"></param>
+    /// <param name="innerException"></param>
+    public EpubContainerException
+        (
+            string message,
+            Exception innerException
+        )
+        : base (message, innerException, EpubSchemaFileType.META_INF_CONTAINER)
     {
+        // пустое тело конструктора
     }
 }

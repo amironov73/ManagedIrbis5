@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* PackageReaderOptions.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,6 +22,9 @@ namespace ManagedIrbis.Epub.Options;
 /// </summary>
 public class PackageReaderOptions
 {
+    /// <summary>
+    ///
+    /// </summary>
     public PackageReaderOptions()
     {
         IgnoreMissingToc = false;

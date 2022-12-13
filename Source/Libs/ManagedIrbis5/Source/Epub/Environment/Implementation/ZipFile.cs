@@ -2,12 +2,9 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* ZipFile.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -45,7 +42,7 @@ internal class ZipFile
 
     public IZipFileEntry GetEntry (string entryName)
     {
-        return new ZipFileEntry (zipArchive.GetEntry (entryName));
+        return new ZipFileEntry (zipArchive.GetEntry (entryName)!);
     }
 
     public void Dispose()
@@ -60,7 +57,7 @@ internal class ZipFile
         {
             if (disposing)
             {
-                zipArchive?.Dispose();
+                zipArchive.Dispose();
             }
 
             isDisposed = true;
