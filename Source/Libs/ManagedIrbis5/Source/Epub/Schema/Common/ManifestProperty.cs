@@ -70,7 +70,10 @@ public enum ManifestProperty
     Justification = "Enum and parser need to be close to each other to avoid issues when the enum was changed without changing the parser. The file needs to be named after enum.")]
 internal static class ManifestPropertyParser
 {
-    public static ManifestProperty Parse (string stringValue)
+    public static ManifestProperty Parse
+        (
+            string stringValue
+        )
     {
         return stringValue.ToLowerInvariant() switch
         {

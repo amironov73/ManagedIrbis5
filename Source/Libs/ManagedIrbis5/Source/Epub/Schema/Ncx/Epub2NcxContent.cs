@@ -2,14 +2,10 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
-/*
+/* Epub2NcxContent.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,11 +13,22 @@
 
 namespace ManagedIrbis.Epub.Schema;
 
+/// <summary>
+///
+/// </summary>
 public class Epub2NcxContent
 {
-    public string Id { get; set; }
-    public string Source { get; set; }
+    /// <summary>
+    ///
+    /// </summary>
+    public string? Id { get; set; }
 
+    /// <summary>
+    ///
+    /// </summary>
+    public string? Source { get; set; }
+
+    /// <inheritdoc cref="object.ToString"/>
     public override string ToString()
     {
         return "Source: " + Source;

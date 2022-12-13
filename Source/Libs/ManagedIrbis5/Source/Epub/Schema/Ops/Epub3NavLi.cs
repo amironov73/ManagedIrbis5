@@ -2,14 +2,10 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
-/*
+/* Epub3NavLi.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,9 +13,23 @@
 
 namespace ManagedIrbis.Epub.Schema;
 
+/// <summary>
+///
+/// </summary>
 public class Epub3NavLi
 {
-    public Epub3NavAnchor Anchor { get; set; }
-    public Epub3NavSpan Span { get; set; }
-    public Epub3NavOl ChildOl { get; set; }
+    /// <summary>
+    ///
+    /// </summary>
+    public Epub3NavAnchor? Anchor { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public Epub3NavSpan? Span { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public Epub3NavOl? ChildOl { get; set; }
 }

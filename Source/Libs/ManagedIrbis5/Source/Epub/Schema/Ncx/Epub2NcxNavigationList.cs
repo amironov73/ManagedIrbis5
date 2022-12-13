@@ -2,14 +2,10 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
-/*
+/* Epub2NcxNavigationList.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,10 +19,28 @@ using System.Collections.Generic;
 
 namespace ManagedIrbis.Epub.Schema;
 
+/// <summary>
+///
+/// </summary>
 public class Epub2NcxNavigationList
 {
-    public string Id { get; set; }
-    public string Class { get; set; }
-    public List<Epub2NcxNavigationLabel> NavigationLabels { get; set; }
-    public List<Epub2NcxNavigationTarget> NavigationTargets { get; set; }
+    /// <summary>
+    ///
+    /// </summary>
+    public string? Id { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public string? Class { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public List<Epub2NcxNavigationLabel>? NavigationLabels { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public List<Epub2NcxNavigationTarget>? NavigationTargets { get; set; }
 }

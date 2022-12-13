@@ -4,7 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
 
 /* Epub2Ncx.cs --
  * Ars Magna project, http://arsmagna.ru
