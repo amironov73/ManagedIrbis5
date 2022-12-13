@@ -132,7 +132,9 @@ public abstract class PoolingListBase<T>
         }
     }
 
-    /// <inheritdoc cref="IList{T}.Count"/>
+    /// <summary>
+    ///
+    /// </summary>
     public int Count => _count;
 
     /// <inheritdoc cref="ICollection{T}.Remove"/>

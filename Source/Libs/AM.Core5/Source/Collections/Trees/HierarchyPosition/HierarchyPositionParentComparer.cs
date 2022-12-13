@@ -34,7 +34,12 @@ internal sealed class HierarchyPositionParentComparer
 
     #region IEqualityComparer members
 
-    /// <inheritdoc cref="IEqualityComparer{T}.Equals(T?,T?)"/>
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <returns></returns>
     public bool Equals
         (
             HierarchyPosition? x,

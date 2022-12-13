@@ -289,7 +289,11 @@ public struct UnicodeSequence
         return _codepoints.GetHashCode();
     }
 
-    /// <inheritdoc cref="IEquatable{T}.Equals(T?)"/>
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
     public bool Equals (string? other)
     {
         return other is not null && other.Codepoints().SequenceEqual (_codepoints);

@@ -182,7 +182,11 @@ public sealed class IPRange
 
     #region IEquatable<T> members
 
-    /// <inheritdoc cref="IEquatable{T}.Equals(T?)"/>
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
     public bool Equals
         (
             IPRange? other

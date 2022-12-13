@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* EpubContentFileRef.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -28,86 +28,158 @@ using ManagedIrbis.Epub.Internal;
 
 namespace ManagedIrbis.Epub;
 
+/// <summary>
+///
+/// </summary>
 public abstract class EpubContentFileRef
 {
-    private readonly EpubBookRef epubBookRef;
+    private readonly EpubBookRef _epubBookRef;
 
-    protected EpubContentFileRef(EpubBookRef epubBookRef, string fileName, EpubContentType contentType, string contentMimeType)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="epubBookRef"></param>
+    /// <param name="fileName"></param>
+    /// <param name="contentType"></param>
+    /// <param name="contentMimeType"></param>
+    protected EpubContentFileRef
+        (
+            EpubBookRef epubBookRef,
+            string fileName,
+            EpubContentType contentType,
+            string contentMimeType
+        )
     {
-        this.epubBookRef = epubBookRef;
+        _epubBookRef = epubBookRef;
         FileName = fileName;
-        FilePathInEpubArchive = ZipPathUtils.Combine(epubBookRef.Schema.ContentDirectoryPath, FileName);
+        FilePathInEpubArchive = ZipPathUtils.Combine
+            (
+                epubBookRef.Schema!.ContentDirectoryPath!,
+                FileName
+            );
         ContentType = contentType;
         ContentMimeType = contentMimeType;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public string FileName { get; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public string FilePathInEpubArchive { get; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public EpubContentType ContentType { get; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public string ContentMimeType { get; }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public byte[] ReadContentAsBytes()
     {
         return ReadContentAsBytesAsync().Result;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public async Task<byte[]> ReadContentAsBytesAsync()
     {
-        IZipFileEntry contentFileEntry = GetContentFileEntry();
-        byte[] content = new byte[(int)contentFileEntry.Length];
-        using (Stream contentStream = OpenContentStream(contentFileEntry))
-        using (MemoryStream memoryStream = new MemoryStream(content))
+        var contentFileEntry = GetContentFileEntry();
+        var content = new byte[(int)contentFileEntry.Length];
+        using (var contentStream = OpenContentStream (contentFileEntry))
+        using (var memoryStream = new MemoryStream (content))
         {
-            await contentStream.CopyToAsync(memoryStream).ConfigureAwait(false);
+            await contentStream.CopyToAsync (memoryStream).ConfigureAwait (false);
         }
+
         return content;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public string ReadContentAsText()
     {
         return ReadContentAsTextAsync().Result;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public async Task<string> ReadContentAsTextAsync()
     {
-        using (Stream contentStream = GetContentStream())
-        using (StreamReader streamReader = new StreamReader(contentStream))
+        using (var contentStream = GetContentStream())
+        using (var streamReader = new StreamReader (contentStream))
         {
-            return await streamReader.ReadToEndAsync().ConfigureAwait(false);
+            return await streamReader.ReadToEndAsync().ConfigureAwait (false);
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public Stream GetContentStream()
     {
-        return OpenContentStream(GetContentFileEntry());
+        return OpenContentStream (GetContentFileEntry());
     }
 
     private IZipFileEntry GetContentFileEntry()
     {
-        if (String.IsNullOrEmpty(FileName))
+        if (string.IsNullOrEmpty (FileName))
         {
-            throw new EpubPackageException("EPUB parsing error: file name of the specified content file is empty.");
+            throw new EpubPackageException ("EPUB parsing error: file name of the specified content file is empty.");
         }
-        string contentFilePath = FilePathInEpubArchive;
-        IZipFileEntry contentFileEntry = epubBookRef.EpubFile.GetEntry(contentFilePath);
+
+        var contentFilePath = FilePathInEpubArchive;
+        var contentFileEntry = _epubBookRef.EpubFile!.GetEntry (contentFilePath);
         if (contentFileEntry == null)
         {
-            throw new EpubContentException($"EPUB parsing error: file \"{contentFilePath}\" was not found in the EPUB file.", contentFilePath);
+            throw new EpubContentException
+                (
+                    $"EPUB parsing error: file \"{contentFilePath}\" was not found in the EPUB file.",
+                contentFilePath
+                );
         }
+
         if (contentFileEntry.Length > Int32.MaxValue)
         {
-            throw new EpubContentException($"EPUB parsing error: file \"{contentFilePath}\" is larger than 2 GB.", contentFilePath);
+            throw new EpubContentException ($"EPUB parsing error: file \"{contentFilePath}\" is larger than 2 GB.",
+                contentFilePath);
         }
+
         return contentFileEntry;
     }
 
-    private Stream OpenContentStream(IZipFileEntry contentFileEntry)
+    private Stream OpenContentStream
+        (
+            IZipFileEntry contentFileEntry
+        )
     {
-        Stream contentStream = contentFileEntry.Open();
+        var contentStream = contentFileEntry.Open();
         if (contentStream == null)
         {
-            throw new EpubContentException($"Incorrect EPUB file: content file \"{FileName}\" specified in the manifest was not found in the EPUB file.", FilePathInEpubArchive);
+            throw new EpubContentException
+                (
+                    $"Incorrect EPUB file: content file \"{FileName}\" specified in the manifest was not found in the EPUB file.",
+                    FilePathInEpubArchive
+                );
         }
+
         return contentStream;
     }
 }

@@ -6,6 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMember.Local
 
 /* Codepoint.cs -- кодовая точка Unicode
  * Ars Magna project, http://arsmagna.ru
@@ -150,11 +151,11 @@ public readonly struct Codepoint
         {
             var newVal = Value - 0x010000; // leaving 20 bits
             var high = (ushort)((newVal >> 10) + 0xD800);
-            System.Diagnostics.Debug.Assert (high <= 0xDBFF && high >= 0xD800);
+            System.Diagnostics.Debug.Assert (high is <= 0xDBFF and >= 0xD800);
             yield return high;
 
             var low = (ushort)((newVal & 0x03FF) + 0xDC00);
-            System.Diagnostics.Debug.Assert (low <= 0xDFFF && low >= 0xDC00);
+            System.Diagnostics.Debug.Assert (low is <= 0xDFFF and >= 0xDC00);
             yield return low;
         }
         else
@@ -179,15 +180,15 @@ public readonly struct Codepoint
         }
 
         // U+10000 to U+10FFFF
-        else if (Value >= 0x10000 && Value <= 0x10_FFFF)
+        else if (Value is >= 0x10000 and <= 0x10_FFFF)
         {
             var newVal = Value - 0x01_0000; // leaving 20 bits
             var high = (ushort)((newVal >> 10) + 0xD800);
-            System.Diagnostics.Debug.Assert (high <= 0xDBFF && high >= 0xD800);
+            System.Diagnostics.Debug.Assert (high is <= 0xDBFF and >= 0xD800);
             dest[0] = high;
 
             var low = (ushort)((newVal & 0x03FF) + 0xDC00);
-            System.Diagnostics.Debug.Assert (low <= 0xDFFF && low >= 0xDC00);
+            System.Diagnostics.Debug.Assert (low is <= 0xDFFF and >= 0xDC00);
             dest[1] = low;
             return 2;
         }
@@ -226,16 +227,16 @@ public readonly struct Codepoint
         }
 
         // U+10000 to U+10FFFF
-        if (Value >= 0x10000 && Value <= 0x10FFFF)
+        if (Value is >= 0x10000 and <= 0x10FFFF)
         {
             var newVal = Value - 0x010000; // leaving 20 bits
             var high = (ushort)((newVal >> 10) + 0xD800);
-            System.Diagnostics.Debug.Assert (high <= 0xDBFF && high >= 0xD800);
+            System.Diagnostics.Debug.Assert (high is <= 0xDBFF and >= 0xD800);
             dest[0] = (byte)high;
             dest[1] = (byte)(high >> 8);
 
             var low = (ushort)((newVal & 0x03FF) + 0xDC00);
-            System.Diagnostics.Debug.Assert (low <= 0xDFFF && low >= 0xDC00);
+            System.Diagnostics.Debug.Assert (low is <= 0xDFFF and >= 0xDC00);
             dest[2] = (byte)low;
             dest[3] = (byte)(low >> 8);
             return 4;
@@ -316,10 +317,10 @@ public readonly struct Codepoint
     /// <exception cref="UnsupportedCodepointException"></exception>
     public Codepoint FromUtf16 (ushort word1, ushort word2 = 0)
     {
-        if (word1 >= 0xD800 && word1 <= 0xDBFF)
+        if (word1 is >= 0xD800 and <= 0xDBFF)
         {
             // word1 is a leading surrogate pair
-            if (!(word2 >= 0xDC00 && word2 <= 0xDFFF))
+            if (!(word2 is >= 0xDC00 and <= 0xDFFF))
             {
                 // word2 is not a trailing surrogate pair
                 throw new UnsupportedCodepointException ("Invalid UTF-16 surrogate pair!");
@@ -331,7 +332,7 @@ public readonly struct Codepoint
             throw new UnsupportedCodepointException ("word1 is not a leading surrogate pair but word2 also provided");
         }
 
-        if (word1 >= 0xDC00 && word1 <= 0xDFFF)
+        if (word1 is >= 0xDC00 and <= 0xDFFF)
         {
             // word1 is a trailing surrogate pair
             throw new UnsupportedCodepointException ("word1 is a trailing surrogate pair!");
@@ -506,16 +507,31 @@ public readonly struct Codepoint
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="range"></param>
+    /// <returns></returns>
     public bool IsIn (CodepointRange range)
     {
         return range.Contains (this);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="multirange"></param>
+    /// <returns></returns>
     public bool IsIn (MultiRange multirange)
     {
         return multirange.Contains (this);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
     public bool Equals (string? other)
     {
         return other is not null && other == AsString();
@@ -543,21 +559,45 @@ public readonly struct Codepoint
         return AsUtf16 (words) == 1 && words[0] == other;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
     public static bool operator == (Codepoint a, string b)
     {
         return a.Equals (b);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
     public static bool operator != (Codepoint a, string b)
     {
         return !a.Equals (b);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
     public static bool operator == (Codepoint a, char b)
     {
         return a.Equals (b);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
     public static bool operator != (Codepoint a, char b)
     {
         return !a.Equals (b);

@@ -312,6 +312,10 @@ public static class Sure
     /// и <param name="count"></param> в допустимые диапазоны
     /// для данного списка.
     /// </summary>
+    /// <param name="index">Стартовый индекс.</param>
+    /// <param name="count">Количество выбираемых элементов.</param>
+    /// <param name="list">Список, из которого выбираются элементы.</param>
+    /// <param name="argumentName">Имя аргумента.</param>
     [DebuggerHidden]
     [AssertionMethod]
     [MethodImpl (MethodImplOptions.AggressiveInlining)]

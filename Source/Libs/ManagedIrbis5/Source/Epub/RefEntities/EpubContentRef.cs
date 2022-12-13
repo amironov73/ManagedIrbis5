@@ -2,14 +2,10 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
-/*
+/* EpubContentRef.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,13 +19,43 @@ using System.Collections.Generic;
 
 namespace ManagedIrbis.Epub;
 
+/// <summary>
+///
+/// </summary>
 public class EpubContentRef
 {
-    public EpubByteContentFileRef Cover { get; set; }
-    public EpubTextContentFileRef NavigationHtmlFile { get; set; }
-    public Dictionary<string, EpubTextContentFileRef> Html { get; set; }
-    public Dictionary<string, EpubTextContentFileRef> Css { get; set; }
-    public Dictionary<string, EpubByteContentFileRef> Images { get; set; }
-    public Dictionary<string, EpubByteContentFileRef> Fonts { get; set; }
-    public Dictionary<string, EpubContentFileRef> AllFiles { get; set; }
+    /// <summary>
+    ///
+    /// </summary>
+    public EpubByteContentFileRef? Cover { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public EpubTextContentFileRef? NavigationHtmlFile { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public Dictionary<string, EpubTextContentFileRef>? Html { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public Dictionary<string, EpubTextContentFileRef>? Css { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public Dictionary<string, EpubByteContentFileRef>? Images { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public Dictionary<string, EpubByteContentFileRef>? Fonts { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public Dictionary<string, EpubContentFileRef>? AllFiles { get; set; }
 }

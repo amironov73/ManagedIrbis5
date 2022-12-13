@@ -2,14 +2,10 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
-/*
+/* EpubNavigationItemRef.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,31 +19,69 @@ using System.Collections.Generic;
 
 namespace ManagedIrbis.Epub;
 
+/// <summary>
+///
+/// </summary>
 public class EpubNavigationItemRef
 {
-    public EpubNavigationItemRef(EpubNavigationItemType type)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="type"></param>
+    public EpubNavigationItemRef
+        (
+            EpubNavigationItemType type
+        )
     {
         Type = type;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public EpubNavigationItemType Type { get; }
-    public string Title { get; set; }
-    public EpubNavigationItemLink Link { get; set; }
-    public EpubTextContentFileRef HtmlContentFileRef { get; set; }
-    public List<EpubNavigationItemRef> NestedItems { get; set; }
 
+    /// <summary>
+    ///
+    /// </summary>
+    public string? Title { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public EpubNavigationItemLink? Link { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public EpubTextContentFileRef? HtmlContentFileRef { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public List<EpubNavigationItemRef>? NestedItems { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public static EpubNavigationItemRef CreateAsHeader()
     {
-        return new EpubNavigationItemRef(EpubNavigationItemType.Header);
+        return new EpubNavigationItemRef (EpubNavigationItemType.Header);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public static EpubNavigationItemRef CreateAsLink()
     {
-        return new EpubNavigationItemRef(EpubNavigationItemType.Link);
+        return new EpubNavigationItemRef (EpubNavigationItemType.Link);
     }
 
+    /// <inheritdoc cref="System.Object.ToString"/>
     public override string ToString()
     {
-        return $"Type: {Type}, Title: {Title}, NestedItems.Count: {NestedItems.Count}";
+        return $"Type: {Type}, Title: {Title}, NestedItems.Count: {NestedItems?.Count}";
     }
 }

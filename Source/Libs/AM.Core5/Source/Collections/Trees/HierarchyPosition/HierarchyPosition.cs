@@ -135,7 +135,11 @@ public partial class HierarchyPosition
     /// <inheritdoc cref="ToString"/>
     public string ToString (string separator) => Components.SerializeToString (separator);
 
-    /// <inheritdoc cref="IEquatable{T}.Equals(T?)"/>
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
     public bool Equals (HierarchyPosition? other)
     {
         return other is not null && Components.SequenceEqual (other.Components);

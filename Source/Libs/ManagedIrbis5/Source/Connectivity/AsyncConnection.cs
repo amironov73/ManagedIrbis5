@@ -562,6 +562,7 @@ public sealed class AsyncConnection
 
         var result = new List<string>();
         var lines = response.ReadRemainingUtfLines();
+        // когда запись всего одна, нужно ли искать '#'?
         if (!lines.IsNullOrEmpty())
         {
             result.Capacity = lines.Length;
