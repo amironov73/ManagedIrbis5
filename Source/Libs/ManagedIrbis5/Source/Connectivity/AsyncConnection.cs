@@ -569,9 +569,9 @@ public sealed class AsyncConnection
             {
                 var item = line;
                 var index = item.IndexOf ('#');
-                if (index > 0)
+                if (index is > 0 and < 8)
                 {
-                    item = item.Substring (index + 1);
+                    item = item[(index + 1)..];
                 }
 
                 item = IrbisText.IrbisToWindows (item);
