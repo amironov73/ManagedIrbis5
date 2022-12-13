@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* EpubGuide.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,6 +23,11 @@ using System.Collections.Generic;
 
 namespace ManagedIrbis.Epub.Schema;
 
-public class EpubGuide : List<EpubGuideReference>
+/// <summary>
+///
+/// </summary>
+public class EpubGuide
+    : List<EpubGuideReference>
 {
+    // пустое тело класса
 }
