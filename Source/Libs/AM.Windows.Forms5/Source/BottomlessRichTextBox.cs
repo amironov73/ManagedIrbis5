@@ -9,103 +9,99 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* BottomlessRichEdit.cs --
+/* BottomlessRichEdit.cs -- RichEdit, не имеющий ограничения снизу
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System.ComponentModel;
-using System.Drawing;
 using System.Windows.Forms;
 
 #endregion
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// RichTextBox that adjusts its height according to height
+/// entered text.
+/// </summary>
+[System.ComponentModel.DesignerCategory ("Code")]
+public class BottomlessRichTextBox
+    : RichTextBox
 {
+    #region Construction
+
     /// <summary>
-    /// RichTextBox that adjusts its height according to height
-    /// entered text.
+    /// Default constructor.
     /// </summary>
-    // ReSharper disable RedundantNameQualifier
-    [System.ComponentModel.DesignerCategory("Code")]
-    // ReSharper restore RedundantNameQualifier
-    public class BottomlessRichTextBox
-        : RichTextBox
+    public BottomlessRichTextBox()
     {
-        #region Construction
+        // ReSharper disable once VirtualMemberCallInConstructor
+        Multiline = true;
+        WordWrap = true;
+    }
 
-        /// <summary>
-        /// Default constructor.
-        /// </summary>
-        public BottomlessRichTextBox()
+    #endregion
+
+    #region Protected members
+
+    /// <summary>
+    /// Raises the
+    /// <see cref="E:System.Windows.Forms.RichTextBox.ContentsResized" />
+    /// event.
+    /// </summary>
+    /// <param name="e">A
+    /// <see cref="T:System.Windows.Forms.ContentsResizedEventArgs" />
+    /// that contains the event data.</param>
+    protected override void OnContentsResized
+        (
+            ContentsResizedEventArgs e
+        )
+    {
+        base.OnContentsResized (e);
+        var newSize = e.NewRectangle.Size;
+        var prevWidth = Width;
+        if (newSize.Height < FontHeight)
         {
-            // ReSharper disable once VirtualMemberCallInConstructor
-            Multiline = true;
-            WordWrap = true;
+            newSize.Height = FontHeight;
         }
 
-        #endregion
-
-        #region Protected members
-
-        /// <summary>
-        /// Raises the
-        /// <see cref="E:System.Windows.Forms.RichTextBox.ContentsResized" />
-        /// event.
-        /// </summary>
-        /// <param name="e">A
-        /// <see cref="T:System.Windows.Forms.ContentsResizedEventArgs" />
-        /// that contains the event data.</param>
-        protected override void OnContentsResized
-            (
-                ContentsResizedEventArgs e
-            )
+        if (!MaximumSize.IsEmpty
+            && (newSize.Height >= MaximumSize.Height))
         {
-            base.OnContentsResized(e);
-            Size newSize = e.NewRectangle.Size;
-            int prevWidth = Width;
-            if (newSize.Height < FontHeight)
-            {
-                newSize.Height = FontHeight;
-            }
-            if (!MaximumSize.IsEmpty
-                && (newSize.Height >= MaximumSize.Height))
-            {
-                newSize.Height = MaximumSize.Height;
-            }
-            if (Parent != null)
-            {
-                int maxHeight = Parent.ClientSize.Height - Location.Y;
-                if (newSize.Height >= maxHeight)
-                {
-                    newSize.Height = maxHeight;
-                }
-            }
-            newSize.Width = ClientSize.Width;
-            ClientSize = newSize;
-            Width = prevWidth;
+            newSize.Height = MaximumSize.Height;
         }
 
-        #endregion
-
-        #region TextBoxBase members
-
-        /// <summary>
-        /// Gets or sets value indicating whether this
-        /// is multiline RichTextBox.
-        /// </summary>
-        [DefaultValue(true)]
-        public override bool Multiline
+        if (Parent != null)
         {
-            get => base.Multiline;
-            set => base.Multiline = value;
+            var maxHeight = Parent.ClientSize.Height - Location.Y;
+            if (newSize.Height >= maxHeight)
+            {
+                newSize.Height = maxHeight;
+            }
         }
 
-        #endregion
+        newSize.Width = ClientSize.Width;
+        ClientSize = newSize;
+        Width = prevWidth;
+    }
 
-    } // class BottomlessRichTextBox
+    #endregion
 
-} // namespace AM.Windows.Forms
+    #region TextBoxBase members
+
+    /// <summary>
+    /// Gets or sets value indicating whether this
+    /// is multiline RichTextBox.
+    /// </summary>
+    [System.ComponentModel.DefaultValue (true)]
+    public override bool Multiline
+    {
+        get => base.Multiline;
+        set => base.Multiline = value;
+    }
+
+    #endregion
+}
