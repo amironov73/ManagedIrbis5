@@ -60,9 +60,9 @@ public abstract class PdfObject
     {
         // If the object that was transformed to an instance of a derived class was an indirect object
         // set the value of the reference to this.
-        if (obj._iref != null)
+        if (obj.Reference != null)
         {
-            obj._iref.Value = this;
+            obj.Reference.Value = this;
         }
 #if DEBUG_ // BUG
             else
@@ -90,7 +90,7 @@ public abstract class PdfObject
     {
         var obj = (PdfObject)base.Copy();
         obj._document = null;
-        obj._iref = null;
+        obj.Reference = null;
         return obj;
     }
 
@@ -135,22 +135,22 @@ public abstract class PdfObject
         var objectID = new PdfObjectID (objectNumber, generationNumber);
 
         // TODO: check imported
-        if (_iref == null)
+        if (Reference == null)
         {
-            _iref = _document._irefTable[objectID];
+            Reference = _document!._irefTable[objectID];
         }
 
-        if (_iref == null)
+        if (Reference == null)
         {
             // ReSharper disable once ObjectCreationAsStatement because the new object is set to this object
             // in the constructor of PdfReference.
             new PdfReference (this);
-            Debug.Assert (_iref != null);
-            _iref.ObjectID = objectID;
+            Debug.Assert (Reference != null);
+            Reference.ObjectID = objectID;
         }
 
-        _iref.Value = this;
-        _iref.Document = _document;
+        Reference.Value = this;
+        Reference.Document = _document;
     }
 
     /// <summary>
@@ -173,9 +173,9 @@ public abstract class PdfObject
                 }
 
                 _document = value;
-                if (_iref != null)
+                if (Reference != null)
                 {
-                    _iref.Document = value;
+                    Reference.Document = value;
                 }
             }
         }
@@ -189,7 +189,7 @@ public abstract class PdfObject
     public bool IsIndirect
     {
         // An object is an indirect object if and only if is has an indirect reference value.
-        get { return _iref != null; }
+        get { return Reference != null; }
     }
 
     /// <summary>
@@ -234,7 +234,7 @@ public abstract class PdfObject
     /// Gets the object identifier. Returns PdfObjectID.Empty for direct objects,
     /// i.e. never returns null.
     /// </summary>
-    internal PdfObjectID ObjectID => _iref?.ObjectID ?? PdfObjectID.Empty;
+    internal PdfObjectID ObjectID => Reference?.ObjectID ?? PdfObjectID.Empty;
 
     /// <summary>
     /// Gets the object number.
@@ -256,7 +256,7 @@ public abstract class PdfObject
     internal static PdfObject DeepCopyClosure (PdfDocument owner, PdfObject externalObject)
     {
         // Get transitive closure.
-        var elements = externalObject.Owner.Internals.GetClosure (externalObject);
+        var elements = externalObject.Owner!.Internals.GetClosure (externalObject);
         var count = elements.Length;
 #if DEBUG_
             for (int idx = 0; idx < count; idx++)
@@ -338,7 +338,7 @@ public abstract class PdfObject
             "The ExternalDocument of the importedObjectTable does not belong to the owner of object to be imported.");
 
         // Get transitive closure of external object.
-        var elements = externalObject.Owner.Internals.GetClosure (externalObject);
+        var elements = externalObject.Owner!.Internals.GetClosure (externalObject);
         var count = elements.Length;
 #if DEBUG_
             for (int idx = 0; idx < count; idx++)
@@ -432,9 +432,7 @@ public abstract class PdfObject
     {
         Debug.Assert (ReferenceEquals (iot.Owner, owner));
 
-        PdfDictionary dict;
-        PdfArray array;
-        if ((dict = value as PdfDictionary) != null)
+        if (value is PdfDictionary dict)
         {
             // Case: The object is a dictionary.
             // Set document for cloned direct objects.
@@ -496,7 +494,7 @@ public abstract class PdfObject
                 }
             }
         }
-        else if ((array = value as PdfArray) != null)
+        else if (value is PdfArray array)
         {
             // Case: The object is an array.
             // Set document for cloned direct objects.
@@ -519,8 +517,7 @@ public abstract class PdfObject
                 Debug.Assert (item != null, "An array element cannot be null.");
 
                 // Is item an iref?
-                var iref = item as PdfReference;
-                if (iref != null)
+                if (item is PdfReference iref)
                 {
                     // Case: The item is a reference.
                     // Does the iref already belongs to the owner?
@@ -541,8 +538,7 @@ public abstract class PdfObject
                 {
                     // Case: The item is not a reference.
                     // If item is an object recursively fix its inner items.
-                    var pdfObject = item as PdfObject;
-                    if (pdfObject != null)
+                    if (item is PdfObject pdfObject)
                     {
                         // Fix up inner objects, i.e. recursively walk down the object tree.
                         FixUpObject (iot, owner, pdfObject);
@@ -620,7 +616,7 @@ public abstract class PdfObject
         }
 
         var type = item.GetType();
-        Debug.Assert (type != null, string.Format ("CheckNonObjects: Add {0} to the list.", type.Name));
+        Debug.Assert (type != null, $"CheckNonObjects: Add {type.Name} to the list.");
     }
 
     /// <summary>
@@ -628,11 +624,9 @@ public abstract class PdfObject
     /// </summary>
     public PdfReference? Reference
     {
-        get { return _iref; }
+        get;
 
         // Setting the reference outside PDFsharp is not considered as a valid operation.
-        internal set { _iref = value; }
+        internal set;
     }
-
-    PdfReference? _iref;
 }

@@ -79,10 +79,7 @@ public class PdfOutlineCollection
     /// </summary>
     public void Add (PdfOutline outline)
     {
-        if (outline == null)
-        {
-            throw new ArgumentNullException (nameof (outline));
-        }
+        Sure.NotNull (outline);
 
         // DestinationPage is optional. PDFsharp does not yet support outlines with action ("/A") instead of destination page ("/DEST")
         if (outline.DestinationPage != null && !ReferenceEquals (Owner, outline.DestinationPage.Owner))
@@ -101,10 +98,10 @@ public class PdfOutlineCollection
         if (outline.Opened)
         {
             outline = _parent;
-            while (outline != null)
+            while (outline != null!)
             {
                 outline.OpenCount++;
-                outline = outline.Parent;
+                outline = outline.Parent!;
             }
         }
     }
@@ -299,7 +296,7 @@ public class PdfOutlineCollection
         outline.Parent = _parent;
 
         //_outlines.Add(outline);
-        if (!Owner._irefTable.Contains (outline.ObjectID))
+        if (!Owner!._irefTable.Contains (outline.ObjectID))
         {
             Owner._irefTable.Add (outline);
         }
@@ -328,7 +325,7 @@ public class PdfOutlineCollection
         //outline.Document = Owner;
         outline.Parent = null;
 
-        Owner._irefTable.Remove (outline.Reference);
+        Owner!._irefTable.Remove (outline.Reference!);
     }
 
     /// <summary>

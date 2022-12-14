@@ -11,7 +11,6 @@
 
 #region Using directives
 
-using System;
 using System.Globalization;
 
 using AM.Drawing.HtmlRenderer.Adapters;
@@ -68,11 +67,6 @@ internal abstract class CssBoxProperties
     /// Gets or sets the location of the box
     /// </summary>
     private RPoint _location;
-
-    /// <summary>
-    /// Gets or sets the size of the box
-    /// </summary>
-    private RSize _size;
 
     private double _actualCornerNw = double.NaN;
     private double _actualCornerNe = double.NaN;
@@ -425,7 +419,7 @@ internal abstract class CssBoxProperties
                 }
                 else if (len.Unit == CssUnit.Ems && GetParent() != null)
                 {
-                    computedValue = len.ConvertEmToPoints (GetParent().ActualFont.Size).ToString();
+                    computedValue = len.ConvertEmToPoints (GetParent()!.ActualFont.Size).ToString();
                 }
                 else
                 {
@@ -482,11 +476,7 @@ internal abstract class CssBoxProperties
     /// <summary>
     /// Gets or sets the size of the box
     /// </summary>
-    public RSize Size
-    {
-        get => _size;
-        set => _size = value;
-    }
+    public RSize Size { get; set; }
 
     /// <summary>
     /// Gets the bounds of the box
@@ -1045,7 +1035,7 @@ internal abstract class CssBoxProperties
     /// <summary>
     /// Gets the actual font of the parent
     /// </summary>
-    public RFont ActualParentFont => GetParent() == null ? ActualFont : GetParent().ActualFont;
+    public RFont ActualParentFont => GetParent() == null ? ActualFont : GetParent()!.ActualFont;
 
     /// <summary>
     /// Gets the font that should be actually used to paint the text of the box
@@ -1079,61 +1069,41 @@ internal abstract class CssBoxProperties
                     st |= RFontStyle.Bold;
                 }
 
-                double fsize;
+                double fontSize;
                 var parentSize = CssConstants.FontSize;
 
                 if (GetParent() != null)
                 {
-                    parentSize = GetParent().ActualFont.Size;
+                    parentSize = GetParent()!.ActualFont.Size;
                 }
 
-                switch (FontSize)
+                fontSize = FontSize switch
                 {
-                    case CssConstants.Medium:
-                        fsize = CssConstants.FontSize;
-                        break;
-                    case CssConstants.XXSmall:
-                        fsize = CssConstants.FontSize - 4;
-                        break;
-                    case CssConstants.XSmall:
-                        fsize = CssConstants.FontSize - 3;
-                        break;
-                    case CssConstants.Small:
-                        fsize = CssConstants.FontSize - 2;
-                        break;
-                    case CssConstants.Large:
-                        fsize = CssConstants.FontSize + 2;
-                        break;
-                    case CssConstants.XLarge:
-                        fsize = CssConstants.FontSize + 3;
-                        break;
-                    case CssConstants.XXLarge:
-                        fsize = CssConstants.FontSize + 4;
-                        break;
-                    case CssConstants.Smaller:
-                        fsize = parentSize - 2;
-                        break;
-                    case CssConstants.Larger:
-                        fsize = parentSize + 2;
-                        break;
-                    default:
-                        fsize = CssValueParser.ParseLength (FontSize, parentSize, parentSize, null, true, true);
-                        break;
-                }
+                    CssConstants.Medium => CssConstants.FontSize,
+                    CssConstants.XXSmall => CssConstants.FontSize - 4,
+                    CssConstants.XSmall => CssConstants.FontSize - 3,
+                    CssConstants.Small => CssConstants.FontSize - 2,
+                    CssConstants.Large => CssConstants.FontSize + 2,
+                    CssConstants.XLarge => CssConstants.FontSize + 3,
+                    CssConstants.XXLarge => CssConstants.FontSize + 4,
+                    CssConstants.Smaller => parentSize - 2,
+                    CssConstants.Larger => parentSize + 2,
+                    _ => CssValueParser.ParseLength (FontSize, parentSize, parentSize, null, true, true)
+                };
 
-                if (fsize <= 1f)
+                if (fontSize <= 1f)
                 {
-                    fsize = CssConstants.FontSize;
+                    fontSize = CssConstants.FontSize;
                 }
 
-                _actualFont = GetCachedFont (FontFamily, fsize, st);
+                _actualFont = GetCachedFont (FontFamily, fontSize, st);
             }
 
             return _actualFont;
         }
     }
 
-    protected abstract RFont GetCachedFont (string fontFamily, double fsize, RFontStyle st);
+    protected abstract RFont GetCachedFont (string fontFamily, double fontSize, RFontStyle st);
 
     /// <summary>
     /// Gets the line height
@@ -1226,7 +1196,7 @@ internal abstract class CssBoxProperties
     /// Get the parent of this css properties instance.
     /// </summary>
     /// <returns></returns>
-    protected abstract CssBoxProperties GetParent();
+    protected abstract CssBoxProperties? GetParent();
 
     /// <summary>
     /// Gets the height of the font in the specified units
@@ -1296,7 +1266,7 @@ internal abstract class CssBoxProperties
             if (WordSpacing != CssConstants.Normal)
             {
                 var len = RegexParserUtils.Search (RegexParserUtils.CssLength, WordSpacing);
-                ActualWordSpacing += CssValueParser.ParseLength (len, 1, this);
+                ActualWordSpacing += CssValueParser.ParseLength (len!, 1, this);
             }
         }
     }

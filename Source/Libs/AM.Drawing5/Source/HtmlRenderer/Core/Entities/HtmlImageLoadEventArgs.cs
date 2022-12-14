@@ -63,7 +63,7 @@ public sealed class HtmlImageLoadEventArgs
     internal HtmlImageLoadEventArgs
         (
             string src,
-            Dictionary<string, string> attributes,
+            Dictionary<string, string>? attributes,
             HtmlImageLoadCallback callback
         )
     {
@@ -80,7 +80,7 @@ public sealed class HtmlImageLoadEventArgs
     /// <summary>
     /// collection of all the attributes that are defined on the image element or CSS style
     /// </summary>
-    public Dictionary<string, string> Attributes { get; }
+    public Dictionary<string, string>? Attributes { get; }
 
     /// <summary>
     /// Indicate the image load is handled asynchronously.

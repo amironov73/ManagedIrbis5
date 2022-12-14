@@ -7,6 +7,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
 /* QRCode.cs --
@@ -27,35 +28,92 @@ using static AM.Drawing.QRCoding.QRCodeGenerator;
 
 namespace AM.Drawing.QRCoding;
 
+/// <summary>
+///
+/// </summary>
 [System.Runtime.Versioning.SupportedOSPlatform ("windows")]
-public class QRCode : AbstractQRCode, IDisposable
+public class QRCode
+    : AbstractQRCode, IDisposable
 {
     /// <summary>
     /// Constructor without params to be used in COM Objects connections
     /// </summary>
     public QRCode()
     {
+        // пустое тело конструктора
     }
 
-    public QRCode (QRCodeData data) : base (data)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="data"></param>
+    public QRCode (QRCodeData data)
+        : base (data)
     {
+        // пустое тело конструктора
     }
 
-    public Bitmap GetGraphic (int pixelsPerModule)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="pixelsPerModule"></param>
+    /// <returns></returns>
+    public Bitmap GetGraphic
+        (
+            int pixelsPerModule
+        )
     {
-        return this.GetGraphic (pixelsPerModule, Color.Black, Color.White, true);
+        return GetGraphic
+            (
+                pixelsPerModule,
+                darkColor: Color.Black,
+                lightColor: Color.White,
+                drawQuietZones: true
+            );
     }
 
-    public Bitmap GetGraphic (int pixelsPerModule, string darkColorHtmlHex, string lightColorHtmlHex,
-        bool drawQuietZones = true)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="pixelsPerModule"></param>
+    /// <param name="darkColorHtmlHex"></param>
+    /// <param name="lightColorHtmlHex"></param>
+    /// <param name="drawQuietZones"></param>
+    /// <returns></returns>
+    public Bitmap GetGraphic
+        (
+            int pixelsPerModule,
+            string darkColorHtmlHex,
+            string lightColorHtmlHex,
+            bool drawQuietZones = true
+        )
     {
-        return this.GetGraphic (pixelsPerModule, ColorTranslator.FromHtml (darkColorHtmlHex),
-            ColorTranslator.FromHtml (lightColorHtmlHex), drawQuietZones);
+        return GetGraphic
+            (
+                pixelsPerModule,
+                darkColor: ColorTranslator.FromHtml (darkColorHtmlHex),
+                lightColor: ColorTranslator.FromHtml (lightColorHtmlHex),
+                drawQuietZones
+            );
     }
 
-    public Bitmap GetGraphic (int pixelsPerModule, Color darkColor, Color lightColor, bool drawQuietZones = true)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="pixelsPerModule"></param>
+    /// <param name="darkColor"></param>
+    /// <param name="lightColor"></param>
+    /// <param name="drawQuietZones"></param>
+    /// <returns></returns>
+    public Bitmap GetGraphic
+        (
+            int pixelsPerModule,
+            Color darkColor,
+            Color lightColor,
+            bool drawQuietZones = true
+        )
     {
-        var size = (this.QrCodeData.ModuleMatrix.Count - (drawQuietZones ? 0 : 8)) * pixelsPerModule;
+        var size = (QrCodeData!.ModuleMatrix!.Count - (drawQuietZones ? 0 : 8)) * pixelsPerModule;
         var offset = drawQuietZones ? 0 : 4 * pixelsPerModule;
 
         var bmp = new Bitmap (size, size);
@@ -68,7 +126,7 @@ public class QRCode : AbstractQRCode, IDisposable
                 for (var y = 0; y < size + offset; y = y + pixelsPerModule)
                 {
                     var module =
-                        this.QrCodeData.ModuleMatrix[(y + pixelsPerModule) / pixelsPerModule - 1][
+                        QrCodeData.ModuleMatrix[(y + pixelsPerModule) / pixelsPerModule - 1][
                             (x + pixelsPerModule) / pixelsPerModule - 1];
 
                     if (module)
@@ -90,6 +148,18 @@ public class QRCode : AbstractQRCode, IDisposable
         return bmp;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="pixelsPerModule"></param>
+    /// <param name="darkColor"></param>
+    /// <param name="lightColor"></param>
+    /// <param name="icon"></param>
+    /// <param name="iconSizePercent"></param>
+    /// <param name="iconBorderWidth"></param>
+    /// <param name="drawQuietZones"></param>
+    /// <param name="iconBackgroundColor"></param>
+    /// <returns></returns>
     public Bitmap GetGraphic
         (
             int pixelsPerModule,
@@ -120,7 +190,7 @@ public class QRCode : AbstractQRCode, IDisposable
             for (var y = 0; y < size + offset; y = y + pixelsPerModule)
             {
                 var moduleBrush =
-                    this.QrCodeData.ModuleMatrix[(y + pixelsPerModule) / pixelsPerModule - 1][
+                    QrCodeData.ModuleMatrix[(y + pixelsPerModule) / pixelsPerModule - 1][
                         (x + pixelsPerModule) / pixelsPerModule - 1]
                         ? darkBrush
                         : lightBrush;
@@ -148,7 +218,7 @@ public class QRCode : AbstractQRCode, IDisposable
                 gfx.FillPath (iconBgBrush, iconPath);
             }
 
-            gfx.DrawImage (icon, iconDestRect, new RectangleF (0, 0, icon.Width, icon.Height), GraphicsUnit.Pixel);
+            gfx.DrawImage (icon!, iconDestRect, new RectangleF (0, 0, icon!.Width, icon.Height), GraphicsUnit.Pixel);
         }
 
         gfx.Save();
@@ -204,7 +274,8 @@ internal static class QRCodeHelper
         )
     {
         using var qrGenerator = new QRCodeGenerator();
-        using var qrCodeData = qrGenerator.CreateQrCode (plainText, eccLevel, forceUtf8, utf8BOM, eciMode, requestedVersion);
+        using var qrCodeData =
+            qrGenerator.CreateQrCode (plainText, eccLevel, forceUtf8, utf8BOM, eciMode, requestedVersion);
         using var qrCode = new QRCode (qrCodeData);
 
         return qrCode.GetGraphic

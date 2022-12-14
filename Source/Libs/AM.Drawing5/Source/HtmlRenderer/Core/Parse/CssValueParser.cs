@@ -500,7 +500,7 @@ internal sealed class CssValueParser
             string length,
             double hundredPercent,
             CssBoxProperties box,
-            string defaultUnit
+            string? defaultUnit
         )
     {
         return ParseLength (length, hundredPercent, box.GetEmHeight(), defaultUnit, false, false);

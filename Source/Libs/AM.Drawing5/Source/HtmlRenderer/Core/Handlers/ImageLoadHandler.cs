@@ -132,7 +132,7 @@ internal sealed class ImageLoadHandler
     public void LoadImage
         (
             string src,
-            Dictionary<string, string> attributes
+            Dictionary<string, string>? attributes
         )
     {
         try
@@ -371,7 +371,7 @@ internal sealed class ImageLoadHandler
         )
     {
         var filePath = CommonUtils.GetLocalfileName (source);
-        if (filePath.Exists && filePath.Length > 0)
+        if (filePath!.Exists && filePath.Length > 0)
         {
             SetImageFromFile (filePath);
         }

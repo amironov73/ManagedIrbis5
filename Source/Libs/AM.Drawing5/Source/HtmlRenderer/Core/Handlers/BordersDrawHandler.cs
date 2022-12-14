@@ -38,34 +38,47 @@ internal static class BordersDrawHandler
 
     #endregion
 
-
     /// <summary>
     /// Draws all the border of the box with respect to style, width, etc.
     /// </summary>
-    /// <param name="g">the device to draw into</param>
+    /// <param name="graphics">the device to draw into</param>
     /// <param name="box">the box to draw borders for</param>
     /// <param name="rect">the bounding rectangle to draw in</param>
     /// <param name="isFirst">is it the first rectangle of the element</param>
     /// <param name="isLast">is it the last rectangle of the element</param>
-    public static void DrawBoxBorders(RGraphics g, CssBox box, RRect rect, bool isFirst, bool isLast)
+    public static void DrawBoxBorders
+        (
+            RGraphics graphics,
+            CssBox box,
+            RRect rect,
+            bool isFirst,
+            bool isLast
+        )
     {
-        if (rect.Width > 0 && rect.Height > 0)
+        if (rect is { Width: > 0, Height: > 0 })
         {
-            if (!(string.IsNullOrEmpty(box.BorderTopStyle) || box.BorderTopStyle == CssConstants.None || box.BorderTopStyle == CssConstants.Hidden) && box.ActualBorderTopWidth > 0)
+            if (!(string.IsNullOrEmpty (box.BorderTopStyle) || box.BorderTopStyle == CssConstants.None ||
+                  box.BorderTopStyle == CssConstants.Hidden) && box.ActualBorderTopWidth > 0)
             {
-                DrawBorder(Border.Top, box, g, rect, isFirst, isLast);
+                DrawBorder (Border.Top, box, graphics, rect, isFirst, isLast);
             }
-            if (isFirst && !(string.IsNullOrEmpty(box.BorderLeftStyle) || box.BorderLeftStyle == CssConstants.None || box.BorderLeftStyle == CssConstants.Hidden) && box.ActualBorderLeftWidth > 0)
+
+            if (isFirst && !(string.IsNullOrEmpty (box.BorderLeftStyle) || box.BorderLeftStyle == CssConstants.None ||
+                             box.BorderLeftStyle == CssConstants.Hidden) && box.ActualBorderLeftWidth > 0)
             {
-                DrawBorder(Border.Left, box, g, rect, true, isLast);
+                DrawBorder (Border.Left, box, graphics, rect, true, isLast);
             }
-            if (!(string.IsNullOrEmpty(box.BorderBottomStyle) || box.BorderBottomStyle == CssConstants.None || box.BorderBottomStyle == CssConstants.Hidden) && box.ActualBorderBottomWidth > 0)
+
+            if (!(string.IsNullOrEmpty (box.BorderBottomStyle) || box.BorderBottomStyle == CssConstants.None ||
+                  box.BorderBottomStyle == CssConstants.Hidden) && box.ActualBorderBottomWidth > 0)
             {
-                DrawBorder(Border.Bottom, box, g, rect, isFirst, isLast);
+                DrawBorder (Border.Bottom, box, graphics, rect, isFirst, isLast);
             }
-            if (isLast && !(string.IsNullOrEmpty(box.BorderRightStyle) || box.BorderRightStyle == CssConstants.None || box.BorderRightStyle == CssConstants.Hidden) && box.ActualBorderRightWidth > 0)
+
+            if (isLast && !(string.IsNullOrEmpty (box.BorderRightStyle) || box.BorderRightStyle == CssConstants.None ||
+                            box.BorderRightStyle == CssConstants.Hidden) && box.ActualBorderRightWidth > 0)
             {
-                DrawBorder(Border.Right, box, g, rect, isFirst, true);
+                DrawBorder (Border.Right, box, graphics, rect, isFirst, true);
             }
         }
     }
@@ -74,15 +87,22 @@ internal static class BordersDrawHandler
     /// Draw simple border.
     /// </summary>
     /// <param name="border">Desired border</param>
-    /// <param name="g">the device to draw to</param>
+    /// <param name="graphics">the device to draw to</param>
     /// <param name="box">Box which the border corresponds</param>
     /// <param name="brush">the brush to use</param>
     /// <param name="rectangle">the bounding rectangle to draw in</param>
     /// <returns>Beveled border path, null if there is no rounded corners</returns>
-    public static void DrawBorder(Border border, RGraphics g, CssBox box, RBrush brush, RRect rectangle)
+    public static void DrawBorder
+        (
+            Border border,
+            RGraphics graphics,
+            CssBox box,
+            RBrush brush,
+            RRect rectangle
+        )
     {
-        SetInOutsetRectanglePoints(border, box, rectangle, true, true);
-        g.DrawPolygon(brush, _borderPts);
+        SetInOutsetRectanglePoints (border, box, rectangle, true, true);
+        graphics.DrawPolygon (brush, _borderPts);
     }
 
 
@@ -93,28 +113,38 @@ internal static class BordersDrawHandler
     /// </summary>
     /// <param name="border">desired border to draw</param>
     /// <param name="box">the box to draw its borders, contain the borders data</param>
-    /// <param name="g">the device to draw into</param>
+    /// <param name="graphics">the device to draw into</param>
     /// <param name="rect">the rectangle the border is enclosing</param>
     /// <param name="isLineStart">Specifies if the border is for a starting line (no bevel on left)</param>
     /// <param name="isLineEnd">Specifies if the border is for an ending line (no bevel on right)</param>
-    private static void DrawBorder(Border border, CssBox box, RGraphics g, RRect rect, bool isLineStart, bool isLineEnd)
+    private static void DrawBorder
+        (
+            Border border,
+            CssBox box,
+            RGraphics graphics,
+            RRect rect,
+            bool isLineStart,
+            bool isLineEnd
+        )
     {
-        var style = GetStyle(border, box);
-        var color = GetColor(border, box, style);
+        var style = GetStyle (border, box);
+        var color = GetColor (border, box, style);
 
-        var borderPath = GetRoundedBorderPath(g, border, box, rect);
+        var borderPath = GetRoundedBorderPath (graphics, border, box, rect);
         if (borderPath != null)
         {
             // rounded border need special path
-            object prevMode = null;
-            if (box.HtmlContainer != null && !box.HtmlContainer.AvoidGeometryAntialias && box.IsRounded)
-                prevMode = g.SetAntiAliasSmoothingMode();
+            object? prevMode = null;
+            if (box is { HtmlContainer: { AvoidGeometryAntialias: false }, IsRounded: true })
+            {
+                prevMode = graphics.SetAntiAliasSmoothingMode();
+            }
 
-            var pen = GetPen(g, style, color, GetWidth(border, box));
+            var pen = GetPen (graphics, style, color, GetWidth (border, box));
             using (borderPath)
-                g.DrawPath(pen, borderPath);
+                graphics.DrawPath (pen, borderPath);
 
-            g.ReturnPreviousSmoothingMode(prevMode);
+            graphics.ReturnPreviousSmoothingMode (prevMode!);
         }
         else
         {
@@ -122,26 +152,30 @@ internal static class BordersDrawHandler
             if (style == CssConstants.Inset || style == CssConstants.Outset)
             {
                 // inset/outset border needs special rectangle
-                SetInOutsetRectanglePoints(border, box, rect, isLineStart, isLineEnd);
-                g.DrawPolygon(g.GetSolidBrush(color), _borderPts);
+                SetInOutsetRectanglePoints (border, box, rect, isLineStart, isLineEnd);
+                graphics.DrawPolygon (graphics.GetSolidBrush (color), _borderPts);
             }
             else
             {
                 // solid/dotted/dashed border draw as simple line
-                var pen = GetPen(g, style, color, GetWidth(border, box));
+                var pen = GetPen (graphics, style, color, GetWidth (border, box));
                 switch (border)
                 {
                     case Border.Top:
-                        g.DrawLine(pen, Math.Ceiling(rect.Left), rect.Top + box.ActualBorderTopWidth / 2, rect.Right - 1, rect.Top + box.ActualBorderTopWidth / 2);
+                        graphics.DrawLine (pen, Math.Ceiling (rect.Left), rect.Top + box.ActualBorderTopWidth / 2,
+                            rect.Right - 1, rect.Top + box.ActualBorderTopWidth / 2);
                         break;
                     case Border.Left:
-                        g.DrawLine(pen, rect.Left + box.ActualBorderLeftWidth / 2, Math.Ceiling(rect.Top), rect.Left + box.ActualBorderLeftWidth / 2, Math.Floor(rect.Bottom));
+                        graphics.DrawLine (pen, rect.Left + box.ActualBorderLeftWidth / 2, Math.Ceiling (rect.Top),
+                            rect.Left + box.ActualBorderLeftWidth / 2, Math.Floor (rect.Bottom));
                         break;
                     case Border.Bottom:
-                        g.DrawLine(pen, Math.Ceiling(rect.Left), rect.Bottom - box.ActualBorderBottomWidth / 2, rect.Right - 1, rect.Bottom - box.ActualBorderBottomWidth / 2);
+                        graphics.DrawLine (pen, Math.Ceiling (rect.Left), rect.Bottom - box.ActualBorderBottomWidth / 2,
+                            rect.Right - 1, rect.Bottom - box.ActualBorderBottomWidth / 2);
                         break;
                     case Border.Right:
-                        g.DrawLine(pen, rect.Right - box.ActualBorderRightWidth / 2, Math.Ceiling(rect.Top), rect.Right - box.ActualBorderRightWidth / 2, Math.Floor(rect.Bottom));
+                        graphics.DrawLine (pen, rect.Right - box.ActualBorderRightWidth / 2, Math.Ceiling (rect.Top),
+                            rect.Right - box.ActualBorderRightWidth / 2, Math.Floor (rect.Bottom));
                         break;
                 }
             }
@@ -157,41 +191,53 @@ internal static class BordersDrawHandler
     /// <param name="isLineStart">Specifies if the border is for a starting line (no bevel on left)</param>
     /// <param name="isLineEnd">Specifies if the border is for an ending line (no bevel on right)</param>
     /// <returns>Beveled border path, null if there is no rounded corners</returns>
-    private static void SetInOutsetRectanglePoints(Border border, CssBox b, RRect r, bool isLineStart, bool isLineEnd)
+    private static void SetInOutsetRectanglePoints (Border border, CssBox b, RRect r, bool isLineStart, bool isLineEnd)
     {
         switch (border)
         {
             case Border.Top:
-                _borderPts[0] = new RPoint(r.Left, r.Top);
-                _borderPts[1] = new RPoint(r.Right, r.Top);
-                _borderPts[2] = new RPoint(r.Right, r.Top + b.ActualBorderTopWidth);
-                _borderPts[3] = new RPoint(r.Left, r.Top + b.ActualBorderTopWidth);
+                _borderPts[0] = new RPoint (r.Left, r.Top);
+                _borderPts[1] = new RPoint (r.Right, r.Top);
+                _borderPts[2] = new RPoint (r.Right, r.Top + b.ActualBorderTopWidth);
+                _borderPts[3] = new RPoint (r.Left, r.Top + b.ActualBorderTopWidth);
                 if (isLineEnd)
+                {
                     _borderPts[2].X -= b.ActualBorderRightWidth;
+                }
+
                 if (isLineStart)
+                {
                     _borderPts[3].X += b.ActualBorderLeftWidth;
+                }
+
                 break;
             case Border.Right:
-                _borderPts[0] = new RPoint(r.Right - b.ActualBorderRightWidth, r.Top + b.ActualBorderTopWidth);
-                _borderPts[1] = new RPoint(r.Right, r.Top);
-                _borderPts[2] = new RPoint(r.Right, r.Bottom);
-                _borderPts[3] = new RPoint(r.Right - b.ActualBorderRightWidth, r.Bottom - b.ActualBorderBottomWidth);
+                _borderPts[0] = new RPoint (r.Right - b.ActualBorderRightWidth, r.Top + b.ActualBorderTopWidth);
+                _borderPts[1] = new RPoint (r.Right, r.Top);
+                _borderPts[2] = new RPoint (r.Right, r.Bottom);
+                _borderPts[3] = new RPoint (r.Right - b.ActualBorderRightWidth, r.Bottom - b.ActualBorderBottomWidth);
                 break;
             case Border.Bottom:
-                _borderPts[0] = new RPoint(r.Left, r.Bottom - b.ActualBorderBottomWidth);
-                _borderPts[1] = new RPoint(r.Right, r.Bottom - b.ActualBorderBottomWidth);
-                _borderPts[2] = new RPoint(r.Right, r.Bottom);
-                _borderPts[3] = new RPoint(r.Left, r.Bottom);
+                _borderPts[0] = new RPoint (r.Left, r.Bottom - b.ActualBorderBottomWidth);
+                _borderPts[1] = new RPoint (r.Right, r.Bottom - b.ActualBorderBottomWidth);
+                _borderPts[2] = new RPoint (r.Right, r.Bottom);
+                _borderPts[3] = new RPoint (r.Left, r.Bottom);
                 if (isLineStart)
+                {
                     _borderPts[0].X += b.ActualBorderLeftWidth;
+                }
+
                 if (isLineEnd)
+                {
                     _borderPts[1].X -= b.ActualBorderRightWidth;
+                }
+
                 break;
             case Border.Left:
-                _borderPts[0] = new RPoint(r.Left, r.Top);
-                _borderPts[1] = new RPoint(r.Left + b.ActualBorderLeftWidth, r.Top + b.ActualBorderTopWidth);
-                _borderPts[2] = new RPoint(r.Left + b.ActualBorderLeftWidth, r.Bottom - b.ActualBorderBottomWidth);
-                _borderPts[3] = new RPoint(r.Left, r.Bottom);
+                _borderPts[0] = new RPoint (r.Left, r.Top);
+                _borderPts[1] = new RPoint (r.Left + b.ActualBorderLeftWidth, r.Top + b.ActualBorderTopWidth);
+                _borderPts[2] = new RPoint (r.Left + b.ActualBorderLeftWidth, r.Bottom - b.ActualBorderBottomWidth);
+                _borderPts[3] = new RPoint (r.Left, r.Bottom);
                 break;
         }
     }
@@ -201,81 +247,131 @@ internal static class BordersDrawHandler
     /// To support rounded dotted/dashed borders we need to use arc in the border path.<br/>
     /// Return null if the border is not rounded.<br/>
     /// </summary>
-    /// <param name="g">the device to draw into</param>
+    /// <param name="graphics">the device to draw into</param>
     /// <param name="border">Desired border</param>
-    /// <param name="b">Box which the border corresponds</param>
-    /// <param name="r">the rectangle the border is enclosing</param>
+    /// <param name="cssBox">Box which the border corresponds</param>
+    /// <param name="rect">the rectangle the border is enclosing</param>
     /// <returns>Beveled border path, null if there is no rounded corners</returns>
-    private static RGraphicsPath GetRoundedBorderPath(RGraphics g, Border border, CssBox b, RRect r)
+    private static RGraphicsPath? GetRoundedBorderPath
+        (
+            RGraphics graphics,
+            Border border,
+            CssBox cssBox,
+            RRect rect
+        )
     {
-        RGraphicsPath path = null;
+        RGraphicsPath? path = null;
         switch (border)
         {
             case Border.Top:
-                if (b.ActualCornerNw > 0 || b.ActualCornerNe > 0)
+                if (cssBox.ActualCornerNw > 0 || cssBox.ActualCornerNe > 0)
                 {
-                    path = g.GetGraphicsPath();
-                    path.Start(r.Left + b.ActualBorderLeftWidth / 2, r.Top + b.ActualBorderTopWidth / 2 + b.ActualCornerNw);
+                    path = graphics.GetGraphicsPath();
+                    path.Start (rect.Left + cssBox.ActualBorderLeftWidth / 2,
+                        rect.Top + cssBox.ActualBorderTopWidth / 2 + cssBox.ActualCornerNw);
 
-                    if (b.ActualCornerNw > 0)
-                        path.ArcTo(r.Left + b.ActualBorderLeftWidth / 2 + b.ActualCornerNw, r.Top + b.ActualBorderTopWidth / 2, b.ActualCornerNw, RGraphicsPath.Corner.TopLeft);
+                    if (cssBox.ActualCornerNw > 0)
+                    {
+                        path.ArcTo (rect.Left + cssBox.ActualBorderLeftWidth / 2 + cssBox.ActualCornerNw,
+                            rect.Top + cssBox.ActualBorderTopWidth / 2, cssBox.ActualCornerNw, RGraphicsPath.Corner.TopLeft);
+                    }
 
-                    path.LineTo(r.Right - b.ActualBorderRightWidth / 2 - b.ActualCornerNe, r.Top + b.ActualBorderTopWidth / 2);
+                    path.LineTo (rect.Right - cssBox.ActualBorderRightWidth / 2 - cssBox.ActualCornerNe,
+                        rect.Top + cssBox.ActualBorderTopWidth / 2);
 
-                    if (b.ActualCornerNe > 0)
-                        path.ArcTo(r.Right - b.ActualBorderRightWidth / 2, r.Top + b.ActualBorderTopWidth / 2 + b.ActualCornerNe, b.ActualCornerNe, RGraphicsPath.Corner.TopRight);
+                    if (cssBox.ActualCornerNe > 0)
+                    {
+                        path.ArcTo (rect.Right - cssBox.ActualBorderRightWidth / 2,
+                            rect.Top + cssBox.ActualBorderTopWidth / 2 + cssBox.ActualCornerNe, cssBox.ActualCornerNe,
+                            RGraphicsPath.Corner.TopRight);
+                    }
                 }
+
                 break;
             case Border.Bottom:
-                if (b.ActualCornerSw > 0 || b.ActualCornerSe > 0)
+                if (cssBox.ActualCornerSw > 0 || cssBox.ActualCornerSe > 0)
                 {
-                    path = g.GetGraphicsPath();
-                    path.Start(r.Right - b.ActualBorderRightWidth / 2, r.Bottom - b.ActualBorderBottomWidth / 2 - b.ActualCornerSe);
+                    path = graphics.GetGraphicsPath();
+                    path.Start (rect.Right - cssBox.ActualBorderRightWidth / 2,
+                        rect.Bottom - cssBox.ActualBorderBottomWidth / 2 - cssBox.ActualCornerSe);
 
-                    if (b.ActualCornerSe > 0)
-                        path.ArcTo(r.Right - b.ActualBorderRightWidth / 2 - b.ActualCornerSe, r.Bottom - b.ActualBorderBottomWidth / 2, b.ActualCornerSe, RGraphicsPath.Corner.BottomRight);
+                    if (cssBox.ActualCornerSe > 0)
+                    {
+                        path.ArcTo (rect.Right - cssBox.ActualBorderRightWidth / 2 - cssBox.ActualCornerSe,
+                            rect.Bottom - cssBox.ActualBorderBottomWidth / 2, cssBox.ActualCornerSe,
+                            RGraphicsPath.Corner.BottomRight);
+                    }
 
-                    path.LineTo(r.Left + b.ActualBorderLeftWidth / 2 + b.ActualCornerSw, r.Bottom - b.ActualBorderBottomWidth / 2);
+                    path.LineTo (rect.Left + cssBox.ActualBorderLeftWidth / 2 + cssBox.ActualCornerSw,
+                        rect.Bottom - cssBox.ActualBorderBottomWidth / 2);
 
-                    if (b.ActualCornerSw > 0)
-                        path.ArcTo(r.Left + b.ActualBorderLeftWidth / 2, r.Bottom - b.ActualBorderBottomWidth / 2 - b.ActualCornerSw, b.ActualCornerSw, RGraphicsPath.Corner.BottomLeft);
+                    if (cssBox.ActualCornerSw > 0)
+                    {
+                        path.ArcTo (rect.Left + cssBox.ActualBorderLeftWidth / 2,
+                            rect.Bottom - cssBox.ActualBorderBottomWidth / 2 - cssBox.ActualCornerSw, cssBox.ActualCornerSw,
+                            RGraphicsPath.Corner.BottomLeft);
+                    }
                 }
+
                 break;
             case Border.Right:
-                if (b.ActualCornerNe > 0 || b.ActualCornerSe > 0)
+                if (cssBox.ActualCornerNe > 0 || cssBox.ActualCornerSe > 0)
                 {
-                    path = g.GetGraphicsPath();
+                    path = graphics.GetGraphicsPath();
 
-                    bool noTop = b.BorderTopStyle == CssConstants.None || b.BorderTopStyle == CssConstants.Hidden;
-                    bool noBottom = b.BorderBottomStyle == CssConstants.None || b.BorderBottomStyle == CssConstants.Hidden;
-                    path.Start(r.Right - b.ActualBorderRightWidth / 2 - (noTop ? b.ActualCornerNe : 0), r.Top + b.ActualBorderTopWidth / 2 + (noTop ? 0 : b.ActualCornerNe));
+                    var noTop = cssBox.BorderTopStyle == CssConstants.None || cssBox.BorderTopStyle == CssConstants.Hidden;
+                    var noBottom = cssBox.BorderBottomStyle == CssConstants.None ||
+                                   cssBox.BorderBottomStyle == CssConstants.Hidden;
+                    path.Start (rect.Right - cssBox.ActualBorderRightWidth / 2 - (noTop ? cssBox.ActualCornerNe : 0),
+                        rect.Top + cssBox.ActualBorderTopWidth / 2 + (noTop ? 0 : cssBox.ActualCornerNe));
 
-                    if (b.ActualCornerNe > 0 && noTop)
-                        path.ArcTo(r.Right - b.ActualBorderLeftWidth / 2, r.Top + b.ActualBorderTopWidth / 2 + b.ActualCornerNe, b.ActualCornerNe, RGraphicsPath.Corner.TopRight);
+                    if (cssBox.ActualCornerNe > 0 && noTop)
+                    {
+                        path.ArcTo (rect.Right - cssBox.ActualBorderLeftWidth / 2,
+                            rect.Top + cssBox.ActualBorderTopWidth / 2 + cssBox.ActualCornerNe, cssBox.ActualCornerNe,
+                            RGraphicsPath.Corner.TopRight);
+                    }
 
-                    path.LineTo(r.Right - b.ActualBorderRightWidth / 2, r.Bottom - b.ActualBorderBottomWidth / 2 - b.ActualCornerSe);
+                    path.LineTo (rect.Right - cssBox.ActualBorderRightWidth / 2,
+                        rect.Bottom - cssBox.ActualBorderBottomWidth / 2 - cssBox.ActualCornerSe);
 
-                    if (b.ActualCornerSe > 0 && noBottom)
-                        path.ArcTo(r.Right - b.ActualBorderRightWidth / 2 - b.ActualCornerSe, r.Bottom - b.ActualBorderBottomWidth / 2, b.ActualCornerSe, RGraphicsPath.Corner.BottomRight);
+                    if (cssBox.ActualCornerSe > 0 && noBottom)
+                    {
+                        path.ArcTo (rect.Right - cssBox.ActualBorderRightWidth / 2 - cssBox.ActualCornerSe,
+                            rect.Bottom - cssBox.ActualBorderBottomWidth / 2, cssBox.ActualCornerSe,
+                            RGraphicsPath.Corner.BottomRight);
+                    }
                 }
+
                 break;
             case Border.Left:
-                if (b.ActualCornerNw > 0 || b.ActualCornerSw > 0)
+                if (cssBox.ActualCornerNw > 0 || cssBox.ActualCornerSw > 0)
                 {
-                    path = g.GetGraphicsPath();
+                    path = graphics.GetGraphicsPath();
 
-                    bool noTop = b.BorderTopStyle == CssConstants.None || b.BorderTopStyle == CssConstants.Hidden;
-                    bool noBottom = b.BorderBottomStyle == CssConstants.None || b.BorderBottomStyle == CssConstants.Hidden;
-                    path.Start(r.Left + b.ActualBorderLeftWidth / 2 + (noBottom ? b.ActualCornerSw : 0), r.Bottom - b.ActualBorderBottomWidth / 2 - (noBottom ? 0 : b.ActualCornerSw));
+                    var noTop = cssBox.BorderTopStyle == CssConstants.None || cssBox.BorderTopStyle == CssConstants.Hidden;
+                    var noBottom = cssBox.BorderBottomStyle == CssConstants.None ||
+                                   cssBox.BorderBottomStyle == CssConstants.Hidden;
+                    path.Start (rect.Left + cssBox.ActualBorderLeftWidth / 2 + (noBottom ? cssBox.ActualCornerSw : 0),
+                        rect.Bottom - cssBox.ActualBorderBottomWidth / 2 - (noBottom ? 0 : cssBox.ActualCornerSw));
 
-                    if (b.ActualCornerSw > 0 && noBottom)
-                        path.ArcTo(r.Left + b.ActualBorderLeftWidth / 2, r.Bottom - b.ActualBorderBottomWidth / 2 - b.ActualCornerSw, b.ActualCornerSw, RGraphicsPath.Corner.BottomLeft);
+                    if (cssBox.ActualCornerSw > 0 && noBottom)
+                    {
+                        path.ArcTo (rect.Left + cssBox.ActualBorderLeftWidth / 2,
+                            rect.Bottom - cssBox.ActualBorderBottomWidth / 2 - cssBox.ActualCornerSw, cssBox.ActualCornerSw,
+                            RGraphicsPath.Corner.BottomLeft);
+                    }
 
-                    path.LineTo(r.Left + b.ActualBorderLeftWidth / 2, r.Top + b.ActualBorderTopWidth / 2 + b.ActualCornerNw);
+                    path.LineTo (rect.Left + cssBox.ActualBorderLeftWidth / 2,
+                        rect.Top + cssBox.ActualBorderTopWidth / 2 + cssBox.ActualCornerNw);
 
-                    if (b.ActualCornerNw > 0 && noTop)
-                        path.ArcTo(r.Left + b.ActualBorderLeftWidth / 2 + b.ActualCornerNw, r.Top + b.ActualBorderTopWidth / 2, b.ActualCornerNw, RGraphicsPath.Corner.TopLeft);
+                    if (cssBox.ActualCornerNw > 0 && noTop)
+                    {
+                        path.ArcTo (rect.Left + cssBox.ActualBorderLeftWidth / 2 + cssBox.ActualCornerNw,
+                            rect.Top + cssBox.ActualBorderTopWidth / 2, cssBox.ActualCornerNw, RGraphicsPath.Corner.TopLeft);
+                    }
                 }
+
                 break;
         }
 
@@ -285,91 +381,113 @@ internal static class BordersDrawHandler
     /// <summary>
     /// Get pen to be used for border draw respecting its style.
     /// </summary>
-    private static RPen GetPen(RGraphics g, string style, RColor color, double width)
+    private static RPen GetPen
+        (
+            RGraphics graphics,
+            string style,
+            RColor color,
+            double width
+        )
     {
-        var p = g.GetPen(color);
-        p.Width = width;
+        var result = graphics.GetPen(color);
+        result.Width = width;
         switch (style)
         {
             case "solid":
-                p.DashStyle = RDashStyle.Solid;
+                result.DashStyle = RDashStyle.Solid;
                 break;
+
             case "dotted":
-                p.DashStyle = RDashStyle.Dot;
+                result.DashStyle = RDashStyle.Dot;
                 break;
+
             case "dashed":
-                p.DashStyle = RDashStyle.Dash;
+                result.DashStyle = RDashStyle.Dash;
                 break;
         }
-        return p;
+
+        return result;
     }
 
     /// <summary>
     /// Get the border color for the given box border.
     /// </summary>
-    private static RColor GetColor(Border border, CssBoxProperties box, string style)
+    private static RColor GetColor
+        (
+            Border border,
+            CssBoxProperties box,
+            string style
+        )
     {
-        switch (border)
+        return border switch
         {
-            case Border.Top:
-                return style == CssConstants.Inset ? Darken(box.ActualBorderTopColor) : box.ActualBorderTopColor;
-            case Border.Right:
-                return style == CssConstants.Outset ? Darken(box.ActualBorderRightColor) : box.ActualBorderRightColor;
-            case Border.Bottom:
-                return style == CssConstants.Outset ? Darken(box.ActualBorderBottomColor) : box.ActualBorderBottomColor;
-            case Border.Left:
-                return style == CssConstants.Inset ? Darken(box.ActualBorderLeftColor) : box.ActualBorderLeftColor;
-            default:
-                throw new ArgumentOutOfRangeException("border");
-        }
+            Border.Top => style == CssConstants.Inset
+                ? Darken (box.ActualBorderTopColor)
+                : box.ActualBorderTopColor,
+
+            Border.Right => style == CssConstants.Outset
+                ? Darken (box.ActualBorderRightColor)
+                : box.ActualBorderRightColor,
+
+            Border.Bottom => style == CssConstants.Outset
+                ? Darken (box.ActualBorderBottomColor)
+                : box.ActualBorderBottomColor,
+
+            Border.Left => style == CssConstants.Inset
+                ? Darken (box.ActualBorderLeftColor)
+                : box.ActualBorderLeftColor,
+
+            _ => throw new ArgumentOutOfRangeException (nameof (border))
+        };
     }
 
     /// <summary>
     /// Get the border width for the given box border.
     /// </summary>
-    private static double GetWidth(Border border, CssBoxProperties box)
+    private static double GetWidth
+        (
+            Border border,
+            CssBoxProperties box
+        )
     {
-        switch (border)
+        return border switch
         {
-            case Border.Top:
-                return box.ActualBorderTopWidth;
-            case Border.Right:
-                return box.ActualBorderRightWidth;
-            case Border.Bottom:
-                return box.ActualBorderBottomWidth;
-            case Border.Left:
-                return box.ActualBorderLeftWidth;
-            default:
-                throw new ArgumentOutOfRangeException("border");
-        }
+            Border.Top => box.ActualBorderTopWidth,
+            Border.Right => box.ActualBorderRightWidth,
+            Border.Bottom => box.ActualBorderBottomWidth,
+            Border.Left => box.ActualBorderLeftWidth,
+            _ => throw new ArgumentOutOfRangeException (nameof (border))
+        };
     }
 
     /// <summary>
     /// Get the border style for the given box border.
     /// </summary>
-    private static string GetStyle(Border border, CssBoxProperties box)
+    private static string GetStyle
+        (
+            Border border,
+            CssBoxProperties box
+        )
     {
-        switch (border)
+        return border switch
         {
-            case Border.Top:
-                return box.BorderTopStyle;
-            case Border.Right:
-                return box.BorderRightStyle;
-            case Border.Bottom:
-                return box.BorderBottomStyle;
-            case Border.Left:
-                return box.BorderLeftStyle;
-            default:
-                throw new ArgumentOutOfRangeException("border");
-        }
+            Border.Top => box.BorderTopStyle,
+            Border.Right => box.BorderRightStyle,
+            Border.Bottom => box.BorderBottomStyle,
+            Border.Left => box.BorderLeftStyle,
+            _ => throw new ArgumentOutOfRangeException (nameof (border))
+        };
     }
 
     /// <summary>
     /// Makes the specified color darker for inset/outset borders.
     /// </summary>
-    private static RColor Darken(RColor c)
+    private static RColor Darken
+        (
+            RColor color
+        )
     {
-        return RColor.FromArgb(c.R / 2, c.G / 2, c.B / 2);
+        return RColor.FromArgb (color.R / 2, color.G / 2, color.B / 2);
     }
 
     #endregion
