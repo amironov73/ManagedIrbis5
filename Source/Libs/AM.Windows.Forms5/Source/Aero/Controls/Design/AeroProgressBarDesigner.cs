@@ -50,7 +50,6 @@ internal class AeroProgressBarDesigner
 /// <summary>
 /// Provides an ActionList for the <see cref="AeroProgressBar"/> Control.
 /// </summary>
-/// <seealso cref="AeroSuite.Controls.Design.DesignerActionListBase{AeroSuite.Controls.AeroProgressBar}" />
 internal class AeroProgressBarActionList
     : DesignerActionListBase<AeroProgressBar>
 {
@@ -91,10 +90,10 @@ internal class AeroProgressBarActionList
     /// </value>
     public int Value
     {
-        get => Control.Value;
+        get => Control!.Value;
         set
         {
-            Control.Value = value;
+            Control!.Value = value;
             RefreshControl();
         }
     }
@@ -107,10 +106,10 @@ internal class AeroProgressBarActionList
     /// </value>
     public ProgressBarState State
     {
-        get => Control.State;
+        get => Control!.State;
         set
         {
-            Control.State = value;
+            Control!.State = value;
             RefreshControl();
         }
     }
@@ -123,10 +122,10 @@ internal class AeroProgressBarActionList
     /// </value>
     public ProgressBarStyle Style
     {
-        get => Control.Style;
+        get => Control!.Style;
         set
         {
-            Control.Style = value;
+            Control!.Style = value;
             RefreshControl();
         }
     }

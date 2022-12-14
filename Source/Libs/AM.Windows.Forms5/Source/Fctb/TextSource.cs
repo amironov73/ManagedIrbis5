@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable VirtualMemberCallInConstructor
 
 /* TextSource.cs --
@@ -73,12 +74,15 @@ public class TextSource
 
     #endregion
 
-    readonly protected List<Line?> lines = new();
+    protected readonly List<Line?> lines = new();
 
     protected LinesAccessor linesAccessor;
 
-    int lastLineUniqueId;
+    private int lastLineUniqueId;
 
+    /// <summary>
+    ///
+    /// </summary>
     public CommandManager Manager { get; set; }
 
     SyntaxTextBox _currentTextBox;
@@ -93,7 +97,7 @@ public class TextSource
     /// </summary>
     public SyntaxTextBox CurrentTextBox
     {
-        get { return _currentTextBox; }
+        get => _currentTextBox;
         set
         {
             if (_currentTextBox == value)
@@ -106,14 +110,21 @@ public class TextSource
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public virtual void ClearIsChanged()
     {
         foreach (var line in lines)
         {
-            line.IsChanged = false;
+            line!.IsChanged = false;
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public virtual Line CreateLine()
     {
         return new Line (GenerateUniqueLineId());
@@ -132,6 +143,10 @@ public class TextSource
 
     #region Construction
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="currentTextBox"></param>
     public TextSource (SyntaxTextBox currentTextBox)
     {
         this.CurrentTextBox = currentTextBox;
@@ -152,11 +167,19 @@ public class TextSource
 
     #endregion
 
+    /// <summary>
+    ///
+    /// </summary>
     public virtual void InitDefaultStyle()
     {
         DefaultStyle = new TextStyle (null, null, FontStyle.Regular);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="iLine"></param>
+    /// <returns></returns>
     public virtual bool IsLineLoaded (int iLine)
     {
         return lines[iLine] != null;
@@ -170,16 +193,27 @@ public class TextSource
         return linesAccessor;
     }
 
+    ///<inheritdoc cref="IEnumerable{T}.GetEnumerator"/>
     public IEnumerator<Line> GetEnumerator()
     {
         return lines.GetEnumerator();
     }
 
-    IEnumerator System.Collections.IEnumerable.GetEnumerator()
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    IEnumerator IEnumerable.GetEnumerator()
     {
         return (lines as IEnumerator);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
     public virtual int BinarySearch (Line item, IComparer<Line> comparer)
     {
         return lines.BinarySearch (item, comparer);
@@ -241,6 +275,9 @@ public class TextSource
         RemoveLine (index, 1);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public virtual bool IsNeedBuildRemovedLineIds => LineRemoved != null;
 
     /// <summary>
@@ -298,11 +335,27 @@ public class TextSource
         TextChanged?.Invoke (this, new TextChangedEventArgs (Math.Min (fromLine, toLine), Math.Max (fromLine, toLine)));
     }
 
-    public class TextChangedEventArgs : EventArgs
+    /// <summary>
+    ///
+    /// </summary>
+    public class TextChangedEventArgs
+        : EventArgs
     {
+        /// <summary>
+        ///
+        /// </summary>
         public int iFromLine;
+
+        /// <summary>
+        ///
+        /// </summary>
         public int iToLine;
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="iFromLine"></param>
+        /// <param name="iToLine"></param>
         public TextChangedEventArgs (int iFromLine, int iToLine)
         {
             this.iFromLine = iFromLine;
@@ -310,11 +363,19 @@ public class TextSource
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="args"></param>
     public virtual void NeedRecalc (TextChangedEventArgs args)
     {
         RecalcNeeded?.Invoke (this, args);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="args"></param>
     public virtual void OnRecalcWordWrap (TextChangedEventArgs args)
     {
         RecalcWordWrap?.Invoke (this, args);
@@ -347,8 +408,6 @@ public class TextSource
                 text = string.Empty;
             }
         }
-
-        ;
     }
 
     /// <summary>
@@ -356,7 +415,7 @@ public class TextSource
     /// </summary>
     public virtual int GetLineLength (int index)
     {
-        return lines[index].Count;
+        return lines[index]!.Count;
     }
 
     /// <summary>
@@ -367,7 +426,7 @@ public class TextSource
             int index
         )
     {
-        return !string.IsNullOrEmpty (lines[index].FoldingStartMarker);
+        return !string.IsNullOrEmpty (lines[index]!.FoldingStartMarker);
     }
 
     /// <summary>
@@ -378,9 +437,8 @@ public class TextSource
             int index
         )
     {
-        return !string.IsNullOrEmpty (lines[index].FoldingEndMarker);
+        return !string.IsNullOrEmpty (lines[index]!.FoldingEndMarker);
     }
-
 
     /// <summary>
     /// Сохранение в файл.
@@ -397,10 +455,10 @@ public class TextSource
         using var writer = new StreamWriter (fileName, false, encoding);
         for (var i = 0; i < Count - 1; i++)
         {
-            writer.WriteLine (lines[i].Text);
+            writer.WriteLine (lines[i]!.Text);
         }
 
-        writer.Write (lines[Count - 1].Text);
+        writer.Write (lines[Count - 1]!.Text);
     }
 
     #region IList<T> members
@@ -408,7 +466,7 @@ public class TextSource
     /// <inheritdoc cref="IList{T}.this"/>
     public virtual Line this [int i]
     {
-        get => lines[i];
+        get => lines[i]!;
         set => throw new NotSupportedException();
     }
 

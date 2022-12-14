@@ -5,6 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
 
 /* SyntaxHighlighter.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -467,10 +468,13 @@ public class SyntaxHighlighter
 
     #region IDisposable Members
 
+    /// <inheritdoc cref="IDisposable.Dispose"/>
     public void Dispose()
     {
         foreach (var desc in descByXMLfileNames.Values)
+        {
             desc.Dispose();
+        }
     }
 
     #endregion
@@ -533,8 +537,7 @@ public class SyntaxHighlighter
             TextRange range
         )
     {
-        SyntaxDescriptor? desc = null;
-        if (!descByXMLfileNames.TryGetValue (xmLdescriptionFile, out desc))
+        if (!descByXMLfileNames.TryGetValue (xmLdescriptionFile, out var desc))
         {
             var doc = new XmlDocument();
             var file = xmLdescriptionFile;
@@ -556,44 +559,44 @@ public class SyntaxHighlighter
     /// </summary>
     public virtual void AutoIndentNeeded
         (
-            object sender,
-            AutoIndentEventArgs args
+            object? sender,
+            AutoIndentEventArgs eventArgs
         )
     {
-        var tb = (sender as SyntaxTextBox);
-        var language = tb.Language;
+        var textBox = (SyntaxTextBox) sender!;
+        var language = textBox.Language;
         switch (language)
         {
             case Language.CSharp:
-                CSharpAutoIndentNeeded (sender, args);
+                CSharpAutoIndentNeeded (sender, eventArgs);
                 break;
 
             case Language.VB:
-                VBAutoIndentNeeded (sender, args);
+                VBAutoIndentNeeded (sender, eventArgs);
                 break;
 
             case Language.HTML:
-                HTMLAutoIndentNeeded (sender, args);
+                HTMLAutoIndentNeeded (sender, eventArgs);
                 break;
 
             case Language.XML:
-                XMLAutoIndentNeeded (sender, args);
+                XMLAutoIndentNeeded (sender, eventArgs);
                 break;
 
             case Language.SQL:
-                SQLAutoIndentNeeded (sender, args);
+                SQLAutoIndentNeeded (sender, eventArgs);
                 break;
 
             case Language.PHP:
-                PHPAutoIndentNeeded (sender, args);
+                PHPAutoIndentNeeded (sender, eventArgs);
                 break;
 
             case Language.JS:
-                CSharpAutoIndentNeeded (sender, args);
+                CSharpAutoIndentNeeded (sender, eventArgs);
                 break; //JS like C#
 
             case Language.Lua:
-                LuaAutoIndentNeeded (sender, args);
+                LuaAutoIndentNeeded (sender, eventArgs);
                 break;
         }
     }
@@ -647,11 +650,11 @@ public class SyntaxHighlighter
     /// </summary>
     protected void SQLAutoIndentNeeded
         (
-            object sender,
+            object? sender,
             AutoIndentEventArgs args
         )
     {
-        var tb = sender as SyntaxTextBox;
+        var tb = (SyntaxTextBox) sender!;
         tb.CalcAutoIndentShiftByCodeFolding (sender, args);
     }
 
@@ -660,27 +663,35 @@ public class SyntaxHighlighter
     /// </summary>
     protected void HTMLAutoIndentNeeded
         (
+            object? sender,
+            AutoIndentEventArgs args
+        )
+    {
+        var tb = (SyntaxTextBox) sender!;
+        tb.CalcAutoIndentShiftByCodeFolding (sender, args);
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    protected void XMLAutoIndentNeeded
+        (
             object sender,
             AutoIndentEventArgs args
         )
     {
-        var tb = sender as SyntaxTextBox;
+        var tb = (SyntaxTextBox) sender!;
         tb.CalcAutoIndentShiftByCodeFolding (sender, args);
     }
 
     /// <summary>
     ///
     /// </summary>
-    protected void XMLAutoIndentNeeded (object sender, AutoIndentEventArgs args)
-    {
-        var tb = sender as SyntaxTextBox;
-        tb.CalcAutoIndentShiftByCodeFolding (sender, args);
-    }
-
-    /// <summary>
-    ///
-    /// </summary>
-    protected void VBAutoIndentNeeded (object sender, AutoIndentEventArgs args)
+    protected void VBAutoIndentNeeded
+        (
+            object? sender,
+            AutoIndentEventArgs args
+        )
     {
         //end of block
         if (Regex.IsMatch (args.LineText, @"^\s*(End|EndIf|Next|Loop)\b", RegexOptions.IgnoreCase))
@@ -730,7 +741,11 @@ public class SyntaxHighlighter
     /// <summary>
     ///
     /// </summary>
-    protected void CSharpAutoIndentNeeded (object sender, AutoIndentEventArgs args)
+    protected void CSharpAutoIndentNeeded
+        (
+            object? sender,
+            AutoIndentEventArgs args
+        )
     {
         //block {}
         if (Regex.IsMatch (args.LineText, @"^[^""']*\{.*\}[^""']*$"))
@@ -774,7 +789,6 @@ public class SyntaxHighlighter
             if (!Regex.IsMatch (args.PrevLineText, @"(;\s*$)|(;\s*//)")) //operator is unclosed
             {
                 args.Shift = args.TabLength;
-                return;
             }
         }
     }
@@ -865,9 +879,14 @@ public class SyntaxHighlighter
         }
 
         foreach (XmlNode rule in doc.SelectNodes ("doc/rule")!)
+        {
             desc.rules.Add (ParseRule (rule, styleByName));
+        }
+
         foreach (XmlNode folding in doc.SelectNodes ("doc/folding")!)
+        {
             desc.foldings.Add (ParseFolding (folding));
+        }
 
         return desc;
     }
@@ -877,11 +896,12 @@ public class SyntaxHighlighter
     /// </summary>
     protected static FoldingDesc ParseFolding (XmlNode foldingNode)
     {
-        var folding = new FoldingDesc();
-
-        //regex
-        folding.startMarkerRegex = foldingNode.Attributes!["start"]!.Value;
-        folding.finishMarkerRegex = foldingNode.Attributes["finish"]!.Value;
+        var folding = new FoldingDesc
+        {
+            //regex
+            startMarkerRegex = foldingNode.Attributes!["start"]!.Value,
+            finishMarkerRegex = foldingNode.Attributes["finish"]!.Value
+        };
 
         //options
         var optionsA = foldingNode.Attributes["options"];
@@ -898,8 +918,10 @@ public class SyntaxHighlighter
     /// </summary>
     protected static RuleDesc ParseRule (XmlNode ruleNode, Dictionary<string, Style> styles)
     {
-        var rule = new RuleDesc();
-        rule.pattern = ruleNode.InnerText;
+        var rule = new RuleDesc
+        {
+            pattern = ruleNode.InnerText
+        };
 
         //
         var styleA = ruleNode.Attributes!["style"];
@@ -1011,14 +1033,18 @@ public class SyntaxHighlighter
 
         //highlight syntax
         foreach (var rule in desc.rules)
+        {
             range.SetStyle (rule.style, rule.Regex);
+        }
 
         //clear folding
         range.ClearFoldingMarkers();
 
         //folding markers
         foreach (var folding in desc.foldings)
+        {
             range.SetFoldingMarkers (folding.startMarkerRegex, folding.finishMarkerRegex, folding.options);
+        }
 
         //
         RestoreBrackets (range._textBox, oldBrackets);
@@ -1896,7 +1922,16 @@ public class SyntaxHighlighter
         range.SetFoldingMarkers (@"--\[\[", @"\]\]"); //allow to collapse comment block
     }
 
-    protected void LuaAutoIndentNeeded (object sender, AutoIndentEventArgs args)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="args"></param>
+    protected void LuaAutoIndentNeeded
+        (
+            object? sender,
+            AutoIndentEventArgs args
+        )
     {
         //end of block
         if (Regex.IsMatch (args.LineText, @"^\s*(end|until)\b"))
@@ -2102,14 +2137,53 @@ public class SyntaxHighlighter
 /// </summary>
 public enum Language
 {
+    /// <summary>
+    ///
+    /// </summary>
     Custom,
+
+    /// <summary>
+    ///
+    /// </summary>
     CSharp,
+
+    /// <summary>
+    ///
+    /// </summary>
     VB,
+
+    /// <summary>
+    ///
+    /// </summary>
     HTML,
+
+    /// <summary>
+    ///
+    /// </summary>
     XML,
+
+    /// <summary>
+    ///
+    /// </summary>
     SQL,
+
+    /// <summary>
+    ///
+    /// </summary>
     PHP,
+
+    /// <summary>
+    ///
+    /// </summary>
     JS,
+
+    /// <summary>
+    ///
+    /// </summary>
     Lua,
+
+    /// <summary>
+    ///
+    /// </summary>
     JSON
 }

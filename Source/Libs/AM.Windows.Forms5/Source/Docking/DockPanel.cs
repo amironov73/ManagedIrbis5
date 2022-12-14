@@ -426,6 +426,10 @@ namespace AM.Windows.Forms.Docking
 
         private double m_dockBottomPortion = 0.25;
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
         [LocalizedCategory ("Category_Docking")]
         [LocalizedDescription ("DockPanel_DockBottomPortion_Description")]
         [DefaultValue (0.25)]
@@ -461,6 +465,10 @@ namespace AM.Windows.Forms.Docking
 
         private double m_dockLeftPortion = 0.25;
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
         [LocalizedCategory ("Category_Docking")]
         [LocalizedDescription ("DockPanel_DockLeftPortion_Description")]
         [DefaultValue (0.25)]
@@ -496,6 +504,10 @@ namespace AM.Windows.Forms.Docking
 
         private double m_dockRightPortion = 0.25;
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
         [LocalizedCategory ("Category_Docking")]
         [LocalizedDescription ("DockPanel_DockRightPortion_Description")]
         [DefaultValue (0.25)]
@@ -531,6 +543,10 @@ namespace AM.Windows.Forms.Docking
 
         private double m_dockTopPortion = 0.25;
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
         [LocalizedCategory ("Category_Docking")]
         [LocalizedDescription ("DockPanel_DockTopPortion_Description")]
         [DefaultValue (0.25)]
@@ -564,6 +580,9 @@ namespace AM.Windows.Forms.Docking
             }
         }
 
+        /// <summary>
+        ///
+        /// </summary>
         [Browsable (false)]
         public DockWindowCollection DockWindows => m_dockWindows;
 
@@ -633,6 +652,10 @@ namespace AM.Windows.Forms.Docking
             }
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <returns></returns>
         public IDockContent[] DocumentsToArray()
         {
             var count = DocumentsCount;

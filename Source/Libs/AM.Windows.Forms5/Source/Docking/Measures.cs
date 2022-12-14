@@ -3,18 +3,38 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
 
-/* 
+/* Measures.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 namespace AM.Windows.Forms.Docking;
 
+/// <summary>
+///
+/// </summary>
 public class Measures
 {
+    /// <summary>
+    ///
+    /// </summary>
     public int SplitterSize = 4;
+
+    /// <summary>
+    ///
+    /// </summary>
     public int AutoHideSplitterSize = 4;
+
+    /// <summary>
+    ///
+    /// </summary>
     public int AutoHideTabLineWidth = 6;
+
+    /// <summary>
+    ///
+    /// </summary>
     public int DockPadding { get; set; }
 }
 

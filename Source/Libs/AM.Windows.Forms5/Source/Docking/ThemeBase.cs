@@ -3,8 +3,9 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable UnusedMember.Global
 
-/*
+/* ThemeBase.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,29 +26,54 @@ using System.Windows.Forms;
 
 namespace AM.Windows.Forms.Docking;
 
-public abstract class ThemeBase : Component
+/// <summary>
+///
+/// </summary>
+public abstract class ThemeBase
+    : Component
 {
     private Color _dockBackColor;
     private bool _showAutoHideContentOnHover;
 
+    /// <summary>
+    ///
+    /// </summary>
     protected ThemeBase()
     {
         Extender = new DockPanelExtender();
     }
 
-    public DockPanelSkin Skin { get; protected set; }
+    /// <summary>
+    ///
+    /// </summary>
+    public DockPanelSkin? Skin { get; protected set; }
 
-    public DockPanelColorPalette ColorPalette { get; protected set; }
+    /// <summary>
+    ///
+    /// </summary>
+    public DockPanelColorPalette? ColorPalette { get; protected set; }
 
-    public IImageService ImageService { get; protected set; }
+    /// <summary>
+    ///
+    /// </summary>
+    public IImageService? ImageService { get; protected set; }
 
-    public IPaintingService PaintingService { get; protected set; }
+    /// <summary>
+    ///
+    /// </summary>
+    public IPaintingService? PaintingService { get; protected set; }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected ToolStripRenderer ToolStripRenderer { get; set; }
 
-    private Dictionary<ToolStrip, KeyValuePair<ToolStripRenderMode, ToolStripRenderer>> _stripBefore
-        = new Dictionary<ToolStrip, KeyValuePair<ToolStripRenderMode, ToolStripRenderer>>();
+    private Dictionary<ToolStrip, KeyValuePair<ToolStripRenderMode, ToolStripRenderer>> _stripBefore = new ();
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="toolStrip"></param>
     public void ApplyTo (ToolStrip toolStrip)
     {
         if (toolStrip == null)
@@ -85,17 +111,33 @@ public abstract class ThemeBase : Component
 
     private KeyValuePair<ToolStripManagerRenderMode, ToolStripRenderer> _managerBefore;
 
+    /// <summary>
+    ///
+    /// </summary>
     public void ApplyToToolStripManager()
     {
-        _managerBefore =
-            new KeyValuePair<ToolStripManagerRenderMode, ToolStripRenderer> (ToolStripManager.RenderMode,
-                ToolStripManager.Renderer);
+        _managerBefore = new KeyValuePair<ToolStripManagerRenderMode, ToolStripRenderer>
+            (
+                ToolStripManager.RenderMode,
+                ToolStripManager.Renderer
+            );
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public Measures Measures { get; } = new Measures();
 
+    /// <summary>
+    ///
+    /// </summary>
     public bool ShowAutoHideContentOnHover { get; protected set; } = true;
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="dockPanel"></param>
+    /// <exception cref="InvalidOperationException"></exception>
     public void ApplyTo (DockPanel dockPanel)
     {
         if (Extender.AutoHideStripFactory == null
@@ -152,6 +194,10 @@ public abstract class ThemeBase : Component
         dockPanel.ResetDockWindows();
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="dockPanel"></param>
     public virtual void CleanUp (DockPanel dockPanel)
     {
         if (dockPanel != null)
@@ -195,9 +241,20 @@ public abstract class ThemeBase : Component
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public DockPanelExtender Extender { get; private set; }
 
-    public static byte[] Decompress (byte[] fileToDecompress)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="fileToDecompress"></param>
+    /// <returns></returns>
+    public static byte[] Decompress
+        (
+            byte[] fileToDecompress
+        )
     {
         using (MemoryStream originalFileStream = new MemoryStream (fileToDecompress))
         {

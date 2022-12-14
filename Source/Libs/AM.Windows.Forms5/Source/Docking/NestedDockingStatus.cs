@@ -106,7 +106,7 @@ public sealed class NestedDockingStatus
         Proportion = proportion;
     }
 
-    internal void SetDisplayingStatus (bool isDisplaying, DockPane displayingPreviousPane,
+    internal void SetDisplayingStatus (bool isDisplaying, DockPane? displayingPreviousPane,
         DockAlignment displayingAlignment, double displayingProportion)
     {
         IsDisplaying = isDisplaying;

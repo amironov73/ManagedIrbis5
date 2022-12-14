@@ -44,7 +44,8 @@ namespace AM.Windows.Forms.Dialogs;
 /// </remarks>
 /// <threadsafety static="true" instance="false"/>
 [DefaultEvent ("FileOk"), DefaultProperty ("FileName")]
-public abstract class VistaFileDialog : CommonDialog
+public abstract class VistaFileDialog
+    : CommonDialog
 {
     internal const int HelpButtonId = 0x4001;
 
@@ -376,7 +377,7 @@ public abstract class VistaFileDialog : CommonDialog
                 {
                     if (!string.IsNullOrEmpty (value))
                     {
-                        string[] filterElements = value.Split (new[] { '|' });
+                        var filterElements = value.Split (new[] { '|' });
                         if (filterElements == null || filterElements.Length % 2 != 0)
                         {
                             throw new ArgumentException (Resources.InvalidFilterString);
@@ -642,7 +643,7 @@ public abstract class VistaFileDialog : CommonDialog
     /// dialog is not supported.
     /// </value>
     [Browsable (false)]
-    protected FileDialog DownlevelDialog
+    protected FileDialog? DownlevelDialog
     {
         get { return _downlevelDialog; }
         set
@@ -709,7 +710,7 @@ public abstract class VistaFileDialog : CommonDialog
     /// <returns>If the user clicks the OK button of the dialog that is displayed (e.g. <see cref="VistaOpenFileDialog" />, <see cref="VistaSaveFileDialog" />), <see langword="true" /> is returned; otherwise, <see langword="false" />.</returns>
     public bool? ShowDialog (IntPtr owner)
     {
-        IntPtr ownerHandle = owner == default (IntPtr) ? NativeMethods.GetActiveWindow() : owner;
+        var ownerHandle = owner == default (IntPtr) ? NativeMethods.GetActiveWindow() : owner;
         return RunFileDialog (ownerHandle);
     }
 
@@ -767,7 +768,7 @@ public abstract class VistaFileDialog : CommonDialog
     /// <param name="e">A <see cref="System.ComponentModel.CancelEventArgs" /> that contains the event data.</param>
     protected virtual void OnFileOk (CancelEventArgs e)
     {
-        CancelEventHandler handler = (CancelEventHandler)Events[EventFileOk];
+        var handler = (CancelEventHandler)Events[EventFileOk];
         if (handler != null)
         {
             handler (this, e);
@@ -799,12 +800,12 @@ public abstract class VistaFileDialog : CommonDialog
 
     internal bool PromptUser (string text, MessageBoxButtons buttons, MessageBoxIcon icon)
     {
-        string caption = string.IsNullOrEmpty (_title)
+        var caption = string.IsNullOrEmpty (_title)
             ? (this is VistaOpenFileDialog
                 ? ComDlgResources.LoadString (ComDlgResources.ComDlgResourceId.Open)
                 : ComDlgResources.LoadString (ComDlgResources.ComDlgResourceId.ConfirmSaveAs))
             : _title;
-        IWin32Window owner = _hwndOwner == IntPtr.Zero ? null : new WindowHandleWrapper (_hwndOwner);
+        IWin32Window? owner = _hwndOwner == IntPtr.Zero ? null : new WindowHandleWrapper (_hwndOwner);
         MessageBoxOptions options = 0;
         if (Thread.CurrentThread.CurrentUICulture.TextInfo.IsRightToLeft)
         {
@@ -823,14 +824,14 @@ public abstract class VistaFileDialog : CommonDialog
         // Set the default file name
         if (!(_fileNames == null || _fileNames.Length == 0 || string.IsNullOrEmpty (_fileNames[0])))
         {
-            string parent = Path.GetDirectoryName (_fileNames[0]);
+            var parent = Path.GetDirectoryName (_fileNames[0]);
             if (parent == null || !Directory.Exists (parent))
             {
                 dialog.SetFileName (_fileNames[0]);
             }
             else
             {
-                string folder = Path.GetFileName (_fileNames[0]);
+                var folder = Path.GetFileName (_fileNames[0]);
                 dialog.SetFolder (NativeMethods.CreateItemFromParsingName (parent));
                 dialog.SetFileName (folder);
             }
@@ -840,9 +841,9 @@ public abstract class VistaFileDialog : CommonDialog
         if (!string.IsNullOrEmpty (_filter))
         {
             string[] filterElements = _filter.Split (new[] { '|' });
-            NativeMethods.COMDLG_FILTERSPEC[] filter =
+            var filter =
                 new NativeMethods.COMDLG_FILTERSPEC[filterElements.Length / 2];
-            for (int x = 0; x < filterElements.Length; x += 2)
+            for (var x = 0; x < filterElements.Length; x += 2)
             {
                 filter[x / 2].pszName = filterElements[x];
                 filter[x / 2].pszSpec = filterElements[x + 1];
@@ -865,14 +866,14 @@ public abstract class VistaFileDialog : CommonDialog
         // Initial directory
         if (!string.IsNullOrEmpty (_initialDirectory))
         {
-            IShellItem item = NativeMethods.CreateItemFromParsingName (_initialDirectory);
+            var item = NativeMethods.CreateItemFromParsingName (_initialDirectory);
             dialog.SetDefaultFolder (item);
         }
 
         // ShowHelp
         if (_showHelp)
         {
-            IFileDialogCustomize customize = (IFileDialogCustomize)dialog;
+            var customize = (IFileDialogCustomize)dialog;
             customize.AddPushButton (HelpButtonId, Resources.Help);
         }
 
@@ -895,7 +896,7 @@ public abstract class VistaFileDialog : CommonDialog
     {
         GetResult (dialog);
 
-        CancelEventArgs e = new CancelEventArgs();
+        var e = new CancelEventArgs();
         OnFileOk (e);
         return !e.Cancel;
     }
@@ -907,12 +908,12 @@ public abstract class VistaFileDialog : CommonDialog
     private bool RunFileDialog (IntPtr hwndOwner)
     {
         _hwndOwner = hwndOwner;
-        IFileDialog dialog = null;
+        IFileDialog? dialog = null;
         try
         {
             dialog = CreateFileDialog();
             SetDialogProperties (dialog);
-            int result = dialog.Show (hwndOwner);
+            var result = dialog.Show (hwndOwner);
             if (result < 0)
             {
                 if ((uint)result == (uint)HRESULT.ERROR_CANCELLED)

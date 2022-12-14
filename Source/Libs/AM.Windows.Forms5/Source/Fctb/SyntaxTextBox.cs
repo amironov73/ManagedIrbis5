@@ -133,9 +133,9 @@ public class SyntaxTextBox
         var prov = TypeDescriptor.GetProvider (GetType());
         var theProvider =
             prov.GetType().GetField ("Provider", BindingFlags.NonPublic | BindingFlags.Instance).GetValue (prov);
-        if (theProvider.GetType() != typeof (FCTBDescriptionProvider))
+        if (theProvider.GetType() != typeof (FctbDescriptionProvider))
         {
-            TypeDescriptor.AddProvider (new FCTBDescriptionProvider (GetType()), GetType());
+            TypeDescriptor.AddProvider (new FctbDescriptionProvider (GetType()), GetType());
         }
 
         //drawing optimization
@@ -5644,7 +5644,11 @@ public class SyntaxTextBox
         return needSpaces;
     }
 
-    internal virtual void CalcAutoIndentShiftByCodeFolding (object sender, AutoIndentEventArgs args)
+    internal virtual void CalcAutoIndentShiftByCodeFolding
+        (
+            object? sender,
+            AutoIndentEventArgs args
+        )
     {
         //inset TAB after start folding marker
         if (string.IsNullOrEmpty (lines[args.iLine].FoldingEndMarker) &&
@@ -7785,12 +7789,12 @@ public class SyntaxTextBox
     {
         if (iLine < 0 || iLine >= lines.Count)
         {
-            throw new ArgumentOutOfRangeException ("Line index out of range");
+            throw new ArgumentOutOfRangeException (nameof (iLine), "Line index out of range");
         }
 
         if (string.IsNullOrEmpty (lines[iLine].FoldingStartMarker))
         {
-            throw new ArgumentOutOfRangeException ("This line is not folding start line");
+            throw new ArgumentOutOfRangeException (nameof (iLine), "This line is not folding start line");
         }
 
         //find end of block

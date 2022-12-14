@@ -4,7 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable VirtualMemberCallInConstructor
 
 /* SelectedEventArgs.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -13,7 +12,6 @@
 #region Using directives
 
 using System;
-using System.Drawing;
 
 #endregion
 
@@ -21,9 +19,23 @@ using System.Drawing;
 
 namespace Fctb;
 
+/// <summary>
+///
+/// </summary>
 public sealed class SelectedEventArgs
     : EventArgs
 {
-    public AutocompleteItem Item { get; internal set; }
-    public SyntaxTextBox Tb { get; set; }
+    #region Properties
+
+    /// <summary>
+    ///
+    /// </summary>
+    public AutocompleteItem? Item { get; internal set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public SyntaxTextBox? Tb { get; set; }
+
+    #endregion
 }

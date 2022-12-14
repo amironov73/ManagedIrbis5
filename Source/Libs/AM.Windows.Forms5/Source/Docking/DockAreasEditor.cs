@@ -4,7 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,56 +23,57 @@ using System.Windows.Forms.Design;
 
 namespace AM.Windows.Forms.Docking;
 
-internal class DockAreasEditor : UITypeEditor
+internal class DockAreasEditor
+    : UITypeEditor
 {
-    private class DockAreasEditorControl : System.Windows.Forms.UserControl
+    private class DockAreasEditorControl : UserControl
     {
-        private CheckBox checkBoxFloat;
-        private CheckBox checkBoxDockLeft;
-        private CheckBox checkBoxDockRight;
-        private CheckBox checkBoxDockTop;
-        private CheckBox checkBoxDockBottom;
-        private CheckBox checkBoxDockFill;
-        private DockAreas m_oldDockAreas;
+        private readonly CheckBox _checkBoxFloat;
+        private readonly CheckBox _checkBoxDockLeft;
+        private readonly CheckBox _checkBoxDockRight;
+        private readonly CheckBox _checkBoxDockTop;
+        private readonly CheckBox _checkBoxDockBottom;
+        private readonly CheckBox _checkBoxDockFill;
+        private DockAreas _mOldDockAreas;
 
         public DockAreas DockAreas
         {
             get
             {
                 DockAreas dockAreas = 0;
-                if (checkBoxFloat.Checked)
+                if (_checkBoxFloat.Checked)
                 {
                     dockAreas |= DockAreas.Float;
                 }
 
-                if (checkBoxDockLeft.Checked)
+                if (_checkBoxDockLeft.Checked)
                 {
                     dockAreas |= DockAreas.DockLeft;
                 }
 
-                if (checkBoxDockRight.Checked)
+                if (_checkBoxDockRight.Checked)
                 {
                     dockAreas |= DockAreas.DockRight;
                 }
 
-                if (checkBoxDockTop.Checked)
+                if (_checkBoxDockTop.Checked)
                 {
                     dockAreas |= DockAreas.DockTop;
                 }
 
-                if (checkBoxDockBottom.Checked)
+                if (_checkBoxDockBottom.Checked)
                 {
                     dockAreas |= DockAreas.DockBottom;
                 }
 
-                if (checkBoxDockFill.Checked)
+                if (_checkBoxDockFill.Checked)
                 {
                     dockAreas |= DockAreas.Document;
                 }
 
                 if (dockAreas == 0)
                 {
-                    return m_oldDockAreas;
+                    return _mOldDockAreas;
                 }
                 else
                 {
@@ -83,121 +84,117 @@ internal class DockAreasEditor : UITypeEditor
 
         public DockAreasEditorControl()
         {
-            checkBoxFloat = new CheckBox();
-            checkBoxDockLeft = new CheckBox();
-            checkBoxDockRight = new CheckBox();
-            checkBoxDockTop = new CheckBox();
-            checkBoxDockBottom = new CheckBox();
-            checkBoxDockFill = new CheckBox();
+            _checkBoxFloat = new CheckBox();
+            _checkBoxDockLeft = new CheckBox();
+            _checkBoxDockRight = new CheckBox();
+            _checkBoxDockTop = new CheckBox();
+            _checkBoxDockBottom = new CheckBox();
+            _checkBoxDockFill = new CheckBox();
 
             SuspendLayout();
 
-            checkBoxFloat.Appearance = Appearance.Button;
-            checkBoxFloat.Dock = DockStyle.Top;
-            checkBoxFloat.Height = 24;
-            checkBoxFloat.Text = Strings.DockAreaEditor_FloatCheckBoxText;
-            checkBoxFloat.TextAlign = ContentAlignment.MiddleCenter;
-            checkBoxFloat.FlatStyle = FlatStyle.System;
+            _checkBoxFloat.Appearance = Appearance.Button;
+            _checkBoxFloat.Dock = DockStyle.Top;
+            _checkBoxFloat.Height = 24;
+            _checkBoxFloat.Text = Strings.DockAreaEditor_FloatCheckBoxText;
+            _checkBoxFloat.TextAlign = ContentAlignment.MiddleCenter;
+            _checkBoxFloat.FlatStyle = FlatStyle.System;
 
-            checkBoxDockLeft.Appearance = System.Windows.Forms.Appearance.Button;
-            checkBoxDockLeft.Dock = System.Windows.Forms.DockStyle.Left;
-            checkBoxDockLeft.Width = 24;
-            checkBoxDockLeft.FlatStyle = FlatStyle.System;
+            _checkBoxDockLeft.Appearance = Appearance.Button;
+            _checkBoxDockLeft.Dock = DockStyle.Left;
+            _checkBoxDockLeft.Width = 24;
+            _checkBoxDockLeft.FlatStyle = FlatStyle.System;
 
-            checkBoxDockRight.Appearance = System.Windows.Forms.Appearance.Button;
-            checkBoxDockRight.Dock = System.Windows.Forms.DockStyle.Right;
-            checkBoxDockRight.Width = 24;
-            checkBoxDockRight.FlatStyle = FlatStyle.System;
+            _checkBoxDockRight.Appearance = Appearance.Button;
+            _checkBoxDockRight.Dock = DockStyle.Right;
+            _checkBoxDockRight.Width = 24;
+            _checkBoxDockRight.FlatStyle = FlatStyle.System;
 
-            checkBoxDockTop.Appearance = System.Windows.Forms.Appearance.Button;
-            checkBoxDockTop.Dock = System.Windows.Forms.DockStyle.Top;
-            checkBoxDockTop.Height = 24;
-            checkBoxDockTop.FlatStyle = FlatStyle.System;
+            _checkBoxDockTop.Appearance = Appearance.Button;
+            _checkBoxDockTop.Dock = DockStyle.Top;
+            _checkBoxDockTop.Height = 24;
+            _checkBoxDockTop.FlatStyle = FlatStyle.System;
 
-            checkBoxDockBottom.Appearance = System.Windows.Forms.Appearance.Button;
-            checkBoxDockBottom.Dock = System.Windows.Forms.DockStyle.Bottom;
-            checkBoxDockBottom.Height = 24;
-            checkBoxDockBottom.FlatStyle = FlatStyle.System;
+            _checkBoxDockBottom.Appearance = Appearance.Button;
+            _checkBoxDockBottom.Dock = DockStyle.Bottom;
+            _checkBoxDockBottom.Height = 24;
+            _checkBoxDockBottom.FlatStyle = FlatStyle.System;
 
-            checkBoxDockFill.Appearance = System.Windows.Forms.Appearance.Button;
-            checkBoxDockFill.Dock = System.Windows.Forms.DockStyle.Fill;
-            checkBoxDockFill.FlatStyle = FlatStyle.System;
+            _checkBoxDockFill.Appearance = Appearance.Button;
+            _checkBoxDockFill.Dock = DockStyle.Fill;
+            _checkBoxDockFill.FlatStyle = FlatStyle.System;
 
-            this.Controls.AddRange (new Control[]
+            Controls.AddRange (new Control[]
             {
-                checkBoxDockFill,
-                checkBoxDockBottom,
-                checkBoxDockTop,
-                checkBoxDockRight,
-                checkBoxDockLeft,
-                checkBoxFloat
+                _checkBoxDockFill,
+                _checkBoxDockBottom,
+                _checkBoxDockTop,
+                _checkBoxDockRight,
+                _checkBoxDockLeft,
+                _checkBoxFloat
             });
 
-            Size = new System.Drawing.Size (160, 144);
+            Size = new Size (160, 144);
             BackColor = SystemColors.Control;
             ResumeLayout();
         }
 
         public void SetStates (DockAreas dockAreas)
         {
-            m_oldDockAreas = dockAreas;
+            _mOldDockAreas = dockAreas;
             if ((dockAreas & DockAreas.DockLeft) != 0)
             {
-                checkBoxDockLeft.Checked = true;
+                _checkBoxDockLeft.Checked = true;
             }
 
             if ((dockAreas & DockAreas.DockRight) != 0)
             {
-                checkBoxDockRight.Checked = true;
+                _checkBoxDockRight.Checked = true;
             }
 
             if ((dockAreas & DockAreas.DockTop) != 0)
             {
-                checkBoxDockTop.Checked = true;
+                _checkBoxDockTop.Checked = true;
             }
 
             if ((dockAreas & DockAreas.DockTop) != 0)
             {
-                checkBoxDockTop.Checked = true;
+                _checkBoxDockTop.Checked = true;
             }
 
             if ((dockAreas & DockAreas.DockBottom) != 0)
             {
-                checkBoxDockBottom.Checked = true;
+                _checkBoxDockBottom.Checked = true;
             }
 
             if ((dockAreas & DockAreas.Document) != 0)
             {
-                checkBoxDockFill.Checked = true;
+                _checkBoxDockFill.Checked = true;
             }
 
             if ((dockAreas & DockAreas.Float) != 0)
             {
-                checkBoxFloat.Checked = true;
+                _checkBoxFloat.Checked = true;
             }
         }
     }
 
-    private DockAreasEditor.DockAreasEditorControl m_ui = null;
+    private DockAreasEditorControl? _ui;
 
-    public override UITypeEditorEditStyle GetEditStyle (ITypeDescriptorContext context)
+    public override UITypeEditorEditStyle GetEditStyle (ITypeDescriptorContext? context)
     {
         return UITypeEditorEditStyle.DropDown;
     }
 
-    public override object EditValue (ITypeDescriptorContext context, IServiceProvider provider, object value)
+    public override object EditValue (ITypeDescriptorContext? context, IServiceProvider provider, object? value)
     {
-        if (m_ui == null)
-        {
-            m_ui = new DockAreasEditor.DockAreasEditorControl();
-        }
+        _ui ??= new DockAreasEditorControl();
 
-        m_ui.SetStates ((DockAreas)value);
+        _ui.SetStates ((DockAreas) value!);
 
-        IWindowsFormsEditorService edSvc =
-            (IWindowsFormsEditorService)provider.GetService (typeof (IWindowsFormsEditorService));
-        edSvc.DropDownControl (m_ui);
+        IWindowsFormsEditorService edSvc = (IWindowsFormsEditorService)provider.GetService (typeof (IWindowsFormsEditorService))!;
+        edSvc.DropDownControl (_ui);
 
-        return m_ui.DockAreas;
+        return _ui.DockAreas;
     }
 }

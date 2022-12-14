@@ -4,7 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
-/* 
+/* LayoutUtils.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -18,9 +18,20 @@ using System.Drawing;
 
 namespace AM.Windows.Forms.Docking;
 
+/// <summary>
+///
+/// </summary>
 public static class LayoutUtils
 {
-    public static bool IsZeroWidthOrHeight (Rectangle rectangle)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="rectangle"></param>
+    /// <returns></returns>
+    public static bool IsZeroWidthOrHeight
+        (
+            Rectangle rectangle
+        )
     {
         return (rectangle.Width == 0 || rectangle.Height == 0);
     }

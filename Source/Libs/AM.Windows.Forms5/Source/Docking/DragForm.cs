@@ -4,7 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
-/* 
+/* DragForm.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -39,8 +39,16 @@ namespace AM.Windows.Forms.Docking;
 // achieve this (don't know why, spent hours to try it out :( ):
 //  1. Enabled = false;
 //  2. WM_NCHITTEST returns HTTRANSPARENT
-public class DragForm : Form
+
+/// <summary>
+///
+/// </summary>
+public class DragForm
+    : Form
 {
+    /// <summary>
+    ///
+    /// </summary>
     public DragForm()
     {
         FormBorderStyle = FormBorderStyle.None;
@@ -57,8 +65,12 @@ public class DragForm : Form
         };
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public Color? BackgroundColor { get; set; }
 
+    /// <inheritdoc cref="Form.CreateParams"/>
     protected override CreateParams CreateParams
     {
         get
@@ -70,6 +82,7 @@ public class DragForm : Form
         }
     }
 
+    /// <inheritdoc cref="Form.WndProc"/>
     protected override void WndProc (ref Message m)
     {
         if (m.Msg == (int)Win32.Msgs.WM_NCHITTEST)
@@ -81,6 +94,7 @@ public class DragForm : Form
         base.WndProc (ref m);
     }
 
+    /// <inheritdoc cref="Form.OnPaint"/>
     protected override void OnPaint (PaintEventArgs e)
     {
         base.OnPaint (e);
@@ -90,7 +104,7 @@ public class DragForm : Form
         }
 
         var all = ClientRectangle;
-        if (all.Width > 10 && all.Height > 10)
+        if (all is { Width: > 10, Height: > 10 })
         {
             var newLocation = new Point (all.Location.X + 5, all.Location.Y + 5);
             var newSize = new Size (all.Width - 10, all.Height - 10);
@@ -100,11 +114,13 @@ public class DragForm : Form
     }
 
     //The form can be still activated by explicity calling Activate
-    protected override bool ShowWithoutActivation
-    {
-        get { return true; }
-    }
+    /// <inheritdoc cref="Form.ShowWithoutActivation"/>
+    protected override bool ShowWithoutActivation => true;
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="bActivate"></param>
     public virtual void Show (bool bActivate)
     {
         Show();

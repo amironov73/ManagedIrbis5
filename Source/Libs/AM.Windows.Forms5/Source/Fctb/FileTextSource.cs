@@ -339,7 +339,7 @@ public class FileTextSource
 
         //create temp file
         var dir = Path.GetDirectoryName (fileName);
-        var tempFileName = Path.Combine (dir, Path.GetFileNameWithoutExtension (fileName) + ".tmp");
+        var tempFileName = Path.Combine (dir!, Path.GetFileNameWithoutExtension (fileName) + ".tmp");
 
         var sr = new StreamReader (_stream!, _encoding);
         using (var tempFs = new FileStream (tempFileName, FileMode.Create))
@@ -356,22 +356,15 @@ public class FileTextSource
 
                 var lineIsChanged = lines[i] != null && lines[i]!.IsChanged;
 
-                if (lineIsChanged)
-                {
-                    line = lines[i]!.Text;
-                }
-                else
-                {
-                    line = sourceLine;
-                }
+                line = lineIsChanged ? lines[i]!.Text : sourceLine;
 
                 //call event handler
                 if (LinePushed != null)
                 {
-                    var args = new LinePushedEventArgs (sourceLine, i, lineIsChanged ? line : null);
+                    var args = new LinePushedEventArgs (sourceLine, i, lineIsChanged ? line : null!);
                     LinePushed (this, args);
 
-                    if (args.SavedText != null)
+                    if (args.SavedText != null!)
                     {
                         line = args.SavedText;
                     }
@@ -419,17 +412,16 @@ public class FileTextSource
 
     private string ReadLine (StreamReader sr, int i)
     {
-        string line;
         var filePos = _sourceFileLinePositions[i];
         if (filePos < 0)
         {
             return "";
         }
 
-        _stream.Seek (filePos, SeekOrigin.Begin);
+        _stream!.Seek (filePos, SeekOrigin.Begin);
         sr.DiscardBufferedData();
-        line = sr.ReadLine();
-        return line;
+        var line = sr.ReadLine();
+        return line!;
     }
 
     /// <summary>
@@ -471,11 +463,7 @@ public class FileTextSource
         _stream!.Seek (_sourceFileLinePositions[i], SeekOrigin.Begin);
         var sr = new StreamReader (_stream, _encoding);
 
-        var s = sr.ReadLine();
-        if (s == null)
-        {
-            s = "";
-        }
+        var s = sr.ReadLine() ?? "";
 
         //call event handler
         if (LineNeeded != null)
@@ -483,7 +471,7 @@ public class FileTextSource
             var args = new LineNeededEventArgs (s, i);
             LineNeeded (this, args);
             s = args.DisplayedLineText;
-            if (s == null)
+            if (s == null!)
             {
                 return;
             }
@@ -528,7 +516,7 @@ public class FileTextSource
         }
         else
         {
-            return lines[index].Count;
+            return lines[index]!.Count;
         }
     }
 

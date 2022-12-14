@@ -20,6 +20,8 @@ using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
+using AM;
+
 #endregion
 
 #nullable enable
@@ -30,7 +32,7 @@ namespace AeroSuite.Forms;
 /// A <see cref="Form"/> base class which allows the creation of borderless
 /// windows which supports AeroSnap, AeroPeek, the system window context menu,
 /// optionally an Aero shadow, all of Windows' window animations and even
-/// windows-like dragging & resizing in specified areas.
+/// windows-like dragging &amp; resizing in specified areas.
 /// </summary>
 /// <remarks>
 /// The various features of this borderless form are implemented by using
@@ -206,6 +208,7 @@ public class BorderlessForm
                 else
                 {
                     var margins = new Margins { BottomHeight = 0, LeftWidth = 0, RightWidth = 0, TopHeight = 0 };
+                    margins.NotUsed();
                 }
             }
         }

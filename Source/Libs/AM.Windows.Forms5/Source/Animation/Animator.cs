@@ -96,7 +96,7 @@ public class Animator : Component, IExtenderProvider
     /// Default animation
     /// </summary>
     [TypeConverter (typeof (ExpandableObjectConverter))]
-    public Animation DefaultAnimation { get; set; }
+    public Animation? DefaultAnimation { get; set; }
 
     /// <summary>
     /// Cursor of animated control
@@ -121,18 +121,18 @@ public class Animator : Component, IExtenderProvider
     [DefaultValue (10)]
     public int Interval { get; set; }
 
-    AnimationType animationType;
+    private AnimationType _animationType;
 
     /// <summary>
     /// Type of built-in animation
     /// </summary>
     public AnimationType AnimationType
     {
-        get { return animationType; }
+        get => _animationType;
         set
         {
-            animationType = value;
-            InitDefaultAnimation (animationType);
+            _animationType = value;
+            InitDefaultAnimation (_animationType);
         }
     }
 
@@ -163,6 +163,9 @@ public class Animator : Component, IExtenderProvider
 
     #endregion
 
+    /// <summary>
+    ///
+    /// </summary>
     protected virtual void Init()
     {
         DefaultAnimation = new Animation();
@@ -170,7 +173,7 @@ public class Animator : Component, IExtenderProvider
         TimeStep = 0.02f;
         Interval = 10;
 
-        Disposed += new EventHandler (Animator_Disposed);
+        Disposed += Animator_Disposed;
 
         //main working thread
         _thread = new Thread (Work);
@@ -178,13 +181,17 @@ public class Animator : Component, IExtenderProvider
         _thread.Start();
     }
 
-    void Animator_Disposed (object sender, EventArgs e)
+    private void Animator_Disposed
+        (
+            object? sender,
+            EventArgs eventArgs
+        )
     {
         ClearQueue();
         _thread.Abort();
     }
 
-    void Work()
+    private void Work()
     {
         while (true)
         {
@@ -232,21 +239,26 @@ public class Animator : Component, IExtenderProvider
                     if (!wasActive)
                     {
                         foreach (var item in queue)
+                        {
                             if (!item.IsActive)
                             {
                                 actived.Add (item);
                                 item.IsActive = true;
                                 break;
                             }
+                        }
                     }
                 }
 
                 //completed
                 foreach (var item in completed)
+                {
                     OnCompleted (item);
+                }
 
                 //build next frame of DoubleBitmap
                 foreach (var item in actived)
+                {
                     try
                     {
                         //build next frame of DoubleBitmap
@@ -257,6 +269,7 @@ public class Animator : Component, IExtenderProvider
                         //we can not start animation, remove from queue
                         OnCompleted (item);
                     }
+                }
 
                 if (count == 0)
                 {
@@ -286,6 +299,7 @@ public class Animator : Component, IExtenderProvider
         {
             var dict = new Dictionary<Control, QueueItem>();
             foreach (var item in _requests)
+            {
                 if (item.control != null)
                 {
                     if (dict.ContainsKey (item.control))
@@ -299,6 +313,7 @@ public class Animator : Component, IExtenderProvider
                 {
                     toRemove.Add (item);
                 }
+            }
 
             foreach (var item in dict.Values)
             {
@@ -313,11 +328,13 @@ public class Animator : Component, IExtenderProvider
             }
 
             foreach (var item in toRemove)
+            {
                 _requests.Remove (item);
+            }
         }
     }
 
-    bool IsStateOK (Control control, AnimateMode mode)
+    private bool IsStateOK (Control control, AnimateMode mode)
     {
         switch (mode)
         {
@@ -328,7 +345,7 @@ public class Animator : Component, IExtenderProvider
         return true;
     }
 
-    void RepairState (Control control, AnimateMode mode)
+    private void RepairState (Control control, AnimateMode mode)
     {
         control.BeginInvoke (new MethodInvoker (() =>
         {
@@ -520,12 +537,13 @@ public class Animator : Component, IExtenderProvider
     {
         AddToQueue (control, AnimateMode.BeginUpdate, parallel, animation, clipRectangle);
 
-        bool wait = false;
+        var wait = false;
         do
         {
             wait = false;
             lock (queue)
                 foreach (var item in queue)
+                {
                     if (item.control == control && item.mode == AnimateMode.BeginUpdate)
                     {
                         if (item.controller == null)
@@ -533,6 +551,7 @@ public class Animator : Component, IExtenderProvider
                             wait = true;
                         }
                     }
+                }
 
             if (wait)
             {
@@ -550,11 +569,13 @@ public class Animator : Component, IExtenderProvider
         lock (queue)
         {
             foreach (var item in queue)
+            {
                 if (item.control == control && item.mode == AnimateMode.BeginUpdate)
                 {
                     item.controller.EndUpdate();
                     item.mode = AnimateMode.Update;
                 }
+            }
         }
     }
 
@@ -590,14 +611,16 @@ public class Animator : Component, IExtenderProvider
     {
         while (true)
         {
-            bool flag = false;
+            var flag = false;
             lock (queue)
                 foreach (var item in queue)
+                {
                     if (item.control == animatedControl)
                     {
                         flag = true;
                         break;
                     }
+                }
 
             if (!flag)
             {
@@ -608,9 +631,9 @@ public class Animator : Component, IExtenderProvider
         }
     }
 
-    readonly List<QueueItem> _requests = new ();
+    private readonly List<QueueItem> _requests = new ();
 
-    void OnCompleted
+    private void OnCompleted
         (
             QueueItem item
         )
@@ -701,7 +724,7 @@ public class Animator : Component, IExtenderProvider
         return controller;
     }
 
-    void OnFramePainted (object sender, PaintEventArgs e)
+    private void OnFramePainted (object sender, PaintEventArgs e)
     {
         if (FramePainted != null)
         {
@@ -729,27 +752,45 @@ public class Animator : Component, IExtenderProvider
         }
     }
 
-    protected virtual void OnNonLinearTransformNeeded (object sender, NonLinearTransfromNeededEventArg e)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="eventArg"></param>
+    protected virtual void OnNonLinearTransformNeeded
+        (
+            object? sender,
+            NonLinearTransfromNeededEventArg eventArg
+        )
     {
         if (NonLinearTransfromNeeded != null)
         {
-            NonLinearTransfromNeeded (this, e);
+            NonLinearTransfromNeeded (this, eventArg);
         }
         else
         {
-            e.UseDefaultTransform = true;
+            eventArg.UseDefaultTransform = true;
         }
     }
 
-    protected virtual void OnTransformNeeded (object sender, TransfromNeededEventArg e)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="eventArg"></param>
+    protected virtual void OnTransformNeeded
+        (
+            object? sender,
+            TransfromNeededEventArg eventArg
+        )
     {
         if (TransfromNeeded != null)
         {
-            TransfromNeeded (this, e);
+            TransfromNeeded (this, eventArg);
         }
         else
         {
-            e.UseDefaultMatrix = true;
+            eventArg.UseDefaultMatrix = true;
         }
     }
 
@@ -777,6 +818,7 @@ public class Animator : Component, IExtenderProvider
                         case AnimateMode.Hide:
                             item.control.Visible = false;
                             break;
+
                         case AnimateMode.Show:
                             item.control.Visible = true;
                             break;
@@ -809,20 +851,52 @@ public class Animator : Component, IExtenderProvider
 
     #region Nested type: QueueItem
 
+    /// <summary>
+    ///
+    /// </summary>
     protected class QueueItem
     {
-        public Animation animation;
-        public AnimationController controller;
-        public Control control;
+        /// <summary>
+        ///
+        /// </summary>
+        public Animation? animation;
+
+        /// <summary>
+        ///
+        /// </summary>
+        public AnimationController? controller;
+
+        /// <summary>
+        ///
+        /// </summary>
+        public Control? control;
+
+        /// <summary>
+        ///
+        /// </summary>
         public DateTime ActivateTime { get; private set; }
+
+        /// <summary>
+        ///
+        /// </summary>
         public AnimateMode mode;
+
+        /// <summary>
+        ///
+        /// </summary>
         public Rectangle clipRectangle;
 
+        /// <summary>
+        ///
+        /// </summary>
         public bool isActive;
 
+        /// <summary>
+        ///
+        /// </summary>
         public bool IsActive
         {
-            get { return isActive; }
+            get => isActive;
             set
             {
                 if (isActive == value)
@@ -838,10 +912,11 @@ public class Animator : Component, IExtenderProvider
             }
         }
 
+        /// <inheritdoc cref="object.ToString"/>
         public override string ToString()
         {
-            StringBuilder sb = new StringBuilder();
-            if (control != null)
+            var sb = new StringBuilder();
+            if (control != null!)
             {
                 sb.Append (control.GetType().Name + " ");
             }
@@ -855,11 +930,16 @@ public class Animator : Component, IExtenderProvider
 
     #region IExtenderProvider
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="control"></param>
+    /// <returns></returns>
     public DecorationType GetDecoration (Control control)
     {
-        if (DecorationByControls.ContainsKey (control))
+        if (_decorationByControls.ContainsKey (control))
         {
-            return DecorationByControls[control].DecorationType;
+            return _decorationByControls[control].DecorationType;
         }
         else
         {
@@ -867,9 +947,20 @@ public class Animator : Component, IExtenderProvider
         }
     }
 
-    public void SetDecoration (Control control, DecorationType decoration)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="control"></param>
+    /// <param name="decoration"></param>
+    public void SetDecoration
+        (
+            Control control,
+            DecorationType decoration
+        )
     {
-        var wrapper = DecorationByControls.ContainsKey (control) ? DecorationByControls[control] : null;
+        var wrapper = _decorationByControls.ContainsKey (control)
+            ? _decorationByControls[control]
+            : null;
         if (decoration == DecorationType.None)
         {
             if (wrapper != null)
@@ -877,7 +968,7 @@ public class Animator : Component, IExtenderProvider
                 wrapper.Dispose();
             }
 
-            DecorationByControls.Remove (control);
+            _decorationByControls.Remove (control);
         }
         else
         {
@@ -887,13 +978,17 @@ public class Animator : Component, IExtenderProvider
             }
 
             wrapper.DecorationType = decoration;
-            DecorationByControls[control] = wrapper;
+            _decorationByControls[control] = wrapper;
         }
     }
 
-    private readonly Dictionary<Control, DecorationControl> DecorationByControls =
-        new Dictionary<Control, DecorationControl>();
+    private readonly Dictionary<Control, DecorationControl> _decorationByControls = new ();
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="extendee"></param>
+    /// <returns></returns>
     public bool CanExtend (object extendee)
     {
         return extendee is Control;
@@ -902,62 +997,188 @@ public class Animator : Component, IExtenderProvider
     #endregion
 }
 
+/// <summary>
+///
+/// </summary>
 public enum DecorationType
 {
+    /// <summary>
+    ///
+    /// </summary>
     None,
+
+    /// <summary>
+    ///
+    /// </summary>
     BottomMirror,
+
+    /// <summary>
+    ///
+    /// </summary>
     Custom
 }
 
-
+/// <summary>
+///
+/// </summary>
 public class AnimationCompletedEventArg
     : EventArgs
 {
-    public Animation Animation { get; set; }
-    public Control Control { get; internal set; }
+    /// <summary>
+    ///
+    /// </summary>
+    public Animation? Animation { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public Control? Control { get; internal set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public AnimateMode Mode { get; internal set; }
 }
 
-public class TransfromNeededEventArg : EventArgs
+/// <summary>
+///
+/// </summary>
+public class TransfromNeededEventArg
+    : EventArgs
 {
+    /// <summary>
+    ///
+    /// </summary>
     public TransfromNeededEventArg()
     {
         Matrix = new Matrix (1, 0, 0, 1, 0, 0);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public Matrix Matrix { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public float CurrentTime { get; internal set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public Rectangle ClientRectangle { get; internal set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public Rectangle ClipRectangle { get; internal set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public Animation Animation { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public Control Control { get; internal set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public AnimateMode Mode { get; internal set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public bool UseDefaultMatrix { get; set; }
 }
 
-public class NonLinearTransfromNeededEventArg : EventArgs
+/// <summary>
+///
+/// </summary>
+public class NonLinearTransfromNeededEventArg
+    : EventArgs
 {
+    /// <summary>
+    ///
+    /// </summary>
     public float CurrentTime { get; internal set; }
 
+    /// <summary>
+    ///
+    /// </summary>
     public Rectangle ClientRectangle { get; internal set; }
-    public byte[] Pixels { get; internal set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public byte[]? Pixels { get; internal set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public int Stride { get; internal set; }
 
+    /// <summary>
+    ///
+    /// </summary>
     public Rectangle SourceClientRectangle { get; internal set; }
-    public byte[] SourcePixels { get; internal set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public byte[]? SourcePixels { get; internal set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public int SourceStride { get; set; }
 
-    public Animation Animation { get; set; }
-    public Control Control { get; internal set; }
+    /// <summary>
+    ///
+    /// </summary>
+    public Animation? Animation { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public Control? Control { get; internal set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public AnimateMode Mode { get; internal set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public bool UseDefaultTransform { get; set; }
 }
 
-
+/// <summary>
+///
+/// </summary>
 public enum AnimateMode
 {
+    /// <summary>
+    ///
+    /// </summary>
     Show,
+
+    /// <summary>
+    ///
+    /// </summary>
     Hide,
+
+    /// <summary>
+    ///
+    /// </summary>
     Update,
+
+    /// <summary>
+    ///
+    /// </summary>
     BeginUpdate
 }

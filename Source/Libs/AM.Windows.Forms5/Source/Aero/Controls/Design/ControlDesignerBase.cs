@@ -43,14 +43,14 @@ public abstract class ControlDesignerBase<TControl>
         )
     {
         base.Initialize (component);
-        InitializeInternal (component as TControl);
+        InitializeInternal ((component as TControl)!);
     }
 
     /// <summary>
     /// Initializes the control designer with the specified target control.
     /// </summary>
     /// <param name="target">The target control.</param>
-    protected abstract void InitializeInternal (TControl? target);
+    protected abstract void InitializeInternal (TControl target);
 
     /// <summary>
     /// Returns the <see cref="Control"/> this control designer instance is targeted at.
@@ -84,15 +84,15 @@ public abstract class ControlDesignerBase<TControl>
     /// </value>
     public DesignerActionList? ActionList { get; set; }
 
-    private SelectionRules selectionRules = SelectionRules.AllSizeable | SelectionRules.Moveable;
+    private SelectionRules _selectionRules = SelectionRules.AllSizeable | SelectionRules.Moveable;
 
     /// <summary>
     /// Gets or sets the selection rules that indicate the movement capabilities of a component.
     /// </summary>
     public SelectionRules MainSelectionRules
     {
-        get => selectionRules;
-        set => selectionRules = value;
+        get => _selectionRules;
+        set => _selectionRules = value;
     }
 
     /// <summary>
@@ -101,5 +101,5 @@ public abstract class ControlDesignerBase<TControl>
     /// <value>
     /// The selection rules.
     /// </value>
-    public override SelectionRules SelectionRules => selectionRules;
+    public override SelectionRules SelectionRules => _selectionRules;
 }

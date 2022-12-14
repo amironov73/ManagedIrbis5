@@ -4,7 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
-/* 
+/* DrawingRoutines.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,14 +19,33 @@ using System.Drawing.Drawing2D;
 
 namespace AM.Windows.Forms.Docking;
 
+/// <summary>
+///
+/// </summary>
 public static class DrawingRoutines
 {
-    public static void SafelyDrawLinearGradient (this Rectangle rectangle, Color startColor, Color endColor,
-        LinearGradientMode mode, Graphics graphics, Blend blend = null)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="rectangle"></param>
+    /// <param name="startColor"></param>
+    /// <param name="endColor"></param>
+    /// <param name="mode"></param>
+    /// <param name="graphics"></param>
+    /// <param name="blend"></param>
+    public static void SafelyDrawLinearGradient
+        (
+            this Rectangle rectangle,
+            Color startColor,
+            Color endColor,
+            LinearGradientMode mode,
+            Graphics graphics,
+            Blend? blend = null
+        )
     {
-        if (rectangle.Width > 0 && rectangle.Height > 0)
+        if (rectangle is { Width: > 0, Height: > 0 })
         {
-            using (LinearGradientBrush brush = new LinearGradientBrush (rectangle, startColor, endColor, mode))
+            using (var brush = new LinearGradientBrush (rectangle, startColor, endColor, mode))
             {
                 if (blend != null)
                 {
@@ -38,12 +57,26 @@ public static class DrawingRoutines
         }
     }
 
-    public static void SafelyDrawLinearGradientF (this RectangleF rectangle, Color startColor, Color endColor,
-        LinearGradientMode mode, Graphics graphics)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="rectangle"></param>
+    /// <param name="startColor"></param>
+    /// <param name="endColor"></param>
+    /// <param name="mode"></param>
+    /// <param name="graphics"></param>
+    public static void SafelyDrawLinearGradientF
+        (
+            this RectangleF rectangle,
+            Color startColor,
+            Color endColor,
+            LinearGradientMode mode,
+            Graphics graphics
+        )
     {
-        if (rectangle.Width > 0 && rectangle.Height > 0)
+        if (rectangle is { Width: > 0, Height: > 0 })
         {
-            using (LinearGradientBrush brush = new LinearGradientBrush (rectangle, startColor, endColor, mode))
+            using (var brush = new LinearGradientBrush (rectangle, startColor, endColor, mode))
             {
                 graphics.FillRectangle (brush, rectangle);
             }

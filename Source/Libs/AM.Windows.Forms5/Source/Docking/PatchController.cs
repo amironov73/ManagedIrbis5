@@ -3,8 +3,9 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable UnusedMember.Global
 
-/*
+/* PatchController.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -13,9 +14,6 @@
 using Microsoft.Win32;
 
 using System;
-using System.Configuration;
-
-using AM.Windows.Forms.Docking.Configuration;
 
 #endregion
 
@@ -23,10 +21,19 @@ using AM.Windows.Forms.Docking.Configuration;
 
 namespace AM.Windows.Forms.Docking;
 
+/// <summary>
+///
+/// </summary>
 public static class PatchController
 {
+    /// <summary>
+    ///
+    /// </summary>
     public static bool? EnableAll { private get; set; }
 
+    /// <summary>
+    ///
+    /// </summary>
     public static void Reset()
     {
         EnableAll = _highDpi = _memoryLeakFix
@@ -41,6 +48,9 @@ public static class PatchController
     //*
     private static bool? _highDpi;
 
+    /// <summary>
+    ///
+    /// </summary>
     public static bool? EnableHighDpi
     {
         get
@@ -69,8 +79,7 @@ public static class PatchController
             var environment = Environment.GetEnvironmentVariable ("DPS_EnableHighDpi");
             if (!string.IsNullOrEmpty (environment))
             {
-                var enable = false;
-                if (bool.TryParse (environment, out enable))
+                if (bool.TryParse (environment, out var enable))
                 {
                     return _highDpi = enable;
                 }
@@ -83,8 +92,7 @@ public static class PatchController
                     var pair = key.GetValue ("EnableHighDpi");
                     if (pair != null)
                     {
-                        var enable = false;
-                        if (bool.TryParse (pair.ToString(), out enable))
+                        if (bool.TryParse (pair.ToString(), out var enable))
                         {
                             return _highDpi = enable;
                         }
@@ -99,8 +107,7 @@ public static class PatchController
                     var pair = key.GetValue ("EnableHighDpi");
                     if (pair != null)
                     {
-                        var enable = false;
-                        if (bool.TryParse (pair.ToString(), out enable))
+                        if (bool.TryParse (pair.ToString(), out var enable))
                         {
                             return _highDpi = enable;
                         }
@@ -120,6 +127,9 @@ public static class PatchController
 
     private static bool? _memoryLeakFix;
 
+    /// <summary>
+    ///
+    /// </summary>
     public static bool? EnableMemoryLeakFix
     {
         get
@@ -148,8 +158,7 @@ public static class PatchController
             var environment = Environment.GetEnvironmentVariable ("DPS_EnableMemoryLeakFix");
             if (!string.IsNullOrEmpty (environment))
             {
-                var enable = false;
-                if (bool.TryParse (environment, out enable))
+                if (bool.TryParse (environment, out var enable))
                 {
                     return _memoryLeakFix = enable;
                 }
@@ -162,8 +171,7 @@ public static class PatchController
                     var pair = key.GetValue ("EnableMemoryLeakFix");
                     if (pair != null)
                     {
-                        var enable = false;
-                        if (bool.TryParse (pair.ToString(), out enable))
+                        if (bool.TryParse (pair.ToString(), out var enable))
                         {
                             return _memoryLeakFix = enable;
                         }
@@ -178,8 +186,7 @@ public static class PatchController
                     var pair = key.GetValue ("EnableMemoryLeakFix");
                     if (pair != null)
                     {
-                        var enable = false;
-                        if (bool.TryParse (pair.ToString(), out enable))
+                        if (bool.TryParse (pair.ToString(), out var enable))
                         {
                             return _memoryLeakFix = enable;
                         }
@@ -195,6 +202,9 @@ public static class PatchController
 
     private static bool? _focusLostFix;
 
+    /// <summary>
+    ///
+    /// </summary>
     public static bool? EnableMainWindowFocusLostFix
     {
         get
@@ -223,8 +233,7 @@ public static class PatchController
             var environment = Environment.GetEnvironmentVariable ("DPS_EnableMainWindowFocusLostFix");
             if (!string.IsNullOrEmpty (environment))
             {
-                var enable = false;
-                if (bool.TryParse (environment, out enable))
+                if (bool.TryParse (environment, out var enable))
                 {
                     return _focusLostFix = enable;
                 }
@@ -237,8 +246,7 @@ public static class PatchController
                     var pair = key.GetValue ("EnableMainWindowFocusLostFix");
                     if (pair != null)
                     {
-                        var enable = false;
-                        if (bool.TryParse (pair.ToString(), out enable))
+                        if (bool.TryParse (pair.ToString(), out var enable))
                         {
                             return _focusLostFix = enable;
                         }
@@ -253,8 +261,7 @@ public static class PatchController
                     var pair = key.GetValue ("EnableMainWindowFocusLostFix");
                     if (pair != null)
                     {
-                        var enable = false;
-                        if (bool.TryParse (pair.ToString(), out enable))
+                        if (bool.TryParse (pair.ToString(), out var enable))
                         {
                             return _focusLostFix = enable;
                         }
@@ -270,6 +277,9 @@ public static class PatchController
 
     private static bool? _nestedDisposalFix;
 
+    /// <summary>
+    ///
+    /// </summary>
     public static bool? EnableNestedDisposalFix
     {
         get
@@ -298,8 +308,7 @@ public static class PatchController
             var environment = Environment.GetEnvironmentVariable ("DPS_EnableNestedDisposalFix");
             if (!string.IsNullOrEmpty (environment))
             {
-                var enable = false;
-                if (bool.TryParse (environment, out enable))
+                if (bool.TryParse (environment, out var enable))
                 {
                     return _nestedDisposalFix = enable;
                 }
@@ -312,8 +321,7 @@ public static class PatchController
                     var pair = key.GetValue ("EnableNestedDisposalFix");
                     if (pair != null)
                     {
-                        var enable = false;
-                        if (bool.TryParse (pair.ToString(), out enable))
+                        if (bool.TryParse (pair.ToString(), out var enable))
                         {
                             return _nestedDisposalFix = enable;
                         }
@@ -328,8 +336,7 @@ public static class PatchController
                     var pair = key.GetValue ("EnableNestedDisposalFix");
                     if (pair != null)
                     {
-                        var enable = false;
-                        if (bool.TryParse (pair.ToString(), out enable))
+                        if (bool.TryParse (pair.ToString(), out var enable))
                         {
                             return _nestedDisposalFix = enable;
                         }
@@ -345,6 +352,9 @@ public static class PatchController
 
     private static bool? _fontInheritanceFix;
 
+    /// <summary>
+    ///
+    /// </summary>
     public static bool? EnableFontInheritanceFix
     {
         get
@@ -373,8 +383,7 @@ public static class PatchController
             var environment = Environment.GetEnvironmentVariable ("DPS_EnableFontInheritanceFix");
             if (!string.IsNullOrEmpty (environment))
             {
-                var enable = false;
-                if (bool.TryParse (environment, out enable))
+                if (bool.TryParse (environment, out var enable))
                 {
                     return _fontInheritanceFix = enable;
                 }
@@ -387,8 +396,7 @@ public static class PatchController
                     var pair = key.GetValue ("EnableFontInheritanceFix");
                     if (pair != null)
                     {
-                        var enable = false;
-                        if (bool.TryParse (pair.ToString(), out enable))
+                        if (bool.TryParse (pair.ToString(), out var enable))
                         {
                             return _fontInheritanceFix = enable;
                         }
@@ -403,8 +411,7 @@ public static class PatchController
                     var pair = key.GetValue ("EnableFontInheritanceFix");
                     if (pair != null)
                     {
-                        var enable = false;
-                        if (bool.TryParse (pair.ToString(), out enable))
+                        if (bool.TryParse (pair.ToString(), out var enable))
                         {
                             return _fontInheritanceFix = enable;
                         }
@@ -420,6 +427,9 @@ public static class PatchController
 
     private static bool? _contentOrderFix;
 
+    /// <summary>
+    ///
+    /// </summary>
     public static bool? EnableContentOrderFix
     {
         get
@@ -448,8 +458,7 @@ public static class PatchController
             var environment = Environment.GetEnvironmentVariable ("DPS_EnableContentOrderFix");
             if (!string.IsNullOrEmpty (environment))
             {
-                var enable = false;
-                if (bool.TryParse (environment, out enable))
+                if (bool.TryParse (environment, out var enable))
                 {
                     return _contentOrderFix = enable;
                 }
@@ -462,8 +471,7 @@ public static class PatchController
                     var pair = key.GetValue ("EnableContentOrderFix");
                     if (pair != null)
                     {
-                        var enable = false;
-                        if (bool.TryParse (pair.ToString(), out enable))
+                        if (bool.TryParse (pair.ToString(), out var enable))
                         {
                             return _contentOrderFix = enable;
                         }
@@ -478,8 +486,7 @@ public static class PatchController
                     var pair = key.GetValue ("EnableContentOrderFix");
                     if (pair != null)
                     {
-                        var enable = false;
-                        if (bool.TryParse (pair.ToString(), out enable))
+                        if (bool.TryParse (pair.ToString(), out var enable))
                         {
                             return _contentOrderFix = enable;
                         }
@@ -495,6 +502,9 @@ public static class PatchController
 
     private static bool? _activeXFix;
 
+    /// <summary>
+    ///
+    /// </summary>
     public static bool? EnableActiveXFix
     {
         get
@@ -523,8 +533,7 @@ public static class PatchController
             var environment = Environment.GetEnvironmentVariable ("DPS_EnableActiveXFix");
             if (!string.IsNullOrEmpty (environment))
             {
-                var enable = false;
-                if (bool.TryParse (environment, out enable))
+                if (bool.TryParse (environment, out var enable))
                 {
                     return _activeXFix = enable;
                 }
@@ -537,8 +546,7 @@ public static class PatchController
                     var pair = key.GetValue ("EnableActiveXFix");
                     if (pair != null)
                     {
-                        var enable = false;
-                        if (bool.TryParse (pair.ToString(), out enable))
+                        if (bool.TryParse (pair.ToString(), out var enable))
                         {
                             return _activeXFix = enable;
                         }
@@ -553,8 +561,7 @@ public static class PatchController
                     var pair = key.GetValue ("EnableActiveXFix");
                     if (pair != null)
                     {
-                        var enable = false;
-                        if (bool.TryParse (pair.ToString(), out enable))
+                        if (bool.TryParse (pair.ToString(), out var enable))
                         {
                             return _activeXFix = enable;
                         }
@@ -570,6 +577,9 @@ public static class PatchController
 
     private static bool? _displayingPaneFix;
 
+    /// <summary>
+    ///
+    /// </summary>
     public static bool? EnableDisplayingPaneFix
     {
         get
@@ -598,8 +608,7 @@ public static class PatchController
             var environment = Environment.GetEnvironmentVariable ("DPS_EnableDisplayingPaneFix");
             if (!string.IsNullOrEmpty (environment))
             {
-                var enable = false;
-                if (bool.TryParse (environment, out enable))
+                if (bool.TryParse (environment, out var enable))
                 {
                     return _displayingPaneFix = enable;
                 }
@@ -612,8 +621,7 @@ public static class PatchController
                     var pair = key.GetValue ("EnableDisplayingPaneFix");
                     if (pair != null)
                     {
-                        var enable = false;
-                        if (bool.TryParse (pair.ToString(), out enable))
+                        if (bool.TryParse (pair.ToString(), out var enable))
                         {
                             return _displayingPaneFix = enable;
                         }
@@ -628,8 +636,7 @@ public static class PatchController
                     var pair = key.GetValue ("EnableDisplayingPaneFix");
                     if (pair != null)
                     {
-                        var enable = false;
-                        if (bool.TryParse (pair.ToString(), out enable))
+                        if (bool.TryParse (pair.ToString(), out var enable))
                         {
                             return _displayingPaneFix = enable;
                         }
@@ -645,6 +652,9 @@ public static class PatchController
 
     private static bool? _activeControlFix;
 
+    /// <summary>
+    ///
+    /// </summary>
     public static bool? EnableActiveControlFix
     {
         get
@@ -673,8 +683,7 @@ public static class PatchController
             var environment = Environment.GetEnvironmentVariable ("DPS_EnableActiveControlFix");
             if (!string.IsNullOrEmpty (environment))
             {
-                var enable = false;
-                if (bool.TryParse (environment, out enable))
+                if (bool.TryParse (environment, out var enable))
                 {
                     return _activeControlFix = enable;
                 }
@@ -687,8 +696,7 @@ public static class PatchController
                     var pair = key.GetValue ("EnableActiveControlFix");
                     if (pair != null)
                     {
-                        var enable = false;
-                        if (bool.TryParse (pair.ToString(), out enable))
+                        if (bool.TryParse (pair.ToString(), out var enable))
                         {
                             return _activeControlFix = enable;
                         }
@@ -703,8 +711,7 @@ public static class PatchController
                     var pair = key.GetValue ("EnableActiveControlFix");
                     if (pair != null)
                     {
-                        var enable = false;
-                        if (bool.TryParse (pair.ToString(), out enable))
+                        if (bool.TryParse (pair.ToString(), out var enable))
                         {
                             return _activeControlFix = enable;
                         }
@@ -720,6 +727,9 @@ public static class PatchController
 
     private static bool? _floatSplitterFix;
 
+    /// <summary>
+    ///
+    /// </summary>
     public static bool? EnableFloatSplitterFix
     {
         get
@@ -748,8 +758,7 @@ public static class PatchController
             var environment = Environment.GetEnvironmentVariable ("DPS_EnableFloatSplitterFix");
             if (!string.IsNullOrEmpty (environment))
             {
-                var enable = false;
-                if (bool.TryParse (environment, out enable))
+                if (bool.TryParse (environment, out var enable))
                 {
                     return _floatSplitterFix = enable;
                 }
@@ -762,8 +771,7 @@ public static class PatchController
                     var pair = key.GetValue ("EnableFloatSplitterFix");
                     if (pair != null)
                     {
-                        var enable = false;
-                        if (bool.TryParse (pair.ToString(), out enable))
+                        if (bool.TryParse (pair.ToString(), out var enable))
                         {
                             return _floatSplitterFix = enable;
                         }
@@ -778,8 +786,7 @@ public static class PatchController
                     var pair = key.GetValue ("EnableFloatSplitterFix");
                     if (pair != null)
                     {
-                        var enable = false;
-                        if (bool.TryParse (pair.ToString(), out enable))
+                        if (bool.TryParse (pair.ToString(), out var enable))
                         {
                             return _floatSplitterFix = enable;
                         }
@@ -795,6 +802,9 @@ public static class PatchController
 
     private static bool? _activateOnDockFix;
 
+    /// <summary>
+    ///
+    /// </summary>
     public static bool? EnableActivateOnDockFix
     {
         get
@@ -823,8 +833,7 @@ public static class PatchController
             var environment = Environment.GetEnvironmentVariable ("DPS_EnableActivateOnDockFix");
             if (!string.IsNullOrEmpty (environment))
             {
-                var enable = false;
-                if (bool.TryParse (environment, out enable))
+                if (bool.TryParse (environment, out var enable))
                 {
                     return _activateOnDockFix = enable;
                 }
@@ -837,8 +846,7 @@ public static class PatchController
                     var pair = key.GetValue ("EnableActivateOnDockFix");
                     if (pair != null)
                     {
-                        var enable = false;
-                        if (bool.TryParse (pair.ToString(), out enable))
+                        if (bool.TryParse (pair.ToString(), out var enable))
                         {
                             return _activateOnDockFix = enable;
                         }
@@ -853,8 +861,7 @@ public static class PatchController
                     var pair = key.GetValue ("EnableActivateOnDockFix");
                     if (pair != null)
                     {
-                        var enable = false;
-                        if (bool.TryParse (pair.ToString(), out enable))
+                        if (bool.TryParse (pair.ToString(), out var enable))
                         {
                             return _activateOnDockFix = enable;
                         }
@@ -870,6 +877,9 @@ public static class PatchController
 
     private static bool? _selectClosestOnClose;
 
+    /// <summary>
+    ///
+    /// </summary>
     public static bool? EnableSelectClosestOnClose
     {
         get
@@ -898,8 +908,7 @@ public static class PatchController
             var environment = Environment.GetEnvironmentVariable ("DPS_EnableSelectClosestOnClose");
             if (!string.IsNullOrEmpty (environment))
             {
-                var enable = false;
-                if (bool.TryParse (environment, out enable))
+                if (bool.TryParse (environment, out var enable))
                 {
                     return _selectClosestOnClose = enable;
                 }
@@ -912,8 +921,7 @@ public static class PatchController
                     var pair = key.GetValue ("EnableSelectClosestOnClose");
                     if (pair != null)
                     {
-                        var enable = false;
-                        if (bool.TryParse (pair.ToString(), out enable))
+                        if (bool.TryParse (pair.ToString(), out var enable))
                         {
                             return _selectClosestOnClose = enable;
                         }
@@ -928,8 +936,7 @@ public static class PatchController
                     var pair = key.GetValue ("EnableSelectClosestOnClose");
                     if (pair != null)
                     {
-                        var enable = false;
-                        if (bool.TryParse (pair.ToString(), out enable))
+                        if (bool.TryParse (pair.ToString(), out var enable))
                         {
                             return _selectClosestOnClose = enable;
                         }
@@ -945,6 +952,9 @@ public static class PatchController
 
     private static bool? _perScreenDpi;
 
+    /// <summary>
+    ///
+    /// </summary>
     public static bool? EnablePerScreenDpi
     {
         get
@@ -973,8 +983,7 @@ public static class PatchController
             var environment = Environment.GetEnvironmentVariable ("DPS_EnablePerScreenDpi");
             if (!string.IsNullOrEmpty (environment))
             {
-                var enable = false;
-                if (bool.TryParse (environment, out enable))
+                if (bool.TryParse (environment, out var enable))
                 {
                     return _perScreenDpi = enable;
                 }
@@ -987,8 +996,7 @@ public static class PatchController
                     var pair = key.GetValue ("EnablePerScreenDpi");
                     if (pair != null)
                     {
-                        var enable = false;
-                        if (bool.TryParse (pair.ToString(), out enable))
+                        if (bool.TryParse (pair.ToString(), out var enable))
                         {
                             return _perScreenDpi = enable;
                         }
@@ -1003,8 +1011,7 @@ public static class PatchController
                     var pair = key.GetValue ("EnablePerScreenDpi");
                     if (pair != null)
                     {
-                        var enable = false;
-                        if (bool.TryParse (pair.ToString(), out enable))
+                        if (bool.TryParse (pair.ToString(), out var enable))
                         {
                             return _perScreenDpi = enable;
                         }

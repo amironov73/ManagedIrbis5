@@ -32,7 +32,7 @@ internal sealed class HotkeyEditor
     /// <inheritdoc cref="UITypeEditor.GetEditStyle(System.ComponentModel.ITypeDescriptorContext)"/>
     public override UITypeEditorEditStyle GetEditStyle
         (
-            ITypeDescriptorContext context
+            ITypeDescriptorContext? context
         )
     {
         return UITypeEditorEditStyle.Modal;
@@ -41,9 +41,9 @@ internal sealed class HotkeyEditor
     /// <inheritdoc cref="UITypeEditor.EditValue(System.ComponentModel.ITypeDescriptorContext,System.IServiceProvider,object)"/>
     public override object EditValue
         (
-            ITypeDescriptorContext context,
+            ITypeDescriptorContext? context,
             IServiceProvider? provider,
-            object value
+            object? value
         )
     {
         if ((provider is not null) &&

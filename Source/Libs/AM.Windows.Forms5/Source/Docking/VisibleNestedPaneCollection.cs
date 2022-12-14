@@ -3,8 +3,9 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable UnusedMember.Global
 
-/* 
+/* VisibleNestedPaneCollection.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,48 +21,50 @@ using System.Drawing;
 
 namespace AM.Windows.Forms.Docking;
 
-public sealed class VisibleNestedPaneCollection : ReadOnlyCollection<DockPane>
+/// <summary>
+///
+/// </summary>
+public sealed class VisibleNestedPaneCollection
+    : ReadOnlyCollection<DockPane>
 {
-    private NestedPaneCollection m_nestedPanes;
-
     internal VisibleNestedPaneCollection (NestedPaneCollection nestedPanes)
         : base (new List<DockPane>())
     {
-        m_nestedPanes = nestedPanes;
+        NestedPanes = nestedPanes;
     }
 
-    public NestedPaneCollection NestedPanes
-    {
-        get { return m_nestedPanes; }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    public NestedPaneCollection NestedPanes { get; }
 
-    public INestedPanesContainer Container
-    {
-        get { return NestedPanes.Container; }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    public INestedPanesContainer Container => NestedPanes.Container;
 
-    public DockState DockState
-    {
-        get { return NestedPanes.DockState; }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    public DockState DockState => NestedPanes.DockState;
 
-    public bool IsFloat
-    {
-        get { return NestedPanes.IsFloat; }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    public bool IsFloat => NestedPanes.IsFloat;
 
     internal void Refresh()
     {
         Items.Clear();
-        for (int i = 0; i < NestedPanes.Count; i++)
+        for (var i = 0; i < NestedPanes.Count; i++)
         {
-            DockPane pane = NestedPanes[i];
-            NestedDockingStatus status = pane.NestedDockingStatus;
-            status.SetDisplayingStatus (true, status.PreviousPane, status.Alignment, status.Proportion);
+            var pane = NestedPanes[i];
+            var status = pane.NestedDockingStatus;
+            status.SetDisplayingStatus (true, status.PreviousPane!, status.Alignment, status.Proportion);
             Items.Add (pane);
         }
 
-        foreach (DockPane pane in NestedPanes)
+        foreach (var pane in NestedPanes)
         {
             if (pane.DockState != DockState || pane.IsHidden)
             {
@@ -73,9 +76,9 @@ public sealed class VisibleNestedPaneCollection : ReadOnlyCollection<DockPane>
 
         CalculateBounds();
 
-        foreach (DockPane pane in this)
+        foreach (var pane in this)
         {
-            NestedDockingStatus status = pane.NestedDockingStatus;
+            var status = pane.NestedDockingStatus;
             pane.Bounds = status.PaneBounds;
             pane.SplitterBounds = status.SplitterBounds;
             pane.SplitterAlignment = status.Alignment;
@@ -89,9 +92,9 @@ public sealed class VisibleNestedPaneCollection : ReadOnlyCollection<DockPane>
             return;
         }
 
-        NestedDockingStatus statusPane = pane.NestedDockingStatus;
-        DockPane lastNestedPane = null;
-        for (int i = Count - 1; i > IndexOf (pane); i--)
+        var statusPane = pane.NestedDockingStatus;
+        DockPane? lastNestedPane = null;
+        for (var i = Count - 1; i > IndexOf (pane); i--)
         {
             if (PatchController.EnableDisplayingPaneFix == true)
             {
@@ -113,15 +116,15 @@ public sealed class VisibleNestedPaneCollection : ReadOnlyCollection<DockPane>
 
         if (lastNestedPane != null)
         {
-            int indexLastNestedPane = IndexOf (lastNestedPane);
+            var indexLastNestedPane = IndexOf (lastNestedPane);
             Items.Remove (lastNestedPane);
             Items[IndexOf (pane)] = lastNestedPane;
-            NestedDockingStatus lastNestedDock = lastNestedPane.NestedDockingStatus;
-            lastNestedDock.SetDisplayingStatus (true, statusPane.DisplayingPreviousPane,
+            var lastNestedDock = lastNestedPane.NestedDockingStatus;
+            lastNestedDock.SetDisplayingStatus (true, statusPane.DisplayingPreviousPane!,
                 statusPane.DisplayingAlignment, statusPane.DisplayingProportion);
-            for (int i = indexLastNestedPane - 1; i > IndexOf (lastNestedPane); i--)
+            for (var i = indexLastNestedPane - 1; i > IndexOf (lastNestedPane); i--)
             {
-                NestedDockingStatus status = this[i].NestedDockingStatus;
+                var status = this[i].NestedDockingStatus;
                 if (PatchController.EnableDisplayingPaneFix == true)
                 {
                     if (status.DisplayingPreviousPane == pane)
@@ -158,20 +161,20 @@ public sealed class VisibleNestedPaneCollection : ReadOnlyCollection<DockPane>
         this[0].NestedDockingStatus.SetDisplayingBounds (Container.DisplayingRectangle,
             Container.DisplayingRectangle, Rectangle.Empty);
 
-        for (int i = 1; i < Count; i++)
+        for (var i = 1; i < Count; i++)
         {
-            DockPane pane = this[i];
-            NestedDockingStatus status = pane.NestedDockingStatus;
-            DockPane prevPane = status.DisplayingPreviousPane;
-            NestedDockingStatus statusPrev = prevPane.NestedDockingStatus;
+            var pane = this[i];
+            var status = pane.NestedDockingStatus;
+            var prevPane = status.DisplayingPreviousPane;
+            var statusPrev = prevPane!.NestedDockingStatus;
 
-            Rectangle rect = statusPrev.PaneBounds;
-            bool bVerticalSplitter = (status.DisplayingAlignment == DockAlignment.Left ||
-                                      status.DisplayingAlignment == DockAlignment.Right);
+            var rect = statusPrev.PaneBounds;
+            var bVerticalSplitter = (status.DisplayingAlignment == DockAlignment.Left ||
+                                     status.DisplayingAlignment == DockAlignment.Right);
 
-            Rectangle rectThis = rect;
-            Rectangle rectPrev = rect;
-            Rectangle rectSplitter = rect;
+            var rectThis = rect;
+            var rectPrev = rect;
+            var rectSplitter = rect;
             if (status.DisplayingAlignment == DockAlignment.Left)
             {
                 rectThis.Width = (int)((double)rect.Width * status.DisplayingProportion) -

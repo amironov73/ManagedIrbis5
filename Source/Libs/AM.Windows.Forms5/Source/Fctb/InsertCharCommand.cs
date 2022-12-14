@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable LocalizableElement
 
 /* InsertCharCommand.cs -- вставка одиночного символа
  * Ars Magna project, http://arsmagna.ru
@@ -64,7 +65,7 @@ public sealed class InsertCharCommand
             case '\n':
                 if (!ts.CurrentTextBox.AllowInsertRemoveLines)
                 {
-                    throw new ArgumentOutOfRangeException ("Cant insert this char in ColumnRange mode");
+                    throw new ArgumentOutOfRangeException (nameof (c), "Cant insert this char in ColumnRange mode");
                 }
 
                 if (ts.Count == 0)
@@ -79,7 +80,7 @@ public sealed class InsertCharCommand
                 break;
 
             case '\b': //backspace
-                if (tb.Selection.Start.Column == 0 && tb.Selection.Start.Line == 0)
+                if (tb.Selection.Start is { Column: 0, Line: 0 })
                 {
                     return;
                 }
@@ -88,7 +89,7 @@ public sealed class InsertCharCommand
                 {
                     if (!ts.CurrentTextBox.AllowInsertRemoveLines)
                     {
-                        throw new ArgumentOutOfRangeException ("Cant insert this char in ColumnRange mode");
+                        throw new ArgumentOutOfRangeException (nameof (c), "Cant insert this char in ColumnRange mode");
                     }
 
                     if (tb.LineInfos[tb.Selection.Start.Line - 1].VisibleState != VisibleState.Visible)
@@ -151,7 +152,7 @@ public sealed class InsertCharCommand
                 break;
 
             case '\b':
-                textSource.CurrentTextBox.Selection.Start = lastSel.Start;
+                textSource.CurrentTextBox.Selection.Start = lastSel!.Start;
                 var cc = '\x0';
                 if (deletedChar != '\x0')
                 {
@@ -163,7 +164,7 @@ public sealed class InsertCharCommand
 
             case '\t':
                 textSource.CurrentTextBox.ExpandBlock (sel.Start.Line);
-                for (var i = sel.FromX; i < lastSel.FromX; i++)
+                for (var i = sel.FromX; i < lastSel!.FromX; i++)
                 {
                     textSource[sel.Start.Line].RemoveAt (sel.Start.Column);
                 }
@@ -191,7 +192,7 @@ public sealed class InsertCharCommand
         textSource.CurrentTextBox.ExpandBlock (textSource.CurrentTextBox.Selection.Start.Line);
         var s = c.ToString();
         textSource.OnTextChanging (ref s);
-        if (s.Length == 1)
+        if (s!.Length == 1)
         {
             c = s[0];
         }
@@ -214,26 +215,26 @@ public sealed class InsertCharCommand
         base.Execute();
     }
 
-    internal static void InsertLine (TextSource ts)
+    internal static void InsertLine (TextSource textSource)
     {
-        var tb = ts.CurrentTextBox;
+        var tb = textSource.CurrentTextBox;
 
-        if (!tb.Multiline && tb.LinesCount > 0)
+        if (tb is { Multiline: false, LinesCount: > 0 })
         {
             return;
         }
 
-        if (ts.Count == 0)
+        if (textSource.Count == 0)
         {
-            ts.InsertLine (0, ts.CreateLine());
+            textSource.InsertLine (0, textSource.CreateLine());
         }
         else
         {
-            BreakLines (tb.Selection.Start.Line, tb.Selection.Start.Column, ts);
+            BreakLines (tb.Selection.Start.Line, tb.Selection.Start.Column, textSource);
         }
 
         tb.Selection.Start = new Place (0, tb.Selection.Start.Line + 1);
-        ts.NeedRecalc (new TextSource.TextChangedEventArgs (0, 1));
+        textSource.NeedRecalc (new TextSource.TextChangedEventArgs (0, 1));
     }
 
     /// <summary>

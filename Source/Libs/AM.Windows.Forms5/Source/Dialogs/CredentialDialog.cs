@@ -56,7 +56,7 @@ namespace AM.Windows.Forms.Dialogs;
  Description ("Allows access to credential UI for generic credentials.")]
 public partial class CredentialDialog : Component
 {
-    private string _confirmTarget;
+    private string? _confirmTarget;
     private readonly NetworkCredential _credentials = new ();
     private bool _isSaveChecked;
     private byte[] _additionalEntropy;
@@ -72,7 +72,7 @@ public partial class CredentialDialog : Component
     /// Event raised when the <see cref="UserName"/> property changes.
     /// </summary>
     [Category ("Property Changed"), Description ("Event raised when the value of the UserName property changes.")]
-    public event EventHandler UserNameChanged;
+    public event EventHandler? UserNameChanged;
 
     /// <summary>
     /// Event raised when the <see cref="Password"/> property changes.
@@ -92,12 +92,12 @@ public partial class CredentialDialog : Component
     /// Initializes a new instance of the <see cref="CredentialDialog"/> class with the specified container.
     /// </summary>
     /// <param name="container">The <see cref="IContainer"/> to add the component to.</param>
-    public CredentialDialog (IContainer container)
+    public CredentialDialog
+        (
+            IContainer? container
+        )
     {
-        if (container != null)
-        {
-            container.Add (this);
-        }
+        container?.Add (this);
 
         InitializeComponent();
     }
@@ -150,7 +150,7 @@ public partial class CredentialDialog : Component
      DefaultValue (false)]
     public bool IsSaveChecked
     {
-        get { return _isSaveChecked; }
+        get => _isSaveChecked;
         set
         {
             _confirmTarget = null;
@@ -167,7 +167,7 @@ public partial class CredentialDialog : Component
     [Browsable (false)]
     public string Password
     {
-        get { return _credentials.Password; }
+        get => _credentials.Password;
         private set
         {
             _confirmTarget = null;
@@ -187,8 +187,8 @@ public partial class CredentialDialog : Component
     [Browsable (false)]
     public byte[] AdditionalEntropy
     {
-        get { return _additionalEntropy; }
-        set { _additionalEntropy = value; }
+        get => _additionalEntropy;
+        set => _additionalEntropy = value;
     }
 
     /// <summary>
@@ -198,10 +198,7 @@ public partial class CredentialDialog : Component
     /// A <see cref="NetworkCredential"/> instance containing the user name and password specified on the dialog.
     /// </value>
     [Browsable (false)]
-    public NetworkCredential Credentials
-    {
-        get { return _credentials; }
-    }
+    public NetworkCredential Credentials => _credentials;
 
     /// <summary>
     /// Gets the user name the user entered in the dialog.
@@ -213,7 +210,7 @@ public partial class CredentialDialog : Component
     [Browsable (false)]
     public string UserName
     {
-        get { return _credentials.UserName ?? string.Empty; }
+        get => _credentials.UserName ?? string.Empty;
         private set
         {
             _confirmTarget = null;
@@ -239,7 +236,7 @@ public partial class CredentialDialog : Component
      DefaultValue ("")]
     public string Target
     {
-        get { return _target ?? string.Empty; }
+        get => _target ?? string.Empty;
         set
         {
             _target = value;
@@ -263,8 +260,8 @@ public partial class CredentialDialog : Component
      DefaultValue ("")]
     public string WindowTitle
     {
-        get { return _windowTitle ?? string.Empty; }
-        set { _windowTitle = value; }
+        get => _windowTitle ?? string.Empty;
+        set => _windowTitle = value;
     }
 
     /// <summary>
@@ -288,8 +285,8 @@ public partial class CredentialDialog : Component
      Description ("A brief message that will be displayed in the dialog box."), DefaultValue ("")]
     public string MainInstruction
     {
-        get { return _caption ?? string.Empty; }
-        set { _caption = value; }
+        get => _caption ?? string.Empty;
+        set => _caption = value;
     }
 
     /// <summary>
@@ -311,8 +308,8 @@ public partial class CredentialDialog : Component
      DefaultValue (""), Editor (typeof (MultilineStringEditor), typeof (UITypeEditor))]
     public string Content
     {
-        get { return _text ?? string.Empty; }
-        set { _text = value; }
+        get => _text ?? string.Empty;
+        set => _text = value;
     }
 
     /// <summary>
@@ -561,7 +558,10 @@ public partial class CredentialDialog : Component
     /// <exception cref="CredentialException">An error occurred while showing the credentials dialog.</exception>
     /// <exception cref="InvalidOperationException"><see cref="Target"/> is an empty string ("").</exception>
     [SecurityPermission (SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
-    public DialogResult ShowDialog (IWin32Window owner)
+    public DialogResult ShowDialog
+        (
+            IWin32Window? owner
+        )
     {
         IntPtr ownerHandle;
         if (owner == null)
@@ -643,22 +643,19 @@ public partial class CredentialDialog : Component
     ///   form "Company_ApplicationName_www.example.com".
     /// </para>
     /// </remarks>
-    public static void StoreCredential (string target, NetworkCredential credential,
-        byte[] additionalEntropy = null)
+    public static void StoreCredential
+        (
+            string target,
+            NetworkCredential credential,
+            byte[]? additionalEntropy = null
+        )
     {
-        if (target == null)
-        {
-            throw new ArgumentNullException ("target");
-        }
+        Sure.NotNull (target);
+        Sure.NotNull (credential);
 
         if (target.Length == 0)
         {
             throw new ArgumentException (Resources.CredentialEmptyTargetError, "target");
-        }
-
-        if (credential == null)
-        {
-            throw new ArgumentNullException ("credential");
         }
 
         var c = new NativeMethods.CREDENTIAL();
@@ -702,12 +699,13 @@ public partial class CredentialDialog : Component
     /// <exception cref="ArgumentNullException"><paramref name="target"/> is <see langword="null" />.</exception>
     /// <exception cref="ArgumentException"><paramref name="target"/> is an empty string ("").</exception>
     /// <exception cref="CredentialException">An error occurred retrieving the credentials.</exception>
-    public static NetworkCredential RetrieveCredential (string target, byte[] additionalEntropy = null)
+    public static NetworkCredential? RetrieveCredential
+        (
+            string target,
+            byte[]? additionalEntropy = null
+        )
     {
-        if (target == null)
-        {
-            throw new ArgumentNullException ("target");
-        }
+        Sure.NotNull (target);
 
         if (target.Length == 0)
         {
@@ -715,7 +713,7 @@ public partial class CredentialDialog : Component
         }
 
         var cred = RetrieveCredentialFromApplicationInstanceCache (target);
-        if (cred != null)
+        if (cred != null!)
         {
             return cred;
         }
@@ -727,8 +725,7 @@ public partial class CredentialDialog : Component
         {
             try
             {
-                var c =
-                    (NativeMethods.CREDENTIAL)Marshal.PtrToStructure (credential,
+                var c = (NativeMethods.CREDENTIAL)Marshal.PtrToStructure (credential,
                         typeof (NativeMethods.CREDENTIAL));
                 var encryptedPassword = new byte[c.CredentialBlobSize];
                 Marshal.Copy (c.CredentialBlob, encryptedPassword, 0, encryptedPassword.Length);
@@ -763,16 +760,16 @@ public partial class CredentialDialog : Component
     /// </remarks>
     /// <exception cref="ArgumentNullException"><paramref name="target"/> is <see langword="null" />.</exception>
     /// <exception cref="ArgumentException"><paramref name="target"/> is an empty string ("").</exception>
-    public static NetworkCredential RetrieveCredentialFromApplicationInstanceCache (string target)
+    public static NetworkCredential? RetrieveCredentialFromApplicationInstanceCache
+        (
+            string target
+        )
     {
-        if (target == null)
-        {
-            throw new ArgumentNullException ("target");
-        }
+        Sure.NotNull (target);
 
         if (target.Length == 0)
         {
-            throw new ArgumentException (Resources.CredentialEmptyTargetError, "target");
+            throw new ArgumentException (Resources.CredentialEmptyTargetError, nameof (target));
         }
 
         lock (_applicationInstanceCredentialCache)
@@ -805,10 +802,7 @@ public partial class CredentialDialog : Component
     /// <exception cref="CredentialException">An error occurred deleting the credentials from the operating system's credential store.</exception>
     public static bool DeleteCredential (string target)
     {
-        if (target == null)
-        {
-            throw new ArgumentNullException ("target");
-        }
+        Sure.NotNull (target);
 
         if (target.Length == 0)
         {
@@ -1067,7 +1061,7 @@ public partial class CredentialDialog : Component
         if (UseApplicationInstanceCredentialCache)
         {
             var credential = RetrieveCredentialFromApplicationInstanceCache (Target);
-            if (credential != null)
+            if (credential != null!)
             {
                 UserName = credential.UserName;
                 Password = credential.Password;

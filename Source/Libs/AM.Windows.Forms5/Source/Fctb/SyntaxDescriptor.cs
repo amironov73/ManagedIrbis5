@@ -83,12 +83,12 @@ public class RuleDesc
     /// <summary>
     ///
     /// </summary>
-    Regex regex;
+    Regex? _regex;
 
     /// <summary>
     ///
     /// </summary>
-    public string pattern;
+    public string? pattern;
 
     /// <summary>
     ///
@@ -98,23 +98,12 @@ public class RuleDesc
     /// <summary>
     ///
     /// </summary>
-    public Style style;
+    public Style? style;
 
     /// <summary>
     ///
     /// </summary>
-    public Regex Regex
-    {
-        get
-        {
-            if (regex == null)
-            {
-                regex = new Regex (pattern, SyntaxHighlighter.RegexCompiledOption | options);
-            }
-
-            return regex;
-        }
-    }
+    public Regex Regex => _regex ??= new Regex (pattern!, SyntaxHighlighter.RegexCompiledOption | options);
 }
 
 /// <summary>
@@ -125,12 +114,12 @@ public class FoldingDesc
     /// <summary>
     ///
     /// </summary>
-    public string startMarkerRegex;
+    public string? startMarkerRegex;
 
     /// <summary>
     ///
     /// </summary>
-    public string finishMarkerRegex;
+    public string? finishMarkerRegex;
 
     /// <summary>
     ///

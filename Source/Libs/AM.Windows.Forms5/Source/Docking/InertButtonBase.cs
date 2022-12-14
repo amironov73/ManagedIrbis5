@@ -3,8 +3,10 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable VirtualMemberCallInConstructor
 
-/* 
+/* InertButtonBase.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,25 +23,44 @@ using System.Drawing.Imaging;
 
 namespace AM.Windows.Forms.Docking;
 
-public abstract class InertButtonBase : Control
+/// <summary>
+///
+/// </summary>
+public abstract class InertButtonBase
+    : Control
 {
+    /// <summary>
+    ///
+    /// </summary>
     protected InertButtonBase()
     {
         SetStyle (ControlStyles.SupportsTransparentBackColor, true);
         BackColor = Color.Transparent;
     }
 
-    public abstract Bitmap HoverImage { get; }
+    /// <summary>
+    ///
+    /// </summary>
+    public abstract Bitmap? HoverImage { get; }
 
+    /// <summary>
+    ///
+    /// </summary>
     public abstract Bitmap PressImage { get; }
 
+    /// <summary>
+    ///
+    /// </summary>
     public abstract Bitmap Image { get; }
 
     private bool m_isMouseOver = false;
 
+    /// <summary>
+    ///
+    /// </summary>
     protected bool IsMouseOver
     {
-        get { return m_isMouseOver; }
+        get => m_isMouseOver;
         private set
         {
             if (m_isMouseOver == value)
@@ -54,9 +75,12 @@ public abstract class InertButtonBase : Control
 
     private bool m_isMouseDown = false;
 
+    /// <summary>
+    ///
+    /// </summary>
     protected bool IsMouseDown
     {
-        get { return m_isMouseDown; }
+        get => m_isMouseDown;
         private set
         {
             if (m_isMouseDown == value)
@@ -69,21 +93,21 @@ public abstract class InertButtonBase : Control
         }
     }
 
-    protected override Size DefaultSize
-    {
-        get { return new Size (16, 15); }
-    }
+    /// <inheritdoc cref="Control.DefaultSize"/>
+    protected override Size DefaultSize => new Size (16, 15);
 
+    /// <inheritdoc cref="Control.OnMouseMove"/>
     protected override void OnMouseMove (MouseEventArgs e)
     {
         base.OnMouseMove (e);
-        bool over = ClientRectangle.Contains (e.X, e.Y);
+        var over = ClientRectangle.Contains (e.X, e.Y);
         if (IsMouseOver != over)
         {
             IsMouseOver = over;
         }
     }
 
+    /// <inheritdoc cref="Control.OnMouseEnter"/>
     protected override void OnMouseEnter (EventArgs e)
     {
         base.OnMouseEnter (e);
@@ -93,6 +117,7 @@ public abstract class InertButtonBase : Control
         }
     }
 
+    /// <inheritdoc cref="Control.OnMouseLeave"/>
     protected override void OnMouseLeave (EventArgs e)
     {
         base.OnMouseLeave (e);
@@ -102,6 +127,7 @@ public abstract class InertButtonBase : Control
         }
     }
 
+    /// <inheritdoc cref="Control.OnMouseDown"/>
     protected override void OnMouseDown (MouseEventArgs e)
     {
         base.OnMouseLeave (e);
@@ -111,6 +137,7 @@ public abstract class InertButtonBase : Control
         }
     }
 
+    /// <inheritdoc cref="Control.OnMouseUp"/>
     protected override void OnMouseUp (MouseEventArgs e)
     {
         base.OnMouseLeave (e);
@@ -120,6 +147,7 @@ public abstract class InertButtonBase : Control
         }
     }
 
+    /// <inheritdoc cref="Control.OnPaint"/>
     protected override void OnPaint (PaintEventArgs e)
     {
         if (HoverImage != null)
@@ -147,21 +175,25 @@ public abstract class InertButtonBase : Control
 
         if (IsMouseOver && Enabled)
         {
-            using (Pen pen = new Pen (ForeColor))
+            using (var pen = new Pen (ForeColor))
             {
                 e.Graphics.DrawRectangle (pen, Rectangle.Inflate (ClientRectangle, -1, -1));
             }
         }
 
-        using (ImageAttributes imageAttributes = new ImageAttributes())
+        using (var imageAttributes = new ImageAttributes())
         {
             ColorMap[] colorMap = new ColorMap[2];
-            colorMap[0] = new ColorMap();
-            colorMap[0].OldColor = Color.FromArgb (0, 0, 0);
-            colorMap[0].NewColor = ForeColor;
-            colorMap[1] = new ColorMap();
-            colorMap[1].OldColor = Image.GetPixel (0, 0);
-            colorMap[1].NewColor = Color.Transparent;
+            colorMap[0] = new ColorMap
+            {
+                OldColor = Color.FromArgb (0, 0, 0),
+                NewColor = ForeColor
+            };
+            colorMap[1] = new ColorMap
+            {
+                OldColor = Image.GetPixel (0, 0),
+                NewColor = Color.Transparent
+            };
 
             imageAttributes.SetRemapTable (colorMap);
 
@@ -178,6 +210,9 @@ public abstract class InertButtonBase : Control
         base.OnPaint (e);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public void RefreshChanges()
     {
         if (IsDisposed)
@@ -185,7 +220,7 @@ public abstract class InertButtonBase : Control
             return;
         }
 
-        bool mouseOver = ClientRectangle.Contains (PointToClient (Control.MousePosition));
+        var mouseOver = ClientRectangle.Contains (PointToClient (Control.MousePosition));
         if (mouseOver != IsMouseOver)
         {
             IsMouseOver = mouseOver;
@@ -194,7 +229,11 @@ public abstract class InertButtonBase : Control
         OnRefreshChanges();
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected virtual void OnRefreshChanges()
     {
+        // пустое тело метода
     }
 }

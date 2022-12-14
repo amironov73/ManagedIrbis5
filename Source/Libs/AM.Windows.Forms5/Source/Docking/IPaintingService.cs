@@ -4,7 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
-/* 
+/* IPaintingService.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -18,9 +18,28 @@ using System.Drawing;
 
 namespace AM.Windows.Forms.Docking;
 
+/// <summary>
+///
+/// </summary>
 public interface IPaintingService
 {
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="color"></param>
+    /// <param name="thickness"></param>
+    /// <returns></returns>
     Pen GetPen (Color color, int thickness = 1);
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="color"></param>
+    /// <returns></returns>
     SolidBrush GetBrush (Color color);
+
+    /// <summary>
+    ///
+    /// </summary>
     void CleanUp();
 }
