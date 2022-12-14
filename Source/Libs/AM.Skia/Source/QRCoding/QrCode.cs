@@ -1,0 +1,240 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
+
+/* QrCode.cs --
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
+using System.IO;
+
+using SkiaSharp;
+
+#endregion
+
+#nullable enable
+
+namespace AM.Skia.QrCoding;
+
+/// <summary>
+///
+/// </summary>
+public class QrCode
+{
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="content"></param>
+    /// <param name="qrSize"></param>
+    public QrCode
+        (
+            string content,
+            Vector2Slim qrSize
+        )
+    {
+        this.content = content;
+        qrInfo = new SKImageInfo (qrSize.X, qrSize.Y);
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="content"></param>
+    /// <param name="qrSize"></param>
+    /// <param name="outputFormat"></param>
+    public QrCode
+        (
+            string content,
+            Vector2Slim qrSize,
+            SKEncodedImageFormat outputFormat
+        )
+        : this (content, qrSize)
+    {
+        this.outputFormat = outputFormat;
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="content"></param>
+    /// <param name="qrSize"></param>
+    /// <param name="outputFormat"></param>
+    /// <param name="quality"></param>
+    public QrCode
+        (
+            string content,
+            Vector2Slim qrSize,
+            SKEncodedImageFormat outputFormat,
+            int quality
+        )
+        : this (content, qrSize, outputFormat)
+    {
+        this.quality = quality;
+    }
+
+    #endregion
+
+    #region Private members
+
+    private readonly string content;
+    private readonly SKImageInfo qrInfo;
+    private readonly SKEncodedImageFormat outputFormat = SKEncodedImageFormat.Png;
+    private readonly int quality = 100;
+
+    #endregion
+
+    /// <summary>
+    /// Generate QR Code and output to stream
+    /// </summary>
+    /// <param name="outputImage"></param>
+    /// <param name="resetStreamPosition"></param>
+    /// <param name="eccLevel"></param>
+    public void GenerateImage
+        (
+            Stream outputImage,
+            bool resetStreamPosition = true,
+            ECCLevel eccLevel = ECCLevel.L
+        )
+    {
+        if (outputImage.CanSeek && resetStreamPosition)
+        {
+            outputImage.Seek (0, SeekOrigin.Begin);
+        }
+
+        using var generator = new QRCodeGenerator();
+        var qr = generator.CreateQrCode (content, eccLevel);
+
+        using var qrSurface = SKSurface.Create (qrInfo);
+        var qrCanvas = qrSurface.Canvas;
+        qrCanvas.Render (qr, qrInfo.Width, qrInfo.Height);
+
+        using var qrImage = qrSurface.Snapshot();
+        Save (qrImage, outputImage);
+    }
+
+    /// <summary>
+    /// Generate QR Code and conbine with base image, then output to stream
+    /// </summary>
+    /// <param name="outputImage"></param>
+    /// <param name="baseImage"></param>
+    /// <param name="baseQrSize"></param>
+    /// <param name="qrPosition"></param>
+    /// <param name="resetStreamPosition"></param>
+    /// <param name="eccLevel"></param>
+    public void GenerateImage
+        (
+            Stream outputImage,
+            Stream baseImage,
+            Vector2Slim baseQrSize,
+            Vector2Slim qrPosition,
+            bool resetStreamPosition = true,
+            ECCLevel eccLevel = ECCLevel.L
+        )
+    {
+        if (outputImage.CanSeek && resetStreamPosition)
+        {
+            outputImage.Seek (0, SeekOrigin.Begin);
+        }
+
+        if (baseImage.CanSeek && resetStreamPosition)
+        {
+            baseImage.Seek (0, SeekOrigin.Begin);
+        }
+
+        using var generator = new QRCodeGenerator();
+        var qr = generator.CreateQrCode (content, eccLevel);
+
+        using var qrSurface = SKSurface.Create (qrInfo);
+        var qrCanvas = qrSurface.Canvas;
+        qrCanvas.Render (qr, qrInfo.Width, qrInfo.Height);
+
+        using var qrImage = qrSurface.Snapshot();
+        SaveCombinedImage (qrImage, baseImage, baseQrSize, qrPosition, outputImage);
+    }
+
+    /// <summary>
+    /// Generate QR Code and conbine with base image, then output to stream
+    /// </summary>
+    /// <param name="outputImage"></param>
+    /// <param name="baseImage"></param>
+    /// <param name="baseQrSize"></param>
+    /// <param name="qrPosition"></param>
+    /// <param name="resetStreamPosition"></param>
+    /// <param name="eccLevel"></param>
+    public void GenerateImage
+        (
+            Stream outputImage,
+            byte[] baseImage,
+            Vector2Slim baseQrSize,
+            Vector2Slim qrPosition,
+            bool resetStreamPosition = true,
+            ECCLevel eccLevel = ECCLevel.L
+        )
+    {
+        if (outputImage.CanSeek && resetStreamPosition)
+        {
+            outputImage.Seek (0, SeekOrigin.Begin);
+        }
+
+        using var generator = new QRCodeGenerator();
+        var qr = generator.CreateQrCode (content, eccLevel);
+
+        using var qrSurface = SKSurface.Create (qrInfo);
+        var qrCanvas = qrSurface.Canvas;
+        qrCanvas.Render (qr, qrInfo.Width, qrInfo.Height);
+
+        using var qrImage = qrSurface.Snapshot();
+        SaveCombinedImage (qrImage, baseImage, baseQrSize, qrPosition, outputImage);
+    }
+
+    private void Save (SKImage qrImage, Stream outputImage)
+    {
+        using var data = qrImage.Encode (outputFormat, quality);
+        data.SaveTo (outputImage);
+    }
+
+    private void SaveCombinedImage (SKImage qrImage, Stream baseImage, Vector2Slim baseImageSize,
+        Vector2Slim qrPosition, Stream output)
+    {
+        var baseInfo = new SKImageInfo (baseImageSize.X, baseImageSize.Y);
+        using var baseSurface = SKSurface.Create (baseInfo);
+        using var baseBitmap = SKBitmap.Decode (baseImage);
+
+        // combine with base image
+        var baseCanvas = baseSurface.Canvas;
+        baseCanvas.DrawBitmap (baseBitmap, 0, 0);
+        baseCanvas.DrawImage (qrImage, qrPosition.X, qrPosition.Y);
+
+        using var image = baseSurface.Snapshot();
+        using var data = image.Encode (outputFormat, quality);
+        data.SaveTo (output);
+    }
+
+    private void SaveCombinedImage (SKImage qrImage, byte[] baseImage, Vector2Slim baseImageSize,
+        Vector2Slim qrPosition, Stream output)
+    {
+        var baseInfo = new SKImageInfo (baseImageSize.X, baseImageSize.Y);
+        using var baseSurface = SKSurface.Create (baseInfo);
+        using var baseBitmap = SKBitmap.Decode (baseImage);
+
+        // combine with base image
+        var baseCanvas = baseSurface.Canvas;
+        baseCanvas.DrawBitmap (baseBitmap, 0, 0);
+        baseCanvas.DrawImage (qrImage, qrPosition.X, qrPosition.Y);
+
+        using var image = baseSurface.Snapshot();
+        using var data = image.Encode (outputFormat, quality);
+        data.SaveTo (output);
+    }
+}
