@@ -29,47 +29,68 @@ namespace AM.Windows.Forms;
 /// </summary>
 public class FastTreeNode
 {
+    /// <summary>
+    ///
+    /// </summary>
     protected readonly List<FastTreeNode> children = new();
 
-    public object Tag { get; set; }
+    /// <summary>
+    ///
+    /// </summary>
+    public object? Tag { get; set; }
 
-    private FastTreeNode parent;
+    private FastTreeNode? _parent;
 
-    public FastTreeNode Parent
+    /// <summary>
+    ///
+    /// </summary>
+    public FastTreeNode? Parent
     {
-        get { return parent; }
+        get => _parent;
         set
         {
-            if (parent == value)
+            if (_parent == value)
             {
                 return;
             }
 
             SetParent (value);
 
-            if (parent != null)
+            if (_parent != null)
             {
-                parent.children.Add (this);
+                _parent.children.Add (this);
             }
         }
     }
 
-    protected virtual void SetParent (FastTreeNode value)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="value"></param>
+    protected virtual void SetParent (FastTreeNode? value)
     {
-        if (parent != null && parent != value)
+        if (_parent != null && _parent != value)
         {
-            parent.children.Remove (this);
+            _parent.children.Remove (this);
         }
 
-        parent = value;
+        _parent = value;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="node"></param>
     public virtual void RemoveNode (FastTreeNode node)
     {
         children.Remove (node);
         SetParent (null);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="node"></param>
     public virtual void AddNode (FastTreeNode node)
     {
         if (node.Parent != this)
@@ -80,12 +101,22 @@ public class FastTreeNode
         SetParent (this);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="node"></param>
     public virtual void InsertNode (int index, FastTreeNode node)
     {
         children.Insert (index, node);
         SetParent (this);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="existsNode"></param>
+    /// <param name="node"></param>
     public virtual void InsertNodeBefore (FastTreeNode existsNode, FastTreeNode node)
     {
         var i = children.IndexOf (existsNode);
@@ -97,12 +128,21 @@ public class FastTreeNode
         InsertNode (i, node);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="existsNode"></param>
+    /// <param name="node"></param>
     public virtual void InsertNodeAfter (FastTreeNode existsNode, FastTreeNode node)
     {
         var i = children.IndexOf (existsNode) + 1;
         InsertNode (i, node);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="nodes"></param>
     public virtual void RemoveNode (IEnumerable<FastTreeNode> nodes)
     {
         var hash = new HashSet<FastTreeNode> (nodes);
@@ -127,20 +167,38 @@ public class FastTreeNode
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="nodes"></param>
     public virtual void AddNode (IEnumerable<FastTreeNode> nodes)
     {
         children.AddRange (nodes);
         foreach (var node in nodes)
+        {
             node.SetParent (this);
+        }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="nodes"></param>
     public virtual void InsertNode (int index, IEnumerable<FastTreeNode> nodes)
     {
         children.InsertRange (index, nodes);
         foreach (var node in nodes)
+        {
             node.SetParent (this);
+        }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="existsNode"></param>
+    /// <param name="nodes"></param>
     public virtual void InsertNodeBefore (FastTreeNode existsNode, IEnumerable<FastTreeNode> nodes)
     {
         var i = children.IndexOf (existsNode);
@@ -152,64 +210,111 @@ public class FastTreeNode
         InsertNode (i, nodes);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="existsNode"></param>
+    /// <param name="nodes"></param>
     public virtual void InsertNodeAfter (FastTreeNode existsNode, IEnumerable<FastTreeNode> nodes)
     {
         var i = children.IndexOf (existsNode) + 1;
         InsertNode (i, nodes);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="node"></param>
+    /// <returns></returns>
     public int IndexOf (FastTreeNode node)
     {
         return children.IndexOf (node);
     }
 
-    public IEnumerable<FastTreeNode> Children
+    /// <summary>
+    ///
+    /// </summary>
+    public IEnumerable<FastTreeNode> Children => children;
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <typeparam name="TType"></typeparam>
+    /// <returns></returns>
+    public IEnumerable<FastTreeNode> GetChildren<TType>()
     {
-        get { return children; }
+        return GetChildren (t => t is TType);
     }
 
-    public IEnumerable<FastTreeNode> GetChilds<TagType>()
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="tagCondition"></param>
+    /// <returns></returns>
+    public IEnumerable<FastTreeNode> GetChildren (Predicate<object> tagCondition)
     {
-        return GetChilds (t => t is TagType);
+        return children.Where (c => tagCondition (c.Tag!));
     }
 
-    public IEnumerable<FastTreeNode> GetChilds (Predicate<object> tagCondition)
-    {
-        return children.Where (c => tagCondition (c.Tag));
-    }
-
-    public IEnumerable<FastTreeNode> AllChilds
+    /// <summary>
+    ///
+    /// </summary>
+    public IEnumerable<FastTreeNode> AllChildren
     {
         get
         {
             yield return this;
 
             foreach (var c in children)
-            foreach (var cc in c.AllChilds)
-                yield return cc;
+            {
+                foreach (var cc in c.AllChildren)
+                {
+                    yield return cc;
+                }
+            }
         }
     }
 
-    public IEnumerable<FastTreeNode> GetAllChilds<TagType>()
+    /// <summary>
+    ///
+    /// </summary>
+    /// <typeparam name="TType"></typeparam>
+    /// <returns></returns>
+    public IEnumerable<FastTreeNode> GetAllChildren<TType>()
     {
-        return GetAllChilds (t => t is TagType);
+        return GetAllChildren (t => t is TType);
     }
 
-    public IEnumerable<FastTreeNode> GetAllChilds (Predicate<object> tagCondition)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="tagCondition"></param>
+    /// <returns></returns>
+    public IEnumerable<FastTreeNode> GetAllChildren (Predicate<object> tagCondition)
     {
-        return AllChilds.Where (c => tagCondition (c.Tag));
+        return AllChildren.Where (c => tagCondition (c.Tag!));
     }
 
-    public FastTreeNode GetParent<TagType>()
+    /// <summary>
+    ///
+    /// </summary>
+    /// <typeparam name="TType"></typeparam>
+    /// <returns></returns>
+    public FastTreeNode? GetParent<TType>()
     {
-        return GetParent (t => t is TagType);
+        return GetParent (t => t is TType);
     }
 
-    public FastTreeNode GetParent (Predicate<object> tagCondition)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="tagCondition"></param>
+    /// <returns></returns>
+    public FastTreeNode? GetParent (Predicate<object> tagCondition)
     {
         var parent = Parent;
         while (parent != null && !tagCondition (parent))
-            parent = parent.parent;
+            parent = parent._parent;
         return parent;
     }
 }

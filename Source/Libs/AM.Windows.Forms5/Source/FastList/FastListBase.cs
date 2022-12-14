@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
@@ -19,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Threading;
@@ -52,6 +54,9 @@ public class FastListBase
     [Browsable (false)]
     public int SelectedItemIndex => SelectedItemIndexes.FirstOrDefault (-1);
 
+    /// <summary>
+    ///
+    /// </summary>
     [Browsable (false)]
     public HashSet<int> CheckedItemIndex { get; }
 
@@ -124,32 +129,32 @@ public class FastListBase
     /// <summary>
     /// Картинка для отмеченного чекбокса.
     /// </summary>
-    public virtual Image ImageCheckBoxOn { get; set; }
+    public virtual Image? ImageCheckBoxOn { get; set; }
 
     /// <summary>
     /// Картинка для неотмеченного текстбокса.
     /// </summary>
-    public virtual Image ImageCheckBoxOff { get; set; }
+    public virtual Image? ImageCheckBoxOff { get; set; }
 
     /// <summary>
     /// Картинка для схлопнутого региона.
     /// </summary>
-    public virtual Image ImageCollapse { get; set; }
+    public virtual Image? ImageCollapse { get; set; }
 
     /// <summary>
     /// Картинка для развернутого региона.
     /// </summary>
-    public virtual Image ImageExpand { get; set; }
+    public virtual Image? ImageExpand { get; set; }
 
     /// <summary>
     /// Картинка для пустого развернутого региона.
     /// </summary>
-    public virtual Image ImageEmptyExpand { get; set; }
+    public virtual Image? ImageEmptyExpand { get; set; }
 
     /// <summary>
     /// Картинка по умолчанию.
     /// </summary>
-    public virtual Image ImageDefaultIcon { get; set; }
+    public virtual Image? ImageDefaultIcon { get; set; }
 
     /// <summary>
     /// Цвет выделенных элементов.
@@ -168,9 +173,24 @@ public class FastListBase
     /// </summary>
     [DefaultValue (false)]
     public bool MultiSelect { get; set; }
-    [DefaultValue (2)] public int ItemInterval { get; set; }
-    [DefaultValue (false)] public bool FullItemSelect { get; set; }
-    [DefaultValue (false)] public bool AllowDragItems { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    [DefaultValue (2)]
+    public int ItemInterval { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    [DefaultValue (false)]
+    public bool FullItemSelect { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    [DefaultValue (false)]
+    public bool AllowDragItems { get; set; }
 
     /// <summary>
     /// Разрешено выбирать элементы?
@@ -290,9 +310,13 @@ public class FastListBase
     private readonly List<int> _yOfItems = new ();
     private readonly ToolTip _toolTip;
     private int _itemCount;
-    protected int currentHotTrackingIndex;
     private bool _showScrollBar;
     private Size _localAutoScrollMinSize;
+
+    /// <summary>
+    ///
+    /// </summary>
+    protected int currentHotTrackingIndex;
 
     #endregion
 
@@ -391,6 +415,10 @@ public class FastListBase
         // пустое тело метода
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="e"></param>
     protected override void OnDragLeave (EventArgs e)
     {
         base.OnDragLeave (e);
@@ -398,6 +426,11 @@ public class FastListBase
         Invalidate();
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="index"></param>
+    /// <returns></returns>
     public Rectangle CalcItemRect (int index)
     {
         Rectangle res;
@@ -436,6 +469,11 @@ public class FastListBase
 
     #region Keyboard
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="keyData"></param>
+    /// <returns></returns>
     protected override bool IsInputKey (Keys keyData)
     {
         if (!IsEditMode)
@@ -605,15 +643,23 @@ public class FastListBase
 
     #region Dealyed Actions
 
-    private System.Threading.Timer delayedActionTimer;
+    private System.Threading.Timer? delayedActionTimer;
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="action"></param>
+    /// <param name="delayInterval"></param>
     protected void CreateDelayedAction (Action action, int delayInterval)
     {
         CancelDelayedAction();
         delayedActionTimer =
-            new System.Threading.Timer ((o) => this.Invoke (action), null, delayInterval, Timeout.Infinite);
+            new System.Threading.Timer ((_) => this.Invoke (action), null, delayInterval, Timeout.Infinite);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected void CancelDelayedAction()
     {
         if (delayedActionTimer != null)
@@ -750,7 +796,7 @@ public class FastListBase
         {
             if (!SelectedItemIndexes.Contains (item.ItemIndex) || SelectedItemIndexes.Count > 1)
             {
-                SelectItem (item.ItemIndex, true);
+                SelectItem (item.ItemIndex);
             }
         }
 
@@ -803,7 +849,7 @@ public class FastListBase
                 mouseSelectArea = Rectangle.Empty;
             }
         }
-        else if (e.Button == System.Windows.Forms.MouseButtons.Left && AllowDragItems &&
+        else if (e.Button == MouseButtons.Left && AllowDragItems &&
                  (Math.Abs (lastMouseClick.X - e.Location.X) > 2 || Math.Abs (lastMouseClick.Y - e.Location.Y) > 2))
         {
             var p = PointToClient (MousePosition);
@@ -818,7 +864,7 @@ public class FastListBase
                 OnItemDrag (new HashSet<int> (SelectedItemIndexes));
             }
         }
-        else if (e.Button == System.Windows.Forms.MouseButtons.None)
+        else if (e.Button == MouseButtons.None)
         {
             var p = PointToClient (MousePosition);
             var info = PointToItemInfo (p);
@@ -840,7 +886,7 @@ public class FastListBase
 
             if (info != null && info.X_EndText == info.X_End)
             {
-                if (_toolTip.Tag != info.Text && ShowToolTips)
+                if ((string?)_toolTip.Tag != info.Text && ShowToolTips)
                 {
                     _toolTip.Show (info.Text, this, info.X_Text - 3, info.Y - 2, 2000);
                 }
@@ -855,8 +901,13 @@ public class FastListBase
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="itemIndex"></param>
     protected virtual void OnItemDrag (HashSet<int> itemIndex)
     {
+        // пустое тело метода
     }
 
     /// <inheritdoc cref="Control.OnMouseUp"/>
@@ -920,6 +971,10 @@ public class FastListBase
 
     #region Check, Expand
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="info"></param>
     protected virtual void OnExpandBoxClick (VisibleItemInfo info)
     {
         if (info.Expanded)
@@ -932,6 +987,11 @@ public class FastListBase
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="itemIndex"></param>
+    /// <returns></returns>
     public virtual bool CollapseItem (int itemIndex)
     {
         Invalidate();
@@ -945,6 +1005,11 @@ public class FastListBase
         return false;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="itemIndex"></param>
+    /// <returns></returns>
     public virtual bool ExpandItem (int itemIndex)
     {
         Invalidate();
@@ -958,15 +1023,29 @@ public class FastListBase
         return false;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="itemIndex"></param>
     protected virtual void OnItemCollapsed (int itemIndex)
     {
+        // пустое тело метода
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="itemIndex"></param>
     protected virtual void OnItemExpanded (int itemIndex)
     {
+        // пустое тело метода
     }
 
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="info"></param>
     protected virtual void OnCheckboxClick (VisibleItemInfo info)
     {
         if (GetItemChecked (info.ItemIndex))
@@ -979,6 +1058,11 @@ public class FastListBase
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="itemIndex"></param>
+    /// <returns></returns>
     public virtual bool CheckItem (int itemIndex)
     {
         if (GetItemChecked (itemIndex))
@@ -998,15 +1082,26 @@ public class FastListBase
         return false;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public virtual bool CheckAll()
     {
-        var res = true;
-        for (int i = 0; i < ItemCount; i++)
-            res &= CheckItem (i);
+        var result = true;
+        for (var i = 0; i < ItemCount; i++)
+        {
+            result &= CheckItem (i);
+        }
 
-        return res;
+        return result;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="itemIndex"></param>
+    /// <returns></returns>
     public virtual bool UncheckItem (int itemIndex)
     {
         if (!GetItemChecked (itemIndex))
@@ -1076,6 +1171,9 @@ public class FastListBase
         // пустое тело метода
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected virtual void CheckSelected()
     {
         foreach (var i in SelectedItemIndexes)
@@ -1084,16 +1182,26 @@ public class FastListBase
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected virtual void UncheckSelected()
     {
         foreach (var i in SelectedItemIndexes)
+        {
             UncheckItem (i);
+        }
     }
 
     #endregion Check, Expand
 
     #region Selection
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="itemIndex"></param>
+    /// <returns></returns>
     public virtual bool UnselectItem (int itemIndex)
     {
         if (itemIndex < 0 || itemIndex >= ItemCount)
@@ -1117,20 +1225,28 @@ public class FastListBase
         return true;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public virtual bool UnselectAll()
     {
         foreach (var i in SelectedItemIndexes)
+        {
             if (!CanUnselectItem (i))
             {
                 return false;
             }
+        }
 
         var list = new List<int> (SelectedItemIndexes);
 
         SelectedItemIndexes.Clear();
 
         foreach (var i in list)
+        {
             OnItemUnselected (i);
+        }
 
         Invalidate();
 
@@ -1154,6 +1270,7 @@ public class FastListBase
         if (unselectOtherItems)
         {
             foreach (var i in SelectedItemIndexes)
+            {
                 if (i != itemIndex)
                 {
                     if (!CanUnselectItem (i))
@@ -1161,17 +1278,20 @@ public class FastListBase
                         return false;
                     }
                 }
+            }
 
             var list = new List<int> (SelectedItemIndexes);
 
             //SelectedItemIndexes.Clear();
 
             foreach (var i in list)
+            {
                 if (i != itemIndex)
                 {
                     SelectedItemIndexes.Remove (i);
                     OnItemUnselected (i);
                 }
+            }
         }
 
         SelectedItemIndexes.Add (itemIndex);
@@ -1189,6 +1309,7 @@ public class FastListBase
     public virtual bool SelectItems (int from, int to)
     {
         foreach (var i in SelectedItemIndexes)
+        {
             if (i < from || i > to)
             {
                 if (!CanUnselectItem (i))
@@ -1196,19 +1317,23 @@ public class FastListBase
                     return false;
                 }
             }
+        }
 
         var list = new List<int> (SelectedItemIndexes);
 
         //SelectedItemIndexes.RemoveWhere(i=> i < from | i > to);
 
         foreach (var i in list)
+        {
             if (i < from || i > to)
             {
                 SelectedItemIndexes.Remove (i);
                 OnItemUnselected (i);
             }
+        }
 
-        for (int i = from; i <= to; i++)
+        for (var i = from; i <= to; i++)
+        {
             if (!SelectedItemIndexes.Contains (i))
             {
                 if (CanSelectItem (i))
@@ -1217,17 +1342,27 @@ public class FastListBase
                     OnItemSelected (i);
                 }
             }
+        }
 
         Invalidate();
 
         return SelectedItemIndexes.Count > 0;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public virtual bool SelectAll()
     {
         return SelectItems (0, ItemCount - 1);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="unselectOtherItems"></param>
+    /// <returns></returns>
     public bool SelectNext (bool unselectOtherItems = true)
     {
         if (SelectedItemIndexes.Count == 0)
@@ -1250,6 +1385,11 @@ public class FastListBase
         return res;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="unselectOtherItems"></param>
+    /// <returns></returns>
     public bool SelectPrev (bool unselectOtherItems = true)
     {
         if (SelectedItemIndexes.Count == 0)
@@ -1272,12 +1412,22 @@ public class FastListBase
         return res;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="itemIndex"></param>
     protected virtual void OnItemSelected (int itemIndex)
     {
+        // пустое тело метода
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="itemIndex"></param>
     protected virtual void OnItemUnselected (int itemIndex)
     {
+        // пустое тело метода
     }
 
     #endregion
@@ -1315,57 +1465,78 @@ public class FastListBase
             var color = Color.FromArgb (50, (BackColor.R + 127) >> 1, (BackColor.G + 127) >> 1,
                 (BackColor.B + 127) >> 1);
             using (var brush = new SolidBrush (color))
+            {
                 e.Graphics.FillRectangle (brush, ClientRectangle);
+            }
         }
     }
 
-    protected virtual void DrawDragOverInsertEffect (Graphics gr, DragOverItemEventArgs e)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="graphics"></param>
+    /// <param name="eventArgs"></param>
+    protected virtual void DrawDragOverInsertEffect
+        (
+            Graphics graphics,
+            DragOverItemEventArgs eventArgs
+        )
     {
         var c1 = Color.FromArgb (SelectionColor.A == 255 ? SelectionColorOpaque : SelectionColor.A, SelectionColor);
-        var c2 = Color.Transparent;
 
-        if (!visibleItemInfos.ContainsKey (e.ItemIndex))
+        if (!visibleItemInfos.ContainsKey (eventArgs.ItemIndex))
         {
             return;
         }
 
-        var info = visibleItemInfos[e.ItemIndex];
+        var info = visibleItemInfos[eventArgs.ItemIndex];
         var rect = new Rectangle (info.X_ExpandBox, info.Y, 1000, info.Height);
 
-        switch (e.InsertEffect)
+        switch (eventArgs.InsertEffect)
         {
             case InsertEffect.Replace:
                 using (var brush = new SolidBrush (c1))
-                    gr.FillRectangle (brush, rect);
+                {
+                    graphics.FillRectangle (brush, rect);
+                }
+
                 break;
 
             case InsertEffect.InsertBefore:
-                if (e.ItemIndex <= 0)
+                if (eventArgs.ItemIndex <= 0)
                 {
                     rect.Offset (0, 2);
                 }
 
                 using (var pen = new Pen (c1, 2) { DashStyle = DashStyle.Dash })
-                    gr.DrawLine (pen, rect.Left, rect.Top, rect.Right, rect.Top);
+                {
+                    graphics.DrawLine (pen, rect.Left, rect.Top, rect.Right, rect.Top);
+                }
+
                 break;
 
             case InsertEffect.InsertAfter:
-                if (e.ItemIndex < 0)
+                if (eventArgs.ItemIndex < 0)
                 {
                     rect.Offset (0, 2);
                 }
 
                 using (var pen = new Pen (c1, 2) { DashStyle = DashStyle.Dash })
-                    gr.DrawLine (pen, rect.Left, rect.Bottom, rect.Right, rect.Bottom);
+                {
+                    graphics.DrawLine (pen, rect.Left, rect.Bottom, rect.Right, rect.Bottom);
+                }
+
                 break;
 
             case InsertEffect.AddAsChild:
-                if (e.ItemIndex >= 0 && e.ItemIndex < ItemCount)
+                if (eventArgs.ItemIndex >= 0 && eventArgs.ItemIndex < ItemCount)
                 {
-                    var dx = GetItemIndent (e.ItemIndex) + 80;
+                    var dx = GetItemIndent (eventArgs.ItemIndex) + 80;
                     rect.Offset (dx, 0);
                     using (var pen = new Pen (c1, 2) { DashStyle = DashStyle.Dash })
-                        gr.DrawLine (pen, rect.Left, rect.Bottom, rect.Right, rect.Bottom);
+                    {
+                        graphics.DrawLine (pen, rect.Left, rect.Bottom, rect.Right, rect.Bottom);
+                    }
                 }
 
                 break;
@@ -1380,11 +1551,17 @@ public class FastListBase
             var rect = new Rectangle (mouseSelectArea.Left - HorizontalScroll.Value,
                 mouseSelectArea.Top - VerticalScroll.Value, mouseSelectArea.Width, mouseSelectArea.Height);
             using (var pen = new Pen (c))
+            {
                 gr.DrawRectangle (pen, rect);
+            }
         }
     }
 
-    protected virtual void DrawItems (Graphics gr)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="graphics"></param>
+    protected virtual void DrawItems (Graphics graphics)
     {
         var i = Math.Max (0, PointToIndex (new Point (Padding.Left, Padding.Top)) - 1);
 
@@ -1392,23 +1569,36 @@ public class FastListBase
 
         for (; i < ItemCount; i++)
         {
-            var info = visibleItemInfos[i] = CalcVisibleItemInfo (gr, i);
+            var info = visibleItemInfos[i] = CalcVisibleItemInfo (graphics, i);
             if (info.Y > ClientSize.Height)
             {
                 break;
             }
 
-            DrawItem (gr, info);
+            DrawItem (graphics, info);
         }
     }
 
-    protected readonly Dictionary<int, VisibleItemInfo> visibleItemInfos = new Dictionary<int, VisibleItemInfo>();
+    /// <summary>
+    ///
+    /// </summary>
+    protected readonly Dictionary<int, VisibleItemInfo> visibleItemInfos = new ();
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="gr"></param>
+    /// <param name="info"></param>
     protected virtual void DrawItem (Graphics gr, VisibleItemInfo info)
     {
         DrawItemWhole (gr, info);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="gr"></param>
+    /// <param name="info"></param>
     public void DrawItemWhole (Graphics gr, VisibleItemInfo info)
     {
         DrawItemBackgound (gr, info);
@@ -1434,6 +1624,11 @@ public class FastListBase
         DrawItemContent (gr, info);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="gr"></param>
+    /// <param name="info"></param>
     protected virtual void DrawItemHotTracking (Graphics gr, VisibleItemInfo info)
     {
         var c1 = HotTrackingColor;
@@ -1445,13 +1640,18 @@ public class FastListBase
             rect = new Rectangle (cr.Left, rect.Top, cr.Width - 1, rect.Height);
         }
 
-        if (rect.Width > 0 && rect.Height > 0)
+        if (rect is { Width: > 0, Height: > 0 })
         {
             using (var pen = new Pen (c1))
+            {
                 gr.DrawRectangle (pen, rect);
+            }
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     [Browsable (false)]
     public Rectangle ClientRectMinusPaddings
     {
@@ -1464,6 +1664,11 @@ public class FastListBase
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="gr"></param>
+    /// <param name="info"></param>
     public virtual void DrawSelection (Graphics gr, VisibleItemInfo info)
     {
         var c1 = Color.FromArgb (SelectionColor.A == 255 ? SelectionColorOpaque : SelectionColor.A, SelectionColor);
@@ -1476,13 +1681,15 @@ public class FastListBase
             rect = new Rectangle (cr.Left, rect.Top, cr.Width - 1, rect.Height);
         }
 
-        if (rect.Width > 0 && rect.Height > 0)
+        if (rect is { Width: > 0, Height: > 0 })
         {
             using (var brush = new LinearGradientBrush (rect, c2, c1, LinearGradientMode.Vertical))
-            using (var pen = new Pen (c1))
             {
-                gr.FillRectangle (brush, Rectangle.FromLTRB (rect.Left, rect.Top, rect.Right + 1, rect.Bottom + 1));
-                gr.DrawRectangle (pen, rect);
+                using (var pen = new Pen (c1))
+                {
+                    gr.FillRectangle (brush, Rectangle.FromLTRB (rect.Left, rect.Top, rect.Right + 1, rect.Bottom + 1));
+                    gr.DrawRectangle (pen, rect);
+                }
             }
         }
     }
@@ -1529,18 +1736,30 @@ public class FastListBase
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="gr"></param>
+    /// <param name="info"></param>
     public virtual void DrawItemContent (Graphics gr, VisibleItemInfo info)
     {
         using (var sf = new StringFormat() { LineAlignment = info.LineAlignment })
-        using (var brush = new SolidBrush (info.ForeColor))
         {
-            var rect = new Rectangle (info.X_Text, info.Y + 1, info.X_EndText - info.X_Text + 1, info.Height - 1);
+            using (var brush = new SolidBrush (info.ForeColor))
+            {
+                var rect = new Rectangle (info.X_Text, info.Y + 1, info.X_EndText - info.X_Text + 1, info.Height - 1);
 
-            //gr.DrawString(info.Text, Font, brush, info.X_Text, info.Y + 1, sf);
-            gr.DrawString (info.Text, Font, brush, rect, sf);
+                //gr.DrawString(info.Text, Font, brush, info.X_Text, info.Y + 1, sf);
+                gr.DrawString (info.Text, Font, brush, rect, sf);
+            }
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="gr"></param>
+    /// <param name="info"></param>
     public virtual void DrawItemBackgound (Graphics gr, VisibleItemInfo info)
     {
         var backColor = info.BackColor;
@@ -1548,10 +1767,18 @@ public class FastListBase
         if (backColor != Color.Empty)
         {
             using (var brush = new SolidBrush (backColor))
+            {
                 gr.FillRectangle (brush, info.TextAndIconRect);
+            }
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="gr"></param>
+    /// <param name="itemIndex"></param>
+    /// <returns></returns>
     protected virtual VisibleItemInfo CalcVisibleItemInfo (Graphics gr, int itemIndex)
     {
         var result = new VisibleItemInfo();
@@ -1585,8 +1812,7 @@ public class FastListBase
             return -1;
         }
 
-        int i = 0;
-
+        int i;
         if (IsItemHeightFixed)
         {
             i = (y - Padding.Top) / (ItemHeightDefault + ItemInterval);
@@ -1609,6 +1835,11 @@ public class FastListBase
         return i;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="index"></param>
+    /// <returns></returns>
     protected virtual int GetItemY
         (
             int index
@@ -1619,6 +1850,11 @@ public class FastListBase
             : _yOfItems[index];
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="y"></param>
+    /// <returns></returns>
     protected int YToIndexAround (int y)
     {
         if (ItemCount <= 0)
@@ -1626,7 +1862,7 @@ public class FastListBase
             return -1;
         }
 
-        var i = 0;
+        int i;
 
         if (IsItemHeightFixed)
         {
@@ -1673,11 +1909,10 @@ public class FastListBase
     /// <summary>
     /// Control visible rect coordinates to item info
     /// </summary>
-    public virtual VisibleItemInfo PointToItemInfo (Point p)
+    public virtual VisibleItemInfo? PointToItemInfo (Point p)
     {
         var index = PointToIndex (p);
-        VisibleItemInfo info = null;
-        visibleItemInfos.TryGetValue (index, out info);
+        visibleItemInfos.TryGetValue (index, out var info);
 
         return info;
     }
@@ -1693,6 +1928,10 @@ public class FastListBase
         /// Индекс элемента.
         /// </summary>
         public int ItemIndex;
+
+        /// <summary>
+        ///
+        /// </summary>
         public int Y;
 
         /// <summary>
@@ -1704,16 +1943,60 @@ public class FastListBase
         /// Текст, соответствующий элементу.
         /// </summary>
         public string? Text;
+
+        /// <summary>
+        ///
+        /// </summary>
         public int X;
+
+        /// <summary>
+        ///
+        /// </summary>
         public int X_ExpandBox;
+
+        /// <summary>
+        ///
+        /// </summary>
         public int X_CheckBox;
+
+        /// <summary>
+        ///
+        /// </summary>
         public int X_Icon;
+
+        /// <summary>
+        ///
+        /// </summary>
         public int X_Text;
+
+        /// <summary>
+        ///
+        /// </summary>
         public int X_EndText;
+
+        /// <summary>
+        ///
+        /// </summary>
         public int X_End;
+
+        /// <summary>
+        ///
+        /// </summary>
         public bool CheckBoxVisible;
+
+        /// <summary>
+        ///
+        /// </summary>
         public int ExpandBoxType;
+
+        /// <summary>
+        ///
+        /// </summary>
         public Image? Icon;
+
+        /// <summary>
+        ///
+        /// </summary>
         public bool Expanded;
 
         /// <summary>
@@ -1751,6 +2034,12 @@ public class FastListBase
         /// </summary>
         public Rectangle TextRect => new (X_Text, Y, X_EndText - X_Text + 1, Height);
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="list"></param>
+        /// <param name="itemIndex"></param>
+        /// <param name="gr"></param>
         public virtual void Calc (FastListBase list, int itemIndex, Graphics gr)
         {
             //var vertScroll = list.VerticalScroll.Visible ? list.VerticalScroll.Value : 0;
@@ -1779,13 +2068,13 @@ public class FastListBase
             X_ExpandBox = x;
             if (list.ShowExpandBoxes)
             {
-                x += list.ImageExpand.Width + 2;
+                x += list.ImageExpand!.Width + 2;
             }
 
             X_CheckBox = x;
             if (list.ShowCheckBoxes)
             {
-                x += list.ImageCheckBoxOn.Width + 2;
+                x += list.ImageCheckBoxOn!.Width + 2;
             }
 
             X_Icon = x;
@@ -1812,11 +2101,11 @@ public class FastListBase
     {
         _yOfItems.Clear();
 
-        int y = Padding.Top;
+        var y = Padding.Top;
 
         if (!IsItemHeightFixed)
         {
-            for (int i = 0; i < _itemCount; i++)
+            for (var i = 0; i < _itemCount; i++)
             {
                 _yOfItems.Add (y);
                 y += GetItemHeight (i) + ItemInterval;
@@ -1876,7 +2165,7 @@ public class FastListBase
     /// <summary>
     /// Получение текста элемента по его индексу.
     /// </summary>
-    protected virtual string GetItemText
+    protected virtual string? GetItemText
         (
             int itemIndex
         )
@@ -2028,11 +2317,21 @@ public class FastListBase
         return true;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="itemIndex"></param>
+    /// <returns></returns>
     protected virtual bool CanCollapseItem (int itemIndex)
     {
         return true;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="itemIndex"></param>
+    /// <returns></returns>
     protected virtual bool CanEditItem (int itemIndex)
     {
         return true;
@@ -2074,6 +2373,9 @@ public class FastListBase
         OnScrollVertical (VerticalScroll.Value + VerticalScroll.LargeChange);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public new Size AutoScrollMinSize
     {
         set
@@ -2085,7 +2387,7 @@ public class FastListBase
                     base.AutoScroll = true;
                 }
 
-                Size newSize = value;
+                var newSize = value;
                 base.AutoScrollMinSize = newSize;
             }
             else
@@ -2129,6 +2431,9 @@ public class FastListBase
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected virtual void OnScrollbarsUpdated()
     {
     }
@@ -2178,8 +2483,8 @@ public class FastListBase
     {
         rect = new Rectangle (rect.X - HorizontalScroll.Value, rect.Y - VerticalScroll.Value, rect.Width, rect.Height);
 
-        int v = VerticalScroll.Value;
-        int h = HorizontalScroll.Value;
+        var v = VerticalScroll.Value;
+        var h = HorizontalScroll.Value;
 
         if (rect.Bottom > ClientRectangle.Height)
         {
@@ -2208,9 +2513,9 @@ public class FastListBase
         {
             OnScrollVertical (v);
         }
-        catch (ArgumentOutOfRangeException)
+        catch (ArgumentOutOfRangeException exception)
         {
-            ;
+            Debug.WriteLine (exception.Message);
         }
     }
 
@@ -2276,9 +2581,14 @@ public class FastListBase
     /// <summary>
     /// Счетчик режима обновления.
     /// </summary>
-    protected int editUpdating = 0;
+    protected int editUpdating;
 
-    public virtual void OnStartEdit (int itemIndex, string startValue = null)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="itemIndex"></param>
+    /// <param name="startValue"></param>
+    public virtual void OnStartEdit (int itemIndex, string? startValue = null)
     {
         if (!visibleItemInfos.ContainsKey (itemIndex))
         {
@@ -2297,12 +2607,12 @@ public class FastListBase
         if (startValue != null)
         {
             ctrl.Text = startValue;
-            (ctrl as TextBox).SelectionStart = startValue.Length;
+            ctrl.SelectionStart = startValue.Length;
         }
 
-        ctrl.LostFocus += (o, a) => OnEndEdit();
-        ctrl.PreviewKeyDown += (o, a) => a.IsInputKey = true;
-        ctrl.KeyDown += (o, a) =>
+        ctrl.LostFocus += (_, _) => OnEndEdit();
+        ctrl.PreviewKeyDown += (_, a) => a.IsInputKey = true;
+        ctrl.KeyDown += (_, a) =>
         {
             switch (a.KeyCode)
             {
@@ -2311,6 +2621,7 @@ public class FastListBase
                     a.Handled = true;
                     a.SuppressKeyPress = true;
                     break;
+
                 case Keys.Enter:
                     OnEndEdit();
                     a.Handled = true;

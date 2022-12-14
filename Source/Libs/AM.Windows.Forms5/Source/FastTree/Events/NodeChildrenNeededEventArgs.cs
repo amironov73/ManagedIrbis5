@@ -30,12 +30,12 @@ public class NodeChildrenNeededEventArgs
     /// <summary>
     /// Узел.
     /// </summary>
-    public object Node { get; internal set; }
+    public object? Node { get; internal set; }
 
     /// <summary>
     /// Потомки.
     /// </summary>
-    public IEnumerable Children { get; set; }
+    public IEnumerable? Children { get; set; }
 
     #endregion
 }

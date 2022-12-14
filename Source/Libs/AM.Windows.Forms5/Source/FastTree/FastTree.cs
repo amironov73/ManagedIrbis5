@@ -7,6 +7,7 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
+// ReSharper disable VirtualMemberCallInConstructor
 
 /* FastTree.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -41,6 +42,9 @@ using System.Windows.Forms;
 
 namespace AM.Windows.Forms;
 
+/// <summary>
+///
+/// </summary>
 [ToolboxItem (true)]
 [DefaultEvent ("NodeChildrenNeeded")]
 public class FastTree
@@ -48,31 +52,119 @@ public class FastTree
 {
     #region Events
 
+    /// <summary>
+    ///
+    /// </summary>
     public event EventHandler<Int32NodeEventArgs>? NodeHeightNeeded;
+
+    /// <summary>
+    ///
+    /// </summary>
     public event EventHandler<StringNodeEventArgs>? NodeTextNeeded;
+
+    /// <summary>
+    ///
+    /// </summary>
     public event EventHandler<BoolNodeEventArgs>? NodeCheckStateNeeded;
+
+    /// <summary>
+    ///
+    /// </summary>
     public event EventHandler<ImageNodeEventArgs>? NodeIconNeeded;
+
+    /// <summary>
+    ///
+    /// </summary>
     public event EventHandler<StringAlignmentNodeEventArgs>? NodeLineAlignmentNeeded;
+
+    /// <summary>
+    ///
+    /// </summary>
     public event EventHandler<BoolNodeEventArgs>? NodeCheckBoxVisibleNeeded;
+
+    /// <summary>
+    ///
+    /// </summary>
     public event EventHandler<ColorNodeEventArgs>? NodeBackColorNeeded;
+
+    /// <summary>
+    ///
+    /// </summary>
     public event EventHandler<Int32NodeEventArgs>? NodeIndentNeeded;
+
+    /// <summary>
+    ///
+    /// </summary>
     public event EventHandler<ColorNodeEventArgs>? NodeForeColorNeeded;
+
+    /// <summary>
+    ///
+    /// </summary>
     public event EventHandler<BoolNodeEventArgs>? NodeVisibilityNeeded;
+
+    /// <summary>
+    ///
+    /// </summary>
     public event EventHandler<BoolNodeEventArgs>? CanUnselectNodeNeeded;
+
+    /// <summary>
+    ///
+    /// </summary>
     public event EventHandler<BoolNodeEventArgs>? CanSelectNodeNeeded;
+
+    /// <summary>
+    ///
+    /// </summary>
     public event EventHandler<BoolNodeEventArgs>? CanUncheckNodeNeeded;
+
+    /// <summary>
+    ///
+    /// </summary>
     public event EventHandler<BoolNodeEventArgs>? CanCheckNodeNeeded;
+
+    /// <summary>
+    ///
+    /// </summary>
     public event EventHandler<BoolNodeEventArgs>? CanExpandNodeNeeded;
+
+    /// <summary>
+    ///
+    /// </summary>
     public event EventHandler<BoolNodeEventArgs>? CanCollapseNodeNeeded;
+
+    /// <summary>
+    ///
+    /// </summary>
     public event EventHandler<BoolNodeEventArgs>? CanEditNodeNeeded;
 
+    /// <summary>
+    ///
+    /// </summary>
     public event EventHandler<NodeCheckedStateChangedEventArgs>? NodeCheckedStateChanged;
+
+    /// <summary>
+    ///
+    /// </summary>
     public event EventHandler<NodeExpandedStateChangedEventArgs>? NodeExpandedStateChanged;
+
+    /// <summary>
+    ///
+    /// </summary>
     public event EventHandler<NodeSelectedStateChangedEventArgs>? NodeSelectedStateChanged;
+
+    /// <summary>
+    ///
+    /// </summary>
     public event EventHandler<NodeTextPushedEventArgs>? NodeTextPushed;
 
+    /// <summary>
+    ///
+    /// </summary>
     public event EventHandler<PaintNodeContentEventArgs>? PaintNode;
 
+    /// <summary>
+    ///
+    /// </summary>
     public event EventHandler<NodeChildrenNeededEventArgs>? NodeChildrenNeeded;
 
     /// <summary>
@@ -90,90 +182,169 @@ public class FastTree
     /// </summary>
     public event EventHandler<DragOverItemEventArgs>? DropOverNode;
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="node"></param>
+    /// <returns></returns>
     protected virtual bool GetNodeVisibility (object node)
     {
         if (NodeVisibilityNeeded != null)
         {
-            boolArg.Node = node;
-            boolArg.Result = true;
-            NodeVisibilityNeeded (this, boolArg);
-            return boolArg.Result;
+            _boolArg.Node = node;
+            _boolArg.Result = true;
+            NodeVisibilityNeeded (this, _boolArg);
+            return _boolArg.Result;
         }
 
         return true;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="itemIndex"></param>
+    /// <returns></returns>
     protected override string GetItemText (int itemIndex)
     {
-        return GetStringNodeProperty (itemIndex, NodeTextNeeded, nodes[itemIndex].ToString());
+        return GetStringNodeProperty (itemIndex, NodeTextNeeded, nodes[itemIndex].ToString()!);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="itemIndex"></param>
+    /// <returns></returns>
     protected override bool GetItemChecked (int itemIndex)
     {
         return GetBoolNodeProperty (itemIndex, NodeCheckStateNeeded, CheckedItemIndex.Contains (itemIndex));
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="itemIndex"></param>
+    /// <returns></returns>
     protected override Image GetItemIcon (int itemIndex)
     {
         return GetImageNodeProperty (itemIndex, NodeIconNeeded, ImageDefaultIcon);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="itemIndex"></param>
+    /// <returns></returns>
     protected override StringAlignment GetItemLineAlignment (int itemIndex)
     {
         return GetLineAlignmentNodeProperty (itemIndex, NodeLineAlignmentNeeded, ItemLineAlignmentDefault);
     }
 
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="itemIndex"></param>
+    /// <returns></returns>
     protected override int GetItemHeight (int itemIndex)
     {
         return GetIntNodeProperty (itemIndex, NodeHeightNeeded, ItemHeightDefault);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="itemIndex"></param>
+    /// <returns></returns>
     protected override bool GetItemCheckBoxVisible (int itemIndex)
     {
         return GetBoolNodeProperty (itemIndex, NodeCheckBoxVisibleNeeded, ShowCheckBoxes);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="itemIndex"></param>
+    /// <returns></returns>
     protected override Color GetItemBackColor (int itemIndex)
     {
         return GetColorNodeProperty (itemIndex, NodeBackColorNeeded, Color.Empty);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="itemIndex"></param>
+    /// <returns></returns>
     protected override Color GetItemForeColor (int itemIndex)
     {
         return GetColorNodeProperty (itemIndex, NodeForeColorNeeded, ForeColor);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="itemIndex"></param>
+    /// <returns></returns>
     protected override bool CanUnselectItem (int itemIndex)
     {
         return GetBoolNodeProperty (itemIndex, CanUnselectNodeNeeded, true);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="itemIndex"></param>
+    /// <returns></returns>
     protected override bool CanSelectItem (int itemIndex)
     {
         return GetBoolNodeProperty (itemIndex, CanSelectNodeNeeded, AllowSelectItems);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="itemIndex"></param>
+    /// <returns></returns>
     protected override bool CanUncheckItem (int itemIndex)
     {
         return GetBoolNodeProperty (itemIndex, CanUncheckNodeNeeded, true);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="itemIndex"></param>
+    /// <returns></returns>
     protected override bool CanCheckItem (int itemIndex)
     {
         return GetBoolNodeProperty (itemIndex, CanCheckNodeNeeded, true);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="itemIndex"></param>
+    /// <returns></returns>
     protected override bool CanCollapseItem (int itemIndex)
     {
         return GetBoolNodeProperty (itemIndex, CanCollapseNodeNeeded, true);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="itemIndex"></param>
+    /// <returns></returns>
     protected override bool CanEditItem (int itemIndex)
     {
         return GetBoolNodeProperty (itemIndex, CanEditNodeNeeded, true);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="itemIndex"></param>
     protected override void OnItemChecked (int itemIndex)
     {
         if (NodeCheckedStateChanged != null)
@@ -185,6 +356,10 @@ public class FastTree
         base.OnItemChecked (itemIndex);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="itemIndex"></param>
     protected override void OnItemUnchecked (int itemIndex)
     {
         if (NodeCheckedStateChanged != null)
@@ -196,6 +371,11 @@ public class FastTree
         base.OnItemUnchecked (itemIndex);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="itemIndex"></param>
+    /// <param name="text"></param>
     protected override void OnItemTextPushed (int itemIndex, string text)
     {
         if (NodeTextPushed != null)
@@ -206,12 +386,20 @@ public class FastTree
         base.OnItemTextPushed (itemIndex, text);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="itemIndex"></param>
     protected override void OnItemExpanded (int itemIndex)
     {
         OnNodeExpanded (nodes[itemIndex]);
         base.OnItemExpanded (itemIndex);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="node"></param>
     protected virtual void OnNodeExpanded (object node)
     {
         if (NodeExpandedStateChanged != null)
@@ -220,6 +408,10 @@ public class FastTree
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="itemIndex"></param>
     protected override void OnItemCollapsed (int itemIndex)
     {
         if (NodeExpandedStateChanged != null)
@@ -231,6 +423,10 @@ public class FastTree
         base.OnItemCollapsed (itemIndex);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="itemIndex"></param>
     protected override void OnItemSelected (int itemIndex)
     {
         if (NodeSelectedStateChanged != null)
@@ -242,6 +438,10 @@ public class FastTree
         base.OnItemSelected (itemIndex);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="itemIndex"></param>
     protected override void OnItemUnselected (int itemIndex)
     {
         if (NodeSelectedStateChanged != null)
@@ -253,22 +453,31 @@ public class FastTree
         base.OnItemUnselected (itemIndex);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="itemIndex"></param>
     protected override void OnItemDrag (HashSet<int> itemIndex)
     {
-        var nodes = new HashSet<object> (itemIndex.Select (i => this.nodes[i]));
+        var nodeSet = new HashSet<object> (itemIndex.Select (i => this.nodes[i]));
 
         if (NodeDrag != null)
         {
-            NodeDrag (this, new NodeDragEventArgs { Nodes = nodes });
+            NodeDrag (this, new NodeDragEventArgs { Nodes = nodeSet });
         }
         else
         {
-            DoDragDrop (nodes, DragDropEffects.Copy);
+            DoDragDrop (nodeSet, DragDropEffects.Copy);
         }
 
         base.OnItemDrag (itemIndex);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="gr"></param>
+    /// <param name="info"></param>
     protected override void DrawItem (Graphics gr, VisibleItemInfo info)
     {
         if (PaintNode != null)
@@ -282,6 +491,10 @@ public class FastTree
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="eventArgs"></param>
     protected override void OnDragOverItem (DragOverItemEventArgs eventArgs)
     {
         base.OnDragOverItem (eventArgs);
@@ -291,6 +504,10 @@ public class FastTree
         DragOverNode?.Invoke (this, eventArgs);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="eventArgs"></param>
     protected override void OnDropOverItem (DragOverItemEventArgs eventArgs)
     {
         eventArgs.Tag = nodes[eventArgs.ItemIndex];
@@ -304,63 +521,99 @@ public class FastTree
 
     #region Properties
 
-    [DefaultValue (true)] public bool AutoCollapse { get; set; }
+    /// <summary>
+    ///
+    /// </summary>
+    [DefaultValue (true)]
+    public bool AutoCollapse { get; set; }
 
-    [DefaultValue (false)] public bool ShowRootNode { get; set; }
+    /// <summary>
+    ///
+    /// </summary>
+    [DefaultValue (false)]
+    public bool ShowRootNode { get; set; }
 
+    /// <summary>
+    ///
+    /// </summary>
     [Browsable (false)]
-    public IEnumerable<object> ExpandedNodes
-    {
-        get { return expandedNodes; }
-    }
+    public IEnumerable<object> ExpandedNodes => expandedNodes;
 
+    /// <summary>
+    ///
+    /// </summary>
     [Browsable (false)]
     public IEnumerable<object> SelectedNodes
     {
         get { return SelectedItemIndexes.OrderBy (i => i).Select (i => nodes[i]); }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     [Browsable (false)]
-    public object SelectedNode
-    {
-        get { return SelectedNodes.FirstOrDefault(); }
-    }
+    public object? SelectedNode => SelectedNodes.FirstOrDefault();
 
+    /// <summary>
+    ///
+    /// </summary>
     [Browsable (false)]
     public IEnumerable<object> CheckedNodes
     {
         get { return CheckedItemIndex.OrderBy (i => i).Select (i => nodes[i]); }
     }
 
-    [DefaultValue (true)] public bool UncheckChildWhenCollapsed { get; set; }
+    /// <summary>
+    ///
+    /// </summary>
+    [DefaultValue (true)]
+    public bool UncheckChildWhenCollapsed { get; set; }
 
     /// <summary>
     /// List of all visible nodes
     /// </summary>
     [Browsable (false)]
-    public IEnumerable<object> Nodes
-    {
-        get { return nodes; }
-    }
+    public IEnumerable<object> Nodes => nodes;
 
-    protected List<object> nodes = new List<object>();
-    protected List<int> levels = new List<int>();
-    protected HashSet<object> expandedNodes = new HashSet<object>();
+    /// <summary>
+    ///
+    /// </summary>
+    protected List<object> nodes = new ();
+
+    /// <summary>
+    ///
+    /// </summary>
+    protected List<int> levels = new ();
+
+    /// <summary>
+    ///
+    /// </summary>
+    protected HashSet<object> expandedNodes = new ();
+
+    /// <summary>
+    ///
+    /// </summary>
     protected BitArray hasChildren;
 
+    /// <summary>
+    ///
+    /// </summary>
     [Browsable (false)]
     [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
     public override int ItemCount
     {
-        get { return base.ItemCount; }
-        set { base.ItemCount = value; }
+        get => base.ItemCount;
+        set => base.ItemCount = value;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     [DefaultValue (16)]
     public override int ItemIndentDefault
     {
-        get { return base.ItemIndentDefault; }
-        set { base.ItemIndentDefault = value; }
+        get => base.ItemIndentDefault;
+        set => base.ItemIndentDefault = value;
     }
 
     #endregion
@@ -370,9 +623,10 @@ public class FastTree
     /// <summary>
     /// Конуструктор.
     /// </summary>
-
     public FastTree()
     {
+        hasChildren = null!;
+
         AutoCollapse = true;
         ShowRootNode = false;
         ShowExpandBoxes = true;
@@ -390,21 +644,32 @@ public class FastTree
 
     #region Build
 
-    protected object root;
+    /// <summary>
+    ///
+    /// </summary>
+    protected object? root;
 
-    public void Build (object root)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="rootNode"></param>
+    public void Build (object? rootNode)
     {
-        this.root = root;
+        root = rootNode;
 
         //create set of selected and checked nodes
         var selected = new HashSet<object>();
         var check = new HashSet<object>();
 
         foreach (var i in SelectedItemIndexes)
+        {
             selected.Add (nodes[i]);
+        }
 
         foreach (var i in CheckedItemIndex)
+        {
             check.Add (nodes[i]);
+        }
 
         //
         nodes.Clear();
@@ -415,18 +680,18 @@ public class FastTree
         //build list of expanded nodes
         if (ShowRootNode)
         {
-            AddNode (root, 0);
+            AddNode (rootNode, 0);
         }
         else
         {
-            AddNodeChildren (root, 0);
+            AddNodeChildren (rootNode, 0);
         }
 
         //restore indexes of selected and checked nodes
         var newExpanded = new HashSet<object>();
         hasChildren = new BitArray (nodes.Count);
 
-        for (int i = 0; i < nodes.Count; i++)
+        for (var i = 0; i < nodes.Count; i++)
         {
             var node = nodes[i];
             if (selected.Contains (node))
@@ -452,6 +717,9 @@ public class FastTree
         base.Build();
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public void Rebuild()
     {
         if (root != null)
@@ -460,7 +728,7 @@ public class FastTree
         }
     }
 
-    private void AddNode (object node, int level)
+    private void AddNode (object? node, int level)
     {
         if (node == null || !GetNodeVisibility (node))
         {
@@ -478,13 +746,15 @@ public class FastTree
         }
     }
 
-    private void AddNodeChildren (object node, int level)
+    private void AddNodeChildren (object? node, int level)
     {
         foreach (var child in GetNodeChildren (node))
+        {
             AddNode (child, level);
+        }
     }
 
-    protected virtual IEnumerable GetNodeChildren (object node)
+    protected virtual IEnumerable GetNodeChildren (object? node)
     {
         if (NodeChildrenNeeded != null)
         {
@@ -493,15 +763,19 @@ public class FastTree
             if (arg.Children != null)
             {
                 foreach (var child in arg.Children)
+                {
                     yield return child;
+                }
             }
         }
-        else if (node is IEnumerable)
+        else if (node is IEnumerable enumerable)
         {
-            if (!(node is string))
+            if (enumerable is not string)
             {
-                foreach (var child in node as IEnumerable)
+                foreach (var child in enumerable)
+                {
                     yield return child;
+                }
             }
         }
     }
@@ -510,7 +784,12 @@ public class FastTree
 
     #region Additional methods
 
-    public virtual object GetNodeByIndex (int index)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="index"></param>
+    /// <returns></returns>
+    public virtual object? GetNodeByIndex (int index)
     {
         if (index < 0 || index >= nodes.Count)
         {
@@ -520,11 +799,21 @@ public class FastTree
         return nodes[index];
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="index"></param>
+    /// <returns></returns>
     public virtual int GetItemLevel (int index)
     {
         return levels[index];
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="itemIndex"></param>
+    /// <returns></returns>
     public override bool ExpandItem (int itemIndex)
     {
         if (itemIndex < 0 || itemIndex >= nodes.Count)
@@ -551,14 +840,26 @@ public class FastTree
         return false;
     }
 
-    public virtual void ExpandNodesUnsafe (IEnumerable<object> nodes)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="sequence"></param>
+    public virtual void ExpandNodesUnsafe (IEnumerable<object> sequence)
     {
-        foreach (var node in nodes)
+        foreach (var node in sequence)
+        {
             expandedNodes.Add (node);
+        }
+
         BuildNeeded();
         Invalidate();
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="itemIndex"></param>
+    /// <returns></returns>
     public override bool CollapseItem (int itemIndex)
     {
         return CollapseItem (itemIndex, true);
@@ -588,6 +889,7 @@ public class FastTree
 
             //check selection, checked
             foreach (var j in SelectedItemIndexes)
+            {
                 if (j >= from && j <= to)
                 {
                     if (!CanUnselectItem (j))
@@ -595,8 +897,10 @@ public class FastTree
                         return false;
                     }
                 }
+            }
 
             foreach (var j in CheckedItemIndex)
+            {
                 if (j >= from && j <= to)
                 {
                     if (!CanUncheckItem (j))
@@ -604,6 +908,7 @@ public class FastTree
                         return false;
                     }
                 }
+            }
 
             for (var j = from; j <= to; j++)
                 if (expandedNodes.Contains (nodes[j]))
@@ -615,7 +920,7 @@ public class FastTree
                 }
 
             //unselect, uncheck
-            for (int j = from; j <= to; j++)
+            for (var j = from; j <= to; j++)
             {
                 UnselectItem (j);
                 if (UncheckChildWhenCollapsed)
@@ -646,55 +951,93 @@ public class FastTree
         return false;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="node"></param>
+    /// <returns></returns>
     public virtual bool UnselectNode (object node)
     {
         return base.UnselectItem (nodes.IndexOf (node));
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="node"></param>
+    /// <param name="unselectOtherItems"></param>
+    /// <returns></returns>
     public virtual bool SelectNode (object node, bool unselectOtherItems = true)
     {
         return base.SelectItem (nodes.IndexOf (node), unselectOtherItems);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="node"></param>
+    /// <returns></returns>
     public virtual bool UncheckNode (object node)
     {
         return base.UncheckItem (nodes.IndexOf (node));
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="node"></param>
+    /// <returns></returns>
     public virtual bool CheckNode (object node)
     {
         return base.CheckItem (nodes.IndexOf (node));
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="node"></param>
+    /// <returns></returns>
     public virtual bool IsNodeSelected (object node)
     {
         return SelectedItemIndexes.Contains (nodes.IndexOf (node));
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="node"></param>
+    /// <returns></returns>
     public virtual bool IsNodeChecked (object node)
     {
         return GetItemChecked (nodes.IndexOf (node));
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="node"></param>
+    /// <returns></returns>
     public virtual bool IsNodeExpanded (object node)
     {
         return expandedNodes.Contains (node);
     }
 
-    private bool ExpandNodeAndChildren (object node, int maxExpandLevelCount)
+    private bool ExpandNodeAndChildren (object? node, int maxExpandLevelCount)
     {
         var list = GetNodeChildren (node).Cast<object>().ToList();
         if (list.Count > 0)
         {
             if (CanExpandNode (node))
             {
-                expandedNodes.Add (node);
-                OnNodeExpanded (node);
+                expandedNodes.Add (node!);
+                OnNodeExpanded (node!);
 
                 if (maxExpandLevelCount > 1)
                 {
                     foreach (var child in list)
+                    {
                         ExpandNodeAndChildren (child, maxExpandLevelCount - 1);
+                    }
                 }
 
                 return true;
@@ -704,6 +1047,12 @@ public class FastTree
         return false;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="node"></param>
+    /// <param name="expandChildren"></param>
+    /// <returns></returns>
     public bool ExpandNode (object node, bool expandChildren = false)
     {
         if (expandChildren)
@@ -722,6 +1071,12 @@ public class FastTree
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="node"></param>
+    /// <param name="maxExpandLevelCount"></param>
+    /// <returns></returns>
     public bool ExpandNode (object node, int maxExpandLevelCount)
     {
         if (maxExpandLevelCount > 1)
@@ -740,11 +1095,19 @@ public class FastTree
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="node"></param>
+    /// <returns></returns>
     public bool CollapseNode (object node)
     {
         return CollapseItem (nodes.IndexOf (node));
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public void ExpandAll()
     {
         if (ShowRootNode)
@@ -754,17 +1117,23 @@ public class FastTree
         else
         {
             foreach (var child in GetNodeChildren (root))
+            {
                 ExpandNodeAndChildren (child, int.MaxValue);
+            }
         }
 
         Build (root);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public bool CollapseAll()
     {
         var res = true;
 
-        for (int i = nodes.Count - 1; i >= 0; i--)
+        for (var i = nodes.Count - 1; i >= 0; i--)
             if (expandedNodes.Contains (nodes[i]))
             {
                 res &= CollapseItem (i, false);
@@ -787,7 +1156,9 @@ public class FastTree
         }
 
         foreach (var i in GetItemExpandedChildren (itemIndex, onlyFirstLevel))
+        {
             yield return nodes[i];
+        }
     }
 
     /// <summary>
@@ -808,11 +1179,22 @@ public class FastTree
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="node"></param>
+    /// <returns></returns>
     public int GetItemIndexOfNode (object node)
     {
         return nodes.IndexOf (node);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="node"></param>
+    /// <param name="tryToCenter"></param>
+    /// <returns></returns>
     public virtual bool ScrollToNode (object node, bool tryToCenter = false)
     {
         var itemIndex = GetItemIndexOfNode (node);
@@ -837,16 +1219,31 @@ public class FastTree
 
     #region Overrided methods
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="itemIndex"></param>
+    /// <returns></returns>
     public override int GetItemIndent (int itemIndex)
     {
         return GetIntNodeProperty (itemIndex, NodeIndentNeeded, levels[itemIndex] * ItemIndentDefault);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="itemIndex"></param>
+    /// <returns></returns>
     protected override bool GetItemExpanded (int itemIndex)
     {
         return expandedNodes.Contains (nodes[itemIndex]);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="itemIndex"></param>
+    /// <returns></returns>
     protected override bool CanExpandItem (int itemIndex)
     {
         return GetBoolNodeProperty (itemIndex, CanExpandNodeNeeded, hasChildren[itemIndex]);
@@ -856,19 +1253,24 @@ public class FastTree
     /// This method is used only for programmatically expanding.
     /// For GUI expanding - use CanExpandItem
     /// </summary>
-    protected virtual bool CanExpandNode (object node)
+    protected virtual bool CanExpandNode (object? node)
     {
         if (CanExpandNodeNeeded != null)
         {
-            boolArg.Node = node;
-            boolArg.Result = true;
-            CanExpandNodeNeeded (this, boolArg);
-            return boolArg.Result;
+            _boolArg.Node = node;
+            _boolArg.Result = true;
+            CanExpandNodeNeeded (this, _boolArg);
+            return _boolArg.Result;
         }
 
         return true;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="itemIndex"></param>
+    /// <returns></returns>
     public override bool CheckItem (int itemIndex)
     {
         if (GetItemChecked (itemIndex))
@@ -893,61 +1295,74 @@ public class FastTree
         return false;
     }
 
-    protected override bool IsItemHeightFixed
-    {
-        get { return NodeHeightNeeded == null; }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    protected override bool IsItemHeightFixed => NodeHeightNeeded == null;
 
-    protected override void DrawDragOverInsertEffect (Graphics gr, DragOverItemEventArgs e)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="graphics"></param>
+    /// <param name="eventArgs"></param>
+    protected override void DrawDragOverInsertEffect
+        (
+            Graphics graphics,
+            DragOverItemEventArgs eventArgs
+        )
     {
         var c1 = Color.FromArgb (255, SelectionColor);
         var c2 = Color.Transparent;
         var c3 = BackColor;
 
-        if (!visibleItemInfos.ContainsKey (e.ItemIndex))
+        if (!visibleItemInfos.ContainsKey (eventArgs.ItemIndex))
         {
             return;
         }
 
-        gr.ResetClip();
-        var info = visibleItemInfos[e.ItemIndex];
+        graphics.ResetClip();
+        var info = visibleItemInfos[eventArgs.ItemIndex];
         var rect = new Rectangle (info.X_ExpandBox + 1, info.Y, 10000, info.Height);
-        if (e.ItemIndex <= 0)
+        if (eventArgs.ItemIndex <= 0)
         {
             rect.Offset (0, 2);
         }
 
-        switch (e.InsertEffect)
+        switch (eventArgs.InsertEffect)
         {
             case InsertEffect.Replace:
                 using (var brush = new SolidBrush (c1))
-                    gr.FillRectangle (brush, rect);
+                {
+                    graphics.FillRectangle (brush, rect);
+                }
+
                 break;
 
             case InsertEffect.InsertBefore:
                 rect.Offset (0, -rect.Height / 2 - ItemInterval - 1);
-                DrawDragDropMarker (gr, rect, c1, c2, c3);
+                DrawDragDropMarker (graphics, rect, c1, c2, c3);
                 break;
 
             case InsertEffect.InsertAfter:
                 rect.Offset (0, rect.Height / 2);
-                DrawDragDropMarker (gr, rect, c1, c2, c3);
+                DrawDragDropMarker (graphics, rect, c1, c2, c3);
                 break;
 
             case InsertEffect.AddAsChild:
-                if (e.ItemIndex >= 0 && e.ItemIndex < ItemCount)
+                if (eventArgs.ItemIndex >= 0 && eventArgs.ItemIndex < ItemCount)
                 {
-                    var dx = GetItemIndent (e.ItemIndex) + ItemIndentDefault;
+                    var dx = GetItemIndent (eventArgs.ItemIndex) + ItemIndentDefault;
                     var r = new Rectangle (dx, rect.Y + rect.Height / 2, rect.Width, rect.Height);
-                    DrawDragDropMarker (gr, r, c1, c2, c3);
+                    DrawDragDropMarker (graphics, r, c1, c2, c3);
                     using (var pen = new Pen (c1))
-                        gr.DrawLines (pen,
-                            new PointF[]
+                    {
+                        graphics.DrawLines (pen, new PointF[]
                             {
                                 new Point (r.Left, r.Top + r.Height / 2),
                                 new Point (rect.Left + 8, r.Top + r.Height / 2),
                                 new Point (rect.Left + 8, r.Top + r.Height / 2 - 5)
                             });
+                    }
                 }
 
                 break;
@@ -961,18 +1376,20 @@ public class FastTree
         {
             brush.InterpolationColors = new ColorBlend()
             {
-                Positions = new float[] { 0, 0.2f, 0.8f, 1.0f },
-                Colors = new Color[] { c2, c3, c3, c2 }
+                Positions = new[] { 0, 0.2f, 0.8f, 1.0f },
+                Colors = new[] { c2, c3, c3, c2 }
             };
             gr.FillRectangle (brush, new RectangleF (0, rect.Top, rect.Width, rect.Height));
         }
 
         rect = new Rectangle (rect.Left, rect.Top + h / 2 - 2, 50, 4);
         using (var brush = new SolidBrush (c3))
-        using (var pen = new Pen (c1))
         {
-            gr.FillRectangle (brush, rect);
-            gr.DrawRectangle (pen, rect);
+            using (var pen = new Pen (c1))
+            {
+                gr.FillRectangle (brush, rect);
+                gr.DrawRectangle (pen, rect);
+            }
         }
     }
 
@@ -980,14 +1397,19 @@ public class FastTree
 
     #region Event Helpers
 
-    private Int32NodeEventArgs _int32Arg = new Int32NodeEventArgs();
-    private BoolNodeEventArgs boolArg = new BoolNodeEventArgs();
-    private StringNodeEventArgs stringArg = new StringNodeEventArgs();
-    private ImageNodeEventArgs imageArg = new ImageNodeEventArgs();
-    private StringAlignmentNodeEventArgs alignArg = new StringAlignmentNodeEventArgs();
-    private ColorNodeEventArgs colorArg = new ColorNodeEventArgs();
+    private readonly Int32NodeEventArgs _int32Arg = new ();
+    private readonly BoolNodeEventArgs _boolArg = new ();
+    private readonly StringNodeEventArgs _stringArg = new ();
+    private readonly ImageNodeEventArgs _imageArg = new ();
+    private readonly StringAlignmentNodeEventArgs _alignArg = new ();
+    private readonly ColorNodeEventArgs _colorArg = new ();
 
-    int GetIntNodeProperty (int itemIndex, EventHandler<Int32NodeEventArgs> handler, int defaultValue)
+    private int GetIntNodeProperty
+        (
+            int itemIndex,
+            EventHandler<Int32NodeEventArgs>? handler,
+            int defaultValue
+        )
     {
         if (handler != null)
         {
@@ -1000,67 +1422,91 @@ public class FastTree
         return defaultValue;
     }
 
-    string GetStringNodeProperty (int itemIndex, EventHandler<StringNodeEventArgs> handler, string defaultValue)
+    private string GetStringNodeProperty
+        (
+            int itemIndex,
+            EventHandler<StringNodeEventArgs>? handler,
+            string defaultValue
+        )
     {
         if (handler != null)
         {
-            stringArg.Node = nodes[itemIndex];
-            stringArg.Result = defaultValue;
-            handler (this, stringArg);
-            return stringArg.Result;
+            _stringArg.Node = nodes[itemIndex];
+            _stringArg.Result = defaultValue;
+            handler (this, _stringArg);
+            return _stringArg.Result;
         }
 
         return defaultValue;
     }
 
-    bool GetBoolNodeProperty (int itemIndex, EventHandler<BoolNodeEventArgs> handler, bool defaultValue)
+    private bool GetBoolNodeProperty
+        (
+            int itemIndex,
+            EventHandler<BoolNodeEventArgs>? handler,
+            bool defaultValue
+        )
     {
         if (handler != null)
         {
-            boolArg.Node = nodes[itemIndex];
-            boolArg.Result = defaultValue;
-            handler (this, boolArg);
-            return boolArg.Result;
+            _boolArg.Node = nodes[itemIndex];
+            _boolArg.Result = defaultValue;
+            handler (this, _boolArg);
+            return _boolArg.Result;
         }
 
         return defaultValue;
     }
 
-    Image GetImageNodeProperty (int itemIndex, EventHandler<ImageNodeEventArgs> handler, Image defaultValue)
+    private Image GetImageNodeProperty
+        (
+            int itemIndex,
+            EventHandler<ImageNodeEventArgs>? handler,
+            Image defaultValue
+        )
     {
         if (handler != null)
         {
-            imageArg.Node = nodes[itemIndex];
-            imageArg.Result = defaultValue;
-            handler (this, imageArg);
-            return imageArg.Result;
+            _imageArg.Node = nodes[itemIndex];
+            _imageArg.Result = defaultValue;
+            handler (this, _imageArg);
+            return _imageArg.Result;
         }
 
         return defaultValue;
     }
 
-    StringAlignment GetLineAlignmentNodeProperty (int itemIndex, EventHandler<StringAlignmentNodeEventArgs> handler,
-        StringAlignment defaultValue)
+    private StringAlignment GetLineAlignmentNodeProperty
+        (
+            int itemIndex,
+            EventHandler<StringAlignmentNodeEventArgs>? handler,
+            StringAlignment defaultValue
+        )
     {
         if (handler != null)
         {
-            alignArg.Node = nodes[itemIndex];
-            alignArg.Result = defaultValue;
-            handler (this, alignArg);
-            return alignArg.Result;
+            _alignArg.Node = nodes[itemIndex];
+            _alignArg.Result = defaultValue;
+            handler (this, _alignArg);
+            return _alignArg.Result;
         }
 
         return defaultValue;
     }
 
-    Color GetColorNodeProperty (int itemIndex, EventHandler<ColorNodeEventArgs> handler, Color defaultValue)
+    private Color GetColorNodeProperty
+        (
+            int itemIndex,
+            EventHandler<ColorNodeEventArgs>? handler,
+            Color defaultValue
+        )
     {
         if (handler != null)
         {
-            colorArg.Node = nodes[itemIndex];
-            colorArg.Result = defaultValue;
-            handler (this, colorArg);
-            return colorArg.Result;
+            _colorArg.Node = nodes[itemIndex];
+            _colorArg.Result = defaultValue;
+            handler (this, _colorArg);
+            return _colorArg.Result;
         }
 
         return defaultValue;

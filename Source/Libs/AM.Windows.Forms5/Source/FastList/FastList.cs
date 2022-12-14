@@ -46,7 +46,7 @@ public class FastList
         if (LicenseManager.UsageMode == LicenseUsageMode.Designtime)
         {
             ItemCount = 100;
-            ItemTextNeeded += (o, a) => a.Result = "Item " + a.ItemIndex;
+            ItemTextNeeded += (_, a) => a.Result = "Item " + a.ItemIndex;
             SelectedItemIndexes.Add (0);
         }
     }
@@ -288,7 +288,7 @@ public class FastList
     }
 
     /// <inheritdoc cref="FastListBase.GetItemIcon"/>
-    protected override Image? GetItemIcon
+    protected override Image GetItemIcon
         (
             int itemIndex
         )
@@ -422,6 +422,7 @@ public class FastList
         base.OnItemUnchecked (itemIndex);
     }
 
+    /// <inheritdoc cref="FastListBase.OnItemExpanded"/>
     protected override void OnItemExpanded (int itemIndex)
     {
         if (ItemExpandedStateChanged != null)
@@ -433,6 +434,7 @@ public class FastList
         base.OnItemExpanded (itemIndex);
     }
 
+    /// <inheritdoc cref="FastListBase.OnItemCollapsed"/>
     protected override void OnItemCollapsed (int itemIndex)
     {
         if (ItemExpandedStateChanged != null)
@@ -444,6 +446,7 @@ public class FastList
         base.OnItemCollapsed (itemIndex);
     }
 
+    /// <inheritdoc cref="FastListBase.OnItemSelected"/>
     protected override void OnItemSelected (int itemIndex)
     {
         if (ItemSelectedStateChanged != null)
@@ -455,6 +458,7 @@ public class FastList
         base.OnItemSelected (itemIndex);
     }
 
+    /// <inheritdoc cref="FastListBase.OnItemTextPushed"/>
     protected override void OnItemTextPushed (int itemIndex, string text)
     {
         if (ItemTextPushed != null)
@@ -465,6 +469,7 @@ public class FastList
         base.OnItemTextPushed (itemIndex, text);
     }
 
+    /// <inheritdoc cref="FastListBase.OnItemUnselected"/>
     protected override void OnItemUnselected (int itemIndex)
     {
         if (ItemSelectedStateChanged != null)
@@ -476,6 +481,7 @@ public class FastList
         base.OnItemUnselected (itemIndex);
     }
 
+    /// <inheritdoc cref="FastListBase.OnItemDrag"/>
     protected override void OnItemDrag (HashSet<int> itemIndex)
     {
         if (ItemDrag != null)
@@ -490,6 +496,7 @@ public class FastList
         base.OnItemDrag (itemIndex);
     }
 
+    /// <inheritdoc cref="FastListBase.DrawItem"/>
     protected override void DrawItem (Graphics gr, VisibleItemInfo info)
     {
         if (PaintItem != null)
@@ -502,6 +509,7 @@ public class FastList
         }
     }
 
+    /// <inheritdoc cref="FastListBase.OnDragOverItem"/>
     protected override void OnDragOverItem (DragOverItemEventArgs eventArgs)
     {
         base.OnDragOverItem (eventArgs);
@@ -509,6 +517,7 @@ public class FastList
         DragOverItem?.Invoke (this, eventArgs);
     }
 
+    /// <inheritdoc cref="FastListBase.OnDropOverItem"/>
     protected override void OnDropOverItem (DragOverItemEventArgs eventArgs)
     {
         DropOverItem?.Invoke (this, eventArgs);
@@ -516,6 +525,7 @@ public class FastList
         base.OnDropOverItem (eventArgs);
     }
 
+    /// <inheritdoc cref="FastListBase.OnScrollbarsUpdated"/>
     protected override void OnScrollbarsUpdated()
     {
         ScrollbarsUpdated?.Invoke (this, EventArgs.Empty);
@@ -586,7 +596,7 @@ public class FastList
         return defaultValue;
     }
 
-    private Image? GetImageItemProperty
+    private Image GetImageItemProperty
         (
             int itemIndex,
             EventHandler<ImageItemEventArgs>? handler,

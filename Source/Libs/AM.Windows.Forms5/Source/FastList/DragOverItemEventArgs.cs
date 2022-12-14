@@ -61,7 +61,7 @@ public sealed class DragOverItemEventArgs
     /// </summary>
     public DragOverItemEventArgs
         (
-            IDataObject data,
+            IDataObject? data,
             int keyState,
             int x,
             int y,

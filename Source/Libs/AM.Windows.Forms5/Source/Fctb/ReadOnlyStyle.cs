@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable VirtualMemberCallInConstructor
 
 /* ReadOnlySytle.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -38,6 +39,7 @@ public class ReadOnlyStyle
 
     #endregion
 
+    /// <inheritdoc cref="Style.Draw"/>
     public override void Draw (Graphics graphics, Point position, TextRange range)
     {
         //

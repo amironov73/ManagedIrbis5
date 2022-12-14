@@ -30,7 +30,7 @@ public class GenericNodeResultEventArgs<T>
     /// <summary>
     /// Узел.
     /// </summary>
-    public object Node { get; internal set; }
+    public object? Node { get; internal set; }
 
     /// <summary>
     /// Результат вычисления.

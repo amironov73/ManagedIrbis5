@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable LocalizableElement
 
 /* FindForm.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -21,16 +22,24 @@ using System.Windows.Forms;
 
 namespace Fctb;
 
-public partial class FindForm : Form
+/// <summary>
+///
+/// </summary>
+public partial class FindForm
+    : Form
 {
-    bool firstSearch = true;
-    Place startPlace;
-    SyntaxTextBox tb;
+    private bool _firstSearch = true;
+    private Place _startPlace;
+    private readonly SyntaxTextBox _textBox;
 
-    public FindForm (SyntaxTextBox tb)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="textBox"></param>
+    public FindForm (SyntaxTextBox textBox)
     {
         InitializeComponent();
-        this.tb = tb;
+        _textBox = textBox;
     }
 
     private void btClose_Click (object sender, EventArgs e)
@@ -43,6 +52,10 @@ public partial class FindForm : Form
         FindNext (tbFind.Text);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="pattern"></param>
     public virtual void FindNext (string pattern)
     {
         try
@@ -59,40 +72,35 @@ public partial class FindForm : Form
             }
 
             //
-            var range = tb.Selection.Clone();
+            var range = _textBox.Selection.Clone();
             range.Normalize();
 
             //
-            if (firstSearch)
+            if (_firstSearch)
             {
-                startPlace = range.Start;
-                firstSearch = false;
+                _startPlace = range.Start;
+                _firstSearch = false;
             }
 
             //
             range.Start = range.End;
-            if (range.Start >= startPlace)
-            {
-                range.End = new Place (tb.GetLineLength (tb.LinesCount - 1), tb.LinesCount - 1);
-            }
-            else
-            {
-                range.End = startPlace;
-            }
+            range.End = range.Start >= _startPlace
+                ? new Place (_textBox.GetLineLength (_textBox.LinesCount - 1), _textBox.LinesCount - 1)
+                : _startPlace;
 
             //
             foreach (var r in range.GetRangesByLines (pattern, opt))
             {
-                tb.Selection = r;
-                tb.DoSelectionVisible();
-                tb.Invalidate();
+                _textBox.Selection = r;
+                _textBox.DoSelectionVisible();
+                _textBox.Invalidate();
                 return;
             }
 
             //
-            if (range.Start >= startPlace && startPlace > Place.Empty)
+            if (range.Start >= _startPlace && _startPlace > Place.Empty)
             {
-                tb.Selection.Start = new Place (0, 0);
+                _textBox.Selection.Start = new Place (0, 0);
                 FindNext (pattern);
                 return;
             }
@@ -105,34 +113,42 @@ public partial class FindForm : Form
         }
     }
 
-    private void tbFind_KeyPress (object sender, KeyPressEventArgs e)
+    private void tbFind_KeyPress
+        (
+            object? sender,
+            KeyPressEventArgs eventArgs
+        )
     {
-        if (e.KeyChar == '\r')
+        if (eventArgs.KeyChar == '\r')
         {
             btFindNext.PerformClick();
-            e.Handled = true;
+            eventArgs.Handled = true;
             return;
         }
 
-        if (e.KeyChar == '\x1b')
+        if (eventArgs.KeyChar == '\x1b')
         {
             Hide();
-            e.Handled = true;
-            return;
+            eventArgs.Handled = true;
         }
     }
 
-    private void FindForm_FormClosing (object sender, FormClosingEventArgs e)
+    private void FindForm_FormClosing
+        (
+            object? sender,
+            FormClosingEventArgs eventArgs
+        )
     {
-        if (e.CloseReason == CloseReason.UserClosing)
+        if (eventArgs.CloseReason == CloseReason.UserClosing)
         {
-            e.Cancel = true;
+            eventArgs.Cancel = true;
             Hide();
         }
 
-        this.tb.Focus();
+        this._textBox.Focus();
     }
 
+    /// <inheritdoc cref="Form.ProcessCmdKey"/>
     protected override bool ProcessCmdKey (ref Message msg, Keys keyData)
     {
         if (keyData == Keys.Escape)
@@ -144,18 +160,19 @@ public partial class FindForm : Form
         return base.ProcessCmdKey (ref msg, keyData);
     }
 
-    protected override void OnActivated (EventArgs e)
+    /// <inheritdoc cref="Form.OnActivated"/>
+    protected override void OnActivated (EventArgs eventArgs)
     {
         tbFind.Focus();
         ResetSerach();
     }
 
-    void ResetSerach()
+    private void ResetSerach()
     {
-        firstSearch = true;
+        _firstSearch = true;
     }
 
-    private void cbMatchCase_CheckedChanged (object sender, EventArgs e)
+    private void cbMatchCase_CheckedChanged (object? sender, EventArgs eventArgs)
     {
         ResetSerach();
     }
