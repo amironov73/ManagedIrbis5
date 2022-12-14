@@ -155,6 +155,7 @@ public sealed class PdbHeader
 
     private void LoadPdbHeader()
     {
+        // ReSharper disable MustUseReturnValue
         _stream.Read (_name, 0, _name.Length);
         _stream.Read (_attributes, 0, _attributes.Length);
         _stream.Read (_version, 0, _version.Length);
@@ -177,6 +178,7 @@ public sealed class PdbHeader
         }
 
         _stream.Read (_gapToData, 0, _gapToData.Length);
+        // ReSharper restore MustUseReturnValue
     }
 
     /// <summary>

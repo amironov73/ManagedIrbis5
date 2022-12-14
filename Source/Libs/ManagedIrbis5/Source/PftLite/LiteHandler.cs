@@ -60,14 +60,14 @@ public static class LiteHandler
 
         try
         {
-            if (!_cache.TryGetValue (format, out LiteFormatter formatter))
+            if (!_cache.TryGetValue (format, out LiteFormatter? formatter))
             {
                 formatter = new LiteFormatter();
                 formatter.SetFormat (format.Trim());
                 _cache.Set (format, formatter, TimeSpan.FromMinutes (5));
             }
 
-            var result = formatter.FormatRecord (record);
+            var result = formatter!.FormatRecord (record);
             context.Output.Write (result);
 
         }

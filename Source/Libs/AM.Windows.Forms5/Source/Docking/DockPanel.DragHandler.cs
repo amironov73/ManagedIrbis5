@@ -4,7 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
-/*
+/* DockPanelDragHandler.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -28,22 +28,31 @@ partial class DockPanel
     ///      and message filtering.
     ///   2. Override the OnDragging and OnEndDrag methods.
     /// </summary>
-    public abstract class DragHandlerBase : NativeWindow, IMessageFilter
+    public abstract class DragHandlerBase
+        : NativeWindow, IMessageFilter
     {
+        /// <summary>
+        ///
+        /// </summary>
         protected DragHandlerBase()
         {
+            // пустое тело конструктора
         }
 
-        protected abstract Control DragControl { get; }
+        /// <summary>
+        ///
+        /// </summary>
+        protected abstract Control? DragControl { get; }
 
-        private Point m_startMousePosition = Point.Empty;
+        /// <summary>
+        ///
+        /// </summary>
+        protected Point StartMousePosition { get; private set; } = Point.Empty;
 
-        protected Point StartMousePosition
-        {
-            get { return m_startMousePosition; }
-            private set { m_startMousePosition = value; }
-        }
-
+        /// <summary>
+        ///
+        /// </summary>
+        /// <returns></returns>
         protected bool BeginDrag()
         {
             if (DragControl == null)
@@ -61,8 +70,8 @@ partial class DockPanel
                 }
             }
 
-            DragControl.FindForm().Capture = true;
-            AssignHandle (DragControl.FindForm().Handle);
+            DragControl.FindForm()!.Capture = true;
+            AssignHandle (DragControl.FindForm()!.Handle);
             if (PatchController.EnableActiveXFix == false)
             {
                 Application.AddMessageFilter (this);
@@ -71,8 +80,15 @@ partial class DockPanel
             return true;
         }
 
+        /// <summary>
+        ///
+        /// </summary>
         protected abstract void OnDragging();
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="abort"></param>
         protected abstract void OnEndDrag (bool abort);
 
         private void EndDrag (bool abort)
@@ -84,7 +100,7 @@ partial class DockPanel
                 Application.RemoveMessageFilter (this);
             }
 
-            DragControl.FindForm().Capture = false;
+            DragControl!.FindForm()!.Capture = false;
 
             OnEndDrag (abort);
         }
@@ -114,32 +130,46 @@ partial class DockPanel
             return OnPreFilterMessage (ref m);
         }
 
-        protected virtual bool OnPreFilterMessage (ref Message m)
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="m"></param>
+        /// <returns></returns>
+        protected virtual bool OnPreFilterMessage
+            (
+                ref Message m
+            )
         {
             if (PatchController.EnableActiveXFix == true)
             {
-                if (m.Msg == (int)Win32.Msgs.WM_MOUSEMOVE)
+                switch (m.Msg)
                 {
-                    OnDragging();
-                }
-                else if (m.Msg == (int)Win32.Msgs.WM_LBUTTONUP)
-                {
-                    EndDrag (false);
-                }
-                else if (m.Msg == (int)Win32.Msgs.WM_CAPTURECHANGED)
-                {
-                    EndDrag (!Win32Helper.IsRunningOnMono);
-                }
-                else if (m.Msg == (int)Win32.Msgs.WM_KEYDOWN && (int)m.WParam == (int)Keys.Escape)
-                {
-                    EndDrag (true);
+                    case (int) Win32.Msgs.WM_MOUSEMOVE:
+                        OnDragging();
+                        break;
+
+                    case (int) Win32.Msgs.WM_LBUTTONUP:
+                        EndDrag (false);
+                        break;
+
+                    case (int) Win32.Msgs.WM_CAPTURECHANGED:
+                        EndDrag (!Win32Helper.IsRunningOnMono);
+                        break;
+
+                    case (int) Win32.Msgs.WM_KEYDOWN when (int)m.WParam == (int)Keys.Escape:
+                        EndDrag (true);
+                        break;
                 }
             }
 
             return false;
         }
 
-        protected sealed override void WndProc (ref Message m)
+        /// <inheritdoc cref="NativeWindow.WndProc"/>
+        protected sealed override void WndProc
+            (
+                ref Message m
+            )
         {
             if (PatchController.EnableActiveXFix == true)
             {
@@ -158,36 +188,49 @@ partial class DockPanel
         }
     }
 
-    public abstract class DragHandler : DragHandlerBase
+    /// <summary>
+    ///
+    /// </summary>
+    public abstract class DragHandler
+        : DragHandlerBase
     {
-        private DockPanel m_dockPanel;
-
-        protected DragHandler (DockPanel dockPanel)
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="dockPanel"></param>
+        protected DragHandler
+            (
+                DockPanel dockPanel
+            )
         {
-            m_dockPanel = dockPanel;
+            Sure.NotNull (dockPanel);
+
+            DockPanel = dockPanel;
         }
 
-        public DockPanel DockPanel
-        {
-            get { return m_dockPanel; }
-        }
+        /// <summary>
+        ///
+        /// </summary>
+        public DockPanel DockPanel { get; }
 
-        private IDragSource m_dragSource;
+        /// <summary>
+        ///
+        /// </summary>
+        protected IDragSource? DragSource { get; set; }
 
-        protected IDragSource DragSource
-        {
-            get { return m_dragSource; }
-            set { m_dragSource = value; }
-        }
+        /// <summary>
+        ///
+        /// </summary>
+        protected sealed override Control? DragControl =>
+            DragSource?.DragControl;
 
-        protected sealed override Control DragControl
+        /// <inheritdoc cref="DragHandlerBase.OnPreFilterMessage"/>
+        protected sealed override bool OnPreFilterMessage
+            (
+                ref Message m
+            )
         {
-            get { return DragSource == null ? null : DragSource.DragControl; }
-        }
-
-        protected sealed override bool OnPreFilterMessage (ref Message m)
-        {
-            if ((m.Msg == (int)Win32.Msgs.WM_KEYDOWN || m.Msg == (int)Win32.Msgs.WM_KEYUP) &&
+            if (m.Msg is (int)Win32.Msgs.WM_KEYDOWN or (int)Win32.Msgs.WM_KEYUP &&
                 ((int)m.WParam == (int)Keys.ControlKey || (int)m.WParam == (int)Keys.ShiftKey))
             {
                 OnDragging();
