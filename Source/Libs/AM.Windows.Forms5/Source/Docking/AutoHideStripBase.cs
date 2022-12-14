@@ -4,7 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
-/*
+/* AutoHideStripBase.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,16 +24,25 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace AM.Windows.Forms.Docking;
 
-public abstract class AutoHideStripBase : Control
+/// <summary>
+///
+/// </summary>
+public abstract class AutoHideStripBase
+    : Control
 {
+    /// <summary>
+    ///
+    /// </summary>
     [SuppressMessage ("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible")]
     protected class Tab : IDisposable
     {
-        private IDockContent m_content;
-
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="content"></param>
         protected internal Tab (IDockContent content)
         {
-            m_content = content;
+            Content = content;
         }
 
         ~Tab()
@@ -41,36 +50,46 @@ public abstract class AutoHideStripBase : Control
             Dispose (false);
         }
 
-        public IDockContent Content
-        {
-            get { return m_content; }
-        }
+        /// <summary>
+        ///
+        /// </summary>
+        public IDockContent Content { get; }
 
+        /// <inheritdoc cref="IDisposable.Dispose"/>
         public void Dispose()
         {
             Dispose (true);
             GC.SuppressFinalize (this);
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="disposing"></param>
         protected virtual void Dispose (bool disposing)
         {
+            // пустое тело метода
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     [SuppressMessage ("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible")]
-    protected sealed class TabCollection : IEnumerable<Tab>
+    protected sealed class TabCollection
+        : IEnumerable<Tab>
     {
         #region IEnumerable Members
 
         IEnumerator<Tab> IEnumerable<Tab>.GetEnumerator()
         {
-            for (int i = 0; i < Count; i++)
+            for (var i = 0; i < Count; i++)
                 yield return this[i];
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            for (int i = 0; i < Count; i++)
+            for (var i = 0; i < Count; i++)
                 yield return this[i];
         }
 
@@ -78,56 +97,71 @@ public abstract class AutoHideStripBase : Control
 
         internal TabCollection (DockPane pane)
         {
-            m_dockPane = pane;
+            DockPane = pane;
         }
 
-        private DockPane m_dockPane = null;
+        /// <summary>
+        ///
+        /// </summary>
+        public DockPane DockPane { get; }
 
-        public DockPane DockPane
-        {
-            get { return m_dockPane; }
-        }
+        /// <summary>
+        ///
+        /// </summary>
+        public DockPanel DockPanel => DockPane.DockPanel;
 
-        public DockPanel DockPanel
-        {
-            get { return DockPane.DockPanel; }
-        }
+        /// <summary>
+        ///
+        /// </summary>
+        public int Count => DockPane.DisplayingContents.Count;
 
-        public int Count
-        {
-            get { return DockPane.DisplayingContents.Count; }
-        }
-
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="index"></param>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
         public Tab this [int index]
         {
             get
             {
-                IDockContent content = DockPane.DisplayingContents[index];
+                var content = DockPane.DisplayingContents[index];
                 if (content == null)
                 {
                     throw new ArgumentOutOfRangeException (nameof (index));
                 }
 
-                if (content.DockHandler.AutoHideTab == null)
-                {
-                    content.DockHandler.AutoHideTab = (DockPanel.AutoHideStripControl.CreateTab (content));
-                }
+                content.DockHandler.AutoHideTab ??= (DockPanel.AutoHideStripControl.CreateTab (content));
 
-                return content.DockHandler.AutoHideTab as Tab;
+                return (content.DockHandler.AutoHideTab as Tab)!;
             }
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="tab"></param>
+        /// <returns></returns>
         public bool Contains (Tab tab)
         {
             return (IndexOf (tab) != -1);
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
         public bool Contains (IDockContent content)
         {
             return (IndexOf (content) != -1);
         }
 
-        public int IndexOf (Tab tab)
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="tab"></param>
+        /// <returns></returns>
+        public int IndexOf (Tab? tab)
         {
             if (tab == null)
             {
@@ -137,20 +171,31 @@ public abstract class AutoHideStripBase : Control
             return IndexOf (tab.Content);
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
         public int IndexOf (IDockContent content)
         {
             return DockPane.DisplayingContents.IndexOf (content);
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     [SuppressMessage ("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible")]
-    protected class Pane : IDisposable
+    protected class Pane
+        : IDisposable
     {
-        private DockPane m_dockPane;
-
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="dockPane"></param>
         protected internal Pane (DockPane dockPane)
         {
-            m_dockPane = dockPane;
+            DockPane = dockPane;
         }
 
         ~Pane()
@@ -158,67 +203,67 @@ public abstract class AutoHideStripBase : Control
             Dispose (false);
         }
 
-        public DockPane DockPane
-        {
-            get { return m_dockPane; }
-        }
+        /// <summary>
+        ///
+        /// </summary>
+        public DockPane DockPane { get; }
 
+        /// <summary>
+        ///
+        /// </summary>
         public TabCollection AutoHideTabs
         {
             get
             {
-                if (DockPane.AutoHideTabs == null)
-                {
-                    DockPane.AutoHideTabs = new TabCollection (DockPane);
-                }
+                DockPane.AutoHideTabs ??= new TabCollection (DockPane);
 
-                return DockPane.AutoHideTabs as TabCollection;
+                return (DockPane.AutoHideTabs as TabCollection)!;
             }
         }
 
+        /// <inheritdoc cref="IDisposable.Dispose"/>
         public void Dispose()
         {
             Dispose (true);
             GC.SuppressFinalize (this);
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="disposing"></param>
         protected virtual void Dispose (bool disposing)
         {
+            // пустое тело метода
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     [SuppressMessage ("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible")]
-    protected sealed class PaneCollection : IEnumerable<Pane>
+    protected sealed class PaneCollection
+        : IEnumerable<Pane>
     {
         private class AutoHideState
         {
-            public DockState m_dockState;
-            public bool m_selected = false;
-
             public AutoHideState (DockState dockState)
             {
-                m_dockState = dockState;
+                this.DockState = dockState;
             }
 
-            public DockState DockState
-            {
-                get { return m_dockState; }
-            }
+            public DockState DockState { get; }
 
-            public bool Selected
-            {
-                get { return m_selected; }
-                set { m_selected = value; }
-            }
+            public bool Selected { get; set; }
         }
 
         private class AutoHideStateCollection
         {
-            private AutoHideState[] m_states;
+            private readonly AutoHideState[] _states;
 
             public AutoHideStateCollection()
             {
-                m_states = new[]
+                _states = new[]
                 {
                     new AutoHideState (DockState.DockTopAutoHide),
                     new AutoHideState (DockState.DockBottomAutoHide),
@@ -231,11 +276,11 @@ public abstract class AutoHideStripBase : Control
             {
                 get
                 {
-                    for (int i = 0; i < m_states.Length; i++)
+                    for (var i = 0; i < _states.Length; i++)
                     {
-                        if (m_states[i].DockState == dockState)
+                        if (_states[i].DockState == dockState)
                         {
-                            return m_states[i];
+                            return _states[i];
                         }
                     }
 
@@ -250,9 +295,9 @@ public abstract class AutoHideStripBase : Control
                     return false;
                 }
 
-                for (int i = 0; i < m_states.Length; i++)
+                for (var i = 0; i < _states.Length; i++)
                 {
-                    if (m_states[i].DockState == pane.DockState && m_states[i].Selected)
+                    if (_states[i].DockState == pane.DockState && _states[i].Selected)
                     {
                         return true;
                     }
@@ -264,34 +309,44 @@ public abstract class AutoHideStripBase : Control
 
         internal PaneCollection (DockPanel panel, DockState dockState)
         {
-            m_dockPanel = panel;
-            m_states = new AutoHideStateCollection();
-            States[DockState.DockTopAutoHide].Selected = (dockState == DockState.DockTopAutoHide);
-            States[DockState.DockBottomAutoHide].Selected = (dockState == DockState.DockBottomAutoHide);
-            States[DockState.DockLeftAutoHide].Selected = (dockState == DockState.DockLeftAutoHide);
-            States[DockState.DockRightAutoHide].Selected = (dockState == DockState.DockRightAutoHide);
+            DockPanel = panel;
+            States = new AutoHideStateCollection
+            {
+                [DockState.DockTopAutoHide] =
+                {
+                    Selected = (dockState == DockState.DockTopAutoHide)
+                },
+                [DockState.DockBottomAutoHide] =
+                {
+                    Selected = (dockState == DockState.DockBottomAutoHide)
+                },
+                [DockState.DockLeftAutoHide] =
+                {
+                    Selected = (dockState == DockState.DockLeftAutoHide)
+                },
+                [DockState.DockRightAutoHide] =
+                {
+                    Selected = (dockState == DockState.DockRightAutoHide)
+                }
+            };
         }
 
-        private DockPanel m_dockPanel;
+        /// <summary>
+        ///
+        /// </summary>
+        public DockPanel DockPanel { get; }
 
-        public DockPanel DockPanel
-        {
-            get { return m_dockPanel; }
-        }
+        private AutoHideStateCollection States { get; }
 
-        private AutoHideStateCollection m_states;
-
-        private AutoHideStateCollection States
-        {
-            get { return m_states; }
-        }
-
+        /// <summary>
+        ///
+        /// </summary>
         public int Count
         {
             get
             {
-                int count = 0;
-                foreach (DockPane pane in DockPanel.Panes)
+                var count = 0;
+                foreach (var pane in DockPanel.Panes)
                 {
                     if (States.ContainsPane (pane))
                     {
@@ -303,12 +358,17 @@ public abstract class AutoHideStripBase : Control
             }
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="index"></param>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
         public Pane this [int index]
         {
             get
             {
-                int count = 0;
-                foreach (DockPane pane in DockPanel.Panes)
+                var count = 0;
+                foreach (var pane in DockPanel.Panes)
                 {
                     if (!States.ContainsPane (pane))
                     {
@@ -317,12 +377,9 @@ public abstract class AutoHideStripBase : Control
 
                     if (count == index)
                     {
-                        if (pane.AutoHidePane == null)
-                        {
-                            pane.AutoHidePane = DockPanel.AutoHideStripControl.CreatePane (pane);
-                        }
+                        pane.AutoHidePane ??= DockPanel.AutoHideStripControl.CreatePane (pane);
 
-                        return pane.AutoHidePane as Pane;
+                        return (pane.AutoHidePane as Pane)!;
                     }
 
                     count++;
@@ -332,27 +389,37 @@ public abstract class AutoHideStripBase : Control
             }
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="pane"></param>
+        /// <returns></returns>
         public bool Contains (Pane pane)
         {
             return (IndexOf (pane) != -1);
         }
 
-        public int IndexOf (Pane pane)
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="pane"></param>
+        /// <returns></returns>
+        public int IndexOf (Pane? pane)
         {
             if (pane == null)
             {
                 return -1;
             }
 
-            int index = 0;
-            foreach (DockPane dockPane in DockPanel.Panes)
+            var index = 0;
+            foreach (var dockPane in DockPanel.Panes)
             {
                 if (!States.ContainsPane (pane.DockPane))
                 {
                     continue;
                 }
 
-                if (pane == dockPane.AutoHidePane)
+                if (ReferenceEquals (pane, dockPane.AutoHidePane))
                 {
                     return index;
                 }
@@ -367,19 +434,23 @@ public abstract class AutoHideStripBase : Control
 
         IEnumerator<Pane> IEnumerable<Pane>.GetEnumerator()
         {
-            for (int i = 0; i < Count; i++)
+            for (var i = 0; i < Count; i++)
                 yield return this[i];
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            for (int i = 0; i < Count; i++)
+            for (var i = 0; i < Count; i++)
                 yield return this[i];
         }
 
         #endregion
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="panel"></param>
     protected AutoHideStripBase (DockPanel panel)
     {
         DockPanel = panel;
@@ -392,35 +463,48 @@ public abstract class AutoHideStripBase : Control
         SetStyle (ControlStyles.Selectable, false);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected DockPanel DockPanel { get; private set; }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected PaneCollection PanesTop { get; private set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     protected PaneCollection PanesBottom { get; private set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     protected PaneCollection PanesLeft { get; private set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     protected PaneCollection PanesRight { get; private set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="dockState"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
 
     protected PaneCollection GetPanes (DockState dockState)
     {
-        if (dockState == DockState.DockTopAutoHide)
+        return dockState switch
         {
-            return PanesTop;
-        }
-        else if (dockState == DockState.DockBottomAutoHide)
-        {
-            return PanesBottom;
-        }
-        else if (dockState == DockState.DockLeftAutoHide)
-        {
-            return PanesLeft;
-        }
-        else if (dockState == DockState.DockRightAutoHide)
-        {
-            return PanesRight;
-        }
-        else
-        {
-            throw new ArgumentOutOfRangeException (nameof (dockState));
-        }
+            DockState.DockTopAutoHide => PanesTop,
+            DockState.DockBottomAutoHide => PanesBottom,
+            DockState.DockLeftAutoHide => PanesLeft,
+            DockState.DockRightAutoHide => PanesRight,
+            _ => throw new ArgumentOutOfRangeException (nameof (dockState))
+        };
     }
 
     internal int GetNumberOfPanes (DockState dockState)
@@ -435,7 +519,7 @@ public abstract class AutoHideStripBase : Control
     {
         get
         {
-            int standard = MeasureHeight();
+            var standard = MeasureHeight();
             var padding = DockPanel.Theme.Measures.DockPadding;
             var width = PanesLeft.Count > 0 ? standard : padding;
             var height = PanesTop.Count > 0 ? standard : padding;
@@ -450,7 +534,7 @@ public abstract class AutoHideStripBase : Control
     {
         get
         {
-            int standard = MeasureHeight();
+            var standard = MeasureHeight();
             var padding = DockPanel.Theme.Measures.DockPadding;
             var width = PanesRight.Count > 0 ? standard : padding;
             var height = PanesTop.Count > 0 ? standard : padding;
@@ -465,7 +549,7 @@ public abstract class AutoHideStripBase : Control
     {
         get
         {
-            int standard = MeasureHeight();
+            var standard = MeasureHeight();
             var padding = DockPanel.Theme.Measures.DockPadding;
             var width = PanesLeft.Count > 0 ? standard : padding;
             var height = PanesBottom.Count > 0 ? standard : padding;
@@ -480,7 +564,7 @@ public abstract class AutoHideStripBase : Control
     {
         get
         {
-            int standard = MeasureHeight();
+            var standard = MeasureHeight();
             var padding = DockPanel.Theme.Measures.DockPadding;
             var width = PanesRight.Count > 0 ? standard : padding;
             var height = PanesBottom.Count > 0 ? standard : padding;
@@ -526,20 +610,9 @@ public abstract class AutoHideStripBase : Control
         return Rectangle.Empty;
     }
 
-    private GraphicsPath m_displayingArea;
+    private GraphicsPath? _displayingArea;
 
-    private GraphicsPath DisplayingArea
-    {
-        get
-        {
-            if (m_displayingArea == null)
-            {
-                m_displayingArea = new GraphicsPath();
-            }
-
-            return m_displayingArea;
-        }
-    }
+    private GraphicsPath DisplayingArea => _displayingArea ??= new GraphicsPath();
 
     private void SetRegion()
     {
@@ -555,6 +628,7 @@ public abstract class AutoHideStripBase : Control
         Region = new Region (DisplayingArea);
     }
 
+    /// <inheritdoc cref="Control.OnMouseDown"/>
     protected override void OnMouseDown (MouseEventArgs e)
     {
         base.OnMouseDown (e);
@@ -564,7 +638,7 @@ public abstract class AutoHideStripBase : Control
             return;
         }
 
-        IDockContent content = HitTest();
+        var content = HitTest();
         if (content == null)
         {
             return;
@@ -575,6 +649,7 @@ public abstract class AutoHideStripBase : Control
         content.DockHandler.Activate();
     }
 
+    /// <inheritdoc cref="Control.OnMouseHover"/>
     protected override void OnMouseHover (EventArgs e)
     {
         base.OnMouseHover (e);
@@ -585,14 +660,14 @@ public abstract class AutoHideStripBase : Control
         }
 
         // IMPORTANT: VS2003/2005 themes only.
-        IDockContent content = HitTest();
+        var content = HitTest();
         SetActiveAutoHideContent (content);
 
         // requires further tracking of mouse hover behavior,
         ResetMouseEventArgs();
     }
 
-    private void SetActiveAutoHideContent (IDockContent content)
+    private void SetActiveAutoHideContent (IDockContent? content)
     {
         if (content != null)
         {
@@ -607,6 +682,7 @@ public abstract class AutoHideStripBase : Control
         }
     }
 
+    /// <inheritdoc cref="Control.OnLayout"/>
     protected override void OnLayout (LayoutEventArgs levent)
     {
         RefreshChanges();
@@ -624,38 +700,67 @@ public abstract class AutoHideStripBase : Control
         OnRefreshChanges();
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected virtual void OnRefreshChanges()
     {
+        // пустое тело метода
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     protected internal abstract int MeasureHeight();
 
-    private IDockContent HitTest()
+    private IDockContent? HitTest()
     {
-        Point ptMouse = PointToClient (Control.MousePosition);
+        var ptMouse = PointToClient (Control.MousePosition);
         return HitTest (ptMouse);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="content"></param>
+    /// <returns></returns>
     protected virtual Tab CreateTab (IDockContent content)
     {
         return new Tab (content);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="dockPane"></param>
+    /// <returns></returns>
     protected virtual Pane CreatePane (DockPane dockPane)
     {
         return new Pane (dockPane);
     }
 
-    protected abstract IDockContent HitTest (Point point);
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="point"></param>
+    /// <returns></returns>
+    protected abstract IDockContent? HitTest (Point point);
 
+    /// <inheritdoc cref="Control.CreateAccessibilityInstance"/>
     protected override AccessibleObject CreateAccessibilityInstance()
     {
         return new AutoHideStripsAccessibleObject (this);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="tab"></param>
+    /// <returns></returns>
     protected abstract Rectangle GetTabBounds (Tab tab);
 
-    internal static Rectangle ToScreen (Rectangle rectangle, Control parent)
+    internal static Rectangle ToScreen (Rectangle rectangle, Control? parent)
     {
         if (parent == null)
         {
@@ -666,46 +771,55 @@ public abstract class AutoHideStripBase : Control
             new Size (rectangle.Width, rectangle.Height));
     }
 
-    public class AutoHideStripsAccessibleObject : Control.ControlAccessibleObject
+    /// <summary>
+    ///
+    /// </summary>
+    public class AutoHideStripsAccessibleObject
+        : ControlAccessibleObject
     {
-        private AutoHideStripBase _strip;
+        private readonly AutoHideStripBase _strip;
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="strip"></param>
         public AutoHideStripsAccessibleObject (AutoHideStripBase strip)
             : base (strip)
         {
             _strip = strip;
         }
 
-        public override AccessibleRole Role
-        {
-            get { return AccessibleRole.Window; }
-        }
+        /// <inheritdoc cref="ControlAccessibleObject.Role"/>
+        public override AccessibleRole Role => AccessibleRole.Window;
 
+        /// <inheritdoc cref="AccessibleObject.GetChildCount"/>
         public override int GetChildCount()
         {
             // Top, Bottom, Left, Right
             return 4;
         }
 
+        /// <inheritdoc cref="AccessibleObject.GetChild"/>
         public override AccessibleObject GetChild (int index)
         {
-            switch (index)
+            return index switch
             {
-                case 0:
-                    return new AutoHideStripAccessibleObject (_strip, DockState.DockTopAutoHide, this);
-                case 1:
-                    return new AutoHideStripAccessibleObject (_strip, DockState.DockBottomAutoHide, this);
-                case 2:
-                    return new AutoHideStripAccessibleObject (_strip, DockState.DockLeftAutoHide, this);
-                case 3:
-                default:
-                    return new AutoHideStripAccessibleObject (_strip, DockState.DockRightAutoHide, this);
-            }
+                0 => new AutoHideStripAccessibleObject (_strip, DockState.DockTopAutoHide, this),
+                1 => new AutoHideStripAccessibleObject (_strip, DockState.DockBottomAutoHide, this),
+                2 => new AutoHideStripAccessibleObject (_strip, DockState.DockLeftAutoHide, this),
+                _ => new AutoHideStripAccessibleObject (_strip, DockState.DockRightAutoHide, this)
+            };
         }
 
-        public override AccessibleObject HitTest (int x, int y)
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
+        public override AccessibleObject? HitTest (int x, int y)
         {
-            Dictionary<DockState, Rectangle> rectangles = new Dictionary<DockState, Rectangle>
+            var rectangles = new Dictionary<DockState, Rectangle>
             {
                 { DockState.DockTopAutoHide, _strip.GetTabStripRectangle (DockState.DockTopAutoHide) },
                 { DockState.DockBottomAutoHide, _strip.GetTabStripRectangle (DockState.DockBottomAutoHide) },
@@ -713,7 +827,7 @@ public abstract class AutoHideStripBase : Control
                 { DockState.DockRightAutoHide, _strip.GetTabStripRectangle (DockState.DockRightAutoHide) },
             };
 
-            Point point = _strip.PointToClient (new Point (x, y));
+            var point = _strip.PointToClient (new Point (x, y));
             foreach (var rectangle in rectangles)
             {
                 if (rectangle.Value.Contains (point))
@@ -726,34 +840,43 @@ public abstract class AutoHideStripBase : Control
         }
     }
 
-    public class AutoHideStripAccessibleObject : AccessibleObject
+    /// <summary>
+    ///
+    /// </summary>
+    public class AutoHideStripAccessibleObject
+        : AccessibleObject
     {
-        private AutoHideStripBase _strip;
-        private DockState _state;
-        private AccessibleObject _parent;
+        private readonly AutoHideStripBase _strip;
+        private readonly DockState _state;
 
-        public AutoHideStripAccessibleObject (AutoHideStripBase strip, DockState state, AccessibleObject parent)
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="strip"></param>
+        /// <param name="state"></param>
+        /// <param name="parent"></param>
+        public AutoHideStripAccessibleObject
+            (
+                AutoHideStripBase strip,
+                DockState state, AccessibleObject parent
+            )
         {
             _strip = strip;
             _state = state;
-
-            _parent = parent;
+            Parent = parent;
         }
 
-        public override AccessibleObject Parent
-        {
-            get { return _parent; }
-        }
+        /// <inheritdoc cref="AccessibleObject.Parent"/>
+        public override AccessibleObject Parent { get; }
 
-        public override AccessibleRole Role
-        {
-            get { return AccessibleRole.PageTabList; }
-        }
+        /// <inheritdoc cref="AccessibleObject.Role"/>
+        public override AccessibleRole Role => AccessibleRole.PageTabList;
 
+        /// <inheritdoc cref="AccessibleObject.GetChildCount"/>
         public override int GetChildCount()
         {
-            int count = 0;
-            foreach (Pane pane in _strip.GetPanes (_state))
+            var count = 0;
+            foreach (var pane in _strip.GetPanes (_state))
             {
                 count += pane.AutoHideTabs.Count;
             }
@@ -761,10 +884,11 @@ public abstract class AutoHideStripBase : Control
             return count;
         }
 
+        /// <inheritdoc cref="AccessibleObject.GetChild"/>
         public override AccessibleObject GetChild (int index)
         {
-            List<Tab> tabs = new List<Tab>();
-            foreach (Pane pane in _strip.GetPanes (_state))
+            var tabs = new List<Tab>();
+            foreach (var pane in _strip.GetPanes (_state))
             {
                 tabs.AddRange (pane.AutoHideTabs);
             }
@@ -772,53 +896,58 @@ public abstract class AutoHideStripBase : Control
             return new AutoHideStripTabAccessibleObject (_strip, tabs[index], this);
         }
 
+        /// <inheritdoc cref="AccessibleObject.Bounds"/>
         public override Rectangle Bounds
         {
             get
             {
-                Rectangle rectangle = _strip.GetTabStripRectangle (_state);
+                var rectangle = _strip.GetTabStripRectangle (_state);
                 return ToScreen (rectangle, _strip);
             }
         }
     }
 
-    protected class AutoHideStripTabAccessibleObject : AccessibleObject
+    /// <summary>
+    ///
+    /// </summary>
+    protected class AutoHideStripTabAccessibleObject
+        : AccessibleObject
     {
-        private AutoHideStripBase _strip;
-        private Tab _tab;
-
-        private AccessibleObject _parent;
+        private readonly AutoHideStripBase _strip;
+        private readonly Tab _tab;
 
         internal AutoHideStripTabAccessibleObject (AutoHideStripBase strip, Tab tab, AccessibleObject parent)
         {
             _strip = strip;
             _tab = tab;
 
-            _parent = parent;
+            Parent = parent;
         }
 
-        public override AccessibleObject Parent
-        {
-            get { return _parent; }
-        }
+        /// <inheritdoc cref="AccessibleObject.Parent"/>
+        public override AccessibleObject Parent { get; }
 
-        public override AccessibleRole Role
-        {
-            get { return AccessibleRole.PageTab; }
-        }
+        /// <inheritdoc cref="AccessibleObject.Role"/>
+        public override AccessibleRole Role => AccessibleRole.PageTab;
 
+        /// <summary>
+        ///
+        /// </summary>
         public override Rectangle Bounds
         {
             get
             {
-                Rectangle rectangle = _strip.GetTabBounds (_tab);
+                var rectangle = _strip.GetTabBounds (_tab);
                 return ToScreen (rectangle, _strip);
             }
         }
 
-        public override string Name
+        /// <summary>
+        ///
+        /// </summary>
+        public override string? Name
         {
-            get { return _tab.Content.DockHandler.TabText; }
+            get => _tab.Content.DockHandler.TabText;
             set
             {
                 //base.Name = value;

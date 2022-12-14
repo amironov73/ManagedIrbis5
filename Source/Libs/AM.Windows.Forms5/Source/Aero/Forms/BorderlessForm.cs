@@ -42,7 +42,7 @@ namespace AeroSuite.Forms;
 /// That makes this variant of a borderless window superior to just setting
 /// the border style to <see cref="System.Windows.Forms.FormBorderStyle.None"/>
 /// which lacks all of the features described in the summary.
-/// To implement the various areas for resizing & dragging, you have
+/// To implement the various areas for resizing &amp; dragging, you have
 /// to override the <see cref="BorderlessForm.PerformHitTest(Point)"/>-method
 /// and check for the areas you desire.
 /// </remarks>

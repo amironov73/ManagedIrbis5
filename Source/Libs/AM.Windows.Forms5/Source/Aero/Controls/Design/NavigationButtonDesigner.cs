@@ -47,7 +47,6 @@ internal class NavigationButtonDesigner
 /// <summary>
 /// Provides an ActionList for the <see cref="NavigationButton"/> Control.
 /// </summary>
-/// <seealso cref="AeroSuite.Controls.Design.DesignerActionListBase{AeroSuite.Controls.NavigationButton}" />
 internal class NavigationButtonActionList
     : DesignerActionListBase<NavigationButton>
 {
@@ -74,10 +73,10 @@ internal class NavigationButtonActionList
 
     public NavigationButtonType Type
     {
-        get => Control.Type;
+        get => Control!.Type;
         set
         {
-            Control.Type = value;
+            Control!.Type = value;
             RefreshControl();
         }
     }

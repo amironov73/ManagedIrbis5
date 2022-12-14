@@ -183,11 +183,11 @@ partial class DockPanel
         {
             #region consts
 
-            private int _panelIndicatorMargin = 10;
+            private readonly int _panelIndicatorMargin = 10;
 
             #endregion
 
-            private DockDragHandler _dragHandler;
+            private readonly DockDragHandler _dragHandler;
 
             /// <summary>
             ///
@@ -217,37 +217,37 @@ partial class DockPanel
             private IPaneIndicator? _paneDiamond;
 
             private IPaneIndicator PaneDiamond =>
-                _paneDiamond ??= _dragHandler.DockPanel.Theme.Extender.PaneIndicatorFactory.CreatePaneIndicator (
+                _paneDiamond ??= _dragHandler.DockPanel.Theme.Extender.PaneIndicatorFactory!.CreatePaneIndicator (
                     _dragHandler.DockPanel.Theme);
 
             private IPanelIndicator? _panelLeft;
 
             private IPanelIndicator PanelLeft =>
-                _panelLeft ??= _dragHandler.DockPanel.Theme.Extender.PanelIndicatorFactory.CreatePanelIndicator (
+                _panelLeft ??= _dragHandler.DockPanel.Theme.Extender.PanelIndicatorFactory!.CreatePanelIndicator (
                     DockStyle.Left, _dragHandler.DockPanel.Theme);
 
             private IPanelIndicator? _panelRight;
 
             private IPanelIndicator PanelRight =>
-                _panelRight ??= _dragHandler.DockPanel.Theme.Extender.PanelIndicatorFactory.CreatePanelIndicator (
+                _panelRight ??= _dragHandler.DockPanel.Theme.Extender.PanelIndicatorFactory!.CreatePanelIndicator (
                     DockStyle.Right, _dragHandler.DockPanel.Theme);
 
             private IPanelIndicator? _panelTop;
 
             private IPanelIndicator PanelTop =>
-                _panelTop ??= _dragHandler.DockPanel.Theme.Extender.PanelIndicatorFactory.CreatePanelIndicator (
+                _panelTop ??= _dragHandler.DockPanel.Theme.Extender.PanelIndicatorFactory!.CreatePanelIndicator (
                     DockStyle.Top, _dragHandler.DockPanel.Theme);
 
             private IPanelIndicator? _panelBottom;
 
             private IPanelIndicator PanelBottom =>
-                _panelBottom ??= _dragHandler.DockPanel.Theme.Extender.PanelIndicatorFactory.CreatePanelIndicator (
+                _panelBottom ??= _dragHandler.DockPanel.Theme.Extender.PanelIndicatorFactory!.CreatePanelIndicator (
                     DockStyle.Bottom, _dragHandler.DockPanel.Theme);
 
             private IPanelIndicator? _panelFill;
 
             private IPanelIndicator PanelFill =>
-                _panelFill ??= _dragHandler.DockPanel.Theme.Extender.PanelIndicatorFactory.CreatePanelIndicator (
+                _panelFill ??= _dragHandler.DockPanel.Theme.Extender.PanelIndicatorFactory!.CreatePanelIndicator (
                     DockStyle.Fill, _dragHandler.DockPanel.Theme);
 
             private bool _fullPanelEdge;
@@ -428,9 +428,9 @@ partial class DockPanel
                     {
                         Point[] pts =
                         {
-                            new Point (PaneDiamond.Left, PaneDiamond.Top),
-                            new Point (PaneDiamond.Right, PaneDiamond.Top),
-                            new Point (PaneDiamond.Left, PaneDiamond.Bottom)
+                            new (PaneDiamond.Left, PaneDiamond.Top),
+                            new (PaneDiamond.Right, PaneDiamond.Top),
+                            new (PaneDiamond.Left, PaneDiamond.Bottom)
                         };
                         using (var matrix = new Matrix (PaneDiamond.ClientRectangle, pts))
                         {
@@ -589,8 +589,8 @@ partial class DockPanel
                 return;
             }
 
-            Outline = DockPanel.Theme.Extender.DockOutlineFactory.CreateDockOutline();
-            Indicator = DockPanel.Theme.Extender.DockIndicatorFactory.CreateDockIndicator (this);
+            Outline = DockPanel.Theme.Extender.DockOutlineFactory!.CreateDockOutline();
+            Indicator = DockPanel.Theme.Extender.DockIndicatorFactory!.CreateDockIndicator (this);
             Indicator.Show (false);
 
             FloatOutlineBounds = DragSource.BeginDrag (StartMousePosition);
@@ -676,7 +676,7 @@ partial class DockPanel
             }
             else
             {
-                Cursor.Current = DragControl.Cursor;
+                Cursor.Current = DragControl!.Cursor;
             }
         }
 

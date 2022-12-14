@@ -422,9 +422,9 @@ public partial class DockPane
     /// </summary>
     public virtual bool AllowDockDragAndDrop { get; set; } = true;
 
-    internal IDisposable AutoHidePane { get; set; }
+    internal IDisposable? AutoHidePane { get; set; }
 
-    internal object AutoHideTabs { get; set; }
+    internal object? AutoHideTabs { get; set; }
 
     private object? TabPageContextMenu
     {

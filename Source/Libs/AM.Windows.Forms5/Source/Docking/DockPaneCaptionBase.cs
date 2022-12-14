@@ -3,15 +3,15 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable UnusedMember.Global
 
-/* 
+/* DockPaneCaptionBase.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System.Drawing;
-using System.Security.Permissions;
 using System.Windows.Forms;
 
 #endregion
@@ -20,11 +20,19 @@ using System.Windows.Forms;
 
 namespace AM.Windows.Forms.Docking;
 
-public abstract class DockPaneCaptionBase : Control
+/// <summary>
+///
+/// </summary>
+public abstract class DockPaneCaptionBase
+    : Control
 {
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="pane"></param>
     protected internal DockPaneCaptionBase (DockPane pane)
     {
-        m_dockPane = pane;
+        DockPane = pane;
 
         SetStyle (ControlStyles.OptimizedDoubleBuffer |
                   ControlStyles.ResizeRedraw |
@@ -33,43 +41,47 @@ public abstract class DockPaneCaptionBase : Control
         SetStyle (ControlStyles.Selectable, false);
     }
 
-    private DockPane m_dockPane;
+    /// <summary>
+    ///
+    /// </summary>
+    public DockPane DockPane { get; }
 
-    public DockPane DockPane
-    {
-        get { return m_dockPane; }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    protected DockPane.AppearanceStyle Appearance => DockPane.Appearance;
 
-    protected DockPane.AppearanceStyle Appearance
-    {
-        get { return DockPane.Appearance; }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    protected bool HasTabPageContextMenu => DockPane.HasTabPageContextMenu;
 
-    protected bool HasTabPageContextMenu
-    {
-        get { return DockPane.HasTabPageContextMenu; }
-    }
-
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="position"></param>
     protected void ShowTabPageContextMenu (Point position)
     {
         DockPane.ShowTabPageContextMenu (this, position);
     }
 
-    protected override void OnMouseUp (MouseEventArgs e)
+    /// <inheritdoc cref="Control.OnMouseUp"/>
+    protected override void OnMouseUp (MouseEventArgs eventArgs)
     {
-        base.OnMouseUp (e);
+        base.OnMouseUp (eventArgs);
 
-        if (e.Button == MouseButtons.Right)
+        if (eventArgs.Button == MouseButtons.Right)
         {
-            ShowTabPageContextMenu (new Point (e.X, e.Y));
+            ShowTabPageContextMenu (new Point (eventArgs.X, eventArgs.Y));
         }
     }
 
-    protected override void OnMouseDown (MouseEventArgs e)
+    /// <inheritdoc cref="Control.OnMouseDown"/>
+    protected override void OnMouseDown (MouseEventArgs eventArgs)
     {
-        base.OnMouseDown (e);
+        base.OnMouseDown (eventArgs);
 
-        if (e.Button == MouseButtons.Left &&
+        if (eventArgs.Button == MouseButtons.Left &&
             DockPane.DockPanel.AllowEndUserDocking &&
             DockPane.AllowDockDragAndDrop &&
             DockPane.ActiveContent != null &&
@@ -79,7 +91,7 @@ public abstract class DockPaneCaptionBase : Control
         }
     }
 
-    [SecurityPermission (SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+    /// <inheritdoc cref="Control.WndProc"/>
     protected override void WndProc (ref Message m)
     {
         if (m.Msg == (int)Win32.Msgs.WM_LBUTTONDBLCLK)
@@ -113,22 +125,31 @@ public abstract class DockPaneCaptionBase : Control
         OnRefreshChanges();
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected virtual void OnRightToLeftLayoutChanged()
     {
+        // пустое тело метода
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected virtual void OnRefreshChanges()
     {
+        // пустое тело метода
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     protected internal abstract int MeasureHeight();
 
     /// <summary>
-    /// Gets a value indicating whether dock panel can be dragged when in auto hide mode. 
+    /// Gets a value indicating whether dock panel can be dragged when in auto hide mode.
     /// Default is false.
     /// </summary>
-    protected virtual bool CanDragAutoHide
-    {
-        get { return false; }
-    }
+    protected virtual bool CanDragAutoHide => false;
 }

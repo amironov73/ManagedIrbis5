@@ -33,23 +33,25 @@ partial class DockPanel
         private const string ConfigFileVersion = "1.0";
         private static readonly string[] _compatibleConfigFileVersions = { };
 
-        private class DummyContent : DockContent
+        private class DummyContent
+            : DockContent
         {
+            // пустое тело конструктора
         }
 
         private struct DockPanelStruct
         {
-            public double DockLeftPortion { get; set; }
+            public double DockLeftPortion { get; init; }
 
-            public double DockRightPortion { get; set; }
+            public double DockRightPortion { get; init; }
 
-            public double DockTopPortion { get; set; }
+            public double DockTopPortion { get; init; }
 
-            public double DockBottomPortion { get; set; }
+            public double DockBottomPortion { get; init; }
 
-            public int IndexActiveDocumentPane { get; set; }
+            public int IndexActiveDocumentPane { get; init; }
 
-            public int IndexActivePane { get; set; }
+            public int IndexActivePane { get; init; }
         }
 
         private struct ContentStruct
@@ -96,29 +98,11 @@ partial class DockPanel
 
         private struct FloatWindowStruct
         {
-            private Rectangle m_bounds;
+            public Rectangle Bounds { get; set; }
 
-            public Rectangle Bounds
-            {
-                get { return m_bounds; }
-                set { m_bounds = value; }
-            }
+            public int ZOrderIndex { get; set; }
 
-            private int m_zOrderIndex;
-
-            public int ZOrderIndex
-            {
-                get { return m_zOrderIndex; }
-                set { m_zOrderIndex = value; }
-            }
-
-            private NestedPane[] m_nestedPanes;
-
-            public NestedPane[] NestedPanes
-            {
-                get { return m_nestedPanes; }
-                set { m_nestedPanes = value; }
-            }
+            public NestedPane[] NestedPanes { get; set; }
         }
 
         public static void SaveAsXml (DockPanel dockPanel, string fileName)
@@ -210,7 +194,7 @@ partial class DockPanel
                     dockPanel.Panes.IndexOf (pane).ToString (CultureInfo.InvariantCulture));
                 xmlOut.WriteAttributeString ("DockState", pane.DockState.ToString());
                 xmlOut.WriteAttributeString ("ActiveContent",
-                    dockPanel.Contents.IndexOf (pane.ActiveContent).ToString (CultureInfo.InvariantCulture));
+                    dockPanel.Contents.IndexOf (pane.ActiveContent!).ToString (CultureInfo.InvariantCulture));
                 xmlOut.WriteStartElement ("Contents");
                 xmlOut.WriteAttributeString ("Count", pane.Contents.Count.ToString (CultureInfo.InvariantCulture));
                 foreach (var content in pane.Contents)
@@ -251,7 +235,7 @@ partial class DockPanel
                         dockPanel.Panes.IndexOf (pane).ToString (CultureInfo.InvariantCulture));
                     var status = pane.NestedDockingStatus;
                     xmlOut.WriteAttributeString ("PrevPane",
-                        dockPanel.Panes.IndexOf (status.PreviousPane).ToString (CultureInfo.InvariantCulture));
+                        dockPanel.Panes.IndexOf (status.PreviousPane!).ToString (CultureInfo.InvariantCulture));
                     xmlOut.WriteAttributeString ("Alignment", status.Alignment.ToString());
                     xmlOut.WriteAttributeString ("Proportion",
                         status.Proportion.ToString (CultureInfo.InvariantCulture));
@@ -278,7 +262,7 @@ partial class DockPanel
                 xmlOut.WriteAttributeString ("ZOrderIndex",
                     fw.DockPanel.FloatWindows.IndexOf (fw).ToString (CultureInfo.InvariantCulture));
                 xmlOut.WriteStartElement ("NestedPanes");
-                xmlOut.WriteAttributeString ("Count", fw.NestedPanes.Count.ToString (CultureInfo.InvariantCulture));
+                xmlOut.WriteAttributeString ("Count", fw.NestedPanes!.Count.ToString (CultureInfo.InvariantCulture));
                 foreach (var pane in fw.NestedPanes)
                 {
                     xmlOut.WriteStartElement ("Pane");
@@ -288,7 +272,7 @@ partial class DockPanel
                         dockPanel.Panes.IndexOf (pane).ToString (CultureInfo.InvariantCulture));
                     var status = pane.NestedDockingStatus;
                     xmlOut.WriteAttributeString ("PrevPane",
-                        dockPanel.Panes.IndexOf (status.PreviousPane).ToString (CultureInfo.InvariantCulture));
+                        dockPanel.Panes.IndexOf (status.PreviousPane!).ToString (CultureInfo.InvariantCulture));
                     xmlOut.WriteAttributeString ("Alignment", status.Alignment.ToString());
                     xmlOut.WriteAttributeString ("Proportion",
                         status.Proportion.ToString (CultureInfo.InvariantCulture));
@@ -343,7 +327,7 @@ partial class DockPanel
                     throw new ArgumentException (Strings.DockPanel_LoadFromXml_InvalidXmlFormat);
                 }
 
-                contents[i].PersistString = xmlIn.GetAttribute ("PersistString");
+                contents[i].PersistString = xmlIn.GetAttribute ("PersistString")!;
                 contents[i].AutoHidePortion = Convert.ToDouble (xmlIn.GetAttribute ("AutoHidePortion"),
                     CultureInfo.InvariantCulture);
                 contents[i].IsHidden =
@@ -370,7 +354,7 @@ partial class DockPanel
                     throw new ArgumentException (Strings.DockPanel_LoadFromXml_InvalidXmlFormat);
                 }
 
-                panes[i].DockState = (DockState)dockStateConverter.ConvertFrom (xmlIn.GetAttribute ("DockState"));
+                panes[i].DockState = (DockState)dockStateConverter.ConvertFrom (xmlIn.GetAttribute ("DockState")!)!;
                 panes[i].IndexActiveContent = Convert.ToInt32 (xmlIn.GetAttribute ("ActiveContent"),
                     CultureInfo.InvariantCulture);
                 panes[i].ZOrderIndex = -1;
@@ -418,7 +402,7 @@ partial class DockPanel
                 }
 
                 dockWindows[i].DockState =
-                    (DockState)dockStateConverter.ConvertFrom (xmlIn.GetAttribute ("DockState"));
+                    (DockState)dockStateConverter.ConvertFrom (xmlIn.GetAttribute ("DockState")!)!;
                 dockWindows[i].ZOrderIndex =
                     Convert.ToInt32 (xmlIn.GetAttribute ("ZOrderIndex"), CultureInfo.InvariantCulture);
                 MoveToNextElement (xmlIn);
@@ -444,7 +428,7 @@ partial class DockPanel
                     dockWindows[i].NestedPanes[j].IndexPrevPane = Convert.ToInt32 (xmlIn.GetAttribute ("PrevPane"),
                         CultureInfo.InvariantCulture);
                     dockWindows[i].NestedPanes[j].Alignment =
-                        (DockAlignment)dockAlignmentConverter.ConvertFrom (xmlIn.GetAttribute ("Alignment"));
+                        (DockAlignment)dockAlignmentConverter.ConvertFrom (xmlIn.GetAttribute ("Alignment")!)!;
                     dockWindows[i].NestedPanes[j].Proportion = Convert.ToDouble (xmlIn.GetAttribute ("Proportion"),
                         CultureInfo.InvariantCulture);
                     MoveToNextElement (xmlIn);
@@ -470,7 +454,7 @@ partial class DockPanel
                 }
 
                 floatWindows[i].Bounds =
-                    (Rectangle)rectConverter.ConvertFromInvariantString (xmlIn.GetAttribute ("Bounds"));
+                    (Rectangle)rectConverter.ConvertFromInvariantString (xmlIn.GetAttribute ("Bounds")!)!;
                 floatWindows[i].ZOrderIndex =
                     Convert.ToInt32 (xmlIn.GetAttribute ("ZOrderIndex"), CultureInfo.InvariantCulture);
                 MoveToNextElement (xmlIn);
@@ -496,7 +480,7 @@ partial class DockPanel
                     floatWindows[i].NestedPanes[j].IndexPrevPane = Convert.ToInt32 (xmlIn.GetAttribute ("PrevPane"),
                         CultureInfo.InvariantCulture);
                     floatWindows[i].NestedPanes[j].Alignment =
-                        (DockAlignment)dockAlignmentConverter.ConvertFrom (xmlIn.GetAttribute ("Alignment"));
+                        (DockAlignment)dockAlignmentConverter.ConvertFrom (xmlIn.GetAttribute ("Alignment")!)!;
                     floatWindows[i].NestedPanes[j].Proportion = Convert.ToDouble (xmlIn.GetAttribute ("Proportion"),
                         CultureInfo.InvariantCulture);
                     MoveToNextElement (xmlIn);
@@ -532,24 +516,24 @@ partial class DockPanel
                 }
 
                 var formatVersion = xmlIn.GetAttribute ("FormatVersion");
-                if (!IsFormatVersionValid (formatVersion))
+                if (!IsFormatVersionValid (formatVersion!))
                 {
                     throw new ArgumentException (Strings.DockPanel_LoadFromXml_InvalidFormatVersion);
                 }
 
-                dockPanelStruct = new DockPanelStruct();
-                dockPanelStruct.DockLeftPortion = Convert.ToDouble (xmlIn.GetAttribute ("DockLeftPortion"),
-                    CultureInfo.InvariantCulture);
-                dockPanelStruct.DockRightPortion = Convert.ToDouble (xmlIn.GetAttribute ("DockRightPortion"),
-                    CultureInfo.InvariantCulture);
-                dockPanelStruct.DockTopPortion = Convert.ToDouble (xmlIn.GetAttribute ("DockTopPortion"),
-                    CultureInfo.InvariantCulture);
-                dockPanelStruct.DockBottomPortion = Convert.ToDouble (xmlIn.GetAttribute ("DockBottomPortion"),
-                    CultureInfo.InvariantCulture);
-                dockPanelStruct.IndexActiveDocumentPane =
-                    Convert.ToInt32 (xmlIn.GetAttribute ("ActiveDocumentPane"), CultureInfo.InvariantCulture);
-                dockPanelStruct.IndexActivePane =
-                    Convert.ToInt32 (xmlIn.GetAttribute ("ActivePane"), CultureInfo.InvariantCulture);
+                dockPanelStruct = new DockPanelStruct
+                {
+                    DockLeftPortion = Convert.ToDouble (xmlIn.GetAttribute ("DockLeftPortion"),
+                        CultureInfo.InvariantCulture),
+                    DockRightPortion = Convert.ToDouble (xmlIn.GetAttribute ("DockRightPortion"),
+                        CultureInfo.InvariantCulture),
+                    DockTopPortion = Convert.ToDouble (xmlIn.GetAttribute ("DockTopPortion"),
+                        CultureInfo.InvariantCulture),
+                    DockBottomPortion = Convert.ToDouble (xmlIn.GetAttribute ("DockBottomPortion"),
+                        CultureInfo.InvariantCulture),
+                    IndexActiveDocumentPane = Convert.ToInt32 (xmlIn.GetAttribute ("ActiveDocumentPane"), CultureInfo.InvariantCulture),
+                    IndexActivePane = Convert.ToInt32 (xmlIn.GetAttribute ("ActivePane"), CultureInfo.InvariantCulture)
+                };
 
                 // Load Contents
                 MoveToNextElement (xmlIn);
@@ -621,7 +605,7 @@ partial class DockPanel
             for (var i = 0; i < contents.Length; i++)
             {
                 var content = deserializeContent (contents[i].PersistString);
-                if (content == null)
+                if (content == null!)
                 {
                     content = new DummyContent();
                 }
@@ -646,11 +630,11 @@ partial class DockPanel
                     }
                     else if (panes[i].DockState == DockState.Float)
                     {
-                        content.DockHandler.FloatPane = pane;
+                        content.DockHandler.FloatPane = pane!;
                     }
                     else
                     {
-                        content.DockHandler.PanelPane = pane;
+                        content.DockHandler.PanelPane = pane!;
                     }
                 }
             }
@@ -696,7 +680,7 @@ partial class DockPanel
                         var prevPane = indexPrevPane == -1 ? null : dockPanel.Panes[indexPrevPane];
                         var alignment = floatWindows[i].NestedPanes[j].Alignment;
                         var proportion = floatWindows[i].NestedPanes[j].Proportion;
-                        pane.DockTo (fw, prevPane, alignment, proportion);
+                        pane.DockTo (fw!, prevPane, alignment, proportion);
                     }
 
                     if (panes[indexPane].DockState == fw.DockState)
@@ -714,16 +698,15 @@ partial class DockPanel
                 for (var i = 0; i < contents.Length; i++)
                     sortedContents[i] = i;
 
-                var lastDocument = contents.Length;
                 for (var i = 0; i < contents.Length - 1; i++)
                 {
                     for (var j = i + 1; j < contents.Length; j++)
                     {
                         var pane1 = dockPanel.Contents[sortedContents[i]].DockHandler.Pane;
-                        var ZOrderIndex1 = pane1 == null! ? 0 : panes[dockPanel.Panes.IndexOf (pane1)].ZOrderIndex;
+                        var zOrderIndex1 = pane1 == null! ? 0 : panes[dockPanel.Panes.IndexOf (pane1)].ZOrderIndex;
                         var pane2 = dockPanel.Contents[sortedContents[j]].DockHandler.Pane;
-                        var ZOrderIndex2 = pane2 == null! ? 0 : panes[dockPanel.Panes.IndexOf (pane2)].ZOrderIndex;
-                        if (ZOrderIndex1 > ZOrderIndex2)
+                        var zOrderIndex2 = pane2 == null! ? 0 : panes[dockPanel.Panes.IndexOf (pane2)].ZOrderIndex;
+                        if (zOrderIndex1 > zOrderIndex2)
                         {
                             (sortedContents[i], sortedContents[j]) = (sortedContents[j], sortedContents[i]);
                         }

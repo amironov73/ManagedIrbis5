@@ -64,7 +64,7 @@ public class DockContentHandler
         }
 
         _tab = null!;
-        _autoHideTab = null!;
+        AutoHideTab = null!;
 
         PreviousActive = null!;
         NextActive = null!;
@@ -95,9 +95,9 @@ public class DockContentHandler
         if (disposing)
         {
             DockPanel = null!;
-            if (_autoHideTab != null!)
+            if (AutoHideTab != null!)
             {
-                _autoHideTab.Dispose();
+                AutoHideTab.Dispose();
             }
 
             if (_tab != null!)
@@ -404,10 +404,10 @@ public class DockContentHandler
                 _tab = null!;
             }
 
-            if (_autoHideTab != null!)
+            if (AutoHideTab != null!)
             {
-                _autoHideTab.Dispose();
-                _autoHideTab = null!;
+                AutoHideTab.Dispose();
+                AutoHideTab = null!;
             }
 
             _dockPanel = value;
@@ -1391,13 +1391,7 @@ public class DockContentHandler
         return _tab;
     }
 
-    private IDisposable _autoHideTab;
-
-    internal IDisposable AutoHideTab
-    {
-        get => _autoHideTab;
-        set => _autoHideTab = value;
-    }
+    internal IDisposable? AutoHideTab { get; set; }
 
     #region Events
 

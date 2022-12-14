@@ -3,8 +3,9 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable UnusedMember.Global
 
-/*
+/* ProgressDialog.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -38,23 +39,35 @@ namespace AM.Windows.Forms.Dialogs;
 /// <threadsafety static="true" instance="false" />
 [DefaultEvent ("DoWork"), DefaultProperty ("Text"),
  Description ("Represents a dialog that can be used to report progress to the user.")]
-public partial class ProgressDialog : Component, IProgress<int>, IProgress<string>
+public partial class ProgressDialog
+    : Component, IProgress<int>, IProgress<string>
 {
     private class ProgressChangedData
     {
-        public string Text { get; set; }
-        public string Description { get; set; }
-        public object UserState { get; set; }
+        /// <summary>
+        ///
+        /// </summary>
+        public string? Text { get; init; }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public string? Description { get; init; }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public object? UserState { get; init; }
     }
 
-    private string _windowTitle;
-    private string _text;
-    private string _description;
-    private IProgressDialog _dialog;
-    private string _cancellationText;
+    private string? _windowTitle;
+    private string? _text;
+    private string? _description;
+    private IProgressDialog? _dialog;
+    private string? _cancellationText;
     private bool _useCompactPathsForText;
     private bool _useCompactPathsForDescription;
-    private SafeModuleHandle _currentAnimationModuleHandle;
+    private SafeModuleHandle? _currentAnimationModuleHandle;
     private bool _cancellationPending;
     private int _percentProgress;
     private IntPtr _ownerHandle;
@@ -66,17 +79,17 @@ public partial class ProgressDialog : Component, IProgress<int>, IProgress<strin
     /// Use this event to perform the operation that the dialog is showing the progress for.
     /// This event will be raised on a different thread than the UI thread.
     /// </remarks>
-    public event DoWorkEventHandler DoWork;
+    public event DoWorkEventHandler? DoWork;
 
     /// <summary>
     /// Event raised when the operation completes.
     /// </summary>
-    public event RunWorkerCompletedEventHandler RunWorkerCompleted;
+    public event RunWorkerCompletedEventHandler? RunWorkerCompleted;
 
     /// <summary>
     /// Event raised when <see cref="ReportProgress(int,string,string,object)"/> is called.
     /// </summary>
-    public event ProgressChangedEventHandler ProgressChanged;
+    public event ProgressChangedEventHandler? ProgressChanged;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ProgressDialog"/> class.
@@ -84,18 +97,16 @@ public partial class ProgressDialog : Component, IProgress<int>, IProgress<strin
     public ProgressDialog()
         : this (null)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ProgressDialog"/> class, adding it to the specified container.
     /// </summary>
     /// <param name="container">The <see cref="IContainer"/> to which the component should be added.</param>
-    public ProgressDialog (IContainer container)
+    public ProgressDialog (IContainer? container)
     {
-        if (container != null)
-        {
-            container.Add (this);
-        }
+        container?.Add (this);
 
         InitializeComponent();
 
@@ -126,8 +137,8 @@ public partial class ProgressDialog : Component, IProgress<int>, IProgress<strin
      DefaultValue ("")]
     public string WindowTitle
     {
-        get { return _windowTitle ?? string.Empty; }
-        set { _windowTitle = value; }
+        get => _windowTitle ?? string.Empty;
+        set => _windowTitle = value;
     }
 
     /// <summary>
@@ -150,7 +161,7 @@ public partial class ProgressDialog : Component, IProgress<int>, IProgress<strin
      Description ("A short description of the operation being carried out.")]
     public string Text
     {
-        get { return _text ?? string.Empty; }
+        get => _text ?? string.Empty;
         set
         {
             _text = value;
@@ -184,7 +195,7 @@ public partial class ProgressDialog : Component, IProgress<int>, IProgress<strin
      DefaultValue (false)]
     public bool UseCompactPathsForText
     {
-        get { return _useCompactPathsForText; }
+        get => _useCompactPathsForText;
         set
         {
             _useCompactPathsForText = value;
@@ -215,7 +226,7 @@ public partial class ProgressDialog : Component, IProgress<int>, IProgress<strin
      Description ("Additional details about the operation being carried out."), DefaultValue ("")]
     public string Description
     {
-        get { return _description ?? string.Empty; }
+        get => _description ?? string.Empty;
         set
         {
             _description = value;
@@ -249,7 +260,7 @@ public partial class ProgressDialog : Component, IProgress<int>, IProgress<strin
      DefaultValue (false)]
     public bool UseCompactPathsForDescription
     {
-        get { return _useCompactPathsForDescription; }
+        get => _useCompactPathsForDescription;
         set
         {
             _useCompactPathsForDescription = value;
@@ -276,8 +287,8 @@ public partial class ProgressDialog : Component, IProgress<int>, IProgress<strin
      Description ("The text that will be shown after the Cancel button is pressed."), DefaultValue ("")]
     public string CancellationText
     {
-        get { return _cancellationText ?? string.Empty; }
-        set { _cancellationText = value; }
+        get => _cancellationText ?? string.Empty;
+        set => _cancellationText = value;
     }
 
     /// <summary>
@@ -385,23 +396,23 @@ public partial class ProgressDialog : Component, IProgress<int>, IProgress<strin
     /// </para>
     /// </remarks>
     [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
-    public AnimationResource Animation { get; set; }
+    public AnimationResource? Animation { get; set; }
 
     /// <summary>
     /// Gets or sets a value that indicates whether a regular or marquee style progress bar should be used.
     /// </summary>
     /// <value>
-    /// One of the values of <see cref="Ookii.Dialogs.WinForms.ProgressBarStyle"/>.
-    /// The default value is <see cref="Ookii.Dialogs.WinForms.ProgressBarStyle.ProgressBar"/>.
+    /// One of the values of <c>Ookii.Dialogs.WinForms.ProgressBarStyle</c>.
+    /// The default value is <c>Ookii.Dialogs.WinForms.ProgressBarStyle.ProgressBar</c>.
     /// </value>
     /// <remarks>
     /// <note>
     ///   Operating systems older than Windows Vista do not support marquee progress bars on the progress dialog. On those operating systems, the
-    ///   progress bar will be hidden completely if this property is <see cref="Ookii.Dialogs.WinForms.ProgressBarStyle.MarqueeProgressBar"/>.
+    ///   progress bar will be hidden completely if this property is <c>Ookii.Dialogs.WinForms.ProgressBarStyle.MarqueeProgressBar</c>.
     /// </note>
     /// <para>
-    ///   When this property is set to <see cref="Ookii.Dialogs.WinForms.ProgressBarStyle.ProgressBar" />, use the <see cref="ReportProgress(int)"/> method to set
-    ///   the value of the progress bar. When this property is set to <see cref="Ookii.Dialogs.WinForms.ProgressBarStyle.MarqueeProgressBar"/>
+    ///   When this property is set to <c>Ookii.Dialogs.WinForms.ProgressBarStyle.ProgressBar</c>, use the <see cref="ReportProgress(int)"/> method to set
+    ///   the value of the progress bar. When this property is set to <c>Ookii.Dialogs.WinForms.ProgressBarStyle.MarqueeProgressBar</c>
     ///   you can still use the <see cref="ReportProgress(int,string,string)"/> method to update the text of the dialog,
     ///   but the percentage will be ignored.
     /// </para>
@@ -423,10 +434,7 @@ public partial class ProgressDialog : Component, IProgress<int>, IProgress<strin
     /// otherwise, <see langword="false"/>.
     /// </value>
     [Browsable (false)]
-    public bool IsBusy
-    {
-        get { return _backgroundWorker.IsBusy; }
-    }
+    public bool IsBusy => _backgroundWorker.IsBusy;
 
     /// <summary>
     /// Displays the progress dialog as a modeless dialog.
@@ -466,7 +474,7 @@ public partial class ProgressDialog : Component, IProgress<int>, IProgress<strin
     /// </remarks>
     /// <exception cref="InvalidOperationException">The animation specified in the <see cref="Animation"/> property
     /// could not be loaded.</exception>
-    public void Show (object argument)
+    public void Show (object? argument)
     {
         RunProgressDialog (IntPtr.Zero, argument);
     }
@@ -590,7 +598,7 @@ public partial class ProgressDialog : Component, IProgress<int>, IProgress<strin
     /// </remarks>
     /// <exception cref="InvalidOperationException">The animation specified in the <see cref="Animation"/> property
     /// could not be loaded, or the operation is already running.</exception>
-    public void ShowDialog (IntPtr owner, object argument)
+    public void ShowDialog (IntPtr owner, object? argument)
     {
         RunProgressDialog (owner == IntPtr.Zero ? NativeMethods.GetActiveWindow() : owner, argument);
     }
@@ -622,9 +630,9 @@ public partial class ProgressDialog : Component, IProgress<int>, IProgress<strin
     /// </remarks>
     /// <exception cref="InvalidOperationException">The animation specified in the <see cref="Animation"/> property
     /// could not be loaded, or the operation is already running.</exception>
-    public void ShowDialog (IWin32Window owner, object argument)
+    public void ShowDialog (IWin32Window? owner, object? argument)
     {
-        RunProgressDialog (owner == null ? NativeMethods.GetActiveWindow() : owner.Handle, argument);
+        RunProgressDialog (owner?.Handle ?? NativeMethods.GetActiveWindow(), argument);
     }
 
     /// <summary>
@@ -654,8 +662,8 @@ public partial class ProgressDialog : Component, IProgress<int>, IProgress<strin
     ///   Call this method from the <see cref="DoWork"/> event handler if you want to report progress.
     /// </para>
     /// <para>
-    ///   This method has no effect is <see cref="ProgressBarStyle"/> is <see cref="Ookii.Dialogs.WinForms.ProgressBarStyle.MarqueeProgressBar"/>
-    ///   or <see cref="Ookii.Dialogs.WinForms.ProgressBarStyle.None"/>.
+    ///   This method has no effect is <see cref="ProgressBarStyle"/> is <c>Ookii.Dialogs.WinForms.ProgressBarStyle.MarqueeProgressBar</c>
+    ///   or <c>Ookii.Dialogs.WinForms.ProgressBarStyle.None</c>.
     /// </para>
     /// </remarks>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="percentProgress"/> is out of range.</exception>
@@ -689,11 +697,11 @@ public partial class ProgressDialog : Component, IProgress<int>, IProgress<strin
     /// <remarks>Call this method from the <see cref="DoWork"/> event handler if you want to report progress.</remarks>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="percentProgress"/> is out of range.</exception>
     /// <exception cref="InvalidOperationException">The progress dialog is not currently being displayed.</exception>
-    public void ReportProgress (int percentProgress, string text, string description, object userState)
+    public void ReportProgress (int percentProgress, string? text, string? description, object? userState)
     {
         if (percentProgress < 0 || percentProgress > 100)
         {
-            throw new ArgumentOutOfRangeException ("percentProgress");
+            throw new ArgumentOutOfRangeException (nameof (percentProgress));
         }
 
         if (_dialog == null)
@@ -711,43 +719,31 @@ public partial class ProgressDialog : Component, IProgress<int>, IProgress<strin
     /// <summary>
     /// Raises the <see cref="DoWork"/> event.
     /// </summary>
-    /// <param name="e">The <see cref="DoWorkEventArgs"/> containing data for the event.</param>
-    protected virtual void OnDoWork (DoWorkEventArgs e)
+    /// <param name="eventArgs">The <see cref="DoWorkEventArgs"/> containing data for the event.</param>
+    protected virtual void OnDoWork (DoWorkEventArgs eventArgs)
     {
-        DoWorkEventHandler handler = DoWork;
-        if (handler != null)
-        {
-            handler (this, e);
-        }
+        DoWork?.Invoke (this, eventArgs);
     }
 
     /// <summary>
     /// Raises the <see cref="RunWorkerCompleted"/> event.
     /// </summary>
-    /// <param name="e">The <see cref="EventArgs"/> containing data for the event.</param>
-    protected virtual void OnRunWorkerCompleted (RunWorkerCompletedEventArgs e)
+    /// <param name="eventArgs">The <see cref="EventArgs"/> containing data for the event.</param>
+    protected virtual void OnRunWorkerCompleted (RunWorkerCompletedEventArgs eventArgs)
     {
-        RunWorkerCompletedEventHandler handler = RunWorkerCompleted;
-        if (handler != null)
-        {
-            handler (this, e);
-        }
+        RunWorkerCompleted?.Invoke (this, eventArgs);
     }
 
     /// <summary>
     /// Raises the <see cref="ProgressChanged"/> event.
     /// </summary>
-    /// <param name="e">The <see cref="ProgressChangedEventArgs"/> containing data for the event.</param>
-    protected virtual void OnProgressChanged (ProgressChangedEventArgs e)
+    /// <param name="eventArgs">The <see cref="ProgressChangedEventArgs"/> containing data for the event.</param>
+    protected virtual void OnProgressChanged (ProgressChangedEventArgs eventArgs)
     {
-        ProgressChangedEventHandler handler = ProgressChanged;
-        if (handler != null)
-        {
-            handler (this, e);
-        }
+        ProgressChanged?.Invoke (this, eventArgs);
     }
 
-    private void RunProgressDialog (IntPtr owner, object argument)
+    private void RunProgressDialog (IntPtr owner, object? argument)
     {
         if (_backgroundWorker.IsBusy)
         {
@@ -777,7 +773,7 @@ public partial class ProgressDialog : Component, IProgress<int>, IProgress<strin
         _dialog.SetTitle (WindowTitle);
         if (Animation != null)
         {
-            _dialog.SetAnimation (_currentAnimationModuleHandle, (ushort)Animation.ResourceId);
+            _dialog.SetAnimation (_currentAnimationModuleHandle!, (ushort)Animation.ResourceId);
         }
 
         if (CancellationText.Length > 0)
@@ -837,9 +833,9 @@ public partial class ProgressDialog : Component, IProgress<int>, IProgress<strin
         OnDoWork (e);
     }
 
-    private void _backgroundWorker_RunWorkerCompleted (object sender, RunWorkerCompletedEventArgs e)
+    private void _backgroundWorker_RunWorkerCompleted (object? sender, RunWorkerCompletedEventArgs eventArgs)
     {
-        _dialog.StopProgressDialog();
+        _dialog!.StopProgressDialog();
         Marshal.ReleaseComObject (_dialog);
         _dialog = null;
         if (_currentAnimationModuleHandle != null)
@@ -853,21 +849,20 @@ public partial class ProgressDialog : Component, IProgress<int>, IProgress<strin
             NativeMethods.EnableWindow (_ownerHandle, true);
         }
 
-        OnRunWorkerCompleted (new RunWorkerCompletedEventArgs ((!e.Cancelled && e.Error == null) ? e.Result : null,
-            e.Error, e.Cancelled));
+        OnRunWorkerCompleted (new RunWorkerCompletedEventArgs (eventArgs is { Cancelled: false, Error: null } ? eventArgs.Result : null,
+            eventArgs.Error, eventArgs.Cancelled));
     }
 
     private void _backgroundWorker_ProgressChanged (object sender, ProgressChangedEventArgs e)
     {
-        _cancellationPending = _dialog.HasUserCancelled();
+        _cancellationPending = _dialog!.HasUserCancelled();
 
         // ReportProgress doesn't allow values outside this range. However, CancellationPending will call
         // BackgroundWorker.ReportProgress directly with a value that is outside this range to update the value of the property.
-        if (e.ProgressPercentage >= 0 && e.ProgressPercentage <= 100)
+        if (e.ProgressPercentage is >= 0 and <= 100)
         {
             _dialog.SetProgress ((uint)e.ProgressPercentage, 100);
-            ProgressChangedData data = e.UserState as ProgressChangedData;
-            if (data != null)
+            if (e.UserState is ProgressChangedData data)
             {
                 if (data.Text != null)
                 {

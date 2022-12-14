@@ -43,26 +43,18 @@ partial class DockPanel
             /// </summary>
             public SplitterControl (AutoHideWindowControl autoHideWindow)
             {
-                m_autoHideWindow = autoHideWindow;
+                AutoHideWindow = autoHideWindow;
             }
 
-            private AutoHideWindowControl m_autoHideWindow;
-
-            private AutoHideWindowControl AutoHideWindow
-            {
-                get { return m_autoHideWindow; }
-            }
+            private AutoHideWindowControl AutoHideWindow { get; }
 
             /// <inheritdoc cref="SplitterBase.SplitterSize"/>
-            protected override int SplitterSize
-            {
-                get { return AutoHideWindow.DockPanel.Theme.Measures.AutoHideSplitterSize; }
-            }
+            protected override int SplitterSize => AutoHideWindow.DockPanel!.Theme.Measures.AutoHideSplitterSize;
 
             /// <inheritdoc cref="SplitterBase.StartDrag"/>
             protected override void StartDrag()
             {
-                AutoHideWindow.DockPanel.BeginDrag (AutoHideWindow, AutoHideWindow.RectangleToScreen (Bounds));
+                AutoHideWindow.DockPanel!.BeginDrag (AutoHideWindow, AutoHideWindow.RectangleToScreen (Bounds));
             }
         }
 
@@ -72,7 +64,7 @@ partial class DockPanel
 
         #endregion
 
-        private Timer m_timerMouseTrack;
+        private Timer _timerMouseTrack;
 
         /// <summary>
         ///
@@ -89,11 +81,11 @@ partial class DockPanel
         {
             DockPanel = dockPanel;
 
-            m_timerMouseTrack = new Timer();
-            m_timerMouseTrack.Tick += TimerMouseTrack_Tick;
+            _timerMouseTrack = new Timer();
+            _timerMouseTrack.Tick += TimerMouseTrack_Tick;
 
             Visible = false;
-            m_splitter = DockPanel.Theme.Extender.WindowSplitterControlFactory.CreateSplitterControl (this);
+            m_splitter = DockPanel.Theme.Extender.WindowSplitterControlFactory!.CreateSplitterControl (this);
             Controls.Add (m_splitter);
         }
 
@@ -102,7 +94,7 @@ partial class DockPanel
         {
             if (disposing)
             {
-                m_timerMouseTrack.Dispose();
+                _timerMouseTrack.Dispose();
             }
 
             base.Dispose (disposing);
@@ -125,7 +117,7 @@ partial class DockPanel
 
         private void SetActivePane()
         {
-            var value = (ActiveContent == null ? null : ActiveContent.DockHandler.Pane);
+            var value = ActiveContent?.DockHandler.Pane;
 
             if (value == ActivePane)
             {
@@ -143,7 +135,7 @@ partial class DockPanel
         public event EventHandler ActiveContentChanged
         {
             add => Events.AddHandler (AutoHideActiveContentChangedEvent, value);
-            remove { Events.RemoveHandler (AutoHideActiveContentChangedEvent, value); }
+            remove => Events.RemoveHandler (AutoHideActiveContentChangedEvent, value);
         }
 
         /// <summary>
@@ -224,10 +216,7 @@ partial class DockPanel
         /// <summary>
         ///
         /// </summary>
-        public DockState DockState
-        {
-            get { return ActiveContent == null ? DockState.Unknown : ActiveContent.DockHandler.DockState; }
-        }
+        public DockState DockState => ActiveContent == null ? DockState.Unknown : ActiveContent.DockHandler.DockState;
 
         private bool FlagAnimate { get; set; } = true;
 
@@ -256,13 +245,13 @@ partial class DockPanel
                 return;
             }
 
-            Parent.SuspendLayout();
+            Parent!.SuspendLayout();
 
             var rectSource = GetRectangle (!show);
             var rectTarget = GetRectangle (show);
-            int dxLoc, dyLoc;
+            int dyLoc;
             int dWidth, dHeight;
-            dxLoc = dyLoc = dWidth = dHeight = 0;
+            var dxLoc = dyLoc = dWidth = dHeight = 0;
             if (DockState == DockState.DockTopAutoHide)
             {
                 dHeight = show ? 1 : -1;
@@ -284,8 +273,12 @@ partial class DockPanel
 
             if (show)
             {
-                Bounds = DockPanel.GetAutoHideWindowBounds (new Rectangle (-rectTarget.Width, -rectTarget.Height,
-                    rectTarget.Width, rectTarget.Height));
+                Bounds = DockPanel!.GetAutoHideWindowBounds (new Rectangle (
+                            -rectTarget.Width,
+                            -rectTarget.Height,
+                            rectTarget.Width,
+                            rectTarget.Height
+                        ));
                 if (Visible == false)
                 {
                     Visible = true;
@@ -368,25 +361,25 @@ partial class DockPanel
             }
 
             ResumeLayout();
-            Parent.ResumeLayout();
+            Parent!.ResumeLayout();
         }
 
         private void LayoutAnimateWindow (Rectangle rect)
         {
-            Bounds = DockPanel.GetAutoHideWindowBounds (rect);
+            Bounds = DockPanel!.GetAutoHideWindowBounds (rect);
 
             var rectClient = ClientRectangle;
 
             if (DockState == DockState.DockLeftAutoHide)
             {
-                ActivePane.Location =
+                ActivePane!.Location =
                     new Point (
                         rectClient.Right - 2 - DockPanel.Theme.Measures.AutoHideSplitterSize - ActivePane.Width,
                         ActivePane.Location.Y);
             }
             else if (DockState == DockState.DockTopAutoHide)
             {
-                ActivePane.Location = new Point (ActivePane.Location.X,
+                ActivePane!.Location = new Point (ActivePane.Location.X,
                     rectClient.Bottom - 2 - DockPanel.Theme.Measures.AutoHideSplitterSize - ActivePane.Height);
             }
         }
@@ -398,7 +391,7 @@ partial class DockPanel
                 return Rectangle.Empty;
             }
 
-            var rect = DockPanel.AutoHideWindowRectangle;
+            var rect = DockPanel!.AutoHideWindowRectangle;
 
             if (show)
             {
@@ -431,7 +424,7 @@ partial class DockPanel
         {
             if (ActivePane == null || ActivePane.IsActivated || FlagDragging)
             {
-                m_timerMouseTrack.Enabled = false;
+                _timerMouseTrack.Enabled = false;
                 return;
             }
 
@@ -444,8 +437,8 @@ partial class DockPanel
                 hovertime = 400;
             }
 
-            m_timerMouseTrack.Interval = 2 * (int)hovertime;
-            m_timerMouseTrack.Enabled = true;
+            _timerMouseTrack.Interval = 2 * hovertime;
+            _timerMouseTrack.Enabled = true;
         }
 
         /// <summary>
@@ -484,6 +477,9 @@ partial class DockPanel
             }
         }
 
+        /// <summary>
+        ///
+        /// </summary>
         public void RefreshActiveContent()
         {
             if (ActiveContent == null)
@@ -499,6 +495,9 @@ partial class DockPanel
             }
         }
 
+        /// <summary>
+        ///
+        /// </summary>
         public void RefreshActivePane()
         {
             SetTimerMouseTrack();
@@ -513,20 +512,20 @@ partial class DockPanel
 
             if (ActivePane == null || ActivePane.IsActivated)
             {
-                m_timerMouseTrack.Enabled = false;
+                _timerMouseTrack.Enabled = false;
                 return;
             }
 
             var pane = ActivePane;
             var ptMouseInAutoHideWindow = PointToClient (Control.MousePosition);
-            var ptMouseInDockPanel = DockPanel.PointToClient (Control.MousePosition);
+            var ptMouseInDockPanel = DockPanel!.PointToClient (Control.MousePosition);
 
             var rectTabStrip = DockPanel.GetTabStripRectangle (pane.DockState);
 
             if (!ClientRectangle.Contains (ptMouseInAutoHideWindow) && !rectTabStrip.Contains (ptMouseInDockPanel))
             {
                 ActiveContent = null;
-                m_timerMouseTrack.Enabled = false;
+                _timerMouseTrack.Enabled = false;
             }
         }
 
@@ -542,16 +541,13 @@ partial class DockPanel
             FlagDragging = false;
         }
 
-        bool ISplitterDragSource.IsVertical
-        {
-            get { return (DockState == DockState.DockLeftAutoHide || DockState == DockState.DockRightAutoHide); }
-        }
+        bool ISplitterDragSource.IsVertical => (DockState == DockState.DockLeftAutoHide || DockState == DockState.DockRightAutoHide);
 
         Rectangle ISplitterDragSource.DragLimitBounds
         {
             get
             {
-                var rectLimit = DockPanel.DockArea;
+                var rectLimit = DockPanel!.DockArea;
 
                 if ((this as ISplitterDragSource).IsVertical)
                 {
@@ -570,13 +566,13 @@ partial class DockPanel
 
         void ISplitterDragSource.MoveSplitter (int offset)
         {
-            var rectDockArea = DockPanel.DockArea;
+            var rectDockArea = DockPanel!.DockArea;
             var content = ActiveContent;
             if (DockState == DockState.DockLeftAutoHide && rectDockArea.Width > 0)
             {
-                if (content.DockHandler.AutoHidePortion < 1)
+                if (content!.DockHandler.AutoHidePortion < 1)
                 {
-                    content.DockHandler.AutoHidePortion += ((double)offset) / (double)rectDockArea.Width;
+                    content.DockHandler.AutoHidePortion += offset / (double)rectDockArea.Width;
                 }
                 else
                 {
@@ -585,9 +581,9 @@ partial class DockPanel
             }
             else if (DockState == DockState.DockRightAutoHide && rectDockArea.Width > 0)
             {
-                if (content.DockHandler.AutoHidePortion < 1)
+                if (content!.DockHandler.AutoHidePortion < 1)
                 {
-                    content.DockHandler.AutoHidePortion -= ((double)offset) / (double)rectDockArea.Width;
+                    content.DockHandler.AutoHidePortion -= offset / (double)rectDockArea.Width;
                 }
                 else
                 {
@@ -596,9 +592,9 @@ partial class DockPanel
             }
             else if (DockState == DockState.DockBottomAutoHide && rectDockArea.Height > 0)
             {
-                if (content.DockHandler.AutoHidePortion < 1)
+                if (content!.DockHandler.AutoHidePortion < 1)
                 {
-                    content.DockHandler.AutoHidePortion -= ((double)offset) / (double)rectDockArea.Height;
+                    content.DockHandler.AutoHidePortion -= offset / (double)rectDockArea.Height;
                 }
                 else
                 {
@@ -607,9 +603,9 @@ partial class DockPanel
             }
             else if (DockState == DockState.DockTopAutoHide && rectDockArea.Height > 0)
             {
-                if (content.DockHandler.AutoHidePortion < 1)
+                if (content!.DockHandler.AutoHidePortion < 1)
                 {
-                    content.DockHandler.AutoHidePortion += ((double)offset) / (double)rectDockArea.Height;
+                    content.DockHandler.AutoHidePortion += offset / (double)rectDockArea.Height;
                 }
                 else
                 {
@@ -620,25 +616,16 @@ partial class DockPanel
 
         #region IDragSource Members
 
-        Control IDragSource.DragControl
-        {
-            get { return this; }
-        }
+        Control IDragSource.DragControl => this;
 
         #endregion
 
         #endregion
     }
 
-    private AutoHideWindowControl AutoHideWindow
-    {
-        get { return m_autoHideWindow; }
-    }
+    private AutoHideWindowControl AutoHideWindow => m_autoHideWindow;
 
-    internal Control AutoHideControl
-    {
-        get { return m_autoHideWindow; }
-    }
+    internal Control AutoHideControl => m_autoHideWindow;
 
     internal void RefreshActiveAutoHideContent()
     {
@@ -741,7 +728,7 @@ partial class DockPanel
         if (DocumentStyle == DocumentStyle.SystemMdi ||
             DocumentStyle == DocumentStyle.DockingMdi)
         {
-            return (Parent == null)
+            return (Parent == null!)
                 ? Rectangle.Empty
                 : Parent.RectangleToClient (RectangleToScreen (rectAutoHideWindow));
         }

@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
 
 /* HtmlContainer.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -68,7 +69,10 @@ public sealed class HtmlContainer
         add => HtmlContainerInt.LoadComplete += value;
         remove
         {
-            if (HtmlContainerInt != null) HtmlContainerInt.LoadComplete -= value;
+            if (HtmlContainerInt != null!)
+            {
+                HtmlContainerInt.LoadComplete -= value;
+            }
         }
     }
 
@@ -78,8 +82,8 @@ public sealed class HtmlContainer
     /// </summary>
     public event EventHandler<HtmlLinkClickedEventArgs> LinkClicked
     {
-        add { HtmlContainerInt.LinkClicked += value; }
-        remove { HtmlContainerInt.LinkClicked -= value; }
+        add => HtmlContainerInt.LinkClicked += value;
+        remove => HtmlContainerInt.LinkClicked -= value;
     }
 
     /// <summary>
@@ -90,8 +94,8 @@ public sealed class HtmlContainer
     /// </remarks>
     public event EventHandler<HtmlRefreshEventArgs> Refresh
     {
-        add { HtmlContainerInt.Refresh += value; }
-        remove { HtmlContainerInt.Refresh -= value; }
+        add => HtmlContainerInt.Refresh += value;
+        remove => HtmlContainerInt.Refresh -= value;
     }
 
     /// <summary>
@@ -100,8 +104,8 @@ public sealed class HtmlContainer
     /// </summary>
     public event EventHandler<HtmlScrollEventArgs> ScrollChange
     {
-        add { HtmlContainerInt.ScrollChange += value; }
-        remove { HtmlContainerInt.ScrollChange -= value; }
+        add => HtmlContainerInt.ScrollChange += value;
+        remove => HtmlContainerInt.ScrollChange -= value;
     }
 
     /// <summary>
@@ -112,8 +116,8 @@ public sealed class HtmlContainer
     /// </remarks>
     public event EventHandler<HtmlRenderErrorEventArgs> RenderError
     {
-        add { HtmlContainerInt.RenderError += value; }
-        remove { HtmlContainerInt.RenderError -= value; }
+        add => HtmlContainerInt.RenderError += value;
+        remove => HtmlContainerInt.RenderError -= value;
     }
 
     /// <summary>
@@ -136,7 +140,10 @@ public sealed class HtmlContainer
         add => HtmlContainerInt.ImageLoad += value;
         remove
         {
-            if (HtmlContainerInt != null) HtmlContainerInt.ImageLoad -= value;
+            if (HtmlContainerInt != null!)
+            {
+                HtmlContainerInt.ImageLoad -= value;
+            }
         }
     }
 
@@ -160,7 +167,7 @@ public sealed class HtmlContainer
     /// </remarks>
     public bool UseGdiPlusTextRendering
     {
-        get { return _useGdiPlusTextRendering; }
+        get => _useGdiPlusTextRendering;
         set
         {
             if (_useGdiPlusTextRendering != value)
@@ -174,15 +181,15 @@ public sealed class HtmlContainer
     /// <summary>
     /// the parsed stylesheet data used for handling the html
     /// </summary>
-    public CssData CssData => HtmlContainerInt.CssData;
+    public CssData CssData => HtmlContainerInt.CssData!;
 
     /// <summary>
     /// Gets or sets a value indicating if anti-aliasing should be avoided for geometry like backgrounds and borders (default - false).
     /// </summary>
     public bool AvoidGeometryAntialias
     {
-        get { return HtmlContainerInt.AvoidGeometryAntialias; }
-        set { HtmlContainerInt.AvoidGeometryAntialias = value; }
+        get => HtmlContainerInt.AvoidGeometryAntialias;
+        set => HtmlContainerInt.AvoidGeometryAntialias = value;
     }
 
     /// <summary>
@@ -197,8 +204,8 @@ public sealed class HtmlContainer
     /// </remarks>
     public bool AvoidAsyncImagesLoading
     {
-        get { return HtmlContainerInt.AvoidAsyncImagesLoading; }
-        set { HtmlContainerInt.AvoidAsyncImagesLoading = value; }
+        get => HtmlContainerInt.AvoidAsyncImagesLoading;
+        set => HtmlContainerInt.AvoidAsyncImagesLoading = value;
     }
 
     /// <summary>
@@ -216,8 +223,8 @@ public sealed class HtmlContainer
     /// </remarks>
     public bool AvoidImagesLateLoading
     {
-        get { return HtmlContainerInt.AvoidImagesLateLoading; }
-        set { HtmlContainerInt.AvoidImagesLateLoading = value; }
+        get => HtmlContainerInt.AvoidImagesLateLoading;
+        set => HtmlContainerInt.AvoidImagesLateLoading = value;
     }
 
     /// <summary>
@@ -226,8 +233,8 @@ public sealed class HtmlContainer
     /// </summary>
     public bool IsSelectionEnabled
     {
-        get { return HtmlContainerInt.IsSelectionEnabled; }
-        set { HtmlContainerInt.IsSelectionEnabled = value; }
+        get => HtmlContainerInt.IsSelectionEnabled;
+        set => HtmlContainerInt.IsSelectionEnabled = value;
     }
 
     /// <summary>
@@ -235,8 +242,8 @@ public sealed class HtmlContainer
     /// </summary>
     public bool IsContextMenuEnabled
     {
-        get { return HtmlContainerInt.IsContextMenuEnabled; }
-        set { HtmlContainerInt.IsContextMenuEnabled = value; }
+        get => HtmlContainerInt.IsContextMenuEnabled;
+        set => HtmlContainerInt.IsContextMenuEnabled = value;
     }
 
     /// <summary>
@@ -249,8 +256,8 @@ public sealed class HtmlContainer
     /// </example>
     public Point ScrollOffset
     {
-        get { return Utils.ConvertRound (HtmlContainerInt.ScrollOffset); }
-        set { HtmlContainerInt.ScrollOffset = Utils.Convert (value); }
+        get => Utils.ConvertRound (HtmlContainerInt.ScrollOffset);
+        set => HtmlContainerInt.ScrollOffset = Utils.Convert (value);
     }
 
     /// <summary>
@@ -259,8 +266,8 @@ public sealed class HtmlContainer
     /// </summary>
     public PointF Location
     {
-        get { return Utils.Convert (HtmlContainerInt.Location); }
-        set { HtmlContainerInt.Location = Utils.Convert (value); }
+        get => Utils.Convert (HtmlContainerInt.Location);
+        set => HtmlContainerInt.Location = Utils.Convert (value);
     }
 
     /// <summary>
@@ -272,8 +279,8 @@ public sealed class HtmlContainer
     /// </summary>
     public SizeF MaxSize
     {
-        get { return Utils.Convert (HtmlContainerInt.MaxSize); }
-        set { HtmlContainerInt.MaxSize = Utils.Convert (value); }
+        get => Utils.Convert (HtmlContainerInt.MaxSize);
+        set => HtmlContainerInt.MaxSize = Utils.Convert (value);
     }
 
     /// <summary>
@@ -281,25 +288,19 @@ public sealed class HtmlContainer
     /// </summary>
     public SizeF ActualSize
     {
-        get { return Utils.Convert (HtmlContainerInt.ActualSize); }
-        internal set { HtmlContainerInt.ActualSize = Utils.Convert (value); }
+        get => Utils.Convert (HtmlContainerInt.ActualSize);
+        internal set => HtmlContainerInt.ActualSize = Utils.Convert (value);
     }
 
     /// <summary>
     /// Get the currently selected text segment in the html.
     /// </summary>
-    public string SelectedText
-    {
-        get { return HtmlContainerInt.SelectedText; }
-    }
+    public string SelectedText => HtmlContainerInt.SelectedText!;
 
     /// <summary>
     /// Copy the currently selected html segment with style.
     /// </summary>
-    public string SelectedHtml
-    {
-        get { return HtmlContainerInt.SelectedHtml; }
-    }
+    public string SelectedHtml => HtmlContainerInt.SelectedHtml!;
 
     /// <summary>
     /// Clear the current selection.
@@ -345,7 +346,7 @@ public sealed class HtmlContainer
     /// <returns>found attribute value or null if not found</returns>
     public string GetAttributeAt (Point location, string attribute)
     {
-        return HtmlContainerInt.GetAttributeAt (Utils.Convert (location), attribute);
+        return HtmlContainerInt.GetAttributeAt (Utils.Convert (location), attribute)!;
     }
 
     /// <summary>
@@ -370,7 +371,7 @@ public sealed class HtmlContainer
     /// <returns>css link href if exists or null</returns>
     public string GetLinkAt (Point location)
     {
-        return HtmlContainerInt.GetLinkAt (Utils.Convert (location));
+        return HtmlContainerInt.GetLinkAt (Utils.Convert (location))!;
     }
 
     /// <summary>

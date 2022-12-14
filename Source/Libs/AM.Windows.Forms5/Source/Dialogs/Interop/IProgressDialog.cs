@@ -106,7 +106,7 @@ internal interface IProgressDialog
     void StartProgressDialog
         (
             IntPtr hwndParent,
-            [MarshalAs (UnmanagedType.IUnknown)] object punkEnableModless,
+            [MarshalAs (UnmanagedType.IUnknown)] object? punkEnableModless,
             ProgressDialogFlags dwFlags,
             IntPtr pvResevered
         );
@@ -183,7 +183,7 @@ internal interface IProgressDialog
     void SetCancelMsg
         (
             [MarshalAs (UnmanagedType.LPWStr)] string pwzCancelMsg,
-            object pvResevered
+            object? pvResevered
         );
 
     /// <summary>
@@ -193,6 +193,6 @@ internal interface IProgressDialog
     void Timer
         (
             uint dwTimerAction,
-            object pvResevered
+            object? pvResevered
         );
 }

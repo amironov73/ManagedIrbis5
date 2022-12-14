@@ -196,7 +196,7 @@ public interface ISplitterHost
     /// <summary>
     ///
     /// </summary>
-    DockPanel DockPanel { get; }
+    DockPanel? DockPanel { get; }
 
     /// <summary>
     ///
