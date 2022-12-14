@@ -63,7 +63,7 @@ internal static class NavigationReader
         return GetNavigationItems
             (
                 bookRef,
-                epub3NavDocument.Navs.FirstOrDefault (nav => nav.Type == StructuralSemanticsProperty.TOC)!
+                epub3NavDocument.Navs!.FirstOrDefault (nav => nav.Type == StructuralSemanticsProperty.TOC)!
             );
     }
 
@@ -109,19 +109,19 @@ internal static class NavigationReader
         if (epub3Nav != null!)
         {
             var epub3NavigationBaseDirectoryPath =
-                ZipPathUtils.GetDirectoryPath (bookRef.Content!.NavigationHtmlFile.FilePathInEpubArchive);
+                ZipPathUtils.GetDirectoryPath (bookRef.Content!.NavigationHtmlFile!.FilePathInEpubArchive);
             if (epub3Nav.Head != null!)
             {
                 result = new List<EpubNavigationItemRef>();
                 var navigationItemRef = EpubNavigationItemRef.CreateAsHeader();
                 navigationItemRef.Title = epub3Nav.Head;
                 navigationItemRef.NestedItems =
-                    GetNavigationItems (bookRef, epub3Nav.Ol, epub3NavigationBaseDirectoryPath);
+                    GetNavigationItems (bookRef, epub3Nav.Ol!, epub3NavigationBaseDirectoryPath);
                 result.Add (navigationItemRef);
             }
             else
             {
-                result = GetNavigationItems (bookRef, epub3Nav.Ol, epub3NavigationBaseDirectoryPath);
+                result = GetNavigationItems (bookRef, epub3Nav.Ol!, epub3NavigationBaseDirectoryPath);
             }
         }
         else
@@ -151,9 +151,9 @@ internal static class NavigationReader
                         var navAnchor = epub3NavLi.Anchor;
                         var navigationItemRef = EpubNavigationItemRef.CreateAsLink();
                         navigationItemRef.Title =
-                            GetFirstNonEmptyHeader (navAnchor.Text, navAnchor.Title, navAnchor.Alt);
+                            GetFirstNonEmptyHeader (navAnchor.Text!, navAnchor.Title!, navAnchor.Alt!);
                         navigationItemRef.Link =
-                            new EpubNavigationItemLink (navAnchor.Href, epub3NavigationBaseDirectoryPath);
+                            new EpubNavigationItemLink (navAnchor.Href!, epub3NavigationBaseDirectoryPath);
                         navigationItemRef.HtmlContentFileRef =
                             GetHtmlContentFileRef (bookRef, navigationItemRef.Link.ContentFileName)!;
                         navigationItemRef.NestedItems = GetNavigationItems (bookRef, epub3NavLi.ChildOl!,
@@ -164,7 +164,7 @@ internal static class NavigationReader
                     {
                         var navSpan = epub3NavLi.Span;
                         var navigationItemRef = EpubNavigationItemRef.CreateAsHeader();
-                        navigationItemRef.Title = GetFirstNonEmptyHeader (navSpan.Text, navSpan.Title, navSpan.Alt);
+                        navigationItemRef.Title = GetFirstNonEmptyHeader (navSpan.Text!, navSpan.Title!, navSpan.Alt!);
                         navigationItemRef.NestedItems = GetNavigationItems (bookRef, epub3NavLi.ChildOl!,
                             epub3NavigationBaseDirectoryPath);
                         result.Add (navigationItemRef);
@@ -187,7 +187,7 @@ internal static class NavigationReader
             return null;
         }
 
-        if (!bookRef.Content!.Html.TryGetValue (contentFileName, out var htmlContentFileRef))
+        if (!bookRef.Content!.Html!.TryGetValue (contentFileName, out var htmlContentFileRef))
         {
             return null;
         }

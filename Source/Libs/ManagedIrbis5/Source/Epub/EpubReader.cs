@@ -171,7 +171,7 @@ public static class EpubReader
     private static async Task<EpubBookRef> OpenBookAsync
         (
             IZipFile zipFile,
-            string filePath,
+            string? filePath,
             EpubReaderOptions? epubReaderOptions
         )
     {
@@ -182,10 +182,10 @@ public static class EpubReader
             result.FilePath = filePath;
             result.Schema = await SchemaReader.ReadSchemaAsync (zipFile, epubReaderOptions ?? new EpubReaderOptions())
                 .ConfigureAwait (false);
-            result.Title = result.Schema.Package?.Metadata.Titles.FirstOrDefault() ?? string.Empty;
-            result.AuthorList = result.Schema.Package?.Metadata.Creators.Select (creator => creator.Creator).ToList();
+            result.Title = result.Schema.Package?.Metadata!.Titles!.FirstOrDefault() ?? string.Empty;
+            result.AuthorList = result.Schema.Package?.Metadata!.Creators!.Select (creator => creator.Creator).ToList()!;
             result.Author = String.Join (", ", result.AuthorList);
-            result.Description = result.Schema.Package.Metadata.Description;
+            result.Description = result.Schema.Package!.Metadata!.Description;
             result.Content = await Task.Run (() => ContentReader.ParseContentMap (result)).ConfigureAwait (false);
             return result;
         }
@@ -209,7 +209,7 @@ public static class EpubReader
             result.Title = epubBookRef.Title;
             result.AuthorList = epubBookRef.AuthorList;
             result.Author = epubBookRef.Author;
-            result.Content = await ReadContent (epubBookRef.Content).ConfigureAwait (false);
+            result.Content = await ReadContent (epubBookRef.Content!).ConfigureAwait (false);
             result.CoverImage = await epubBookRef.ReadCoverAsync().ConfigureAwait (false);
             result.Description = epubBookRef.Description;
             var htmlContentFileRefs =
@@ -240,10 +240,10 @@ public static class EpubReader
     {
         var result = new EpubContent
         {
-            Html = await ReadTextContentFiles (contentRef.Html).ConfigureAwait (false),
-            Css = await ReadTextContentFiles (contentRef.Css).ConfigureAwait (false),
-            Images = await ReadByteContentFiles (contentRef.Images).ConfigureAwait (false),
-            Fonts = await ReadByteContentFiles (contentRef.Fonts).ConfigureAwait (false),
+            Html = await ReadTextContentFiles (contentRef.Html!).ConfigureAwait (false),
+            Css = await ReadTextContentFiles (contentRef.Css!).ConfigureAwait (false),
+            Images = await ReadByteContentFiles (contentRef.Images!).ConfigureAwait (false),
+            Fonts = await ReadByteContentFiles (contentRef.Fonts!).ConfigureAwait (false),
             AllFiles = new Dictionary<string, EpubContentFile>()
         };
         foreach (var textContentFile in result.Html.Concat (result.Css))
@@ -256,7 +256,7 @@ public static class EpubReader
             result.AllFiles.Add (byteContentFile.Key, byteContentFile.Value);
         }
 
-        foreach (var contentFileRef in contentRef.AllFiles)
+        foreach (var contentFileRef in contentRef.AllFiles!)
         {
             if (!result.AllFiles.ContainsKey (contentFileRef.Key))
             {
@@ -291,9 +291,9 @@ public static class EpubReader
                 FileName = textContentFileRef.Value.FileName,
                 FilePathInEpubArchive = textContentFileRef.Value.FilePathInEpubArchive,
                 ContentType = textContentFileRef.Value.ContentType,
-                ContentMimeType = textContentFileRef.Value.ContentMimeType
+                ContentMimeType = textContentFileRef.Value.ContentMimeType,
+                Content = await textContentFileRef.Value.ReadContentAsTextAsync().ConfigureAwait (false)
             };
-            textContentFile.Content = await textContentFileRef.Value.ReadContentAsTextAsync().ConfigureAwait (false);
             result.Add (textContentFileRef.Key, textContentFile);
         }
 
@@ -325,9 +325,9 @@ public static class EpubReader
             FileName = contentFileRef.FileName,
             FilePathInEpubArchive = contentFileRef.FilePathInEpubArchive,
             ContentType = contentFileRef.ContentType,
-            ContentMimeType = contentFileRef.ContentMimeType
+            ContentMimeType = contentFileRef.ContentMimeType,
+            Content = await contentFileRef.ReadContentAsBytesAsync().ConfigureAwait (false)
         };
-        result.Content = await contentFileRef.ReadContentAsBytesAsync().ConfigureAwait (false);
         return result;
     }
 
@@ -337,7 +337,7 @@ public static class EpubReader
             List<EpubTextContentFileRef> htmlContentFileRefs
         )
     {
-        return htmlContentFileRefs.Select (htmlContentFileRef => epubBook.Content.Html[htmlContentFileRef.FileName])
+        return htmlContentFileRefs.Select (htmlContentFileRef => epubBook.Content!.Html![htmlContentFileRef.FileName])
             .ToList();
     }
 
@@ -357,10 +357,10 @@ public static class EpubReader
             };
             if (navigationItemRef.HtmlContentFileRef != null)
             {
-                navigationItem.HtmlContentFile = epubBook.Content.Html[navigationItemRef.HtmlContentFileRef.FileName];
+                navigationItem.HtmlContentFile = epubBook.Content!.Html![navigationItemRef.HtmlContentFileRef.FileName];
             }
 
-            navigationItem.NestedItems = ReadNavigation (epubBook, navigationItemRef.NestedItems);
+            navigationItem.NestedItems = ReadNavigation (epubBook, navigationItemRef.NestedItems!);
             result.Add (navigationItem);
         }
 

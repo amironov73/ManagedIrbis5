@@ -2,14 +2,11 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
-/*
+/* EpubVersion.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,26 +21,50 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace ManagedIrbis.Epub.Schema;
 
+/// <summary>
+///
+/// </summary>
 public enum EpubVersion
 {
-    [VersionString("2")]
+    /// <summary>
+    ///
+    /// </summary>
+    [VersionString ("2")]
     EPUB_2 = 2,
 
-    [VersionString("3")]
+    /// <summary>
+    ///
+    /// </summary>
+    [VersionString ("3")]
     EPUB_3,
 
-    [VersionString("3.1")]
+    /// <summary>
+    ///
+    /// </summary>
+    [VersionString ("3.1")]
     EPUB_3_1
 }
 
-[SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1649:File name should match first type name",
+[SuppressMessage ("StyleCop.CSharp.DocumentationRules", "SA1649:File name should match first type name",
     Justification = "Enum and attribute need to be close to each other to indicate that attribute applies only to this enum. The file needs to be named after enum.")]
-internal class VersionStringAttribute : Attribute
+internal class VersionStringAttribute
+    : Attribute
 {
-    public VersionStringAttribute(string version)
+    #region Properties
+
+    public string Version { get; }
+
+    #endregion
+
+    #region Construction
+
+    public VersionStringAttribute
+        (
+            string version
+        )
     {
         Version = version;
     }
 
-    public string Version { get; }
+    #endregion
 }

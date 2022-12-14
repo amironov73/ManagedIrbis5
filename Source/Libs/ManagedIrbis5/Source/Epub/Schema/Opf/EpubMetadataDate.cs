@@ -2,14 +2,10 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
-/*
+/* EpubMetadataDate.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,8 +13,22 @@
 
 namespace ManagedIrbis.Epub.Schema;
 
+/// <summary>
+///
+/// </summary>
 public class EpubMetadataDate
 {
-    public string Date { get; set; }
-    public string Event { get; set; }
+    #region Properties
+
+    /// <summary>
+    ///
+    /// </summary>
+    public string? Date { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public string? Event { get; set; }
+
+    #endregion
 }

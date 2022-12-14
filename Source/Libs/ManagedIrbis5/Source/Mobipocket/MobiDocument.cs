@@ -105,16 +105,29 @@ public sealed class MobiDocument
     {
         if (MobiHeader == null)
         {
-            return PdbHeader.Name;
+            return PdbHeader!.Name;
         }
 
         return MobiHeader.FullName;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    public PdbHeader? PdbHeader { get; set; }
 
-    public PdbHeader PdbHeader { get; set; }
-    public MobiHeader MobiHeader { get; set; }
+    /// <summary>
+    ///
+    /// </summary>
+    public MobiHeader? MobiHeader { get; set; }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="outStream"></param>
+    /// <param name="saveFilePath"></param>
+    /// <exception cref="ApplicationException"></exception>
+    /// <exception cref="ArgumentException"></exception>
     public void Write (FileStream outStream, string saveFilePath)
     {
         if (PdbHeader == null || MobiHeader == null)

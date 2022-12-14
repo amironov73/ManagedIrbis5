@@ -2,13 +2,11 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedParameter.Local
 
 /* FileUtils.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -37,7 +35,8 @@ using Exception = System.Exception;
 
 namespace ManagedIrbis.FictionBook;
 
-internal sealed class FB2EncoderFallbackBuffer : EncoderFallbackBuffer
+internal sealed class FB2EncoderFallbackBuffer
+    : EncoderFallbackBuffer
 {
     #region FB2EncoderFallbackBuffer
 
@@ -205,8 +204,7 @@ internal static class NativeMethods
                 path += Path.DirectorySeparatorChar + "*";
             }
 
-            WIN32_FIND_DATA findData;
-            var findHandle = FindFirstFile (path, out findData);
+            var findHandle = FindFirstFile (path, out var findData);
 
             if (findHandle != INVALID_HANDLE_VALUE)
             {
@@ -446,7 +444,11 @@ public class FileMetadata
 
     #endregion
 
-    private void InternalAddMetadata (string key, string value)
+    private void InternalAddMetadata
+        (
+            string key,
+            string value
+        )
     {
         var _key = key;
         var _value = string.IsNullOrEmpty (value) ? string.Empty : value.Trim();
@@ -561,7 +563,12 @@ public class FileMetadata
     /// <param name="key"></param>
     /// <param name="index"></param>
     /// <param name="value"></param>
-    public void AddMetadata (DescriptionElements key, int index, string value)
+    public void AddMetadata
+        (
+            DescriptionElements key,
+            int index,
+            string value
+        )
     {
         var name = Enum.GetName (typeof (DescriptionElements), key);
         if (index == 0)
@@ -637,7 +644,10 @@ public class FB2Metadata
 
     #endregion
 
-    private void ParseBookTitleAuthor (string author)
+    private void ParseBookTitleAuthor
+        (
+            string author
+        )
     {
         using (var reader = XmlReader.Create (new StringReader (author)))
         {
@@ -689,7 +699,10 @@ public class FB2Metadata
         }
     }
 
-    private void ParseBookTitleTranslator (string translator)
+    private void ParseBookTitleTranslator
+        (
+            string translator
+        )
     {
         using (var reader = XmlReader.Create (new StringReader (translator)))
         {
@@ -957,7 +970,11 @@ public class FB2File
         }
     }
 
-    private void SchemaValidation (object sender, ValidationEventArgs e)
+    private void SchemaValidation
+        (
+            object? sender,
+            ValidationEventArgs eventArgs
+        )
     {
         //validationSchemaErrors.Add(string.Format(Properties.Resources.ValidationError, e.Exception.LineNumber, e.Exception.LinePosition, e.Message));
         validationSchemaErrors.Add ("Validation Error");
@@ -1511,10 +1528,10 @@ public class FB2File
         {
             var curr = ids.Current;
             var info = curr as IXmlLineInfo;
-            var id = curr.GetAttribute ("id", string.Empty);
+            var id = curr!.GetAttribute ("id", string.Empty);
             if (!idList.ContainsKey (id))
             {
-                idList.Add (id, string.Format ("{0}|{1}", info!.LineNumber, info.LinePosition));
+                idList.Add (id, $"{info!.LineNumber}|{info.LinePosition}");
             }
             else
             {
@@ -1610,7 +1627,7 @@ public class FB2File
             {
                 CheckCharacters = true
             };
-            settings.ValidationEventHandler += new ValidationEventHandler (SchemaValidation!);
+            settings.ValidationEventHandler += SchemaValidation;
             settings.ValidationType = ValidationType.Schema;
             settings.Schemas.Add (FictionBook!);
             settings.Schemas.Add (FictionBookGenres!);

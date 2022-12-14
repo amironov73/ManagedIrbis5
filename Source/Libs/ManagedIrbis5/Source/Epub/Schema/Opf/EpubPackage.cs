@@ -2,14 +2,10 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
-/*
+/* EpubPackage.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,16 +19,46 @@ using ManagedIrbis.Epub.Internal;
 
 namespace ManagedIrbis.Epub.Schema;
 
+/// <summary>
+///
+/// </summary>
 public class EpubPackage
 {
+    /// <summary>
+    ///
+    /// </summary>
     public EpubVersion EpubVersion { get; set; }
-    public EpubMetadata Metadata { get; set; }
-    public EpubManifest Manifest { get; set; }
-    public EpubSpine Spine { get; set; }
-    public EpubGuide Guide { get; set; }
 
+    /// <summary>
+    ///
+    /// </summary>
+    public EpubMetadata? Metadata { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public EpubManifest? Manifest { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public EpubSpine? Spine { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public EpubGuide? Guide { get; set; }
+
+    #region Public methods
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public string GetVersionString()
     {
-        return VersionUtils.GetVersionString(EpubVersion);
+        return VersionUtils.GetVersionString (EpubVersion);
     }
+
+    #endregion
 }

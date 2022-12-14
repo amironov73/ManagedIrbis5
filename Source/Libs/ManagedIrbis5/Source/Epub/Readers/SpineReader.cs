@@ -28,9 +28,9 @@ internal static class SpineReader
         )
     {
         var result = new List<EpubTextContentFileRef>();
-        foreach (var spineItemRef in bookRef.Schema!.Package!.Spine)
+        foreach (var spineItemRef in bookRef.Schema!.Package!.Spine!)
         {
-            var manifestItem = bookRef.Schema.Package.Manifest.FirstOrDefault
+            var manifestItem = bookRef.Schema.Package.Manifest!.FirstOrDefault
                 (
                     item => item.Id == spineItemRef.IdRef
                 );
@@ -42,7 +42,7 @@ internal static class SpineReader
                     );
             }
 
-            if (!bookRef.Content!.Html.TryGetValue (manifestItem.Href, out var htmlContentFileRef))
+            if (!bookRef.Content!.Html!.TryGetValue (manifestItem.Href!, out var htmlContentFileRef))
             {
                 throw new EpubPackageException
                     (

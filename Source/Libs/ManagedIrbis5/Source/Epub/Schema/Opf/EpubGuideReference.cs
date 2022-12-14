@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* EpubGuideReference.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,14 +17,37 @@
 
 namespace ManagedIrbis.Epub.Schema;
 
+/// <summary>
+///
+/// </summary>
 public class EpubGuideReference
 {
-    public string Type { get; set; }
-    public string Title { get; set; }
-    public string Href { get; set; }
+    #region Properties
 
+    /// <summary>
+    ///
+    /// </summary>
+    public string? Type { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public string? Title { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public string? Href { get; set; }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString"/>
     public override string ToString()
     {
         return $"Type: {Type}, Href: {Href}";
     }
+
+    #endregion
 }

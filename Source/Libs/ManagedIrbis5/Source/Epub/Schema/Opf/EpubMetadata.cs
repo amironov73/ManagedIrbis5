@@ -2,14 +2,10 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
-/*
+/* EpubMetadata.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,22 +19,92 @@ using System.Collections.Generic;
 
 namespace ManagedIrbis.Epub.Schema;
 
+/// <summary>
+///
+/// </summary>
 public class EpubMetadata
 {
-    public List<string> Titles { get; set; }
-    public List<EpubMetadataCreator> Creators { get; set; }
-    public List<string> Subjects { get; set; }
-    public string Description { get; set; }
-    public List<string> Publishers { get; set; }
-    public List<EpubMetadataContributor> Contributors { get; set; }
-    public List<EpubMetadataDate> Dates { get; set; }
-    public List<string> Types { get; set; }
-    public List<string> Formats { get; set; }
-    public List<EpubMetadataIdentifier> Identifiers { get; set; }
-    public List<string> Sources { get; set; }
-    public List<string> Languages { get; set; }
-    public List<string> Relations { get; set; }
-    public List<string> Coverages { get; set; }
-    public List<string> Rights { get; set; }
-    public List<EpubMetadataMeta> MetaItems { get; set; }
+    #region Using directives
+
+    /// <summary>
+    ///
+    /// </summary>
+    public List<string>? Titles { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public List<EpubMetadataCreator>? Creators { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public List<string>? Subjects { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public string? Description { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public List<string>? Publishers { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public List<EpubMetadataContributor>? Contributors { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public List<EpubMetadataDate>? Dates { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public List<string>? Types { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public List<string>? Formats { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public List<EpubMetadataIdentifier>? Identifiers { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public List<string>? Sources { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public List<string>? Languages { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public List<string>? Relations { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public List<string>? Coverages { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public List<string>? Rights { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public List<EpubMetadataMeta>? MetaItems { get; set; }
+
+    #endregion
 }

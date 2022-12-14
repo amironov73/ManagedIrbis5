@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* EpubManifestItem.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,19 +23,62 @@ using System.Collections.Generic;
 
 namespace ManagedIrbis.Epub.Schema;
 
+/// <summary>
+///
+/// </summary>
 public class EpubManifestItem
 {
-    public string Id { get; set; }
-    public string Href { get; set; }
-    public string MediaType { get; set; }
-    public string RequiredNamespace { get; set; }
-    public string RequiredModules { get; set; }
-    public string Fallback { get; set; }
-    public string FallbackStyle { get; set; }
-    public List<ManifestProperty> Properties { get; set; }
+    #region Properties
 
+    /// <summary>
+    ///
+    /// </summary>
+    public string? Id { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public string? Href { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public string? MediaType { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public string? RequiredNamespace { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public string? RequiredModules { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public string? Fallback { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public string? FallbackStyle { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public List<ManifestProperty>? Properties { get; set; }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString"/>
     public override string ToString()
     {
         return $"Id: {Id}, Href = {Href}, MediaType = {MediaType}";
     }
+
+    #endregion
 }
