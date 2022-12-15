@@ -24,37 +24,35 @@ using System.Text;
 
 #nullable enable
 
-namespace AM.Skia.RichTextKit
+namespace AM.Skia.RichTextKit;
+
+internal static class BinaryReaderExtensions
 {
-    static class BinaryReaderExtensions
+    public static int ReadInt32BE (this BinaryReader reader)
     {
-        public static int ReadInt32BE(this BinaryReader reader)
-        {
-            var bytes = reader.ReadBytes(4);
-            Array.Reverse(bytes);
-            return BitConverter.ToInt32(bytes, 0);
-        }
+        var bytes = reader.ReadBytes (4);
+        Array.Reverse (bytes);
+        return BitConverter.ToInt32 (bytes, 0);
+    }
 
-        public static uint ReadUInt32BE(this BinaryReader reader)
-        {
-            var bytes = reader.ReadBytes(4);
-            Array.Reverse(bytes);
-            return BitConverter.ToUInt32(bytes, 0);
-        }
+    public static uint ReadUInt32BE (this BinaryReader reader)
+    {
+        var bytes = reader.ReadBytes (4);
+        Array.Reverse (bytes);
+        return BitConverter.ToUInt32 (bytes, 0);
+    }
 
-        public static void WriteBE(this BinaryWriter writer, int value)
-        {
-            var bytes = BitConverter.GetBytes(value);
-            Array.Reverse(bytes);
-            writer.Write(bytes);
-        }
+    public static void WriteBE (this BinaryWriter writer, int value)
+    {
+        var bytes = BitConverter.GetBytes (value);
+        Array.Reverse (bytes);
+        writer.Write (bytes);
+    }
 
-        public static void WriteBE(this BinaryWriter writer, uint value)
-        {
-            var bytes = BitConverter.GetBytes(value);
-            Array.Reverse(bytes);
-            writer.Write(bytes);
-        }
-
+    public static void WriteBE (this BinaryWriter writer, uint value)
+    {
+        var bytes = BitConverter.GetBytes (value);
+        Array.Reverse (bytes);
+        writer.Write (bytes);
     }
 }

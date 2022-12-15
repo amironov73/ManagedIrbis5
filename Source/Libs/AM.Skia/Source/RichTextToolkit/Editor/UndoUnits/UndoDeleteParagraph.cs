@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* UndoDeleteParagraph.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,27 +21,27 @@ using AM.Skia.RichTextKit.Utils;
 
 #nullable enable
 
-namespace AM.Skia.RichTextKit.Editor.UndoUnits
+namespace AM.Skia.RichTextKit.Editor.UndoUnits;
+
+internal class UndoDeleteParagraph
+    : UndoUnit<TextDocument>
 {
-    class UndoDeleteParagraph : UndoUnit<TextDocument>
+    public UndoDeleteParagraph (int index)
     {
-        public UndoDeleteParagraph(int index)
-        {
-            _index = index;
-        }
-
-        public override void Do(TextDocument context)
-        {
-            _paragraph = context._paragraphs[_index];
-            context._paragraphs.RemoveAt(_index);
-        }
-
-        public override void Undo(TextDocument context)
-        {
-            context._paragraphs.Insert(_index, _paragraph);
-        }
-
-        int _index;
-        Paragraph _paragraph;
+        _index = index;
     }
+
+    public override void Do (TextDocument context)
+    {
+        _paragraph = context._paragraphs[_index];
+        context._paragraphs.RemoveAt (_index);
+    }
+
+    public override void Undo (TextDocument context)
+    {
+        context._paragraphs.Insert (_index, _paragraph);
+    }
+
+    private int _index;
+    private Paragraph _paragraph;
 }

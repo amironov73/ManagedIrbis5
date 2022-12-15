@@ -240,13 +240,21 @@ public class QRCodeGenerator
         var dataLength = eccInfo.TotalDataCodewords * 8;
         var lengthDiff = dataLength - bitString.Length;
         if (lengthDiff > 0)
+        {
             bitString += new string ('0', Math.Min (lengthDiff, 4));
+        }
+
         if ((bitString.Length % 8) != 0)
+        {
             bitString += new string ('0', 8 - (bitString.Length % 8));
+        }
+
         while (bitString.Length < dataLength)
             bitString += "1110110000010001";
         if (bitString.Length > dataLength)
+        {
             bitString = bitString.Substring (0, dataLength);
+        }
 
         //Calculate error correction words
         var codeWordWithECC = new List<CodewordBlock>();
@@ -293,7 +301,9 @@ public class QRCodeGenerator
         {
             foreach (var codeBlock in codeWordWithECC)
                 if (codeBlock.CodeWords.Count > i)
+                {
                     interleavedWordsSb.Append (codeBlock.CodeWords[i]);
+                }
         }
 
 
@@ -301,7 +311,9 @@ public class QRCodeGenerator
         {
             foreach (var codeBlock in codeWordWithECC)
                 if (codeBlock.ECCWords.Count > i)
+                {
                     interleavedWordsSb.Append (codeBlock.ECCWords[i]);
+                }
         }
 
         interleavedWordsSb.Append (new string ('0', remainderBits[version - 1]));
@@ -538,7 +550,10 @@ public class QRCodeGenerator
             for (var x = size - 1; x >= 0; x = x - 2)
             {
                 if (x == 6)
+                {
                     x = 5;
+                }
+
                 for (var yMod = 1; yMod <= size; yMod++)
                 {
                     int y;
@@ -546,17 +561,27 @@ public class QRCodeGenerator
                     {
                         y = size - yMod;
                         if (datawords.Count > 0 && !IsBlocked (new Rectangle (x, y, 1, 1), blockedModules))
+                        {
                             qrCode.ModuleMatrix[y][x] = datawords.Dequeue();
+                        }
+
                         if (datawords.Count > 0 && x > 0 && !IsBlocked (new Rectangle (x - 1, y, 1, 1), blockedModules))
+                        {
                             qrCode.ModuleMatrix[y][x - 1] = datawords.Dequeue();
+                        }
                     }
                     else
                     {
                         y = yMod - 1;
                         if (datawords.Count > 0 && !IsBlocked (new Rectangle (x, y, 1, 1), blockedModules))
+                        {
                             qrCode.ModuleMatrix[y][x] = datawords.Dequeue();
+                        }
+
                         if (datawords.Count > 0 && x > 0 && !IsBlocked (new Rectangle (x - 1, y, 1, 1), blockedModules))
+                        {
                             qrCode.ModuleMatrix[y][x - 1] = datawords.Dequeue();
+                        }
                     }
                 }
 
@@ -644,7 +669,9 @@ public class QRCodeGenerator
                 }
 
                 if (blocked)
+                {
                     continue;
+                }
 
                 for (var x = 0; x < 5; x++)
                 {
@@ -692,7 +719,9 @@ public class QRCodeGenerator
             foreach (var blockedMod in blockedModules)
             {
                 if (Intersects (blockedMod, r1))
+                {
                     isBlocked = true;
+                }
             }
 
             return isBlocked;
@@ -757,24 +786,44 @@ public class QRCodeGenerator
                     for (var x = 0; x < size; x++)
                     {
                         if (qrCode.ModuleMatrix[y][x] == lastValRow)
+                        {
                             modInRow++;
+                        }
                         else
+                        {
                             modInRow = 1;
+                        }
+
                         if (modInRow == 5)
+                        {
                             score1 += 3;
+                        }
                         else if (modInRow > 5)
+                        {
                             score1++;
+                        }
+
                         lastValRow = qrCode.ModuleMatrix[y][x];
 
 
                         if (qrCode.ModuleMatrix[x][y] == lastValColumn)
+                        {
                             modInColumn++;
+                        }
                         else
+                        {
                             modInColumn = 1;
+                        }
+
                         if (modInColumn == 5)
+                        {
                             score1 += 3;
+                        }
                         else if (modInColumn > 5)
+                        {
                             score1++;
+                        }
+
                         lastValColumn = qrCode.ModuleMatrix[x][y];
                     }
                 }
@@ -788,7 +837,9 @@ public class QRCodeGenerator
                         if (qrCode.ModuleMatrix[y][x] == qrCode.ModuleMatrix[y][x + 1] &&
                             qrCode.ModuleMatrix[y][x] == qrCode.ModuleMatrix[y + 1][x] &&
                             qrCode.ModuleMatrix[y][x] == qrCode.ModuleMatrix[y + 1][x + 1])
+                        {
                             score2 += 3;
+                        }
                     }
                 }
 
@@ -856,7 +907,9 @@ public class QRCodeGenerator
                 foreach (var row in qrCode.ModuleMatrix)
                 foreach (bool bit in row)
                     if (bit)
+                    {
                         blackModules++;
+                    }
 
                 var percent = (blackModules / (qrCode.ModuleMatrix.Count * qrCode.ModuleMatrix.Count)) * 100;
                 var prevMultipleOf5 = Math.Abs ((int)Math.Floor (percent / 5) * 5 - 50) / 5;
@@ -950,17 +1003,23 @@ public class QRCodeGenerator
         var result = EncodingMode.Numeric;
 
         if (forceUtf8)
+        {
             return EncodingMode.Byte;
+        }
 
         foreach (var c in plainText)
         {
             if (numTable.Contains (c))
+            {
                 continue;
+            }
 
             result = EncodingMode.Alphanumeric;
 
             if (!alphanumEncTable.Contains (c))
+            {
                 return EncodingMode.Byte;
+            }
         }
 
         return result;
@@ -1036,33 +1095,55 @@ public class QRCodeGenerator
         if (version < 10)
         {
             if (encMode.Equals (EncodingMode.Numeric))
+            {
                 return 10;
+            }
             else if (encMode.Equals (EncodingMode.Alphanumeric))
+            {
                 return 9;
+            }
             else
+            {
                 return 8;
+            }
         }
         else if (version < 27)
         {
             if (encMode.Equals (EncodingMode.Numeric))
+            {
                 return 12;
+            }
             else if (encMode.Equals (EncodingMode.Alphanumeric))
+            {
                 return 11;
+            }
             else if (encMode.Equals (EncodingMode.Byte))
+            {
                 return 16;
+            }
             else
+            {
                 return 10;
+            }
         }
         else
         {
             if (encMode.Equals (EncodingMode.Numeric))
+            {
                 return 14;
+            }
             else if (encMode.Equals (EncodingMode.Alphanumeric))
+            {
                 return 13;
+            }
             else if (encMode.Equals (EncodingMode.Byte))
+            {
                 return 16;
+            }
             else
+            {
                 return 12;
+            }
         }
     }
 
@@ -1325,7 +1406,9 @@ public class QRCodeGenerator
                             var p = new Point (alignmentPatternBaseValues[i + x] - 2,
                                 alignmentPatternBaseValues[i + y] - 2);
                             if (!points.Contains (p))
+                            {
                                 points.Add (p);
+                            }
                         }
                     }
                 }

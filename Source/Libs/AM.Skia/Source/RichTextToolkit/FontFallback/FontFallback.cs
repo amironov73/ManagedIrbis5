@@ -16,189 +16,206 @@
 #region Using directives
 
 using SkiaSharp;
+
 using System;
 using System.Collections.Generic;
+
 using AM.Skia.RichTextKit.Utils;
 
 #endregion
 
 #nullable enable
 
-namespace AM.Skia.RichTextKit
+namespace AM.Skia.RichTextKit;
+
+/// <summary>
+/// Helper to split a run of code points based on a particular typeface
+/// into a series of runs where unsupported code points are mapped to a
+/// fallback font.
+/// </summary>
+public class FontFallback
 {
     /// <summary>
-    /// Helper to split a run of code points based on a particular typeface
-    /// into a series of runs where unsupported code points are mapped to a
-    /// fallback font.
+    /// Specified details about a font fallback run
     /// </summary>
-    public class FontFallback
+    public struct Run
     {
         /// <summary>
-        /// Specified details about a font fallback run
+        /// The starting code point index of this run
         /// </summary>
-        public struct Run
+        public int Start;
+
+        /// <summary>
+        /// The length of this run in code points
+        /// </summary>
+        public int Length;
+
+        /// <summary>
+        /// The typeface to be used for this run
+        /// </summary>
+        public SKTypeface Typeface;
+    }
+
+    /// <summary>
+    /// Specifies the instance of the character matcher to be used for font fallback
+    /// </summary>
+    /// <remarks>
+    /// This instance is shared by all TextBlock instances and should be thread safe
+    /// if used in a multi-threaded environment.
+    /// </remarks>
+    public static ICharacterMatcher CharacterMatcher = new DefaultCharacterMatcher();
+
+    /// <summary>
+    /// Splits a sequence of code points into a series of runs with font fallback applied
+    /// </summary>
+    /// <param name="codePoints">The code points</param>
+    /// <param name="typeface">The preferred typeface</param>
+    /// <param name="replacementCharacter">The replacement character to be used for the run</param>
+    /// <returns>A sequence of runs with unsupported code points replaced by a selected font fallback</returns>
+    public static IEnumerable<Run> GetFontRuns (Slice<int> codePoints, SKTypeface typeface,
+        char replacementCharacter = '\0')
+    {
+        var font = new SKFont (typeface);
+
+        if (replacementCharacter != '\0')
         {
-            /// <summary>
-            /// The starting code point index of this run
-            /// </summary>
-            public int Start;
+            var glyph = font.GetGlyph (replacementCharacter);
+            if (glyph == 0)
+            {
+                var fallbackTypeface = CharacterMatcher.MatchCharacter (typeface.FamilyName, typeface.FontWeight,
+                    typeface.FontWidth, typeface.FontSlant, null, replacementCharacter);
+                if (fallbackTypeface != null)
+                {
+                    typeface = fallbackTypeface;
+                }
+            }
 
-            /// <summary>
-            /// The length of this run in code points
-            /// </summary>
-            public int Length;
-
-            /// <summary>
-            /// The typeface to be used for this run
-            /// </summary>
-            public SKTypeface Typeface;
+            yield return new Run()
+            {
+                Start = 0,
+                Length = codePoints.Length,
+                Typeface = typeface,
+            };
+            yield break;
         }
 
-        /// <summary>
-        /// Specifies the instance of the character matcher to be used for font fallback
-        /// </summary>
-        /// <remarks>
-        /// This instance is shared by all TextBlock instances and should be thread safe
-        /// if used in a multi-threaded environment.
-        /// </remarks>
-        public static ICharacterMatcher CharacterMatcher = new DefaultCharacterMatcher();
+        // Get glyphs using the top-level typeface
+        var glyphs = new ushort[codePoints.Length];
+        font.GetGlyphs (codePoints.AsSpan(), glyphs);
 
-        /// <summary>
-        /// Splits a sequence of code points into a series of runs with font fallback applied
-        /// </summary>
-        /// <param name="codePoints">The code points</param>
-        /// <param name="typeface">The preferred typeface</param>
-        /// <param name="replacementCharacter">The replacement character to be used for the run</param>
-        /// <returns>A sequence of runs with unsupported code points replaced by a selected font fallback</returns>
-        public static IEnumerable<Run> GetFontRuns(Slice<int> codePoints, SKTypeface typeface, char replacementCharacter = '\0')
+        // Look for subspans that need font fallback (where glyphs are zero)
+        var runStart = 0;
+        for (var i = 0; i < codePoints.Length; i++)
         {
-            var font = new SKFont(typeface);
-
-            if (replacementCharacter != '\0')
+            // Do we need fallback for this character?
+            if (glyphs[i] == 0)
             {
-                var glyph = font.GetGlyph(replacementCharacter);
-                if (glyph == 0)
+                // Check if there's a fallback available, if not, might as well continue with the current top-level typeface
+                var subSpanTypeface = CharacterMatcher.MatchCharacter (typeface.FamilyName, typeface.FontWeight,
+                    typeface.FontWidth, typeface.FontSlant, null, codePoints[i]);
+                if (subSpanTypeface == null)
                 {
-                    var fallbackTypeface = CharacterMatcher.MatchCharacter(typeface.FamilyName, typeface.FontWeight, typeface.FontWidth, typeface.FontSlant, null, replacementCharacter);
-                    if (fallbackTypeface != null)
-                        typeface = fallbackTypeface;
+                    continue;
                 }
 
-                yield return new Run()
+                // Don't fallback for whitespace characters
+                if (UnicodeClasses.BoundaryGroup (codePoints[i]) == WordBoundaryClass.Space)
                 {
-                    Start = 0,
-                    Length = codePoints.Length,
-                    Typeface = typeface,
-                };
-                yield break;
-            }
+                    continue;
+                }
 
-            // Get glyphs using the top-level typeface
-            var glyphs = new ushort[codePoints.Length];
-            font.GetGlyphs(codePoints.AsSpan(), glyphs);
-
-            // Look for subspans that need font fallback (where glyphs are zero)
-            int runStart = 0;
-            for (int i = 0; i < codePoints.Length; i++)
-            {
-                // Do we need fallback for this character?
-                if (glyphs[i] == 0)
+                // Must be a cluster boundary
+                if (!GraphemeClusterAlgorithm.IsBoundary (codePoints, i))
                 {
-                    // Check if there's a fallback available, if not, might as well continue with the current top-level typeface
-                    var subSpanTypeface = CharacterMatcher.MatchCharacter(typeface.FamilyName, typeface.FontWeight, typeface.FontWidth, typeface.FontSlant, null, codePoints[i]);
+                    continue;
+                }
+
+                // We can do font fallback...
+
+                // Flush the current top-level run
+                if (i > runStart)
+                {
+                    yield return new Run()
+                    {
+                        Start = runStart,
+                        Length = i - runStart,
+                        Typeface = typeface,
+                    };
+                }
+
+                // Count how many unmatched characters
+                var unmatchedStart = i;
+                var unmatchedEnd = i + 1;
+                while (unmatchedEnd < codePoints.Length &&
+                       (glyphs[unmatchedEnd] == 0 || !GraphemeClusterAlgorithm.IsBoundary (codePoints, unmatchedEnd)))
+                {
+                    unmatchedEnd++;
+                }
+
+                var unmatchedLength = unmatchedEnd - unmatchedStart;
+
+                // Match the missing characters
+                while (unmatchedLength > 0)
+                {
+                    // Find the font fallback using the first character
+                    subSpanTypeface = CharacterMatcher.MatchCharacter (typeface.FamilyName, typeface.FontWeight,
+                        typeface.FontWidth, typeface.FontSlant, null, codePoints[unmatchedStart]);
                     if (subSpanTypeface == null)
-                        continue;
-
-                    // Don't fallback for whitespace characters
-                    if (UnicodeClasses.BoundaryGroup(codePoints[i]) == WordBoundaryClass.Space)
-                        continue;
-
-                    // Must be a cluster boundary
-                    if (!GraphemeClusterAlgorithm.IsBoundary(codePoints, i))
-                        continue;
-
-                    // We can do font fallback...
-
-                    // Flush the current top-level run
-                    if (i > runStart)
                     {
-                        yield return new Run()
+                        // Reset the glyphs in the rest of the range back to unknown
+                        // Fix for this text block string like this:
+                        // "再起動に問題がある場合は次のオプションを使用して、通常の起動機能を無効にし\n制御を回復することをお勧めします。"
+                        // not reverting to fallback font after the embedded carriage return:
+                        for (var j = unmatchedStart; j < unmatchedEnd; j++)
                         {
-                            Start = runStart,
-                            Length = i - runStart,
-                            Typeface = typeface,
-                        };
-                    }
-
-                    // Count how many unmatched characters
-                    var unmatchedStart = i;
-                    var unmatchedEnd = i + 1;
-                    while (unmatchedEnd < codePoints.Length &&
-                            (glyphs[unmatchedEnd] == 0 || !GraphemeClusterAlgorithm.IsBoundary(codePoints, unmatchedEnd)))
-                    {
-                        unmatchedEnd++;
-                    }
-                    var unmatchedLength = unmatchedEnd - unmatchedStart;
-
-                    // Match the missing characters
-                    while (unmatchedLength > 0)
-                    {
-                        // Find the font fallback using the first character
-                        subSpanTypeface = CharacterMatcher.MatchCharacter(typeface.FamilyName, typeface.FontWeight, typeface.FontWidth, typeface.FontSlant, null, codePoints[unmatchedStart]);
-                        if (subSpanTypeface == null)
-                        {
-                            // Reset the glyphs in the rest of the range back to unknown
-                            // Fix for this text block string like this:
-                            // "再起動に問題がある場合は次のオプションを使用して、通常の起動機能を無効にし\n制御を回復することをお勧めします。"
-                            // not reverting to fallback font after the embedded carriage return:
-                            for (int j = unmatchedStart; j < unmatchedEnd; j++)
-                            {
-                                glyphs[j] = 0;
-                            }
-                            unmatchedEnd = unmatchedStart;
-                            break;
+                            glyphs[j] = 0;
                         }
-                        var subSpanFont = new SKFont(subSpanTypeface);
 
-                        // Get the glyphs over the current unmatched range
-                        subSpanFont.GetGlyphs(codePoints.SubSlice(unmatchedStart, unmatchedLength).AsSpan(), new Span<ushort>(glyphs, unmatchedStart, unmatchedLength));
-
-                        // Count how many characters were matched
-                        var fallbackStart = unmatchedStart;
-                        var fallbackEnd = unmatchedStart + 1;
-                        while (fallbackEnd < unmatchedEnd && glyphs[fallbackEnd] != 0)
-                            fallbackEnd++;
-                        var fallbackLength = fallbackEnd - fallbackStart;
-
-                        // Yield this font fallback run
-                        yield return new Run()
-                        {
-                            Start = fallbackStart,
-                            Length = fallbackLength,
-                            Typeface = subSpanTypeface,
-                        };
-
-                        // Continue selecting font fallbacks until the entire unmatched ranges has been matched
-                        unmatchedStart += fallbackLength;
-                        unmatchedLength -= fallbackLength;
+                        unmatchedEnd = unmatchedStart;
+                        break;
                     }
 
-                    // Move onto the next top level span
-                    i = unmatchedEnd - 1;           // account for i++ on for loop
-                    runStart = unmatchedEnd;
-                }
-            }
+                    var subSpanFont = new SKFont (subSpanTypeface);
 
-            // Flush find run
-            if (codePoints.Length > runStart)
-            {
-                yield return new Run()
-                {
-                    Start = runStart,
-                    Length = codePoints.Length - runStart,
-                    Typeface = typeface,
-                };
+                    // Get the glyphs over the current unmatched range
+                    subSpanFont.GetGlyphs (codePoints.SubSlice (unmatchedStart, unmatchedLength).AsSpan(),
+                        new Span<ushort> (glyphs, unmatchedStart, unmatchedLength));
+
+                    // Count how many characters were matched
+                    var fallbackStart = unmatchedStart;
+                    var fallbackEnd = unmatchedStart + 1;
+                    while (fallbackEnd < unmatchedEnd && glyphs[fallbackEnd] != 0)
+                        fallbackEnd++;
+                    var fallbackLength = fallbackEnd - fallbackStart;
+
+                    // Yield this font fallback run
+                    yield return new Run()
+                    {
+                        Start = fallbackStart,
+                        Length = fallbackLength,
+                        Typeface = subSpanTypeface,
+                    };
+
+                    // Continue selecting font fallbacks until the entire unmatched ranges has been matched
+                    unmatchedStart += fallbackLength;
+                    unmatchedLength -= fallbackLength;
+                }
+
+                // Move onto the next top level span
+                i = unmatchedEnd - 1; // account for i++ on for loop
+                runStart = unmatchedEnd;
             }
+        }
+
+        // Flush find run
+        if (codePoints.Length > runStart)
+        {
+            yield return new Run()
+            {
+                Start = runStart,
+                Length = codePoints.Length - runStart,
+                Typeface = typeface,
+            };
         }
     }
 }

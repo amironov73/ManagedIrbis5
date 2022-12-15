@@ -25,58 +25,56 @@ using System.Threading.Tasks;
 
 #nullable enable
 
-namespace AM.Skia.RichTextKit
+namespace AM.Skia.RichTextKit;
+
+/// <summary>
+/// Unicode directionality classes
+/// </summary>
+/// <remarks>
+/// Note, these need to match those used by the JavaScript script that
+/// generates the .trie resources
+/// </remarks>
+internal enum Directionality : byte
 {
-    /// <summary>
-    /// Unicode directionality classes
-    /// </summary>
-    /// <remarks>
-    /// Note, these need to match those used by the JavaScript script that
-    /// generates the .trie resources
-    /// </remarks>
-    enum Directionality : byte
-    {
-        // Strong types
-        L = 0,
-        R = 1,
-        AL = 2,
+    // Strong types
+    L = 0,
+    R = 1,
+    AL = 2,
 
-        // Weak Types
-        EN = 3,
-        ES = 4,
-        ET = 5,
-        AN = 6,
-        CS = 7,
-        NSM = 8,
-        BN = 9,
+    // Weak Types
+    EN = 3,
+    ES = 4,
+    ET = 5,
+    AN = 6,
+    CS = 7,
+    NSM = 8,
+    BN = 9,
 
-        // Neutral Types
-        B = 10,
-        S = 11,
-        WS = 12,
-        ON = 13,
+    // Neutral Types
+    B = 10,
+    S = 11,
+    WS = 12,
+    ON = 13,
 
-        // Explicit Formatting Types - Embed
-        LRE = 14,
-        LRO = 15,
-        RLE = 16,
-        RLO = 17,
-        PDF = 18,
+    // Explicit Formatting Types - Embed
+    LRE = 14,
+    LRO = 15,
+    RLE = 16,
+    RLO = 17,
+    PDF = 18,
 
-        // Explicit Formatting Types - Isolate
-        LRI = 19,
-        RLI = 20,
-        FSI = 21,
-        PDI = 22,
+    // Explicit Formatting Types - Isolate
+    LRI = 19,
+    RLI = 20,
+    FSI = 21,
+    PDI = 22,
 
-        /** Minimum bidi type value. */
-        TYPE_MIN = 0,
+    /** Minimum bidi type value. */
+    TYPE_MIN = 0,
 
-        /** Maximum bidi type value. */
-        TYPE_MAX = 22,
+    /** Maximum bidi type value. */
+    TYPE_MAX = 22,
 
-        /* Unknown */
-        Unknown = 0xFF,
-    }
-
+    /* Unknown */
+    Unknown = 0xFF,
 }

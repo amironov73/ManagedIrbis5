@@ -25,21 +25,20 @@ using System.Threading.Tasks;
 
 #nullable enable
 
-namespace AM.Skia.RichTextKit
+namespace AM.Skia.RichTextKit;
+
+/// <summary>
+/// Describes the strike-through style for a run of text
+/// </summary>
+public enum StrikeThroughStyle
 {
     /// <summary>
-    /// Describes the strike-through style for a run of text
+    /// No strike through.
     /// </summary>
-    public enum StrikeThroughStyle
-    {
-        /// <summary>
-        /// No strike through.
-        /// </summary>
-        None,
+    None,
 
-        /// <summary>
-        /// Standard solid line strike through.
-        /// </summary>
-        Solid,
-    }
+    /// <summary>
+    /// Standard solid line strike through.
+    /// </summary>
+    Solid,
 }

@@ -25,46 +25,45 @@ using System.Threading.Tasks;
 
 #nullable enable
 
-namespace AM.Skia.RichTextKit
+namespace AM.Skia.RichTextKit;
+
+/// <summary>
+/// Describes the underline style for a run of text
+/// </summary>
+public enum UnderlineStyle
 {
     /// <summary>
-    /// Describes the underline style for a run of text
+    /// No underline.
     /// </summary>
-    public enum UnderlineStyle
-    {
-        /// <summary>
-        /// No underline.
-        /// </summary>
-        None,
+    None,
 
-        /// <summary>
-        /// Underline with gaps over descenders.
-        /// </summary>
-        Gapped,
+    /// <summary>
+    /// Underline with gaps over descenders.
+    /// </summary>
+    Gapped,
 
-        /// <summary>
-        /// Underline with no gaps over descenders.
-        /// </summary>
-        Solid,
+    /// <summary>
+    /// Underline with no gaps over descenders.
+    /// </summary>
+    Solid,
 
-        /// <summary>
-        /// Underline style for IME input
-        /// </summary>
-        ImeInput,
+    /// <summary>
+    /// Underline style for IME input
+    /// </summary>
+    ImeInput,
 
-        /// <summary>
-        /// Underline style for converted IME input
-        /// </summary>
-        ImeConverted,
+    /// <summary>
+    /// Underline style for converted IME input
+    /// </summary>
+    ImeConverted,
 
-        /// <summary>
-        /// Underline style for converted IME input (target clause)
-        /// </summary>
-        ImeTargetConverted,
+    /// <summary>
+    /// Underline style for converted IME input (target clause)
+    /// </summary>
+    ImeTargetConverted,
 
-        /// <summary>
-        /// Underline style for unconverted IME input (target clause)
-        /// </summary>
-        ImeTargetNonConverted,
-    }
+    /// <summary>
+    /// Underline style for unconverted IME input (target clause)
+    /// </summary>
+    ImeTargetNonConverted,
 }

@@ -27,6 +27,10 @@
     </ItemGroup>
 
     <ItemGroup>
+        <EmbeddedResource Include="Resources\**" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="SkiaSharp" />
         <PackageReference Include="SkiaSharp.HarfBuzz" />
     </ItemGroup>

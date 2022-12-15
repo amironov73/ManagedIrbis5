@@ -47,7 +47,9 @@ public class FontCache
     {
         var cacheKey = GetCacheKey (typeface, fontSize);
         if (CacheStore.TryGetValue (cacheKey, out var fontCache))
+        {
             return fontCache;
+        }
 
         var newFontCache = new FontCache (typeface, fontSize);
         CacheStore[cacheKey] = newFontCache;
@@ -112,7 +114,9 @@ public class FontCache
         FindNewCharacters (text, ref newChars);
 
         if (newChars.Count == 0)
+        {
             return false;
+        }
 
         var newCharString = new string (newChars.ToArray());
 
@@ -142,13 +146,17 @@ public class FontCache
     private void FindNewCharacters (string text, ref List<char> chars)
     {
         if (_LetterDefinitions.Count == 0)
+        {
             chars.AddRange (text);
+        }
         else
         {
             foreach (var c in text)
             {
                 if (!_LetterDefinitions.ContainsKey (c))
+                {
                     chars.Add (c);
+                }
             }
         }
     }

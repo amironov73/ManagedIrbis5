@@ -16,6 +16,7 @@
 #region Using directives
 
 using SkiaSharp;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,19 +27,18 @@ using System.Threading.Tasks;
 
 #nullable enable
 
-namespace AM.Skia.RichTextKit
+namespace AM.Skia.RichTextKit;
+
+/// <summary>
+/// Resolved, internal class used to pass paint context info
+/// </summary>
+internal class PaintTextContext
 {
-    /// <summary>
-    /// Resolved, internal class used to pass paint context info
-    /// </summary>
-    class PaintTextContext
-    {
-        public SKCanvas Canvas;
-        public int SelectionStart;
-        public int SelectionEnd;
-        public SKPaint PaintSelectionBackground;
-        public SKPaint PaintSelectionHandle;
-        public float SelectionHandleScale = 1.0f;
-        public TextPaintOptions Options;
-    }
+    public SKCanvas Canvas;
+    public int SelectionStart;
+    public int SelectionEnd;
+    public SKPaint PaintSelectionBackground;
+    public SKPaint PaintSelectionHandle;
+    public float SelectionHandleScale = 1.0f;
+    public TextPaintOptions Options;
 }

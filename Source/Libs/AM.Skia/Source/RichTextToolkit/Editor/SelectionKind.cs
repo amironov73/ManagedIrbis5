@@ -21,36 +21,35 @@ using SkiaSharp;
 
 #nullable enable
 
-namespace AM.Skia.RichTextKit.Editor
+namespace AM.Skia.RichTextKit.Editor;
+
+/// <summary>
+/// Defines a kind of selection range
+/// </summary>
+public enum SelectionKind
 {
     /// <summary>
-    /// Defines a kind of selection range
+    /// No range
     /// </summary>
-    public enum SelectionKind
-    {
-        /// <summary>
-        /// No range
-        /// </summary>
-        None,
+    None,
 
-        /// <summary>
-        /// Select a word
-        /// </summary>
-        Word,
+    /// <summary>
+    /// Select a word
+    /// </summary>
+    Word,
 
-        /// <summary>
-        /// Select a line
-        /// </summary>
-        Line,
+    /// <summary>
+    /// Select a line
+    /// </summary>
+    Line,
 
-        /// <summary>
-        /// Select a paragraph
-        /// </summary>
-        Paragraph,
+    /// <summary>
+    /// Select a paragraph
+    /// </summary>
+    Paragraph,
 
-        /// <summary>
-        /// Select the entire document (ie: select all)
-        /// </summary>
-        Document,
-    }
+    /// <summary>
+    /// Select the entire document (ie: select all)
+    /// </summary>
+    Document,
 }

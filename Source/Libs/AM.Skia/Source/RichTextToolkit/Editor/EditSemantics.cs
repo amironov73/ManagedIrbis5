@@ -21,41 +21,40 @@ using SkiaSharp;
 
 #nullable enable
 
-namespace AM.Skia.RichTextKit.Editor
+namespace AM.Skia.RichTextKit.Editor;
+
+/// <summary>
+/// Defines various semantics for TextDocument edit operations
+/// </summary>
+public enum EditSemantics
 {
     /// <summary>
-    /// Defines various semantics for TextDocument edit operations
+    /// No special behaviour
     /// </summary>
-    public enum EditSemantics
-    {
-        /// <summary>
-        /// No special behaviour
-        /// </summary>
-        None,
+    None,
 
-        /// <summary>
-        /// Special behaviour for backspacing over one character
-        /// </summary>
-        Backspace,
+    /// <summary>
+    /// Special behaviour for backspacing over one character
+    /// </summary>
+    Backspace,
 
-        /// <summary>
-        /// Special behaviour for forward deleting text one character
-        /// </summary>
-        ForwardDelete,
+    /// <summary>
+    /// Special behaviour for forward deleting text one character
+    /// </summary>
+    ForwardDelete,
 
-        /// <summary>
-        /// Special behaviour typing text one character at time
-        /// </summary>
-        Typing,
+    /// <summary>
+    /// Special behaviour typing text one character at time
+    /// </summary>
+    Typing,
 
-        /// <summary>
-        /// Special behaviour for overtyping existing text
-        /// </summary>
-        Overtype,
+    /// <summary>
+    /// Special behaviour for overtyping existing text
+    /// </summary>
+    Overtype,
 
-        /// <summary>
-        /// Special behaviour for displaying the composition string of an IME
-        /// </summary>
-        ImeComposition,
-    }
+    /// <summary>
+    /// Special behaviour for displaying the composition string of an IME
+    /// </summary>
+    ImeComposition,
 }

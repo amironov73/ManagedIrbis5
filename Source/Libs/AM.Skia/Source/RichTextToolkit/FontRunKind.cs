@@ -13,26 +13,25 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-namespace AM.Skia.RichTextKit
+namespace AM.Skia.RichTextKit;
+
+/// <summary>
+/// Indicates the kind of font run.
+/// </summary>
+public enum FontRunKind
 {
     /// <summary>
-    /// Indicates the kind of font run.
+    /// This is a normal text font run.
     /// </summary>
-    public enum FontRunKind
-    {
-        /// <summary>
-        /// This is a normal text font run.
-        /// </summary>
-        Normal,
+    Normal,
 
-        /// <summary>
-        /// This font run covers the trailing white space on a line.
-        /// </summary>
-        TrailingWhitespace,
+    /// <summary>
+    /// This font run covers the trailing white space on a line.
+    /// </summary>
+    TrailingWhitespace,
 
-        /// <summary>
-        /// This is a special font run created for the truncation ellipsis.
-        /// </summary>
-        Ellipsis,
-    }
+    /// <summary>
+    /// This is a special font run created for the truncation ellipsis.
+    /// </summary>
+    Ellipsis,
 }

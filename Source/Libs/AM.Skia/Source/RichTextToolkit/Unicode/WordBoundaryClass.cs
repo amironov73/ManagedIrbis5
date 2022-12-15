@@ -13,35 +13,34 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-namespace AM.Skia.RichTextKit
+namespace AM.Skia.RichTextKit;
+
+/// <summary>
+/// Unicode word boundary group classes
+/// </summary>
+/// <remarks>
+/// Note, these need to match those used by the JavaScript script that
+/// generates the .trie resources
+/// </remarks>
+internal enum WordBoundaryClass
 {
     /// <summary>
-    /// Unicode word boundary group classes
+    /// Character is an letter or number
     /// </summary>
-    /// <remarks>
-    /// Note, these need to match those used by the JavaScript script that
-    /// generates the .trie resources
-    /// </remarks>
-    enum WordBoundaryClass
-    {
-        /// <summary>
-        /// Character is an letter or number
-        /// </summary>
-        AlphaDigit = 0,
+    AlphaDigit = 0,
 
-        /// <summary>
-        /// Character should be ignored when locating word boundaries
-        /// </summary>
-        Ignore = 1,
+    /// <summary>
+    /// Character should be ignored when locating word boundaries
+    /// </summary>
+    Ignore = 1,
 
-        /// <summary>
-        /// Character is a spacing character
-        /// </summary>
-        Space = 2,
+    /// <summary>
+    /// Character is a spacing character
+    /// </summary>
+    Space = 2,
 
-        /// <summary>
-        /// Character is a punctuation character
-        /// </summary>
-        Punctuation = 3,
-    }
+    /// <summary>
+    /// Character is a punctuation character
+    /// </summary>
+    Punctuation = 3,
 }

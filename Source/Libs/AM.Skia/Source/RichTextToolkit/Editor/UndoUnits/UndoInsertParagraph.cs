@@ -21,27 +21,26 @@ using AM.Skia.RichTextKit.Utils;
 
 #nullable enable
 
-namespace AM.Skia.RichTextKit.Editor.UndoUnits
+namespace AM.Skia.RichTextKit.Editor.UndoUnits;
+
+internal class UndoInsertParagraph : UndoUnit<TextDocument>
 {
-    class UndoInsertParagraph : UndoUnit<TextDocument>
+    public UndoInsertParagraph (int index, Paragraph paragraph)
     {
-        public UndoInsertParagraph(int index, Paragraph paragraph)
-        {
-            _index = index;
-            _paragraph = paragraph;
-        }
-
-        public override void Do(TextDocument context)
-        {
-            context._paragraphs.Insert(_index, _paragraph);
-        }
-
-        public override void Undo(TextDocument context)
-        {
-            context._paragraphs.RemoveAt(_index);
-        }
-
-        int _index;
-        Paragraph _paragraph;
+        _index = index;
+        _paragraph = paragraph;
     }
+
+    public override void Do (TextDocument context)
+    {
+        context._paragraphs.Insert (_index, _paragraph);
+    }
+
+    public override void Undo (TextDocument context)
+    {
+        context._paragraphs.RemoveAt (_index);
+    }
+
+    private int _index;
+    private Paragraph _paragraph;
 }

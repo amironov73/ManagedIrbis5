@@ -25,26 +25,25 @@ using System.Threading.Tasks;
 
 #nullable enable
 
-namespace AM.Skia.RichTextKit
+namespace AM.Skia.RichTextKit;
+
+/// <summary>
+/// Specifies the text writing direction for text.
+/// </summary>
+public enum TextDirection
 {
     /// <summary>
-    /// Specifies the text writing direction for text.
+    /// Left to right.
     /// </summary>
-    public enum TextDirection
-    {
-        /// <summary>
-        /// Left to right.
-        /// </summary>
-        LTR,
+    LTR,
 
-        /// <summary>
-        /// Right to left.
-        /// </summary>
-        RTL,
+    /// <summary>
+    /// Right to left.
+    /// </summary>
+    RTL,
 
-        /// <summary>
-        /// Automatic
-        /// </summary>
-        Auto,
-    }
+    /// <summary>
+    /// Automatic
+    /// </summary>
+    Auto,
 }

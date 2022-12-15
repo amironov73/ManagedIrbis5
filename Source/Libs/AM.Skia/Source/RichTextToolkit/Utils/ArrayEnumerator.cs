@@ -24,52 +24,57 @@ using System.Text;
 
 #nullable enable
 
-namespace AM.Skia.RichTextKit
+namespace AM.Skia.RichTextKit;
+
+internal class ArraySliceEnumerator<T> : IEnumerator<T>, IEnumerator
 {
-    class ArraySliceEnumerator<T> : IEnumerator<T>, IEnumerator
+    public ArraySliceEnumerator (T[] arr, int start, int length)
     {
-        public ArraySliceEnumerator(T[] arr, int start, int length)
-        {
-            _arr = arr;
-            _start = start;
-            _end = start + length;
-            _current = _start - 1;
-        }
+        _arr = arr;
+        _start = start;
+        _end = start + length;
+        _current = _start - 1;
+    }
 
-        T[] _arr;
-        int _start;
-        int _end;
-        int _current;
+    private T[] _arr;
+    private int _start;
+    private int _end;
+    private int _current;
 
-        public T Current
-        {
-            get
-            {
-                if (_current < _end)
-                    return _arr[_current];
-                else
-                    return default(T);
-            }
-        }
-
-
-        object IEnumerator.Current => Current;
-
-        public bool MoveNext()
+    public T Current
+    {
+        get
         {
             if (_current < _end)
-                _current++;
-
-            return _current < _end;
+            {
+                return _arr[_current];
+            }
+            else
+            {
+                return default (T);
+            }
         }
+    }
 
-        public void Reset()
+
+    object IEnumerator.Current => Current;
+
+    public bool MoveNext()
+    {
+        if (_current < _end)
         {
-            _current = _start - 1;
+            _current++;
         }
 
-        public void Dispose()
-        {
-        }
+        return _current < _end;
+    }
+
+    public void Reset()
+    {
+        _current = _start - 1;
+    }
+
+    public void Dispose()
+    {
     }
 }

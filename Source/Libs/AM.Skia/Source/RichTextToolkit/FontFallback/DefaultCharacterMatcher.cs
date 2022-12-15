@@ -16,6 +16,7 @@
 #region Using directives
 
 using SkiaSharp;
+
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -24,21 +25,20 @@ using System.Text;
 
 #nullable enable
 
-namespace AM.Skia.RichTextKit
+namespace AM.Skia.RichTextKit;
+
+internal class DefaultCharacterMatcher : ICharacterMatcher
 {
-    class DefaultCharacterMatcher : ICharacterMatcher
+    public DefaultCharacterMatcher()
     {
-        public DefaultCharacterMatcher()
-        {
+    }
 
-        }
+    private SKFontManager _fontManager = SKFontManager.Default;
 
-        SKFontManager _fontManager = SKFontManager.Default;
-
-        /// <inheritdoc />
-        public SKTypeface MatchCharacter(string familyName, int weight, int width, SKFontStyleSlant slant, string[] bcp47, int character)
-        {
-            return _fontManager.MatchCharacter(familyName, weight, width, slant, bcp47, character);
-        }
+    /// <inheritdoc />
+    public SKTypeface MatchCharacter (string familyName, int weight, int width, SKFontStyleSlant slant, string[] bcp47,
+        int character)
+    {
+        return _fontManager.MatchCharacter (familyName, weight, width, slant, bcp47, character);
     }
 }

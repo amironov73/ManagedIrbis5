@@ -25,19 +25,18 @@ using System.Threading.Tasks;
 
 #nullable enable
 
-namespace AM.Skia.RichTextKit
+namespace AM.Skia.RichTextKit;
+
+/// <summary>
+/// Unicode paired bracket types
+/// </summary>
+/// <remarks>
+/// Note, these need to match those used by the JavaScript script that
+/// generates the .trie resources
+/// </remarks>
+internal enum PairedBracketType : byte
 {
-    /// <summary>
-    /// Unicode paired bracket types
-    /// </summary>
-    /// <remarks>
-    /// Note, these need to match those used by the JavaScript script that
-    /// generates the .trie resources
-    /// </remarks>
-    enum PairedBracketType : byte
-    {
-        n,
-        o,
-        c
-    }
+    n,
+    o,
+    c
 }

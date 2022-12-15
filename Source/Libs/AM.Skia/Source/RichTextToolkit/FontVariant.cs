@@ -25,26 +25,25 @@ using System.Threading.Tasks;
 
 #nullable enable
 
-namespace AM.Skia.RichTextKit
+namespace AM.Skia.RichTextKit;
+
+/// <summary>
+/// Describes variations to a base font for a run of text.
+/// </summary>
+public enum FontVariant
 {
     /// <summary>
-    /// Describes variations to a base font for a run of text.
+    /// Normal text.
     /// </summary>
-    public enum FontVariant
-    {
-        /// <summary>
-        /// Normal text.
-        /// </summary>
-        Normal,
+    Normal,
 
-        /// <summary>
-        /// Super-script Text
-        /// </summary>
-        SuperScript,
+    /// <summary>
+    /// Super-script Text
+    /// </summary>
+    SuperScript,
 
-        /// <summary>
-        /// Sub-script Text
-        /// </summary>
-        SubScript,
-    }
+    /// <summary>
+    /// Sub-script Text
+    /// </summary>
+    SubScript,
 }

@@ -113,7 +113,7 @@ public static class TextRenderer
     private static List<float> LinesOffsetX = new List<float>();
     private static float LetterOffsetY;
 
-    class LetterInfo
+    private class LetterInfo
     {
         public char Character;
         public bool Valid;
