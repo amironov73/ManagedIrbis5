@@ -23,11 +23,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\AM.Core5\AM.Core5.csproj"/>
+        <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="SkiaSharp"/>
+        <PackageReference Include="SkiaSharp" />
+        <PackageReference Include="SkiaSharp.HarfBuzz" />
     </ItemGroup>
 
 </Project>
