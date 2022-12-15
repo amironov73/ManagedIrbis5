@@ -39,6 +39,7 @@ public sealed class PooledMemoryStream
     public PooledMemoryStream()
         : this (PooledMemoryStreamManager.Shared)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -103,7 +104,10 @@ public sealed class PooledMemoryStream
     /// </summary>
     public override bool CanTimeout => false;
 
-    private BufferSegment EnsureCurrentInitialized (int length)
+    private BufferSegment EnsureCurrentInitialized
+        (
+            int length
+        )
     {
         if (_head is null)
         {

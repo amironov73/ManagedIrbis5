@@ -3,9 +3,6 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable NonReadonlyMemberInGetHashCode
 // ReSharper disable UnusedMember.Global
 
 /* AsnUtility.cs -- полезные методы для работы с ASN.1
