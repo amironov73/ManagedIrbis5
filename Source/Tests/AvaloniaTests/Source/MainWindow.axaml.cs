@@ -585,4 +585,13 @@ public partial class MainWindow
     {
         new PropertyGridDemo().Show (this);
     }
+
+    private void DocumentButton_OnClick
+        (
+            object? sender,
+            RoutedEventArgs eventArgs
+        )
+    {
+        new DocumentDemo().Show (this);
+    }
 }
