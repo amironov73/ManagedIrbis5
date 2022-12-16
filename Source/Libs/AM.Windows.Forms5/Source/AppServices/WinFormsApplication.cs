@@ -21,6 +21,7 @@ using System.Threading;
 using System.Windows.Forms;
 
 using AM.AppServices;
+using AM.Logging;
 
 using Microsoft.Extensions.Hosting;
 
@@ -95,6 +96,7 @@ public class WinFormsApplication
         mainForm.Text = _formTitle;
         MainForm = mainForm;
         MainForm.ShowVersionInfoInTitle();
+        MagnaTarget.RegisterForNlog();
 
         InputLanguageUtility.InstallWmInputLanguageRequestFix();
 

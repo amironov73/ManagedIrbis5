@@ -30,6 +30,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using AM.AppServices;
+using AM.Logging;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -243,6 +244,7 @@ public class RazorApplication
 
         _builder.Host.ConfigureLogging (logging =>
         {
+            MagnaTarget.RegisterForNlog();
             logging.ClearProviders();
             logging.AddNLog (Configuration);
         });

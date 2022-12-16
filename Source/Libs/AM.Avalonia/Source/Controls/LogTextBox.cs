@@ -42,6 +42,15 @@ namespace AM.Avalonia.Controls;
 public sealed class LogTextBox
     : TextBox, IStyleable
 {
+    #region Properties
+
+    /// <summary>
+    /// Минимальный уровень, начиная с которого происходит вывод на экран.
+    /// </summary>
+    public LogLevel MinLevel { get; set; }
+
+    #endregion
+
     #region Construction
 
     /// <summary>
@@ -51,6 +60,7 @@ public sealed class LogTextBox
     {
         IsReadOnly = true;
         TextWrapping = TextWrapping.Wrap;
+        MinLevel = LogLevel.Info;
     }
 
     #endregion
@@ -79,13 +89,16 @@ public sealed class LogTextBox
             LogEventInfo eventInfo
         )
     {
-        Dispatcher.UIThread.Post (() =>
+        if (eventInfo.Level >= MinLevel)
         {
-            var line = $"{eventInfo.TimeStamp}: {eventInfo.Level.ToString().ToUpperInvariant()} : {eventInfo.FormattedMessage}{NewLine}";
+            Dispatcher.UIThread.Post (() =>
+            {
+                var line = $"{eventInfo.TimeStamp}: {eventInfo.Level.ToString().ToUpperInvariant()} : {eventInfo.FormattedMessage}{NewLine}";
 
-            Text += line;
-            CaretIndex = int.MaxValue;
-        });
+                Text += line;
+                CaretIndex = int.MaxValue;
+            });
+        }
     }
 
     Type IStyleable.StyleKey => typeof (TextBox);
