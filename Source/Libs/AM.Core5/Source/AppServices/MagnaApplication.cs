@@ -30,6 +30,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using AM.Interactivity;
+using AM.Logging;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -250,6 +251,7 @@ public class MagnaApplication
 
         _builder.ConfigureLogging (logging =>
         {
+            MagnaTarget.RegisterForNlog();
             logging.ClearProviders();
             logging.AddNLog (Configuration);
         });

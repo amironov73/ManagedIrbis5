@@ -16,6 +16,7 @@ using System;
 using System.Text;
 
 using AM.Interactivity;
+using AM.Logging;
 using AM.Plugins;
 
 using Microsoft.Extensions.Configuration;
@@ -262,6 +263,7 @@ public class MagnaBackbone
 
         _builder.ConfigureLogging (logging =>
         {
+            MagnaTarget.RegisterForNlog();
             logging.ClearProviders();
             logging.AddNLog (Configuration);
         });

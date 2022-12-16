@@ -28,6 +28,7 @@ using System.Threading.Tasks;
 using AM.AppServices;
 using AM.Avalonia.Dialogs;
 using AM.Interactivity;
+using AM.Logging;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -218,6 +219,7 @@ public class AvaloniaApplication
 
         _hostBuilder.ConfigureLogging (logging =>
         {
+            MagnaTarget.RegisterForNlog();
             logging.ClearProviders();
             logging.AddNLog (Configuration);
         });

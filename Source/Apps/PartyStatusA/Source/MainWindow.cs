@@ -50,7 +50,7 @@ public sealed class MainWindow
 {
     private LabeledTextBox _numberBox = null!;
     private LabeledComboBox _statusBox = null!;
-    private LogBox _logBox = null!;
+    private LogTextBox _logBox = null!;
     private Button _button = null!;
     private BusyStripe _busyStripe = null!;
     private MenuFile? _menu;
@@ -117,11 +117,10 @@ public sealed class MainWindow
         _busyStripe.SetValue (Grid.RowProperty, 2);
         _busyStripe.SetValue (Grid.ColumnSpanProperty, 5);
 
-        _logBox = new LogBox
+        _logBox = new LogTextBox
         {
             FontFamily = new FontFamily ("Courier"),
             FontSize = 12.0,
-            IsReadOnly = true
         };
         _logBox.SetValue (Grid.RowProperty, 4);
         _logBox.SetValue (Grid.ColumnSpanProperty, 5);
@@ -237,7 +236,6 @@ public sealed class MainWindow
     private async Task InitializeConnectionAsync()
     {
         this.ShowVersionInfoInTitle();
-        _logBox.Output.PrintSystemInformation();
 
         await Run (async () =>
         {

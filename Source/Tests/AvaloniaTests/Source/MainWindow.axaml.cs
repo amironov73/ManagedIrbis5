@@ -594,4 +594,13 @@ public partial class MainWindow
     {
         new DocumentDemo().Show (this);
     }
+
+    private void LogButton_OnClick
+        (
+            object? sender,
+            RoutedEventArgs eventArgs
+        )
+    {
+        new LogTextBoxDemo().Show (this);
+    }
 }

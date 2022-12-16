@@ -122,6 +122,12 @@
             Document
         </Button>
 
+        <Button
+            Name="LogButton"
+            Click="LogButton_OnClick">
+            LogTextBox
+        </Button>
+
     </WrapPanel>
 
 </Window>
