@@ -129,10 +129,10 @@ public abstract class Paragraph : IRun
     /// <param name="other">The paragraph to copy style from</param>
     public virtual void CopyStyleFrom (Paragraph other)
     {
-        this.MarginLeft = other.MarginLeft;
-        this.MarginTop = other.MarginTop;
-        this.MarginRight = other.MarginRight;
-        this.MarginBottom = other.MarginBottom;
+        MarginLeft = other.MarginLeft;
+        MarginTop = other.MarginTop;
+        MarginRight = other.MarginRight;
+        MarginBottom = other.MarginBottom;
     }
 
     /// <summary>

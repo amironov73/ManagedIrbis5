@@ -1037,7 +1037,7 @@ public class RichString
         {
             // Adjust x-position according to resolved text alignment to prevent
             // having to re-calculate the TextBlock's layout
-            var yPos = this.yPosition + MarginTop;
+            var yPos = yPosition + MarginTop;
             var xPos = MarginLeft;
             if (!owner.MaxWidth.HasValue)
             {
@@ -1079,7 +1079,7 @@ public class RichString
                 if (ctx.textPaintOptions.Selection.HasValue)
                 {
                     ctx.textPaintOptions.Selection =
-                        ctx.textPaintOptions.Selection.Value.Offset (-this.CodePointOffset);
+                        ctx.textPaintOptions.Selection.Value.Offset (-CodePointOffset);
                 }
             }
 
@@ -1101,7 +1101,7 @@ public class RichString
         public void Layout (ref LayoutContext ctx)
         {
             // Store y position of this block
-            this.yPosition = ctx.yPosition;
+            yPosition = ctx.yPosition;
 
             // Create the text block
             if (TextBlock == null)

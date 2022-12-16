@@ -9,15 +9,13 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* WordBoundaryAlgorithm.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 using AM.Skia.RichTextKit.Utils;
 
@@ -36,7 +34,10 @@ internal class WordBoundaryAlgorithm
     /// Locate the start of each "word" in a unicode string.  Used for Ctrl+Left/Right
     /// in editor and different to the line break algorithm.
     /// </summary>
-    public static IEnumerable<int> FindWordBoundaries (Slice<int> codePoints)
+    public static IEnumerable<int> FindWordBoundaries
+        (
+            Slice<int> codePoints
+        )
     {
         // Start is always a word boundary
         yield return 0;

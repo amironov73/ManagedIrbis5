@@ -437,20 +437,14 @@ public class PdfArray
         /// <summary>
         /// Gets all items of this array.
         /// </summary>
-        public PdfItem[] Items
-        {
-            get { return _elements.ToArray(); }
-        }
+        public PdfItem[] Items => _elements.ToArray();
 
         #region IList Members
 
         /// <summary>
         /// Returns false.
         /// </summary>
-        public bool IsReadOnly
-        {
-            get { return false; }
-        }
+        public bool IsReadOnly => false;
 
         /// <summary>
         /// Gets or sets an item at the specified index.
@@ -458,7 +452,7 @@ public class PdfArray
         /// <value></value>
         public PdfItem this [int index]
         {
-            get { return _elements[index]; }
+            get => _elements[index];
             set
             {
                 if (value == null)
@@ -541,10 +535,7 @@ public class PdfArray
         /// <summary>
         /// Returns false.
         /// </summary>
-        public bool IsFixedSize
-        {
-            get { return false; }
-        }
+        public bool IsFixedSize => false;
 
         #endregion
 
@@ -553,18 +544,12 @@ public class PdfArray
         /// <summary>
         /// Returns false.
         /// </summary>
-        public bool IsSynchronized
-        {
-            get { return false; }
-        }
+        public bool IsSynchronized => false;
 
         /// <summary>
         /// Gets the number of elements in the array.
         /// </summary>
-        public int Count
-        {
-            get { return _elements.Count; }
-        }
+        public int Count => _elements.Count;
 
         /// <summary>
         /// Copies the elements of the array to the specified array.
@@ -577,10 +562,7 @@ public class PdfArray
         /// <summary>
         /// The current implementation return null.
         /// </summary>
-        public object SyncRoot
-        {
-            get { return null; }
-        }
+        public object SyncRoot => null;
 
         #endregion
 
@@ -615,14 +597,7 @@ public class PdfArray
     /// </summary>
 
     // ReSharper disable UnusedMember.Local
-    string DebuggerDisplay
-
-        // ReSharper restore UnusedMember.Local
-    {
-        get
-        {
-            return string.Format (CultureInfo.InvariantCulture, "array({0},[{1}])", ObjectID.DebuggerDisplay,
-                _elements == null ? 0 : _elements.Count);
-        }
-    }
+    string DebuggerDisplay =>
+        string.Format (CultureInfo.InvariantCulture, "array({0},[{1}])", ObjectID.DebuggerDisplay,
+            _elements == null ? 0 : _elements.Count); // ReSharper restore UnusedMember.Local
 }

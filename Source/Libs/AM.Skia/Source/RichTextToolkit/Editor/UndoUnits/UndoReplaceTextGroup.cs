@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* UndoReplaceTextGroup.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,14 +23,23 @@ using AM.Skia.RichTextKit.Utils;
 
 namespace AM.Skia.RichTextKit.Editor.UndoUnits;
 
-internal class UndoReplaceTextGroup : UndoGroup<TextDocument>
+internal class UndoReplaceTextGroup
+    : UndoGroup<TextDocument>
 {
-    public UndoReplaceTextGroup() : base (null)
+    public UndoReplaceTextGroup()
+        : base (null)
     {
+        // пустое тело конструктора
     }
 
-    public bool TryExtend (TextDocument context, TextRange range, StyledText text, EditSemantics semantics,
-        int imeCaretOffset)
+    public bool TryExtend
+        (
+            TextDocument context,
+            TextRange range,
+            StyledText text,
+            EditSemantics semantics,
+            int imeCaretOffset
+        )
     {
         // Extend typing?
         if (semantics == EditSemantics.Typing && _info.Semantics == EditSemantics.Typing)
@@ -107,7 +116,7 @@ internal class UndoReplaceTextGroup : UndoGroup<TextDocument>
             if (Units.Count < 2 || (!(Units[Units.Count - 2] is UndoDeleteText deleteUnit)))
             {
                 deleteUnit = new UndoDeleteText (insertUnit.TextBlock, insertUnit.Offset, 0);
-                this.Insert (Units.Count - 1, deleteUnit);
+                Insert (Units.Count - 1, deleteUnit);
             }
 
             // Delete forward if can
@@ -143,7 +152,7 @@ internal class UndoReplaceTextGroup : UndoGroup<TextDocument>
         if (semantics == EditSemantics.Backspace && _info.Semantics == EditSemantics.Backspace)
         {
             // Get the last delete unit
-            var deleteUnit = this.LastUnit as UndoDeleteText;
+            var deleteUnit = LastUnit as UndoDeleteText;
             if (deleteUnit == null)
             {
                 return false;
@@ -183,7 +192,7 @@ internal class UndoReplaceTextGroup : UndoGroup<TextDocument>
         if (semantics == EditSemantics.ForwardDelete && _info.Semantics == EditSemantics.ForwardDelete)
         {
             // Get the last delete unit
-            var deleteUnit = this.LastUnit as UndoDeleteText;
+            var deleteUnit = LastUnit as UndoDeleteText;
             if (deleteUnit == null)
             {
                 return false;

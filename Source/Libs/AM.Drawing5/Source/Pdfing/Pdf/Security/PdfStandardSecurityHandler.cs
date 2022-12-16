@@ -107,7 +107,7 @@ public sealed class PdfStandardSecurityHandler : PdfSecurityHandler
 
             return permission;
         }
-        set { Elements.SetInteger (Keys.P, (int)value); }
+        set => Elements.SetInteger (Keys.P, (int)value);
     }
 
     /// <summary>

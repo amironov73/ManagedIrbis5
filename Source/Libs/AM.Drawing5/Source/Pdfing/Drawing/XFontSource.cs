@@ -98,7 +98,7 @@ internal class XFontSource
     /// </summary>
     internal OpenTypeFontface? Fontface
     {
-        get { return _fontface; }
+        get => _fontface;
         set
         {
             _fontface = value;
@@ -165,15 +165,9 @@ internal class XFontSource
     /// </summary>
 
     // ReSha rper disable UnusedMember.Local
-    internal string DebuggerDisplay
+    internal string DebuggerDisplay =>
 
-        // ReShar per restore UnusedMember.Local
-    {
         // The key is converted to a value a human can remember during debugging.
-        get
-        {
-            return string.Format (CultureInfo.InvariantCulture, "XFontSource: '{0}', keyhash={1}", FontName,
-                Key % 99991 /* largest prime number less than 100000 */);
-        }
-    }
+        string.Format (CultureInfo.InvariantCulture, "XFontSource: '{0}', keyhash={1}", FontName,
+            Key % 99991 /* largest prime number less than 100000 */); // ReShar per restore UnusedMember.Local
 }

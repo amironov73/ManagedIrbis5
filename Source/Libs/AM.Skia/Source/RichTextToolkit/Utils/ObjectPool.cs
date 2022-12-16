@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* ObjectPool.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,7 +17,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 #endregion
 
@@ -25,12 +24,9 @@ using System.Text;
 
 namespace AM.Skia.RichTextKit.Utils;
 
-internal class ObjectPool<T> where T : class, new()
+internal class ObjectPool<T>
+    where T : class, new()
 {
-    public ObjectPool()
-    {
-    }
-
     public T Get()
     {
 #if NO_POOLING
@@ -90,7 +86,7 @@ internal class ObjectPool<T> where T : class, new()
         objs.Clear();
     }
 
-    public Action<T> Cleaner;
+    public Action<T>? Cleaner;
 
     private List<T> _pool = new ();
 }

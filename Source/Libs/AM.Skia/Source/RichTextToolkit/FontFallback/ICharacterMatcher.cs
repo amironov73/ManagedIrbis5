@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* ICharacterMatcher.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -46,6 +46,13 @@ public interface ICharacterMatcher
     /// <param name="bcp47">The ISO 639, 15924, and 3166-1 code to use when searching, such as "ja" and "zh".</param>
     /// <param name="character">The character to find a typeface for.</param>
     /// <returns>Returns the SkiaSharp.SKTypeface that contains the given character, or null if none was found.</returns>
-    SKTypeface MatchCharacter (string familyName, int weight, int width, SKFontStyleSlant slant, string[] bcp47,
-        int character);
+    SKTypeface? MatchCharacter
+        (
+            string familyName,
+            int weight,
+            int width,
+            SKFontStyleSlant slant,
+            string[]? bcp47,
+            int character
+        );
 }

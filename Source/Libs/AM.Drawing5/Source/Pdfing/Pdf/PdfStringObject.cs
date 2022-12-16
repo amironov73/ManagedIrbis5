@@ -84,18 +84,15 @@ namespace PdfSharpCore.Pdf
         /// <summary>
         /// Gets the number of characters in this string.
         /// </summary>
-        public int Length
-        {
-            get { return _value == null ? 0 : _value.Length; }
-        }
+        public int Length => _value == null ? 0 : _value.Length;
 
         /// <summary>
         /// Gets or sets the encoding.
         /// </summary>
         public PdfStringEncoding Encoding
         {
-            get { return (PdfStringEncoding)(_flags & PdfStringFlags.EncodingMask); }
-            set { _flags = (_flags & ~PdfStringFlags.EncodingMask) | ((PdfStringFlags)value & PdfStringFlags.EncodingMask); }
+            get => (PdfStringEncoding)(_flags & PdfStringFlags.EncodingMask);
+            set => _flags = (_flags & ~PdfStringFlags.EncodingMask) | ((PdfStringFlags)value & PdfStringFlags.EncodingMask);
         }
 
         /// <summary>
@@ -103,8 +100,8 @@ namespace PdfSharpCore.Pdf
         /// </summary>
         public bool HexLiteral
         {
-            get { return (_flags & PdfStringFlags.HexLiteral) != 0; }
-            set { _flags = value ? _flags | PdfStringFlags.HexLiteral : _flags & ~PdfStringFlags.HexLiteral; }
+            get => (_flags & PdfStringFlags.HexLiteral) != 0;
+            set => _flags = value ? _flags | PdfStringFlags.HexLiteral : _flags & ~PdfStringFlags.HexLiteral;
         }
         PdfStringFlags _flags;
 
@@ -113,8 +110,8 @@ namespace PdfSharpCore.Pdf
         /// </summary>
         public string Value
         {
-            get { return _value ?? ""; }
-            set { _value = value ?? ""; }
+            get => _value ?? "";
+            set => _value = value ?? "";
         }
         string _value;
 
@@ -124,8 +121,8 @@ namespace PdfSharpCore.Pdf
         internal byte[] EncryptionValue
         {
             // TODO: Unicode case is not handled!
-            get { return _value == null ? new byte[0] : PdfEncoders.RawEncoding.GetBytes(_value); }
-            set { _value = PdfEncoders.RawEncoding.GetString(value, 0, value.Length); }
+            get => _value == null ? new byte[0] : PdfEncoders.RawEncoding.GetBytes(_value);
+            set => _value = PdfEncoders.RawEncoding.GetString(value, 0, value.Length);
         }
 
         /// <summary>

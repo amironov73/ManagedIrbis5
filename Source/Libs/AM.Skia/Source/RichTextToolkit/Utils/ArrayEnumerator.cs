@@ -9,16 +9,14 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* ArrayEnumerator.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 
 #endregion
 
@@ -26,7 +24,8 @@ using System.Text;
 
 namespace AM.Skia.RichTextKit;
 
-internal class ArraySliceEnumerator<T> : IEnumerator<T>, IEnumerator
+internal class ArraySliceEnumerator<T>
+    : IEnumerator<T>, IEnumerator
 {
     public ArraySliceEnumerator (T[] arr, int start, int length)
     {
@@ -51,13 +50,13 @@ internal class ArraySliceEnumerator<T> : IEnumerator<T>, IEnumerator
             }
             else
             {
-                return default (T);
+                return default!;
             }
         }
     }
 
 
-    object IEnumerator.Current => Current;
+    object? IEnumerator.Current => Current;
 
     public bool MoveNext()
     {

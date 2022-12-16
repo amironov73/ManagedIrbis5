@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* LineBreaker.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -30,13 +30,6 @@ namespace AM.Skia.RichTextKit;
 /// </summary>
 internal class LineBreaker
 {
-    /// <summary>
-    /// Constructor
-    /// </summary>
-    static LineBreaker()
-    {
-    }
-
     /// <summary>
     /// Reset this line breaker
     /// </summary>
@@ -67,9 +60,9 @@ internal class LineBreaker
     private int _lastPos;
     private LineBreakClass _curClass;
     private LineBreakClass _nextClass;
-    private bool _LB8a = false;
-    private bool _LB21a = false;
-    private int _LB30a = 0;
+    private bool _LB8a;
+    private bool _LB21a;
+    private int _LB30a;
 
     /// <summary>
     /// Enumerate all line breaks
@@ -268,7 +261,7 @@ internal class LineBreaker
 
             if (shouldBreak.Value)
             {
-                lineBreak = new LineBreak (findPriorNonWhitespace (_lastPos), _lastPos, false);
+                lineBreak = new LineBreak (findPriorNonWhitespace (_lastPos), _lastPos, required: false);
                 return true;
             }
         }
@@ -283,7 +276,7 @@ internal class LineBreaker
         }
         else
         {
-            lineBreak = new LineBreak (0, 0, false);
+            lineBreak = new LineBreak (0, 0, required: false);
             return false;
         }
     }

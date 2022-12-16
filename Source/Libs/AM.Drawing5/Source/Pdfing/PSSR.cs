@@ -17,6 +17,9 @@ using System;
 using System.Diagnostics;
 using System.Resources;
 using System.Reflection;
+
+using AM;
+
 using PdfSharpCore.Drawing;
 using PdfSharpCore.Internal;
 using PdfSharpCore.Pdf;
@@ -32,22 +35,24 @@ namespace PdfSharpCore
     /// <summary>
     /// The Pdf-Sharp-String-Resources.
     /// </summary>
+
     // ReSharper disable once InconsistentNaming
     static class PSSR
     {
         // How to use:
         // Create a function or property for each message text, depending on how many parameters are
-        // part of the message. For the beginning, type plain English text in the function or property. 
+        // part of the message. For the beginning, type plain English text in the function or property.
         // The use of functions is safe when a parameter must be changed. The compiler tells you all
         // places in your code that must be modified.
         // For localization, create an enum value for each function or property with the same name. Then
         // create localized message files with the enum values as messages identifiers. In the properties
         // and functions all text is replaced by Format or GetString functions with the corresponding enum value
-        // as first parameter. The use of enums ensures that typing errors in message resource names are 
-        // simply impossible. Use the TestResourceMessages function to ensure that each enum value has an 
+        // as first parameter. The use of enums ensures that typing errors in message resource names are
+        // simply impossible. Use the TestResourceMessages function to ensure that each enum value has an
         // appropriate message text.
 
         #region Helper functions
+
         /// <summary>
         /// Loads the message from the resource associated with the enum type and formats it
         /// using 'String.Format'. Because this function is intended to be used during error
@@ -57,106 +62,82 @@ namespace PdfSharpCore
         /// and the name of the enum identifies the message in the resource.</param>
         /// <param name="args">Parameters passed through 'String.Format'.</param>
         /// <returns>The formatted message.</returns>
-        public static string Format(PSMsgID id, params object[] args)
+        public static string Format (PSMsgID id, params object[] args)
         {
-            string message;
+            string? message;
             try
             {
-                message = GetString(id);
-                message = message != null ? Format(message, args) : "INTERNAL ERROR: Message not found in resources.";
+                message = GetString (id);
+                message = message != null ? Format (message, args) : "INTERNAL ERROR: Message not found in resources.";
                 return message;
             }
             catch (Exception ex)
             {
-                message = string.Format("UNEXPECTED ERROR while formatting message with ID {0}: {1}", id.ToString(), ex.ToString());
+                message = $"UNEXPECTED ERROR while formatting message with ID {id.ToString()}: {ex}";
             }
+
             return message;
         }
 
-        public static string Format(string format, params object[] args)
+        public static string Format (string format, params object[] args)
         {
-            if (format == null)
-                throw new ArgumentNullException("format");
+            Sure.NotNull (format);
 
             string message;
             try
             {
-                message = string.Format(format, args);
+                message = string.Format (format, args);
             }
             catch (Exception ex)
             {
-                message = string.Format("UNEXPECTED ERROR while formatting message '{0}': {1}", format, ex);
+                message = $"UNEXPECTED ERROR while formatting message '{format}': {ex}";
             }
+
             return message;
         }
 
         /// <summary>
         /// Gets the localized message identified by the specified DomMsgID.
         /// </summary>
-        public static string GetString(PSMsgID id)
+        public static string? GetString (PSMsgID id)
         {
-            return ResMngr.GetString(id.ToString());
+            return ResMngr.GetString (id.ToString());
         }
 
         #endregion
 
         #region General messages
 
-        public static string IndexOutOfRange
+        public static string IndexOutOfRange => "The index is out of range.";
+
+        public static string ListEnumCurrentOutOfRange => "Enumeration out of range.";
+
+        public static string PageIndexOutOfRange => "The index of a page is out of range.";
+
+        public static string OutlineIndexOutOfRange => "The index of an outline is out of range.";
+
+        public static string SetValueMustNotBeNull => "The set value property must not be null.";
+
+        public static string InvalidValue (int val, string name, int min, int max)
         {
-            get { return "The index is out of range."; }
+            return Format (
+                "{0} is not a valid value for {1}. {1} should be greater than or equal to {2} and less than or equal to {3}.",
+                val, name, min, max);
         }
 
-        public static string ListEnumCurrentOutOfRange
+        public static string ObsoleteFunktionCalled => "The function is obsolete and must not be called.";
+
+        public static string OwningDocumentRequired =>
+            "The PDF object must belong to a PdfDocument, but property Document is null.";
+
+        public static string FileNotFound (string path)
         {
-            get { return "Enumeration out of range."; }
+            return Format ("The file '{0}' does not exist.", path);
         }
 
-        public static string PageIndexOutOfRange
-        {
-            get { return "The index of a page is out of range."; }
-        }
+        public static string FontDataReadOnly => "Font data is read-only.";
 
-        public static string OutlineIndexOutOfRange
-        {
-            get { return "The index of an outline is out of range."; }
-        }
-
-        public static string SetValueMustNotBeNull
-        {
-            get { return "The set value property must not be null."; }
-        }
-
-        public static string InvalidValue(int val, string name, int min, int max)
-        {
-            return Format("{0} is not a valid value for {1}. {1} should be greater than or equal to {2} and less than or equal to {3}.",
-              val, name, min, max);
-        }
-
-        public static string ObsoleteFunktionCalled
-        {
-            get { return "The function is obsolete and must not be called."; }
-        }
-
-        public static string OwningDocumentRequired
-        {
-            get { return "The PDF object must belong to a PdfDocument, but property Document is null."; }
-        }
-
-        public static string FileNotFound(string path)
-        {
-            return Format("The file '{0}' does not exist.", path);
-        }
-
-        public static string FontDataReadOnly
-        {
-            get { return "Font data is read-only."; }
-        }
-
-        public static string ErrorReadingFontData
-        {
-            get { return "Error while parsing an OpenType font."; }
-        }
+        public static string ErrorReadingFontData => "Error while parsing an OpenType font.";
 
         #endregion
 
@@ -164,34 +145,28 @@ namespace PdfSharpCore
 
         // ----- XGraphics ----------------------------------------------------------------------------
 
-        public static string PointArrayEmpty
+        public static string PointArrayEmpty => "The PointF array must not be empty.";
+
+        public static string PointArrayAtLeast (int count)
         {
-            get { return "The PointF array must not be empty."; }
+            return Format ("The point array must contain {0} or more points.", count);
         }
 
-        public static string PointArrayAtLeast(int count)
+        public static string NeedPenOrBrush => "XPen or XBrush or both must not be null.";
+
+        public static string CannotChangeImmutableObject (string typename)
         {
-            return Format("The point array must contain {0} or more points.", count);
+            return $"You cannot change this immutable {typename} object.";
         }
 
-        public static string NeedPenOrBrush
+        public static string FontAlreadyAdded (string fontname)
         {
-            get { return "XPen or XBrush or both must not be null."; }
+            return $"Fontface with the name '{fontname}' already added to font collection.";
         }
 
-        public static string CannotChangeImmutableObject(string typename)
+        public static string NotImplementedForFontsRetrievedWithFontResolver (string name)
         {
-            return string.Format("You cannot change this immutable {0} object.", typename);
-        }
-
-        public static string FontAlreadyAdded(string fontname)
-        {
-            return string.Format("Fontface with the name '{0}' already added to font collection.", fontname);
-        }
-
-        public static string NotImplementedForFontsRetrievedWithFontResolver(string name)
-        {
-            return string.Format("Not implemented for font '{0}', because it was retrieved with font resolver.", name);
+            return $"Not implemented for font '{name}', because it was retrieved with font resolver.";
         }
 
         #endregion
@@ -200,70 +175,44 @@ namespace PdfSharpCore
 
         // ----- PDF ----------------------------------------------------------------------------------
 
-        public static string InvalidPdf
-        {
-            get { return "The file is not a valid PDF document."; }
-        }
+        public static string InvalidPdf => "The file is not a valid PDF document.";
 
-        public static string InvalidVersionNumber
-        {
-            get { return "Invalid version number. Valid values are 12, 13, and 14."; }
-        }
+        public static string InvalidVersionNumber => "Invalid version number. Valid values are 12, 13, and 14.";
 
-        public static string CannotHandleXRefStreams
-        {
-            get { return "Cannot handle cross-reference streams. The current implementation of PDFsharp cannot handle this PDF feature introduced with Acrobat 6."; }
-        }
+        public static string CannotHandleXRefStreams =>
+            "Cannot handle cross-reference streams. The current implementation of PDFsharp cannot handle this PDF feature introduced with Acrobat 6.";
 
-        public static string PasswordRequired
-        {
-            get { return "A password is required to open the PDF document."; }
-        }
+        public static string PasswordRequired => "A password is required to open the PDF document.";
 
-        public static string InvalidPassword
-        {
-            get { return "The specified password is invalid."; }
-        }
+        public static string InvalidPassword => "The specified password is invalid.";
 
-        public static string OwnerPasswordRequired
-        {
-            get { return "To modify the document the owner password is required"; }
-        }
+        public static string OwnerPasswordRequired => "To modify the document the owner password is required";
 
-        public static string UserOrOwnerPasswordRequired
-        {
-            get { return GetString(PSMsgID.UserOrOwnerPasswordRequired); }
-            //get { return "At least a user or an owner password is required to encrypt the document."; }
-        }
+        public static string? UserOrOwnerPasswordRequired => GetString (PSMsgID.UserOrOwnerPasswordRequired);
 
-        public static string CannotModify
-        {
-            get { return "The document cannot be modified."; }
-        }
+        //get { return "At least a user or an owner password is required to encrypt the document."; }
+        public static string CannotModify => "The document cannot be modified.";
 
-        public static string NameMustStartWithSlash
-        {
+        public static string NameMustStartWithSlash =>
+
             //get { return GetString(PSMsgID.NameMustStartWithSlash); }
-            get { return "A PDF name must start with a slash (/)."; }
-        }
+            "A PDF name must start with a slash (/).";
 
-        public static string ImportPageNumberOutOfRange(int pageNumber, int maxPage, string path)
+        public static string ImportPageNumberOutOfRange (int pageNumber, int maxPage, string path)
         {
-            return string.Format("The page cannot be imported from document '{2}', because the page number is out of range. " +
-              "The specified page number is {0}, but it must be in the range from 1 to {1}.", pageNumber, maxPage, path);
+            return string.Format (
+                "The page cannot be imported from document '{2}', because the page number is out of range. " +
+                "The specified page number is {0}, but it must be in the range from 1 to {1}.", pageNumber, maxPage,
+                path);
         }
 
-        public static string MultiplePageInsert
-        {
-            get { return "The page cannot be added to this document because the document already owned this page."; }
-        }
+        public static string MultiplePageInsert =>
+            "The page cannot be added to this document because the document already owned this page.";
 
-        public static string UnexpectedTokenInPdfFile
-        {
-            get { return "Unexpected token in PDF file. The PDF file may be corrupt. If it is not, please send us the file for service."; }
-        }
+        public static string UnexpectedTokenInPdfFile =>
+            "Unexpected token in PDF file. The PDF file may be corrupt. If it is not, please send us the file for service.";
 
-        public static string InappropriateColorSpace(PdfColorMode colorMode, XColorSpace colorSpace)
+        public static string InappropriateColorSpace (PdfColorMode colorMode, XColorSpace colorSpace)
         {
             string mode;
             switch (colorMode)
@@ -300,29 +249,29 @@ namespace PdfSharpCore
                     space = "(undefined)";
                     break;
             }
-            return string.Format("The document requires color mode {0}, but a color is defined using {1}. " +
-              "Use only colors that match the color mode of the PDF document", mode, space);
+
+            return $"The document requires color mode {mode}, but a color is defined using {space}. " +
+                   "Use only colors that match the color mode of the PDF document";
         }
 
-        public static string CannotGetGlyphTypeface(string fontName)
+        public static string CannotGetGlyphTypeface (string fontName)
         {
-            return Format("Cannot get a matching glyph typeface for font '{0}'.", fontName);
+            return Format ("Cannot get a matching glyph typeface for font '{0}'.", fontName);
         }
 
 
         // ----- PdfParser ----------------------------------------------------------------------------
 
-        public static string UnexpectedToken(string token)
+        public static string UnexpectedToken (string token)
         {
-            return Format(PSMsgID.UnexpectedToken, token);
+            return Format (PSMsgID.UnexpectedToken, token);
+
             //return Format("Token '{0}' was not expected.", token);
         }
 
-        public static string UnknownEncryption
-        {
-            get { return GetString(PSMsgID.UnknownEncryption); }
-            //get { return "The PDF document is protected with an encryption not supported by PdfSharpCore."; }
-        }
+        public static string? UnknownEncryption => GetString (PSMsgID.UnknownEncryption);
+
+        //get { return "The PDF document is protected with an encryption not supported by PdfSharpCore."; }
 
         #endregion
 
@@ -344,28 +293,34 @@ namespace PdfSharpCore
                         {
 #if true_
                             // Force the English language.
-                            System.Threading.Thread.CurrentThread.CurrentUICulture = System.Globalization.CultureInfo.InvariantCulture;
+                            System.Threading.Thread.CurrentThread.CurrentUICulture =
+ System.Globalization.CultureInfo.InvariantCulture;
 #endif
 #if !NETFX_CORE && !UWP && !PORTABLE
                             _resmngr = new ResourceManager("PdfSharpCore.Resources.Messages",
                                 Assembly.GetExecutingAssembly());
 #else
-                            _resmngr = new ResourceManager("PdfSharpCore.Resources.Messages",
-                                typeof(PSSR).GetTypeInfo().Assembly);
+                            _resmngr = new ResourceManager ("PdfSharpCore.Resources.Messages",
+                                typeof (PSSR).GetTypeInfo().Assembly);
 #endif
                         }
                     }
-                    finally { Lock.ExitFontFactory(); }
+                    finally
+                    {
+                        Lock.ExitFontFactory();
+                    }
                 }
+
                 return _resmngr;
             }
         }
-        static ResourceManager _resmngr;
+
+        static ResourceManager? _resmngr;
 
         /// <summary>
         /// Writes all messages defined by PSMsgID.
         /// </summary>
-        [Conditional("DEBUG")]
+        [Conditional ("DEBUG")]
         public static void TestResourceMessages()
         {
         }

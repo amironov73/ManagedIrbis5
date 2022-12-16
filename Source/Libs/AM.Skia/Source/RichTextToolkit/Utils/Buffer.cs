@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* Buffer.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -32,7 +32,8 @@ namespace AM.Skia.RichTextKit.Utils;
 /// </summary>
 /// <typeparam name="T">The buffer element type</typeparam>
 [DebuggerDisplay ("Length = {Length}")]
-public class Buffer<T> : IEnumerable<T>, IEnumerable
+public class Buffer<T>
+    : IEnumerable<T>
 {
     /// <summary>
     /// Constructs a new buffer.
@@ -298,7 +299,7 @@ public class Buffer<T> : IEnumerable<T>, IEnumerable
         var start = 0;
         for (var i = 0; i < Length; i++)
         {
-            if (_data[i].Equals (delim))
+            if (_data[i]!.Equals (delim))
             {
                 yield return SubSlice (start, i - start);
                 start = i + 1;
@@ -318,7 +319,7 @@ public class Buffer<T> : IEnumerable<T>, IEnumerable
         var start = 0;
         for (var i = 0; i < Length; i++)
         {
-            if (_data[i].Equals (delim))
+            if (_data[i]!.Equals (delim))
             {
                 yield return (start, i - start);
                 start = i + 1;
@@ -339,7 +340,7 @@ public class Buffer<T> : IEnumerable<T>, IEnumerable
         var count = 0;
         for (var i = 0; i < Length; i++)
         {
-            if (_data[i].Equals (oldValue))
+            if (_data[i]!.Equals (oldValue))
             {
                 _data[i] = newValue;
                 count++;

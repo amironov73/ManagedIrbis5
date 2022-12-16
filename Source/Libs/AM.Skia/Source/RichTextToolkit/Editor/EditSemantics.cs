@@ -9,17 +9,9 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* EditSemantics.cs --
  * Ars Magna project, http://arsmagna.ru
  */
-
-#region Using directives
-
-using SkiaSharp;
-
-#endregion
-
-#nullable enable
 
 namespace AM.Skia.RichTextKit.Editor;
 
@@ -56,5 +48,5 @@ public enum EditSemantics
     /// <summary>
     /// Special behaviour for displaying the composition string of an IME
     /// </summary>
-    ImeComposition,
+    ImeComposition
 }

@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* FontRunKind.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -33,5 +33,5 @@ public enum FontRunKind
     /// <summary>
     /// This is a special font run created for the truncation ellipsis.
     /// </summary>
-    Ellipsis,
+    Ellipsis
 }

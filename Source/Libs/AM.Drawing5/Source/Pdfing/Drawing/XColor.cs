@@ -210,7 +210,7 @@ public struct XColor
     /// </summary>
     public XColorSpace ColorSpace
     {
-        get { return _cs; }
+        get => _cs;
         set
         {
             if (!Enum.IsDefined (typeof (XColorSpace), value))
@@ -222,10 +222,7 @@ public struct XColor
     /// <summary>
     /// Indicates whether this XColor structure is uninitialized.
     /// </summary>
-    public bool IsEmpty
-    {
-        get { return this == Empty; }
-    }
+    public bool IsEmpty => this == Empty;
 
     /// <summary>
     /// Determines whether the specified object is a Color structure and is equivalent to this
@@ -289,10 +286,7 @@ public struct XColor
     /// <summary>
     /// Gets a value indicating whether this color is a known color.
     /// </summary>
-    public bool IsKnownColor
-    {
-        get { return XKnownColorTable.IsKnownColor (Argb); }
-    }
+    public bool IsKnownColor => XKnownColorTable.IsKnownColor (Argb);
 
     /// <summary>
     /// Gets the hue-saturation-brightness (HSB) hue value, in degrees, for this color.
@@ -463,7 +457,7 @@ public struct XColor
     /// </summary>
     public double A
     {
-        get { return _a; }
+        get => _a;
         set
         {
             if (value < 0)
@@ -480,7 +474,7 @@ public struct XColor
     /// </summary>
     public byte R
     {
-        get { return _r; }
+        get => _r;
         set
         {
             _r = value;
@@ -493,7 +487,7 @@ public struct XColor
     /// </summary>
     public byte G
     {
-        get { return _g; }
+        get => _g;
         set
         {
             _g = value;
@@ -506,7 +500,7 @@ public struct XColor
     /// </summary>
     public byte B
     {
-        get { return _b; }
+        get => _b;
         set
         {
             _b = value;
@@ -517,25 +511,19 @@ public struct XColor
     /// <summary>
     /// Gets the RGB part value of the color. Internal helper function.
     /// </summary>
-    internal uint Rgb
-    {
-        get { return ((uint)_r << 16) | ((uint)_g << 8) | _b; }
-    }
+    internal uint Rgb => ((uint)_r << 16) | ((uint)_g << 8) | _b;
 
     /// <summary>
     /// Gets the ARGB part value of the color. Internal helper function.
     /// </summary>
-    internal uint Argb
-    {
-        get { return ((uint)(_a * 255) << 24) | ((uint)_r << 16) | ((uint)_g << 8) | _b; }
-    }
+    internal uint Argb => ((uint)(_a * 255) << 24) | ((uint)_r << 16) | ((uint)_g << 8) | _b;
 
     /// <summary>
     /// Gets or sets the cyan value.
     /// </summary>
     public double C
     {
-        get { return _c; }
+        get => _c;
         set
         {
             if (value < 0)
@@ -553,7 +541,7 @@ public struct XColor
     /// </summary>
     public double M
     {
-        get { return _m; }
+        get => _m;
         set
         {
             if (value < 0)
@@ -571,7 +559,7 @@ public struct XColor
     /// </summary>
     public double Y
     {
-        get { return _y; }
+        get => _y;
         set
         {
             if (value < 0)
@@ -589,7 +577,7 @@ public struct XColor
     /// </summary>
     public double K
     {
-        get { return _k; }
+        get => _k;
         set
         {
             if (value < 0)
@@ -611,7 +599,7 @@ public struct XColor
 
         // ReSharper restore InconsistentNaming
     {
-        get { return _gs; }
+        get => _gs;
         set
         {
             if (value < 0)
@@ -634,11 +622,9 @@ public struct XColor
     /// </summary>
     public string RgbCmykG
     {
-        get
-        {
-            return string.Format (CultureInfo.InvariantCulture,
+        get =>
+            string.Format (CultureInfo.InvariantCulture,
                 "{0};{1};{2};{3};{4};{5};{6};{7};{8}", _r, _g, _b, _c, _m, _y, _k, _gs, _a);
-        }
         set
         {
             string[] values = value.Split (';');

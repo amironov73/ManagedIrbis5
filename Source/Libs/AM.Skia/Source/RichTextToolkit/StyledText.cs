@@ -209,9 +209,13 @@ public class StyledText
     /// </summary>
     /// <param name="offset">The position at which to insert the text</param>
     /// <param name="text">Text to add</param>
-    public void InsertText (int offset, StyledText text)
+    public void InsertText
+        (
+            int offset,
+            StyledText? text
+        )
     {
-        foreach (var sr in text.StyleRuns)
+        foreach (var sr in text!.StyleRuns)
         {
             InsertText (offset, sr.CodePoints, sr.Style);
             offset += sr.CodePoints.Length;
@@ -414,7 +418,7 @@ public class StyledText
     public void ApplyStyle (int position, int length, IStyle style)
     {
         // Check args
-        if (position < 0 || position + length > this.Length)
+        if (position < 0 || position + length > Length)
         {
             throw new ArgumentException ("Invalid range");
         }
@@ -431,7 +435,7 @@ public class StyledText
         }
 
         // Easy case when applying same style to entire text block
-        if (position == 0 && length == this.Length)
+        if (position == 0 && length == Length)
         {
             // Remove excess runs
             while (_styleRuns.Count > 1)

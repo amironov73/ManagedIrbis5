@@ -150,13 +150,12 @@ namespace PdfSharpCore.Pdf
         /// <summary>
         /// Tests whether all coordinate are zero.
         /// </summary>
-        public bool IsEmpty
-        {
-            // ReSharper disable CompareOfFloatsByEqualityOperator
-            get { return _x1 == 0 && _y1 == 0 && _x2 == 0 && _y2 == 0; }
+        public bool IsEmpty =>
 
-            // ReSharper restore CompareOfFloatsByEqualityOperator
-        }
+            // ReSharper disable CompareOfFloatsByEqualityOperator
+            _x1 == 0 && _y1 == 0 && _x2 == 0 && _y2 == 0;
+
+        // ReSharper restore CompareOfFloatsByEqualityOperator
 
         /// <summary>
         /// Tests whether the specified object is a PdfRectangle and has equal coordinates.
@@ -222,74 +221,50 @@ namespace PdfSharpCore.Pdf
         /// <summary>
         /// Gets or sets the x-coordinate of the first corner of this PdfRectangle.
         /// </summary>
-        public double X1
-        {
-            get { return _x1; }
-        }
+        public double X1 => _x1;
 
         readonly double _x1;
 
         /// <summary>
         /// Gets or sets the y-coordinate of the first corner of this PdfRectangle.
         /// </summary>
-        public double Y1
-        {
-            get { return _y1; }
-        }
+        public double Y1 => _y1;
 
         readonly double _y1;
 
         /// <summary>
         /// Gets or sets the x-coordinate of the second corner of this PdfRectangle.
         /// </summary>
-        public double X2
-        {
-            get { return _x2; }
-        }
+        public double X2 => _x2;
 
         readonly double _x2;
 
         /// <summary>
         /// Gets or sets the y-coordinate of the second corner of this PdfRectangle.
         /// </summary>
-        public double Y2
-        {
-            get { return _y2; }
-        }
+        public double Y2 => _y2;
 
         readonly double _y2;
 
         /// <summary>
         /// Gets X2 - X1.
         /// </summary>
-        public double Width
-        {
-            get { return _x2 - _x1; }
-        }
+        public double Width => _x2 - _x1;
 
         /// <summary>
         /// Gets Y2 - Y1.
         /// </summary>
-        public double Height
-        {
-            get { return _y2 - _y1; }
-        }
+        public double Height => _y2 - _y1;
 
         /// <summary>
         /// Gets or sets the coordinates of the first point of this PdfRectangle.
         /// </summary>
-        public XPoint Location
-        {
-            get { return new XPoint (_x1, _y1); }
-        }
+        public XPoint Location => new XPoint (_x1, _y1);
 
         /// <summary>
         /// Gets or sets the size of this PdfRectangle.
         /// </summary>
-        public XSize Size
-        {
-            get { return new XSize (_x2 - _x1, _y2 - _y1); }
-        }
+        public XSize Size => new XSize (_x2 - _x1, _y2 - _y1);
 
 #if GDI
         /// <summary>

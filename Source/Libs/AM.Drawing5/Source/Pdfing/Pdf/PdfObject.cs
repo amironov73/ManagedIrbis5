@@ -186,11 +186,10 @@ public abstract class PdfObject
     /// <summary>
     /// Indicates whether the object is an indirect object.
     /// </summary>
-    public bool IsIndirect
-    {
+    public bool IsIndirect =>
+
         // An object is an indirect object if and only if is has an indirect reference value.
-        get { return Reference != null; }
-    }
+        Reference != null;
 
     /// <summary>
     /// Gets the PdfInternals object of this document, that grants access to some internal structures

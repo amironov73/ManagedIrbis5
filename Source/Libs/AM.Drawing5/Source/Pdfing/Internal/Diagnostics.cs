@@ -37,8 +37,8 @@ namespace PdfSharpCore.Internal
     {
         public static NotImplementedBehaviour NotImplementedBehaviour
         {
-            get { return _notImplementedBehaviour; }
-            set { _notImplementedBehaviour = value; }
+            get => _notImplementedBehaviour;
+            set => _notImplementedBehaviour = value;
         }
         static NotImplementedBehaviour _notImplementedBehaviour;
     }

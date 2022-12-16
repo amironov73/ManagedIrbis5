@@ -141,7 +141,7 @@ public sealed class XPen
     /// </summary>
     public XColor Color
     {
-        get { return _color; }
+        get => _color;
         set
         {
             if (_immutable)
@@ -162,7 +162,7 @@ public sealed class XPen
     /// </summary>
     public double Width
     {
-        get { return _width; }
+        get => _width;
         set
         {
             if (_immutable)
@@ -182,7 +182,7 @@ public sealed class XPen
     /// </summary>
     public XLineJoin LineJoin
     {
-        get { return _lineJoin; }
+        get => _lineJoin;
         set
         {
             if (_immutable)
@@ -202,7 +202,7 @@ public sealed class XPen
     /// </summary>
     public XLineCap LineCap
     {
-        get { return _lineCap; }
+        get => _lineCap;
         set
         {
             if (_immutable)
@@ -222,7 +222,7 @@ public sealed class XPen
     /// </summary>
     public double MiterLimit
     {
-        get { return _miterLimit; }
+        get => _miterLimit;
         set
         {
             if (_immutable)
@@ -242,7 +242,7 @@ public sealed class XPen
     /// </summary>
     public XDashStyle DashStyle
     {
-        get { return _dashStyle; }
+        get => _dashStyle;
         set
         {
             if (_immutable)
@@ -262,7 +262,7 @@ public sealed class XPen
     /// </summary>
     public double DashOffset
     {
-        get { return _dashOffset; }
+        get => _dashOffset;
         set
         {
             if (_immutable)
@@ -325,7 +325,7 @@ public sealed class XPen
     /// </summary>
     public bool Overprint
     {
-        get { return _overprint; }
+        get => _overprint;
         set
         {
             if (_immutable)

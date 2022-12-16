@@ -4,12 +4,13 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
+// ReSharper disable CompareOfFloatsByEqualityOperator
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* TextShaper.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,7 +23,6 @@ using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 using AM.Skia.RichTextKit.Utils;
@@ -36,7 +36,8 @@ namespace AM.Skia.RichTextKit;
 /// <summary>
 /// Helper class for shaping text
 /// </summary>
-internal class TextShaper : IDisposable
+internal class TextShaper
+    : IDisposable
 {
     /// <summary>
     /// Cache of shapers for typefaces
@@ -78,7 +79,7 @@ internal class TextShaper : IDisposable
         {
             face.UnitsPerEm = typeface.UnitsPerEm;
 
-            _font = new HarfBuzzSharp.Font (face);
+            _font = new Font (face);
             _font.SetScale (overScale, overScale);
             _font.SetFunctionsOpenType();
         }
@@ -94,11 +95,11 @@ internal class TextShaper : IDisposable
             // a way to check if a font is fixed pitch.  For now
             // we just measure and `i` and a `w` and see if they're
             // the same width.
-            var widths = paint.GetGlyphWidths ("iw", out var rects);
+            var widths = paint.GetGlyphWidths ("iw", out _);
             _isFixedPitch = widths != null && widths.Length > 1 && widths[0] == widths[1];
             if (_isFixedPitch)
             {
-                _fixedCharacterWidth = widths[0];
+                _fixedCharacterWidth = widths![0];
             }
         }
     }
@@ -118,7 +119,7 @@ internal class TextShaper : IDisposable
     /// <summary>
     /// The HarfBuzz font for this shaper
     /// </summary>
-    private HarfBuzzSharp.Font _font;
+    private Font? _font;
 
     /// <summary>
     /// The typeface for this shaper
@@ -235,12 +236,12 @@ internal class TextShaper : IDisposable
 
         var widths = new float[1];
         var bounds = new SKRect[1];
-        font.GetGlyphWidths ((new ushort[] { glyph }).AsSpan(), widths.AsSpan(), bounds.AsSpan());
+        font.GetGlyphWidths (new[] { glyph }.AsSpan(), widths.AsSpan(), bounds.AsSpan());
 
         var r = new Result();
-        r.GlyphIndicies = bufferSet.GlyphIndicies.Add ((int)clusters.Length - 1, false);
-        r.GlyphPositions = bufferSet.GlyphPositions.Add ((int)clusters.Length - 1, false);
-        r.Clusters = bufferSet.Clusters.Add ((int)clusters.Length - 1, false);
+        r.GlyphIndicies = bufferSet.GlyphIndicies.Add (clusters.Length - 1, false);
+        r.GlyphPositions = bufferSet.GlyphPositions.Add (clusters.Length - 1, false);
+        r.Clusters = bufferSet.Clusters.Add (clusters.Length - 1, false);
         r.CodePointXCoords = bufferSet.CodePointXCoords.Add (codePoints.Length, false);
         r.CodePointXCoords.Fill (0);
 
@@ -286,7 +287,7 @@ internal class TextShaper : IDisposable
         // Work out if we need to force this to a fixed pitch and if
         // so the unscale character width we need to use
         float forceFixedPitchWidth = 0;
-        if (asFallbackFor != _typeface && asFallbackFor != null)
+        if (asFallbackFor != _typeface && asFallbackFor != null!)
         {
             var originalTypefaceShaper = ForTypeface (asFallbackFor);
             if (originalTypefaceShaper._isFixedPitch)
@@ -337,7 +338,7 @@ internal class TextShaper : IDisposable
             buffer.GuessSegmentProperties();
 
             // Shape it
-            _font.Shape (buffer);
+            _font!.Shape (buffer);
 
             // RTL?
             var rtl = buffer.Direction == Direction.RightToLeft;
@@ -359,9 +360,9 @@ internal class TextShaper : IDisposable
 
             // Create results and get buffes
             var r = new Result();
-            r.GlyphIndicies = bufferSet.GlyphIndicies.Add ((int)buffer.Length, false);
-            r.GlyphPositions = bufferSet.GlyphPositions.Add ((int)buffer.Length, false);
-            r.Clusters = bufferSet.Clusters.Add ((int)buffer.Length, false);
+            r.GlyphIndicies = bufferSet.GlyphIndicies.Add (buffer.Length, false);
+            r.GlyphPositions = bufferSet.GlyphPositions.Add (buffer.Length, false);
+            r.Clusters = bufferSet.Clusters.Add (buffer.Length, false);
             r.CodePointXCoords = bufferSet.CodePointXCoords.Add (codePoints.Length, false);
             r.CodePointXCoords.Fill (0);
 
@@ -382,8 +383,8 @@ internal class TextShaper : IDisposable
                 {
                     // First cluster, different cluster, or same cluster with lower x-coord
                     if (i == 0 ||
-                        (r.Clusters[i] != r.Clusters[i - 1]) ||
-                        (cursorX < r.CodePointXCoords[r.Clusters[i] - clusterAdjustment]))
+                        r.Clusters[i] != r.Clusters[i - 1] ||
+                        cursorX < r.CodePointXCoords[r.Clusters[i] - clusterAdjustment])
                     {
                         r.CodePointXCoords[r.Clusters[i] - clusterAdjustment] = cursorX;
                     }
@@ -449,8 +450,8 @@ internal class TextShaper : IDisposable
                 {
                     // First cluster, different cluster, or same cluster with lower x-coord
                     if (i == 0 ||
-                        (r.Clusters[i] != r.Clusters[i - 1]) ||
-                        (cursorX > r.CodePointXCoords[r.Clusters[i] - clusterAdjustment]))
+                        r.Clusters[i] != r.Clusters[i - 1] ||
+                        cursorX > r.CodePointXCoords[r.Clusters[i] - clusterAdjustment])
                     {
                         r.CodePointXCoords[r.Clusters[i] - clusterAdjustment] = cursorX;
                     }

@@ -70,16 +70,15 @@ public abstract class PdfAcroField
     /// <summary>
     /// Gets the field flags of this instance.
     /// </summary>
-    public PdfAcroFieldFlags Flags
-    {
+    public PdfAcroFieldFlags Flags =>
+
         // TODO: This entry is inheritable, thus the implementation is incorrect...
-        get { return (PdfAcroFieldFlags)Elements.GetInteger (Keys.Ff); }
-    }
+        (PdfAcroFieldFlags)Elements.GetInteger (Keys.Ff);
 
     internal PdfAcroFieldFlags SetFlags
     {
-        get { return (PdfAcroFieldFlags)Elements.GetInteger (Keys.Ff); }
-        set { Elements.SetInteger (Keys.Ff, (int)value); }
+        get => (PdfAcroFieldFlags)Elements.GetInteger (Keys.Ff);
+        set => Elements.SetInteger (Keys.Ff, (int)value);
     }
 
     /// <summary>
@@ -87,7 +86,7 @@ public abstract class PdfAcroField
     /// </summary>
     public virtual PdfItem Value
     {
-        get { return Elements[Keys.V]; }
+        get => Elements[Keys.V];
         set
         {
             if (ReadOnly)
@@ -111,7 +110,7 @@ public abstract class PdfAcroField
     /// </summary>
     public bool ReadOnly
     {
-        get { return (Flags & PdfAcroFieldFlags.ReadOnly) != 0; }
+        get => (Flags & PdfAcroFieldFlags.ReadOnly) != 0;
         set
         {
             if (value)
@@ -439,10 +438,7 @@ public abstract class PdfAcroField
         /// <summary>
         /// Gets the field with the specified name.
         /// </summary>
-        public PdfAcroField? this [string name]
-        {
-            get { return GetValue (name); }
-        }
+        public PdfAcroField? this [string name] => GetValue (name);
 
         internal PdfAcroField? GetValue (string name)
         {

@@ -69,10 +69,8 @@ namespace PdfSharpCore.Pdf
         /// <summary>
         /// Gets the value as unsigned integer.
         /// </summary>
-        public uint Value
-        {
-            get { return _value; }
-        }
+        public uint Value => _value;
+
         readonly uint _value;
 
         /// <summary>

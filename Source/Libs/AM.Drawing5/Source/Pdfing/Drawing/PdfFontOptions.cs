@@ -41,26 +41,18 @@ namespace PdfSharpCore.Drawing
         /// <summary>
         /// Gets a value indicating how the font is encoded.
         /// </summary>
-        public PdfFontEncoding FontEncoding
-        {
-            get { return _fontEncoding; }
-        }
+        public PdfFontEncoding FontEncoding => _fontEncoding;
+
         readonly PdfFontEncoding _fontEncoding;
 
         /// <summary>
         /// Gets the default options with WinAnsi encoding and always font embedding.
         /// </summary>
-        public static XPdfFontOptions WinAnsiDefault
-        {
-            get { return new XPdfFontOptions(PdfFontEncoding.WinAnsi); }
-        }
+        public static XPdfFontOptions WinAnsiDefault => new XPdfFontOptions(PdfFontEncoding.WinAnsi);
 
         /// <summary>
         /// Gets the default options with Unicode encoding and always font embedding.
         /// </summary>
-        public static XPdfFontOptions UnicodeDefault
-        {
-            get { return new XPdfFontOptions(PdfFontEncoding.Unicode); }
-        }
+        public static XPdfFontOptions UnicodeDefault => new XPdfFontOptions(PdfFontEncoding.Unicode);
     }
 }

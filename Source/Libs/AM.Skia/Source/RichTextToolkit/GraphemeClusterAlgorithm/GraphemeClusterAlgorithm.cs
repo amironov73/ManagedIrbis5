@@ -9,15 +9,13 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* GraphemeClusterAlgorithm.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 using AM.Skia.RichTextKit.Utils;
 
@@ -108,7 +106,7 @@ internal static class GraphemeClusterAlgorithm
         return pairTable[(int)b][(int)a] != 0;
     }
 
-    private static byte[][] pairTable = new byte[][]
+    private static byte[][] pairTable = new[]
     {
 //                          Any   CR   LF   Control   Extend   Regional_Indicator   Prepend   SpacingMark   L   V   T   LV   LVT   ExtPict   ZWJ   SOT   EOT   ExtPictZwg
         new byte[] { 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, }, // Any

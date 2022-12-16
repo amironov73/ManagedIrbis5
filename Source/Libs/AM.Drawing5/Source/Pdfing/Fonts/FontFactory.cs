@@ -188,10 +188,7 @@ internal static class FontFactory
     /// <summary>
     /// Gets a value indicating whether at least one font source was created.
     /// </summary>
-    public static bool HasFontSources
-    {
-        get { return FontSourcesByName.Count > 0; }
-    }
+    public static bool HasFontSources => FontSourcesByName.Count > 0;
 
     public static bool TryGetFontResolverInfoByTypefaceKey (string typeFaceKey, out FontResolverInfo? info)
     {

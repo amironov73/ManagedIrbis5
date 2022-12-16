@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* UndoJoinParagraphs.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,7 +23,8 @@ using AM.Skia.RichTextKit.Utils;
 
 namespace AM.Skia.RichTextKit.Editor.UndoUnits;
 
-internal class UndoJoinParagraphs : UndoUnit<TextDocument>
+internal class UndoJoinParagraphs
+    : UndoUnit<TextDocument>
 {
     public UndoJoinParagraphs (int paragraphIndex)
     {
@@ -40,7 +41,7 @@ internal class UndoJoinParagraphs : UndoUnit<TextDocument>
         _removedParagraph = secondPara;
 
         // Copy all text from the second paragraph
-        firstPara.TextBlock.AddText (secondPara.TextBlock);
+        firstPara.TextBlock!.AddText (secondPara.TextBlock!);
 
         // Remove the joined paragraph
         context._paragraphs.RemoveAt (_paragraphIndex + 1);
@@ -50,13 +51,13 @@ internal class UndoJoinParagraphs : UndoUnit<TextDocument>
     {
         // Delete the joined text from the first paragraph
         var firstPara = context._paragraphs[_paragraphIndex];
-        firstPara.TextBlock.DeleteText (_splitPoint, firstPara.TextBlock.Length - _splitPoint);
+        firstPara.TextBlock!.DeleteText (_splitPoint, firstPara.TextBlock.Length - _splitPoint);
 
         // Restore the split paragraph
-        context._paragraphs.Insert (_paragraphIndex + 1, _removedParagraph);
+        context._paragraphs.Insert (_paragraphIndex + 1, _removedParagraph!);
     }
 
     private int _paragraphIndex;
     private int _splitPoint;
-    private Paragraph _removedParagraph;
+    private Paragraph? _removedParagraph;
 }

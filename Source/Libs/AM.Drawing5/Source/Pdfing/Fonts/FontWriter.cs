@@ -72,8 +72,8 @@ internal class FontWriter
     /// </summary>
     public int Position
     {
-        get { return (int) _stream!.Position; }
-        set { _stream!.Position = value; }
+        get => (int) _stream!.Position;
+        set => _stream!.Position = value;
     }
 
     /// <summary>
@@ -178,10 +178,7 @@ internal class FontWriter
     /// <summary>
     /// Gets the underlying stream.
     /// </summary>
-    internal Stream Stream
-    {
-        get { return _stream!; }
-    }
+    internal Stream Stream => _stream!;
 
     private Stream? _stream;
 }

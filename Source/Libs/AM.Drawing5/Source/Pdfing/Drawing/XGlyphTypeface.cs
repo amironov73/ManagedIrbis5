@@ -251,10 +251,7 @@ internal sealed class XGlyphTypeface
         return ComputeKey (familyName, new FontResolvingOptions (FontHelper.CreateStyle (isBold, isItalic)));
     }
 
-    public string Key
-    {
-        get { return _key; }
-    }
+    public string Key => _key;
 
     readonly string _key;
 
@@ -263,10 +260,5 @@ internal sealed class XGlyphTypeface
     /// </summary>
 
     // ReSharper disable UnusedMember.Local
-    internal string DebuggerDisplay
-
-        // ReSharper restore UnusedMember.Local
-    {
-        get { return string.Format (CultureInfo.InvariantCulture, "{0} - {1} ({2})", FamilyName, StyleName, FaceName); }
-    }
+    internal string DebuggerDisplay => string.Format (CultureInfo.InvariantCulture, "{0} - {1} ({2})", FamilyName, StyleName, FaceName); // ReSharper restore UnusedMember.Local
 }

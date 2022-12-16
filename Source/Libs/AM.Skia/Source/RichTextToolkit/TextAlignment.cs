@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* TextAlignment.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -40,5 +40,5 @@ public enum TextAlignment
     /// Right aligns text <see cref="TextBlock.MaxWidth"/> unless not
     /// specified in which case it right aligns to the widest line in the text block.
     /// </summary>
-    Right,
+    Right
 }

@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* Slice.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,8 +20,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 #endregion
 
@@ -34,7 +32,8 @@ namespace AM.Skia.RichTextKit.Utils;
 /// </summary>
 /// <typeparam name="T">The array type</typeparam>
 [DebuggerDisplay ("Length = {Length}")]
-public struct Slice<T> : IEnumerable<T>, System.Collections.IEnumerable
+public struct Slice<T>
+    : IEnumerable<T>
 {
     /// <summary>
     /// Constructs a new slice covering the entire passed array.
@@ -78,7 +77,7 @@ public struct Slice<T> : IEnumerable<T>, System.Collections.IEnumerable
     /// </summary>
     public void Clear()
     {
-        System.Array.Clear (_array, _start, _length);
+        Array.Clear (_array, _start, _length);
     }
 
     /// <summary>
@@ -99,7 +98,7 @@ public struct Slice<T> : IEnumerable<T>, System.Collections.IEnumerable
     /// <param name="Source">The source data</param>
     public void Set (Slice<T> Source)
     {
-        if (Source.Length != this.Length)
+        if (Source.Length != Length)
         {
             throw new ArgumentException ("Slices must have the same length");
         }
@@ -163,7 +162,7 @@ public struct Slice<T> : IEnumerable<T>, System.Collections.IEnumerable
     public T[] ToArray()
     {
         var array = new T[_length];
-        System.Array.Copy (_array, _start, array, 0, _length);
+        Array.Copy (_array, _start, array, 0, _length);
         return array;
     }
 
@@ -206,7 +205,7 @@ public struct Slice<T> : IEnumerable<T>, System.Collections.IEnumerable
         var start = 0;
         for (var i = 0; i < Length; i++)
         {
-            if (this[i].Equals (delimiter))
+            if (this[i]!.Equals (delimiter))
             {
                 yield return SubSlice (start, i - start);
                 start = i + 1;
@@ -225,7 +224,7 @@ public struct Slice<T> : IEnumerable<T>, System.Collections.IEnumerable
     {
         for (var i = 0; i < Length; i++)
         {
-            if (this[i].Equals (value))
+            if (this[i]!.Equals (value))
             {
                 return i;
             }
@@ -261,7 +260,7 @@ public struct Slice<T> : IEnumerable<T>, System.Collections.IEnumerable
     {
         for (var i = 0; i < Length; i++)
         {
-            if (this[i].Equals (replace))
+            if (this[i]!.Equals (replace))
             {
                 this[i] = with;
             }

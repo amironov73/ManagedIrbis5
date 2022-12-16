@@ -9,10 +9,9 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* LineBreakClass.cs --
  * Ars Magna project, http://arsmagna.ru
  */
-
 
 namespace AM.Skia.RichTextKit;
 

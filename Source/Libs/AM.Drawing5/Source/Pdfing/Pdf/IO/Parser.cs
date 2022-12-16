@@ -97,10 +97,7 @@ internal sealed class Parser
         return _lexer.Position = position;
     }
 
-    public Symbol Symbol
-    {
-        get { return _lexer.Symbol; }
-    }
+    public Symbol Symbol => _lexer.Symbol;
 
     public PdfObjectID ReadObjectNumber (int position)
     {

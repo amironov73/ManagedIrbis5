@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* FontCache.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -108,6 +108,11 @@ public class FontCache
         _LetterDefinitions[character] = letterDefinition;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="text"></param>
+    /// <returns></returns>
     public bool PrepareLetterDefinitions (string text)
     {
         List<char> newChars = new List<char>();

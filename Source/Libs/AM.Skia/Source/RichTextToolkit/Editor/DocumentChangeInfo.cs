@@ -9,17 +9,9 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* DocumentChangeInfo.cs --
  * Ars Magna project, http://arsmagna.ru
  */
-
-#region Using directives
-
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-#endregion
 
 #nullable enable
 

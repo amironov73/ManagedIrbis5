@@ -76,7 +76,7 @@ public sealed class PdfComboBoxField
     // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     public override PdfItem Value //R080304
     {
-        get { return Elements[Keys.V]; }
+        get => Elements[Keys.V];
         set
         {
             if (ReadOnly)
@@ -137,8 +137,5 @@ public sealed class PdfComboBoxField
     /// <summary>
     /// Gets the KeysMeta of this dictionary type.
     /// </summary>
-    internal override DictionaryMeta Meta
-    {
-        get { return Keys.Meta; }
-    }
+    internal override DictionaryMeta Meta => Keys.Meta;
 }

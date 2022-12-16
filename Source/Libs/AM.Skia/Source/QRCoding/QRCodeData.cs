@@ -123,7 +123,7 @@ public class QRCodeData
         var modules = new Queue<bool>();
         foreach (var b in bytes)
         {
-            var bArr = new BitArray (new byte[] { b });
+            var bArr = new BitArray (new[] { b });
             for (int i = 7; i >= 0; i--)
             {
                 modules.Enqueue ((b & (1 << i)) != 0);

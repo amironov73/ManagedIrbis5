@@ -578,13 +578,14 @@ public abstract class UndoUnit<T>
     /// </summary>
     public UndoUnit()
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
     /// Constructs a new UndoUnit with a description
     /// </summary>
     /// <param name="description">The description of this unit</param>
-    public UndoUnit (string description)
+    public UndoUnit (string? description)
     {
         _description = description;
     }
@@ -654,14 +655,17 @@ public abstract class UndoUnit<T>
 /// into a single operation
 /// </summary>
 /// <typeparam name="T">The document context type</typeparam>
-public class UndoGroup<T> : UndoUnit<T>
+public class UndoGroup<T>
+    : UndoUnit<T>
 {
     /// <summary>
     /// Constructs a new UndoGroup with a description
     /// </summary>
     /// <param name="description">The description</param>
-    public UndoGroup (string description) : base (description)
+    public UndoGroup (string? description)
+        : base (description)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>

@@ -415,12 +415,10 @@ namespace PdfSharpCore.Drawing
         /// </summary>
         public XFillMode FillMode
         {
-            get { return _fillMode; }
-            set
-            {
-                _fillMode = value;
-                // Nothing to do.
-            }
+            get => _fillMode;
+            set => _fillMode = value;
+
+            // Nothing to do.
         }
 
         private XFillMode _fillMode;
@@ -483,10 +481,7 @@ namespace PdfSharpCore.Drawing
         /// <summary>
         /// Grants access to internal objects of this class.
         /// </summary>
-        public XGraphicsPathInternals Internals
-        {
-            get { return new XGraphicsPathInternals(this); }
-        }
+        public XGraphicsPathInternals Internals => new XGraphicsPathInternals(this);
 
         /// <summary>
         /// Gets access to underlying Core graphics path.

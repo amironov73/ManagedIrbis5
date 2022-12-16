@@ -8,8 +8,9 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
+// ReSharper disable VirtualMemberCallInConstructor
 
-/*
+/* TextParagraph.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -18,8 +19,6 @@
 using SkiaSharp;
 
 using System.Collections.Generic;
-
-using AM.Skia.RichTextKit.Utils;
 
 #endregion
 
@@ -57,7 +56,7 @@ internal class TextParagraph : Paragraph
         _textBlock.RenderWidth =
             owner.PageWidth
             - owner.MarginLeft - owner.MarginRight
-            - this.MarginLeft - this.MarginRight;
+            - MarginLeft - MarginRight;
 
         // For layout just need to set the appropriate layout width on the text block
         if (owner.LineWrap)
@@ -71,7 +70,7 @@ internal class TextParagraph : Paragraph
     }
 
     /// <inheritdoc />
-    public override void Paint (SKCanvas canvas, TextPaintOptions options) =>
+    public override void Paint (SKCanvas canvas, TextPaintOptions? options) =>
         _textBlock.Paint (canvas, new SKPoint (ContentXCoord, ContentYCoord), options);
 
     /// <inheritdoc />
@@ -108,7 +107,7 @@ internal class TextParagraph : Paragraph
     public override void CopyStyleFrom (Paragraph other)
     {
         base.CopyStyleFrom (other);
-        _textBlock.Alignment = other.TextBlock.Alignment;
+        _textBlock.Alignment = other.TextBlock!.Alignment;
         _textBlock.BaseDirection = other.TextBlock.BaseDirection;
     }
 

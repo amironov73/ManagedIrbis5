@@ -233,11 +233,11 @@ public class TextBlock
     {
         // Create a new text block with the same attributes as this one
         var other = new TextBlock();
-        other.Alignment = this.Alignment;
-        other.BaseDirection = this.BaseDirection;
-        other.MaxWidth = this.MaxWidth;
-        other.MaxHeight = this.MaxHeight;
-        other.MaxLines = this.MaxLines;
+        other.Alignment = Alignment;
+        other.BaseDirection = BaseDirection;
+        other.MaxWidth = MaxWidth;
+        other.MaxHeight = MaxHeight;
+        other.MaxLines = MaxLines;
 
         // Copy text to the new paragraph
         foreach (var subRun in _styleRuns.GetInterectingRuns (from, length))
@@ -475,7 +475,7 @@ public class TextBlock
         }
 
         // Clean up
-        ctx.PaintSelectionBackground.Dispose();
+        ctx.PaintSelectionBackground!.Dispose();
     }
 
     /// <summary>
@@ -883,7 +883,7 @@ public class TextBlock
         // Setup caret coordinates
         ci.CaretXCoord = ci.CodePointIndex < 0 ? 0 : fontRun.GetXCoordOfCodePointIndex (ci.CodePointIndex);
         ci.CaretRectangle = CalculateCaretRectangle (ci, fontRun);
-        ci.LineIndex = _lines.IndexOf (fontRun.Line);
+        ci.LineIndex = _lines.IndexOf (fontRun.Line!);
 
         return ci;
     }
@@ -901,12 +901,12 @@ public class TextBlock
         // Setup the basic rectangle
         var rect = new SKRect();
         rect.Left = ci.CaretXCoord;
-        rect.Top = fr.Line.YCoord + fr.Line.BaseLine + fr.Ascent;
+        rect.Top = fr.Line!.YCoord + fr.Line.BaseLine + fr.Ascent;
         rect.Right = rect.Left;
         rect.Bottom = fr.Line.YCoord + fr.Line.BaseLine + fr.Descent;
 
         // Apply slant if italic
-        if (fr.Style.FontItalic)
+        if (fr.Style!.FontItalic)
         {
             rect.Left -= rect.Height / 14;
             rect.Right = rect.Left + rect.Height / 5;
@@ -934,7 +934,7 @@ public class TextBlock
         }
 
         // Try to get the previous font run in this line
-        var lineRuns = fr.Line.Runs as List<FontRun>;
+        var lineRuns = fr.Line!.Runs as List<FontRun>;
         var index = lineRuns!.IndexOf (fr);
         if (index <= 0)
         {
@@ -1665,11 +1665,11 @@ public class TextBlock
                 if (fr.Direction != _resolvedBaseDirection)
                 {
                     // What is this a fallback for?
-                    var asFallbackFor = TypefaceFromStyle (fr.Style, ignoreFontVariants: false);
+                    var asFallbackFor = TypefaceFromStyle (fr.Style!, ignoreFontVariants: false);
 
                     // Create a new font run over the same text span but using the base direction
-                    _fontRuns[i] = CreateFontRun (fr.StyleRun, fr.CodePoints, _resolvedBaseDirection, fr.Style,
-                        fr.Typeface, asFallbackFor);
+                    _fontRuns[i] = CreateFontRun (fr.StyleRun!, fr.CodePoints, _resolvedBaseDirection, fr.Style!,
+                        fr.Typeface!, asFallbackFor);
                 }
             }
 
@@ -2022,14 +2022,14 @@ public class TextBlock
     private FontRun CreateEllipsisRun (FontRun basedOn)
     {
         // Get the type face
-        var typeface = TypefaceFromStyle (basedOn.Style, true);
+        var typeface = TypefaceFromStyle (basedOn.Style!, true);
 
         // Split into font fallback runs (there should only ever be just one)
         var fontRun = FontFallback.GetFontRuns (ellipsis.AsSlice(), typeface).Single();
 
         // Create the new run and mark is as a special run type for ellipsis
-        var fr = CreateFontRun (basedOn.StyleRun, ellipsis.SubSlice (fontRun.Start, fontRun.Length),
-            _resolvedBaseDirection, basedOn.Style, fontRun.Typeface, typeface);
+        var fr = CreateFontRun (basedOn.StyleRun!, ellipsis.SubSlice (fontRun.Start, fontRun.Length),
+            _resolvedBaseDirection, basedOn.Style!, fontRun.Typeface, typeface);
         fr.RunKind = FontRunKind.Ellipsis;
 
         // Done

@@ -89,10 +89,7 @@ namespace PdfSharpCore.Drawing
         /// <summary>
         /// Gets the name of the font family.
         /// </summary>
-        public string Name
-        {
-            get { return FamilyInternal.Name; }
-        }
+        public string Name => FamilyInternal.Name;
 
 #if true__
         public double LineSpacing

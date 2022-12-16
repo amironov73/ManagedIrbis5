@@ -2216,13 +2216,7 @@ public sealed class XGraphics : IDisposable
     /// Gets the PDF page that serves as drawing surface if PDF is rendered,
     /// or null, if no such object exists.
     /// </summary>
-    public PdfPage? PdfPage
-    {
-        get
-        {
-            return _renderer is XGraphicsPdfRenderer renderer ? renderer._page : null;
-        }
-    }
+    public PdfPage? PdfPage => _renderer is XGraphicsPdfRenderer renderer ? renderer._page : null;
 
     /// <summary>
     /// Provides access to internal data structures of the XGraphics class.

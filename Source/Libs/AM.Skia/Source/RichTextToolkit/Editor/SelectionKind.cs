@@ -9,17 +9,9 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* SelectionKind.cs --
  * Ars Magna project, http://arsmagna.ru
  */
-
-#region Using directives
-
-using SkiaSharp;
-
-#endregion
-
-#nullable enable
 
 namespace AM.Skia.RichTextKit.Editor;
 
@@ -51,5 +43,5 @@ public enum SelectionKind
     /// <summary>
     /// Select the entire document (ie: select all)
     /// </summary>
-    Document,
+    Document
 }

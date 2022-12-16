@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* UndoInsertParagraph.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,7 +23,8 @@ using AM.Skia.RichTextKit.Utils;
 
 namespace AM.Skia.RichTextKit.Editor.UndoUnits;
 
-internal class UndoInsertParagraph : UndoUnit<TextDocument>
+internal class UndoInsertParagraph 
+    : UndoUnit<TextDocument>
 {
     public UndoInsertParagraph (int index, Paragraph paragraph)
     {

@@ -364,8 +364,8 @@ public sealed class PdfCheckBoxField : PdfButtonField
     /// The default value is "/Yes".
     public string CheckedName
     {
-        get { return _checkedName; }
-        set { _checkedName = value; }
+        get => _checkedName;
+        set => _checkedName = value;
     }
 
     string _checkedName = "/Yes";
@@ -376,8 +376,8 @@ public sealed class PdfCheckBoxField : PdfButtonField
     /// </summary>
     public string UncheckedName
     {
-        get { return _uncheckedName; }
-        set { _uncheckedName = value; }
+        get => _uncheckedName;
+        set => _uncheckedName = value;
     }
 
     string _uncheckedName = "/Off";
@@ -398,10 +398,7 @@ public sealed class PdfCheckBoxField : PdfButtonField
         /// <summary>
         /// Gets the KeysMeta for these keys.
         /// </summary>
-        internal static DictionaryMeta Meta
-        {
-            get { return _meta ?? (_meta = CreateMeta (typeof (Keys))); }
-        }
+        internal static DictionaryMeta Meta => _meta ?? (_meta = CreateMeta (typeof (Keys)));
 
         static DictionaryMeta _meta;
     }
@@ -409,8 +406,5 @@ public sealed class PdfCheckBoxField : PdfButtonField
     /// <summary>
     /// Gets the KeysMeta of this dictionary type.
     /// </summary>
-    internal override DictionaryMeta Meta
-    {
-        get { return Keys.Meta; }
-    }
+    internal override DictionaryMeta Meta => Keys.Meta;
 }

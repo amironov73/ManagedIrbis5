@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* FontFallback.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 

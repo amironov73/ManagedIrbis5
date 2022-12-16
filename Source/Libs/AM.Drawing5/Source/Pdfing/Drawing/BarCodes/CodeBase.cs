@@ -79,7 +79,7 @@ public abstract class CodeBase
     /// </summary>
     public string Text
     {
-        get { return _text; }
+        get => _text;
         set
         {
             CheckCode (value);

@@ -173,10 +173,8 @@ namespace PdfSharpCore.Drawing
         /// <summary>
         /// Gets the owning document.
         /// </summary>
-        internal PdfDocument Owner
-        {
-            get { return _document; }
-        }
+        internal PdfDocument Owner => _document;
+
         PdfDocument _document;
 
         /// <summary>
@@ -195,90 +193,76 @@ namespace PdfSharpCore.Drawing
         /// <summary>
         /// Gets a value indicating whether this instance is a template.
         /// </summary>
-        internal bool IsTemplate
-        {
-            get { return _formState != FormState.NotATemplate; }
-        }
+        internal bool IsTemplate => _formState != FormState.NotATemplate;
+
         internal FormState _formState;
 
         /// <summary>
         /// Get the width in point of this image.
         /// </summary>
-        public override double PointWidth
-        {
+        public override double PointWidth =>
+
             //get { return templateSize.width; }
-            get { return _viewBox.Width; }
-        }
+            _viewBox.Width;
 
         /// <summary>
         /// Get the height in point of this image.
         /// </summary>
-        public override double PointHeight
-        {
+        public override double PointHeight =>
+
             //get { return templateSize.height; }
-            get { return _viewBox.Height; }
-        }
+            _viewBox.Height;
 
         /// <summary>
         /// Get the width of the page identified by the property PageNumber.
         /// </summary>
-        public override int PixelWidth
-        {
+        public override int PixelWidth =>
+
             //get { return (int)templateSize.width; }
-            get { return (int)_viewBox.Width; }
-        }
+            (int)_viewBox.Width;
 
         /// <summary>
         /// Get the height of the page identified by the property PageNumber.
         /// </summary>
-        public override int PixelHeight
-        {
+        public override int PixelHeight =>
+
             //get { return (int)templateSize.height; }
-            get { return (int)_viewBox.Height; }
-        }
+            (int)_viewBox.Height;
 
         /// <summary>
         /// Get the size of the page identified by the property PageNumber.
         /// </summary>
-        public override XSize Size
-        {
+        public override XSize Size =>
+
             //get { return templateSize; }
-            get { return _viewBox.Size; }
-        }
+            _viewBox.Size;
+
         //XSize templateSize;
 
         /// <summary>
         /// Gets the view box of the form.
         /// </summary>
-        public XRect ViewBox
-        {
-            get { return _viewBox; }
-        }
+        public XRect ViewBox => _viewBox;
+
         XRect _viewBox;
 
         /// <summary>
         /// Gets 72, the horizontal resolution by design of a form object.
         /// </summary>
-        public override double HorizontalResolution
-        {
-            get { return 72; }
-        }
+        public override double HorizontalResolution => 72;
 
         /// <summary>
         /// Gets 72 always, the vertical resolution by design of a form object.
         /// </summary>
-        public override double VerticalResolution
-        {
-            get { return 72; }
-        }
+        public override double VerticalResolution => 72;
 
         /// <summary>
         /// Gets or sets the bounding box.
         /// </summary>
         public XRect BoundingBox
         {
-            get { return _boundingBox; }
-            set { _boundingBox = value; }  // TODO: pdfForm = null
+            get => _boundingBox;
+            set => _boundingBox = value; // TODO: pdfForm = null
         }
         XRect _boundingBox;
 
@@ -287,7 +271,7 @@ namespace PdfSharpCore.Drawing
         /// </summary>
         public virtual XMatrix Transform
         {
-            get { return _transform; }
+            get => _transform;
             set
             {
                 if (_formState == FormState.Finished)
@@ -313,10 +297,7 @@ namespace PdfSharpCore.Drawing
         /// <summary>
         /// Implements the interface because the primary function is internal.
         /// </summary>
-        PdfResources IContentStream.Resources
-        {
-            get { return Resources; }
-        }
+        PdfResources IContentStream.Resources => Resources;
 
         /// <summary>
         /// Gets the resource name of the specified font within this form.

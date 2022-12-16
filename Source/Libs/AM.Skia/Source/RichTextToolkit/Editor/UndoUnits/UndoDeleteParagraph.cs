@@ -39,9 +39,9 @@ internal class UndoDeleteParagraph
 
     public override void Undo (TextDocument context)
     {
-        context._paragraphs.Insert (_index, _paragraph);
+        context._paragraphs.Insert (_index, _paragraph!);
     }
 
     private int _index;
-    private Paragraph _paragraph;
+    private Paragraph? _paragraph;
 }

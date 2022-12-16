@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* UndoInsertText.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,9 +23,15 @@ using AM.Skia.RichTextKit.Utils;
 
 namespace AM.Skia.RichTextKit.Editor.UndoUnits;
 
-internal class UndoInsertText : UndoUnit<TextDocument>
+internal class UndoInsertText
+    : UndoUnit<TextDocument>
 {
-    public UndoInsertText (TextBlock textBlock, int offset, StyledText text)
+    public UndoInsertText
+        (
+            TextBlock textBlock,
+            int offset,
+            StyledText text
+        )
     {
         _textBlock = textBlock;
         _offset = offset;
@@ -84,5 +90,5 @@ internal class UndoInsertText : UndoUnit<TextDocument>
     private TextBlock _textBlock;
     private int _offset;
     private int _length;
-    private StyledText _text;
+    private StyledText? _text;
 }

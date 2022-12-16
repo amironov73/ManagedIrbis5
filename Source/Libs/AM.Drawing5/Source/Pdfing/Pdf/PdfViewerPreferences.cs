@@ -46,72 +46,72 @@ namespace PdfSharpCore.Pdf
         { }
 
         /// <summary>
-        /// Gets or sets a value indicating whether to hide the viewer applicationís tool
+        /// Gets or sets a value indicating whether to hide the viewer application‚Äôs tool
         /// bars when the document is active.
         /// </summary>
         public bool HideToolbar
         {
-            get { return Elements.GetBoolean(Keys.HideToolbar); }
-            set { Elements.SetBoolean(Keys.HideToolbar, value); }
+            get => Elements.GetBoolean(Keys.HideToolbar);
+            set => Elements.SetBoolean(Keys.HideToolbar, value);
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether to hide the viewer applicationís
+        /// Gets or sets a value indicating whether to hide the viewer application‚Äôs
         /// menu bar when the document is active.
         /// </summary>
         public bool HideMenubar
         {
-            get { return Elements.GetBoolean(Keys.HideMenubar); }
-            set { Elements.SetBoolean(Keys.HideMenubar, value); }
+            get => Elements.GetBoolean(Keys.HideMenubar);
+            set => Elements.SetBoolean(Keys.HideMenubar, value);
         }
 
         /// <summary>
         /// Gets or sets a value indicating whether to hide user interface elements in
-        /// the documentís window (such as scroll bars and navigation controls),
-        /// leaving only the documentís contents displayed.
+        /// the document‚Äôs window (such as scroll bars and navigation controls),
+        /// leaving only the document‚Äôs contents displayed.
         /// </summary>
         public bool HideWindowUI
         {
-            get { return Elements.GetBoolean(Keys.HideWindowUI); }
-            set { Elements.SetBoolean(Keys.HideWindowUI, value); }
+            get => Elements.GetBoolean(Keys.HideWindowUI);
+            set => Elements.SetBoolean(Keys.HideWindowUI, value);
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether to resize the documentís window to
+        /// Gets or sets a value indicating whether to resize the document‚Äôs window to
         /// fit the size of the first displayed page.
         /// </summary>
         public bool FitWindow
         {
-            get { return Elements.GetBoolean(Keys.FitWindow); }
-            set { Elements.SetBoolean(Keys.FitWindow, value); }
+            get => Elements.GetBoolean(Keys.FitWindow);
+            set => Elements.SetBoolean(Keys.FitWindow, value);
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether to position the documentís window
+        /// Gets or sets a value indicating whether to position the document‚Äôs window
         /// in the center of the screen.
         /// </summary>
         public bool CenterWindow
         {
-            get { return Elements.GetBoolean(Keys.CenterWindow); }
-            set { Elements.SetBoolean(Keys.CenterWindow, value); }
+            get => Elements.GetBoolean(Keys.CenterWindow);
+            set => Elements.SetBoolean(Keys.CenterWindow, value);
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the windowís title bar
+        /// Gets or sets a value indicating whether the window‚Äôs title bar
         /// should display the document title taken from the Title entry of the document
         /// information dictionary. If false, the title bar should instead display the name
         /// of the PDF file containing the document.
         /// </summary>
         public bool DisplayDocTitle
         {
-            get { return Elements.GetBoolean(Keys.DisplayDocTitle); }
-            set { Elements.SetBoolean(Keys.DisplayDocTitle, value); }
+            get => Elements.GetBoolean(Keys.DisplayDocTitle);
+            set => Elements.SetBoolean(Keys.DisplayDocTitle, value);
         }
 
         /// <summary>
         /// The predominant reading order for text: LeftToRight or RightToLeft 
         /// (including vertical writing systems, such as Chinese, Japanese, and Korean).
-        /// This entry has no direct effect on the documentís contents or page numbering
+        /// This entry has no direct effect on the document‚Äôs contents or page numbering
         /// but can be used to determine the relative positioning of pages when displayed 
         /// side by side or printed n-up. Default value: LeftToRight.
         /// </summary>
@@ -155,14 +155,14 @@ namespace PdfSharpCore.Pdf
         internal sealed class Keys : KeysBase
         {
             /// <summary>
-            /// (Optional) A flag specifying whether to hide the viewer applicationís tool
+            /// (Optional) A flag specifying whether to hide the viewer application‚Äôs tool
             ///  bars when the document is active. Default value: false.
             /// </summary>
             [KeyInfo(KeyType.Boolean | KeyType.Optional)]
             public const string HideToolbar = "/HideToolbar";
 
             /// <summary>
-            /// (Optional) A flag specifying whether to hide the viewer applicationís
+            /// (Optional) A flag specifying whether to hide the viewer application‚Äôs
             /// menu bar when the document is active. Default value: false.
             /// </summary>
             [KeyInfo(KeyType.Boolean | KeyType.Optional)]
@@ -170,28 +170,28 @@ namespace PdfSharpCore.Pdf
 
             /// <summary>
             /// (Optional) A flag specifying whether to hide user interface elements in
-            ///  the documentís window (such as scroll bars and navigation controls),
-            ///  leaving only the documentís contents displayed. Default value: false.
+            ///  the document‚Äôs window (such as scroll bars and navigation controls),
+            ///  leaving only the document‚Äôs contents displayed. Default value: false.
             /// </summary>
             [KeyInfo(KeyType.Boolean | KeyType.Optional)]
             public const string HideWindowUI = "/HideWindowUI";
 
             /// <summary>
-            /// (Optional) A flag specifying whether to resize the documentís window to
+            /// (Optional) A flag specifying whether to resize the document‚Äôs window to
             /// fit the size of the first displayed page. Default value: false.
             /// </summary>
             [KeyInfo(KeyType.Boolean | KeyType.Optional)]
             public const string FitWindow = "/FitWindow";
 
             /// <summary>
-            /// (Optional) A flag specifying whether to position the documentís window
+            /// (Optional) A flag specifying whether to position the document‚Äôs window
             /// in the center of the screen. Default value: false.
             /// </summary>
             [KeyInfo(KeyType.Boolean | KeyType.Optional)]
             public const string CenterWindow = "/CenterWindow";
 
             /// <summary>
-            /// (Optional; PDF 1.4) A flag specifying whether the windowís title bar
+            /// (Optional; PDF 1.4) A flag specifying whether the window‚Äôs title bar
             /// should display the document title taken from the Title entry of the document
             /// information dictionary. If false, the title bar should instead display the name
             /// of the PDF file containing the document. Default value: false.
@@ -200,7 +200,7 @@ namespace PdfSharpCore.Pdf
             public const string DisplayDocTitle = "/DisplayDocTitle";
 
             /// <summary>
-            /// (Optional) The documentís page mode, specifying how to display the document on 
+            /// (Optional) The document‚Äôs page mode, specifying how to display the document on 
             /// exiting full-screen mode:
             ///   UseNone     Neither document outline nor thumbnail images visible
             ///   UseOutlines Document outline visible
@@ -216,7 +216,7 @@ namespace PdfSharpCore.Pdf
             /// (Optional; PDF 1.3) The predominant reading order for text:
             ///   L2R  Left to right
             ///   R2L  Right to left (including vertical writing systems, such as Chinese, Japanese, and Korean)
-            /// This entry has no direct effect on the documentís contents or page numbering
+            /// This entry has no direct effect on the document‚Äôs contents or page numbering
             /// but can be used to determine the relative positioning of pages when displayed 
             /// side by side or printed n-up. Default value: L2R.
             /// </summary>
@@ -230,7 +230,7 @@ namespace PdfSharpCore.Pdf
             /// boundary is not defined in the page object, its default value is used.
             /// Default value: CropBox.
             /// Note: This entry is intended primarily for use by prepress applications that
-            /// interpret or manipulate the page boundaries as described in Section 10.10.1, ìPage Boundaries.î
+            /// interpret or manipulate the page boundaries as described in Section 10.10.1, ‚ÄúPage Boundaries.‚Äù
             /// Most PDF consumer applications disregard it.
             /// </summary>
             [KeyInfo(KeyType.Name | KeyType.Optional)]
@@ -243,7 +243,7 @@ namespace PdfSharpCore.Pdf
             /// boundary is not defined in the page object, its default value is used.
             /// Default value: CropBox.
             /// Note: This entry is intended primarily for use by prepress applications that
-            /// interpret or manipulate the page boundaries as described in Section 10.10.1, ìPage Boundaries.î
+            /// interpret or manipulate the page boundaries as described in Section 10.10.1, ‚ÄúPage Boundaries.‚Äù
             /// Most PDF consumer applications disregard it.
             /// </summary>
             [KeyInfo(KeyType.Name | KeyType.Optional)]
@@ -256,7 +256,7 @@ namespace PdfSharpCore.Pdf
             /// defined in the page object, its default value is used.
             /// Default value: CropBox.
             /// Note: This entry is intended primarily for use by prepress applications that
-            /// interpret or manipulate the page boundaries as described in Section 10.10.1, ìPage Boundaries.î
+            /// interpret or manipulate the page boundaries as described in Section 10.10.1, ‚ÄúPage Boundaries.‚Äù
             /// Most PDF consumer applications disregard it.
             /// </summary>
             [KeyInfo(KeyType.Name | KeyType.Optional)]
@@ -290,19 +290,14 @@ namespace PdfSharpCore.Pdf
             /// <summary>
             /// Gets the KeysMeta for these keys.
             /// </summary>
-            public static DictionaryMeta Meta
-            {
-                get { return _meta ?? (_meta = CreateMeta(typeof(Keys))); }
-            }
+            public static DictionaryMeta Meta => _meta ?? (_meta = CreateMeta(typeof(Keys)));
+
             static DictionaryMeta _meta;
         }
 
         /// <summary>
         /// Gets the KeysMeta of this dictionary type.
         /// </summary>
-        internal override DictionaryMeta Meta
-        {
-            get { return Keys.Meta; }
-        }
+        internal override DictionaryMeta Meta => Keys.Meta;
     }
 }

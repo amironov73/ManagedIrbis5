@@ -6,10 +6,11 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable LocalizableElement
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* TextRenderer.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -34,18 +35,15 @@ public static class TextRenderer
     private static readonly string[] NewLineCharacters = new[]
         { Environment.NewLine, UnicodeCharacters.NewLine.ToString(), UnicodeCharacters.CarriageReturn.ToString() };
 
-    private static FontCache FontCache;
+    private static FontCache? FontCache;
     private static readonly SKPaint TextPaint = new ();
 
-    private static float LineHeight
-    {
-        get => TextPaint.FontMetrics.Descent - TextPaint.FontMetrics.Ascent;
-    }
+    private static float LineHeight => TextPaint.FontMetrics.Descent - TextPaint.FontMetrics.Ascent;
 
     private static FontStyle TextStyle;
-    private static string Text;
+    private static string? Text;
     private static TextFormatFlags Flags;
-    private static TextPaintOptions PaintOptions;
+    private static TextPaintOptions? PaintOptions;
     private static float MaxLineWidth;
     private static SKRect Bounds = SKRect.Empty;
 
@@ -97,15 +95,9 @@ public static class TextRenderer
         }
     }
 
-    private static bool EnableWrap
-    {
-        get => (Flags & (TextFormatFlags.NoClipping | TextFormatFlags.SingleLine)) == 0;
-    }
+    private static bool EnableWrap => (Flags & (TextFormatFlags.NoClipping | TextFormatFlags.SingleLine)) == 0;
 
-    private static bool LineBreakWithoutSpaces
-    {
-        get => (Flags & TextFormatFlags.WordBreak) == 0;
-    }
+    private static bool LineBreakWithoutSpaces => (Flags & TextFormatFlags.WordBreak) == 0;
 
     private static int NumberOfLines;
     private static float TextDesiredHeight;
@@ -173,20 +165,20 @@ public static class TextRenderer
                 break;
             }
 
-            if (!FontCache.GetLetterDefinitionForChar (character, out var letterDef))
+            if (!FontCache!.GetLetterDefinitionForChar (character, out var letterDef))
             {
                 break;
             }
 
             if (MaxLineWidth > 0)
             {
-                if (nextLetterX + letterDef.AdvanceX > MaxLineWidth)
+                if (nextLetterX + letterDef!.AdvanceX > MaxLineWidth)
                 {
                     break;
                 }
             }
 
-            nextLetterX += letterDef.AdvanceX;
+            nextLetterX += letterDef!.AdvanceX;
 
             length++;
         }
@@ -208,8 +200,8 @@ public static class TextRenderer
 
         LettersInfo[letterIndex].LineIndex = lineIndex;
         LettersInfo[letterIndex].Character = character;
-        LettersInfo[letterIndex].Valid = FontCache.GetLetterDefinitionForChar (character, out var letterDef) &&
-                                         letterDef.ValidDefinition;
+        LettersInfo[letterIndex].Valid = FontCache!.GetLetterDefinitionForChar (character, out var letterDef) &&
+                                         letterDef!.ValidDefinition;
         LettersInfo[letterIndex].PositionX = point.X;
         LettersInfo[letterIndex].PositionY = point.Y;
     }
@@ -237,14 +229,14 @@ public static class TextRenderer
 
     private static void MultilineTextWrap (GetFirstCharOrWordLength nextTokenLength)
     {
-        var textLength = Text.Length;
+        var textLength = Text!.Length;
         var lineIndex = 0;
         float nextTokenX = 0;
         float nextTokenY = 0;
         float longestLine = 0;
         float letterRight = 0;
         float nextWhitespaceWidth = 0;
-        FontLetterDefinition letterDef;
+        FontLetterDefinition? letterDef;
         var letterPosition = new SKPoint();
         var nextChangeSize = true;
 
@@ -290,7 +282,7 @@ public static class TextRenderer
                     continue;
                 }
 
-                if (!FontCache.GetLetterDefinitionForChar (character, out letterDef))
+                if (!FontCache!.GetLetterDefinitionForChar (character, out letterDef))
                 {
                     RecordPlaceholderInfo (letterIndex, character);
                     Console.WriteLine (
@@ -298,7 +290,7 @@ public static class TextRenderer
                     continue;
                 }
 
-                if (EnableWrap && MaxLineWidth > 0 && nextTokenX > 0 && nextLetterX + letterDef.AdvanceX > MaxLineWidth
+                if (EnableWrap && MaxLineWidth > 0 && nextTokenX > 0 && nextLetterX + letterDef!.AdvanceX > MaxLineWidth
                     && !Utils.IsUnicodeSpace (character) && nextChangeSize)
                 {
                     LinesWidth.Add (letterRight - whitespaceWidth);
@@ -320,7 +312,7 @@ public static class TextRenderer
 
                 if (nextChangeSize)
                 {
-                    var newLetterWidth = letterDef.AdvanceX;
+                    var newLetterWidth = letterDef!.AdvanceX;
 
                     nextLetterX += newLetterWidth;
                     tokenRight = nextLetterX;
@@ -409,7 +401,7 @@ public static class TextRenderer
 
     private static void ComputeLetterPositionInBounds (ref SKRect bounds)
     {
-        for (var i = 0; i < Text.Length; i++)
+        for (var i = 0; i < Text!.Length; i++)
         {
             var letterInfo = LettersInfo[i];
 
@@ -443,7 +435,7 @@ public static class TextRenderer
             return;
         }
 
-        FontCache.PrepareLetterDefinitions (Text);
+        FontCache!.PrepareLetterDefinitions (Text);
 
         TextDesiredHeight = 0;
         LinesWidth.Clear();
@@ -458,16 +450,37 @@ public static class TextRenderer
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="text"></param>
+    /// <param name="font"></param>
+    /// <returns></returns>
     public static SKSize MeasureText (string text, Font font)
     {
         return MeasureText (text, font, 0, TextFormatFlags.Default);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="text"></param>
+    /// <param name="font"></param>
+    /// <param name="maxLineWidth"></param>
+    /// <returns></returns>
     public static SKSize MeasureText (string text, Font font, float maxLineWidth)
     {
         return MeasureText (text, font, maxLineWidth, TextFormatFlags.Default);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="text"></param>
+    /// <param name="font"></param>
+    /// <param name="maxLineWidth"></param>
+    /// <param name="flags"></param>
+    /// <returns></returns>
     public static SKSize MeasureText (string text, Font font, float maxLineWidth, TextFormatFlags flags)
     {
         Text = text;
@@ -500,13 +513,13 @@ public static class TextRenderer
         var pos1 = new SKPoint();
         var pos2 = new SKPoint();
 
-        if (PaintOptions.CursorPosition == Text.Length)
+        if (PaintOptions.CursorPosition == Text!.Length)
         {
             var letterInfo = LettersInfo[PaintOptions.CursorPosition.Value - 1];
-            FontLetterDefinition letterDef;
-            FontCache.GetLetterDefinitionForChar (letterInfo.Character, out letterDef);
+            FontLetterDefinition? letterDef;
+            FontCache!.GetLetterDefinitionForChar (letterInfo.Character, out letterDef);
 
-            pos1.X = letterInfo.PositionX + letterDef.AdvanceX;
+            pos1.X = letterInfo.PositionX + letterDef!.AdvanceX;
             pos1.Y = letterInfo.PositionY;
             pos2.X = pos1.X;
             pos2.Y = letterInfo.PositionY + LineHeight;
@@ -523,8 +536,13 @@ public static class TextRenderer
         canvas.DrawLine (pos1, pos2, TextPaint);
     }
 
-    private static void DrawSelectionByStartEndLetter (SKCanvas canvas, LetterInfo startLetter, LetterInfo endLetter,
-        bool afterEndLetter = false)
+    private static void DrawSelectionByStartEndLetter
+        (
+            SKCanvas canvas,
+            LetterInfo? startLetter,
+            LetterInfo? endLetter,
+            bool afterEndLetter = false
+        )
     {
         if (startLetter == null || endLetter == null)
         {
@@ -548,9 +566,9 @@ public static class TextRenderer
         if (afterEndLetter)
         {
             float endLetterAdvanceX = 0;
-            if (FontCache.GetLetterDefinitionForChar (endLetter.Character, out var letterDef))
+            if (FontCache!.GetLetterDefinitionForChar (endLetter.Character, out var letterDef))
             {
-                endLetterAdvanceX = letterDef.AdvanceX;
+                endLetterAdvanceX = letterDef!.AdvanceX;
             }
 
             endPosition.X += endLetterAdvanceX;
@@ -559,9 +577,12 @@ public static class TextRenderer
         canvas.DrawRect (startPosition.X, startPosition.Y, endPosition.X - startPosition.X, LineHeight, TextPaint);
     }
 
-    private static LetterInfo EnsureValidLetter (int selectionIndex)
+    private static LetterInfo? EnsureValidLetter
+        (
+            int selectionIndex
+        )
     {
-        if (selectionIndex == Text.Length)
+        if (selectionIndex == Text!.Length)
         {
             return null;
         }
@@ -588,7 +609,10 @@ public static class TextRenderer
         return null;
     }
 
-    private static LetterInfo EnsureValidEndLetter (int selectionIndex)
+    private static LetterInfo? EnsureValidEndLetter
+        (
+            int selectionIndex
+        )
     {
         var letterInfo = LettersInfo[selectionIndex];
 
@@ -630,13 +654,13 @@ public static class TextRenderer
         var endLetter = EnsureValidLetter (PaintOptions.SelectionEnd.Value);
 
         var afterEndLetter = false;
-        if (PaintOptions.SelectionEnd.Value == Text.Length)
+        if (PaintOptions.SelectionEnd.Value == Text!.Length)
         {
             afterEndLetter = true;
             endLetter = EnsureValidEndLetter (PaintOptions.SelectionEnd.Value - 1);
         }
 
-        if (startLetter.LineIndex == endLetter.LineIndex)
+        if (startLetter!.LineIndex == endLetter!.LineIndex)
         {
             DrawSelectionByStartEndLetter (canvas, startLetter, endLetter, afterEndLetter);
             return true;
@@ -687,7 +711,7 @@ public static class TextRenderer
 
     private static void DrawToCanvas (SKCanvas canvas, ref SKColor foreColor)
     {
-        var glyphPositions = new SKPoint[Text.Length];
+        var glyphPositions = new SKPoint[Text!.Length];
 
         var drawSelection = DrawSelectionIfNeed (canvas);
 
@@ -711,7 +735,7 @@ public static class TextRenderer
 
                 // X and Y coordinates passed to the DrawText method specify the left side of the text at the baseline.
                 // So we need move Y with a ascender.
-                var realPosY = letterInfo.PositionY + FontCache.FontAscender;
+                var realPosY = letterInfo.PositionY + FontCache!.FontAscender;
                 glyphPositions[i] = new SKPoint (letterInfo.PositionX, realPosY);
 
                 if (TextStyle == FontStyle.Underline || TextStyle == FontStyle.Strikeout)
@@ -819,8 +843,23 @@ public static class TextRenderer
         DrawText (canvas, text, font, bounds, foreColor, flags, options);
     }
 
-    public static SKPoint GetCursorDrawPosition (string text, Font font, SKRect bounds, TextFormatFlags flags,
-        int cursorPosition)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="text"></param>
+    /// <param name="font"></param>
+    /// <param name="bounds"></param>
+    /// <param name="flags"></param>
+    /// <param name="cursorPosition"></param>
+    /// <returns></returns>
+    public static SKPoint GetCursorDrawPosition
+        (
+            string text,
+            Font font,
+            SKRect bounds,
+            TextFormatFlags flags,
+            int cursorPosition
+        )
     {
         if (string.IsNullOrEmpty (text))
         {
@@ -843,8 +882,8 @@ public static class TextRenderer
             return new SKPoint (bounds.Left, bounds.Top);
         }
 
-        LetterInfo letterInfo;
-        FontLetterDefinition letterDef;
+        LetterInfo? letterInfo;
+        FontLetterDefinition? letterDef;
         var pos = SKPoint.Empty;
 
         if (cursorPosition >= Text.Length)
@@ -858,8 +897,8 @@ public static class TextRenderer
                 return new SKPoint (bounds.Left, bounds.Top);
             }
 
-            FontCache.GetLetterDefinitionForChar (letterInfo.Character, out letterDef);
-            pos.X = letterInfo.PositionX + letterDef.AdvanceX;
+            FontCache!.GetLetterDefinitionForChar (letterInfo.Character, out letterDef);
+            pos.X = letterInfo.PositionX + letterDef!.AdvanceX;
             pos.Y = letterInfo.PositionY;
 
             return pos;
@@ -872,20 +911,53 @@ public static class TextRenderer
             return new SKPoint (bounds.Left, bounds.Top);
         }
 
-        FontCache.GetLetterDefinitionForChar (letterInfo.Character, out letterDef);
+        FontCache!.GetLetterDefinitionForChar (letterInfo.Character, out letterDef);
         pos.X = letterInfo.PositionX;
         pos.Y = letterInfo.PositionY;
 
         return pos;
     }
 
-    public static int GetCursorFromPoint (string text, Font font, SKRect bounds, TextFormatFlags flags, SKPoint point)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="text"></param>
+    /// <param name="font"></param>
+    /// <param name="bounds"></param>
+    /// <param name="flags"></param>
+    /// <param name="point"></param>
+    /// <returns></returns>
+    public static int GetCursorFromPoint
+        (
+            string text,
+            Font font,
+            SKRect bounds,
+            TextFormatFlags flags,
+            SKPoint point
+        )
     {
-        return GetCursorFromPoint (text, font, bounds, flags, point, out var drawPos);
+        return GetCursorFromPoint (text, font, bounds, flags, point, out _);
     }
 
-    public static int GetCursorFromPoint (string text, Font font, SKRect bounds, TextFormatFlags flags, SKPoint point,
-        out SKPoint cursorDrawPosition)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="text"></param>
+    /// <param name="font"></param>
+    /// <param name="bounds"></param>
+    /// <param name="flags"></param>
+    /// <param name="point"></param>
+    /// <param name="cursorDrawPosition"></param>
+    /// <returns></returns>
+    public static int GetCursorFromPoint
+        (
+            string text,
+            Font font,
+            SKRect bounds,
+            TextFormatFlags flags,
+            SKPoint point,
+            out SKPoint cursorDrawPosition
+        )
     {
         cursorDrawPosition = SKPoint.Empty;
 
@@ -915,7 +987,7 @@ public static class TextRenderer
                 continue;
             }
 
-            FontCache.GetLetterDefinitionForChar (letterInfo.Character, out var letterDef);
+            FontCache!.GetLetterDefinitionForChar (letterInfo.Character, out var letterDef);
 
             // Click the left side of the first character
             if (point.X <= letterInfo.PositionX)

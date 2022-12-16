@@ -9,15 +9,13 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* TextRange.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
-using System.IO;
-using System.Xml.Schema;
 
 #endregion
 
@@ -103,7 +101,7 @@ public struct TextRange
     /// <summary>
     /// Returns the reversed text range
     /// </summary>
-    public TextRange Reversed => new TextRange (End, Start, false);
+    public TextRange Reversed => new TextRange (End, Start, altPosition: false);
 
     /// <summary>
     /// Returns the normalized version of the text range

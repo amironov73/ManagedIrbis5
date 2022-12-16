@@ -140,7 +140,7 @@ public partial class TextDocument
     /// </summary>
     public string Text
     {
-        get => this.GetText (new TextRange (0, Length)).ToString();
+        get => GetText (new TextRange (0, Length)).ToString();
         set
         {
             // Suppress normal events
@@ -656,7 +656,7 @@ public partial class TextDocument
         CaretPosition navigatePage (int direction, ref float? xCoord)
         {
             // Get current caret position
-            var ci = this.GetCaretInfo (position);
+            var ci = GetCaretInfo (position);
 
             // Work out which XCoord to use
             if (xCoord == null)
@@ -665,7 +665,7 @@ public partial class TextDocument
             }
 
             // Hit test one page up
-            var htr = this.HitTest (xCoord.Value, ci.CaretRectangle.MidY + pageSize * direction);
+            var htr = HitTest (xCoord.Value, ci.CaretRectangle.MidY + pageSize * direction);
 
             // Convert to caret position
             return new CaretPosition (htr.ClosestCodePointIndex, htr.AltCaretPosition);
@@ -853,7 +853,7 @@ public partial class TextDocument
         )
     {
         // Check range is valid
-        if (range.Minimum < 0 || range.Maximum > this.Length)
+        if (range.Minimum < 0 || range.Maximum > Length)
         {
             throw new ArgumentException ("Invalid range", nameof (range));
         }
@@ -1032,7 +1032,7 @@ public partial class TextDocument
         var paraThis = GetParagraphForCodePointIndex (range.CaretPosition, out var _);
         var paraNext = GetParagraphForCodePointIndex (nextPos, out var _);
 
-        if (paraThis == paraNext && nextPos.CodePointIndex < this.Length)
+        if (paraThis == paraNext && nextPos.CodePointIndex < Length)
         {
             range.End = nextPos.CodePointIndex;
         }

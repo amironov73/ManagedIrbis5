@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* GraphemeClusterClass.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 

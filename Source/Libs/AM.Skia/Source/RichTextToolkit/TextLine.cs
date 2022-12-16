@@ -9,20 +9,16 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* TextLine.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using SkiaSharp;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 using AM.Skia.RichTextKit.Utils;
 
@@ -37,12 +33,12 @@ namespace AM.Skia.RichTextKit;
 /// </summary>
 public class TextLine
 {
-    /// <summary>
-    /// Constructs a new TextLine.
-    /// </summary>
-    public TextLine()
-    {
-    }
+    // /// <summary>
+    // /// Constructs a new TextLine.
+    // /// </summary>
+    // public TextLine()
+    // {
+    // }
 
     /// <summary>
     /// Gets the set of text runs comprising this line.
@@ -57,16 +53,16 @@ public class TextLine
     /// <summary>
     /// Gets the text block that owns this line.
     /// </summary>
-    public TextBlock TextBlock { get; internal set; }
+    public TextBlock? TextBlock { get; internal set; }
 
     /// <summary>
     /// Gets the next line in this text block, or null if this is the last line.
     /// </summary>
-    public TextLine NextLine
+    public TextLine? NextLine
     {
         get
         {
-            var index = (TextBlock.Lines as List<TextLine>).IndexOf (this);
+            var index = (TextBlock!.Lines as List<TextLine>)!.IndexOf (this);
             if (index < 0 || index + 1 >= TextBlock.Lines.Count)
             {
                 return null;
@@ -79,11 +75,11 @@ public class TextLine
     /// <summary>
     /// Gets the previous line in this text block, or null if this is the first line.
     /// </summary>
-    public TextLine PreviousLine
+    public TextLine? PreviousLine
     {
         get
         {
-            var index = (TextBlock.Lines as List<TextLine>).IndexOf (this);
+            var index = (TextBlock!.Lines as List<TextLine>)!.IndexOf (this);
             if (index <= 0)
             {
                 return null;
@@ -166,8 +162,8 @@ public class TextLine
     {
         get
         {
-            var pl = PreviousLine;
-            return PreviousLine == null ? 0 : PreviousLine.End;
+            var previousLine = PreviousLine;
+            return previousLine == null ? 0 : previousLine.End;
         }
     }
 
@@ -184,7 +180,7 @@ public class TextLine
         get
         {
             // Get the last run that's not an ellipsis
-            var lastRun = this.Runs.LastOrDefault (x => x.RunKind != FontRunKind.Ellipsis);
+            var lastRun = Runs.LastOrDefault (x => x.RunKind != FontRunKind.Ellipsis);
 
             // If last run found, then it's the end of the run, other wise it's the start index
             return lastRun == null ? Start : lastRun.End;

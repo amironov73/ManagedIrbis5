@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* LineBreak.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -37,9 +37,9 @@ internal struct LineBreak
     /// <param name="required">True if this is a required line break; otherwise false</param>
     public LineBreak (int positionMeasure, int positionWrap, bool required = false)
     {
-        this.PositionMeasure = positionMeasure;
-        this.PositionWrap = positionWrap;
-        this.Required = required;
+        PositionMeasure = positionMeasure;
+        PositionWrap = positionWrap;
+        Required = required;
     }
 
 

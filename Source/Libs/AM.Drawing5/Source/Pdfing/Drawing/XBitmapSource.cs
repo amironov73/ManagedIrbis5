@@ -25,22 +25,10 @@ public abstract class XBitmapSource : XImage
     /// <summary>
     /// Gets the width of the image in pixels.
     /// </summary>
-    public override int PixelWidth
-    {
-        get
-        {
-            return PixelWidth;
-        }
-    }
+    public override int PixelWidth => PixelWidth;
 
     /// <summary>
     /// Gets the height of the image in pixels.
     /// </summary>
-    public override int PixelHeight
-    {
-        get
-        {
-            return PixelHeight;
-        }
-    }
+    public override int PixelHeight => PixelHeight;
 }

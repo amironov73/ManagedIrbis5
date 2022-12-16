@@ -70,8 +70,8 @@ namespace PdfSharpCore.Pdf
         /// </summary>
         public XUnit Left
         {
-            get { return _left; }
-            set { _left = value; }
+            get => _left;
+            set => _left = value;
         }
         XUnit _left;
 
@@ -80,8 +80,8 @@ namespace PdfSharpCore.Pdf
         /// </summary>
         public XUnit Right
         {
-            get { return _right; }
-            set { _right = value; }
+            get => _right;
+            set => _right = value;
         }
         XUnit _right;
 
@@ -90,8 +90,8 @@ namespace PdfSharpCore.Pdf
         /// </summary>
         public XUnit Top
         {
-            get { return _top; }
-            set { _top = value; }
+            get => _top;
+            set => _top = value;
         }
         XUnit _top;
 
@@ -100,17 +100,14 @@ namespace PdfSharpCore.Pdf
         /// </summary>
         public XUnit Bottom
         {
-            get { return _bottom; }
-            set { _bottom = value; }
+            get => _bottom;
+            set => _bottom = value;
         }
         XUnit _bottom;
 
         /// <summary>
         /// Gets a value indicating whether this instance has at least one margin with a value other than zero.
         /// </summary>
-        public bool AreSet
-        {
-            get { return _left.Value != 0 || _right.Value != 0 || _top.Value != 0 || _bottom.Value != 0; }
-        }
+        public bool AreSet => _left.Value != 0 || _right.Value != 0 || _top.Value != 0 || _bottom.Value != 0;
     }
 }

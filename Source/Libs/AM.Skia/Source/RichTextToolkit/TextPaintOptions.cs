@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* TextPaintOptions.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -31,20 +31,12 @@ namespace AM.Skia.RichTextKit;
 public class TextPaintOptions
 {
     /// <summary>
-    /// Constructs a new text paint options
-    /// </summary>
-    public TextPaintOptions()
-    {
-    }
-
-
-    /// <summary>
     /// Creates a clone of this object
     /// </summary>
     /// <returns>The closed object</returns>
     public TextPaintOptions Clone()
     {
-        return (TextPaintOptions)this.MemberwiseClone();
+        return (TextPaintOptions)MemberwiseClone();
     }
 
     /// <summary>

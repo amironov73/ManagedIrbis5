@@ -138,8 +138,8 @@ internal class FontDescriptor
     /// </summary>
     public bool IsFixedPitch
     {
-        get { return _isFixedPitch; }
-        private set { _isFixedPitch = value; } // BUG: never set
+        get => _isFixedPitch;
+        private set => _isFixedPitch = value; // BUG: never set
     }
 
     bool _isFixedPitch;
@@ -171,8 +171,8 @@ internal class FontDescriptor
     /// </summary>
     public string? Version
     {
-        get { return _version; }
-        private set { _version = value; } // BUG: never set
+        get => _version;
+        private set => _version = value; // BUG: never set
     }
 
     string? _version;
@@ -191,8 +191,8 @@ internal class FontDescriptor
     /// </summary>
     public string? EncodingScheme
     {
-        get { return _encodingScheme; }
-        private set { _encodingScheme = value; } // BUG: never set
+        get => _encodingScheme;
+        private set => _encodingScheme = value; // BUG: never set
     }
 
     private string? _encodingScheme;
@@ -232,8 +232,8 @@ internal class FontDescriptor
     /// </summary>
     public int Flags
     {
-        get { return _flags; }
-        private set { _flags = value; } // BUG: never set
+        get => _flags;
+        private set => _flags = value; // BUG: never set
     }
 
     int _flags;

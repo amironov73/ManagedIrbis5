@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* DefaultCharacterMatcher.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,27 +17,27 @@
 
 using SkiaSharp;
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 #endregion
 
 #nullable enable
 
 namespace AM.Skia.RichTextKit;
 
-internal class DefaultCharacterMatcher : ICharacterMatcher
+internal class DefaultCharacterMatcher
+    : ICharacterMatcher
 {
-    public DefaultCharacterMatcher()
-    {
-    }
-
     private SKFontManager _fontManager = SKFontManager.Default;
 
     /// <inheritdoc />
-    public SKTypeface MatchCharacter (string familyName, int weight, int width, SKFontStyleSlant slant, string[] bcp47,
-        int character)
+    public SKTypeface MatchCharacter
+        (
+            string familyName,
+            int weight,
+            int width,
+            SKFontStyleSlant slant,
+            string[]? bcp47,
+            int character
+        )
     {
         return _fontManager.MatchCharacter (familyName, weight, width, slant, bcp47, character);
     }

@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* UnicodeClasses.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -26,19 +26,19 @@ internal static class UnicodeClasses
     {
         // Load trie resources
         _bidiTrie = new UnicodeTrie (
-            typeof (LineBreaker).Assembly.GetManifestResourceStream ("AM.Skia.RichTextKit.Resources.BidiClasses.trie"));
+            typeof (LineBreaker).Assembly.GetManifestResourceStream ("AM.Skia.RichTextKit.Resources.BidiClasses.trie")!);
         _classesTrie =
             new UnicodeTrie (
                 typeof (LineBreaker).Assembly.GetManifestResourceStream (
-                    "AM.Skia.RichTextKit.Resources.LineBreakClasses.trie"));
+                    "AM.Skia.RichTextKit.Resources.LineBreakClasses.trie")!);
         _boundaryTrie =
             new UnicodeTrie (
                 typeof (LineBreaker).Assembly.GetManifestResourceStream (
-                    "AM.Skia.RichTextKit.Resources.WordBoundaryClasses.trie"));
+                    "AM.Skia.RichTextKit.Resources.WordBoundaryClasses.trie")!);
         _graphemeTrie =
             new UnicodeTrie (
                 typeof (LineBreaker).Assembly.GetManifestResourceStream (
-                    "AM.Skia.RichTextKit.Resources.GraphemeClusterClasses.trie"));
+                    "AM.Skia.RichTextKit.Resources.GraphemeClusterClasses.trie")!);
     }
 
     private static UnicodeTrie _bidiTrie;

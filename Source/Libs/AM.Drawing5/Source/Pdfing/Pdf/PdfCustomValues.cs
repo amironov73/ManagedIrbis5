@@ -64,7 +64,7 @@ public class PdfCustomValues
     /// </summary>
     public PdfCustomValueCompressionMode CompressionMode
     {
-        set { throw new NotImplementedException(); }
+        set => throw new NotImplementedException();
     }
 
     /// <summary>

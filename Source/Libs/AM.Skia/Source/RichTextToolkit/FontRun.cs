@@ -4,18 +4,17 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
+// ReSharper disable CompareOfFloatsByEqualityOperator
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* FontRun.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
-
-using HarfBuzzSharp;
 
 using SkiaSharp;
 
@@ -45,12 +44,12 @@ public class FontRun
     /// <summary>
     /// The style run this typeface run was derived from.
     /// </summary>
-    public StyleRun StyleRun;
+    public StyleRun? StyleRun;
 
     /// <summary>
     /// Get the code points of this run
     /// </summary>
-    public Slice<int> CodePoints => CodePointBuffer.SubSlice (Start, Length);
+    public Slice<int> CodePoints => CodePointBuffer!.SubSlice (Start, Length);
 
     /// <summary>
     /// Code point index of the start of this run
@@ -70,7 +69,7 @@ public class FontRun
     /// <summary>
     /// The user supplied style for this run
     /// </summary>
-    public IStyle Style;
+    public IStyle? Style;
 
     /// <summary>
     /// The direction of this run
@@ -80,7 +79,7 @@ public class FontRun
     /// <summary>
     /// The typeface of this run (use this over Style.Fontface)
     /// </summary>
-    public SKTypeface Typeface;
+    public SKTypeface? Typeface;
 
     /// <summary>
     /// The glyph indicies
@@ -113,7 +112,7 @@ public class FontRun
     /// <returns>The x-coord relative to the entire text block</returns>
     public float GetXCoordOfCodePointIndex (int codePointIndex)
     {
-        if (this.RunKind == FontRunKind.Ellipsis)
+        if (RunKind == FontRunKind.Ellipsis)
         {
             codePointIndex = 0;
         }
@@ -159,7 +158,7 @@ public class FontRun
     /// <summary>
     /// Calculate the half leading height for text in this run
     /// </summary>
-    public float HalfLeading => (TextHeight * (Style.LineHeight - 1) + Leading) / 2;
+    public float HalfLeading => (TextHeight * (Style!.LineHeight - 1) + Leading) / 2;
 
     /// <summary>
     /// Width of this typeface run
@@ -174,17 +173,17 @@ public class FontRun
     /// <summary>
     /// The line that owns this font run
     /// </summary>
-    public TextLine Line { get; internal set; }
+    public TextLine? Line { get; internal set; }
 
     /// <summary>
     /// Get the next font run from this one
     /// </summary>
-    public FontRun NextRun
+    public FontRun? NextRun
     {
         get
         {
-            var allRuns = Line.TextBlock.FontRuns as List<FontRun>;
-            var index = allRuns.IndexOf (this);
+            var allRuns = Line!.TextBlock!.FontRuns as List<FontRun>;
+            var index = allRuns!.IndexOf (this);
             if (index < 0 || index + 1 >= Line.Runs.Count)
             {
                 return null;
@@ -197,12 +196,12 @@ public class FontRun
     /// <summary>
     /// Get the previous font run from this one
     /// </summary>
-    public FontRun PreviousRun
+    public FontRun? PreviousRun
     {
         get
         {
-            var allRuns = Line.TextBlock.FontRuns as List<FontRun>;
-            var index = allRuns.IndexOf (this);
+            var allRuns = Line!.TextBlock!.FontRuns as List<FontRun>;
+            var index = allRuns!.IndexOf (this);
             if (index - 1 < 0)
             {
                 return null;
@@ -254,9 +253,9 @@ public class FontRun
     public float LeadingWidth (int codePoint)
     {
         // At either end?
-        if (codePoint == this.End)
+        if (codePoint == End)
         {
-            return this.Width;
+            return Width;
         }
 
         if (codePoint == 0)
@@ -265,14 +264,14 @@ public class FontRun
         }
 
         // Internal, calculate the leading width (ie from code point 0 to code point N)
-        var codePointIndex = codePoint - this.Start;
-        if (this.Direction == TextDirection.LTR)
+        var codePointIndex = codePoint - Start;
+        if (Direction == TextDirection.LTR)
         {
-            return this.RelativeCodePointXCoords[codePointIndex];
+            return RelativeCodePointXCoords[codePointIndex];
         }
         else
         {
-            return this.Width - this.RelativeCodePointXCoords[codePointIndex];
+            return Width - RelativeCodePointXCoords[codePointIndex];
         }
     }
 
@@ -284,12 +283,12 @@ public class FontRun
     /// <returns>The code point position to break at</returns>
     internal int FindBreakPosition (float maxWidth, bool force)
     {
-        var lastFittingCodePoint = this.Start;
+        var lastFittingCodePoint = Start;
         var firstNonZeroWidthCodePoint = -1;
         var prevWidth = 0f;
-        for (var i = this.Start; i < this.End; i++)
+        for (var i = Start; i < End; i++)
         {
-            var width = this.LeadingWidth (i);
+            var width = LeadingWidth (i);
             if (prevWidth != width)
             {
                 if (firstNonZeroWidthCodePoint < 0)
@@ -310,18 +309,18 @@ public class FontRun
             prevWidth = width;
         }
 
-        if (lastFittingCodePoint > this.Start || !force)
+        if (lastFittingCodePoint > Start || !force)
         {
             return lastFittingCodePoint;
         }
 
-        if (firstNonZeroWidthCodePoint > this.Start)
+        if (firstNonZeroWidthCodePoint > Start)
         {
             return firstNonZeroWidthCodePoint;
         }
 
         // Split at the end
-        return this.End;
+        return End;
     }
 
     /// <summary>
@@ -333,7 +332,7 @@ public class FontRun
     /// <returns>A new typeface run for the split off part</returns>
     internal FontRun Split (int splitAtCodePoint)
     {
-        if (this.Direction == TextDirection.LTR)
+        if (Direction == TextDirection.LTR)
         {
             return SplitLTR (splitAtCodePoint);
         }
@@ -352,44 +351,44 @@ public class FontRun
     private FontRun SplitLTR (int splitAtCodePoint)
     {
         // Check split point is internal to the run
-        System.Diagnostics.Debug.Assert (this.Direction == TextDirection.LTR);
-        System.Diagnostics.Debug.Assert (splitAtCodePoint > this.Start);
-        System.Diagnostics.Debug.Assert (splitAtCodePoint < this.End);
+        System.Diagnostics.Debug.Assert (Direction == TextDirection.LTR);
+        System.Diagnostics.Debug.Assert (splitAtCodePoint > Start);
+        System.Diagnostics.Debug.Assert (splitAtCodePoint < End);
 
         // Work out the split position
-        var codePointSplitPos = splitAtCodePoint - this.Start;
+        var codePointSplitPos = splitAtCodePoint - Start;
 
         // Work out the width that we're slicing off
-        var sliceLeftWidth = this.RelativeCodePointXCoords[codePointSplitPos];
-        var sliceRightWidth = this.Width - sliceLeftWidth;
+        var sliceLeftWidth = RelativeCodePointXCoords[codePointSplitPos];
+        var sliceRightWidth = Width - sliceLeftWidth;
 
         // Work out the glyph split position
-        var glyphSplitPos = 0;
-        for (glyphSplitPos = 0; glyphSplitPos < this.Clusters.Length; glyphSplitPos++)
+        int glyphSplitPos;
+        for (glyphSplitPos = 0; glyphSplitPos < Clusters.Length; glyphSplitPos++)
         {
-            if (this.Clusters[glyphSplitPos] >= splitAtCodePoint)
+            if (Clusters[glyphSplitPos] >= splitAtCodePoint)
             {
                 break;
             }
         }
 
         // Create the other run
-        var newRun = FontRun.Pool.Value.Get();
-        newRun.StyleRun = this.StyleRun;
-        newRun.CodePointBuffer = this.CodePointBuffer;
-        newRun.Direction = this.Direction;
-        newRun.Ascent = this.Ascent;
-        newRun.Descent = this.Descent;
-        newRun.Leading = this.Leading;
-        newRun.Style = this.Style;
-        newRun.Typeface = this.Typeface;
+        var newRun = Pool.Value!.Get();
+        newRun.StyleRun = StyleRun;
+        newRun.CodePointBuffer = CodePointBuffer;
+        newRun.Direction = Direction;
+        newRun.Ascent = Ascent;
+        newRun.Descent = Descent;
+        newRun.Leading = Leading;
+        newRun.Style = Style;
+        newRun.Typeface = Typeface;
         newRun.Start = splitAtCodePoint;
-        newRun.Length = this.End - splitAtCodePoint;
+        newRun.Length = End - splitAtCodePoint;
         newRun.Width = sliceRightWidth;
-        newRun.RelativeCodePointXCoords = this.RelativeCodePointXCoords.SubSlice (codePointSplitPos);
-        newRun.GlyphPositions = this.GlyphPositions.SubSlice (glyphSplitPos);
-        newRun.Glyphs = this.Glyphs.SubSlice (glyphSplitPos);
-        newRun.Clusters = this.Clusters.SubSlice (glyphSplitPos);
+        newRun.RelativeCodePointXCoords = RelativeCodePointXCoords.SubSlice (codePointSplitPos);
+        newRun.GlyphPositions = GlyphPositions.SubSlice (glyphSplitPos);
+        newRun.Glyphs = Glyphs.SubSlice (glyphSplitPos);
+        newRun.Clusters = Clusters.SubSlice (glyphSplitPos);
 
         // Adjust code point positions
         for (var i = 0; i < newRun.RelativeCodePointXCoords.Length; i++)
@@ -404,14 +403,14 @@ public class FontRun
         }
 
         // Update this run
-        this.RelativeCodePointXCoords = this.RelativeCodePointXCoords.SubSlice (0, codePointSplitPos);
-        this.Glyphs = this.Glyphs.SubSlice (0, glyphSplitPos);
-        this.GlyphPositions = this.GlyphPositions.SubSlice (0, glyphSplitPos);
-        this.Clusters = this.Clusters.SubSlice (0, glyphSplitPos);
-        this.Width = sliceLeftWidth;
-        this.Length = codePointSplitPos;
-        this._textBlob?.Dispose();
-        this._textBlob = null;
+        RelativeCodePointXCoords = RelativeCodePointXCoords.SubSlice (0, codePointSplitPos);
+        Glyphs = Glyphs.SubSlice (0, glyphSplitPos);
+        GlyphPositions = GlyphPositions.SubSlice (0, glyphSplitPos);
+        Clusters = Clusters.SubSlice (0, glyphSplitPos);
+        Width = sliceLeftWidth;
+        Length = codePointSplitPos;
+        _textBlob?.Dispose();
+        _textBlob = null;
 
         // Return the new run
         return newRun;
@@ -426,65 +425,65 @@ public class FontRun
     private FontRun SplitRTL (int splitAtCodePoint)
     {
         // Check split point is internal to the run
-        System.Diagnostics.Debug.Assert (this.Direction == TextDirection.RTL);
-        System.Diagnostics.Debug.Assert (splitAtCodePoint > this.Start);
-        System.Diagnostics.Debug.Assert (splitAtCodePoint < this.End);
+        System.Diagnostics.Debug.Assert (Direction == TextDirection.RTL);
+        System.Diagnostics.Debug.Assert (splitAtCodePoint > Start);
+        System.Diagnostics.Debug.Assert (splitAtCodePoint < End);
 
         // Work out the split position
-        var codePointSplitPos = splitAtCodePoint - this.Start;
+        var codePointSplitPos = splitAtCodePoint - Start;
 
         // Work out the width that we're slicing off
-        var sliceLeftWidth = this.RelativeCodePointXCoords[codePointSplitPos];
-        var sliceRightWidth = this.Width - sliceLeftWidth;
+        var sliceLeftWidth = RelativeCodePointXCoords[codePointSplitPos];
+        var sliceRightWidth = Width - sliceLeftWidth;
 
         // Work out the glyph split position
-        var glyphSplitPos = 0;
-        for (glyphSplitPos = this.Clusters.Length; glyphSplitPos > 0; glyphSplitPos--)
+        int glyphSplitPos;
+        for (glyphSplitPos = Clusters.Length; glyphSplitPos > 0; glyphSplitPos--)
         {
-            if (this.Clusters[glyphSplitPos - 1] >= splitAtCodePoint)
+            if (Clusters[glyphSplitPos - 1] >= splitAtCodePoint)
             {
                 break;
             }
         }
 
         // Create the other run
-        var newRun = FontRun.Pool.Value.Get();
-        newRun.StyleRun = this.StyleRun;
-        newRun.CodePointBuffer = this.CodePointBuffer;
-        newRun.Direction = this.Direction;
-        newRun.Ascent = this.Ascent;
-        newRun.Descent = this.Descent;
-        newRun.Leading = this.Leading;
-        newRun.Style = this.Style;
-        newRun.Typeface = this.Typeface;
+        var newRun = Pool.Value!.Get();
+        newRun.StyleRun = StyleRun;
+        newRun.CodePointBuffer = CodePointBuffer;
+        newRun.Direction = Direction;
+        newRun.Ascent = Ascent;
+        newRun.Descent = Descent;
+        newRun.Leading = Leading;
+        newRun.Style = Style;
+        newRun.Typeface = Typeface;
         newRun.Start = splitAtCodePoint;
-        newRun.Length = this.End - splitAtCodePoint;
+        newRun.Length = End - splitAtCodePoint;
         newRun.Width = sliceLeftWidth;
-        newRun.RelativeCodePointXCoords = this.RelativeCodePointXCoords.SubSlice (codePointSplitPos);
-        newRun.GlyphPositions = this.GlyphPositions.SubSlice (0, glyphSplitPos);
-        newRun.Glyphs = this.Glyphs.SubSlice (0, glyphSplitPos);
-        newRun.Clusters = this.Clusters.SubSlice (0, glyphSplitPos);
+        newRun.RelativeCodePointXCoords = RelativeCodePointXCoords.SubSlice (codePointSplitPos);
+        newRun.GlyphPositions = GlyphPositions.SubSlice (0, glyphSplitPos);
+        newRun.Glyphs = Glyphs.SubSlice (0, glyphSplitPos);
+        newRun.Clusters = Clusters.SubSlice (0, glyphSplitPos);
 
         // Update this run
-        this.RelativeCodePointXCoords = this.RelativeCodePointXCoords.SubSlice (0, codePointSplitPos);
-        this.Glyphs = this.Glyphs.SubSlice (glyphSplitPos);
-        this.GlyphPositions = this.GlyphPositions.SubSlice (glyphSplitPos);
-        this.Clusters = this.Clusters.SubSlice (glyphSplitPos);
-        this.Width = sliceRightWidth;
-        this.Length = codePointSplitPos;
-        this._textBlob?.Dispose();
-        this._textBlob = null;
+        RelativeCodePointXCoords = RelativeCodePointXCoords.SubSlice (0, codePointSplitPos);
+        Glyphs = Glyphs.SubSlice (glyphSplitPos);
+        GlyphPositions = GlyphPositions.SubSlice (glyphSplitPos);
+        Clusters = Clusters.SubSlice (glyphSplitPos);
+        Width = sliceRightWidth;
+        Length = codePointSplitPos;
+        _textBlob?.Dispose();
+        _textBlob = null;
 
         // Adjust code point positions
-        for (var i = 0; i < this.RelativeCodePointXCoords.Length; i++)
+        for (var i = 0; i < RelativeCodePointXCoords.Length; i++)
         {
-            this.RelativeCodePointXCoords[i] -= sliceLeftWidth;
+            RelativeCodePointXCoords[i] -= sliceLeftWidth;
         }
 
         // Adjust glyph positions
-        for (var i = 0; i < this.GlyphPositions.Length; i++)
+        for (var i = 0; i < GlyphPositions.Length; i++)
         {
-            this.GlyphPositions[i].X -= sliceLeftWidth;
+            GlyphPositions[i].X -= sliceLeftWidth;
         }
 
         // Return the new run
@@ -494,7 +493,7 @@ public class FontRun
     /// <summary>
     /// The global list of code points
     /// </summary>
-    internal Buffer<int> CodePointBuffer;
+    internal Buffer<int>? CodePointBuffer;
 
     /// <summary>
     /// Calculate any overhang for this text line
@@ -517,7 +516,7 @@ public class FontRun
         using (var paint = new SKPaint())
         {
             float glyphScale = 1;
-            if (Style.FontVariant == FontVariant.SuperScript)
+            if (Style!.FontVariant == FontVariant.SuperScript)
             {
                 glyphScale = 0.65f;
             }
@@ -587,7 +586,7 @@ public class FontRun
             else
             {
                 paintStartHandle = true;
-                selStartXCoord = RelativeCodePointXCoords[ctx.SelectionStart - this.Start];
+                selStartXCoord = RelativeCodePointXCoords[ctx.SelectionStart - Start];
             }
 
             float selEndXCoord;
@@ -602,14 +601,14 @@ public class FontRun
             }
             else
             {
-                selEndXCoord = RelativeCodePointXCoords[ctx.SelectionEnd - this.Start];
+                selEndXCoord = RelativeCodePointXCoords[ctx.SelectionEnd - Start];
                 paintEndHandle = true;
             }
 
             if (selStartXCoord != selEndXCoord)
             {
-                var tl = new SKPoint (selStartXCoord + this.XCoord, Line.YCoord);
-                var br = new SKPoint (selEndXCoord + this.XCoord, Line.YCoord + Line.Height);
+                var tl = new SKPoint (selStartXCoord + XCoord, Line!.YCoord);
+                var br = new SKPoint (selEndXCoord + XCoord, Line.YCoord + Line.Height);
 
                 // Align coords to pixel boundaries
                 // Not needed - disabled antialias on SKPaint instead
@@ -626,7 +625,7 @@ public class FontRun
                 */
 
                 var rect = new SKRect (tl.X, tl.Y, br.X, br.Y);
-                ctx.Canvas.DrawRect (rect, ctx.PaintSelectionBackground);
+                ctx.Canvas!.DrawRect (rect, ctx.PaintSelectionBackground);
 
                 // Paint selection handles?
                 if (ctx.PaintSelectionHandle != null)
@@ -665,7 +664,7 @@ public class FontRun
             // Work out font variant adjustments
             float glyphScale = 1;
             float glyphVOffset = 0;
-            if (Style.FontVariant == FontVariant.SuperScript)
+            if (Style!.FontVariant == FontVariant.SuperScript)
             {
                 glyphScale = 0.65f;
                 glyphVOffset = -Style.FontSize * 0.35f;
@@ -702,10 +701,10 @@ public class FontRun
                     // Create the font
                     if (_font == null)
                     {
-                        _font = new SKFont (this.Typeface, this.Style.FontSize * glyphScale);
+                        _font = new SKFont (Typeface, Style.FontSize * glyphScale);
                     }
 
-                    _font.Hinting = ctx.Options.Hinting;
+                    _font.Hinting = ctx.Options!.Hinting;
                     _font.Edging = ctx.Options.Edging;
                     _font.Subpixel = ctx.Options.SubpixelPositioning;
 
@@ -729,7 +728,7 @@ public class FontRun
                     if (Style.Underline != UnderlineStyle.None && RunKind == FontRunKind.Normal)
                     {
                         // Work out underline metrics
-                        var underlineYPos = Line.YCoord + Line.BaseLine + (_font.Metrics.UnderlinePosition ?? 0);
+                        var underlineYPos = Line!.YCoord + Line.BaseLine + (_font.Metrics.UnderlinePosition ?? 0);
                         if (underlineYPos < Line.YCoord + Line.BaseLine + 1)
                         {
                             underlineYPos = Line.YCoord + Line.BaseLine + 1;
@@ -758,11 +757,11 @@ public class FontRun
                                 {
                                     if (Style.HaloColor != SKColor.Empty)
                                     {
-                                        ctx.Canvas.DrawLine (new SKPoint (x, underlineYPos),
+                                        ctx.Canvas!.DrawLine (new SKPoint (x, underlineYPos),
                                             new SKPoint (b, underlineYPos), paintHalo);
                                     }
 
-                                    ctx.Canvas.DrawLine (new SKPoint (x, underlineYPos), new SKPoint (b, underlineYPos),
+                                    ctx.Canvas!.DrawLine (new SKPoint (x, underlineYPos), new SKPoint (b, underlineYPos),
                                         paint);
                                 }
 
@@ -773,11 +772,11 @@ public class FontRun
                             {
                                 if (Style.HaloColor != SKColor.Empty)
                                 {
-                                    ctx.Canvas.DrawLine (new SKPoint (x, underlineYPos),
+                                    ctx.Canvas!.DrawLine (new SKPoint (x, underlineYPos),
                                         new SKPoint (XCoord + Width, underlineYPos), paintHalo);
                                 }
 
-                                ctx.Canvas.DrawLine (new SKPoint (x, underlineYPos),
+                                ctx.Canvas!.DrawLine (new SKPoint (x, underlineYPos),
                                     new SKPoint (XCoord + Width, underlineYPos), paint);
                             }
                         }
@@ -787,17 +786,17 @@ public class FontRun
                             {
                                 case UnderlineStyle.ImeInput:
                                     paint.PathEffect = SKPathEffect.CreateDash (
-                                        new float[] { paint.StrokeWidth, paint.StrokeWidth }, paint.StrokeWidth);
+                                        new[] { paint.StrokeWidth, paint.StrokeWidth }, paint.StrokeWidth);
                                     paintHalo.PathEffect = SKPathEffect.CreateDash (
-                                        new float[] { paintHalo.StrokeWidth, paintHalo.StrokeWidth },
+                                        new[] { paintHalo.StrokeWidth, paintHalo.StrokeWidth },
                                         paintHalo.StrokeWidth);
                                     break;
 
                                 case UnderlineStyle.ImeConverted:
                                     paint.PathEffect = SKPathEffect.CreateDash (
-                                        new float[] { paint.StrokeWidth, paint.StrokeWidth }, paint.StrokeWidth);
+                                        new[] { paint.StrokeWidth, paint.StrokeWidth }, paint.StrokeWidth);
                                     paintHalo.PathEffect = SKPathEffect.CreateDash (
-                                        new float[] { paintHalo.StrokeWidth, paintHalo.StrokeWidth },
+                                        new[] { paintHalo.StrokeWidth, paintHalo.StrokeWidth },
                                         paintHalo.StrokeWidth);
                                     break;
 
@@ -813,11 +812,11 @@ public class FontRun
                             // Paint solid underline
                             if (Style.HaloColor != SKColor.Empty)
                             {
-                                ctx.Canvas.DrawLine (new SKPoint (XCoord, underlineYPos),
+                                ctx.Canvas!.DrawLine (new SKPoint (XCoord, underlineYPos),
                                     new SKPoint (XCoord + Width, underlineYPos), paintHalo);
                             }
 
-                            ctx.Canvas.DrawLine (new SKPoint (XCoord, underlineYPos),
+                            ctx.Canvas!.DrawLine (new SKPoint (XCoord, underlineYPos),
                                 new SKPoint (XCoord + Width, underlineYPos), paint);
                             paint.PathEffect = null;
                             paintHalo.PathEffect = null;
@@ -836,16 +835,16 @@ public class FontRun
                             }
 
                             paintHalo.StrokeWidth += Style.HaloWidth;
-                            var strikeYPos = Line.YCoord + Line.BaseLine + (_font.Metrics.StrikeoutPosition ?? 0) +
+                            var strikeYPos = Line!.YCoord + Line.BaseLine + (_font.Metrics.StrikeoutPosition ?? 0) +
                                              glyphVOffset;
-                            ctx.Canvas.DrawLine (new SKPoint (XCoord, strikeYPos),
+                            ctx.Canvas!.DrawLine (new SKPoint (XCoord, strikeYPos),
                                 new SKPoint (XCoord + Width, strikeYPos), paintHalo);
                         }
 
-                        ctx.Canvas.DrawText (_textBlob, 0, 0, paintHalo);
+                        ctx.Canvas!.DrawText (_textBlob, 0, 0, paintHalo);
                     }
 
-                    ctx.Canvas.DrawText (_textBlob, 0, 0, paint);
+                    ctx.Canvas!.DrawText (_textBlob, 0, 0, paint);
                 }
             }
 
@@ -858,7 +857,7 @@ public class FontRun
                     paint.StrokeWidth = 1;
                 }
 
-                var strikeYPos = Line.YCoord + Line.BaseLine + (_font.Metrics.StrikeoutPosition ?? 0) + glyphVOffset;
+                var strikeYPos = Line!.YCoord + Line.BaseLine + (_font.Metrics.StrikeoutPosition ?? 0) + glyphVOffset;
                 ctx.Canvas.DrawLine (new SKPoint (XCoord, strikeYPos), new SKPoint (XCoord + Width, strikeYPos), paint);
             }
         }
@@ -870,19 +869,19 @@ public class FontRun
     /// <param name="ctx"></param>
     internal void PaintBackground (PaintTextContext ctx)
     {
-        if (Style.BackgroundColor != SKColor.Empty && RunKind == FontRunKind.Normal)
+        if (Style!.BackgroundColor != SKColor.Empty && RunKind == FontRunKind.Normal)
         {
-            var rect = new SKRect (XCoord, Line.YCoord,
+            var rect = new SKRect (XCoord, Line!.YCoord,
                 XCoord + Width, Line.YCoord + Line.Height);
             using (var skPaint = new SKPaint { Style = SKPaintStyle.Fill, Color = Style.BackgroundColor })
             {
-                ctx.Canvas.DrawRect (rect, skPaint);
+                ctx.Canvas!.DrawRect (rect, skPaint);
             }
         }
     }
 
-    private SKTextBlob _textBlob;
-    private SKFont _font;
+    private SKTextBlob? _textBlob;
+    private SKFont? _font;
 
     private void Reset()
     {

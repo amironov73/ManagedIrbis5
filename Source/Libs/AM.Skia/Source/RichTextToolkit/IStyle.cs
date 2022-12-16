@@ -9,19 +9,13 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* IStyle.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using SkiaSharp;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 #endregion
 

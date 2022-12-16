@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* UnicodeTrieBuilder.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,8 +17,6 @@
 
 using System;
 using System.IO;
-using System.IO.Compression;
-using System.Text;
 
 #endregion
 
@@ -509,7 +507,7 @@ internal class UnicodeTrieBuilder
 
     public void Save (Stream stream)
     {
-        var trie = this.Freeze();
+        var trie = Freeze();
         trie.Save (stream);
     }
 

@@ -4,12 +4,13 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
+// ReSharper disable CompareOfFloatsByEqualityOperator
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* IStyleExtensions.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -33,8 +34,7 @@ public static class IStyleExtensions
     /// <returns>A key string</returns>
     public static string Key (this IStyle This)
     {
-        return
-            $"{This.FontFamily}.{This.FontSize}.{This.FontWeight}.{This.FontWidth}.{This.FontItalic}.{This.Underline}.{This.StrikeThrough}.{This.LineHeight}.{This.TextColor}.{This.BackgroundColor}.{This.LetterSpacing}.{This.FontVariant}.{This.TextDirection}.{This.ReplacementCharacter}";
+        return $"{This.FontFamily}.{This.FontSize}.{This.FontWeight}.{This.FontWidth}.{This.FontItalic}.{This.Underline}.{This.StrikeThrough}.{This.LineHeight}.{This.TextColor}.{This.BackgroundColor}.{This.LetterSpacing}.{This.FontVariant}.{This.TextDirection}.{This.ReplacementCharacter}";
     }
 
     /// <summary>
@@ -106,7 +106,7 @@ public static class IStyleExtensions
     /// <param name="This">The style instance</param>
     /// <param name="other">The other style instance to compare to</param>
     /// <returns>True if both styles will give the same layout</returns>
-    public static bool IsSame (this IStyle This, IStyle other)
+    public static bool IsSame (this IStyle? This, IStyle? other)
     {
         if (This == null && other == null)
         {

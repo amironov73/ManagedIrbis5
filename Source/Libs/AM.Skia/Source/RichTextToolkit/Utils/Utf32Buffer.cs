@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* Utf32Buffer.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,11 +17,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using AM.Skia.RichTextKit.Utils;
 
 #endregion
 
@@ -32,7 +27,8 @@ namespace AM.Skia.RichTextKit.Utils;
 /// <summary>
 /// Represents a buffer of UTF-32 encoded code point data
 /// </summary>
-public class Utf32Buffer : Buffer<int>
+public class Utf32Buffer
+    : Buffer<int>
 {
     /// <summary>
     /// Constructs a new Utf32Buffer
@@ -299,9 +295,9 @@ public class Utf32Buffer : Buffer<int>
         _surrogatePositions.Clear();
         unsafe
         {
-            fixed (int* pBuf = this.Underlying)
+            fixed (int* pBuf = Underlying)
             {
-                var pEnd = pBuf + this.Length;
+                var pEnd = pBuf + Length;
                 var p = pBuf;
                 while (p < pEnd)
                 {

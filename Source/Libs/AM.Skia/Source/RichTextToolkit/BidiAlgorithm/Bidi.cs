@@ -1474,8 +1474,8 @@ internal class Bidi
         /// <param name="closingIndex">Index of the closing bracket</param>
         public BracketPair (int openingIndex, int closingIndex)
         {
-            this.OpeningIndex = openingIndex;
-            this.ClosingIndex = closingIndex;
+            OpeningIndex = openingIndex;
+            ClosingIndex = closingIndex;
         }
     }
 

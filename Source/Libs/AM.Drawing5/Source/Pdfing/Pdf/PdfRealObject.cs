@@ -69,8 +69,8 @@ namespace PdfSharpCore.Pdf
         /// </summary>
         public double Value
         {
-            get { return _value; }
-            set { _value = value; }
+            get => _value;
+            set => _value = value;
         }
         double _value;
 

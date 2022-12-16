@@ -31,10 +31,7 @@ namespace PdfSharpCore.Drawing
             _guid = guid;
         }
 
-        internal Guid Guid
-        {
-            get { return _guid; }
-        }
+        internal Guid Guid => _guid;
 
         /// <inheritdoc cref="object.Equals(object?)"/>
         public override bool Equals (object? obj)
@@ -51,50 +48,32 @@ namespace PdfSharpCore.Drawing
         /// <summary>
         /// Gets the Portable Network Graphics (PNG) image format.
         /// </summary>
-        public static XImageFormat Png
-        {
-            get { return _png; }
-        }
+        public static XImageFormat Png => _png;
 
         /// <summary>
         /// Gets the Graphics Interchange Format (GIF) image format.
         /// </summary>
-        public static XImageFormat Gif
-        {
-            get { return _gif; }
-        }
+        public static XImageFormat Gif => _gif;
 
         /// <summary>
         /// Gets the Joint Photographic Experts Group (JPEG) image format.
         /// </summary>
-        public static XImageFormat Jpeg
-        {
-            get { return _jpeg; }
-        }
+        public static XImageFormat Jpeg => _jpeg;
 
         /// <summary>
         /// Gets the Tag Image File Format (TIFF) image format.
         /// </summary>
-        public static XImageFormat Tiff
-        {
-            get { return _tiff; }
-        }
+        public static XImageFormat Tiff => _tiff;
 
         /// <summary>
         /// Gets the Portable Document Format (PDF) image format
         /// </summary>
-        public static XImageFormat Pdf
-        {
-            get { return _pdf; }
-        }
+        public static XImageFormat Pdf => _pdf;
 
         /// <summary>
         /// Gets the Windows icon image format.
         /// </summary>
-        public static XImageFormat Icon
-        {
-            get { return _icon; }
-        }
+        public static XImageFormat Icon => _icon;
 
         readonly Guid _guid;
 
