@@ -84,6 +84,31 @@ public static class Utility
     }
 
     /// <summary>
+    /// Требование, чтобы аргументы <paramref name="argument"/>
+    /// имел тип <typeparamref name="TType"/>.
+    /// </summary>
+    public static TType SureOfType<TType>
+        (
+            this object? argument,
+            [CallerArgumentExpression (nameof (argument))]
+            string? argumentName = null
+        )
+    {
+        if (argument is TType value)
+        {
+            return value;
+        }
+
+        if (!string.IsNullOrEmpty (argumentName))
+        {
+            // .NET 5 SDK подставляет в argumentName значение null, .NET 6 делает по-человечески
+            throw new ArgumentException (argumentName);
+        }
+
+        throw new ArgumentException();
+    }
+
+    /// <summary>
     /// Очистка с последующим обнулением переменной.
     /// </summary>
     public static void DisposeAndNull<T>

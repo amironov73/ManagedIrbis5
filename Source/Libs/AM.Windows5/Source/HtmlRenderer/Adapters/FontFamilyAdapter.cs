@@ -49,10 +49,7 @@ internal sealed class FontFamilyAdapter
     /// <summary>
     /// the underline WPF font family.
     /// </summary>
-    public FontFamily FontFamily
-    {
-        get { return _fontFamily; }
-    }
+    public FontFamily FontFamily => _fontFamily;
 
     public override string Name
     {

@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
 
 /* HtmlRender.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -18,7 +19,6 @@ using System.Windows.Media.Imaging;
 
 using AM.Drawing.HtmlRenderer.Core;
 using AM.Drawing.HtmlRenderer.Core.Entities;
-using AM.Drawing.HtmlRenderer.Core.Utils;
 using AM.Windows.HtmlRenderer.Adapters;
 using AM.Windows.HtmlRenderer.Utilities;
 
@@ -95,9 +95,12 @@ public static class HtmlRender
             FontFamily fontFamily
         )
     {
-        ArgChecker.AssertArgNotNull (fontFamily, "fontFamily");
+        Sure.NotNull (fontFamily);
 
-        WpfAdapter.Instance.AddFontFamily (new FontFamilyAdapter (fontFamily));
+        WpfAdapter.Instance.AddFontFamily
+            (
+                new FontFamilyAdapter (fontFamily)
+            );
     }
 
     /// <summary>
@@ -116,8 +119,8 @@ public static class HtmlRender
             string toFamily
         )
     {
-        ArgChecker.AssertArgNotNullOrEmpty (fromFamily, "fromFamily");
-        ArgChecker.AssertArgNotNullOrEmpty (toFamily, "toFamily");
+        Sure.NotNullNorEmpty (fromFamily);
+        Sure.NotNullNorEmpty (toFamily);
 
         WpfAdapter.Instance.AddFontFamilyMapping (fromFamily, toFamily);
     }
@@ -195,7 +198,7 @@ public static class HtmlRender
     /// wrap as specified in the html<br/>
     /// Returned is the actual width and height of the rendered html.<br/>
     /// </summary>
-    /// <param name="drawingContext">Device to render with</param>
+    /// <param name="graphics">Device to render with</param>
     /// <param name="html">HTML source to render</param>
     /// <param name="left">optional: the left most location to start render the html at (default - 0)</param>
     /// <param name="top">optional: the top most location to start render the html at (default - 0)</param>
@@ -206,7 +209,7 @@ public static class HtmlRender
     /// <returns>the actual size of the rendered html</returns>
     public static Size Render
         (
-            DrawingContext drawingContext,
+            DrawingContext graphics,
             string html,
             double left = 0,
             double top = 0,
@@ -216,9 +219,18 @@ public static class HtmlRender
             EventHandler<HtmlImageLoadEventArgs>? imageLoad = null
         )
     {
-        ArgChecker.AssertArgNotNull (drawingContext, "g");
+        Sure.NotNull (graphics);
 
-        return RenderClip (drawingContext, html, new Point (left, top), new Size (maxWidth, 0), cssData, stylesheetLoad, imageLoad);
+        return RenderClip
+            (
+                graphics,
+                html,
+                location: new Point (left, top),
+                new Size (maxWidth, 0),
+                cssData,
+                stylesheetLoad,
+                imageLoad
+            );
     }
 
     /// <summary>
@@ -229,7 +241,7 @@ public static class HtmlRender
     /// given max height not rendering the html below it.<br/>
     /// Returned is the actual width and height of the rendered html.<br/>
     /// </summary>
-    /// <param name="drawingContext">Device to render with</param>
+    /// <param name="graphics">Device to render with</param>
     /// <param name="html">HTML source to render</param>
     /// <param name="location">the top-left most location to start render the html at</param>
     /// <param name="maxSize">the max size of the rendered html (if height above zero it will be clipped)</param>
@@ -239,7 +251,7 @@ public static class HtmlRender
     /// <returns>the actual size of the rendered html</returns>
     public static Size Render
         (
-            DrawingContext drawingContext,
+            DrawingContext graphics,
             string html,
             Point location,
             Size maxSize,
@@ -248,8 +260,18 @@ public static class HtmlRender
             EventHandler<HtmlImageLoadEventArgs>? imageLoad = null
         )
     {
-        ArgChecker.AssertArgNotNull (drawingContext, "g");
-        return RenderClip (drawingContext, html, location, maxSize, cssData, stylesheetLoad, imageLoad);
+        Sure.NotNull (graphics);
+
+        return RenderClip
+            (
+                graphics,
+                html,
+                location,
+                maxSize,
+                cssData,
+                stylesheetLoad,
+                imageLoad
+            );
     }
 
     /// <summary>
@@ -454,9 +476,9 @@ public static class HtmlRender
             string html,
             Point location,
             Size maxSize,
-            CssData cssData,
-            EventHandler<HtmlStylesheetLoadEventArgs> stylesheetLoad,
-            EventHandler<HtmlImageLoadEventArgs> imageLoad
+            CssData? cssData,
+            EventHandler<HtmlStylesheetLoadEventArgs>? stylesheetLoad,
+            EventHandler<HtmlImageLoadEventArgs>? imageLoad
         )
     {
         if (maxSize.Height > 0)
@@ -496,7 +518,7 @@ public static class HtmlRender
             string html,
             Point location,
             Size maxSize,
-            CssData cssData,
+            CssData? cssData,
             EventHandler<HtmlStylesheetLoadEventArgs>? stylesheetLoad,
             EventHandler<HtmlImageLoadEventArgs>? imageLoad
         )

@@ -22,7 +22,6 @@ using System.Windows.Forms;
 
 using AM.Drawing.HtmlRenderer.Core;
 using AM.Drawing.HtmlRenderer.Core.Entities;
-using AM.Drawing.HtmlRenderer.Core.Utils;
 using AM.Windows.Forms.HtmlRenderer.Utilities;
 
 #endregion
@@ -400,9 +399,12 @@ public class HtmlPanel : ScrollableControl
     /// is not enough height to scroll to the top the scroll will be at maximum.<br/>
     /// </summary>
     /// <param name="elementId">the id of the element to scroll to</param>
-    public virtual void ScrollToElement (string elementId)
+    public virtual void ScrollToElement
+        (
+            string elementId
+        )
     {
-        ArgChecker.AssertArgNotNullOrEmpty (elementId, "elementId");
+        Sure.NotNullNorEmpty (elementId);
 
         if (_htmlContainer != null)
         {
@@ -410,8 +412,11 @@ public class HtmlPanel : ScrollableControl
             if (rect.HasValue)
             {
                 UpdateScroll (Point.Round (rect.Value.Location));
-                _htmlContainer.HandleMouseMove (this,
-                    new MouseEventArgs (MouseButtons, 0, MousePosition.X, MousePosition.Y, 0));
+                _htmlContainer.HandleMouseMove
+                    (
+                        this,
+                        new MouseEventArgs (MouseButtons, 0, MousePosition.X, MousePosition.Y, 0)
+                    );
             }
         }
     }
@@ -742,18 +747,9 @@ public class HtmlPanel : ScrollableControl
     /// </summary>
     protected virtual void InvokeMouseMove()
     {
-        try
-        {
-            // mono has issue throwing exception for no reason
-            var mp = PointToClient (MousePosition);
-            _htmlContainer!.HandleMouseMove (this, new MouseEventArgs (MouseButtons.None, 0, mp.X, mp.Y, 0));
-        }
-        catch
-        {
-#if !MONO
-            throw;
-#endif
-        }
+        // mono has issue throwing exception for no reason
+        var mp = PointToClient (MousePosition);
+        _htmlContainer!.HandleMouseMove (this, new MouseEventArgs (MouseButtons.None, 0, mp.X, mp.Y, 0));
     }
 
     /// <summary>

@@ -26,21 +26,21 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\AM.Core5\AM.Core5.csproj"/>
+        <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
     </ItemGroup>
 
     <!-- Централизованное управление пакетами -->
     <ItemGroup>
-        <PackageReference Include="Microsoft.Windows.Compatibility"/>
-        <PackageReference Include="System.Drawing.Common"/>
-        <PackageReference Include="System.Resources.Extensions"/>
-        <PackageReference Include="SharpZipLib"/>
-        <PackageReference Include="SixLabors.ImageSharp"/>
-        <PackageReference Include="SixLabors.Fonts"/>
+        <PackageReference Include="Microsoft.Windows.Compatibility" />
+        <PackageReference Include="System.Drawing.Common" />
+        <PackageReference Include="System.Resources.Extensions" />
+        <PackageReference Include="SharpZipLib" />
+        <PackageReference Include="SixLabors.ImageSharp" />
+        <PackageReference Include="SixLabors.Fonts" />
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Source\Pdfing\Pdf\AcroForms\enums"/>
+        <Folder Include="Source\Pdfing\Pdf\AcroForms\enums" />
     </ItemGroup>
 
 </Project>

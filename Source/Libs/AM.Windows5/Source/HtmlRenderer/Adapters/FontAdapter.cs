@@ -82,7 +82,9 @@ internal sealed class FontAdapter
             foreach (var sysTypeface in Fonts.SystemTypefaces)
             {
                 if (sysTypeface.TryGetGlyphTypeface(out typeface))
+                {
                     break;
+                }
             }
         }
     }
@@ -90,35 +92,17 @@ internal sealed class FontAdapter
     /// <summary>
     /// the underline win-forms font.
     /// </summary>
-    public Typeface Font
-    {
-        get { return _font; }
-    }
+    public Typeface Font => _font;
 
-    public GlyphTypeface GlyphTypeface
-    {
-        get { return _glyphTypeface; }
-    }
+    public GlyphTypeface GlyphTypeface => _glyphTypeface;
 
-    public override double Size
-    {
-        get { return _size; }
-    }
+    public override double Size => _size;
 
-    public override double UnderlineOffset
-    {
-        get { return _underlineOffset; }
-    }
+    public override double UnderlineOffset => _underlineOffset;
 
-    public override double Height
-    {
-        get { return _height; }
-    }
+    public override double Height => _height;
 
-    public override double LeftPadding
-    {
-        get { return _height / 6f; }
-    }
+    public override double LeftPadding => _height / 6f;
 
     public override double GetWhitespaceWidth(RGraphics graphics)
     {

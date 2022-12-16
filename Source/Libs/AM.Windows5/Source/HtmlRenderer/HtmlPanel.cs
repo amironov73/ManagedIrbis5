@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
 
 /* HtmlPanel.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -18,7 +19,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 
 using AM.Drawing.HtmlRenderer.Core.Entities;
-using AM.Drawing.HtmlRenderer.Core.Utils;
 
 #endregion
 
@@ -66,21 +66,25 @@ public class HtmlPanel
     /// </summary>
     public HtmlPanel()
     {
-        _verticalScrollBar = new ScrollBar();
-        _verticalScrollBar.Orientation = Orientation.Vertical;
-        _verticalScrollBar.Width = 18;
+        _verticalScrollBar = new ScrollBar
+        {
+            Orientation = Orientation.Vertical,
+            Width = 18
+        };
         _verticalScrollBar.Scroll += OnScrollBarScroll;
         AddVisualChild (_verticalScrollBar);
         AddLogicalChild (_verticalScrollBar);
 
-        _horizontalScrollBar = new ScrollBar();
-        _horizontalScrollBar.Orientation = Orientation.Horizontal;
-        _horizontalScrollBar.Height = 18;
+        _horizontalScrollBar = new ScrollBar
+        {
+            Orientation = Orientation.Horizontal,
+            Height = 18
+        };
         _horizontalScrollBar.Scroll += OnScrollBarScroll;
         AddVisualChild (_horizontalScrollBar);
         AddLogicalChild (_horizontalScrollBar);
 
-        _htmlContainer.ScrollChange += OnScrollChange;
+        _htmlContainer!.ScrollChange += OnScrollChange;
     }
 
     /// <summary>
@@ -89,9 +93,12 @@ public class HtmlPanel
     /// is not enough height to scroll to the top the scroll will be at maximum.<br/>
     /// </summary>
     /// <param name="elementId">the id of the element to scroll to</param>
-    public virtual void ScrollToElement (string elementId)
+    public virtual void ScrollToElement
+        (
+            string elementId
+        )
     {
-        ArgChecker.AssertArgNotNullOrEmpty (elementId, "elementId");
+        Sure.NotNullNorEmpty (elementId);
 
         if (_htmlContainer != null)
         {
@@ -136,8 +143,8 @@ public class HtmlPanel
         var htmlWidth = HtmlWidth (constraint);
         var htmlHeight = HtmlHeight (constraint);
 
-        if ((_verticalScrollBar.Visibility == Visibility.Hidden && size.Height > htmlHeight) ||
-            (_verticalScrollBar.Visibility == Visibility.Visible && size.Height <= htmlHeight))
+        if (_verticalScrollBar.Visibility == Visibility.Hidden && size.Height > htmlHeight ||
+            _verticalScrollBar.Visibility == Visibility.Visible && size.Height <= htmlHeight)
         {
             _verticalScrollBar.Visibility = _verticalScrollBar.Visibility == Visibility.Visible
                 ? Visibility.Hidden
@@ -145,8 +152,8 @@ public class HtmlPanel
             relayout = true;
         }
 
-        if ((_horizontalScrollBar.Visibility == Visibility.Hidden && size.Width > htmlWidth) ||
-            (_horizontalScrollBar.Visibility == Visibility.Visible && size.Width <= htmlWidth))
+        if (_horizontalScrollBar.Visibility == Visibility.Hidden && size.Width > htmlWidth ||
+            _horizontalScrollBar.Visibility == Visibility.Visible && size.Width <= htmlWidth)
         {
             _horizontalScrollBar.Visibility = _horizontalScrollBar.Visibility == Visibility.Visible
                 ? Visibility.Hidden
@@ -350,9 +357,13 @@ public class HtmlPanel
     /// <summary>
     /// On HTML container scroll change request scroll to the requested location.
     /// </summary>
-    private void OnScrollChange (object sender, HtmlScrollEventArgs e)
+    private void OnScrollChange
+        (
+            object? sender,
+            HtmlScrollEventArgs eventArgs
+        )
     {
-        ScrollToPoint (e.X, e.Y);
+        ScrollToPoint (eventArgs.X, eventArgs.Y);
     }
 
     /// <summary>
@@ -379,7 +390,7 @@ public class HtmlPanel
     private void UpdateScrollOffsets()
     {
         var newScrollOffset = new Point (-_horizontalScrollBar.Value, -_verticalScrollBar.Value);
-        if (!newScrollOffset.Equals (_htmlContainer.ScrollOffset))
+        if (!newScrollOffset.Equals (_htmlContainer!.ScrollOffset))
         {
             _htmlContainer.ScrollOffset = newScrollOffset;
             InvalidateVisual();
@@ -391,8 +402,7 @@ public class HtmlPanel
     /// </summary>
     private static void OnTextProperty_change (DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-        var panel = d as HtmlPanel;
-        if (panel != null)
+        if (d is HtmlPanel panel)
         {
             panel._horizontalScrollBar.Value = panel._verticalScrollBar.Value = 0;
         }

@@ -18,7 +18,6 @@ using System.Collections.Generic;
 using AM.Drawing.HtmlRenderer.Adapters.Entities;
 using AM.Drawing.HtmlRenderer.Core;
 using AM.Drawing.HtmlRenderer.Core.Entities;
-using AM.Drawing.HtmlRenderer.Core.Utils;
 using AM.Drawing.HtmlRenderer.PdfSharp.Adapters;
 using AM.Drawing.HtmlRenderer.PdfSharp.Utilities;
 
@@ -333,24 +332,30 @@ public sealed class HtmlContainer
     /// <summary>
     /// Measures the bounds of box and children, recursively.
     /// </summary>
-    /// <param name="g">Device context to draw</param>
-    public void PerformLayout (XGraphics g)
+    /// <param name="graphics">Device context to draw</param>
+    public void PerformLayout
+        (
+            XGraphics graphics
+        )
     {
-        ArgChecker.AssertArgNotNull (g, "g");
+        Sure.NotNull (graphics);
 
-        using var ig = new GraphicsAdapter (g);
+        using var ig = new GraphicsAdapter (graphics);
         _htmlContainerInt.PerformLayout (ig);
     }
 
     /// <summary>
     /// Render the html using the given device.
     /// </summary>
-    /// <param name="g">the device to use to render</param>
-    public void PerformPaint (XGraphics g)
+    /// <param name="graphics">the device to use to render</param>
+    public void PerformPaint
+        (
+            XGraphics graphics
+        )
     {
-        ArgChecker.AssertArgNotNull (g, "g");
+        Sure.NotNull (graphics);
 
-        using var ig = new GraphicsAdapter (g);
+        using var ig = new GraphicsAdapter (graphics);
         _htmlContainerInt.PerformPaint (ig);
     }
 

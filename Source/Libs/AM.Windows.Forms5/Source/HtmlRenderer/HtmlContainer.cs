@@ -22,7 +22,6 @@ using AM.Drawing.HtmlRenderer.Adapters.Entities;
 using AM.Drawing.HtmlRenderer.Core;
 using AM.Drawing.HtmlRenderer.Core.Entities;
 using AM.Drawing.HtmlRenderer.Core.Parse;
-using AM.Drawing.HtmlRenderer.Core.Utils;
 using AM.Windows.Forms.HtmlRenderer.Adapters;
 using AM.Windows.Forms.HtmlRenderer.Utilities;
 
@@ -390,109 +389,154 @@ public sealed class HtmlContainer
     /// <summary>
     /// Measures the bounds of box and children, recursively.
     /// </summary>
-    /// <param name="g">Device context to draw</param>
-    public void PerformLayout (Graphics g)
+    /// <param name="graphics">Device context to draw</param>
+    public void PerformLayout
+        (
+            Graphics graphics
+        )
     {
-        ArgChecker.AssertArgNotNull (g, "g");
+        Sure.NotNull (graphics);
 
-        using (var ig = new GraphicsAdapter (g, _useGdiPlusTextRendering))
-        {
-            HtmlContainerInt.PerformLayout (ig);
-        }
+        using var adapter = new GraphicsAdapter (graphics, _useGdiPlusTextRendering);
+        HtmlContainerInt.PerformLayout (adapter);
     }
 
     /// <summary>
     /// Render the html using the given device.
     /// </summary>
-    /// <param name="g">the device to use to render</param>
-    public void PerformPaint (Graphics g)
+    /// <param name="graphics">the device to use to render</param>
+    public void PerformPaint
+        (
+            Graphics graphics
+        )
     {
-        ArgChecker.AssertArgNotNull (g, "g");
+        Sure.NotNull (graphics);
 
-        using (var ig = new GraphicsAdapter (g, _useGdiPlusTextRendering))
-        {
-            HtmlContainerInt.PerformPaint (ig);
-        }
+        using var adapter = new GraphicsAdapter (graphics, _useGdiPlusTextRendering);
+        HtmlContainerInt.PerformPaint (adapter);
     }
 
     /// <summary>
     /// Handle mouse down to handle selection.
     /// </summary>
     /// <param name="parent">the control hosting the html to invalidate</param>
-    /// <param name="e">the mouse event args</param>
-    public void HandleMouseDown (Control parent, MouseEventArgs e)
+    /// <param name="eventArgs">the mouse event args</param>
+    public void HandleMouseDown
+        (
+            Control parent,
+            MouseEventArgs eventArgs
+        )
     {
-        ArgChecker.AssertArgNotNull (parent, "parent");
-        ArgChecker.AssertArgNotNull (e, "e");
+        Sure.NotNull (parent);
+        Sure.NotNull (eventArgs);
 
-        HtmlContainerInt.HandleMouseDown (new ControlAdapter (parent, _useGdiPlusTextRendering),
-            Utils.Convert (e.Location));
+        HtmlContainerInt.HandleMouseDown
+            (
+                new ControlAdapter (parent, _useGdiPlusTextRendering),
+                Utils.Convert (eventArgs.Location)
+            );
     }
 
     /// <summary>
     /// Handle mouse up to handle selection and link click.
     /// </summary>
     /// <param name="parent">the control hosting the html to invalidate</param>
-    /// <param name="e">the mouse event args</param>
-    public void HandleMouseUp (Control parent, MouseEventArgs e)
+    /// <param name="eventArgs">the mouse event args</param>
+    public void HandleMouseUp
+        (
+            Control parent,
+            MouseEventArgs eventArgs
+        )
     {
-        ArgChecker.AssertArgNotNull (parent, "parent");
-        ArgChecker.AssertArgNotNull (e, "e");
+        Sure.NotNull (parent);
+        Sure.NotNull (eventArgs);
 
-        HtmlContainerInt.HandleMouseUp (new ControlAdapter (parent, _useGdiPlusTextRendering),
-            Utils.Convert (e.Location), CreateMouseEvent (e));
+        HtmlContainerInt.HandleMouseUp
+            (
+                new ControlAdapter (parent, _useGdiPlusTextRendering),
+                Utils.Convert (eventArgs.Location),
+                CreateMouseEvent (eventArgs)
+            );
     }
 
     /// <summary>
     /// Handle mouse double click to select word under the mouse.
     /// </summary>
     /// <param name="parent">the control hosting the html to set cursor and invalidate</param>
-    /// <param name="e">mouse event args</param>
-    public void HandleMouseDoubleClick (Control parent, MouseEventArgs e)
+    /// <param name="eventArgs">mouse event args</param>
+    public void HandleMouseDoubleClick
+        (
+            Control parent,
+            MouseEventArgs eventArgs
+        )
     {
-        ArgChecker.AssertArgNotNull (parent, "parent");
-        ArgChecker.AssertArgNotNull (e, "e");
+        Sure.NotNull (parent);
+        Sure.NotNull (eventArgs);
 
-        HtmlContainerInt.HandleMouseDoubleClick (new ControlAdapter (parent, _useGdiPlusTextRendering),
-            Utils.Convert (e.Location));
+        HtmlContainerInt.HandleMouseDoubleClick
+            (
+                new ControlAdapter (parent, _useGdiPlusTextRendering),
+                Utils.Convert (eventArgs.Location)
+            );
     }
 
     /// <summary>
     /// Handle mouse move to handle hover cursor and text selection.
     /// </summary>
     /// <param name="parent">the control hosting the html to set cursor and invalidate</param>
-    /// <param name="e">the mouse event args</param>
-    public void HandleMouseMove (Control parent, MouseEventArgs e)
+    /// <param name="eventArgs">the mouse event args</param>
+    public void HandleMouseMove
+        (
+            Control parent,
+            MouseEventArgs eventArgs
+        )
     {
-        ArgChecker.AssertArgNotNull (parent, "parent");
-        ArgChecker.AssertArgNotNull (e, "e");
+        Sure.NotNull (parent);
+        Sure.NotNull (eventArgs);
 
-        HtmlContainerInt.HandleMouseMove (new ControlAdapter (parent, _useGdiPlusTextRendering),
-            Utils.Convert (e.Location));
+        HtmlContainerInt.HandleMouseMove
+            (
+                new ControlAdapter (parent, _useGdiPlusTextRendering),
+                Utils.Convert (eventArgs.Location)
+            );
     }
 
     /// <summary>
     /// Handle mouse leave to handle hover cursor.
     /// </summary>
     /// <param name="parent">the control hosting the html to set cursor and invalidate</param>
-    public void HandleMouseLeave (Control parent)
+    public void HandleMouseLeave
+        (
+            Control parent
+        )
     {
-        ArgChecker.AssertArgNotNull (parent, "parent");
+        Sure.NotNull (parent);
 
-        HtmlContainerInt.HandleMouseLeave (new ControlAdapter (parent, _useGdiPlusTextRendering));
+        HtmlContainerInt.HandleMouseLeave
+            (
+                new ControlAdapter (parent, _useGdiPlusTextRendering)
+            );
     }
 
     /// <summary>
     /// Handle key down event for selection and copy.
     /// </summary>
     /// <param name="parent">the control hosting the html to invalidate</param>
-    /// <param name="e">the pressed key</param>
-    public void HandleKeyDown (Control parent, KeyEventArgs e)
+    /// <param name="eventArgs">the pressed key</param>
+    public void HandleKeyDown
+        (
+            Control parent,
+            KeyEventArgs eventArgs
+        )
     {
-        ArgChecker.AssertArgNotNull (parent, "parent");
-        ArgChecker.AssertArgNotNull (e, "e");
+        Sure.NotNull (parent);
+        Sure.NotNull (eventArgs);
 
-        HtmlContainerInt.HandleKeyDown (new ControlAdapter (parent, _useGdiPlusTextRendering), CreateKeyEevent (e));
+        HtmlContainerInt.HandleKeyDown
+            (
+                new ControlAdapter (parent, _useGdiPlusTextRendering),
+                CreateKeyEvent (eventArgs)
+            );
     }
 
     /// <inheritdoc cref="IDisposable.Dispose"/>
@@ -506,17 +550,23 @@ public sealed class HtmlContainer
     /// <summary>
     /// Create HtmlRenderer mouse event from win forms mouse event.
     /// </summary>
-    private static RMouseEvent CreateMouseEvent (MouseEventArgs e)
+    private static RMouseEvent CreateMouseEvent
+        (
+            MouseEventArgs eventArgs
+        )
     {
-        return new RMouseEvent ((e.Button & MouseButtons.Left) != 0);
+        return new RMouseEvent ((eventArgs.Button & MouseButtons.Left) != 0);
     }
 
     /// <summary>
     /// Create HtmlRenderer key event from win forms key event.
     /// </summary>
-    private static RKeyEvent CreateKeyEevent (KeyEventArgs e)
+    private static RKeyEvent CreateKeyEvent
+        (
+            KeyEventArgs eventArgs
+        )
     {
-        return new RKeyEvent (e.Control, e.KeyCode == Keys.A, e.KeyCode == Keys.C);
+        return new RKeyEvent (eventArgs.Control, eventArgs.KeyCode == Keys.A, eventArgs.KeyCode == Keys.C);
     }
 
     #endregion

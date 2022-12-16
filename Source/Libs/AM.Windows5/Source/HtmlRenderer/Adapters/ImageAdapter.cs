@@ -43,24 +43,17 @@ internal sealed class ImageAdapter
     /// <summary>
     /// the underline WPF image.
     /// </summary>
-    public BitmapImage Image
-    {
-        get { return _image; }
-    }
+    public BitmapImage Image => _image;
 
-    public override double Width
-    {
-        get { return _image.PixelWidth; }
-    }
+    public override double Width => _image.PixelWidth;
 
-    public override double Height
-    {
-        get { return _image.PixelHeight; }
-    }
+    public override double Height => _image.PixelHeight;
 
     public override void Dispose()
     {
         if (_image.StreamSource != null)
+        {
             _image.StreamSource.Dispose();
+        }
     }
 }

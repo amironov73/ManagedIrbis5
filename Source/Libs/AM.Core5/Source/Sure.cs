@@ -686,6 +686,32 @@ public static class Sure
     }
 
     /// <summary>
+    /// Проверка, что аргумент <paramref name="argument" />
+    /// имеет правильный тип <typeparamref name="TType"/>.
+    /// </summary>
+    [DebuggerHidden]
+    [AssertionMethod]
+    [MethodImpl (MethodImplOptions.AggressiveInlining)]
+    public static void OfType<TType>
+        (
+            object? argument,
+            [CallerArgumentExpression (nameof (argument))]
+            string? argumentName = null
+        )
+    {
+        if (argument is not TType)
+        {
+            if (!string.IsNullOrEmpty (argumentName))
+            {
+                // .NET 5 SDK подставляет в argumentName значение null, .NET 6 делает по-человечески
+                throw new ArgumentException (argumentName);
+            }
+
+            throw new ArgumentException();
+        }
+    }
+
+    /// <summary>
     /// Проверка, что число <paramref name="argument"/> положительное.
     /// </summary>
     [DebuggerHidden]

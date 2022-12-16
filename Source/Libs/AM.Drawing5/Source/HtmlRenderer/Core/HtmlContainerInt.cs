@@ -613,7 +613,7 @@ public sealed class HtmlContainerInt
             RGraphics graphics
         )
     {
-        ArgChecker.AssertArgNotNull (graphics, "g");
+        Sure.NotNull (graphics);
 
         if (MaxSize.Height > 0)
         {

@@ -53,8 +53,8 @@ internal sealed class PenAdapter
 
     public override double Width
     {
-        get { return _width; }
-        set { _width = value; }
+        get => _width;
+        set => _width = value;
     }
 
     public override RDashStyle DashStyle

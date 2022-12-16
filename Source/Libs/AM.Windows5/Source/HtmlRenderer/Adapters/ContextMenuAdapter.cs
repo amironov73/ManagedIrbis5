@@ -17,7 +17,6 @@ using System.Windows.Controls;
 
 using AM.Drawing.HtmlRenderer.Adapters;
 using AM.Drawing.HtmlRenderer.Adapters.Entities;
-using AM.Drawing.HtmlRenderer.Core.Utils;
 using AM.Windows.HtmlRenderer.Utilities;
 
 #endregion
@@ -29,7 +28,7 @@ namespace AM.Windows.HtmlRenderer.Adapters;
 /// <summary>
 /// Adapter for WPF context menu for core.
 /// </summary>
-internal sealed class ContextMenuAdapter 
+internal sealed class ContextMenuAdapter
     : RContextMenu
 {
     #region Fields and Consts
@@ -50,38 +49,39 @@ internal sealed class ContextMenuAdapter
         _contextMenu = new ContextMenu();
     }
 
-    public override int ItemsCount
-    {
-        get { return _contextMenu.Items.Count; }
-    }
+    public override int ItemsCount => _contextMenu.Items.Count;
 
     public override void AddDivider()
     {
-        _contextMenu.Items.Add(new Separator());
+        _contextMenu.Items.Add (new Separator());
     }
 
-    public override void AddItem(string text, bool enabled, EventHandler onClick)
+    public override void AddItem (string text, bool enabled, EventHandler onClick)
     {
-        ArgChecker.AssertArgNotNullOrEmpty(text, "text");
-        ArgChecker.AssertArgNotNull(onClick, "onClick");
+        Sure.NotNullNorEmpty (text);
+        Sure.NotNull (onClick);
 
-        var item = new MenuItem();
-        item.Header = text;
-        item.IsEnabled = enabled;
-        item.Click += new RoutedEventHandler(onClick);
-        _contextMenu.Items.Add(item);
+        var item = new MenuItem
+        {
+            Header = text,
+            IsEnabled = enabled
+        };
+        item.Click += new RoutedEventHandler (onClick);
+        _contextMenu.Items.Add (item);
     }
 
     public override void RemoveLastDivider()
     {
-        if (_contextMenu.Items[_contextMenu.Items.Count - 1].GetType() == typeof(Separator))
-            _contextMenu.Items.RemoveAt(_contextMenu.Items.Count - 1);
+        if (_contextMenu.Items[^1].GetType() == typeof (Separator))
+        {
+            _contextMenu.Items.RemoveAt (_contextMenu.Items.Count - 1);
+        }
     }
 
-    public override void Show(RControl parent, RPoint location)
+    public override void Show (RControl parent, RPoint location)
     {
         _contextMenu.PlacementTarget = ((ControlAdapter)parent).Control;
-        _contextMenu.PlacementRectangle = new Rect(Utils.ConvertRound(location), Size.Empty);
+        _contextMenu.PlacementRectangle = new Rect (Utils.ConvertRound (location), Size.Empty);
         _contextMenu.IsOpen = true;
     }
 

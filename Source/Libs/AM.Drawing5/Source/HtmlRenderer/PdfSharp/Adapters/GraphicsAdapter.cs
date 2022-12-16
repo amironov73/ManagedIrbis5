@@ -37,7 +37,7 @@ internal sealed class GraphicsAdapter
     /// <summary>
     /// The wrapped WinForms graphics object
     /// </summary>
-    private readonly XGraphics _g;
+    private readonly XGraphics _graphics;
 
     /// <summary>
     /// if to release the graphics object on dispose
@@ -64,79 +64,87 @@ internal sealed class GraphicsAdapter
     /// <summary>
     /// Init.
     /// </summary>
-    /// <param name="g">the win forms graphics object to use</param>
+    /// <param name="graphics">the win forms graphics object to use</param>
     /// <param name="releaseGraphics">optional: if to release the graphics object on dispose (default - false)</param>
-    public GraphicsAdapter(XGraphics g, bool releaseGraphics = false)
-        : base(PdfSharpAdapter.Instance, new RRect(0, 0, double.MaxValue, double.MaxValue))
+    public GraphicsAdapter
+        (
+            XGraphics graphics,
+            bool releaseGraphics = false
+        )
+        : base (PdfSharpAdapter.Instance, new RRect (0, 0, double.MaxValue, double.MaxValue))
     {
-        ArgChecker.AssertArgNotNull(g, "g");
+        Sure.NotNull (graphics);
 
-        _g = g;
+        _graphics = graphics;
         _releaseGraphics = releaseGraphics;
     }
 
     public override void PopClip()
     {
         _clipStack.Pop();
-        _g.Restore();
+        _graphics.Restore();
     }
 
-    public override void PushClip(RRect rect)
+    public override void PushClip (RRect rect)
     {
-        _clipStack.Push(rect);
-        _g.Save();
-        _g.IntersectClip(Utils.Convert(rect));
+        _clipStack.Push (rect);
+        _graphics.Save();
+        _graphics.IntersectClip (Utils.Convert (rect));
     }
 
-    public override void PushClipExclude(RRect rect)
-    { }
+    public override void PushClipExclude (RRect rect)
+    {
+    }
 
     public override object SetAntiAliasSmoothingMode()
     {
-        var prevMode = _g.SmoothingMode;
-        _g.SmoothingMode = XSmoothingMode.AntiAlias;
+        var prevMode = _graphics.SmoothingMode;
+        _graphics.SmoothingMode = XSmoothingMode.AntiAlias;
         return prevMode;
     }
 
-    public override void ReturnPreviousSmoothingMode(object prevMode)
+    public override void ReturnPreviousSmoothingMode (object prevMode)
     {
         if (prevMode != null!)
         {
-            _g.SmoothingMode = (XSmoothingMode)prevMode;
+            _graphics.SmoothingMode = (XSmoothingMode)prevMode;
         }
     }
 
-    public override RSize MeasureString(string str, RFont font)
+    public override RSize MeasureString (string str, RFont font)
     {
         var fontAdapter = (FontAdapter)font;
         var realFont = fontAdapter.Font;
-        var size = _g.MeasureString(str, realFont, _stringFormat);
+        var size = _graphics.MeasureString (str, realFont, _stringFormat);
 
         if (font.Height < 0)
         {
             var height = realFont.Height;
-            var descent = realFont.Size * realFont.FontFamily.GetCellDescent(realFont.Style) / realFont.FontFamily.GetEmHeight(realFont.Style);
-            fontAdapter.SetMetrics(height, (int)Math.Round((height - descent + 1f)));
+            var descent = realFont.Size * realFont.FontFamily.GetCellDescent (realFont.Style) /
+                          realFont.FontFamily.GetEmHeight (realFont.Style);
+            fontAdapter.SetMetrics (height, (int)Math.Round ((height - descent + 1f)));
         }
 
-        return Utils.Convert(size);
+        return Utils.Convert (size);
     }
 
-    public override void MeasureString(string str, RFont font, double maxWidth, out int charFit, out double charFitWidth)
+    public override void MeasureString (string str, RFont font, double maxWidth, out int charFit,
+        out double charFitWidth)
     {
         // there is no need for it - used for text selection
         throw new NotSupportedException();
     }
 
-    public override void DrawString(string? str, RFont font, RColor color, RPoint point, RSize size, bool rtl)
+    public override void DrawString (string? str, RFont font, RColor color, RPoint point, RSize size, bool rtl)
     {
-        var xBrush = ((BrushAdapter)_adapter.GetSolidBrush(color)).Brush;
-        _g.DrawString(str!, ((FontAdapter)font).Font, (XBrush)xBrush, point.X, point.Y, _stringFormat);
+        var xBrush = ((BrushAdapter)_adapter.GetSolidBrush (color)).Brush;
+        _graphics.DrawString (str!, ((FontAdapter)font).Font, (XBrush)xBrush, point.X, point.Y, _stringFormat);
     }
 
-    public override RBrush GetTextureBrush(RImage image, RRect dstRect, RPoint translateTransformLocation)
+    public override RBrush GetTextureBrush (RImage image, RRect dstRect, RPoint translateTransformLocation)
     {
-        return new BrushAdapter(new XTextureBrush(((ImageAdapter)image).Image, Utils.Convert(dstRect), Utils.Convert(translateTransformLocation)));
+        return new BrushAdapter (new XTextureBrush (((ImageAdapter)image).Image, Utils.Convert (dstRect),
+            Utils.Convert (translateTransformLocation)));
     }
 
     public override RGraphicsPath GetGraphicsPath()
@@ -147,64 +155,65 @@ internal sealed class GraphicsAdapter
     public override void Dispose()
     {
         if (_releaseGraphics)
-            _g.Dispose();
+            _graphics.Dispose();
     }
 
 
     #region Delegate graphics methods
 
-    public override void DrawLine(RPen pen, double x1, double y1, double x2, double y2)
+    public override void DrawLine (RPen pen, double x1, double y1, double x2, double y2)
     {
-        _g.DrawLine(((PenAdapter)pen).Pen, x1, y1, x2, y2);
+        _graphics.DrawLine (((PenAdapter)pen).Pen, x1, y1, x2, y2);
     }
 
-    public override void DrawRectangle(RPen pen, double x, double y, double width, double height)
+    public override void DrawRectangle (RPen pen, double x, double y, double width, double height)
     {
-        _g.DrawRectangle(((PenAdapter)pen).Pen, x, y, width, height);
+        _graphics.DrawRectangle (((PenAdapter)pen).Pen, x, y, width, height);
     }
 
-    public override void DrawRectangle(RBrush brush, double x, double y, double width, double height)
+    public override void DrawRectangle (RBrush brush, double x, double y, double width, double height)
     {
         var xBrush = ((BrushAdapter)brush).Brush;
         if (xBrush is XTextureBrush xTextureBrush)
         {
-            xTextureBrush.DrawRectangle(_g, x, y, width, height);
+            xTextureBrush.DrawRectangle (_graphics, x, y, width, height);
         }
         else
         {
-            _g.DrawRectangle((XBrush)xBrush, x, y, width, height);
+            _graphics.DrawRectangle ((XBrush)xBrush, x, y, width, height);
 
             // handle bug in PdfSharp that keeps the brush color for next string draw
             if (xBrush is XLinearGradientBrush)
-                _g.DrawRectangle(XBrushes.White, 0, 0, 0.1, 0.1);
+                _graphics.DrawRectangle (XBrushes.White, 0, 0, 0.1, 0.1);
         }
     }
 
-    public override void DrawImage(RImage image, RRect destRect, RRect srcRect)
+    public override void DrawImage (RImage image, RRect destRect, RRect srcRect)
     {
-        _g.DrawImage(((ImageAdapter)image).Image, Utils.Convert(destRect), Utils.Convert(srcRect), XGraphicsUnit.Point);
+        _graphics.DrawImage (((ImageAdapter)image).Image, Utils.Convert (destRect), Utils.Convert (srcRect),
+            XGraphicsUnit.Point);
     }
 
-    public override void DrawImage(RImage image, RRect destRect)
+    public override void DrawImage (RImage image, RRect destRect)
     {
-        _g.DrawImage(((ImageAdapter)image).Image, Utils.Convert(destRect));
+        _graphics.DrawImage (((ImageAdapter)image).Image, Utils.Convert (destRect));
     }
 
-    public override void DrawPath(RPen pen, RGraphicsPath path)
+    public override void DrawPath (RPen pen, RGraphicsPath path)
     {
-        _g.DrawPath(((PenAdapter)pen).Pen, ((GraphicsPathAdapter)path).GraphicsPath);
+        _graphics.DrawPath (((PenAdapter)pen).Pen, ((GraphicsPathAdapter)path).GraphicsPath);
     }
 
-    public override void DrawPath(RBrush brush, RGraphicsPath path)
+    public override void DrawPath (RBrush brush, RGraphicsPath path)
     {
-        _g.DrawPath((XBrush)((BrushAdapter)brush).Brush, ((GraphicsPathAdapter)path).GraphicsPath);
+        _graphics.DrawPath ((XBrush)((BrushAdapter)brush).Brush, ((GraphicsPathAdapter)path).GraphicsPath);
     }
 
-    public override void DrawPolygon(RBrush brush, RPoint[] points)
+    public override void DrawPolygon (RBrush brush, RPoint[] points)
     {
         if (points is { Length: > 0 })
         {
-            _g.DrawPolygon((XBrush)((BrushAdapter)brush).Brush, Utils.Convert(points), XFillMode.Winding);
+            _graphics.DrawPolygon ((XBrush)((BrushAdapter)brush).Brush, Utils.Convert (points), XFillMode.Winding);
         }
     }
 

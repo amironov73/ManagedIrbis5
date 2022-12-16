@@ -84,16 +84,15 @@ internal sealed class WpfAdapter
     /// <summary>
     /// Singleton instance of global adapter.
     /// </summary>
-    public static WpfAdapter Instance
-    {
-        get { return _instance; }
-    }
+    public static WpfAdapter Instance => _instance;
 
     protected override RColor GetColorInt(string colorName)
     {
         // check if color name is valid to avoid ColorConverter throwing an exception
         if (!ValidColorNamesLc.Contains(colorName.ToLower()))
+        {
             return RColor.Empty;
+        }
 
         var convertFromString = ColorConverter.ConvertFromString(colorName) ?? Colors.Black;
         return Utils.Convert((Color)convertFromString);
@@ -200,13 +199,22 @@ internal sealed class WpfAdapter
     {
         Brush solidBrush;
         if (color == RColor.White)
+        {
             solidBrush = Brushes.White;
+        }
         else if (color == RColor.Black)
+        {
             solidBrush = Brushes.Black;
+        }
         else if (color.A < 1)
+        {
             solidBrush = Brushes.Transparent;
+        }
         else
+        {
             solidBrush = new SolidColorBrush(Utils.Convert(color));
+        }
+
         return solidBrush;
     }
 
@@ -216,7 +224,9 @@ internal sealed class WpfAdapter
     private static FontStyle GetFontStyle(RFontStyle style)
     {
         if ((style & RFontStyle.Italic) == RFontStyle.Italic)
+        {
             return FontStyles.Italic;
+        }
 
         return FontStyles.Normal;
     }
@@ -227,7 +237,9 @@ internal sealed class WpfAdapter
     private static FontWeight GetFontWidth(RFontStyle style)
     {
         if ((style & RFontStyle.Bold) == RFontStyle.Bold)
+        {
             return FontWeights.Bold;
+        }
 
         return FontWeights.Normal;
     }

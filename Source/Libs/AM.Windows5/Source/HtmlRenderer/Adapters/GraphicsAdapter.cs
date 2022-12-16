@@ -31,7 +31,7 @@ namespace AM.Windows.HtmlRenderer.Adapters;
 /// <summary>
 /// Adapter for WPF Graphics.
 /// </summary>
-internal sealed class GraphicsAdapter 
+internal sealed class GraphicsAdapter
     : RGraphics
 {
     #region Fields and Consts
@@ -39,7 +39,7 @@ internal sealed class GraphicsAdapter
     /// <summary>
     /// The wrapped WPF graphics object
     /// </summary>
-    private readonly DrawingContext _g;
+    private readonly DrawingContext _drawingContext;
 
     /// <summary>
     /// if to release the graphics object on dispose
@@ -48,19 +48,23 @@ internal sealed class GraphicsAdapter
 
     #endregion
 
-
     /// <summary>
     /// Init.
     /// </summary>
-    /// <param name="g">the WPF graphics object to use</param>
+    /// <param name="drawingContext">the WPF graphics object to use</param>
     /// <param name="initialClip">the initial clip of the graphics</param>
     /// <param name="releaseGraphics">optional: if to release the graphics object on dispose (default - false)</param>
-    public GraphicsAdapter(DrawingContext g, RRect initialClip, bool releaseGraphics = false)
-        : base(WpfAdapter.Instance, initialClip)
+    public GraphicsAdapter
+        (
+            DrawingContext drawingContext,
+            RRect initialClip,
+            bool releaseGraphics = false
+        )
+        : base (WpfAdapter.Instance, initialClip)
     {
-        ArgChecker.AssertArgNotNull(g, "g");
+        Sure.NotNull (drawingContext);
 
-        _g = g;
+        _drawingContext = drawingContext;
         _releaseGraphics = releaseGraphics;
     }
 
@@ -68,55 +72,58 @@ internal sealed class GraphicsAdapter
     /// Init.
     /// </summary>
     public GraphicsAdapter()
-        : base(WpfAdapter.Instance, RRect.Empty)
+        : base (WpfAdapter.Instance, RRect.Empty)
     {
-        _g = null;
+        _drawingContext = null!;
         _releaseGraphics = false;
     }
 
     public override void PopClip()
     {
-        _g.Pop();
+        _drawingContext.Pop();
         _clipStack.Pop();
     }
 
-    public override void PushClip(RRect rect)
+    public override void PushClip (RRect rect)
     {
-        _clipStack.Push(rect);
-        _g.PushClip(new RectangleGeometry(Utils.Convert(rect)));
+        _clipStack.Push (rect);
+        _drawingContext.PushClip (new RectangleGeometry (Utils.Convert (rect)));
     }
 
-    public override void PushClipExclude(RRect rect)
+    public override void PushClipExclude (RRect rect)
     {
-        var geometry = new CombinedGeometry();
-        geometry.Geometry1 = new RectangleGeometry(Utils.Convert(_clipStack.Peek()));
-        geometry.Geometry2 = new RectangleGeometry(Utils.Convert(rect));
-        geometry.GeometryCombineMode = GeometryCombineMode.Exclude;
+        var geometry = new CombinedGeometry
+        {
+            Geometry1 = new RectangleGeometry (Utils.Convert (_clipStack.Peek())),
+            Geometry2 = new RectangleGeometry (Utils.Convert (rect)),
+            GeometryCombineMode = GeometryCombineMode.Exclude
+        };
 
-        _clipStack.Push(_clipStack.Peek());
-        _g.PushClip(geometry);
+        _clipStack.Push (_clipStack.Peek());
+        _drawingContext.PushClip (geometry);
     }
 
-    public override Object SetAntiAliasSmoothingMode()
+    public override object? SetAntiAliasSmoothingMode()
     {
         return null;
     }
 
-    public override void ReturnPreviousSmoothingMode(Object prevMode)
-    { }
+    public override void ReturnPreviousSmoothingMode (Object prevMode)
+    {
+    }
 
-    public override RSize MeasureString(string str, RFont font)
+    public override RSize MeasureString (string str, RFont font)
     {
         double width = 0;
-        GlyphTypeface glyphTypeface = ((FontAdapter)font).GlyphTypeface;
-        if (glyphTypeface != null)
+        var glyphTypeface = ((FontAdapter)font).GlyphTypeface;
+        if (glyphTypeface != null!)
         {
-            for (int i = 0; i < str.Length; i++)
+            for (var i = 0; i < str.Length; i++)
             {
-                if (glyphTypeface.CharacterToGlyphMap.ContainsKey(str[i]))
+                if (glyphTypeface.CharacterToGlyphMap.ContainsKey (str[i]))
                 {
-                    ushort glyph = glyphTypeface.CharacterToGlyphMap[str[i]];
-                    double advanceWidth = glyphTypeface.AdvanceWidths[glyph];
+                    var glyph = glyphTypeface.CharacterToGlyphMap[str[i]];
+                    var advanceWidth = glyphTypeface.AdvanceWidths[glyph];
                     width += advanceWidth;
                 }
                 else
@@ -129,29 +136,38 @@ internal sealed class GraphicsAdapter
 
         if (width <= 0)
         {
-            var formattedText = new FormattedText(str, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, ((FontAdapter)font).Font, 96d / 72d * font.Size, Brushes.Red);
-            return new RSize(formattedText.WidthIncludingTrailingWhitespace, formattedText.Height);
+            var formattedText = new FormattedText
+                (
+                    str,
+                    CultureInfo.CurrentCulture,
+                    FlowDirection.LeftToRight,
+                    ((FontAdapter)font).Font,
+                    96d / 72d * font.Size,
+                    Brushes.Red
+                );
+            return new RSize (formattedText.WidthIncludingTrailingWhitespace, formattedText.Height);
         }
 
-        return new RSize(width * font.Size * 96d / 72d, font.Height);
+        return new RSize (width * font.Size * 96d / 72d, font.Height);
     }
 
-    public override void MeasureString(string str, RFont font, double maxWidth, out int charFit, out double charFitWidth)
+    public override void MeasureString (string str, RFont font, double maxWidth, out int charFit,
+        out double charFitWidth)
     {
         charFit = 0;
         charFitWidth = 0;
-        bool handled = false;
-        GlyphTypeface glyphTypeface = ((FontAdapter)font).GlyphTypeface;
-        if (glyphTypeface != null)
+        var handled = false;
+        var glyphTypeface = ((FontAdapter)font).GlyphTypeface;
+        if (glyphTypeface != null!)
         {
             handled = true;
             double width = 0;
-            for (int i = 0; i < str.Length; i++)
+            for (var i = 0; i < str.Length; i++)
             {
-                if (glyphTypeface.CharacterToGlyphMap.ContainsKey(str[i]))
+                if (glyphTypeface.CharacterToGlyphMap.ContainsKey (str[i]))
                 {
-                    ushort glyph = glyphTypeface.CharacterToGlyphMap[str[i]];
-                    double advanceWidth = glyphTypeface.AdvanceWidths[glyph] * font.Size * 96d / 72d;
+                    var glyph = glyphTypeface.CharacterToGlyphMap[str[i]];
+                    var advanceWidth = glyphTypeface.AdvanceWidths[glyph] * font.Size * 96d / 72d;
 
                     if (!(width + advanceWidth < maxWidth))
                     {
@@ -159,6 +175,7 @@ internal sealed class GraphicsAdapter
                         charFitWidth = width;
                         break;
                     }
+
                     width += advanceWidth;
                 }
                 else
@@ -171,30 +188,47 @@ internal sealed class GraphicsAdapter
 
         if (!handled)
         {
-            var formattedText = new FormattedText(str, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, ((FontAdapter)font).Font, 96d / 72d * font.Size, Brushes.Red);
+            var formattedText = new FormattedText
+                (
+                    str,
+                    CultureInfo.CurrentCulture,
+                    FlowDirection.LeftToRight,
+                    ((FontAdapter)font).Font,
+                    96d / 72d * font.Size,
+                    Brushes.Red
+                );
             charFit = str.Length;
             charFitWidth = formattedText.WidthIncludingTrailingWhitespace;
         }
     }
 
-    public override void DrawString(string str, RFont font, RColor color, RPoint point, RSize size, bool rtl)
+    public override void DrawString
+        (
+            string str,
+            RFont font,
+            RColor color,
+            RPoint point,
+            RSize size,
+            bool rtl
+        )
     {
-        var colorConv = ((BrushAdapter)_adapter.GetSolidBrush(color)).Brush;
+        var colorConv = ((BrushAdapter)_adapter.GetSolidBrush (color)).Brush;
 
-        bool glyphRendered = false;
-        GlyphTypeface glyphTypeface = ((FontAdapter)font).GlyphTypeface;
-        if (glyphTypeface != null)
+        var glyphRendered = false;
+        var glyphTypeface = ((FontAdapter)font).GlyphTypeface;
+        if (glyphTypeface != null!)
         {
             double width = 0;
-            ushort[] glyphs = new ushort[str.Length];
-            double[] widths = new double[str.Length];
+            var glyphs = new ushort[str.Length];
+            var widths = new double[str.Length];
 
-            int i = 0;
+            var i = 0;
             for (; i < str.Length; i++)
             {
-                ushort glyph;
-                if (!glyphTypeface.CharacterToGlyphMap.TryGetValue(str[i], out glyph))
+                if (!glyphTypeface.CharacterToGlyphMap.TryGetValue (str[i], out var glyph))
+                {
                     break;
+                }
 
                 glyphs[i] = glyph;
                 width += glyphTypeface.AdvanceWidths[glyph];
@@ -207,29 +241,34 @@ internal sealed class GraphicsAdapter
                 point.X += rtl ? 96d / 72d * font.Size * width : 0;
 
                 glyphRendered = true;
-                var glyphRun = new GlyphRun(glyphTypeface, rtl ? 1 : 0, false, 96d / 72d * font.Size, glyphs, Utils.ConvertRound(point), widths, null, null, null, null, null, null);
-                _g.DrawGlyphRun(colorConv, glyphRun);
+                var glyphRun = new GlyphRun (glyphTypeface, rtl ? 1 : 0, false, 96d / 72d * font.Size, glyphs,
+                    Utils.ConvertRound (point), widths, null, null, null, null, null, null);
+                _drawingContext.DrawGlyphRun (colorConv, glyphRun);
             }
         }
 
         if (!glyphRendered)
         {
-            var formattedText = new FormattedText(str, CultureInfo.CurrentCulture, rtl ? FlowDirection.RightToLeft : FlowDirection.LeftToRight, ((FontAdapter)font).Font, 96d / 72d * font.Size, colorConv);
+            var formattedText = new FormattedText (str, CultureInfo.CurrentCulture,
+                rtl ? FlowDirection.RightToLeft : FlowDirection.LeftToRight, ((FontAdapter)font).Font,
+                96d / 72d * font.Size, colorConv);
             point.X += rtl ? formattedText.Width : 0;
-            _g.DrawText(formattedText, Utils.ConvertRound(point));
+            _drawingContext.DrawText (formattedText, Utils.ConvertRound (point));
         }
     }
 
-    public override RBrush GetTextureBrush(RImage image, RRect dstRect, RPoint translateTransformLocation)
+    public override RBrush GetTextureBrush (RImage image, RRect dstRect, RPoint translateTransformLocation)
     {
-        var brush = new ImageBrush(((ImageAdapter)image).Image);
-        brush.Stretch = Stretch.None;
-        brush.TileMode = TileMode.Tile;
-        brush.Viewport = Utils.Convert(dstRect);
-        brush.ViewportUnits = BrushMappingMode.Absolute;
-        brush.Transform = new TranslateTransform(translateTransformLocation.X, translateTransformLocation.Y);
+        var brush = new ImageBrush (((ImageAdapter)image).Image)
+        {
+            Stretch = Stretch.None,
+            TileMode = TileMode.Tile,
+            Viewport = Utils.Convert (dstRect),
+            ViewportUnits = BrushMappingMode.Absolute,
+            Transform = new TranslateTransform (translateTransformLocation.X, translateTransformLocation.Y)
+        };
         brush.Freeze();
-        return new BrushAdapter(brush);
+        return new BrushAdapter (brush);
     }
 
     public override RGraphicsPath GetGraphicsPath()
@@ -240,13 +279,15 @@ internal sealed class GraphicsAdapter
     public override void Dispose()
     {
         if (_releaseGraphics)
-            _g.Close();
+        {
+            _drawingContext.Close();
+        }
     }
 
 
     #region Delegate graphics methods
 
-    public override void DrawLine(RPen pen, double x1, double y1, double x2, double y2)
+    public override void DrawLine (RPen pen, double x1, double y1, double x2, double y2)
     {
         x1 = (int)x1;
         x2 = (int)x2;
@@ -254,72 +295,77 @@ internal sealed class GraphicsAdapter
         y2 = (int)y2;
 
         var adj = pen.Width;
-        if (Math.Abs(x1 - x2) < .1 && Math.Abs(adj % 2 - 1) < .1)
+        if (Math.Abs (x1 - x2) < .1 && Math.Abs (adj % 2 - 1) < .1)
         {
             x1 += .5;
             x2 += .5;
         }
-        if (Math.Abs(y1 - y2) < .1 && Math.Abs(adj % 2 - 1) < .1)
+
+        if (Math.Abs (y1 - y2) < .1 && Math.Abs (adj % 2 - 1) < .1)
         {
             y1 += .5;
             y2 += .5;
         }
 
-        _g.DrawLine(((PenAdapter)pen).CreatePen(), new Point(x1, y1), new Point(x2, y2));
+        _drawingContext.DrawLine (((PenAdapter)pen).CreatePen(), new Point (x1, y1), new Point (x2, y2));
     }
 
-    public override void DrawRectangle(RPen pen, double x, double y, double width, double height)
+    public override void DrawRectangle (RPen pen, double x, double y, double width, double height)
     {
         var adj = pen.Width;
-        if (Math.Abs(adj % 2 - 1) < .1)
+        if (Math.Abs (adj % 2 - 1) < .1)
         {
             x += .5;
             y += .5;
         }
 
-        _g.DrawRectangle(null, ((PenAdapter)pen).CreatePen(), new Rect(x, y, width, height));
+        _drawingContext.DrawRectangle (null, ((PenAdapter)pen).CreatePen(), new Rect (x, y, width, height));
     }
 
-    public override void DrawRectangle(RBrush brush, double x, double y, double width, double height)
+    public override void DrawRectangle (RBrush brush, double x, double y, double width, double height)
     {
-        _g.DrawRectangle(((BrushAdapter)brush).Brush, null, new Rect(x, y, width, height));
+        _drawingContext.DrawRectangle (((BrushAdapter)brush).Brush, null, new Rect (x, y, width, height));
     }
 
-    public override void DrawImage(RImage image, RRect destRect, RRect srcRect)
+    public override void DrawImage (RImage image, RRect destRect, RRect srcRect)
     {
-        CroppedBitmap croppedImage = new CroppedBitmap(((ImageAdapter)image).Image, new Int32Rect((int)srcRect.X, (int)srcRect.Y, (int)srcRect.Width, (int)srcRect.Height));
-        _g.DrawImage(croppedImage, Utils.ConvertRound(destRect));
+        var croppedImage = new CroppedBitmap (((ImageAdapter)image).Image,
+            new Int32Rect ((int)srcRect.X, (int)srcRect.Y, (int)srcRect.Width, (int)srcRect.Height));
+        _drawingContext.DrawImage (croppedImage, Utils.ConvertRound (destRect));
     }
 
-    public override void DrawImage(RImage image, RRect destRect)
+    public override void DrawImage (RImage image, RRect destRect)
     {
-        _g.DrawImage(((ImageAdapter)image).Image, Utils.ConvertRound(destRect));
+        _drawingContext.DrawImage (((ImageAdapter)image).Image, Utils.ConvertRound (destRect));
     }
 
-    public override void DrawPath(RPen pen, RGraphicsPath path)
+    public override void DrawPath (RPen pen, RGraphicsPath path)
     {
-        _g.DrawGeometry(null, ((PenAdapter)pen).CreatePen(), ((GraphicsPathAdapter)path).GetClosedGeometry());
+        _drawingContext.DrawGeometry (null, ((PenAdapter)pen).CreatePen(),
+            ((GraphicsPathAdapter)path).GetClosedGeometry());
     }
 
-    public override void DrawPath(RBrush brush, RGraphicsPath path)
+    public override void DrawPath (RBrush brush, RGraphicsPath path)
     {
-        _g.DrawGeometry(((BrushAdapter)brush).Brush, null, ((GraphicsPathAdapter)path).GetClosedGeometry());
+        _drawingContext.DrawGeometry (((BrushAdapter)brush).Brush, null,
+            ((GraphicsPathAdapter)path).GetClosedGeometry());
     }
 
-    public override void DrawPolygon(RBrush brush, RPoint[] points)
+    public override void DrawPolygon (RBrush brush, RPoint[] points)
     {
         if (points != null && points.Length > 0)
         {
             var g = new StreamGeometry();
             using (var context = g.Open())
             {
-                context.BeginFigure(Utils.Convert(points[0]), true, true);
-                for (int i = 1; i < points.Length; i++)
-                    context.LineTo(Utils.Convert(points[i]), true, true);
+                context.BeginFigure (Utils.Convert (points[0]), true, true);
+                for (var i = 1; i < points.Length; i++)
+                    context.LineTo (Utils.Convert (points[i]), true, true);
             }
+
             g.Freeze();
 
-            _g.DrawGeometry(((BrushAdapter)brush).Brush, null, g);
+            _drawingContext.DrawGeometry (((BrushAdapter)brush).Brush, null, g);
         }
     }
 

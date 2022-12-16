@@ -43,10 +43,7 @@ internal sealed class BrushAdapter
     /// <summary>
     /// The actual WPF brush instance.
     /// </summary>
-    public Brush Brush
-    {
-        get { return _brush; }
-    }
+    public Brush Brush => _brush;
 
     public override void Dispose()
     { }

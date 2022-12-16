@@ -24,18 +24,15 @@ namespace UnitTests.AM.Skia.QRCoding;
 [TestClass]
 public sealed class QRCodeTest
 {
-    [Ignore]
     [TestMethod]
     public void QRCode_Generate_1()
     {
-        // TODO разобраться, как победить на Linux
-        // System.DllNotFoundException: Unable to load shared library 'libSkiaSharp' or one of its dependencies
-
         const string content = "Hello, world!";
-        const string fileName = "qrcode1.png";
+        const string outputFile = "qrcode1.png";
+        File.Delete (outputFile);
 
         var qrCode = new QrCode (content, new Vector2Slim (256, 256), SKEncodedImageFormat.Png);
-        using var output = new FileStream (fileName, FileMode.CreateNew);
+        using var output = new FileStream (outputFile, FileMode.CreateNew);
         qrCode.GenerateImage (output);
     }
 }

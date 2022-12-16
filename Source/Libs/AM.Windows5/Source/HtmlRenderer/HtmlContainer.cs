@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
 
 /* HtmlContainer.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -21,7 +22,6 @@ using System.Windows.Media;
 using AM.Drawing.HtmlRenderer.Adapters.Entities;
 using AM.Drawing.HtmlRenderer.Core;
 using AM.Drawing.HtmlRenderer.Core.Entities;
-using AM.Drawing.HtmlRenderer.Core.Utils;
 using AM.Windows.HtmlRenderer.Adapters;
 using AM.Windows.HtmlRenderer.Utilities;
 
@@ -32,8 +32,8 @@ using AM.Windows.HtmlRenderer.Utilities;
 namespace AM.Windows.HtmlRenderer;
 
 /// <summary>
-/// Low level handling of Html Renderer logic, this class is used by <see cref="HtmlParser"/>,
-/// <see cref="HtmlLabel"/>, <see cref="HtmlToolTip"/> and <see cref="HtmlRender"/>.<br/>
+/// Low level handling of Html Renderer logic, this class is used by <c>HtmlParser</c>,
+/// <see cref="HtmlLabel"/>, <c>HtmlToolTip</c> and <c>HtmlRender</c>.
 /// </summary>
 /// <seealso cref="HtmlContainerInt"/>
 public sealed class HtmlContainer
@@ -141,7 +141,7 @@ public sealed class HtmlContainer
     /// <summary>
     /// the parsed stylesheet data used for handling the html
     /// </summary>
-    public CssData CssData => _htmlContainerInt.CssData;
+    public CssData CssData => _htmlContainerInt.CssData!;
 
     /// <summary>
     /// Gets or sets a value indicating if image asynchronous loading should be avoided (default - false).<br/>
@@ -246,12 +246,12 @@ public sealed class HtmlContainer
     /// <summary>
     /// Get the currently selected text segment in the html.
     /// </summary>
-    public string SelectedText => _htmlContainerInt.SelectedText;
+    public string? SelectedText => _htmlContainerInt.SelectedText;
 
     /// <summary>
     /// Copy the currently selected html segment with style.
     /// </summary>
-    public string SelectedHtml => _htmlContainerInt.SelectedHtml;
+    public string? SelectedHtml => _htmlContainerInt.SelectedHtml;
 
     /// <summary>
     /// Clear the current selection.
@@ -296,7 +296,7 @@ public sealed class HtmlContainer
     /// <param name="location">the location to find the attribute at</param>
     /// <param name="attribute">the attribute key to get value by</param>
     /// <returns>found attribute value or null if not found</returns>
-    public string GetAttributeAt (Point location, string attribute)
+    public string? GetAttributeAt (Point location, string attribute)
     {
         return _htmlContainerInt.GetAttributeAt (Utils.Convert (location), attribute);
     }
@@ -321,7 +321,7 @@ public sealed class HtmlContainer
     /// </summary>
     /// <param name="location">the location to find the link at</param>
     /// <returns>css link href if exists or null</returns>
-    public string GetLinkAt (Point location)
+    public string? GetLinkAt (Point location)
     {
         return _htmlContainerInt.GetLinkAt (Utils.Convert (location));
     }
@@ -344,102 +344,144 @@ public sealed class HtmlContainer
     /// </summary>
     public void PerformLayout()
     {
-        using (var ig = new GraphicsAdapter())
-        {
-            _htmlContainerInt.PerformLayout (ig);
-        }
+        using var adapter = new GraphicsAdapter();
+        _htmlContainerInt.PerformLayout (adapter);
     }
 
     /// <summary>
     /// Render the html using the given device.
     /// </summary>
-    /// <param name="g">the device to use to render</param>
+    /// <param name="graphics">the device to use to render</param>
     /// <param name="clip">the clip rectangle of the html container</param>
-    public void PerformPaint (DrawingContext g, Rect clip)
+    public void PerformPaint (DrawingContext graphics, Rect clip)
     {
-        ArgChecker.AssertArgNotNull (g, "g");
+        Sure.NotNull (graphics);
 
-        using (var ig = new GraphicsAdapter (g, Utils.Convert (clip)))
-        {
-            _htmlContainerInt.PerformPaint (ig);
-        }
+        using var ig = new GraphicsAdapter (graphics, Utils.Convert (clip));
+        _htmlContainerInt.PerformPaint (ig);
     }
 
     /// <summary>
     /// Handle mouse down to handle selection.
     /// </summary>
     /// <param name="parent">the control hosting the html to invalidate</param>
-    /// <param name="e">the mouse event args</param>
-    public void HandleMouseDown (Control parent, MouseEventArgs e)
+    /// <param name="eventArgs">the mouse event args</param>
+    public void HandleMouseDown
+        (
+            Control parent,
+            MouseEventArgs eventArgs
+        )
     {
-        ArgChecker.AssertArgNotNull (parent, "parent");
-        ArgChecker.AssertArgNotNull (e, "e");
+        Sure.NotNull (parent);
+        Sure.NotNull (eventArgs);
 
-        _htmlContainerInt.HandleMouseDown (new ControlAdapter (parent), Utils.Convert (e.GetPosition (parent)));
+        _htmlContainerInt.HandleMouseDown
+            (
+                new ControlAdapter (parent),
+                Utils.Convert (eventArgs.GetPosition (parent))
+            );
     }
 
     /// <summary>
     /// Handle mouse up to handle selection and link click.
     /// </summary>
     /// <param name="parent">the control hosting the html to invalidate</param>
-    /// <param name="e">the mouse event args</param>
-    public void HandleMouseUp (Control parent, MouseButtonEventArgs e)
+    /// <param name="eventArgs">the mouse event args</param>
+    public void HandleMouseUp
+        (
+            Control parent,
+            MouseButtonEventArgs eventArgs
+        )
     {
-        ArgChecker.AssertArgNotNull (parent, "parent");
-        ArgChecker.AssertArgNotNull (e, "e");
+        Sure.NotNull (parent);
+        Sure.NotNull (eventArgs);
 
-        var mouseEvent = new RMouseEvent (e.ChangedButton == MouseButton.Left);
-        _htmlContainerInt.HandleMouseUp (new ControlAdapter (parent), Utils.Convert (e.GetPosition (parent)),
-            mouseEvent);
+        var mouseEvent = new RMouseEvent (eventArgs.ChangedButton == MouseButton.Left);
+        _htmlContainerInt.HandleMouseUp
+            (
+                new ControlAdapter (parent),
+                Utils.Convert (eventArgs.GetPosition (parent)),
+                mouseEvent
+            );
     }
 
     /// <summary>
     /// Handle mouse double click to select word under the mouse.
     /// </summary>
     /// <param name="parent">the control hosting the html to set cursor and invalidate</param>
-    /// <param name="e">mouse event args</param>
-    public void HandleMouseDoubleClick (Control parent, MouseEventArgs e)
+    /// <param name="eventArgs">mouse event args</param>
+    public void HandleMouseDoubleClick
+        (
+            Control parent,
+            MouseEventArgs eventArgs
+        )
     {
-        ArgChecker.AssertArgNotNull (parent, "parent");
-        ArgChecker.AssertArgNotNull (e, "e");
+        Sure.NotNull (parent);
+        Sure.NotNull (eventArgs);
 
-        _htmlContainerInt.HandleMouseDoubleClick (new ControlAdapter (parent), Utils.Convert (e.GetPosition (parent)));
+        _htmlContainerInt.HandleMouseDoubleClick
+            (
+                new ControlAdapter (parent),
+                Utils.Convert (eventArgs.GetPosition (parent))
+            );
     }
 
     /// <summary>
     /// Handle mouse move to handle hover cursor and text selection.
     /// </summary>
     /// <param name="parent">the control hosting the html to set cursor and invalidate</param>
-    /// <param name="mousePos">the mouse event args</param>
-    public void HandleMouseMove (Control parent, Point mousePos)
+    /// <param name="mousePosition">the mouse event args</param>
+    public void HandleMouseMove
+        (
+            Control parent,
+            Point mousePosition
+        )
     {
-        ArgChecker.AssertArgNotNull (parent, "parent");
+        Sure.NotNull (parent);
 
-        _htmlContainerInt.HandleMouseMove (new ControlAdapter (parent), Utils.Convert (mousePos));
+        _htmlContainerInt.HandleMouseMove
+            (
+                new ControlAdapter (parent),
+                Utils.Convert (mousePosition)
+            );
     }
 
     /// <summary>
     /// Handle mouse leave to handle hover cursor.
     /// </summary>
     /// <param name="parent">the control hosting the html to set cursor and invalidate</param>
-    public void HandleMouseLeave (Control parent)
+    public void HandleMouseLeave
+        (
+            Control parent
+        )
     {
-        ArgChecker.AssertArgNotNull (parent, "parent");
+        Sure.NotNull (parent);
 
-        _htmlContainerInt.HandleMouseLeave (new ControlAdapter (parent));
+        _htmlContainerInt.HandleMouseLeave
+            (
+                new ControlAdapter (parent)
+            );
     }
 
     /// <summary>
     /// Handle key down event for selection and copy.
     /// </summary>
     /// <param name="parent">the control hosting the html to invalidate</param>
-    /// <param name="e">the pressed key</param>
-    public void HandleKeyDown (Control parent, KeyEventArgs e)
+    /// <param name="eventArgs">the pressed key</param>
+    public void HandleKeyDown
+        (
+            Control parent,
+            KeyEventArgs eventArgs
+        )
     {
-        ArgChecker.AssertArgNotNull (parent, "parent");
-        ArgChecker.AssertArgNotNull (e, "e");
+        Sure.NotNull (parent);
+        Sure.NotNull (eventArgs);
 
-        _htmlContainerInt.HandleKeyDown (new ControlAdapter (parent), CreateKeyEevent (e));
+        _htmlContainerInt.HandleKeyDown
+            (
+                new ControlAdapter (parent),
+                CreateKeyEvent (eventArgs)
+            );
     }
 
     /// <summary>
@@ -456,10 +498,13 @@ public sealed class HtmlContainer
     /// <summary>
     /// Create HtmlRenderer key event from WPF key event.
     /// </summary>
-    private static RKeyEvent CreateKeyEevent (KeyEventArgs e)
+    private static RKeyEvent CreateKeyEvent
+        (
+            KeyEventArgs eventArgs
+        )
     {
         var control = (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control;
-        return new RKeyEvent (control, e.Key == Key.A, e.Key == Key.C);
+        return new RKeyEvent (control, eventArgs.Key == Key.A, eventArgs.Key == Key.C);
     }
 
     #endregion

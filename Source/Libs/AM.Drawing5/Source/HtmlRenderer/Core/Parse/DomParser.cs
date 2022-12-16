@@ -46,7 +46,7 @@ internal sealed class DomParser
     /// </summary>
     public DomParser (CssParser cssParser)
     {
-        ArgChecker.AssertArgNotNull (cssParser, "cssParser");
+        Sure.NotNull (cssParser);
 
         _cssParser = cssParser;
     }
