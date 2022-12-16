@@ -30,6 +30,7 @@
     <ItemGroup>
         <PackageReference Include="MaxMind.GeoIP2"/>
         <PackageReference Include="Microsoft.AspNetCore.Razor.Language"/>
+        <PackageReference Include="Microsoft.DotNet.PlatformAbstractions"/>
         <PackageReference Include="Microsoft.Extensions.Configuration"/>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection"/>
         <PackageReference Include="Microsoft.Extensions.Hosting"/>
