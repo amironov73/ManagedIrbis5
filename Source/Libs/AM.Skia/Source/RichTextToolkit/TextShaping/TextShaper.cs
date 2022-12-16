@@ -41,7 +41,7 @@ internal class TextShaper : IDisposable
     /// <summary>
     /// Cache of shapers for typefaces
     /// </summary>
-    private static Dictionary<SKTypeface, TextShaper> _shapers = new Dictionary<SKTypeface, TextShaper>();
+    private static Dictionary<SKTypeface, TextShaper> _shapers = new ();
 
     /// <summary>
     /// Get the text shaper for a particular type face
@@ -153,10 +153,10 @@ internal class TextShaper : IDisposable
             CodePointXCoords.Clear();
         }
 
-        public Buffer<ushort> GlyphIndicies = new Buffer<ushort>();
-        public Buffer<SKPoint> GlyphPositions = new Buffer<SKPoint>();
-        public Buffer<int> Clusters = new Buffer<int>();
-        public Buffer<float> CodePointXCoords = new Buffer<float>();
+        public Buffer<ushort> GlyphIndicies = new ();
+        public Buffer<SKPoint> GlyphPositions = new ();
+        public Buffer<int> Clusters = new ();
+        public Buffer<float> CodePointXCoords = new ();
     }
 
     /// <summary>

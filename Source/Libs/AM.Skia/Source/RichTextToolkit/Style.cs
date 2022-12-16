@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* Style.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -18,8 +18,6 @@
 using SkiaSharp;
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 #endregion
 
@@ -279,11 +277,11 @@ public class Style : IStyle
     private UnderlineStyle _underlineStyle;
     private StrikeThroughStyle _strikeThrough;
     private float _lineHeight = 1.0f;
-    private SKColor _textColor = new SKColor (0xFF000000);
+    private SKColor _textColor = new (0xFF000000);
     private SKColor _backgroundColor = SKColor.Empty;
     private SKColor _haloColor = SKColor.Empty;
-    private float _haloWidth = 0f;
-    private float _haloBlur = 0f;
+    private float _haloWidth;
+    private float _haloBlur;
     private float _letterSpacing;
     private FontVariant _fontVariant;
     private TextDirection _textDirection = TextDirection.Auto;
@@ -315,8 +313,9 @@ public class Style : IStyle
     /// <param name="textDirection">The new text direction</param>
     /// <param name="replacementCharacter">The new replacement character</param>
     /// <returns>A new style with the passed attributes changed</returns>
-    public Style Modify (
-            string fontFamily = null,
+    public Style Modify
+        (
+            string? fontFamily = null,
             float? fontSize = null,
             int? fontWeight = null,
             SKFontStyleWidth? fontWidth = null,

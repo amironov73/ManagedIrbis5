@@ -62,8 +62,8 @@ public class FontCache
     /// </summary>
     public float FontAscender { get; }
 
-    private Dictionary<char, FontLetterDefinition> _LetterDefinitions = new Dictionary<char, FontLetterDefinition>();
-    private SKPaint _TextPaint = new SKPaint();
+    private Dictionary<char, FontLetterDefinition> _LetterDefinitions = new ();
+    private SKPaint _TextPaint = new ();
 
     /// <summary>
     ///

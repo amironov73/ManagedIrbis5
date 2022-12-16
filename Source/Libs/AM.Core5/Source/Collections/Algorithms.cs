@@ -5861,7 +5861,7 @@ public static class Algorithms
     /// <returns>A delegate to a method that converts keys to values. </returns>
     public static Converter<TKey, TValue> GetDictionaryConverter<TKey, TValue> (IDictionary<TKey, TValue> dictionary)
     {
-        return GetDictionaryConverter (dictionary, default);
+        return GetDictionaryConverter (dictionary!, default)!;
     }
 
     /// <summary>

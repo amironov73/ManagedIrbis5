@@ -4,12 +4,13 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
+// ReSharper disable CompareOfFloatsByEqualityOperator
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* RichString.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -38,13 +39,13 @@ public class RichString
     /// <summary>
     /// Constructs a new rich text string
     /// </summary>
-    /// <param name="str">An initial piece of text to append to the string</param>
-    public RichString (string str = null)
+    /// <param name="text">An initial piece of text to append to the string</param>
+    public RichString (string? text = null)
     {
         _paragraphs.Add (new ParagraphInfo());
-        if (str != null)
+        if (text != null)
         {
-            Add (str);
+            Add (text);
         }
     }
 
@@ -76,8 +77,10 @@ public class RichString
     /// <param name="fontVariant">The new font variant</param>
     /// <param name="textDirection">The new text direction</param>
     /// <returns>A reference to the same RichString instance</returns>
-    public RichString Add (string text,
-            string fontFamily = null,
+    public RichString Add
+        (
+            string text,
+            string fontFamily,
             float? fontSize = null,
             int? fontWeight = null,
             SKFontStyleWidth? fontWidth = null,
@@ -101,7 +104,7 @@ public class RichString
         }
 
         Push();
-        if (fontFamily != null)
+        if (fontFamily != null!)
         {
             FontFamily (fontFamily);
         }
@@ -554,10 +557,10 @@ public class RichString
     /// </summary>
     public IStyle DefaultStyle
     {
-        get => _baseStyle;
+        get => _baseStyle!;
         set
         {
-            if (!_baseStyle.IsSame (value))
+            if (!_baseStyle!.IsSame (value))
             {
                 _needsFullLayout = true;
                 Invalidate();
@@ -572,9 +575,11 @@ public class RichString
     /// </summary>
     /// <param name="canvas">The Skia canvas to paint to</param>
     /// <param name="options">Options controlling the paint operation</param>
-    public void Paint (
-        SKCanvas canvas,
-        TextPaintOptions options = null)
+    public void Paint
+        (
+            SKCanvas canvas,
+            TextPaintOptions? options = null
+        )
     {
         Paint (canvas, SKPoint.Empty, options);
     }
@@ -585,10 +590,12 @@ public class RichString
     /// <param name="canvas">The Skia canvas to paint to</param>
     /// <param name="position">The top left position within the canvas to draw at</param>
     /// <param name="options">Options controlling the paint operation</param>
-    public void Paint (
-        SKCanvas canvas,
-        SKPoint position,
-        TextPaintOptions options = null)
+    public void Paint
+        (
+            SKCanvas canvas,
+            SKPoint position,
+            TextPaintOptions? options = null
+        )
     {
         Layout();
 
@@ -749,10 +756,10 @@ public class RichString
         var para = FindClosestParagraph (y);
 
         // Get it's paint positio
-        var paintPos = para.TextBlockPaintPosition (this);
+        var paintPos = para!.TextBlockPaintPosition (this);
 
         // Hit test
-        var htr = para.TextBlock.HitTest (x - paintPos.X, y - paintPos.Y);
+        var htr = para.TextBlock!.HitTest (x - paintPos.X, y - paintPos.Y);
 
         // Convert the hit test record from TextBlock relative indices
         // to rich string relative indicies
@@ -772,10 +779,10 @@ public class RichString
         return htr;
     }
 
-    private ParagraphInfo FindClosestParagraph (float y)
+    private ParagraphInfo? FindClosestParagraph (float y)
     {
         // Work out which text block is closest
-        ParagraphInfo pPrev = null;
+        ParagraphInfo? pPrev = null;
         foreach (var p in _paragraphs)
         {
             // Ignore truncated paragraphs
@@ -791,7 +798,7 @@ public class RichString
                 // NB: We compare the text block coords, not the paragraphs
                 //     so that regardless of paragraph margins we always
                 //     hit test against the closer text block
-                var distPrev = y - (pPrev.yPosition + pPrev.TextBlock.MeasuredHeight);
+                var distPrev = y - (pPrev.yPosition + pPrev.TextBlock!.MeasuredHeight);
                 var distThis = y - (p.yPosition + p.MarginTop);
                 if (Math.Abs (distPrev) < Math.Abs (distThis))
                 {
@@ -804,7 +811,7 @@ public class RichString
             }
 
             // Is it within this paragraph's textblock?
-            if (y < p.yPosition + p.MarginTop + p.TextBlock.MeasuredHeight)
+            if (y < p.yPosition + p.MarginTop + p.TextBlock!.MeasuredHeight)
             {
                 return p;
             }
@@ -833,7 +840,7 @@ public class RichString
         if (position.CodePointIndex == MeasuredLength)
         {
             // Special case for after the last displayed paragraph
-            p = _paragraphs.LastOrDefault (x => !x.Truncated);
+            p = _paragraphs.LastOrDefault (x => !x.Truncated)!;
         }
         else
         {
@@ -842,7 +849,7 @@ public class RichString
 
 
         // Get the caret info
-        var ci = p.TextBlock.GetCaretInfo (new CaretPosition (position.CodePointIndex - p.CodePointOffset,
+        var ci = p.TextBlock!.GetCaretInfo (new CaretPosition (position.CodePointIndex - p.CodePointOffset,
             position.AltPosition));
 
         // Adjust it
@@ -903,7 +910,7 @@ public class RichString
             ellipsisEnabled = _ellipsisEnabled,
             textAlignment = _textAlignment,
             baseDirection = _baseDirection,
-            styleManager = StyleManager.Default.Value,
+            styleManager = StyleManager.Default.Value!,
             previousParagraph = null,
         };
 
@@ -924,7 +931,7 @@ public class RichString
             // If this paragraph wasn't completely truncated, then update the measured width
             if (!p.Truncated)
             {
-                var paraWidth = p.TextBlock.MeasuredWidth + p.MarginLeft + p.MarginRight;
+                var paraWidth = p.TextBlock!.MeasuredWidth + p.MarginLeft + p.MarginRight;
                 if (paraWidth > _measuredWidth)
                 {
                     _measuredWidth = paraWidth;
@@ -949,7 +956,7 @@ public class RichString
         public SKCanvas canvas;
         public SKPoint paintPosition;
         public float renderWidth;
-        public TextPaintOptions textPaintOptions;
+        public TextPaintOptions? textPaintOptions;
     }
 
     private struct LayoutContext
@@ -965,7 +972,7 @@ public class RichString
         public TextAlignment? textAlignment;
         public TextDirection? baseDirection;
         public StyleManager styleManager;
-        public ParagraphInfo previousParagraph;
+        public ParagraphInfo? previousParagraph;
         public int MeasuredLength;
         public int TotalLength;
     }
@@ -980,9 +987,9 @@ public class RichString
         return this;
     }
 
-    private static int _nextRevision = 0;
-    private bool _revisionValid = false;
-    private uint _revision = 0;
+    private static int _nextRevision;
+    private bool _revisionValid;
+    private uint _revision;
     private bool _needsLayout = true;
     private bool _needsFullLayout = true;
     private float? _maxWidth;
@@ -991,7 +998,7 @@ public class RichString
     private bool _ellipsisEnabled = true;
     private TextAlignment _textAlignment;
     private TextDirection _baseDirection;
-    private IStyle _baseStyle;
+    private IStyle? _baseStyle;
 
     private float _measuredWidth;
     private float _measuredHeight;
@@ -1000,7 +1007,7 @@ public class RichString
     private int _measuredLength;
     private int _totalLength;
 
-    private List<ParagraphInfo> _paragraphs = new List<ParagraphInfo>();
+    private List<ParagraphInfo> _paragraphs = new ();
 
     private class ParagraphInfo
     {
@@ -1034,7 +1041,7 @@ public class RichString
             var xPos = MarginLeft;
             if (!owner.MaxWidth.HasValue)
             {
-                switch (TextBlock.ResolveTextAlignment())
+                switch (TextBlock!.ResolveTextAlignment())
                 {
                     case RichTextKit.TextAlignment.Center:
                         xPos += (owner.MeasuredWidth - TextBlock.MeasuredWidth) / 2;
@@ -1078,12 +1085,12 @@ public class RichString
 
 
             // Paint it
-            TextBlock.Paint (ctx.canvas, ctx.paintPosition + TextBlockPaintPosition (ctx.owner), ctx.textPaintOptions);
+            TextBlock!.Paint (ctx.canvas, ctx.paintPosition + TextBlockPaintPosition (ctx.owner), ctx.textPaintOptions);
 
             // Restore selection indicies
             if (oldSel.HasValue)
             {
-                ctx.textPaintOptions.Selection = oldSel;
+                ctx.textPaintOptions!.Selection = oldSel;
             }
         }
 
@@ -1163,7 +1170,7 @@ public class RichString
             // Truncated?
             if (TextBlock.MaxLines == 0 || TextBlock.MaxHeight == 0)
             {
-                ctx.previousParagraph?.TextBlock.AddEllipsis();
+                ctx.previousParagraph?.TextBlock?.AddEllipsis();
                 TextBlock = null;
                 Truncated = true;
                 ctx.Truncated = true;
@@ -1183,7 +1190,7 @@ public class RichString
             {
                 if (TextBlock.Lines.Count == 0 && ctx.previousParagraph != null)
                 {
-                    ctx.previousParagraph.TextBlock.AddEllipsis();
+                    ctx.previousParagraph.TextBlock!.AddEllipsis();
                 }
 
                 // All following blocks should be truncated
@@ -1191,7 +1198,7 @@ public class RichString
             }
         }
 
-        public TextBlock TextBlock;
+        public TextBlock? TextBlock;
         public float MarginLeft;
         public float MarginRight;
         public float MarginTop;
@@ -1201,13 +1208,13 @@ public class RichString
         public bool Truncated;
         public float yPosition; // Laid out y-position
 
-        public List<Item> _items = new List<Item>();
+        public List<Item> _items = new ();
     }
 
     private class BuildContext
     {
-        public TextBlock TextBlock;
-        public StyleManager StyleManager;
+        public TextBlock? TextBlock;
+        public StyleManager? StyleManager;
     }
 
     private abstract class Item
@@ -1231,7 +1238,7 @@ public class RichString
 
         public override void Build (BuildContext ctx)
         {
-            ctx.TextBlock.AddText (_text, ctx.StyleManager.CurrentStyle);
+            ctx.TextBlock!.AddText (_text, ctx.StyleManager!.CurrentStyle);
         }
 
         public override void Build (StringBuilder sb)
@@ -1251,7 +1258,7 @@ public class RichString
 
         public override void Build (BuildContext ctx)
         {
-            ctx.StyleManager.FontFamily (_value);
+            ctx.StyleManager!.FontFamily (_value);
         }
     }
 
@@ -1266,7 +1273,7 @@ public class RichString
 
         public override void Build (BuildContext ctx)
         {
-            ctx.StyleManager.FontSize (_value);
+            ctx.StyleManager!.FontSize (_value);
         }
     }
 
@@ -1281,7 +1288,7 @@ public class RichString
 
         public override void Build (BuildContext ctx)
         {
-            ctx.StyleManager.FontWeight (_value);
+            ctx.StyleManager!.FontWeight (_value);
         }
     }
 
@@ -1296,7 +1303,7 @@ public class RichString
 
         public override void Build (BuildContext ctx)
         {
-            ctx.StyleManager.FontWidth (_value);
+            ctx.StyleManager!.FontWidth (_value);
         }
     }
 
@@ -1311,7 +1318,7 @@ public class RichString
 
         public override void Build (BuildContext ctx)
         {
-            ctx.StyleManager.FontItalic (_value);
+            ctx.StyleManager!.FontItalic (_value);
         }
     }
 
@@ -1326,7 +1333,7 @@ public class RichString
 
         public override void Build (BuildContext ctx)
         {
-            ctx.StyleManager.Underline (_value);
+            ctx.StyleManager!.Underline (_value);
         }
     }
 
@@ -1341,7 +1348,7 @@ public class RichString
 
         public override void Build (BuildContext ctx)
         {
-            ctx.StyleManager.StrikeThrough (_value);
+            ctx.StyleManager!.StrikeThrough (_value);
         }
     }
 
@@ -1356,7 +1363,7 @@ public class RichString
 
         public override void Build (BuildContext ctx)
         {
-            ctx.StyleManager.LineHeight (_value);
+            ctx.StyleManager!.LineHeight (_value);
         }
     }
 
@@ -1371,7 +1378,7 @@ public class RichString
 
         public override void Build (BuildContext ctx)
         {
-            ctx.StyleManager.TextColor (_value);
+            ctx.StyleManager!.TextColor (_value);
         }
     }
 
@@ -1386,7 +1393,7 @@ public class RichString
 
         public override void Build (BuildContext ctx)
         {
-            ctx.StyleManager.BackgroundColor (_value);
+            ctx.StyleManager!.BackgroundColor (_value);
         }
     }
 
@@ -1401,7 +1408,7 @@ public class RichString
 
         public override void Build (BuildContext ctx)
         {
-            ctx.StyleManager.HaloColor (_value);
+            ctx.StyleManager!.HaloColor (_value);
         }
     }
 
@@ -1416,7 +1423,7 @@ public class RichString
 
         public override void Build (BuildContext ctx)
         {
-            ctx.StyleManager.HaloWidth (_value);
+            ctx.StyleManager!.HaloWidth (_value);
         }
     }
 
@@ -1431,7 +1438,7 @@ public class RichString
 
         public override void Build (BuildContext ctx)
         {
-            ctx.StyleManager.HaloBlur (_value);
+            ctx.StyleManager!.HaloBlur (_value);
         }
     }
 
@@ -1446,7 +1453,7 @@ public class RichString
 
         public override void Build (BuildContext ctx)
         {
-            ctx.StyleManager.LetterSpacing (_value);
+            ctx.StyleManager!.LetterSpacing (_value);
         }
     }
 
@@ -1461,7 +1468,7 @@ public class RichString
 
         public override void Build (BuildContext ctx)
         {
-            ctx.StyleManager.FontVariant (_value);
+            ctx.StyleManager!.FontVariant (_value);
         }
     }
 
@@ -1476,43 +1483,32 @@ public class RichString
 
         public override void Build (BuildContext ctx)
         {
-            ctx.StyleManager.TextDirection (_value);
+            ctx.StyleManager!.TextDirection (_value);
         }
     }
 
-    private class PushItem : Item
+    private class PushItem
+        : Item
     {
-        public PushItem()
-        {
-        }
-
         public override void Build (BuildContext ctx)
         {
-            ctx.StyleManager.Push();
+            ctx.StyleManager!.Push();
         }
     }
 
     private class PopItem : Item
     {
-        public PopItem()
-        {
-        }
-
         public override void Build (BuildContext ctx)
         {
-            ctx.StyleManager.Pop();
+            ctx.StyleManager!.Pop();
         }
     }
 
     private class NormalItem : Item
     {
-        public NormalItem()
-        {
-        }
-
         public override void Build (BuildContext ctx)
         {
-            ctx.StyleManager.Bold (false);
+            ctx.StyleManager!.Bold (false);
             ctx.StyleManager.FontItalic (false);
             ctx.StyleManager.Underline (UnderlineStyle.None);
             ctx.StyleManager.StrikeThrough (StrikeThroughStyle.None);

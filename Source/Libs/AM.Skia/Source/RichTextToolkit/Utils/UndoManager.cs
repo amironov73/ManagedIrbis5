@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* UndoManager.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -263,7 +263,7 @@ public class UndoManager<T>
     /// <summary>
     /// Gets the description of the next undo operation
     /// </summary>
-    public string UndoDescription
+    public string? UndoDescription
     {
         get
         {
@@ -280,7 +280,7 @@ public class UndoManager<T>
     /// <summary>
     /// Gets the description of the next redo operation
     /// </summary>
-    public string RedoDescription
+    public string? RedoDescription
     {
         get
         {
@@ -297,17 +297,17 @@ public class UndoManager<T>
     /// <summary>
     /// Event fired when any operation (or group of operations) starts
     /// </summary>
-    public event Action StartOperation;
+    public event Action? StartOperation;
 
     /// <summary>
     /// Event fired when any operation (or group of operations) ends
     /// </summary>
-    public event Action EndOperation;
+    public event Action? EndOperation;
 
     /// <summary>
     /// Fired when the modified state of the document changes
     /// </summary>
-    public event Action ModifiedChanged;
+    public event Action? ModifiedChanged;
 
     /// <summary>
     /// Checks if the document is currently modified
@@ -354,7 +354,7 @@ public class UndoManager<T>
     /// Get the current unsealed unit
     /// </summary>
     /// <returns>The unsealed unit if available, otherwise null</returns>
-    public UndoUnit<T> GetUnsealedUnit()
+    public UndoUnit<T>? GetUnsealedUnit()
     {
         // Don't allow coalescing while we have open groups.
         if (_openGroups.Count > 0)
@@ -381,7 +381,7 @@ public class UndoManager<T>
     /// Retrieves the unit that would be executed on Undo
     /// </summary>
     /// <returns>An UndoUnit, or null</returns>
-    public UndoUnit<T> GetUndoUnit()
+    public UndoUnit<T>? GetUndoUnit()
     {
         if (_currentPos > 0)
         {
@@ -397,7 +397,7 @@ public class UndoManager<T>
     /// Retrieves the unit that would be executed on Redo
     /// </summary>
     /// <returns>An UndoUnit, or null</returns>
-    public UndoUnit<T> GetRedoUnit()
+    public UndoUnit<T>? GetRedoUnit()
     {
         if (_currentPos < _units.Count)
         {
@@ -526,7 +526,7 @@ public class UndoManager<T>
     /// <summary>
     /// Get the currently undo group
     /// </summary>
-    private UndoGroup<T> CurrentGroup
+    private UndoGroup<T>? CurrentGroup
     {
         get
         {
@@ -558,13 +558,13 @@ public class UndoManager<T>
 
     // Private members
     private T _context;
-    private List<UndoUnit<T>> _units = new List<UndoUnit<T>>();
-    private Stack<UndoGroup<T>> _openGroups = new Stack<UndoGroup<T>>();
+    private List<UndoUnit<T>> _units = new ();
+    private Stack<UndoGroup<T>> _openGroups = new ();
     private int _currentPos;
     private int _unmodifiedPos;
     private int _maxUnits;
     private int _blockDepth;
-    private GroupDisposer _groupDisposer;
+    private GroupDisposer? _groupDisposer;
 }
 
 /// <summary>
@@ -594,7 +594,7 @@ public abstract class UndoUnit<T>
     /// </summary>
     public virtual string Description
     {
-        get => _description;
+        get => _description!;
         protected set => _description = value;
     }
 
@@ -642,10 +642,10 @@ public abstract class UndoUnit<T>
     /// <remarks>
     /// Will be null if the undo unit isn't within a group operation
     /// </remarks>
-    public UndoGroup<T> Group { get; set; }
+    public UndoGroup<T>? Group { get; set; }
 
     // Private members
-    private string _description;
+    private string? _description;
     private bool _sealed;
 }
 
@@ -740,5 +740,5 @@ public class UndoGroup<T> : UndoUnit<T>
     }
 
     // Private members
-    private List<UndoUnit<T>> _units = new List<UndoUnit<T>>();
+    private List<UndoUnit<T>> _units = new ();
 }

@@ -70,7 +70,7 @@ public struct Slice<T> : IEnumerable<T>, System.Collections.IEnumerable
     public int Length
     {
         [MethodImpl (MethodImplOptions.AggressiveInlining)]
-        get { return _length; }
+        get => _length;
     }
 
     /// <summary>
@@ -272,11 +272,11 @@ public struct Slice<T> : IEnumerable<T>, System.Collections.IEnumerable
     /// <summary>
     /// A shared empty slice of type T
     /// </summary>
-    public static Slice<T> Empty => new Slice<T>();
+    public static Slice<T> Empty => new ();
 
     /// <summary>
     /// Get the slice as a Span
     /// </summary>
     /// <returns></returns>
-    public Span<T> AsSpan() => new Span<T> (_array, _start, _length);
+    public Span<T> AsSpan() => new (_array, _start, _length);
 }

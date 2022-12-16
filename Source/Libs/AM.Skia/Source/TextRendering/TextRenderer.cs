@@ -35,7 +35,7 @@ public static class TextRenderer
         { Environment.NewLine, UnicodeCharacters.NewLine.ToString(), UnicodeCharacters.CarriageReturn.ToString() };
 
     private static FontCache FontCache;
-    private static readonly SKPaint TextPaint = new SKPaint();
+    private static readonly SKPaint TextPaint = new ();
 
     private static float LineHeight
     {
@@ -109,8 +109,8 @@ public static class TextRenderer
 
     private static int NumberOfLines;
     private static float TextDesiredHeight;
-    private static List<float> LinesWidth = new List<float>();
-    private static List<float> LinesOffsetX = new List<float>();
+    private static List<float> LinesWidth = new ();
+    private static List<float> LinesOffsetX = new ();
     private static float LetterOffsetY;
 
     private class LetterInfo
@@ -122,7 +122,7 @@ public static class TextRenderer
         public int LineIndex;
     }
 
-    private static List<LetterInfo> LettersInfo = new List<LetterInfo>();
+    private static List<LetterInfo> LettersInfo = new ();
 
     private delegate int GetFirstCharOrWordLength (string textLine, int startIndex);
 
@@ -481,7 +481,7 @@ public static class TextRenderer
         return ContentSize;
     }
 
-    private static HashSet<int> LinesHadDrawedUnderlines = new HashSet<int>();
+    private static HashSet<int> LinesHadDrawedUnderlines = new ();
 
     private static void DrawCursorForEmptyString (SKCanvas canvas, Font font, ref SKColor foreColor)
     {

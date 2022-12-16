@@ -387,9 +387,9 @@ public class TextLine
     /// <summary>
     /// Internal List of runs
     /// </summary>
-    internal List<FontRun> RunsInternal = new List<FontRun>();
+    internal List<FontRun> RunsInternal = new ();
 
-    internal static ThreadLocal<ObjectPool<TextLine>> Pool = new ThreadLocal<ObjectPool<TextLine>> (() =>
+    internal static ThreadLocal<ObjectPool<TextLine>> Pool = new (() =>
         new ObjectPool<TextLine>()
         {
             Cleaner = (r) =>

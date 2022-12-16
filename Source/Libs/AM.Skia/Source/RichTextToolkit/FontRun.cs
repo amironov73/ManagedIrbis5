@@ -895,7 +895,7 @@ public class FontRun
         _font = null;
     }
 
-    internal static ThreadLocal<ObjectPool<FontRun>> Pool = new ThreadLocal<ObjectPool<FontRun>> (() =>
+    internal static ThreadLocal<ObjectPool<FontRun>> Pool = new (() =>
         new ObjectPool<FontRun>()
         {
             Cleaner = (r) => r.Reset()

@@ -75,7 +75,7 @@ public struct CaretInfo
     /// <summary>
     /// Place holder caret info structure for no caret
     /// </summary>
-    public static CaretInfo None = new CaretInfo()
+    public static CaretInfo None = new ()
     {
         CodePointIndex = -1,
     };

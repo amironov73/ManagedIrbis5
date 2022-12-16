@@ -9,20 +9,13 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* StyleRun.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-
-using AM.Skia.RichTextKit.Utils;
 
 #endregion
 
@@ -30,16 +23,19 @@ using AM.Skia.RichTextKit.Utils;
 
 namespace AM.Skia.RichTextKit;
 
+using Utils;
+
 /// <summary>
 /// Represets a style run - a logical run of characters all with the same
 /// style.
 /// </summary>
-public class StyleRun : IRun
+public class StyleRun
+    : IRun
 {
     /// <summary>
     /// Get the code points of this run.
     /// </summary>
-    public Slice<int> CodePoints => CodePointBuffer.SubSlice (Start, Length);
+    public Slice<int> CodePoints => CodePointBuffer!.SubSlice (Start, Length);
 
     /// <summary>
     /// Get the text of this style run
@@ -69,7 +65,7 @@ public class StyleRun : IRun
     /// <summary>
     /// The style attributes to be applied to text in this run.
     /// </summary>
-    public IStyle Style { get; internal set; }
+    public IStyle? Style { get; internal set; }
 
     int IRun.Offset => Start;
     int IRun.Length => Length;
@@ -77,9 +73,9 @@ public class StyleRun : IRun
     /// <summary>
     /// The global list of code points
     /// </summary>
-    internal Buffer<int> CodePointBuffer;
+    internal Buffer<int>? CodePointBuffer;
 
-    internal static ThreadLocal<ObjectPool<StyleRun>> Pool = new ThreadLocal<ObjectPool<StyleRun>> (() =>
+    internal static ThreadLocal<ObjectPool<StyleRun>> Pool = new (() =>
         new ObjectPool<StyleRun>()
         {
             Cleaner = (r) =>

@@ -9,26 +9,23 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* StyledText.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using SkiaSharp;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-
-using AM.Skia.RichTextKit.Utils;
 
 #endregion
 
 #nullable enable
 
 namespace AM.Skia.RichTextKit;
+
+using Utils;
 
 /// <summary>
 /// Represents a block of formatted, laid out and measurable text
@@ -58,7 +55,7 @@ public class StyledText
     {
         // Reset everything
         _codePoints.Clear();
-        StyleRun.Pool.Value.ReturnAndClear (_styleRuns);
+        StyleRun.Pool.Value!.ReturnAndClear (_styleRuns);
         _hasTextDirectionOverrides = false;
         OnChanged();
     }
@@ -76,10 +73,7 @@ public class StyledText
     /// <summary>
     /// Get the text runs as added by AddText
     /// </summary>
-    public IReadOnlyList<StyleRun> StyleRuns
-    {
-        get { return _styleRuns; }
-    }
+    public IReadOnlyList<StyleRun> StyleRuns => _styleRuns;
 
     /// <summary>
     /// Converts a code point index to a character index
@@ -126,12 +120,12 @@ public class StyledText
         var utf32 = _codePoints.Add (text);
 
         // Create a run
-        var run = StyleRun.Pool.Value.Get();
+        var run = StyleRun.Pool.Value!.Get();
         run.CodePointBuffer = _codePoints;
         run.Start = utf32.Start;
         run.Length = utf32.Length;
         run.Style = style;
-        if (style != null)
+        if (style != null!)
         {
             _hasTextDirectionOverrides |= style.TextDirection != TextDirection.Auto;
         }
@@ -148,7 +142,11 @@ public class StyledText
     /// </summary>
     /// <param name="text">The text to add</param>
     /// <param name="style">The style of the text</param>
-    public void AddText (Slice<int> text, IStyle style)
+    public void AddText
+        (
+            Slice<int> text,
+            IStyle? style
+        )
     {
         if (text.Length == 0)
         {
@@ -159,7 +157,7 @@ public class StyledText
         var utf32 = _codePoints.Add (text);
 
         // Create a run
-        var run = StyleRun.Pool.Value.Get();
+        var run = StyleRun.Pool.Value!.Get();
         run.CodePointBuffer = _codePoints;
         run.Start = utf32.Start;
         run.Length = utf32.Length;
@@ -269,7 +267,12 @@ public class StyledText
     /// <param name="position">The position to insert the text</param>
     /// <param name="text">The text to add</param>
     /// <param name="style">The style of the text (optional)</param>
-    public void InsertText (int position, ReadOnlySpan<char> text, IStyle style = null)
+    public void InsertText
+        (
+            int position,
+            ReadOnlySpan<char> text,
+            IStyle? style = null
+        )
     {
         // Redundant?
         if (text.Length == 0)
@@ -301,7 +304,12 @@ public class StyledText
     /// <param name="position">The position to insert the text</param>
     /// <param name="text">The text to add</param>
     /// <param name="style">The style of the text (optional)</param>
-    public void InsertText (int position, string text, IStyle style = null)
+    public void InsertText
+        (
+            int position,
+            string text,
+            IStyle? style = null
+        )
     {
         // Redundant?
         if (text.Length == 0)
@@ -372,7 +380,7 @@ public class StyledText
                 {
                     // Delete runs that are completely within the deleted range
                     _styleRuns.RemoveAt (i);
-                    StyleRun.Pool.Value.Return (sr);
+                    StyleRun.Pool.Value!.Return (sr);
                     i--;
                     continue;
                 }
@@ -428,7 +436,7 @@ public class StyledText
             // Remove excess runs
             while (_styleRuns.Count > 1)
             {
-                StyleRun.Pool.Value.Return (_styleRuns[1]);
+                StyleRun.Pool.Value!.Return (_styleRuns[1]);
                 _styleRuns.RemoveAt (1);
             }
 
@@ -472,7 +480,7 @@ public class StyledText
                     // Internal to existing run, keep start and end
 
                     // Create new run for end
-                    var endRun = StyleRun.Pool.Value.Get();
+                    var endRun = StyleRun.Pool.Value!.Get();
                     endRun.CodePointBuffer = _codePoints;
                     endRun.Start = run.Start + subRun.Offset + subRun.Length;
                     endRun.Length = run.End - endRun.Start;
@@ -488,14 +496,14 @@ public class StyledText
             else
             {
                 // Remove completely covered style runs
-                StyleRun.Pool.Value.Return (_styleRuns[subRun.Index]);
+                StyleRun.Pool.Value!.Return (_styleRuns[subRun.Index]);
                 _styleRuns.RemoveAt (subRun.Index);
                 newRunPos = subRun.Index;
             }
         }
 
         // Create style run for the new style
-        var newRun = StyleRun.Pool.Value.Get();
+        var newRun = StyleRun.Pool.Value!.Get();
         newRun.CodePointBuffer = _codePoints;
         newRun.Start = position;
         newRun.Length = length;
@@ -542,7 +550,10 @@ public class StyledText
     /// </remarks>
     /// <param name="offset">The code point offset in the text</param>
     /// <returns>An IStyle</returns>
-    public IStyle GetStyleAtOffset (int offset)
+    public IStyle? GetStyleAtOffset
+        (
+            int offset
+        )
     {
         if (Length == 0 || _styleRuns.Count == 0)
         {
@@ -663,7 +674,7 @@ public class StyledText
                 // Split this run and insert the new style run between
 
                 // Create the second part
-                var split = StyleRun.Pool.Value.Get();
+                var split = StyleRun.Pool.Value!.Get();
                 split.CodePointBuffer = _codePoints;
                 split.Start = utf32.Start + utf32.Length;
                 split.Length = sr.End - utf32.Start;
@@ -685,7 +696,7 @@ public class StyledText
         // Create a new style run
         if (style != null)
         {
-            var run = StyleRun.Pool.Value.Get();
+            var run = StyleRun.Pool.Value!.Get();
             run.CodePointBuffer = _codePoints;
             run.Start = utf32.Start;
             run.Length = utf32.Length;
@@ -721,7 +732,7 @@ public class StyledText
 
         // Since we're iterating the entire set of style runs, might as
         // we recalculate this flag while we're at it
-        _hasTextDirectionOverrides = _styleRuns[0].Style.TextDirection != TextDirection.Auto;
+        _hasTextDirectionOverrides = _styleRuns[0].Style!.TextDirection != TextDirection.Auto;
 
         // No need to coalesc a single run
         if (_styleRuns.Count == 1)
@@ -737,14 +748,14 @@ public class StyledText
             var run = _styleRuns[i];
 
             // Update flag
-            _hasTextDirectionOverrides |= run.Style.TextDirection != TextDirection.Auto;
+            _hasTextDirectionOverrides |= run.Style!.TextDirection != TextDirection.Auto;
 
             // Can run be coalesced?
             if (run.Style == prev.Style)
             {
                 // Yes
                 prev.Length += run.Length;
-                StyleRun.Pool.Value.Return (run);
+                StyleRun.Pool.Value!.Return (run);
                 _styleRuns.RemoveAt (i);
                 i--;
             }
@@ -767,17 +778,17 @@ public class StyledText
     /// <summary>
     /// All code points as supplied by user, accumulated into a single buffer
     /// </summary>
-    protected Utf32Buffer _codePoints = new Utf32Buffer();
+    protected Utf32Buffer _codePoints = new ();
 
     /// <summary>
     /// A list of style runs, as supplied by user
     /// </summary>
-    protected List<StyleRun> _styleRuns = new List<StyleRun>();
+    protected List<StyleRun> _styleRuns = new ();
 
     /// <summary>
     /// Set to true if any style runs have a directionality override.
     /// </summary>
-    protected bool _hasTextDirectionOverrides = false;
+    protected bool _hasTextDirectionOverrides;
 
     /// <inheritdoc />
     public override string ToString()

@@ -155,7 +155,7 @@ public abstract partial class EntityTreeNode<TNode, TId, TItem>
 
         var duplicateNodeIds =
             from grp in nodesGroupedById
-            let hasBeenRegistered = TreeIdMap.Contains (grp.Key)
+            let hasBeenRegistered = TreeIdMap!.Contains (grp.Key)
             where hasBeenRegistered
             select grp.Key;
 

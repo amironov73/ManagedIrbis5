@@ -67,7 +67,7 @@ public struct MappedSlice<T>
     public ref T this [int index]
     {
         [MethodImpl (MethodImplOptions.AggressiveInlining)]
-        get { return ref _data[_mapping[index]]; }
+        get => ref _data[_mapping[index]];
     }
 
     /// <summary>

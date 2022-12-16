@@ -48,7 +48,7 @@ internal class Bidi
     /// A per-thread instance that can be re-used as often
     /// as necessary.
     /// </summary>
-    internal static ThreadLocal<Bidi> Instance = new ThreadLocal<Bidi> (() => new Bidi());
+    internal static ThreadLocal<Bidi> Instance = new (() => new Bidi());
 
     /// <summary>
     /// Constructs a new instance of Bidi algorithm processor
@@ -193,7 +193,7 @@ internal class Bidi
     /// The forward mapping maps the start index to the end index.
     /// The reverse mapping maps the end index to the start index.
     /// </remarks>
-    private BiDictionary<int, int> _isolatePairs = new BiDictionary<int, int>();
+    private BiDictionary<int, int> _isolatePairs = new ();
 
     /// <summary>
     /// The working Directionality types
@@ -203,7 +203,7 @@ internal class Bidi
     /// <summary>
     /// The buffer underlying _workingTypes
     /// </summary>
-    private Buffer<Directionality> _workingTypesBuffer = new Buffer<Directionality>();
+    private Buffer<Directionality> _workingTypesBuffer = new ();
 
     /// <summary>
     /// The resolved levels
@@ -213,7 +213,7 @@ internal class Bidi
     /// <summary>
     /// The buffer underlying _resolvedLevels
     /// </summary>
-    private Buffer<sbyte> _resolvedLevelsBuffer = new Buffer<sbyte>();
+    private Buffer<sbyte> _resolvedLevelsBuffer = new ();
 
     /// <summary>
     /// The resolve paragraph embedding level
@@ -235,28 +235,28 @@ internal class Bidi
     /// The status stack used during resolution of explicit
     /// embedding and isolating runs
     /// </summary>
-    private Stack<Status> _statusStack = new Stack<Status>();
+    private Stack<Status> _statusStack = new ();
 
     /// <summary>
     /// Mapping used to virtually remove characters for rule X9
     /// </summary>
-    private Buffer<int> _X9Map = new Buffer<int>();
+    private Buffer<int> _X9Map = new ();
 
     /// <summary>
     /// Re-usable list of level runs
     /// </summary>
-    private List<LevelRun> _levelRuns = new List<LevelRun>();
+    private List<LevelRun> _levelRuns = new ();
 
     /// <summary>
     /// Mapping for the current isolating sequence, built
     /// by joining level runs from the x9 map.
     /// </summary>
-    private Buffer<int> _isolatedRunMapping = new Buffer<int>();
+    private Buffer<int> _isolatedRunMapping = new ();
 
     /// <summary>
     /// A stack of pending isolate openings used by FindIsolatePairs()
     /// </summary>
-    private Stack<int> _pendingIsolateOpenings = new Stack<int>();
+    private Stack<int> _pendingIsolateOpenings = new ();
 
     /// <summary>
     /// Build a list of matching isolates for a directionality slice
@@ -1265,7 +1265,7 @@ internal class Bidi
     /// <summary>
     /// An shared instance of the PairedBracket comparer
     /// </summary>
-    private static PairedBracketComparer _pairedBracketComparer = new PairedBracketComparer();
+    private static PairedBracketComparer _pairedBracketComparer = new ();
 
     /// <summary>
     /// Maximum pairing depth for paired brackets
@@ -1276,12 +1276,12 @@ internal class Bidi
     /// Re-useable list of pending opening brackets used by the
     /// LocatePairedBrackets method
     /// </summary>
-    private List<int> _pendingOpeningBrackets = new List<int>();
+    private List<int> _pendingOpeningBrackets = new ();
 
     /// <summary>
     /// Resolved list of paired brackets
     /// </summary>
-    private List<BracketPair> _pairedBrackets = new List<BracketPair>();
+    private List<BracketPair> _pairedBrackets = new ();
 
     /// <summary>
     /// Locate all pair brackets in the current isolating run

@@ -1486,7 +1486,7 @@ public class QRCodeGenerator
                     (i + 16) / 16,
                     new List<VersionInfoDetails>
                     {
-                        new VersionInfoDetails (
+                        new (
                                 ECCLevel.L,
                                 new Dictionary<EncodingMode, int>()
                                 {
@@ -1496,7 +1496,7 @@ public class QRCodeGenerator
                                     { EncodingMode.Kanji, capacityBaseValues[i + 3] },
                                 }
                             ),
-                        new VersionInfoDetails (
+                        new (
                                 ECCLevel.M,
                                 new Dictionary<EncodingMode, int>()
                                 {
@@ -1506,7 +1506,7 @@ public class QRCodeGenerator
                                     { EncodingMode.Kanji, capacityBaseValues[i + 7] },
                                 }
                             ),
-                        new VersionInfoDetails (
+                        new (
                                 ECCLevel.Q,
                                 new Dictionary<EncodingMode, int>()
                                 {
@@ -1516,7 +1516,7 @@ public class QRCodeGenerator
                                     { EncodingMode.Kanji, capacityBaseValues[i + 11] },
                                 }
                             ),
-                        new VersionInfoDetails (
+                        new (
                                 ECCLevel.H,
                                 new Dictionary<EncodingMode, int>()
                                 {

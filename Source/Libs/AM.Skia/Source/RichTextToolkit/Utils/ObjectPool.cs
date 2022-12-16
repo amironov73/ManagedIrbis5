@@ -92,5 +92,5 @@ internal class ObjectPool<T> where T : class, new()
 
     public Action<T> Cleaner;
 
-    private List<T> _pool = new List<T>();
+    private List<T> _pool = new ();
 }

@@ -15,11 +15,7 @@
 
 #region Using directives
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using AM.Skia.RichTextKit.Utils;
 
@@ -45,7 +41,7 @@ internal class BidiData
         _pairedBracketValues = new Buffer<int>();
     }
 
-    private List<int> _paragraphPositions = new List<int>();
+    private List<int> _paragraphPositions = new ();
 
     private sbyte _paragraphEmbeddingLevel;
     public sbyte ParagraphEmbeddingLevel => _paragraphEmbeddingLevel;
@@ -166,8 +162,8 @@ internal class BidiData
     private Buffer<Directionality> _types;
     private Buffer<PairedBracketType> _pairedBracketTypes;
     private Buffer<int> _pairedBracketValues;
-    private Buffer<Directionality> _savedTypes;
-    private Buffer<PairedBracketType> _savedPairedBracketTypes;
+    private Buffer<Directionality>? _savedTypes;
+    private Buffer<PairedBracketType>? _savedPairedBracketTypes;
 
     /// <summary>
     /// Save the Types and PairedBracketTypes of this bididata
@@ -191,8 +187,8 @@ internal class BidiData
         // Capture the types data
         _savedTypes.Clear();
         _savedTypes.Add (_types.AsSlice());
-        _savedPairedBracketTypes.Clear();
-        _savedPairedBracketTypes.Add (_pairedBracketTypes.AsSlice());
+        _savedPairedBracketTypes!.Clear();
+        _savedPairedBracketTypes!.Add (_pairedBracketTypes.AsSlice());
     }
 
     /// <summary>
@@ -201,9 +197,9 @@ internal class BidiData
     public void RestoreTypes()
     {
         _types.Clear();
-        _types.Add (_savedTypes.AsSlice());
+        _types.Add (_savedTypes!.AsSlice());
         _pairedBracketTypes.Clear();
-        _pairedBracketTypes.Add (_savedPairedBracketTypes.AsSlice());
+        _pairedBracketTypes.Add (_savedPairedBracketTypes!.AsSlice());
     }
 
     /// <summary>
@@ -228,7 +224,7 @@ internal class BidiData
     /// </remarks>
     public Slice<int> PairedBracketValues;
 
-    public Buffer<sbyte> _tempLevelBuffer;
+    public Buffer<sbyte>? _tempLevelBuffer;
 
     /// <summary>
     /// Gets a temporary level buffer.  Used by TextBlock when

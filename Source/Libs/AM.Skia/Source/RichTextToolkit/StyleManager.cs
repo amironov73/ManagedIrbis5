@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* StyleManager.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -43,7 +43,7 @@ public class StyleManager
     /// <summary>
     /// A per-thread style manager
     /// </summary>
-    public static ThreadLocal<StyleManager> Default = new ThreadLocal<StyleManager> (() => new StyleManager());
+    public static ThreadLocal<StyleManager> Default = new (() => new StyleManager());
 
     /// <summary>
     /// Constructs a new StyleManager
@@ -270,8 +270,9 @@ public class StyleManager
     /// <param name="textDirection">The new text direction</param>
     /// <param name="replacementCharacter">The new replacement character</param>
     /// <returns>An IStyle for the new style</returns>
-    public IStyle Update (
-            string fontFamily = null,
+    public IStyle Update
+        (
+            string? fontFamily = null,
             float? fontSize = null,
             int? fontWeight = null,
             SKFontStyleWidth? fontWidth = 0,
@@ -359,13 +360,14 @@ public class StyleManager
     /// <summary>
     /// Internal wrapper around Style to attach our owner reference check
     /// </summary>
-    private class StyleManagerStyle : Style
+    private class StyleManagerStyle
+        : Style
     {
-        public StyleManager Owner;
+        public StyleManager? Owner;
     }
 
-    private Dictionary<string, Style> _styleMap = new Dictionary<string, Style>();
-    private Stack<IStyle> _userStack = new Stack<IStyle>();
-    private IStyle _defaultStyle = new Style();
+    private Dictionary<string, Style> _styleMap = new ();
+    private Stack<IStyle> _userStack = new ();
+    private IStyle _defaultStyle;
     private IStyle _currentStyle;
 }

@@ -9,19 +9,13 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* HitTestResult.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
-#region Using directives
+#nullable enable
 
 using System;
-using System.Collections.Generic;
-using System.Text;
-
-#endregion
-
-#nullable enable
 
 namespace AM.Skia.RichTextKit;
 
@@ -84,18 +78,13 @@ public struct HitTestResult
     /// </remarks>
     public bool AltCaretPosition;
 
-
     /// <summary>
     /// Helper to get the closest position as a CaretPosition
     /// </summary>
-    public CaretPosition CaretPosition => new CaretPosition (ClosestCodePointIndex, AltCaretPosition);
+    public CaretPosition CaretPosition => new (ClosestCodePointIndex, AltCaretPosition);
 
-    /// <summary>
-    /// Compares this object to another instance
-    /// </summary>
-    /// <param name="obj"></param>
-    /// <returns></returns>
-    public override bool Equals (object obj)
+    /// <inheritdoc cref="ValueType.Equals(object?)"/>
+    public override bool Equals (object? obj)
     {
         return obj is HitTestResult result &&
                OverLine == result.OverLine &&
@@ -104,13 +93,16 @@ public struct HitTestResult
                ClosestCodePointIndex == result.ClosestCodePointIndex;
     }
 
-    /// <summary>
-    /// Gets a hash code for this object
-    /// </summary>
-    /// <returns>The hash value</returns>
+    /// <inheritdoc cref="ValueType.GetHashCode"/>
     public override int GetHashCode()
     {
-        return base.GetHashCode();
+        return HashCode.Combine
+            (
+                OverLine,
+                ClosestLine,
+                OverCodePointIndex,
+                ClosestCodePointIndex
+            );
     }
 
     /// <summary>
@@ -121,7 +113,7 @@ public struct HitTestResult
     /// <summary>
     /// Hit test result indicating no hit, or untested hit
     /// </summary>
-    public static HitTestResult None = new HitTestResult()
+    public static HitTestResult None = new ()
     {
         OverLine = -1,
         OverCodePointIndex = -1,

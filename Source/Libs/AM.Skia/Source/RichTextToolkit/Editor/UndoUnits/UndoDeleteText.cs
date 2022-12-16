@@ -9,16 +9,11 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* UndoDeleteText.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
-
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
 
 using AM.Skia.RichTextKit.Utils;
 
@@ -28,7 +23,8 @@ using AM.Skia.RichTextKit.Utils;
 
 namespace AM.Skia.RichTextKit.Editor.UndoUnits;
 
-internal class UndoDeleteText : UndoUnit<TextDocument>
+internal class UndoDeleteText
+    : UndoUnit<TextDocument>
 {
     public UndoDeleteText (TextBlock textBlock, int offset, int length)
     {
@@ -45,7 +41,7 @@ internal class UndoDeleteText : UndoUnit<TextDocument>
 
     public override void Undo (TextDocument context)
     {
-        _textBlock.InsertText (_offset, _savedText);
+        _textBlock.InsertText (_offset, _savedText!);
         _savedText = null;
     }
 
@@ -59,7 +55,7 @@ internal class UndoDeleteText : UndoUnit<TextDocument>
 
         // Copy the additional text
         var temp = _textBlock.Extract (_offset - length, length);
-        _savedText.InsertText (0, temp);
+        _savedText!.InsertText (0, temp);
         _textBlock.DeleteText (_offset - length, length);
 
         // Update position
@@ -79,7 +75,7 @@ internal class UndoDeleteText : UndoUnit<TextDocument>
 
         // Copy the additional text
         var temp = _textBlock.Extract (_offset, length);
-        _savedText.InsertText (_length, temp);
+        _savedText!.InsertText (_length, temp);
         _textBlock.DeleteText (_offset, length);
 
         // Update position
@@ -118,5 +114,5 @@ internal class UndoDeleteText : UndoUnit<TextDocument>
     private TextBlock _textBlock;
     private int _offset;
     private int _length;
-    private StyledText _savedText;
+    private StyledText? _savedText;
 }

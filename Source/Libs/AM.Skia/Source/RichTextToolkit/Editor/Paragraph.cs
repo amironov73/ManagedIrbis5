@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* Paragraph.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -50,7 +50,7 @@ public abstract class Paragraph : IRun
     /// </summary>
     /// <param name="canvas">The canvas to paint to</param>
     /// <param name="options">Paint options</param>
-    public abstract void Paint (SKCanvas canvas, TextPaintOptions options);
+    public abstract void Paint (SKCanvas canvas, TextPaintOptions? options);
 
     /// <summary>
     /// Get caret position information
@@ -121,10 +121,7 @@ public abstract class Paragraph : IRun
     /// <remarks>
     /// Non-text paragraphs should return null
     /// </remarks>
-    public virtual TextBlock TextBlock
-    {
-        get => null;
-    }
+    public virtual TextBlock? TextBlock => null;
 
     /// <summary>
     /// Copy all style attributes from this paragraph to another

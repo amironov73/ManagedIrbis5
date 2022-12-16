@@ -4,12 +4,14 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
+// ReSharper disable CompareOfFloatsByEqualityOperator
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Local
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* TextBlock.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,7 +21,6 @@ using SkiaSharp;
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 using AM.Skia.RichTextKit.Utils;
@@ -33,14 +34,15 @@ namespace AM.Skia.RichTextKit;
 /// <summary>
 /// Represents a block of formatted, laid out and measurable text
 /// </summary>
-public class TextBlock : StyledText
+public class TextBlock
+    : StyledText
 {
-    /// <summary>
-    /// Constructor
-    /// </summary>
-    public TextBlock()
-    {
-    }
+    // /// <summary>
+    // /// Constructor
+    // /// </summary>
+    // public TextBlock()
+    // {
+    // }
 
     /// <summary>
     /// The max width property sets the maximum width of a line, after which
@@ -215,8 +217,8 @@ public class TextBlock : StyledText
     public override void Clear()
     {
         // Reset everything
-        FontRun.Pool.Value.ReturnAndClear (_fontRuns);
-        TextLine.Pool.Value.ReturnAndClear (_lines);
+        FontRun.Pool.Value!.ReturnAndClear (_fontRuns);
+        TextLine.Pool.Value!.ReturnAndClear (_lines);
         _textShapingBuffers.Clear();
         base.Clear();
     }
@@ -423,13 +425,10 @@ public class TextBlock : StyledText
     /// </summary>
     /// <param name="canvas">The Skia canvas to paint to</param>
     /// <param name="options">Options controlling the paint operation</param>
-    public void Paint (SKCanvas canvas, TextPaintOptions options = null)
+    public void Paint (SKCanvas canvas, TextPaintOptions? options = null)
     {
         // Ensure have options
-        if (options == null)
-        {
-            options = TextPaintOptions.Default;
-        }
+        options ??=TextPaintOptions.Default;
 
         // Ensure layout done
         Layout();
@@ -476,7 +475,7 @@ public class TextBlock : StyledText
         }
 
         // Clean up
-        ctx.PaintSelectionBackground?.Dispose();
+        ctx.PaintSelectionBackground.Dispose();
     }
 
     /// <summary>
@@ -485,7 +484,7 @@ public class TextBlock : StyledText
     /// <param name="canvas">The Skia canvas to paint to</param>
     /// <param name="position">The top left position within the canvas to draw at</param>
     /// <param name="options">Options controlling the paint operation</param>
-    public void Paint (SKCanvas canvas, SKPoint position, TextPaintOptions options = null)
+    public void Paint (SKCanvas canvas, SKPoint position, TextPaintOptions? options = null)
     {
         // Translate
         canvas.Save();
@@ -656,7 +655,7 @@ public class TextBlock : StyledText
                 _rightOverhang = rightOverhang;
             }
 
-            return new SKRect (_leftOverhang.Value, 0, _rightOverhang.Value, 0);
+            return new SKRect (_leftOverhang.Value, 0, _rightOverhang!.Value, 0);
         }
     }
 
@@ -848,12 +847,12 @@ public class TextBlock : StyledText
         ci.CodePointIndex = _caretIndicies[cpii];
 
         var frIndex = FindFontRunForCodePointIndex (position.CodePointIndex);
-        FontRun fr = null;
+        FontRun? fontRun = null;
         if (frIndex >= 0)
         {
-            fr = _fontRuns[frIndex];
+            fontRun = _fontRuns[frIndex];
 
-            if (fr.Start == position.CodePointIndex && frIndex > 0)
+            if (fontRun.Start == position.CodePointIndex && frIndex > 0)
             {
                 var frPrior = _fontRuns[frIndex - 1];
                 if (frPrior.End == position.CodePointIndex)
@@ -862,7 +861,7 @@ public class TextBlock : StyledText
                         (frPrior.Direction == TextDirection.RTL &&
                          frPrior.RunKind != FontRunKind.TrailingWhitespace))
                     {
-                        fr = frPrior;
+                        fontRun = frPrior;
                     }
                 }
             }
@@ -872,19 +871,19 @@ public class TextBlock : StyledText
             var lastLine = _lines[_lines.Count - 1];
             if (lastLine.RunsInternal.Count > 0)
             {
-                fr = lastLine.RunsInternal[lastLine.RunsInternal.Count - 1];
+                fontRun = lastLine.RunsInternal[lastLine.RunsInternal.Count - 1];
             }
         }
 
-        if (fr == null)
+        if (fontRun == null)
         {
             return CaretInfo.None;
         }
 
         // Setup caret coordinates
-        ci.CaretXCoord = ci.CodePointIndex < 0 ? 0 : fr.GetXCoordOfCodePointIndex (ci.CodePointIndex);
-        ci.CaretRectangle = CalculateCaretRectangle (ci, fr);
-        ci.LineIndex = _lines.IndexOf (fr.Line);
+        ci.CaretXCoord = ci.CodePointIndex < 0 ? 0 : fontRun.GetXCoordOfCodePointIndex (ci.CodePointIndex);
+        ci.CaretRectangle = CalculateCaretRectangle (ci, fontRun);
+        ci.LineIndex = _lines.IndexOf (fontRun.Line);
 
         return ci;
     }
@@ -936,7 +935,7 @@ public class TextBlock : StyledText
 
         // Try to get the previous font run in this line
         var lineRuns = fr.Line.Runs as List<FontRun>;
-        var index = lineRuns.IndexOf (fr);
+        var index = lineRuns!.IndexOf (fr);
         if (index <= 0)
         {
             return fr;
@@ -1060,22 +1059,22 @@ public class TextBlock : StyledText
     /// <summary>
     /// Re-usable buffers for text shaping results
     /// </summary>
-    private TextShaper.ResultBufferSet _textShapingBuffers = new TextShaper.ResultBufferSet();
+    private TextShaper.ResultBufferSet _textShapingBuffers = new ();
 
     /// <summary>
     /// Reusable buffer for bidi data
     /// </summary>
-    private BidiData _bidiData = new BidiData();
+    private BidiData _bidiData = new ();
 
     /// <summary>
     /// A list of font runs, after splitting by directionality, user styles and font fallback
     /// </summary>
-    private List<FontRun> _fontRuns = new List<FontRun>();
+    private List<FontRun> _fontRuns = new ();
 
     /// <summary>
     /// Helper for splitting code into linebreaks
     /// </summary>
-    private LineBreaker _lineBreaker = new LineBreaker();
+    private LineBreaker _lineBreaker = new ();
 
     /// <summary>
     /// The measured height
@@ -1090,12 +1089,12 @@ public class TextBlock : StyledText
     /// <summary>
     /// The required left overhang
     /// </summary>
-    private float? _leftOverhang = null;
+    private float? _leftOverhang;
 
     /// <summary>
     /// The required left overhang
     /// </summary>
-    private float? _rightOverhang = null;
+    private float? _rightOverhang;
 
     /// <summary>
     /// Indicates if the text was truncated by max height/max lines limitations
@@ -1105,17 +1104,17 @@ public class TextBlock : StyledText
     /// <summary>
     /// The final laid out set of lines
     /// </summary>
-    private List<TextLine> _lines = new List<TextLine>();
+    private List<TextLine> _lines = new ();
 
     /// <summary>
     /// Calculated valid caret indicies
     /// </summary>
-    private List<int> _caretIndicies = new List<int>();
+    private List<int> _caretIndicies = new ();
 
     /// <summary>
     /// Calculated word boundary caret indicies
     /// </summary>
-    private List<int> _wordBoundaryIndicies = new List<int>();
+    private List<int> _wordBoundaryIndicies = new ();
 
     /// <summary>
     /// Resolve the text alignment when set to Auto
@@ -1164,7 +1163,7 @@ public class TextBlock : StyledText
                     var sr = _styleRuns[i];
 
                     // Does it have a direction override?
-                    if (sr.Style.TextDirection == TextDirection.Auto)
+                    if (sr.Style!.TextDirection == TextDirection.Auto)
                     {
                         continue;
                     }
@@ -1176,7 +1175,7 @@ public class TextBlock : StyledText
             }
 
             // Process bidi
-            bidi.Process (_bidiData);
+            bidi!.Process (_bidiData);
 
             var resolvedLevels = bidi.ResolvedLevels;
 
@@ -1196,7 +1195,7 @@ public class TextBlock : StyledText
                     var sr = _styleRuns[i];
 
                     // Does it have a direction override?
-                    if (sr.Style.TextDirection == TextDirection.Auto)
+                    if (sr.Style!.TextDirection == TextDirection.Auto)
                     {
                         continue;
                     }
@@ -1244,7 +1243,7 @@ public class TextBlock : StyledText
 
                 // Add the run
                 var dir = bidiRuns[bidiRun].Direction == Directionality.L ? TextDirection.LTR : TextDirection.RTL;
-                AddDirectionalRun (_styleRuns[styleRun], pos, nextPos - pos, dir, _styleRuns[styleRun].Style);
+                AddDirectionalRun (_styleRuns[styleRun], pos, nextPos - pos, dir, _styleRuns[styleRun].Style!);
 
                 // Move to next position
                 pos = nextPos;
@@ -1255,8 +1254,14 @@ public class TextBlock : StyledText
 
             // Add the final run
             var dir2 = bidiRuns[bidiRun].Direction == Directionality.L ? TextDirection.LTR : TextDirection.RTL;
-            AddDirectionalRun (_styleRuns[_styleRuns.Count - 1], pos, _codePoints.Length - pos, dir2,
-                _styleRuns[styleRun].Style);
+            AddDirectionalRun
+                (
+                    _styleRuns[_styleRuns.Count - 1],
+                    pos,
+                    _codePoints.Length - pos,
+                    dir2,
+                    _styleRuns[styleRun].Style!
+                );
 
             // Flush runs
             FlushUnshapedRuns();
@@ -1287,7 +1292,7 @@ public class TextBlock : StyledText
     /// <remarks>
     /// When null, the default font mapper (FontMapper.Default) is used.
     /// </remarks>
-    public FontMapper FontMapper { get; set; }
+    public FontMapper? FontMapper { get; set; }
 
     /// <summary>
     /// Adds a run of directional text
@@ -1369,8 +1374,8 @@ public class TextBlock : StyledText
         {
             // If there's only one accumulated shape run then we can shape and add it directly
             var usr = _unshapedRuns[0];
-            _fontRuns.Add (CreateFontRun (usr.styleRun, _codePoints.SubSlice (usr.start, usr.length), usr.direction,
-                usr.style, usr.typeface, usr.asFallbackFor));
+            _fontRuns.Add (CreateFontRun (usr.styleRun!, _codePoints.SubSlice (usr.start, usr.length), usr.direction,
+                usr.style!, usr.typeface!, usr.asFallbackFor!));
         }
         else
         {
@@ -1379,46 +1384,46 @@ public class TextBlock : StyledText
             // apart so they're rendered separately with correct style for each piece.
             var first = _unshapedRuns[0];
             var last = _unshapedRuns[_unshapedRuns.Count - 1];
-            var spanningRun = CreateFontRun (first.styleRun,
+            var spanningRun = CreateFontRun (first.styleRun!,
                 _codePoints.SubSlice (first.start, last.start + last.length - first.start), first.direction,
-                first.style, first.typeface, first.asFallbackFor);
+                first.style!, first.typeface!, first.asFallbackFor!);
 
             for (var i = 1; i < _unshapedRuns.Count; i++)
             {
                 var newRun = spanningRun.Split (_unshapedRuns[i].start);
 
-                spanningRun.StyleRun = _unshapedRuns[i - 1].styleRun;
-                spanningRun.Style = _unshapedRuns[i - 1].style;
+                spanningRun.StyleRun = _unshapedRuns[i - 1].styleRun!;
+                spanningRun.Style = _unshapedRuns[i - 1].style!;
 
                 _fontRuns.Add (spanningRun);
                 spanningRun = newRun;
             }
 
-            spanningRun.StyleRun = _unshapedRuns[_unshapedRuns.Count - 1].styleRun;
-            spanningRun.Style = _unshapedRuns[_unshapedRuns.Count - 1].style;
+            spanningRun.StyleRun = _unshapedRuns[_unshapedRuns.Count - 1].styleRun!;
+            spanningRun.Style = _unshapedRuns[_unshapedRuns.Count - 1].style!;
             _fontRuns.Add (spanningRun);
         }
 
         _unshapedRuns.Clear();
     }
 
-    private List<UnshapedRun> _unshapedRuns = new List<UnshapedRun>();
+    private List<UnshapedRun> _unshapedRuns = new ();
 
     private class UnshapedRun
     {
-        public StyleRun styleRun;
+        public StyleRun? styleRun;
         public int start;
         public int length;
         public TextDirection direction;
-        public IStyle style;
-        public SKTypeface typeface;
-        public SKTypeface asFallbackFor;
+        public IStyle? style;
+        public SKTypeface? typeface;
+        public SKTypeface? asFallbackFor;
 
         // Check if this unshaped run can be shaped with the next one
         public bool CanShapeWith (UnshapedRun next)
         {
             return typeface == next.typeface &&
-                   style.FontSize == next.style.FontSize &&
+                   style!.FontSize == next.style!.FontSize &&
                    asFallbackFor == next.asFallbackFor &&
                    direction == next.direction &&
                    start + length == next.start;
@@ -1453,7 +1458,7 @@ public class TextBlock : StyledText
         }
 
         // Create the run
-        var fontRun = FontRun.Pool.Value.Get();
+        var fontRun = FontRun.Pool.Value!.Get();
         fontRun.StyleRun = styleRun;
         fontRun.CodePointBuffer = _codePoints;
         fontRun.Start = codePoints.Start;
@@ -1502,8 +1507,6 @@ public class TextBlock : StyledText
             fr.XCoord = consumedWidth;
             consumedWidth += fr.Width;
 
-            float totalWidthToThisBreakPoint = 0;
-
             // Skip line breaks
             var breakLine = false;
             while (lbrIndex < lineBreakPositions.Count)
@@ -1522,7 +1525,7 @@ public class TextBlock : StyledText
                 }
 
                 // Do we need to break
-                totalWidthToThisBreakPoint = fr.XCoord + fr.LeadingWidth (lbr.PositionMeasure);
+                var totalWidthToThisBreakPoint = fr.XCoord + fr.LeadingWidth (lbr.PositionMeasure);
                 if (totalWidthToThisBreakPoint > _maxWidthResolved)
                 {
                     breakLine = true;
@@ -1647,7 +1650,7 @@ public class TextBlock : StyledText
     {
         // Create the line
 
-        var line = TextLine.Pool.Value.Get();
+        var line = TextLine.Pool.Value!.Get();
         line.TextBlock = this;
         line.YCoord = _measuredHeight;
 
@@ -1662,7 +1665,7 @@ public class TextBlock : StyledText
                 if (fr.Direction != _resolvedBaseDirection)
                 {
                     // What is this a fallback for?
-                    var asFallbackFor = TypefaceFromStyle (fr.Style, false);
+                    var asFallbackFor = TypefaceFromStyle (fr.Style, ignoreFontVariants: false);
 
                     // Create a new font run over the same text span but using the base direction
                     _fontRuns[i] = CreateFontRun (fr.StyleRun, fr.CodePoints, _resolvedBaseDirection, fr.Style,
@@ -1869,7 +1872,6 @@ public class TextBlock : StyledText
     private float LayoutLineRTLWordStyle (TextLine line)
     {
         float xPos = 0;
-        float totalWidth = 0;
         float trailingWhitespaceWidth = 0;
         for (var i = 0; i < line.Runs.Count; i++)
         {
@@ -1889,8 +1891,6 @@ public class TextBlock : StyledText
                 groupWidth += line.Runs[j].Width;
                 j++;
             }
-
-            totalWidth += groupWidth;
 
             // How many runs in the group
             var runsInGroup = j - i;
@@ -1968,7 +1968,7 @@ public class TextBlock : StyledText
 
         // Remove the font runs that weren't assigned to a line because the text
         // was truncated
-        while (_fontRuns.Count > 0 && _fontRuns[_fontRuns.Count - 1].Line == null)
+        while (_fontRuns.Count > 0 && _fontRuns[_fontRuns.Count - 1].Line == null!)
         {
             _fontRuns.RemoveAt (_fontRuns.Count - 1);
         }
@@ -2011,7 +2011,7 @@ public class TextBlock : StyledText
     /// <summary>
     /// Re-usable buffer holding just the ellipsis character
     /// </summary>
-    private static Utf32Buffer ellipsis = new Utf32Buffer ("…");
+    private static Utf32Buffer ellipsis = new ("…");
 
     /// <summary>
     /// Create a special font run containing the ellipsis character

@@ -9,17 +9,9 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* ITextDocumentView.cs --
  * Ars Magna project, http://arsmagna.ru
  */
-
-#region Using directives
-
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-#endregion
 
 #nullable enable
 
@@ -47,7 +39,7 @@ public interface ITextDocumentView
     /// Notifies that the document is about to change
     /// </summary>
     /// <param name="view">The view initiating the change</param>
-    void OnDocumentWillChange (ITextDocumentView view);
+    void OnDocumentWillChange (ITextDocumentView? view);
 
     /// <summary>
     /// Notifies a view that the document has changed and provides
@@ -55,11 +47,11 @@ public interface ITextDocumentView
     /// </summary>
     /// <param name="view">The view initiating the change</param>
     /// <param name="info">Information about the change</param>
-    void OnDocumentChange (ITextDocumentView view, DocumentChangeInfo info);
+    void OnDocumentChange (ITextDocumentView? view, DocumentChangeInfo info);
 
     /// <summary>
     /// Notifies that the document has finished changing
     /// </summary>
     /// <param name="view">The view initiating the change</param>
-    void OnDocumentDidChange (ITextDocumentView view);
+    void OnDocumentDidChange (ITextDocumentView? view);
 }

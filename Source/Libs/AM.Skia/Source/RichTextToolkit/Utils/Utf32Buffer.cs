@@ -279,7 +279,7 @@ public class Utf32Buffer : Buffer<int>
     /// Indicies of all code points in the in the buffer
     /// that were decoded from a surrogate pair
     /// </summary>
-    private List<int> _surrogatePositions = new List<int>();
+    private List<int> _surrogatePositions = new ();
 
     private bool _surrogatePositionsValid = false;
 

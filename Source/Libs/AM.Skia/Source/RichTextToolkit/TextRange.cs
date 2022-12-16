@@ -103,10 +103,7 @@ public struct TextRange
     /// <summary>
     /// Returns the reversed text range
     /// </summary>
-    public TextRange Reversed
-    {
-        get { return new TextRange (End, Start, false); }
-    }
+    public TextRange Reversed => new TextRange (End, Start, false);
 
     /// <summary>
     /// Returns the normalized version of the text range
@@ -156,10 +153,7 @@ public struct TextRange
     /// <summary>
     /// Gets the end of the range as a caret position
     /// </summary>
-    public CaretPosition CaretPosition
-    {
-        get { return new CaretPosition (End, AltPosition); }
-    }
+    public CaretPosition CaretPosition => new CaretPosition (End, AltPosition);
 
     /// <summary>
     /// Clamp the text range to a document length

@@ -4,12 +4,14 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
+// ReSharper disable CompareOfFloatsByEqualityOperator
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable LocalizableElement
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* TextDocument.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -102,7 +104,7 @@ public partial class TextDocument
             {
                 foreach (var p in _paragraphs)
                 {
-                    p.TextBlock.Alignment = value;
+                    p.TextBlock!.Alignment = value;
                 }
 
                 InvalidateLayout();
@@ -124,7 +126,7 @@ public partial class TextDocument
             {
                 foreach (var p in _paragraphs)
                 {
-                    p.TextBlock.ApplyStyle (0, p.TextBlock.Length, _defaultStyle);
+                    p.TextBlock!.ApplyStyle (0, p.TextBlock.Length, _defaultStyle);
                 }
 
                 InvalidateLayout();
@@ -138,7 +140,7 @@ public partial class TextDocument
     /// </summary>
     public string Text
     {
-        get { return this.GetText (new TextRange (0, Length)).ToString(); }
+        get => this.GetText (new TextRange (0, Length)).ToString();
         set
         {
             // Suppress normal events
@@ -189,7 +191,13 @@ public partial class TextDocument
     /// <param name="fromYCoord">The top Y-Coord of the visible part of the document</param>
     /// <param name="toYCoord">The bottom Y-Coord of the visible part of the document</param>
     /// <param name="options">Options controlling the paint operation</param>
-    public void Paint (SKCanvas canvas, float fromYCoord, float toYCoord, TextPaintOptions options = null)
+    public void Paint
+        (
+            SKCanvas canvas,
+            float fromYCoord,
+            float toYCoord,
+            TextPaintOptions? options = null
+        )
     {
         // Make sure layout up to date
         Layout();
@@ -415,10 +423,10 @@ public partial class TextDocument
     /// </summary>
     /// <param name="offset">The offset of the code point</param>
     /// <returns>An IStyle</returns>
-    public IStyle GetStyleAtOffset (int offset)
+    public IStyle? GetStyleAtOffset (int offset)
     {
         // Find containing paragraph
-        var paraIndex = GetParagraphForCodePointIndex (new CaretPosition (offset), out var indexInPara);
+        var paraIndex = GetParagraphForCodePointIndex (new CaretPosition (offset), out _);
         var para = _paragraphs[paraIndex];
 
         // Only support text blocks for now
@@ -782,7 +790,7 @@ public partial class TextDocument
         TextRange getParagraphRange()
         {
             // Get the paragraph and position in paragraph
-            var paraIndex = GetParagraphForCodePointIndex (position, out var paraCodePointIndex);
+            var paraIndex = GetParagraphForCodePointIndex (position, out _);
             var para = _paragraphs[paraIndex];
 
             // Create text range covering the entire paragraph
@@ -806,7 +814,13 @@ public partial class TextDocument
     /// <param name="range">The range to be replaced</param>
     /// <param name="text">The text to replace with</param>
     /// <param name="semantics">Controls how undo operations are coalesced and view selections updated</param>"
-    public void ReplaceText (ITextDocumentView view, TextRange range, string text, EditSemantics semantics)
+    public void ReplaceText
+        (
+            ITextDocumentView? view,
+            TextRange range,
+            string text,
+            EditSemantics semantics
+        )
     {
         // Convert text to utf32
         Slice<int> codePoints;
@@ -830,7 +844,13 @@ public partial class TextDocument
     /// <param name="range">The range to be replaced</param>
     /// <param name="codePoints">The text to replace with</param>
     /// <param name="semantics">Controls how undo operations are coalesced and view selections updated</param>"
-    public void ReplaceText (ITextDocumentView view, TextRange range, Slice<int> codePoints, EditSemantics semantics)
+    public void ReplaceText
+        (
+            ITextDocumentView? view,
+            TextRange range,
+            Slice<int> codePoints,
+            EditSemantics semantics
+        )
     {
         // Check range is valid
         if (range.Minimum < 0 || range.Maximum > this.Length)
@@ -865,19 +885,13 @@ public partial class TextDocument
     /// <summary>
     /// Indicates if an IME composition is currently in progress
     /// </summary>
-    public bool IsImeComposing
-    {
-        get => _imeView != null;
-    }
+    public bool IsImeComposing => _imeView != null;
 
 
     /// <summary>
     /// Get the code point offset position of the current IME composition
     /// </summary>
-    public int ImeCompositionOffset
-    {
-        get => _imeView == null ? -1 : _imeInitialSelection.Minimum;
-    }
+    public int ImeCompositionOffset => _imeView == null ? -1 : _imeInitialSelection.Minimum;
 
     /// <summary>
     /// Starts and IME composition action
@@ -917,7 +931,10 @@ public partial class TextDocument
     /// Complete an IME composition
     /// </summary>
     /// <param name="view">The initiating view</param>
-    public void FinishImeComposition (ITextDocumentView view)
+    public void FinishImeComposition
+        (
+            ITextDocumentView? view
+        )
     {
         if (_imeView != null)
         {
@@ -930,7 +947,10 @@ public partial class TextDocument
     /// Undo the last editor operation
     /// </summary>
     /// <param name="view">The view initiating the undo command</param>
-    public void Undo (ITextDocumentView view)
+    public void Undo
+        (
+            ITextDocumentView? view
+        )
     {
         _initiatingView = view;
         _undoManager.Undo();
@@ -1073,7 +1093,7 @@ public partial class TextDocument
             indexInParagraph = _paragraphs[paraIndex].Length;
         }
 
-        System.Diagnostics.Debug.Assert (indexInParagraph >= 0);
+        Debug.Assert (indexInParagraph >= 0);
 
         // Done
         return paraIndex;
@@ -1289,8 +1309,14 @@ public partial class TextDocument
     /// <param name="text">The replacement text</param>
     /// <param name="semantics">The edit semantics of the change</param>
     /// <param name="imeCaretOffset">The position of the IME caret relative to the start of the range</param>
-    private void ReplaceTextInternal (ITextDocumentView view, TextRange range, StyledText text, EditSemantics semantics,
-        int imeCaretOffset)
+    private void ReplaceTextInternal
+        (
+            ITextDocumentView? view,
+            TextRange range,
+            StyledText text,
+            EditSemantics semantics,
+            int imeCaretOffset
+        )
     {
         // Quit if redundant
         if (!range.IsRange && text.Length == 0)
@@ -1458,7 +1484,7 @@ public partial class TextDocument
         {
             // Split the paragraph at the insertion point into paragraphs A and B
             var paraA = para;
-            var paraB = new TextParagraph (para as TextParagraph, indexInParagraph, para.Length);
+            var paraB = new TextParagraph ((para as TextParagraph)!, indexInParagraph, para.Length);
             if (para.TextBlock.Length - indexInParagraph - 1 != 0)
             {
                 _undoManager.Do (new UndoDeleteText (paraA.TextBlock, indexInParagraph,
@@ -1489,7 +1515,7 @@ public partial class TextDocument
             // betweeen paragraphs A and B.
             for (var i = 1; i < parts.Length - 1; i++)
             {
-                var betweenPara = new TextParagraph (para as TextParagraph, para.Length - 1, 1);
+                var betweenPara = new TextParagraph ((para as TextParagraph)!, para.Length - 1, 1);
                 var part = parts[i];
                 betweenPara.TextBlock.InsertText (0, text.Extract (part.Offset, part.Length));
                 _undoManager.Do (new UndoInsertParagraph (paraIndex + i, betweenPara));
@@ -1506,18 +1532,18 @@ public partial class TextDocument
     /// Private members
     private float _pageWidth = 1000; // Arbitary default
 
-    private float _measuredHeight = 0;
-    private float _measuredWidth = 0;
-    private int _totalLength = 0;
-    private bool _layoutValid = false;
+    private float _measuredHeight;
+    private float _measuredWidth;
+    private int _totalLength;
+    private bool _layoutValid;
     private bool _lineWrap = true;
     internal List<Paragraph> _paragraphs;
     private UndoManager<TextDocument> _undoManager;
-    private List<ITextDocumentView> _views = new List<ITextDocumentView>();
-    private ITextDocumentView _initiatingView;
-    private ITextDocumentView _imeView;
+    private List<ITextDocumentView> _views = new ();
+    private ITextDocumentView? _initiatingView;
+    private ITextDocumentView? _imeView;
     private TextRange _imeInitialSelection;
-    private IStyle _defaultStyle = StyleManager.Default.Value.DefaultStyle;
+    private IStyle _defaultStyle = StyleManager.Default.Value!.DefaultStyle;
     private TextAlignment _defaultAlignment = TextAlignment.Left;
-    private bool _suppressDocumentChangeEvents = false;
+    private bool _suppressDocumentChangeEvents;
 }

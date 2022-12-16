@@ -113,5 +113,5 @@ public class TextPaintOptions
     /// A default set of paint options that renders text blocks without
     /// a selection range.
     /// </summary>
-    public static TextPaintOptions Default = new TextPaintOptions();
+    public static TextPaintOptions Default = new ();
 }

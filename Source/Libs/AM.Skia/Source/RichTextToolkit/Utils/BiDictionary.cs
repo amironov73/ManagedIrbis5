@@ -9,15 +9,13 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* BiDictionary.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 #endregion
 
@@ -31,9 +29,11 @@ namespace AM.Skia.RichTextKit.Utils;
 /// <typeparam name="T1">Key type</typeparam>
 /// <typeparam name="T2">Value type</typeparam>
 internal class BiDictionary<T1, T2>
+    where T1: notnull
+    where T2: notnull
 {
-    public Dictionary<T1, T2> Forward = new Dictionary<T1, T2>();
-    public Dictionary<T2, T1> Reverse = new Dictionary<T2, T1>();
+    public Dictionary<T1, T2> Forward = new ();
+    public Dictionary<T2, T1> Reverse = new ();
 
     public void Clear()
     {
@@ -47,12 +47,12 @@ internal class BiDictionary<T1, T2>
         Reverse.Add (value, key);
     }
 
-    public bool TryGetValue (T1 key, out T2 value)
+    public bool TryGetValue (T1 key, out T2? value)
     {
         return Forward.TryGetValue (key, out value);
     }
 
-    public bool TryGetKey (T2 value, out T1 key)
+    public bool TryGetKey (T2 value, out T1? key)
     {
         return Reverse.TryGetValue (value, out key);
     }
