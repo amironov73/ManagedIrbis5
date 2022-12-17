@@ -3,33 +3,84 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* AddClassForAttributeModifier.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
-namespace AM.HtmlTags.Conventions.Elements.Builders;
+#region Using directives
 
 using System;
 
+using JetBrains.Annotations;
+
+namespace AM.HtmlTags.Conventions.Elements.Builders;
+
+#region Using directives
+
 using Reflection;
 
-public class AddClassForAttributeModifier<T> : IElementModifier where T : Attribute
-{
-    private readonly string _className;
+#endregion
 
-    public AddClassForAttributeModifier (string className)
+#nullable enable
+
+/// <summary>
+///
+/// </summary>
+/// <typeparam name="T"></typeparam>
+[PublicAPI]
+public class AddClassForAttributeModifier<T>
+    : IElementModifier where T : Attribute
+{
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="className"></param>
+    public AddClassForAttributeModifier
+        (
+            string className
+        )
     {
+        Sure.NotNullNorEmpty (className);
+
         _className = className;
     }
 
-    public bool Matches (ElementRequest token) => token.Accessor.HasAttribute<T>();
+    #endregion
 
-    public void Modify (ElementRequest request) => request.CurrentTag.AddClass (_className);
+    #region Private members
+
+    private readonly string _className;
+
+    #endregion
+
+    #region IElementModifier members
+
+    /// <inheritdoc cref="ITagModifier.Matches"/>
+    public bool Matches
+        (
+            ElementRequest token
+        )
+    {
+        Sure.NotNull (token);
+
+        return token.Accessor.HasAttribute<T>();
+    }
+
+    /// <inheritdoc cref="ITagModifier.Modify"/>
+    public void Modify
+        (
+            ElementRequest request
+        )
+    {
+        Sure.NotNull (request);
+
+        request.CurrentTag.AddClass (_className);
+    }
+
+    #endregion
 }
+
+#endregion

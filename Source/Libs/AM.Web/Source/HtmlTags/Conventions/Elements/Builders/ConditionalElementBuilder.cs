@@ -3,37 +3,94 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* ConditionElementBuilder.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
-namespace AM.HtmlTags.Conventions.Elements.Builders;
+#region Using directives
 
 using System;
 
-// Tested through HtmlConventionRegistry
-public class ConditionalElementBuilder : IElementBuilderPolicy, ITagBuilder
-{
-    private readonly Func<ElementRequest, bool> _filter;
-    private readonly IElementBuilder _inner;
+using JetBrains.Annotations;
 
-    public ConditionalElementBuilder (Func<ElementRequest, bool> filter, IElementBuilder inner)
+#endregion
+
+#nullable enable
+
+namespace AM.HtmlTags.Conventions.Elements.Builders;
+
+/// <summary>
+///
+/// </summary>
+// Tested through HtmlConventionRegistry
+[PublicAPI]
+public class ConditionalElementBuilder
+    : IElementBuilderPolicy, ITagBuilder
+{
+    #region Properties
+
+    /// <inheritdoc cref="ConditionDescription"/>
+    public string? ConditionDescription { get; set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="filter"></param>
+    /// <param name="inner"></param>
+    public ConditionalElementBuilder
+        (
+            Func<ElementRequest, bool> filter,
+            IElementBuilder inner
+        )
     {
+        Sure.NotNull (filter);
+        Sure.NotNull (inner);
+
         _filter = filter;
         _inner = inner;
     }
 
-    public string ConditionDescription { get; set; }
-    public bool Matches (ElementRequest subject) => _filter (subject);
+    #endregion
 
+    #region Private members
+
+    private readonly Func<ElementRequest, bool> _filter;
+
+    private readonly IElementBuilder _inner;
+
+    #endregion
+
+    #region ITagBuilder members
+
+    /// <inheritdoc cref="ITagBuilderPolicy.Matches"/>
+    public bool Matches
+        (
+            ElementRequest subject
+        )
+    {
+        Sure.NotNull (subject);
+
+        return _filter (subject);
+    }
+
+    /// <inheritdoc cref="ITagBuilderPolicy.BuilderFor"/>
     public ITagBuilder BuilderFor (ElementRequest subject) => this;
 
-    public HtmlTag Build (ElementRequest request) => _inner.Build (request);
+    /// <inheritdoc cref="ITagBuilder.Build"/>
+    public HtmlTag Build
+        (
+            ElementRequest request
+        )
+    {
+        Sure.NotNull (request);
+
+        return _inner.Build (request);
+    }
+
+    #endregion
 }

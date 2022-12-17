@@ -3,24 +3,29 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* DefaultLabelBuilder.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
-namespace AM.HtmlTags.Conventions.Elements.Builders;
+#region Using directives
 
 using System.Linq;
 using System.Text.RegularExpressions;
 
-public class DefaultLabelBuilder : IElementBuilder
+#endregion
+
+namespace AM.HtmlTags.Conventions.Elements.Builders;
+
+/// <summary>
+///
+/// </summary>
+public class DefaultLabelBuilder
+    : IElementBuilder
 {
+    #region Private members
+
     private static readonly Regex[] RxPatterns =
     {
         new ("([a-z])([A-Z])", RegexOptions.IgnorePatternWhitespace),
@@ -28,18 +33,50 @@ public class DefaultLabelBuilder : IElementBuilder
         new ("([a-zA-Z])([0-9])", RegexOptions.IgnorePatternWhitespace)
     };
 
-    public bool Matches (ElementRequest subject) => true;
+    #endregion
 
-    public HtmlTag Build (ElementRequest request)
+    #region IElementBuilder members
+
+    /// <inheritdoc cref="ITagBuilder.Build"/>
+    public HtmlTag Build
+        (
+            ElementRequest request
+        )
     {
-        return new HtmlTag ("label").Attr ("for", DefaultIdBuilder.Build (request))
+        Sure.NotNull (request);
+
+        return new HtmlTag ("label")
+            .Attr ("for", DefaultIdBuilder.Build (request))
             .Text (BreakUpCamelCase (request.Accessor.Name));
     }
 
-    public static string BreakUpCamelCase (string fieldName)
+    #endregion
+
+    #region Public methods
+
+    /// <inheritdoc cref="Matches"/>
+    public bool Matches (ElementRequest subject) => true;
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="fieldName"></param>
+    /// <returns></returns>
+    public static string BreakUpCamelCase
+        (
+            string fieldName
+        )
     {
-        var output = RxPatterns.Aggregate (fieldName,
-            (current, regex) => regex.Replace (current, "$1 $2"));
+        Sure.NotNullNorEmpty (fieldName);
+
+        var output = RxPatterns.Aggregate
+            (
+                fieldName,
+                (current, regex) => regex.Replace (current, "$1 $2")
+            );
+
         return output.Replace ('_', ' ');
     }
+
+    #endregion
 }

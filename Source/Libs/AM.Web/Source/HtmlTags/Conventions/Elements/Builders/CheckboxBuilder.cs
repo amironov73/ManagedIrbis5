@@ -3,23 +3,47 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* CheckboxBuilder.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
+#region Using directives
+
+using JetBrains.Annotations;
+
+#endregion
+
+#nullable enable
+
 namespace AM.HtmlTags.Conventions.Elements.Builders;
 
-public class CheckboxBuilder : ElementTagBuilder
+/// <summary>
+///
+/// </summary>
+[PublicAPI]
+public class CheckboxBuilder
+    : ElementTagBuilder
 {
-    public override bool Matches (ElementRequest subject) => subject?.Accessor?.PropertyType == typeof (bool);
+    #region TagBuilder members
 
-    public override HtmlTag Build (ElementRequest request) =>
-        new CheckboxTag (request?.RawValue?.As<bool>() ?? false);
+    /// <inheritdoc cref="TagBuilder.Matches"/>
+    public override bool Matches
+        (
+            ElementRequest subject
+        )
+    {
+        return subject?.Accessor?.PropertyType == typeof (bool);
+    }
+
+    /// <inheritdoc cref="TagBuilder.Build"/>
+    public override HtmlTag Build
+        (
+            ElementRequest request
+        )
+    {
+        return new CheckboxTag (request?.RawValue?.As<bool>() ?? false);
+    }
+
+    #endregion
 }

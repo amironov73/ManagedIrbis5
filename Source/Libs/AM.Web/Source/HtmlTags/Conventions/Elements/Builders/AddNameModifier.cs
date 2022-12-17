@@ -3,29 +3,47 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* AddNameModifier.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
+#region Using directives
+
+using JetBrains.Annotations;
+
+#endregion
+
+#nullable enable
+
 namespace AM.HtmlTags.Conventions.Elements.Builders;
 
-public class AddNameModifier : IElementModifier
+/// <summary>
+///
+/// </summary>
+[PublicAPI]
+public class AddNameModifier
+    : IElementModifier
 {
+    #region IElementModifier members
+
+    /// <inheritdoc cref="ITagModifier.Matches"/>
     public bool Matches (ElementRequest token) => true;
 
-    public void Modify (ElementRequest request)
+    /// <inheritdoc cref="ITagModifier.Modify"/>
+    public void Modify
+        (
+            ElementRequest request
+        )
     {
+        Sure.NotNull (request);
+
         var tag = request.CurrentTag;
         if (tag.IsInputElement() && !tag.HasAttr ("name"))
         {
             tag.Attr ("name", request.ElementId);
         }
     }
+
+    #endregion
 }

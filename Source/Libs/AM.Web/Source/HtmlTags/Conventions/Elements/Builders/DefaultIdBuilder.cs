@@ -3,14 +3,9 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* DefaultIdBuilder.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -18,16 +13,42 @@
 
 using System.Text.RegularExpressions;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
 
 namespace AM.HtmlTags.Conventions.Elements.Builders;
 
+/// <summary>
+///
+/// </summary>
+[PublicAPI]
 public class DefaultIdBuilder
 {
+    #region Private members
+
     private static readonly Regex IdRegex = new (@"[\.\[\]]");
 
-    public static string Build (ElementRequest request)
-        => IdRegex.Replace (request.ElementId, "_");
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    public static string Build
+        (
+            ElementRequest request
+        )
+    {
+        Sure.NotNull (request);
+
+        return IdRegex.Replace (request.ElementId, "_");
+    }
+
+    #endregion
 }

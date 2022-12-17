@@ -3,29 +3,45 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* AddIdModifier
  * Ars Magna project, http://arsmagna.ru
  */
 
+#region Using directives
+
+using JetBrains.Annotations;
+
+#endregion
+
 namespace AM.HtmlTags.Conventions.Elements.Builders;
 
-public class AddIdModifier : IElementModifier
+/// <summary>
+///
+/// </summary>
+[PublicAPI]
+public class AddIdModifier
+    : IElementModifier
 {
+    #region IElementModifier members
+
+    /// <inheritdoc cref="ITagModifier.Matches"/>
     public bool Matches (ElementRequest token) => true;
 
-    public void Modify (ElementRequest request)
+    /// <inheritdoc cref="ITagModifier.Modify"/>
+    public void Modify
+        (
+            ElementRequest request
+        )
     {
+        Sure.NotNull (request);
+
         var tag = request.CurrentTag;
         if (tag.IsInputElement() && !tag.HasAttr ("id"))
         {
             tag.Id (DefaultIdBuilder.Build (request));
         }
     }
+
+    #endregion
 }

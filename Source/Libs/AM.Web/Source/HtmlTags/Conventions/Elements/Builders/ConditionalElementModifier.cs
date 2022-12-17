@@ -3,37 +3,93 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* ConditionalElementModifier.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
+#region Using directives
+
+using JetBrains.Annotations;
+
+#endregion
+
+#nullable enable
+
 namespace AM.HtmlTags.Conventions.Elements.Builders;
+
+#region Using directives
 
 using System;
 
-// Tested through HtmlConventionRegistry
-public class ConditionalElementModifier : IElementModifier
-{
-    private readonly Func<ElementRequest, bool> _filter;
-    private readonly IElementModifier _inner;
+#endregion
 
-    public ConditionalElementModifier (Func<ElementRequest, bool> filter, IElementModifier inner)
+/// <summary>
+///
+/// </summary>
+// Tested through HtmlConventionRegistry
+[PublicAPI]
+public class ConditionalElementModifier
+    : IElementModifier
+{
+    #region Properties
+
+    /// <summary>
+    ///
+    /// </summary>
+    public string? ConditionDescription { get; set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="filter"></param>
+    /// <param name="inner"></param>
+    public ConditionalElementModifier
+        (
+            Func<ElementRequest, bool> filter,
+            IElementModifier inner
+        )
     {
+        Sure.NotNull (filter);
+        Sure.NotNull (inner);
+
         _filter = filter;
         _inner = inner;
     }
 
-    public string ConditionDescription { get; set; }
+    #endregion
 
+    private readonly Func<ElementRequest, bool> _filter;
 
-    public bool Matches (ElementRequest token) => _filter (token);
+    private readonly IElementModifier _inner;
 
-    public void Modify (ElementRequest request) => _inner.Modify (request);
+    #region ITagBuilder members
+
+    /// <inheritdoc cref="ITagModifier.Matches"/>
+    public bool Matches
+        (
+            ElementRequest token
+        )
+    {
+        Sure.NotNull (token);
+
+        return _filter (token);
+    }
+
+    /// <inheritdoc cref="ITagModifier.Modify"/>
+    public void Modify
+        (
+            ElementRequest request
+        )
+    {
+        Sure.NotNull (request);
+
+        _inner.Modify (request);
+    }
+
+    #endregion
 }
