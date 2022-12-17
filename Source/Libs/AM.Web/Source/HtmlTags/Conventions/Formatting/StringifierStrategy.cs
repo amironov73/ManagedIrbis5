@@ -3,23 +3,34 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* StringifierStrategy.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
-namespace AM.HtmlTags.Conventions.Formatting;
+#region Using directives
 
 using System;
 
+#endregion
+
+#nullable enable
+
+namespace AM.HtmlTags.Conventions.Formatting;
+
+/// <summary>
+///
+/// </summary>
 public class StringifierStrategy
 {
-    public Func<GetStringRequest, bool> Matches;
-    public Func<GetStringRequest, string> StringFunction;
+    /// <summary>
+    ///
+    /// </summary>
+    public Func<GetStringRequest, bool>? Matches;
+
+    /// <summary>
+    ///
+    /// </summary>
+    public Func<GetStringRequest, string>? StringFunction;
 }

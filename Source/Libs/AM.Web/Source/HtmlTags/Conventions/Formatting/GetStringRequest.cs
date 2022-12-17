@@ -3,36 +3,108 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* GetStringRequest.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
-namespace AM.HtmlTags.Conventions.Formatting;
+#region Using directives
 
 using System;
 using System.Reflection;
 
+#endregion
+
+#nullable enable
+
+namespace AM.HtmlTags.Conventions.Formatting;
+
+#region Using directives
+
 using Reflection;
 
+#endregion
+
+/// <summary>
+///
+/// </summary>
 public class GetStringRequest
 {
-    private Type _propertyType;
+    #region Properties
 
-    public GetStringRequest (PropertyInfo property, object rawValue)
-        : this (new SingleProperty (property), rawValue, null, null, null)
+    /// <summary>
+    ///
+    /// </summary>
+    public Type? OwnerType { get; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public Type? PropertyType
     {
+        get
+        {
+            if (_propertyType == null && Property != null)
+            {
+                return Property.PropertyType;
+            }
+
+            return _propertyType;
+        }
+        set => _propertyType = value;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    public PropertyInfo? Property { get; }
 
-    public GetStringRequest (Accessor accessor, object rawValue, Func<Type, object> locator, string format,
-        Type ownerType)
+    /// <summary>
+    ///
+    /// </summary>
+    public object? RawValue { get; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public string? Format { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="property"></param>
+    /// <param name="rawValue"></param>
+    public GetStringRequest
+        (
+            PropertyInfo property,
+            object? rawValue
+        )
+        : this (new SingleProperty (property), rawValue, null, null, null)
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="accessor"></param>
+    /// <param name="rawValue"></param>
+    /// <param name="locator"></param>
+    /// <param name="format"></param>
+    /// <param name="ownerType"></param>
+    public GetStringRequest
+        (
+            Accessor? accessor,
+            object? rawValue,
+            Func<Type, object>? locator,
+            string? format,
+            Type? ownerType
+        )
     {
         Locator = locator;
         if (accessor != null)
@@ -70,8 +142,22 @@ public class GetStringRequest
         Format = format;
     }
 
-    public GetStringRequest (Type ownerType, PropertyInfo property, object rawValue, string format,
-        Type propertyType)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="ownerType"></param>
+    /// <param name="property"></param>
+    /// <param name="rawValue"></param>
+    /// <param name="format"></param>
+    /// <param name="propertyType"></param>
+    public GetStringRequest
+        (
+            Type? ownerType,
+            PropertyInfo? property,
+            object? rawValue,
+            string? format,
+            Type propertyType
+        )
     {
         OwnerType = ownerType;
         Property = property;
@@ -80,51 +166,67 @@ public class GetStringRequest
         PropertyType = propertyType;
     }
 
+    #endregion
+
+    #region Private members
+
+    private Type? _propertyType;
+
     // Yes, I made this internal.  Don't necessarily want it in the public interface,
     // but needs to be "settable"
-    internal Func<Type, object> Locator { get; set; }
+    internal Func<Type, object>? Locator { get; set; }
 
-    public Type OwnerType { get; }
+    #endregion
 
-    public Type PropertyType
-    {
-        get
-        {
-            if (_propertyType == null && Property != null)
-            {
-                return Property.PropertyType;
-            }
+    #region Public methods
 
-            return _propertyType;
-        }
-        set => _propertyType = value;
-    }
-
-    public PropertyInfo Property { get; }
-    public object RawValue { get; }
-    public string Format { get; }
-
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="format"></param>
+    /// <returns></returns>
     public string WithFormat (string format) => string.Format (format, RawValue);
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public GetStringRequest GetRequestForNullableType()
     {
-        return new (OwnerType, Property, RawValue, Format, PropertyType.GetInnerTypeFromNullable())
+        return new (OwnerType, Property, RawValue, Format, PropertyType!.GetInnerTypeFromNullable())
         {
             Locator = Locator
         };
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public GetStringRequest GetRequestForElementType()
     {
-        return new (OwnerType, Property, RawValue, Format, PropertyType.GetElementType())
+        return new (OwnerType, Property, RawValue, Format, PropertyType!.GetElementType()!)
         {
             Locator = Locator,
         };
     }
 
-    public T Get<T>() => (T)Locator (typeof (T));
+    /// <summary>
+    ///
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public T Get<T>() => (T)Locator! (typeof (T));
 
-    public bool Equals (GetStringRequest other)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
+    public bool Equals
+        (
+            GetStringRequest other
+        )
     {
         if (ReferenceEquals (null, other))
         {
@@ -140,7 +242,15 @@ public class GetStringRequest
                Equals (other.RawValue, RawValue) && Equals (other.Format, Format);
     }
 
-    public override bool Equals (object obj)
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.Equals(object?)"/>
+    public override bool Equals
+        (
+            object? obj
+        )
     {
         if (ReferenceEquals (null, obj))
         {
@@ -159,7 +269,7 @@ public class GetStringRequest
 
         return Equals ((GetStringRequest)obj);
     }
-
+    /// <inheritdoc cref="object.GetHashCode"/>
     public override int GetHashCode()
     {
         unchecked
@@ -171,4 +281,6 @@ public class GetStringRequest
             return result;
         }
     }
+
+    #endregion
 }

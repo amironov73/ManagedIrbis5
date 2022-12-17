@@ -3,14 +3,8 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* TypeExtensions
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,21 +17,30 @@ using System.Reflection;
 
 internal static class TypeExtensions
 {
+    #region Public methods
+
     public static T As<T> (this object target) => (T)target;
 
-    public static bool CanBeCastTo<T> (this Type type)
+    public static bool CanBeCastTo<T>
+        (
+            this Type? type
+        )
     {
         if (type == null)
         {
             return false;
         }
 
-        Type destinationType = typeof (T);
+        var destinationType = typeof (T);
 
         return CanBeCastTo (type, destinationType);
     }
 
-    public static bool CanBeCastTo (this Type type, Type destinationType)
+    public static bool CanBeCastTo
+        (
+            this Type? type,
+            Type destinationType
+        )
     {
         if (type == null)
         {
@@ -52,12 +55,19 @@ internal static class TypeExtensions
         return destinationType.IsAssignableFrom (type);
     }
 
-    public static bool IsNullable (this Type type)
+    public static bool IsNullable
+        (
+            this Type type
+        )
     {
         return type.GetTypeInfo().IsGenericType && type.GetGenericTypeDefinition() == typeof (Nullable<>);
     }
 
-    public static bool Closes (this Type type, Type openType)
+    public static bool Closes
+        (
+            this Type? type,
+            Type openType
+        )
     {
         if (type == null)
         {
@@ -74,13 +84,13 @@ internal static class TypeExtensions
             return true;
         }
 
-        Type baseType = type.GetTypeInfo().BaseType;
+        var baseType = type.GetTypeInfo().BaseType;
         if (baseType == null)
         {
             return false;
         }
 
-        bool closes = baseType.GetTypeInfo().IsGenericType && baseType.GetGenericTypeDefinition() == openType;
+        var closes = baseType.GetTypeInfo().IsGenericType && baseType.GetGenericTypeDefinition() == openType;
         if (closes)
         {
             return true;
@@ -89,7 +99,10 @@ internal static class TypeExtensions
         return type.GetTypeInfo().BaseType != null && type.GetTypeInfo().BaseType.Closes (openType);
     }
 
-    public static Type IsAnEnumerationOf (this Type type)
+    public static Type? IsAnEnumerationOf
+        (
+            this Type type
+        )
     {
         if (!type.Closes (typeof (IEnumerable<>)))
         {
@@ -111,12 +124,31 @@ internal static class TypeExtensions
             "I don't know how to figure out what this is a collection of. Can you tell me? {0}", new[] { type }));
     }
 
-    public static bool PropertyMatches (this PropertyInfo prop1, PropertyInfo prop2)
-        => prop1.DeclaringType == prop2.DeclaringType && prop1.Name == prop2.Name;
+    public static bool PropertyMatches
+        (
+            this PropertyInfo prop1,
+            PropertyInfo prop2
+        )
+    {
+        return prop1.DeclaringType == prop2.DeclaringType && prop1.Name == prop2.Name;
+    }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="nullableType"></param>
+    /// <returns></returns>
     public static Type GetInnerTypeFromNullable (this Type nullableType) => nullableType.GetGenericArguments()[0];
 
-    public static bool IsNullableOfT (this Type theType)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="theType"></param>
+    /// <returns></returns>
+    public static bool IsNullableOfT
+        (
+            this Type? theType
+        )
     {
         if (theType == null)
         {
@@ -126,10 +158,15 @@ internal static class TypeExtensions
         return theType.GetTypeInfo().IsGenericType && theType.GetGenericTypeDefinition() == typeof (Nullable<>);
     }
 
-    public static bool IsTypeOrNullableOf<T> (this Type theType)
+    public static bool IsTypeOrNullableOf<T>
+        (
+            this Type theType
+        )
     {
-        Type otherType = typeof (T);
+        var otherType = typeof (T);
         return theType == otherType ||
                (theType.IsNullableOfT() && theType.GetGenericArguments()[0] == otherType);
     }
+
+    #endregion
 }

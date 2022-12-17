@@ -3,24 +3,58 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* IDisplayFormatter.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 namespace AM.HtmlTags.Conventions.Formatting;
 
+#region Using directives
+
 using Reflection;
 
+#endregion
+
+#nullable enable
+
+/// <summary>
+///
+/// </summary>
 public interface IDisplayFormatter
 {
-    string GetDisplay (GetStringRequest request);
-    string GetDisplay (Accessor accessor, object target);
-    string GetDisplayForValue (Accessor accessor, object rawValue);
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    string GetDisplay
+        (
+            GetStringRequest request
+        );
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="accessor"></param>
+    /// <param name="target"></param>
+    /// <returns></returns>
+    string GetDisplay
+        (
+            Accessor accessor,
+            object target
+        );
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="accessor"></param>
+    /// <param name="rawValue"></param>
+    /// <returns></returns>
+    string GetDisplayForValue
+        (
+            Accessor accessor,
+            object rawValue
+        );
 }

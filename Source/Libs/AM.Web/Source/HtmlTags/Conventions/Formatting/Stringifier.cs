@@ -3,26 +3,55 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
 /*
  * Ars Magna project, http://arsmagna.ru
  */
 
-namespace AM.HtmlTags.Conventions.Formatting;
+#region Using directives
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
+#endregion
+
+#nullable enable
+
+namespace AM.HtmlTags.Conventions.Formatting;
+
+/// <summary>
+///
+/// </summary>
 public class Stringifier
 {
+    #region Nested type
+
+    /// <summary>
+    ///
+    /// </summary>
+    public class PropertyOverrideStrategy
+    {
+        #region Peroperties
+
+        /// <summary>
+        ///
+        /// </summary>
+        public Func<PropertyInfo, bool>? Matches;
+
+        /// <summary>
+        ///
+        /// </summary>
+        public Func<GetStringRequest, string>? StringFunction;
+
+        #endregion
+    }
+
+    #endregion
+
+    #region Private members
+
     private readonly List<PropertyOverrideStrategy> _overrides = new ();
     private readonly List<StringifierStrategy> _strategies = new ();
 
@@ -62,6 +91,10 @@ public class Stringifier
 
     private static string ToString (GetStringRequest value) => value.RawValue?.ToString() ?? string.Empty;
 
+    #endregion
+
+    #region Public methods
+
     public string GetString (GetStringRequest request)
     {
         if (request?.RawValue == null || request.RawValue as string == string.Empty)
@@ -80,25 +113,40 @@ public class Stringifier
     }
 
 
-    public string GetString (object rawValue)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="rawValue"></param>
+    /// <returns></returns>
+    public string GetString
+        (
+            object? rawValue
+        )
     {
-        if (rawValue == null || (rawValue as string) == string.Empty)
+        if (rawValue is null || rawValue as string == string.Empty)
         {
             return string.Empty;
         }
 
-        return GetString (new GetStringRequest (null, rawValue, null, null, null));
+        return GetString
+            (
+                new GetStringRequest (null, rawValue, null, null, null)
+            );
     }
 
 
-    public void AddStrategy (StringifierStrategy strategy) => _strategies.Add (strategy);
-
-    #region Nested type: PropertyOverrideStrategy
-
-    public class PropertyOverrideStrategy
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="strategy"></param>
+    public void AddStrategy
+        (
+            StringifierStrategy strategy
+        )
     {
-        public Func<PropertyInfo, bool> Matches;
-        public Func<GetStringRequest, string> StringFunction;
+        Sure.NotNull (strategy);
+
+        _strategies.Add (strategy);
     }
 
     #endregion
