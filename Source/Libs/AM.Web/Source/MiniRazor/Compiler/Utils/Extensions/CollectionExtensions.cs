@@ -36,7 +36,9 @@ internal static class CollectionExtensions
         foreach (var i in source)
         {
             if (i is not null)
+            {
                 yield return i;
+            }
         }
     }
 }

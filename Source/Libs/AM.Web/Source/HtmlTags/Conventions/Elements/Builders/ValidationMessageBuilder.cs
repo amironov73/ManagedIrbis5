@@ -3,14 +3,9 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* ValidationMessageBuilder.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -29,10 +24,43 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace AM.HtmlTags.Conventions.Elements.Builders;
 
-public class DefaultValidationMessageBuilder : IElementBuilder
+/// <summary>
+///
+/// </summary>
+public class DefaultValidationMessageBuilder
+    : IElementBuilder
 {
-    public HtmlTag Build (ElementRequest request)
+    #region Private members
+
+    private static string GetModelErrorMessageOrDefault
+        (
+            ModelError modelError,
+            ModelStateEntry containingEntry,
+            ModelExplorer modelExplorer
+        )
     {
+        if (!string.IsNullOrEmpty (modelError.ErrorMessage))
+        {
+            return modelError.ErrorMessage;
+        }
+
+        // Default in the ValidationMessage case is a fallback error message.
+        var attemptedValue = containingEntry.AttemptedValue ?? "null";
+        return modelExplorer.Metadata.ModelBindingMessageProvider.ValueIsInvalidAccessor (attemptedValue);
+    }
+
+    #endregion
+
+    #region IElementBuilder members
+
+    /// <inheritdoc cref="ITagBuilder.Build"/>
+    public HtmlTag Build
+        (
+            ElementRequest request
+        )
+    {
+        Sure.NotNull (request);
+
         var viewContext = request.Get<ViewContext>() ??
                           throw new InvalidOperationException ("Validation messages require a ViewContext");
 
@@ -45,7 +73,7 @@ public class DefaultValidationMessageBuilder : IElementBuilder
         var tryGetModelStateResult = viewContext.ViewData.ModelState.TryGetValue (request.ElementId, out var entry);
         var modelErrors = tryGetModelStateResult ? entry.Errors : null;
 
-        ModelError modelError = null;
+        ModelError? modelError = null;
         if (modelErrors != null && modelErrors.Count != 0)
         {
             modelError = modelErrors.FirstOrDefault (m => !string.IsNullOrEmpty (m.ErrorMessage)) ?? modelErrors[0];
@@ -80,19 +108,5 @@ public class DefaultValidationMessageBuilder : IElementBuilder
         return tag;
     }
 
-    // Generously donated by https://github.com/aspnet/AspNetCore/blob/v3.0.0/src/Mvc/Mvc.ViewFeatures/src/ValidationHelpers.cs#L40
-    private static string GetModelErrorMessageOrDefault (
-        ModelError modelError,
-        ModelStateEntry containingEntry,
-        ModelExplorer modelExplorer)
-    {
-        if (!string.IsNullOrEmpty (modelError.ErrorMessage))
-        {
-            return modelError.ErrorMessage;
-        }
-
-        // Default in the ValidationMessage case is a fallback error message.
-        var attemptedValue = containingEntry.AttemptedValue ?? "null";
-        return modelExplorer.Metadata.ModelBindingMessageProvider.ValueIsInvalidAccessor (attemptedValue);
-    }
+    #endregion
 }

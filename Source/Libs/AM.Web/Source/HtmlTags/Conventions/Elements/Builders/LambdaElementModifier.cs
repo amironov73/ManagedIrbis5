@@ -3,33 +3,71 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* LambdaElementModifier.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
-namespace AM.HtmlTags.Conventions.Elements.Builders;
+#region Using directives
 
 using System;
 
+#endregion
+
+#nullable enable
+
+namespace AM.HtmlTags.Conventions.Elements.Builders;
+
+/// <summary>
+///
+/// </summary>
 // Tested through HtmlConventionRegistry
-public class LambdaElementModifier : LambdaTagModifier, IElementModifier
+public class LambdaElementModifier
+    : LambdaTagModifier, IElementModifier
 {
-    public LambdaElementModifier (Func<ElementRequest, bool> matcher, Action<ElementRequest> modify)
+    #region Properties
+
+    /// <summary>
+    ///
+    /// </summary>
+    public string? ConditionDescription { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public string? ModifierDescription { get; set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="matcher"></param>
+    /// <param name="modify"></param>
+    public LambdaElementModifier
+        (
+            Func<ElementRequest, bool> matcher,
+            Action<ElementRequest> modify
+        )
         : base (matcher, modify)
     {
+        // пустое тело конструктора
     }
 
-    public LambdaElementModifier (Action<ElementRequest> modify) : base (modify)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="modify"></param>
+    public LambdaElementModifier
+        (
+            Action<ElementRequest> modify
+        )
+        : base (modify)
     {
+        // пустое тело конструктора
     }
 
-    public string ConditionDescription { get; set; }
-    public string ModifierDescription { get; set; }
+    #endregion
 }

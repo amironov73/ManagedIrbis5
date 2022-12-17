@@ -3,7 +3,7 @@
 // Forum & Issues: https://github.com/zzzprojects/html-agility-pack
 // License: https://github.com/zzzprojects/html-agility-pack/blob/master/LICENSE
 // More projects: http://www.zzzprojects.com/
-// Copyright © ZZZ Projects Inc. 2014 - 2017. All rights reserved.
+// Copyright Â© ZZZ Projects Inc. 2014 - 2017. All rights reserved.
 
 using System;
 
@@ -52,9 +52,14 @@ namespace HtmlAgilityPack
                 if (GetStringArg(args[i], ref p))
                 {
                     if (index == j)
+                    {
                         return p;
+                    }
                     else
+                    {
                         p = def;
+                    }
+
                     j++;
                 }
             }
@@ -93,19 +98,33 @@ namespace HtmlAgilityPack
         private static void GetBoolArg(string Arg, string Name, ref bool ArgValue)
         {
             if (Arg.Length < (Name.Length + 1)) // -name is 1 more than name
+            {
                 return;
+            }
+
             if (('/' != Arg[0]) && ('-' != Arg[0])) // not a param
+            {
                 return;
+            }
+
             if (Arg.Substring(1, Name.Length).ToLowerInvariant() == Name.ToLowerInvariant())
+            {
                 ArgValue = true;
+            }
         }
 
         private static void GetIntArg(string Arg, string Name, ref int ArgValue)
         {
             if (Arg.Length < (Name.Length + 3)) // -name:12 is 3 more than name
+            {
                 return;
+            }
+
             if (('/' != Arg[0]) && ('-' != Arg[0])) // not a param
+            {
                 return;
+            }
+
             if (Arg.Substring(1, Name.Length).ToLowerInvariant() == Name.ToLowerInvariant())
             {
                 try
@@ -121,7 +140,10 @@ namespace HtmlAgilityPack
         private static bool GetStringArg(string Arg, ref string ArgValue)
         {
             if (('/' == Arg[0]) || ('-' == Arg[0]))
+            {
                 return false;
+            }
+
             ArgValue = Arg;
             return true;
         }
@@ -129,11 +151,19 @@ namespace HtmlAgilityPack
         private static void GetStringArg(string Arg, string Name, ref string ArgValue)
         {
             if (Arg.Length < (Name.Length + 3)) // -name:x is 3 more than name
+            {
                 return;
+            }
+
             if (('/' != Arg[0]) && ('-' != Arg[0])) // not a param
+            {
                 return;
+            }
+
             if (Arg.Substring(1, Name.Length).ToLowerInvariant() == Name.ToLowerInvariant())
+            {
                 ArgValue = Arg.Substring(Name.Length + 2, Arg.Length - Name.Length - 2);
+            }
         }
 
         private static void ParseArgs()

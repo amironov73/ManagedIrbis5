@@ -60,7 +60,10 @@ public class CollectionContainsPropertyOperation : IPropertyOperation
         return valuesToCheck =>
         {
             var enumerationOfObjects = (IEnumerable<object>)valuesToCheck;
-            if (enumerationOfObjects == null) return c => false;
+            if (enumerationOfObjects == null)
+            {
+                return c => false;
+            }
 
             //what's the type of the collection?
             var valuesToCheckType = valuesToCheck.GetType();

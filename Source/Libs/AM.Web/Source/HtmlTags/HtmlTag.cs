@@ -314,7 +314,11 @@ public class HtmlTag : ITagSource, IHtmlContent
     public HtmlTag Data<T> (string key, Action<T> configure) where T : class
     {
         var dataKey = DataPrefix + key;
-        if (!_htmlAttributes.Has (dataKey)) return this;
+        if (!_htmlAttributes.Has (dataKey))
+        {
+            return this;
+        }
+
         var value = (T)_htmlAttributes[dataKey].Value;
         configure (value);
         return this;
@@ -360,7 +364,11 @@ public class HtmlTag : ITagSource, IHtmlContent
     /// <returns>The calling tag.</returns>
     public HtmlTag MetaData<T> (string key, Action<T> configure) where T : class
     {
-        if (!_metaData.Has (key)) return this;
+        if (!_metaData.Has (key))
+        {
+            return this;
+        }
+
         var value = (T)_metaData[key];
         configure (value);
 
@@ -451,7 +459,10 @@ public class HtmlTag : ITagSource, IHtmlContent
 
     protected virtual void WriteHtml (TextWriter html, HtmlEncoder encoder)
     {
-        if (!WillBeRendered()) return;
+        if (!WillBeRendered())
+        {
+            return;
+        }
 
         WriteBeginTag (html, encoder);
 
@@ -464,7 +475,10 @@ public class HtmlTag : ITagSource, IHtmlContent
 
     protected void WriteBeginTag (TextWriter html, HtmlEncoder encoder)
     {
-        if (!HasTag()) return;
+        if (!HasTag())
+        {
+            return;
+        }
 
         html.Write ("<");
         html.Write (_tag);
@@ -553,7 +567,10 @@ public class HtmlTag : ITagSource, IHtmlContent
 
     private void WriteEndTag (TextWriter html)
     {
-        if (!HasClosingTag()) return;
+        if (!HasClosingTag())
+        {
+            return;
+        }
 
         html.Write ("</");
         html.Write (_tag);
@@ -720,9 +737,21 @@ public class HtmlTag : ITagSource, IHtmlContent
 
     public bool HasAttr (string key)
     {
-        if (IsCssClassAttr (key)) return _cssClasses.Count > 0;
-        if (IsCssStyleAttr (key)) return _customStyles.Count > 0;
-        if (IsMetadataAttr (key)) return _metaData.Count > 0;
+        if (IsCssClassAttr (key))
+        {
+            return _cssClasses.Count > 0;
+        }
+
+        if (IsCssStyleAttr (key))
+        {
+            return _customStyles.Count > 0;
+        }
+
+        if (IsMetadataAttr (key))
+        {
+            return _metaData.Count > 0;
+        }
+
         return _htmlAttributes.Has (key);
     }
 
@@ -826,8 +855,11 @@ public class HtmlTag : ITagSource, IHtmlContent
     public HtmlTag TextIfEmpty (string defaultText)
     {
         if (TagName().EqualsIgnoreCase ("input"))
+        {
             throw new InvalidOperationException (
                 "You are attempting to set the inner text on an INPUT tag. If you wanted a textarea, call MultilineMode() first.");
+        }
+
         if (Text().IsEmpty())
         {
             Text (defaultText);

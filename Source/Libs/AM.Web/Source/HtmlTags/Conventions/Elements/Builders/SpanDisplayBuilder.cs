@@ -3,23 +3,33 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* SpanDisplayBuilder.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 namespace AM.HtmlTags.Conventions.Elements.Builders;
 
-public class SpanDisplayBuilder : IElementBuilder
+/// <summary>
+///
+/// </summary>
+public class SpanDisplayBuilder
+    : IElementBuilder
 {
-    public HtmlTag Build (ElementRequest request)
+    #region IElementBuilder members
+
+    /// <inheritdoc cref="ITagBuilder.Build"/>
+    public HtmlTag Build
+        (
+            ElementRequest request
+        )
     {
-        return new HtmlTag ("span").Text (request.StringValue()).Id (request.ElementId);
+        Sure.NotNull (request);
+
+        return new HtmlTag ("span")
+            .Text (request.StringValue())
+            .Id (request.ElementId);
     }
+
+    #endregion
 }

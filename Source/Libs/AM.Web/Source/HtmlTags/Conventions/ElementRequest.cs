@@ -94,7 +94,10 @@ public class ElementRequest
 
     public void ForValue<T> (Action<T> action)
     {
-        if (ValueIsEmpty()) return;
+        if (ValueIsEmpty())
+        {
+            return;
+        }
 
         action ((T)RawValue);
     }

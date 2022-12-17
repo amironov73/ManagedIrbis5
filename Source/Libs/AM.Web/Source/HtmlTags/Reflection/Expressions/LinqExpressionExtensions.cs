@@ -54,7 +54,10 @@ public static class LinqExpressionExtensions
         {
             var parameterExpression = outerMostMemberExpression.Expression as ParameterExpression;
             if (parameterExpression != null && parameterExpression.Type == typeof (T))
+            {
                 return parameterExpression;
+            }
+
             outerMostMemberExpression = outerMostMemberExpression.Expression as MemberExpression;
         }
 

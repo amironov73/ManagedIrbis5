@@ -16,7 +16,10 @@ namespace HtmlAgilityPack
             get
             {
                 if (_current == null)
+                {
                     _current = new Trace();
+                }
+
                 return _current;
             }
         }

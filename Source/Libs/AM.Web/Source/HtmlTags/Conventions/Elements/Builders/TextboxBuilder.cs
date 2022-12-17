@@ -4,22 +4,35 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* TextboxBuilder.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 namespace AM.HtmlTags.Conventions.Elements.Builders;
 
-public class TextboxBuilder : IElementBuilder
+/// <summary>
+///
+/// </summary>
+public class TextboxBuilder
+    : IElementBuilder
 {
-    public HtmlTag Build (ElementRequest request)
+    #region IElementBuilder
+
+    /// <inheritdoc cref="ITagBuilder.Build"/>
+    public HtmlTag Build
+        (
+            ElementRequest request
+        )
     {
-        return new TextboxTag().Attr ("value", (request.RawValue ?? string.Empty).ToString());
+        Sure.NotNull (request);
+
+        return new TextboxTag().Attr
+            (
+                "value",
+                (request.RawValue ?? string.Empty).ToString()!
+            );
     }
+
+    #endregion
 }

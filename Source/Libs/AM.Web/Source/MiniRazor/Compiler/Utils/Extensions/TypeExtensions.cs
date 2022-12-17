@@ -52,7 +52,9 @@ internal static class TypeExtensions
         {
             var obj = property.GetValue(anonymousObject);
             if (obj is not null && obj.GetType().IsAnonymousType())
+            {
                 obj = obj.ToExpando();
+            }
 
             expandoMap[property.Name] = obj;
         }

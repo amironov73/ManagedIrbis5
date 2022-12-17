@@ -89,16 +89,36 @@ public class SingleMethod : Accessor
 
     public bool Equals (SingleMethod other)
     {
-        if (ReferenceEquals (null, other)) return false;
-        if (ReferenceEquals (this, other)) return true;
+        if (ReferenceEquals (null, other))
+        {
+            return false;
+        }
+
+        if (ReferenceEquals (this, other))
+        {
+            return true;
+        }
+
         return Equals (other._getter, _getter);
     }
 
     public override bool Equals (object obj)
     {
-        if (ReferenceEquals (null, obj)) return false;
-        if (ReferenceEquals (this, obj)) return true;
-        if (obj.GetType() != typeof (SingleMethod)) return false;
+        if (ReferenceEquals (null, obj))
+        {
+            return false;
+        }
+
+        if (ReferenceEquals (this, obj))
+        {
+            return true;
+        }
+
+        if (obj.GetType() != typeof (SingleMethod))
+        {
+            return false;
+        }
+
         return Equals ((SingleMethod)obj);
     }
 

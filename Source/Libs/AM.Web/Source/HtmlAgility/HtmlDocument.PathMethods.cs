@@ -86,7 +86,9 @@ namespace HtmlAgilityPack
         public void Load(string path)
         {
             if (path == null)
+            {
                 throw new ArgumentNullException("path");
+            }
 
 #if NETSTANDARD1_3 || NETSTANDARD1_6
             using (StreamReader sr = new StreamReader(File.OpenRead(path), OptionDefaultStreamEncoding))
@@ -106,7 +108,9 @@ namespace HtmlAgilityPack
         public void Load(string path, bool detectEncodingFromByteOrderMarks)
         {
             if (path == null)
+            {
                 throw new ArgumentNullException("path");
+            }
 
 #if NETSTANDARD1_3 || NETSTANDARD1_6
             using (StreamReader sr = new StreamReader(File.OpenRead(path), detectEncodingFromByteOrderMarks))
@@ -126,10 +130,14 @@ namespace HtmlAgilityPack
         public void Load(string path, Encoding encoding)
         {
             if (path == null)
+            {
                 throw new ArgumentNullException("path");
+            }
 
             if (encoding == null)
+            {
                 throw new ArgumentNullException("encoding");
+            }
 
 #if NETSTANDARD1_3 || NETSTANDARD1_6
             using (StreamReader sr = new StreamReader(File.OpenRead(path), encoding))
@@ -150,10 +158,14 @@ namespace HtmlAgilityPack
         public void Load(string path, Encoding encoding, bool detectEncodingFromByteOrderMarks)
         {
             if (path == null)
+            {
                 throw new ArgumentNullException("path");
+            }
 
             if (encoding == null)
+            {
                 throw new ArgumentNullException("encoding");
+            }
 
 #if NETSTANDARD1_3 || NETSTANDARD1_6
             using (StreamReader sr = new StreamReader(File.OpenRead(path), encoding, detectEncodingFromByteOrderMarks))
@@ -175,10 +187,14 @@ namespace HtmlAgilityPack
         public void Load(string path, Encoding encoding, bool detectEncodingFromByteOrderMarks, int buffersize)
         {
             if (path == null)
+            {
                 throw new ArgumentNullException("path");
+            }
 
             if (encoding == null)
+            {
                 throw new ArgumentNullException("encoding");
+            }
 
 #if NETSTANDARD1_3 || NETSTANDARD1_6
             using (StreamReader sr = new StreamReader(File.OpenRead(path), encoding, detectEncodingFromByteOrderMarks, buffersize))

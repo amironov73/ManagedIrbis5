@@ -70,7 +70,9 @@ public abstract class TemplateBase<TModel> : ITemplate
     protected void Write(string? str)
     {
         if (str is not null)
+        {
             WriteLiteral(WebUtility.HtmlEncode(str));
+        }
     }
 
     /// <summary>

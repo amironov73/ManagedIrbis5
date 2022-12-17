@@ -84,7 +84,9 @@ public static class Razor
 
                     // Absence of access modifiers defaults to internal in C#
                     if (!string.IsNullOrWhiteSpace(accessModifier))
+                    {
                         node.Modifiers.Add(accessModifier);
+                    }
 
                     // Partial to allow extension
                     node.Modifiers.Add("partial");
@@ -119,11 +121,15 @@ public static class Razor
             {
                 // Avoid doing the same work twice
                 if (!assemblyNames.Add(referencedAssemblyName))
+                {
                     continue;
+                }
 
                 var referencedAssembly = assemblyLoadContext.TryLoadFromAssemblyName(referencedAssemblyName);
                 if (referencedAssembly is not null)
+                {
                     PopulateTransitiveDependencies(referencedAssembly, assemblyNames);
+                }
             }
         }
 

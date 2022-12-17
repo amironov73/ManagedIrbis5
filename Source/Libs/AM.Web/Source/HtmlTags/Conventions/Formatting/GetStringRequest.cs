@@ -35,7 +35,11 @@ public class GetStringRequest
         Type ownerType)
     {
         Locator = locator;
-        if (accessor != null) Property = accessor.InnerProperty;
+        if (accessor != null)
+        {
+            Property = accessor.InnerProperty;
+        }
+
         RawValue = rawValue;
 
         if (Property != null)
@@ -122,17 +126,37 @@ public class GetStringRequest
 
     public bool Equals (GetStringRequest other)
     {
-        if (ReferenceEquals (null, other)) return false;
-        if (ReferenceEquals (this, other)) return true;
+        if (ReferenceEquals (null, other))
+        {
+            return false;
+        }
+
+        if (ReferenceEquals (this, other))
+        {
+            return true;
+        }
+
         return Equals (other.OwnerType, OwnerType) && Equals (other.Property, Property) &&
                Equals (other.RawValue, RawValue) && Equals (other.Format, Format);
     }
 
     public override bool Equals (object obj)
     {
-        if (ReferenceEquals (null, obj)) return false;
-        if (ReferenceEquals (this, obj)) return true;
-        if (obj.GetType() != typeof (GetStringRequest)) return false;
+        if (ReferenceEquals (null, obj))
+        {
+            return false;
+        }
+
+        if (ReferenceEquals (this, obj))
+        {
+            return true;
+        }
+
+        if (obj.GetType() != typeof (GetStringRequest))
+        {
+            return false;
+        }
+
         return Equals ((GetStringRequest)obj);
     }
 

@@ -44,7 +44,10 @@ public class HtmlConventionLibrary
     {
         profile = profile ?? TagConstants.Default;
         var builder = _services[profile];
-        if (builder.Has (typeof (T))) return builder.Build<T>();
+        if (builder.Has (typeof (T)))
+        {
+            return builder.Build<T>();
+        }
 
         if (profile != TagConstants.Default && _defaultBuilder.Has (typeof (T)))
         {

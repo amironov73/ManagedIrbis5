@@ -50,8 +50,15 @@ public class MethodValueGetter : IValueGetter
     {
         get
         {
-            if (_arguments.Length == 1) return $"[{_arguments[0]}]";
-            if (_arguments.Length == 0) return _methodInfo.Name;
+            if (_arguments.Length == 1)
+            {
+                return $"[{_arguments[0]}]";
+            }
+
+            if (_arguments.Length == 0)
+            {
+                return _methodInfo.Name;
+            }
 
             throw new NotSupportedException ("Dunno how to deal with this method");
         }
@@ -75,16 +82,36 @@ public class MethodValueGetter : IValueGetter
 
     public override bool Equals (object obj)
     {
-        if (ReferenceEquals (null, obj)) return false;
-        if (ReferenceEquals (this, obj)) return true;
-        if (obj.GetType() != typeof (MethodValueGetter)) return false;
+        if (ReferenceEquals (null, obj))
+        {
+            return false;
+        }
+
+        if (ReferenceEquals (this, obj))
+        {
+            return true;
+        }
+
+        if (obj.GetType() != typeof (MethodValueGetter))
+        {
+            return false;
+        }
+
         return Equals ((MethodValueGetter)obj);
     }
 
     public bool Equals (MethodValueGetter other)
     {
-        if (ReferenceEquals (null, other)) return false;
-        if (ReferenceEquals (this, other)) return true;
+        if (ReferenceEquals (null, other))
+        {
+            return false;
+        }
+
+        if (ReferenceEquals (this, other))
+        {
+            return true;
+        }
+
         return Equals (other._methodInfo, _methodInfo) && Enumerable.SequenceEqual (other._arguments, _arguments);
     }
 

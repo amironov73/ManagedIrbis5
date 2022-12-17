@@ -92,7 +92,10 @@ public class PropertyChain : Accessor
         get
         {
             var last = _valueGetters.Last();
-            if (last is PropertyValueGetter) return last.Name;
+            if (last is PropertyValueGetter)
+            {
+                return last.Name;
+            }
 
             var previous = _valueGetters[_valueGetters.Length - 2];
             return previous.Name + last.Name;
@@ -170,17 +173,36 @@ public class PropertyChain : Accessor
 
     public bool Equals (PropertyChain other)
     {
-        if (ReferenceEquals (null, other)) return false;
-        if (ReferenceEquals (this, other)) return true;
+        if (ReferenceEquals (null, other))
+        {
+            return false;
+        }
+
+        if (ReferenceEquals (this, other))
+        {
+            return true;
+        }
 
         return _valueGetters.SequenceEqual (other._valueGetters);
     }
 
     public override bool Equals (object obj)
     {
-        if (ReferenceEquals (null, obj)) return false;
-        if (ReferenceEquals (this, obj)) return true;
-        if (obj.GetType() != typeof (PropertyChain)) return false;
+        if (ReferenceEquals (null, obj))
+        {
+            return false;
+        }
+
+        if (ReferenceEquals (this, obj))
+        {
+            return true;
+        }
+
+        if (obj.GetType() != typeof (PropertyChain))
+        {
+            return false;
+        }
+
         return Equals ((PropertyChain)obj);
     }
 

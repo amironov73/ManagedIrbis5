@@ -30,18 +30,27 @@ public class Stringifier
     {
         if (request.PropertyType.IsNullable())
         {
-            if (request.RawValue == null) return r => string.Empty;
+            if (request.RawValue == null)
+            {
+                return r => string.Empty;
+            }
 
             return findConverter (request.GetRequestForNullableType());
         }
 
         if (request.PropertyType.IsArray)
         {
-            if (request.RawValue == null) return r => string.Empty;
+            if (request.RawValue == null)
+            {
+                return r => string.Empty;
+            }
 
             return r =>
             {
-                if (r.RawValue == null) return string.Empty;
+                if (r.RawValue == null)
+                {
+                    return string.Empty;
+                }
 
                 return r.RawValue.As<Array>().OfType<object>().Select (GetString).Join (", ");
             };
@@ -56,7 +65,10 @@ public class Stringifier
     public string GetString (GetStringRequest request)
     {
         if (request?.RawValue == null || request.RawValue as string == string.Empty)
+        {
             return string.Empty;
+        }
+
         PropertyOverrideStrategy propertyOverride = _overrides.FirstOrDefault (o => o.Matches (request.Property));
 
         if (propertyOverride != null)
@@ -70,7 +82,10 @@ public class Stringifier
 
     public string GetString (object rawValue)
     {
-        if (rawValue == null || (rawValue as string) == string.Empty) return string.Empty;
+        if (rawValue == null || (rawValue as string) == string.Empty)
+        {
+            return string.Empty;
+        }
 
         return GetString (new GetStringRequest (null, rawValue, null, null, null));
     }

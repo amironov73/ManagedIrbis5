@@ -37,7 +37,9 @@ internal static class ReflectionHelper
 
         // No constraints, away we go!
         if (constraints == GenericParameterAttributes.None)
+        {
             return true;
+        }
 
         // "class" constraint and this is a value type
         if ((constraints & GenericParameterAttributes.ReferenceTypeConstraint) != 0
@@ -95,7 +97,11 @@ internal static class ReflectionHelper
         }
 
 
-        if (memberExpression == null) throw new ArgumentException ("Not a member access", "member");
+        if (memberExpression == null)
+        {
+            throw new ArgumentException ("Not a member access", "member");
+        }
+
         return memberExpression;
     }
 
@@ -122,7 +128,10 @@ internal static class ReflectionHelper
 
 
         if (enforceMemberExpression && memberExpression == null)
+        {
             throw new ArgumentException ("Not a member access", "member");
+        }
+
         return memberExpression;
     }
 

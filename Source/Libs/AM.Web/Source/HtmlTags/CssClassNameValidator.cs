@@ -49,9 +49,15 @@ public static class CssClassNameValidator
 
     public static string SanitizeClassName (string className)
     {
-        if (string.IsNullOrEmpty (className)) return DefaultClass;
+        if (string.IsNullOrEmpty (className))
+        {
+            return DefaultClass;
+        }
 
-        if (IsValidClassName (className)) return className;
+        if (IsValidClassName (className))
+        {
+            return className;
+        }
 
         // it can't have anything other than _,-,a-z,A-Z, or 0-9
         className = RxReplaceInvalidChars.Replace (className, "");

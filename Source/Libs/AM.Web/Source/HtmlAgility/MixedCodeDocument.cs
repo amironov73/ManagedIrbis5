@@ -409,7 +409,9 @@ public class MixedCodeDocument
             _line++;
         }
         else
+        {
             _lineposition++;
+        }
     }
 
     private void Parse()

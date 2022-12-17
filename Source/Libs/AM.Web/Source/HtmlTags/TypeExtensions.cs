@@ -27,7 +27,11 @@ internal static class TypeExtensions
 
     public static bool CanBeCastTo<T> (this Type type)
     {
-        if (type == null) return false;
+        if (type == null)
+        {
+            return false;
+        }
+
         Type destinationType = typeof (T);
 
         return CanBeCastTo (type, destinationType);
@@ -35,8 +39,15 @@ internal static class TypeExtensions
 
     public static bool CanBeCastTo (this Type type, Type destinationType)
     {
-        if (type == null) return false;
-        if (type == destinationType) return true;
+        if (type == null)
+        {
+            return false;
+        }
+
+        if (type == destinationType)
+        {
+            return true;
+        }
 
         return destinationType.IsAssignableFrom (type);
     }
@@ -48,9 +59,15 @@ internal static class TypeExtensions
 
     public static bool Closes (this Type type, Type openType)
     {
-        if (type == null) return false;
+        if (type == null)
+        {
+            return false;
+        }
 
-        if (type.GetTypeInfo().IsGenericType && type.GetGenericTypeDefinition() == openType) return true;
+        if (type.GetTypeInfo().IsGenericType && type.GetGenericTypeDefinition() == openType)
+        {
+            return true;
+        }
 
         if (type.GetInterfaces().Any (@interface => @interface.Closes (openType)))
         {
@@ -58,10 +75,16 @@ internal static class TypeExtensions
         }
 
         Type baseType = type.GetTypeInfo().BaseType;
-        if (baseType == null) return false;
+        if (baseType == null)
+        {
+            return false;
+        }
 
         bool closes = baseType.GetTypeInfo().IsGenericType && baseType.GetGenericTypeDefinition() == openType;
-        if (closes) return true;
+        if (closes)
+        {
+            return true;
+        }
 
         return type.GetTypeInfo().BaseType != null && type.GetTypeInfo().BaseType.Closes (openType);
     }
@@ -95,7 +118,10 @@ internal static class TypeExtensions
 
     public static bool IsNullableOfT (this Type theType)
     {
-        if (theType == null) return false;
+        if (theType == null)
+        {
+            return false;
+        }
 
         return theType.GetTypeInfo().IsGenericType && theType.GetGenericTypeDefinition() == typeof (Nullable<>);
     }

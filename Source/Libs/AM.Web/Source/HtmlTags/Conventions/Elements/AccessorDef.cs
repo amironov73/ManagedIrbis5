@@ -4,62 +4,154 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* AccessorDef.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
-namespace AM.HtmlTags.Conventions.Elements;
+#region Using directives
 
 using System;
 using System.Linq.Expressions;
 
+#endregion
+
+#nullable enable
+
+namespace AM.HtmlTags.Conventions.Elements;
+
+#region Using directives
+
 using Reflection;
 
+#endregion
+
+/// <summary>
+///
+/// </summary>
 public class AccessorDef
 {
-    public AccessorDef (Accessor accessor, Type modelType)
+    #region Properties
+
+    /// <summary>
+    ///
+    /// </summary>
+    public Accessor Accessor { get; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public Type ModelType { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="accessor"></param>
+    /// <param name="modelType"></param>
+    public AccessorDef
+        (
+            Accessor accessor,
+            Type modelType
+        )
     {
+        Sure.NotNull (accessor);
+        Sure.NotNull (modelType);
+
         Accessor = accessor;
         ModelType = modelType;
     }
 
-    public Accessor Accessor { get; }
-    public Type ModelType { get; }
+    #endregion
 
-    public static AccessorDef For<T> (Expression<Func<T, object>> expression)
+    #region Public methods
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="expression"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static AccessorDef For<T>
+        (
+            Expression<Func<T, object>> expression
+        )
     {
+        Sure.NotNull (expression);
+
         return new (expression.ToAccessor(), typeof (T));
     }
 
-    public bool Equals (AccessorDef other)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
+    public bool Equals
+        (
+            AccessorDef? other
+        )
     {
-        if (ReferenceEquals (null, other)) return false;
-        if (ReferenceEquals (this, other)) return true;
-        return Equals (other.Accessor, Accessor) && Equals (other.ModelType, ModelType);
+        if (ReferenceEquals (null, other))
+        {
+            return false;
+        }
+
+        if (ReferenceEquals (this, other))
+        {
+            return true;
+        }
+
+        return Equals (other.Accessor, Accessor) && other.ModelType == ModelType;
     }
 
-    public override bool Equals (object obj)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public bool Is<T>() => Accessor.PropertyType == typeof (T);
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.Equals(object?)"/>
+    public override bool Equals
+        (
+            object? obj
+        )
     {
-        if (ReferenceEquals (null, obj)) return false;
-        if (ReferenceEquals (this, obj)) return true;
-        if (obj.GetType() != typeof (AccessorDef)) return false;
+        if (ReferenceEquals (null, obj))
+        {
+            return false;
+        }
+
+        if (ReferenceEquals (this, obj))
+        {
+            return true;
+        }
+
+        if (obj.GetType() != typeof (AccessorDef))
+        {
+            return false;
+        }
+
         return Equals ((AccessorDef)obj);
     }
 
+    /// <inheritdoc cref="object.GetHashCode"/>
     public override int GetHashCode()
     {
-        unchecked
-        {
-            return ((Accessor?.GetHashCode() ?? 0) * 397) ^
-                   (ModelType?.GetHashCode() ?? 0);
-        }
+        return HashCode.Combine
+            (
+                Accessor.GetHashCode(),
+                ModelType.GetHashCode()
+            );
     }
 
-    public bool Is<T>() => Accessor.PropertyType == typeof (T);
+    #endregion
 }
