@@ -3,14 +3,8 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* CategoryExpression.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,20 +18,70 @@ using System;
 
 namespace AM.HtmlTags.Conventions;
 
+/// <summary>
+///
+/// </summary>
 // Tested through the tests for TagCategory and TagLibrary
 public class CategoryExpression
 {
-    private readonly BuilderSet _parent;
-    private readonly Func<ElementRequest, bool> _matcher;
+    #region Construction
 
-    public CategoryExpression (BuilderSet parent, Func<ElementRequest, bool> matcher)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="parent"></param>
+    /// <param name="matcher"></param>
+    public CategoryExpression
+        (
+            BuilderSet parent,
+            Func<ElementRequest, bool> matcher
+        )
     {
+        Sure.NotNull (parent);
+        Sure.NotNull (matcher);
+
         _parent = parent;
         _matcher = matcher;
     }
 
-    public void Modify (Action<ElementRequest> modify) => _parent.Add (new LambdaTagModifier (_matcher, modify));
+    #endregion
 
-    public void Build (Func<ElementRequest, HtmlTag> build) =>
+    #region Private members
+
+    private readonly BuilderSet _parent;
+    private readonly Func<ElementRequest, bool> _matcher;
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="modify"></param>
+    public void Modify
+        (
+            Action<ElementRequest> modify
+        )
+    {
+        Sure.NotNull (modify);
+
+        _parent.Add (new LambdaTagModifier (_matcher, modify));
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="build"></param>
+    public void Build
+        (
+            Func<ElementRequest, HtmlTag> build
+        )
+    {
+        Sure.NotNull (build);
+
         _parent.Add (new ConditionalTagBuilderPolicy (_matcher, build));
+    }
+
+    #endregion
 }

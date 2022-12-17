@@ -10,7 +10,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UseNameofExpression
 
-/*
+/* BuilderDef.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -27,45 +27,164 @@ namespace AM.HtmlTags.Conventions;
 
 using Elements;
 
+/// <summary>
+///
+/// </summary>
 // Tested through the test for TagCategory and TagLibrary
-public class BuilderSet : ITagBuildingExpression
+public class BuilderSet
+    : ITagBuildingExpression
 {
-    private readonly List<ITagBuilderPolicy> _policies = new ();
-    private readonly List<ITagModifier> _modifiers = new ();
-    private IElementNamingConvention _elementNamingConvention;
+    #region Properties
 
+    /// <summary>
+    ///
+    /// </summary>
+    public IEnumerable<ITagBuilderPolicy> Policies => _policies;
+
+    /// <summary>
+    ///
+    /// </summary>
+    public IEnumerable<ITagModifier> Modifiers => _modifiers;
+
+    /// <summary>
+    ///
+    /// </summary>
+    public CategoryExpression Always => new (this, _ => true);
+
+    /// <summary>
+    ///
+    /// </summary>
+    public IElementNamingConvention ElementNamingConvention => _elementNamingConvention;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
     public BuilderSet()
     {
         _elementNamingConvention = new DefaultElementNamingConvention();
     }
 
-    public IEnumerable<ITagBuilderPolicy> Policies => _policies;
+    #endregion
 
-    public IEnumerable<ITagModifier> Modifiers => _modifiers;
+    #region Private members
 
-    public IElementNamingConvention ElementNamingConvention => _elementNamingConvention;
+    private readonly List<ITagBuilderPolicy> _policies = new ();
 
-    public void Add (Func<ElementRequest, bool> filter, ITagBuilder builder)
-        => _policies.Add (new ConditionalTagBuilderPolicy (filter, builder));
+    private readonly List<ITagModifier> _modifiers = new ();
 
-    public void Add (ITagBuilderPolicy policy) => _policies.Add (policy);
+    private IElementNamingConvention _elementNamingConvention;
 
-    public void Add (ITagModifier modifier)
-        => _modifiers.Add (modifier);
+    #endregion
 
-    public void NamingConvention (IElementNamingConvention elementNamingConvention)
-        => _elementNamingConvention = elementNamingConvention;
+    #region Public methods
 
-    public CategoryExpression Always => new (this, x => true);
-
-    public CategoryExpression If (Func<ElementRequest, bool> matches) => new (this, matches);
-
-    public void Import (BuilderSet other)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="filter"></param>
+    /// <param name="builder"></param>
+    public void Add
+        (
+            Func<ElementRequest, bool> filter,
+            ITagBuilder builder
+        )
     {
+        Sure.NotNull (filter);
+        Sure.NotNull (builder);
+
+        _policies.Add (new ConditionalTagBuilderPolicy (filter, builder));
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="policy"></param>
+    public void Add
+        (
+            ITagBuilderPolicy policy
+        )
+    {
+        Sure.NotNull (policy);
+
+        _policies.Add (policy);
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="modifier"></param>
+    public void Add
+        (
+            ITagModifier modifier
+        )
+    {
+        Sure.NotNull (modifier);
+
+        _modifiers.Add (modifier);
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="elementNamingConvention"></param>
+    public void NamingConvention
+        (
+            IElementNamingConvention elementNamingConvention
+        )
+    {
+        Sure.NotNull (elementNamingConvention);
+
+        _elementNamingConvention = elementNamingConvention;
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="matches"></param>
+    /// <returns></returns>
+    public CategoryExpression If
+        (
+            Func<ElementRequest, bool> matches
+        )
+    {
+        Sure.NotNull (matches);
+
+        return new (this, matches);
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="other"></param>
+    public void Import
+        (
+            BuilderSet other
+        )
+    {
+        Sure.NotNull (other);
+
         _policies.AddRange (other._policies);
         _modifiers.AddRange (other._modifiers);
         _elementNamingConvention = other._elementNamingConvention;
     }
 
-    public void InsertFirst (ITagBuilderPolicy policy) => _policies.Insert (0, policy);
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="policy"></param>
+    public void InsertFirst
+        (
+            ITagBuilderPolicy policy
+        )
+    {
+        Sure.NotNull (policy);
+
+        _policies.Insert (0, policy);
+    }
+
+    #endregion
 }

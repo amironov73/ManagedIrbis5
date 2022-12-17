@@ -3,23 +3,30 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* DefaultHtmlConventions.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 namespace AM.HtmlTags.Conventions;
 
-public class DefaultHtmlConventions : HtmlConventionRegistry
+/// <summary>
+///
+/// </summary>
+public class DefaultHtmlConventions
+    : HtmlConventionRegistry
 {
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
     public DefaultHtmlConventions()
     {
         this.Defaults();
     }
+
+    #endregion
 }
