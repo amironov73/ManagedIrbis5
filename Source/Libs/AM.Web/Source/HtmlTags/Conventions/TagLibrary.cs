@@ -27,7 +27,7 @@ namespace AM.HtmlTags.Conventions;
 
 public interface ITagLibrary
 {
-    ITagPlan PlanFor (ElementRequest subject, string profile = null, string category = null);
+    ITagPlan PlanFor (ElementRequest subject, string? profile = null, string? category = null);
 }
 
 public class TagLibrary : ITagBuildingExpression, ITagLibrary
@@ -35,7 +35,7 @@ public class TagLibrary : ITagBuildingExpression, ITagLibrary
     private readonly Cache<string, TagCategory> _categories =
         new (name => new TagCategory());
 
-    public ITagPlan PlanFor (ElementRequest subject, string profile = null, string category = null)
+    public ITagPlan PlanFor (ElementRequest subject, string? profile = null, string? category = null)
     {
         profile = profile ?? TagConstants.Default;
         category = category ?? TagConstants.Default;
@@ -58,7 +58,7 @@ public class TagLibrary : ITagBuildingExpression, ITagLibrary
     /// <returns></returns>
     public TagCategory Category (string category) => _categories[category];
 
-    public BuilderSet BuilderSetFor (string category = null, string profile = null)
+    public BuilderSet BuilderSetFor (string? category = null, string? profile = null)
     {
         profile = profile ?? TagConstants.Default;
         category = category ?? TagConstants.Default;

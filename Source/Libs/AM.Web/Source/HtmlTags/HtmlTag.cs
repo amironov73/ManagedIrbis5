@@ -849,18 +849,24 @@ public class HtmlTag : ITagSource, IHtmlContent
 
     public HtmlTag ForChild (string tagName)
     {
-        return ((ITagSource)this).AllTags().First (child => child.TagName().EqualsIgnoreCase (tagName));
+        return ((ITagSource)this).AllTags().First (child => child.TagName().SameString (tagName));
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="defaultText"></param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
     public HtmlTag TextIfEmpty (string defaultText)
     {
-        if (TagName().EqualsIgnoreCase ("input"))
+        if (TagName().SameString ("input"))
         {
             throw new InvalidOperationException (
                 "You are attempting to set the inner text on an INPUT tag. If you wanted a textarea, call MultilineMode() first.");
         }
 
-        if (Text().IsEmpty())
+        if (string.IsNullOrEmpty (Text()))
         {
             Text (defaultText);
         }
@@ -868,8 +874,23 @@ public class HtmlTag : ITagSource, IHtmlContent
         return this;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
     public HtmlTag Name (string name) => Attr ("name", name);
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
     public HtmlTag Value (string value) => Attr ("value", value);
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public string Value() => Attr ("value");
 }

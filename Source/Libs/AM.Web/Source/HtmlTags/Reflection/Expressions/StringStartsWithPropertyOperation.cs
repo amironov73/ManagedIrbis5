@@ -42,14 +42,18 @@ public class StringStartsWithPropertyOperation : CaseInsensitiveStringMethodProp
     public override string Text => "starts with";
 }
 
-public class CollectionContainsPropertyOperation : IPropertyOperation
+/// <summary>
+///
+/// </summary>
+public class CollectionContainsPropertyOperation
+    : IPropertyOperation
 {
     private const string _operationName = "Contains";
     private const string _description = "contains";
 
     private readonly MethodInfo _method =
-        typeof (Enumerable).GetMethods (
-            BindingFlags.Static | BindingFlags.Public).First (m => m.Name.EqualsIgnoreCase ("Contains"));
+        typeof (Enumerable).GetMethods (BindingFlags.Static | BindingFlags.Public)
+            .First (m => m.Name.SameString ("Contains"));
 
     public string OperationName => _operationName;
 

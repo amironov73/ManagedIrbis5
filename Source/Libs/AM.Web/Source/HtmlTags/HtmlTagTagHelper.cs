@@ -10,7 +10,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UseNameofExpression
 
-/*
+/* HtmlTagHelper.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,21 +19,32 @@
 using System;
 using System.Linq;
 
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.Extensions.DependencyInjection;
+
 #endregion
 
 #nullable enable
 
 namespace AM.HtmlTags;
 
+#region Using directives
+
 using Conventions;
 
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using Microsoft.AspNetCore.Razor.TagHelpers;
-using Microsoft.Extensions.DependencyInjection;
+#endregion
 
-public abstract class HtmlTagTagHelper : TagHelper
+/// <summary>
+///
+/// </summary>
+public abstract class HtmlTagTagHelper
+    : TagHelper
 {
+    /// <summary>
+    ///
+    /// </summary>
     public const string ForAttributeName = "for";
 
     [HtmlAttributeName (ForAttributeName)] public ModelExpression For { get; set; }

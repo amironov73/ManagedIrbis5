@@ -5,12 +5,8 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* TableTag.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,20 +15,45 @@
 using System;
 using System.Linq;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
 
 namespace AM.HtmlTags;
 
-public class TableTag : HtmlTag
+/// <summary>
+///
+/// </summary>
+[PublicAPI]
+public class TableTag
+    : HtmlTag
 {
+    #region Properties
+
+    /// <summary>
+    ///
+    /// </summary>
     public HtmlTag THead { get; }
 
+    /// <summary>
+    ///
+    /// </summary>
     public HtmlTag TBody { get; }
 
+    /// <summary>
+    ///
+    /// </summary>
     public HtmlTag TFoot { get; }
 
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
     public TableTag()
         : base ("table")
     {
@@ -41,9 +62,16 @@ public class TableTag : HtmlTag
         TBody = new HtmlTag ("tbody", this);
     }
 
+    #endregion
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="text"></param>
+    /// <returns></returns>
     public TableTag CaptionText (string text)
     {
-        HtmlTag caption = ExistingCaption();
+        var caption = ExistingCaption();
         if (caption == null)
         {
             caption = new HtmlTag ("caption");
@@ -55,40 +83,98 @@ public class TableTag : HtmlTag
         return this;
     }
 
+    #region Private members
+
+    private HtmlTag? ExistingCaption()
+    {
+        return Children.FirstOrDefault (x => x.TagName() == "caption");
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public string CaptionText()
     {
         var caption = ExistingCaption();
         return caption == null ? string.Empty : caption.Text();
     }
 
-    private HtmlTag ExistingCaption() => Children.FirstOrDefault (x => x.TagName() == "caption");
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    public TableRowTag AddHeaderRow()
+    {
+        return THead.Add<TableRowTag>();
+    }
 
-    public TableRowTag AddHeaderRow() => THead.Add<TableRowTag>();
-
-    public TableTag AddHeaderRow (Action<TableRowTag> configure)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="configure"></param>
+    /// <returns></returns>
+    public TableTag AddHeaderRow
+        (
+            Action<TableRowTag> configure
+        )
     {
         configure (AddHeaderRow());
 
         return this;
     }
 
-    public TableRowTag AddBodyRow() => TBody.Add<TableRowTag>();
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    public TableRowTag AddBodyRow()
+    {
+        return TBody.Add<TableRowTag>();
+    }
 
-    public TableTag AddBodyRow (Action<TableRowTag> configure)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="configure"></param>
+    /// <returns></returns>
+    public TableTag AddBodyRow
+        (
+            Action<TableRowTag> configure
+        )
     {
         configure (AddBodyRow());
         return this;
     }
 
-    public TableTag AddFooterRow (Action<TableRowTag> configure)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="configure"></param>
+    /// <returns></returns>
+    public TableTag AddFooterRow
+        (
+            Action<TableRowTag> configure
+        )
     {
-        TFoot.Render (true);
+        TFoot.Render (true).NotUsed();
         configure (TFoot.Add<TableRowTag>());
         return this;
     }
 
-
-    public TableTag Caption (string caption)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="caption"></param>
+    /// <returns></returns>
+    public TableTag Caption
+        (
+            string caption
+        )
     {
         var captionTag = ExistingCaption();
         if (captionTag == null)
@@ -101,20 +187,56 @@ public class TableTag : HtmlTag
 
         return this;
     }
+
+    #endregion
 }
 
-public class TableRowTag : HtmlTag
+/// <summary>
+///
+/// </summary>
+public class TableRowTag
+    : HtmlTag
 {
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
     public TableRowTag()
         : base ("tr")
     {
+        // пустое тело конструктора
     }
 
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="text"></param>
+    /// <returns></returns>
     public HtmlTag Header (string text) => new HtmlTag ("th", this).Text (text);
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public HtmlTag Header() => new ("th", this);
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="text"></param>
+    /// <returns></returns>
     public HtmlTag Cell (string text) => new HtmlTag ("td", this).Text (text);
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public HtmlTag Cell() => new ("td", this);
+
+    #endregion
 }

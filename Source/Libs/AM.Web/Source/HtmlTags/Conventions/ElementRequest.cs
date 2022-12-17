@@ -81,7 +81,7 @@ public class ElementRequest
     public bool TryGet<T> (out T service) => (service = (T)_services (typeof (T))) != null;
 
     // virtual for mocking
-    public virtual HtmlTag BuildForCategory (string category, string profile = null) =>
+    public virtual HtmlTag BuildForCategory (string category, string? profile = null) =>
         Get<ITagGenerator>().Build (this, category, profile);
 
     public T Value<T>() => (T)RawValue;

@@ -10,7 +10,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UseNameofExpression
 
-/*
+/* ElementCategoryExpression.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,46 +22,194 @@ using Elements;
 
 using Reflection;
 
+/// <summary>
+///
+/// </summary>
 public class ElementCategoryExpression
 {
-    private readonly BuilderSet _set;
+    #region Properties
 
-    public ElementCategoryExpression (BuilderSet set)
+    /// <summary>
+    ///
+    /// </summary>
+    public ElementActionExpression Always
     {
+        get { return new (_set, _ => true, "Always"); }
+    }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="set"></param>
+    public ElementCategoryExpression
+        (
+            BuilderSet set
+        )
+    {
+        Sure.NotNull (set);
+
         _set = set;
     }
 
-    public void Add (Func<ElementRequest, bool> filter, IElementBuilder builder) => _set.Add (filter, builder);
+    #endregion
 
-    public void Add (IElementBuilderPolicy policy) => _set.Add (policy);
+    #region Private members
 
-    public void Add (IElementModifier modifier) => _set.Add (modifier);
+    private readonly BuilderSet _set;
 
-    public void BuilderPolicy<T>() where T : IElementBuilderPolicy, new() => Add (new T());
+    #endregion
 
-    public void Modifier<T>() where T : IElementModifier, new() => Add (new T());
+    #region Public methods
 
-    public void NamingConvention (IElementNamingConvention elementNamingConvention)
-        => _set.NamingConvention (elementNamingConvention);
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="filter"></param>
+    /// <param name="builder"></param>
+    public void Add
+        (
+            Func<ElementRequest, bool> filter,
+            IElementBuilder builder
+        )
+    {
+        Sure.NotNull (filter);
+        Sure.NotNull (builder);
 
-    public ElementActionExpression Always => new (_set, req => true, "Always");
+        _set.Add (filter, builder);
+    }
 
-    public ElementActionExpression If (Func<ElementRequest, bool> matches, string description = null)
-        => new (_set, matches, description);
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="policy"></param>
+    public void Add
+        (
+            IElementBuilderPolicy policy
+        )
+    {
+        Sure.NotNull (policy);
 
-    public ElementActionExpression IfPropertyIs<T>() => If (req => req.Accessor.PropertyType == typeof (T),
-        $"Property type is {typeof (T).Name}");
+        _set.Add (policy);
+    }
 
-    public ElementActionExpression IfPropertyTypeIs (Func<Type, bool> matches, string description = null)
-        => If (def => matches (def.Accessor.PropertyType), description);
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="modifier"></param>
+    public void Add
+        (
+            IElementModifier modifier
+        )
+    {
+        Sure.NotNull (modifier);
 
+        _set.Add (modifier);
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public void BuilderPolicy<T>()
+        where T : IElementBuilderPolicy, new()
+    {
+        Add (new T());
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public void Modifier<T>()
+        where T : IElementModifier, new()
+    {
+        Add (new T());
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="elementNamingConvention"></param>
+    public void NamingConvention
+        (
+            IElementNamingConvention elementNamingConvention
+        )
+    {
+        Sure.NotNull (elementNamingConvention);
+
+        _set.NamingConvention (elementNamingConvention);
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="matches"></param>
+    /// <param name="description"></param>
+    /// <returns></returns>
+    public ElementActionExpression If
+        (
+            Func<ElementRequest, bool> matches,
+            string? description = null
+        )
+    {
+        Sure.NotNull (matches);
+
+        return new (_set, matches, description);
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public ElementActionExpression IfPropertyIs<T>()
+    {
+        return If (req => req.Accessor.PropertyType == typeof (T),
+            $"Property type is {typeof (T).Name}");
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="matches"></param>
+    /// <param name="description"></param>
+    /// <returns></returns>
+    public ElementActionExpression IfPropertyTypeIs (Func<Type, bool> matches, string? description = null)
+    {
+        return If (def => matches (def.Accessor.PropertyType), description);
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
     public ElementActionExpression IfPropertyHasAttribute<T>() where T : Attribute
-        => If (req => req.Accessor.HasAttribute<T>(), $"Accessor has attribute [{typeof (T).Name}]");
+    {
+        return If (req => req.Accessor.HasAttribute<T>(), $"Accessor has attribute [{typeof (T).Name}]");
+    }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="className"></param>
+    /// <typeparam name="T"></typeparam>
     public void AddClassForAttribute<T> (string className) where T : Attribute
-        => IfPropertyHasAttribute<T>().AddClass (className);
+    {
+        IfPropertyHasAttribute<T>().AddClass (className);
+    }
 
-    public void ModifyForAttribute<T> (Action<HtmlTag, T> modification, string description = null)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="modification"></param>
+    /// <param name="description"></param>
+    /// <typeparam name="T"></typeparam>
+    public void ModifyForAttribute<T> (Action<HtmlTag, T> modification, string? description = null)
         where T : Attribute
     {
         IfPropertyHasAttribute<T>().ModifyWith (req =>
@@ -71,6 +219,16 @@ public class ElementCategoryExpression
         }, description);
     }
 
-    public void ModifyForAttribute<T> (Action<HtmlTag> modification, string description = null) where T : Attribute
-        => ModifyForAttribute<T> ((tag, att) => modification (tag), description);
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="modification"></param>
+    /// <param name="description"></param>
+    /// <typeparam name="T"></typeparam>
+    public void ModifyForAttribute<T> (Action<HtmlTag> modification, string? description = null) where T : Attribute
+    {
+        ModifyForAttribute<T> ((tag, att) => modification (tag), description);
+    }
+
+    #endregion
 }

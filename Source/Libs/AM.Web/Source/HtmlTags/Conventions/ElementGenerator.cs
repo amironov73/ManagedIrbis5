@@ -33,8 +33,8 @@ public class ElementGenerator<T> : IElementGenerator<T> where T : class
         _tags = tags;
     }
 
-    public static ElementGenerator<T> For (HtmlConventionLibrary library, Func<Type, object> serviceLocator = null,
-        T model = null)
+    public static ElementGenerator<T> For (HtmlConventionLibrary library, Func<Type, object>? serviceLocator = null,
+        T? model = null)
     {
         serviceLocator = serviceLocator ?? Activator.CreateInstance;
 
@@ -46,33 +46,33 @@ public class ElementGenerator<T> : IElementGenerator<T> where T : class
         };
     }
 
-    public HtmlTag LabelFor<TResult> (Expression<Func<T, TResult>> expression, string profile = null,
-        T model = null)
+    public HtmlTag LabelFor<TResult> (Expression<Func<T, TResult>> expression, string? profile = null,
+        T? model = null)
         => Build (expression, ElementConstants.Label, profile, model);
 
-    public HtmlTag InputFor<TResult> (Expression<Func<T, TResult>> expression, string profile = null,
-        T model = null)
+    public HtmlTag InputFor<TResult> (Expression<Func<T, TResult>> expression, string? profile = null,
+        T? model = null)
         => Build (expression, ElementConstants.Editor, profile, model);
 
-    public HtmlTag ValidationMessageFor<TResult> (Expression<Func<T, TResult>> expression, string profile = null,
-        T model = null)
+    public HtmlTag ValidationMessageFor<TResult> (Expression<Func<T, TResult>> expression, string? profile = null,
+        T? model = null)
         => Build (expression, ElementConstants.ValidationMessage, profile, model);
 
-    public HtmlTag DisplayFor<TResult> (Expression<Func<T, TResult>> expression, string profile = null,
-        T model = null)
+    public HtmlTag DisplayFor<TResult> (Expression<Func<T, TResult>> expression, string? profile = null,
+        T? model = null)
         => Build (expression, ElementConstants.Display, profile, model);
 
-    public HtmlTag TagFor<TResult> (Expression<Func<T, TResult>> expression, string category, string profile = null,
-        T model = null)
+    public HtmlTag TagFor<TResult> (Expression<Func<T, TResult>> expression, string category, string? profile = null,
+        T? model = null)
         => Build (expression, category, profile, model);
 
-    public T Model
+    public T? Model
     {
         get => _model.Value;
         set => _model = new Lazy<T> (() => value);
     }
 
-    public ElementRequest GetRequest<TResult> (Expression<Func<T, TResult>> expression, T model = null)
+    public ElementRequest GetRequest<TResult> (Expression<Func<T, TResult>> expression, T? model = null)
     {
         return new (expression.ToAccessor())
         {
@@ -80,32 +80,32 @@ public class ElementGenerator<T> : IElementGenerator<T> where T : class
         };
     }
 
-    private HtmlTag Build<TResult> (Expression<Func<T, TResult>> expression, string category, string profile = null,
-        T model = null)
+    private HtmlTag Build<TResult> (Expression<Func<T, TResult>> expression, string category, string? profile = null,
+        T? model = null)
     {
         ElementRequest request = GetRequest (expression, model);
         return _tags.Build (request, category, profile);
     }
 
-    private HtmlTag Build (ElementRequest request, string category, string profile = null, T model = null)
+    private HtmlTag Build (ElementRequest request, string category, string? profile = null, T? model = null)
     {
         request.Model = model ?? Model;
         return _tags.Build (request, category, profile: profile);
     }
 
     // Below methods are tested through the IFubuPage.Show/Edit method tests
-    public HtmlTag LabelFor (ElementRequest request, string profile = null, T model = null) =>
+    public HtmlTag LabelFor (ElementRequest request, string? profile = null, T? model = null) =>
         Build (request, ElementConstants.Label, profile, model);
 
-    public HtmlTag InputFor (ElementRequest request, string profile = null, T model = null) =>
+    public HtmlTag InputFor (ElementRequest request, string? profile = null, T? model = null) =>
         Build (request, ElementConstants.Editor, profile, model);
 
-    public HtmlTag ValidationMessageFor (ElementRequest request, string profile = null, T model = null) =>
+    public HtmlTag ValidationMessageFor (ElementRequest request, string? profile = null, T? model = null) =>
         Build (request, ElementConstants.ValidationMessage, profile, model);
 
-    public HtmlTag DisplayFor (ElementRequest request, string profile = null, T model = null) =>
+    public HtmlTag DisplayFor (ElementRequest request, string? profile = null, T? model = null) =>
         Build (request, ElementConstants.Display, profile, model);
 
-    public HtmlTag TagFor (ElementRequest request, string category, string profile = null, T model = null) =>
+    public HtmlTag TagFor (ElementRequest request, string category, string? profile = null, T? model = null) =>
         Build (request, category, profile, model);
 }

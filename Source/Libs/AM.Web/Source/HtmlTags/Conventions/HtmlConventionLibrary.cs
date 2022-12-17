@@ -40,7 +40,7 @@ public class HtmlConventionLibrary
 
     public TagLibrary TagLibrary { get; }
 
-    public T Get<T> (string profile = null)
+    public T Get<T> (string? profile = null)
     {
         profile = profile ?? TagConstants.Default;
         var builder = _services[profile];
@@ -58,10 +58,10 @@ public class HtmlConventionLibrary
             "No service implementation is registered for type " + typeof (T).FullName);
     }
 
-    public void RegisterService<T, TImplementation> (string profile = null) where TImplementation : T, new()
+    public void RegisterService<T, TImplementation> (string? profile = null) where TImplementation : T, new()
         => RegisterService<T> (() => new TImplementation(), profile);
 
-    public void RegisterService<T> (Func<T> builder, string profile = null)
+    public void RegisterService<T> (Func<T> builder, string? profile = null)
     {
         profile = profile ?? TagConstants.Default;
         _services[profile].Add (builder);

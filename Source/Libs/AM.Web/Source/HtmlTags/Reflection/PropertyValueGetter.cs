@@ -57,7 +57,7 @@ public class PropertyValueGetter : IValueGetter
     public void SetValue (object target, object propertyValue) =>
         PropertyInfo.SetValue (target, propertyValue, null);
 
-    public override bool Equals (object obj)
+    public override bool Equals (object? obj)
     {
         if (ReferenceEquals (null, obj))
         {
