@@ -3,30 +3,56 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* DotNotationElementNamingConvention.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
-namespace AM.HtmlTags.Conventions.Elements;
+#region Using directives
 
 using System;
 using System.Linq;
 
+#endregion
+
+#nullable enable
+
+namespace AM.HtmlTags.Conventions.Elements;
+
+#region Using directives
+
 using Reflection;
 
-public class DotNotationElementNamingConvention : IElementNamingConvention
+#endregion
+
+/// <summary>
+///
+/// </summary>
+public class DotNotationElementNamingConvention
+    : IElementNamingConvention
 {
+    #region Public methods
+
+    /// <summary>
+    ///
+    /// </summary>
     public static Func<string, bool> IsCollectionIndexer = x => x.StartsWith ("[") && x.EndsWith ("]");
 
-    public string GetName (Type modelType, Accessor accessor)
+    #endregion
+
+    #region IElementNamingConvention members
+
+    /// <inheritdoc cref="IElementNamingConvention.GetName"/>
+    public string GetName
+        (
+            Type modelType,
+            Accessor accessor
+        )
     {
+        Sure.NotNull (accessor);
+        modelType.NotUsed();
+
         return accessor.PropertyNames
             .Aggregate ((x, y) =>
             {
@@ -36,4 +62,6 @@ public class DotNotationElementNamingConvention : IElementNamingConvention
                 return string.Format (formatString, x, y);
             });
     }
+
+    #endregion
 }

@@ -3,35 +3,79 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* IElementTagOverride.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
+#nullable enable
+
 namespace AM.HtmlTags.Conventions.Elements;
 
+/// <summary>
+///
+/// </summary>
 public interface IElementTagOverride
 {
+    /// <summary>
+    ///
+    /// </summary>
     string Category { get; }
+
+    /// <summary>
+    ///
+    /// </summary>
     string Profile { get; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     IElementBuilder Builder();
 }
 
-public class ElementTagOverride<T> : IElementTagOverride where T : IElementBuilder, new()
+/// <summary>
+///
+/// </summary>
+/// <typeparam name="T"></typeparam>
+public class ElementTagOverride<T>
+    : IElementTagOverride
+    where T : IElementBuilder, new()
 {
-    public ElementTagOverride (string category, string profile)
+    #region Properties
+
+    /// <inheritdoc cref="IElementTagOverride.Category"/>
+    public string Category { get; }
+
+    /// <inheritdoc cref="IElementTagOverride.Profile"/>
+    public string Profile { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="category"></param>
+    /// <param name="profile"></param>
+    public ElementTagOverride
+        (
+            string? category,
+            string? profile
+        )
     {
         Category = category ?? TagConstants.Default;
         Profile = profile ?? TagConstants.Default;
     }
 
-    public string Category { get; }
-    public string Profile { get; }
+    #endregion
+
+    #region IElementTagOverride members
+
+    /// <inheritdoc cref="IElementTagOverride.Builder"/>
     public IElementBuilder Builder() => new T();
+
+    #endregion
 }

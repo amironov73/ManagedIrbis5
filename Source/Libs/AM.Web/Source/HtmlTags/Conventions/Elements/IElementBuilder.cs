@@ -3,27 +3,36 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* IElementBuilder.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 namespace AM.HtmlTags.Conventions.Elements;
 
-public interface IElementBuilder : ITagBuilder
+/// <summary>
+///
+/// </summary>
+public interface IElementBuilder
+    : ITagBuilder
 {
+    // пустое тело интерфейса
 }
 
-public interface IElementBuilderPolicy : ITagBuilderPolicy
+/// <summary>
+///
+/// </summary>
+public interface IElementBuilderPolicy
+    : ITagBuilderPolicy
 {
+    // пустое тело интерфейса
 }
 
-public abstract class ElementTagBuilder : TagBuilder, IElementBuilderPolicy, IElementBuilder
+/// <summary>
+///
+/// </summary>
+public abstract class ElementTagBuilder
+    : TagBuilder, IElementBuilderPolicy, IElementBuilder
 {
+    // пустое тело класса
 }

@@ -3,47 +3,98 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* AccessorOverrideElementBuilderPolicy.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
-namespace AM.HtmlTags.Conventions.Elements;
+#region Using directives
 
 using System.Linq;
 
+using JetBrains.Annotations;
+
+#endregion
+
+#nullable enable
+
+namespace AM.HtmlTags.Conventions.Elements;
+
+#region Using directives
+
 using Reflection;
 
-public class AccessorOverrideElementBuilderPolicy : IElementBuilderPolicy
-{
-    private readonly AccessorRules _rules;
-    private readonly string _category;
-    private readonly string _profile;
+#endregion
 
-    public AccessorOverrideElementBuilderPolicy (AccessorRules rules, string category, string profile)
+/// <summary>
+///
+/// </summary>
+[PublicAPI]
+public class AccessorOverrideElementBuilderPolicy
+    : IElementBuilderPolicy
+{
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="rules"></param>
+    /// <param name="category"></param>
+    /// <param name="profile"></param>
+    public AccessorOverrideElementBuilderPolicy
+        (
+            AccessorRules rules,
+            string category,
+            string profile
+        )
     {
+        Sure.NotNull (rules);
+        Sure.NotNullNorEmpty (category);
+        Sure.NotNullNorEmpty (profile);
+
         _rules = rules;
         _category = category;
         _profile = profile;
     }
 
-    public bool Matches (ElementRequest subject)
+    #endregion
+
+    #region Private members
+
+    private readonly AccessorRules _rules;
+
+    private readonly string _category;
+
+    private readonly string _profile;
+
+    #endregion
+
+    #region IElementBuilderPolicy members
+
+    /// <inheritdoc cref="ITagBuilderPolicy.Matches"/>
+    public bool Matches
+        (
+            ElementRequest subject
+        )
     {
+        Sure.NotNull (subject);
+
         return _rules.AllRulesFor<IElementTagOverride> (subject.Accessor)
             .Any (x => x.Category == _category && x.Profile == _profile);
     }
 
-    public ITagBuilder BuilderFor (ElementRequest subject)
+    /// <inheritdoc cref="ITagBuilderPolicy.BuilderFor"/>
+    public ITagBuilder BuilderFor
+        (
+            ElementRequest subject
+        )
     {
-        return
-            _rules.AllRulesFor<IElementTagOverride> (subject.Accessor)
+        Sure.NotNull (subject);
+
+        return _rules.AllRulesFor<IElementTagOverride> (subject.Accessor)
                 .First (x => x.Category == _category && x.Profile == _profile)
                 .Builder();
     }
+
+    #endregion
 }

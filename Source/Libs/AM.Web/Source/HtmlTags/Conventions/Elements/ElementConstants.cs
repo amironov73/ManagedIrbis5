@@ -3,25 +3,44 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* ElementConstants.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 namespace AM.HtmlTags.Conventions.Elements;
 
+/// <summary>
+///
+/// </summary>
 public static class ElementConstants
 {
+    #region Constants
+
+    /// <summary>
+    ///
+    /// </summary>
     public static readonly string Label = "Label";
+
+    /// <summary>
+    ///
+    /// </summary>
     public static readonly string Display = "Display";
+
+    /// <summary>
+    ///
+    /// </summary>
     public static readonly string Editor = "Editor";
+
+    /// <summary>
+    ///
+    /// </summary>
     public static readonly string ValidationMessage = "ValidationMessage";
 
+    /// <summary>
+    ///
+    /// </summary>
     public static readonly string Templates = "Templates";
+
+    #endregion
 }

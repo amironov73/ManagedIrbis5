@@ -3,39 +3,181 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* IElementGenerator.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
-namespace AM.HtmlTags.Conventions.Elements;
+#region Using directives
 
 using System;
 using System.Linq.Expressions;
 
-public interface IElementGenerator<T> where T : class
+#endregion
+
+#nullable enable
+
+namespace AM.HtmlTags.Conventions.Elements;
+
+/// <summary>
+///
+/// </summary>
+/// <typeparam name="T"></typeparam>
+public interface IElementGenerator<T>
+    where T : class
 {
+    /// <summary>
+    ///
+    /// </summary>
     T Model { get; set; }
-    HtmlTag LabelFor<TResult> (Expression<Func<T, TResult>> expression, string profile = null, T model = null);
-    HtmlTag InputFor<TResult> (Expression<Func<T, TResult>> expression, string profile = null, T model = null);
 
-    HtmlTag ValidationMessageFor<TResult> (Expression<Func<T, TResult>> expression, string profile = null,
-        T model = null);
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="expression"></param>
+    /// <param name="profile"></param>
+    /// <param name="model"></param>
+    /// <typeparam name="TResult"></typeparam>
+    /// <returns></returns>
+    HtmlTag LabelFor<TResult>
+        (
+            Expression<Func<T, TResult>> expression,
+            string? profile = null,
+            T? model = null
+        );
 
-    HtmlTag DisplayFor<TResult> (Expression<Func<T, TResult>> expression, string profile = null, T model = null);
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="expression"></param>
+    /// <param name="profile"></param>
+    /// <param name="model"></param>
+    /// <typeparam name="TResult"></typeparam>
+    /// <returns></returns>
+    HtmlTag InputFor<TResult>
+        (
+            Expression<Func<T, TResult>> expression,
+            string? profile = null,
+            T? model = null
+        );
 
-    HtmlTag TagFor<TResult> (Expression<Func<T, TResult>> expression, string category, string profile = null,
-        T model = null);
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="expression"></param>
+    /// <param name="profile"></param>
+    /// <param name="model"></param>
+    /// <typeparam name="TResult"></typeparam>
+    /// <returns></returns>
+    HtmlTag ValidationMessageFor<TResult>
+        (
+            Expression<Func<T, TResult>> expression,
+            string? profile = null,
+            T? model = null
+        );
 
-    HtmlTag LabelFor (ElementRequest request, string profile = null, T model = null);
-    HtmlTag InputFor (ElementRequest request, string profile = null, T model = null);
-    HtmlTag ValidationMessageFor (ElementRequest request, string profile = null, T model = null);
-    HtmlTag DisplayFor (ElementRequest request, string profile = null, T model = null);
-    HtmlTag TagFor (ElementRequest request, string category, string profile = null, T model = null);
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="expression"></param>
+    /// <param name="profile"></param>
+    /// <param name="model"></param>
+    /// <typeparam name="TResult"></typeparam>
+    /// <returns></returns>
+    HtmlTag DisplayFor<TResult>
+        (
+            Expression<Func<T, TResult>> expression,
+            string? profile = null,
+            T? model = null
+        );
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="expression"></param>
+    /// <param name="category"></param>
+    /// <param name="profile"></param>
+    /// <param name="model"></param>
+    /// <typeparam name="TResult"></typeparam>
+    /// <returns></returns>
+    HtmlTag TagFor<TResult>
+        (
+            Expression<Func<T, TResult>> expression,
+            string category,
+            string? profile = null,
+            T? model = null
+        );
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="profile"></param>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    HtmlTag LabelFor
+        (
+            ElementRequest request,
+            string? profile = null,
+            T? model = null
+        );
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="profile"></param>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    HtmlTag InputFor
+        (
+            ElementRequest request,
+            string? profile = null,
+            T? model = null
+        );
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="profile"></param>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    HtmlTag ValidationMessageFor
+        (
+            ElementRequest request,
+            string? profile = null,
+            T? model = null
+        );
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="profile"></param>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    HtmlTag DisplayFor
+        (
+            ElementRequest request,
+            string? profile = null,
+            T? model = null
+        );
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="category"></param>
+    /// <param name="profile"></param>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    HtmlTag TagFor
+        (
+            ElementRequest request,
+            string category,
+            string? profile = null,
+            T? model = null
+        );
 }

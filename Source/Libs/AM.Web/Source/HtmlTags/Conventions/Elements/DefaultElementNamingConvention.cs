@@ -3,24 +3,48 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* DefaultElementNamingConvention.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
-namespace AM.HtmlTags.Conventions.Elements;
+#region Using directives
 
 using System;
 
+#endregion
+
+#nullable enable
+
+namespace AM.HtmlTags.Conventions.Elements;
+
+#region Using directives
+
 using Reflection;
 
-public class DefaultElementNamingConvention : IElementNamingConvention
+#endregion
+
+/// <summary>
+///
+/// </summary>
+public class DefaultElementNamingConvention
+    : IElementNamingConvention
 {
-    public string GetName (Type modelType, Accessor accessor) => accessor.Name;
+    #region IElementNamingConvention members
+
+    /// <inheritdoc cref="IElementNamingConvention.GetName"/>
+    public string GetName
+        (
+            Type modelType,
+            Accessor accessor
+        )
+    {
+        Sure.NotNull (accessor);
+        modelType.NotUsed();
+
+        return accessor.Name;
+    }
+
+    #endregion
 }

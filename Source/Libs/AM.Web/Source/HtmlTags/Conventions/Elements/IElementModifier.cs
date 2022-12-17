@@ -3,19 +3,18 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* IElementModifier.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 namespace AM.HtmlTags.Conventions.Elements;
 
-public interface IElementModifier : ITagModifier
+/// <summary>
+///
+/// </summary>
+public interface IElementModifier
+    : ITagModifier
 {
+    // пустое тело интерфейса
 }
