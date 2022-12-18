@@ -87,9 +87,9 @@ namespace UnitTests.ManagedIrbis.Search
             };
             var actual = Term.TrimPrefix(terms, "T=");
             Assert.AreEqual(3, actual.Length);
-            Assert.AreEqual("HELLO", actual[0]);
-            Assert.AreEqual("IRBIS", actual[1]);
-            Assert.AreEqual("WORLD", actual[2]);
+            Assert.AreEqual("HELLO", actual[0].Text);
+            Assert.AreEqual("IRBIS", actual[1].Text);
+            Assert.AreEqual("WORLD", actual[2].Text);
 
             terms = new []
             {
@@ -99,9 +99,9 @@ namespace UnitTests.ManagedIrbis.Search
             };
             actual = Term.TrimPrefix(terms, string.Empty);
             Assert.AreEqual(3, actual.Length);
-            Assert.AreEqual("HELLO", actual[0]);
-            Assert.AreEqual("IRBIS", actual[1]);
-            Assert.AreEqual("WORLD", actual[2]);
+            Assert.AreEqual("HELLO", actual[0].Text);
+            Assert.AreEqual("IRBIS", actual[1].Text);
+            Assert.AreEqual("WORLD", actual[2].Text);
         }
 
         [TestMethod]
