@@ -10,7 +10,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UseNameofExpression
 
-/*
+/* HtmlConventionRegistry.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 

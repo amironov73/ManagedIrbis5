@@ -3,39 +3,43 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* ElementRequest.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
-namespace AM.HtmlTags.Conventions;
+#region Using directives
 
 using System;
 
+using JetBrains.Annotations;
+
+#endregion
+
+#nullable enable
+
+namespace AM.HtmlTags.Conventions;
+
+#region Using directives
+
 using Elements;
-
 using Formatting;
-
 using Reflection;
 
+#endregion
+
+/// <summary>
+///
+/// </summary>
+[PublicAPI]
 public class ElementRequest
 {
-    private bool _hasFetched;
-    private object _rawValue;
-    private Func<Type, object> _services;
+    #region Properties
 
-    public ElementRequest (Accessor accessor)
-    {
-        Accessor = accessor;
-    }
-
-    public object RawValue
+    /// <summary>
+    ///
+    /// </summary>
+    public object? RawValue
     {
         get
         {
@@ -49,19 +53,80 @@ public class ElementRequest
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public string ElementId { get; set; }
-    public object Model { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public object? Model { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public Accessor Accessor { get; }
-    public HtmlTag OriginalTag { get; private set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public HtmlTag? OriginalTag { get; private set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public HtmlTag CurrentTag { get; private set; }
 
-    public void WrapWith (HtmlTag tag)
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="accessor"></param>
+    public ElementRequest
+        (
+            Accessor accessor
+        )
+    {
+        Sure.NotNull (accessor);
+
+        Accessor = accessor;
+    }
+
+    #endregion
+
+    #region Private members
+
+    private bool _hasFetched;
+    private object? _rawValue;
+    private Func<Type, object>? _services;
+
+    #endregion
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="tag"></param>
+    public void WrapWith
+        (
+            HtmlTag tag
+        )
     {
         CurrentTag.WrapWith (tag);
         ReplaceTag (tag);
     }
 
-    public void ReplaceTag (HtmlTag tag)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="tag"></param>
+    public void ReplaceTag
+        (
+            HtmlTag tag
+        )
     {
         if (OriginalTag == null)
         {
@@ -71,38 +136,92 @@ public class ElementRequest
         CurrentTag = tag;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public AccessorDef ToAccessorDef() => new (Accessor, HolderType());
 
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public Type HolderType() => Model == null ? Accessor.DeclaringType : Model?.GetType();
 
-    public T Get<T>() => (T)_services (typeof (T));
+    /// <summary>
+    ///
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public T Get<T>() => (T)_services! (typeof (T));
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="service"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
     public bool TryGet<T> (out T service) => (service = (T)_services (typeof (T))) != null;
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="category"></param>
+    /// <param name="profile"></param>
+    /// <returns></returns>
     // virtual for mocking
     public virtual HtmlTag BuildForCategory (string category, string? profile = null) =>
         Get<ITagGenerator>().Build (this, category, profile);
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
     public T Value<T>() => (T)RawValue;
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public string StringValue() =>
         new DisplayFormatter (_services).GetDisplay (new GetStringRequest (Accessor, RawValue, _services, null,
             null));
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public bool ValueIsEmpty() => RawValue == null || string.Empty.Equals (RawValue);
 
-    public void ForValue<T> (Action<T> action)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="action"></param>
+    /// <typeparam name="T"></typeparam>
+    public void ForValue<T>
+        (
+            Action<T?> action
+        )
     {
         if (ValueIsEmpty())
         {
             return;
         }
 
-        action ((T)RawValue);
+        action ((T?) RawValue);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="locator"></param>
     public void Attach (Func<Type, object> locator) => _services = locator;
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public ElementRequest ToToken() => new (Accessor);
 }

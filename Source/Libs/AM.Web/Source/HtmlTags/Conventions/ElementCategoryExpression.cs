@@ -168,8 +168,11 @@ public class ElementCategoryExpression
     /// <returns></returns>
     public ElementActionExpression IfPropertyIs<T>()
     {
-        return If (req => req.Accessor.PropertyType == typeof (T),
-            $"Property type is {typeof (T).Name}");
+        return If
+            (
+                req => req.Accessor.PropertyType == typeof (T),
+                $"Property type is {typeof (T).Name}"
+            );
     }
 
     /// <summary>
@@ -178,9 +181,17 @@ public class ElementCategoryExpression
     /// <param name="matches"></param>
     /// <param name="description"></param>
     /// <returns></returns>
-    public ElementActionExpression IfPropertyTypeIs (Func<Type, bool> matches, string? description = null)
+    public ElementActionExpression IfPropertyTypeIs
+        (
+            Func<Type, bool> matches,
+            string? description = null
+        )
     {
-        return If (def => matches (def.Accessor.PropertyType), description);
+        return If
+            (
+                def => matches (def.Accessor.PropertyType),
+                description
+            );
     }
 
     /// <summary>
@@ -188,9 +199,14 @@ public class ElementCategoryExpression
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    public ElementActionExpression IfPropertyHasAttribute<T>() where T : Attribute
+    public ElementActionExpression IfPropertyHasAttribute<T>()
+        where T : Attribute
     {
-        return If (req => req.Accessor.HasAttribute<T>(), $"Accessor has attribute [{typeof (T).Name}]");
+        return If
+            (
+                req => req.Accessor.HasAttribute<T>(),
+                $"Accessor has attribute [{typeof (T).Name}]"
+            );
     }
 
     /// <summary>
@@ -198,8 +214,14 @@ public class ElementCategoryExpression
     /// </summary>
     /// <param name="className"></param>
     /// <typeparam name="T"></typeparam>
-    public void AddClassForAttribute<T> (string className) where T : Attribute
+    public void AddClassForAttribute<T>
+        (
+            string className
+        )
+        where T : Attribute
     {
+        Sure.NotNullNorEmpty (className);
+
         IfPropertyHasAttribute<T>().AddClass (className);
     }
 
@@ -209,9 +231,15 @@ public class ElementCategoryExpression
     /// <param name="modification"></param>
     /// <param name="description"></param>
     /// <typeparam name="T"></typeparam>
-    public void ModifyForAttribute<T> (Action<HtmlTag, T> modification, string? description = null)
+    public void ModifyForAttribute<T>
+        (
+            Action<HtmlTag, T> modification,
+            string? description = null
+        )
         where T : Attribute
     {
+        Sure.NotNull (modification);
+
         IfPropertyHasAttribute<T>().ModifyWith (req =>
         {
             var att = req.Accessor.GetAttribute<T>();
@@ -225,9 +253,16 @@ public class ElementCategoryExpression
     /// <param name="modification"></param>
     /// <param name="description"></param>
     /// <typeparam name="T"></typeparam>
-    public void ModifyForAttribute<T> (Action<HtmlTag> modification, string? description = null) where T : Attribute
+    public void ModifyForAttribute<T>
+        (
+            Action<HtmlTag> modification,
+            string? description = null
+        )
+        where T : Attribute
     {
-        ModifyForAttribute<T> ((tag, att) => modification (tag), description);
+        Sure.NotNull (modification);
+
+        ModifyForAttribute<T> ((tag, _) => modification (tag), description);
     }
 
     #endregion

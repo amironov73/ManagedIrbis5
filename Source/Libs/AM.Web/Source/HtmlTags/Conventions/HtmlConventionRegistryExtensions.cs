@@ -3,57 +3,103 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* HtmlConventionRegistryExtensions.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 namespace AM.HtmlTags.Conventions;
 
+#region Using directives
+
 using Elements;
 using Elements.Builders;
 
+#endregion
+
+#nullable enable
+
+/// <summary>
+///
+/// </summary>
 public static class HtmlConventionRegistryExtensions
 {
-    public static HtmlConventionRegistry Defaults (this HtmlConventionRegistry registry) =>
-        registry
+    #region Public methods
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="registry"></param>
+    /// <returns></returns>
+    public static HtmlConventionRegistry Defaults
+        (
+            this HtmlConventionRegistry registry
+        )
+    {
+        Sure.NotNull (registry);
+
+        return registry
             .DefaultBuilders()
             .DefaultModifiers()
             .DefaultNamingConvention();
+    }
 
-    public static HtmlConventionRegistry DefaultNamingConvention (this HtmlConventionRegistry registry)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="registry"></param>
+    /// <returns></returns>
+    public static HtmlConventionRegistry DefaultNamingConvention
+        (
+            this HtmlConventionRegistry registry
+        )
     {
+        Sure.NotNull (registry);
+
         registry.Editors.NamingConvention (new DotNotationElementNamingConvention());
         registry.Labels.NamingConvention (new DotNotationElementNamingConvention());
 
         return registry;
     }
 
-    public static HtmlConventionRegistry DefaultModifiers (this HtmlConventionRegistry registry)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="registry"></param>
+    /// <returns></returns>
+    public static HtmlConventionRegistry DefaultModifiers
+        (
+            this HtmlConventionRegistry registry
+        )
     {
-        registry.Editors.Modifier<AddNameModifier>();
+        Sure.NotNull (registry);
 
+        registry.Editors.Modifier<AddNameModifier>();
         registry.Editors.Modifier<AddIdModifier>();
 
         return registry;
     }
 
-    public static HtmlConventionRegistry DefaultBuilders (this HtmlConventionRegistry registry)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="registry"></param>
+    /// <returns></returns>
+    public static HtmlConventionRegistry DefaultBuilders
+        (
+            this HtmlConventionRegistry registry
+        )
     {
+        Sure.NotNull (registry);
+
         registry.Editors.BuilderPolicy<CheckboxBuilder>();
-
         registry.Editors.Always.BuildBy<TextboxBuilder>();
-
         registry.Displays.Always.BuildBy<SpanDisplayBuilder>();
-
         registry.Labels.Always.BuildBy<DefaultLabelBuilder>();
 
         return registry;
     }
+
+    #endregion
 }

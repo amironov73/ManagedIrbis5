@@ -3,25 +3,37 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* DisplayFormatterExtensions.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
-namespace AM.HtmlTags.Conventions.Formatting;
+#region Using directives
 
 using System;
 
+using JetBrains.Annotations;
+
+#endregion
+
+#nullable enable
+
+namespace AM.HtmlTags.Conventions.Formatting;
+
+#region Using directives
+
 using Reflection;
 
+#endregion
+
+/// <summary>
+///
+/// </summary>
+[PublicAPI]
 public static class DisplayFormatterExtensions
 {
+    #region Public methods
+
     /// <summary>
     /// Formats the provided value using the accessor accessor metadata and a custom format
     /// </summary>
@@ -30,16 +42,40 @@ public static class DisplayFormatterExtensions
     /// <param name="accessor">The property that holds the given value</param>
     /// <param name="value">The data to format</param>
     /// <param name="format">The custom format specifier</param>
-    public static string FormatValue (this IDisplayFormatter formatter, Type modelType, Accessor accessor,
-        object value, string format)
+    public static string FormatValue
+        (
+            this IDisplayFormatter formatter,
+            Type modelType,
+            Accessor accessor,
+            object value,
+            string format
+        )
     {
+        Sure.NotNull (formatter);
+        Sure.NotNull (accessor);
+
         var request = new GetStringRequest (accessor, value, null, format, null);
 
         return formatter.GetDisplay (request);
     }
 
-    public static string GetDisplayForProperty (this IDisplayFormatter formatter, Accessor accessor, object target)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="formatter"></param>
+    /// <param name="accessor"></param>
+    /// <param name="target"></param>
+    /// <returns></returns>
+    public static string GetDisplayForProperty
+        (
+            this IDisplayFormatter formatter,
+            Accessor accessor,
+            object target
+        )
     {
+        Sure.NotNull (formatter);
+        Sure.NotNull (accessor);
+
         return formatter.GetDisplay (accessor, accessor.GetValue (target));
     }
 
@@ -50,8 +86,21 @@ public static class DisplayFormatterExtensions
     /// <param name="formatter">The formatter</param>
     /// <param name="property">The property that holds the given value</param>
     /// <param name="value">The data to format</param>
-    public static string FormatValue (this IDisplayFormatter formatter, Type modelType, Accessor property,
-        object value) => formatter.GetDisplay (new GetStringRequest (property, value, null, null, modelType));
+    public static string FormatValue
+        (
+            this IDisplayFormatter formatter,
+            Type modelType,
+            Accessor property,
+            object value
+        )
+    {
+        Sure.NotNull (formatter);
+
+        return formatter.GetDisplay
+            (
+                new GetStringRequest (property, value, null, null, modelType)
+            );
+    }
 
     /// <summary>
     /// Retrieves the formatted value of a property from an instance
@@ -60,10 +109,19 @@ public static class DisplayFormatterExtensions
     /// <param name="modelType">The type of the model to which the property belongs (i.e. Case where the property might be on its base class WorkflowItem)</param>
     /// <param name="property">The property of <paramref name="entity"/> whose value should be formatted</param>
     /// <param name="entity">The instance containing the data to format</param>
-    public static string FormatProperty (this IDisplayFormatter formatter, Type modelType, Accessor property,
-        object entity)
+    public static string FormatProperty
+        (
+            this IDisplayFormatter formatter,
+            Type modelType,
+            Accessor property,
+            object entity
+        )
     {
+        Sure.NotNull (formatter);
+
         var raw = property.GetValue (entity);
         return formatter.FormatValue (modelType, property, raw);
     }
+
+    #endregion
 }

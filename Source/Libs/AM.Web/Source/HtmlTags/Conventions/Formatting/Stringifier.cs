@@ -3,8 +3,9 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable InconsistentNaming
 
-/*
+/* Stringifier.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -55,23 +56,26 @@ public class Stringifier
     private readonly List<PropertyOverrideStrategy> _overrides = new ();
     private readonly List<StringifierStrategy> _strategies = new ();
 
-    private Func<GetStringRequest, string> findConverter (GetStringRequest request)
+    private Func<GetStringRequest, string> findConverter
+        (
+            GetStringRequest request
+        )
     {
-        if (request.PropertyType.IsNullable())
+        if (request.PropertyType!.IsNullable())
         {
             if (request.RawValue == null)
             {
-                return r => string.Empty;
+                return _ => string.Empty;
             }
 
             return findConverter (request.GetRequestForNullableType());
         }
 
-        if (request.PropertyType.IsArray)
+        if (request.PropertyType!.IsArray)
         {
             if (request.RawValue == null)
             {
-                return r => string.Empty;
+                return _ => string.Empty;
             }
 
             return r =>
@@ -85,8 +89,9 @@ public class Stringifier
             };
         }
 
-        StringifierStrategy strategy = _strategies.FirstOrDefault (x => x.Matches (request));
-        return strategy == null ? ToString : strategy.StringFunction;
+        var strategy = _strategies.FirstOrDefault (x => x.Matches! (request));
+
+        return strategy == null ? ToString : strategy.StringFunction!;
     }
 
     private static string ToString (GetStringRequest value) => value.RawValue?.ToString() ?? string.Empty;
@@ -95,18 +100,26 @@ public class Stringifier
 
     #region Public methods
 
-    public string GetString (GetStringRequest request)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    public string GetString
+        (
+            GetStringRequest request
+        )
     {
-        if (request?.RawValue == null || request.RawValue as string == string.Empty)
+        if (request.RawValue == null || request.RawValue as string == string.Empty)
         {
             return string.Empty;
         }
 
-        PropertyOverrideStrategy propertyOverride = _overrides.FirstOrDefault (o => o.Matches (request.Property));
+        var propertyOverride = _overrides.FirstOrDefault (o => o.Matches! (request.Property!));
 
         if (propertyOverride != null)
         {
-            return propertyOverride.StringFunction (request);
+            return propertyOverride.StringFunction! (request);
         }
 
         return findConverter (request) (request);
