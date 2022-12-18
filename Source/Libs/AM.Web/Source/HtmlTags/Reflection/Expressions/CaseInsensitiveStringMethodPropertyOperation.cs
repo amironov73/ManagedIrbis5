@@ -3,14 +3,8 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* CaseInsensitiveStringMethodPropertyOperation.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -26,26 +20,76 @@ using System.Reflection;
 
 namespace AM.HtmlTags.Reflection.Expressions;
 
-public abstract class CaseInsensitiveStringMethodPropertyOperation : IPropertyOperation
+/// <summary>
+///
+/// </summary>
+public abstract class CaseInsensitiveStringMethodPropertyOperation
+    : IPropertyOperation
 {
-    private readonly MethodInfo _method;
-    private readonly bool _negate;
+    #region Properties
 
-    protected CaseInsensitiveStringMethodPropertyOperation (MethodInfo method) : this (method, false)
+    /// <summary>
+    ///
+    /// </summary>
+    public virtual string OperationName => _method.Name;
+
+    /// <summary>
+    ///
+    /// </summary>
+    public abstract string Text { get; }
+
+    #endregion
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="method"></param>
+    protected CaseInsensitiveStringMethodPropertyOperation
+        (
+            MethodInfo method
+        )
+        : this (method, false)
     {
+        // пустое тело конструктора
     }
 
-    protected CaseInsensitiveStringMethodPropertyOperation (MethodInfo method, bool negate)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="method"></param>
+    /// <param name="negate"></param>
+    protected CaseInsensitiveStringMethodPropertyOperation
+        (
+            MethodInfo method,
+            bool negate
+        )
     {
+        Sure.NotNull (method);
+
         _method = method;
         _negate = negate;
     }
 
-    public virtual string OperationName => _method.Name;
-    public abstract string Text { get; }
+    #region Private members
 
-    public Func<object, Expression<Func<T, bool>>> GetPredicateBuilder<T> (MemberExpression propertyPath)
+    private readonly MethodInfo _method;
+    private readonly bool _negate;
+
+    #endregion
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="propertyPath"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public Func<object, Expression<Func<T, bool>>> GetPredicateBuilder<T>
+        (
+            MemberExpression propertyPath
+        )
     {
+        Sure.NotNull (propertyPath);
+
         return valueToCheck =>
         {
             ConstantExpression valueToCheckConstant = Expression.Constant (valueToCheck);

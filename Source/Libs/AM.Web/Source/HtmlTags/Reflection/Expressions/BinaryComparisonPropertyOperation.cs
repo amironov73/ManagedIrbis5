@@ -3,14 +3,8 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* BinaryComparisonPropertyOperation.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -27,22 +21,59 @@ using System.Reflection;
 
 namespace AM.HtmlTags.Reflection.Expressions;
 
-public abstract class BinaryComparisonPropertyOperation : IPropertyOperation
+/// <summary>
+///
+/// </summary>
+public abstract class BinaryComparisonPropertyOperation
+    : IPropertyOperation
 {
-    private readonly ExpressionType _comparisonType;
+    #region Construction
 
-    protected BinaryComparisonPropertyOperation (ExpressionType comparisonType)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="comparisonType"></param>
+    protected BinaryComparisonPropertyOperation
+        (
+            ExpressionType comparisonType
+        )
     {
         _comparisonType = comparisonType;
     }
 
+    #endregion
+
+    #region Private members
+
+    private readonly ExpressionType _comparisonType;
+
+    #endregion
+
     #region IPropertyOperation Members
 
+    /// <summary>
+    ///
+    /// </summary>
     public abstract string OperationName { get; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public abstract string Text { get; }
 
-    public Func<object, Expression<Func<T, bool>>> GetPredicateBuilder<T> (MemberExpression propertyPath)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="propertyPath"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public Func<object, Expression<Func<T, bool>>> GetPredicateBuilder<T>
+        (
+            MemberExpression propertyPath
+        )
     {
+        Sure.NotNull (propertyPath);
+
         return expected =>
         {
             Debug.WriteLine ("Building expression for " + _comparisonType);

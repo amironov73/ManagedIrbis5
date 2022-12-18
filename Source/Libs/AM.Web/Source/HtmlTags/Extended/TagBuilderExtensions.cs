@@ -3,14 +3,8 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* TagBuilderExtensions.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,34 +16,75 @@ using System;
 
 #nullable enable
 
-namespace AM.HtmlTags.Extended
+namespace AM.HtmlTags.Extended.TagBuilders;
+
+/// <summary>
+///
+/// </summary>
+public static class TagBuilderExtensions
 {
-    namespace TagBuilders
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="tag"></param>
+    /// <param name="configure"></param>
+    /// <returns></returns>
+    public static HtmlTag Span
+        (
+            this HtmlTag tag,
+            Action<HtmlTag> configure
+        )
     {
-        public static class TagBuilderExtensions
-        {
-            public static HtmlTag Span (this HtmlTag tag, Action<HtmlTag> configure)
-            {
-                var span = new HtmlTag ("span");
-                configure (span);
-                return tag.Append (span);
-            }
+        Sure.NotNull (tag);
+        Sure.NotNull (configure);
 
-            public static HtmlTag Div (this HtmlTag tag, Action<HtmlTag> configure)
-            {
-                var div = new HtmlTag ("div");
-                configure (div);
+        var span = new HtmlTag ("span");
+        configure (span);
+        return tag.Append (span);
+    }
 
-                return tag.Append (div);
-            }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="tag"></param>
+    /// <param name="configure"></param>
+    /// <returns></returns>
+    public static HtmlTag Div
+        (
+            this HtmlTag tag,
+            Action<HtmlTag> configure
+        )
+    {
+        Sure.NotNull (tag);
+        Sure.NotNull (configure);
 
-            public static LinkTag ActionLink (this HtmlTag tag, string text, params string[] classes)
-            {
-                var child = new LinkTag (text, "#", classes);
-                tag.Append (child);
+        var div = new HtmlTag ("div");
+        configure (div);
 
-                return child;
-            }
-        }
+        return tag.Append (div);
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="tag"></param>
+    /// <param name="text"></param>
+    /// <param name="classes"></param>
+    /// <returns></returns>
+    public static LinkTag ActionLink
+        (
+            this HtmlTag tag,
+            string text,
+            params string[] classes
+        )
+    {
+        Sure.NotNull (tag);
+        Sure.NotNullNorEmpty (text);
+        Sure.NotNull (classes);
+
+        var child = new LinkTag (text, "#", classes);
+        tag.Append (child);
+
+        return child;
     }
 }

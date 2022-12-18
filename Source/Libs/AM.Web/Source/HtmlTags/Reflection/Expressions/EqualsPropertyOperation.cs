@@ -3,14 +3,8 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* EqualsPropertyOperation.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,14 +18,32 @@ using System.Linq.Expressions;
 
 namespace AM.HtmlTags.Reflection.Expressions;
 
-public class EqualsPropertyOperation : BinaryComparisonPropertyOperation
+/// <summary>
+///
+/// </summary>
+public class EqualsPropertyOperation
+    : BinaryComparisonPropertyOperation
 {
+    #region Properties
+
+    /// <inheritdoc cref="BinaryComparisonPropertyOperation.OperationName"/>
+    public override string OperationName => "Is";
+
+    /// <inheritdoc cref="BinaryComparisonPropertyOperation.Text"/>
+    public override string Text => "is";
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
     public EqualsPropertyOperation()
         : base (ExpressionType.Equal)
     {
+        // пустое тело конструктора
     }
 
-    public override string OperationName => "Is";
-
-    public override string Text => "is";
+    #endregion
 }
