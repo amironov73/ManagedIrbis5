@@ -3,14 +3,8 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* ServiceBuilder.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,17 +18,70 @@ using System;
 
 namespace AM.HtmlTags.Conventions;
 
+/// <summary>
+///
+/// </summary>
 public class ServiceBuilder
 {
+    #region Private members
+
     private readonly Cache<Type, object> _services = new ();
 
-    public bool Has (Type type) => _services.Has (type);
+    #endregion
 
-    public T Build<T>() => ((Func<T>)_services[typeof (T)])();
+    #region Public methods
 
-    public void Add<T> (Func<T> func) => _services[typeof (T)] = func;
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    public bool Has
+        (
+            Type type
+        )
+    {
+        Sure.NotNull (type);
 
+        return _services.Has (type);
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public T Build<T>() => ((Func<T>) _services[typeof (T)])();
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="func"></param>
+    /// <typeparam name="T"></typeparam>
+    public void Add<T>
+        (
+            Func<T> func
+        )
+    {
+        Sure.NotNull (func);
+
+        _services[typeof (T)] = func;
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="serviceBuilder"></param>
     // START HERE!
-    public void FillInto (ServiceBuilder serviceBuilder) =>
+    public void FillInto
+        (
+            ServiceBuilder serviceBuilder
+        )
+    {
+        Sure.NotNull (serviceBuilder);
+
         _services.Each ((type, o) => serviceBuilder._services.Fill (type, o));
+    }
+
+    #endregion
 }

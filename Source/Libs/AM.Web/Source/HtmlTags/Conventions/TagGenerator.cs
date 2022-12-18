@@ -3,14 +3,8 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* TagGenerator.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,40 +19,131 @@ using System.Collections.Generic;
 
 namespace AM.HtmlTags.Conventions;
 
+/// <summary>
+///
+/// </summary>
 public class ActiveProfile
 {
-    private readonly Stack<string> _profiles = new ();
+    #region Properties
 
+    /// <summary>
+    ///
+    /// </summary>
+    public string Name => _profiles.Peek();
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
     public ActiveProfile()
     {
         _profiles.Push (TagConstants.Default);
     }
 
-    public string Name => _profiles.Peek();
+    #endregion
 
-    public void Push (string profile) => _profiles.Push (profile);
+    #region Private members
 
+    private readonly Stack<string> _profiles = new ();
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="profile"></param>
+    public void Push
+        (
+            string profile
+        )
+    {
+        Sure.NotNullNorEmpty (profile);
+
+        _profiles.Push (profile);
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
     public void Pop() => _profiles.Pop();
+
+    #endregion
 }
 
-public class TagGenerator : ITagGenerator
+/// <summary>
+///
+/// </summary>
+public class TagGenerator
+    : ITagGenerator
 {
-    private readonly ITagLibrary _library;
-    private readonly ActiveProfile _profile;
-    private readonly Func<Type, object> _serviceLocator;
+    #region Properties
 
+    /// <summary>
+    ///
+    /// </summary>
+    public string ActiveProfile => _profile.Name;
 
-    public TagGenerator (ITagLibrary library, ActiveProfile profile, Func<Type, object> serviceLocator)
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="library"></param>
+    /// <param name="profile"></param>
+    /// <param name="serviceLocator"></param>
+    public TagGenerator
+        (
+            ITagLibrary library,
+            ActiveProfile profile,
+            Func<Type, object> serviceLocator
+        )
     {
+        Sure.NotNull (library);
+        Sure.NotNull (profile);
+        Sure.NotNull (serviceLocator);
+
         _library = library;
         _profile = profile;
         _serviceLocator = serviceLocator;
     }
 
-    public HtmlTag Build (ElementRequest request, string category = null, string profile = null)
+    #endregion
+
+    #region Private members
+
+    private readonly ITagLibrary _library;
+    private readonly ActiveProfile _profile;
+    private readonly Func<Type, object> _serviceLocator;
+
+    #endregion
+
+    #region ITagGenerator methods
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="category"></param>
+    /// <param name="profile"></param>
+    /// <returns></returns>
+    public HtmlTag Build
+        (
+            ElementRequest request,
+            string? category = null,
+            string? profile = null
+        )
     {
-        profile = profile ?? _profile.Name ?? TagConstants.Default;
-        category = category ?? TagConstants.Default;
+        Sure.NotNull (request);
+
+        profile ??= _profile.Name ?? TagConstants.Default;
+        category ??= TagConstants.Default;
 
         var token = request.ToToken();
 
@@ -71,5 +156,5 @@ public class TagGenerator : ITagGenerator
         return plan.Build (request);
     }
 
-    public string ActiveProfile => _profile.Name;
+    #endregion
 }

@@ -3,14 +3,8 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* TagCategory.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -26,30 +20,51 @@ using System.Linq;
 
 namespace AM.HtmlTags.Conventions;
 
-public class TagCategory : ITagBuildingExpression
+/// <summary>
+///
+/// </summary>
+public class TagCategory
+    : ITagBuildingExpression
 {
-    private readonly Cache<string, BuilderSet> _profiles =
-        new (name => new BuilderSet());
+    #region Properties
 
+    /// <summary>
+    ///
+    /// </summary>
+    public BuilderSet Defaults { get; } = new ();
+
+    /// <summary>
+    ///
+    /// </summary>
+    public CategoryExpression Always => Defaults.Always;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
     public TagCategory()
     {
         _profiles[TagConstants.Default] = Defaults;
     }
 
-    public BuilderSet Defaults { get; } = new ();
+    #endregion
 
-    public BuilderSet Profile (string name) => _profiles[name];
+    #region Private members
 
-    public TagPlan PlanFor (ElementRequest request, string profile = null)
-    {
-        var subject = new TagSubject (profile, request);
-        return BuildPlan (subject);
-    }
+    private readonly Cache<string, BuilderSet> _profiles =
+        new (_ => new BuilderSet());
 
-    private TagPlan BuildPlan (TagSubject subject)
+    private TagPlan BuildPlan
+        (
+            TagSubject subject
+        )
     {
         var sets = SetsFor (subject.Profile).ToList();
-        var policy = sets.SelectMany (x => x.Policies).FirstOrDefault (x => x.Matches (subject.Subject));
+        var policy = sets.SelectMany (x => x.Policies)
+            .FirstOrDefault (x => x.Matches (subject.Subject));
         if (policy == null)
         {
             throw new ArgumentOutOfRangeException ("Unable to select a TagBuilderPolicy for subject " + subject);
@@ -64,6 +79,42 @@ public class TagCategory : ITagBuildingExpression
         return new TagPlan (builder, modifiers, elementNamingConvention);
     }
 
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    public BuilderSet Profile
+        (
+            string name
+        )
+    {
+        Sure.NotNullNorEmpty (name);
+
+        return _profiles[name];
+    }
+
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="profile"></param>
+    /// <returns></returns>
+    public TagPlan PlanFor
+        (
+            ElementRequest request,
+            string? profile = null
+        )
+    {
+        var subject = new TagSubject (profile, request);
+        return BuildPlan (subject);
+    }
+
     private IEnumerable<BuilderSet> SetsFor (string profile)
     {
         if (!string.IsNullOrEmpty (profile) && profile != TagConstants.Default)
@@ -74,22 +125,92 @@ public class TagCategory : ITagBuildingExpression
         yield return Defaults;
     }
 
-    public void Add (Func<ElementRequest, bool> filter, ITagBuilder builder) =>
-        Add (new ConditionalTagBuilderPolicy (filter, builder));
-
-    public void Add (ITagBuilderPolicy policy) => _profiles[TagConstants.Default].Add (policy);
-
-    public void Add (ITagModifier modifier) => _profiles[TagConstants.Default].Add (modifier);
-
-
-    public CategoryExpression Always => Defaults.Always;
-
-    public CategoryExpression If (Func<ElementRequest, bool> matches) => Defaults.If (matches);
-
-    public ITagBuildingExpression ForProfile (string profile) => _profiles[profile];
-
-    public void Import (TagCategory other)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="filter"></param>
+    /// <param name="builder"></param>
+    public void Add
+        (
+            Func<ElementRequest, bool> filter,
+            ITagBuilder builder
+        )
     {
+        Sure.NotNull (filter);
+        Sure.NotNull (builder);
+
+        Add (new ConditionalTagBuilderPolicy (filter, builder));
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="policy"></param>
+    public void Add
+        (
+            ITagBuilderPolicy policy
+        )
+    {
+        Sure.NotNull (policy);
+
+        _profiles[TagConstants.Default].Add (policy);
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="modifier"></param>
+    public void Add
+        (
+            ITagModifier modifier
+        )
+    {
+        Sure.NotNull (modifier);
+
+        _profiles[TagConstants.Default].Add (modifier);
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="matches"></param>
+    /// <returns></returns>
+    public CategoryExpression If
+        (
+            Func<ElementRequest, bool> matches
+        )
+    {
+        Sure.NotNull (matches);
+
+        return Defaults.If (matches);
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="profile"></param>
+    /// <returns></returns>
+    public ITagBuildingExpression ForProfile
+        (
+            string profile
+        )
+    {
+        Sure.NotNullNorEmpty (profile);
+
+        return _profiles[profile];
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="other"></param>
+    public void Import
+        (
+            TagCategory other
+        )
+    {
+        Sure.NotNull (other);
+
         Defaults.Import (other.Defaults);
 
         var keys = _profiles.GetKeys().Union (other._profiles.GetKeys())
@@ -98,4 +219,6 @@ public class TagCategory : ITagBuildingExpression
 
         keys.Each (key => _profiles[key].Import (other._profiles[key]));
     }
+
+    #endregion
 }

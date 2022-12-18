@@ -3,20 +3,22 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* TagConstants.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
+#nullable enable
+
 namespace AM.HtmlTags.Conventions;
 
+/// <summary>
+///
+/// </summary>
 public static class TagConstants
 {
+    /// <summary>
+    ///
+    /// </summary>
     public static readonly string Default = "Default";
 }

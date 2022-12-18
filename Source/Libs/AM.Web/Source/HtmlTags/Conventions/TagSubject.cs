@@ -10,15 +10,22 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UseNameofExpression
 
-/*
+/* TagSubject.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 namespace AM.HtmlTags.Conventions;
 
+/// <summary>
+///
+/// </summary>
 public class TagSubject
 {
-    public TagSubject (string profile, ElementRequest subject)
+    public TagSubject
+        (
+            string? profile,
+            ElementRequest subject
+        )
     {
         Profile = profile ?? TagConstants.Default;
         Subject = subject;

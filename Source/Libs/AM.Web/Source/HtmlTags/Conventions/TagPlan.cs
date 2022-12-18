@@ -10,7 +10,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UseNameofExpression
 
-/*
+/* TagPlan.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -35,8 +35,12 @@ public class TagPlan : ITagPlan
 {
     private readonly List<ITagModifier> _modifiers = new ();
 
-    public TagPlan (ITagBuilder builder, IEnumerable<ITagModifier> modifiers,
-        IElementNamingConvention elementNamingConvention)
+    public TagPlan
+        (
+            ITagBuilder builder,
+            IEnumerable<ITagModifier> modifiers,
+            IElementNamingConvention? elementNamingConvention
+        )
     {
         Builder = builder;
         ElementNamingConvention = elementNamingConvention;
@@ -49,12 +53,12 @@ public class TagPlan : ITagPlan
 
     public IEnumerable<ITagModifier> Modifiers => _modifiers;
 
-    public IElementNamingConvention ElementNamingConvention { get; }
+    public IElementNamingConvention? ElementNamingConvention { get; }
 
     public HtmlTag Build (ElementRequest request)
     {
         request.ElementId = string.IsNullOrEmpty (request.ElementId)
-            ? ElementNamingConvention.GetName (request.HolderType(), request.Accessor)
+            ? ElementNamingConvention!.GetName (request.HolderType(), request.Accessor)
             : request.ElementId;
 
         var tag = Builder.Build (request);

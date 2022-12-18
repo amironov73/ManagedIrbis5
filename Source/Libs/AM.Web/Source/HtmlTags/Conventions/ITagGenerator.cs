@@ -21,6 +21,11 @@ public interface ITagGenerator
     /// <summary>
     ///
     /// </summary>
+    string? ActiveProfile { get; }
+
+    /// <summary>
+    ///
+    /// </summary>
     /// <param name="request"></param>
     /// <param name="category"></param>
     /// <param name="profile"></param>
@@ -31,9 +36,4 @@ public interface ITagGenerator
             string? category = null,
             string? profile = null
         );
-
-    /// <summary>
-    ///
-    /// </summary>
-    string ActiveProfile { get; }
 }
