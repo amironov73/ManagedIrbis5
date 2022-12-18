@@ -3,16 +3,14 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
 /* TagSubject.cs --
  * Ars Magna project, http://arsmagna.ru
  */
+
+#nullable enable
+
+using System;
 
 namespace AM.HtmlTags.Conventions;
 
@@ -21,20 +19,46 @@ namespace AM.HtmlTags.Conventions;
 /// </summary>
 public class TagSubject
 {
+    #region Properties
+
+    /// <summary>
+    ///
+    /// </summary>
+    public string Profile { get; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public ElementRequest Subject { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="profile"></param>
+    /// <param name="subject"></param>
     public TagSubject
         (
             string? profile,
             ElementRequest subject
         )
     {
+        Sure.NotNull (subject);
+
         Profile = profile ?? TagConstants.Default;
         Subject = subject;
     }
 
-    public string Profile { get; }
+    #endregion
 
-    public ElementRequest Subject { get; }
-
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
     public bool Equals (TagSubject other)
     {
         if (ReferenceEquals (null, other))
@@ -50,7 +74,13 @@ public class TagSubject
         return Equals (other.Profile, Profile) && Equals (other.Subject, Subject);
     }
 
-    public override bool Equals (object obj)
+    #region Object members
+
+    /// <inheritdoc cref="object.Equals(object?)"/>
+    public override bool Equals
+        (
+            object? obj
+        )
     {
         if (ReferenceEquals (null, obj))
         {
@@ -70,14 +100,14 @@ public class TagSubject
         return Equals ((TagSubject)obj);
     }
 
+    /// <inheritdoc cref="object.GetHashCode"/>
     public override int GetHashCode()
     {
-        unchecked
-        {
-            return ((Profile?.GetHashCode() ?? 0) * 397) ^
-                   (Subject?.GetHashCode() ?? 0);
-        }
+        return HashCode.Combine (Profile, Subject);
     }
 
+    /// <inheritdoc cref="object.ToString"/>
     public override string ToString() => $"Profile: {Profile}, Subject: {Subject}";
+
+    #endregion
 }

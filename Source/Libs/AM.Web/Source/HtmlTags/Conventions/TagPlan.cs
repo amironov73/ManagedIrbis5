@@ -3,12 +3,6 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
 /* TagPlan.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -24,17 +18,58 @@ using System.Collections.Generic;
 
 namespace AM.HtmlTags.Conventions;
 
+#region Using directives
+
 using Elements;
 
+#endregion
+
+/// <summary>
+///
+/// </summary>
 public interface ITagPlan
 {
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
     HtmlTag Build (ElementRequest request);
 }
 
-public class TagPlan : ITagPlan
+/// <summary>
+///
+/// </summary>
+public class TagPlan
+    : ITagPlan
 {
-    private readonly List<ITagModifier> _modifiers = new ();
+    #region Properties
 
+    /// <summary>
+    ///
+    /// </summary>
+    public ITagBuilder Builder { get; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public IEnumerable<ITagModifier> Modifiers => _modifiers;
+
+    /// <summary>
+    ///
+    /// </summary>
+    public IElementNamingConvention? ElementNamingConvention { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <param name="modifiers"></param>
+    /// <param name="elementNamingConvention"></param>
     public TagPlan
         (
             ITagBuilder builder,
@@ -42,21 +77,34 @@ public class TagPlan : ITagPlan
             IElementNamingConvention? elementNamingConvention
         )
     {
+        Sure.NotNull (builder);
+        Sure.NotNull (modifiers);
+
         Builder = builder;
         ElementNamingConvention = elementNamingConvention;
 
-        _modifiers.AddRange (
-            modifiers); // Important to force the enumerable to be executed no later than this point
+        // Important to force the enumerable to be executed no later than this point
+        _modifiers.AddRange (modifiers);
     }
 
-    public ITagBuilder Builder { get; }
+    #endregion
 
-    public IEnumerable<ITagModifier> Modifiers => _modifiers;
+    #region Private members
 
-    public IElementNamingConvention? ElementNamingConvention { get; }
+    private readonly List<ITagModifier> _modifiers = new ();
 
-    public HtmlTag Build (ElementRequest request)
+    #endregion
+
+    #region ITagPlan members
+
+    /// <inheritdoc cref="ITagPlan.Build"/>
+    public HtmlTag Build
+        (
+            ElementRequest request
+        )
     {
+        Sure.NotNull (request);
+
         request.ElementId = string.IsNullOrEmpty (request.ElementId)
             ? ElementNamingConvention!.GetName (request.HolderType(), request.Accessor)
             : request.ElementId;
@@ -68,4 +116,6 @@ public class TagPlan : ITagPlan
 
         return request.CurrentTag;
     }
+
+    #endregion
 }

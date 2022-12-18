@@ -4,78 +4,183 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* AttributeExtensions.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
-namespace AM.HtmlTags.Extended
+#nullable enable
+
+namespace AM.HtmlTags.Extended.Attributes;
+
+/// <summary>
+///
+/// </summary>
+public static class AttributesExtensions
 {
-    namespace Attributes
+    #region Public methods
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="tag"></param>
+    /// <returns></returns>
+    public static THtmlTag UnEncoded<THtmlTag>
+        (
+            this THtmlTag tag
+        )
+        where THtmlTag: HtmlTag
     {
-        public static class AttributesExtensions
-        {
-            public static HtmlTag UnEncoded (this HtmlTag tag)
-            {
-                tag.Encoded (false);
-                return tag;
-            }
+        Sure.NotNull (tag);
 
-            public static HtmlTag Value (this HtmlTag tag, object value) => tag.Attr ("value", value);
-
-            public static T Name<T> (this T tag, string name) where T : HtmlTag
-            {
-                tag.Attr ("name", name);
-                return tag;
-            }
-
-
-            public static T MultilineMode<T> (this T tag) where T : HtmlTag
-            {
-                if (tag.HasAttr ("value"))
-                {
-                    tag.Text (tag.Attr ("value"));
-                    tag.RemoveAttr ("value");
-                }
-
-                tag.TagName ("textarea");
-                return tag;
-            }
-
-            public static T NoAutoComplete<T> (this T tag) where T : HtmlTag
-            {
-                tag.Attr ("autocomplete", "off");
-                return tag;
-            }
-
-            public static T PasswordMode<T> (this T tag) where T : HtmlTag
-            {
-                tag.TagName ("input").Attr ("type", "password");
-                tag.NoAutoComplete();
-                return tag;
-            }
-
-            public static T FileUploadMode<T> (this T tag) where T : HtmlTag
-            {
-                tag.Attr ("type", "file");
-                tag.NoClosingTag();
-                return tag;
-            }
-
-            public static T HideUnless<T> (this T tag, bool shouldDisplay) where T : HtmlTag
-            {
-                if (!shouldDisplay)
-                {
-                    tag.Style ("display", "none");
-                }
-
-                return tag;
-            }
-        }
+        tag.Encoded (false).NotUsed();
+        return tag;
     }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="tag"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static THtmlTag Value<THtmlTag>
+        (
+            this THtmlTag tag,
+            object value
+        )
+        where THtmlTag: HtmlTag
+    {
+        Sure.NotNull (tag);
+
+        tag.Attr ("value", value).NotUsed();
+        return tag;
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="tag"></param>
+    /// <param name="name"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static T Name<T>
+        (
+            this T tag,
+            string name
+        )
+        where T: HtmlTag
+    {
+        Sure.NotNull (tag);
+        Sure.NotNullNorEmpty (name);
+
+        tag.Attr ("name", name).NotUsed();
+        return tag;
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="tag"></param>
+    /// <typeparam name="THtmlTag"></typeparam>
+    /// <returns></returns>
+    public static THtmlTag MultilineMode<THtmlTag>
+        (
+            this THtmlTag tag
+        )
+        where THtmlTag: HtmlTag
+    {
+        Sure.NotNull (tag);
+
+        if (tag.HasAttr ("value"))
+        {
+            tag.Text (tag.Attr ("value")).NotUsed();
+            tag.RemoveAttr ("value").NotUsed();
+        }
+
+        tag.TagName ("textarea").NotUsed();
+        return tag;
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="tag"></param>
+    /// <typeparam name="THtmlTag"></typeparam>
+    /// <returns></returns>
+    public static THtmlTag NoAutoComplete<THtmlTag>
+        (
+            this THtmlTag tag
+        )
+        where THtmlTag: HtmlTag
+    {
+        Sure.NotNull(tag);
+
+        tag.Attr ("autocomplete", "off").NotUsed();
+        return tag;
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="tag"></param>
+    /// <typeparam name="THtmlTag"></typeparam>
+    /// <returns></returns>
+    public static THtmlTag PasswordMode<THtmlTag>
+        (
+            this THtmlTag tag
+        )
+        where THtmlTag: HtmlTag
+    {
+        Sure.NotNull (tag);
+
+        tag.TagName ("input").Attr ("type", "password").NotUsed();
+        tag.NoAutoComplete();
+        return tag;
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="tag"></param>
+    /// <typeparam name="THtmlTag"></typeparam>
+    /// <returns></returns>
+    public static THtmlTag FileUploadMode<THtmlTag>
+        (
+            this THtmlTag tag
+        )
+        where THtmlTag: HtmlTag
+    {
+        Sure.NotNull (tag);
+
+        tag.Attr ("type", "file").NotUsed();
+        tag.NoClosingTag().NotUsed();
+        return tag;
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="tag"></param>
+    /// <param name="shouldDisplay"></param>
+    /// <typeparam name="THtmlTag"></typeparam>
+    /// <returns></returns>
+    public static THtmlTag HideUnless<THtmlTag>
+        (
+            this THtmlTag tag,
+            bool shouldDisplay
+        )
+        where THtmlTag: HtmlTag
+    {
+        if (!shouldDisplay)
+        {
+            tag.Style ("display", "none").NotUsed();
+        }
+
+        return tag;
+    }
+
+    #endregion
 }
+
+
