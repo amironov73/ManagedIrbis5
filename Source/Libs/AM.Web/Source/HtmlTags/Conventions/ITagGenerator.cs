@@ -3,21 +3,37 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* ITagGenerator.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
+#nullable enable
+
 namespace AM.HtmlTags.Conventions;
 
+/// <summary>
+///
+/// </summary>
 public interface ITagGenerator
 {
-    HtmlTag Build (ElementRequest request, string? category = null, string? profile = null);
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="category"></param>
+    /// <param name="profile"></param>
+    /// <returns></returns>
+    HtmlTag Build
+        (
+            ElementRequest request,
+            string? category = null,
+            string? profile = null
+        );
+
+    /// <summary>
+    ///
+    /// </summary>
     string ActiveProfile { get; }
 }

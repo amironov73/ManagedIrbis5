@@ -3,42 +3,107 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* ProfileExpression.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 namespace AM.HtmlTags.Conventions;
 
+#region Using directives
+
 using Elements;
 
+#endregion
+
+#nullable enable
+
+/// <summary>
+///
+/// </summary>
 public class ProfileExpression
 {
-    protected HtmlConventionLibrary Library { get; set; }
-    private readonly string _profileName;
+    #region Properties
 
-    public ProfileExpression (HtmlConventionLibrary library, string profileName)
+    /// <summary>
+    ///
+    /// </summary>
+    protected HtmlConventionLibrary Library { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public ElementCategoryExpression Labels =>
+        new (BuildersFor (ElementConstants.Label));
+
+    /// <summary>
+    ///
+    /// </summary>
+    public ElementCategoryExpression Displays =>
+        new (BuildersFor (ElementConstants.Display));
+
+    /// <summary>
+    ///
+    /// </summary>
+    public ElementCategoryExpression Editors =>
+        new (BuildersFor (ElementConstants.Editor));
+
+    /// <summary>
+    ///
+    /// </summary>
+    public ElementCategoryExpression ValidationMessages =>
+        new (BuildersFor (ElementConstants.ValidationMessage));
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="library"></param>
+    /// <param name="profileName"></param>
+    public ProfileExpression
+        (
+            HtmlConventionLibrary library,
+            string profileName
+        )
     {
+        Sure.NotNull (library);
+        Sure.NotNull (profileName);
+
         Library = library;
         _profileName = profileName;
     }
 
-    private BuilderSet BuildersFor (string category) =>
-        Library.TagLibrary.Category (category).Profile (_profileName);
+    #endregion
 
-    public ElementCategoryExpression Labels => new (BuildersFor (ElementConstants.Label));
+    #region Private members
 
-    public ElementCategoryExpression Displays => new (BuildersFor (ElementConstants.Display));
+    private readonly string _profileName;
 
-    public ElementCategoryExpression Editors => new (BuildersFor (ElementConstants.Editor));
+    private BuilderSet BuildersFor (string category)
+    {
+        return Library.TagLibrary.Category (category).Profile (_profileName);
+    }
 
-    public ElementCategoryExpression ValidationMessages => new (BuildersFor (ElementConstants.ValidationMessage));
+    #endregion
 
-    public void Apply (HtmlConventionLibrary library) => library.Import (Library);
+    #region Public methods
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="library"></param>
+    public void Apply
+        (
+            HtmlConventionLibrary library
+        )
+    {
+        Sure.NotNull (library);
+
+        library.Import (Library);
+    }
+
+    #endregion
 }

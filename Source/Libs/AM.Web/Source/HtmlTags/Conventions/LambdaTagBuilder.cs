@@ -3,14 +3,8 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* LambdaTagBuilder.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,14 +18,40 @@ using System;
 
 namespace AM.HtmlTags.Conventions;
 
-public class LambdaTagBuilder : ITagBuilder
+/// <summary>
+///
+/// </summary>
+public class LambdaTagBuilder
+    : ITagBuilder
 {
-    private readonly Func<ElementRequest, HtmlTag> _build;
+    #region Construction
 
-    public LambdaTagBuilder (Func<ElementRequest, HtmlTag> build)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="build"></param>
+    public LambdaTagBuilder
+        (
+            Func<ElementRequest, HtmlTag> build
+        )
     {
+        Sure.NotNull (build);
+
         _build = build;
     }
 
+    #endregion
+
+    #region Private members
+
+    private readonly Func<ElementRequest, HtmlTag> _build;
+
+    #endregion
+
+    #region ITagBuilder methods
+
+    /// <inheritdoc cref="ITagBuilder.Build"/>
     public HtmlTag Build (ElementRequest request) => _build (request);
+
+    #endregion
 }

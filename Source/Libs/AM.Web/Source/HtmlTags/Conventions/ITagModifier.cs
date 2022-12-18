@@ -3,21 +3,36 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* ITagModifier.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
+#nullable enable
+
 namespace AM.HtmlTags.Conventions;
 
+/// <summary>
+///
+/// </summary>
 public interface ITagModifier
 {
-    bool Matches (ElementRequest token);
-    void Modify (ElementRequest request);
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    bool Matches
+        (
+            ElementRequest token
+        );
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="request"></param>
+    void Modify
+        (
+            ElementRequest request
+        );
 }

@@ -3,14 +3,8 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* ITagBuildingExpression.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,12 +18,52 @@ using System;
 
 namespace AM.HtmlTags.Conventions;
 
+/// <summary>
+///
+/// </summary>
 public interface ITagBuildingExpression
 {
+    /// <summary>
+    ///
+    /// </summary>
     CategoryExpression Always { get; }
-    CategoryExpression If (Func<ElementRequest, bool> matches);
 
-    void Add (Func<ElementRequest, bool> filter, ITagBuilder builder);
-    void Add (ITagBuilderPolicy policy);
-    void Add (ITagModifier modifier);
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="matches"></param>
+    /// <returns></returns>
+    CategoryExpression If
+        (
+            Func<ElementRequest, bool> matches
+        );
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="filter"></param>
+    /// <param name="builder"></param>
+    void Add
+        (
+            Func<ElementRequest, bool> filter,
+            ITagBuilder builder
+        );
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="policy"></param>
+    void Add
+        (
+            ITagBuilderPolicy policy
+        );
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="modifier"></param>
+    void Add
+        (
+            ITagModifier modifier
+        );
 }

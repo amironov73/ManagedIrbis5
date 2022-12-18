@@ -3,14 +3,8 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* LambdaTagModifier.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,23 +18,61 @@ using System;
 
 namespace AM.HtmlTags.Conventions;
 
-public class LambdaTagModifier : ITagModifier
+/// <summary>
+///
+/// </summary>
+public class LambdaTagModifier
+    : ITagModifier
 {
-    private readonly Func<ElementRequest, bool> _matcher;
-    private readonly Action<ElementRequest> _modify;
+    #region Construction
 
-    public LambdaTagModifier (Func<ElementRequest, bool> matcher, Action<ElementRequest> modify)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="matcher"></param>
+    /// <param name="modify"></param>
+    public LambdaTagModifier
+        (
+            Func<ElementRequest, bool> matcher,
+            Action<ElementRequest> modify
+        )
     {
+        Sure.NotNull (matcher);
+        Sure.NotNull (modify);
+
         _matcher = matcher;
         _modify = modify;
     }
 
-    public LambdaTagModifier (Action<ElementRequest> modify)
-        : this (x => true, modify)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="modify"></param>
+    public LambdaTagModifier
+        (
+            Action<ElementRequest> modify
+        )
+        : this (_ => true, modify)
     {
+        // пустое тело конструктора
     }
 
+    #endregion
+
+    #region Private members
+
+    private readonly Func<ElementRequest, bool> _matcher;
+    private readonly Action<ElementRequest> _modify;
+
+    #endregion
+
+    #region ITagBuilder members
+
+    /// <inheritdoc cref="ITagModifier.Matches"/>
     public bool Matches (ElementRequest token) => _matcher (token);
 
+    /// <inheritdoc cref="ITagModifier.Modify"/>
     public void Modify (ElementRequest request) => _modify (request);
+
+    #endregion
 }
