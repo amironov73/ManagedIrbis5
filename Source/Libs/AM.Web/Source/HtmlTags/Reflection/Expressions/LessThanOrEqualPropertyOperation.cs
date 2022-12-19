@@ -3,14 +3,9 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* LessThanOrEqualPropertyOperation.cs
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,14 +19,32 @@ using System.Linq.Expressions;
 
 namespace AM.HtmlTags.Reflection.Expressions;
 
-public class LessThanOrEqualPropertyOperation : BinaryComparisonPropertyOperation
+/// <summary>
+///
+/// </summary>
+public class LessThanOrEqualPropertyOperation
+    : BinaryComparisonPropertyOperation
 {
+    #region Properties
+
+    /// <inheritdoc cref="BinaryComparisonPropertyOperation.OperationName"/>
+    public override string OperationName => "LessThanOrEqual";
+
+    /// <inheritdoc cref="BinaryComparisonPropertyOperation.Text"/>
+    public override string Text => "less than or equal to";
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
     public LessThanOrEqualPropertyOperation()
         : base (ExpressionType.LessThanOrEqual)
     {
+        // пустое тело конструктора
     }
 
-    public override string OperationName => "LessThanOrEqual";
-
-    public override string Text => "less than or equal to";
+    #endregion
 }

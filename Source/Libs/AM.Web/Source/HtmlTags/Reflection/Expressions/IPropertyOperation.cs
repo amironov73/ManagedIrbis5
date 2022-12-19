@@ -3,14 +3,8 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* IPropertyOperation.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,9 +19,29 @@ using System.Linq.Expressions;
 
 namespace AM.HtmlTags.Reflection.Expressions;
 
+/// <summary>
+///
+/// </summary>
 public interface IPropertyOperation
 {
+    /// <summary>
+    ///
+    /// </summary>
     string OperationName { get; }
+
+    /// <summary>
+    ///
+    /// </summary>
     string Text { get; }
-    Func<object, Expression<Func<T, bool>>> GetPredicateBuilder<T> (MemberExpression propertyPath);
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="propertyPath"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    Func<object, Expression<Func<T, bool>>> GetPredicateBuilder<T>
+        (
+            MemberExpression propertyPath
+        );
 }
