@@ -107,6 +107,23 @@ public class DirectProvider
     #region Construction
 
     /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public DirectProvider()
+    {
+        _access = new TransientDirectAccess64();
+        _caching = new TransientCaching();
+        _locking = new NullLocking();
+        _serviceProvider = Magna.Host.Services;
+        _logger = (ILogger?) GetService (typeof (ILogger<MstFile64>));
+        RootPath = Directory.GetCurrentDirectory();
+        Mode = DirectAccessMode.ReadOnly;
+        DataPath = Path.Combine (RootPath, "DataI");
+        Busy = new BusyState();
+        PlatformAbstraction = PlatformAbstractionLayer.Current;
+    }
+
+    /// <summary>
     /// Конструктор.
     /// </summary>
     /// <param name="rootPath">Корневой путь.</param>
