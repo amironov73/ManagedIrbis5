@@ -16,8 +16,10 @@
 #region Using directives
 
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 
 using AM;
 using AM.Avalonia;
@@ -29,6 +31,8 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
+
+using DynamicData;
 
 using ManagedIrbis;
 using ManagedIrbis.Formatting;
@@ -56,6 +60,8 @@ public sealed class MainWindow
     {
         base.OnInitialized();
 
+        this.AttachDevTools();
+
         Title = "Просмотр базы данных ИРБИС64";
         Width = MinWidth = 600;
         Height = MinHeight = 450;
@@ -78,7 +84,8 @@ public sealed class MainWindow
         _mfnListBox = new ListBox
         {
             SelectionMode = SelectionMode.Single,
-            VirtualizationMode = ItemVirtualizationMode.None
+            AutoScrollToSelectedItem = true,
+            // VirtualizationMode = ItemVirtualizationMode.None
         };
         _mfnListBox.SelectionChanged += MfnListBox_SelectionChanged;
 
@@ -198,7 +205,7 @@ public sealed class MainWindow
         }
 
         _mfnListBox.Items = _mfnList;
-
+        AddDescriptionsNear (1);
     }
 
     private void SetStatusText
@@ -209,21 +216,49 @@ public sealed class MainWindow
         _statusTextBox.Text = text;
     }
 
+    private void AddDescriptionsNear
+        (
+            int selectionIndex
+        )
+    {
+        if (_mfnListBox.Scroll is { } scroll)
+        {
+
+        }
+        else
+        {
+            var min = Math.Max (1, selectionIndex - 50);
+            var max = Math.Min (_mfnList.Count, selectionIndex + 50);
+            for (var mfn = min; mfn < max; mfn++)
+            {
+                AddDescriptionIfNotYet (mfn);
+            }
+        }
+    }
+
     private void AddDescriptionIfNotYet (int mfn)
     {
-        var item = new MfnListItem
+        if (_mfnList[mfn - 1] is MfnListItem listItem)
+        {
+            if (!string.IsNullOrEmpty (listItem.Description))
+            {
+                return;
+            }
+        }
+
+        var newItem = new MfnListItem
         {
             Mfn = mfn
         };
         _mfnList[mfn - 1] = null!;
-        _mfnList[mfn - 1] = item;
+        _mfnList[mfn - 1] = newItem;
 
         var parameters = new ReadRecordParameters
         {
             Mfn = mfn
         };
         var record = _provider.ReadRecord<Record> (parameters);
-        AddDescriptionIfNotYet (item, record);
+        AddDescriptionIfNotYet (newItem, record);
     }
 
     private void AddDescriptionIfNotYet
@@ -255,6 +290,7 @@ public sealed class MainWindow
         };
         var record = _provider.ReadRecord<Record> (parameters);
         AddDescriptionIfNotYet (item, record);
+        AddDescriptionsNear (item.Mfn - 1);
     }
 
     private void MfnButton_Click
