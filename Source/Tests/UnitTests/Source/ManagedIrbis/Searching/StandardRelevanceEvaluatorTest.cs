@@ -118,7 +118,7 @@ public class StandardRelevanceEvaluatorTest
             );
 
         var result = evaluator.EvaluateRelevance (record);
-        Assert.AreEqual (1.0, result);
+        Assert.AreEqual (1.33, result, 0.01);
     }
 
     [TestMethod]
@@ -139,7 +139,7 @@ public class StandardRelevanceEvaluatorTest
             );
 
         var result = evaluator.EvaluateRelevance (record);
-        Assert.AreEqual (2.0, result);
+        Assert.AreEqual (2.66, result, 0.01);
     }
 
     [TestMethod]
@@ -181,11 +181,74 @@ public class StandardRelevanceEvaluatorTest
             );
 
         var result = evaluator.EvaluateRelevance (record);
-        Assert.AreEqual (33.0, result);
+        Assert.AreEqual (36.66, result, 0.01);
     }
 
     [TestMethod]
     public void StandardRelevanceEvaluator_EvaluateRelevance_6()
+    {
+        var serviceProvider = ServiceProviderUtility.CreateNullProvider();
+        const string searchExpression = "K=CONCRETE * A=BYRON";
+
+        var record = new Record
+        {
+            { 100, 'a', "Building with concrete" }
+        };
+        var evaluator = new StandardRelevanceEvaluator
+            (
+                serviceProvider,
+                searchExpression
+            );
+
+        var result = evaluator.EvaluateRelevance (record);
+        Assert.AreEqual (1.0, result);
+    }
+
+    [TestMethod]
+    public void StandardRelevanceEvaluator_EvaluateRelevance_7()
+    {
+        var serviceProvider = ServiceProviderUtility.CreateNullProvider();
+        const string searchExpression = "K=CONCRETE * A=BYRON";
+
+        var record = new Record
+        {
+            { 100, 'a', "Building with concrete" },
+            { 110, 'b', "Byron poems" }
+        };
+        var evaluator = new StandardRelevanceEvaluator
+            (
+                serviceProvider,
+                searchExpression
+            );
+
+        var result = evaluator.EvaluateRelevance (record);
+        Assert.AreEqual (2.33, result, 0.01);
+    }
+
+    [TestMethod]
+    public void StandardRelevanceEvaluator_EvaluateRelevance_8()
+    {
+        var serviceProvider = ServiceProviderUtility.CreateNullProvider();
+        const string searchExpression = "K=CONCRETE * A=BYRON";
+
+        var record = new Record
+        {
+            { 200, 'a', "Building with concrete" },
+            { 700, 'b', "Byron" }
+        };
+        var evaluator = new StandardRelevanceEvaluator
+            (
+                serviceProvider,
+                searchExpression
+            );
+
+        var result = evaluator.EvaluateRelevance (record);
+        Assert.AreEqual (33.0, result);
+    }
+
+
+    [TestMethod]
+    public void StandardRelevanceEvaluator_EvaluateRelevance_9()
     {
         var serviceProvider = ServiceProviderUtility.CreateNullProvider();
         const string searchExpression = "K=CONCRETE * A=BYRON";

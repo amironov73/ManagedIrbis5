@@ -116,9 +116,17 @@ public sealed class StandardRelevanceEvaluator
     {
         if (text.Contains (term, StringComparison.OrdinalIgnoreCase))
         {
-            return string.Compare (text, term, StringComparison.OrdinalIgnoreCase) == 0
-                ? supposedValue * Multiplier
-                : supposedValue;
+            if (string.Compare (text, term, StringComparison.OrdinalIgnoreCase) == 0)
+            {
+                return supposedValue * Multiplier;
+            }
+
+            if (text.StartsWith (term, StringComparison.OrdinalIgnoreCase))
+            {
+                return supposedValue * Multiplier / 1.5;
+            }
+
+            return supposedValue;
         }
 
         return 0.0;
