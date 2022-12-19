@@ -16,28 +16,24 @@
 #region Using directives
 
 using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.IO;
-using System.Reactive.Linq;
 
 using AM;
 using AM.Avalonia;
 using AM.Avalonia.AppServices;
-using AM.Parameters;
+using AM.Text;
 
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Data;
+using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
-using Avalonia.ReactiveUI;
 
 using ManagedIrbis;
-using ManagedIrbis.Direct;
+using ManagedIrbis.Formatting;
+using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Providers;
-
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 
 #endregion
 
@@ -70,15 +66,23 @@ public sealed class MainWindow
             Padding = new Thickness (5)
         };
 
+        _mfnButton = new Button
+        {
+            Margin = new Thickness (5, 0, 0, 0),
+            Content = "Go"
+        };
+        _mfnButton.Click += MfnButton_Click;
+
+        _mfnTextBox = new TextBox();
+
         _mfnListBox = new ListBox
         {
+            SelectionMode = SelectionMode.Single,
+            VirtualizationMode = ItemVirtualizationMode.None
         };
+        _mfnListBox.SelectionChanged += MfnListBox_SelectionChanged;
 
-        _recordTextBox = new TextBox
-        {
-        };
-
-
+        _recordTextBox = new TextBox();
 
         _splitView = new SplitView
         {
@@ -89,8 +93,19 @@ public sealed class MainWindow
             VerticalAlignment = VerticalAlignment.Stretch,
             Pane = new DockPanel
             {
+                Margin = new Thickness (5),
                 Children =
                 {
+                    new DockPanel
+                    {
+                        Children =
+                        {
+                            _mfnButton.DockRight(),
+                            _mfnTextBox
+                        }
+                    }
+                    .DockTop(),
+
                     _mfnListBox
                 }
             },
@@ -137,11 +152,15 @@ public sealed class MainWindow
 
     #region Private members
 
+    private ObservableCollection<object> _mfnList = null!;
     private SplitView _splitView = null!;
     private ListBox _mfnListBox = null!;
     private TextBox _recordTextBox = null!;
+    private TextBox _mfnTextBox = null!;
+    private Button _mfnButton = null!;
     private TextBlock _statusTextBox = null!;
     private ISyncProvider _provider = null!;
+    private HardFormat _format = null!;
 
     private void ReadInitialData()
     {
@@ -167,8 +186,19 @@ public sealed class MainWindow
             return;
         }
 
+        _format = new HardFormat (Magna.Host, _provider);
+
         var maxMfn = _provider.GetMaxMfn();
         SetStatusText ($"Max MFN={maxMfn}");
+
+        _mfnList = new ObservableCollection<object>();
+        for (var mfn = 1; mfn <= maxMfn; mfn++)
+        {
+            _mfnList.Add (mfn);
+        }
+
+        _mfnListBox.Items = _mfnList;
+
     }
 
     private void SetStatusText
@@ -177,6 +207,121 @@ public sealed class MainWindow
         )
     {
         _statusTextBox.Text = text;
+    }
+
+    private void AddDescriptionIfNotYet (int mfn)
+    {
+        var item = new MfnListItem
+        {
+            Mfn = mfn
+        };
+        _mfnList[mfn - 1] = null!;
+        _mfnList[mfn - 1] = item;
+
+        var parameters = new ReadRecordParameters
+        {
+            Mfn = mfn
+        };
+        var record = _provider.ReadRecord<Record> (parameters);
+        AddDescriptionIfNotYet (item, record);
+    }
+
+    private void AddDescriptionIfNotYet
+        (
+            MfnListItem item,
+            Record? record
+        )
+    {
+        if (record is not null)
+        {
+            if (string.IsNullOrEmpty (item.Description))
+            {
+                item.Description = GetBriefDescription (record);
+
+                _mfnList[item.Mfn - 1] = null!;
+                _mfnList[item.Mfn - 1] = item;
+            }
+
+            _recordTextBox.Text = record.ToPlainText();
+        }
+    }
+
+    private void GotoMfn (MfnListItem item)
+    {
+        _recordTextBox.Text = null;
+        var parameters = new ReadRecordParameters
+        {
+            Mfn = item.Mfn
+        };
+        var record = _provider.ReadRecord<Record> (parameters);
+        AddDescriptionIfNotYet (item, record);
+    }
+
+    private void MfnButton_Click
+        (
+            object? sender,
+            RoutedEventArgs eventArgs
+        )
+    {
+        if (int.TryParse (_mfnTextBox.Text, out var mfn))
+        {
+            var mfnList = _mfnListBox.Items;
+            if (mfnList is not null)
+            {
+                foreach (var item in mfnList)
+                {
+                    if (item is int itemMfn && itemMfn == mfn)
+                    {
+                        _mfnListBox.SelectedItem = item;
+                        return;
+                    }
+                    if (item is MfnListItem listItem && listItem.Mfn == mfn)
+                    {
+                        _mfnListBox.SelectedItem = listItem;
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    private string? GetBriefDescription
+        (
+            Record? record
+        )
+    {
+        if (record is null)
+        {
+            return null;
+        }
+
+        var builder = StringBuilderPool.Shared.Get();
+        _format.Brief (builder, record);
+
+        return builder.ReturnShared();
+    }
+
+    private void MfnListBox_SelectionChanged
+        (
+            object? sender,
+            SelectionChangedEventArgs eventArgs
+        )
+    {
+        var selectedItem = _mfnListBox.SelectedItem;
+        if (selectedItem is int mfn)
+        {
+            var newItem = new MfnListItem
+            {
+                Mfn = mfn
+            };
+            _mfnList[mfn - 1] = null!;
+            _mfnList[mfn - 1] = newItem;
+            GotoMfn (newItem);
+        }
+        if (selectedItem is MfnListItem listItem)
+        {
+            GotoMfn (listItem);
+        }
     }
 
     #endregion

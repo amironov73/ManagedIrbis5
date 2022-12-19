@@ -10,7 +10,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UseNameofExpression
 
-/*
+/* LinqExpressionExtensions.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -26,34 +26,89 @@ using System.Reflection;
 
 namespace AM.HtmlTags.Reflection.Expressions;
 
+/// <summary>
+///
+/// </summary>
 public static class LinqExpressionExtensions
 {
-    public static Func<object, Expression<Func<T, bool>>> GetPredicateBuilder<T> (this IPropertyOperation builder,
-        Expression<Func<T, object>> path)
+    #region Public methods
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <param name="path"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static Func<object, Expression<Func<T, bool>>> GetPredicateBuilder<T>
+        (
+            this IPropertyOperation builder,
+            Expression<Func<T, object>> path
+        )
     {
-        MemberExpression memberExpression = path.GetMemberExpression (true);
+        Sure.NotNull (builder);
+        Sure.NotNull (path);
+
+        var memberExpression = path.GetMemberExpression (true);
+
         return builder.GetPredicateBuilder<T> (memberExpression);
     }
 
-    public static Expression<Func<T, bool>> GetPredicate<T> (this IPropertyOperation operation,
-        Expression<Func<T, object>> path, object value)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="operation"></param>
+    /// <param name="path"></param>
+    /// <param name="value"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static Expression<Func<T, bool>> GetPredicate<T>
+        (
+            this IPropertyOperation operation,
+            Expression<Func<T, object>> path,
+            object value
+        )
     {
+        Sure.NotNull (operation);
+        Sure.NotNull (path);
+
         return operation.GetPredicateBuilder (path) (value);
     }
 
-    public static MemberExpression ToMemberExpression<T> (this PropertyInfo property)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="property"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static MemberExpression ToMemberExpression<T>
+        (
+            this PropertyInfo property
+        )
     {
-        ParameterExpression lambdaParameter = Expression.Parameter (typeof (T), "entity");
+        Sure.NotNull (property);
+
+        var lambdaParameter = Expression.Parameter (typeof (T), "entity");
+
         return Expression.MakeMemberAccess (lambdaParameter, property);
     }
 
-    public static ParameterExpression GetParameter<T> (this MemberExpression memberExpression)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="memberExpression"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static ParameterExpression GetParameter<T>
+        (
+            this MemberExpression memberExpression
+        )
     {
-        MemberExpression outerMostMemberExpression = memberExpression;
+        var outerMostMemberExpression = memberExpression;
         while (outerMostMemberExpression != null)
         {
-            var parameterExpression = outerMostMemberExpression.Expression as ParameterExpression;
-            if (parameterExpression != null && parameterExpression.Type == typeof (T))
+            if (outerMostMemberExpression.Expression is ParameterExpression parameterExpression
+                && parameterExpression.Type == typeof (T))
             {
                 return parameterExpression;
             }
@@ -63,4 +118,6 @@ public static class LinqExpressionExtensions
 
         return Expression.Parameter (typeof (T), "unreferenced");
     }
+
+    #endregion
 }
