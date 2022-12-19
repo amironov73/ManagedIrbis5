@@ -3,21 +3,16 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
 // ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* ExpressionClasses.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -28,52 +23,131 @@ using System.Reflection;
 
 namespace AM.HtmlTags.Reflection.Expressions;
 
+/// <summary>
+///
+/// </summary>
 public interface IArguments
 {
-    T Get<T> (string propertyName);
-    bool Has (string propertyName);
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="propertyName"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    T Get<T>
+        (
+            string propertyName
+        );
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="propertyName"></param>
+    /// <returns></returns>
+    bool Has
+        (
+            string propertyName
+        );
 }
 
+/// <summary>
+///
+/// </summary>
 public static class ConstructorBuilder
 {
-    public static LambdaExpression CreateSingleStringArgumentConstructor (Type concreteType)
+    #region Public methods
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="concreteType"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    public static LambdaExpression CreateSingleStringArgumentConstructor
+        (
+            Type concreteType
+        )
     {
-        var constructor = concreteType.GetConstructor (new Type[] { typeof (string) });
+        Sure.NotNull (concreteType);
+
+        var constructor = concreteType.GetConstructor (new[] { typeof (string) });
         if (constructor == null)
         {
-            throw new ArgumentOutOfRangeException (nameof (concreteType), concreteType,
-                "Only types with a ctor(string) can be used here");
+            throw new ArgumentOutOfRangeException
+                (
+                    nameof (concreteType),
+                    concreteType,
+                    "Only types with a ctor(string) can be used here"
+                );
         }
 
         var argument = Expression.Parameter (typeof (string), "x");
 
-        NewExpression ctorCall = Expression.New (constructor, argument);
+        var ctorCall = Expression.New (constructor, argument);
 
         var funcType = typeof (Func<,>).MakeGenericType (typeof (string), concreteType);
         return Expression.Lambda (funcType, ctorCall, argument);
     }
+
+    #endregion
 }
 
+/// <summary>
+///
+/// </summary>
+/// <typeparam name="T"></typeparam>
 public class ConstructorFunctionBuilder<T>
 {
-    public Func<IArguments, T> CreateBuilder (ConstructorInfo constructor)
+    #region Public methods
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="constructor"></param>
+    /// <returns></returns>
+    public Func<IArguments, T> CreateBuilder
+        (
+            ConstructorInfo constructor
+        )
     {
-        ParameterExpression args = Expression.Parameter (typeof (IArguments), "x");
+        Sure.NotNull (constructor);
 
+        var args = Expression.Parameter (typeof (IArguments), "x");
 
-        IEnumerable<Expression> arguments =
-            constructor.GetParameters().Select (
-                param => ToParameterValueGetter (args, param.ParameterType, param.Name));
+        var arguments = constructor.GetParameters().Select
+                (
+                    param => ToParameterValueGetter (args, param.ParameterType, param.Name!)
+                );
 
-        NewExpression ctorCall = Expression.New (constructor, arguments);
+        var ctorCall = Expression.New (constructor, arguments);
+        var lambda = Expression.Lambda (typeof (Func<IArguments, T>), ctorCall, args);
 
-        LambdaExpression lambda = Expression.Lambda (typeof (Func<IArguments, T>), ctorCall, args);
         return (Func<IArguments, T>)lambda.Compile();
     }
 
-    public static Expression ToParameterValueGetter (ParameterExpression args, Type type, string argName)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="args"></param>
+    /// <param name="type"></param>
+    /// <param name="argName"></param>
+    /// <returns></returns>
+    public static Expression ToParameterValueGetter
+        (
+            ParameterExpression args,
+            Type type,
+            string argName
+        )
     {
-        MethodInfo method = typeof (IArguments).GetMethod ("Get").MakeGenericMethod (type);
+        Sure.NotNull (args);
+        Sure.NotNull (type);
+        Sure.NotNullNorEmpty (argName);
+
+        var method = typeof (IArguments).GetMethod ("Get")
+            .ThrowIfNull().MakeGenericMethod (type);
+
         return Expression.Call (args, method, Expression.Constant (argName));
     }
+
+    #endregion
 }
