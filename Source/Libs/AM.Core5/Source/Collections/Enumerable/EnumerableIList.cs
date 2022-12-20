@@ -74,7 +74,7 @@ public readonly struct EnumerableIList<T>
     /// </summary>
     /// <param name="array"></param>
     /// <returns></returns>
-    public static implicit operator EnumerableIList<T>(T[] array) => new EnumerableIList<T>(array);
+    public static implicit operator EnumerableIList<T>(T[] array) => new (array);
 
     /// <summary>
     ///
