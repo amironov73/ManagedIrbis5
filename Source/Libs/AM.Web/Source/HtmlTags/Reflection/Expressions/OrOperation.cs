@@ -3,14 +3,9 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* OrOperation.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -27,34 +22,77 @@ using System.Linq;
 
 namespace AM.HtmlTags.Reflection.Expressions;
 
+/// <summary>
+///
+/// </summary>
 public class ComposableOrOperation
 {
+    #region Private members
+
     private readonly List<Tuple<IPropertyOperation, MemberExpression, object>> _listOfOperations = new ();
 
-    public void Set<T> (Expression<Func<T, object>> path, object value)
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="path"></param>
+    /// <param name="value"></param>
+    /// <typeparam name="T"></typeparam>
+    public void Set<T>
+        (
+            Expression<Func<T, object>> path,
+            object value
+        )
     {
+        Sure.NotNull (path);
+
         //why am I falling into here
         var memberExpression = path.GetMemberExpression (true);
         var operation = new EqualsPropertyOperation();
-        _listOfOperations.Add (
-            new Tuple<IPropertyOperation, MemberExpression, object> (operation, memberExpression, value));
+        _listOfOperations.Add
+            (
+                new Tuple<IPropertyOperation, MemberExpression, object> (operation, memberExpression, value)
+            );
     }
 
 
-    public void Set<T> (Expression<Func<T, object>> path, IEnumerable<object> value)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="path"></param>
+    /// <param name="value"></param>
+    /// <typeparam name="T"></typeparam>
+    public void Set<T>
+        (
+            Expression<Func<T, object>> path,
+            IEnumerable<object> value
+        )
     {
+        Sure.NotNull (path);
+        Sure.NotNull (value);
+
         var memberExpression = path.GetMemberExpression (true);
         var operation = new CollectionContainsPropertyOperation();
-        _listOfOperations.Add (
-            new Tuple<IPropertyOperation, MemberExpression, object> (operation, memberExpression, value));
+        _listOfOperations.Add
+            (
+                new Tuple<IPropertyOperation, MemberExpression, object> (operation, memberExpression, value)
+            );
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    /// <exception cref="Exception"></exception>
     public Expression<Func<T, bool>> GetPredicateBuilder<T>()
     {
         if (!_listOfOperations.Any())
         {
-            throw new Exception (
-                $"You must have at least one operation registered for an 'or' operation (you have {new[] { _listOfOperations.Count }})");
+            throw new Exception ($"You must have at least one operation registered for an 'or' operation (you have {new[] { _listOfOperations.Count }})");
         }
 
         //the parameter to use
@@ -67,105 +105,234 @@ public class ComposableOrOperation
         {
             var predBuilder = operation.Item1.GetPredicateBuilder<T> (operation.Item2);
             var predicate = predBuilder (operation.Item3);
-            var expPredicate = rebuild (predicate, lambdaParameter);
+            var expPredicate = Rebuild (predicate, lambdaParameter);
             builtUpPredicate = Expression.MakeBinary (ExpressionType.OrElse, builtUpPredicate, expPredicate);
         }
 
         return Expression.Lambda<Func<T, bool>> (builtUpPredicate, lambdaParameter);
     }
 
-    Expression rebuild (Expression exp, ParameterExpression parameter)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="expression"></param>
+    /// <param name="parameter"></param>
+    /// <returns></returns>
+    Expression Rebuild
+        (
+            Expression expression,
+            ParameterExpression parameter
+        )
     {
-        var lb = (LambdaExpression)exp;
+        Sure.NotNull (expression);
+        Sure.NotNull (parameter);
+
+        var lb = (LambdaExpression) expression;
         var targetBody = lb.Body;
 
         return new RewriteToLambda (parameter).Visit (targetBody);
     }
+
+    #endregion
 }
 
+/// <summary>
+///
+/// </summary>
 public class OrOperation
 {
-    public Expression<Func<T, bool>> GetPredicateBuilder<T> (Expression<Func<T, object>> leftPath, object leftValue,
-        Expression<Func<T, object>> rightPath, object rightValue)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="leftPath"></param>
+    /// <param name="leftValue"></param>
+    /// <param name="rightPath"></param>
+    /// <param name="rightValue"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public Expression<Func<T, bool>> GetPredicateBuilder<T>
+        (
+            Expression<Func<T, object>> leftPath,
+            object leftValue,
+            Expression<Func<T, object>> rightPath,
+            object rightValue
+        )
     {
+        Sure.NotNull (leftPath);
+        Sure.NotNull (rightPath);
+
         var comp = new ComposableOrOperation();
         comp.Set (leftPath, leftValue);
         comp.Set (rightPath, rightValue);
+
         return comp.GetPredicateBuilder<T>();
     }
 
-    public Expression<Func<T, bool>> GetPredicateBuilder<T> (Expression<Func<T, object>> leftPath,
-        IEnumerable<object> leftValue, Expression<Func<T, object>> rightPath, object rightValue)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="leftPath"></param>
+    /// <param name="leftValue"></param>
+    /// <param name="rightPath"></param>
+    /// <param name="rightValue"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public Expression<Func<T, bool>> GetPredicateBuilder<T>
+        (
+            Expression<Func<T, object>> leftPath,
+            IEnumerable<object> leftValue,
+            Expression<Func<T, object>> rightPath,
+            object rightValue
+        )
     {
+        Sure.NotNull (leftPath);
+        Sure.NotNull (leftValue);
+        Sure.NotNull (rightPath);
+
         var comp = new ComposableOrOperation();
         comp.Set (leftPath, leftValue);
         comp.Set (rightPath, rightValue);
+
         return comp.GetPredicateBuilder<T>();
     }
 
-    public Expression<Func<T, bool>> GetPredicateBuilder<T> (Expression<Func<T, object>> leftPath, object leftValue,
-        Expression<Func<T, object>> rightPath, IEnumerable<object> rightValue)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="leftPath"></param>
+    /// <param name="leftValue"></param>
+    /// <param name="rightPath"></param>
+    /// <param name="rightValue"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public Expression<Func<T, bool>> GetPredicateBuilder<T>
+        (
+            Expression<Func<T, object>> leftPath,
+            object leftValue,
+            Expression<Func<T, object>> rightPath,
+            IEnumerable<object> rightValue
+        )
     {
+        Sure.NotNull (leftPath);
+        Sure.NotNull (rightPath);
+        Sure.NotNull (rightValue);
+
         var comp = new ComposableOrOperation();
         comp.Set (leftPath, leftValue);
         comp.Set (rightPath, rightValue);
+
         return comp.GetPredicateBuilder<T>();
     }
 }
 
-public class RewriteToLambda : ExpressionVisitor
+/// <summary>
+///
+/// </summary>
+public class RewriteToLambda
+    : ExpressionVisitor
 {
-    private readonly ParameterExpression _parameter;
+    #region Construction
 
-    public RewriteToLambda (ParameterExpression parameter)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="parameter"></param>
+    public RewriteToLambda
+        (
+            ParameterExpression parameter
+        )
     {
+        Sure.NotNull (parameter);
+
         _parameter = parameter;
     }
 
-    protected override Expression VisitBinary (BinaryExpression exp)
+    #endregion
+
+    #region Private members
+
+    private readonly ParameterExpression _parameter;
+
+    #endregion
+
+    #region Protected members
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="expression"></param>
+    /// <returns></returns>
+    protected override Expression VisitBinary
+        (
+            BinaryExpression expression
+        )
     {
-        var a = VisitMember ((MemberExpression)exp.Left);
-        return Expression.Equal (a, exp.Right);
+        Sure.NotNull (expression);
+
+        var a = VisitMember ((MemberExpression) expression.Left);
+        return Expression.Equal (a, expression.Right);
     }
 
-    protected override Expression VisitMember (MemberExpression m)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="member"></param>
+    /// <returns></returns>
+    protected override Expression VisitMember
+        (
+            MemberExpression member
+        )
     {
-        Expression exp = null;
-        if (m.Expression.NodeType == ExpressionType.Parameter)
+        Sure.NotNull (member);
+
+        Expression? expression = null;
+        if (member.Expression!.NodeType == ExpressionType.Parameter)
         {
             //c.IsThere
-            exp = Expression.MakeMemberAccess (_parameter, m.Member);
+            expression = Expression.MakeMemberAccess (_parameter, member.Member);
         }
 
-        if (m.Expression.NodeType == ExpressionType.MemberAccess)
+        if (member.Expression.NodeType == ExpressionType.MemberAccess)
         {
             //c.Thing.IsThere
 
             //rewrite c.Thing
-            var intermediate = VisitMember ((MemberExpression)m.Expression);
+            var intermediate = VisitMember ((MemberExpression)member.Expression);
 
             //now combine 'c.Thing' with '.IsThere'
-            exp = Expression.MakeMemberAccess (intermediate, m.Member);
+            expression = Expression.MakeMemberAccess (intermediate, member.Member);
         }
 
-        return exp;
+        return expression!;
     }
 
-    protected override Expression VisitMethodCall (MethodCallExpression exp)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="expression"></param>
+    /// <returns></returns>
+    protected override Expression VisitMethodCall
+        (
+            MethodCallExpression expression
+        )
     {
-        if (exp.Method.IsStatic)
+        Sure.NotNull (expression);
+
+        if (expression.Method.IsStatic)
         {
-            var aa = exp.Arguments.Skip (1).First();
+            var aa = expression.Arguments.Skip (1).First();
             if (aa.NodeType != ExpressionType.Constant)
             {
-                aa = VisitMember ((MemberExpression)exp.Arguments.Skip (1).First());
+                aa = VisitMember ((MemberExpression)expression.Arguments.Skip (1).First());
             }
 
             //if second arg is a constant of our type swap other wise continue down the rabbit hole
-            var args = new[] { exp.Arguments.First(), aa };
-            return Expression.Call (exp.Method, args);
+            var args = new[] { expression.Arguments.First(), aa };
+            return Expression.Call (expression.Method, args);
         }
 
-        return Expression.Call (_parameter, exp.Method, exp.Arguments.First());
+        return Expression.Call (_parameter, expression.Method, expression.Arguments.First());
     }
+
+    #endregion
 }

@@ -3,12 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
 /* LinqExpressionExtensions.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -104,6 +99,8 @@ public static class LinqExpressionExtensions
             this MemberExpression memberExpression
         )
     {
+        Sure.NotNull (memberExpression);
+
         var outerMostMemberExpression = memberExpression;
         while (outerMostMemberExpression != null)
         {

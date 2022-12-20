@@ -3,14 +3,9 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* NotEqualPropertyOperation.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,14 +19,32 @@ using System.Linq.Expressions;
 
 namespace AM.HtmlTags.Reflection.Expressions;
 
-public class NotEqualPropertyOperation : BinaryComparisonPropertyOperation
+/// <summary>
+///
+/// </summary>
+public class NotEqualPropertyOperation
+    : BinaryComparisonPropertyOperation
 {
+    #region Properties
+
+    /// <inheritdoc cref="AM.HtmlTags.Reflection.Expressions.BinaryComparisonPropertyOperation.OperationName"/>
+    public override string OperationName => "IsNot";
+
+    /// <inheritdoc cref="BinaryComparisonPropertyOperation.Text"/>
+    public override string Text => "is not";
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
     public NotEqualPropertyOperation()
         : base (ExpressionType.NotEqual)
     {
+        // пустое тело конструктора
     }
 
-    public override string OperationName => "IsNot";
-
-    public override string Text => "is not";
+    #endregion
 }

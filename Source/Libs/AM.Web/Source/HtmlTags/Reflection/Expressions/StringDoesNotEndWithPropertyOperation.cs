@@ -3,14 +3,9 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* StringDoesNotEndWitPropertyOperation.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,17 +20,42 @@ using System.Reflection;
 
 namespace AM.HtmlTags.Reflection.Expressions;
 
-public class StringDoesNotEndWithPropertyOperation : CaseInsensitiveStringMethodPropertyOperation
+/// <summary>
+///
+/// </summary>
+public class StringDoesNotEndWithPropertyOperation
+    : CaseInsensitiveStringMethodPropertyOperation
 {
-    private static readonly MethodInfo _method =
-        ReflectionHelper.GetMethod<string> (s => s.EndsWith ("", StringComparison.CurrentCulture));
+    #region Properties
 
+    /// <inheritdoc cref="CaseInsensitiveStringMethodPropertyOperation.OperationName"/>
+    public override string OperationName => "DoesNotEndWith";
+
+    /// <inheritdoc cref="CaseInsensitiveStringMethodPropertyOperation.Text"/>
+    public override string Text => "does not end with";
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
     public StringDoesNotEndWithPropertyOperation()
         : base (_method, true)
     {
+        // пустое тело конструктора
     }
 
-    public override string OperationName => "DoesNotEndWith";
+    #endregion
 
-    public override string Text => "does not end with";
+    #region Private members
+
+    private static readonly MethodInfo _method =
+        ReflectionHelper.GetMethod<string>
+            (
+                s => s.EndsWith ("", StringComparison.CurrentCulture)
+            );
+
+    #endregion
 }
