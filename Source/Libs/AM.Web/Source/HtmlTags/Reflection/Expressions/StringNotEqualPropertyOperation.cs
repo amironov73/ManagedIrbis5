@@ -3,14 +3,9 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* StringNotEqualsPropertyOperation.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,17 +20,42 @@ using System.Reflection;
 
 namespace AM.HtmlTags.Reflection.Expressions;
 
-public class StringNotEqualPropertyOperation : CaseInsensitiveStringMethodPropertyOperation
+/// <summary>
+///
+/// </summary>
+public class StringNotEqualPropertyOperation
+    : CaseInsensitiveStringMethodPropertyOperation
 {
-    private static readonly MethodInfo _method =
-        ReflectionHelper.GetMethod<string> (s => s.Equals ("", StringComparison.CurrentCulture));
+    #region Properties
 
+    /// <inheritdoc cref="CaseInsensitiveStringMethodPropertyOperation.OperationName"/>
+    public override string OperationName => "DoesNotEqual";
+
+    /// <inheritdoc cref="CaseInsensitiveStringMethodPropertyOperation.Text"/>
+    public override string Text => "is not";
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
     public StringNotEqualPropertyOperation()
         : base (_method, true)
     {
+        // пустое тело конструктора
     }
 
-    public override string OperationName => "DoesNotEqual";
+    #endregion
 
-    public override string Text => "is not";
+    #region Private members
+
+    private static readonly MethodInfo _method =
+        ReflectionHelper.GetMethod<string>
+            (
+                s => s.Equals ("", StringComparison.CurrentCulture)
+            );
+
+    #endregion
 }

@@ -3,14 +3,10 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* StringStartsWithPropertyOperation.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -18,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Linq;
@@ -29,17 +24,40 @@ using System.Linq;
 
 namespace AM.HtmlTags.Reflection.Expressions;
 
-public class StringStartsWithPropertyOperation : CaseInsensitiveStringMethodPropertyOperation
+/// <summary>
+///
+/// </summary>
+public class StringStartsWithPropertyOperation
+    : CaseInsensitiveStringMethodPropertyOperation
 {
-    private static readonly MethodInfo _method =
-        ReflectionHelper.GetMethod<string> (s => s.StartsWith ("", StringComparison.CurrentCulture));
+    #region Properties
 
+    /// <inheritdoc cref="CaseInsensitiveStringMethodPropertyOperation.Text"/>
+    public override string Text => "starts with";
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
     public StringStartsWithPropertyOperation()
         : base (_method)
     {
+        // пустое тело конструктора
     }
 
-    public override string Text => "starts with";
+    #endregion
+
+    #region Private members
+
+    private static readonly MethodInfo _method = ReflectionHelper.GetMethod<string>
+            (
+                s => s.StartsWith ("", StringComparison.CurrentCulture)
+            );
+
+    #endregion
 }
 
 /// <summary>
@@ -48,22 +66,39 @@ public class StringStartsWithPropertyOperation : CaseInsensitiveStringMethodProp
 public class CollectionContainsPropertyOperation
     : IPropertyOperation
 {
+    #region Properties
+
+    /// <inheritdoc cref="IPropertyOperation.OperationName"/>
+    public string OperationName => _operationName;
+
+    /// <inheritdoc cref="Text"/>
+    public string Text => _description;
+
+    #endregion
+
+    #region Private members
+
     private const string _operationName = "Contains";
     private const string _description = "contains";
+
 
     private readonly MethodInfo _method =
         typeof (Enumerable).GetMethods (BindingFlags.Static | BindingFlags.Public)
             .First (m => m.Name.SameString ("Contains"));
 
-    public string OperationName => _operationName;
+    #endregion
 
-    public string Text => _description;
+    #region Public methods
 
-    public Func<object, Expression<Func<T, bool>>> GetPredicateBuilder<T> (MemberExpression propertyPath)
+    /// <inheritdoc cref="IPropertyOperation.GetPredicateBuilder{T}"/>
+    public Func<object, Expression<Func<T, bool>>> GetPredicateBuilder<T>
+        (
+            MemberExpression propertyPath
+        )
     {
         return valuesToCheck =>
         {
-            var enumerationOfObjects = (IEnumerable<object>)valuesToCheck;
+            var enumerationOfObjects = (IEnumerable<object>?) valuesToCheck;
             if (enumerationOfObjects == null)
             {
                 return c => false;
@@ -75,7 +110,7 @@ public class CollectionContainsPropertyOperation
 
 
             //capture and close the Enumerbable.Contains _method
-            var closedMethod = _method.MakeGenericMethod (collectionOf);
+            var closedMethod = _method.MakeGenericMethod (collectionOf!);
 
             //the list that we need to call contains on
             var list = Expression.Constant (enumerationOfObjects);
@@ -97,60 +132,135 @@ public class CollectionContainsPropertyOperation
             //return enumerationOfObjects.Contains(((PropertyInfo) propertyPath.Member).GetValue(c, null));
             return lambda;
         };
+
+        #endregion
     }
 }
 
-public class StringContainsPropertyOperation : StringContainsPropertyOperationBase
+/// <summary>
+///
+/// </summary>
+public class StringContainsPropertyOperation
+    : StringContainsPropertyOperationBase
 {
-    public StringContainsPropertyOperation() : base ("Contains", "contains", false)
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
+    public StringContainsPropertyOperation()
+        : base ("Contains", "contains", false)
     {
+        // пустое тело конструктора
     }
+
+    #endregion
 }
 
-public class StringDoesNotContainPropertyOperation : StringContainsPropertyOperationBase
+/// <summary>
+///
+/// </summary>
+public class StringDoesNotContainPropertyOperation
+    : StringContainsPropertyOperationBase
 {
-    public StringDoesNotContainPropertyOperation() : base ("DoesNotContain", "does not contain", true)
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
+    public StringDoesNotContainPropertyOperation()
+        : base ("DoesNotContain", "does not contain", true)
     {
+        // пустое тело конструктора
     }
+
+    #endregion
 }
 
-public abstract class StringContainsPropertyOperationBase : IPropertyOperation
+/// <summary>
+///
+/// </summary>
+public abstract class StringContainsPropertyOperationBase
+    : IPropertyOperation
 {
-    private static readonly MethodInfo _indexOfMethod;
-    private readonly bool _negate;
+    #region Properties
+
+    /// <inheritdoc cref="IPropertyOperation.OperationName"/>
+    public string OperationName { get; }
+
+    /// <inheritdoc cref="IPropertyOperation.Text"/>
+    public string Text { get; }
+
+    #endregion
+
+    #region Construction
 
     static StringContainsPropertyOperationBase()
     {
-        _indexOfMethod =
-            ReflectionHelper.GetMethod<string> (s => s.IndexOf ("", StringComparison.OrdinalIgnoreCase));
+        _indexOfMethod = ReflectionHelper.GetMethod<string>
+            (
+                s => s.IndexOf ("", StringComparison.OrdinalIgnoreCase)
+            );
     }
 
-    protected StringContainsPropertyOperationBase (string operation, string description, bool negate)
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="operation"></param>
+    /// <param name="description"></param>
+    /// <param name="negate"></param>
+    protected StringContainsPropertyOperationBase
+        (
+            string operation,
+            string description,
+            bool negate
+        )
     {
+        Sure.NotNullNorEmpty (operation);
+
         OperationName = operation;
         Text = description;
         _negate = negate;
     }
 
-    public string OperationName { get; }
+    #endregion
 
-    public string Text { get; }
+    #region Private members
 
-    public Func<object, Expression<Func<T, bool>>> GetPredicateBuilder<T> (MemberExpression propertyPath)
+    private static readonly MethodInfo _indexOfMethod;
+    private readonly bool _negate;
+
+    #endregion
+
+    #region Public methods
+
+    /// <inheritdoc cref="IPropertyOperation.GetPredicateBuilder{T}"/>
+    public Func<object, Expression<Func<T, bool>>> GetPredicateBuilder<T>
+        (
+            MemberExpression propertyPath
+        )
     {
+        Sure.NotNull (propertyPath);
+
         return valueToCheck =>
         {
-            ConstantExpression valueToCheckConstant = Expression.Constant (valueToCheck);
-            MethodCallExpression indexOfCall =
-                Expression.Call (Expression.Coalesce (propertyPath, Expression.Constant (String.Empty)),
+            var valueToCheckConstant = Expression.Constant (valueToCheck);
+            var indexOfCall = Expression.Call
+                (
+                    Expression.Coalesce (propertyPath, Expression.Constant (String.Empty)),
                     _indexOfMethod,
                     valueToCheckConstant,
-                    Expression.Constant (StringComparison.OrdinalIgnoreCase));
+                    Expression.Constant (StringComparison.OrdinalIgnoreCase)
+                );
             var operation = _negate ? ExpressionType.LessThan : ExpressionType.GreaterThanOrEqual;
-            BinaryExpression comparison = Expression.MakeBinary (operation, indexOfCall,
+            var comparison = Expression.MakeBinary (operation, indexOfCall,
                 Expression.Constant (0));
-            ParameterExpression lambdaParameter = propertyPath.GetParameter<T>();
+            var lambdaParameter = propertyPath.GetParameter<T>();
+
             return Expression.Lambda<Func<T, bool>> (comparison, lambdaParameter);
         };
     }
+
+    #endregion
 }
