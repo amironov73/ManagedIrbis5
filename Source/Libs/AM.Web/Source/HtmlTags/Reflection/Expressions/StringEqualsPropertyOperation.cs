@@ -3,14 +3,9 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* StringEqualsPropertyOperation.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,15 +20,39 @@ using System.Reflection;
 
 namespace AM.HtmlTags.Reflection.Expressions;
 
-public class StringEqualsPropertyOperation : CaseInsensitiveStringMethodPropertyOperation
+/// <summary>
+///
+/// </summary>
+public class StringEqualsPropertyOperation
+    : CaseInsensitiveStringMethodPropertyOperation
 {
-    private static readonly MethodInfo _method =
-        ReflectionHelper.GetMethod<string> (s => s.Equals ("", StringComparison.CurrentCulture));
+    #region Properties
 
+    /// <inheritdoc cref="CaseInsensitiveStringMethodPropertyOperation.Text"/>
+    public override string Text => "is";
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
     public StringEqualsPropertyOperation()
         : base (_method)
     {
+        // пустое тело конструктора
     }
 
-    public override string Text => "is";
+    #endregion
+
+    #region Private members
+
+    private static readonly MethodInfo _method =
+        ReflectionHelper.GetMethod<string>
+            (
+                s => s.Equals ("", StringComparison.CurrentCulture)
+            );
+
+    #endregion
 }

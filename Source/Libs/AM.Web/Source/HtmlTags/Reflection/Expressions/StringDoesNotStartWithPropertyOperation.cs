@@ -3,14 +3,9 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* StringDoesNotStartWithPropertyOperation.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,17 +20,42 @@ using System.Reflection;
 
 namespace AM.HtmlTags.Reflection.Expressions;
 
-public class StringDoesNotStartWithPropertyOperation : CaseInsensitiveStringMethodPropertyOperation
+/// <summary>
+///
+/// </summary>
+public class StringDoesNotStartWithPropertyOperation
+    : CaseInsensitiveStringMethodPropertyOperation
 {
-    private static readonly MethodInfo _method =
-        ReflectionHelper.GetMethod<string> (s => s.StartsWith ("", StringComparison.CurrentCulture));
+    #region Properties
 
+    /// <inheritdoc cref="CaseInsensitiveStringMethodPropertyOperation.OperationName"/>
+    public override string OperationName => "DoesNotStartWith";
+
+    /// <inheritdoc cref="CaseInsensitiveStringMethodPropertyOperation.Text"/>
+    public override string Text => "does not start with";
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
     public StringDoesNotStartWithPropertyOperation()
         : base (_method, true)
     {
+        // пустое тело конструктора
     }
 
-    public override string OperationName => "DoesNotStartWith";
+    #endregion
 
-    public override string Text => "does not start with";
+    #region Private members
+
+    private static readonly MethodInfo _method =
+        ReflectionHelper.GetMethod<string>
+            (
+                s => s.StartsWith ("", StringComparison.CurrentCulture)
+            );
+
+    #endregion
 }
