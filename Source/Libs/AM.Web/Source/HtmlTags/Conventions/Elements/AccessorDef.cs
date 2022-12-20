@@ -36,7 +36,7 @@ public class AccessorDef
     /// <summary>
     ///
     /// </summary>
-    public Accessor Accessor { get; }
+    public IAccessor Accessor { get; }
 
     /// <summary>
     ///
@@ -54,7 +54,7 @@ public class AccessorDef
     /// <param name="modelType"></param>
     public AccessorDef
         (
-            Accessor accessor,
+            IAccessor accessor,
             Type modelType
         )
     {

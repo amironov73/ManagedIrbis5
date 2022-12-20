@@ -3,14 +3,9 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* IAccessor.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -31,7 +26,7 @@ namespace AM.HtmlTags.Reflection;
 /// <summary>
 ///
 /// </summary>
-public interface Accessor
+public interface IAccessor
 {
     /// <summary>
     /// /
@@ -78,7 +73,7 @@ public interface Accessor
     /// <param name="expression"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    Accessor GetChildAccessor<T> (Expression<Func<T, object>> expression);
+    IAccessor GetChildAccessor<T> (Expression<Func<T, object>> expression);
 
     /// <summary>
     ///
@@ -97,7 +92,7 @@ public interface Accessor
     /// </summary>
     /// <param name="property"></param>
     /// <returns></returns>
-    Accessor Prepend (PropertyInfo property);
+    IAccessor Prepend (PropertyInfo property);
 
     /// <summary>
     ///
@@ -119,10 +114,10 @@ public static class AccessorExtensions
     /// <param name="accessor"></param>
     /// <param name="prefixedAccessor"></param>
     /// <returns></returns>
-    public static Accessor Prepend
+    public static IAccessor Prepend
         (
-            this Accessor accessor,
-            Accessor prefixedAccessor
+            this IAccessor accessor,
+            IAccessor prefixedAccessor
         )
     {
         Sure.NotNull (accessor);

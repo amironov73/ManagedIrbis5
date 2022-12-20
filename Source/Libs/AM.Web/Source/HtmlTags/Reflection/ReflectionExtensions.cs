@@ -45,10 +45,10 @@ public static class ReflectionExtensions
         return (U)(result ?? default (U));
     }
 
-    public static IEnumerable<T> GetAllAttributes<T> (this Accessor accessor) where T : Attribute =>
+    public static IEnumerable<T> GetAllAttributes<T> (this IAccessor accessor) where T : Attribute =>
         accessor.InnerProperty.GetCustomAttributes<T>();
 
-    public static void ForAttribute<T> (this Accessor accessor, Action<T> action) where T : Attribute
+    public static void ForAttribute<T> (this IAccessor accessor, Action<T> action) where T : Attribute
     {
         foreach (T attribute in accessor.InnerProperty.GetCustomAttributes (typeof (T), true))
         {
@@ -56,20 +56,20 @@ public static class ReflectionExtensions
         }
     }
 
-    public static T GetAttribute<T> (this Accessor provider) where T : Attribute =>
+    public static T GetAttribute<T> (this IAccessor provider) where T : Attribute =>
         provider.InnerProperty.GetCustomAttribute<T>();
 
-    public static bool HasAttribute<T> (this Accessor provider) where T : Attribute =>
+    public static bool HasAttribute<T> (this IAccessor provider) where T : Attribute =>
         provider.InnerProperty.GetCustomAttribute<T>() != null;
 
-    public static Accessor ToAccessor<T, TResult> (this Expression<Func<T, TResult>> expression) =>
+    public static IAccessor ToAccessor<T, TResult> (this Expression<Func<T, TResult>> expression) =>
         ReflectionHelper.GetAccessor (expression);
 
     public static string GetName<T> (this Expression<Func<T, object>> expression) =>
         ReflectionHelper.GetAccessor (expression).Name;
 
 
-    public static void IfPropertyTypeIs<T> (this Accessor accessor, Action action)
+    public static void IfPropertyTypeIs<T> (this IAccessor accessor, Action action)
     {
         if (accessor.PropertyType == typeof (T))
         {
@@ -77,6 +77,6 @@ public static class ReflectionExtensions
         }
     }
 
-    public static bool IsInteger (this Accessor accessor) => accessor.PropertyType.IsTypeOrNullableOf<int>() ||
+    public static bool IsInteger (this IAccessor accessor) => accessor.PropertyType.IsTypeOrNullableOf<int>() ||
                                                              accessor.PropertyType.IsTypeOrNullableOf<long>();
 }

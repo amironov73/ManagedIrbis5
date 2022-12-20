@@ -42,7 +42,7 @@ public interface IDisplayFormatter
     /// <returns></returns>
     string GetDisplay
         (
-            Accessor accessor,
+            IAccessor accessor,
             object target
         );
 
@@ -54,7 +54,7 @@ public interface IDisplayFormatter
     /// <returns></returns>
     string GetDisplayForValue
         (
-            Accessor accessor,
+            IAccessor accessor,
             object rawValue
         );
 }

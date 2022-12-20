@@ -27,7 +27,7 @@ using System.Reflection;
 
 namespace AM.HtmlTags.Reflection;
 
-public class SingleProperty : Accessor
+public class SingleProperty : IAccessor
 {
     private readonly Type _ownerType;
 
@@ -52,7 +52,7 @@ public class SingleProperty : Accessor
 
     public PropertyInfo InnerProperty { get; }
 
-    public Accessor GetChildAccessor<T> (Expression<Func<T, object>> expression)
+    public IAccessor GetChildAccessor<T> (Expression<Func<T, object>> expression)
     {
         PropertyInfo property = ReflectionHelper.GetProperty (expression);
         return new PropertyChain (new[]
@@ -75,7 +75,7 @@ public class SingleProperty : Accessor
         return (Expression<Func<T, object>>)Expression.Lambda (delegateType, body, parameter);
     }
 
-    public Accessor Prepend (PropertyInfo property)
+    public IAccessor Prepend (PropertyInfo property)
     {
         return
             new PropertyChain (new IValueGetter[]

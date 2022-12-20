@@ -66,7 +66,7 @@ public class ElementRequest
     /// <summary>
     ///
     /// </summary>
-    public Accessor Accessor { get; }
+    public IAccessor Accessor { get; }
 
     /// <summary>
     ///
@@ -88,7 +88,7 @@ public class ElementRequest
     /// <param name="accessor"></param>
     public ElementRequest
         (
-            Accessor accessor
+            IAccessor accessor
         )
     {
         Sure.NotNull (accessor);

@@ -47,7 +47,7 @@ public class DotNotationElementNamingConvention
     public string GetName
         (
             Type modelType,
-            Accessor accessor
+            IAccessor accessor
         )
     {
         Sure.NotNull (accessor);

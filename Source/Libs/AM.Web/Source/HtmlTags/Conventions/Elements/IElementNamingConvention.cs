@@ -38,6 +38,6 @@ public interface IElementNamingConvention
     string GetName
         (
             Type modelType,
-            Accessor accessor
+            IAccessor accessor
         );
 }

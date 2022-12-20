@@ -25,7 +25,7 @@ using System.Reflection;
 
 namespace AM.HtmlTags.Reflection;
 
-public class SingleMethod : Accessor
+public class SingleMethod : IAccessor
 {
     private readonly MethodValueGetter _getter;
     private readonly Type _ownerType;
@@ -51,7 +51,7 @@ public class SingleMethod : Accessor
 
     public PropertyInfo InnerProperty => null;
 
-    public Accessor GetChildAccessor<T> (Expression<Func<T, object>> expression)
+    public IAccessor GetChildAccessor<T> (Expression<Func<T, object>> expression)
     {
         throw new NotSupportedException ("Not supported with Methods");
     }
@@ -63,7 +63,7 @@ public class SingleMethod : Accessor
         throw new NotSupportedException ("Not yet supported with Methods");
     }
 
-    public Accessor Prepend (PropertyInfo property)
+    public IAccessor Prepend (PropertyInfo property)
     {
         return
             new PropertyChain (new IValueGetter[]

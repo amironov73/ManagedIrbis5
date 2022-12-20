@@ -46,7 +46,7 @@ public static class DisplayFormatterExtensions
         (
             this IDisplayFormatter formatter,
             Type modelType,
-            Accessor accessor,
+            IAccessor accessor,
             object value,
             string format
         )
@@ -69,7 +69,7 @@ public static class DisplayFormatterExtensions
     public static string GetDisplayForProperty
         (
             this IDisplayFormatter formatter,
-            Accessor accessor,
+            IAccessor accessor,
             object target
         )
     {
@@ -90,7 +90,7 @@ public static class DisplayFormatterExtensions
         (
             this IDisplayFormatter formatter,
             Type modelType,
-            Accessor property,
+            IAccessor property,
             object value
         )
     {
@@ -113,7 +113,7 @@ public static class DisplayFormatterExtensions
         (
             this IDisplayFormatter formatter,
             Type modelType,
-            Accessor property,
+            IAccessor property,
             object entity
         )
     {

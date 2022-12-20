@@ -99,7 +99,7 @@ public class GetStringRequest
     /// <param name="ownerType"></param>
     public GetStringRequest
         (
-            Accessor? accessor,
+            IAccessor? accessor,
             object? rawValue,
             Func<Type, object>? locator,
             string? format,

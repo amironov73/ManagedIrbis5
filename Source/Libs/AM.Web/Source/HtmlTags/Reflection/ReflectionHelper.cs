@@ -105,7 +105,7 @@ internal static class ReflectionHelper
         return memberExpression;
     }
 
-    public static Accessor GetAccessor (LambdaExpression expression)
+    public static IAccessor GetAccessor (LambdaExpression expression)
     {
         MemberExpression memberExpression = GetMemberExpression (expression, true);
 
@@ -141,7 +141,7 @@ internal static class ReflectionHelper
     public static bool IsMemberExpression<T, U> (Expression<Func<T, U>> expression) =>
         GetMemberExpression (expression, false) != null;
 
-    public static Accessor GetAccessor<TModel> (Expression<Func<TModel, object>> expression)
+    public static IAccessor GetAccessor<TModel> (Expression<Func<TModel, object>> expression)
     {
         if (expression.Body is MethodCallExpression || expression.Body.NodeType == ExpressionType.ArrayIndex)
         {
@@ -153,7 +153,7 @@ internal static class ReflectionHelper
         return GetAccessor (memberExpression);
     }
 
-    public static Accessor GetAccessor (Expression memberExpression)
+    public static IAccessor GetAccessor (Expression memberExpression)
     {
         var list = new List<IValueGetter>();
 
@@ -278,7 +278,7 @@ internal static class ReflectionHelper
         return false;
     }
 
-    public static Accessor GetAccessor<TModel, T> (Expression<Func<TModel, T>> expression)
+    public static IAccessor GetAccessor<TModel, T> (Expression<Func<TModel, T>> expression)
     {
         MemberExpression memberExpression = GetMemberExpression (expression);
 

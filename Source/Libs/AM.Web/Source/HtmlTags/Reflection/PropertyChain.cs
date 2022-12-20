@@ -28,7 +28,7 @@ using System.Reflection;
 
 namespace AM.HtmlTags.Reflection;
 
-public class PropertyChain : Accessor
+public class PropertyChain : IAccessor
 {
     private readonly IValueGetter[] _chain;
     private readonly IValueGetter[] _valueGetters;
@@ -108,7 +108,7 @@ public class PropertyChain : Accessor
 
     public Type DeclaringType => _chain[0].DeclaringType;
 
-    public Accessor GetChildAccessor<T> (Expression<Func<T, object>> expression)
+    public IAccessor GetChildAccessor<T> (Expression<Func<T, object>> expression)
     {
         var accessor = expression.ToAccessor();
         var allGetters = Getters().Union (accessor.Getters()).ToArray();
@@ -129,7 +129,7 @@ public class PropertyChain : Accessor
         return (Expression<Func<T, object>>)Expression.Lambda (delegateType, body, parameter);
     }
 
-    public Accessor Prepend (PropertyInfo property)
+    public IAccessor Prepend (PropertyInfo property)
     {
         var list = new List<IValueGetter>
         {

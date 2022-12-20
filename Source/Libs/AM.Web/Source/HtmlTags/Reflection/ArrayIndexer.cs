@@ -27,7 +27,7 @@ using System.Reflection;
 
 namespace AM.HtmlTags.Reflection;
 
-public class ArrayIndexer : Accessor
+public class ArrayIndexer : IAccessor
 {
     private readonly IndexerValueGetter _getter;
 
@@ -47,7 +47,7 @@ public class ArrayIndexer : Accessor
 
     public object GetValue (object target) => _getter.GetValue (target);
 
-    public Accessor GetChildAccessor<T> (Expression<Func<T, object>> expression)
+    public IAccessor GetChildAccessor<T> (Expression<Func<T, object>> expression)
     {
         throw new NotSupportedException ("Not supported in arrays");
     }
@@ -68,7 +68,7 @@ public class ArrayIndexer : Accessor
         return (Expression<Func<T, object>>)Expression.Lambda (delegateType, body, parameter);
     }
 
-    public Accessor Prepend (PropertyInfo property) => new PropertyChain (new IValueGetter[]
+    public IAccessor Prepend (PropertyInfo property) => new PropertyChain (new IValueGetter[]
         { new PropertyValueGetter (property), _getter });
 
     public IEnumerable<IValueGetter> Getters()

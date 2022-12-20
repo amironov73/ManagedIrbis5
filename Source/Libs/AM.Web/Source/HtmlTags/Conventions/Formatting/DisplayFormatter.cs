@@ -82,7 +82,7 @@ public class DisplayFormatter
     /// <returns></returns>
     public string GetDisplay
         (
-            Accessor accessor,
+            IAccessor accessor,
             object? target
         )
     {
@@ -108,7 +108,7 @@ public class DisplayFormatter
     /// <returns></returns>
     public string GetDisplayForValue
         (
-            Accessor accessor,
+            IAccessor accessor,
             object? rawValue
         )
     {

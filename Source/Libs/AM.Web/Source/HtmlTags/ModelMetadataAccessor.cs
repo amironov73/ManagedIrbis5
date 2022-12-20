@@ -26,7 +26,7 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 using Reflection;
 
-public class ModelMetadataAccessor : Accessor
+public class ModelMetadataAccessor : IAccessor
 {
     public ModelMetadata ModelMetadata { get; }
     public ModelExpression ModelExpression { get; }
@@ -50,7 +50,7 @@ public class ModelMetadataAccessor : Accessor
 
     public object GetValue (object target) => ModelExpression.Model;
 
-    public Accessor GetChildAccessor<T> (Expression<Func<T, object>> expression)
+    public IAccessor GetChildAccessor<T> (Expression<Func<T, object>> expression)
     {
         throw new NotImplementedException();
     }
@@ -62,7 +62,7 @@ public class ModelMetadataAccessor : Accessor
         throw new NotImplementedException();
     }
 
-    public Accessor Prepend (PropertyInfo property)
+    public IAccessor Prepend (PropertyInfo property)
     {
         throw new NotImplementedException();
     }
