@@ -30,6 +30,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
+using Avalonia.LogicalTree;
 using Avalonia.Media;
 using Avalonia.Platform;
 using Avalonia.Styling;
@@ -365,6 +366,83 @@ public static class AvaloniaUtility
         if (Application.Current!.ApplicationLifetime is ClassicDesktopStyleApplicationLifetime classic)
         {
             return classic.MainWindow;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Поиск родительского контрола с контекстом данных
+    /// указанного типа.
+    /// </summary>
+    public static IControl? GetParentWithDataContext<TDataContext>
+        (
+            this IControl control
+        )
+        where TDataContext: class
+    {
+        Sure.NotNull (control);
+
+        var parent = control.Parent;
+        while (parent is not null)
+        {
+            if (parent.DataContext is TDataContext)
+            {
+                return parent;
+            }
+
+            parent = parent.Parent;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Поиск родительского контрола указанного типа.
+    /// </summary>
+    public static TParent? GetParentOfType<TParent>
+        (
+            this IControl control
+        )
+        where TParent: class, IControl
+    {
+        Sure.NotNull (control);
+
+        var parent = control.Parent;
+        while (parent is not null)
+        {
+            if (parent is TParent found)
+            {
+                return found;
+            }
+
+            parent = parent.Parent;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Поиск первого дочернего элемента с контекстом данных указанного типа.
+    /// </summary>
+    public static IDataContextProvider? FindChildWithDataContext<TDataContext>
+        (
+            this ILogical control
+        )
+    {
+        Sure.NotNull (control);
+
+        foreach (var child in control.LogicalChildren)
+        {
+            if (child is IDataContextProvider { DataContext: TDataContext } found)
+            {
+                return found;
+            }
+
+            if (child.FindChildWithDataContext<TDataContext>() is { } inDepth)
+            {
+                return inDepth;
+            }
         }
 
         return null;
