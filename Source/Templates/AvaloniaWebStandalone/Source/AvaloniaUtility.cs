@@ -23,23 +23,28 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 
+using AM.Text.Output;
+
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.LogicalTree;
+using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Media;
 using Avalonia.Platform;
 using Avalonia.Styling;
 
-#endregion
+using Microsoft.Extensions.Logging;
 
-#pragma warning disable CA1416 // некоторые вызовы недоступны в браузере
+using SkiaSharp;
+
+#endregion
 
 #nullable enable
 
-namespace AvaloniaWeb;
+namespace AvaloniaApp;
 
 /// <summary>
 /// Полезные расширения для Avalonia UI.
@@ -47,6 +52,20 @@ namespace AvaloniaWeb;
 public static class AvaloniaUtility
 {
     #region Public methods
+
+    /// <summary>
+    /// only target is Initialized
+    /// </summary>
+    /// <param name="visual">target</param>
+    /// <returns>size</returns>
+    public static double ActualWidth (this Visual visual) => visual.Bounds.Width;
+
+    /// <summary>
+    /// only target is Initialized
+    /// </summary>
+    /// <param name="visual">target</param>
+    /// <returns>size</returns>
+    public static double ActualHeight (this Visual visual) => visual.Bounds.Height;
 
     /// <summary>
     /// Выполнение произвольных побочных действий.
@@ -64,6 +83,41 @@ public static class AvaloniaUtility
         action (control);
 
         return control;
+    }
+
+    /// <summary>
+    /// Получение ресурса по указанному URL.
+    /// </summary>
+    public static ResourceInclude? AsResource
+        (
+            this string url
+        )
+    {
+        Sure.NotNullNorEmpty (url);
+
+        return new Uri (url).AsResource();
+    }
+
+    /// <summary>
+    /// Получение ресурса по указанному URL.
+    /// </summary>
+    public static ResourceInclude? AsResource
+        (
+            this Uri uri
+        )
+    {
+        Sure.NotNull (uri);
+
+        try
+        {
+            return new ResourceInclude { Source = uri };
+        }
+        catch (Exception exception)
+        {
+            Magna.Logger.LogDebug (exception, "URI as resource");
+        }
+
+        return default;
     }
 
     /// <summary>
@@ -330,6 +384,32 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
+    /// Поиск первого дочернего элемента с контекстом данных указанного типа.
+    /// </summary>
+    public static IDataContextProvider? FindChildWithDataContext<TDataContext>
+        (
+            this ILogical control
+        )
+    {
+        Sure.NotNull (control);
+
+        foreach (var child in control.LogicalChildren)
+        {
+            if (child is IDataContextProvider { DataContext: TDataContext } found)
+            {
+                return found;
+            }
+
+            if (child.FindChildWithDataContext<TDataContext>() is { } inDepth)
+            {
+                return inDepth;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
     /// Получение темы для контрола указанного типа.
     /// </summary>
     public static ControlTheme? GetControlTheme
@@ -379,7 +459,7 @@ public static class AvaloniaUtility
         (
             this IControl control
         )
-        where TDataContext: class
+        where TDataContext : class
     {
         Sure.NotNull (control);
 
@@ -404,7 +484,7 @@ public static class AvaloniaUtility
         (
             this IControl control
         )
-        where TParent: class, IControl
+        where TParent : class, IControl
     {
         Sure.NotNull (control);
 
@@ -423,29 +503,27 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
-    /// Поиск первого дочернего элемента с контекстом данных указанного типа.
+    /// Получение окна, которому принадлежит указанный контрол.
     /// </summary>
-    public static IDataContextProvider? FindChildWithDataContext<TDataContext>
+    public static Window GetWindow
         (
-            this ILogical control
+            this IControl control
         )
     {
         Sure.NotNull (control);
 
-        foreach (var child in control.LogicalChildren)
+        var parent = control.Parent;
+        while (parent is not null)
         {
-            if (child is IDataContextProvider { DataContext: TDataContext } found)
+            if (parent is Window found)
             {
                 return found;
             }
 
-            if (child.FindChildWithDataContext<TDataContext>() is { } inDepth)
-            {
-                return inDepth;
-            }
+            parent = parent.Parent;
         }
 
-        return null;
+        throw new ArsMagnaException ($"Can't find window for {control}");
     }
 
     /// <summary>
@@ -478,6 +556,45 @@ public static class AvaloniaUtility
         control.VerticalContentAlignment = VerticalAlignment.Center;
 
         return control;
+    }
+
+    /// <summary>
+    /// Измерение строки.
+    /// </summary>
+    public static Size MeasureString
+        (
+            this string text,
+            double fontSize,
+            SKTypeface typeface
+        )
+    {
+        Sure.Positive (fontSize);
+        Sure.NotNull (typeface);
+
+        if (string.IsNullOrEmpty (text))
+        {
+            return default;
+        }
+
+        try
+        {
+            using var paint = new SKPaint();
+            paint.Typeface = typeface;
+            paint.Style = SKPaintStyle.Fill;
+            paint.TextSize = Convert.ToSingle (fontSize);
+            var result = new SKRect();
+            paint.MeasureText (text, ref result);
+            var width = Convert.ToSingle (Math.Ceiling (result.Size.Width));
+            var height = Convert.ToSingle (Math.Ceiling (result.Size.Height));
+
+            return new Size (width, height);
+        }
+        catch (Exception exception)
+        {
+            Magna.Logger.LogDebug (exception, nameof (MeasureString));
+        }
+
+        return default;
     }
 
     /// <summary>
@@ -523,6 +640,52 @@ public static class AvaloniaUtility
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Print system information in abstract output.
+    /// </summary>
+    public static void PrintSystemInformation
+        (
+            this AbstractOutput? output
+        )
+    {
+        if (output is not null)
+        {
+            output.WriteLine
+                (
+                    "OS version: {0}",
+                    Environment.OSVersion
+                );
+            output.WriteLine
+                (
+                    "Framework version: {0}",
+                    Environment.Version
+                );
+            var assembly = Assembly.GetEntryAssembly();
+            var vi = assembly?.GetName().Version;
+            if (assembly?.Location is null)
+            {
+                // TODO: в single-exe-application .Location возвращает string.Empty
+                // consider using the AppContext.BaseDirectory
+                return;
+            }
+
+            // TODO: в single-exe-application .Location возвращает string.Empty
+            // consider using the AppContext.BaseDirectory
+            var fi = new FileInfo (assembly.Location);
+            output.WriteLine
+                (
+                    "Application version: {0} ({1})",
+                    vi.ToVisibleString(),
+                    fi.LastWriteTime.ToShortDateString()
+                );
+            output.WriteLine
+                (
+                    "Memory: {0} Mb",
+                    GC.GetTotalMemory (false) / 1024
+                );
+        }
     }
 
     /// <summary>
@@ -842,6 +1005,30 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
+    /// Завершение приложения.
+    /// </summary>
+    /// <param name="exitCode">Код завершения приложения.
+    /// Ненулевой код, как правило, свидетельствует об ошибке.
+    /// </param>
+    public static void Shutdown
+        (
+            int exitCode = 0
+        )
+    {
+        if (Application.Current is { } application)
+        {
+            if (application.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime lifetime)
+            {
+                lifetime.Shutdown (exitCode);
+            }
+            else
+            {
+                Environment.Exit (exitCode);
+            }
+        }
+    }
+
+    /// <summary>
     /// Растягивание контрола по горизонтали и по вертикали.
     /// </summary>
     public static T Stretch<T>
@@ -888,6 +1075,29 @@ public static class AvaloniaUtility
         control.VerticalAlignment = VerticalAlignment.Stretch;
 
         return control;
+    }
+
+    /// <summary>
+    /// Попытка завершения приложения.
+    /// </summary>
+    /// <param name="exitCode">Код завершения приложения.
+    /// Ненулевой код, как правило, свидетельствует об ошибке.</param>
+    public static void TryShutdown
+        (
+            int exitCode = 0
+        )
+    {
+        if (Application.Current is { } application)
+        {
+            if (application.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime lifetime)
+            {
+                lifetime.TryShutdown (exitCode);
+            }
+            else
+            {
+                Environment.Exit (exitCode);
+            }
+        }
     }
 
     /// <summary>

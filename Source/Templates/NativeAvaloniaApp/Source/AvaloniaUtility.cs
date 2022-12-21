@@ -21,7 +21,8 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Reflection;
+
+using AM;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -29,14 +30,18 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.LogicalTree;
+using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Media;
 using Avalonia.Platform;
+using Avalonia.Styling;
+
+using SkiaSharp;
 
 #endregion
 
 #nullable enable
 
-namespace NativeAvaloniaApp;
+namespace AvaloniaApp;
 
 /// <summary>
 /// Полезные расширения для Avalonia UI.
@@ -46,6 +51,20 @@ public static class AvaloniaUtility
     #region Public methods
 
     /// <summary>
+    /// only target is Initialized
+    /// </summary>
+    /// <param name="visual">target</param>
+    /// <returns>size</returns>
+    public static double ActualWidth (this Visual visual) => visual.Bounds.Width;
+
+    /// <summary>
+    /// only target is Initialized
+    /// </summary>
+    /// <param name="visual">target</param>
+    /// <returns>size</returns>
+    public static double ActualHeight (this Visual visual) => visual.Bounds.Height;
+
+    /// <summary>
     /// Выполнение произвольных побочных действий.
     /// </summary>
     public static TControl Also<TControl>
@@ -53,7 +72,7 @@ public static class AvaloniaUtility
             this TControl control,
             Action<TControl> action
         )
-        where TControl: Control
+        where TControl : Control
     {
         Sure.NotNull (control);
         Sure.NotNull (action);
@@ -64,6 +83,41 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
+    /// Получение ресурса по указанному URL.
+    /// </summary>
+    public static ResourceInclude? AsResource
+        (
+            this string url
+        )
+    {
+        Sure.NotNullNorEmpty (url);
+
+        return new Uri (url).AsResource();
+    }
+
+    /// <summary>
+    /// Получение ресурса по указанному URL.
+    /// </summary>
+    public static ResourceInclude? AsResource
+        (
+            this Uri uri
+        )
+    {
+        Sure.NotNull (uri);
+
+        try
+        {
+            return new ResourceInclude { Source = uri };
+        }
+        catch (Exception exception)
+        {
+            Debug.WriteLine (exception.Message);
+        }
+
+        return default;
+    }
+
+    /// <summary>
     /// Присваивание указанной переменной.
     /// </summary>
     public static TControl Assign<TControl>
@@ -71,7 +125,7 @@ public static class AvaloniaUtility
             this TControl control,
             out TControl variable
         )
-        where TControl: Control
+        where TControl : Control
     {
         Sure.NotNull (control);
 
@@ -88,7 +142,7 @@ public static class AvaloniaUtility
             this T block,
             bool bold = true
         )
-        where T: TextBlock
+        where T : TextBlock
     {
         Sure.NotNull (block);
 
@@ -104,7 +158,7 @@ public static class AvaloniaUtility
         (
             this T control
         )
-        where T: IContentControl
+        where T : IContentControl
     {
         control.HorizontalContentAlignment = HorizontalAlignment.Center;
         control.VerticalContentAlignment = VerticalAlignment.Center;
@@ -119,7 +173,7 @@ public static class AvaloniaUtility
         (
             this T control
         )
-        where T: Control
+        where T : Control
     {
         Sure.NotNull (control);
 
@@ -136,7 +190,7 @@ public static class AvaloniaUtility
         (
             this T control
         )
-        where T: Control
+        where T : Control
     {
         Sure.NotNull (control);
 
@@ -152,13 +206,40 @@ public static class AvaloniaUtility
         (
             this T control
         )
-        where T: Control
+        where T : Control
     {
         Sure.NotNull (control);
 
         control.VerticalAlignment = VerticalAlignment.Center;
 
         return control;
+    }
+
+    /// <summary>
+    /// Создание темы для контрола, основанной на теме для указанного типа.
+    /// </summary>
+    /// <returns></returns>
+    public static ControlTheme? CreateControlTheme
+        (
+            Type baseControlType,
+            Type actualControlType
+        )
+    {
+        Sure.NotNull (baseControlType);
+        Sure.NotNull (actualControlType);
+
+        var basedOn = GetControlTheme (baseControlType);
+        if (basedOn is null)
+        {
+            return null;
+        }
+
+        var result = new ControlTheme (actualControlType)
+        {
+            BasedOn = basedOn
+        };
+
+        return result;
     }
 
     /// <summary>
@@ -241,9 +322,8 @@ public static class AvaloniaUtility
     public static T DockBottom<T>
         (
             this T control
-
         )
-        where T: Control
+        where T : Control
     {
         Sure.NotNull (control);
 
@@ -258,9 +338,8 @@ public static class AvaloniaUtility
     public static T DockLeft<T>
         (
             this T control
-
         )
-        where T: Control
+        where T : Control
     {
         Sure.NotNull (control);
 
@@ -275,9 +354,8 @@ public static class AvaloniaUtility
     public static T DockRight<T>
         (
             this T control
-
         )
-        where T: Control
+        where T : Control
     {
         Sure.NotNull (control);
 
@@ -292,79 +370,14 @@ public static class AvaloniaUtility
     public static T DockTop<T>
         (
             this T control
-
         )
-        where T: Control
+        where T : Control
     {
         Sure.NotNull (control);
 
         control.SetValue (DockPanel.DockProperty, Dock.Top);
 
         return control;
-    }
-
-    /// <summary>
-    /// Получение главного окна приложения (если оно есть, конечно).
-    /// </summary>
-    public static Window? GetMainWindow()
-    {
-        if (Application.Current!.ApplicationLifetime is ClassicDesktopStyleApplicationLifetime classic)
-        {
-            return classic.MainWindow;
-        }
-
-        return null;
-    }
-
-    /// <summary>
-    /// Поиск родительского контрола с контекстом данных
-    /// указанного типа.
-    /// </summary>
-    public static IControl? GetParentWithDataContext<TDataContext>
-        (
-            this IControl control
-        )
-        where TDataContext: class
-    {
-        Sure.NotNull (control);
-
-        var parent = control.Parent;
-        while (parent is not null)
-        {
-            if (parent.DataContext is TDataContext)
-            {
-                return parent;
-            }
-
-            parent = parent.Parent;
-        }
-
-        return null;
-    }
-
-    /// <summary>
-    /// Поиск родительского контрола указанного типа.
-    /// </summary>
-    public static TParent? GetParentOfType<TParent>
-        (
-            this IControl control
-        )
-        where TParent: class, IControl
-    {
-        Sure.NotNull (control);
-
-        var parent = control.Parent;
-        while (parent is not null)
-        {
-            if (parent is TParent found)
-            {
-                return found;
-            }
-
-            parent = parent.Parent;
-        }
-
-        return null;
     }
 
     /// <summary>
@@ -394,6 +407,123 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
+    /// Получение темы для контрола указанного типа.
+    /// </summary>
+    public static ControlTheme? GetControlTheme
+        (
+            Type controlType
+        )
+    {
+        Sure.NotNull (controlType);
+
+        while (controlType.IsAssignableTo (typeof (Control)))
+        {
+            if (Application.Current!.Styles.TryGetResource (controlType, out var result))
+            {
+                return result as ControlTheme;
+            }
+
+            var baseType = controlType.BaseType;
+            if (baseType is null)
+            {
+                break;
+            }
+
+            controlType = baseType;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Получение главного окна приложения (если оно есть, конечно).
+    /// </summary>
+    public static Window? GetMainWindow()
+    {
+        if (Application.Current!.ApplicationLifetime is ClassicDesktopStyleApplicationLifetime classic)
+        {
+            return classic.MainWindow;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Поиск родительского контрола с контекстом данных
+    /// указанного типа.
+    /// </summary>
+    public static IControl? GetParentWithDataContext<TDataContext>
+        (
+            this IControl control
+        )
+        where TDataContext : class
+    {
+        Sure.NotNull (control);
+
+        var parent = control.Parent;
+        while (parent is not null)
+        {
+            if (parent.DataContext is TDataContext)
+            {
+                return parent;
+            }
+
+            parent = parent.Parent;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Поиск родительского контрола указанного типа.
+    /// </summary>
+    public static TParent? GetParentOfType<TParent>
+        (
+            this IControl control
+        )
+        where TParent : class, IControl
+    {
+        Sure.NotNull (control);
+
+        var parent = control.Parent;
+        while (parent is not null)
+        {
+            if (parent is TParent found)
+            {
+                return found;
+            }
+
+            parent = parent.Parent;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Получение окна, которому принадлежит указанный контрол.
+    /// </summary>
+    public static Window GetWindow
+        (
+            this IControl control
+        )
+    {
+        Sure.NotNull (control);
+
+        var parent = control.Parent;
+        while (parent is not null)
+        {
+            if (parent is Window found)
+            {
+                return found;
+            }
+
+            parent = parent.Parent;
+        }
+
+        throw new ArsMagnaException ($"Can't find window for {control}");
+    }
+
+    /// <summary>
     /// Установка наклонного начертания для текстового блока.
     /// </summary>
     public static T Italic<T>
@@ -401,7 +531,7 @@ public static class AvaloniaUtility
             this T block,
             bool italic = true
         )
-        where T: TextBlock
+        where T : TextBlock
     {
         Sure.NotNull (block);
 
@@ -417,12 +547,51 @@ public static class AvaloniaUtility
         (
             this T control
         )
-        where T: IContentControl
+        where T : IContentControl
     {
         control.HorizontalContentAlignment = HorizontalAlignment.Left;
         control.VerticalContentAlignment = VerticalAlignment.Center;
 
         return control;
+    }
+
+    /// <summary>
+    /// Измерение строки.
+    /// </summary>
+    public static Size MeasureString
+        (
+            this string text,
+            double fontSize,
+            SKTypeface typeface
+        )
+    {
+        Sure.Positive (fontSize);
+        Sure.NotNull (typeface);
+
+        if (string.IsNullOrEmpty (text))
+        {
+            return default;
+        }
+
+        try
+        {
+            using var paint = new SKPaint();
+            paint.Typeface = typeface;
+            paint.Style = SKPaintStyle.Fill;
+            paint.TextSize = Convert.ToSingle (fontSize);
+            var result = new SKRect();
+            paint.MeasureText (text, ref result);
+            var width = Convert.ToSingle (Math.Ceiling (result.Size.Width));
+            var height = Convert.ToSingle (Math.Ceiling (result.Size.Height));
+
+            return new Size (width, height);
+        }
+        catch (Exception exception)
+        {
+            Debug.WriteLine (exception.Message);
+        }
+
+        return default;
     }
 
     /// <summary>
@@ -433,7 +602,7 @@ public static class AvaloniaUtility
             this T button,
             EventHandler<RoutedEventArgs> handler
         )
-        where T: Button
+        where T : Button
     {
         Sure.NotNull (button);
         Sure.NotNull (handler);
@@ -448,24 +617,23 @@ public static class AvaloniaUtility
     /// </summary>
     public static Stream? OpenAssetStream
         (
+            Type type,
             string assetName
         )
     {
+        Sure.NotNull (type);
         Sure.NotNullNorEmpty (assetName);
 
         var assets = AvaloniaLocator.Current.GetService<IAssetLoader>();
         if (assets is not null)
         {
-                var assembly = Assembly.GetEntryAssembly();
-                if (assembly is not null)
-                {
-                    var name = assembly.GetName().Name;
-                    if (!string.IsNullOrEmpty (name))
-                    {
-                        var uri = "avares://" + name + "/" + assetName;
-                        return assets.Open (new Uri (uri));
-                    }
-                }
+            var assembly = type.Assembly;
+            var name = assembly.GetName().Name;
+            if (!string.IsNullOrEmpty (name))
+            {
+                var uri = "avares://" + name + "/" + assetName;
+                return assets.Open (new Uri (uri));
+            }
         }
 
         return null;
@@ -545,7 +713,7 @@ public static class AvaloniaUtility
             this T obj,
             int column
         )
-        where T: AvaloniaObject
+        where T : AvaloniaObject
     {
         Sure.NotNull (obj);
         Sure.Positive (column);
@@ -563,7 +731,7 @@ public static class AvaloniaUtility
             this T control,
             Thickness thickness
         )
-        where T: ContentControl
+        where T : ContentControl
     {
         Sure.NotNull (control);
 
@@ -580,7 +748,7 @@ public static class AvaloniaUtility
             this T control,
             double thickness
         )
-        where T: ContentControl
+        where T : ContentControl
     {
         Sure.NotNull (control);
 
@@ -598,7 +766,7 @@ public static class AvaloniaUtility
             double horizontal,
             double vertical
         )
-        where T: ContentControl
+        where T : ContentControl
     {
         Sure.NotNull (control);
 
@@ -618,7 +786,7 @@ public static class AvaloniaUtility
             double right,
             double bottom
         )
-        where T: ContentControl
+        where T : ContentControl
     {
         Sure.NotNull (control);
 
@@ -635,7 +803,7 @@ public static class AvaloniaUtility
             this T block,
             Thickness thickness
         )
-        where T: TextBlock
+        where T : TextBlock
     {
         Sure.NotNull (block);
 
@@ -652,7 +820,7 @@ public static class AvaloniaUtility
             this T block,
             double thickness
         )
-        where T: TextBlock
+        where T : TextBlock
     {
         Sure.NotNull (block);
 
@@ -670,7 +838,7 @@ public static class AvaloniaUtility
             double horizontal,
             double vertical
         )
-        where T: TextBlock
+        where T : TextBlock
     {
         Sure.NotNull (block);
 
@@ -690,7 +858,7 @@ public static class AvaloniaUtility
             double right,
             double bottom
         )
-        where T: TextBlock
+        where T : TextBlock
     {
         Sure.NotNull (block);
 
@@ -707,7 +875,7 @@ public static class AvaloniaUtility
             this T obj,
             int row
         )
-        where T: AvaloniaObject
+        where T : AvaloniaObject
     {
         Sure.NotNull (obj);
         Sure.Positive (row);
@@ -726,7 +894,7 @@ public static class AvaloniaUtility
             int row,
             int column
         )
-        where T: AvaloniaObject
+        where T : AvaloniaObject
     {
         Sure.NotNull (obj);
         Sure.Positive (row);
@@ -739,30 +907,49 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
-    /// Добавление в заголовок окна информации о версии сборки.
+    /// Установка иконки для окна.
     /// </summary>
-    public static void ShowVersionInfoInTitle
+    public static void SetWindowIcon
         (
-            this Window window
+            this Window window,
+            string iconName
         )
     {
         Sure.NotNull (window);
+        Sure.NotNullNorEmpty (iconName);
 
-        var assembly = Assembly.GetEntryAssembly();
-        var location = assembly?.Location;
-        if (string.IsNullOrEmpty (location))
+        if (OperatingSystem.IsWindows())
         {
-            // TODO: в single-exe-application .Location возвращает string.Empty
-            // consider using the AppContext.BaseDirectory
-            return;
+            using var stream = OpenAssetStream (window.GetType(), iconName);
+            if (stream is not null)
+            {
+                window.Icon = new WindowIcon (stream);
+            }
         }
+    }
 
-        // TODO: в single-exe-application .Location возвращает string.Empty
-        // consider using the AppContext.BaseDirectory
-        var fvi = FileVersionInfo.GetVersionInfo (location);
-        var fi = new FileInfo (location);
-
-        window.Title += $": version {fvi.FileVersion} from {fi.LastWriteTime.ToShortDateString()}";
+    /// <summary>
+    /// Завершение приложения.
+    /// </summary>
+    /// <param name="exitCode">Код завершения приложения.
+    /// Ненулевой код, как правило, свидетельствует об ошибке.
+    /// </param>
+    public static void Shutdown
+        (
+            int exitCode = 0
+        )
+    {
+        if (Application.Current is { } application)
+        {
+            if (application.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime lifetime)
+            {
+                lifetime.Shutdown (exitCode);
+            }
+            else
+            {
+                Environment.Exit (exitCode);
+            }
+        }
     }
 
     /// <summary>
@@ -772,7 +959,7 @@ public static class AvaloniaUtility
         (
             this T control
         )
-        where T: Control
+        where T : Control
     {
         Sure.NotNull (control);
 
@@ -789,7 +976,7 @@ public static class AvaloniaUtility
         (
             this T control
         )
-        where T: Control
+        where T : Control
     {
         Sure.NotNull (control);
 
@@ -805,13 +992,36 @@ public static class AvaloniaUtility
         (
             this T control
         )
-        where T: Control
+        where T : Control
     {
         Sure.NotNull (control);
 
         control.VerticalAlignment = VerticalAlignment.Stretch;
 
         return control;
+    }
+
+    /// <summary>
+    /// Попытка завершения приложения.
+    /// </summary>
+    /// <param name="exitCode">Код завершения приложения.
+    /// Ненулевой код, как правило, свидетельствует об ошибке.</param>
+    public static void TryShutdown
+        (
+            int exitCode = 0
+        )
+    {
+        if (Application.Current is { } application)
+        {
+            if (application.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime lifetime)
+            {
+                lifetime.TryShutdown (exitCode);
+            }
+            else
+            {
+                Environment.Exit (exitCode);
+            }
+        }
     }
 
     /// <summary>
@@ -844,7 +1054,7 @@ public static class AvaloniaUtility
             this T panel,
             params Control[] children
         )
-        where T: Panel
+        where T : Panel
     {
         Sure.NotNull (panel);
 
