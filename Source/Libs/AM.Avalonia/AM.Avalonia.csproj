@@ -26,6 +26,14 @@
         <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <AvaloniaResource Remove="Styles\**\*.axamll" />
+        <AvaloniaResource Include="Styles\**\*.axaml">
+            <SubType>Designer</SubType>
+        </AvaloniaResource>
+    </ItemGroup>
+
+
     <!-- Централизованное управление пакетами -->
     <ItemGroup>
         <PackageReference Include="Avalonia" />

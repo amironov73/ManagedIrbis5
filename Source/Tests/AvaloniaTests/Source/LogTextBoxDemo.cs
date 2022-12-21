@@ -81,6 +81,5 @@ public sealed class LogTextBoxDemo
 
             logger.Log (LogLevel.Info, "Успешно завершено!");
         }
-
     }
 }

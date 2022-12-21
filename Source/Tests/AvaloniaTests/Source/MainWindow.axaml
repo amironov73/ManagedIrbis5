@@ -128,6 +128,18 @@
             LogTextBox
         </Button>
 
+        <Button
+            Name="GroupBoxButton"
+            Click="GroupBoxButton_OnClick">
+            GroupBox
+        </Button>
+
+        <Button
+            Name="ProgressRingButton"
+            Click="ProgressRingButton_OnClick">
+            ProgressRing
+        </Button>
+
     </WrapPanel>
 
 </Window>

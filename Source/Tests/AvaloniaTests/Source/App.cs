@@ -41,10 +41,12 @@ public sealed class App
 
         // стили для датагрида
         var uri = new Uri ("avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml");
-        var include = new StyleInclude (uri)
-        {
-            Source = uri
-        };
+        var include = new StyleInclude (uri) { Source = uri };
+        Styles.Add (include);
+
+        // стили из AM.Avalonia
+        uri = new Uri ("avares://AM.Avalonia/Styles.axaml");
+        include = new StyleInclude (uri) { Source = uri };
         Styles.Add (include);
     }
 

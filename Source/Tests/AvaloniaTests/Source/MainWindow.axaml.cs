@@ -603,4 +603,22 @@ public partial class MainWindow
     {
         new LogTextBoxDemo().Show (this);
     }
+
+    private void GroupBoxButton_OnClick
+        (
+            object? sender,
+            RoutedEventArgs eventArgs
+        )
+    {
+        new GroupBoxDemo().Show (this);
+    }
+
+    private void ProgressRingButton_OnClick
+        (
+            object? sender,
+            RoutedEventArgs eventArgs
+        )
+    {
+        new ProgressRingDemo().Show (this);
+    }
 }
