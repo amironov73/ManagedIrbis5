@@ -3,14 +3,8 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* IValueGetter.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,14 +19,44 @@ using System.Linq.Expressions;
 
 namespace AM.HtmlTags.Reflection;
 
+/// <summary>
+///
+/// </summary>
 public interface IValueGetter
 {
-    object GetValue (object target);
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="target"></param>
+    /// <returns></returns>
+    object? GetValue (object target);
+
+    /// <summary>
+    ///
+    /// </summary>
     string Name { get; }
-    Type DeclaringType { get; }
 
-    Type ValueType { get; }
+    /// <summary>
+    ///
+    /// </summary>
+    Type? DeclaringType { get; }
 
+    /// <summary>
+    ///
+    /// </summary>
+    Type? ValueType { get; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="body"></param>
+    /// <returns></returns>
     Expression ChainExpression (Expression body);
-    void SetValue (object target, object propertyValue);
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="target"></param>
+    /// <param name="propertyValue"></param>
+    void SetValue (object target, object? propertyValue);
 }

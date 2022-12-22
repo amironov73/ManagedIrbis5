@@ -3,21 +3,14 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* IndexerValueGetter.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -27,28 +20,77 @@ using System.Reflection;
 
 namespace AM.HtmlTags.Reflection;
 
-public class IndexerValueGetter : IValueGetter
+/// <summary>
+///
+/// </summary>
+public class IndexerValueGetter
+    : IValueGetter
 {
-    public IndexerValueGetter (Type arrayType, int index)
+    #region Properties
+
+    /// <inheritdoc cref="IValueGetter.Name"/>
+    public string Name => $"[{Index}]";
+
+    /// <summary>
+    ///
+    /// </summary>
+    public int Index { get; }
+
+    /// <inheritdoc cref="IValueGetter.DeclaringType"/>
+    public Type? DeclaringType { get; }
+
+    /// <inheritdoc cref="IValueGetter.ValueType"/>
+    public Type? ValueType => DeclaringType?.GetElementType();
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="arrayType"></param>
+    /// <param name="index"></param>
+    public IndexerValueGetter
+        (
+            Type arrayType,
+            int index
+        )
     {
+        Sure.NotNull (arrayType);
+
         DeclaringType = arrayType;
         Index = index;
     }
 
-    public object GetValue (object target) => ((Array)target).GetValue (Index);
+    #endregion
 
-    public string Name => $"[{Index}]";
+    #region IValueGetter members
 
-    public int Index { get; }
-
-    public Type DeclaringType { get; }
-
-    public Type ValueType => DeclaringType.GetElementType();
-
-    public Expression ChainExpression (Expression body)
+    /// <inheritdoc cref="IValueGetter.GetValue"/>
+    public object? GetValue
+        (
+            object target
+        )
     {
-        var memberExpression = Expression.ArrayIndex (body, Expression.Constant (Index, typeof (int)));
-        if (!DeclaringType.GetElementType().GetTypeInfo().IsValueType)
+        Sure.NotNull (target);
+
+        return ((Array) target).GetValue (Index);
+    }
+    /// <inheritdoc cref="IValueGetter.ChainExpression"/>
+    public Expression ChainExpression
+        (
+            Expression body
+        )
+    {
+        Sure.NotNull (body);
+
+        var memberExpression = Expression.ArrayIndex
+            (
+                body,
+                Expression.Constant (Index, typeof (int))
+            );
+        if (!DeclaringType!.GetElementType()!.GetTypeInfo().IsValueType)
         {
             return memberExpression;
         }
@@ -56,14 +98,48 @@ public class IndexerValueGetter : IValueGetter
         return Expression.Convert (memberExpression, typeof (object));
     }
 
-    public void SetValue (object target, object propertyValue) => ((Array)target).SetValue (propertyValue, Index);
-
-    protected bool Equals (IndexerValueGetter other) =>
-        DeclaringType == other.DeclaringType && Index == other.Index;
-
-    public override bool Equals (object obj)
+    /// <inheritdoc cref="IValueGetter.SetValue"/>
+    public void SetValue
+        (
+            object target,
+            object? propertyValue
+        )
     {
-        if (ReferenceEquals (null, obj))
+        Sure.NotNull (target);
+
+        ((Array)target).SetValue (propertyValue, Index);
+    }
+
+    #endregion
+
+    #region Private methods
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
+    protected bool Equals
+        (
+            IndexerValueGetter other
+        )
+    {
+        Sure.NotNull (other);
+
+        return DeclaringType == other.DeclaringType && Index == other.Index;
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.Equals(object?)"/>
+    public override bool Equals
+        (
+            object? obj
+        )
+    {
+        if (obj is null)
         {
             return false;
         }
@@ -73,14 +149,10 @@ public class IndexerValueGetter : IValueGetter
             return true;
         }
 
-        if (obj.GetType() != this.GetType())
-        {
-            return false;
-        }
-
-        return Equals ((IndexerValueGetter)obj);
+        return obj is IndexerValueGetter getter && Equals (getter);
     }
 
+    /// <inheritdoc cref="object.GetHashCode"/>
     public override int GetHashCode()
     {
         unchecked
@@ -88,4 +160,6 @@ public class IndexerValueGetter : IValueGetter
             return ((DeclaringType?.GetHashCode() ?? 0) * 397) ^ Index;
         }
     }
+
+    #endregion
 }

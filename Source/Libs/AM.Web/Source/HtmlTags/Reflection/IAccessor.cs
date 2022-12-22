@@ -31,17 +31,17 @@ public interface IAccessor
     /// <summary>
     /// /
     /// </summary>
-    Type PropertyType { get; }
+    Type? PropertyType { get; }
 
     /// <summary>
     ///
     /// </summary>
-    PropertyInfo InnerProperty { get; }
+    PropertyInfo? InnerProperty { get; }
 
     /// <summary>
     ///
     /// </summary>
-    Type DeclaringType { get; }
+    Type? DeclaringType { get; }
 
     /// <summary>
     ///
@@ -51,21 +51,21 @@ public interface IAccessor
     /// <summary>
     ///
     /// </summary>
-    Type OwnerType { get; }
+    Type? OwnerType { get; }
 
     /// <summary>
     ///
     /// </summary>
     /// <param name="target"></param>
     /// <param name="propertyValue"></param>
-    void SetValue (object target, object propertyValue);
+    void SetValue (object target, object? propertyValue);
 
     /// <summary>
     ///
     /// </summary>
     /// <param name="target"></param>
     /// <returns></returns>
-    object GetValue (object target);
+    object? GetValue (object target);
 
     /// <summary>
     ///

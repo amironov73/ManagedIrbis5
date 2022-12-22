@@ -3,14 +3,9 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* ArrayIndexer.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -27,52 +22,142 @@ using System.Reflection;
 
 namespace AM.HtmlTags.Reflection;
 
-public class ArrayIndexer : IAccessor
+/// <summary>
+///
+/// </summary>
+public class ArrayIndexer
+    : IAccessor
 {
-    private readonly IndexerValueGetter _getter;
+    #region Properties
 
-    public ArrayIndexer (IndexerValueGetter getter)
+    /// <summary>
+    ///
+    /// </summary>
+    public string FieldName => _getter.Name;
+
+    /// <summary>
+    ///
+    /// </summary>
+    public Type? PropertyType => _getter.ValueType;
+
+    /// <inheritdoc cref="IAccessor.InnerProperty"/>
+    public PropertyInfo? InnerProperty => null;
+
+    /// <inheritdoc cref="IAccessor.DeclaringType"/>
+    public Type? DeclaringType => _getter.DeclaringType;
+
+    /// <inheritdoc cref="IAccessor.Name"/>
+    public string Name => _getter.Name;
+
+    /// <inheritdoc cref="IAccessor.OwnerType"/>
+    public Type? OwnerType => DeclaringType;
+
+    /// <inheritdoc cref="IAccessor.PropertyNames"/>
+    public string[] PropertyNames => new[] { Name };
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="getter"></param>
+    public ArrayIndexer
+        (
+            IndexerValueGetter getter
+        )
     {
+        Sure.NotNull (getter);
+
         _getter = getter;
     }
 
-    public string FieldName => _getter.Name;
-    public Type PropertyType => _getter.ValueType;
-    public PropertyInfo InnerProperty => null;
-    public Type DeclaringType => _getter.DeclaringType;
-    public string Name => _getter.Name;
-    public Type OwnerType => DeclaringType;
+    #endregion
 
-    public void SetValue (object target, object propertyValue) => _getter.SetValue (target, propertyValue);
+    #region Private members
 
-    public object GetValue (object target) => _getter.GetValue (target);
+    private readonly IndexerValueGetter _getter;
 
-    public IAccessor GetChildAccessor<T> (Expression<Func<T, object>> expression)
+    #endregion
+
+    #region IAccessor members
+
+    /// <inheritdoc cref="IAccessor.SetValue"/>
+    public void SetValue
+        (
+            object target,
+            object? propertyValue
+        )
+    {
+        Sure.NotNull (target);
+
+        _getter.SetValue (target, propertyValue);
+    }
+
+    ///<inheritdoc cref="IAccessor.GetValue"/>
+    public object? GetValue
+        (
+            object target
+        )
+    {
+        Sure.NotNull (target);
+
+        return _getter.GetValue (target);
+    }
+
+    /// <inheritdoc cref="IAccessor.GetChildAccessor{T}"/>
+    public IAccessor GetChildAccessor<T>
+        (
+            Expression<Func<T, object>> expression
+        )
     {
         throw new NotSupportedException ("Not supported in arrays");
     }
 
-    public string[] PropertyNames => new[] { Name };
-
+    /// <inheritdoc cref="IAccessor.ToExpression{T}"/>
     public Expression<Func<T, object>> ToExpression<T>()
     {
         var parameter = Expression.Parameter (typeof (T), "x");
-        Expression body = Expression.ArrayIndex (parameter, Expression.Constant (_getter.Index, typeof (int)));
-        if (_getter.ValueType.GetTypeInfo().IsValueType)
+        Expression body = Expression.ArrayIndex
+            (
+                parameter,
+                Expression.Constant (_getter.Index, typeof (int))
+            );
+        if (_getter.ValueType!.GetTypeInfo().IsValueType)
         {
             body = Expression.Convert (body, typeof (object));
         }
 
 
         var delegateType = typeof (Func<,>).MakeGenericType (typeof (T), typeof (object));
+
         return (Expression<Func<T, object>>)Expression.Lambda (delegateType, body, parameter);
     }
 
-    public IAccessor Prepend (PropertyInfo property) => new PropertyChain (new IValueGetter[]
-        { new PropertyValueGetter (property), _getter });
+    /// <inheritdoc cref="IAccessor.Prepend"/>
+    public IAccessor Prepend
+        (
+            PropertyInfo property
+        )
+    {
+        Sure.NotNull (property);
 
+        return new PropertyChain
+            (
+                new IValueGetter[]
+                {
+                    new PropertyValueGetter (property),
+                    _getter
+                }
+            );
+    }
+
+    /// <inheritdoc cref="IAccessor.Getters"/>
     public IEnumerable<IValueGetter> Getters()
     {
         yield return _getter;
     }
+
+    #endregion
 }
