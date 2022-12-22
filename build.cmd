@@ -19,7 +19,7 @@ dotnet pack    --no-restore --no-build --configuration Release --output NuGet   
 dotnet publish --no-restore --no-build --configuration Release --output Publish        Source\ManagedIrbis5-publish.sln
 dotnet publish --no-restore --no-build --configuration Release --output Publish        Source\Libs\TinyClient\TinyClient.csproj
 
-dotnet test Source/ManagedIrbis5-windows.sln --no-restore --no-build --configuration Release --settings sequential.runsettings --collect "XPlat Code Coverage"
+dotnet test Source/ManagedIrbis5-windows.sln --no-restore --no-build --configuration Release --settings sequential.runsettings --collect "XPlat Code Coverage" --blame-hang-timeout 5m --blame-hang-dump-type full --blame-crash-dump-type full
 dotnet run     --no-restore --no-build --configuration Release --project               Source\Tests\PftTests\PftTests.csproj
 
 echo ALL DONE
