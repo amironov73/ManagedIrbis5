@@ -3,14 +3,8 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* PropertyValueGetter.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -26,25 +20,69 @@ using System.Reflection;
 
 namespace AM.HtmlTags.Reflection;
 
-public class PropertyValueGetter : IValueGetter
+/// <summary>
+///
+/// </summary>
+public class PropertyValueGetter
+    : IValueGetter
 {
-    public PropertyValueGetter (PropertyInfo propertyInfo)
+    #region Properties
+
+    /// <summary>
+    ///
+    /// </summary>
+    public PropertyInfo PropertyInfo { get; }
+
+    /// <inheritdoc cref="IValueGetter.Name"/>
+    public string Name => PropertyInfo.Name;
+
+    /// <inheritdoc cref="IValueGetter.DeclaringType"/>
+    public Type? DeclaringType => PropertyInfo.DeclaringType;
+
+    /// <inheritdoc cref="IValueGetter.ValueType"/>
+    public Type ValueType => PropertyInfo.PropertyType;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="propertyInfo"></param>
+    public PropertyValueGetter
+        (
+            PropertyInfo propertyInfo
+        )
     {
+        Sure.NotNull (propertyInfo);
+
         PropertyInfo = propertyInfo;
     }
 
-    public PropertyInfo PropertyInfo { get; }
+    #endregion
 
-    public object GetValue (object target) => PropertyInfo.GetValue (target, null);
+    #region IValueGetter members
 
-    public string Name => PropertyInfo.Name;
-
-    public Type DeclaringType => PropertyInfo.DeclaringType;
-
-    public Type ValueType => PropertyInfo.PropertyType;
-
-    public Expression ChainExpression (Expression body)
+    /// <inheritdoc cref="IValueGetter.GetValue"/>
+    public object? GetValue
+        (
+            object target
+        )
     {
+        Sure.NotNull (target);
+
+        return PropertyInfo.GetValue (target, null);
+    }
+
+    /// <inheritdoc cref="IValueGetter.ChainExpression"/>
+    public Expression ChainExpression
+        (
+            Expression body
+        )
+    {
+        Sure.NotNull (body);
+
         var memberExpression = Expression.Property (body, PropertyInfo);
         if (!PropertyInfo.PropertyType.GetTypeInfo().IsValueType)
         {
@@ -54,32 +92,33 @@ public class PropertyValueGetter : IValueGetter
         return Expression.Convert (memberExpression, typeof (object));
     }
 
-    public void SetValue (object target, object propertyValue) =>
-        PropertyInfo.SetValue (target, propertyValue, null);
-
-    public override bool Equals (object? obj)
+    /// <inheritdoc cref="IValueGetter.SetValue"/>
+    public void SetValue
+        (
+            object target,
+            object? propertyValue
+        )
     {
-        if (ReferenceEquals (null, obj))
-        {
-            return false;
-        }
+        Sure.NotNull (target);
 
-        if (ReferenceEquals (this, obj))
-        {
-            return true;
-        }
-
-        if (obj.GetType() != typeof (PropertyValueGetter))
-        {
-            return false;
-        }
-
-        return Equals ((PropertyValueGetter)obj);
+        PropertyInfo.SetValue (target, propertyValue, null);
     }
 
-    public bool Equals (PropertyValueGetter other)
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
+    public bool Equals
+        (
+            PropertyValueGetter? other
+        )
     {
-        if (ReferenceEquals (null, other))
+        if (other is null)
         {
             return false;
         }
@@ -92,5 +131,31 @@ public class PropertyValueGetter : IValueGetter
         return other.PropertyInfo.PropertyMatches (PropertyInfo);
     }
 
-    public override int GetHashCode() => PropertyInfo?.GetHashCode() ?? 0;
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.Equals(object?)"/>
+    public override bool Equals
+        (
+            object? obj
+        )
+    {
+        if (obj is null)
+        {
+            return false;
+        }
+
+        if (ReferenceEquals (this, obj))
+        {
+            return true;
+        }
+
+        return obj is PropertyValueGetter getter && Equals (getter);
+    }
+
+    /// <inheritdoc cref="object.GetHashCode"/>
+    public override int GetHashCode() => PropertyInfo.GetHashCode();
+
+    #endregion
 }

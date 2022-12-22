@@ -3,22 +3,29 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* BrTag.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 namespace AM.HtmlTags;
 
-public class BrTag : HtmlTag
+/// <summary>
+///
+/// </summary>
+public class BrTag
+    : HtmlTag
 {
-    public BrTag() : base ("br")
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
+    public BrTag()
+        : base ("br")
     {
+        // пустое тело конструктора
     }
+
+    #endregion
 }
