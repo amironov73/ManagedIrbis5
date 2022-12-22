@@ -10,7 +10,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UseNameofExpression
 
-/*
+/* MethodValueGetter.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -27,25 +27,15 @@ using System.Reflection;
 
 namespace AM.HtmlTags.Reflection;
 
-public class MethodValueGetter : IValueGetter
+/// <summary>
+///
+/// </summary>
+public class MethodValueGetter
+    : IValueGetter
 {
-    private readonly MethodInfo _methodInfo;
-    private readonly object[] _arguments;
+    #region Proeprties
 
-    public MethodValueGetter (MethodInfo methodInfo, object[] arguments)
-    {
-        if (arguments.Length > 1)
-        {
-            throw new NotSupportedException (
-                "ReflectionHelper only supports methods with no arguments or a single indexer argument");
-        }
-
-        _methodInfo = methodInfo;
-        _arguments = arguments;
-    }
-
-    public object GetValue (object target) => _methodInfo.Invoke (target, _arguments);
-
+    /// <inheritdoc cref="IValueGetter.Name"/>
     public string Name
     {
         get
@@ -64,45 +54,105 @@ public class MethodValueGetter : IValueGetter
         }
     }
 
-    public Type DeclaringType => _methodInfo.DeclaringType;
+    /// <inheritdoc cref="IValueGetter.DeclaringType"/>
+    public Type? DeclaringType => _methodInfo.DeclaringType;
 
+    /// <inheritdoc cref="IValueGetter.ValueType"/>
     public Type ValueType => _methodInfo.ReturnType;
 
+    /// <summary>
+    ///
+    /// </summary>
     public Type ReturnType => _methodInfo.ReturnType;
 
-    public Expression ChainExpression (Expression body)
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="methodInfo"></param>
+    /// <param name="arguments"></param>
+    /// <exception cref="NotSupportedException"></exception>
+    public MethodValueGetter
+        (
+            MethodInfo methodInfo,
+            object[] arguments
+        )
+    {
+        Sure.NotNull (methodInfo);
+        Sure.NotNull (arguments);
+
+        if (arguments.Length > 1)
+        {
+            throw new NotSupportedException
+                (
+                    "ReflectionHelper only supports methods with no arguments or a single indexer argument"
+                );
+        }
+
+        _methodInfo = methodInfo;
+        _arguments = arguments;
+    }
+
+    #endregion
+
+    #region Private members
+
+    private readonly MethodInfo _methodInfo;
+
+    private readonly object[] _arguments;
+
+    #endregion
+
+    #region IValueGetter members
+
+    /// <inheritdoc cref="IValueGetter.GetValue"/>
+    public object? GetValue
+        (
+            object target
+        )
+    {
+        Sure.NotNull (target);
+
+        return _methodInfo.Invoke (target, _arguments);
+    }
+
+    /// <inheritdoc cref="IValueGetter.ChainExpression"/>
+    public Expression ChainExpression
+        (
+            Expression body
+        )
     {
         throw new NotSupportedException();
     }
 
-    public void SetValue (object target, object propertyValue)
+    /// <inheritdoc cref="IValueGetter.SetValue"/>
+    public void SetValue
+        (
+            object target,
+            object? propertyValue
+        )
     {
         throw new NotSupportedException();
     }
 
-    public override bool Equals (object obj)
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
+    public bool Equals
+        (
+            MethodValueGetter? other
+        )
     {
-        if (ReferenceEquals (null, obj))
-        {
-            return false;
-        }
-
-        if (ReferenceEquals (this, obj))
-        {
-            return true;
-        }
-
-        if (obj.GetType() != typeof (MethodValueGetter))
-        {
-            return false;
-        }
-
-        return Equals ((MethodValueGetter)obj);
-    }
-
-    public bool Equals (MethodValueGetter other)
-    {
-        if (ReferenceEquals (null, other))
+        if (other is null)
         {
             return false;
         }
@@ -112,20 +162,46 @@ public class MethodValueGetter : IValueGetter
             return true;
         }
 
-        return Equals (other._methodInfo, _methodInfo) && Enumerable.SequenceEqual (other._arguments, _arguments);
+        return Equals (other._methodInfo, _methodInfo) && other._arguments.SequenceEqual (_arguments);
     }
 
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.Equals(object?)"/>
+    public override bool Equals
+        (
+            object? obj
+        )
+    {
+        if (obj is null)
+        {
+            return false;
+        }
+
+        if (ReferenceEquals (this, obj))
+        {
+            return true;
+        }
+
+        return obj is MethodValueGetter getter && Equals (getter);
+    }
+
+    /// <inheritdoc cref="object.GetHashCode"/>
     public override int GetHashCode()
     {
         unchecked
         {
             if (_arguments.Length != 0)
             {
-                return ((_methodInfo != null ? _methodInfo.GetHashCode() : 0) * 397) ^
-                       (_arguments[0] != null ? _arguments[0].GetHashCode() : 0);
+                return ((_methodInfo != null! ? _methodInfo.GetHashCode() : 0) * 397) ^
+                       (_arguments[0] != null! ? _arguments[0].GetHashCode() : 0);
             }
 
             return _methodInfo.GetHashCode();
         }
     }
+
+    #endregion
 }
