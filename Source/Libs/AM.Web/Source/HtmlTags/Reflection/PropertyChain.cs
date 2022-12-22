@@ -3,14 +3,9 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* PropertyChain.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -28,45 +23,51 @@ using System.Reflection;
 
 namespace AM.HtmlTags.Reflection;
 
-public class PropertyChain : IAccessor
+/// <summary>
+///
+/// </summary>
+public class PropertyChain
+    : IAccessor
 {
-    private readonly IValueGetter[] _chain;
-    private readonly IValueGetter[] _valueGetters;
+    #region Properties
 
-
-    public PropertyChain (IValueGetter[] valueGetters)
+    /// <summary>
+    ///
+    /// </summary>
+    public string FieldName
     {
-        _chain = new IValueGetter[valueGetters.Length - 1];
-        for (int i = 0; i < _chain.Length; i++)
+        get
         {
-            _chain[i] = valueGetters[i];
-        }
+            var last = _valueGetters.Last();
+            if (last is PropertyValueGetter)
+            {
+                return last.Name;
+            }
 
-        _valueGetters = valueGetters;
+            var previous = _valueGetters[^2];
+            return previous.Name + last.Name;
+        }
     }
 
+    /// <inheritdoc cref="IAccessor.PropertyType"/>
+    public Type? PropertyType => _valueGetters.Last().ValueType;
+
+    /// <inheritdoc cref="IAccessor.InnerProperty"/>
+    public PropertyInfo? InnerProperty => (_valueGetters.Last() as PropertyValueGetter)?.PropertyInfo;
+
+    /// <inheritdoc cref="IAccessor.DeclaringType"/>
+    public Type? DeclaringType => _chain[0].DeclaringType;
+
+    /// <inheritdoc cref="IAccessor.PropertyNames"/>
+    public string[] PropertyNames => _valueGetters.Select (x => x.Name).ToArray();
+
+    /// <summary>
+    ///
+    /// </summary>
     public IValueGetter[] ValueGetters => _valueGetters;
 
-
-    public void SetValue (object target, object propertyValue)
-    {
-        target = FindInnerMostTarget (target);
-        if (target == null)
-        {
-            return;
-        }
-
-        SetValueOnInnerObject (target, propertyValue);
-    }
-
-    public object GetValue (object target)
-    {
-        target = FindInnerMostTarget (target);
-
-        return target == null ? null : _valueGetters.Last().GetValue (target);
-    }
-
-    public Type OwnerType
+    /// <inheritdoc cref="IAccessor.OwnerType"/>
+    public Type? OwnerType
     {
         get
         {
@@ -74,8 +75,7 @@ public class PropertyChain : IAccessor
             var last = _valueGetters.Last();
             if (last is MethodValueGetter || last is IndexerValueGetter)
             {
-                var nextUp = _chain.Reverse().Skip (1).FirstOrDefault() as PropertyValueGetter;
-                if (nextUp != null)
+                if (_chain.Reverse().Skip (1).FirstOrDefault() is PropertyValueGetter nextUp)
                 {
                     return nextUp.PropertyInfo.PropertyType;
                 }
@@ -87,50 +87,105 @@ public class PropertyChain : IAccessor
         }
     }
 
-    public string FieldName
-    {
-        get
-        {
-            var last = _valueGetters.Last();
-            if (last is PropertyValueGetter)
-            {
-                return last.Name;
-            }
+    #endregion
 
-            var previous = _valueGetters[_valueGetters.Length - 2];
-            return previous.Name + last.Name;
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="valueGetters"></param>
+    public PropertyChain
+        (
+            IValueGetter[] valueGetters
+        )
+    {
+        Sure.NotNull (valueGetters);
+
+        _chain = new IValueGetter[valueGetters.Length - 1];
+        for (var i = 0; i < _chain.Length; i++)
+        {
+            _chain[i] = valueGetters[i];
+        }
+
+        _valueGetters = valueGetters;
+    }
+
+    #endregion
+
+    #region Private members
+
+    private readonly IValueGetter[] _chain;
+    private readonly IValueGetter[] _valueGetters;
+
+    #endregion
+
+    #region IValueGetter members
+
+    /// <inheritdoc cref="IAccessor.SetValue"/>
+    public void SetValue
+        (
+            object target,
+            object? propertyValue
+        )
+    {
+        Sure.NotNull (target);
+
+        var found = FindInnerMostTarget (target);
+        if (found is not null)
+        {
+            SetValueOnInnerObject (found, propertyValue);
         }
     }
 
-    public Type PropertyType => _valueGetters.Last().ValueType;
-
-    public PropertyInfo InnerProperty => (_valueGetters.Last() as PropertyValueGetter)?.PropertyInfo;
-
-    public Type DeclaringType => _chain[0].DeclaringType;
-
-    public IAccessor GetChildAccessor<T> (Expression<Func<T, object>> expression)
+    /// <inheritdoc cref="IAccessor.GetValue"/>
+    public object? GetValue
+        (
+            object target
+        )
     {
+        Sure.NotNull (target);
+
+        var inner = FindInnerMostTarget (target);
+
+        return inner is null ? null : _valueGetters.Last().GetValue (inner);
+    }
+
+    /// <inheritdoc cref="IAccessor.GetChildAccessor{T}"/>
+    public IAccessor GetChildAccessor<T>
+        (
+            Expression<Func<T, object>> expression
+        )
+    {
+        Sure.NotNull (expression);
+
         var accessor = expression.ToAccessor();
         var allGetters = Getters().Union (accessor.Getters()).ToArray();
         return new PropertyChain (allGetters);
     }
 
-    public string[] PropertyNames => _valueGetters.Select (x => x.Name).ToArray();
 
-
+    /// <inheritdoc cref="IAccessor.ToExpression{T}"/>
     public Expression<Func<T, object>> ToExpression<T>()
     {
-        ParameterExpression parameter = Expression.Parameter (typeof (T), "x");
+        var parameter = Expression.Parameter (typeof (T), "x");
         Expression body = parameter;
 
         _valueGetters.Each (getter => { body = getter.ChainExpression (body); });
 
-        Type delegateType = typeof (Func<,>).MakeGenericType (typeof (T), typeof (object));
+        var delegateType = typeof (Func<,>).MakeGenericType (typeof (T), typeof (object));
+
         return (Expression<Func<T, object>>)Expression.Lambda (delegateType, body, parameter);
     }
 
-    public IAccessor Prepend (PropertyInfo property)
+    /// <inheritdoc cref="IAccessor.Prepend"/>
+    public IAccessor Prepend
+        (
+            PropertyInfo property
+        )
     {
+        Sure.NotNull (property);
+
         var list = new List<IValueGetter>
         {
             new PropertyValueGetter (property)
@@ -140,8 +195,8 @@ public class PropertyChain : IAccessor
         return new PropertyChain (list.ToArray());
     }
 
+    /// <inheritdoc cref="IAccessor.Getters"/>
     public IEnumerable<IValueGetter> Getters() => _valueGetters;
-
 
     /// <summary>
     ///     Concatenated names of all the properties in the chain.
@@ -149,31 +204,67 @@ public class PropertyChain : IAccessor
     /// </summary>
     public string Name => _valueGetters.Select (x => x.Name).Join ("");
 
-    protected virtual void SetValueOnInnerObject (object target, object propertyValue)
-        => _valueGetters.Last().SetValue (target, propertyValue);
+    #endregion
 
+    #region Protected members
 
-    protected object FindInnerMostTarget (object target)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="target"></param>
+    /// <param name="propertyValue"></param>
+    protected virtual void SetValueOnInnerObject
+        (
+            object target,
+            object? propertyValue
+        )
     {
-        foreach (IValueGetter info in _chain)
+        Sure.NotNull (target);
+
+        _valueGetters.Last().SetValue (target, propertyValue);
+    }
+
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="target"></param>
+    /// <returns></returns>
+    protected object? FindInnerMostTarget
+        (
+            object target
+        )
+    {
+        Sure.NotNull (target);
+
+        var found = target;
+        foreach (var info in _chain)
         {
-            target = info.GetValue (target);
-            if (target == null)
+            found = info.GetValue (found);
+            if (found is null)
             {
                 return null;
             }
         }
 
-        return target;
+        return found;
     }
 
+    #endregion
 
-    public override string ToString() =>
-        _chain.First().DeclaringType.FullName + _chain.Select (x => x.Name).Join (".");
+    #region Public methods
 
-    public bool Equals (PropertyChain other)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
+    public bool Equals
+        (
+            PropertyChain? other
+        )
     {
-        if (ReferenceEquals (null, other))
+        if (other is null)
         {
             return false;
         }
@@ -186,7 +277,22 @@ public class PropertyChain : IAccessor
         return _valueGetters.SequenceEqual (other._valueGetters);
     }
 
-    public override bool Equals (object obj)
+    #endregion
+
+    #region Object members
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    public override string ToString() =>
+        _chain.First().DeclaringType!.FullName + _chain.Select (x => x.Name).Join (".");
+
+    /// <inheritdoc cref="object.Equals(object?)"/>
+    public override bool Equals
+        (
+            object? obj
+        )
     {
         if (ReferenceEquals (null, obj))
         {
@@ -198,13 +304,11 @@ public class PropertyChain : IAccessor
             return true;
         }
 
-        if (obj.GetType() != typeof (PropertyChain))
-        {
-            return false;
-        }
-
-        return Equals ((PropertyChain)obj);
+        return obj is PropertyChain chain && Equals (chain);
     }
 
+    /// <inheritdoc cref="object.GetHashCode"/>
     public override int GetHashCode() => _chain?.GetHashCode() ?? 0;
+
+    #endregion
 }
