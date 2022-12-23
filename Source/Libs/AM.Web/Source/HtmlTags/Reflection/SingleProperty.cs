@@ -3,14 +3,11 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable CoVariantArrayConversion
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* SingleProperty.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -27,40 +24,101 @@ using System.Reflection;
 
 namespace AM.HtmlTags.Reflection;
 
-public class SingleProperty : IAccessor
+/// <summary>
+///
+/// </summary>
+public class SingleProperty
+    : IAccessor
 {
-    private readonly Type _ownerType;
+    #region Properties
 
-    public SingleProperty (PropertyInfo property)
+    /// <summary>
+    ///
+    /// </summary>
+    public string FieldName => InnerProperty.Name;
+
+    /// <inheritdoc cref="IAccessor.PropertyType"/>
+    public Type PropertyType => InnerProperty.PropertyType;
+
+    /// <inheritdoc cref="IAccessor.DeclaringType"/>
+    public Type? DeclaringType => InnerProperty.DeclaringType;
+
+    /// <inheritdoc cref="IAccessor.InnerProperty"/>
+    public PropertyInfo InnerProperty { get; }
+
+    /// <inheritdoc cref="IAccessor.OwnerType"/>
+    public Type? OwnerType => _ownerType ?? DeclaringType;
+
+    /// <inheritdoc cref="IAccessor.PropertyNames"/>
+    public string[] PropertyNames => new[] { InnerProperty.Name };
+
+    /// <inheritdoc cref="IAccessor.Name"/>
+    public string Name => InnerProperty.Name;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="property"></param>
+    public SingleProperty
+        (
+            PropertyInfo property
+        )
     {
+        Sure.NotNull (property);
+
         InnerProperty = property;
     }
 
-    public SingleProperty (PropertyInfo property, Type ownerType)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="property"></param>
+    /// <param name="ownerType"></param>
+    public SingleProperty
+        (
+            PropertyInfo property,
+            Type ownerType
+        )
     {
+        Sure.NotNull (property);
+        Sure.NotNull (ownerType);
+
         InnerProperty = property;
         _ownerType = ownerType;
     }
 
+    #endregion
 
-    public string FieldName => InnerProperty.Name;
+    #region Private members
 
-    public Type PropertyType => InnerProperty.PropertyType;
+    private readonly Type? _ownerType;
 
-    public Type DeclaringType => InnerProperty.DeclaringType;
+    #endregion
 
+    #region IAccessor members
 
-    public PropertyInfo InnerProperty { get; }
-
-    public IAccessor GetChildAccessor<T> (Expression<Func<T, object>> expression)
+    /// <inheritdoc cref="IAccessor.GetChildAccessor{T}"/>
+    public IAccessor GetChildAccessor<T>
+        (
+            Expression<Func<T, object>> expression
+        )
     {
-        PropertyInfo property = ReflectionHelper.GetProperty (expression);
+        Sure.NotNull (expression);
+
+        var property = ReflectionHelper.GetProperty (expression);
         return new PropertyChain (new[]
-            { new PropertyValueGetter (InnerProperty), new PropertyValueGetter (property) });
+        {
+            new PropertyValueGetter (InnerProperty),
+            new PropertyValueGetter (property)
+
+        });
     }
 
-    public string[] PropertyNames => new[] { InnerProperty.Name };
-
+    /// <inheritdoc cref="IAccessor.ToExpression{T}"/>
     public Expression<Func<T, object>> ToExpression<T>()
     {
         var parameter = Expression.Parameter (typeof (T), "x");
@@ -75,81 +133,129 @@ public class SingleProperty : IAccessor
         return (Expression<Func<T, object>>)Expression.Lambda (delegateType, body, parameter);
     }
 
-    public IAccessor Prepend (PropertyInfo property)
+    /// <inheritdoc cref="IAccessor.Prepend"/>
+    public IAccessor Prepend
+        (
+            PropertyInfo property
+        )
     {
-        return
-            new PropertyChain (new IValueGetter[]
-                { new PropertyValueGetter (property), new PropertyValueGetter (InnerProperty) });
+        Sure.NotNull (property);
+
+        return new PropertyChain (new IValueGetter[]
+        {
+            new PropertyValueGetter (property),
+            new PropertyValueGetter (InnerProperty)
+
+        });
     }
 
+    /// <inheritdoc cref="IAccessor.Getters"/>
     public IEnumerable<IValueGetter> Getters()
     {
         yield return new PropertyValueGetter (InnerProperty);
     }
 
-    public string Name => InnerProperty.Name;
-
-    public virtual void SetValue (object target, object propertyValue)
+    /// <inheritdoc cref="IAccessor.SetValue"/>
+    public virtual void SetValue
+        (
+            object target,
+            object? propertyValue
+        )
     {
+        Sure.NotNull (target);
+
         if (InnerProperty.CanWrite)
         {
             InnerProperty.SetValue (target, propertyValue, null);
         }
     }
 
-    public object GetValue (object target) => InnerProperty.GetValue (target, null);
-
-    public Type OwnerType => _ownerType ?? DeclaringType;
-
-
-    public static SingleProperty Build<T> (Expression<Func<T, object>> expression)
+    /// <inheritdoc cref="IAccessor.GetValue"/>
+    public object? GetValue
+        (
+            object target
+        )
     {
-        PropertyInfo property = ReflectionHelper.GetProperty (expression);
+        Sure.NotNull (target);
+
+        return InnerProperty.GetValue (target, null);
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="expression"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static SingleProperty Build<T>
+        (
+            Expression<Func<T, object>> expression
+        )
+    {
+        var property = ReflectionHelper.GetProperty (expression);
         return new SingleProperty (property);
     }
 
-    public static SingleProperty Build<T> (string propertyName)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="propertyName"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static SingleProperty Build<T>
+        (
+            string propertyName
+        )
     {
-        PropertyInfo property = typeof (T).GetProperty (propertyName);
-        return new SingleProperty (property);
+        var property = typeof (T).GetProperty (propertyName);
+        return new SingleProperty (property!);
     }
 
-    public bool Equals (SingleProperty other)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
+    public bool Equals
+        (
+            SingleProperty? other
+        )
     {
-        if (ReferenceEquals (null, other))
+        if (other is null)
         {
             return false;
         }
 
-        if (ReferenceEquals (this, other))
-        {
-            return true;
-        }
-
-        return InnerProperty.PropertyMatches (other.InnerProperty);
+        return ReferenceEquals (this, other)
+               || InnerProperty.PropertyMatches (other.InnerProperty);
     }
 
-    public override bool Equals (object obj)
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.Equals(object?)"/>
+    public override bool Equals
+        (
+            object? obj
+        )
     {
-        if (ReferenceEquals (null, obj))
+        if (obj is null)
         {
             return false;
         }
 
-        if (ReferenceEquals (this, obj))
-        {
-            return true;
-        }
-
-        if (obj.GetType() != typeof (SingleProperty))
-        {
-            return false;
-        }
-
-        return Equals ((SingleProperty)obj);
+        return ReferenceEquals (this, obj)
+               || obj is SingleProperty property && Equals (property);
     }
 
-    public override int GetHashCode() => (InnerProperty != null
-        ? (InnerProperty.DeclaringType?.FullName + "." + InnerProperty.Name).GetHashCode()
-        : 0);
+    /// <inheritdoc cref="object.GetHashCode"/>
+    public override int GetHashCode() =>
+        (InnerProperty.DeclaringType?.FullName + "." + InnerProperty.Name).GetHashCode();
+
+    #endregion
 }
