@@ -22,12 +22,14 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 using AM.Text.Output;
 
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Data;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.LogicalTree;
@@ -384,6 +386,32 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
+    /// Получение цвета как динамического ресурса темы.
+    /// </summary>
+    public static IBinding DynamicColor
+        (
+            [CallerMemberName] string? key = null
+        )
+    {
+        Sure.NotNullNorEmpty (key);
+
+        return new DynamicResourceExtension (key!);
+    }
+
+    /// <summary>
+    /// Получение кисти как динамического ресурса темы.
+    /// </summary>
+    public static IBinding DynamicBrush
+        (
+            [CallerMemberName] string? key = null
+        )
+    {
+        Sure.NotNullNorEmpty (key);
+
+        return new DynamicResourceExtension (key!);
+    }
+
+    /// <summary>
     /// Поиск первого дочернего элемента с контекстом данных указанного типа.
     /// </summary>
     public static IDataContextProvider? FindChildWithDataContext<TDataContext>
@@ -407,6 +435,132 @@ public static class AvaloniaUtility
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Получение кисти как статического ресурса темы.
+    /// </summary>
+    public static IBrush FindBrush
+        (
+            this IResourceHost host,
+            [CallerMemberName] string? key = null
+        )
+    {
+        Sure.NotNullNorEmpty (key);
+
+        var found = host.FindResource (key!);
+        if (found is null)
+        {
+            return Brushes.Black;
+        }
+
+        return (IBrush) found;
+    }
+
+    /// <summary>
+    /// Получение цвета как статического ресурса темы.
+    /// </summary>
+    /// <example>
+    /// Предполагаемый сценарий использования
+    /// <code>
+    /// public static Color SystemAccentColor (this IResourceHost host) =&gt; host.FindColor();
+    /// </code>
+    /// </example>
+    public static Color FindColor
+        (
+            this IResourceHost host,
+            [CallerMemberName] string? key = null
+        )
+    {
+        Sure.NotNullNorEmpty (key);
+
+        var found = host.FindResource (key!);
+        if (found is null)
+        {
+            return Colors.Black;
+        }
+
+        return (Color) found;
+    }
+
+    /// <summary>
+    /// Получение скругления углов как статического ресурса темы.
+    /// </summary>
+    public static CornerRadius FindCornerRadius
+        (
+            this IResourceHost host,
+            [CallerMemberName] string? key = null
+        )
+    {
+        Sure.NotNullNorEmpty (key);
+
+        var found = host.FindResource (key!);
+        if (found is null)
+        {
+            return default;
+        }
+
+        return (CornerRadius) found;
+    }
+
+    /// <summary>
+    /// Получение числа с плавающей точкой как статического ресурса темы.
+    /// </summary>
+    public static double FindDouble
+        (
+            this IResourceHost host,
+            [CallerMemberName] string? key = null
+        )
+    {
+        Sure.NotNullNorEmpty (key);
+
+        var found = host.FindResource (key!);
+        if (found is null)
+        {
+            return 0;
+        }
+
+        return Convert.ToDouble (found);
+    }
+
+    /// <summary>
+    /// Получение размера как статического ресурса темы.
+    /// </summary>
+    public static Size FindSize
+        (
+            this IResourceHost host,
+            [CallerMemberName] string? key = null
+        )
+    {
+        Sure.NotNullNorEmpty (key);
+
+        var found = host.FindResource (key!);
+        if (found is null)
+        {
+            return default;
+        }
+
+        return (Size) found;
+    }
+
+    /// <summary>
+    /// Получение толщины как статического ресурса темы.
+    /// </summary>
+    public static Thickness FindThickness
+        (
+            this IResourceHost host,
+            [CallerMemberName] string? key = null
+        )
+    {
+        Sure.NotNullNorEmpty (key);
+
+        var found = host.FindResource (key!);
+        if (found is null)
+        {
+            return default;
+        }
+
+        return (Thickness) found;
     }
 
     /// <summary>
