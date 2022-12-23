@@ -3,20 +3,18 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* ITypeDescriptorCache.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 #endregion
 
@@ -24,21 +22,13 @@ using System.Linq;
 
 namespace AM.HtmlTags.Reflection;
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-
-public interface ITypeDescriptorCache
+/// <summary>
+///
+/// </summary>
+public class TypeDescriptorCache
+    : ITypeDescriptorCache
 {
-    IDictionary<string, PropertyInfo> GetPropertiesFor<T>();
-    IDictionary<string, PropertyInfo> GetPropertiesFor (Type itemType);
-    void ForEachProperty (Type itemType, Action<PropertyInfo> action);
-    void ClearAll();
-}
-
-public class TypeDescriptorCache : ITypeDescriptorCache
-{
-    private static readonly Cache<Type, IDictionary<string, PropertyInfo>> _cache;
+    #region Construciton
 
     static TypeDescriptorCache()
     {
@@ -48,18 +38,61 @@ public class TypeDescriptorCache : ITypeDescriptorCache
                 .ToDictionary (propertyInfo => propertyInfo.Name));
     }
 
+    #endregion
+
+    #region Private members
+
+    private static readonly Cache<Type, IDictionary<string, PropertyInfo>> _cache;
+
+    #endregion
+
+    #region ITypeDescriptorCache
+
+    /// <inheritdoc cref="ITypeDescriptorCache.GetPropertiesFor{T}"/>
     public IDictionary<string, PropertyInfo> GetPropertiesFor<T>() => GetPropertiesFor (typeof (T));
 
+    /// <inheritdoc cref="ITypeDescriptorCache.GetPropertiesFor"/>
     public IDictionary<string, PropertyInfo> GetPropertiesFor (Type itemType) => _cache[itemType];
 
-    public void ForEachProperty (Type itemType, Action<PropertyInfo> action) =>
-        _cache[itemType].Values.Each (action);
+    /// <inheritdoc cref="ITypeDescriptorCache.ForEachProperty"/>
+    public void ForEachProperty
+        (
+            Type itemType,
+            Action<PropertyInfo> action
+        )
+    {
+        Sure.NotNull (itemType);
+        Sure.NotNull (action);
 
+        _cache[itemType].Values.Each (action);
+    }
+
+    /// <inheritdoc cref="ITypeDescriptorCache.ClearAll"/>
     public void ClearAll() => _cache.ClearAll();
 
-    public static PropertyInfo GetPropertyFor (Type modelType, string propertyName)
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="modelType"></param>
+    /// <param name="propertyName"></param>
+    /// <returns></returns>
+    public static PropertyInfo? GetPropertyFor
+        (
+            Type modelType,
+            string propertyName
+        )
     {
+        Sure.NotNull (modelType);
+        Sure.NotNullNorEmpty (propertyName);
+
         var dict = _cache[modelType];
+
         return dict.ContainsKey (propertyName) ? dict[propertyName] : null;
     }
+
+    #endregion
 }
