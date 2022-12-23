@@ -3,14 +3,11 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
 // ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
+// ReSharper disable VirtualMemberCallInConstructor
 
-/*
+/* ReflectionHelper.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -30,10 +27,19 @@ namespace AM.HtmlTags.Reflection;
 
 internal static class ReflectionHelper
 {
-    public static bool MeetsSpecialGenericConstraints (Type genericArgType, Type proposedSpecificType)
+    #region Public methods
+
+    public static bool MeetsSpecialGenericConstraints
+        (
+            Type genericArgType,
+            Type proposedSpecificType
+        )
     {
-        GenericParameterAttributes gpa = genericArgType.GetTypeInfo().GenericParameterAttributes;
-        GenericParameterAttributes constraints = gpa & GenericParameterAttributes.SpecialConstraintMask;
+        Sure.NotNull (genericArgType);
+        Sure.NotNull (proposedSpecificType);
+
+        var gpa = genericArgType.GetTypeInfo().GenericParameterAttributes;
+        var constraints = gpa & GenericParameterAttributes.SpecialConstraintMask;
 
         // No constraints, away we go!
         if (constraints == GenericParameterAttributes.None)
@@ -65,57 +71,60 @@ internal static class ReflectionHelper
         return true;
     }
 
-    public static PropertyInfo GetProperty<TModel> (Expression<Func<TModel, object>> expression)
+    public static PropertyInfo GetProperty<TModel>
+        (
+            Expression<Func<TModel, object>> expression
+        )
     {
-        MemberExpression memberExpression = GetMemberExpression (expression);
+        Sure.NotNull (expression);
+
+        var memberExpression = GetMemberExpression (expression);
         return (PropertyInfo)memberExpression.Member;
     }
 
-    public static PropertyInfo GetProperty<TModel, T> (Expression<Func<TModel, T>> expression)
+    public static PropertyInfo GetProperty<TModel, T>
+        (
+            Expression<Func<TModel, T>> expression
+        )
     {
-        MemberExpression memberExpression = GetMemberExpression (expression);
+        Sure.NotNull (expression);
+
+        var memberExpression = GetMemberExpression (expression);
         return (PropertyInfo)memberExpression.Member;
     }
 
-    public static PropertyInfo GetProperty (LambdaExpression expression)
+    public static PropertyInfo GetProperty
+        (
+            LambdaExpression expression
+        )
     {
-        MemberExpression memberExpression = GetMemberExpression (expression, true);
-        return (PropertyInfo)memberExpression.Member;
+        Sure.NotNull (expression);
+
+        var memberExpression = GetMemberExpression (expression, true);
+        return (PropertyInfo) memberExpression!.Member;
     }
 
-    private static MemberExpression GetMemberExpression<TModel, T> (Expression<Func<TModel, T>> expression)
+    public static IAccessor GetAccessor
+        (
+            LambdaExpression expression
+        )
     {
-        MemberExpression memberExpression = null;
-        if (expression.Body.NodeType == ExpressionType.Convert)
-        {
-            var body = (UnaryExpression)expression.Body;
-            memberExpression = body.Operand as MemberExpression;
-        }
-        else if (expression.Body.NodeType == ExpressionType.MemberAccess)
-        {
-            memberExpression = expression.Body as MemberExpression;
-        }
+        Sure.NotNull (expression);
 
+        var memberExpression = GetMemberExpression (expression, true);
 
-        if (memberExpression == null)
-        {
-            throw new ArgumentException ("Not a member access", "member");
-        }
-
-        return memberExpression;
+        return GetAccessor (memberExpression!);
     }
 
-    public static IAccessor GetAccessor (LambdaExpression expression)
+    public static MemberExpression? GetMemberExpression
+        (
+            this LambdaExpression expression,
+            bool enforceMemberExpression
+        )
     {
-        MemberExpression memberExpression = GetMemberExpression (expression, true);
+        Sure.NotNull (expression);
 
-        return GetAccessor (memberExpression);
-    }
-
-    public static MemberExpression GetMemberExpression (this LambdaExpression expression,
-        bool enforceMemberExpression)
-    {
-        MemberExpression memberExpression = null;
+        MemberExpression? memberExpression = null;
         if (expression.Body.NodeType == ExpressionType.Convert)
         {
             var body = (UnaryExpression)expression.Body;
@@ -129,59 +138,85 @@ internal static class ReflectionHelper
 
         if (enforceMemberExpression && memberExpression == null)
         {
-            throw new ArgumentException ("Not a member access", "member");
+            throw new ArgumentException ("Not a member access", nameof (expression));
         }
 
         return memberExpression;
     }
 
-    public static bool IsMemberExpression<T> (Expression<Func<T, object>> expression) =>
-        IsMemberExpression<T, object> (expression);
-
-    public static bool IsMemberExpression<T, U> (Expression<Func<T, U>> expression) =>
-        GetMemberExpression (expression, false) != null;
-
-    public static IAccessor GetAccessor<TModel> (Expression<Func<TModel, object>> expression)
+    public static bool IsMemberExpression<T>
+        (
+            Expression<Func<T, object>> expression
+        )
     {
+        Sure.NotNull (expression);
+
+        return IsMemberExpression<T, object> (expression);
+    }
+
+    public static bool IsMemberExpression<T1, T2>
+        (
+            Expression<Func<T1, T2>> expression
+        )
+    {
+        Sure.NotNull (expression);
+
+        return GetMemberExpression (expression, false) is not null;
+    }
+
+    public static IAccessor GetAccessor<TModel>
+        (
+            Expression<Func<TModel, object>> expression
+        )
+    {
+        Sure.NotNull (expression);
+
         if (expression.Body is MethodCallExpression || expression.Body.NodeType == ExpressionType.ArrayIndex)
         {
             return GetAccessor (expression.Body);
         }
 
-        MemberExpression memberExpression = GetMemberExpression (expression);
+        var memberExpression = GetMemberExpression (expression);
 
         return GetAccessor (memberExpression);
     }
 
-    public static IAccessor GetAccessor (Expression memberExpression)
+    public static IAccessor GetAccessor
+        (
+            Expression memberExpression
+        )
     {
+        Sure.NotNull (memberExpression);
+
         var list = new List<IValueGetter>();
-
         BuildValueGetters (memberExpression, list);
-
-        if (list.Count == 1 && list[0] is PropertyValueGetter)
+        switch (list)
         {
-            return new SingleProperty (((PropertyValueGetter)list[0]).PropertyInfo);
-        }
+            case [PropertyValueGetter pvg]:
+                return new SingleProperty (pvg.PropertyInfo);
 
-        if (list.Count == 1 && list[0] is MethodValueGetter)
-        {
-            return new SingleMethod ((MethodValueGetter)list[0]);
-        }
+            case [MethodValueGetter mvg]:
+                return new SingleMethod (mvg);
 
-        if (list.Count == 1 && list[0] is IndexerValueGetter)
-        {
-            return new ArrayIndexer ((IndexerValueGetter)list[0]);
-        }
+            case [IndexerValueGetter ivg]:
+                return new ArrayIndexer (ivg);
 
-        list.Reverse();
-        return new PropertyChain (list.ToArray());
+            default:
+                list.Reverse();
+                return new PropertyChain (list.ToArray());
+        }
     }
 
-    private static void BuildValueGetters (Expression expression, IList<IValueGetter> list)
+    private static void BuildValueGetters
+        (
+            Expression expression,
+            ICollection<IValueGetter> list
+        )
     {
-        var memberExpression = expression as MemberExpression;
-        if (memberExpression != null)
+        Sure.NotNull (expression);
+        Sure.NotNull (list);
+
+        if (expression is MemberExpression memberExpression)
         {
             var propertyInfo = (PropertyInfo)memberExpression.Member;
             list.Add (new PropertyValueGetter (propertyInfo));
@@ -192,29 +227,27 @@ internal static class ReflectionHelper
         }
 
         //deals with collection indexers, an indexer [0] will look like a get(0) method call expression
-        var methodCallExpression = expression as MethodCallExpression;
-        if (methodCallExpression != null)
+        if (expression is MethodCallExpression methodCallExpression)
         {
             var methodInfo = methodCallExpression.Method;
-            Expression argument = methodCallExpression.Arguments.FirstOrDefault();
+            var argument = methodCallExpression.Arguments.FirstOrDefault();
 
             if (argument == null)
             {
-                var methodValueGetter = new MethodValueGetter (methodInfo, new object[0]);
+                var methodValueGetter = new MethodValueGetter (methodInfo, Array.Empty<object>());
                 list.Add (methodValueGetter);
             }
             else
             {
-                object value;
-                if (TryEvaluateExpression (argument, out value))
+                if (TryEvaluateExpression (argument, out var value))
                 {
-                    var methodValueGetter = new MethodValueGetter (methodInfo, new object[] { value });
+                    var methodValueGetter = new MethodValueGetter (methodInfo, new[] { value });
                     list.Add (methodValueGetter);
                 }
             }
 
 
-            if (methodCallExpression.Object != null)
+            if (methodCallExpression.Object is not null)
             {
                 BuildValueGetters (methodCallExpression.Object, list);
             }
@@ -226,10 +259,9 @@ internal static class ReflectionHelper
 
             var indexExpression = binaryExpression.Right;
 
-            object index;
-            if (TryEvaluateExpression (indexExpression, out index))
+            if (TryEvaluateExpression (indexExpression, out var index))
             {
-                var indexValueGetter = new IndexerValueGetter (binaryExpression.Left.Type, (int)index);
+                var indexValueGetter = new IndexerValueGetter (binaryExpression.Left.Type, (int) index!);
 
                 list.Add (indexValueGetter);
             }
@@ -238,9 +270,128 @@ internal static class ReflectionHelper
         }
     }
 
-    private static bool TryEvaluateExpression (Expression operation, out object value)
+    public static IAccessor GetAccessor<TModel, T>
+        (
+            Expression<Func<TModel, T>> expression
+        )
     {
-        if (operation == null)
+        Sure.NotNull (expression);
+
+        var memberExpression = GetMemberExpression (expression);
+
+        return GetAccessor (memberExpression);
+    }
+
+    public static MethodInfo GetMethod<T>
+        (
+            Expression<Func<T, object>> expression
+        )
+    {
+        Sure.NotNull (expression);
+
+        return new FindMethodVisitor (expression).Method;
+    }
+
+    public static MethodInfo GetMethod
+        (
+            Expression<Func<object>> expression
+        )
+    {
+        Sure.NotNull (expression);
+
+        return GetMethod<Func<object>> (expression);
+    }
+
+    public static MethodInfo GetMethod
+        (
+            Expression expression
+        )
+    {
+        Sure.NotNull (expression);
+
+        return new FindMethodVisitor (expression).Method;
+    }
+
+    public static MethodInfo GetMethod<TDelegate>
+        (
+            Expression<TDelegate> expression
+        )
+    {
+        Sure.NotNull (expression);
+
+        return new FindMethodVisitor (expression).Method;
+    }
+
+    public static MethodInfo GetMethod<T1, T2>
+        (
+            Expression<Func<T1, T2>> expression
+        )
+    {
+        Sure.NotNull (expression);
+
+        return new FindMethodVisitor (expression).Method;
+    }
+
+    public static MethodInfo GetMethod<T1, T2, T3>
+        (
+            Expression<Func<T1, T2, T3>> expression
+        )
+    {
+        Sure.NotNull (expression);
+
+        return new FindMethodVisitor (expression).Method;
+    }
+
+    public static MethodInfo GetMethod<T>
+        (
+            Expression<Action<T>> expression
+        )
+    {
+        Sure.NotNull (expression);
+
+        return new FindMethodVisitor (expression).Method;
+    }
+
+    #endregion
+
+    #region Private members
+
+    private static MemberExpression GetMemberExpression<TModel, T>
+        (
+            Expression<Func<TModel, T>> expression
+        )
+    {
+        Sure.NotNull (expression);
+
+        MemberExpression? memberExpression = null;
+        if (expression.Body.NodeType == ExpressionType.Convert)
+        {
+            var body = (UnaryExpression)expression.Body;
+            memberExpression = body.Operand as MemberExpression;
+        }
+        else if (expression.Body.NodeType == ExpressionType.MemberAccess)
+        {
+            memberExpression = expression.Body as MemberExpression;
+        }
+
+
+        if (memberExpression is null)
+        {
+            throw new ArgumentException ("Not a member access", nameof (expression));
+        }
+
+        return memberExpression;
+    }
+
+    private static bool TryEvaluateExpression
+        (
+            Expression? operation,
+            out object? value
+        )
+    {
+        Sure.NotNull (operation);
+
+        if (operation is null)
         {
             // used for static fields, etc
             value = null;
@@ -252,21 +403,21 @@ internal static class ReflectionHelper
             case ExpressionType.Constant:
                 value = ((ConstantExpression)operation).Value;
                 return true;
+
             case ExpressionType.MemberAccess:
-                MemberExpression me = (MemberExpression)operation;
-                object target;
-                if (TryEvaluateExpression (me.Expression, out target))
+                var me = (MemberExpression)operation;
+                if (TryEvaluateExpression (me.Expression, out var target))
                 {
                     // instance target
-                    if (me.Member is FieldInfo)
+                    if (me.Member is FieldInfo fieldInfo)
                     {
-                        value = ((FieldInfo)me.Member).GetValue (target);
+                        value = fieldInfo.GetValue (target);
                         return true;
                     }
 
-                    if (me.Member is PropertyInfo)
+                    if (me.Member is PropertyInfo propertyInfo)
                     {
-                        value = ((PropertyInfo)me.Member).GetValue (target, null);
+                        value = propertyInfo.GetValue (target, null);
                         return true;
                     }
                 }
@@ -278,46 +429,56 @@ internal static class ReflectionHelper
         return false;
     }
 
-    public static IAccessor GetAccessor<TModel, T> (Expression<Func<TModel, T>> expression)
-    {
-        MemberExpression memberExpression = GetMemberExpression (expression);
-
-        return GetAccessor (memberExpression);
-    }
-
-    public static MethodInfo GetMethod<T> (Expression<Func<T, object>> expression) =>
-        new FindMethodVisitor (expression).Method;
-
-    public static MethodInfo GetMethod (Expression<Func<object>> expression) =>
-        GetMethod<Func<object>> (expression);
-
-    public static MethodInfo GetMethod (Expression expression) => new FindMethodVisitor (expression).Method;
-
-    public static MethodInfo GetMethod<TDelegate> (Expression<TDelegate> expression) =>
-        new FindMethodVisitor (expression).Method;
-
-    public static MethodInfo GetMethod<T, U> (Expression<Func<T, U>> expression) =>
-        new FindMethodVisitor (expression).Method;
-
-    public static MethodInfo GetMethod<T, U, V> (Expression<Func<T, U, V>> expression) =>
-        new FindMethodVisitor (expression).Method;
-
-    public static MethodInfo GetMethod<T> (Expression<Action<T>> expression) =>
-        new FindMethodVisitor (expression).Method;
+    #endregion
 }
 
-public class FindMethodVisitor : ExpressionVisitor
+/// <summary>
+///
+/// </summary>
+public class FindMethodVisitor
+    : ExpressionVisitor
 {
-    public FindMethodVisitor (Expression expression)
+    #region Properties
+
+    /// <summary>
+    ///
+    /// </summary>
+    public MethodInfo Method { get; private set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="expression"></param>
+    public FindMethodVisitor
+        (
+            Expression expression
+        )
     {
+        Sure.NotNull (expression);
+
+        Method = null!;
         Visit (expression);
     }
 
-    public MethodInfo Method { get; private set; }
+    #endregion
 
-    protected override Expression VisitMethodCall (MethodCallExpression m)
+    #region ExpressionVisitor members
+
+    /// <inheritdoc cref="ExpressionVisitor.VisitMethodCall"/>
+    protected override Expression VisitMethodCall
+        (
+            MethodCallExpression expression
+        )
     {
-        Method = m.Method;
-        return m;
+        Sure.NotNull (expression);
+
+        Method = expression.Method;
+        return expression;
     }
+
+    #endregion
 }

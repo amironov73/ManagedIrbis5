@@ -3,14 +3,9 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* ReflectionExtensions.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,7 +15,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Linq;
 
 #endregion
 
@@ -28,55 +22,183 @@ using System.Linq;
 
 namespace AM.HtmlTags.Reflection;
 
+/// <summary>
+///
+/// </summary>
 public static class ReflectionExtensions
 {
-    public static U ValueOrDefault<T, U> (this T root, Expression<Func<T, U>> expression)
-        where T : class
+    #region Public methods
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="root"></param>
+    /// <param name="expression"></param>
+    /// <typeparam name="T1"></typeparam>
+    /// <typeparam name="T2"></typeparam>
+    /// <returns></returns>
+    public static T2 ValueOrDefault<T1, T2>
+        (
+            this T1? root,
+            Expression<Func<T1, T2>> expression
+        )
+        where T1: class
     {
-        if (root == null)
+        Sure.NotNull (expression);
+
+        if (root is null)
         {
-            return default (U);
+            return default!;
         }
 
         var accessor = ReflectionHelper.GetAccessor (expression);
-
         var result = accessor.GetValue (root);
 
-        return (U)(result ?? default (U));
+        return ((T2?)result ?? default (T2))!;
     }
 
-    public static IEnumerable<T> GetAllAttributes<T> (this IAccessor accessor) where T : Attribute =>
-        accessor.InnerProperty.GetCustomAttributes<T>();
-
-    public static void ForAttribute<T> (this IAccessor accessor, Action<T> action) where T : Attribute
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="accessor"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static IEnumerable<T> GetAllAttributes<T>
+        (
+            this IAccessor accessor
+        )
+        where T: Attribute
     {
-        foreach (T attribute in accessor.InnerProperty.GetCustomAttributes (typeof (T), true))
+        Sure.NotNull (accessor);
+
+        return accessor.InnerProperty.ThrowIfNull().GetCustomAttributes<T>();
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="accessor"></param>
+    /// <param name="action"></param>
+    /// <typeparam name="T"></typeparam>
+    public static void ForAttribute<T>
+        (
+            this IAccessor accessor,
+            Action<T> action
+        )
+        where T: Attribute
+    {
+        Sure.NotNull (accessor);
+        Sure.NotNull (action);
+
+        var innerProperty = accessor.InnerProperty.ThrowIfNull();
+        foreach (T attribute in innerProperty.GetCustomAttributes (typeof (T), true))
         {
             action (attribute);
         }
     }
 
-    public static T GetAttribute<T> (this IAccessor provider) where T : Attribute =>
-        provider.InnerProperty.GetCustomAttribute<T>();
-
-    public static bool HasAttribute<T> (this IAccessor provider) where T : Attribute =>
-        provider.InnerProperty.GetCustomAttribute<T>() != null;
-
-    public static IAccessor ToAccessor<T, TResult> (this Expression<Func<T, TResult>> expression) =>
-        ReflectionHelper.GetAccessor (expression);
-
-    public static string GetName<T> (this Expression<Func<T, object>> expression) =>
-        ReflectionHelper.GetAccessor (expression).Name;
-
-
-    public static void IfPropertyTypeIs<T> (this IAccessor accessor, Action action)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="provider"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static T? GetAttribute<T>
+        (
+            this IAccessor provider
+        )
+        where T: Attribute
     {
+        Sure.NotNull (provider);
+
+        return provider.InnerProperty.ThrowIfNull().GetCustomAttribute<T>();
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="provider"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static bool HasAttribute<T>
+        (
+            this IAccessor provider
+        )
+        where T: Attribute
+    {
+        return provider.InnerProperty.ThrowIfNull().GetCustomAttribute<T>() is not null;
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="expression"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="TResult"></typeparam>
+    /// <returns></returns>
+    public static IAccessor ToAccessor<T, TResult>
+        (
+            this Expression<Func<T, TResult>> expression
+        )
+    {
+        Sure.NotNull (expression);
+
+        return ReflectionHelper.GetAccessor (expression);
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="expression"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static string GetName<T>
+        (
+            this Expression<Func<T, object>> expression
+        )
+    {
+        Sure.NotNull (expression);
+
+        return ReflectionHelper.GetAccessor (expression).Name;
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="accessor"></param>
+    /// <param name="action"></param>
+    /// <typeparam name="T"></typeparam>
+    public static void IfPropertyTypeIs<T>
+        (
+            this IAccessor accessor,
+            Action action
+        )
+    {
+        Sure.NotNull (accessor);
+        Sure.NotNull (action);
+
         if (accessor.PropertyType == typeof (T))
         {
             action();
         }
     }
 
-    public static bool IsInteger (this IAccessor accessor) => accessor.PropertyType.IsTypeOrNullableOf<int>() ||
-                                                             accessor.PropertyType.IsTypeOrNullableOf<long>();
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="accessor"></param>
+    /// <returns></returns>
+    public static bool IsInteger
+        (
+            this IAccessor accessor
+        )
+    {
+        Sure.NotNull (accessor);
+
+        var propertyType = accessor.PropertyType.ThrowIfNull();
+        return propertyType.IsTypeOrNullableOf<int>() ||
+               propertyType.IsTypeOrNullableOf<long>();
+    }
+
+    #endregion
 }

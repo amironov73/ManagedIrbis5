@@ -78,7 +78,7 @@ public class MethodValueGetter
     public MethodValueGetter
         (
             MethodInfo methodInfo,
-            object[] arguments
+            object?[] arguments
         )
     {
         Sure.NotNull (methodInfo);
