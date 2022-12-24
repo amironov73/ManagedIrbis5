@@ -6,7 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
-/* ArrayToListConverter.cs -- преобразует массив в строку
+/* StorageItemToImageConverter.cs -- преобразует IStorageItem в Bitmap
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -15,8 +15,12 @@
 using Avalonia.Data.Converters;
 
 using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
+using System.IO;
+
+using Avalonia.Media.Imaging;
+using Avalonia.Platform.Storage;
 
 #endregion
 
@@ -25,9 +29,9 @@ using System.Globalization;
 namespace AM.Avalonia.Converters;
 
 /// <summary>
-/// Преобразует массив в строку.
+/// Преобразует <see cref="IStorageItem"/> в <see cref="Bitmap"/>.
 /// </summary>
-public sealed class ArrayToListConverter
+public sealed class StorageItemToImageConverter
     : IValueConverter
 {
     #region Properties
@@ -35,29 +39,40 @@ public sealed class ArrayToListConverter
     /// <summary>
     /// Общий экземпляр конвертера.
     /// </summary>
-    public static readonly IValueConverter Instance = new ArrayToListConverter();
+    public static readonly IValueConverter Instance = new StorageItemToImageConverter();
 
     #endregion
 
-    #region IValueConverter
+    #region IValueConverter members
 
     /// <inheritdoc cref="IValueConverter.Convert"/>
     public object? Convert
         (
             object? value,
             Type targetType,
-            object? parameter, CultureInfo culture
+            object? parameter,
+            CultureInfo culture
         )
     {
-        if (value is IEnumerable<string> enumerable)
+        if (value is IStorageItem item && item.TryGetUri (out var uri))
         {
-            return string.Join (", ", enumerable);
+            try
+            {
+                using var stream = File.OpenRead (uri.LocalPath);
+                var image = new Bitmap (stream);
+
+                return image;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine (ex);
+            }
         }
 
         return null;
     }
 
-    /// <inheritdoc cref="IValueConverter.ConvertBack"/>
+    /// <inheritdoc cref="ConvertBack"/>
     public object? ConvertBack
         (
             object? value,
@@ -66,7 +81,7 @@ public sealed class ArrayToListConverter
             CultureInfo culture
         )
     {
-        return null;
+        throw new NotImplementedException();
     }
 
     #endregion
