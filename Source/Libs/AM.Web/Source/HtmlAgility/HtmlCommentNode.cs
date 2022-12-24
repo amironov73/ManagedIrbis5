@@ -9,7 +9,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UseNameofExpression
 
-/*
+/* HtmlCommandNode.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 

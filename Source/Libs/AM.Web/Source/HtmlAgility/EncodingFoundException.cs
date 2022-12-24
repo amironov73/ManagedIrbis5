@@ -9,7 +9,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UseNameofExpression
 
-/*
+/* EncodingFoundException.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -18,35 +18,43 @@
 using System;
 using System.Text;
 
+using AM;
+
 #endregion
 
 #nullable enable
 
 namespace HtmlAgilityPack;
 
+/// <summary>
+///
+/// </summary>
 internal class EncodingFoundException
     : Exception
 {
-    #region Fields
+    #region Properties
 
-    private Encoding _encoding;
+    /// <summary>
+    ///
+    /// </summary>
+    internal Encoding Encoding { get; }
 
     #endregion
 
     #region Constructors
 
-    internal EncodingFoundException(Encoding encoding)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="encoding"></param>
+    internal EncodingFoundException
+        (
+            Encoding encoding
+        )
     {
-        _encoding = encoding;
-    }
+        Sure.NotNull (encoding);
 
-    #endregion
-
-    #region Properties
-
-    internal Encoding Encoding
-    {
-        get { return _encoding; }
+        Encoding = encoding;
     }
 
     #endregion

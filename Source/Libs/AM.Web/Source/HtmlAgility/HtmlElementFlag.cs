@@ -9,7 +9,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UseNameofExpression
 
-/*
+/* HtmlElementFlag.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 

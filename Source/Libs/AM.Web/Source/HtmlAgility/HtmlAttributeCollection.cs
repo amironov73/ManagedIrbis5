@@ -8,7 +8,7 @@
 // ReSharper disable NonReadonlyMemberInGetHashCode
 // ReSharper disable UnusedMember.Global
 
-/*
+/* HtmlAttributeCollection.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -56,8 +56,7 @@ public class HtmlAttributeCollection
 
     #endregion
 
-
-    #region IList<HtmlAttribute> Members
+    #region IList<HtmlAttribute> members
 
     /// <summary>
     /// Gets the number of elements actually contained in the list.
@@ -86,7 +85,7 @@ public class HtmlAttributeCollection
 
             Hashitems[value.Name] = value;
 
-            value._ownernode = _ownernode;
+            value._ownerNode = _ownernode;
             _ownernode.SetChanged();
         }
     }
@@ -220,15 +219,16 @@ public class HtmlAttributeCollection
     /// </summary>
     /// <param name="index"></param>
     /// <param name="item"></param>
-    public void Insert (int index, HtmlAttribute item)
+    public void Insert
+        (
+            int index,
+            HtmlAttribute item
+        )
     {
-        if (item == null)
-        {
-            throw new ArgumentNullException ("item");
-        }
+        Sure.NotNull (item);
 
         Hashitems[item.Name] = item;
-        item._ownernode = _ownernode;
+        item._ownerNode = _ownernode;
         _items.Insert (index, item);
 
         _ownernode.SetChanged();
@@ -278,20 +278,20 @@ public class HtmlAttributeCollection
     /// </summary>
     /// <param name="newAttribute">The attribute to insert. May not be null.</param>
     /// <returns>The appended attribute.</returns>
-    public HtmlAttribute Append (HtmlAttribute newAttribute)
+    public HtmlAttribute Append
+        (
+            HtmlAttribute newAttribute
+        )
     {
         if (_ownernode.NodeType == HtmlNodeType.Text || _ownernode.NodeType == HtmlNodeType.Comment)
         {
             throw new Exception ("A Text or Comment node cannot have attributes.");
         }
 
-        if (newAttribute == null)
-        {
-            throw new ArgumentNullException ("newAttribute");
-        }
+        Sure.NotNull (newAttribute);
 
         Hashitems[newAttribute.Name] = newAttribute;
-        newAttribute._ownernode = _ownernode;
+        newAttribute._ownerNode = _ownernode;
         _items.Add (newAttribute);
 
         _ownernode.SetChanged();
@@ -303,7 +303,10 @@ public class HtmlAttributeCollection
     /// </summary>
     /// <param name="name">The name of the attribute to insert.</param>
     /// <returns>The appended attribute.</returns>
-    public HtmlAttribute Append (string name)
+    public HtmlAttribute Append
+        (
+            string name
+        )
     {
         var att = _ownernode._ownerDocument.CreateAttribute (name);
         return Append (att);
@@ -315,8 +318,15 @@ public class HtmlAttributeCollection
     /// <param name="name">The name of the attribute to insert.</param>
     /// <param name="value">The value of the attribute to insert.</param>
     /// <returns>The appended attribute.</returns>
-    public HtmlAttribute Append (string name, string value)
+    public HtmlAttribute Append
+        (
+            string name,
+            string value
+        )
     {
+        Sure.NotNullNorEmpty (name);
+        Sure.NotNull (value);
+
         var att = _ownernode._ownerDocument.CreateAttribute (name, value);
         return Append (att);
     }
@@ -326,8 +336,13 @@ public class HtmlAttributeCollection
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
-    public bool Contains (string name)
+    public bool Contains
+        (
+            string name
+        )
     {
+        Sure.NotNull (name);
+
         for (var i = 0; i < _items.Count; i++)
         {
             if (string.Equals (_items[i].Name, name, StringComparison.OrdinalIgnoreCase))
@@ -344,8 +359,13 @@ public class HtmlAttributeCollection
     /// </summary>
     /// <param name="newAttribute">The attribute to insert. May not be null.</param>
     /// <returns>The prepended attribute.</returns>
-    public HtmlAttribute Prepend (HtmlAttribute newAttribute)
+    public HtmlAttribute Prepend
+        (
+            HtmlAttribute newAttribute
+        )
     {
+        Sure.NotNull (newAttribute);
+
         Insert (0, newAttribute);
         return newAttribute;
     }
@@ -354,12 +374,12 @@ public class HtmlAttributeCollection
     /// Removes a given attribute from the list.
     /// </summary>
     /// <param name="attribute">The attribute to remove. May not be null.</param>
-    public void Remove (HtmlAttribute attribute)
+    public void Remove
+        (
+            HtmlAttribute attribute
+        )
     {
-        if (attribute == null)
-        {
-            throw new ArgumentNullException ("attribute");
-        }
+        Sure.NotNull (attribute);
 
         var index = GetAttributeIndex (attribute);
         if (index == -1)
@@ -374,12 +394,12 @@ public class HtmlAttributeCollection
     /// Removes an attribute from the list, using its name. If there are more than one attributes with this name, they will all be removed.
     /// </summary>
     /// <param name="name">The attribute's name. May not be null.</param>
-    public void Remove (string name)
+    public void Remove
+        (
+            string name
+        )
     {
-        if (name == null)
-        {
-            throw new ArgumentNullException ("name");
-        }
+        Sure.NotNullNorEmpty (name);
 
         var listToRemove = new List<int>();
         for (var i = 0; i < _items.Count; i++)
@@ -410,7 +430,7 @@ public class HtmlAttributeCollection
 
     #endregion
 
-    #region LINQ Methods
+    #region LINQ methods
 
     /// <summary>
     /// Returns all attributes with specified name. Handles case insentivity

@@ -10,7 +10,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UseNameofExpression
 
-/*
+/* HtmlAttribute.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -35,13 +35,13 @@ public class HtmlAttribute
     #region Fields
 
     internal int _lineposition;
-    internal string _name;
+    internal string? _name;
     internal int _namelength;
     internal int _namestartindex;
-    internal HtmlDocument ownerDocument; // attribute can exists without a node
-    internal HtmlNode _ownernode;
+    internal HtmlDocument _ownerDocument; // attribute can exists without a node
+    internal HtmlNode? _ownerNode;
     internal int _streamposition;
-    internal string _value;
+    internal string? _value;
     internal bool _isFromParse;
     internal bool _hasEqual;
     private bool? _localUseOriginalName;
@@ -50,9 +50,18 @@ public class HtmlAttribute
 
     #region Constructors
 
-    internal HtmlAttribute (HtmlDocument ownerDocument)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="ownerDocument"></param>
+    internal HtmlAttribute
+        (
+            HtmlDocument ownerDocument
+        )
     {
-        this.ownerDocument = ownerDocument;
+        Sure.NotNull (ownerDocument);
+
+        _ownerDocument = ownerDocument;
     }
 
     #endregion
@@ -107,10 +116,7 @@ public class HtmlAttribute
     {
         get
         {
-            if (_name == null!)
-            {
-                _name = ownerDocument.Text.Substring (_namestartindex, _namelength);
-            }
+            _name ??= _ownerDocument.Text.Substring (_namestartindex, _namelength);
 
             return UseOriginalName ? _name : _name.ToLowerInvariant();
         }
@@ -119,9 +125,9 @@ public class HtmlAttribute
             Sure.NotNull (value);
 
             _name = value;
-            if (_ownernode != null!)
+            if (_ownerNode != null!)
             {
-                _ownernode.SetChanged();
+                _ownerNode.SetChanged();
             }
         }
     }
@@ -129,17 +135,17 @@ public class HtmlAttribute
     /// <summary>
     /// Name of attribute with original case
     /// </summary>
-    public string OriginalName => _name;
+    public string? OriginalName => _name;
 
     /// <summary>
     /// Gets the HTML document to which this attribute belongs.
     /// </summary>
-    public HtmlDocument OwnerDocument => ownerDocument;
+    public HtmlDocument OwnerDocument => _ownerDocument;
 
     /// <summary>
     /// Gets the HTML node to which this attribute belongs.
     /// </summary>
-    public HtmlNode OwnerNode => _ownernode;
+    public HtmlNode? OwnerNode => _ownerNode;
 
     /// <summary>
     /// Specifies what type of quote the data should be wrapped in
@@ -164,16 +170,16 @@ public class HtmlAttribute
         get
         {
             // A null value has been provided, the attribute should be considered as "hidden"
-            if (_value == null! && ownerDocument.Text == null! && ValueStartIndex == 0 && ValueLength == 0)
+            if (_value == null! && _ownerDocument.Text == null! && ValueStartIndex == 0 && ValueLength == 0)
             {
                 return null;
             }
 
             if (_value == null)
             {
-                _value = ownerDocument.Text!.Substring (ValueStartIndex, ValueLength);
+                _value = _ownerDocument.Text!.Substring (ValueStartIndex, ValueLength);
 
-                if (!ownerDocument.BackwardCompatibility)
+                if (!_ownerDocument.BackwardCompatibility)
                 {
                     _value = HtmlEntity.DeEntitize (_value);
                 }
@@ -185,9 +191,9 @@ public class HtmlAttribute
         {
             _value = value!;
 
-            if (_ownernode != null!)
+            if (_ownerNode != null!)
             {
-                _ownernode.SetChanged();
+                _ownerNode.SetChanged();
             }
         }
     }
@@ -195,7 +201,7 @@ public class HtmlAttribute
     /// <summary>
     /// Gets the DeEntitized value of the attribute.
     /// </summary>
-    public string DeEntitizeValue => HtmlEntity.DeEntitize (Value!);
+    public string? DeEntitizeValue => HtmlEntity.DeEntitize (Value);
 
     internal string XmlName => HtmlDocument.GetXmlName (Name, true, OwnerDocument.OptionPreserveXmlNamespaces);
 
@@ -242,14 +248,16 @@ public class HtmlAttribute
     /// <returns>The cloned attribute.</returns>
     public HtmlAttribute Clone()
     {
-        var att = new HtmlAttribute (ownerDocument);
-        att.Name = OriginalName;
-        att.Value = Value;
-        att.QuoteType = QuoteType;
-        att.InternalQuoteType = InternalQuoteType;
+        var att = new HtmlAttribute (_ownerDocument)
+        {
+            Name = OriginalName,
+            Value = Value,
+            QuoteType = QuoteType,
+            InternalQuoteType = InternalQuoteType,
+            _isFromParse = _isFromParse,
+            _hasEqual = _hasEqual
+        };
 
-        att._isFromParse = _isFromParse;
-        att._hasEqual = _hasEqual;
         return att;
     }
 
@@ -258,7 +266,7 @@ public class HtmlAttribute
     /// </summary>
     public void Remove()
     {
-        _ownernode.Attributes.Remove (this);
+        _ownerNode?.Attributes.Remove (this);
     }
 
     #endregion
