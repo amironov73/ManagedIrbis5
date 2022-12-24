@@ -23,15 +23,14 @@ using AM;
 
 #endregion
 
-// ReSharper disable InconsistentNaming
-
 namespace HtmlAgilityPack;
 
 /// <summary>
 /// Represents an HTML attribute.
 /// </summary>
 [DebuggerDisplay ("Name: {OriginalName}, Value: {Value}")]
-public class HtmlAttribute : IComparable
+public class HtmlAttribute
+    : IComparable
 {
     #region Fields
 

@@ -13,8 +13,14 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
+#region Using directives
+
 using System;
 using System.Diagnostics;
+
+#endregion
+
+#nullable enable
 
 namespace HtmlAgilityPack;
 
