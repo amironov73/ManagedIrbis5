@@ -21,12 +21,13 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-
-using AM;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Data;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.LogicalTree;
@@ -381,6 +382,32 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
+    /// Получение цвета как динамического ресурса темы.
+    /// </summary>
+    public static IBinding DynamicColor
+        (
+            [CallerMemberName] string? key = null
+        )
+    {
+        Sure.NotNullNorEmpty (key);
+
+        return new DynamicResourceExtension (key!);
+    }
+
+    /// <summary>
+    /// Получение кисти как динамического ресурса темы.
+    /// </summary>
+    public static IBinding DynamicBrush
+        (
+            [CallerMemberName] string? key = null
+        )
+    {
+        Sure.NotNullNorEmpty (key);
+
+        return new DynamicResourceExtension (key!);
+    }
+
+    /// <summary>
     /// Поиск первого дочернего элемента с контекстом данных указанного типа.
     /// </summary>
     public static IDataContextProvider? FindChildWithDataContext<TDataContext>
@@ -404,6 +431,132 @@ public static class AvaloniaUtility
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Получение кисти как статического ресурса темы.
+    /// </summary>
+    public static IBrush FindBrush
+        (
+            this IResourceHost host,
+            [CallerMemberName] string? key = null
+        )
+    {
+        Sure.NotNullNorEmpty (key);
+
+        var found = host.FindResource (key!);
+        if (found is null)
+        {
+            return Brushes.Black;
+        }
+
+        return (IBrush) found;
+    }
+
+    /// <summary>
+    /// Получение цвета как статического ресурса темы.
+    /// </summary>
+    /// <example>
+    /// Предполагаемый сценарий использования
+    /// <code>
+    /// public static Color SystemAccentColor (this IResourceHost host) =&gt; host.FindColor();
+    /// </code>
+    /// </example>
+    public static Color FindColor
+        (
+            this IResourceHost host,
+            [CallerMemberName] string? key = null
+        )
+    {
+        Sure.NotNullNorEmpty (key);
+
+        var found = host.FindResource (key!);
+        if (found is null)
+        {
+            return Colors.Black;
+        }
+
+        return (Color) found;
+    }
+
+    /// <summary>
+    /// Получение скругления углов как статического ресурса темы.
+    /// </summary>
+    public static CornerRadius FindCornerRadius
+        (
+            this IResourceHost host,
+            [CallerMemberName] string? key = null
+        )
+    {
+        Sure.NotNullNorEmpty (key);
+
+        var found = host.FindResource (key!);
+        if (found is null)
+        {
+            return default;
+        }
+
+        return (CornerRadius) found;
+    }
+
+    /// <summary>
+    /// Получение числа с плавающей точкой как статического ресурса темы.
+    /// </summary>
+    public static double FindDouble
+        (
+            this IResourceHost host,
+            [CallerMemberName] string? key = null
+        )
+    {
+        Sure.NotNullNorEmpty (key);
+
+        var found = host.FindResource (key!);
+        if (found is null)
+        {
+            return 0;
+        }
+
+        return Convert.ToDouble (found);
+    }
+
+    /// <summary>
+    /// Получение размера как статического ресурса темы.
+    /// </summary>
+    public static Size FindSize
+        (
+            this IResourceHost host,
+            [CallerMemberName] string? key = null
+        )
+    {
+        Sure.NotNullNorEmpty (key);
+
+        var found = host.FindResource (key!);
+        if (found is null)
+        {
+            return default;
+        }
+
+        return (Size) found;
+    }
+
+    /// <summary>
+    /// Получение толщины как статического ресурса темы.
+    /// </summary>
+    public static Thickness FindThickness
+        (
+            this IResourceHost host,
+            [CallerMemberName] string? key = null
+        )
+    {
+        Sure.NotNullNorEmpty (key);
+
+        var found = host.FindResource (key!);
+        if (found is null)
+        {
+            return default;
+        }
+
+        return (Thickness) found;
     }
 
     /// <summary>
@@ -520,7 +673,7 @@ public static class AvaloniaUtility
             parent = parent.Parent;
         }
 
-        throw new ArsMagnaException ($"Can't find window for {control}");
+        throw new Exception ($"Can't find window for {control}");
     }
 
     /// <summary>
@@ -926,6 +1079,33 @@ public static class AvaloniaUtility
                 window.Icon = new WindowIcon (stream);
             }
         }
+    }
+
+    /// <summary>
+    /// Добавление в заголовок окна информации о версии сборки.
+    /// </summary>
+    public static void ShowVersionInfoInTitle
+        (
+            this Window window
+        )
+    {
+        Sure.NotNull (window);
+
+        var assembly = Assembly.GetEntryAssembly();
+        var location = assembly?.Location;
+        if (string.IsNullOrEmpty (location))
+        {
+            // TODO: в single-exe-application .Location возвращает string.Empty
+            // consider using the AppContext.BaseDirectory
+            return;
+        }
+
+        // TODO: в single-exe-application .Location возвращает string.Empty
+        // consider using the AppContext.BaseDirectory
+        var fvi = FileVersionInfo.GetVersionInfo (location);
+        var fi = new FileInfo (location);
+
+        window.Title += $": version {fvi.FileVersion} from {fi.LastWriteTime.ToShortDateString()}";
     }
 
     /// <summary>

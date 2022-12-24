@@ -22,12 +22,12 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-
-using AM.Text.Output;
+using System.Runtime.CompilerServices;
 
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Data;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.LogicalTree;
@@ -36,15 +36,13 @@ using Avalonia.Media;
 using Avalonia.Platform;
 using Avalonia.Styling;
 
-using Microsoft.Extensions.Logging;
-
 using SkiaSharp;
 
 #endregion
 
 #nullable enable
 
-namespace AvaloniaApp;
+namespace AvaloniaWeb;
 
 /// <summary>
 /// Полезные расширения для Avalonia UI.
@@ -114,7 +112,7 @@ public static class AvaloniaUtility
         }
         catch (Exception exception)
         {
-            Magna.Logger.LogDebug (exception, "URI as resource");
+            Debug.WriteLine (exception.Message);
         }
 
         return default;
@@ -384,6 +382,32 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
+    /// Получение цвета как динамического ресурса темы.
+    /// </summary>
+    public static IBinding DynamicColor
+        (
+            [CallerMemberName] string? key = null
+        )
+    {
+        Sure.NotNullNorEmpty (key);
+
+        return new DynamicResourceExtension (key!);
+    }
+
+    /// <summary>
+    /// Получение кисти как динамического ресурса темы.
+    /// </summary>
+    public static IBinding DynamicBrush
+        (
+            [CallerMemberName] string? key = null
+        )
+    {
+        Sure.NotNullNorEmpty (key);
+
+        return new DynamicResourceExtension (key!);
+    }
+
+    /// <summary>
     /// Поиск первого дочернего элемента с контекстом данных указанного типа.
     /// </summary>
     public static IDataContextProvider? FindChildWithDataContext<TDataContext>
@@ -407,6 +431,132 @@ public static class AvaloniaUtility
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Получение кисти как статического ресурса темы.
+    /// </summary>
+    public static IBrush FindBrush
+        (
+            this IResourceHost host,
+            [CallerMemberName] string? key = null
+        )
+    {
+        Sure.NotNullNorEmpty (key);
+
+        var found = host.FindResource (key!);
+        if (found is null)
+        {
+            return Brushes.Black;
+        }
+
+        return (IBrush) found;
+    }
+
+    /// <summary>
+    /// Получение цвета как статического ресурса темы.
+    /// </summary>
+    /// <example>
+    /// Предполагаемый сценарий использования
+    /// <code>
+    /// public static Color SystemAccentColor (this IResourceHost host) =&gt; host.FindColor();
+    /// </code>
+    /// </example>
+    public static Color FindColor
+        (
+            this IResourceHost host,
+            [CallerMemberName] string? key = null
+        )
+    {
+        Sure.NotNullNorEmpty (key);
+
+        var found = host.FindResource (key!);
+        if (found is null)
+        {
+            return Colors.Black;
+        }
+
+        return (Color) found;
+    }
+
+    /// <summary>
+    /// Получение скругления углов как статического ресурса темы.
+    /// </summary>
+    public static CornerRadius FindCornerRadius
+        (
+            this IResourceHost host,
+            [CallerMemberName] string? key = null
+        )
+    {
+        Sure.NotNullNorEmpty (key);
+
+        var found = host.FindResource (key!);
+        if (found is null)
+        {
+            return default;
+        }
+
+        return (CornerRadius) found;
+    }
+
+    /// <summary>
+    /// Получение числа с плавающей точкой как статического ресурса темы.
+    /// </summary>
+    public static double FindDouble
+        (
+            this IResourceHost host,
+            [CallerMemberName] string? key = null
+        )
+    {
+        Sure.NotNullNorEmpty (key);
+
+        var found = host.FindResource (key!);
+        if (found is null)
+        {
+            return 0;
+        }
+
+        return Convert.ToDouble (found);
+    }
+
+    /// <summary>
+    /// Получение размера как статического ресурса темы.
+    /// </summary>
+    public static Size FindSize
+        (
+            this IResourceHost host,
+            [CallerMemberName] string? key = null
+        )
+    {
+        Sure.NotNullNorEmpty (key);
+
+        var found = host.FindResource (key!);
+        if (found is null)
+        {
+            return default;
+        }
+
+        return (Size) found;
+    }
+
+    /// <summary>
+    /// Получение толщины как статического ресурса темы.
+    /// </summary>
+    public static Thickness FindThickness
+        (
+            this IResourceHost host,
+            [CallerMemberName] string? key = null
+        )
+    {
+        Sure.NotNullNorEmpty (key);
+
+        var found = host.FindResource (key!);
+        if (found is null)
+        {
+            return default;
+        }
+
+        return (Thickness) found;
     }
 
     /// <summary>
@@ -523,7 +673,7 @@ public static class AvaloniaUtility
             parent = parent.Parent;
         }
 
-        throw new ArsMagnaException ($"Can't find window for {control}");
+        throw new Exception ($"Can't find window for {control}");
     }
 
     /// <summary>
@@ -591,7 +741,7 @@ public static class AvaloniaUtility
         }
         catch (Exception exception)
         {
-            Magna.Logger.LogDebug (exception, nameof (MeasureString));
+            Debug.WriteLine (exception.Message);
         }
 
         return default;
@@ -640,52 +790,6 @@ public static class AvaloniaUtility
         }
 
         return null;
-    }
-
-    /// <summary>
-    /// Print system information in abstract output.
-    /// </summary>
-    public static void PrintSystemInformation
-        (
-            this AbstractOutput? output
-        )
-    {
-        if (output is not null)
-        {
-            output.WriteLine
-                (
-                    "OS version: {0}",
-                    Environment.OSVersion
-                );
-            output.WriteLine
-                (
-                    "Framework version: {0}",
-                    Environment.Version
-                );
-            var assembly = Assembly.GetEntryAssembly();
-            var vi = assembly?.GetName().Version;
-            if (assembly?.Location is null)
-            {
-                // TODO: в single-exe-application .Location возвращает string.Empty
-                // consider using the AppContext.BaseDirectory
-                return;
-            }
-
-            // TODO: в single-exe-application .Location возвращает string.Empty
-            // consider using the AppContext.BaseDirectory
-            var fi = new FileInfo (assembly.Location);
-            output.WriteLine
-                (
-                    "Application version: {0} ({1})",
-                    vi.ToVisibleString(),
-                    fi.LastWriteTime.ToShortDateString()
-                );
-            output.WriteLine
-                (
-                    "Memory: {0} Mb",
-                    GC.GetTotalMemory (false) / 1024
-                );
-        }
     }
 
     /// <summary>

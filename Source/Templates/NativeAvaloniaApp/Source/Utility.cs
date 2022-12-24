@@ -41,7 +41,7 @@ using System.Threading.Tasks;
 
 #nullable enable
 
-namespace NativeAvaloniaApp;
+namespace AvaloniaApp;
 
 /// <summary>
 /// Сборник простых вспомогательных методов.
@@ -56,10 +56,40 @@ public static class Utility
     [DebuggerStepThrough]
     public static void NotUsed<T>
         (
-            this T variable
+            this T variable,
+            [CallerArgumentExpression ("variable")]
+            string? variableName = null,
+            [CallerMemberName] string? member = null,
+            [CallerFilePath] string? file = null,
+            [CallerLineNumber] int line = 0
         )
     {
-        // пустое тело метода
+        Debug.WriteLine ($"variable {variableName} on {file}: {line} not used");
+    }
+
+    /// <summary>
+    /// Требование, чтобы аргументы <paramref name="argument"/>
+    /// имел тип <typeparamref name="TType"/>.
+    /// </summary>
+    public static TType SureOfType<TType>
+        (
+            this object? argument,
+            [CallerArgumentExpression (nameof (argument))]
+            string? argumentName = null
+        )
+    {
+        if (argument is TType value)
+        {
+            return value;
+        }
+
+        if (!string.IsNullOrEmpty (argumentName))
+        {
+            // .NET 5 SDK подставляет в argumentName значение null, .NET 6 делает по-человечески
+            throw new ArgumentException (argumentName);
+        }
+
+        throw new ArgumentException();
     }
 
     /// <summary>
@@ -141,6 +171,74 @@ public static class Utility
             action();
         }
     }
+
+    /// <summary>
+    /// Первый день следующего месяца.
+    /// </summary>
+    [Pure]
+    public static DateTime BeginningOfNextMonth => BeginningOfTheMonth.AddMonths (1);
+
+    /// <summary>
+    /// Первый день следующего года.
+    /// </summary>
+    [Pure]
+    public static DateTime BeginningOfNextYear => BeginningOfTheYear.AddYears (1);
+
+    /// <summary>
+    /// Первый день предыдущего месяца.
+    /// </summary>
+    [Pure]
+    public static DateTime BeginningOfPreviousMonth => BeginningOfTheMonth.AddMonths (-1);
+
+    /// <summary>
+    /// Первый день предыдущего года.
+    /// </summary>
+    [Pure]
+    public static DateTime BeginningOfPreviousYear => BeginningOfTheYear.AddYears (-1);
+
+    /// <summary>
+    /// Первый день текущего месяца.
+    /// </summary>
+    [Pure]
+    public static DateTime BeginningOfTheMonth
+    {
+        [DebuggerStepThrough]
+        get
+        {
+            var today = Today;
+
+            return new DateTime (today.Year, today.Month, 1);
+        }
+    }
+
+    /// <summary>
+    /// Первый день текущего года.
+    /// </summary>
+    [Pure]
+    public static DateTime BeginningOfTheYear => new
+        (
+            DateTime.Today.Year,
+            1,
+            1
+        );
+
+    /// <summary>
+    /// Сегодняшний день.
+    /// </summary>
+    [Pure]
+    public static DateTime Today => DateTime.Today;
+
+    /// <summary>
+    /// Завтрашний день.
+    /// </summary>
+    [Pure]
+    public static DateTime Tomorrow => Today.AddDays (1.0);
+
+    /// <summary>
+    /// Вчерашний день.
+    /// </summary>
+    [Pure]
+    public static DateTime Yesterday => Today.AddDays (-1.0);
 
     /// <summary>
     /// Длительность: одни сутки.
@@ -609,6 +707,46 @@ public static class Utility
     }
 
     /// <summary>
+    /// Кодирование строки в формат URL.
+    /// </summary>
+    public static string? UrlEncode
+        (
+            string? text,
+            Encoding encoding
+        )
+    {
+        char _IntToHex (int n) => n <= 9 ? (char)(n + '0') : (char)(n - 10 + 'A');
+
+        if (string.IsNullOrEmpty (text))
+        {
+            return text;
+        }
+
+        var bytes = encoding.GetBytes (text);
+        var builder = new StringBuilder();
+        foreach (var b in bytes)
+        {
+            var c = (char) b;
+            if (IsUrlSafeChar (c))
+            {
+                builder.Append (c);
+            }
+            else if (c == ' ')
+            {
+                builder.Append ('+');
+            }
+            else
+            {
+                builder.Append ('%');
+                builder.Append (_IntToHex ((b >> 4) & 0x0F));
+                builder.Append (_IntToHex (b & 0x0F));
+            }
+        }
+
+        return builder.ToString();
+    }
+
+    /// <summary>
     /// Проверка строго на цифры от <c>0</c> до <c>9</c> включительно,
     /// различные "расширенные цифры" не рассматриваются.
     /// Is digit from 0 to 9?
@@ -775,8 +913,13 @@ public static class Utility
         {
             if (!string.IsNullOrEmpty (message))
             {
+                // .NET 5 SDK подставляет в message значение null, .NET 6 делает по-человечески
+                Debug.WriteLine (nameof (Utility) + "::" + nameof (ThrowIfEmpty) + ": " + message);
+
                 throw new ArgumentException (message);
             }
+
+            Debug.WriteLine (nameof (Utility) + "::" + nameof (ThrowIfEmpty));
 
             throw new ArgumentException();
         }
@@ -800,8 +943,13 @@ public static class Utility
         {
             if (!string.IsNullOrEmpty (message))
             {
+                // .NET 5 SDK подставляет в message значение null, .NET 6 делает по-человечески
+                Debug.WriteLine (nameof (Utility) + "::" + nameof (ThrowIfEmpty) + ": " + message);
+
                 throw new ArgumentException (message);
             }
+
+            Debug.WriteLine (nameof (Utility) + "::" + nameof (ThrowIfEmpty));
 
             throw new ArgumentException();
         }
@@ -826,8 +974,13 @@ public static class Utility
         {
             if (!string.IsNullOrEmpty (message))
             {
+                // .NET 5 SDK подставляет в message значение null, .NET 6 делает по-человечески
+                Debug.WriteLine (nameof (Utility) + "::" + nameof (ThrowIfNull) + ": " + message);
+
                 throw new ArgumentException (message);
             }
+
+            Debug.WriteLine (nameof (Utility) + "::" + nameof (ThrowIfNull));
 
             throw new ArgumentException();
         }
@@ -4677,7 +4830,16 @@ public static class Utility
             return converted is not null && (bool)converted;
         }
 
-        throw new FormatException ("Bad value: " + value);
+        Debug.WriteLine
+            (
+                nameof (Utility) + "::" + nameof (ToBoolean)
+                + "bad value=" + value
+            );
+
+        throw new FormatException
+            (
+                "Bad value: " + value
+            );
     }
 
     /// <summary>
@@ -5379,7 +5541,7 @@ public static class Utility
             string defaultValue = "(none)"
         )
     {
-        if (array is null or { Length: 0 })
+        if (array is null || array.Length == 0)
         {
             return defaultValue;
         }
@@ -5610,7 +5772,19 @@ public static class Utility
         if (exception is AggregateException aggregate)
         {
             aggregate = aggregate.Flatten();
-            aggregate.Handle (ex => true);
+            aggregate.Handle
+                (
+                    ex =>
+                    {
+                        Debug.WriteLine
+                            (
+                                nameof (Utility) + "::" + nameof (Unwrap) 
+                                + ": " + ex.Message
+                            );
+
+                        return true;
+                    }
+                );
 
             return aggregate.InnerExceptions[0];
         }
@@ -6073,7 +6247,7 @@ public static class Utility
         )
         where TSource : struct
     {
-        Sure.NotNull ((object?) source);
+        Sure.NotNull (source);
 
         // Use `GetType() == typeof(...)` rather than `is` to avoid cast helpers.  This is measurably cheaper
         // but does mean we could end up missing some rare cases where we could get a span but don't (e.g. a uint[]

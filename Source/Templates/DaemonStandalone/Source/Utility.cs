@@ -41,7 +41,7 @@ using System.Threading.Tasks;
 
 #nullable enable
 
-namespace AvaloniaWeb;
+namespace DaemonStandalone;
 
 /// <summary>
 /// Сборник простых вспомогательных методов.

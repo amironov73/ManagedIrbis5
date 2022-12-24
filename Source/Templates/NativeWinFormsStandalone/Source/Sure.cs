@@ -28,7 +28,7 @@ using JetBrains.Annotations;
 
 #nullable enable
 
-namespace AvaloniaWeb;
+namespace WinFormsAot;
 
 /// <summary>
 /// Ассерты на все случаи жизни.
