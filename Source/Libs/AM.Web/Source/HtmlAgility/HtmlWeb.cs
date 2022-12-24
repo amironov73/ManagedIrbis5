@@ -26,6 +26,8 @@ using AM;
 
 #endregion
 
+#nullable enable
+
 namespace HtmlAgilityPack;
 
 /// <summary>

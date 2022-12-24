@@ -1,27 +1,34 @@
-// Description: Html Agility Pack - HTML Parsers, selectors, traversors, manupulators.
-// Website & Documentation: http://html-agility-pack.net
-// Forum & Issues: https://github.com/zzzprojects/html-agility-pack
-// License: https://github.com/zzzprojects/html-agility-pack/blob/master/LICENSE
-// More projects: http://www.zzzprojects.com/
-// Copyright © ZZZ Projects Inc. 2014 - 2017. All rights reserved.
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-#if !METRO
-namespace HtmlAgilityPack
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UseNameofExpression
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#nullable enable
+
+namespace HtmlAgilityPack;
+
+/// <summary>
+/// Represents the type of fragment in a mixed code document.
+/// </summary>
+public enum MixedCodeDocumentFragmentType
 {
     /// <summary>
-    /// Represents the type of fragment in a mixed code document.
+    /// The fragment contains code.
     /// </summary>
-    public enum MixedCodeDocumentFragmentType
-    {
-        /// <summary>
-        /// The fragment contains code.
-        /// </summary>
-        Code,
+    Code,
 
-        /// <summary>
-        /// The fragment contains text.
-        /// </summary>
-        Text,
-    }
+    /// <summary>
+    /// The fragment contains text.
+    /// </summary>
+    Text,
 }
-#endif
