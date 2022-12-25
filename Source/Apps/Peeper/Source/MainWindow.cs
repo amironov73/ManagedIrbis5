@@ -145,7 +145,9 @@ internal sealed class MainWindow
 
         Content = _mainPanel;
         KeyDown += _Window_KeyDown;
-        _fileList.KeyDown += _FileList_KeyDown;
+        _imageBox.KeyDown += _Window_KeyDown;
+        _scrollViewer.KeyDown += _Window_KeyDown;
+        _fileList.KeyDown += _Window_KeyDown;
     }
 
     #endregion
@@ -153,15 +155,10 @@ internal sealed class MainWindow
     #region Private members
 
     private FolderModel _model;
-
     private readonly ListBox _fileList;
-
     private readonly DockPanel _mainPanel;
-
     private bool _scrollEnabled;
-
     private readonly Image _imageBox;
-
     private readonly ScrollViewer _scrollViewer;
 
     private async void _ChangeDirectory()
@@ -222,6 +219,16 @@ internal sealed class MainWindow
     {
         switch (eventArgs.Key)
         {
+            case Key.Escape:
+                eventArgs.Handled = true;
+                Close();
+                break;
+
+            case Key.Space:
+                eventArgs.Handled = true;
+                _MoveToNextPicture();
+                break;
+
             case Key.F2:
                 eventArgs.Handled = true;
                 _MoveToNextPicture();
@@ -230,21 +237,6 @@ internal sealed class MainWindow
             case Key.F3:
                 eventArgs.Handled = true;
                 _ChangeScroll();
-                break;
-        }
-    }
-
-    private void _FileList_KeyDown
-        (
-            object? sender,
-            KeyEventArgs eventArgs
-        )
-    {
-        switch (eventArgs.Key)
-        {
-            case Key.Space:
-                eventArgs.Handled = true;
-                _MoveToNextPicture();
                 break;
         }
     }

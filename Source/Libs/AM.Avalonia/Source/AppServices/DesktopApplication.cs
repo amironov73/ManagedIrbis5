@@ -21,6 +21,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 
 using AM.Avalonia.Dialogs;
 
@@ -180,12 +182,17 @@ public sealed class DesktopApplication
     /// </summary>
     public DesktopApplication WithApplicationName
         (
-            string applicationName
+            string? applicationName = null
         )
     {
-        // TODO добавить автоматическое определение имени приложения
-
-        Sure.NotNullNorEmpty (applicationName);
+        if (string.IsNullOrEmpty (applicationName))
+        {
+            var location = Assembly.GetEntryAssembly()?.Location;
+            if (!string.IsNullOrEmpty (location))
+            {
+                applicationName = Path.GetFileNameWithoutExtension (location);
+            }
+        }
 
         _applicationName = applicationName;
 

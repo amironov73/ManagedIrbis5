@@ -36,7 +36,7 @@ internal sealed class Program
     {
         DesktopApplication.BuildAvaloniaApp (args)
             .UseMainWindow<MainWindow>()
-            .WithApplicationName ("Peeper")
+            .WithApplicationName()
             .WithNativeMenu()
             .Run();
     }
