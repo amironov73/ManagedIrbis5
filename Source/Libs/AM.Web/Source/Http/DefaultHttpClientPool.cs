@@ -37,17 +37,39 @@ public class DefaultHttpClientPool
     /// Creates a new <see cref="DefaultHttpClientPool"/> based on the settings.
     /// </summary>
     /// <param name="settings">The settings to based this pool on.</param>
-    public DefaultHttpClientPool (HttpSettings settings) => Settings = settings;
+    public DefaultHttpClientPool
+        (
+            HttpSettings settings
+        )
+    {
+        Sure.NotNull (settings);
+
+        Settings = settings;
+    }
 
     /// <summary>
     /// Gets a <see cref="HttpClient"/> from the pool, based on the <see cref="IRequestBuilder"/>.
     /// </summary>
     /// <param name="builder">The builder to get a request from.</param>
     /// <returns>The found or created <see cref="HttpClient"/> from the pool.</returns>
-    public HttpClient Get (IRequestBuilder builder) =>
-        ClientPool.GetOrAdd (new HttpClientCacheKey (builder.Timeout, builder.Proxy), CreateHttpClient);
+    public HttpClient Get
+        (
+            IRequestBuilder builder
+        )
+    {
+        Sure.NotNull (builder);
 
-    private HttpClient CreateHttpClient (HttpClientCacheKey options)
+        return ClientPool.GetOrAdd
+            (
+                new HttpClientCacheKey (builder.Timeout, builder.Proxy!),
+                CreateHttpClient
+            );
+    }
+
+    private HttpClient CreateHttpClient
+        (
+            HttpClientCacheKey options
+        )
     {
         var handler = new HttpClientHandler
         {
@@ -99,28 +121,72 @@ public class DefaultHttpClientPool
     private readonly struct HttpClientCacheKey
         : IEquatable<HttpClientCacheKey>
     {
-        public TimeSpan Timeout { get; }
-        public IWebProxy Proxy { get; }
+        #region Properties
 
-        public HttpClientCacheKey (TimeSpan timeout, IWebProxy proxy)
+        public TimeSpan Timeout { get; }
+
+        public IWebProxy? Proxy { get; }
+
+        #endregion
+
+        #region Construction
+
+        public HttpClientCacheKey
+            (
+                TimeSpan timeout,
+                IWebProxy? proxy
+            )
         {
             Timeout = timeout;
             Proxy = proxy;
         }
 
-        public override bool Equals (object? obj)
+        #endregion
+
+        #region Operators
+
+        public static bool operator ==
+            (
+                HttpClientCacheKey left,
+                HttpClientCacheKey right
+            )
         {
-            return obj is HttpClientCacheKey key && Equals (key);
+            return left.Equals (right);
         }
 
-        public bool Equals (HttpClientCacheKey other)
+        public static bool operator !=
+            (
+                HttpClientCacheKey left,
+                HttpClientCacheKey right
+            )
+        {
+            return !(left == right);
+        }
+
+        #endregion
+
+        #region Public methods
+
+        public bool Equals
+            (
+                HttpClientCacheKey other
+            )
         {
             return Timeout.Equals (other.Timeout)
                    && EqualityComparer<IWebProxy>.Default.Equals (Proxy, other.Proxy);
         }
 
-        public static bool operator == (HttpClientCacheKey left, HttpClientCacheKey right)
-            => left.Equals (right);
+        #endregion
+
+        #region Object members
+
+        public override bool Equals
+            (
+                object? obj
+            )
+        {
+            return obj is HttpClientCacheKey key && Equals (key);
+        }
 
         public override int GetHashCode()
         {
@@ -128,12 +194,11 @@ public class DefaultHttpClientPool
             {
                 var hashCode = 647927907;
                 hashCode = (hashCode * -1521134295) + EqualityComparer<TimeSpan>.Default.GetHashCode (Timeout);
-                hashCode = (hashCode * -1521134295) + EqualityComparer<IWebProxy>.Default.GetHashCode (Proxy);
+                hashCode = (hashCode * -1521134295) + EqualityComparer<IWebProxy>.Default.GetHashCode (Proxy!);
                 return hashCode;
             }
         }
 
-        public static bool operator != (HttpClientCacheKey left, HttpClientCacheKey right)
-            => !(left == right);
+        #endregion
     }
 }

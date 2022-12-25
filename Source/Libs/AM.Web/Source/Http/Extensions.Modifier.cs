@@ -40,8 +40,15 @@ public static partial class ExtensionsForHttp
     /// This isn't *really* per request since it's global on <see cref="System.Net.Http.HttpClient"/>,
     /// so in reality we grab a different client from the pool.
     /// </remarks>
-    public static IRequestBuilder WithProxy (this IRequestBuilder builder, IWebProxy proxy)
+    public static IRequestBuilder WithProxy
+        (
+            this IRequestBuilder builder,
+            IWebProxy proxy
+        )
     {
+        Sure.NotNull (builder);
+        Sure.NotNull (proxy);
+
         builder.Proxy = proxy;
         return builder;
     }
@@ -52,8 +59,15 @@ public static partial class ExtensionsForHttp
     /// <param name="builder">The builder we're working on.</param>
     /// <param name="pool">The pool to use on this request (defaults to global settings otherwise).</param>
     /// <returns>The request builder for chaining.</returns>
-    public static IRequestBuilder WithClientPool (this IRequestBuilder builder, IHttpClientPool pool)
+    public static IRequestBuilder WithClientPool
+        (
+            this IRequestBuilder builder,
+            IHttpClientPool pool
+        )
     {
+        Sure.NotNull (builder);
+        Sure.NotNull (pool);
+
         builder.ClientPool = pool;
         return builder;
     }
@@ -68,8 +82,14 @@ public static partial class ExtensionsForHttp
     /// This isn't *really* per request since it's global on <see cref="System.Net.Http.HttpClient"/>,
     /// so in reality we grab a different client from the pool.
     /// </remarks>
-    public static IRequestBuilder WithTimeout (this IRequestBuilder builder, TimeSpan timeout)
+    public static IRequestBuilder WithTimeout
+        (
+            this IRequestBuilder builder,
+            TimeSpan timeout
+        )
     {
+        Sure.NotNull (builder);
+
         builder.Timeout = timeout;
         return builder;
     }
@@ -79,9 +99,15 @@ public static partial class ExtensionsForHttp
     /// </summary>
     /// <param name="builder">The builder we're working on.</param>
     /// <returns>The request builder for chaining.</returns>
-    public static IRequestBuilder WithoutErrorLogging (this IRequestBuilder builder)
+    public static IRequestBuilder WithoutErrorLogging
+        (
+            this IRequestBuilder builder
+        )
     {
+        Sure.NotNull (builder);
+
         builder.LogErrors = false;
+
         return builder;
     }
 
@@ -91,15 +117,19 @@ public static partial class ExtensionsForHttp
     /// <param name="builder">The builder we're working on.</param>
     /// <param name="ignoredStatusCodes">HTTP status codes to ignore.</param>
     /// <returns>The request builder for chaining.</returns>
-    public static IRequestBuilder WithoutLogging (this IRequestBuilder builder,
-        IEnumerable<HttpStatusCode> ignoredStatusCodes)
+    public static IRequestBuilder WithoutLogging
+        (
+            this IRequestBuilder builder,
+            IEnumerable<HttpStatusCode> ignoredStatusCodes
+        )
     {
+        Sure.NotNull (builder);
+
         builder.IgnoredResponseStatuses = ignoredStatusCodes;
         return builder;
     }
 
-    private static readonly ConcurrentDictionary<HttpStatusCode, ImmutableHashSet<HttpStatusCode>> _ignoreCache =
-        new ConcurrentDictionary<HttpStatusCode, ImmutableHashSet<HttpStatusCode>>();
+    private static readonly ConcurrentDictionary<HttpStatusCode, ImmutableHashSet<HttpStatusCode>> _ignoreCache = new ();
 
     /// <summary>
     /// Doesn't log an error when the response's HTTP status code is <paramref name="ignoredStatusCode"/>.
@@ -107,8 +137,14 @@ public static partial class ExtensionsForHttp
     /// <param name="builder">The builder we're working on.</param>
     /// <param name="ignoredStatusCode">HTTP status code to ignore.</param>
     /// <returns>The request builder for chaining.</returns>
-    public static IRequestBuilder WithoutLogging (this IRequestBuilder builder, HttpStatusCode ignoredStatusCode)
+    public static IRequestBuilder WithoutLogging
+        (
+            this IRequestBuilder builder,
+            HttpStatusCode ignoredStatusCode
+        )
     {
+        Sure.NotNull (builder);
+
         builder.IgnoredResponseStatuses = _ignoreCache.GetOrAdd (ignoredStatusCode, k => ImmutableHashSet.Create (k));
         return builder;
     }
@@ -119,10 +155,17 @@ public static partial class ExtensionsForHttp
     /// <param name="builder">The builder we're working on.</param>
     /// <param name="beforeLogHandler">The exception handler to run before logging</param>
     /// <returns>The request builder for chaining.</returns>
-    public static IRequestBuilder OnException (this IRequestBuilder builder,
-        EventHandler<HttpExceptionArgs> beforeLogHandler)
+    public static IRequestBuilder OnException
+        (
+            this IRequestBuilder builder,
+            EventHandler<HttpExceptionArgs> beforeLogHandler
+        )
     {
+        Sure.NotNull (builder);
+        Sure.NotNull (beforeLogHandler);
+
         builder.BeforeExceptionLog += beforeLogHandler;
+
         return builder;
     }
 
@@ -133,8 +176,15 @@ public static partial class ExtensionsForHttp
     /// <param name="name">The header name to add to this request.</param>
     /// <param name="value">The header value (for <paramref name="name"/>) to add to this request.</param>
     /// <returns>The request builder for chaining.</returns>
-    public static IRequestBuilder AddHeader (this IRequestBuilder builder, string name, string value)
+    public static IRequestBuilder AddHeader
+        (
+            this IRequestBuilder builder,
+            string? name,
+            string value
+        )
     {
+        Sure.NotNull (builder);
+
         if (!string.IsNullOrEmpty (name))
         {
             try
@@ -160,18 +210,25 @@ public static partial class ExtensionsForHttp
     /// <param name="name">The auth scheme to add to this request.</param>
     /// <param name="value">The key value (for <paramref name="name"/>) to add to this request.</param>
     /// <returns>The request builder for chaining.</returns>
-    public static IRequestBuilder AddHeaderWithoutValidation (this IRequestBuilder builder, string name, string value)
+    public static IRequestBuilder AddHeaderWithoutValidation
+        (
+            this IRequestBuilder builder,
+            string? name,
+            string value
+        )
     {
+        Sure.NotNull (builder);
+
         if (!string.IsNullOrEmpty (name))
         {
             try
             {
                 builder.Message.Headers.TryAddWithoutValidation (name, value);
             }
-            catch (Exception e)
+            catch (Exception exception)
             {
                 var wrapper = new HttpClientException ("Unable to set header using: " + name + " to '" + value + "'",
-                    builder.Message.RequestUri!, e);
+                    builder.Message.RequestUri!, exception);
                 builder.GetSettings().OnException (builder, new HttpExceptionArgs (builder, wrapper));
             }
         }
@@ -191,7 +248,9 @@ public static partial class ExtensionsForHttp
             IDictionary<string, string>? headers
         )
     {
-        if (headers == null)
+        Sure.NotNull (builder);
+
+        if (headers is null)
         {
             return builder;
         }
@@ -240,18 +299,32 @@ public static partial class ExtensionsForHttp
     /// <summary>
     /// Specifies the HTTP version to use for this request
     /// </summary>
-    public static IRequestBuilder WithProtocolVersion (this IRequestBuilder builder, Version version)
+    public static IRequestBuilder WithProtocolVersion
+        (
+            this IRequestBuilder builder,
+            Version version
+        )
     {
+        Sure.NotNull (builder);
+        Sure.NotNull (version);
+
         builder.Message.Version = version;
+
         return builder;
     }
 
     /// <summary>
     /// Indicates that the response's content shouldn't be buffered, setting the HttpCompletionOption accordingly.
     /// </summary>
-    public static IRequestBuilder WithoutResponseBuffering (this IRequestBuilder builder)
+    public static IRequestBuilder WithoutResponseBuffering
+        (
+            this IRequestBuilder builder
+        )
     {
+        Sure.NotNull (builder);
+
         builder.BufferResponse = false;
+
         return builder;
     }
 }

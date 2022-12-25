@@ -28,6 +28,9 @@ using System.Threading.Tasks;
 
 namespace AM.Web;
 
+/// <summary>
+///
+/// </summary>
 public static partial class ExtensionsForHttp
 {
     /// <summary>
