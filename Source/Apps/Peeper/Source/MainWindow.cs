@@ -15,8 +15,13 @@
 
 #region Using directives
 
+using System;
+using System.IO;
+
+using AM;
 using AM.Avalonia;
 using AM.Avalonia.Converters;
+using AM.Collections;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -28,6 +33,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Avalonia.ReactiveUI;
+using Avalonia.Threading;
 
 using ReactiveUI;
 
@@ -58,7 +64,10 @@ internal sealed class MainWindow
 
         this.SetWindowIcon ("Assets/view.ico");
 
-        _model = new FolderModel();
+        _model = Magna.Args.Length != 0
+            ? FolderModel.LoadFolder (Magna.Args[0])
+            : new FolderModel();
+
         DataContext = _model;
 
         var toolBar = new StackPanel
@@ -68,17 +77,8 @@ internal sealed class MainWindow
                 Spacing = 5,
                 Children =
                 {
-                    new Button
-                    {
-                        Content = "Дир",
-                        Command = ReactiveCommand.Create (_ChangeDirectory)
-                    },
-
-                    new Button
-                    {
-                        Content = "Скролл",
-                        Command = ReactiveCommand.Create (_ChangeScroll)
-                    }
+                    CreateButton ("folder.png", _ChangeDirectory),
+                    CreateButton ("scroll.png", _ChangeScroll)
                 }
             }
             .DockTop();
@@ -124,6 +124,12 @@ internal sealed class MainWindow
                 _imageBox
             }
         };
+
+        DispatcherTimer.RunOnce
+            (
+                _MoveToNextPicture,
+                TimeSpan.FromMilliseconds (100)
+            );
     }
 
     #endregion
@@ -195,15 +201,17 @@ internal sealed class MainWindow
     private void _MoveToNextPicture()
     {
         var files = _model.Files;
-        if (files is null)
+        if (files.IsNullOrEmpty())
         {
             return;
         }
 
-        if (_fileList.SelectedIndex < files.Length)
-        {
-            _fileList.SelectedIndex++;
-        }
+        var selectedIndex = _fileList.SelectedIndex;
+        selectedIndex = selectedIndex < files.Length
+            ? selectedIndex + 1
+            : 0;
+
+        _fileList.SelectedItem = files[selectedIndex];
     }
 
     private void _Window_KeyDown
@@ -239,6 +247,29 @@ internal sealed class MainWindow
                 _MoveToNextPicture();
                 break;
         }
+    }
+
+    private Button CreateButton
+        (
+            string assetName,
+            Action action
+        )
+    {
+        Sure.NotNullNorEmpty (assetName);
+        Sure.NotNull (action);
+
+        assetName = Path.Combine ("Assets", assetName);
+        return new Button
+        {
+            Content = new Image
+            {
+                Width = 24,
+                Height = 24,
+                Source = this.LoadBitmapFromAssets (assetName).ThrowIfNull()
+            },
+            Background = Brushes.Transparent,
+            Command = ReactiveCommand.Create (action)
+        };
     }
 
     #endregion

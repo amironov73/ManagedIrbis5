@@ -176,6 +176,23 @@ public sealed class DesktopApplication
     }
 
     /// <summary>
+    /// Имя приложения (для OSX -- отображается в верхней общей строке меню).
+    /// </summary>
+    public DesktopApplication WithApplicationName
+        (
+            string applicationName
+        )
+    {
+        // TODO добавить автоматическое определение имени приложения
+
+        Sure.NotNullNorEmpty (applicationName);
+
+        _applicationName = applicationName;
+
+        return this;
+    }
+
+    /// <summary>
     /// Нативное меню (для OSX -- отображается в верхней общей строке меню).
     /// </summary>
     public DesktopApplication WithNativeMenu
@@ -183,24 +200,7 @@ public sealed class DesktopApplication
             NativeMenu? nativeMenu = null
         )
     {
-        Sure.NotNull (nativeMenu);
-
         _nativeMenu = nativeMenu ?? AboutDialog.BuildNativeMenuAboutApplication();
-
-        return this;
-    }
-
-    /// <summary>
-    /// Имя (для OSX -- отображается в верхней общей строке меню).
-    /// </summary>
-    public DesktopApplication WithName
-        (
-            string applicationName
-        )
-    {
-        Sure.NotNullNorEmpty (applicationName);
-
-        _applicationName = applicationName;
 
         return this;
     }

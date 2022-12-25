@@ -35,6 +35,7 @@ using Avalonia.Layout;
 using Avalonia.LogicalTree;
 using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Styling;
 
@@ -710,6 +711,24 @@ public static class AvaloniaUtility
         control.VerticalContentAlignment = VerticalAlignment.Center;
 
         return control;
+    }
+
+    /// <summary>
+    /// Загрузка картинки из ассетов.
+    /// </summary>
+    public static Bitmap? LoadBitmapFromAssets
+        (
+            this IControl control,
+            string assetName
+        )
+    {
+        Sure.NotNull (control);
+        Sure.NotNullNorEmpty (assetName);
+
+        using var stream = OpenAssetStream (control.GetType(), assetName);
+        return stream is not null
+            ? new Bitmap (stream)
+            : null;
     }
 
     /// <summary>

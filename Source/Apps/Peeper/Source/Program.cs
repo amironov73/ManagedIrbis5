@@ -3,11 +3,6 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable CoVariantArrayConversion
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
 
 /* Program.cs -- точка входа в программу
  * Ars Magna project, http://arsmagna.ru
@@ -18,10 +13,6 @@
 using System;
 
 using AM.Avalonia.AppServices;
-
-using Avalonia.Controls;
-
-using ReactiveUI;
 
 #endregion
 
@@ -44,7 +35,8 @@ internal sealed class Program
         )
     {
         DesktopApplication.BuildAvaloniaApp (args)
-            .WithName ("Peeper")
+            .UseMainWindow<MainWindow>()
+            .WithApplicationName ("Peeper")
             .WithNativeMenu()
             .Run();
     }

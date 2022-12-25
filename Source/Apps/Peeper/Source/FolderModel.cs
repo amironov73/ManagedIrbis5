@@ -3,11 +3,6 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable CoVariantArrayConversion
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
 
 /* DirectoryModel.cs -- модель папки с картинками
  * Ars Magna project, http://arsmagna.ru
@@ -15,19 +10,12 @@
 
 #region Using directives
 
-using System;
 using System.Linq;
-using System.Reactive.Linq;
 
 using AM;
-using AM.Avalonia;
-using AM.Avalonia.AppServices;
 
-using Avalonia.Controls;
-using Avalonia.Data;
-using Avalonia.Layout;
 using Avalonia.Platform.Storage;
-using Avalonia.ReactiveUI;
+using Avalonia.Platform.Storage.FileIO;
 
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -68,6 +56,16 @@ internal class FolderModel
     #endregion
 
     #region Public methods
+
+    public static FolderModel LoadFolder
+        (
+            string folderName
+        )
+    {
+        Sure.DirectoryExists (folderName);
+
+        return LoadFolder (new BclStorageFolder (folderName));
+    }
 
     public static FolderModel LoadFolder
         (
