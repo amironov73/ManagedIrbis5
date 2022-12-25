@@ -323,6 +323,27 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
+    /// Создание стиля с сеттером.
+    /// </summary>
+    public static Style CreateStyle<TControl>
+        (
+            AvaloniaProperty property,
+            object value
+        )
+        where TControl: Control
+    {
+        Sure.NotNull (property);
+
+        return new Style (x => x.OfType<TControl>())
+        {
+            Setters =
+            {
+                new Setter (property, value)
+            }
+        };
+    }
+
+    /// <summary>
     /// Размещение контрола внизу в <see cref="DockPanel"/>>.
     /// </summary>
     public static T DockBottom<T>

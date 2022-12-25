@@ -33,6 +33,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Avalonia.ReactiveUI;
+using Avalonia.Styling;
 using Avalonia.Threading;
 
 using ReactiveUI;
@@ -72,13 +73,14 @@ internal sealed class MainWindow
 
         var toolBar = new StackPanel
             {
-                Margin = new Thickness (5),
+                Background = Brushes.LightGray,
                 Orientation = Orientation.Horizontal,
                 Spacing = 5,
                 Children =
                 {
                     CreateButton ("folder.png", _ChangeDirectory),
-                    CreateButton ("scroll.png", _ChangeScroll)
+                    CreateButton ("scroll.png", _ChangeScroll),
+                    CreateButton ("slideshow.png", _SlideshowControl)
                 }
             }
             .DockTop();
@@ -100,9 +102,11 @@ internal sealed class MainWindow
                 [!ItemsControl.ItemsProperty] = new Binding (nameof (_model.Files)),
                 [!SelectingItemsControl.SelectedItemProperty] = new Binding (nameof (_model.SelectedFile)),
                 ItemTemplate = new FuncDataTemplate<IStorageItem> ((data, _) =>
-                    new TextBlock{ Text = data.Name })
+                    new TextBlock { Text = data.Name }),
+                Styles = { AvaloniaUtility.CreateStyle<ListBoxItem> (PaddingProperty, new Thickness (10, 3)) }
             }
             .DockLeft();
+
         _imageBox = new Image
         {
             IsTabStop = true,
@@ -160,6 +164,24 @@ internal sealed class MainWindow
     private bool _scrollEnabled;
     private readonly Image _imageBox;
     private readonly ScrollViewer _scrollViewer;
+    private IDisposable? _slideshowTimer;
+
+    private void _SlideshowControl()
+    {
+        if (_slideshowTimer is null)
+        {
+            _slideshowTimer = DispatcherTimer.Run
+                (
+                    () => { _MoveToNextPicture(); return true; },
+                    TimeSpan.FromSeconds (3)
+                );
+        }
+        else
+        {
+            _slideshowTimer.Dispose();
+            _slideshowTimer = null;
+        }
+    }
 
     private async void _ChangeDirectory()
     {
@@ -238,6 +260,11 @@ internal sealed class MainWindow
                 eventArgs.Handled = true;
                 _ChangeScroll();
                 break;
+
+            case Key.F4:
+                eventArgs.Handled = true;
+                _SlideshowControl();
+                break;
         }
     }
 
@@ -265,5 +292,4 @@ internal sealed class MainWindow
     }
 
     #endregion
-
 }
