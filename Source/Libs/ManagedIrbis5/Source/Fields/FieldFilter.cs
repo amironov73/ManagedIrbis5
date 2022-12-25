@@ -2,17 +2,10 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable ConvertClosureToMethodGroup
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable PropertyCanBeMadeInitOnly.Local
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable UnusedParameter.Local
-// ReSharper disable UseStringInterpolation
+// ReSharper disable LocalizableElement
+// ReSharper disable LoopCanBeConvertedToQuery
 
 /* FieldFilter.cs -- динамическая фильтрация полей записи
  * Ars Magna project, http://arsmagna.ru
@@ -30,215 +23,220 @@ using ManagedIrbis.Pft;
 
 #nullable enable
 
-namespace ManagedIrbis.Fields
+namespace ManagedIrbis.Fields;
+
+/// <summary>
+/// Динамическая фильтрация полей записи.
+/// </summary>
+public sealed class FieldFilter
 {
+    #region Properties
+
     /// <summary>
-    /// Динамическая фильтрация полей записи.
+    /// Провайдер.
     /// </summary>
-    public sealed class FieldFilter
+    public ISyncProvider Provider { get; }
+
+    /// <summary>
+    /// Форматтер.
+    /// </summary>
+    public PftFormatter Formatter { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public FieldFilter
+        (
+            ISyncProvider provider,
+            string format
+        )
     {
-        #region Properties
+        Sure.NotNull (provider);
+        Sure.NotNullNorEmpty (format);
 
-        /// <summary>
-        /// Провайдер.
-        /// </summary>
-        public ISyncProvider Provider { get; }
+        Provider = provider;
 
-        /// <summary>
-        /// Форматтер.
-        /// </summary>
-        public PftFormatter Formatter { get; }
+        Formatter = new PftFormatter();
+        Formatter.SetProvider (provider);
+        SetProgram (format);
+    }
 
-        #endregion
+    #endregion
 
-        #region Construction
+    #region Public methods
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public FieldFilter
-            (
-                ISyncProvider provider,
-                string format
-            )
+    /// <summary>
+    /// Все ли поля среди перечисленных удовлетворяют условию?
+    /// </summary>
+    public bool AllFields
+        (
+            IEnumerable<Field> fields
+        )
+    {
+        Sure.NotNull (fields);
+
+        var result = false;
+        foreach (var field in fields)
         {
-            Provider = provider;
-
-            Formatter = new PftFormatter();
-            Formatter.SetProvider(provider);
-            SetProgram(format);
+            result = CheckField (field);
+            if (!result)
+            {
+                break;
+            }
         }
 
-        #endregion
+        return result;
+    }
 
-        #region Public methods
+    /// <summary>
+    /// Хотя бы одно поле среди перечисленных удовлетворяет условию?
+    /// </summary>
+    public bool AnyField
+        (
+            IEnumerable<Field> fields
+        )
+    {
+        Sure.NotNull (fields);
 
-        /// <summary>
-        /// Whether all fields satisfy the condition.
-        /// </summary>
-        public bool AllFields
-            (
-                IEnumerable<Field> fields
-            )
+        var result = false;
+        foreach (var field in fields)
         {
-            var result = false;
-
-            foreach (var field in fields)
+            result = CheckField (field);
+            if (result)
             {
-                result = CheckField(field);
-                if (!result)
-                {
-                    break;
-                }
+                break;
             }
+        }
 
-            return result;
+        return result;
+    }
 
-        } // method AllFields
+    /// <summary>
+    /// Проверка, удовлетворяет ли данное поле заданному условию.
+    /// </summary>
+    public bool CheckField
+        (
+            Field field
+        )
+    {
+        Sure.NotNull (field);
 
-        /// <summary>
-        /// Whether any field satisfy the condition.
-        /// </summary>
-        public bool AnyField
-            (
-                IEnumerable<Field> fields
-            )
+        var record = new Record();
+        var copy = field.Clone();
+        record.Fields.Add (copy);
+
+        Formatter.Context.AlternativeRecord = field.Record;
+        var text = Formatter.FormatRecord (record);
+        var result = text.SameString ("1");
+
+        return result;
+    }
+
+    /// <summary>
+    /// Фильтрация полей согласно заданному условию.
+    /// </summary>
+    public Field[] FilterFields
+        (
+            IEnumerable<Field> fields
+        )
+    {
+        Sure.NotNull (fields);
+
+        var result = new List<Field>();
+        foreach (var field in fields)
         {
-            var result = false;
-
-            foreach (var field in fields)
+            if (CheckField (field))
             {
-                result = CheckField(field);
-                if (result)
-                {
-                    break;
-                }
+                result.Add (field);
             }
+        }
 
-            return result;
+        return result.ToArray();
+    }
 
-        } // method AnyField
+    /// <summary>
+    /// Отбор записей, содержащих поля, удовлетворяющих заданному условию.
+    /// </summary>
+    public IEnumerable<Record> FilterRecords
+        (
+            IEnumerable<Record> records
+        )
+    {
+        Sure.NotNull (records);
 
-        /// <summary>
-        /// Check the field.
-        /// </summary>
-        public bool CheckField
-            (
-                Field field
-            )
+        foreach (var record in records)
         {
-            var record = new Record();
-            var copy = field.Clone();
-            record.Fields.Add(copy);
-
-            Formatter.Context.AlternativeRecord = field.Record;
-            string text = Formatter.FormatRecord(record);
-            bool result = text.SameString("1");
-
-            return result;
-
-        } // method CheckField
-
-        /// <summary>
-        /// Filter records.
-        /// </summary>
-        public Field[] FilterFields
-            (
-                IEnumerable<Field> fields
-            )
-        {
-            var result = new List<Field>();
-
-            foreach (var field in fields)
+            if (AnyField (record.Fields))
             {
-                if (CheckField(field))
-                {
-                    result.Add(field);
-                }
+                yield return record;
             }
+        }
+    }
 
-            return result.ToArray();
+    /// <summary>
+    /// Первое из полей, удовлетворяющих заданному условию.
+    /// </summary>
+    public Field? First
+        (
+            IEnumerable<Field> fields
+        )
+    {
+        Sure.NotNull (fields);
 
-        } // method FilterFields
-
-        /// <summary>
-        /// Filter records by field specification.
-        /// </summary>
-        public IEnumerable<Record> FilterRecords
-            (
-                IEnumerable<Record> records
-            )
+        Field? result = null;
+        foreach (var field in fields)
         {
-            foreach (var record in records)
+            if (CheckField (field))
             {
-                if (AnyField(record.Fields))
-                {
-                    yield return record;
-                }
+                result = field;
+                break;
             }
+        }
 
-        } // method FilterRecords
+        return result;
+    }
 
-        /// <summary>
-        /// Find first satisfying field.
-        /// </summary>
-        public Field? First
-            (
-                IEnumerable<Field> fields
-            )
+    /// <summary>
+    /// Последнее из полей, удовлетворяющих заданному условию.
+    /// </summary>
+    public Field? Last
+        (
+            IEnumerable<Field> fields
+        )
+    {
+        Sure.NotNull (fields);
+
+        Field? result = null;
+        foreach (var field in fields)
         {
-            Field? result = null;
-
-            foreach (var field in fields)
+            if (CheckField (field))
             {
-                if (CheckField(field))
-                {
-                    result = field;
-                    break;
-                }
+                result = field;
             }
+        }
 
-            return result;
+        return result;
+    }
 
-        } // method First
+    /// <summary>
+    /// Установка условия в виде программы-формата.
+    /// </summary>
+    public void SetProgram
+        (
+            string format
+        )
+    {
+        Sure.NotNull (format);
 
-        /// <summary>
-        /// Find last satisfying field.
-        /// </summary>
-        public Field? Last
-            (
-                IEnumerable<Field> fields
-            )
-        {
-            Field? result = null;
+        var text = format.StartsWith ("if")
+            ? format
+            : $"if {format} then '1' else '0' fi";
+        Formatter.ParseProgram (text);
+    }
 
-            foreach (var field in fields)
-            {
-                if (CheckField(field))
-                {
-                    result = field;
-                }
-            }
-
-            return result;
-
-        } // method Last
-
-        /// <summary>
-        /// Set filter program.
-        /// </summary>
-        public void SetProgram
-            (
-                string format
-            )
-        {
-            var text = $"if {format} then '1' else '0' fi";
-            Formatter.ParseProgram(text);
-
-        } // method SetProgram
-
-        #endregion
-
-    } // class FieldFilter
-
-} // namespace ManagedIrbis.Fields
+    #endregion
+}

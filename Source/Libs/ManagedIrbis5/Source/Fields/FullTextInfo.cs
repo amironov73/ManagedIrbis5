@@ -2,15 +2,9 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable ConvertClosureToMethodGroup
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
 // ReSharper disable LocalizableElement
-// ReSharper disable PropertyCanBeMadeInitOnly.Local
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* FullTextInfo.cs -- сведения о полном тексте документа, поле 955
  * Ars Magna project, http://arsmagna.ru
@@ -217,7 +211,7 @@ public sealed class FullTextInfo
 
         return record
             .EnumerateField (tag)
-            .Select (field => ParseField (field))
+            .Select (ParseField)
             .ToArray();
     }
 
