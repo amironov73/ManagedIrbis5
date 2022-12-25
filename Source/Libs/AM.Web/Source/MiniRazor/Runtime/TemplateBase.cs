@@ -35,7 +35,8 @@ namespace MiniRazor;
 /// <summary>
 /// Base implementation of a Razor template.
 /// </summary>
-public abstract class TemplateBase<TModel> : ITemplate
+public abstract class TemplateBase<TModel>
+    : ITemplate
 {
     private string? _lastAttributeSuffix;
 
@@ -48,7 +49,7 @@ public abstract class TemplateBase<TModel> : ITemplate
     object? ITemplate.Model
     {
         get => Model;
-        set => Model = (TModel) value!;
+        set => Model = (TModel)value!;
     }
 
     /// <inheritdoc />
@@ -57,76 +58,83 @@ public abstract class TemplateBase<TModel> : ITemplate
     /// <summary>
     /// Wraps a string in a container that instructs the renderer to avoid encoding.
     /// </summary>
-    protected RawString Raw(string value) => new(value);
+    protected RawString Raw (string value) => new (value);
 
     /// <summary>
     /// Writes a template literal.
     /// </summary>
-    protected void WriteLiteral(string? literal) => Output?.Write(literal);
+    protected void WriteLiteral (string? literal) => Output?.Write (literal);
 
     /// <summary>
     /// Writes a string with encoding.
     /// </summary>
-    protected void Write(string? str)
+    protected void Write (string? str)
     {
         if (str is not null)
         {
-            WriteLiteral(WebUtility.HtmlEncode(str));
+            WriteLiteral (WebUtility.HtmlEncode (str));
         }
     }
 
     /// <summary>
     /// Writes a string without encoding.
     /// </summary>
-    protected void Write(RawString str) => WriteLiteral(str.Value);
+    protected void Write (RawString str) => WriteLiteral (str.Value);
 
     /// <summary>
     /// Writes an object.
     /// </summary>
-    protected void Write(object? obj)
+    protected void Write
+        (
+            object? obj
+        )
     {
         if (obj is string str)
         {
-            Write(str);
+            Write (str);
         }
         else if (obj is RawString raw)
         {
-            Write(raw);
+            Write (raw);
         }
         else
         {
-            Write(obj?.ToString());
+            Write (obj?.ToString());
         }
     }
 
     /// <summary>
     /// Begins writing attribute.
     /// </summary>
-    protected void BeginWriteAttribute(
-        string? name,
-        string? prefix,
-        int prefixOffset,
-        string? suffix,
-        int suffixOffset,
-        int attributeValuesCount)
+    protected void BeginWriteAttribute
+        (
+            string? name,
+            string? prefix,
+            int prefixOffset,
+            string? suffix,
+            int suffixOffset,
+            int attributeValuesCount
+        )
     {
         _lastAttributeSuffix = suffix;
-        WriteLiteral(prefix);
+        WriteLiteral (prefix);
     }
 
     /// <summary>
     /// Writes attribute value.
     /// </summary>
-    protected void WriteAttributeValue(
-        string? prefix,
-        int prefixOffset,
-        object? value,
-        int valueOffset,
-        int valueLength,
-        bool isLiteral)
+    protected void WriteAttributeValue
+        (
+            string? prefix,
+            int prefixOffset,
+            object? value,
+            int valueOffset,
+            int valueLength,
+            bool isLiteral
+        )
     {
-        WriteLiteral(prefix);
-        Write(value);
+        WriteLiteral (prefix);
+        Write (value);
     }
 
     /// <summary>
@@ -134,7 +142,7 @@ public abstract class TemplateBase<TModel> : ITemplate
     /// </summary>
     protected void EndWriteAttribute()
     {
-        WriteLiteral(_lastAttributeSuffix);
+        WriteLiteral (_lastAttributeSuffix);
         _lastAttributeSuffix = null;
     }
 

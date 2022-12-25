@@ -42,7 +42,7 @@ public readonly struct RawString
     /// <summary>
     /// Initializes an instance of <see cref="RawString"/>.
     /// </summary>
-    public RawString(string value) => Value = value;
+    public RawString (string value) => Value = value;
 
     /// <inheritdoc />
     [ExcludeFromCodeCoverage]

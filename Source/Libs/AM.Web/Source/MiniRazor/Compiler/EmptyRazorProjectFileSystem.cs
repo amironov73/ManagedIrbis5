@@ -52,7 +52,8 @@ internal class EmptyRazorProjectFileSystem
 
 
     [ExcludeFromCodeCoverage]
-    private class NotFoundProjectItem : RazorProjectItem
+    private class NotFoundProjectItem
+        : RazorProjectItem
     {
         public override string BasePath { get; }
 

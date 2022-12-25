@@ -24,6 +24,8 @@
 using System.Reflection;
 using System.Runtime.Loader;
 
+using AM;
+
 using Microsoft.CodeAnalysis;
 
 #endregion
@@ -34,14 +36,28 @@ namespace MiniRazor.Utils.Extensions;
 
 internal static class AssemblyExtensions
 {
-    public static MetadataReference ToMetadataReference(this Assembly assembly) =>
-        MetadataReference.CreateFromFile(assembly.Location);
-
-    public static Assembly? TryLoadFromAssemblyName(this AssemblyLoadContext loadContext, AssemblyName name)
+    public static MetadataReference ToMetadataReference
+        (
+            this Assembly assembly
+        )
     {
+        Sure.NotNull (assembly);
+
+        return MetadataReference.CreateFromFile (assembly.Location);
+    }
+
+    public static Assembly? TryLoadFromAssemblyName
+        (
+            this AssemblyLoadContext loadContext,
+            AssemblyName name
+        )
+    {
+        Sure.NotNull (loadContext);
+        Sure.NotNull (name);
+
         try
         {
-            return loadContext.LoadFromAssemblyName(name);
+            return loadContext.LoadFromAssemblyName (name);
         }
         catch
         {
