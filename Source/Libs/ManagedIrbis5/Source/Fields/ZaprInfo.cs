@@ -4,9 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable PropertyCanBeMadeInitOnly.Global
-// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable StringLiteralTypo
 
 /* ZaprInfo.cs -- информация о постоянном запросе, поле 2
  * Ars Magna project, http://arsmagna.ru
