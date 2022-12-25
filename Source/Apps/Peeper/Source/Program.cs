@@ -19,6 +19,10 @@ using System;
 
 using AM.Avalonia.AppServices;
 
+using Avalonia.Controls;
+
+using ReactiveUI;
+
 #endregion
 
 #nullable enable
@@ -39,8 +43,10 @@ internal sealed class Program
             string[] args
         )
     {
-        DesktopApplication
-            .Run<MainWindow> (args);
+        DesktopApplication.BuildAvaloniaApp (args)
+            .WithName ("Peeper")
+            .WithNativeMenu()
+            .Run();
     }
 
     #endregion

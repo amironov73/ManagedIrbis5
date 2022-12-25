@@ -2,17 +2,17 @@
 
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        x:Class="ManagedIrbis.Avalonia.AboutWindow"
-        xmlns:vm="using:ManagedIrbis.Avalonia"
+        x:Class="AM.Avalonia.Dialogs.AboutDialog"
+        xmlns:vm="using:AM.Avalonia.Dialogs"
         Width="600" Height="300"
         MinWidth="600" MinHeight="300"
         MaxWidth="600" MaxHeight="300"
         CanResize="False"
         ShowInTaskbar="False"
-        Title="О продукте">
+        Title="О приложении">
 
     <Design.DataContext>
-        <vm:AboutWindow />
+        <vm:AboutDialog />
     </Design.DataContext>
 
     <StackPanel
@@ -57,6 +57,4 @@
 
     </StackPanel>
 
-
 </Window>
-

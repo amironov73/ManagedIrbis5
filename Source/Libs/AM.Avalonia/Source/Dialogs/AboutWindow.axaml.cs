@@ -11,32 +11,31 @@
 // ReSharper disable UnusedMember.Local
 // ReSharper disable UnusedParameter.Local
 
-/* AboutWindow.cs -- окно "О продукте"
+/* AboutWindow.cs -- окно "О приложении"
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
-using System.Globalization;
-
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 
+using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Avalonia;
+namespace AM.Avalonia.Dialogs;
 
 /// <summary>
-/// Окно "О продукте".
+/// Окно "О приложении".
 /// </summary>
-public partial class AboutWindow
+public partial class AboutDialog
     : Window
 {
     #region Properties
@@ -72,7 +71,7 @@ public partial class AboutWindow
     /// <summary>
     /// Конструктор по умолчанию
     /// </summary>
-    public AboutWindow()
+    public AboutDialog()
     {
         AvaloniaXamlLoader.Load (this);
 
@@ -104,5 +103,36 @@ public partial class AboutWindow
     }
 
     #endregion
-}
 
+    #region Public methods
+
+    /// <summary>
+    /// Построение стандартного меню "О приложении" для OSX.
+    /// </summary>
+    public static NativeMenu BuildNativeMenuAboutApplication()
+    {
+        return new NativeMenu
+        {
+            new NativeMenuItem
+            {
+                Header = "About Peeper",
+                Command = ReactiveCommand.Create (ShowAboutWindow)
+            }
+        };
+    }
+
+    /// <summary>
+    /// Показ окна "О приложении".
+    /// </summary>
+    public static void ShowAboutWindow()
+    {
+        if (Application.Current?.ApplicationLifetime
+            is ClassicDesktopStyleApplicationLifetime { MainWindow: {} mainWindow })
+        {
+            var aboutWindow = new AboutDialog();
+            aboutWindow.ShowDialog (mainWindow);
+        }
+    }
+
+    #endregion
+}

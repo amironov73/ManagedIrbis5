@@ -66,6 +66,10 @@
         <Compile Update="Source\Dialogs\InputDialog.axaml.cs">
             <DependentUpon>InputDialog.axaml</DependentUpon>
         </Compile>
+        <Compile Update="Source\Dialogs\AboutWindow.axaml.cs">
+          <DependentUpon>AboutWindow.axaml</DependentUpon>
+          <SubType>Code</SubType>
+        </Compile>
     </ItemGroup>
 
 </Project>

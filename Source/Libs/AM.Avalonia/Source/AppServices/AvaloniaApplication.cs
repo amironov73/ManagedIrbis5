@@ -276,6 +276,16 @@ public class AvaloniaApplication
         ThemeManager = new FluentThemeManager();
         ThemeManager.Initialize (this);
         // Current!.Styles.Add (new FluentTheme (new Uri("avares://Avalonia.Themes.Fluent/FluentLight.xaml")));
+
+        if (!string.IsNullOrEmpty (DesktopApplication._applicationName))
+        {
+            Name = DesktopApplication._applicationName;
+        }
+
+        if (DesktopApplication._nativeMenu is not null)
+        {
+            SetValue (NativeMenu.MenuProperty, DesktopApplication._nativeMenu);
+        }
     }
 
     /// <inheritdoc cref="Application.OnFrameworkInitializationCompleted"/>

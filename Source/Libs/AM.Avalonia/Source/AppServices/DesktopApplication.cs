@@ -22,6 +22,8 @@
 using System;
 using System.Collections.Generic;
 
+using AM.Avalonia.Dialogs;
+
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.ReactiveUI;
@@ -72,6 +74,8 @@ public sealed class DesktopApplication
     internal static AppBuilder _appBuilder = null!;
     internal List<Action<HostBuilderContext, IServiceCollection>> _configurationActions = new();
     private Func<AvaloniaApplication, Window> _windowCreator;
+    internal static string? _applicationName;
+    internal static NativeMenu? _nativeMenu;
 
     #endregion
 
@@ -167,6 +171,36 @@ public sealed class DesktopApplication
         where TWindow: Window, new()
     {
         _windowCreator = _ => new TWindow();
+
+        return this;
+    }
+
+    /// <summary>
+    /// Нативное меню (для OSX -- отображается в верхней общей строке меню).
+    /// </summary>
+    public DesktopApplication WithNativeMenu
+        (
+            NativeMenu? nativeMenu = null
+        )
+    {
+        Sure.NotNull (nativeMenu);
+
+        _nativeMenu = nativeMenu ?? AboutDialog.BuildNativeMenuAboutApplication();
+
+        return this;
+    }
+
+    /// <summary>
+    /// Имя (для OSX -- отображается в верхней общей строке меню).
+    /// </summary>
+    public DesktopApplication WithName
+        (
+            string applicationName
+        )
+    {
+        Sure.NotNullNorEmpty (applicationName);
+
+        _applicationName = applicationName;
 
         return this;
     }

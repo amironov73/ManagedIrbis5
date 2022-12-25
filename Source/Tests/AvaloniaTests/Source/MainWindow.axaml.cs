@@ -97,7 +97,7 @@ public partial class MainWindow
             RoutedEventArgs eventArgs
         )
     {
-        var window = new AboutWindow();
+        var window = new AboutDialog();
         await window.ShowDialog<bool> (this);
     }
 
