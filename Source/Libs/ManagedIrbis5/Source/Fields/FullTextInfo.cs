@@ -34,269 +34,266 @@ using ManagedIrbis.Mapping;
 
 #nullable enable
 
-namespace ManagedIrbis.Fields
-{
-    //
-    // Начиная с версии 2018.1
-    //
+namespace ManagedIrbis.Fields;
 
-    //
-    // В структуру БД ЭК ИРБИС64+ по сравнению с ИРБИС64
-    // введено одно новое поле, предназначенное для описания
-    // ПОЛНОГО ТЕКСТА исходного документа (не путать
-    // с полем 951 – ВНЕШНИЙ ОБЪЕКТ, которое сохраняется
-    // в структуре БД ЭК в прежнем виде).
-    // Метка поля – 955.
-    // Поле – НЕПОВТОРЯЮЩЕЕСЯ.
-    // Включает в себя следующие подполя:
-    // A – имя файла полного текста с расширением PDF
-    // (расширение указывается обязательно);
-    // B – идентификатор записи права доступа (см. ниже);
-    // N – количество физических страниц полного текста
-    // (формируется системой автоматически).
-    //
-    // Файл полного текста должен быть распознанным
-    // (т.е. иметь текстовый слой) PDF-файлом, поддающимся
-    // разбиению на страницы. Имя файла не может содержать
-    // символы «запятая», «кавычки», двойные подчеркивания,
-    // квадратные и фигурные скобки. Максимальная длина
-    // имени файла - 64 символа. Не рекомендуется использовать
-    // в именах файлов кириллические символы. Файл полного
-    // текста должен находиться по пути, который указан в
-    // 11 строке параметрического файла <имя_БД>.par или
-    // в подпапках по этому пути – в последнем случае
-    // в подполе А 955 поля необходимо указывать относительный
-    // путь, начинающийся со слэша (все слэши в относительном
-    // пути должны быть ОБРАТНЫМИ). Имя файла должно быть
-    // УНИКАЛЬНЫМ в рамках одной БД.
-    //
+//
+// Начиная с версии 2018.1
+//
+
+//
+// В структуру БД ЭК ИРБИС64+ по сравнению с ИРБИС64
+// введено одно новое поле, предназначенное для описания
+// ПОЛНОГО ТЕКСТА исходного документа (не путать
+// с полем 951 – ВНЕШНИЙ ОБЪЕКТ, которое сохраняется
+// в структуре БД ЭК в прежнем виде).
+// Метка поля – 955.
+// Поле – НЕПОВТОРЯЮЩЕЕСЯ.
+// Включает в себя следующие подполя:
+// A – имя файла полного текста с расширением PDF
+// (расширение указывается обязательно);
+// B – идентификатор записи права доступа (см. ниже);
+// N – количество физических страниц полного текста
+// (формируется системой автоматически).
+//
+// Файл полного текста должен быть распознанным
+// (т.е. иметь текстовый слой) PDF-файлом, поддающимся
+// разбиению на страницы. Имя файла не может содержать
+// символы «запятая», «кавычки», двойные подчеркивания,
+// квадратные и фигурные скобки. Максимальная длина
+// имени файла - 64 символа. Не рекомендуется использовать
+// в именах файлов кириллические символы. Файл полного
+// текста должен находиться по пути, который указан в
+// 11 строке параметрического файла <имя_БД>.par или
+// в подпапках по этому пути – в последнем случае
+// в подполе А 955 поля необходимо указывать относительный
+// путь, начинающийся со слэша (все слэши в относительном
+// пути должны быть ОБРАТНЫМИ). Имя файла должно быть
+// УНИКАЛЬНЫМ в рамках одной БД.
+//
+
+/// <summary>
+/// Сведения о полном тексте документа (поле 955).
+/// </summary>
+[XmlRoot ("fulltext")]
+public sealed class FullTextInfo
+    : IHandmadeSerializable,
+    IVerifiable
+{
+    #region Constants
 
     /// <summary>
-    /// Сведения о полном тексте документа (поле 955).
+    /// Метка поля.
     /// </summary>
-    [XmlRoot ("fulltext")]
-    public sealed class FullTextInfo
-        : IHandmadeSerializable,
-        IVerifiable
+    public const int Tag = 955;
+
+    /// <summary>
+    /// Известные коды подполей.
+    /// </summary>
+    public const string KnownCodes = "abnt";
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Текст для ссылки. Подполе T.
+    /// </summary>
+    [SubField ('t')]
+    [XmlAttribute ("display-text")]
+    [JsonPropertyName ("displayText")]
+    [Description ("Текст для ссылки")]
+    [DisplayName ("Текст для ссылки")]
+    public string? DisplayText { get; set; }
+
+    /// <summary>
+    /// Имя файла (PDF). Подполе A.
+    /// </summary>
+    [SubField ('a')]
+    [XmlAttribute ("filename")]
+    [JsonPropertyName ("filename")]
+    [Description ("Имя файла")]
+    [DisplayName ("Имя файла")]
+    public string? FileName { get; set; }
+
+    /// <summary>
+    /// Количество страниц. Подполе N.
+    /// Формируется автоматически.
+    /// </summary>
+    [SubField ('n')]
+    [XmlAttribute ("page-count")]
+    [JsonPropertyName ("pageCount")]
+    [Description ("Количество страниц")]
+    [DisplayName ("Количество страниц")]
+    public string? PageCount { get; set; }
+
+    /// <summary>
+    /// Идентификатор записи права доступа. Подполе B.
+    /// Запись расположена в базе данных RIGHT,
+    /// отыскивается по поисковому префиксу "I=".
+    /// </summary>
+    [SubField ('b')]
+    [XmlAttribute ("access-rights")]
+    [JsonPropertyName ("accessRights")]
+    [Description ("Идентификатор записи права доступа")]
+    [DisplayName ("Идентификатор записи права доступа")]
+    public string? AccessRights { get; set; }
+
+    /// <summary>
+    /// Неизвестные подполя.
+    /// </summary>
+    [XmlElement ("unknown")]
+    [JsonPropertyName ("unknown")]
+    [Browsable (false)]
+    public SubField[]? UnknownSubFields { get; set; }
+
+    /// <summary>
+    /// Ассоциированное поле библиографической записи.
+    /// </summary>
+    [XmlIgnore]
+    [JsonIgnore]
+    [Browsable (false)]
+    public Field? Field { get; set; }
+
+    /// <summary>
+    /// Произвольные пользовательские данные.
+    /// </summary>
+    [XmlIgnore]
+    [JsonIgnore]
+    [Browsable (false)]
+    public object? UserData { get; set; }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Применение данных к указанному полю библиографической записи.
+    /// </summary>
+    public void ApplyTo
+        (
+            Field field
+        )
     {
-        #region Constants
+        Sure.NotNull (field);
 
-        /// <summary>
-        /// Метка поля.
-        /// </summary>
-        public const int Tag = 955;
+        field
+            .SetSubFieldValue ('t', DisplayText)
+            .SetSubFieldValue ('a', FileName)
+            .SetSubFieldValue ('n', PageCount)
+            .SetSubFieldValue ('b', AccessRights);
+    }
 
-        /// <summary>
-        /// Известные коды подполей.
-        /// </summary>
-        public const string KnownCodes = "abnt";
+    /// <summary>
+    /// Разбор указанного поля библиографической записи.
+    /// </summary>
+    public static FullTextInfo ParseField
+        (
+            Field field
+        )
+    {
+        Sure.NotNull (field);
 
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// Текст для ссылки. Подполе T.
-        /// </summary>
-        [SubField ('t')]
-        [XmlAttribute ("display-text")]
-        [JsonPropertyName ("displayText")]
-        [Description ("Текст для ссылки")]
-        [DisplayName ("Текст для ссылки")]
-        public string? DisplayText { get; set; }
-
-        /// <summary>
-        /// Имя файла (PDF). Подполе A.
-        /// </summary>
-        [SubField ('a')]
-        [XmlAttribute ("filename")]
-        [JsonPropertyName ("filename")]
-        [Description ("Имя файла")]
-        [DisplayName ("Имя файла")]
-        public string? FileName { get; set; }
-
-        /// <summary>
-        /// Количество страниц. Подполе N.
-        /// Формируется автоматически.
-        /// </summary>
-        [SubField ('n')]
-        [XmlAttribute ("page-count")]
-        [JsonPropertyName ("pageCount")]
-        [Description ("Количество страниц")]
-        [DisplayName ("Количество страниц")]
-        public string? PageCount { get; set; }
-
-        /// <summary>
-        /// Идентификатор записи права доступа. Подполе B.
-        /// Запись расположена в базе данных RIGHT,
-        /// отыскивается по поисковому префиксу "I=".
-        /// </summary>
-        [SubField ('b')]
-        [XmlAttribute ("access-rights")]
-        [JsonPropertyName ("accessRights")]
-        [Description ("Идентификатор записи права доступа")]
-        [DisplayName ("Идентификатор записи права доступа")]
-        public string? AccessRights { get; set; }
-
-        /// <summary>
-        /// Неизвестные подполя.
-        /// </summary>
-        [XmlElement ("unknown")]
-        [JsonPropertyName ("unknown")]
-        [Browsable (false)]
-        public SubField[]? UnknownSubFields { get; set; }
-
-        /// <summary>
-        /// Ассоциированное поле библиографической записи.
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        [Browsable (false)]
-        public Field? Field { get; set; }
-
-        /// <summary>
-        /// Произвольные пользовательские данные.
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        [Browsable (false)]
-        public object? UserData { get; set; }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Применение данных к указанному полю библиографической записи.
-        /// </summary>
-        public void ApplyTo
-            (
-                Field field
-            )
+        return new FullTextInfo
         {
-            Sure.NotNull (field);
+            DisplayText = field.GetFirstSubFieldValue ('t'),
+            FileName = field.GetFirstSubFieldValue ('a'),
+            PageCount = field.GetFirstSubFieldValue ('n'),
+            AccessRights = field.GetFirstSubFieldValue ('b'),
+            Field = field
+        };
+    }
 
-            field
-                .SetSubFieldValue ('t', DisplayText)
-                .SetSubFieldValue ('a', FileName)
-                .SetSubFieldValue ('n', PageCount)
-                .SetSubFieldValue ('b', AccessRights);
-        }
+    /// <summary>
+    /// Разбор указанной библиографической записи.
+    /// </summary>
+    public static FullTextInfo[] ParseRecord
+        (
+            Record record,
+            int tag = Tag
+        )
+    {
+        Sure.NotNull (record);
+        Sure.Positive (tag);
 
-        /// <summary>
-        /// Разбор указанного поля библиографической записи.
-        /// </summary>
-        public static FullTextInfo ParseField
-            (
-                Field field
-            )
-        {
-            Sure.NotNull (field);
+        return record
+            .EnumerateField (tag)
+            .Select (field => ParseField (field))
+            .ToArray();
+    }
 
-            return new FullTextInfo ()
-            {
-                DisplayText = field.GetFirstSubFieldValue ('t'),
-                FileName = field.GetFirstSubFieldValue ('a'),
-                PageCount = field.GetFirstSubFieldValue ('n'),
-                AccessRights = field.GetFirstSubFieldValue ('b'),
-                Field = field
-            };
-        }
+    /// <summary>
+    /// Преобразование данных в поле библиографической записи.
+    /// </summary>
+    public Field ToField()
+    {
+        var result = new Field (Tag)
+            .AddNonEmpty ('t', DisplayText)
+            .AddNonEmpty ('a', FileName)
+            .AddNonEmpty ('n', PageCount)
+            .AddNonEmpty ('b', AccessRights);
 
-        /// <summary>
-        /// Разбор указанной библиографической записи.
-        /// </summary>
-        public static FullTextInfo[] ParseRecord
-            (
-                Record record,
-                int tag = Tag
-            )
-        {
-            Sure.NotNull (record);
-            Sure.Positive (tag);
+        return result;
+    }
 
-            return record
-                .EnumerateField (tag)
-                .Select (field => ParseField (field))
-                .ToArray();
-        }
+    #endregion
 
-        /// <summary>
-        /// Преобразование данных в поле библиографической записи.
-        /// </summary>
-        public Field ToField()
-        {
-            var result = new Field (Tag)
-                .AddNonEmpty ('t', DisplayText)
-                .AddNonEmpty ('a', FileName)
-                .AddNonEmpty ('n', PageCount)
-                .AddNonEmpty ('b', AccessRights);
+    #region IHandmadeSerializable members
 
-            return result;
-        }
+    /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
+    public void RestoreFromStream
+        (
+            BinaryReader reader
+        )
+    {
+        Sure.NotNull (reader);
 
-        #endregion
+        DisplayText = reader.ReadNullableString();
+        FileName = reader.ReadNullableString();
+        AccessRights = reader.ReadNullableString();
+        PageCount = reader.ReadNullableString();
+        UnknownSubFields = reader.ReadNullableArray<SubField>();
+    }
 
-        #region IHandmadeSerializable members
+    /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
+    public void SaveToStream
+        (
+            BinaryWriter writer
+        )
+    {
+        Sure.NotNull (writer);
 
-        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
-        public void RestoreFromStream
-            (
-                BinaryReader reader
-            )
-        {
-            Sure.NotNull (reader);
+        writer
+            .WriteNullable (DisplayText)
+            .WriteNullable (FileName)
+            .WriteNullable (AccessRights)
+            .WriteNullable (PageCount)
+            .WriteNullableArray (UnknownSubFields);
+    }
 
-            DisplayText = reader.ReadNullableString();
-            FileName = reader.ReadNullableString();
-            AccessRights = reader.ReadNullableString();
-            PageCount = reader.ReadNullableString();
-            UnknownSubFields = reader.ReadNullableArray<SubField>();
-        }
+    #endregion
 
-        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
-        public void SaveToStream
-            (
-                BinaryWriter writer
-            )
-        {
-            Sure.NotNull (writer);
+    #region IVerifiable members
 
-            writer
-                .WriteNullable (DisplayText)
-                .WriteNullable (FileName)
-                .WriteNullable (AccessRights)
-                .WriteNullable (PageCount)
-                .WriteNullableArray (UnknownSubFields);
-        }
+    /// <inheritdoc cref="IVerifiable.Verify" />
+    public bool Verify
+        (
+            bool throwOnError
+        )
+    {
+        var verifier = new Verifier<FullTextInfo> (this, throwOnError);
 
-        #endregion
+        verifier
+            .NotNullNorEmpty (FileName);
 
-        #region IVerifiable members
+        return verifier.Result;
+    }
 
-        /// <inheritdoc cref="IVerifiable.Verify" />
-        public bool Verify
-            (
-                bool throwOnError
-            )
-        {
-            var verifier = new Verifier<FullTextInfo> (this, throwOnError);
+    #endregion
 
-            verifier
-                .NotNullNorEmpty (FileName);
+    #region Object members
 
-            return verifier.Result;
-        }
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString() => FileName.ToVisibleString();
 
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString() => FileName.ToVisibleString();
-
-        #endregion
-
-    } // class FullTextInfo
-
-} // namespace ManagedIrbis.Fields
+    #endregion
+}
