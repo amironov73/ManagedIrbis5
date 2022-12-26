@@ -28,7 +28,7 @@ internal class App
 {
     public override void Initialize()
     {
-        Name = "Visual Renumber";
+        Name = "Перенумерация";
         var nativeMenu = AboutDialog.BuildNativeMenuAboutApplication();
         SetValue (NativeMenu.MenuProperty, nativeMenu);
 

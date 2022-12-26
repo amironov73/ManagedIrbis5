@@ -646,6 +646,31 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
+    /// Получение родительского контекста указанного типа.
+    /// </summary>
+    public static TDataContext? GetParentDataContext<TDataContext>
+        (
+            this IControl control
+        )
+        where TDataContext: class
+    {
+        Sure.NotNull (control);
+
+        var parent = control.Parent;
+        while (parent is not null)
+        {
+            if (parent.DataContext is TDataContext found)
+            {
+                return found;
+            }
+
+            parent = parent.Parent;
+        }
+
+        return null;
+    }
+
+    /// <summary>
     /// Поиск родительского контрола с контекстом данных
     /// указанного типа.
     /// </summary>
@@ -653,7 +678,7 @@ public static class AvaloniaUtility
         (
             this IControl control
         )
-        where TDataContext : class
+        where TDataContext: class
     {
         Sure.NotNull (control);
 

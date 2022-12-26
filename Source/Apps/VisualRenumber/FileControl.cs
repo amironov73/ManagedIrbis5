@@ -12,6 +12,7 @@
 
 using AM.Avalonia;
 
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Data;
@@ -29,6 +30,14 @@ public class FileControl
 {
     public FileControl()
     {
+        var checkBox = new CheckBox
+        {
+            Height = 10,
+            [!ToggleButton.IsCheckedProperty] = new Binding (nameof (FileItem.IsChecked))
+        }
+        .DockLeft();
+        checkBox.PropertyChanged += CheckBox_Checked;
+
         Content = new Grid
         {
             HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -36,12 +45,7 @@ public class FileControl
 
             Children =
             {
-                new CheckBox
-                {
-                    Height = 10,
-                    [!ToggleButton.IsCheckedProperty] = new Binding (nameof (FileItem.IsChecked))
-                }
-                .DockLeft(),
+                checkBox,
 
                 new TextBlock
                 {
@@ -61,6 +65,15 @@ public class FileControl
     }
 
     #region Private members
+
+    private void CheckBox_Checked
+        (
+            object? sender,
+            AvaloniaPropertyChangedEventArgs eventArgs
+        )
+    {
+        this.GetParentDataContext<FolderModel>()?.SyncRenumber();
+    }
 
     #endregion
 }

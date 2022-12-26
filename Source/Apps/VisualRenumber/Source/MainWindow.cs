@@ -15,24 +15,24 @@
 #region Using directives
 
 using System;
-using System.Reactive.Linq;
+using System.ComponentModel;
+using System.IO;
 
 using AM;
 using AM.Avalonia;
-using AM.Avalonia.AppServices;
 
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
 using Avalonia.Layout;
 using Avalonia.Media;
-using Avalonia.ReactiveUI;
+using Avalonia.Platform.Storage;
 using Avalonia.Styling;
 
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 
 #endregion
 
@@ -59,9 +59,12 @@ public sealed class MainWindow
         this.SetWindowIcon ("Assets/number.ico");
 
         Title = "Перенумерация файлов";
-        Width = MinWidth = 800;
+        Width = MinWidth = 960;
         Height = MinHeight = 550;
-        _model = new FolderModel();
+        _model = new FolderModel
+        {
+            DryRun = true
+        };
         _fileListBox = new ListBox
         {
             HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -112,21 +115,55 @@ public sealed class MainWindow
 
                         Children =
                         {
-                            new Button
+                            CreateButton ("open.png", _OpenFolder),
+                            CreateButton ("check-all.png", () => _model.CheckAll()),
+                            CreateButton ("check-none.png", () => _model.CheckNone()),
+                            CreateButton ("check-reverse.png", () => _model.CheckReverse()),
+                            new Label
                             {
-                                Content = "Open",
+                                Content = "Группа",
+                                VerticalAlignment = VerticalAlignment.Center
                             },
-
-                            new Button
+                            new NumericUpDown
                             {
-                                Content = "Rename",
+                                Width = 120,
+                                Minimum = 1,
+                                Maximum = 9,
+                                [!NumericUpDown.ValueProperty] = new Binding (nameof (_model.GroupNumber))
                             },
+                            new Label
+                            {
+                                Content = "Ширина",
+                                VerticalAlignment = VerticalAlignment.Center
+                            },
+                            new NumericUpDown
+                            {
+                                Width = 120,
+                                Minimum = 0,
+                                Maximum = 9,
+                                [!NumericUpDown.ValueProperty] = new Binding (nameof (_model.GroupWidth))
+                            },
+                            new Label
+                            {
+                                Content = "Префикс",
+                                VerticalAlignment = VerticalAlignment.Center
+                            },
+                            new TextBox
+                            {
+                                Width = 150,
+                                [!TextBox.TextProperty] = new Binding (nameof (_model.Prefix))
+                            },
+                            new CheckBox
+                            {
+                                Content = "Сухой",
+                                [!ToggleButton.IsCheckedProperty] = new Binding (nameof (_model.DryRun))
+                            },
+                            CreateButton ("runner.png", _Run)
                         }
                     }
                 }
             }
             .DockTop();
-
         Content = new DockPanel
         {
             HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -137,14 +174,80 @@ public sealed class MainWindow
                 _fileListBox
             }
         };
+
+        _model.PropertyChanged += _Refresh;
     }
 
     #endregion
 
     #region Program entry point
 
-    private FolderModel _model;
-    private ListBox _fileListBox;
+    private readonly FolderModel _model;
+    private readonly ListBox _fileListBox;
+
+    private Button CreateButton
+        (
+            string assetName,
+            Action action
+        )
+    {
+        Sure.NotNullNorEmpty (assetName);
+        Sure.NotNull (action);
+
+        assetName = Path.Combine ("Assets", assetName);
+        return new Button
+        {
+            Content = new Image
+            {
+                Width = 24,
+                Height = 24,
+                Source = this.LoadBitmapFromAssets (assetName).ThrowIfNull()
+            },
+            Background = Brushes.Transparent,
+            Command = ReactiveCommand.Create (action)
+        };
+    }
+
+    private async void _OpenFolder()
+    {
+        if (!StorageProvider.CanPickFolder)
+        {
+            return;
+        }
+
+        var options = new FolderPickerOpenOptions();
+        var result = await StorageProvider.OpenFolderPickerAsync (options);
+        if (result.Count != 0)
+        {
+            if (result[0].TryGetUri (out var uri))
+            {
+                _model.ReadDirectory (uri.LocalPath);
+            }
+        }
+    }
+
+    private void _Refresh (object? sender, PropertyChangedEventArgs eventArgs)
+    {
+        _model.Refresh();
+    }
+
+    private void _Run()
+    {
+        if (_model.DryRun)
+        {
+            var message = _model.HasError()
+                ? "Нельзя"
+                : "Можно";
+            MessageBoxManager
+                .GetMessageBoxStandardWindow ("Renumberer", message)
+                .ShowDialog (this);
+        }
+        else
+        {
+            _model.RenameChecked();
+            _model.ClearChecked();
+        }
+    }
 
     #endregion
 }

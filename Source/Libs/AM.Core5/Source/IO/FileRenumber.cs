@@ -218,8 +218,10 @@ public sealed class FileRenumber
             return result;
         }
 
+        var counter = 0;
         foreach (var sourceFile in sourceFiles)
         {
+            var extension = Path.GetExtension (sourceFile);
             var oldName = Path.GetFileNameWithoutExtension (sourceFile);
             var match = regex.Matches (oldName)!.SafeAt (GroupNumber)!;
             var value = int.Parse (match.Value, CultureInfo.InvariantCulture);
@@ -228,7 +230,8 @@ public sealed class FileRenumber
                 ? oldName.Substring (0, match.Index)
                   + value.ToString (pattern, CultureInfo.InvariantCulture)
                   + oldName.Substring (match.Index + match.Length)
-                : Prefix + value.ToString (pattern, CultureInfo.InvariantCulture);
+                : Prefix + (++counter).ToString (pattern, CultureInfo.InvariantCulture);
+            newName += extension;
 
             if (string.CompareOrdinal (oldName, newName) != 0)
             {
