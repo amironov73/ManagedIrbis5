@@ -9,6 +9,10 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
+    <ItemGroup>
+        <AvaloniaResource Include="Assets\**" />
+    </ItemGroup>
+    
     <PropertyGroup>
         <Description>Avalonia support for Ars Magna</Description>
         <Title>Avalonia support for Ars Magna</Title>
@@ -65,10 +69,6 @@
     <ItemGroup>
         <Compile Update="Source\Dialogs\InputDialog.axaml.cs">
             <DependentUpon>InputDialog.axaml</DependentUpon>
-        </Compile>
-        <Compile Update="Source\Dialogs\AboutWindow.axaml.cs">
-          <DependentUpon>AboutWindow.axaml</DependentUpon>
-          <SubType>Code</SubType>
         </Compile>
     </ItemGroup>
 
