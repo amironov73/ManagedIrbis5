@@ -38,6 +38,7 @@ using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Styling;
+using Avalonia.Themes.Fluent;
 
 using Microsoft.Extensions.Logging;
 
@@ -246,6 +247,23 @@ public static class AvaloniaUtility
         };
 
         return result;
+    }
+
+    /// <summary>
+    /// Создание Fluent-темы.
+    /// </summary>
+    public static FluentTheme CreateFluentTheme
+        (
+            bool light = true
+        )
+    {
+        return new FluentTheme (new Uri
+            (
+                light
+                ? "avares://Avalonia.Themes.Fluent/FluentLight.xaml"
+                : "avares://Avalonia.Themes.Fluent/FluentDark.xaml"
+            ));
+
     }
 
     /// <summary>
