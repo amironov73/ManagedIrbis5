@@ -10,7 +10,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UseNameofExpression
 
-/*
+/* Cache.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -27,57 +27,25 @@ using System.Linq;
 
 namespace AM.HtmlTags;
 
-internal class Cache<TKey, TValue> : IEnumerable<TValue> where TValue : class
+internal class Cache<TKey, TValue>
+    : IEnumerable<TValue>
+    where TKey: notnull
+    where TValue: class
 {
-    private readonly object _locker = new ();
-    private readonly IDictionary<TKey, TValue> _values;
-
-    private Func<TValue, TKey> _getKey = arg => { throw new NotImplementedException(); };
-
-    private Func<TKey, TValue> _onMissing = key =>
-    {
-        var message = $"Key '{key}' could not be found";
-        throw new KeyNotFoundException (message);
-    };
-
-    public Cache()
-        : this (new Dictionary<TKey, TValue>())
-    {
-    }
-
-    public Cache (Func<TKey, TValue> onMissing)
-        : this (new Dictionary<TKey, TValue>(), onMissing)
-    {
-    }
-
-    public Cache (IDictionary<TKey, TValue> dictionary, Func<TKey, TValue> onMissing)
-        : this (dictionary)
-    {
-        _onMissing = onMissing;
-    }
-
-    public Cache (IDictionary<TKey, TValue> dictionary)
-    {
-        _values = dictionary;
-    }
+    #region Properties
 
     public Func<TKey, TValue> OnMissing
     {
         set => _onMissing = value;
     }
 
-    public Func<TValue, TKey> GetKey
-    {
-        get => _getKey;
-        set => _getKey = value;
-    }
+    public Func<TValue, TKey> GetKey { get; set; } = _ => throw new NotImplementedException();
 
     public int Count => _values.Count;
 
-    public TValue First => _values.Select (pair => pair.Value).FirstOrDefault();
+    public TValue? First => _values.Select (pair => pair.Value).FirstOrDefault();
 
     public IDictionary<TKey, TValue> Inner => _values;
-
 
     public TValue this [TKey key]
     {
@@ -110,13 +78,71 @@ internal class Cache<TKey, TValue> : IEnumerable<TValue> where TValue : class
         }
     }
 
-    #region IEnumerable<TValue> Members
+    #endregion
+
+    #region Construction
+
+    public Cache()
+        : this (new Dictionary<TKey, TValue>())
+    {
+        // пустое тело конструктора
+    }
+
+    public Cache
+        (
+            Func<TKey, TValue> onMissing
+        )
+        : this (new Dictionary<TKey, TValue>(), onMissing)
+    {
+        // пустое тело конструктора
+    }
+
+    public Cache
+        (
+            IDictionary<TKey, TValue> dictionary,
+            Func<TKey, TValue> onMissing
+        )
+        : this (dictionary)
+    {
+        Sure.NotNull (onMissing);
+
+        _onMissing = onMissing;
+    }
+
+    public Cache
+        (
+            IDictionary<TKey, TValue> dictionary
+        )
+    {
+        Sure.NotNull (dictionary);
+
+        _values = dictionary;
+    }
+
+    #endregion
+
+    #region Private members
+
+    private readonly object _locker = new ();
+    private readonly IDictionary<TKey, TValue> _values;
+
+    private Func<TKey, TValue> _onMissing = key =>
+    {
+        var message = $"Key '{key}' could not be found";
+        throw new KeyNotFoundException (message);
+    };
+
+    #endregion
+
+    #region IEnumerable<TValue> members
 
     IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable<TValue>)this).GetEnumerator();
 
     public IEnumerator<TValue> GetEnumerator() => _values.Values.GetEnumerator();
 
     #endregion
+
+    #region Public methods
 
     public IEnumerable<TKey> GetKeys() => _values.Keys;
 
@@ -130,9 +156,9 @@ internal class Cache<TKey, TValue> : IEnumerable<TValue> where TValue : class
         _values.Add (key, value);
     }
 
-    public bool TryRetrieve (TKey key, out TValue value)
+    public bool TryRetrieve (TKey key, out TValue? value)
     {
-        value = default (TValue);
+        value = default;
 
         if (_values.ContainsKey (key))
         {
@@ -143,15 +169,23 @@ internal class Cache<TKey, TValue> : IEnumerable<TValue> where TValue : class
         return false;
     }
 
-    public void Each (Action<TValue> action)
+    public void Each
+        (
+            Action<TValue> action
+        )
     {
+        Sure.NotNull (action);
+
         foreach (var pair in _values)
         {
             action (pair.Value);
         }
     }
 
-    public void Each (Action<TKey, TValue> action)
+    public void Each
+        (
+            Action<TKey, TValue> action
+        )
     {
         foreach (var pair in _values)
         {
@@ -159,10 +193,21 @@ internal class Cache<TKey, TValue> : IEnumerable<TValue> where TValue : class
         }
     }
 
-    public bool Has (TKey key) => _values.ContainsKey (key);
-
-    public bool Exists (Predicate<TValue> predicate)
+    public bool Has
+        (
+            TKey key
+        )
     {
+        return _values.ContainsKey (key);
+    }
+
+    public bool Exists
+        (
+            Predicate<TValue> predicate
+        )
+    {
+        Sure.NotNull (predicate);
+
         var returnValue = false;
 
         Each (value => returnValue |= predicate (value));
@@ -170,8 +215,16 @@ internal class Cache<TKey, TValue> : IEnumerable<TValue> where TValue : class
         return returnValue;
     }
 
-    public TValue Find (Predicate<TValue> predicate) => _values.Where (pair => predicate (pair.Value))
-        .Select (pair => pair.Value).FirstOrDefault();
+    public TValue? Find
+        (
+            Predicate<TValue> predicate
+        )
+    {
+        Sure.NotNull (predicate);
+
+        return _values.Where (pair => predicate (pair.Value))
+            .Select (pair => pair.Value).FirstOrDefault();
+    }
 
     public TValue[] GetAll()
     {
@@ -190,4 +243,6 @@ internal class Cache<TKey, TValue> : IEnumerable<TValue> where TValue : class
     }
 
     public void ClearAll() => _values.Clear();
+
+    #endregion
 }
