@@ -1,0 +1,15 @@
+﻿//
+// Работа с базой данных читателей
+//
+
+house = get_storehouse("Data Source=center;Initial Catalog=kladovka;User ID=librarian;Password=secret;")
+println (house)
+
+//=================================
+
+mironov = reader_by_email ("amironov73@gmail.com")
+println (mironov)
+
+//=================================
+
+println ("THAT'S ALL, FOLKS!")

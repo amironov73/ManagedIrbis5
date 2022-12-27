@@ -56,7 +56,7 @@ public sealed class Storehouse
 
         _logger.LogTrace (nameof (Storehouse) + "::Constructor");
 
-        _kladovkaConnectionString = connectionString ?? _configuration["kladovka"];
+        _kladovkaConnectionString = (connectionString ?? _configuration["kladovka"]).ThrowIfNullOrEmpty();
     }
 
     #endregion
@@ -80,16 +80,19 @@ public sealed class Storehouse
     /// <summary>
     /// Получение (возможно, нового) экземпляра.
     /// </summary>
-    public static Storehouse GetInstance()
+    public static Storehouse GetInstance
+        (
+            string? connnectionString = null
+        )
     {
         if (_instance is null)
         {
             var serviceProvider = Magna.Host.Services;
             var configuration = Magna.Configuration;
-            _instance = new Storehouse (serviceProvider, configuration);
+            _instance = new Storehouse (serviceProvider, configuration, connnectionString);
         }
 
-        return _instance!;
+        return _instance;
     }
 
     /// <summary>

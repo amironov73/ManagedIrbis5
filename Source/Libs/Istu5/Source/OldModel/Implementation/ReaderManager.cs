@@ -21,6 +21,8 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
+using AM;
+
 using Istu.OldModel.Interfaces;
 
 using LinqToDB;
@@ -48,6 +50,8 @@ public sealed class ReaderManager
             Storehouse storehouse
         )
     {
+        Sure.NotNull (storehouse);
+
         _storehouse = storehouse;
     }
 
@@ -76,7 +80,7 @@ public sealed class ReaderManager
         var result = db.Insert (reader);
 
         return result;
-    } // method CreateReader
+    }
 
     /// <inheritdoc cref="IReaderManager.GetReaderByTicket"/>
     public Reader? GetReaderByTicket
@@ -89,7 +93,7 @@ public sealed class ReaderManager
         var result = readers.FirstOrDefault (reader => reader.Ticket == ticket);
 
         return result;
-    } // method GetReaderByTicket
+    }
 
     /// <inheritdoc cref="IReaderManager.GetReaderByTicketAndPassword"/>
     public Reader? GetReaderByTicketAndPassword
@@ -111,7 +115,7 @@ public sealed class ReaderManager
         }
 
         return result;
-    } // method GetReaderByTicketAndPassword
+    }
 
     /// <inheritdoc cref="IReaderManager.GetReaderByBarcode"/>
     public Reader? GetReaderByBarcode
@@ -124,7 +128,7 @@ public sealed class ReaderManager
         var result = readers.FirstOrDefault (reader => reader.Barcode == barcode);
 
         return result;
-    } // method GetReaderByBarcode
+    }
 
     /// <inheritdoc cref="IReaderManager.GetReaderByIstuId"/>
     public Reader? GetReaderByIstuId
@@ -137,7 +141,7 @@ public sealed class ReaderManager
         var result = readers.FirstOrDefault (reader => reader.IstuID == id);
 
         return result;
-    } // method GetReaderByIstuId
+    }
 
     /// <inheritdoc cref="IReaderManager.GetReaderByRfid"/>
     public Reader? GetReaderByRfid
@@ -150,7 +154,33 @@ public sealed class ReaderManager
         var result = readers.FirstOrDefault (reader => reader.Rfid == rfid);
 
         return result;
-    } // method GetReaderByRfid
+    }
+
+    /// <inheritdoc cref="IReaderManager.GetReaderByEmail"/>
+    public Reader? GetReaderByEmail
+        (
+            string email
+        )
+    {
+        var db = _GetDb();
+        var readers = db.GetReaders();
+        var result = readers.FirstOrDefault (reader => reader.Mail == email);
+
+        return result;
+    }
+
+    /// <inheritdoc cref="IReaderManager.GetReaderByTelegramId"/>
+    public Reader? GetReaderByTelegramId
+        (
+            long telegramId
+        )
+    {
+        var db = _GetDb();
+        var readers = db.GetReaders();
+        var result = readers.FirstOrDefault (reader => reader.TelegramId == telegramId);
+
+        return result;
+    }
 
     /// <inheritdoc cref="IReaderManager.UpdateReaderInfo"/>
     public void UpdateReaderInfo
@@ -160,7 +190,7 @@ public sealed class ReaderManager
     {
         var db = _GetDb();
         db.Update (reader);
-    } // method UpdateReaderInfo
+    }
 
     /// <inheritdoc cref="IReaderManager.Reregister"/>
     public void Reregister
@@ -174,7 +204,7 @@ public sealed class ReaderManager
         readers.Where (reader => reader.Ticket == ticket)
             .Set (reader => reader.Reregistered, year)
             .Update();
-    } // method Reregister
+    }
 
     /// <inheritdoc cref="IReaderManager.DeleteReader"/>
     public void DeleteReader
@@ -185,7 +215,7 @@ public sealed class ReaderManager
         var db = _GetDb();
         var readers = db.GetReaders();
         readers.Delete (reader => reader.Ticket == ticket);
-    } // method DeleteReader
+    }
 
     /// <inheritdoc cref="IReaderManager.CheckExistence"/>
     public bool CheckExistence
@@ -198,7 +228,7 @@ public sealed class ReaderManager
         var result = readers.Count (reader => reader.Ticket == ticket) != 0;
 
         return result;
-    } // method CheckExistence
+    }
 
     /// <inheritdoc cref="IReaderManager.ValidateTicketString"/>
     public bool ValidateTicketString
@@ -209,7 +239,7 @@ public sealed class ReaderManager
         var result = Regex.IsMatch (@"[0-9A-Za-zа-яА-Я\-]+", ticket);
 
         return result;
-    } // method ValidateTicketString
+    }
 
     /// <inheritdoc cref="IReaderManager.ValidateNameString"/>
     public bool ValidateNameString
@@ -218,7 +248,7 @@ public sealed class ReaderManager
         )
     {
         throw new NotImplementedException();
-    } // method ValidateNameString
+    }
 
     /// <inheritdoc cref="IReaderManager.VerifyPassword"/>
     public bool VerifyPassword
@@ -233,7 +263,7 @@ public sealed class ReaderManager
         var result = reader is not null && string.CompareOrdinal (reader.Ticket, password) == 0;
 
         return result;
-    } // method VerifyPassword
+    }
 
     /// <inheritdoc cref="IReaderManager.FindReaders"/>
     public Reader[] FindReaders
@@ -263,7 +293,7 @@ public sealed class ReaderManager
             );
 
         return result.ToArray();
-    } // method FindReaders
+    }
 
     /// <inheritdoc cref="IReaderManager.Search"/>
     public Reader[] Search
@@ -275,7 +305,7 @@ public sealed class ReaderManager
         var result = db.Query<Reader> (expression);
 
         return result.ToArray();
-    } // method FindReaders
+    }
 
     /// <inheritdoc cref="IReaderManager.GetPhoto"/>
     public byte[]? GetPhoto
@@ -290,7 +320,7 @@ public sealed class ReaderManager
             .FirstOrDefault();
 
         return result;
-    } // method GetPhoto
+    }
 
     /// <inheritdoc cref="IReaderManager.SetPhoto"/>
     public void SetPhoto
@@ -304,7 +334,7 @@ public sealed class ReaderManager
         readers.Where (reader => reader.Ticket == ticket)
             .Set (reader => reader.Photo, photo)
             .Update();
-    } // method SetPhoto
+    }
 
     /// <inheritdoc cref="IReaderManager.ExportPhoto"/>
     public void ExportPhoto
@@ -325,7 +355,7 @@ public sealed class ReaderManager
             var fileName = Path.Combine (path, reader.Ticket + ".jpg");
             File.WriteAllBytes (fileName, reader.Photo!);
         }
-    } // method ExportPhoto
+    }
 
     /// <inheritdoc cref="IReaderManager.GetDopplers"/>
     public string[] GetDopplers()
@@ -338,7 +368,7 @@ public sealed class ReaderManager
             .ToArray();
 
         return result!;
-    } // method GetDopplers
+    }
 
     #endregion
 

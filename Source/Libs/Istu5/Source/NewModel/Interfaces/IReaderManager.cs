@@ -76,6 +76,22 @@ public interface IReaderManager
         );
 
     /// <summary>
+    /// Поиск читателя по e-mail.
+    /// </summary>
+    Reader? GetReaderByEmail
+        (
+            string email
+        );
+
+    /// <summary>
+    /// Поиск читателя по идентификатору Telegram.
+    /// </summary>
+    Reader? GetReaderByTelegramId
+        (
+            long telegramId
+        );
+
+    /// <summary>
     /// Обновление данных читателя.
     /// </summary>
     void UpdateReaderInfo

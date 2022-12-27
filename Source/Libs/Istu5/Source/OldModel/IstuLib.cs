@@ -47,13 +47,6 @@ public sealed class IstuLib
 
     #region Properties
 
-    // TODO добавить аналоги операторов глобальной корректировки
-    // Оператор ADD
-    // Оператор REP
-    // Оператор CHA/CHAC
-    // Оператор DEL
-    // Оператор UNDOR (откат)
-
     // TODO добавить работу с читателями
     // parse_reader
 
@@ -63,6 +56,8 @@ public sealed class IstuLib
     public static readonly Dictionary<string, FunctionDescriptor> Registry = new ()
     {
         { "get_storehouse", new FunctionDescriptor ("get_storehouse", GetStorehouse) },
+        { "reader_by_email", new FunctionDescriptor ("reader_by_email", ReaderByEmail) },
+        { "reader_by_telegram", new FunctionDescriptor ("reader_by_telegram", ReaderByTelegramId) },
     };
 
     #endregion
@@ -123,10 +118,60 @@ public sealed class IstuLib
             return storehouse;
         }
 
-        storehouse = Storehouse.GetInstance();
+        var connectionString = Compute (context, args, 0) as string;
+        storehouse = Storehouse.GetInstance (connectionString);
         context.SetDefine (StorehouseDefineName, storehouse);
 
         return storehouse;
+    }
+
+    /// <summary>
+    /// Поиск читателя по e-mail.
+    /// </summary>
+    public static dynamic? ReaderByEmail
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (!TryGetStorehouse (context, out var storehouse))
+        {
+            return null;
+        }
+
+        var email = Compute (context, args, 0) as string;
+        if (string.IsNullOrEmpty (email))
+        {
+            return null;
+        }
+
+        var readerManager = storehouse.CreateReaderManager();
+
+        return readerManager.GetReaderByEmail (email);
+    }
+
+    /// <summary>
+    /// Поиск читателя по e-mail.
+    /// </summary>
+    public static dynamic? ReaderByTelegramId
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (!TryGetStorehouse (context, out var storehouse))
+        {
+            return null;
+        }
+
+        if (Compute (context, args, 0) is long id and > 0)
+        {
+            var readerManager = storehouse.CreateReaderManager();
+
+            return readerManager.GetReaderByTelegramId (id);
+        }
+
+        return null;
     }
 
     #endregion
@@ -187,5 +232,4 @@ public sealed class IstuLib
     }
 
     #endregion
-
 }

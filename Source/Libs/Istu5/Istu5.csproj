@@ -25,6 +25,7 @@
     <!-- Централизованное управление пакетами -->
     <ItemGroup>
         <PackageReference Include="linq2db"/>
+        <PackageReference Include="System.Data.SqlClient"/>
     </ItemGroup>
 
     <ItemGroup>

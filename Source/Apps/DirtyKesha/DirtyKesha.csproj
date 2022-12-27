@@ -41,4 +41,8 @@
         </None>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\Libs\Istu5\Istu5.csproj" />
+    </ItemGroup>
+
 </Project>

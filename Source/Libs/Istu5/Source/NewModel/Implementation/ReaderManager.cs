@@ -169,6 +169,32 @@ public sealed class ReaderManager
         return result;
     }
 
+    /// <inheritdoc cref="IReaderManager.GetReaderByEmail"/>
+    public Reader? GetReaderByEmail
+        (
+            string email
+        )
+    {
+        var db = _GetDb();
+        var readers = db.GetReaders();
+        var result = readers.FirstOrDefault (reader => reader.Mail == email);
+
+        return result;
+    }
+
+    /// <inheritdoc cref="IReaderManager.GetReaderByTelegramId"/>
+    public Reader? GetReaderByTelegramId
+        (
+            long telegramId
+        )
+    {
+        var db = _GetDb();
+        var readers = db.GetReaders();
+        var result = readers.FirstOrDefault (reader => reader.TelegramId == telegramId);
+
+        return result;
+    }
+
     /// <inheritdoc cref="IReaderManager.UpdateReaderInfo"/>
     public void UpdateReaderInfo
         (
