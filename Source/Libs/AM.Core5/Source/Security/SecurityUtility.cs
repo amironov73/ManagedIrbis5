@@ -161,7 +161,8 @@ public static class SecurityUtility
         )
     {
         var bytes = Encoding.UTF8.GetBytes (text);
-        var result = Convert.ToBase64String (bytes);
+        var result = Convert.ToBase64String (bytes)
+            .Replace ("=", string.Empty);
 
         return result;
     }
@@ -174,6 +175,11 @@ public static class SecurityUtility
             string text
         )
     {
+        while (text.Length % 4 != 0)
+        {
+            text += "=";
+        }
+
         var bytes = Convert.FromBase64String (text);
         var result = Encoding.UTF8.GetString (bytes);
 

@@ -28,6 +28,8 @@ using AM;
 using AM.Collections;
 using AM.Net;
 
+using Istu.OldModel;
+
 using ManagedIrbis;
 using ManagedIrbis.Searching;
 
@@ -146,9 +148,35 @@ internal sealed class Client
     }
 
     /// <summary>
+    /// Регистрация заказа на книгу.
+    /// </summary>
+    private static async Task RegisterBookOrder
+        (
+            ITelegramBotClient client,
+            long chatId,
+            User? user,
+            string encodedOrder,
+            CancellationToken token
+        )
+    {
+        var decodedOrder = KeshaUtility.DecodeTheOrder (encodedOrder);
+        if (string.IsNullOrEmpty (decodedOrder))
+        {
+            return;
+        }
+
+        await client.SendTextMessageAsync
+            (
+                chatId,
+                "Размещение заказов временно недоступно",
+                cancellationToken: token
+            );
+    }
+
+    /// <summary>
     /// Связывание читателя с Telegram-идентификатором через email.
     /// </summary>
-    private static void StoreTelegramIdForEmail
+    private static async Task StoreTelegramIdForEmail
         (
             ITelegramBotClient client,
             long chatId,
@@ -162,9 +190,40 @@ internal sealed class Client
             return;
         }
 
+        if (user.IsBot)
+        {
+            return;
+        }
+
+        var storehouse = Storehouse.GetInstance
+            (
+                Program.ApplicationHost.Services,
+                Program.Configuration
+            );
+        using var readerManager = storehouse.CreateReaderManager();
+
         // 1. Находим читателя в базе по e-mail
+        var reader = readerManager.GetReaderByEmail (email);
+        if (reader is null)
+        {
+            await client.SendTextMessageAsync
+                (
+                    chatId,
+                    "В базе нет читателя с таким e-mail",
+                    cancellationToken: token
+                );
+            return;
+        }
 
         // 2. Сохраняем TelegramID
+        reader.TelegramId = user.Id;
+        readerManager.UpdateReaderInfo (reader);
+        await client.SendTextMessageAsync
+            (
+                chatId,
+                "Ваш аккаунт авторизован, теперь Вы можете заказывать книги",
+                cancellationToken: token
+            );
     }
 
     /// <summary>
@@ -200,6 +259,7 @@ internal sealed class Client
 
         if (string.IsNullOrWhiteSpace (messageText))
         {
+            // пустые сообщения принципиально не обрабатываем
             return;
         }
 
@@ -217,13 +277,14 @@ internal sealed class Client
         if (MailUtility.VerifyEmail (messageText))
         {
             // Читатель прислал свой e-mail, чтобы мы связали его с телеграммом
-            StoreTelegramIdForEmail (client, chatId, message.From, messageText, token);
+            await StoreTelegramIdForEmail (client, chatId, message.From, messageText, token);
             return;
         }
 
         if (messageText.StartsWith ("//"))
         {
             // заказ на книгу
+            await RegisterBookOrder (client, chatId, message.From, messageText, token);
             return;
         }
 

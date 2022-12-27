@@ -82,6 +82,19 @@ public sealed class Storehouse
     /// </summary>
     public static Storehouse GetInstance
         (
+            IServiceProvider serviceProvider,
+            IConfiguration configuration,
+            string? connnectionString = null
+        )
+    {
+        return _instance ??= new Storehouse (serviceProvider, configuration, connnectionString);
+    }
+
+    /// <summary>
+    /// Получение (возможно, нового) экземпляра.
+    /// </summary>
+    public static Storehouse GetInstance
+        (
             string? connnectionString = null
         )
     {
