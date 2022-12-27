@@ -6,7 +6,6 @@
         <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
         <ApplicationManifest>app.manifest</ApplicationManifest>
         <ApplicationIcon>Assets/number.ico</ApplicationIcon>
-        <Platforms>x64</Platforms>
         <InvariantGlobalization>true</InvariantGlobalization>
         <PublishAot>true</PublishAot>
     </PropertyGroup>
