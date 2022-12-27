@@ -458,8 +458,7 @@ namespace ManagedIrbis.Providers
             return found is { Length: 1 }
                 ? await connection.ReadRecordAsync(found[0].Mfn)
                 : default;
-
-        } // method SearchReadOneRecordAsyn
+        }
 
         /// <summary>
         /// Сохранение/обновление записи в базе данных.
@@ -482,11 +481,8 @@ namespace ManagedIrbis.Providers
             };
 
             return await connection.WriteRecordAsync(parameters);
-
-        } // method WriteRecordAsync
+        }
 
         #endregion
-
-    } // class AsyncProviderUtility
-
+    }
 } // namespace ManagedIrbis.Providers

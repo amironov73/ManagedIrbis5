@@ -6,8 +6,9 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 
-/* HardFormat.cs -- захардкоженный формат
+/* AsyncHardFormat.cs -- асинхронный захардкоженный формат
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -16,6 +17,7 @@
 using System;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 using AM;
 using AM.AppServices;
@@ -44,9 +46,9 @@ using Microsoft.Extensions.Logging;
 namespace ManagedIrbis.Formatting;
 
 /// <summary>
-/// Захардкоженный формат.
+/// Асинхронный захардкоженный формат.
 /// </summary>
-public sealed class HardFormat
+public sealed class AsyncHardFormat
 {
     #region Properties
 
@@ -62,7 +64,7 @@ public sealed class HardFormat
     /// <summary>
     /// Конструктор по умолчанию.
     /// </summary>
-    public HardFormat()
+    public AsyncHardFormat()
         : this
         (
             Magna.Host,
@@ -75,10 +77,10 @@ public sealed class HardFormat
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public HardFormat
+    public AsyncHardFormat
         (
             IHost host,
-            ISyncProvider provider,
+            IAsyncProvider provider,
             RecordConfiguration? configuration = null,
             IStringLocalizer? localizer = null,
             IFormatDriver? driver = null,
@@ -129,7 +131,7 @@ public sealed class HardFormat
 
     private readonly RecordConfiguration _configuration;
 
-    private readonly ISyncProvider _provider;
+    private readonly IAsyncProvider _provider;
 
     private readonly IMemoryCache _cache;
 
@@ -251,7 +253,7 @@ public sealed class HardFormat
     /// <summary>
     /// Перекодирование значения через меню.
     /// </summary>
-    public string? TranslateMenu
+    public async Task<string?> TranslateMenuAsync
         (
             string menuName,
             string? key
@@ -267,7 +269,7 @@ public sealed class HardFormat
                 Path = IrbisPath.MasterFile,
                 FileName = menuName
             };
-            menu = _provider.ReadMenu (specification);
+            menu = await _provider.ReadMenuAsync (specification);
         }
 
         if (menu is null)
@@ -290,7 +292,7 @@ public sealed class HardFormat
     /// <summary>
     /// Получение записи по ее шифру в базе.
     /// </summary>
-    public Record? RecordByIndex
+    public async Task<Record?> RecordByIndexAsync
         (
             string index
         )
@@ -303,7 +305,7 @@ public sealed class HardFormat
             return result;
         }
 
-        result = _provider.ByIndex (index);
+        result = await _provider.ByIndexAsync (index);
         _cache.Set (index, result);
 
         return result;
@@ -498,6 +500,7 @@ public sealed class HardFormat
         var first = true;
         var commons = record.Fields.GetField (461);
         var additionals = record.Fields.GetField (46); // дополнение
+        additionals.NotUsed ();
 
         foreach (var common in commons)
         {
@@ -1058,7 +1061,7 @@ public sealed class HardFormat
     /// <summary>
     /// Выпуск журнала/газеты.
     /// </summary>
-    public void MagazineIssue
+    public async void MagazineIssue
         (
             StringBuilder builder,
             Record record
@@ -1085,7 +1088,7 @@ public sealed class HardFormat
             return;
         }
 
-        var magazine = RecordByIndex (summaryIndex);
+        var magazine = await RecordByIndexAsync (summaryIndex);
         if (magazine is null)
         {
             return;
@@ -1475,7 +1478,7 @@ public sealed class HardFormat
     /// <summary>
     /// Поле 982: патент, отчет о НИР, НТД и ЮД - спец. сведения.
     /// </summary>
-    public void Patent
+    public async void Patent
         (
             StringBuilder builder,
             Record record
@@ -1491,7 +1494,7 @@ public sealed class HardFormat
         {
             NewArea (builder);
             var key = field['0']; // подполе 0: вид патентного или НТД документа
-            var kind = TranslateMenu ("vpatu.mnu", key);
+            var kind = await TranslateMenuAsync ("vpatu.mnu", key);
             builder.AppendWithSeparator
                 (
                     " ",

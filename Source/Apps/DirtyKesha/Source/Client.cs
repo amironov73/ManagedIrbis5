@@ -31,6 +31,8 @@ using AM.Net;
 using Istu.OldModel;
 
 using ManagedIrbis;
+using ManagedIrbis.Formatting;
+using ManagedIrbis.Providers;
 using ManagedIrbis.Searching;
 
 using Microsoft.Extensions.Logging;
@@ -148,6 +150,20 @@ internal sealed class Client
     }
 
     /// <summary>
+    /// Подключение к серверу ИРБИС.
+    /// </summary>
+    /// <returns></returns>
+    private static async Task<IAsyncProvider?> GetIrbis()
+    {
+        var connection = ConnectionFactory.Shared.CreateAsyncConnection();
+        var connectionString = Program.Configuration["connection"].ThrowIfNullOrEmpty();
+        connection.ParseConnectionString (connectionString);
+        await connection.ConnectAsync();
+
+        return !connection.IsConnected ? null : connection;
+    }
+
+    /// <summary>
     /// Регистрация заказа на книгу.
     /// </summary>
     private static async Task RegisterBookOrder
@@ -155,20 +171,90 @@ internal sealed class Client
             ITelegramBotClient client,
             long chatId,
             User? user,
-            string encodedOrder,
+            string encodedIndex,
             CancellationToken token
         )
     {
-        var decodedOrder = KeshaUtility.DecodeTheOrder (encodedOrder);
-        if (string.IsNullOrEmpty (decodedOrder))
+        if (user is null || user.IsBot)
         {
             return;
         }
 
+        // раскодируем шифр книги
+        var decodedIndex = KeshaUtility.DecodeTheOrder (encodedIndex);
+        if (string.IsNullOrEmpty (decodedIndex))
+        {
+            return;
+        }
+
+        var storehouse = Storehouse.GetInstance
+            (
+                Program.ApplicationHost.Services,
+                Program.Configuration
+            );
+        using var readerManager = storehouse.CreateReaderManager();
+
+        // 1. Находим читателя по его Telegram-идентификатору
+        var reader = readerManager.GetReaderByTelegramId (user.Id);
+        if (reader is null)
+        {
+            await client.SendTextMessageAsync
+                (
+                    chatId,
+                    "Читатель не зарегистрирован",
+                    cancellationToken: token
+                );
+            return;
+        }
+
+        // 2. Находим книгу
+        await using var irbis = await GetIrbis();
+        if (irbis is null)
+        {
+            await client.SendTextMessageAsync
+                (
+                    chatId,
+                    "Ошибка при регистрации заказа",
+                    cancellationToken: token
+                );
+            return;
+        }
+
+        var book = await irbis.SearchReadOneRecordAsync ($"\"I={decodedIndex}\"");
+        if (book is null)
+        {
+            await client.SendTextMessageAsync
+                (
+                    chatId,
+                    "Не найдена книга",
+                    cancellationToken: token
+                );
+            return;
+        }
+
+        // 3. Размещаем заказ
+        using var orderManager = storehouse.CreateOrderManager();
+        var format = new AsyncHardFormat
+            (
+                Program.ApplicationHost,
+                irbis
+            );
+        var newOrder = new Order
+        {
+            Ticket = reader.Ticket,
+            Name = reader.Name,
+            Moment = DateTime.Now,
+            Status = Order.NewOrder,
+            Mfn = book.Mfn.ToInvariantString(),
+            Description = format.Brief (book),
+            Mailto = reader.Mail
+        };
+        orderManager.CreateOrder (newOrder);
+
         await client.SendTextMessageAsync
             (
                 chatId,
-                "Размещение заказов временно недоступно",
+                "Заказ успешно размещен",
                 cancellationToken: token
             );
     }
@@ -185,12 +271,7 @@ internal sealed class Client
             CancellationToken token
         )
     {
-        if (user is null)
-        {
-            return;
-        }
-
-        if (user.IsBot)
+        if (user is null || user.IsBot)
         {
             return;
         }
