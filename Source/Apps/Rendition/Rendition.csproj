@@ -9,28 +9,31 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\Libs\AM.Avalonia\AM.Avalonia.csproj"/>
+        <ProjectReference Remove="..\..\Libs\ManagedIrbis5\ManagedIrbis5.csproj" />
+        <ProjectReference Include="..\..\Libs\AM.AOT5\AM.AOT5.csproj" />
+        <ProjectReference Include="..\..\Libs\AM.Avalonia\AM.Avalonia.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <TrimmableAssembly Include="Avalonia.Themes.Fluent"/>
-        <TrimmableAssembly Include="Avalonia.Themes.Default"/>
+        <TrimmableAssembly Include="Avalonia.Themes.Fluent" />
+        <TrimmableAssembly Include="Avalonia.Themes.Default" />
     </ItemGroup>
 
     <!-- Централизованное управление пакетами -->
     <ItemGroup>
-        <PackageReference Include="Avalonia"/>
-        <PackageReference Include="Avalonia.Desktop"/>
-        <PackageReference Include="Avalonia.Diagnostics"/>
-        <PackageReference Include="Avalonia.ReactiveUI"/>
-        <PackageReference Include="Avalonia.Themes.Fluent"/>
-        <PackageReference Include="ReactiveUI"/>
-        <PackageReference Include="ReactiveUI.Fody"/>
-        <PackageReference Include="XamlNameReferenceGenerator"/>
+        <PackageReference Include="Avalonia" />
+        <PackageReference Include="Avalonia.Desktop" />
+        <PackageReference Include="Avalonia.Diagnostics" />
+        <PackageReference Include="Avalonia.ReactiveUI" />
+        <PackageReference Include="Avalonia.Themes.Fluent" />
+        <PackageReference Include="ReactiveUI" />
+        <PackageReference Include="ReactiveUI.Fody" />
+        <PackageReference Include="RestSharp" />
+        <PackageReference Include="XamlNameReferenceGenerator" />
     </ItemGroup>
 
     <ItemGroup>
-        <AvaloniaResource Include="translate.ico"/>
+        <AvaloniaResource Include="translate.ico" />
     </ItemGroup>
 
     <ItemGroup>

@@ -9,7 +9,9 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Remove="..\..\Libs\ManagedIrbis5\ManagedIrbis5.csproj" />
         <ProjectReference Include="..\..\Libs\AM.Avalonia\AM.Avalonia.csproj" />
+        <ProjectReference Include="..\..\Libs\AM.Web\AM.Web.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -26,6 +28,7 @@
         <PackageReference Include="Avalonia.Themes.Fluent" />
         <PackageReference Include="ReactiveUI" />
         <PackageReference Include="ReactiveUI.Fody" />
+        <PackageReference Include="RestSharp" />
         <PackageReference Include="XamlNameReferenceGenerator" />
     </ItemGroup>
 

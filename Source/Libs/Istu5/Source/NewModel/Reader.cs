@@ -284,6 +284,13 @@ public sealed class Reader
     [Column ("sertif"), Nullable]
     public string? Certificate { get; set; }
 
+    /// <summary>
+    /// Идентификатор пользователя в Telegram.
+    /// Используется ботом.
+    /// </summary>
+    [Column ("telega"), Nullable]
+    public long TelegramId { get; set; }
+
     #endregion
 
     #region Object members

@@ -156,13 +156,13 @@ public class ModelInfo
             .FirstOrDefault (x => x.HasClass ("model-name"))
             ?.InnerText;
         Page = figure.Descendants ("a").FirstOrDefault()
-            ?.Attributes["href"].Value;
+            ?.Attributes["href"]?.Value;
         ThumbnailUrl = figure.Descendants ("img").FirstOrDefault()
-            ?.Attributes["src"].Value;
+            ?.Attributes["src"]?.Value;
         Aka = ParseAka (figure.Descendants ("figcaption")
             .FirstOrDefault()
             ?.Descendants ("span")
-            ?.FirstOrDefault()?.InnerText);
+            .FirstOrDefault()?.InnerText);
 
         return true;
     }

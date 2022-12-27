@@ -26,6 +26,7 @@ using System.Threading.Tasks;
 
 using AM;
 using AM.Collections;
+using AM.Net;
 
 using ManagedIrbis;
 using ManagedIrbis.Searching;
@@ -145,6 +146,28 @@ internal sealed class Client
     }
 
     /// <summary>
+    /// Связывание читателя с Telegram-идентификатором через email.
+    /// </summary>
+    private static void StoreTelegramIdForEmail
+        (
+            ITelegramBotClient client,
+            long chatId,
+            User? user,
+            string email,
+            CancellationToken token
+        )
+    {
+        if (user is null)
+        {
+            return;
+        }
+
+        // 1. Находим читателя в базе по e-mail
+
+        // 2. Сохраняем TelegramID
+    }
+
+    /// <summary>
     /// Ответ на запрос пользователя.
     /// </summary>
     private static async Task HandleUpdateAsync
@@ -175,6 +198,11 @@ internal sealed class Client
                 chatId
             );
 
+        if (string.IsNullOrWhiteSpace (messageText))
+        {
+            return;
+        }
+
         if (messageText == "/start")
         {
             await client.SendTextMessageAsync
@@ -183,6 +211,19 @@ internal sealed class Client
                     "Введите ключевое слово, заглавие книги или фамилию автора",
                     cancellationToken: token
                 );
+            return;
+        }
+
+        if (MailUtility.VerifyEmail (messageText))
+        {
+            // Читатель прислал свой e-mail, чтобы мы связали его с телеграммом
+            StoreTelegramIdForEmail (client, chatId, message.From, messageText, token);
+            return;
+        }
+
+        if (messageText.StartsWith ("//"))
+        {
+            // заказ на книгу
             return;
         }
 
