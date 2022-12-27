@@ -137,7 +137,7 @@ public sealed class FileRenumberTest
         {
             new ("hello1", "prefix_001"),
             new ("hello2", "prefix_002"),
-            new ("hello100", "prefix_100"),
+            new ("hello100", "prefix_003"),
         };
         CollectionAssert.AreEqual (expected, generated);
     }

@@ -217,45 +217,45 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ManagedIrbis5.Avalonia", "L
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AvaloniaTests", "Tests\AvaloniaTests\AvaloniaTests.csproj", "{B76A065D-9ED1-4413-BA08-2EED4BFF67E4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IrbisHammer", "Apps\IrbisHammer\IrbisHammer.csproj", "{4AB89921-A62B-43F1-A69D-C140C1D3925E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IrbisHammer", "Apps\IrbisHammer\IrbisHammer.csproj", "{4AB89921-A62B-43F1-A69D-C140C1D3925E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RookoutExample", "Examples\RookoutExample\RookoutExample.csproj", "{1B0079D2-2A3F-4631-9DD5-DB0A19652244}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RookoutExample", "Examples\RookoutExample\RookoutExample.csproj", "{1B0079D2-2A3F-4631-9DD5-DB0A19652244}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FindBbk", "Apps\FindBbk\FindBbk.csproj", "{7A2D3EB9-B229-462A-A8B3-4676ECD40DBA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FindBbk", "Apps\FindBbk\FindBbk.csproj", "{7A2D3EB9-B229-462A-A8B3-4676ECD40DBA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PartyStatusA", "Apps\PartyStatusA\PartyStatusA.csproj", "{E74BE6C1-FD08-402C-9CF4-837D2A7B0BE2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PartyStatusA", "Apps\PartyStatusA\PartyStatusA.csproj", "{E74BE6C1-FD08-402C-9CF4-837D2A7B0BE2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvaloniaAppTests", "Tests\AvaloniaAppTests\AvaloniaAppTests.csproj", "{7BF4D067-3005-41A6-9492-10783FA4CC92}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AvaloniaAppTests", "Tests\AvaloniaAppTests\AvaloniaAppTests.csproj", "{7BF4D067-3005-41A6-9492-10783FA4CC92}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kingfisher", "Apps\Kingfisher\Kingfisher.csproj", "{0F597B15-A222-41A5-B041-E5B39D081AA8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kingfisher", "Apps\Kingfisher\Kingfisher.csproj", "{0F597B15-A222-41A5-B041-E5B39D081AA8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AM.Daemonization", "Libs\AM.Daemonization\AM.Daemonization.csproj", "{234D4CC8-0EB5-4681-9DD6-A377A7259C8C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AM.Daemonization", "Libs\AM.Daemonization\AM.Daemonization.csproj", "{234D4CC8-0EB5-4681-9DD6-A377A7259C8C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DirtyKesha", "Apps\DirtyKesha\DirtyKesha.csproj", "{F39E3493-164E-49BC-81B5-FB3B0BEF4E3B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DirtyKesha", "Apps\DirtyKesha\DirtyKesha.csproj", "{F39E3493-164E-49BC-81B5-FB3B0BEF4E3B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasySearcher", "Apps\EasySearcher\EasySearcher.csproj", "{E247F9CF-FB62-4152-8C0E-70446854D3A5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EasySearcher", "Apps\EasySearcher\EasySearcher.csproj", "{E247F9CF-FB62-4152-8C0E-70446854D3A5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mx64", "Apps\Mx64\Mx64.csproj", "{DD61F17C-F9AA-4AB4-8E65-FF85A86F2BFE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mx64", "Apps\Mx64\Mx64.csproj", "{DD61F17C-F9AA-4AB4-8E65-FF85A86F2BFE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AM.Scripting.Avalonia", "Libs\AM.Scripting.Avalonia\AM.Scripting.Avalonia.csproj", "{415E8DE2-A65D-4059-A13C-38EBE2AD80FB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AM.Scripting.Avalonia", "Libs\AM.Scripting.Avalonia\AM.Scripting.Avalonia.csproj", "{415E8DE2-A65D-4059-A13C-38EBE2AD80FB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Barsik.Avalonia", "Apps\Barsik.Avalonia\Barsik.Avalonia.csproj", "{94612456-5AE7-49DB-8A3F-881781FB5C3C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Barsik.Avalonia", "Apps\Barsik.Avalonia\Barsik.Avalonia.csproj", "{94612456-5AE7-49DB-8A3F-881781FB5C3C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rendition", "Apps\Rendition\Rendition.csproj", "{AD6FB502-11F8-4E2F-88EF-AE6A7F0C2D79}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rendition", "Apps\Rendition\Rendition.csproj", "{AD6FB502-11F8-4E2F-88EF-AE6A7F0C2D79}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheNude", "Apps\TheNude\TheNude.csproj", "{A137CEBC-AB9A-433D-9D05-C26E54644C6B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TheNude", "Apps\TheNude\TheNude.csproj", "{A137CEBC-AB9A-433D-9D05-C26E54644C6B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FixRoot", "Apps\FixRoot\FixRoot.csproj", "{840BE109-C3A4-4549-9A78-5BF226516540}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FixRoot", "Apps\FixRoot\FixRoot.csproj", "{840BE109-C3A4-4549-9A78-5BF226516540}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CheckPar", "Apps\CheckPar\CheckPar.csproj", "{D6198BF5-CA5D-4C65-8538-3ED226A2BA47}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CheckPar", "Apps\CheckPar\CheckPar.csproj", "{D6198BF5-CA5D-4C65-8538-3ED226A2BA47}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeapotTest", "Tests\TeapotTest\TeapotTest.csproj", "{56FB83FD-92B4-4233-B9DC-15639D491A49}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeapotTest", "Tests\TeapotTest\TeapotTest.csproj", "{56FB83FD-92B4-4233-B9DC-15639D491A49}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DirectViewer", "Apps\DirectViewer\DirectViewer.csproj", "{741C1190-68BC-42D3-9243-F055B3C9E0A1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DirectViewer", "Apps\DirectViewer\DirectViewer.csproj", "{741C1190-68BC-42D3-9243-F055B3C9E0A1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Peeper", "Apps\Peeper\Peeper.csproj", "{3B1A8A4E-7299-47CD-A1BF-7BEEFA912B17}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Peeper", "Apps\Peeper\Peeper.csproj", "{3B1A8A4E-7299-47CD-A1BF-7BEEFA912B17}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VisualRenumber", "Apps\VisualRenumber\VisualRenumber.csproj", "{915FCFEC-FCB5-4EE4-BE9A-039F89C01BFE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VisualRenumber", "Apps\VisualRenumber\VisualRenumber.csproj", "{915FCFEC-FCB5-4EE4-BE9A-039F89C01BFE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -1695,8 +1695,8 @@ Global
 		{3B1A8A4E-7299-47CD-A1BF-7BEEFA912B17}.Release|x64.Build.0 = Release|Any CPU
 		{3B1A8A4E-7299-47CD-A1BF-7BEEFA912B17}.Release|x86.ActiveCfg = Release|Any CPU
 		{3B1A8A4E-7299-47CD-A1BF-7BEEFA912B17}.Release|x86.Build.0 = Release|Any CPU
-		{915FCFEC-FCB5-4EE4-BE9A-039F89C01BFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{915FCFEC-FCB5-4EE4-BE9A-039F89C01BFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{915FCFEC-FCB5-4EE4-BE9A-039F89C01BFE}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{915FCFEC-FCB5-4EE4-BE9A-039F89C01BFE}.Debug|Any CPU.Build.0 = Debug|x64
 		{915FCFEC-FCB5-4EE4-BE9A-039F89C01BFE}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{915FCFEC-FCB5-4EE4-BE9A-039F89C01BFE}.Debug|x64.Build.0 = Debug|Any CPU
 		{915FCFEC-FCB5-4EE4-BE9A-039F89C01BFE}.Debug|x86.ActiveCfg = Debug|Any CPU
