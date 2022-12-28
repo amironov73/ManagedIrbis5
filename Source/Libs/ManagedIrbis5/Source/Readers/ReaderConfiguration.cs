@@ -97,6 +97,12 @@ public sealed class ReaderConfiguration
     #region Public methods
 
     /// <summary>
+    /// Получение конфигурации по умолчанию.
+    /// </summary>
+    /// <returns></returns>
+    public static ReaderConfiguration GetDefault() => new ();
+
+    /// <summary>
     /// Получение идентификатора читателя из библиографической записи.
     /// </summary>
     public string? GetReaderId
