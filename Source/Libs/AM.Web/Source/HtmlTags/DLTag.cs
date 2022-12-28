@@ -3,14 +3,10 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* DLTag.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,24 +20,62 @@ using System;
 
 namespace AM.HtmlTags;
 
-public class DLTag : HtmlTag
+/// <summary>
+///
+/// </summary>
+public class DLTag
+    : HtmlTag
 {
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
     public DLTag()
         : base ("dl")
     {
+        // пустое тело конструктора
     }
 
-    public DLTag (Action<DLTag> configure)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="configure"></param>
+    public DLTag
+        (
+            Action<DLTag> configure
+        )
         : this()
     {
+        Sure.NotNull (configure);
+
         configure (this);
     }
 
-    public DLTag AddDefinition (string term, string definition)
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="term"></param>
+    /// <param name="definition"></param>
+    /// <returns></returns>
+    public DLTag AddDefinition
+        (
+            string term,
+            string definition
+        )
     {
+        Sure.NotNullNorEmpty (term);
+        Sure.NotNullNorEmpty (definition);
+
         Add ("dt").Text (term);
         Add ("dd").Text (definition);
 
         return this;
     }
+
+    #endregion
 }
