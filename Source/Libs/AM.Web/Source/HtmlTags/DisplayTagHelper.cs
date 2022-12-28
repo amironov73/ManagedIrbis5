@@ -3,14 +3,9 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* DisplayTagHelper.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,8 +15,21 @@ using Conventions.Elements;
 
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
-[HtmlTargetElement ("display-tag", Attributes = ForAttributeName, TagStructure = TagStructure.WithoutEndTag)]
-public class DisplayTagHelper : HtmlTagTagHelper
+/// <summary>
+///
+/// </summary>
+[HtmlTargetElement ("display-tag",
+    Attributes = ForAttributeName,
+    TagStructure = TagStructure.WithoutEndTag)]
+public class DisplayTagHelper
+    : HtmlTagTagHelper
 {
-    protected override string Category { get; } = ElementConstants.Display;
+    #region Protected members
+
+    /// <summary>
+    ///
+    /// </summary>
+    protected override string Category => ElementConstants.Display;
+
+    #endregion
 }

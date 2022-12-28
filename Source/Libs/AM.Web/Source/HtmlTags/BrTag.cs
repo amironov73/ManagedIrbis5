@@ -19,7 +19,7 @@ public class BrTag
     #region Construction
 
     /// <summary>
-    ///
+    /// Конструктор.
     /// </summary>
     public BrTag()
         : base ("br")

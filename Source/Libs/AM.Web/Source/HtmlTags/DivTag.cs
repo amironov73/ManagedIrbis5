@@ -3,29 +3,40 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
-/*
+/* DivTag.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 namespace AM.HtmlTags;
 
-public class DivTag : HtmlTag
+/// <summary>
+///
+/// </summary>
+public class DivTag
+    : HtmlTag
 {
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
+    public DivTag()
+        : base ("div")
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    /// <param name="id">Идентификатор элемента.</param>
     public DivTag (string id)
         : base ("div")
     {
         Id (id);
     }
 
-    public DivTag()
-        : base ("div")
-    {
-    }
+    #endregion
 }
