@@ -10,15 +10,28 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UseNameofExpression
 
-/*
+/* CheckboxTag.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 namespace AM.HtmlTags;
 
-public class CheckboxTag : HtmlTag
+/// <summary>
+///
+/// </summary>
+public class CheckboxTag
+    : HtmlTag
 {
-    public CheckboxTag (bool isChecked)
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="isChecked"></param>
+    public CheckboxTag
+        (
+            bool isChecked
+        )
         : base ("input")
     {
         Attr ("type", "checkbox");
@@ -27,4 +40,6 @@ public class CheckboxTag : HtmlTag
             Attr ("checked", "true");
         }
     }
+
+    #endregion
 }

@@ -10,7 +10,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UseNameofExpression
 
-/*
+/* CssClassNameValidator.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,30 +24,90 @@ using System.Text.RegularExpressions;
 
 namespace AM.HtmlTags;
 
+/// <summary>
+///
+/// </summary>
 public static class CssClassNameValidator
 {
+    #region Constants
+
+    /// <summary>
+    ///
+    /// </summary>
     public const string DefaultClass = "cssclassnamevalidator-santized";
+
+    /// <summary>
+    ///
+    /// </summary>
     public const string ValidStartRegex = @"^-?[_a-zA-Z]+";
+
+    /// <summary>
+    ///
+    /// </summary>
     public const string InvalidStartRegex = @"^-?[^_a-zA-Z]+";
+
+    /// <summary>
+    ///
+    /// </summary>
     public const string ValidClassChars = @"_a-zA-Z0-9-";
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    ///
+    /// </summary>
+    public static bool AllowInvalidCssClassNames { get; set; }
+
+    #endregion
+
+    #region Private members
+
     private static readonly Regex RxValidClassName = new ($@"{ValidStartRegex}[{ValidClassChars}]*$");
     private static readonly Regex RxReplaceInvalidChars = new ($"[^{ValidClassChars}]");
     private static readonly Regex RxReplaceLeadingChars = new ($"{InvalidStartRegex}(?<rest>.*)$");
 
-    public static bool AllowInvalidCssClassNames { get; set; }
+    #endregion
 
-    public static bool IsJsonClassName (string className)
+    #region Public methods
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="className"></param>
+    /// <returns></returns>
+    public static bool IsJsonClassName
+        (
+            string className
+        )
     {
         return className.StartsWith ("{") && className.EndsWith ("}")
                || className.StartsWith ("[") && className.EndsWith ("]");
     }
 
-    public static bool IsValidClassName (string className)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="className"></param>
+    /// <returns></returns>
+    public static bool IsValidClassName
+        (
+            string className
+        )
     {
         return AllowInvalidCssClassNames || IsJsonClassName (className) || RxValidClassName.IsMatch (className);
     }
 
-    public static string SanitizeClassName (string className)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="className"></param>
+    /// <returns></returns>
+    public static string SanitizeClassName
+        (
+            string className
+        )
     {
         if (string.IsNullOrEmpty (className))
         {
@@ -69,4 +129,6 @@ public static class CssClassNameValidator
         // if the whole thing was invalid, we'll end up with an empty string. That's not valid either, so return the default
         return string.IsNullOrEmpty (className) ? DefaultClass : className;
     }
+
+    #endregion
 }
