@@ -4483,6 +4483,7 @@ public static class Utility
             }
 
             builder.Append (item.ToVisibleString());
+            first = false;
         }
 
         builder.Append (close);
@@ -6544,6 +6545,30 @@ public static class Utility
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// Проверка: пустой ли получается склеенный текст?
+    /// </summary>
+    public static bool IsEmptyText
+        (
+            IEnumerable<string?>? sequence
+        )
+    {
+        if (sequence is null)
+        {
+            return true;
+        }
+
+        foreach (var item in sequence)
+        {
+            if (!string.IsNullOrEmpty (item))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     #endregion
