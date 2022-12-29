@@ -22,6 +22,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 
 using AM;
+using AM.PlatformAbstraction;
 using AM.Runtime;
 
 #endregion
@@ -51,6 +52,12 @@ namespace ManagedIrbis.Infrastructure
         /// Формат конверсии.
         /// </summary>
         public static string ConversionFormat = DefaultFormat;
+
+        /// <summary>
+        /// Текущее время в формате ИРБИС.
+        /// </summary>
+        public static string NowText =>
+            PlatformAbstractionLayer.Current.Now().ToString ("HH:mm:ss");
 
         /// <summary>
         /// Сегодняшняя дата в формате ИРБИС.

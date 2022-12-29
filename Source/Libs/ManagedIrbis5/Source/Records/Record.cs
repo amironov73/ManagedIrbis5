@@ -508,7 +508,7 @@ public sealed class Record
             var line = response.ReadUtf();
 
             var first = line.Split ('#');
-            Sure.AssertState (first.Length is 1 or 2);
+            // Sure.AssertState (first.Length is 1 or 2);
             Mfn = int.Parse (first[0]);
             Status = first.Length == 1
                 ? None
@@ -516,7 +516,7 @@ public sealed class Record
 
             line = response.ReadUtf();
             var second = line.Split ('#');
-            Sure.AssertState (second.Length is 1 or 2);
+            // Sure.AssertState (second.Length is 1 or 2);
             Version = second.Length == 1
                 ? 0
                 : int.Parse (second[1]);

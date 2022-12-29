@@ -147,7 +147,7 @@ public static class HtmlText
             (
                 html,
                 @"<br\s*?/?>",
-                Environment.NewLine
+                "\n"
             );
 
         result = Regex.Replace

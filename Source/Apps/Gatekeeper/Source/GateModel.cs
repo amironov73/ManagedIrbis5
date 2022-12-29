@@ -12,6 +12,8 @@
 
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 using AM;
@@ -20,6 +22,7 @@ using AM.Text;
 using ManagedIrbis;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Providers;
+using ManagedIrbis.Records;
 using ManagedIrbis.Readers.Formatting;
 
 using ReactiveUI;
@@ -38,6 +41,12 @@ internal sealed class GateModel
     : ReactiveObject
 {
     #region Properties
+
+    /// <summary>
+    /// Направление: читатели входят (in) или выходят (out).
+    /// </summary>
+    [Reactive]
+    public string? Direction { get; set; }
 
     /// <summary>
     /// Наименование библиотеки.
@@ -151,6 +160,16 @@ internal sealed class GateModel
         IsError = error;
         IsInfo = info;
         text = HtmlText.ToPlainText (text).SafeTrim();
+        if (!string.IsNullOrEmpty (text))
+        {
+            text = Regex.Replace
+                (
+                    text,
+                    @"\n{3,}",
+                    "\n\n"
+                );
+        }
+
         Last = text;
     }
 
@@ -158,6 +177,76 @@ internal sealed class GateModel
     {
         await using var connection = await CreateConnection();
         await UpdateStatistics (connection);
+    }
+
+    /// <summary>
+    /// Читатель вошел.
+    /// </summary>
+    public async Task RegisterIn
+        (
+            IAsyncConnection connection,
+            Record record,
+            string today,
+            string now
+        )
+    {
+        Sure.NotNull (connection);
+        Sure.NotNull (record);
+        connection.EnsureConnected();
+
+        record.SetValue (999, "1");
+        var v40 = new Field (40)
+            .Add ('1', now)
+            .Add ('c', "(Посещение)")
+            .Add ('d', today)
+            .Add ('i', string.Empty)
+            .Add ('v', "*");
+        record.Add (v40);
+
+        await connection.WriteRecordAsync (record, actualize: false, lockRecord: true, dontParse: true);
+    }
+
+
+    /// <summary>
+    /// Читатель вышел.
+    /// </summary>
+    public async Task RegisterOut
+        (
+            IAsyncConnection connection,
+            Record record,
+            string today,
+            string now
+        )
+    {
+        var modified = false;
+        if (record.HaveField (999))
+        {
+            record.RemoveField (999);
+            modified = true;
+        }
+
+        var v40 = record.Fields
+            .GetField (40)
+            .GetField ('v', "*")
+            .GetField ('d', today)
+            .LastOrDefault
+                (
+                    field => field.HaveSubField ('1')
+                             && field.HaveNotSubField ('a')
+                             && field.HaveNotSubField ('2')
+                );
+        if (v40 is not null)
+        {
+            v40
+                .SetSubFieldValue ('2', now)
+                .SetSubFieldValue ('f', today);
+            modified = true;
+        }
+
+        if (modified)
+        {
+            await connection.WriteRecordAsync (record, actualize: false, lockRecord: true, dontParse: true);
+        }
     }
 
     public async Task UpdateStatistics
@@ -215,8 +304,8 @@ internal sealed class GateModel
             Database = connection.EnsureDatabase(),
             Mfn = found[0].Mfn
         };
-        var record = await connection.ReadRecordAsync (recordParameters);
-        if (record is null)
+        var reader = await connection.ReadRecordAsync (recordParameters);
+        if (reader is null)
         {
             return;
         }
@@ -237,14 +326,25 @@ internal sealed class GateModel
         var html = formatParameters.Result.AsSingle();
         ShowHtml (html);
 
+        var today = IrbisDate.TodayText;
+        var now = IrbisDate.NowText;
+        if (Direction.SameString ("in"))
+        {
+            await RegisterIn (connection, reader, today, now);
+        }
+        else
+        {
+            await RegisterOut (connection, reader, today, now);
+        }
+
         var formatter = new AsyncHardReaderFormat (Magna.Host, connection);
-        var name = formatter.FullNameWithYear (record);
+        var name = formatter.FullNameWithYear (reader);
         var lastEvent = new EventModel
         {
-            Moment = DateTime.Now.ToLongDateString(),
+            Moment = DateTime.Now.ToString ("HH:mm:ss"),
             Action = "вошел",
             Name = name,
-            Ticket = formatter.Ticket (record)
+            Ticket = formatter.Ticket (reader)
         };
         Events ??= new ();
         Events.Insert (0, lastEvent);
@@ -266,6 +366,7 @@ internal sealed class GateModel
             Today = configuration["today"],
             Readers = configuration["readers"],
             Last = configuration["last"],
+            Direction = configuration["direction"],
             IsInfo = true
         };
     }

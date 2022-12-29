@@ -81,7 +81,7 @@ internal sealed class MainWindow
                 }
             );
 
-        var yellowBrush = new SolidColorBrush (0xFFFFFF00u);
+        var yellowBrush = new SolidColorBrush (0xFFFFFFAAu);
         _barcodeBox = new TextBox
             {
                 // штрих-код читателя
@@ -217,8 +217,11 @@ internal sealed class MainWindow
     {
         base.OnInitialized();
 
-        _barcodeBox.Focus();
-        // _model.AutoUpdate().Forget();
+        DispatcherTimer.RunOnce (() =>
+        {
+            _barcodeBox.Focus();
+            _model.AutoUpdate().Forget();
+        }, TimeSpan.FromMilliseconds (100));
     }
 
     #endregion

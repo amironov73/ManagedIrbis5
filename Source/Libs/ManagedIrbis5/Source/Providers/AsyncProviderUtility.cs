@@ -485,4 +485,4 @@ namespace ManagedIrbis.Providers
 
         #endregion
     }
-} // namespace ManagedIrbis.Providers
+}

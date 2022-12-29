@@ -212,6 +212,17 @@ public sealed class DesktopApplication
         return this;
     }
 
+    /// <returns></returns>
+    public DesktopApplication With<T>
+        (
+            T options
+        )
+    {
+        _appBuilder.With (options);
+
+        return this;
+    }
+
     #endregion
 
     #region IAvaloniaApplicationBuilder members

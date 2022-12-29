@@ -14,6 +14,8 @@ using System;
 
 using AM.Avalonia.AppServices;
 
+using Avalonia;
+
 #endregion
 
 #nullable enable
