@@ -10,7 +10,16 @@
 
 #region Using directives
 
+using System;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
+
+using AM;
+using AM.Text;
+
+using ManagedIrbis;
+using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Providers;
 
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -69,6 +78,26 @@ internal sealed class GateModel
 
     #region Public methods
 
+    public async Task<IAsyncConnection> CreateClient()
+    {
+        var connectionString = Magna.Configuration["connection-string"];
+        if (string.IsNullOrEmpty (connectionString))
+        {
+            throw new Exception();
+        }
+
+        var result = ConnectionFactory.Shared.CreateAsyncConnection();
+        result.ParseConnectionString (connectionString);
+        await result.ConnectAsync();
+        if (!result.IsConnected)
+        {
+            throw new Exception();
+        }
+
+        return result;
+    }
+
+
     public static GateModel GetTestModel()
     {
         var result = new GateModel
@@ -79,6 +108,68 @@ internal sealed class GateModel
         };
 
         return result;
+    }
+
+    public void ShowHtml
+        (
+            string? text,
+            bool error = false
+        )
+    {
+        text = HtmlText.ToPlainText (text).SafeTrim();
+        Last = text;
+    }
+
+    public async void HandleReader
+        (
+            string? readerId
+        )
+    {
+        ShowHtml (null);
+        if (string.IsNullOrWhiteSpace (readerId))
+        {
+            return;
+        }
+
+        readerId = readerId.Trim();
+        await using var connection = await CreateClient();
+        var searchParameters = new SearchParameters
+        {
+            Database = connection.EnsureDatabase(),
+            Expression = $"\"RI={readerId}\""
+        };
+        var found = await connection.SearchAsync (searchParameters);
+        if (found?.Length != 1)
+        {
+            ShowHtml("Читатель не найден", error: true);
+            return;
+        }
+
+        var recordParameters = new ReadRecordParameters
+        {
+            Database = connection.EnsureDatabase(),
+            Mfn = found[0].Mfn
+        };
+        var record = await connection.ReadRecordAsync (recordParameters);
+        if (record is null)
+        {
+            return;
+        }
+
+        var formatName = Magna.Configuration["format"];
+        if (string.IsNullOrEmpty (formatName))
+        {
+            return;
+        }
+        var formatParameters = new FormatRecordParameters
+        {
+            Database = connection.EnsureDatabase(),
+            Format = formatName,
+            Mfns = new [] { found[0].Mfn }
+        };
+        await connection.FormatRecordsAsync (formatParameters);
+        var html = formatParameters.Result.AsSingle();
+        ShowHtml (html);
     }
 
     #endregion

@@ -15,15 +15,19 @@
 
 #region Using directives
 
+using System;
+
 using AM.Avalonia;
 
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data;
+using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.ReactiveUI;
 using Avalonia.Styling;
+using Avalonia.Threading;
 
 #endregion
 
@@ -56,6 +60,15 @@ internal sealed class MainWindow
         DataContext = _model;
 
         var yellowBrush = new SolidColorBrush (0xFFFFFF00u);
+        _barcodeBox = new TextBox
+        {
+            // штрих-код читателя
+            TextWrapping = TextWrapping.NoWrap,
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            [!TextBox.TextProperty] = new Binding (nameof (_model.Barcode))
+        }
+        .DockTop();
+        _barcodeBox.KeyDown += BarcodeBoxOnKeyDown;
 
         Content = new DockPanel
         {
@@ -109,13 +122,8 @@ internal sealed class MainWindow
                 }
                 .DockTop(),
 
-                new TextBox
-                {
-                    // штрих-код читателя
-                    HorizontalAlignment = HorizontalAlignment.Stretch,
-                    [!TextBox.TextProperty] = new Binding (nameof (_model.Barcode))
-                }
-                .DockTop(),
+                // штрих-код читателя
+                _barcodeBox,
 
                 new Label
                 {
@@ -131,11 +139,14 @@ internal sealed class MainWindow
                 new TextBox
                 {
                     // последний посетитель
+                    TextWrapping = TextWrapping.Wrap,
                     IsReadOnly = true,
+                    IsTabStop = false,
                     Height = 200,
-                    Padding = new Thickness (5),
+                    Padding = new Thickness (10),
+                    FontSize = 18,
                     HorizontalAlignment = HorizontalAlignment.Stretch,
-                    VerticalContentAlignment = VerticalAlignment.Center,
+                    VerticalContentAlignment = VerticalAlignment.Stretch,
                     [!TextBox.TextProperty] = new Binding (nameof (_model.Last)),
                 }.DockTop(),
 
@@ -159,6 +170,8 @@ internal sealed class MainWindow
                 }
             }
         };
+
+        DispatcherTimer.RunOnce (() => _barcodeBox.Focus(), TimeSpan.FromMilliseconds (100));
     }
 
     #endregion
@@ -166,6 +179,22 @@ internal sealed class MainWindow
     #region Private members
 
     private readonly GateModel _model;
+    private readonly TextBox _barcodeBox;
+
+    private void BarcodeBoxOnKeyDown
+        (
+            object? sender,
+            KeyEventArgs eventArgs
+        )
+    {
+        if (eventArgs.Key == Key.Enter)
+        {
+            var barcode = _model.Barcode;
+            _model.Barcode = null;
+            _model.HandleReader (barcode);
+            _barcodeBox.Focus();
+        }
+    }
 
     #endregion
 }

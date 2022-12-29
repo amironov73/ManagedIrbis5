@@ -15,6 +15,7 @@
 
 #region Using directives
 
+using System;
 using System.Net;
 using System.Text.RegularExpressions;
 
@@ -145,6 +146,13 @@ public static class HtmlText
         var result = Regex.Replace
             (
                 html,
+                @"<br\s*?/?>",
+                Environment.NewLine
+            );
+
+        result = Regex.Replace
+            (
+                result,
                 @"<.*?>",
                 string.Empty
             );
