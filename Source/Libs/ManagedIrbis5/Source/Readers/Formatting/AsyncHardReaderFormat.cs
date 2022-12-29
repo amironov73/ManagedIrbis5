@@ -391,7 +391,7 @@ public sealed class AsyncHardReaderFormat
         Sure.NotNull (record);
 
         FullName (builder, record);
-        _AppendWithPrefix (builder, ", ", record.FM (21));
+        _AppendWithPrefix (builder, record.FM (21), ", ");
         builder.Append ('.');
     }
 

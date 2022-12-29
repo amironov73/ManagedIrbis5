@@ -20,6 +20,7 @@ using AM.Text;
 using ManagedIrbis;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Providers;
+using ManagedIrbis.Readers.Formatting;
 
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -153,15 +154,13 @@ internal sealed class GateModel
         Last = text;
     }
 
-    public async void AutoUpdate()
+    public async Task AutoUpdate()
     {
-        using (var connection = await CreateConnection())
-        {
-            UpdateStatistics (connection);
-        }
+        await using var connection = await CreateConnection();
+        await UpdateStatistics (connection);
     }
 
-    public async void UpdateStatistics
+    public async Task UpdateStatistics
         (
             IAsyncConnection connection
         )
@@ -186,7 +185,7 @@ internal sealed class GateModel
         InsiderCount = readers?.Length ?? 0;
     }
 
-    public async void HandleReader
+    public async Task HandleReader
         (
             string? readerId
         )
@@ -237,7 +236,20 @@ internal sealed class GateModel
         await connection.FormatRecordsAsync (formatParameters);
         var html = formatParameters.Result.AsSingle();
         ShowHtml (html);
-        UpdateStatistics (connection);
+
+        var formatter = new AsyncHardReaderFormat (Magna.Host, connection);
+        var name = formatter.FullNameWithYear (record);
+        var lastEvent = new EventModel
+        {
+            Moment = DateTime.Now.ToLongDateString(),
+            Action = "вошел",
+            Name = name,
+            Ticket = formatter.Ticket (record)
+        };
+        Events ??= new ();
+        Events.Insert (0, lastEvent);
+
+        await UpdateStatistics (connection);
     }
 
     /// <summary>
@@ -253,6 +265,8 @@ internal sealed class GateModel
             Message = configuration["message"],
             Today = configuration["today"],
             Readers = configuration["readers"],
+            Last = configuration["last"],
+            IsInfo = true
         };
     }
 

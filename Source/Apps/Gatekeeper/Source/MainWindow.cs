@@ -58,7 +58,6 @@ internal sealed class MainWindow
         this.SetWindowIcon ("Assets/guard.ico");
 
         _model = GateModel.FromConfiguration();
-            // GateModel.GetTestModel();
         DataContext = _model;
 
         Styles.Add
@@ -84,30 +83,31 @@ internal sealed class MainWindow
 
         var yellowBrush = new SolidColorBrush (0xFFFFFF00u);
         _barcodeBox = new TextBox
-        {
-            // штрих-код читателя
-            TextWrapping = TextWrapping.NoWrap,
-            HorizontalAlignment = HorizontalAlignment.Stretch,
-            [!TextBox.TextProperty] = new Binding (nameof (_model.Barcode))
-        }
-        .DockTop();
+            {
+                // штрих-код читателя
+                TextWrapping = TextWrapping.NoWrap,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                [!TextBox.TextProperty] = new Binding (nameof (_model.Barcode))
+            }
+            .DockTop();
         _barcodeBox.KeyDown += BarcodeBoxOnKeyDown;
 
         var lastBox = new TextBox
-        {
-            // последний посетитель
-            TextWrapping = TextWrapping.Wrap,
-            IsReadOnly = true,
-            IsTabStop = false,
-            Height = 200,
-            Padding = new Thickness (10),
-            FontSize = 18,
-            HorizontalAlignment = HorizontalAlignment.Stretch,
-            VerticalContentAlignment = VerticalAlignment.Stretch,
-            [!TextBox.TextProperty] = new Binding (nameof (_model.Last)),
-        }
-        .DockTop();
+            {
+                // последний посетитель
+                TextWrapping = TextWrapping.Wrap,
+                IsReadOnly = true,
+                IsTabStop = false,
+                Height = 200,
+                Padding = new Thickness (10),
+                FontSize = 22,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalContentAlignment = VerticalAlignment.Stretch,
+                [!TextBox.TextProperty] = new Binding (nameof (_model.Last)),
+            }
+            .DockTop();
         lastBox.BindClass ("error", new Binding (nameof (_model.IsError)), null!);
+        lastBox.BindClass ("info", new Binding (nameof (_model.IsInfo)), null!);
 
         Content = new DockPanel
         {
@@ -117,63 +117,63 @@ internal sealed class MainWindow
             Children =
             {
                 new Label
-                {
-                    // название библиотеки
-                    Padding = new Thickness (5),
-                    Background = yellowBrush,
-                    HorizontalAlignment = HorizontalAlignment.Stretch,
-                    HorizontalContentAlignment = HorizontalAlignment.Center,
-                    Content = new TextBlock
                     {
-                        TextAlignment = TextAlignment.Center,
-                        [!TextBlock.TextProperty] = new Binding (nameof (_model.Title))
-                    },
-                }
-                .DockTop(),
+                        // название библиотеки
+                        Padding = new Thickness (5),
+                        Background = yellowBrush,
+                        HorizontalAlignment = HorizontalAlignment.Stretch,
+                        HorizontalContentAlignment = HorizontalAlignment.Center,
+                        Content = new TextBlock
+                        {
+                            TextAlignment = TextAlignment.Center,
+                            [!TextBlock.TextProperty] = new Binding (nameof (_model.Title))
+                        },
+                    }
+                    .DockTop(),
 
                 new Label
-                {
-                    // посещений за сегодня
-                    Padding = new Thickness (5),
-                    Background = yellowBrush,
-                    HorizontalAlignment = HorizontalAlignment.Stretch,
-                    HorizontalContentAlignment = HorizontalAlignment.Center,
-                    FontWeight = FontWeight.Bold,
-                    [!ContentProperty] = new Binding (nameof (_model.VisitCount))
                     {
-                        StringFormat = _model.Today
+                        // посещений за сегодня
+                        Padding = new Thickness (5),
+                        Background = yellowBrush,
+                        HorizontalAlignment = HorizontalAlignment.Stretch,
+                        HorizontalContentAlignment = HorizontalAlignment.Center,
+                        FontWeight = FontWeight.Bold,
+                        [!ContentProperty] = new Binding (nameof (_model.VisitCount))
+                        {
+                            StringFormat = _model.Today
+                        }
                     }
-                }
-                .DockTop(),
+                    .DockTop(),
 
                 new Label
-                {
-                    // читателей в библиотеке
-                    Padding = new Thickness (5),
-                    Background = yellowBrush,
-                    HorizontalAlignment = HorizontalAlignment.Stretch,
-                    HorizontalContentAlignment = HorizontalAlignment.Center,
-                    FontWeight = FontWeight.Bold,
-                    [!ContentProperty] = new Binding (nameof (_model.InsiderCount))
                     {
-                        StringFormat = _model.Readers
+                        // читателей в библиотеке
+                        Padding = new Thickness (5),
+                        Background = yellowBrush,
+                        HorizontalAlignment = HorizontalAlignment.Stretch,
+                        HorizontalContentAlignment = HorizontalAlignment.Center,
+                        FontWeight = FontWeight.Bold,
+                        [!ContentProperty] = new Binding (nameof (_model.InsiderCount))
+                        {
+                            StringFormat = _model.Readers
+                        }
                     }
-                }
-                .DockTop(),
+                    .DockTop(),
 
                 // штрих-код читателя
                 _barcodeBox,
 
                 new Label
-                {
-                    // обращение к охранникам
-                    Padding = new Thickness (5),
-                    Foreground = Brushes.Blue,
-                    HorizontalAlignment = HorizontalAlignment.Stretch,
-                    HorizontalContentAlignment = HorizontalAlignment.Center,
-                    [!ContentProperty] = new Binding (nameof (_model.Message))
-                }
-                .DockTop(),
+                    {
+                        // обращение к охранникам
+                        Padding = new Thickness (5),
+                        Foreground = Brushes.Blue,
+                        HorizontalAlignment = HorizontalAlignment.Stretch,
+                        HorizontalContentAlignment = HorizontalAlignment.Center,
+                        [!ContentProperty] = new Binding (nameof (_model.Message))
+                    }
+                    .DockTop(),
 
                 // последний посетитель
                 lastBox,
@@ -199,11 +199,26 @@ internal sealed class MainWindow
             }
         };
 
-        DispatcherTimer.RunOnce (() =>
-        {
-            _barcodeBox.Focus();
-            _model.AutoUpdate();
-        }, TimeSpan.FromMilliseconds (100));
+        DispatcherTimer.Run
+            (() =>
+                {
+                    _model.AutoUpdate().Forget();
+                    return true;
+                },
+                TimeSpan.FromMinutes (1)
+            );
+    }
+
+    #endregion
+
+    #region Window members
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        _barcodeBox.Focus();
+        // _model.AutoUpdate().Forget();
     }
 
     #endregion
@@ -213,7 +228,7 @@ internal sealed class MainWindow
     private readonly GateModel _model;
     private readonly TextBox _barcodeBox;
 
-    private void BarcodeBoxOnKeyDown
+    private async void BarcodeBoxOnKeyDown
         (
             object? sender,
             KeyEventArgs eventArgs
@@ -223,7 +238,7 @@ internal sealed class MainWindow
         {
             var barcode = _model.Barcode;
             _model.Barcode = null;
-            _model.HandleReader (barcode);
+            await _model.HandleReader (barcode);
             _barcodeBox.Focus();
         }
     }
