@@ -17,6 +17,7 @@
 
 using System;
 
+using AM;
 using AM.Avalonia;
 
 using Avalonia;
@@ -56,8 +57,30 @@ internal sealed class MainWindow
 
         this.SetWindowIcon ("Assets/guard.ico");
 
-        _model = GateModel.GetTestModel();
+        _model = GateModel.FromConfiguration();
+            // GateModel.GetTestModel();
         DataContext = _model;
+
+        Styles.Add
+            (
+                new Style (x => x.Class ("error"))
+                {
+                    Setters =
+                    {
+                        new Setter (ForegroundProperty, Brushes.Red)
+                    }
+                }
+            );
+        Styles.Add
+            (
+                new Style (x => x.Class ("info"))
+                {
+                    Setters =
+                    {
+                        new Setter (ForegroundProperty, Brushes.Blue)
+                    }
+                }
+            );
 
         var yellowBrush = new SolidColorBrush (0xFFFFFF00u);
         _barcodeBox = new TextBox
@@ -69,6 +92,22 @@ internal sealed class MainWindow
         }
         .DockTop();
         _barcodeBox.KeyDown += BarcodeBoxOnKeyDown;
+
+        var lastBox = new TextBox
+        {
+            // последний посетитель
+            TextWrapping = TextWrapping.Wrap,
+            IsReadOnly = true,
+            IsTabStop = false,
+            Height = 200,
+            Padding = new Thickness (10),
+            FontSize = 18,
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            VerticalContentAlignment = VerticalAlignment.Stretch,
+            [!TextBox.TextProperty] = new Binding (nameof (_model.Last)),
+        }
+        .DockTop();
+        lastBox.BindClass ("error", new Binding (nameof (_model.IsError)), null!);
 
         Content = new DockPanel
         {
@@ -87,7 +126,7 @@ internal sealed class MainWindow
                     Content = new TextBlock
                     {
                         TextAlignment = TextAlignment.Center,
-                        Text = "Иркутская областная универсальная научная библиотека\nимени И. И. Молчанова-Сибирского"
+                        [!TextBlock.TextProperty] = new Binding (nameof (_model.Title))
                     },
                 }
                 .DockTop(),
@@ -102,7 +141,7 @@ internal sealed class MainWindow
                     FontWeight = FontWeight.Bold,
                     [!ContentProperty] = new Binding (nameof (_model.VisitCount))
                     {
-                        StringFormat = "Посещений за сегодня: {0}"
+                        StringFormat = _model.Today
                     }
                 }
                 .DockTop(),
@@ -117,7 +156,7 @@ internal sealed class MainWindow
                     FontWeight = FontWeight.Bold,
                     [!ContentProperty] = new Binding (nameof (_model.InsiderCount))
                     {
-                        StringFormat = "Читателей в библиотеке: {0}"
+                        StringFormat = _model.Readers
                     }
                 }
                 .DockTop(),
@@ -136,19 +175,8 @@ internal sealed class MainWindow
                 }
                 .DockTop(),
 
-                new TextBox
-                {
-                    // последний посетитель
-                    TextWrapping = TextWrapping.Wrap,
-                    IsReadOnly = true,
-                    IsTabStop = false,
-                    Height = 200,
-                    Padding = new Thickness (10),
-                    FontSize = 18,
-                    HorizontalAlignment = HorizontalAlignment.Stretch,
-                    VerticalContentAlignment = VerticalAlignment.Stretch,
-                    [!TextBox.TextProperty] = new Binding (nameof (_model.Last)),
-                }.DockTop(),
+                // последний посетитель
+                lastBox,
 
                 new ListBox
                 {
@@ -171,7 +199,11 @@ internal sealed class MainWindow
             }
         };
 
-        DispatcherTimer.RunOnce (() => _barcodeBox.Focus(), TimeSpan.FromMilliseconds (100));
+        DispatcherTimer.RunOnce (() =>
+        {
+            _barcodeBox.Focus();
+            _model.AutoUpdate();
+        }, TimeSpan.FromMilliseconds (100));
     }
 
     #endregion

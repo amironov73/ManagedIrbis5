@@ -39,6 +39,24 @@ internal sealed class GateModel
     #region Properties
 
     /// <summary>
+    /// Наименование библиотеки.
+    /// </summary>
+    [Reactive]
+    public string? Title { get; set; }
+
+    /// <summary>
+    /// Посещений за сегодня.
+    /// </summary>
+    [Reactive]
+    public string? Today { get; set; }
+
+    /// <summary>
+    /// Читателей в библиотеке.
+    /// </summary>
+    [Reactive]
+    public string? Readers { get; set; }
+
+    /// <summary>
     /// События.
     /// </summary>
     [Reactive]
@@ -74,11 +92,23 @@ internal sealed class GateModel
     [Reactive]
     public string? Barcode { get; set; }
 
+    /// <summary>
+    /// Признак ошибки.
+    /// </summary>
+    [Reactive]
+    public bool IsError { get; set; }
+
+    /// <summary>
+    /// Признак информационного сообщения.
+    /// </summary>
+    [Reactive]
+    public bool IsInfo { get; set; }
+
     #endregion
 
     #region Public methods
 
-    public async Task<IAsyncConnection> CreateClient()
+    public async Task<IAsyncConnection> CreateConnection()
     {
         var connectionString = Magna.Configuration["connection-string"];
         if (string.IsNullOrEmpty (connectionString))
@@ -113,11 +143,47 @@ internal sealed class GateModel
     public void ShowHtml
         (
             string? text,
-            bool error = false
+            bool error = false,
+            bool info = false
         )
     {
+        IsError = error;
+        IsInfo = info;
         text = HtmlText.ToPlainText (text).SafeTrim();
         Last = text;
+    }
+
+    public async void AutoUpdate()
+    {
+        using (var connection = await CreateConnection())
+        {
+            UpdateStatistics (connection);
+        }
+    }
+
+    public async void UpdateStatistics
+        (
+            IAsyncConnection connection
+        )
+    {
+        var today = IrbisDate.TodayText;
+        var term = $"VS={today}/*";
+        var postingsParameters = new PostingParameters
+        {
+            Database = connection.EnsureDatabase(),
+            Terms = new[] { term }
+        };
+        var postings = await connection.ReadPostingsAsync (postingsParameters);
+        VisitCount = postings?.Length ?? 0;
+
+        var expression = "VIS=$";
+        var searchParameters = new SearchParameters
+        {
+            Database = connection.EnsureDatabase(),
+            Expression = expression
+        };
+        var readers = await connection.SearchAsync (searchParameters);
+        InsiderCount = readers?.Length ?? 0;
     }
 
     public async void HandleReader
@@ -132,7 +198,7 @@ internal sealed class GateModel
         }
 
         readerId = readerId.Trim();
-        await using var connection = await CreateClient();
+        await using var connection = await CreateConnection();
         var searchParameters = new SearchParameters
         {
             Database = connection.EnsureDatabase(),
@@ -141,7 +207,7 @@ internal sealed class GateModel
         var found = await connection.SearchAsync (searchParameters);
         if (found?.Length != 1)
         {
-            ShowHtml("Читатель не найден", error: true);
+            ShowHtml ("Читатель не найден", error: true);
             return;
         }
 
@@ -161,15 +227,33 @@ internal sealed class GateModel
         {
             return;
         }
+
         var formatParameters = new FormatRecordParameters
         {
             Database = connection.EnsureDatabase(),
             Format = formatName,
-            Mfns = new [] { found[0].Mfn }
+            Mfns = new[] { found[0].Mfn }
         };
         await connection.FormatRecordsAsync (formatParameters);
         var html = formatParameters.Result.AsSingle();
         ShowHtml (html);
+        UpdateStatistics (connection);
+    }
+
+    /// <summary>
+    /// Получение модели из конфигурации
+    /// </summary>
+    /// <returns></returns>
+    public static GateModel FromConfiguration()
+    {
+        var configuration = Magna.Configuration;
+        return new GateModel
+        {
+            Title = configuration["title"],
+            Message = configuration["message"],
+            Today = configuration["today"],
+            Readers = configuration["readers"],
+        };
     }
 
     #endregion
