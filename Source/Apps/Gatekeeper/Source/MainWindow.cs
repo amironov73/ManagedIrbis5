@@ -81,7 +81,7 @@ internal sealed class MainWindow
                 }
             );
 
-        var yellowBrush = new SolidColorBrush (0xFFFFFFAAu);
+        var background = new SolidColorBrush (0xFFCCCCCCu);
         _barcodeBox = new TextBox
             {
                 // штрих-код читателя
@@ -120,7 +120,7 @@ internal sealed class MainWindow
                     {
                         // название библиотеки
                         Padding = new Thickness (5),
-                        Background = yellowBrush,
+                        Background = background,
                         HorizontalAlignment = HorizontalAlignment.Stretch,
                         HorizontalContentAlignment = HorizontalAlignment.Center,
                         Content = new TextBlock
@@ -135,7 +135,7 @@ internal sealed class MainWindow
                     {
                         // посещений за сегодня
                         Padding = new Thickness (5),
-                        Background = yellowBrush,
+                        Background = background,
                         HorizontalAlignment = HorizontalAlignment.Stretch,
                         HorizontalContentAlignment = HorizontalAlignment.Center,
                         FontWeight = FontWeight.Bold,
@@ -150,7 +150,7 @@ internal sealed class MainWindow
                     {
                         // читателей в библиотеке
                         Padding = new Thickness (5),
-                        Background = yellowBrush,
+                        Background = background,
                         HorizontalAlignment = HorizontalAlignment.Stretch,
                         HorizontalContentAlignment = HorizontalAlignment.Center,
                         FontWeight = FontWeight.Bold,
@@ -168,6 +168,7 @@ internal sealed class MainWindow
                     {
                         // обращение к охранникам
                         Padding = new Thickness (5),
+                        Background = background,
                         Foreground = Brushes.Blue,
                         HorizontalAlignment = HorizontalAlignment.Stretch,
                         HorizontalContentAlignment = HorizontalAlignment.Center,
