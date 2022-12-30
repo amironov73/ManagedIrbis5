@@ -1,3 +1,20 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/* 
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.IO;
 using System.Xml;
@@ -7,16 +24,17 @@ using FastReport.Table;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+
 using FastReport.Barcode;
 using FastReport.Utils;
-#if MSCHART
-using FastReport.MSChart;
-using FastReport.DataVisualization.Charting;
-#endif
 using FastReport.Matrix;
 using FastReport.Dialog;
 using FastReport.Data;
 using FastReport.Data.JsonConnection;
+
+#endregion
+
+#nullable enable
 
 namespace FastReport.Import.StimulSoft
 {
