@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -18,8 +18,8 @@
 using System;
 using System.Globalization;
 using System.Drawing;
-using FastReport.Utils;
-using FastReport.Barcode;
+using AM.Reporting.Utils;
+using AM.Reporting.Barcode;
 using System.Xml;
 using System.Windows.Forms;
 
@@ -27,7 +27,7 @@ using System.Windows.Forms;
 
 #nullable enable
 
-namespace FastReport.Import.JasperReports
+namespace AM.Reporting.Import.JasperReports
 {
     /// <summary>
     /// The JasperReports units converter.
@@ -135,7 +135,7 @@ namespace FastReport.Import.JasperReports
         public static BorderLine ConvertBorderLine(XmlNode node)
         {
             BorderLine line = new BorderLine();
-            
+
             if(node.Attributes["lineWidth"] != null)
                 line.Width = ConvertInt(node.Attributes["lineWidth"].Value) * DrawUtils.ScreenDpi / 96f;
 
@@ -156,7 +156,7 @@ namespace FastReport.Import.JasperReports
         public static Border ConvertBorder(XmlNode border)
         {
             Border result = new Border();
-            
+
             foreach(XmlNode node in border.ChildNodes)
             {
                 if (node.Name == "pen")

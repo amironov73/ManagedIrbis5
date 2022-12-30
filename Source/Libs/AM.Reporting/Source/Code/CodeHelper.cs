@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,15 +22,15 @@ using System.ComponentModel;
 using System.Reflection;
 using System.CodeDom.Compiler;
 
-using FastReport.Data;
-using FastReport.Engine;
-using FastReport.Utils;
+using AM.Reporting.Data;
+using AM.Reporting.Engine;
+using AM.Reporting.Utils;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Code
+namespace AM.Reporting.Code
 {
   internal abstract partial class CodeHelperBase
   {

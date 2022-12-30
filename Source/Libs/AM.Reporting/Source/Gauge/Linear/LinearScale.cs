@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,13 +20,13 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.ComponentModel;
 
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Gauge.Linear
+namespace AM.Reporting.Gauge.Linear
 {
     /// <summary>
     /// Represents a linear scale.
@@ -48,7 +48,7 @@ namespace FastReport.Gauge.Linear
 
         #region Properties
 
-        
+
 
         #endregion // Properties
 

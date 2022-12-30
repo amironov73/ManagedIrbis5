@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,13 +19,13 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Preview
+namespace AM.Reporting.Preview
 {
     internal partial class PageCache : IDisposable
     {

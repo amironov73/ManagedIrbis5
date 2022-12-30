@@ -1,10 +1,32 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.ComponentModel;
-using FastReport.Utils;
 
-namespace FastReport.Table
+using AM.Reporting.Utils;
+
+#endregion
+
+#nullable enable
+
+namespace AM.Reporting.Table
 {
     /// <summary>
     /// Specifies the layout that will be used when printing a big table.
@@ -28,8 +50,8 @@ namespace FastReport.Table
     }
 
     /// <summary>
-    /// The base class for table-type controls such as <see cref="TableObject"/> and 
-    /// <see cref="FastReport.Matrix.MatrixObject"/>.
+    /// The base class for table-type controls such as <see cref="TableObject"/> and
+    /// <see cref="AM.Reporting.Matrix.MatrixObject"/>.
     /// </summary>
     public partial class TableBase : BreakableComponent, IParent
     {
@@ -201,7 +223,7 @@ namespace FastReport.Table
         /// </remarks>
         [DefaultValue(0f)]
         [Category("Behavior")]
-        [TypeConverter("FastReport.TypeConverters.UnitsConverter, FastReport")]
+        [TypeConverter("AM.Reporting.TypeConverters.UnitsConverter, AM.Reporting")]
         public float WrappedGap
         {
             get { return wrappedGap; }
@@ -296,7 +318,7 @@ namespace FastReport.Table
         /// </summary>
         /// <remarks>
         /// Use this property to access the result of rendering your table in dynamic mode.
-        /// It may be useful if you want to center or right-align the result table on a page. 
+        /// It may be useful if you want to center or right-align the result table on a page.
         /// In this case, you need to add the following code at the end of your ManualBuild event handler:
         /// <code>
         /// // right-align the table
@@ -594,7 +616,7 @@ namespace FastReport.Table
 
             ResetSpanList();
         }
-        
+
         public bool IsInsideSpan(TableCell cell)
         {
             Point address = cell.Address;
@@ -1030,7 +1052,7 @@ namespace FastReport.Table
                 TableCell cellTo = breakTo[i, rowIndex];
                 cell.Height = rowHeight;
                 cell.Break(cellTo);
-                
+
                 // fix height if row is not autosized
                 if (!rowTo.AutoSize)
                 {

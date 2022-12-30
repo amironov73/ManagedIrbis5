@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -26,7 +26,7 @@ using System.Text.RegularExpressions;
 
 #nullable enable
 
-namespace FastReport.Data.JsonConnection
+namespace AM.Reporting.Data.JsonConnection
 {
     /// <summary>
     /// Represents the JsonDataConnection connection string builder.
@@ -110,7 +110,7 @@ namespace FastReport.Data.JsonConnection
 
         /// <summary>
         /// Set or get headers of the connection string.
-        /// 
+        ///
         /// </summary>
         /// <remarks>
         /// Returns copy of dictionary. If you need to update values, set the dictionary again!

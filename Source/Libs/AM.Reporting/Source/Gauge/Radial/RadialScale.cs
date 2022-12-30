@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,13 +20,13 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.ComponentModel;
 
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Gauge.Radial
+namespace AM.Reporting.Gauge.Radial
 {
     /// <summary>
     /// Represents a linear scale.
@@ -231,7 +231,7 @@ namespace FastReport.Gauge.Radial
             SizeF minTxt = RadialUtils.GetStringSize(e, Parent, Font, Parent.Minimum.ToString());
             float maxTxtOffset = maxTxt.Height > maxTxt.Width ? maxTxt.Height : maxTxt.Width;
             float minTxtOffset = minTxt.Height > minTxt.Width ? minTxt.Height : minTxt.Width;
-            majorTicksOffset = maxTxtOffset > minTxtOffset ? maxTxtOffset : minTxtOffset;       
+            majorTicksOffset = maxTxtOffset > minTxtOffset ? maxTxtOffset : minTxtOffset;
 
             PointF[] tick0 = new PointF[2];
             avrTick = new PointF(left + width / 2, top + majorTicksOffset);
@@ -340,7 +340,7 @@ namespace FastReport.Gauge.Radial
 
             tick0 = RadialUtils.RotateVector(tick0, angle, center);
 
-            g.DrawLine(pen, tick0[0].X, tick0[0].Y, tick0[1].X, tick0[1].Y);         
+            g.DrawLine(pen, tick0[0].X, tick0[0].Y, tick0[1].X, tick0[1].Y);
             string text = startValue.ToString();
             DrawText(e, text, brush, tick0[0].X, tick0[0].Y, horAlign, vertAlign);
 
@@ -437,7 +437,7 @@ namespace FastReport.Gauge.Radial
                     txtPoint = GetTextPoint(tick, -1 * e.ScaleX, isNegative(i, true), isRightPart);
                     DrawText(e, text, brush, txtPoint.X, txtPoint.Y, horAlign, vertAlign);
                 }
-                
+
                 if(drawLeft)
                 {
                     //left side
@@ -529,7 +529,7 @@ namespace FastReport.Gauge.Radial
         }
 
         private void DrawMinorTicks(FRPaintEventArgs e)
-        { 
+        {
             IGraphics g = e.Graphics;
             Pen pen = e.Cache.GetPen(MinorTicks.Color, MinorTicks.Width * e.ScaleX, DashStyle.Solid);
 
@@ -597,7 +597,7 @@ namespace FastReport.Gauge.Radial
                 angle += minorStep * RadialGauge.Radians;
             }
         }
-        
+
         #endregion // Private Methods
 
         #region Public Methods

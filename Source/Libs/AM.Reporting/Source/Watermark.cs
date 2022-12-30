@@ -1,11 +1,11 @@
 using System;
 using System.ComponentModel;
 using System.Drawing;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 using System.Windows.Forms;
 using System.Drawing.Design;
 
-namespace FastReport
+namespace AM.Reporting
 {
     /// <summary>
     /// Specifies the watermark image size mode.
@@ -71,8 +71,8 @@ namespace FastReport
     /// Watermark can draw text and/or image behind the page objects on in front of them. To enable
     /// watermark, set its <b>Enabled</b> property to <b>true</b>.
     /// </remarks>
-    [TypeConverter(typeof(FastReport.TypeConverters.FRExpandableObjectConverter))]
-    [EditorAttribute("FastReport.TypeEditors.WatermarkEditor, FastReport", typeof(UITypeEditor))]
+    [TypeConverter(typeof(AM.Reporting.TypeConverters.FRExpandableObjectConverter))]
+    [EditorAttribute("AM.Reporting.TypeEditors.WatermarkEditor, AM.Reporting", typeof(UITypeEditor))]
     public class Watermark : IDisposable
     {
         #region Fields
@@ -149,7 +149,7 @@ namespace FastReport
         /// <summary>
         /// Gets or sets a text fill.
         /// </summary>
-        [Editor("FastReport.TypeEditors.FillEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.FillEditor, AM.Reporting", typeof(UITypeEditor))]
         public FillBase TextFill
         {
             get { return textObject.TextFill; }
@@ -192,7 +192,7 @@ namespace FastReport
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public PictureObject PictureObject
         {

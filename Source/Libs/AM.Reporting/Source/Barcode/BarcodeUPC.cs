@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,13 +19,13 @@ using System;
 using System.Text;
 using System.Drawing;
 
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Barcode
+namespace AM.Reporting.Barcode
 {
   /// <summary>
   /// Generates the UPC E0 barcode.
@@ -49,7 +49,7 @@ namespace FastReport.Barcode
     internal override void DrawText(IGraphics g, string barData)
     {
       DrawString(g, -8, -2, "0", true);
-      
+
       // parts of pattern: 3 + 24 + 6
       float x1 = GetWidth(pattern.Substring(0, 3));
       float x2 = GetWidth(pattern.Substring(0, 3 + 24));
@@ -114,7 +114,7 @@ namespace FastReport.Barcode
         {
           for (int j = 0; j <= 3; j++)
             result += tabelle_EAN_C[CharToInt(text[i])][3 - j];
-        }    
+        }
       }
 
       // Stopcode
@@ -156,7 +156,7 @@ namespace FastReport.Barcode
       {
         string code = tabelle_EAN_A[CharToInt(text[i])];
         result += i == 0 ? MakeLong(code) : code;
-      }  
+      }
 
       //Trennzeichen
       result += "0A0A0";
@@ -164,7 +164,7 @@ namespace FastReport.Barcode
       {
         string code = tabelle_EAN_C[CharToInt(text[i])];
         result += i == 11 ? MakeLong(code) : code;
-      }  
+      }
 
       //Stopcode
       return result + "A0A";
@@ -238,7 +238,7 @@ namespace FastReport.Barcode
           result += tabelle_EAN_A[CharToInt(tmp[i])];
 
         if (i < 1)
-          result += "05"; // character delineator 
+          result += "05"; // character delineator
       }
 
       return result;
@@ -279,7 +279,7 @@ namespace FastReport.Barcode
           result += tabelle_EAN_A[CharToInt(tmp[i])];
 
         if (i < 4)
-          result += "05"; // character delineator 
+          result += "05"; // character delineator
       }
 
       return result;

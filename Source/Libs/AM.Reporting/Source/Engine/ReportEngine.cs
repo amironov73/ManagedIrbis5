@@ -9,15 +9,15 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using FastReport.Data;
-using FastReport.Preview;
-using FastReport.Utils;
+using AM.Reporting.Data;
+using AM.Reporting.Preview;
+using AM.Reporting.Utils;
 using System;
 using System.Collections.Generic;
 
@@ -25,7 +25,7 @@ using System.Collections.Generic;
 
 #nullable enable
 
-namespace FastReport.Engine
+namespace AM.Reporting.Engine
 {
     /// <summary>
     /// Represents the report engine.
@@ -217,7 +217,7 @@ namespace FastReport.Engine
         /// Gets the number of total pages in a prepared report.
         /// </summary>
         /// <remarks>
-        /// To use this property, your report must be two-pass. Set the <see cref="FastReport.Report.DoublePass"/>
+        /// To use this property, your report must be two-pass. Set the <see cref="AM.Reporting.Report.DoublePass"/>
         /// property to <b>true</b>.
         /// </remarks>
         public int TotalPages

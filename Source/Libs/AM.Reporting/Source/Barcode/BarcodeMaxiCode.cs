@@ -9,13 +9,13 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using FastReport.Utils;
+using AM.Reporting.Utils;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -26,7 +26,7 @@ using System.Text;
 
 #nullable enable
 
-namespace FastReport.Barcode
+namespace AM.Reporting.Barcode
 {
     /// <summary>
     /// Generates the 2D MaxiCode barcode.
@@ -116,7 +116,7 @@ namespace FastReport.Barcode
 
                 g.FillPolygon(b, points);
             }
-            
+
             foreach (MaxiCodeImpl.Ellipse circle in maxiCodeImpl.target)
             {
                 g.DrawEllipse(p,
@@ -139,7 +139,7 @@ namespace FastReport.Barcode
             Mode = src.Mode;
         }
 
-        internal override void Serialize(FastReport.Utils.FRWriter writer, string prefix, BarcodeBase diff)
+        internal override void Serialize(AM.Reporting.Utils.FRWriter writer, string prefix, BarcodeBase diff)
         {
             base.Serialize(writer, prefix, diff);
             BarcodeMaxiCode c = diff as BarcodeMaxiCode;

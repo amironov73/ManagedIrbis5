@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,7 +24,7 @@ using System.ComponentModel;
 
 #nullable enable
 
-namespace FastReport.Data
+namespace AM.Reporting.Data
 {
   /// <summary>
   /// Represents the collection of system variables.
@@ -118,7 +118,7 @@ namespace FastReport.Data
   }
 
   /// <summary>
-  /// Returns total number of pages in the report. To use this variable, you need 
+  /// Returns total number of pages in the report. To use this variable, you need
   /// to enable the report's double pass.
   /// </summary>
   public class TotalPagesVariable : SystemVariable
@@ -174,7 +174,7 @@ namespace FastReport.Data
   }
 
   /// <summary>
-  /// Returns data row number inside the group. This value is reset at the start of a new group. 
+  /// Returns data row number inside the group. This value is reset at the start of a new group.
   /// </summary>
   public class RowVariable : SystemVariable
   {
@@ -211,7 +211,7 @@ namespace FastReport.Data
 
   /// <summary>
   /// Returns current page number.
-  /// <para/>This variable is actually a macro. Its value is substituted when the component is viewed in 
+  /// <para/>This variable is actually a macro. Its value is substituted when the component is viewed in
   /// the preview window. That means you cannot use it in an expression.
   /// </summary>
   public class PageMacroVariable : SystemVariable
@@ -231,7 +231,7 @@ namespace FastReport.Data
 
   /// <summary>
   /// Returns the number of total pages in the report.
-  /// <para/>This variable is actually a macro. Its value is substituted when the component is viewed in 
+  /// <para/>This variable is actually a macro. Its value is substituted when the component is viewed in
   /// the preview window. That means you cannot use it in an expression.
   /// </summary>
   public class TotalPagesMacroVariable : SystemVariable
@@ -251,7 +251,7 @@ namespace FastReport.Data
 
   /// <summary>
   /// Returns the name of the printed copy.
-  /// <para/>This variable is actually a macro. Its value is substituted when the component is viewed in 
+  /// <para/>This variable is actually a macro. Its value is substituted when the component is viewed in
   /// the preview window. That means you cannot use it in an expression.
   /// </summary>
   public class CopyNameMacroVariable : SystemVariable

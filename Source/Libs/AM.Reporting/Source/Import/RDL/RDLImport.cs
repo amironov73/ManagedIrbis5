@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,14 +21,14 @@ using System.Xml;
 using System.Drawing;
 using System.Windows.Forms;
 
-using FastReport.Data;
-using FastReport.Table;
+using AM.Reporting.Data;
+using AM.Reporting.Table;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Import.RDL
+namespace AM.Reporting.Import.RDL
 {
     /// <summary>
     /// Represents the RDL import plugin.

@@ -1,11 +1,11 @@
 using System;
 using System.ComponentModel;
 using System.IO;
-using FastReport.Utils;
-using FastReport.Data;
+using AM.Reporting.Utils;
+using AM.Reporting.Data;
 using System.Drawing.Design;
 
-namespace FastReport
+namespace AM.Reporting
 {
     /// <summary>
     /// Specifies the hyperlink type.
@@ -48,7 +48,7 @@ namespace FastReport
     /// <summary>
     /// This class contains a hyperlink settings.
     /// </summary>
-    [TypeConverter(typeof(FastReport.TypeConverters.FRExpandableObjectConverter))]
+    [TypeConverter(typeof(AM.Reporting.TypeConverters.FRExpandableObjectConverter))]
     public class Hyperlink
     {
         #region Fields
@@ -69,9 +69,9 @@ namespace FastReport
         /// Gets or sets the kind of hyperlink.
         /// </summary>
         /// <remarks>
-        /// <para>Use the <b>Kind</b> property to define hyperlink's behavior. 
-        /// The hyperlink may be used to navigate to the external url, the page number, 
-        /// the bookmark defined by other report object, the external report, the other page of this report, 
+        /// <para>Use the <b>Kind</b> property to define hyperlink's behavior.
+        /// The hyperlink may be used to navigate to the external url, the page number,
+        /// the bookmark defined by other report object, the external report, the other page of this report,
         /// and custom hyperlink.</para>
         /// </remarks>
         [DefaultValue(HyperlinkKind.URL)]
@@ -91,7 +91,7 @@ namespace FastReport
         /// <para>If you want to navigate to some fixed data (URL or page number, for example),
         /// use the <see cref="Value"/> property instead.</para>
         /// </remarks>
-        [Editor("FastReport.TypeEditors.HyperlinkExpressionEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.HyperlinkExpressionEditor, AM.Reporting", typeof(UITypeEditor))]
         public string Expression
         {
             get { return expression; }
@@ -128,10 +128,10 @@ namespace FastReport
         /// </summary>
         /// <remarks>
         /// <para>Use this property if <see cref="Kind"/> is set to <b>DetailReport</b>. </para>
-        /// <para>When you follow the hyperlink, this report will be loaded and run. 
+        /// <para>When you follow the hyperlink, this report will be loaded and run.
         /// You also may specify the report's parameter in the <see cref="ReportParameter"/> property.</para>
         /// </remarks>
-        [Editor("FastReport.TypeEditors.HyperlinkReportFileEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.HyperlinkReportFileEditor, AM.Reporting", typeof(UITypeEditor))]
         public string DetailReportName
         {
             get { return detailReportName; }
@@ -144,10 +144,10 @@ namespace FastReport
         /// <remarks>
         /// <para>Use this property if <see cref="Kind"/> is set to <b>DetailPage</b>. </para>
         /// <para>When you follow the hyperlink, the specified page will be executed. It may contain the
-        /// detailed report. You also may specify the report's parameter in the 
+        /// detailed report. You also may specify the report's parameter in the
         /// <see cref="ReportParameter"/> property.</para>
         /// </remarks>
-        [Editor("FastReport.TypeEditors.HyperlinkReportPageEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.HyperlinkReportPageEditor, AM.Reporting", typeof(UITypeEditor))]
         public string DetailPageName
         {
             get { return detailPageName; }
@@ -160,22 +160,22 @@ namespace FastReport
         /// <remarks>
         /// Use this property if <see cref="Kind"/> is set to <b>DetailReport</b> or <b>DetailPage</b>.
         /// <para>If you want to pass the hyperlink's value to the report's parameter, specify the
-        /// parameter name in this property. This parameter will be set to the hyperlink's value 
+        /// parameter name in this property. This parameter will be set to the hyperlink's value
         /// before running a report. It may be used to display detailed information about clicked item.</para>
         /// <para>It is also possible to pass multiple values to several parameters. If hyperlink's value
         /// contains separators (the separator string can be set in the <see cref="ValuesSeparator"/>
         /// property), it will be splitted to several values. That values will be passed to nested parameters
         /// of the <b>ReportParameter</b> (you should create nested parameters by youself). For example, you have
-        /// the <b>ReportParameter</b> called "SelectedValue" which has two nested parameters: the first one is 
-        /// "Employee" and the second is "Category". The hyperlink's value is "Andrew Fuller;Beverages". 
-        /// It will be splitted to two values: "Andrew Fuller" and "Beverages". The first nested parameter 
+        /// the <b>ReportParameter</b> called "SelectedValue" which has two nested parameters: the first one is
+        /// "Employee" and the second is "Category". The hyperlink's value is "Andrew Fuller;Beverages".
+        /// It will be splitted to two values: "Andrew Fuller" and "Beverages". The first nested parameter
         /// of the <b>ReportParameter</b> that is "Employee" in our case will be set to "Andrew Fuller";
         /// the second nested parameter ("Category") will be set to "Beverages".</para>
-        /// <para>Note: when you create a parameter in the detailed report, don't forget to set 
+        /// <para>Note: when you create a parameter in the detailed report, don't forget to set
         /// its <b>DataType</b> property. It is used to convert string values to actual data type.
         /// </para>
         /// </remarks>
-        [Editor("FastReport.TypeEditors.HyperlinkReportParameterEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.HyperlinkReportParameterEditor, AM.Reporting", typeof(UITypeEditor))]
         public string ReportParameter
         {
             get { return reportParameter; }
@@ -183,7 +183,7 @@ namespace FastReport
         }
 
         /// <summary>
-        /// Gets or sets a string that will be used as a separator to pass several values 
+        /// Gets or sets a string that will be used as a separator to pass several values
         /// to the external report parameters.
         /// </summary>
         public string ValuesSeparator

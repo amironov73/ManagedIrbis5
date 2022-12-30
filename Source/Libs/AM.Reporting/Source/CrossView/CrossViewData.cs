@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -18,13 +18,13 @@ using System;
 
 using System.Collections;
 
-using FastReport.Data;
+using AM.Reporting.Data;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.CrossView
+namespace AM.Reporting.CrossView
 {
   /// <summary>
   /// Contains a set of properties and methods to hold and manipulate the CrossView descriptors.
@@ -48,39 +48,39 @@ namespace FastReport.CrossView
     #region FastCube properties (temporary)
     private CubeSourceBase cubeSource;
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public int XAxisFieldsCount { get { return cubeSource != null ? cubeSource.XAxisFieldsCount : 0; } }
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public int YAxisFieldsCount { get { return cubeSource != null ? cubeSource.YAxisFieldsCount : 0; } }
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public int MeasuresCount { get { return cubeSource != null ? cubeSource.MeasuresCount : 0; } }
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public int MeasuresLevel { get { return cubeSource != null ? cubeSource.MeasuresLevel : 0; } }
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public bool MeasuresInXAxis { get { return cubeSource != null ? cubeSource.MeasuresInXAxis : false; } }
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public bool MeasuresInYAxis { get { return cubeSource != null ? cubeSource.MeasuresInYAxis : false; } }
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public int DataColumnCount { get { return cubeSource != null ? cubeSource.DataColumnCount : 0; } }
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public int DataRowCount { get { return cubeSource != null ? cubeSource.DataRowCount : 0; } }
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public bool SourceAssigned { get { return cubeSource != null; } }
 #if !DOTNET_4
@@ -107,7 +107,7 @@ namespace FastReport.CrossView
     }
 #endif
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public string ColumnDescriptorsIndexes
     {
@@ -120,7 +120,7 @@ namespace FastReport.CrossView
 #endif
     }
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public string RowDescriptorsIndexes
     {
@@ -133,7 +133,7 @@ namespace FastReport.CrossView
 #endif
     }
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public string ColumnTerminalIndexes
     {
@@ -146,7 +146,7 @@ namespace FastReport.CrossView
 #endif
     }
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public string RowTerminalIndexes
     {
@@ -179,7 +179,7 @@ namespace FastReport.CrossView
       Columns.Clear();
       Rows.Clear();
       Cells.Clear();
-      
+
       if (!SourceAssigned)
         return;
       int cell = 0;
@@ -539,7 +539,7 @@ namespace FastReport.CrossView
     /// Gets a collection of column descriptors.
     /// </summary>
     /// <remarks>
-    /// Note: after you change something in this collection, call the 
+    /// Note: after you change something in this collection, call the
     /// <see cref="CrossViewObject.BuildTemplate"/> method to refresh the CrossView.
     /// </remarks>
     public CrossViewHeader Columns
@@ -551,7 +551,7 @@ namespace FastReport.CrossView
     /// Gets a collection of row descriptors.
     /// </summary>
     /// <remarks>
-    /// Note: after you change something in this collection, call the 
+    /// Note: after you change something in this collection, call the
     /// <see cref="CrossViewObject.BuildTemplate"/> method to refresh the CrossView.
     /// </remarks>
     public CrossViewHeader Rows
@@ -563,7 +563,7 @@ namespace FastReport.CrossView
     /// Gets a collection of data cell descriptors.
     /// </summary>
     /// <remarks>
-    /// Note: after you change something in this collection, call the 
+    /// Note: after you change something in this collection, call the
     /// <see cref="CrossViewObject.BuildTemplate"/> method to refresh the CrossView.
     /// </remarks>
     public CrossViewCells Cells

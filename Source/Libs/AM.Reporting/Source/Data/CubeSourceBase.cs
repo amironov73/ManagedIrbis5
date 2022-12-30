@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,21 +17,21 @@
 
 using System;
 using System.ComponentModel;
-using FastReport.Utils;
-using FastReport.CrossView;
+using AM.Reporting.Utils;
+using AM.Reporting.CrossView;
 using System.Drawing.Design;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Data
+namespace AM.Reporting.Data
 {
   /// <summary>
   /// Base class for all CubeSources such as <see cref="SliceCubeSource"/>.
   /// </summary>
-  [TypeConverter(typeof(FastReport.TypeConverters.CubeSourceConverter))]
-  [Editor("FastReport.TypeEditors.CubeSourceEditor, FastReport", typeof(UITypeEditor))]
+  [TypeConverter(typeof(AM.Reporting.TypeConverters.CubeSourceConverter))]
+  [Editor("AM.Reporting.TypeEditors.CubeSourceEditor, AM.Reporting", typeof(UITypeEditor))]
   public abstract class CubeSourceBase : DataComponentBase
   {
     #region Fields
@@ -39,47 +39,47 @@ namespace FastReport.Data
 
     #region Properties
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public int XAxisFieldsCount { get { return CubeLink != null ? CubeLink.XAxisFieldsCount : 0; } }
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public int YAxisFieldsCount { get { return CubeLink != null ? CubeLink.YAxisFieldsCount : 0; } }
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public int MeasuresCount { get { return CubeLink != null ? CubeLink.MeasuresCount : 0; } }
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public int MeasuresLevel { get { return CubeLink != null ? CubeLink.MeasuresLevel : 0; } }
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public bool MeasuresInXAxis { get { return CubeLink != null ? CubeLink.MeasuresInXAxis : false; } }
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public bool MeasuresInYAxis { get { return CubeLink != null ? CubeLink.MeasuresInYAxis : false; } }
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public int DataColumnCount { get { return CubeLink != null ? CubeLink.DataColumnCount : 0; } }
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public int DataRowCount { get { return CubeLink != null ? CubeLink.DataRowCount : 0; } }
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public bool SourceAssigned { get { return CubeLink != null; } }
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventHandler OnChanged;
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public IBaseCubeLink CubeLink { get { return Reference as IBaseCubeLink; } }
     #endregion
@@ -92,7 +92,7 @@ namespace FastReport.Data
 
     #region Public Methods
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public CrossViewMeasureCell GetMeasureCell(int colIndex, int rowIndex)
     {
@@ -101,9 +101,9 @@ namespace FastReport.Data
       else
         return new CrossViewMeasureCell();
     }
-    
+
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public void TraverseXAxis(CrossViewAxisDrawCellHandler crossViewAxisDrawCellHandler)
     {
@@ -115,7 +115,7 @@ namespace FastReport.Data
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public void TraverseYAxis(CrossViewAxisDrawCellHandler crossViewAxisDrawCellHandler)
     {
@@ -124,9 +124,9 @@ namespace FastReport.Data
         CubeLink.TraverseYAxis(crossViewAxisDrawCellHandler);
       }
     }
-    
+
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public string GetXAxisFieldName(int fieldIndex)
     {
@@ -137,9 +137,9 @@ namespace FastReport.Data
       else
         return "";
     }
-    
+
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public string GetYAxisFieldName(int fieldIndex)
     {
@@ -151,7 +151,7 @@ namespace FastReport.Data
         return "";
     }
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public string GetMeasureName(int measureIndex)
     {
@@ -174,9 +174,9 @@ namespace FastReport.Data
     {
       base.Deserialize(reader);
     }
-    
+
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public void Changed()
     {
@@ -192,6 +192,6 @@ namespace FastReport.Data
     {
       SetFlags(Flags.HasGlobalName, true);
     }
-  
+
   }
 }

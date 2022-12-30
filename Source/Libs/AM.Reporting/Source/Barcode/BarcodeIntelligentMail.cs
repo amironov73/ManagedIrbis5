@@ -9,13 +9,13 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using FastReport.Utils;
+using AM.Reporting.Utils;
 using System;
 using System.ComponentModel;
 using System.Globalization;
@@ -25,7 +25,7 @@ using System.Text.RegularExpressions;
 
 #nullable enable
 
-namespace FastReport.Barcode
+namespace AM.Reporting.Barcode
 {
     /// <summary>
     /// Generates the Intelligent Mail (USPS) barcode.
@@ -33,7 +33,7 @@ namespace FastReport.Barcode
     public class BarcodeIntelligentMail : LinearBarcodeBase
     {
         #region LinearBarcodeBase
-        
+
         private bool quietZone;
         const string space = "2";
 
@@ -75,7 +75,7 @@ namespace FastReport.Barcode
             return "12345678901234567890";
         }
 
-        internal override void Serialize(FastReport.Utils.FRWriter writer, string prefix, BarcodeBase diff)
+        internal override void Serialize(AM.Reporting.Utils.FRWriter writer, string prefix, BarcodeBase diff)
         {
             base.Serialize(writer, prefix, diff);
             BarcodeIntelligentMail c = diff as BarcodeIntelligentMail;

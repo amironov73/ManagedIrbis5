@@ -1,22 +1,44 @@
-﻿using FastReport.Utils;
-using FastReport.Data;
-using FastReport.Table;
-using FastReport.Export.Image;
-using FastReport.Barcode;
-using FastReport.Matrix;
-using FastReport.CrossView;
-using FastReport.Format;
-using FastReport.Functions;
-using FastReport.Gauge.Linear;
-using FastReport.Gauge.Simple;
-using FastReport.Gauge.Radial;
-using FastReport.Gauge.Simple.Progress;
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
+using AM.Reporting.Utils;
+using AM.Reporting.Data;
+using AM.Reporting.Table;
+using AM.Reporting.Export.Image;
+using AM.Reporting.Barcode;
+using AM.Reporting.Matrix;
+using AM.Reporting.CrossView;
+using AM.Reporting.Format;
+using AM.Reporting.Functions;
+using AM.Reporting.Gauge.Linear;
+using AM.Reporting.Gauge.Simple;
+using AM.Reporting.Gauge.Radial;
+using AM.Reporting.Gauge.Simple.Progress;
+
 using System.Runtime.CompilerServices;
 
-namespace FastReport
+#endregion
+
+#nullable enable
+
+namespace AM.Reporting
 {
     /// <summary>
-    /// The FastReport.dll assembly initializer.
+    /// The AM.Reporting.dll assembly initializer.
     /// </summary>
     public sealed class AssemblyInitializer : AssemblyInitializerBase
     {

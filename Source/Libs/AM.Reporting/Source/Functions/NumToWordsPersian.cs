@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,7 +24,7 @@ using System.Collections.Generic;
 
 #nullable enable
 
-namespace FastReport.Functions
+namespace AM.Reporting.Functions
 {
     internal class NumToWordsPersian : NumToWordsBase
     {
@@ -89,7 +89,7 @@ namespace FastReport.Functions
         protected override WordInfo GetTrillions()
         {
             return trillions;
-        }   
+        }
 
         protected override CurrencyInfo GetCurrency(string currencyName)
         {

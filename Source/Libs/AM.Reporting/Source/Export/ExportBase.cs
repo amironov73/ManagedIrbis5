@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,15 +19,15 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using FastReport.Utils;
-using FastReport.Preview;
+using AM.Reporting.Utils;
+using AM.Reporting.Preview;
 using System.Drawing;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Export
+namespace AM.Reporting.Export
 {
     /// <summary>
     /// The base class for all export filters.
@@ -96,7 +96,7 @@ namespace FastReport.Export
         /// Page numbers to export.
         /// </summary>
         /// <remarks>
-        /// Use page numbers separated by comma and/or page ranges, for example: "1,3-5,12". Empty string means 
+        /// Use page numbers separated by comma and/or page ranges, for example: "1,3-5,12". Empty string means
         /// that all pages need to be exported.
         /// </remarks>
         public string PageNumbers
@@ -163,7 +163,7 @@ namespace FastReport.Export
         }
 
         /// <summary>
-        /// Gets or sets a value indicating that the report bands should be shifted, if page 
+        /// Gets or sets a value indicating that the report bands should be shifted, if page
         /// has any non-exportable bands
         /// </summary>
         public bool ShiftNonExportable

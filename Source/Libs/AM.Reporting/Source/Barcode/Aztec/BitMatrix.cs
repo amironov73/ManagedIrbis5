@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,7 +21,7 @@ using System;
 
 #nullable enable
 
-namespace FastReport.Barcode.Aztec
+namespace AM.Reporting.Barcode.Aztec
 {
    /// <summary>
    ///   <p>Represents a 2D matrix of bits. In function arguments below, and throughout the common
@@ -64,7 +64,7 @@ namespace FastReport.Barcode.Aztec
       }
       /// <summary> This method is for compatibility with older code. It's only logical to call if the matrix
       /// is square, so I'm throwing if that's not the case.
-      /// 
+      ///
       /// </summary>
       /// <returns> row/column dimension of this matrix
       /// </returns>
@@ -116,7 +116,7 @@ namespace FastReport.Barcode.Aztec
       }
 
       /// <summary> <p>Gets the requested bit, where true means black.</p>
-      /// 
+      ///
       /// </summary>
       /// <param name="x">The horizontal component (i.e. which column)
       /// </param>
@@ -142,7 +142,7 @@ namespace FastReport.Barcode.Aztec
       }
 
       /// <summary> <p>Flips the given bit.</p>
-      /// 
+      ///
       /// </summary>
       /// <param name="x">The horizontal component (i.e. which column)
       /// </param>
@@ -165,7 +165,7 @@ namespace FastReport.Barcode.Aztec
       }
 
       /// <summary> <p>Sets a square region of the bit matrix to true.</p>
-      /// 
+      ///
       /// </summary>
       /// <param name="left">The horizontal position to begin at (inclusive)
       /// </param>
@@ -202,7 +202,7 @@ namespace FastReport.Barcode.Aztec
       }
 
       /// <summary> A fast method to retrieve one row of data from the matrix as a BitArray.
-      /// 
+      ///
       /// </summary>
       /// <param name="y">The row to retrieve
       /// </param>

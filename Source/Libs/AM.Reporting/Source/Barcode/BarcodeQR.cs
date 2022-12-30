@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,8 +22,8 @@ using System.Text;
 using System.Drawing;
 using System.ComponentModel;
 
-using FastReport.Barcode.QRCode;
-using FastReport.Utils;
+using AM.Reporting.Barcode.QRCode;
+using AM.Reporting.Utils;
 
 using System.Drawing.Drawing2D;
 
@@ -31,7 +31,7 @@ using System.Drawing.Drawing2D;
 
 #nullable enable
 
-namespace FastReport.Barcode
+namespace AM.Reporting.Barcode
 {
     /// <summary>
     /// Specifies the QR code error correction level.
@@ -188,7 +188,7 @@ namespace FastReport.Barcode
             QuietZone = src.QuietZone;
         }
 
-        internal override void Serialize(FastReport.Utils.FRWriter writer, string prefix, BarcodeBase diff)
+        internal override void Serialize(AM.Reporting.Utils.FRWriter writer, string prefix, BarcodeBase diff)
         {
             base.Serialize(writer, prefix, diff);
             BarcodeQR c = diff as BarcodeQR;

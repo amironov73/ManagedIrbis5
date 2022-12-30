@@ -1,8 +1,8 @@
 using System.ComponentModel;
-using FastReport.Data;
-using FastReport.Utils;
+using AM.Reporting.Data;
+using AM.Reporting.Utils;
 
-namespace FastReport
+namespace AM.Reporting
 {
   /// <summary>
   /// Specifies the default paper size used when creating a new report.
@@ -13,17 +13,17 @@ namespace FastReport
     /// A4 paper (210 x 297 mm).
     /// </summary>
     A4,
-    
+
     /// <summary>
     /// Letter paper (8.5 x 11 inches, 216 x 279 mm).
     /// </summary>
     Letter
   }
-  
+
   /// <summary>
   /// This class contains settings that will be applied to the Report component.
   /// </summary>
-  [TypeConverter(typeof(FastReport.TypeConverters.FRExpandableObjectConverter))]
+  [TypeConverter(typeof(AM.Reporting.TypeConverters.FRExpandableObjectConverter))]
   public partial class ReportSettings
   {
     private Language defaultLanguage;
@@ -50,7 +50,7 @@ namespace FastReport
     public event GetPropertyKindEventHandler GetBusinessObjectPropertyKind;
 
     /// <summary>
-    /// Occurs when discovering the structure of business object of ICustomTypeDescriptor type 
+    /// Occurs when discovering the structure of business object of ICustomTypeDescriptor type
     /// with no instance specified.
     /// </summary>
     /// <remarks>
@@ -79,7 +79,7 @@ namespace FastReport
     }
 
     /// <summary>
-    /// Gets or sets a value indicating that the business object engine will use property values 
+    /// Gets or sets a value indicating that the business object engine will use property values
     /// when possible to discover the BO structure.
     /// </summary>
     [DefaultValue(true)]

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Collections;
 using System.IO;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
-namespace FastReport
+namespace AM.Reporting
 {
   /// <summary>
   /// Represents a collection of styles used in the <see cref="Report.Styles"/>.
@@ -13,7 +13,7 @@ namespace FastReport
   public class StyleCollection : CollectionBase, IFRSerializable
   {
     private string name;
-    
+
     /// <summary>
     /// Gets or sets the name of the style.
     /// </summary>
@@ -28,7 +28,7 @@ namespace FastReport
     /// </summary>
     /// <param name="index">Index of an element.</param>
     /// <returns>The element at the specified index.</returns>
-    public Style this[int index]  
+    public Style this[int index]
     {
       get { return List[index] as Style; }
       set { List[index] = value; }
@@ -61,7 +61,7 @@ namespace FastReport
     /// </summary>
     /// <param name="index">The zero-based index at which value should be inserted.</param>
     /// <param name="value">The object to insert.</param>
-    public void Insert(int index, Style value)  
+    public void Insert(int index, Style value)
     {
       List.Insert(index, value);
     }
@@ -70,10 +70,10 @@ namespace FastReport
     /// Removes the specified object from the collection.
     /// </summary>
     /// <param name="value">Object to remove.</param>
-    public void Remove(Style value)  
+    public void Remove(Style value)
     {
       int i = IndexOf(value);
-      if (i != -1) 
+      if (i != -1)
         List.RemoveAt(i);
     }
 
@@ -81,7 +81,7 @@ namespace FastReport
     /// Returns the zero-based index of the first occurrence of an object.
     /// </summary>
     /// <param name="value">The object to locate in the collection.</param>
-    /// <returns>The zero-based index of the first occurrence of value within the entire collection, if found; 
+    /// <returns>The zero-based index of the first occurrence of value within the entire collection, if found;
     /// otherwise, -1.</returns>
     public int IndexOf(Style value)
     {
@@ -92,7 +92,7 @@ namespace FastReport
     /// Returns the zero-based index of the first occurrence of a style with specified name.
     /// </summary>
     /// <param name="value">The name to locate in the collection.</param>
-    /// <returns>The zero-based index of the first occurrence of value within the entire collection, if found; 
+    /// <returns>The zero-based index of the first occurrence of value within the entire collection, if found;
     /// otherwise, -1.</returns>
     public int IndexOf(string value)
     {
@@ -110,7 +110,7 @@ namespace FastReport
     /// </summary>
     /// <param name="value">The object to locate in the collection.</param>
     /// <returns><b>true</b> if object is found in the collection; otherwise, <b>false</b>.</returns>
-    public bool Contains(Style value)  
+    public bool Contains(Style value)
     {
       return IndexOf(value) != -1;
     }

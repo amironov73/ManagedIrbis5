@@ -1,6 +1,27 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 
-namespace FastReport.Utils
+#endregion
+
+#nullable enable
+
+namespace AM.Reporting.Utils
 {
     /// <summary>
     /// The exception that is thrown when the user tried to set object's name that is already exists.
@@ -78,7 +99,7 @@ namespace FastReport.Utils
     }
 
     /// <summary>
-    /// The exception that is thrown when trying to set an object's <b>Parent</b> property to 
+    /// The exception that is thrown when trying to set an object's <b>Parent</b> property to
     /// an object that not accepts children of this type.
     /// </summary>
     public class ParentException : Exception
@@ -90,7 +111,7 @@ namespace FastReport.Utils
     }
 
     /// <summary>
-    /// The exception that is thrown when trying to load a report file that contains reference to an 
+    /// The exception that is thrown when trying to load a report file that contains reference to an
     /// unknown object type.
     /// </summary>
     public class ClassException : Exception
@@ -169,7 +190,7 @@ namespace FastReport.Utils
     }
 
     /// <summary>
-    /// <see cref="FastReport.Cloud.StorageClient.CloudStorageClient"/> throws this exception if an error occurs in the <b>SaveReport</b> method.
+    /// <see cref="AM.Reporting.Cloud.StorageClient.CloudStorageClient"/> throws this exception if an error occurs in the <b>SaveReport</b> method.
     /// See inner exception for detailed information.
     /// </summary>
     public class CloudStorageException : Exception
@@ -187,6 +208,6 @@ namespace FastReport.Utils
         internal GroupHeaderHasNoGroupCondition(string name)
           : base(String.Format(Res.Get("Messages,GroupHeaderHasNoGroupCondition"), name))
         {
-        }       
+        }
     }
 }

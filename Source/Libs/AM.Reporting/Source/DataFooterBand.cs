@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 
-namespace FastReport
+namespace AM.Reporting
 {
   /// <summary>
   /// This class represents a data band footer.

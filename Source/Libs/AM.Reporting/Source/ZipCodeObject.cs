@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 using System.Drawing.Design;
 
-namespace FastReport
+namespace AM.Reporting
 {
   /// <summary>
   /// Represents a zip code object.
@@ -37,7 +37,7 @@ namespace FastReport
     /// Gets or sets the width of a single zipcode segment, in pixels.
     /// </summary>
     [Category("Layout")]
-    [TypeConverter("FastReport.TypeConverters.UnitsConverter, FastReport")]
+    [TypeConverter("AM.Reporting.TypeConverters.UnitsConverter, AM.Reporting")]
     public float SegmentWidth
     {
       get { return segmentWidth; }
@@ -48,7 +48,7 @@ namespace FastReport
     /// Gets or sets the height of a single zipcode segment, in pixels.
     /// </summary>
     [Category("Layout")]
-    [TypeConverter("FastReport.TypeConverters.UnitsConverter, FastReport")]
+    [TypeConverter("AM.Reporting.TypeConverters.UnitsConverter, AM.Reporting")]
     public float SegmentHeight
     {
       get { return segmentHeight; }
@@ -59,7 +59,7 @@ namespace FastReport
     /// Gets or sets the spacing between origins of segments, in pixels.
     /// </summary>
     [Category("Layout")]
-    [TypeConverter("FastReport.TypeConverters.UnitsConverter, FastReport")]
+    [TypeConverter("AM.Reporting.TypeConverters.UnitsConverter, AM.Reporting")]
     public float Spacing
     {
       get { return spacing; }
@@ -109,7 +109,7 @@ namespace FastReport
     /// Value must be in the form "Datasource.Column".
     /// </remarks>
     [Category("Data")]
-    [Editor("FastReport.TypeEditors.DataColumnEditor, FastReport", typeof(UITypeEditor))]
+    [Editor("AM.Reporting.TypeEditors.DataColumnEditor, AM.Reporting", typeof(UITypeEditor))]
     public string DataColumn
     {
       get { return dataColumn; }
@@ -120,7 +120,7 @@ namespace FastReport
     /// Gets or sets an expression that contains the zip code.
     /// </summary>
     [Category("Data")]
-    [Editor("FastReport.TypeEditors.ExpressionEditor, FastReport", typeof(UITypeEditor))]
+    [Editor("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof(UITypeEditor))]
     public string Expression
     {
       get { return expression; }
@@ -146,25 +146,25 @@ namespace FastReport
       g.SmoothingMode = SmoothingMode.AntiAlias;
 
       Brush b = e.Cache.GetBrush(Border.Color);
-      
+
       int[] grid = new int[] { 111111, 110001, 101001, 100101, 100011, 111111, 110001, 101001, 100101, 100011, 111111 };
       float ratioX = segmentWidth / (Units.Centimeters * 0.5f);
       float ratioY = segmentHeight / (Units.Centimeters * 1);
       float pointSize = Units.Millimeters * 0.25f;
       float y = AbsTop;
-      
+
       foreach (int gridRow in grid)
       {
         int row = gridRow;
         float x = AbsLeft;
-        
+
         while (row > 0)
         {
           if (row % 10 == 1)
             g.FillEllipse(b, (x + offsetX - pointSize / 2) * e.ScaleX, (y + offsetY - pointSize / 2) * e.ScaleY,
               pointSize * e.ScaleX, pointSize * e.ScaleY);
           row /= 10;
-          
+
           x += Units.Millimeters * 1 * ratioX;
         }
 
@@ -212,11 +212,11 @@ namespace FastReport
         offsetX += Border.Width / 2;
         offsetY += Border.Width / 2;
       }
-      
+
       // draw grid
       if (showGrid)
         DrawSegmentGrid(e, offsetX, offsetY);
-      
+
       // draw symbol
       if (symbol != -1)
       {
@@ -224,13 +224,13 @@ namespace FastReport
         PointF[] path = new PointF[digit.Length];
         float ratioX = segmentWidth / (Units.Centimeters * 0.5f);
         float ratioY = segmentHeight / (Units.Centimeters * 1);
-        
+
         for (int i = 0; i < digit.Length; i++)
         {
           path[i] = new PointF((AbsLeft + digit[i].X * Units.Millimeters * ratioX + offsetX) * e.ScaleX,
             (AbsTop + digit[i].Y * Units.Millimeters * ratioY + offsetY) * e.ScaleY);
         }
-        
+
         using (Pen pen = new Pen(Border.Color, Border.Width * e.ScaleX))
         {
           pen.StartCap = LineCap.Round;
@@ -238,7 +238,7 @@ namespace FastReport
           pen.LineJoin = LineJoin.Round;
           g.DrawLines(pen, path);
         }
-      }  
+      }
     }
     #endregion
 
@@ -267,9 +267,9 @@ namespace FastReport
     {
       Width = ((showMarkers ? 1 : 0) + segmentCount) * spacing;
       Height = (showMarkers ? segmentHeight + Units.Millimeters * 4: segmentHeight) + Border.Width;
-      
+
       base.Draw(e);
-      
+
       float offsetX = 0;
       if (showMarkers)
       {
@@ -280,7 +280,7 @@ namespace FastReport
 
       string text = Text.PadLeft(segmentCount, '0');
       text = text.Substring(0, segmentCount);
-      
+
       foreach (char ch in text)
       {
         int symbol = -1;
@@ -309,8 +309,8 @@ namespace FastReport
       if (ShowMarkers != c.ShowMarkers)
         writer.WriteBool("ShowMarkers", ShowMarkers);
       if (ShowGrid != c.ShowGrid)
-        writer.WriteBool("ShowGrid", ShowGrid);  
-      
+        writer.WriteBool("ShowGrid", ShowGrid);
+
       if (DataColumn != c.DataColumn)
         writer.WriteStr("DataColumn", DataColumn);
       if (Expression != c.Expression)
@@ -362,16 +362,16 @@ namespace FastReport
       segmentCount = 6;
       showMarkers = true;
       showGrid = true;
-      
+
       text = "123456";
       dataColumn = "";
       expression = "";
-      
+
       FlagSimpleBorder = true;
       Border.Width = 3;
       SetFlags(Flags.HasSmartTag, true);
     }
-    
+
     static ZipCodeObject()
     {
       FDigits = new List<Point[]>();

@@ -1,14 +1,14 @@
-using FastReport.Utils;
+using AM.Reporting.Utils;
 using System;
 using System.ComponentModel;
 
-namespace FastReport
+namespace AM.Reporting
 {
   /// <summary>
-  /// This class contains the page columns settings. 
+  /// This class contains the page columns settings.
   /// It is used in the <see cref="ReportPage.Columns"/> property.
   /// </summary>
-  [TypeConverter(typeof(FastReport.TypeConverters.FRExpandableObjectConverter))]
+  [TypeConverter(typeof(AM.Reporting.TypeConverters.FRExpandableObjectConverter))]
   public class PageColumns
   {
     private int count;
@@ -44,7 +44,7 @@ namespace FastReport
     /// <summary>
     /// Gets or sets the column width.
     /// </summary>
-    [TypeConverter("FastReport.TypeConverters.PaperConverter, FastReport")]
+    [TypeConverter("AM.Reporting.TypeConverters.PaperConverter, AM.Reporting")]
     public float Width
     {
       get { return width; }
@@ -97,7 +97,7 @@ namespace FastReport
       Width = source.Width;
       Positions.Assign(source.Positions);
     }
-    
+
     internal void Serialize(FRWriter writer, PageColumns c)
     {
       if (Count != c.Count)
@@ -107,9 +107,9 @@ namespace FastReport
         writer.WriteFloat("Columns.Width", Width);
         Positions = Positions; // avoid bug when number of positions is not equal number of columns
         writer.WriteValue("Columns.Positions", Positions);
-      }  
+      }
     }
-    
+
     internal PageColumns(ReportPage page)
     {
             this.page = page;

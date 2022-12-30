@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Drawing;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
-namespace FastReport
+namespace AM.Reporting
 {
   /// <summary>
   /// Represents a style.
@@ -23,7 +23,7 @@ namespace FastReport
   public class Style : StyleBase
   {
     private string name;
-    
+
     /// <summary>
     /// Gets or sets a name of the style.
     /// </summary>
@@ -50,7 +50,7 @@ namespace FastReport
       base.Assign(source);
       Name = (source as Style).Name;
     }
-    
+
     /// <summary>
     /// Creates exact copy of this <b>Style</b>.
     /// </summary>

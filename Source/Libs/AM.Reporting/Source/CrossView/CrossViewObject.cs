@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -18,10 +18,10 @@
 using System;
 using System.ComponentModel;
 
-using FastReport.Matrix;
-using FastReport.Utils;
-using FastReport.Data;
-using FastReport.Table;
+using AM.Reporting.Matrix;
+using AM.Reporting.Utils;
+using AM.Reporting.Data;
+using AM.Reporting.Table;
 
 using System.Drawing.Design;
 
@@ -29,7 +29,7 @@ using System.Drawing.Design;
 
 #nullable enable
 
-namespace FastReport.CrossView
+namespace AM.Reporting.CrossView
 {
   /// <summary>
   /// Represents the crossview object that is used to print cube slice or slicegrid.
@@ -118,7 +118,7 @@ namespace FastReport.CrossView
     /// Gets or sets a matrix style.
     /// </summary>
     [Category("Appearance")]
-    [Editor("FastReport.TypeEditors.CrossViewStyleEditor, FastReport", typeof(UITypeEditor))]
+    [Editor("AM.Reporting.TypeEditors.CrossViewStyleEditor, AM.Reporting", typeof(UITypeEditor))]
     public new string Style
     {
       get { return style; }
@@ -130,7 +130,7 @@ namespace FastReport.CrossView
     }
 
     /// <summary>
-    /// Gets or sets a script method name that will be used to handle the 
+    /// Gets or sets a script method name that will be used to handle the
     /// <see cref="ModifyResult"/> event.
     /// </summary>
     /// <remarks>
@@ -144,7 +144,7 @@ namespace FastReport.CrossView
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     [Browsable(false)]
     public string ColumnDescriptorsIndexes
@@ -153,7 +153,7 @@ namespace FastReport.CrossView
       set { if (!IsDesigning) Data.ColumnDescriptorsIndexes = value; }
     }
     /// <summary>
-    /// 
+    ///
     /// </summary>
     [Browsable(false)]
     public string RowDescriptorsIndexes
@@ -162,7 +162,7 @@ namespace FastReport.CrossView
       set { if (!IsDesigning) Data.RowDescriptorsIndexes = value; }
     }
     /// <summary>
-    /// 
+    ///
     /// </summary>
     [Browsable(false)]
     public string ColumnTerminalIndexes
@@ -171,7 +171,7 @@ namespace FastReport.CrossView
       set { if (!IsDesigning) Data.ColumnTerminalIndexes = value; }
     }
     /// <summary>
-    /// 
+    ///
     /// </summary>
     [Browsable(false)]
     public string RowTerminalIndexes
@@ -419,7 +419,7 @@ namespace FastReport.CrossView
     /// </summary>
     /// <remarks>
     /// Call this method after you modify the matrix descriptors using the <see cref="Data"/>
-    /// object's properties. 
+    /// object's properties.
     /// </remarks>
     public void BuildTemplate()
     {

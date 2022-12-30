@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,13 +20,13 @@ using System.Collections.Generic;
 using System.Text;
 using System.Collections;
 
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.CrossView
+namespace AM.Reporting.CrossView
 {
   /// <summary>
   /// Represents a collection of CrossView data descriptors used in the <see cref="CrossViewObject"/>.
@@ -99,7 +99,7 @@ namespace FastReport.CrossView
     /// Returns the zero-based index of the first occurrence of a descriptor.
     /// </summary>
     /// <param name="value">The descriptor to locate in the collection.</param>
-    /// <returns>The zero-based index of the first occurrence of descriptor within 
+    /// <returns>The zero-based index of the first occurrence of descriptor within
     /// the entire collection, if found; otherwise, -1.</returns>
     internal int IndexOf(CrossViewCellDescriptor value)
     {
@@ -117,7 +117,7 @@ namespace FastReport.CrossView
     }
 
     /// <summary>
-    /// Copies the elements of this collection to a new array. 
+    /// Copies the elements of this collection to a new array.
     /// </summary>
     /// <returns>An array containing copies of this collection elements. </returns>
     internal CrossViewCellDescriptor[] ToArray()

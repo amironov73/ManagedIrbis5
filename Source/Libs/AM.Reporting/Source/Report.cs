@@ -1,10 +1,10 @@
-using FastReport.Code;
-using FastReport.CrossView;
-using FastReport.Data;
-using FastReport.Dialog;
-using FastReport.Engine;
-using FastReport.Export;
-using FastReport.Utils;
+using AM.Reporting.Code;
+using AM.Reporting.CrossView;
+using AM.Reporting.Data;
+using AM.Reporting.Dialog;
+using AM.Reporting.Engine;
+using AM.Reporting.Export;
+using AM.Reporting.Utils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,7 +16,7 @@ using System.IO;
 using System.Security;
 using System.Text;
 
-namespace FastReport
+namespace AM.Reporting
 {
     /// <summary>
     /// Specifies the language of the report's script.
@@ -236,7 +236,7 @@ namespace FastReport
         private string[] referencedAssemblies;
         private Hashtable cachedDataItems;
         private AssemblyCollection assemblies;
-        private FastReport.Preview.PreparedPages preparedPages;
+        private AM.Reporting.Preview.PreparedPages preparedPages;
         private ReportEngine engine;
         private bool aborted;
         private Bitmap measureBitmap;
@@ -399,7 +399,7 @@ namespace FastReport
         /// Gets or sets the name of a file the report was loaded from.
         /// </summary>
         /// <remarks>
-        /// This property is used to support the FastReport.Net infrastructure;
+        /// This property is used to support the AM.Reporting.Net infrastructure;
         /// typically you don't need to use it.
         /// </remarks>
         [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -420,7 +420,7 @@ namespace FastReport
         /// you run the report.</para>
         /// <para>By default this property contains an empty script text. You may see it in the designer
         /// when you switch to the Code window.</para>
-        /// <para>If you set this property programmatically, you have to declare the <b>FastReport</b>
+        /// <para>If you set this property programmatically, you have to declare the <b>AM.Reporting</b>
         /// namespace and the <b>ReportScript</b> class in it. Do not declare report items (such as bands,
         /// objects, etc) in the <b>ReportScript</b> class: the report engine does this automatically when
         /// you run the report.</para>
@@ -586,7 +586,7 @@ namespace FastReport
         /// DataSet registered with <b>RegisterData</b> call.
         /// </summary>
         /// <remarks>
-        /// If this property is <b>true</b> (by default), FastReport will automatically fill
+        /// If this property is <b>true</b> (by default), AM.Reporting will automatically fill
         /// the DataSet with data when you trying to run a report. Set it to <b>false</b> if
         /// you want to fill the DataSet by yourself.
         /// </remarks>
@@ -639,10 +639,10 @@ namespace FastReport
             set {
                 if (value != null)
                 {
-                    // fix for old reports with "System.Windows.Forms.DataVisualization" in referenced assemblies 
+                    // fix for old reports with "System.Windows.Forms.DataVisualization" in referenced assemblies
                     for (int i = 0; i < value.Length; i++)
                     {
-                        value[i] = value[i].Replace("System.Windows.Forms.DataVisualization", "FastReport.DataVisualization");
+                        value[i] = value[i].Replace("System.Windows.Forms.DataVisualization", "AM.Reporting.DataVisualization");
                     }
                 }
                 referencedAssemblies = value;
@@ -774,7 +774,7 @@ namespace FastReport
         /// Gets a reference to the graphics cache for this report.
         /// </summary>
         /// <remarks>
-        /// This property is used to support the FastReport.Net infrastructure. Do not use it directly.
+        /// This property is used to support the AM.Reporting.Net infrastructure. Do not use it directly.
         /// </remarks>
         [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public GraphicCache GraphicCache
@@ -865,7 +865,7 @@ namespace FastReport
 
                     "System.Xml.dll",
 
-                    "FastReport.Compat.dll",
+                    "AM.Reporting.Compat.dll",
 #if !CROSSPLATFORM
                     "System.Windows.Forms.dll",
 #endif
@@ -875,7 +875,7 @@ namespace FastReport
 #endif
 
 #if MSCHART
-                    "FastReport.DataVisualization.dll"
+                    "AM.Reporting.DataVisualization.dll"
 #endif
                 };
             }
@@ -2598,7 +2598,7 @@ namespace FastReport
         {
             isLoadPrepared = true;
             if (PreparedPages == null)
-                SetPreparedPages(new FastReport.Preview.PreparedPages(this));
+                SetPreparedPages(new AM.Reporting.Preview.PreparedPages(this));
             PreparedPages.Load(fileName);
         }
 
@@ -2610,7 +2610,7 @@ namespace FastReport
         {
             isLoadPrepared = true;
             if (PreparedPages == null)
-                SetPreparedPages(new FastReport.Preview.PreparedPages(this));
+                SetPreparedPages(new AM.Reporting.Preview.PreparedPages(this));
             PreparedPages.Load(stream);
         }
 

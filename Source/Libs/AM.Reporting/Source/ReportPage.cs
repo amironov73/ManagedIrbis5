@@ -2,10 +2,10 @@ using System;
 using System.Drawing;
 using System.Collections.Generic;
 using System.ComponentModel;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 using System.Drawing.Design;
 
-namespace FastReport
+namespace AM.Reporting
 {
     /// <summary>
     /// Represents a report page.
@@ -13,10 +13,10 @@ namespace FastReport
     /// <remarks>
     /// To get/set a paper size and orientation, use the <see cref="PaperWidth"/>, <see cref="PaperHeight"/>
     /// and <see cref="Landscape"/> properties. Note that paper size is measured in millimeters.
-    /// <para/>Report page can contain one or several bands with report objects. Use the <see cref="ReportTitle"/>, 
-    /// <see cref="ReportSummary"/>, <see cref="PageHeader"/>, <see cref="PageFooter"/>, 
+    /// <para/>Report page can contain one or several bands with report objects. Use the <see cref="ReportTitle"/>,
+    /// <see cref="ReportSummary"/>, <see cref="PageHeader"/>, <see cref="PageFooter"/>,
     /// <see cref="ColumnHeader"/>, <see cref="ColumnFooter"/>, <see cref="Overlay"/> properties
-    /// to get/set the page bands. The <see cref="Bands"/> property holds the list of data bands or groups. 
+    /// to get/set the page bands. The <see cref="Bands"/> property holds the list of data bands or groups.
     /// Thus you may add several databands to this property to create master-master reports, for example.
     /// <note type="caution">
     /// Report page can contain bands only. You cannot place report objects such as <b>TextObject</b> on a page.
@@ -116,7 +116,7 @@ namespace FastReport
         /// Gets or sets a width of the paper, in millimeters.
         /// </summary>
         [Category("Paper")]
-        [TypeConverter("FastReport.TypeConverters.PaperConverter, FastReport")]
+        [TypeConverter("AM.Reporting.TypeConverters.PaperConverter, AM.Reporting")]
         public float PaperWidth
         {
             get { return paperWidth; }
@@ -137,7 +137,7 @@ namespace FastReport
         /// Gets or sets a height of the paper, in millimeters.
         /// </summary>
         [Category("Paper")]
-        [TypeConverter("FastReport.TypeConverters.PaperConverter, FastReport")]
+        [TypeConverter("AM.Reporting.TypeConverters.PaperConverter, AM.Reporting")]
         public float PaperHeight
         {
             get { return paperHeight; }
@@ -150,8 +150,8 @@ namespace FastReport
         /// <remarks>
         /// This property stores the RawKind value of a selected papersize. It is used to distiguish
         /// between several papers with the same size (for ex. "A3" and "A3 with no margins") used in some
-        /// printer drivers. 
-        /// <para/>It is not obligatory to set this property. FastReport will select the
+        /// printer drivers.
+        /// <para/>It is not obligatory to set this property. AM.Reporting will select the
         /// necessary paper using the <b>PaperWidth</b> and <b>PaperHeight</b> values.
         /// </remarks>
         [Category("Paper")]
@@ -308,7 +308,7 @@ namespace FastReport
         /// Gets or sets the left page margin, in millimeters.
         /// </summary>
         [Category("Paper")]
-        [TypeConverter("FastReport.TypeConverters.PaperConverter, FastReport")]
+        [TypeConverter("AM.Reporting.TypeConverters.PaperConverter, AM.Reporting")]
         public float LeftMargin
         {
             get { return leftMargin; }
@@ -319,7 +319,7 @@ namespace FastReport
         /// Gets or sets the top page margin, in millimeters.
         /// </summary>
         [Category("Paper")]
-        [TypeConverter("FastReport.TypeConverters.PaperConverter, FastReport")]
+        [TypeConverter("AM.Reporting.TypeConverters.PaperConverter, AM.Reporting")]
         public float TopMargin
         {
             get { return topMargin; }
@@ -330,7 +330,7 @@ namespace FastReport
         /// Gets or sets the right page margin, in millimeters.
         /// </summary>
         [Category("Paper")]
-        [TypeConverter("FastReport.TypeConverters.PaperConverter, FastReport")]
+        [TypeConverter("AM.Reporting.TypeConverters.PaperConverter, AM.Reporting")]
         public float RightMargin
         {
             get { return rightMargin; }
@@ -341,7 +341,7 @@ namespace FastReport
         /// Gets or sets the bottom page margin, in millimeters.
         /// </summary>
         [Category("Paper")]
-        [TypeConverter("FastReport.TypeConverters.PaperConverter, FastReport")]
+        [TypeConverter("AM.Reporting.TypeConverters.PaperConverter, AM.Reporting")]
         public float BottomMargin
         {
             get { return bottomMargin; }
@@ -384,7 +384,7 @@ namespace FastReport
         /// Gets or sets the page background fill.
         /// </summary>
         [Category("Appearance")]
-        [Editor("FastReport.TypeEditors.FillEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.FillEditor, AM.Reporting", typeof(UITypeEditor))]
         public FillBase Fill
         {
             get { return fill; }
@@ -416,7 +416,7 @@ namespace FastReport
         }
 
         /// <summary>
-        /// Gets or sets a value indicating that <b>ReportTitle</b> band should be printed before the 
+        /// Gets or sets a value indicating that <b>ReportTitle</b> band should be printed before the
         /// <b>PageHeader</b> band.
         /// </summary>
         [DefaultValue(true)]
@@ -434,7 +434,7 @@ namespace FastReport
         /// For more information, see <see cref="BandBase.OutlineExpression"/> property.
         /// </remarks>
         [Category("Data")]
-        [Editor("FastReport.TypeEditors.ExpressionEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof(UITypeEditor))]
         public string OutlineExpression
         {
             get { return outlineExpression; }
@@ -456,7 +456,7 @@ namespace FastReport
         }
 
         /// <summary>
-        /// Gets or sets a value indicating that FastReport engine must reset page numbers before printing this page.
+        /// Gets or sets a value indicating that AM.Reporting engine must reset page numbers before printing this page.
         /// </summary>
         /// <remarks>
         /// This property can be used if you have two or more pages in the report template.
@@ -612,7 +612,7 @@ namespace FastReport
         /// Gets the collection of data bands or group header bands.
         /// </summary>
         /// <remarks>
-        /// The <b>Bands</b> property holds the list of data bands or group headers. 
+        /// The <b>Bands</b> property holds the list of data bands or group headers.
         /// Thus you may add several databands to this property to create master-master reports, for example.
         /// </remarks>
         [Browsable(false)]
@@ -669,7 +669,7 @@ namespace FastReport
         }
 
         /// <summary>
-        /// Gets or sets a script event name that will be fired when the report engine is about 
+        /// Gets or sets a script event name that will be fired when the report engine is about
         /// to print databands in this page.
         /// </summary>
         [Category("Build")]

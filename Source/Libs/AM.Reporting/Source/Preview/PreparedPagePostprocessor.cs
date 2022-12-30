@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,7 +23,7 @@ using System.Collections;
 
 #nullable enable
 
-namespace FastReport.Preview
+namespace AM.Reporting.Preview
 {
   internal class PreparedPagePosprocessor
   {
@@ -120,7 +120,7 @@ namespace FastReport.Preview
     private void CloseDuplicatesMerge(List<TextObjectBase> list)
     {
       float top = list[0].AbsTop;
-      
+
       // dispose all objects except the last one
       for (int i = 0; i < list.Count - 1; i++)
       {
@@ -144,7 +144,7 @@ namespace FastReport.Preview
                 if (c.Report == null)
                     c.SetReport(page.Report);
         c.ExtractMacros();
-        
+
         if (c is BandBase)
           (c as BandBase).UpdateWidth();
 

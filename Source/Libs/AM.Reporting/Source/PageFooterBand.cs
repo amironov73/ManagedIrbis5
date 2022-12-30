@@ -1,9 +1,9 @@
 using System;
 using System.Collections;
 using System.ComponentModel;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
-namespace FastReport
+namespace AM.Reporting
 {
     /// <summary>
     /// Represents a page footer band.

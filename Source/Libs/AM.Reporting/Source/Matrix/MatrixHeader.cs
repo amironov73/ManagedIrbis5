@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,13 +20,13 @@ using System.Collections.Generic;
 using System.Text;
 using System.Collections;
 
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Matrix
+namespace AM.Reporting.Matrix
 {
   /// <summary>
   /// Represents a collection of matrix header descriptors used in the <see cref="MatrixObject"/>.
@@ -52,7 +52,7 @@ namespace FastReport.Matrix
     {
       get { return rootItem; }
     }
-    
+
     internal string Name
     {
       get { return name; }
@@ -106,7 +106,7 @@ namespace FastReport.Matrix
     /// Returns the zero-based index of the first occurrence of a descriptor.
     /// </summary>
     /// <param name="value">The descriptor to locate in the collection.</param>
-    /// <returns>The zero-based index of the first occurrence of descriptor within 
+    /// <returns>The zero-based index of the first occurrence of descriptor within
     /// the entire collection, if found; otherwise, -1.</returns>
     public int IndexOf(MatrixHeaderDescriptor value)
     {
@@ -124,7 +124,7 @@ namespace FastReport.Matrix
     }
 
     /// <summary>
-    /// Copies the elements of this collection to a new array. 
+    /// Copies the elements of this collection to a new array.
     /// </summary>
     /// <returns>An array containing copies of this collection elements. </returns>
     public MatrixHeaderDescriptor[] ToArray()
@@ -167,7 +167,7 @@ namespace FastReport.Matrix
     }
 
     /// <summary>
-    /// Removes a header item with the address specified. 
+    /// Removes a header item with the address specified.
     /// </summary>
     /// <param name="address">The address of a header.</param>
     public void RemoveItem(object[] address)
@@ -178,7 +178,7 @@ namespace FastReport.Matrix
     }
 
     /// <summary>
-    /// Gets an index of header with the address specified. 
+    /// Gets an index of header with the address specified.
     /// </summary>
     /// <param name="address">The address of a header.</param>
     /// <returns>The index of header.</returns>
@@ -205,14 +205,14 @@ namespace FastReport.Matrix
 
     internal MatrixHeaderItem Find(object[] address, bool create, int dataRowNo)
     {
-        // Note that the top header itself does not contain a value. 
+        // Note that the top header itself does not contain a value.
         // It is used as a list of first-level headers only.
         MatrixHeaderItem rootItem = RootItem;
-            
+
         for (int i = 0; i < address.Length; i++)
         {
             int index = rootItem.Find(address[i], this[i].Sort);
-                
+
             if (index >= 0)
                 rootItem = rootItem.Items[index];
             else if (create)
@@ -249,13 +249,13 @@ namespace FastReport.Matrix
     {
       if (descriptorIndex >= Count)
         return;
-        
+
       foreach (MatrixHeaderItem item in rootItem.Items)
       {
         AddTotalItems(item, descriptorIndex + 1, isTemplate);
       }
-      
-      if (this[descriptorIndex].Totals && 
+
+      if (this[descriptorIndex].Totals &&
         (isTemplate || !this[descriptorIndex].SuppressTotals || rootItem.Items.Count > 1))
       {
         MatrixHeaderItem totalItem = new MatrixHeaderItem(rootItem);
@@ -267,14 +267,14 @@ namespace FastReport.Matrix
         totalItem.TemplateCell = this[descriptorIndex].TemplateTotalCell;
         totalItem.Index = nextIndex;
         nextIndex++;
-        
+
         if (this[descriptorIndex].TotalsFirst && !isTemplate)
           rootItem.Items.Insert(0, totalItem);
         else
           rootItem.Items.Add(totalItem);
       }
     }
-    
+
     internal void AddTotalItems(bool isTemplate)
     {
       AddTotalItems(RootItem, 0, isTemplate);

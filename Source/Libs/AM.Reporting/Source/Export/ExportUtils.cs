@@ -9,14 +9,14 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using FastReport.Format;
-using FastReport.Utils;
+using AM.Reporting.Format;
+using AM.Reporting.Utils;
 using System;
 using System.ComponentModel;
 using System.Drawing;
@@ -30,7 +30,7 @@ using System.Text;
 
 #nullable enable
 
-namespace FastReport.Export
+namespace AM.Reporting.Export
 {
     /// <summary>
     /// For internal use only.
@@ -145,7 +145,7 @@ namespace FastReport.Export
 
                 switch (f.CurrencyPositivePattern)
                 {
-                    case 0: positive_pattern = currency_symbol + fm_str; break;       // $n 
+                    case 0: positive_pattern = currency_symbol + fm_str; break;       // $n
                     case 1: positive_pattern = fm_str + currency_symbol; break;       // n$
                     case 2: positive_pattern = currency_symbol + " " + fm_str; break; // $ n
                     case 3: positive_pattern = fm_str + " " + currency_symbol; break; // n $
@@ -186,7 +186,7 @@ namespace FastReport.Export
 
                     switch (f.CurrencyPositivePattern)
                     {
-                        case 0: positive_pattern = @"_-* " + financeSymbol + fm_str + "_-;"; break;       // $n 
+                        case 0: positive_pattern = @"_-* " + financeSymbol + fm_str + "_-;"; break;       // $n
                         case 1: positive_pattern = @"_-* " + fm_str + financeSymbol + "_-;"; break;       // n$
                         case 2: positive_pattern = @"_-* " + financeSymbol + " " + fm_str + "_-;"; break; // $ n
                         case 3: positive_pattern = @"_-* " + fm_str + " "+ financeSymbol + "_-;"; break;  // n $
@@ -279,7 +279,7 @@ namespace FastReport.Export
                     pattern += ".";
                     for (int i = 0; i < (format as PercentFormat).DecimalDigits; i++)
                         pattern += "0";
-                }                  
+                }
                 return pattern + "%";
             }
 
@@ -481,7 +481,7 @@ namespace FastReport.Export
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="Value"></param>
         /// <returns></returns>
@@ -557,7 +557,7 @@ namespace FastReport.Export
             stream.WriteByte(13);
             stream.WriteByte(10);
         }
-   
+
         internal static void ZLibDeflate(Stream src, Stream dst)
         {
             dst.WriteByte(0x78);

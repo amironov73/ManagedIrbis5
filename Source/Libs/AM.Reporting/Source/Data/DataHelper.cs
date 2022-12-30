@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,7 +25,7 @@ using System.Collections;
 
 #nullable enable
 
-namespace FastReport.Data
+namespace AM.Reporting.Data
 {
   internal static class DataHelper
   {
@@ -33,14 +33,14 @@ namespace FastReport.Data
     {
       if (String.IsNullOrEmpty(complexName))
         return null;
-      
+
       string[] names = complexName.Split('.');
       DataSourceBase data = dictionary.FindByAlias(names[0]) as DataSourceBase;
       if (data == null)
         return null;
 
       Column column = data;
-      
+
       // take into account nested tables. Table may even be nested into Column.
       for (int i = 1; i < names.Length; i++)
       {
@@ -51,7 +51,7 @@ namespace FastReport.Data
         if (childColumn is DataSourceBase)
           data = childColumn as DataSourceBase;
         column = childColumn;
-      }  
+      }
 
       return data;
     }
@@ -64,7 +64,7 @@ namespace FastReport.Data
       string[] names = complexName.Split('.');
       // the first part of complex name is always datasource name.
       DataSourceBase data = dictionary.FindByAlias(names[0]) as DataSourceBase;
-      
+
       return GetColumn(dictionary, data, names, false);
     }
 
@@ -140,10 +140,10 @@ namespace FastReport.Data
     public static bool IsSimpleColumn(Dictionary dictionary, string complexName)
     {
       Column column = GetColumn(dictionary, complexName);
-      return column != null && column.Parent is DataSourceBase && 
+      return column != null && column.Parent is DataSourceBase &&
         (column.Parent as DataSourceBase).FullName + "." + column.Alias == complexName;
     }
-    
+
     public static bool IsValidParameter(Dictionary dictionary, string complexName)
     {
       string[] names = complexName.Split('.');
@@ -153,8 +153,8 @@ namespace FastReport.Data
         if (names.Length == 1)
           par = dictionary.SystemVariables.FindByName(names[0]);
         return par != null;
-      }  
-        
+      }
+
       for (int i = 1; i < names.Length; i++)
       {
         par = par.Parameters.FindByName(names[i]);
@@ -178,7 +178,7 @@ namespace FastReport.Data
       {
         par = dictionary.SystemVariables.FindByName(names[0]);
         return par;
-      }  
+      }
 
       for (int i = 1; i < names.Length; i++)
       {
@@ -194,7 +194,7 @@ namespace FastReport.Data
       string[] names = complexName.Split('.');
       ParameterCollection parameters = dictionary.Parameters;
       Parameter par = null;
-      
+
       for (int i = 0; i < names.Length; i++)
       {
         par = parameters.FindByName(names[i]);
@@ -205,7 +205,7 @@ namespace FastReport.Data
         }
         parameters = par.Parameters;
       }
-      
+
       return par;
     }
 
@@ -214,7 +214,7 @@ namespace FastReport.Data
       Total sum = dictionary.Totals.FindByName(name);
       if (sum != null)
         return sum.Value;
-      return null;  
+      return null;
     }
 
     public static Type GetColumnType(Dictionary dictionary, string complexName)

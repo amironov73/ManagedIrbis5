@@ -1,7 +1,28 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.Collections.Generic;
 
-namespace FastReport.Utils
+#endregion
+
+#nullable enable
+
+namespace AM.Reporting.Utils
 {
     /// <summary>
     /// Script security event arguments.
@@ -81,7 +102,7 @@ namespace FastReport.Utils
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:FastReport.Utils.ScriptSecurityEventArgs"/> class.
+        /// Initializes a new instance of the <see cref="T:AM.Reporting.Utils.ScriptSecurityEventArgs"/> class.
         /// </summary>
         /// <param name="report">Report.</param>
         /// <param name="script">Report's script.</param>

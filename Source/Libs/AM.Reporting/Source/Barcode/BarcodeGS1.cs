@@ -9,13 +9,13 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using FastReport.Utils;
+using AM.Reporting.Utils;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -26,7 +26,7 @@ using System.Text.RegularExpressions;
 
 #nullable enable
 
-namespace FastReport.Barcode
+namespace AM.Reporting.Barcode
 {
     /// <summary>
     /// Base methods for GS1 DataBar barcodes.
@@ -93,7 +93,7 @@ namespace FastReport.Barcode
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="n"></param>
         /// <param name="r"></param>

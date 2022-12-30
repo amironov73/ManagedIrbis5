@@ -1,16 +1,16 @@
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.ComponentModel;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 using System.Drawing.Design;
 
-namespace FastReport
+namespace AM.Reporting
 {
     /// <summary>
     /// Represents text outline.
     /// </summary>
     [ToolboxItem(false)]
-    [TypeConverter(typeof(FastReport.TypeConverters.FRExpandableObjectConverter))]
+    [TypeConverter(typeof(AM.Reporting.TypeConverters.FRExpandableObjectConverter))]
     public class TextOutline// : Component
     {
         #region Fields
@@ -50,7 +50,7 @@ namespace FastReport
         /// <summary>
         /// Gets or sets the outline color.
         /// </summary>
-        [Editor("FastReport.TypeEditors.ColorEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.ColorEditor, AM.Reporting", typeof(UITypeEditor))]
         public Color Color
         {
             get { return color; }

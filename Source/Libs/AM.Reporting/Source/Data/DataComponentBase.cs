@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,13 +20,13 @@ using System.Collections.Generic;
 using System.Text;
 using System.ComponentModel;
 
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Data
+namespace AM.Reporting.Data
 {
   /// <summary>
   /// The base class for all data components such as data sources, columns.
@@ -45,7 +45,7 @@ namespace FastReport.Data
     /// Gets or sets alias of this object.
     /// </summary>
     /// <remarks>
-    /// Alias is a human-friendly name of this object. It may contain any symbols (including 
+    /// Alias is a human-friendly name of this object. It may contain any symbols (including
     /// spaces and national symbols).
     /// </remarks>
     [Category("Design")]
@@ -68,12 +68,12 @@ namespace FastReport.Data
       get { return enabled; }
       set { enabled = value; }
     }
-    
+
     /// <summary>
     /// Gets or sets a name of the data object.
     /// </summary>
     /// <remarks>
-    /// This property is used to support FastReport.Net infrastructure. Do not use it directly.
+    /// This property is used to support AM.Reporting.Net infrastructure. Do not use it directly.
     /// </remarks>
     [Browsable(false)]
     public string ReferenceName
@@ -86,7 +86,7 @@ namespace FastReport.Data
     /// Gets or sets a reference to the data object.
     /// </summary>
     /// <remarks>
-    /// This property is used to support FastReport.Net infrastructure. Do not use it directly.
+    /// This property is used to support AM.Reporting.Net infrastructure. Do not use it directly.
     /// </remarks>
     [Browsable(false)]
     public object Reference

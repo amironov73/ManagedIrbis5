@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,7 +23,7 @@ using System.Text;
 
 #nullable enable
 
-namespace FastReport.Format
+namespace AM.Reporting.Format
 {
     /// <summary>
     /// Represents a format used to display values with no formatting.

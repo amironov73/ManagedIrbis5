@@ -9,14 +9,14 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using FastReport.Gauge.Radial;
-using FastReport.Utils;
+using AM.Reporting.Gauge.Radial;
+using AM.Reporting.Utils;
 using System;
 using System.ComponentModel;
 using System.Drawing;
@@ -25,14 +25,14 @@ using System.Drawing;
 
 #nullable enable
 
-namespace FastReport.Gauge.Simple.Progress
+namespace AM.Reporting.Gauge.Simple.Progress
 {
     /// <inheritdoc />
 #if !DEBUG
     [DesignTimeVisible(false)]
 #endif
     public class SimpleProgressLabel : GaugeLabel
-    { 
+    {
         private int decimals;
 
         /// <summary>

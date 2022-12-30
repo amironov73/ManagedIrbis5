@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,13 +19,13 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Format
+namespace AM.Reporting.Format
 {
     /// <summary>
     /// Defines how time values are formatted and displayed.
@@ -48,7 +48,7 @@ namespace FastReport.Format
         #endregion
 
         /// <summary>
-        /// Initializes a new instance of the <b>TimeFormat</b> class with default settings. 
+        /// Initializes a new instance of the <b>TimeFormat</b> class with default settings.
         /// </summary>
         public TimeFormat()
         {

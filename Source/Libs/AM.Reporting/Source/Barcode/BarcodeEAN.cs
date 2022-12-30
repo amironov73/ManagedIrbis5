@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,13 +21,13 @@ using System.Text;
 using System.Drawing;
 using System.ComponentModel;
 
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Barcode
+namespace AM.Reporting.Barcode
 {
   /// <summary>
   /// The base class for EAN barcodes.
@@ -37,46 +37,46 @@ namespace FastReport.Barcode
     // Pattern for Barcode EAN Charset C
     // S1   L1   S2   L2
     internal static string[] tabelle_EAN_C = {
-      "7150",    // 0 
-      "6160",    // 1 
-      "6061",    // 2 
-      "5350",    // 3 
-      "5071",    // 4 
-      "5170",    // 5 
-      "5053",    // 6 
-      "5251",    // 7 
-      "5152",    // 8 
-      "7051"     // 9 
+      "7150",    // 0
+      "6160",    // 1
+      "6061",    // 2
+      "5350",    // 3
+      "5071",    // 4
+      "5170",    // 5
+      "5053",    // 6
+      "5251",    // 7
+      "5152",    // 8
+      "7051"     // 9
     };
 
     // Pattern for Barcode EAN Charset A
     // L1   S1   L2   S2
-    internal static string[] tabelle_EAN_A = {  
-      "2605",    //0 
-      "1615",    //1 
-      "1516",    //2 
-      "0805",    //3 
-      "0526",    //4 
-      "0625",    //5 
-      "0508",    //6 
-      "0706",    //7 
-      "0607",    //8 
-      "2506"     //9 
+    internal static string[] tabelle_EAN_A = {
+      "2605",    //0
+      "1615",    //1
+      "1516",    //2
+      "0805",    //3
+      "0526",    //4
+      "0625",    //5
+      "0508",    //6
+      "0706",    //7
+      "0607",    //8
+      "2506"     //9
     };
 
     // Pattern for Barcode EAN Zeichensatz B}
     //L1   S1   L2   S2
     internal static string[] tabelle_EAN_B = {
-      "0517",    // 0 
-      "0616",    // 1 
-      "1606",    // 2 
-      "0535",    // 3 
-      "1705",    // 4 
-      "0715",    // 5 
-      "3505",    // 6 
-      "1525",    // 7 
-      "2515",    // 8 
-      "1507"     // 9 
+      "0517",    // 0
+      "0616",    // 1
+      "1606",    // 2
+      "0535",    // 3
+      "1705",    // 4
+      "0715",    // 5
+      "3505",    // 6
+      "1525",    // 7
+      "2515",    // 8
+      "1507"     // 9
     };
 
     /// <summary>
@@ -117,14 +117,14 @@ namespace FastReport.Barcode
       {
         result += tabelle_EAN_A[CharToInt(text[i])];
       }
-      
+
       result += "0A0A0";   // Center Guard Pattern
 
       for (int i = 4; i <= 7; i++)
       {
         result += tabelle_EAN_C[CharToInt(text[i])];
       }
-      
+
       result += "A0A";   // Stopcode
       return result;
     }
@@ -135,18 +135,18 @@ namespace FastReport.Barcode
   /// </summary>
   public class BarcodeEAN13 : BarcodeEAN
   {
-    //Zuordung der Paraitaetsfolgen f¹r EAN13
+    //Zuordung der Paraitaetsfolgen fï¿½r EAN13
     private static string[,] tabelle_ParityEAN13 = {
-      {"A", "A", "A", "A", "A", "A"},    // 0 
-      {"A", "A", "B", "A", "B", "B"},    // 1 
-      {"A", "A", "B", "B", "A", "B"},    // 2 
-      {"A", "A", "B", "B", "B", "A"},    // 3 
-      {"A", "B", "A", "A", "B", "B"},    // 4 
-      {"A", "B", "B", "A", "A", "B"},    // 5 
-      {"A", "B", "B", "B", "A", "A"},    // 6 
-      {"A", "B", "A", "B", "A", "B"},    // 7 
-      {"A", "B", "A", "B", "B", "A"},    // 8 
-      {"A", "B", "B", "A", "B", "A"}     // 9 
+      {"A", "A", "A", "A", "A", "A"},    // 0
+      {"A", "A", "B", "A", "B", "B"},    // 1
+      {"A", "A", "B", "B", "A", "B"},    // 2
+      {"A", "A", "B", "B", "B", "A"},    // 3
+      {"A", "B", "A", "A", "B", "B"},    // 4
+      {"A", "B", "B", "A", "A", "B"},    // 5
+      {"A", "B", "B", "B", "A", "A"},    // 6
+      {"A", "B", "A", "B", "A", "B"},    // 7
+      {"A", "B", "A", "B", "B", "A"},    // 8
+      {"A", "B", "B", "A", "B", "A"}     // 9
     };
 
     internal override void DrawText(IGraphics g, string barData)
@@ -196,7 +196,7 @@ namespace FastReport.Barcode
       for (int i = 6; i < 12; i++)
       {
         result += tabelle_EAN_C[CharToInt(tmp[i])];
-      }  
+      }
 
       result += "A0A";   // Stopcode
       return result;

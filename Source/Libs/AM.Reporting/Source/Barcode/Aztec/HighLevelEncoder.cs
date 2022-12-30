@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,7 +23,7 @@ using System.Collections.ObjectModel;
 
 #nullable enable
 
-namespace FastReport.Barcode.Aztec
+namespace AM.Reporting.Barcode.Aztec
 {
    /// <summary>
    /// This produces nearly optimal encodings of text into the first-level of

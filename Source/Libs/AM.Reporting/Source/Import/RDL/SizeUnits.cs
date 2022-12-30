@@ -9,11 +9,11 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
-namespace FastReport.Import.RDL
+namespace AM.Reporting.Import.RDL
 {
     /// <summary>
     /// The RDL Size units.
@@ -66,27 +66,27 @@ namespace FastReport.Import.RDL
         /// <summary>
         /// The number of pixels in one millimeter.
         /// </summary>
-        public static float Millimeter = FastReport.Utils.Units.Millimeters;
-        
+        public static float Millimeter = AM.Reporting.Utils.Units.Millimeters;
+
         /// <summary>
         /// The number of pixels in one centimeter.
         /// </summary>
-        public static float Centimeter = FastReport.Utils.Units.Centimeters;
+        public static float Centimeter = AM.Reporting.Utils.Units.Centimeters;
 
         /// <summary>
         /// The number of pixels in one inch.
         /// </summary>
-        public static float Inch = FastReport.Utils.Units.Inches;
+        public static float Inch = AM.Reporting.Utils.Units.Inches;
 
         /// <summary>
         /// The number of pixels in one point.
         /// </summary>
-        public static float Point = FastReport.Utils.Units.Millimeters * SizeUnitsM.Point;
+        public static float Point = AM.Reporting.Utils.Units.Millimeters * SizeUnitsM.Point;
 
         /// <summary>
         /// The number of pixels in one pica.
         /// </summary>
-        public static float Pica = FastReport.Utils.Units.Millimeters * SizeUnitsM.Pica;
+        public static float Pica = AM.Reporting.Utils.Units.Millimeters * SizeUnitsM.Pica;
 
         #endregion // Fields
     }
@@ -108,17 +108,17 @@ namespace FastReport.Import.RDL
         /// The number of millimeters in one centimeter.
         /// </summary>
         public const float Centimeter = 10;
-        
+
         /// <summary>
         /// The number of millimeters in one inch.
         /// </summary>
         public const float Inch = 25.4f;
-        
+
         /// <summary>
         /// The number of millimeters in one point.
         /// </summary>
         public const float Point = 0.3528f;
-        
+
         /// <summary>
         /// The number of millimeters in one pica.
         /// </summary>

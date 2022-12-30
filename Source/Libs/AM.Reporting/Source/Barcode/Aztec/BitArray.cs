@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,7 +21,7 @@ using System;
 
 #nullable enable
 
-namespace FastReport.Barcode.Aztec
+namespace AM.Reporting.Barcode.Aztec
 {
    /// <summary>
    /// A simple, fast array of bits, represented compactly by an array of ints internally.
@@ -95,7 +95,7 @@ namespace FastReport.Barcode.Aztec
       }
 
       /// <summary> Flips bit i.
-      /// 
+      ///
       /// </summary>
       /// <param name="i">bit to set
       /// </param>
@@ -174,7 +174,7 @@ namespace FastReport.Barcode.Aztec
       }
 
       /// <summary> Sets a block of 32 bits, starting at bit i.
-      /// 
+      ///
       /// </summary>
       /// <param name="i">first bit to set
       /// </param>
@@ -236,7 +236,7 @@ namespace FastReport.Barcode.Aztec
       }
 
       /// <summary> Efficient method to check if a range of bits is set, or not set.
-      /// 
+      ///
       /// </summary>
       /// <param name="start">start of range, inclusive.
       /// </param>
@@ -257,7 +257,7 @@ namespace FastReport.Barcode.Aztec
          {
             return true; // empty range matches
          }
-         end--; // will be easier to treat this as the last actually set bit -- inclusive    
+         end--; // will be easier to treat this as the last actually set bit -- inclusive
          int firstInt = start >> 5;
          int lastInt = end >> 5;
          for (int i = firstInt; i <= lastInt; i++)
@@ -447,7 +447,7 @@ namespace FastReport.Barcode.Aztec
       /// Returns a hash code for this instance.
       /// </summary>
       /// <returns>
-      /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
+      /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.
       /// </returns>
       public override int GetHashCode()
       {

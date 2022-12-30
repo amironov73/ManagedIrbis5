@@ -1,13 +1,34 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.Collections;
 using System.ComponentModel;
 
-namespace FastReport.Utils
+#endregion
+
+#nullable enable
+
+namespace AM.Reporting.Utils
 {
   /// <summary>
   /// Represents a collection of float values.
   /// </summary>
-  [TypeConverter(typeof(FastReport.TypeConverters.FloatCollectionConverter))]
+  [TypeConverter(typeof(AM.Reporting.TypeConverters.FloatCollectionConverter))]
   public class FloatCollection : CollectionBase
   {
     /// <summary>
@@ -15,7 +36,7 @@ namespace FastReport.Utils
     /// </summary>
     /// <param name="index">Index of a value.</param>
     /// <returns>The value at the specified index.</returns>
-    public float this[int index]  
+    public float this[int index]
     {
       get { return (float)List[index]; }
       set { List[index] = value; }
@@ -48,7 +69,7 @@ namespace FastReport.Utils
     /// </summary>
     /// <param name="index">The zero-based index at which value should be inserted.</param>
     /// <param name="value">The value to insert.</param>
-    public void Insert(int index, float value)  
+    public void Insert(int index, float value)
     {
       List.Insert(index, value);
     }
@@ -57,7 +78,7 @@ namespace FastReport.Utils
     /// Removes the specified value from the collection.
     /// </summary>
     /// <param name="value">Value to remove.</param>
-    public void Remove(float value)  
+    public void Remove(float value)
     {
       int i = IndexOf(value);
       if (i != -1)
@@ -68,7 +89,7 @@ namespace FastReport.Utils
     /// Returns the zero-based index of the first occurrence of a value.
     /// </summary>
     /// <param name="value">The value to locate in the collection.</param>
-    /// <returns>The zero-based index of the first occurrence of value within the entire collection, if found; 
+    /// <returns>The zero-based index of the first occurrence of value within the entire collection, if found;
     /// otherwise, -1.</returns>
     public int IndexOf(float value)
     {
@@ -85,7 +106,7 @@ namespace FastReport.Utils
     /// </summary>
     /// <param name="value">The value to locate in the collection.</param>
     /// <returns><b>true</b> if value is found in the collection; otherwise, <b>false</b>.</returns>
-    public bool Contains(float value)  
+    public bool Contains(float value)
     {
       return IndexOf(value) != -1;
     }
@@ -97,7 +118,7 @@ namespace FastReport.Utils
     public void Assign(FloatCollection source)
     {
       Clear();
-      
+
       foreach (float f in source)
       {
         Add(f);

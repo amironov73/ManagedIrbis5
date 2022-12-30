@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,30 +21,30 @@ using System;
 
 #nullable enable
 
-namespace FastReport.Barcode.QRCode
+namespace AM.Reporting.Barcode.QRCode
 {
-  
+
   /*/// <author>  satorux@google.com (Satoru Takabayashi) - creator
   /// </author>
   /// <author>  dswitkin@google.com (Daniel Switkin) - ported from C++
   /// </author>
-  /// <author>www.Redivivus.in (suraj.supekar@redivivus.in) - Ported from ZXING Java Source 
+  /// <author>www.Redivivus.in (suraj.supekar@redivivus.in) - Ported from ZXING Java Source
   /// </author>*/
   internal sealed class MaskUtil
   {
-    
+
     private MaskUtil()
     {
       // do nothing
     }
-    
+
     // Apply mask penalty rule 1 and return the penalty. Find repetitive cells with the same color and
     // give penalty to them. Example: 00000 or 11111.
     public static int applyMaskPenaltyRule1(ByteMatrix matrix)
     {
       return applyMaskPenaltyRule1Internal(matrix, true) + applyMaskPenaltyRule1Internal(matrix, false);
     }
-    
+
     // Apply mask penalty rule 2 and return the penalty. Find 2x2 blocks with the same color and give
     // penalty to them.
     public static int applyMaskPenaltyRule2(ByteMatrix matrix)
@@ -66,7 +66,7 @@ namespace FastReport.Barcode.QRCode
       }
       return penalty;
     }
-    
+
     // Apply mask penalty rule 3 and return the penalty. Find consecutive cells of 00001011101 or
     // 10111010000, and give penalty to them.  If we find patterns like 000010111010000, we give
     // penalties twice (i.e. 40 * 2).
@@ -93,7 +93,7 @@ namespace FastReport.Barcode.QRCode
       }
       return penalty;
     }
-    
+
     // Apply mask penalty rule 4 and return the penalty. Calculate the ratio of dark cells and give
     // penalty if the ratio is far from 50%. It gives 10 penalty for 5% distance. Examples:
     // -   0% => 100
@@ -124,7 +124,7 @@ namespace FastReport.Barcode.QRCode
       //UPGRADE_WARNING: Data types in Visual C# might be different.  Verify the accuracy of narrowing conversions. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1042'"
       return System.Math.Abs((int) (darkRatio * 100 - 50)) / 5 * 10;
     }
-    
+
     // Return the mask bit for "getMaskPattern" at "x" and "y". See 8.8 of JISX0510:2004 for mask
     // pattern conditions.
     public static bool getDataMaskBit(int maskPattern, int x, int y)
@@ -136,49 +136,49 @@ namespace FastReport.Barcode.QRCode
       int intermediate, temp;
       switch (maskPattern)
       {
-        
-        case 0: 
+
+        case 0:
           intermediate = (y + x) & 0x1;
           break;
-        
-        case 1: 
+
+        case 1:
           intermediate = y & 0x1;
           break;
-        
-        case 2: 
+
+        case 2:
           intermediate = x % 3;
           break;
-        
-        case 3: 
+
+        case 3:
           intermediate = (y + x) % 3;
           break;
-        
-        case 4: 
+
+        case 4:
           intermediate = ((SupportClass.URShift(y, 1)) + (x / 3)) & 0x1;
           break;
-        
-        case 5: 
+
+        case 5:
           temp = y * x;
           intermediate = (temp & 0x1) + (temp % 3);
           break;
-        
-        case 6: 
+
+        case 6:
           temp = y * x;
           intermediate = (((temp & 0x1) + (temp % 3)) & 0x1);
           break;
-        
-        case 7: 
+
+        case 7:
           temp = y * x;
           intermediate = (((temp % 3) + ((y + x) & 0x1)) & 0x1);
           break;
-        
-        default: 
+
+        default:
           throw new System.ArgumentException("Invalid mask pattern: " + maskPattern);
-        
+
       }
       return intermediate == 0;
     }
-    
+
     // Helper function for applyMaskPenaltyRule1. We need this for doing this calculation in both
     // vertical and horizontal orders respectively.
     private static int applyMaskPenaltyRule1Internal(ByteMatrix matrix, bool isHorizontal)

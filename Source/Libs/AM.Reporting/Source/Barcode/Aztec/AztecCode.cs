@@ -9,13 +9,13 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
 #nullable enable
 
-namespace FastReport.Barcode.Aztec
+namespace AM.Reporting.Barcode.Aztec
 {
    /// <summary>
    /// Aztec 2D code representation
@@ -32,7 +32,7 @@ namespace FastReport.Barcode.Aztec
       /// <summary>
       /// Compact or full symbol indicator
       /// </summary>
-      public bool isCompact 
+      public bool isCompact
       {
           get { return is_Compact; }
           set { is_Compact = value; }
@@ -41,7 +41,7 @@ namespace FastReport.Barcode.Aztec
       /// <summary>
       /// Size in pixels (width and height)
       /// </summary>
-      public int Size 
+      public int Size
       {
           get { return size; }
           set { size = value; }
@@ -50,7 +50,7 @@ namespace FastReport.Barcode.Aztec
       /// <summary>
       /// Number of levels
       /// </summary>
-      public int Layers 
+      public int Layers
       {
           get { return layers; }
           set { layers = value; }
@@ -59,7 +59,7 @@ namespace FastReport.Barcode.Aztec
       /// <summary>
       /// Number of data codewords
       /// </summary>
-      public int CodeWords 
+      public int CodeWords
       {
           get { return codeWords; }
           set { codeWords = value; }
@@ -68,7 +68,7 @@ namespace FastReport.Barcode.Aztec
       /// <summary>
       /// The symbol image
       /// </summary>
-      public BitMatrix Matrix 
+      public BitMatrix Matrix
       {
           get { return matrix; }
           set { matrix = value; }

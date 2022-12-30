@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,20 +20,20 @@ using System.Collections.Generic;
 using System.Data;
 using System.ComponentModel;
 using System.Collections;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 using System.Drawing.Design;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Data
+namespace AM.Reporting.Data
 {
   /// <summary>
   /// Base class for all datasources such as <see cref="TableDataSource"/>.
   /// </summary>
-  [TypeConverter(typeof(FastReport.TypeConverters.DataSourceConverter))]
-  [Editor("FastReport.TypeEditors.DataSourceEditor, FastReport", typeof(UITypeEditor))]
+  [TypeConverter(typeof(AM.Reporting.TypeConverters.DataSourceConverter))]
+  [Editor("AM.Reporting.TypeEditors.DataSourceEditor, AM.Reporting", typeof(UITypeEditor))]
   public abstract class DataSourceBase : Column
   {
     #region Fields
@@ -51,10 +51,10 @@ namespace FastReport.Data
 
     #region Properties
     /// <summary>
-    /// Occurs when the FastReport engine loads data source with data.
+    /// Occurs when the AM.Reporting engine loads data source with data.
     /// </summary>
     /// <remarks>
-    /// Use this event if you want to implement load-on-demand. Event handler must load the data 
+    /// Use this event if you want to implement load-on-demand. Event handler must load the data
     /// into the data object which this datasource is bound to (for example, the
     /// <b>TableDataSource</b> uses data from the <b>DataTable</b> object bound to
     /// the <b>Table</b> property).
@@ -65,7 +65,7 @@ namespace FastReport.Data
     /// Gets or sets alias of this object.
     /// </summary>
     /// <remarks>
-    /// Alias is a human-friendly name of this object. It may contain any symbols (including 
+    /// Alias is a human-friendly name of this object. It may contain any symbols (including
     /// spaces and national symbols).
     /// </remarks>
     [Category("Design")]
@@ -141,8 +141,8 @@ namespace FastReport.Data
     public int CurrentRowNo
     {
       get { return currentRowNo; }
-      set 
-      { 
+      set
+      {
         currentRowNo = value;
         if (value >= 0 && value < rows.Count)
           currentRow = rows[value];
@@ -162,9 +162,9 @@ namespace FastReport.Data
     [Browsable(false)]
     public object this[string columnAlias]
     {
-      get 
+      get
       {
-        return GetValue(columnAlias); 
+        return GetValue(columnAlias);
       }
     }
 
@@ -179,13 +179,13 @@ namespace FastReport.Data
     [Browsable(false)]
     public object this[Column column]
     {
-      get 
+      get
       {
         if (InternalRows.Count == 0)
           Init();
         if (column.Calculated)
           return column.Value;
-        return GetValue(column); 
+        return GetValue(column);
       }
     }
 
@@ -193,7 +193,7 @@ namespace FastReport.Data
     /// Forces loading of data for this datasource.
     /// </summary>
     /// <remarks>
-    /// This property is <b>false</b> by default. Set it to <b>true</b> if you need to reload data 
+    /// This property is <b>false</b> by default. Set it to <b>true</b> if you need to reload data
     /// each time when the datasource initialized. Note that this may slow down the performance.
     /// </remarks>
     [DefaultValue(false)]
@@ -309,13 +309,13 @@ namespace FastReport.Data
         foreach (object row in InternalRows)
         {
           SetCurrentRow(row);
-          
+
           object[] values = new object[columnsCount];
           for (int i = 0; i < columnsCount; i++)
           {
             values[i] = this[childColumns[i]];
           }
-          
+
           Indices indices = new Indices(values);
           ArrayList rows = null;
           int index = sortedChildRows.IndexOfKey(indices);
@@ -326,7 +326,7 @@ namespace FastReport.Data
           }
           else
             rows = sortedChildRows.Values[index];
-          
+
           rows.Add(row);
         }
       }
@@ -341,7 +341,7 @@ namespace FastReport.Data
         }
       }
     }
-    
+
     private void ApplyAdditionalFilter()
     {
       for (int i = 0; i < rows.Count; i++)
@@ -358,7 +358,7 @@ namespace FastReport.Data
             i--;
             break;
           }
-        }  
+        }
       }
     }
 
@@ -433,15 +433,15 @@ namespace FastReport.Data
     /// Initializes the datasource schema.
     /// </summary>
     /// <remarks>
-    /// This method is used to support the FastReport.Net infrastructure. Do not call it directly.
+    /// This method is used to support the AM.Reporting.Net infrastructure. Do not call it directly.
     /// </remarks>
     public abstract void InitSchema();
-    
+
     /// <summary>
     /// Loads the datasource with data.
     /// </summary>
     /// <remarks>
-    /// This method is used to support the FastReport.Net infrastructure. Do not call it directly.
+    /// This method is used to support the AM.Reporting.Net infrastructure. Do not call it directly.
     /// </remarks>
     /// <param name="rows">Rows to fill with data.</param>
     public abstract void LoadData(ArrayList rows);
@@ -460,12 +460,12 @@ namespace FastReport.Data
         Load(this, EventArgs.Empty);
       }
     }
-    
+
     internal void SetCurrentRow(object row)
     {
       currentRow = row;
     }
-    
+
     internal void FindParentRow(Relation relation)
     {
       InitSchema();
@@ -477,7 +477,7 @@ namespace FastReport.Data
       {
         childValues[i] = relation.ChildDataSource[relation.ChildColumns[i]];
       }
-      
+
       object result = null;
       if (childValues[0] == null)
       {
@@ -504,12 +504,12 @@ namespace FastReport.Data
           return;
         }
       }
-      
+
       foreach (object row in InternalRows)
       {
         SetCurrentRow(row);
         bool found = true;
-        
+
         for (int i = 0; i < columnCount; i++)
         {
           if (!this[relation.ParentColumns[i]].Equals(childValues[i]))
@@ -522,12 +522,12 @@ namespace FastReport.Data
         {
           result = row;
           break;
-        }  
+        }
       }
 
       if (columnCount == 1)
         rowIndices[childValues[0]] = result;
-      
+
       SetCurrentRow(result);
     }
 
@@ -619,7 +619,7 @@ namespace FastReport.Data
     {
       if (FShowAccessDataMessage)
         Config.ReportSettings.OnProgress(Report, Res.Get("Messages,AccessingData"));
-        
+
       // InitSchema may fail sometimes (for example, when using OracleConnection with nested select).
       try
       {
@@ -659,7 +659,7 @@ namespace FastReport.Data
       // filter data rows
       if (FShowAccessDataMessage && rows.Count > 10000)
         Config.ReportSettings.OnProgress(Report, Res.Get("Messages,PreparingData"));
-      
+
       if (filter != null && filter.Trim() != "")
       {
         for (int i = 0; i < rows.Count; i++)
@@ -670,14 +670,14 @@ namespace FastReport.Data
           {
             rows.RemoveAt(i);
             i--;
-          }  
+          }
         }
       }
-      
+
       // additional filter
       if (AdditionalFilter.Count > 0)
         ApplyAdditionalFilter();
-      
+
       // sort data rows
       if (sort != null && sort.Count > 0)
       {
@@ -690,7 +690,7 @@ namespace FastReport.Data
         }
         rows.Sort(new RowComparer(Report, this, expressions, descending));
       }
-      
+
       FShowAccessDataMessage = false;
       First();
     }
@@ -766,7 +766,7 @@ namespace FastReport.Data
       relation_SortedChildRows = null;
       FShowAccessDataMessage = true;
     }
-    
+
     /// <inheritdoc/>
     public override void InitializeComponent()
     {
@@ -786,7 +786,7 @@ namespace FastReport.Data
       rowIndices = new Hashtable();
       SetFlags(Flags.HasGlobalName, true);
     }
-  
+
     private class RowComparer : IComparer
     {
       private Report report;
@@ -794,7 +794,7 @@ namespace FastReport.Data
       private string[] expressions;
       private bool[] descending;
       private Column[] columns;
-      
+
       public int Compare(object x, object y)
       {
         int result = 0;
@@ -816,26 +816,26 @@ namespace FastReport.Data
             dataSource.SetCurrentRow(y);
             i2 = columns[i].Value as IComparable;
           }
-          
+
           if (i1 != null)
             result = i1.CompareTo(i2);
           else if (i2 != null)
-            result = -1;  
+            result = -1;
           if (descending[i])
             result = -result;
           if (result != 0)
-            break;  
+            break;
         }
         return result;
       }
-      
+
       public RowComparer(Report report, DataSourceBase dataSource, string[] expressions, bool[] descending)
       {
                 this.report = report;
                 this.dataSource = dataSource;
                 this.expressions = expressions;
                 this.descending = descending;
-        
+
         // optimize performance if expression is a single data column
         columns = new Column[expressions.Length];
         for (int i = 0; i < expressions.Length; i++)
@@ -860,7 +860,7 @@ namespace FastReport.Data
       public int CompareTo(object obj)
       {
         Indices indices = obj as Indices;
-        
+
         int result = 0;
         for (int i = 0; i < values.Length; i++)
         {

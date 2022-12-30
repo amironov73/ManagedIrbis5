@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,15 +25,15 @@ using System.Collections;
 
 #nullable enable
 
-namespace FastReport.Data
+namespace AM.Reporting.Data
 {
   /// <summary>
   /// Represents a datasource based on <b>DataView</b> class.
   /// </summary>
   /// <remarks>
-  /// This class is used to support FastReport.Net infrastructure, do not use it directly.
-  /// If you want to use data from <b>DataView</b> object, call the 
-  /// <see cref="FastReport.Report.RegisterData(DataView, string)"/> method of the <b>Report</b>.
+  /// This class is used to support AM.Reporting.Net infrastructure, do not use it directly.
+  /// If you want to use data from <b>DataView</b> object, call the
+  /// <see cref="AM.Reporting.Report.RegisterData(DataView, string)"/> method of the <b>Report</b>.
   /// </remarks>
   public class ViewDataSource : DataSourceBase
   {
@@ -88,7 +88,7 @@ namespace FastReport.Data
       return CurrentRow == null ? null : ((DataRowView)CurrentRow)[(int)column.Tag];
     }
     #endregion
-    
+
     #region Public Methods
     /// <inheritdoc/>
     public override void InitSchema()

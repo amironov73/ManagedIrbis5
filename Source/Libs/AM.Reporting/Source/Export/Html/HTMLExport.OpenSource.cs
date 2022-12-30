@@ -9,13 +9,13 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using FastReport.Utils;
+using AM.Reporting.Utils;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
@@ -26,7 +26,7 @@ using System.Text;
 
 #nullable enable
 
-namespace FastReport.Export.Html
+namespace AM.Reporting.Export.Html
 {
 
     public partial class HTMLExport
@@ -55,13 +55,13 @@ namespace FastReport.Export.Html
 
         }
         partial void SetExportableAdvMatrix(Base c);
-       
+
 
         private string GetHrefAdvMatrixButton(ReportComponentBase obj, string href)
         {
             return string.Empty;
         }
-       
+
         /// <inheritdoc/>
         protected override void ExportBand(BandBase band)
         {

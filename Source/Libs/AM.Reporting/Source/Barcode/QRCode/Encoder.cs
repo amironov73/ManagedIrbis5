@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,28 +21,28 @@ using System;
 
 #nullable enable
 
-namespace FastReport.Barcode.QRCode
+namespace AM.Reporting.Barcode.QRCode
 {
-  
+
 /*  /// <author>  satorux@google.com (Satoru Takabayashi) - creator
   /// </author>
   /// <author>  dswitkin@google.com (Daniel Switkin) - ported from C++
   /// </author>
-  /// <author>www.Redivivus.in (suraj.supekar@redivivus.in) - Ported from ZXING Java Source 
+  /// <author>www.Redivivus.in (suraj.supekar@redivivus.in) - Ported from ZXING Java Source
   /// </author>*/
   internal sealed class Encoder
   {
-    
+
     // The original table is defined in the table 5 of JISX0510:2004 (p.19).
     //UPGRADE_NOTE: Final was removed from the declaration of 'ALPHANUMERIC_TABLE'. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1003'"
     private static readonly int[] ALPHANUMERIC_TABLE = new int[]{- 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, 36, - 1, - 1, - 1, 37, 38, - 1, - 1, - 1, - 1, 39, 40, - 1, 41, 42, 43, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 44, - 1, - 1, - 1, - 1, - 1, - 1, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, - 1, - 1, - 1, - 1, - 1};
-    
+
     internal const System.String DEFAULT_BYTE_MODE_ENCODING = "ISO-8859-1";
-    
+
     private Encoder()
     {
     }
-    
+
     // The mask penalty calculation is complicated.  See Table 21 of JISX0510:2004 (p.45) for details.
     // Basically it applies four rules and summate all penalties.
     private static int calculateMaskPenalty(ByteMatrix matrix)
@@ -54,14 +54,14 @@ namespace FastReport.Barcode.QRCode
       penalty += MaskUtil.applyMaskPenaltyRule4(matrix);
       return penalty;
     }
-    
+
     /*/// <summary>  Encode "bytes" with the error correction level "ecLevel". The encoding mode will be chosen
     /// internally by chooseMode(). On success, store the result in "qrCode".
-    /// 
+    ///
     /// We recommend you to use QRCode.EC_LEVEL_L (the lowest level) for
     /// "getECLevel" since our primary use is to show QR code on desktop screens. We don't need very
     /// strong error correction for this purpose.
-    /// 
+    ///
     /// Note that there is no way to encode bytes in MODE_KANJI. We might want to add EncodeWithMode()
     /// with which clients can specify the encoding mode. For now, we don't need the functionality.
     /// </summary>*/
@@ -76,20 +76,20 @@ namespace FastReport.Barcode.QRCode
       {
         encoding = DEFAULT_BYTE_MODE_ENCODING;
       }
-      
+
       // Step 1: Choose the mode (encoding).
       Mode mode = chooseMode(content, encoding);
-      
+
       // Step 2: Append "bytes" into "dataBits" in appropriate encoding.
       BitVector dataBits = new BitVector();
       appendBytes(content, mode, dataBits, encoding);
       // Step 3: Initialize QR code that can contain "dataBits".
       int numInputBytes = dataBits.sizeInBytes();
       initQRCode(numInputBytes, ecLevel, mode, qrCode);
-      
+
       // Step 4: Build another bit vector that contains header and data.
       BitVector headerAndDataBits = new BitVector();
-      
+
       // tz - commented out to match zxing encoder online
       // Step 4.5: Append ECI message if applicable
       /*if (mode == Mode.BYTE && !DEFAULT_BYTE_MODE_ENCODING.Equals(encoding))
@@ -100,24 +100,24 @@ namespace FastReport.Barcode.QRCode
           appendECI(eci, headerAndDataBits);
         }
       }*/
-      
+
       appendModeInfo(mode, headerAndDataBits);
-      
+
       int numLetters = mode.Equals(Mode.BYTE)?dataBits.sizeInBytes():content.Length;
       appendLengthInfo(numLetters, qrCode.Version, mode, headerAndDataBits);
       headerAndDataBits.appendBitVector(dataBits);
-      
+
       // Step 5: Terminate the bits properly.
       terminateBits(qrCode.NumDataBytes, headerAndDataBits);
-      
+
       // Step 6: Interleave data bits with error correction code.
       BitVector finalBits = new BitVector();
       interleaveWithECBytes(headerAndDataBits, qrCode.NumTotalBytes, qrCode.NumDataBytes, qrCode.NumRSBlocks, finalBits);
-      
+
       // Step 7: Choose the mask pattern and set to "qrCode".
       ByteMatrix matrix = new ByteMatrix(qrCode.MatrixWidth, qrCode.MatrixWidth);
       qrCode.MaskPattern = chooseMaskPattern(finalBits, qrCode.ECLevel, qrCode.Version, matrix);
-      
+
       // Step 8.  Build the matrix and set it to "qrCode".
       MatrixUtil.buildMatrix(finalBits, qrCode.ECLevel, qrCode.Version, qrCode.MaskPattern, matrix);
       qrCode.Matrix = matrix;
@@ -127,7 +127,7 @@ namespace FastReport.Barcode.QRCode
         throw new WriterException("Invalid QR code: " + qrCode.ToString());
       }
     }
-    
+
     /*/// <returns> the code point of the table used in alphanumeric mode or
     /// -1 if there is no corresponding code in the table.
     /// </returns>*/
@@ -139,12 +139,12 @@ namespace FastReport.Barcode.QRCode
       }
       return - 1;
     }
-    
+
     public static Mode chooseMode(System.String content)
     {
       return chooseMode(content, null);
     }
-    
+
     /*/// <summary> Choose the best mode by examining the content. Note that 'encoding' is used as a hint;
     /// if it is Shift_JIS, and the input is only double-byte Kanji, then we return {@link Mode#KANJI}.
     /// </summary>*/
@@ -183,7 +183,7 @@ namespace FastReport.Barcode.QRCode
       }
       return Mode.BYTE;
     }
-    
+
     private static bool isOnlyDoubleByteKanji(System.String content)
     {
       sbyte[] bytes;
@@ -211,10 +211,10 @@ namespace FastReport.Barcode.QRCode
       }
       return true;
     }
-    
+
     private static int chooseMaskPattern(BitVector bits, ErrorCorrectionLevel ecLevel, int version, ByteMatrix matrix)
     {
-      
+
       int minPenalty = System.Int32.MaxValue; // Lower penalty is better.
       int bestMaskPattern = - 1;
       // We try all mask patterns to choose the best one.
@@ -230,7 +230,7 @@ namespace FastReport.Barcode.QRCode
       }
       return bestMaskPattern;
     }
-    
+
     /*/// <summary> Initialize "qrCode" according to "numInputBytes", "ecLevel", and "mode". On success,
     /// modify "qrCode".
     /// </summary>*/
@@ -238,7 +238,7 @@ namespace FastReport.Barcode.QRCode
     {
       qrCode.ECLevel = ecLevel;
       qrCode.Mode = mode;
-      
+
       // In the following comments, we use numbers of Version 7-H.
       for (int versionNum = 1; versionNum <= 40; versionNum++)
       {
@@ -271,7 +271,7 @@ namespace FastReport.Barcode.QRCode
       }
       throw new WriterException("Cannot find proper rs block info (input data too big?)");
     }
-    
+
     /*/// <summary> Terminate bits as described in 8.4.8 and 8.4.9 of JISX0510:2004 (p.24).</summary>*/
     internal static void  terminateBits(int numDataBytes, BitVector bits)
     {
@@ -321,7 +321,7 @@ namespace FastReport.Barcode.QRCode
         throw new WriterException("Bits size does not equal capacity");
       }
     }
-    
+
     /*/// <summary> Get number of data bytes and number of error correction bytes for block id "blockID". Store
     /// the result in "numDataBytesInBlock", and "numECBytesInBlock". See table 12 in 8.5.1 of
     /// JISX0510:2004 (p.30)
@@ -364,7 +364,7 @@ namespace FastReport.Barcode.QRCode
       {
         throw new WriterException("Total bytes mismatch");
       }
-      
+
       if (blockID < numRsBlocksInGroup1)
       {
         numDataBytesInBlock[0] = numDataBytesInGroup1;
@@ -376,39 +376,39 @@ namespace FastReport.Barcode.QRCode
         numECBytesInBlock[0] = numEcBytesInGroup2;
       }
     }
-    
+
     /*/// <summary> Interleave "bits" with corresponding error correction bytes. On success, store the result in
     /// "result". The interleave rule is complicated. See 8.6 of JISX0510:2004 (p.37) for details.
     /// </summary>*/
     internal static void  interleaveWithECBytes(BitVector bits, int numTotalBytes, int numDataBytes, int numRSBlocks, BitVector result)
     {
-      
+
       // "bits" must have "getNumDataBytes" bytes of data.
       if (bits.sizeInBytes() != numDataBytes)
       {
         throw new WriterException("Number of bits and data bytes does not match");
       }
-      
+
       // Step 1.  Divide data bytes into blocks and generate error correction bytes for them. We'll
       // store the divided data bytes blocks and error correction bytes blocks into "blocks".
       int dataBytesOffset = 0;
       int maxNumDataBytes = 0;
       int maxNumEcBytes = 0;
-      
+
       // Since, we know the number of reedsolmon blocks, we can initialize the vector with the number.
       System.Collections.ArrayList blocks = System.Collections.ArrayList.Synchronized(new System.Collections.ArrayList(numRSBlocks));
-      
+
       for (int i = 0; i < numRSBlocks; ++i)
       {
         int[] numDataBytesInBlock = new int[1];
         int[] numEcBytesInBlock = new int[1];
         getNumDataBytesAndNumECBytesForBlockID(numTotalBytes, numDataBytes, numRSBlocks, i, numDataBytesInBlock, numEcBytesInBlock);
-        
+
         ByteArray dataBytes = new ByteArray();
         dataBytes.set_Renamed(bits.Array, dataBytesOffset, numDataBytesInBlock[0]);
         ByteArray ecBytes = generateECBytes(dataBytes, numEcBytesInBlock[0]);
         blocks.Add(new BlockPair(dataBytes, ecBytes));
-        
+
         maxNumDataBytes = System.Math.Max(maxNumDataBytes, dataBytes.size());
         maxNumEcBytes = System.Math.Max(maxNumEcBytes, ecBytes.size());
         dataBytesOffset += numDataBytesInBlock[0];
@@ -417,7 +417,7 @@ namespace FastReport.Barcode.QRCode
       {
         throw new WriterException("Data bytes does not match offset");
       }
-      
+
       // First, place data blocks.
       for (int i = 0; i < maxNumDataBytes; ++i)
       {
@@ -448,7 +448,7 @@ namespace FastReport.Barcode.QRCode
         throw new WriterException("Interleaving error: " + numTotalBytes + " and " + result.sizeInBytes() + " differ.");
       }
     }
-    
+
     internal static ByteArray generateECBytes(ByteArray dataBytes, int numEcBytesInBlock)
     {
       int numDataBytes = dataBytes.size();
@@ -458,7 +458,7 @@ namespace FastReport.Barcode.QRCode
         toEncode[i] = dataBytes.at(i);
       }
       new ReedSolomonEncoder(GF256.QR_CODE_FIELD).encode(toEncode, numEcBytesInBlock);
-      
+
       ByteArray ecBytes = new ByteArray(numEcBytesInBlock);
       for (int i = 0; i < numEcBytesInBlock; i++)
       {
@@ -466,14 +466,14 @@ namespace FastReport.Barcode.QRCode
       }
       return ecBytes;
     }
-    
+
     /*/// <summary> Append mode info. On success, store the result in "bits".</summary>*/
     internal static void  appendModeInfo(Mode mode, BitVector bits)
     {
       bits.appendBits(mode.Bits, 4);
     }
-    
-    
+
+
     /*/// <summary> Append length info. On success, store the result in "bits".</summary>*/
     internal static void  appendLengthInfo(int numLetters, int version, Mode mode, BitVector bits)
     {
@@ -484,7 +484,7 @@ namespace FastReport.Barcode.QRCode
       }
       bits.appendBits(numLetters, numBits);
     }
-    
+
     /*/// <summary> Append "bytes" in "mode" mode (encoding) into "bits". On success, store the result in "bits".</summary>*/
     internal static void  appendBytes(System.String content, Mode mode, BitVector bits, System.String encoding)
     {
@@ -509,7 +509,7 @@ namespace FastReport.Barcode.QRCode
         throw new WriterException("Invalid mode: " + mode);
       }
     }
-    
+
     internal static void  appendNumericBytes(System.String content, BitVector bits)
     {
       int length = content.Length;
@@ -540,7 +540,7 @@ namespace FastReport.Barcode.QRCode
         }
       }
     }
-    
+
     internal static void  appendAlphanumericBytes(System.String content, BitVector bits)
     {
       int length = content.Length;
@@ -571,7 +571,7 @@ namespace FastReport.Barcode.QRCode
         }
       }
     }
-    
+
     internal static void  append8BitBytes(System.String content, BitVector bits, System.String encoding)
     {
       sbyte[] bytes;
@@ -590,7 +590,7 @@ namespace FastReport.Barcode.QRCode
         bits.appendBits(bytes[i], 8);
       }
     }
-    
+
     internal static void  appendKanjiBytes(System.String content, BitVector bits)
     {
       sbyte[] bytes;

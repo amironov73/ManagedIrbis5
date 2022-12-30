@@ -9,14 +9,14 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using FastReport.Barcode;
-using FastReport.Table;
+using AM.Reporting.Barcode;
+using AM.Reporting.Table;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -28,7 +28,7 @@ using System.Xml;
 
 #nullable enable
 
-namespace FastReport.Import.DevExpress
+namespace AM.Reporting.Import.DevExpress
 {
     partial class DevExpressImport
     {
@@ -517,9 +517,9 @@ namespace FastReport.Import.DevExpress
             string height = GetAttribute(reportNode, "PageHeight");
             string width = GetAttribute(reportNode, "PageWidth");
             if (!String.IsNullOrEmpty(height))
-                page.PaperHeight = UnitsConverter.SizeFToPixels(height) / FastReport.Utils.Units.Millimeters;
+                page.PaperHeight = UnitsConverter.SizeFToPixels(height) / AM.Reporting.Utils.Units.Millimeters;
             if (!String.IsNullOrEmpty(width))
-                page.PaperWidth = UnitsConverter.SizeFToPixels(width) / FastReport.Utils.Units.Millimeters;
+                page.PaperWidth = UnitsConverter.SizeFToPixels(width) / AM.Reporting.Utils.Units.Millimeters;
         }
 
         private void LoadStylesXml()
@@ -527,7 +527,7 @@ namespace FastReport.Import.DevExpress
             XmlNode styleNode = FindChildNoteByName(reportNode, "StyleSheet");
             if (styleNode == null)
                 return;
-            XmlNodeList styles = styleNode.ChildNodes; 
+            XmlNodeList styles = styleNode.ChildNodes;
             foreach (XmlNode styleName in styles)
             {
                 Style style = ComponentsFactory.CreateStyle(GetAttribute(styleName, "Name"), Report);

@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,50 +21,50 @@ using System;
 
 #nullable enable
 
-namespace FastReport.Barcode.QRCode
+namespace AM.Reporting.Barcode.QRCode
 {
-  
+
   /*/// <author>  satorux@google.com (Satoru Takabayashi) - creator
   /// </author>
   /// <author>  dswitkin@google.com (Daniel Switkin) - ported from C++
   /// </author>
-  /// <author>www.Redivivus.in (suraj.supekar@redivivus.in) - Ported from ZXING Java Source 
+  /// <author>www.Redivivus.in (suraj.supekar@redivivus.in) - Ported from ZXING Java Source
   /// </author>*/
   internal sealed class MatrixUtil
   {
-    
+
     private MatrixUtil()
     {
       // do nothing
     }
-    
+
     //UPGRADE_NOTE: Final was removed from the declaration of 'POSITION_DETECTION_PATTERN'. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1003'"
     private static readonly int[][] POSITION_DETECTION_PATTERN = new int[][]{new int[]{1, 1, 1, 1, 1, 1, 1}, new int[]{1, 0, 0, 0, 0, 0, 1}, new int[]{1, 0, 1, 1, 1, 0, 1}, new int[]{1, 0, 1, 1, 1, 0, 1}, new int[]{1, 0, 1, 1, 1, 0, 1}, new int[]{1, 0, 0, 0, 0, 0, 1}, new int[]{1, 1, 1, 1, 1, 1, 1}};
-    
+
     //UPGRADE_NOTE: Final was removed from the declaration of 'HORIZONTAL_SEPARATION_PATTERN'. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1003'"
     private static readonly int[][] HORIZONTAL_SEPARATION_PATTERN = new int[][]{new int[]{0, 0, 0, 0, 0, 0, 0, 0}};
-    
+
     //UPGRADE_NOTE: Final was removed from the declaration of 'VERTICAL_SEPARATION_PATTERN'. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1003'"
     private static readonly int[][] VERTICAL_SEPARATION_PATTERN = new int[][]{new int[]{0}, new int[]{0}, new int[]{0}, new int[]{0}, new int[]{0}, new int[]{0}, new int[]{0}};
-    
+
     //UPGRADE_NOTE: Final was removed from the declaration of 'POSITION_ADJUSTMENT_PATTERN'. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1003'"
     private static readonly int[][] POSITION_ADJUSTMENT_PATTERN = new int[][]{new int[]{1, 1, 1, 1, 1}, new int[]{1, 0, 0, 0, 1}, new int[]{1, 0, 1, 0, 1}, new int[]{1, 0, 0, 0, 1}, new int[]{1, 1, 1, 1, 1}};
-    
+
     // From Appendix E. Table 1, JIS0510X:2004 (p 71). The table was double-checked by komatsu.
     //UPGRADE_NOTE: Final was removed from the declaration of 'POSITION_ADJUSTMENT_PATTERN_COORDINATE_TABLE'. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1003'"
     private static readonly int[][] POSITION_ADJUSTMENT_PATTERN_COORDINATE_TABLE = new int[][]{new int[]{- 1, - 1, - 1, - 1, - 1, - 1, - 1}, new int[]{6, 18, - 1, - 1, - 1, - 1, - 1}, new int[]{6, 22, - 1, - 1, - 1, - 1, - 1}, new int[]{6, 26, - 1, - 1, - 1, - 1, - 1}, new int[]{6, 30, - 1, - 1, - 1, - 1, - 1}, new int[]{6, 34, - 1, - 1, - 1, - 1, - 1}, new int[]{6, 22, 38, - 1, - 1, - 1, - 1}, new int[]{6, 24, 42, - 1, - 1, - 1, - 1}, new int[]{6, 26, 46, - 1, - 1, - 1, - 1}, new int[]{6, 28, 50, - 1, - 1, - 1, - 1}, new int[]{6, 30, 54, - 1, - 1, - 1, - 1}, new int[]{6, 32, 58, - 1, - 1, - 1, - 1}, new int[]{6, 34, 62, - 1, - 1, - 1, - 1}, new int[]{6, 26, 46, 66, - 1, - 1, - 1}, new int[]{6, 26, 48, 70, - 1, - 1, - 1}, new int[]{6, 26, 50, 74, - 1, - 1, - 1}, new int[]{6, 30, 54, 78, - 1, - 1, - 1}, new int[]{6, 30, 56, 82, - 1, - 1, - 1}, new int[]{6, 30, 58, 86, - 1, - 1, - 1}, new int[]{6, 34, 62, 90, - 1, - 1, - 1}, new int[]{6, 28, 50, 72, 94, - 1, - 1}, new int[]{6, 26, 50, 74, 98, - 1, - 1}, new int[]{6, 30, 54, 78, 102, - 1, - 1}, new int[]{6, 28, 54, 80, 106, - 1, - 1}, new int[]{6, 32, 58, 84, 110, - 1, - 1}, new int[]{6, 30, 58, 86, 114, - 1, - 1}, new int[]{6, 34, 62, 90, 118, - 1, - 1}, new int[]{6, 26, 50, 74, 98, 122, - 1}, new int[]{6, 30, 54, 78, 102, 126, - 1}, new int[]{6, 26, 52, 78, 104, 130, - 1}, new int[]{6, 30, 56, 82, 108, 134, - 1}, new int[]{6, 34, 60, 86, 112, 138, - 1}, new int[]{6, 30, 58, 86, 114, 142, - 1}, new int[]{6, 34, 62, 90, 118, 146, - 1}, new int[]{6, 30, 54, 78, 102, 126, 150}, new int[]{6, 24, 50, 76, 102, 128, 154}, new int[]{6, 28, 54, 80, 106, 132, 158}, new int[]{6, 32, 58, 84, 110, 136, 162}, new int[]{6, 26, 54, 82, 110, 138, 166}, new int[]{6, 30, 58, 86, 114, 142, 170}};
-    
+
     // Type info cells at the left top corner.
     //UPGRADE_NOTE: Final was removed from the declaration of 'TYPE_INFO_COORDINATES'. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1003'"
     private static readonly int[][] TYPE_INFO_COORDINATES = new int[][]{new int[]{8, 0}, new int[]{8, 1}, new int[]{8, 2}, new int[]{8, 3}, new int[]{8, 4}, new int[]{8, 5}, new int[]{8, 7}, new int[]{8, 8}, new int[]{7, 8}, new int[]{5, 8}, new int[]{4, 8}, new int[]{3, 8}, new int[]{2, 8}, new int[]{1, 8}, new int[]{0, 8}};
-    
+
     // From Appendix D in JISX0510:2004 (p. 67)
     private const int VERSION_INFO_POLY = 0x1f25; // 1 1111 0010 0101
-    
+
     // From Appendix C in JISX0510:2004 (p.65).
     private const int TYPE_INFO_POLY = 0x537;
     private const int TYPE_INFO_MASK_PATTERN = 0x5412;
-    
+
     // Set all cells to -1.  -1 means that the cell is empty (not set yet).
     //
     // JAVAPORT: We shouldn't need to do this at all. The code should be rewritten to begin encoding
@@ -73,7 +73,7 @@ namespace FastReport.Barcode.QRCode
     {
       matrix.clear((sbyte) (- 1));
     }
-    
+
     // Build 2D matrix of QR Code from "dataBits" with "ecLevel", "version" and "getMaskPattern". On
     // success, store the result in "matrix" and return true.
     public static void  buildMatrix(BitVector dataBits, ErrorCorrectionLevel ecLevel, int version, int maskPattern, ByteMatrix matrix)
@@ -87,7 +87,7 @@ namespace FastReport.Barcode.QRCode
       // Data should be embedded at end.
       embedDataBits(dataBits, maskPattern, matrix);
     }
-    
+
     // Embed basic patterns. On success, modify the matrix and return true.
     // The basic patterns are:
     // - Position detection patterns
@@ -100,30 +100,30 @@ namespace FastReport.Barcode.QRCode
       embedPositionDetectionPatternsAndSeparators(matrix);
       // Then, embed the dark dot at the left bottom corner.
       embedDarkDotAtLeftBottomCorner(matrix);
-      
+
       // Position adjustment patterns appear if version >= 2.
       maybeEmbedPositionAdjustmentPatterns(version, matrix);
       // Timing patterns should be embedded after position adj. patterns.
       embedTimingPatterns(matrix);
     }
-    
+
     // Embed type information. On success, modify the matrix.
     public static void  embedTypeInfo(ErrorCorrectionLevel ecLevel, int maskPattern, ByteMatrix matrix)
     {
       BitVector typeInfoBits = new BitVector();
       makeTypeInfoBits(ecLevel, maskPattern, typeInfoBits);
-      
+
       for (int i = 0; i < typeInfoBits.size(); ++i)
       {
         // Place bits in LSB to MSB order.  LSB (least significant bit) is the last value in
         // "typeInfoBits".
         int bit = typeInfoBits.at(typeInfoBits.size() - 1 - i);
-        
+
         // Type info bits at the left top corner. See 8.9 of JISX0510:2004 (p.46).
         int x1 = TYPE_INFO_COORDINATES[i][0];
         int y1 = TYPE_INFO_COORDINATES[i][1];
         matrix.set_Renamed(x1, y1, bit);
-        
+
         if (i < 8)
         {
           // Right top corner.
@@ -140,7 +140,7 @@ namespace FastReport.Barcode.QRCode
         }
       }
     }
-    
+
     // Embed version information if need be. On success, modify the matrix and return true.
     // See 8.10 of JISX0510:2004 (p.47) for how to embed version information.
     public static void  maybeEmbedVersionInfo(int version, ByteMatrix matrix)
@@ -152,7 +152,7 @@ namespace FastReport.Barcode.QRCode
       }
       BitVector versionInfoBits = new BitVector();
       makeVersionInfoBits(version, versionInfoBits);
-      
+
       int bitIndex = 6 * 3 - 1; // It will decrease from 17 to 0.
       for (int i = 0; i < 6; ++i)
       {
@@ -168,7 +168,7 @@ namespace FastReport.Barcode.QRCode
         }
       }
     }
-    
+
     // Embed "dataBits" using "getMaskPattern". On success, modify the matrix and return true.
     // For debugging purposes, it skips masking process if "getMaskPattern" is -1.
     // See 8.7 of JISX0510:2004 (p.38) for how to embed data bits.
@@ -208,7 +208,7 @@ namespace FastReport.Barcode.QRCode
               // in 8.4.9 of JISX0510:2004 (p. 24).
               bit = 0;
             }
-            
+
             // Skip masking if mask_pattern is -1.
             if (maskPattern != - 1)
             {
@@ -231,7 +231,7 @@ namespace FastReport.Barcode.QRCode
         throw new WriterException("Not all bits consumed: " + bitIndex + '/' + dataBits.size());
       }
     }
-    
+
     // Return the position of the most significant bit set (to one) in the "value". The most
     // significant bit is position 32. If there is no bit set, return 0. Examples:
     // - findMSBSet(0) => 0
@@ -247,7 +247,7 @@ namespace FastReport.Barcode.QRCode
       }
       return numDigits;
     }
-    
+
     // Calculate BCH (Bose-Chaudhuri-Hocquenghem) code for "value" using polynomial "poly". The BCH
     // code is used for encoding type information and version information.
     // Example: Calculation of version information of 7.
@@ -287,7 +287,7 @@ namespace FastReport.Barcode.QRCode
       // Now the "value" is the remainder (i.e. the BCH code)
       return value_Renamed;
     }
-    
+
     // Make bit vector of type information. On success, store the result in "bits" and return true.
     // Encode error correction level and mask pattern. See 8.9 of
     // JISX0510:2004 (p.45) for details.
@@ -299,21 +299,21 @@ namespace FastReport.Barcode.QRCode
       }
       int typeInfo = (ecLevel.Bits << 3) | maskPattern;
       bits.appendBits(typeInfo, 5);
-      
+
       int bchCode = calculateBCHCode(typeInfo, TYPE_INFO_POLY);
       bits.appendBits(bchCode, 10);
-      
+
       BitVector maskBits = new BitVector();
       maskBits.appendBits(TYPE_INFO_MASK_PATTERN, 15);
       bits.xor(maskBits);
-      
+
       if (bits.size() != 15)
       {
         // Just in case.
         throw new WriterException("should not happen but we got: " + bits.size());
       }
     }
-    
+
     // Make bit vector of version information. On success, store the result in "bits" and return true.
     // See 8.10 of JISX0510:2004 (p.45) for details.
     public static void  makeVersionInfoBits(int version, BitVector bits)
@@ -321,26 +321,26 @@ namespace FastReport.Barcode.QRCode
       bits.appendBits(version, 6);
       int bchCode = calculateBCHCode(version, VERSION_INFO_POLY);
       bits.appendBits(bchCode, 12);
-      
+
       if (bits.size() != 18)
       {
         // Just in case.
         throw new WriterException("should not happen but we got: " + bits.size());
       }
     }
-    
+
     // Check if "value" is empty.
     private static bool isEmpty(int value_Renamed)
     {
       return value_Renamed == - 1;
     }
-    
+
     // Check if "value" is valid.
     private static bool isValidValue(int value_Renamed)
     {
       return (value_Renamed == - 1 || value_Renamed == 0 || value_Renamed == 1); // Dark (black).
     }
-    
+
     private static void  embedTimingPatterns(ByteMatrix matrix)
     {
       // -8 is for skipping position detection patterns (size 7), and two horizontal/vertical
@@ -368,7 +368,7 @@ namespace FastReport.Barcode.QRCode
         }
       }
     }
-    
+
     // Embed the lonely dark dot at left bottom corner. JISX0510:2004 (p.46)
     private static void  embedDarkDotAtLeftBottomCorner(ByteMatrix matrix)
     {
@@ -378,7 +378,7 @@ namespace FastReport.Barcode.QRCode
       }
       matrix.set_Renamed(8, matrix.Height - 8, 1);
     }
-    
+
     private static void  embedHorizontalSeparationPattern(int xStart, int yStart, ByteMatrix matrix)
     {
       // We know the width and height.
@@ -395,7 +395,7 @@ namespace FastReport.Barcode.QRCode
         matrix.set_Renamed(xStart + x, yStart, HORIZONTAL_SEPARATION_PATTERN[0][x]);
       }
     }
-    
+
     private static void  embedVerticalSeparationPattern(int xStart, int yStart, ByteMatrix matrix)
     {
       // We know the width and height.
@@ -412,7 +412,7 @@ namespace FastReport.Barcode.QRCode
         matrix.set_Renamed(xStart, yStart + y, VERTICAL_SEPARATION_PATTERN[y][0]);
       }
     }
-    
+
     // Note that we cannot unify the function with embedPositionDetectionPattern() despite they are
     // almost identical, since we cannot write a function that takes 2D arrays in different sizes in
     // C/C++. We should live with the fact.
@@ -435,7 +435,7 @@ namespace FastReport.Barcode.QRCode
         }
       }
     }
-    
+
     private static void  embedPositionDetectionPattern(int xStart, int yStart, ByteMatrix matrix)
     {
       // We know the width and height.
@@ -455,7 +455,7 @@ namespace FastReport.Barcode.QRCode
         }
       }
     }
-    
+
     // Embed position detection patterns and surrounding vertical/horizontal separators.
     private static void  embedPositionDetectionPatternsAndSeparators(ByteMatrix matrix)
     {
@@ -467,7 +467,7 @@ namespace FastReport.Barcode.QRCode
       embedPositionDetectionPattern(matrix.Width - pdpWidth, 0, matrix);
       // Left bottom corner.
       embedPositionDetectionPattern(0, matrix.Width - pdpWidth, matrix);
-      
+
       // Embed horizontal separation patterns around the squares.
       int hspWidth = HORIZONTAL_SEPARATION_PATTERN[0].Length;
       // Left top corner.
@@ -476,7 +476,7 @@ namespace FastReport.Barcode.QRCode
       embedHorizontalSeparationPattern(matrix.Width - hspWidth, hspWidth - 1, matrix);
       // Left bottom corner.
       embedHorizontalSeparationPattern(0, matrix.Width - hspWidth, matrix);
-      
+
       // Embed vertical separation patterns around the squares.
       int vspSize = VERTICAL_SEPARATION_PATTERN.Length;
       // Left top corner.
@@ -486,7 +486,7 @@ namespace FastReport.Barcode.QRCode
       // Left bottom corner.
       embedVerticalSeparationPattern(vspSize, matrix.Height - vspSize, matrix);
     }
-    
+
     // Embed position adjustment patterns if need be.
     private static void  maybeEmbedPositionAdjustmentPatterns(int version, ByteMatrix matrix)
     {

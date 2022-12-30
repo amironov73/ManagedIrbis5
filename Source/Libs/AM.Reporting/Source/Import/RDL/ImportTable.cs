@@ -9,14 +9,14 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using FastReport.Matrix;
-using FastReport.Table;
+using AM.Reporting.Matrix;
+using AM.Reporting.Table;
 using System;
 using System.Collections.Generic;
 using System.Xml;
@@ -25,7 +25,7 @@ using System.Xml;
 
 #nullable enable
 
-namespace FastReport.Import.RDL
+namespace AM.Reporting.Import.RDL
 {
 
     // Represents the RDL tables import

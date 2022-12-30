@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,14 +19,14 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.ComponentModel;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 using System.Globalization;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Format
+namespace AM.Reporting.Format
 {
     /// <summary>
     /// Defines how percent values are formatted and displayed.
@@ -55,7 +55,7 @@ namespace FastReport.Format
         }
 
         /// <summary>
-        /// Gets or sets the number of decimal places to use in percent values. 
+        /// Gets or sets the number of decimal places to use in percent values.
         /// </summary>
         [DefaultValue(2)]
         public int DecimalDigits
@@ -74,7 +74,7 @@ namespace FastReport.Format
         }
 
         /// <summary>
-        /// Gets or sets the string that separates groups of digits to the left of the decimal in percent values. 
+        /// Gets or sets the string that separates groups of digits to the left of the decimal in percent values.
         /// </summary>
         public string GroupSeparator
         {
@@ -94,7 +94,7 @@ namespace FastReport.Format
         /// <summary>
         /// Gets or sets the format pattern for positive percent values.
         /// </summary>
-        /// <remarks>This property can have one of the values in the following table. 
+        /// <remarks>This property can have one of the values in the following table.
         /// The symbol "%" is the <b>PercentSymbol</b> and <i>n</i> is a number.
         /// <list type="table">
         ///   <listheader><term>Value</term><description>Associated Pattern</description></listheader>
@@ -114,7 +114,7 @@ namespace FastReport.Format
         /// <summary>
         /// Gets or sets the format pattern for negative percent values.
         /// </summary>
-        /// <remarks>This property can have one of the values in the following table. 
+        /// <remarks>This property can have one of the values in the following table.
         /// The symbol "%" is the <b>PercentSymbol</b> and <i>n</i> is a number.
         /// <list type="table">
         ///   <listheader><term>Value</term><description>Associated Pattern</description></listheader>
@@ -243,7 +243,7 @@ namespace FastReport.Format
         #endregion
 
         /// <summary>
-        /// Initializes a new instance of the <b>PercentFormat</b> class with default settings. 
+        /// Initializes a new instance of the <b>PercentFormat</b> class with default settings.
         /// </summary>
         public PercentFormat()
         {

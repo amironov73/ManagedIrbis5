@@ -1,7 +1,28 @@
-﻿using System;
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
+using System;
 using System.Collections.Generic;
 
-namespace FastReport.Utils
+#endregion
+
+#nullable enable
+
+namespace AM.Reporting.Utils
 {
 #if !COMMUNITY
     /// <summary>
@@ -88,7 +109,7 @@ namespace FastReport.Utils
             {
                 get { return nodes; }
             }
-            
+
             /// <summary>
             /// Gets type of the export.
             /// </summary>
@@ -96,7 +117,7 @@ namespace FastReport.Utils
             {
                 get { return exportType; }
             }
-            
+
             /// <summary>
             /// Gets index of the image.
             /// </summary>
@@ -104,7 +125,7 @@ namespace FastReport.Utils
             {
                 get { return imageIndex; }
             }
-            
+
             /// <summary>
             /// Gets or sets the tag.
             /// </summary>
@@ -122,7 +143,7 @@ namespace FastReport.Utils
                 get { return enabled; }
                 set { enabled = value; }
             }
-            
+
             /// <summary>
             /// Gets true if node is export, otherwise false.
             /// </summary>
@@ -143,7 +164,7 @@ namespace FastReport.Utils
                 this.exportType = exportType;
             }
 
-            public ExportsTreeNode(string name, Type exportType, bool isExport, ObjectInfo tag) 
+            public ExportsTreeNode(string name, Type exportType, bool isExport, ObjectInfo tag)
                 : this(name, exportType, isExport)
             {
                 this.tag = tag;
@@ -231,7 +252,7 @@ namespace FastReport.Utils
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public void RegisterExports()
         {

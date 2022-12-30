@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,7 +22,7 @@ using System.Data.Common;
 
 #nullable enable
 
-namespace FastReport.Data
+namespace AM.Reporting.Data
 {
     partial class DataConnectionBase
     {

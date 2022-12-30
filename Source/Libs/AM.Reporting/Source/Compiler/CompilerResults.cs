@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,7 +19,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 
-namespace FastReport.Code.CodeDom.Compiler
+namespace AM.Reporting.Code.CodeDom.Compiler
 {
     public class CompilerResults
     {

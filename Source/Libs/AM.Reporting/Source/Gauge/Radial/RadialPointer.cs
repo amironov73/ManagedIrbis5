@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,14 +17,14 @@
 
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 using System.ComponentModel;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Gauge.Radial
+namespace AM.Reporting.Gauge.Radial
 {
     /// <summary>
     /// Represents a linear pointer.
@@ -48,7 +48,7 @@ namespace FastReport.Gauge.Radial
             get { return gradAutoRotate; }
             set { gradAutoRotate = value; }
         }
-        
+
         #region Constructors
 
         /// <summary>
@@ -126,7 +126,7 @@ namespace FastReport.Gauge.Radial
             pointerPerpStrt = RadialUtils.RotateVector(pointerPerpStrt, startAngle, center);
             pointerPerpEnd = RadialUtils.RotateVector(pointerPerpEnd, startAngle, center);
 
-            PointF[] rotatedPointerPerpStrt = RadialUtils.RotateVector(pointerPerpStrt, angle, center); 
+            PointF[] rotatedPointerPerpStrt = RadialUtils.RotateVector(pointerPerpStrt, angle, center);
             PointF[] rotatedPointerPerpEnd = RadialUtils.RotateVector(pointerPerpEnd, angle, center);
 
             //calc brush rect

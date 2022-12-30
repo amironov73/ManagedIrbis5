@@ -9,13 +9,13 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
 #nullable enable
 
-namespace FastReport.Engine
+namespace AM.Reporting.Engine
 {
     partial class ReportEngine
     {

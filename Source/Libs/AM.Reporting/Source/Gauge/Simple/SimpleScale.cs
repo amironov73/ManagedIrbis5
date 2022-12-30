@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,13 +20,13 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Gauge.Simple
+namespace AM.Reporting.Gauge.Simple
 {
     /// <summary>
     /// Represents a simple scale.
@@ -285,7 +285,7 @@ namespace FastReport.Gauge.Simple
         }
 
         /// <inheritdoc/>
-        public override void Draw(FastReport.Utils.FRPaintEventArgs e)
+        public override void Draw(AM.Reporting.Utils.FRPaintEventArgs e)
         {
             base.Draw(e);
 

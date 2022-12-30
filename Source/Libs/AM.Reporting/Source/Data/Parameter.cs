@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,14 +17,14 @@
 
 using System;
 using System.ComponentModel;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 using System.Drawing.Design;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Data
+namespace AM.Reporting.Data
 {
   /// <summary>
   /// Represents a report parameter that is used to pass user data to a report.
@@ -74,9 +74,9 @@ namespace FastReport.Data
     /// <summary>
     /// Gets or sets the type of parameter.
     /// </summary>
-    [TypeConverter(typeof(FastReport.TypeConverters.DataTypeConverter))]
+    [TypeConverter(typeof(AM.Reporting.TypeConverters.DataTypeConverter))]
     [Category("Data")]
-    [Editor("FastReport.TypeEditors.DataTypeEditor, FastReport", typeof(UITypeEditor))]
+    [Editor("AM.Reporting.TypeEditors.DataTypeEditor, AM.Reporting", typeof(UITypeEditor))]
     public Type DataType
     {
       get { return dataType; }
@@ -93,13 +93,13 @@ namespace FastReport.Data
     [Browsable(false)]
     public virtual object Value
     {
-      get 
+      get
       {
         if (!String.IsNullOrEmpty(Expression) && Report != null && Report.IsRunning)
           value = Report.Calc(Expression);
-        return value; 
+        return value;
       }
-      set 
+      set
       {
                 this.value = value;
         if (value != null)
@@ -113,7 +113,7 @@ namespace FastReport.Data
     [Browsable(false)]
     public string AsString
     {
-      get 
+      get
       {
         object value = Value;
         return value == null ? "" : value.ToString();
@@ -132,7 +132,7 @@ namespace FastReport.Data
     /// This expression will be calculated each time you access a parameter's <b>Value</b>.
     /// </remarks>
     [Category("Data")]
-    [Editor("FastReport.TypeEditors.ExpressionEditor, FastReport", typeof(UITypeEditor))]
+    [Editor("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof(UITypeEditor))]
     public string Expression
     {
       get { return expression; }
@@ -160,7 +160,7 @@ namespace FastReport.Data
     {
       get { return parameters; }
     }
-    
+
     /// <summary>
     /// Gets the full name of the parameter. This is useful to get the nested parameter's full name.
     /// </summary>
@@ -179,7 +179,7 @@ namespace FastReport.Data
         return result;
       }
     }
-    
+
     /// <summary>
     /// This property is not relevant to this class.
     /// </summary>

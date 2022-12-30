@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,13 +19,13 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Format
+namespace AM.Reporting.Format
 {
   /// <summary>
   /// Defines how boolean values are formatted and displayed.
@@ -36,7 +36,7 @@ namespace FastReport.Format
     private string falseText;
     private string trueText;
     #endregion
-    
+
     #region Properties
     /// <summary>
     /// Gets or sets a string that will be displayed if value is <b>false</b>.
@@ -89,7 +89,7 @@ namespace FastReport.Format
         return FalseText;
       if (value is bool && (bool)value == true)
         return TrueText;
-      return value.ToString();  
+      return value.ToString();
     }
 
     internal override string GetSampleValue()
@@ -101,7 +101,7 @@ namespace FastReport.Format
     {
       base.Serialize(writer, prefix, format);
       BooleanFormat c = format as BooleanFormat;
-      
+
       if (c == null || TrueText != c.TrueText)
         writer.WriteStr(prefix + "TrueText", TrueText);
       if (c == null || FalseText != c.FalseText)
@@ -110,7 +110,7 @@ namespace FastReport.Format
     #endregion
 
     /// <summary>
-    /// Initializes a new instance of the <b>BooleanFormat</b> class with default settings. 
+    /// Initializes a new instance of the <b>BooleanFormat</b> class with default settings.
     /// </summary>
     public BooleanFormat()
     {

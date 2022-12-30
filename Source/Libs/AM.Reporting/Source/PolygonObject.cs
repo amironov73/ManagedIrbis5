@@ -1,16 +1,16 @@
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
-namespace FastReport
+namespace AM.Reporting
 {
     /// <summary>
     /// Represents a polygon object.
     /// </summary>
     /// <remarks>
-    /// Use the <b>Border.Width</b>, <b>Border.Style</b> and <b>Border.Color</b> properties to set 
+    /// Use the <b>Border.Width</b>, <b>Border.Style</b> and <b>Border.Color</b> properties to set
     /// the line width, style and color.
-    /// 
+    ///
     /// </remarks>
     public partial class PolygonObject : PolyLineObject
     {

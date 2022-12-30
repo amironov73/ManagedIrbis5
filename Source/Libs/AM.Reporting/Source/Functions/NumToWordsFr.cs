@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,7 +24,7 @@ using System.Collections.Generic;
 
 #nullable enable
 
-namespace FastReport.Functions
+namespace AM.Reporting.Functions
 {
   internal class NumToWordsFr : NumToWordsBase
   {
@@ -40,13 +40,13 @@ namespace FastReport.Functions
 
     private static string[] fixedWords71to79 =
     {
-      "soixante et onze", "soixante-douze", "soixante-treize", "soixante-quatorze", 
+      "soixante et onze", "soixante-douze", "soixante-treize", "soixante-quatorze",
       "soixante-quinze", "soixante-seize", "soixante-dix-sept", "soixante-dix-huit", "soixante-dix-neuf"
     };
 
     private static string[] fixedWords91to99 =
     {
-      "quatre-vingt-onze", "quatre-vingt-douze", "quatre-vingt-treize", "quatre-vingt-quatorze", 
+      "quatre-vingt-onze", "quatre-vingt-douze", "quatre-vingt-treize", "quatre-vingt-quatorze",
       "quatre-vingt-quinze", "quatre-vingt-seize", "quatre-vingt-dix-sept", "quatre-vingt-dix-huit", "quatre-vingt-dix-neuf"
     };
 
@@ -85,7 +85,7 @@ namespace FastReport.Functions
             sep100_10 = "";
 
         val = val % 100;
-        if (val < 20) 
+        if (val < 20)
         {
             r.Append(sep100_10 + GetFixedWords(info.male, val));
         }

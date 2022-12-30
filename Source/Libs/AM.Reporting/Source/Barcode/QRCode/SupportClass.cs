@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,7 +21,7 @@ using System;
 
 #nullable enable
 
-namespace FastReport.Barcode.QRCode
+namespace AM.Reporting.Barcode.QRCode
 {
   /*/// <summary>
   /// Contains conversion support elements such as classes, interfaces and static methods.

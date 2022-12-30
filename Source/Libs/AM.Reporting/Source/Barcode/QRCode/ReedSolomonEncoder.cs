@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,26 +21,26 @@ using System;
 
 #nullable enable
 
-namespace FastReport.Barcode.QRCode
+namespace AM.Reporting.Barcode.QRCode
 {
-  
+
   /*/// <summary> <p>Implements Reed-Solomon enbcoding, as the name implies.</p>
-  /// 
+  ///
   /// </summary>
   /// <author>  Sean Owen
   /// </author>
   /// <author>  William Rucklidge
   /// </author>
-  /// <author>www.Redivivus.in (suraj.supekar@redivivus.in) - Ported from ZXING Java Source 
+  /// <author>www.Redivivus.in (suraj.supekar@redivivus.in) - Ported from ZXING Java Source
   /// </author>*/
   internal sealed class ReedSolomonEncoder
   {
-    
+
     //UPGRADE_NOTE: Final was removed from the declaration of 'field '. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1003'"
     private GF256 field;
     //UPGRADE_NOTE: Final was removed from the declaration of 'cachedGenerators '. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1003'"
     private System.Collections.ArrayList cachedGenerators;
-    
+
     public ReedSolomonEncoder(GF256 field)
     {
       if (!GF256.QR_CODE_FIELD.Equals(field))
@@ -51,7 +51,7 @@ namespace FastReport.Barcode.QRCode
       this.cachedGenerators = System.Collections.ArrayList.Synchronized(new System.Collections.ArrayList(10));
       cachedGenerators.Add(new GF256Poly(field, new int[]{1}));
     }
-    
+
     private GF256Poly buildGenerator(int degree)
     {
       if (degree >= cachedGenerators.Count)
@@ -66,7 +66,7 @@ namespace FastReport.Barcode.QRCode
       }
       return (GF256Poly) cachedGenerators[degree];
     }
-    
+
     public void  encode(int[] toEncode, int ecBytes)
     {
       if (ecBytes == 0)

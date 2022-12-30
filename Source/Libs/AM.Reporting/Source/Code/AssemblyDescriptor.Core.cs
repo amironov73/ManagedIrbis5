@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,7 +22,7 @@ using System.CodeDom.Compiler;
 
 #nullable enable
 
-namespace FastReport.Code
+namespace AM.Reporting.Code
 {
     partial class AssemblyDescriptor
     {

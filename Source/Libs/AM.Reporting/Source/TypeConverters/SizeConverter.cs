@@ -1,4 +1,21 @@
-﻿using System;
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
+using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Globalization;
@@ -6,8 +23,12 @@ using System.Drawing;
 using System.Reflection;
 using System.ComponentModel.Design.Serialization;
 
+#endregion
+
+#nullable enable
+
 #if NETSTANDARD2_0
-namespace FastReport.TypeConverters
+namespace AM.Reporting.TypeConverters
 {
 	public class SizeConverter : TypeConverter
 	{

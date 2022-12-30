@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,13 +20,13 @@ using System.Collections.Generic;
 using System.Text;
 using System.Collections;
 
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Data
+namespace AM.Reporting.Data
 {
   /// <summary>
   /// Represents the collection of <see cref="Relation"/> objects.
@@ -38,7 +38,7 @@ namespace FastReport.Data
     /// </summary>
     /// <param name="index">The index of a relation in this collection.</param>
     /// <returns>The relation with specified index.</returns>
-    public Relation this[int index]  
+    public Relation this[int index]
     {
       get { return List[index] as Relation; }
       set { List[index] = value; }
@@ -96,5 +96,5 @@ namespace FastReport.Data
     public RelationCollection(Base owner) : base(owner)
     {
     }
-  }  
+  }
 }

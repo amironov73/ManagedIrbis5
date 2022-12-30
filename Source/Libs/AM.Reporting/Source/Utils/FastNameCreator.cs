@@ -1,16 +1,37 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Collections;
 
-namespace FastReport.Utils
+#endregion
+
+#nullable enable
+
+namespace AM.Reporting.Utils
 {
   /// <summary>
   /// The helper class used to create unique component names using the fastest method.
   /// </summary>
   /// <remarks>
   /// <para>Note: you can create unique component's name using its <b>CreateUniqueName</b> method.
-  /// However, it is very slow and can't be used in some situations (when you create a report 
+  /// However, it is very slow and can't be used in some situations (when you create a report
   /// layout in a code and have a lot of objects on a page).</para>
   /// </remarks>
   /// <example>This example demonstrates how to use this class.
@@ -43,7 +64,7 @@ namespace FastReport.Utils
     }
 
     /// <summary>
-    /// Initializes a new instance of the <b>FastNameCreator</b> class with collection of 
+    /// Initializes a new instance of the <b>FastNameCreator</b> class with collection of
     /// existing report objects.
     /// </summary>
     /// <param name="objects">The collection of existing report objects.</param>
@@ -62,7 +83,7 @@ namespace FastReport.Utils
           {
             i--;
           }
-          
+
           if (i >= 0 && i < objName.Length - 1)
           {
             // get number

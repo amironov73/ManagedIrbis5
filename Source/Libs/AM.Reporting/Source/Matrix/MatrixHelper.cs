@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -18,9 +18,9 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using FastReport.Data;
-using FastReport.Table;
-using FastReport.Utils;
+using AM.Reporting.Data;
+using AM.Reporting.Table;
+using AM.Reporting.Utils;
 using System.Drawing;
 using System.Collections;
 
@@ -28,7 +28,7 @@ using System.Collections;
 
 #nullable enable
 
-namespace FastReport.Matrix
+namespace AM.Reporting.Matrix
 {
     internal class MatrixHelper
     {
@@ -308,7 +308,7 @@ namespace FastReport.Matrix
 
         private Point GetBodyLocation()
         {
-            // determine the template's body location. Do not rely on HeaderWidth, HeaderHeight - 
+            // determine the template's body location. Do not rely on HeaderWidth, HeaderHeight -
             // the template may be empty
             Point result = new Point();
 
@@ -712,7 +712,7 @@ namespace FastReport.Matrix
                             cellValues[cellIndex] = GetCellValue(columnItem, rowItem, cellIndex);
                     }
 
-                    // at second we calc cells with custom functions 
+                    // at second we calc cells with custom functions
                     // (to allow the custom function to use other cells' values)
                     for (int cellIndex = 0; cellIndex < dataCount; cellIndex++)
                     {
@@ -788,9 +788,9 @@ namespace FastReport.Matrix
 
         private void PrintData()
         {
-            // use two passes to calc cell values. This is necessary because this calculation 
-            // replaces an array of cell values by the single (aggregated) value. 
-            // At the first pass we calc total values only (so they include all cell values, not aggregated ones); 
+            // use two passes to calc cell values. This is necessary because this calculation
+            // replaces an array of cell values by the single (aggregated) value.
+            // At the first pass we calc total values only (so they include all cell values, not aggregated ones);
             // at the second pass we calc other values except total.
             PrintData_CalcTotals(1);
             PrintData_CalcTotals(2);

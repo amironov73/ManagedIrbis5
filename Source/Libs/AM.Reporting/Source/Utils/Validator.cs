@@ -1,3 +1,20 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -5,7 +22,11 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace FastReport.Utils
+#endregion
+
+#nullable enable
+
+namespace AM.Reporting.Utils
 {
 
     public struct ValidationError
@@ -28,7 +49,7 @@ namespace FastReport.Utils
             this.Message = message;
             this.Object = obj;
         }
-    } 
+    }
 
     /// <summary>
     /// Contains methods used for validation of report.
@@ -94,9 +115,9 @@ namespace FastReport.Utils
         /// <returns></returns>
         static public Task<bool> ValidateIntersectionAllObjectsAsync(BandBase band, CancellationToken token)
         {
-            return Task.Factory.StartNew(() => 
-            { 
-                return ValidateIntersectionAllObjects(band, token); 
+            return Task.Factory.StartNew(() =>
+            {
+                return ValidateIntersectionAllObjects(band, token);
             }, token);
         }
 
@@ -174,5 +195,5 @@ namespace FastReport.Utils
             }
             return listError.Distinct().ToList();
         }
-    } 
+    }
 }

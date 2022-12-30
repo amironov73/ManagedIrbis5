@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,7 +22,7 @@ using System.Text;
 
 #nullable enable
 
-namespace FastReport.Barcode
+namespace AM.Reporting.Barcode
 {
   /// <summary>
   /// Generates the Code39 barcode.
@@ -109,7 +109,7 @@ namespace FastReport.Barcode
         if (c == tabelle_39[i].c)
           return i;
       }
-      
+
       return -1;
     }
 
@@ -141,7 +141,7 @@ namespace FastReport.Barcode
             result += i.data + '0';
             break;
           }
-        }  
+        }
       }
 
       // Stopcode
@@ -194,7 +194,7 @@ namespace FastReport.Barcode
         if (saveText[i] <= (char)127)
           text += code39x[saveText[i]];
       }
-      
+
       string pattern = base.GetPattern();
       text = saveText;
       return pattern;

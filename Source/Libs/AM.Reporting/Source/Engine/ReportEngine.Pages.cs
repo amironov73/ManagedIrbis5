@@ -9,20 +9,20 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using FastReport.Utils;
+using AM.Reporting.Utils;
 using System;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Engine
+namespace AM.Reporting.Engine
 {
     public partial class ReportEngine
     {
@@ -383,7 +383,7 @@ namespace FastReport.Engine
 
         private void StartPage()
         {
-            // apply Right to Left layout if needed 
+            // apply Right to Left layout if needed
             if (Config.RightToLeft)
             {
                 CurX = page.Columns.Positions[page.Columns.Positions.Count - 1] * Units.Millimeters;

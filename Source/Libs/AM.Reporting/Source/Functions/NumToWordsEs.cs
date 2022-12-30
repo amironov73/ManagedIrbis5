@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,7 +24,7 @@ using System.Collections.Generic;
 
 #nullable enable
 
-namespace FastReport.Functions
+namespace AM.Reporting.Functions
 {
   internal class NumToWordsEs : NumToWordsBase
   {
@@ -36,7 +36,7 @@ namespace FastReport.Functions
       "siete", "ocho", "nueve", "diez", "once",
       "doce", "trece", "catorce", "quince",
       "dieciséis", "diecisiete", "dieciocho", "diecinueve",
-      "veinte", "veintiún", "veintidós", "veintitrés", "veinticuatro", 
+      "veinte", "veintiún", "veintidós", "veintitrés", "veinticuatro",
       "veinticinco", "veintiséis", "veintisiete", "veintiocho", "veintinueve"
     };
 
@@ -99,8 +99,8 @@ namespace FastReport.Functions
 
     protected override string Case(long value, WordInfo info)
     {
-      // return things (dollars, euros, pages, etc) in the plural form unless it is 1. 
-      // the "1" case is handled in the Str method. 
+      // return things (dollars, euros, pages, etc) in the plural form unless it is 1.
+      // the "1" case is handled in the Str method.
       if (info == thousands || info == millions || info == milliards || info == trillions)
       {
         if (value == 1)

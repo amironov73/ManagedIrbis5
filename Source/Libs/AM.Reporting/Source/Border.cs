@@ -1,11 +1,32 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.ComponentModel;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 using System.Drawing.Design;
 
-namespace FastReport
+#endregion
+
+#nullable enable
+
+namespace AM.Reporting
 {
   /// <summary>
   /// Specifies the style of a border line.
@@ -13,37 +34,37 @@ namespace FastReport
   public enum LineStyle
   {
     /// <summary>
-    /// Specifies a solid line. 
+    /// Specifies a solid line.
     /// </summary>
     Solid,
-    
+
     /// <summary>
     /// Specifies a line consisting of dashes.
     /// </summary>
     Dash,
-    
+
     /// <summary>
-    /// Specifies a line consisting of dots. 
+    /// Specifies a line consisting of dots.
     /// </summary>
     Dot,
-    
+
     /// <summary>
-    /// Specifies a line consisting of a repeating pattern of dash-dot. 
+    /// Specifies a line consisting of a repeating pattern of dash-dot.
     /// </summary>
     DashDot,
-    
+
     /// <summary>
-    /// Specifies a line consisting of a repeating pattern of dash-dot-dot. 
+    /// Specifies a line consisting of a repeating pattern of dash-dot-dot.
     /// </summary>
     DashDotDot,
-    
+
     /// <summary>
-    /// Specifies a double line. 
+    /// Specifies a double line.
     /// </summary>
     Double,
 
     /// <summary>
-    /// Specifies a custom line. 
+    /// Specifies a custom line.
     /// </summary>
     Custom
     }
@@ -58,7 +79,7 @@ namespace FastReport
     /// Specifies no border lines.
     /// </summary>
     None = 0,
-    
+
     /// <summary>
     /// Specifies the left border line.
     /// </summary>
@@ -84,11 +105,11 @@ namespace FastReport
     /// </summary>
     All = 15
   }
-                       
+
   /// <summary>
   /// Represents a single border line.
   /// </summary>
-  [TypeConverter(typeof(FastReport.TypeConverters.FRExpandableObjectConverter))]
+  [TypeConverter(typeof(AM.Reporting.TypeConverters.FRExpandableObjectConverter))]
   public class BorderLine
   {
     #region Fields
@@ -101,7 +122,7 @@ namespace FastReport
     /// <summary>
     /// Gets or sets a color of the line.
     /// </summary>
-    [Editor("FastReport.TypeEditors.ColorEditor, FastReport", typeof(UITypeEditor))]
+    [Editor("AM.Reporting.TypeEditors.ColorEditor, AM.Reporting", typeof(UITypeEditor))]
     public Color Color
     {
       get { return color; }
@@ -112,7 +133,7 @@ namespace FastReport
     /// Gets or sets a style of the line.
     /// </summary>
     [DefaultValue(LineStyle.Solid)]
-    [Editor("FastReport.TypeEditors.LineStyleEditor, FastReport", typeof(UITypeEditor))]
+    [Editor("AM.Reporting.TypeEditors.LineStyleEditor, AM.Reporting", typeof(UITypeEditor))]
     public LineStyle Style
     {
       get { return style; }
@@ -128,12 +149,12 @@ namespace FastReport
       get { return width; }
       set { width = value; }
     }
-    
+
     internal DashStyle DashStyle
     {
       get
       {
-        DashStyle[] styles = new DashStyle[] { 
+        DashStyle[] styles = new DashStyle[] {
           DashStyle.Solid, DashStyle.Dash, DashStyle.Dot, DashStyle.DashDot, DashStyle.DashDotDot, DashStyle.Solid };
         return styles[(int)Style];
       }
@@ -145,7 +166,7 @@ namespace FastReport
     {
       return Color != Color.Black;
     }
-    
+
     internal bool ShouldSerialize()
     {
       return Width != 1 || Style != LineStyle.Solid || Color != Color.Black;
@@ -180,7 +201,7 @@ namespace FastReport
       return Color.GetHashCode() ^ Style.GetHashCode() ^ Width.GetHashCode();
     }
 
-    internal void Draw(FRPaintEventArgs e, float x, float y, float x1, float y1, 
+    internal void Draw(FRPaintEventArgs e, float x, float y, float x1, float y1,
       bool reverseGaps, bool gap1, bool gap2)
     {
       IGraphics g = e.Graphics;
@@ -203,7 +224,7 @@ namespace FastReport
           else
             pen.DashOffset = (y - ((int)(y / patternWidth)) * patternWidth) / pen.Width;
         }
-        
+
         if (Style != LineStyle.Double)
           g.DrawLine(pen, x, y, x1, y1);
         else
@@ -231,9 +252,9 @@ namespace FastReport
           {
             g.DrawLine(pen, x + g1, y - pen.Width, x1 - g2, y1 - pen.Width);
             g.DrawLine(pen, x + g3, y + pen.Width, x1 - g4, y1 + pen.Width);
-          }  
+          }
         }
-      }  
+      }
     }
 
     internal void Serialize(FRWriter writer, string prefix, BorderLine c)
@@ -264,8 +285,8 @@ namespace FastReport
     /// To turn on and off the lines, use the <see cref="Lines"/> property. To set the same color, style or width
     /// for each line, use <see cref="Color"/>, <see cref="Style"/>, <see cref="Width"/> properties of the <b>Border</b>.
     /// </remarks>
-    [TypeConverter(typeof(FastReport.TypeConverters.FRExpandableObjectConverter))]
-    [Editor("FastReport.TypeEditors.BorderEditor, FastReport", typeof(UITypeEditor))]
+    [TypeConverter(typeof(AM.Reporting.TypeConverters.FRExpandableObjectConverter))]
+    [Editor("AM.Reporting.TypeEditors.BorderEditor, AM.Reporting", typeof(UITypeEditor))]
   public class Border
   {
     #region Fields
@@ -285,10 +306,10 @@ namespace FastReport
     /// Gets or sets a color of the border.
     /// </summary>
     /// <remarks>
-    /// This property actually returns a color of the <see cref="LeftLine"/>. When you assign a value 
+    /// This property actually returns a color of the <see cref="LeftLine"/>. When you assign a value
     /// to this property, the value will be set to each border line.
     /// </remarks>
-    [Editor("FastReport.TypeEditors.ColorEditor, FastReport", typeof(UITypeEditor))]
+    [Editor("AM.Reporting.TypeEditors.ColorEditor, AM.Reporting", typeof(UITypeEditor))]
     public Color Color
     {
       get { return leftLine.Color; }
@@ -300,7 +321,7 @@ namespace FastReport
         bottomLine.Color = value;
       }
     }
-    
+
     /// <summary>
     /// Gets or sets a value determines whether to draw a shadow.
     /// </summary>
@@ -324,7 +345,7 @@ namespace FastReport
     /// <summary>
     /// Gets or sets a shadow color.
     /// </summary>
-    [Editor("FastReport.TypeEditors.ColorEditor, FastReport", typeof(UITypeEditor))]
+    [Editor("AM.Reporting.TypeEditors.ColorEditor, AM.Reporting", typeof(UITypeEditor))]
     public Color ShadowColor
     {
       get { return shadowColor; }
@@ -335,11 +356,11 @@ namespace FastReport
     /// Gets or sets a style of the border.
     /// </summary>
     /// <remarks>
-    /// This property actually returns a style of the <see cref="LeftLine"/>. When you assign a value 
+    /// This property actually returns a style of the <see cref="LeftLine"/>. When you assign a value
     /// to this property, the value will be set to each border line.
     /// </remarks>
     [DefaultValue(LineStyle.Solid)]
-    [Editor("FastReport.TypeEditors.LineStyleEditor, FastReport", typeof(UITypeEditor))]
+    [Editor("AM.Reporting.TypeEditors.LineStyleEditor, AM.Reporting", typeof(UITypeEditor))]
     public LineStyle Style
     {
       get { return leftLine.Style; }
@@ -356,7 +377,7 @@ namespace FastReport
     /// Gets or sets a visible lines of a border.
     /// </summary>
     [DefaultValue(BorderLines.None)]
-    [Editor("FastReport.TypeEditors.BorderLinesEditor, FastReport", typeof(UITypeEditor))]
+    [Editor("AM.Reporting.TypeEditors.BorderLinesEditor, AM.Reporting", typeof(UITypeEditor))]
     public BorderLines Lines
     {
       get { return lines; }
@@ -367,7 +388,7 @@ namespace FastReport
     /// Gets or sets a width of the border, in pixels.
     /// </summary>
     /// <remarks>
-    /// This property actually returns a width of the <see cref="LeftLine"/>. When you assign a value 
+    /// This property actually returns a width of the <see cref="LeftLine"/>. When you assign a value
     /// to this property, the value will be set to each border line.
     /// </remarks>
     [DefaultValue(1f)]
@@ -458,7 +479,7 @@ namespace FastReport
     {
       return BottomLine.ShouldSerialize();
     }
-    
+
     private bool ShouldSerializeColor()
     {
       return Color != Color.Black;
@@ -508,20 +529,20 @@ namespace FastReport
     public override bool Equals(object obj)
     {
       Border b = obj as Border;
-      return b != null && Lines == b.Lines && 
+      return b != null && Lines == b.Lines &&
         LeftLine.Equals(b.LeftLine) && TopLine.Equals(b.TopLine) &&
-        RightLine.Equals(b.RightLine) && BottomLine.Equals(b.BottomLine) && 
+        RightLine.Equals(b.RightLine) && BottomLine.Equals(b.BottomLine) &&
         Shadow == b.Shadow && ShadowColor == b.ShadowColor && ShadowWidth == b.ShadowWidth;
     }
 
     /// <inheritdoc/>
     public override int GetHashCode()
     {
-      return Lines.GetHashCode() ^ (Shadow.GetHashCode() + 16) ^ ShadowColor.GetHashCode() ^ 
+      return Lines.GetHashCode() ^ (Shadow.GetHashCode() + 16) ^ ShadowColor.GetHashCode() ^
         (ShadowWidth.GetHashCode() + 32) ^ (LeftLine.GetHashCode() << 1) ^ (TopLine.GetHashCode() << 2) ^
         (RightLine.GetHashCode() << 3) ^ (BottomLine.GetHashCode() << 4);
     }
-    
+
     /// <summary>
     /// Serializes the border.
     /// </summary>
@@ -555,7 +576,7 @@ namespace FastReport
             RightLine.Serialize(writer, prefix + ".RightLine", c.RightLine);
             BottomLine.Serialize(writer, prefix + ".BottomLine", c.BottomLine);
           }
-        }  
+        }
       }
       else
         LeftLine.Serialize(writer, prefix, c.LeftLine);
@@ -620,7 +641,7 @@ namespace FastReport
     #endregion
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Border"/> class with default settings. 
+    /// Initializes a new instance of the <see cref="Border"/> class with default settings.
     /// </summary>
     public Border()
     {

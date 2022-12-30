@@ -9,13 +9,13 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
 #nullable enable
 
-namespace FastReport.Barcode.Aztec
+namespace AM.Reporting.Barcode.Aztec
 {
    /// <summary>
    /// These are a set of hints that you may pass to Writers to specify their behavior.

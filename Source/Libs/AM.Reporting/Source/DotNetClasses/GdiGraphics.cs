@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,7 +25,7 @@ using System.Drawing.Text;
 
 #nullable enable
 
-namespace FastReport
+namespace AM.Reporting
 {
     /// <summary>
     /// Drawing objects to a standard Graphics or Bitmap

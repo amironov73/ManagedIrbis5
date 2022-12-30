@@ -9,13 +9,13 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
 #nullable enable
 
-namespace FastReport.Data
+namespace AM.Reporting.Data
 {
     /// <summary>
     /// Datasource for stored procedure.

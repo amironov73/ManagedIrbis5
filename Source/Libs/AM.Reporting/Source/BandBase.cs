@@ -1,13 +1,34 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.Drawing;
 using System.ComponentModel;
 using System.Collections.Generic;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 using System.Windows.Forms;
 using System.Drawing.Drawing2D;
 using System.Drawing.Design;
 
-namespace FastReport
+#endregion
+
+#nullable enable
+
+namespace AM.Reporting
 {
     /// <summary>
     /// Base class for all bands.
@@ -84,7 +105,7 @@ namespace FastReport
         /// </summary>
         /// <remarks>
         /// Use this property if <see cref="StartNewPage"/> is set to <b>true</b>. Normally the new page
-        /// is not started when printing the first data row, to avoid empty first page. 
+        /// is not started when printing the first data row, to avoid empty first page.
         /// </remarks>
         [DefaultValue(true)]
         [Category("Behavior")]
@@ -121,20 +142,20 @@ namespace FastReport
         /// </summary>
         /// <remarks>
         /// <para>
-        /// Outline is a tree control displayed in the preview window. It represents the prepared report structure. 
+        /// Outline is a tree control displayed in the preview window. It represents the prepared report structure.
         /// Each outline node can be clicked to navigate to the item in the prepared report.
         /// </para>
         /// <para>
-        /// To create the outline, set this property to any valid expression that represents the outline node text. 
+        /// To create the outline, set this property to any valid expression that represents the outline node text.
         /// This expression will be calculated when band is about to print, and its value will be added to the
-        /// outline. Thus, nodes' hierarchy in the outline is similar to the bands' hierarchy 
-        /// in a report. That means there will be the main and subordinate outline nodes, corresponding 
-        /// to the main and subordinate bands in a report (a report with two levels of data or with groups can 
+        /// outline. Thus, nodes' hierarchy in the outline is similar to the bands' hierarchy
+        /// in a report. That means there will be the main and subordinate outline nodes, corresponding
+        /// to the main and subordinate bands in a report (a report with two levels of data or with groups can
         /// exemplify the point).
         /// </para>
         /// </remarks>
         [Category("Navigation")]
-        [Editor("FastReport.TypeEditors.ExpressionEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof(UITypeEditor))]
         public string OutlineExpression
         {
             get { return outlineExpression; }
@@ -172,8 +193,8 @@ namespace FastReport
         /// Gets a value indicating that band is reprinted on a new page.
         /// </summary>
         /// <remarks>
-        /// This property is applicable to the <b>DataHeaderBand</b> and <b>GroupHeaderBand</b> only. 
-        /// It returns <b>true</b> if its <b>RepeatOnAllPages</b> property is <b>true</b> and band is 
+        /// This property is applicable to the <b>DataHeaderBand</b> and <b>GroupHeaderBand</b> only.
+        /// It returns <b>true</b> if its <b>RepeatOnAllPages</b> property is <b>true</b> and band is
         /// reprinted on a new page.
         /// </remarks>
         [Browsable(false)]
@@ -239,7 +260,7 @@ namespace FastReport
         /// Gets a row number (the same value returned by the "Row#" system variable).
         /// </summary>
         /// <remarks>
-        /// This property can be used when running a report. It may be useful to print hierarchical 
+        /// This property can be used when running a report. It may be useful to print hierarchical
         /// row numbers in a master-detail report, like this:
         /// <para/>1.1
         /// <para/>1.2
@@ -738,7 +759,7 @@ namespace FastReport
             }
             SetRunning(false);
 
-            ReportComponentCollection collection_clone = new ReportComponentCollection(); 
+            ReportComponentCollection collection_clone = new ReportComponentCollection();
             Objects.CopyTo(collection_clone);
             foreach (ReportComponentBase obj in collection_clone)
             {

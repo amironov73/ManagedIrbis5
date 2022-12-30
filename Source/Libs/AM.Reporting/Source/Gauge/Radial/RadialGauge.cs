@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,13 +21,13 @@ using System.Drawing;
 using System.Drawing.Design;
 using System.Drawing.Drawing2D;
 
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Gauge.Radial
+namespace AM.Reporting.Gauge.Radial
 {
     #region Enums
 
@@ -86,7 +86,7 @@ namespace FastReport.Gauge.Radial
     }
 
     #endregion // Enums
-    
+
     /// <summary>
     /// Represents a linear gauge.
     /// </summary>
@@ -159,7 +159,7 @@ namespace FastReport.Gauge.Radial
                 {
                     position = RadialGaugePosition.None;
                     type = value;
-                }               
+                }
                 if (value == RadialGaugeType.Semicircle &&
                     !(Position == RadialGaugePosition.Bottom ||
                     Position == RadialGaugePosition.Left ||
@@ -176,10 +176,10 @@ namespace FastReport.Gauge.Radial
 
                     ((Position & RadialGaugePosition.Right) != 0 && (Position & RadialGaugePosition.Top) != 0 &&
                     (Position & RadialGaugePosition.Left) == 0 && (Position & RadialGaugePosition.Bottom) == 0) ||
-                 
+
                     ((Position & RadialGaugePosition.Left) != 0 && (Position & RadialGaugePosition.Bottom) != 0 &&
                     (Position & RadialGaugePosition.Right) == 0 && (Position & RadialGaugePosition.Top) == 0) ||
-                 
+
                     ((Position & RadialGaugePosition.Right) != 0 && (Position & RadialGaugePosition.Bottom) != 0 &&
                     (Position & RadialGaugePosition.Left) == 0 && (Position & RadialGaugePosition.Top) == 0)
                     ))
@@ -187,7 +187,7 @@ namespace FastReport.Gauge.Radial
                     position = RadialGaugePosition.Top | RadialGaugePosition.Left;
                     type = value;
                 }
-                    
+
             }
         }
 
@@ -195,7 +195,7 @@ namespace FastReport.Gauge.Radial
         /// Gats or sets the Radial Gauge position. Doesn't work for Full Radial Gauge.
         /// </summary>
         [Category("Appearance")]
-        [Editor("FastReport.TypeEditors.FlagsEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.FlagsEditor, AM.Reporting", typeof(UITypeEditor))]
         public RadialGaugePosition Position
         {
             get { return position; }
@@ -252,7 +252,7 @@ namespace FastReport.Gauge.Radial
             Label = new RadialLabel(this);
             Height = 4.0f * Units.Centimeters;
             Width = 4.0f * Units.Centimeters;
-            semicircleOffsetRatio = type == RadialGaugeType.Semicircle && 
+            semicircleOffsetRatio = type == RadialGaugeType.Semicircle &&
                 (position == RadialGaugePosition.Left || position == RadialGaugePosition.Right) ? 1.5f :  1;
             Type = RadialGaugeType.Circle;
             Border.Lines = BorderLines.None;
@@ -306,7 +306,7 @@ namespace FastReport.Gauge.Radial
                     g.DrawArc(pen, x, y, dx, dy, -180, 180);
 
                     PointF startPoint = RadialUtils.RotateVector(new PointF[] { new PointF(x + dx / 2, y), center }, -90 * RAD, center)[0];
-                    
+
                     points[0] = new PointF(startPoint.X, startPoint.Y - 1 * e.ScaleY);
                     points[1] = new PointF(startPoint.X, startPoint.Y + semiOffset);
                     points[2] = new PointF(startPoint.X + dx, startPoint.Y + semiOffset);
@@ -342,7 +342,7 @@ namespace FastReport.Gauge.Radial
                     g.DrawArc(pen, x, y, dx, dy, -90, 180);
 
                     PointF startPoint = RadialUtils.RotateVector(new PointF[] { new PointF(x + dx / 2, y), center }, -180 * RAD, center)[0];
-                    
+
                     points[0] = new PointF(startPoint.X + 1 * e.ScaleX, startPoint.Y);
                     points[1] = new PointF(startPoint.X - semiOffset, startPoint.Y);
                     points[2] = new PointF(startPoint.X - semiOffset, startPoint.Y - dy);

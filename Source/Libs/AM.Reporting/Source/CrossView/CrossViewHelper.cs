@@ -9,14 +9,14 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using FastReport.Table;
-using FastReport.Utils;
+using AM.Reporting.Table;
+using AM.Reporting.Utils;
 
 using System.Drawing;
 
@@ -24,7 +24,7 @@ using System.Drawing;
 
 #nullable enable
 
-namespace FastReport.CrossView
+namespace AM.Reporting.CrossView
 {
     internal partial class CrossViewHelper
     {
@@ -657,7 +657,7 @@ namespace FastReport.CrossView
             resultBodyWidth = CrossView.Data.DataColumnCount;
         }
 
-      
+
 
 
         public void AddData()

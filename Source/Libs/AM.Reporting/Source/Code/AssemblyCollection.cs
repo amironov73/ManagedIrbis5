@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,7 +24,7 @@ using System.Collections;
 
 #nullable enable
 
-namespace FastReport.Code
+namespace AM.Reporting.Code
 {
   internal class AssemblyCollection : CollectionBase
   {

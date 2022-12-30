@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,14 +22,14 @@ using System.Text;
 using System.Drawing;
 using System.Windows.Forms;
 
-using FastReport.Utils;
-using FastReport.Barcode;
+using AM.Reporting.Utils;
+using AM.Reporting.Barcode;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Import.DevExpress
+namespace AM.Reporting.Import.DevExpress
 {
     /// <summary>
     /// The DevExpress units converter.
@@ -431,7 +431,7 @@ namespace FastReport.Import.DevExpress
         }
 
         /// <summary>
-        /// Converts the DevExpress border sides to FastReport border sides
+        /// Converts the DevExpress border sides to AM.Reporting border sides
         /// </summary>
         /// <param name="sides">The DevExpress Barcode.Symbology value as string.</param>
         /// <param name="border">The BarcodeObject instance.</param>

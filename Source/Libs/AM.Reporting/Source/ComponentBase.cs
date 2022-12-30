@@ -1,4 +1,21 @@
-using FastReport.Utils;
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
+using AM.Reporting.Utils;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -6,7 +23,11 @@ using System.Drawing;
 using System.Drawing.Design;
 using System.Windows.Forms;
 
-namespace FastReport
+#endregion
+
+#nullable enable
+
+namespace AM.Reporting
 {
     /// <summary>
     /// Class that implements some object's properties such as location, size and visibility.
@@ -134,7 +155,7 @@ namespace FastReport
         /// Gets or sets the size of client area of the object.
         /// </summary>
         /// <remarks>
-        /// This property is used in the <see cref="FastReport.Dialog.DialogPage"/> class.
+        /// This property is used in the <see cref="AM.Reporting.Dialog.DialogPage"/> class.
         /// </remarks>
         [Browsable(false)]
         public virtual SizeF ClientSize
@@ -342,7 +363,7 @@ namespace FastReport
         /// </summary>
         [DefaultValue("")]
         [Category("Behavior")]
-        [Editor("FastReport.TypeEditors.ExpressionEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof(UITypeEditor))]
         public virtual string VisibleExpression
         {
             get { return visibleExpression; }
@@ -369,7 +390,7 @@ namespace FastReport
         /// </summary>
         [DefaultValue("")]
         [Category("Behavior")]
-        [Editor("FastReport.TypeEditors.ExpressionEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof(UITypeEditor))]
         public string PrintableExpression
         {
             get { return printableExpression; }

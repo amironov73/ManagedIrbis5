@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,13 +20,13 @@ using System.Collections.Generic;
 using System.Text;
 using System.Collections;
 
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Data
+namespace AM.Reporting.Data
 {
   /// <summary>
   /// Represents the collection of <see cref="Parameter"/> objects.
@@ -76,7 +76,7 @@ namespace FastReport.Data
       }
       return name;
     }
-    
+
     /// <summary>
     /// Copies the parameters from other collection.
     /// </summary>
@@ -93,7 +93,7 @@ namespace FastReport.Data
         thisParam.Value = par.Value;
         thisParam.Expression = par.Expression;
         thisParam.Description = par.Description;
-        
+
         thisParam.Parameters.Assign(par.Parameters);
       }
     }
@@ -109,7 +109,7 @@ namespace FastReport.Data
             }
         }
     }
-    
+
     internal void AssignValues(ParameterCollection source)
     {
       SortedList<string, Parameter> this_list = new SortedList<string,Parameter>();

@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.ComponentModel;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
-namespace FastReport
+namespace AM.Reporting
 {
   /// <summary>
   /// Base class for headers and footers which support the "Keep With Data" and "Repeat on Every Page" features.
@@ -62,7 +62,7 @@ namespace FastReport
     {
       HeaderFooterBandBase c = writer.DiffObject as HeaderFooterBandBase;
       base.Serialize(writer);
-      
+
       if (KeepWithData != c.KeepWithData)
         writer.WriteBool("KeepWithData", KeepWithData);
       if (RepeatOnEveryPage != c.RepeatOnEveryPage)

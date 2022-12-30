@@ -1,9 +1,31 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System.ComponentModel;
 using System.Drawing.Drawing2D;
 using System.Drawing;
-using FastReport.Utils;
 
-namespace FastReport
+using AM.Reporting.Utils;
+
+#endregion
+
+#nullable enable
+
+namespace AM.Reporting
 {
     /// <summary>
     /// Specifies a line cap style.
@@ -40,7 +62,7 @@ namespace FastReport
     /// <summary>
     /// Specifies a start and end line caps.
     /// </summary>
-    [TypeConverter(typeof(FastReport.TypeConverters.FRExpandableObjectConverter))]
+    [TypeConverter(typeof(AM.Reporting.TypeConverters.FRExpandableObjectConverter))]
     public class CapSettings
     {
         private float width;
@@ -163,7 +185,7 @@ namespace FastReport
         }
 
         /// <summary>
-        /// Initializes a new instance of the <b>CapSettings</b> class with default settings. 
+        /// Initializes a new instance of the <b>CapSettings</b> class with default settings.
         /// </summary>
         public CapSettings()
         {

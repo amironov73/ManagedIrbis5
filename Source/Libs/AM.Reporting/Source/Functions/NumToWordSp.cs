@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,7 +24,7 @@ using System.Collections.Generic;
 
 #nullable enable
 
-namespace FastReport.Functions
+namespace AM.Reporting.Functions
 {
 
   internal class NumToWordsSp : NumToWordsBase
@@ -37,7 +37,7 @@ namespace FastReport.Functions
       private static WordInfo milliards = new WordInfo("millardo", "millardos");
       private static WordInfo trillions = new WordInfo("billón", "billiones");
 
-      //if million, milliard or trillions use un instead of uno. 
+      //if million, milliard or trillions use un instead of uno.
       private bool _useUn;
 
       private static string[] hunds = {
@@ -199,7 +199,7 @@ namespace FastReport.Functions
             currencyList.Add("USD",new CurrencyInfo(
                 new WordInfo("dólar", "dólares"),
                 new WordInfo("céntimo", "céntimos")));
-           
+
         }
   }
 }

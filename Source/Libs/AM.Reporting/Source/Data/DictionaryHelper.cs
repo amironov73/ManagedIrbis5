@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,13 +21,13 @@ using System.Collections.Generic;
 using System.Data;
 using System.Windows.Forms;
 
-using FastReport.CrossView;
+using AM.Reporting.CrossView;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Data
+namespace AM.Reporting.Data
 {
     internal class DictionaryHelper
     {

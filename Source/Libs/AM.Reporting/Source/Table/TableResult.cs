@@ -1,19 +1,41 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.Collections.Generic;
 using System.Text;
-using FastReport.Engine;
-using FastReport.Preview;
+using AM.Reporting.Engine;
+using AM.Reporting.Preview;
 using System.Drawing;
-using FastReport.Utils;
 
-namespace FastReport.Table
+using AM.Reporting.Utils;
+
+#endregion
+
+#nullable enable
+
+namespace AM.Reporting.Table
 {
     /// <summary>
     /// Represents a result table.
     /// </summary>
     /// <remarks>
-    /// Do not use this class directly. It is used by the <see cref="TableObject"/> and 
-    /// <see cref="FastReport.Matrix.MatrixObject"/> objects to render a result.
+    /// Do not use this class directly. It is used by the <see cref="TableObject"/> and
+    /// <see cref="AM.Reporting.Matrix.MatrixObject"/> objects to render a result.
     /// </remarks>
     public class TableResult : TableBase
     {

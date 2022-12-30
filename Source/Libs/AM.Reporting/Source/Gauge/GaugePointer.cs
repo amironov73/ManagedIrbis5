@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,14 +17,14 @@
 
 using System.Drawing;
 using System.ComponentModel;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 using System.Drawing.Design;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Gauge
+namespace AM.Reporting.Gauge
 {
     /// <summary>
     /// Represents a pointer of gauge.
@@ -59,7 +59,7 @@ namespace FastReport.Gauge
         /// Gets or sets the color of a pointer.
         /// </summary>
         [Browsable(true)]
-        [Editor("FastReport.TypeEditors.FillEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.FillEditor, AM.Reporting", typeof(UITypeEditor))]
         public FillBase Fill
         {
             get { return fill; }

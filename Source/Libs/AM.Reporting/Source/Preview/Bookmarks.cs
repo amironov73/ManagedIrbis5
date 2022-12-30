@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -18,50 +18,50 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 using System.Collections;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Preview
+namespace AM.Reporting.Preview
 {
   internal class Bookmarks
   {
     private List<BookmarkItem> items;
     private List<BookmarkItem> firstPassItems;
-  
+
     internal int CurPosition
     {
       get { return items.Count; }
     }
-    
+
     internal void Shift(int index, float newY)
     {
       if (index < 0 || index >= items.Count)
         return;
-        
+
       float topY = items[index].offsetY;
       float shift = newY - topY;
-      
+
       for (int i = index; i < items.Count; i++)
       {
         items[i].pageNo++;
         items[i].offsetY += shift;
       }
     }
-    
+
     public void Add(string name, int pageNo, float offsetY)
     {
       BookmarkItem item = new BookmarkItem();
       item.name = name;
       item.pageNo = pageNo;
       item.offsetY = offsetY;
-      
+
       items.Add(item);
     }
-    
+
     public int GetPageNo(string name)
     {
       BookmarkItem item = Find(name);
@@ -69,7 +69,7 @@ namespace FastReport.Preview
         item = Find(name, firstPassItems);
       return item == null ? 0 : item.pageNo + 1;
     }
-    
+
     public BookmarkItem Find(string name)
     {
       return Find(name, items);
@@ -85,7 +85,7 @@ namespace FastReport.Preview
         if (item.name == name)
           return item;
       }
-      
+
       return null;
     }
 
@@ -123,13 +123,13 @@ namespace FastReport.Preview
           (float)Converter.FromString(typeof(float), item.GetProp("Offset")));
       }
     }
-    
+
     public Bookmarks()
     {
       items = new List<BookmarkItem>();
     }
-    
-    
+
+
     internal class BookmarkItem
     {
       public string name;

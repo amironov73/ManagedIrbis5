@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,23 +20,23 @@ using System.IO;
 using System.Xml;
 using System.Drawing;
 using System.Windows.Forms;
-using FastReport.Table;
+using AM.Reporting.Table;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-using FastReport.Barcode;
-using FastReport.Utils;
-using FastReport.Matrix;
-using FastReport.Dialog;
-using FastReport.Data;
-using FastReport.Data.JsonConnection;
+using AM.Reporting.Barcode;
+using AM.Reporting.Utils;
+using AM.Reporting.Matrix;
+using AM.Reporting.Dialog;
+using AM.Reporting.Data;
+using AM.Reporting.Data.JsonConnection;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Import.StimulSoft
+namespace AM.Reporting.Import.StimulSoft
 {
     /// <summary>
     /// Represents the StimulSoft import plugin.

@@ -1,4 +1,21 @@
-﻿using System;
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
+using System;
 using System.Collections.Generic;
 using System.Drawing.Drawing2D;
 using System.Drawing;
@@ -7,7 +24,11 @@ using System.Text;
 using System.Net;
 using System.IO;
 
-namespace FastReport.Utils
+#endregion
+
+#nullable enable
+
+namespace AM.Reporting.Utils
 {
     /// <summary>
     /// Advanced text renderer is used to perform the following tasks:
@@ -32,7 +53,7 @@ namespace FastReport.Utils
     ///           using (Brush b = run.GetBrush())
     ///           {
     ///             g.DrawString(run.Text, f, b, run.Left, run.Top, renderer.Format);
-    ///           }  
+    ///           }
     ///         }
     ///       }
     ///       else
@@ -429,7 +450,7 @@ namespace FastReport.Utils
             StringFormatFlags saveFlags = Format.FormatFlags;
             StringTrimming saveTrimming = Format.Trimming;
 
-            // match DrawString behavior: 
+            // match DrawString behavior:
             // if height is less than 1.25 of font height, turn off word wrap
             // commented out due to bug with band.break
             //if (rect.Height < FFontLineHeight * 1.25f)
@@ -444,7 +465,7 @@ namespace FastReport.Utils
 
             if (Angle != 0)
             {
-                // shift displayrect 
+                // shift displayrect
                 displayRect.X = -DisplayRect.Width / 2;
                 displayRect.Y = -DisplayRect.Height / 2;
 
@@ -527,7 +548,7 @@ namespace FastReport.Utils
                     int linesFit = 0;
                     // END: The fix for linux and core app a264aae5-193b-4e5c-955c-0818de3ca01b
                     Renderer.Graphics.MeasureString(text, Renderer.Font,
-                      new SizeF(Renderer.DisplayRect.Width - left, Renderer.FontLineHeight * 1.25f), 
+                      new SizeF(Renderer.DisplayRect.Width - left, Renderer.FontLineHeight * 1.25f),
                       Renderer.Format, out charsFit, out linesFit);
                     return charsFit + tabFit;
                 }
@@ -2309,7 +2330,7 @@ namespace FastReport.Utils
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         ~InlineImageCache()
         {
@@ -2507,7 +2528,7 @@ namespace FastReport.Utils
             private bool disposedValue = false; // To detect redundant calls
 
             /// <summary>
-            /// 
+            ///
             /// </summary>
             /// <param name="disposing"></param>
             protected virtual void Dispose(bool disposing)
@@ -2598,7 +2619,7 @@ namespace FastReport.Utils
         private bool disposedValue = false; // To detect redundant calls
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="disposing"></param>
         protected virtual void Dispose(bool disposing)

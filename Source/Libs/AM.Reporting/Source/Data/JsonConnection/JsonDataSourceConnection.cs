@@ -9,13 +9,13 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using FastReport.Utils.Json;
+using AM.Reporting.Utils.Json;
 using System;
 using System.Data;
 using System.Data.Common;
@@ -27,10 +27,10 @@ using System.Text;
 
 #nullable enable
 
-namespace FastReport.Data.JsonConnection
+namespace AM.Reporting.Data.JsonConnection
 {
     /// <summary>
-    /// FastReport json connection
+    /// AM.Reporting json connection
     /// </summary>
     public partial class JsonDataSourceConnection : DataConnectionBase, IJsonProviderSourceConnection
     {

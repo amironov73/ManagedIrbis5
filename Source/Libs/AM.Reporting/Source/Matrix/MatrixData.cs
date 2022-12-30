@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -18,14 +18,14 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 using System.Collections;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Matrix
+namespace AM.Reporting.Matrix
 {
   /// <summary>
   /// Contains a set of properties and methods to hold and manipulate the matrix descriptors.
@@ -44,13 +44,13 @@ namespace FastReport.Matrix
     private MatrixHeader rows;
     private MatrixCells cells;
     #endregion
-    
+
     #region Properties
     /// <summary>
     /// Gets a collection of column descriptors.
     /// </summary>
     /// <remarks>
-    /// Note: after you change something in this collection, call the 
+    /// Note: after you change something in this collection, call the
     /// <see cref="MatrixObject.BuildTemplate"/> method to refresh the matrix.
     /// </remarks>
     public MatrixHeader Columns
@@ -62,7 +62,7 @@ namespace FastReport.Matrix
     /// Gets a collection of row descriptors.
     /// </summary>
     /// <remarks>
-    /// Note: after you change something in this collection, call the 
+    /// Note: after you change something in this collection, call the
     /// <see cref="MatrixObject.BuildTemplate"/> method to refresh the matrix.
     /// </remarks>
     public MatrixHeader Rows
@@ -74,7 +74,7 @@ namespace FastReport.Matrix
     /// Gets a collection of data cell descriptors.
     /// </summary>
     /// <remarks>
-    /// Note: after you change something in this collection, call the 
+    /// Note: after you change something in this collection, call the
     /// <see cref="MatrixObject.BuildTemplate"/> method to refresh the matrix.
     /// </remarks>
     public MatrixCells Cells
@@ -87,7 +87,7 @@ namespace FastReport.Matrix
         get { return Cells.IsEmpty; }
     }
     #endregion
-    
+
     #region Public Methods
     /// <summary>
     /// Clears all descriptors.
@@ -98,7 +98,7 @@ namespace FastReport.Matrix
       Rows.Reset();
       Cells.Reset();
     }
-    
+
     /// <summary>
     /// Adds a value in the matrix.
     /// </summary>
@@ -119,9 +119,9 @@ namespace FastReport.Matrix
     /// MatrixObject matrix;
     /// matrix.Data.AddValue(
     ///   new object[] { 1996 },
-    ///   new object[] { "Andrew Fuller" }, 
+    ///   new object[] { "Andrew Fuller" },
     ///   new object[] { 123.45f });
-    /// 
+    ///
     /// // this will produce the following result:
     /// //               |   1996   |
     /// // --------------+----------+

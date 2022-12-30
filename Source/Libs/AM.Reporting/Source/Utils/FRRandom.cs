@@ -1,11 +1,33 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.Text;
 using System.Data;
 using System.Globalization;
 using System.Collections.Generic;
-using FastReport.Data;
 
-namespace FastReport.Utils
+using AM.Reporting.Data;
+
+#endregion
+
+#nullable enable
+
+namespace AM.Reporting.Utils
 {
     /// <summary>
     /// The pseudo-random generator.
@@ -356,7 +378,7 @@ namespace FastReport.Utils
         public SByte RandomizeSByte(SByte source)
         {
             StringBuilder sb = new StringBuilder();
-            
+
             int length = source.ToString(CultureInfo.InvariantCulture).Length;
             if (source < 0)
             {

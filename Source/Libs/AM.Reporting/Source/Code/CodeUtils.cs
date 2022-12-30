@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,22 +19,22 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-using FastReport.Data;
-using FastReport.Engine;
-using FastReport.Utils;
+using AM.Reporting.Data;
+using AM.Reporting.Engine;
+using AM.Reporting.Utils;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Code
+namespace AM.Reporting.Code
 {
     /// <summary>
     /// This class is used to pass find arguments to some methods of the <b>CodeUtils</b> class.
     /// </summary>
     public class FindTextArgs
     {
-        
+
         private int startIndex;
         private int endIndex;
         private string openBracket;
@@ -96,11 +96,11 @@ namespace FastReport.Code
             get { return foundText;  }
             set { foundText = value; }
         }
-     
+
     }
 
     /// <summary>
-    /// This static class contains methods that may be used to find expressions embedded 
+    /// This static class contains methods that may be used to find expressions embedded
     /// in the object's text.
     /// </summary>
     public static class CodeUtils
@@ -160,7 +160,7 @@ namespace FastReport.Code
         }
 
         // find matching open and close brackets starting from StartIndex. Takes strings into account.
-        // Returns true if matching brackets found. Also returns FoundText with text inside brackets, 
+        // Returns true if matching brackets found. Also returns FoundText with text inside brackets,
         // StartIndex pointing to the OpenBracket and EndIndex pointing to the next char after CloseBracket.
         private static bool FindMatchingBrackets(FindTextArgs args, bool skipLeadingStrings)
         {
@@ -299,7 +299,7 @@ namespace FastReport.Code
         }
 
         /// <summary>
-        /// Gets first expression found in the text. 
+        /// Gets first expression found in the text.
         /// </summary>
         /// <param name="args">Object with find arguments.</param>
         /// <param name="skipStrings">Indicates whether to skip strings.</param>

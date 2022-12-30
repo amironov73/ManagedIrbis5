@@ -1,6 +1,6 @@
-﻿using FastReport.Utils;
+﻿using AM.Reporting.Utils;
 
-namespace FastReport
+namespace AM.Reporting
 {
     partial class ReportComponentBase
     {
@@ -19,7 +19,7 @@ namespace FastReport
         /// <param name="source"></param>
         public virtual void AssignPreviewEvents(Base source)
         {
-          
+
         }
 
         /// <summary>

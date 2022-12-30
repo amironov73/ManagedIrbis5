@@ -9,12 +9,12 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
-  
+
 using System;
 using System.Collections;
 using System.Text;
@@ -22,13 +22,13 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.ComponentModel;
 
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Barcode 
+namespace AM.Reporting.Barcode
 {
   /// <summary>
   /// Specifies the error correction level used for PDF417 barcode.
@@ -39,7 +39,7 @@ namespace FastReport.Barcode
     /// Indicates that correction level should be calculated automatically.
     /// </summary>
     Auto,
-    
+
     /// <summary>
     /// Specifies level 0.
     /// </summary>
@@ -85,7 +85,7 @@ namespace FastReport.Barcode
     /// </summary>
     Level8
   }
-  
+
   /// <summary>
   /// Specifies the compaction mode used for PDF417 barcode.
   /// </summary>
@@ -95,7 +95,7 @@ namespace FastReport.Barcode
     /// Indicates that compaction mode should be calculated automatically.
     /// </summary>
     Auto,
-    
+
     /// <summary>
     /// Specifies the text compaction mode.
     /// </summary>
@@ -615,7 +615,7 @@ namespace FastReport.Barcode
 
     #region Properties
     /// <summary>
-    /// Gets or sets the barcode aspect ratio. 
+    /// Gets or sets the barcode aspect ratio.
     /// </summary>
     /// <remarks>
     /// A ratio or 0.5 will make the barcode width twice as large as the height.
@@ -631,7 +631,7 @@ namespace FastReport.Barcode
     /// Gets or sets the number of barcode data columns.
     /// </summary>
     /// <remarks>
-    /// To calculate the necessary number of columns and rows, set the <see cref="Columns"/> 
+    /// To calculate the necessary number of columns and rows, set the <see cref="Columns"/>
     /// and <see cref="Rows"/> properties to 0. In this case, the <see cref="AspectRatio"/> property
     /// should be set to desired aspect ratio.
     /// </remarks>
@@ -646,7 +646,7 @@ namespace FastReport.Barcode
     /// Gets or sets the number of barcode data rows.
     /// </summary>
     /// <remarks>
-    /// To calculate the necessary number of columns and rows, set the <see cref="Columns"/> 
+    /// To calculate the necessary number of columns and rows, set the <see cref="Columns"/>
     /// and <see cref="Rows"/> properties to 0. In this case, the <see cref="AspectRatio"/> property
     /// should be set to desired aspect ratio.
     /// </remarks>
@@ -671,7 +671,7 @@ namespace FastReport.Barcode
     /// Gets or sets the code page used for text conversion.
     /// </summary>
     /// <remarks>
-    /// Use this property to encode non-ASCII characters. For example, set this 
+    /// Use this property to encode non-ASCII characters. For example, set this
     /// property to <b>1251</b> to use Window CP1251.
     /// </remarks>
     [DefaultValue(437)]
@@ -1146,7 +1146,7 @@ namespace FastReport.Barcode
           segmentList.Add('B', 0, textLength);
           return;
       }
-      
+
       for (k = 0; k < textLength; ++k)
       {
         c = (char)(bytes[k] & 0xff);
@@ -1355,7 +1355,7 @@ namespace FastReport.Barcode
     private void PaintCode()
     {
       int maxErr, lenErr, tot, pad;
-      
+
       if (bytes == null)
         throw new ArgumentNullException("Text cannot be null.");
       if (bytes.Length > ABSOLUTE_MAX_TEXT_SIZE)
@@ -1490,7 +1490,7 @@ namespace FastReport.Barcode
       PixelSize = src.PixelSize;
     }
 
-    internal override void Serialize(FastReport.Utils.FRWriter writer, string prefix, BarcodeBase diff)
+    internal override void Serialize(AM.Reporting.Utils.FRWriter writer, string prefix, BarcodeBase diff)
     {
       base.Serialize(writer, prefix, diff);
       BarcodePDF417 c = diff as BarcodePDF417;
@@ -1521,7 +1521,7 @@ namespace FastReport.Barcode
         Encoding e = Encoding.GetEncoding(codePage);
         bytes = e.GetBytes(text);
       }
-      
+
       codeColumns = columns;
       codeRows = rows;
       PaintCode();
@@ -1532,7 +1532,7 @@ namespace FastReport.Barcode
       int textAdd = showText ? 18 : 0;
       return new SizeF(bitColumns * PixelSize.Width, codeRows * PixelSize.Height + textAdd);
     }
-    
+
     internal override void Draw2DBarcode(IGraphics g, float kx, float ky)
     {
       Brush light = Brushes.White;

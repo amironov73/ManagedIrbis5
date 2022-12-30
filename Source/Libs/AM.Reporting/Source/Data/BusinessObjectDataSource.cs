@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,13 +22,13 @@ using System.Collections;
 using System.Reflection;
 using System.ComponentModel;
 
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Data
+namespace AM.Reporting.Data
 {
   /// <summary>
   /// Represents a datasource based on business object of <b>IEnumerable</b> type.
@@ -41,25 +41,25 @@ namespace FastReport.Data
   {
     #region Fields
     #endregion
-    
+
     #region Properties
     /// <summary>
-    /// Occurs when FastReport engine loads data source with data from a business object.
+    /// Occurs when AM.Reporting engine loads data source with data from a business object.
     /// </summary>
     /// <remarks>
-    /// Use this event if you want to implement load-on-demand. Event handler must load the data into 
+    /// Use this event if you want to implement load-on-demand. Event handler must load the data into
     /// your business object.
     /// </remarks>
     public event LoadBusinessObjectEventHandler LoadBusinessObject;
     #endregion
-    
+
     #region Private Methods
     private void LoadData(IEnumerable enumerable, ArrayList rows)
     {
       if (enumerable == null)
         return;
       OnLoadBusinessObject();
-      
+
       IEnumerator enumerator = enumerable.GetEnumerator();
       while (enumerator.MoveNext())
       {
@@ -80,14 +80,14 @@ namespace FastReport.Data
     {
       string[] colAliases = alias.Split('.');
       Column column = this;
-      
+
       foreach (string colAlias in colAliases)
       {
         column = column.Columns.FindByAlias(colAlias);
         if (column == null)
           return null;
       }
-      
+
       return GetValue(column);
     }
 
@@ -101,7 +101,7 @@ namespace FastReport.Data
       // check if column is a list value
       if (column.PropDescriptor == null && column.PropName == "Value")
         return CurrentRow;
-        
+
       // get nested columns in right order
       List<Column> columns = new List<Column>();
       while (column != this)
@@ -115,19 +115,19 @@ namespace FastReport.Data
       {
         if (obj == null)
           return null;
-        
+
         obj = c.PropDescriptor.GetValue(obj);
       }
-      
+
       return obj;
     }
     #endregion
-    
+
     #region Public Methods
     /// <inheritdoc/>
     public override void InitSchema()
     {
-      // do nothing; the schema was initialized when we register a business object. 
+      // do nothing; the schema was initialized when we register a business object.
     }
 
     /// <inheritdoc/>
@@ -167,14 +167,14 @@ namespace FastReport.Data
           // bug fix - two-pass report shows empty data
           parent.ClearData();
         }
-      }  
+      }
     }
 
     /// <inheritdoc/>
     public override void Deserialize(FRReader reader)
     {
       base.Deserialize(reader);
-      
+
       // compatibility with old reports: try to use last part of ReferenceName as a value for PropName
       if (!String.IsNullOrEmpty(ReferenceName) && ReferenceName.Contains("."))
       {
@@ -213,7 +213,7 @@ namespace FastReport.Data
   /// <param name="sender">The source of the event.</param>
   /// <param name="e">The event data.</param>
   public delegate void LoadBusinessObjectEventHandler(object sender, LoadBusinessObjectEventArgs e);
-  
+
   /// <summary>
   /// Provides data for <see cref="LoadBusinessObjectEventHandler"/> event.
   /// </summary>
@@ -223,7 +223,7 @@ namespace FastReport.Data
     /// Parent object for this data source.
     /// </summary>
     public object parent;
-    
+
     internal LoadBusinessObjectEventArgs(object parent)
     {
             this.parent = parent;

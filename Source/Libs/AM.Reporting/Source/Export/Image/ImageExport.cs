@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,13 +21,13 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
 
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Export.Image
+namespace AM.Reporting.Export.Image
 {
     /// <summary>
     /// Specifies the image export format.
@@ -106,7 +106,7 @@ namespace FastReport.Export.Image
         }
 
         /// <summary>
-        /// Gets or sets a value that determines whether to generate separate image file 
+        /// Gets or sets a value that determines whether to generate separate image file
         /// for each exported page.
         /// </summary>
         /// <remarks>
@@ -190,7 +190,7 @@ namespace FastReport.Export.Image
         /// Gets or sets a value that determines whether the Tiff export must produce monochrome image.
         /// </summary>
         /// <remarks>
-        /// Monochrome tiff image is compressed using the compression method specified in the 
+        /// Monochrome tiff image is compressed using the compression method specified in the
         /// <see cref="MonochromeTiffCompression"/> property.
         /// </remarks>
         public bool MonochromeTiff
@@ -204,10 +204,10 @@ namespace FastReport.Export.Image
         /// </summary>
         /// <remarks>
         /// This property is used only when exporting to TIFF image, and the <see cref="MonochromeTiff"/> property
-        /// is set to <b>true</b>. 
-        /// <para/>The valid values for this property are: <b>EncoderValue.CompressionNone</b>, 
-        /// <b>EncoderValue.CompressionLZW</b>, <b>EncoderValue.CompressionRle</b>, 
-        /// <b>EncoderValue.CompressionCCITT3</b>, <b>EncoderValue.CompressionCCITT4</b>. 
+        /// is set to <b>true</b>.
+        /// <para/>The valid values for this property are: <b>EncoderValue.CompressionNone</b>,
+        /// <b>EncoderValue.CompressionLZW</b>, <b>EncoderValue.CompressionRle</b>,
+        /// <b>EncoderValue.CompressionCCITT3</b>, <b>EncoderValue.CompressionCCITT4</b>.
         /// The default compression method is CCITT4.
         /// </remarks>
         public EncoderValue MonochromeTiffCompression
@@ -529,7 +529,7 @@ namespace FastReport.Export.Image
             else
                 g = Graphics.FromImage(image);
 
-            state = g.Save(); 
+            state = g.Save();
 
             g.FillRegion(Brushes.Transparent, new Region(new RectangleF(0, curOriginY, width, height)));
             if (bigImage != null && curOriginY + height * 2 > bigImage.Height)

@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,7 +23,7 @@ using System.Data;
 using System.Data.Common;
 using System.IO;
 using System.Net;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 using System.Globalization;
 using System.Collections;
 
@@ -31,7 +31,7 @@ using System.Collections;
 
 #nullable enable
 
-namespace FastReport.Data
+namespace AM.Reporting.Data
 {
     /// <summary>
     /// Represents a connection to csv file-based database.

@@ -1,9 +1,29 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.Collections.Generic;
 using System.Text;
 
+#endregion
 
-namespace FastReport.Utils
+#nullable enable
+
+namespace AM.Reporting.Utils
 {
     /// <summary>
     /// Fast alternative of StringBuilder.
@@ -278,11 +298,11 @@ namespace FastReport.Utils
         public FastString Remove(int startIndex, int length)
         {
             sb.Remove(startIndex, length);
-            /*         
+            /*
             if (startIndex >= 0 && (length + startIndex) <= count)
             {
-                int len = count - length - startIndex;                
-                
+                int len = count - length - startIndex;
+
                 for (int i = 0; i < len; i++)
                     chars[startIndex + i] = chars[startIndex + i + length];
 
@@ -335,21 +355,21 @@ namespace FastReport.Utils
             for (int i = 0; i < count; i++)
             {
                 bool isRep = false;
-                if (chars[i] == oldValue[0]) 
+                if (chars[i] == oldValue[0])
                 {
                     int k = 1;
                     while (k < oldValue.Length && chars[i + k] == oldValue[k])
                         k++;
                     isRep = (k >= oldValue.Length);
                 }
-                if (isRep) 
+                if (isRep)
                 {
                     i += oldValue.Length - 1;
                     if (newValue != null)
                         for (int k = 0; k < newValue.Length; k++)
                             repList.Add(newValue[k]);
                 }
-                else 
+                else
                     repList.Add(chars[i]);
             }
 
@@ -371,8 +391,8 @@ namespace FastReport.Utils
         /// <returns>Position of substring.</returns>
         public int IndexOf(string value, int startIndex)
         {
-            if (!String.IsNullOrEmpty(value) && 
-                startIndex >= 0 && 
+            if (!String.IsNullOrEmpty(value) &&
+                startIndex >= 0 &&
                 startIndex < sb.Length)
             {
                 int valueIndex = 0;
@@ -399,8 +419,8 @@ namespace FastReport.Utils
         /// <returns>True if substring is identical in position.</returns>
         public bool SubstringCompare(int startIndex, string value)
         {
-            if (!String.IsNullOrEmpty(value) && 
-                startIndex >= 0 && 
+            if (!String.IsNullOrEmpty(value) &&
+                startIndex >= 0 &&
                 startIndex < sb.Length)
             {
                 int valueIndex = 0;

@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,13 +21,13 @@ using System.Text;
 using System.Data;
 using System.ComponentModel;
 
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Data
+namespace AM.Reporting.Data
 {
   /// <summary>
   /// Represents a master-detail relation between two data sources.
@@ -51,7 +51,7 @@ namespace FastReport.Data
   /// </code>
   /// </example>
   /// </remarks>
-  [TypeConverter(typeof(FastReport.TypeConverters.RelationConverter))]
+  [TypeConverter(typeof(AM.Reporting.TypeConverters.RelationConverter))]
   public partial class Relation : DataComponentBase
   {
     #region Fields
@@ -60,7 +60,7 @@ namespace FastReport.Data
     private string[] parentColumns;
     private string[] childColumns;
     #endregion
-    
+
     #region Properties
     /// <summary>
     /// Gets or sets the parent datasource.
@@ -119,10 +119,10 @@ namespace FastReport.Data
       writer.WriteRef("ParentDataSource", ParentDataSource);
       writer.WriteRef("ChildDataSource", ChildDataSource);
       writer.WriteValue("ParentColumns", ParentColumns);
-      writer.WriteValue("ChildColumns", ChildColumns);    
+      writer.WriteValue("ChildColumns", ChildColumns);
       writer.WriteBool("Enabled", Enabled);
     }
-    
+
     /// <summary>
     /// Compares this relation with another one.
     /// </summary>

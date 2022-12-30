@@ -1,14 +1,35 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.ComponentModel;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 using System.CodeDom.Compiler;
 using System.Drawing.Design;
 
-namespace FastReport
+#endregion
+
+#nullable enable
+
+namespace AM.Reporting
 {
     /// <summary>
     /// Specifies a set of actions that cannot be performed on the object in the design mode.
@@ -141,7 +162,7 @@ namespace FastReport
     }
 
     /// <summary>
-    /// Represents the root class of the FastReport object's hierarhy.
+    /// Represents the root class of the AM.Reporting object's hierarhy.
     /// </summary>
     [ToolboxItem(false)]
     public abstract partial class Base : Component, IFRSerializable
@@ -214,7 +235,7 @@ namespace FastReport
         [DefaultValue(Restrictions.None)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         [Category("Design")]
-        [Editor("FastReport.TypeEditors.FlagsEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.FlagsEditor, AM.Reporting", typeof(UITypeEditor))]
         public Restrictions Restrictions
         {
             get { return restrictions; }
@@ -225,7 +246,7 @@ namespace FastReport
         /// Gets the flags that allow some functionality in the designer.
         /// </summary>
         /// <remarks>
-        /// Use this property only if you developing a new FastReport object.
+        /// Use this property only if you developing a new AM.Reporting object.
         /// </remarks>
         [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Flags Flags
@@ -240,7 +261,7 @@ namespace FastReport
         ///   <para>Each report object must have a parent in order to appear in the report. Parent must be able to
         /// contain objects of such type.</para>
         ///   <para>Another way (preferred) to set a parent is to use specific properties of the parent object.
-        /// For example, the <see cref="Report"/> object has the <see cref="FastReport.Report.Pages"/> collection.
+        /// For example, the <see cref="Report"/> object has the <see cref="AM.Reporting.Report.Pages"/> collection.
         /// To add a new page to the report, use the following code: <c>report1.Pages.Add(new ReportPage());</c>
         ///   </para>
         /// </remarks>
@@ -482,7 +503,7 @@ namespace FastReport
         /// <param name="prop">Old property value.</param>
         /// <param name="value">New property value.</param>
         /// <remarks>
-        /// This method is used widely to set a new value to the property that references another FastReport object.
+        /// This method is used widely to set a new value to the property that references another AM.Reporting object.
         /// Method deals with the <see cref="Parent"/> property.
         /// </remarks>
         /// <example>This is example of the <c>DataBand.Header</c> property:<code>
@@ -658,7 +679,7 @@ namespace FastReport
         /// </summary>
         /// <remarks>
         /// This method is for internal use only. You can use it if you are developing a new
-        /// component for FastReport. Override it to perform some actions when the parent of an
+        /// component for AM.Reporting. Override it to perform some actions when the parent of an
         /// object is changing. This method checks that parent can contain a child.
         /// </remarks>
         /// <exception cref="ParentException" caption="">Parent object cannot contain this object.</exception>
@@ -676,7 +697,7 @@ namespace FastReport
         /// </summary>
         /// <param name="value">New parent.</param>
         /// <remarks>
-        /// This method is for internal use only. You can use it if you are developing a new component for FastReport.
+        /// This method is for internal use only. You can use it if you are developing a new component for AM.Reporting.
         /// This method does not perform any checks, it just sets the new parent.
         /// </remarks>
         public void SetParentCore(Base value)
@@ -763,7 +784,7 @@ namespace FastReport
         /// </summary>
         /// <remarks>
         ///   <para>Do not call this method directly. You should override it if you are
-        ///     developing a new component for FastReport.</para>
+        ///     developing a new component for AM.Reporting.</para>
         ///   <para>This method is called when the object needs to save the state. It may happen
         ///     when:</para>
         ///   <list type="bullet">
@@ -820,7 +841,7 @@ namespace FastReport
         /// </summary>
         /// <remarks>
         ///   <para>Do not call this method directly. You should override it if you are
-        ///     developing a new component for FastReport.</para>
+        ///     developing a new component for AM.Reporting.</para>
         ///   <para>This method is called when the object needs to restore the state. It may
         ///     happen when:</para>
         ///   <list type="bullet">
@@ -994,7 +1015,7 @@ namespace FastReport
         /// <param name="param">Event parameters.</param>
         /// <remarks>
         /// <para>Do not call this method directly. You should use it if you are developing a new component
-        /// for FastReport.</para>
+        /// for AM.Reporting.</para>
         /// <para>Use this method to call an event handler that is located in the report's script.</para>
         /// </remarks>
         /// <example>Example of the OnBeforePrint method:<code>
@@ -1019,7 +1040,7 @@ namespace FastReport
         /// </summary>
         /// <remarks>
         /// Do not call this method directly. You may override it if you are developing a new component
-        /// for FastReport.
+        /// for AM.Reporting.
         /// </remarks>
         public virtual void OnAfterLoad()
         {
@@ -1031,9 +1052,9 @@ namespace FastReport
         /// <returns>Array of expressions or <b>null</b> if object contains no expressions.</returns>
         /// <remarks>
         ///   <para>Do not call this method directly. You may override it if you are developing a
-        ///     new component for FastReport.</para>
+        ///     new component for AM.Reporting.</para>
         ///   <para>
-        ///         This method is called by FastReport each time before run a report. FastReport
+        ///         This method is called by AM.Reporting each time before run a report. AM.Reporting
         ///         do this to collect all expressions and compile them. For example,
         ///         <b>GetExpressions</b> method of the <see cref="TextObject"/> class
         ///         parses the text and returns all expressions found in the text.

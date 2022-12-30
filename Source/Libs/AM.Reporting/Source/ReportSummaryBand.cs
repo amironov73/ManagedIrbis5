@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.ComponentModel;
 
-namespace FastReport
+namespace AM.Reporting
 {
   /// <summary>
   /// Represents a report summary band.

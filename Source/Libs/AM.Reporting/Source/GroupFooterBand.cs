@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 
-namespace FastReport
+namespace AM.Reporting
 {
   /// <summary>
   /// Represents a group footer band.

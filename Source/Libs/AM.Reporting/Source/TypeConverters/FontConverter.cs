@@ -1,11 +1,19 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-// Note: the original file was modified by AlexTZ:
-// - code changed to support .Net 2.0
-// - PrivateFontCollection property added
-// - Instance property added
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
 
 using System;
 using System.Collections;
@@ -17,7 +25,11 @@ using System.Reflection;
 using System.Text;
 using System.Drawing;
 
-namespace FastReport.TypeConverters
+#endregion
+
+#nullable enable
+
+namespace AM.Reporting.TypeConverters
 {
     public class FontConverter : TypeConverter
     {

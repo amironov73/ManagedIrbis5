@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,14 +20,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Drawing;
 using System.Windows.Forms;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 using System.Linq;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Import.ListAndLabel
+namespace AM.Reporting.Import.ListAndLabel
 {
     /// <summary>
     /// Represents the List and Label import plugin.
@@ -47,7 +47,7 @@ namespace FastReport.Import.ListAndLabel
         #region Properties
 
         /// <summary>
-        /// Gets the value indicating is the report List and Label template after trying to load it. 
+        /// Gets the value indicating is the report List and Label template after trying to load it.
         /// </summary>
         public bool IsListAndLabelReport
         {

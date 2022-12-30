@@ -1,9 +1,9 @@
 using System;
 using System.Collections;
 using System.ComponentModel;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
-namespace FastReport
+namespace AM.Reporting
 {
   /// <summary>
   /// Base class for report pages and dialog forms.
@@ -19,21 +19,21 @@ namespace FastReport
     #region Properties
     internal string PageName
     {
-      get 
+      get
       {
         if (!String.IsNullOrEmpty(pageName))
           return pageName;
         return Name;
-          
+
         //string pageName = Name;
         //if (pageName.StartsWith(BaseName))
         //  pageName = pageName.Replace(BaseName, Res.Get("Objects," + ClassName));
 
-        //return pageName; 
+        //return pageName;
       }
       set { pageName = value; }
     }
-    
+
     internal bool NeedRefresh
     {
       get { return needRefresh; }
@@ -55,7 +55,7 @@ namespace FastReport
     /// Call this method when you handle object's MouseMove, MouseDown, MouseUp, MouseEnter, MouseLeave events
     /// and want to refresh the preview window.
     /// <note type="caution">
-    /// If you have changed some objects on a page, the <b>Refresh</b> method will not save the changes. 
+    /// If you have changed some objects on a page, the <b>Refresh</b> method will not save the changes.
     /// This means when you print or export the page, you will see original (unmodified) page content.
     /// If you want to save the changes, you have to use the <see cref="Modify"/> method instead.
     /// </note>
@@ -70,7 +70,7 @@ namespace FastReport
     /// </summary>
     /// <remarks>
     /// Call this method when you handle object's Click, MouseDown or MouseUp events
-    /// and want to modify an object and refresh the preview window. 
+    /// and want to modify an object and refresh the preview window.
     /// </remarks>
     public void Modify()
     {
@@ -84,7 +84,7 @@ namespace FastReport
     /// </summary>
     public PageBase()
     {
-      SetFlags(Flags.CanMove | Flags.CanResize | Flags.CanDelete | Flags.CanChangeOrder | 
+      SetFlags(Flags.CanMove | Flags.CanResize | Flags.CanDelete | Flags.CanChangeOrder |
         Flags.CanChangeParent | Flags.CanCopy, false);
     }
   }

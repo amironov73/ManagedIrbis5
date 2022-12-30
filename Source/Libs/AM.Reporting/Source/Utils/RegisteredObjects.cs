@@ -1,13 +1,35 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 //#define CATEGORY_OPTIMIZATION
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Drawing;
-using FastReport.Data;
-using FastReport.Export;
 
-namespace FastReport.Utils
+using AM.Reporting.Data;
+using AM.Reporting.Export;
+
+#endregion
+
+#nullable enable
+
+namespace AM.Reporting.Utils
 {
     public abstract class BaseObjectInfo<T> where T : BaseObjectInfo<T>
     {
@@ -407,7 +429,7 @@ namespace FastReport.Utils
     /// Contains all registered report items such as objects, export filters, wizards.
     /// </summary>
     /// <remarks>
-    /// Use this class to register own components, wizards, export filters or another items that 
+    /// Use this class to register own components, wizards, export filters or another items that
     /// need to be serialized to/from a report file.
     /// </remarks>
     /// <example>
@@ -567,9 +589,9 @@ namespace FastReport.Utils
         /// <param name="image">Image for category button.</param>
         /// <param name="text">Text for category button.</param>
         /// <remarks>
-        /// <para>Category is a button on the "Objects" toolbar that shows context menu with nested items 
-        /// when you click it. Consider using categories if you register several report objects. It can 
-        /// save space on the "Objects" toolbar. For example, FastReport registers one category called "Shapes"
+        /// <para>Category is a button on the "Objects" toolbar that shows context menu with nested items
+        /// when you click it. Consider using categories if you register several report objects. It can
+        /// save space on the "Objects" toolbar. For example, AM.Reporting registers one category called "Shapes"
         /// that contains the <b>LineObject</b> and different types of <b>ShapeObject</b>.</para>
         /// <para>The name of category must starts either with "ReportPage," or "DialogPage," depending on
         /// what kind of controls do you need to regiter in this category: report objects or dialog controls.
@@ -735,7 +757,7 @@ namespace FastReport.Utils
         /// // add a category and register an object inside it
         /// RegisteredObjects.AddCategory("ReportPage,MyCategory", myCategoryBmp, "My Category");
         /// // register another report object in MyCategory
-        /// RegisteredObjects.Add(typeof(MyReportObject), "ReportPage,MyCategory", 
+        /// RegisteredObjects.Add(typeof(MyReportObject), "ReportPage,MyCategory",
         ///   anotherReportObjectBmp, "Another Report Object");
         /// </code>
         /// </example>
@@ -752,8 +774,8 @@ namespace FastReport.Utils
         /// <param name="category">Short name of category.</param>
         /// <param name="text">Display name of category.</param>
         /// <remarks>
-        /// Short name is used to reference the category in the subsequent <see cref="InternalAddFunction"/> 
-        /// method call. It may be any value, for example, "MyFuncs". Display name of category is displayed 
+        /// Short name is used to reference the category in the subsequent <see cref="InternalAddFunction"/>
+        /// method call. It may be any value, for example, "MyFuncs". Display name of category is displayed
         /// in the "Data" window. In may be, for example, "My Functions".
         /// <para/>The following standard categories are registered by default:
         /// <list type="bullet">
@@ -825,8 +847,8 @@ namespace FastReport.Utils
         /// </list>
         /// You may use one of the standard categories, or create a new category by the
         /// <see cref="AddFunctionCategory"/> method call.
-        /// <para/>FastReport uses XML comments to display your function's description. 
-        /// To generate XML comments, enable it in your project's properties 
+        /// <para/>AM.Reporting uses XML comments to display your function's description.
+        /// To generate XML comments, enable it in your project's properties
         /// ("Project|Properties..." menu, "Build" tab, enable the "XML documentation file" checkbox).
         /// </remarks>
         /// <example>
@@ -845,7 +867,7 @@ namespace FastReport.Utils
         ///   }
         ///
         ///   /// &lt;summary&gt;
-        ///   /// Returns the larger of two 32-bit signed integers. 
+        ///   /// Returns the larger of two 32-bit signed integers.
         ///   /// &lt;/summary&gt;
         ///   /// &lt;param name="val1"&gt;The first of two values to compare.&lt;/param&gt;
         ///   /// &lt;param name="val2"&gt;The second of two values to compare.&lt;/param&gt;
@@ -856,7 +878,7 @@ namespace FastReport.Utils
         ///   }
         ///
         ///   /// &lt;summary&gt;
-        ///   /// Returns the larger of two 64-bit signed integers. 
+        ///   /// Returns the larger of two 64-bit signed integers.
         ///   /// &lt;/summary&gt;
         ///   /// &lt;param name="val1"&gt;The first of two values to compare.&lt;/param&gt;
         ///   /// &lt;param name="val2"&gt;The second of two values to compare.&lt;/param&gt;
@@ -866,19 +888,19 @@ namespace FastReport.Utils
         ///     return Math.Max(val1, val2);
         ///   }
         /// }
-        /// 
+        ///
         /// // register a category
         /// RegisteredObjects.AddFunctionCategory("MyFuncs", "My Functions");
-        ///  
+        ///
         /// // obtain MethodInfo for our functions
         /// Type myType = typeof(MyFunctions);
         /// MethodInfo myUpperCaseFunc = myType.GetMethod("MyUpperCase");
         /// MethodInfo myMaximumIntFunc = myType.GetMethod("MyMaximum", new Type[] { typeof(int), typeof(int) });
         /// MethodInfo myMaximumLongFunc = myType.GetMethod("MyMaximum", new Type[] { typeof(long), typeof(long) });
-        ///      
+        ///
         /// // register simple function
         /// RegisteredObjects.AddFunction(myUpperCaseFunc, "MyFuncs");
-        ///      
+        ///
         /// // register overridden functions
         /// RegisteredObjects.AddFunction(myMaximumIntFunc, "MyFuncs,MyMaximum");
         /// RegisteredObjects.AddFunction(myMaximumLongFunc, "MyFuncs,MyMaximum");
@@ -1087,7 +1109,7 @@ namespace FastReport.Utils
         static RegisteredObjects()
         {
             Assemblies = new List<Assembly>();
-            // add FastReport Assembly
+            // add AM.Reporting Assembly
             Assemblies.Add(Assembly.GetExecutingAssembly());
 
             Functions = new FunctionInfo();

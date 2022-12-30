@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,16 +19,16 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Drawing;
-using FastReport.Barcode;
-using FastReport.Table;
-using FastReport.Utils;
+using AM.Reporting.Barcode;
+using AM.Reporting.Table;
+using AM.Reporting.Utils;
 using System.Linq;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Import.DevExpress
+namespace AM.Reporting.Import.DevExpress
 {
     /// <summary>
     /// Represents the DevExpess import plugin.
@@ -214,7 +214,7 @@ namespace FastReport.Import.DevExpress
                 try
                 {
                     return int.Parse(value);
-                } 
+                }
                 catch
                 {
                     return -1;
@@ -296,10 +296,10 @@ namespace FastReport.Import.DevExpress
             string type = string.Empty;
             int start = devText.IndexOf(name + " = new ");
             if(start > -1)
-            {        
+            {
                 int end = devText.IndexOf(";", start);
                 start += name.Length + 7;
-                type = devText.Substring(start, end - start - 2);               
+                type = devText.Substring(start, end - start - 2);
             }
             return type;
         }
@@ -593,7 +593,7 @@ namespace FastReport.Import.DevExpress
                 TableRow row = new TableRow();
                 row.Name = rowNames[i];
                 string rowDescription = GetObjectDescription(row.Name);
-                
+
                 row.Height = GetRowColumnSize(tableInfo.Row, i, table.Height);
                 List<string> cellNames = GetChildNames(DEV_EXPRESS_TABLE_CELL, rowDescription);
 

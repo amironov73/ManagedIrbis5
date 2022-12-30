@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,14 +23,14 @@ using System.Data.Common;
 using System.Drawing.Design;
 using System.Linq;
 
-using FastReport.Data.JsonConnection;
-using FastReport.Utils;
+using AM.Reporting.Data.JsonConnection;
+using AM.Reporting.Utils;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Data
+namespace AM.Reporting.Data
 {
     /// <summary>
     /// The base class for all data connection components such as <see cref="MsSqlDataConnection"/>.
@@ -72,7 +72,7 @@ namespace FastReport.Data
                 return dataSet;
             }
         }
-        
+
         /// <summary>
         /// Gets a collection of data tables in this connection.
         /// </summary>
@@ -91,11 +91,11 @@ namespace FastReport.Data
         /// Gets or sets a connection string that contains all connection parameters.
         /// </summary>
         /// <remarks>
-        /// <para>To modify some parameter of the connection, use respective 
+        /// <para>To modify some parameter of the connection, use respective
         /// <b>ConnectionStringBuilder</b> class.</para>
-        /// <para><b>Security note:</b> the connection string may contain a user name/password. 
+        /// <para><b>Security note:</b> the connection string may contain a user name/password.
         /// This information is stored in a report file. By default, it is crypted using the standard
-        /// FastReport's password. Since FastReport's source code is available to anyone who paid for it,
+        /// AM.Reporting's password. Since AM.Reporting's source code is available to anyone who paid for it,
         /// it may be insecure to use the standard password. For more security, you should use own
         /// password. To do this, specify it in the <b>Crypter.DefaultPassword</b> property.</para>
         /// </remarks>
@@ -122,20 +122,20 @@ namespace FastReport.Data
         /// Gets or sets an expression that returns a connection string.
         /// </summary>
         /// <remarks>
-        /// Use this property to set the connection string dynamically. 
-        /// <para/>The recommended way to do this is to define a report parameter. You can do this in the 
-        /// "Data" window. Once you have defined the parameter, you can use it to pass a value 
+        /// Use this property to set the connection string dynamically.
+        /// <para/>The recommended way to do this is to define a report parameter. You can do this in the
+        /// "Data" window. Once you have defined the parameter, you can use it to pass a value
         /// to the connection. Set the <b>ConnectionStringExpression</b> property of the
         /// connection object to the report parameter's name (so it will look like [myReportParam]).
-        /// To pass a value to the report parameter from your application, use the 
+        /// To pass a value to the report parameter from your application, use the
         /// <see cref="Report.SetParameterValue"/> method.
         /// <note type="caution">
-        /// Once you set value for this property, the <see cref="ConnectionString"/> property will be ignored 
+        /// Once you set value for this property, the <see cref="ConnectionString"/> property will be ignored
         /// when report is run.
         /// </note>
         /// </remarks>
         [Category("Data")]
-        [Editor("FastReport.TypeEditors.ExpressionEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof(UITypeEditor))]
         public string ConnectionStringExpression
         {
             get
@@ -172,7 +172,7 @@ namespace FastReport.Data
         /// Set <b>LoginPrompt</b> to <b>true</b> to provide login dialog when establishing a connection. If this
         /// property is <b>false</b> (by default), you should provide login information (user name and password)
         /// in the <see cref="ConnectionString"/> property. Though that property is stored in a crypted form,
-        /// this may be insecure. 
+        /// this may be insecure.
         /// <para/>Another way to pass login information to the connection is to use
         /// <see cref="ConnectionStringExpression"/> property that is bound to the report parameter. In that
         /// case you supply the entire connection string from your application.
@@ -253,7 +253,7 @@ namespace FastReport.Data
         /// </summary>
         /// <returns>The <b>DataSet</b> object.</returns>
         /// <remarks>
-        /// This method is used to support FastReport infrastructure. You don't need to use it.
+        /// This method is used to support AM.Reporting infrastructure. You don't need to use it.
         /// </remarks>
         protected virtual DataSet CreateDataSet()
         {
@@ -266,7 +266,7 @@ namespace FastReport.Data
         /// Disposes a <b>DataSet</b>.
         /// </summary>
         /// <remarks>
-        /// This method is used to support FastReport infrastructure. You don't need to use it.
+        /// This method is used to support AM.Reporting infrastructure. You don't need to use it.
         /// </remarks>
         protected void DisposeDataSet()
         {
@@ -356,7 +356,7 @@ namespace FastReport.Data
         /// Fills the <see cref="Tables"/> collection with all tables available in the database.
         /// </summary>
         /// <remarks>
-        /// This method does not read the table data; to do this, call the 
+        /// This method does not read the table data; to do this, call the
         /// <see cref="TableDataSource.LoadData"/> method of each table.
         /// </remarks>
         public void CreateAllTables()
@@ -586,7 +586,7 @@ namespace FastReport.Data
         /// <returns><b>Type</b> instance.</returns>
         /// <remarks>
         /// You should override this method if you developing a new connection component.
-        /// <para/>If your connection component does not use data connection, you need to override 
+        /// <para/>If your connection component does not use data connection, you need to override
         /// the <see cref="FillTableSchema"/> and <see cref="FillTableData"/> methods instead.
         /// </remarks>
         /// <example>Here is the example of this method implementation:
@@ -713,7 +713,7 @@ namespace FastReport.Data
         /// <remarks>
         /// You should override this method if you are developing a new connection component. In this method,
         /// you need to create the adapter and set its <b>SelectCommand</b>'s parameters.
-        /// <para/>If your connection does not use data adapter, you need to override 
+        /// <para/>If your connection does not use data adapter, you need to override
         /// the <see cref="FillTableSchema"/> and <see cref="FillTableData"/> methods instead.
         /// </remarks>
         /// <example>Here is the example of this method implementation:

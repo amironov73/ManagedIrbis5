@@ -1,18 +1,39 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace FastReport.Utils
+#endregion
+
+#nullable enable
+
+namespace AM.Reporting.Utils
 {
   /// <summary>
   /// Base class for plugin's assembly initializer.
   /// </summary>
   /// <remarks>
-  /// FastReport has an open architecture. That means you can extend it with own classes
+  /// AM.Reporting has an open architecture. That means you can extend it with own classes
   /// such as report objects, wizards, export filters. Usually such classes are
-  /// placed in separate dlls (plugins). FastReport has mechanism to load plugin dlls. You can specify 
-  /// which plugins to load at first start, in the FastReport configuration file (by default it is located in the
-  /// C:\Documents and Settings\User_Name\Local Settings\Application Data\FastReport\FastReport.config file).
+  /// placed in separate dlls (plugins). AM.Reporting has mechanism to load plugin dlls. You can specify
+  /// which plugins to load at first start, in the AM.Reporting configuration file (by default it is located in the
+  /// C:\Documents and Settings\User_Name\Local Settings\Application Data\AM.Reporting\AM.Reporting.config file).
   /// To do this, add an xml item with your plugin name inside the &lt;Plugins&gt; item:
   /// <code>
   /// &lt;?xml version="1.0" encoding="utf-8"?&gt;
@@ -22,8 +43,8 @@ namespace FastReport.Utils
   ///   &lt;/Plugins&gt;
   /// &lt;/Config&gt;
   /// </code>
-  /// When you run your application and use the <b>Report</b> object first time, all plugins will be loaded. 
-  /// To register objects contained in a plugin, FastReport searches for classes of type 
+  /// When you run your application and use the <b>Report</b> object first time, all plugins will be loaded.
+  /// To register objects contained in a plugin, AM.Reporting searches for classes of type
   /// <b>AssemblyInitializerBase</b> and instantiates them.
   /// <para>Use this class to register custom report objects, controls, wizards, exports that
   /// are contained in the assembly. To do this, make your own class of the <b>AssemblyInitializerBase</b>

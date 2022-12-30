@@ -1,3 +1,20 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.IO;
 using System.Collections;
@@ -8,7 +25,11 @@ using System.Collections.Generic;
 using System.Text;
 using System.Globalization;
 
-namespace FastReport.Utils
+#endregion
+
+#nullable enable
+
+namespace AM.Reporting.Utils
 {
     /// <summary>
     /// Specifies the target for the serialize operation.
@@ -156,16 +177,16 @@ namespace FastReport.Utils
         /// {
         ///   // get the etalon object. It will be used to write changed properties only.
         ///   Base c = writer.DiffObject as Base;
-        /// 
+        ///
         ///   // write the type name
         ///   writer.ItemName = ClassName;
-        /// 
+        ///
         ///   // write properties
         ///   if (Name != "")
         ///     writer.WriteStr("Name", Name);
         ///   if (Restrictions != c.Restrictions)
         ///     writer.WriteValue("Restrictions", Restrictions);
-        ///   
+        ///
         ///   // write child objects if allowed
         ///   if (writer.SaveChildren)
         ///   {
@@ -410,7 +431,7 @@ namespace FastReport.Utils
         }
 
         /// <summary>
-        /// Initializes a new instance of the <b>FRWriter</b> class with specified xml item that will 
+        /// Initializes a new instance of the <b>FRWriter</b> class with specified xml item that will
         /// receive writer's output.
         /// </summary>
         /// <param name="root">The xml item that will receive writer's output.</param>

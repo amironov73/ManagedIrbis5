@@ -1,9 +1,9 @@
 using System.ComponentModel;
-using FastReport.Utils;
-using FastReport.Data;
+using AM.Reporting.Utils;
+using AM.Reporting.Data;
 using System.Drawing.Design;
 
-namespace FastReport
+namespace AM.Reporting
 {
   /// <summary>
   /// Specifies a sort order.
@@ -11,13 +11,13 @@ namespace FastReport
   /// <remarks>
   /// This enumeration is used in the group header and in the "Matrix" object.
   /// </remarks>
-  public enum SortOrder 
-  { 
+  public enum SortOrder
+  {
     /// <summary>
     /// Specifies no sort (natural order).
     /// </summary>
-    None, 
-    
+    None,
+
     /// <summary>
     /// Specifies an ascending sort order.
     /// </summary>
@@ -33,7 +33,7 @@ namespace FastReport
   /// Represents a group header band.
   /// </summary>
   /// <remarks>
-  /// A simple group consists of one <b>GroupHeaderBand</b> and the <b>DataBand</b> that is set 
+  /// A simple group consists of one <b>GroupHeaderBand</b> and the <b>DataBand</b> that is set
   /// to the <see cref="Data"/> property. To create the nested groups, use the <see cref="NestedGroup"/> property.
   /// <note type="caution">
   /// Only the last nested group can have data band.
@@ -45,7 +45,7 @@ namespace FastReport
   /// <example>This example shows how to create nested groups.
   /// <code>
   /// ReportPage page = report.Pages[0] as ReportPage;
-  /// 
+  ///
   /// // create the main group
   /// GroupHeaderBand mainGroup = new GroupHeaderBand();
   /// mainGroup.Height = Units.Millimeters * 10;
@@ -53,7 +53,7 @@ namespace FastReport
   /// mainGroup.Condition = "[Orders.CustomerName]";
   /// // add a group to the page
   /// page.Bands.Add(mainGroup);
-  /// 
+  ///
   /// // create the nested group
   /// GroupHeaderBand nestedGroup = new GroupHeaderBand();
   /// nestedGroup.Height = Units.Millimeters * 10;
@@ -61,7 +61,7 @@ namespace FastReport
   /// nestedGroup.Condition = "[Orders.OrderDate]";
   /// // add it to the main group
   /// mainGroup.NestedGroup = nestedGroup;
-  /// 
+  ///
   /// // create a data band
   /// DataBand dataBand = new DataBand();
   /// dataBand.Height = Units.Millimeters * 10;
@@ -110,7 +110,7 @@ namespace FastReport
     public GroupHeaderBand NestedGroup
     {
       get { return nestedGroup; }
-      set 
+      set
       {
         SetProp(nestedGroup, value);
         nestedGroup = value;
@@ -192,22 +192,22 @@ namespace FastReport
     /// Gets or sets the group condition.
     /// </summary>
     /// <remarks>
-    /// This property can contain any valid expression. When running a report, this expression is calculated 
-    /// for each data row. When the value of this condition is changed, FastReport starts a new group.
+    /// This property can contain any valid expression. When running a report, this expression is calculated
+    /// for each data row. When the value of this condition is changed, AM.Reporting starts a new group.
     /// </remarks>
     [Category("Data")]
-    [Editor("FastReport.TypeEditors.ExpressionEditor, FastReport", typeof(UITypeEditor))]
+    [Editor("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof(UITypeEditor))]
     public string Condition
     {
       get { return condition; }
       set { condition = value; }
     }
-    
+
     /// <summary>
     /// Gets or sets the sort order.
     /// </summary>
     /// <remarks>
-    /// FastReport can sort data rows automatically using the <see cref="Condition"/> value.
+    /// AM.Reporting can sort data rows automatically using the <see cref="Condition"/> value.
     /// </remarks>
     [DefaultValue(SortOrder.Ascending)]
     [Category("Behavior")]
@@ -244,13 +244,13 @@ namespace FastReport
 
     internal DataSourceBase DataSource
     {
-      get 
-      { 
+      get
+      {
         DataBand dataBand = GroupDataBand;
         return dataBand == null ? null : dataBand.DataSource;
-      }  
+      }
     }
-    
+
     internal DataBand GroupDataBand
     {
       get
@@ -263,7 +263,7 @@ namespace FastReport
           group = group.NestedGroup;
         }
         return null;
-      }  
+      }
     }
     #endregion
 
@@ -285,9 +285,9 @@ namespace FastReport
     /// <inheritdoc/>
     public override bool CanContain(Base child)
     {
-      return base.CanContain(child) || 
-        (child is DataBand && nestedGroup == null && data == null) || 
-        (child is GroupHeaderBand && (nestedGroup == null || nestedGroup is GroupHeaderBand) && data == null) || 
+      return base.CanContain(child) ||
+        (child is DataBand && nestedGroup == null && data == null) ||
+        (child is GroupHeaderBand && (nestedGroup == null || nestedGroup is GroupHeaderBand) && data == null) ||
         child is GroupFooterBand || child is DataHeaderBand || child is DataFooterBand;
     }
 
@@ -299,7 +299,7 @@ namespace FastReport
         base.AddChild(child);
         return;
       }
-      
+
       if (child is GroupHeaderBand)
         NestedGroup = child as GroupHeaderBand;
       else if (child is DataBand)
@@ -339,7 +339,7 @@ namespace FastReport
     public override void Assign(Base source)
     {
       base.Assign(source);
-      
+
       GroupHeaderBand src = source as GroupHeaderBand;
       Condition = src.Condition;
       SortOrder = src.SortOrder;
@@ -354,7 +354,7 @@ namespace FastReport
       base.Serialize(writer);
       if (writer.SerializeTo == SerializeTo.Preview)
         return;
-      
+
       if (Condition != c.Condition)
         writer.WriteStr("Condition", Condition);
       if (SortOrder != c.SortOrder)
@@ -379,7 +379,7 @@ namespace FastReport
         return Data.IsEmpty();
       return base.IsEmpty();
     }
-    
+
     internal void InitDataSource()
     {
       DataBand dataBand = GroupDataBand;
@@ -395,10 +395,10 @@ namespace FastReport
         }
         group = group.NestedGroup;
       }
-      
+
       dataBand.InitDataSource();
     }
-    
+
     internal void FinalizeDataSource()
     {
       DataBand dataBand = GroupDataBand;
@@ -411,7 +411,7 @@ namespace FastReport
         group = group.NestedGroup;
       }
     }
-    
+
     internal void ResetGroupValue()
     {
       if (!string.IsNullOrEmpty(Condition))
@@ -428,7 +428,7 @@ namespace FastReport
     {
       object value = null;
       if (!string.IsNullOrEmpty(Condition))
-      { 
+      {
         value = Report.Calc(Condition);
       }
       else
@@ -439,12 +439,12 @@ namespace FastReport
       {
         if (value == null)
           return false;
-        return true;  
+        return true;
       }
       return !groupValue.Equals(value);
     }
     #endregion
-    
+
     /// <summary>
     /// Initializes a new instance of the <see cref="GroupHeaderBand"/> class with default settings.
     /// </summary>

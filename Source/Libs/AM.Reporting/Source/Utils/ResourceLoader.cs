@@ -1,3 +1,20 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -6,7 +23,11 @@ using System.IO;
 using System.Reflection;
 using System.IO.Compression;
 
-namespace FastReport.Utils
+#endregion
+
+#nullable enable
+
+namespace AM.Reporting.Utils
 {
     /// <summary>
     /// Resource loader class.
@@ -37,13 +58,13 @@ namespace FastReport.Utils
         }
 
         /// <summary>
-        /// Gets a stream from FastReport assembly resource.
+        /// Gets a stream from AM.Reporting assembly resource.
         /// </summary>
         /// <param name="resource">Resource name.</param>
         /// <returns>Stream object.</returns>
         public static Stream GetStream(string resource)
         {
-            return GetStream("FastReport", resource);
+            return GetStream("AM.Reporting", resource);
         }
 
         /// <summary>
@@ -68,13 +89,13 @@ namespace FastReport.Utils
         }
 
         /// <summary>
-        /// Gets a stream from specified FastReport assembly resource and unpacks it.
+        /// Gets a stream from specified AM.Reporting assembly resource and unpacks it.
         /// </summary>
         /// <param name="resource">Resource name.</param>
         /// <returns>Stream object.</returns>
         public static Stream UnpackStream(string resource)
         {
-            return UnpackStream("FastReport", resource);
+            return UnpackStream("AM.Reporting", resource);
         }
     }
 }

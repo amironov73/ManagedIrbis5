@@ -9,14 +9,14 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using FastReport.Engine;
-using FastReport.Utils;
+using AM.Reporting.Engine;
+using AM.Reporting.Utils;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -27,7 +27,7 @@ using System.Windows.Forms;
 
 #nullable enable
 
-namespace FastReport.Preview
+namespace AM.Reporting.Preview
 {
     internal class PreparedPage : IDisposable
     {

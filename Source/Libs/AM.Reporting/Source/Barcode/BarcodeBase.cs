@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,18 +19,18 @@ using System;
 using System.Drawing;
 using System.ComponentModel;
 
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Barcode
+namespace AM.Reporting.Barcode
 {
     /// <summary>
     /// The base class for all barcodes.
     /// </summary>
-    [TypeConverter(typeof(FastReport.TypeConverters.BarcodeConverter))]
+    [TypeConverter(typeof(AM.Reporting.TypeConverters.BarcodeConverter))]
     public abstract class BarcodeBase
     {
         #region Fields

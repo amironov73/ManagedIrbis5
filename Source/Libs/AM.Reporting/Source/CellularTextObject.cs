@@ -1,10 +1,31 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.Drawing;
 using System.ComponentModel;
-using FastReport.Utils;
-using FastReport.Table;
+using AM.Reporting.Utils;
+using AM.Reporting.Table;
 
-namespace FastReport
+#endregion
+
+#nullable enable
+
+namespace AM.Reporting
 {
     /// <summary>
     /// Represents a text object which draws each symbol of text in its own cell.
@@ -36,7 +57,7 @@ namespace FastReport
         /// automatically based on its font.
         /// </remarks>
         [Category("Appearance")]
-        [TypeConverter("FastReport.TypeConverters.UnitsConverter, FastReport")]
+        [TypeConverter("AM.Reporting.TypeConverters.UnitsConverter, AM.Reporting")]
         public float CellWidth
         {
             get { return cellWidth; }
@@ -51,7 +72,7 @@ namespace FastReport
         /// automatically based on its font.
         /// </remarks>
         [Category("Appearance")]
-        [TypeConverter("FastReport.TypeConverters.UnitsConverter, FastReport")]
+        [TypeConverter("AM.Reporting.TypeConverters.UnitsConverter, AM.Reporting")]
         public float CellHeight
         {
             get { return cellHeight; }
@@ -62,7 +83,7 @@ namespace FastReport
         /// Gets or sets the horizontal spacing between cells, in pixels.
         /// </summary>
         [Category("Appearance")]
-        [TypeConverter("FastReport.TypeConverters.UnitsConverter, FastReport")]
+        [TypeConverter("AM.Reporting.TypeConverters.UnitsConverter, AM.Reporting")]
         public float HorzSpacing
         {
             get { return horzSpacing; }
@@ -73,7 +94,7 @@ namespace FastReport
         /// Gets or sets the vertical spacing between cells, in pixels.
         /// </summary>
         [Category("Appearance")]
-        [TypeConverter("FastReport.TypeConverters.UnitsConverter, FastReport")]
+        [TypeConverter("AM.Reporting.TypeConverters.UnitsConverter, AM.Reporting")]
         public float VertSpacing
         {
             get { return vertSpacing; }

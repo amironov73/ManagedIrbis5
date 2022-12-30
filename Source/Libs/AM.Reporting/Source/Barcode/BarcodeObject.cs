@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,19 +22,19 @@ using System.Drawing;
 using System.Drawing.Text;
 using System.Drawing.Drawing2D;
 
-using FastReport.Utils;
-using FastReport.Code;
+using AM.Reporting.Utils;
+using AM.Reporting.Code;
 
 using System.Windows.Forms;
 using System.Drawing.Design;
 
-using FastReport.Barcode.QRCode;
+using AM.Reporting.Barcode.QRCode;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Barcode
+namespace AM.Reporting.Barcode
 {
     /// <summary>
     /// Represents a barcode object.
@@ -125,7 +125,7 @@ namespace FastReport.Barcode
         /// Gets or sets the barcode type.
         /// </summary>
         [Category("Appearance")]
-        [Editor("FastReport.TypeEditors.BarcodeEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.BarcodeEditor, AM.Reporting", typeof(UITypeEditor))]
         public BarcodeBase Barcode
         {
             get { return barcode; }
@@ -230,7 +230,7 @@ namespace FastReport.Barcode
         /// Value must be in the form "Datasource.Column".
         /// </remarks>
         [Category("Data")]
-        [Editor("FastReport.TypeEditors.DataColumnEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.DataColumnEditor, AM.Reporting", typeof(UITypeEditor))]
         public string DataColumn
         {
             get { return dataColumn; }
@@ -241,7 +241,7 @@ namespace FastReport.Barcode
         /// Gets or sets an expression that contains the barcode data.
         /// </summary>
         [Category("Data")]
-        [Editor("FastReport.TypeEditors.ExpressionEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof(UITypeEditor))]
         public string Expression
         {
             get { return expression; }
@@ -284,7 +284,7 @@ namespace FastReport.Barcode
         /// Gets or sets the barcode data.
         /// </summary>
         [Category("Data")]
-        [Editor("FastReport.TypeEditors.ExpressionEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof(UITypeEditor))]
         public string Text
         {
             get { return text; }

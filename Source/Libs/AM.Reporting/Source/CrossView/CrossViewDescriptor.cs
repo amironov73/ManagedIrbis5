@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,14 +19,14 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-using FastReport.Table;
-using FastReport.Utils;
+using AM.Reporting.Table;
+using AM.Reporting.Utils;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.CrossView
+namespace AM.Reporting.CrossView
 {
     /// <summary>
     /// The base class for matrix element descriptors such as <see cref="CrossViewHeaderDescriptor"/> and
@@ -84,7 +84,7 @@ namespace FastReport.CrossView
     /// </summary>
     /// <remarks>
     /// Using this property, you may access the matrix cell which is bound to
-    /// this descriptor. It may be useful to change the cell's appearance. 
+    /// this descriptor. It may be useful to change the cell's appearance.
     /// <note>
     /// Before using this property, you must initialize the matrix descriptors by
     /// calling the <see cref="CrossViewObject.BuildTemplate"/> method.

@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
-namespace FastReport
+namespace AM.Reporting
 {
   /// <summary>
   /// Represents a collection of the <see cref="StyleCollection"/> objects.
@@ -70,7 +70,7 @@ namespace FastReport
     /// Returns the zero-based index of the first occurrence of an object.
     /// </summary>
     /// <param name="value">The object to locate in the collection.</param>
-    /// <returns>The zero-based index of the first occurrence of value within the entire collection, if found; 
+    /// <returns>The zero-based index of the first occurrence of value within the entire collection, if found;
     /// otherwise, -1.</returns>
     public int IndexOf(StyleCollection value)
     {
@@ -81,7 +81,7 @@ namespace FastReport
     /// Returns the zero-based index of the first occurrence of a style collection with specified name.
     /// </summary>
     /// <param name="value">The style collection name to locate in the collection.</param>
-    /// <returns>The zero-based index of the first occurrence of value within the entire collection, if found; 
+    /// <returns>The zero-based index of the first occurrence of value within the entire collection, if found;
     /// otherwise, -1.</returns>
     public int IndexOf(string value)
     {

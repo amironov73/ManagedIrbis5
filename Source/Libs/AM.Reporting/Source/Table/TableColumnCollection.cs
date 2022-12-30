@@ -1,10 +1,32 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Collections;
-using FastReport.Utils;
 
-namespace FastReport.Table
+using AM.Reporting.Utils;
+
+#endregion
+
+#nullable enable
+
+namespace AM.Reporting.Table
 {
   /// <summary>
   /// Represents a collection of <see cref="TableColumn"/> objects.
@@ -18,8 +40,8 @@ namespace FastReport.Table
     /// <returns>The column with specified index.</returns>
     public TableColumn this[int index]
     {
-      get 
-      { 
+      get
+      {
         TableColumn column = List[index] as TableColumn;
         column.SetIndex(index);
         return column;

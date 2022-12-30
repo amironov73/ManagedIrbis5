@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,7 +20,7 @@ using System.Data;
 using System.ComponentModel;
 using System.Reflection;
 using System.Collections;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 using System.IO;
 using System.Drawing.Design;
 
@@ -28,7 +28,7 @@ using System.Drawing.Design;
 
 #nullable enable
 
-namespace FastReport.Data
+namespace AM.Reporting.Data
 {
     /// <summary>
     /// Represents a datasource based on <b>DataTable</b> class.
@@ -84,7 +84,7 @@ namespace FastReport.Data
         /// property.
         /// </remarks>
         [Category("Data")]
-        [Editor("FastReport.TypeEditors.SqlEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.SqlEditor, AM.Reporting", typeof(UITypeEditor))]
         public string SelectCommand
         {
             get { return selectCommand; }
@@ -95,14 +95,14 @@ namespace FastReport.Data
         /// Gets a collection of parameters used by "select" command.
         /// </summary>
         /// <remarks>
-        /// You must set up this property if the SQL query that you've specified in the 
+        /// You must set up this property if the SQL query that you've specified in the
         /// <see cref="SelectCommand"/> property contains parameters.
         /// <para/>You can pass a value to the SQL parameter in two ways.
-        /// <para/>The right way is to define a report parameter. You can do this in the 
-        /// "Data" window. Once you have defined the parameter, you can use it to pass a value 
+        /// <para/>The right way is to define a report parameter. You can do this in the
+        /// "Data" window. Once you have defined the parameter, you can use it to pass a value
         /// to the SQL parameter. To do this, set the SQL parameter's <b>Expression</b> property
         /// to the report parameter's name (so it will look like [myReportParam]).
-        /// To pass a value to the report parameter from your application, use the 
+        /// To pass a value to the report parameter from your application, use the
         /// <see cref="Report.SetParameterValue"/> method.
         /// <para/>The other way (unrecommended) is to find a datasource object and set its parameter from a code:
         /// <code>
@@ -112,7 +112,7 @@ namespace FastReport.Data
         /// This way is not good because you hardcode the report object's name.
         /// </remarks>
         [Category("Data")]
-        [Editor("FastReport.TypeEditors.CommandParametersEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.CommandParametersEditor, AM.Reporting", typeof(UITypeEditor))]
         public CommandParameterCollection Parameters
         {
             get { return parameters; }

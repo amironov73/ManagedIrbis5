@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
-namespace FastReport
+namespace AM.Reporting
 {
   /// <summary>
   /// Provides the serialize/deserialize functionality.
@@ -15,7 +15,7 @@ namespace FastReport
     /// </summary>
     /// <param name="writer">Writer object.</param>
     void Serialize(FRWriter writer);
-    
+
     /// <summary>
     /// Deserializes the object.
     /// </summary>

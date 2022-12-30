@@ -9,13 +9,13 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using FastReport.Utils;
+using AM.Reporting.Utils;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -24,7 +24,7 @@ using System.Text.RegularExpressions;
 
 #nullable enable
 
-namespace FastReport.Barcode
+namespace AM.Reporting.Barcode
 {
     /// <summary>
     /// Represents a class that contains all parameters of Swiss QR Code.
@@ -167,7 +167,7 @@ namespace FastReport.Barcode
         /// </summary>
         /// <param name="referenceType">Type of the reference (QRR, SCOR or NON)</param>
         /// <param name="reference">Reference text</param>
-        /// <param name="referenceTextType">Type of the reference text (QR-reference or Creditor Reference)</param>                
+        /// <param name="referenceTextType">Type of the reference text (QR-reference or Creditor Reference)</param>
         public Reference(ReferenceType referenceType, string reference, ReferenceTextType? referenceTextType)
         {
             MyRes res = new MyRes("Messages,Swiss");

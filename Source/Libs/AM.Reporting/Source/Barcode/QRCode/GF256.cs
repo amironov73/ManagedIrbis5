@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,20 +21,20 @@ using System;
 
 #nullable enable
 
-namespace FastReport.Barcode.QRCode
+namespace AM.Reporting.Barcode.QRCode
 {
-  
+
   /*/// <summary> <p>This class contains utility methods for performing mathematical operations over
   /// the Galois Field GF(256). Operations use a given primitive polynomial in calculations.</p>
-  /// 
+  ///
   /// <p>Throughout this package, elements of GF(256) are represented as an <code>int</code>
   /// for convenience and speed (but at the cost of memory).
   /// Only the bottom 8 bits are really used.</p>
-  /// 
+  ///
   /// </summary>
   /// <author>  Sean Owen
   /// </author>
-  /// <author>www.Redivivus.in (suraj.supekar@redivivus.in) - Ported from ZXING Java Source 
+  /// <author>www.Redivivus.in (suraj.supekar@redivivus.in) - Ported from ZXING Java Source
   /// </author>*/
   internal sealed class GF256
   {
@@ -44,7 +44,7 @@ namespace FastReport.Barcode.QRCode
       {
         return zero;
       }
-      
+
     }
     internal GF256Poly One
     {
@@ -52,12 +52,12 @@ namespace FastReport.Barcode.QRCode
       {
         return one;
       }
-      
+
     }
-    
+
     //UPGRADE_NOTE: Final was removed from the declaration of 'QR_CODE_FIELD '. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1003'"
     public static readonly GF256 QR_CODE_FIELD = new GF256(0x011D); // x^8 + x^4 + x^3 + x^2 + 1
-    
+
     //UPGRADE_NOTE: Final was removed from the declaration of 'expTable '. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1003'"
     private int[] expTable;
     //UPGRADE_NOTE: Final was removed from the declaration of 'logTable '. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1003'"
@@ -66,9 +66,9 @@ namespace FastReport.Barcode.QRCode
     private GF256Poly zero;
     //UPGRADE_NOTE: Final was removed from the declaration of 'one '. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1003'"
     private GF256Poly one;
-    
+
     /*/// <summary> Create a representation of GF(256) using the given primitive polynomial.
-    /// 
+    ///
     /// </summary>
     /// <param name="primitive">irreducible polynomial whose coefficients are represented by
     /// the bits of an int, where the least-significant bit represents the constant
@@ -96,7 +96,7 @@ namespace FastReport.Barcode.QRCode
       zero = new GF256Poly(this, new int[]{0});
       one = new GF256Poly(this, new int[]{1});
     }
-    
+
     /*/// <returns> the monomial representing coefficient * x^degree
     /// </returns>*/
     internal GF256Poly buildMonomial(int degree, int coefficient)
@@ -113,9 +113,9 @@ namespace FastReport.Barcode.QRCode
       coefficients[0] = coefficient;
       return new GF256Poly(this, coefficients);
     }
-    
+
     /*/// <summary> Implements both addition and subtraction -- they are the same in GF(256).
-    /// 
+    ///
     /// </summary>
     /// <returns> sum/difference of a and b
     /// </returns>*/
@@ -123,14 +123,14 @@ namespace FastReport.Barcode.QRCode
     {
       return a ^ b;
     }
-    
+
     /*/// <returns> 2 to the power of a in GF(256)
     /// </returns>*/
     internal int exp(int a)
     {
       return expTable[a];
     }
-    
+
     /*/// <returns> base 2 log of a in GF(256)
     /// </returns>*/
     internal int log(int a)
@@ -141,7 +141,7 @@ namespace FastReport.Barcode.QRCode
       }
       return logTable[a];
     }
-    
+
     /*/// <returns> multiplicative inverse of a
     /// </returns>*/
     internal int inverse(int a)
@@ -152,7 +152,7 @@ namespace FastReport.Barcode.QRCode
       }
       return expTable[255 - logTable[a]];
     }
-    
+
     /*/// <param name="a">
     /// </param>
     /// <param name="b">

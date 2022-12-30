@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,7 +23,7 @@ using System.ComponentModel;
 
 #nullable enable
 
-namespace FastReport.Barcode.Aztec
+namespace AM.Reporting.Barcode.Aztec
 {
    /// <summary>
    /// Defines an container for encoder options
@@ -36,9 +36,9 @@ namespace FastReport.Barcode.Aztec
       /// Gets the data container for all options
       /// </summary>
       [Browsable(false)]
-      public IDictionary<EncodeHintType, object> Hints 
+      public IDictionary<EncodeHintType, object> Hints
       {
-          get { return hints; }  
+          get { return hints; }
       }
 
       /// <summary>

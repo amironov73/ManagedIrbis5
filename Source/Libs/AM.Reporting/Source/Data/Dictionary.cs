@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,18 +20,18 @@ using System.Collections.Generic;
 using System.Text;
 using System.Data;
 using System.IO;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 using System.CodeDom;
 using System.ComponentModel;
 using System.Collections;
-using FastReport.CrossView;
+using AM.Reporting.CrossView;
 using System.Windows.Forms;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Data
+namespace AM.Reporting.Data
 {
     /// <summary>
     /// This class stores all report data items such as datasources, connections, relations, parameters,
@@ -65,12 +65,12 @@ namespace FastReport.Data
         }
 
         /// <summary>
-        /// Gets a collection of datasources available in a report. 
+        /// Gets a collection of datasources available in a report.
         /// </summary>
         /// <remarks>
-        /// Usually you don't need to use this property. It contains only datasources 
-        /// registered using the <b>RegisterData</b> method. All other datasources are contained 
-        /// in connection objects and may be accessed via <see cref="Connections"/> property. 
+        /// Usually you don't need to use this property. It contains only datasources
+        /// registered using the <b>RegisterData</b> method. All other datasources are contained
+        /// in connection objects and may be accessed via <see cref="Connections"/> property.
         /// </remarks>
         public DataSourceCollection DataSources
         {
@@ -121,10 +121,10 @@ namespace FastReport.Data
         }
 
         /// <summary>
-        /// Gets a collection of cubesources available in a report. 
+        /// Gets a collection of cubesources available in a report.
         /// </summary>
         /// <remarks>
-        /// Usually you don't need to use this property. It contains only cubesources 
+        /// Usually you don't need to use this property. It contains only cubesources
         /// registered using the <b>RegisterData</b> method.
         /// </remarks>
         public CubeSourceCollection CubeSources
@@ -229,7 +229,7 @@ namespace FastReport.Data
                 // check tables inside connections. Are we trying to replace the connection table
                 // with table provided by an application?
                 source = FindByAlias(referenceName) as TableDataSource;
-                // check "Data.TableName" case 
+                // check "Data.TableName" case
                 if (source == null && referenceName.StartsWith("Data."))
                     source = FindByAlias(referenceName.Remove(0, 5)) as TableDataSource;
                 if (source != null && (source.Connection != null || source.IgnoreConnection))

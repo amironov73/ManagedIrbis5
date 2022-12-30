@@ -1,11 +1,11 @@
 using System;
 using System.ComponentModel;
-using FastReport.Utils;
-using FastReport.Format;
+using AM.Reporting.Utils;
+using AM.Reporting.Format;
 using System.Windows.Forms;
 using System.Drawing.Design;
 
-namespace FastReport
+namespace AM.Reporting
 {
     /// <summary>
     /// Specifies how to display the duplicate values.
@@ -85,7 +85,7 @@ namespace FastReport
         GroupFinished,
 
         /// <summary>
-        /// Specifies that the text object is processed manually when you call the <b>Engine.ProcessObject</b> 
+        /// Specifies that the text object is processed manually when you call the <b>Engine.ProcessObject</b>
         /// method in the report script.
         /// </summary>
         Custom
@@ -130,7 +130,7 @@ namespace FastReport
         /// Gets or sets the symbols that will be used to find expressions in the object's text.
         /// </summary>
         /// <remarks>
-        /// The default property value is "[,]". As you can see, the open and close symbols are 
+        /// The default property value is "[,]". As you can see, the open and close symbols are
         /// separated by the comma. You may use another symbols, for example: "&lt;,&gt;" or "&lt;%,%&gt;".
         /// You should use different open and close symbols.
         /// </remarks>
@@ -145,8 +145,8 @@ namespace FastReport
         /// Gets or sets the object's text.
         /// </summary>
         /// <remarks>
-        /// Text may contain expressions and data items, for example: "Today is [Date]". 
-        /// When report is running, all expressions are calculated and replaced with actual 
+        /// Text may contain expressions and data items, for example: "Today is [Date]".
+        /// When report is running, all expressions are calculated and replaced with actual
         /// values, so the text would be "Today is 01.01.2008".
         /// </remarks>
         [Category("Data")]
@@ -187,7 +187,7 @@ namespace FastReport
         /// In this case you need to specify a string containing both date and time, for example:
         /// "1/1/1900 0:00:00".
         /// <note type="caution">
-        /// FastReport uses the <b>ToString</b> conversion to compare the expression value with this property.
+        /// AM.Reporting uses the <b>ToString</b> conversion to compare the expression value with this property.
         /// This conversion depends on regional settings selected in the Control Panel, so be aware of this
         /// if you going to distribute your report worldwide.
         /// </note>
@@ -225,7 +225,7 @@ namespace FastReport
         /// </code>
         /// </example>
         [Category("Data")]
-        [Editor("FastReport.TypeEditors.FormatEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.FormatEditor, AM.Reporting", typeof(UITypeEditor))]
         public FormatBase Format
         {
             get { return formats.Count == 0 ? new GeneralFormat() : formats[0]; }
@@ -246,8 +246,8 @@ namespace FastReport
         /// <remarks>
         /// Use this property to perform such task as "print a total value in the group header". Normally,
         /// all total values are calculated in the footers (for example, in a group footer). If you try to print
-        /// a total value in the group header, you will get 0. If you set this property to 
-        /// <b>ProcessAt.DataFinished</b>, FastReport will do the following:
+        /// a total value in the group header, you will get 0. If you set this property to
+        /// <b>ProcessAt.DataFinished</b>, AM.Reporting will do the following:
         /// <list type="bullet">
         ///   <item>
         ///     <description>print the object (with wrong value);</description>
@@ -276,7 +276,7 @@ namespace FastReport
         /// </summary>
         /// <remarks>
         /// This property is used to set format for each expression contained in the text.
-        /// For example, if the <b>TextObject</b> contains two expressions: 
+        /// For example, if the <b>TextObject</b> contains two expressions:
         /// <para/><i>Today is [Date]; Page [PageN]</i>
         /// <para/>you can use the following code to format these expressions separately:
         /// <code>
@@ -460,7 +460,7 @@ namespace FastReport
             }
             catch (Exception e)
             {
-                throw new Exception(Name + ": " + Res.Get("Messages,ErrorInExpression") + ": " + expression, 
+                throw new Exception(Name + ": " + Res.Get("Messages,ErrorInExpression") + ": " + expression,
                     e.InnerException == null ? e : e.InnerException);
             }
         }

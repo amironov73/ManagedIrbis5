@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,7 +21,7 @@ using System;
 
 #nullable enable
 
-namespace FastReport.Barcode.QRCode
+namespace AM.Reporting.Barcode.QRCode
 {
   internal sealed class BlockPair
   {
@@ -31,7 +31,7 @@ namespace FastReport.Barcode.QRCode
       {
         return dataBytes;
       }
-      
+
     }
     public ByteArray ErrorCorrectionBytes
     {
@@ -39,14 +39,14 @@ namespace FastReport.Barcode.QRCode
       {
         return errorCorrectionBytes;
       }
-      
+
     }
-    
+
     //UPGRADE_NOTE: Final was removed from the declaration of 'dataBytes '. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1003'"
     private ByteArray dataBytes;
     //UPGRADE_NOTE: Final was removed from the declaration of 'errorCorrectionBytes '. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1003'"
     private ByteArray errorCorrectionBytes;
-    
+
     internal BlockPair(ByteArray data, ByteArray errorCorrection)
     {
       dataBytes = data;

@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,13 +20,13 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Format
+namespace AM.Reporting.Format
 {
     /// <summary>
     /// Represents a format that uses the <b>Format</b> string to display values.
@@ -43,7 +43,7 @@ namespace FastReport.Format
         /// </summary>
         /// <remarks>
         /// Default format is "G". For example, if you want to format a date, use the following
-        /// format string: "MM/dd/yyyy". See the <b>System.String.Format</b> method for list 
+        /// format string: "MM/dd/yyyy". See the <b>System.String.Format</b> method for list
         /// of possible format strings.
         /// </remarks>
         public string Format
@@ -99,7 +99,7 @@ namespace FastReport.Format
         #endregion
 
         /// <summary>
-        /// Initializes a new instance of the <b>CustomFormat</b> class with default settings. 
+        /// Initializes a new instance of the <b>CustomFormat</b> class with default settings.
         /// </summary>
         public CustomFormat()
         {

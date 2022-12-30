@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,15 +21,15 @@ using System;
 
 #nullable enable
 
-namespace FastReport.Barcode.QRCode
+namespace AM.Reporting.Barcode.QRCode
 {
-  
+
 /*  /// <summary> This class implements an array of unsigned bytes.
-  /// 
+  ///
   /// </summary>
   /// <author>  dswitkin@google.com (Daniel Switkin)
   /// </author>
-  /// <author>www.Redivivus.in (suraj.supekar@redivivus.in) - Ported from ZXING Java Source 
+  /// <author>www.Redivivus.in (suraj.supekar@redivivus.in) - Ported from ZXING Java Source
   /// </author>*/
   internal sealed class ByteArray
   {
@@ -39,32 +39,32 @@ namespace FastReport.Barcode.QRCode
       {
         return size_Renamed_Field == 0;
       }
-      
+
     }
-    
+
     private const int INITIAL_SIZE = 32;
-    
+
     private sbyte[] bytes;
     private int size_Renamed_Field;
-    
+
     public ByteArray()
     {
       bytes = null;
       size_Renamed_Field = 0;
     }
-    
+
     public ByteArray(int size)
     {
       bytes = new sbyte[size];
       this.size_Renamed_Field = size;
     }
-    
+
     public ByteArray(sbyte[] byteArray)
     {
       bytes = byteArray;
       size_Renamed_Field = bytes.Length;
     }
-    
+
 /*    /// <summary> Access an unsigned byte at location index.</summary>
     /// <param name="index">The index in the array to access.
     /// </param>
@@ -85,12 +85,12 @@ namespace FastReport.Barcode.QRCode
                 bytes[index] = (sbyte)value_Renamed;
             }
         }
-    
+
     public int size()
     {
       return size_Renamed_Field;
     }
-    
+
     // Copy count bytes from array source starting at offset.
     public void  set_Renamed(sbyte[] source, int offset, int count)
     {

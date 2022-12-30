@@ -5,13 +5,13 @@ using System.Drawing;
 using System.Drawing.Text;
 using System.Drawing.Drawing2D;
 using System.ComponentModel;
-using FastReport.Utils;
-using FastReport.Format;
-using FastReport.Code;
+using AM.Reporting.Utils;
+using AM.Reporting.Format;
+using AM.Reporting.Code;
 using System.Windows.Forms;
 using System.Drawing.Design;
 
-namespace FastReport
+namespace AM.Reporting
 {
     /// <summary>
     /// Specifies the horizontal alignment of a text in the TextObject object.
@@ -99,7 +99,7 @@ namespace FastReport
         /// </summary>
         [Browsable(true)]
         [DefaultValue(0f)]
-        [TypeConverter("FastReport.TypeConverters.UnitsConverter, FastReport")]
+        [TypeConverter("AM.Reporting.TypeConverters.UnitsConverter, AM.Reporting")]
         public float FirstLineIndent
         {
             get { return firstLineIndent; }
@@ -111,7 +111,7 @@ namespace FastReport
         /// </summary>
         [Browsable(true)]
         [DefaultValue(0f)]
-        [TypeConverter("FastReport.TypeConverters.UnitsConverter, FastReport")]
+        [TypeConverter("AM.Reporting.TypeConverters.UnitsConverter, AM.Reporting")]
         public float LineSpacing
         {
             get { return lineSpacing; }
@@ -376,7 +376,7 @@ namespace FastReport
         /// </summary>
         [DefaultValue(0)]
         [Category("Appearance")]
-        [Editor("FastReport.TypeEditors.AngleEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.AngleEditor, AM.Reporting", typeof(UITypeEditor))]
         public int Angle
         {
             get { return angle; }
@@ -458,7 +458,7 @@ namespace FastReport
         /// Use the <see cref="TextColor"/> property to set the solid text color.
         /// </remarks>
         [Category("Appearance")]
-        [Editor("FastReport.TypeEditors.FillEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.FillEditor, AM.Reporting", typeof(UITypeEditor))]
         public FillBase TextFill
         {
             get { return textFill; }
@@ -476,7 +476,7 @@ namespace FastReport
         /// Gets or sets the text outline.
         /// </summary>
         [Category("Appearance")]
-        [Editor("FastReport.TypeEditors.OutlineEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.OutlineEditor, AM.Reporting", typeof(UITypeEditor))]
         public TextOutline TextOutline
         {
             get { return textOutline; }
@@ -552,7 +552,7 @@ namespace FastReport
         /// </summary>
         [DefaultValue(0f)]
         [Category("Appearance")]
-        //[TypeConverter("FastReport.TypeConverters.UnitsConverter, FastReport")]
+        //[TypeConverter("AM.Reporting.TypeConverters.UnitsConverter, AM.Reporting")]
         public float FirstTabOffset
         {
             get { return firstTabOffset; }
@@ -598,7 +598,7 @@ namespace FastReport
         /// </code>
         /// </remarks>
         [Category("Data")]
-        [Editor("FastReport.TypeEditors.HighlightEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.HighlightEditor, AM.Reporting", typeof(UITypeEditor))]
         public ConditionCollection Highlight
         {
             get { return highlight; }
@@ -695,7 +695,7 @@ namespace FastReport
         /// </summary>
         [DefaultValue(0f)]
         [Category("Appearance")]
-        [TypeConverter("FastReport.TypeConverters.UnitsConverter, FastReport")]
+        [TypeConverter("AM.Reporting.TypeConverters.UnitsConverter, AM.Reporting")]
         public float ParagraphOffset
         {
             get { return paragraphOffset; }

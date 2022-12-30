@@ -9,14 +9,14 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using FastReport.Utils;
-using FastReport.Utils.Json;
+using AM.Reporting.Utils;
+using AM.Reporting.Utils.Json;
 
 using System;
 using System.Collections;
@@ -27,7 +27,7 @@ using System.ComponentModel;
 
 #nullable enable
 
-namespace FastReport.Data.JsonConnection
+namespace AM.Reporting.Data.JsonConnection
 {
     /// <summary>
     /// JsonTableDataSource present a json array object

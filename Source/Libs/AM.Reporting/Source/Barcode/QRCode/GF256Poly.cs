@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,19 +21,19 @@ using System;
 
 #nullable enable
 
-namespace FastReport.Barcode.QRCode
+namespace AM.Reporting.Barcode.QRCode
 {
-  
+
   /*/// <summary> <p>Represents a polynomial whose coefficients are elements of GF(256).
   /// Instances of this class are immutable.</p>
-  /// 
+  ///
   /// <p>Much credit is due to William Rucklidge since portions of this code are an indirect
   /// port of his C++ Reed-Solomon implementation.</p>
-  /// 
+  ///
   /// </summary>
   /// <author>  Sean Owen
   /// </author>
-  /// <author>www.Redivivus.in (suraj.supekar@redivivus.in) - Ported from ZXING Java Source 
+  /// <author>www.Redivivus.in (suraj.supekar@redivivus.in) - Ported from ZXING Java Source
   /// </author>*/
   internal sealed class GF256Poly
   {
@@ -43,7 +43,7 @@ namespace FastReport.Barcode.QRCode
       {
         return coefficients;
       }
-      
+
     }
     /*/// <returns> degree of this polynomial
     /// </returns>*/
@@ -53,7 +53,7 @@ namespace FastReport.Barcode.QRCode
       {
         return coefficients.Length - 1;
       }
-      
+
     }
     /*/// <returns> true iff this polynomial is the monomial "0"
     /// </returns>*/
@@ -63,14 +63,14 @@ namespace FastReport.Barcode.QRCode
       {
         return coefficients[0] == 0;
       }
-      
+
     }
-    
+
     //UPGRADE_NOTE: Final was removed from the declaration of 'field '. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1003'"
     private GF256 field;
     //UPGRADE_NOTE: Final was removed from the declaration of 'coefficients '. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1003'"
     private int[] coefficients;
-    
+
     /*/// <param name="field">the {@link GF256} instance representing the field to use
     /// to perform computations
     /// </param>
@@ -112,14 +112,14 @@ namespace FastReport.Barcode.QRCode
         this.coefficients = coefficients;
       }
     }
-    
+
     /*/// <returns> coefficient of x^degree term in this polynomial
     /// </returns>*/
     internal int getCoefficient(int degree)
     {
       return coefficients[coefficients.Length - 1 - degree];
     }
-    
+
     internal GF256Poly addOrSubtract(GF256Poly other)
     {
       if (!field.Equals(other.field))
@@ -134,7 +134,7 @@ namespace FastReport.Barcode.QRCode
       {
         return this;
       }
-      
+
       int[] smallerCoefficients = this.coefficients;
       int[] largerCoefficients = other.coefficients;
       if (smallerCoefficients.Length > largerCoefficients.Length)
@@ -147,15 +147,15 @@ namespace FastReport.Barcode.QRCode
       int lengthDiff = largerCoefficients.Length - smallerCoefficients.Length;
       // Copy high-order terms only found in higher-degree polynomial's coefficients
       Array.Copy(largerCoefficients, 0, sumDiff, 0, lengthDiff);
-      
+
       for (int i = lengthDiff; i < largerCoefficients.Length; i++)
       {
         sumDiff[i] = GF256.addOrSubtract(smallerCoefficients[i - lengthDiff], largerCoefficients[i]);
       }
-      
+
       return new GF256Poly(field, sumDiff);
     }
-    
+
     internal GF256Poly multiply(GF256Poly other)
     {
       if (!field.Equals(other.field))
@@ -181,7 +181,7 @@ namespace FastReport.Barcode.QRCode
       }
       return new GF256Poly(field, product);
     }
-    
+
     internal GF256Poly multiplyByMonomial(int degree, int coefficient)
     {
       if (degree < 0)
@@ -200,7 +200,7 @@ namespace FastReport.Barcode.QRCode
       }
       return new GF256Poly(field, product);
     }
-    
+
     internal GF256Poly[] divide(GF256Poly other)
     {
       if (!field.Equals(other.field))
@@ -211,13 +211,13 @@ namespace FastReport.Barcode.QRCode
       {
         throw new System.ArgumentException("Divide by 0");
       }
-      
+
       GF256Poly quotient = field.Zero;
       GF256Poly remainder = this;
-      
+
       int denominatorLeadingTerm = other.getCoefficient(other.Degree);
       int inverseDenominatorLeadingTerm = field.inverse(denominatorLeadingTerm);
-      
+
       while (remainder.Degree >= other.Degree && !remainder.Zero)
       {
         int degreeDifference = remainder.Degree - other.Degree;
@@ -227,7 +227,7 @@ namespace FastReport.Barcode.QRCode
         quotient = quotient.addOrSubtract(iterationQuotient);
         remainder = remainder.addOrSubtract(term);
       }
-      
+
       return new GF256Poly[]{quotient, remainder};
     }
   }

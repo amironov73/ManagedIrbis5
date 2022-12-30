@@ -9,14 +9,14 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using FastReport.Table;
-using FastReport.Utils;
+using AM.Reporting.Table;
+using AM.Reporting.Utils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -25,12 +25,12 @@ using System.Collections.Generic;
 
 #nullable enable
 
-namespace FastReport.Preview
+namespace AM.Reporting.Preview
 {
     internal class Dictionary
   {
     private SortedList<string, DictionaryItem> names;
-    //private SortedDictionary<string, DictionaryItem> FNames;    
+    //private SortedDictionary<string, DictionaryItem> FNames;
     private Hashtable baseNames;
     private PreparedPages preparedPages;
 
@@ -103,7 +103,7 @@ namespace FastReport.Preview
             return item.OriginalComponent;
         else
             return null;
-        
+
       //  int i = FNames.IndexOfKey(name);
       //if (i == -1)
       //  return null;
@@ -153,19 +153,19 @@ namespace FastReport.Preview
           obj = preparedPages.SourcePages[pageN].FindObject(objName[1]);
         else
           obj = preparedPages.SourcePages[pageN];
-        
+
         // add s1, Page0.Shape1, object
         string name = rootItem[i].Name;
         Add(name, sourceName, obj);
         AddBaseName(name);
       }
     }
-    
+
     public Dictionary(PreparedPages preparedPages)
     {
             this.preparedPages = preparedPages;
-      names = new SortedList<string, DictionaryItem>(); 
-      //FNames = new SortedDictionary<string, DictionaryItem>(); 
+      names = new SortedList<string, DictionaryItem>();
+      //FNames = new SortedDictionary<string, DictionaryItem>();
       baseNames = new Hashtable();
     }
 
@@ -173,17 +173,17 @@ namespace FastReport.Preview
     {
       private string sourceName;
       private Base originalComponent;
-      
+
       public string SourceName
       {
         get { return sourceName; }
       }
-      
+
       public Base OriginalComponent
       {
         get { return originalComponent; }
       }
-      
+
       public Base CloneObject(string alias)
       {
         Base result = null;
@@ -198,7 +198,7 @@ namespace FastReport.Preview
           result = new DataBand();
         else
           result = Activator.CreateInstance(type) as Base;
-        
+
         result.Assign(originalComponent);
         result.OriginalComponent = originalComponent;
         result.Alias = alias;

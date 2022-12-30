@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,19 +21,19 @@ using System;
 
 #nullable enable
 
-namespace FastReport.Barcode.QRCode
+namespace AM.Reporting.Barcode.QRCode
 {
-  
+
 /*  /// <summary> JAVAPORT: This should be combined with BitArray in the future, although that class is not yet
   /// dynamically resizeable. This implementation is reasonable but there is a lot of function calling
   /// in loops I'd like to get rid of.
-  /// 
+  ///
   /// </summary>
   /// <author>  satorux@google.com (Satoru Takabayashi) - creator
   /// </author>
   /// <author>  dswitkin@google.com (Daniel Switkin) - ported from C++
   /// </author>
-  /// <author>www.Redivivus.in (suraj.supekar@redivivus.in) - Ported from ZXING Java Source 
+  /// <author>www.Redivivus.in (suraj.supekar@redivivus.in) - Ported from ZXING Java Source
   /// </author>*/
   internal sealed class BitVector
   {
@@ -41,26 +41,26 @@ namespace FastReport.Barcode.QRCode
     {
       // Callers should not assume that array.length is the exact number of bytes needed to hold
       // sizeInBits - it will typically be larger for efficiency.
-      
+
       get
       {
         return array;
       }
-      
+
     }
-    
+
     private int sizeInBits;
     private sbyte[] array;
-    
+
     // For efficiency, start out with some room to work.
     private const int DEFAULT_SIZE_IN_BYTES = 32;
-    
+
     public BitVector()
     {
       sizeInBits = 0;
       array = new sbyte[DEFAULT_SIZE_IN_BYTES];
     }
-    
+
     // Return the bit value at "index".
     public int at(int index)
     {
@@ -71,19 +71,19 @@ namespace FastReport.Barcode.QRCode
       int value_Renamed = array[index >> 3] & 0xff;
       return (value_Renamed >> (7 - (index & 0x7))) & 1;
     }
-    
+
     // Return the number of bits in the bit vector.
     public int size()
     {
       return sizeInBits;
     }
-    
+
     // Return the number of bytes in the bit vector.
     public int sizeInBytes()
     {
       return (sizeInBits + 7) >> 3;
     }
-    
+
     // Append one bit to the bit vector.
     public void  appendBit(int bit)
     {
@@ -106,7 +106,7 @@ namespace FastReport.Barcode.QRCode
                 ++sizeInBits;
             }
     }
-    
+
     // Append "numBits" bits in "value" to the bit vector.
     // REQUIRES: 0<= numBits <= 32.
     //
@@ -138,7 +138,7 @@ namespace FastReport.Barcode.QRCode
         }
       }
     }
-    
+
     // Append "bits".
     public void  appendBitVector(BitVector bits)
     {
@@ -148,7 +148,7 @@ namespace FastReport.Barcode.QRCode
         appendBit(bits.at(i));
       }
     }
-    
+
     // Modify the bit vector by XOR'ing with "other"
     public void  xor(BitVector other)
     {
@@ -164,7 +164,7 @@ namespace FastReport.Barcode.QRCode
         array[i] ^= other.array[i];
       }
     }
-    
+
     // Add a new byte to the end, possibly reallocating and doubling the size of the array if we've
     // run out of room.
     private void  appendByte(int value_Renamed)
@@ -175,7 +175,7 @@ namespace FastReport.Barcode.QRCode
             {
                 sbyte[] newArray = new sbyte[(array.Length << 1)];
                 // Redivivus.in Java to c# Porting update
-                // 30/01/2010 
+                // 30/01/2010
                 // added namespace system
                 System.Array.Copy(array, 0, newArray, 0, array.Length);
                 array = newArray;

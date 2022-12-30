@@ -1,9 +1,30 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
 
-namespace FastReport.Utils
+#endregion
+
+#nullable enable
+
+namespace AM.Reporting.Utils
 {
   internal static class FileUtils
   {
@@ -13,7 +34,7 @@ namespace FastReport.Utils
       baseDirectoryPath = Path.GetFullPath(baseDirectoryPath);
       absPath = Path.GetFullPath(absPath);
       baseDirectoryPath = baseDirectoryPath.TrimEnd(separators);
-      
+
       string[] bPath = baseDirectoryPath.Split(separators);
       string[] aPath = absPath.Split(separators);
       int indx = 0;
@@ -21,7 +42,7 @@ namespace FastReport.Utils
       {
         if (String.Compare(aPath[indx], bPath[indx], true) != 0)
           break;
-        indx++;  
+        indx++;
       }
       // no matches, return absPath
       if (indx == 0)

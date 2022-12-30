@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -18,16 +18,16 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 using System.Globalization;
 
-using FastReport.Data;
+using AM.Reporting.Data;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Functions
+namespace AM.Reporting.Functions
 {
   /// <summary>
   /// Contains standard functions registered in the "Data" window.
@@ -36,7 +36,7 @@ namespace FastReport.Functions
   {
     #region Math functions
     /// <summary>
-    /// Returns the larger of two 32-bit signed integers. 
+    /// Returns the larger of two 32-bit signed integers.
     /// </summary>
     /// <param name="val1">The first of two values to compare.</param>
     /// <param name="val2">The second of two values to compare.</param>
@@ -47,7 +47,7 @@ namespace FastReport.Functions
     }
 
     /// <summary>
-    /// Returns the larger of two 64-bit signed integers. 
+    /// Returns the larger of two 64-bit signed integers.
     /// </summary>
     /// <param name="val1">The first of two values to compare.</param>
     /// <param name="val2">The second of two values to compare.</param>
@@ -91,7 +91,7 @@ namespace FastReport.Functions
     }
 
     /// <summary>
-    /// Returns the smaller of two 32-bit signed integers. 
+    /// Returns the smaller of two 32-bit signed integers.
     /// </summary>
     /// <param name="val1">The first of two values to compare.</param>
     /// <param name="val2">The second of two values to compare.</param>
@@ -102,7 +102,7 @@ namespace FastReport.Functions
     }
 
     /// <summary>
-    /// Returns the smaller of two 64-bit signed integers. 
+    /// Returns the smaller of two 64-bit signed integers.
     /// </summary>
     /// <param name="val1">The first of two values to compare.</param>
     /// <param name="val2">The second of two values to compare.</param>
@@ -178,7 +178,7 @@ namespace FastReport.Functions
     {
       return s == null ? "" : s.Insert(startIndex, value);
     }
-    
+
     /// <summary>
     /// Gets the number of characters in a string.
     /// </summary>
@@ -188,7 +188,7 @@ namespace FastReport.Functions
     {
       return s == null ? 0 : s.Length;
     }
-    
+
     /// <summary>
     /// Converts a specified string to lowercase.
     /// </summary>
@@ -235,7 +235,7 @@ namespace FastReport.Functions
     }
 
     /// <summary>
-    /// Left-aligns the characters in a string, padding on the right with a specified character, 
+    /// Left-aligns the characters in a string, padding on the right with a specified character,
     /// for a specified total length.
     /// </summary>
     /// <param name="s">The original string.</param>
@@ -248,7 +248,7 @@ namespace FastReport.Functions
     }
 
     /// <summary>
-    /// Converts the specified string to titlecase. 
+    /// Converts the specified string to titlecase.
     /// </summary>
     /// <param name="s">The string to convert.</param>
     /// <returns>A new string.</returns>
@@ -308,7 +308,7 @@ namespace FastReport.Functions
     }
 
     /// <summary>
-    /// Retrieves a substring from the original string, starting at a specified character position, 
+    /// Retrieves a substring from the original string, starting at a specified character position,
     /// with a specified length.
     /// </summary>
     /// <param name="s">The original string.</param>
@@ -555,11 +555,11 @@ namespace FastReport.Functions
       return date.Year;
     }
     #endregion
-    
+
     #region Formatting
     /// <summary>
-    /// Replaces the format item in a specified String with the text equivalent of the value of a 
-    /// corresponding Object instance in a specified array. 
+    /// Replaces the format item in a specified String with the text equivalent of the value of a
+    /// corresponding Object instance in a specified array.
     /// </summary>
     /// <param name="format">A String containing zero or more format items.</param>
     /// <param name="args">An Object array containing zero or more objects to format.</param>
@@ -623,7 +623,7 @@ namespace FastReport.Functions
     /// Returns a string formatted as a date/time value.
     /// </summary>
     /// <param name="value">The value to format.</param>
-    /// <param name="format">The format specifier, one of the 
+    /// <param name="format">The format specifier, one of the
     /// "Long Date", "Short Date", "Long Time", "Short Time" values.</param>
     /// <returns>The formatted string.</returns>
     public static string FormatDateTime(DateTime value, string format)
@@ -708,7 +708,7 @@ namespace FastReport.Functions
     {
       return Roman.Convert(Convert.ToInt32(value));
     }
-    
+
     /// <summary>
     /// Converts a currency value to an english (US) string representation of that value.
     /// </summary>
@@ -720,7 +720,7 @@ namespace FastReport.Functions
     }
 
     /// <summary>
-    /// Converts a currency value to an english (US) string representation of that value, 
+    /// Converts a currency value to an english (US) string representation of that value,
     /// using the specified currency.
     /// </summary>
     /// <param name="value">The currency value to convert.</param>
@@ -754,7 +754,7 @@ namespace FastReport.Functions
     }
 
     /// <summary>
-    /// Converts a currency value to an english (GB) string representation of that value, 
+    /// Converts a currency value to an english (GB) string representation of that value,
     /// using the specified currency.
     /// </summary>
     /// <param name="value">The currency value to convert.</param>
@@ -788,7 +788,7 @@ namespace FastReport.Functions
     }
 
     /// <summary>
-    /// Converts a currency value to a spanish string representation of that value, 
+    /// Converts a currency value to a spanish string representation of that value,
     /// using the specified currency.
     /// </summary>
     /// <param name="value">The currency value to convert.</param>
@@ -822,7 +822,7 @@ namespace FastReport.Functions
     }
 
     /// <summary>
-    /// Converts a currency value to a russian string representation of that value, 
+    /// Converts a currency value to a russian string representation of that value,
     /// using the specified currency.
     /// </summary>
     /// <param name="value">The currency value to convert.</param>
@@ -858,7 +858,7 @@ namespace FastReport.Functions
     }
 
     /// <summary>
-    /// Converts a currency value to a german string representation of that value, 
+    /// Converts a currency value to a german string representation of that value,
     /// using the specified currency.
     /// </summary>
     /// <param name="value">The currency value to convert.</param>
@@ -892,7 +892,7 @@ namespace FastReport.Functions
     }
 
     /// <summary>
-    /// Converts a currency value to a french string representation of that value, 
+    /// Converts a currency value to a french string representation of that value,
     /// using the specified currency.
     /// </summary>
     /// <param name="value">The currency value to convert.</param>
@@ -926,7 +926,7 @@ namespace FastReport.Functions
     }
 
     /// <summary>
-    /// Converts a currency value to a dutch string representation of that value, 
+    /// Converts a currency value to a dutch string representation of that value,
     /// using the specified currency.
     /// </summary>
     /// <param name="value">The currency value to convert.</param>
@@ -993,7 +993,7 @@ namespace FastReport.Functions
 
 
         /// <summary>
-        /// Converts a currency value to a ukrainian string representation of that value, 
+        /// Converts a currency value to a ukrainian string representation of that value,
         /// using the specified currency.
         /// </summary>
         /// <param name="value">The currency value to convert.</param>
@@ -1190,7 +1190,7 @@ namespace FastReport.Functions
     }
 
     /// <summary>
-    /// Evaluates a list of expressions and returns a value corresponding to the first 
+    /// Evaluates a list of expressions and returns a value corresponding to the first
     /// expression in the list that is True.
     /// </summary>
     /// <param name="expressions">Parameter array consists of paired expressions and values.</param>
@@ -1319,7 +1319,7 @@ namespace FastReport.Functions
       RegisteredObjects.InternalAddFunction(dt.GetMethod("WeekOfYear"), "DateTime");
       RegisteredObjects.InternalAddFunction(dt.GetMethod("Year"), "DateTime");
       #endregion
-      
+
       #region Formatting
       RegisteredObjects.AddFunctionCategory("Formatting", "Functions,Formatting");
       Type fmt = typeof(StdFunctions);

@@ -1,29 +1,51 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.ComponentModel;
-using FastReport.Utils;
 
-namespace FastReport
+using AM.Reporting.Utils;
+
+#endregion
+
+#nullable enable
+
+namespace AM.Reporting
 {
   /// <summary>
   /// The layout of the data band columns.
   /// </summary>
-  public enum ColumnLayout 
-  { 
+  public enum ColumnLayout
+  {
     /// <summary>
     /// Print columns across then down.
     /// </summary>
-    AcrossThenDown, 
-    
+    AcrossThenDown,
+
     /// <summary>
     /// Print columns down then across.
     /// </summary>
-    DownThenAcross 
+    DownThenAcross
   }
-  
+
   /// <summary>
   /// This class holds the band columns settings. It is used in the <see cref="DataBand.Columns"/> property.
   /// </summary>
-  [TypeConverter(typeof(FastReport.TypeConverters.FRExpandableObjectConverter))]
+  [TypeConverter(typeof(AM.Reporting.TypeConverters.FRExpandableObjectConverter))]
   public class BandColumns
   {
     private int count;
@@ -54,13 +76,13 @@ namespace FastReport
     /// The column width, in pixels.
     /// </summary>
     [DefaultValue(0f)]
-    [TypeConverter("FastReport.TypeConverters.UnitsConverter, FastReport")]
+    [TypeConverter("AM.Reporting.TypeConverters.UnitsConverter, AM.Reporting")]
     public float Width
     {
       get { return width; }
       set { width = value; }
     }
-    
+
     /// <summary>
     /// Gets or sets the layout of the columns.
     /// </summary>
@@ -70,13 +92,13 @@ namespace FastReport
       get { return layout; }
       set { layout = value; }
     }
-    
+
     /// <summary>
     /// Gets or sets the minimum row count that must be printed.
     /// </summary>
     /// <remarks>
     /// This property is used if the <b>Layout</b> property is set to <b>DownThenAcross</b>. 0 means that
-    /// FastReport should calculate the optimal number of rows.
+    /// AM.Reporting should calculate the optimal number of rows.
     /// </remarks>
     [DefaultValue(0)]
     public int MinRowCount
@@ -84,7 +106,7 @@ namespace FastReport
       get { return minRowCount; }
       set { minRowCount = value; }
     }
-    
+
     internal float ActualWidth
     {
       get
@@ -95,7 +117,7 @@ namespace FastReport
         return Width;
       }
     }
-    
+
     internal FloatCollection Positions
     {
       get
@@ -133,9 +155,9 @@ namespace FastReport
       if (MinRowCount != c.MinRowCount)
         writer.WriteInt("Columns.MinRowCount", MinRowCount);
     }
-    
+
     /// <summary>
-    /// Initializes a new instance of the <b>BandColumns</b> class with default settings. 
+    /// Initializes a new instance of the <b>BandColumns</b> class with default settings.
     /// </summary>
     public BandColumns(DataBand band)
     {

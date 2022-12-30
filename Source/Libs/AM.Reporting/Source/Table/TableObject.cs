@@ -1,3 +1,20 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -5,16 +22,21 @@ using System.Text;
 using System.Drawing;
 using System.ComponentModel;
 using System.Drawing.Drawing2D;
-using FastReport.Utils;
-using FastReport.Data;
 
-namespace FastReport.Table
+using AM.Reporting.Utils;
+using AM.Reporting.Data;
+
+#endregion
+
+#nullable enable
+
+namespace AM.Reporting.Table
 {
     /// <summary>
     /// Represents a table object that consists of several rows and columns.
     /// </summary>
     /// <remarks>
-    /// <para/>To add/remove columns, use the <see cref="TableBase.Columns"/> collection. To add/remove 
+    /// <para/>To add/remove columns, use the <see cref="TableBase.Columns"/> collection. To add/remove
     /// rows, use the <see cref="TableBase.Rows"/> collection. To initialize a table with specified number of
     /// columns and rows, use <see cref="ColumnCount"/> and <see cref="RowCount"/> properties.
     /// <para/>To print a table in code, use the <see cref="ManualBuild"/> event. In the manual build
@@ -46,7 +68,7 @@ namespace FastReport.Table
     ///   </item>
     /// </list>
     /// <para/>To print aggregate value, place the aggregate function call in the table cell:
-    /// <c>[Count(Cell2)]</c>. 
+    /// <c>[Count(Cell2)]</c>.
     /// </remarks>
     public partial class TableObject : TableBase
     {
@@ -65,23 +87,23 @@ namespace FastReport.Table
         /// <remarks>
         /// This event is used to handle the table print process in a code. Using special methods
         /// like <see cref="PrintRow"/>, <see cref="PrintColumn"/> you can print specified rows/columns.
-        /// 
-        /// <para/>First way is to repeat specified row(s) to get a table that will grow downwards. 
+        ///
+        /// <para/>First way is to repeat specified row(s) to get a table that will grow downwards.
         /// To do this, you have to call the <b>PrintRow</b> method followed by the <b>PrintColumns</b> method.
-        /// 
+        ///
         /// <para/>Another way is to repeat the specified column(s) to get a table that grows sidewards.
         /// To do this, call the <b>PrintColumn</b> method followed by the <b>PrintRows</b> method.
-        /// 
+        ///
         /// <para/>Finally, the third way is to repeat rows and columns. The table will grow downwards and
         /// sidewards. To do this, call the <b>PrintRow</b> method followed by the <b>PrintColumn</b>
         /// method (or vice versa).
-        /// 
+        ///
         /// <para/>
         /// <note type="caution">
         /// When you print a table row-by-row, you must call one of the <b>PrintColumn</b>,
-        /// <b>PrintColumns</b> methods right after the <b>PrintRow</b> method. 
-        /// In the same manner, when you print a table column-by-column, call one of the 
-        /// <b>PrintRow</b>, <b>PrintRows</b> methods right after the <b>PrintColumn</b> method. 
+        /// <b>PrintColumns</b> methods right after the <b>PrintRow</b> method.
+        /// In the same manner, when you print a table column-by-column, call one of the
+        /// <b>PrintRow</b>, <b>PrintRows</b> methods right after the <b>PrintColumn</b> method.
         /// If you ignore this rule you will get an exception.
         /// </note>
         /// </remarks>
@@ -102,7 +124,7 @@ namespace FastReport.Table
         /// Table1.PrintRow(2);
         /// Table1.PrintColumns();
         /// </code>
-        /// 
+        ///
         /// <para/>Case 2: print a table sidewards.
         /// <code>
         /// // print table header (the first column)
@@ -118,7 +140,7 @@ namespace FastReport.Table
         /// Table1.PrintColumn(2);
         /// Table1.PrintRows();
         /// </code>
-        /// 
+        ///
         /// <para/>Case 3: print a table downwards and sidewards.
         /// <code>
         /// // print the first row with all its columns
@@ -132,7 +154,7 @@ namespace FastReport.Table
         /// }
         /// // print footer column
         /// Table1.PrintColumn(2);
-        /// 
+        ///
         /// // print table body (the second row)
         /// for (int i = 0; i &lt; 10; i++)
         /// {
@@ -145,7 +167,7 @@ namespace FastReport.Table
         ///   }
         ///   Table1.PrintColumn(2);
         /// }
-        /// 
+        ///
         /// // print table footer (the third row)
         /// Table1.PrintRow(2);
         /// // again print all columns in the table footer
@@ -160,7 +182,7 @@ namespace FastReport.Table
         public event EventHandler ManualBuild;
 
         /// <summary>
-        /// Gets or sets a script method name that will be used to handle the 
+        /// Gets or sets a script method name that will be used to handle the
         /// <see cref="ManualBuild"/> event.
         /// </summary>
         /// <remarks>

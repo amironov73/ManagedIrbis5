@@ -1,12 +1,34 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.ComponentModel;
 using System.Drawing;
-using FastReport.Data;
-using FastReport.Utils;
 
-namespace FastReport.Table
+using AM.Reporting.Data;
+using AM.Reporting.Utils;
+
+#endregion
+
+#nullable enable
+
+namespace AM.Reporting.Table
 {
     /// <summary>
     /// Represents a table column.
@@ -36,12 +58,12 @@ namespace FastReport.Table
         /// Gets or sets a width of the column, in pixels.
         /// </summary>
         /// <remarks>
-        /// The column width cannot exceed the range defined by the <see cref="MinWidth"/> 
+        /// The column width cannot exceed the range defined by the <see cref="MinWidth"/>
         /// and <see cref="MaxWidth"/> properties.
-        /// <note>To convert between pixels and report units, use the constants defined 
+        /// <note>To convert between pixels and report units, use the constants defined
         /// in the <see cref="Units"/> class.</note>
         /// </remarks>
-        [TypeConverter("FastReport.TypeConverters.UnitsConverter, FastReport")]
+        [TypeConverter("AM.Reporting.TypeConverters.UnitsConverter, AM.Reporting")]
         public override float Width
         {
             get { return base.Width; }
@@ -65,7 +87,7 @@ namespace FastReport.Table
         /// </summary>
         [DefaultValue(0f)]
         [Category("Layout")]
-        [TypeConverter("FastReport.TypeConverters.UnitsConverter, FastReport")]
+        [TypeConverter("AM.Reporting.TypeConverters.UnitsConverter, AM.Reporting")]
         public float MinWidth
         {
             get { return minWidth; }
@@ -77,7 +99,7 @@ namespace FastReport.Table
         /// </summary>
         [DefaultValue(5000f)]
         [Category("Layout")]
-        [TypeConverter("FastReport.TypeConverters.UnitsConverter, FastReport")]
+        [TypeConverter("AM.Reporting.TypeConverters.UnitsConverter, AM.Reporting")]
         public float MaxWidth
         {
             get { return maxWidth; }
@@ -88,7 +110,7 @@ namespace FastReport.Table
         /// Gets or sets a value determines if the column should calculate its width automatically.
         /// </summary>
         /// <remarks>
-        /// The column width cannot exceed the range defined by the <see cref="MinWidth"/> 
+        /// The column width cannot exceed the range defined by the <see cref="MinWidth"/>
         /// and <see cref="MaxWidth"/> properties.
         /// </remarks>
         [DefaultValue(false)]

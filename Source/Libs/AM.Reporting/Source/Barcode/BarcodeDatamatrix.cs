@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,13 +22,13 @@ using System.Text;
 using System.Drawing;
 using System.ComponentModel;
 
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Barcode
+namespace AM.Reporting.Barcode
 {
   /// <summary>
   /// Specifies the Datamatrix encoding.
@@ -80,7 +80,7 @@ namespace FastReport.Barcode
     /// Specifies the auto size.
     /// </summary>
     Auto,
-    
+
     /// <summary>
     /// Specifies the 10x10 size.
     /// </summary>
@@ -292,7 +292,7 @@ namespace FastReport.Barcode
       get { return symbolSize; }
       set { symbolSize = value; }
     }
-    
+
     /// <summary>
     /// Gets or sets the encoding mode.
     /// </summary>
@@ -307,7 +307,7 @@ namespace FastReport.Barcode
     /// Gets or sets the code page used for text conversion.
     /// </summary>
     /// <remarks>
-    /// Use this property to encode non-ASCII characters. For example, set this 
+    /// Use this property to encode non-ASCII characters. For example, set this
     /// property to <b>1251</b> to use Window CP1251.
     /// </remarks>
     [DefaultValue(1252)]
@@ -863,7 +863,7 @@ namespace FastReport.Barcode
             }
             return text;
     }
-    
+
     private void Generate(String text)
     {
       text = ReplaceControlCodes(text);
@@ -885,7 +885,7 @@ namespace FastReport.Barcode
         textSize--;
         extCount = 1;
       }
-      
+
       if (height == 0 || width == 0)
       {
         last = dmSizes[dmSizes.Length - 1];
@@ -923,7 +923,7 @@ namespace FastReport.Barcode
         }
         e += extCount;
       }
-      
+
       image = new byte[((dm.width + 7) / 8) * dm.height];
       MakePadding(data, e, dm.dataSize - e);
       place = Placement.DoPlacement(dm.height - (dm.height / dm.heightSection * 2), dm.width - (dm.width / dm.widthSection * 2));
@@ -947,7 +947,7 @@ namespace FastReport.Barcode
             AutoEncode = src.AutoEncode;
     }
 
-    internal override void Serialize(FastReport.Utils.FRWriter writer, string prefix, BarcodeBase diff)
+    internal override void Serialize(AM.Reporting.Utils.FRWriter writer, string prefix, BarcodeBase diff)
     {
       base.Serialize(writer, prefix, diff);
       BarcodeDatamatrix c = diff as BarcodeDatamatrix;
@@ -967,7 +967,7 @@ namespace FastReport.Barcode
     internal override void Initialize(string text, bool showText, int angle, float zoom)
     {
       base.Initialize(text, showText, angle, zoom);
-      
+
       if (SymbolSize == DatamatrixSymbolSize.Auto)
       {
         width = 0;
@@ -1004,7 +1004,7 @@ namespace FastReport.Barcode
     {
       if (image == null)
         return;
-      
+
       Brush light = Brushes.White;
       Brush dark = new SolidBrush(Color);
       int stride = (width + 7) / 8;

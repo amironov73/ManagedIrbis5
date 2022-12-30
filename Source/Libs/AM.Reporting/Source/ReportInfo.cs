@@ -1,11 +1,11 @@
 using System;
 using System.Drawing;
 using System.ComponentModel;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 using System.Reflection;
 using System.Drawing.Design;
 
-namespace FastReport
+namespace AM.Reporting
 {
    /// <summary>
    /// Specifies the Save Mode of designed report.
@@ -39,13 +39,13 @@ namespace FastReport
       /// <summary>
       /// Custom saving rules.
       /// </summary>
-      Custom 
+      Custom
    }
 
   /// <summary>
   /// This class represents the report information such as name, author, description etc.
   /// </summary>
-  [TypeConverter(typeof(FastReport.TypeConverters.FRExpandableObjectConverter))]
+  [TypeConverter(typeof(AM.Reporting.TypeConverters.FRExpandableObjectConverter))]
   public class ReportInfo
   {
     #region Fields
@@ -94,7 +94,7 @@ namespace FastReport
     /// <summary>
     /// Gets or sets the report description.
     /// </summary>
-   
+
     [Editor("System.ComponentModel.Design.MultilineStringEditor, System.Design, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", typeof(UITypeEditor))]
     public string Description
     {
@@ -147,16 +147,16 @@ namespace FastReport
     public float PreviewPictureRatio
     {
       get { return previewPictureRatio; }
-      set 
+      set
       {
         if (value <= 0)
           value = 0.05f;
-        previewPictureRatio = value; 
+        previewPictureRatio = value;
       }
     }
-    
+
     /// <summary>
-    /// Gets the version of FastReport that was created this report file.
+    /// Gets the version of AM.Reporting that was created this report file.
     /// </summary>
     public string CreatorVersion
     {
@@ -183,13 +183,13 @@ namespace FastReport
       get { return saveMode; }
       set { saveMode = value; }
     }
-    
+
     private string CurrentVersion
     {
-      get 
+      get
       {
         AssemblyName asm = new AssemblyName(GetType().Assembly.FullName);
-        return asm.Version.ToString(); 
+        return asm.Version.ToString();
       }
     }
     #endregion
@@ -215,7 +215,7 @@ namespace FastReport
       creatorVersion = CurrentVersion;
       saveMode = SaveMode.All;
     }
-    
+
     internal void Serialize(FRWriter writer, ReportInfo c)
     {
       if (Name != c.Name)
@@ -246,7 +246,7 @@ namespace FastReport
     /// <summary>
     /// Initializes a new instance of the <see cref="ReportInfo"/> class with default settings.
     /// </summary>
-    public ReportInfo() 
+    public ReportInfo()
     {
       Clear();
     }

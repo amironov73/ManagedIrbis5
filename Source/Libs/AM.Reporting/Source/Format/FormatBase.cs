@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,21 +19,21 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.ComponentModel;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Format
+namespace AM.Reporting.Format
 {
     /// <summary>
     /// Base class for all formats.
     /// </summary>
     /// <remarks>
-    /// The format is used to format expression value in a <see cref="TextObject"/> object. 
+    /// The format is used to format expression value in a <see cref="TextObject"/> object.
     /// </remarks>
-    [TypeConverter(typeof(FastReport.TypeConverters.FormatConverter))]
+    [TypeConverter(typeof(AM.Reporting.TypeConverters.FormatConverter))]
     public abstract class FormatBase : IFRSerializable
     {
         #region Properties

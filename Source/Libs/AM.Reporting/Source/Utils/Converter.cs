@@ -1,3 +1,20 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.Collections;
 using System.Drawing;
@@ -7,7 +24,11 @@ using System.IO;
 using System.Collections.Specialized;
 using System.Text;
 
-namespace FastReport.Utils
+#endregion
+
+#nullable enable
+
+namespace AM.Reporting.Utils
 {
   /// <summary>
   /// Contains methods that peform string to object and vice versa conversions.
@@ -15,7 +36,7 @@ namespace FastReport.Utils
   public static class Converter
   {
 
-        
+
     /// <summary>
     /// Converts an object to a string.
     /// </summary>
@@ -105,7 +126,7 @@ namespace FastReport.Utils
     /// </summary>
     /// <param name="type">The data type to convert to.</param>
     /// <param name="value">The string to convert from.</param>
-    /// <returns>The object of type specified in the <b>type</b> parameter that contains 
+    /// <returns>The object of type specified in the <b>type</b> parameter that contains
     /// a converted value.</returns>
     public static object FromString(Type type, string value)
     {
@@ -161,7 +182,7 @@ namespace FastReport.Utils
     /// <param name="s">The string to convert.</param>
     /// <returns>The result string.</returns>
     /// <remarks>
-    /// This method replaces some special symbols like &lt;, &gt; into xml-compatible 
+    /// This method replaces some special symbols like &lt;, &gt; into xml-compatible
     /// form: &amp;lt;, &amp;gt;. To convert such string back to original form, use the
     /// <see cref="FromXml"/> method.
     /// </remarks>
@@ -251,7 +272,7 @@ namespace FastReport.Utils
             {
                 result.Append((char)int.Parse(s.Substring(i + 2, j - i - 2)));
             }
-            
+
             i = j;
           }
           else if (i + 5 < s.Length && s.Substring(i + 1, 5) == "quot;")

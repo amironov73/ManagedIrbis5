@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using FastReport.Utils;
-using FastReport.Data;
+using AM.Reporting.Utils;
+using AM.Reporting.Data;
 using System.Drawing.Design;
 
-namespace FastReport
+namespace AM.Reporting
 {
   /// <summary>
   /// This class represents the Data band.
@@ -139,7 +139,7 @@ namespace FastReport
     /// If there is only one relation (in most cases it is), you can leave this property empty.
     /// </remarks>
     [Category("Data")]
-    [Editor("FastReport.TypeEditors.RelationEditor, FastReport", typeof(UITypeEditor))]
+    [Editor("AM.Reporting.TypeEditors.RelationEditor, AM.Reporting", typeof(UITypeEditor))]
     public Relation Relation
     {
       get { return relation; }
@@ -163,7 +163,7 @@ namespace FastReport
     /// the corresponding data row will not be printed.
     /// </remarks>
     [Category("Data")]
-    [Editor("FastReport.TypeEditors.ExpressionEditor, FastReport", typeof(UITypeEditor))]
+    [Editor("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof(UITypeEditor))]
     public string Filter
     {
       get { return filter; }
@@ -174,7 +174,7 @@ namespace FastReport
     /// Gets the band columns.
     /// </summary>
     [Category("Appearance")]
-    [Editor("FastReport.TypeEditors.DataBandColumnEditor, FastReport", typeof(UITypeEditor))]
+    [Editor("AM.Reporting.TypeEditors.DataBandColumnEditor, AM.Reporting", typeof(UITypeEditor))]
     public BandColumns Columns
     {
       get { return columns; }
@@ -233,14 +233,14 @@ namespace FastReport
     /// <b>ParentIdColumn</b> and <b>Indent</b>. First two properties are used to identify the data
     /// row and its parent; the <b>Indent</b> property specifies the indent that will be used to shift
     /// the databand according to its hierarchy level.</para>
-    /// <para/>When printing hierarchy, FastReport shifts the band to the right
+    /// <para/>When printing hierarchy, AM.Reporting shifts the band to the right
     /// (by value specified in the <see cref="Indent"/> property), and also decreases the
     /// width of the band by the same value. You may use the <b>Anchor</b> property of the
     /// objects on a band to indicate whether the object should move with the band, or stay
     /// on its original position, or shrink.
     /// </remarks>
     [Category("Hierarchy")]
-    [Editor("FastReport.TypeEditors.DataColumnEditor, FastReport", typeof(UITypeEditor))]
+    [Editor("AM.Reporting.TypeEditors.DataColumnEditor, AM.Reporting", typeof(UITypeEditor))]
     public string IdColumn
     {
       get { return idColumn; }
@@ -255,7 +255,7 @@ namespace FastReport
     /// <see cref="IdColumn"/> property for more details.
     /// </remarks>
     [Category("Hierarchy")]
-    [Editor("FastReport.TypeEditors.DataColumnEditor, FastReport", typeof(UITypeEditor))]
+    [Editor("AM.Reporting.TypeEditors.DataColumnEditor, AM.Reporting", typeof(UITypeEditor))]
     public string ParentIdColumn
     {
       get { return parentIdColumn; }
@@ -271,7 +271,7 @@ namespace FastReport
     /// </remarks>
     [DefaultValue(37.8f)]
     [Category("Hierarchy")]
-    [TypeConverter("FastReport.TypeConverters.UnitsConverter, FastReport")]
+    [TypeConverter("AM.Reporting.TypeConverters.UnitsConverter, AM.Reporting")]
     public float Indent
     {
       get { return indent; }

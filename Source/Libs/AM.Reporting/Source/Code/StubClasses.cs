@@ -9,13 +9,13 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
 #nullable enable
 
-namespace FastReport.Code
+namespace AM.Reporting.Code
 {
     partial class AssemblyDescriptor
     {
@@ -162,7 +162,7 @@ namespace System.Web.UI
 internal static class Timer {}
 }
 
-namespace FastReport.Utils
+namespace AM.Reporting.Utils
 {
 internal static class Config {}
 }
@@ -479,7 +479,7 @@ Namespace System.Web.UI
     End Class
 End Namespace
 
-Namespace FastReport.Utils
+Namespace AM.Reporting.Utils
     Friend Class Config
     End Class
 End Namespace

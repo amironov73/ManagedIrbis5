@@ -2,9 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
-namespace FastReport
+namespace AM.Reporting
 {
   /// <summary>
   /// Holds the list of objects of <see cref="ReportComponentBase"/> type.
@@ -16,12 +16,12 @@ namespace FastReport
     /// </summary>
     /// <param name="index">Index of an element.</param>
     /// <returns>The element at the specified index.</returns>
-    public ReportComponentBase this[int index]  
+    public ReportComponentBase this[int index]
     {
       get { return List[index] as ReportComponentBase; }
       set { List[index] = value; }
     }
-    
+
     internal ReportComponentCollection SortByTop()
     {
       ReportComponentCollection result = new ReportComponentCollection();

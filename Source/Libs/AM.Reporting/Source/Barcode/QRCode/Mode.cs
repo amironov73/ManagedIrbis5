@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,16 +21,16 @@ using System;
 
 #nullable enable
 
-namespace FastReport.Barcode.QRCode
+namespace AM.Reporting.Barcode.QRCode
 {
-  
+
   /*/// <summary> <p>See ISO 18004:2006, 6.4.1, Tables 2 and 3. This enum encapsulates the various modes in which
   /// data can be encoded to bits in the QR code standard.</p>
-  /// 
+  ///
   /// </summary>
   /// <author>  Sean Owen
   /// </author>
-  /// <author>www.Redivivus.in (suraj.supekar@redivivus.in) - Ported from ZXING Java Source 
+  /// <author>www.Redivivus.in (suraj.supekar@redivivus.in) - Ported from ZXING Java Source
   /// </author>*/
   internal sealed class Mode
   {
@@ -40,7 +40,7 @@ namespace FastReport.Barcode.QRCode
       {
         return bits;
       }
-      
+
     }
     public System.String Name
     {
@@ -48,11 +48,11 @@ namespace FastReport.Barcode.QRCode
       {
         return name;
       }
-      
+
     }
-    
+
     // No, we can't use an enum here. J2ME doesn't support it.
-    
+
     //UPGRADE_NOTE: Final was removed from the declaration of 'TERMINATOR '. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1003'"
     public static readonly Mode TERMINATOR = new Mode(new int[]{0, 0, 0}, 0x00, "TERMINATOR"); // Not really a mode...
     //UPGRADE_NOTE: Final was removed from the declaration of 'NUMERIC '. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1003'"
@@ -71,21 +71,21 @@ namespace FastReport.Barcode.QRCode
     public static readonly Mode FNC1_FIRST_POSITION = new Mode(null, 0x05, "FNC1_FIRST_POSITION");
     //UPGRADE_NOTE: Final was removed from the declaration of 'FNC1_SECOND_POSITION '. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1003'"
     public static readonly Mode FNC1_SECOND_POSITION = new Mode(null, 0x09, "FNC1_SECOND_POSITION");
-    
+
     //UPGRADE_NOTE: Final was removed from the declaration of 'characterCountBitsForVersions '. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1003'"
     private int[] characterCountBitsForVersions;
     //UPGRADE_NOTE: Final was removed from the declaration of 'bits '. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1003'"
     private int bits;
     //UPGRADE_NOTE: Final was removed from the declaration of 'name '. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1003'"
     private System.String name;
-    
+
     private Mode(int[] characterCountBitsForVersions, int bits, System.String name)
     {
       this.characterCountBitsForVersions = characterCountBitsForVersions;
       this.bits = bits;
       this.name = name;
     }
-    
+
     /*/// <param name="version">version in question
     /// </param>
     /// <returns> number of bits used, in this QR Code symbol {@link Version}, to encode the

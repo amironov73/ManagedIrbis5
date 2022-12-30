@@ -5,11 +5,11 @@ using System.ComponentModel;
 using System.Drawing.Drawing2D;
 using System.IO;
 using System.Drawing.Imaging;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 using System.Windows.Forms;
 using System.Drawing.Design;
 
-namespace FastReport
+namespace AM.Reporting
 {
     /// <summary>
     /// Represents a Picture object that can display pictures.
@@ -45,9 +45,9 @@ namespace FastReport
     {
         #region Fields
         private Image image;
-        
+
         private int imageIndex;
-        
+
         private Color transparentColor;
         private float transparency;
         private bool tile;
@@ -73,7 +73,7 @@ namespace FastReport
         /// </code>
         /// </remarks>
         [Category("Data")]
-        [Editor("FastReport.TypeEditors.ImageEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.ImageEditor, AM.Reporting", typeof(UITypeEditor))]
         public virtual Image Image
         {
             get { return image; }
@@ -147,7 +147,7 @@ namespace FastReport
         /// Gets or sets the color of the image that will be treated as transparent.
         /// </summary>
         [Category("Appearance")]
-        [Editor("FastReport.TypeEditors.ColorEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.ColorEditor, AM.Reporting", typeof(UITypeEditor))]
         public Color TransparentColor
         {
             get { return transparentColor; }
@@ -193,10 +193,10 @@ namespace FastReport
             set { tile = value; }
         }
 
-        
+
 
         /// <summary>
-        /// Gets or sets a value indicating that the image stored in the <see cref="Image"/> 
+        /// Gets or sets a value indicating that the image stored in the <see cref="Image"/>
         /// property should be disposed when this object is disposed.
         /// </summary>
         /// <remarks>
@@ -443,7 +443,7 @@ namespace FastReport
             image.Dispose();
         }
 
-        // This is analogue of graphics.DrawImage(image, PointF[] points) method. 
+        // This is analogue of graphics.DrawImage(image, PointF[] points) method.
         // The original gdi+ method does not work properly in mono on linux/macos.
         private void DrawImage3Points(IGraphics g, Image image, PointF p0, PointF p1, PointF p2)
         {
@@ -474,7 +474,7 @@ namespace FastReport
             if (SizeMode == PictureBoxSizeMode.AutoSize)
                 ForceLoadImage();
         }
-        
+
         /// <inheritdoc/>
         public override void Serialize(FRWriter writer)
         {
@@ -556,10 +556,10 @@ namespace FastReport
 
 
 
-        
+
         //static int number = 0;
 
-        
+
 
 
 
@@ -570,7 +570,7 @@ namespace FastReport
         {
             if (!String.IsNullOrEmpty(ImageLocation))
             {
-                // 
+                //
                 try
                 {
                     Uri uri = CalculateUri();
@@ -653,9 +653,9 @@ namespace FastReport
         /// Forces loading the image from a data column.
         /// </summary>
         /// <remarks>
-        /// Call this method in the <b>AfterData</b> event handler to force loading an image 
-        /// into the <see cref="Image"/> property. Normally, the image is stored internally as byte[] array 
-        /// and never loaded into the <b>Image</b> property, to save the time. The side effect is that you 
+        /// Call this method in the <b>AfterData</b> event handler to force loading an image
+        /// into the <see cref="Image"/> property. Normally, the image is stored internally as byte[] array
+        /// and never loaded into the <b>Image</b> property, to save the time. The side effect is that you
         /// can't analyze the image properties such as width and height. If you need this, call this method
         /// before you access the <b>Image</b> property. Note that this will significantly slow down the report.
         /// </remarks>
@@ -682,6 +682,6 @@ namespace FastReport
             SetFlags(Flags.HasSmartTag, true);
             ResetImageIndex();
         }
-        
+
     }
 }

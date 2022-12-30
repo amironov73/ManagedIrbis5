@@ -5,9 +5,9 @@ using System.Drawing;
 using System.Drawing.Design;
 using System.IO;
 using System.Windows.Forms;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
-namespace FastReport
+namespace AM.Reporting
 {
 
     /// <summary>
@@ -66,7 +66,7 @@ namespace FastReport
         Bottom_Right,
     }
 
- 
+
 
     /// <summary>
     /// the base class for all picture objects
@@ -112,7 +112,7 @@ namespace FastReport
         /// Gets or sets the data column name to get the image from.
         /// </summary>
         [Category("Data")]
-        [Editor("FastReport.TypeEditors.DataColumnEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.DataColumnEditor, AM.Reporting", typeof(UITypeEditor))]
         public string DataColumn
         {
             get { return dataColumn; }
@@ -175,7 +175,7 @@ namespace FastReport
         /// The path will be savetd to the <see cref="ImageLocation"/> property.
         /// </remarks>
         [Category("Data")]
-        [Editor("FastReport.TypeEditors.ExpressionEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof(UITypeEditor))]
         public string ImageSourceExpression
         {
             get { return imageSourceExpression; }
@@ -250,7 +250,7 @@ namespace FastReport
         /// </remarks>
         [DefaultValue(0f)]
         [Category("Layout")]
-        [TypeConverter("FastReport.TypeConverters.UnitsConverter, FastReport")]
+        [TypeConverter("AM.Reporting.TypeConverters.UnitsConverter, AM.Reporting")]
         public float MaxHeight
         {
             get { return maxHeight; }
@@ -266,7 +266,7 @@ namespace FastReport
         /// </remarks>
         [DefaultValue(0f)]
         [Category("Layout")]
-        [TypeConverter("FastReport.TypeConverters.UnitsConverter, FastReport")]
+        [TypeConverter("AM.Reporting.TypeConverters.UnitsConverter, AM.Reporting")]
         public float MaxWidth
         {
             get { return maxWidth; }
@@ -668,7 +668,7 @@ namespace FastReport
             lowerLeft.Y += offsetY;
         }
 
-        
+
 
         /// <summary>
         /// Loads image

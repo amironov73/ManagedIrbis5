@@ -1,12 +1,34 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Drawing;
 using System.ComponentModel;
-using FastReport.Utils;
 
-namespace FastReport.Preview
+using AM.Reporting.Utils;
+
+#endregion
+
+#nullable enable
+
+namespace AM.Reporting.Preview
 {
     /// <summary>
     /// Specifies an action that will be performed on <b>PreparedPages.AddPage</b> method call.
@@ -29,13 +51,13 @@ namespace FastReport.Preview
     /// </summary>
     /// <remarks>
     /// <para>Prepared page is a page that you can see in the preview window. Prepared pages can be
-    /// accessed via <see cref="FastReport.Report.PreparedPages"/> property.</para>
+    /// accessed via <see cref="AM.Reporting.Report.PreparedPages"/> property.</para>
     /// <para>The common scenarios of using this object are:
     /// <list type="bullet">
     ///   <item>
-    ///     <description>Working with prepared pages after the report is finished: load 
-    ///     (<see cref="Load(string)"/>) or save (<see cref="Save(string)"/>) pages 
-    ///     from/to a .fpx file, get a page with specified index to work with its objects 
+    ///     <description>Working with prepared pages after the report is finished: load
+    ///     (<see cref="Load(string)"/>) or save (<see cref="Save(string)"/>) pages
+    ///     from/to a .fpx file, get a page with specified index to work with its objects
     ///     (<see cref="GetPage"/>); modify specified page (<see cref="ModifyPage"/>).
     ///     </description>
     ///   </item>
@@ -138,7 +160,7 @@ namespace FastReport.Preview
         /// <summary>
         /// Gets the XML for rendering the outline of the report
         /// </summary>
-        public XmlItem OutlineXml 
+        public XmlItem OutlineXml
         {
             get => outline.Xml;
         }
@@ -229,7 +251,7 @@ namespace FastReport.Preview
         /// </summary>
         /// <param name="page">The original (template) page to add.</param>
         /// <remarks>
-        /// Call the <see cref="AddSourcePage"/> method before adding a page. This method creates 
+        /// Call the <see cref="AddSourcePage"/> method before adding a page. This method creates
         /// a new output page with settings based on <b>page</b> parameter.
         /// </remarks>
         public void AddPage(ReportPage page)
@@ -254,7 +276,7 @@ namespace FastReport.Preview
         /// Prints a band with all its child objects.
         /// </summary>
         /// <param name="band">The band to print.</param>
-        /// <returns><b>true</b> if band was printed; <b>false</b> if it can't be printed 
+        /// <returns><b>true</b> if band was printed; <b>false</b> if it can't be printed
         /// on current page due to its <b>PrintOn</b> property value.</returns>
         /// <remarks>
         /// Call the <see cref="AddPage"/> method before adding a band.
@@ -465,10 +487,10 @@ namespace FastReport.Preview
                 // save ReportInfo
                 doc.Root.SetProp("ReportInfo.Name", Report.ReportInfo.Name);
                 doc.Root.SetProp("ReportInfo.Author", Report.ReportInfo.Author);
-                doc.Root.SetProp("ReportInfo.Description", Report.ReportInfo.Description);                
+                doc.Root.SetProp("ReportInfo.Description", Report.ReportInfo.Description);
                 doc.Root.SetProp("ReportInfo.Created", SystemFake.DateTime.Now.ToString());
                 doc.Root.SetProp("ReportInfo.Modified", SystemFake.DateTime.Now.ToString());
-                doc.Root.SetProp("ReportInfo.CreatorVersion", Report.ReportInfo.CreatorVersion);                
+                doc.Root.SetProp("ReportInfo.CreatorVersion", Report.ReportInfo.CreatorVersion);
 
                 XmlItem pages = doc.Root.Add();
                 pages.Name = "pages";

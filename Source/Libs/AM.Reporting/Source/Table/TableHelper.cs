@@ -1,9 +1,30 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Drawing;
 
-namespace FastReport.Table
+#endregion
+
+#nullable enable
+
+namespace AM.Reporting.Table
 {
     internal class TableHelper
     {
@@ -79,7 +100,7 @@ namespace FastReport.Table
                 TableRow row = null;
                 if (resultTable.Rows.Count <= printingRowIndex)
                 {
-                    // index is outside existing rows. Probably not all rows created yet, 
+                    // index is outside existing rows. Probably not all rows created yet,
                     // we're at the start. Add new row.
                     row = new TableRow();
                     row.Assign(sourceTable.Rows[rowIndex]);
@@ -154,7 +175,7 @@ namespace FastReport.Table
                 TableColumn column = null;
                 if (resultTable.Columns.Count <= printingColumnIndex)
                 {
-                    // index is outside existing columns. Probably not all columns 
+                    // index is outside existing columns. Probably not all columns
                     // created yet, we're at the start. Add new column.
                     column = new TableColumn();
                     column.Assign(sourceTable.Columns[columnIndex]);
@@ -199,7 +220,7 @@ namespace FastReport.Table
                     {
                         SpanData spanData = columnSpans[0];
 
-                        // check if we are printing the last column of the cell's span. From now, we will not accept 
+                        // check if we are printing the last column of the cell's span. From now, we will not accept
                         // the first column.
                         if (originalColumnIndex == spanData.originalCellOrigin.X + spanData.originalCell.ColSpan - 1)
                             spanData.finishFlag = true;
@@ -234,7 +255,7 @@ namespace FastReport.Table
                         {
                             SpanData spanData = rowSpans[i];
 
-                            // check if we are printing the last row of the cell's span. From now, we will not accept 
+                            // check if we are printing the last row of the cell's span. From now, we will not accept
                             // the first row.
                             if (originalRowIndex == spanData.originalCellOrigin.Y + spanData.originalCell.RowSpan - 1)
                                 spanData.finishFlag = true;
@@ -285,7 +306,7 @@ namespace FastReport.Table
                     {
                         SpanData spanData = rowSpans[0];
 
-                        // check if we are printing the last row of the cell's span. From now, we will not accept 
+                        // check if we are printing the last row of the cell's span. From now, we will not accept
                         // the first row.
                         if (originalRowIndex == spanData.originalCellOrigin.Y + spanData.originalCell.RowSpan - 1)
                             spanData.finishFlag = true;
@@ -320,7 +341,7 @@ namespace FastReport.Table
                         {
                             SpanData spanData = columnSpans[i];
 
-                            // check if we are printing the last column of the cell's span. From now, we will not accept 
+                            // check if we are printing the last column of the cell's span. From now, we will not accept
                             // the first column.
                             if (originalColumnIndex == spanData.originalCellOrigin.X + spanData.originalCell.ColSpan - 1)
                                 spanData.finishFlag = true;

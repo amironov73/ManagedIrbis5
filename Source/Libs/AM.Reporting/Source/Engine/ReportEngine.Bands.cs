@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,7 +22,7 @@ using System.Collections.Generic;
 
 #nullable enable
 
-namespace FastReport.Engine
+namespace AM.Reporting.Engine
 {
     public partial class ReportEngine
     {
@@ -90,7 +90,7 @@ namespace FastReport.Engine
 
             try
             {
-                PrepareBand(band, getData); 
+                PrepareBand(band, getData);
 
                 if (band.Visible)
                 {

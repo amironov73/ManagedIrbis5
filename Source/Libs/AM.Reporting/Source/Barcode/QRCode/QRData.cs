@@ -9,13 +9,13 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
 using System;
 using System.Collections.Generic;
@@ -27,7 +27,7 @@ using System.Text.RegularExpressions;
 
 #nullable enable
 
-namespace FastReport.Barcode.QRCode
+namespace AM.Reporting.Barcode.QRCode
 {
     abstract class QRData
     {
@@ -248,7 +248,7 @@ namespace FastReport.Barcode.QRCode
         public string VersionStandart = "0001";
         public string Encoding="2";
 
-        #region necessary payment details 
+        #region necessary payment details
         public string Name;
         public string PersonalAcc;
         public string BankName;
@@ -345,7 +345,7 @@ namespace FastReport.Barcode.QRCode
             if (!String.IsNullOrWhiteSpace(Contract)) result += Separator +"Contract="+Contract;
             if (!String.IsNullOrWhiteSpace(PersAccp)) result += Separator +"PersAcc="+PersAccp;
             if (!String.IsNullOrWhiteSpace(Flat)) result += Separator +"Flat="+Flat;
-            if (!String.IsNullOrWhiteSpace(Phone)) result += Separator + "Phone=" + Phone; 
+            if (!String.IsNullOrWhiteSpace(Phone)) result += Separator + "Phone=" + Phone;
             if (!String.IsNullOrWhiteSpace(PayerIdType)) result += Separator +"PayerIdType="+PayerIdType;
             if (!String.IsNullOrWhiteSpace(PayerIdNum)) result += Separator +"PayerIdNum="+PayerIdNum;
             if (!String.IsNullOrWhiteSpace(ChildFio)) result += Separator +"ChildFio="+ChildFio;

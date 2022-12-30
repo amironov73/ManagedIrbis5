@@ -1,15 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using FastReport.Data;
-using FastReport.Export;
+using AM.Reporting.Data;
+using AM.Reporting.Export;
 using System.Data.Common;
 using System.ComponentModel;
 
-namespace FastReport
+namespace AM.Reporting
 {
   /// <summary>
-  /// Provides data for the <see cref="FastReport.Report.LoadBaseReport"/> event.
+  /// Provides data for the <see cref="AM.Reporting.Report.LoadBaseReport"/> event.
   /// </summary>
   public class CustomLoadEventArgs : EventArgs
   {
@@ -46,7 +46,7 @@ namespace FastReport
   }
 
   /// <summary>
-  /// Provides data for the <see cref="FastReport.Report.CustomCalc"/> event.
+  /// Provides data for the <see cref="AM.Reporting.Report.CustomCalc"/> event.
   /// </summary>
   public class CustomCalcEventArgs : EventArgs
   {
@@ -116,7 +116,7 @@ namespace FastReport
     private string message;
     private int progress;
     private int total;
-    
+
     /// <summary>
     /// Gets a progress message.
     /// </summary>
@@ -124,7 +124,7 @@ namespace FastReport
     {
       get { return message; }
     }
-    
+
     /// <summary>
     /// Gets the current page number.
     /// </summary>
@@ -132,7 +132,7 @@ namespace FastReport
     {
       get { return progress; }
     }
-    
+
     /// <summary>
     /// Gets the number of total pages.
     /// </summary>
@@ -172,7 +172,7 @@ namespace FastReport
     private string connectionString;
     private string userName;
     private string password;
-    
+
     /// <summary>
     /// Gets or sets the connection string.
     /// </summary>
@@ -181,7 +181,7 @@ namespace FastReport
       get { return connectionString; }
       set { connectionString = value; }
     }
-    
+
     /// <summary>
     /// Gets or sets an user name.
     /// </summary>
@@ -190,7 +190,7 @@ namespace FastReport
       get { return userName; }
       set { userName = value; }
     }
-    
+
     /// <summary>
     /// Gets or sets a password.
     /// </summary>
@@ -199,7 +199,7 @@ namespace FastReport
       get { return password; }
       set { password = value; }
     }
-    
+
     /// <summary>
     /// Initializes a new instance of the <see cref="DatabaseLoginEventArgs"/> class using the specified
     /// connection string.
@@ -228,7 +228,7 @@ namespace FastReport
   public class AfterDatabaseLoginEventArgs
   {
     private DbConnection connection;
-    
+
     /// <summary>
     /// Gets the <b>DbConnection</b> object.
     /// </summary>
@@ -238,7 +238,7 @@ namespace FastReport
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="AfterDatabaseLoginEventArgs"/> class using 
+    /// Initializes a new instance of the <see cref="AfterDatabaseLoginEventArgs"/> class using
     /// the specified connection.
     /// </summary>
     /// <param name="connection">The connection object.</param>

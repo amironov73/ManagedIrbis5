@@ -1,12 +1,33 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 
-namespace FastReport.Utils
+#endregion
+
+#nullable enable
+
+namespace AM.Reporting.Utils
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class ZipArchive
     {
@@ -21,7 +42,7 @@ namespace FastReport.Utils
             source.Position = 0;
             int bufflength = 8192;
             uint crc = Crc32.Begin();
-            byte[] buff = new byte[bufflength];            
+            byte[] buff = new byte[bufflength];
             int i;
             while ((i = source.Read(buff, 0, bufflength)) > 0)
             {
@@ -34,14 +55,14 @@ namespace FastReport.Utils
         /// <summary>
         /// Clear all files in archive.
         /// </summary>
-        public void Clear()        
+        public void Clear()
         {
             foreach (ZipFileItem item in fileList)
                 item.Clear();
             foreach (ZipLocalFile item in fileObjects)
                 item.Clear();
             fileList.Clear();
-            fileObjects.Clear();            
+            fileObjects.Clear();
             errors = "";
             rootFolder = "";
             comment = "";
@@ -103,7 +124,7 @@ namespace FastReport.Utils
                 if ((File.GetAttributes(folder) & FileAttributes.Hidden) != 0)
                     continue;
                 AddDir(folder);
-            }            
+            }
         }
 
         /// <summary>
@@ -169,7 +190,7 @@ namespace FastReport.Utils
                 ZipFile.FileData = null;
                 fileObjects.Add(ZipFile);
             }
-            
+
             CentralStartPos = Stream.Position;
             for (int i = 0; i < fileObjects.Count; i++)
             {
@@ -247,7 +268,7 @@ namespace FastReport.Utils
             fileList = new List<ZipFileItem>();
             fileObjects = new List<ZipLocalFile>();
             Clear();
-        }                
+        }
     }
 
     internal class ZipFileItem
@@ -266,7 +287,7 @@ namespace FastReport.Utils
                 ((date.Hour & 0x1F) << 11) |
                 ((date.Minute & 0x3F) << 5) |
                 (date.Second >> 1));
-        }        
+        }
 
         public string Name
         {
@@ -349,7 +370,7 @@ namespace FastReport.Utils
             Stream.Write(BitConverter.GetBytes(compressedSize), 0, 4);
             Stream.Write(BitConverter.GetBytes(unCompressedSize), 0, 4);
             Stream.Write(BitConverter.GetBytes(fileNameLength), 0, 2);
-            Stream.Write(BitConverter.GetBytes(extraFieldLength), 0, 2);            
+            Stream.Write(BitConverter.GetBytes(extraFieldLength), 0, 2);
             if (fileNameLength > 0)
                 Stream.Write(System.Text.Encoding.UTF8.GetBytes(fileName), 0, fileNameLength);
             if (extraFieldLength > 0)
@@ -365,7 +386,7 @@ namespace FastReport.Utils
         {
             get { return version; }
             set { version = value; }
-            
+
         }
 
         public ushort GeneralPurpose
@@ -373,7 +394,7 @@ namespace FastReport.Utils
             get { return generalPurpose; }
             set { generalPurpose = value; }
         }
-    
+
         public ushort CompressionMethod
         {
             get { return compressionMethod; }
@@ -385,7 +406,7 @@ namespace FastReport.Utils
             get { return lastModFileDate; }
             set { lastModFileDate = value; }
         }
-    
+
         public uint Crc32
         {
             get { return crc32; }
@@ -418,18 +439,18 @@ namespace FastReport.Utils
         public string FileName
         {
             get { return fileName; }
-            set 
-            {                
+            set
+            {
                 fileName = value.Replace('\\', '/');
-                fileNameLength = (ushort)System.Text.Encoding.UTF8.GetBytes(value).Length;            
+                fileNameLength = (ushort)System.Text.Encoding.UTF8.GetBytes(value).Length;
             }
         }
 
         public string ExtraField
         {
             get { return extraField; }
-            set 
-            {   
+            set
+            {
                 extraField = value;
                 extraFieldLength = (ushort)value.Length;
             }
@@ -495,19 +516,19 @@ namespace FastReport.Utils
             get { return numberOfTheDiskStartCentralDir; }
             set { numberOfTheDiskStartCentralDir = value; }
         }
-        
+
         public ushort TotalOfEntriesCentralDirOnDisk
         {
             get { return totalOfEntriesCentralDirOnDisk; }
             set { totalOfEntriesCentralDirOnDisk = value; }
         }
-        
+
         public ushort TotalOfEntriesCentralDir
         {
             get { return totalOfEntriesCentralDir; }
             set { totalOfEntriesCentralDir = value; }
         }
-        
+
         public uint SizeOfCentralDir
         {
             get { return sizeOfCentralDir; }
@@ -529,7 +550,7 @@ namespace FastReport.Utils
         public string Comment
         {
             get { return comment; }
-            set 
+            set
             {
                 comment = value;
                 commentLength = (ushort)value.Length;
@@ -636,7 +657,7 @@ namespace FastReport.Utils
         }
 
         public uint CompressedSize
-        { 
+        {
             get { return compressedSize; }
             set { compressedSize = value; }
         }
@@ -646,7 +667,7 @@ namespace FastReport.Utils
             get { return unCompressedSize; }
             set { unCompressedSize =value; }
         }
-        
+
         public ushort FileNameLength
         {
             get { return fileNameLength; }
@@ -676,39 +697,39 @@ namespace FastReport.Utils
             get { return internalFileAttribute; }
             set { internalFileAttribute = value; }
         }
-        
+
         public uint ExternalFileAttribute
         {
             get { return externalFileAttribute; }
             set { externalFileAttribute = value; }
         }
-        
+
         public uint RelativeOffsetLocalHeader
         {
             get { return relativeOffsetLocalHeader; }
             set { relativeOffsetLocalHeader = value; }
         }
-        
+
         public string FileName
         {
             get { return fileName; }
-            set 
-            { 
+            set
+            {
                 fileName = value.Replace('\\', '/');
                 fileNameLength = (ushort)System.Text.Encoding.UTF8.GetBytes(value).Length;
             }
         }
-        
+
         public string ExtraField
         {
             get { return extraField; }
-            set 
-            { 
+            set
+            {
                 extraField = value;
-                extraFieldLength = (ushort)value.Length; 
+                extraFieldLength = (ushort)value.Length;
             }
         }
-        
+
         public string FileComment
         {
             get { return fileComment; }

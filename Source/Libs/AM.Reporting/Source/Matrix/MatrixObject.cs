@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -18,16 +18,16 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using FastReport.Table;
-using FastReport.Data;
-using FastReport.Utils;
+using AM.Reporting.Table;
+using AM.Reporting.Data;
+using AM.Reporting.Utils;
 using System.Drawing.Design;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Matrix
+namespace AM.Reporting.Matrix
 {
     /// <summary>
     /// Describes how the even style is applied to a matrix.
@@ -73,7 +73,7 @@ namespace FastReport.Matrix
     ///   </item>
     /// </list>
     /// <para/>To connect the matrix to a datasource, use the <see cref="DataSource"/> property. If
-    /// this property is not set, the result matrix will be empty. In this case you may use 
+    /// this property is not set, the result matrix will be empty. In this case you may use
     /// the <see cref="ManualBuild"/> event handler to fill the matrix.
     /// </remarks>
     /// <example>This example demonstrates how to create a matrix in a code.
@@ -83,30 +83,30 @@ namespace FastReport.Matrix
     /// matrix.Name = "Matrix1";
     /// // add it to the report title band of the first report page
     /// matrix.Parent = (report.Pages[0] as ReportPage).ReportTitle;
-    /// 
+    ///
     /// // create two column descriptors
     /// MatrixHeaderDescriptor column = new MatrixHeaderDescriptor("[MatrixDemo.Year]");
     /// matrix.Data.Columns.Add(column);
     /// column = new MatrixHeaderDescriptor("[MatrixDemo.Month]");
     /// matrix.Data.Columns.Add(column);
-    /// 
+    ///
     /// // create one row descriptor
     /// MatrixHeaderDescriptor row = new MatrixHeaderDescriptor("[MatrixDemo.Name]");
     /// matrix.Data.Rows.Add(row);
-    /// 
+    ///
     /// // create one data cell
     /// MatrixCellDescriptor cell = new MatrixCellDescriptor("[MatrixDemo.Revenue]", MatrixAggregateFunction.Sum);
     /// matrix.Data.Cells.Add(cell);
-    /// 
+    ///
     /// // connect matrix to a datasource
     /// matrix.DataSource = Report.GetDataSource("MatrixDemo");
-    /// 
+    ///
     /// // create the matrix template
     /// matrix.BuildTemplate();
-    /// 
+    ///
     /// // change the style
     /// matrix.Style = "Green";
-    /// 
+    ///
     /// // change the column and row total's text to "Grand Total"
     /// matrix.Data.Columns[0].TemplateTotalCell.Text = "Grand Total";
     /// matrix.Data.Rows[0].TemplateTotalCell.Text = "Grand Total";
@@ -143,7 +143,7 @@ namespace FastReport.Matrix
         /// Allows to fill the matrix in code.
         /// </summary>
         /// <remarks>
-        /// In most cases the matrix is connected to a datasource via the <see cref="DataSource"/> 
+        /// In most cases the matrix is connected to a datasource via the <see cref="DataSource"/>
         /// property. When you run a report, the matrix is filled with datasource values automatically.
         /// <para/>Using this event, you can put additional values to the matrix or even completely fill it
         /// with own values (if <see cref="DataSource"/> is set to <b>null</b>. To do this, call the
@@ -156,17 +156,17 @@ namespace FastReport.Matrix
         /// // provide 3 one-dimensional arrays with one element in each to the AddValue method
         /// Matrix1.Data.AddValue(
         ///   new object[] { 1996 },
-        ///   new object[] { "Andrew Fuller" }, 
+        ///   new object[] { "Andrew Fuller" },
         ///   new object[] { 123.45f });
         /// Matrix1.Data.AddValue(
         ///   new object[] { 1997 },
-        ///   new object[] { "Andrew Fuller" }, 
+        ///   new object[] { "Andrew Fuller" },
         ///   new object[] { 21.35f });
         /// Matrix1.Data.AddValue(
         ///   new object[] { 1997 },
-        ///   new object[] { "Nancy Davolio" }, 
+        ///   new object[] { "Nancy Davolio" },
         ///   new object[] { 421.5f });
-        /// 
+        ///
         /// // this code will produce the following matrix:
         /// //               |  1996  |  1997  |
         /// // --------------+--------+--------+
@@ -257,7 +257,7 @@ namespace FastReport.Matrix
         /// </summary>
         /// <remarks>
         /// When you create the matrix in the designer by drag-drop data columns into it,
-        /// this property will be set automatically. However you need to set it if you create 
+        /// this property will be set automatically. However you need to set it if you create
         /// the matrix in code.
         /// </remarks>
         [Category("Data")]
@@ -285,7 +285,7 @@ namespace FastReport.Matrix
         /// the corresponding data row will be skipped.
         /// </remarks>
         [Category("Data")]
-        [Editor("FastReport.TypeEditors.ExpressionEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof(UITypeEditor))]
         public string Filter
         {
             get { return filter; }
@@ -312,7 +312,7 @@ namespace FastReport.Matrix
         /// Gets or sets a matrix style.
         /// </summary>
         [Category("Appearance")]
-        [Editor("FastReport.TypeEditors.MatrixStyleEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.MatrixStyleEditor, AM.Reporting", typeof(UITypeEditor))]
         public new string Style
         {
             get { return style; }
@@ -339,7 +339,7 @@ namespace FastReport.Matrix
         /// </summary>
         [Category("Behavior")]
         [DefaultValue(false)]
-        public bool SplitRows 
+        public bool SplitRows
         {
             get { return splitRows; }
             set { splitRows = value; }
@@ -357,7 +357,7 @@ namespace FastReport.Matrix
         }
 
         /// <summary>
-        /// Gets or sets a script method name that will be used to handle the 
+        /// Gets or sets a script method name that will be used to handle the
         /// <see cref="ManualBuild"/> event.
         /// </summary>
         /// <remarks>
@@ -371,7 +371,7 @@ namespace FastReport.Matrix
         }
 
         /// <summary>
-        /// Gets or sets a script method name that will be used to handle the 
+        /// Gets or sets a script method name that will be used to handle the
         /// <see cref="ModifyResult"/> event.
         /// </summary>
         /// <remarks>
@@ -385,7 +385,7 @@ namespace FastReport.Matrix
         }
 
         /// <summary>
-        /// Gets or sets a script method name that will be used to handle the 
+        /// Gets or sets a script method name that will be used to handle the
         /// <see cref="AfterTotals"/> event.
         /// </summary>
         /// <remarks>
@@ -426,8 +426,8 @@ namespace FastReport.Matrix
         ///     <description>click the "Highlight" button on the "Text" toolbar;</description>
         ///   </item>
         ///   <item>
-        ///     <description>add a new highlight condition. Use the <b>Matrix.ColumnValues</b> to 
-        ///     refer to the value you need to analyze. Note: these values are arrays of <b>System.Object</b>, 
+        ///     <description>add a new highlight condition. Use the <b>Matrix.ColumnValues</b> to
+        ///     refer to the value you need to analyze. Note: these values are arrays of <b>System.Object</b>,
         ///     so you need to cast it to actual type before making any comparisons. Example of highlight
         ///     condition: <c>(int)Matrix1.ColumnValues[0] == 2000</c>.
         ///     </description>
@@ -455,8 +455,8 @@ namespace FastReport.Matrix
         ///     <description>click the "Highlight" button on the "Text" toolbar;</description>
         ///   </item>
         ///   <item>
-        ///     <description>add a new highlight condition. Use the <b>Matrix.RowValues</b> to 
-        ///     refer to the value you need to analyze. Note: these values are arrays of <b>System.Object</b>, 
+        ///     <description>add a new highlight condition. Use the <b>Matrix.RowValues</b> to
+        ///     refer to the value you need to analyze. Note: these values are arrays of <b>System.Object</b>,
         ///     so you need to cast it to actual type before making any comparisons. Example of highlight
         ///     condition: <c>(string)Matrix1.RowValues[0] == "Andrew Fuller"</c>.
         ///     </description>
@@ -671,7 +671,7 @@ namespace FastReport.Matrix
             MatrixEvenStylePriority = src.MatrixEvenStylePriority;
             SplitRows = src.SplitRows;
             PrintIfEmpty = src.PrintIfEmpty;
-            data = src.Data;            
+            data = src.Data;
         }
 
         /// <inheritdoc/>
@@ -722,7 +722,7 @@ namespace FastReport.Matrix
         /// </summary>
         /// <remarks>
         /// Call this method after you modify the matrix descriptors using the <see cref="Data"/>
-        /// object's properties. 
+        /// object's properties.
         /// </remarks>
         public void BuildTemplate()
         {
@@ -881,7 +881,7 @@ namespace FastReport.Matrix
         /// <param name="index">Zero-based index of the data cell.</param>
         /// <returns>The cell's value.</returns>
         /// <remarks>
-        /// Use this method in the cell's expression if the cell has custom totals 
+        /// Use this method in the cell's expression if the cell has custom totals
         /// (the total function is set to "Custom"). The example:
         /// <para/>Matrix1.Value(0) / Matrix1.Value(1)
         /// <para/>will return the result of dividing the first data cell's value by the second one.

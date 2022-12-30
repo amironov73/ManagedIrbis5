@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,14 +24,14 @@ using System.CodeDom.Compiler;
 
 using Microsoft.VisualBasic;
 
-using FastReport.Utils;
-using FastReport.Data;
+using AM.Reporting.Utils;
+using AM.Reporting.Data;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Code
+namespace AM.Reporting.Code
 {
     internal partial class VbCodeHelper : CodeHelperBase
     {
@@ -98,8 +98,8 @@ namespace FastReport.Code
             return "Imports System\r\nImports System.Collections\r\nImports System.Collections.Generic\r\n" +
               "Imports System.ComponentModel\r\nImports System.Windows.Forms\r\nImports System.Drawing\r\n" +
               "Imports Microsoft.VisualBasic\r\n" +
-              "Imports FastReport\r\nImports FastReport.Data\r\nImports FastReport.Dialog\r\nImports FastReport.Table\r\n" +
-              "Imports FastReport.Barcode\r\nImports FastReport.Utils\r\n\r\nNamespace FastReport\r\n" +
+              "Imports AM.Reporting\r\nImports AM.Reporting.Data\r\nImports AM.Reporting.Dialog\r\nImports AM.Reporting.Table\r\n" +
+              "Imports AM.Reporting.Barcode\r\nImports AM.Reporting.Utils\r\n\r\nNamespace AM.Reporting\r\n" +
               "  Public Class ReportScript\r\n\r\n  End Class\r\nEnd Namespace\r\n";
         }
 
@@ -119,7 +119,7 @@ namespace FastReport.Code
 
         public override string BeginCalcExpression()
         {
-            return "    Private Function CalcExpression(ByVal expression As String, ByVal Value as Global.FastReport.Variant) As Object\r\n      ";
+            return "    Private Function CalcExpression(ByVal expression As String, ByVal Value as Global.AM.Reporting.Variant) As Object\r\n      ";
         }
 
         public override string AddExpression(string expr, string value)

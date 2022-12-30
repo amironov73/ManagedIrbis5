@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,13 +19,13 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Export.Html
+namespace AM.Reporting.Export.Html
 {
     /// <summary>
     /// Represents the HTML export templates.
@@ -114,7 +114,7 @@ namespace FastReport.Export.Html
             Part("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">");
             Part("<html><head>");
             Part("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">");
-            Part("<meta name=Generator content=\"FastReport http://www.fast-report.com\">");
+            Part("<meta name=Generator content=\"AM.Reporting http://www.fast-report.com\">");
             Part("<title>{0}</title>");
             pageTemplateTitle = Capacitor();
 
@@ -131,7 +131,7 @@ namespace FastReport.Export.Html
             Part("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">");
             Part("<html><head>");
             Part("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">");
-            Part("<meta name=Generator content=\"FastReport http://www.fast-report.com\">");
+            Part("<meta name=Generator content=\"AM.Reporting http://www.fast-report.com\">");
             Part("<title></title><style type=\"text/css\"><!--");
             Part("body,input,select {{ font-family:\"Lucida Grande\",Calibri,Arial,sans-serif; font-size: 8px; font-weight: bold; font-style: normal; text-align: center; vertical-align: middle; }}");
             Part("input {{text-align: center}}");
@@ -177,7 +177,7 @@ namespace FastReport.Export.Html
             Part("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Frameset//EN\" \"http://www.w3.org/TR/html4/frameset.dtd\"");
             Part("<html><head>");
             Part("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">");
-            Part("<meta name=Generator content=\"FastReport http://www.fast-report.com\">");
+            Part("<meta name=Generator content=\"AM.Reporting http://www.fast-report.com\">");
             Part("<title>{0}</title>");
             Part("<frameset rows=\"36,*\" cols=\"*\">");
             Part("<frame name=\"topFrame\" src=\"{1}\" noresize frameborder=\"0\" scrolling=\"no\">");

@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,7 +21,7 @@ using System.Text;
 using System.Drawing;
 using System.ComponentModel;
 
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
 using System.Drawing.Drawing2D;
 
@@ -29,7 +29,7 @@ using System.Drawing.Drawing2D;
 
 #nullable enable
 
-namespace FastReport.Barcode
+namespace AM.Reporting.Barcode
 {
     internal enum BarLineType
     {
@@ -533,7 +533,7 @@ namespace FastReport.Barcode
                 SizeF size = g.MeasureString(s, drawFont);
                 size.Width /= zoom;
                 size.Height /= zoom;
-                
+
                 g.DrawString(s, drawFont, new SolidBrush(Color),
                   (x1 + (x2 - x1 - size.Width) / 2) * zoom,
                   (textUp ? 0 : drawArea.Height - size.Height) * zoom);

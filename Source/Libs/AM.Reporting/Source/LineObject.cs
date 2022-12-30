@@ -4,15 +4,15 @@ using System.Text;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
-namespace FastReport
+namespace AM.Reporting
 {
     /// <summary>
     /// Represents a line object.
     /// </summary>
     /// <remarks>
-    /// Use the <b>Border.Width</b>, <b>Border.Style</b> and <b>Border.Color</b> properties to set 
+    /// Use the <b>Border.Width</b>, <b>Border.Style</b> and <b>Border.Color</b> properties to set
     /// the line width, style and color. Set the <see cref="Diagonal"/> property to <b>true</b>
     /// if you want to show a diagonal line.
     /// </remarks>

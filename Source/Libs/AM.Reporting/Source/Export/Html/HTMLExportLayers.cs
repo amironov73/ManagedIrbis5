@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -18,16 +18,16 @@
 using System;
 using System.Drawing;
 using System.IO;
-using FastReport.Table;
-using FastReport.Utils;
+using AM.Reporting.Table;
+using AM.Reporting.Utils;
 using System.Windows.Forms;
-using FastReport.Export;
+using AM.Reporting.Export;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Export.Html
+namespace AM.Reporting.Export.Html
 {
     public partial class HTMLExport : ExportBase
     {
@@ -140,7 +140,7 @@ namespace FastReport.Export.Html
             if (Page != null && obj != null)
             {
                 string onclick = null;
-                
+
                 if (!String.IsNullOrEmpty(ReportID))
                 {
                     if (!String.IsNullOrEmpty(obj.ClickEvent) || obj.HasClickListeners())
@@ -159,7 +159,7 @@ namespace FastReport.Export.Html
                     {
                         onclick = "text_edit";
                     }
-           
+
                 }
 
                 // we need to adjust left, top, width and height values because borders take up space in html elements
@@ -240,7 +240,7 @@ namespace FastReport.Export.Html
                         !textObject.Font.Underline ? ";text-decoration:none" : String.Empty
                         );
                 }
-            
+
                 string url = EncodeURL(obj.Hyperlink.Value);
                 if (obj.Hyperlink.Kind == HyperlinkKind.URL)
                     href = String.Format("<a {0} href=\"{1}\"" + (obj.Hyperlink.OpenLinkInNewTab ? "target=\"_blank\"" : "") + ">", hrefStyle, obj.Hyperlink.Value);
@@ -391,7 +391,7 @@ namespace FastReport.Export.Html
                                             }
                                         }
                                         else if (obj.VertAlign == VertAlign.Bottom)
-                                        {                                         
+                                        {
                                             // (float)(Math.Round(obj.Font.Size * 96 / 72) / 2
                                             // necessary to compensate for paragraph offset error in GetSpanText method below
                                             top = obj.Height - height - obj.Padding.Bottom - (float)(Math.Round(obj.Font.Size * 96 / 72) / 2);
@@ -575,7 +575,7 @@ namespace FastReport.Export.Html
                         using (Graphics g = Graphics.FromImage(image))
                         {
 #if MSCHART
-                            if (obj is TextObjectBase || obj is FastReport.MSChart.MSChartObject)
+                            if (obj is TextObjectBase || obj is AM.Reporting.MSChart.MSChartObject)
                                 g.Clear(GetClearColor(obj));
 #else
                             if (obj is TextObjectBase)
@@ -594,7 +594,7 @@ namespace FastReport.Export.Html
                             obj.Draw(new FRPaintEventArgs(g, Zoom * zoom, Zoom * zoom, Report.GraphicCache));
                             obj.Border.Lines = oldLines;
                         }
-                        
+
                         using (Bitmap b = new Bitmap(
                         (int)(Math.Abs(Math.Round(Width * Zoom))),
                         (int)(Math.Abs(Math.Round(Height * Zoom)))
@@ -623,7 +623,7 @@ namespace FastReport.Export.Html
 #if MONO
                             using (MemoryStream picStr = new MemoryStream())
                             {
-                                
+
                                 ImageHelper.Save(pic.Image, picStr);
                                 using(StreamWriter picWriter = new StreamWriter(picStr))
                                 {
@@ -635,8 +635,8 @@ namespace FastReport.Export.Html
                                     picWriter.Write(pic.CanShrink);
                                     picWriter.Write(pic.CanGrow);
                                     hash = Crypter.ComputeHash(picStr);
-                                }        
-                            }   
+                                }
+                            }
 #else
 
                             hash = Crypter.ComputeHash(PictureStream);
@@ -673,7 +673,7 @@ namespace FastReport.Export.Html
                 {
                     i++;
                     tempObj = tempObj.Parent as ReportComponentBase;
-                    
+
                     if (tempObj != null && !tempObj.Fill.IsTransparent)
                     {
                         color = tempObj.FillColor;
@@ -788,7 +788,7 @@ namespace FastReport.Export.Html
                         TableCell textcell = table[j, i];
 
                         textcell.Left = x;
-                        textcell.Top = y;                      
+                        textcell.Top = y;
 
                         // custom draw
                         CustomDrawEventArgs e = new CustomDrawEventArgs();
@@ -800,7 +800,7 @@ namespace FastReport.Export.Html
                         e.top = hPos + textcell.AbsTop;
                         e.width = textcell.Width;
                         e.height = textcell.Height;
-                        
+
                         OnCustomDraw(e);
                         if (e.done)
                         {
@@ -832,7 +832,7 @@ namespace FastReport.Export.Html
                 return (aObj.Angle == 0) && (aObj.FontWidthRatio == 1) && (!aObj.TextOutline.Enabled) && (!aObj.Underlines);
             }
             return false;
-            
+
         }
 
         private void Watermark(FastString Page, ReportPage page, bool drawText)
@@ -1006,11 +1006,11 @@ namespace FastReport.Export.Html
                                     tableback.Top = table.AbsTop;
                                     float tableWidth = 0;
                                     float tableHeight = 0;
-                                  
+
                                     for (int i = 0; i < table.ColumnCount; i++)
                                         tableWidth += table[i, 0].Width;
                                     for (int i = 0; i < table.RowCount; i++)
-                                        tableHeight += table.Rows[i].Height;                         
+                                        tableHeight += table.Rows[i].Height;
                                     tableback.Width = (tableWidth < table.Width) ? tableWidth : table.Width;
                                     tableback.Height = tableHeight;
                                     LayerText(htmlPage, tableback);

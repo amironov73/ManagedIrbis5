@@ -9,13 +9,13 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
 using System;
 using System.Collections.Generic;
@@ -26,7 +26,7 @@ using System.Text;
 
 #nullable enable
 
-namespace FastReport.Barcode
+namespace AM.Reporting.Barcode
 {
     /// <summary>
     /// Generates the "2/5 Interleaved" barcode.
@@ -176,7 +176,7 @@ namespace FastReport.Barcode
                 base.text = base.text.Substring(0, base.text.Length - 1);
             }
             else
-                base.text = base.text.Insert(14, " ");           
+                base.text = base.text.Insert(14, " ");
 
 
             return result;
@@ -248,9 +248,9 @@ namespace FastReport.Barcode
                 return data + "0";
             return data + (10 - (sum % 10)).ToString();
         }
-		
 
-        #endregion 
+
+        #endregion
         internal override void Serialize(FRWriter writer, string prefix, BarcodeBase diff)
         {
             base.Serialize(writer, prefix, diff);
@@ -323,7 +323,7 @@ namespace FastReport.Barcode
                 .Insert(16, " ")
                 .Insert(19, " ");
 
-       
+
 
 
             return result;
@@ -404,7 +404,7 @@ namespace FastReport.Barcode
                 }
             }
 
-            result += "605";   //Stopcode 
+            result += "605";   //Stopcode
             for (int i = 0; i < 14; i++)//10 for light margin and 4 for vertical bearer bar
             {
                 result += "0";
@@ -503,7 +503,7 @@ namespace FastReport.Barcode
                 }
             }
 
-            result += "605060";   //Stopcode 
+            result += "605060";   //Stopcode
             return result;
         }
     }

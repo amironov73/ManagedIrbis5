@@ -1,12 +1,34 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.ComponentModel;
 using System.Drawing;
-using FastReport.Data;
-using FastReport.Utils;
 
-namespace FastReport.Table
+using AM.Reporting.Data;
+using AM.Reporting.Utils;
+
+#endregion
+
+#nullable enable
+
+namespace AM.Reporting.Table
 {
     /// <summary>
     /// Represents a table row.
@@ -38,12 +60,12 @@ namespace FastReport.Table
         /// Gets or sets a height of the row, in pixels.
         /// </summary>
         /// <remarks>
-        /// The row height cannot exceed the range defined by the <see cref="MinHeight"/> 
+        /// The row height cannot exceed the range defined by the <see cref="MinHeight"/>
         /// and <see cref="MaxHeight"/> properties.
-        /// <note>To convert between pixels and report units, use the constants defined 
+        /// <note>To convert between pixels and report units, use the constants defined
         /// in the <see cref="Units"/> class.</note>
         /// </remarks>
-        [TypeConverter("FastReport.TypeConverters.UnitsConverter, FastReport")]
+        [TypeConverter("AM.Reporting.TypeConverters.UnitsConverter, AM.Reporting")]
         public override float Height
         {
             get { return base.Height; }
@@ -63,7 +85,7 @@ namespace FastReport.Table
         /// </summary>
         [DefaultValue(0f)]
         [Category("Layout")]
-        [TypeConverter("FastReport.TypeConverters.UnitsConverter, FastReport")]
+        [TypeConverter("AM.Reporting.TypeConverters.UnitsConverter, AM.Reporting")]
         public float MinHeight
         {
             get { return minHeight; }
@@ -75,7 +97,7 @@ namespace FastReport.Table
         /// </summary>
         [DefaultValue(1000f)]
         [Category("Layout")]
-        [TypeConverter("FastReport.TypeConverters.UnitsConverter, FastReport")]
+        [TypeConverter("AM.Reporting.TypeConverters.UnitsConverter, AM.Reporting")]
         public float MaxHeight
         {
             get { return maxHeight; }
@@ -86,7 +108,7 @@ namespace FastReport.Table
         /// Gets or sets a value determines if the row should calculate its height automatically.
         /// </summary>
         /// <remarks>
-        /// The row height cannot exceed the range defined by the <see cref="MinHeight"/> 
+        /// The row height cannot exceed the range defined by the <see cref="MinHeight"/>
         /// and <see cref="MaxHeight"/> properties.
         /// </remarks>
         [DefaultValue(false)]

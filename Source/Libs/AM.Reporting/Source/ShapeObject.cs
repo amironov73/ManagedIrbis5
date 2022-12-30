@@ -2,15 +2,15 @@ using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.ComponentModel;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
-namespace FastReport
+namespace AM.Reporting
 {
   /// <summary>
   /// Specifies a kind of the shape.
   /// </summary>
-  public enum ShapeKind 
-  { 
+  public enum ShapeKind
+  {
     /// <summary>
     /// Specifies a rectangle shape.
     /// </summary>
@@ -97,7 +97,7 @@ namespace FastReport
       gp.CloseFigure();
       return gp;
     }
-#else    
+#else
     private GraphicsPath GetRoundRectPath(float x, float y, float x1, float y1, float radius)
     {
         GraphicsPath gp = new GraphicsPath();
@@ -118,7 +118,7 @@ namespace FastReport
     public override void Assign(Base source)
     {
       base.Assign(source);
-      
+
       ShapeObject src = source as ShapeObject;
       Shape = src.Shape;
       Curve = src.Curve;
@@ -144,13 +144,13 @@ namespace FastReport
         brush = e.Cache.GetBrush((Fill as SolidFill).Color);
       else
         brush = Fill.CreateBrush(new RectangleF(x, y, dx, dy), e.ScaleX, e.ScaleY);
-        
+
       Report report = Report;
       if (report != null && report.SmoothGraphics && Shape != ShapeKind.Rectangle)
       {
         g.InterpolationMode = InterpolationMode.HighQualityBicubic;
         g.SmoothingMode = SmoothingMode.AntiAlias;
-      }  
+      }
 
       switch (Shape)
       {
@@ -174,13 +174,13 @@ namespace FastReport
           break;
 
         case ShapeKind.Triangle:
-          PointF[] triPoints = { 
+          PointF[] triPoints = {
             new PointF(x1, y1), new PointF(x, y1), new PointF(x + dx / 2, y), new PointF(x1, y1) };
           g.FillAndDrawPolygon(pen, brush, triPoints);
           break;
 
         case ShapeKind.Diamond:
-          PointF[] diaPoints = { 
+          PointF[] diaPoints = {
             new PointF(x + dx / 2, y), new PointF(x1, y + dy / 2), new PointF(x + dx / 2, y1),
             new PointF(x, y + dy / 2) };
           g.FillAndDrawPolygon(pen, brush, diaPoints);
@@ -193,7 +193,7 @@ namespace FastReport
       {
         g.InterpolationMode = InterpolationMode.Default;
         g.SmoothingMode = SmoothingMode.Default;
-      }  
+      }
     }
 
     /// <inheritdoc/>
@@ -202,11 +202,11 @@ namespace FastReport
       Border.SimpleBorder = true;
       base.Serialize(writer);
       ShapeObject c = writer.DiffObject as ShapeObject;
-      
+
       if (Shape != c.Shape)
         writer.WriteValue("Shape", Shape);
       if (Curve != c.Curve)
-        writer.WriteFloat("Curve", Curve);  
+        writer.WriteFloat("Curve", Curve);
     }
     #endregion
 

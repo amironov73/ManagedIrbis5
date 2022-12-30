@@ -1,4 +1,4 @@
-using FastReport.Utils;
+using AM.Reporting.Utils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Drawing.Drawing2D;
 using System.Globalization;
 using System.Text;
 
-namespace FastReport
+namespace AM.Reporting
 {
     /// <summary>
     /// Represents a poly line object.
@@ -322,7 +322,7 @@ namespace FastReport
 
                     bool haveToCalculate = false;
 
-                    
+
                     PolyPoint p_1 = null;
                     PolyPoint p_2 = null;
 
@@ -363,7 +363,7 @@ namespace FastReport
                         if (p_2 == null)
                             p_2 = GetPseudoPoint(point, prev);
 
-                       
+
                         // now calculate extrema
 
                         // x
@@ -415,7 +415,7 @@ namespace FastReport
                                     bottom = y;
                             }
                         }
-                        
+
 
                     }
                 }

@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,7 +21,7 @@ using System.Collections.Generic;
 
 #nullable enable
 
-namespace FastReport.Export
+namespace AM.Reporting.Export
 {
     partial class ExportBase
     {

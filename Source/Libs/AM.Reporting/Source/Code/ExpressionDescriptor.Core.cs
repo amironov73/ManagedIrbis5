@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,7 +22,7 @@ using System.Reflection;
 
 #nullable enable
 
-namespace FastReport.Code
+namespace AM.Reporting.Code
 {
     internal class ExpressionDescriptor
     {
@@ -46,7 +46,7 @@ namespace FastReport.Code
                 methodInfo = assembly.Instance.GetType().GetMethod(MethodName,
                     BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             }
-                
+
             if (methodInfo == null)
                 return null;
             return methodInfo.Invoke(assembly.Instance, parameters);

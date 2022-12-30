@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,13 +21,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Format
+namespace AM.Reporting.Format
 {
     /// <summary>
     /// Represents a collection of formats used by the <see cref="TextObject"/> and <see cref="RichObject"/>
@@ -95,7 +95,7 @@ namespace FastReport.Format
         /// Returns the zero-based index of the first occurrence of an object.
         /// </summary>
         /// <param name="value">The object to locate in the collection.</param>
-        /// <returns>The zero-based index of the first occurrence of value within the entire collection, if found; 
+        /// <returns>The zero-based index of the first occurrence of value within the entire collection, if found;
         /// otherwise, -1.</returns>
         public int IndexOf(FormatBase value)
         {

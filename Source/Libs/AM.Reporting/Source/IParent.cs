@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
-namespace FastReport
+namespace AM.Reporting
 {
 
   /// <summary>
@@ -23,19 +23,19 @@ namespace FastReport
     /// </summary>
     /// <param name="list">List to fill with values.</param>
     void GetChildObjects(ObjectCollection list);
-    
+
     /// <summary>
     /// Adds a child object to this object's childs.
     /// </summary>
     /// <param name="child">Object to add.</param>
     void AddChild(Base child);
-    
+
     /// <summary>
     /// Removes a specified object from this object's childs.
     /// </summary>
     /// <param name="child"></param>
     void RemoveChild(Base child);
-    
+
     /// <summary>
     /// Returns z-order of the specified child object.
     /// </summary>
@@ -45,7 +45,7 @@ namespace FastReport
     /// This method must return the index of a specified child object in the internal child list.
     /// </remarks>
     int GetChildOrder(Base child);
-    
+
     /// <summary>
     /// Sets the z-order of the specified object.
     /// </summary>

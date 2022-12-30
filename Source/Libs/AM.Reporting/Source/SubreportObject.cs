@@ -1,15 +1,15 @@
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Design;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
-namespace FastReport
+namespace AM.Reporting
 {
     /// <summary>
     /// Represents a subreport object.
     /// </summary>
     /// <remarks>
-    /// To create a subreport in code, you should create the report page first and 
+    /// To create a subreport in code, you should create the report page first and
     /// connect it to the subreport using the <see cref="ReportPage"/> property.
     /// </remarks>
     /// <example>The following example shows how to create a subreport object in code.
@@ -45,8 +45,8 @@ namespace FastReport
         /// Gets or sets a report page that contains the subreport bands and objects.
         /// </summary>
         //[Browsable(false)]
-        [Editor("FastReport.TypeEditors.SubreportPageEditor, FastReport", typeof(UITypeEditor))]
-        [TypeConverter(typeof(FastReport.TypeConverters.ComponentRefConverter))]
+        [Editor("AM.Reporting.TypeEditors.SubreportPageEditor, AM.Reporting", typeof(UITypeEditor))]
+        [TypeConverter(typeof(AM.Reporting.TypeConverters.ComponentRefConverter))]
         public ReportPage ReportPage
         {
             get { return reportPage; }
@@ -151,7 +151,7 @@ namespace FastReport
             FlagUseBorder = false;
             FlagUseFill = false;
             FlagPreviewVisible = false;
-            SetFlags(Flags.CanCopy, false);    
+            SetFlags(Flags.CanCopy, false);
         }
     }
 }

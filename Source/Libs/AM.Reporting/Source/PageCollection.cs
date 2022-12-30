@@ -2,9 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
-namespace FastReport
+namespace AM.Reporting
 {
   /// <summary>
   /// Holds the list of objects of <see cref="PageBase"/> type.
@@ -16,7 +16,7 @@ namespace FastReport
     /// </summary>
     /// <param name="index">Index of an element.</param>
     /// <returns>The element at the specified index.</returns>
-    public PageBase this[int index]  
+    public PageBase this[int index]
     {
       get { return List[index] as PageBase; }
       set { List[index] = value; }

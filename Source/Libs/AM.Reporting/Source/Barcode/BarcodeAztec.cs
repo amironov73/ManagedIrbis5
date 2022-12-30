@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,14 +21,14 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.ComponentModel;
 
-using FastReport.Barcode.Aztec;
-using FastReport.Utils;
+using AM.Reporting.Barcode.Aztec;
+using AM.Reporting.Utils;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Barcode
+namespace AM.Reporting.Barcode
 {
     /// <summary>
     /// Generates the 2D Aztec barcode.
@@ -73,7 +73,7 @@ namespace FastReport.Barcode
         internal override void Draw2DBarcode(IGraphics g, float kx, float ky)
         {
             Brush light = Brushes.White;
-            Brush dark = new SolidBrush(Color);     
+            Brush dark = new SolidBrush(Color);
 
             for (int y = 0; y < matrix.Height; y++)
             {
@@ -99,7 +99,7 @@ namespace FastReport.Barcode
             ErrorCorrectionPercent = src.ErrorCorrectionPercent;
         }
 
-        internal override void Serialize(FastReport.Utils.FRWriter writer, string prefix, BarcodeBase diff)
+        internal override void Serialize(AM.Reporting.Utils.FRWriter writer, string prefix, BarcodeBase diff)
         {
             base.Serialize(writer, prefix, diff);
             BarcodeAztec c = diff as BarcodeAztec;

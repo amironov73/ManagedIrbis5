@@ -1,7 +1,7 @@
-﻿using FastReport.Utils;
+﻿using AM.Reporting.Utils;
 using System.Drawing;
 
-namespace FastReport
+namespace AM.Reporting
 {
     partial class PictureObjectBase
     {

@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,13 +20,13 @@ using System.Text;
 using System.Drawing;
 using System.ComponentModel;
 
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Barcode
+namespace AM.Reporting.Barcode
 {
   /// <summary>
   /// Generates the Code128 barcode.
@@ -59,7 +59,7 @@ namespace FastReport.Barcode
             public readonly string c;
 #pragma warning restore FR0006 // Field name of struct must be longer than 2 characters.
             public readonly string data;
-      
+
             public Code128(string a, string b, string c, string data)
             {
                 this.a = a;
@@ -172,7 +172,7 @@ namespace FastReport.Barcode
       new Code128(" ", " ", "99", "113141"),     // CODE C
       new Code128(" ", " ", "  ", "114131"),     // FNC4, CODE B
       new Code128(" ", " ", "  ", "311141"),     // FNC4, CODE A
-      new Code128(" ", " ", "  ", "411131"),     // FNC1 
+      new Code128(" ", " ", "  ", "411131"),     // FNC1
       new Code128(" ", " ", "  ", "211412"),     // START A
       new Code128(" ", " ", "  ", "211214"),     // START B
       new Code128(" ", " ", "  ", "211232")      // START C
@@ -184,11 +184,11 @@ namespace FastReport.Barcode
 
     #region Properties
     /// <summary>
-    /// Gets or sets a value that determines whether the barcode should automatically 
+    /// Gets or sets a value that determines whether the barcode should automatically
     /// use appropriate encoding.
     /// </summary>
     /// <remarks>
-    /// You may use this property to encode data automatically. If you set it to <b>false</b>, 
+    /// You may use this property to encode data automatically. If you set it to <b>false</b>,
     /// you must specify the code page inside the data string. The following control codes are available:
     /// <list type="table">
     ///   <listheader>
@@ -256,7 +256,7 @@ namespace FastReport.Barcode
     {
       return c >= '0' && c <= '9';
     }
-    
+
     private bool IsFourOrMoreDigits(string code, int index, out int numDigits)
     {
       numDigits = 0;
@@ -267,7 +267,7 @@ namespace FastReport.Barcode
           numDigits++;
         }
       }
-      
+
       return numDigits >= 4;
     }
 
@@ -311,7 +311,7 @@ namespace FastReport.Barcode
         return "";
 
       string result = "";
-        
+
       // determine the first character encoding
       int aIndex = FindCodeA(code[index]);
       int bIndex = FindCodeB(code[index]);
@@ -357,33 +357,33 @@ namespace FastReport.Barcode
           if (firstCharEncoding == Encoding.AorB)
             firstCharEncoding = nextCharEncoding;
           else if (nextCharEncoding == Encoding.AorB)
-            nextCharEncoding = firstCharEncoding;  
+            nextCharEncoding = firstCharEncoding;
         }
 
         if (firstCharEncoding != nextCharEncoding)
           break;
-        numChars++;  
+        numChars++;
       }
 
       // give precedence to B encoding
       if (firstCharEncoding == Encoding.AorB)
         firstCharEncoding = Encoding.B;
-      
+
       string prefix = firstCharEncoding == Encoding.A ? "&A;" : "&B;";
       // if we have only one character, use SHIFT code to switch encoding. Do not change current encoding.
-      if (encoding != firstCharEncoding && 
+      if (encoding != firstCharEncoding &&
         numChars == 1 &&
-        (encoding == Encoding.A || encoding == Encoding.B) && 
+        (encoding == Encoding.A || encoding == Encoding.B) &&
         (firstCharEncoding == Encoding.A || firstCharEncoding == Encoding.B))
         prefix = "&S;";
       else
-        encoding = firstCharEncoding;  
+        encoding = firstCharEncoding;
 
       result = prefix + code.Substring(index, numChars);
       index += numChars;
       return result;
     }
-    
+
     private string StripControlCodes(string code, bool stripFNCodes)
     {
       string result = "";
@@ -396,7 +396,7 @@ namespace FastReport.Barcode
         {
           if (!stripFNCodes || (nextChar != "&1;" && nextChar != "&2;" && nextChar != "&3;" && nextChar != "&4;"))
             result += nextChar;
-        }  
+        }
       }
 
       return result;
@@ -408,12 +408,12 @@ namespace FastReport.Barcode
       string result = "";
       int index = 0;
       Encoding encoding = Encoding.None;
-      
+
       while (index < code.Length)
       {
         result += GetNextPortion(code, ref index, ref encoding);
       }
-      
+
       return result;
     }
 
@@ -433,7 +433,7 @@ namespace FastReport.Barcode
       // "&2;" means FNC2
       // "&3;" means FNC3
       // "&4;" means FNC4
-      
+
       if (code[index] == '&' && index + 2 < code.Length && code[index + 2] == ';')
       {
         char c = code[index + 1].ToString().ToUpper()[0];
@@ -443,7 +443,7 @@ namespace FastReport.Barcode
           return "&" + c + ";";
         }
       }
-      
+
       // if encoding is C, get next two chars
       if (encoding == Encoding.C && index + 1 < code.Length)
       {
@@ -451,7 +451,7 @@ namespace FastReport.Barcode
         index += 2;
         return result;
       }
-      
+
       result = code.Substring(index, 1);
       index++;
       return result;
@@ -469,14 +469,14 @@ namespace FastReport.Barcode
       string code = text;
       if (AutoEncode)
         code = Encode(code);
-      
+
       // get first char to determine encoding
       Encoding encoding = Encoding.None;
       int index = 0;
       string nextChar = GetNextChar(code, ref index, encoding);
       int checksum = 0;
       string startCode = "";
-      
+
       // setup encoding
       switch (nextChar)
       {
@@ -497,11 +497,11 @@ namespace FastReport.Barcode
           checksum = 105;
           startCode = tabelle_128[105].data;
           break;
-          
+
         default:
           throw new Exception(Res.Get("Messages,InvalidBarcode1"));
       }
-      
+
       string result = startCode;    // Startcode
       int codeword_pos = 1;
 
@@ -534,23 +534,23 @@ namespace FastReport.Barcode
               encoding = Encoding.A;
             idx = 98;
             break;
-            
+
           case "&1;":
             idx = 102;
             break;
-            
+
           case "&2;":
             idx = 97;
             break;
-            
+
           case "&3;":
             idx = 96;
             break;
-            
+
           case "&4;":
             idx = encoding == Encoding.A ? 101 : 100;
             break;
-            
+
           default:
             if (encoding == Encoding.A)
               idx = FindCodeA(nextChar[0]);
@@ -558,7 +558,7 @@ namespace FastReport.Barcode
               idx = FindCodeB(nextChar[0]);
             else
               idx = FindCodeC(nextChar);
-            break;  
+            break;
         }
 
         if (idx < 0)
@@ -575,9 +575,9 @@ namespace FastReport.Barcode
             encoding = Encoding.B;
           else
             encoding = Encoding.A;
-        }    
+        }
       }
-      
+
       checksum = checksum % 103;
       result += tabelle_128[checksum].data;
 
@@ -586,7 +586,7 @@ namespace FastReport.Barcode
       return DoConvert(result);
     }
     #endregion
-    
+
     #region Public Methods
     /// <inheritdoc/>
     public override void Assign(BarcodeBase source)

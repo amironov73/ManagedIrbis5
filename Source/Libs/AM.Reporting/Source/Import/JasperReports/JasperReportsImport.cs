@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,16 +21,16 @@ using System.Xml;
 using System.Drawing;
 using System.Windows.Forms;
 
-using FastReport.Table;
-using FastReport.Barcode;
-using FastReport.Utils;
-using FastReport.Matrix;
+using AM.Reporting.Table;
+using AM.Reporting.Barcode;
+using AM.Reporting.Utils;
+using AM.Reporting.Matrix;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Import.JasperReports
+namespace AM.Reporting.Import.JasperReports
 {
     /// <summary>
     /// Represents the JasperReports import plugin.
@@ -91,7 +91,7 @@ namespace FastReport.Import.JasperReports
                     else
                         PictureObject.ImageLocation = (xmlObject["imageExpression"].InnerText).Replace("\"", "");
                 }
-                
+
                 return PictureObject;
             }
         }
@@ -239,7 +239,7 @@ namespace FastReport.Import.JasperReports
 
                     obj.Left += xData;
                     xData += obj.Width;
-                    
+
                 }
                 else if (cell.Name.Contains("columnHeader"))
                 {
@@ -434,7 +434,7 @@ namespace FastReport.Import.JasperReports
         {
             LineObject lineObject = ComponentsFactory.CreateLineObject("", (Base)band);
             LoadReportComponentBase(lineObject, xmlObject);
-            
+
            lineObject.Diagonal = true;
 
             return lineObject;
@@ -791,7 +791,7 @@ namespace FastReport.Import.JasperReports
         {
             obj.CreateUniqueName();
 
-            if (node["reportElement"] != null) 
+            if (node["reportElement"] != null)
             {
                 if (node["reportElement"].Attributes["x"] != null && node["reportElement"].Attributes["y"] != null &&
                     node["reportElement"].Attributes["width"] != null && node["reportElement"].Attributes["height"] != null)
@@ -972,7 +972,7 @@ namespace FastReport.Import.JasperReports
         }
 
         private Font ParseFont(XmlNode font)
-        { 
+        {
             float size = 10;
             if (font.Attributes["size"] != null)
                 size = UnitsConverter.ConvertFloat(font.Attributes["size"].Value);
@@ -996,7 +996,7 @@ namespace FastReport.Import.JasperReports
             }
 
             if(font.Attributes["fontName"] == null)
-                return new Font(DrawUtils.DefaultReportFont.FontFamily, size, fontStyle); 
+                return new Font(DrawUtils.DefaultReportFont.FontFamily, size, fontStyle);
 
             return new Font(font.Attributes["fontName"].Value, size, fontStyle);
         }
@@ -1005,7 +1005,7 @@ namespace FastReport.Import.JasperReports
         {
             foreach (XmlNode node in reportNode)
             {
-                if (node.Name == "style") 
+                if (node.Name == "style")
                 {
                     Style newStyle = ComponentsFactory.CreateStyle(node.Attributes["name"].Value, Report);
 
@@ -1029,7 +1029,7 @@ namespace FastReport.Import.JasperReports
                         newStyle.Fill = new SolidFill(UnitsConverter.ConvertColor(node.Attributes["backcolor"].Value));
                         newStyle.ApplyFill = true;
                     }
-                    if (node.Attributes["fontName"] != null || node.Attributes["size"] != null || node.Attributes["isBold"] != null 
+                    if (node.Attributes["fontName"] != null || node.Attributes["size"] != null || node.Attributes["isBold"] != null
                         || node.Attributes["isItalic"] != null || node.Attributes["isUnderline"] != null || node.Attributes["isStrikeThrough"] != null)
                     {
                         newStyle.Font = ParseFont(node);

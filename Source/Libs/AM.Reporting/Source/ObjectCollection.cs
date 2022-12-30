@@ -1,9 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
-namespace FastReport
+namespace AM.Reporting
 {
   /// <summary>
   /// Holds the list of objects of <see cref="Base"/> type.
@@ -15,7 +15,7 @@ namespace FastReport
     /// </summary>
     /// <param name="index">Index of an element.</param>
     /// <returns>The element at the specified index.</returns>
-    public Base this[int index]  
+    public Base this[int index]
     {
       get { return List[index] as Base; }
       set { List[index] = value; }

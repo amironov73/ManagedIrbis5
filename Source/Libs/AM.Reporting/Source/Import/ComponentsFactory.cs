@@ -9,18 +9,18 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using FastReport.Table;
-using FastReport.Matrix;
-using FastReport.Barcode;
-using FastReport.Gauge.Linear;
-using FastReport.Gauge.Simple;
-using FastReport.Data;
+using AM.Reporting.Table;
+using AM.Reporting.Matrix;
+using AM.Reporting.Barcode;
+using AM.Reporting.Gauge.Linear;
+using AM.Reporting.Gauge.Simple;
+using AM.Reporting.Data;
 #if !CROSSPLATFORM
 using System.CodeDom.Compiler;
 #endif
@@ -29,7 +29,7 @@ using System.CodeDom.Compiler;
 
 #nullable enable
 
-namespace FastReport.Import
+namespace AM.Reporting.Import
 {
     /// <summary>
     /// The components factory.

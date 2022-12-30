@@ -1,9 +1,30 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.Text;
 using System.IO;
 using System.Collections.Generic;
 
-namespace FastReport.Utils
+#endregion
+
+#nullable enable
+
+namespace AM.Reporting.Utils
 {
     /// <summary>
     /// Represents a xml property.
@@ -60,7 +81,7 @@ namespace FastReport.Utils
         private string name;
         private string value;
         private XmlProperty[] properties;
-        
+
         /// <summary>
         /// Gets a number of children in this node.
         /// </summary>
@@ -270,7 +291,7 @@ namespace FastReport.Utils
         /// <param name="key">The property name.</param>
         /// <returns>The value of property, if found; empty string otherwise.</returns>
         /// <remarks>
-        /// This property will return "0" when you request the "Left" property for a node 
+        /// This property will return "0" when you request the "Left" property for a node
         /// like <c>&lt;Node Text="" Left="0"/&gt;</c>
         /// </remarks>
         public string GetProp(string key)
@@ -390,7 +411,7 @@ namespace FastReport.Utils
                 properties = null;
                 return true;
             }
-            
+
             if (properties[properties.Length - 1].Key == key)
             {
                 Array.Resize<XmlProperty>(ref properties, properties.Length - 1);

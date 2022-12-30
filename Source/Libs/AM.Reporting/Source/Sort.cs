@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
-namespace FastReport
+namespace AM.Reporting
 {
   /// <summary>
   /// Represents a sort condition used in the <see cref="DataBand.Sort"/>.
@@ -12,7 +12,7 @@ namespace FastReport
   {
     private string expression;
     private bool descending;
-    
+
     /// <summary>
     /// Gets or sets an expression used to sort data band rows.
     /// </summary>
@@ -24,7 +24,7 @@ namespace FastReport
       get { return expression; }
       set { expression = value; }
     }
-    
+
     /// <summary>
     /// Gets or sets a value indicating that sort must be performed in descending order.
     /// </summary>
@@ -33,7 +33,7 @@ namespace FastReport
       get { return descending; }
       set { descending = value; }
     }
-    
+
     /// <summary>
     /// Serializes the class.
     /// </summary>

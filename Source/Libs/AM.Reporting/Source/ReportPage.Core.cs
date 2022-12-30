@@ -1,6 +1,6 @@
-﻿using FastReport.Utils;
+﻿using AM.Reporting.Utils;
 
-namespace FastReport
+namespace AM.Reporting
 {
     partial class ReportPage
     {

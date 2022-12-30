@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,22 +19,22 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-using FastReport.Table;
-using FastReport.Utils;
+using AM.Reporting.Table;
+using AM.Reporting.Utils;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.CrossView
+namespace AM.Reporting.CrossView
 {
   /// <summary>
   /// The descriptor that is used to describe one element of the CrossView header.
   /// </summary>
   /// <remarks>
   /// The <see cref="CrossViewHeaderDescriptor"/> class is used to define one header element of the CrossView
-  /// (either the column element or row element). 
-  /// <para/>To set visual appearance of the element, use the <see cref="CrossViewDescriptor.TemplateCell"/> 
+  /// (either the column element or row element).
+  /// <para/>To set visual appearance of the element, use the <see cref="CrossViewDescriptor.TemplateCell"/>
   /// property.
   /// <para/>The collection of descriptors used to represent the CrossView header is stored
   /// in the <b>CrossViewObject.Data.Columns</b> and <b>CrossViewObject.Data.Rows</b> properties.

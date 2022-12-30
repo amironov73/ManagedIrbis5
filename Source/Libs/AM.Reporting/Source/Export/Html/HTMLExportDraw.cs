@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -18,14 +18,14 @@
 using System;
 using System.Drawing;
 using System.IO;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 using System.Windows.Forms;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Export.Html
+namespace AM.Reporting.Export.Html
 {
     public partial class HTMLExport : ExportBase
     {
@@ -357,7 +357,7 @@ namespace FastReport.Export.Html
                 {
                     if (EmbedPictures)
                     {
-                        return embedPreffix + GetBase64Image(PictureStream, hash); 
+                        return embedPreffix + GetBase64Image(PictureStream, hash);
                     }
                     else
                     {

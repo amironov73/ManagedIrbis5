@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,10 +24,10 @@ using System.Collections.Generic;
 
 #nullable enable
 
-namespace FastReport.Functions
+namespace AM.Reporting.Functions
 {
   /// <summary>
-  /// Based on code of Stefan Böther,  xprocs@hotmail.de
+  /// Based on code of Stefan Bï¿½ther,  xprocs@hotmail.de
   /// </summary>
   internal static class Roman
   {

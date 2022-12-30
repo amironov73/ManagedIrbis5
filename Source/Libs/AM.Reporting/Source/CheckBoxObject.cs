@@ -1,12 +1,33 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.ComponentModel;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 using System.Drawing.Design;
 
-namespace FastReport
+#endregion
+
+#nullable enable
+
+namespace AM.Reporting
 {
     /// <summary>
     /// Specifies a symbol that will be displayed when a <see cref="CheckBoxObject"/> is in the checked state.
@@ -120,7 +141,7 @@ namespace FastReport
         /// Gets or sets a color of the check symbol.
         /// </summary>
         [Category("Appearance")]
-        [Editor("FastReport.TypeEditors.ColorEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.ColorEditor, AM.Reporting", typeof(UITypeEditor))]
         public Color CheckColor
         {
             get { return checkColor; }
@@ -134,7 +155,7 @@ namespace FastReport
         /// Value must be in the form "[Datasource.Column]".
         /// </remarks>
         [Category("Data")]
-        [Editor("FastReport.TypeEditors.DataColumnEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.DataColumnEditor, AM.Reporting", typeof(UITypeEditor))]
         public string DataColumn
         {
             get { return dataColumn; }
@@ -145,7 +166,7 @@ namespace FastReport
         /// Gets or sets an expression that determines whether to show a check.
         /// </summary>
         [Category("Data")]
-        [Editor("FastReport.TypeEditors.ExpressionEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof(UITypeEditor))]
         public string Expression
         {
             get { return expression; }
@@ -357,7 +378,7 @@ namespace FastReport
         #endregion
 
         /// <summary>
-        /// Initializes a new instance of the <b>CheckBoxObject</b> class with default settings. 
+        /// Initializes a new instance of the <b>CheckBoxObject</b> class with default settings.
         /// </summary>
         public CheckBoxObject()
         {

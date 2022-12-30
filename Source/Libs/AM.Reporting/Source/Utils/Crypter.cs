@@ -1,10 +1,31 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Security.Cryptography;
 using System.IO;
 
-namespace FastReport.Utils
+#endregion
+
+#nullable enable
+
+namespace AM.Reporting.Utils
 {
   /// <summary>
   /// Contains methods used to crypt/decrypt a data.
@@ -12,18 +33,18 @@ namespace FastReport.Utils
   public static class Crypter
   {
     private static string FDefaultPassword = typeof(Crypter).FullName;
-    
+
     /// <summary>
     /// Sets the password that is used to crypt connection strings stored in a report.
     /// </summary>
     /// <remarks>
-    /// See the <see cref="FastReport.Data.DataConnectionBase.ConnectionString"/> property for more details.
+    /// See the <see cref="AM.Reporting.Data.DataConnectionBase.ConnectionString"/> property for more details.
     /// </remarks>
     public static string DefaultPassword
     {
       set { FDefaultPassword = value; }
     }
-    
+
     /// <summary>
     /// Crypts a stream using specified password.
     /// </summary>
@@ -31,7 +52,7 @@ namespace FastReport.Utils
     /// <param name="password">The password.</param>
     /// <returns>The stream that you need to write to.</returns>
     /// <remarks>
-    /// Pass the stream you need to write to, to the <b>dest</b> parameter. Write your data to the 
+    /// Pass the stream you need to write to, to the <b>dest</b> parameter. Write your data to the
     /// stream that this method returns. When you close this stream, the <b>dest</b> stream will be
     /// closed too and contains the crypted data.
     /// </remarks>
@@ -81,7 +102,7 @@ namespace FastReport.Utils
       source.Position -= 3;
       return null;
     }
-    
+
     /// <summary>
     /// Checks if the stream contains a crypt signature.
     /// </summary>
@@ -135,8 +156,8 @@ namespace FastReport.Utils
         {
           byte[] bytes = Encoding.UTF8.GetBytes(data);
           cryptedStream.Write(bytes, 0, bytes.Length);
-        }  
-          
+        }
+
         return "rij" + Convert.ToBase64String(stream.ToArray());
       }
     }
@@ -200,18 +221,18 @@ namespace FastReport.Utils
     }
 
     /// <summary>
-    /// Computes hash of specified array. 
+    /// Computes hash of specified array.
     /// </summary>
     /// <param name="input">Initial array</param>
     /// <returns></returns>
     public static string ComputeHash(byte[] input)
     {
-        byte[] hash = new Murmur3().ComputeHash(input);        
+        byte[] hash = new Murmur3().ComputeHash(input);
         return BitConverter.ToString(hash).Replace("-", String.Empty);
     }
 
     /// <summary>
-    /// Computes hash of specified array. 
+    /// Computes hash of specified array.
     /// </summary>
     /// <param name="input">Initial array</param>
     /// <returns></returns>
@@ -222,12 +243,12 @@ namespace FastReport.Utils
   }
 
     /// <summary>
-    /// MurmurHash is a non-cryptographic hash function suitable for general hash-based lookup. 
-    /// It was created by Austin Appleby in 2008 and is currently hosted on Github along with its test suite named 'SMHasher'. 
-    /// It also exists in a number of variants, all of which have been released into the public domain. 
+    /// MurmurHash is a non-cryptographic hash function suitable for general hash-based lookup.
+    /// It was created by Austin Appleby in 2008 and is currently hosted on Github along with its test suite named 'SMHasher'.
+    /// It also exists in a number of variants, all of which have been released into the public domain.
     /// The name comes from two basic operations, multiply (MU) and rotate (R), used in its inner loop.
     /// https://en.wikipedia.org/wiki/MurmurHash
-    /// Implementation of Murmur3 Hash by Adam Horvath 
+    /// Implementation of Murmur3 Hash by Adam Horvath
     /// http://blog.teamleadnet.com/2012/08/murmurhash3-ultra-fast-hash-algorithm.html
     /// </summary>
     [CLSCompliantAttribute(true)]
@@ -249,8 +270,8 @@ namespace FastReport.Utils
 
         private void MixBody(ulong k1, ulong k2)
         {
-			unchecked 
-			{ 
+			unchecked
+			{
 	            h1 ^= MixKey1(k1);
 				h1 = (h1 << 27) | (h1 >> 37);
 	            h1 += h2;
@@ -264,8 +285,8 @@ namespace FastReport.Utils
 
         private static ulong MixKey1(ulong k1)
         {
-			unchecked 
-			{ 
+			unchecked
+			{
 	            k1 *= C1;
 	            k1 = (k1 << 31) | (k1 >> 33);
 	            k1 *= C2;
@@ -275,8 +296,8 @@ namespace FastReport.Utils
 
         private static ulong MixKey2(ulong k2)
         {
-			unchecked 
-			{ 
+			unchecked
+			{
 	            k2 *= C2;
 	            k2 = (k2 << 33) | (k2 >> 31);
 	            k2 *= C1;
@@ -286,8 +307,8 @@ namespace FastReport.Utils
 
         private static ulong MixFinal(ulong k)
         {
-			unchecked 
-			{ 
+			unchecked
+			{
 	            // avalanche bits
 	            k ^= k >> 33;
 	            k *= 0xff51afd7ed558ccdL;

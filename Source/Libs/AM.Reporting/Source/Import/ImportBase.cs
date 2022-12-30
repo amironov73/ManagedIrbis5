@@ -9,19 +9,19 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System.IO; 
+using System.IO;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Import
+namespace AM.Reporting.Import
 {
     /// <summary>
     /// Base class for all import plugins.

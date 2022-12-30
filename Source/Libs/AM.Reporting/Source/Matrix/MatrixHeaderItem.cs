@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,13 +19,13 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-using FastReport.Table;
+using AM.Reporting.Table;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Matrix
+namespace AM.Reporting.Matrix
 {
   internal class MatrixHeaderItem : MatrixDescriptor
   {
@@ -53,42 +53,42 @@ namespace FastReport.Matrix
       get { return value; }
       set { this.value = value; }
     }
-    
+
     public int Index
     {
       get { return index; }
       set { index = value; }
     }
-    
+
     public int Span
     {
-      get 
-      { 
+      get
+      {
         List<MatrixHeaderItem> terminalItems = new List<MatrixHeaderItem>();
         GetTerminalItems(terminalItems);
         return terminalItems.Count;
       }
     }
-    
+
     public bool IsTotal
     {
       get { return isTotal; }
       set { isTotal = value; }
     }
-    
+
     public object[] Values
     {
       get
       {
         int count = 0;
         MatrixHeaderItem item = this;
-        
+
         while (item.Parent != null)
         {
           count++;
           item = item.Parent;
         }
-        
+
         object[] values = new object[count];
         item = this;
         int index = count - 1;
@@ -99,24 +99,24 @@ namespace FastReport.Matrix
           index--;
           item = item.Parent;
         }
-        
+
         return values;
       }
     }
-    
+
     public int DataRowNo
     {
       get { return dataRowNo; }
       set { dataRowNo = value; }
     }
-    
+
     public bool PageBreak
     {
       get { return pageBreak; }
       set { pageBreak = value; }
     }
 
-    internal bool IsSplitted 
+    internal bool IsSplitted
     {
         get { return isSplitted; }
         set { isSplitted = value; }
@@ -138,9 +138,9 @@ namespace FastReport.Matrix
             result = i1.CompareTo(value);
           else if (value != null)
             result = -1;
-            
+
           if (result == 0)
-            return i;  
+            return i;
         }
         return ~Items.Count;
       }
@@ -149,14 +149,14 @@ namespace FastReport.Matrix
         MatrixHeaderItem header = new MatrixHeaderItem(null);
         header.Value = value;
         return Items.BinarySearch(header, new HeaderComparer(sort));
-      }  
+      }
     }
 
     public void Clear()
     {
       Items.Clear();
     }
-    
+
     private void GetTerminalItems(List<MatrixHeaderItem> list)
     {
       if (Items.Count == 0 && !IsSplitted)
@@ -176,7 +176,7 @@ namespace FastReport.Matrix
       GetTerminalItems(result);
       return result;
     }
-    
+
     public MatrixHeaderItem(MatrixHeaderItem parent)
     {
             this.parent = parent;

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Collections;
 using System.IO;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
-namespace FastReport
+namespace AM.Reporting
 {
   /// <summary>
   /// Represents a collection of sort conditions used in the <see cref="DataBand.Sort"/>.
@@ -70,7 +70,7 @@ namespace FastReport
     /// Returns the zero-based index of the first occurrence of an object.
     /// </summary>
     /// <param name="value">The object to locate in the collection.</param>
-    /// <returns>The zero-based index of the first occurrence of value within the entire collection, if found; 
+    /// <returns>The zero-based index of the first occurrence of value within the entire collection, if found;
     /// otherwise, -1.</returns>
     public int IndexOf(Sort value)
     {
@@ -108,7 +108,7 @@ namespace FastReport
         Add(s);
       }
     }
-    
+
     /// <summary>
     /// Assigns values from another collection.
     /// </summary>
@@ -116,7 +116,7 @@ namespace FastReport
     public void Assign(SortCollection source)
     {
       Clear();
-      
+
       foreach (Sort sort in source)
       {
         Add(sort);

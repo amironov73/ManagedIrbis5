@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,7 +23,7 @@ using System.Windows.Forms;
 
 #nullable enable
 
-namespace FastReport.Import.RDL
+namespace AM.Reporting.Import.RDL
 {
     /// <summary>
     /// The RDL units converter.

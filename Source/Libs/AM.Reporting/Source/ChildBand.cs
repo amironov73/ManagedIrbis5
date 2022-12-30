@@ -1,10 +1,32 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.Collections;
 using System.Drawing;
 using System.ComponentModel;
-using FastReport.Utils;
 
-namespace FastReport
+using AM.Reporting.Utils;
+
+#endregion
+
+#nullable enable
+
+namespace AM.Reporting
 {
   /// <summary>
   /// This class represents a child band.
@@ -18,12 +40,12 @@ namespace FastReport
     private bool fillUnusedSpace;
     private int completeToNRows;
     private bool printIfDatabandEmpty;
-    
+
     /// <summary>
     /// Gets or sets a value indicating that band will be used to fill unused space on a page.
     /// </summary>
     /// <remarks>
-    /// If you set this property to <b>true</b>, the band will be printed several times to fill 
+    /// If you set this property to <b>true</b>, the band will be printed several times to fill
     /// unused space on a report page.
     /// </remarks>
     [Category("Behavior")]
@@ -53,7 +75,7 @@ namespace FastReport
     /// Gets or sets a value indicating that the band will be printed if its parent databand is empty.
     /// </summary>
     /// <remarks>
-    /// The child band with this property set to true, connected to a databand can be used to print "No data" 
+    /// The child band with this property set to true, connected to a databand can be used to print "No data"
     /// text if the databand has no rows.
     /// </remarks>
     [Category("Behavior")]
@@ -73,7 +95,7 @@ namespace FastReport
         {
           band = band.Parent as BandBase;
         }
-        
+
         return band;
       }
     }

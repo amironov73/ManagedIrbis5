@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,7 +24,7 @@ using System.Data.Common;
 
 #nullable enable
 
-namespace FastReport.Data
+namespace AM.Reporting.Data
 {
   /// <summary>
   /// Represents the XmlDataConnection connection string builder.
@@ -77,9 +77,9 @@ namespace FastReport.Data
     {
       ConnectionString = "";
     }
-    
+
     /// <summary>
-    /// Initializes a new instance of the <see cref="XmlConnectionStringBuilder"/> class with 
+    /// Initializes a new instance of the <see cref="XmlConnectionStringBuilder"/> class with
     /// specified connection string.
     /// </summary>
     /// <param name="connectionString">The connection string.</param>

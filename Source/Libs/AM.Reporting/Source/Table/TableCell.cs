@@ -1,12 +1,33 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.ComponentModel;
 using System.Drawing;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 using System.Windows.Forms;
 
-namespace FastReport.Table
+#endregion
+
+#nullable enable
+
+namespace AM.Reporting.Table
 {
     /// <summary>
     /// Specifies how to display the duplicate values.
@@ -38,7 +59,7 @@ namespace FastReport.Table
     /// Represents a table cell.
     /// </summary>
     /// <remarks>
-    /// Use <see cref="ColSpan"/>, <see cref="RowSpan"/> properties to set the cell's 
+    /// Use <see cref="ColSpan"/>, <see cref="RowSpan"/> properties to set the cell's
     /// column and row spans. To put an object inside the cell, use its <see cref="Objects"/> property:
     /// <code>
     /// TableCell cell1;
@@ -246,7 +267,7 @@ namespace FastReport.Table
         /// <returns><b>true</b> if cells are equal.</returns>
         public bool Equals(TableCell cell)
         {
-            // do not override exising Equals method. It is used to compare elements in a list, 
+            // do not override exising Equals method. It is used to compare elements in a list,
             // and will cause problems in the designer.
             return cell != null &&
               Fill.Equals(cell.Fill) &&
@@ -320,9 +341,9 @@ namespace FastReport.Table
         /// </summary>
         /// <param name="style">The new style.</param>
         /// <remarks>
-        /// Each cell in a dynamic table object (or in a matrix) has associated style. 
-        /// Several cells may share one style. If you try to change the cell's appearance directly 
-        /// (like setting cell.TextColor), it may affect other cells in the table. 
+        /// Each cell in a dynamic table object (or in a matrix) has associated style.
+        /// Several cells may share one style. If you try to change the cell's appearance directly
+        /// (like setting cell.TextColor), it may affect other cells in the table.
         /// To change the single cell, use this method.
         /// </remarks>
         public void SetStyle(TableCell style)
@@ -394,7 +415,7 @@ namespace FastReport.Table
             base.GetData();
             if (Table != null && Table.IsInsideSpan(this))
                 Text = "";
-            
+
             if (Objects != null)
             {
                 for (int i = 0; i < savedOriginalObjectsCount; i++)

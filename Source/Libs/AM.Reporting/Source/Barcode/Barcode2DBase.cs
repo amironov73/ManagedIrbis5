@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,13 +21,13 @@ using System.Text;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Barcode
+namespace AM.Reporting.Barcode
 {
   /// <summary>
   /// The base class for 2D-barcodes such as PDF417 and Datamatrix.
@@ -77,11 +77,11 @@ namespace FastReport.Barcode
                 }
             }
         }
-    
+
     internal virtual void Draw2DBarcode(IGraphics g, float kx, float ky)
     {
     }
-    
+
     public override void DrawBarcode(IGraphics g, RectangleF displayRect)
     {
       float width = angle == 90 || angle == 270 ? displayRect.Height : displayRect.Width;

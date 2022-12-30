@@ -1,4 +1,21 @@
-﻿namespace FastReport.Utils
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#nullable enable
+
+namespace AM.Reporting.Utils
 {
     static partial class Config
     {
@@ -19,8 +36,8 @@
         /// Gets a value that determines whether to disable some functionality to run in web mode.
         /// </summary>
         /// <remarks>
-        /// Use this property if you use FastReport in ASP.Net. Set this property to <b>true</b> <b>before</b>
-        /// you access any FastReport.Net objects.
+        /// Use this property if you use AM.Reporting in ASP.Net. Set this property to <b>true</b> <b>before</b>
+        /// you access any AM.Reporting.Net objects.
         /// </remarks>
         public static bool WebMode
         {

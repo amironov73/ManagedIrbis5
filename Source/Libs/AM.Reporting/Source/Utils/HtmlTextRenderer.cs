@@ -1,17 +1,38 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Text;
 
-namespace FastReport.Utils
+#endregion
+
+#nullable enable
+
+namespace AM.Reporting.Utils
 {
     public class HtmlTextRenderer : IDisposable
     {
         #region Definitions
         /// <summary>
         /// Context of HTML rendering
-        /// It is better to put this structure instead of class' private fields. 
+        /// It is better to put this structure instead of class' private fields.
         /// For future optimization. Then we can avoid constructor with dozen arguments
         /// </summary>
         public struct RendererContext
@@ -340,7 +361,7 @@ namespace FastReport.Utils
                     height += lineSpacing = line.LineSpacing;
                 }
             }
-            if(!keepLastSpace) // It looks like TextProcessors keep this value for every line. 
+            if(!keepLastSpace) // It looks like TextProcessors keep this value for every line.
                 height -= lineSpacing;
 
             if (charsFit < 0)
@@ -677,7 +698,7 @@ namespace FastReport.Utils
                 tabOffset = TabOffset;
                 tabSize = TabSize;
             }
-            else 
+            else
             {
                 for (int i = 0; i < tabIndex; i++)
                 {
@@ -764,7 +785,7 @@ namespace FastReport.Utils
 
                             word = new Word(this, line, WordType.Tab);
 
-                            
+
                             Run tabRun = new RunText(this, word, style, new List<CharWithIndex>(new CharWithIndex[] { reader.Character }), width, charIndex);
                             word.Runs.Add(tabRun);
                             float width2 = GetTabPosition(width);

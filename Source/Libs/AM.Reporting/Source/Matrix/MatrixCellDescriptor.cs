@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,14 +19,14 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-using FastReport.Table;
-using FastReport.Utils;
+using AM.Reporting.Table;
+using AM.Reporting.Utils;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Matrix
+namespace AM.Reporting.Matrix
 {
   /// <summary>
   /// Specifies the aggregate function used in the <see cref="MatrixObject"/>.
@@ -88,12 +88,12 @@ namespace FastReport.Matrix
     /// Calculate percent of the column total value.
     /// </summary>
     ColumnTotal,
-    
+
     /// <summary>
     /// Calculate percent of the row total value.
     /// </summary>
     RowTotal,
-    
+
     /// <summary>
     /// Calculate percent of the grand total value.
     /// </summary>
@@ -106,8 +106,8 @@ namespace FastReport.Matrix
   /// </summary>
   /// <remarks>
   /// The <see cref="MatrixCellDescriptor"/> class is used to define one data cell of the matrix.
-  /// The key properties are <see cref="MatrixDescriptor.Expression"/> and <see cref="Function"/>. 
-  /// To set visual appearance of the data cell, use the <see cref="MatrixDescriptor.TemplateCell"/> 
+  /// The key properties are <see cref="MatrixDescriptor.Expression"/> and <see cref="Function"/>.
+  /// To set visual appearance of the data cell, use the <see cref="MatrixDescriptor.TemplateCell"/>
   /// property.
   /// <para/>The collection of descriptors used to represent the matrix data cells is stored
   /// in the <b>MatrixObject.Data.Cells</b> property.
@@ -116,7 +116,7 @@ namespace FastReport.Matrix
   {
     private MatrixAggregateFunction function;
     private MatrixPercent percent;
-    
+
     #region Properties
     /// <summary>
     /// Gets or sets an aggregate function used to calculate totals for this cell.

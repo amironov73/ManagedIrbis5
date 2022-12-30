@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.ComponentModel;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 using System.Windows.Forms;
 using System.Drawing.Design;
 
-namespace FastReport
+namespace AM.Reporting
 {
     /// <summary>
     /// The automatic shift mode.
@@ -24,7 +24,7 @@ namespace FastReport
         Always,
 
         /// <summary>
-        /// Shift the object up or down if any object above it shrinks or grows. 
+        /// Shift the object up or down if any object above it shrinks or grows.
         /// Objects must have overlapped x-coordinates.
         /// </summary>
         WhenOverlapped
@@ -65,7 +65,7 @@ namespace FastReport
         EvenPages = 8,
 
         /// <summary>
-        /// Print the object on band with "Repeat on Every Page" flag when that band is repeated. 
+        /// Print the object on band with "Repeat on Every Page" flag when that band is repeated.
         /// </summary>
         RepeatedBand = 16,
 
@@ -186,7 +186,7 @@ namespace FastReport
         /// </summary>
         [DefaultValue("")]
         [Category("Behavior")]
-        [Editor("FastReport.TypeEditors.ExpressionEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof(UITypeEditor))]
         public virtual string ExportableExpression
         {
             get { return exportableExpression; }
@@ -212,7 +212,7 @@ namespace FastReport
         /// Gets or sets an object's fill.
         /// </summary>
         /// <remarks>
-        /// The fill can be one of the following types: <see cref="SolidFill"/>, <see cref="LinearGradientFill"/>, 
+        /// The fill can be one of the following types: <see cref="SolidFill"/>, <see cref="LinearGradientFill"/>,
         /// <see cref="PathGradientFill"/>, <see cref="HatchFill"/>.
         /// <para/>To set the solid fill color, use the simpler <see cref="FillColor"/> property.
         /// </remarks>
@@ -221,14 +221,14 @@ namespace FastReport
         /// textObject1.Fill = new SolidFill(Color.Green);
         /// (textObject1.Fill as SolidFill).Color = Color.Red;
         /// </code>
-        /// </example>          
+        /// </example>
         [Category("Appearance")]
-        [EditorAttribute("FastReport.TypeEditors.FillEditor, FastReport",typeof(UITypeEditor))]
+        [EditorAttribute("AM.Reporting.TypeEditors.FillEditor, AM.Reporting",typeof(UITypeEditor))]
         public virtual FillBase Fill
         {
             get
             {
-                return fill; 
+                return fill;
             }
             set
             {
@@ -244,7 +244,7 @@ namespace FastReport
         /// Gets or sets the fill color in a simple manner.
         /// </summary>
         /// <remarks>
-        /// This property can be used in a report script to change the fill color of the object. It is 
+        /// This property can be used in a report script to change the fill color of the object. It is
         /// equivalent to: <code>reportComponent1.Fill = new SolidFill(color);</code>
         /// </remarks>
         [Browsable(false)]
@@ -263,7 +263,7 @@ namespace FastReport
         /// </remarks>
 
         [Category("Navigation")]
-        [Editor("FastReport.TypeEditors.ExpressionEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof(UITypeEditor))]
         public string Bookmark
         {
             get { return bookmark; }
@@ -274,9 +274,9 @@ namespace FastReport
         /// Gets or sets a hyperlink.
         /// </summary>
         /// <remarks>
-        /// <para>The hyperlink is used to define clickable objects in the preview. 
-        /// When you click such object, you may navigate to the external url, the page number, 
-        /// the bookmark defined by other report object, or display the external report. 
+        /// <para>The hyperlink is used to define clickable objects in the preview.
+        /// When you click such object, you may navigate to the external url, the page number,
+        /// the bookmark defined by other report object, or display the external report.
         /// Set the <b>Kind</b> property of the hyperlink to select appropriate behavior.</para>
         /// <para>Usually you should set the <b>Expression</b> property of the hyperlink to
         /// any valid expression that will be calculated when this object is about to print.
@@ -286,7 +286,7 @@ namespace FastReport
         /// property instead of <b>Expression</b>.</para>
         /// </remarks>
         [Category("Navigation")]
-        [Editor("FastReport.TypeEditors.HyperlinkEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.HyperlinkEditor, AM.Reporting", typeof(UITypeEditor))]
         public Hyperlink Hyperlink
         {
             get { return hyperlink; }
@@ -342,7 +342,7 @@ namespace FastReport
         /// Gets or sets a shift mode of the object.
         /// </summary>
         /// <remarks>
-        /// See <see cref="FastReport.ShiftMode"/> enumeration for details.
+        /// See <see cref="AM.Reporting.ShiftMode"/> enumeration for details.
         /// </remarks>
         [DefaultValue(ShiftMode.Always)]
         [Category("Behavior")]
@@ -357,11 +357,11 @@ namespace FastReport
         /// </summary>
         /// <remarks>
         /// Style is a set of common properties such as border, fill, font, text color. The <b>Report</b>
-        /// has a set of styles in the <see cref="Report.Styles"/> property. 
+        /// has a set of styles in the <see cref="Report.Styles"/> property.
         /// </remarks>
 
         [Category("Appearance")]
-        [Editor("FastReport.TypeEditors.StyleEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.StyleEditor, AM.Reporting", typeof(UITypeEditor))]
         public string Style
         {
             get { return style; }
@@ -379,7 +379,7 @@ namespace FastReport
         /// Style with this name must exist in the <see cref="Report.Styles"/> collection.
         /// </remarks>
         [Category("Appearance")]
-        [Editor("FastReport.TypeEditors.StyleEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.StyleEditor, AM.Reporting", typeof(UITypeEditor))]
         public string EvenStyle
         {
             get { return evenStyle; }
@@ -394,7 +394,7 @@ namespace FastReport
         /// </remarks>
 
         [Category("Appearance")]
-        [Editor("FastReport.TypeEditors.StyleEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.StyleEditor, AM.Reporting", typeof(UITypeEditor))]
         public string HoverStyle
         {
             get { return hoverStyle; }
@@ -405,7 +405,7 @@ namespace FastReport
         /// Gets or sets a value that determines which properties of the even style to use.
         /// </summary>
         /// <remarks>
-        /// Usually you will need only the Fill property of the even style to be applied. If you want to 
+        /// Usually you will need only the Fill property of the even style to be applied. If you want to
         /// apply all style settings, set this property to <b>StylePriority.UseAll</b>.
         /// </remarks>
         [DefaultValue(StylePriority.UseFill)]
@@ -432,12 +432,12 @@ namespace FastReport
         /// Gets or sets a value that determines where to print the object.
         /// </summary>
         /// <remarks>
-        /// See the <see cref="FastReport.PrintOn"/> enumeration for details.
+        /// See the <see cref="AM.Reporting.PrintOn"/> enumeration for details.
         /// </remarks>
         [DefaultValue(PrintOn.FirstPage | PrintOn.LastPage | PrintOn.OddPages | PrintOn.EvenPages | PrintOn.RepeatedBand | PrintOn.SinglePage)]
 
         [Category("Behavior")]
-        [Editor("FastReport.TypeEditors.FlagsEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.FlagsEditor, AM.Reporting", typeof(UITypeEditor))]
         public PrintOn PrintOn
         {
             get { return printOn; }
@@ -485,7 +485,7 @@ namespace FastReport
         }
 
         /// <summary>
-        /// Determines if the object has custom border and use only <b>Border.Width</b>, <b>Border.Style</b> and 
+        /// Determines if the object has custom border and use only <b>Border.Width</b>, <b>Border.Style</b> and
         /// <b>Border.Color</b> properties.
         /// </summary>
         /// <remarks>
@@ -539,7 +539,7 @@ namespace FastReport
         /// Determines if serializing the Style property is needed.
         /// </summary>
         /// <remarks>
-        /// The <b>Style</b> property must be serialized last. Some ancestor classes may turn off the standard Style 
+        /// The <b>Style</b> property must be serialized last. Some ancestor classes may turn off the standard Style
         /// serialization and serialize it by themselves.
         /// </remarks>
         [Browsable(false)]
@@ -626,7 +626,7 @@ namespace FastReport
         }
 
         /// <summary>
-        /// Gets or sets a script event name that will be fired when the user 
+        /// Gets or sets a script event name that will be fired when the user
         /// moves the mouse over the object in the preview window.
         /// </summary>
         [Category("Preview")]
@@ -637,7 +637,7 @@ namespace FastReport
         }
 
         /// <summary>
-        /// Gets or sets a script event name that will be fired when the user 
+        /// Gets or sets a script event name that will be fired when the user
         /// releases the mouse button in the preview window.
         /// </summary>
         [Category("Preview")]
@@ -648,7 +648,7 @@ namespace FastReport
         }
 
         /// <summary>
-        /// Gets or sets a script event name that will be fired when the user 
+        /// Gets or sets a script event name that will be fired when the user
         /// clicks the mouse button in the preview window.
         /// </summary>
         [Category("Preview")]
@@ -891,7 +891,7 @@ namespace FastReport
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="reader"></param>
         public override void Deserialize(FRReader reader)
@@ -963,9 +963,9 @@ namespace FastReport
         /// Saves the object's state before printing it.
         /// </summary>
         /// <remarks>
-        /// This method is called by the report engine before processing the object. 
-        /// <para/>Do not call it directly. You may override it if you are developing a new FastReport component. 
-        /// In this method you should save any object properties that may be changed during the object printing. 
+        /// This method is called by the report engine before processing the object.
+        /// <para/>Do not call it directly. You may override it if you are developing a new AM.Reporting component.
+        /// In this method you should save any object properties that may be changed during the object printing.
         /// The standard implementation saves the object's bounds, visibility, bookmark and hyperlink.
         /// </remarks>
         public virtual void SaveState()
@@ -983,7 +983,7 @@ namespace FastReport
         /// </summary>
         /// <remarks>
         /// This method is called by the report engine after processing the object.
-        /// <para/>Do not call it directly. You may override it if you are developing a new FastReport component. 
+        /// <para/>Do not call it directly. You may override it if you are developing a new AM.Reporting component.
         /// In this method you should restore the object properties that were saved by the <see cref="SaveState"/> method.
         /// </remarks>
         public virtual void RestoreState()
@@ -1014,7 +1014,7 @@ namespace FastReport
         /// </summary>
         /// <remarks>
         /// This method is called by the report engine before processing the object.
-        /// <para/>Do not call it directly. You may override it if you are developing a new FastReport component. 
+        /// <para/>Do not call it directly. You may override it if you are developing a new AM.Reporting component.
         /// In this method you should get the data from a datasource that the object is connected to.
         /// </remarks>
         public virtual void GetData()

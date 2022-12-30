@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,13 +23,13 @@ using System.Text;
 
 #nullable enable
 
-namespace FastReport.Data
+namespace AM.Reporting.Data
 {
   /// <summary>
   /// Determines how to filter the data value.
   /// </summary>
   /// <remarks>
-  /// The "Data value" is a value contained in the datasource which you filter. 
+  /// The "Data value" is a value contained in the datasource which you filter.
   /// The "Selected value" is a value you have entered or selected in the dialog control.
   /// </remarks>
   public enum FilterOperation
@@ -98,30 +98,30 @@ namespace FastReport.Data
   internal class DataSourceFilter
   {
     private List<FilterElement> elements;
-    
+
     public void Clear()
     {
       elements.Clear();
     }
-    
+
     public FilterElement Add(object value, FilterOperation operation)
     {
       FilterElement element = new FilterElement(value, operation);
       elements.Add(element);
       return element;
     }
-    
+
     public void Remove(FilterElement element)
     {
       elements.Remove(element);
     }
-    
+
     public bool ValueMatch(object value)
     {
       foreach (FilterElement element in elements)
       {
         bool match = false;
-        
+
         // check if element is a string list
         if (element.SortedList != null)
         {
@@ -144,7 +144,7 @@ namespace FastReport.Data
 
           if (!match)
             return false;
-          
+
           continue;
         }
 
@@ -167,7 +167,7 @@ namespace FastReport.Data
         IComparable valComparable = value as IComparable;
         if (valComparable == null)
           return false;
-    
+
         // handle DateTime values in the special way
         if (value is DateTime)
         {
@@ -245,11 +245,11 @@ namespace FastReport.Data
               break;
           }
         }
-        
+
         if (!match)
-          return false;  
+          return false;
       }
-      
+
       return true;
     }
 
@@ -264,22 +264,22 @@ namespace FastReport.Data
       private object value;
       private FilterOperation operation;
       private SortedList<string,object> sortedList;
-      
+
       public object Value
       {
         get { return value; }
       }
-      
+
       public FilterOperation Operation
       {
         get { return operation; }
       }
-      
+
       public SortedList<string,object> SortedList
       {
         get { return sortedList; }
       }
-      
+
       public FilterElement(object value, FilterOperation operation)
       {
                 this.value = value;
@@ -292,7 +292,7 @@ namespace FastReport.Data
             if (!sortedList.ContainsKey(s))
               sortedList.Add(s, null);
           }
-        }  
+        }
       }
     }
   }

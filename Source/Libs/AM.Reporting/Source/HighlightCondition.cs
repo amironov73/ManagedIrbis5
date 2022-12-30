@@ -1,9 +1,9 @@
 using System.Drawing;
 using System.ComponentModel;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 using System.Drawing.Design;
 
-namespace FastReport
+namespace AM.Reporting
 {
   /// <summary>
   /// Represents a single highlight condition used by the <see cref="TextObject.Highlight"/> property
@@ -24,7 +24,7 @@ namespace FastReport
     /// This property can contain any valid boolean expression. If value of this expression is <b>true</b>,
     /// the fill and font settings will be applied to the <b>TextObject</b>.
     /// </remarks>
-    [Editor("FastReport.TypeEditors.ExpressionEditor, FastReport", typeof(UITypeEditor))]
+    [Editor("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof(UITypeEditor))]
     public string Expression
     {
       get { return expression; }
@@ -56,7 +56,7 @@ namespace FastReport
         writer.WriteStr("Expression", Expression);
       if (Visible != c.Visible)
         writer.WriteBool("Visible", Visible);
-      
+
       base.Serialize(writer);
     }
 
@@ -85,7 +85,7 @@ namespace FastReport
       HighlightCondition c = obj as HighlightCondition;
       return c != null && Expression == c.Expression && Border.Equals(c.Border) && Fill.Equals(c.Fill) &&
         TextFill.Equals(c.TextFill) && Font.Equals(c.Font) && Visible == c.Visible &&
-        ApplyBorder == c.ApplyBorder && ApplyFill == c.ApplyFill && ApplyTextFill == c.ApplyTextFill && 
+        ApplyBorder == c.ApplyBorder && ApplyFill == c.ApplyFill && ApplyTextFill == c.ApplyTextFill &&
         ApplyFont == c.ApplyFont;
     }
 
@@ -102,7 +102,7 @@ namespace FastReport
     public HighlightCondition()
     {
       Expression = "";
-      TextFill = new SolidFill(Color.Red); 
+      TextFill = new SolidFill(Color.Red);
       Visible = true;
       ApplyBorder = false;
       ApplyFill = false;

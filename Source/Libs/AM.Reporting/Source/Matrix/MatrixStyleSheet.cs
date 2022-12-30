@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,7 +24,7 @@ using System.Drawing;
 
 #nullable enable
 
-namespace FastReport.Matrix
+namespace AM.Reporting.Matrix
 {
   internal class MatrixStyleSheet : StyleSheet
   {
@@ -32,7 +32,7 @@ namespace FastReport.Matrix
     {
       StyleCollection styleCollection = this[index];
       Style style = styleCollection[styleCollection.IndexOf("Header")];
-      
+
       Color headerColor = Color.White;
       if (style.Fill is SolidFill)
         headerColor = (style.Fill as SolidFill).Color;
@@ -45,13 +45,13 @@ namespace FastReport.Matrix
         bodyColor = (style.Fill as SolidFill).Color;
       else if (style.Fill is LinearGradientFill)
         bodyColor = (style.Fill as LinearGradientFill).StartColor;
-        
+
       // draw style picture
       Bitmap result = new Bitmap(16, 16);
       using (Graphics g = Graphics.FromImage(result))
       {
         g.FillRectangle(Brushes.White, 0, 0, 16, 16);
-        
+
         using (Brush b = new SolidBrush(headerColor))
         {
           g.FillRectangle(b, 0, 0, 15, 8);
@@ -60,10 +60,10 @@ namespace FastReport.Matrix
         {
           g.FillRectangle(b, 0, 8, 15, 8);
         }
-        
+
         g.DrawRectangle(Pens.Silver, 0, 0, 14, 14);
       }
-      
+
       return result;
     }
   }

@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,13 +20,13 @@ using System.Collections.Generic;
 using System.Text;
 using System.Collections;
 
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Matrix
+namespace AM.Reporting.Matrix
 {
   /// <summary>
   /// Represents a collection of matrix data descriptors used in the <see cref="MatrixObject"/>.
@@ -105,7 +105,7 @@ namespace FastReport.Matrix
     /// Returns the zero-based index of the first occurrence of a descriptor.
     /// </summary>
     /// <param name="value">The descriptor to locate in the collection.</param>
-    /// <returns>The zero-based index of the first occurrence of descriptor within 
+    /// <returns>The zero-based index of the first occurrence of descriptor within
     /// the entire collection, if found; otherwise, -1.</returns>
     public int IndexOf(MatrixCellDescriptor value)
     {
@@ -123,7 +123,7 @@ namespace FastReport.Matrix
     }
 
     /// <summary>
-    /// Copies the elements of this collection to a new array. 
+    /// Copies the elements of this collection to a new array.
     /// </summary>
     /// <returns>An array containing copies of this collection elements. </returns>
     public MatrixCellDescriptor[] ToArray()
@@ -158,13 +158,13 @@ namespace FastReport.Matrix
         }
       }
     }
-    
+
     private void AddValue(int columnIndex, int rowIndex, object value, List<ArrayList> rows)
     {
       // do not put null values to the matrix!
       if (value == null || value == DBNull.Value)
         return;
-      
+
       CheckIndices(columnIndex, rowIndex, rows);
 
       ArrayList row = rows[rowIndex];
@@ -186,7 +186,7 @@ namespace FastReport.Matrix
         valuesList.Add(oldValue);
         valuesList.Add(value);
         row[columnIndex] = valuesList;
-      }  
+      }
     }
 
     private void SetValue(int columnIndex, int rowIndex, object value, List<ArrayList> rows)
@@ -205,21 +205,21 @@ namespace FastReport.Matrix
 
       if (rows == null)
         rows = new List<ArrayList>[Count];
-        
+
       for (int i = 0; i < Count; i++)
       {
         if (rows[i] == null)
           rows[i] = new List<ArrayList>();
-        
+
         AddValue(columnIndex, rowIndex, value[i], rows[i]);
-      }  
+      }
     }
 
     // return value(s) contained in a cell.
     // in case of empty cell, return null.
     internal object GetValue(int columnIndex, int rowIndex, int cellIndex)
     {
-      if (rows == null || 
+      if (rows == null ||
         cellIndex >= rows.Length ||
         rowIndex >= rows[cellIndex].Count ||
         columnIndex >= rows[cellIndex][rowIndex].Count)
@@ -264,7 +264,7 @@ namespace FastReport.Matrix
         {
           if (rows[i] == null)
             rows[i] = new List<ArrayList>();
-          
+
           SetValue(columnIndex, rowIndex, cellValues[i], rows[i]);
         }
       }
@@ -296,7 +296,7 @@ namespace FastReport.Matrix
         Add(d);
       }
     }
-    
+
     internal MatrixCells()
     {
     }

@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,13 +19,13 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Preview
+namespace AM.Reporting.Preview
 {
   internal class Outline
   {
@@ -43,12 +43,12 @@ namespace FastReport.Preview
         value.Parent = null;
       }
     }
-    
+
     internal bool IsEmpty
     {
       get { return rootItem.Count == 0; }
     }
-    
+
     internal XmlItem CurPosition
     {
       get { return curItem.Count == 0 ? null : curItem[curItem.Count - 1]; }
@@ -60,7 +60,7 @@ namespace FastReport.Preview
       float offset = Converter.StringToFloat(item.GetProp("Offset"));
       item.SetProp("Page", Converter.ToString(pageNo + 1));
       item.SetProp("Offset", Converter.ToString(offset + shift));
-      
+
       for (int i = 0; i < item.Count; i++)
       {
         EnumItems(item[i], shift);
@@ -79,7 +79,7 @@ namespace FastReport.Preview
       float topY = Converter.StringToFloat(from.GetProp("Offset"));
       EnumItems(from, newY - topY);
     }
-    
+
     public void Add(string text, int pageNo, float offsetY)
     {
       curItem = curItem.Add();
@@ -88,12 +88,12 @@ namespace FastReport.Preview
       curItem.SetProp("Page", pageNo.ToString());
       curItem.SetProp("Offset", Converter.ToString(offsetY));
     }
-    
+
     public void LevelRoot()
     {
       curItem = rootItem;
     }
-    
+
     public void LevelUp()
     {
       if (curItem != rootItem)

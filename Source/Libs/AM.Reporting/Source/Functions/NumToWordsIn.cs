@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,7 +22,7 @@ using System.Collections.Generic;
 
 #nullable enable
 
-namespace FastReport.Functions
+namespace AM.Reporting.Functions
 {
     internal class NumToWordsIn : NumToWordsBase
     {
@@ -165,7 +165,7 @@ namespace FastReport.Functions
         {
             long val;
 
-            //if its third or 
+            //if its third or
             if (counter == 3 || counter == 4) shouldReturnMany = true;
             else shouldReturnMany = false;
 

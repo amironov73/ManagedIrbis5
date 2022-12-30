@@ -1,3 +1,20 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.IO;
 using System.Collections;
@@ -7,17 +24,22 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Reflection;
 using System.Globalization;
+
 using Microsoft.Win32;
 
-namespace FastReport.Utils
+#endregion
+
+#nullable enable
+
+namespace AM.Reporting.Utils
 {
     /// <summary>
     /// Used to get localized values from the language resource file.
     /// </summary>
     /// <remarks>
-    /// The resource file used by default is english. To load another locale, call 
+    /// The resource file used by default is english. To load another locale, call
     /// the <see cref="Res.LoadLocale(string)"/> method. It should be done at application start
-    /// before you use any FastReport classes.
+    /// before you use any AM.Reporting classes.
     /// </remarks>
     public static partial class Res
     {
@@ -32,7 +54,7 @@ namespace FastReport.Utils
         /// </summary>
         public static string LocaleFolder
         {
-            get 
+            get
             {
                 Report.EnsureInit();
                 string folder = Config.Root.FindItem("Language").GetProp("Folder");
@@ -43,7 +65,7 @@ namespace FastReport.Utils
                     RegistryKey key = Registry.CurrentUser.OpenSubKey("Software").OpenSubKey("FastReports");
                     if (key != null)
                     {
-                        key = key.OpenSubKey("FastReport.Net");
+                        key = key.OpenSubKey("AM.Reporting.Net");
                         if (key != null)
                             folder = (string)key.GetValue("LocalizationFolder", "");
                     }
@@ -55,7 +77,7 @@ namespace FastReport.Utils
 
                 return folder;
             }
-            set { 
+            set {
                 Config.Root.FindItem("Language").SetProp("Folder", value);
             }
         }
@@ -65,9 +87,9 @@ namespace FastReport.Utils
         /// </summary>
         public static string LocaleName
         {
-            get 
+            get
             {
-                return FLocale.Root.GetProp("Name"); 
+                return FLocale.Root.GetProp("Name");
             }
         }
 
@@ -110,7 +132,7 @@ namespace FastReport.Utils
         /// <summary>
         /// Loads and caches the locale from <see cref="CultureInfo"/> information.
         /// Notes: *.frl the localization file is looked for in <see cref="LocaleFolder"/>
-        /// To work correctly, it is recommended to install FastReport.Localization package
+        /// To work correctly, it is recommended to install AM.Reporting.Localization package
         /// </summary>
         /// <param name="culture"></param>
         public static void LoadLocale(CultureInfo culture)
@@ -154,7 +176,7 @@ namespace FastReport.Utils
                 localeFile = FindLocaleFile(ref culture, localeFolder);
             }
 
-            // Find 'Localization' directory from FastReport.Localization package
+            // Find 'Localization' directory from AM.Reporting.Localization package
             if (string.IsNullOrEmpty(localeFile))
             {
                 localeFolder = Path.Combine(Config.ApplicationFolder, "Localization");
@@ -217,12 +239,12 @@ namespace FastReport.Utils
         {
             FLocale = FBuiltinLocale;
         }
-    
+
     internal static void LoadDefaultLocale()
     {
       if (!Directory.Exists(LocaleFolder))
         return;
-        
+
       if (String.IsNullOrEmpty(DefaultLocaleName))
       {
             // locale is set to "Auto"
@@ -243,7 +265,7 @@ namespace FastReport.Utils
         /// <param name="id">The resource ID.</param>
         /// <returns>The localized string.</returns>
         /// <remarks>
-        /// Since the locale file is xml-based, it may contain several xml node levels. For example, 
+        /// Since the locale file is xml-based, it may contain several xml node levels. For example,
         /// the file contains the following items:
         /// <code>
         /// &lt;Objects&gt;
@@ -268,7 +290,7 @@ namespace FastReport.Utils
                     if (string.IsNullOrEmpty(result))
                         result = id + " " + FBadResult;
                 }
-                else                  
+                else
                     result = id + " " + FBadResult;
             }
             return result;
@@ -334,9 +356,9 @@ namespace FastReport.Utils
             string result = Get(id);
             if (result.IndexOf(FBadResult) != -1)
                 result = id;
-            return result;  
+            return result;
         }
-    
+
         /// <summary>
         /// Tries to get builtin string with specified ID.
         /// </summary>
@@ -347,7 +369,7 @@ namespace FastReport.Utils
             string result = GetBuiltin(id);
             if (string.IsNullOrEmpty(result))
                 result = id;
-            return result;  
+            return result;
         }
 
         /// <summary>
@@ -369,7 +391,7 @@ namespace FastReport.Utils
 
         static partial void ResDesignExt();
     }
-  
+
   /// <summary>
   /// Used to access to resource IDs inside the specified branch.
   /// </summary>
@@ -381,13 +403,13 @@ namespace FastReport.Utils
   /// miKeepTogether = new ToolStripMenuItem(Res.Get("ComponentMenu,HeaderBand,KeepTogether"));
   /// miResetPageNumber = new ToolStripMenuItem(Res.Get("ComponentMenu,HeaderBand,ResetPageNumber"));
   /// miRepeatOnEveryPage = new ToolStripMenuItem(Res.Get("ComponentMenu,HeaderBand,RepeatOnEveryPage"));
-  /// 
+  ///
   /// // using MyRes.Get method
   /// MyRes res = new MyRes("ComponentMenu,HeaderBand");
   /// miKeepTogether = new ToolStripMenuItem(res.Get("KeepTogether"));
   /// miResetPageNumber = new ToolStripMenuItem(res.Get("ResetPageNumber"));
   /// miRepeatOnEveryPage = new ToolStripMenuItem(res.Get("RepeatOnEveryPage"));
-  /// 
+  ///
   /// </code>
   /// </remarks>
   public class MyRes
@@ -417,7 +439,7 @@ namespace FastReport.Utils
     }
   }
 
-  
+
   /// <summary>
   /// Localized CategoryAttribute class.
   /// </summary>

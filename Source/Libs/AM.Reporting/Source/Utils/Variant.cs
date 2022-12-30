@@ -1,3 +1,18 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
 //**************************************
 // Name: The Return of the Variant (ver. 6)
 // Description:A Variant structure written in C#, ideal for VB.NET 2005 or C# 2002/2003/2005 developers who miss the old (and, in the eyes of many, ugly) VB6 Variant. A Variant is a type that contains any type of variable and can be worked with "automagically" without heavy typecasting procedures. (System.Object is not a variant equivalent because you cannot do things like addition with it.)
@@ -50,7 +65,7 @@
 
 using System;
 
-namespace FastReport
+namespace AM.Reporting
 {
     /// <summary>
     /// A strongly typed object that readily casts an intrinsic

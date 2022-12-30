@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,7 +22,7 @@ using System.Collections.Generic;
 
 #nullable enable
 
-namespace FastReport.Barcode.Aztec
+namespace AM.Reporting.Barcode.Aztec
 {
    /// <summary>
    /// The class holds the available options for the AztecWriter
@@ -31,7 +31,7 @@ namespace FastReport.Barcode.Aztec
    internal class AztecEncodingOptions : EncodingOptions
    {
       /// <summary>
-      /// Representing the minimal percentage of error correction words. 
+      /// Representing the minimal percentage of error correction words.
       /// Note: an Aztec symbol should have a minimum of 25% EC words.
       /// </summary>
       public int? ErrorCorrection

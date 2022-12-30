@@ -9,13 +9,13 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using FastReport.Utils;
+using AM.Reporting.Utils;
 using System;
 using System.ComponentModel;
 using System.Drawing;
@@ -24,7 +24,7 @@ using System.Drawing;
 
 #nullable enable
 
-namespace FastReport.Gauge
+namespace AM.Reporting.Gauge
 {
     /// <summary>
     /// Represents a label of a gauge.

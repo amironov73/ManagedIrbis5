@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -27,17 +27,17 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Collections.Concurrent;
-using FastReport.Data;
-using FastReport.Engine;
-using FastReport.Utils;
+using AM.Reporting.Data;
+using AM.Reporting.Engine;
+using AM.Reporting.Utils;
 
 #if SKIA
-using HMACSHA1 = FastReport.Utils.DetravHMACSHA1;
+using HMACSHA1 = AM.Reporting.Utils.DetravHMACSHA1;
 #endif
 
 #endregion
 
-namespace FastReport.Code
+namespace AM.Reporting.Code
 {
     partial class AssemblyDescriptor
     {
@@ -169,7 +169,7 @@ namespace FastReport.Code
 #if CROSSPLATFORM || COREWIN
                 if (aLocation == "")
                 {
-                    // try fix SFA in FastReport.Compat
+                    // try fix SFA in AM.Reporting.Compat
                     string fixedReference = CodeDomProvider.TryFixReferenceInSingeFileApp(assembly);
                     if (!string.IsNullOrEmpty(fixedReference))
                         aLocation = fixedReference;
@@ -188,23 +188,23 @@ namespace FastReport.Code
 
 #if CROSSPLATFORM
                 if (s == "System.Windows.Forms.dll")
-                    s = "FastReport.Compat";
+                    s = "AM.Reporting.Compat";
 #endif
                 // fix for old reports with "System.Windows.Forms.DataVisualization" in referenced assemblies
                 if (s.IndexOf("System.Windows.Forms.DataVisualization") != -1)
-                    s = "FastReport.DataVisualization";
+                    s = "AM.Reporting.DataVisualization";
 #if SKIA
-                if (s.IndexOf("FastReport.Compat") != -1)
-                    s = "FastReport.Compat.Skia";
-                if (s.IndexOf("FastReport.DataVisualization") != -1)
-                    s = "FastReport.DataVisualization.Skia";
+                if (s.IndexOf("AM.Reporting.Compat") != -1)
+                    s = "AM.Reporting.Compat.Skia";
+                if (s.IndexOf("AM.Reporting.DataVisualization") != -1)
+                    s = "AM.Reporting.DataVisualization.Skia";
 #endif
 
                 AddReferencedAssembly(assemblies, defaultPath, s);
             }
 
 #if SKIA
-            AddReferencedAssembly(assemblies, defaultPath, "FastReport.SkiaDrawing");
+            AddReferencedAssembly(assemblies, defaultPath, "AM.Reporting.SkiaDrawing");
 #endif
 
             // these two required for "dynamic" type support
@@ -460,7 +460,7 @@ namespace FastReport.Code
             if (FAssemblyCache.TryGetValue(assemblyHash, out cachedAssembly))
             {
                 Assembly = cachedAssembly;
-                var reportScript = Assembly.CreateInstance("FastReport.ReportScript");
+                var reportScript = Assembly.CreateInstance("AM.Reporting.ReportScript");
                 InitInstance(reportScript);
                 cr = null;
                 return true;
@@ -488,7 +488,7 @@ namespace FastReport.Code
                 FAssemblyCache.TryAdd(assemblyHash, cr.CompiledAssembly);
 
                 Assembly = cr.CompiledAssembly;
-                var reportScript = Assembly.CreateInstance("FastReport.ReportScript");
+                var reportScript = Assembly.CreateInstance("AM.Reporting.ReportScript");
                 InitInstance(reportScript);
                 return true;
             }

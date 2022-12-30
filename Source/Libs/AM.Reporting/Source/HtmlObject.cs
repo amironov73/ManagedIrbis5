@@ -3,22 +3,22 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Text;
 using System.ComponentModel;
-using FastReport.Utils;
-using FastReport.Code;
+using AM.Reporting.Utils;
+using AM.Reporting.Code;
 
-namespace FastReport
+namespace AM.Reporting
 {
 
     /// <summary>
     /// Represents the Text object that may display one or several text lines.
     /// </summary>
     /// <remarks>
-    /// Specify the object's text in the <see cref="TextObjectBase.Text">Text</see> property. 
-    /// Text may contain expressions and data items, for example: "Today is [Date]". When report 
-    /// is running, all expressions are calculated and replaced with actual values, so the text 
+    /// Specify the object's text in the <see cref="TextObjectBase.Text">Text</see> property.
+    /// Text may contain expressions and data items, for example: "Today is [Date]". When report
+    /// is running, all expressions are calculated and replaced with actual values, so the text
     /// would be "Today is 01.01.2008".
-    /// <para/>The symbols used to find expressions in a text are set in the 
-    /// <see cref="TextObjectBase.Brackets">Brackets</see> property. You also may disable expressions 
+    /// <para/>The symbols used to find expressions in a text are set in the
+    /// <see cref="TextObjectBase.Brackets">Brackets</see> property. You also may disable expressions
     /// using the <see cref="TextObjectBase.AllowExpressions">AllowExpressions</see> property.
     /// <para/>To format an expression value, use the <see cref="Format"/> property.
     /// </remarks>

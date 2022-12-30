@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,13 +21,13 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
 
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Data
+namespace AM.Reporting.Data
 {
     /// <summary>
     /// Specifies the total type.
@@ -107,7 +107,7 @@ namespace FastReport.Data
         /// Gets or sets the expression used to calculate the total.
         /// </summary>
         [Category("Data")]
-        [Editor("FastReport.TypeEditors.ExpressionEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof(UITypeEditor))]
         public string Expression
         {
             get { return expression; }
@@ -163,7 +163,7 @@ namespace FastReport.Data
         }
 
         /// <summary>
-        /// Gets or sets a value that determines whether the total should be resetted if printed 
+        /// Gets or sets a value that determines whether the total should be resetted if printed
         /// on repeated band (i.e. band with "RepeatOnEveryPage" flag).
         /// </summary>
         [DefaultValue(true)]
@@ -178,7 +178,7 @@ namespace FastReport.Data
         /// Gets or sets the condition which tells the total to evaluate.
         /// </summary>
         [Category("Data")]
-        [Editor("FastReport.TypeEditors.ExpressionEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof(UITypeEditor))]
         public string EvaluateCondition
         {
             get { return evaluateCondition; }

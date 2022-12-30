@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,14 +24,14 @@ using System.CodeDom.Compiler;
 
 using Microsoft.CSharp;
 
-using FastReport.Utils;
-using FastReport.Data;
+using AM.Reporting.Utils;
+using AM.Reporting.Data;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Code
+namespace AM.Reporting.Code
 {
     internal partial class CsCodeHelper : CodeHelperBase
     {
@@ -109,9 +109,9 @@ namespace FastReport.Code
         {
             return "using System;\r\nusing System.Collections;\r\nusing System.Collections.Generic;\r\n" +
               "using System.ComponentModel;\r\nusing System.Windows.Forms;\r\nusing System.Drawing;\r\n" +
-              "using System.Data;\r\nusing FastReport;\r\nusing FastReport.Data;\r\nusing FastReport.Dialog;\r\n" +
-              "using FastReport.Barcode;\r\nusing FastReport.Table;\r\nusing FastReport.Utils;\r\n\r\n" +
-              "namespace FastReport\r\n{\r\n  public class ReportScript\r\n  {\r\n  }\r\n}\r\n";
+              "using System.Data;\r\nusing AM.Reporting;\r\nusing AM.Reporting.Data;\r\nusing AM.Reporting.Dialog;\r\n" +
+              "using AM.Reporting.Barcode;\r\nusing AM.Reporting.Table;\r\nusing AM.Reporting.Utils;\r\n\r\n" +
+              "namespace AM.Reporting\r\n{\r\n  public class ReportScript\r\n  {\r\n  }\r\n}\r\n";
         }
 
         public override int GetPositionToInsertOwnItems(string scriptText)

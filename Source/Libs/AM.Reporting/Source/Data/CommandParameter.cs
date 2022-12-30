@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,7 +17,7 @@
 
 using System;
 using System.ComponentModel;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 using System.Drawing.Design;
 using System.Data;
 
@@ -25,7 +25,7 @@ using System.Data;
 
 #nullable enable
 
-namespace FastReport.Data
+namespace AM.Reporting.Data
 {
   /// <summary>
   /// This class represents a single parameter to use in the "select" command.
@@ -48,17 +48,17 @@ namespace FastReport.Data
     /// <summary>
     /// Gets or sets the parameter's data type.
     /// </summary>
-    [TypeConverter(typeof(FastReport.TypeConverters.ParameterDataTypeConverter))]
+    [TypeConverter(typeof(AM.Reporting.TypeConverters.ParameterDataTypeConverter))]
     [Category("Data")]
-    [Editor("FastReport.TypeEditors.ParameterDataTypeEditor, FastReport", typeof(UITypeEditor))]
+    [Editor("AM.Reporting.TypeEditors.ParameterDataTypeEditor, AM.Reporting", typeof(UITypeEditor))]
     public virtual int DataType
     {
       get { return dataType; }
       set { dataType = value; }
     }
-    
+
     /// <summary>
-    /// Gets or sets the size of parameter's data. 
+    /// Gets or sets the size of parameter's data.
     /// </summary>
     /// <remarks>
     /// This property is used if the <see cref="DataType"/> property is set to <b>String</b>.
@@ -70,7 +70,7 @@ namespace FastReport.Data
       get { return size; }
       set { size = value; }
     }
-    
+
     /// <summary>
     /// Gets or set type of parameter.
     /// </summary>
@@ -85,17 +85,17 @@ namespace FastReport.Data
     /// Gets or sets an expression that returns the parameter's value.
     /// </summary>
     /// <remarks>
-    /// If this property is not set, the <see cref="DefaultValue"/> property will be used 
+    /// If this property is not set, the <see cref="DefaultValue"/> property will be used
     /// to obtain a parameter's value.
     /// </remarks>
     [Category("Data")]
-    [Editor("FastReport.TypeEditors.ExpressionEditor, FastReport", typeof(UITypeEditor))]
+    [Editor("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof(UITypeEditor))]
     public virtual string Expression
     {
       get { return expression; }
       set { expression = value; }
     }
-    
+
     /// <summary>
     /// Gets or sets a default value for this parameter.
     /// </summary>
@@ -106,8 +106,8 @@ namespace FastReport.Data
     public virtual string DefaultValue
     {
       get { return defaultValue; }
-      set 
-      { 
+      set
+      {
         defaultValue = value;
                 this.value = null;
       }
@@ -146,10 +146,10 @@ namespace FastReport.Data
       {
         if (Parent is TableDataSource && Parent.Parent is DataConnectionBase)
           return (Parent.Parent as DataConnectionBase).GetParameterType();
-        return null;  
+        return null;
       }
     }
-    
+
     internal object LastValue
     {
       get { return lastValue; }
@@ -163,7 +163,7 @@ namespace FastReport.Data
     {
       CommandParameter c = writer.DiffObject as CommandParameter;
       base.Serialize(writer);
-      
+
       if (DataType != c.DataType)
         writer.WriteInt("DataType", DataType);
       if (Size != c.Size)
@@ -194,7 +194,7 @@ namespace FastReport.Data
     {
       return new string[] { Expression };
     }
-    
+
     internal void ResetLastValue()
     {
       LastValue = ParamValue.Uninitialized;

@@ -1,11 +1,33 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using FastReport.Utils;
 
-namespace FastReport
+using AM.Reporting.Utils;
+
+#endregion
+
+#nullable enable
+
+namespace AM.Reporting
 {
   /// <summary>
   /// Represents a collection of highlight conditions used in the <see cref="TextObject.Highlight"/> property
@@ -73,7 +95,7 @@ namespace FastReport
     /// Returns the zero-based index of the first occurrence of an object.
     /// </summary>
     /// <param name="value">The object to locate in the collection.</param>
-    /// <returns>The zero-based index of the first occurrence of value within the entire collection, if found; 
+    /// <returns>The zero-based index of the first occurrence of value within the entire collection, if found;
     /// otherwise, -1.</returns>
     public int IndexOf(HighlightCondition value)
     {

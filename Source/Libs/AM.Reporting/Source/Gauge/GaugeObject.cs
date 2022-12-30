@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -18,7 +18,7 @@
 using System;
 using System.ComponentModel;
 using System.Collections.Generic;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 using System.Drawing;
 using System.Drawing.Design;
 
@@ -26,7 +26,7 @@ using System.Drawing.Design;
 
 #nullable enable
 
-namespace FastReport.Gauge
+namespace AM.Reporting.Gauge
 {
     /// <summary>
     /// Represents a gauge object.
@@ -107,8 +107,8 @@ namespace FastReport.Gauge
         /// Gets or sets scale of gauge.
         /// </summary>
         [Category("Appearance")]
-        [TypeConverter(typeof(FastReport.TypeConverters.FRExpandableObjectConverter))]
-        [Editor("FastReport.TypeEditors.ScaleEditor, FastReport", typeof(UITypeEditor))]
+        [TypeConverter(typeof(AM.Reporting.TypeConverters.FRExpandableObjectConverter))]
+        [Editor("AM.Reporting.TypeEditors.ScaleEditor, AM.Reporting", typeof(UITypeEditor))]
         public GaugeScale Scale
         {
             get { return scale; }
@@ -119,8 +119,8 @@ namespace FastReport.Gauge
         /// Gets or sets pointer of gauge.
         /// </summary>
         [Category("Appearance")]
-        [TypeConverter(typeof(FastReport.TypeConverters.FRExpandableObjectConverter))]
-        [Editor("FastReport.TypeEditors.PointerEditor, FastReport", typeof(UITypeEditor))]
+        [TypeConverter(typeof(AM.Reporting.TypeConverters.FRExpandableObjectConverter))]
+        [Editor("AM.Reporting.TypeEditors.PointerEditor, AM.Reporting", typeof(UITypeEditor))]
         public GaugePointer Pointer
         {
             get { return pointer; }
@@ -131,8 +131,8 @@ namespace FastReport.Gauge
         /// Gets or sets gauge label.
         /// </summary>
         [Category("Appearance")]
-        [TypeConverter(typeof(FastReport.TypeConverters.FRExpandableObjectConverter))]
-        [Editor("FastReport.TypeEditors.LabelEditor, FastReport", typeof(UITypeEditor))]
+        [TypeConverter(typeof(AM.Reporting.TypeConverters.FRExpandableObjectConverter))]
+        [Editor("AM.Reporting.TypeEditors.LabelEditor, AM.Reporting", typeof(UITypeEditor))]
         public virtual GaugeLabel Label
         {
             get { return label; }
@@ -143,7 +143,7 @@ namespace FastReport.Gauge
         /// Gets or sets an expression that determines the value of gauge object.
         /// </summary>
         [Category("Data")]
-        [Editor("FastReport.TypeEditors.ExpressionEditor, FastReport", typeof(UITypeEditor))]
+        [Editor("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof(UITypeEditor))]
         public string Expression
         {
             get { return expression; }

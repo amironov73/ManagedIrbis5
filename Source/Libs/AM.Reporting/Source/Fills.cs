@@ -2,17 +2,17 @@ using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.ComponentModel;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 using System.Drawing.Design;
 using System.IO;
 using System.Drawing.Imaging;
 
-namespace FastReport
+namespace AM.Reporting
 {
   /// <summary>
   /// Base class for all fills.
   /// </summary>
-  [TypeConverter(typeof(FastReport.TypeConverters.FillConverter))]
+  [TypeConverter(typeof(AM.Reporting.TypeConverters.FillConverter))]
   public abstract class FillBase
   {
     internal string Name
@@ -100,7 +100,7 @@ namespace FastReport
       }
     }
   }
-  
+
   /// <summary>
   /// Class represents the solid fill.
   /// </summary>
@@ -111,14 +111,14 @@ namespace FastReport
     /// <summary>
     /// Gets or sets the fill color.
     /// </summary>
-    [Editor("FastReport.TypeEditors.ColorEditor, FastReport", typeof(UITypeEditor))]
+    [Editor("AM.Reporting.TypeEditors.ColorEditor, AM.Reporting", typeof(UITypeEditor))]
     public Color Color
     {
       get { return color; }
       set { color = value; }
     }
 
-    public override bool IsTransparent 
+    public override bool IsTransparent
     {
         get { return color.A == 0; }
     }
@@ -153,7 +153,7 @@ namespace FastReport
     {
       base.Serialize(writer, prefix, fill);
       SolidFill c = fill as SolidFill;
-      
+
       if (c == null || c.Color != Color)
         writer.WriteValue(prefix + ".Color", Color);
     }
@@ -166,14 +166,14 @@ namespace FastReport
       Brush brush = e.Cache.GetBrush(Color);
       e.Graphics.FillRectangle(brush, rect.Left * e.ScaleX, rect.Top * e.ScaleY, rect.Width * e.ScaleX, rect.Height * e.ScaleY);
     }
-    
+
     /// <summary>
     /// Initializes the <see cref="SolidFill"/> class with Transparent color.
     /// </summary>
     public SolidFill() : this(Color.Transparent)
     {
     }
-    
+
     /// <summary>
     /// Initializes the <see cref="SolidFill"/> class with specified color.
     /// </summary>
@@ -183,7 +183,7 @@ namespace FastReport
       Color = color;
     }
   }
-  
+
   /// <summary>
   /// Class represents the linear gradient fill.
   /// </summary>
@@ -196,9 +196,9 @@ namespace FastReport
     private float contrast;
 
     /// <summary>
-    /// Gets or sets the start color of the gradient. 
+    /// Gets or sets the start color of the gradient.
     /// </summary>
-    [Editor("FastReport.TypeEditors.ColorEditor, FastReport", typeof(UITypeEditor))]
+    [Editor("AM.Reporting.TypeEditors.ColorEditor, AM.Reporting", typeof(UITypeEditor))]
     public Color StartColor
     {
       get { return startColor; }
@@ -206,16 +206,16 @@ namespace FastReport
     }
 
     /// <summary>
-    /// Gets or sets the end color of the gradient. 
+    /// Gets or sets the end color of the gradient.
     /// </summary>
-    [Editor("FastReport.TypeEditors.ColorEditor, FastReport", typeof(UITypeEditor))]
+    [Editor("AM.Reporting.TypeEditors.ColorEditor, AM.Reporting", typeof(UITypeEditor))]
     public Color EndColor
     {
       get { return endColor; }
       set { endColor = value; }
     }
 
-    public override bool IsTransparent 
+    public override bool IsTransparent
     {
         get { return startColor.A == 0 && endColor.A == 0; }
     }
@@ -223,13 +223,13 @@ namespace FastReport
     /// <summary>
     /// Gets or sets the angle of the gradient.
     /// </summary>
-    [Editor("FastReport.TypeEditors.AngleEditor, FastReport", typeof(UITypeEditor))]
+    [Editor("AM.Reporting.TypeEditors.AngleEditor, AM.Reporting", typeof(UITypeEditor))]
     public int Angle
     {
       get { return angle; }
       set { angle = value % 360; }
     }
-    
+
     /// <summary>
     /// Gets or sets the focus point of the gradient.
     /// </summary>
@@ -239,16 +239,16 @@ namespace FastReport
     public float Focus
     {
       get { return focus; }
-      set 
-      { 
+      set
+      {
         if (value < 0)
           value = 0;
         if (value > 1)
           value = 1;
-        focus = value; 
+        focus = value;
       }
     }
-    
+
     /// <summary>
     /// Gets or sets the gradient contrast.
     /// </summary>
@@ -258,13 +258,13 @@ namespace FastReport
     public float Contrast
     {
       get { return contrast; }
-      set 
+      set
       {
         if (value < 0)
           value = 0;
         if (value > 1)
           value = 1;
-        contrast = value; 
+        contrast = value;
       }
     }
 
@@ -277,7 +277,7 @@ namespace FastReport
     /// <inheritdoc/>
     public override int GetHashCode()
     {
-      return StartColor.GetHashCode() ^ (EndColor.GetHashCode() << 1) ^ 
+      return StartColor.GetHashCode() ^ (EndColor.GetHashCode() << 1) ^
         ((Angle.GetHashCode() + 1) << 2) ^ ((Focus.GetHashCode() + 1) << 10) ^ ((Contrast.GetHashCode() + 1) << 20);
     }
 
@@ -285,7 +285,7 @@ namespace FastReport
     public override bool Equals(object obj)
     {
       LinearGradientFill f = obj as LinearGradientFill;
-      return f != null && StartColor == f.StartColor && EndColor == f.EndColor && Angle == f.Angle && 
+      return f != null && StartColor == f.StartColor && EndColor == f.EndColor && Angle == f.Angle &&
         !FloatDiff(Focus, f.Focus) && !FloatDiff(Contrast, f.Contrast);
     }
 
@@ -294,7 +294,7 @@ namespace FastReport
     {
       // workaround the gradient bug
       rect.Inflate(1, 1);
-      
+
       LinearGradientBrush result = new LinearGradientBrush(rect, StartColor, EndColor, Angle);
       result.SetSigmaBellShape(Focus, Contrast);
       return result;
@@ -360,20 +360,20 @@ namespace FastReport
       Focus = focus;
       Contrast = contrast;
     }
-    
+
   }
 
-  
+
   /// <summary>
   /// The style of the path gradient.
   /// </summary>
-  public enum PathGradientStyle 
-  { 
+  public enum PathGradientStyle
+  {
     /// <summary>
     /// Elliptic gradient.
     /// </summary>
-    Elliptic, 
-    
+    Elliptic,
+
     /// <summary>
     /// Rectangular gradient.
     /// </summary>
@@ -393,7 +393,7 @@ namespace FastReport
     /// <summary>
     /// Gets or sets the center color of the gradient.
     /// </summary>
-    [Editor("FastReport.TypeEditors.ColorEditor, FastReport", typeof(UITypeEditor))]
+    [Editor("AM.Reporting.TypeEditors.ColorEditor, AM.Reporting", typeof(UITypeEditor))]
     public Color CenterColor
     {
       get { return centerColor; }
@@ -403,7 +403,7 @@ namespace FastReport
     /// <summary>
     /// Gets or sets the edge color of the gradient.
     /// </summary>
-    [Editor("FastReport.TypeEditors.ColorEditor, FastReport", typeof(UITypeEditor))]
+    [Editor("AM.Reporting.TypeEditors.ColorEditor, AM.Reporting", typeof(UITypeEditor))]
     public Color EdgeColor
     {
       get { return edgeColor; }
@@ -419,7 +419,7 @@ namespace FastReport
       set { style = value; }
     }
 
-    public override bool IsTransparent 
+    public override bool IsTransparent
     {
         get { return centerColor.A == 0 && edgeColor.A == 0; }
     }
@@ -510,7 +510,7 @@ namespace FastReport
     /// <summary>
     /// Gets or sets the foreground color.
     /// </summary>
-    [Editor("FastReport.TypeEditors.ColorEditor, FastReport", typeof(UITypeEditor))]
+    [Editor("AM.Reporting.TypeEditors.ColorEditor, AM.Reporting", typeof(UITypeEditor))]
     public Color ForeColor
     {
       get { return foreColor; }
@@ -520,7 +520,7 @@ namespace FastReport
     /// <summary>
     /// Gets or sets the background color.
     /// </summary>
-    [Editor("FastReport.TypeEditors.ColorEditor, FastReport", typeof(UITypeEditor))]
+    [Editor("AM.Reporting.TypeEditors.ColorEditor, AM.Reporting", typeof(UITypeEditor))]
     public Color BackColor
     {
       get { return backColor; }
@@ -536,7 +536,7 @@ namespace FastReport
       set { style = value; }
     }
 
-    public override bool IsTransparent 
+    public override bool IsTransparent
     {
         get { return foreColor.A == 0 && backColor.A == 0; }
     }
@@ -579,14 +579,14 @@ namespace FastReport
       if (c == null || c.Style != Style)
         writer.WriteValue(prefix + ".Style", Style);
     }
-    
+
     /// <summary>
     /// Initializes the <see cref="HatchFill"/> class with default settings.
     /// </summary>
     public HatchFill() : this(Color.Black, Color.White, HatchStyle.BackwardDiagonal)
     {
     }
-    
+
     /// <summary>
     /// Initializes the <see cref="HatchFill"/> class with foreground, background colors and hatch style.
     /// </summary>
@@ -614,14 +614,14 @@ namespace FastReport
     /// <summary>
     /// Gets or sets the fill color.
     /// </summary>
-    
-    [Editor("FastReport.TypeEditors.ColorEditor, FastReport", typeof(UITypeEditor))]
+
+    [Editor("AM.Reporting.TypeEditors.ColorEditor, AM.Reporting", typeof(UITypeEditor))]
     public Color Color
     {
       get { return color; }
       set { color = value; }
     }
-    
+
     /// <summary>
     /// Gets or sets the blend value.
     /// </summary>
@@ -633,7 +633,7 @@ namespace FastReport
       get { return blend; }
       set { blend = value < 0 ? 0 : value > 1 ? 1 : value; }
     }
-    
+
     /// <summary>
     /// Gets or sets a value determines whether to draw a hatch or not.
     /// </summary>
@@ -644,7 +644,7 @@ namespace FastReport
       set { hatch = value; }
     }
 
-    public override bool IsTransparent 
+    public override bool IsTransparent
     {
         get { return color.A == 0; }
     }
@@ -678,7 +678,7 @@ namespace FastReport
       {
         e.Graphics.FillRectangle(b, rect.Left, rect.Top, rect.Width, rect.Height);
       }
-      
+
       // draw hatch
       if (Hatch)
       {
@@ -866,7 +866,7 @@ namespace FastReport
             set { imageOffsetY = value; }
         }
 
-        public override bool IsTransparent 
+        public override bool IsTransparent
         {
             get { return false; }
         }
@@ -892,7 +892,7 @@ namespace FastReport
                 image = ImageHelper.Load(imageData);
                 image = new Bitmap(image, width, height);
             }
-                
+
         }
         private void ResetImageIndex()
         {
@@ -950,7 +950,7 @@ namespace FastReport
         /// <inheritdoc/>
         public override FillBase Clone()
         {
-            
+
             TextureFill f = new TextureFill(imageData.Clone() as byte[], ImageWidth, ImageHeight, PreserveAspectRatio, WrapMode, ImageOffsetX, ImageOffsetY);
             //f.ImageIndex = ImageIndex;
             return f;
@@ -971,8 +971,8 @@ namespace FastReport
         public override bool Equals(object obj)
         {
             TextureFill f = obj as TextureFill;
-            return f != null && ImageData == f.ImageData && 
-                ImageWidth == f.ImageWidth && 
+            return f != null && ImageData == f.ImageData &&
+                ImageWidth == f.ImageWidth &&
                 ImageHeight == f.ImageHeight &&
                 PreserveAspectRatio == f.PreserveAspectRatio &&
                 WrapMode == f.WrapMode &&
@@ -984,7 +984,7 @@ namespace FastReport
         public override Brush CreateBrush(RectangleF rect)
         {
             if (image == null)
-                ForceLoadImage();          
+                ForceLoadImage();
             TextureBrush brush = new TextureBrush(image, WrapMode);
             brush.TranslateTransform(rect.Left + ImageOffsetX, rect.Top + ImageOffsetY);
             return brush;
@@ -1084,7 +1084,7 @@ namespace FastReport
             base.FinalizeComponent();
             Clear();
             ResetImageIndex();
-            
+
         }
 
         /// <inheritdoc/>
@@ -1116,7 +1116,7 @@ namespace FastReport
         {
             ResetImageIndex();
             SetImageData(null);
-            Stream dummy = ResourceLoader.GetStream("FastReport", "icon16.ico");
+            Stream dummy = ResourceLoader.GetStream("AM.Reporting", "icon16.ico");
             using (MemoryStream ms = new MemoryStream())
             {
                 const int BUFFER_SIZE = 4 * 1024;

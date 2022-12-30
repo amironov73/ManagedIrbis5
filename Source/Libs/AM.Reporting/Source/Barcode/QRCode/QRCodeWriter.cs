@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,39 +21,39 @@ using System;
 
 #nullable enable
 
-namespace FastReport.Barcode.QRCode
+namespace AM.Reporting.Barcode.QRCode
 {
-  
+
   /*/// <summary> This object renders a QR Code as a ByteMatrix 2D array of greyscale values.
-  /// 
+  ///
   /// </summary>
   /// <author>  dswitkin@google.com (Daniel Switkin)
   /// </author>
-  /// <author>www.Redivivus.in (suraj.supekar@redivivus.in) - Ported from ZXING Java Source 
+  /// <author>www.Redivivus.in (suraj.supekar@redivivus.in) - Ported from ZXING Java Source
   /// </author>*/
   internal static class QRCodeWriter
   {
-    
+
     private const int QUIET_ZONE_SIZE = 4;
-    
-    public static ByteMatrix encode(System.String contents, int width, int height, 
+
+    public static ByteMatrix encode(System.String contents, int width, int height,
       ErrorCorrectionLevel errorCorrectionLevel, System.String encoding, bool quietZone)
     {
       if (contents == null || contents.Length == 0)
       {
         throw new System.ArgumentException("Found empty contents");
       }
-      
+
       if (width < 0 || height < 0)
       {
         throw new System.ArgumentException("Requested dimensions are too small: " + width + 'x' + height);
       }
-      
+
       QRCode code = new QRCode();
       Encoder.encode(contents, errorCorrectionLevel, encoding, code);
       return renderResult(code, width, height, quietZone);
     }
-    
+
     // Note that the input matrix uses 0 == white, 1 == black, while the output matrix uses
     // 0 == black, 255 == white (i.e. an 8 bit greyscale bitmap).
     private static ByteMatrix renderResult(QRCode code, int width, int height, bool quietZone)
@@ -104,7 +104,7 @@ namespace FastReport.Barcode.QRCode
                 for (int x = 0; x < inputWidth; x++)
                 {
                     // Redivivus.in Java to c# Porting update - Type cased sbyte
-                    // 30/01/2010 
+                    // 30/01/2010
                     // sbyte value_Renamed = (inputArray[y][x] == 1)?0:(sbyte) SupportClass.Identity(255);
                     sbyte value_Renamed = (sbyte)((inputArray[y][x] == 1) ? 0 : SupportClass.Identity(255));
                     for (int z = 0; z < multiple; z++)
@@ -138,7 +138,7 @@ namespace FastReport.Barcode.QRCode
                 return output;
         }
     }
-    
+
     private static void  setRowColor(sbyte[] row, sbyte value_Renamed)
     {
       for (int x = 0; x < row.Length; x++)

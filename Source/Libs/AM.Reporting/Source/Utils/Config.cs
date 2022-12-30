@@ -1,4 +1,21 @@
-﻿using System;
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
+using System;
 using System.Drawing;
 using System.Drawing.Text;
 using System.Globalization;
@@ -6,20 +23,24 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-namespace FastReport.Utils
+#endregion
+
+#nullable enable
+
+namespace AM.Reporting.Utils
 {
     /// <summary>
-    /// Contains some configuration properties and settings that will be applied to the FastReport.Net
+    /// Contains some configuration properties and settings that will be applied to the AM.Reporting.Net
     /// environment, including Report, Designer and Preview components.
     /// </summary>
     public static partial class Config
     {
 #if COMMUNITY
-        const string CONFIG_NAME = "FastReport.Community.config";
+        const string CONFIG_NAME = "AM.Reporting.Community.config";
 #elif MONO
-        const string CONFIG_NAME = "FastReport.Mono.config";
+        const string CONFIG_NAME = "AM.Reporting.Mono.config";
 #else
-        const string CONFIG_NAME = "FastReport.config";
+        const string CONFIG_NAME = "AM.Reporting.config";
 #endif
         #region Private Fields
 
@@ -126,7 +147,7 @@ namespace FastReport.Utils
         /// </summary>
         /// <remarks>
         /// By default, the configuration file is saved to the application local data folder
-        /// (C:\Documents and Settings\User_Name\Local Settings\Application Data\FastReport\).
+        /// (C:\Documents and Settings\User_Name\Local Settings\Application Data\AM.Reporting\).
         /// Set this property to "" if you want to store the configuration file in the application folder.
         /// </remarks>
         public static string Folder
@@ -139,7 +160,7 @@ namespace FastReport.Utils
         /// Gets or sets the path used to font.list file.
         /// </summary>
         /// <remarks>
-        /// By default, the font.list file is saved to the FastReport.config folder
+        /// By default, the font.list file is saved to the AM.Reporting.config folder
         /// If WebMode enabled (or config file path is null), then file is saved in the application folder.
         /// </remarks>
         public static string FontListFolder
@@ -213,7 +234,7 @@ namespace FastReport.Utils
         }
 
         /// <summary>
-        /// Gets FastReport version.
+        /// Gets AM.Reporting version.
         /// </summary>
         public static string Version
         {
@@ -454,7 +475,7 @@ namespace FastReport.Utils
                         FDoc.Save(configFile);
                     }
                     if (FLogs != "")
-                        File.WriteAllText(Path.Combine(Folder, "FastReport.logs"), FLogs);
+                        File.WriteAllText(Path.Combine(Folder, "AM.Reporting.logs"), FLogs);
                 }
                 catch
                 {
@@ -472,7 +493,7 @@ namespace FastReport.Utils
                     if (Folder == null)
                     {
                         string baseFolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-                        Folder = Path.Combine(baseFolder, "FastReport");
+                        Folder = Path.Combine(baseFolder, "AM.Reporting");
                     }
                     else if (Folder == "")
                         Folder = ApplicationFolder;
@@ -507,7 +528,7 @@ namespace FastReport.Utils
             if (!configLoaded)
             {
                 // load default config
-                using (Stream stream = ResourceLoader.GetStream("FastReport.config"))
+                using (Stream stream = ResourceLoader.GetStream("AM.Reporting.config"))
                 {
                     FDoc.Load(stream);
                 }

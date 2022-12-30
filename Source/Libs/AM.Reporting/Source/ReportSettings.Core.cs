@@ -1,7 +1,7 @@
-﻿using FastReport.Data;
+﻿using AM.Reporting.Data;
 using System;
 
-namespace FastReport
+namespace AM.Reporting
 {
     partial class ReportSettings
     {

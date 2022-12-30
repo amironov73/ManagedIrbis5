@@ -9,13 +9,13 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using FastReport.Utils;
+using AM.Reporting.Utils;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -27,7 +27,7 @@ using System.Text;
 
 #nullable enable
 
-namespace FastReport.Export.Html
+namespace AM.Reporting.Export.Html
 {
     /// <summary>
     /// Represents the HTML export filter.
@@ -420,7 +420,7 @@ namespace FastReport.Export.Html
             get { return printPageData; }
         }
 
-        
+
 
         /// <summary>
         /// Enable or disable saving streams in GeneratedStreams collection.
@@ -1001,7 +1001,7 @@ namespace FastReport.Export.Html
             writer.WriteBool("NotRotateLandscapePage", NotRotateLandscapePage);
             writer.WriteBool("HighQualitySVG", HighQualitySVG);
         }
-       
+
         /// <summary>
         /// For internal use only.
         /// </summary>
@@ -1054,7 +1054,7 @@ namespace FastReport.Export.Html
             notRotateLandscapePage = false;
             highQualitySVG = false;
         }
-        
+
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HTMLExport"/> class for WebPreview mode.

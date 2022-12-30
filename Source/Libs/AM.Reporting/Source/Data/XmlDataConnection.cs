@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,7 +20,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Data;
 using System.ComponentModel;
-using FastReport.Utils;
+using AM.Reporting.Utils;
 using System.Data.Common;
 using System.Net;
 using System.IO;
@@ -29,7 +29,7 @@ using System.IO;
 
 #nullable enable
 
-namespace FastReport.Data
+namespace AM.Reporting.Data
 {
   /// <summary>
   /// Represents a connection to xml file-based database.
@@ -52,10 +52,10 @@ namespace FastReport.Data
     [Category("Data")]
     public string XsdFile
     {
-      get 
-      { 
+      get
+      {
         XmlConnectionStringBuilder builder = new XmlConnectionStringBuilder(ConnectionString);
-        return builder.XsdFile; 
+        return builder.XsdFile;
       }
       set
       {
@@ -71,7 +71,7 @@ namespace FastReport.Data
     [Category("Data")]
     public string XmlFile
     {
-      get 
+      get
       {
         XmlConnectionStringBuilder builder = new XmlConnectionStringBuilder(ConnectionString);
         return builder.XmlFile;
@@ -83,7 +83,7 @@ namespace FastReport.Data
         ConnectionString = builder.ToString();
       }
     }
-        #endregion        
+        #endregion
 
     #region Protected Methods
     /// <inheritdoc/>
@@ -182,7 +182,7 @@ namespace FastReport.Data
 
         private void LoadXmlFromUrl(DataSet dataset)
         {
-            ServicePointManager.Expect100Continue = true; 
+            ServicePointManager.Expect100Continue = true;
             ServicePointManager.SecurityProtocol = (SecurityProtocolType)(0xc0 | 0x300 | 0xc00);
             HttpWebRequest req = (HttpWebRequest)WebRequest.Create(XmlFile);
             using (var response = req.GetResponse() as HttpWebResponse)

@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -18,19 +18,19 @@
 using System;
 using System.Globalization;
 using System.Drawing;
-using FastReport.Utils;
-using FastReport.Barcode;
+using AM.Reporting.Utils;
+using AM.Reporting.Barcode;
 using System.Drawing.Drawing2D;
-using FastReport.Format;
+using AM.Reporting.Format;
 using System.Xml;
 
-using FastReport.Matrix;
+using AM.Reporting.Matrix;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Import.StimulSoft
+namespace AM.Reporting.Import.StimulSoft
 {
     /// <summary>
     /// The StimulSoft units converter.
@@ -83,7 +83,7 @@ namespace FastReport.Import.StimulSoft
                     return PageUnits.Inches;
                 case "HundredthsOfInch":
                     return PageUnits.HundrethsOfInch;
-                default: 
+                default:
                     return PageUnits.Millimeters;
             }
         }
@@ -203,7 +203,7 @@ namespace FastReport.Import.StimulSoft
 
                     return Color.FromArgb(ConvertInt(rgb[0]), ConvertInt(rgb[1]), ConvertInt(rgb[2]));
                 }
-                else 
+                else
                     return Color.FromName(str);
             }
             return Color.Black;
@@ -522,7 +522,7 @@ namespace FastReport.Import.StimulSoft
                     return customFormat;
             }
 
-            return new GeneralFormat();    
+            return new GeneralFormat();
         }
 
 
@@ -538,7 +538,7 @@ namespace FastReport.Import.StimulSoft
             {
                 if(result[i] == '_')
                     try
-                    {   
+                    {
                         result = result.Replace(result.Substring(i, 7), ((char)Int16.Parse(result.Substring(i + 2, 4), NumberStyles.AllowHexSpecifier)).ToString());
                     }
                     catch { }
@@ -601,7 +601,7 @@ namespace FastReport.Import.StimulSoft
                     return CheckedSymbol.Cross;
                 case "DotRectangle":
                     return CheckedSymbol.Fill;
-                default: 
+                default:
                     return CheckedSymbol.Check;
             }
         }
@@ -705,7 +705,7 @@ namespace FastReport.Import.StimulSoft
         }
 
         /// <summary>
-        /// Converts the StimulSoft border sides to FastReport border sides
+        /// Converts the StimulSoft border sides to AM.Reporting border sides
         /// </summary>
         /// <param name="sides"></param>
         public static BorderLines ConvertBorderSides(string sides)
@@ -738,7 +738,7 @@ namespace FastReport.Import.StimulSoft
         }
 
         /// <summary>
-        /// Converts the StimulSoft AggregateFunction sides to FastReport MatrixAggregateFunction
+        /// Converts the StimulSoft AggregateFunction sides to AM.Reporting MatrixAggregateFunction
         /// </summary>
         /// <param name="node"></param>
         /// <returns></returns>
@@ -794,7 +794,7 @@ namespace FastReport.Import.StimulSoft
         /// <returns></returns>
         public static SeriesChartType ConvertChartType(string value)
         {
-            switch (value) 
+            switch (value)
             {
                 case "Stimulsoft.Report.Chart.StiPieSeries":
                     return SeriesChartType.Pie;

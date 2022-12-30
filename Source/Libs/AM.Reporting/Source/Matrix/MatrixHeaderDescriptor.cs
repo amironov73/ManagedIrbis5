@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,24 +19,24 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-using FastReport.Table;
-using FastReport.Utils;
+using AM.Reporting.Table;
+using AM.Reporting.Utils;
 
 #endregion
 
 #nullable enable
 
-namespace FastReport.Matrix
+namespace AM.Reporting.Matrix
 {
   /// <summary>
   /// The descriptor that is used to describe one element of the matrix header.
   /// </summary>
   /// <remarks>
   /// The <see cref="MatrixHeaderDescriptor"/> class is used to define one header element of the matrix
-  /// (either the column element or row element). The key properties are 
-  /// <see cref="MatrixDescriptor.Expression"/>, <see cref="Sort"/> and <see cref="Totals"/>. 
-  /// <para/>To set visual appearance of the element, use the <see cref="MatrixDescriptor.TemplateCell"/> 
-  /// property. To set visual appearance of the "total" element, use the <see cref="TemplateTotalCell"/> 
+  /// (either the column element or row element). The key properties are
+  /// <see cref="MatrixDescriptor.Expression"/>, <see cref="Sort"/> and <see cref="Totals"/>.
+  /// <para/>To set visual appearance of the element, use the <see cref="MatrixDescriptor.TemplateCell"/>
+  /// property. To set visual appearance of the "total" element, use the <see cref="TemplateTotalCell"/>
   /// property.
   /// <para/>The collection of descriptors used to represent the matrix header is stored
   /// in the <b>MatrixObject.Data.Columns</b> and <b>MatrixObject.Data.Rows</b> properties.
@@ -67,7 +67,7 @@ namespace FastReport.Matrix
       get { return sort; }
       set { sort = value; }
     }
-    
+
     /// <summary>
     /// Gets or sets a value indicating that this element has associated "total" element.
     /// </summary>
@@ -96,7 +96,7 @@ namespace FastReport.Matrix
       get { return totalsFirst; }
       set { totalsFirst = value; }
     }
-    
+
     /// <summary>
     /// Gets or sets a value indicating that the page break must be printed before this element.
     /// </summary>
@@ -159,7 +159,7 @@ namespace FastReport.Matrix
     /// matrix.Data.Rows[0].TemplateTotalCell.Text = "Grand Total";
     /// matrix.Data.Rows[0].TemplateTotalCell.Fill = new SolidFill(Color.Green);
     /// </code>
-    /// </example>    
+    /// </example>
     public TableCell TemplateTotalCell
     {
       get { return templateTotalCell; }

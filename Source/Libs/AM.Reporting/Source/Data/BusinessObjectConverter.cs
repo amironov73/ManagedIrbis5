@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,7 +20,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Drawing;
 
-using FastReport.Utils;
+using AM.Reporting.Utils;
 
 using System.Windows.Forms;
 
@@ -28,7 +28,7 @@ using System.Windows.Forms;
 
 #nullable enable
 
-namespace FastReport.Data
+namespace AM.Reporting.Data
 {
   /// <summary>
   /// <b>Obsolete</b>. Specifies a set of flags used to convert business objects into datasources.
@@ -40,12 +40,12 @@ namespace FastReport.Data
     /// Specifies no actions.
     /// </summary>
     None,
-    
+
     /// <summary>
     /// Allows using the fields of a business object.
     /// </summary>
     AllowFields,
-    
+
     /// <summary>
     /// Allows using properties of a business object with <b>BrowsableAttribute</b> only.
     /// </summary>
@@ -81,12 +81,12 @@ namespace FastReport.Data
     private int nestingLevel;
     private int maxNestingLevel;
     private FastNameCreator nameCreator;
-    
+
     private PropertyKind GetPropertyKind(string name, Type type)
     {
       if (type == null)
         return PropertyKind.Simple;
-      
+
       PropertyKind kind = PropertyKind.Complex;
       if (type.IsValueType ||
         type == typeof(string) ||
@@ -175,7 +175,7 @@ namespace FastReport.Data
           {
           }
         }
-        
+
         return filteredProperties;
       }
     }
@@ -211,7 +211,7 @@ namespace FastReport.Data
         childColumn.Reference = null;
         return;
       }
-      
+
       object obj = null;
       if (column is BusinessObjectDataSource)
       {
@@ -343,7 +343,7 @@ namespace FastReport.Data
             childColumn.Enabled = isSimpleProperty || nestingLevel < maxNestingLevel;
           }
 
-          // update column's prop data - the schema may be changed 
+          // update column's prop data - the schema may be changed
           childColumn.DataType = prop.PropertyType;
           childColumn.PropName = prop.Name;
           childColumn.PropDescriptor = prop;

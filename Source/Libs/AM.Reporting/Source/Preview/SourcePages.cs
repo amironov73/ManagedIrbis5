@@ -1,9 +1,31 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.Collections.Generic;
 using System.Text;
-using FastReport.Utils;
 
-namespace FastReport.Preview
+using AM.Reporting.Utils;
+
+#endregion
+
+#nullable enable
+
+namespace AM.Reporting.Preview
 {
   internal partial class SourcePages : IDisposable
   {
@@ -68,7 +90,7 @@ namespace FastReport.Preview
       ObjectCollection childObjects = source.ChildObjects;
       foreach (Base c in childObjects)
       {
-        CloneObjects(c, clone); 
+        CloneObjects(c, clone);
       }
       clone.Parent = parent;
       return clone;
@@ -94,12 +116,12 @@ namespace FastReport.Preview
         pages.RemoveAt(0);
       }
     }
-    
+
     public int IndexOf(ReportPage page)
     {
       return pages.IndexOf(page);
     }
-    
+
     public void ApplyWatermark(Watermark watermark)
     {
       foreach (ReportPage page in pages)
@@ -107,7 +129,7 @@ namespace FastReport.Preview
         page.Watermark = watermark.Clone();
       }
     }
-    
+
     public void ApplyPageSize()
     {
     }
@@ -133,7 +155,7 @@ namespace FastReport.Preview
         {
           writer.Write(pages[i]);
         }
-      }  
+      }
     }
 
     public void Dispose()

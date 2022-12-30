@@ -1,10 +1,31 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Net;
 
-namespace FastReport.Utils
+#endregion
+
+#nullable enable
+
+namespace AM.Reporting.Utils
 {
     internal static class ImageHelper
     {
@@ -121,7 +142,7 @@ namespace FastReport.Utils
                     return true;
                 }
             }
-            //throw new Exception(Res.Get("Export,Image,ImageParceFormatException")); // we cant convert image to exif or from bitmap to mf 
+            //throw new Exception(Res.Get("Export,Image,ImageParceFormatException")); // we cant convert image to exif or from bitmap to mf
             return false;
         }
 
@@ -350,7 +371,7 @@ namespace FastReport.Utils
             {
                 format = ImageFormat.Bmp;
             }
-            else if (ImageFormat.Wmf.Equals(bitmap.RawFormat)) 
+            else if (ImageFormat.Wmf.Equals(bitmap.RawFormat))
             {
                 format = ImageFormat.Wmf;
             }

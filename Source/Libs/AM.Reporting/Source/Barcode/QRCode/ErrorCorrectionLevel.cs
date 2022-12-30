@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,16 +21,16 @@ using System;
 
 #nullable enable
 
-namespace FastReport.Barcode.QRCode
+namespace AM.Reporting.Barcode.QRCode
 {
-  
+
   /*/// <summary> <p>See ISO 18004:2006, 6.5.1. This enum encapsulates the four error correction levels
   /// defined by the QR code standard.</p>
-  /// 
+  ///
   /// </summary>
   /// <author>  Sean Owen
   /// </author>
-  /// <author>www.Redivivus.in (suraj.supekar@redivivus.in) - Ported from ZXING Java Source 
+  /// <author>www.Redivivus.in (suraj.supekar@redivivus.in) - Ported from ZXING Java Source
   /// </author>*/
   internal sealed class ErrorCorrectionLevel
   {
@@ -40,7 +40,7 @@ namespace FastReport.Barcode.QRCode
       {
         return bits;
       }
-      
+
     }
     public System.String Name
     {
@@ -48,11 +48,11 @@ namespace FastReport.Barcode.QRCode
       {
         return name;
       }
-      
+
     }
-    
+
     // No, we can't use an enum here. J2ME doesn't support it.
-    
+
     // <summary> L = ~7% correction</summary>
     //UPGRADE_NOTE: Final was removed from the declaration of 'L '. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1003'"
     public static readonly ErrorCorrectionLevel L = new ErrorCorrectionLevel(0, 0x01, "L");
@@ -65,29 +65,29 @@ namespace FastReport.Barcode.QRCode
     // <summary> H = ~30% correction</summary>
     //UPGRADE_NOTE: Final was removed from the declaration of 'H '. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1003'"
     public static readonly ErrorCorrectionLevel H = new ErrorCorrectionLevel(3, 0x02, "H");
-    
+
     //UPGRADE_NOTE: Final was removed from the declaration of 'FOR_BITS '. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1003'"
     private static readonly ErrorCorrectionLevel[] FOR_BITS = new ErrorCorrectionLevel[]{M, L, H, Q};
-    
+
     //UPGRADE_NOTE: Final was removed from the declaration of 'ordinal '. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1003'"
     private int ordinal_Renamed_Field;
     //UPGRADE_NOTE: Final was removed from the declaration of 'bits '. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1003'"
     private int bits;
     //UPGRADE_NOTE: Final was removed from the declaration of 'name '. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1003'"
     private System.String name;
-    
+
     private ErrorCorrectionLevel(int ordinal, int bits, System.String name)
     {
       this.ordinal_Renamed_Field = ordinal;
       this.bits = bits;
       this.name = name;
     }
-    
+
     public int ordinal()
     {
       return ordinal_Renamed_Field;
     }
-    
+
     public override System.String ToString()
     {
       return name;
