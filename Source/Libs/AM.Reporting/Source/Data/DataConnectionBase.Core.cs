@@ -32,7 +32,7 @@ namespace AM.Reporting.Data
         /// Does nothing
         /// </summary>
         /// <param name="tableNames"></param>
-        partial void FilterTables(List<string> tableNames);
+        partial void FilterTables (List<string> tableNames);
 
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace AM.Reporting.Data
         /// </summary>
         /// <param name="connection"></param>
         /// <returns>false</returns>
-        private bool ShouldNotDispose(DbConnection connection)
+        private bool ShouldNotDispose (DbConnection connection)
         {
             return false;
         }
@@ -56,7 +56,7 @@ namespace AM.Reporting.Data
         /// <summary>
         /// Does nothing
         /// </summary>
-        partial void ShowLoginForm(string lastConnectionString);
+        partial void ShowLoginForm (string lastConnectionString);
 
         #endregion Private Methods
     }

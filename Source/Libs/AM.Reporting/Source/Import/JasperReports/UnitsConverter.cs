@@ -18,8 +18,10 @@
 using System;
 using System.Globalization;
 using System.Drawing;
+
 using AM.Reporting.Utils;
 using AM.Reporting.Barcode;
+
 using System.Xml;
 using System.Windows.Forms;
 
@@ -40,7 +42,7 @@ namespace AM.Reporting.Import.JasperReports
         /// Converts value to Boolean.
         /// </summary>
         /// <param name="str">Boolen value as string.</param>
-        public static bool ConvertBool(string str)
+        public static bool ConvertBool (string str)
         {
             return str.ToLower() == "true";
         }
@@ -50,7 +52,7 @@ namespace AM.Reporting.Import.JasperReports
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static PictureBoxSizeMode ConvertImageSizeMode(string value)
+        public static PictureBoxSizeMode ConvertImageSizeMode (string value)
         {
             switch (value)
             {
@@ -64,6 +66,7 @@ namespace AM.Reporting.Import.JasperReports
                 case "RealSize":
                     return PictureBoxSizeMode.AutoSize;
             }
+
             return PictureBoxSizeMode.Normal;
         }
 
@@ -72,10 +75,10 @@ namespace AM.Reporting.Import.JasperReports
         /// </summary>
         /// <param name="strInt"></param>
         /// <returns></returns>
-        public static int ConvertInt(string strInt)
+        public static int ConvertInt (string strInt)
         {
-            int result = 0;
-            int.TryParse(strInt, NumberStyles.Float, NumberFormatInfo.InvariantInfo, out result);
+            var result = 0;
+            int.TryParse (strInt, NumberStyles.Float, NumberFormatInfo.InvariantInfo, out result);
             return result;
         }
 
@@ -84,10 +87,10 @@ namespace AM.Reporting.Import.JasperReports
         /// </summary>
         /// <param name="strFloat"></param>
         /// <returns></returns>
-        public static float ConvertFloat(string strFloat)
+        public static float ConvertFloat (string strFloat)
         {
             float result = 0;
-            float.TryParse(strFloat, NumberStyles.Float, NumberFormatInfo.InvariantInfo, out result);
+            float.TryParse (strFloat, NumberStyles.Float, NumberFormatInfo.InvariantInfo, out result);
             return result;
         }
 
@@ -96,12 +99,13 @@ namespace AM.Reporting.Import.JasperReports
         /// </summary>
         /// <param name="str">The DevExpress Color value as string.</param>
         /// <returns>The Color value.</returns>
-        public static Color ConvertColor(string str)
+        public static Color ConvertColor (string str)
         {
-            if (!String.IsNullOrEmpty(str))
+            if (!string.IsNullOrEmpty (str))
             {
-                return ColorTranslator.FromHtml(str);
+                return ColorTranslator.FromHtml (str);
             }
+
             return Color.Black;
         }
 
@@ -110,7 +114,7 @@ namespace AM.Reporting.Import.JasperReports
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static QRCodeErrorCorrection ConvertErrorCorrection(string value)
+        public static QRCodeErrorCorrection ConvertErrorCorrection (string value)
         {
             switch (value)
             {
@@ -132,18 +136,24 @@ namespace AM.Reporting.Import.JasperReports
         /// </summary>
         /// <param name="node"></param>
         /// <returns></returns>
-        public static BorderLine ConvertBorderLine(XmlNode node)
+        public static BorderLine ConvertBorderLine (XmlNode node)
         {
-            BorderLine line = new BorderLine();
+            var line = new BorderLine();
 
-            if(node.Attributes["lineWidth"] != null)
-                line.Width = ConvertInt(node.Attributes["lineWidth"].Value) * DrawUtils.ScreenDpi / 96f;
+            if (node.Attributes["lineWidth"] != null)
+            {
+                line.Width = ConvertInt (node.Attributes["lineWidth"].Value) * DrawUtils.ScreenDpi / 96f;
+            }
 
             if (node.Attributes["lineColor"] != null)
-                line.Color = ConvertColor(node.Attributes["lineColor"].Value);
+            {
+                line.Color = ConvertColor (node.Attributes["lineColor"].Value);
+            }
 
             if (node.Attributes["lineStyle"] != null)
-                line.Style = ConvertLineStyle(node.Attributes["lineStyle"].Value);
+            {
+                line.Style = ConvertLineStyle (node.Attributes["lineStyle"].Value);
+            }
 
             return line;
         }
@@ -153,38 +163,42 @@ namespace AM.Reporting.Import.JasperReports
         /// </summary>
         /// <param name="border"></param>
         /// <returns></returns>
-        public static Border ConvertBorder(XmlNode border)
+        public static Border ConvertBorder (XmlNode border)
         {
-            Border result = new Border();
+            var result = new Border();
 
-            foreach(XmlNode node in border.ChildNodes)
+            foreach (XmlNode node in border.ChildNodes)
             {
                 if (node.Name == "pen")
                 {
-                    result.TopLine = ConvertBorderLine(node);
+                    result.TopLine = ConvertBorderLine (node);
                     result.LeftLine = result.TopLine;
                     result.BottomLine = result.TopLine;
                     result.RightLine = result.TopLine;
                     result.Lines = BorderLines.All;
                 }
+
                 if (node.Name == "topPen")
                 {
-                    result.TopLine = ConvertBorderLine(node);
+                    result.TopLine = ConvertBorderLine (node);
                     result.Lines |= BorderLines.Top;
                 }
+
                 if (node.Name == "leftPen")
                 {
-                    result.LeftLine = ConvertBorderLine(node);
+                    result.LeftLine = ConvertBorderLine (node);
                     result.Lines |= BorderLines.Left;
                 }
+
                 if (node.Name == "bottomPen")
                 {
-                    result.BottomLine = ConvertBorderLine(node);
+                    result.BottomLine = ConvertBorderLine (node);
                     result.Lines |= BorderLines.Bottom;
                 }
+
                 if (node.Name == "rightPen")
                 {
-                    result.RightLine = ConvertBorderLine(node);
+                    result.RightLine = ConvertBorderLine (node);
                     result.Lines |= BorderLines.Right;
                 }
             }
@@ -197,28 +211,29 @@ namespace AM.Reporting.Import.JasperReports
         /// </summary>
         /// <param name="borderDashStyle">The DevExpress BorderDashStyle value.</param>
         /// <returns>The LineStyle value.</returns>
-        public static LineStyle ConvertBorderDashStyle(string borderDashStyle)
+        public static LineStyle ConvertBorderDashStyle (string borderDashStyle)
         {
-            if (borderDashStyle.Equals("Dot"))
+            if (borderDashStyle.Equals ("Dot"))
             {
                 return LineStyle.Dot;
             }
-            else if (borderDashStyle.Equals("Dash"))
+            else if (borderDashStyle.Equals ("Dash"))
             {
                 return LineStyle.Dash;
             }
-            else if (borderDashStyle.Equals("DashDot"))
+            else if (borderDashStyle.Equals ("DashDot"))
             {
                 return LineStyle.DashDot;
             }
-            else if (borderDashStyle.Equals("DashDotDot"))
+            else if (borderDashStyle.Equals ("DashDotDot"))
             {
                 return LineStyle.DashDotDot;
             }
-            else if (borderDashStyle.Equals("Double"))
+            else if (borderDashStyle.Equals ("Double"))
             {
                 return LineStyle.Double;
             }
+
             return LineStyle.Solid;
         }
 
@@ -227,7 +242,7 @@ namespace AM.Reporting.Import.JasperReports
         /// </summary>
         /// <param name="lineStyle">The JasperReports LineStyle value.</param>
         /// <returns>The LineStyle value.</returns>
-        public static LineStyle ConvertLineStyle(string lineStyle)
+        public static LineStyle ConvertLineStyle (string lineStyle)
         {
             if (lineStyle == "Dotted")
             {
@@ -241,6 +256,7 @@ namespace AM.Reporting.Import.JasperReports
             {
                 return LineStyle.Double;
             }
+
             return LineStyle.Solid;
         }
 
@@ -249,20 +265,23 @@ namespace AM.Reporting.Import.JasperReports
         /// </summary>
         /// <param name="textAlignment">The JasperReports TextAlignment value.</param>
         /// <returns>The HorzAlign value.</returns>
-        public static HorzAlign ConvertTextAlignmentToHorzAlign(string textAlignment)
+        public static HorzAlign ConvertTextAlignmentToHorzAlign (string textAlignment)
         {
-            if (textAlignment.Contains("Center"))
+            if (textAlignment.Contains ("Center"))
             {
                 return HorzAlign.Center;
             }
-            if (textAlignment.Contains("Justified"))
+
+            if (textAlignment.Contains ("Justified"))
             {
                 return HorzAlign.Justify;
             }
-            if (textAlignment.Contains("Right"))
+
+            if (textAlignment.Contains ("Right"))
             {
                 return HorzAlign.Right;
             }
+
             return HorzAlign.Left;
         }
 
@@ -271,7 +290,7 @@ namespace AM.Reporting.Import.JasperReports
         /// </summary>
         /// <param name="rotation"></param>
         /// <returns></returns>
-        public static int ConvertRotation(string rotation)
+        public static int ConvertRotation (string rotation)
         {
             switch (rotation)
             {
@@ -282,6 +301,7 @@ namespace AM.Reporting.Import.JasperReports
                 case "UpsideDown":
                     return 180;
             }
+
             return 0;
         }
 
@@ -290,16 +310,18 @@ namespace AM.Reporting.Import.JasperReports
         /// </summary>
         /// <param name="textAlignment">The JasperReports TextAlignment value.</param>
         /// <returns>The VertAlign value.</returns>
-        public static VertAlign ConvertTextAlignmentToVertAlign(string textAlignment)
+        public static VertAlign ConvertTextAlignmentToVertAlign (string textAlignment)
         {
-            if (textAlignment.Contains("Middle"))
+            if (textAlignment.Contains ("Middle"))
             {
                 return VertAlign.Center;
             }
-            if (textAlignment.Contains("Bottom"))
+
+            if (textAlignment.Contains ("Bottom"))
             {
                 return VertAlign.Bottom;
             }
+
             return VertAlign.Top;
         }
 
@@ -308,7 +330,7 @@ namespace AM.Reporting.Import.JasperReports
         /// </summary>
         /// <param name="symbology">The JasperReports Barcode.Symbology value as string.</param>
         /// <param name="barcode">The BarcodeObject instance.</param>
-        public static void ConvertBarcodeSymbology(string symbology, BarcodeObject barcode)
+        public static void ConvertBarcodeSymbology (string symbology, BarcodeObject barcode)
         {
             switch (symbology)
             {
@@ -373,7 +395,7 @@ namespace AM.Reporting.Import.JasperReports
         /// </summary>
         /// <param name="node"></param>
         /// <returns></returns>
-        public static HyperlinkKind ConvertHyperlinkType(XmlNode node)
+        public static HyperlinkKind ConvertHyperlinkType (XmlNode node)
         {
             if (node.Attributes["hyperlinkType"] != null)
             {
@@ -387,6 +409,7 @@ namespace AM.Reporting.Import.JasperReports
                         return HyperlinkKind.URL;
                 }
             }
+
             return HyperlinkKind.Custom;
         }
 

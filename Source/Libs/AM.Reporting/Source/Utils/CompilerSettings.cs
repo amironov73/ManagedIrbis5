@@ -17,7 +17,9 @@
 
 using System;
 using System.CodeDom.Compiler;
+
 using Microsoft.CSharp;
+
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -62,9 +64,6 @@ namespace AM.Reporting.Utils
     {
         #region Fields
 
-        private string placeholder;
-        private CompilerExceptionBehaviour exceptionBehaviour;
-
         #endregion Fields
 
         #region Properties
@@ -72,20 +71,12 @@ namespace AM.Reporting.Utils
         /// <summary>
         /// Gets or set the string that will be used for replacing incorrect expressions.
         /// </summary>
-        public string Placeholder
-        {
-            get { return placeholder; }
-            set { placeholder = value; }
-        }
+        public string Placeholder { get; set; }
 
         /// <summary>
         /// Gets or sets the behaviour of compiler when exception is thrown.
         /// </summary>
-        public CompilerExceptionBehaviour ExceptionBehaviour
-        {
-            get { return exceptionBehaviour; }
-            set { exceptionBehaviour = value; }
-        }
+        public CompilerExceptionBehaviour ExceptionBehaviour { get; set; }
 
         /// <summary>
         /// Get or sets number of recompiles
@@ -104,8 +95,8 @@ namespace AM.Reporting.Utils
         /// </summary>
         public CompilerSettings()
         {
-            placeholder = "";
-            exceptionBehaviour = CompilerExceptionBehaviour.Default;
+            Placeholder = "";
+            ExceptionBehaviour = CompilerExceptionBehaviour.Default;
         }
 
         #endregion Constructors

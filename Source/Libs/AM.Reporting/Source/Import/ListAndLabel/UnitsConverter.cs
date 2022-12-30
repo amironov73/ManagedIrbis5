@@ -39,9 +39,9 @@ namespace AM.Reporting.Import.ListAndLabel
         /// </summary>
         /// <param name="str">The List and Label unit as string.</param>
         /// <returns>The value in millimeters.</returns>
-        public static float LLUnitsToMillimeters(string str)
+        public static float LLUnitsToMillimeters (string str)
         {
-            return (float)Math.Round(Convert.ToDouble(str) / 1000);
+            return (float)Math.Round (Convert.ToDouble (str) / 1000);
         }
 
         /// <summary>
@@ -49,9 +49,9 @@ namespace AM.Reporting.Import.ListAndLabel
         /// </summary>
         /// <param name="str">The List and Label unit as string.</param>
         /// <returns>The value in pixels.</returns>
-        public static float LLUnitsToPixels(string str)
+        public static float LLUnitsToPixels (string str)
         {
-            return LLUnitsToMillimeters(str) * Units.Millimeters;
+            return LLUnitsToMillimeters (str) * Units.Millimeters;
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace AM.Reporting.Import.ListAndLabel
         /// </summary>
         /// <param name="str">The List and Label paper orientation value as string.</param>
         /// <returns>Returns <b>true</b> if orientation is landscape.</returns>
-        public static bool ConvertPaperOrientation(string str)
+        public static bool ConvertPaperOrientation (string str)
         {
             return str == "2" ? true : false;
         }
@@ -69,7 +69,7 @@ namespace AM.Reporting.Import.ListAndLabel
         /// </summary>
         /// <param name="str">The List and Label bool value as string.</param>
         /// <returns>A bool value.</returns>
-        public static bool ConvertBool(string str)
+        public static bool ConvertBool (string str)
         {
             return str.ToLower() == "true" ? true : false;
         }
@@ -79,9 +79,9 @@ namespace AM.Reporting.Import.ListAndLabel
         /// </summary>
         /// <param name="str">The List and Label text Align value as string.</param>
         /// <returns>A HorzAlign value.</returns>
-        public static HorzAlign ConvertTextAlign(string str)
+        public static HorzAlign ConvertTextAlign (string str)
         {
-            HorzAlign align = HorzAlign.Left;
+            var align = HorzAlign.Left;
             switch (str)
             {
                 case "1":
@@ -94,6 +94,7 @@ namespace AM.Reporting.Import.ListAndLabel
                     align = HorzAlign.Left;
                     break;
             }
+
             return align;
         }
 
@@ -102,9 +103,9 @@ namespace AM.Reporting.Import.ListAndLabel
         /// </summary>
         /// <param name="str">The List and Label LineType value as string.</param>
         /// <returns>A LineStyle value.</returns>
-        public static LineStyle ConvertLineType(string str)
+        public static LineStyle ConvertLineType (string str)
         {
-            LineStyle style = LineStyle.Solid;
+            var style = LineStyle.Solid;
             switch (str)
             {
                 case "0":
@@ -126,6 +127,7 @@ namespace AM.Reporting.Import.ListAndLabel
                     style = LineStyle.Double;
                     break;
             }
+
             return style;
         }
 
@@ -134,9 +136,9 @@ namespace AM.Reporting.Import.ListAndLabel
         /// </summary>
         /// <param name="str">The List and Label rounding value as string.</param>
         /// <returns>A float value.</returns>
-        public static float ConvertRounding(string str)
+        public static float ConvertRounding (string str)
         {
-            return Convert.ToSingle(str) / 10;
+            return Convert.ToSingle (str) / 10;
         }
 
         #endregion // Public Methods

@@ -31,42 +31,25 @@ namespace AM.Reporting.Utils
     /// </summary>
     public class FRPaintEventArgs
     {
-        private IGraphics graphics;
-        private float scaleX;
-        private float scaleY;
-        private GraphicCache cache;
-
         /// <summary>
         /// Gets a <b>Graphics</b> object to draw on.
         /// </summary>
-        public IGraphics Graphics
-        {
-            get { return graphics; }
-        }
+        public IGraphics Graphics { get; }
 
         /// <summary>
         /// Gets the X scale factor.
         /// </summary>
-        public float ScaleX
-        {
-            get { return scaleX; }
-        }
+        public float ScaleX { get; }
 
         /// <summary>
         /// Gets the Y scale factor.
         /// </summary>
-        public float ScaleY
-        {
-            get { return scaleY; }
-        }
+        public float ScaleY { get; }
 
         /// <summary>
         /// Gets the cache that contains graphics objects.
         /// </summary>
-        public GraphicCache Cache
-        {
-            get { return cache; }
-        }
+        public GraphicCache Cache { get; }
 
         /// <summary>
         /// Initializes a new instance of the <b>FRPaintEventArgs</b> class with specified settings.
@@ -75,12 +58,12 @@ namespace AM.Reporting.Utils
         /// <param name="scaleX">X scale factor.</param>
         /// <param name="scaleY">Y scale factor.</param>
         /// <param name="cache">Cache that contains graphics objects.</param>
-        public FRPaintEventArgs(IGraphics g, float scaleX, float scaleY, GraphicCache cache)
+        public FRPaintEventArgs (IGraphics g, float scaleX, float scaleY, GraphicCache cache)
         {
-            graphics = g;
-            this.scaleX = scaleX;
-            this.scaleY = scaleY;
-            this.cache = cache;
+            Graphics = g;
+            this.ScaleX = scaleX;
+            this.ScaleY = scaleY;
+            this.Cache = cache;
         }
 
         /// <summary>
@@ -90,10 +73,9 @@ namespace AM.Reporting.Utils
         /// <param name="scaleX">X scale factor.</param>
         /// <param name="scaleY">Y scale factor.</param>
         /// <param name="cache">Cache that contains graphics objects.</param>
-        public FRPaintEventArgs(Graphics g, float scaleX, float scaleY, GraphicCache cache) :
-            this(GdiGraphics.FromGraphics(g), scaleX, scaleY, cache)
+        public FRPaintEventArgs (Graphics g, float scaleX, float scaleY, GraphicCache cache) :
+            this (GdiGraphics.FromGraphics (g), scaleX, scaleY, cache)
         {
         }
     }
-
 }

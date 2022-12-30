@@ -36,14 +36,18 @@ namespace AM.Reporting.Code
     internal partial class CsCodeHelper : CodeHelperBase
     {
         #region Private Methods
-        private string GetEquivalentKeyword(string s)
+
+        private string GetEquivalentKeyword (string s)
         {
-            if (s.EndsWith("[]"))
-                return GetEquivalentKeyword1(s.Substring(0, s.Length - 2)) + "[]";
-            return GetEquivalentKeyword1(s);
+            if (s.EndsWith ("[]"))
+            {
+                return GetEquivalentKeyword1 (s.Substring (0, s.Length - 2)) + "[]";
+            }
+
+            return GetEquivalentKeyword1 (s);
         }
 
-        private string GetEquivalentKeyword1(string s)
+        private string GetEquivalentKeyword1 (string s)
         {
             switch (s)
             {
@@ -78,53 +82,63 @@ namespace AM.Reporting.Code
                 case "Boolean":
                     return "bool";
             }
+
             return s;
         }
+
         #endregion
 
         #region Protected Methods
-        protected override string GetTypeDeclaration(Type type)
+
+        protected override string GetTypeDeclaration (Type type)
         {
             if (type.IsGenericType)
             {
-                string result = type.Name;
-                result = result.Substring(0, result.IndexOf('`'));
+                var result = type.Name;
+                result = result.Substring (0, result.IndexOf ('`'));
                 result += "<";
 
-                foreach (Type elementType in type.GetGenericArguments())
+                foreach (var elementType in type.GetGenericArguments())
                 {
-                    result += GetTypeDeclaration(elementType) + ",";
+                    result += GetTypeDeclaration (elementType) + ",";
                 }
 
-                result = result.Substring(0, result.Length - 1) + ">";
+                result = result.Substring (0, result.Length - 1) + ">";
                 return result;
             }
             else
+            {
                 return type.Name;
+            }
         }
+
         #endregion
 
         #region Public Methods
+
         public override string EmptyScript()
         {
             return "using System;\r\nusing System.Collections;\r\nusing System.Collections.Generic;\r\n" +
-              "using System.ComponentModel;\r\nusing System.Windows.Forms;\r\nusing System.Drawing;\r\n" +
-              "using System.Data;\r\nusing AM.Reporting;\r\nusing AM.Reporting.Data;\r\nusing AM.Reporting.Dialog;\r\n" +
-              "using AM.Reporting.Barcode;\r\nusing AM.Reporting.Table;\r\nusing AM.Reporting.Utils;\r\n\r\n" +
-              "namespace AM.Reporting\r\n{\r\n  public class ReportScript\r\n  {\r\n  }\r\n}\r\n";
+                   "using System.ComponentModel;\r\nusing System.Windows.Forms;\r\nusing System.Drawing;\r\n" +
+                   "using System.Data;\r\nusing AM.Reporting;\r\nusing AM.Reporting.Data;\r\nusing AM.Reporting.Dialog;\r\n" +
+                   "using AM.Reporting.Barcode;\r\nusing AM.Reporting.Table;\r\nusing AM.Reporting.Utils;\r\n\r\n" +
+                   "namespace AM.Reporting\r\n{\r\n  public class ReportScript\r\n  {\r\n  }\r\n}\r\n";
         }
 
-        public override int GetPositionToInsertOwnItems(string scriptText)
+        public override int GetPositionToInsertOwnItems (string scriptText)
         {
-            int pos = scriptText.IndexOf("public class ReportScript");
+            var pos = scriptText.IndexOf ("public class ReportScript");
             if (pos == -1)
+            {
                 return -1;
-            return scriptText.IndexOf('{', pos) + 3;
+            }
+
+            return scriptText.IndexOf ('{', pos) + 3;
         }
 
-        public override string AddField(Type type, string name)
+        public override string AddField (Type type, string name)
         {
-            name = name.Replace(" ", "_");
+            name = name.Replace (" ", "_");
             return "    public " + type.FullName + " " + name + ";\r\n";
         }
 
@@ -133,10 +147,10 @@ namespace AM.Reporting.Code
             return "    private object CalcExpression(string expression, Variant Value)\r\n    {\r\n      ";
         }
 
-        public override string AddExpression(string expr, string value)
+        public override string AddExpression (string expr, string value)
         {
-            expr = expr.Replace("\\", "\\\\");
-            expr = expr.Replace("\"", "\\\"");
+            expr = expr.Replace ("\\", "\\\\");
+            expr = expr.Replace ("\"", "\\\"");
             return "if (expression == \"" + expr + "\")\r\n        return " + value + ";\r\n      ";
         }
 
@@ -145,36 +159,36 @@ namespace AM.Reporting.Code
             return "return null;\r\n    }\r\n\r\n";
         }
 
-        public override string ReplaceColumnName(string name, Type type)
+        public override string ReplaceColumnName (string name, Type type)
         {
-            string typeName = GetTypeDeclaration(type);
-            string result = "((" + typeName + ")Report.GetColumnValue(\"" + name + "\"";
+            var typeName = GetTypeDeclaration (type);
+            var result = "((" + typeName + ")Report.GetColumnValue(\"" + name + "\"";
             result += "))";
             return result;
         }
 
-        public override string ReplaceParameterName(Parameter parameter)
+        public override string ReplaceParameterName (Parameter parameter)
         {
-            string typeName = GetTypeDeclaration(parameter.DataType);
+            var typeName = GetTypeDeclaration (parameter.DataType);
             return "((" + typeName + ")Report.GetParameterValue(\"" + parameter.FullName + "\"))";
         }
 
-        public override string ReplaceVariableName(Parameter parameter)
+        public override string ReplaceVariableName (Parameter parameter)
         {
-            string typeName = GetTypeDeclaration(parameter.DataType);
+            var typeName = GetTypeDeclaration (parameter.DataType);
             return "((" + typeName + ")Report.GetVariableValue(\"" + parameter.FullName + "\"))";
         }
 
-        public override string ReplaceTotalName(string name)
+        public override string ReplaceTotalName (string name)
         {
             return "Report.GetTotalValue(\"" + name + "\")";
         }
 
         public override string GenerateInitializeMethod()
         {
-            Hashtable events = new Hashtable();
-            string reportString = StripEventHandlers(events);
-            string result = "";
+            var events = new Hashtable();
+            var reportString = StripEventHandlers (events);
+            var result = "";
 
             // form the InitializeComponent method
             result += "    private void InitializeComponent()\r\n    {\r\n      ";
@@ -182,14 +196,14 @@ namespace AM.Reporting.Code
             // form the reportString
             result += "string reportString = \r\n        ";
 
-            int totalLength = 0;
+            var totalLength = 0;
             while (reportString.Length > 0)
             {
-                string part = "";
+                var part = "";
                 if (reportString.Length > 80)
                 {
-                    part = reportString.Substring(0, 80);
-                    reportString = reportString.Substring(80);
+                    part = reportString.Substring (0, 80);
+                    reportString = reportString.Substring (80);
                 }
                 else
                 {
@@ -197,10 +211,10 @@ namespace AM.Reporting.Code
                     reportString = "";
                 }
 
-                part = part.Replace("\\", "\\\\");
-                part = part.Replace("\"", "\\\"");
-                part = part.Replace("\r", "\\r");
-                part = part.Replace("\n", "\\n");
+                part = part.Replace ("\\", "\\\\");
+                part = part.Replace ("\"", "\\\"");
+                part = part.Replace ("\r", "\\r");
+                part = part.Replace ("\n", "\\n");
                 result += "\"" + part + "\"";
                 if (reportString != "")
                 {
@@ -210,7 +224,10 @@ namespace AM.Reporting.Code
                         result += ";\r\n      reportString += ";
                     }
                     else
+                    {
                         result += " +\r\n        ";
+                    }
+
                     totalLength += part.Length;
                 }
                 else
@@ -233,32 +250,40 @@ namespace AM.Reporting.Code
             return result;
         }
 
-        public override string ReplaceClassName(string scriptText, string className)
+        public override string ReplaceClassName (string scriptText, string className)
         {
-            return scriptText.Replace("class ReportScript", "class " + className + " : Report").Replace(
-              "public ReportScript()", "public " + className + "()").Replace(
-              "private object CalcExpression", "protected override object CalcExpression");
+            return scriptText.Replace ("class ReportScript", "class " + className + " : Report").Replace (
+                "public ReportScript()", "public " + className + "()").Replace (
+                "private object CalcExpression", "protected override object CalcExpression");
         }
 
-        public override string GetMethodSignature(MethodInfo info, bool fullForm)
+        public override string GetMethodSignature (MethodInfo info, bool fullForm)
         {
-            string result = info.Name + "(";
-            string fontBegin = "<font color=\"Blue\">";
-            string fontEnd = "</font>";
+            var result = info.Name + "(";
+            var fontBegin = "<font color=\"Blue\">";
+            var fontEnd = "</font>";
             if (fullForm)
-                result = fontBegin + GetEquivalentKeyword(info.ReturnType.Name) + fontEnd + " " + result;
+            {
+                result = fontBegin + GetEquivalentKeyword (info.ReturnType.Name) + fontEnd + " " + result;
+            }
 
-            System.Reflection.ParameterInfo[] pars = info.GetParameters();
-            foreach (System.Reflection.ParameterInfo par in pars)
+            ParameterInfo[] pars = info.GetParameters();
+            foreach (var par in pars)
             {
                 // special case - skip "thisReport" parameter
                 if (par.Name == "thisReport")
+                {
                     continue;
-                string paramType = "";
-                object[] attr = par.GetCustomAttributes(typeof(ParamArrayAttribute), false);
+                }
+
+                var paramType = "";
+                object[] attr = par.GetCustomAttributes (typeof (ParamArrayAttribute), false);
                 if (attr.Length > 0)
+                {
                     paramType = "params ";
-                paramType += GetEquivalentKeyword(par.ParameterType.Name);
+                }
+
+                paramType += GetEquivalentKeyword (par.ParameterType.Name);
                 result += (fullForm ? fontBegin : "") + paramType + (fullForm ? fontEnd : "");
                 result += (fullForm ? " " + par.Name : "");
 #if DOTNET_4
@@ -268,30 +293,37 @@ namespace AM.Reporting.Code
                 result += ", ";
             }
 
-            if (result.EndsWith(", "))
-                result = result.Substring(0, result.Length - 2);
+            if (result.EndsWith (", "))
+            {
+                result = result.Substring (0, result.Length - 2);
+            }
 
             result += ")";
             return result;
         }
 
-        public override string GetMethodSignatureAndBody(MethodInfo info)
+        public override string GetMethodSignatureAndBody (MethodInfo info)
         {
-            string result = info.Name + "(";
-            result = "    private " + GetTypeDeclaration(info.ReturnType) + " " + result;
+            var result = info.Name + "(";
+            result = "    private " + GetTypeDeclaration (info.ReturnType) + " " + result;
 
-            System.Reflection.ParameterInfo[] pars = info.GetParameters();
-            foreach (System.Reflection.ParameterInfo par in pars)
+            ParameterInfo[] pars = info.GetParameters();
+            foreach (var par in pars)
             {
                 // special case - skip "thisReport" parameter
                 if (par.Name == "thisReport")
+                {
                     continue;
+                }
 
-                string paramType = "";
-                object[] attr = par.GetCustomAttributes(typeof(ParamArrayAttribute), false);
+                var paramType = "";
+                object[] attr = par.GetCustomAttributes (typeof (ParamArrayAttribute), false);
                 if (attr.Length > 0)
+                {
                     paramType = "params ";
-                paramType += GetTypeDeclaration(par.ParameterType);
+                }
+
+                paramType += GetTypeDeclaration (par.ParameterType);
                 result += paramType;
                 result += " " + par.Name;
 #if DOTNET_4
@@ -301,26 +333,36 @@ namespace AM.Reporting.Code
                 result += ", ";
             }
 
-            if (result.EndsWith(", "))
-                result = result.Substring(0, result.Length - 2);
+            if (result.EndsWith (", "))
+            {
+                result = result.Substring (0, result.Length - 2);
+            }
+
             result += ")";
 
             result += "\r\n";
             result += "    {\r\n";
             result += "      return " + info.ReflectedType.Namespace + "." +
-              info.ReflectedType.Name + "." + info.Name + "(";
+                      info.ReflectedType.Name + "." + info.Name + "(";
 
-            foreach (System.Reflection.ParameterInfo par in pars)
+            foreach (var par in pars)
             {
-                string parName = par.Name;
+                var parName = par.Name;
+
                 // special case - handle "thisReport" parameter
                 if (parName == "thisReport")
+                {
                     parName = "Report";
+                }
+
                 result += parName + ", ";
             }
 
-            if (result.EndsWith(", "))
-                result = result.Substring(0, result.Length - 2);
+            if (result.EndsWith (", "))
+            {
+                result = result.Substring (0, result.Length - 2);
+            }
+
             result += ");\r\n";
             result += "    }\r\n";
             result += "\r\n";
@@ -336,9 +378,8 @@ namespace AM.Reporting.Code
 
         #endregion
 
-        public CsCodeHelper(Report report) : base(report)
+        public CsCodeHelper (Report report) : base (report)
         {
         }
     }
-
 }

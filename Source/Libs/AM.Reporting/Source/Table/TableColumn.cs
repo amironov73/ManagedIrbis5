@@ -42,18 +42,14 @@ namespace AM.Reporting.Table
     public partial class TableColumn : ComponentBase
     {
         #region Fields
-        private float minWidth;
-        private float maxWidth;
-        private bool autoSize;
-        private bool pageBreak;
-        private int keepColumns;
-        private int index;
+
         private float saveWidth;
         private bool saveVisible;
-        private float minimumBreakWidth;
+
         #endregion
 
         #region Properties
+
         /// <summary>
         /// Gets or sets a width of the column, in pixels.
         /// </summary>
@@ -63,20 +59,26 @@ namespace AM.Reporting.Table
         /// <note>To convert between pixels and report units, use the constants defined
         /// in the <see cref="Units"/> class.</note>
         /// </remarks>
-        [TypeConverter("AM.Reporting.TypeConverters.UnitsConverter, AM.Reporting")]
+        [TypeConverter ("AM.Reporting.TypeConverters.UnitsConverter, AM.Reporting")]
         public override float Width
         {
-            get { return base.Width; }
+            get => base.Width;
             set
             {
-                value = Converter.DecreasePrecision(value, 2);
+                value = Converter.DecreasePrecision (value, 2);
                 if (value > MaxWidth)
-                    value = MaxWidth;
-                if (value < MinWidth)
-                    value = MinWidth;
-                if (FloatDiff(base.Width, value))
                 {
-                    UpdateLayout(value - base.Width);
+                    value = MaxWidth;
+                }
+
+                if (value < MinWidth)
+                {
+                    value = MinWidth;
+                }
+
+                if (FloatDiff (base.Width, value))
+                {
+                    UpdateLayout (value - base.Width);
                     base.Width = value;
                 }
             }
@@ -85,26 +87,18 @@ namespace AM.Reporting.Table
         /// <summary>
         /// Gets or sets the minimal width for this column, in pixels.
         /// </summary>
-        [DefaultValue(0f)]
-        [Category("Layout")]
-        [TypeConverter("AM.Reporting.TypeConverters.UnitsConverter, AM.Reporting")]
-        public float MinWidth
-        {
-            get { return minWidth; }
-            set { minWidth = value; }
-        }
+        [DefaultValue (0f)]
+        [Category ("Layout")]
+        [TypeConverter ("AM.Reporting.TypeConverters.UnitsConverter, AM.Reporting")]
+        public float MinWidth { get; set; }
 
         /// <summary>
         /// Gets or sets the maximal width for this column, in pixels.
         /// </summary>
-        [DefaultValue(5000f)]
-        [Category("Layout")]
-        [TypeConverter("AM.Reporting.TypeConverters.UnitsConverter, AM.Reporting")]
-        public float MaxWidth
-        {
-            get { return maxWidth; }
-            set { maxWidth = value; }
-        }
+        [DefaultValue (5000f)]
+        [Category ("Layout")]
+        [TypeConverter ("AM.Reporting.TypeConverters.UnitsConverter, AM.Reporting")]
+        public float MaxWidth { get; set; }
 
         /// <summary>
         /// Gets or sets a value determines if the column should calculate its width automatically.
@@ -113,130 +107,128 @@ namespace AM.Reporting.Table
         /// The column width cannot exceed the range defined by the <see cref="MinWidth"/>
         /// and <see cref="MaxWidth"/> properties.
         /// </remarks>
-        [DefaultValue(false)]
-        [Category("Behavior")]
-        public bool AutoSize
-        {
-            get { return autoSize; }
-            set { autoSize = value; }
-        }
+        [DefaultValue (false)]
+        [Category ("Behavior")]
+        public bool AutoSize { get; set; }
 
         /// <summary>
         /// Gets the index of this column.
         /// </summary>
-        [Browsable(false)]
-        public int Index
-        {
-            get { return index; }
-        }
+        [Browsable (false)]
+        public int Index { get; private set; }
 
         /// <inheritdoc/>
-        [Browsable(false)]
+        [Browsable (false)]
         public override float Left
         {
             get
             {
-                TableBase table = Parent as TableBase;
-                if (table == null)
+                if (Parent is not TableBase table)
+                {
                     return 0;
+                }
 
                 float result = 0;
-                for (int i = 0; i < Index; i++)
+                for (var i = 0; i < Index; i++)
                 {
                     result += table.Columns[i].Width;
                 }
+
                 return result;
             }
-            set { base.Left = value; }
+            set => base.Left = value;
         }
 
         /// <summary>
         /// Gets or sets the page break flag for this column.
         /// </summary>
-        [Browsable(false)]
-        public bool PageBreak
-        {
-            get { return pageBreak; }
-            set { pageBreak = value; }
-        }
+        [Browsable (false)]
+        public bool PageBreak { get; set; }
 
         /// <summary>
         /// Gets or sets the number of columns to keep on the same page.
         /// </summary>
-        [Browsable(false)]
-        public int KeepColumns
-        {
-            get { return keepColumns; }
-            set { keepColumns = value; }
-        }
+        [Browsable (false)]
+        public int KeepColumns { get; set; }
 
-        internal float MinimumBreakWidth
-        {
-            get { return minimumBreakWidth; }
-            set { minimumBreakWidth = value; }
-        }
+        internal float MinimumBreakWidth { get; set; }
 
-        internal static float DefaultWidth
-        {
-            get { return (int)Math.Round(64 / (0.25f * Units.Centimeters)) * (0.25f * Units.Centimeters); }
-        }
+        internal static float DefaultWidth => (int)Math.Round (64 / (0.25f * Units.Centimeters)) * (0.25f * Units.Centimeters);
+
         #endregion
 
         #region Private Methods
-        private void UpdateLayout(float dx)
+
+        private void UpdateLayout (float dx)
         {
-            TableBase table = Parent as TableBase;
-            if (table == null)
+            if (Parent is not TableBase table)
+            {
                 return;
+            }
 
             // update this column cells
             foreach (TableRow row in table.Rows)
             {
-                row.CellData(Index).UpdateLayout(dx, 0);
+                row.CellData (Index).UpdateLayout (dx, 0);
             }
 
             // update spanned cells that contains this column
-            List<Rectangle> spanList = table.GetSpanList();
-            foreach (Rectangle span in spanList)
+            var spanList = table.GetSpanList();
+            foreach (var span in spanList)
             {
                 if (Index > span.Left && Index < span.Right)
-                    table[span.Left, span.Top].CellData.UpdateLayout(dx, 0);
+                {
+                    table[span.Left, span.Top].CellData.UpdateLayout (dx, 0);
+                }
             }
         }
+
         #endregion
 
         #region Public Methods
+
         /// <inheritdoc/>
-        public override void Assign(Base source)
+        public override void Assign (Base source)
         {
-            TableColumn src = source as TableColumn;
+            var src = source as TableColumn;
             MinWidth = src.MinWidth;
             MaxWidth = src.MaxWidth;
             AutoSize = src.AutoSize;
             KeepColumns = src.KeepColumns;
 
-            base.Assign(source);
+            base.Assign (source);
         }
 
         /// <inheritdoc/>
-        public override void Serialize(FRWriter writer)
+        public override void Serialize (FRWriter writer)
         {
-            TableColumn c = writer.DiffObject as TableColumn;
-            base.Serialize(writer);
+            var c = writer.DiffObject as TableColumn;
+            base.Serialize (writer);
 
-            if (FloatDiff(MinWidth, c.MinWidth))
-                writer.WriteFloat("MinWidth", MinWidth);
-            if (FloatDiff(MaxWidth, c.MaxWidth))
-                writer.WriteFloat("MaxWidth", MaxWidth);
-            if (FloatDiff(Width, c.Width))
-                writer.WriteFloat("Width", Width);
+            if (FloatDiff (MinWidth, c.MinWidth))
+            {
+                writer.WriteFloat ("MinWidth", MinWidth);
+            }
+
+            if (FloatDiff (MaxWidth, c.MaxWidth))
+            {
+                writer.WriteFloat ("MaxWidth", MaxWidth);
+            }
+
+            if (FloatDiff (Width, c.Width))
+            {
+                writer.WriteFloat ("Width", Width);
+            }
+
             if (AutoSize != c.AutoSize)
-                writer.WriteBool("AutoSize", AutoSize);
+            {
+                writer.WriteBool ("AutoSize", AutoSize);
+            }
         }
 
-        public void SetIndex(int value)
+        public void SetIndex (int value)
         {
-            index = value;
+            Index = value;
         }
 
         internal void SaveState()
@@ -254,11 +246,12 @@ namespace AM.Reporting.Table
         /// <inheritdoc/>
         public override void Clear()
         {
-            TableBase grid = Parent as TableBase;
-            if (grid == null)
+            if (Parent is not TableBase grid)
+            {
                 return;
+            }
 
-            int colIndex = grid.Columns.IndexOf(this);
+            var colIndex = grid.Columns.IndexOf (this);
             foreach (TableRow row in grid.Rows)
             {
                 row[colIndex].Dispose();
@@ -266,6 +259,7 @@ namespace AM.Reporting.Table
 
             base.Clear();
         }
+
         #endregion
 
         /// <summary>
@@ -273,9 +267,9 @@ namespace AM.Reporting.Table
         /// </summary>
         public TableColumn()
         {
-            maxWidth = 5000;
+            MaxWidth = 5000;
             Width = DefaultWidth;
-            SetFlags(Flags.CanCopy | Flags.CanDelete | Flags.CanWriteBounds, false);
+            SetFlags (Flags.CanCopy | Flags.CanDelete | Flags.CanWriteBounds, false);
             BaseName = "Column";
         }
     }

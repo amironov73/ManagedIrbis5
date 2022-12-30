@@ -70,20 +70,11 @@ namespace AM.Reporting.Export.Image
     /// </summary>
     public partial class ImageExport : ExportBase
     {
-        private ImageExportFormat imageFormat;
-        private bool separateFiles;
-        private int resolutionX;
-        private int resolutionY;
-        private int jpegQuality;
-        private bool multiFrameTiff;
-        private bool monochromeTiff;
-        private EncoderValue monochromeTiffCompression;
         private System.Drawing.Image masterTiffImage;
         private System.Drawing.Image bigImage;
         private Graphics bigGraphics;
         private float curOriginY;
         private bool firstPage;
-        private int paddingNonSeparatePages;
         private int pageNumber;
         private System.Drawing.Image image;
         private Graphics g;
@@ -96,14 +87,11 @@ namespace AM.Reporting.Export.Image
         private System.Drawing.Drawing2D.GraphicsState state;
 
         #region Properties
+
         /// <summary>
         /// Gets or sets the image format.
         /// </summary>
-        public ImageExportFormat ImageFormat
-        {
-            get { return imageFormat; }
-            set { imageFormat = value; }
-        }
+        public ImageExportFormat ImageFormat { get; set; }
 
         /// <summary>
         /// Gets or sets a value that determines whether to generate separate image file
@@ -115,11 +103,7 @@ namespace AM.Reporting.Export.Image
         /// because it may produce out of memory error.
         /// And also when using Memory Stream and the value is true, an exception will be thrown.
         /// </remarks>
-        public bool SeparateFiles
-        {
-            get { return separateFiles; }
-            set { separateFiles = value; }
-        }
+        public bool SeparateFiles { get; set; }
 
         /// <summary>
         /// Gets or sets image resolution, in dpi.
@@ -130,11 +114,11 @@ namespace AM.Reporting.Export.Image
         /// </remarks>
         public int Resolution
         {
-            get { return resolutionX; }
+            get => ResolutionX;
             set
             {
-                resolutionX = value;
-                resolutionY = value;
+                ResolutionX = value;
+                ResolutionY = value;
             }
         }
 
@@ -145,11 +129,7 @@ namespace AM.Reporting.Export.Image
         /// Separate horizontal and vertical resolution is used when exporting to TIFF. In other
         /// cases, use the <see cref="Resolution"/> property instead.
         /// </remarks>
-        public int ResolutionX
-        {
-            get { return resolutionX; }
-            set { resolutionX = value; }
-        }
+        public int ResolutionX { get; set; }
 
         /// <summary>
         /// Gets or sets vertical image resolution, in dpi.
@@ -158,11 +138,7 @@ namespace AM.Reporting.Export.Image
         /// Separate horizontal and vertical resolution is used when exporting to TIFF. In other
         /// cases, use the <see cref="Resolution"/> property instead.
         /// </remarks>
-        public int ResolutionY
-        {
-            get { return resolutionY; }
-            set { resolutionY = value; }
-        }
+        public int ResolutionY { get; set; }
 
         /// <summary>
         /// Gets or sets the jpg image quality.
@@ -171,20 +147,12 @@ namespace AM.Reporting.Export.Image
         /// This property is used if <see cref="ImageFormat"/> is set to <b>Jpeg</b>. By default
         /// it is set to 100. Use lesser value to decrease the jpg file size.
         /// </remarks>
-        public int JpegQuality
-        {
-            get { return jpegQuality; }
-            set { jpegQuality = value; }
-        }
+        public int JpegQuality { get; set; }
 
         /// <summary>
         /// Gets or sets the value determines whether to produce multi-frame tiff file.
         /// </summary>
-        public bool MultiFrameTiff
-        {
-            get { return multiFrameTiff; }
-            set { multiFrameTiff = value; }
-        }
+        public bool MultiFrameTiff { get; set; }
 
         /// <summary>
         /// Gets or sets a value that determines whether the Tiff export must produce monochrome image.
@@ -193,11 +161,7 @@ namespace AM.Reporting.Export.Image
         /// Monochrome tiff image is compressed using the compression method specified in the
         /// <see cref="MonochromeTiffCompression"/> property.
         /// </remarks>
-        public bool MonochromeTiff
-        {
-            get { return monochromeTiff; }
-            set { monochromeTiff = value; }
-        }
+        public bool MonochromeTiff { get; set; }
 
         /// <summary>
         /// Gets or sets the compression method for a monochrome TIFF image.
@@ -210,71 +174,71 @@ namespace AM.Reporting.Export.Image
         /// <b>EncoderValue.CompressionCCITT3</b>, <b>EncoderValue.CompressionCCITT4</b>.
         /// The default compression method is CCITT4.
         /// </remarks>
-        public EncoderValue MonochromeTiffCompression
-        {
-            get { return monochromeTiffCompression; }
-            set { monochromeTiffCompression = value; }
-        }
+        public EncoderValue MonochromeTiffCompression { get; set; }
 
         /// <summary>
         /// Sets padding in non separate pages
         /// </summary>
-        public int PaddingNonSeparatePages
-        {
-            get { return paddingNonSeparatePages; }
-            set { paddingNonSeparatePages = value; }
-        }
+        public int PaddingNonSeparatePages { get; set; }
 
-        private bool IsMultiFrameTiff
-        {
-            get { return ImageFormat == ImageExportFormat.Tiff && MultiFrameTiff; }
-        }
+        private bool IsMultiFrameTiff => ImageFormat == ImageExportFormat.Tiff && MultiFrameTiff;
+
         #endregion
 
         #region Private Methods
-        private System.Drawing.Image CreateImage(int width, int height, string suffix)
+
+        private System.Drawing.Image CreateImage (int width, int height, string suffix)
         {
             widthK = width;
             if (ImageFormat == ImageExportFormat.Metafile)
-                return CreateMetafile(suffix);
-            return new Bitmap(width, height);
+            {
+                return CreateMetafile (suffix);
+            }
+
+            return new Bitmap (width, height);
         }
 
-        private System.Drawing.Image CreateMetafile(string suffix)
+        private System.Drawing.Image CreateMetafile (string suffix)
         {
-            string extension = Path.GetExtension(FileName);
-            string fileName = Path.ChangeExtension(FileName, suffix + extension);
+            var extension = Path.GetExtension (FileName);
+            var fileName = Path.ChangeExtension (FileName, suffix + extension);
 
             System.Drawing.Image image;
-            using (Bitmap bmp = new Bitmap(1, 1))
-            using (Graphics g = Graphics.FromImage(bmp))
+            using (var bmp = new Bitmap (1, 1))
+            using (var g = Graphics.FromImage (bmp))
             {
-                IntPtr hdc = g.GetHdc();
+                var hdc = g.GetHdc();
                 if (suffix == "")
-                    image = new Metafile(Stream, hdc);
+                {
+                    image = new Metafile (Stream, hdc);
+                }
                 else
                 {
-                    image = new Metafile(fileName, hdc);
-                    if (!GeneratedFiles.Contains(fileName))
-                        GeneratedFiles.Add(fileName);
+                    image = new Metafile (fileName, hdc);
+                    if (!GeneratedFiles.Contains (fileName))
+                    {
+                        GeneratedFiles.Add (fileName);
+                    }
                 }
-                g.ReleaseHdc(hdc);
+
+                g.ReleaseHdc (hdc);
             }
+
             return image;
         }
 
-        private Bitmap ConvertToBitonal(Bitmap original)
+        private Bitmap ConvertToBitonal (Bitmap original)
         {
             Bitmap source = null;
 
             // If original bitmap is not already in 32 BPP, ARGB format, then convert
             if (original.PixelFormat != PixelFormat.Format32bppArgb)
             {
-                source = new Bitmap(original.Width, original.Height, PixelFormat.Format32bppArgb);
-                source.SetResolution(original.HorizontalResolution, original.VerticalResolution);
-                using (Graphics g = Graphics.FromImage(source))
+                source = new Bitmap (original.Width, original.Height, PixelFormat.Format32bppArgb);
+                source.SetResolution (original.HorizontalResolution, original.VerticalResolution);
+                using (var g = Graphics.FromImage (source))
                 {
-                    g.DrawImageUnscaled(original, 0, 0);
+                    g.DrawImageUnscaled (original, 0, 0);
                 }
             }
             else
@@ -283,37 +247,40 @@ namespace AM.Reporting.Export.Image
             }
 
             // Lock source bitmap in memory
-            BitmapData sourceData = source.LockBits(new Rectangle(0, 0, source.Width, source.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            var sourceData = source.LockBits (new Rectangle (0, 0, source.Width, source.Height),
+                ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
 
             // Copy image data to binary array
-            int imageSize = sourceData.Stride * sourceData.Height;
-            byte[] sourceBuffer = new byte[imageSize];
-            Marshal.Copy(sourceData.Scan0, sourceBuffer, 0, imageSize);
+            var imageSize = sourceData.Stride * sourceData.Height;
+            var sourceBuffer = new byte[imageSize];
+            Marshal.Copy (sourceData.Scan0, sourceBuffer, 0, imageSize);
 
             // Unlock source bitmap
-            source.UnlockBits(sourceData);
+            source.UnlockBits (sourceData);
 
             // Create destination bitmap
-            Bitmap destination = new Bitmap(source.Width, source.Height, PixelFormat.Format1bppIndexed);
+            var destination = new Bitmap (source.Width, source.Height, PixelFormat.Format1bppIndexed);
 
             // Lock destination bitmap in memory
-            BitmapData destinationData = destination.LockBits(new Rectangle(0, 0, destination.Width, destination.Height), ImageLockMode.WriteOnly, PixelFormat.Format1bppIndexed);
+            var destinationData = destination.LockBits (
+                new Rectangle (0, 0, destination.Width, destination.Height), ImageLockMode.WriteOnly,
+                PixelFormat.Format1bppIndexed);
 
             // Create destination buffer
             imageSize = destinationData.Stride * destinationData.Height;
-            byte[] destinationBuffer = new byte[imageSize];
+            var destinationBuffer = new byte[imageSize];
 
-            int sourceIndex = 0;
-            int destinationIndex = 0;
-            int pixelTotal = 0;
+            var sourceIndex = 0;
+            var destinationIndex = 0;
+            var pixelTotal = 0;
             byte destinationValue = 0;
-            int pixelValue = 128;
-            int height = source.Height;
-            int width = source.Width;
-            int threshold = 500;
+            var pixelValue = 128;
+            var height = source.Height;
+            var width = source.Width;
+            var threshold = 500;
 
             // Iterate lines
-            for (int y = 0; y < height; y++)
+            for (var y = 0; y < height; y++)
             {
                 sourceIndex = y * sourceData.Stride;
                 destinationIndex = y * destinationData.Stride;
@@ -321,14 +288,16 @@ namespace AM.Reporting.Export.Image
                 pixelValue = 128;
 
                 // Iterate pixels
-                for (int x = 0; x < width; x++)
+                for (var x = 0; x < width; x++)
                 {
                     // Compute pixel brightness (i.e. total of Red, Green, and Blue values)
-                    pixelTotal = sourceBuffer[sourceIndex + 1] + sourceBuffer[sourceIndex + 2] + sourceBuffer[sourceIndex + 3];
+                    pixelTotal = sourceBuffer[sourceIndex + 1] + sourceBuffer[sourceIndex + 2] +
+                                 sourceBuffer[sourceIndex + 3];
                     if (pixelTotal > threshold)
                     {
                         destinationValue += (byte)pixelValue;
                     }
+
                     if (pixelValue == 1)
                     {
                         destinationBuffer[destinationIndex] = destinationValue;
@@ -340,8 +309,10 @@ namespace AM.Reporting.Export.Image
                     {
                         pixelValue >>= 1;
                     }
+
                     sourceIndex += 4;
                 }
+
                 if (pixelValue != 128)
                 {
                     destinationBuffer[destinationIndex] = destinationValue;
@@ -349,10 +320,10 @@ namespace AM.Reporting.Export.Image
             }
 
             // Copy binary image data to destination bitmap
-            Marshal.Copy(destinationBuffer, 0, destinationData.Scan0, imageSize);
+            Marshal.Copy (destinationBuffer, 0, destinationData.Scan0, imageSize);
 
             // Unlock destination bitmap
-            destination.UnlockBits(destinationData);
+            destination.UnlockBits (destinationData);
 
             // Dispose of source if not originally supplied bitmap
             if (source != original)
@@ -361,73 +332,84 @@ namespace AM.Reporting.Export.Image
             }
 
             // Return
-            destination.SetResolution(ResolutionX, ResolutionY);
+            destination.SetResolution (ResolutionX, ResolutionY);
             return destination;
         }
 
-        private void SaveImage(System.Drawing.Image image, string suffix)
+        private void SaveImage (System.Drawing.Image image, string suffix)
         {
             // store the resolution in output file.
             // Call this method after actual draw because it may affect drawing the text
-            if (image is Bitmap)
-                (image as Bitmap).SetResolution(ResolutionX, ResolutionY);
+            if (image is Bitmap bitmap)
+            {
+                bitmap.SetResolution (ResolutionX, ResolutionY);
+            }
+
             if (IsMultiFrameTiff)
             {
                 // select the image encoder
-                ImageCodecInfo info = ExportUtils.GetCodec("image/tiff");
-                EncoderParameters ep = new EncoderParameters(2);
-                ep.Param[0] = new EncoderParameter(Encoder.Compression, MonochromeTiff ?
-                  (long)MonochromeTiffCompression : (long)EncoderValue.CompressionLZW);
+                var info = ExportUtils.GetCodec ("image/tiff");
+                var ep = new EncoderParameters (2);
+                ep.Param[0] = new EncoderParameter (Encoder.Compression,
+                    MonochromeTiff ? (long)MonochromeTiffCompression : (long)EncoderValue.CompressionLZW);
 
                 if (image == masterTiffImage)
                 {
                     // save the master bitmap
                     if (MonochromeTiff)
-                        masterTiffImage = ConvertToBitonal(image as Bitmap);
-                    ep.Param[1] = new EncoderParameter(Encoder.SaveFlag, (long)EncoderValue.MultiFrame);
-                    masterTiffImage.Save(Stream, info, ep);
+                    {
+                        masterTiffImage = ConvertToBitonal (image as Bitmap);
+                    }
+
+                    ep.Param[1] = new EncoderParameter (Encoder.SaveFlag, (long)EncoderValue.MultiFrame);
+                    masterTiffImage.Save (Stream, info, ep);
                 }
                 else
                 {
                     // save the frame
                     if (MonochromeTiff)
                     {
-                        System.Drawing.Image oldImage = image;
-                        image = ConvertToBitonal(image as Bitmap);
+                        var oldImage = image;
+                        image = ConvertToBitonal (image as Bitmap);
                         oldImage.Dispose();
                     }
-                    ep.Param[1] = new EncoderParameter(Encoder.SaveFlag, (long)EncoderValue.FrameDimensionPage);
-                    masterTiffImage.SaveAdd(image, ep);
+
+                    ep.Param[1] = new EncoderParameter (Encoder.SaveFlag, (long)EncoderValue.FrameDimensionPage);
+                    masterTiffImage.SaveAdd (image, ep);
                 }
             }
             else if (ImageFormat != ImageExportFormat.Metafile)
             {
-                string extension = Path.GetExtension(FileName);
-                string fileName = Path.ChangeExtension(FileName, suffix + extension);
+                var extension = Path.GetExtension (FileName);
+                var fileName = Path.ChangeExtension (FileName, suffix + extension);
 
                 // empty suffix means that we should use the Stream that was created in the ExportBase
-                Stream stream = suffix == "" ? Stream : new FileStream(fileName, FileMode.Create);
+                var stream = suffix == "" ? Stream : new FileStream (fileName, FileMode.Create);
 
                 if (suffix != "")
-                    GeneratedFiles.Add(fileName);
+                {
+                    GeneratedFiles.Add (fileName);
+                }
 
                 if (ImageFormat == ImageExportFormat.Jpeg)
-                    ExportUtils.SaveJpeg(image, stream, JpegQuality);
+                {
+                    ExportUtils.SaveJpeg (image, stream, JpegQuality);
+                }
                 else if (ImageFormat == ImageExportFormat.Tiff && MonochromeTiff)
                 {
                     // handle monochrome tiff separately
-                    ImageCodecInfo info = ExportUtils.GetCodec("image/tiff");
-                    EncoderParameters ep = new EncoderParameters();
-                    ep.Param[0] = new EncoderParameter(Encoder.Compression, (long)MonochromeTiffCompression);
+                    var info = ExportUtils.GetCodec ("image/tiff");
+                    var ep = new EncoderParameters();
+                    ep.Param[0] = new EncoderParameter (Encoder.Compression, (long)MonochromeTiffCompression);
 
-                    using (Bitmap bwImage = ConvertToBitonal(image as Bitmap))
+                    using (var bwImage = ConvertToBitonal (image as Bitmap))
                     {
-                        bwImage.Save(stream, info, ep);
+                        bwImage.Save (stream, info, ep);
                     }
                 }
                 else
                 {
-                    ImageFormat format = System.Drawing.Imaging.ImageFormat.Bmp;
+                    var format = System.Drawing.Imaging.ImageFormat.Bmp;
                     switch (ImageFormat)
                     {
                         case ImageExportFormat.Gif:
@@ -442,24 +424,31 @@ namespace AM.Reporting.Export.Image
                             format = System.Drawing.Imaging.ImageFormat.Tiff;
                             break;
                     }
-                    image.Save(stream, format);
+
+                    image.Save (stream, format);
                 }
 
                 if (suffix != "")
+                {
                     stream.Dispose();
+                }
             }
 
             if (image != masterTiffImage)
+            {
                 image.Dispose();
+            }
         }
+
         #endregion
 
         #region Protected Methods
+
         /// <inheritdoc/>
         protected override string GetFileFilter()
         {
-            string filter = ImageFormat.ToString();
-            return Res.Get("FileFilters," + filter + "File");
+            var filter = ImageFormat.ToString();
+            return Res.Get ("FileFilters," + filter + "File");
         }
 
         /// <inheritdoc/>
@@ -487,130 +476,181 @@ namespace AM.Reporting.Export.Image
                 float w = 0;
                 float h = 0;
 
-                foreach (int pageNo in Pages)
+                foreach (var pageNo in Pages)
                 {
-                    SizeF size = Report.PreparedPages.GetPageSize(pageNo);
+                    var size = Report.PreparedPages.GetPageSize (pageNo);
                     if (size.Width > w)
+                    {
                         w = size.Width;
-                    h += size.Height + paddingNonSeparatePages * 2;
+                    }
+
+                    h += size.Height + PaddingNonSeparatePages * 2;
                 }
 
-                w += paddingNonSeparatePages * 2;
+                w += PaddingNonSeparatePages * 2;
 
-                bigImage = CreateImage((int)(w * ResolutionX / 96f), (int)(h * ResolutionY / 96f), "");
-                bigGraphics = Graphics.FromImage(bigImage);
-                bigGraphics.Clear(Color.Transparent);
+                bigImage = CreateImage ((int)(w * ResolutionX / 96f), (int)(h * ResolutionY / 96f), "");
+                bigGraphics = Graphics.FromImage (bigImage);
+                bigGraphics.Clear (Color.Transparent);
             }
+
             pageNumber = 0;
         }
 
 
         /// <inheritdoc/>
-        protected override void ExportPageBegin(ReportPage page)
+        protected override void ExportPageBegin (ReportPage page)
         {
-            base.ExportPageBegin(page);
+            base.ExportPageBegin (page);
             zoomX = ResolutionX / 96f;
             zoomY = ResolutionY / 96f;
-            width = (int)(ExportUtils.GetPageWidth(page) * Units.Millimeters * zoomX);
-            height = (int)(ExportUtils.GetPageHeight(page) * Units.Millimeters * zoomY);
-            int suffixDigits = Pages[Pages.Length - 1].ToString().Length;
-            fileSuffix = firstPage ? "" : (pageNumber + 1).ToString("".PadLeft(suffixDigits, '0'));
+            width = (int)(ExportUtils.GetPageWidth (page) * Units.Millimeters * zoomX);
+            height = (int)(ExportUtils.GetPageHeight (page) * Units.Millimeters * zoomY);
+            var suffixDigits = Pages[Pages.Length - 1].ToString().Length;
+            fileSuffix = firstPage ? "" : (pageNumber + 1).ToString ("".PadLeft (suffixDigits, '0'));
             if (SeparateFiles || IsMultiFrameTiff)
             {
-                image = CreateImage(width, height, fileSuffix);
+                image = CreateImage (width, height, fileSuffix);
                 if (IsMultiFrameTiff && masterTiffImage == null)
+                {
                     masterTiffImage = image;
+                }
             }
             else
+            {
                 image = bigImage;
+            }
 
             if (bigGraphics != null)
+            {
                 g = bigGraphics;
+            }
             else
-                g = Graphics.FromImage(image);
+            {
+                g = Graphics.FromImage (image);
+            }
 
             state = g.Save();
 
-            g.FillRegion(Brushes.Transparent, new Region(new RectangleF(0, curOriginY, width, height)));
+            g.FillRegion (Brushes.Transparent, new Region (new RectangleF (0, curOriginY, width, height)));
             if (bigImage != null && curOriginY + height * 2 > bigImage.Height)
-                page.Fill.Draw(new FRPaintEventArgs(g, 1, 1, Report.GraphicCache), new RectangleF(0, curOriginY, widthK, bigImage.Height - curOriginY));
+            {
+                page.Fill.Draw (new FRPaintEventArgs (g, 1, 1, Report.GraphicCache),
+                    new RectangleF (0, curOriginY, widthK, bigImage.Height - curOriginY));
+            }
             else
-                page.Fill.Draw(new FRPaintEventArgs(g, 1, 1, Report.GraphicCache), new RectangleF(0, curOriginY, widthK, height + paddingNonSeparatePages * 2));
+            {
+                page.Fill.Draw (new FRPaintEventArgs (g, 1, 1, Report.GraphicCache),
+                    new RectangleF (0, curOriginY, widthK, height + PaddingNonSeparatePages * 2));
+            }
 
 
             if (image == bigImage)
             {
                 if (ImageFormat != ImageExportFormat.Metafile)
-                    g.TranslateTransform(image.Width / 2 - width / 2 + page.LeftMargin * Units.Millimeters * zoomX,
-                    curOriginY + paddingNonSeparatePages + page.TopMargin * Units.Millimeters * zoomY);
+                {
+                    g.TranslateTransform (image.Width / 2 - width / 2 + page.LeftMargin * Units.Millimeters * zoomX,
+                        curOriginY + PaddingNonSeparatePages + page.TopMargin * Units.Millimeters * zoomY);
+                }
                 else
-                    g.TranslateTransform(widthK / 2 - width / 2 + page.LeftMargin * Units.Millimeters * zoomX,
-                    curOriginY + paddingNonSeparatePages + page.TopMargin * Units.Millimeters * zoomY);
-
+                {
+                    g.TranslateTransform (widthK / 2 - width / 2 + page.LeftMargin * Units.Millimeters * zoomX,
+                        curOriginY + PaddingNonSeparatePages + page.TopMargin * Units.Millimeters * zoomY);
+                }
             }
             else
-                g.TranslateTransform(page.LeftMargin * Units.Millimeters * zoomX, page.TopMargin * Units.Millimeters * zoomY);
+            {
+                g.TranslateTransform (page.LeftMargin * Units.Millimeters * zoomX,
+                    page.TopMargin * Units.Millimeters * zoomY);
+            }
 
-            g.ScaleTransform(1, zoomY / zoomX);
+            g.ScaleTransform (1, zoomY / zoomX);
 
             // export bottom watermark
             if (page.Watermark.Enabled && !page.Watermark.ShowImageOnTop)
-                AddImageWatermark(page);
-            if (page.Watermark.Enabled && !page.Watermark.ShowTextOnTop)
-                AddTextWatermark(page);
-        }
-
-        /// <inheritdoc/>
-        protected override void ExportBand(BandBase band)
-        {
-            base.ExportBand(band);
-            ExportObj(band);
-            foreach (Base c in band.ForEachAllConvectedObjects(this))
             {
-                if (!(c is Table.TableColumn || c is Table.TableCell || c is Table.TableRow))
-                    ExportObj(c);
+                AddImageWatermark (page);
+            }
+
+            if (page.Watermark.Enabled && !page.Watermark.ShowTextOnTop)
+            {
+                AddTextWatermark (page);
             }
         }
 
-        private void ExportObj(Base obj)
+        /// <inheritdoc/>
+        protected override void ExportBand (BandBase band)
         {
-            if (obj is ReportComponentBase && (obj as ReportComponentBase).Exportable)
-                (obj as ReportComponentBase).Draw(new FRPaintEventArgs(g, zoomX, zoomX, Report.GraphicCache));
+            base.ExportBand (band);
+            ExportObj (band);
+            foreach (Base c in band.ForEachAllConvectedObjects (this))
+            {
+                if (!(c is Table.TableColumn || c is Table.TableCell || c is Table.TableRow))
+                {
+                    ExportObj (c);
+                }
+            }
+        }
+
+        private void ExportObj (Base obj)
+        {
+            if (obj is ReportComponentBase @base && @base.Exportable)
+            {
+                @base.Draw (new FRPaintEventArgs (g, zoomX, zoomX, Report.GraphicCache));
+            }
         }
 
         /// <inheritdoc/>
-        protected override void ExportPageEnd(ReportPage page)
+        protected override void ExportPageEnd (ReportPage page)
         {
             // export top watermark
             if (page.Watermark.Enabled && page.Watermark.ShowImageOnTop)
-                AddImageWatermark(page);
-            if (page.Watermark.Enabled && page.Watermark.ShowTextOnTop)
-                AddTextWatermark(page);
+            {
+                AddImageWatermark (page);
+            }
 
-            g.Restore(state);
+            if (page.Watermark.Enabled && page.Watermark.ShowTextOnTop)
+            {
+                AddTextWatermark (page);
+            }
+
+            g.Restore (state);
             if (g != bigGraphics)
+            {
                 g.Dispose();
+            }
+
             if (SeparateFiles || IsMultiFrameTiff)
-                SaveImage(image, fileSuffix);
+            {
+                SaveImage (image, fileSuffix);
+            }
             else
-                curOriginY += height + paddingNonSeparatePages * 2;
+            {
+                curOriginY += height + PaddingNonSeparatePages * 2;
+            }
+
             firstPage = false;
             pageNumber++;
         }
 
-        private void AddImageWatermark(ReportPage page)
+        private void AddImageWatermark (ReportPage page)
         {
-            page.Watermark.DrawImage(new FRPaintEventArgs(g, zoomX, zoomX, Report.GraphicCache),
-                new RectangleF(-page.LeftMargin * Units.Millimeters, -page.TopMargin * Units.Millimeters, width / zoomX, height / zoomY),
+            page.Watermark.DrawImage (new FRPaintEventArgs (g, zoomX, zoomX, Report.GraphicCache),
+                new RectangleF (-page.LeftMargin * Units.Millimeters, -page.TopMargin * Units.Millimeters,
+                    width / zoomX, height / zoomY),
                 page.Report, false);
         }
 
-        private void AddTextWatermark(ReportPage page)
+        private void AddTextWatermark (ReportPage page)
         {
-            if (string.IsNullOrEmpty(page.Watermark.Text))
+            if (string.IsNullOrEmpty (page.Watermark.Text))
+            {
                 return;
-            page.Watermark.DrawText(new FRPaintEventArgs(g, zoomX, zoomX, Report.GraphicCache),
-                new RectangleF(-page.LeftMargin * Units.Millimeters, -page.TopMargin * Units.Millimeters, width / zoomX, height / zoomY),
+            }
+
+            page.Watermark.DrawText (new FRPaintEventArgs (g, zoomX, zoomX, Report.GraphicCache),
+                new RectangleF (-page.LeftMargin * Units.Millimeters, -page.TopMargin * Units.Millimeters,
+                    width / zoomX, height / zoomY),
                 page.Report, false);
         }
 
@@ -620,39 +660,41 @@ namespace AM.Reporting.Export.Image
             if (IsMultiFrameTiff)
             {
                 // close the file.
-                EncoderParameters ep = new EncoderParameters(1);
-                ep.Param[0] = new EncoderParameter(Encoder.SaveFlag, (long)EncoderValue.Flush);
-                masterTiffImage.SaveAdd(ep);
+                var ep = new EncoderParameters (1);
+                ep.Param[0] = new EncoderParameter (Encoder.SaveFlag, (long)EncoderValue.Flush);
+                masterTiffImage.SaveAdd (ep);
             }
             else if (!SeparateFiles)
             {
                 bigGraphics.Dispose();
                 bigGraphics = null;
-                SaveImage(bigImage, "");
+                SaveImage (bigImage, "");
             }
+
             if (masterTiffImage != null)
             {
                 masterTiffImage.Dispose();
                 masterTiffImage = null;
             }
         }
+
         #endregion
 
         #region Public Methods
 
-
         /// <inheritdoc/>
-        public override void Serialize(FRWriter writer)
+        public override void Serialize (FRWriter writer)
         {
-            base.Serialize(writer);
-            writer.WriteValue("ImageFormat", ImageFormat);
-            writer.WriteBool("SeparateFiles", SeparateFiles);
-            writer.WriteInt("ResolutionX", ResolutionX);
-            writer.WriteInt("ResolutionY", ResolutionY);
-            writer.WriteInt("JpegQuality", JpegQuality);
-            writer.WriteBool("MultiFrameTiff", MultiFrameTiff);
-            writer.WriteBool("MonochromeTiff", MonochromeTiff);
+            base.Serialize (writer);
+            writer.WriteValue ("ImageFormat", ImageFormat);
+            writer.WriteBool ("SeparateFiles", SeparateFiles);
+            writer.WriteInt ("ResolutionX", ResolutionX);
+            writer.WriteInt ("ResolutionY", ResolutionY);
+            writer.WriteInt ("JpegQuality", JpegQuality);
+            writer.WriteBool ("MultiFrameTiff", MultiFrameTiff);
+            writer.WriteBool ("MonochromeTiff", MonochromeTiff);
         }
+
         #endregion
 
         /// <summary>
@@ -660,14 +702,14 @@ namespace AM.Reporting.Export.Image
         /// </summary>
         public ImageExport()
         {
-            paddingNonSeparatePages = 10;
-            fileSuffix = String.Empty;
+            PaddingNonSeparatePages = 10;
+            fileSuffix = string.Empty;
             HasMultipleFiles = true;
-            imageFormat = ImageExportFormat.Jpeg;
-            separateFiles = true;
+            ImageFormat = ImageExportFormat.Jpeg;
+            SeparateFiles = true;
             Resolution = 96;
-            jpegQuality = 100;
-            monochromeTiffCompression = EncoderValue.CompressionCCITT4;
+            JpegQuality = 100;
+            MonochromeTiffCompression = EncoderValue.CompressionCCITT4;
         }
     }
 }

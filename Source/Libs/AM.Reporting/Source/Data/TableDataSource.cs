@@ -20,7 +20,9 @@ using System.Data;
 using System.ComponentModel;
 using System.Reflection;
 using System.Collections;
+
 using AM.Reporting.Utils;
+
 using System.IO;
 using System.Drawing.Design;
 
@@ -46,35 +48,22 @@ namespace AM.Reporting.Data
     public partial class TableDataSource : DataSourceBase
     {
         #region Fields
-        private DataTable table;
-        private string tableName;
-        private string selectCommand;
-        private CommandParameterCollection parameters;
-        private bool storeData;
-        private bool ignoreConnection;
-        private string qbSchema;
+
         #endregion
 
         #region Properties
+
         /// <summary>
         /// Gets or sets the underlying <b>DataTable</b> object.
         /// </summary>
-        [Browsable(false)]
-        public DataTable Table
-        {
-            get { return table; }
-            set { table = value; }
-        }
+        [Browsable (false)]
+        public DataTable Table { get; set; }
 
         /// <summary>
         /// Gets or sets the table name.
         /// </summary>
-        [Category("Data")]
-        public string TableName
-        {
-            get { return tableName; }
-            set { tableName = value; }
-        }
+        [Category ("Data")]
+        public string TableName { get; set; }
 
         /// <summary>
         /// Gets or sets SQL "select" command.
@@ -83,13 +72,9 @@ namespace AM.Reporting.Data
         /// If this command contains parameters, you should specify them in the <see cref="Parameters"/>
         /// property.
         /// </remarks>
-        [Category("Data")]
-        [Editor("AM.Reporting.TypeEditors.SqlEditor, AM.Reporting", typeof(UITypeEditor))]
-        public string SelectCommand
-        {
-            get { return selectCommand; }
-            set { selectCommand = value; }
-        }
+        [Category ("Data")]
+        [Editor ("AM.Reporting.TypeEditors.SqlEditor, AM.Reporting", typeof (UITypeEditor))]
+        public string SelectCommand { get; set; }
 
         /// <summary>
         /// Gets a collection of parameters used by "select" command.
@@ -111,34 +96,26 @@ namespace AM.Reporting.Data
         /// </code>
         /// This way is not good because you hardcode the report object's name.
         /// </remarks>
-        [Category("Data")]
-        [Editor("AM.Reporting.TypeEditors.CommandParametersEditor, AM.Reporting", typeof(UITypeEditor))]
-        public CommandParameterCollection Parameters
-        {
-            get { return parameters; }
-            set { parameters = value; }
-        }
+        [Category ("Data")]
+        [Editor ("AM.Reporting.TypeEditors.CommandParametersEditor, AM.Reporting", typeof (UITypeEditor))]
+        public CommandParameterCollection Parameters { get; set; }
 
         /// <summary>
         /// Gets or sets the parent <see cref="DataConnectionBase"/> object.
         /// </summary>
-        [Browsable(false)]
+        [Browsable (false)]
         public DataConnectionBase Connection
         {
-            get { return IgnoreConnection ? null : Parent as DataConnectionBase; }
-            set { Parent = value; }
+            get => IgnoreConnection ? null : Parent as DataConnectionBase;
+            set => Parent = value;
         }
 
         /// <summary>
         /// Gets or sets a value that determines whether it is necessary to store table data in a report file.
         /// </summary>
-        [Category("Data")]
-        [DefaultValue(false)]
-        public bool StoreData
-        {
-            get { return storeData; }
-            set { storeData = value; }
-        }
+        [Category ("Data")]
+        [DefaultValue (false)]
+        public bool StoreData { get; set; }
 
         /// <summary>
         /// Gets or sets the table data.
@@ -146,29 +123,30 @@ namespace AM.Reporting.Data
         /// <remarks>
         /// This property is for internal use only.
         /// </remarks>
-        [Browsable(false)]
+        [Browsable (false)]
         public virtual string TableData
         {
             get
             {
-                string result = "";
+                var result = "";
                 if (Table == null && Connection != null)
                 {
-                    Connection.CreateTable(this);
-                    Connection.FillTable(this);
+                    Connection.CreateTable (this);
+                    Connection.FillTable (this);
                 }
 
                 if (Table != null)
                 {
-                    using (DataSet tempDs = new DataSet())
+                    using (var tempDs = new DataSet())
                     {
-                        DataTable tempTable = Table.Copy();
-                        tempDs.Tables.Add(tempTable);
-                        using (MemoryStream stream = new MemoryStream())
+                        var tempTable = Table.Copy();
+                        tempDs.Tables.Add (tempTable);
+                        using (var stream = new MemoryStream())
                         {
-                            tempDs.WriteXml(stream, XmlWriteMode.WriteSchema);
-                            result = Convert.ToBase64String(stream.ToArray());
+                            tempDs.WriteXml (stream, XmlWriteMode.WriteSchema);
+                            result = Convert.ToBase64String (stream.ToArray());
                         }
+
                         tempTable.Dispose();
                     }
                 }
@@ -177,15 +155,15 @@ namespace AM.Reporting.Data
             }
             set
             {
-                if(!string.IsNullOrEmpty(value))
+                if (!string.IsNullOrEmpty (value))
                 {
-                    using (MemoryStream stream = new MemoryStream(Convert.FromBase64String(value)))
-                    using (DataSet tempDs = new DataSet())
+                    using (var stream = new MemoryStream (Convert.FromBase64String (value)))
+                    using (var tempDs = new DataSet())
                     {
-                        tempDs.ReadXml(stream);
-                        table = tempDs.Tables[0];
-                        Reference = table;
-                        tempDs.Tables.RemoveAt(0);
+                        tempDs.ReadXml (stream);
+                        Table = tempDs.Tables[0];
+                        Reference = Table;
+                        tempDs.Tables.RemoveAt (0);
                     }
                 }
             }
@@ -195,11 +173,7 @@ namespace AM.Reporting.Data
         /// If set, ignores the Connection (always returns null). Needed when we replace the
         /// existing connection-based datasource with datatable defined in an application.
         /// </summary>
-        internal bool IgnoreConnection
-        {
-            get { return ignoreConnection; }
-            set { ignoreConnection = value; }
-        }
+        internal bool IgnoreConnection { get; set; }
 
         /// <summary>
         /// Gets or sets the query builder schema.
@@ -207,29 +181,29 @@ namespace AM.Reporting.Data
         /// <remarks>
         /// This property is for internal use only.
         /// </remarks>
-        [Browsable(false)]
-        public string QbSchema
-        {
-            get { return qbSchema; }
-            set { qbSchema = value; }
-        }
+        [Browsable (false)]
+        public string QbSchema { get; set; }
+
         #endregion
 
         #region Private Methods
-        private Column CreateColumn(DataColumn column)
+
+        private Column CreateColumn (DataColumn column)
         {
-            Column c = new Column();
+            var c = new Column();
             c.Name = column.ColumnName;
             c.Alias = column.Caption;
             c.DataType = column.DataType;
-            c.SetBindableControlType(c.DataType);
+            c.SetBindableControlType (c.DataType);
             return c;
         }
 
         private void DeleteTable()
         {
             if (Connection != null)
-                Connection.DeleteTable(this);
+            {
+                Connection.DeleteTable (this);
+            }
         }
 
         private void CreateColumns()
@@ -239,8 +213,8 @@ namespace AM.Reporting.Data
             {
                 foreach (DataColumn column in Table.Columns)
                 {
-                    Column c = CreateColumn(column);
-                    Columns.Add(c);
+                    var c = CreateColumn (column);
+                    Columns.Add (c);
                 }
             }
         }
@@ -248,34 +222,45 @@ namespace AM.Reporting.Data
         #endregion
 
         #region Protected Methods
+
         /// <inheritdoc/>
-        protected override void Dispose(bool disposing)
+        protected override void Dispose (bool disposing)
         {
             if (disposing)
+            {
                 DeleteTable();
-            base.Dispose(disposing);
+            }
+
+            base.Dispose (disposing);
         }
 
         /// <inheritdoc/>
-        protected override object GetValue(Column column)
+        protected override object GetValue (Column column)
         {
             if (column == null)
+            {
                 return null;
+            }
 
             if (column.Tag == null)
             {
-                int index = Table.Columns.IndexOf(column.Name);
+                var index = Table.Columns.IndexOf (column.Name);
                 if (index == -1)
+                {
                     return null;
+                }
+
                 column.Tag = index;
             }
 
 
             return CurrentRow == null ? null : ((DataRow)CurrentRow)[(int)column.Tag];
         }
+
         #endregion
 
         #region Public Methods
+
         /// <inheritdoc/>
         public override void InitSchema()
         {
@@ -283,16 +268,22 @@ namespace AM.Reporting.Data
             {
                 if (!StoreData)
                 {
-                    Connection.CreateTable(this);
+                    Connection.CreateTable (this);
                     if (Table.Columns.Count == 0)
-                        Connection.FillTableSchema(Table, SelectCommand, Parameters);
+                    {
+                        Connection.FillTableSchema (Table, SelectCommand, Parameters);
+                    }
                 }
             }
             else
-                table = Reference as DataTable;
+            {
+                Table = Reference as DataTable;
+            }
 
             if (Columns.Count == 0)
+            {
                 CreateColumns();
+            }
 
             foreach (Column column in Columns)
             {
@@ -301,12 +292,14 @@ namespace AM.Reporting.Data
         }
 
         /// <inheritdoc/>
-        public override void LoadData(ArrayList rows)
+        public override void LoadData (ArrayList rows)
         {
             if (Connection != null)
             {
                 if (!StoreData)
-                    Connection.FillTable(this);
+                {
+                    Connection.FillTable (this);
+                }
             }
             else
             {
@@ -314,12 +307,14 @@ namespace AM.Reporting.Data
             }
 
             if (Table == null)
-                throw new DataTableException(Alias);
+            {
+                throw new DataTableException (Alias);
+            }
 
             // custom load data via Load event
             OnLoad();
 
-            bool needReload = ForceLoadData || rows.Count == 0 || Parameters.Count > 0;
+            var needReload = ForceLoadData || rows.Count == 0 || Parameters.Count > 0;
             if (needReload)
             {
                 // fill rows
@@ -327,7 +322,9 @@ namespace AM.Reporting.Data
                 foreach (DataRow row in Table.Rows)
                 {
                     if (row.RowState != DataRowState.Deleted && row.RowState != DataRowState.Detached)
-                        rows.Add(row);
+                    {
+                        rows.Add (row);
+                    }
                 }
             }
         }
@@ -339,58 +336,72 @@ namespace AM.Reporting.Data
         {
             DeleteTable();
             InitSchema();
-            RefreshColumns(true);
+            RefreshColumns (true);
         }
 
-        internal void RefreshColumns(bool enableNew)
+        internal void RefreshColumns (bool enableNew)
         {
             if (Table != null)
             {
                 // add new columns
                 foreach (DataColumn column in Table.Columns)
                 {
-                    if (Columns.FindByName(column.ColumnName) == null)
+                    if (Columns.FindByName (column.ColumnName) == null)
                     {
-                        Column c = CreateColumn(column);
+                        var c = CreateColumn (column);
                         c.Enabled = enableNew;
-                        Columns.Add(c);
+                        Columns.Add (c);
                     }
                 }
+
                 // delete obsolete columns
-                int i = 0;
+                var i = 0;
                 while (i < Columns.Count)
                 {
-                    Column c = Columns[i];
-                    if (!c.Calculated && !Table.Columns.Contains(c.Name))
+                    var c = Columns[i];
+                    if (!c.Calculated && !Table.Columns.Contains (c.Name))
+                    {
                         c.Dispose();
+                    }
                     else
+                    {
                         i++;
+                    }
                 }
             }
         }
 
         /// <inheritdoc/>
-        public override void Serialize(FRWriter writer)
+        public override void Serialize (FRWriter writer)
         {
-            base.Serialize(writer);
-            if (!String.IsNullOrEmpty(TableName))
-                writer.WriteStr("TableName", TableName);
-            if (!String.IsNullOrEmpty(SelectCommand))
-                writer.WriteStr("SelectCommand", SelectCommand);
-            if (!String.IsNullOrEmpty(QbSchema))
-                writer.WriteStr("QbSchema", QbSchema);
+            base.Serialize (writer);
+            if (!string.IsNullOrEmpty (TableName))
+            {
+                writer.WriteStr ("TableName", TableName);
+            }
+
+            if (!string.IsNullOrEmpty (SelectCommand))
+            {
+                writer.WriteStr ("SelectCommand", SelectCommand);
+            }
+
+            if (!string.IsNullOrEmpty (QbSchema))
+            {
+                writer.WriteStr ("QbSchema", QbSchema);
+            }
+
             if (StoreData)
             {
-                writer.WriteBool("StoreData", true);
-                writer.WriteStr("TableData", TableData);
+                writer.WriteBool ("StoreData", true);
+                writer.WriteStr ("TableData", TableData);
             }
         }
 
         /// <inheritdoc/>
-        public override void SetParent(Base value)
+        public override void SetParent (Base value)
         {
-            base.SetParent(value);
-            SetFlags(Flags.CanEdit, Connection != null);
+            base.SetParent (value);
+            SetFlags (Flags.CanEdit, Connection != null);
         }
 
         /// <inheritdoc/>
@@ -402,42 +413,53 @@ namespace AM.Reporting.Data
                 par.ResetLastValue();
             }
         }
+
         #endregion
 
         #region IParent Members
+
         /// <inheritdoc/>
-        public override bool CanContain(Base child)
+        public override bool CanContain (Base child)
         {
-            return base.CanContain(child) || child is CommandParameter;
+            return base.CanContain (child) || child is CommandParameter;
         }
 
         /// <inheritdoc/>
-        public override void GetChildObjects(ObjectCollection list)
+        public override void GetChildObjects (ObjectCollection list)
         {
-            base.GetChildObjects(list);
+            base.GetChildObjects (list);
             foreach (CommandParameter p in Parameters)
             {
-                list.Add(p);
+                list.Add (p);
             }
         }
 
         /// <inheritdoc/>
-        public override void AddChild(Base child)
+        public override void AddChild (Base child)
         {
-            if (child is CommandParameter)
-                Parameters.Add(child as CommandParameter);
+            if (child is CommandParameter parameter)
+            {
+                Parameters.Add (parameter);
+            }
             else
-                base.AddChild(child);
+            {
+                base.AddChild (child);
+            }
         }
 
         /// <inheritdoc/>
-        public override void RemoveChild(Base child)
+        public override void RemoveChild (Base child)
         {
-            if (child is CommandParameter)
-                Parameters.Remove(child as CommandParameter);
+            if (child is CommandParameter parameter)
+            {
+                Parameters.Remove (parameter);
+            }
             else
-                base.RemoveChild(child);
+            {
+                base.RemoveChild (child);
+            }
         }
+
         #endregion
 
         /// <summary>
@@ -448,7 +470,7 @@ namespace AM.Reporting.Data
             TableName = "";
             SelectCommand = "";
             QbSchema = "";
-            parameters = new CommandParameterCollection(this);
+            Parameters = new CommandParameterCollection (this);
         }
     }
 }

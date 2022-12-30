@@ -29,19 +29,35 @@ namespace AM.Reporting.Data
     public class ProcedureParameter : CommandParameter
     {
         /// <inheritdoc/>
-        [ReadOnlyAttribute(true)]
-        public override string Name { get => base.Name; set => base.Name = value; }
+        [ReadOnlyAttribute (true)]
+        public override string Name
+        {
+            get => base.Name;
+            set => base.Name = value;
+        }
 
         /// <inheritdoc/>
-        [ReadOnlyAttribute(true)]
-        public override int DataType { get => base.DataType; set => base.DataType = value; }
+        [ReadOnlyAttribute (true)]
+        public override int DataType
+        {
+            get => base.DataType;
+            set => base.DataType = value;
+        }
 
         /// <inheritdoc/>
-        [Browsable(false)]
-        public override int Size { get => base.Size; set => base.Size = value; }
+        [Browsable (false)]
+        public override int Size
+        {
+            get => base.Size;
+            set => base.Size = value;
+        }
 
         /// <inheritdoc/>
-        [DisplayName("Value")]
-        public override string DefaultValue { get => base.DefaultValue; set => base.DefaultValue = value; }
+        [DisplayName ("Value")]
+        public override string DefaultValue
+        {
+            get => base.DefaultValue;
+            set => base.DefaultValue = value;
+        }
     }
 }

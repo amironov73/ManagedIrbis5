@@ -16,6 +16,7 @@
 #region Using directives
 
 using AM.Reporting.Utils;
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -43,11 +44,11 @@ namespace AM.Reporting.Export.Html
         /// Draw any custom controls.
         /// </summary>
         /// <param name="e"></param>
-        public void OnCustomDraw(CustomDrawEventArgs e)
+        public void OnCustomDraw (CustomDrawEventArgs e)
         {
             if (CustomDraw != null)
             {
-                CustomDraw(this, e);
+                CustomDraw (this, e);
             }
         }
 
@@ -65,7 +66,7 @@ namespace AM.Reporting.Export.Html
             public readonly ReportPage page;
             public readonly Stream PagesStream;
 
-            public HTMLData(int reportPage, int pageNumber, int currentPage, ReportPage page, Stream pagesStream)
+            public HTMLData (int reportPage, int pageNumber, int currentPage, ReportPage page, Stream pagesStream)
             {
                 ReportPage = reportPage;
                 PageNumber = pageNumber;
@@ -84,7 +85,7 @@ namespace AM.Reporting.Export.Html
             public readonly string FileName;
             public readonly MemoryStream Stream;
 
-            public PicsArchiveItem(string fileName, MemoryStream stream)
+            public PicsArchiveItem (string fileName, MemoryStream stream)
             {
                 FileName = fileName;
                 Stream = stream;
@@ -112,10 +113,6 @@ namespace AM.Reporting.Export.Html
             WebPrint
         }
 
-        private bool layers;
-        private bool wysiwyg;
-        private bool notRotateLandscapePage;
-        private bool highQualitySVG;
         private MyRes res;
         private HtmlTemplates templates;
         private string targetPath;
@@ -128,63 +125,40 @@ namespace AM.Reporting.Export.Html
         private int pagesCount;
 
         private string documentTitle;
-        private ImageFormat imageFormat;
-        private bool subFolder;
-        private bool navigator;
-        private bool singlePage;
-        private bool pictures;
-        private bool embedPictures;
-        private bool webMode;
-        private List<HTMLPageData> pages;
-        private HTMLPageData printPageData;
-        private int count;
-        private string webImagePrefix;
-        private string webImageSuffix;
-        private string stylePrefix;
         private string prevWatermarkName;
         private long prevWatermarkSize;
-        private HtmlSizeUnits widthUnits;
-        private HtmlSizeUnits heightUnits;
         private string singlePageFileName;
         private string subFolderPath;
-        private HTMLExportFormat format;
         private MemoryStream mimeStream;
-        private String boundary;
+        private string boundary;
         private List<PicsArchiveItem> picsArchive;
         private List<ExportIEMStyle> prevStyleList;
         private int prevStyleListIndex;
-        private bool pageBreaks;
-        private bool print;
-        private bool preview;
         private List<string> cssStyles;
         private float hPos;
         private NumberFormatInfo numberFormat;
         private string pageStyleName;
 
-        private bool saveStreams;
-
-        private string onClickTemplate = String.Empty;
-        private string reportID;
-
         private const string BODY_BEGIN = "</head>\r\n<body bgcolor=\"#FFFFFF\" text=\"#000000\">";
         private const string BODY_END = "</body>";
-        private const string PRINT_JS = "<script language=\"javascript\" type=\"text/javascript\"> parent.focus(); parent.print();</script>";
+
+        private const string PRINT_JS =
+            "<script language=\"javascript\" type=\"text/javascript\"> parent.focus(); parent.print();</script>";
+
         private const string NBSP = "&nbsp;";
-        private int currentPage = 0;
+        private int currentPage;
         private HTMLData d;
         private IGraphics htmlMeasureGraphics;
         private float maxWidth, maxHeight;
         private FastString css;
         private FastString htmlPage;
         private float leftMargin, topMargin;
-        private bool enableMargins = false;
-        private ExportType exportMode;
-        private bool enableVectorObjects = true;
 
         /// <summary>
         /// hash:base64Image
         /// </summary>
         private Dictionary<string, string> embeddedImages;
+
         #endregion Private fields
 
         #region Public properties
@@ -194,281 +168,167 @@ namespace AM.Reporting.Export.Html
         /// </summary>
         public Dictionary<string, string> EmbeddedImages
         {
-            get { return embeddedImages; }
-            set { embeddedImages = value; }
+            get => embeddedImages;
+            set => embeddedImages = value;
         }
 
         /// <summary>
         /// Sets a ID of report
         /// </summary>
-        public string ReportID
-        {
-            get { return reportID; }
-            set { reportID = value; }
-        }
+        public string ReportID { get; set; }
 
         /// <summary>
         /// Sets an onclick template
         /// </summary>
-        public string OnClickTemplate
-        {
-            get { return onClickTemplate; }
-            set { onClickTemplate = value; }
-        }
+        public string OnClickTemplate { get; set; } = string.Empty;
 
         /// <summary>
         /// Enable or disable layers export mode
         /// </summary>
-        public bool Layers
-        {
-            get { return layers; }
-            set { layers = value; }
-        }
+        public bool Layers { get; set; }
 
         /// <summary>
         /// For internal use only.
         /// </summary>
-        public string StylePrefix
-        {
-            get { return stylePrefix; }
-            set { stylePrefix = value; }
-        }
+        public string StylePrefix { get; set; }
 
         /// <summary>
         /// For internal use only.
         /// </summary>
-        public string WebImagePrefix
-        {
-            get { return webImagePrefix; }
-            set { webImagePrefix = value; }
-        }
+        public string WebImagePrefix { get; set; }
 
         /// <summary>
         /// For internal use only.
         /// </summary>
-        public string WebImageSuffix
-        {
-            get { return webImageSuffix; }
-            set { webImageSuffix = value; }
-        }
+        public string WebImageSuffix { get; set; }
 
         /// <summary>
         /// For internal use only.
         /// </summary>
-        public int Count
-        {
-            get { return count; }
-        }
+        public int Count { get; private set; }
 
         /// <summary>
         /// For internal use only.
         /// </summary>
-        public List<HTMLPageData> PreparedPages
-        {
-            get { return pages; }
-        }
+        public List<HTMLPageData> PreparedPages { get; private set; }
 
         /// <summary>
         /// Enable or disable showing of print dialog in browser when html document is opened
         /// </summary>
-        public bool Print
-        {
-            get { return print; }
-            set { print = value; }
-        }
+        public bool Print { get; set; }
 
         /// <summary>
         /// Enable or disable a picture optimization.
         /// </summary>
-        public bool HighQualitySVG
-        {
-            get { return highQualitySVG; }
-            set { highQualitySVG = value; }
-        }
+        public bool HighQualitySVG { get; set; }
 
         /// <summary>
         /// Enable or disable preview in Web settings
         /// </summary>
-        public bool Preview
-        {
-            get { return preview; }
-            set { preview = value; }
-        }
+        public bool Preview { get; set; }
 
         /// <summary>
         /// Enable or disable the breaks between pages in print preview when single page mode is enabled
         /// </summary>
-        public bool PageBreaks
-        {
-            get { return pageBreaks; }
-            set { pageBreaks = value; }
-        }
+        public bool PageBreaks { get; set; }
 
         /// <summary>
         /// Specifies the output format
         /// </summary>
-        public HTMLExportFormat Format
-        {
-            get { return format; }
-            set { format = value; }
-        }
+        public HTMLExportFormat Format { get; set; }
 
         /// <summary>
         /// Specifies the width units in HTML export
         /// </summary>
-        public HtmlSizeUnits WidthUnits
-        {
-            get { return widthUnits; }
-            set { widthUnits = value; }
-        }
+        public HtmlSizeUnits WidthUnits { get; set; }
 
         /// <summary>
         /// Specifies the height units in HTML export
         /// </summary>
-        public HtmlSizeUnits HeightUnits
-        {
-            get { return heightUnits; }
-            set { heightUnits = value; }
-        }
+        public HtmlSizeUnits HeightUnits { get; set; }
 
         /// <summary>
         /// Enable or disable the pictures in HTML export
         /// </summary>
-        public bool Pictures
-        {
-            get { return pictures; }
-            set { pictures = value; }
-        }
+        public bool Pictures { get; set; }
 
         /// <summary>
         /// Enable or disable embedding pictures in HTML export
         /// </summary>
-        public bool EmbedPictures
-        {
-            get { return embedPictures; }
-            set { embedPictures = value; }
-        }
+        public bool EmbedPictures { get; set; }
 
         /// <summary>
         /// Enable or disable the WEB mode in HTML export
         /// </summary>
-        internal bool WebMode
-        {
-            get { return webMode; }
-            set { webMode = value; }
-        }
+        internal bool WebMode { get; set; }
 
         /// <summary>
         /// Gets or sets html export mode
         /// </summary>
-        public ExportType ExportMode
-        {
-            get { return exportMode; }
-            set { exportMode = value; }
-        }
+        public ExportType ExportMode { get; set; }
 
         /// <summary>
         /// Enable or disable the single HTML page creation
         /// </summary>
-        public bool SinglePage
-        {
-            get { return singlePage; }
-            set { singlePage = value; }
-        }
+        public bool SinglePage { get; set; }
 
         /// <summary>
         /// Enable or disable the page navigator in html export
         /// </summary>
-        public bool Navigator
-        {
-            get { return navigator; }
-            set { navigator = value; }
-        }
+        public bool Navigator { get; set; }
 
         /// <summary>
         /// Enable or disable the sub-folder for files of export
         /// </summary>
-        public bool SubFolder
-        {
-            get { return subFolder; }
-            set { subFolder = value; }
-        }
+        public bool SubFolder { get; set; }
 
         /// <summary>
         ///  Gets or sets the Wysiwyg quality of export
         /// </summary>
-        public bool Wysiwyg
-        {
-            get { return wysiwyg; }
-            set { wysiwyg = value; }
-        }
+        public bool Wysiwyg { get; set; }
 
         /// <summary>
         /// Gets or sets the image format.
         /// </summary>
-        public ImageFormat ImageFormat
-        {
-            get { return imageFormat; }
-            set { imageFormat = value; }
-        }
+        public ImageFormat ImageFormat { get; set; }
 
         /// <summary>
         /// Gets print page data
         /// </summary>
-        public HTMLPageData PrintPageData
-        {
-            get { return printPageData; }
-        }
-
+        public HTMLPageData PrintPageData { get; private set; }
 
 
         /// <summary>
         /// Enable or disable saving streams in GeneratedStreams collection.
         /// </summary>
-        public bool SaveStreams
-        {
-            get { return saveStreams; }
-            set { saveStreams = value; }
-        }
+        public bool SaveStreams { get; set; }
 
         /// <summary>
         /// Enable or disable margins for pages. Works only for Layers-mode.
         /// </summary>
-        public bool EnableMargins
-        {
-            get { return enableMargins; }
-            set { enableMargins = value; }
-        }
+        public bool EnableMargins { get; set; }
 
         /// <summary>
         /// Enable or disable export of vector objects such as Barcodes in SVG format.
         /// </summary>
-        public bool EnableVectorObjects
-        {
-            get { return enableVectorObjects; }
-            set { enableVectorObjects = value; }
-        }
+        public bool EnableVectorObjects { get; set; } = true;
 
         /// <summary>
         /// Not rotate landscape page when print.
         /// </summary>
-        public bool NotRotateLandscapePage
-        {
-            get { return notRotateLandscapePage; }
-            set { notRotateLandscapePage = value; }
-        }
+        public bool NotRotateLandscapePage { get; set; }
 
         #endregion Public properties
 
         #region Private methods
 
-        private void GeneratedUpdate(string filename, Stream stream)
+        private void GeneratedUpdate (string filename, Stream stream)
         {
-            int i = GeneratedFiles.IndexOf(filename);
+            var i = GeneratedFiles.IndexOf (filename);
             if (i == -1)
             {
-                GeneratedFiles.Add(filename);
-                GeneratedStreams.Add(stream);
+                GeneratedFiles.Add (filename);
+                GeneratedStreams.Add (stream);
             }
             else
             {
@@ -476,81 +336,88 @@ namespace AM.Reporting.Export.Html
             }
         }
 
-        private void ExportHTMLPageStart(FastString Page, int PageNumber, int CurrentPage)
+        private void ExportHTMLPageStart (FastString Page, int PageNumber, int CurrentPage)
         {
-            if (webMode)
+            if (WebMode)
             {
-                if (!layers)
+                if (!Layers)
                 {
-                    pages[CurrentPage].CSSText = Page.ToString();
+                    PreparedPages[CurrentPage].CSSText = Page.ToString();
                     Page.Clear();
                 }
-                pages[CurrentPage].PageNumber = PageNumber;
+
+                PreparedPages[CurrentPage].PageNumber = PageNumber;
             }
 
-            if (!webMode && !singlePage)
+            if (!WebMode && !SinglePage)
             {
-                Page.AppendLine(BODY_BEGIN);
+                Page.AppendLine (BODY_BEGIN);
             }
         }
 
-        private void ExportHTMLPageFinal(FastString CSS, FastString Page, HTMLData d, float MaxWidth, float MaxHeight)
+        private void ExportHTMLPageFinal (FastString CSS, FastString Page, HTMLData d, float MaxWidth, float MaxHeight)
         {
-            if (!webMode)
+            if (!WebMode)
             {
-                if (!singlePage)
-                    Page.AppendLine(BODY_END);
+                if (!SinglePage)
+                {
+                    Page.AppendLine (BODY_END);
+                }
+
                 if (d.PagesStream == null)
                 {
-                    string pageFileName = targetIndexPath + targetFileName + d.PageNumber.ToString() + ".html";
-                    if (saveStreams)
+                    var pageFileName = targetIndexPath + targetFileName + d.PageNumber.ToString() + ".html";
+                    if (SaveStreams)
                     {
-                        string fileName = singlePage ? singlePageFileName : pageFileName;
-                        int i = GeneratedFiles.IndexOf(fileName);
-                        Stream outStream = (i == -1) ? new MemoryStream() : GeneratedStreams[i];
-                        DoPage(outStream, documentTitle, CSS, Page);
-                        GeneratedUpdate(fileName, outStream);
+                        var fileName = SinglePage ? singlePageFileName : pageFileName;
+                        var i = GeneratedFiles.IndexOf (fileName);
+                        var outStream = (i == -1) ? new MemoryStream() : GeneratedStreams[i];
+                        DoPage (outStream, documentTitle, CSS, Page);
+                        GeneratedUpdate (fileName, outStream);
                     }
                     else
                     {
-                        GeneratedFiles.Add(pageFileName);
-                        using (FileStream outStream = new FileStream(pageFileName, FileMode.Create))
+                        GeneratedFiles.Add (pageFileName);
+                        using (var outStream = new FileStream (pageFileName, FileMode.Create))
                         {
-                            DoPage(outStream, documentTitle, CSS, Page);
+                            DoPage (outStream, documentTitle, CSS, Page);
                         }
                     }
                 }
                 else
                 {
-                    DoPage(d.PagesStream, documentTitle, CSS, Page);
+                    DoPage (d.PagesStream, documentTitle, CSS, Page);
                 }
             }
             else
             {
-                ExportHTMLPageFinalWeb(CSS, Page, d, MaxWidth, MaxHeight);
+                ExportHTMLPageFinalWeb (CSS, Page, d, MaxWidth, MaxHeight);
             }
         }
 
-        private void ExportHTMLPageFinalWeb(FastString CSS, FastString Page, HTMLData d, float MaxWidth, float MaxHeight)
+        private void ExportHTMLPageFinalWeb (FastString CSS, FastString Page, HTMLData d, float MaxWidth,
+            float MaxHeight)
         {
-            CalcPageSize(pages[d.CurrentPage], MaxWidth, MaxHeight);
+            CalcPageSize (PreparedPages[d.CurrentPage], MaxWidth, MaxHeight);
 
             if (Page != null)
             {
-                pages[d.CurrentPage].PageText = Page.ToString();
+                PreparedPages[d.CurrentPage].PageText = Page.ToString();
                 Page.Clear();
             }
+
             if (CSS != null)
             {
-                pages[d.CurrentPage].CSSText = CSS.ToString();
+                PreparedPages[d.CurrentPage].CSSText = CSS.ToString();
                 CSS.Clear();
             }
-            pages[d.CurrentPage].PageEvent.Set();
+
+            PreparedPages[d.CurrentPage].PageEvent.Set();
         }
 
-        private void CalcPageSize(HTMLPageData page, float MaxWidth, float MaxHeight)
+        private void CalcPageSize (HTMLPageData page, float MaxWidth, float MaxHeight)
         {
-            if (!layers)
+            if (!Layers)
             {
                 page.Width = MaxWidth / Zoom;
                 page.Height = MaxHeight / Zoom;
@@ -562,27 +429,34 @@ namespace AM.Reporting.Export.Html
             }
         }
 
-        private void DoPage(Stream stream, string documentTitle, FastString CSS, FastString Page)
+        private void DoPage (Stream stream, string documentTitle, FastString CSS, FastString Page)
         {
-            if (!singlePage)
-                ExportUtils.Write(stream, String.Format(templates.PageTemplateTitle, documentTitle));
+            if (!SinglePage)
+            {
+                ExportUtils.Write (stream, string.Format (templates.PageTemplateTitle, documentTitle));
+            }
+
             if (CSS != null)
             {
-                ExportUtils.Write(stream, CSS.ToString());
+                ExportUtils.Write (stream, CSS.ToString());
                 CSS.Clear();
             }
+
             if (Page != null)
             {
-                ExportUtils.Write(stream, Page.ToString());
+                ExportUtils.Write (stream, Page.ToString());
                 Page.Clear();
             }
-            if (!singlePage)
-                ExportUtils.Write(stream, templates.PageTemplateFooter);
+
+            if (!SinglePage)
+            {
+                ExportUtils.Write (stream, templates.PageTemplateFooter);
+            }
         }
 
-        private void ExportHTMLOutline(Stream OutStream)
+        private void ExportHTMLOutline (Stream OutStream)
         {
-            if (!webMode)
+            if (!WebMode)
             {
                 // under construction
             }
@@ -592,39 +466,49 @@ namespace AM.Reporting.Export.Html
             }
         }
 
-        private void DoPageStart(Stream stream, string documentTitle, bool print)
+        private void DoPageStart (Stream stream, string documentTitle, bool print)
         {
-            ExportUtils.Write(stream, String.Format(templates.PageTemplateTitle, documentTitle));
+            ExportUtils.Write (stream, string.Format (templates.PageTemplateTitle, documentTitle));
             if (print)
-                ExportUtils.WriteLn(stream, PRINT_JS);
-            ExportUtils.WriteLn(stream, BODY_BEGIN);
+            {
+                ExportUtils.WriteLn (stream, PRINT_JS);
+            }
+
+            ExportUtils.WriteLn (stream, BODY_BEGIN);
         }
 
-        private void DoPageEnd(Stream stream)
+        private void DoPageEnd (Stream stream)
         {
-            ExportUtils.WriteLn(stream, BODY_END);
-            ExportUtils.Write(stream, templates.PageTemplateFooter);
+            ExportUtils.WriteLn (stream, BODY_END);
+            ExportUtils.Write (stream, templates.PageTemplateFooter);
         }
 
-        private void ExportHTMLIndex(Stream stream)
+        private void ExportHTMLIndex (Stream stream)
         {
-            ExportUtils.Write(stream, String.Format(templates.IndexTemplate,
-                new object[] { documentTitle, ExportUtils.HtmlURL(navFileName),
-                        ExportUtils.HtmlURL(targetFileName +
-                        (singlePage ? ".main" : "1") + ".html") }));
+            ExportUtils.Write (stream, string.Format (templates.IndexTemplate,
+                new object[]
+                {
+                    documentTitle, ExportUtils.HtmlURL (navFileName),
+                    ExportUtils.HtmlURL (targetFileName +
+                                         (SinglePage ? ".main" : "1") + ".html")
+                }));
         }
 
-        private void ExportHTMLNavigator(Stream stream)
+        private void ExportHTMLNavigator (Stream stream)
         {
-            string prefix = ExportUtils.HtmlURL(fileName);
+            var prefix = ExportUtils.HtmlURL (fileName);
+
             //  {0} - pages count {1} - name of report {2} multipage document {3} prefix of pages
             //  {4} first caption {5} previous caption {6} next caption {7} last caption
             //  {8} total caption
-            ExportUtils.Write(stream, String.Format(templates.NavigatorTemplate,
-                new object[] { pagesCount.ToString(),
-                        documentTitle, (singlePage ? "0" : "1"),
-                        prefix, res.Get("First"), res.Get("Prev"),
-                        res.Get("Next"), res.Get("Last"), res.Get("Total") }));
+            ExportUtils.Write (stream, string.Format (templates.NavigatorTemplate,
+                new object[]
+                {
+                    pagesCount.ToString(),
+                    documentTitle, (SinglePage ? "0" : "1"),
+                    prefix, res.Get ("First"), res.Get ("Prev"),
+                    res.Get ("Next"), res.Get ("Last"), res.Get ("Total")
+                }));
         }
 
         private void Init()
@@ -632,9 +516,9 @@ namespace AM.Reporting.Export.Html
             htmlMeasureGraphics = Report.MeasureGraphics;
             cssStyles = new List<string>();
             hPos = 0;
-            count = Report.PreparedPages.Count;
+            Count = Report.PreparedPages.Count;
             pagesCount = 0;
-            prevWatermarkName = String.Empty;
+            prevWatermarkName = string.Empty;
             prevWatermarkSize = 0;
             prevStyleList = null;
             prevStyleListIndex = 0;
@@ -644,50 +528,55 @@ namespace AM.Reporting.Export.Html
 
         private void StartMHT()
         {
-            subFolder = false;
-            singlePage = true;
-            navigator = false;
+            SubFolder = false;
+            SinglePage = true;
+            Navigator = false;
             mimeStream = new MemoryStream();
             boundary = ExportUtils.GetID();
         }
 
         private void StartWeb()
         {
-            pages.Clear();
-            for (int i = 0; i < count; i++)
-                pages.Add(new HTMLPageData());
+            PreparedPages.Clear();
+            for (var i = 0; i < Count; i++)
+                PreparedPages.Add (new HTMLPageData());
         }
 
         private void StartSaveStreams()
         {
-            if (singlePage)
-                GeneratedUpdate("index.html", null);
-            subFolder = false;
-            navigator = false;
+            if (SinglePage)
+            {
+                GeneratedUpdate ("index.html", null);
+            }
+
+            SubFolder = false;
+            Navigator = false;
         }
 
         private void FinishMHT()
         {
-            DoPageEnd(mimeStream);
-            WriteMHTHeader(Stream, FileName);
-            WriteMimePart(mimeStream, "text/html", "utf-8", "index.html");
-            for (int i = 0; i < picsArchive.Count; i++)
+            DoPageEnd (mimeStream);
+            WriteMHTHeader (Stream, FileName);
+            WriteMimePart (mimeStream, "text/html", "utf-8", "index.html");
+            for (var i = 0; i < picsArchive.Count; i++)
             {
-                string imagename = picsArchive[i].FileName;
-                WriteMimePart(picsArchive[i].Stream, "image/" + imagename.Substring(imagename.LastIndexOf('.') + 1), "utf-8", imagename);
+                var imagename = picsArchive[i].FileName;
+                WriteMimePart (picsArchive[i].Stream, "image/" + imagename.Substring (imagename.LastIndexOf ('.') + 1),
+                    "utf-8", imagename);
             }
-            string last = "--" + boundary + "--";
-            Stream.Write(Encoding.ASCII.GetBytes(last), 0, last.Length);
+
+            var last = "--" + boundary + "--";
+            Stream.Write (Encoding.ASCII.GetBytes (last), 0, last.Length);
         }
 
         private void FinishSaveStreams()
         {
             // do append in memory stream
-            int fileIndex = GeneratedFiles.IndexOf(singlePageFileName);
-            ExportHTMLIndex(GeneratedStreams[fileIndex]);
-            MemoryStream outStream = new MemoryStream();
-            ExportHTMLNavigator(outStream);
-            GeneratedUpdate(targetIndexPath + navFileName, outStream);
+            var fileIndex = GeneratedFiles.IndexOf (singlePageFileName);
+            ExportHTMLIndex (GeneratedStreams[fileIndex]);
+            var outStream = new MemoryStream();
+            ExportHTMLNavigator (outStream);
+            GeneratedUpdate (targetIndexPath + navFileName, outStream);
         }
 
         #endregion Private methods
@@ -698,9 +587,13 @@ namespace AM.Reporting.Export.Html
         protected override string GetFileFilter()
         {
             if (Format == HTMLExportFormat.HTML)
-                return new MyRes("FileFilters").Get("HtmlFile");
+            {
+                return new MyRes ("FileFilters").Get ("HtmlFile");
+            }
             else
-                return new MyRes("FileFilters").Get("MhtFile");
+            {
+                return new MyRes ("FileFilters").Get ("MhtFile");
+            }
         }
 
         /// <inheritdoc/>
@@ -710,14 +603,14 @@ namespace AM.Reporting.Export.Html
 
             Init();
 
-            if (saveStreams)
+            if (SaveStreams)
             {
                 StartSaveStreams();
             }
 
-            if (!webMode)
+            if (!WebMode)
             {
-                if (format == HTMLExportFormat.MessageHTML)
+                if (Format == HTMLExportFormat.MessageHTML)
                 {
                     StartMHT();
                 }
@@ -725,83 +618,95 @@ namespace AM.Reporting.Export.Html
                 if (FileName == "" && Stream != null)
                 {
                     targetFileName = "html";
-                    singlePage = true;
-                    subFolder = false;
-                    navigator = false;
-                    if(ExportMode == ExportType.WebPrint)
+                    SinglePage = true;
+                    SubFolder = false;
+                    Navigator = false;
+                    if (ExportMode == ExportType.WebPrint)
                     {
                         NotRotateLandscapePage = true;
-                        for (int i = 0; i < Report.PreparedPages.Count; i++ )
+                        for (var i = 0; i < Report.PreparedPages.Count; i++)
                         {
-                            if (!Report.PreparedPages.GetPage(i).Landscape)
+                            if (!Report.PreparedPages.GetPage (i).Landscape)
                             {
                                 NotRotateLandscapePage = false;
                                 break;
                             }
                         }
                     }
-                    if (format == HTMLExportFormat.HTML && !embedPictures)
-                        pictures = false;
+
+                    if (Format == HTMLExportFormat.HTML && !EmbedPictures)
+                    {
+                        Pictures = false;
+                    }
                 }
                 else
                 {
-                    targetFileName = Path.GetFileNameWithoutExtension(FileName);
+                    targetFileName = Path.GetFileNameWithoutExtension (FileName);
                     fileName = targetFileName;
-                    targetIndexPath = !String.IsNullOrEmpty(FileName) ? Path.GetDirectoryName(FileName) : FileName;
+                    targetIndexPath = !string.IsNullOrEmpty (FileName) ? Path.GetDirectoryName (FileName) : FileName;
                 }
 
-                if (!String.IsNullOrEmpty(targetIndexPath))
-                    targetIndexPath += Path.DirectorySeparatorChar;
-
-                if (preview)
+                if (!string.IsNullOrEmpty (targetIndexPath))
                 {
-                    pictures = true;
-                    printPageData = new HTMLPageData();
+                    targetIndexPath += Path.DirectorySeparatorChar;
                 }
-                else if (subFolder)
+
+                if (Preview)
+                {
+                    Pictures = true;
+                    PrintPageData = new HTMLPageData();
+                }
+                else if (SubFolder)
                 {
                     subFolderPath = targetFileName + ".files" + Path.DirectorySeparatorChar;
                     targetPath = targetIndexPath + subFolderPath;
                     targetFileName = subFolderPath + targetFileName;
-                    if (!Directory.Exists(targetPath))
-                        Directory.CreateDirectory(targetPath);
+                    if (!Directory.Exists (targetPath))
+                    {
+                        Directory.CreateDirectory (targetPath);
+                    }
                 }
                 else
+                {
                     targetPath = targetIndexPath;
+                }
 
                 navFileName = targetFileName + ".nav.html";
-                //FOutlineFileName = FTargetFileName + ".outline.html";
-                documentTitle = (!String.IsNullOrEmpty(Report.ReportInfo.Name) ?
-                    Report.ReportInfo.Name : Path.GetFileNameWithoutExtension(FileName));
 
-                if (singlePage)
+                //FOutlineFileName = FTargetFileName + ".outline.html";
+                documentTitle = (!string.IsNullOrEmpty (Report.ReportInfo.Name)
+                    ? Report.ReportInfo.Name
+                    : Path.GetFileNameWithoutExtension (FileName));
+
+                if (SinglePage)
                 {
-                    if (navigator)
+                    if (Navigator)
                     {
                         singlePageFileName = targetIndexPath + targetFileName + ".main.html";
-                        if (saveStreams)
+                        if (SaveStreams)
                         {
-                            MemoryStream pageStream = new MemoryStream();
-                            DoPageStart(pageStream, documentTitle, print);
-                            GeneratedUpdate(singlePageFileName, pageStream);
+                            var pageStream = new MemoryStream();
+                            DoPageStart (pageStream, documentTitle, Print);
+                            GeneratedUpdate (singlePageFileName, pageStream);
                         }
                         else
                         {
-                            using (Stream pageStream = new FileStream(singlePageFileName,
-                                FileMode.Create))
+                            using (Stream pageStream = new FileStream (singlePageFileName,
+                                       FileMode.Create))
                             {
-                                DoPageStart(pageStream, documentTitle, print);
+                                DoPageStart (pageStream, documentTitle, Print);
                             }
                         }
                     }
                     else
                     {
-                        singlePageFileName = String.IsNullOrEmpty(FileName) ? "index.html" : FileName;
-                        if (saveStreams)
+                        singlePageFileName = string.IsNullOrEmpty (FileName) ? "index.html" : FileName;
+                        if (SaveStreams)
                         {
-                            GeneratedUpdate(singlePageFileName, new MemoryStream());
+                            GeneratedUpdate (singlePageFileName, new MemoryStream());
                         }
-                        DoPageStart((format == HTMLExportFormat.HTML) ? Stream : mimeStream, documentTitle, print);
+
+                        DoPageStart ((Format == HTMLExportFormat.HTML) ? Stream : mimeStream, documentTitle, Print);
                     }
                 }
             }
@@ -812,77 +717,98 @@ namespace AM.Reporting.Export.Html
         }
 
         /// <inheritdoc/>
-        protected override void ExportPageBegin(ReportPage page)
+        protected override void ExportPageBegin (ReportPage page)
         {
             if (ExportMode == ExportType.Export)
-                base.ExportPageBegin(page);
+            {
+                base.ExportPageBegin (page);
+            }
+
             pagesCount++;
             if (!WebMode)
             {
-                if (singlePage)
+                if (SinglePage)
                 {
                     Stream stream;
-                    if (navigator)
+                    if (Navigator)
                     {
-                        if (saveStreams)
-                            stream = new MemoryStream();
-                        else
-                            stream = new FileStream(singlePageFileName, FileMode.Append);
-
-                        d = new HTMLData(pagesCount, pagesCount, 0, page, stream);
-                        ExportHTMLPageBegin(d);
-                    }
-                    else
-                    {
-                        if (format == HTMLExportFormat.HTML)
-                            stream = Stream;
-                        else
-                            stream = mimeStream;
-
-                        d = new HTMLData(pagesCount, pagesCount, 0, page, stream);
-                        ExportHTMLPageBegin(d);
-                    }
-                }
-                else
-                    ProcessPageBegin(pagesCount - 1, pagesCount, page);
-            }
-            else
-                // Web
-                ProcessPageBegin(pagesCount - 1, pagesCount, page);
-        }
-
-        /// <inheritdoc/>
-        protected override void ExportPageEnd(ReportPage page)
-        {
-            if (!WebMode)
-            {
-                if (singlePage)
-                {
-                    if (navigator)
-                    {
-                        if (saveStreams)
+                        if (SaveStreams)
                         {
-                            ExportHTMLPageEnd(d);
-                            GeneratedUpdate(singlePageFileName, d.PagesStream);
+                            stream = new MemoryStream();
                         }
                         else
                         {
-                            ExportHTMLPageEnd(d);
+                            stream = new FileStream (singlePageFileName, FileMode.Append);
+                        }
+
+                        d = new HTMLData (pagesCount, pagesCount, 0, page, stream);
+                        ExportHTMLPageBegin (d);
+                    }
+                    else
+                    {
+                        if (Format == HTMLExportFormat.HTML)
+                        {
+                            stream = Stream;
+                        }
+                        else
+                        {
+                            stream = mimeStream;
+                        }
+
+                        d = new HTMLData (pagesCount, pagesCount, 0, page, stream);
+                        ExportHTMLPageBegin (d);
+                    }
+                }
+                else
+                {
+                    ProcessPageBegin (pagesCount - 1, pagesCount, page);
+                }
+            }
+            else
+
+                // Web
+            {
+                ProcessPageBegin (pagesCount - 1, pagesCount, page);
+            }
+        }
+
+        /// <inheritdoc/>
+        protected override void ExportPageEnd (ReportPage page)
+        {
+            if (!WebMode)
+            {
+                if (SinglePage)
+                {
+                    if (Navigator)
+                    {
+                        if (SaveStreams)
+                        {
+                            ExportHTMLPageEnd (d);
+                            GeneratedUpdate (singlePageFileName, d.PagesStream);
+                        }
+                        else
+                        {
+                            ExportHTMLPageEnd (d);
                             d.PagesStream.Close();
                             d.PagesStream.Dispose();
                         }
                     }
                     else
                     {
-                        ExportHTMLPageEnd(d);
+                        ExportHTMLPageEnd (d);
                     }
                 }
                 else
-                    ProcessPageEnd(pagesCount - 1, pagesCount);
+                {
+                    ProcessPageEnd (pagesCount - 1, pagesCount);
+                }
             }
             else
+
                 // Web
-                ProcessPageEnd(pagesCount - 1, pagesCount);
+            {
+                ProcessPageEnd (pagesCount - 1, pagesCount);
+            }
         }
 
         /// <summary>
@@ -891,10 +817,10 @@ namespace AM.Reporting.Export.Html
         /// <param name="p"></param>
         /// <param name="ReportPage"></param>
         /// <param name="page"></param>
-        public void ProcessPageBegin(int p, int ReportPage, ReportPage page)
+        public void ProcessPageBegin (int p, int ReportPage, ReportPage page)
         {
-            d = new HTMLData(ReportPage, pagesCount, p, page, null);
-            ExportHTMLPageBegin(d);
+            d = new HTMLData (ReportPage, pagesCount, p, page, null);
+            ExportHTMLPageBegin (d);
         }
 
         /// <summary>
@@ -902,25 +828,25 @@ namespace AM.Reporting.Export.Html
         /// </summary>
         /// <param name="p"></param>
         /// <param name="ReportPage"></param>
-        public void ProcessPageEnd(int p, int ReportPage)
+        public void ProcessPageEnd (int p, int ReportPage)
         {
-            ExportHTMLPageEnd(d);
+            ExportHTMLPageEnd (d);
         }
 
         /// <inheritdoc/>
         protected override void Finish()
         {
-            if (!webMode)
+            if (!WebMode)
             {
-                if (navigator)
+                if (Navigator)
                 {
-                    if (saveStreams)
+                    if (SaveStreams)
                     {
                         FinishSaveStreams();
                     }
                     else
                     {
-                        if (singlePage)
+                        if (SinglePage)
                         {
                             //if (saveStreams) // Commented because saveStreams is always false!!
                             //{
@@ -929,17 +855,19 @@ namespace AM.Reporting.Export.Html
                             //}
                             //else
                             //{
-                            using (Stream pageStream = new FileStream(singlePageFileName, FileMode.Append))
+                            using (Stream pageStream = new FileStream (singlePageFileName, FileMode.Append))
                             {
-                                DoPageEnd(pageStream);
+                                DoPageEnd (pageStream);
                             }
+
                             //} // Commented because saveStreams is always false!!
                         }
-                        ExportHTMLIndex(Stream);
-                        GeneratedFiles.Add(targetIndexPath + navFileName);
-                        using (FileStream outStream = new FileStream(targetIndexPath + navFileName, FileMode.Create))
+
+                        ExportHTMLIndex (Stream);
+                        GeneratedFiles.Add (targetIndexPath + navFileName);
+                        using (var outStream = new FileStream (targetIndexPath + navFileName, FileMode.Create))
                         {
-                            ExportHTMLNavigator(outStream);
+                            ExportHTMLNavigator (outStream);
                         }
 
                         //GeneratedFiles.Add(FTargetIndexPath + FOutlineFileName);
@@ -947,39 +875,44 @@ namespace AM.Reporting.Export.Html
                         //    ExportHTMLOutline(OutStream);
                     }
                 }
-                else if (format == HTMLExportFormat.MessageHTML)
+                else if (Format == HTMLExportFormat.MessageHTML)
                 {
                     FinishMHT();
                 }
                 else
                 {
-                    if (saveStreams)
+                    if (SaveStreams)
                     {
-                        if (!String.IsNullOrEmpty(singlePageFileName))
+                        if (!string.IsNullOrEmpty (singlePageFileName))
                         {
-                            int fileIndex = GeneratedFiles.IndexOf(singlePageFileName);
-                            DoPageEnd(GeneratedStreams[fileIndex]);
+                            var fileIndex = GeneratedFiles.IndexOf (singlePageFileName);
+                            DoPageEnd (GeneratedStreams[fileIndex]);
                         }
                     }
                     else
                     {
-                        if (!singlePage)
+                        if (!SinglePage)
                         {
-                            DoPageStart(Stream, documentTitle, false);
-                            int pageCounter = 0;
-                            foreach (string genFile in GeneratedFiles)
+                            DoPageStart (Stream, documentTitle, false);
+                            var pageCounter = 0;
+                            foreach (var genFile in GeneratedFiles)
                             {
-                                string ext = Path.GetExtension(genFile);
+                                var ext = Path.GetExtension (genFile);
                                 if (ext == ".html" && genFile != FileName)
                                 {
-                                    string file = Path.GetFileName(genFile);
-                                    if (subFolder)
-                                        file = Path.Combine(subFolderPath, file);
-                                    ExportUtils.WriteLn(Stream, String.Format("<a href=\"{0}\">Page {1}</a><br />", file, ++pageCounter));
+                                    var file = Path.GetFileName (genFile);
+                                    if (SubFolder)
+                                    {
+                                        file = Path.Combine (subFolderPath, file);
+                                    }
+
+                                    ExportUtils.WriteLn (Stream,
+                                        string.Format ("<a href=\"{0}\">Page {1}</a><br />", file, ++pageCounter));
                                 }
                             }
                         }
-                        DoPageEnd(Stream);
+
+                        DoPageEnd (Stream);
                     }
                 }
             }
@@ -988,18 +921,18 @@ namespace AM.Reporting.Export.Html
         #endregion Protected methods
 
         /// <inheritdoc/>
-        public override void Serialize(FRWriter writer)
+        public override void Serialize (FRWriter writer)
         {
-            base.Serialize(writer);
-            writer.WriteBool("Layers", Layers);
-            writer.WriteBool("Wysiwyg", Wysiwyg);
-            writer.WriteBool("Pictures", Pictures);
-            writer.WriteBool("EmbedPictures", EmbedPictures);
-            writer.WriteBool("SubFolder", SubFolder);
-            writer.WriteBool("Navigator", Navigator);
-            writer.WriteBool("SinglePage", SinglePage);
-            writer.WriteBool("NotRotateLandscapePage", NotRotateLandscapePage);
-            writer.WriteBool("HighQualitySVG", HighQualitySVG);
+            base.Serialize (writer);
+            writer.WriteBool ("Layers", Layers);
+            writer.WriteBool ("Wysiwyg", Wysiwyg);
+            writer.WriteBool ("Pictures", Pictures);
+            writer.WriteBool ("EmbedPictures", EmbedPictures);
+            writer.WriteBool ("SubFolder", SubFolder);
+            writer.WriteBool ("Navigator", Navigator);
+            writer.WriteBool ("SinglePage", SinglePage);
+            writer.WriteBool ("NotRotateLandscapePage", NotRotateLandscapePage);
+            writer.WriteBool ("HighQualitySVG", HighQualitySVG);
         }
 
         /// <summary>
@@ -1007,17 +940,17 @@ namespace AM.Reporting.Export.Html
         /// </summary>
         public void Init_WebMode()
         {
-            subFolder = false;
-            navigator = false;
+            SubFolder = false;
+            Navigator = false;
             ShowProgress = false;
-            pages = new List<HTMLPageData>();
-            webMode = true;
+            PreparedPages = new List<HTMLPageData>();
+            WebMode = true;
             OpenAfterExport = false;
         }
 
         internal void Finish_WebMode()
         {
-            pages.Clear();
+            PreparedPages.Clear();
         }
 
         /// <summary>
@@ -1027,43 +960,47 @@ namespace AM.Reporting.Export.Html
         {
             Zoom = 1.0f;
             HasMultipleFiles = true;
-            layers = true;
-            wysiwyg = true;
-            pictures = true;
-            webMode = false;
-            subFolder = true;
-            navigator = true;
-            singlePage = false;
-            widthUnits = HtmlSizeUnits.Pixel;
-            heightUnits = HtmlSizeUnits.Pixel;
-            imageFormat = ImageFormat.Png;
+            Layers = true;
+            Wysiwyg = true;
+            Pictures = true;
+            WebMode = false;
+            SubFolder = true;
+            Navigator = true;
+            SinglePage = false;
+            WidthUnits = HtmlSizeUnits.Pixel;
+            HeightUnits = HtmlSizeUnits.Pixel;
+            ImageFormat = ImageFormat.Png;
             templates = new HtmlTemplates();
-            format = HTMLExportFormat.HTML;
+            Format = HTMLExportFormat.HTML;
             prevStyleList = null;
             prevStyleListIndex = 0;
-            pageBreaks = true;
-            print = false;
-            preview = false;
-            saveStreams = false;
-            numberFormat = new NumberFormatInfo();
-            numberFormat.NumberGroupSeparator = String.Empty;
-            numberFormat.NumberDecimalSeparator = ".";
-            exportMode = ExportType.Export;
-            res = new MyRes("Export,Html");
+            PageBreaks = true;
+            Print = false;
+            Preview = false;
+            SaveStreams = false;
+            numberFormat = new NumberFormatInfo
+            {
+                NumberGroupSeparator = string.Empty,
+                NumberDecimalSeparator = "."
+            };
+            ExportMode = ExportType.Export;
+            res = new MyRes ("Export,Html");
             embeddedImages = new Dictionary<string, string>();
-            notRotateLandscapePage = false;
-            highQualitySVG = false;
+            NotRotateLandscapePage = false;
+            HighQualitySVG = false;
         }
 
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HTMLExport"/> class for WebPreview mode.
         /// </summary>
-        public HTMLExport(bool webPreview) : this()
+        public HTMLExport (bool webPreview) : this()
         {
             this.webPreview = webPreview;
             if (webPreview)
-                exportMode = ExportType.WebPreview;
+            {
+                ExportMode = ExportType.WebPreview;
+            }
         }
     }
 

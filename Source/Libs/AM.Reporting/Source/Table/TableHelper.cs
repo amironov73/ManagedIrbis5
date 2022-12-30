@@ -31,7 +31,13 @@ namespace AM.Reporting.Table
         private TableObject sourceTable;
         private TableResult resultTable;
 
-        private enum NowPrinting { None, Row, Column }
+        private enum NowPrinting
+        {
+            None,
+            Row,
+            Column
+        }
+
         private NowPrinting nowPrinting;
         private bool rowsPriority;
         private int originalRowIndex;
@@ -42,13 +48,11 @@ namespace AM.Reporting.Table
         private List<SpanData> rowSpans;
         private bool pageBreak;
 
-        private bool AutoSpans
-        {
-            get { return sourceTable.ManualBuildAutoSpans; }
-        }
+        private bool AutoSpans => sourceTable.ManualBuildAutoSpans;
 
         #region Build the Table
-        public void PrintRow(int rowIndex)
+
+        public void PrintRow (int rowIndex)
         {
             originalRowIndex = rowIndex;
 
@@ -77,10 +81,10 @@ namespace AM.Reporting.Table
                 }
 
                 // add new row, do not copy cells: it will be done in the PrintColumn.
-                TableRow row = new TableRow();
-                row.Assign(sourceTable.Rows[rowIndex]);
+                var row = new TableRow();
+                row.Assign (sourceTable.Rows[rowIndex]);
                 row.PageBreak = pageBreak;
-                resultTable.Rows.Add(row);
+                resultTable.Rows.Add (row);
 
                 columnSpans.Clear();
             }
@@ -103,27 +107,28 @@ namespace AM.Reporting.Table
                     // index is outside existing rows. Probably not all rows created yet,
                     // we're at the start. Add new row.
                     row = new TableRow();
-                    row.Assign(sourceTable.Rows[rowIndex]);
-                    resultTable.Rows.Add(row);
+                    row.Assign (sourceTable.Rows[rowIndex]);
+                    resultTable.Rows.Add (row);
                 }
                 else
                 {
                     // do not create row, use existing one
                     row = resultTable.Rows[printingRowIndex];
                 }
+
                 // apply page break
                 row.PageBreak = pageBreak;
 
                 // copy cells from the template to the result
-                CopyCells(originalColumnIndex, originalRowIndex,
-                  printingColumnIndex, printingRowIndex);
+                CopyCells (originalColumnIndex, originalRowIndex,
+                    printingColumnIndex, printingRowIndex);
             }
 
             nowPrinting = NowPrinting.Row;
             pageBreak = false;
         }
 
-        public void PrintColumn(int columnIndex)
+        public void PrintColumn (int columnIndex)
         {
             originalColumnIndex = columnIndex;
 
@@ -152,10 +157,10 @@ namespace AM.Reporting.Table
                 }
 
                 // add new column, do not copy cells: it will be done in the PrintRow.
-                TableColumn column = new TableColumn();
-                column.Assign(sourceTable.Columns[columnIndex]);
+                var column = new TableColumn();
+                column.Assign (sourceTable.Columns[columnIndex]);
                 column.PageBreak = pageBreak;
-                resultTable.Columns.Add(column);
+                resultTable.Columns.Add (column);
 
                 rowSpans.Clear();
             }
@@ -178,20 +183,21 @@ namespace AM.Reporting.Table
                     // index is outside existing columns. Probably not all columns
                     // created yet, we're at the start. Add new column.
                     column = new TableColumn();
-                    column.Assign(sourceTable.Columns[columnIndex]);
-                    resultTable.Columns.Add(column);
+                    column.Assign (sourceTable.Columns[columnIndex]);
+                    resultTable.Columns.Add (column);
                 }
                 else
                 {
                     // do not create column, use existing one
                     column = resultTable.Columns[printingColumnIndex];
                 }
+
                 // apply page break
                 column.PageBreak = pageBreak;
 
                 // copy cells from the template to the result
-                CopyCells(originalColumnIndex, originalRowIndex,
-                  printingColumnIndex, printingRowIndex);
+                CopyCells (originalColumnIndex, originalRowIndex,
+                    printingColumnIndex, printingRowIndex);
             }
 
             nowPrinting = NowPrinting.Column;
@@ -203,13 +209,13 @@ namespace AM.Reporting.Table
             pageBreak = true;
         }
 
-        private void CopyCells(int originalColumnIndex, int originalRowIndex,
-          int resultColumnIndex, int resultRowIndex)
+        private void CopyCells (int originalColumnIndex, int originalRowIndex,
+            int resultColumnIndex, int resultRowIndex)
         {
-            TableCell cell = sourceTable[originalColumnIndex, originalRowIndex];
-            TableCellData cellTo = resultTable.GetCellData(resultColumnIndex, resultRowIndex);
+            var cell = sourceTable[originalColumnIndex, originalRowIndex];
+            var cellTo = resultTable.GetCellData (resultColumnIndex, resultRowIndex);
             sourceTable.PrintingCell = cellTo;
-            bool needData = true;
+            var needData = true;
 
             if (AutoSpans)
             {
@@ -218,17 +224,21 @@ namespace AM.Reporting.Table
                     // We are printing columns inside a row. Check if we need to finish the column cell.
                     if (columnSpans.Count > 0)
                     {
-                        SpanData spanData = columnSpans[0];
+                        var spanData = columnSpans[0];
 
                         // check if we are printing the last column of the cell's span. From now, we will not accept
                         // the first column.
                         if (originalColumnIndex == spanData.originalCellOrigin.X + spanData.originalCell.ColSpan - 1)
+                        {
                             spanData.finishFlag = true;
+                        }
 
                         if ((spanData.finishFlag && originalColumnIndex == spanData.originalCellOrigin.X) ||
-                          (originalColumnIndex < spanData.originalCellOrigin.X ||
-                           originalColumnIndex > spanData.originalCellOrigin.X + spanData.originalCell.ColSpan - 1))
+                            (originalColumnIndex < spanData.originalCellOrigin.X ||
+                             originalColumnIndex > spanData.originalCellOrigin.X + spanData.originalCell.ColSpan - 1))
+                        {
                             columnSpans.Clear();
+                        }
                         else
                         {
                             spanData.resultCell.ColSpan++;
@@ -239,48 +249,52 @@ namespace AM.Reporting.Table
                     // add the column cell if it has ColSpan > 1
                     if (cell.ColSpan > 1 && columnSpans.Count == 0)
                     {
-                        SpanData spanData = new SpanData();
-                        columnSpans.Add(spanData);
+                        var spanData = new SpanData();
+                        columnSpans.Add (spanData);
 
                         spanData.originalCell = cell;
                         spanData.resultCell = cellTo;
-                        spanData.originalCellOrigin = new Point(originalColumnIndex, originalRowIndex);
-                        spanData.resultCellOrigin = new Point(resultColumnIndex, resultRowIndex);
+                        spanData.originalCellOrigin = new Point (originalColumnIndex, originalRowIndex);
+                        spanData.resultCellOrigin = new Point (resultColumnIndex, resultRowIndex);
                     }
 
                     // now check the row cells. Do this once for each row.
                     if (printingColumnIndex == 0)
                     {
-                        for (int i = 0; i < rowSpans.Count; i++)
+                        for (var i = 0; i < rowSpans.Count; i++)
                         {
-                            SpanData spanData = rowSpans[i];
+                            var spanData = rowSpans[i];
 
                             // check if we are printing the last row of the cell's span. From now, we will not accept
                             // the first row.
                             if (originalRowIndex == spanData.originalCellOrigin.Y + spanData.originalCell.RowSpan - 1)
+                            {
                                 spanData.finishFlag = true;
+                            }
 
                             if ((spanData.finishFlag && originalRowIndex == spanData.originalCellOrigin.Y) ||
-                              (originalRowIndex < spanData.originalCellOrigin.Y ||
-                               originalRowIndex > spanData.originalCellOrigin.Y + spanData.originalCell.RowSpan - 1))
+                                (originalRowIndex < spanData.originalCellOrigin.Y ||
+                                 originalRowIndex > spanData.originalCellOrigin.Y + spanData.originalCell.RowSpan - 1))
                             {
-                                rowSpans.RemoveAt(i);
+                                rowSpans.RemoveAt (i);
                                 i--;
                             }
                             else
+                            {
                                 spanData.resultCell.RowSpan++;
+                            }
                         }
                     }
 
                     // check if we should skip current cell because it is inside a span
-                    for (int i = 0; i < rowSpans.Count; i++)
+                    for (var i = 0; i < rowSpans.Count; i++)
                     {
-                        SpanData spanData = rowSpans[i];
+                        var spanData = rowSpans[i];
 
                         if (resultColumnIndex >= spanData.resultCellOrigin.X &&
-                          resultColumnIndex <= spanData.resultCellOrigin.X + spanData.resultCell.ColSpan - 1 &&
-                          resultRowIndex >= spanData.resultCellOrigin.Y &&
-                          resultRowIndex <= spanData.resultCellOrigin.Y + spanData.resultCell.RowSpan)
+                            resultColumnIndex <= spanData.resultCellOrigin.X + spanData.resultCell.ColSpan - 1 &&
+                            resultRowIndex >= spanData.resultCellOrigin.Y &&
+                            resultRowIndex <= spanData.resultCellOrigin.Y + spanData.resultCell.RowSpan)
                         {
                             needData = false;
                             break;
@@ -290,13 +304,13 @@ namespace AM.Reporting.Table
                     // add the row cell if it has RowSpan > 1 and not added yet
                     if (cell.RowSpan > 1 && needData)
                     {
-                        SpanData spanData = new SpanData();
-                        rowSpans.Add(spanData);
+                        var spanData = new SpanData();
+                        rowSpans.Add (spanData);
 
                         spanData.originalCell = cell;
                         spanData.resultCell = cellTo;
-                        spanData.originalCellOrigin = new Point(originalColumnIndex, originalRowIndex);
-                        spanData.resultCellOrigin = new Point(resultColumnIndex, resultRowIndex);
+                        spanData.originalCellOrigin = new Point (originalColumnIndex, originalRowIndex);
+                        spanData.resultCellOrigin = new Point (resultColumnIndex, resultRowIndex);
                     }
                 }
                 else
@@ -304,17 +318,21 @@ namespace AM.Reporting.Table
                     // We are printing rows inside a column. Check if we need to finish the row cell.
                     if (rowSpans.Count > 0)
                     {
-                        SpanData spanData = rowSpans[0];
+                        var spanData = rowSpans[0];
 
                         // check if we are printing the last row of the cell's span. From now, we will not accept
                         // the first row.
                         if (originalRowIndex == spanData.originalCellOrigin.Y + spanData.originalCell.RowSpan - 1)
+                        {
                             spanData.finishFlag = true;
+                        }
 
                         if ((spanData.finishFlag && originalRowIndex == spanData.originalCellOrigin.Y) ||
-                          (originalRowIndex < spanData.originalCellOrigin.Y ||
-                           originalRowIndex > spanData.originalCellOrigin.Y + spanData.originalCell.RowSpan - 1))
+                            (originalRowIndex < spanData.originalCellOrigin.Y ||
+                             originalRowIndex > spanData.originalCellOrigin.Y + spanData.originalCell.RowSpan - 1))
+                        {
                             rowSpans.Clear();
+                        }
                         else
                         {
                             spanData.resultCell.RowSpan++;
@@ -325,48 +343,54 @@ namespace AM.Reporting.Table
                     // add the row cell if it has RowSpan > 1
                     if (cell.RowSpan > 1 && rowSpans.Count == 0)
                     {
-                        SpanData spanData = new SpanData();
-                        rowSpans.Add(spanData);
+                        var spanData = new SpanData();
+                        rowSpans.Add (spanData);
 
                         spanData.originalCell = cell;
                         spanData.resultCell = cellTo;
-                        spanData.originalCellOrigin = new Point(originalColumnIndex, originalRowIndex);
-                        spanData.resultCellOrigin = new Point(resultColumnIndex, resultRowIndex);
+                        spanData.originalCellOrigin = new Point (originalColumnIndex, originalRowIndex);
+                        spanData.resultCellOrigin = new Point (resultColumnIndex, resultRowIndex);
                     }
 
                     // now check the column cells. Do this once for each column.
                     if (printingRowIndex == 0)
                     {
-                        for (int i = 0; i < columnSpans.Count; i++)
+                        for (var i = 0; i < columnSpans.Count; i++)
                         {
-                            SpanData spanData = columnSpans[i];
+                            var spanData = columnSpans[i];
 
                             // check if we are printing the last column of the cell's span. From now, we will not accept
                             // the first column.
-                            if (originalColumnIndex == spanData.originalCellOrigin.X + spanData.originalCell.ColSpan - 1)
+                            if (originalColumnIndex ==
+                                spanData.originalCellOrigin.X + spanData.originalCell.ColSpan - 1)
+                            {
                                 spanData.finishFlag = true;
+                            }
 
                             if ((spanData.finishFlag && originalColumnIndex == spanData.originalCellOrigin.X) ||
-                              (originalColumnIndex < spanData.originalCellOrigin.X ||
-                               originalColumnIndex > spanData.originalCellOrigin.X + spanData.originalCell.ColSpan - 1))
+                                (originalColumnIndex < spanData.originalCellOrigin.X ||
+                                 originalColumnIndex >
+                                 spanData.originalCellOrigin.X + spanData.originalCell.ColSpan - 1))
                             {
-                                columnSpans.RemoveAt(i);
+                                columnSpans.RemoveAt (i);
                                 i--;
                             }
                             else
+                            {
                                 spanData.resultCell.ColSpan++;
+                            }
                         }
                     }
 
                     // check if we should skip current cell because it is inside a span
-                    for (int i = 0; i < columnSpans.Count; i++)
+                    for (var i = 0; i < columnSpans.Count; i++)
                     {
-                        SpanData spanData = columnSpans[i];
+                        var spanData = columnSpans[i];
 
                         if (resultColumnIndex >= spanData.resultCellOrigin.X &&
-                          resultColumnIndex <= spanData.resultCellOrigin.X + spanData.resultCell.ColSpan - 1 &&
-                          resultRowIndex >= spanData.resultCellOrigin.Y &&
-                          resultRowIndex <= spanData.resultCellOrigin.Y + spanData.resultCell.RowSpan)
+                            resultColumnIndex <= spanData.resultCellOrigin.X + spanData.resultCell.ColSpan - 1 &&
+                            resultRowIndex >= spanData.resultCellOrigin.Y &&
+                            resultRowIndex <= spanData.resultCellOrigin.Y + spanData.resultCell.RowSpan)
                         {
                             needData = false;
                             break;
@@ -376,13 +400,13 @@ namespace AM.Reporting.Table
                     // add the column cell if it has ColSpan > 1 and not added yet
                     if (cell.ColSpan > 1 && needData)
                     {
-                        SpanData spanData = new SpanData();
-                        columnSpans.Add(spanData);
+                        var spanData = new SpanData();
+                        columnSpans.Add (spanData);
 
                         spanData.originalCell = cell;
                         spanData.resultCell = cellTo;
-                        spanData.originalCellOrigin = new Point(originalColumnIndex, originalRowIndex);
-                        spanData.resultCellOrigin = new Point(resultColumnIndex, resultRowIndex);
+                        spanData.originalCellOrigin = new Point (originalColumnIndex, originalRowIndex);
+                        spanData.resultCellOrigin = new Point (resultColumnIndex, resultRowIndex);
                     }
                 }
             }
@@ -396,16 +420,18 @@ namespace AM.Reporting.Table
             {
                 cell.SaveState();
                 cell.GetData();
-                cellTo.RunTimeAssign(cell, true);
+                cellTo.RunTimeAssign (cell, true);
                 cell.RestoreState();
             }
         }
+
         #endregion
 
         #region Aggregate Functions
+
         #endregion
 
-        public TableHelper(TableObject source, TableResult result)
+        public TableHelper (TableObject source, TableResult result)
         {
             sourceTable = source;
             resultTable = result;

@@ -23,7 +23,6 @@ using System;
 
 namespace AM.Reporting.Barcode.QRCode
 {
-
 /*  /// <summary> A class which wraps a 2D array of bytes. The default usage is signed. If you want to use it as a
   /// unsigned container, it's up to you to do byteValue &amp; 0xff at each location.
   ///
@@ -35,75 +34,56 @@ namespace AM.Reporting.Barcode.QRCode
   /// </author>
   /// <author>www.Redivivus.in (suraj.supekar@redivivus.in) - Ported from ZXING Java Source
   /// </author>*/
-  internal sealed class ByteMatrix
-  {
-    public int Height
+    internal sealed class ByteMatrix
     {
-      get
-      {
-        return height;
-      }
+        public int Height { get; }
 
-    }
-    public int Width
-    {
-      get
-      {
-        return width;
-      }
+        public int Width { get; }
 
-    }
-    public sbyte[][] Array
-    {
-      get
-      {
-        return bytes;
-      }
+        public sbyte[][] Array { get; }
 
-    }
+        //UPGRADE_NOTE: Final was removed from the declaration of 'bytes '. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1003'"
 
-    //UPGRADE_NOTE: Final was removed from the declaration of 'bytes '. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1003'"
-    private sbyte[][] bytes;
-    //UPGRADE_NOTE: Final was removed from the declaration of 'width '. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1003'"
-    private int width;
-    //UPGRADE_NOTE: Final was removed from the declaration of 'height '. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1003'"
-    private int height;
+        //UPGRADE_NOTE: Final was removed from the declaration of 'width '. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1003'"
 
-    public ByteMatrix(int width, int height)
-    {
-      bytes = new sbyte[height][];
-      for (int i = 0; i < height; i++)
-      {
-        bytes[i] = new sbyte[width];
-      }
-      this.width = width;
-      this.height = height;
-    }
+        //UPGRADE_NOTE: Final was removed from the declaration of 'height '. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1003'"
 
-    public sbyte get_Renamed(int x, int y)
-    {
-      return bytes[y][x];
-    }
-
-    public void  set_Renamed(int x, int y, sbyte value_Renamed)
-    {
-      bytes[y][x] = value_Renamed;
-    }
-
-    public void  set_Renamed(int x, int y, int value_Renamed)
-    {
-      bytes[y][x] = (sbyte) value_Renamed;
-    }
-
-    public void  clear(sbyte value_Renamed)
-    {
-      for (int y = 0; y < height; ++y)
-      {
-        for (int x = 0; x < width; ++x)
+        public ByteMatrix (int width, int height)
         {
-          bytes[y][x] = value_Renamed;
+            Array = new sbyte[height][];
+            for (var i = 0; i < height; i++)
+            {
+                Array[i] = new sbyte[width];
+            }
+
+            this.Width = width;
+            this.Height = height;
         }
-      }
+
+        public sbyte get_Renamed (int x, int y)
+        {
+            return Array[y][x];
+        }
+
+        public void set_Renamed (int x, int y, sbyte value_Renamed)
+        {
+            Array[y][x] = value_Renamed;
+        }
+
+        public void set_Renamed (int x, int y, int value_Renamed)
+        {
+            Array[y][x] = (sbyte)value_Renamed;
+        }
+
+        public void clear (sbyte value_Renamed)
+        {
+            for (var y = 0; y < Height; ++y)
+            {
+                for (var x = 0; x < Width; ++x)
+                {
+                    Array[y][x] = value_Renamed;
+                }
+            }
+        }
     }
-  }
 }

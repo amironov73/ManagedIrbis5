@@ -1,3 +1,20 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/* 
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#nullable enable
+
 //#define USE_FAKES
 
 // This file represent mock for System.DateTime & System.Guid (because Microsoft Fakes doesn't correct work in .Net Core)
@@ -11,7 +28,7 @@ namespace SystemFake
         internal static System.DateTime Now
         {
 #if NETSTANDARD || NETCOREAPP
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
             get
             {
@@ -27,7 +44,7 @@ namespace SystemFake
         internal static System.DateTime UtcNow
         {
 #if NETSTANDARD || NETCOREAPP
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
             get
             {
@@ -44,7 +61,7 @@ namespace SystemFake
     internal struct Guid
     {
 #if NETSTANDARD || NETCOREAPP
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
         internal static System.Guid NewGuid()
         {

@@ -27,24 +27,22 @@ using System.Linq;
 
 namespace AM.Reporting.Utils.Json.Serialization
 {
-
     public static partial class JsonConverter
     {
-
-        public static T Deserialize<T>(string json)
+        public static T Deserialize<T> (string json)
         {
-            return JsonDeserializer.Deserialize<T>(json);
+            return JsonDeserializer.Deserialize<T> (json);
         }
 
-        public static string Serialize<T>(T instance)
+        public static string Serialize<T> (T instance)
         {
-            return JsonSerializer.Serialize(instance);
+            return JsonSerializer.Serialize (instance);
         }
 
-        public static byte[] SerializeToBytes<T>(T instance)
+        public static byte[] SerializeToBytes<T> (T instance)
         {
-            var strContent = Serialize(instance);
-            byte[] bytes = Encoding.UTF8.GetBytes(strContent);
+            var strContent = Serialize (instance);
+            var bytes = Encoding.UTF8.GetBytes (strContent);
             return bytes;
         }
     }

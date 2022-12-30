@@ -16,6 +16,7 @@
 #region Using directives
 
 using AM.Reporting.Utils;
+
 using System;
 using System.Collections;
 using System.Drawing;
@@ -59,9 +60,9 @@ namespace AM.Reporting
         /// <param name="width">Width of a pen.</param>
         /// <param name="style">Dash style of a pen.</param>
         /// <returns>The <b>Pen</b> object.</returns>
-        public Pen GetPen(Color color, float width, DashStyle style)
+        public Pen GetPen (Color color, float width, DashStyle style)
         {
-            return GetPen(color, width, style, LineJoin.Miter);
+            return GetPen (color, width, style, LineJoin.Miter);
         }
 
         /// <summary>
@@ -72,17 +73,17 @@ namespace AM.Reporting
         /// <param name="style">Dash style of a pen.</param>
         /// <param name="lineJoin">Line join of a pen.</param>
         /// <returns>The <b>Pen</b> object.</returns>
-        public Pen GetPen(Color color, float width, DashStyle style, LineJoin lineJoin)
+        public Pen GetPen (Color color, float width, DashStyle style, LineJoin lineJoin)
         {
-            int hash = color.GetHashCode() ^ width.GetHashCode() ^ style.GetHashCode() ^ lineJoin.GetHashCode();
-            Pen result = pens[hash] as Pen;
-            if (result == null)
+            var hash = color.GetHashCode() ^ width.GetHashCode() ^ style.GetHashCode() ^ lineJoin.GetHashCode();
+            if (pens[hash] is not Pen result)
             {
-                result = new Pen(color, width);
+                result = new Pen (color, width);
                 result.DashStyle = style;
                 result.LineJoin = lineJoin;
                 pens[hash] = result;
             }
+
             return result;
         }
 
@@ -91,15 +92,15 @@ namespace AM.Reporting
         /// </summary>
         /// <param name="color">Color of a brush.</param>
         /// <returns>The <b>SolidBrush</b> object.</returns>
-        public SolidBrush GetBrush(Color color)
+        public SolidBrush GetBrush (Color color)
         {
-            int hash = color.GetHashCode();
-            SolidBrush result = brushes[hash] as SolidBrush;
-            if (result == null)
+            var hash = color.GetHashCode();
+            if (brushes[hash] is not SolidBrush result)
             {
-                result = new SolidBrush(color);
+                result = new SolidBrush (color);
                 brushes[hash] = result;
             }
+
             return result;
         }
 
@@ -110,15 +111,15 @@ namespace AM.Reporting
         /// <param name="size">Size of a font.</param>
         /// <param name="style">Style of a font.</param>
         /// <returns>The <b>Font</b> object.</returns>
-        public Font GetFont(FontFamily name, float size, FontStyle style)
+        public Font GetFont (FontFamily name, float size, FontStyle style)
         {
-            int hash = name.GetHashCode() ^ size.GetHashCode() ^ style.GetHashCode();
-            Font result = fonts[hash] as Font;
-            if (result == null)
+            var hash = name.GetHashCode() ^ size.GetHashCode() ^ style.GetHashCode();
+            if (fonts[hash] is not Font result)
             {
-                result = new Font(name, size, style);
+                result = new Font (name, size, style);
                 fonts[hash] = result;
             }
+
             return result;
         }
 
@@ -132,29 +133,31 @@ namespace AM.Reporting
         /// <param name="firstTab">The number of spaces between the beginning of a line of text and the first tab stop.</param>
         /// <param name="tabWidth">Distance between tab stops.</param>
         /// <returns>The <b>StringFormat</b> object.</returns>
-        public StringFormat GetStringFormat(StringAlignment align, StringAlignment lineAlign,
-          StringTrimming trimming, StringFormatFlags flags, float firstTab, float tabWidth)
+        public StringFormat GetStringFormat (StringAlignment align, StringAlignment lineAlign,
+            StringTrimming trimming, StringFormatFlags flags, float firstTab, float tabWidth)
         {
-            int hash = align.GetHashCode() ^ (lineAlign.GetHashCode() << 2) ^ (trimming.GetHashCode() << 5) ^
-              (flags.GetHashCode() << 16) ^ (100 - firstTab).GetHashCode() ^ tabWidth.GetHashCode();
-            StringFormat result = stringFormats[hash] as StringFormat;
-            if (result == null)
+            var hash = align.GetHashCode() ^ (lineAlign.GetHashCode() << 2) ^ (trimming.GetHashCode() << 5) ^
+                       (flags.GetHashCode() << 16) ^ (100 - firstTab).GetHashCode() ^ tabWidth.GetHashCode();
+            if (stringFormats[hash] is not StringFormat result)
             {
                 result = new StringFormat();
                 result.Alignment = align;
                 result.LineAlignment = lineAlign;
                 result.Trimming = trimming;
                 result.FormatFlags = flags;
-                float[] tabStops = new float[64];
+                var tabStops = new float[64];
+
                 // fixed issue 2823
                 tabStops[0] = firstTab;
-                for (int i = 1; i < 64; i++)
+                for (var i = 1; i < 64; i++)
                 {
                     tabStops[i] = tabWidth;
                 }
-                result.SetTabStops(0, tabStops);
+
+                result.SetTabStops (0, tabStops);
                 stringFormats[hash] = result;
             }
+
             return result;
         }
 
@@ -169,35 +172,38 @@ namespace AM.Reporting
         /// <param name="tabWidth">Distance between tab stops.</param>
         /// <param name="defaultTab">Default distance between default tabs stops.</param>
         /// <returns>The <b>StringFormat</b> object.</returns>
-        public StringFormat GetStringFormat(StringAlignment align, StringAlignment lineAlign,
-          StringTrimming trimming, StringFormatFlags flags, float firstTab, FloatCollection tabWidth,
-          float defaultTab = 48)
+        public StringFormat GetStringFormat (StringAlignment align, StringAlignment lineAlign,
+            StringTrimming trimming, StringFormatFlags flags, float firstTab, FloatCollection tabWidth,
+            float defaultTab = 48)
         {
-            int hash = align.GetHashCode() ^ (lineAlign.GetHashCode() << 2) ^ (trimming.GetHashCode() << 5) ^
-              (flags.GetHashCode() << 16) ^ (100 - firstTab).GetHashCode() ^ tabWidth.GetHashCode();
-            StringFormat result = stringFormats[hash] as StringFormat;
-            if (result == null)
+            var hash = align.GetHashCode() ^ (lineAlign.GetHashCode() << 2) ^ (trimming.GetHashCode() << 5) ^
+                       (flags.GetHashCode() << 16) ^ (100 - firstTab).GetHashCode() ^ tabWidth.GetHashCode();
+            if (stringFormats[hash] is not StringFormat result)
             {
                 result = new StringFormat();
                 result.Alignment = align;
                 result.LineAlignment = lineAlign;
                 result.Trimming = trimming;
                 result.FormatFlags = flags;
-                float[] tabStops = new float[64];
+                var tabStops = new float[64];
+
                 // fixed issue 2823
                 tabStops[0] = firstTab;
-                for (int i = 1; i < 64; i++)
+                for (var i = 1; i < 64; i++)
                 {
                     if (i > tabWidth.Count)
                     {
                         tabStops[i] = defaultTab;
                         continue;
                     }
+
                     tabStops[i] = tabWidth[i - 1];
                 }
-                result.SetTabStops(0, tabStops);
+
+                result.SetTabStops (0, tabStops);
                 stringFormats[hash] = result;
             }
+
             return result;
         }
 
@@ -210,18 +216,22 @@ namespace AM.Reporting
             {
                 pen.Dispose();
             }
+
             foreach (Brush brush in brushes.Values)
             {
                 brush.Dispose();
             }
+
             foreach (Font font in fonts.Values)
             {
                 font.Dispose();
             }
+
             foreach (StringFormat format in stringFormats.Values)
             {
                 format.Dispose();
             }
+
             pens.Clear();
             brushes.Clear();
             fonts.Clear();
@@ -238,6 +248,5 @@ namespace AM.Reporting
             fonts = new Hashtable();
             stringFormats = new Hashtable();
         }
-
     }
 }

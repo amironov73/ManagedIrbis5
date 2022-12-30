@@ -28,8 +28,8 @@ namespace AM.Reporting.Utils
     /// <summary>
     /// Calc the Crc32 checksum
     /// </summary>
-	internal static class Crc32
-	{
+    internal static class Crc32
+    {
         private static readonly uint[] Table =
         {
             0x00000000, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419,
@@ -92,12 +92,12 @@ namespace AM.Reporting.Utils
         /// </summary>
         /// <param name="Stream"></param>
         /// <returns></returns>
-        public static uint Calculate(Stream Stream)
+        public static uint Calculate (Stream Stream)
         {
-            uint crc = 0xffffffff;
-            long OldPos = Stream.Position;
+            var crc = 0xffffffff;
+            var OldPos = Stream.Position;
             Stream.Position = 0;
-            for (int i = 0; i < Stream.Length; i++)
+            for (var i = 0; i < Stream.Length; i++)
                 crc = (uint)((crc >> 8) ^ Table[(byte)((crc & 0xff) ^ Stream.ReadByte())]);
             Stream.Position = OldPos;
             return ~crc;
@@ -108,11 +108,11 @@ namespace AM.Reporting.Utils
         /// </summary>
         /// <param name="ByteArray"></param>
         /// <returns></returns>
-        public static uint Calculate(byte[] ByteArray)
+        public static uint Calculate (byte[] ByteArray)
         {
-            uint crc = Begin();
-            crc = Update(crc, ByteArray, 0, ByteArray.Length);
-            return End(crc);
+            var crc = Begin();
+            crc = Update (crc, ByteArray, 0, ByteArray.Length);
+            return End (crc);
         }
 
 
@@ -121,12 +121,12 @@ namespace AM.Reporting.Utils
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        public static uint Calculate(string input)
+        public static uint Calculate (string input)
         {
-            uint crc = Begin();
-            byte[] ByteArray = Encoding.UTF8.GetBytes(input);
-            crc = Update(crc, ByteArray, 0, ByteArray.Length);
-            return End(crc);
+            var crc = Begin();
+            var ByteArray = Encoding.UTF8.GetBytes (input);
+            crc = Update (crc, ByteArray, 0, ByteArray.Length);
+            return End (crc);
         }
 
         /// <summary>
@@ -146,9 +146,9 @@ namespace AM.Reporting.Utils
         /// <param name="offset"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        public static uint Update(uint crc, byte[] ByteArray, int offset, int count)
+        public static uint Update (uint crc, byte[] ByteArray, int offset, int count)
         {
-            for (int i = offset; i < count; i++)
+            for (var i = offset; i < count; i++)
                 crc = (uint)((crc >> 8) ^ Table[(byte)(((crc) & 0xff) ^ ByteArray[i])]);
             return crc;
         }
@@ -158,12 +158,9 @@ namespace AM.Reporting.Utils
         /// </summary>
         /// <param name="crc"></param>
         /// <returns></returns>
-        public static uint End(uint crc)
+        public static uint End (uint crc)
         {
             return ~crc;
         }
-
-
-	}
-
+    }
 }

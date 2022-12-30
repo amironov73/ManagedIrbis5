@@ -37,13 +37,6 @@ namespace AM.Reporting.Gauge.Simple
     {
         #region Fields
 
-        private float left;
-        private float top;
-        private float horizontalOffset;
-        private float height;
-        private float width;
-        private float ptrRatio = 0.08f;
-
         #endregion // Fields
 
         #region Properties
@@ -51,62 +44,38 @@ namespace AM.Reporting.Gauge.Simple
         /// <summary>
         /// Gets o sets the Left offset of gauge pointer.
         /// </summary>
-        [Browsable(false)]
-        internal float Left
-        {
-            get { return left; }
-            set { left = value; }
-        }
+        [Browsable (false)]
+        internal float Left { get; set; }
 
         /// <summary>
         /// Gets o sets the Top offset of gauge pointer.
         /// </summary>
-        [Browsable(false)]
-        internal float Top
-        {
-            get { return top; }
-            set { top = value; }
-        }
+        [Browsable (false)]
+        internal float Top { get; set; }
 
         /// <summary>
         /// Gets o sets the height of gauge pointer.
         /// </summary>
-        [Browsable(false)]
-        public float Height
-        {
-            get { return height; }
-            set { height = value; }
-        }
+        [Browsable (false)]
+        public float Height { get; set; }
 
         /// <summary>
         /// Gets or sets the width of a pointer.
         /// </summary>
-        [Browsable(false)]
-        public float Width
-        {
-            get { return width; }
-            set { width = value; }
-        }
+        [Browsable (false)]
+        public float Width { get; set; }
 
         /// <summary>
         /// Gets or sets the pointer ratio.
         /// </summary>
-        [Browsable(false)]
-        public float PointerRatio
-        {
-            get { return ptrRatio; }
-            set { ptrRatio = value; }
-        }
+        [Browsable (false)]
+        public float PointerRatio { get; set; } = 0.08f;
 
         /// <summary>
         /// Gets or sets the pointer horizontal offset (cm).
         /// </summary>
-        [Browsable(false)]
-        public float HorizontalOffset
-        {
-            get { return horizontalOffset; }
-            set { horizontalOffset = value; }
-        }
+        [Browsable (false)]
+        public float HorizontalOffset { get; set; }
 
         #endregion // Properties
 
@@ -116,43 +85,48 @@ namespace AM.Reporting.Gauge.Simple
         /// Initializes a new instance of the <see cref="SimplePointer"/> class.
         /// </summary>
         /// <param name="parent">The parent gauge object.</param>
-        public SimplePointer(GaugeObject parent) : base(parent)
+        public SimplePointer (GaugeObject parent) : base (parent)
         {
-            height = Parent.Height * ptrRatio;
-            width = Parent.Width * ptrRatio;
-            horizontalOffset = 0.5f * Units.Centimeters;
+            Height = Parent.Height * PointerRatio;
+            Width = Parent.Width * PointerRatio;
+            HorizontalOffset = 0.5f * Units.Centimeters;
         }
 
         #endregion // Constructors
 
         #region Internal Methods
 
-        internal virtual void DrawHorz(FRPaintEventArgs e)
+        internal virtual void DrawHorz (FRPaintEventArgs e)
         {
-            IGraphics g = e.Graphics;
-            Pen pen = e.Cache.GetPen(BorderColor, BorderWidth * e.ScaleX, DashStyle.Solid);
+            var g = e.Graphics;
+            var pen = e.Cache.GetPen (BorderColor, BorderWidth * e.ScaleX, DashStyle.Solid);
 
-            left = (Parent.AbsLeft + Parent.Border.Width / 2 + horizontalOffset) * e.ScaleX;
-            top = (Parent.AbsTop + Parent.Border.Width / 2 + (Parent.Height - Parent.Border.Width) / 2 - (Parent.Height - Parent.Border.Width) * ptrRatio / 2) * e.ScaleY;
-            height = ((Parent.Height - Parent.Border.Width) * ptrRatio) * e.ScaleY;
-            width = (float)((Parent.Width - Parent.Border.Width - horizontalOffset * 2) * (Parent.Value - Parent.Minimum) / (Parent.Maximum - Parent.Minimum) * e.ScaleX);
+            Left = (Parent.AbsLeft + Parent.Border.Width / 2 + HorizontalOffset) * e.ScaleX;
+            Top = (Parent.AbsTop + Parent.Border.Width / 2 + (Parent.Height - Parent.Border.Width) / 2 -
+                   (Parent.Height - Parent.Border.Width) * PointerRatio / 2) * e.ScaleY;
+            Height = ((Parent.Height - Parent.Border.Width) * PointerRatio) * e.ScaleY;
+            Width = (float)((Parent.Width - Parent.Border.Width - HorizontalOffset * 2) *
+                (Parent.Value - Parent.Minimum) / (Parent.Maximum - Parent.Minimum) * e.ScaleX);
 
-            Brush brush = Fill.CreateBrush(new RectangleF(left, top, width, height), e.ScaleX, e.ScaleY);
-            g.FillAndDrawRectangle(pen, brush, left, top, width, height);
+            var brush = Fill.CreateBrush (new RectangleF (Left, Top, Width, Height), e.ScaleX, e.ScaleY);
+            g.FillAndDrawRectangle (pen, brush, Left, Top, Width, Height);
         }
 
-        internal virtual void DrawVert(FRPaintEventArgs e)
+        internal virtual void DrawVert (FRPaintEventArgs e)
         {
-            IGraphics g = e.Graphics;
-            Pen pen = e.Cache.GetPen(BorderColor, BorderWidth * e.ScaleY, DashStyle.Solid);
+            var g = e.Graphics;
+            var pen = e.Cache.GetPen (BorderColor, BorderWidth * e.ScaleY, DashStyle.Solid);
 
-            width = ((Parent.Width - Parent.Border.Width) * ptrRatio) * e.ScaleX;
-            height = (float)((Parent.Height - Parent.Border.Width -  horizontalOffset * 2) * (Parent.Value - Parent.Minimum) / (Parent.Maximum - Parent.Minimum) * e.ScaleY);
-            left = (Parent.AbsLeft + Parent.Border.Width / 2 + (Parent.Width - Parent.Border.Width) / 2 - (Parent.Width - Parent.Border.Width) * ptrRatio / 2) * e.ScaleX;
-            top = (Parent.AbsTop + Parent.Border.Width / 2 + Parent.Height - Parent.Border.Width - horizontalOffset) * e.ScaleY - height;
+            Width = ((Parent.Width - Parent.Border.Width) * PointerRatio) * e.ScaleX;
+            Height = (float)((Parent.Height - Parent.Border.Width - HorizontalOffset * 2) *
+                (Parent.Value - Parent.Minimum) / (Parent.Maximum - Parent.Minimum) * e.ScaleY);
+            Left = (Parent.AbsLeft + Parent.Border.Width / 2 + (Parent.Width - Parent.Border.Width) / 2 -
+                    (Parent.Width - Parent.Border.Width) * PointerRatio / 2) * e.ScaleX;
+            Top = (Parent.AbsTop + Parent.Border.Width / 2 + Parent.Height - Parent.Border.Width - HorizontalOffset) *
+                e.ScaleY - Height;
 
-            Brush brush = Fill.CreateBrush(new RectangleF(left, top, width, height), e.ScaleX, e.ScaleY);
-            g.FillAndDrawRectangle(pen, brush, left, top, width, height);
+            var brush = Fill.CreateBrush (new RectangleF (Left, Top, Width, Height), e.ScaleX, e.ScaleY);
+            g.FillAndDrawRectangle (pen, brush, Left, Top, Width, Height);
         }
 
         #endregion // Internal Methods
@@ -160,43 +134,44 @@ namespace AM.Reporting.Gauge.Simple
         #region Public Methods
 
         /// <inheritdoc/>
-        public override void Assign(GaugePointer src)
+        public override void Assign (GaugePointer src)
         {
-            base.Assign(src);
+            base.Assign (src);
 
-            SimplePointer s = src as SimplePointer;
+            var s = src as SimplePointer;
             Height = s.Height;
             Width = s.Width;
         }
 
         /// <inheritdoc/>
-        public override void Draw(FRPaintEventArgs e)
+        public override void Draw (FRPaintEventArgs e)
         {
-            base.Draw(e);
+            base.Draw (e);
 
             if (Parent.Vertical)
             {
-                DrawVert(e);
+                DrawVert (e);
             }
             else
             {
-                DrawHorz(e);
+                DrawHorz (e);
             }
         }
 
         /// <inheritdoc/>
-        public override void Serialize(FRWriter writer, string prefix, GaugePointer diff)
+        public override void Serialize (FRWriter writer, string prefix, GaugePointer diff)
         {
-            base.Serialize(writer, prefix, diff);
+            base.Serialize (writer, prefix, diff);
 
-            SimplePointer dc = diff as SimplePointer;
+            var dc = diff as SimplePointer;
             if (Height != dc.Height)
             {
-                writer.WriteFloat(prefix + ".Height", Height);
+                writer.WriteFloat (prefix + ".Height", Height);
             }
+
             if (Width != dc.Width)
             {
-                writer.WriteFloat(prefix + ".Width", Width);
+                writer.WriteFloat (prefix + ".Width", Width);
             }
         }
 

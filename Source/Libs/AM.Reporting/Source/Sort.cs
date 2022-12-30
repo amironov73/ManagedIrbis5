@@ -1,87 +1,100 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.Collections.Generic;
 using System.Text;
+
 using AM.Reporting.Utils;
+
+#endregion
+
+#nullable enable
 
 namespace AM.Reporting
 {
-  /// <summary>
-  /// Represents a sort condition used in the <see cref="DataBand.Sort"/>.
-  /// </summary>
-  public class Sort : IFRSerializable
-  {
-    private string expression;
-    private bool descending;
-
     /// <summary>
-    /// Gets or sets an expression used to sort data band rows.
+    /// Represents a sort condition used in the <see cref="DataBand.Sort"/>.
     /// </summary>
-    /// <remarks>
-    /// This property can contain any valid expression.
-    /// </remarks>
-    public string Expression
+    public class Sort : IFRSerializable
     {
-      get { return expression; }
-      set { expression = value; }
-    }
+        /// <summary>
+        /// Gets or sets an expression used to sort data band rows.
+        /// </summary>
+        /// <remarks>
+        /// This property can contain any valid expression.
+        /// </remarks>
+        public string Expression { get; set; }
 
-    /// <summary>
-    /// Gets or sets a value indicating that sort must be performed in descending order.
-    /// </summary>
-    public bool Descending
-    {
-      get { return descending; }
-      set { descending = value; }
-    }
+        /// <summary>
+        /// Gets or sets a value indicating that sort must be performed in descending order.
+        /// </summary>
+        public bool Descending { get; set; }
 
-    /// <summary>
-    /// Serializes the class.
-    /// </summary>
-    /// <param name="writer">Writer object.</param>
-    /// <remarks>
-    /// This method is for internal use only.
-    /// </remarks>
-    public void Serialize(FRWriter writer)
-    {
-      writer.ItemName = "Sort";
-      writer.WriteStr("Expression", Expression);
-      if (Descending)
-        writer.WriteBool("Descending", Descending);
-    }
+        /// <summary>
+        /// Serializes the class.
+        /// </summary>
+        /// <param name="writer">Writer object.</param>
+        /// <remarks>
+        /// This method is for internal use only.
+        /// </remarks>
+        public void Serialize (FRWriter writer)
+        {
+            writer.ItemName = "Sort";
+            writer.WriteStr ("Expression", Expression);
+            if (Descending)
+            {
+                writer.WriteBool ("Descending", Descending);
+            }
+        }
 
-    /// <summary>
-    /// Deserializes the class.
-    /// </summary>
-    /// <param name="reader">Reader object.</param>
-    /// <remarks>
-    /// This method is for internal use only.
-    /// </remarks>
-    public void Deserialize(FRReader reader)
-    {
-      reader.ReadProperties(this);
-    }
+        /// <summary>
+        /// Deserializes the class.
+        /// </summary>
+        /// <param name="reader">Reader object.</param>
+        /// <remarks>
+        /// This method is for internal use only.
+        /// </remarks>
+        public void Deserialize (FRReader reader)
+        {
+            reader.ReadProperties (this);
+        }
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Sort"/> class with default settings.
-    /// </summary>
-    public Sort() : this("")
-    {
-    }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Sort"/> class with default settings.
+        /// </summary>
+        public Sort() : this ("")
+        {
+        }
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Sort"/> class with specified expression.
-    /// </summary>
-    public Sort(string expression) : this(expression, false)
-    {
-    }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Sort"/> class with specified expression.
+        /// </summary>
+        public Sort (string expression) : this (expression, false)
+        {
+        }
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Sort"/> class with specified expression and sort order.
-    /// </summary>
-    public Sort(string expression, bool descending)
-    {
-            this.expression = expression;
-            this.descending = descending;
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Sort"/> class with specified expression and sort order.
+        /// </summary>
+        public Sort (string expression, bool descending)
+        {
+            this.Expression = expression;
+            this.Descending = descending;
+        }
     }
-  }
 }

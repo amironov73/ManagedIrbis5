@@ -18,9 +18,11 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+
 using AM.Reporting.Table;
 using AM.Reporting.Data;
 using AM.Reporting.Utils;
+
 using System.Drawing.Design;
 
 #endregion
@@ -115,30 +117,18 @@ namespace AM.Reporting.Matrix
     public partial class MatrixObject : TableBase
     {
         #region Fields
+
         private bool autoSize;
         private bool cellsSideBySide;
-        private bool keepCellsSideBySide;
         private DataSourceBase dataSource;
-        private string filter;
         private bool showTitle;
         private string style;
-        private MatrixData data;
-        private string manualBuildEvent;
-        private string modifyResultEvent;
-        private string afterTotalsEvent;
-        private MatrixHelper helper;
         private bool saveVisible;
-        private MatrixStyleSheet styleSheet;
-        private object[] columnValues;
-        private object[] rowValues;
-        private int columnIndex;
-        private int rowIndex;
-        private MatrixEvenStylePriority matrixEvenStylePriority;
-        private bool splitRows;
-        private bool printIfEmpty;
+
         #endregion
 
         #region Properties
+
         /// <summary>
         /// Allows to fill the matrix in code.
         /// </summary>
@@ -191,11 +181,11 @@ namespace AM.Reporting.Matrix
         /// <summary>
         /// Gets or sets a value that determines whether the matrix must calculate column/row sizes automatically.
         /// </summary>
-        [DefaultValue(true)]
-        [Category("Behavior")]
+        [DefaultValue (true)]
+        [Category ("Behavior")]
         public bool AutoSize
         {
-            get { return autoSize; }
+            get => autoSize;
             set
             {
                 autoSize = value;
@@ -203,6 +193,7 @@ namespace AM.Reporting.Matrix
                 {
                     column.AutoSize = AutoSize;
                 }
+
                 foreach (TableRow row in Rows)
                 {
                     row.AutoSize = AutoSize;
@@ -217,11 +208,11 @@ namespace AM.Reporting.Matrix
         /// This property can be used if matrix has two or more data cells. Default property value
         /// is <b>false</b> - that means the data cells will be stacked.
         /// </remarks>
-        [DefaultValue(false)]
-        [Category("Behavior")]
+        [DefaultValue (false)]
+        [Category ("Behavior")]
         public bool CellsSideBySide
         {
-            get { return cellsSideBySide; }
+            get => cellsSideBySide;
             set
             {
                 if (cellsSideBySide != value)
@@ -244,13 +235,9 @@ namespace AM.Reporting.Matrix
         /// <summary>
         /// Gets or sets a value indicating that the side-by-side cells must be kept together on the same page.
         /// </summary>
-        [DefaultValue(false)]
-        [Category("Behavior")]
-        public bool KeepCellsSideBySide
-        {
-            get { return keepCellsSideBySide; }
-            set { keepCellsSideBySide = value; }
-        }
+        [DefaultValue (false)]
+        [Category ("Behavior")]
+        public bool KeepCellsSideBySide { get; set; }
 
         /// <summary>
         /// Gets or sets a data source.
@@ -260,19 +247,25 @@ namespace AM.Reporting.Matrix
         /// this property will be set automatically. However you need to set it if you create
         /// the matrix in code.
         /// </remarks>
-        [Category("Data")]
+        [Category ("Data")]
         public DataSourceBase DataSource
         {
-            get { return dataSource; }
+            get => dataSource;
             set
             {
                 if (dataSource != value)
                 {
                     if (dataSource != null)
-                        dataSource.Disposed -= new EventHandler(DataSource_Disposed);
+                    {
+                        dataSource.Disposed -= new EventHandler (DataSource_Disposed);
+                    }
+
                     if (value != null)
-                        value.Disposed += new EventHandler(DataSource_Disposed);
+                    {
+                        value.Disposed += new EventHandler (DataSource_Disposed);
+                    }
                 }
+
                 dataSource = value;
             }
         }
@@ -284,38 +277,36 @@ namespace AM.Reporting.Matrix
         /// This property can contain any valid boolean expression. If the expression returns <b>false</b>,
         /// the corresponding data row will be skipped.
         /// </remarks>
-        [Category("Data")]
-        [Editor("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof(UITypeEditor))]
-        public string Filter
-        {
-            get { return filter; }
-            set { filter = value; }
-        }
+        [Category ("Data")]
+        [Editor ("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof (UITypeEditor))]
+        public string Filter { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether to show a title row.
         /// </summary>
-        [DefaultValue(false)]
-        [Category("Behavior")]
+        [DefaultValue (false)]
+        [Category ("Behavior")]
         public bool ShowTitle
         {
-            get { return showTitle; }
+            get => showTitle;
             set
             {
                 showTitle = value;
                 if (IsDesigning)
+                {
                     BuildTemplate();
+                }
             }
         }
 
         /// <summary>
         /// Gets or sets a matrix style.
         /// </summary>
-        [Category("Appearance")]
-        [Editor("AM.Reporting.TypeEditors.MatrixStyleEditor, AM.Reporting", typeof(UITypeEditor))]
+        [Category ("Appearance")]
+        [Editor ("AM.Reporting.TypeEditors.MatrixStyleEditor, AM.Reporting", typeof (UITypeEditor))]
         public new string Style
         {
-            get { return style; }
+            get => style;
             set
             {
                 style = value;
@@ -326,35 +317,23 @@ namespace AM.Reporting.Matrix
         /// <summary>
         /// Gets or sets even style priority for matrix cells.
         /// </summary>
-        [Category("Behavior")]
-        [DefaultValue(MatrixEvenStylePriority.Rows)]
-        public MatrixEvenStylePriority MatrixEvenStylePriority
-        {
-            get { return matrixEvenStylePriority; }
-            set { matrixEvenStylePriority = value; }
-        }
+        [Category ("Behavior")]
+        [DefaultValue (MatrixEvenStylePriority.Rows)]
+        public MatrixEvenStylePriority MatrixEvenStylePriority { get; set; }
 
         /// <summary>
         /// Gets or sets need split rows.
         /// </summary>
-        [Category("Behavior")]
-        [DefaultValue(false)]
-        public bool SplitRows
-        {
-            get { return splitRows; }
-            set { splitRows = value; }
-        }
+        [Category ("Behavior")]
+        [DefaultValue (false)]
+        public bool SplitRows { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating that empty matrix should be printed.
         /// </summary>
-        [Category("Behavior")]
-        [DefaultValue(true)]
-        public bool PrintIfEmpty
-        {
-            get { return printIfEmpty; }
-            set { printIfEmpty = value; }
-        }
+        [Category ("Behavior")]
+        [DefaultValue (true)]
+        public bool PrintIfEmpty { get; set; }
 
         /// <summary>
         /// Gets or sets a script method name that will be used to handle the
@@ -363,12 +342,8 @@ namespace AM.Reporting.Matrix
         /// <remarks>
         /// See the <see cref="ManualBuild"/> event for more details.
         /// </remarks>
-        [Category("Build")]
-        public string ManualBuildEvent
-        {
-            get { return manualBuildEvent; }
-            set { manualBuildEvent = value; }
-        }
+        [Category ("Build")]
+        public string ManualBuildEvent { get; set; }
 
         /// <summary>
         /// Gets or sets a script method name that will be used to handle the
@@ -377,12 +352,8 @@ namespace AM.Reporting.Matrix
         /// <remarks>
         /// See the <see cref="ModifyResult"/> event for more details.
         /// </remarks>
-        [Category("Build")]
-        public string ModifyResultEvent
-        {
-            get { return modifyResultEvent; }
-            set { modifyResultEvent = value; }
-        }
+        [Category ("Build")]
+        public string ModifyResultEvent { get; set; }
 
         /// <summary>
         /// Gets or sets a script method name that will be used to handle the
@@ -391,12 +362,8 @@ namespace AM.Reporting.Matrix
         /// <remarks>
         /// See the <see cref="AfterTotals"/> event for more details.
         /// </remarks>
-        [Category("Build")]
-        public string AfterTotalsEvent
-        {
-            get { return afterTotalsEvent; }
-            set { afterTotalsEvent = value; }
-        }
+        [Category ("Build")]
+        public string AfterTotalsEvent { get; set; }
 
 
         /// <summary>
@@ -406,11 +373,8 @@ namespace AM.Reporting.Matrix
         /// <remarks>
         /// See the <see cref="MatrixData"/> class for more details.
         /// </remarks>
-        [Browsable(false)]
-        public MatrixData Data
-        {
-            get { return data; }
-        }
+        [Browsable (false)]
+        public MatrixData Data { get; private set; }
 
         /// <summary>
         /// Gets or sets array of values that describes the currently printing column.
@@ -434,12 +398,8 @@ namespace AM.Reporting.Matrix
         ///   </item>
         /// </list>
         /// </remarks>
-        [Browsable(false)]
-        public object[] ColumnValues
-        {
-            get { return columnValues; }
-            set { columnValues = value; }
-        }
+        [Browsable (false)]
+        public object[] ColumnValues { get; set; }
 
         /// <summary>
         /// Gets or sets array of values that describes the currently printing row.
@@ -463,12 +423,8 @@ namespace AM.Reporting.Matrix
         ///   </item>
         /// </list>
         /// </remarks>
-        [Browsable(false)]
-        public object[] RowValues
-        {
-            get { return rowValues; }
-            set { rowValues = value; }
-        }
+        [Browsable (false)]
+        public object[] RowValues { get; set; }
 
         /// <summary>
         /// Gets or sets the index of currently printing column.
@@ -489,12 +445,8 @@ namespace AM.Reporting.Matrix
         ///   </item>
         /// </list>
         /// </remarks>
-        [Browsable(false)]
-        public int ColumnIndex
-        {
-            get { return columnIndex; }
-            set { columnIndex = value; }
-        }
+        [Browsable (false)]
+        public int ColumnIndex { get; set; }
 
         /// <summary>
         /// Gets or sets the index of currently printing row.
@@ -515,35 +467,25 @@ namespace AM.Reporting.Matrix
         ///   </item>
         /// </list>
         /// </remarks>
-        [Browsable(false)]
-        public int RowIndex
-        {
-            get { return rowIndex; }
-            set { rowIndex = value; }
-        }
+        [Browsable (false)]
+        public int RowIndex { get; set; }
 
-        internal MatrixStyleSheet StyleSheet
-        {
-            get { return styleSheet; }
-        }
+        internal MatrixStyleSheet StyleSheet { get; }
 
-        private MatrixHelper Helper
-        {
-            get { return helper; }
-        }
+        private MatrixHelper Helper { get; }
 
-        internal bool IsResultMatrix
-        {
-            get { return !IsDesigning && Data.Columns.Count == 0 && Data.Rows.Count == 0; }
-        }
+        internal bool IsResultMatrix => !IsDesigning && Data.Columns.Count == 0 && Data.Rows.Count == 0;
 
         private BandBase ParentBand
         {
             get
             {
-                BandBase parentBand = this.Band;
-                if (parentBand is ChildBand)
-                    parentBand = (parentBand as ChildBand).GetTopParentBand;
+                var parentBand = Band;
+                if (parentBand is ChildBand band)
+                {
+                    parentBand = band.GetTopParentBand;
+                }
+
                 return parentBand;
             }
         }
@@ -554,9 +496,14 @@ namespace AM.Reporting.Matrix
             {
                 DataBand dataBand = null;
                 if (ParentBand is GroupFooterBand)
+                {
                     dataBand = ((ParentBand as GroupFooterBand).Parent as GroupHeaderBand).GroupDataBand;
+                }
                 else if (ParentBand is DataFooterBand)
+                {
                     dataBand = ParentBand.Parent as DataBand;
+                }
+
                 return dataBand;
             }
         }
@@ -565,20 +512,24 @@ namespace AM.Reporting.Matrix
         {
             get
             {
-                DataBand dataBand = FootersDataBand;
+                var dataBand = FootersDataBand;
                 if (dataBand != null)
                 {
                     return DataSource == dataBand.DataSource;
                 }
+
                 return false;
             }
         }
+
         #endregion
 
         #region Private Methods
+
         private void CreateResultTable()
         {
-            SetResultTable(new TableResult());
+            SetResultTable (new TableResult());
+
             // assign properties from this object. Do not use Assign method: TableResult is incompatible with MatrixObject.
             ResultTable.OriginalComponent = OriginalComponent;
             ResultTable.Alias = Alias;
@@ -592,75 +543,97 @@ namespace AM.Reporting.Matrix
             ResultTable.Layout = Layout;
             ResultTable.WrappedGap = WrappedGap;
             ResultTable.AdjustSpannedCellsWidth = AdjustSpannedCellsWidth;
-            ResultTable.SetReport(Report);
-            ResultTable.AfterData += new EventHandler(ResultTable_AfterData);
+            ResultTable.SetReport (Report);
+            ResultTable.AfterData += new EventHandler (ResultTable_AfterData);
         }
 
         private void DisposeResultTable()
         {
             ResultTable.Dispose();
-            SetResultTable(null);
+            SetResultTable (null);
         }
 
-        private void ResultTable_AfterData(object sender, EventArgs e)
+        private void ResultTable_AfterData (object sender, EventArgs e)
         {
-            OnModifyResult(e);
+            OnModifyResult (e);
         }
 
-        private void DataSource_Disposed(object sender, EventArgs e)
+        private void DataSource_Disposed (object sender, EventArgs e)
         {
             dataSource = null;
         }
 
-        private void WireEvents(bool wire)
+        private void WireEvents (bool wire)
         {
             if (IsOnFooter)
             {
-                DataBand dataBand = FootersDataBand;
+                var dataBand = FootersDataBand;
                 if (wire)
-                    dataBand.BeforePrint += new EventHandler(dataBand_BeforePrint);
+                {
+                    dataBand.BeforePrint += new EventHandler (dataBand_BeforePrint);
+                }
                 else
-                    dataBand.BeforePrint -= new EventHandler(dataBand_BeforePrint);
+                {
+                    dataBand.BeforePrint -= new EventHandler (dataBand_BeforePrint);
+                }
             }
         }
 
-        private void dataBand_BeforePrint(object sender, EventArgs e)
+        private void dataBand_BeforePrint (object sender, EventArgs e)
         {
-            bool firstRow = (sender as DataBand).IsFirstRow;
+            var firstRow = (sender as DataBand).IsFirstRow;
             if (firstRow)
+            {
                 Helper.StartPrint();
+            }
 
             object match = true;
-            if (!String.IsNullOrEmpty(Filter))
-                match = Report.Calc(Filter);
+            if (!string.IsNullOrEmpty (Filter))
+            {
+                match = Report.Calc (Filter);
+            }
 
-            if (match is bool && (bool)match == true)
+            if (match is bool b && b == true)
+            {
                 Helper.AddDataRow();
+            }
         }
+
         #endregion
 
         #region Protected Methods
+
         /// <inheritdoc/>
-        protected override void DeserializeSubItems(FRReader reader)
+        protected override void DeserializeSubItems (FRReader reader)
         {
-            if (String.Compare(reader.ItemName, "MatrixColumns", true) == 0)
-                reader.Read(Data.Columns);
-            else if (String.Compare(reader.ItemName, "MatrixRows", true) == 0)
-                reader.Read(Data.Rows);
-            else if (String.Compare(reader.ItemName, "MatrixCells", true) == 0)
-                reader.Read(Data.Cells);
+            if (string.Compare (reader.ItemName, "MatrixColumns", true) == 0)
+            {
+                reader.Read (Data.Columns);
+            }
+            else if (string.Compare (reader.ItemName, "MatrixRows", true) == 0)
+            {
+                reader.Read (Data.Rows);
+            }
+            else if (string.Compare (reader.ItemName, "MatrixCells", true) == 0)
+            {
+                reader.Read (Data.Cells);
+            }
             else
-                base.DeserializeSubItems(reader);
+            {
+                base.DeserializeSubItems (reader);
+            }
         }
+
         #endregion
 
         #region Public Methods
-        /// <inheritdoc/>
-        public override void Assign(Base source)
-        {
-            base.Assign(source);
 
-            MatrixObject src = source as MatrixObject;
+        /// <inheritdoc/>
+        public override void Assign (Base source)
+        {
+            base.Assign (source);
+
+            var src = source as MatrixObject;
             AutoSize = src.AutoSize;
             CellsSideBySide = src.CellsSideBySide;
             KeepCellsSideBySide = src.KeepCellsSideBySide;
@@ -671,50 +644,90 @@ namespace AM.Reporting.Matrix
             MatrixEvenStylePriority = src.MatrixEvenStylePriority;
             SplitRows = src.SplitRows;
             PrintIfEmpty = src.PrintIfEmpty;
-            data = src.Data;
+            Data = src.Data;
         }
 
         /// <inheritdoc/>
-        public override void Serialize(FRWriter writer)
+        public override void Serialize (FRWriter writer)
         {
             if (writer.SerializeTo != SerializeTo.SourcePages)
             {
-                writer.Write(Data.Columns);
-                writer.Write(Data.Rows);
-                writer.Write(Data.Cells);
+                writer.Write (Data.Columns);
+                writer.Write (Data.Rows);
+                writer.Write (Data.Cells);
             }
             else
-                RefreshTemplate(true);
+            {
+                RefreshTemplate (true);
+            }
 
-            base.Serialize(writer);
-            MatrixObject c = writer.DiffObject as MatrixObject;
+            base.Serialize (writer);
+            var c = writer.DiffObject as MatrixObject;
 
             if (AutoSize != c.AutoSize)
-                writer.WriteBool("AutoSize", AutoSize);
+            {
+                writer.WriteBool ("AutoSize", AutoSize);
+            }
+
             if (CellsSideBySide != c.CellsSideBySide)
-                writer.WriteBool("CellsSideBySide", CellsSideBySide);
+            {
+                writer.WriteBool ("CellsSideBySide", CellsSideBySide);
+            }
+
             if (KeepCellsSideBySide != c.KeepCellsSideBySide)
-                writer.WriteBool("KeepCellsSideBySide", KeepCellsSideBySide);
+            {
+                writer.WriteBool ("KeepCellsSideBySide", KeepCellsSideBySide);
+            }
+
             if (DataSource != c.DataSource)
-                writer.WriteRef("DataSource", DataSource);
+            {
+                writer.WriteRef ("DataSource", DataSource);
+            }
+
             if (Filter != c.Filter)
-                writer.WriteStr("Filter", Filter);
+            {
+                writer.WriteStr ("Filter", Filter);
+            }
+
             if (ShowTitle != c.ShowTitle)
-                writer.WriteBool("ShowTitle", ShowTitle);
+            {
+                writer.WriteBool ("ShowTitle", ShowTitle);
+            }
+
             if (Style != c.Style)
-                writer.WriteStr("Style", Style);
+            {
+                writer.WriteStr ("Style", Style);
+            }
+
             if (MatrixEvenStylePriority != c.MatrixEvenStylePriority)
-                writer.WriteValue("MatrixEvenStylePriority", MatrixEvenStylePriority);
+            {
+                writer.WriteValue ("MatrixEvenStylePriority", MatrixEvenStylePriority);
+            }
+
             if (SplitRows != c.SplitRows)
-                writer.WriteBool("SplitRows", SplitRows);
+            {
+                writer.WriteBool ("SplitRows", SplitRows);
+            }
+
             if (PrintIfEmpty != c.PrintIfEmpty)
-                writer.WriteBool("PrintIfEmpty", PrintIfEmpty);
+            {
+                writer.WriteBool ("PrintIfEmpty", PrintIfEmpty);
+            }
+
             if (ManualBuildEvent != c.ManualBuildEvent)
-                writer.WriteStr("ManualBuildEvent", ManualBuildEvent);
+            {
+                writer.WriteStr ("ManualBuildEvent", ManualBuildEvent);
+            }
+
             if (ModifyResultEvent != c.ModifyResultEvent)
-                writer.WriteStr("ModifyResultEvent", ModifyResultEvent);
+            {
+                writer.WriteStr ("ModifyResultEvent", ModifyResultEvent);
+            }
+
             if (AfterTotalsEvent != c.AfterTotalsEvent)
-                writer.WriteStr("AfterTotalsEvent", AfterTotalsEvent);
+            {
+                writer.WriteStr ("AfterTotalsEvent", AfterTotalsEvent);
+            }
         }
 
         /// <summary>
@@ -728,44 +741,50 @@ namespace AM.Reporting.Matrix
         {
             Helper.BuildTemplate();
         }
+
         #endregion
 
         #region Report Engine
+
         /// <inheritdoc/>
         public override void InitializeComponent()
         {
             base.InitializeComponent();
-            WireEvents(true);
+            WireEvents (true);
         }
 
         /// <inheritdoc/>
         public override void FinalizeComponent()
         {
             base.FinalizeComponent();
-            WireEvents(false);
+            WireEvents (false);
         }
 
         /// <inheritdoc/>
         public override string[] GetExpressions()
         {
             List<string> expressions = new List<string>();
-            expressions.AddRange(base.GetExpressions());
+            expressions.AddRange (base.GetExpressions());
 
             Helper.UpdateDescriptors();
             List<MatrixDescriptor> descrList = new List<MatrixDescriptor>();
-            descrList.AddRange(Data.Columns.ToArray());
-            descrList.AddRange(Data.Rows.ToArray());
-            descrList.AddRange(Data.Cells.ToArray());
+            descrList.AddRange (Data.Columns.ToArray());
+            descrList.AddRange (Data.Rows.ToArray());
+            descrList.AddRange (Data.Cells.ToArray());
 
-            foreach (MatrixDescriptor descr in descrList)
+            foreach (var descr in descrList)
             {
-                expressions.Add(descr.Expression);
+                expressions.Add (descr.Expression);
                 if (descr.TemplateCell != null)
+                {
                     descr.TemplateCell.AllowExpressions = false;
+                }
             }
 
-            if (!String.IsNullOrEmpty(Filter))
-                expressions.Add(Filter);
+            if (!string.IsNullOrEmpty (Filter))
+            {
+                expressions.Add (Filter);
+            }
 
             return expressions.ToArray();
         }
@@ -774,9 +793,11 @@ namespace AM.Reporting.Matrix
         public override void SaveState()
         {
             saveVisible = Visible;
-            BandBase parent = Parent as BandBase;
+            var parent = Parent as BandBase;
             if (!Visible || (parent != null && !parent.Visible))
+            {
                 return;
+            }
 
             // create the result table that will be rendered in the preview
             CreateResultTable();
@@ -804,24 +825,30 @@ namespace AM.Reporting.Matrix
         }
 
         /// <inheritdoc/>
-        public override void OnAfterData(EventArgs e)
+        public override void OnAfterData (EventArgs e)
         {
-            base.OnAfterData(e);
+            base.OnAfterData (e);
             Helper.FinishPrint();
 
             if (PrintOnParent)
-                ResultTable.AddToParent(Parent);
+            {
+                ResultTable.AddToParent (Parent);
+            }
         }
 
         /// <inheritdoc/>
         public override void RestoreState()
         {
-            BandBase parent = Parent as BandBase;
+            var parent = Parent as BandBase;
             if (!saveVisible || (parent != null && !parent.Visible))
+            {
                 return;
+            }
 
             if (parent != null && !PrintOnParent)
+            {
                 parent.AfterPrint -= ResultTable.GeneratePages;
+            }
 
             DisposeResultTable();
             Visible = saveVisible;
@@ -831,33 +858,42 @@ namespace AM.Reporting.Matrix
         /// This method fires the <b>ManualBuild</b> event and the script code connected to the <b>ManualBuildEvent</b>.
         /// </summary>
         /// <param name="e">Event data.</param>
-        public void OnManualBuild(EventArgs e)
+        public void OnManualBuild (EventArgs e)
         {
             if (ManualBuild != null)
-                ManualBuild(this, e);
-            InvokeEvent(ManualBuildEvent, e);
+            {
+                ManualBuild (this, e);
+            }
+
+            InvokeEvent (ManualBuildEvent, e);
         }
 
         /// <summary>
         /// This method fires the <b>ModifyResult</b> event and the script code connected to the <b>ModifyResultEvent</b>.
         /// </summary>
         /// <param name="e">Event data.</param>
-        public void OnModifyResult(EventArgs e)
+        public void OnModifyResult (EventArgs e)
         {
             if (ModifyResult != null)
-                ModifyResult(this, e);
-            InvokeEvent(ModifyResultEvent, e);
+            {
+                ModifyResult (this, e);
+            }
+
+            InvokeEvent (ModifyResultEvent, e);
         }
 
         /// <summary>
         /// This method fires the <b>AfterTotals</b> event and the script code connected to the <b>AfterTotalsEvent</b>.
         /// </summary>
         /// <param name="e">Event data.</param>
-        public void OnAfterTotals(EventArgs e)
+        public void OnAfterTotals (EventArgs e)
         {
             if (AfterTotals != null)
-                AfterTotals(this, e);
-            InvokeEvent(AfterTotalsEvent, e);
+            {
+                AfterTotals (this, e);
+            }
+
+            InvokeEvent (AfterTotalsEvent, e);
         }
 
         /// <summary>
@@ -870,9 +906,9 @@ namespace AM.Reporting.Matrix
         /// This is a shortcut method to call the matrix <b>Data.AddValue</b>.
         /// See the <see cref="MatrixData.AddValue(object[],object[],object[])"/> method for more details.
         /// </remarks>
-        public void AddValue(object[] columnValues, object[] rowValues, object[] cellValues)
+        public void AddValue (object[] columnValues, object[] rowValues, object[] cellValues)
         {
-            Data.AddValue(columnValues, rowValues, cellValues, 0);
+            Data.AddValue (columnValues, rowValues, cellValues, 0);
         }
 
         /// <summary>
@@ -886,12 +922,15 @@ namespace AM.Reporting.Matrix
         /// <para/>Matrix1.Value(0) / Matrix1.Value(1)
         /// <para/>will return the result of dividing the first data cell's value by the second one.
         /// </remarks>
-        public Variant Value(int index)
+        public Variant Value (int index)
         {
-            object value = Helper.CellValues[index];
+            var value = Helper.CellValues[index];
             if (value == null)
+            {
                 value = 0;
-            return new Variant(value);
+            }
+
+            return new Variant (value);
         }
 
         #endregion
@@ -902,17 +941,17 @@ namespace AM.Reporting.Matrix
         public MatrixObject()
         {
             autoSize = true;
-            data = new MatrixData();
-            manualBuildEvent = "";
-            afterTotalsEvent = "";
-            helper = new MatrixHelper(this);
+            Data = new MatrixData();
+            ManualBuildEvent = "";
+            AfterTotalsEvent = "";
+            Helper = new MatrixHelper (this);
             InitDesign();
-            styleSheet = new MatrixStyleSheet();
-            styleSheet.Load(ResourceLoader.GetStream("cross.frss"));
+            StyleSheet = new MatrixStyleSheet();
+            StyleSheet.Load (ResourceLoader.GetStream ("cross.frss"));
             style = "";
-            filter = "";
-            splitRows = false;
-            printIfEmpty = true;
+            Filter = "";
+            SplitRows = false;
+            PrintIfEmpty = true;
         }
     }
 }

@@ -16,6 +16,7 @@
 #region Using directives
 
 using AM.Reporting.Dialog;
+
 using System.Windows.Forms;
 
 #endregion
@@ -27,7 +28,6 @@ namespace AM.Reporting.Engine
     public partial class ReportEngine
     {
         #region Private Methods
-
 
         private bool RunDialogs()
         {

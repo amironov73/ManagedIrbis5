@@ -32,41 +32,41 @@ namespace AM.Reporting.Functions
 
         private static string[] fixedWords =
         {
-      "", "یک", "دو", "سه", "چهار", "پنج", "شش",
-      "هفت", "هشت", "نه", "ده", "یازده",
-      "دوازده", "سیزده", "چهارده", "پانزده",
-      "شانزده", "هفده", "هجده", "نوزده"
-    };
+            "", "یک", "دو", "سه", "چهار", "پنج", "شش",
+            "هفت", "هشت", "نه", "ده", "یازده",
+            "دوازده", "سیزده", "چهارده", "پانزده",
+            "شانزده", "هفده", "هجده", "نوزده"
+        };
 
         private static string[] tens =
         {
-      "", "ده", "بیست", "سی", "چهل", "پنجاه",
-      "شصت", "هفتاد", "هشتاد", "نود"
-    };
+            "", "ده", "بیست", "سی", "چهل", "پنجاه",
+            "شصت", "هفتاد", "هشتاد", "نود"
+        };
 
         private static string[] hunds =
         {
-      "", "صد", "دویست", "سیصد", "چهارصد",
-      "پانصد", "ششصد", "هفتصد", "هشتصد", "نهصد"
-    };
+            "", "صد", "دویست", "سیصد", "چهارصد",
+            "پانصد", "ششصد", "هفتصد", "هشتصد", "نهصد"
+        };
 
-        private static WordInfo thousands = new WordInfo( "هزار");
-        private static WordInfo millions = new WordInfo("میلیون");
-        private static WordInfo milliards = new WordInfo("میلیارد");
-        private static WordInfo trillions = new WordInfo("تریلیون");
+        private static WordInfo thousands = new WordInfo ("هزار");
+        private static WordInfo millions = new WordInfo ("میلیون");
+        private static WordInfo milliards = new WordInfo ("میلیارد");
+        private static WordInfo trillions = new WordInfo ("تریلیون");
 
-        protected override string GetFixedWords(bool male, long value)
+        protected override string GetFixedWords (bool male, long value)
         {
-            string result = fixedWords[value];
+            var result = fixedWords[value];
             return result;
         }
 
-        protected override string GetTen(bool male, long value)
+        protected override string GetTen (bool male, long value)
         {
             return tens[value];
         }
 
-        protected override string GetHund(bool male, long value)
+        protected override string GetHund (bool male, long value)
         {
             return hunds[value / 100];
         }
@@ -91,7 +91,7 @@ namespace AM.Reporting.Functions
             return trillions;
         }
 
-        protected override CurrencyInfo GetCurrency(string currencyName)
+        protected override CurrencyInfo GetCurrency (string currencyName)
         {
             return currencyList[currencyName];
         }
@@ -120,17 +120,18 @@ namespace AM.Reporting.Functions
         {
             return "و ";
         }
+
         static NumToWordsPersian()
         {
-            currencyList = new Dictionary<string, CurrencyInfo>(3);
-            currencyList.Add("EUR", new CurrencyInfo(
-              new WordInfo("یورو"),
-              new WordInfo("یورو سنت")));
-            currencyList.Add("USD", new CurrencyInfo(
-              new WordInfo("دلار"),
-              new WordInfo("سنت")));
-            currencyList.Add("IRR", new CurrencyInfo(
-                new WordInfo("ریال‎"), new WordInfo("دینار")));
+            currencyList = new Dictionary<string, CurrencyInfo> (3);
+            currencyList.Add ("EUR", new CurrencyInfo (
+                new WordInfo ("یورو"),
+                new WordInfo ("یورو سنت")));
+            currencyList.Add ("USD", new CurrencyInfo (
+                new WordInfo ("دلار"),
+                new WordInfo ("سنت")));
+            currencyList.Add ("IRR", new CurrencyInfo (
+                new WordInfo ("ریال‎"), new WordInfo ("دینار")));
         }
     }
 }

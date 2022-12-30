@@ -27,7 +27,7 @@ namespace AM.Reporting.Code.CodeDom.Compiler
         {
         }
 
-        public CompilerResults(Assembly compiledAssembly)
+        public CompilerResults (Assembly compiledAssembly)
         {
             CompiledAssembly = compiledAssembly;
         }

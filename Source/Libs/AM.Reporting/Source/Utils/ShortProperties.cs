@@ -25,38 +25,44 @@ using System.Collections.Generic;
 
 namespace AM.Reporting.Utils
 {
-  internal static class ShortProperties
-  {
-    private static SortedList<string, string> FProps = new SortedList<string, string>();
-
-    public static void Add(string shortName, string name)
+    internal static class ShortProperties
     {
-      if (!FProps.ContainsKey(shortName))
-        FProps.Add(shortName, name);
-    }
+        private static SortedList<string, string> FProps = new SortedList<string, string>();
 
-    public static string GetFullName(string name)
-    {
-      int i = FProps.IndexOfKey(name);
-      return i == -1 ? name : FProps.Values[i];
-    }
+        public static void Add (string shortName, string name)
+        {
+            if (!FProps.ContainsKey (shortName))
+            {
+                FProps.Add (shortName, name);
+            }
+        }
 
-    public static string GetShortName(string name)
-    {
-      int i = FProps.IndexOfValue(name);
-      if (i != -1)
-        return FProps.Keys[i];
-      else
-        return name;
-    }
+        public static string GetFullName (string name)
+        {
+            var i = FProps.IndexOfKey (name);
+            return i == -1 ? name : FProps.Values[i];
+        }
 
-    static ShortProperties()
-    {
-      Add("l", "Left");
-      Add("t", "Top");
-      Add("w", "Width");
-      Add("h", "Height");
-      Add("x", "Text");
+        public static string GetShortName (string name)
+        {
+            var i = FProps.IndexOfValue (name);
+            if (i != -1)
+            {
+                return FProps.Keys[i];
+            }
+            else
+            {
+                return name;
+            }
+        }
+
+        static ShortProperties()
+        {
+            Add ("l", "Left");
+            Add ("t", "Top");
+            Add ("w", "Width");
+            Add ("h", "Height");
+            Add ("x", "Text");
+        }
     }
-  }
 }

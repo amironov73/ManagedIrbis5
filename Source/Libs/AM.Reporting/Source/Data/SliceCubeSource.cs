@@ -27,26 +27,30 @@ using System.Collections;
 
 namespace AM.Reporting.Data
 {
-  /// <summary>
-  /// Represents a datasource based on <b>DataView</b> class.
-  /// </summary>
-  /// <remarks>
-  /// This class is used to support AM.Reporting.Net infrastructure, do not use it directly.
-  /// If you want to use data from <b>DataView</b> object, call the
-  /// <see cref="AM.Reporting.Report.RegisterData(DataView, string)"/> method of the <b>Report</b>.
-  /// </remarks>
-  public class SliceCubeSource : CubeSourceBase
-  {
-    #region Properties
-    #endregion
+    /// <summary>
+    /// Represents a datasource based on <b>DataView</b> class.
+    /// </summary>
+    /// <remarks>
+    /// This class is used to support AM.Reporting.Net infrastructure, do not use it directly.
+    /// If you want to use data from <b>DataView</b> object, call the
+    /// <see cref="AM.Reporting.Report.RegisterData(DataView, string)"/> method of the <b>Report</b>.
+    /// </remarks>
+    public class SliceCubeSource : CubeSourceBase
+    {
+        #region Properties
 
-    #region Private Methods
-    #endregion
+        #endregion
 
-    #region Protected Methods
-    #endregion
+        #region Private Methods
 
-    #region Public Methods
-    #endregion
-  }
+        #endregion
+
+        #region Protected Methods
+
+        #endregion
+
+        #region Public Methods
+
+        #endregion
+    }
 }

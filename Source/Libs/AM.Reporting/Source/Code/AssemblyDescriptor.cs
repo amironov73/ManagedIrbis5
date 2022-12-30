@@ -27,6 +27,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Collections.Concurrent;
+
 using AM.Reporting.Data;
 using AM.Reporting.Engine;
 using AM.Reporting.Utils;
@@ -59,113 +60,132 @@ namespace AM.Reporting.Code
 
         public Hashtable Expressions { get; }
 
-        private void InsertItem(string text, string objName)
+        private void InsertItem (string text, string objName)
         {
-            string[] lines = text.Split('\r');
-            scriptText.Insert(insertPos, text);
-            SourcePosition pos = new SourcePosition(objName, insertLine, insertLine + lines.Length - 2);
-            sourcePositions.Add(pos);
+            string[] lines = text.Split ('\r');
+            scriptText.Insert (insertPos, text);
+            var pos = new SourcePosition (objName, insertLine, insertLine + lines.Length - 2);
+            sourcePositions.Add (pos);
             insertLine += lines.Length - 1;
             insertPos += text.Length;
         }
 
-        private void InitField(string name, object c)
+        private void InitField (string name, object c)
         {
-            FieldInfo info = Instance.GetType().GetField(name,
-              BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            info.SetValue(Instance, c);
+            var info = Instance.GetType().GetField (name,
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            info.SetValue (Instance, c);
         }
 
         private void InitFields()
         {
-            InitField("Report", Report);
-            InitField("Engine", Report.Engine);
-            ObjectCollection allObjects = Report.AllObjects;
+            InitField ("Report", Report);
+            InitField ("Engine", Report.Engine);
+            var allObjects = Report.AllObjects;
             foreach (Base c in allObjects)
             {
-                if (!String.IsNullOrEmpty(c.Name))
-                    InitField(c.Name, c);
+                if (!string.IsNullOrEmpty (c.Name))
+                {
+                    InitField (c.Name, c);
+                }
             }
         }
 
-        private string GetErrorObjectName(int errorLine)
+        private string GetErrorObjectName (int errorLine)
         {
-            foreach (SourcePosition pos in sourcePositions)
+            foreach (var pos in sourcePositions)
             {
                 if (errorLine >= pos.start && errorLine <= pos.end)
                 {
                     return pos.sourceObject;
                 }
             }
+
             return "";
         }
 
-        private int GetScriptLine(int errorLine)
+        private int GetScriptLine (int errorLine)
         {
-            int start = sourcePositions[0].start;
-            int end = sourcePositions[sourcePositions.Count - 1].end;
+            var start = sourcePositions[0].start;
+            var end = sourcePositions[sourcePositions.Count - 1].end;
             if (errorLine >= start && errorLine <= end)
+            {
                 return -1;
+            }
+
             if (errorLine > end)
+            {
                 return errorLine - (end - start + 1);
+            }
+
             return errorLine;
         }
 
-        private string ReplaceDataItems(string expression)
+        private string ReplaceDataItems (string expression)
         {
-            FindTextArgs args = new FindTextArgs();
-            args.Text = new FastString(expression);
-            args.OpenBracket = "[";
-            args.CloseBracket = "]";
+            var args = new FindTextArgs
+            {
+                Text = new FastString (expression),
+                OpenBracket = "[",
+                CloseBracket = "]"
+            };
 
             while (args.StartIndex < args.Text.Length)
             {
-                expression = CodeUtils.GetExpression(args, true);
+                expression = CodeUtils.GetExpression (args, true);
                 if (expression == null)
+                {
                     break;
+                }
 
-                if (DataHelper.IsValidColumn(Report.Dictionary, expression))
+                if (DataHelper.IsValidColumn (Report.Dictionary, expression))
                 {
-                    Type type = DataHelper.GetColumnType(Report.Dictionary, expression);
-                    expression = Report.CodeHelper.ReplaceColumnName(expression, type);
+                    var type = DataHelper.GetColumnType (Report.Dictionary, expression);
+                    expression = Report.CodeHelper.ReplaceColumnName (expression, type);
                 }
-                else if (DataHelper.IsValidParameter(Report.Dictionary, expression))
+                else if (DataHelper.IsValidParameter (Report.Dictionary, expression))
                 {
-                    expression = Report.CodeHelper.ReplaceParameterName(DataHelper.GetParameter(Report.Dictionary, expression));
+                    expression =
+                        Report.CodeHelper.ReplaceParameterName (DataHelper.GetParameter (Report.Dictionary,
+                            expression));
                 }
-                else if (DataHelper.IsValidTotal(Report.Dictionary, expression))
+                else if (DataHelper.IsValidTotal (Report.Dictionary, expression))
                 {
-                    expression = Report.CodeHelper.ReplaceTotalName(expression);
+                    expression = Report.CodeHelper.ReplaceTotalName (expression);
                 }
                 else
                 {
-                    expression = "[" + ReplaceDataItems(expression) + "]";
+                    expression = "[" + ReplaceDataItems (expression) + "]";
                 }
 
-                args.Text = args.Text.Remove(args.StartIndex, args.EndIndex - args.StartIndex);
-                args.Text = args.Text.Insert(args.StartIndex, expression);
+                args.Text = args.Text.Remove (args.StartIndex, args.EndIndex - args.StartIndex);
+                args.Text = args.Text.Insert (args.StartIndex, expression);
                 args.StartIndex += expression.Length;
             }
+
             return args.Text.ToString();
         }
 
-        private bool ContainsAssembly(StringCollection assemblies, string assembly)
+        private bool ContainsAssembly (StringCollection assemblies, string assembly)
         {
-            string asmName = Path.GetFileName(assembly);
-            foreach (string a in assemblies)
+            var asmName = Path.GetFileName (assembly);
+            foreach (var a in assemblies)
             {
-                string asmName1 = Path.GetFileName(a);
-                if (String.Compare(asmName, asmName1, true) == 0)
+                var asmName1 = Path.GetFileName (a);
+                if (string.Compare (asmName, asmName1, true) == 0)
+                {
                     return true;
+                }
             }
+
             return false;
         }
 
-        private void AddFastReportAssemblies(StringCollection assemblies)
+        private void AddFastReportAssemblies (StringCollection assemblies)
         {
-            foreach (Assembly assembly in RegisteredObjects.Assemblies)
+            foreach (var assembly in RegisteredObjects.Assemblies)
             {
-                string aLocation = assembly.Location;
+                var aLocation = assembly.Location;
 #if CROSSPLATFORM || COREWIN
                 if (aLocation == "")
                 {
@@ -175,24 +195,29 @@ namespace AM.Reporting.Code
                         aLocation = fixedReference;
                 }
 #endif
-                if (!ContainsAssembly(assemblies, aLocation))
-                    assemblies.Add(aLocation);
+                if (!ContainsAssembly (assemblies, aLocation))
+                {
+                    assemblies.Add (aLocation);
+                }
             }
         }
 
-        private void AddReferencedAssemblies(StringCollection assemblies, string defaultPath)
+        private void AddReferencedAssemblies (StringCollection assemblies, string defaultPath)
         {
-            for (int i = 0; i < Report.ReferencedAssemblies.Length; i++)
+            for (var i = 0; i < Report.ReferencedAssemblies.Length; i++)
             {
-                string s = Report.ReferencedAssemblies[i];
+                var s = Report.ReferencedAssemblies[i];
 
 #if CROSSPLATFORM
                 if (s == "System.Windows.Forms.dll")
                     s = "AM.Reporting.Compat";
 #endif
+
                 // fix for old reports with "System.Windows.Forms.DataVisualization" in referenced assemblies
-                if (s.IndexOf("System.Windows.Forms.DataVisualization") != -1)
+                if (s.IndexOf ("System.Windows.Forms.DataVisualization") != -1)
+                {
                     s = "AM.Reporting.DataVisualization";
+                }
 #if SKIA
                 if (s.IndexOf("AM.Reporting.Compat") != -1)
                     s = "AM.Reporting.Compat.Skia";
@@ -200,7 +225,7 @@ namespace AM.Reporting.Code
                     s = "AM.Reporting.DataVisualization.Skia";
 #endif
 
-                AddReferencedAssembly(assemblies, defaultPath, s);
+                AddReferencedAssembly (assemblies, defaultPath, s);
             }
 
 #if SKIA
@@ -208,34 +233,40 @@ namespace AM.Reporting.Code
 #endif
 
             // these two required for "dynamic" type support
-            AddReferencedAssembly(assemblies, defaultPath, "System.Core");
-            AddReferencedAssembly(assemblies, defaultPath, "Microsoft.CSharp");
+            AddReferencedAssembly (assemblies, defaultPath, "System.Core");
+            AddReferencedAssembly (assemblies, defaultPath, "Microsoft.CSharp");
         }
 
-        private void AddReferencedAssembly(StringCollection assemblies, string defaultPath, string assemblyName)
+        private void AddReferencedAssembly (StringCollection assemblies, string defaultPath, string assemblyName)
         {
-            string location = GetFullAssemblyReference(assemblyName, defaultPath);
-            if (location != "" && !ContainsAssembly(assemblies, location))
-                assemblies.Add(location);
+            var location = GetFullAssemblyReference (assemblyName, defaultPath);
+            if (location != "" && !ContainsAssembly (assemblies, location))
+            {
+                assemblies.Add (location);
+            }
         }
 
-        private string GetFullAssemblyReference(string relativeReference, string defaultPath)
+        private string GetFullAssemblyReference (string relativeReference, string defaultPath)
         {
             // in .NET Core we get the AssemblyReference in FR.Compat
 #if !(CROSSPLATFORM || COREWIN)
             if (relativeReference == null || relativeReference.Trim() == "")
+            {
                 return "";
+            }
 
             // Strip off any trailing ".dll" ".exe" if present.
-            string dllName = relativeReference;
-            if (string.Compare(relativeReference.Substring(relativeReference.Length - 4), ".dll", true) == 0 ||
-              string.Compare(relativeReference.Substring(relativeReference.Length - 4), ".exe", true) == 0)
-                dllName = relativeReference.Substring(0, relativeReference.Length - 4);
+            var dllName = relativeReference;
+            if (string.Compare (relativeReference.Substring (relativeReference.Length - 4), ".dll", true) == 0 ||
+                string.Compare (relativeReference.Substring (relativeReference.Length - 4), ".exe", true) == 0)
+            {
+                dllName = relativeReference.Substring (0, relativeReference.Length - 4);
+            }
 
             // See if the required assembly is already present in our current AppDomain
-            foreach (Assembly currAssembly in AppDomain.CurrentDomain.GetAssemblies())
+            foreach (var currAssembly in AppDomain.CurrentDomain.GetAssemblies())
             {
-                if (string.Compare(currAssembly.GetName().Name, dllName, true) == 0)
+                if (string.Compare (currAssembly.GetName().Name, dllName, true) == 0)
                 {
                     // Found it, return the location as the full reference.
                     return currAssembly.Location;
@@ -243,97 +274,117 @@ namespace AM.Reporting.Code
             }
 
             // See if the required assembly is present in the ReferencedAssemblies but not yet loaded
-            foreach (AssemblyName assemblyName in Assembly.GetExecutingAssembly().GetReferencedAssemblies())
+            foreach (var assemblyName in Assembly.GetExecutingAssembly().GetReferencedAssemblies())
             {
-                if (string.Compare(assemblyName.Name, dllName, true) == 0)
+                if (string.Compare (assemblyName.Name, dllName, true) == 0)
                 {
                     // Found it, try to load assembly and return the location as the full reference.
                     try
                     {
-                        return Assembly.ReflectionOnlyLoad(assemblyName.FullName).Location;
+                        return Assembly.ReflectionOnlyLoad (assemblyName.FullName).Location;
                     }
-                    catch { }
+                    catch
+                    {
+                    }
                 }
             }
 
             // See if the required assembly is present locally
-            string path = Path.Combine(defaultPath, relativeReference);
-            if (File.Exists(path))
+            var path = Path.Combine (defaultPath, relativeReference);
+            if (File.Exists (path))
+            {
                 return path;
+            }
 #endif
             return relativeReference;
         }
 
-        private void AddExpression(string expression, Base source, bool forceSimpleItems)
+        private void AddExpression (string expression, Base source, bool forceSimpleItems)
         {
-            if (expression.Trim() == "" || Expressions.ContainsKey(expression))
+            if (expression.Trim() == "" || Expressions.ContainsKey (expression))
+            {
                 return;
+            }
 
-            string expr = expression;
-            if (expr.StartsWith("[") && expr.EndsWith("]"))
-                expr = expr.Substring(1, expr.Length - 2);
+            var expr = expression;
+            if (expr.StartsWith ("[") && expr.EndsWith ("]"))
+            {
+                expr = expr.Substring (1, expr.Length - 2);
+            }
 
             // skip simple items. Report.Calc does this.
             if (!forceSimpleItems)
             {
-                if (DataHelper.IsSimpleColumn(Report.Dictionary, expr) ||
-                  DataHelper.IsValidParameter(Report.Dictionary, expr) ||
-                  DataHelper.IsValidTotal(Report.Dictionary, expr))
+                if (DataHelper.IsSimpleColumn (Report.Dictionary, expr) ||
+                    DataHelper.IsValidParameter (Report.Dictionary, expr) ||
+                    DataHelper.IsValidTotal (Report.Dictionary, expr))
+                {
                     return;
+                }
             }
 
             // handle complex expressions, relations
-            ExpressionDescriptor descriptor = new ExpressionDescriptor(this);
-            Expressions.Add(expression, descriptor);
+            var descriptor = new ExpressionDescriptor (this);
+            Expressions.Add (expression, descriptor);
             descriptor.MethodName = "CalcExpression";
 
-            if (DataHelper.IsValidColumn(Report.Dictionary, expr))
+            if (DataHelper.IsValidColumn (Report.Dictionary, expr))
+            {
                 expr = "[" + expr + "]";
+            }
             else
+            {
                 expr = expression;
-            string expressionCode = ReplaceDataItems(expr);
-            InsertItem(Report.CodeHelper.AddExpression(expression, expressionCode), source == null ? "" : source.Name);
+            }
+
+            var expressionCode = ReplaceDataItems (expr);
+            InsertItem (Report.CodeHelper.AddExpression (expression, expressionCode),
+                source == null ? "" : source.Name);
             needCompile = true;
         }
 
         public void AddObjects()
         {
-            ObjectCollection allObjects = Report.AllObjects;
+            var allObjects = Report.AllObjects;
             SortedList<string, Base> objects = new SortedList<string, Base>();
 
             // add all report objects
-            InsertItem(Report.CodeHelper.AddField(typeof(Report), "Report") +
-              Report.CodeHelper.AddField(typeof(ReportEngine), "Engine"), "Report");
+            InsertItem (Report.CodeHelper.AddField (typeof (Report), "Report") +
+                        Report.CodeHelper.AddField (typeof (ReportEngine), "Engine"), "Report");
             foreach (Base c in allObjects)
             {
-                if (!String.IsNullOrEmpty(c.Name) && !objects.ContainsKey(c.Name))
-                    objects.Add(c.Name, c);
+                if (!string.IsNullOrEmpty (c.Name) && !objects.ContainsKey (c.Name))
+                {
+                    objects.Add (c.Name, c);
+                }
             }
-            foreach (Base c in objects.Values)
+
+            foreach (var c in objects.Values)
             {
-                InsertItem(Report.CodeHelper.AddField(c.GetType(), c.Name), c.Name);
+                InsertItem (Report.CodeHelper.AddField (c.GetType(), c.Name), c.Name);
             }
 
             // add custom script
-            string processedCode = "";
-            foreach (Base c in objects.Values)
+            var processedCode = "";
+            foreach (var c in objects.Values)
             {
-                string customCode = c.GetCustomScript();
+                var customCode = c.GetCustomScript();
+
                 // avoid custom script duplicates
-                if (!String.IsNullOrEmpty(customCode) && processedCode.IndexOf(customCode) == -1)
+                if (!string.IsNullOrEmpty (customCode) && processedCode.IndexOf (customCode) == -1)
                 {
-                    InsertItem(customCode, c.Name);
+                    InsertItem (customCode, c.Name);
                     processedCode += customCode;
                     needCompile = true;
                 }
             }
         }
 
-        public void AddSingleExpression(string expression)
+        public void AddSingleExpression (string expression)
         {
-            InsertItem(Report.CodeHelper.BeginCalcExpression(), "");
-            AddExpression(expression, null, true);
-            InsertItem(Report.CodeHelper.EndCalcExpression(), "");
+            InsertItem (Report.CodeHelper.BeginCalcExpression(), "");
+            AddExpression (expression, null, true);
+            InsertItem (Report.CodeHelper.EndCalcExpression(), "");
             needCompile = true;
         }
 
@@ -342,13 +393,13 @@ namespace AM.Reporting.Code
             // speed up the case: lot of report objects (> 1000) and lot of data columns in the dictionary (> 10000).
             Report.Dictionary.CacheAllObjects = true;
 
-            InsertItem(Report.CodeHelper.BeginCalcExpression(), "");
+            InsertItem (Report.CodeHelper.BeginCalcExpression(), "");
 
-            ObjectCollection allObjects = Report.AllObjects;
-            ObjectCollection l = Report.Dictionary.AllObjects;
+            var allObjects = Report.AllObjects;
+            var l = Report.Dictionary.AllObjects;
             foreach (Base c in l)
             {
-                allObjects.Add(c);
+                allObjects.Add (c);
             }
 
             foreach (Base c in allObjects)
@@ -356,35 +407,35 @@ namespace AM.Reporting.Code
                 string[] expressions = c.GetExpressions();
                 if (expressions != null)
                 {
-                    foreach (string expr in expressions)
+                    foreach (var expr in expressions)
                     {
-                        AddExpression(expr, c, false);
+                        AddExpression (expr, c, false);
                     }
                 }
             }
 
-            InsertItem(Report.CodeHelper.EndCalcExpression(), "");
+            InsertItem (Report.CodeHelper.EndCalcExpression(), "");
             Report.Dictionary.CacheAllObjects = false;
         }
 
         public void AddFunctions()
         {
             List<FunctionInfo> list = new List<FunctionInfo>();
-            RegisteredObjects.Functions.EnumItems(list);
+            RegisteredObjects.Functions.EnumItems (list);
 
-            foreach (FunctionInfo info in list)
+            foreach (var info in list)
             {
                 if (info.Function != null)
                 {
-                    InsertItem(Report.CodeHelper.GetMethodSignatureAndBody(info.Function), "Function");
+                    InsertItem (Report.CodeHelper.GetMethodSignatureAndBody (info.Function), "Function");
                 }
             }
         }
 
-        public string GenerateReportClass(string className)
+        public string GenerateReportClass (string className)
         {
-            InsertItem(Report.CodeHelper.GenerateInitializeMethod(), "");
-            return Report.CodeHelper.ReplaceClassName(scriptText.ToString(), className);
+            InsertItem (Report.CodeHelper.GenerateInitializeMethod(), "");
+            return Report.CodeHelper.ReplaceClassName (scriptText.ToString(), className);
         }
 
         public void Compile()
@@ -394,7 +445,9 @@ namespace AM.Reporting.Code
                 lock (compileLocker)
                 {
                     if (needCompile)
+                    {
                         InternalCompile();
+                    }
                 }
             }
         }
@@ -402,177 +455,201 @@ namespace AM.Reporting.Code
         private void InternalCompile()
         {
             // configure compiler options
-            CompilerParameters cp = new CompilerParameters();
-            AddFastReportAssemblies(cp.ReferencedAssemblies);   // 2
-            AddReferencedAssemblies(cp.ReferencedAssemblies, currentFolder);    // 9
-            ReviewReferencedAssemblies(cp.ReferencedAssemblies);
+            var cp = new CompilerParameters();
+            AddFastReportAssemblies (cp.ReferencedAssemblies); // 2
+            AddReferencedAssemblies (cp.ReferencedAssemblies, currentFolder); // 9
+            ReviewReferencedAssemblies (cp.ReferencedAssemblies);
             cp.GenerateInMemory = true;
+
             // sometimes the system temp folder is not accessible...
             if (Config.TempFolder != null)
-                cp.TempFiles = new TempFileCollection(Config.TempFolder, false);
+            {
+                cp.TempFiles = new TempFileCollection (Config.TempFolder, false);
+            }
 
             if (Config.WebMode &&
                 Config.EnableScriptSecurity &&
                 Config.ScriptSecurityProps.AddStubClasses)
-                AddStubClasses();
-
-            string errors = string.Empty;
-            CompilerResults cr;
-            bool exception = !InternalCompile(cp, out cr);
-            for (int i = 0; exception && i < Config.CompilerSettings.RecompileCount; i++)
             {
-                exception = !TryRecompile(cp, ref cr);
+                AddStubClasses();
+            }
+
+            var errors = string.Empty;
+            var exception = !InternalCompile (cp, out var cr);
+            for (var i = 0; exception && i < Config.CompilerSettings.RecompileCount; i++)
+            {
+                exception = !TryRecompile (cp, ref cr);
             }
 
             if (cr != null)
-                HandleCompileErrors(cr, out errors);
-
-            if (exception && errors != string.Empty)
-                throw new CompilerException(errors);
-        }
-
-        private string GetAssemblyHash(CompilerParameters cp)
-        {
-            StringBuilder assemblyHashSB = new StringBuilder();
-            foreach (string a in cp.ReferencedAssemblies)
-                assemblyHashSB.Append(a);
-            var script = scriptText.ToString();
-            assemblyHashSB.Append(script);
-            byte[] hash;
-
-            using (HMACSHA1 hMACSHA1 = new HMACSHA1(Encoding.ASCII.GetBytes(shaKey)))
             {
-                hash = hMACSHA1.ComputeHash(Encoding.Unicode.GetBytes(assemblyHashSB.ToString()));
+                HandleCompileErrors (cr, out errors);
             }
 
-            return Convert.ToBase64String(hash);
+            if (exception && errors != string.Empty)
+            {
+                throw new CompilerException (errors);
+            }
+        }
+
+        private string GetAssemblyHash (CompilerParameters cp)
+        {
+            var assemblyHashSB = new StringBuilder();
+            foreach (var a in cp.ReferencedAssemblies)
+            {
+                assemblyHashSB.Append (a);
+            }
+
+            var script = scriptText.ToString();
+            assemblyHashSB.Append (script);
+            byte[] hash;
+
+            using (var hMACSHA1 = new HMACSHA1 (Encoding.ASCII.GetBytes (shaKey)))
+            {
+                hash = hMACSHA1.ComputeHash (Encoding.Unicode.GetBytes (assemblyHashSB.ToString()));
+            }
+
+            return Convert.ToBase64String (hash);
         }
 
         /// <summary>
         /// Returns true, if compilation is successful
         /// </summary>
-        private bool InternalCompile(CompilerParameters cp, out CompilerResults cr)
+        private bool InternalCompile (CompilerParameters cp, out CompilerResults cr)
         {
-
             // find assembly in cache
-            string assemblyHash = GetAssemblyHash(cp);
-            Assembly cachedAssembly;
-            if (FAssemblyCache.TryGetValue(assemblyHash, out cachedAssembly))
+            var assemblyHash = GetAssemblyHash (cp);
+            if (FAssemblyCache.TryGetValue (assemblyHash, out var cachedAssembly))
             {
                 Assembly = cachedAssembly;
-                var reportScript = Assembly.CreateInstance("AM.Reporting.ReportScript");
-                InitInstance(reportScript);
+                var reportScript = Assembly.CreateInstance ("AM.Reporting.ReportScript");
+                InitInstance (reportScript);
                 cr = null;
                 return true;
             }
 
 
             // compile report scripts
-            using (CodeDomProvider provider = Report.CodeHelper.GetCodeProvider())
+            using (var provider = Report.CodeHelper.GetCodeProvider())
             {
-
-                ScriptSecurityEventArgs ssea = new ScriptSecurityEventArgs(Report, scriptText.ToString(), Report.ReferencedAssemblies);
-                Config.OnScriptCompile(ssea);
+                var ssea =
+                    new ScriptSecurityEventArgs (Report, scriptText.ToString(), Report.ReferencedAssemblies);
+                Config.OnScriptCompile (ssea);
 
 #if CROSSPLATFORM || COREWIN
                 provider.BeforeEmitCompilation += Config.OnBeforeScriptCompilation;
 #endif
 
-                cr = provider.CompileAssemblyFromSource(cp, scriptText.ToString());
+                cr = provider.CompileAssemblyFromSource (cp, scriptText.ToString());
                 Assembly = null;
                 Instance = null;
 
-                if (cr.Errors.Count != 0)   // Compile errors
+                if (cr.Errors.Count != 0) // Compile errors
+                {
                     return false;
+                }
 
-                FAssemblyCache.TryAdd(assemblyHash, cr.CompiledAssembly);
+                FAssemblyCache.TryAdd (assemblyHash, cr.CompiledAssembly);
 
                 Assembly = cr.CompiledAssembly;
-                var reportScript = Assembly.CreateInstance("AM.Reporting.ReportScript");
-                InitInstance(reportScript);
+                var reportScript = Assembly.CreateInstance ("AM.Reporting.ReportScript");
+                InitInstance (reportScript);
                 return true;
             }
         }
 
-        private string ReplaceExpression(string error, TextObjectBase text)
+        private string ReplaceExpression (string error, TextObjectBase text)
         {
-            string result = text.Text;
-            string[] parts = error.Split('\"');
+            var result = text.Text;
+            string[] parts = error.Split ('\"');
             if (parts.Length == 3)
             {
                 string[] expressions = text.GetExpressions();
-                foreach (string expr in expressions)
+                foreach (var expr in expressions)
                 {
-                    if (expr.Contains(parts[1]))
+                    if (expr.Contains (parts[1]))
                     {
-                        if (!DataHelper.IsValidColumn(Report.Dictionary, expr))
+                        if (!DataHelper.IsValidColumn (Report.Dictionary, expr))
                         {
-                            string replaceString = text.Brackets[0] + expr + text.Brackets[2];
-                            if (Config.CompilerSettings.ExceptionBehaviour == CompilerExceptionBehaviour.ShowExceptionMessage ||
-                                Config.CompilerSettings.ExceptionBehaviour == CompilerExceptionBehaviour.ReplaceExpressionWithPlaceholder)
+                            var replaceString = text.Brackets[0] + expr + text.Brackets[2];
+                            if (Config.CompilerSettings.ExceptionBehaviour ==
+                                CompilerExceptionBehaviour.ShowExceptionMessage ||
+                                Config.CompilerSettings.ExceptionBehaviour ==
+                                CompilerExceptionBehaviour.ReplaceExpressionWithPlaceholder)
                             {
-                                result = result.Replace(replaceString, Config.CompilerSettings.Placeholder);
+                                result = result.Replace (replaceString, Config.CompilerSettings.Placeholder);
                             }
-                            else if (Config.CompilerSettings.ExceptionBehaviour == CompilerExceptionBehaviour.ReplaceExpressionWithExceptionMessage)
+                            else if (Config.CompilerSettings.ExceptionBehaviour ==
+                                     CompilerExceptionBehaviour.ReplaceExpressionWithExceptionMessage)
                             {
-                                result = result.Replace(replaceString, error);
+                                result = result.Replace (replaceString, error);
                             }
                         }
                     }
                 }
             }
+
             return result;
         }
 
         /// <summary>
         /// Handle compile errors
         /// </summary>
-        private void HandleCompileErrors(CompilerResults cr, out string errors)
+        private void HandleCompileErrors (CompilerResults cr, out string errors)
         {
             errors = string.Empty;
             Regex regex;
 
             if (Config.WebMode && Config.EnableScriptSecurity)
             {
-                for (int i = 0; i < cr.Errors.Count;)
+                for (var i = 0; i < cr.Errors.Count;)
                 {
-                    CompilerError ce = cr.Errors[i];
+                    var ce = cr.Errors[i];
                     if (ce.ErrorNumber == "CS1685") // duplicate class
                     {
-                        cr.Errors.Remove(ce);
+                        cr.Errors.Remove (ce);
                         continue;
                     }
                     else if (ce.ErrorNumber == "CS0436") // user using a forbidden type
                     {
                         const string pattern = "[\"'](\\S+)[\"']";
-                        regex = new Regex(pattern, RegexOptions.Compiled);
-                        string typeName = regex.Match(ce.ErrorText).Value;
+                        regex = new Regex (pattern, RegexOptions.Compiled);
+                        var typeName = regex.Match (ce.ErrorText).Value;
 
                         const string res = "Web,ScriptSecurity,ForbiddenType";
-                        string message = Res.TryGet(res);
-                        if (string.Equals(res, message))
+                        var message = Res.TryGet (res);
+                        if (string.Equals (res, message))
+                        {
                             message = "Please don't use the type " + typeName;
+                        }
                         else
-                            message = message.Replace("{typeName}", typeName); //$"Please don't use the type {typeName}";
+                        {
+                            message = message.Replace ("{typeName}",
+                                typeName); //$"Please don't use the type {typeName}";
+                        }
 
                         ce.ErrorText = message;
-
                     }
                     else if (ce.ErrorNumber == "CS0117") // user using a forbidden method
                     {
                         const string pattern = "[\"'](\\S+)[\"']";
-                        regex = new Regex(pattern, RegexOptions.Compiled);
-                        MatchCollection mathes = regex.Matches(ce.ErrorText);
+                        regex = new Regex (pattern, RegexOptions.Compiled);
+                        var mathes = regex.Matches (ce.ErrorText);
                         if (mathes.Count > 1)
                         {
-                            string methodName = mathes[1].Value;
+                            var methodName = mathes[1].Value;
 
                             const string res = "Web,ScriptSecurity,ForbiddenMethod";
-                            string message = Res.TryGet(res);
-                            if (string.Equals(res, message))
+                            var message = Res.TryGet (res);
+                            if (string.Equals (res, message))
+                            {
                                 message = "Please don't use the method " + methodName;
+                            }
                             else
-                                message = message.Replace("{methodName}", methodName); //$"Please don't use the method {methodName}";
+                            {
+                                message = message.Replace ("{methodName}",
+                                    methodName); //$"Please don't use the method {methodName}";
+                            }
 
                             ce.ErrorText = message;
                         }
@@ -584,21 +661,26 @@ namespace AM.Reporting.Code
 
             foreach (CompilerError ce in cr.Errors)
             {
-                int line = GetScriptLine(ce.Line);
+                var line = GetScriptLine (ce.Line);
+
                 // error is inside own items
                 if (line == -1)
                 {
-                    string errObjName = GetErrorObjectName(ce.Line);
+                    var errObjName = GetErrorObjectName (ce.Line);
 
                     if (Config.CompilerSettings.ExceptionBehaviour != CompilerExceptionBehaviour.Default)
                     {
                         // handle errors when name does not exist in the current context
                         if (ce.ErrorNumber == "CS0103")
                         {
-                            TextObjectBase text = Report.FindObject(errObjName) as TextObjectBase;
-                            text.Text = ReplaceExpression(ce.ErrorText, text);
-                            if (Config.CompilerSettings.ExceptionBehaviour == CompilerExceptionBehaviour.ShowExceptionMessage)
-                                System.Windows.Forms.MessageBox.Show(ce.ErrorText);
+                            var text = Report.FindObject (errObjName) as TextObjectBase;
+                            text.Text = ReplaceExpression (ce.ErrorText, text);
+                            if (Config.CompilerSettings.ExceptionBehaviour ==
+                                CompilerExceptionBehaviour.ShowExceptionMessage)
+                            {
+                                System.Windows.Forms.MessageBox.Show (ce.ErrorText);
+                            }
+
                             continue;
                         }
                     }
@@ -606,7 +688,7 @@ namespace AM.Reporting.Code
                     // handle division by zero errors
                     if (ce.ErrorNumber == "CS0020")
                     {
-                        TextObjectBase text = Report.FindObject(errObjName) as TextObjectBase;
+                        var text = Report.FindObject (errObjName) as TextObjectBase;
                         text.CanGrow = true;
                         text.FillColor = Color.Red;
                         text.Text = "DIVISION BY ZERO!";
@@ -614,14 +696,15 @@ namespace AM.Reporting.Code
                     }
                     else
                     {
-                        errors += $"({errObjName}): {Res.Get("Messages,Error")} {ce.ErrorNumber}: {ce.ErrorText}\r\n";
-                        ErrorMsg(errObjName, ce);
+                        errors += $"({errObjName}): {Res.Get ("Messages,Error")} {ce.ErrorNumber}: {ce.ErrorText}\r\n";
+                        ErrorMsg (errObjName, ce);
                     }
                 }
                 else
                 {
-                    errors += $"({line},{ce.Column}): {Res.Get("Messages,Error")} {ce.ErrorNumber}: {ce.ErrorText}\r\n";
-                    ErrorMsg(ce, line);
+                    errors +=
+                        $"({line},{ce.Column}): {Res.Get ("Messages,Error")} {ce.ErrorNumber}: {ce.ErrorText}\r\n";
+                    ErrorMsg (ce, line);
                 }
             }
         }
@@ -629,9 +712,9 @@ namespace AM.Reporting.Code
         /// <summary>
         /// Returns true if recompilation is successful
         /// </summary>
-        private bool TryRecompile(CompilerParameters cp, ref CompilerResults cr)
+        private bool TryRecompile (CompilerParameters cp, ref CompilerResults cr)
         {
-            List<string> additionalAssemblies = new List<string>(4);
+            List<string> additionalAssemblies = new List<string> (4);
 
             foreach (CompilerError ce in cr.Errors)
             {
@@ -647,66 +730,79 @@ namespace AM.Reporting.Code
                         const string quotes = "\"";
 #endif
                         const string pattern = quotes + @"(\S{1,}),";
-                        Regex regex = new Regex(pattern, RegexOptions.Compiled);
-                        string assemblyName = regex.Match(ce.ErrorText).Groups[1].Value;   // Groups[1] include string without quotes and , symbols
-                        if (!additionalAssemblies.Contains(assemblyName))
-                            additionalAssemblies.Add(assemblyName);
+                        var regex = new Regex (pattern, RegexOptions.Compiled);
+                        var assemblyName =
+                            regex.Match (ce.ErrorText).Groups[1]
+                                .Value; // Groups[1] include string without quotes and , symbols
+                        if (!additionalAssemblies.Contains (assemblyName))
+                        {
+                            additionalAssemblies.Add (assemblyName);
+                        }
+
                         continue;
                     }
-                    catch { }
+                    catch
+                    {
+                    }
                 }
             }
 
-            if (additionalAssemblies.Count > 0)  // need recompile
+            if (additionalAssemblies.Count > 0) // need recompile
             {
                 // try to load missing assemblies
-                foreach (string assemblyName in additionalAssemblies)
+                foreach (var assemblyName in additionalAssemblies)
                 {
-                    AddReferencedAssembly(cp.ReferencedAssemblies, currentFolder, assemblyName);
+                    AddReferencedAssembly (cp.ReferencedAssemblies, currentFolder, assemblyName);
                 }
 
-                return InternalCompile(cp, out cr);
+                return InternalCompile (cp, out cr);
             }
 
             return false;
         }
 
 
-        public void InitInstance(object instance)
+        public void InitInstance (object instance)
         {
-            this.Instance = instance;
+            Instance = instance;
             InitFields();
         }
 
-        public bool ContainsExpression(string expr)
+        public bool ContainsExpression (string expr)
         {
-            return Expressions.ContainsKey(expr);
+            return Expressions.ContainsKey (expr);
         }
 
-        public object CalcExpression(string expr, Variant value)
+        public object CalcExpression (string expr, Variant value)
         {
-            ExpressionDescriptor expressionDescriptor = Expressions[expr] as ExpressionDescriptor;
-            if (expressionDescriptor != null)
-                return expressionDescriptor.Invoke(new object[] { expr, value });
-            else
-                return null;
-        }
-
-        public object InvokeMethod(string name, object[] parms)
-        {
-            if (String.IsNullOrEmpty(name))
-                return null;
-
-            string exprName = "method_" + name;
-            if (!ContainsExpression(exprName))
+            if (Expressions[expr] is ExpressionDescriptor expressionDescriptor)
             {
-                ExpressionDescriptor descriptor = new ExpressionDescriptor(this);
-                Expressions.Add(exprName, descriptor);
+                return expressionDescriptor.Invoke (new object[] { expr, value });
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public object InvokeMethod (string name, object[] parms)
+        {
+            if (string.IsNullOrEmpty (name))
+            {
+                return null;
+            }
+
+            var exprName = "method_" + name;
+            if (!ContainsExpression (exprName))
+            {
+                var descriptor = new ExpressionDescriptor (this);
+                Expressions.Add (exprName, descriptor);
                 descriptor.MethodName = name;
             }
+
             try
             {
-                return (Expressions[exprName] as ExpressionDescriptor).Invoke(parms);
+                return (Expressions[exprName] as ExpressionDescriptor).Invoke (parms);
             }
             catch (TargetInvocationException ex)
             {
@@ -714,25 +810,27 @@ namespace AM.Reporting.Code
             }
         }
 
-        public AssemblyDescriptor(Report report, string scriptText)
+        public AssemblyDescriptor (Report report, string scriptText)
         {
-            this.Report = report;
-            this.scriptText = new FastString(scriptText);
+            Report = report;
+            this.scriptText = new FastString (scriptText);
             Expressions = new Hashtable();
             sourcePositions = new List<SourcePosition>();
-            insertPos = Report.CodeHelper.GetPositionToInsertOwnItems(scriptText);
+            insertPos = Report.CodeHelper.GetPositionToInsertOwnItems (scriptText);
             if (insertPos == -1)
             {
-                string msg = Res.Get("Messages,ClassError");
-                ErrorMsg(msg);
-                throw new CompilerException(msg);
+                var msg = Res.Get ("Messages,ClassError");
+                ErrorMsg (msg);
+                throw new CompilerException (msg);
             }
             else
             {
-                string[] lines = scriptText.Substring(0, insertPos).Split('\r');
+                string[] lines = scriptText.Substring (0, insertPos).Split ('\r');
                 insertLine = lines.Length;
                 if (scriptText != Report.CodeHelper.EmptyScript())
+                {
                     needCompile = true;
+                }
             }
 
             // set the current folder
@@ -741,14 +839,17 @@ namespace AM.Reporting.Code
             {
                 try
                 {
-                    string bin_directory = Path.Combine(currentFolder, "Bin");
-                    if (Directory.Exists(bin_directory))
+                    var bin_directory = Path.Combine (currentFolder, "Bin");
+                    if (Directory.Exists (bin_directory))
+                    {
                         currentFolder = bin_directory;
+                    }
                 }
                 catch
                 {
                 }
             }
+
             // Commented by Samuray
             //Directory.SetCurrentDirectory(currentFolder);
         }
@@ -766,7 +867,7 @@ namespace AM.Reporting.Code
             public readonly int start;
             public readonly int end;
 
-            public SourcePosition(string obj, int start, int end)
+            public SourcePosition (string obj, int start, int end)
             {
                 sourceObject = obj;
                 this.start = start;

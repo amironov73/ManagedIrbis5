@@ -36,7 +36,7 @@ namespace AM.Reporting.Engine
 
             #endregion Fields
 
-            public PageNumberInfo(int pageNo)
+            public PageNumberInfo (int pageNo)
             {
                 this.pageNo = pageNo;
             }
@@ -65,14 +65,18 @@ namespace AM.Reporting.Engine
         public void ResetLogicalPageNumber()
         {
             if (!FirstPass)
-                return;
-
-            for (int i = pageNumbers.Count - 1; i >= 0; i--)
             {
-                PageNumberInfo info = pageNumbers[i];
+                return;
+            }
+
+            for (var i = pageNumbers.Count - 1; i >= 0; i--)
+            {
+                var info = pageNumbers[i];
                 info.totalPages = logicalPageNo;
                 if (info.pageNo == 1)
+                {
                     break;
+                }
             }
 
             logicalPageNo = 0;
@@ -80,13 +84,13 @@ namespace AM.Reporting.Engine
 
         private int GetLogicalPageNumber()
         {
-            int index = CurPage - firstReportPage;
+            var index = CurPage - firstReportPage;
             return pageNumbers[index].pageNo + Report.InitialPageNumber - 1;
         }
 
         private int GetLogicalTotalPages()
         {
-            int index = CurPage - firstReportPage;
+            var index = CurPage - firstReportPage;
             return pageNumbers[index].totalPages + Report.InitialPageNumber - 1;
         }
 
@@ -97,11 +101,11 @@ namespace AM.Reporting.Engine
         internal void IncLogicalPageNumber()
         {
             logicalPageNo++;
-            int index = CurPage - firstReportPage;
+            var index = CurPage - firstReportPage;
             if (FirstPass || index >= pageNumbers.Count)
             {
-                PageNumberInfo info = new PageNumberInfo(logicalPageNo);
-                pageNumbers.Add(info);
+                var info = new PageNumberInfo (logicalPageNo);
+                pageNumbers.Add (info);
             }
         }
 
@@ -111,11 +115,11 @@ namespace AM.Reporting.Engine
         /// </summary>
         internal void ShiftLastPage()
         {
-            PageNumberInfo info = new PageNumberInfo(pageNumbers.Count + 1);
-            pageNumbers.Add(info);
+            var info = new PageNumberInfo (pageNumbers.Count + 1);
+            pageNumbers.Add (info);
 
 
-            for (int i = pageNumbers.Count - 1; i >= 0; i--)
+            for (var i = pageNumbers.Count - 1; i >= 0; i--)
             {
                 info = pageNumbers[i];
                 info.totalPages = pageNumbers.Count;

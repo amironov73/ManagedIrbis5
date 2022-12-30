@@ -57,58 +57,58 @@ namespace AM.Reporting.Utils
             get
             {
                 Report.EnsureInit();
-                string folder = Config.Root.FindItem("Language").GetProp("Folder");
+                var folder = Config.Root.FindItem ("Language").GetProp ("Folder");
+
                 // check the registry
 #if !CROSSPLATFORM
-                if (String.IsNullOrEmpty(folder) && !Config.WebMode)
+                if (string.IsNullOrEmpty (folder) && !Config.WebMode)
                 {
-                    RegistryKey key = Registry.CurrentUser.OpenSubKey("Software").OpenSubKey("FastReports");
+                    var key = Registry.CurrentUser.OpenSubKey ("Software").OpenSubKey ("FastReports");
                     if (key != null)
                     {
-                        key = key.OpenSubKey("AM.Reporting.Net");
+                        key = key.OpenSubKey ("AM.Reporting.Net");
                         if (key != null)
-                            folder = (string)key.GetValue("LocalizationFolder", "");
+                        {
+                            folder = (string)key.GetValue ("LocalizationFolder", "");
+                        }
                     }
                 }
 #endif
+
                 // get application folder
-                if (String.IsNullOrEmpty(folder))
+                if (string.IsNullOrEmpty (folder))
+                {
                     folder = Config.ApplicationFolder;
+                }
 
                 return folder;
             }
-            set {
-                Config.Root.FindItem("Language").SetProp("Folder", value);
-            }
+            set { Config.Root.FindItem ("Language").SetProp ("Folder", value); }
         }
 
         /// <summary>
         /// Returns the current UI locale name, for example "en".
         /// </summary>
-        public static string LocaleName
-        {
-            get
-            {
-                return FLocale.Root.GetProp("Name");
-            }
-        }
+        public static string LocaleName => FLocale.Root.GetProp ("Name");
 
         internal static string DefaultLocaleName
         {
-            get { return Config.Root.FindItem("Language").GetProp("Name"); }
-            set { Config.Root.FindItem("Language").SetProp("Name", value); }
+            get => Config.Root.FindItem ("Language").GetProp ("Name");
+            set => Config.Root.FindItem ("Language").SetProp ("Name", value);
         }
 
         private static void LoadBuiltinLocale()
         {
             FLocale = new XmlDocument();
             FBuiltinLocale = FLocale;
-            using (Stream stream = ResourceLoader.GetStream("en.xml"))
+            using (var stream = ResourceLoader.GetStream ("en.xml"))
             {
-                FLocale.Load(stream);
-                CultureInfo enCulture = CultureInfo.GetCultureInfo("en");
-                if (!LocalesCache.ContainsKey(enCulture))
-                    LocalesCache.Add(enCulture, FLocale);
+                FLocale.Load (stream);
+                var enCulture = CultureInfo.GetCultureInfo ("en");
+                if (!LocalesCache.ContainsKey (enCulture))
+                {
+                    LocalesCache.Add (enCulture, FLocale);
+                }
             }
         }
 
@@ -116,17 +116,19 @@ namespace AM.Reporting.Utils
         /// Loads the locale from a file.
         /// </summary>
         /// <param name="fileName">The name of the file that contains localized strings.</param>
-        public static void LoadLocale(string fileName)
+        public static void LoadLocale (string fileName)
         {
             Report.EnsureInit();
 
-            if (File.Exists(fileName))
+            if (File.Exists (fileName))
             {
                 FLocale = new XmlDocument();
-                FLocale.Load(fileName);
+                FLocale.Load (fileName);
             }
             else
+            {
                 FLocale = FBuiltinLocale;
+            }
         }
 
         /// <summary>
@@ -135,7 +137,7 @@ namespace AM.Reporting.Utils
         /// To work correctly, it is recommended to install AM.Reporting.Localization package
         /// </summary>
         /// <param name="culture"></param>
-        public static void LoadLocale(CultureInfo culture)
+        public static void LoadLocale (CultureInfo culture)
         {
             if (culture == CultureInfo.InvariantCulture)
             {
@@ -143,7 +145,7 @@ namespace AM.Reporting.Utils
                 return;
             }
 
-            if (LocalesCache.ContainsKey(culture))
+            if (LocalesCache.ContainsKey (culture))
             {
                 FLocale = LocalesCache[culture];
                 return;
@@ -153,7 +155,7 @@ namespace AM.Reporting.Utils
             var parent = culture.Parent;
             if (parent != CultureInfo.InvariantCulture)
             {
-                if (LocalesCache.ContainsKey(parent))
+                if (LocalesCache.ContainsKey (parent))
                 {
                     FLocale = LocalesCache[parent];
                     return;
@@ -161,49 +163,51 @@ namespace AM.Reporting.Utils
 
                 // in some cultures, parent have self parent
                 if (parent.Parent != CultureInfo.InvariantCulture)
-                    if (LocalesCache.ContainsKey(parent.Parent))
+                {
+                    if (LocalesCache.ContainsKey (parent.Parent))
                     {
                         FLocale = LocalesCache[parent.Parent];
                         return;
                     }
-            }
-
-            string localeFolder = LocaleFolder;
-            string localeFile = string.Empty;
-
-            if (Directory.Exists(localeFolder))
-            {
-                localeFile = FindLocaleFile(ref culture, localeFolder);
-            }
-
-            // Find 'Localization' directory from AM.Reporting.Localization package
-            if (string.IsNullOrEmpty(localeFile))
-            {
-                localeFolder = Path.Combine(Config.ApplicationFolder, "Localization");
-                if (Directory.Exists(localeFolder))
-                {
-                    localeFile = FindLocaleFile(ref culture, localeFolder);
                 }
             }
 
-            if (!string.IsNullOrEmpty(localeFile))
+            var localeFolder = LocaleFolder;
+            var localeFile = string.Empty;
+
+            if (Directory.Exists (localeFolder))
+            {
+                localeFile = FindLocaleFile (ref culture, localeFolder);
+            }
+
+            // Find 'Localization' directory from AM.Reporting.Localization package
+            if (string.IsNullOrEmpty (localeFile))
+            {
+                localeFolder = Path.Combine (Config.ApplicationFolder, "Localization");
+                if (Directory.Exists (localeFolder))
+                {
+                    localeFile = FindLocaleFile (ref culture, localeFolder);
+                }
+            }
+
+            if (!string.IsNullOrEmpty (localeFile))
             {
                 Report.EnsureInit();
 
                 var newLocale = new XmlDocument();
-                newLocale.Load(localeFile);
+                newLocale.Load (localeFile);
                 FLocale = newLocale;
-                LocalesCache.Add(culture, newLocale);
+                LocalesCache.Add (culture, newLocale);
             }
         }
 
-        private static string FindLocaleFile(ref CultureInfo culture, string localeFolder)
+        private static string FindLocaleFile (ref CultureInfo culture, string localeFolder)
         {
-            var files = Directory.GetFiles(localeFolder, "*.frl");
-            CultureInfo parent = culture.Parent;
+            var files = Directory.GetFiles (localeFolder, "*.frl");
+            var parent = culture.Parent;
             foreach (var file in files)
             {
-                var filename = Path.GetFileNameWithoutExtension(file);
+                var filename = Path.GetFileNameWithoutExtension (file);
                 if (filename == culture.EnglishName)
                 {
                     return file;
@@ -217,6 +221,7 @@ namespace AM.Reporting.Utils
                     }
                 }
             }
+
             return null;
         }
 
@@ -224,12 +229,12 @@ namespace AM.Reporting.Utils
         /// Loads the locale from a stream.
         /// </summary>
         /// <param name="stream">The stream that contains localized strings.</param>
-        public static void LoadLocale(Stream stream)
+        public static void LoadLocale (Stream stream)
         {
             Report.EnsureInit();
 
             FLocale = new XmlDocument();
-            FLocale.Load(stream);
+            FLocale.Load (stream);
         }
 
         /// <summary>
@@ -240,24 +245,26 @@ namespace AM.Reporting.Utils
             FLocale = FBuiltinLocale;
         }
 
-    internal static void LoadDefaultLocale()
-    {
-      if (!Directory.Exists(LocaleFolder))
-        return;
+        internal static void LoadDefaultLocale()
+        {
+            if (!Directory.Exists (LocaleFolder))
+            {
+                return;
+            }
 
-      if (String.IsNullOrEmpty(DefaultLocaleName))
-      {
-            // locale is set to "Auto"
-            CultureInfo currentCulture = CultureInfo.CurrentCulture;
+            if (string.IsNullOrEmpty (DefaultLocaleName))
+            {
+                // locale is set to "Auto"
+                var currentCulture = CultureInfo.CurrentCulture;
 
-            LoadLocale(currentCulture);
-      }
-      else
-      {
-        // locale is set to specific name
-        LoadLocale(Path.Combine(LocaleFolder, DefaultLocaleName + ".frl"));
-      }
-    }
+                LoadLocale (currentCulture);
+            }
+            else
+            {
+                // locale is set to specific name
+                LoadLocale (Path.Combine (LocaleFolder, DefaultLocaleName + ".frl"));
+            }
+        }
 
         /// <summary>
         /// Gets a string with specified ID.
@@ -278,37 +285,46 @@ namespace AM.Reporting.Utils
         /// To get the localized "ReportTitle" value, you should pass the following ID
         /// to this method: "Objects,Bands,ReportTitle".
         /// </remarks>
-        public static string Get(string id)
+        public static string Get (string id)
         {
-            string result = Get(id, FLocale);
+            var result = Get (id, FLocale);
+
             // if no item found, try built-in (english) locale
-            if(string.IsNullOrEmpty(result))
+            if (string.IsNullOrEmpty (result))
             {
-                if(FLocale != FBuiltinLocale)
+                if (FLocale != FBuiltinLocale)
                 {
-                    result = Get(id, FBuiltinLocale);
-                    if (string.IsNullOrEmpty(result))
+                    result = Get (id, FBuiltinLocale);
+                    if (string.IsNullOrEmpty (result))
+                    {
                         result = id + " " + FBadResult;
+                    }
                 }
                 else
+                {
                     result = id + " " + FBadResult;
+                }
             }
+
             return result;
         }
 
-        private static string Get(string id, XmlDocument locale)
+        private static string Get (string id, XmlDocument locale)
         {
-            string[] categories = id.Split(',');
-            XmlItem xi = locale.Root;
-            foreach (string category in categories)
+            string[] categories = id.Split (',');
+            var xi = locale.Root;
+            foreach (var category in categories)
             {
-                int i = xi.Find(category);
+                var i = xi.Find (category);
                 if (i == -1)
+                {
                     return null;
+                }
+
                 xi = xi[i];
             }
 
-            return xi.GetProp("Text");
+            return xi.GetProp ("Text");
         }
 
         /// <summary>
@@ -316,9 +332,9 @@ namespace AM.Reporting.Utils
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public static string GetBuiltin(string id)
+        public static string GetBuiltin (string id)
         {
-            return Get(id, FBuiltinLocale);
+            return Get (id, FBuiltinLocale);
         }
 
         /// <summary>
@@ -334,16 +350,16 @@ namespace AM.Reporting.Utils
         /// Res.Set("Messages,SaveChanges", "My text that will appear when you close the designer");
         /// </code>
         /// </example>
-        public static void Set(string id, string value)
+        public static void Set (string id, string value)
         {
-            string[] categories = id.Split(',');
-            XmlItem xi = FLocale.Root;
-            foreach (string category in categories)
+            string[] categories = id.Split (',');
+            var xi = FLocale.Root;
+            foreach (var category in categories)
             {
-                xi = xi.FindItem(category);
+                xi = xi.FindItem (category);
             }
 
-            xi.SetProp("Text", value);
+            xi.SetProp ("Text", value);
         }
 
         /// <summary>
@@ -351,11 +367,14 @@ namespace AM.Reporting.Utils
         /// </summary>
         /// <param name="id">The resource ID.</param>
         /// <returns>The localized value, if specified ID exists; otherwise, the ID itself.</returns>
-        public static string TryGet(string id)
+        public static string TryGet (string id)
         {
-            string result = Get(id);
-            if (result.IndexOf(FBadResult) != -1)
+            var result = Get (id);
+            if (result.IndexOf (FBadResult) != -1)
+            {
                 result = id;
+            }
+
             return result;
         }
 
@@ -364,11 +383,14 @@ namespace AM.Reporting.Utils
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public static string TryGetBuiltin(string id)
+        public static string TryGetBuiltin (string id)
         {
-            string result = GetBuiltin(id);
-            if (string.IsNullOrEmpty(result))
+            var result = GetBuiltin (id);
+            if (string.IsNullOrEmpty (result))
+            {
                 result = id;
+            }
+
             return result;
         }
 
@@ -377,9 +399,9 @@ namespace AM.Reporting.Utils
         /// </summary>
         /// <param name="id">The resource ID.</param>
         /// <returns><b>true</b> if specified ID exists.</returns>
-        public static bool StringExists(string id)
+        public static bool StringExists (string id)
         {
-            return Get(id).IndexOf(FBadResult) == -1;
+            return Get (id).IndexOf (FBadResult) == -1;
         }
 
         static Res()
@@ -392,72 +414,76 @@ namespace AM.Reporting.Utils
         static partial void ResDesignExt();
     }
 
-  /// <summary>
-  /// Used to access to resource IDs inside the specified branch.
-  /// </summary>
-  /// <remarks>
-  /// Using the <see cref="Res.Get(string)"/> method, you have to specify the full path to your resource.
-  /// Using this class, you can shorten the path:
-  /// <code>
-  /// // using the Res.Get method
-  /// miKeepTogether = new ToolStripMenuItem(Res.Get("ComponentMenu,HeaderBand,KeepTogether"));
-  /// miResetPageNumber = new ToolStripMenuItem(Res.Get("ComponentMenu,HeaderBand,ResetPageNumber"));
-  /// miRepeatOnEveryPage = new ToolStripMenuItem(Res.Get("ComponentMenu,HeaderBand,RepeatOnEveryPage"));
-  ///
-  /// // using MyRes.Get method
-  /// MyRes res = new MyRes("ComponentMenu,HeaderBand");
-  /// miKeepTogether = new ToolStripMenuItem(res.Get("KeepTogether"));
-  /// miResetPageNumber = new ToolStripMenuItem(res.Get("ResetPageNumber"));
-  /// miRepeatOnEveryPage = new ToolStripMenuItem(res.Get("RepeatOnEveryPage"));
-  ///
-  /// </code>
-  /// </remarks>
-  public class MyRes
-  {
-    private string category;
-
     /// <summary>
-    /// Gets a string with specified ID inside the main branch.
+    /// Used to access to resource IDs inside the specified branch.
     /// </summary>
-    /// <param name="id">The resource ID.</param>
-    /// <returns>The localized value.</returns>
-    public string Get(string id)
+    /// <remarks>
+    /// Using the <see cref="Res.Get(string)"/> method, you have to specify the full path to your resource.
+    /// Using this class, you can shorten the path:
+    /// <code>
+    /// // using the Res.Get method
+    /// miKeepTogether = new ToolStripMenuItem(Res.Get("ComponentMenu,HeaderBand,KeepTogether"));
+    /// miResetPageNumber = new ToolStripMenuItem(Res.Get("ComponentMenu,HeaderBand,ResetPageNumber"));
+    /// miRepeatOnEveryPage = new ToolStripMenuItem(Res.Get("ComponentMenu,HeaderBand,RepeatOnEveryPage"));
+    ///
+    /// // using MyRes.Get method
+    /// MyRes res = new MyRes("ComponentMenu,HeaderBand");
+    /// miKeepTogether = new ToolStripMenuItem(res.Get("KeepTogether"));
+    /// miResetPageNumber = new ToolStripMenuItem(res.Get("ResetPageNumber"));
+    /// miRepeatOnEveryPage = new ToolStripMenuItem(res.Get("RepeatOnEveryPage"));
+    ///
+    /// </code>
+    /// </remarks>
+    public class MyRes
     {
-      if (id != "")
-        return Res.Get(category + "," + id);
-      else
-        return Res.Get(category);
-    }
+        private string category;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="MyRes"/> class with spevified branch.
-    /// </summary>
-    /// <param name="category">The main resource branch.</param>
-    public MyRes(string category)
-    {
+        /// <summary>
+        /// Gets a string with specified ID inside the main branch.
+        /// </summary>
+        /// <param name="id">The resource ID.</param>
+        /// <returns>The localized value.</returns>
+        public string Get (string id)
+        {
+            if (id != "")
+            {
+                return Res.Get (category + "," + id);
+            }
+            else
+            {
+                return Res.Get (category);
+            }
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MyRes"/> class with spevified branch.
+        /// </summary>
+        /// <param name="category">The main resource branch.</param>
+        public MyRes (string category)
+        {
             this.category = category;
+        }
     }
-  }
 
-
-  /// <summary>
-  /// Localized CategoryAttribute class.
-  /// </summary>
-  public class SRCategory : CategoryAttribute
-  {
-    /// <inheritdoc/>
-    protected override string GetLocalizedString(string value)
-    {
-      return Res.TryGet("Properties,Categories," + value);
-    }
 
     /// <summary>
-    /// Initializes a new instance of the SRCategory class.
+    /// Localized CategoryAttribute class.
     /// </summary>
-    /// <param name="value">The category name.</param>
-    public SRCategory(string value)
-      : base(value)
+    public class SRCategory : CategoryAttribute
     {
+        /// <inheritdoc/>
+        protected override string GetLocalizedString (string value)
+        {
+            return Res.TryGet ("Properties,Categories," + value);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the SRCategory class.
+        /// </summary>
+        /// <param name="value">The category name.</param>
+        public SRCategory (string value)
+            : base (value)
+        {
+        }
     }
-  }
 }

@@ -16,6 +16,7 @@
 #region Using directives
 
 using AM.Reporting.Utils;
+
 using System;
 
 #endregion
@@ -31,42 +32,45 @@ namespace AM.Reporting.Engine
         /// <summary>
         /// Gets xml containing outline nodes.
         /// </summary>
-        public XmlItem OutlineXml
-        {
-            get { return PreparedPages.Outline.Xml; }
-        }
+        public XmlItem OutlineXml => PreparedPages.Outline.Xml;
 
         #endregion Properties
 
         #region Private Methods
 
-        private void AddOutline(string name, int pageNo, float curY)
+        private void AddOutline (string name, int pageNo, float curY)
         {
-            PreparedPages.Outline.Add(name, pageNo, curY);
+            PreparedPages.Outline.Add (name, pageNo, curY);
         }
 
-        private void AddBandOutline(BandBase band)
+        private void AddBandOutline (BandBase band)
         {
-            if (band.Visible && !String.IsNullOrEmpty(band.OutlineExpression) && !band.Repeated)
+            if (band.Visible && !string.IsNullOrEmpty (band.OutlineExpression) && !band.Repeated)
             {
-                AddOutline(Converter.ToString(Report.Calc(band.OutlineExpression)), CurPage, CurY);
+                AddOutline (Converter.ToString (Report.Calc (band.OutlineExpression)), CurPage, CurY);
                 if (!(band is DataBand) && !(band is GroupHeaderBand))
+                {
                     OutlineUp();
+                }
             }
         }
 
         private void AddPageOutline()
         {
-            if (!String.IsNullOrEmpty(page.OutlineExpression))
-                AddOutline(Converter.ToString(Report.Calc(page.OutlineExpression)), CurPage, 0);
+            if (!string.IsNullOrEmpty (page.OutlineExpression))
+            {
+                AddOutline (Converter.ToString (Report.Calc (page.OutlineExpression)), CurPage, 0);
+            }
         }
 
-        private void OutlineUp(BandBase band)
+        private void OutlineUp (BandBase band)
         {
             if (band is DataBand || band is GroupHeaderBand)
             {
-                if (!String.IsNullOrEmpty(band.OutlineExpression))
+                if (!string.IsNullOrEmpty (band.OutlineExpression))
+                {
                     OutlineUp();
+                }
             }
         }
 
@@ -84,9 +88,9 @@ namespace AM.Reporting.Engine
         /// To shift the position, use the <see cref="OutlineRoot"/> or
         /// <see cref="OutlineUp()">OutlineUp</see> methods.
         /// </remarks>
-        public void AddOutline(string text)
+        public void AddOutline (string text)
         {
-            AddOutline(text, CurPage, CurY);
+            AddOutline (text, CurPage, CurY);
         }
 
         /// <summary>
@@ -109,10 +113,12 @@ namespace AM.Reporting.Engine
         /// Creates a new bookmark with specified name at current position.
         /// </summary>
         /// <param name="name"></param>
-        public void AddBookmark(string name)
+        public void AddBookmark (string name)
         {
-            if (!String.IsNullOrEmpty(name))
-                PreparedPages.Bookmarks.Add(name, CurPage, CurY);
+            if (!string.IsNullOrEmpty (name))
+            {
+                PreparedPages.Bookmarks.Add (name, CurPage, CurY);
+            }
         }
 
         /// <summary>
@@ -127,9 +133,9 @@ namespace AM.Reporting.Engine
         /// You must set your report to double pass to use this method.
         /// </note>
         /// </remarks>
-        public int GetBookmarkPage(string name)
+        public int GetBookmarkPage (string name)
         {
-            return PreparedPages.Bookmarks.GetPageNo(name);
+            return PreparedPages.Bookmarks.GetPageNo (name);
         }
 
         #endregion Public Methods

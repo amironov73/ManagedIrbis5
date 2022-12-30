@@ -14,7 +14,6 @@
  */
 
 #if NETSTANDARD2_0 || NETSTANDARD2_1
-
 #region Using directives
 
 using System;
@@ -209,8 +208,10 @@ namespace System.Drawing
 #endif
     public class ColorExt
     {
-        private static readonly ConcurrentDictionary<int, KnownColor> ColorToKnownColor = new ConcurrentDictionary<int, KnownColor>();
-        private static readonly ConcurrentDictionary<KnownColor, Color> KnownColorToColor = new ConcurrentDictionary<KnownColor, Color>();
+        private static readonly ConcurrentDictionary<int, KnownColor> ColorToKnownColor =
+ new ConcurrentDictionary<int, KnownColor>();
+        private static readonly ConcurrentDictionary<KnownColor, Color> KnownColorToColor =
+ new ConcurrentDictionary<KnownColor, Color>();
 
         static ColorExt()
         {
@@ -595,4 +596,3 @@ namespace System.Drawing
     }
 }
 #endif
-

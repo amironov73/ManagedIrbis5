@@ -33,31 +33,38 @@ namespace AM.Reporting.TypeConverters
         #region Public Methods
 
         /// <inheritdoc/>
-        public override bool CanConvertTo(ITypeDescriptorContext context,
-          Type destinationType)
+        public override bool CanConvertTo (ITypeDescriptorContext context,
+            Type destinationType)
         {
-            if (destinationType == typeof(string)) return true;
-            return base.CanConvertTo(context, destinationType);
+            if (destinationType == typeof (string))
+            {
+                return true;
+            }
+
+            return base.CanConvertTo (context, destinationType);
         }
 
         /// <inheritdoc/>
-        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture,
-          object value, Type destinationType)
+        public override object ConvertTo (ITypeDescriptorContext context, CultureInfo culture,
+            object value, Type destinationType)
         {
-            if (value != null && destinationType == typeof(string))
+            if (value != null && destinationType == typeof (string))
+            {
                 return "(" + value.GetType().Name + ")";
+            }
+
             return null;
         }
 
         /// <inheritdoc/>
-        public override PropertyDescriptorCollection GetProperties(ITypeDescriptorContext context,
-      object value, Attribute[] attributes)
+        public override PropertyDescriptorCollection GetProperties (ITypeDescriptorContext context,
+            object value, Attribute[] attributes)
         {
-            return TypeDescriptor.GetProperties(value, attributes);
+            return TypeDescriptor.GetProperties (value, attributes);
         }
 
         /// <inheritdoc/>
-        public override bool GetPropertiesSupported(ITypeDescriptorContext context)
+        public override bool GetPropertiesSupported (ITypeDescriptorContext context)
         {
             return true;
         }

@@ -31,6 +31,7 @@ namespace AM.Reporting.Format
     public class GeneralFormat : FormatBase
     {
         #region Public Methods
+
         /// <inheritdoc/>
         public override FormatBase Clone()
         {
@@ -38,9 +39,9 @@ namespace AM.Reporting.Format
         }
 
         /// <inheritdoc/>
-        public override bool Equals(object obj)
+        public override bool Equals (object obj)
         {
-            GeneralFormat f = obj as GeneralFormat;
+            var f = obj as GeneralFormat;
             return f != null;
         }
 
@@ -51,10 +52,13 @@ namespace AM.Reporting.Format
         }
 
         /// <inheritdoc/>
-        public override string FormatValue(object value)
+        public override string FormatValue (object value)
         {
             if (value != null)
+            {
                 return value.ToString();
+            }
+
             return "";
         }
 
@@ -62,6 +66,7 @@ namespace AM.Reporting.Format
         {
             return "";
         }
+
         #endregion
     }
 }

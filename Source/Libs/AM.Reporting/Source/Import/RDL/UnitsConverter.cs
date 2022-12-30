@@ -37,12 +37,13 @@ namespace AM.Reporting.Import.RDL
         /// </summary>
         /// <param name="boolean">The RDL Boolean value.</param>
         /// <returns>The bool value.</returns>
-        public static bool BooleanToBool(string boolean)
+        public static bool BooleanToBool (string boolean)
         {
             if (boolean.ToLower() == "true")
             {
                 return true;
             }
+
             return false;
         }
 
@@ -51,9 +52,9 @@ namespace AM.Reporting.Import.RDL
         /// </summary>
         /// <param name="colorName">The RDL Color value.</param>
         /// <returns>The Color value.</returns>
-        public static Color ConvertColor(string colorName)
+        public static Color ConvertColor (string colorName)
         {
-            return Color.FromName(colorName);
+            return Color.FromName (colorName);
         }
 
         /// <summary>
@@ -62,9 +63,9 @@ namespace AM.Reporting.Import.RDL
         /// <param name="size">The RDL Size value.</param>
         /// <param name="unit">The RDL Size units measure.</param>
         /// <returns>The float value of RDL Size.</returns>
-        public static float SizeToFloat(string size, string unit)
+        public static float SizeToFloat (string size, string unit)
         {
-            return float.Parse(size.Replace(unit, ""), new CultureInfo("en-US", false).NumberFormat);
+            return float.Parse (size.Replace (unit, ""), new CultureInfo ("en-US", false).NumberFormat);
         }
 
         /// <summary>
@@ -73,10 +74,11 @@ namespace AM.Reporting.Import.RDL
         /// <param name="size">The RDL Size value.</param>
         /// <param name="unit">The RDL Size units measure.</param>
         /// <returns>The int value of RDL Size.</returns>
-        public static int SizeToInt(string size, string unit)
+        public static int SizeToInt (string size, string unit)
         {
-            int resSize = 0;
-            int.TryParse(size.Replace(unit, ""), NumberStyles.None, new CultureInfo("en-US", false).NumberFormat, out resSize);
+            var resSize = 0;
+            int.TryParse (size.Replace (unit, ""), NumberStyles.None, new CultureInfo ("en-US", false).NumberFormat,
+                out resSize);
             return resSize;
         }
 
@@ -85,28 +87,29 @@ namespace AM.Reporting.Import.RDL
         /// </summary>
         /// <param name="size">The RDL Size value.</param>
         /// <returns>The float value of RDL Size in millimeters.</returns>
-        public static float SizeToMillimeters(string size)
+        public static float SizeToMillimeters (string size)
         {
-            if (size.Contains(SizeUnits.Millimeter))
+            if (size.Contains (SizeUnits.Millimeter))
             {
-                return SizeToFloat(size, SizeUnits.Millimeter);
+                return SizeToFloat (size, SizeUnits.Millimeter);
             }
-            else if (size.Contains(SizeUnits.Centimeter))
+            else if (size.Contains (SizeUnits.Centimeter))
             {
-                return SizeToFloat(size, SizeUnits.Centimeter) * SizeUnitsM.Centimeter;
+                return SizeToFloat (size, SizeUnits.Centimeter) * SizeUnitsM.Centimeter;
             }
-            else if (size.Contains(SizeUnits.Inch))
+            else if (size.Contains (SizeUnits.Inch))
             {
-                return SizeToFloat(size, SizeUnits.Inch) * SizeUnitsM.Inch;
+                return SizeToFloat (size, SizeUnits.Inch) * SizeUnitsM.Inch;
             }
-            else if (size.Contains(SizeUnits.Point))
+            else if (size.Contains (SizeUnits.Point))
             {
-                return SizeToFloat(size, SizeUnits.Point) * SizeUnitsM.Point;
+                return SizeToFloat (size, SizeUnits.Point) * SizeUnitsM.Point;
             }
-            else if (size.Contains(SizeUnits.Pica))
+            else if (size.Contains (SizeUnits.Pica))
             {
-                return SizeToFloat(size, SizeUnits.Pica) * SizeUnitsM.Pica;
+                return SizeToFloat (size, SizeUnits.Pica) * SizeUnitsM.Pica;
             }
+
             return 0.0f;
         }
 
@@ -115,28 +118,29 @@ namespace AM.Reporting.Import.RDL
         /// </summary>
         /// <param name="size">The RDL Size value.</param>
         /// <returns>The float value of RDL Size in pixels.</returns>
-        public static float SizeToPixels(string size)
+        public static float SizeToPixels (string size)
         {
-            if (size.Contains(SizeUnits.Millimeter))
+            if (size.Contains (SizeUnits.Millimeter))
             {
-                return SizeToFloat(size, SizeUnits.Millimeter) * SizeUnitsP.Millimeter;
+                return SizeToFloat (size, SizeUnits.Millimeter) * SizeUnitsP.Millimeter;
             }
-            else if (size.Contains(SizeUnits.Centimeter))
+            else if (size.Contains (SizeUnits.Centimeter))
             {
-                return SizeToFloat(size, SizeUnits.Centimeter) * SizeUnitsP.Centimeter;
+                return SizeToFloat (size, SizeUnits.Centimeter) * SizeUnitsP.Centimeter;
             }
-            else if (size.Contains(SizeUnits.Inch))
+            else if (size.Contains (SizeUnits.Inch))
             {
-                return SizeToFloat(size, SizeUnits.Inch) * SizeUnitsP.Inch;
+                return SizeToFloat (size, SizeUnits.Inch) * SizeUnitsP.Inch;
             }
-            else if (size.Contains(SizeUnits.Point))
+            else if (size.Contains (SizeUnits.Point))
             {
-                return SizeToFloat(size, SizeUnits.Point) * SizeUnitsP.Point;
+                return SizeToFloat (size, SizeUnits.Point) * SizeUnitsP.Point;
             }
-            else if (size.Contains(SizeUnits.Pica))
+            else if (size.Contains (SizeUnits.Pica))
             {
-                return SizeToFloat(size, SizeUnits.Pica) * SizeUnitsP.Pica;
+                return SizeToFloat (size, SizeUnits.Pica) * SizeUnitsP.Pica;
             }
+
             return 0.0f;
         }
 
@@ -145,12 +149,13 @@ namespace AM.Reporting.Import.RDL
         /// </summary>
         /// <param name="fontStyle">The RDL FontStyle value.</param>
         /// <returns>The FontStyle value.</returns>
-        public static FontStyle ConvertFontStyle(string fontStyle)
+        public static FontStyle ConvertFontStyle (string fontStyle)
         {
             if (fontStyle == "Italic")
             {
                 return FontStyle.Italic;
             }
+
             return FontStyle.Regular;
         }
 
@@ -159,9 +164,9 @@ namespace AM.Reporting.Import.RDL
         /// </summary>
         /// <param name="fontSize">The RDL FontSize value.</param>
         /// <returns>The float value of RDL FontSize in points.</returns>
-        public static float ConvertFontSize(string fontSize)
+        public static float ConvertFontSize (string fontSize)
         {
-            return float.Parse(fontSize.Replace(SizeUnits.Point, ""), new CultureInfo("en-US", false).NumberFormat);
+            return float.Parse (fontSize.Replace (SizeUnits.Point, ""), new CultureInfo ("en-US", false).NumberFormat);
         }
 
         /// <summary>
@@ -169,7 +174,7 @@ namespace AM.Reporting.Import.RDL
         /// </summary>
         /// <param name="textAlign">The RDL TextAlign value.</param>
         /// <returns>The HorzAlign value.</returns>
-        public static HorzAlign ConvertTextAlign(string textAlign)
+        public static HorzAlign ConvertTextAlign (string textAlign)
         {
             if (textAlign == "Center")
             {
@@ -179,6 +184,7 @@ namespace AM.Reporting.Import.RDL
             {
                 return HorzAlign.Right;
             }
+
             return HorzAlign.Left;
         }
 
@@ -187,7 +193,7 @@ namespace AM.Reporting.Import.RDL
         /// </summary>
         /// <param name="verticalAlign">The RDL VerticalAlign value.</param>
         /// <returns>The VertAlign value.</returns>
-        public static VertAlign ConvertVerticalAlign(string verticalAlign)
+        public static VertAlign ConvertVerticalAlign (string verticalAlign)
         {
             if (verticalAlign == "Middle")
             {
@@ -197,6 +203,7 @@ namespace AM.Reporting.Import.RDL
             {
                 return VertAlign.Bottom;
             }
+
             return VertAlign.Top;
         }
 
@@ -205,12 +212,13 @@ namespace AM.Reporting.Import.RDL
         /// </summary>
         /// <param name="writingMode">The RDL WritingMode value.</param>
         /// <returns>The int value of RDL WritingMode in degree.</returns>
-        public static int ConvertWritingMode(string writingMode)
+        public static int ConvertWritingMode (string writingMode)
         {
             if (writingMode == "tb-rl")
             {
                 return 90;
             }
+
             return 0;
         }
 
@@ -219,7 +227,7 @@ namespace AM.Reporting.Import.RDL
         /// </summary>
         /// <param name="textAlign">The RDL TextAling value.</param>
         /// <returns>The StringAlignment value.</returns>
-        public static StringAlignment ConvertTextAlignToStringAlignment(string textAlign)
+        public static StringAlignment ConvertTextAlignToStringAlignment (string textAlign)
         {
             if (textAlign == "Left")
             {
@@ -229,6 +237,7 @@ namespace AM.Reporting.Import.RDL
             {
                 return StringAlignment.Far;
             }
+
             return StringAlignment.Center;
         }
 
@@ -238,7 +247,7 @@ namespace AM.Reporting.Import.RDL
         /// <param name="textAlign">The RDL TextAlign value.</param>
         /// <param name="vertAlign">The RDL VerticalAlign value.</param>
         /// <returns>The ContentAlignment value.</returns>
-        public static ContentAlignment ConvertTextAndVerticalAlign(string textAlign, string vertAlign)
+        public static ContentAlignment ConvertTextAndVerticalAlign (string textAlign, string vertAlign)
         {
             if (textAlign == "General" || textAlign == "Center")
             {
@@ -254,6 +263,7 @@ namespace AM.Reporting.Import.RDL
                 {
                     return ContentAlignment.BottomCenter;
                 }
+
                 return ContentAlignment.TopCenter;
             }
             else if (textAlign == "Left")
@@ -270,6 +280,7 @@ namespace AM.Reporting.Import.RDL
                 {
                     return ContentAlignment.BottomLeft;
                 }
+
                 return ContentAlignment.TopLeft;
             }
             else if (textAlign == "Right")
@@ -286,8 +297,10 @@ namespace AM.Reporting.Import.RDL
                 {
                     return ContentAlignment.BottomRight;
                 }
+
                 return ContentAlignment.TopRight;
             }
+
             return ContentAlignment.TopLeft;
         }
 
@@ -296,7 +309,7 @@ namespace AM.Reporting.Import.RDL
         /// </summary>
         /// <param name="borderStyle">The RDL BorderStyle value.</param>
         /// <returns>The LineStyle value.</returns>
-        public static LineStyle ConvertBorderStyle(string borderStyle)
+        public static LineStyle ConvertBorderStyle (string borderStyle)
         {
             if (borderStyle == "Dotted")
             {
@@ -310,6 +323,7 @@ namespace AM.Reporting.Import.RDL
             {
                 return LineStyle.Double;
             }
+
             return LineStyle.Solid;
         }
 
@@ -318,7 +332,7 @@ namespace AM.Reporting.Import.RDL
         /// </summary>
         /// <param name="sizing">The RDL Sizing value.</param>
         /// <returns>The PictureBoxSizeMode value.</returns>
-        public static PictureBoxSizeMode ConvertSizing(string sizing)
+        public static PictureBoxSizeMode ConvertSizing (string sizing)
         {
             if (sizing == "AutoSize")
             {
@@ -332,6 +346,7 @@ namespace AM.Reporting.Import.RDL
             {
                 return PictureBoxSizeMode.Normal;
             }
+
             return PictureBoxSizeMode.Zoom;
         }
 

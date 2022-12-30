@@ -37,8 +37,6 @@ namespace AM.Reporting.Data.JsonConnection
         #region Private Fields
 
         private JsonArray _json;
-        private bool updateSchema;
-        private bool simpleStructure;
         private string tableData;
 
         #endregion Private Fields
@@ -48,52 +46,30 @@ namespace AM.Reporting.Data.JsonConnection
         /// <summary>
         /// Gets or sets value for force update schema on init schema
         /// </summary>
-        [Browsable(false)]
-        public bool UpdateSchema
-        {
-            get
-            {
-                return updateSchema;
-            }
-            set
-            {
-                updateSchema = value;
-            }
-        }
+        [Browsable (false)]
+        public bool UpdateSchema { get; set; }
+
         /// <summary>
         /// Get or sets simplify mode for array types
         /// </summary>
-        [Browsable(false)]
-        public bool SimpleStructure
-        {
-            get
-            {
-                return simpleStructure;
-            }
-
-            set
-            {
-                simpleStructure = value;
-            }
-        }
+        [Browsable (false)]
+        public bool SimpleStructure { get; set; }
 
         /// <inheritdoc />
-        [Browsable(false)]
+        [Browsable (false)]
         public override string TableData
         {
             get
             {
-                if (String.IsNullOrEmpty(tableData))
+                if (string.IsNullOrEmpty (tableData))
                 {
                     tableData = Json.ToString();
                 }
+
                 return tableData;
             }
 
-            set
-            {
-                tableData = value;
-            }
+            set => tableData = value;
         }
 
         #endregion Public Properties
@@ -106,23 +82,24 @@ namespace AM.Reporting.Data.JsonConnection
             {
                 if (_json == null)
                 {
-                    if (StoreData && !String.IsNullOrEmpty(tableData))
+                    if (StoreData && !string.IsNullOrEmpty (tableData))
                     {
-                        _json = JsonBase.FromString(tableData) as JsonArray;
+                        _json = JsonBase.FromString (tableData) as JsonArray;
                     }
                     else
                     {
-                        _json = GetJson(Parent, this) as JsonArray;
+                        _json = GetJson (Parent, this) as JsonArray;
                     }
+
                     if (_json == null)
+                    {
                         _json = new JsonArray();
+                    }
                 }
+
                 return _json;
             }
-            set
-            {
-                _json = value;
-            }
+            set => _json = value;
         }
 
         #endregion Internal Properties
@@ -133,14 +110,20 @@ namespace AM.Reporting.Data.JsonConnection
         {
             get
             {
-                if (currentRow is int)
-                    return (int)currentRow;
+                if (currentRow is int row)
+                {
+                    return row;
+                }
+
                 if (CurrentRowNo < Rows.Count)
                 {
-                    object result = Rows[CurrentRowNo];
-                    if (result is int)
-                        return (int)result;
+                    var result = Rows[CurrentRowNo];
+                    if (result is int i)
+                    {
+                        return i;
+                    }
                 }
+
                 return CurrentRowNo;
             }
         }
@@ -152,7 +135,7 @@ namespace AM.Reporting.Data.JsonConnection
         /// <inheritdoc/>
         public JsonTableDataSource()
         {
-            DataType = typeof(JsonArray);
+            DataType = typeof (JsonArray);
         }
 
         #endregion Public Constructors
@@ -171,29 +154,30 @@ namespace AM.Reporting.Data.JsonConnection
         {
             if (Columns.Count == 0 || UpdateSchema && !StoreData)
             {
-
                 if (Connection is JsonDataSourceConnection)
                 {
-                    JsonDataSourceConnection con = Connection as JsonDataSourceConnection;
+                    var con = Connection as JsonDataSourceConnection;
 
-                    InitSchema(this, con.JsonSchema, con.SimpleStructure);
+                    InitSchema (this, con.JsonSchema, con.SimpleStructure);
                 }
             }
+
             UpdateSchema = false;
         }
 
         /// <inheritdoc/>
-        public override void LoadData(ArrayList rows)
+        public override void LoadData (ArrayList rows)
         {
             Json = null;
+
             // JSON is calculated property, no problem with null
             if (rows != null && Json != null)
             {
                 rows.Clear();
-                int count = Json.Count;
-                for (int i = 0; i < count; i++)
+                var count = Json.Count;
+                for (var i = 0; i < count; i++)
                 {
-                    rows.Add(i);
+                    rows.Add (i);
                 }
             }
         }
@@ -202,16 +186,16 @@ namespace AM.Reporting.Data.JsonConnection
 
         #region Internal Methods
 
-        internal static object GetJsonBaseByColumn(Base parentColumn, Column column)
+        internal static object GetJsonBaseByColumn (Base parentColumn, Column column)
         {
-            if (parentColumn is JsonTableDataSource)
+            if (parentColumn is JsonTableDataSource jsonTableDataSource)
             {
-                JsonTableDataSource jsonTableDataSource = parentColumn as JsonTableDataSource;
                 if (jsonTableDataSource.SimpleStructure)
                 {
-                    if (!String.IsNullOrEmpty(column.PropName))
+                    if (!string.IsNullOrEmpty (column.PropName))
                     {
-                        var obj = (parentColumn as JsonTableDataSource).Json[(parentColumn as JsonTableDataSource).CurrentIndex];
+                        var obj = jsonTableDataSource.Json[
+                            jsonTableDataSource.CurrentIndex];
 
                         return (obj as JsonBase)[column.PropName];
                     }
@@ -221,44 +205,47 @@ namespace AM.Reporting.Data.JsonConnection
                     switch (column.PropName)
                     {
                         case "item":
-                            return (parentColumn as JsonTableDataSource).Json[(parentColumn as JsonTableDataSource).CurrentIndex];
+                            return jsonTableDataSource.Json[
+                                jsonTableDataSource.CurrentIndex];
                     }
-                    JsonTableDataSource source = column as JsonTableDataSource;
+
+                    var source = column as JsonTableDataSource;
                     return source.Json;
                 }
             }
-            if (parentColumn is Column && !String.IsNullOrEmpty(column.PropName))
+
+            if (parentColumn is Column @base && !string.IsNullOrEmpty (column.PropName))
             {
-                object json = GetJsonBaseByColumn(parentColumn.Parent, parentColumn as Column);
-                if (json is JsonBase)
+                var json = GetJsonBaseByColumn (@base.Parent, @base);
+                if (json is JsonBase jsonBase)
                 {
-                    return (json as JsonBase)[column.PropName];
+                    return jsonBase[column.PropName];
                 }
             }
 
             return null;
         }
 
-        internal static object GetValueByColumn(Base parentColumn, Column column)
+        internal static object GetValueByColumn (Base parentColumn, Column column)
         {
-            if (parentColumn is JsonTableDataSource)
+            if (parentColumn is JsonTableDataSource source)
             {
                 switch (column.PropName)
                 {
                     case "index":
-                        return (parentColumn as JsonTableDataSource).CurrentIndex;
+                        return source.CurrentIndex;
 
                     case "array":
-                        return (parentColumn as JsonTableDataSource).Json;
+                        return source.Json;
                 }
             }
 
-            object json = GetJsonBaseByColumn(parentColumn, column);
+            var json = GetJsonBaseByColumn (parentColumn, column);
 
             return json;
         }
 
-        internal static void InitSchema(Column table, JsonSchema schema, bool simpleStructure)
+        internal static void InitSchema (Column table, JsonSchema schema, bool simpleStructure)
         {
             List<Column> saveColumns = new List<Column>();
             switch (schema.Type)
@@ -268,13 +255,13 @@ namespace AM.Reporting.Data.JsonConnection
                     {
                         if (kv.Value.Type == "object")
                         {
-                            Column c = new Column();
+                            var c = new Column();
                             c.Name = kv.Key;
                             c.Alias = kv.Key;
                             c.PropName = kv.Key;
                             c.DataType = kv.Value.DataType;
-                            c = UpdateColumn(table, c, saveColumns);
-                            InitSchema(c, kv.Value, simpleStructure);
+                            c = UpdateColumn (table, c, saveColumns);
+                            InitSchema (c, kv.Value, simpleStructure);
                         }
                         else if (kv.Value.Type == "array")
                         {
@@ -283,32 +270,31 @@ namespace AM.Reporting.Data.JsonConnection
                             c.Alias = kv.Key;
                             c.PropName = kv.Key;
                             c.DataType = kv.Value.DataType;
-                            c = UpdateColumn(table, c, saveColumns);
+                            c = UpdateColumn (table, c, saveColumns);
 
-                            InitSchema(c, kv.Value, simpleStructure);
-
+                            InitSchema (c, kv.Value, simpleStructure);
                         }
                         else
                         {
-                            Column c = new Column();
+                            var c = new Column();
                             c.Name = kv.Key;
                             c.Alias = kv.Key;
                             c.PropName = kv.Key;
                             c.DataType = kv.Value.DataType;
-                            c.SetBindableControlType(c.DataType);
-                            UpdateColumn(table, c, saveColumns);
+                            c.SetBindableControlType (c.DataType);
+                            UpdateColumn (table, c, saveColumns);
                         }
                     }
+
                     break;
 
                 case "array":
-                    JsonSchema items = schema.Items;
+                    var items = schema.Items;
 
-                    bool simpleArray = false;
+                    var simpleArray = false;
 
-                    if (table is JsonTableDataSource)
+                    if (table is JsonTableDataSource jsonTableDataSource)
                     {
-                        JsonTableDataSource jsonTableDataSource = table as JsonTableDataSource;
                         simpleArray = jsonTableDataSource.SimpleStructure =
                             simpleStructure & items.Type == "object";
                     }
@@ -316,94 +302,92 @@ namespace AM.Reporting.Data.JsonConnection
                     if (simpleArray)
                     {
                         // remake schema in simplify mode
-                        InitSchema(table, items, simpleStructure);
+                        InitSchema (table, items, simpleStructure);
+
                         // and return, no need to clear column data
                         // in this case this method has no control to columns
                         return;
                     }
 
 
+                {
+                    var c = new Column();
+                    c.Name = "index";
+                    c.Alias = "index";
+                    c.PropName = "index";
+                    c.DataType = typeof (int);
+                    UpdateColumn (table, c, saveColumns);
+                }
+
+
+                {
+                    Column c;
+                    var iSchema = false;
+
+                    if (items.Type == "object")
                     {
-                        Column c = new Column();
-                        c.Name = "index";
-                        c.Alias = "index";
-                        c.PropName = "index";
-                        c.DataType = typeof(int);
-                        UpdateColumn(table, c, saveColumns);
+                        c = new Column();
+                        iSchema = true;
+                    }
+                    else if (items.Type == "array")
+                    {
+                        c = new JsonTableDataSource();
+                        iSchema = true;
+                    }
+                    else
+                    {
+                        c = new Column();
                     }
 
+                    c.Name = "item";
+                    c.Alias = "item";
+                    c.PropName = "item";
+                    c.DataType = items.DataType;
+                    c = UpdateColumn (table, c, saveColumns);
 
-
+                    if (iSchema)
                     {
-                        Column c;
-                        bool iSchema = false;
-
-                        if (items.Type == "object")
-                        {
-                            c = new Column();
-                            iSchema = true;
-
-                        }
-                        else if (items.Type == "array")
-                        {
-                            c = new JsonTableDataSource();
-                            iSchema = true;
-                        }
-                        else
-                        {
-                            c = new Column();
-                        }
-
-                        c.Name = "item";
-                        c.Alias = "item";
-                        c.PropName = "item";
-                        c.DataType = items.DataType;
-                        c = UpdateColumn(table, c, saveColumns);
-
-                        if (iSchema)
-                            InitSchema(c, items, simpleStructure);
+                        InitSchema (c, items, simpleStructure);
                     }
+                }
 
-                    {
-                        Column c = new Column();
-                        c.Name = "array";
-                        c.Alias = "array";
-                        c.PropName = "array";
-                        c.DataType = typeof(JsonBase);
-                        UpdateColumn(table, c, saveColumns);
-                    }
+                {
+                    var c = new Column();
+                    c.Name = "array";
+                    c.Alias = "array";
+                    c.PropName = "array";
+                    c.DataType = typeof (JsonBase);
+                    UpdateColumn (table, c, saveColumns);
+                }
 
                     break;
             }
 
-            for (int i = 0; i < table.Columns.Count; i++)
+            for (var i = 0; i < table.Columns.Count; i++)
             {
-                if (!(table.Columns[i].Calculated || saveColumns.Contains(table.Columns[i])))
+                if (!(table.Columns[i].Calculated || saveColumns.Contains (table.Columns[i])))
                 {
-                    table.Columns.RemoveAt(i);
+                    table.Columns.RemoveAt (i);
                     i--;
                 }
             }
         }
 
-        internal object GetJson(Base parentColumn, Column column)
+        internal object GetJson (Base parentColumn, Column column)
         {
-            if(parentColumn is IJsonProviderSourceConnection)
+            if (parentColumn is IJsonProviderSourceConnection connection)
             {
-                return (parentColumn as IJsonProviderSourceConnection).GetJson(this);
+                return connection.GetJson (this);
             }
 
-            if (parentColumn is JsonTableDataSource)
+            if (parentColumn is JsonTableDataSource source)
             {
-
-                JsonTableDataSource source = parentColumn as JsonTableDataSource;
-
                 if (source.SimpleStructure)
                 {
-                    object parentJson = source.Json[source.CurrentIndex];
-                    if (parentJson is JsonBase && !String.IsNullOrEmpty(column.PropName))
+                    var parentJson = source.Json[source.CurrentIndex];
+                    if (parentJson is JsonBase @base && !string.IsNullOrEmpty (column.PropName))
                     {
-                        return (parentJson as JsonBase)[column.PropName];
+                        return @base[column.PropName];
                     }
                 }
                 else
@@ -411,14 +395,15 @@ namespace AM.Reporting.Data.JsonConnection
                     return source.Json[source.CurrentIndex] as object;
                 }
             }
-            else if (parentColumn is Column)
+            else if (parentColumn is Column @base)
             {
-                object parentJson = GetJson(parentColumn.Parent, parentColumn as Column);
-                if (parentJson is JsonBase && !String.IsNullOrEmpty(column.PropName))
+                var parentJson = GetJson (@base.Parent, @base);
+                if (parentJson is JsonBase jsonBase && !string.IsNullOrEmpty (column.PropName))
                 {
-                    return (parentJson as JsonBase)[column.PropName];
+                    return jsonBase[column.PropName];
                 }
             }
+
             return null;
         }
 
@@ -427,45 +412,48 @@ namespace AM.Reporting.Data.JsonConnection
         #region Protected Methods
 
         /// <inheritdoc/>
-        protected override object GetValue(Column column)
+        protected override object GetValue (Column column)
         {
-            return GetValueByColumn(column.Parent, column);
+            return GetValueByColumn (column.Parent, column);
         }
 
         /// <inheritdoc/>
-        protected override object GetValue(string alias)
+        protected override object GetValue (string alias)
         {
             // TODO TEST
             Column column = this;
-            string[] colAliases = alias.Split('.');
+            string[] colAliases = alias.Split ('.');
 
-            foreach (string colAlias in colAliases)
+            foreach (var colAlias in colAliases)
             {
-                column = column.Columns.FindByAlias(colAlias);
+                column = column.Columns.FindByAlias (colAlias);
                 if (column == null)
+                {
                     return null;
+                }
             }
 
-            return GetValueByColumn(column.Parent, column);
+            return GetValueByColumn (column.Parent, column);
         }
 
         #endregion Protected Methods
 
         #region Private Methods
 
-        private static Column UpdateColumn(Column table, Column c, List<Column> list)
+        private static Column UpdateColumn (Column table, Column c, List<Column> list)
         {
             foreach (Column child in table.Columns)
             {
                 if (child.PropName == c.PropName)
                 {
                     child.DataType = c.DataType;
-                    list.Add(child);
+                    list.Add (child);
                     return child;
                 }
             }
-            table.AddChild(c);
-            list.Add(c);
+
+            table.AddChild (c);
+            list.Add (c);
             return c;
         }
 
@@ -473,13 +461,13 @@ namespace AM.Reporting.Data.JsonConnection
 
 
         ///  <inheritdoc/>
-        public override void Serialize(FRWriter writer)
+        public override void Serialize (FRWriter writer)
         {
-            base.Serialize(writer);
+            base.Serialize (writer);
 
             if (SimpleStructure)
             {
-                writer.WriteBool("SimpleStructure", SimpleStructure);
+                writer.WriteBool ("SimpleStructure", SimpleStructure);
             }
         }
     }

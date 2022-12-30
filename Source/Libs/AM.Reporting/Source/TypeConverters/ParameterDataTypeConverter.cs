@@ -16,6 +16,7 @@
 #region Using directives
 
 using AM.Reporting.Data;
+
 using System;
 using System.ComponentModel;
 using System.Globalization;
@@ -30,42 +31,53 @@ namespace AM.Reporting.TypeConverters
     {
         #region Public Methods
 
-        public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
+        public override bool CanConvertFrom (ITypeDescriptorContext context, Type sourceType)
         {
-            if (sourceType == typeof(string))
-                return true;
-            return base.CanConvertFrom(context, sourceType);
-        }
-
-        public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
-        {
-            if (destinationType == typeof(string))
-                return true;
-            return base.CanConvertTo(context, destinationType);
-        }
-
-        public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
-        {
-            if (context != null && context.Instance is CommandParameter && value is string)
+            if (sourceType == typeof (string))
             {
-                CommandParameter parameter = context.Instance as CommandParameter;
-                Type dataType = parameter.GetUnderlyingDataType;
-                if (dataType != null)
-                    return (int)Enum.Parse(dataType, (string)value);
+                return true;
             }
-            return base.ConvertFrom(context, culture, value);
+
+            return base.CanConvertFrom (context, sourceType);
         }
 
-        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
+        public override bool CanConvertTo (ITypeDescriptorContext context, Type destinationType)
         {
-            if (context != null && context.Instance is CommandParameter && destinationType == typeof(string))
+            if (destinationType == typeof (string))
             {
-                CommandParameter parameter = context.Instance as CommandParameter;
-                Type dataType = parameter.GetUnderlyingDataType;
-                if (dataType != null)
-                    return Enum.Format(dataType, value, "G");
+                return true;
             }
-            return base.ConvertTo(context, culture, value, destinationType);
+
+            return base.CanConvertTo (context, destinationType);
+        }
+
+        public override object ConvertFrom (ITypeDescriptorContext context, CultureInfo culture, object value)
+        {
+            if (context != null && context.Instance is CommandParameter parameter && value is string s)
+            {
+                var dataType = parameter.GetUnderlyingDataType;
+                if (dataType != null)
+                {
+                    return (int)Enum.Parse (dataType, s);
+                }
+            }
+
+            return base.ConvertFrom (context, culture, value);
+        }
+
+        public override object ConvertTo (ITypeDescriptorContext context, CultureInfo culture, object value,
+            Type destinationType)
+        {
+            if (context != null && context.Instance is CommandParameter parameter && destinationType == typeof (string))
+            {
+                var dataType = parameter.GetUnderlyingDataType;
+                if (dataType != null)
+                {
+                    return Enum.Format (dataType, value, "G");
+                }
+            }
+
+            return base.ConvertTo (context, culture, value, destinationType);
         }
 
         #endregion Public Methods

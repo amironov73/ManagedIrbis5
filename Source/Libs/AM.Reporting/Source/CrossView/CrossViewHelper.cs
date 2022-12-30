@@ -28,11 +28,6 @@ namespace AM.Reporting.CrossView
 {
     internal partial class CrossViewHelper
     {
-        private CrossViewObject crossView;
-        private int headerWidth;
-        private int headerHeight;
-        private int templateBodyWidth;
-        private int templateBodyHeight;
         private bool designTime;
         private TableResult resultTable;
         private CrossViewDescriptor titleDescriptor;
@@ -41,54 +36,26 @@ namespace AM.Reporting.CrossView
         private CrossViewHeaderDescriptor noColumnsDescriptor;
         private CrossViewHeaderDescriptor noRowsDescriptor;
         private CrossViewCellDescriptor noCellsDescriptor;
-        private int resultBodyWidth;
-        private int resultBodyHeight;
 
         #region Properties
-        public CrossViewObject CrossView
-        {
-            get { return crossView; }
-        }
 
-        public Report Report
-        {
-            get { return CrossView.Report; }
-        }
+        public CrossViewObject CrossView { get; }
 
-        public TableResult ResultTable
-        {
-            get { return designTime ? resultTable : CrossView.ResultTable; }
-        }
+        public Report Report => CrossView.Report;
 
-        public int HeaderHeight
-        {
-            get { return headerHeight; }
-        }
+        public TableResult ResultTable => designTime ? resultTable : CrossView.ResultTable;
 
-        public int HeaderWidth
-        {
-            get { return headerWidth; }
-        }
+        public int HeaderHeight { get; private set; }
 
-        public int TemplateBodyWidth
-        {
-            get { return templateBodyWidth; }
-        }
+        public int HeaderWidth { get; private set; }
 
-        public int TemplateBodyHeight
-        {
-            get { return templateBodyHeight; }
-        }
+        public int TemplateBodyWidth { get; private set; }
 
-        public int ResultBodyWidth
-        {
-            get { return resultBodyWidth; }
-        }
+        public int TemplateBodyHeight { get; private set; }
 
-        public int ResultBodyHeight
-        {
-            get { return resultBodyHeight; }
-        }
+        public int ResultBodyWidth { get; private set; }
+
+        public int ResultBodyHeight { get; private set; }
 
         #endregion
 
@@ -101,37 +68,59 @@ namespace AM.Reporting.CrossView
         {
             if (CrossView.Data.SourceAssigned)
             {
-                headerWidth = CrossView.Data.YAxisFieldsCount;
-                headerHeight = CrossView.Data.XAxisFieldsCount;
+                HeaderWidth = CrossView.Data.YAxisFieldsCount;
+                HeaderHeight = CrossView.Data.XAxisFieldsCount;
             }
             else
             {
-                headerWidth = 1;
-                headerHeight = 1;
+                HeaderWidth = 1;
+                HeaderHeight = 1;
             }
+
             if (CrossView.ShowXAxisFieldsCaption)
-                headerHeight++;
+            {
+                HeaderHeight++;
+            }
+
             if (CrossView.ShowTitle)
-                headerHeight++;
-            if (headerHeight == 0)
+            {
+                HeaderHeight++;
+            }
+
+            if (HeaderHeight == 0)
+            {
                 if (CrossView.ShowYAxisFieldsCaption)
-                    headerHeight = 1;
-            templateBodyWidth = 1 + CrossView.Data.XAxisFieldsCount;
+                {
+                    HeaderHeight = 1;
+                }
+            }
+
+            TemplateBodyWidth = 1 + CrossView.Data.XAxisFieldsCount;
             if (CrossView.Data.MeasuresInXAxis)
-                templateBodyWidth = (templateBodyWidth - 1) * CrossView.Data.MeasuresCount;
-            templateBodyHeight = 1 + CrossView.Data.YAxisFieldsCount;
+            {
+                TemplateBodyWidth = (TemplateBodyWidth - 1) * CrossView.Data.MeasuresCount;
+            }
+
+            TemplateBodyHeight = 1 + CrossView.Data.YAxisFieldsCount;
             if (CrossView.Data.MeasuresInYAxis)
-                templateBodyHeight = (templateBodyHeight - 1) * CrossView.Data.MeasuresCount;
+            {
+                TemplateBodyHeight = (TemplateBodyHeight - 1) * CrossView.Data.MeasuresCount;
+            }
         }
 
         private void UpdateColumnDescriptors()
         {
-            int left = HeaderWidth;
-            int top = 0;
+            var left = HeaderWidth;
+            var top = 0;
             if (CrossView.ShowTitle)
+            {
                 top++;
+            }
+
             if (CrossView.ShowXAxisFieldsCaption)
+            {
                 top++;
+            }
 
             foreach (CrossViewHeaderDescriptor descr in CrossView.Data.Columns)
             {
@@ -143,8 +132,8 @@ namespace AM.Reporting.CrossView
 
         private void UpdateRowDescriptors()
         {
-            int left = 0;
-            int top = HeaderHeight;
+            var left = 0;
+            var top = HeaderHeight;
 
             foreach (CrossViewHeaderDescriptor descr in CrossView.Data.Rows)
             {
@@ -156,8 +145,8 @@ namespace AM.Reporting.CrossView
 
         private void UpdateCellDescriptors()
         {
-            int x = HeaderWidth;
-            int y = HeaderHeight;
+            var x = HeaderWidth;
+            var y = HeaderHeight;
 
             foreach (CrossViewCellDescriptor descr in CrossView.Data.Cells)
             {
@@ -188,84 +177,96 @@ namespace AM.Reporting.CrossView
                 xAxisFieldCaptionDescriptor.TemplateRow = CrossView.Rows[(CrossView.ShowTitle ? 1 : 0)];
                 xAxisFieldCaptionDescriptor.TemplateCell = CrossView[HeaderWidth, (CrossView.ShowTitle ? 1 : 0)];
             }
-
         }
 
-        private void ApplyStyle(TableCell cell, string styleName)
+        private void ApplyStyle (TableCell cell, string styleName)
         {
             Style style = null;
-            int styleIndex = CrossView.StyleSheet.IndexOf(CrossView.Style);
+            var styleIndex = CrossView.StyleSheet.IndexOf (CrossView.Style);
             if (styleIndex != -1)
             {
-                StyleCollection styles = CrossView.StyleSheet[styleIndex];
-                style = styles[styles.IndexOf(styleName)];
+                var styles = CrossView.StyleSheet[styleIndex];
+                style = styles[styles.IndexOf (styleName)];
             }
+
             if (style != null)
-                cell.ApplyStyle(style);
+            {
+                cell.ApplyStyle (style);
+            }
         }
 
-        private TableCell CreateCell(string text)
+        private TableCell CreateCell (string text)
         {
-            TableCell cell = new TableCell();
+            var cell = new TableCell();
             cell.AllowExpressions = false;
             cell.Font = DrawUtils.DefaultReportFont;
             cell.Text = text;
             cell.HorzAlign = HorzAlign.Center;
             cell.VertAlign = VertAlign.Center;
-            ApplyStyle(cell, "Header");
+            ApplyStyle (cell, "Header");
             return cell;
         }
 
         private TableCell CreateDataCell()
         {
-            TableCell cell = new TableCell();
+            var cell = new TableCell();
             cell.AllowExpressions = false;
             cell.Font = DrawUtils.DefaultReportFont;
             cell.HorzAlign = HorzAlign.Right;
             cell.VertAlign = VertAlign.Center;
-            ApplyStyle(cell, "Body");
+            ApplyStyle (cell, "Body");
             return cell;
         }
 
-        private void SetHint(TableCell cell, string text)
+        private void SetHint (TableCell cell, string text)
         {
-            cell.Assign(CrossView.Styles.DefaultStyle);
+            cell.Assign (CrossView.Styles.DefaultStyle);
             cell.Text = text;
             cell.Font = DrawUtils.DefaultReportFont;
-            cell.TextFill = new SolidFill(Color.Gray);
+            cell.TextFill = new SolidFill (Color.Gray);
             cell.HorzAlign = HorzAlign.Center;
             cell.VertAlign = VertAlign.Center;
-            cell.SetFlags(Flags.CanEdit, false);
+            cell.SetFlags (Flags.CanEdit, false);
         }
 
         private void InitTemplateTable()
         {
             TableColumn column;
             CrossViewDescriptor descr;
-            for (int i = 0; i < headerWidth + templateBodyWidth; i++)
+            for (var i = 0; i < HeaderWidth + TemplateBodyWidth; i++)
             {
                 column = new TableColumn();
-                descr = CrossView.Data.GetColumnDescriptor(i);
+                descr = CrossView.Data.GetColumnDescriptor (i);
                 if (descr.TemplateColumn != null)
-                    column.Assign(descr.TemplateColumn);
-                ResultTable.Columns.Add(column);
+                {
+                    column.Assign (descr.TemplateColumn);
+                }
+
+                ResultTable.Columns.Add (column);
             }
+
             TableRow row;
-            for (int i = 0; i < headerHeight + templateBodyHeight; i++)
+            for (var i = 0; i < HeaderHeight + TemplateBodyHeight; i++)
             {
                 row = new TableRow();
-                int rowindex = i;
-                if (crossView.ShowTitle)
+                var rowindex = i;
+                if (CrossView.ShowTitle)
+                {
                     rowindex--;
-                if (crossView.ShowXAxisFieldsCaption)
+                }
+
+                if (CrossView.ShowXAxisFieldsCaption)
+                {
                     rowindex--;
+                }
+
                 if (rowindex >= 0)
                 {
-                    descr = CrossView.Data.GetRowDescriptor(rowindex);
+                    descr = CrossView.Data.GetRowDescriptor (rowindex);
                 }
                 else
                 {
-                    if (crossView.ShowTitle)
+                    if (CrossView.ShowTitle)
                     {
                         if (i == 0)
                         {
@@ -281,9 +282,13 @@ namespace AM.Reporting.CrossView
                         descr = xAxisFieldCaptionDescriptor;
                     }
                 }
+
                 if (descr.TemplateRow != null)
-                    row.Assign(descr.TemplateRow);
-                ResultTable.Rows.Add(row);
+                {
+                    row.Assign (descr.TemplateRow);
+                }
+
+                ResultTable.Rows.Add (row);
             }
         }
 
@@ -292,32 +297,42 @@ namespace AM.Reporting.CrossView
             //todo
             TableColumn column;
             CrossViewDescriptor descr;
-            for (int i = 0; i < headerWidth + resultBodyWidth; i++)
+            for (var i = 0; i < HeaderWidth + ResultBodyWidth; i++)
             {
                 column = new TableColumn();
 
-                descr = CrossView.Data.GetColumnDescriptor(0); // temp 0 !!!
+                descr = CrossView.Data.GetColumnDescriptor (0); // temp 0 !!!
 
                 if (descr.TemplateColumn != null)
-                    column.Assign(descr.TemplateColumn);
-                ResultTable.Columns.Add(column);
+                {
+                    column.Assign (descr.TemplateColumn);
+                }
+
+                ResultTable.Columns.Add (column);
             }
+
             TableRow row;
-            for (int i = 0; i < headerHeight + resultBodyHeight; i++)
+            for (var i = 0; i < HeaderHeight + ResultBodyHeight; i++)
             {
                 row = new TableRow();
-                int rowindex = i;
-                if (crossView.ShowTitle)
+                var rowindex = i;
+                if (CrossView.ShowTitle)
+                {
                     rowindex--;
-                if (crossView.ShowXAxisFieldsCaption)
+                }
+
+                if (CrossView.ShowXAxisFieldsCaption)
+                {
                     rowindex--;
+                }
+
                 if (rowindex >= 0)
                 {
-                    descr = CrossView.Data.GetRowDescriptor(0); // temp 0 !!! (rowindex)
+                    descr = CrossView.Data.GetRowDescriptor (0); // temp 0 !!! (rowindex)
                 }
                 else
                 {
-                    if (crossView.ShowTitle)
+                    if (CrossView.ShowTitle)
                     {
                         if (i == 0)
                         {
@@ -333,69 +348,87 @@ namespace AM.Reporting.CrossView
                         descr = xAxisFieldCaptionDescriptor;
                     }
                 }
+
                 if (descr.TemplateRow != null)
-                    row.Assign(descr.TemplateRow);
-                ResultTable.Rows.Add(row);
+                {
+                    row.Assign (descr.TemplateRow);
+                }
+
+                ResultTable.Rows.Add (row);
             }
         }
 
         private void PrintHeaders()
         {
             if (CrossView.ShowTitle)
+            {
                 PrintTitle();
+            }
+
             PrintCorner();
             if (CrossView.ShowXAxisFieldsCaption)
+            {
                 PrintXAxisFieldsCaption();
+            }
         }
 
         private void PrintTitle()
         {
-            TableCell templateCell = titleDescriptor.TemplateCell;
+            var templateCell = titleDescriptor.TemplateCell;
             if (titleDescriptor.TemplateCell == null)
-                templateCell = CreateCell(Res.Get("ComponentsMisc,Matrix,Title"));
+            {
+                templateCell = CreateCell (Res.Get ("ComponentsMisc,Matrix,Title"));
+            }
 
-            TableCellData resultCell = ResultTable.GetCellData(HeaderWidth, 0);
+            var resultCell = ResultTable.GetCellData (HeaderWidth, 0);
             templateCell.SaveState();
             templateCell.GetData();
-            resultCell.RunTimeAssign(templateCell, true);
+            resultCell.RunTimeAssign (templateCell, true);
             resultCell.ColSpan = ResultTable.ColumnCount - HeaderWidth;
             templateCell.RestoreState();
 
             // print left-top cell
             if (titleDescriptor.TemplateCell == null)
+            {
                 templateCell.Text = "";
+            }
             else
+            {
                 templateCell = CrossView[0, 0];
+            }
 
-            resultCell = ResultTable.GetCellData(0, 0);
+            resultCell = ResultTable.GetCellData (0, 0);
             templateCell.SaveState();
             templateCell.GetData();
-            resultCell.RunTimeAssign(templateCell, true);
+            resultCell.RunTimeAssign (templateCell, true);
             templateCell.RestoreState();
             resultCell.ColSpan = HeaderWidth;
         }
 
         private void PrintCorner()
         {
-            int left = 0;
-            int top = (CrossView.ShowTitle ? 1 : 0);
-            int templateTop = titleDescriptor.TemplateRow != null ? 1 : 0;
+            var left = 0;
+            var top = (CrossView.ShowTitle ? 1 : 0);
+            var templateTop = titleDescriptor.TemplateRow != null ? 1 : 0;
             if (CrossView.ShowYAxisFieldsCaption)
             {
-
-                for (int i = 0; i < HeaderWidth; i++)
+                for (var i = 0; i < HeaderWidth; i++)
                 {
                     TableCell templateCell = null;
-                    CrossViewHeaderDescriptor descr = crossView.Data.GetColumnDescriptor(i);
+                    var descr = CrossView.Data.GetColumnDescriptor (i);
                     if (descr.TemplateColumn != null)
+                    {
                         templateCell = CrossView[0, templateTop];
+                    }
                     else
-                        templateCell = CreateCell(descr.GetName());
+                    {
+                        templateCell = CreateCell (descr.GetName());
+                    }
 
-                    TableCellData resultCell = ResultTable.GetCellData(left, top);
+                    var resultCell = ResultTable.GetCellData (left, top);
                     templateCell.SaveState();
                     templateCell.GetData();
-                    resultCell.RunTimeAssign(templateCell, true);
+                    resultCell.RunTimeAssign (templateCell, true);
                     templateCell.RestoreState();
 
                     resultCell.RowSpan = HeaderHeight - top;
@@ -405,11 +438,11 @@ namespace AM.Reporting.CrossView
             }
             else
             {
-                TableCell templateCell = CreateCell("");
-                TableCellData resultCell = ResultTable.GetCellData(left, top);
+                var templateCell = CreateCell ("");
+                var resultCell = ResultTable.GetCellData (left, top);
                 templateCell.SaveState();
                 templateCell.GetData();
-                resultCell.RunTimeAssign(templateCell, true);
+                resultCell.RunTimeAssign (templateCell, true);
                 templateCell.RestoreState();
                 resultCell.ColSpan = HeaderWidth;
                 resultCell.RowSpan = HeaderHeight - top;
@@ -418,90 +451,114 @@ namespace AM.Reporting.CrossView
 
         private void PrintXAxisFieldsCaption()
         {
-            int top = (CrossView.ShowTitle ? 1 : 0);
-            int templateTop = titleDescriptor.TemplateRow != null ? 1 : 0;
-            string captions = "";
-            for (int i = 0; i < CrossView.Data.XAxisFieldsCount; i++)
+            var top = (CrossView.ShowTitle ? 1 : 0);
+            var templateTop = titleDescriptor.TemplateRow != null ? 1 : 0;
+            var captions = "";
+            for (var i = 0; i < CrossView.Data.XAxisFieldsCount; i++)
             {
-                CrossViewHeaderDescriptor descr = crossView.Data.GetRowDescriptor(i);
+                var descr = CrossView.Data.GetRowDescriptor (i);
                 if (captions != "")
+                {
                     captions += ", ";
+                }
+
                 captions += descr.GetName();
             }
-            TableCell templateCell = xAxisFieldCaptionDescriptor.TemplateCell;
+
+            var templateCell = xAxisFieldCaptionDescriptor.TemplateCell;
             if (xAxisFieldCaptionDescriptor.TemplateCell == null)
-                templateCell = CreateCell(captions);
-            TableCellData resultCell = ResultTable.GetCellData(HeaderWidth, top);
+            {
+                templateCell = CreateCell (captions);
+            }
+
+            var resultCell = ResultTable.GetCellData (HeaderWidth, top);
             templateCell.SaveState();
             templateCell.GetData();
-            resultCell.RunTimeAssign(templateCell, true);
+            resultCell.RunTimeAssign (templateCell, true);
             resultCell.ColSpan = ResultTable.ColumnCount - HeaderWidth;
             templateCell.RestoreState();
         }
 
         private void PrintXAxisTemplate()
         {
-            int left = headerWidth;
-            int top = (CrossView.ShowTitle ? 1 : 0) + (CrossView.ShowXAxisFieldsCaption ? 1 : 0);
-            for (int i = 0; i < CrossView.Data.Columns.Count; i++)
+            var left = HeaderWidth;
+            var top = (CrossView.ShowTitle ? 1 : 0) + (CrossView.ShowXAxisFieldsCaption ? 1 : 0);
+            for (var i = 0; i < CrossView.Data.Columns.Count; i++)
             {
-                CrossViewHeaderDescriptor crossViewHeaderDescriptor = CrossView.Data.Columns[i];
-                TableCellData resultCell = ResultTable.GetCellData(left + crossViewHeaderDescriptor.cell, top + crossViewHeaderDescriptor.level);
+                var crossViewHeaderDescriptor = CrossView.Data.Columns[i];
+                var resultCell = ResultTable.GetCellData (left + crossViewHeaderDescriptor.cell,
+                    top + crossViewHeaderDescriptor.level);
                 resultCell.ColSpan = crossViewHeaderDescriptor.cellsize;
                 resultCell.RowSpan = crossViewHeaderDescriptor.levelsize;
-                TableCell templateCell = crossViewHeaderDescriptor.TemplateCell;
+                var templateCell = crossViewHeaderDescriptor.TemplateCell;
                 if (templateCell != null)
+                {
                     templateCell.Text = "[" + crossViewHeaderDescriptor.GetName() + "]";
+                }
                 else
-                    templateCell = CreateCell("[" + crossViewHeaderDescriptor.GetName() + "]");
-                resultCell.RunTimeAssign(templateCell, true);
+                {
+                    templateCell = CreateCell ("[" + crossViewHeaderDescriptor.GetName() + "]");
+                }
+
+                resultCell.RunTimeAssign (templateCell, true);
             }
         }
 
         private void PrintYAxisTemplate()
         {
-            int left = 0;
-            int top = headerHeight;
-            for (int i = 0; i < CrossView.Data.Rows.Count; i++)
+            var left = 0;
+            var top = HeaderHeight;
+            for (var i = 0; i < CrossView.Data.Rows.Count; i++)
             {
-                CrossViewHeaderDescriptor crossViewHeaderDescriptor = CrossView.Data.Rows[i];
-                TableCellData resultCell = ResultTable.GetCellData(left + crossViewHeaderDescriptor.level, top + crossViewHeaderDescriptor.cell);
+                var crossViewHeaderDescriptor = CrossView.Data.Rows[i];
+                var resultCell = ResultTable.GetCellData (left + crossViewHeaderDescriptor.level,
+                    top + crossViewHeaderDescriptor.cell);
                 resultCell.ColSpan = crossViewHeaderDescriptor.levelsize;
                 resultCell.RowSpan = crossViewHeaderDescriptor.cellsize;
-                TableCell templateCell = crossViewHeaderDescriptor.TemplateCell;
+                var templateCell = crossViewHeaderDescriptor.TemplateCell;
                 if (templateCell != null)
+                {
                     templateCell.Text = "[" + crossViewHeaderDescriptor.GetName() + "]";
+                }
                 else
-                    templateCell = CreateCell("[" + crossViewHeaderDescriptor.GetName() + "]");
-                resultCell.RunTimeAssign(templateCell, true);
+                {
+                    templateCell = CreateCell ("[" + crossViewHeaderDescriptor.GetName() + "]");
+                }
+
+                resultCell.RunTimeAssign (templateCell, true);
             }
         }
 
         private void PrintDataTemplate()
         {
             CrossViewCellDescriptor crossViewCellDescriptor;
-            int top = headerHeight;
-            int left = headerWidth;
+            var top = HeaderHeight;
+            var left = HeaderWidth;
             TableCell templateCell = null;
             TableCellData resultCell = null;
-            for (int i = 0; i < CrossView.Data.columnTerminalIndexes.Length; i++)
+            for (var i = 0; i < CrossView.Data.columnTerminalIndexes.Length; i++)
             {
-                for (int j = 0; j < CrossView.Data.rowTerminalIndexes.Length; j++)
+                for (var j = 0; j < CrossView.Data.rowTerminalIndexes.Length; j++)
                 {
                     crossViewCellDescriptor = CrossView.Data.Cells[i * CrossView.Data.rowTerminalIndexes.Length + j];
-                    resultCell = ResultTable.GetCellData(left + i, top + j);
+                    resultCell = ResultTable.GetCellData (left + i, top + j);
 
                     templateCell = crossViewCellDescriptor.TemplateCell;
                     if (templateCell == null)
+                    {
                         templateCell = CreateDataCell();
+                    }
+
                     templateCell.Text = "0";
-                    resultCell.RunTimeAssign(templateCell, true);
+                    resultCell.RunTimeAssign (templateCell, true);
                 }
             }
         }
+
         #endregion
 
         #region Public Methods
+
         public void BuildTemplate()
         {
             // create temporary descriptors
@@ -511,9 +568,9 @@ namespace AM.Reporting.CrossView
                 CrossView.Data.rowDescriptorsIndexes = new int[] { 0 };
                 CrossView.Data.columnTerminalIndexes = new int[] { 0 };
                 CrossView.Data.rowTerminalIndexes = new int[] { 0 };
-                CrossView.Data.Columns.Add(noColumnsDescriptor);
-                CrossView.Data.Rows.Add(noRowsDescriptor);
-                CrossView.Data.Cells.Add(noCellsDescriptor);
+                CrossView.Data.Columns.Add (noColumnsDescriptor);
+                CrossView.Data.Rows.Add (noRowsDescriptor);
+                CrossView.Data.Cells.Add (noCellsDescriptor);
             }
 
             UpdateTemplateSizes();
@@ -534,34 +591,39 @@ namespace AM.Reporting.CrossView
             CrossView.FixedRows = HeaderHeight;
             CrossView.CreateUniqueNames();
 
-            for (int x = 0; x < CrossView.ColumnCount; x++)
+            for (var x = 0; x < CrossView.ColumnCount; x++)
             {
-                CrossView.Columns[x].Assign(ResultTable.Columns[x]);
+                CrossView.Columns[x].Assign (ResultTable.Columns[x]);
             }
-            for (int y = 0; y < CrossView.RowCount; y++)
+
+            for (var y = 0; y < CrossView.RowCount; y++)
             {
-                CrossView.Rows[y].Assign(ResultTable.Rows[y]);
+                CrossView.Rows[y].Assign (ResultTable.Rows[y]);
             }
-            for (int x = 0; x < CrossView.ColumnCount; x++)
+
+            for (var x = 0; x < CrossView.ColumnCount; x++)
             {
-                for (int y = 0; y < CrossView.RowCount; y++)
+                for (var y = 0; y < CrossView.RowCount; y++)
                 {
-                    TableCell cell = CrossView[x, y];
-                    cell.AssignAll(ResultTable[x, y]);
-                    cell.SetFlags(Flags.CanEdit, true);
+                    var cell = CrossView[x, y];
+                    cell.AssignAll (ResultTable[x, y]);
+                    cell.SetFlags (Flags.CanEdit, true);
                 }
             }
+
             UpdateDescriptors();
             resultTable.Dispose();
 
             // clear temporary descriptors, set hints
             if (!CrossView.Data.SourceAssigned)
             {
-                SetHint(CrossView[HeaderWidth, (CrossView.ShowTitle ? 1 : 0) + (CrossView.ShowXAxisFieldsCaption ? 1 : 0)], Res.Get("ComponentsMisc,CrossView,SetSource"));
+                SetHint (
+                    CrossView[HeaderWidth, (CrossView.ShowTitle ? 1 : 0) + (CrossView.ShowXAxisFieldsCaption ? 1 : 0)],
+                    Res.Get ("ComponentsMisc,CrossView,SetSource"));
                 CrossView.Data.Columns.Clear();
-                SetHint(CrossView[0, HeaderHeight], Res.Get("ComponentsMisc,CrossView,SetSource"));
+                SetHint (CrossView[0, HeaderHeight], Res.Get ("ComponentsMisc,CrossView,SetSource"));
                 CrossView.Data.Rows.Clear();
-                SetHint(CrossView[HeaderWidth, HeaderHeight], Res.Get("ComponentsMisc,CrossView,SetSource"));
+                SetHint (CrossView[HeaderWidth, HeaderHeight], Res.Get ("ComponentsMisc,CrossView,SetSource"));
                 CrossView.Data.Cells.Clear();
                 CrossView.Data.columnDescriptorsIndexes = new int[0];
                 CrossView.Data.rowDescriptorsIndexes = new int[0];
@@ -584,7 +646,7 @@ namespace AM.Reporting.CrossView
 
         public void UpdateDescriptors()
         {
-            bool needClearTemporaryDescriptors = false;
+            var needClearTemporaryDescriptors = false;
             if (!CrossView.Data.SourceAssigned && (CrossView.Data.Columns.Count == 0))
             {
                 needClearTemporaryDescriptors = true;
@@ -592,9 +654,9 @@ namespace AM.Reporting.CrossView
                 CrossView.Data.rowDescriptorsIndexes = new int[] { 0 };
                 CrossView.Data.columnTerminalIndexes = new int[] { 0 };
                 CrossView.Data.rowTerminalIndexes = new int[] { 0 };
-                CrossView.Data.Columns.Add(noColumnsDescriptor);
-                CrossView.Data.Rows.Add(noRowsDescriptor);
-                CrossView.Data.Cells.Add(noCellsDescriptor);
+                CrossView.Data.Columns.Add (noColumnsDescriptor);
+                CrossView.Data.Rows.Add (noRowsDescriptor);
+                CrossView.Data.Cells.Add (noCellsDescriptor);
             }
 
             UpdateTemplateSizes();
@@ -620,12 +682,12 @@ namespace AM.Reporting.CrossView
 
         public void UpdateStyle()
         {
-            for (int y = 0; y < CrossView.RowCount; y++)
+            for (var y = 0; y < CrossView.RowCount; y++)
             {
-                for (int x = 0; x < CrossView.ColumnCount; x++)
+                for (var x = 0; x < CrossView.ColumnCount; x++)
                 {
-                    string style = x < HeaderWidth || y < HeaderHeight ? "Header" : "Body";
-                    ApplyStyle(CrossView[x, y], style);
+                    var style = x < HeaderWidth || y < HeaderHeight ? "Header" : "Body";
+                    ApplyStyle (CrossView[x, y], style);
                 }
             }
         }
@@ -653,16 +715,13 @@ namespace AM.Reporting.CrossView
                   Matrix.Data.Clear();
                   Matrix.OnManualBuild(EventArgs.Empty);
             */
-            resultBodyHeight = CrossView.Data.DataRowCount;
-            resultBodyWidth = CrossView.Data.DataColumnCount;
+            ResultBodyHeight = CrossView.Data.DataRowCount;
+            ResultBodyWidth = CrossView.Data.DataColumnCount;
         }
-
-
 
 
         public void AddData()
         {
-
         }
 
         public void FinishPrint()
@@ -673,13 +732,13 @@ namespace AM.Reporting.CrossView
             ResultTable.FixedRows = HeaderHeight;
 
             InitResultTable();
+
             //todo
             //temp
             PrintHeaders();
             PrintXAxisResult();
             PrintYAxisResult();
             PrintResultData();
-
 
 
             //      PrintData();
@@ -694,75 +753,89 @@ namespace AM.Reporting.CrossView
 
         private int axisLeft;
         private int axisTop;
-        public bool XAxisDrawCellHandler(CrossViewAxisDrawCell crossViewAxisDrawCell)
+
+        public bool XAxisDrawCellHandler (CrossViewAxisDrawCell crossViewAxisDrawCell)
         {
-            CrossViewHeaderDescriptor crossViewHeaderDescriptor = CrossView.Data.Columns[0]; // temp - 0 todoCUBE
-            TableCellData resultCell = ResultTable.GetCellData(axisLeft + crossViewAxisDrawCell.Cell, axisTop + crossViewAxisDrawCell.Level);
+            var crossViewHeaderDescriptor = CrossView.Data.Columns[0]; // temp - 0 todoCUBE
+            var resultCell = ResultTable.GetCellData (axisLeft + crossViewAxisDrawCell.Cell,
+                axisTop + crossViewAxisDrawCell.Level);
             resultCell.ColSpan = crossViewAxisDrawCell.SizeCell;
             resultCell.RowSpan = crossViewAxisDrawCell.SizeLevel;
-            TableCell templateCell = crossViewHeaderDescriptor.TemplateCell;
+            var templateCell = crossViewHeaderDescriptor.TemplateCell;
             if (templateCell != null)
+            {
                 templateCell.Text = crossViewAxisDrawCell.Text;
+            }
             else
-                templateCell = CreateCell(crossViewAxisDrawCell.Text);
-            resultCell.RunTimeAssign(templateCell, true);
+            {
+                templateCell = CreateCell (crossViewAxisDrawCell.Text);
+            }
+
+            resultCell.RunTimeAssign (templateCell, true);
             return false;
         }
 
         private void PrintXAxisResult()
         {
-
-            axisLeft = headerWidth;
+            axisLeft = HeaderWidth;
             axisTop = (CrossView.ShowTitle ? 1 : 0) + (CrossView.ShowXAxisFieldsCaption ? 1 : 0);
 
-            CrossView.CubeSource.TraverseXAxis(XAxisDrawCellHandler);
+            CrossView.CubeSource.TraverseXAxis (XAxisDrawCellHandler);
         }
 
-        public bool YAxisDrawCellHandler(CrossViewAxisDrawCell crossViewAxisDrawCell)
+        public bool YAxisDrawCellHandler (CrossViewAxisDrawCell crossViewAxisDrawCell)
         {
-            CrossViewHeaderDescriptor crossViewHeaderDescriptor = CrossView.Data.Rows[0]; // temp - 0 todoCUBE
-            TableCellData resultCell = ResultTable.GetCellData(axisLeft + crossViewAxisDrawCell.Level, axisTop + crossViewAxisDrawCell.Cell);
+            var crossViewHeaderDescriptor = CrossView.Data.Rows[0]; // temp - 0 todoCUBE
+            var resultCell = ResultTable.GetCellData (axisLeft + crossViewAxisDrawCell.Level,
+                axisTop + crossViewAxisDrawCell.Cell);
             resultCell.ColSpan = crossViewAxisDrawCell.SizeLevel;
             resultCell.RowSpan = crossViewAxisDrawCell.SizeCell;
-            TableCell templateCell = crossViewHeaderDescriptor.TemplateCell;
+            var templateCell = crossViewHeaderDescriptor.TemplateCell;
             if (templateCell != null)
+            {
                 templateCell.Text = crossViewAxisDrawCell.Text;
+            }
             else
-                templateCell = CreateCell(crossViewAxisDrawCell.Text);
-            resultCell.RunTimeAssign(templateCell, true);
+            {
+                templateCell = CreateCell (crossViewAxisDrawCell.Text);
+            }
+
+            resultCell.RunTimeAssign (templateCell, true);
             return false;
         }
 
         private void PrintYAxisResult()
         {
-
             axisLeft = 0;
-            axisTop = headerHeight;
+            axisTop = HeaderHeight;
 
-            CrossView.CubeSource.TraverseYAxis(YAxisDrawCellHandler);
+            CrossView.CubeSource.TraverseYAxis (YAxisDrawCellHandler);
         }
 
         private void PrintResultData()
         {
             CrossViewCellDescriptor crossViewCellDescriptor;
-            int top = headerHeight;
-            int left = headerWidth;
+            var top = HeaderHeight;
+            var left = HeaderWidth;
             TableCell templateCell = null;
             TableCellData resultCell = null;
             CrossViewMeasureCell cubeMeasureCell;
-            for (int i = 0; i < CrossView.Data.DataColumnCount; i++)
+            for (var i = 0; i < CrossView.Data.DataColumnCount; i++)
             {
-                for (int j = 0; j < CrossView.Data.DataRowCount; j++)
+                for (var j = 0; j < CrossView.Data.DataRowCount; j++)
                 {
-                    cubeMeasureCell = CrossView.CubeSource.GetMeasureCell(i, j);
+                    cubeMeasureCell = CrossView.CubeSource.GetMeasureCell (i, j);
                     crossViewCellDescriptor = CrossView.Data.Cells[0]; // todoCUBE temp 0 !!!
-                    resultCell = ResultTable.GetCellData(left + i, top + j);
+                    resultCell = ResultTable.GetCellData (left + i, top + j);
 
                     templateCell = crossViewCellDescriptor.TemplateCell;
                     if (templateCell == null)
+                    {
                         templateCell = CreateDataCell();
+                    }
+
                     templateCell.Text = cubeMeasureCell.Text;
-                    resultCell.RunTimeAssign(templateCell, true);
+                    resultCell.RunTimeAssign (templateCell, true);
                 }
             }
         }
@@ -772,23 +845,28 @@ namespace AM.Reporting.CrossView
             titleDescriptor = new CrossViewDescriptor();
             xAxisFieldCaptionDescriptor = new CrossViewDescriptor();
             yAxisFieldCaptionDescriptor = new CrossViewDescriptor();
-            noColumnsDescriptor = new CrossViewHeaderDescriptor();
-            noColumnsDescriptor.cell = 0;
-            noColumnsDescriptor.cellsize = 1;
-            noColumnsDescriptor.level = 0;
-            noColumnsDescriptor.levelsize = 1;
-            noRowsDescriptor = new CrossViewHeaderDescriptor();
-            noRowsDescriptor.cell = 0;
-            noRowsDescriptor.cellsize = 1;
-            noRowsDescriptor.level = 0;
-            noRowsDescriptor.levelsize = 1;
+            noColumnsDescriptor = new CrossViewHeaderDescriptor
+            {
+                cell = 0,
+                cellsize = 1,
+                level = 0,
+                levelsize = 1
+            };
+            noRowsDescriptor = new CrossViewHeaderDescriptor
+            {
+                cell = 0,
+                cellsize = 1,
+                level = 0,
+                levelsize = 1
+            };
             noCellsDescriptor = new CrossViewCellDescriptor();
         }
+
         #endregion
 
-        public CrossViewHelper(CrossViewObject crossView)
+        public CrossViewHelper (CrossViewObject crossView)
         {
-            this.crossView = crossView;
+            this.CrossView = crossView;
             CreateOtherDescriptor();
         }
     }

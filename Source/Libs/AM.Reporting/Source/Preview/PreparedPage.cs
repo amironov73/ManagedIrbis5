@@ -17,6 +17,7 @@
 
 using AM.Reporting.Engine;
 using AM.Reporting.Utils;
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -44,19 +45,13 @@ namespace AM.Reporting.Preview
 
         #region Properties
 
-        private Report Report
-        {
-            get { return preparedPages.Report; }
-        }
+        private Report Report => preparedPages.Report;
 
-        private bool UseFileCache
-        {
-            get { return Report.UseFileCache; }
-        }
+        private bool UseFileCache => Report.UseFileCache;
 
         public XmlItem Xml
         {
-            get { return xmlItem; }
+            get => xmlItem;
             set
             {
                 xmlItem = value;
@@ -72,73 +67,81 @@ namespace AM.Reporting.Preview
                 {
                     ReCalcSizes();
                 }
+
                 return pageSize;
             }
-            set
-            {
-                pageSize = value;
-            }
+            set => pageSize = value;
         }
 
-        public int CurPosition
-        {
-            get { return xmlItem.Count; }
-        }
+        public int CurPosition => xmlItem.Count;
 
         #endregion Properties
 
         #region Private Methods
 
-        private bool DoAdd(Base c, XmlItem item)
+        private bool DoAdd (Base c, XmlItem item)
         {
             if (c == null)
-                return false;
-            ReportEngine engine = Report.Engine;
-            bool isRunning = Report.IsRunning && engine != null;
-            if (c is ReportComponentBase)
             {
-                if (isRunning && !engine.CanPrint(c as ReportComponentBase))
+                return false;
+            }
+
+            var engine = Report.Engine;
+            var isRunning = Report.IsRunning && engine != null;
+            if (c is ReportComponentBase @base)
+            {
+                if (isRunning && !engine.CanPrint (@base))
+                {
                     return false;
+                }
             }
 
             item = item.Add();
-            using (FRWriter writer = new FRWriter(item))
+            using (var writer = new FRWriter (item))
             {
                 writer.SerializeTo = SerializeTo.Preview;
                 writer.SaveChildren = false;
                 writer.BlobStore = preparedPages.BlobStore;
-                writer.Write(c);
+                writer.Write (c);
             }
+
             if (isRunning)
-                engine.AddObjectToProcess(c, item);
+            {
+                engine.AddObjectToProcess (c, item);
+            }
 
             if ((c.Flags & Flags.CanWriteChildren) == 0)
             {
-                ObjectCollection childObjects = c.ChildObjects;
+                var childObjects = c.ChildObjects;
                 foreach (Base obj in childObjects)
                 {
-                    DoAdd(obj, item);
+                    DoAdd (obj, item);
                 }
             }
+
             return true;
         }
 
-        private Base ReadObject(Base parent, XmlItem item, bool readChildren, FRReader reader)
+        private Base ReadObject (Base parent, XmlItem item, bool readChildren, FRReader reader)
         {
-            string objName = item.Name;
+            var objName = item.Name;
 
             // try to find the object in the dictionary
-            Base obj = preparedPages.Dictionary.GetObject(objName);
+            var obj = preparedPages.Dictionary.GetObject (objName);
 
             // object not found, objName is type name
             if (obj == null)
             {
-                Type type = RegisteredObjects.FindType(objName);
+                var type = RegisteredObjects.FindType (objName);
                 if (type == null)
+                {
                     return null;
-                obj = Activator.CreateInstance(type) as Base;
+                }
+
+                obj = Activator.CreateInstance (type) as Base;
             }
-            obj.SetRunning(true);
+
+            obj.SetRunning (true);
 
             // read object's properties
             if (!item.IsNullOrEmptyProps())
@@ -147,15 +150,15 @@ namespace AM.Reporting.Preview
                 // this may happen in the html export that uses several threads to export one report.
                 lock (reader.BlobStore)
                 {
-                    reader.Read(obj, item);
+                    reader.Read (obj, item);
                 }
             }
 
             if (readChildren)
             {
-                for (int i = 0; i < item.Count; i++)
+                for (var i = 0; i < item.Count; i++)
                 {
-                    ReadObject(obj, item[i], true, reader);
+                    ReadObject (obj, item[i], true, reader);
                 }
             }
 
@@ -163,19 +166,20 @@ namespace AM.Reporting.Preview
             return obj;
         }
 
-        private void UpdateUnlimitedPage(Base obj, XmlItem item)
+        private void UpdateUnlimitedPage (Base obj, XmlItem item)
         {
             item.Clear();
-            using (FRWriter writer = new FRWriter(item))
+            using (var writer = new FRWriter (item))
             {
                 writer.SerializeTo = SerializeTo.Preview;
                 writer.SaveChildren = false;
                 writer.BlobStore = preparedPages.BlobStore;
-                writer.Write(obj);
+                writer.Write (obj);
             }
+
             foreach (Base child in obj.ChildObjects)
             {
-                UpdateUnlimitedPage(child, item.Add());
+                UpdateUnlimitedPage (child, item.Add());
             }
         }
 
@@ -183,97 +187,123 @@ namespace AM.Reporting.Preview
 
         #region Internal Methods
 
-        internal ReportPage ReadPage(Base parent, XmlItem item, bool readchild, FRReader reader)
+        internal ReportPage ReadPage (Base parent, XmlItem item, bool readchild, FRReader reader)
         {
-            ReportPage page = ReadObject(parent, item, false, reader) as ReportPage;
+            var page = ReadObject (parent, item, false, reader) as ReportPage;
             if (readchild)
-                for (int i = 0; i < item.Count; i++)
+            {
+                for (var i = 0; i < item.Count; i++)
                 {
-                    ReadObject(page, item[i], true, reader);
+                    ReadObject (page, item[i], true, reader);
                 }
+            }
+
             return page;
         }
 
-        internal ReportPage StartGetPage(int index)
+        internal ReportPage StartGetPage (int index)
         {
             Load();
             ReportPage page;
-            using (FRReader reader = new FRReader(null))
+            using (var reader = new FRReader (null))
             {
                 reader.DeserializeFrom = SerializeTo.Preview;
                 reader.ReadChildren = false;
                 reader.BlobStore = preparedPages.BlobStore;
-                page = ReadPage(null, xmlItem, false, reader);
+                page = ReadPage (null, xmlItem, false, reader);
                 if (!(page.UnlimitedHeight || page.UnlimitedWidth))
                 {
                     page.Dispose();
-                    page = ReadPage(null, xmlItem, true, reader);
-                    page.SetReport(preparedPages.Report);
+                    page = ReadPage (null, xmlItem, true, reader);
+                    page.SetReport (preparedPages.Report);
                     posprocessor = new PreparedPagePosprocessor();
-                    posprocessor.Postprocess(page);
+                    posprocessor.Postprocess (page);
                     posprocessor = null;
                 }
                 else
                 {
-                    page.SetReport(preparedPages.Report);
+                    page.SetReport (preparedPages.Report);
                     posprocessor = new PreparedPagePosprocessor();
-                    posprocessor.PostprocessUnlimited(this, page);
+                    posprocessor.PostprocessUnlimited (this, page);
                 }
             }
+
             if (page.MirrorMargins && (index + 1) % 2 == 0)
             {
-                float f = page.LeftMargin;
+                var f = page.LeftMargin;
                 page.LeftMargin = page.RightMargin;
                 page.RightMargin = f;
             }
+
             return page;
         }
 
-        internal void EndGetPage(ReportPage page)
+        internal void EndGetPage (ReportPage page)
         {
-            if (posprocessor != null) posprocessor = null;
+            if (posprocessor != null)
+            {
+                posprocessor = null;
+            }
+
             if (page != null)
+            {
                 page.Dispose();
+            }
+
             ClearUploadedXml();
         }
 
-        internal IEnumerable<Base> GetPageItems(ReportPage page, bool postprocess)
+        internal IEnumerable<Base> GetPageItems (ReportPage page, bool postprocess)
         {
             if (!(page.UnlimitedHeight || page.UnlimitedWidth))
             {
                 foreach (Base child in page.ChildObjects)
                 {
-                    if (postprocess) yield return child;
+                    if (postprocess)
+                    {
+                        yield return child;
+                    }
                     else
+                    {
                         using (child)
                             yield return child;
+                    }
                 }
             }
             else
             {
                 if (Export.ExportBase.HAVE_TO_WORK_WITH_OVERLAY)
 #pragma warning disable CS0162 // Unreachable code detected
+                {
                     foreach (Base child in page.ChildObjects)
 #pragma warning restore CS0162 // Unreachable code detected
                     {
                         if (child is OverlayBand)
+                        {
                             yield return child;
+                        }
                     }
+                }
 
-                using (FRReader reader = new FRReader(null))
+                using (var reader = new FRReader (null))
                 {
                     reader.DeserializeFrom = SerializeTo.Preview;
                     reader.ReadChildren = false;
                     reader.BlobStore = preparedPages.BlobStore;
-                    for (int i = 0; i < xmlItem.Count; i++)
+                    for (var i = 0; i < xmlItem.Count; i++)
                     {
-                        if (postprocess) yield return ReadObject(page, xmlItem[i], true, reader);
+                        if (postprocess)
+                        {
+                            yield return ReadObject (page, xmlItem[i], true, reader);
+                        }
                         else
-                            using (Base obj = ReadObject(page, xmlItem[i], true, reader))
+                        {
+                            using (var obj = ReadObject (page, xmlItem[i], true, reader))
                             {
-                                using (Base obj2 = posprocessor.PostProcessBandUnlimitedPage(obj))
+                                using (var obj2 = posprocessor.PostProcessBandUnlimitedPage (obj))
                                     yield return obj2;
                             }
+                        }
                     }
                 }
             }
@@ -281,70 +311,81 @@ namespace AM.Reporting.Preview
 
         internal string GetName()
         {
-            using (FRReader reader = new FRReader(null))
+            using (var reader = new FRReader (null))
             {
                 reader.DeserializeFrom = SerializeTo.Preview;
                 reader.ReadChildren = false;
                 reader.BlobStore = preparedPages.BlobStore;
-                ReportPage page = ReadObject(null, xmlItem, false, reader) as ReportPage;
+                var page = ReadObject (null, xmlItem, false, reader) as ReportPage;
                 return page.Name;
             }
         }
 
         internal void ReCalcSizes()
         {
-            XmlItem item = xmlItem;
-            using (FRReader reader = new FRReader(null, item))
+            var item = xmlItem;
+            using (var reader = new FRReader (null, item))
             {
                 reader.DeserializeFrom = SerializeTo.Preview;
                 reader.BlobStore = preparedPages.BlobStore;
                 reader.ReadChildren = false;
 
-                using (ReportPage page = ReadPage(Report, item, false, reader))
+                using (var page = ReadPage (Report, item, false, reader))
                 {
                     if (page.UnlimitedHeight | page.UnlimitedWidth)
                     {
-
-                        float maxWidth = 0.0f;
-                        float maxHeight = 0.0f;
-                        for (int i = 0; i < item.Count; i++)
+                        var maxWidth = 0.0f;
+                        var maxHeight = 0.0f;
+                        for (var i = 0; i < item.Count; i++)
                         {
-                            using (Base obj = ReadObject(page, item[i], true, reader))
+                            using (var obj = ReadObject (page, item[i], true, reader))
                             {
-                                if (obj is BandBase)
+                                if (obj is BandBase band)
                                 {
-                                    BandBase band = obj as BandBase;
-                                    float bandsHeight = band.Top + band.Height;
+                                    var bandsHeight = band.Top + band.Height;
                                     if (maxHeight < bandsHeight)
+                                    {
                                         maxHeight = bandsHeight;
-                                    float bandWidth = 0.0f;
+                                    }
+
+                                    var bandWidth = 0.0f;
                                     foreach (ComponentBase comp in band.Objects)
                                     {
                                         if ((comp.Anchor & AnchorStyles.Right) == 0 && comp.Dock == DockStyle.None)
                                         {
-                                            bandWidth = Math.Max(bandWidth, comp.Left + comp.Width);
+                                            bandWidth = Math.Max (bandWidth, comp.Left + comp.Width);
                                         }
                                     }
+
                                     if (maxWidth < bandWidth)
+                                    {
                                         maxWidth = bandWidth;
+                                    }
                                 }
                             }
                         }
 
                         if (page.UnlimitedHeight)
-                            page.UnlimitedHeightValue = maxHeight + (page.TopMargin + page.BottomMargin) * Units.Millimeters;
+                        {
+                            page.UnlimitedHeightValue =
+                                maxHeight + (page.TopMargin + page.BottomMargin) * Units.Millimeters;
+                        }
+
                         if (page.UnlimitedWidth)
-                            page.UnlimitedWidthValue = maxWidth + (page.LeftMargin + page.RightMargin) * Units.Millimeters;
-
+                        {
+                            page.UnlimitedWidthValue =
+                                maxWidth + (page.LeftMargin + page.RightMargin) * Units.Millimeters;
+                        }
                     }
-                    pageSize = new SizeF(page.WidthInPixels, page.HeightInPixels);
 
-                    using (FRWriter writer = new FRWriter(item))
+                    pageSize = new SizeF (page.WidthInPixels, page.HeightInPixels);
+
+                    using (var writer = new FRWriter (item))
                     {
                         writer.SerializeTo = SerializeTo.Preview;
                         writer.SaveChildren = false;
                         writer.BlobStore = preparedPages.BlobStore;
-                        writer.Write(page);
+                        writer.Write (page);
                     }
                 }
             }
@@ -354,7 +395,7 @@ namespace AM.Reporting.Preview
 
         #region Public Methods
 
-        public PreparedPage(ReportPage page, PreparedPages preparedPages)
+        public PreparedPage (ReportPage page, PreparedPages preparedPages)
         {
             this.preparedPages = preparedPages;
             xmlItem = new XmlItem();
@@ -362,35 +403,36 @@ namespace AM.Reporting.Preview
             // page == null when we load prepared report from a file
             if (page != null)
             {
-                using (FRWriter writer = new FRWriter(xmlItem))
+                using (var writer = new FRWriter (xmlItem))
                 {
                     writer.SerializeTo = SerializeTo.Preview;
                     writer.SaveChildren = false;
-                    writer.Write(page);
+                    writer.Write (page);
                 }
 
-                pageSize = new SizeF(page.WidthInPixels, page.HeightInPixels);
+                pageSize = new SizeF (page.WidthInPixels, page.HeightInPixels);
             }
         }
 
-        public bool AddBand(BandBase band)
+        public bool AddBand (BandBase band)
         {
-            return DoAdd(band, xmlItem);
+            return DoAdd (band, xmlItem);
         }
 
         public ReportPage GetPage()
         {
             Load();
             ReportPage page;
-            using (FRReader reader = new FRReader(null))
+            using (var reader = new FRReader (null))
             {
                 reader.DeserializeFrom = SerializeTo.Preview;
                 reader.ReadChildren = false;
                 reader.BlobStore = preparedPages.BlobStore;
-                page = ReadPage(null, xmlItem, true, reader);
+                page = ReadPage (null, xmlItem, true, reader);
             }
-            page.SetReport(preparedPages.Report);
-            new PreparedPagePosprocessor().Postprocess(page);
+
+            page.SetReport (preparedPages.Report);
+            new PreparedPagePosprocessor().Postprocess (page);
             ClearUploadedXml();
             return page;
         }
@@ -400,60 +442,61 @@ namespace AM.Reporting.Preview
             if (UseFileCache && uploaded)
             {
                 preparedPages.TempFile.Position = tempFilePosition;
-                XmlReader reader = new XmlReader(preparedPages.TempFile);
-                reader.Read(xmlItem);
+                var reader = new XmlReader (preparedPages.TempFile);
+                reader.Read (xmlItem);
             }
         }
 
         public void ClearUploadedXml()
         {
             if (UseFileCache && uploaded)
+            {
                 xmlItem.Clear();
+            }
         }
 
         public void Upload()
         {
             if (UseFileCache && !uploaded)
             {
-                preparedPages.TempFile.Seek(0, SeekOrigin.End);
+                preparedPages.TempFile.Seek (0, SeekOrigin.End);
                 tempFilePosition = preparedPages.TempFile.Position;
 
-                XmlWriter writer = new XmlWriter(preparedPages.TempFile);
-                writer.Write(xmlItem);
+                var writer = new XmlWriter (preparedPages.TempFile);
+                writer.Write (xmlItem);
 
                 xmlItem.Clear();
                 uploaded = true;
             }
         }
 
-        public XmlItem CutObjects(int index)
+        public XmlItem CutObjects (int index)
         {
-            XmlItem result = new XmlItem();
+            var result = new XmlItem();
             while (xmlItem.Count > index)
             {
-                result.AddItem(xmlItem[index]);
+                result.AddItem (xmlItem[index]);
             }
+
             return result;
         }
 
-        public void PasteObjects(XmlItem objects, float deltaX, float deltaY)
+        public void PasteObjects (XmlItem objects, float deltaX, float deltaY)
         {
             if (objects.Count > 0)
             {
                 while (objects.Count > 0)
                 {
-                    XmlItem obj = objects[0];
+                    var obj = objects[0];
 
                     // shift the object's location
-                    float objX = (obj.GetProp("l") != "") ?
-                      Utils.Converter.StringToFloat(obj.GetProp("l")) : 0;
-                    float objY = (obj.GetProp("t") != "") ?
-                      Utils.Converter.StringToFloat(obj.GetProp("t")) : 0;
-                    obj.SetProp("l", Utils.Converter.ToString(objX + deltaX));
-                    obj.SetProp("t", Utils.Converter.ToString(objY + deltaY));
+                    var objX = (obj.GetProp ("l") != "") ? Converter.StringToFloat (obj.GetProp ("l")) : 0;
+                    var objY = (obj.GetProp ("t") != "") ? Converter.StringToFloat (obj.GetProp ("t")) : 0;
+                    obj.SetProp ("l", Converter.ToString (objX + deltaX));
+                    obj.SetProp ("t", Converter.ToString (objY + deltaY));
 
                     // add object to a page
-                    xmlItem.AddItem(obj);
+                    xmlItem.AddItem (obj);
                 }
             }
         }
@@ -462,49 +505,52 @@ namespace AM.Reporting.Preview
         {
             float result = 0;
 
-            for (int i = 0; i < xmlItem.Count; i++)
+            for (var i = 0; i < xmlItem.Count; i++)
             {
-                XmlItem xi = xmlItem[i];
+                var xi = xmlItem[i];
 
-                BandBase obj = preparedPages.Dictionary.GetOriginalObject(xi.Name) as BandBase;
-                if (obj != null && !(obj is PageFooterBand) && !(obj is OverlayBand))
+                if (preparedPages.Dictionary.GetOriginalObject (xi.Name) is BandBase obj && !(obj is PageFooterBand) && !(obj is OverlayBand))
                 {
-                    string s = xi.GetProp("t");
-                    float top = (s != "") ? Utils.Converter.StringToFloat(s) : obj.Top;
-                    s = xi.GetProp("h");
-                    float height = (s != "") ? Utils.Converter.StringToFloat(s) : obj.Height;
+                    var s = xi.GetProp ("t");
+                    var top = (s != "") ? Converter.StringToFloat (s) : obj.Top;
+                    s = xi.GetProp ("h");
+                    var height = (s != "") ? Converter.StringToFloat (s) : obj.Height;
 
                     if (top + height > result)
+                    {
                         result = top + height;
+                    }
                 }
             }
 
             return result;
         }
 
-        public bool ContainsBand(Type bandType)
+        public bool ContainsBand (Type bandType)
         {
-            for (int i = 0; i < xmlItem.Count; i++)
+            for (var i = 0; i < xmlItem.Count; i++)
             {
-                XmlItem xi = xmlItem[i];
+                var xi = xmlItem[i];
 
-                BandBase obj = preparedPages.Dictionary.GetOriginalObject(xi.Name) as BandBase;
-                if (obj != null && obj.GetType() == bandType)
+                if (preparedPages.Dictionary.GetOriginalObject (xi.Name) is BandBase obj && obj.GetType() == bandType)
+                {
                     return true;
+                }
             }
 
             return false;
         }
 
-        public bool ContainsBand(string bandName)
+        public bool ContainsBand (string bandName)
         {
-            for (int i = 0; i < xmlItem.Count; i++)
+            for (var i = 0; i < xmlItem.Count; i++)
             {
-                XmlItem xi = xmlItem[i];
+                var xi = xmlItem[i];
 
-                BandBase obj = preparedPages.Dictionary.GetOriginalObject(xi.Name) as BandBase;
-                if (obj != null && obj.Name == bandName)
+                if (preparedPages.Dictionary.GetOriginalObject (xi.Name) is BandBase obj && obj.Name == bandName)
+                {
                     return true;
+                }
             }
 
             return false;

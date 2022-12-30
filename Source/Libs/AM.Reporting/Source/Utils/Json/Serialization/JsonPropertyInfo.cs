@@ -37,30 +37,31 @@ namespace AM.Reporting.Utils.Json.Serialization
             Info.PropertyType.IsPrimitive;
 
         public bool IsDateTime =>
-            Info.PropertyType == typeof(DateTime);
+            Info.PropertyType == typeof (DateTime);
 
         public bool IsCollection
         {
             get
             {
                 var type = Info.PropertyType;
-                var result = type.IsArray || typeof(IEnumerable).IsAssignableFrom(type);
+                var result = type.IsArray || typeof (IEnumerable).IsAssignableFrom (type);
                 return result;
             }
         }
 
         public bool IsEnum => Info.PropertyType.IsEnum;
 
-        internal static JsonPropertyInfo Parse(PropertyInfo propertyInfo)
+        internal static JsonPropertyInfo Parse (PropertyInfo propertyInfo)
         {
-            var attr = Attribute.GetCustomAttribute(propertyInfo, typeof(JsonPropertyAttribute)) as JsonPropertyAttribute;
-            string propName = attr?.PropertyName ?? propertyInfo.Name;
-            bool ignoreNull = attr?.IgnoreNullValue ?? true;
-            var propInfo = new JsonPropertyInfo(propertyInfo, propName, ignoreNull);
+            var attr =
+                Attribute.GetCustomAttribute (propertyInfo, typeof (JsonPropertyAttribute)) as JsonPropertyAttribute;
+            var propName = attr?.PropertyName ?? propertyInfo.Name;
+            var ignoreNull = attr?.IgnoreNullValue ?? true;
+            var propInfo = new JsonPropertyInfo (propertyInfo, propName, ignoreNull);
             return propInfo;
         }
 
-        public JsonPropertyInfo(PropertyInfo propertyInfo,
+        public JsonPropertyInfo (PropertyInfo propertyInfo,
             string propertyName,
             bool ignoreNullValue = true)
         {

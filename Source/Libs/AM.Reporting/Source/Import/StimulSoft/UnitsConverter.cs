@@ -18,10 +18,14 @@
 using System;
 using System.Globalization;
 using System.Drawing;
+
 using AM.Reporting.Utils;
 using AM.Reporting.Barcode;
+
 using System.Drawing.Drawing2D;
+
 using AM.Reporting.Format;
+
 using System.Xml;
 
 using AM.Reporting.Matrix;
@@ -37,13 +41,13 @@ namespace AM.Reporting.Import.StimulSoft
     /// </summary>
     public static class UnitsConverter
     {
-#region Public Methods
+        #region Public Methods
 
         /// <summary>
         /// Converts value to Boolean.
         /// </summary>
         /// <param name="str">Boolen value as string.</param>
-        public static bool ConvertBool(string str)
+        public static bool ConvertBool (string str)
         {
             return str.ToLower() == "true";
         }
@@ -53,7 +57,7 @@ namespace AM.Reporting.Import.StimulSoft
         /// </summary>
         /// <param name="unitType"></param>
         /// <returns></returns>
-        public static float GetPixelsInUnit(PageUnits unitType)
+        public static float GetPixelsInUnit (PageUnits unitType)
         {
             switch (unitType)
             {
@@ -73,7 +77,7 @@ namespace AM.Reporting.Import.StimulSoft
         /// </summary>
         /// <param name="unitType"></param>
         /// <returns></returns>
-        public static PageUnits ConverPageUnits(string unitType)
+        public static PageUnits ConverPageUnits (string unitType)
         {
             switch (unitType)
             {
@@ -93,10 +97,12 @@ namespace AM.Reporting.Import.StimulSoft
         /// </summary>
         /// <param name="paperSize">The PaperSize value.</param>
         /// <param name="page">The ReportPage instance.</param>
-        public static void ConvertPaperSize(string paperSize, ReportPage page)
+        public static void ConvertPaperSize (string paperSize, ReportPage page)
         {
             if (page == null)
+            {
                 return;
+            }
 
             float width = 210;
             float height = 297;
@@ -157,10 +163,10 @@ namespace AM.Reporting.Import.StimulSoft
         /// </summary>
         /// <param name="strInt"></param>
         /// <returns></returns>
-        public static int ConvertInt(string strInt)
+        public static int ConvertInt (string strInt)
         {
-            int result = 0;
-            int.TryParse(strInt, NumberStyles.Float, NumberFormatInfo.InvariantInfo, out result);
+            var result = 0;
+            int.TryParse (strInt, NumberStyles.Float, NumberFormatInfo.InvariantInfo, out result);
             return result;
         }
 
@@ -169,10 +175,10 @@ namespace AM.Reporting.Import.StimulSoft
         /// </summary>
         /// <param name="strFloat"></param>
         /// <returns></returns>
-        public static float ConvertFloat(string strFloat)
+        public static float ConvertFloat (string strFloat)
         {
             float result = 0;
-            float.TryParse(strFloat, NumberStyles.Float, NumberFormatInfo.InvariantInfo, out result);
+            float.TryParse (strFloat, NumberStyles.Float, NumberFormatInfo.InvariantInfo, out result);
             return result;
         }
 
@@ -181,31 +187,40 @@ namespace AM.Reporting.Import.StimulSoft
         /// </summary>
         /// <param name="str">The DevExpress Color value as string.</param>
         /// <returns>The Color value.</returns>
-        public static Color ConvertColor(string str)
+        public static Color ConvertColor (string str)
         {
-            if (!String.IsNullOrEmpty(str))
+            if (!string.IsNullOrEmpty (str))
             {
-                if (str.Contains("["))
+                if (str.Contains ("["))
                 {
-                    string[] rgb = str.Replace("[", "").Replace("]","").Split(':');
-
-                    if(rgb.Length > 3)
-                        return Color.FromArgb(ConvertInt(rgb[0]), ConvertInt(rgb[1]), ConvertInt(rgb[2]), ConvertInt(rgb[3]));
-
-                    return Color.FromArgb(ConvertInt(rgb[0]), ConvertInt(rgb[1]), ConvertInt(rgb[2]));
-                }
-                else if (str.Contains(","))
-                {
-                    string[] rgb = str.Replace(" ", "").Split(',');
+                    string[] rgb = str.Replace ("[", "").Replace ("]", "").Split (':');
 
                     if (rgb.Length > 3)
-                        return Color.FromArgb(ConvertInt(rgb[0]), ConvertInt(rgb[1]), ConvertInt(rgb[2]), ConvertInt(rgb[3]));
+                    {
+                        return Color.FromArgb (ConvertInt (rgb[0]), ConvertInt (rgb[1]), ConvertInt (rgb[2]),
+                            ConvertInt (rgb[3]));
+                    }
 
-                    return Color.FromArgb(ConvertInt(rgb[0]), ConvertInt(rgb[1]), ConvertInt(rgb[2]));
+                    return Color.FromArgb (ConvertInt (rgb[0]), ConvertInt (rgb[1]), ConvertInt (rgb[2]));
+                }
+                else if (str.Contains (","))
+                {
+                    string[] rgb = str.Replace (" ", "").Split (',');
+
+                    if (rgb.Length > 3)
+                    {
+                        return Color.FromArgb (ConvertInt (rgb[0]), ConvertInt (rgb[1]), ConvertInt (rgb[2]),
+                            ConvertInt (rgb[3]));
+                    }
+
+                    return Color.FromArgb (ConvertInt (rgb[0]), ConvertInt (rgb[1]), ConvertInt (rgb[2]));
                 }
                 else
-                    return Color.FromName(str);
+                {
+                    return Color.FromName (str);
+                }
             }
+
             return Color.Black;
         }
 
@@ -214,23 +229,25 @@ namespace AM.Reporting.Import.StimulSoft
         /// </summary>
         /// <param name="border"></param>
         /// <returns></returns>
-        public static Border ConvertBorder(string border)
+        public static Border ConvertBorder (string border)
         {
-            Border result = new Border();
-            string[] parametrs = border.Split(';');
-            int indexParam = 0;
-            if (border.StartsWith("Adv"))
+            var result = new Border();
+            string[] parametrs = border.Split (';');
+            var indexParam = 0;
+            if (border.StartsWith ("Adv"))
             {
-                parametrs = border.Remove(0, 3).Split(';');
+                parametrs = border.Remove (0, 3).Split (';');
                 result.SimpleBorder = false;
 
-                for (int i = 0; i < 4; i++)
+                for (var i = 0; i < 4; i++)
                 {
-                    BorderLine line = new BorderLine();
+                    var line = new BorderLine
+                    {
+                        Color = ConvertColor (parametrs[indexParam])
+                    };
 
-                    line.Color = ConvertColor(parametrs[indexParam]);
                     indexParam++;
-                    line.Width = ConvertInt(parametrs[indexParam]);
+                    line.Width = ConvertInt (parametrs[indexParam]);
                     indexParam++;
 
                     if (parametrs[indexParam] == "None")
@@ -240,7 +257,7 @@ namespace AM.Reporting.Import.StimulSoft
                     }
                     else
                     {
-                        line.Style = ConvertBorderDashStyle(parametrs[indexParam]);
+                        line.Style = ConvertBorderDashStyle (parametrs[indexParam]);
                         indexParam++;
                     }
 
@@ -267,21 +284,21 @@ namespace AM.Reporting.Import.StimulSoft
             }
             else
             {
-                result.Lines = ConvertBorderSides(parametrs[indexParam]);
+                result.Lines = ConvertBorderSides (parametrs[indexParam]);
                 indexParam++;
-                result.Color = ConvertColor(parametrs[indexParam]);
+                result.Color = ConvertColor (parametrs[indexParam]);
                 indexParam++;
-                result.Width = ConvertInt(parametrs[indexParam]);
+                result.Width = ConvertInt (parametrs[indexParam]);
                 indexParam++;
-                result.Style = ConvertBorderDashStyle(parametrs[indexParam]);
+                result.Style = ConvertBorderDashStyle (parametrs[indexParam]);
                 indexParam++;
             }
 
-            result.Shadow = ConvertBool(parametrs[indexParam]);
+            result.Shadow = ConvertBool (parametrs[indexParam]);
             indexParam++;
-            result.ShadowWidth = ConvertInt(parametrs[indexParam]);
+            result.ShadowWidth = ConvertInt (parametrs[indexParam]);
             indexParam++;
-            result.ShadowColor = ConvertColor(parametrs[indexParam]);
+            result.ShadowColor = ConvertColor (parametrs[indexParam]);
 
 
             return result;
@@ -292,28 +309,29 @@ namespace AM.Reporting.Import.StimulSoft
         /// </summary>
         /// <param name="borderDashStyle">The DevExpress BorderDashStyle value.</param>
         /// <returns>The LineStyle value.</returns>
-        public static LineStyle ConvertBorderDashStyle(string borderDashStyle)
+        public static LineStyle ConvertBorderDashStyle (string borderDashStyle)
         {
-            if (borderDashStyle.Equals("Dot"))
+            if (borderDashStyle.Equals ("Dot"))
             {
                 return LineStyle.Dot;
             }
-            else if (borderDashStyle.Equals("Dash"))
+            else if (borderDashStyle.Equals ("Dash"))
             {
                 return LineStyle.Dash;
             }
-            else if (borderDashStyle.Equals("DashDot"))
+            else if (borderDashStyle.Equals ("DashDot"))
             {
                 return LineStyle.DashDot;
             }
-            else if (borderDashStyle.Equals("DashDotDot"))
+            else if (borderDashStyle.Equals ("DashDotDot"))
             {
                 return LineStyle.DashDotDot;
             }
-            else if (borderDashStyle.Equals("Double"))
+            else if (borderDashStyle.Equals ("Double"))
             {
                 return LineStyle.Double;
             }
+
             return LineStyle.Solid;
         }
 
@@ -354,7 +372,7 @@ namespace AM.Reporting.Import.StimulSoft
         /// </summary>
         /// <param name="lineStyle">The StimulSoft LineStyle value.</param>
         /// <returns>The LineStyle value.</returns>
-        public static LineStyle ConvertLineStyle(string lineStyle)
+        public static LineStyle ConvertLineStyle (string lineStyle)
         {
             if (lineStyle == "System.Drawing.Drawing2D.DashStyle.Dot")
             {
@@ -376,6 +394,7 @@ namespace AM.Reporting.Import.StimulSoft
             {
                 return LineStyle.Double;
             }
+
             return LineStyle.Solid;
         }
 
@@ -384,20 +403,23 @@ namespace AM.Reporting.Import.StimulSoft
         /// </summary>
         /// <param name="textAlignment">The StimulSoft TextAlignment value.</param>
         /// <returns>The HorzAlign value.</returns>
-        public static HorzAlign ConvertTextAlignmentToHorzAlign(string textAlignment)
+        public static HorzAlign ConvertTextAlignmentToHorzAlign (string textAlignment)
         {
-            if (textAlignment.Contains("Center"))
+            if (textAlignment.Contains ("Center"))
             {
                 return HorzAlign.Center;
             }
-            if (textAlignment.Contains("Width"))
+
+            if (textAlignment.Contains ("Width"))
             {
                 return HorzAlign.Justify;
             }
-            if (textAlignment.Contains("Right"))
+
+            if (textAlignment.Contains ("Right"))
             {
                 return HorzAlign.Right;
             }
+
             return HorzAlign.Left;
         }
 
@@ -407,16 +429,18 @@ namespace AM.Reporting.Import.StimulSoft
         /// </summary>
         /// <param name="brush"></param>
         /// <returns></returns>
-        public static FillBase ConvertBrush(string brush)
+        public static FillBase ConvertBrush (string brush)
         {
-            string[] parametrs = brush.Split(',');
+            string[] parametrs = brush.Split (',');
 
-            if (brush.Contains("HatchBrush"))
+            if (brush.Contains ("HatchBrush"))
             {
-                HatchFill fill = new HatchFill();
-                fill.ForeColor = ConvertColor(parametrs[2]);
-                fill.BackColor = ConvertColor(parametrs[3]);
-                foreach (HatchStyle style in Enum.GetValues(typeof(HatchStyle)))
+                var fill = new HatchFill
+                {
+                    ForeColor = ConvertColor (parametrs[2]),
+                    BackColor = ConvertColor (parametrs[3])
+                };
+                foreach (HatchStyle style in Enum.GetValues (typeof (HatchStyle)))
                 {
                     if (style.ToString() == parametrs[1])
                     {
@@ -424,25 +448,29 @@ namespace AM.Reporting.Import.StimulSoft
                         break;
                     }
                 }
+
                 return fill;
             }
 
-            if (brush.Contains("GradientBrush"))
+            if (brush.Contains ("GradientBrush"))
             {
-                return new LinearGradientFill(ConvertColor(parametrs[2]), ConvertColor(parametrs[1]), ConvertInt(parametrs[3]));
+                return new LinearGradientFill (ConvertColor (parametrs[2]), ConvertColor (parametrs[1]),
+                    ConvertInt (parametrs[3]));
             }
 
-            if (brush.Contains("GlareBrush"))
+            if (brush.Contains ("GlareBrush"))
             {
-                return new LinearGradientFill(ConvertColor(parametrs[1]), ConvertColor(parametrs[2]), ConvertInt(parametrs[3]), ConvertFloat(parametrs[4]), 100);
+                return new LinearGradientFill (ConvertColor (parametrs[1]), ConvertColor (parametrs[2]),
+                    ConvertInt (parametrs[3]), ConvertFloat (parametrs[4]), 100);
             }
 
-            if (brush.Contains("GlassBrush"))
+            if (brush.Contains ("GlassBrush"))
             {
-                return new GlassFill(ConvertColor(parametrs[1]), ConvertFloat(parametrs[3]), ConvertBool(parametrs[2]));
+                return new GlassFill (ConvertColor (parametrs[1]), ConvertFloat (parametrs[3]),
+                    ConvertBool (parametrs[2]));
             }
 
-            return new SolidFill(ConvertColor(brush));
+            return new SolidFill (ConvertColor (brush));
         }
 
         /// <summary>
@@ -450,75 +478,134 @@ namespace AM.Reporting.Import.StimulSoft
         /// </summary>
         /// <param name="node"></param>
         /// <returns></returns>
-        public static FormatBase ConvertFormat(XmlNode node)
+        public static FormatBase ConvertFormat (XmlNode node)
         {
             switch (node.Attributes["type"].Value)
             {
                 case "NumberFormat":
-                    NumberFormat numberFormat = new NumberFormat();
+                    var numberFormat = new NumberFormat();
                     if (node["GroupSeparator"] != null)
+                    {
                         numberFormat.GroupSeparator = node["GroupSeparator"].InnerText;
+                    }
+
                     if (node["NegativePattern"] != null)
-                        numberFormat.NegativePattern = ConvertInt(node["NegativePattern"].InnerText);
+                    {
+                        numberFormat.NegativePattern = ConvertInt (node["NegativePattern"].InnerText);
+                    }
+
                     if (node["DecimalDigits"] != null)
-                        numberFormat.DecimalDigits = ConvertInt(node["DecimalDigits"].InnerText);
+                    {
+                        numberFormat.DecimalDigits = ConvertInt (node["DecimalDigits"].InnerText);
+                    }
+
                     if (node["DecimalSeparator"] != null)
+                    {
                         numberFormat.DecimalSeparator = node["DecimalSeparator"].InnerText;
+                    }
+
                     return numberFormat;
 
                 case "CurrencyFormat":
-                    CurrencyFormat currencyFormat = new CurrencyFormat();
+                    var currencyFormat = new CurrencyFormat();
                     if (node["GroupSeparator"] != null)
+                    {
                         currencyFormat.GroupSeparator = node["GroupSeparator"].InnerText;
+                    }
+
                     if (node["NegativePattern"] != null)
-                        currencyFormat.NegativePattern = ConvertInt(node["NegativePattern"].InnerText);
+                    {
+                        currencyFormat.NegativePattern = ConvertInt (node["NegativePattern"].InnerText);
+                    }
+
                     if (node["DecimalDigits"] != null)
-                        currencyFormat.DecimalDigits = ConvertInt(node["DecimalDigits"].InnerText);
+                    {
+                        currencyFormat.DecimalDigits = ConvertInt (node["DecimalDigits"].InnerText);
+                    }
+
                     if (node["DecimalSeparator"] != null)
+                    {
                         currencyFormat.DecimalSeparator = node["DecimalSeparator"].InnerText;
+                    }
+
                     if (node["PositivePattern"] != null)
-                        currencyFormat.PositivePattern = ConvertInt(node["PositivePattern"].InnerText);
+                    {
+                        currencyFormat.PositivePattern = ConvertInt (node["PositivePattern"].InnerText);
+                    }
+
                     if (node["Symbol"] != null)
+                    {
                         currencyFormat.CurrencySymbol = node["Symbol"].InnerText;
+                    }
+
                     return currencyFormat;
 
                 case "PercentageFormat":
-                    PercentFormat percentFormat = new PercentFormat();
+                    var percentFormat = new PercentFormat();
                     if (node["GroupSeparator"] != null)
+                    {
                         percentFormat.GroupSeparator = node["GroupSeparator"].InnerText;
+                    }
+
                     if (node["NegativePattern"] != null)
-                        percentFormat.NegativePattern = ConvertInt(node["NegativePattern"].InnerText);
+                    {
+                        percentFormat.NegativePattern = ConvertInt (node["NegativePattern"].InnerText);
+                    }
+
                     if (node["DecimalDigits"] != null)
-                        percentFormat.DecimalDigits = ConvertInt(node["DecimalDigits"].InnerText);
+                    {
+                        percentFormat.DecimalDigits = ConvertInt (node["DecimalDigits"].InnerText);
+                    }
+
                     if (node["DecimalSeparator"] != null)
+                    {
                         percentFormat.DecimalSeparator = node["DecimalSeparator"].InnerText;
+                    }
+
                     if (node["PositivePattern"] != null)
-                        percentFormat.PositivePattern = ConvertInt(node["PositivePattern"].InnerText);
+                    {
+                        percentFormat.PositivePattern = ConvertInt (node["PositivePattern"].InnerText);
+                    }
+
                     return percentFormat;
 
                 case "DateFormat":
-                    DateFormat dataFormats = new DateFormat();
+                    var dataFormats = new DateFormat();
                     if (node["StringFormat"] != null)
+                    {
                         dataFormats.Format = node["StringFormat"].InnerText;
+                    }
+
                     return dataFormats;
 
                 case "TimeFormat":
-                    TimeFormat timeFormats = new TimeFormat();
+                    var timeFormats = new TimeFormat();
                     if (node["StringFormat"] != null)
+                    {
                         timeFormats.Format = node["StringFormat"].InnerText;
+                    }
+
                     return timeFormats;
 
                 case "BooleanFormat":
-                    BooleanFormat booleanFormat = new BooleanFormat();
+                    var booleanFormat = new BooleanFormat();
                     if (node["FalseDisplay"] != null)
+                    {
                         booleanFormat.FalseText = node["FalseDisplay"].InnerText;
+                    }
+
                     if (node["TrueDisplay"] != null)
+                    {
                         booleanFormat.TrueText = node["TrueDisplay"].InnerText;
+                    }
+
                     return booleanFormat;
 
                 case "CustomFormat":
-                    CustomFormat customFormat = new CustomFormat();
-                    customFormat.Format = node["StringFormat"].InnerText;
+                    var customFormat = new CustomFormat
+                    {
+                        Format = node["StringFormat"].InnerText
+                    };
                     return customFormat;
             }
 
@@ -531,17 +618,23 @@ namespace AM.Reporting.Import.StimulSoft
         /// </summary>
         /// <param name="rtfStimulsoft"></param>
         /// <returns></returns>
-        public static string ConvertRTF(string rtfStimulsoft)
+        public static string ConvertRTF (string rtfStimulsoft)
         {
-            string result = rtfStimulsoft.Replace("__LP__", "{").Replace("__RP__", "}");
-            for(int i = 0; i < result.Length; i++)
+            var result = rtfStimulsoft.Replace ("__LP__", "{").Replace ("__RP__", "}");
+            for (var i = 0; i < result.Length; i++)
             {
-                if(result[i] == '_')
+                if (result[i] == '_')
+                {
                     try
                     {
-                        result = result.Replace(result.Substring(i, 7), ((char)Int16.Parse(result.Substring(i + 2, 4), NumberStyles.AllowHexSpecifier)).ToString());
+                        result = result.Replace (result.Substring (i, 7),
+                            ((char)short.Parse (result.Substring (i + 2, 4), NumberStyles.AllowHexSpecifier))
+                            .ToString());
                     }
-                    catch { }
+                    catch
+                    {
+                    }
+                }
             }
 
             return result;
@@ -553,7 +646,7 @@ namespace AM.Reporting.Import.StimulSoft
         /// </summary>
         /// <param name="style"></param>
         /// <returns></returns>
-        public static CapStyle ConvertCapStyle(string style)
+        public static CapStyle ConvertCapStyle (string style)
         {
             switch (style)
             {
@@ -575,16 +668,18 @@ namespace AM.Reporting.Import.StimulSoft
         /// </summary>
         /// <param name="textAlignment">The StimulSoft TextAlignment value.</param>
         /// <returns>The VertAlign value.</returns>
-        public static VertAlign ConvertTextAlignmentToVertAlign(string textAlignment)
+        public static VertAlign ConvertTextAlignmentToVertAlign (string textAlignment)
         {
-            if (textAlignment.Contains("Center"))
+            if (textAlignment.Contains ("Center"))
             {
                 return VertAlign.Center;
             }
-            if (textAlignment.Contains("Bottom"))
+
+            if (textAlignment.Contains ("Bottom"))
             {
                 return VertAlign.Bottom;
             }
+
             return VertAlign.Top;
         }
 
@@ -593,7 +688,7 @@ namespace AM.Reporting.Import.StimulSoft
         /// </summary>
         /// <param name="checksymbol"></param>
         /// <returns></returns>
-        public static CheckedSymbol ConvertCheckSymbol(string checksymbol)
+        public static CheckedSymbol ConvertCheckSymbol (string checksymbol)
         {
             switch (checksymbol)
             {
@@ -611,7 +706,7 @@ namespace AM.Reporting.Import.StimulSoft
         /// </summary>
         /// <param name="symbology">The StimulSoft Barcode.Symbology value as string.</param>
         /// <param name="barcode">The BarcodeObject instance.</param>
-        public static void ConvertBarcodeSymbology(string symbology, BarcodeObject barcode)
+        public static void ConvertBarcodeSymbology (string symbology, BarcodeObject barcode)
         {
             switch (symbology)
             {
@@ -708,32 +803,37 @@ namespace AM.Reporting.Import.StimulSoft
         /// Converts the StimulSoft border sides to AM.Reporting border sides
         /// </summary>
         /// <param name="sides"></param>
-        public static BorderLines ConvertBorderSides(string sides)
+        public static BorderLines ConvertBorderSides (string sides)
         {
-            BorderLines borderLines = BorderLines.None;
-            if (!String.IsNullOrEmpty(sides))
+            var borderLines = BorderLines.None;
+            if (!string.IsNullOrEmpty (sides))
             {
-                if (sides.IndexOf("Left") > -1)
+                if (sides.IndexOf ("Left") > -1)
                 {
                     borderLines |= BorderLines.Left;
                 }
-                if (sides.IndexOf("Top") > -1)
+
+                if (sides.IndexOf ("Top") > -1)
                 {
                     borderLines |= BorderLines.Top;
                 }
-                if (sides.IndexOf("Right") > -1)
+
+                if (sides.IndexOf ("Right") > -1)
                 {
                     borderLines |= BorderLines.Right;
                 }
-                if (sides.IndexOf("Bottom") > -1)
+
+                if (sides.IndexOf ("Bottom") > -1)
                 {
                     borderLines |= BorderLines.Bottom;
                 }
-                if (sides.IndexOf("All") > -1)
+
+                if (sides.IndexOf ("All") > -1)
                 {
                     borderLines = BorderLines.All;
                 }
             }
+
             return borderLines;
         }
 
@@ -742,7 +842,7 @@ namespace AM.Reporting.Import.StimulSoft
         /// </summary>
         /// <param name="node"></param>
         /// <returns></returns>
-        public static MatrixAggregateFunction GetMatrixAggregateFunction(XmlNode node)
+        public static MatrixAggregateFunction GetMatrixAggregateFunction (XmlNode node)
         {
             if (node["Summary"] != null)
             {
@@ -773,16 +873,28 @@ namespace AM.Reporting.Import.StimulSoft
         /// </summary>
         /// <param name="fill"></param>
         /// <returns></returns>
-        public static Color ConvertBrushToColor(FillBase fill)
+        public static Color ConvertBrushToColor (FillBase fill)
         {
-            if (fill is HatchFill)
-                return (fill as HatchFill).ForeColor;
-            if (fill is LinearGradientFill)
-                return (fill as LinearGradientFill).StartColor;
-            if (fill is GlassFill)
-                return (fill as GlassFill).Color;
-            if (fill is SolidFill)
-                return (fill as SolidFill).Color;
+            if (fill is HatchFill hatchFill)
+            {
+                return hatchFill.ForeColor;
+            }
+
+            if (fill is LinearGradientFill gradientFill)
+            {
+                return gradientFill.StartColor;
+            }
+
+            if (fill is GlassFill glassFill)
+            {
+                return glassFill.Color;
+            }
+
+            if (fill is SolidFill solidFill)
+            {
+                return solidFill.Color;
+            }
+
             return Color.Transparent;
         }
 
@@ -833,10 +945,10 @@ namespace AM.Reporting.Import.StimulSoft
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static Point ConvertPoint(string value)
+        public static Point ConvertPoint (string value)
         {
-            string[] points = value.Split(',');
-            return new Point(ConvertInt(points[0]), ConvertInt(points[1]));
+            string[] points = value.Split (',');
+            return new Point (ConvertInt (points[0]), ConvertInt (points[1]));
         }
 
         /// <summary>
@@ -844,10 +956,10 @@ namespace AM.Reporting.Import.StimulSoft
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static Size ConvertSize(string value)
+        public static Size ConvertSize (string value)
         {
-            string[] points = value.Split(',');
-            return new Size(ConvertInt(points[0]), ConvertInt(points[1]));
+            string[] points = value.Split (',');
+            return new Size (ConvertInt (points[0]), ConvertInt (points[1]));
         }
 
 
@@ -856,7 +968,7 @@ namespace AM.Reporting.Import.StimulSoft
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static ContentAlignment ConvertContentAlignment(string value)
+        public static ContentAlignment ConvertContentAlignment (string value)
         {
             switch (value)
             {
@@ -879,8 +991,10 @@ namespace AM.Reporting.Import.StimulSoft
                 case "BottomRight":
                     return ContentAlignment.BottomRight;
             }
+
             return ContentAlignment.TopLeft;
         }
-#endregion // Public Methods
+
+        #endregion // Public Methods
     }
 }

@@ -42,80 +42,48 @@ namespace AM.Reporting.Utils
 #else
         const string CONFIG_NAME = "AM.Reporting.config";
 #endif
+
         #region Private Fields
 
-        private static readonly CultureInfo engCultureInfo = new CultureInfo("en-US");
         private static readonly XmlDocument FDoc = new XmlDocument();
 
-        private static readonly string version = typeof(Report).Assembly.GetName().Version.ToString(3);
-        private static string FFolder = null;
-        private static string FFontListFolder = null;
         private static string FLogs = "";
-        private static bool FIsRunningOnMono;
-        private static ReportSettings FReportSettings = new ReportSettings();
-        private static bool FRightToLeft = false;
-        private static string FTempFolder = null;
-        private static string systemTempFolder = null;
-        private static bool FStringOptimization = true;
-        private static bool FWebMode;
-        private static bool preparedCompressed = true;
-        private static bool disableHotkeys = false;
-        private static bool enableScriptSecurity = false;
-        private static ScriptSecurityProperties scriptSecurityProps = null;
-        private static bool forbidLocalData = false;
-        private static bool userSetsScriptSecurity = false;
-        private static readonly FRPrivateFontCollection privateFontCollection = new FRPrivateFontCollection();
+        private static string systemTempFolder;
+        private static bool enableScriptSecurity;
+        private static bool userSetsScriptSecurity;
         internal static bool CleanupOnExit;
-        private static CompilerSettings compilerSettings = new CompilerSettings();
         private static string applicationFolder;
         private static readonly string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-        private static bool disableLastFormatting = false;
-
 
         #endregion Private Fields
 
         #region Public Properties
+
         /// <summary>
         /// Gets a value indicating that the Mono runtime is used.
         /// </summary>
-        public static bool IsRunningOnMono
-        {
-            get { return FIsRunningOnMono; }
-        }
+        public static bool IsRunningOnMono { get; private set; }
 
 #if CROSSPLATFORM
         public static bool IsWindows { get; } = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 #endif
 
 
-
         /// <summary>
         /// Gets or sets a value indicating is it impossible to specify a local data path in Xml and Csv.
         /// </summary>
-        public static bool ForbidLocalData
-        {
-            get { return forbidLocalData; }
-            set { forbidLocalData = value; }
-        }
+        public static bool ForbidLocalData { get; set; }
 
 
         /// <summary>
         /// Gets or sets the optimization of strings. Is experimental feature.
         /// </summary>
-        public static bool IsStringOptimization
-        {
-            get { return FStringOptimization; }
-            set { FStringOptimization = value; }
-        }
+        public static bool IsStringOptimization { get; set; } = true;
 
         /// <summary>
         /// Enable or disable the compression in files with prepared reports (fpx).
         /// </summary>
-        public static bool PreparedCompressed
-        {
-            get { return preparedCompressed; }
-            set { preparedCompressed = value; }
-        }
+        public static bool PreparedCompressed { get; set; } = true;
 
         /// <summary>
         /// Gets or sets the application folder.
@@ -124,23 +92,20 @@ namespace AM.Reporting.Utils
         {
             get
             {
-                if(applicationFolder == null)
+                if (applicationFolder == null)
+                {
                     return baseDirectory;
+                }
+
                 return applicationFolder;
             }
-            set
-            {
-                applicationFolder = value;
-            }
+            set => applicationFolder = value;
         }
 
         /// <summary>
         /// Gets an english culture information for localization purposes
         /// </summary>
-        public static CultureInfo EngCultureInfo
-        {
-            get { return engCultureInfo; }
-        }
+        public static CultureInfo EngCultureInfo { get; } = new CultureInfo ("en-US");
 
         /// <summary>
         /// Gets or sets the path used to load/save the configuration file.
@@ -150,11 +115,7 @@ namespace AM.Reporting.Utils
         /// (C:\Documents and Settings\User_Name\Local Settings\Application Data\AM.Reporting\).
         /// Set this property to "" if you want to store the configuration file in the application folder.
         /// </remarks>
-        public static string Folder
-        {
-            get { return FFolder; }
-            set { FFolder = value; }
-        }
+        public static string Folder { get; set; }
 
         /// <summary>
         /// Gets or sets the path used to font.list file.
@@ -163,55 +124,32 @@ namespace AM.Reporting.Utils
         /// By default, the font.list file is saved to the AM.Reporting.config folder
         /// If WebMode enabled (or config file path is null), then file is saved in the application folder.
         /// </remarks>
-        public static string FontListFolder
-        {
-            get { return FFontListFolder; }
-            set { FFontListFolder = value; }
-        }
+        public static string FontListFolder { get; set; }
 
         /// <summary>
         /// Gets or sets the settings for the Report component.
         /// </summary>
-        public static ReportSettings ReportSettings
-        {
-            get { return FReportSettings; }
-            set { FReportSettings = value; }
-        }
+        public static ReportSettings ReportSettings { get; set; } = new ReportSettings();
 
         /// <summary>
         /// Gets or sets a value indicating whether RTL layout should be used.
         /// </summary>
-        public static bool RightToLeft
-        {
-            get { return FRightToLeft; }
-            set { FRightToLeft = value; }
-        }
+        public static bool RightToLeft { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether hotkeys should be disabled.
         /// </summary>
-        public static bool DisableHotkeys
-        {
-            get { return disableHotkeys; }
-            set { disableHotkeys =  value; }
-        }
+        public static bool DisableHotkeys { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating saving last formatting should be disabled.
         /// </summary>
-        public static bool DisableLastFormatting
-        {
-            get { return disableLastFormatting; }
-            set { disableLastFormatting = value; }
-        }
+        public static bool DisableLastFormatting { get; set; }
 
         /// <summary>
         /// Gets the root item of config xml.
         /// </summary>
-        public static XmlItem Root
-        {
-            get { return FDoc.Root; }
-        }
+        public static XmlItem Root => FDoc.Root;
 
         /// <summary>
         /// Gets or sets the path to the temporary folder used to store temporary files.
@@ -219,27 +157,17 @@ namespace AM.Reporting.Utils
         /// <remarks>
         /// The default value is <b>null</b>, so the system temp folder will be used.
         /// </remarks>
-        public static string TempFolder
-        {
-            get { return FTempFolder; }
-            set { FTempFolder = value; }
-        }
+        public static string TempFolder { get; set; }
 
         /// <summary>
         /// Gets the path to the system temporary folder used to store temporary files.
         /// </summary>
-        public static string SystemTempFolder
-        {
-            get { return systemTempFolder == null ? GetTempPath() : systemTempFolder; }
-        }
+        public static string SystemTempFolder => systemTempFolder == null ? GetTempPath() : systemTempFolder;
 
         /// <summary>
         /// Gets AM.Reporting version.
         /// </summary>
-        public static string Version
-        {
-            get { return version; }
-        }
+        public static string Version { get; } = typeof (Report).Assembly.GetName().Version.ToString (3);
 
         /// <summary>
         /// Called on script compile
@@ -249,31 +177,31 @@ namespace AM.Reporting.Utils
         /// <summary>
         /// Gets a PrivateFontCollection instance.
         /// </summary>
-        public static FRPrivateFontCollection PrivateFontCollection
-        {
-            get { return privateFontCollection; }
-        }
+        public static FRPrivateFontCollection PrivateFontCollection { get; } = new FRPrivateFontCollection();
 
         /// <summary>
         /// Enable report script validation. For WebMode only
         /// </summary>
         public static bool EnableScriptSecurity
         {
-            get
-            {
-                return enableScriptSecurity;
-            }
+            get => enableScriptSecurity;
             set
             {
                 if (OnEnableScriptSecurityChanged != null)
-                    OnEnableScriptSecurityChanged.Invoke(null, null);
+                {
+                    OnEnableScriptSecurityChanged.Invoke (null, null);
+                }
+
                 enableScriptSecurity = value;
+
                 //
                 userSetsScriptSecurity = true;
                 if (value)
                 {
-                    if(scriptSecurityProps == null)
-                        scriptSecurityProps = new ScriptSecurityProperties();
+                    if (ScriptSecurityProps == null)
+                    {
+                        ScriptSecurityProps = new ScriptSecurityProperties();
+                    }
                 }
             }
         }
@@ -286,29 +214,25 @@ namespace AM.Reporting.Utils
         /// <summary>
         /// Properties of report script validation
         /// </summary>
-        public static ScriptSecurityProperties ScriptSecurityProps
-        {
-            get { return scriptSecurityProps; }
-        }
+        public static ScriptSecurityProperties ScriptSecurityProps { get; private set; }
 
         /// <summary>
         /// Settings of report compiler.
         /// </summary>
-        public static CompilerSettings CompilerSettings
-        {
-            get { return compilerSettings; }
-            set { compilerSettings = value; }
-        }
+        public static CompilerSettings CompilerSettings { get; set; } = new CompilerSettings();
 
         #endregion Public Properties
 
         #region Internal Methods
 
-        internal static string CreateTempFile(string dir)
+        internal static string CreateTempFile (string dir)
         {
-            if (String.IsNullOrEmpty(dir))
+            if (string.IsNullOrEmpty (dir))
+            {
                 return GetTempFileName();
-            return Path.Combine(dir, Path.GetRandomFileName());
+            }
+
+            return Path.Combine (dir, Path.GetRandomFileName());
         }
 
         internal static string GetTempFolder()
@@ -318,7 +242,7 @@ namespace AM.Reporting.Utils
 
         internal static void Init()
         {
-            FIsRunningOnMono = Type.GetType("Mono.Runtime") != null;
+            IsRunningOnMono = Type.GetType ("Mono.Runtime") != null;
 #if SKIA
             Topten.RichTextKit.FontFallback.CharacterMatcher = characterMatcher;
 #endif
@@ -327,13 +251,15 @@ namespace AM.Reporting.Utils
 
 #if !CROSSPLATFORM
             if (!WebMode)
+            {
                 LoadConfig();
+            }
 #endif
 
             if (!userSetsScriptSecurity && WebMode)
             {
-                enableScriptSecurity = true;    // don't throw event
-                scriptSecurityProps = new ScriptSecurityProperties();
+                enableScriptSecurity = true; // don't throw event
+                ScriptSecurityProps = new ScriptSecurityProperties();
             }
 
 #if !COMMUNITY
@@ -348,11 +274,11 @@ namespace AM.Reporting.Utils
             // init TextRenderingHint.SystemDefault
             // bug in .Net: if you use any other hint before SystemDefault, the SystemDefault will
             // look like SingleBitPerPixel
-            using (Bitmap bmp = new Bitmap(1, 1))
-            using (Graphics g = Graphics.FromImage(bmp))
+            using (var bmp = new Bitmap (1, 1))
+            using (var g = Graphics.FromImage (bmp))
             {
                 g.TextRenderingHint = TextRenderingHint.SystemDefault;
-                g.DrawString(" ", SystemFonts.DefaultFont, Brushes.Black, 0, 0);
+                g.DrawString (" ", SystemFonts.DefaultFont, Brushes.Black, 0, 0);
             }
         }
 
@@ -365,7 +291,7 @@ namespace AM.Reporting.Utils
                 var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies();
                 foreach (var loadedAsmbly in loadedAssemblies)
                 {
-                    bool isAspNetCore = loadedAsmbly.GetName().Name.StartsWith("Microsoft.AspNetCore");
+                    var isAspNetCore = loadedAsmbly.GetName().Name.StartsWith ("Microsoft.AspNetCore");
                     if (isAspNetCore)
                     {
                         WebMode = true;
@@ -380,36 +306,40 @@ namespace AM.Reporting.Utils
             }
         }
 
-        internal static void WriteLogString(string s)
+        internal static void WriteLogString (string s)
         {
-            WriteLogString(s, false);
+            WriteLogString (s, false);
         }
 
-        internal static void WriteLogString(string s, bool distinct)
+        internal static void WriteLogString (string s, bool distinct)
         {
             if (distinct)
             {
-                if (FLogs.IndexOf(s + "\r\n") != -1)
+                if (FLogs.IndexOf (s + "\r\n") != -1)
+                {
                     return;
+                }
             }
+
             FLogs += s + "\r\n";
         }
 
 
-        internal static void OnScriptCompile(ScriptSecurityEventArgs e)
+        internal static void OnScriptCompile (ScriptSecurityEventArgs e)
         {
             if (ScriptCompile != null)
             {
-                ScriptCompile.Invoke(null, e);
+                ScriptCompile.Invoke (null, e);
             }
 
             if (!e.IsValid)
             {
-                throw new CompilerException(Res.Get("Messages,CompilerError"));
+                throw new CompilerException (Res.Get ("Messages,CompilerError"));
             }
         }
 
 #if NETSTANDARD || NETCOREAPP
+
         // public static event EventHandler<Code.CodeDom.Compiler.CompilationEventArgs> BeforeEmitCompile;
 
         // internal static void OnBeforeScriptCompilation(object sender, Code.CodeDom.Compiler.CompilationEventArgs e)
@@ -427,26 +357,37 @@ namespace AM.Reporting.Utils
 
         private static string GetTempFileName()
         {
-            return Path.Combine(GetTempFolder(), SystemFake.DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss-") + Path.GetRandomFileName());
+            return Path.Combine (GetTempFolder(),
+                SystemFake.DateTime.Now.ToString ("yyyy-dd-M--HH-mm-ss-") + Path.GetRandomFileName());
         }
 
         private static string GetTempPath()
         {
-            if (!string.IsNullOrEmpty(systemTempFolder))
+            if (!string.IsNullOrEmpty (systemTempFolder))
+            {
                 return systemTempFolder;
+            }
 
-            systemTempFolder = Environment.GetEnvironmentVariable("TMP");
-            if (string.IsNullOrEmpty(systemTempFolder))
-                systemTempFolder = Environment.GetEnvironmentVariable("TEMP");
-            if (string.IsNullOrEmpty(systemTempFolder))
-                systemTempFolder = Environment.GetEnvironmentVariable("TMPDIR");
-            if (string.IsNullOrEmpty(systemTempFolder))
+            systemTempFolder = Environment.GetEnvironmentVariable ("TMP");
+            if (string.IsNullOrEmpty (systemTempFolder))
+            {
+                systemTempFolder = Environment.GetEnvironmentVariable ("TEMP");
+            }
+
+            if (string.IsNullOrEmpty (systemTempFolder))
+            {
+                systemTempFolder = Environment.GetEnvironmentVariable ("TMPDIR");
+            }
+
+            if (string.IsNullOrEmpty (systemTempFolder))
+            {
                 systemTempFolder = Path.GetTempPath();
+            }
 
             return systemTempFolder;
         }
 
-        private static void CurrentDomain_ProcessExit(object sender, EventArgs e)
+        private static void CurrentDomain_ProcessExit (object sender, EventArgs e)
         {
             FDoc.Root.Name = "Config";
             FDoc.AutoIndent = true;
@@ -463,19 +404,25 @@ namespace AM.Reporting.Utils
             {
                 try
                 {
-                    if (!Directory.Exists(Folder))
-                        Directory.CreateDirectory(Folder);
-                    string configFile = Path.Combine(Folder, CONFIG_NAME);
+                    if (!Directory.Exists (Folder))
+                    {
+                        Directory.CreateDirectory (Folder);
+                    }
+
+                    var configFile = Path.Combine (Folder, CONFIG_NAME);
                     if (CleanupOnExit)
                     {
-                        File.Delete(configFile);
+                        File.Delete (configFile);
                     }
                     else
                     {
-                        FDoc.Save(configFile);
+                        FDoc.Save (configFile);
                     }
+
                     if (FLogs != "")
-                        File.WriteAllText(Path.Combine(Folder, "AM.Reporting.logs"), FLogs);
+                    {
+                        File.WriteAllText (Path.Combine (Folder, "AM.Reporting.logs"), FLogs);
+                    }
                 }
                 catch
                 {
@@ -485,30 +432,32 @@ namespace AM.Reporting.Utils
 
         private static void LoadConfig()
         {
-            bool configLoaded = false;
-            if (!Config.WebMode)
+            var configLoaded = false;
+            if (!WebMode)
             {
                 try
                 {
                     if (Folder == null)
                     {
-                        string baseFolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-                        Folder = Path.Combine(baseFolder, "AM.Reporting");
+                        var baseFolder = Environment.GetFolderPath (Environment.SpecialFolder.LocalApplicationData);
+                        Folder = Path.Combine (baseFolder, "AM.Reporting");
                     }
                     else if (Folder == "")
+                    {
                         Folder = ApplicationFolder;
+                    }
                 }
                 catch
                 {
                 }
 
-                string fileName = Path.Combine(Folder, CONFIG_NAME);
+                var fileName = Path.Combine (Folder, CONFIG_NAME);
 
-                if (File.Exists(fileName))
+                if (File.Exists (fileName))
                 {
                     try
                     {
-                        FDoc.Load(fileName);
+                        FDoc.Load (fileName);
                         configLoaded = true;
                     }
                     catch
@@ -523,14 +472,15 @@ namespace AM.Reporting.Utils
                 RestoreAuthServiceUser();
                 RestoreCompilerSettings();
                 Res.LoadDefaultLocale();
-                AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit);
+                AppDomain.CurrentDomain.ProcessExit += new EventHandler (CurrentDomain_ProcessExit);
             }
+
             if (!configLoaded)
             {
                 // load default config
-                using (Stream stream = ResourceLoader.GetStream("AM.Reporting.config"))
+                using (var stream = ResourceLoader.GetStream ("AM.Reporting.config"))
                 {
-                    FDoc.Load(stream);
+                    FDoc.Load (stream);
                 }
             }
         }
@@ -540,16 +490,16 @@ namespace AM.Reporting.Utils
             // main assembly initializer
             ProcessMainAssembly();
 
-            XmlItem pluginsItem = Root.FindItem("Plugins");
-            for (int i = 0; i < pluginsItem.Count; i++)
+            var pluginsItem = Root.FindItem ("Plugins");
+            for (var i = 0; i < pluginsItem.Count; i++)
             {
-                XmlItem item = pluginsItem[i];
-                string pluginName = item.GetProp("Name");
+                var item = pluginsItem[i];
+                var pluginName = item.GetProp ("Name");
 
                 try
                 {
-                    var assembly = Assembly.LoadFrom(pluginName);
-                    ProcessAssembly(assembly);
+                    var assembly = Assembly.LoadFrom (pluginName);
+                    ProcessAssembly (assembly);
                 }
                 catch
                 {
@@ -563,28 +513,30 @@ namespace AM.Reporting.Utils
         }
 
 
-        private static void ProcessAssembly(Assembly a)
+        private static void ProcessAssembly (Assembly a)
         {
-            foreach (Type t in a.GetTypes())
+            foreach (var t in a.GetTypes())
             {
-                if (t.IsSubclassOf(typeof(AssemblyInitializerBase)))
-                    Activator.CreateInstance(t);
+                if (t.IsSubclassOf (typeof (AssemblyInitializerBase)))
+                {
+                    Activator.CreateInstance (t);
+                }
             }
         }
 
         private static void RestoreDefaultLanguage()
         {
-            XmlItem xi = Root.FindItem("Designer").FindItem("Code");
-            string defaultLanguage = xi.GetProp("DefaultScriptLanguage");
+            var xi = Root.FindItem ("Designer").FindItem ("Code");
+            var defaultLanguage = xi.GetProp ("DefaultScriptLanguage");
             ReportSettings.DefaultLanguage = defaultLanguage == Language.Vb.ToString() ? Language.Vb : Language.CSharp;
         }
 
         private static void RestoreRightToLeft()
         {
-            XmlItem xi = Root.FindItem("UIOptions");
-            string rtl = xi.GetProp("RightToLeft");
+            var xi = Root.FindItem ("UIOptions");
+            var rtl = xi.GetProp ("RightToLeft");
 
-            if (!String.IsNullOrEmpty(rtl))
+            if (!string.IsNullOrEmpty (rtl))
             {
                 switch (rtl)
                 {
@@ -613,14 +565,14 @@ namespace AM.Reporting.Utils
         public class ScriptSecurityProperties
         {
             private static readonly string[] defaultStopList = new[]
-                {
-                    "GetType",
-                    "typeof",
-                    "TypeOf",   // VB
-                    "DllImport",
-                    "LoadLibrary",
-                    "GetProcAddress",
-                };
+            {
+                "GetType",
+                "typeof",
+                "TypeOf", // VB
+                "DllImport",
+                "LoadLibrary",
+                "GetProcAddress",
+            };
 
             private string[] stopList;
 
@@ -634,12 +586,12 @@ namespace AM.Reporting.Utils
             /// </summary>
             public string[] StopList
             {
-                get { return (string[])stopList.Clone(); }
+                get => (string[])stopList.Clone();
                 set
                 {
-                    if(value != null)
+                    if (value != null)
                     {
-                        OnStopListChanged?.Invoke(this, null);
+                        OnStopListChanged?.Invoke (this, null);
                         stopList = value;
                     }
                 }
@@ -655,7 +607,7 @@ namespace AM.Reporting.Utils
                 SetDefaultStopList();
             }
 
-            internal ScriptSecurityProperties(string[] stopList)
+            internal ScriptSecurityProperties (string[] stopList)
             {
                 this.stopList = stopList;
             }
@@ -667,55 +619,54 @@ namespace AM.Reporting.Utils
             {
                 StopList = defaultStopList;
             }
-
         }
 
         private static void SaveUIOptions()
         {
-            XmlItem xi = Root.FindItem("UIOptions");
-            xi.SetProp("DisableHotkeys", Converter.ToString(DisableHotkeys));
-            xi.SetProp("DisableLastFormatting", Converter.ToString(DisableLastFormatting));
+            var xi = Root.FindItem ("UIOptions");
+            xi.SetProp ("DisableHotkeys", Converter.ToString (DisableHotkeys));
+            xi.SetProp ("DisableLastFormatting", Converter.ToString (DisableLastFormatting));
         }
 
         private static void RestoreUIOptions()
         {
             RestoreRightToLeft();
 
-            XmlItem xi = Root.FindItem("UIOptions");
+            var xi = Root.FindItem ("UIOptions");
 
-            string disableHotkeysStringValue = xi.GetProp("DisableHotkeys");
-            if (!String.IsNullOrEmpty(disableHotkeysStringValue))
+            var disableHotkeysStringValue = xi.GetProp ("DisableHotkeys");
+            if (!string.IsNullOrEmpty (disableHotkeysStringValue))
             {
-                disableHotkeys = disableHotkeysStringValue.ToLower() != "false";
+                DisableHotkeys = disableHotkeysStringValue.ToLower() != "false";
             }
 
-            string disableLastFormattingStringValue = xi.GetProp("DisableLastFormatting");
-            if (!String.IsNullOrEmpty(disableLastFormattingStringValue))
+            var disableLastFormattingStringValue = xi.GetProp ("DisableLastFormatting");
+            if (!string.IsNullOrEmpty (disableLastFormattingStringValue))
             {
-                disableLastFormatting = disableLastFormattingStringValue.ToLower() != "false";
+                DisableLastFormatting = disableLastFormattingStringValue.ToLower() != "false";
             }
         }
 
         private static void SaveCompilerSettings()
         {
-            XmlItem xi = Root.FindItem("CompilerSettings");
-            xi.SetProp("Placeholder", CompilerSettings.Placeholder);
-            xi.SetProp("ExceptionBehaviour", Converter.ToString(CompilerSettings.ExceptionBehaviour));
+            var xi = Root.FindItem ("CompilerSettings");
+            xi.SetProp ("Placeholder", CompilerSettings.Placeholder);
+            xi.SetProp ("ExceptionBehaviour", Converter.ToString (CompilerSettings.ExceptionBehaviour));
         }
 
         private static void RestoreCompilerSettings()
         {
-            XmlItem xi = Root.FindItem("CompilerSettings");
-            CompilerSettings.Placeholder = xi.GetProp("Placeholder");
+            var xi = Root.FindItem ("CompilerSettings");
+            CompilerSettings.Placeholder = xi.GetProp ("Placeholder");
 
-            string exceptionBehaviour = xi.GetProp("ExceptionBehaviour");
-            if (!String.IsNullOrEmpty(exceptionBehaviour))
+            var exceptionBehaviour = xi.GetProp ("ExceptionBehaviour");
+            if (!string.IsNullOrEmpty (exceptionBehaviour))
             {
                 try
                 {
                     CompilerSettings.ExceptionBehaviour =
-                        (CompilerExceptionBehaviour)Converter.FromString(typeof(CompilerExceptionBehaviour),
-                        exceptionBehaviour);
+                        (CompilerExceptionBehaviour)Converter.FromString (typeof (CompilerExceptionBehaviour),
+                            exceptionBehaviour);
                 }
                 catch
                 {
@@ -724,6 +675,6 @@ namespace AM.Reporting.Utils
             }
         }
 
-#endregion Private Methods
+        #endregion Private Methods
     }
 }

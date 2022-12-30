@@ -29,7 +29,6 @@ using AM.Reporting.Utils;
 
 namespace AM.Reporting.Export.Html
 {
-
     /// <summary>
     /// Represents the HTML export format enum
     /// </summary>
@@ -39,6 +38,7 @@ namespace AM.Reporting.Export.Html
         /// Represents the message-HTML type
         /// </summary>
         MessageHTML,
+
         /// <summary>
         /// Represents the HTML type
         /// </summary>
@@ -80,6 +80,7 @@ namespace AM.Reporting.Export.Html
         /// Specifies the pixel units.
         /// </summary>
         Pixel,
+
         /// <summary>
         /// Specifies the percent units.
         /// </summary>
@@ -88,70 +89,83 @@ namespace AM.Reporting.Export.Html
 
     public partial class HTMLExport : ExportBase
     {
-        private string Px(double pixel)
+        private string Px (double pixel)
         {
-            return String.Join(String.Empty, new String[] { ExportUtils.FloatToString(pixel), "px;" });
+            return string.Join (string.Empty, new string[] { ExportUtils.FloatToString (pixel), "px;" });
         }
 
-        private string SizeValue(double value, double maxvalue, HtmlSizeUnits units)
+        private string SizeValue (double value, double maxvalue, HtmlSizeUnits units)
         {
-            FastString sb = new FastString(6);
+            var sb = new FastString (6);
             if (units == HtmlSizeUnits.Pixel)
-                sb.Append(Px(value));
+            {
+                sb.Append (Px (value));
+            }
             else if (units == HtmlSizeUnits.Percent)
-                sb.Append(((int)Math.Round((value * 100 / maxvalue))).ToString()).Append("%");
+            {
+                sb.Append (((int)Math.Round ((value * 100 / maxvalue))).ToString()).Append ("%");
+            }
             else
-                sb.Append(value.ToString());
+            {
+                sb.Append (value.ToString());
+            }
+
             return sb.ToString();
         }
 
-        private void WriteMimePart(Stream stream, string mimetype, string charset, string filename)
+        private void WriteMimePart (Stream stream, string mimetype, string charset, string filename)
         {
-            FastString sb = new FastString();
-            sb.Append("--").AppendLine(boundary);
-            sb.Append("Content-Type: ").Append(mimetype).Append(";");
-            if (charset != String.Empty)
-                sb.Append(" charset=\"").Append(charset).AppendLine("\"");
+            var sb = new FastString();
+            sb.Append ("--").AppendLine (boundary);
+            sb.Append ("Content-Type: ").Append (mimetype).Append (";");
+            if (charset != string.Empty)
+            {
+                sb.Append (" charset=\"").Append (charset).AppendLine ("\"");
+            }
             else
+            {
                 sb.AppendLine();
+            }
+
             string body;
-            byte[] buff = new byte[stream.Length];
+            var buff = new byte[stream.Length];
             stream.Position = 0;
-            stream.Read(buff, 0, buff.Length);
+            stream.Read (buff, 0, buff.Length);
             if (mimetype == "text/html")
             {
-                sb.AppendLine("Content-Transfer-Encoding: quoted-printable");
-                body = ExportUtils.QuotedPrintable(buff);
+                sb.AppendLine ("Content-Transfer-Encoding: quoted-printable");
+                body = ExportUtils.QuotedPrintable (buff);
             }
             else
             {
-                sb.AppendLine("Content-Transfer-Encoding: base64");
-                body = System.Convert.ToBase64String(buff, Base64FormattingOptions.InsertLineBreaks);
+                sb.AppendLine ("Content-Transfer-Encoding: base64");
+                body = Convert.ToBase64String (buff, Base64FormattingOptions.InsertLineBreaks);
             }
-            sb.Append("Content-Location: ").AppendLine(ExportUtils.HtmlURL(filename));
+
+            sb.Append ("Content-Location: ").AppendLine (ExportUtils.HtmlURL (filename));
             sb.AppendLine();
-            sb.AppendLine(body);
+            sb.AppendLine (body);
             sb.AppendLine();
-            Stream.Write(Encoding.ASCII.GetBytes(sb.ToString()), 0, sb.Length);
+            Stream.Write (Encoding.ASCII.GetBytes (sb.ToString()), 0, sb.Length);
             sb.Clear();
         }
 
-        private void WriteMHTHeader(Stream Stream, string FileName)
+        private void WriteMHTHeader (Stream Stream, string FileName)
         {
-            FastString sb = new FastString(256);
-            string s = "=?utf-8?B?" + System.Convert.ToBase64String(Encoding.UTF8.GetBytes(FileName)) + "?=";
-            sb.Append("From: ").AppendLine(s);
-            sb.Append("Subject: ").AppendLine(s);
-            sb.Append("Date: ").AppendLine(ExportUtils.GetRFCDate(SystemFake.DateTime.Now));
-            sb.AppendLine("MIME-Version: 1.0");
-            sb.Append("Content-Type: multipart/related; type=\"text/html\"; boundary=\"").Append(boundary).AppendLine("\"");
+            var sb = new FastString (256);
+            var s = "=?utf-8?B?" + Convert.ToBase64String (Encoding.UTF8.GetBytes (FileName)) + "?=";
+            sb.Append ("From: ").AppendLine (s);
+            sb.Append ("Subject: ").AppendLine (s);
+            sb.Append ("Date: ").AppendLine (ExportUtils.GetRFCDate (SystemFake.DateTime.Now));
+            sb.AppendLine ("MIME-Version: 1.0");
+            sb.Append ("Content-Type: multipart/related; type=\"text/html\"; boundary=\"").Append (boundary)
+                .AppendLine ("\"");
             sb.AppendLine();
-            sb.AppendLine("This is a multi-part message in MIME format.");
+            sb.AppendLine ("This is a multi-part message in MIME format.");
             sb.AppendLine();
-            ExportUtils.Write(Stream, sb.ToString());
+            ExportUtils.Write (Stream, sb.ToString());
             sb.Clear();
         }
-
     }
 
     /// <summary>
@@ -159,92 +173,54 @@ namespace AM.Reporting.Export.Html
     /// </summary>
     public class HTMLPageData
     {
-        private string cssText;
-        private string pageText;
-        private List<Stream> pictures;
-        private List<string> guids;
-        private ManualResetEvent pageEvent;
-        private int pageNumber;
-        private float width;
-        private float height;
+        /// <summary>
+        /// For internal use only.
+        /// </summary>
+        public float Width { get; set; }
 
         /// <summary>
         /// For internal use only.
         /// </summary>
-        public float Width
-        {
-            get { return width; }
-            set { width = value; }
-        }
+        public float Height { get; set; }
 
         /// <summary>
         /// For internal use only.
         /// </summary>
-        public float Height
-        {
-            get { return height; }
-            set { height = value; }
-        }
+        public string CSSText { get; set; }
 
         /// <summary>
         /// For internal use only.
         /// </summary>
-        public string CSSText
-        {
-            get { return cssText; }
-            set { cssText = value; }
-        }
+        public string PageText { get; set; }
 
         /// <summary>
         /// For internal use only.
         /// </summary>
-        public string PageText
-        {
-            get { return pageText; }
-            set { pageText = value; }
-        }
+        public List<Stream> Pictures { get; }
 
         /// <summary>
         /// For internal use only.
         /// </summary>
-        public List<Stream> Pictures
-        {
-            get { return pictures; }
-        }
+        public List<string> Guids { get; }
 
         /// <summary>
         /// For internal use only.
         /// </summary>
-        public List<string> Guids
-        {
-            get { return guids; }
-        }
+        public ManualResetEvent PageEvent { get; }
 
         /// <summary>
         /// For internal use only.
         /// </summary>
-        public ManualResetEvent PageEvent
-        {
-            get { return pageEvent; }
-        }
-
-        /// <summary>
-        /// For internal use only.
-        /// </summary>
-        public int PageNumber
-        {
-            get { return pageNumber; }
-            set { pageNumber = value; }
-        }
+        public int PageNumber { get; set; }
 
         /// <summary>
         /// For internal use only.
         /// </summary>
         public HTMLPageData()
         {
-            pictures = new List<Stream>();
-            guids = new List<string>();
-            pageEvent = new ManualResetEvent(false);
+            Pictures = new List<Stream>();
+            Guids = new List<string>();
+            PageEvent = new ManualResetEvent (false);
         }
     }
 }

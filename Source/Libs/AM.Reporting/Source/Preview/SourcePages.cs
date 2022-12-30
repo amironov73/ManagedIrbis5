@@ -27,147 +27,159 @@ using AM.Reporting.Utils;
 
 namespace AM.Reporting.Preview
 {
-  internal partial class SourcePages : IDisposable
-  {
-    #region Fields
-    private readonly List<ReportPage> pages;
-    private readonly PreparedPages preparedPages;
-    #endregion
-
-    #region Properties
-    public int Count
+    internal partial class SourcePages : IDisposable
     {
-      get { return pages.Count; }
-    }
+        #region Fields
 
-    public ReportPage this[int index]
-    {
-      get { return pages[index]; }
-    }
-    #endregion
+        private readonly List<ReportPage> pages;
+        private readonly PreparedPages preparedPages;
 
-    #region Private Methods
+        #endregion
 
-    private Base CloneObjects(Base source, Base parent)
-    {
-      if (source is ReportComponentBase && !(source as ReportComponentBase).FlagPreviewVisible)
-        return null;
+        #region Properties
 
-      // create clone object and assign all properties from source
-      string baseName = "";
-      string objName;
-      Base clone = Activator.CreateInstance(source.GetType()) as Base;
-      using (XmlItem xml = new XmlItem())
-      using (FRWriter writer = new FRWriter(xml))
-      using (FRReader reader = new FRReader(null, xml))
-      {
-        reader.DeserializeFrom = SerializeTo.SourcePages;
-        writer.SaveChildren = false;
-        writer.SerializeTo = SerializeTo.SourcePages;
-        writer.Write(source, clone);
-        reader.Read(clone);
-      }
-      clone.Name = source.Name;
-      clone.OriginalComponent = source;
-      source.OriginalComponent = clone;
-      if (clone is ReportComponentBase)
-        (clone as ReportComponentBase).AssignPreviewEvents(source);
-      // create alias
-      objName = "Page" + pages.Count.ToString() + "." + clone.Name;
-      if (clone is BandBase)
-        baseName = "b";
-      else if (clone is PageBase)
-      {
-        baseName = "page";
-        objName = "Page" + pages.Count.ToString();
-      }
-      else
-        baseName = clone.BaseName[0].ToString().ToLower();
+        public int Count => pages.Count;
 
-      clone.Alias = preparedPages.Dictionary.AddUnique(baseName, objName, clone);
-      source.Alias = clone.Alias;
+        public ReportPage this [int index] => pages[index];
 
-      ObjectCollection childObjects = source.ChildObjects;
-      foreach (Base c in childObjects)
-      {
-        CloneObjects(c, clone);
-      }
-      clone.Parent = parent;
-      return clone;
-    }
-#endregion
+        #endregion
 
-#region Public Methods
-    public void Add(ReportPage page)
-    {
-      pages.Add(CloneObjects(page, null) as ReportPage);
-    }
+        #region Private Methods
 
-    public void RemoveLast()
-    {
-        pages.RemoveAt(pages.Count - 1);
-    }
-
-    public void Clear()
-    {
-      while (pages.Count > 0)
-      {
-        pages[0].Dispose();
-        pages.RemoveAt(0);
-      }
-    }
-
-    public int IndexOf(ReportPage page)
-    {
-      return pages.IndexOf(page);
-    }
-
-    public void ApplyWatermark(Watermark watermark)
-    {
-      foreach (ReportPage page in pages)
-      {
-        page.Watermark = watermark.Clone();
-      }
-    }
-
-    public void ApplyPageSize()
-    {
-    }
-
-    public void Load(XmlItem rootItem)
-    {
-      Clear();
-      for (int i = 0; i < rootItem.Count; i++)
-      {
-        using (FRReader reader = new FRReader(null, rootItem[i]))
+        private Base CloneObjects (Base source, Base parent)
         {
-          pages.Add(reader.Read() as ReportPage);
-        }
-      }
-    }
+            if (source is ReportComponentBase @base && !@base.FlagPreviewVisible)
+            {
+                return null;
+            }
 
-    public void Save(XmlItem rootItem)
-    {
-      rootItem.Clear();
-      for (int i = 0; i < pages.Count; i++)
-      {
-        using (FRWriter writer = new FRWriter(rootItem.Add()))
+            // create clone object and assign all properties from source
+            var baseName = "";
+            string objName;
+            var clone = Activator.CreateInstance (source.GetType()) as Base;
+            using (var xml = new XmlItem())
+            using (var writer = new FRWriter (xml))
+            using (var reader = new FRReader (null, xml))
+            {
+                reader.DeserializeFrom = SerializeTo.SourcePages;
+                writer.SaveChildren = false;
+                writer.SerializeTo = SerializeTo.SourcePages;
+                writer.Write (source, clone);
+                reader.Read (clone);
+            }
+
+            clone.Name = source.Name;
+            clone.OriginalComponent = source;
+            source.OriginalComponent = clone;
+            if (clone is ReportComponentBase componentBase)
+            {
+                componentBase.AssignPreviewEvents (source);
+            }
+
+            // create alias
+            objName = "Page" + pages.Count.ToString() + "." + clone.Name;
+            if (clone is BandBase)
+            {
+                baseName = "b";
+            }
+            else if (clone is PageBase)
+            {
+                baseName = "page";
+                objName = "Page" + pages.Count.ToString();
+            }
+            else
+            {
+                baseName = clone.BaseName[0].ToString().ToLower();
+            }
+
+            clone.Alias = preparedPages.Dictionary.AddUnique (baseName, objName, clone);
+            source.Alias = clone.Alias;
+
+            var childObjects = source.ChildObjects;
+            foreach (Base c in childObjects)
+            {
+                CloneObjects (c, clone);
+            }
+
+            clone.Parent = parent;
+            return clone;
+        }
+
+        #endregion
+
+        #region Public Methods
+
+        public void Add (ReportPage page)
         {
-          writer.Write(pages[i]);
+            pages.Add (CloneObjects (page, null) as ReportPage);
         }
-      }
-    }
 
-    public void Dispose()
-    {
-      Clear();
-    }
-#endregion
+        public void RemoveLast()
+        {
+            pages.RemoveAt (pages.Count - 1);
+        }
 
-    public SourcePages(PreparedPages preparedPages)
-    {
+        public void Clear()
+        {
+            while (pages.Count > 0)
+            {
+                pages[0].Dispose();
+                pages.RemoveAt (0);
+            }
+        }
+
+        public int IndexOf (ReportPage page)
+        {
+            return pages.IndexOf (page);
+        }
+
+        public void ApplyWatermark (Watermark watermark)
+        {
+            foreach (var page in pages)
+            {
+                page.Watermark = watermark.Clone();
+            }
+        }
+
+        public void ApplyPageSize()
+        {
+        }
+
+        public void Load (XmlItem rootItem)
+        {
+            Clear();
+            for (var i = 0; i < rootItem.Count; i++)
+            {
+                using (var reader = new FRReader (null, rootItem[i]))
+                {
+                    pages.Add (reader.Read() as ReportPage);
+                }
+            }
+        }
+
+        public void Save (XmlItem rootItem)
+        {
+            rootItem.Clear();
+            for (var i = 0; i < pages.Count; i++)
+            {
+                using (var writer = new FRWriter (rootItem.Add()))
+                {
+                    writer.Write (pages[i]);
+                }
+            }
+        }
+
+        public void Dispose()
+        {
+            Clear();
+        }
+
+        #endregion
+
+        public SourcePages (PreparedPages preparedPages)
+        {
             this.preparedPages = preparedPages;
-      pages = new List<ReportPage>();
+            pages = new List<ReportPage>();
+        }
     }
-  }
 }

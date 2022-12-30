@@ -18,6 +18,7 @@
 using AM.Reporting.Data;
 using AM.Reporting.Preview;
 using AM.Reporting.Utils;
+
 using System;
 using System.Collections.Generic;
 
@@ -34,34 +35,22 @@ namespace AM.Reporting.Engine
     {
         #region Fields
 
-        private Report report;
         private float curX;
         private float originX;
         private float curY;
-        private int curColumn;
         private BandBase curBand;
-        private DateTime date;
-        private int hierarchyLevel;
         private float hierarchyIndent;
-        private string hierarchyRowNo;
-        private bool finalPass;
         private int firstReportPage;
         private bool isFirstReportPage;
-        private int pagesLimit = 0;
+        private int pagesLimit;
 
         #endregion Fields
 
         #region Properties
 
-        private Report Report
-        {
-            get { return report; }
-        }
+        private Report Report { get; }
 
-        private PreparedPages PreparedPages
-        {
-            get { return report.PreparedPages; }
-        }
+        private PreparedPages PreparedPages => Report.PreparedPages;
 
         /// <summary>
         /// Gets or sets the current X offset.
@@ -71,8 +60,8 @@ namespace AM.Reporting.Engine
         /// </remarks>
         public float CurX
         {
-            get { return curX; }
-            set { curX = Converter.DecreasePrecision(value, 2); }
+            get => curX;
+            set => curX = Converter.DecreasePrecision (value, 2);
         }
 
         /// <summary>
@@ -84,8 +73,8 @@ namespace AM.Reporting.Engine
         /// </remarks>
         public float CurY
         {
-            get { return curY; }
-            set { curY = Converter.DecreasePrecision(value, 2); }
+            get => curY;
+            set => curY = Converter.DecreasePrecision (value, 2);
         }
 
         /// <summary>
@@ -94,10 +83,7 @@ namespace AM.Reporting.Engine
         /// <remarks>
         /// This value is 0-based.
         /// </remarks>
-        public int CurColumn
-        {
-            get { return curColumn; }
-        }
+        public int CurColumn { get; private set; }
 
         /// <summary>
         /// Gets or sets index of current prepared page the current band will print on.
@@ -108,8 +94,8 @@ namespace AM.Reporting.Engine
         /// </remarks>
         public int CurPage
         {
-            get { return PreparedPages.CurPage; }
-            set { PreparedPages.CurPage = value; }
+            get => PreparedPages.CurPage;
+            set => PreparedPages.CurPage = value;
         }
 
         /// <summary>
@@ -118,10 +104,7 @@ namespace AM.Reporting.Engine
         /// <remarks>
         /// This property returns a paper width minus left and right margins.
         /// </remarks>
-        public float PageWidth
-        {
-            get { return page.WidthInPixels - (page.LeftMargin + page.RightMargin) * Units.Millimeters; }
-        }
+        public float PageWidth => page.WidthInPixels - (page.LeftMargin + page.RightMargin) * Units.Millimeters;
 
         /// <summary>
         /// Gets the current page height, in pixels.
@@ -129,34 +112,25 @@ namespace AM.Reporting.Engine
         /// <remarks>
         /// This property returns a paper height minus top and bottom margins.
         /// </remarks>
-        public float PageHeight
-        {
-            get { return page.HeightInPixels - (page.TopMargin + page.BottomMargin) * Units.Millimeters; }
-        }
+        public float PageHeight => page.HeightInPixels - (page.TopMargin + page.BottomMargin) * Units.Millimeters;
 
         /// <summary>
         /// Gets the value indicating whether the page has unlimited height.
         /// </summary>
-        public bool UnlimitedHeight
-        {
-            get { return page.UnlimitedHeight; }
-        }
+        public bool UnlimitedHeight => page.UnlimitedHeight;
 
         /// <summary>
         /// Gets the value indicating whether the page has unlimited width.
         /// </summary>
-        public bool UnlimitedWidth
-        {
-            get { return page.UnlimitedWidth; }
-        }
+        public bool UnlimitedWidth => page.UnlimitedWidth;
 
         /// <summary>
         /// Gets or sets the current height of unlimited page.
         /// </summary>
         public float UnlimitedHeightValue
         {
-            get { return page.UnlimitedHeightValue; }
-            set { page.UnlimitedHeightValue = value; }
+            get => page.UnlimitedHeightValue;
+            set => page.UnlimitedHeightValue = value;
         }
 
         /// <summary>
@@ -164,25 +138,19 @@ namespace AM.Reporting.Engine
         /// </summary>
         public float UnlimitedWidthValue
         {
-            get { return page.UnlimitedWidthValue; }
-            set { page.UnlimitedWidthValue = value; }
+            get => page.UnlimitedWidthValue;
+            set => page.UnlimitedWidthValue = value;
         }
 
         /// <summary>
         /// Gets the height of page footer (including all its child bands), in pixels.
         /// </summary>
-        public float PageFooterHeight
-        {
-            get { return GetBandHeightWithChildren(page.PageFooter); }
-        }
+        public float PageFooterHeight => GetBandHeightWithChildren (page.PageFooter);
 
         /// <summary>
         /// Gets the height of column footer (including all its child bands), in pixels.
         /// </summary>
-        public float ColumnFooterHeight
-        {
-            get { return GetBandHeightWithChildren(page.ColumnFooter); }
-        }
+        public float ColumnFooterHeight => GetBandHeightWithChildren (page.ColumnFooter);
 
         /// <summary>
         /// Gets the free space on the current page, in pixels.
@@ -194,11 +162,11 @@ namespace AM.Reporting.Engine
         {
             get
             {
-                float pageHeight = PageHeight;
+                var pageHeight = PageHeight;
                 pageHeight -= PageFooterHeight;
                 pageHeight -= ColumnFooterHeight;
                 pageHeight -= GetFootersHeight();
-                return Converter.DecreasePrecision(pageHeight - CurY, 2);
+                return Converter.DecreasePrecision (pageHeight - CurY, 2);
             }
         }
 
@@ -208,10 +176,7 @@ namespace AM.Reporting.Engine
         /// <remarks>
         /// This value is 1-based. The initial value (usually 1) is set in the Report.InitialPageNumber property.
         /// </remarks>
-        public int PageNo
-        {
-            get { return GetLogicalPageNumber(); }
-        }
+        public int PageNo => GetLogicalPageNumber();
 
         /// <summary>
         /// Gets the number of total pages in a prepared report.
@@ -220,10 +185,7 @@ namespace AM.Reporting.Engine
         /// To use this property, your report must be two-pass. Set the <see cref="AM.Reporting.Report.DoublePass"/>
         /// property to <b>true</b>.
         /// </remarks>
-        public int TotalPages
-        {
-            get { return GetLogicalTotalPages(); }
-        }
+        public int TotalPages => GetLogicalTotalPages();
 
         /// <summary>
         /// Gets the string that represents the current page number.
@@ -231,10 +193,7 @@ namespace AM.Reporting.Engine
         /// <remarks>
         /// This property returns a locale-based value, for example: "Page 1".
         /// </remarks>
-        public string PageN
-        {
-            get { return String.Format(Res.Get("Misc,PageN"), PageNo); }
-        }
+        public string PageN => string.Format (Res.Get ("Misc,PageN"), PageNo);
 
         /// <summary>
         /// Gets the string that represents the "Page N of M" number.
@@ -242,10 +201,7 @@ namespace AM.Reporting.Engine
         /// <remarks>
         /// This property returns a locale-based value, for example: "Page 1 of 10".
         /// </remarks>
-        public string PageNofM
-        {
-            get { return String.Format(Res.Get("Misc,PageNofM"), PageNo, TotalPages); }
-        }
+        public string PageNofM => string.Format (Res.Get ("Misc,PageNofM"), PageNo, TotalPages);
 
         /// <summary>
         /// Gets the current row number of currently printing band.
@@ -253,10 +209,7 @@ namespace AM.Reporting.Engine
         /// <remarks>
         /// This value is 1-based. It resets to 1 on each new group.
         /// </remarks>
-        public int RowNo
-        {
-            get { return curBand == null ? 0 : curBand.RowNo; }
-        }
+        public int RowNo => curBand == null ? 0 : curBand.RowNo;
 
         /// <summary>
         /// Gets the running current row number of currently printing band.
@@ -264,18 +217,12 @@ namespace AM.Reporting.Engine
         /// <remarks>
         /// This value is 1-based.
         /// </remarks>
-        public int AbsRowNo
-        {
-            get { return curBand == null ? 0 : curBand.AbsRowNo; }
-        }
+        public int AbsRowNo => curBand == null ? 0 : curBand.AbsRowNo;
 
         /// <summary>
         /// Gets the date of report start.
         /// </summary>
-        public DateTime Date
-        {
-            get { return date; }
-        }
+        public DateTime Date { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether the report is executing the final pass.
@@ -284,10 +231,7 @@ namespace AM.Reporting.Engine
         /// This property is <b>true</b> if report is one-pass, or if report is two-pass and
         /// the second pass is executing.
         /// </remarks>
-        public bool FinalPass
-        {
-            get { return finalPass; }
-        }
+        public bool FinalPass { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether the report is executing the first pass.
@@ -296,10 +240,7 @@ namespace AM.Reporting.Engine
         /// This property is <b>true</b> if report is one-pass, or if report is two-pass and
         /// the first pass is executing.
         /// </remarks>
-        public bool FirstPass
-        {
-            get { return !(Report.DoublePass && FinalPass); }
-        }
+        public bool FirstPass => !(Report.DoublePass && FinalPass);
 
         /// <summary>
         /// Gets a level of hierarchy when printing hierarchical bands.
@@ -307,26 +248,20 @@ namespace AM.Reporting.Engine
         /// <remarks>
         /// The first level of hierarchy has 0 index.
         /// </remarks>
-        public int HierarchyLevel
-        {
-            get { return hierarchyLevel; }
-        }
+        public int HierarchyLevel { get; private set; }
 
         /// <summary>
         /// Gets the row number like "1.2.1" when printing hierarchical bands.
         /// </summary>
-        public string HierarchyRowNo
-        {
-            get { return hierarchyRowNo; }
-        }
+        public string HierarchyRowNo { get; private set; }
 
         #endregion Properties
 
         #region Constructors
 
-        internal ReportEngine(Report report)
+        internal ReportEngine (Report report)
         {
-            this.report = report;
+            this.Report = report;
             objectsToProcess = new List<ProcessInfo>();
         }
 
@@ -336,10 +271,10 @@ namespace AM.Reporting.Engine
 
         private void ResetDesigningFlag()
         {
-            ObjectCollection allObjects = Report.AllObjects;
+            var allObjects = Report.AllObjects;
             foreach (Base c in allObjects)
             {
-                c.SetDesigning(false);
+                c.SetDesigning (false);
             }
         }
 
@@ -347,13 +282,18 @@ namespace AM.Reporting.Engine
         {
             foreach (Base c in Report.Dictionary.AllObjects)
             {
-                if (c is DataComponentBase)
-                    (c as DataComponentBase).InitializeComponent();
+                if (c is DataComponentBase @base)
+                {
+                    @base.InitializeComponent();
+                }
             }
+
             foreach (Base c in Report.AllObjects)
             {
                 if (c is ReportComponentBase obj)
+                {
                     obj.ResetData();
+                }
             }
         }
 
@@ -361,24 +301,30 @@ namespace AM.Reporting.Engine
         {
             foreach (Base c in Report.Dictionary.AllObjects)
             {
-                if (c is DataSourceBase)
+                if (c is DataSourceBase data)
                 {
-                    DataSourceBase data = c as DataSourceBase;
                     if (data.RowCount > 0)
+                    {
                         data.First();
+                    }
                 }
             }
         }
 
-        private void PrepareToFirstPass(bool append)
+        private void PrepareToFirstPass (bool append)
         {
-            finalPass = !Report.DoublePass;
+            FinalPass = !Report.DoublePass;
             if (!append)
+            {
                 PreparedPages.Clear();
+            }
             else
+            {
                 PreparedPages.CurPage = PreparedPages.Count > 0 ? PreparedPages.Count - 1 : 0;
+            }
+
             isFirstReportPage = true;
-            hierarchyLevel = 1;
+            HierarchyLevel = 1;
             PreparedPages.PrepareToFirstPass();
             Report.Dictionary.Totals.ClearValues();
             objectsToProcess.Clear();
@@ -394,84 +340,98 @@ namespace AM.Reporting.Engine
             InitializeSecondPassData();
         }
 
-        private float GetBandHeightWithChildren(BandBase band)
+        private float GetBandHeightWithChildren (BandBase band)
         {
             float result = 0;
 
             while (band != null)
             {
-                if (CanPrint(band))
-                    result += (band.CanGrow || band.CanShrink) ? CalcHeight(band) : band.Height;
-                else if (FinalPass && !String.IsNullOrEmpty(band.VisibleExpression) && band.VisibleExpression.Contains("TotalPages"))
-                    result += (band.CanGrow || band.CanShrink) ? CalcHeight(band) : band.Height;
+                if (CanPrint (band))
+                {
+                    result += (band.CanGrow || band.CanShrink) ? CalcHeight (band) : band.Height;
+                }
+                else if (FinalPass && !string.IsNullOrEmpty (band.VisibleExpression) &&
+                         band.VisibleExpression.Contains ("TotalPages"))
+                {
+                    result += (band.CanGrow || band.CanShrink) ? CalcHeight (band) : band.Height;
+                }
+
                 band = band.Child;
                 if (band != null && ((band as ChildBand).FillUnusedSpace || (band as ChildBand).CompleteToNRows != 0))
+                {
                     break;
+                }
             }
 
             return result;
         }
 
-        private void RunReportPages(ReportPage page)
+        private void RunReportPages (ReportPage page)
         {
-            OnStateChanged(Report, EngineState.ReportStarted);
+            OnStateChanged (Report, EngineState.ReportStarted);
 
             if (page == null)
+            {
                 RunReportPages();
+            }
             else
-                RunReportPage(page);
+            {
+                RunReportPage (page);
+            }
 
-            OnStateChanged(Report, EngineState.ReportFinished);
+            OnStateChanged (Report, EngineState.ReportFinished);
         }
 
         #endregion Private Methods
 
         #region Internal Methods
 
-        internal bool Run(bool runDialogs, bool append, bool resetDataState)
+        internal bool Run (bool runDialogs, bool append, bool resetDataState)
         {
-            return Run(runDialogs, append, resetDataState, null);
+            return Run (runDialogs, append, resetDataState, null);
         }
 
-        internal bool Run(bool runDialogs, bool append, bool resetDataState, int pagesLimit)
+        internal bool Run (bool runDialogs, bool append, bool resetDataState, int pagesLimit)
         {
             this.pagesLimit = pagesLimit;
-            return Run(runDialogs, append, resetDataState, null);
+            return Run (runDialogs, append, resetDataState, null);
         }
 
-        internal bool Run(bool runDialogs, bool append, bool resetDataState, ReportPage page)
+        internal bool Run (bool runDialogs, bool append, bool resetDataState, ReportPage page)
         {
-            RunPhase1(resetDataState);
+            RunPhase1 (resetDataState);
 
             try
             {
                 if (runDialogs && !RunDialogs())
+                {
                     return false;
+                }
 
-                Config.ReportSettings.OnStartProgress(Report);
-                PrepareToFirstPass(append);
-                RunReportPages(page);
+                Config.ReportSettings.OnStartProgress (Report);
+                PrepareToFirstPass (append);
+                RunReportPages (page);
 
                 ResetLogicalPageNumber();
                 if (Report.DoublePass && !Report.Aborted)
                 {
-                    finalPass = true;
+                    FinalPass = true;
                     PrepareToSecondPass();
-                    RunReportPages(page);
+                    RunReportPages (page);
                 }
             }
             finally
             {
-                Report.OnFinishReport(EventArgs.Empty);
-                Config.ReportSettings.OnFinishProgress(Report);
-                Report.SetOperation(ReportOperation.None);
+                Report.OnFinishReport (EventArgs.Empty);
+                Config.ReportSettings.OnFinishProgress (Report);
+                Report.SetOperation (ReportOperation.None);
 
                 // limit the prepared pages
                 if (Report.MaxPages > 0)
                 {
                     while (PreparedPages.Count > Report.MaxPages)
                     {
-                        PreparedPages.RemovePage(PreparedPages.Count - 1);
+                        PreparedPages.RemovePage (PreparedPages.Count - 1);
                     }
                 }
 
@@ -480,58 +440,67 @@ namespace AM.Reporting.Engine
                 {
                     while (PreparedPages.Count > pagesLimit)
                     {
-                        PreparedPages.RemovePage(PreparedPages.Count - 1);
+                        PreparedPages.RemovePage (PreparedPages.Count - 1);
                     }
                 }
             }
+
             return true;
         }
 
-        internal void RunPhase1(bool resetDataState = true, bool webDialog = false)
+        internal void RunPhase1 (bool resetDataState = true, bool webDialog = false)
         {
-            date = SystemFake.DateTime.Now;
-            Report.SetOperation(ReportOperation.Running);
+            Date = SystemFake.DateTime.Now;
+            Report.SetOperation (ReportOperation.Running);
             ResetDesigningFlag();
 
             // don't reset the data state if we run the hyperlink's detail page or refresh a report.
             // This is necessary to keep data filtering settings alive
             if (resetDataState)
+            {
                 InitializeData();
+            }
+
             // don't call OnStartReport event again, if it's web dialog re-render
-            if(!webDialog)
-                Report.OnStartReport(EventArgs.Empty);
+            if (!webDialog)
+            {
+                Report.OnStartReport (EventArgs.Empty);
+            }
         }
 
-        internal void RunPhase2(int? pagesLimit = null)
+        internal void RunPhase2 (int? pagesLimit = null)
         {
             if (pagesLimit != null)
+            {
                 this.pagesLimit = pagesLimit.Value;
+            }
+
             try
             {
-                Config.ReportSettings.OnStartProgress(Report);
-                PrepareToFirstPass(false);
+                Config.ReportSettings.OnStartProgress (Report);
+                PrepareToFirstPass (false);
                 RunReportPages();
 
                 ResetLogicalPageNumber();
                 if (Report.DoublePass && !Report.Aborted)
                 {
-                    finalPass = true;
+                    FinalPass = true;
                     PrepareToSecondPass();
                     RunReportPages();
                 }
             }
             finally
             {
-                Report.OnFinishReport(EventArgs.Empty);
-                Config.ReportSettings.OnFinishProgress(Report);
-                Report.SetOperation(ReportOperation.None);
+                Report.OnFinishReport (EventArgs.Empty);
+                Config.ReportSettings.OnFinishProgress (Report);
+                Report.SetOperation (ReportOperation.None);
 
                 // limit the prepared pages
                 if (Report.MaxPages > 0)
                 {
                     while (PreparedPages.Count > Report.MaxPages)
                     {
-                        PreparedPages.RemovePage(PreparedPages.Count - 1);
+                        PreparedPages.RemovePage (PreparedPages.Count - 1);
                     }
                 }
 
@@ -540,7 +509,7 @@ namespace AM.Reporting.Engine
                 {
                     while (PreparedPages.Count > pagesLimit)
                     {
-                        PreparedPages.RemovePage(PreparedPages.Count - 1);
+                        PreparedPages.RemovePage (PreparedPages.Count - 1);
                     }
                 }
             }

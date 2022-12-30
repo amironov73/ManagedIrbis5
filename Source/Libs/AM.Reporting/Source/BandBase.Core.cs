@@ -16,6 +16,7 @@
 #region Using directives
 
 using AM.Reporting.Utils;
+
 using System.Drawing;
 
 #endregion
@@ -27,10 +28,10 @@ namespace AM.Reporting
     partial class BandBase
     {
         /// <inheritdoc/>
-        public override void Draw(FRPaintEventArgs e)
+        public override void Draw (FRPaintEventArgs e)
         {
-            DrawBackground(e);
-            Border.Draw(e, new RectangleF(AbsLeft, AbsTop, Width, Height));
+            DrawBackground (e);
+            Border.Draw (e, new RectangleF (AbsLeft, AbsTop, Width, Height));
         }
     }
 }

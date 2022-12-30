@@ -73,14 +73,15 @@ namespace AM.Reporting.Table
     public partial class TableObject : TableBase
     {
         #region Fields
-        private string manualBuildEvent;
+
         private TableHelper helper;
         private bool saveVisible;
         private bool saveStateSkipped;
-        private bool manualBuildAutoSpans;
+
         #endregion
 
         #region Properties
+
         /// <summary>
         /// Allows to print table rows/columns dynamically.
         /// </summary>
@@ -189,12 +190,8 @@ namespace AM.Reporting.Table
         /// If you use this event, you must handle the table print process manually.
         /// See the <see cref="ManualBuild"/> event for details.
         /// </remarks>
-        [Category("Build")]
-        public string ManualBuildEvent
-        {
-            get { return manualBuildEvent; }
-            set { manualBuildEvent = value; }
-        }
+        [Category ("Build")]
+        public string ManualBuildEvent { get; set; }
 
         /// <summary>
         /// Determines whether to manage cell spans automatically during manual build.
@@ -203,18 +200,14 @@ namespace AM.Reporting.Table
         /// The default value for this property is <b>true</b>. If you set it to <b>false</b>, you need to manage
         /// spans in your ManualBuild event handler.
         /// </remarks>
-        [Category("Build")]
-        [DefaultValue(true)]
-        public bool ManualBuildAutoSpans
-        {
-            get { return manualBuildAutoSpans; }
-            set { manualBuildAutoSpans = value; }
-        }
+        [Category ("Build")]
+        [DefaultValue (true)]
+        public bool ManualBuildAutoSpans { get; set; }
 
         /// <inheritdoc/>
         public override int ColumnCount
         {
-            get { return base.ColumnCount; }
+            get => base.ColumnCount;
             set
             {
                 base.ColumnCount = value;
@@ -225,7 +218,7 @@ namespace AM.Reporting.Table
         /// <inheritdoc/>
         public override int RowCount
         {
-            get { return base.RowCount; }
+            get => base.RowCount;
             set
             {
                 base.RowCount = value;
@@ -233,56 +226,62 @@ namespace AM.Reporting.Table
             }
         }
 
-        internal bool IsManualBuild
-        {
-            get { return !String.IsNullOrEmpty(ManualBuildEvent) || ManualBuild != null; }
-        }
+        internal bool IsManualBuild => !string.IsNullOrEmpty (ManualBuildEvent) || ManualBuild != null;
+
         #endregion
 
         #region Public Methods
-        /// <inheritdoc/>
-        public override void Assign(Base source)
-        {
-            base.Assign(source);
 
-            TableObject src = source as TableObject;
+        /// <inheritdoc/>
+        public override void Assign (Base source)
+        {
+            base.Assign (source);
+
+            var src = source as TableObject;
             ManualBuildEvent = src.ManualBuildEvent;
             ManualBuildAutoSpans = src.ManualBuildAutoSpans;
         }
 
         /// <inheritdoc/>
-        public override void Serialize(FRWriter writer)
+        public override void Serialize (FRWriter writer)
         {
-            TableObject c = writer.DiffObject as TableObject;
-            base.Serialize(writer);
+            var c = writer.DiffObject as TableObject;
+            base.Serialize (writer);
 
             if (ManualBuildEvent != c.ManualBuildEvent)
-                writer.WriteStr("ManualBuildEvent", ManualBuildEvent);
+            {
+                writer.WriteStr ("ManualBuildEvent", ManualBuildEvent);
+            }
+
             if (ManualBuildAutoSpans != c.ManualBuildAutoSpans)
-                writer.WriteBool("ManualBuildAutoSpans", ManualBuildAutoSpans);
+            {
+                writer.WriteBool ("ManualBuildAutoSpans", ManualBuildAutoSpans);
+            }
         }
+
         #endregion
 
         #region Report Engine
-        private string GetFunctionCode(string function)
+
+        private string GetFunctionCode (string function)
         {
-            string result = "";
+            var result = "";
 
             switch (Report.ScriptLanguage)
             {
                 case Language.CSharp:
                     result =
-                      "    private object " + function + "(TableCell cell)\r\n" +
-                      "    {\r\n" +
-                      "      return cell.Table." + function + "(cell);\r\n" +
-                      "    }\r\n\r\n";
+                        "    private object " + function + "(TableCell cell)\r\n" +
+                        "    {\r\n" +
+                        "      return cell.Table." + function + "(cell);\r\n" +
+                        "    }\r\n\r\n";
                     break;
 
                 case Language.Vb:
                     result =
-                      "    Private Function " + function + "(ByVal cell As TableCell) As Object\r\n" +
-                      "      Return cell.Table." + function + "(cell)\r\n" +
-                      "    End Function\r\n\r\n";
+                        "    Private Function " + function + "(ByVal cell As TableCell) As Object\r\n" +
+                        "      Return cell.Table." + function + "(cell)\r\n" +
+                        "    End Function\r\n\r\n";
                     break;
             }
 
@@ -292,12 +291,12 @@ namespace AM.Reporting.Table
         /// <inheritdoc/>
         public override string GetCustomScript()
         {
-            string result = "";
+            var result = "";
             string[] functions = new string[] { "Sum", "Min", "Max", "Avg", "Count" };
 
-            foreach (string function in functions)
+            foreach (var function in functions)
             {
-                result += GetFunctionCode(function);
+                result += GetFunctionCode (function);
             }
 
             return result;
@@ -307,10 +306,12 @@ namespace AM.Reporting.Table
         public override void SaveState()
         {
             saveVisible = Visible;
-            BandBase parent = Parent as BandBase;
+            var parent = Parent as BandBase;
             saveStateSkipped = !Visible || (parent != null && !parent.Visible);
             if (saveStateSkipped)
+            {
                 return;
+            }
 
             if (!IsManualBuild)
             {
@@ -319,10 +320,10 @@ namespace AM.Reporting.Table
             else
             {
                 // create the result table that will be rendered in the preview
-                SetResultTable(new TableResult());
-                ResultTable.Assign(this);
-                ResultTable.SetReport(Report);
-                helper = new TableHelper(this, ResultTable);
+                SetResultTable (new TableResult());
+                ResultTable.Assign (this);
+                ResultTable.SetReport (Report);
+                helper = new TableHelper (this, ResultTable);
 
                 Visible = false;
 
@@ -334,17 +335,20 @@ namespace AM.Reporting.Table
                     parent.AfterPrint += ResultTable.GeneratePages;
                 }
 
-                OnManualBuild(EventArgs.Empty);
+                OnManualBuild (EventArgs.Empty);
             }
         }
 
         /// <inheritdoc/>
         public override void RestoreState()
         {
-            BandBase parent = Parent as BandBase;
+            var parent = Parent as BandBase;
+
             // SaveState was skipped, there is nothing to restore
             if (saveStateSkipped)
+            {
                 return;
+            }
 
             if (!IsManualBuild)
             {
@@ -353,11 +357,13 @@ namespace AM.Reporting.Table
             else
             {
                 if (parent != null && !PrintOnParent)
+                {
                     parent.AfterPrint -= ResultTable.GeneratePages;
+                }
 
                 helper = null;
                 ResultTable.Dispose();
-                SetResultTable(null);
+                SetResultTable (null);
                 Visible = saveVisible;
             }
         }
@@ -369,9 +375,9 @@ namespace AM.Reporting.Table
 
             if (!IsManualBuild)
             {
-                for (int y = 0; y < Rows.Count; y++)
+                for (var y = 0; y < Rows.Count; y++)
                 {
-                    for (int x = 0; x < Columns.Count; x++)
+                    for (var x = 0; x < Columns.Count; x++)
                     {
                         this[x, y].GetData();
                     }
@@ -380,23 +386,28 @@ namespace AM.Reporting.Table
         }
 
         /// <inheritdoc/>
-        public override void OnAfterData(EventArgs e)
+        public override void OnAfterData (EventArgs e)
         {
-            base.OnAfterData(e);
+            base.OnAfterData (e);
 
             if (IsManualBuild && PrintOnParent)
-                ResultTable.AddToParent(Parent);
+            {
+                ResultTable.AddToParent (Parent);
+            }
         }
 
         /// <summary>
         /// This method fires the <b>ManualBuild</b> event and the script code connected to the <b>ManualBuildEvent</b>.
         /// </summary>
         /// <param name="e">Event data.</param>
-        public void OnManualBuild(EventArgs e)
+        public void OnManualBuild (EventArgs e)
         {
             if (ManualBuild != null)
-                ManualBuild(this, e);
-            InvokeEvent(ManualBuildEvent, e);
+            {
+                ManualBuild (this, e);
+            }
+
+            InvokeEvent (ManualBuildEvent, e);
         }
 
         /// <summary>
@@ -406,11 +417,14 @@ namespace AM.Reporting.Table
         /// <remarks>
         /// See the <see cref="ManualBuild"/> event for more details.
         /// </remarks>
-        public void PrintRow(int index)
+        public void PrintRow (int index)
         {
             if (!IsManualBuild)
+            {
                 throw new TableManualBuildException();
-            helper.PrintRow(index);
+            }
+
+            helper.PrintRow (index);
         }
 
         /// <summary>
@@ -420,11 +434,11 @@ namespace AM.Reporting.Table
         /// <remarks>
         /// See the <see cref="ManualBuild"/> event for more details.
         /// </remarks>
-        public void PrintRows(int[] indices)
+        public void PrintRows (int[] indices)
         {
-            foreach (int index in indices)
+            foreach (var index in indices)
             {
-                PrintRow(index);
+                PrintRow (index);
             }
         }
 
@@ -436,9 +450,9 @@ namespace AM.Reporting.Table
         /// </remarks>
         public void PrintRows()
         {
-            for (int i = 0; i < Rows.Count; i++)
+            for (var i = 0; i < Rows.Count; i++)
             {
-                PrintRow(i);
+                PrintRow (i);
             }
         }
 
@@ -449,11 +463,14 @@ namespace AM.Reporting.Table
         /// <remarks>
         /// See the <see cref="ManualBuild"/> event for more details.
         /// </remarks>
-        public void PrintColumn(int index)
+        public void PrintColumn (int index)
         {
             if (!IsManualBuild)
+            {
                 throw new TableManualBuildException();
-            helper.PrintColumn(index);
+            }
+
+            helper.PrintColumn (index);
         }
 
         /// <summary>
@@ -463,11 +480,11 @@ namespace AM.Reporting.Table
         /// <remarks>
         /// See the <see cref="ManualBuild"/> event for more details.
         /// </remarks>
-        public void PrintColumns(int[] indices)
+        public void PrintColumns (int[] indices)
         {
-            foreach (int index in indices)
+            foreach (var index in indices)
             {
-                PrintColumn(index);
+                PrintColumn (index);
             }
         }
 
@@ -479,9 +496,9 @@ namespace AM.Reporting.Table
         /// </remarks>
         public void PrintColumns()
         {
-            for (int i = 0; i < Columns.Count; i++)
+            for (var i = 0; i < Columns.Count; i++)
             {
-                PrintColumn(i);
+                PrintColumn (i);
             }
         }
 
@@ -496,10 +513,16 @@ namespace AM.Reporting.Table
         public void PageBreak()
         {
             if (!IsManualBuild)
+            {
                 throw new TableManualBuildException();
+            }
+
             if (!Report.Engine.UnlimitedHeight && !Report.Engine.UnlimitedWidth)
+            {
                 helper.PageBreak();
+            }
         }
+
         #endregion
 
         /// <summary>
@@ -507,8 +530,8 @@ namespace AM.Reporting.Table
         /// </summary>
         public TableObject()
         {
-            manualBuildEvent = "";
-            manualBuildAutoSpans = true;
+            ManualBuildEvent = "";
+            ManualBuildAutoSpans = true;
         }
     }
 }

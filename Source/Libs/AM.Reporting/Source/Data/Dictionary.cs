@@ -20,11 +20,15 @@ using System.Collections.Generic;
 using System.Text;
 using System.Data;
 using System.IO;
+
 using AM.Reporting.Utils;
+
 using System.CodeDom;
 using System.ComponentModel;
 using System.Collections;
+
 using AM.Reporting.CrossView;
+
 using System.Windows.Forms;
 
 #endregion
@@ -43,26 +47,18 @@ namespace AM.Reporting.Data
     public class Dictionary : Base, IParent
     {
         #region Fields
-        private ConnectionCollection connections;
-        private DataSourceCollection dataSources;
-        private RelationCollection relations;
-        private ParameterCollection parameters;
-        private SystemVariables systemVariables;
-        private TotalCollection totals;
-        private CubeSourceCollection cubeSources;
-        private List<RegDataItem> registeredItems;
+
         private ObjectCollection cachedAllObjects;
         private bool cacheAllObjects;
+
         #endregion
 
         #region Properties
+
         /// <summary>
         /// Gets a collection of connection objects available in a report.
         /// </summary>
-        public ConnectionCollection Connections
-        {
-            get { return connections; }
-        }
+        public ConnectionCollection Connections { get; }
 
         /// <summary>
         /// Gets a collection of datasources available in a report.
@@ -72,18 +68,12 @@ namespace AM.Reporting.Data
         /// registered using the <b>RegisterData</b> method. All other datasources are contained
         /// in connection objects and may be accessed via <see cref="Connections"/> property.
         /// </remarks>
-        public DataSourceCollection DataSources
-        {
-            get { return dataSources; }
-        }
+        public DataSourceCollection DataSources { get; }
 
         /// <summary>
         /// Gets a collection of relations.
         /// </summary>
-        public RelationCollection Relations
-        {
-            get { return relations; }
-        }
+        public RelationCollection Relations { get; }
 
         /// <summary>
         /// Gets a collection of parameters.
@@ -93,10 +83,7 @@ namespace AM.Reporting.Data
         /// which is actually a shortcut to this property. You also may use the <b>Report.GetParameter</b>
         /// and <b>Report.GetParameterValue</b> methods.
         /// </remarks>
-        public ParameterCollection Parameters
-        {
-            get { return parameters; }
-        }
+        public ParameterCollection Parameters { get; }
 
         /// <summary>
         /// Gets a collection of system variables like Date, PageNofM etc.
@@ -104,10 +91,7 @@ namespace AM.Reporting.Data
         /// <remarks>
         /// Another way to access a system variable is to use the <b>Report.GetVariableValue</b> method.
         /// </remarks>
-        public SystemVariables SystemVariables
-        {
-            get { return systemVariables; }
-        }
+        public SystemVariables SystemVariables { get; }
 
         /// <summary>
         /// Gets a collection of totals.
@@ -115,10 +99,7 @@ namespace AM.Reporting.Data
         /// <remarks>
         /// Another way to get a total value is to use the <b>Report.GetTotalValue</b> method.
         /// </remarks>
-        public TotalCollection Totals
-        {
-            get { return totals; }
-        }
+        public TotalCollection Totals { get; }
 
         /// <summary>
         /// Gets a collection of cubesources available in a report.
@@ -127,10 +108,7 @@ namespace AM.Reporting.Data
         /// Usually you don't need to use this property. It contains only cubesources
         /// registered using the <b>RegisterData</b> method.
         /// </remarks>
-        public CubeSourceCollection CubeSources
-        {
-            get { return cubeSources; }
-        }
+        public CubeSourceCollection CubeSources { get; }
 
         /// <summary>
         /// Gets a list of registered items.
@@ -138,14 +116,11 @@ namespace AM.Reporting.Data
         /// <remarks>
         /// This property is for internal use only.
         /// </remarks>
-        public List<RegDataItem> RegisteredItems
-        {
-            get { return registeredItems; }
-        }
+        public List<RegDataItem> RegisteredItems { get; }
 
         internal bool CacheAllObjects
         {
-            get { return cacheAllObjects; }
+            get => cacheAllObjects;
             set
             {
                 cacheAllObjects = value;
@@ -166,89 +141,107 @@ namespace AM.Reporting.Data
             get
             {
                 if (cachedAllObjects != null)
+                {
                     return cachedAllObjects;
+                }
+
                 return base.AllObjects;
             }
         }
+
         #endregion
 
         #region Private Methods
-        private RegDataItem FindRegisteredItem(object data)
+
+        private RegDataItem FindRegisteredItem (object data)
         {
-            foreach (RegDataItem item in registeredItems)
+            foreach (var item in RegisteredItems)
             {
                 if (item.data == data)
+                {
                     return item;
+                }
             }
+
             return null;
         }
 
-        private RegDataItem FindRegisteredItem(string name)
+        private RegDataItem FindRegisteredItem (string name)
         {
-            foreach (RegDataItem item in registeredItems)
+            foreach (var item in RegisteredItems)
             {
                 if (item.name == name)
+                {
                     return item;
+                }
             }
+
             return null;
         }
 
-        internal void AddRegisteredItem(object data, string name)
+        internal void AddRegisteredItem (object data, string name)
         {
-            if (FindRegisteredItem(data) == null)
-                registeredItems.Add(new RegDataItem(data, name));
+            if (FindRegisteredItem (data) == null)
+            {
+                RegisteredItems.Add (new RegDataItem (data, name));
+            }
         }
+
         #endregion
 
         #region Public Methods
+
         /// <inheritdoc/>
-        public override void Assign(Base source)
+        public override void Assign (Base source)
         {
-            BaseAssign(source);
+            BaseAssign (source);
         }
 
-        internal void RegisterDataSet(DataSet data, string referenceName, bool enabled)
+        internal void RegisterDataSet (DataSet data, string referenceName, bool enabled)
         {
-            DictionaryHelper helper = new DictionaryHelper(this, AllObjects, Report.AllNamedObjects);
-            helper.RegisterDataSet(data, referenceName, enabled);
+            var helper = new DictionaryHelper (this, AllObjects, Report.AllNamedObjects);
+            helper.RegisterDataSet (data, referenceName, enabled);
         }
 
-        internal void RegisterDataTable(DataTable table, string referenceName, bool enabled)
+        internal void RegisterDataTable (DataTable table, string referenceName, bool enabled)
         {
-            AddRegisteredItem(table, referenceName);
+            AddRegisteredItem (table, referenceName);
 
-            TableDataSource source = FindDataComponent(referenceName) as TableDataSource;
-            if (source != null)
+            if (FindDataComponent (referenceName) is TableDataSource source)
             {
                 source.Reference = table;
                 source.InitSchema();
-                source.RefreshColumns(true);
+                source.RefreshColumns (true);
             }
             else
             {
                 // check tables inside connections. Are we trying to replace the connection table
                 // with table provided by an application?
-                source = FindByAlias(referenceName) as TableDataSource;
+                source = FindByAlias (referenceName) as TableDataSource;
+
                 // check "Data.TableName" case
-                if (source == null && referenceName.StartsWith("Data."))
-                    source = FindByAlias(referenceName.Remove(0, 5)) as TableDataSource;
+                if (source == null && referenceName.StartsWith ("Data."))
+                {
+                    source = FindByAlias (referenceName.Remove (0, 5)) as TableDataSource;
+                }
+
                 if (source != null && (source.Connection != null || source.IgnoreConnection))
                 {
                     source.IgnoreConnection = true;
                     source.Reference = table;
                     source.InitSchema();
-                    source.RefreshColumns(true);
+                    source.RefreshColumns (true);
                 }
                 else
                 {
                     source = new TableDataSource();
                     source.ReferenceName = referenceName;
                     source.Reference = table;
-                    source.Name = CreateUniqueName(referenceName.Contains(".") ? table.TableName : referenceName);
-                    source.Alias = CreateUniqueAlias(source.Alias);
+                    source.Name = CreateUniqueName (referenceName.Contains (".") ? table.TableName : referenceName);
+                    source.Alias = CreateUniqueAlias (source.Alias);
                     source.Enabled = enabled;
                     source.InitSchema();
-                    DataSources.Add(source);
+                    DataSources.Add (source);
                 }
             }
         }
@@ -262,12 +255,11 @@ namespace AM.Reporting.Data
         /// <remarks>
         /// This method is for internal use only.
         /// </remarks>
-        public void RegisterDataView(DataView view, string referenceName, bool enabled)
+        public void RegisterDataView (DataView view, string referenceName, bool enabled)
         {
-            AddRegisteredItem(view, referenceName);
+            AddRegisteredItem (view, referenceName);
 
-            ViewDataSource source = FindDataComponent(referenceName) as ViewDataSource;
-            if (source != null)
+            if (FindDataComponent (referenceName) is ViewDataSource source)
             {
                 source.Reference = view;
                 source.InitSchema();
@@ -278,40 +270,44 @@ namespace AM.Reporting.Data
                 source = new ViewDataSource();
                 source.ReferenceName = referenceName;
                 source.Reference = view;
-                source.Name = CreateUniqueName(referenceName);
-                source.Alias = CreateUniqueAlias(source.Alias);
+                source.Name = CreateUniqueName (referenceName);
+                source.Alias = CreateUniqueAlias (source.Alias);
                 source.Enabled = enabled;
                 source.InitSchema();
-                DataSources.Add(source);
+                DataSources.Add (source);
             }
         }
 
-        internal void RegisterDataRelation(DataRelation relation, string referenceName, bool enabled)
+        internal void RegisterDataRelation (DataRelation relation, string referenceName, bool enabled)
         {
-            AddRegisteredItem(relation, referenceName);
-            if (FindDataComponent(referenceName) != null)
+            AddRegisteredItem (relation, referenceName);
+            if (FindDataComponent (referenceName) != null)
+            {
                 return;
+            }
 
-            Relation rel = new Relation();
+            var rel = new Relation();
             rel.ReferenceName = referenceName;
             rel.Reference = relation;
             rel.Name = relation.RelationName;
             rel.Enabled = enabled;
-            rel.ParentDataSource = FindDataTableSource(relation.ParentTable);
-            rel.ChildDataSource = FindDataTableSource(relation.ChildTable);
+            rel.ParentDataSource = FindDataTableSource (relation.ParentTable);
+            rel.ChildDataSource = FindDataTableSource (relation.ChildTable);
             string[] parentColumns = new string[relation.ParentColumns.Length];
             string[] childColumns = new string[relation.ChildColumns.Length];
-            for (int i = 0; i < relation.ParentColumns.Length; i++)
+            for (var i = 0; i < relation.ParentColumns.Length; i++)
             {
                 parentColumns[i] = relation.ParentColumns[i].Caption;
             }
-            for (int i = 0; i < relation.ChildColumns.Length; i++)
+
+            for (var i = 0; i < relation.ChildColumns.Length; i++)
             {
                 childColumns[i] = relation.ChildColumns[i].Caption;
             }
+
             rel.ParentColumns = parentColumns;
             rel.ChildColumns = childColumns;
-            Relations.Add(rel);
+            Relations.Add (rel);
         }
 
         /// <summary>
@@ -324,26 +320,29 @@ namespace AM.Reporting.Data
         /// <remarks>
         /// This method is for internal use only.
         /// </remarks>
-        public void RegisterBusinessObject(IEnumerable data, string referenceName, int maxNestingLevel, bool enabled)
+        public void RegisterBusinessObject (IEnumerable data, string referenceName, int maxNestingLevel, bool enabled)
         {
-            AddRegisteredItem(data, referenceName);
+            AddRegisteredItem (data, referenceName);
 
-            Type dataType = data.GetType();
-            if (data is BindingSource)
+            var dataType = data.GetType();
+            if (data is BindingSource bindingSource)
             {
-                if ((data as BindingSource).DataSource is Type)
-                    dataType = ((data as BindingSource).DataSource as Type);
+                if (bindingSource.DataSource is Type type)
+                {
+                    dataType = type;
+                }
                 else
-                    dataType = (data as BindingSource).DataSource.GetType();
+                {
+                    dataType = bindingSource.DataSource.GetType();
+                }
             }
 
-            BusinessObjectConverter converter = new BusinessObjectConverter(this);
-            BusinessObjectDataSource source = FindDataComponent(referenceName) as BusinessObjectDataSource;
-            if (source != null)
+            var converter = new BusinessObjectConverter (this);
+            if (FindDataComponent (referenceName) is BusinessObjectDataSource source)
             {
                 source.Reference = data;
                 source.DataType = dataType;
-                converter.UpdateExistingObjects(source, maxNestingLevel);
+                converter.UpdateExistingObjects (source, maxNestingLevel);
             }
             else
             {
@@ -351,12 +350,12 @@ namespace AM.Reporting.Data
                 source.ReferenceName = referenceName;
                 source.Reference = data;
                 source.DataType = dataType;
-                source.Name = CreateUniqueName(referenceName);
-                source.Alias = CreateUniqueAlias(source.Alias);
+                source.Name = CreateUniqueName (referenceName);
+                source.Alias = CreateUniqueAlias (source.Alias);
                 source.Enabled = enabled;
-                DataSources.Add(source);
+                DataSources.Add (source);
 
-                converter.CreateInitialObjects(source, maxNestingLevel);
+                converter.CreateInitialObjects (source, maxNestingLevel);
             }
         }
 
@@ -369,12 +368,11 @@ namespace AM.Reporting.Data
         /// <remarks>
         /// This method is for internal use only.
         /// </remarks>
-        public void RegisterCubeLink(IBaseCubeLink cubeLink, string referenceName, bool enabled)
+        public void RegisterCubeLink (IBaseCubeLink cubeLink, string referenceName, bool enabled)
         {
-            AddRegisteredItem(cubeLink, referenceName);
+            AddRegisteredItem (cubeLink, referenceName);
 
-            CubeSourceBase source = FindDataComponent(referenceName) as CubeSourceBase;
-            if (source != null)
+            if (FindDataComponent (referenceName) is CubeSourceBase source)
             {
                 source.Reference = cubeLink;
             }
@@ -383,10 +381,10 @@ namespace AM.Reporting.Data
                 source = new SliceCubeSource();
                 source.ReferenceName = referenceName;
                 source.Reference = cubeLink;
-                source.Name = CreateUniqueName(referenceName);
-                source.Alias = CreateUniqueAlias(source.Alias);
+                source.Name = CreateUniqueName (referenceName);
+                source.Alias = CreateUniqueAlias (source.Alias);
                 source.Enabled = enabled;
-                CubeSources.Add(source);
+                CubeSources.Add (source);
             }
         }
 
@@ -399,31 +397,31 @@ namespace AM.Reporting.Data
         /// <remarks>
         /// This method is for internal use only.
         /// </remarks>
-        public void RegisterData(object data, string name, bool enabled)
+        public void RegisterData (object data, string name, bool enabled)
         {
-            if (data is DataSet)
+            if (data is DataSet set)
             {
-                RegisterDataSet(data as DataSet, name, enabled);
+                RegisterDataSet (set, name, enabled);
             }
-            else if (data is DataTable)
+            else if (data is DataTable table)
             {
-                RegisterDataTable(data as DataTable, name, enabled);
+                RegisterDataTable (table, name, enabled);
             }
-            else if (data is DataView)
+            else if (data is DataView view)
             {
-                RegisterDataView(data as DataView, name, enabled);
+                RegisterDataView (view, name, enabled);
             }
-            else if (data is DataRelation)
+            else if (data is DataRelation relation)
             {
-                RegisterDataRelation(data as DataRelation, name, enabled);
+                RegisterDataRelation (relation, name, enabled);
             }
-            else if (data is IEnumerable)
+            else if (data is IEnumerable enumerable)
             {
-                RegisterBusinessObject(data as IEnumerable, name, 1, enabled);
+                RegisterBusinessObject (enumerable, name, 1, enabled);
             }
-            else if (data is IBaseCubeLink)
+            else if (data is IBaseCubeLink link)
             {
-                RegisterCubeLink(data as IBaseCubeLink, name, enabled);
+                RegisterCubeLink (link, name, enabled);
             }
         }
 
@@ -431,9 +429,9 @@ namespace AM.Reporting.Data
         /// Unregisters the previously registered data.
         /// </summary>
         /// <param name="data">The application data.</param>
-        public void UnregisterData(object data)
+        public void UnregisterData (object data)
         {
-            UnregisterData(data, "Data");
+            UnregisterData (data, "Data");
         }
 
         /// <summary>
@@ -444,31 +442,34 @@ namespace AM.Reporting.Data
         /// <remarks>
         /// You must specify the same <b>data</b> and <b>name</b> as when you call <b>RegisterData</b>.
         /// </remarks>
-        public void UnregisterData(object data, string name)
+        public void UnregisterData (object data, string name)
         {
-            for (int i = 0; i < registeredItems.Count; i++)
+            for (var i = 0; i < RegisteredItems.Count; i++)
             {
-                RegDataItem item = registeredItems[i];
+                var item = RegisteredItems[i];
                 if (item.name == name)
                 {
-                    registeredItems.RemoveAt(i);
+                    RegisteredItems.RemoveAt (i);
                     break;
                 }
             }
 
-            DataComponentBase comp = FindDataComponent(name);
+            var comp = FindDataComponent (name);
             if (comp != null)
-                comp.Dispose();
-
-            if (data is DataSet)
             {
-                foreach (DataTable table in (data as DataSet).Tables)
+                comp.Dispose();
+            }
+
+            if (data is DataSet set)
+            {
+                foreach (DataTable table in set.Tables)
                 {
-                    UnregisterData(table, name + "." + table.TableName);
+                    UnregisterData (table, name + "." + table.TableName);
                 }
-                foreach (DataRelation relation in (data as DataSet).Relations)
+
+                foreach (DataRelation relation in set.Relations)
                 {
-                    UnregisterData(relation, name + "." + relation.RelationName);
+                    UnregisterData (relation, name + "." + relation.RelationName);
                 }
             }
         }
@@ -481,20 +482,21 @@ namespace AM.Reporting.Data
         /// </remarks>
         public void ReRegisterData()
         {
-            ReRegisterData(this);
+            ReRegisterData (this);
         }
 
         /// <summary>
         /// Re-registers the data registered before.
         /// </summary>
         /// <param name="dictionary"></param>
-        public void ReRegisterData(Dictionary dictionary)
+        public void ReRegisterData (Dictionary dictionary)
         {
             // re-register all data items. It is needed after load or "new report" operations
-            if (registeredItems.Count > 0)
+            if (RegisteredItems.Count > 0)
             {
-                DictionaryHelper helper = new DictionaryHelper(dictionary, dictionary.AllObjects, dictionary.Report.AllNamedObjects);
-                helper.ReRegisterData(registeredItems, false);
+                var helper = new DictionaryHelper (dictionary, dictionary.AllObjects,
+                    dictionary.Report.AllNamedObjects);
+                helper.ReRegisterData (RegisteredItems, false);
             }
         }
 
@@ -503,7 +505,7 @@ namespace AM.Reporting.Data
         /// </summary>
         public void ClearRegisteredData()
         {
-            registeredItems.Clear();
+            RegisteredItems.Clear();
         }
 
         /// <summary>
@@ -519,7 +521,7 @@ namespace AM.Reporting.Data
             foreach (Relation relation in Relations)
             {
                 relation.Enabled = relation.ParentDataSource != null && relation.ParentDataSource.Enabled &&
-                  relation.ChildDataSource != null && relation.ChildDataSource.Enabled;
+                                   relation.ChildDataSource != null && relation.ChildDataSource.Enabled;
             }
         }
 
@@ -540,15 +542,16 @@ namespace AM.Reporting.Data
         /// </code>
         /// </example>
         /// </remarks>
-        public string CreateUniqueName(string name)
+        public string CreateUniqueName (string name)
         {
-            string baseName = name;
-            int i = 1;
-            while (FindByName(name) != null || Report.FindObject(name) != null)
+            var baseName = name;
+            var i = 1;
+            while (FindByName (name) != null || Report.FindObject (name) != null)
             {
                 name = baseName + i.ToString();
                 i++;
             }
+
             return name;
         }
 
@@ -572,15 +575,16 @@ namespace AM.Reporting.Data
         /// </code>
         /// </example>
         /// </remarks>
-        public string CreateUniqueAlias(string alias)
+        public string CreateUniqueAlias (string alias)
         {
-            string baseAlias = alias;
-            int i = 1;
-            while (FindByAlias(alias) != null)
+            var baseAlias = alias;
+            var i = 1;
+            while (FindByAlias (alias) != null)
             {
                 alias = baseAlias + i.ToString();
                 i++;
             }
+
             return alias;
         }
 
@@ -589,18 +593,21 @@ namespace AM.Reporting.Data
         /// </summary>
         /// <param name="name">The item's name.</param>
         /// <returns>The data item if found; otherwise, <b>null</b>.</returns>
-        public Base FindByName(string name)
+        public Base FindByName (string name)
         {
             foreach (Base c in AllObjects)
             {
                 if (c is DataConnectionBase || c is DataSourceBase || c is Relation ||
-                  (c is Parameter && c.Parent == this) || c is Total || c is CubeSourceBase)
+                    (c is Parameter && c.Parent == this) || c is Total || c is CubeSourceBase)
                 {
                     // check complete match or match without case sensitivity
                     if (name == c.Name || name.ToLower() == c.Name.ToLower())
+                    {
                         return c;
+                    }
                 }
             }
+
             return null;
         }
 
@@ -609,23 +616,30 @@ namespace AM.Reporting.Data
         /// </summary>
         /// <param name="alias">The item's alias.</param>
         /// <returns>The data item if found; otherwise, <b>null</b>.</returns>
-        public DataComponentBase FindByAlias(string alias)
+        public DataComponentBase FindByAlias (string alias)
         {
             foreach (Base c in AllObjects)
             {
                 if (c is DataConnectionBase || c is Relation)
                 {
                     // check complete match or match without case sensitivity
-                    if (alias == (c as DataComponentBase).Alias || alias.ToLower() == (c as DataComponentBase).Alias.ToLower())
+                    if (alias == (c as DataComponentBase).Alias ||
+                        alias.ToLower() == (c as DataComponentBase).Alias.ToLower())
+                    {
                         return c as DataComponentBase;
+                    }
                 }
-                else if (c is DataSourceBase)
+                else if (c is DataSourceBase @base)
                 {
                     // check complete match or match without case sensitivity
-                    if (alias == (c as DataSourceBase).FullName || alias.ToLower() == (c as DataSourceBase).FullName.ToLower())
-                        return c as DataSourceBase;
+                    if (alias == @base.FullName ||
+                        alias.ToLower() == @base.FullName.ToLower())
+                    {
+                        return @base;
+                    }
                 }
             }
+
             return null;
         }
 
@@ -637,13 +651,16 @@ namespace AM.Reporting.Data
         /// <remarks>
         /// This method is for internal use only.
         /// </remarks>
-        public DataSourceBase FindDataTableSource(DataTable table)
+        public DataSourceBase FindDataTableSource (DataTable table)
         {
             foreach (DataSourceBase c in DataSources)
             {
                 if (c is TableDataSource && c.Reference == table)
+                {
                     return c;
+                }
             }
+
             return null;
         }
 
@@ -655,33 +672,38 @@ namespace AM.Reporting.Data
         /// <remarks>
         /// This method is for internal use only.
         /// </remarks>
-        public DataComponentBase FindDataComponent(string referenceName)
+        public DataComponentBase FindDataComponent (string referenceName)
         {
             foreach (Base c in AllObjects)
             {
-                DataComponentBase data = c as DataComponentBase;
-                if (data != null && data.ReferenceName == referenceName)
+                if (c is DataComponentBase data && data.ReferenceName == referenceName)
+                {
                     return data;
+                }
             }
+
             return null;
         }
 
         /// <inheritdoc/>
-        public override void Serialize(FRWriter writer)
+        public override void Serialize (FRWriter writer)
         {
             writer.ItemName = ClassName;
-            ObjectCollection childObjects = ChildObjects;
+            var childObjects = ChildObjects;
             foreach (Base c in childObjects)
             {
-                if (c is Parameter || c is Total || c is CubeSourceBase || (c is DataComponentBase && (c as DataComponentBase).Enabled))
-                    writer.Write(c);
+                if (c is Parameter || c is Total || c is CubeSourceBase ||
+                    (c is DataComponentBase @base && @base.Enabled))
+                {
+                    writer.Write (c);
+                }
             }
         }
 
         /// <inheritdoc/>
-        public override void Deserialize(FRReader reader)
+        public override void Deserialize (FRReader reader)
         {
-            base.Deserialize(reader);
+            base.Deserialize (reader);
             ReRegisterData();
         }
 
@@ -689,12 +711,12 @@ namespace AM.Reporting.Data
         /// Saves the dictionary to a stream.
         /// </summary>
         /// <param name="stream">Stream to save to.</param>
-        public void Save(Stream stream)
+        public void Save (Stream stream)
         {
-            using (FRWriter writer = new FRWriter())
+            using (var writer = new FRWriter())
             {
-                writer.Write(this);
-                writer.Save(stream);
+                writer.Write (this);
+                writer.Save (stream);
             }
         }
 
@@ -702,11 +724,11 @@ namespace AM.Reporting.Data
         /// Saves the dictionary to a file.
         /// </summary>
         /// <param name="fileName">The name of a file to save to.</param>
-        public void Save(string fileName)
+        public void Save (string fileName)
         {
-            using (FileStream f = new FileStream(fileName, FileMode.Create))
+            using (var f = new FileStream (fileName, FileMode.Create))
             {
-                Save(f);
+                Save (f);
             }
         }
 
@@ -714,13 +736,13 @@ namespace AM.Reporting.Data
         /// Loads the dictionary from a stream.
         /// </summary>
         /// <param name="stream">The stream to load from.</param>
-        public void Load(Stream stream)
+        public void Load (Stream stream)
         {
             Clear();
-            using (FRReader reader = new FRReader(Report))
+            using (var reader = new FRReader (Report))
             {
-                reader.Load(stream);
-                reader.Read(this);
+                reader.Load (stream);
+                reader.Read (this);
             }
         }
 
@@ -728,11 +750,11 @@ namespace AM.Reporting.Data
         /// Loads the dictionary from a file.
         /// </summary>
         /// <param name="fileName">The name of a file to load from.</param>
-        public void Load(string fileName)
+        public void Load (string fileName)
         {
-            using (FileStream f = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
+            using (var f = new FileStream (fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
-                Load(f);
+                Load (f);
             }
         }
 
@@ -740,120 +762,155 @@ namespace AM.Reporting.Data
         /// Merges this dictionary with another <b>Dictionary</b>.
         /// </summary>
         /// <param name="source">Another dictionary to merge the data from.</param>
-        public void Merge(Dictionary source)
+        public void Merge (Dictionary source)
         {
             // Report object is needed to handle save/load of dictionary correctly.
             // Some dictionary objects (such as relations) may contain references to other objects.
             // In order to clone them correctly, we need a parent Report object, because
             // reader uses it to fixup references.
 
-            using (Report cloneReport = new Report())
+            using (var cloneReport = new Report())
             {
-                Dictionary clone = cloneReport.Dictionary;
-                clone.AssignAll(source, true);
+                var clone = cloneReport.Dictionary;
+                clone.AssignAll (source, true);
 
                 foreach (Base c in clone.ChildObjects)
                 {
-                    Base my = FindByName(c.Name);
+                    var my = FindByName (c.Name);
                     if (my != null)
+                    {
                         my.Dispose();
+                    }
+
                     c.Parent = this;
                 }
 
-                source.ReRegisterData(this);
+                source.ReRegisterData (this);
                 ReRegisterData();
             }
         }
+
         #endregion
 
         #region IParent Members
+
         /// <inheritdoc/>
-        public bool CanContain(Base child)
+        public bool CanContain (Base child)
         {
             return child is DataConnectionBase || child is DataSourceBase || child is Relation || child is Parameter ||
-              child is Total || child is CubeSourceBase;
+                   child is Total || child is CubeSourceBase;
         }
 
         /// <inheritdoc/>
-        public void GetChildObjects(ObjectCollection list)
+        public void GetChildObjects (ObjectCollection list)
         {
             foreach (DataConnectionBase c in Connections)
             {
-                list.Add(c);
+                list.Add (c);
             }
+
             foreach (DataSourceBase c in DataSources)
             {
-                list.Add(c);
+                list.Add (c);
             }
+
             foreach (Relation c in Relations)
             {
-                list.Add(c);
+                list.Add (c);
             }
+
             foreach (Parameter c in Parameters)
             {
-                list.Add(c);
+                list.Add (c);
             }
+
             foreach (Total c in Totals)
             {
-                list.Add(c);
+                list.Add (c);
             }
+
             foreach (CubeSourceBase c in CubeSources)
             {
-                list.Add(c);
+                list.Add (c);
             }
         }
 
         /// <inheritdoc/>
-        public void AddChild(Base child)
+        public void AddChild (Base child)
         {
-            if (child is DataConnectionBase)
-                Connections.Add(child as DataConnectionBase);
-            else if (child is DataSourceBase)
-                DataSources.Add(child as DataSourceBase);
-            else if (child is Relation)
-                Relations.Add(child as Relation);
-            else if (child is Parameter)
-                Parameters.Add(child as Parameter);
-            else if (child is Total)
-                Totals.Add(child as Total);
-            else if (child is CubeSourceBase)
-                CubeSources.Add(child as CubeSourceBase);
+            if (child is DataConnectionBase @base)
+            {
+                Connections.Add (@base);
+            }
+            else if (child is DataSourceBase sourceBase)
+            {
+                DataSources.Add (sourceBase);
+            }
+            else if (child is Relation relation)
+            {
+                Relations.Add (relation);
+            }
+            else if (child is Parameter parameter)
+            {
+                Parameters.Add (parameter);
+            }
+            else if (child is Total total)
+            {
+                Totals.Add (total);
+            }
+            else if (child is CubeSourceBase cubeSourceBase)
+            {
+                CubeSources.Add (cubeSourceBase);
+            }
         }
 
         /// <inheritdoc/>
-        public void RemoveChild(Base child)
+        public void RemoveChild (Base child)
         {
-            if (child is DataConnectionBase)
-                Connections.Remove(child as DataConnectionBase);
-            else if (child is DataSourceBase)
-                DataSources.Remove(child as DataSourceBase);
-            else if (child is Relation)
-                Relations.Remove(child as Relation);
-            else if (child is Parameter)
-                Parameters.Remove(child as Parameter);
-            else if (child is Total)
-                Totals.Remove(child as Total);
-            else if (child is CubeSourceBase)
-                CubeSources.Remove(child as CubeSourceBase);
+            if (child is DataConnectionBase @base)
+            {
+                Connections.Remove (@base);
+            }
+            else if (child is DataSourceBase sourceBase)
+            {
+                DataSources.Remove (sourceBase);
+            }
+            else if (child is Relation relation)
+            {
+                Relations.Remove (relation);
+            }
+            else if (child is Parameter parameter)
+            {
+                Parameters.Remove (parameter);
+            }
+            else if (child is Total total)
+            {
+                Totals.Remove (total);
+            }
+            else if (child is CubeSourceBase cubeSourceBase)
+            {
+                CubeSources.Remove (cubeSourceBase);
+            }
         }
 
         /// <inheritdoc/>
-        public int GetChildOrder(Base child)
+        public int GetChildOrder (Base child)
         {
             return 0;
         }
 
         /// <inheritdoc/>
-        public void SetChildOrder(Base child, int order)
+        public void SetChildOrder (Base child, int order)
         {
             // do nothing
         }
 
         /// <inheritdoc/>
-        public void UpdateLayout(float dx, float dy)
+        public void UpdateLayout (float dx, float dy)
         {
             // do nothing
         }
+
         #endregion
 
         /// <summary>
@@ -861,14 +918,14 @@ namespace AM.Reporting.Data
         /// </summary>
         public Dictionary()
         {
-            connections = new ConnectionCollection(this);
-            dataSources = new DataSourceCollection(this);
-            relations = new RelationCollection(this);
-            parameters = new ParameterCollection(this);
-            systemVariables = new SystemVariables(this);
-            totals = new TotalCollection(this);
-            cubeSources = new CubeSourceCollection(this);
-            registeredItems = new List<RegDataItem>();
+            Connections = new ConnectionCollection (this);
+            DataSources = new DataSourceCollection (this);
+            Relations = new RelationCollection (this);
+            Parameters = new ParameterCollection (this);
+            SystemVariables = new SystemVariables (this);
+            Totals = new TotalCollection (this);
+            CubeSources = new CubeSourceCollection (this);
+            RegisteredItems = new List<RegDataItem>();
         }
 
         /// <summary>
@@ -886,7 +943,7 @@ namespace AM.Reporting.Data
             /// </summary>
             public string name;
 
-            internal RegDataItem(object data, string name)
+            internal RegDataItem (object data, string name)
             {
                 this.data = data;
                 this.name = name;

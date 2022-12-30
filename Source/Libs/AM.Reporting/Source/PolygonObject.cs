@@ -1,6 +1,28 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System.Drawing;
 using System.Drawing.Drawing2D;
+
 using AM.Reporting.Utils;
+
+#endregion
+
+#nullable enable
 
 namespace AM.Reporting
 {
@@ -23,9 +45,9 @@ namespace AM.Reporting
         /// <param name="scaleX">scale by width</param>
         /// <param name="scaleY">scale by height</param>
         /// <returns>Always returns a non-empty path</returns>
-        protected GraphicsPath getPolygonPath(Pen pen, float scaleX, float scaleY)
+        protected GraphicsPath getPolygonPath (Pen pen, float scaleX, float scaleY)
         {
-            GraphicsPath gp = base.GetPath(pen, AbsLeft, AbsTop, AbsRight, AbsBottom, scaleX, scaleY);
+            var gp = GetPath (pen, AbsLeft, AbsTop, AbsRight, AbsBottom, scaleX, scaleY);
             gp.CloseAllFigures();
             return gp;
         }
@@ -34,42 +56,52 @@ namespace AM.Reporting
         /// Draw polyline path to graphics
         /// </summary>
         /// <param name="e">Event arguments</param>
-        protected override void drawPoly(FRPaintEventArgs e)
+        protected override void drawPoly (FRPaintEventArgs e)
         {
-            float x = (AbsLeft + Border.Width / 2) * e.ScaleX;
-            float y = (AbsTop + Border.Width / 2) * e.ScaleY;
-            float dx = (Width - Border.Width) * e.ScaleX - 1;
-            float dy = (Height - Border.Width) * e.ScaleY - 1;
+            var x = (AbsLeft + Border.Width / 2) * e.ScaleX;
+            var y = (AbsTop + Border.Width / 2) * e.ScaleY;
+            var dx = (Width - Border.Width) * e.ScaleX - 1;
+            var dy = (Height - Border.Width) * e.ScaleY - 1;
 
             Pen pen;
             if (polygonSelectionMode == PolygonSelectionMode.MoveAndScale)
             {
-                pen = e.Cache.GetPen(Border.Color, Border.Width * e.ScaleX, Border.DashStyle);
+                pen = e.Cache.GetPen (Border.Color, Border.Width * e.ScaleX, Border.DashStyle);
             }
-            else pen = e.Cache.GetPen(Border.Color, 1, DashStyle.Solid);
+            else
+            {
+                pen = e.Cache.GetPen (Border.Color, 1, DashStyle.Solid);
+            }
 
             Brush brush = null;
             if (Fill is SolidFill)
-                brush = e.Cache.GetBrush((Fill as SolidFill).Color);
-            else
-                brush = Fill.CreateBrush(new RectangleF(x, y, dx, dy), e.ScaleX, e.ScaleY);
-
-            using (GraphicsPath path = getPolygonPath(pen, e.ScaleX, e.ScaleY))
             {
-                if(polygonSelectionMode == PolygonSelectionMode.MoveAndScale)
-                e.Graphics.FillAndDrawPath(pen, brush, path);
+                brush = e.Cache.GetBrush ((Fill as SolidFill).Color);
+            }
+            else
+            {
+                brush = Fill.CreateBrush (new RectangleF (x, y, dx, dy), e.ScaleX, e.ScaleY);
+            }
+
+            using (var path = getPolygonPath (pen, e.ScaleX, e.ScaleY))
+            {
+                if (polygonSelectionMode == PolygonSelectionMode.MoveAndScale)
+                {
+                    e.Graphics.FillAndDrawPath (pen, brush, path);
+                }
             }
         }
 
         #endregion
 
         #region Public Methods
+
         /// <inheritdoc/>
-        public override void Serialize(FRWriter writer)
+        public override void Serialize (FRWriter writer)
         {
             Border.SimpleBorder = true;
-            base.Serialize(writer);
-            PolygonObject c = writer.DiffObject as PolygonObject;
+            base.Serialize (writer);
+            var c = writer.DiffObject as PolygonObject;
         }
 
         #endregion

@@ -35,29 +35,20 @@ namespace AM.Reporting.Utils
     public struct XmlProperty
 #endif
     {
-        private readonly string key;
-        private readonly string value;
-
         /// <summary>
         /// Represents a property key.
         /// </summary>
-        public string Key
-        {
-            get { return key; }
-        }
+        public string Key { get; }
 
         /// <summary>
         /// Represents a property value.
         /// </summary>
-        public string Value
-        {
-            get { return value; }
-        }
+        public string Value { get; }
 
-        private XmlProperty(string key, string value)
+        private XmlProperty (string key, string value)
         {
-            this.key = key;
-            this.value = value;
+            this.Key = key;
+            this.Value = value;
         }
 
         /// <summary>
@@ -65,9 +56,9 @@ namespace AM.Reporting.Utils
         /// </summary>
         /// <param name="key">Property key</param>
         /// <param name="value">Property value</param>
-        public static XmlProperty Create(string key, string value)
+        public static XmlProperty Create (string key, string value)
         {
-            return new XmlProperty(key, value);
+            return new XmlProperty (key, value);
         }
     }
 
@@ -78,17 +69,12 @@ namespace AM.Reporting.Utils
     {
         private List<XmlItem> items;
         private XmlItem parent;
-        private string name;
-        private string value;
         private XmlProperty[] properties;
 
         /// <summary>
         /// Gets a number of children in this node.
         /// </summary>
-        public int Count
-        {
-            get { return items == null ? 0 : items.Count; }
-        }
+        public int Count => items == null ? 0 : items.Count;
 
         /// <summary>
         /// Gets a list of children in this node.
@@ -98,7 +84,10 @@ namespace AM.Reporting.Utils
             get
             {
                 if (items == null)
+                {
                     items = new List<XmlItem>();
+                }
+
                 return items;
             }
         }
@@ -108,10 +97,7 @@ namespace AM.Reporting.Utils
         /// </summary>
         /// <param name="index">Index of node.</param>
         /// <returns>The node with specified index.</returns>
-        public XmlItem this[int index]
-        {
-            get { return Items[index]; }
-        }
+        public XmlItem this [int index] => Items[index];
 
         /// <summary>
         /// Gets or sets the node name.
@@ -119,11 +105,7 @@ namespace AM.Reporting.Utils
         /// <remarks>
         /// This property will return "Node" for a node like <c>&lt;Node Text="" Left="0"/&gt;</c>
         /// </remarks>
-        public string Name
-        {
-            get { return name; }
-            set { name = value; }
-        }
+        public string Name { get; set; }
 
         /// <summary>
         /// Gets or sets a list of properties in this node.
@@ -133,13 +115,13 @@ namespace AM.Reporting.Utils
             get
             {
                 if (properties == null)
+                {
                     properties = new XmlProperty[0];
+                }
+
                 return properties;
             }
-            set
-            {
-                properties = value;
-            }
+            set => properties = value;
         }
 
         /// <summary>
@@ -147,16 +129,22 @@ namespace AM.Reporting.Utils
         /// </summary>
         public XmlItem Parent
         {
-            get { return parent; }
+            get => parent;
             set
             {
                 if (parent != value)
                 {
                     if (parent != null)
-                        parent.Items.Remove(this);
+                    {
+                        parent.Items.Remove (this);
+                    }
+
                     if (value != null)
-                        value.Items.Add(this);
+                    {
+                        value.Items.Add (this);
+                    }
                 }
+
                 parent = value;
             }
         }
@@ -167,11 +155,7 @@ namespace AM.Reporting.Utils
         /// <remarks>
         /// This property will return "ABC" for a node like <c>&lt;Node&gt;ABC&lt;/Node&gt;</c>
         /// </remarks>
-        public string Value
-        {
-            get { return value; }
-            set { this.value = value; }
-        }
+        public string Value { get; set; }
 
         /// <summary>
         /// Gets the root node which owns this node.
@@ -180,11 +164,12 @@ namespace AM.Reporting.Utils
         {
             get
             {
-                XmlItem result = this;
+                var result = this;
                 while (result.Parent != null)
                 {
                     result = result.Parent;
                 }
+
                 return result;
             }
         }
@@ -211,8 +196,8 @@ namespace AM.Reporting.Utils
         /// <returns>The new child node.</returns>
         public XmlItem Add()
         {
-            XmlItem result = new XmlItem();
-            AddItem(result);
+            var result = new XmlItem();
+            AddItem (result);
             return result;
         }
 
@@ -220,7 +205,7 @@ namespace AM.Reporting.Utils
         /// Adds a specified node to this node.
         /// </summary>
         /// <param name="item">The node to add.</param>
-        public void AddItem(XmlItem item)
+        public void AddItem (XmlItem item)
         {
             item.Parent = this;
         }
@@ -230,11 +215,11 @@ namespace AM.Reporting.Utils
         /// </summary>
         /// <param name="index">Position to insert.</param>
         /// <param name="item">Node to insert.</param>
-        public void InsertItem(int index, XmlItem item)
+        public void InsertItem (int index, XmlItem item)
         {
-            AddItem(item);
-            Items.RemoveAt(Count - 1);
-            Items.Insert(index, item);
+            AddItem (item);
+            Items.RemoveAt (Count - 1);
+            Items.Insert (index, item);
         }
 
         /// <summary>
@@ -242,13 +227,16 @@ namespace AM.Reporting.Utils
         /// </summary>
         /// <param name="name">The name of node to find.</param>
         /// <returns>The node with specified name, if found; <b>null</b> otherwise.</returns>
-        public int Find(string name)
+        public int Find (string name)
         {
-            for (int i = 0; i < Count; i++)
+            for (var i = 0; i < Count; i++)
             {
-                if (String.Compare(Items[i].Name, name, true) == 0)
+                if (string.Compare (Items[i].Name, name, true) == 0)
+                {
                     return i;
+                }
             }
+
             return -1;
         }
 
@@ -261,17 +249,20 @@ namespace AM.Reporting.Utils
         /// This method adds the node with specified name to the child nodes if it cannot find the node.
         /// Do not dispose items, which has been created by this method
         /// </remarks>
-        public XmlItem FindItem(string name)
+        public XmlItem FindItem (string name)
         {
             XmlItem result = null;
-            int i = Find(name);
+            var i = Find (name);
             if (i == -1)
             {
                 result = Add();
                 result.Name = name;
             }
             else
+            {
                 result = Items[i];
+            }
+
             return result;
         }
 
@@ -280,9 +271,9 @@ namespace AM.Reporting.Utils
         /// </summary>
         /// <param name="item">The node to find.</param>
         /// <returns>Zero-based index of node, if found; <b>-1</b> otherwise.</returns>
-        public int IndexOf(XmlItem item)
+        public int IndexOf (XmlItem item)
         {
-            return Items.IndexOf(item);
+            return Items.IndexOf (item);
         }
 
         /// <summary>
@@ -294,43 +285,54 @@ namespace AM.Reporting.Utils
         /// This property will return "0" when you request the "Left" property for a node
         /// like <c>&lt;Node Text="" Left="0"/&gt;</c>
         /// </remarks>
-        public string GetProp(string key)
+        public string GetProp (string key)
         {
-            return GetProp(key, true);
+            return GetProp (key, true);
         }
 
-        internal string GetProp(string key, bool convertFromXml)
+        internal string GetProp (string key, bool convertFromXml)
         {
             if (properties == null || properties.Length == 0)
+            {
                 return "";
+            }
 
             // property key should be trimmed
             key = key.Trim();
 
-            foreach (XmlProperty kv in properties)
+            foreach (var kv in properties)
+            {
                 if (kv.Key == key)
+                {
                     return kv.Value;
+                }
+            }
 
             return "";
         }
 
-        internal void WriteProps(FastString sb)
+        internal void WriteProps (FastString sb)
         {
             if (properties == null || properties.Length == 0)
+            {
                 return;
+            }
 
-            sb.Append(" ");
-            foreach (XmlProperty kv in properties)
+            sb.Append (" ");
+            foreach (var kv in properties)
             {
                 //if (string.IsNullOrWhiteSpace(kv.Key))
-                if (String.IsNullOrEmpty(kv.Key) || kv.Key.Trim().Length == 0)
+                if (string.IsNullOrEmpty (kv.Key) || kv.Key.Trim().Length == 0)
+                {
                     continue;
+                }
 
-                sb.Append(kv.Key);
-                sb.Append("=\"");
-                sb.Append(Converter.ToXml(kv.Value));
-                sb.Append("\" ");
+                sb.Append (kv.Key);
+                sb.Append ("=\"");
+                sb.Append (Converter.ToXml (kv.Value));
+                sb.Append ("\" ");
             }
+
             sb.Length--;
         }
 
@@ -342,7 +344,7 @@ namespace AM.Reporting.Utils
             properties = null;
         }
 
-        internal void CopyPropsTo(XmlItem item)
+        internal void CopyPropsTo (XmlItem item)
         {
             if (properties == null)
             {
@@ -368,7 +370,7 @@ namespace AM.Reporting.Utils
         /// "Text" property to "test", the node will be <c>&lt;Node Text="test" Left="0"/&gt;</c>.
         /// If property with specified name is not exist, it will be added.
         /// </remarks>
-        public void SetProp(string key, string value)
+        public void SetProp (string key, string value)
         {
             // property key should be trimmed
             key = key.Trim();
@@ -376,21 +378,21 @@ namespace AM.Reporting.Utils
             if (properties == null)
             {
                 properties = new XmlProperty[1];
-                properties[0] = XmlProperty.Create(key, value);
+                properties[0] = XmlProperty.Create (key, value);
                 return;
             }
 
-            for (int i = 0; i < properties.Length; i++)
+            for (var i = 0; i < properties.Length; i++)
             {
                 if (properties[i].Key == key)
                 {
-                    properties[i] = XmlProperty.Create(key, value);
+                    properties[i] = XmlProperty.Create (key, value);
                     return;
                 }
             }
 
-            Array.Resize<XmlProperty>(ref properties, properties.Length + 1);
-            properties[properties.Length - 1] = XmlProperty.Create(key, value);
+            Array.Resize<XmlProperty> (ref properties, properties.Length + 1);
+            properties[properties.Length - 1] = XmlProperty.Create (key, value);
         }
 
         /// <summary>
@@ -398,10 +400,12 @@ namespace AM.Reporting.Utils
         /// </summary>
         /// <param name="key">The property name.</param>
         /// <returns>Returns true if property is removed, false otherwise.</returns>
-        public bool RemoveProp(string key)
+        public bool RemoveProp (string key)
         {
             if (properties == null || properties.Length == 0)
+            {
                 return false;
+            }
 
             // property key should be trimmed
             key = key.Trim();
@@ -414,13 +418,13 @@ namespace AM.Reporting.Utils
 
             if (properties[properties.Length - 1].Key == key)
             {
-                Array.Resize<XmlProperty>(ref properties, properties.Length - 1);
+                Array.Resize<XmlProperty> (ref properties, properties.Length - 1);
                 return true;
             }
 
-            int target = -1;
+            var target = -1;
 
-            for (int i = 0; i < properties.Length; i++)
+            for (var i = 0; i < properties.Length; i++)
             {
                 if (properties[i].Key == key)
                 {
@@ -431,12 +435,12 @@ namespace AM.Reporting.Utils
 
             if (target != -1)
             {
-                for (int i = target; i < properties.Length - 1; i++)
+                for (var i = target; i < properties.Length - 1; i++)
                 {
                     properties[i] = properties[i + 1];
                 }
 
-                Array.Resize<XmlProperty>(ref properties, properties.Length - 1);
+                Array.Resize<XmlProperty> (ref properties, properties.Length - 1);
                 return true;
             }
 
@@ -457,8 +461,8 @@ namespace AM.Reporting.Utils
         /// </summary>
         public XmlItem()
         {
-            name = "";
-            value = "";
+            Name = "";
+            Value = "";
         }
     }
 
@@ -472,88 +476,77 @@ namespace AM.Reporting.Utils
     /// </remarks>
     public class XmlDocument : IDisposable
     {
-        private bool autoIndent;
-        private bool writeHeader;
-        private XmlItem root;
-
         /// <summary>
         /// Gets or sets a value indicating whether is necessary to indent the document
         /// when saving it to a file/stream.
         /// </summary>
-        public bool AutoIndent
-        {
-            get { return autoIndent; }
-            set { autoIndent = value; }
-        }
+        public bool AutoIndent { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether is necessary to add xml header.
         /// </summary>
-        public bool WriteHeader
-        {
-            get { return writeHeader; }
-            set { writeHeader = value; }
-        }
+        public bool WriteHeader { get; set; }
 
         /// <summary>
         /// Gets the root node of the document.
         /// </summary>
-        public XmlItem Root
-        {
-            get { return root; }
-        }
+        public XmlItem Root { get; }
 
         /// <summary>
         /// Clears the document.
         /// </summary>
         public void Clear()
         {
-            root.Clear();
+            Root.Clear();
         }
 
         /// <summary>
         /// Saves the document to a stream.
         /// </summary>
         /// <param name="stream">Stream to save to.</param>
-        public void Save(Stream stream)
+        public void Save (Stream stream)
         {
-            XmlWriter wr = new XmlWriter(stream);
-            wr.AutoIndent = autoIndent;
-            wr.IsWriteHeader = WriteHeader;
-            wr.Write(root);
+            var wr = new XmlWriter (stream)
+            {
+                AutoIndent = AutoIndent,
+                IsWriteHeader = WriteHeader
+            };
+            wr.Write (Root);
         }
 
         /// <summary>
         /// Saves the document to a string.
         /// </summary>
         /// <param name="textWriter">Writer to save to.</param>
-        public void Save(TextWriter textWriter)
+        public void Save (TextWriter textWriter)
         {
-            XmlWriter wr = new XmlWriter(textWriter);
-            wr.AutoIndent = autoIndent;
-            wr.IsWriteHeader = WriteHeader;
-            wr.Write(root);
+            var wr = new XmlWriter (textWriter)
+            {
+                AutoIndent = AutoIndent,
+                IsWriteHeader = WriteHeader
+            };
+            wr.Write (Root);
         }
 
         /// <summary>
         /// Loads the document from a stream.
         /// </summary>
         /// <param name="stream">Stream to load from.</param>
-        public void Load(Stream stream)
+        public void Load (Stream stream)
         {
-            XmlReader rd = new XmlReader(stream);
-            root.Clear();
-            rd.Read(root);
+            var rd = new XmlReader (stream);
+            Root.Clear();
+            rd.Read (Root);
         }
 
         /// <summary>
         /// Saves the document to a file.
         /// </summary>
         /// <param name="fileName">The name of file to save to.</param>
-        public void Save(string fileName)
+        public void Save (string fileName)
         {
-            FileStream s = new FileStream(fileName, FileMode.Create);
-            Save(s);
+            var s = new FileStream (fileName, FileMode.Create);
+            Save (s);
             s.Close();
         }
 
@@ -561,10 +554,10 @@ namespace AM.Reporting.Utils
         /// Loads the document from a file.
         /// </summary>
         /// <param name="fileName">The name of file to load from.</param>
-        public void Load(string fileName)
+        public void Load (string fileName)
         {
-            FileStream s = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
-            Load(s);
+            var s = new FileStream (fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+            Load (s);
             s.Close();
         }
 
@@ -573,7 +566,7 @@ namespace AM.Reporting.Utils
         /// </summary>
         public void Dispose()
         {
-            root.Dispose();
+            Root.Dispose();
         }
 
         /// <summary>
@@ -581,8 +574,8 @@ namespace AM.Reporting.Utils
         /// </summary>
         public XmlDocument()
         {
-            root = new XmlItem();
-            writeHeader = true;
+            Root = new XmlItem();
+            WriteHeader = true;
         }
 
         /// <inheritdoc/>
@@ -590,7 +583,7 @@ namespace AM.Reporting.Utils
         {
             using (TextWriter tw = new StringWriter())
             {
-                this.Save(tw);
+                Save (tw);
                 tw.Flush();
                 return tw.ToString();
             }
@@ -602,30 +595,55 @@ namespace AM.Reporting.Utils
         private StreamReader reader;
         private Stream stream;
         private string lastName;
-        private enum ReadState { FindLeft, FindRight, FindComment, FindCloseItem, Done }
-        private enum ItemState { Begin, End, Complete }
+
+        private enum ReadState
+        {
+            FindLeft,
+            FindRight,
+            FindComment,
+            FindCloseItem,
+            Done
+        }
+
+        private enum ItemState
+        {
+            Begin,
+            End,
+            Complete
+        }
+
         private int symbolInBuffer;
         Dictionary<string, string> stringPool;
-        private ItemState ReadItem(XmlItem item)
+
+        private ItemState ReadItem (XmlItem item)
         {
             FastString builder;
             if (Config.IsStringOptimization)
-                builder = new FastStringWithPool(stringPool);
+            {
+                builder = new FastStringWithPool (stringPool);
+            }
             else
+            {
                 builder = new FastString();
-            ReadState state = ReadState.FindLeft;
-            int comment = 0;
-            int i = 0;
+            }
+
+            var state = ReadState.FindLeft;
+            var comment = 0;
+            var i = 0;
+
             //string tempAttrName = null;
             //int lc = -1;
-            int c = -1;
+            var c = -1;
 
             // find <
             c = readNextSymbol();
             while (c != -1)
             {
                 if (c == '<')
+                {
                     break;
+                }
+
                 c = readNextSymbol();
             }
 
@@ -641,24 +659,63 @@ namespace AM.Reporting.Utils
                     {
                         switch (comment)
                         {
-                            case 0: if (c == '!') comment++; break;
-                            case 1: if (c == '-') comment++; break;
-                            case 2: if (c == '-') state = ReadState.FindComment; break;
-                            default: comment = -1; break;
+                            case 0:
+                                if (c == '!')
+                                {
+                                    comment++;
+                                }
+
+                                break;
+                            case 1:
+                                if (c == '-')
+                                {
+                                    comment++;
+                                }
+
+                                break;
+                            case 2:
+                                if (c == '-')
+                                {
+                                    state = ReadState.FindComment;
+                                }
+
+                                break;
+                            default:
+                                comment = -1;
+                                break;
                         }
-                        if (state == ReadState.FindComment) break;
+
+                        if (state == ReadState.FindComment)
+                        {
+                            break;
+                        }
                     }
+
                     i++;
                     switch (c)
                     {
-                        case '>': state = ReadState.Done; break; //Found name
-                        case ' ': state = ReadState.FindRight; break; //Found name
-                        case '<': RaiseException(); break;
-                        default: builder.Append((char)c); break;
+                        case '>':
+                            state = ReadState.Done;
+                            break; //Found name
+                        case ' ':
+                            state = ReadState.FindRight;
+                            break; //Found name
+                        case '<':
+                            RaiseException();
+                            break;
+                        default:
+                            builder.Append ((char)c);
+                            break;
                     }
-                    if (state != ReadState.FindLeft) break;
+
+                    if (state != ReadState.FindLeft)
+                    {
+                        break;
+                    }
+
                     c = readNextSymbol();
                 }
+
                 switch (state)
                 {
                     case ReadState.FindComment:
@@ -677,41 +734,53 @@ namespace AM.Reporting.Utils
                             else
                             {
                                 if (c == '-')
+                                {
                                     comment++;
+                                }
                                 else
+                                {
                                     comment = 0;
+                                }
                             }
                         }
+
                         comment = 0;
                         builder.Length = 0;
                         while (c != -1)
                         {
                             if (c == '<')
+                            {
                                 break;
+                            }
+
                             c = readNextSymbol();
                         }
+
                         break;
                     case ReadState.Done:
-                        string result = builder.ToString();
+                        var result = builder.ToString();
                         if (result[0] == '/')
                         {
-                            item.Name = result.Substring(1);
+                            item.Name = result.Substring (1);
                             return ItemState.End;
                         }
+
                         if (result[result.Length - 1] == '/')
                         {
-                            item.Name = result.Substring(0, result.Length - 1);
+                            item.Name = result.Substring (0, result.Length - 1);
                             return ItemState.Complete;
                         }
+
                         item.Name = result;
                         return ItemState.Begin;
                     case ReadState.FindRight:
                         if (builder[0] == '/')
                         {
-                            builder.Remove(0, 1);
+                            builder.Remove (0, 1);
                             item.Name = builder.ToString();
                             return ItemState.End;
                         }
+
                         item.Name = builder.ToString();
                         builder.Length = 0;
                         while (c != -1 && c != '>')
@@ -725,33 +794,49 @@ namespace AM.Reporting.Utils
                                     c = readNextSymbol();
                                     continue;
                                 }
+
                                 if (c == '=' || c == '>')
+                                {
                                     break;
-                                builder.Append((char)c);
+                                }
+
+                                builder.Append ((char)c);
                                 c = readNextSymbol();
                             }
+
                             if (c == '>')
                             {
-
                                 if (builder.Length > 0 && builder[builder.Length - 1] == '/')
+                                {
                                     return ItemState.Complete;
+                                }
+
                                 return ItemState.Begin;
                             }
+
                             c = readNextSymbol();
                             if (c != '"')
+                            {
                                 continue;
-                            string attrName = builder.ToString();
+                            }
+
+                            var attrName = builder.ToString();
                             builder.Length = 0;
                             while (c != -1)
                             {
                                 c = readNextSymbol();
                                 if (c == '"')
+                                {
                                     break;
-                                builder.Append((char)c);
+                                }
+
+                                builder.Append ((char)c);
                             }
-                            item.SetProp(attrName, Converter.FromXml(builder.ToString()));
+
+                            item.SetProp (attrName, Converter.FromXml (builder.ToString()));
                             builder.Length = 0;
                         }
+
                         break;
                 }
             }
@@ -765,31 +850,39 @@ namespace AM.Reporting.Utils
         {
             if (symbolInBuffer != -1)
             {
-                int temp = symbolInBuffer;
+                var temp = symbolInBuffer;
                 symbolInBuffer = -1;
                 return temp;
             }
+
             return reader.Read();
         }
 
-        private bool ReadValue(XmlItem item)
+        private bool ReadValue (XmlItem item)
         {
             FastString builder;
             if (Config.IsStringOptimization)
-                builder = new FastStringWithPool(stringPool);
+            {
+                builder = new FastStringWithPool (stringPool);
+            }
             else
+            {
                 builder = new FastString();
-            ReadState state = ReadState.FindLeft;
-            string lastName = "</" + this.lastName + ">";
-            int lastNameLength = lastName.Length;
+            }
+
+            var state = ReadState.FindLeft;
+            var lastName = "</" + this.lastName + ">";
+            var lastNameLength = lastName.Length;
 
             do
             {
-                int c = reader.Read();
+                var c = reader.Read();
                 if (c == -1)
+                {
                     RaiseException();
+                }
 
-                builder.Append((char)c);
+                builder.Append ((char)c);
                 if (state == ReadState.FindLeft)
                 {
                     if (c == '<')
@@ -798,14 +891,16 @@ namespace AM.Reporting.Utils
                         return false;
                     }
                     else if (c != ' ' && c != '\r' && c != '\n' && c != '\t')
+                    {
                         state = ReadState.FindCloseItem;
+                    }
                 }
                 else if (state == ReadState.FindCloseItem)
                 {
                     if (builder.Length >= lastNameLength)
                     {
-                        bool match = true;
-                        for (int j = 0; j < lastNameLength; j++)
+                        var match = true;
+                        for (var j = 0; j < lastNameLength; j++)
                         {
                             if (builder[builder.Length - lastNameLength + j] != lastName[j])
                             {
@@ -817,42 +912,52 @@ namespace AM.Reporting.Utils
                         if (match)
                         {
                             builder.Length -= lastNameLength;
-                            item.Value = Converter.FromXml(builder.ToString());
+                            item.Value = Converter.FromXml (builder.ToString());
                             return true;
                         }
                     }
                 }
-            }
-            while (true);
+            } while (true);
         }
 
-        private bool DoRead(XmlItem rootItem)
+        private bool DoRead (XmlItem rootItem)
         {
-            ItemState itemState = ReadItem(rootItem);
+            var itemState = ReadItem (rootItem);
             lastName = rootItem.Name;
 
             if (itemState == ItemState.End)
+            {
                 return true;
+            }
             else if (itemState == ItemState.Complete)
+            {
                 return false;
+            }
 
-            if (ReadValue(rootItem))
+            if (ReadValue (rootItem))
+            {
                 return false;
+            }
 
-            bool done = false;
+            var done = false;
             do
             {
-                XmlItem childItem = new XmlItem();
-                done = DoRead(childItem);
+                var childItem = new XmlItem();
+                done = DoRead (childItem);
                 if (!done)
-                    rootItem.AddItem(childItem);
+                {
+                    rootItem.AddItem (childItem);
+                }
                 else
+                {
                     childItem.Dispose();
-            }
-            while (!done);
+                }
+            } while (!done);
 
-            if (lastName != "" && String.Compare(lastName, rootItem.Name, true) != 0)
+            if (lastName != "" && string.Compare (lastName, rootItem.Name, true) != 0)
+            {
                 RaiseException();
+            }
 
             return false;
         }
@@ -864,26 +969,31 @@ namespace AM.Reporting.Utils
 
         private void ReadHeader()
         {
-            using (XmlItem item = new XmlItem())
+            using (var item = new XmlItem())
             {
-                ReadItem(item);
-                if (item.Name.IndexOf("?xml") != 0)
+                ReadItem (item);
+                if (item.Name.IndexOf ("?xml") != 0)
+                {
                     RaiseException();
+                }
             }
         }
 
-        public void Read(XmlItem item)
+        public void Read (XmlItem item)
         {
             ReadHeader();
-            DoRead(item);
+            DoRead (item);
         }
 
-        public XmlReader(Stream stream)
+        public XmlReader (Stream stream)
         {
             this.stream = stream;
-            reader = new StreamReader(this.stream, Encoding.UTF8);
+            reader = new StreamReader (this.stream, Encoding.UTF8);
             if (Config.IsStringOptimization)
+            {
                 stringPool = new Dictionary<string, string>();
+            }
+
             lastName = "";
             symbolInBuffer = -1;
         }
@@ -892,112 +1002,123 @@ namespace AM.Reporting.Utils
 
     internal class XmlWriter
     {
-        private bool autoIndent;
-        private bool isWriteHeader;
         //private Stream FStream;
         private TextWriter writer;
 
-        public bool AutoIndent
-        {
-            get { return autoIndent; }
-            set { autoIndent = value; }
-        }
+        public bool AutoIndent { get; set; }
 
-        public bool IsWriteHeader
-        {
-            get { return isWriteHeader; }
-            set { isWriteHeader = value; }
-        }
+        public bool IsWriteHeader { get; set; }
 
-        private void WriteLn(string s)
+        private void WriteLn (string s)
         {
-            if (!autoIndent)
-                writer.Write(s);
+            if (!AutoIndent)
+            {
+                writer.Write (s);
+            }
             else
-                writer.Write(s + "\r\n");
+            {
+                writer.Write (s + "\r\n");
+            }
         }
 
-        private string Dup(int num)
+        private string Dup (int num)
         {
-            string s = "";
-            return s.PadLeft(num);
+            var s = "";
+            return s.PadLeft (num);
         }
 
-        private void WriteItem(XmlItem item, int level)
+        private void WriteItem (XmlItem item, int level)
         {
-            FastString sb = new FastString();
+            var sb = new FastString();
 
 
             // start
-            if (autoIndent)
-                sb.Append(Dup(level));
-            sb.Append("<");
-            sb.Append(item.Name);
+            if (AutoIndent)
+            {
+                sb.Append (Dup (level));
+            }
+
+            sb.Append ("<");
+            sb.Append (item.Name);
 
             // text
 
-            item.WriteProps(sb);
+            item.WriteProps (sb);
 
             // end
             if (item.Count == 0 && item.Value == "")
-                sb.Append("/>");
+            {
+                sb.Append ("/>");
+            }
             else
-                sb.Append(">");
+            {
+                sb.Append (">");
+            }
 
             // value
             if (item.Count == 0 && item.Value != "")
             {
-                sb.Append(Converter.ToXml(item.Value,false));
-                sb.Append("</");
-                sb.Append(item.Name);
-                sb.Append(">");
+                sb.Append (Converter.ToXml (item.Value, false));
+                sb.Append ("</");
+                sb.Append (item.Name);
+                sb.Append (">");
             }
-            WriteLn(sb.ToString());
+
+            WriteLn (sb.ToString());
         }
 
-        private void DoWrite(XmlItem rootItem, int level)
+        private void DoWrite (XmlItem rootItem, int level)
         {
-            if (!autoIndent)
+            if (!AutoIndent)
+            {
                 level = 0;
+            }
 
-            WriteItem(rootItem, level);
-            for (int i = 0; i < rootItem.Count; i++)
-                DoWrite(rootItem[i], level + 2);
+            WriteItem (rootItem, level);
+            for (var i = 0; i < rootItem.Count; i++)
+                DoWrite (rootItem[i], level + 2);
 
             if (rootItem.Count > 0)
             {
-                if (!autoIndent)
-                    WriteLn("</" + rootItem.Name + ">");
+                if (!AutoIndent)
+                {
+                    WriteLn ("</" + rootItem.Name + ">");
+                }
                 else
-                    WriteLn(Dup(level) + "</" + rootItem.Name + ">");
+                {
+                    WriteLn (Dup (level) + "</" + rootItem.Name + ">");
+                }
             }
         }
 
         private void WriteHeader()
         {
-            WriteLn("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+            WriteLn ("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
         }
 
-        public void Write(XmlItem rootItem)
+        public void Write (XmlItem rootItem)
         {
             if (IsWriteHeader)
+            {
                 WriteHeader();
-            DoWrite(rootItem, 0);
+            }
+
+            DoWrite (rootItem, 0);
             writer.Flush();
         }
 
-        public XmlWriter(Stream stream)
+        public XmlWriter (Stream stream)
         {
             //FStream = stream;
-            writer = new StreamWriter(stream, Encoding.UTF8);
-            isWriteHeader = true;
+            writer = new StreamWriter (stream, Encoding.UTF8);
+            IsWriteHeader = true;
         }
 
-        public XmlWriter(TextWriter textWriter)
+        public XmlWriter (TextWriter textWriter)
         {
             //FStream = null;
             writer = textWriter;
-            isWriteHeader = true;
+            IsWriteHeader = true;
         }
     }
 }

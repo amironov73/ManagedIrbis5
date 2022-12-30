@@ -27,46 +27,44 @@ namespace AM.Reporting.Engine
     {
         #region Fields
 
-        private bool keeping;
         private int keepPosition;
         private XmlItem keepOutline;
         private int keepBookmarks;
         private float keepCurX;
-        private float keepCurY;
         private float keepDeltaY;
 
         #endregion Fields
 
         #region Properties
+
         /// <summary>
         /// Returns true of keeping is enabled
         /// </summary>
-        public bool IsKeeping
-        {
-            get { return keeping; }
-        }
+        public bool IsKeeping { get; private set; }
+
         /// <summary>
         /// Returns keeping position
         /// </summary>
-        public float KeepCurY
-        {
-            get { return keepCurY; }
-        }
+        public float KeepCurY { get; private set; }
+
         #endregion Properties
 
         #region Private Methods
 
-        private void StartKeep(BandBase band)
+        private void StartKeep (BandBase band)
         {
             // do not keep the first row on a page, avoid empty first page
-            if (keeping || (band != null && band.AbsRowNo == 1 && !band.FirstRowStartsNewPage))
+            if (IsKeeping || (band != null && band.AbsRowNo == 1 && !band.FirstRowStartsNewPage))
+            {
                 return;
-            keeping = true;
+            }
+
+            IsKeeping = true;
 
             keepPosition = PreparedPages.CurPosition;
             keepOutline = PreparedPages.Outline.CurPosition;
             keepBookmarks = PreparedPages.Bookmarks.CurPosition;
-            keepCurY = CurY;
+            KeepCurY = CurY;
             Report.Dictionary.Totals.StartKeep();
             StartKeepReprint();
         }
@@ -74,16 +72,16 @@ namespace AM.Reporting.Engine
         private void CutObjects()
         {
             keepCurX = CurX;
-            keepDeltaY = CurY - keepCurY;
-            PreparedPages.CutObjects(keepPosition);
-            CurY = keepCurY;
+            keepDeltaY = CurY - KeepCurY;
+            PreparedPages.CutObjects (keepPosition);
+            CurY = KeepCurY;
         }
 
         private void PasteObjects()
         {
-            PreparedPages.PasteObjects(CurX - keepCurX, CurY - keepCurY);
-            PreparedPages.Outline.Shift(keepOutline, CurY);
-            PreparedPages.Bookmarks.Shift(keepBookmarks, CurY);
+            PreparedPages.PasteObjects (CurX - keepCurX, CurY - KeepCurY);
+            PreparedPages.Outline.Shift (keepOutline, CurY);
+            PreparedPages.Bookmarks.Shift (keepBookmarks, CurY);
             EndKeep();
             CurY += keepDeltaY;
         }
@@ -102,7 +100,7 @@ namespace AM.Reporting.Engine
         /// </remarks>
         public void StartKeep()
         {
-            StartKeep(null);
+            StartKeep (null);
         }
 
         /// <summary>
@@ -115,11 +113,11 @@ namespace AM.Reporting.Engine
         /// </remarks>
         public void EndKeep()
         {
-            if (keeping)
+            if (IsKeeping)
             {
                 Report.Dictionary.Totals.EndKeep();
                 EndKeepReprint();
-                keeping = false;
+                IsKeeping = false;
             }
         }
 

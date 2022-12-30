@@ -24,13 +24,7 @@ namespace AM.Reporting.Utils
         /// <summary>
         /// Gets a value indicating that the ASP.NET hosting permission level is set to full trust.
         /// </summary>
-        public static bool FullTrust
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public static bool FullTrust => true;
 
         /// <summary>
         /// Gets a value that determines whether to disable some functionality to run in web mode.
@@ -39,17 +33,7 @@ namespace AM.Reporting.Utils
         /// Use this property if you use AM.Reporting in ASP.Net. Set this property to <b>true</b> <b>before</b>
         /// you access any AM.Reporting.Net objects.
         /// </remarks>
-        public static bool WebMode
-        {
-            get
-            {
-                return FWebMode;
-            }
-            set
-            {
-                FWebMode = value;
-            }
-        }
+        public static bool WebMode { get; set; }
 
         #endregion Public Properties
 
@@ -77,7 +61,7 @@ namespace AM.Reporting.Utils
 
         private static void RestoreExportOptions()
         {
-            ExportsOptions options = ExportsOptions.GetInstance();
+            var options = ExportsOptions.GetInstance();
             options.RestoreExportOptions();
         }
 

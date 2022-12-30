@@ -55,21 +55,21 @@ namespace AM.Reporting.Gauge.Simple
         /// <summary>
         /// Gets or sets the first subscale (top or left).
         /// </summary>
-        [Browsable(true)]
+        [Browsable (true)]
         public virtual SimpleSubScale FirstSubScale
         {
-            get { return firstSubScale; }
-            set { firstSubScale = value; }
+            get => firstSubScale;
+            set => firstSubScale = value;
         }
 
         /// <summary>
         /// Gets or sets the second subscale (right or bottom).
         /// </summary>
-        [Browsable(true)]
+        [Browsable (true)]
         public virtual SimpleSubScale SecondSubScale
         {
-            get { return secondSubScale; }
-            set { secondSubScale = value; }
+            get => secondSubScale;
+            set => secondSubScale = value;
         }
 
         #endregion // Properties
@@ -80,10 +80,10 @@ namespace AM.Reporting.Gauge.Simple
         /// Initializes a new instance of the <see cref="SimpleScale"/> class.
         /// </summary>
         /// <param name="parent">The parent gauge object.</param>
-        public SimpleScale(GaugeObject parent) : base(parent)
+        public SimpleScale (GaugeObject parent) : base (parent)
         {
-            MajorTicks = new ScaleTicks(10, 2, Color.Black);
-            MinorTicks = new ScaleTicks(6, 1, Color.Black);
+            MajorTicks = new ScaleTicks (10, 2, Color.Black);
+            MinorTicks = new ScaleTicks (6, 1, Color.Black);
             majorTicksNum = 6;
             firstSubScale = new SimpleSubScale();
             secondSubScale = new SimpleSubScale();
@@ -93,175 +93,199 @@ namespace AM.Reporting.Gauge.Simple
 
         #region Private Methods
 
-        private void DrawMajorTicksHorz(FRPaintEventArgs e)
+        private void DrawMajorTicksHorz (FRPaintEventArgs e)
         {
-            IGraphics g = e.Graphics;
-            Pen pen = e.Cache.GetPen(MajorTicks.Color, MajorTicks.Width * e.ScaleX, DashStyle.Solid);
-            Brush brush = TextFill.CreateBrush(new RectangleF(Parent.AbsLeft, Parent.AbsTop, Parent.Width, Parent.Height), e.ScaleX, e.ScaleY);
-            pointerHeightOffset = (Parent.Pointer as SimplePointer).Height / 2 + Parent.Pointer.BorderWidth * 2 * e.ScaleY;
-            float x = left;
-            float y1 = top;
-            float y2 = top + height / 2 - pointerHeightOffset;
-            float y3 = top + height / 2 + pointerHeightOffset;
-            float y4 = top + height;
-            float step = width / (majorTicksNum - 1);
-            int textStep = (int)((Parent.Maximum - Parent.Minimum) / (majorTicksNum - 1));
-            Font font = e.Cache.GetFont(Font.FontFamily, Parent.IsPrinting ? Font.Size : Font.Size * e.ScaleX * 96f / DrawUtils.ScreenDpi, Font.Style);
-            string text = Parent.Minimum.ToString();
+            var g = e.Graphics;
+            var pen = e.Cache.GetPen (MajorTicks.Color, MajorTicks.Width * e.ScaleX, DashStyle.Solid);
+            var brush =
+                TextFill.CreateBrush (new RectangleF (Parent.AbsLeft, Parent.AbsTop, Parent.Width, Parent.Height),
+                    e.ScaleX, e.ScaleY);
+            pointerHeightOffset =
+                (Parent.Pointer as SimplePointer).Height / 2 + Parent.Pointer.BorderWidth * 2 * e.ScaleY;
+            var x = left;
+            var y1 = top;
+            var y2 = top + height / 2 - pointerHeightOffset;
+            var y3 = top + height / 2 + pointerHeightOffset;
+            var y4 = top + height;
+            var step = width / (majorTicksNum - 1);
+            var textStep = (int)((Parent.Maximum - Parent.Minimum) / (majorTicksNum - 1));
+            var font = e.Cache.GetFont (Font.FontFamily,
+                Parent.IsPrinting ? Font.Size : Font.Size * e.ScaleX * 96f / DrawUtils.ScreenDpi, Font.Style);
+            var text = Parent.Minimum.ToString();
             if (firstSubScale.Enabled)
             {
-                for (int i = 0; i < majorTicksNum; i++)
+                for (var i = 0; i < majorTicksNum; i++)
                 {
-                    g.DrawLine(pen, x, y1, x, y2);
+                    g.DrawLine (pen, x, y1, x, y2);
                     if (firstSubScale.ShowCaption)
                     {
-                        SizeF strSize = g.MeasureString(text, Font);
-                        g.DrawString(text, font, brush, x - strSize.Width / 2 * e.ScaleX / (DrawUtils.ScreenDpi / 96f), y1 - 0.4f * Units.Centimeters * e.ScaleY);
-                        text = Convert.ToString(textStep * (i + 1) + Parent.Minimum);
+                        var strSize = g.MeasureString (text, Font);
+                        g.DrawString (text, font, brush, x - strSize.Width / 2 * e.ScaleX / (DrawUtils.ScreenDpi / 96f),
+                            y1 - 0.4f * Units.Centimeters * e.ScaleY);
+                        text = Convert.ToString (textStep * (i + 1) + Parent.Minimum);
                     }
+
                     x += step;
                 }
             }
+
             x = left;
             text = Parent.Minimum.ToString();
             if (secondSubScale.Enabled)
             {
-                for (int i = 0; i < majorTicksNum; i++)
+                for (var i = 0; i < majorTicksNum; i++)
                 {
-                    g.DrawLine(pen, x, y3, x, y4);
+                    g.DrawLine (pen, x, y3, x, y4);
                     if (secondSubScale.ShowCaption)
                     {
-                        SizeF strSize = g.MeasureString(text, Font);
+                        var strSize = g.MeasureString (text, Font);
 
-                        g.DrawString(text, font, brush, x - strSize.Width / 2 * e.ScaleX / (DrawUtils.ScreenDpi / 96f), y4 + 0.08f * Units.Centimeters * e.ScaleY);
-                        text = Convert.ToString(textStep * (i + 1) + Parent.Minimum);
+                        g.DrawString (text, font, brush, x - strSize.Width / 2 * e.ScaleX / (DrawUtils.ScreenDpi / 96f),
+                            y4 + 0.08f * Units.Centimeters * e.ScaleY);
+                        text = Convert.ToString (textStep * (i + 1) + Parent.Minimum);
                     }
+
                     x += step;
                 }
             }
+
             brush.Dispose();
         }
 
-        private void DrawMinorTicksHorz(FRPaintEventArgs e)
+        private void DrawMinorTicksHorz (FRPaintEventArgs e)
         {
-            IGraphics g = e.Graphics;
-            Pen pen = e.Cache.GetPen(MinorTicks.Color, MinorTicks.Width * e.ScaleX, DashStyle.Solid);
-            pointerHeightOffset = (Parent.Pointer as SimplePointer).Height / 2 + Parent.Pointer.BorderWidth * 2 * e.ScaleY;
-            float x = left;
-            float y1 = top + height * 0.15f;
-            float y2 = top + height / 2 - pointerHeightOffset;
-            float y3 = top + height / 2 + pointerHeightOffset;
-            float y4 = top + height - height * 0.15f;
-            float step = width / (majorTicksNum - 1) / 4;
+            var g = e.Graphics;
+            var pen = e.Cache.GetPen (MinorTicks.Color, MinorTicks.Width * e.ScaleX, DashStyle.Solid);
+            pointerHeightOffset =
+                (Parent.Pointer as SimplePointer).Height / 2 + Parent.Pointer.BorderWidth * 2 * e.ScaleY;
+            var x = left;
+            var y1 = top + height * 0.15f;
+            var y2 = top + height / 2 - pointerHeightOffset;
+            var y3 = top + height / 2 + pointerHeightOffset;
+            var y4 = top + height - height * 0.15f;
+            var step = width / (majorTicksNum - 1) / 4;
             if (firstSubScale.Enabled)
             {
-                for (int i = 0; i < majorTicksNum - 1; i++)
+                for (var i = 0; i < majorTicksNum - 1; i++)
                 {
                     x += step;
-                    for (int j = 0; j < 3; j++)
+                    for (var j = 0; j < 3; j++)
                     {
-                        g.DrawLine(pen, x, y1, x, y2);
+                        g.DrawLine (pen, x, y1, x, y2);
                         x += step;
                     }
                 }
             }
+
             x = left;
             if (secondSubScale.Enabled)
             {
-                for (int i = 0; i < majorTicksNum - 1; i++)
+                for (var i = 0; i < majorTicksNum - 1; i++)
                 {
                     x += step;
-                    for (int j = 0; j < 3; j++)
+                    for (var j = 0; j < 3; j++)
                     {
-                        g.DrawLine(pen, x, y3, x, y4);
+                        g.DrawLine (pen, x, y3, x, y4);
                         x += step;
                     }
                 }
             }
         }
 
-        private void DrawMajorTicksVert(FRPaintEventArgs e)
+        private void DrawMajorTicksVert (FRPaintEventArgs e)
         {
-            IGraphics g = e.Graphics;
-            Pen pen = e.Cache.GetPen(MajorTicks.Color, MajorTicks.Width * e.ScaleY, DashStyle.Solid);
-            Brush brush = TextFill.CreateBrush(new RectangleF(Parent.AbsLeft * e.ScaleX, Parent.AbsTop * e.ScaleY,
-    Parent.Width * e.ScaleX, Parent.Height * e.ScaleY), e.ScaleX, e.ScaleY);
-            pointerWidthOffset = (Parent.Pointer as SimplePointer).Width / 2 + Parent.Pointer.BorderWidth * 2 * e.ScaleX;
-            float y = top + height;
-            float x1 = left;
-            float x2 = left + width / 2 - pointerWidthOffset;
-            float x3 = left + width / 2 + pointerWidthOffset;
-            float x4 = left + width;
-            float step = height / (majorTicksNum - 1);
-            int textStep = (int)((Parent.Maximum - Parent.Minimum) / (majorTicksNum - 1));
-            Font font = e.Cache.GetFont(Font.FontFamily, Parent.IsPrinting ? Font.Size : Font.Size * e.ScaleX * 96f / DrawUtils.ScreenDpi, Font.Style);
-            string text = Parent.Minimum.ToString();
+            var g = e.Graphics;
+            var pen = e.Cache.GetPen (MajorTicks.Color, MajorTicks.Width * e.ScaleY, DashStyle.Solid);
+            var brush = TextFill.CreateBrush (new RectangleF (Parent.AbsLeft * e.ScaleX, Parent.AbsTop * e.ScaleY,
+                Parent.Width * e.ScaleX, Parent.Height * e.ScaleY), e.ScaleX, e.ScaleY);
+            pointerWidthOffset =
+                (Parent.Pointer as SimplePointer).Width / 2 + Parent.Pointer.BorderWidth * 2 * e.ScaleX;
+            var y = top + height;
+            var x1 = left;
+            var x2 = left + width / 2 - pointerWidthOffset;
+            var x3 = left + width / 2 + pointerWidthOffset;
+            var x4 = left + width;
+            var step = height / (majorTicksNum - 1);
+            var textStep = (int)((Parent.Maximum - Parent.Minimum) / (majorTicksNum - 1));
+            var font = e.Cache.GetFont (Font.FontFamily,
+                Parent.IsPrinting ? Font.Size : Font.Size * e.ScaleX * 96f / DrawUtils.ScreenDpi, Font.Style);
+            var text = Parent.Minimum.ToString();
             if (firstSubScale.Enabled)
             {
-                for (int i = 0; i < majorTicksNum; i++)
+                for (var i = 0; i < majorTicksNum; i++)
                 {
-                    g.DrawLine(pen, x1, y, x2, y);
+                    g.DrawLine (pen, x1, y, x2, y);
                     if (firstSubScale.ShowCaption)
                     {
-                        SizeF strSize = g.MeasureString(text, Font);
-                        g.DrawString(text, font, brush, x1 - strSize.Width * e.ScaleX / (DrawUtils.ScreenDpi / 96f) - 0.04f * Units.Centimeters * e.ScaleX, y - strSize.Height / 2 * e.ScaleY / (DrawUtils.ScreenDpi / 96f));
-                        text = Convert.ToString(textStep * (i + 1) + Parent.Minimum);
+                        var strSize = g.MeasureString (text, Font);
+                        g.DrawString (text, font, brush,
+                            x1 - strSize.Width * e.ScaleX / (DrawUtils.ScreenDpi / 96f) -
+                            0.04f * Units.Centimeters * e.ScaleX,
+                            y - strSize.Height / 2 * e.ScaleY / (DrawUtils.ScreenDpi / 96f));
+                        text = Convert.ToString (textStep * (i + 1) + Parent.Minimum);
                     }
+
                     y -= step;
                 }
             }
+
             y = top + height;
             text = Parent.Minimum.ToString();
             if (secondSubScale.Enabled)
             {
-                for (int i = 0; i < majorTicksNum; i++)
+                for (var i = 0; i < majorTicksNum; i++)
                 {
-                    g.DrawLine(pen, x3, y, x4, y);
+                    g.DrawLine (pen, x3, y, x4, y);
                     if (secondSubScale.ShowCaption)
                     {
-                        SizeF strSize = g.MeasureString(text, Font);
+                        var strSize = g.MeasureString (text, Font);
 
-                        g.DrawString(text, font, brush, x4 + 0.04f * Units.Centimeters * e.ScaleX, y - strSize.Height / 2 * e.ScaleY / (DrawUtils.ScreenDpi / 96f));
-                        text = Convert.ToString(textStep * (i + 1) + Parent.Minimum);
+                        g.DrawString (text, font, brush, x4 + 0.04f * Units.Centimeters * e.ScaleX,
+                            y - strSize.Height / 2 * e.ScaleY / (DrawUtils.ScreenDpi / 96f));
+                        text = Convert.ToString (textStep * (i + 1) + Parent.Minimum);
                     }
+
                     y -= step;
                 }
             }
+
             brush.Dispose();
         }
 
-        private void DrawMinorTicksVert(FRPaintEventArgs e)
+        private void DrawMinorTicksVert (FRPaintEventArgs e)
         {
-            IGraphics g = e.Graphics;
-            Pen pen = e.Cache.GetPen(MinorTicks.Color, MinorTicks.Width * e.ScaleY, DashStyle.Solid);
-            pointerWidthOffset = (Parent.Pointer as SimplePointer).Width / 2 + Parent.Pointer.BorderWidth * 2 * e.ScaleX;
-            float y = top + height;
-            float x1 = left + width * 0.15f;
-            float x2 = left + width / 2 - pointerWidthOffset;
-            float x3 = left + width / 2 + pointerWidthOffset;
-            float x4 = left + width - width * 0.15f;
-            float step = height / (majorTicksNum - 1) / 4;
+            var g = e.Graphics;
+            var pen = e.Cache.GetPen (MinorTicks.Color, MinorTicks.Width * e.ScaleY, DashStyle.Solid);
+            pointerWidthOffset =
+                (Parent.Pointer as SimplePointer).Width / 2 + Parent.Pointer.BorderWidth * 2 * e.ScaleX;
+            var y = top + height;
+            var x1 = left + width * 0.15f;
+            var x2 = left + width / 2 - pointerWidthOffset;
+            var x3 = left + width / 2 + pointerWidthOffset;
+            var x4 = left + width - width * 0.15f;
+            var step = height / (majorTicksNum - 1) / 4;
             if (firstSubScale.Enabled)
             {
-                for (int i = 0; i < majorTicksNum - 1; i++)
+                for (var i = 0; i < majorTicksNum - 1; i++)
                 {
                     y -= step;
-                    for (int j = 0; j < 3; j++)
+                    for (var j = 0; j < 3; j++)
                     {
-                        g.DrawLine(pen, x1, y, x2, y);
+                        g.DrawLine (pen, x1, y, x2, y);
                         y -= step;
                     }
                 }
             }
+
             y = top + height;
             if (secondSubScale.Enabled)
             {
-                for (int i = 0; i < majorTicksNum - 1; i++)
+                for (var i = 0; i < majorTicksNum - 1; i++)
                 {
                     y -= step;
-                    for (int j = 0; j < 3; j++)
+                    for (var j = 0; j < 3; j++)
                     {
-                        g.DrawLine(pen, x3, y, x4, y);
+                        g.DrawLine (pen, x3, y, x4, y);
                         y -= step;
                     }
                 }
@@ -273,21 +297,21 @@ namespace AM.Reporting.Gauge.Simple
         #region Public Methods
 
         /// <inheritdoc/>
-        public override void Assign(GaugeScale src)
+        public override void Assign (GaugeScale src)
         {
-            base.Assign(src);
+            base.Assign (src);
 
-            SimpleScale s = src as SimpleScale;
-            MajorTicks.Assign(s.MajorTicks);
-            MinorTicks.Assign(s.MinorTicks);
-            FirstSubScale.Assign(s.FirstSubScale);
-            SecondSubScale.Assign(s.SecondSubScale);
+            var s = src as SimpleScale;
+            MajorTicks.Assign (s.MajorTicks);
+            MinorTicks.Assign (s.MinorTicks);
+            FirstSubScale.Assign (s.FirstSubScale);
+            SecondSubScale.Assign (s.SecondSubScale);
         }
 
         /// <inheritdoc/>
-        public override void Draw(AM.Reporting.Utils.FRPaintEventArgs e)
+        public override void Draw (FRPaintEventArgs e)
         {
-            base.Draw(e);
+            base.Draw (e);
 
             if (Parent.Vertical)
             {
@@ -296,8 +320,8 @@ namespace AM.Reporting.Gauge.Simple
                 height = (Parent.Height - 1.0f * Units.Centimeters) * e.ScaleY;
                 width = (Parent.Width - 1.4f * Units.Centimeters) * e.ScaleX;
 
-                DrawMajorTicksVert(e);
-                DrawMinorTicksVert(e);
+                DrawMajorTicksVert (e);
+                DrawMinorTicksVert (e);
             }
             else
             {
@@ -306,21 +330,21 @@ namespace AM.Reporting.Gauge.Simple
                 height = (Parent.Height - 1.2f * Units.Centimeters) * e.ScaleY;
                 width = (Parent.Width - 1.0f * Units.Centimeters) * e.ScaleX;
 
-                DrawMajorTicksHorz(e);
-                DrawMinorTicksHorz(e);
+                DrawMajorTicksHorz (e);
+                DrawMinorTicksHorz (e);
             }
         }
 
         /// <inheritdoc/>
-        public override void Serialize(FRWriter writer, string prefix, GaugeScale diff)
+        public override void Serialize (FRWriter writer, string prefix, GaugeScale diff)
         {
-            base.Serialize(writer, prefix, diff);
+            base.Serialize (writer, prefix, diff);
 
-            SimpleScale dc = diff as SimpleScale;
-            MajorTicks.Serialize(writer, prefix + ".MajorTicks", dc.MajorTicks);
-            MinorTicks.Serialize(writer, prefix + ".MinorTicks", dc.MinorTicks);
-            FirstSubScale.Serialize(writer, prefix + ".FirstSubScale", dc.FirstSubScale);
-            SecondSubScale.Serialize(writer, prefix + ".SecondSubScale", dc.SecondSubScale);
+            var dc = diff as SimpleScale;
+            MajorTicks.Serialize (writer, prefix + ".MajorTicks", dc.MajorTicks);
+            MinorTicks.Serialize (writer, prefix + ".MinorTicks", dc.MinorTicks);
+            FirstSubScale.Serialize (writer, prefix + ".FirstSubScale", dc.FirstSubScale);
+            SecondSubScale.Serialize (writer, prefix + ".SecondSubScale", dc.SecondSubScale);
         }
 
         #endregion // Public Methods
@@ -329,13 +353,10 @@ namespace AM.Reporting.Gauge.Simple
     /// <summary>
     /// Represent the subscale of simple scale.
     /// </summary>
-    [ToolboxItem(false)]
+    [ToolboxItem (false)]
     public class SimpleSubScale : Component
     {
         #region Fields
-
-        private bool enabled;
-        private bool showCaption;
 
         #endregion // Fields
 
@@ -344,22 +365,14 @@ namespace AM.Reporting.Gauge.Simple
         /// <summary>
         /// Gets or sets a value that specifies enabled subscale or not.
         /// </summary>
-        [Browsable(true)]
-        public bool Enabled
-        {
-            get { return enabled; }
-            set { enabled = value; }
-        }
+        [Browsable (true)]
+        public bool Enabled { get; set; }
 
         /// <summary>
         /// Gets or sets a value that specifies show caption or not.
         /// </summary>
-        [Browsable(true)]
-        public bool ShowCaption
-        {
-            get { return showCaption; }
-            set { showCaption = value; }
-        }
+        [Browsable (true)]
+        public bool ShowCaption { get; set; }
 
         #endregion // Properties
 
@@ -370,8 +383,8 @@ namespace AM.Reporting.Gauge.Simple
         /// </summary>
         public SimpleSubScale()
         {
-            enabled = true;
-            showCaption = true;
+            Enabled = true;
+            ShowCaption = true;
         }
 
         #endregion // Constructors
@@ -382,7 +395,7 @@ namespace AM.Reporting.Gauge.Simple
         /// Copies the contents of another SimpleSubScale.
         /// </summary>
         /// <param name="src">The SimpleSubScale instance to copy the contents from.</param>
-        public virtual void Assign(SimpleSubScale src)
+        public virtual void Assign (SimpleSubScale src)
         {
             Enabled = src.Enabled;
             ShowCaption = src.ShowCaption;
@@ -397,15 +410,16 @@ namespace AM.Reporting.Gauge.Simple
         /// <remarks>
         /// This method is for internal use only.
         /// </remarks>
-        public virtual void Serialize(FRWriter writer, string prefix, SimpleSubScale diff)
+        public virtual void Serialize (FRWriter writer, string prefix, SimpleSubScale diff)
         {
             if (Enabled != diff.Enabled)
             {
-                writer.WriteBool(prefix + ".Enabled", Enabled);
+                writer.WriteBool (prefix + ".Enabled", Enabled);
             }
+
             if (ShowCaption != diff.ShowCaption)
             {
-                writer.WriteBool(prefix + ".ShowCaption", ShowCaption);
+                writer.WriteBool (prefix + ".ShowCaption", ShowCaption);
             }
         }
 

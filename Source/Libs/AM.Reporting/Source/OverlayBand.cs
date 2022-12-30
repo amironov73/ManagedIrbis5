@@ -1,43 +1,67 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.Collections;
 using System.ComponentModel;
+
 using AM.Reporting.Utils;
+
+#endregion
+
+#nullable enable
 
 namespace AM.Reporting
 {
-  /// <summary>
-  /// Represents an overlay band.
-  /// </summary>
-  public class OverlayBand : BandBase
-  {
-    #region Properties
     /// <summary>
-    /// This property is not relevant to this class.
+    /// Represents an overlay band.
     /// </summary>
-    [Browsable(false)]
-    public new bool StartNewPage
+    public class OverlayBand : BandBase
     {
-      get { return base.StartNewPage; }
-      set { base.StartNewPage = value; }
-    }
+        #region Properties
 
-    /// <summary>
-    /// This property is not relevant to this class.
-    /// </summary>
-    [Browsable(false)]
-    public new bool PrintOnBottom
-    {
-      get { return base.PrintOnBottom; }
-      set { base.PrintOnBottom = value; }
-    }
-    #endregion
+        /// <summary>
+        /// This property is not relevant to this class.
+        /// </summary>
+        [Browsable (false)]
+        public new bool StartNewPage
+        {
+            get => base.StartNewPage;
+            set => base.StartNewPage = value;
+        }
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="OverlayBand"/> class with default settings.
-    /// </summary>
-    public OverlayBand()
-    {
-      FlagUseStartNewPage = false;
+        /// <summary>
+        /// This property is not relevant to this class.
+        /// </summary>
+        [Browsable (false)]
+        public new bool PrintOnBottom
+        {
+            get => base.PrintOnBottom;
+            set => base.PrintOnBottom = value;
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OverlayBand"/> class with default settings.
+        /// </summary>
+        public OverlayBand()
+        {
+            FlagUseStartNewPage = false;
+        }
     }
-  }
 }

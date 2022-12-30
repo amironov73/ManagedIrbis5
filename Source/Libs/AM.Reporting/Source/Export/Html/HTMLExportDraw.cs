@@ -18,7 +18,9 @@
 using System;
 using System.Drawing;
 using System.IO;
+
 using AM.Reporting.Utils;
+
 using System.Windows.Forms;
 
 #endregion
@@ -29,32 +31,41 @@ namespace AM.Reporting.Export.Html
 {
     public partial class HTMLExport : ExportBase
     {
-        private void HTMLFontStyle(FastString FFontDesc, Font font, float LineHeight)
+        private void HTMLFontStyle (FastString FFontDesc, Font font, float LineHeight)
         {
-            FFontDesc.Append((((font.Style & FontStyle.Bold) > 0) ? "font-weight:bold;" : String.Empty) +
-                (((font.Style & FontStyle.Italic) > 0) ? "font-style:italic;" : "font-style:normal;"));
+            FFontDesc.Append ((((font.Style & FontStyle.Bold) > 0) ? "font-weight:bold;" : string.Empty) +
+                              (((font.Style & FontStyle.Italic) > 0) ? "font-style:italic;" : "font-style:normal;"));
             if ((font.Style & FontStyle.Underline) > 0 && (font.Style & FontStyle.Strikeout) > 0)
-                FFontDesc.Append("text-decoration:underline|line-through;");
+            {
+                FFontDesc.Append ("text-decoration:underline|line-through;");
+            }
             else if ((font.Style & FontStyle.Underline) > 0)
-                FFontDesc.Append("text-decoration:underline;");
+            {
+                FFontDesc.Append ("text-decoration:underline;");
+            }
             else if ((font.Style & FontStyle.Strikeout) > 0)
-                FFontDesc.Append("text-decoration:line-through;");
-            FFontDesc.Append("font-family:").Append(font.Name).Append(";");
-            FFontDesc.Append("font-size:").Append(Px(Math.Round(font.Size * 96 / 72)));
+            {
+                FFontDesc.Append ("text-decoration:line-through;");
+            }
+
+            FFontDesc.Append ("font-family:").Append (font.Name).Append (";");
+            FFontDesc.Append ("font-size:").Append (Px (Math.Round (font.Size * 96 / 72)));
             if (LineHeight > 0)
-                FFontDesc.Append("line-height:").Append(Px(LineHeight)).Append(";");
+            {
+                FFontDesc.Append ("line-height:").Append (Px (LineHeight)).Append (";");
+            }
         }
 
-        private void HTMLPadding(FastString PaddingDesc, Padding padding, float ParagraphOffset)
+        private void HTMLPadding (FastString PaddingDesc, Padding padding, float ParagraphOffset)
         {
-            PaddingDesc.Append("text-indent:").Append(Px(ParagraphOffset));
-            PaddingDesc.Append("padding-left:").Append(Px(padding.Left));
-            PaddingDesc.Append("padding-right:").Append(Px(padding.Right));
-            PaddingDesc.Append("padding-top:").Append(Px(padding.Top));
-            PaddingDesc.Append("padding-bottom:").Append(Px(padding.Bottom));
+            PaddingDesc.Append ("text-indent:").Append (Px (ParagraphOffset));
+            PaddingDesc.Append ("padding-left:").Append (Px (padding.Left));
+            PaddingDesc.Append ("padding-right:").Append (Px (padding.Right));
+            PaddingDesc.Append ("padding-top:").Append (Px (padding.Top));
+            PaddingDesc.Append ("padding-bottom:").Append (Px (padding.Bottom));
         }
 
-        private string HTMLBorderStyle(BorderLine line)
+        private string HTMLBorderStyle (BorderLine line)
         {
             switch (line.Style)
             {
@@ -71,79 +82,109 @@ namespace AM.Reporting.Export.Html
             }
         }
 
-        private float HTMLBorderWidth(BorderLine line)
+        private float HTMLBorderWidth (BorderLine line)
         {
             if (line.Style == LineStyle.Double)
+            {
                 return (line.Width * 3 * Zoom);
+            }
             else
+            {
                 return line.Width * Zoom;
+            }
         }
 
-        private string HTMLBorderWidthPx(BorderLine line)
+        private string HTMLBorderWidthPx (BorderLine line)
         {
             if (line.Style != LineStyle.Double && line.Width == 1 && Zoom == 1)
+            {
                 return "1px;";
+            }
+
             float width;
             if (line.Style == LineStyle.Double)
+            {
                 width = line.Width * 3 * Zoom;
-            else if (layers)
+            }
+            else if (Layers)
+            {
                 width = line.Width * Zoom;
+            }
             else
+            {
                 width = line.Width;
+            }
 
-            return ExportUtils.FloatToString(width) + "px;";
+            return ExportUtils.FloatToString (width) + "px;";
         }
 
-        private void HTMLBorder(FastString BorderDesc, Border border)
+        private void HTMLBorder (FastString BorderDesc, Border border)
         {
-            if (!layers)
-                BorderDesc.Append("border-collapse: separate;");
+            if (!Layers)
+            {
+                BorderDesc.Append ("border-collapse: separate;");
+            }
+
             if (border.Lines > 0)
             {
                 // bottom
                 if ((border.Lines & BorderLines.Bottom) > 0)
-                    BorderDesc.Append("border-bottom-width:").
-                        Append(HTMLBorderWidthPx(border.BottomLine)).
-                        Append("border-bottom-color:").
-                        Append(ExportUtils.HTMLColor(border.BottomLine.Color)).Append(";border-bottom-style:").
-                        Append(HTMLBorderStyle(border.BottomLine)).Append(";");
+                {
+                    BorderDesc.Append ("border-bottom-width:").Append (HTMLBorderWidthPx (border.BottomLine))
+                        .Append ("border-bottom-color:").Append (ExportUtils.HTMLColor (border.BottomLine.Color))
+                        .Append (";border-bottom-style:").Append (HTMLBorderStyle (border.BottomLine)).Append (";");
+                }
                 else
-                    BorderDesc.Append("border-bottom:none;");
+                {
+                    BorderDesc.Append ("border-bottom:none;");
+                }
+
                 // top
                 if ((border.Lines & BorderLines.Top) > 0)
-                    BorderDesc.Append("border-top-width:").
-                        Append(HTMLBorderWidthPx(border.TopLine)).
-                        Append("border-top-color:").
-                        Append(ExportUtils.HTMLColor(border.TopLine.Color)).Append(";border-top-style:").
-                        Append(HTMLBorderStyle(border.TopLine)).Append(";");
+                {
+                    BorderDesc.Append ("border-top-width:").Append (HTMLBorderWidthPx (border.TopLine))
+                        .Append ("border-top-color:").Append (ExportUtils.HTMLColor (border.TopLine.Color))
+                        .Append (";border-top-style:").Append (HTMLBorderStyle (border.TopLine)).Append (";");
+                }
                 else
-                    BorderDesc.Append("border-top:none;");
+                {
+                    BorderDesc.Append ("border-top:none;");
+                }
+
                 // left
                 if ((border.Lines & BorderLines.Left) > 0)
-                    BorderDesc.Append("border-left-width:").
-                        Append(HTMLBorderWidthPx(border.LeftLine)).
-                        Append("border-left-color:").
-                        Append(ExportUtils.HTMLColor(border.LeftLine.Color)).Append(";border-left-style:").
-                        Append(HTMLBorderStyle(border.LeftLine)).Append(";");
+                {
+                    BorderDesc.Append ("border-left-width:").Append (HTMLBorderWidthPx (border.LeftLine))
+                        .Append ("border-left-color:").Append (ExportUtils.HTMLColor (border.LeftLine.Color))
+                        .Append (";border-left-style:").Append (HTMLBorderStyle (border.LeftLine)).Append (";");
+                }
                 else
-                    BorderDesc.Append("border-left:none;");
+                {
+                    BorderDesc.Append ("border-left:none;");
+                }
+
                 // right
                 if ((border.Lines & BorderLines.Right) > 0)
-                    BorderDesc.Append("border-right-width:").
-                        Append(HTMLBorderWidthPx(border.RightLine)).
-                        Append("border-right-color:").
-                        Append(ExportUtils.HTMLColor(border.RightLine.Color)).Append(";border-right-style:").
-                        Append(HTMLBorderStyle(border.RightLine)).Append(";");
+                {
+                    BorderDesc.Append ("border-right-width:").Append (HTMLBorderWidthPx (border.RightLine))
+                        .Append ("border-right-color:").Append (ExportUtils.HTMLColor (border.RightLine.Color))
+                        .Append (";border-right-style:").Append (HTMLBorderStyle (border.RightLine)).Append (";");
+                }
                 else
-                    BorderDesc.Append("border-right:none;");
+                {
+                    BorderDesc.Append ("border-right:none;");
+                }
             }
             else
-                BorderDesc.Append("border:none;");
+            {
+                BorderDesc.Append ("border:none;");
+            }
         }
 
-        private bool HTMLBorderWidthValues(ReportComponentBase obj, out float left, out float top, out float right, out float bottom)
+        private bool HTMLBorderWidthValues (ReportComponentBase obj, out float left, out float top, out float right,
+            out float bottom)
         {
-            Border border = obj.Border;
+            var border = obj.Border;
             left = 0;
             top = 0;
             right = 0;
@@ -152,16 +193,24 @@ namespace AM.Reporting.Export.Html
             if (border.Lines > 0)
             {
                 if ((border.Lines & BorderLines.Left) > 0)
-                    left += HTMLBorderWidth(border.LeftLine);
+                {
+                    left += HTMLBorderWidth (border.LeftLine);
+                }
 
                 if ((border.Lines & BorderLines.Right) > 0)
-                    right += HTMLBorderWidth(border.RightLine);
+                {
+                    right += HTMLBorderWidth (border.RightLine);
+                }
 
                 if ((border.Lines & BorderLines.Top) > 0)
-                    top += HTMLBorderWidth(border.TopLine);
+                {
+                    top += HTMLBorderWidth (border.TopLine);
+                }
 
                 if ((border.Lines & BorderLines.Bottom) > 0)
-                    bottom += HTMLBorderWidth(border.BottomLine);
+                {
+                    bottom += HTMLBorderWidth (border.BottomLine);
+                }
 
                 return true;
             }
@@ -169,33 +218,54 @@ namespace AM.Reporting.Export.Html
             return false;
         }
 
-        private void HTMLAlign(FastString sb, HorzAlign horzAlign, VertAlign vertAlign, bool wordWrap)
+        private void HTMLAlign (FastString sb, HorzAlign horzAlign, VertAlign vertAlign, bool wordWrap)
         {
-            sb.Append("text-align:");
+            sb.Append ("text-align:");
             if (horzAlign == HorzAlign.Left)
-                sb.Append("Left");
+            {
+                sb.Append ("Left");
+            }
             else if (horzAlign == HorzAlign.Right)
-                sb.Append("Right");
+            {
+                sb.Append ("Right");
+            }
             else if (horzAlign == HorzAlign.Center)
-                sb.Append("Center");
+            {
+                sb.Append ("Center");
+            }
             else if (horzAlign == HorzAlign.Justify)
-                sb.Append("Justify");
-            sb.Append(";vertical-align:");
+            {
+                sb.Append ("Justify");
+            }
+
+            sb.Append (";vertical-align:");
             if (vertAlign == VertAlign.Top)
-                sb.Append("Top");
+            {
+                sb.Append ("Top");
+            }
             else if (vertAlign == VertAlign.Bottom)
-                sb.Append("Bottom");
+            {
+                sb.Append ("Bottom");
+            }
             else if (vertAlign == VertAlign.Center)
-                sb.Append("Middle");
+            {
+                sb.Append ("Middle");
+            }
+
             if (wordWrap)
-                sb.Append(";word-wrap:break-word");
-            sb.Append(";overflow:hidden;");
+            {
+                sb.Append (";word-wrap:break-word");
+            }
+
+            sb.Append (";overflow:hidden;");
         }
 
-        private void HTMLRtl(FastString sb, bool rtl)
+        private void HTMLRtl (FastString sb, bool rtl)
         {
             if (rtl)
-                sb.Append("direction:rtl;");
+            {
+                sb.Append ("direction:rtl;");
+            }
         }
 
         private string HTMLGetStylesHeader()
@@ -203,47 +273,45 @@ namespace AM.Reporting.Export.Html
             return "<style type=\"text/css\"><!-- ";
         }
 
-        private void PrintPageStyle(FastString sb)
+        private void PrintPageStyle (FastString sb)
         {
-            if (singlePage && pageBreaks)
+            if (SinglePage && PageBreaks)
             {
-                sb.AppendLine("<style type=\"text/css\" media=\"print\"><!--");
-                sb.Append("div.").Append(pageStyleName)
-                    .Append(" { page-break-after: always; page-break-inside: avoid; ");
+                sb.AppendLine ("<style type=\"text/css\" media=\"print\"><!--");
+                sb.Append ("div.").Append (pageStyleName)
+                    .Append (" { page-break-after: always; page-break-inside: avoid; ");
                 if (d.page.Landscape && !NotRotateLandscapePage)
                 {
-                    sb.Append("width:").Append(Px(maxHeight * Zoom).Replace(";", " !important;"))
-                          .Append("transform: rotate(90deg); -webkit-transform: rotate(90deg)");
+                    sb.Append ("width:").Append (Px (maxHeight * Zoom).Replace (";", " !important;"))
+                        .Append ("transform: rotate(90deg); -webkit-transform: rotate(90deg)");
                 }
 
-                sb.AppendLine("}")
-                      .AppendLine("--></style>");
+                sb.AppendLine ("}")
+                    .AppendLine ("--></style>");
             }
         }
 
-        private string HTMLGetStyleHeader(long index, long subindex)
+        private string HTMLGetStyleHeader (long index, long subindex)
         {
-            FastString header = new FastString();
-            return header.Append(".").
-                Append(stylePrefix).
-                Append("s").
-                Append(index.ToString()).
-                Append((singlePage || layers)? String.Empty : String.Concat("-", subindex.ToString())).
-                Append(" { ").ToString();
+            var header = new FastString();
+            return header.Append (".").Append (StylePrefix).Append ("s").Append (index.ToString())
+                .Append ((SinglePage || Layers) ? string.Empty : string.Concat ("-", subindex.ToString()))
+                .Append (" { ").ToString();
         }
 
-        private void HTMLGetStyle(FastString style, Font Font, Color TextColor, Color FillColor, HorzAlign HAlign, VertAlign VAlign,
+        private void HTMLGetStyle (FastString style, Font Font, Color TextColor, Color FillColor, HorzAlign HAlign,
+            VertAlign VAlign,
             Border Border, Padding Padding, bool RTL, bool wordWrap, float LineHeight, float ParagraphOffset)
         {
-            HTMLFontStyle(style, Font, LineHeight);
-            style.Append("color:").Append(ExportUtils.HTMLColor(TextColor)).Append(";");
-            style.Append("background-color:");
-            style.Append(FillColor.A == 0 ? "transparent" : ExportUtils.HTMLColor(FillColor)).Append(";");
-            HTMLAlign(style, HAlign, VAlign, wordWrap);
-            HTMLBorder(style, Border);
-            HTMLPadding(style, Padding, ParagraphOffset);
-            HTMLRtl(style, RTL);
-            style.AppendLine("}");
+            HTMLFontStyle (style, Font, LineHeight);
+            style.Append ("color:").Append (ExportUtils.HTMLColor (TextColor)).Append (";");
+            style.Append ("background-color:");
+            style.Append (FillColor.A == 0 ? "transparent" : ExportUtils.HTMLColor (FillColor)).Append (";");
+            HTMLAlign (style, HAlign, VAlign, wordWrap);
+            HTMLBorder (style, Border);
+            HTMLPadding (style, Padding, ParagraphOffset);
+            HTMLRtl (style, RTL);
+            style.AppendLine ("}");
         }
 
         private string HTMLGetStylesFooter()
@@ -251,142 +319,167 @@ namespace AM.Reporting.Export.Html
             return "--></style>";
         }
 
-        private string HTMLGetAncor(string ancorName)
+        private string HTMLGetAncor (string ancorName)
         {
-            FastString ancor = new FastString();
-            return ancor.Append("<a name=\"PageN").Append(ancorName).Append("\" style=\"padding:0;margin:0;font-size:1px;\"></a>").ToString();
+            var ancor = new FastString();
+            return ancor.Append ("<a name=\"PageN").Append (ancorName)
+                .Append ("\" style=\"padding:0;margin:0;font-size:1px;\"></a>").ToString();
         }
 
-        private string HTMLGetImageTag(string file)
+        private string HTMLGetImageTag (string file)
         {
             return "<img src=\"" + file + "\" alt=\"\"/>";
         }
 
-        private string HTMLGetImage(int PageNumber, int CurrentPage, int ImageNumber, string hash, bool Base,
+        private string HTMLGetImage (int PageNumber, int CurrentPage, int ImageNumber, string hash, bool Base,
             System.Drawing.Image Metafile, MemoryStream PictureStream, bool isSvg)
         {
-            if (pictures)
+            if (Pictures)
             {
-                System.Drawing.Imaging.ImageFormat format = System.Drawing.Imaging.ImageFormat.Bmp;
-                if (imageFormat == ImageFormat.Png)
+                var format = System.Drawing.Imaging.ImageFormat.Bmp;
+                if (ImageFormat == ImageFormat.Png)
+                {
                     format = System.Drawing.Imaging.ImageFormat.Png;
-                else if (imageFormat == ImageFormat.Jpeg)
+                }
+                else if (ImageFormat == ImageFormat.Jpeg)
+                {
                     format = System.Drawing.Imaging.ImageFormat.Jpeg;
-                else if (imageFormat == ImageFormat.Gif)
+                }
+                else if (ImageFormat == ImageFormat.Gif)
+                {
                     format = System.Drawing.Imaging.ImageFormat.Gif;
-                string formatNm = isSvg ? "svg" : format.ToString().ToLower();
+                }
 
-                string embedImgType = isSvg ? "svg+xml" : format.ToString();
-                string embedPreffix = "data:image/" + embedImgType + ";base64,";
+                var formatNm = isSvg ? "svg" : format.ToString().ToLower();
 
-                FastString ImageFileNameBuilder = new FastString(48);
+                var embedImgType = isSvg ? "svg+xml" : format.ToString();
+                var embedPreffix = "data:image/" + embedImgType + ";base64,";
+
+                var ImageFileNameBuilder = new FastString (48);
                 string ImageFileName;
-                if (!saveStreams)
-                    ImageFileNameBuilder.Append(Path.GetFileName(targetFileName)).Append(".");
-                ImageFileNameBuilder.Append(hash).
-                    Append(".").Append(formatNm);
+                if (!SaveStreams)
+                {
+                    ImageFileNameBuilder.Append (Path.GetFileName (targetFileName)).Append (".");
+                }
+
+                ImageFileNameBuilder.Append (hash).Append (".").Append (formatNm);
 
                 ImageFileName = ImageFileNameBuilder.ToString();
 
-                if (!webMode && !(preview || print))
+                if (!WebMode && !(Preview || Print))
                 {
                     if (Base)
                     {
                         if (Metafile != null && !EmbedPictures)
                         {
-                            if (saveStreams)
+                            if (SaveStreams)
                             {
-                                MemoryStream ImageFileStream = new MemoryStream();
-                                Metafile.Save(ImageFileStream, format);
-                                GeneratedUpdate(targetPath + ImageFileName, ImageFileStream);
+                                var ImageFileStream = new MemoryStream();
+                                Metafile.Save (ImageFileStream, format);
+                                GeneratedUpdate (targetPath + ImageFileName, ImageFileStream);
                             }
                             else
                             {
-                                using (FileStream ImageFileStream =
-                                    new FileStream(targetPath + ImageFileName, FileMode.Create))
-                                    Metafile.Save(ImageFileStream, format);
+                                using (var ImageFileStream =
+                                       new FileStream (targetPath + ImageFileName, FileMode.Create))
+                                    Metafile.Save (ImageFileStream, format);
                             }
                         }
                         else if (PictureStream != null && !EmbedPictures)
                         {
-                            if (this.format == HTMLExportFormat.HTML)
+                            if (this.Format == HTMLExportFormat.HTML)
                             {
-                                string fileName = targetPath + ImageFileName;
-                                FileInfo info = new FileInfo(fileName);
+                                var fileName = targetPath + ImageFileName;
+                                var info = new FileInfo (fileName);
                                 if (!(info.Exists && info.Length == PictureStream.Length))
                                 {
-                                    if (saveStreams)
+                                    if (SaveStreams)
                                     {
-                                        GeneratedUpdate(targetPath + ImageFileName, PictureStream);
+                                        GeneratedUpdate (targetPath + ImageFileName, PictureStream);
                                     }
                                     else
                                     {
-                                        using (FileStream ImageFileStream =
-                                        new FileStream(fileName, FileMode.Create))
-                                            PictureStream.WriteTo(ImageFileStream);
+                                        using (var ImageFileStream =
+                                               new FileStream (fileName, FileMode.Create))
+                                            PictureStream.WriteTo (ImageFileStream);
                                     }
                                 }
                             }
                             else
                             {
-                                PicsArchiveItem item = new PicsArchiveItem(ImageFileName, PictureStream);
-                                bool founded = false;
-                                for (int i = 0; i < picsArchive.Count; i++)
+                                var item = new PicsArchiveItem (ImageFileName, PictureStream);
+                                var founded = false;
+                                for (var i = 0; i < picsArchive.Count; i++)
                                     if (item.FileName == picsArchive[i].FileName)
                                     {
                                         founded = true;
                                         break;
                                     }
+
                                 if (!founded)
-                                    picsArchive.Add(item);
+                                {
+                                    picsArchive.Add (item);
+                                }
                             }
                         }
-                        if (!saveStreams)
-                            GeneratedFiles.Add(targetPath + ImageFileName);
+
+                        if (!SaveStreams)
+                        {
+                            GeneratedFiles.Add (targetPath + ImageFileName);
+                        }
                     }
+
                     if (EmbedPictures && PictureStream != null)
                     {
-                        return embedPreffix + GetBase64Image(PictureStream, hash);
+                        return embedPreffix + GetBase64Image (PictureStream, hash);
                     }
-                    else if (subFolder && singlePage && !navigator)
-                        return ExportUtils.HtmlURL(subFolderPath + ImageFileName);
+                    else if (SubFolder && SinglePage && !Navigator)
+                    {
+                        return ExportUtils.HtmlURL (subFolderPath + ImageFileName);
+                    }
                     else
-                        return ExportUtils.HtmlURL(ImageFileName);
+                    {
+                        return ExportUtils.HtmlURL (ImageFileName);
+                    }
                 }
                 else
                 {
                     if (EmbedPictures)
                     {
-                        return embedPreffix + GetBase64Image(PictureStream, hash);
+                        return embedPreffix + GetBase64Image (PictureStream, hash);
                     }
                     else
                     {
-                        if (print || preview)
+                        if (Print || Preview)
                         {
-                            printPageData.Pictures.Add(PictureStream);
-                            printPageData.Guids.Add(hash);
+                            PrintPageData.Pictures.Add (PictureStream);
+                            PrintPageData.Guids.Add (hash);
                         }
                         else if (Base)
                         {
-                            pages[CurrentPage].Pictures.Add(PictureStream);
-                            pages[CurrentPage].Guids.Add(hash);
+                            PreparedPages[CurrentPage].Pictures.Add (PictureStream);
+                            PreparedPages[CurrentPage].Guids.Add (hash);
                         }
-                        return webImagePrefix + "=" + hash + webImageSuffix;
+
+                        return WebImagePrefix + "=" + hash + WebImageSuffix;
                     }
                 }
             }
             else
-                return String.Empty;
+            {
+                return string.Empty;
+            }
         }
 
-        private string GetBase64Image(MemoryStream PictureStream, string hash)
+        private string GetBase64Image (MemoryStream PictureStream, string hash)
         {
-            string base64Image = String.Empty;
-            if (!EmbeddedImages.TryGetValue(hash, out base64Image))
+            var base64Image = string.Empty;
+            if (!EmbeddedImages.TryGetValue (hash, out base64Image))
             {
-                base64Image = Convert.ToBase64String(PictureStream.ToArray());
-                EmbeddedImages.Add(hash, base64Image);
+                base64Image = Convert.ToBase64String (PictureStream.ToArray());
+                EmbeddedImages.Add (hash, base64Image);
             }
+
             return base64Image;
         }
     }

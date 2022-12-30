@@ -93,16 +93,15 @@ namespace AM.Reporting.Gauge.Radial
     public partial class RadialGauge : GaugeObject
     {
         private const double RAD = Math.PI / 180.0;
-        private PointF center;
         private RadialGaugeType type;
         private RadialGaugePosition position;
-        private float semicircleOffsetRatio;
 
         #region Properties
+
         /// <inheritdoc/>
         public override float Width
         {
-            get { return base.Width; }
+            get => base.Width;
             set
             {
                 base.Width = value;
@@ -116,7 +115,7 @@ namespace AM.Reporting.Gauge.Radial
         /// <inheritdoc/>
         public override float Height
         {
-            get { return base.Height; }
+            get => base.Height;
             set
             {
                 base.Height = value;
@@ -130,29 +129,22 @@ namespace AM.Reporting.Gauge.Radial
         /// <summary>
         /// Returns centr of the gauge
         /// </summary>
-        [Browsable(false)]
-        public PointF Center
-        {
-            get { return center; }
-            set { center = value; }
-        }
+        [Browsable (false)]
+        public PointF Center { get; set; }
 
         /// <summary>
         /// The number of radians in one degree
         /// </summary>
-        public static double Radians
-        {
-            get { return RAD; }
-        }
+        public static double Radians => RAD;
 
         /// <summary>
         /// Gets or sets the Radial Gauge type
         /// </summary>
-        [Browsable(true)]
-        [Category("Appearance")]
+        [Browsable (true)]
+        [Category ("Appearance")]
         public RadialGaugeType Type
         {
-            get { return type; }
+            get => type;
             set
             {
                 if (value == RadialGaugeType.Circle)
@@ -160,83 +152,85 @@ namespace AM.Reporting.Gauge.Radial
                     position = RadialGaugePosition.None;
                     type = value;
                 }
+
                 if (value == RadialGaugeType.Semicircle &&
                     !(Position == RadialGaugePosition.Bottom ||
-                    Position == RadialGaugePosition.Left ||
-                    Position == RadialGaugePosition.Right ||
-                    Position == RadialGaugePosition.Top))
+                      Position == RadialGaugePosition.Left ||
+                      Position == RadialGaugePosition.Right ||
+                      Position == RadialGaugePosition.Top))
                 {
                     position = RadialGaugePosition.Top;
                     type = value;
                 }
                 else if (value == RadialGaugeType.Quadrant &&
-                    !(
-                    ((Position & RadialGaugePosition.Left) != 0 && (Position & RadialGaugePosition.Top) != 0 &&
-                    (Position & RadialGaugePosition.Right) == 0 && (Position & RadialGaugePosition.Bottom) == 0) ||
-
-                    ((Position & RadialGaugePosition.Right) != 0 && (Position & RadialGaugePosition.Top) != 0 &&
-                    (Position & RadialGaugePosition.Left) == 0 && (Position & RadialGaugePosition.Bottom) == 0) ||
-
-                    ((Position & RadialGaugePosition.Left) != 0 && (Position & RadialGaugePosition.Bottom) != 0 &&
-                    (Position & RadialGaugePosition.Right) == 0 && (Position & RadialGaugePosition.Top) == 0) ||
-
-                    ((Position & RadialGaugePosition.Right) != 0 && (Position & RadialGaugePosition.Bottom) != 0 &&
-                    (Position & RadialGaugePosition.Left) == 0 && (Position & RadialGaugePosition.Top) == 0)
-                    ))
+                         !(
+                             ((Position & RadialGaugePosition.Left) != 0 && (Position & RadialGaugePosition.Top) != 0 &&
+                              (Position & RadialGaugePosition.Right) == 0 &&
+                              (Position & RadialGaugePosition.Bottom) == 0) ||
+                             ((Position & RadialGaugePosition.Right) != 0 &&
+                              (Position & RadialGaugePosition.Top) != 0 &&
+                              (Position & RadialGaugePosition.Left) == 0 &&
+                              (Position & RadialGaugePosition.Bottom) == 0) ||
+                             ((Position & RadialGaugePosition.Left) != 0 &&
+                              (Position & RadialGaugePosition.Bottom) != 0 &&
+                              (Position & RadialGaugePosition.Right) == 0 &&
+                              (Position & RadialGaugePosition.Top) == 0) ||
+                             ((Position & RadialGaugePosition.Right) != 0 &&
+                              (Position & RadialGaugePosition.Bottom) != 0 &&
+                              (Position & RadialGaugePosition.Left) == 0 && (Position & RadialGaugePosition.Top) == 0)
+                         ))
                 {
                     position = RadialGaugePosition.Top | RadialGaugePosition.Left;
                     type = value;
                 }
-
             }
         }
 
         /// <summary>
         /// Gats or sets the Radial Gauge position. Doesn't work for Full Radial Gauge.
         /// </summary>
-        [Category("Appearance")]
-        [Editor("AM.Reporting.TypeEditors.FlagsEditor, AM.Reporting", typeof(UITypeEditor))]
+        [Category ("Appearance")]
+        [Editor ("AM.Reporting.TypeEditors.FlagsEditor, AM.Reporting", typeof (UITypeEditor))]
         public RadialGaugePosition Position
         {
-            get { return position; }
+            get => position;
             set
             {
-                if(Type == RadialGaugeType.Semicircle &&
+                if (Type == RadialGaugeType.Semicircle &&
                     (value == RadialGaugePosition.Bottom ||
-                    value == RadialGaugePosition.Left ||
-                    value == RadialGaugePosition.Right ||
-                    value == RadialGaugePosition.Top))
-                position = value;
-                else if (Type == RadialGaugeType.Quadrant &&
-                    (
-                    ((value & RadialGaugePosition.Left) != 0 && (value & RadialGaugePosition.Top) != 0 &&
-                    (value & RadialGaugePosition.Right) == 0 && (value & RadialGaugePosition.Bottom) == 0) ||
-
-                    ((value & RadialGaugePosition.Right) != 0 && (value & RadialGaugePosition.Top) != 0 &&
-                    (value & RadialGaugePosition.Left) == 0 && (value & RadialGaugePosition.Bottom) == 0) ||
-
-                    ((value & RadialGaugePosition.Left) != 0 && (value & RadialGaugePosition.Bottom) != 0 &&
-                    (value & RadialGaugePosition.Right) == 0 && (value & RadialGaugePosition.Top) == 0) ||
-
-                    ((value & RadialGaugePosition.Right) != 0 && (value & RadialGaugePosition.Bottom) != 0 &&
-                    (value & RadialGaugePosition.Left) == 0 && (value & RadialGaugePosition.Top) == 0)
-                    ))
+                     value == RadialGaugePosition.Left ||
+                     value == RadialGaugePosition.Right ||
+                     value == RadialGaugePosition.Top))
+                {
                     position = value;
+                }
+                else if (Type == RadialGaugeType.Quadrant &&
+                         (
+                             ((value & RadialGaugePosition.Left) != 0 && (value & RadialGaugePosition.Top) != 0 &&
+                              (value & RadialGaugePosition.Right) == 0 && (value & RadialGaugePosition.Bottom) == 0) ||
+                             ((value & RadialGaugePosition.Right) != 0 && (value & RadialGaugePosition.Top) != 0 &&
+                              (value & RadialGaugePosition.Left) == 0 && (value & RadialGaugePosition.Bottom) == 0) ||
+                             ((value & RadialGaugePosition.Left) != 0 && (value & RadialGaugePosition.Bottom) != 0 &&
+                              (value & RadialGaugePosition.Right) == 0 && (value & RadialGaugePosition.Top) == 0) ||
+                             ((value & RadialGaugePosition.Right) != 0 && (value & RadialGaugePosition.Bottom) != 0 &&
+                              (value & RadialGaugePosition.Left) == 0 && (value & RadialGaugePosition.Top) == 0)
+                         ))
+                {
+                    position = value;
+                }
                 else if (Type == RadialGaugeType.Circle)
-                    position  = 0;
-
+                {
+                    position = 0;
+                }
             }
         }
 
         /// <summary>
         /// Gets or sets the semicircles offset
         /// </summary>
-        [Category("Appearance")]
-        public float SemicircleOffsetRatio
-        {
-            get { return semicircleOffsetRatio; }
-            set { semicircleOffsetRatio = value; }
-        }
+        [Category ("Appearance")]
+        public float SemicircleOffsetRatio { get; set; }
+
         #endregion // Properties
 
         #region Constructors
@@ -247,13 +241,15 @@ namespace AM.Reporting.Gauge.Radial
         public RadialGauge() : base()
         {
             InitializeComponent();
-            Scale = new RadialScale(this);
-            Pointer = new RadialPointer(this, Scale as RadialScale);
-            Label = new RadialLabel(this);
+            Scale = new RadialScale (this);
+            Pointer = new RadialPointer (this, Scale as RadialScale);
+            Label = new RadialLabel (this);
             Height = 4.0f * Units.Centimeters;
             Width = 4.0f * Units.Centimeters;
-            semicircleOffsetRatio = type == RadialGaugeType.Semicircle &&
-                (position == RadialGaugePosition.Left || position == RadialGaugePosition.Right) ? 1.5f :  1;
+            SemicircleOffsetRatio = type == RadialGaugeType.Semicircle &&
+                                    (position == RadialGaugePosition.Left || position == RadialGaugePosition.Right)
+                ? 1.5f
+                : 1;
             Type = RadialGaugeType.Circle;
             Border.Lines = BorderLines.None;
         }
@@ -263,179 +259,192 @@ namespace AM.Reporting.Gauge.Radial
         #region Public Methods
 
         /// <inheritdoc/>
-        public override void Assign(Base source)
+        public override void Assign (Base source)
         {
-            base.Assign(source);
-            RadialGauge src = source as RadialGauge;
+            base.Assign (source);
+            var src = source as RadialGauge;
             Type = src.Type;
             Position = src.Position;
         }
 
         /// <inheritdoc/>
-        public override void Draw(FRPaintEventArgs e)
+        public override void Draw (FRPaintEventArgs e)
         {
-            IGraphics g = e.Graphics;
+            var g = e.Graphics;
 
-            float x = (AbsLeft + Border.Width / 2) * e.ScaleX;
-            float y = (AbsTop + Border.Width / 2) * e.ScaleY;
-            float dx = (Width - Border.Width) * e.ScaleX - 1;
-            float dy = (Height - Border.Width) * e.ScaleY - 1;
-            float x1 = x + dx;
-            float y1 = y + dy;
+            var x = (AbsLeft + Border.Width / 2) * e.ScaleX;
+            var y = (AbsTop + Border.Width / 2) * e.ScaleY;
+            var dx = (Width - Border.Width) * e.ScaleX - 1;
+            var dy = (Height - Border.Width) * e.ScaleY - 1;
+            var x1 = x + dx;
+            var y1 = y + dy;
 
-            Pen pen = e.Cache.GetPen(Border.Color, Border.Width * e.ScaleX, Border.DashStyle);
+            var pen = e.Cache.GetPen (Border.Color, Border.Width * e.ScaleX, Border.DashStyle);
             Brush brush;
             if (Fill is SolidFill)
-                brush = e.Cache.GetBrush((Fill as SolidFill).Color);
+            {
+                brush = e.Cache.GetBrush ((Fill as SolidFill).Color);
+            }
             else
-                brush = Fill.CreateBrush(new RectangleF(x, y, dx, dy), e.ScaleX, e.ScaleY);
+            {
+                brush = Fill.CreateBrush (new RectangleF (x, y, dx, dy), e.ScaleX, e.ScaleY);
+            }
 
-            center = new PointF(x + dx / 2, y + dy / 2);
+            Center = new PointF (x + dx / 2, y + dy / 2);
 
             if (type == RadialGaugeType.Circle)
             {
-                g.FillAndDrawEllipse(pen, brush, x, y, dx, dy);
+                g.FillAndDrawEllipse (pen, brush, x, y, dx, dy);
             }
             else if (type == RadialGaugeType.Semicircle)
             {
-                float semiOffset = (Width / 16f /2f + 2f) * semicircleOffsetRatio * e.ScaleY;
-                PointF[] points = new PointF[4];
+                var semiOffset = (Width / 16f / 2f + 2f) * SemicircleOffsetRatio * e.ScaleY;
+                var points = new PointF[4];
                 if (position == RadialGaugePosition.Top)
                 {
-                    g.FillPie(brush, x, y, dx, dy, -180, 180);
-                    g.DrawArc(pen, x, y, dx, dy, -180, 180);
+                    g.FillPie (brush, x, y, dx, dy, -180, 180);
+                    g.DrawArc (pen, x, y, dx, dy, -180, 180);
 
-                    PointF startPoint = RadialUtils.RotateVector(new PointF[] { new PointF(x + dx / 2, y), center }, -90 * RAD, center)[0];
+                    var startPoint = RadialUtils.RotateVector (new PointF[] { new PointF (x + dx / 2, y), Center },
+                        -90 * RAD, Center)[0];
 
-                    points[0] = new PointF(startPoint.X, startPoint.Y - 1 * e.ScaleY);
-                    points[1] = new PointF(startPoint.X, startPoint.Y + semiOffset);
-                    points[2] = new PointF(startPoint.X + dx, startPoint.Y + semiOffset);
-                    points[3] = new PointF(startPoint.X + dx, startPoint.Y - 1 * e.ScaleY);
+                    points[0] = new PointF (startPoint.X, startPoint.Y - 1 * e.ScaleY);
+                    points[1] = new PointF (startPoint.X, startPoint.Y + semiOffset);
+                    points[2] = new PointF (startPoint.X + dx, startPoint.Y + semiOffset);
+                    points[3] = new PointF (startPoint.X + dx, startPoint.Y - 1 * e.ScaleY);
                 }
-                else if(position == RadialGaugePosition.Bottom)
+                else if (position == RadialGaugePosition.Bottom)
                 {
-                    g.FillPie(brush, x, y, dx, dy, 0, 180);
-                    g.DrawArc(pen, x, y, dx, dy, 0, 180);
+                    g.FillPie (brush, x, y, dx, dy, 0, 180);
+                    g.DrawArc (pen, x, y, dx, dy, 0, 180);
 
-                    PointF startPoint = RadialUtils.RotateVector(new PointF[] { new PointF(x + dx / 2, y), center }, 90 * RAD, center)[0];
+                    var startPoint = RadialUtils.RotateVector (new PointF[] { new PointF (x + dx / 2, y), Center },
+                        90 * RAD, Center)[0];
 
-                    points[0] = new PointF(startPoint.X, startPoint.Y + 1 * e.ScaleY);
-                    points[1] = new PointF(startPoint.X, startPoint.Y - semiOffset);
-                    points[2] = new PointF(startPoint.X - dx, startPoint.Y - semiOffset);
-                    points[3] = new PointF(startPoint.X - dx, startPoint.Y + 1 * e.ScaleY);
+                    points[0] = new PointF (startPoint.X, startPoint.Y + 1 * e.ScaleY);
+                    points[1] = new PointF (startPoint.X, startPoint.Y - semiOffset);
+                    points[2] = new PointF (startPoint.X - dx, startPoint.Y - semiOffset);
+                    points[3] = new PointF (startPoint.X - dx, startPoint.Y + 1 * e.ScaleY);
                 }
                 else if (position == RadialGaugePosition.Left)
                 {
-                    g.FillPie(brush, x, y, dx, dy, 90, 180);
-                    g.DrawArc(pen, x, y, dx, dy, 90, 180);
+                    g.FillPie (brush, x, y, dx, dy, 90, 180);
+                    g.DrawArc (pen, x, y, dx, dy, 90, 180);
 
-                    PointF startPoint = RadialUtils.RotateVector(new PointF[] { new PointF(x + dx / 2, y), center }, 180 * RAD, center)[0];
+                    var startPoint = RadialUtils.RotateVector (new PointF[] { new PointF (x + dx / 2, y), Center },
+                        180 * RAD, Center)[0];
 
-                    points[0] = new PointF(startPoint.X - 1 * e.ScaleX, startPoint.Y);
-                    points[1] = new PointF(startPoint.X + semiOffset, startPoint.Y);
-                    points[2] = new PointF(startPoint.X + semiOffset, startPoint.Y - dy);
-                    points[3] = new PointF(startPoint.X - 1 * e.ScaleX, startPoint.Y - dy);
+                    points[0] = new PointF (startPoint.X - 1 * e.ScaleX, startPoint.Y);
+                    points[1] = new PointF (startPoint.X + semiOffset, startPoint.Y);
+                    points[2] = new PointF (startPoint.X + semiOffset, startPoint.Y - dy);
+                    points[3] = new PointF (startPoint.X - 1 * e.ScaleX, startPoint.Y - dy);
                 }
                 else if (position == RadialGaugePosition.Right)
                 {
-                    g.FillPie(brush, x, y, dx, dy, -90, 180);
-                    g.DrawArc(pen, x, y, dx, dy, -90, 180);
+                    g.FillPie (brush, x, y, dx, dy, -90, 180);
+                    g.DrawArc (pen, x, y, dx, dy, -90, 180);
 
-                    PointF startPoint = RadialUtils.RotateVector(new PointF[] { new PointF(x + dx / 2, y), center }, -180 * RAD, center)[0];
+                    var startPoint = RadialUtils.RotateVector (new PointF[] { new PointF (x + dx / 2, y), Center },
+                        -180 * RAD, Center)[0];
 
-                    points[0] = new PointF(startPoint.X + 1 * e.ScaleX, startPoint.Y);
-                    points[1] = new PointF(startPoint.X - semiOffset, startPoint.Y);
-                    points[2] = new PointF(startPoint.X - semiOffset, startPoint.Y - dy);
-                    points[3] = new PointF(startPoint.X + 1 * e.ScaleX, startPoint.Y - dy);
+                    points[0] = new PointF (startPoint.X + 1 * e.ScaleX, startPoint.Y);
+                    points[1] = new PointF (startPoint.X - semiOffset, startPoint.Y);
+                    points[2] = new PointF (startPoint.X - semiOffset, startPoint.Y - dy);
+                    points[3] = new PointF (startPoint.X + 1 * e.ScaleX, startPoint.Y - dy);
                 }
 
-                if(position != RadialGaugePosition.None)
+                if (position != RadialGaugePosition.None)
                 {
-                    GraphicsPath path = new GraphicsPath();
-                    path.AddLines(points);
-                    g.FillAndDrawPath(pen, brush, path);
+                    var path = new GraphicsPath();
+                    path.AddLines (points);
+                    g.FillAndDrawPath (pen, brush, path);
                 }
             }
             else if (type == RadialGaugeType.Quadrant)
             {
-                float semiOffset = (Width / 16f / 2f + 2f) * semicircleOffsetRatio * e.ScaleY;
-                if (RadialUtils.IsTop(this) && RadialUtils.IsLeft(this))
+                var semiOffset = (Width / 16f / 2f + 2f) * SemicircleOffsetRatio * e.ScaleY;
+                if (RadialUtils.IsTop (this) && RadialUtils.IsLeft (this))
                 {
-                    g.FillPie(brush, x, y, dx, dy, -180, 90);
-                    g.DrawArc(pen, x, y, dx, dy, -180, 90);
+                    g.FillPie (brush, x, y, dx, dy, -180, 90);
+                    g.DrawArc (pen, x, y, dx, dy, -180, 90);
 
-                    PointF startPoint = RadialUtils.RotateVector(new PointF[] { new PointF(x + dx / 2, y), center }, -90 * RAD, center)[0];
+                    var startPoint = RadialUtils.RotateVector (new PointF[] { new PointF (x + dx / 2, y), Center },
+                        -90 * RAD, Center)[0];
 
-                    PointF[] points = new PointF[5];
-                    points[0] = new PointF(startPoint.X, startPoint.Y - 1 * e.ScaleY);
-                    points[1] = new PointF(startPoint.X, startPoint.Y + semiOffset);
-                    points[2] = new PointF(startPoint.X + dx / 2 + semiOffset, startPoint.Y + semiOffset);
-                    points[3] = new PointF(startPoint.X + dx / 2 + semiOffset, y);
-                    points[4] = new PointF(startPoint.X + dx / 2 - 1 * e.ScaleX, y);
-                    GraphicsPath path = new GraphicsPath();
-                    path.AddLines(points);
-                    g.FillAndDrawPath(pen, brush, path);
-
+                    var points = new PointF[5];
+                    points[0] = new PointF (startPoint.X, startPoint.Y - 1 * e.ScaleY);
+                    points[1] = new PointF (startPoint.X, startPoint.Y + semiOffset);
+                    points[2] = new PointF (startPoint.X + dx / 2 + semiOffset, startPoint.Y + semiOffset);
+                    points[3] = new PointF (startPoint.X + dx / 2 + semiOffset, y);
+                    points[4] = new PointF (startPoint.X + dx / 2 - 1 * e.ScaleX, y);
+                    var path = new GraphicsPath();
+                    path.AddLines (points);
+                    g.FillAndDrawPath (pen, brush, path);
                 }
-                else if (RadialUtils.IsBottom(this) && RadialUtils.IsLeft(this))
+                else if (RadialUtils.IsBottom (this) && RadialUtils.IsLeft (this))
                 {
+                    g.FillPie (brush, x, y, dx, dy, -270, 90);
+                    g.DrawArc (pen, x, y, dx, dy, -270, 90);
 
-                    g.FillPie(brush, x, y, dx, dy, -270, 90);
-                    g.DrawArc(pen, x, y, dx, dy, -270, 90);
-
-                    PointF startPoint = RadialUtils.RotateVector(new PointF[] { new PointF(x + dx / 2, y), center }, -90 * RAD, center)[0];
-                    PointF[] points = new PointF[5];
-                    points[0] = new PointF(startPoint.X, startPoint.Y + 1 * e.ScaleY);
-                    points[1] = new PointF(startPoint.X, startPoint.Y - semiOffset);
-                    points[2] = new PointF(startPoint.X + dx / 2 + semiOffset, startPoint.Y - semiOffset);
-                    points[3] = new PointF(startPoint.X + dx / 2 + semiOffset, y + dy);
-                    points[4] = new PointF(x + dx / 2 - 1 * e.ScaleX, y + dy);
-                    GraphicsPath path = new GraphicsPath();
-                    path.AddLines(points);
-                    g.FillAndDrawPath(pen, brush, path);
+                    var startPoint = RadialUtils.RotateVector (new PointF[] { new PointF (x + dx / 2, y), Center },
+                        -90 * RAD, Center)[0];
+                    var points = new PointF[5];
+                    points[0] = new PointF (startPoint.X, startPoint.Y + 1 * e.ScaleY);
+                    points[1] = new PointF (startPoint.X, startPoint.Y - semiOffset);
+                    points[2] = new PointF (startPoint.X + dx / 2 + semiOffset, startPoint.Y - semiOffset);
+                    points[3] = new PointF (startPoint.X + dx / 2 + semiOffset, y + dy);
+                    points[4] = new PointF (x + dx / 2 - 1 * e.ScaleX, y + dy);
+                    var path = new GraphicsPath();
+                    path.AddLines (points);
+                    g.FillAndDrawPath (pen, brush, path);
                 }
-                else if (RadialUtils.IsTop(this) && RadialUtils.IsRight(this))
+                else if (RadialUtils.IsTop (this) && RadialUtils.IsRight (this))
                 {
-                    g.FillPie(brush, x, y, dx, dy, -90, 90);
-                    g.DrawArc(pen, x, y, dx, dy, -90, 90);
+                    g.FillPie (brush, x, y, dx, dy, -90, 90);
+                    g.DrawArc (pen, x, y, dx, dy, -90, 90);
 
-                    PointF startPoint = RadialUtils.RotateVector(new PointF[] { new PointF(x + dx / 2, y), center }, 90 * RAD, center)[0];
+                    var startPoint = RadialUtils.RotateVector (new PointF[] { new PointF (x + dx / 2, y), Center },
+                        90 * RAD, Center)[0];
 
-                    PointF[] points = new PointF[5];
-                    points[0] = new PointF(startPoint.X, startPoint.Y - 1 * e.ScaleY);
-                    points[1] = new PointF(startPoint.X, startPoint.Y + semiOffset);
-                    points[2] = new PointF(startPoint.X - dx / 2 - semiOffset, startPoint.Y + semiOffset);
-                    points[3] = new PointF(x + dx / 2 - semiOffset , y);
-                    points[4] = new PointF(x + dx / 2 + 1 * e.ScaleX, y);
-                    GraphicsPath path = new GraphicsPath();
-                    path.AddLines(points);
-                    g.FillAndDrawPath(pen, brush, path);
+                    var points = new PointF[5];
+                    points[0] = new PointF (startPoint.X, startPoint.Y - 1 * e.ScaleY);
+                    points[1] = new PointF (startPoint.X, startPoint.Y + semiOffset);
+                    points[2] = new PointF (startPoint.X - dx / 2 - semiOffset, startPoint.Y + semiOffset);
+                    points[3] = new PointF (x + dx / 2 - semiOffset, y);
+                    points[4] = new PointF (x + dx / 2 + 1 * e.ScaleX, y);
+                    var path = new GraphicsPath();
+                    path.AddLines (points);
+                    g.FillAndDrawPath (pen, brush, path);
                 }
-                else if (RadialUtils.IsBottom(this) && RadialUtils.IsRight(this))
+                else if (RadialUtils.IsBottom (this) && RadialUtils.IsRight (this))
                 {
-                    g.FillPie(brush, x, y, dx, dy, 0, 90);
-                    g.DrawArc(pen, x, y, dx, dy, 0, 90);
+                    g.FillPie (brush, x, y, dx, dy, 0, 90);
+                    g.DrawArc (pen, x, y, dx, dy, 0, 90);
 
-                    PointF startPoint = RadialUtils.RotateVector(new PointF[] { new PointF(x + dx / 2, y), center }, 90 * RAD, center)[0];
+                    var startPoint = RadialUtils.RotateVector (new PointF[] { new PointF (x + dx / 2, y), Center },
+                        90 * RAD, Center)[0];
 
-                    PointF[] points = new PointF[5];
-                    points[0] = new PointF(startPoint.X, startPoint.Y + 1 * e.ScaleY);
-                    points[1] = new PointF(startPoint.X, startPoint.Y - semiOffset);
-                    points[2] = new PointF(x + dx / 2 - semiOffset, startPoint.Y - semiOffset);
-                    points[3] = new PointF(x + dx / 2 - semiOffset, y + dy);
-                    points[4] = new PointF(x + dx / 2 + 1 * e.ScaleX, y + dy);
-                    GraphicsPath path = new GraphicsPath();
-                    path.AddLines(points);
-                    g.FillAndDrawPath(pen, brush, path);
+                    var points = new PointF[5];
+                    points[0] = new PointF (startPoint.X, startPoint.Y + 1 * e.ScaleY);
+                    points[1] = new PointF (startPoint.X, startPoint.Y - semiOffset);
+                    points[2] = new PointF (x + dx / 2 - semiOffset, startPoint.Y - semiOffset);
+                    points[3] = new PointF (x + dx / 2 - semiOffset, y + dy);
+                    points[4] = new PointF (x + dx / 2 + 1 * e.ScaleX, y + dy);
+                    var path = new GraphicsPath();
+                    path.AddLines (points);
+                    g.FillAndDrawPath (pen, brush, path);
                 }
             }
 
-            Scale.Draw(e);
-            Pointer.Draw(e);
-            Label.Draw(e);
-            DrawMarkers(e);
+            Scale.Draw (e);
+            Pointer.Draw (e);
+            Label.Draw (e);
+            DrawMarkers (e);
             if (!(Fill is SolidFill))
+            {
                 brush.Dispose();
+            }
+
             if (Report != null && Report.SmoothGraphics)
             {
                 g.InterpolationMode = InterpolationMode.HighQualityBicubic;
@@ -444,17 +453,18 @@ namespace AM.Reporting.Gauge.Radial
         }
 
         /// <inheritdoc/>
-        public override void Serialize(FRWriter writer)
+        public override void Serialize (FRWriter writer)
         {
-            RadialGauge c = writer.DiffObject as RadialGauge;
-            base.Serialize(writer);
+            var c = writer.DiffObject as RadialGauge;
+            base.Serialize (writer);
             if (Type != c.Type)
             {
-                writer.WriteValue("Type", Type);
+                writer.WriteValue ("Type", Type);
             }
+
             if (Position != c.Position)
             {
-                writer.WriteValue("Position", Position);
+                writer.WriteValue ("Position", Position);
             }
         }
 

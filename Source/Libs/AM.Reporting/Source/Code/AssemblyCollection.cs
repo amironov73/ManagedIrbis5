@@ -26,48 +26,53 @@ using System.Collections;
 
 namespace AM.Reporting.Code
 {
-  internal class AssemblyCollection : CollectionBase
-  {
-    public AssemblyDescriptor this[int index]
+    internal class AssemblyCollection : CollectionBase
     {
-      get { return List[index] as AssemblyDescriptor; }
-      set { List[index] = value; }
-    }
+        public AssemblyDescriptor this [int index]
+        {
+            get => List[index] as AssemblyDescriptor;
+            set => List[index] = value;
+        }
 
-    public void AddRange(AssemblyDescriptor[] range)
-    {
-      foreach (AssemblyDescriptor t in range)
-      {
-        Add(t);
-      }
-    }
+        public void AddRange (AssemblyDescriptor[] range)
+        {
+            foreach (var t in range)
+            {
+                Add (t);
+            }
+        }
 
-    public int Add(AssemblyDescriptor value)
-    {
-      if (value == null)
-        return -1;
-      return List.Add(value);
-    }
+        public int Add (AssemblyDescriptor value)
+        {
+            if (value == null)
+            {
+                return -1;
+            }
 
-    public void Insert(int index, AssemblyDescriptor value)
-    {
-      if (value != null)
-        List.Insert(index, value);
-    }
+            return List.Add (value);
+        }
 
-    public void Remove(AssemblyDescriptor value)
-    {
-      List.Remove(value);
-    }
+        public void Insert (int index, AssemblyDescriptor value)
+        {
+            if (value != null)
+            {
+                List.Insert (index, value);
+            }
+        }
 
-    public int IndexOf(AssemblyDescriptor value)
-    {
-      return List.IndexOf(value);
-    }
+        public void Remove (AssemblyDescriptor value)
+        {
+            List.Remove (value);
+        }
 
-    public bool Contains(AssemblyDescriptor value)
-    {
-      return List.Contains(value);
+        public int IndexOf (AssemblyDescriptor value)
+        {
+            return List.IndexOf (value);
+        }
+
+        public bool Contains (AssemblyDescriptor value)
+        {
+            return List.Contains (value);
+        }
     }
-  }
 }

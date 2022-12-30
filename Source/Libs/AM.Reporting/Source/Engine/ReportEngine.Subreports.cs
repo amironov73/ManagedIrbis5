@@ -16,6 +16,7 @@
 #region Using directives
 
 using System;
+
 using AM.Reporting.Preview;
 
 #endregion
@@ -28,17 +29,19 @@ namespace AM.Reporting.Engine
     {
         #region Private Methods
 
-        private void RenderSubreport(SubreportObject subreport)
+        private void RenderSubreport (SubreportObject subreport)
         {
             if (subreport.ReportPage != null)
-                RunBands(subreport.ReportPage.Bands);
+            {
+                RunBands (subreport.ReportPage.Bands);
+            }
         }
 
-        private void RenderInnerSubreport(BandBase parentBand, SubreportObject subreport)
+        private void RenderInnerSubreport (BandBase parentBand, SubreportObject subreport)
         {
-            BandBase saveOutputBand = outputBand;
-            float saveCurX = CurX;
-            float saveCurY = CurY;
+            var saveOutputBand = outputBand;
+            var saveCurX = CurX;
+            var saveCurY = CurY;
 
             try
             {
@@ -46,7 +49,7 @@ namespace AM.Reporting.Engine
                 CurX = subreport.Left;
                 CurY = subreport.Top;
 
-                RenderSubreport(subreport);
+                RenderSubreport (subreport);
             }
             finally
             {
@@ -56,63 +59,69 @@ namespace AM.Reporting.Engine
             }
         }
 
-        private void RenderInnerSubreports(BandBase parentBand)
+        private void RenderInnerSubreports (BandBase parentBand)
         {
-            int originalObjectsCount = parentBand.Objects.Count;
-            for (int i = 0; i < originalObjectsCount; i++)
+            var originalObjectsCount = parentBand.Objects.Count;
+            for (var i = 0; i < originalObjectsCount; i++)
             {
-                SubreportObject subreport = parentBand.Objects[i] as SubreportObject;
+                var subreport = parentBand.Objects[i] as SubreportObject;
 
                 // Apply visible expression if needed.
-                if (subreport != null && !String.IsNullOrEmpty(subreport.VisibleExpression))
+                if (subreport != null && !string.IsNullOrEmpty (subreport.VisibleExpression))
                 {
-                    subreport.Visible = CalcVisibleExpression(subreport.VisibleExpression);
+                    subreport.Visible = CalcVisibleExpression (subreport.VisibleExpression);
                 }
 
                 if (subreport != null && subreport.Visible && subreport.PrintOnParent)
-                    RenderInnerSubreport(parentBand, subreport);
+                {
+                    RenderInnerSubreport (parentBand, subreport);
+                }
             }
         }
 
-        private void RenderOuterSubreports(BandBase parentBand)
+        private void RenderOuterSubreports (BandBase parentBand)
         {
-            float saveCurY = CurY;
-            float saveOriginX = originX;
-            int saveCurPage = CurPage;
+            var saveCurY = CurY;
+            var saveOriginX = originX;
+            var saveCurPage = CurPage;
 
             float maxY = 0;
-            int maxPage = CurPage;
-            bool hasSubreports = false;
+            var maxPage = CurPage;
+            var hasSubreports = false;
 
             try
             {
-                for (int i = 0; i < parentBand.Objects.Count; i++)
+                for (var i = 0; i < parentBand.Objects.Count; i++)
                 {
-                    SubreportObject subreport = parentBand.Objects[i] as SubreportObject;
+                    var subreport = parentBand.Objects[i] as SubreportObject;
 
                     // Apply visible expression if needed.
-                    if (subreport != null && !String.IsNullOrEmpty(subreport.VisibleExpression))
+                    if (subreport != null && !string.IsNullOrEmpty (subreport.VisibleExpression))
                     {
-                        subreport.Visible = CalcVisibleExpression(subreport.VisibleExpression);
+                        subreport.Visible = CalcVisibleExpression (subreport.VisibleExpression);
                     }
 
                     if (subreport != null && subreport.Visible && !subreport.PrintOnParent)
                     {
                         hasSubreports = true;
+
                         // restore start position
                         CurPage = saveCurPage;
                         CurY = saveCurY - subreport.Height;
                         originX = saveOriginX + subreport.Left;
+
                         // do not upload generated pages to the file cache
                         PreparedPages.CanUploadToCache = false;
 
-                        RenderSubreport(subreport);
+                        RenderSubreport (subreport);
 
                         // find maxY. We will continue from maxY when all subreports finished.
                         if (CurPage == maxPage)
                         {
                             if (CurY > maxY)
+                            {
                                 maxY = CurY;
+                            }
                         }
                         else if (CurPage > maxPage)
                         {
@@ -129,6 +138,7 @@ namespace AM.Reporting.Engine
                     CurPage = maxPage;
                     CurY = maxY;
                 }
+
                 originX = saveOriginX;
                 PreparedPages.CanUploadToCache = true;
             }

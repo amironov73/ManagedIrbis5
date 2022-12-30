@@ -17,6 +17,7 @@
 
 using AM.Reporting.Matrix;
 using AM.Reporting.Table;
+
 using System;
 using System.Collections.Generic;
 using System.Xml;
@@ -27,207 +28,206 @@ using System.Xml;
 
 namespace AM.Reporting.Import.RDL
 {
-
     // Represents the RDL tables import
     public partial class RDLImport
     {
-        private void LoadTableColumn(XmlNode tableColumnNode, TableColumn column)
+        private void LoadTableColumn (XmlNode tableColumnNode, TableColumn column)
         {
-            XmlNodeList nodeList = tableColumnNode.ChildNodes;
+            var nodeList = tableColumnNode.ChildNodes;
             foreach (XmlNode node in nodeList)
             {
                 if (node.Name == "Width")
                 {
-                    column.Width = UnitsConverter.SizeToPixels(node.InnerText);
+                    column.Width = UnitsConverter.SizeToPixels (node.InnerText);
                 }
                 else if (node.Name == "Visibility")
                 {
-                    LoadVisibility(node);
+                    LoadVisibility (node);
                 }
             }
         }
 
-        private void LoadTableColumns(XmlNode tableColumnsNode)
+        private void LoadTableColumns (XmlNode tableColumnsNode)
         {
             if (tableColumnsNode != null)
             {
-                XmlNodeList nodeList = tableColumnsNode.ChildNodes;
+                var nodeList = tableColumnsNode.ChildNodes;
                 foreach (XmlNode node in nodeList)
                 {
                     if (node.Name == "TableColumn" || node.Name == "TablixColumn")
                     {
-                        if (component is TableObject)
+                        if (component is TableObject tableObject)
                         {
-                            TableColumn column = new TableColumn();
-                            (component as TableObject).Columns.Add(column);
-                            LoadTableColumn(node, column);
+                            var column = new TableColumn();
+                            tableObject.Columns.Add (column);
+                            LoadTableColumn (node, column);
                         }
                     }
                 }
             }
         }
 
-        private void LoadTableCell(XmlNode tableCellNode, ref int col)
+        private void LoadTableCell (XmlNode tableCellNode, ref int col)
         {
-            int row = (component as TableObject).RowCount - 1;
-            XmlNodeList nodeList = tableCellNode.ChildNodes;
+            var row = (component as TableObject).RowCount - 1;
+            var nodeList = tableCellNode.ChildNodes;
             foreach (XmlNode node in nodeList)
             {
                 if (node.Name == "ReportItems" || node.Name == "CellContents")
                 {
-                    Base tempParent = parent;
-                    ComponentBase tempComponent = component;
-                    parent = (component as TableObject).GetCellData(col, row).Cell;
-                    LoadReportItems(node);
+                    var tempParent = parent;
+                    var tempComponent = component;
+                    parent = (component as TableObject).GetCellData (col, row).Cell;
+                    LoadReportItems (node);
                     component = tempComponent;
                     parent = tempParent;
                 }
                 else if (node.Name == "ColSpan")
                 {
-                    int colSpan = Convert.ToInt32(node.InnerText);
-                    (component as TableObject).GetCellData(col, row).Cell.ColSpan = colSpan;
+                    var colSpan = Convert.ToInt32 (node.InnerText);
+                    (component as TableObject).GetCellData (col, row).Cell.ColSpan = colSpan;
                     col += colSpan - 1;
                 }
             }
         }
 
-        private void LoadTableCells(XmlNode tableCellsNode)
+        private void LoadTableCells (XmlNode tableCellsNode)
         {
-            int col = 0;
-            XmlNodeList nodeList = tableCellsNode.ChildNodes;
+            var col = 0;
+            var nodeList = tableCellsNode.ChildNodes;
             foreach (XmlNode node in nodeList)
             {
                 if (node.Name == "TableCell" || node.Name == "TablixCell")
                 {
-                    LoadTableCell(node, ref col);
+                    LoadTableCell (node, ref col);
                     col++;
                 }
             }
         }
 
-        private void LoadTableRow(XmlNode tableRowNode, TableRow row)
+        private void LoadTableRow (XmlNode tableRowNode, TableRow row)
         {
-            XmlNodeList nodeList = tableRowNode.ChildNodes;
+            var nodeList = tableRowNode.ChildNodes;
             foreach (XmlNode node in nodeList)
             {
                 if (node.Name == "TableCells" || node.Name == "TablixCells")
                 {
-                    LoadTableCells(node);
+                    LoadTableCells (node);
                 }
                 else if (node.Name == "Height")
                 {
-                    row.Height = UnitsConverter.SizeToPixels(node.InnerText);
+                    row.Height = UnitsConverter.SizeToPixels (node.InnerText);
                 }
                 else if (node.Name == "Visibility")
                 {
-                    LoadVisibility(node);
+                    LoadVisibility (node);
                 }
             }
         }
 
-        private void LoadTableRows(XmlNode tableRowsNode)
+        private void LoadTableRows (XmlNode tableRowsNode)
         {
-            XmlNodeList nodeList = tableRowsNode.ChildNodes;
+            var nodeList = tableRowsNode.ChildNodes;
             foreach (XmlNode node in nodeList)
             {
                 if (node.Name == "TableRow" || node.Name == "TablixRow")
                 {
-                    if (component is TableObject)
+                    if (component is TableObject tableObject)
                     {
-                        TableRow row = new TableRow();
-                        (component as TableObject).Rows.Add(row);
-                        LoadTableRow(node, row);
+                        var row = new TableRow();
+                        tableObject.Rows.Add (row);
+                        LoadTableRow (node, row);
                     }
                 }
             }
         }
 
-        private void LoadHeader(XmlNode headerNode)
+        private void LoadHeader (XmlNode headerNode)
         {
             if (headerNode != null)
             {
-                XmlNodeList nodeList = headerNode.ChildNodes;
+                var nodeList = headerNode.ChildNodes;
                 foreach (XmlNode node in nodeList)
                 {
                     if (node.Name == "TableRows" || node.Name == "TablixRows")
                     {
-                        LoadTableRows(node);
+                        LoadTableRows (node);
                     }
                 }
             }
         }
 
-        private void LoadTableGroup(XmlNode tableGroupNode)
+        private void LoadTableGroup (XmlNode tableGroupNode)
         {
-            XmlNodeList nodeList = tableGroupNode.ChildNodes;
+            var nodeList = tableGroupNode.ChildNodes;
             foreach (XmlNode node in nodeList)
             {
                 if (node.Name == "Header")
                 {
-                    LoadHeader(node);
+                    LoadHeader (node);
                 }
                 else if (node.Name == "Footer")
                 {
-                    LoadFooter(node);
+                    LoadFooter (node);
                 }
                 else if (node.Name == "Visibility")
                 {
-                    LoadVisibility(node);
+                    LoadVisibility (node);
                 }
             }
         }
 
-        private void LoadTableGroups(XmlNode tableGroupsNode)
+        private void LoadTableGroups (XmlNode tableGroupsNode)
         {
-            XmlNodeList nodeList = tableGroupsNode.ChildNodes;
+            var nodeList = tableGroupsNode.ChildNodes;
             foreach (XmlNode node in nodeList)
             {
                 if (node.Name == "TableGroup")
                 {
-                    LoadTableGroup(node);
+                    LoadTableGroup (node);
                 }
             }
         }
 
-        private void LoadDetails(XmlNode detailsNode)
+        private void LoadDetails (XmlNode detailsNode)
         {
             if (detailsNode != null)
             {
-                XmlNodeList nodeList = detailsNode.ChildNodes;
+                var nodeList = detailsNode.ChildNodes;
                 foreach (XmlNode node in nodeList)
                 {
                     if (node.Name == "TableRows")
                     {
-                        LoadTableRows(node);
+                        LoadTableRows (node);
                     }
                     else if (node.Name == "Visibility")
                     {
-                        LoadVisibility(node);
+                        LoadVisibility (node);
                     }
                 }
             }
         }
 
-        private void LoadFooter(XmlNode footerNode)
+        private void LoadFooter (XmlNode footerNode)
         {
             if (footerNode != null)
             {
-                XmlNodeList nodeList = footerNode.ChildNodes;
+                var nodeList = footerNode.ChildNodes;
                 foreach (XmlNode node in nodeList)
                 {
                     if (node.Name == "TableRows")
                     {
-                        LoadTableRows(node);
+                        LoadTableRows (node);
                     }
                 }
             }
         }
 
-        private void LoadCorner(XmlNode cornerNode)
+        private void LoadCorner (XmlNode cornerNode)
         {
             if (cornerNode != null)
             {
-                XmlNodeList nodeList = cornerNode.ChildNodes;
+                var nodeList = cornerNode.ChildNodes;
                 foreach (XmlNode node in nodeList)
                 {
                     if (node.Name == "ReportItems")
@@ -238,37 +238,37 @@ namespace AM.Reporting.Import.RDL
             }
         }
 
-        private void LoadDynamicColumns(XmlNode dynamicColumnsNode, List<XmlNode> dynamicColumns)
+        private void LoadDynamicColumns (XmlNode dynamicColumnsNode, List<XmlNode> dynamicColumns)
         {
-            XmlNodeList nodeList = dynamicColumnsNode.ChildNodes;
+            var nodeList = dynamicColumnsNode.ChildNodes;
             foreach (XmlNode node in nodeList)
             {
                 if (node.Name == "Subtotal")
                 {
-                    XmlNodeList subtotalNodeList = node.ChildNodes;
+                    var subtotalNodeList = node.ChildNodes;
                     foreach (XmlNode subtotalNode in subtotalNodeList)
                     {
                         if (subtotalNode.Name == "ReportItems")
                         {
-                            dynamicColumns.Add(subtotalNode.Clone());
+                            dynamicColumns.Add (subtotalNode.Clone());
                         }
                     }
                 }
                 else if (node.Name == "ReportItems")
                 {
-                    dynamicColumns.Add(node.Clone());
+                    dynamicColumns.Add (node.Clone());
                 }
                 else if (node.Name == "Visibility")
                 {
-                    LoadVisibility(node);
+                    LoadVisibility (node);
                 }
             }
         }
 
-        private XmlNode LoadStaticColumn(XmlNode staticColumnNode)
+        private XmlNode LoadStaticColumn (XmlNode staticColumnNode)
         {
             XmlNode staticColumn = null;
-            XmlNodeList nodeList = staticColumnNode.ChildNodes;
+            var nodeList = staticColumnNode.ChildNodes;
             foreach (XmlNode node in nodeList)
             {
                 if (node.Name == "ReportItems")
@@ -276,94 +276,99 @@ namespace AM.Reporting.Import.RDL
                     staticColumn = node.Clone();
                 }
             }
+
             return staticColumn;
         }
 
-        private void LoadStaticColumns(XmlNode staticColumnsNode, List<XmlNode> staticColumns)
+        private void LoadStaticColumns (XmlNode staticColumnsNode, List<XmlNode> staticColumns)
         {
-            XmlNodeList nodeList = staticColumnsNode.ChildNodes;
+            var nodeList = staticColumnsNode.ChildNodes;
             foreach (XmlNode node in nodeList)
             {
                 if (node.Name == "StaticColumn")
                 {
-                    staticColumns.Add(LoadStaticColumn(node));
+                    staticColumns.Add (LoadStaticColumn (node));
                 }
             }
         }
 
-        private float LoadColumnGrouping(XmlNode columnGroupingNode, List<XmlNode> dynamicColumns, List<XmlNode> staticColumns)
+        private float LoadColumnGrouping (XmlNode columnGroupingNode, List<XmlNode> dynamicColumns,
+            List<XmlNode> staticColumns)
         {
-            float cornerHeight = 0.8f * Utils.Units.Centimeters;
-            XmlNodeList nodeList = columnGroupingNode.ChildNodes;
+            var cornerHeight = 0.8f * Utils.Units.Centimeters;
+            var nodeList = columnGroupingNode.ChildNodes;
             foreach (XmlNode node in nodeList)
             {
                 if (node.Name == "Height")
                 {
-                    cornerHeight = UnitsConverter.SizeToPixels(node.InnerText);
+                    cornerHeight = UnitsConverter.SizeToPixels (node.InnerText);
                 }
                 else if (node.Name == "DynamicColumns")
                 {
-                    LoadDynamicColumns(node, dynamicColumns);
+                    LoadDynamicColumns (node, dynamicColumns);
                 }
                 else if (node.Name == "StaticColumns")
                 {
-                    LoadStaticColumns(node, staticColumns);
+                    LoadStaticColumns (node, staticColumns);
                 }
             }
+
             return cornerHeight;
         }
 
-        private float LoadColumnGroupings(XmlNode columnGroupingsNode, List<XmlNode> dynamicColumns, List<XmlNode> staticColumns)
+        private float LoadColumnGroupings (XmlNode columnGroupingsNode, List<XmlNode> dynamicColumns,
+            List<XmlNode> staticColumns)
         {
-            float cornerHeight = 0.8f * Utils.Units.Centimeters;
+            var cornerHeight = 0.8f * Utils.Units.Centimeters;
             if (columnGroupingsNode != null)
             {
-                XmlNodeList nodeList = columnGroupingsNode.ChildNodes;
+                var nodeList = columnGroupingsNode.ChildNodes;
                 foreach (XmlNode node in nodeList)
                 {
                     if (node.Name == "ColumnGrouping")
                     {
                         if (component is MatrixObject)
                         {
-                            cornerHeight = LoadColumnGrouping(node, dynamicColumns, staticColumns);
+                            cornerHeight = LoadColumnGrouping (node, dynamicColumns, staticColumns);
                         }
                     }
                 }
             }
+
             return cornerHeight;
         }
 
-        private void LoadDynamicRows(XmlNode dynamicRowsNode, List<XmlNode> dynamicRows)
+        private void LoadDynamicRows (XmlNode dynamicRowsNode, List<XmlNode> dynamicRows)
         {
-            XmlNodeList nodeList = dynamicRowsNode.ChildNodes;
+            var nodeList = dynamicRowsNode.ChildNodes;
             foreach (XmlNode node in nodeList)
             {
                 if (node.Name == "Subtotal")
                 {
-                    XmlNodeList subtotalNodeList = node.ChildNodes;
+                    var subtotalNodeList = node.ChildNodes;
                     foreach (XmlNode subtotalNode in subtotalNodeList)
                     {
                         if (subtotalNode.Name == "ReportItems")
                         {
-                            dynamicRows.Add(subtotalNode.Clone());
+                            dynamicRows.Add (subtotalNode.Clone());
                         }
                     }
                 }
                 else if (node.Name == "ReportItems")
                 {
-                    dynamicRows.Add(node.Clone());
+                    dynamicRows.Add (node.Clone());
                 }
                 else if (node.Name == "Visibility")
                 {
-                    LoadVisibility(node);
+                    LoadVisibility (node);
                 }
             }
         }
 
-        private XmlNode LoadStaticRow(XmlNode staticRowNode)
+        private XmlNode LoadStaticRow (XmlNode staticRowNode)
         {
             XmlNode staticRow = null;
-            XmlNodeList nodeList = staticRowNode.ChildNodes;
+            var nodeList = staticRowNode.ChildNodes;
             foreach (XmlNode node in nodeList)
             {
                 if (node.Name == "ReportItems")
@@ -371,67 +376,70 @@ namespace AM.Reporting.Import.RDL
                     staticRow = node.Clone();
                 }
             }
+
             return staticRow;
         }
 
-        private void LoadStaticRows(XmlNode staticRowsNode, List<XmlNode> staticRows)
+        private void LoadStaticRows (XmlNode staticRowsNode, List<XmlNode> staticRows)
         {
-            XmlNodeList nodeList = staticRowsNode.ChildNodes;
+            var nodeList = staticRowsNode.ChildNodes;
             foreach (XmlNode node in nodeList)
             {
                 if (node.Name == "StaticRow")
                 {
-                    staticRows.Add(LoadStaticRow(node));
+                    staticRows.Add (LoadStaticRow (node));
                 }
             }
         }
 
-        private float LoadRowGrouping(XmlNode rowGroupingNode, List<XmlNode> dynamicRows, List<XmlNode> staticRows)
+        private float LoadRowGrouping (XmlNode rowGroupingNode, List<XmlNode> dynamicRows, List<XmlNode> staticRows)
         {
-            float cornerWidth = 2.5f * Utils.Units.Centimeters;
-            XmlNodeList nodeList = rowGroupingNode.ChildNodes;
+            var cornerWidth = 2.5f * Utils.Units.Centimeters;
+            var nodeList = rowGroupingNode.ChildNodes;
             foreach (XmlNode node in nodeList)
             {
                 if (node.Name == "Width")
                 {
-                    cornerWidth = UnitsConverter.SizeToPixels(node.InnerText);
+                    cornerWidth = UnitsConverter.SizeToPixels (node.InnerText);
                 }
                 else if (node.Name == "DynamicRows")
                 {
-                    LoadDynamicRows(node, dynamicRows);
+                    LoadDynamicRows (node, dynamicRows);
                 }
                 else if (node.Name == "StaticRows")
                 {
-                    LoadStaticRows(node, staticRows);
+                    LoadStaticRows (node, staticRows);
                 }
             }
+
             return cornerWidth;
         }
 
-        private float LoadRowGroupings(XmlNode rowGroupingsNode, List<XmlNode> dynamicRows, List<XmlNode> staticRows)
+        private float LoadRowGroupings (XmlNode rowGroupingsNode, List<XmlNode> dynamicRows, List<XmlNode> staticRows)
         {
-            float cornerWidth = 2.5f * Utils.Units.Centimeters;
+            var cornerWidth = 2.5f * Utils.Units.Centimeters;
             if (rowGroupingsNode != null)
             {
-                XmlNodeList nodeList = rowGroupingsNode.ChildNodes;
+                var nodeList = rowGroupingsNode.ChildNodes;
                 foreach (XmlNode node in nodeList)
                 {
                     if (node.Name == "RowGrouping")
                     {
                         if (component is MatrixObject)
                         {
-                            cornerWidth = LoadRowGrouping(node, dynamicRows, staticRows);
+                            cornerWidth = LoadRowGrouping (node, dynamicRows, staticRows);
                         }
                     }
                 }
             }
+
             return cornerWidth;
         }
 
-        private void LoadMatrixCell(XmlNode matrixCellNode, MatrixCellDescriptor cell, int col)
+        private void LoadMatrixCell (XmlNode matrixCellNode, MatrixCellDescriptor cell, int col)
         {
-            int row = (component as MatrixObject).RowCount - 1;
-            XmlNodeList nodeList = matrixCellNode.ChildNodes;
+            var row = (component as MatrixObject).RowCount - 1;
+            var nodeList = matrixCellNode.ChildNodes;
             foreach (XmlNode node in nodeList)
             {
                 if (node.Name == "ReportItems")
@@ -440,113 +448,122 @@ namespace AM.Reporting.Import.RDL
             }
         }
 
-        private void LoadMatrixCells(XmlNode matrixCellsNode)
+        private void LoadMatrixCells (XmlNode matrixCellsNode)
         {
-            int col = 0;
-            XmlNodeList nodeList = matrixCellsNode.ChildNodes;
+            var col = 0;
+            var nodeList = matrixCellsNode.ChildNodes;
             foreach (XmlNode node in nodeList)
             {
                 if (node.Name == "MatrixCell")
                 {
-                    if (component is MatrixObject)
+                    if (component is MatrixObject matrixObject)
                     {
-                        MatrixCellDescriptor cell = new MatrixCellDescriptor();
-                        (component as MatrixObject).Data.Cells.Add(cell);
-                        LoadMatrixCell(node, cell, col);
+                        var cell = new MatrixCellDescriptor();
+                        matrixObject.Data.Cells.Add (cell);
+                        LoadMatrixCell (node, cell, col);
                         col++;
                     }
                 }
             }
         }
 
-        private float LoadMatrixRow(XmlNode matrixRowNode, MatrixHeaderDescriptor row)
+        private float LoadMatrixRow (XmlNode matrixRowNode, MatrixHeaderDescriptor row)
         {
-            float rowHeight = 0.8f * Utils.Units.Centimeters;
-            XmlNodeList nodeList = matrixRowNode.ChildNodes;
+            var rowHeight = 0.8f * Utils.Units.Centimeters;
+            var nodeList = matrixRowNode.ChildNodes;
             foreach (XmlNode node in nodeList)
             {
                 if (node.Name == "Height")
                 {
-                    rowHeight = UnitsConverter.SizeToPixels(node.InnerText);
+                    rowHeight = UnitsConverter.SizeToPixels (node.InnerText);
                 }
                 else if (node.Name == "MatrixCells")
                 {
-                    LoadMatrixCells(node);
+                    LoadMatrixCells (node);
                 }
             }
+
             return rowHeight;
         }
 
-        private float LoadMatrixRows(XmlNode matrixRowsNode)
+        private float LoadMatrixRows (XmlNode matrixRowsNode)
         {
-            float rowHeight = 0.8f * Utils.Units.Centimeters;
+            var rowHeight = 0.8f * Utils.Units.Centimeters;
             if (matrixRowsNode != null)
             {
-                XmlNodeList nodeList = matrixRowsNode.ChildNodes;
+                var nodeList = matrixRowsNode.ChildNodes;
                 foreach (XmlNode node in nodeList)
                 {
                     if (node.Name == "MatrixRow")
                     {
-                        if (component is MatrixObject)
+                        if (component is MatrixObject matrixObject)
                         {
-                            MatrixHeaderDescriptor row = new MatrixHeaderDescriptor();
-                            (component as MatrixObject).Data.Rows.Add(row);
-                            rowHeight = LoadMatrixRow(node, row);
+                            var row = new MatrixHeaderDescriptor();
+                            matrixObject.Data.Rows.Add (row);
+                            rowHeight = LoadMatrixRow (node, row);
                         }
                     }
                 }
             }
+
             return rowHeight;
         }
 
-        private float LoadMatrixColumn(XmlNode matrixColumnNode, MatrixHeaderDescriptor column)
+        private float LoadMatrixColumn (XmlNode matrixColumnNode, MatrixHeaderDescriptor column)
         {
-            float columnWidth = 2.5f * Utils.Units.Centimeters;
-            XmlNodeList nodeList = matrixColumnNode.ChildNodes;
+            var columnWidth = 2.5f * Utils.Units.Centimeters;
+            var nodeList = matrixColumnNode.ChildNodes;
             foreach (XmlNode node in nodeList)
             {
                 if (node.Name == "Width")
                 {
-                    columnWidth = UnitsConverter.SizeToPixels(node.InnerText);
+                    columnWidth = UnitsConverter.SizeToPixels (node.InnerText);
                 }
             }
+
             return columnWidth;
         }
 
-        private float LoadMatrixColumns(XmlNode matrixColumnsNode)
+        private float LoadMatrixColumns (XmlNode matrixColumnsNode)
         {
-            float columnWidth = 2.5f * Utils.Units.Centimeters;
+            var columnWidth = 2.5f * Utils.Units.Centimeters;
             if (matrixColumnsNode != null)
             {
-                XmlNodeList nodeList = matrixColumnsNode.ChildNodes;
+                var nodeList = matrixColumnsNode.ChildNodes;
                 foreach (XmlNode node in nodeList)
                 {
                     if (node.Name == "MatrixColumn")
                     {
-                        if (component is MatrixObject)
+                        if (component is MatrixObject matrixObject)
                         {
-                            MatrixHeaderDescriptor column = new MatrixHeaderDescriptor();
-                            (component as MatrixObject).Data.Columns.Add(column);
-                            columnWidth = LoadMatrixColumn(node, column);
+                            var column = new MatrixHeaderDescriptor();
+                            matrixObject.Data.Columns.Add (column);
+                            columnWidth = LoadMatrixColumn (node, column);
                         }
                     }
                 }
             }
+
             return columnWidth;
         }
 
-        private void LoadTable(XmlNode tableNode)
+        private void LoadTable (XmlNode tableNode)
         {
             if (parent is TableCell)
             {
-                if(curBand != null)
+                if (curBand != null)
+                {
                     parent = curBand;
+                }
                 else
+                {
                     return;
+                }
             }
-            component = ComponentsFactory.CreateTableObject(tableNode.Attributes["Name"].Value, parent);
-            XmlNodeList nodeList = tableNode.ChildNodes;
-            LoadReportItem(nodeList);
+
+            component = ComponentsFactory.CreateTableObject (tableNode.Attributes["Name"].Value, parent);
+            var nodeList = tableNode.ChildNodes;
+            LoadReportItem (nodeList);
             XmlNode tableColumnsNode = null;
             XmlNode headerNode = null;
             XmlNode detailsNode = null;
@@ -574,7 +591,9 @@ namespace AM.Reporting.Import.RDL
                 else if (node.Name == "TablixBody")
                 {
                     if (node.HasChildNodes)
+                    {
                         foreach (XmlNode bodyChild in node.ChildNodes)
+                        {
                             if (bodyChild.Name == "TablixColumns")
                             {
                                 tableColumnsNode = bodyChild.Clone();
@@ -583,37 +602,44 @@ namespace AM.Reporting.Import.RDL
                             {
                                 tableRowsNode = node.Clone();
                             }
+                        }
+                    }
                 }
             }
-            LoadTableColumns(tableColumnsNode);
-            LoadHeader(headerNode != null ? headerNode : tableRowsNode);
-            LoadDetails(detailsNode);
-            LoadFooter(footerNode);
+
+            LoadTableColumns (tableColumnsNode);
+            LoadHeader (headerNode != null ? headerNode : tableRowsNode);
+            LoadDetails (detailsNode);
+            LoadFooter (footerNode);
             (component as TableObject).CreateUniqueNames();
         }
 
-        private bool IsTablixMatrix(XmlNode node)
+        private bool IsTablixMatrix (XmlNode node)
         {
             if (node.HasChildNodes)
+            {
                 foreach (XmlNode tablixItem in node.ChildNodes)
                 {
                     if (tablixItem.Name == "TablixCorner")
+                    {
                         return true;
+                    }
                 }
+            }
+
             return false;
         }
 
 
-
-
-        private void LoadMatrix(XmlNode matrixNode)
+        private void LoadMatrix (XmlNode matrixNode)
         {
-            component = ComponentsFactory.CreateMatrixObject(matrixNode.Attributes["Name"].Value, parent);
-            MatrixObject matrix = component as MatrixObject;
+            component = ComponentsFactory.CreateMatrixObject (matrixNode.Attributes["Name"].Value, parent);
+            var matrix = component as MatrixObject;
             matrix.AutoSize = false;
 
-            XmlNodeList nodeList = matrixNode.ChildNodes;
-            LoadReportItem(nodeList);
+            var nodeList = matrixNode.ChildNodes;
+            LoadReportItem (nodeList);
+
             //XmlNode cornerNode = null;
             XmlNode columnGroupingsNode = null;
             XmlNode rowGroupingsNode = null;
@@ -648,50 +674,52 @@ namespace AM.Reporting.Import.RDL
 
             List<XmlNode> dynamicColumns = new List<XmlNode>();
             List<XmlNode> staticColumns = new List<XmlNode>();
-            LoadColumnGroupings(columnGroupingsNode, dynamicColumns, staticColumns);
+            LoadColumnGroupings (columnGroupingsNode, dynamicColumns, staticColumns);
 
             List<XmlNode> dynamicRows = new List<XmlNode>();
             List<XmlNode> staticRows = new List<XmlNode>();
-            LoadRowGroupings(rowGroupingsNode, dynamicRows, staticRows);
+            LoadRowGroupings (rowGroupingsNode, dynamicRows, staticRows);
 
-            float columnWidth = LoadMatrixColumns(matrixColumnsNode);
-            float rowHeight = LoadMatrixRows(matrixRowsNode);
+            var columnWidth = LoadMatrixColumns (matrixColumnsNode);
+            var rowHeight = LoadMatrixRows (matrixRowsNode);
 
             matrix.CreateUniqueNames();
             matrix.BuildTemplate();
 
-            for (int i = 1; i < matrix.Columns.Count; i++)
+            for (var i = 1; i < matrix.Columns.Count; i++)
             {
                 matrix.Columns[i].Width = columnWidth;
             }
-            for (int i = 1; i < matrix.Rows.Count; i++)
+
+            for (var i = 1; i < matrix.Rows.Count; i++)
             {
                 matrix.Rows[i].Height = rowHeight;
             }
 
-            for (int i = 0; i < matrix.Columns.Count; i++)
+            for (var i = 0; i < matrix.Columns.Count; i++)
             {
-                for (int j = 0; j < matrix.Rows.Count; j++)
+                for (var j = 0; j < matrix.Rows.Count; j++)
                 {
-                    matrix.GetCellData(i, j).Cell.Text = "";
+                    matrix.GetCellData (i, j).Cell.Text = "";
                 }
             }
 
-            for (int i = 0; i < dynamicColumns.Count; i++)
+            for (var i = 0; i < dynamicColumns.Count; i++)
             {
-                Base tempParent = parent;
-                ComponentBase tempComponent = component;
-                parent = matrix.GetCellData(i + 1, 0).Cell;
-                LoadReportItems(dynamicColumns[i]);
+                var tempParent = parent;
+                var tempComponent = component;
+                parent = matrix.GetCellData (i + 1, 0).Cell;
+                LoadReportItems (dynamicColumns[i]);
                 component = tempComponent;
                 parent = tempParent;
             }
-            for (int i = 0; i < dynamicRows.Count; i++)
+
+            for (var i = 0; i < dynamicRows.Count; i++)
             {
-                Base tempParent = parent;
-                ComponentBase tempComponent = component;
-                parent = matrix.GetCellData(0, i + 1).Cell;
-                LoadReportItems(dynamicRows[i]);
+                var tempParent = parent;
+                var tempComponent = component;
+                parent = matrix.GetCellData (0, i + 1).Cell;
+                LoadReportItems (dynamicRows[i]);
                 component = tempComponent;
                 parent = tempParent;
             }

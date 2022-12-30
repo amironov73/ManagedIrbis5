@@ -32,67 +32,74 @@ namespace AM.Reporting.Preview
         private List<CacheItem> pages;
         private PreparedPages preparedPages;
 
-        private int ItemIndex(int index)
+        private int ItemIndex (int index)
         {
-            for (int i = 0; i < pages.Count; i++)
+            for (var i = 0; i < pages.Count; i++)
             {
                 if (pages[i].index == index)
+                {
                     return i;
+                }
             }
+
             return -1;
         }
 
-        private void RemoveAt(int index)
+        private void RemoveAt (int index)
         {
-            CacheItem item = pages[index];
+            var item = pages[index];
             item.Dispose();
             item = null;
-            pages.RemoveAt(index);
+            pages.RemoveAt (index);
         }
 
-        public ReportPage Get(int index)
+        public ReportPage Get (int index)
         {
-            int i = ItemIndex(index);
+            var i = ItemIndex (index);
             if (i != -1)
             {
                 // page exists. Put it on the top of list.
-                CacheItem item = pages[i];
+                var item = pages[i];
                 if (i != 0)
                 {
-                    pages.RemoveAt(i);
-                    pages.Insert(0, item);
+                    pages.RemoveAt (i);
+                    pages.Insert (0, item);
                 }
+
                 return item.page;
             }
 
             // add new page on the top of list.
-            ReportPage page = preparedPages.GetPage(index);
+            var page = preparedPages.GetPage (index);
 
             if (preparedPages.Count > pages.Count)
             {
-                pages.Insert(0, new CacheItem(index, page));
+                pages.Insert (0, new CacheItem (index, page));
 
                 // remove least used pages.
                 while (pages.Count > GetPageLimit())
                 {
-                    RemoveAt(pages.Count - 1);
+                    RemoveAt (pages.Count - 1);
                 }
             }
+
             return page;
         }
 
-        public void Remove(int index)
+        public void Remove (int index)
         {
-            int i = ItemIndex(index);
+            var i = ItemIndex (index);
             if (i != -1)
-                RemoveAt(i);
+            {
+                RemoveAt (i);
+            }
         }
 
         public void Clear()
         {
             while (pages.Count > 0)
             {
-                RemoveAt(0);
+                RemoveAt (0);
             }
         }
 
@@ -101,7 +108,7 @@ namespace AM.Reporting.Preview
             Clear();
         }
 
-        public PageCache(PreparedPages preparedPages)
+        public PageCache (PreparedPages preparedPages)
         {
             this.preparedPages = preparedPages;
             pages = new List<CacheItem>();
@@ -119,7 +126,7 @@ namespace AM.Reporting.Preview
                 page = null;
             }
 
-            public CacheItem(int index, ReportPage page)
+            public CacheItem (int index, ReportPage page)
             {
                 this.index = index;
                 this.page = page;

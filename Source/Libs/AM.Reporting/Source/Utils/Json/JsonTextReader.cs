@@ -29,76 +29,51 @@ namespace AM.Reporting.Utils.Json
     {
         #region Private Fields
 
-        private string jsonText;
         private Dictionary<string, string> pool = new Dictionary<string, string>();
-        private int position;
         private readonly bool stringOptimization;
 
         #endregion Private Fields
 
         #region Public Properties
 
-        public char Char
-        {
-            get
-            {
-                return jsonText[position];
-            }
-        }
+        public char Char => JsonText[Position];
 
-        public bool IsEOF
-        {
-            get
-            {
-                return position >= jsonText.Length;
-            }
-        }
+        public bool IsEOF => Position >= JsonText.Length;
 
-        public bool IsNotEOF
-        {
-            get
-            {
-                return position < jsonText.Length;
-            }
-        }
+        public bool IsNotEOF => Position < JsonText.Length;
 
-        public string JsonText
-        {
-            get { return jsonText; }
-            set { jsonText = value; }
-        }
+        public string JsonText { get; set; }
 
-        public int Position
-        {
-            get { return position; }
-            set { position = value; }
-        }
+        public int Position { get; set; }
 
         #endregion Public Properties
 
         #region Public Constructors
 
-        public JsonTextReader(string jsonText)
+        public JsonTextReader (string jsonText)
         {
             stringOptimization = Config.IsStringOptimization;
 
-            this.jsonText = jsonText;
-            position = 0;
+            this.JsonText = jsonText;
+            Position = 0;
         }
 
         #endregion Public Constructors
 
         #region Public Methods
 
-        public string Dedublicate(string value)
+        public string Dedublicate (string value)
         {
             if (stringOptimization)
             {
-                string result;
-                if (pool.TryGetValue(value, out result))
+                if (pool.TryGetValue (value, out var result))
+                {
                     return result;
+                }
+
                 return pool[value] = value;
             }
+
             return value;
         }
 
@@ -111,54 +86,56 @@ namespace AM.Reporting.Utils.Json
 
         public void ReadNext()
         {
-            position++;
+            Position++;
         }
 
         public void SkipWhiteSpace()
         {
-            while (IsNotEOF && char.IsWhiteSpace(Char))
-                position++;
+            while (IsNotEOF && char.IsWhiteSpace (Char))
+                Position++;
         }
 
-        public Exception ThrowEOF(params char[] args)
+        public Exception ThrowEOF (params char[] args)
         {
-            StringBuilder sb = new StringBuilder();
-            sb.Append("Unexpected end of input json, wait for");
-            ArgsToStringBuilder(sb, args);
-            return new FormatException(sb.ToString());
+            var sb = new StringBuilder();
+            sb.Append ("Unexpected end of input json, wait for");
+            ArgsToStringBuilder (sb, args);
+            return new FormatException (sb.ToString());
         }
 
-        public Exception ThrowEOF(string args)
+        public Exception ThrowEOF (string args)
         {
-            return new FormatException("Unexpected end of input json, wait for " + args);
+            return new FormatException ("Unexpected end of input json, wait for " + args);
         }
 
-        public Exception ThrowFormat(params char[] args)
+        public Exception ThrowFormat (params char[] args)
         {
-            StringBuilder sb = new StringBuilder();
-            sb.Append("Json text at position ").Append(Position).Append(", unexpected symbol ").Append(Char).Append(", wait for");
-            ArgsToStringBuilder(sb, args);
-            return new FormatException(sb.ToString());
+            var sb = new StringBuilder();
+            sb.Append ("Json text at position ").Append (Position).Append (", unexpected symbol ").Append (Char)
+                .Append (", wait for");
+            ArgsToStringBuilder (sb, args);
+            return new FormatException (sb.ToString());
         }
 
         #endregion Public Methods
 
         #region Internal Methods
 
-        internal string Substring(int startPos, int len)
+        internal string Substring (int startPos, int len)
         {
-            return JsonText.Substring(startPos, len);
+            return JsonText.Substring (startPos, len);
         }
 
-        private static void ArgsToStringBuilder(StringBuilder sb, char[] args)
+        private static void ArgsToStringBuilder (StringBuilder sb, char[] args)
         {
             if (args.Length > 0)
             {
-                sb.Append(' ').Append(args[0]);
+                sb.Append (' ').Append (args[0]);
             }
-            for (int i = 1; i < args.Length; i++)
+
+            for (var i = 1; i < args.Length; i++)
             {
-                sb.Append(", ").Append(args[i]);
+                sb.Append (", ").Append (args[i]);
             }
         }
 

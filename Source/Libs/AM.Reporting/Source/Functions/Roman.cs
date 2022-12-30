@@ -26,40 +26,47 @@ using System.Collections.Generic;
 
 namespace AM.Reporting.Functions
 {
-  /// <summary>
-  /// Based on code of Stefan B�ther,  xprocs@hotmail.de
-  /// </summary>
-  internal static class Roman
-  {
-    private static int MAX = 3998;
-    private static string[,] romanDigits = new string[,] {
-        {"M",      "C",    "X",    "I"    },
-        {"MM",     "CC",   "XX",   "II"   },
-        {"MMM",    "CCC",  "XXX",  "III"  },
-        {null,     "CD",   "XL",   "IV"   },
-        {null,     "D",    "L",    "V"    },
-        {null,     "DC",   "LX",   "VI"   },
-        {null,     "DCC",  "LXX",  "VII"  },
-        {null,     "DCCC", "LXXX", "VIII" },
-        {null,     "CM",   "XC",   "IX"   }};
-
-    public static string Convert(int value)
+    /// <summary>
+    /// Based on code of Stefan B�ther,  xprocs@hotmail.de
+    /// </summary>
+    internal static class Roman
     {
-      if (value > MAX)
-        throw new ArgumentOutOfRangeException("value");
+        private static int MAX = 3998;
 
-      StringBuilder result = new StringBuilder(15);
+        private static string[,] romanDigits = new string[,]
+        {
+            { "M", "C", "X", "I" },
+            { "MM", "CC", "XX", "II" },
+            { "MMM", "CCC", "XXX", "III" },
+            { null, "CD", "XL", "IV" },
+            { null, "D", "L", "V" },
+            { null, "DC", "LX", "VI" },
+            { null, "DCC", "LXX", "VII" },
+            { null, "DCCC", "LXXX", "VIII" },
+            { null, "CM", "XC", "IX" }
+        };
 
-      for (int index = 0; index < 4; index++)
-      {
-        int power = (int)Math.Pow(10, 3 - index);
-        int digit = value / power;
-        value -= digit * power;
-        if (digit > 0)
-          result.Append(romanDigits[digit - 1, index]);
-      }
+        public static string Convert (int value)
+        {
+            if (value > MAX)
+            {
+                throw new ArgumentOutOfRangeException ("value");
+            }
 
-      return result.ToString();
+            var result = new StringBuilder (15);
+
+            for (var index = 0; index < 4; index++)
+            {
+                var power = (int)Math.Pow (10, 3 - index);
+                var digit = value / power;
+                value -= digit * power;
+                if (digit > 0)
+                {
+                    result.Append (romanDigits[digit - 1, index]);
+                }
+            }
+
+            return result.ToString();
+        }
     }
-  }
 }

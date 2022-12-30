@@ -27,6 +27,6 @@ namespace AM.Reporting.Data.JsonConnection
         /// </summary>
         /// <param name="tableDataSource"></param>
         /// <returns></returns>
-        JsonBase GetJson(TableDataSource tableDataSource);
+        JsonBase GetJson (TableDataSource tableDataSource);
     }
 }

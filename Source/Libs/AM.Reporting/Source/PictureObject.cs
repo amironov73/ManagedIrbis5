@@ -1,3 +1,20 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -5,9 +22,15 @@ using System.ComponentModel;
 using System.Drawing.Drawing2D;
 using System.IO;
 using System.Drawing.Imaging;
+
 using AM.Reporting.Utils;
+
 using System.Windows.Forms;
 using System.Drawing.Design;
+
+#endregion
+
+#nullable enable
 
 namespace AM.Reporting
 {
@@ -44,22 +67,21 @@ namespace AM.Reporting
     public partial class PictureObject : PictureObjectBase
     {
         #region Fields
+
         private Image image;
 
         private int imageIndex;
 
         private Color transparentColor;
         private float transparency;
-        private bool tile;
-        private Bitmap transparentImage;
         private byte[] imageData;
-        private bool shouldDisposeImage;
         private Bitmap grayscaleBitmap;
-        private int grayscaleHash;
         private ImageFormat imageFormat;
+
         #endregion
 
         #region Properties
+
         /// <summary>
         /// Gets or sets the image.
         /// </summary>
@@ -72,11 +94,11 @@ namespace AM.Reporting
         /// myPictureObject.ShouldDisposeImage = true;
         /// </code>
         /// </remarks>
-        [Category("Data")]
-        [Editor("AM.Reporting.TypeEditors.ImageEditor, AM.Reporting", typeof(UITypeEditor))]
+        [Category ("Data")]
+        [Editor ("AM.Reporting.TypeEditors.ImageEditor, AM.Reporting", typeof (UITypeEditor))]
         public virtual Image Image
         {
-            get { return image; }
+            get => image;
             set
             {
                 image = value;
@@ -92,22 +114,29 @@ namespace AM.Reporting
         /// <summary>
         /// Gets or sets the extension of image.
         /// </summary>
-        [Category("Data")]
+        [Category ("Data")]
         public virtual ImageFormat ImageFormat
         {
-            get { return imageFormat; }
+            get => imageFormat;
             set
             {
                 if (image == null)
-                    return;
-                bool wasC = false;
-                using (MemoryStream stream = new MemoryStream())
                 {
-                    wasC = ImageHelper.SaveAndConvert(Image, stream, value);
+                    return;
+                }
+
+                var wasC = false;
+                using (var stream = new MemoryStream())
+                {
+                    wasC = ImageHelper.SaveAndConvert (Image, stream, value);
                     imageData = stream.ToArray();
                 }
+
                 if (!wasC)
+                {
                     return;
+                }
+
                 ForceLoadImage();
                 imageFormat = CheckImageFormat();
             }
@@ -116,11 +145,11 @@ namespace AM.Reporting
         /// <summary>
         /// Gets or sets a value indicating that the image should be displayed in grayscale mode.
         /// </summary>
-        [DefaultValue(false)]
-        [Category("Appearance")]
+        [DefaultValue (false)]
+        [Category ("Appearance")]
         public override bool Grayscale
         {
-            get { return base.Grayscale; }
+            get => base.Grayscale;
             set
             {
                 base.Grayscale = value;
@@ -135,22 +164,18 @@ namespace AM.Reporting
         /// <summary>
         /// Gets or sets a hash of grayscale svg image
         /// </summary>
-        [Browsable(false)]
-        public int GrayscaleHash
-        {
-            get { return grayscaleHash; }
-            set { grayscaleHash = value; }
-        }
+        [Browsable (false)]
+        public int GrayscaleHash { get; set; }
 
 
         /// <summary>
         /// Gets or sets the color of the image that will be treated as transparent.
         /// </summary>
-        [Category("Appearance")]
-        [Editor("AM.Reporting.TypeEditors.ColorEditor, AM.Reporting", typeof(UITypeEditor))]
+        [Category ("Appearance")]
+        [Editor ("AM.Reporting.TypeEditors.ColorEditor, AM.Reporting", typeof (UITypeEditor))]
         public Color TransparentColor
         {
-            get { return transparentColor; }
+            get => transparentColor;
             set
             {
                 transparentColor = value;
@@ -164,35 +189,35 @@ namespace AM.Reporting
         /// <remarks>
         /// Valid range of values is 0..1. Default value is 0.
         /// </remarks>
-        [DefaultValue(0f)]
-        [Category("Appearance")]
+        [DefaultValue (0f)]
+        [Category ("Appearance")]
         public float Transparency
         {
-            get { return transparency; }
+            get => transparency;
             set
             {
                 if (value < 0)
+                {
                     value = 0;
+                }
+
                 if (value > 1)
+                {
                     value = 1;
+                }
+
                 transparency = value;
                 UpdateTransparentImage();
             }
         }
 
 
-
         /// <summary>
         /// Gets or sets a value indicating that the image should be tiled.
         /// </summary>
-        [DefaultValue(false)]
-        [Category("Appearance")]
-        public bool Tile
-        {
-            get { return tile; }
-            set { tile = value; }
-        }
-
+        [DefaultValue (false)]
+        [Category ("Appearance")]
+        public bool Tile { get; set; }
 
 
         /// <summary>
@@ -204,143 +229,156 @@ namespace AM.Reporting
         /// take care about it. If you want to dispose the image when this <b>PictureObject</b> is disposed,
         /// set this property to <b>true</b> right after you assign an image to the <see cref="Image"/> property.
         /// </remarks>
-        [Browsable(false)]
-        public bool ShouldDisposeImage
-        {
-            get { return shouldDisposeImage; }
-            set { shouldDisposeImage = value; }
-        }
-
-
-
-
-
-
-
-
+        [Browsable (false)]
+        public bool ShouldDisposeImage { get; set; }
 
 
         /// <summary>
         /// Gets or sets a bitmap transparent image
         /// </summary>
-        [Browsable(false)]
-        public Bitmap TransparentImage
-        {
-            get { return transparentImage; }
-            set { transparentImage = value; }
-        }
+        [Browsable (false)]
+        public Bitmap TransparentImage { get; set; }
 
         /// <inheritdoc/>
-        [Browsable(false)]
+        [Browsable (false)]
         protected override float ImageWidth
         {
             get
             {
-                if (Image == null) return 0;
+                if (Image == null)
+                {
+                    return 0;
+                }
+
                 return Image.Width;
             }
         }
 
         /// <inheritdoc/>
-        [Browsable(false)]
+        [Browsable (false)]
         protected override float ImageHeight
         {
             get
             {
-                if (Image == null) return 0;
+                if (Image == null)
+                {
+                    return 0;
+                }
+
                 return Image.Height;
             }
         }
+
         #endregion
 
         #region Private Methods
+
         private ImageFormat CheckImageFormat()
         {
             if (Image == null || Image.RawFormat == null)
+            {
                 return null;
+            }
+
             ImageFormat format = null;
-            if (ImageFormat.Jpeg.Equals(image.RawFormat))
+            if (ImageFormat.Jpeg.Equals (image.RawFormat))
             {
                 format = ImageFormat.Jpeg;
             }
-            else if (ImageFormat.Gif.Equals(image.RawFormat))
+            else if (ImageFormat.Gif.Equals (image.RawFormat))
             {
                 format = ImageFormat.Gif;
             }
-            else if (ImageFormat.Png.Equals(image.RawFormat))
+            else if (ImageFormat.Png.Equals (image.RawFormat))
             {
                 format = ImageFormat.Png;
             }
-            else if (ImageFormat.Emf.Equals(image.RawFormat))
+            else if (ImageFormat.Emf.Equals (image.RawFormat))
             {
                 format = ImageFormat.Emf;
             }
-            else if (ImageFormat.Icon.Equals(image.RawFormat))
+            else if (ImageFormat.Icon.Equals (image.RawFormat))
             {
                 format = ImageFormat.Icon;
             }
-            else if (ImageFormat.Tiff.Equals(image.RawFormat))
+            else if (ImageFormat.Tiff.Equals (image.RawFormat))
             {
                 format = ImageFormat.Tiff;
             }
-            else if (ImageFormat.Bmp.Equals(image.RawFormat) || ImageFormat.MemoryBmp.Equals(image.RawFormat))
+            else if (ImageFormat.Bmp.Equals (image.RawFormat) || ImageFormat.MemoryBmp.Equals (image.RawFormat))
             {
                 format = ImageFormat.Bmp;
             }
-            else if (ImageFormat.Wmf.Equals(image.RawFormat))
+            else if (ImageFormat.Wmf.Equals (image.RawFormat))
             {
                 format = ImageFormat.Wmf;
             }
+
             if (format != null)
+            {
                 return format;
+            }
+
             return ImageFormat.Bmp;
         }
 
         private void UpdateTransparentImage()
         {
-            if (transparentImage != null)
-                transparentImage.Dispose();
-            transparentImage = null;
+            if (TransparentImage != null)
+            {
+                TransparentImage.Dispose();
+            }
+
+            TransparentImage = null;
             if (Image is Bitmap)
             {
                 if (TransparentColor != Color.Transparent)
                 {
-                    transparentImage = new Bitmap(Image);
-                    transparentImage.MakeTransparent(TransparentColor);
+                    TransparentImage = new Bitmap (Image);
+                    TransparentImage.MakeTransparent (TransparentColor);
                 }
                 else if (Transparency != 0)
                 {
-                    transparentImage = ImageHelper.GetTransparentBitmap(Image, Transparency);
+                    TransparentImage = ImageHelper.GetTransparentBitmap (Image, Transparency);
                 }
             }
         }
+
         #endregion
 
         #region Protected Methods
+
         /// <inheritdoc/>
-        protected override void Dispose(bool disposing)
+        protected override void Dispose (bool disposing)
         {
             if (disposing)
+            {
                 DisposeImage();
-            base.Dispose(disposing);
+            }
+
+            base.Dispose (disposing);
         }
+
         #endregion
 
         #region Public Methods
-        /// <inheritdoc/>
-        public override void Assign(Base source)
-        {
-            base.Assign(source);
 
-            PictureObject src = source as PictureObject;
-            if (src != null)
+        /// <inheritdoc/>
+        public override void Assign (Base source)
+        {
+            base.Assign (source);
+
+            if (source is PictureObject src)
             {
                 TransparentColor = src.TransparentColor;
                 Transparency = src.Transparency;
                 Tile = src.Tile;
                 Image = src.Image == null ? null : src.Image.Clone() as Image;
                 if (src.Image == null && src.imageData != null)
+                {
                     imageData = src.imageData;
+                }
+
                 ShouldDisposeImage = true;
                 ImageFormat = src.ImageFormat;
             }
@@ -350,36 +388,38 @@ namespace AM.Reporting
         /// Draws the image.
         /// </summary>
         /// <param name="e">Paint event args.</param>
-        public override void DrawImage(FRPaintEventArgs e)
+        public override void DrawImage (FRPaintEventArgs e)
         {
-            IGraphics g = e.Graphics;
+            var g = e.Graphics;
             if (Image == null)
+            {
                 ForceLoadImage();
+            }
 
             if (Image == null)
             {
-                DrawErrorImage(g, e);
+                DrawErrorImage (g, e);
                 return;
             }
 
-            float drawLeft = (AbsLeft + Padding.Left) * e.ScaleX;
-            float drawTop = (AbsTop + Padding.Top) * e.ScaleY;
-            float drawWidth = (Width - Padding.Horizontal) * e.ScaleX;
-            float drawHeight = (Height - Padding.Vertical) * e.ScaleY;
+            var drawLeft = (AbsLeft + Padding.Left) * e.ScaleX;
+            var drawTop = (AbsTop + Padding.Top) * e.ScaleY;
+            var drawWidth = (Width - Padding.Horizontal) * e.ScaleX;
+            var drawHeight = (Height - Padding.Vertical) * e.ScaleY;
 
-            RectangleF drawRect = new RectangleF(
-              drawLeft,
-              drawTop,
-              drawWidth,
-              drawHeight);
+            var drawRect = new RectangleF (
+                drawLeft,
+                drawTop,
+                drawWidth,
+                drawHeight);
 
-            IGraphicsState state = g.Save();
+            var state = g.Save();
             try
             {
                 //if (Config.IsRunningOnMono) // strange behavior of mono - we need to reset clip before we set new one
-                    g.ResetClip();
-                g.SetClip(drawRect);
-                Report report = Report;
+                g.ResetClip();
+                g.SetClip (drawRect);
+                var report = Report;
                 if (report != null && report.SmoothGraphics)
                 {
                     g.InterpolationMode = InterpolationMode.HighQualityBicubic;
@@ -387,30 +427,38 @@ namespace AM.Reporting
                 }
 
                 if (!Tile)
-                    DrawImageInternal(e, drawRect);
+                {
+                    DrawImageInternal (e, drawRect);
+                }
                 else
                 {
-                    float y = drawRect.Top;
-                    float width = Image.Width * e.ScaleX;
-                    float height = Image.Height * e.ScaleY;
+                    var y = drawRect.Top;
+                    var width = Image.Width * e.ScaleX;
+                    var height = Image.Height * e.ScaleY;
                     while (y < drawRect.Bottom)
                     {
-                        float x = drawRect.Left;
+                        var x = drawRect.Left;
                         while (x < drawRect.Right)
                         {
-                            if (transparentImage != null)
-                                g.DrawImage(transparentImage, x, y, width, height);
+                            if (TransparentImage != null)
+                            {
+                                g.DrawImage (TransparentImage, x, y, width, height);
+                            }
                             else
-                                g.DrawImage(Image, x, y, width, height);
+                            {
+                                g.DrawImage (Image, x, y, width, height);
+                            }
+
                             x += width;
                         }
+
                         y += height;
                     }
                 }
             }
             finally
             {
-                g.Restore(state);
+                g.Restore (state);
             }
 
             if (IsPrinting)
@@ -419,19 +467,26 @@ namespace AM.Reporting
             }
         }
 
-        protected override void DrawImageInternal2(IGraphics graphics, PointF upperLeft, PointF upperRight, PointF lowerLeft)
+        protected override void DrawImageInternal2 (IGraphics graphics, PointF upperLeft, PointF upperRight,
+            PointF lowerLeft)
         {
-            Image image = transparentImage != null ? transparentImage.Clone() as Image : Image.Clone() as Image;
+            var image = TransparentImage != null ? TransparentImage.Clone() as Image : Image.Clone() as Image;
             if (image == null)
+            {
                 return;
+            }
+
             if (Grayscale)
             {
-                if (grayscaleHash != image.GetHashCode() || grayscaleBitmap == null)
+                if (GrayscaleHash != image.GetHashCode() || grayscaleBitmap == null)
                 {
                     if (grayscaleBitmap != null)
+                    {
                         grayscaleBitmap.Dispose();
-                    grayscaleBitmap = ImageHelper.GetGrayscaleBitmap(image);
-                    grayscaleHash = image.GetHashCode();
+                    }
+
+                    grayscaleBitmap = ImageHelper.GetGrayscaleBitmap (image);
+                    GrayscaleHash = image.GetHashCode();
                 }
 
                 image = grayscaleBitmap;
@@ -439,64 +494,85 @@ namespace AM.Reporting
 
             //graphics.DrawImage(image, new PointF[] { upperLeft, upperRight, lowerLeft });
 
-            DrawImage3Points(graphics, image, upperLeft, upperRight, lowerLeft);
+            DrawImage3Points (graphics, image, upperLeft, upperRight, lowerLeft);
             image.Dispose();
         }
 
         // This is analogue of graphics.DrawImage(image, PointF[] points) method.
         // The original gdi+ method does not work properly in mono on linux/macos.
-        private void DrawImage3Points(IGraphics g, Image image, PointF p0, PointF p1, PointF p2)
+        private void DrawImage3Points (IGraphics g, Image image, PointF p0, PointF p1, PointF p2)
         {
             // Skip drawing image, when height or width of the image equal zero.
             if (image == null || image.Width == 0 || image.Height == 0)
+            {
                 return;
+            }
+
             // Skip drawing image, when height or width of the parallelogram for drawing equal zero.
             if (p0 == p1 || p0 == p2)
+            {
                 return;
+            }
 
-            RectangleF rect = new RectangleF(0, 0, image.Width, image.Height);
-            float m11 = (p1.X - p0.X) / rect.Width;
-            float m12 = (p1.Y - p0.Y) / rect.Width;
-            float m21 = (p2.X - p0.X) / rect.Height;
-            float m22 = (p2.Y - p0.Y) / rect.Height;
-            g.MultiplyTransform(new System.Drawing.Drawing2D.Matrix(m11, m12, m21, m22, p0.X, p0.Y), MatrixOrder.Prepend);
-            g.DrawImage(image, rect);
+            var rect = new RectangleF (0, 0, image.Width, image.Height);
+            var m11 = (p1.X - p0.X) / rect.Width;
+            var m12 = (p1.Y - p0.Y) / rect.Width;
+            var m21 = (p2.X - p0.X) / rect.Height;
+            var m22 = (p2.Y - p0.Y) / rect.Height;
+            g.MultiplyTransform (new System.Drawing.Drawing2D.Matrix (m11, m12, m21, m22, p0.X, p0.Y),
+                MatrixOrder.Prepend);
+            g.DrawImage (image, rect);
         }
 
         /// <summary>
         /// Sets image data to FImageData
         /// </summary>
         /// <param name="data"></param>
-        public void SetImageData(byte[] data)
+        public void SetImageData (byte[] data)
         {
             imageData = data;
+
             // if autosize is on, load the image.
             if (SizeMode == PictureBoxSizeMode.AutoSize)
+            {
                 ForceLoadImage();
+            }
         }
 
         /// <inheritdoc/>
-        public override void Serialize(FRWriter writer)
+        public override void Serialize (FRWriter writer)
         {
-            PictureObject c = writer.DiffObject as PictureObject;
-            base.Serialize(writer);
+            var c = writer.DiffObject as PictureObject;
+            base.Serialize (writer);
 
 #if PRINT_HOUSE
       writer.WriteStr("ImageLocation", ImageLocation);
 #endif
             if (TransparentColor != c.TransparentColor)
-                writer.WriteValue("TransparentColor", TransparentColor);
-            if (FloatDiff(Transparency, c.Transparency))
-                writer.WriteFloat("Transparency", Transparency);
+            {
+                writer.WriteValue ("TransparentColor", TransparentColor);
+            }
+
+            if (FloatDiff (Transparency, c.Transparency))
+            {
+                writer.WriteFloat ("Transparency", Transparency);
+            }
+
             if (Tile != c.Tile)
-                writer.WriteBool("Tile", Tile);
+            {
+                writer.WriteBool ("Tile", Tile);
+            }
+
             if (ImageFormat != c.ImageFormat)
-                writer.WriteValue("ImageFormat", ImageFormat);
+            {
+                writer.WriteValue ("ImageFormat", ImageFormat);
+            }
+
             // store image data
             if (writer.SerializeTo != SerializeTo.SourcePages)
             {
                 if (writer.SerializeTo == SerializeTo.Preview ||
-                  (String.IsNullOrEmpty(ImageLocation) && String.IsNullOrEmpty(DataColumn)))
+                    (string.IsNullOrEmpty (ImageLocation) && string.IsNullOrEmpty (DataColumn)))
                 {
                     if (writer.BlobStore != null)
                     {
@@ -505,62 +581,62 @@ namespace AM.Reporting
                         // previous BlobStore item and is not -1.
                         if (imageIndex == -1 || imageIndex >= writer.BlobStore.Count)
                         {
-                            byte[] bytes = imageData;
+                            var bytes = imageData;
                             if (bytes == null)
                             {
-                                using (MemoryStream stream = new MemoryStream())
+                                using (var stream = new MemoryStream())
                                 {
-                                    ImageHelper.Save(Image, stream, imageFormat);
+                                    ImageHelper.Save (Image, stream, imageFormat);
                                     bytes = stream.ToArray();
                                 }
                             }
+
                             if (bytes != null)
                             {
-                                string imgHash = BitConverter.ToString(new Murmur3().ComputeHash(bytes));
-                                imageIndex = writer.BlobStore.AddOrUpdate(bytes, imgHash);
+                                var imgHash = BitConverter.ToString (new Murmur3().ComputeHash (bytes));
+                                imageIndex = writer.BlobStore.AddOrUpdate (bytes, imgHash);
                             }
                         }
                     }
                     else
                     {
                         if (Image == null && imageData != null)
-                            writer.WriteStr("Image", Convert.ToBase64String(imageData));
-                        else if (!writer.AreEqual(Image, c.Image))
-                            writer.WriteValue("Image", Image);
+                        {
+                            writer.WriteStr ("Image", Convert.ToBase64String (imageData));
+                        }
+                        else if (!writer.AreEqual (Image, c.Image))
+                        {
+                            writer.WriteValue ("Image", Image);
+                        }
                     }
 
                     if (writer.BlobStore != null || writer.SerializeTo == SerializeTo.Undo)
-                        writer.WriteInt("ImageIndex", imageIndex);
+                    {
+                        writer.WriteInt ("ImageIndex", imageIndex);
+                    }
                 }
             }
         }
 
         /// <inheritdoc/>
-        public override void Deserialize(FRReader reader)
+        public override void Deserialize (FRReader reader)
         {
-            base.Deserialize(reader);
-            if (reader.HasProperty("ImageIndex"))
+            base.Deserialize (reader);
+            if (reader.HasProperty ("ImageIndex"))
             {
-                imageIndex = reader.ReadInt("ImageIndex");
+                imageIndex = reader.ReadInt ("ImageIndex");
                 if (reader.BlobStore != null && imageIndex != -1)
                 {
                     //int saveIndex = FImageIndex;
                     //Image = ImageHelper.Load(reader.BlobStore.Get(FImageIndex));
                     //FImageIndex = saveIndex;
-                    SetImageData(reader.BlobStore.Get(imageIndex));
+                    SetImageData (reader.BlobStore.Get (imageIndex));
                 }
             }
         }
 
 
-
-
-
-
         //static int number = 0;
-
-
-
 
 
         /// <summary>
@@ -568,16 +644,20 @@ namespace AM.Reporting
         /// </summary>
         public override void LoadImage()
         {
-            if (!String.IsNullOrEmpty(ImageLocation))
+            if (!string.IsNullOrEmpty (ImageLocation))
             {
                 //
                 try
                 {
-                    Uri uri = CalculateUri();
+                    var uri = CalculateUri();
                     if (uri.IsFile)
-                        SetImageData(ImageHelper.Load(uri.LocalPath));
+                    {
+                        SetImageData (ImageHelper.Load (uri.LocalPath));
+                    }
                     else
-                        SetImageData(ImageHelper.LoadURL(uri.ToString()));
+                    {
+                        SetImageData (ImageHelper.LoadURL (uri.ToString()));
+                    }
                 }
                 catch
                 {
@@ -594,7 +674,10 @@ namespace AM.Reporting
         public void DisposeImage()
         {
             if (Image != null && ShouldDisposeImage)
+            {
                 Image.Dispose();
+            }
+
             Image = null;
         }
 
@@ -602,10 +685,10 @@ namespace AM.Reporting
         {
             imageIndex = -1;
         }
-#endregion
 
-#region Report Engine
+        #endregion
 
+        #region Report Engine
 
         /// <inheritdoc/>
         public override void InitializeComponent()
@@ -622,25 +705,24 @@ namespace AM.Reporting
         }
 
 
-
         /// <inheritdoc/>
         public override void GetData()
         {
             base.GetData();
-            if (!String.IsNullOrEmpty(DataColumn))
+            if (!string.IsNullOrEmpty (DataColumn))
             {
                 // reset the image
                 Image = null;
                 imageData = null;
 
-                object data = Report.GetColumnValueNullable(DataColumn);
-                if (data is byte[])
+                var data = Report.GetColumnValueNullable (DataColumn);
+                if (data is byte[] bytes)
                 {
-                    SetImageData((byte[])data);
+                    SetImageData (bytes);
                 }
-                else if (data is Image)
+                else if (data is Image data1)
                 {
-                    Image = data as Image;
+                    Image = data1;
                 }
                 else if (data is string)
                 {
@@ -662,16 +744,19 @@ namespace AM.Reporting
         public void ForceLoadImage()
         {
             if (imageData == null)
+            {
                 return;
+            }
 
-            byte[] saveImageData = imageData;
+            var saveImageData = imageData;
+
             // FImageData will be reset after this line, keep it
-            Image = ImageHelper.Load(imageData);
+            Image = ImageHelper.Load (imageData);
             imageData = saveImageData;
             ShouldDisposeImage = true;
         }
 
-#endregion
+        #endregion
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PictureObject"/> class with default settings.
@@ -679,9 +764,8 @@ namespace AM.Reporting
         public PictureObject()
         {
             transparentColor = Color.Transparent;
-            SetFlags(Flags.HasSmartTag, true);
+            SetFlags (Flags.HasSmartTag, true);
             ResetImageIndex();
         }
-
     }
 }

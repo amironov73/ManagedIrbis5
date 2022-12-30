@@ -1,9 +1,32 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.ComponentModel;
 using System.Drawing;
+
 using AM.Reporting.Utils;
+
 using System.Windows.Forms;
 using System.Drawing.Design;
+
+#endregion
+
+#nullable enable
 
 namespace AM.Reporting
 {
@@ -71,49 +94,36 @@ namespace AM.Reporting
     /// Watermark can draw text and/or image behind the page objects on in front of them. To enable
     /// watermark, set its <b>Enabled</b> property to <b>true</b>.
     /// </remarks>
-    [TypeConverter(typeof(AM.Reporting.TypeConverters.FRExpandableObjectConverter))]
-    [EditorAttribute("AM.Reporting.TypeEditors.WatermarkEditor, AM.Reporting", typeof(UITypeEditor))]
+    [TypeConverter (typeof (TypeConverters.FRExpandableObjectConverter))]
+    [EditorAttribute ("AM.Reporting.TypeEditors.WatermarkEditor, AM.Reporting", typeof (UITypeEditor))]
     public class Watermark : IDisposable
     {
         #region Fields
-        private bool enabled;
-        private PictureObject pictureObject;
-        private TextObject textObject;
-        private WatermarkTextRotation textRotation;
-        private WatermarkImageSize imageSize;
-        private bool showImageOnTop;
-        private bool showTextOnTop;
+
         #endregion
 
         #region Properties
+
         /// <summary>
         /// Gets or sets avalue indicating that watermark is enabled.
         /// </summary>
-        [DefaultValue(false)]
-        public bool Enabled
-        {
-            get { return enabled; }
-            set { enabled = value; }
-        }
+        [DefaultValue (false)]
+        public bool Enabled { get; set; }
 
         /// <summary>
         /// Gets or sets the watermark image.
         /// </summary>
         public Image Image
         {
-            get { return pictureObject.Image; }
-            set { pictureObject.Image = value; }
+            get => PictureObject.Image;
+            set => PictureObject.Image = value;
         }
 
         /// <summary>
         /// Gets or sets the watermark image size mode.
         /// </summary>
-        [DefaultValue(WatermarkImageSize.Zoom)]
-        public WatermarkImageSize ImageSize
-        {
-            get { return imageSize; }
-            set { imageSize = value; }
-        }
+        [DefaultValue (WatermarkImageSize.Zoom)]
+        public WatermarkImageSize ImageSize { get; set; }
 
         /// <summary>
         /// Gets or sets an image transparency.
@@ -121,11 +131,11 @@ namespace AM.Reporting
         /// <remarks>
         /// Valid values are 0..1. 1 means totally transparent image.
         /// </remarks>
-        [DefaultValue(0f)]
+        [DefaultValue (0f)]
         public float ImageTransparency
         {
-            get { return pictureObject.Transparency; }
-            set { pictureObject.Transparency = value; }
+            get => PictureObject.Transparency;
+            set => PictureObject.Transparency = value;
         }
 
         /// <summary>
@@ -133,8 +143,8 @@ namespace AM.Reporting
         /// </summary>
         public string Text
         {
-            get { return textObject.Text; }
-            set { textObject.Text = value; }
+            get => TextObject.Text;
+            set => TextObject.Text = value;
         }
 
         /// <summary>
@@ -142,66 +152,49 @@ namespace AM.Reporting
         /// </summary>
         public Font Font
         {
-            get { return textObject.Font; }
-            set { textObject.Font = value; }
+            get => TextObject.Font;
+            set => TextObject.Font = value;
         }
 
         /// <summary>
         /// Gets or sets a text fill.
         /// </summary>
-        [Editor("AM.Reporting.TypeEditors.FillEditor, AM.Reporting", typeof(UITypeEditor))]
+        [Editor ("AM.Reporting.TypeEditors.FillEditor, AM.Reporting", typeof (UITypeEditor))]
         public FillBase TextFill
         {
-            get { return textObject.TextFill; }
-            set { textObject.TextFill = value; }
+            get => TextObject.TextFill;
+            set => TextObject.TextFill = value;
         }
 
         /// <summary>
         /// Gets or sets a text rotation.
         /// </summary>
-        [DefaultValue(WatermarkTextRotation.ForwardDiagonal)]
-        public WatermarkTextRotation TextRotation
-        {
-            get { return textRotation; }
-            set { textRotation = value; }
-        }
+        [DefaultValue (WatermarkTextRotation.ForwardDiagonal)]
+        public WatermarkTextRotation TextRotation { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicates that the text should be displayed on top of all page objects.
         /// </summary>
-        [DefaultValue(true)]
-        public bool ShowTextOnTop
-        {
-            get { return showTextOnTop; }
-            set { showTextOnTop = value; }
-        }
+        [DefaultValue (true)]
+        public bool ShowTextOnTop { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicates that the image should be displayed on top of all page objects.
         /// </summary>
-        [DefaultValue(false)]
-        public bool ShowImageOnTop
-        {
-            get { return showImageOnTop; }
-            set { showImageOnTop = value; }
-        }
+        [DefaultValue (false)]
+        public bool ShowImageOnTop { get; set; }
 
-        internal TextObject TextObject
-        {
-            get { return textObject; }
-        }
+        internal TextObject TextObject { get; }
 
         /// <summary>
         ///
         /// </summary>
-        public PictureObject PictureObject
-        {
-            get { return pictureObject; }
-            set { pictureObject = value; }
-        }
+        public PictureObject PictureObject { get; set; }
+
         #endregion
 
         #region Private Methods
+
         //private bool ShouldSerializeFont()
         //{
         //    return Font.Name != DrawUtils.DefaultReportFont.Name || Font.Size != 60 || Font.Style != FontStyle.Regular;
@@ -216,9 +209,11 @@ namespace AM.Reporting
         {
             return Image != null;
         }
+
         #endregion
 
         #region Public Methods
+
         /// <summary>
         /// Draws watermark image.
         /// </summary>
@@ -226,21 +221,28 @@ namespace AM.Reporting
         /// <param name="displayRect"></param>
         /// <param name="report"></param>
         /// <param name="isPrinting"></param>
-        public virtual void DrawImage(FRPaintEventArgs e, RectangleF displayRect, Report report, bool isPrinting)
+        public virtual void DrawImage (FRPaintEventArgs e, RectangleF displayRect, Report report, bool isPrinting)
         {
-            pictureObject.SetReport(report);
-            pictureObject.Bounds = displayRect;
-            PictureBoxSizeMode sizeMode = PictureBoxSizeMode.Normal;
+            PictureObject.SetReport (report);
+            PictureObject.Bounds = displayRect;
+            var sizeMode = PictureBoxSizeMode.Normal;
             if (ImageSize == WatermarkImageSize.Stretch)
+            {
                 sizeMode = PictureBoxSizeMode.StretchImage;
+            }
             else if (ImageSize == WatermarkImageSize.Zoom)
+            {
                 sizeMode = PictureBoxSizeMode.Zoom;
+            }
             else if (ImageSize == WatermarkImageSize.Center)
+            {
                 sizeMode = PictureBoxSizeMode.CenterImage;
-            pictureObject.SizeMode = sizeMode;
-            pictureObject.Tile = ImageSize == WatermarkImageSize.Tile;
-            pictureObject.SetPrinting(isPrinting);
-            pictureObject.DrawImage(e);
+            }
+
+            PictureObject.SizeMode = sizeMode;
+            PictureObject.Tile = ImageSize == WatermarkImageSize.Tile;
+            PictureObject.SetPrinting (isPrinting);
+            PictureObject.DrawImage (e);
         }
 
         /// <summary>
@@ -250,11 +252,11 @@ namespace AM.Reporting
         /// <param name="displayRect"></param>
         /// <param name="report"></param>
         /// <param name="isPrinting"></param>
-        public void DrawText(FRPaintEventArgs e, RectangleF displayRect, Report report, bool isPrinting)
+        public void DrawText (FRPaintEventArgs e, RectangleF displayRect, Report report, bool isPrinting)
         {
-            textObject.SetReport(report);
-            textObject.Bounds = displayRect;
-            int angle = 0;
+            TextObject.SetReport (report);
+            TextObject.Bounds = displayRect;
+            var angle = 0;
             switch (TextRotation)
             {
                 case WatermarkTextRotation.Horizontal:
@@ -264,15 +266,16 @@ namespace AM.Reporting
                     angle = 270;
                     break;
                 case WatermarkTextRotation.ForwardDiagonal:
-                    angle = 360 - (int)(Math.Atan(displayRect.Height / displayRect.Width) * (180 / Math.PI));
+                    angle = 360 - (int)(Math.Atan (displayRect.Height / displayRect.Width) * (180 / Math.PI));
                     break;
                 case WatermarkTextRotation.BackwardDiagonal:
-                    angle = (int)(Math.Atan(displayRect.Height / displayRect.Width) * (180 / Math.PI));
+                    angle = (int)(Math.Atan (displayRect.Height / displayRect.Width) * (180 / Math.PI));
                     break;
             }
-            textObject.Angle = angle;
-            textObject.SetPrinting(isPrinting);
-            textObject.DrawText(e);
+
+            TextObject.Angle = angle;
+            TextObject.SetPrinting (isPrinting);
+            TextObject.DrawText (e);
         }
 
         /// <summary>
@@ -284,27 +287,54 @@ namespace AM.Reporting
         /// <remarks>
         /// This method is for internal use only.
         /// </remarks>
-        public void Serialize(FRWriter writer, string prefix, Watermark c)
+        public void Serialize (FRWriter writer, string prefix, Watermark c)
         {
             if (Enabled != c.Enabled)
-                writer.WriteBool(prefix + ".Enabled", Enabled);
-            if (!writer.AreEqual(Image, c.Image))
-                writer.WriteValue(prefix + ".Image", Image);
+            {
+                writer.WriteBool (prefix + ".Enabled", Enabled);
+            }
+
+            if (!writer.AreEqual (Image, c.Image))
+            {
+                writer.WriteValue (prefix + ".Image", Image);
+            }
+
             if (ImageSize != c.ImageSize)
-                writer.WriteValue(prefix + ".ImageSize", ImageSize);
+            {
+                writer.WriteValue (prefix + ".ImageSize", ImageSize);
+            }
+
             if (ImageTransparency != c.ImageTransparency)
-                writer.WriteFloat(prefix + ".ImageTransparency", ImageTransparency);
+            {
+                writer.WriteFloat (prefix + ".ImageTransparency", ImageTransparency);
+            }
+
             if (Text != c.Text)
-                writer.WriteStr(prefix + ".Text", Text);
-            if ((writer.SerializeTo != SerializeTo.Preview || !writer.AreEqual(Font, c.Font)) && writer.ItemName != "inherited")
-                writer.WriteValue(prefix + ".Font", Font);
-            TextFill.Serialize(writer, prefix + ".TextFill", c.TextFill);
+            {
+                writer.WriteStr (prefix + ".Text", Text);
+            }
+
+            if ((writer.SerializeTo != SerializeTo.Preview || !writer.AreEqual (Font, c.Font)) &&
+                writer.ItemName != "inherited")
+            {
+                writer.WriteValue (prefix + ".Font", Font);
+            }
+
+            TextFill.Serialize (writer, prefix + ".TextFill", c.TextFill);
             if (TextRotation != c.TextRotation)
-                writer.WriteValue(prefix + ".TextRotation", TextRotation);
+            {
+                writer.WriteValue (prefix + ".TextRotation", TextRotation);
+            }
+
             if (ShowTextOnTop != c.ShowTextOnTop)
-                writer.WriteBool(prefix + ".ShowTextOnTop", ShowTextOnTop);
+            {
+                writer.WriteBool (prefix + ".ShowTextOnTop", ShowTextOnTop);
+            }
+
             if (ShowImageOnTop != c.ShowImageOnTop)
-                writer.WriteBool(prefix + ".ShowImageOnTop", ShowImageOnTop);
+            {
+                writer.WriteBool (prefix + ".ShowImageOnTop", ShowImageOnTop);
+            }
         }
 
         /// <summary>
@@ -312,15 +342,15 @@ namespace AM.Reporting
         /// </summary>
         public void Dispose()
         {
-            pictureObject.Dispose();
-            textObject.Dispose();
+            PictureObject.Dispose();
+            TextObject.Dispose();
         }
 
         /// <summary>
         /// Assigns values from another source.
         /// </summary>
         /// <param name="source">Source to assign from.</param>
-        public void Assign(Watermark source)
+        public void Assign (Watermark source)
         {
             Enabled = source.Enabled;
             Image = source.Image == null ? null : source.Image.Clone() as Image;
@@ -340,10 +370,11 @@ namespace AM.Reporting
         /// <returns>Copy of this watermark.</returns>
         public Watermark Clone()
         {
-            Watermark result = new Watermark();
-            result.Assign(this);
+            var result = new Watermark();
+            result.Assign (this);
             return result;
         }
+
         #endregion
 
         /// <summary>
@@ -351,15 +382,15 @@ namespace AM.Reporting
         /// </summary>
         public Watermark()
         {
-            pictureObject = new PictureObject();
-            textObject = new TextObject();
+            PictureObject = new PictureObject();
+            TextObject = new TextObject();
 
-            pictureObject.ShowErrorImage = false;
-            textObject.HorzAlign = HorzAlign.Center;
-            textObject.VertAlign = VertAlign.Center;
+            PictureObject.ShowErrorImage = false;
+            TextObject.HorzAlign = HorzAlign.Center;
+            TextObject.VertAlign = VertAlign.Center;
             ImageSize = WatermarkImageSize.Zoom;
-            Font = new Font(DrawUtils.DefaultReportFont.Name, 60);
-            TextFill = new SolidFill(Color.FromArgb(40, Color.Gray));
+            Font = new Font (DrawUtils.DefaultReportFont.Name, 60);
+            TextFill = new SolidFill (Color.FromArgb (40, Color.Gray));
             TextRotation = WatermarkTextRotation.ForwardDiagonal;
             ShowTextOnTop = true;
         }

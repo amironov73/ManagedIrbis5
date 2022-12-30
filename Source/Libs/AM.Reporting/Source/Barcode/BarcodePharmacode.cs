@@ -30,23 +30,14 @@ namespace AM.Reporting.Barcode
     /// </summary>
     public class BarcodePharmacode : LinearBarcodeBase
     {
-        private bool quietZone;
-
         /// <summary>
         /// Gets or sets the value indicating that quiet zone must be shown.
         /// </summary>
-        [DefaultValue(true)]
-        public bool QuietZone
-        {
-            get { return quietZone; }
-            set { quietZone = value; }
-        }
+        [DefaultValue (true)]
+        public bool QuietZone { get; set; }
 
         /// <inheritdoc/>
-        public override bool IsNumeric
-        {
-            get { return true; }
-        }
+        public override bool IsNumeric => true;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BarcodePharmacode"/> class with default settings.
@@ -58,54 +49,61 @@ namespace AM.Reporting.Barcode
 
         internal override string GetPattern()
         {
-            ulong value = ulong.Parse(text);
+            var value = ulong.Parse (text);
             value += 1;
-            string binary = Convert.ToString((long)value, 2);
+            var binary = Convert.ToString ((long)value, 2);
 
-            if (binary.StartsWith("1"))
-                binary = binary.Remove(0, 1);
+            if (binary.StartsWith ("1"))
+            {
+                binary = binary.Remove (0, 1);
+            }
 
             const string space = "2";
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
 
             if (QuietZone)
-                result.Append(space);
-
-            foreach (char c in binary)
             {
-                switch(c)
+                result.Append (space);
+            }
+
+            foreach (var c in binary)
+            {
+                switch (c)
                 {
                     case '0':
-                        result.Append("5");
-                        result.Append(space);
+                        result.Append ("5");
+                        result.Append (space);
                         break;
                     case '1':
-                        result.Append("7");
-                        result.Append(space);
+                        result.Append ("7");
+                        result.Append (space);
                         break;
                 }
             }
 
-            if (!QuietZone && result.ToString().EndsWith(space))
-                result.Remove(result.Length - space.Length, space.Length);
+            if (!QuietZone && result.ToString().EndsWith (space))
+            {
+                result.Remove (result.Length - space.Length, space.Length);
+            }
 
             return result.ToString();
         }
 
         /// <inheritdoc/>
-        public override void Assign(BarcodeBase source)
+        public override void Assign (BarcodeBase source)
         {
-            base.Assign(source);
-            BarcodePharmacode src = source as BarcodePharmacode;
+            base.Assign (source);
+            var src = source as BarcodePharmacode;
             QuietZone = src.QuietZone;
         }
 
-        internal override void Serialize(AM.Reporting.Utils.FRWriter writer, string prefix, BarcodeBase diff)
+        internal override void Serialize (Utils.FRWriter writer, string prefix, BarcodeBase diff)
         {
-            base.Serialize(writer, prefix, diff);
-            BarcodePharmacode c = diff as BarcodePharmacode;
-            if (c == null || QuietZone != c.QuietZone)
-                writer.WriteBool(prefix + "QuietZone", QuietZone);
+            base.Serialize (writer, prefix, diff);
+            if (diff is not BarcodePharmacode c || QuietZone != c.QuietZone)
+            {
+                writer.WriteBool (prefix + "QuietZone", QuietZone);
+            }
         }
     }
 }

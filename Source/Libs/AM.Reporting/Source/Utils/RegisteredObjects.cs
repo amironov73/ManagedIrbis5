@@ -47,9 +47,9 @@ namespace AM.Reporting.Utils
         /// Enumerates all objects.
         /// </summary>
         /// <param name="list">List that will contain enumerated items.</param>
-        public abstract void EnumItems(ICollection<T> list);
+        public abstract void EnumItems (ICollection<T> list);
 
-        internal abstract T FindOrCreate(string complexName);
+        internal abstract T FindOrCreate (string complexName);
 
         protected BaseObjectInfo()
         {
@@ -60,21 +60,20 @@ namespace AM.Reporting.Utils
     public class FunctionInfo : BaseObjectInfo<FunctionInfo>
     {
         #region Fields
+
         private string text;
 #if CATEGORY_OPTIMIZATION
         private FunctionInfo root;
 #endif
+
         #endregion
 
-#region Properties
+        #region Properties
+
         /// <summary>
         /// Name of object or category.
         /// </summary>
-        public string Name
-        {
-            get;
-            set;
-        }
+        public string Name { get; set; }
 
 #if CATEGORY_OPTIMIZATION
         public FunctionInfo Category
@@ -92,14 +91,16 @@ namespace AM.Reporting.Utils
         /// </summary>
         public override string Text
         {
-            get { return text; }
+            get => text;
             set
             {
                 text = value;
                 if (text == "")
                 {
                     if (Function != null)
+                    {
                         text = "Objects," + Function.Name;
+                    }
                 }
             }
         }
@@ -108,34 +109,31 @@ namespace AM.Reporting.Utils
         /// <summary>
         /// The registered function.
         /// </summary>
-        public MethodInfo Function
-        {
-            get;
-            set;
-        }
+        public MethodInfo Function { get; set; }
 
-#endregion
+        #endregion
 
-#region Public Methods
+        #region Public Methods
+
         /// <summary>
         /// Enumerates all objects.
         /// </summary>
         /// <param name="list">List that will contain enumerated items.</param>
-        public override void EnumItems(ICollection<FunctionInfo> list)
+        public override void EnumItems (ICollection<FunctionInfo> list)
         {
-            list.Add(this);
-            foreach (FunctionInfo item in Items)
+            list.Add (this);
+            foreach (var item in Items)
             {
-                item.EnumItems(list);
+                item.EnumItems (list);
             }
         }
 
 #if !CATEGORY_OPTIMIZATION
-        internal override FunctionInfo FindOrCreate(string complexName)
+        internal override FunctionInfo FindOrCreate (string complexName)
         {
-            string[] itemNames = complexName.Split(',');
-            FunctionInfo root = this;
-            foreach (string itemName in itemNames)
+            string[] itemNames = complexName.Split (',');
+            var root = this;
+            foreach (var itemName in itemNames)
             {
                 FunctionInfo item = null;
                 foreach (var rootItem in root.Items)
@@ -146,19 +144,23 @@ namespace AM.Reporting.Utils
                         break;
                     }
                 }
+
                 if (item == null)
                 {
-                    item = new FunctionInfo();
-                    item.Name = itemName;
-                    item.Text = itemName;
-                    root.Items.Add(item);
+                    item = new FunctionInfo
+                    {
+                        Name = itemName,
+                        Text = itemName
+                    };
+                    root.Items.Add (item);
                 }
+
                 root = item;
             }
+
             return root;
         }
 #else
-
         internal FunctionInfo FindOrCreate(FunctionInfo category, string name)
         {
             foreach(FunctionInfo item in category.Items)
@@ -176,23 +178,23 @@ namespace AM.Reporting.Utils
         }
 #endif
 
-        internal void Update(MethodInfo func, string text)
+        internal void Update (MethodInfo func, string text)
         {
             Function = func;
             Text = text;
         }
 
-#endregion
+        #endregion
 
         internal FunctionInfo()
         {
             Name = "";
         }
 
-        internal FunctionInfo(string name, MethodInfo func, string text) : this()
+        internal FunctionInfo (string name, MethodInfo func, string text) : this()
         {
             Name = name;
-            Update(func, text);
+            Update (func, text);
         }
     }
 
@@ -210,39 +212,43 @@ namespace AM.Reporting.Utils
         /// </summary>
         public override string Text
         {
-            get { return text; }
+            get => text;
             set
             {
                 text = value;
                 if (text == "")
                 {
                     if (Object != null)
+                    {
                         text = "Objects," + Object.Name;
+                    }
                 }
             }
         }
 
-        public override void EnumItems(ICollection<DataConnectionInfo> list)
+        public override void EnumItems (ICollection<DataConnectionInfo> list)
         {
-            list.Add(this);
+            list.Add (this);
             foreach (var item in Items)
             {
-                item.EnumItems(list);
+                item.EnumItems (list);
             }
         }
 
-        internal void Update(Type obj, string text)
+        internal void Update (Type obj, string text)
         {
             Object = obj;
             Text = text;
         }
 
-        internal override DataConnectionInfo FindOrCreate(string complexName)
+        internal override DataConnectionInfo FindOrCreate (string complexName)
         {
-            DataConnectionInfo root = this;
-            var item = new DataConnectionInfo();
-            item.Text = complexName;
-            root.Items.Add(item);
+            var root = this;
+            var item = new DataConnectionInfo
+            {
+                Text = complexName
+            };
+            root.Items.Add (item);
             return item;
         }
 
@@ -256,39 +262,31 @@ namespace AM.Reporting.Utils
     /// </summary>
     public partial class ObjectInfo : BaseObjectInfo<ObjectInfo>
     {
-#region Fields
-        private string name;
-        private Type fObject;
-        private string text;
-        private bool enabled;
-#endregion
+        #region Fields
 
-#region Properties
+        private string text;
+
+        #endregion
+
+        #region Properties
+
         /// <summary>
         /// Name of object or category.
         /// </summary>
-        public string Name
-        {
-            get { return name; }
-            set { name = value; }
-        }
+        public string Name { get; set; }
 
         /// <summary>
         /// The registered object.
         /// </summary>
-        public Type Object
-        {
-            get { return fObject; }
-            set { fObject = value; }
-        }
+        public Type Object { get; set; }
 
         /// <summary>
         /// The registered function.
         /// </summary>
-        [Obsolete("Use RegisteredObjects.Functions", true)]
+        [Obsolete ("Use RegisteredObjects.Functions", true)]
         public MethodInfo Function
         {
-            get { return null; }
+            get => null;
             set { }
         }
 
@@ -297,14 +295,16 @@ namespace AM.Reporting.Utils
         /// </summary>
         public override string Text
         {
-            get { return text; }
+            get => text;
             set
             {
                 text = value;
                 if (text == "")
                 {
                     if (Object != null)
+                    {
                         text = "Objects," + Object.Name;
+                    }
                 }
             }
         }
@@ -312,36 +312,33 @@ namespace AM.Reporting.Utils
         /// <summary>
         /// Gets or sets the enabled flag for the object.
         /// </summary>
-        public bool Enabled
-        {
-            get { return enabled; }
-            set { enabled = value; }
-        }
+        public bool Enabled { get; set; }
 
-#endregion
+        #endregion
 
-#region Public Methods
+        #region Public Methods
+
         /// <summary>
         /// Enumerates all objects.
         /// </summary>
         /// <param name="list">List that will contain enumerated items.</param>
-        public override void EnumItems(ICollection<ObjectInfo> list)
+        public override void EnumItems (ICollection<ObjectInfo> list)
         {
-            list.Add(this);
+            list.Add (this);
             foreach (var item in Items)
             {
-                item.EnumItems(list);
+                item.EnumItems (list);
             }
         }
 
-        internal override ObjectInfo FindOrCreate(string complexName)
+        internal override ObjectInfo FindOrCreate (string complexName)
         {
-            string[] itemNames = complexName.Split(',');
-            ObjectInfo root = this;
-            foreach (string itemName in itemNames)
+            string[] itemNames = complexName.Split (',');
+            var root = this;
+            foreach (var itemName in itemNames)
             {
                 ObjectInfo item = null;
-                foreach (ObjectInfo rootItem in root.Items)
+                foreach (var rootItem in root.Items)
                 {
                     if (rootItem.Name != "" && rootItem.Name == itemName)
                     {
@@ -349,26 +346,31 @@ namespace AM.Reporting.Utils
                         break;
                     }
                 }
+
                 if (item == null)
                 {
-                    item = new ObjectInfo();
-                    item.Name = itemName;
-                    item.Text = itemName;
-                    root.Items.Add(item);
+                    item = new ObjectInfo
+                    {
+                        Name = itemName,
+                        Text = itemName
+                    };
+                    root.Items.Add (item);
                 }
+
                 root = item;
             }
+
             return root;
         }
 
-        internal void Remove(string complexName)
+        internal void Remove (string complexName)
         {
-            string[] itemNames = complexName.Split(',');
-            ObjectInfo root = this;
-            foreach (string itemName in itemNames)
+            string[] itemNames = complexName.Split (',');
+            var root = this;
+            foreach (var itemName in itemNames)
             {
                 ObjectInfo item = null;
-                for (int i = 0; i < root.Items.Count; i++)
+                for (var i = 0; i < root.Items.Count; i++)
                 {
                     var rootItem = root.Items[i];
 
@@ -377,51 +379,53 @@ namespace AM.Reporting.Utils
                         item = rootItem;
                         break;
                     }
-                    if (rootItem.Text.Contains(itemName))
+
+                    if (rootItem.Text.Contains (itemName))
                     {
-                        root.Items.RemoveAt(i);
+                        root.Items.RemoveAt (i);
                         break;
                     }
                 }
+
                 root = item;
             }
         }
 
-        internal void Update(Type obj, Bitmap image, int imageIndex, string text)
+        internal void Update (Type obj, Bitmap image, int imageIndex, string text)
         {
-            fObject = obj;
-            UpdateDesign(image, imageIndex);
+            Object = obj;
+            UpdateDesign (image, imageIndex);
             Text = text;
         }
 
-        internal void Update(Type obj, Bitmap image, int imageIndex, string text, int flags, bool multiInsert)
+        internal void Update (Type obj, Bitmap image, int imageIndex, string text, int flags, bool multiInsert)
         {
-            fObject = obj;
-            UpdateDesign(flags, multiInsert, image, imageIndex);
+            Object = obj;
+            UpdateDesign (flags, multiInsert, image, imageIndex);
             Text = text;
         }
 
-        internal void Update(Type obj, Bitmap image, int imageIndex, int buttonIndex, string text, int flags,
+        internal void Update (Type obj, Bitmap image, int imageIndex, int buttonIndex, string text, int flags,
             bool multiInsert)
         {
-            fObject = obj;
-            UpdateDesign(flags, multiInsert, image, imageIndex, buttonIndex);
+            Object = obj;
+            UpdateDesign (flags, multiInsert, image, imageIndex, buttonIndex);
             Text = text;
         }
 
-#endregion
+        #endregion
 
         internal ObjectInfo()
         {
-            name = "";
-            enabled = true;
+            Name = "";
+            Enabled = true;
         }
 
-        internal ObjectInfo(string name, Type obj, Bitmap image, int imageIndex, string text,
-          int flags, bool multiInsert) : this()
+        internal ObjectInfo (string name, Type obj, Bitmap image, int imageIndex, string text,
+            int flags, bool multiInsert) : this()
         {
-            this.name = name;
-            Update(obj, image, imageIndex, text, flags, multiInsert);
+            this.Name = name;
+            Update (obj, image, imageIndex, text, flags, multiInsert);
         }
     }
 
@@ -444,21 +448,21 @@ namespace AM.Reporting.Utils
     /// </example>
     public static partial class RegisteredObjects
     {
-#region Fields
+        #region Fields
+
         private static readonly Hashtable FTypes = new Hashtable();
-        private static readonly ObjectInfo FObjects = new ObjectInfo();
+
         private static readonly Dictionary<Type, Dictionary<string, Delegate>> methodsDictionary
             = new Dictionary<Type, Dictionary<string, Delegate>>();
-#endregion
 
-#region Properties
+        #endregion
+
+        #region Properties
+
         /// <summary>
         /// Root object for all registered objects.
         /// </summary>
-        public static ObjectInfo Objects
-        {
-            get { return FObjects; }
-        }
+        public static ObjectInfo Objects { get; } = new ObjectInfo();
 
         /// <summary>
         /// Root object for all registered exports.
@@ -468,64 +472,64 @@ namespace AM.Reporting.Utils
         /// <summary>
         /// Root object for all registered DataConnections
         /// </summary>
-        public static DataConnectionInfo DataConnections
-        {
-            get;
-        }
+        public static DataConnectionInfo DataConnections { get; }
 
         /// <summary>
         /// Root object for all registered functions.
         /// </summary>
-        public static FunctionInfo Functions
-        {
-            get;
-        }
+        public static FunctionInfo Functions { get; }
 
-        public static List<Assembly> Assemblies
-        {
-            get;
-        }
+        public static List<Assembly> Assemblies { get; }
 
-#endregion
+        #endregion
 
-#region Private Methods
+        #region Private Methods
 
-        private static void RegisterType(Type type)
+        private static void RegisterType (Type type)
         {
             FTypes[type.Name] = type;
         }
 
-        private static void RemoveRegisteredType(Type type)
+        private static void RemoveRegisteredType (Type type)
         {
-            FTypes.Remove(type.Name);
+            FTypes.Remove (type.Name);
         }
 
-        private static ObjectInfo InternalAdd(Type obj, string category, Bitmap image, int imageIndex, string text)
+        private static ObjectInfo InternalAdd (Type obj, string category, Bitmap image, int imageIndex, string text)
         {
-            ObjectInfo item = FObjects.FindOrCreate(category);
-            item.Update(obj, image, imageIndex, text);
+            var item = Objects.FindOrCreate (category);
+            item.Update (obj, image, imageIndex, text);
             if (obj != null)
-                RegisterType(obj);
+            {
+                RegisterType (obj);
+            }
+
             return item;
         }
 
-        private static ObjectInfo InternalAdd(Type obj, string category, Bitmap image, int imageIndex, string text,
+        private static ObjectInfo InternalAdd (Type obj, string category, Bitmap image, int imageIndex, string text,
             int flags, bool multiInsert)
         {
-            ObjectInfo item = FObjects.FindOrCreate(category);
-            item.Update(obj, image, imageIndex, text, flags, multiInsert);
+            var item = Objects.FindOrCreate (category);
+            item.Update (obj, image, imageIndex, text, flags, multiInsert);
             if (obj != null)
-                RegisterType(obj);
+            {
+                RegisterType (obj);
+            }
+
             return item;
         }
 
-        private static ObjectInfo InternalAdd(Type obj, string category, Bitmap image, int imageIndex, int buttonIndex,
+        private static ObjectInfo InternalAdd (Type obj, string category, Bitmap image, int imageIndex, int buttonIndex,
             string text, int flags, bool multiInsert)
         {
-            ObjectInfo item = FObjects.FindOrCreate(category);
-            item.Update(obj, image, imageIndex, buttonIndex, text, flags, multiInsert);
+            var item = Objects.FindOrCreate (category);
+            item.Update (obj, image, imageIndex, buttonIndex, text, flags, multiInsert);
             if (obj != null)
-                RegisterType(obj);
+            {
+                RegisterType (obj);
+            }
+
             return item;
         }
 
@@ -536,50 +540,53 @@ namespace AM.Reporting.Utils
             item.Update(func, imageIndex);
         }
 #else
-        private static void PrivateAddFunction(MethodInfo func, string category, string text = "")
+        private static void PrivateAddFunction (MethodInfo func, string category, string text = "")
         {
-            FunctionInfo item = Functions.FindOrCreate(category);
-            item.Update(func, text);
+            var item = Functions.FindOrCreate (category);
+            item.Update (func, text);
         }
 #endif
 
-#endregion
+        #endregion
 
-#region Public Methods
+        #region Public Methods
+
         /// <summary>
         /// Checks whether the specified type is registered already.
         /// </summary>
         /// <param name="obj">Type to check.</param>
         /// <returns><b>true</b> if such type is registered.</returns>
-        public static bool IsTypeRegistered(Type obj)
+        public static bool IsTypeRegistered (Type obj)
         {
-            return FTypes.ContainsKey(obj.Name);
+            return FTypes.ContainsKey (obj.Name);
         }
 
-        private static void AddAssembly(Assembly assembly)
+        private static void AddAssembly (Assembly assembly)
         {
-            if (!Assemblies.Contains(assembly))
-                Assemblies.Add(assembly);
+            if (!Assemblies.Contains (assembly))
+            {
+                Assemblies.Add (assembly);
+            }
         }
 
-        internal static void AddReport(Type obj, int imageIndex)
+        internal static void AddReport (Type obj, int imageIndex)
         {
-            InternalAdd(obj, "", null, imageIndex, "");
+            InternalAdd (obj, "", null, imageIndex, "");
         }
 
-        internal static void AddPage(Type obj, string category, int imageIndex)
+        internal static void AddPage (Type obj, string category, int imageIndex)
         {
-            InternalAdd(obj, category, null, imageIndex, "");
+            InternalAdd (obj, category, null, imageIndex, "");
         }
 
-        internal static void AddCategory(string category, int imageIndex, string text)
+        internal static void AddCategory (string category, int imageIndex, string text)
         {
-            InternalAdd(null, category, null, imageIndex, text);
+            InternalAdd (null, category, null, imageIndex, text);
         }
 
-        internal static void AddCategory(string category, int imageIndex, int buttonIndex, string text)
+        internal static void AddCategory (string category, int imageIndex, int buttonIndex, string text)
         {
-            InternalAdd(null, category, null, imageIndex, buttonIndex, text, 0, false);
+            InternalAdd (null, category, null, imageIndex, buttonIndex, text, 0, false);
         }
 
         /// <summary>
@@ -601,9 +608,9 @@ namespace AM.Reporting.Utils
         /// <para>When register an object inside a category, you must specify the full category name in the
         /// <b>category</b> parameter of the <b>Add</b> method. </para>
         /// </remarks>
-        public static void AddCategory(string name, Bitmap image, string text)
+        public static void AddCategory (string name, Bitmap image, string text)
         {
-            InternalAdd(null, name, image, -1, text);
+            InternalAdd (null, name, image, -1, text);
         }
 
         /// <summary>
@@ -611,9 +618,9 @@ namespace AM.Reporting.Utils
         /// </summary>
         /// <param name="name">Category name.</param>
         /// <param name="text">Category text.</param>
-        public static void AddExportCategory(string name, string text, int imageIndex = -1)
+        public static void AddExportCategory (string name, string text, int imageIndex = -1)
         {
-            PrivateAddExport(null, "ExportGroups," + name, text, null, imageIndex);
+            PrivateAddExport (null, "ExportGroups," + name, text, null, imageIndex);
         }
 
         /// <summary>
@@ -630,41 +637,47 @@ namespace AM.Reporting.Utils
         /// RegisteredObjects.AddExport(typeof(MyExport), "My Export");
         /// </code>
         /// </example>
-        public static void AddExport(Type obj, string text)
+        public static void AddExport (Type obj, string text)
         {
-            AddExport(obj, "", text);
+            AddExport (obj, "", text);
         }
 
-        public static void AddExport(Type obj, string category, string text, Bitmap image = null)
+        public static void AddExport (Type obj, string category, string text, Bitmap image = null)
         {
-            if (!obj.IsSubclassOf(typeof(ExportBase)))
-                throw new Exception("The 'obj' parameter must be of ExportBase type.");
-            AddAssembly(obj.Assembly);
-            InternalAddExport(obj, category, text, image);
+            if (!obj.IsSubclassOf (typeof (ExportBase)))
+            {
+                throw new Exception ("The 'obj' parameter must be of ExportBase type.");
+            }
+
+            AddAssembly (obj.Assembly);
+            InternalAddExport (obj, category, text, image);
         }
 
-        internal static ObjectInfo AddExport(Type obj, string text, int imageIndex)
+        internal static ObjectInfo AddExport (Type obj, string text, int imageIndex)
         {
-            return PrivateAddExport(obj, "", text, null, imageIndex);
+            return PrivateAddExport (obj, "", text, null, imageIndex);
         }
 
-        internal static void AddExport(Type obj, string category, string text, int imageIndex)
+        internal static void AddExport (Type obj, string category, string text, int imageIndex)
         {
-            PrivateAddExport(obj, "ExportGroups," + category + ",", text, null, imageIndex);
+            PrivateAddExport (obj, "ExportGroups," + category + ",", text, null, imageIndex);
         }
 
-        internal static void InternalAddExport(Type obj, string category, string text, Bitmap image = null)
+        internal static void InternalAddExport (Type obj, string category, string text, Bitmap image = null)
         {
-            PrivateAddExport(obj, "ExportGroups," + category + ",", text, image);
+            PrivateAddExport (obj, "ExportGroups," + category + ",", text, image);
         }
 
-        private static ObjectInfo PrivateAddExport(Type obj, string category, string text,
+        private static ObjectInfo PrivateAddExport (Type obj, string category, string text,
             Bitmap image = null, int imageIndex = -1)
         {
-            var item = Exports.FindOrCreate(category);
-            item.Update(obj, image, imageIndex, text);
+            var item = Exports.FindOrCreate (category);
+            item.Update (obj, image, imageIndex, text);
             if (obj != null)
-                RegisterType(obj);
+            {
+                RegisterType (obj);
+            }
+
             return item;
         }
 
@@ -682,26 +695,30 @@ namespace AM.Reporting.Utils
         /// RegisteredObjects.AddConnection(typeof(MyDataConnection), "My Data Connection");
         /// </code>
         /// </example>
-        public static void AddConnection(Type obj, string text = "")
+        public static void AddConnection (Type obj, string text = "")
         {
-            if (!obj.IsSubclassOf(typeof(DataConnectionBase)))
-                throw new Exception("The 'obj' parameter must be of DataConnectionBase type.");
+            if (!obj.IsSubclassOf (typeof (DataConnectionBase)))
+            {
+                throw new Exception ("The 'obj' parameter must be of DataConnectionBase type.");
+            }
 
-            AddAssembly(obj.Assembly);
-            InternalAddConnection(obj, text);
+            AddAssembly (obj.Assembly);
+            InternalAddConnection (obj, text);
         }
 
-        internal static void InternalAddConnection(Type obj, string text = "")
+        internal static void InternalAddConnection (Type obj, string text = "")
         {
-            if (!IsTypeRegistered(obj))
-                PrivateAddConnection(obj, text);
+            if (!IsTypeRegistered (obj))
+            {
+                PrivateAddConnection (obj, text);
+            }
         }
 
-        private static void PrivateAddConnection(Type obj, string text)
+        private static void PrivateAddConnection (Type obj, string text)
         {
-            DataConnectionInfo item = DataConnections.FindOrCreate("");
-            item.Update(obj, text);
-            RegisterType(obj);
+            var item = DataConnections.FindOrCreate ("");
+            item.Update (obj, text);
+            RegisterType (obj);
         }
 
         /// <summary>
@@ -711,20 +728,21 @@ namespace AM.Reporting.Utils
         /// <param name="category">Name of category to register in.</param>
         /// <param name="imageIndex">Index of image for object's button.</param>
         /// <param name="buttonIndex">Index of object's button in toolbar.</param>
-        public static void Add(Type obj, string category, int imageIndex, int buttonIndex = -1)
+        public static void Add (Type obj, string category, int imageIndex, int buttonIndex = -1)
         {
-            AddAssembly(obj.Assembly);
-            InternalAdd(obj, category, imageIndex, buttonIndex);
+            AddAssembly (obj.Assembly);
+            InternalAdd (obj, category, imageIndex, buttonIndex);
         }
 
-        internal static void InternalAdd(Type obj, string category, int imageIndex, int buttonIndex = -1)
+        internal static void InternalAdd (Type obj, string category, int imageIndex, int buttonIndex = -1)
         {
-            InternalAdd(obj, category + ",", null, imageIndex, buttonIndex, "", 0, false);
+            InternalAdd (obj, category + ",", null, imageIndex, buttonIndex, "", 0, false);
         }
 
-        internal static void Add(Type obj, string category, int imageIndex, string text, int flags = 0, bool multiInsert = false)
+        internal static void Add (Type obj, string category, int imageIndex, string text, int flags = 0,
+            bool multiInsert = false)
         {
-            InternalAdd(obj, category + ",", null, imageIndex, text, flags, multiInsert);
+            InternalAdd (obj, category + ",", null, imageIndex, text, flags, multiInsert);
         }
 
 
@@ -761,11 +779,12 @@ namespace AM.Reporting.Utils
         ///   anotherReportObjectBmp, "Another Report Object");
         /// </code>
         /// </example>
-        public static void Add(Type obj, string category, Bitmap image, string text, int flags = 0, bool multiInsert = false)
+        public static void Add (Type obj, string category, Bitmap image, string text, int flags = 0,
+            bool multiInsert = false)
         {
-            AddAssembly(obj.Assembly);
+            AddAssembly (obj.Assembly);
 
-            InternalAdd(obj, category + ",", image, -1, text, flags, multiInsert);
+            InternalAdd (obj, category + ",", image, -1, text, flags, multiInsert);
         }
 
         /// <summary>
@@ -805,9 +824,9 @@ namespace AM.Reporting.Utils
         /// RegisteredObjects.AddFunctionCategory("MyFuncs", "My Functions");
         /// </code>
         /// </example>
-        public static void AddFunctionCategory(string category, string text)
+        public static void AddFunctionCategory (string category, string text)
         {
-            PrivateAddFunction(null, "Functions," + category, text);
+            PrivateAddFunction (null, "Functions," + category, text);
         }
 
 #if CATEGORY_OPTIMIZATION
@@ -906,34 +925,40 @@ namespace AM.Reporting.Utils
         /// RegisteredObjects.AddFunction(myMaximumLongFunc, "MyFuncs,MyMaximum");
         /// </code>
         /// </example>
-        public static void AddFunction(MethodInfo function, string category)
+        public static void AddFunction (MethodInfo function, string category)
         {
             if (function == null)
-                throw new ArgumentNullException("function");
+            {
+                throw new ArgumentNullException ("function");
+            }
+
             // User runs this function, trying to add external assembly
-            AddAssembly(function.DeclaringType.Assembly);
-            InternalAddFunction(function, category);
+            AddAssembly (function.DeclaringType.Assembly);
+            InternalAddFunction (function, category);
         }
 
-        internal static void InternalAddFunction(MethodInfo function, string category)
+        internal static void InternalAddFunction (MethodInfo function, string category)
         {
-            PrivateAddFunction(function, "Functions," + category + ",");
+            PrivateAddFunction (function, "Functions," + category + ",");
         }
 
 
-        public static void Remove(Type obj, string category)
+        public static void Remove (Type obj, string category)
         {
-            FObjects.Remove(category + "," + obj.Name);
+            Objects.Remove (category + "," + obj.Name);
             if (obj != null)
-                RemoveRegisteredType(obj);
+            {
+                RemoveRegisteredType (obj);
+            }
         }
 
-        internal static Type FindType(string typeName)
+        internal static Type FindType (string typeName)
         {
-            if (!string.IsNullOrEmpty(typeName))
+            if (!string.IsNullOrEmpty (typeName))
             {
                 return FTypes[typeName] as Type;
             }
+
             return null;
         }
 
@@ -945,55 +970,70 @@ namespace AM.Reporting.Utils
         /// <remarks>This method can be used to disable some objects, for example:
         /// <para/>RegisteredObjects.FindObject(typeof(PDFExport)).Enabled = false;
         /// </remarks>
-        public static ObjectInfo FindObject(Type type)
+        public static ObjectInfo FindObject (Type type)
         {
             if (type == null)
-                return null;
-
-            List<ObjectInfo> list = new List<ObjectInfo>();
-            FObjects.EnumItems(list);
-            foreach (ObjectInfo item in list)
             {
-                if (item.Object == type)
-                    return item;
+                return null;
             }
 
-            var export = FindExport(type);
+            List<ObjectInfo> list = new List<ObjectInfo>();
+            Objects.EnumItems (list);
+            foreach (var item in list)
+            {
+                if (item.Object == type)
+                {
+                    return item;
+                }
+            }
+
+            var export = FindExport (type);
             return export;
         }
 
-        public static ObjectInfo FindExport(Type type)
+        public static ObjectInfo FindExport (Type type)
         {
             var exports = new List<ObjectInfo>();
-            Exports.EnumItems(exports);
-            foreach (ObjectInfo item in exports)
+            Exports.EnumItems (exports);
+            foreach (var item in exports)
             {
                 if (item.Object == type)
+                {
                     return item;
+                }
             }
 
             return null;
         }
 
-        public static DataConnectionInfo FindConnection(Type type)
+        public static DataConnectionInfo FindConnection (Type type)
         {
             if (type == null)
+            {
                 return null;
+            }
 
             var dataConnections = new List<DataConnectionInfo>();
-            DataConnections.EnumItems(dataConnections);
+            DataConnections.EnumItems (dataConnections);
             foreach (var item in dataConnections)
+            {
                 if (item.Object == type)
+                {
                     return item;
+                }
+            }
 
             return null;
         }
 
-        internal static ObjectInfo FindObject(object obj)
+        internal static ObjectInfo FindObject (object obj)
         {
             if (obj == null)
+            {
                 return null;
-            return FindObject(obj.GetType());
+            }
+
+            return FindObject (obj.GetType());
         }
 
 
@@ -1004,11 +1044,10 @@ namespace AM.Reporting.Utils
         /// <param name="type">Type for registering method</param>
         /// <param name="methodName">Name of method fir registering</param>
         /// <param name="method">Method for registering</param>
-        public static void RegisterMethod(Type type, string methodName, Delegate method)
+        public static void RegisterMethod (Type type, string methodName, Delegate method)
         {
-            Dictionary<string, Delegate> methods;
-            AddAssembly(type.Assembly);
-            if (!methodsDictionary.TryGetValue(type, out methods))
+            AddAssembly (type.Assembly);
+            if (!methodsDictionary.TryGetValue (type, out Dictionary<string, Delegate> methods))
             {
                 methods = new Dictionary<string, Delegate>();
                 methodsDictionary[type] = methods;
@@ -1024,98 +1063,121 @@ namespace AM.Reporting.Utils
         /// <param name="methodName">Name for method finfing</param>
         /// <param name="inheritance">Use True value for inheritance the method from base type, use false for get the method only from the this type</param>
         /// <returns></returns>
-        public static Delegate GetMethod(Type type, string methodName, bool inheritance)
+        public static Delegate GetMethod (Type type, string methodName, bool inheritance)
         {
-            if (type == typeof(object))
-                return null;
-            Dictionary<string, Delegate> methods;
-            if (methodsDictionary.TryGetValue(type, out methods))
+            if (type == typeof (object))
             {
-                Delegate result;
-                if (methods.TryGetValue(methodName, out result))
-                    return result;
+                return null;
             }
+
+            if (methodsDictionary.TryGetValue (type, out Dictionary<string, Delegate> methods))
+            {
+                if (methods.TryGetValue (methodName, out var result))
+                {
+                    return result;
+                }
+            }
+
             if (inheritance)
-                return GetMethod(type.BaseType, methodName, inheritance);
+            {
+                return GetMethod (type.BaseType, methodName, inheritance);
+            }
+
             return null;
         }
 
-        public static void CreateFunctionsTree(Report report, FunctionInfo rootItem, XmlItem rootNode)
+        public static void CreateFunctionsTree (Report report, FunctionInfo rootItem, XmlItem rootNode)
         {
-            foreach (FunctionInfo item in rootItem.Items)
+            foreach (var item in rootItem.Items)
             {
                 string text;
-                string desc = String.Empty;
-                MethodInfo func = item.Function;
+                var desc = string.Empty;
+                var func = item.Function;
                 if (func != null)
                 {
                     text = func.Name;
+
                     // if this is an overridden function, show its parameters
                     if (rootItem.Name == text)
-                        text = report.CodeHelper.GetMethodSignature(func, false);
-                    desc = GetFunctionDescription(report, func);
+                    {
+                        text = report.CodeHelper.GetMethodSignature (func, false);
+                    }
+
+                    desc = GetFunctionDescription (report, func);
                 }
                 else
                 {
                     // it's a category
-                    text = Res.TryGet(item.Text);
+                    text = Res.TryGet (item.Text);
                 }
-                XmlItem node = rootNode.Add();
-                node.SetProp("Name", text);
-                if (!String.IsNullOrEmpty(desc))
+
+                var node = rootNode.Add();
+                node.SetProp ("Name", text);
+                if (!string.IsNullOrEmpty (desc))
                 {
-                    node.SetProp("Description", desc);
+                    node.SetProp ("Description", desc);
                 }
 
                 if (item.Items.Count > 0)
                 {
                     node.Name = "Functions";
-                    CreateFunctionsTree(report, item, node);
+                    CreateFunctionsTree (report, item, node);
                 }
                 else
+                {
                     node.Name = "Function";
+                }
             }
         }
 
-        internal static string GetFunctionDescription(Report report, object info)
+        internal static string GetFunctionDescription (Report report, object info)
         {
-            FastString descr = new FastString();
+            var descr = new FastString();
 
-            if (info is SystemVariable)
+            if (info is SystemVariable variable)
             {
-                descr.Append("<b>").Append((info as SystemVariable).Name).Append("</b>")
-                    .Append("<br/><br/>").Append(Editor.Syntax.Parsers.ReflectionRepository.DescriptionHelper.GetDescription(info.GetType()));
+                descr.Append ("<b>").Append (variable.Name).Append ("</b>")
+                    .Append ("<br/><br/>")
+                    .Append (
+                        Editor.Syntax.Parsers.ReflectionRepository.DescriptionHelper.GetDescription (variable.GetType()));
             }
-            else if (info is MethodInfo)
+            else if (info is MethodInfo methodInfo)
             {
-                descr.Append(report.CodeHelper.GetMethodSignature(info as MethodInfo, true))
-                    .Append("<br/><br/>").Append(Editor.Syntax.Parsers.ReflectionRepository.DescriptionHelper.GetDescription(info as MethodInfo));
+                descr.Append (report.CodeHelper.GetMethodSignature (methodInfo, true))
+                    .Append ("<br/><br/>")
+                    .Append (
+                        Editor.Syntax.Parsers.ReflectionRepository.DescriptionHelper
+                            .GetDescription (methodInfo));
 
-                foreach (ParameterInfo parInfo in (info as MethodInfo).GetParameters())
+                foreach (var parInfo in methodInfo.GetParameters())
                 {
                     // special case - skip "thisReport" parameter
                     if (parInfo.Name == "thisReport")
+                    {
                         continue;
-                    descr.Append("<br/><br/>").Append(Editor.Syntax.Parsers.ReflectionRepository.DescriptionHelper.GetDescription(parInfo));
+                    }
+
+                    descr.Append ("<br/><br/>")
+                        .Append (Editor.Syntax.Parsers.ReflectionRepository.DescriptionHelper.GetDescription (parInfo));
                 }
             }
 
-            return descr.Replace("\"", "&quot;").Replace(" & ", "&amp;")
-                .Replace("<", "&lt;").Replace(">", "&gt;").Replace("\t", "<br/>").ToString();
+            return descr.Replace ("\"", "&quot;").Replace (" & ", "&amp;")
+                .Replace ("<", "&lt;").Replace (">", "&gt;").Replace ("\t", "<br/>").ToString();
         }
 
-#endregion
+        #endregion
 
         static RegisteredObjects()
         {
             Assemblies = new List<Assembly>();
+
             // add AM.Reporting Assembly
-            Assemblies.Add(Assembly.GetExecutingAssembly());
+            Assemblies.Add (Assembly.GetExecutingAssembly());
 
             Functions = new FunctionInfo();
             DataConnections = new DataConnectionInfo();
             Exports = new ObjectInfo();
         }
     }
-
 }

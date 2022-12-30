@@ -66,27 +66,27 @@ namespace AM.Reporting.Import.RDL
         /// <summary>
         /// The number of pixels in one millimeter.
         /// </summary>
-        public static float Millimeter = AM.Reporting.Utils.Units.Millimeters;
+        public static float Millimeter = Utils.Units.Millimeters;
 
         /// <summary>
         /// The number of pixels in one centimeter.
         /// </summary>
-        public static float Centimeter = AM.Reporting.Utils.Units.Centimeters;
+        public static float Centimeter = Utils.Units.Centimeters;
 
         /// <summary>
         /// The number of pixels in one inch.
         /// </summary>
-        public static float Inch = AM.Reporting.Utils.Units.Inches;
+        public static float Inch = Utils.Units.Inches;
 
         /// <summary>
         /// The number of pixels in one point.
         /// </summary>
-        public static float Point = AM.Reporting.Utils.Units.Millimeters * SizeUnitsM.Point;
+        public static float Point = Utils.Units.Millimeters * SizeUnitsM.Point;
 
         /// <summary>
         /// The number of pixels in one pica.
         /// </summary>
-        public static float Pica = AM.Reporting.Utils.Units.Millimeters * SizeUnitsM.Pica;
+        public static float Pica = Utils.Units.Millimeters * SizeUnitsM.Pica;
 
         #endregion // Fields
     }

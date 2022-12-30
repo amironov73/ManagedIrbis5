@@ -21,6 +21,7 @@ using AM.Reporting.Code.CodeDom.Compiler;
 using AM.Reporting.Code.CSharp;
 #else
 using System.CodeDom.Compiler;
+
 using Microsoft.CSharp;
 #endif
 using System.Collections.Generic;
@@ -45,25 +46,26 @@ namespace AM.Reporting.Utils
         /// <param name="sourceCode"></param>
         /// <param name="assemblyPaths"></param>
         /// <returns></returns>
-        public static Assembly GenerateAssemblyInMemory(string sourceCode, params string[] assemblyPaths)
+        public static Assembly GenerateAssemblyInMemory (string sourceCode, params string[] assemblyPaths)
         {
-            using (CSharpCodeProvider compiler = new CSharpCodeProvider())
+            using (var compiler = new CSharpCodeProvider())
             {
-                CompilerParameters parameters = new CompilerParameters();
-                parameters.GenerateInMemory = true;
-
-                foreach (string asm in assemblyPaths)
+                var parameters = new CompilerParameters
                 {
-                    parameters.ReferencedAssemblies.Add(asm);
+                    GenerateInMemory = true
+                };
+
+                foreach (var asm in assemblyPaths)
+                {
+                    parameters.ReferencedAssemblies.Add (asm);
                 }
 
 #if CROSSPLATFORM || COREWIN
-
                 var mscorPath = compiler.GetReference("System.Private.CoreLib.dll").Display;
                 parameters.ReferencedAssemblies.Add(mscorPath);
 #endif
 
-                CompilerResults results = compiler.CompileAssemblyFromSource(parameters, sourceCode);
+                var results = compiler.CompileAssemblyFromSource (parameters, sourceCode);
                 return results.CompiledAssembly;
             }
         }

@@ -42,14 +42,14 @@ namespace AM.Reporting.Data
         {
             get
             {
-                object csvFile;
-                if (TryGetValue("CsvFile", out csvFile))
+                if (TryGetValue ("CsvFile", out var csvFile))
                 {
                     return (string)csvFile;
                 }
+
                 return "";
             }
-            set { base["CsvFile"] = value; }
+            set => base["CsvFile"] = value;
         }
 
         /// <summary>
@@ -59,14 +59,14 @@ namespace AM.Reporting.Data
         {
             get
             {
-                object codepage;
-                if (TryGetValue("Codepage", out codepage))
+                if (TryGetValue ("Codepage", out var codepage))
                 {
-                    return int.Parse((string)codepage);
+                    return int.Parse ((string)codepage);
                 }
+
                 return Encoding.Default.CodePage;
             }
-            set { base["Codepage"] = value; }
+            set => base["Codepage"] = value;
         }
 
         /// <summary>
@@ -76,14 +76,14 @@ namespace AM.Reporting.Data
         {
             get
             {
-                object separator;
-                if (TryGetValue("Separator", out separator))
+                if (TryGetValue ("Separator", out var separator))
                 {
                     return (string)separator;
                 }
+
                 return ";";
             }
-            set { base["Separator"] = value; }
+            set => base["Separator"] = value;
         }
 
         /// <summary>
@@ -93,14 +93,14 @@ namespace AM.Reporting.Data
         {
             get
             {
-                object fieldNamesInFirstString;
-                if (TryGetValue("FieldNamesInFirstString", out fieldNamesInFirstString))
+                if (TryGetValue ("FieldNamesInFirstString", out var fieldNamesInFirstString))
                 {
                     return fieldNamesInFirstString.ToString().ToLower() == "true";
                 }
+
                 return false;
             }
-            set { base["FieldNamesInFirstString"] = value.ToString().ToLower(); }
+            set => base["FieldNamesInFirstString"] = value.ToString().ToLower();
         }
 
         /// <summary>
@@ -110,14 +110,14 @@ namespace AM.Reporting.Data
         {
             get
             {
-                object removeQuotationMarks;
-                if (TryGetValue("RemoveQuotationMarks", out removeQuotationMarks))
+                if (TryGetValue ("RemoveQuotationMarks", out var removeQuotationMarks))
                 {
                     return removeQuotationMarks.ToString().ToLower() == "true";
                 }
+
                 return true;
             }
-            set { base["RemoveQuotationMarks"] = value.ToString().ToLower(); }
+            set => base["RemoveQuotationMarks"] = value.ToString().ToLower();
         }
 
         /// <summary>
@@ -127,14 +127,14 @@ namespace AM.Reporting.Data
         {
             get
             {
-                object convertFieldTypes;
-                if (TryGetValue("ConvertFieldTypes", out convertFieldTypes))
+                if (TryGetValue ("ConvertFieldTypes", out var convertFieldTypes))
                 {
                     return convertFieldTypes.ToString().ToLower() == "true";
                 }
+
                 return true;
             }
-            set { base["ConvertFieldTypes"] = value.ToString().ToLower(); }
+            set => base["ConvertFieldTypes"] = value.ToString().ToLower();
         }
 
         /// <summary>
@@ -144,14 +144,14 @@ namespace AM.Reporting.Data
         {
             get
             {
-                object numberFormat;
-                if (TryGetValue("NumberFormat", out numberFormat))
+                if (TryGetValue ("NumberFormat", out var numberFormat))
                 {
                     return numberFormat.ToString();
                 }
+
                 return CultureInfo.CurrentCulture.Name;
             }
-            set { base["NumberFormat"] = value; }
+            set => base["NumberFormat"] = value;
         }
 
         /// <summary>
@@ -161,14 +161,14 @@ namespace AM.Reporting.Data
         {
             get
             {
-                object currencyFormat;
-                if (TryGetValue("CurrencyFormat", out currencyFormat))
+                if (TryGetValue ("CurrencyFormat", out var currencyFormat))
                 {
                     return currencyFormat.ToString();
                 }
+
                 return CultureInfo.CurrentCulture.Name;
             }
-            set { base["CurrencyFormat"] = value; }
+            set => base["CurrencyFormat"] = value;
         }
 
         /// <summary>
@@ -178,14 +178,14 @@ namespace AM.Reporting.Data
         {
             get
             {
-                object dateTimeFormat;
-                if (TryGetValue("DateTimeFormat", out dateTimeFormat))
+                if (TryGetValue ("DateTimeFormat", out var dateTimeFormat))
                 {
                     return dateTimeFormat.ToString();
                 }
+
                 return CultureInfo.CurrentCulture.Name;
             }
-            set { base["DateTimeFormat"] = value; }
+            set => base["DateTimeFormat"] = value;
         }
 
         #endregion Properties
@@ -204,7 +204,7 @@ namespace AM.Reporting.Data
         /// Initializes a new instance of the <see cref="CsvConnectionStringBuilder"/> class with a specified connection string.
         /// </summary>
         /// <param name="connectionString">The connection string.</param>
-        public CsvConnectionStringBuilder(string connectionString) : base()
+        public CsvConnectionStringBuilder (string connectionString) : base()
         {
             ConnectionString = connectionString;
         }

@@ -30,9 +30,6 @@ namespace AM.Reporting.Import
     {
         #region Fields
 
-        private string name;
-        private Report report;
-
         #endregion // Fields
 
         #region Properties
@@ -40,20 +37,12 @@ namespace AM.Reporting.Import
         /// <summary>
         /// Gets or sets the name of plugin.
         /// </summary>
-        public string Name
-        {
-            get { return name; }
-            protected set { name = value; }
-        }
+        public string Name { get; protected set; }
 
         /// <summary>
         /// Gets or sets reference to the report.
         /// </summary>
-        public Report Report
-        {
-            get { return report; }
-            protected set { report = value; }
-        }
+        public Report Report { get; protected set; }
 
         #endregion // Properties
 
@@ -75,7 +64,7 @@ namespace AM.Reporting.Import
         /// </summary>
         /// <param name="report">Report object.</param>
         /// <param name="filename">File name.</param>
-        public virtual void LoadReport(Report report, string filename)
+        public virtual void LoadReport (Report report, string filename)
         {
             report.Clear();
         }
@@ -85,7 +74,7 @@ namespace AM.Reporting.Import
         /// </summary>
         /// <param name="report">Report object</param>
         /// <param name="content">File stream</param>
-        public virtual void LoadReport(Report report, Stream content)
+        public virtual void LoadReport (Report report, Stream content)
         {
             report.Clear();
         }

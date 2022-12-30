@@ -28,7 +28,6 @@ using System.Threading.Tasks;
 
 namespace AM.Reporting.Utils
 {
-
     public struct ValidationError
     {
         public enum ErrorLevel
@@ -42,12 +41,12 @@ namespace AM.Reporting.Utils
         public string Message;
         public ReportComponentBase Object;
 
-        public ValidationError(string name, ErrorLevel level, string message, ReportComponentBase obj)
+        public ValidationError (string name, ErrorLevel level, string message, ReportComponentBase obj)
         {
-            this.Name = name;
-            this.Level = level;
-            this.Message = message;
-            this.Object = obj;
+            Name = name;
+            Level = level;
+            Message = message;
+            Object = obj;
         }
     }
 
@@ -62,32 +61,36 @@ namespace AM.Reporting.Utils
         /// <param name="band">Band that should be checked.</param>
         /// <param name="token">Token for cancelling method if it execute in thread.</param>
         /// <returns>Returns <b>true</b> if band has intersecting objects. Otherwise <b>false</b>.</returns>
-        static public bool ValidateIntersectionAllObjects(BandBase band, CancellationToken token = default)
+        static public bool ValidateIntersectionAllObjects (BandBase band, CancellationToken token = default)
         {
-            bool result = false;
+            var result = false;
             try
             {
                 foreach (ReportComponentBase component in band.Objects)
                 {
                     if (token.IsCancellationRequested)
+                    {
                         return false;
+                    }
 
                     component.IsIntersectingWithOtherObject = false;
-                    if (!band.Bounds.Contains(GetReducedRect(component.AbsBounds)))
+                    if (!band.Bounds.Contains (GetReducedRect (component.AbsBounds)))
                     {
                         component.IsIntersectingWithOtherObject = true;
                         result = true;
                     }
                 }
 
-                for (int i = 0; i < band.Objects.Count; i++)
+                for (var i = 0; i < band.Objects.Count; i++)
                 {
-                    for (int j = i + 1; j < band.Objects.Count; j++)
+                    for (var j = i + 1; j < band.Objects.Count; j++)
                     {
                         if (token.IsCancellationRequested)
+                        {
                             return false;
+                        }
 
-                        if (band.Objects[i].Bounds.IntersectsWith(GetReducedRect(band.Objects[j].Bounds)))
+                        if (band.Objects[i].Bounds.IntersectsWith (GetReducedRect (band.Objects[j].Bounds)))
                         {
                             result = true;
                             band.Objects[i].IsIntersectingWithOtherObject = true;
@@ -99,9 +102,13 @@ namespace AM.Reporting.Utils
             catch (Exception e)
             {
                 if (token.IsCancellationRequested)
+                {
                     return false;
+                }
                 else
+                {
                     throw e;
+                }
             }
 
             return result;
@@ -113,12 +120,9 @@ namespace AM.Reporting.Utils
         /// <param name="band"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        static public Task<bool> ValidateIntersectionAllObjectsAsync(BandBase band, CancellationToken token)
+        static public Task<bool> ValidateIntersectionAllObjectsAsync (BandBase band, CancellationToken token)
         {
-            return Task.Factory.StartNew(() =>
-            {
-                return ValidateIntersectionAllObjects(band, token);
-            }, token);
+            return Task.Factory.StartNew (() => { return ValidateIntersectionAllObjects (band, token); }, token);
         }
 
         /// <summary>
@@ -127,14 +131,14 @@ namespace AM.Reporting.Utils
         /// <param name="parent"></param>
         /// <param name="child"></param>
         /// <returns></returns>
-        static public bool RectContainInOtherRect(RectangleF parent, RectangleF child)
+        static public bool RectContainInOtherRect (RectangleF parent, RectangleF child)
         {
-            return parent.Contains(GetReducedRect(child));
+            return parent.Contains (GetReducedRect (child));
         }
 
-        private static RectangleF GetReducedRect(RectangleF rect)
+        private static RectangleF GetReducedRect (RectangleF rect)
         {
-            return new RectangleF(rect.X + 0.01f, rect.Y + 0.01f, rect.Width - 0.02f, rect.Height - 0.02f);
+            return new RectangleF (rect.X + 0.01f, rect.Y + 0.01f, rect.Width - 0.02f, rect.Height - 0.02f);
         }
 
         /// <summary>
@@ -144,11 +148,15 @@ namespace AM.Reporting.Utils
         /// <param name="checkIntersectObj">Need set false if enabled backlight intersecting objects and report is designing.</param>
         /// <param name="token">Token for cancelling method if it execute in thread.</param>
         /// <returns>List of errors.</returns>
-        static public List<ValidationError> ValidateReport(Report report, bool checkIntersectObj = true, CancellationToken token = default)
+        static public List<ValidationError> ValidateReport (Report report, bool checkIntersectObj = true,
+            CancellationToken token = default)
         {
             if (report == null)
+            {
                 return null;
-            List<ValidationError> listError = new List<ValidationError>();
+            }
+
+            var listError = new List<ValidationError>();
 
             try
             {
@@ -157,42 +165,62 @@ namespace AM.Reporting.Utils
                     foreach (Base c in page.AllObjects)
                     {
                         if (token.IsCancellationRequested)
+                        {
                             return null;
+                        }
 
-                        if (c is BandBase && checkIntersectObj)
-                            ValidateIntersectionAllObjects(c as BandBase, token);
+                        if (c is BandBase @base && checkIntersectObj)
+                        {
+                            ValidateIntersectionAllObjects (@base, token);
+                        }
 
-                        if (c is ReportComponentBase)
-                            listError.AddRange((c as ReportComponentBase).Validate());
+                        if (c is ReportComponentBase componentBase)
+                        {
+                            listError.AddRange (componentBase.Validate());
+                        }
                     }
                 }
 
                 bool duplicateName;
-                for (int i = 0; i < report.AllObjects.Count - 1; i++)
+                for (var i = 0; i < report.AllObjects.Count - 1; i++)
                 {
                     duplicateName = false;
-                    for (int j = i + 1; j < report.AllObjects.Count; j++)
+                    for (var j = i + 1; j < report.AllObjects.Count; j++)
                     {
                         if (token.IsCancellationRequested)
-                            return null;
-
-                        if (report.AllObjects[j] is ReportComponentBase && report.AllObjects[i].Name == report.AllObjects[j].Name)
                         {
-                            listError.Add(new ValidationError(report.AllObjects[j].Name, ValidationError.ErrorLevel.Error, Res.Get("Messages,Validator,DuplicateName"), (ReportComponentBase)report.AllObjects[j]));
+                            return null;
+                        }
+
+                        if (report.AllObjects[j] is ReportComponentBase &&
+                            report.AllObjects[i].Name == report.AllObjects[j].Name)
+                        {
+                            listError.Add (new ValidationError (report.AllObjects[j].Name,
+                                ValidationError.ErrorLevel.Error, Res.Get ("Messages,Validator,DuplicateName"),
+                                (ReportComponentBase)report.AllObjects[j]));
                             duplicateName = true;
                         }
                     }
+
                     if (report.AllObjects[i] is ReportComponentBase && duplicateName)
-                        listError.Add(new ValidationError(report.AllObjects[i].Name, ValidationError.ErrorLevel.Error, Res.Get("Messages,Validator,DuplicateName"), (ReportComponentBase)report.AllObjects[i]));
+                    {
+                        listError.Add (new ValidationError (report.AllObjects[i].Name, ValidationError.ErrorLevel.Error,
+                            Res.Get ("Messages,Validator,DuplicateName"), (ReportComponentBase)report.AllObjects[i]));
+                    }
                 }
             }
             catch (Exception e)
             {
                 if (token.IsCancellationRequested)
+                {
                     return null;
+                }
                 else
+                {
                     throw e;
+                }
             }
+
             return listError.Distinct().ToList();
         }
     }

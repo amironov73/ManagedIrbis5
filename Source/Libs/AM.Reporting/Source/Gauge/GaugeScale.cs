@@ -37,12 +37,6 @@ namespace AM.Reporting.Gauge
     {
         #region Fields
 
-        private GaugeObject parent;
-        private Font font;
-        private FillBase textFill;
-        private ScaleTicks majorTicks;
-        private ScaleTicks minorTicks;
-
         #endregion // Fields
 
         #region Properties
@@ -50,52 +44,33 @@ namespace AM.Reporting.Gauge
         /// <summary>
         /// Gets or sets major ticks of scale.
         /// </summary>
-        [Browsable(true)]
-        public ScaleTicks MajorTicks
-        {
-            get { return majorTicks; }
-            set { majorTicks = value; }
-        }
+        [Browsable (true)]
+        public ScaleTicks MajorTicks { get; set; }
 
         /// <summary>
         /// Gets or sets minor ticks of scale.
         /// </summary>
-        [Browsable(true)]
-        public ScaleTicks MinorTicks
-        {
-            get { return minorTicks; }
-            set { minorTicks = value; }
-        }
+        [Browsable (true)]
+        public ScaleTicks MinorTicks { get; set; }
 
         /// <summary>
         /// Gets or sets the parent gauge object.
         /// </summary>
-        [Browsable(false)]
-        public GaugeObject Parent
-        {
-            get { return parent; }
-            set { parent = value; }
-        }
+        [Browsable (false)]
+        public GaugeObject Parent { get; set; }
 
         /// <summary>
         /// Gets or sets the font of scale.
         /// </summary>
-        [Browsable(true)]
-        public Font Font
-        {
-            get { return font; }
-            set { font = value; }
-        }
+        [Browsable (true)]
+        public Font Font { get; set; }
 
         /// <summary>
         /// Gets or sets the scale font color
         /// </summary>
-        [Editor("AM.Reporting.TypeEditors.FillEditor, AM.Reporting", typeof(UITypeEditor))]
-        public FillBase TextFill
-        {
-            get { return textFill; }
-            set { textFill = value; }
-        }
+        [Editor ("AM.Reporting.TypeEditors.FillEditor, AM.Reporting", typeof (UITypeEditor))]
+        public FillBase TextFill { get; set; }
+
         #endregion // Properties
 
         #region Constructors
@@ -104,13 +79,13 @@ namespace AM.Reporting.Gauge
         /// Initializes a new instance of the <see cref="GaugeScale"/> class.
         /// </summary>
         /// <param name="parent">The parent gauge object.</param>
-        public GaugeScale(GaugeObject parent)
+        public GaugeScale (GaugeObject parent)
         {
-            this.parent = parent;
-            font = new Font("Arial", 8.0f);
-            TextFill = new SolidFill(Color.Black);
-            majorTicks = new ScaleTicks();
-            minorTicks = new ScaleTicks();
+            this.Parent = parent;
+            Font = new Font ("Arial", 8.0f);
+            TextFill = new SolidFill (Color.Black);
+            MajorTicks = new ScaleTicks();
+            MinorTicks = new ScaleTicks();
         }
 
         #endregion // Constructors
@@ -121,7 +96,7 @@ namespace AM.Reporting.Gauge
         /// Copies the contents of another GaugeScale.
         /// </summary>
         /// <param name="src">The GaugeScale instance to copy the contents from.</param>
-        public virtual void Assign(GaugeScale src)
+        public virtual void Assign (GaugeScale src)
         {
             Font = src.Font;
             TextFill = src.TextFill;
@@ -131,7 +106,7 @@ namespace AM.Reporting.Gauge
         /// Draws the scale of gauge.
         /// </summary>
         /// <param name="e">Draw event arguments.</param>
-        public virtual void Draw(FRPaintEventArgs e)
+        public virtual void Draw (FRPaintEventArgs e)
         {
         }
 
@@ -144,12 +119,13 @@ namespace AM.Reporting.Gauge
         /// <remarks>
         /// This method is for internal use only.
         /// </remarks>
-        public virtual void Serialize(FRWriter writer, string prefix, GaugeScale diff)
+        public virtual void Serialize (FRWriter writer, string prefix, GaugeScale diff)
         {
-            TextFill.Serialize(writer, prefix + ".TextFill", diff.TextFill);
-            if ((writer.SerializeTo != SerializeTo.Preview || !Font.Equals(diff.Font)) && writer.ItemName != "inherited")
+            TextFill.Serialize (writer, prefix + ".TextFill", diff.TextFill);
+            if ((writer.SerializeTo != SerializeTo.Preview || !Font.Equals (diff.Font)) &&
+                writer.ItemName != "inherited")
             {
-                writer.WriteValue(prefix + ".Font", Font);
+                writer.WriteValue (prefix + ".Font", Font);
             }
         }
 
@@ -159,15 +135,10 @@ namespace AM.Reporting.Gauge
     /// <summary>
     /// Represents a scale ticks.
     /// </summary>
-    [ToolboxItem(false)]
+    [ToolboxItem (false)]
     public class ScaleTicks : Component
     {
         #region Fields
-
-        private float length;
-        private int width;
-        private Color color;
-        private int count;
 
         #endregion // Fields
 
@@ -176,42 +147,27 @@ namespace AM.Reporting.Gauge
         /// <summary>
         /// Gets or sets the length of ticks.
         /// </summary>
-        [Browsable(false)]
-        public float Length
-        {
-            get { return length; }
-            set { length = value; }
-        }
+        [Browsable (false)]
+        public float Length { get; set; }
 
         /// <summary>
         /// Gets or sets the width of ticks.
         /// </summary>
-        [Browsable(true)]
-        public int Width
-        {
-            get { return width; }
-            set { width = value; }
-        }
+        [Browsable (true)]
+        public int Width { get; set; }
 
         /// <summary>
         /// Gets or sets the color of ticks.
         /// </summary>
-        [Browsable(true)]
-        public Color Color
-        {
-            get { return color; }
-            set { color = value; }
-        }
+        [Browsable (true)]
+        public Color Color { get; set; }
 
         /// <summary>
         /// Gets or sets the count of ticks
         /// </summary>
-        [Browsable(false)]
-        public int Count
-        {
-            get { return count; }
-            set { count = value; }
-        }
+        [Browsable (false)]
+        public int Count { get; set; }
+
         #endregion // Properties
 
         #region Constructors
@@ -221,10 +177,10 @@ namespace AM.Reporting.Gauge
         /// </summary>
         public ScaleTicks()
         {
-            length = 8.0f;
-            width = 1;
-            color = Color.Black;
-            count = 6;
+            Length = 8.0f;
+            Width = 1;
+            Color = Color.Black;
+            Count = 6;
         }
 
         /// <summary>
@@ -233,11 +189,11 @@ namespace AM.Reporting.Gauge
         /// <param name="length">Ticks length.</param>
         /// <param name="width">Ticks width.</param>
         /// <param name="color">Ticks color.</param>
-        public ScaleTicks(float length, int width, Color color)
+        public ScaleTicks (float length, int width, Color color)
         {
-            this.length = length;
-            this.width = width;
-            this.color = color;
+            this.Length = length;
+            this.Width = width;
+            this.Color = color;
         }
 
         /// <summary>
@@ -247,12 +203,12 @@ namespace AM.Reporting.Gauge
         /// <param name="width">Ticks width.</param>
         /// <param name="color">Ticks color.</param>
         /// <param name="count">Ticks count.</param>
-        public ScaleTicks(float length, int width, Color color, int count)
+        public ScaleTicks (float length, int width, Color color, int count)
         {
-            this.length = length;
-            this.width = width;
-            this.color = color;
-            this.count = count;
+            this.Length = length;
+            this.Width = width;
+            this.Color = color;
+            this.Count = count;
         }
 
         #endregion // Constructors
@@ -263,7 +219,7 @@ namespace AM.Reporting.Gauge
         /// Copies the contents of another ScaleTicks.
         /// </summary>
         /// <param name="src">The ScaleTicks instance to copy the contents from.</param>
-        public virtual void Assign(ScaleTicks src)
+        public virtual void Assign (ScaleTicks src)
         {
             Length = src.Length;
             Width = src.Width;
@@ -279,19 +235,21 @@ namespace AM.Reporting.Gauge
         /// <remarks>
         /// This method is for internal use only.
         /// </remarks>
-        public virtual void Serialize(FRWriter writer, string prefix, ScaleTicks diff)
+        public virtual void Serialize (FRWriter writer, string prefix, ScaleTicks diff)
         {
             if (Length != diff.Length)
             {
-                writer.WriteFloat(prefix + ".Length", Length);
+                writer.WriteFloat (prefix + ".Length", Length);
             }
+
             if (Width != diff.Width)
             {
-                writer.WriteInt(prefix + ".Width", Width);
+                writer.WriteInt (prefix + ".Width", Width);
             }
+
             if (Color != diff.Color)
             {
-                writer.WriteValue(prefix + ".Color", Color);
+                writer.WriteValue (prefix + ".Color", Color);
             }
         }
 

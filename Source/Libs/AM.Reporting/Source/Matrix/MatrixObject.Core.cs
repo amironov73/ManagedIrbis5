@@ -30,7 +30,7 @@ namespace AM.Reporting.Matrix
         /// Does nothing
         /// </summary>
         /// <param name="flag"></param>
-        partial void RefreshTemplate(bool flag);
+        partial void RefreshTemplate (bool flag);
 
         #endregion Private Methods
     }

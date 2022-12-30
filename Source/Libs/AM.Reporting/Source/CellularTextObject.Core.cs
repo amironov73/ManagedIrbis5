@@ -16,6 +16,7 @@
 #region Using directives
 
 using AM.Reporting.Utils;
+
 using System;
 
 #endregion
@@ -26,9 +27,9 @@ namespace AM.Reporting
 {
     partial class CellularTextObject
     {
-        private float GetCellWidthInternal(float fontHeight)
+        private float GetCellWidthInternal (float fontHeight)
         {
-            return (int)Math.Round((fontHeight + 10) / (0.25f * Units.Centimeters)) * (0.25f * Units.Centimeters);
+            return (int)Math.Round ((fontHeight + 10) / (0.25f * Units.Centimeters)) * (0.25f * Units.Centimeters);
         }
     }
 }

@@ -28,11 +28,6 @@ namespace AM.Reporting.Utils.Json
     {
         #region Private Fields
 
-        private string description;
-        private JsonSchema items;
-        private Dictionary<string, JsonSchema> properties;
-        private string type;
-
         #endregion Private Fields
 
         #region Public Properties
@@ -41,74 +36,65 @@ namespace AM.Reporting.Utils.Json
         {
             get
             {
-                switch (type)
+                switch (Type)
                 {
-                    case "object": return typeof(JsonBase);
-                    case "array": return typeof(JsonBase);
-                    case "integer": return typeof(int);
-                    case "number": return typeof(double);
-                    case "string": return typeof(string);
-                    case "boolean": return typeof(bool);
-                    default: return typeof(object);
+                    case "object": return typeof (JsonBase);
+                    case "array": return typeof (JsonBase);
+                    case "integer": return typeof (int);
+                    case "number": return typeof (double);
+                    case "string": return typeof (string);
+                    case "boolean": return typeof (bool);
+                    default: return typeof (object);
                 }
             }
         }
 
-        public string Description { get { return description; } set { description = value; } }
+        public string Description { get; set; }
 
-        public JsonSchema Items
-        {
-            get
-            {
-                return items;
-            }
-            set
-            {
-                items = value;
-            }
-        }
+        public JsonSchema Items { get; set; }
 
-        public Dictionary<string, JsonSchema> Properties
-        {
-            get
-            {
-                return properties;
-            }
-        }
+        public Dictionary<string, JsonSchema> Properties { get; private set; }
 
-        public string Type { get { return type; } set { type = value; } }
+        public string Type { get; set; }
 
         #endregion Public Properties
 
         #region Public Methods
 
-        public static JsonSchema FromJson(object json)
+        public static JsonSchema FromJson (object json)
         {
-            JsonSchema result = new JsonSchema();
-            if (json is JsonObject)
+            var result = new JsonSchema();
+            if (json is JsonObject jsonObject)
             {
-                result.type = "object";
-                result.properties = new Dictionary<string, JsonSchema>();
+                result.Type = "object";
+                result.Properties = new Dictionary<string, JsonSchema>();
 
-                foreach (KeyValuePair<string, object> kv in (json as JsonObject))
+                foreach (var kv in jsonObject)
                 {
-                    result.Properties[kv.Key] = FromJson(kv.Value);
+                    result.Properties[kv.Key] = FromJson (kv.Value);
                 }
             }
-            else if (json is JsonArray)
+            else if (json is JsonArray array)
             {
                 result.Type = "array";
-                result.items = null;
-                foreach (object obj in (json as JsonArray))
+                result.Items = null;
+                foreach (var obj in array)
                 {
-                    JsonSchema sub = FromJson(obj);
-                    if (result.items == null)
-                        result.items = sub;
-                    else result.items.Union(sub);
+                    var sub = FromJson (obj);
+                    if (result.Items == null)
+                    {
+                        result.Items = sub;
+                    }
+                    else
+                    {
+                        result.Items.Union (sub);
+                    }
                 }
 
-                if (result.items == null)
-                    result.items = new JsonSchema();
+                if (result.Items == null)
+                {
+                    result.Items = new JsonSchema();
+                }
             }
             else if (json is string)
             {
@@ -126,35 +112,35 @@ namespace AM.Reporting.Utils.Json
             {
                 result.Type = "null";
             }
+
             return result;
         }
 
-        public static JsonSchema Load(JsonObject obj)
+        public static JsonSchema Load (JsonObject obj)
         {
             if (obj == null)
             {
-                throw new NullReferenceException("Unable to load schema from non-object");
+                throw new NullReferenceException ("Unable to load schema from non-object");
             }
 
-            JsonSchema result = new JsonSchema();
+            var result = new JsonSchema();
             if (obj != null)
             {
-                result.Type = obj.ReadString("type");
-                result.Description = obj.ReadString("description");
+                result.Type = obj.ReadString ("type");
+                result.Description = obj.ReadString ("description");
                 switch (result.Type)
                 {
                     case "object":
-                        result.properties = new Dictionary<string, JsonSchema>();
-                        if (obj.ContainsKey("properties"))
+                        result.Properties = new Dictionary<string, JsonSchema>();
+                        if (obj.ContainsKey ("properties"))
                         {
-                            JsonObject child = obj["properties"] as JsonObject;
-                            if (child != null)
+                            if (obj["properties"] is JsonObject child)
                             {
-                                foreach (KeyValuePair<string, object> kv in child)
+                                foreach (var kv in child)
                                 {
-                                    if (kv.Value is JsonObject)
+                                    if (kv.Value is JsonObject value)
                                     {
-                                        result.Properties[kv.Key] = Load(kv.Value as JsonObject);
+                                        result.Properties[kv.Key] = Load (value);
                                     }
                                     else
                                     {
@@ -163,13 +149,19 @@ namespace AM.Reporting.Utils.Json
                                 }
                             }
                         }
+
                         break;
 
                     case "array":
-                        if (obj.ContainsKey("items"))
-                            result.items = Load(obj["items"] as JsonObject);
+                        if (obj.ContainsKey ("items"))
+                        {
+                            result.Items = Load (obj["items"] as JsonObject);
+                        }
                         else
-                            result.items = new JsonSchema();
+                        {
+                            result.Items = new JsonSchema();
+                        }
+
                         break;
                 }
             }
@@ -177,12 +169,13 @@ namespace AM.Reporting.Utils.Json
             return result;
         }
 
-        public void Save(JsonObject obj)
+        public void Save (JsonObject obj)
         {
             if (Type != null)
             {
                 obj["type"] = Type;
             }
+
             if (Description != null)
             {
                 obj["description"] = Description;
@@ -190,19 +183,19 @@ namespace AM.Reporting.Utils.Json
 
             if (Items != null)
             {
-                JsonObject child = new JsonObject();
-                Items.Save(child);
+                var child = new JsonObject();
+                Items.Save (child);
                 obj["items"] = child;
             }
 
             if (Properties != null && Properties.Count > 0)
             {
-                JsonObject child = new JsonObject();
+                var child = new JsonObject();
                 obj["properties"] = child;
                 foreach (KeyValuePair<string, JsonSchema> kv in Properties)
                 {
-                    JsonObject sub_child = new JsonObject();
-                    kv.Value.Save(sub_child);
+                    var sub_child = new JsonObject();
+                    kv.Value.Save (sub_child);
                     child[kv.Key] = sub_child;
                 }
             }
@@ -212,39 +205,45 @@ namespace AM.Reporting.Utils.Json
 
         #region Private Methods
 
-        private void Union(JsonSchema sub)
+        private void Union (JsonSchema sub)
         {
-            if (sub == null || type != sub.type)
+            if (sub == null || Type != sub.Type)
             {
-                items = null;
-                properties = null;
-                type = "null";
+                Items = null;
+                Properties = null;
+                Type = "null";
             }
-            else if (type == "object")
+            else if (Type == "object")
             {
-                if (properties == null)
-                    properties = new Dictionary<string, JsonSchema>();
+                if (Properties == null)
+                {
+                    Properties = new Dictionary<string, JsonSchema>();
+                }
+
                 if (sub.Properties != null)
+                {
                     foreach (KeyValuePair<string, JsonSchema> kv in sub.Properties)
                     {
-                        JsonSchema child;
-                        if (Properties.TryGetValue(kv.Key, out child))
+                        if (Properties.TryGetValue (kv.Key, out var child))
                         {
-                            child.Union(kv.Value);
+                            child.Union (kv.Value);
                         }
                         else
                         {
                             Properties[kv.Key] = kv.Value;
                         }
                     }
+                }
             }
-            else if (type == "array")
+            else if (Type == "array")
             {
-                if (items == null)
-                    items = sub.items;
+                if (Items == null)
+                {
+                    Items = sub.Items;
+                }
                 else
                 {
-                    items.Union(sub.items);
+                    Items.Union (sub.Items);
                 }
             }
         }

@@ -27,57 +27,40 @@ using System.Windows.Forms;
 
 namespace AM.Reporting.Utils
 {
-
     /// <summary>
     /// The reader used to deserialize object's properties from a report file.
     /// </summary>
     public class FRReader : IDisposable
     {
         #region Fields
+
         private XmlDocument doc;
         private XmlItem root;
         private XmlItem curItem;
         private XmlItem curRoot;
         private XmlProperty[] props;
-        private string errors;
         private List<FixupInfo> fixups;
-        private Report report;
-        private BlobStore blobStore;
-        private bool readChildren;
-        private SerializeTo deserializeFrom;
+
         #endregion
 
         #region Properties
+
         /// <summary>
         /// Gets a string that contains errors occured during the load.
         /// </summary>
-        public string Errors
-        {
-            get { return errors; }
-        }
+        public string Errors { get; private set; }
 
-        internal BlobStore BlobStore
-        {
-            get { return blobStore; }
-            set { blobStore = value; }
-        }
+        internal BlobStore BlobStore { get; set; }
 
         /// <summary>
         /// Gets the current item name.
         /// </summary>
-        public string ItemName
-        {
-            get { return curItem.Name; }
-        }
+        public string ItemName => curItem.Name;
 
         /// <summary>
         /// Gets or sets a value indicating whther is necessary to read the object's children.
         /// </summary>
-        public bool ReadChildren
-        {
-            get { return readChildren; }
-            set { readChildren = value; }
-        }
+        public bool ReadChildren { get; set; }
 
         /// <summary>
         /// Returns Root element for this reader
@@ -87,7 +70,10 @@ namespace AM.Reporting.Utils
             get
             {
                 if (curItem != null)
-                    return GetRoot(curItem, 11);
+                {
+                    return GetRoot (curItem, 11);
+                }
+
                 return null;
             }
         }
@@ -95,27 +81,24 @@ namespace AM.Reporting.Utils
         /// <summary>
         /// Gets or sets target of serialization.
         /// </summary>
-        public SerializeTo DeserializeFrom
-        {
-            get { return deserializeFrom; }
-            set { deserializeFrom = value; }
-        }
+        public SerializeTo DeserializeFrom { get; set; }
 
-        public Report Report
-        {
-            get { return report; }
-        }
+        public Report Report { get; private set; }
 
-        private XmlItem GetRoot(XmlItem item, int count)
+        private XmlItem GetRoot (XmlItem item, int count)
         {
-            if (count < 0 || item.Parent==null)
+            if (count < 0 || item.Parent == null)
+            {
                 return item;
-            return GetRoot(item.Parent, count - 1);
+            }
 
+            return GetRoot (item.Parent, count - 1);
         }
+
         #endregion
 
         #region Private Methods
+
         private void GetProps()
         {
             if (curRoot != null)
@@ -124,54 +107,68 @@ namespace AM.Reporting.Utils
             }
         }
 
-        private string PropName(string name)
+        private string PropName (string name)
         {
-            return ShortProperties.GetFullName(name);
+            return ShortProperties.GetFullName (name);
         }
 
-        private string PropValue(string name)
+        private string PropValue (string name)
         {
-            int i = IndexOf(name);
+            var i = IndexOf (name);
             if (i != -1)
+            {
                 return props[i].Value;
+            }
+
             return "";
         }
 
-        private int IndexOf(string name)
+        private int IndexOf (string name)
         {
             if (props == null)
+            {
                 return -1;
+            }
 
             // property key should be trimmed
             name = name.Trim();
 
-            int result = -1;
-            for (int i = 0; i < props.Length; i++)
+            var result = -1;
+            for (var i = 0; i < props.Length; i++)
             {
-                if (String.Compare(props[i].Key, name, true) == 0)
+                if (string.Compare (props[i].Key, name, true) == 0)
                 {
                     result = i;
                     break;
                 }
             }
+
             return result;
         }
 
         private void FixupReferences()
         {
-            if (report == null)
-                return;
-            foreach (FixupInfo fixup in fixups)
+            if (Report == null)
             {
-                PropertyInfo pi = fixup.obj.GetType().GetProperty(fixup.name);
-                if (pi != null)
-                    pi.SetValue(fixup.obj, report.FindObject(fixup.value), null);
+                return;
             }
+
+            foreach (var fixup in fixups)
+            {
+                var pi = fixup.obj.GetType().GetProperty (fixup.name);
+                if (pi != null)
+                {
+                    pi.SetValue (fixup.obj, Report.FindObject (fixup.value), null);
+                }
+            }
+
             fixups.Clear();
         }
+
         #endregion
 
         #region Public Methods
+
         /// <summary>
         /// Reads the specified object.
         /// </summary>
@@ -205,18 +202,21 @@ namespace AM.Reporting.Utils
         /// }
         /// </code>
         /// </example>
-        public void Read(IFRSerializable obj)
+        public void Read (IFRSerializable obj)
         {
-            XmlItem saveCurItem = curItem;
-            XmlItem saveCurRoot = curRoot;
-            XmlProperty[] saveProps = props;
+            var saveCurItem = curItem;
+            var saveCurRoot = curRoot;
+            var saveProps = props;
             try
             {
                 if (curItem == null)
+                {
                     curItem = root;
+                }
+
                 curRoot = curItem;
                 GetProps();
-                obj.Deserialize(this);
+                obj.Deserialize (this);
             }
             finally
             {
@@ -226,10 +226,10 @@ namespace AM.Reporting.Utils
             }
         }
 
-        internal void Read(IFRSerializable obj, XmlItem Root)
+        internal void Read (IFRSerializable obj, XmlItem Root)
         {
             curItem = Root;
-            Read(obj);
+            Read (obj);
         }
 
         /// <summary>
@@ -267,39 +267,54 @@ namespace AM.Reporting.Utils
         /// </example>
         public IFRSerializable Read()
         {
-            XmlItem saveCurItem = curItem;
-            XmlItem saveCurRoot = curRoot;
-            XmlProperty[] saveProps = props;
+            var saveCurItem = curItem;
+            var saveCurRoot = curRoot;
+            var saveProps = props;
             IFRSerializable result = null;
 
             try
             {
                 if (curItem == null)
+                {
                     curItem = root;
+                }
+
                 curRoot = curItem;
                 GetProps();
 
-                if (report != null && report.IsAncestor)
-                    result = report.FindObject(ReadStr("Name"));
+                if (Report != null && Report.IsAncestor)
+                {
+                    result = Report.FindObject (ReadStr ("Name"));
+                }
+
                 if (result == null && curItem.Name != "inherited")
                 {
-                    Type type = RegisteredObjects.FindType(curItem.Name);
+                    var type = RegisteredObjects.FindType (curItem.Name);
                     if (type != null)
                     {
-                        result = Activator.CreateInstance(type) as IFRSerializable;
-                        if (result is Report)
-                            report = result as Report;
+                        result = Activator.CreateInstance (type) as IFRSerializable;
+                        if (result is Report report1)
+                        {
+                            Report = report1;
+                        }
                     }
                     else
                     {
                         if (!Config.WebMode)
-                            MessageBox.Show(Res.Get("Messages,CantFindObject") + " " + curItem.Name);
+                        {
+                            MessageBox.Show (Res.Get ("Messages,CantFindObject") + " " + curItem.Name);
+                        }
                         else
-                            throw new ClassException(curItem.Name);
+                        {
+                            throw new ClassException (curItem.Name);
+                        }
                     }
                 }
+
                 if (result != null)
-                    result.Deserialize(this);
+                {
+                    result.Deserialize (this);
+                }
             }
             finally
             {
@@ -311,33 +326,37 @@ namespace AM.Reporting.Utils
             return result;
         }
 
-        private int getDotCount(string s)
+        private int getDotCount (string s)
         {
-            if (String.IsNullOrEmpty(s))
+            if (string.IsNullOrEmpty (s))
+            {
                 return 0;
+            }
 
-            int i = 0;
-            int count = 0;
-            while ((i = s.IndexOf('.', i)) != -1)
+            var i = 0;
+            var count = 0;
+            while ((i = s.IndexOf ('.', i)) != -1)
             {
                 ++i;
                 ++count;
             }
+
             return count;
         }
 
-        private void DoReadProperties(object obj, XmlProperty[] properties)
+        private void DoReadProperties (object obj, XmlProperty[] properties)
         {
-            for (int i = 0; i < properties.Length; i++)
+            for (var i = 0; i < properties.Length; i++)
             {
-                string name = properties[i].Key;
-                string value = properties[i].Value;
+                var name = properties[i].Key;
+                var value = properties[i].Value;
 
                 // check multiple properties like Frame.LeftLine.Typ
-                object obj1 = obj;
-                int len = name.Length;
-                int start = 0;
-                int j = 0;
+                var obj1 = obj;
+                var len = name.Length;
+                var start = 0;
+                var j = 0;
+
                 // find '.'
                 while (j < len && name[j] != '.')
                     j++;
@@ -346,9 +365,13 @@ namespace AM.Reporting.Utils
                     while (j < len)
                     {
                         // get subproperty
-                        PropertyInfo pi = obj1.GetType().GetProperty(name.Substring(start, j - start));
-                        if (pi == null) break;
-                        obj1 = pi.GetValue(obj1, null);
+                        var pi = obj1.GetType().GetProperty (name.Substring (start, j - start));
+                        if (pi == null)
+                        {
+                            break;
+                        }
+
+                        obj1 = pi.GetValue (obj1, null);
 
                         // find next '.'
                         start = j + 1;
@@ -356,43 +379,50 @@ namespace AM.Reporting.Utils
                         while (j < len && name[j] != '.')
                             j++;
                     }
-                    name = name.Substring(start);
+
+                    name = name.Substring (start);
                 }
 
                 try
                 {
-                    name = PropName(name);
-                    PropertyInfo pi = obj1.GetType().GetProperty(name);
+                    name = PropName (name);
+                    var pi = obj1.GetType().GetProperty (name);
                     if (pi == null)
+                    {
                         continue;
+                    }
 
                     if (value == "null")
                     {
-                        if (pi.PropertyType == typeof(string))
-                            pi.SetValue(obj1, "null", null);
+                        if (pi.PropertyType == typeof (string))
+                        {
+                            pi.SetValue (obj1, "null", null);
+                        }
                         else
-                            pi.SetValue(obj1, null, null);
+                        {
+                            pi.SetValue (obj1, null, null);
+                        }
                     }
                     else
                     {
-                        if (pi.PropertyType == typeof(string))
+                        if (pi.PropertyType == typeof (string))
                         {
-                            pi.SetValue(obj1, value, null);
+                            pi.SetValue (obj1, value, null);
                         }
-                        else if (pi.PropertyType.IsClass && pi.PropertyType.IsSubclassOf(typeof(Base)))
+                        else if (pi.PropertyType.IsClass && pi.PropertyType.IsSubclassOf (typeof (Base)))
                         {
                             // it's a reference
-                            fixups.Add(new FixupInfo(obj1, name, value));
+                            fixups.Add (new FixupInfo (obj1, name, value));
                         }
                         else
                         {
-                            pi.SetValue(obj1, Converter.FromString(pi.PropertyType, value), null);
+                            pi.SetValue (obj1, Converter.FromString (pi.PropertyType, value), null);
                         }
                     }
                 }
                 catch (Exception e)
                 {
-                    errors += e.Message + "\r\n";
+                    Errors += e.Message + "\r\n";
                 }
             }
         }
@@ -431,55 +461,65 @@ namespace AM.Reporting.Utils
         /// }
         /// </code>
         /// </example>
-        public void ReadProperties(object obj)
+        public void ReadProperties (object obj)
         {
             if (props == null)
+            {
                 return;
+            }
 
             // speed optimization, for use in the preview mode
-            if (obj is TextObject && props.Length == 1 && props[0].Key == "x")
+            if (obj is TextObject textObject && props.Length == 1 && props[0].Key == "x")
             {
-                (obj as TextObject).Text = props[0].Value;
+                textObject.Text = props[0].Value;
                 return;
             }
 
             // Fix for multilevel properties with dots such Barcode.CalcCheckSum
             // Reported wrong working with saving from On-line Designer
-            XmlProperty[] FProps0 = new XmlProperty[0];
-            XmlProperty[] FProps1 = new XmlProperty[0];
-            XmlProperty[] FProps2 = new XmlProperty[0];
+            var FProps0 = new XmlProperty[0];
+            var FProps1 = new XmlProperty[0];
+            var FProps2 = new XmlProperty[0];
 
-            for (int i = 0; i < props.Length; i++)
+            for (var i = 0; i < props.Length; i++)
             {
-                int dotCount = getDotCount(props[i].Key);
+                var dotCount = getDotCount (props[i].Key);
                 switch (dotCount)
                 {
                     case 0:
-                        AppendProperty(ref FProps0, props[i]);
+                        AppendProperty (ref FProps0, props[i]);
                         break;
                     case 1:
-                        AppendProperty(ref FProps1, props[i]);
+                        AppendProperty (ref FProps1, props[i]);
                         break;
                     default:
-                        AppendProperty(ref FProps2, props[i]);
+                        AppendProperty (ref FProps2, props[i]);
                         break;
                 }
             }
 
             // without dots
             if (FProps0.Length > 0)
-                DoReadProperties(obj, FProps0);
+            {
+                DoReadProperties (obj, FProps0);
+            }
+
             // with one dot
             if (FProps1.Length > 0)
-                DoReadProperties(obj, FProps1);
+            {
+                DoReadProperties (obj, FProps1);
+            }
+
             // with two dots
             if (FProps2.Length > 0)
-                DoReadProperties(obj, FProps2);
+            {
+                DoReadProperties (obj, FProps2);
+            }
         }
 
-        private void AppendProperty(ref XmlProperty[] fProps, XmlProperty xmlProperty)
+        private void AppendProperty (ref XmlProperty[] fProps, XmlProperty xmlProperty)
         {
-            Array.Resize<XmlProperty>(ref fProps, fProps.Length + 1);
+            Array.Resize<XmlProperty> (ref fProps, fProps.Length + 1);
             fProps[fProps.Length - 1] = xmlProperty;
         }
 
@@ -525,18 +565,22 @@ namespace AM.Reporting.Utils
                     return true;
                 }
                 else
+                {
                     return false;
+                }
             }
             else
             {
-                int i = curRoot.IndexOf(curItem);
+                var i = curRoot.IndexOf (curItem);
                 if (i < curRoot.Count - 1)
                 {
                     curItem = curRoot[i + 1];
                     return true;
                 }
                 else
+                {
                     return false;
+                }
             }
         }
 
@@ -545,9 +589,9 @@ namespace AM.Reporting.Utils
         /// </summary>
         /// <param name="name">The property name to check.</param>
         /// <returns><b>true</b> if current item has specified property.</returns>
-        public bool HasProperty(string name)
+        public bool HasProperty (string name)
         {
-            return IndexOf(name) != -1;
+            return IndexOf (name) != -1;
         }
 
         /// <summary>
@@ -555,9 +599,9 @@ namespace AM.Reporting.Utils
         /// </summary>
         /// <param name="name">Name of property.</param>
         /// <returns>Property value.</returns>
-        public string ReadStr(string name)
+        public string ReadStr (string name)
         {
-            return PropValue(name);
+            return PropValue (name);
         }
 
         /// <summary>
@@ -565,9 +609,9 @@ namespace AM.Reporting.Utils
         /// </summary>
         /// <param name="name">Name of property.</param>
         /// <returns>Property value.</returns>
-        public bool ReadBool(string name)
+        public bool ReadBool (string name)
         {
-            string prop = PropValue(name);
+            var prop = PropValue (name);
             return (prop == "1" || prop.ToLower() == "true") ? true : false;
         }
 
@@ -576,9 +620,9 @@ namespace AM.Reporting.Utils
         /// </summary>
         /// <param name="name">Name of property.</param>
         /// <returns>Property value.</returns>
-        public int ReadInt(string name)
+        public int ReadInt (string name)
         {
-            return int.Parse(PropValue(name));
+            return int.Parse (PropValue (name));
         }
 
         /// <summary>
@@ -586,9 +630,9 @@ namespace AM.Reporting.Utils
         /// </summary>
         /// <param name="name">Name of property.</param>
         /// <returns>Property value.</returns>
-        public float ReadFloat(string name)
+        public float ReadFloat (string name)
         {
-            return (float)Converter.FromString(typeof(float), PropValue(name));
+            return (float)Converter.FromString (typeof (float), PropValue (name));
         }
 
         /// <summary>
@@ -596,9 +640,9 @@ namespace AM.Reporting.Utils
         /// </summary>
         /// <param name="name">Name of property.</param>
         /// <returns>Property value.</returns>
-        public double ReadDouble(string name)
+        public double ReadDouble (string name)
         {
-            return (double)Converter.FromString(typeof(double), PropValue(name));
+            return (double)Converter.FromString (typeof (double), PropValue (name));
         }
 
         /// <summary>
@@ -607,16 +651,20 @@ namespace AM.Reporting.Utils
         /// <param name="name">Name of property.</param>
         /// <param name="typ">Type of property.</param>
         /// <returns>Property value.</returns>
-        public object ReadValue(string name, Type typ)
+        public object ReadValue (string name, Type typ)
         {
-            string propValue = PropValue(name);
+            var propValue = PropValue (name);
             if (propValue == "null")
             {
-                if (typ == typeof(string))
+                if (typ == typeof (string))
+                {
                     return "null";
+                }
+
                 return null;
             }
-            return Converter.FromString(typ, propValue);
+
+            return Converter.FromString (typ, propValue);
         }
 
         /// <summary>
@@ -641,24 +689,25 @@ namespace AM.Reporting.Utils
         /// Loads the xml items from a stream.
         /// </summary>
         /// <param name="stream">The stream to load from.</param>
-        public void Load(Stream stream)
+        public void Load (Stream stream)
         {
-            doc.Load(stream);
+            doc.Load (stream);
         }
+
         #endregion
 
         /// <summary>
         /// Initializes a new instance of the <b>FRReader</b> class with specified report.
         /// </summary>
         /// <param name="report">Reference to a report.</param>
-        public FRReader(Report report)
+        public FRReader (Report report)
         {
             doc = new XmlDocument();
             root = doc.Root;
             fixups = new List<FixupInfo>();
-            errors = "";
-            this.report = report;
-            readChildren = true;
+            Errors = "";
+            this.Report = report;
+            ReadChildren = true;
         }
 
         /// <summary>
@@ -667,7 +716,7 @@ namespace AM.Reporting.Utils
         /// </summary>
         /// <param name="report">Reference to a report.</param>
         /// <param name="root">Xml item with contents to read.</param>
-        public FRReader(Report report, XmlItem root) : this(report)
+        public FRReader (Report report, XmlItem root) : this (report)
         {
             this.root = root;
         }
@@ -679,7 +728,7 @@ namespace AM.Reporting.Utils
             public string name;
             public string value;
 
-            public FixupInfo(object obj, string name, string value)
+            public FixupInfo (object obj, string name, string value)
             {
                 this.obj = obj;
                 this.name = name;

@@ -31,25 +31,23 @@ namespace AM.Reporting.Utils
     /// </summary>
     public class ZipArchive
     {
-        string rootFolder;
-        string errors;
         List<ZipFileItem> fileList;
         List<ZipLocalFile> fileObjects;
-        string comment;
 
-        private uint CopyStream(Stream source, Stream target)
+        private uint CopyStream (Stream source, Stream target)
         {
             source.Position = 0;
-            int bufflength = 8192;
-            uint crc = Crc32.Begin();
-            byte[] buff = new byte[bufflength];
+            var bufflength = 8192;
+            var crc = Crc32.Begin();
+            var buff = new byte[bufflength];
             int i;
-            while ((i = source.Read(buff, 0, bufflength)) > 0)
+            while ((i = source.Read (buff, 0, bufflength)) > 0)
             {
-                target.Write(buff, 0, i);
-                crc = Crc32.Update(crc, buff, 0, i);
+                target.Write (buff, 0, i);
+                crc = Crc32.Update (crc, buff, 0, i);
             }
-            return Crc32.End(crc);
+
+            return Crc32.End (crc);
         }
 
         /// <summary>
@@ -57,15 +55,21 @@ namespace AM.Reporting.Utils
         /// </summary>
         public void Clear()
         {
-            foreach (ZipFileItem item in fileList)
+            foreach (var item in fileList)
+            {
                 item.Clear();
-            foreach (ZipLocalFile item in fileObjects)
+            }
+
+            foreach (var item in fileObjects)
+            {
                 item.Clear();
+            }
+
             fileList.Clear();
             fileObjects.Clear();
-            errors = "";
-            rootFolder = "";
-            comment = "";
+            Errors = "";
+            RootFolder = "";
+            Comment = "";
         }
 
         /// <summary>
@@ -73,13 +77,16 @@ namespace AM.Reporting.Utils
         /// </summary>
         /// <param name="FileName"></param>
         /// <returns></returns>
-        public bool FileExists(string FileName)
+        public bool FileExists (string FileName)
         {
-            foreach(ZipFileItem item in fileList)
+            foreach (var item in fileList)
             {
                 if (item.Name == FileName)
+                {
                     return true;
+                }
             }
+
             return false;
         }
 
@@ -87,18 +94,22 @@ namespace AM.Reporting.Utils
         /// Adds the file form disk to the archive.
         /// </summary>
         /// <param name="FileName"></param>
-        public void AddFile(string FileName)
+        public void AddFile (string FileName)
         {
-            if (!FileExists(FileName)) // check for exisiting file in archive
+            if (!FileExists (FileName)) // check for exisiting file in archive
             {
-                if (File.Exists(FileName))
+                if (File.Exists (FileName))
                 {
-                    fileList.Add(new ZipFileItem(FileName));
-                    if (rootFolder == String.Empty)
-                        rootFolder = Path.GetDirectoryName(FileName);
+                    fileList.Add (new ZipFileItem (FileName));
+                    if (RootFolder == string.Empty)
+                    {
+                        RootFolder = Path.GetDirectoryName (FileName);
+                    }
                 }
                 else
-                    errors += "File " + FileName + " not found\r";
+                {
+                    Errors += "File " + FileName + " not found\r";
+                }
             }
         }
 
@@ -106,24 +117,30 @@ namespace AM.Reporting.Utils
         /// Adds all files from directory (recursive) on the disk to the archive.
         /// </summary>
         /// <param name="DirName"></param>
-        public void AddDir(string DirName)
+        public void AddDir (string DirName)
         {
             List<string> files = new List<string>();
-            files.AddRange(Directory.GetFiles(DirName));
-            foreach (string file in files)
+            files.AddRange (Directory.GetFiles (DirName));
+            foreach (var file in files)
             {
-                if ((File.GetAttributes(file) & FileAttributes.Hidden) != 0)
+                if ((File.GetAttributes (file) & FileAttributes.Hidden) != 0)
+                {
                     continue;
-                AddFile(file);
+                }
+
+                AddFile (file);
             }
 
             List<string> folders = new List<string>();
-            folders.AddRange(Directory.GetDirectories(DirName));
-            foreach (string folder in folders)
+            folders.AddRange (Directory.GetDirectories (DirName));
+            foreach (var folder in folders)
             {
-                if ((File.GetAttributes(folder) & FileAttributes.Hidden) != 0)
+                if ((File.GetAttributes (folder) & FileAttributes.Hidden) != 0)
+                {
                     continue;
-                AddDir(folder);
+                }
+
+                AddDir (folder);
             }
         }
 
@@ -132,25 +149,28 @@ namespace AM.Reporting.Utils
         /// </summary>
         /// <param name="fileName"></param>
         /// <param name="stream"></param>
-        public void AddStream(string fileName, Stream stream)
+        public void AddStream (string fileName, Stream stream)
         {
-            if (!FileExists(fileName)) // check for exisiting file in archive
-                fileList.Add(new ZipFileItem(fileName, stream));
+            if (!FileExists (fileName)) // check for exisiting file in archive
+            {
+                fileList.Add (new ZipFileItem (fileName, stream));
+            }
         }
 
-        private void AddStreamToZip(Stream stream, ZipLocalFile ZipFile)
+        private void AddStreamToZip (Stream stream, ZipLocalFile ZipFile)
         {
             if (stream.Length > 128)
             {
-                using (DeflateStream deflate = new DeflateStream(ZipFile.FileData, CompressionMode.Compress, true))
-                    ZipFile.LocalFileHeader.Crc32 = CopyStream(stream, deflate);
+                using (var deflate = new DeflateStream (ZipFile.FileData, CompressionMode.Compress, true))
+                    ZipFile.LocalFileHeader.Crc32 = CopyStream (stream, deflate);
                 ZipFile.LocalFileHeader.CompressionMethod = 8;
             }
             else
             {
-                ZipFile.LocalFileHeader.Crc32 = CopyStream(stream, ZipFile.FileData);
+                ZipFile.LocalFileHeader.Crc32 = CopyStream (stream, ZipFile.FileData);
                 ZipFile.LocalFileHeader.CompressionMethod = 0;
             }
+
             ZipFile.LocalFileHeader.CompressedSize = (uint)ZipFile.FileData.Length;
             ZipFile.LocalFileHeader.UnCompressedSize = (uint)stream.Length;
         }
@@ -159,106 +179,99 @@ namespace AM.Reporting.Utils
         /// Creates the zip and writes it to rhe Stream
         /// </summary>
         /// <param name="Stream"></param>
-        public void SaveToStream(Stream Stream)
+        public void SaveToStream (Stream Stream)
         {
             ZipLocalFile ZipFile;
             ZipCentralDirectory ZipDir;
             ZipFileHeader ZipFileHeader;
             long CentralStartPos, CentralEndPos;
 
-            for (int i = 0; i < fileList.Count; i++)
+            for (var i = 0; i < fileList.Count; i++)
             {
                 ZipFile = new ZipLocalFile();
                 using (ZipFile.FileData = new MemoryStream())
                 {
                     if (fileList[i].Disk)
                     {
-                        ZipFile.LocalFileHeader.FileName = fileList[i].Name.Replace(rootFolder + Path.DirectorySeparatorChar, "");
-                        using (FileStream file = new FileStream(fileList[i].Name, FileMode.Open))
-                            AddStreamToZip(file, ZipFile);
+                        ZipFile.LocalFileHeader.FileName =
+                            fileList[i].Name.Replace (RootFolder + Path.DirectorySeparatorChar, "");
+                        using (var file = new FileStream (fileList[i].Name, FileMode.Open))
+                            AddStreamToZip (file, ZipFile);
                     }
                     else
                     {
                         ZipFile.LocalFileHeader.FileName = fileList[i].Name;
                         fileList[i].Stream.Position = 0;
-                        AddStreamToZip(fileList[i].Stream, ZipFile);
+                        AddStreamToZip (fileList[i].Stream, ZipFile);
                     }
+
                     ZipFile.Offset = (uint)Stream.Position;
                     ZipFile.LocalFileHeader.LastModFileDate = fileList[i].FileDateTime;
-                    ZipFile.SaveToStream(Stream);
+                    ZipFile.SaveToStream (Stream);
                 }
+
                 ZipFile.FileData = null;
-                fileObjects.Add(ZipFile);
+                fileObjects.Add (ZipFile);
             }
 
             CentralStartPos = Stream.Position;
-            for (int i = 0; i < fileObjects.Count; i++)
+            for (var i = 0; i < fileObjects.Count; i++)
             {
                 ZipFile = fileObjects[i];
-                ZipFileHeader = new ZipFileHeader();
-                ZipFileHeader.CompressionMethod = ZipFile.LocalFileHeader.CompressionMethod;
-                ZipFileHeader.LastModFileDate = ZipFile.LocalFileHeader.LastModFileDate;
-                ZipFileHeader.GeneralPurpose = ZipFile.LocalFileHeader.GeneralPurpose;
-                ZipFileHeader.Crc32 = ZipFile.LocalFileHeader.Crc32;
-                ZipFileHeader.CompressedSize = ZipFile.LocalFileHeader.CompressedSize;
-                ZipFileHeader.UnCompressedSize = ZipFile.LocalFileHeader.UnCompressedSize;
-                ZipFileHeader.RelativeOffsetLocalHeader = ZipFile.Offset;
-                ZipFileHeader.FileName = ZipFile.LocalFileHeader.FileName;
-                ZipFileHeader.SaveToStream(Stream);
+                ZipFileHeader = new ZipFileHeader
+                {
+                    CompressionMethod = ZipFile.LocalFileHeader.CompressionMethod,
+                    LastModFileDate = ZipFile.LocalFileHeader.LastModFileDate,
+                    GeneralPurpose = ZipFile.LocalFileHeader.GeneralPurpose,
+                    Crc32 = ZipFile.LocalFileHeader.Crc32,
+                    CompressedSize = ZipFile.LocalFileHeader.CompressedSize,
+                    UnCompressedSize = ZipFile.LocalFileHeader.UnCompressedSize,
+                    RelativeOffsetLocalHeader = ZipFile.Offset,
+                    FileName = ZipFile.LocalFileHeader.FileName
+                };
+                ZipFileHeader.SaveToStream (Stream);
             }
+
             CentralEndPos = Stream.Position;
-            ZipDir = new ZipCentralDirectory();
-            ZipDir.TotalOfEntriesCentralDirOnDisk = (ushort)fileList.Count;
-            ZipDir.TotalOfEntriesCentralDir = (ushort)fileList.Count;
-            ZipDir.SizeOfCentralDir = (uint)(CentralEndPos - CentralStartPos);
-            ZipDir.OffsetStartingDiskDir = (uint)CentralStartPos;
-            ZipDir.SaveToStream(Stream);
+            ZipDir = new ZipCentralDirectory
+            {
+                TotalOfEntriesCentralDirOnDisk = (ushort)fileList.Count,
+                TotalOfEntriesCentralDir = (ushort)fileList.Count,
+                SizeOfCentralDir = (uint)(CentralEndPos - CentralStartPos),
+                OffsetStartingDiskDir = (uint)CentralStartPos
+            };
+            ZipDir.SaveToStream (Stream);
         }
 
         /// <summary>
         /// Creates the ZIP archive and writes it to the file.
         /// </summary>
         /// <param name="FileName"></param>
-        public void SaveToFile(string FileName)
+        public void SaveToFile (string FileName)
         {
-            using (FileStream file = new FileStream(FileName, FileMode.Create))
-                SaveToStream(file);
+            using (var file = new FileStream (FileName, FileMode.Create))
+                SaveToStream (file);
         }
 
         /// <summary>
         /// Gets or sets the Root Folder.
         /// </summary>
-        public string RootFolder
-        {
-            get { return rootFolder; }
-            set { rootFolder = value; }
-        }
+        public string RootFolder { get; set; }
 
         /// <summary>
         /// Gets or sets the errors.
         /// </summary>
-        public string Errors
-        {
-            get { return errors; }
-            set { errors = value; }
-        }
+        public string Errors { get; set; }
 
         /// <summary>
         /// Gets or sets the commentary to the archive.
         /// </summary>
-        public string Comment
-        {
-            get { return comment; }
-            set { comment = value; }
-        }
+        public string Comment { get; set; }
 
         /// <summary>
         /// Gets count of files in archive.
         /// </summary>
-        public int FileCount
-        {
-            get { return fileList.Count; }
-        }
+        public int FileCount => fileList.Count;
 
         /// <summary>
         /// Creates the new zip archive.
@@ -273,12 +286,7 @@ namespace AM.Reporting.Utils
 
     internal class ZipFileItem
     {
-        private string name;
-        private Stream stream;
-        private bool disk;
-        private uint fileDateTime;
-
-        private uint GetDosDateTime(DateTime date)
+        private uint GetDosDateTime (DateTime date)
         {
             return (uint)(
                 ((date.Year - 1980 & 0x7f) << 25) |
@@ -289,529 +297,340 @@ namespace AM.Reporting.Utils
                 (date.Second >> 1));
         }
 
-        public string Name
-        {
-            get { return name; }
-            set { name = value; }
-        }
+        public string Name { get; set; }
 
-        public Stream Stream
-        {
-            get { return stream; }
-        }
+        public Stream Stream { get; private set; }
 
-        public bool Disk
-        {
-            get { return disk; }
-            set { disk = value; }
-        }
+        public bool Disk { get; set; }
 
-        public uint FileDateTime
-        {
-            get { return fileDateTime; }
-            set { fileDateTime = value; }
-        }
+        public uint FileDateTime { get; set; }
 
         public void Clear()
         {
-            if (stream != null)
+            if (Stream != null)
             {
-                stream.Dispose();
-                stream = null;
+                Stream.Dispose();
+                Stream = null;
             }
         }
 
         public ZipFileItem()
         {
-            stream = new MemoryStream();
-            fileDateTime = GetDosDateTime(SystemFake.DateTime.Now);
-            disk = false;
+            Stream = new MemoryStream();
+            FileDateTime = GetDosDateTime (SystemFake.DateTime.Now);
+            Disk = false;
         }
 
-        public ZipFileItem(string fileName, Stream stream)
+        public ZipFileItem (string fileName, Stream stream)
         {
-            this.stream = stream;
-            name = fileName;
-            fileDateTime = GetDosDateTime(SystemFake.DateTime.Now);
-            disk = false;
+            this.Stream = stream;
+            Name = fileName;
+            FileDateTime = GetDosDateTime (SystemFake.DateTime.Now);
+            Disk = false;
         }
 
-        public ZipFileItem(string fileName)
+        public ZipFileItem (string fileName)
         {
-            name = fileName;
-            fileDateTime = GetDosDateTime(File.GetLastWriteTime(fileName));
-            disk = true;
+            Name = fileName;
+            FileDateTime = GetDosDateTime (File.GetLastWriteTime (fileName));
+            Disk = true;
         }
     }
 
     internal class ZipLocalFileHeader
     {
-        private uint  localFileHeaderSignature;
-        private ushort version;
-        private ushort generalPurpose;
-        private ushort compressionMethod;
-        private uint crc32;
-        private uint lastModFileDate;
-        private uint compressedSize;
-        private uint unCompressedSize;
         private string extraField;
         private string fileName;
-        private ushort fileNameLength;
-        private ushort extraFieldLength;
 
-        public void SaveToStream(Stream Stream)
+        public void SaveToStream (Stream Stream)
         {
-            Stream.Write(BitConverter.GetBytes(localFileHeaderSignature), 0, 4);
-            Stream.Write(BitConverter.GetBytes(version), 0, 2);
-            Stream.Write(BitConverter.GetBytes(generalPurpose), 0, 2);
-            Stream.Write(BitConverter.GetBytes(compressionMethod), 0, 2);
-            Stream.Write(BitConverter.GetBytes(lastModFileDate), 0, 4);
-            Stream.Write(BitConverter.GetBytes(crc32), 0, 4);
-            Stream.Write(BitConverter.GetBytes(compressedSize), 0, 4);
-            Stream.Write(BitConverter.GetBytes(unCompressedSize), 0, 4);
-            Stream.Write(BitConverter.GetBytes(fileNameLength), 0, 2);
-            Stream.Write(BitConverter.GetBytes(extraFieldLength), 0, 2);
-            if (fileNameLength > 0)
-                Stream.Write(System.Text.Encoding.UTF8.GetBytes(fileName), 0, fileNameLength);
-            if (extraFieldLength > 0)
-                Stream.Write(Converter.StringToByteArray(extraField), 0, extraFieldLength);
+            Stream.Write (BitConverter.GetBytes (LocalFileHeaderSignature), 0, 4);
+            Stream.Write (BitConverter.GetBytes (Version), 0, 2);
+            Stream.Write (BitConverter.GetBytes (GeneralPurpose), 0, 2);
+            Stream.Write (BitConverter.GetBytes (CompressionMethod), 0, 2);
+            Stream.Write (BitConverter.GetBytes (LastModFileDate), 0, 4);
+            Stream.Write (BitConverter.GetBytes (Crc32), 0, 4);
+            Stream.Write (BitConverter.GetBytes (CompressedSize), 0, 4);
+            Stream.Write (BitConverter.GetBytes (UnCompressedSize), 0, 4);
+            Stream.Write (BitConverter.GetBytes (FileNameLength), 0, 2);
+            Stream.Write (BitConverter.GetBytes (ExtraFieldLength), 0, 2);
+            if (FileNameLength > 0)
+            {
+                Stream.Write (System.Text.Encoding.UTF8.GetBytes (fileName), 0, FileNameLength);
+            }
+
+            if (ExtraFieldLength > 0)
+            {
+                Stream.Write (Converter.StringToByteArray (extraField), 0, ExtraFieldLength);
+            }
         }
 
-        public uint LocalFileHeaderSignature
-        {
-            get { return localFileHeaderSignature; }
-        }
+        public uint LocalFileHeaderSignature { get; }
 
-        public ushort Version
-        {
-            get { return version; }
-            set { version = value; }
+        public ushort Version { get; set; }
 
-        }
+        public ushort GeneralPurpose { get; set; }
 
-        public ushort GeneralPurpose
-        {
-            get { return generalPurpose; }
-            set { generalPurpose = value; }
-        }
+        public ushort CompressionMethod { get; set; }
 
-        public ushort CompressionMethod
-        {
-            get { return compressionMethod; }
-            set { compressionMethod =  value; }
-        }
+        public uint LastModFileDate { get; set; }
 
-        public uint LastModFileDate
-        {
-            get { return lastModFileDate; }
-            set { lastModFileDate = value; }
-        }
+        public uint Crc32 { get; set; }
 
-        public uint Crc32
-        {
-            get { return crc32; }
-            set { crc32 = value; }
-        }
+        public uint CompressedSize { get; set; }
 
-        public uint CompressedSize
-        {
-            get { return compressedSize; }
-            set { compressedSize = value; }
-        }
+        public uint UnCompressedSize { get; set; }
 
-        public uint UnCompressedSize
-        {
-            get { return unCompressedSize; }
-            set { unCompressedSize = value; }
-        }
+        public ushort FileNameLength { get; set; }
 
-        public ushort FileNameLength
-        {
-            get { return fileNameLength; }
-            set { fileNameLength = value; }
-        }
-        public ushort ExtraFieldLength
-        {
-            get { return extraFieldLength; }
-            set { extraFieldLength = value; }
-        }
+        public ushort ExtraFieldLength { get; set; }
 
         public string FileName
         {
-            get { return fileName; }
+            get => fileName;
             set
             {
-                fileName = value.Replace('\\', '/');
-                fileNameLength = (ushort)System.Text.Encoding.UTF8.GetBytes(value).Length;
+                fileName = value.Replace ('\\', '/');
+                FileNameLength = (ushort)System.Text.Encoding.UTF8.GetBytes (value).Length;
             }
         }
 
         public string ExtraField
         {
-            get { return extraField; }
+            get => extraField;
             set
             {
                 extraField = value;
-                extraFieldLength = (ushort)value.Length;
+                ExtraFieldLength = (ushort)value.Length;
             }
         }
 
         // constructor
         public ZipLocalFileHeader()
         {
-            localFileHeaderSignature = 0x04034b50;
-            version = 20;
-            generalPurpose = 0x800;
-            compressionMethod = 0;
-            crc32 = 0;
-            lastModFileDate = 0;
-            compressedSize = 0;
-            unCompressedSize = 0;
+            LocalFileHeaderSignature = 0x04034b50;
+            Version = 20;
+            GeneralPurpose = 0x800;
+            CompressionMethod = 0;
+            Crc32 = 0;
+            LastModFileDate = 0;
+            CompressedSize = 0;
+            UnCompressedSize = 0;
             extraField = "";
             fileName = "";
-            fileNameLength = 0;
-            extraFieldLength = 0;
+            FileNameLength = 0;
+            ExtraFieldLength = 0;
         }
     }
 
     internal class ZipCentralDirectory
     {
-        private uint endOfChentralDirSignature;
-        private ushort numberOfTheDisk;
-        private ushort totalOfEntriesCentralDirOnDisk;
-        private ushort numberOfTheDiskStartCentralDir;
-        private ushort totalOfEntriesCentralDir;
-        private uint sizeOfCentralDir;
-        private uint offsetStartingDiskDir;
         private string comment;
-        private ushort commentLength;
 
-        public void SaveToStream(Stream Stream)
+        public void SaveToStream (Stream Stream)
         {
-            Stream.Write(BitConverter.GetBytes(endOfChentralDirSignature), 0, 4);
-            Stream.Write(BitConverter.GetBytes(numberOfTheDisk), 0, 2);
-            Stream.Write(BitConverter.GetBytes(numberOfTheDiskStartCentralDir), 0, 2);
-            Stream.Write(BitConverter.GetBytes(totalOfEntriesCentralDirOnDisk), 0, 2);
-            Stream.Write(BitConverter.GetBytes(totalOfEntriesCentralDir), 0, 2);
-            Stream.Write(BitConverter.GetBytes(sizeOfCentralDir), 0, 4);
-            Stream.Write(BitConverter.GetBytes(offsetStartingDiskDir), 0, 4);
-            Stream.Write(BitConverter.GetBytes(commentLength), 0, 2);
-            if (commentLength > 0)
-                Stream.Write(Converter.StringToByteArray(comment), 0, commentLength);
+            Stream.Write (BitConverter.GetBytes (EndOfChentralDirSignature), 0, 4);
+            Stream.Write (BitConverter.GetBytes (NumberOfTheDisk), 0, 2);
+            Stream.Write (BitConverter.GetBytes (NumberOfTheDiskStartCentralDir), 0, 2);
+            Stream.Write (BitConverter.GetBytes (TotalOfEntriesCentralDirOnDisk), 0, 2);
+            Stream.Write (BitConverter.GetBytes (TotalOfEntriesCentralDir), 0, 2);
+            Stream.Write (BitConverter.GetBytes (SizeOfCentralDir), 0, 4);
+            Stream.Write (BitConverter.GetBytes (OffsetStartingDiskDir), 0, 4);
+            Stream.Write (BitConverter.GetBytes (CommentLength), 0, 2);
+            if (CommentLength > 0)
+            {
+                Stream.Write (Converter.StringToByteArray (comment), 0, CommentLength);
+            }
         }
 
-        public uint EndOfChentralDirSignature
-        {
-            get { return endOfChentralDirSignature; }
-        }
+        public uint EndOfChentralDirSignature { get; }
 
-        public ushort NumberOfTheDisk
-        {
-            get { return numberOfTheDisk; }
-            set { numberOfTheDisk = value; }
-        }
+        public ushort NumberOfTheDisk { get; set; }
 
-        public ushort NumberOfTheDiskStartCentralDir
-        {
-            get { return numberOfTheDiskStartCentralDir; }
-            set { numberOfTheDiskStartCentralDir = value; }
-        }
+        public ushort NumberOfTheDiskStartCentralDir { get; set; }
 
-        public ushort TotalOfEntriesCentralDirOnDisk
-        {
-            get { return totalOfEntriesCentralDirOnDisk; }
-            set { totalOfEntriesCentralDirOnDisk = value; }
-        }
+        public ushort TotalOfEntriesCentralDirOnDisk { get; set; }
 
-        public ushort TotalOfEntriesCentralDir
-        {
-            get { return totalOfEntriesCentralDir; }
-            set { totalOfEntriesCentralDir = value; }
-        }
+        public ushort TotalOfEntriesCentralDir { get; set; }
 
-        public uint SizeOfCentralDir
-        {
-            get { return sizeOfCentralDir; }
-            set { sizeOfCentralDir = value; }
-        }
+        public uint SizeOfCentralDir { get; set; }
 
-        public uint OffsetStartingDiskDir
-        {
-            get { return offsetStartingDiskDir; }
-            set { offsetStartingDiskDir = value; }
-        }
+        public uint OffsetStartingDiskDir { get; set; }
 
-        public ushort CommentLength
-        {
-            get { return commentLength; }
-            set { commentLength = value; }
-        }
+        public ushort CommentLength { get; set; }
 
         public string Comment
         {
-            get { return comment; }
+            get => comment;
             set
             {
                 comment = value;
-                commentLength = (ushort)value.Length;
+                CommentLength = (ushort)value.Length;
             }
         }
 
         // constructor
         public ZipCentralDirectory()
         {
-            endOfChentralDirSignature = 0x06054b50;
-            numberOfTheDisk = 0;
-            numberOfTheDiskStartCentralDir = 0;
-            totalOfEntriesCentralDirOnDisk = 0;
-            totalOfEntriesCentralDir = 0;
-            sizeOfCentralDir = 0;
-            offsetStartingDiskDir = 0;
-            commentLength = 0;
+            EndOfChentralDirSignature = 0x06054b50;
+            NumberOfTheDisk = 0;
+            NumberOfTheDiskStartCentralDir = 0;
+            TotalOfEntriesCentralDirOnDisk = 0;
+            TotalOfEntriesCentralDir = 0;
+            SizeOfCentralDir = 0;
+            OffsetStartingDiskDir = 0;
+            CommentLength = 0;
             comment = "";
         }
     }
 
     internal class ZipFileHeader
     {
-        private uint centralFileHeaderSignature;
-        private uint relativeOffsetLocalHeader;
-        private uint unCompressedSize;
-        private uint compressedSize;
-        private uint crc32;
-        private uint externalFileAttribute;
         private string extraField;
         private string fileComment;
         private string fileName;
-        private ushort compressionMethod;
-        private ushort diskNumberStart;
-        private uint lastModFileDate;
-        private ushort versionMadeBy;
-        private ushort generalPurpose;
-        private ushort fileNameLength;
-        private ushort internalFileAttribute;
-        private ushort extraFieldLength;
-        private ushort versionNeeded;
-        private ushort fileCommentLength;
 
-        public void SaveToStream(Stream Stream)
+        public void SaveToStream (Stream Stream)
         {
-            Stream.Write(BitConverter.GetBytes(centralFileHeaderSignature), 0, 4);
-            Stream.Write(BitConverter.GetBytes(versionMadeBy), 0, 2);
-            Stream.Write(BitConverter.GetBytes(versionNeeded), 0, 2);
-            Stream.Write(BitConverter.GetBytes(generalPurpose), 0, 2);
-            Stream.Write(BitConverter.GetBytes(compressionMethod), 0, 2);
-            Stream.Write(BitConverter.GetBytes(lastModFileDate), 0, 4);
-            Stream.Write(BitConverter.GetBytes(crc32), 0, 4);
-            Stream.Write(BitConverter.GetBytes(compressedSize), 0, 4);
-            Stream.Write(BitConverter.GetBytes(unCompressedSize), 0, 4);
-            Stream.Write(BitConverter.GetBytes(fileNameLength), 0, 2);
-            Stream.Write(BitConverter.GetBytes(extraFieldLength), 0, 2);
-            Stream.Write(BitConverter.GetBytes(fileCommentLength), 0, 2);
-            Stream.Write(BitConverter.GetBytes(diskNumberStart), 0, 2);
-            Stream.Write(BitConverter.GetBytes(internalFileAttribute), 0, 2);
-            Stream.Write(BitConverter.GetBytes(externalFileAttribute), 0, 4);
-            Stream.Write(BitConverter.GetBytes(relativeOffsetLocalHeader), 0, 4);
-            Stream.Write(System.Text.Encoding.UTF8.GetBytes(fileName), 0, fileNameLength);
-            Stream.Write(Converter.StringToByteArray(extraField), 0, extraFieldLength);
-            Stream.Write(Converter.StringToByteArray(fileComment), 0, fileCommentLength);
+            Stream.Write (BitConverter.GetBytes (CentralFileHeaderSignature), 0, 4);
+            Stream.Write (BitConverter.GetBytes (VersionMadeBy), 0, 2);
+            Stream.Write (BitConverter.GetBytes (VersionNeeded), 0, 2);
+            Stream.Write (BitConverter.GetBytes (GeneralPurpose), 0, 2);
+            Stream.Write (BitConverter.GetBytes (CompressionMethod), 0, 2);
+            Stream.Write (BitConverter.GetBytes (LastModFileDate), 0, 4);
+            Stream.Write (BitConverter.GetBytes (Crc32), 0, 4);
+            Stream.Write (BitConverter.GetBytes (CompressedSize), 0, 4);
+            Stream.Write (BitConverter.GetBytes (UnCompressedSize), 0, 4);
+            Stream.Write (BitConverter.GetBytes (FileNameLength), 0, 2);
+            Stream.Write (BitConverter.GetBytes (ExtraFieldLength), 0, 2);
+            Stream.Write (BitConverter.GetBytes (FileCommentLength), 0, 2);
+            Stream.Write (BitConverter.GetBytes (DiskNumberStart), 0, 2);
+            Stream.Write (BitConverter.GetBytes (InternalFileAttribute), 0, 2);
+            Stream.Write (BitConverter.GetBytes (ExternalFileAttribute), 0, 4);
+            Stream.Write (BitConverter.GetBytes (RelativeOffsetLocalHeader), 0, 4);
+            Stream.Write (System.Text.Encoding.UTF8.GetBytes (fileName), 0, FileNameLength);
+            Stream.Write (Converter.StringToByteArray (extraField), 0, ExtraFieldLength);
+            Stream.Write (Converter.StringToByteArray (fileComment), 0, FileCommentLength);
         }
 
-        public uint CentralFileHeaderSignature
-        {
-            get { return centralFileHeaderSignature; }
-        }
+        public uint CentralFileHeaderSignature { get; }
 
-        public ushort VersionMadeBy
-        {
-            get { return versionMadeBy; }
-        }
+        public ushort VersionMadeBy { get; }
 
-        public ushort VersionNeeded
-        {
-            get { return versionNeeded; }
-        }
+        public ushort VersionNeeded { get; }
 
-        public ushort GeneralPurpose
-        {
-            get { return generalPurpose; }
-            set { generalPurpose = value; }
-        }
+        public ushort GeneralPurpose { get; set; }
 
-        public ushort CompressionMethod
-        {
-            get { return compressionMethod; }
-            set { compressionMethod = value; }
-        }
+        public ushort CompressionMethod { get; set; }
 
-        public uint LastModFileDate
-        {
-            get { return lastModFileDate; }
-            set { lastModFileDate = value; }
-        }
+        public uint LastModFileDate { get; set; }
 
-        public uint Crc32
-        {
-            get { return crc32; }
-            set { crc32 = value; }
-        }
+        public uint Crc32 { get; set; }
 
-        public uint CompressedSize
-        {
-            get { return compressedSize; }
-            set { compressedSize = value; }
-        }
+        public uint CompressedSize { get; set; }
 
-        public uint UnCompressedSize
-        {
-            get { return unCompressedSize; }
-            set { unCompressedSize =value; }
-        }
+        public uint UnCompressedSize { get; set; }
 
-        public ushort FileNameLength
-        {
-            get { return fileNameLength; }
-            set { fileNameLength = value; }
-        }
+        public ushort FileNameLength { get; set; }
 
-        public ushort ExtraFieldLength
-        {
-            get { return extraFieldLength; }
-            set { extraFieldLength = value; }
-        }
+        public ushort ExtraFieldLength { get; set; }
 
-        public ushort FileCommentLength
-        {
-            get { return fileCommentLength; }
-            set { fileCommentLength = value; }
-        }
+        public ushort FileCommentLength { get; set; }
 
-        public ushort DiskNumberStart
-        {
-            get { return diskNumberStart; }
-            set { diskNumberStart = value; }
-        }
+        public ushort DiskNumberStart { get; set; }
 
-        public ushort InternalFileAttribute
-        {
-            get { return internalFileAttribute; }
-            set { internalFileAttribute = value; }
-        }
+        public ushort InternalFileAttribute { get; set; }
 
-        public uint ExternalFileAttribute
-        {
-            get { return externalFileAttribute; }
-            set { externalFileAttribute = value; }
-        }
+        public uint ExternalFileAttribute { get; set; }
 
-        public uint RelativeOffsetLocalHeader
-        {
-            get { return relativeOffsetLocalHeader; }
-            set { relativeOffsetLocalHeader = value; }
-        }
+        public uint RelativeOffsetLocalHeader { get; set; }
 
         public string FileName
         {
-            get { return fileName; }
+            get => fileName;
             set
             {
-                fileName = value.Replace('\\', '/');
-                fileNameLength = (ushort)System.Text.Encoding.UTF8.GetBytes(value).Length;
+                fileName = value.Replace ('\\', '/');
+                FileNameLength = (ushort)System.Text.Encoding.UTF8.GetBytes (value).Length;
             }
         }
 
         public string ExtraField
         {
-            get { return extraField; }
+            get => extraField;
             set
             {
                 extraField = value;
-                extraFieldLength = (ushort)value.Length;
+                ExtraFieldLength = (ushort)value.Length;
             }
         }
 
         public string FileComment
         {
-            get { return fileComment; }
+            get => fileComment;
             set
             {
                 fileComment = value;
-                fileCommentLength = (ushort)value.Length;
+                FileCommentLength = (ushort)value.Length;
             }
         }
 
         // constructor
         public ZipFileHeader()
         {
-            centralFileHeaderSignature = 0x02014b50;
-            relativeOffsetLocalHeader = 0;
-            unCompressedSize = 0;
-            compressedSize = 0;
-            crc32 = 0;
-            externalFileAttribute = 0;
+            CentralFileHeaderSignature = 0x02014b50;
+            RelativeOffsetLocalHeader = 0;
+            UnCompressedSize = 0;
+            CompressedSize = 0;
+            Crc32 = 0;
+            ExternalFileAttribute = 0;
             extraField = "";
             fileComment = "";
             fileName = "";
-            compressionMethod = 0;
-            diskNumberStart = 0;
-            lastModFileDate = 0;
-            versionMadeBy = 20;
-            generalPurpose = 0x800;
-            fileNameLength = 0;
-            internalFileAttribute = 0;
-            extraFieldLength = 0;
-            versionNeeded = 20;
-            fileCommentLength = 0;
+            CompressionMethod = 0;
+            DiskNumberStart = 0;
+            LastModFileDate = 0;
+            VersionMadeBy = 20;
+            GeneralPurpose = 0x800;
+            FileNameLength = 0;
+            InternalFileAttribute = 0;
+            ExtraFieldLength = 0;
+            VersionNeeded = 20;
+            FileCommentLength = 0;
         }
     }
 
     internal class ZipLocalFile
     {
-        ZipLocalFileHeader localFileHeader;
-        MemoryStream fileData;
-        uint offset;
-
-        public void SaveToStream(Stream Stream)
+        public void SaveToStream (Stream Stream)
         {
-            localFileHeader.SaveToStream(Stream);
-            fileData.Position = 0;
-            fileData.WriteTo(Stream);
-            fileData.Dispose();
-            fileData = null;
+            LocalFileHeader.SaveToStream (Stream);
+            FileData.Position = 0;
+            FileData.WriteTo (Stream);
+            FileData.Dispose();
+            FileData = null;
         }
 
-        public ZipLocalFileHeader LocalFileHeader
-        {
-            get { return localFileHeader; }
-        }
+        public ZipLocalFileHeader LocalFileHeader { get; }
 
-        public MemoryStream FileData
-        {
-            get { return fileData; }
-            set { fileData = value; }
-        }
+        public MemoryStream FileData { get; set; }
 
-        public uint Offset
-        {
-            get { return offset; }
-            set { offset = value; }
-        }
+        public uint Offset { get; set; }
 
         public void Clear()
         {
-            if (fileData != null)
+            if (FileData != null)
             {
-                fileData.Dispose();
-                fileData = null;
+                FileData.Dispose();
+                FileData = null;
             }
         }
 
         // constructor
         public ZipLocalFile()
         {
-            localFileHeader = new ZipLocalFileHeader();
-            offset = 0;
+            LocalFileHeader = new ZipLocalFileHeader();
+            Offset = 0;
         }
     }
-
 }

@@ -44,8 +44,7 @@ namespace AM.Reporting.Utils
                 private List<char> repList = null;
                 */
         private string result = "";
-        StringBuilder sb;
-        private bool done = false;
+        private bool done;
 
         #endregion Fields
 
@@ -56,10 +55,10 @@ namespace AM.Reporting.Utils
         /// </summary>
         public int Length
         {
-            get { return sb.Length;  }
+            get => StringBuilder.Length;
             set
             {
-                sb.Length = value;
+                StringBuilder.Length = value;
                 done = false;
             }
         }
@@ -69,21 +68,30 @@ namespace AM.Reporting.Utils
         /// </summary>
         /// <param name="index"></param>
         /// <returns>Char value</returns>
-        public char this[int index]
+        public char this [int index]
         {
             get
             {
-                if (index >= 0 && index < sb.Length)
-                    return sb[index];
+                if (index >= 0 && index < StringBuilder.Length)
+                {
+                    return StringBuilder[index];
+                }
                 else
+                {
                     throw new IndexOutOfRangeException();
+                }
             }
             set
             {
-                if (index >= 0 && index < sb.Length)
-                    sb[index] = value;
+                if (index >= 0 && index < StringBuilder.Length)
+                {
+                    StringBuilder[index] = value;
+                }
                 else
+                {
                     throw new IndexOutOfRangeException();
+                }
+
                 done = false;
             }
         }
@@ -91,10 +99,7 @@ namespace AM.Reporting.Utils
         /// <summary>
         /// Gets StringBuilder
         /// </summary>
-        public StringBuilder StringBuilder
-        {
-            get { return sb;  }
-        }
+        public StringBuilder StringBuilder { get; private set; }
 
         #endregion Properties
 
@@ -120,9 +125,10 @@ namespace AM.Reporting.Utils
         /// Initialize the new array for chars.
         /// </summary>
         /// <param name="iniCapacity">Length of initial array.</param>
-        private void Init(int iniCapacity)
+        private void Init (int iniCapacity)
         {
-            sb = new StringBuilder(iniCapacity);
+            StringBuilder = new StringBuilder (iniCapacity);
+
             //chars = new char[iniCapacity];
             //capacity = iniCapacity;
         }
@@ -137,7 +143,7 @@ namespace AM.Reporting.Utils
         /// <returns>True if string is empty.</returns>
         public bool IsEmpty()
         {
-            return sb.Length == 0;
+            return StringBuilder.Length == 0;
         }
 
         /// <summary>
@@ -148,10 +154,12 @@ namespace AM.Reporting.Utils
         {
             if (!done)
             {
-                result = sb.ToString();
+                result = StringBuilder.ToString();
+
                 //result = new string(chars, 0, count);
                 done = true;
             }
+
             return result;
         }
 
@@ -162,7 +170,7 @@ namespace AM.Reporting.Utils
         public FastString Clear()
         {
             //count = 0;
-            sb.Clear();
+            StringBuilder.Clear();
             done = false;
             return this;
         }
@@ -172,16 +180,17 @@ namespace AM.Reporting.Utils
         /// </summary>
         /// <param name="value">String value.</param>
         /// <returns>FastString object.</returns>
-        public FastString Append(string value)
+        public FastString Append (string value)
         {
-            if (!String.IsNullOrEmpty(value))
+            if (!string.IsNullOrEmpty (value))
             {
                 /*                ReAlloc(value.Length);
                                 value.CopyTo(0, chars, count, value.Length);
                                 count += value.Length;*/
-                sb.Append(value);
+                StringBuilder.Append (value);
                 done = false;
             }
+
             return this;
         }
 
@@ -190,14 +199,14 @@ namespace AM.Reporting.Utils
         /// </summary>
         /// <param name="value">String value.</param>
         /// <returns>FastString object.</returns>
-        public FastString AppendLine(string value)
+        public FastString AppendLine (string value)
         {
             /*            ReAlloc(value.Length + 2);
                         value.CopyTo(0, chars, count, value.Length);
                         count += value.Length + 2;
                         chars[count - 2] = '\r';
                         chars[count - 1] = '\n';*/
-            sb.AppendLine(value);
+            StringBuilder.AppendLine (value);
             done = false;
             return this;
         }
@@ -208,13 +217,13 @@ namespace AM.Reporting.Utils
         /// <param name="format"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        public FastString AppendFormat(String format, params Object[] args)
+        public FastString AppendFormat (string format, params object[] args)
         {
             /*            string value = String.Format(format, args);
                         ReAlloc(value.Length);
                         value.CopyTo(0, chars, count, value.Length);
                         count += value.Length;*/
-            sb.AppendFormat(format, args);
+            StringBuilder.AppendFormat (format, args);
             done = false;
             return this;
         }
@@ -229,7 +238,7 @@ namespace AM.Reporting.Utils
                         count += 2;
                         chars[count - 2] = '\r';
                         chars[count - 1] = '\n';*/
-            sb.AppendLine();
+            StringBuilder.AppendLine();
             done = false;
             return this;
         }
@@ -239,11 +248,11 @@ namespace AM.Reporting.Utils
         /// </summary>
         /// <param name="value">Char value.</param>
         /// <returns>FastString object.</returns>
-        public FastString Append(char value)
+        public FastString Append (char value)
         {
             //ReAlloc(1);
             //chars[count++] = value;
-            sb.Append(value);
+            StringBuilder.Append (value);
             done = false;
             return this;
         }
@@ -253,13 +262,14 @@ namespace AM.Reporting.Utils
         /// </summary>
         /// <param name="fastString">FastString object.</param>
         /// <returns>FastString object.</returns>
-        public FastString Append(FastString fastString)
+        public FastString Append (FastString fastString)
         {
             if (fastString != null)
             {
-                sb.Append(fastString.StringBuilder);
+                StringBuilder.Append (fastString.StringBuilder);
                 done = false;
             }
+
             return this;
         }
 
@@ -268,10 +278,11 @@ namespace AM.Reporting.Utils
         /// </summary>
         /// <param name="value">Object value.</param>
         /// <returns>FastString object.</returns>
-        public FastString Append(object value)
+        public FastString Append (object value)
         {
-            sb.Append(value);
+            StringBuilder.Append (value);
             done = false;
+
             //Append(value.ToString());
             return this;
         }
@@ -283,9 +294,10 @@ namespace AM.Reporting.Utils
         /// <param name="destination">Destination array.</param>
         /// <param name="destinationIndex">Destination index.</param>
         /// <param name="count">Count of chars</param>
-        public void CopyTo(int sourceIndex, char[] destination, int destinationIndex, int count)
+        public void CopyTo (int sourceIndex, char[] destination, int destinationIndex, int count)
         {
-            sb.CopyTo(sourceIndex, destination, destinationIndex, count);
+            StringBuilder.CopyTo (sourceIndex, destination, destinationIndex, count);
+
             //Array.Copy(chars, sourceIndex, destination, destinationIndex, count);
         }
 
@@ -295,9 +307,9 @@ namespace AM.Reporting.Utils
         /// <param name="startIndex">Start index of removed string.</param>
         /// <param name="length">Length of removed string.</param>
         /// <returns>FastString object.</returns>
-        public FastString Remove(int startIndex, int length)
+        public FastString Remove (int startIndex, int length)
         {
-            sb.Remove(startIndex, length);
+            StringBuilder.Remove (startIndex, length);
             /*
             if (startIndex >= 0 && (length + startIndex) <= count)
             {
@@ -319,9 +331,9 @@ namespace AM.Reporting.Utils
         /// <param name="startIndex">Start index in existing string.</param>
         /// <param name="value">Value of inserting string.</param>
         /// <returns>FastString object.</returns>
-        public FastString Insert(int startIndex, string value)
+        public FastString Insert (int startIndex, string value)
         {
-            sb.Insert(startIndex, value);
+            StringBuilder.Insert (startIndex, value);
             /*
             if (value != null && value.Length > 0 && startIndex >= 0 && startIndex <= count)
             {
@@ -342,9 +354,9 @@ namespace AM.Reporting.Utils
         /// <param name="oldValue">Old string value.</param>
         /// <param name="newValue">New string value.</param>
         /// <returns>FastString object.</returns>
-        public FastString Replace(string oldValue, string newValue)
+        public FastString Replace (string oldValue, string newValue)
         {
-            sb.Replace(oldValue, newValue);
+            StringBuilder.Replace (oldValue, newValue);
             /*
             if (count == 0)
                 return this;
@@ -379,7 +391,7 @@ namespace AM.Reporting.Utils
             count = repList.Count;
             repList.Clear();
             */
-	    done = false;
+            done = false;
             return this;
         }
 
@@ -389,25 +401,30 @@ namespace AM.Reporting.Utils
         /// <param name="value">Substring for search.</param>
         /// <param name="startIndex">Sarting position for search.</param>
         /// <returns>Position of substring.</returns>
-        public int IndexOf(string value, int startIndex)
+        public int IndexOf (string value, int startIndex)
         {
-            if (!String.IsNullOrEmpty(value) &&
+            if (!string.IsNullOrEmpty (value) &&
                 startIndex >= 0 &&
-                startIndex < sb.Length)
+                startIndex < StringBuilder.Length)
             {
-                int valueIndex = 0;
-                for (int i = startIndex; i < sb.Length; i++)
+                var valueIndex = 0;
+                for (var i = startIndex; i < StringBuilder.Length; i++)
                 {
-                    if (sb[i] == value[valueIndex])
+                    if (StringBuilder[i] == value[valueIndex])
                     {
                         valueIndex++;
                         if (valueIndex == value.Length)
+                        {
                             return i;
+                        }
                     }
                     else
+                    {
                         valueIndex = 0;
+                    }
                 }
             }
+
             return -1;
         }
 
@@ -417,25 +434,30 @@ namespace AM.Reporting.Utils
         /// <param name="startIndex">Starting index for comparsion.</param>
         /// <param name="value">Value for compare.</param>
         /// <returns>True if substring is identical in position.</returns>
-        public bool SubstringCompare(int startIndex, string value)
+        public bool SubstringCompare (int startIndex, string value)
         {
-            if (!String.IsNullOrEmpty(value) &&
+            if (!string.IsNullOrEmpty (value) &&
                 startIndex >= 0 &&
-                startIndex < sb.Length)
+                startIndex < StringBuilder.Length)
             {
-                int valueIndex = 0;
-                for (int i = 0; i < value.Length; i++)
+                var valueIndex = 0;
+                for (var i = 0; i < value.Length; i++)
                 {
-                    if (sb[startIndex + i] == value[i])
+                    if (StringBuilder[startIndex + i] == value[i])
                     {
                         valueIndex++;
                         if (valueIndex == value.Length)
+                        {
                             return true;
+                        }
                     }
                     else
+                    {
                         valueIndex = 0;
+                    }
                 }
             }
+
             return false;
         }
 
@@ -445,15 +467,15 @@ namespace AM.Reporting.Utils
         /// <param name="startIndex">Starting index.</param>
         /// <param name="length">Length of substring.</param>
         /// <returns>Substring.</returns>
-        public string Substring(int startIndex, int length)
+        public string Substring (int startIndex, int length)
         {
-            char[] result = new char[length];
-            sb.CopyTo(startIndex, result, 0, length);
-            return new string(result);
- /*           if (startIndex + length > count)
-                return new string(chars, startIndex, count - startIndex);
-            else
-                return new string(chars, startIndex, length);*/
+            var result = new char[length];
+            StringBuilder.CopyTo (startIndex, result, 0, length);
+            return new string (result);
+            /*           if (startIndex + length > count)
+                           return new string(chars, startIndex, count - startIndex);
+                       else
+                           return new string(chars, startIndex, length);*/
         }
 
         #endregion Public Methods
@@ -464,9 +486,9 @@ namespace AM.Reporting.Utils
         /// Creates the new FastString object with initial capacity.
         /// </summary>
         /// <param name="initCapacity">Initial capacity.</param>
-        public FastString(int initCapacity)
+        public FastString (int initCapacity)
         {
-            Init(initCapacity);
+            Init (initCapacity);
         }
 
         /// <summary>
@@ -474,22 +496,24 @@ namespace AM.Reporting.Utils
         /// </summary>
         public FastString()
         {
-            Init(INIT_CAPACITY);
+            Init (INIT_CAPACITY);
         }
 
         /// <summary>
         /// Creates the new FastString object from initial string.
         /// </summary>
         /// <param name="initValue"></param>
-        public FastString(string initValue)
+        public FastString (string initValue)
         {
-            if (!string.IsNullOrEmpty(initValue))
+            if (!string.IsNullOrEmpty (initValue))
             {
-                Init(initValue.Length);
-                Append(initValue);
+                Init (initValue.Length);
+                Append (initValue);
             }
             else
-                Init(0);
+            {
+                Init (0);
+            }
         }
 
         #endregion Constructors
@@ -499,17 +523,19 @@ namespace AM.Reporting.Utils
     {
         Dictionary<string, string> pool;
 
-        public FastStringWithPool(Dictionary<string, string> pool): base()
+        public FastStringWithPool (Dictionary<string, string> pool) : base()
         {
             this.pool = pool;
         }
 
         public override string ToString()
         {
-            string baseResult = base.ToString();
-            string result;
-            if (pool.TryGetValue(baseResult, out result))
+            var baseResult = base.ToString();
+            if (pool.TryGetValue (baseResult, out var result))
+            {
                 return result;
+            }
+
             return pool[baseResult] = baseResult;
         }
     }

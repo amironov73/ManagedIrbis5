@@ -1,10 +1,33 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.ComponentModel;
+
 using AM.Reporting.Utils;
+
 using System.Windows.Forms;
 using System.Drawing.Design;
+
+#endregion
+
+#nullable enable
 
 namespace AM.Reporting
 {
@@ -98,47 +121,21 @@ namespace AM.Reporting
     public abstract partial class ReportComponentBase : ComponentBase
     {
         #region Fields
-        private bool exportable;
+
         private string exportableExpression;
         private Border border;
         private FillBase fill;
-        private string bookmark;
-        private Hyperlink hyperlink;
-        private bool canGrow;
-        private bool canShrink;
-        private bool growToBottom;
-        private ShiftMode shiftMode;
         private string style;
-        private string evenStyle;
-        private string hoverStyle;
-        private StylePriority evenStylePriority;
-        private bool pageBreak;
-        private PrintOn printOn;
-        private string beforePrintEvent;
-        private string afterPrintEvent;
-        private string afterDataEvent;
-        private string clickEvent;
-        private bool flagSimpleBorder;
-        private bool flagUseBorder;
-        private bool flagUseFill;
-        private bool flagPreviewVisible;
-        private bool flagSerializeStyle;
-        private bool flagProvidesHyperlinkValue;
         private RectangleF savedBounds;
         private bool savedVisible;
         private string savedBookmark;
         private Border savedBorder;
         private FillBase savedFill;
-        private Cursor cursor;
-        private string mouseMoveEvent;
-        private string mouseUpEvent;
-        private string mouseDownEvent;
-        private string mouseEnterEvent;
-        private string mouseLeaveEvent;
-        private bool isIntersectingWithOtherObject;
+
         #endregion
 
         #region Properties
+
         /// <summary>
         /// This event occurs before the object is added to the preview pages.
         /// </summary>
@@ -162,49 +159,43 @@ namespace AM.Reporting
         /// <summary>
         /// Gets or sets a value that determines if the object can be exported.
         /// </summary>
-        [DefaultValue(true)]
-        [Category("Behavior")]
-        public bool Exportable
-        {
-            get { return exportable; }
-            set { exportable = value; }
-        }
+        [DefaultValue (true)]
+        [Category ("Behavior")]
+        public bool Exportable { get; set; }
 
         /// <summary>
         /// Gets or sets a value that determines if the object is intersecting with other object.
         /// </summary>
-        [DefaultValue(false)]
-        [Browsable(false)]
-        public bool IsIntersectingWithOtherObject
-        {
-            get { return isIntersectingWithOtherObject; }
-            set { isIntersectingWithOtherObject = value; }
-        }
+        [DefaultValue (false)]
+        [Browsable (false)]
+        public bool IsIntersectingWithOtherObject { get; set; }
 
         /// <summary>
         /// Gets or sets a string containing expression that determines should be object exported.
         /// </summary>
-        [DefaultValue("")]
-        [Category("Behavior")]
-        [Editor("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof(UITypeEditor))]
+        [DefaultValue ("")]
+        [Category ("Behavior")]
+        [Editor ("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof (UITypeEditor))]
         public virtual string ExportableExpression
         {
-            get { return exportableExpression; }
-            set { exportableExpression = value; }
+            get => exportableExpression;
+            set => exportableExpression = value;
         }
 
         /// <summary>
         /// Gets or sets an object's border.
         /// </summary>
-        [Category("Appearance")]
+        [Category ("Appearance")]
         public virtual Border Border
         {
-            get { return border; }
+            get => border;
             set
             {
                 border = value;
-                if (!String.IsNullOrEmpty(Style))
+                if (!string.IsNullOrEmpty (Style))
+                {
                     Style = "";
+                }
             }
         }
 
@@ -222,21 +213,23 @@ namespace AM.Reporting
         /// (textObject1.Fill as SolidFill).Color = Color.Red;
         /// </code>
         /// </example>
-        [Category("Appearance")]
-        [EditorAttribute("AM.Reporting.TypeEditors.FillEditor, AM.Reporting",typeof(UITypeEditor))]
+        [Category ("Appearance")]
+        [EditorAttribute ("AM.Reporting.TypeEditors.FillEditor, AM.Reporting", typeof (UITypeEditor))]
         public virtual FillBase Fill
         {
-            get
-            {
-                return fill;
-            }
+            get => fill;
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException("Fill");
+                {
+                    throw new ArgumentNullException ("Fill");
+                }
+
                 fill = value;
-                if (!String.IsNullOrEmpty(Style))
+                if (!string.IsNullOrEmpty (Style))
+                {
                     Style = "";
+                }
             }
         }
 
@@ -247,11 +240,11 @@ namespace AM.Reporting
         /// This property can be used in a report script to change the fill color of the object. It is
         /// equivalent to: <code>reportComponent1.Fill = new SolidFill(color);</code>
         /// </remarks>
-        [Browsable(false)]
+        [Browsable (false)]
         public Color FillColor
         {
-            get { return Fill is SolidFill ? (Fill as SolidFill).Color : Color.Transparent; }
-            set { Fill = new SolidFill(value); }
+            get => Fill is SolidFill ? (Fill as SolidFill).Color : Color.Transparent;
+            set => Fill = new SolidFill (value);
         }
 
         /// <summary>
@@ -262,13 +255,9 @@ namespace AM.Reporting
         /// a data column. To navigate to a bookmark, you have to use the <see cref="Hyperlink"/> property.
         /// </remarks>
 
-        [Category("Navigation")]
-        [Editor("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof(UITypeEditor))]
-        public string Bookmark
-        {
-            get { return bookmark; }
-            set { bookmark = value; }
-        }
+        [Category ("Navigation")]
+        [Editor ("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof (UITypeEditor))]
+        public string Bookmark { get; set; }
 
         /// <summary>
         /// Gets or sets a hyperlink.
@@ -285,13 +274,9 @@ namespace AM.Reporting
         /// something fixed (URL or page number, for example) you also may set the <b>Value</b>
         /// property instead of <b>Expression</b>.</para>
         /// </remarks>
-        [Category("Navigation")]
-        [Editor("AM.Reporting.TypeEditors.HyperlinkEditor, AM.Reporting", typeof(UITypeEditor))]
-        public Hyperlink Hyperlink
-        {
-            get { return hyperlink; }
-            set { hyperlink = value; }
-        }
+        [Category ("Navigation")]
+        [Editor ("AM.Reporting.TypeEditors.HyperlinkEditor, AM.Reporting", typeof (UITypeEditor))]
+        public Hyperlink Hyperlink { get; set; }
 
         /// <summary>
         /// Determines if the object can grow.
@@ -300,13 +285,9 @@ namespace AM.Reporting
         /// This property is applicable to the bands or text objects that can contain several text lines.
         /// If the property is set to <b>true</b>, object will grow to display all the information that it contains.
         /// </remarks>
-        [DefaultValue(false)]
-        [Category("Behavior")]
-        public bool CanGrow
-        {
-            get { return canGrow; }
-            set { canGrow = value; }
-        }
+        [DefaultValue (false)]
+        [Category ("Behavior")]
+        public bool CanGrow { get; set; }
 
         /// <summary>
         /// Determines if the object can shrink.
@@ -315,13 +296,9 @@ namespace AM.Reporting
         /// This property is applicable to the bands or text objects that can contain several text lines.
         /// If the property is set to true, object can shrink to remove the unused space.
         /// </remarks>
-        [DefaultValue(false)]
-        [Category("Behavior")]
-        public bool CanShrink
-        {
-            get { return canShrink; }
-            set { canShrink = value; }
-        }
+        [DefaultValue (false)]
+        [Category ("Behavior")]
+        public bool CanShrink { get; set; }
 
         /// <summary>
         /// Determines if the object must grow to the band's bottom side.
@@ -330,13 +307,9 @@ namespace AM.Reporting
         /// If the property is set to true, object grows to the bottom side of its parent. This is useful if
         /// you have several objects on a band, and some of them can grow or shrink.
         /// </remarks>
-        [DefaultValue(false)]
-        [Category("Behavior")]
-        public bool GrowToBottom
-        {
-            get { return growToBottom; }
-            set { growToBottom = value; }
-        }
+        [DefaultValue (false)]
+        [Category ("Behavior")]
+        public bool GrowToBottom { get; set; }
 
         /// <summary>
         /// Gets or sets a shift mode of the object.
@@ -344,13 +317,9 @@ namespace AM.Reporting
         /// <remarks>
         /// See <see cref="AM.Reporting.ShiftMode"/> enumeration for details.
         /// </remarks>
-        [DefaultValue(ShiftMode.Always)]
-        [Category("Behavior")]
-        public ShiftMode ShiftMode
-        {
-            get { return shiftMode; }
-            set { shiftMode = value; }
-        }
+        [DefaultValue (ShiftMode.Always)]
+        [Category ("Behavior")]
+        public ShiftMode ShiftMode { get; set; }
 
         /// <summary>
         /// Gets or sets the style name.
@@ -360,14 +329,14 @@ namespace AM.Reporting
         /// has a set of styles in the <see cref="Report.Styles"/> property.
         /// </remarks>
 
-        [Category("Appearance")]
-        [Editor("AM.Reporting.TypeEditors.StyleEditor, AM.Reporting", typeof(UITypeEditor))]
+        [Category ("Appearance")]
+        [Editor ("AM.Reporting.TypeEditors.StyleEditor, AM.Reporting", typeof (UITypeEditor))]
         public string Style
         {
-            get { return style; }
+            get => style;
             set
             {
-                ApplyStyle(value);
+                ApplyStyle (value);
                 style = value;
             }
         }
@@ -378,13 +347,9 @@ namespace AM.Reporting
         /// <remarks>
         /// Style with this name must exist in the <see cref="Report.Styles"/> collection.
         /// </remarks>
-        [Category("Appearance")]
-        [Editor("AM.Reporting.TypeEditors.StyleEditor, AM.Reporting", typeof(UITypeEditor))]
-        public string EvenStyle
-        {
-            get { return evenStyle; }
-            set { evenStyle = value; }
-        }
+        [Category ("Appearance")]
+        [Editor ("AM.Reporting.TypeEditors.StyleEditor, AM.Reporting", typeof (UITypeEditor))]
+        public string EvenStyle { get; set; }
 
         /// <summary>
         /// Gets or sets a style name that will be applied to this object when the mouse pointer is over it.
@@ -393,13 +358,9 @@ namespace AM.Reporting
         /// Style with this name must exist in the <see cref="Report.Styles"/> collection.
         /// </remarks>
 
-        [Category("Appearance")]
-        [Editor("AM.Reporting.TypeEditors.StyleEditor, AM.Reporting", typeof(UITypeEditor))]
-        public string HoverStyle
-        {
-            get { return hoverStyle; }
-            set { hoverStyle = value; }
-        }
+        [Category ("Appearance")]
+        [Editor ("AM.Reporting.TypeEditors.StyleEditor, AM.Reporting", typeof (UITypeEditor))]
+        public string HoverStyle { get; set; }
 
         /// <summary>
         /// Gets or sets a value that determines which properties of the even style to use.
@@ -408,25 +369,17 @@ namespace AM.Reporting
         /// Usually you will need only the Fill property of the even style to be applied. If you want to
         /// apply all style settings, set this property to <b>StylePriority.UseAll</b>.
         /// </remarks>
-        [DefaultValue(StylePriority.UseFill)]
-        [Category("Appearance")]
-        public StylePriority EvenStylePriority
-        {
-            get { return evenStylePriority; }
-            set { evenStylePriority = value; }
-        }
+        [DefaultValue (StylePriority.UseFill)]
+        [Category ("Appearance")]
+        public StylePriority EvenStylePriority { get; set; }
 
         /// <summary>
         /// Gets or sets a value that determines whether to insert the hard page break before processing this object.
         /// </summary>
-        [Browsable(false)]
-        [DefaultValue(false)]
-        [Category("Behavior")]
-        public bool PageBreak
-        {
-            get { return pageBreak; }
-            set { pageBreak = value; }
-        }
+        [Browsable (false)]
+        [DefaultValue (false)]
+        [Category ("Behavior")]
+        public bool PageBreak { get; set; }
 
         /// <summary>
         /// Gets or sets a value that determines where to print the object.
@@ -434,55 +387,35 @@ namespace AM.Reporting
         /// <remarks>
         /// See the <see cref="AM.Reporting.PrintOn"/> enumeration for details.
         /// </remarks>
-        [DefaultValue(PrintOn.FirstPage | PrintOn.LastPage | PrintOn.OddPages | PrintOn.EvenPages | PrintOn.RepeatedBand | PrintOn.SinglePage)]
-
-        [Category("Behavior")]
-        [Editor("AM.Reporting.TypeEditors.FlagsEditor, AM.Reporting", typeof(UITypeEditor))]
-        public PrintOn PrintOn
-        {
-            get { return printOn; }
-            set { printOn = value; }
-        }
+        [DefaultValue (PrintOn.FirstPage | PrintOn.LastPage | PrintOn.OddPages | PrintOn.EvenPages |
+                       PrintOn.RepeatedBand | PrintOn.SinglePage)]
+        [Category ("Behavior")]
+        [Editor ("AM.Reporting.TypeEditors.FlagsEditor, AM.Reporting", typeof (UITypeEditor))]
+        public PrintOn PrintOn { get; set; }
 
         /// <summary>
         /// Gets or sets a script event name that will be fired before the object will be printed in the preview page.
         /// </summary>
-        [Category("Build")]
-        public string BeforePrintEvent
-        {
-            get { return beforePrintEvent; }
-            set { beforePrintEvent = value; }
-        }
+        [Category ("Build")]
+        public string BeforePrintEvent { get; set; }
 
         /// <summary>
         /// Gets or sets a script event name that will be fired after the object was printed in the preview page.
         /// </summary>
-        [Category("Build")]
-        public string AfterPrintEvent
-        {
-            get { return afterPrintEvent; }
-            set { afterPrintEvent = value; }
-        }
+        [Category ("Build")]
+        public string AfterPrintEvent { get; set; }
 
         /// <summary>
         /// Gets or sets a script event name that will be fired after the object was filled with data.
         /// </summary>
-        [Category("Build")]
-        public string AfterDataEvent
-        {
-            get { return afterDataEvent; }
-            set { afterDataEvent = value; }
-        }
+        [Category ("Build")]
+        public string AfterDataEvent { get; set; }
 
         /// <summary>
         /// Gets or sets a script event name that will be fired when the user click the object in the preview window.
         /// </summary>
-        [Category("Preview")]
-        public string ClickEvent
-        {
-            get { return clickEvent; }
-            set { clickEvent = value; }
-        }
+        [Category ("Preview")]
+        public string ClickEvent { get; set; }
 
         /// <summary>
         /// Determines if the object has custom border and use only <b>Border.Width</b>, <b>Border.Style</b> and
@@ -492,12 +425,8 @@ namespace AM.Reporting
         /// This flag is used to disable some toolbar buttons when such object is selected. Applicable to the
         /// ShapeObject and LineObject.
         /// </remarks>
-        [Browsable(false)]
-        public bool FlagSimpleBorder
-        {
-            get { return flagSimpleBorder; }
-            set { flagSimpleBorder = value; }
-        }
+        [Browsable (false)]
+        public bool FlagSimpleBorder { get; set; }
 
         /// <summary>
         /// Determines if the object uses the <b>Border</b>.
@@ -505,12 +434,8 @@ namespace AM.Reporting
         /// <remarks>
         /// This flag is used to disable some toolbar buttons when such object is selected.
         /// </remarks>
-        [Browsable(false)]
-        public bool FlagUseBorder
-        {
-            get { return flagUseBorder; }
-            set { flagUseBorder = value; }
-        }
+        [Browsable (false)]
+        public bool FlagUseBorder { get; set; }
 
         /// <summary>
         /// Determines if the object uses the fill.
@@ -518,22 +443,14 @@ namespace AM.Reporting
         /// <remarks>
         /// This flag is used to disable some toolbar buttons when such object is selected.
         /// </remarks>
-        [Browsable(false)]
-        public bool FlagUseFill
-        {
-            get { return flagUseFill; }
-            set { flagUseFill = value; }
-        }
+        [Browsable (false)]
+        public bool FlagUseFill { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicates that object should not be added to the preview.
         /// </summary>
-        [Browsable(false)]
-        public bool FlagPreviewVisible
-        {
-            get { return flagPreviewVisible; }
-            set { flagPreviewVisible = value; }
-        }
+        [Browsable (false)]
+        public bool FlagPreviewVisible { get; set; }
 
         /// <summary>
         /// Determines if serializing the Style property is needed.
@@ -542,12 +459,8 @@ namespace AM.Reporting
         /// The <b>Style</b> property must be serialized last. Some ancestor classes may turn off the standard Style
         /// serialization and serialize it by themselves.
         /// </remarks>
-        [Browsable(false)]
-        public bool FlagSerializeStyle
-        {
-            get { return flagSerializeStyle; }
-            set { flagSerializeStyle = value; }
-        }
+        [Browsable (false)]
+        public bool FlagSerializeStyle { get; set; }
 
         /// <summary>
         /// Determines if an object can provide the hyperlink value automatically.
@@ -556,12 +469,8 @@ namespace AM.Reporting
         /// This flag is used in complex objects such as Matrix or Chart. These objects can provide
         /// a hyperlink value automatically, depending on where you click.
         /// </remarks>
-        [Browsable(false)]
-        public bool FlagProvidesHyperlinkValue
-        {
-            get { return flagProvidesHyperlinkValue; }
-            set { flagProvidesHyperlinkValue = value; }
-        }
+        [Browsable (false)]
+        public bool FlagProvidesHyperlinkValue { get; set; }
 
         /// <summary>
         /// Gets an object's parent band.
@@ -571,15 +480,21 @@ namespace AM.Reporting
             get
             {
                 if (this is BandBase)
+                {
                     return this as BandBase;
+                }
 
-                Base c = Parent;
+                var c = Parent;
                 while (c != null)
                 {
-                    if (c is BandBase)
-                        return c as BandBase;
+                    if (c is BandBase @base)
+                    {
+                        return @base;
+                    }
+
                     c = c.Parent;
                 }
+
                 return null;
             }
         }
@@ -592,22 +507,30 @@ namespace AM.Reporting
             get
             {
                 if (this is DataBand)
+                {
                     return this as DataBand;
+                }
 
-                Base c = Parent;
+                var c = Parent;
                 while (c != null)
                 {
-                    if (c is DataBand)
-                        return c as DataBand;
+                    if (c is DataBand band)
+                    {
+                        return band;
+                    }
+
                     c = c.Parent;
                 }
 
-                ObjectCollection pageBands = Page.AllObjects;
+                var pageBands = Page.AllObjects;
                 foreach (Base c1 in pageBands)
                 {
-                    if (c1 is DataBand)
-                        return c1 as DataBand;
+                    if (c1 is DataBand band)
+                    {
+                        return band;
+                    }
                 }
+
                 return null;
             }
         }
@@ -618,83 +541,61 @@ namespace AM.Reporting
         /// <remarks>
         /// This property is used in the preview mode.
         /// </remarks>
-        [Category("Appearance")]
-        public Cursor Cursor
-        {
-            get { return cursor; }
-            set { cursor = value; }
-        }
+        [Category ("Appearance")]
+        public Cursor Cursor { get; set; }
 
         /// <summary>
         /// Gets or sets a script event name that will be fired when the user
         /// moves the mouse over the object in the preview window.
         /// </summary>
-        [Category("Preview")]
-        public string MouseMoveEvent
-        {
-            get { return mouseMoveEvent; }
-            set { mouseMoveEvent = value; }
-        }
+        [Category ("Preview")]
+        public string MouseMoveEvent { get; set; }
 
         /// <summary>
         /// Gets or sets a script event name that will be fired when the user
         /// releases the mouse button in the preview window.
         /// </summary>
-        [Category("Preview")]
-        public string MouseUpEvent
-        {
-            get { return mouseUpEvent; }
-            set { mouseUpEvent = value; }
-        }
+        [Category ("Preview")]
+        public string MouseUpEvent { get; set; }
 
         /// <summary>
         /// Gets or sets a script event name that will be fired when the user
         /// clicks the mouse button in the preview window.
         /// </summary>
-        [Category("Preview")]
-        public string MouseDownEvent
-        {
-            get { return mouseDownEvent; }
-            set { mouseDownEvent = value; }
-        }
+        [Category ("Preview")]
+        public string MouseDownEvent { get; set; }
 
         /// <summary>
         /// Gets or sets a script event name that will be fired when the
         /// mouse enters the object's bounds in the preview window.
         /// </summary>
-        [Category("Preview")]
-        public string MouseEnterEvent
-        {
-            get { return mouseEnterEvent; }
-            set { mouseEnterEvent = value; }
-        }
+        [Category ("Preview")]
+        public string MouseEnterEvent { get; set; }
 
         /// <summary>
         /// Gets or sets a script event name that will be fired when the
         /// mouse leaves the object's bounds in the preview window.
         /// </summary>
-        [Category("Preview")]
-        public string MouseLeaveEvent
-        {
-            get { return mouseLeaveEvent; }
-            set { mouseLeaveEvent = value; }
-        }
+        [Category ("Preview")]
+        public string MouseLeaveEvent { get; set; }
+
         #endregion
 
         #region Public Methods
-        /// <inheritdoc/>
-        public override void Assign(Base source)
-        {
-            base.Assign(source);
 
-            ReportComponentBase src = source as ReportComponentBase;
+        /// <inheritdoc/>
+        public override void Assign (Base source)
+        {
+            base.Assign (source);
+
+            var src = source as ReportComponentBase;
             Exportable = src.Exportable;
             ExportableExpression = src.ExportableExpression;
             Border = src.Border.Clone();
             Fill = src.Fill.Clone();
             Bookmark = src.Bookmark;
             IsIntersectingWithOtherObject = src.IsIntersectingWithOtherObject;
-            Hyperlink.Assign(src.Hyperlink);
+            Hyperlink.Assign (src.Hyperlink);
             CanGrow = src.CanGrow;
             CanShrink = src.CanShrink;
             GrowToBottom = src.GrowToBottom;
@@ -721,38 +622,49 @@ namespace AM.Reporting
         /// Applies the style settings.
         /// </summary>
         /// <param name="style">Style to apply.</param>
-        public virtual void ApplyStyle(Style style)
+        public virtual void ApplyStyle (Style style)
         {
             if (style.ApplyBorder)
+            {
                 Border = style.Border.Clone();
+            }
+
             if (style.ApplyFill)
+            {
                 Fill = style.Fill.Clone();
+            }
         }
 
-        internal void ApplyStyle(string style)
+        internal void ApplyStyle (string style)
         {
-            if (!String.IsNullOrEmpty(style) && Report != null)
+            if (!string.IsNullOrEmpty (style) && Report != null)
             {
-                StyleCollection styles = Report.Styles;
-                int index = styles.IndexOf(style);
+                var styles = Report.Styles;
+                var index = styles.IndexOf (style);
                 if (index != -1)
-                    ApplyStyle(styles[index]);
+                {
+                    ApplyStyle (styles[index]);
+                }
             }
         }
 
         internal void ApplyEvenStyle()
         {
-            if (!String.IsNullOrEmpty(EvenStyle) && Report != null)
+            if (!string.IsNullOrEmpty (EvenStyle) && Report != null)
             {
-                StyleCollection styles = Report.Styles;
-                int index = styles.IndexOf(EvenStyle);
+                var styles = Report.Styles;
+                var index = styles.IndexOf (EvenStyle);
                 if (index != -1)
                 {
-                    Style style = styles[index];
+                    var style = styles[index];
                     if (EvenStylePriority == StylePriority.UseFill)
+                    {
                         Fill = style.Fill.Clone();
+                    }
                     else
-                        ApplyStyle(style);
+                    {
+                        ApplyStyle (style);
+                    }
                 }
             }
         }
@@ -779,31 +691,37 @@ namespace AM.Reporting
         /// Draws the object's background.
         /// </summary>
         /// <param name="e">Draw event arguments.</param>
-        public void DrawBackground(FRPaintEventArgs e)
+        public void DrawBackground (FRPaintEventArgs e)
         {
             if (Width < 0.01 || Height < 0.01)
+            {
                 return;
-            if (DrawIntersectBackground(e))
+            }
+
+            if (DrawIntersectBackground (e))
+            {
                 return;
-            Fill.Draw(e, AbsBounds);
+            }
+
+            Fill.Draw (e, AbsBounds);
         }
 
         /// <inheritdoc/>
-        public override void Draw(FRPaintEventArgs e)
+        public override void Draw (FRPaintEventArgs e)
         {
-            DrawBackground(e);
-            base.Draw(e);
+            DrawBackground (e);
+            base.Draw (e);
         }
 
         /// <summary>
         /// Determines if the object is visible on current drawing surface.
         /// </summary>
         /// <param name="e">Draw event arguments.</param>
-        public virtual bool IsVisible(FRPaintEventArgs e)
+        public virtual bool IsVisible (FRPaintEventArgs e)
         {
-            RectangleF objRect = new RectangleF(AbsLeft * e.ScaleX, AbsTop * e.ScaleY,
-              Width * e.ScaleX + 1, Height * e.ScaleY + 1);
-            return e.Graphics.IsVisible(objRect);
+            var objRect = new RectangleF (AbsLeft * e.ScaleX, AbsTop * e.ScaleY,
+                Width * e.ScaleX + 1, Height * e.ScaleY + 1);
+            return e.Graphics.IsVisible (objRect);
         }
 
         /// <summary>
@@ -812,81 +730,165 @@ namespace AM.Reporting
         /// <returns>List of errors</returns>
         public virtual List<ValidationError> Validate()
         {
-            List<ValidationError> listError = new List<ValidationError>();
+            var listError = new List<ValidationError>();
 
-            if (IsIntersectingWithOtherObject && !(Parent is ReportComponentBase && !Validator.RectContainInOtherRect((Parent as ReportComponentBase).AbsBounds, this.AbsBounds)))
-                listError.Add(new ValidationError(Name, ValidationError.ErrorLevel.Warning, Res.Get("Messages,Validator,IntersectedObjects"), this));
+            if (IsIntersectingWithOtherObject && !(Parent is ReportComponentBase &&
+                                                   !Validator.RectContainInOtherRect (
+                                                       (Parent as ReportComponentBase).AbsBounds, AbsBounds)))
+            {
+                listError.Add (new ValidationError (Name, ValidationError.ErrorLevel.Warning,
+                    Res.Get ("Messages,Validator,IntersectedObjects"), this));
+            }
 
             if (Height <= 0 || Width <= 0)
-                listError.Add(new ValidationError(Name, ValidationError.ErrorLevel.Error, Res.Get("Messages,Validator,IncorrectSize"), this));
+            {
+                listError.Add (new ValidationError (Name, ValidationError.ErrorLevel.Error,
+                    Res.Get ("Messages,Validator,IncorrectSize"), this));
+            }
 
             if (Name == "")
-                listError.Add(new ValidationError(Name, ValidationError.ErrorLevel.Error, Res.Get("Messages,Validator,UnnamedObject"), this));
+            {
+                listError.Add (new ValidationError (Name, ValidationError.ErrorLevel.Error,
+                    Res.Get ("Messages,Validator,UnnamedObject"), this));
+            }
 
-            if (Parent is ReportComponentBase && !Validator.RectContainInOtherRect((Parent as ReportComponentBase).AbsBounds, this.AbsBounds))
-                listError.Add(new ValidationError(Name, ValidationError.ErrorLevel.Error, Res.Get("Messages,Validator,OutOfBounds"), this));
+            if (Parent is ReportComponentBase &&
+                !Validator.RectContainInOtherRect ((Parent as ReportComponentBase).AbsBounds, AbsBounds))
+            {
+                listError.Add (new ValidationError (Name, ValidationError.ErrorLevel.Error,
+                    Res.Get ("Messages,Validator,OutOfBounds"), this));
+            }
 
             return listError;
         }
 
         /// <inheritdoc/>
-        public override void Serialize(FRWriter writer)
+        public override void Serialize (FRWriter writer)
         {
-            ReportComponentBase c = writer.DiffObject as ReportComponentBase;
-            base.Serialize(writer);
+            var c = writer.DiffObject as ReportComponentBase;
+            base.Serialize (writer);
 
             if (Exportable != c.Exportable)
-                writer.WriteBool("Exportable", Exportable);
+            {
+                writer.WriteBool ("Exportable", Exportable);
+            }
+
             if (ExportableExpression != c.ExportableExpression)
-                writer.WriteStr("ExportableExpression", ExportableExpression);
-            Border.Serialize(writer, "Border", c.Border);
+            {
+                writer.WriteStr ("ExportableExpression", ExportableExpression);
+            }
+
+            Border.Serialize (writer, "Border", c.Border);
+
             //if(Fill != c.Fill)
-                Fill.Serialize(writer, "Fill", c.Fill);
+            Fill.Serialize (writer, "Fill", c.Fill);
             if (Cursor != c.Cursor && !Config.WebMode)
-                writer.WriteValue("Cursor", Cursor);
-            Hyperlink.Serialize(writer, c.Hyperlink);
+            {
+                writer.WriteValue ("Cursor", Cursor);
+            }
+
+            Hyperlink.Serialize (writer, c.Hyperlink);
             if (Bookmark != c.Bookmark)
-                writer.WriteStr("Bookmark", Bookmark);
+            {
+                writer.WriteStr ("Bookmark", Bookmark);
+            }
+
             if (writer.SerializeTo != SerializeTo.Preview)
             {
                 if (CanGrow != c.CanGrow)
-                    writer.WriteBool("CanGrow", CanGrow);
+                {
+                    writer.WriteBool ("CanGrow", CanGrow);
+                }
+
                 if (CanShrink != c.CanShrink)
-                    writer.WriteBool("CanShrink", CanShrink);
+                {
+                    writer.WriteBool ("CanShrink", CanShrink);
+                }
+
                 if (GrowToBottom != c.GrowToBottom)
-                    writer.WriteBool("GrowToBottom", GrowToBottom);
+                {
+                    writer.WriteBool ("GrowToBottom", GrowToBottom);
+                }
+
                 if (ShiftMode != c.ShiftMode)
-                    writer.WriteValue("ShiftMode", ShiftMode);
+                {
+                    writer.WriteValue ("ShiftMode", ShiftMode);
+                }
+
                 if (FlagSerializeStyle && Style != c.Style)
-                    writer.WriteStr("Style", Style);
+                {
+                    writer.WriteStr ("Style", Style);
+                }
+
                 if (EvenStyle != c.EvenStyle)
-                    writer.WriteStr("EvenStyle", EvenStyle);
+                {
+                    writer.WriteStr ("EvenStyle", EvenStyle);
+                }
+
                 if (EvenStylePriority != c.EvenStylePriority)
-                    writer.WriteValue("EvenStylePriority", EvenStylePriority);
+                {
+                    writer.WriteValue ("EvenStylePriority", EvenStylePriority);
+                }
+
                 if (HoverStyle != c.HoverStyle)
-                    writer.WriteStr("HoverStyle", HoverStyle);
+                {
+                    writer.WriteStr ("HoverStyle", HoverStyle);
+                }
+
                 if (PageBreak != c.PageBreak)
-                    writer.WriteBool("PageBreak", PageBreak);
+                {
+                    writer.WriteBool ("PageBreak", PageBreak);
+                }
+
                 if (PrintOn != c.PrintOn)
-                    writer.WriteValue("PrintOn", PrintOn);
+                {
+                    writer.WriteValue ("PrintOn", PrintOn);
+                }
+
                 if (BeforePrintEvent != c.BeforePrintEvent)
-                    writer.WriteStr("BeforePrintEvent", BeforePrintEvent);
+                {
+                    writer.WriteStr ("BeforePrintEvent", BeforePrintEvent);
+                }
+
                 if (AfterPrintEvent != c.AfterPrintEvent)
-                    writer.WriteStr("AfterPrintEvent", AfterPrintEvent);
+                {
+                    writer.WriteStr ("AfterPrintEvent", AfterPrintEvent);
+                }
+
                 if (AfterDataEvent != c.AfterDataEvent)
-                    writer.WriteStr("AfterDataEvent", AfterDataEvent);
+                {
+                    writer.WriteStr ("AfterDataEvent", AfterDataEvent);
+                }
+
                 if (ClickEvent != c.ClickEvent)
-                    writer.WriteStr("ClickEvent", ClickEvent);
+                {
+                    writer.WriteStr ("ClickEvent", ClickEvent);
+                }
+
                 if (MouseMoveEvent != c.MouseMoveEvent)
-                    writer.WriteStr("MouseMoveEvent", MouseMoveEvent);
+                {
+                    writer.WriteStr ("MouseMoveEvent", MouseMoveEvent);
+                }
+
                 if (MouseUpEvent != c.MouseUpEvent)
-                    writer.WriteStr("MouseUpEvent", MouseUpEvent);
+                {
+                    writer.WriteStr ("MouseUpEvent", MouseUpEvent);
+                }
+
                 if (MouseDownEvent != c.MouseDownEvent)
-                    writer.WriteStr("MouseDownEvent", MouseDownEvent);
+                {
+                    writer.WriteStr ("MouseDownEvent", MouseDownEvent);
+                }
+
                 if (MouseEnterEvent != c.MouseEnterEvent)
-                    writer.WriteStr("MouseEnterEvent", MouseEnterEvent);
+                {
+                    writer.WriteStr ("MouseEnterEvent", MouseEnterEvent);
+                }
+
                 if (MouseLeaveEvent != c.MouseLeaveEvent)
-                    writer.WriteStr("MouseLeaveEvent", MouseLeaveEvent);
+                {
+                    writer.WriteStr ("MouseLeaveEvent", MouseLeaveEvent);
+                }
             }
         }
 
@@ -894,21 +896,24 @@ namespace AM.Reporting
         ///
         /// </summary>
         /// <param name="reader"></param>
-        public override void Deserialize(FRReader reader)
+        public override void Deserialize (FRReader reader)
         {
-            base.Deserialize(reader);
-            Fill.Deserialize(reader, "Fill");
+            base.Deserialize (reader);
+            Fill.Deserialize (reader, "Fill");
         }
 
         /// <summary>
         /// This method fires the <b>Click</b> event and the script code connected to the <b>ClickEvent</b>.
         /// </summary>
         /// <param name="e">Event data.</param>
-        public virtual void OnClick(EventArgs e)
+        public virtual void OnClick (EventArgs e)
         {
             if (Click != null)
-                Click(this, e);
-            InvokeEvent(ClickEvent, e);
+            {
+                Click (this, e);
+            }
+
+            InvokeEvent (ClickEvent, e);
         }
 
         /// <inheritdoc/>
@@ -925,9 +930,11 @@ namespace AM.Reporting
         {
             return Click != null;
         }
+
         #endregion
 
         #region Report Engine
+
         /// <summary>
         /// Resets the data from the previous report run.
         /// </summary>
@@ -1021,9 +1028,9 @@ namespace AM.Reporting
         {
             Hyperlink.Calculate();
 
-            if (!String.IsNullOrEmpty(Bookmark))
+            if (!string.IsNullOrEmpty (Bookmark))
             {
-                object value = Report.Calc(Bookmark);
+                var value = Report.Calc (Bookmark);
                 Bookmark = value == null ? "" : value.ToString();
             }
         }
@@ -1036,22 +1043,28 @@ namespace AM.Reporting
             string[] baseExpressions = base.GetExpressions();
             if (baseExpressions != null)
             {
-                expressions.AddRange(baseExpressions);
+                expressions.AddRange (baseExpressions);
             }
 
-            if (!String.IsNullOrEmpty(Hyperlink.Expression))
-                expressions.Add(Hyperlink.Expression);
-            if (!String.IsNullOrEmpty(Bookmark))
-                expressions.Add(Bookmark);
-
-            if (!String.IsNullOrEmpty(ExportableExpression))
+            if (!string.IsNullOrEmpty (Hyperlink.Expression))
             {
-                string expression = Code.CodeUtils.FixExpressionWithBrackets(ExportableExpression);
+                expressions.Add (Hyperlink.Expression);
+            }
+
+            if (!string.IsNullOrEmpty (Bookmark))
+            {
+                expressions.Add (Bookmark);
+            }
+
+            if (!string.IsNullOrEmpty (ExportableExpression))
+            {
+                var expression = Code.CodeUtils.FixExpressionWithBrackets (ExportableExpression);
                 if (expression.ToLower() == "true" || expression.ToLower() == "false")
                 {
                     expression = expression.ToLower();
                 }
-                expressions.Add(expression);
+
+                expressions.Add (expression);
             }
 
             return expressions.ToArray();
@@ -1061,39 +1074,49 @@ namespace AM.Reporting
         /// This method fires the <b>BeforePrint</b> event and the script code connected to the <b>BeforePrintEvent</b>.
         /// </summary>
         /// <param name="e">Event data.</param>
-        public virtual void OnBeforePrint(EventArgs e)
+        public virtual void OnBeforePrint (EventArgs e)
         {
             if (BeforePrint != null)
-                BeforePrint(this, e);
-            InvokeEvent(BeforePrintEvent, e);
+            {
+                BeforePrint (this, e);
+            }
+
+            InvokeEvent (BeforePrintEvent, e);
         }
 
         /// <summary>
         /// This method fires the <b>AfterPrint</b> event and the script code connected to the <b>AfterPrintEvent</b>.
         /// </summary>
         /// <param name="e">Event data.</param>
-        public virtual void OnAfterPrint(EventArgs e)
+        public virtual void OnAfterPrint (EventArgs e)
         {
             if (AfterPrint != null)
-                AfterPrint(this, e);
-            InvokeEvent(AfterPrintEvent, e);
+            {
+                AfterPrint (this, e);
+            }
+
+            InvokeEvent (AfterPrintEvent, e);
         }
 
         /// <summary>
         /// This method fires the <b>AfterData</b> event and the script code connected to the <b>AfterDataEvent</b>.
         /// </summary>
         /// <param name="e">Event data.</param>
-        public virtual void OnAfterData(EventArgs e)
+        public virtual void OnAfterData (EventArgs e)
         {
             if (AfterData != null)
-                AfterData(this, e);
-            InvokeEvent(AfterDataEvent, e);
+            {
+                AfterData (this, e);
+            }
+
+            InvokeEvent (AfterDataEvent, e);
         }
 
         internal void OnAfterData()
         {
-            OnAfterData(EventArgs.Empty);
+            OnAfterData (EventArgs.Empty);
         }
+
         #endregion
 
         /// <summary>
@@ -1103,33 +1126,36 @@ namespace AM.Reporting
         {
             border = new Border();
             fill = new SolidFill();
-            hyperlink = new Hyperlink(this);
-            bookmark = "";
-            exportable = true;
+            Hyperlink = new Hyperlink (this);
+            Bookmark = "";
+            Exportable = true;
             exportableExpression = "";
-            flagUseFill = true;
-            flagUseBorder = true;
-            flagPreviewVisible = true;
-            flagSerializeStyle = true;
-            isIntersectingWithOtherObject = false;
-            shiftMode = ShiftMode.Always;
+            FlagUseFill = true;
+            FlagUseBorder = true;
+            FlagPreviewVisible = true;
+            FlagSerializeStyle = true;
+            IsIntersectingWithOtherObject = false;
+            ShiftMode = ShiftMode.Always;
             style = "";
-            evenStyle = "";
-            hoverStyle = "";
-            printOn = PrintOn.FirstPage | PrintOn.LastPage | PrintOn.OddPages | PrintOn.EvenPages | PrintOn.RepeatedBand | PrintOn.SinglePage;
-            beforePrintEvent = "";
-            afterPrintEvent = "";
-            afterDataEvent = "";
-            clickEvent = "";
-            cursor = Cursors.Default;
-            mouseMoveEvent = "";
-            mouseUpEvent = "";
-            mouseDownEvent = "";
-            mouseEnterEvent = "";
-            mouseLeaveEvent = "";
-            SetFlags(Flags.CanGroup, true);
-            if (BaseName.EndsWith("Object"))
-                BaseName = ClassName.Substring(0, ClassName.Length - 6);
+            EvenStyle = "";
+            HoverStyle = "";
+            PrintOn = PrintOn.FirstPage | PrintOn.LastPage | PrintOn.OddPages | PrintOn.EvenPages |
+                      PrintOn.RepeatedBand | PrintOn.SinglePage;
+            BeforePrintEvent = "";
+            AfterPrintEvent = "";
+            AfterDataEvent = "";
+            ClickEvent = "";
+            Cursor = Cursors.Default;
+            MouseMoveEvent = "";
+            MouseUpEvent = "";
+            MouseDownEvent = "";
+            MouseEnterEvent = "";
+            MouseLeaveEvent = "";
+            SetFlags (Flags.CanGroup, true);
+            if (BaseName.EndsWith ("Object"))
+            {
+                BaseName = ClassName.Substring (0, ClassName.Length - 6);
+            }
         }
     }
 }

@@ -1,389 +1,320 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.Collections.Generic;
 using System.Text;
+
 using AM.Reporting.Data;
 using AM.Reporting.Export;
+
 using System.Data.Common;
 using System.ComponentModel;
 
+#endregion
+
+#nullable enable
+
 namespace AM.Reporting
 {
-  /// <summary>
-  /// Provides data for the <see cref="AM.Reporting.Report.LoadBaseReport"/> event.
-  /// </summary>
-  public class CustomLoadEventArgs : EventArgs
-  {
-    private string fileName;
-    private Report report;
-
     /// <summary>
-    /// Gets a name of the file to load the report from.
+    /// Provides data for the <see cref="AM.Reporting.Report.LoadBaseReport"/> event.
     /// </summary>
-    public string FileName
+    public class CustomLoadEventArgs : EventArgs
     {
-      get { return fileName; }
-    }
+        /// <summary>
+        /// Gets a name of the file to load the report from.
+        /// </summary>
+        public string FileName { get; }
 
-    /// <summary>
-    /// The reference to a report.
-    /// </summary>
-    public Report Report
-    {
-      get { return report; }
-    }
+        /// <summary>
+        /// The reference to a report.
+        /// </summary>
+        public Report Report { get; }
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="CustomLoadEventArgs"/> class using the specified
-    /// file name and the report.
-    /// </summary>
-    /// <param name="fileName">The name of the file to load the report from.</param>
-    /// <param name="report">The report.</param>
-    public CustomLoadEventArgs(string fileName, Report report)
-    {
-            this.fileName = fileName;
-            this.report = report;
-    }
-  }
-
-  /// <summary>
-  /// Provides data for the <see cref="AM.Reporting.Report.CustomCalc"/> event.
-  /// </summary>
-  public class CustomCalcEventArgs : EventArgs
-  {
-    private string expr;
-    private object @object;
-    private Report report;
-
-    /// <summary>
-    /// Gets an expression.
-    /// </summary>
-    public string Expression
-    {
-      get { return expr; }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CustomLoadEventArgs"/> class using the specified
+        /// file name and the report.
+        /// </summary>
+        /// <param name="fileName">The name of the file to load the report from.</param>
+        /// <param name="report">The report.</param>
+        public CustomLoadEventArgs (string fileName, Report report)
+        {
+            this.FileName = fileName;
+            this.Report = report;
+        }
     }
 
     /// <summary>
-    /// Gets or sets a object.
+    /// Provides data for the <see cref="AM.Reporting.Report.CustomCalc"/> event.
     /// </summary>
-    public object CalculatedObject
+    public class CustomCalcEventArgs : EventArgs
     {
-      get { return @object; }
-      set { @object = value; }
+        /// <summary>
+        /// Gets an expression.
+        /// </summary>
+        public string Expression { get; }
+
+        /// <summary>
+        /// Gets or sets a object.
+        /// </summary>
+        public object CalculatedObject { get; set; }
+
+        /// <summary>
+        /// The reference to a report.
+        /// </summary>
+        public Report Report { get; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CustomLoadEventArgs"/> class using the specified
+        /// file name and the report.
+        /// </summary>
+        /// <param name="expression">The text of expression.</param>
+        /// <param name="Object">The name of the file to load the report from.</param>
+        /// <param name="report">The report.</param>
+        public CustomCalcEventArgs (string expression, object Object, Report report)
+        {
+            Expression = expression;
+            CalculatedObject = Object;
+            this.Report = report;
+        }
     }
 
     /// <summary>
-    /// The reference to a report.
+    /// Represents the method that will handle the <see cref="Report.LoadBaseReport"/> event.
     /// </summary>
-    public Report Report
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">The event data.</param>
+    public delegate void CustomLoadEventHandler (object sender, CustomLoadEventArgs e);
+
+    /// <summary>
+    /// Represents the method that will handle the event.
+    /// </summary>
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">The event data.</param>
+    public delegate void CustomCalcEventHandler (object sender, CustomCalcEventArgs e);
+
+    /// <summary>
+    /// Provides data for the Progress event.
+    /// </summary>
+    public class ProgressEventArgs
     {
-      get { return report; }
+        /// <summary>
+        /// Gets a progress message.
+        /// </summary>
+        public string Message { get; }
+
+        /// <summary>
+        /// Gets the current page number.
+        /// </summary>
+        public int Progress { get; }
+
+        /// <summary>
+        /// Gets the number of total pages.
+        /// </summary>
+        public int Total { get; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProgressEventArgs"/> class using the specified
+        /// message, page number and total number of pages.
+        /// </summary>
+        /// <param name="message">The progress message.</param>
+        /// <param name="progress">Current page number.</param>
+        /// <param name="total">Number of total pages.</param>
+        public ProgressEventArgs (string message, int progress, int total)
+        {
+            this.Message = message;
+            this.Progress = progress;
+            this.Total = total;
+        }
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="CustomLoadEventArgs"/> class using the specified
-    /// file name and the report.
+    /// Represents the method that will handle the Progress event.
     /// </summary>
-    /// <param name="expression">The text of expression.</param>
-    /// <param name="Object">The name of the file to load the report from.</param>
-    /// <param name="report">The report.</param>
-    public CustomCalcEventArgs(string expression, object Object, Report report)
-    {
-      expr = expression;
-      @object = Object;
-            this.report = report;
-    }
-  }
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">The event data.</param>
+    public delegate void ProgressEventHandler (object sender, ProgressEventArgs e);
 
-  /// <summary>
-  /// Represents the method that will handle the <see cref="Report.LoadBaseReport"/> event.
-  /// </summary>
-  /// <param name="sender">The source of the event.</param>
-  /// <param name="e">The event data.</param>
-  public delegate void CustomLoadEventHandler(object sender, CustomLoadEventArgs e);
-
-  /// <summary>
-  /// Represents the method that will handle the event.
-  /// </summary>
-  /// <param name="sender">The source of the event.</param>
-  /// <param name="e">The event data.</param>
-  public delegate void CustomCalcEventHandler(object sender, CustomCalcEventArgs e);
-
-  /// <summary>
-  /// Provides data for the Progress event.
-  /// </summary>
-  public class ProgressEventArgs
-  {
-    private string message;
-    private int progress;
-    private int total;
 
     /// <summary>
-    /// Gets a progress message.
+    /// Provides data for the DatabaseLogin event.
     /// </summary>
-    public string Message
+    public class DatabaseLoginEventArgs
     {
-      get { return message; }
+        /// <summary>
+        /// Gets or sets the connection string.
+        /// </summary>
+        public string ConnectionString { get; set; }
+
+        /// <summary>
+        /// Gets or sets an user name.
+        /// </summary>
+        public string UserName { get; set; }
+
+        /// <summary>
+        /// Gets or sets a password.
+        /// </summary>
+        public string Password { get; set; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DatabaseLoginEventArgs"/> class using the specified
+        /// connection string.
+        /// </summary>
+        /// <param name="connectionString">The connection string.</param>
+        public DatabaseLoginEventArgs (string connectionString)
+        {
+            this.ConnectionString = connectionString;
+            UserName = "";
+            Password = "";
+        }
     }
 
-    /// <summary>
-    /// Gets the current page number.
-    /// </summary>
-    public int Progress
-    {
-      get { return progress; }
-    }
 
     /// <summary>
-    /// Gets the number of total pages.
+    /// Represents the method that will handle the DatabaseLogin event.
     /// </summary>
-    public int Total
-    {
-      get { return total; }
-    }
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">The event data.</param>
+    public delegate void DatabaseLoginEventHandler (object sender, DatabaseLoginEventArgs e);
+
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ProgressEventArgs"/> class using the specified
-    /// message, page number and total number of pages.
+    /// Provides data for the AfterDatabaseLogin event.
     /// </summary>
-    /// <param name="message">The progress message.</param>
-    /// <param name="progress">Current page number.</param>
-    /// <param name="total">Number of total pages.</param>
-    public ProgressEventArgs(string message, int progress, int total)
+    public class AfterDatabaseLoginEventArgs
     {
-            this.message = message;
-            this.progress = progress;
-            this.total = total;
-    }
-  }
+        /// <summary>
+        /// Gets the <b>DbConnection</b> object.
+        /// </summary>
+        public DbConnection Connection { get; }
 
-  /// <summary>
-  /// Represents the method that will handle the Progress event.
-  /// </summary>
-  /// <param name="sender">The source of the event.</param>
-  /// <param name="e">The event data.</param>
-  public delegate void ProgressEventHandler(object sender, ProgressEventArgs e);
-
-
-  /// <summary>
-  /// Provides data for the DatabaseLogin event.
-  /// </summary>
-  public class DatabaseLoginEventArgs
-  {
-    private string connectionString;
-    private string userName;
-    private string password;
-
-    /// <summary>
-    /// Gets or sets the connection string.
-    /// </summary>
-    public string ConnectionString
-    {
-      get { return connectionString; }
-      set { connectionString = value; }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AfterDatabaseLoginEventArgs"/> class using
+        /// the specified connection.
+        /// </summary>
+        /// <param name="connection">The connection object.</param>
+        public AfterDatabaseLoginEventArgs (DbConnection connection)
+        {
+            this.Connection = connection;
+        }
     }
 
     /// <summary>
-    /// Gets or sets an user name.
+    /// Represents the method that will handle the AfterDatabaseLogin event.
     /// </summary>
-    public string UserName
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">The event data.</param>
+    public delegate void AfterDatabaseLoginEventHandler (object sender, AfterDatabaseLoginEventArgs e);
+
+
+    /// <summary>
+    /// Provides data for the FilterProperties event.
+    /// </summary>
+    public class FilterPropertiesEventArgs
     {
-      get { return userName; }
-      set { userName = value; }
+        /// <summary>
+        /// Gets the property descriptor.
+        /// </summary>
+        public PropertyDescriptor Property { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether this property should be skipped.
+        /// </summary>
+        public bool Skip { get; set; }
+
+        internal FilterPropertiesEventArgs (PropertyDescriptor property)
+        {
+            this.Property = property;
+            Skip = false;
+        }
     }
 
     /// <summary>
-    /// Gets or sets a password.
+    /// Represents the method that will handle the FilterProperties event.
     /// </summary>
-    public string Password
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">The event data.</param>
+    public delegate void FilterPropertiesEventHandler (object sender, FilterPropertiesEventArgs e);
+
+
+    /// <summary>
+    /// Provides data for the GetPropertyKind event.
+    /// </summary>
+    public class GetPropertyKindEventArgs
     {
-      get { return password; }
-      set { password = value; }
+        /// <summary>
+        /// Gets the property name.
+        /// </summary>
+        public string PropertyName { get; }
+
+        /// <summary>
+        /// Gets the property type.
+        /// </summary>
+        public Type PropertyType { get; }
+
+        /// <summary>
+        /// Gets or sets the kind of property.
+        /// </summary>
+        public PropertyKind PropertyKind { get; set; }
+
+        internal GetPropertyKindEventArgs (string propertyName, Type propertyType, PropertyKind propertyKind)
+        {
+            this.PropertyName = propertyName;
+            this.PropertyType = propertyType;
+            this.PropertyKind = propertyKind;
+        }
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="DatabaseLoginEventArgs"/> class using the specified
-    /// connection string.
+    /// Represents the method that will handle the GetPropertyKind event.
     /// </summary>
-    /// <param name="connectionString">The connection string.</param>
-    public DatabaseLoginEventArgs(string connectionString)
-    {
-            this.connectionString = connectionString;
-      userName = "";
-      password = "";
-    }
-  }
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">The event data.</param>
+    public delegate void GetPropertyKindEventHandler (object sender, GetPropertyKindEventArgs e);
 
-
-  /// <summary>
-  /// Represents the method that will handle the DatabaseLogin event.
-  /// </summary>
-  /// <param name="sender">The source of the event.</param>
-  /// <param name="e">The event data.</param>
-  public delegate void DatabaseLoginEventHandler(object sender, DatabaseLoginEventArgs e);
-
-
-  /// <summary>
-  /// Provides data for the AfterDatabaseLogin event.
-  /// </summary>
-  public class AfterDatabaseLoginEventArgs
-  {
-    private DbConnection connection;
 
     /// <summary>
-    /// Gets the <b>DbConnection</b> object.
+    /// Provides data for the GetTypeInstance event.
     /// </summary>
-    public DbConnection Connection
+    public class GetTypeInstanceEventArgs
     {
-      get { return connection; }
+        /// <summary>
+        /// Gets the type.
+        /// </summary>
+        public Type Type { get; }
+
+        /// <summary>
+        /// Gets or sets the instance of type.
+        /// </summary>
+        public object Instance { get; set; }
+
+        internal GetTypeInstanceEventArgs (Type type)
+        {
+            this.Type = type;
+        }
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="AfterDatabaseLoginEventArgs"/> class using
-    /// the specified connection.
+    /// Represents the method that will handle the GetPropertyKind event.
     /// </summary>
-    /// <param name="connection">The connection object.</param>
-    public AfterDatabaseLoginEventArgs(DbConnection connection)
-    {
-            this.connection = connection;
-    }
-  }
-
-  /// <summary>
-  /// Represents the method that will handle the AfterDatabaseLogin event.
-  /// </summary>
-  /// <param name="sender">The source of the event.</param>
-  /// <param name="e">The event data.</param>
-  public delegate void AfterDatabaseLoginEventHandler(object sender, AfterDatabaseLoginEventArgs e);
-
-
-  /// <summary>
-  /// Provides data for the FilterProperties event.
-  /// </summary>
-  public class FilterPropertiesEventArgs
-  {
-    private PropertyDescriptor property;
-    private bool skip;
-
-    /// <summary>
-    /// Gets the property descriptor.
-    /// </summary>
-    public PropertyDescriptor Property
-    {
-      get { return property; }
-      set { property = value; }
-    }
-
-    /// <summary>
-    /// Gets or sets a value that indicates whether this property should be skipped.
-    /// </summary>
-    public bool Skip
-    {
-      get { return skip; }
-      set { skip = value; }
-    }
-
-    internal FilterPropertiesEventArgs(PropertyDescriptor property)
-    {
-            this.property = property;
-      skip = false;
-    }
-  }
-
-  /// <summary>
-  /// Represents the method that will handle the FilterProperties event.
-  /// </summary>
-  /// <param name="sender">The source of the event.</param>
-  /// <param name="e">The event data.</param>
-  public delegate void FilterPropertiesEventHandler(object sender, FilterPropertiesEventArgs e);
-
-
-  /// <summary>
-  /// Provides data for the GetPropertyKind event.
-  /// </summary>
-  public class GetPropertyKindEventArgs
-  {
-    private string propertyName;
-    private Type propertyType;
-    private PropertyKind propertyKind;
-
-    /// <summary>
-    /// Gets the property name.
-    /// </summary>
-    public string PropertyName
-    {
-      get { return propertyName; }
-    }
-
-    /// <summary>
-    /// Gets the property type.
-    /// </summary>
-    public Type PropertyType
-    {
-      get { return propertyType; }
-    }
-
-    /// <summary>
-    /// Gets or sets the kind of property.
-    /// </summary>
-    public PropertyKind PropertyKind
-    {
-      get { return propertyKind; }
-      set { propertyKind = value; }
-    }
-
-    internal GetPropertyKindEventArgs(string propertyName, Type propertyType, PropertyKind propertyKind)
-    {
-            this.propertyName = propertyName;
-            this.propertyType = propertyType;
-            this.propertyKind = propertyKind;
-    }
-  }
-
-  /// <summary>
-  /// Represents the method that will handle the GetPropertyKind event.
-  /// </summary>
-  /// <param name="sender">The source of the event.</param>
-  /// <param name="e">The event data.</param>
-  public delegate void GetPropertyKindEventHandler(object sender, GetPropertyKindEventArgs e);
-
-
-  /// <summary>
-  /// Provides data for the GetTypeInstance event.
-  /// </summary>
-  public class GetTypeInstanceEventArgs
-  {
-    private Type type;
-    private object instance;
-
-    /// <summary>
-    /// Gets the type.
-    /// </summary>
-    public Type Type
-    {
-      get { return type; }
-    }
-
-    /// <summary>
-    /// Gets or sets the instance of type.
-    /// </summary>
-    public object Instance
-    {
-      get { return instance; }
-      set { instance = value; }
-    }
-
-    internal GetTypeInstanceEventArgs(Type type)
-    {
-            this.type = type;
-    }
-  }
-
-  /// <summary>
-  /// Represents the method that will handle the GetPropertyKind event.
-  /// </summary>
-  /// <param name="sender">The source of the event.</param>
-  /// <param name="e">The event data.</param>
-  public delegate void GetTypeInstanceEventHandler(object sender, GetTypeInstanceEventArgs e);
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">The event data.</param>
+    public delegate void GetTypeInstanceEventHandler (object sender, GetTypeInstanceEventArgs e);
 
     /// <summary>
     /// Event arguments for custom Export parameters
@@ -395,9 +326,9 @@ namespace AM.Reporting
         /// </summary>
         public readonly ExportBase Export;
 
-        public ExportParametersEventArgs(ExportBase export)
+        public ExportParametersEventArgs (ExportBase export)
         {
-            this.Export = export;
+            Export = export;
         }
     }
 }

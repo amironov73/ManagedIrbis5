@@ -34,8 +34,8 @@ namespace AM.Reporting.Utils
             return IntPtr.Zero;
         }
 #else
-        [DllImport("user32.dll")]
-        static extern IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wParam, DrawingOptions drawingOptions);
+        [DllImport ("user32.dll")]
+        static extern nint SendMessage (nint hWnd, int msg, nint wParam, DrawingOptions drawingOptions);
 #endif
 
         const int WM_PRINT = 0x317;
@@ -57,19 +57,23 @@ namespace AM.Reporting.Utils
         /// <param name="control">Control to draw.</param>
         /// <param name="children">Determines whether to draw control's children or not.</param>
         /// <returns>The bitmap.</returns>
-        public static Bitmap DrawToBitmap(Control control, bool children)
+        public static Bitmap DrawToBitmap (Control control, bool children)
         {
-            Bitmap bitmap = new Bitmap(control.Width, control.Height);
-            using (Graphics gr = Graphics.FromImage(bitmap))
+            var bitmap = new Bitmap (control.Width, control.Height);
+            using (var gr = Graphics.FromImage (bitmap))
             {
-                IntPtr hdc = gr.GetHdc();
-                DrawingOptions options = DrawingOptions.PRF_ERASEBKGND |
-                  DrawingOptions.PRF_CLIENT | DrawingOptions.PRF_NONCLIENT;
+                var hdc = gr.GetHdc();
+                var options = DrawingOptions.PRF_ERASEBKGND |
+                              DrawingOptions.PRF_CLIENT | DrawingOptions.PRF_NONCLIENT;
                 if (children)
+                {
                     options |= DrawingOptions.PRF_CHILDREN;
-                SendMessage(control.Handle, WM_PRINT, hdc, options);
-                gr.ReleaseHdc(hdc);
+                }
+
+                SendMessage (control.Handle, WM_PRINT, hdc, options);
+                gr.ReleaseHdc (hdc);
             }
+
             return bitmap;
         }
     }

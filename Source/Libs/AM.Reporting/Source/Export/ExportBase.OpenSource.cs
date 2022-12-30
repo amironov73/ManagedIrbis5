@@ -31,14 +31,14 @@ namespace AM.Reporting.Export
         /// Does nothing
         /// </summary>
         /// <param name="int0"></param>
-        partial void ShowPerformance(int int0);
+        partial void ShowPerformance (int int0);
 
-        protected ReportPage GetOverlayPage(ReportPage page)
+        protected ReportPage GetOverlayPage (ReportPage page)
         {
             return page;
         }
 
-        private int GetPagesCount(List<int> pages)
+        private int GetPagesCount (List<int> pages)
         {
             return pages.Count;
         }

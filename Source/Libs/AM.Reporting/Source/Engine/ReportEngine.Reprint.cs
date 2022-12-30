@@ -46,13 +46,13 @@ namespace AM.Reporting.Engine
 
         private void ShowReprintHeaders()
         {
-            float saveOriginX = originX;
+            var saveOriginX = originX;
 
-            foreach (BandBase band in reprintHeaders)
+            foreach (var band in reprintHeaders)
             {
                 band.Repeated = true;
                 originX = band.ReprintOffset;
-                ShowBand(band);
+                ShowBand (band);
                 band.Repeated = false;
             }
 
@@ -61,21 +61,21 @@ namespace AM.Reporting.Engine
 
         private void ShowReprintFooters()
         {
-            ShowReprintFooters(true);
+            ShowReprintFooters (true);
         }
 
-        private void ShowReprintFooters(bool repeated)
+        private void ShowReprintFooters (bool repeated)
         {
-            float saveOriginX = originX;
+            var saveOriginX = originX;
 
             // show footers in reverse order
-            for (int i = reprintFooters.Count - 1; i >= 0; i--)
+            for (var i = reprintFooters.Count - 1; i >= 0; i--)
             {
-                BandBase band = reprintFooters[i];
+                var band = reprintFooters[i];
                 band.Repeated = repeated;
                 band.FlagCheckFreeSpace = false;
                 originX = band.ReprintOffset;
-                ShowBand(band);
+                ShowBand (band);
                 band.Repeated = false;
                 band.FlagCheckFreeSpace = true;
             }
@@ -83,38 +83,57 @@ namespace AM.Reporting.Engine
             originX = saveOriginX;
         }
 
-        private void AddReprint(BandBase band)
+        private void AddReprint (BandBase band)
         {
             // save current offset and use it later when reprinting a band.
             // it is required when printing subreports
             band.ReprintOffset = originX;
 
-            if (keeping)
+            if (IsKeeping)
             {
                 if (band is DataHeaderBand || band is GroupHeaderBand)
-                    keepReprintHeaders.Add(band);
+                {
+                    keepReprintHeaders.Add (band);
+                }
                 else
-                    keepReprintFooters.Add(band);
+                {
+                    keepReprintFooters.Add (band);
+                }
             }
             else
             {
                 if (band is DataHeaderBand || band is GroupHeaderBand)
-                    reprintHeaders.Add(band);
+                {
+                    reprintHeaders.Add (band);
+                }
                 else
-                    reprintFooters.Add(band);
+                {
+                    reprintFooters.Add (band);
+                }
             }
         }
 
-        private void RemoveReprint(BandBase band)
+        private void RemoveReprint (BandBase band)
         {
-            if (keepReprintHeaders.Contains(band))
-                keepReprintHeaders.Remove(band);
-            if (reprintHeaders.Contains(band))
-                reprintHeaders.Remove(band);
-            if (keepReprintFooters.Contains(band))
-                keepReprintFooters.Remove(band);
-            if (reprintFooters.Contains(band))
-                reprintFooters.Remove(band);
+            if (keepReprintHeaders.Contains (band))
+            {
+                keepReprintHeaders.Remove (band);
+            }
+
+            if (reprintHeaders.Contains (band))
+            {
+                reprintHeaders.Remove (band);
+            }
+
+            if (keepReprintFooters.Contains (band))
+            {
+                keepReprintFooters.Remove (band);
+            }
+
+            if (reprintFooters.Contains (band))
+            {
+                reprintFooters.Remove (band);
+            }
         }
 
         private void StartKeepReprint()
@@ -125,14 +144,16 @@ namespace AM.Reporting.Engine
 
         private void EndKeepReprint()
         {
-            foreach (BandBase band in keepReprintHeaders)
+            foreach (var band in keepReprintHeaders)
             {
-                reprintHeaders.Add(band);
+                reprintHeaders.Add (band);
             }
-            foreach (BandBase band in keepReprintFooters)
+
+            foreach (var band in keepReprintFooters)
             {
-                reprintFooters.Add(band);
+                reprintFooters.Add (band);
             }
+
             keepReprintHeaders.Clear();
             keepReprintFooters.Clear();
         }
@@ -140,20 +161,21 @@ namespace AM.Reporting.Engine
         private float GetFootersHeight()
         {
             float result = 0;
-            bool saveRepeated = false;
+            var saveRepeated = false;
 
-            foreach (BandBase band in reprintFooters)
+            foreach (var band in reprintFooters)
             {
                 saveRepeated = band.Repeated;
                 band.Repeated = true;
-                result += GetBandHeightWithChildren(band);
+                result += GetBandHeightWithChildren (band);
                 band.Repeated = saveRepeated;
             }
-            foreach (BandBase band in keepReprintFooters)
+
+            foreach (var band in keepReprintFooters)
             {
                 saveRepeated = band.Repeated;
                 band.Repeated = true;
-                result += GetBandHeightWithChildren(band);
+                result += GetBandHeightWithChildren (band);
                 band.Repeated = saveRepeated;
             }
 

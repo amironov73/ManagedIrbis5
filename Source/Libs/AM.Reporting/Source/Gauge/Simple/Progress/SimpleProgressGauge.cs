@@ -16,6 +16,7 @@
 #region Using directives
 
 using AM.Reporting.Utils;
+
 using System.ComponentModel;
 using System.Drawing;
 
@@ -33,22 +34,19 @@ namespace AM.Reporting.Gauge.Simple.Progress
         /// <summary>
         /// Gets or sets gauge label.
         /// </summary>
-        [Category("Appearance")]
-        [Browsable(true)]
+        [Category ("Appearance")]
+        [Browsable (true)]
         public override GaugeLabel Label
         {
-            get { return base.Label; }
-            set { base.Label = value; }
+            get => base.Label;
+            set => base.Label = value;
         }
 
         /// <summary>
         /// Gets scale. Should be disabled for SimpleProgressGauge
         /// </summary>
-        [Browsable(false)]
-        public new GaugeScale Scale
-        {
-            get { return base.Scale; }
-        }
+        [Browsable (false)]
+        public new GaugeScale Scale => base.Scale;
 
         #region Constructors
 
@@ -57,13 +55,13 @@ namespace AM.Reporting.Gauge.Simple.Progress
         /// </summary>
         public SimpleProgressGauge() : base()
         {
-            Pointer = new SimpleProgressPointer(this);
+            Pointer = new SimpleProgressPointer (this);
 
             (Scale as SimpleScale).FirstSubScale.Enabled = false;
             (Scale as SimpleScale).SecondSubScale.Enabled = false;
             (Pointer as SimplePointer).PointerRatio = 1f;
             (Pointer as SimplePointer).HorizontalOffset = 0;
-            Label = new SimpleProgressLabel(this);
+            Label = new SimpleProgressLabel (this);
             Pointer.BorderColor = Color.Transparent;
             Border.Lines = BorderLines.All;
         }
@@ -73,10 +71,10 @@ namespace AM.Reporting.Gauge.Simple.Progress
         #region Public Methods
 
         /// <inheritdoc/>
-        public override void Draw(FRPaintEventArgs e)
+        public override void Draw (FRPaintEventArgs e)
         {
-            base.Draw(e);
-            Label.Draw(e);
+            base.Draw (e);
+            Label.Draw (e);
         }
 
         #endregion // Public Methods

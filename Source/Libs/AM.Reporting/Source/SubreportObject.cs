@@ -1,7 +1,29 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Design;
+
 using AM.Reporting.Utils;
+
+#endregion
+
+#nullable enable
 
 namespace AM.Reporting
 {
@@ -38,31 +60,37 @@ namespace AM.Reporting
     public partial class SubreportObject : ReportComponentBase
     {
         private ReportPage reportPage;
-        private bool printOnParent;
 
         #region Properties
+
         /// <summary>
         /// Gets or sets a report page that contains the subreport bands and objects.
         /// </summary>
+
         //[Browsable(false)]
-        [Editor("AM.Reporting.TypeEditors.SubreportPageEditor, AM.Reporting", typeof(UITypeEditor))]
-        [TypeConverter(typeof(AM.Reporting.TypeConverters.ComponentRefConverter))]
+        [Editor ("AM.Reporting.TypeEditors.SubreportPageEditor, AM.Reporting", typeof (UITypeEditor))]
+        [TypeConverter (typeof (TypeConverters.ComponentRefConverter))]
         public ReportPage ReportPage
         {
-            get { return reportPage; }
+            get => reportPage;
             set
             {
                 if (value == Page)
+                {
                     return;
+                }
+
                 if (reportPage != null && value != reportPage)
                 {
-                    RemoveSubReport(false);
+                    RemoveSubReport (false);
                 }
+
                 if (value != null)
                 {
                     value.Subreport = this;
                     value.PageName = Name;
                 }
+
                 reportPage = value;
             }
         }
@@ -73,16 +101,13 @@ namespace AM.Reporting
         /// <remarks>
         /// Default behavior of the subreport is to print subreport objects they own separate bands.
         /// </remarks>
-        [DefaultValue(false)]
-        [Category("Behavior")]
-        public bool PrintOnParent
-        {
-            get { return printOnParent; }
-            set { printOnParent = value; }
-        }
+        [DefaultValue (false)]
+        [Category ("Behavior")]
+        public bool PrintOnParent { get; set; }
+
         #endregion
 
-        private void RemoveSubReport(bool delete)
+        private void RemoveSubReport (bool delete)
         {
             if (reportPage != null)
             {
@@ -90,12 +115,10 @@ namespace AM.Reporting
                 {
                     foreach (Base obj in Report.AllObjects)
                     {
-                        if (obj is SubreportObject && obj != this)
+                        if (obj is SubreportObject subReport && obj != this)
                         {
-                            SubreportObject subReport = obj as SubreportObject;
                             if (subReport.ReportPage == reportPage)
                             {
-
                                 reportPage.Subreport = subReport;
                                 reportPage.PageName = subReport.Name;
                                 reportPage = null;
@@ -104,6 +127,7 @@ namespace AM.Reporting
                         }
                     }
                 }
+
                 if (reportPage != null)
                 {
                     if (delete && Report != null)
@@ -115,31 +139,36 @@ namespace AM.Reporting
                         reportPage.Subreport = null;
                         reportPage.PageName = reportPage.Name;
                     }
+
                     reportPage = null;
                 }
             }
         }
 
         #region Public Methods
-        /// <inheritdoc/>
-        public override void Assign(Base source)
-        {
-            base.Assign(source);
 
-            SubreportObject src = source as SubreportObject;
+        /// <inheritdoc/>
+        public override void Assign (Base source)
+        {
+            base.Assign (source);
+
+            var src = source as SubreportObject;
             PrintOnParent = src.PrintOnParent;
         }
 
         /// <inheritdoc/>
-        public override void Serialize(FRWriter writer)
+        public override void Serialize (FRWriter writer)
         {
-            SubreportObject c = writer.DiffObject as SubreportObject;
-            base.Serialize(writer);
+            var c = writer.DiffObject as SubreportObject;
+            base.Serialize (writer);
 
-            writer.WriteRef("ReportPage", ReportPage);
+            writer.WriteRef ("ReportPage", ReportPage);
             if (PrintOnParent != c.PrintOnParent)
-                writer.WriteBool("PrintOnParent", PrintOnParent);
+            {
+                writer.WriteBool ("PrintOnParent", PrintOnParent);
+            }
         }
+
         #endregion
 
         /// <summary>
@@ -147,11 +176,11 @@ namespace AM.Reporting
         /// </summary>
         public SubreportObject()
         {
-            Fill = new SolidFill(SystemColors.Control);
+            Fill = new SolidFill (SystemColors.Control);
             FlagUseBorder = false;
             FlagUseFill = false;
             FlagPreviewVisible = false;
-            SetFlags(Flags.CanCopy, false);
+            SetFlags (Flags.CanCopy, false);
         }
     }
 }

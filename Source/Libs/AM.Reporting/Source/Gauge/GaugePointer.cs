@@ -17,7 +17,9 @@
 
 using System.Drawing;
 using System.ComponentModel;
+
 using AM.Reporting.Utils;
+
 using System.Drawing.Design;
 
 #endregion
@@ -34,83 +36,62 @@ namespace AM.Reporting.Gauge
 #endif
     public class GaugePointer : Component
     {
-#region Fields
+        #region Fields
 
-        private GaugeObject parent;
-        private FillBase fill;
-        private float borderWidth;
-        private Color borderColor;
+        #endregion // Fields
 
-#endregion // Fields
-
-#region Properties
+        #region Properties
 
         /// <summary>
         /// Gets or sets the parent gauge object.
         /// </summary>
-        [Browsable(false)]
-        public GaugeObject Parent
-        {
-            get { return parent; }
-            set { parent = value; }
-        }
+        [Browsable (false)]
+        public GaugeObject Parent { get; set; }
 
         /// <summary>
         /// Gets or sets the color of a pointer.
         /// </summary>
-        [Browsable(true)]
-        [Editor("AM.Reporting.TypeEditors.FillEditor, AM.Reporting", typeof(UITypeEditor))]
-        public FillBase Fill
-        {
-            get { return fill; }
-            set { fill = value; }
-        }
+        [Browsable (true)]
+        [Editor ("AM.Reporting.TypeEditors.FillEditor, AM.Reporting", typeof (UITypeEditor))]
+        public FillBase Fill { get; set; }
 
         /// <summary>
         /// Gets or sets the border width of a pointer.
         /// </summary>
-        [Browsable(false)]
-        public float BorderWidth
-        {
-            get { return borderWidth; }
-            set { borderWidth = value; }
-        }
+        [Browsable (false)]
+        public float BorderWidth { get; set; }
 
         /// <summary>
         /// Gets or sets the border color of a pointer.
         /// </summary>
-        [Browsable(true)]
-        public Color BorderColor
-        {
-            get { return borderColor; }
-            set { borderColor = value; }
-        }
+        [Browsable (true)]
+        public Color BorderColor { get; set; }
 
-#endregion // Properties
+        #endregion // Properties
 
-#region Constructors
+        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GaugePointer"/> class.
         /// </summary>
         /// <param name="parent">The parent gauge object.</param>
-        public GaugePointer(GaugeObject parent)
+        public GaugePointer (GaugeObject parent)
         {
-            fill = new SolidFill(Color.Orange);
-            borderWidth = 1.0f;
-            borderColor = Color.Black;
-            this.parent = parent;
+            Fill = new SolidFill (Color.Orange);
+            BorderWidth = 1.0f;
+            BorderColor = Color.Black;
+            this.Parent = parent;
         }
 
-#endregion // Constructors
+        #endregion // Constructors
 
-#region Public Methods
+        #region Public Methods
 
         /// <summary>
         /// Copies the contents of another GaugePointer.
         /// </summary>
         /// <param name="src">The GaugePointer instance to copy the contents from.</param>
-        public virtual void Assign(GaugePointer src)
+        public virtual void Assign (GaugePointer src)
         {
             Fill = src.Fill;
             BorderWidth = src.BorderWidth;
@@ -121,7 +102,7 @@ namespace AM.Reporting.Gauge
         /// Draws the gauge pointer.
         /// </summary>
         /// <param name="e">Draw event arguments.</param>
-        public virtual void Draw(FRPaintEventArgs e)
+        public virtual void Draw (FRPaintEventArgs e)
         {
         }
 
@@ -134,19 +115,20 @@ namespace AM.Reporting.Gauge
         /// <remarks>
         /// This method is for internal use only.
         /// </remarks>
-        public virtual void Serialize(FRWriter writer, string prefix, GaugePointer diff)
+        public virtual void Serialize (FRWriter writer, string prefix, GaugePointer diff)
         {
-            Fill.Serialize(writer, prefix + ".Fill", diff.Fill);
+            Fill.Serialize (writer, prefix + ".Fill", diff.Fill);
             if (BorderWidth != diff.BorderWidth)
             {
-                writer.WriteFloat(prefix + ".BorderWidth", BorderWidth);
+                writer.WriteFloat (prefix + ".BorderWidth", BorderWidth);
             }
+
             if (BorderColor != diff.BorderColor)
             {
-                writer.WriteValue(prefix + ".BorderColor", BorderColor);
+                writer.WriteValue (prefix + ".BorderColor", BorderColor);
             }
         }
 
-#endregion // Public Methods
+        #endregion // Public Methods
     }
 }

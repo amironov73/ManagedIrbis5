@@ -16,6 +16,7 @@
 #region Using directives
 
 using AM.Reporting.Utils;
+
 using System.Collections.Generic;
 
 #endregion
@@ -44,37 +45,28 @@ namespace AM.Reporting.Engine
     {
         #region Fields
 
-        private ReportEngine engine;
-        private EngineState state;
-
         #endregion Fields
 
         #region Properties
 
-        public ReportEngine Engine
-        {
-            get { return engine; }
-        }
+        public ReportEngine Engine { get; }
 
-        public EngineState State
-        {
-            get { return state; }
-        }
+        public EngineState State { get; }
 
         #endregion Properties
 
         #region Constructors
 
-        internal EngineStateChangedEventArgs(ReportEngine engine, EngineState state)
+        internal EngineStateChangedEventArgs (ReportEngine engine, EngineState state)
         {
-            this.engine = engine;
-            this.state = state;
+            this.Engine = engine;
+            this.State = state;
         }
 
         #endregion Constructors
     }
 
-    internal delegate void EngineStateChangedEventHandler(object sender, EngineStateChangedEventArgs e);
+    internal delegate void EngineStateChangedEventHandler (object sender, EngineStateChangedEventArgs e);
 
     internal class ProcessInfo
     {
@@ -87,16 +79,13 @@ namespace AM.Reporting.Engine
 
         #region Properties
 
-        public TextObjectBase TextObject
-        {
-            get { return textObject; }
-        }
+        public TextObjectBase TextObject => textObject;
 
         #endregion Properties
 
         #region Constructors
 
-        public ProcessInfo(TextObject obj, XmlItem item)
+        public ProcessInfo (TextObject obj, XmlItem item)
         {
             textObject = obj;
             xmlItem = item;
@@ -112,15 +101,17 @@ namespace AM.Reporting.Engine
             try
             {
                 textObject.GetData();
-                string fill_clr = textObject.FillColor.IsNamedColor ? textObject.FillColor.Name :
-                    "#" + textObject.FillColor.Name;
-                string txt_clr = textObject.TextColor.IsNamedColor ? textObject.TextColor.Name :
-                    "#" + textObject.TextColor.Name;
+                var fill_clr = textObject.FillColor.IsNamedColor
+                    ? textObject.FillColor.Name
+                    : "#" + textObject.FillColor.Name;
+                var txt_clr = textObject.TextColor.IsNamedColor
+                    ? textObject.TextColor.Name
+                    : "#" + textObject.TextColor.Name;
 
-                xmlItem.SetProp("x", textObject.Text);
-                xmlItem.SetProp("Fill.Color", fill_clr);
-                xmlItem.SetProp("TextFill.Color", txt_clr);
-                xmlItem.SetProp("Font.Name", textObject.Font.Name);
+                xmlItem.SetProp ("x", textObject.Text);
+                xmlItem.SetProp ("Fill.Color", fill_clr);
+                xmlItem.SetProp ("TextFill.Color", txt_clr);
+                xmlItem.SetProp ("Font.Name", textObject.Font.Name);
             }
             finally
             {
@@ -128,28 +119,35 @@ namespace AM.Reporting.Engine
             }
         }
 
-        public bool Process(object sender, EngineState state)
+        public bool Process (object sender, EngineState state)
         {
-            ProcessAt processAt = textObject.ProcessAt;
-            bool canProcess = false;
+            var processAt = textObject.ProcessAt;
+            var canProcess = false;
 
             if ((processAt == ProcessAt.DataFinished && state == EngineState.BlockFinished) ||
                 (processAt == ProcessAt.GroupFinished && state == EngineState.GroupFinished))
             {
                 // check which data is finished
-                BandBase topParentBand = textObject.Band;
-                if (topParentBand is ChildBand)
-                    topParentBand = (topParentBand as ChildBand).GetTopParentBand;
+                var topParentBand = textObject.Band;
+                if (topParentBand is ChildBand band)
+                {
+                    topParentBand = band.GetTopParentBand;
+                }
 
                 if (processAt == ProcessAt.DataFinished && state == EngineState.BlockFinished)
                 {
                     // total can be printed on the same data header, or on its parent data band
-                    DataBand senderBand = sender as DataBand;
+                    var senderBand = sender as DataBand;
                     canProcess = true;
                     if (topParentBand is DataHeaderBand && (topParentBand.Parent != sender))
+                    {
                         canProcess = false;
+                    }
+
                     if (topParentBand is DataBand && senderBand.Parent != topParentBand)
+                    {
                         canProcess = false;
+                    }
                 }
                 else
                 {
@@ -160,9 +158,9 @@ namespace AM.Reporting.Engine
             else
             {
                 canProcess = (processAt == ProcessAt.ReportFinished && state == EngineState.ReportFinished) ||
-                    (processAt == ProcessAt.ReportPageFinished && state == EngineState.ReportPageFinished) ||
-                    (processAt == ProcessAt.PageFinished && state == EngineState.PageFinished) ||
-                    (processAt == ProcessAt.ColumnFinished && state == EngineState.ColumnFinished);
+                             (processAt == ProcessAt.ReportPageFinished && state == EngineState.ReportPageFinished) ||
+                             (processAt == ProcessAt.PageFinished && state == EngineState.PageFinished) ||
+                             (processAt == ProcessAt.ColumnFinished && state == EngineState.ColumnFinished);
             }
 
             if (canProcess)
@@ -171,7 +169,9 @@ namespace AM.Reporting.Engine
                 return true;
             }
             else
+            {
                 return false;
+            }
         }
 
         #endregion Public Methods
@@ -193,37 +193,40 @@ namespace AM.Reporting.Engine
 
         #region Private Methods
 
-        private void ProcessObjects(object sender, EngineState state)
+        private void ProcessObjects (object sender, EngineState state)
         {
-            for (int i = 0; i < objectsToProcess.Count; i++)
+            for (var i = 0; i < objectsToProcess.Count; i++)
             {
-                ProcessInfo info = objectsToProcess[i];
-                if (info.Process(sender, state))
+                var info = objectsToProcess[i];
+                if (info.Process (sender, state))
                 {
-                    objectsToProcess.RemoveAt(i);
+                    objectsToProcess.RemoveAt (i);
                     i--;
                 }
             }
         }
 
-        private void OnStateChanged(object sender, EngineState state)
+        private void OnStateChanged (object sender, EngineState state)
         {
-            ProcessObjects(sender, state);
+            ProcessObjects (sender, state);
             if (StateChanged != null)
-                StateChanged(sender, new EngineStateChangedEventArgs(this, state));
+            {
+                StateChanged (sender, new EngineStateChangedEventArgs (this, state));
+            }
         }
 
         #endregion Private Methods
 
         #region Internal Methods
 
-        internal void AddObjectToProcess(Base obj, XmlItem item)
+        internal void AddObjectToProcess (Base obj, XmlItem item)
         {
-            TextObject textObj = obj as TextObject;
-            if (textObj == null || textObj.ProcessAt == ProcessAt.Default)
+            if (obj is not TextObject textObj || textObj.ProcessAt == ProcessAt.Default)
+            {
                 return;
+            }
 
-            objectsToProcess.Add(new ProcessInfo(textObj, item));
+            objectsToProcess.Add (new ProcessInfo (textObj, item));
         }
 
         #endregion Internal Methods
@@ -234,15 +237,15 @@ namespace AM.Reporting.Engine
         /// Processes the specified text object which <b>ProcessAt</b> property is set to <b>Custom</b>.
         /// </summary>
         /// <param name="obj">The text object to process.</param>
-        public void ProcessObject(TextObjectBase obj)
+        public void ProcessObject (TextObjectBase obj)
         {
-            for (int i = 0; i < objectsToProcess.Count; i++)
+            for (var i = 0; i < objectsToProcess.Count; i++)
             {
-                ProcessInfo info = objectsToProcess[i];
+                var info = objectsToProcess[i];
                 if (info.TextObject == obj)
                 {
                     info.Process();
-                    objectsToProcess.RemoveAt(i);
+                    objectsToProcess.RemoveAt (i);
                     break;
                 }
             }

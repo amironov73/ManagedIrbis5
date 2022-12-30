@@ -26,38 +26,36 @@ using System.Collections;
 
 namespace AM.Reporting.Data
 {
-  internal class VirtualDataSource : DataSourceBase
-  {
-    private int virtualRowsCount;
-
-    public int VirtualRowsCount
+    internal class VirtualDataSource : DataSourceBase
     {
-      get { return virtualRowsCount; }
-      set { virtualRowsCount = value; }
-    }
+        public int VirtualRowsCount { get; set; }
 
-    #region Protected Methods
-    /// <inheritdoc/>
-    protected override object GetValue(Column column)
-    {
-      return null;
-    }
-    #endregion
+        #region Protected Methods
 
-    #region Public Methods
-    public override void InitSchema()
-    {
-     // do nothing
-    }
+        /// <inheritdoc/>
+        protected override object GetValue (Column column)
+        {
+            return null;
+        }
 
-    public override void LoadData(ArrayList rows)
-    {
-      rows.Clear();
-      for (int i = 0; i < virtualRowsCount; i++)
-      {
-        rows.Add(0);
-      }
+        #endregion
+
+        #region Public Methods
+
+        public override void InitSchema()
+        {
+            // do nothing
+        }
+
+        public override void LoadData (ArrayList rows)
+        {
+            rows.Clear();
+            for (var i = 0; i < VirtualRowsCount; i++)
+            {
+                rows.Add (0);
+            }
+        }
+
+        #endregion
     }
-    #endregion
-  }
 }

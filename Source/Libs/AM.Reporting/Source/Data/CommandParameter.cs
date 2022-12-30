@@ -17,7 +17,9 @@
 
 using System;
 using System.ComponentModel;
+
 using AM.Reporting.Utils;
+
 using System.Drawing.Design;
 using System.Data;
 
@@ -27,188 +29,195 @@ using System.Data;
 
 namespace AM.Reporting.Data
 {
-  /// <summary>
-  /// This class represents a single parameter to use in the "select" command.
-  /// </summary>
-  public class CommandParameter : Base
-  {
-    private enum ParamValue { Uninitialized }
-
-    #region Fields
-    private int dataType;
-    private int size;
-    private string expression;
-    private string defaultValue;
-    private object value;
-    private object lastValue;
-    private ParameterDirection direction;
-    #endregion
-
-    #region Properties
     /// <summary>
-    /// Gets or sets the parameter's data type.
+    /// This class represents a single parameter to use in the "select" command.
     /// </summary>
-    [TypeConverter(typeof(AM.Reporting.TypeConverters.ParameterDataTypeConverter))]
-    [Category("Data")]
-    [Editor("AM.Reporting.TypeEditors.ParameterDataTypeEditor, AM.Reporting", typeof(UITypeEditor))]
-    public virtual int DataType
+    public class CommandParameter : Base
     {
-      get { return dataType; }
-      set { dataType = value; }
-    }
+        private enum ParamValue
+        {
+            Uninitialized
+        }
 
-    /// <summary>
-    /// Gets or sets the size of parameter's data.
-    /// </summary>
-    /// <remarks>
-    /// This property is used if the <see cref="DataType"/> property is set to <b>String</b>.
-    /// </remarks>
-    [DefaultValue(0)]
-    [Category("Data")]
-    public virtual int Size
-    {
-      get { return size; }
-      set { size = value; }
-    }
+        #region Fields
 
-    /// <summary>
-    /// Gets or set type of parameter.
-    /// </summary>
-    [BrowsableAttribute(false)]
-    public virtual ParameterDirection Direction
-    {
-        get { return direction; }
-        set { direction = value; }
-    }
+        private string defaultValue;
+        private object value;
 
-    /// <summary>
-    /// Gets or sets an expression that returns the parameter's value.
-    /// </summary>
-    /// <remarks>
-    /// If this property is not set, the <see cref="DefaultValue"/> property will be used
-    /// to obtain a parameter's value.
-    /// </remarks>
-    [Category("Data")]
-    [Editor("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof(UITypeEditor))]
-    public virtual string Expression
-    {
-      get { return expression; }
-      set { expression = value; }
-    }
+        #endregion
 
-    /// <summary>
-    /// Gets or sets a default value for this parameter.
-    /// </summary>
-    /// <remarks>
-    /// This value is used when you designing a report. Also it is used when report is running
-    /// in case if you don't provide a value for the <see cref="Expression"/> property.
-    /// </remarks>
-    public virtual string DefaultValue
-    {
-      get { return defaultValue; }
-      set
-      {
-        defaultValue = value;
+        #region Properties
+
+        /// <summary>
+        /// Gets or sets the parameter's data type.
+        /// </summary>
+        [TypeConverter (typeof (TypeConverters.ParameterDataTypeConverter))]
+        [Category ("Data")]
+        [Editor ("AM.Reporting.TypeEditors.ParameterDataTypeEditor, AM.Reporting", typeof (UITypeEditor))]
+        public virtual int DataType { get; set; }
+
+        /// <summary>
+        /// Gets or sets the size of parameter's data.
+        /// </summary>
+        /// <remarks>
+        /// This property is used if the <see cref="DataType"/> property is set to <b>String</b>.
+        /// </remarks>
+        [DefaultValue (0)]
+        [Category ("Data")]
+        public virtual int Size { get; set; }
+
+        /// <summary>
+        /// Gets or set type of parameter.
+        /// </summary>
+        [BrowsableAttribute (false)]
+        public virtual ParameterDirection Direction { get; set; }
+
+        /// <summary>
+        /// Gets or sets an expression that returns the parameter's value.
+        /// </summary>
+        /// <remarks>
+        /// If this property is not set, the <see cref="DefaultValue"/> property will be used
+        /// to obtain a parameter's value.
+        /// </remarks>
+        [Category ("Data")]
+        [Editor ("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof (UITypeEditor))]
+        public virtual string Expression { get; set; }
+
+        /// <summary>
+        /// Gets or sets a default value for this parameter.
+        /// </summary>
+        /// <remarks>
+        /// This value is used when you designing a report. Also it is used when report is running
+        /// in case if you don't provide a value for the <see cref="Expression"/> property.
+        /// </remarks>
+        public virtual string DefaultValue
+        {
+            get => defaultValue;
+            set
+            {
+                defaultValue = value;
                 this.value = null;
-      }
-    }
+            }
+        }
 
-    /// <summary>
-    /// Gets or sets the parameter's value.
-    /// </summary>
-    [Browsable(false)]
-    public object Value
-    {
-      get
-      {
-        if (!String.IsNullOrEmpty(Expression) && Report.IsRunning)
-          value = Report.Calc(Expression);
-        if (value == null)
-          value = new Variant(DefaultValue);
-        return value;
-      }
-      set { this.value = value; }
-    }
+        /// <summary>
+        /// Gets or sets the parameter's value.
+        /// </summary>
+        [Browsable (false)]
+        public object Value
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty (Expression) && Report.IsRunning)
+                {
+                    value = Report.Calc (Expression);
+                }
 
-    /// <summary>
-    /// This property is not relevant to this class.
-    /// </summary>
-    [Browsable(false)]
-    public new Restrictions Restrictions
-    {
-      get { return base.Restrictions; }
-      set { base.Restrictions = value; }
-    }
+                if (value == null)
+                {
+                    value = new Variant (DefaultValue);
+                }
 
-    internal Type GetUnderlyingDataType
-    {
-      get
-      {
-        if (Parent is TableDataSource && Parent.Parent is DataConnectionBase)
-          return (Parent.Parent as DataConnectionBase).GetParameterType();
-        return null;
-      }
-    }
+                return value;
+            }
+            set => this.value = value;
+        }
 
-    internal object LastValue
-    {
-      get { return lastValue; }
-      set { lastValue = value; }
-    }
-    #endregion
+        /// <summary>
+        /// This property is not relevant to this class.
+        /// </summary>
+        [Browsable (false)]
+        public new Restrictions Restrictions
+        {
+            get => base.Restrictions;
+            set => base.Restrictions = value;
+        }
 
-    #region Public Methods
-    /// <inheritdoc/>
-    public override void Serialize(FRWriter writer)
-    {
-      CommandParameter c = writer.DiffObject as CommandParameter;
-      base.Serialize(writer);
+        internal Type GetUnderlyingDataType
+        {
+            get
+            {
+                if (Parent is TableDataSource && Parent.Parent is DataConnectionBase)
+                {
+                    return (Parent.Parent as DataConnectionBase).GetParameterType();
+                }
 
-      if (DataType != c.DataType)
-        writer.WriteInt("DataType", DataType);
-      if (Size != c.Size)
-        writer.WriteInt("Size", Size);
-      if (Expression != c.Expression)
-        writer.WriteStr("Expression", Expression);
-      if (DefaultValue != c.DefaultValue)
-        writer.WriteStr("DefaultValue", DefaultValue);
-      if (Direction != c.Direction)
-        writer.WriteValue("Direction", Direction);
-    }
+                return null;
+            }
+        }
 
-    /// <inheritdoc/>
-    public override void Assign(Base source)
-    {
-        base.Assign(source);
-        CommandParameter src= source as CommandParameter;
-        Name = src.Name;
-        DataType = src.DataType;
-        Size = src.Size;
-        Value = src.Value;
-        Expression = src.Expression;
-        DefaultValue = src.DefaultValue;
-    }
+        internal object LastValue { get; set; }
 
-    /// <inheritdoc/>
-    public override string[] GetExpressions()
-    {
-      return new string[] { Expression };
-    }
+        #endregion
 
-    internal void ResetLastValue()
-    {
-      LastValue = ParamValue.Uninitialized;
-    }
-    #endregion
+        #region Public Methods
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="CommandParameter"/> class with default settings.
-    /// </summary>
-    public CommandParameter()
-    {
-      Expression = "";
-      DefaultValue = "";
-      SetFlags(Flags.CanEdit | Flags.CanCopy, false);
+        /// <inheritdoc/>
+        public override void Serialize (FRWriter writer)
+        {
+            var c = writer.DiffObject as CommandParameter;
+            base.Serialize (writer);
+
+            if (DataType != c.DataType)
+            {
+                writer.WriteInt ("DataType", DataType);
+            }
+
+            if (Size != c.Size)
+            {
+                writer.WriteInt ("Size", Size);
+            }
+
+            if (Expression != c.Expression)
+            {
+                writer.WriteStr ("Expression", Expression);
+            }
+
+            if (DefaultValue != c.DefaultValue)
+            {
+                writer.WriteStr ("DefaultValue", DefaultValue);
+            }
+
+            if (Direction != c.Direction)
+            {
+                writer.WriteValue ("Direction", Direction);
+            }
+        }
+
+        /// <inheritdoc/>
+        public override void Assign (Base source)
+        {
+            base.Assign (source);
+            var src = source as CommandParameter;
+            Name = src.Name;
+            DataType = src.DataType;
+            Size = src.Size;
+            Value = src.Value;
+            Expression = src.Expression;
+            DefaultValue = src.DefaultValue;
+        }
+
+        /// <inheritdoc/>
+        public override string[] GetExpressions()
+        {
+            return new string[] { Expression };
+        }
+
+        internal void ResetLastValue()
+        {
+            LastValue = ParamValue.Uninitialized;
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CommandParameter"/> class with default settings.
+        /// </summary>
+        public CommandParameter()
+        {
+            Expression = "";
+            DefaultValue = "";
+            SetFlags (Flags.CanEdit | Flags.CanCopy, false);
+        }
     }
-  }
 }

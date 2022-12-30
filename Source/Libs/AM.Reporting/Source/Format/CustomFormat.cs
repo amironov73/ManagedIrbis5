@@ -34,10 +34,11 @@ namespace AM.Reporting.Format
     public class CustomFormat : FormatBase
     {
         #region Fields
-        private string format;
+
         #endregion
 
         #region Properties
+
         /// <summary>
         /// Gets or sets a format string.
         /// </summary>
@@ -46,26 +47,26 @@ namespace AM.Reporting.Format
         /// format string: "MM/dd/yyyy". See the <b>System.String.Format</b> method for list
         /// of possible format strings.
         /// </remarks>
-        public string Format
-        {
-            get { return format; }
-            set { format = value; }
-        }
+        public string Format { get; set; }
+
         #endregion
 
         #region Public Methods
+
         /// <inheritdoc/>
         public override FormatBase Clone()
         {
-            CustomFormat result = new CustomFormat();
-            result.Format = Format;
+            var result = new CustomFormat
+            {
+                Format = Format
+            };
             return result;
         }
 
         /// <inheritdoc/>
-        public override bool Equals(object obj)
+        public override bool Equals (object obj)
         {
-            CustomFormat f = obj as CustomFormat;
+            var f = obj as CustomFormat;
             return f != null && Format == f.Format;
         }
 
@@ -76,11 +77,14 @@ namespace AM.Reporting.Format
         }
 
         /// <inheritdoc/>
-        public override string FormatValue(object value)
+        public override string FormatValue (object value)
         {
-            if (value is Variant)
-                value = ((Variant)value).Value;
-            return String.Format("{0:" + Format + "}", value);
+            if (value is Variant variant)
+            {
+                value = variant.Value;
+            }
+
+            return string.Format ("{0:" + Format + "}", value);
         }
 
         internal override string GetSampleValue()
@@ -88,14 +92,16 @@ namespace AM.Reporting.Format
             return "";
         }
 
-        internal override void Serialize(FRWriter writer, string prefix, FormatBase format)
+        internal override void Serialize (FRWriter writer, string prefix, FormatBase format)
         {
-            base.Serialize(writer, prefix, format);
-            CustomFormat c = format as CustomFormat;
+            base.Serialize (writer, prefix, format);
 
-            if (c == null || Format != c.Format)
-                writer.WriteStr(prefix + "Format", Format);
+            if (format is not CustomFormat c || Format != c.Format)
+            {
+                writer.WriteStr (prefix + "Format", Format);
+            }
         }
+
         #endregion
 
         /// <summary>

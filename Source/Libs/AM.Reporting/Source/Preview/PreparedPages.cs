@@ -69,110 +69,68 @@ namespace AM.Reporting.Preview
     /// </list>
     /// </para>
     /// </remarks>
-    [ToolboxItem(false)]
+    [ToolboxItem (false)]
     public partial class PreparedPages : IDisposable
     {
         #region Fields
-        private SourcePages sourcePages;
+
         private List<PreparedPage> preparedPages;
-        private Dictionary dictionary;
-        private Bookmarks bookmarks;
-        private Outline outline;
-        private BlobStore blobStore;
-        private int curPage;
-        private AddPageAction addPageAction;
-        private Report report;
         private PageCache pageCache;
-        private FileStream tempFile;
         private bool canUpload;
         private string tempFileName;
         private XmlItem cutObjects;
-        private Dictionary<string, object> macroValues;
         private int firstPassPage;
         private int firstPassPosition;
+
         #endregion
 
         #region Properties
-        internal Report Report
-        {
-            get { return report; }
-        }
 
-        internal SourcePages SourcePages
-        {
-            get { return sourcePages; }
-        }
+        internal Report Report { get; private set; }
 
-        internal Dictionary Dictionary
-        {
-            get { return dictionary; }
-        }
+        internal SourcePages SourcePages { get; }
 
-        internal Bookmarks Bookmarks
-        {
-            get { return bookmarks; }
-        }
+        internal Dictionary Dictionary { get; }
 
-        internal Outline Outline
-        {
-            get { return outline; }
-        }
+        internal Bookmarks Bookmarks { get; }
 
-        internal BlobStore BlobStore
-        {
-            get { return blobStore; }
-        }
+        internal Outline Outline { get; }
 
-        internal FileStream TempFile
-        {
-            get { return tempFile; }
-        }
+        internal BlobStore BlobStore { get; }
 
-        internal Dictionary<string, object> MacroValues
-        {
-            get { return macroValues; }
-        }
+        internal FileStream TempFile { get; private set; }
+
+        internal Dictionary<string, object> MacroValues { get; }
 
         internal int CurPosition
         {
             get
             {
                 if (CurPage < 0 || CurPage >= Count)
+                {
                     return 0;
+                }
+
                 return preparedPages[CurPage].CurPosition;
             }
         }
 
-        internal int CurPage
-        {
-            get { return curPage; }
-            set { curPage = value; }
-        }
+        internal int CurPage { get; set; }
 
         /// <summary>
         /// Gets the number of pages in the prepared report.
         /// </summary>
-        public int Count
-        {
-            get { return preparedPages.Count; }
-        }
+        public int Count => preparedPages.Count;
 
         /// <summary>
         /// Gets the XML for rendering the outline of the report
         /// </summary>
-        public XmlItem OutlineXml
-        {
-            get => outline.Xml;
-        }
+        public XmlItem OutlineXml => Outline.Xml;
 
         /// <summary>
         /// Specifies an action that will be performed on <see cref="AddPage"/> method call.
         /// </summary>
-        public AddPageAction AddPageAction
-        {
-            get { return addPageAction; }
-            set { addPageAction = value; }
-        }
+        public AddPageAction AddPageAction { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the prepared pages can be uploaded to the file cache.
@@ -185,52 +143,63 @@ namespace AM.Reporting.Preview
         /// </remarks>
         public bool CanUploadToCache
         {
-            get { return canUpload; }
+            get => canUpload;
             set
             {
-              if (canUpload != value)
-              {
-                canUpload = value;
-                if (value)
-                  UploadPages();
-              }
+                if (canUpload != value)
+                {
+                    canUpload = value;
+                    if (value)
+                    {
+                        UploadPages();
+                    }
+                }
             }
         }
+
         #endregion
 
         #region Private Methods
+
         private void UploadPages()
         {
             if (Report.UseFileCache)
             {
-                for (int i = 0; i < Count - 1; i++)
+                for (var i = 0; i < Count - 1; i++)
                 {
                     preparedPages[i].Upload();
                 }
             }
         }
+
         #endregion
 
         #region Protected Methods
+
         /// <inheritdoc/>
         public void Dispose()
         {
             Clear();
-            if (tempFile != null)
+            if (TempFile != null)
             {
-                tempFile.Dispose();
-                tempFile = null;
-                if (File.Exists(tempFileName))
-                    File.Delete(tempFileName);
+                TempFile.Dispose();
+                TempFile = null;
+                if (File.Exists (tempFileName))
+                {
+                    File.Delete (tempFileName);
+                }
             }
+
             BlobStore.Dispose();
         }
+
         #endregion
 
         #region Public Methods
-        internal void SetReport(Report report)
+
+        internal void SetReport (Report report)
         {
-            this.report = report;
+            this.Report = report;
         }
 
         /// <summary>
@@ -241,9 +210,9 @@ namespace AM.Reporting.Preview
         /// Call this method before using <b>AddPage</b> and <b>AddBand</b> methods. This method adds
         /// a page to the dictionary that will be used to decrease size of the prepared report.
         /// </remarks>
-        public void AddSourcePage(ReportPage page)
+        public void AddSourcePage (ReportPage page)
         {
-            SourcePages.Add(page);
+            SourcePages.Add (page);
         }
 
         /// <summary>
@@ -254,17 +223,19 @@ namespace AM.Reporting.Preview
         /// Call the <see cref="AddSourcePage"/> method before adding a page. This method creates
         /// a new output page with settings based on <b>page</b> parameter.
         /// </remarks>
-        public void AddPage(ReportPage page)
+        public void AddPage (ReportPage page)
         {
             CurPage++;
             if (CurPage >= Count || AddPageAction != AddPageAction.WriteOver)
             {
-                PreparedPage preparedPage = new PreparedPage(page, this);
-                preparedPages.Add(preparedPage);
+                var preparedPage = new PreparedPage (page, this);
+                preparedPages.Add (preparedPage);
 
                 // upload previous page to the file cache if enabled
                 if (CanUploadToCache && Count > 1)
+                {
                     preparedPages[Count - 2].Upload();
+                }
 
                 AddPageAction = AddPageAction.WriteOver;
                 CurPage = Count - 1;
@@ -281,9 +252,9 @@ namespace AM.Reporting.Preview
         /// <remarks>
         /// Call the <see cref="AddPage"/> method before adding a band.
         /// </remarks>
-        public bool AddBand(BandBase band)
+        public bool AddBand (BandBase band)
         {
-            return preparedPages[CurPage].AddBand(band);
+            return preparedPages[CurPage].AddBand (band);
         }
 
         /// <summary>
@@ -291,40 +262,45 @@ namespace AM.Reporting.Preview
         /// </summary>
         /// <param name="index">Zero-based index of page.</param>
         /// <returns>The page with specified index.</returns>
-        public ReportPage GetPage(int index)
+        public ReportPage GetPage (int index)
         {
             if (index >= 0 && index < preparedPages.Count)
             {
-                macroValues["Page#"] = index + Report.InitialPageNumber;
-                macroValues["TotalPages#"] = preparedPages.Count + Report.InitialPageNumber - 1;
-                ReportPage page = preparedPages[index].GetPage();
+                MacroValues["Page#"] = index + Report.InitialPageNumber;
+                MacroValues["TotalPages#"] = preparedPages.Count + Report.InitialPageNumber - 1;
+                var page = preparedPages[index].GetPage();
                 if (page.MirrorMargins && (index + 1) % 2 == 0)
                 {
-                    float f = page.LeftMargin;
+                    var f = page.LeftMargin;
                     page.LeftMargin = page.RightMargin;
                     page.RightMargin = f;
                 }
+
                 return page;
             }
             else
+            {
                 return null;
+            }
         }
 
-        internal PreparedPage GetPreparedPage(int index)
+        internal PreparedPage GetPreparedPage (int index)
         {
             if (index >= 0 && index < preparedPages.Count)
             {
-                macroValues["Page#"] = index + Report.InitialPageNumber;
-                macroValues["TotalPages#"] = preparedPages.Count + Report.InitialPageNumber - 1;
+                MacroValues["Page#"] = index + Report.InitialPageNumber;
+                MacroValues["TotalPages#"] = preparedPages.Count + Report.InitialPageNumber - 1;
                 return preparedPages[index];
             }
             else
+            {
                 return null;
+            }
         }
 
-        internal ReportPage GetCachedPage(int index)
+        internal ReportPage GetCachedPage (int index)
         {
-            return pageCache.Get(index);
+            return pageCache.Get (index);
         }
 
         /// <summary>
@@ -332,7 +308,7 @@ namespace AM.Reporting.Preview
         /// </summary>
         /// <param name="index">Index of page.</param>
         /// <returns>the size of specified page, in pixels.</returns>
-        public SizeF GetPageSize(int index)
+        public SizeF GetPageSize (int index)
         {
             return preparedPages[index].PageSize;
         }
@@ -342,28 +318,31 @@ namespace AM.Reporting.Preview
         /// </summary>
         /// <param name="index">The index of prepared page to replace.</param>
         /// <param name="newPage">The new page to replace with.</param>
-        public void ModifyPage(int index, ReportPage newPage)
+        public void ModifyPage (int index, ReportPage newPage)
         {
-            PreparedPage preparedPage = new PreparedPage(newPage, this);
+            var preparedPage = new PreparedPage (newPage, this);
             foreach (Base obj in newPage.ChildObjects)
             {
-                if (obj is BandBase)
-                    preparedPage.AddBand(obj as BandBase);
+                if (obj is BandBase @base)
+                {
+                    preparedPage.AddBand (@base);
+                }
             }
+
             preparedPages[index].Dispose();
             preparedPages[index] = preparedPage;
-            pageCache.Remove(index);
+            pageCache.Remove (index);
         }
 
         /// <summary>
         /// Modify the prepared page with new sizes.
         /// </summary>
         /// <param name="name">The name of prepared page to reSize.</param>
-        public void ModifyPageSize(string name)
+        public void ModifyPageSize (string name)
         {
-            foreach (PreparedPage page in preparedPages)
+            foreach (var page in preparedPages)
             {
-                if (String.Equals(name, page.GetName(), StringComparison.InvariantCultureIgnoreCase))
+                if (string.Equals (name, page.GetName(), StringComparison.InvariantCultureIgnoreCase))
                 {
                     page.ReCalcSizes();
                 }
@@ -374,10 +353,10 @@ namespace AM.Reporting.Preview
         /// Removes a page with the specified index.
         /// </summary>
         /// <param name="index">The zero-based index of page to remove.</param>
-        public void RemovePage(int index)
+        public void RemovePage (int index)
         {
             preparedPages[index].Dispose();
-            preparedPages.RemoveAt(index);
+            preparedPages.RemoveAt (index);
             pageCache.Clear();
         }
 
@@ -386,44 +365,48 @@ namespace AM.Reporting.Preview
         /// Creates a copy of a page with specified index and inserts it after original one.
         /// </summary>
         /// <param name="index">The zero-based index of original page.</param>
-        public void CopyPage(int index)
+        public void CopyPage (int index)
         {
             // insert a new empty page at specified index
-            PreparedPage newPage = new PreparedPage(null, this);
+            var newPage = new PreparedPage (null, this);
             if (index == preparedPages.Count - 1)
-                preparedPages.Add(newPage);
+            {
+                preparedPages.Add (newPage);
+            }
             else
-                preparedPages.Insert(index + 1, newPage);
+            {
+                preparedPages.Insert (index + 1, newPage);
+            }
 
             // and copy source page into it
-            ModifyPage(index + 1, GetPage(index));
+            ModifyPage (index + 1, GetPage (index));
             pageCache.Clear();
         }
 
-        internal void InterleaveWithBackPage(int backPageIndex)
+        internal void InterleaveWithBackPage (int backPageIndex)
         {
-            PreparedPage page = preparedPages[backPageIndex];
-            int count = backPageIndex - 1;
-            for (int i = 0; i < count; i++)
+            var page = preparedPages[backPageIndex];
+            var count = backPageIndex - 1;
+            for (var i = 0; i < count; i++)
             {
-                preparedPages.Insert(i * 2 + 1, page);
+                preparedPages.Insert (i * 2 + 1, page);
             }
         }
 
-        internal void ApplyWatermark(Watermark watermark)
+        internal void ApplyWatermark (Watermark watermark)
         {
-            SourcePages.ApplyWatermark(watermark);
+            SourcePages.ApplyWatermark (watermark);
             pageCache.Clear();
         }
 
-        internal void CutObjects(int index)
+        internal void CutObjects (int index)
         {
-            cutObjects = preparedPages[CurPage].CutObjects(index);
+            cutObjects = preparedPages[CurPage].CutObjects (index);
         }
 
-        internal void PasteObjects(float x, float y)
+        internal void PasteObjects (float x, float y)
         {
-            preparedPages[CurPage].PasteObjects(cutObjects, x, y);
+            preparedPages[CurPage].PasteObjects (cutObjects, x, y);
         }
 
         internal float GetLastY()
@@ -446,104 +429,113 @@ namespace AM.Reporting.Preview
             // clear all pages after specified FFirstPassPage
             while (firstPassPage < Count - 1)
             {
-                RemovePage(Count - 1);
+                RemovePage (Count - 1);
             }
 
             // if position is at begin, clear all pages
             if (firstPassPage == 0 && firstPassPosition == 0)
-                RemovePage(0);
+            {
+                RemovePage (0);
+            }
 
             // delete objects on the FFirstPassPage
             if (firstPassPage >= 0 && firstPassPage < Count)
-                preparedPages[firstPassPage].CutObjects(firstPassPosition).Dispose();
+            {
+                preparedPages[firstPassPage].CutObjects (firstPassPosition).Dispose();
+            }
 
             CurPage = firstPassPage;
         }
 
-        internal bool ContainsBand(Type bandType)
+        internal bool ContainsBand (Type bandType)
         {
-            return preparedPages[CurPage].ContainsBand(bandType);
+            return preparedPages[CurPage].ContainsBand (bandType);
         }
 
-        internal bool ContainsBand(string bandName)
+        internal bool ContainsBand (string bandName)
         {
-            return preparedPages[CurPage].ContainsBand(bandName);
+            return preparedPages[CurPage].ContainsBand (bandName);
         }
 
         /// <summary>
         /// Saves prepared pages to a stream.
         /// </summary>
         /// <param name="stream">The stream to save to.</param>
-        public void Save(Stream stream)
+        public void Save (Stream stream)
         {
             if (Config.PreparedCompressed)
-                stream = Compressor.Compress(stream);
+            {
+                stream = Compressor.Compress (stream);
+            }
 
-            using (XmlDocument doc = new XmlDocument())
+            using (var doc = new XmlDocument())
             {
                 doc.AutoIndent = true;
                 doc.Root.Name = "preparedreport";
 
                 // save ReportInfo
-                doc.Root.SetProp("ReportInfo.Name", Report.ReportInfo.Name);
-                doc.Root.SetProp("ReportInfo.Author", Report.ReportInfo.Author);
-                doc.Root.SetProp("ReportInfo.Description", Report.ReportInfo.Description);
-                doc.Root.SetProp("ReportInfo.Created", SystemFake.DateTime.Now.ToString());
-                doc.Root.SetProp("ReportInfo.Modified", SystemFake.DateTime.Now.ToString());
-                doc.Root.SetProp("ReportInfo.CreatorVersion", Report.ReportInfo.CreatorVersion);
+                doc.Root.SetProp ("ReportInfo.Name", Report.ReportInfo.Name);
+                doc.Root.SetProp ("ReportInfo.Author", Report.ReportInfo.Author);
+                doc.Root.SetProp ("ReportInfo.Description", Report.ReportInfo.Description);
+                doc.Root.SetProp ("ReportInfo.Created", SystemFake.DateTime.Now.ToString());
+                doc.Root.SetProp ("ReportInfo.Modified", SystemFake.DateTime.Now.ToString());
+                doc.Root.SetProp ("ReportInfo.CreatorVersion", Report.ReportInfo.CreatorVersion);
 
-                XmlItem pages = doc.Root.Add();
+                var pages = doc.Root.Add();
                 pages.Name = "pages";
 
                 // attach each page's xml to the doc
-                foreach (PreparedPage page in preparedPages)
+                foreach (var page in preparedPages)
                 {
                     page.Load();
-                    pages.AddItem(page.Xml);
+                    pages.AddItem (page.Xml);
                 }
 
-                XmlItem sourcePages = doc.Root.Add();
+                var sourcePages = doc.Root.Add();
                 sourcePages.Name = "sourcepages";
-                SourcePages.Save(sourcePages);
+                SourcePages.Save (sourcePages);
 
-                XmlItem dictionary = doc.Root.Add();
+                var dictionary = doc.Root.Add();
                 dictionary.Name = "dictionary";
-                Dictionary.Save(dictionary);
+                Dictionary.Save (dictionary);
 
-                XmlItem bookmarks = doc.Root.Add();
+                var bookmarks = doc.Root.Add();
                 bookmarks.Name = "bookmarks";
-                Bookmarks.Save(bookmarks);
+                Bookmarks.Save (bookmarks);
 
-                doc.Root.AddItem(Outline.Xml);
+                doc.Root.AddItem (Outline.Xml);
 
-                XmlItem blobStore = doc.Root.Add();
+                var blobStore = doc.Root.Add();
                 blobStore.Name = "blobstore";
-                BlobStore.Save(blobStore);
+                BlobStore.Save (blobStore);
 
-                doc.Save(stream);
+                doc.Save (stream);
 
                 // detach each page's xml from the doc
-                foreach (PreparedPage page in preparedPages)
+                foreach (var page in preparedPages)
                 {
                     page.Xml.Parent = null;
                     page.ClearUploadedXml();
                 }
+
                 Outline.Xml.Parent = null;
             }
 
             if (Config.PreparedCompressed)
+            {
                 stream.Dispose();
+            }
         }
 
         /// <summary>
         /// Saves prepared pages to a .fpx file.
         /// </summary>
         /// <param name="fileName">The name of the file to save to.</param>
-        public void Save(string fileName)
+        public void Save (string fileName)
         {
-            using (FileStream stream = new FileStream(fileName, FileMode.Create, FileAccess.Write))
+            using (var stream = new FileStream (fileName, FileMode.Create, FileAccess.Write))
             {
-                Save(stream);
+                Save (stream);
             }
         }
 
@@ -551,73 +543,84 @@ namespace AM.Reporting.Preview
         /// Loads prepared pages from a stream.
         /// </summary>
         /// <param name="stream">The stream to load from.</param>
-        public void Load(Stream stream)
+        public void Load (Stream stream)
         {
             Clear();
 
             if (stream.Length == 0)
+            {
                 return;
+            }
 
             if (!stream.CanSeek)
             {
-                MemoryStream tempStream = new MemoryStream();
+                var tempStream = new MemoryStream();
                 const int BUFFER_SIZE = 32768;
-                stream.CopyTo(tempStream, BUFFER_SIZE);
+                stream.CopyTo (tempStream, BUFFER_SIZE);
                 tempStream.Position = 0;
                 stream = tempStream;
             }
 
-            bool compressed = Compressor.IsStreamCompressed(stream);
+            var compressed = Compressor.IsStreamCompressed (stream);
             if (compressed)
-                stream = Compressor.Decompress(stream, false);
+            {
+                stream = Compressor.Decompress (stream, false);
+            }
 
             try
             {
-                using (XmlDocument doc = new XmlDocument())
+                using (var doc = new XmlDocument())
                 {
-                    doc.Load(stream);
+                    doc.Load (stream);
 
-                    XmlItem sourcePages = doc.Root.FindItem("sourcepages");
-                    SourcePages.Load(sourcePages);
+                    var sourcePages = doc.Root.FindItem ("sourcepages");
+                    SourcePages.Load (sourcePages);
 
-                    XmlItem dictionary = doc.Root.FindItem("dictionary");
-                    Dictionary.Load(dictionary);
+                    var dictionary = doc.Root.FindItem ("dictionary");
+                    Dictionary.Load (dictionary);
 
-                    XmlItem bookmarks = doc.Root.FindItem("bookmarks");
-                    Bookmarks.Load(bookmarks);
+                    var bookmarks = doc.Root.FindItem ("bookmarks");
+                    Bookmarks.Load (bookmarks);
 
-                    XmlItem outline = doc.Root.FindItem("outline");
+                    var outline = doc.Root.FindItem ("outline");
                     Outline.Xml = outline;
 
 
-                    XmlItem blobStore = doc.Root.FindItem("blobstore");
-                    BlobStore.LoadDestructive(blobStore);
+                    var blobStore = doc.Root.FindItem ("blobstore");
+                    BlobStore.LoadDestructive (blobStore);
 
-                    XmlItem pages = doc.Root.FindItem("pages");
+                    var pages = doc.Root.FindItem ("pages");
                     while (pages.Count > 0)
                     {
-                        XmlItem pageItem = pages[0];
-                        PreparedPage preparedPage = new PreparedPage(null, this);
-                        preparedPages.Add(preparedPage);
+                        var pageItem = pages[0];
+                        var preparedPage = new PreparedPage (null, this);
+                        preparedPages.Add (preparedPage);
                         preparedPage.Xml = pageItem;
                     }
 
                     // load ReportInfo
-                    Report.ReportInfo.Name = doc.Root.GetProp("ReportInfo.Name");
-                    Report.ReportInfo.Author = doc.Root.GetProp("ReportInfo.Author");
-                    Report.ReportInfo.Description = doc.Root.GetProp("ReportInfo.Description");
-                    DateTime createDate;
-                    if (DateTime.TryParse(doc.Root.GetProp("ReportInfo.Created"), out createDate))
+                    Report.ReportInfo.Name = doc.Root.GetProp ("ReportInfo.Name");
+                    Report.ReportInfo.Author = doc.Root.GetProp ("ReportInfo.Author");
+                    Report.ReportInfo.Description = doc.Root.GetProp ("ReportInfo.Description");
+                    if (DateTime.TryParse (doc.Root.GetProp ("ReportInfo.Created"), out var createDate))
+                    {
                         Report.ReportInfo.Created = createDate;
-                    if (DateTime.TryParse(doc.Root.GetProp("ReportInfo.Modified"), out createDate))
+                    }
+
+                    if (DateTime.TryParse (doc.Root.GetProp ("ReportInfo.Modified"), out createDate))
+                    {
                         Report.ReportInfo.Modified = createDate;
-                    Report.ReportInfo.CreatorVersion = doc.Root.GetProp("ReportInfo.CreatorVersion");
+                    }
+
+                    Report.ReportInfo.CreatorVersion = doc.Root.GetProp ("ReportInfo.CreatorVersion");
                 }
             }
             finally
             {
                 if (compressed)
+                {
                     stream.Dispose();
+                }
             }
         }
 
@@ -625,11 +628,11 @@ namespace AM.Reporting.Preview
         /// Loads prepared pages from a .fpx file.
         /// </summary>
         /// <param name="fileName">The name of the file to load from.</param>
-        public void Load(string fileName)
+        public void Load (string fileName)
         {
-            using (FileStream stream = new FileStream(fileName, FileMode.Open, FileAccess.Read))
+            using (var stream = new FileStream (fileName, FileMode.Open, FileAccess.Read))
             {
-                Load(stream);
+                Load (stream);
             }
         }
 
@@ -638,45 +641,47 @@ namespace AM.Reporting.Preview
         /// </summary>
         public void Clear()
         {
-            sourcePages.Clear();
+            SourcePages.Clear();
             pageCache.Clear();
-            foreach (PreparedPage page in preparedPages)
+            foreach (var page in preparedPages)
             {
                 page.Dispose();
             }
+
             preparedPages.Clear();
-            dictionary.Clear();
-            bookmarks.Clear();
-            outline.Clear();
-            blobStore.Clear();
-            curPage = 0;
+            Dictionary.Clear();
+            Bookmarks.Clear();
+            Outline.Clear();
+            BlobStore.Clear();
+            CurPage = 0;
         }
 
         internal void ClearPageCache()
         {
             pageCache.Clear();
         }
+
         #endregion
 
         /// <summary>
         /// Creates the pages of a prepared report
         /// </summary>
         /// <param name="report"></param>
-        public PreparedPages(Report report)
+        public PreparedPages (Report report)
         {
-            this.report = report;
-            sourcePages = new SourcePages(this);
+            this.Report = report;
+            SourcePages = new SourcePages (this);
             preparedPages = new List<PreparedPage>();
-            dictionary = new Dictionary(this);
-            bookmarks = new Bookmarks();
-            outline = new Outline();
-            blobStore = new BlobStore(report != null ? report.UseFileCache : false);
-            pageCache = new PageCache(this);
-            macroValues = new Dictionary<string, object>();
-            if (this.report != null && this.report.UseFileCache)
+            Dictionary = new Dictionary (this);
+            Bookmarks = new Bookmarks();
+            Outline = new Outline();
+            BlobStore = new BlobStore (report != null ? report.UseFileCache : false);
+            pageCache = new PageCache (this);
+            MacroValues = new Dictionary<string, object>();
+            if (this.Report != null && this.Report.UseFileCache)
             {
-                tempFileName = Config.CreateTempFile("");
-                tempFile = new FileStream(tempFileName, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                tempFileName = Config.CreateTempFile ("");
+                TempFile = new FileStream (tempFileName, FileMode.OpenOrCreate, FileAccess.ReadWrite);
             }
         }
     }

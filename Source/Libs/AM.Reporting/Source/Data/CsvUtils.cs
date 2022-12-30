@@ -23,7 +23,9 @@ using System.Data;
 using System.Data.Common;
 using System.IO;
 using System.Net;
+
 using AM.Reporting.Utils;
+
 using System.Globalization;
 using System.Collections;
 
@@ -40,20 +42,16 @@ namespace AM.Reporting.Data
         /// </summary>
         public const string DEFAULT_FIELD_NAME = "Field";
 
-        private static void DetermineTypes(List<string[]> lines, DataTable table, NumberFormatInfo numberInfo, NumberFormatInfo currencyInfo, DateTimeFormatInfo dateTimeInfo)
+        private static void DetermineTypes (List<string[]> lines, DataTable table, NumberFormatInfo numberInfo,
+            NumberFormatInfo currencyInfo, DateTimeFormatInfo dateTimeInfo)
         {
-            int intTemp;
-            double doubleTemp;
-            decimal decimalTemp;
-            DateTime dateTemp;
-
-            for (int i = 0; i < table.Columns.Count; i++)
+            for (var i = 0; i < table.Columns.Count; i++)
             {
                 // gather types here
                 Dictionary<Type, int> types = new Dictionary<Type, int>();
 
                 // check all values in the column
-                for (int j = 0; j < lines.Count; j++)
+                for (var j = 0; j < lines.Count; j++)
                 {
                     if (i >= lines[j].Length)
                     {
@@ -62,28 +60,30 @@ namespace AM.Reporting.Data
                     }
                     else
                     {
-                        string value = lines[j][i];
-                        if (!String.IsNullOrEmpty(value))
+                        var value = lines[j][i];
+                        if (!string.IsNullOrEmpty (value))
                         {
-                            if (Int32.TryParse(value, out intTemp))
+                            if (int.TryParse (value, out var intTemp))
                             {
-                                types[typeof(Int32)] = 1;
+                                types[typeof (int)] = 1;
                             }
-                            else if (value.Contains(currencyInfo.CurrencySymbol) && Decimal.TryParse(value, NumberStyles.Currency, currencyInfo, out decimalTemp))
+                            else if (value.Contains (currencyInfo.CurrencySymbol) && decimal.TryParse (value,
+                                         NumberStyles.Currency, currencyInfo, out var decimalTemp))
                             {
-                                types[typeof(Decimal)] = 1;
+                                types[typeof (decimal)] = 1;
                             }
-                            else if (Double.TryParse(value, NumberStyles.Number, numberInfo, out doubleTemp))
+                            else if (double.TryParse (value, NumberStyles.Number, numberInfo, out var doubleTemp))
                             {
-                                types[typeof(Double)] = 1;
+                                types[typeof (double)] = 1;
                             }
-                            else if (DateTime.TryParse(value, dateTimeInfo, DateTimeStyles.NoCurrentDateDefault, out dateTemp))
+                            else if (DateTime.TryParse (value, dateTimeInfo, DateTimeStyles.NoCurrentDateDefault,
+                                         out var dateTemp))
                             {
-                                types[typeof(DateTime)] = 1;
+                                types[typeof (DateTime)] = 1;
                             }
                             else
                             {
-                                types[typeof(String)] = 1;
+                                types[typeof (string)] = 1;
                                 break;
                             }
                         }
@@ -94,28 +94,30 @@ namespace AM.Reporting.Data
                 // - single type -> the type
                 // - mix of ints and doubles -> double
                 // - all others should not be mixed -> string
-                Type guessType = typeof(String);
+                var guessType = typeof (string);
                 if (types.Count == 1)
                 {
                     // get a single value this way
-                    foreach (Type t in types.Keys)
+                    foreach (var t in types.Keys)
                     {
                         guessType = t;
                     }
                 }
-                else if (types.Count == 2 && types.ContainsKey(typeof(Int32)) && types.ContainsKey(typeof(Double)))
+                else if (types.Count == 2 && types.ContainsKey (typeof (int)) && types.ContainsKey (typeof (double)))
                 {
-                    guessType = typeof(Double);
+                    guessType = typeof (double);
                 }
 
                 table.Columns[i].DataType = guessType;
             }
         }
 
-        internal static List<string> ReadLines(CsvConnectionStringBuilder builder, int maxLines = 0)
+        internal static List<string> ReadLines (CsvConnectionStringBuilder builder, int maxLines = 0)
         {
-            if (String.IsNullOrEmpty(builder.CsvFile) || String.IsNullOrEmpty(builder.Separator))
+            if (string.IsNullOrEmpty (builder.CsvFile) || string.IsNullOrEmpty (builder.Separator))
+            {
                 return null;
+            }
 
             ServicePointManager.Expect100Continue = true;
             ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072;
@@ -125,28 +127,33 @@ namespace AM.Reporting.Data
             try
             {
                 // fix for datafile in current folder
-                if (File.Exists(builder.CsvFile))
-                    builder.CsvFile = Path.GetFullPath(builder.CsvFile);
+                if (File.Exists (builder.CsvFile))
+                {
+                    builder.CsvFile = Path.GetFullPath (builder.CsvFile);
+                }
 
-                Uri uri = new Uri(builder.CsvFile);
+                var uri = new Uri (builder.CsvFile);
 
                 if (uri.IsFile)
                 {
                     if (Config.ForbidLocalData)
-                        throw new Exception(Res.Get("ConnectionEditors,Common,OnlyUrlException"));
-                    request = (FileWebRequest)WebRequest.Create(uri);
+                    {
+                        throw new Exception (Res.Get ("ConnectionEditors,Common,OnlyUrlException"));
+                    }
+
+                    request = (FileWebRequest)WebRequest.Create (uri);
                     request.Timeout = 5000;
                     response = (FileWebResponse)request.GetResponse();
                 }
-                else if (uri.OriginalString.StartsWith("http"))
+                else if (uri.OriginalString.StartsWith ("http"))
                 {
-                    request = (HttpWebRequest)WebRequest.Create(uri);
+                    request = (HttpWebRequest)WebRequest.Create (uri);
                     request.Timeout = 5000;
                     response = (HttpWebResponse)request.GetResponse();
                 }
-                else if (uri.OriginalString.StartsWith("ftp"))
+                else if (uri.OriginalString.StartsWith ("ftp"))
                 {
-                    request = (FtpWebRequest)WebRequest.Create(uri);
+                    request = (FtpWebRequest)WebRequest.Create (uri);
                     request.Timeout = 5000;
                     response = (FtpWebResponse)request.GetResponse();
                 }
@@ -157,78 +164,97 @@ namespace AM.Reporting.Data
             }
 
             if (response == null)
+            {
                 return null;
+            }
 
             List<string> lines = new List<string>();
             if (maxLines == 0)
+            {
                 maxLines = int.MaxValue;
+            }
 
             // read lines
-            using (StreamReader reader = new StreamReader(response.GetResponseStream(), Encoding.GetEncoding(builder.Codepage)))
+            using (var reader =
+                   new StreamReader (response.GetResponseStream(), Encoding.GetEncoding (builder.Codepage)))
             {
-                for (int i = 0; i < maxLines; i++)
+                for (var i = 0; i < maxLines; i++)
                 {
-                    string line = reader.ReadLine();
+                    var line = reader.ReadLine();
+
                     // end of stream reached
                     if (line == null)
+                    {
                         break;
+                    }
 
                     // skip empty lines
-                    if (!String.IsNullOrEmpty(line))
-                        lines.Add(line);
+                    if (!string.IsNullOrEmpty (line))
+                    {
+                        lines.Add (line);
+                    }
                 }
             }
+
             return lines;
         }
 
-        internal static DataTable CreateDataTable(CsvConnectionStringBuilder builder, List<string> rawLines)
+        internal static DataTable CreateDataTable (CsvConnectionStringBuilder builder, List<string> rawLines)
         {
             if (rawLines == null)
+            {
                 return null;
+            }
 
             // split each line to array of values
             List<string[]> lines = new List<string[]>();
-            for (int i = 0; i < rawLines.Count; i++)
+            for (var i = 0; i < rawLines.Count; i++)
             {
-                string line = rawLines[i];
-                string[] values = line.Split(builder.Separator.ToCharArray());
+                var line = rawLines[i];
+                string[] values = line.Split (builder.Separator.ToCharArray());
                 if (builder.RemoveQuotationMarks)
                 {
-                    for (int j = 0; j < values.Length; j++)
+                    for (var j = 0; j < values.Length; j++)
                     {
-                        values[j] = values[j].Trim("\"".ToCharArray());
+                        values[j] = values[j].Trim ("\"".ToCharArray());
                     }
                 }
-                lines.Add(values);
+
+                lines.Add (values);
             }
 
             if (lines.Count == 0)
+            {
                 return null;
+            }
 
-            NumberFormatInfo numberInfo = CultureInfo.GetCultureInfo(builder.NumberFormat)?.NumberFormat ?? CultureInfo.CurrentCulture.NumberFormat;
-            NumberFormatInfo currencyInfo = CultureInfo.GetCultureInfo(builder.CurrencyFormat)?.NumberFormat ?? CultureInfo.CurrentCulture.NumberFormat;
-            DateTimeFormatInfo dateTimeInfo = CultureInfo.GetCultureInfo(builder.DateTimeFormat)?.DateTimeFormat ?? CultureInfo.CurrentCulture.DateTimeFormat;
+            var numberInfo = CultureInfo.GetCultureInfo (builder.NumberFormat)?.NumberFormat ??
+                             CultureInfo.CurrentCulture.NumberFormat;
+            var currencyInfo = CultureInfo.GetCultureInfo (builder.CurrencyFormat)?.NumberFormat ??
+                               CultureInfo.CurrentCulture.NumberFormat;
+            var dateTimeInfo = CultureInfo.GetCultureInfo (builder.DateTimeFormat)?.DateTimeFormat ??
+                               CultureInfo.CurrentCulture.DateTimeFormat;
 
             // get table name from file name
-            string tableName = Path.GetFileNameWithoutExtension(builder.CsvFile).Replace(".", "_");
-            if (String.IsNullOrEmpty(tableName))
+            var tableName = Path.GetFileNameWithoutExtension (builder.CsvFile).Replace (".", "_");
+            if (string.IsNullOrEmpty (tableName))
             {
                 tableName = "Table";
             }
 
-            DataTable table = new DataTable(tableName);
+            var table = new DataTable (tableName);
 
             string[] fields = lines[0];
 
             // create table columns
-            for (int i = 0; i < fields.Length; i++)
+            for (var i = 0; i < fields.Length; i++)
             {
-                DataColumn column = new DataColumn();
-                column.DataType = typeof(string);
+                var column = new DataColumn();
+                column.DataType = typeof (string);
 
                 // get field names from first string if needed
-                string fieldName = fields[i].Replace("\t", "");
-                if (builder.FieldNamesInFirstString && !table.Columns.Contains(fieldName))
+                var fieldName = fields[i].Replace ("\t", "");
+                if (builder.FieldNamesInFirstString && !table.Columns.Contains (fieldName))
                 {
                     column.ColumnName = fieldName;
                     column.Caption = column.ColumnName;
@@ -239,19 +265,20 @@ namespace AM.Reporting.Data
                     column.Caption = column.ColumnName;
                 }
 
-                table.Columns.Add(column);
+                table.Columns.Add (column);
             }
 
-            int startIndex = builder.FieldNamesInFirstString ? 1 : 0;
+            var startIndex = builder.FieldNamesInFirstString ? 1 : 0;
+
             // cast types of fields if needed
             if (builder.ConvertFieldTypes)
             {
-                int number = lines.Count - startIndex;
-                DetermineTypes(lines.GetRange(startIndex, number), table, numberInfo, currencyInfo, dateTimeInfo);
+                var number = lines.Count - startIndex;
+                DetermineTypes (lines.GetRange (startIndex, number), table, numberInfo, currencyInfo, dateTimeInfo);
             }
 
             // add table rows
-            for (int i = startIndex; i < lines.Count; i++)
+            for (var i = startIndex; i < lines.Count; i++)
             {
                 if (lines[i].Length > 0)
                 {
@@ -259,42 +286,41 @@ namespace AM.Reporting.Data
                     fields = lines[i];
 
                     // add a new row
-                    DataRow row = table.NewRow();
-                    int valuesCount = fields.Length < table.Columns.Count ? fields.Length : table.Columns.Count;
-                    for (int j = 0; j < valuesCount; j++)
+                    var row = table.NewRow();
+                    var valuesCount = fields.Length < table.Columns.Count ? fields.Length : table.Columns.Count;
+                    for (var j = 0; j < valuesCount; j++)
                     {
-                        string value = fields[j];
-                        if (!String.IsNullOrEmpty(value))
+                        var value = fields[j];
+                        if (!string.IsNullOrEmpty (value))
                         {
-                            if (table.Columns[j].DataType == typeof(String))
+                            if (table.Columns[j].DataType == typeof (string))
                             {
                                 row[j] = value;
                             }
-                            else if (table.Columns[j].DataType == typeof(Int32))
+                            else if (table.Columns[j].DataType == typeof (int))
                             {
-                                row[j] = Int32.Parse(value);
+                                row[j] = int.Parse (value);
                             }
-                            else if (table.Columns[j].DataType == typeof(Decimal))
+                            else if (table.Columns[j].DataType == typeof (decimal))
                             {
-                                row[j] = Decimal.Parse(value, NumberStyles.Currency, currencyInfo);
+                                row[j] = decimal.Parse (value, NumberStyles.Currency, currencyInfo);
                             }
-                            else if (table.Columns[j].DataType == typeof(Double))
+                            else if (table.Columns[j].DataType == typeof (double))
                             {
-                                row[j] = Double.Parse(value, NumberStyles.Number, numberInfo);
+                                row[j] = double.Parse (value, NumberStyles.Number, numberInfo);
                             }
-                            else if (table.Columns[j].DataType == typeof(DateTime))
+                            else if (table.Columns[j].DataType == typeof (DateTime))
                             {
-                                row[j] = DateTime.Parse(value, dateTimeInfo);
+                                row[j] = DateTime.Parse (value, dateTimeInfo);
                             }
                         }
                     }
-                    table.Rows.Add(row);
+
+                    table.Rows.Add (row);
                 }
             }
 
             return table;
         }
-
-
     }
 }

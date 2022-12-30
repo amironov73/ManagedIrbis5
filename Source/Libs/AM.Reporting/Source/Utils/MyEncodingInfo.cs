@@ -29,60 +29,28 @@ namespace AM.Reporting.Utils
     {
         #region Private Fields
 
-        private int codePage;
-        private string displayName;
-        private string name;
-
         #endregion Private Fields
 
         #region Public Properties
 
-        public int CodePage
-        {
-            get
-            {
-                return codePage;
-            }
-            set
-            {
-                codePage = value;
-            }
-        }
+        public int CodePage { get; set; }
 
-        public string DisplayName
-        {
-            get { return displayName; }
-            set
-            {
-                displayName = value;
-            }
-        }
+        public string DisplayName { get; set; }
 
-        public string Name
-        {
-            get
-            {
-                return name;
-            }
-
-            set
-            {
-                name = value;
-            }
-        }
+        public string Name { get; set; }
 
         #endregion Public Properties
 
         #region Public Constructors
 
-        public MyEncodingInfo(Encoding encoding)
+        public MyEncodingInfo (Encoding encoding)
         {
             DisplayName = encoding.EncodingName;
             Name = encoding.WebName;
             CodePage = encoding.CodePage;
         }
 
-        public MyEncodingInfo(EncodingInfo info)
+        public MyEncodingInfo (EncodingInfo info)
         {
             DisplayName = info.DisplayName;
             Name = info.Name;
@@ -97,12 +65,13 @@ namespace AM.Reporting.Utils
         {
             List<MyEncodingInfo> encodings = new List<MyEncodingInfo>();
 
-            foreach (EncodingInfo info in Encoding.GetEncodings())
+            foreach (var info in Encoding.GetEncodings())
             {
-                encodings.Add(new MyEncodingInfo(info));
+                encodings.Add (new MyEncodingInfo (info));
             }
 
-            encodings.Sort(new Comparison<MyEncodingInfo>(compareEncoding)); ;
+            encodings.Sort (new Comparison<MyEncodingInfo> (compareEncoding));
+            ;
 
             return encodings;
         }
@@ -116,12 +85,13 @@ namespace AM.Reporting.Utils
 
         #region Private Methods
 
-        private static int compareEncoding(MyEncodingInfo x, MyEncodingInfo y)
+        private static int compareEncoding (MyEncodingInfo x, MyEncodingInfo y)
         {
             if (x != null && y != null)
             {
-                return String.Compare(x.DisplayName, y.DisplayName);
+                return string.Compare (x.DisplayName, y.DisplayName);
             }
+
             return 0;
         }
 

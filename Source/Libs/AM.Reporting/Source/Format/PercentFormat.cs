@@ -19,7 +19,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.ComponentModel;
+
 using AM.Reporting.Utils;
+
 using System.Globalization;
 
 #endregion
@@ -34,62 +36,37 @@ namespace AM.Reporting.Format
     public class PercentFormat : FormatBase
     {
         #region Fields
-        private bool useLocale;
-        private int decimalDigits;
-        private string decimalSeparator;
-        private string groupSeparator;
-        private string percentSymbol;
-        private int positivePattern;
-        private int negativePattern;
+
         #endregion
 
         #region Properties
+
         /// <summary>
         /// Gets or sets a value that determines whether to use system locale settings to format a value.
         /// </summary>
-        [DefaultValue(true)]
-        public bool UseLocale
-        {
-            get { return useLocale; }
-            set { useLocale = value; }
-        }
+        [DefaultValue (true)]
+        public bool UseLocale { get; set; }
 
         /// <summary>
         /// Gets or sets the number of decimal places to use in percent values.
         /// </summary>
-        [DefaultValue(2)]
-        public int DecimalDigits
-        {
-            get { return decimalDigits; }
-            set { decimalDigits = value; }
-        }
+        [DefaultValue (2)]
+        public int DecimalDigits { get; set; }
 
         /// <summary>
         /// Gets or sets the string to use as the decimal separator in percent values.
         /// </summary>
-        public string DecimalSeparator
-        {
-            get { return decimalSeparator; }
-            set { decimalSeparator = value; }
-        }
+        public string DecimalSeparator { get; set; }
 
         /// <summary>
         /// Gets or sets the string that separates groups of digits to the left of the decimal in percent values.
         /// </summary>
-        public string GroupSeparator
-        {
-            get { return groupSeparator; }
-            set { groupSeparator = value; }
-        }
+        public string GroupSeparator { get; set; }
 
         /// <summary>
         /// Gets or sets the string to use as the percent symbol.
         /// </summary>
-        public string PercentSymbol
-        {
-            get { return percentSymbol; }
-            set { percentSymbol = value; }
-        }
+        public string PercentSymbol { get; set; }
 
         /// <summary>
         /// Gets or sets the format pattern for positive percent values.
@@ -104,12 +81,8 @@ namespace AM.Reporting.Format
         ///   <item><term>3</term><description>% n</description></item>
         /// </list>
         /// </remarks>
-        [DefaultValue(0)]
-        public int PositivePattern
-        {
-            get { return positivePattern; }
-            set { positivePattern = value; }
-        }
+        [DefaultValue (0)]
+        public int PositivePattern { get; set; }
 
         /// <summary>
         /// Gets or sets the format pattern for negative percent values.
@@ -132,41 +105,41 @@ namespace AM.Reporting.Format
         ///   <item><term>11</term><description>n- %</description></item>
         /// </list>
         /// </remarks>
-        [DefaultValue(0)]
-        public int NegativePattern
-        {
-            get { return negativePattern; }
-            set { negativePattern = value; }
-        }
+        [DefaultValue (0)]
+        public int NegativePattern { get; set; }
+
         #endregion
 
         #region Public Methods
+
         /// <inheritdoc/>
         public override FormatBase Clone()
         {
-            PercentFormat result = new PercentFormat();
-            result.UseLocale = UseLocale;
-            result.DecimalDigits = DecimalDigits;
-            result.DecimalSeparator = DecimalSeparator;
-            result.GroupSeparator = GroupSeparator;
-            result.PercentSymbol = PercentSymbol;
-            result.PositivePattern = PositivePattern;
-            result.NegativePattern = NegativePattern;
+            var result = new PercentFormat
+            {
+                UseLocale = UseLocale,
+                DecimalDigits = DecimalDigits,
+                DecimalSeparator = DecimalSeparator,
+                GroupSeparator = GroupSeparator,
+                PercentSymbol = PercentSymbol,
+                PositivePattern = PositivePattern,
+                NegativePattern = NegativePattern
+            };
             return result;
         }
 
         /// <inheritdoc/>
-        public override bool Equals(object obj)
+        public override bool Equals (object obj)
         {
-            PercentFormat f = obj as PercentFormat;
+            var f = obj as PercentFormat;
             return f != null &&
-              UseLocale == f.UseLocale &&
-              DecimalDigits == f.DecimalDigits &&
-              DecimalSeparator == f.DecimalSeparator &&
-              GroupSeparator == f.GroupSeparator &&
-              PercentSymbol == f.PercentSymbol &&
-              PositivePattern == f.PositivePattern &&
-              NegativePattern == f.NegativePattern;
+                   UseLocale == f.UseLocale &&
+                   DecimalDigits == f.DecimalDigits &&
+                   DecimalSeparator == f.DecimalSeparator &&
+                   GroupSeparator == f.GroupSeparator &&
+                   PercentSymbol == f.PercentSymbol &&
+                   PositivePattern == f.PositivePattern &&
+                   NegativePattern == f.NegativePattern;
         }
 
         /// <inheritdoc/>
@@ -176,20 +149,22 @@ namespace AM.Reporting.Format
         }
 
         /// <inheritdoc/>
-        public override string FormatValue(object value)
+        public override string FormatValue (object value)
         {
-            if (value is Variant)
-                value = ((Variant)value).Value;
+            if (value is Variant variant)
+            {
+                value = variant.Value;
+            }
 
-            return String.Format(GetNumberFormatInfo(), "{0:p}", new object[] { value });
+            return string.Format (GetNumberFormatInfo(), "{0:p}", new object[] { value });
         }
 
         internal NumberFormatInfo GetNumberFormatInfo()
         {
-            NumberFormatInfo info = new NumberFormatInfo();
+            var info = new NumberFormatInfo();
             if (UseLocale)
             {
-                NumberFormatInfo cultureFormat = CultureInfo.CurrentCulture.NumberFormat;
+                var cultureFormat = CultureInfo.CurrentCulture.NumberFormat;
                 info.PercentDecimalDigits = DecimalDigits;
                 info.PercentDecimalSeparator = cultureFormat.PercentDecimalSeparator;
                 info.PercentGroupSizes = cultureFormat.PercentGroupSizes;
@@ -208,38 +183,59 @@ namespace AM.Reporting.Format
                 info.PercentPositivePattern = PositivePattern;
                 info.PercentNegativePattern = NegativePattern;
             }
+
             return info;
         }
 
         internal override string GetSampleValue()
         {
-            return FormatValue(1.23f);
+            return FormatValue (1.23f);
         }
 
-        internal override void Serialize(FRWriter writer, string prefix, FormatBase format)
+        internal override void Serialize (FRWriter writer, string prefix, FormatBase format)
         {
-            base.Serialize(writer, prefix, format);
-            PercentFormat c = format as PercentFormat;
+            base.Serialize (writer, prefix, format);
+            var c = format as PercentFormat;
 
             if (c == null || UseLocale != c.UseLocale)
-                writer.WriteBool(prefix + "UseLocale", UseLocale);
+            {
+                writer.WriteBool (prefix + "UseLocale", UseLocale);
+            }
+
             if (c == null || DecimalDigits != c.DecimalDigits)
-                writer.WriteInt(prefix + "DecimalDigits", DecimalDigits);
+            {
+                writer.WriteInt (prefix + "DecimalDigits", DecimalDigits);
+            }
 
             if (!UseLocale)
             {
                 if (c == null || DecimalSeparator != c.DecimalSeparator)
-                    writer.WriteStr(prefix + "DecimalSeparator", DecimalSeparator);
+                {
+                    writer.WriteStr (prefix + "DecimalSeparator", DecimalSeparator);
+                }
+
                 if (c == null || GroupSeparator != c.GroupSeparator)
-                    writer.WriteStr(prefix + "GroupSeparator", GroupSeparator);
+                {
+                    writer.WriteStr (prefix + "GroupSeparator", GroupSeparator);
+                }
+
                 if (c == null || PercentSymbol != c.PercentSymbol)
-                    writer.WriteStr(prefix + "PercentSymbol", PercentSymbol);
+                {
+                    writer.WriteStr (prefix + "PercentSymbol", PercentSymbol);
+                }
+
                 if (c == null || PositivePattern != c.PositivePattern)
-                    writer.WriteInt(prefix + "PositivePattern", PositivePattern);
+                {
+                    writer.WriteInt (prefix + "PositivePattern", PositivePattern);
+                }
+
                 if (c == null || NegativePattern != c.NegativePattern)
-                    writer.WriteInt(prefix + "NegativePattern", NegativePattern);
+                {
+                    writer.WriteInt (prefix + "NegativePattern", NegativePattern);
+                }
             }
         }
+
         #endregion
 
         /// <summary>

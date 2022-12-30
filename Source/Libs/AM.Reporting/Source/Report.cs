@@ -1,3 +1,20 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using AM.Reporting.Code;
 using AM.Reporting.CrossView;
 using AM.Reporting.Data;
@@ -5,6 +22,7 @@ using AM.Reporting.Dialog;
 using AM.Reporting.Engine;
 using AM.Reporting.Export;
 using AM.Reporting.Utils;
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -15,6 +33,10 @@ using System.Drawing.Text;
 using System.IO;
 using System.Security;
 using System.Text;
+
+#endregion
+
+#nullable enable
 
 namespace AM.Reporting
 {
@@ -204,54 +226,25 @@ namespace AM.Reporting
     /// page.Bands.Add(data);
     /// </code>
     /// </example>
-
     public partial class Report : Base, IParent, ISupportInitialize
     {
         #region Fields
 
-        private PageCollection pages;
         private Dictionary dictionary;
-        private ReportInfo reportInfo;
         private string baseReport;
         private Report baseReportObject;
-        private string baseReportAbsolutePath;
-        private string fileName;
-        private string scriptText;
         private Language scriptLanguage;
-        private bool compressed;
-        private bool useFileCache;
-        private TextQuality textQuality;
-        private bool smoothGraphics;
-        private string password;
-        private bool convertNulls;
-        private bool doublePass;
-        private bool autoFillDataSet;
-        private int initialPageNumber;
-        private int maxPages;
-        private string startReportEvent;
-        private string finishReportEvent;
-        private StyleCollection styles;
-        private CodeHelperBase codeHelper;
-        private GraphicCache graphicCache;
         private string[] referencedAssemblies;
         private Hashtable cachedDataItems;
         private AssemblyCollection assemblies;
-        private AM.Reporting.Preview.PreparedPages preparedPages;
-        private ReportEngine engine;
         private bool aborted;
         private Bitmap measureBitmap;
         private IGraphics measureGraphics;
-        private bool storeInResources;
-        private PermissionSet scriptRestrictions;
-        private ReportOperation operation;
         private int tickCount;
         private bool needCompile;
-        private bool needRefresh;
         private bool initializing;
         private object initializeData;
         private string initializeDataName;
-        private object tag;
-        private bool isLoadPrepared = false;
 
         #endregion Fields
 
@@ -297,11 +290,8 @@ namespace AM.Reporting
         /// ReportPage page1 = report1.Pages[0] as ReportPage;
         /// </code>
         /// </example>
-        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public PageCollection Pages
-        {
-            get { return pages; }
-        }
+        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+        public PageCollection Pages { get; }
 
         /// <summary>
         /// Gets the report's data.
@@ -310,13 +300,13 @@ namespace AM.Reporting
         /// The dictionary contains all data items such as connections, data sources, parameters,
         /// system variables.
         /// </remarks>
-        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
         public Dictionary Dictionary
         {
-            get { return dictionary; }
+            get => dictionary;
             set
             {
-                SetProp(dictionary, value);
+                SetProp (dictionary, value);
                 dictionary = value;
             }
         }
@@ -342,22 +332,15 @@ namespace AM.Reporting
         /// <see cref="GetParameter"/> method that returns a <b>Parameter</b> object and set its
         /// <b>Expression</b> property.</para>
         /// </remarks>
-        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public ParameterCollection Parameters
-        {
-            get { return dictionary.Parameters; }
-        }
+        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+        public ParameterCollection Parameters => dictionary.Parameters;
 
         /// <summary>
         /// Gets or sets the report information such as report name, author, description etc.
         /// </summary>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        [SRCategory("Design")]
-        public ReportInfo ReportInfo
-        {
-            get { return reportInfo; }
-            set { reportInfo = value; }
-        }
+        [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+        [SRCategory ("Design")]
+        public ReportInfo ReportInfo { get; set; }
 
         /// <summary>
         /// Gets or sets the base report file name.
@@ -367,33 +350,27 @@ namespace AM.Reporting
         /// <b>Note:</b> setting this property to non-empty value will clear the report and
         /// load the base file into it.
         /// </remarks>
-        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
         public string BaseReport
         {
-            get { return baseReport; }
-            set { SetBaseReport(value); }
+            get => baseReport;
+            set => SetBaseReport (value);
         }
 
         /// <summary>
         /// Gets a value indicating whether Report is prepared
         /// </summary>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public bool IsPrepared
-        {
-            get { return PreparedPages != null && PreparedPages.Count != 0; }
-        }
+        [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+        public bool IsPrepared => PreparedPages != null && PreparedPages.Count != 0;
+
         /// <summary>
         /// Gets or sets the absolute path to the parent report.
         /// </summary>
         /// <remarks>
         /// This property contains the absolute path to the parent report.
         /// </remarks>
-        [Browsable(true), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public string BaseReportAbsolutePath
-        {
-            get { return baseReportAbsolutePath; }
-            set { baseReportAbsolutePath = value; }
-        }
+        [Browsable (true), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+        public string BaseReportAbsolutePath { get; set; }
 
         /// <summary>
         /// Gets or sets the name of a file the report was loaded from.
@@ -402,12 +379,8 @@ namespace AM.Reporting
         /// This property is used to support the AM.Reporting.Net infrastructure;
         /// typically you don't need to use it.
         /// </remarks>
-        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public string FileName
-        {
-            get { return fileName; }
-            set { fileName = value; }
-        }
+        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+        public string FileName { get; set; }
 
         /// <summary>
         /// Gets or sets the report script.
@@ -428,12 +401,8 @@ namespace AM.Reporting
         /// you to do ANYTHING. For example, you may create a script that will read/write files from/to a disk.
         /// To restrict such operations, use the <see cref="ScriptRestrictions"/> property.</para>
         /// </remarks>
-        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public string ScriptText
-        {
-            get { return scriptText; }
-            set { scriptText = value; }
-        }
+        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+        public string ScriptText { get; set; }
 
         /// <summary>
         /// Gets or sets the script language of this report.
@@ -441,22 +410,29 @@ namespace AM.Reporting
         /// <remarks>
         /// Note: changing this property will reset the report script to default empty script.
         /// </remarks>
-        [DefaultValue(Language.CSharp)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        [SRCategory("Script")]
+        [DefaultValue (Language.CSharp)]
+        [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+        [SRCategory ("Script")]
         public Language ScriptLanguage
         {
-            get { return scriptLanguage; }
+            get => scriptLanguage;
             set
             {
-                bool needClear = scriptLanguage != value;
+                var needClear = scriptLanguage != value;
                 scriptLanguage = value;
                 if (scriptLanguage == Language.CSharp)
-                    codeHelper = new CsCodeHelper(this);
+                {
+                    CodeHelper = new CsCodeHelper (this);
+                }
                 else
-                    codeHelper = new VbCodeHelper(this);
+                {
+                    CodeHelper = new VbCodeHelper (this);
+                }
+
                 if (needClear)
-                    scriptText = codeHelper.EmptyScript();
+                {
+                    ScriptText = CodeHelper.EmptyScript();
+                }
             }
         }
 
@@ -469,14 +445,10 @@ namespace AM.Reporting
         /// the DB value before you do something with it (for example, typecast it to any type, use it
         /// in a expression etc.)
         /// </remarks>
-        [DefaultValue(true)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        [SRCategory("Engine")]
-        public bool ConvertNulls
-        {
-            get { return convertNulls; }
-            set { convertNulls = value; }
-        }
+        [DefaultValue (true)]
+        [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+        [SRCategory ("Engine")]
+        public bool ConvertNulls { get; set; }
 
         /// <summary>
         /// Gets or sets a value that specifies whether the report engine should perform the second pass.
@@ -488,14 +460,10 @@ namespace AM.Reporting
         /// <para>Use the <b>Engine.FirstPass</b>, <b>Engine.FinalPass</b> properties to determine which
         /// pass the engine is performing now.</para>
         /// </remarks>
-        [DefaultValue(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        [SRCategory("Engine")]
-        public bool DoublePass
-        {
-            get { return doublePass; }
-            set { doublePass = value; }
-        }
+        [DefaultValue (false)]
+        [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+        [SRCategory ("Engine")]
+        public bool DoublePass { get; set; }
 
         /// <summary>
         /// Gets or sets a value that specifies whether to compress the report file.
@@ -504,35 +472,24 @@ namespace AM.Reporting
         /// The report file is compressed using the Gzip algorithm. So you can open the
         /// compressed report in any zip-compatible archiver.
         /// </remarks>
-        [DefaultValue(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        [SRCategory("Misc")]
-        public bool Compressed
-        {
-            get { return compressed; }
-            set { compressed = value; }
-        }
+        [DefaultValue (false)]
+        [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+        [SRCategory ("Misc")]
+        public bool Compressed { get; set; }
 
         /// <summary>
         /// Returns a bool value depending on the .frx or .fpx report was loaded
         /// </summary>
-        public bool IsLoadPrepared
-        {
-            get => isLoadPrepared;
-        }
+        public bool IsLoadPrepared { get; private set; }
 
         /// <summary>
         /// Gets or sets a value that specifies whether to use the file cache rather than memory
         /// to store the prepared report pages.
         /// </summary>
-        [DefaultValue(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        [SRCategory("Engine")]
-        public bool UseFileCache
-        {
-            get { return useFileCache; }
-            set { useFileCache = value; }
-        }
+        [DefaultValue (false)]
+        [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+        [SRCategory ("Engine")]
+        public bool UseFileCache { get; set; }
 
         /// <summary>
         /// Gets or sets a value that specifies the quality of text rendering.
@@ -541,27 +498,19 @@ namespace AM.Reporting
         /// <b>Note:</b> the default property value is <b>TextQuality.Default</b>. That means the report
         /// may look different depending on OS settings. This property does not affect the printout.
         /// </remarks>
-        [DefaultValue(TextQuality.Default)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        [SRCategory("Misc")]
-        public TextQuality TextQuality
-        {
-            get { return textQuality; }
-            set { textQuality = value; }
-        }
+        [DefaultValue (TextQuality.Default)]
+        [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+        [SRCategory ("Misc")]
+        public TextQuality TextQuality { get; set; }
 
         /// <summary>
         /// Gets or sets a value that specifies if the graphic objects such as bitmaps
         /// and shapes should be displayed smoothly.
         /// </summary>
-        [DefaultValue(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        [SRCategory("Misc")]
-        public bool SmoothGraphics
-        {
-            get { return smoothGraphics; }
-            set { smoothGraphics = value; }
-        }
+        [DefaultValue (false)]
+        [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+        [SRCategory ("Misc")]
+        public bool SmoothGraphics { get; set; }
 
         /// <summary>
         /// Gets or sets the report password.
@@ -574,12 +523,8 @@ namespace AM.Reporting
         /// Do not forget your password! It will be hard or even impossible to open
         /// the protected file in this case.</para>
         /// </remarks>
-        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public string Password
-        {
-            get { return password; }
-            set { password = value; }
-        }
+        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+        public string Password { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether it is necessary to automatically fill
@@ -590,13 +535,9 @@ namespace AM.Reporting
         /// the DataSet with data when you trying to run a report. Set it to <b>false</b> if
         /// you want to fill the DataSet by yourself.
         /// </remarks>
-        [DefaultValue(true)]
-        [SRCategory("Misc")]
-        public bool AutoFillDataSet
-        {
-            get { return autoFillDataSet; }
-            set { autoFillDataSet = value; }
-        }
+        [DefaultValue (true)]
+        [SRCategory ("Misc")]
+        public bool AutoFillDataSet { get; set; }
 
         /// <summary>
         /// Gets or sets the maximum number of generated pages in a prepared report.
@@ -604,24 +545,16 @@ namespace AM.Reporting
         /// <remarks>
         /// Use this property to limit the number of pages in a prepared report.
         /// </remarks>
-        [DefaultValue(0)]
-        [SRCategory("Misc")]
-        public int MaxPages
-        {
-            get { return maxPages; }
-            set { maxPages = value; }
-        }
+        [DefaultValue (0)]
+        [SRCategory ("Misc")]
+        public int MaxPages { get; set; }
 
         /// <summary>
         /// Gets or sets the collection of styles used in this report.
         /// </summary>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        [SRCategory("Misc")]
-        public StyleCollection Styles
-        {
-            get { return styles; }
-            set { styles = value; }
-        }
+        [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+        [SRCategory ("Misc")]
+        public StyleCollection Styles { get; set; }
 
         /// <summary>
         /// Gets or sets an array of assembly names that will be used to compile the report script.
@@ -631,20 +564,23 @@ namespace AM.Reporting
         /// "System.Windows.Forms.dll", "System.Data.dll", "System.Xml.dll". If your script uses some types
         /// from another assemblies, you have to add them to this property.
         /// </remarks>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        [SRCategory("Script")]
+        [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+        [SRCategory ("Script")]
         public string[] ReferencedAssemblies
         {
-            get { return referencedAssemblies; }
-            set {
+            get => referencedAssemblies;
+            set
+            {
                 if (value != null)
                 {
                     // fix for old reports with "System.Windows.Forms.DataVisualization" in referenced assemblies
-                    for (int i = 0; i < value.Length; i++)
+                    for (var i = 0; i < value.Length; i++)
                     {
-                        value[i] = value[i].Replace("System.Windows.Forms.DataVisualization", "AM.Reporting.DataVisualization");
+                        value[i] = value[i].Replace ("System.Windows.Forms.DataVisualization",
+                            "AM.Reporting.DataVisualization");
                     }
                 }
+
                 referencedAssemblies = value;
             }
         }
@@ -652,29 +588,21 @@ namespace AM.Reporting
         /// <summary>
         /// Gets or sets a script event name that will be fired when the report starts.
         /// </summary>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        [SRCategory("Build")]
-        public string StartReportEvent
-        {
-            get { return startReportEvent; }
-            set { startReportEvent = value; }
-        }
+        [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+        [SRCategory ("Build")]
+        public string StartReportEvent { get; set; }
 
         /// <summary>
         /// Gets or sets a script event name that will be fired when the report is finished.
         /// </summary>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        [SRCategory("Build")]
-        public string FinishReportEvent
-        {
-            get { return finishReportEvent; }
-            set { finishReportEvent = value; }
-        }
+        [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+        [SRCategory ("Build")]
+        public string FinishReportEvent { get; set; }
 
         /// <summary>
         /// Gets a value indicating that report execution was aborted.
         /// </summary>
-        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
         public bool Aborted
         {
             get
@@ -692,13 +620,9 @@ namespace AM.Reporting
         /// By default this property is <b>true</b>. When set to <b>false</b>, you should store your report
         /// in a file.
         /// </remarks>
-        [DefaultValue(true)]
-        [SRCategory("Design")]
-        public bool StoreInResources
-        {
-            get { return storeInResources; }
-            set { storeInResources = value; }
-        }
+        [DefaultValue (true)]
+        [SRCategory ("Design")]
+        public bool StoreInResources { get; set; }
 
         /// <summary>
         /// Gets or sets the resource string that contains the report.
@@ -706,31 +630,35 @@ namespace AM.Reporting
         /// <remarks>
         /// This property is used by the MS Visual Studio to store the report. Do not use it directly.
         /// </remarks>
-        [Browsable(false)]
-        [Localizable(true)]
+        [Browsable (false)]
+        [Localizable (true)]
         public string ReportResourceString
         {
             get
             {
                 if (!StoreInResources)
+                {
                     return "";
+                }
+
                 return SaveToString();
             }
             set
             {
-                if (String.IsNullOrEmpty(value))
+                if (string.IsNullOrEmpty (value))
                 {
                     Clear();
                     return;
                 }
-                LoadFromString(value);
+
+                LoadFromString (value);
             }
         }
 
         /// <summary>
         /// Gets a value indicating that this report contains dialog forms.
         /// </summary>
-        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
         public bool HasDialogs
         {
             get
@@ -738,8 +666,11 @@ namespace AM.Reporting
                 foreach (PageBase page in Pages)
                 {
                     if (page is DialogPage)
+                    {
                         return true;
+                    }
                 }
+
                 return false;
             }
         }
@@ -763,12 +694,8 @@ namespace AM.Reporting
         /// </code>
         /// </example>
         /// </remarks>
-        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public PermissionSet ScriptRestrictions
-        {
-            get { return scriptRestrictions; }
-            set { scriptRestrictions = value; }
-        }
+        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+        public PermissionSet ScriptRestrictions { get; set; }
 
         /// <summary>
         /// Gets a reference to the graphics cache for this report.
@@ -776,20 +703,14 @@ namespace AM.Reporting
         /// <remarks>
         /// This property is used to support the AM.Reporting.Net infrastructure. Do not use it directly.
         /// </remarks>
-        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public GraphicCache GraphicCache
-        {
-            get { return graphicCache; }
-        }
+        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+        public GraphicCache GraphicCache { get; private set; }
 
         /// <summary>
         /// Gets a pages of the prepared report.
         /// </summary>
-        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public Preview.PreparedPages PreparedPages
-        {
-            get { return preparedPages; }
-        }
+        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+        public Preview.PreparedPages PreparedPages { get; private set; }
 
         /// <summary>
         /// Gets a reference to the report engine.
@@ -797,66 +718,50 @@ namespace AM.Reporting
         /// <remarks>
         /// This property can be used when report is running. In other cases it returns <b>null</b>.
         /// </remarks>
-        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public ReportEngine Engine
-        {
-            get { return engine; }
-        }
+        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+        public ReportEngine Engine { get; private set; }
 
         /// <summary>
         /// Gets or sets the initial page number for PageN/PageNofM system variables.
         /// </summary>
-        [DefaultValue(1)]
-        [SRCategory("Engine")]
-        public int InitialPageNumber
-        {
-            get { return initialPageNumber; }
-            set { initialPageNumber = value; }
-        }
+        [DefaultValue (1)]
+        [SRCategory ("Engine")]
+        public int InitialPageNumber { get; set; }
 
         /// <summary>
         /// This property is not relevant to this class.
         /// </summary>
-        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public new string Name
-        {
-            get { return base.Name; }
-        }
+        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+        public new string Name => base.Name;
 
         /// <summary>
         /// This property is not relevant to this class.
         /// </summary>
-        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
         public new Restrictions Restrictions
         {
-            get { return base.Restrictions; }
-            set { base.Restrictions = value; }
+            get => base.Restrictions;
+            set => base.Restrictions = value;
         }
 
         /// <summary>
         /// Gets the report operation that is currently performed.
         /// </summary>
-        [Browsable(false)]
-        public ReportOperation Operation
-        {
-            get { return operation; }
-        }
+        [Browsable (false)]
+        public ReportOperation Operation { get; private set; }
 
         /// <summary>
         /// Gets or sets the Tag object of the report.
         /// </summary>
-        [Browsable(false)]
-        public object Tag
-        {
-            get { return tag; }
-            set { tag = value; }
-        }
+        [Browsable (false)]
+        public object Tag { get; set; }
 
         private string[] DefaultAssemblies
         {
             get
             {
-                return new string[] {
+                return new string[]
+                {
                     "System.dll",
 
                     "System.Drawing.dll",
@@ -881,10 +786,7 @@ namespace AM.Reporting
             }
         }
 
-        internal CodeHelperBase CodeHelper
-        {
-            get { return codeHelper; }
-        }
+        internal CodeHelperBase CodeHelper { get; private set; }
 
         public IGraphics MeasureGraphics
         {
@@ -896,9 +798,10 @@ namespace AM.Reporting
                     measureBitmap = new Bitmap(1, 1);
                     measureGraphics = new GdiGraphics(measureBitmap);
 #else
-                    measureGraphics = GdiGraphics.FromGraphics(Graphics.FromHwnd(IntPtr.Zero));
+                    measureGraphics = GdiGraphics.FromGraphics (Graphics.FromHwnd (nint.Zero));
 #endif
                 }
+
                 return measureGraphics;
             }
         }
@@ -907,9 +810,12 @@ namespace AM.Reporting
         {
             get
             {
-                string result = ReportInfo.Name;
-                if (String.IsNullOrEmpty(result))
-                    result = Path.GetFileNameWithoutExtension(FileName);
+                var result = ReportInfo.Name;
+                if (string.IsNullOrEmpty (result))
+                {
+                    result = Path.GetFileNameWithoutExtension (FileName);
+                }
+
                 return result;
             }
         }
@@ -917,22 +823,21 @@ namespace AM.Reporting
         /// <summary>
         /// Gets or sets the flag for refresh.
         /// </summary>
-        public bool NeedRefresh
-        {
-            get { return needRefresh; }
-            set { needRefresh = value; }
-        }
+        public bool NeedRefresh { get; set; }
 
         internal ObjectCollection AllNamedObjects
         {
             get
             {
-                ObjectCollection allObjects = AllObjects;
+                var allObjects = AllObjects;
+
                 // data objects are not included into AllObjects list. Include named items separately.
                 foreach (Base c in Dictionary.AllObjects)
                 {
                     if (c is DataConnectionBase || c is DataSourceBase || c is Relation || c is CubeSourceBase)
-                        allObjects.Add(c);
+                    {
+                        allObjects.Add (c);
+                    }
                 }
 
                 return allObjects;
@@ -945,38 +850,39 @@ namespace AM.Reporting
 
         private bool ShouldSerializeReferencedAssemblies()
         {
-            return Converter.ToString(ReferencedAssemblies) != Converter.ToString(DefaultAssemblies);
+            return Converter.ToString (ReferencedAssemblies) != Converter.ToString (DefaultAssemblies);
         }
 
         // convert absolute path to the base report to relative path (based on the main report path).
         private string GetRelativePathToBaseReport()
         {
-            string path = "";
-            if (!String.IsNullOrEmpty(FileName))
+            var path = "";
+            if (!string.IsNullOrEmpty (FileName))
             {
                 try
                 {
-                    path = Path.GetDirectoryName(FileName);
+                    path = Path.GetDirectoryName (FileName);
                 }
                 catch
                 {
                 }
             }
 
-            if (!String.IsNullOrEmpty(path))
+            if (!string.IsNullOrEmpty (path))
             {
                 try
                 {
-                    return FileUtils.GetRelativePath(BaseReport, path);
+                    return FileUtils.GetRelativePath (BaseReport, path);
                 }
                 catch
                 {
                 }
             }
+
             return BaseReport;
         }
 
-        private void SetBaseReport(string value)
+        private void SetBaseReport (string value)
         {
             baseReport = value;
             if (baseReportObject != null)
@@ -986,66 +892,75 @@ namespace AM.Reporting
             }
 
             // detach the base report
-            if (String.IsNullOrEmpty(value))
+            if (string.IsNullOrEmpty (value))
             {
                 foreach (Base c in AllObjects)
                 {
-                    c.SetAncestor(false);
+                    c.SetAncestor (false);
                 }
-                SetAncestor(false);
+
+                SetAncestor (false);
                 return;
             }
 
-            string saveFileName = fileName;
+            var saveFileName = FileName;
             if (LoadBaseReport != null)
             {
-                LoadBaseReport(this, new CustomLoadEventArgs(value, this));
+                LoadBaseReport (this, new CustomLoadEventArgs (value, this));
             }
             else
             {
                 // convert the relative path to absolute path (based on the main report path).
-                if (!Path.IsPathRooted(value))
+                if (!Path.IsPathRooted (value))
                 {
-                    var fullPath = Path.GetFullPath(Path.GetDirectoryName(FileName));
+                    var fullPath = Path.GetFullPath (Path.GetDirectoryName (FileName));
+
                     // since directory path separator for Win OS is  '\' and for Unix OS is '/'
                     // we have to modify the incoming path string with actual for current OS path separator
-                    value = Path.Combine(fullPath, GetFixedSeparatedPath(value));
+                    value = Path.Combine (fullPath, GetFixedSeparatedPath (value));
                 }
-                if (!File.Exists(value) && File.Exists(BaseReportAbsolutePath))
+
+                if (!File.Exists (value) && File.Exists (BaseReportAbsolutePath))
                 {
                     value = BaseReportAbsolutePath;
                 }
-                Load(value);
+
+                Load (value);
             }
 
-            fileName = saveFileName;
+            FileName = saveFileName;
             baseReport = "";
             Password = "";
-            baseReportObject = Activator.CreateInstance(GetType()) as Report;
-            baseReportObject.AssignAll(this, true);
+            baseReportObject = Activator.CreateInstance (GetType()) as Report;
+            baseReportObject.AssignAll (this, true);
 
             // set Ancestor & CanChangeParent flags
             foreach (Base c in AllObjects)
             {
-                c.SetAncestor(true);
+                c.SetAncestor (true);
             }
-            SetAncestor(true);
+
+            SetAncestor (true);
             baseReport = value;
         }
 
-        private static string GetFixedSeparatedPath( string baseReport)
+        private static string GetFixedSeparatedPath (string baseReport)
         {
-            return baseReport.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar);
+            return baseReport.Replace ('/', Path.DirectorySeparatorChar).Replace ('\\', Path.DirectorySeparatorChar);
         }
 
-        private void GetDiff(object sender, DiffEventArgs e)
+        private void GetDiff (object sender, DiffEventArgs e)
         {
             if (baseReportObject != null)
             {
                 if (e.Object is Report)
+                {
                     e.DiffObject = baseReportObject;
-                else if (e.Object is Base)
-                    e.DiffObject = baseReportObject.FindObject((e.Object as Base).Name);
+                }
+                else if (e.Object is Base @base)
+                {
+                    e.DiffObject = baseReportObject.FindObject (@base.Name);
+                }
             }
         }
 
@@ -1071,7 +986,8 @@ namespace AM.Reporting
             {
                 ScriptLanguage = Language.CSharp;
             }
-            ScriptText = codeHelper.EmptyScript();
+
+            ScriptText = CodeHelper.EmptyScript();
             BaseReport = "";
             BaseReportAbsolutePath = "";
             DoublePass = false;
@@ -1096,37 +1012,57 @@ namespace AM.Reporting
         #region Protected Methods
 
         /// <inheritdoc/>
-        protected override void Dispose(bool disposing)
+        protected override void Dispose (bool disposing)
         {
             if (disposing)
             {
-                if (graphicCache != null)
-                    graphicCache.Dispose();
-                graphicCache = null;
+                if (GraphicCache != null)
+                {
+                    GraphicCache.Dispose();
+                }
+
+                GraphicCache = null;
                 if (measureGraphics != null)
+                {
                     measureGraphics.Dispose();
+                }
+
                 measureGraphics = null;
                 if (measureBitmap != null)
+                {
                     measureBitmap.Dispose();
+                }
+
                 measureBitmap = null;
                 DisposeDesign();
                 if (PreparedPages != null)
+                {
                     PreparedPages.Dispose();
+                }
             }
-            base.Dispose(disposing);
+
+            base.Dispose (disposing);
         }
 
         /// <inheritdoc/>
-        protected override void DeserializeSubItems(FRReader reader)
+        protected override void DeserializeSubItems (FRReader reader)
         {
-            if (String.Compare(reader.ItemName, "ScriptText", true) == 0)
+            if (string.Compare (reader.ItemName, "ScriptText", true) == 0)
+            {
                 ScriptText = reader.ReadPropertyValue();
-            else if (String.Compare(reader.ItemName, "Dictionary", true) == 0)
-                reader.Read(Dictionary);
-            else if (String.Compare(reader.ItemName, "Styles", true) == 0)
-                reader.Read(Styles);
+            }
+            else if (string.Compare (reader.ItemName, "Dictionary", true) == 0)
+            {
+                reader.Read (Dictionary);
+            }
+            else if (string.Compare (reader.ItemName, "Styles", true) == 0)
+            {
+                reader.Read (Styles);
+            }
             else
-                base.DeserializeSubItems(reader);
+            {
+                base.DeserializeSubItems (reader);
+            }
         }
 
         #endregion Protected Methods
@@ -1134,66 +1070,83 @@ namespace AM.Reporting
         #region IParent
 
         /// <inheritdoc/>
-        public bool CanContain(Base child)
+        public bool CanContain (Base child)
         {
             return child is PageBase || child is Dictionary;
         }
 
         /// <inheritdoc/>
-        public void GetChildObjects(ObjectCollection list)
+        public void GetChildObjects (ObjectCollection list)
         {
-            foreach (PageBase page in pages)
+            foreach (PageBase page in Pages)
             {
-                list.Add(page);
+                list.Add (page);
             }
         }
 
         /// <inheritdoc/>
-        public void AddChild(Base obj)
+        public void AddChild (Base obj)
         {
-            if (obj is PageBase)
-                pages.Add(obj as PageBase);
-            else if (obj is Dictionary)
-                Dictionary = obj as Dictionary;
+            if (obj is PageBase @base)
+            {
+                Pages.Add (@base);
+            }
+            else if (obj is Dictionary dictionary1)
+            {
+                Dictionary = dictionary1;
+            }
         }
 
         /// <inheritdoc/>
-        public void RemoveChild(Base obj)
+        public void RemoveChild (Base obj)
         {
-            if (obj is PageBase)
-                pages.Remove(obj as PageBase);
-            else if (obj is Dictionary && (obj as Dictionary) == dictionary)
+            if (obj is PageBase @base)
+            {
+                Pages.Remove (@base);
+            }
+            else if (obj is Dictionary dictionary1 && dictionary1 == dictionary)
+            {
                 Dictionary = null;
+            }
         }
 
         /// <inheritdoc/>
-        public virtual int GetChildOrder(Base child)
+        public virtual int GetChildOrder (Base child)
         {
-            if (child is PageBase)
-                return pages.IndexOf(child as PageBase);
+            if (child is PageBase @base)
+            {
+                return Pages.IndexOf (@base);
+            }
+
             return 0;
         }
 
         /// <inheritdoc/>
-        public virtual void SetChildOrder(Base child, int order)
+        public virtual void SetChildOrder (Base child, int order)
         {
-            if (child is PageBase)
+            if (child is PageBase @base)
             {
-                if (order > pages.Count)
-                    order = pages.Count;
-                int oldOrder = child.ZOrder;
+                if (order > Pages.Count)
+                {
+                    order = Pages.Count;
+                }
+
+                var oldOrder = @base.ZOrder;
                 if (oldOrder != -1 && order != -1 && oldOrder != order)
                 {
                     if (oldOrder <= order)
+                    {
                         order--;
-                    pages.Remove(child as PageBase);
-                    pages.Insert(order, child as PageBase);
+                    }
+
+                    Pages.Remove (@base);
+                    Pages.Insert (order, @base);
                 }
             }
         }
 
         /// <inheritdoc/>
-        public virtual void UpdateLayout(float dx, float dy)
+        public virtual void UpdateLayout (float dx, float dy)
         {
             // do nothing
         }
@@ -1212,7 +1165,7 @@ namespace AM.Reporting
         public void EndInit()
         {
             initializing = false;
-            Dictionary.RegisterData(initializeData, initializeDataName, false);
+            Dictionary.RegisterData (initializeData, initializeDataName, false);
         }
 
         #endregion ISupportInitialize Members
@@ -1222,35 +1175,39 @@ namespace AM.Reporting
         private void FillDataSourceCache()
         {
             cachedDataItems.Clear();
-            ObjectCollection dictionaryObjects = Dictionary.AllObjects;
+            var dictionaryObjects = Dictionary.AllObjects;
             foreach (Parameter c in Dictionary.SystemVariables)
             {
-                dictionaryObjects.Add(c);
+                dictionaryObjects.Add (c);
             }
+
             foreach (Base c in dictionaryObjects)
             {
-                if (c is DataSourceBase)
+                if (c is DataSourceBase data)
                 {
-                    DataSourceBase data = c as DataSourceBase;
-                    CachedDataItem cachedItem = new CachedDataItem();
-                    cachedItem.dataSource = data;
+                    var cachedItem = new CachedDataItem
+                    {
+                        dataSource = data
+                    };
                     cachedDataItems[data.FullName] = cachedItem;
 
-                    for (int i = 0; i < data.Columns.Count; i++)
+                    for (var i = 0; i < data.Columns.Count; i++)
                     {
-                        cachedItem = new CachedDataItem();
-                        cachedItem.dataSource = data;
-                        cachedItem.column = data.Columns[i];
+                        cachedItem = new CachedDataItem
+                        {
+                            dataSource = data,
+                            column = data.Columns[i]
+                        };
                         cachedDataItems[data.FullName + "." + data.Columns[i].Alias] = cachedItem;
                     }
                 }
-                else if (c is Parameter)
+                else if (c is Parameter parameter)
                 {
-                    cachedDataItems[(c as Parameter).FullName] = c;
+                    cachedDataItems[parameter.FullName] = c;
                 }
-                else if (c is Total)
+                else if (c is Total total)
                 {
-                    cachedDataItems[(c as Total).Name] = c;
+                    cachedDataItems[total.Name] = c;
                 }
             }
         }
@@ -1261,9 +1218,9 @@ namespace AM.Reporting
 
             if (needCompile)
             {
-                AssemblyDescriptor descriptor = new AssemblyDescriptor(this, ScriptText);
+                var descriptor = new AssemblyDescriptor (this, ScriptText);
                 assemblies.Clear();
-                assemblies.Add(descriptor);
+                assemblies.Add (descriptor);
                 descriptor.AddObjects();
                 descriptor.AddExpressions();
                 descriptor.AddFunctions();
@@ -1285,10 +1242,10 @@ namespace AM.Reporting
         {
             needCompile = false;
 
-            AssemblyDescriptor descriptor = new AssemblyDescriptor(this, CodeHelper.EmptyScript());
+            var descriptor = new AssemblyDescriptor (this, CodeHelper.EmptyScript());
             assemblies.Clear();
-            assemblies.Add(descriptor);
-            descriptor.InitInstance(this);
+            assemblies.Add (descriptor);
+            descriptor.InitInstance (this);
         }
 
         /// <summary>
@@ -1304,24 +1261,26 @@ namespace AM.Reporting
         /// report.Show();
         /// </code>
         /// </remarks>
-        public void GenerateReportAssembly(string fileName)
+        public void GenerateReportAssembly (string fileName)
         {
             // create the class name
-            string className = "";
+            var className = "";
             const string punctuation = " ~`!@#$%^&*()-=+[]{},.<>/?;:'\"\\|";
-            foreach (char c in Path.GetFileNameWithoutExtension(fileName))
+            foreach (var c in Path.GetFileNameWithoutExtension (fileName))
             {
-                if (!punctuation.Contains(c.ToString()))
+                if (!punctuation.Contains (c.ToString()))
+                {
                     className += c;
+                }
             }
 
-            AssemblyDescriptor descriptor = new AssemblyDescriptor(this, ScriptText);
+            var descriptor = new AssemblyDescriptor (this, ScriptText);
             descriptor.AddObjects();
             descriptor.AddExpressions();
             descriptor.AddFunctions();
 
-            string reportClassText = descriptor.GenerateReportClass(className);
-            File.WriteAllText(fileName, reportClassText, Encoding.UTF8);
+            var reportClassText = descriptor.GenerateReportClass (className);
+            File.WriteAllText (fileName, reportClassText, Encoding.UTF8);
         }
 
         /// <summary>
@@ -1336,9 +1295,9 @@ namespace AM.Reporting
         /// so you may refer to any objects available in this context: private fields,
         /// methods, report objects.</para>
         /// </remarks>
-        public object Calc(string expression)
+        public object Calc (string expression)
         {
-            return Calc(expression, 0);
+            return Calc (expression, 0);
         }
 
         /// <summary>
@@ -1351,71 +1310,81 @@ namespace AM.Reporting
         /// <remarks>
         /// Do not call this method directly. Use the <b>Calc(string expression)</b> method instead.
         /// </remarks>
-        public object Calc(string expression, Variant value)
+        public object Calc (string expression, Variant value)
         {
             if (!IsRunning)
+            {
                 return null;
-            if (String.IsNullOrEmpty(expression) || String.IsNullOrEmpty(expression.Trim()))
-                return null;
+            }
 
-            string expr = expression;
-            if (expr.StartsWith("[") && expr.EndsWith("]"))
-                expr = expression.Substring(1, expression.Length - 2);
+            if (string.IsNullOrEmpty (expression) || string.IsNullOrEmpty (expression.Trim()))
+            {
+                return null;
+            }
+
+            var expr = expression;
+            if (expr.StartsWith ("[") && expr.EndsWith ("]"))
+            {
+                expr = expression.Substring (1, expression.Length - 2);
+            }
 
             // check cached items first
-            object cachedObject = cachedDataItems[expr];
+            var cachedObject = cachedDataItems[expr];
 
-            if (cachedObject is CachedDataItem)
+            if (cachedObject is CachedDataItem cachedItem)
             {
-                CachedDataItem cachedItem = cachedObject as CachedDataItem;
-                DataSourceBase data = cachedItem.dataSource;
-                Column column = cachedItem.column;
+                var data = cachedItem.dataSource;
+                var column = cachedItem.column;
 
-                object val = ConvertToColumnDataType(column.Value, column.DataType, ConvertNulls);
+                var val = ConvertToColumnDataType (column.Value, column.DataType, ConvertNulls);
 
                 if (CustomCalc != null)
                 {
-                    CustomCalcEventArgs e = new CustomCalcEventArgs(expr, val, this);
-                    CustomCalc(this, e);
+                    var e = new CustomCalcEventArgs (expr, val, this);
+                    CustomCalc (this, e);
                     val = e.CalculatedObject;
                 }
 
                 return val;
             }
-            else if (cachedObject is Parameter)
+            else if (cachedObject is Parameter parameter)
             {
-                return (cachedObject as Parameter).Value;
+                return parameter.Value;
             }
-            else if (cachedObject is Total)
+            else if (cachedObject is Total total)
             {
-                object val = (cachedObject as Total).Value;
+                var val = total.Value;
                 if (ConvertNulls && (val == null || val is DBNull))
+                {
                     val = 0;
+                }
 
-                (cachedObject as Total).ExecuteTotal(val);
+                total.ExecuteTotal (val);
 
                 return val;
             }
 
             // calculate the expression
-            return CalcExpression(expression, value);
+            return CalcExpression (expression, value);
         }
 
-        private object ConvertToColumnDataType(object val, Type dataType, bool convertNulls)
+        private object ConvertToColumnDataType (object val, Type dataType, bool convertNulls)
         {
             if (val == null || val is DBNull)
             {
                 if (convertNulls)
-                    val = Converter.ConvertNull(dataType);
+                {
+                    val = Converter.ConvertNull (dataType);
+                }
             }
             else
             {
                 if (val is IConvertible)
                 {
-                    Type t = Nullable.GetUnderlyingType(dataType);
+                    var t = Nullable.GetUnderlyingType (dataType);
                     try
                     {
-                        val = Convert.ChangeType(val, t != null ? t : dataType);
+                        val = Convert.ChangeType (val, t != null ? t : dataType);
                     }
                     catch (InvalidCastException)
                     {
@@ -1427,6 +1396,7 @@ namespace AM.Reporting
                     }
                 }
             }
+
             return val;
         }
 
@@ -1439,7 +1409,7 @@ namespace AM.Reporting
         /// <remarks>
         /// This method is for internal use only, do not call it directly.
         /// </remarks>
-        protected virtual object CalcExpression(string expression, Variant value)
+        protected virtual object CalcExpression (string expression, Variant value)
         {
             if (expression.ToLower() == "true" || expression.ToLower() == "false")
             {
@@ -1449,19 +1419,21 @@ namespace AM.Reporting
             // try to calculate the expression
             foreach (AssemblyDescriptor d in assemblies)
             {
-                if (d.ContainsExpression(expression))
-                    return d.CalcExpression(expression, value);
+                if (d.ContainsExpression (expression))
+                {
+                    return d.CalcExpression (expression, value);
+                }
             }
 
             // expression not found. Probably it was added after the start of the report.
             // Compile new assembly containing this expression.
-            AssemblyDescriptor descriptor = new AssemblyDescriptor(this, CodeHelper.EmptyScript());
-            assemblies.Add(descriptor);
+            var descriptor = new AssemblyDescriptor (this, CodeHelper.EmptyScript());
+            assemblies.Add (descriptor);
             descriptor.AddObjects();
-            descriptor.AddSingleExpression(expression);
+            descriptor.AddSingleExpression (expression);
             descriptor.AddFunctions();
             descriptor.Compile();
-            return descriptor.CalcExpression(expression, value);
+            return descriptor.CalcExpression (expression, value);
         }
 
         /// <summary>
@@ -1469,45 +1441,55 @@ namespace AM.Reporting
         /// </summary>
         /// <param name="name">The name of the script method.</param>
         /// <param name="parms">The method parameters.</param>
-        public object InvokeMethod(string name, object[] parms)
+        public object InvokeMethod (string name, object[] parms)
         {
             if (assemblies.Count > 0)
-                return assemblies[0].InvokeMethod(name, parms);
+            {
+                return assemblies[0].InvokeMethod (name, parms);
+            }
+
             return null;
         }
 
-        private Column GetColumn(string complexName)
+        private Column GetColumn (string complexName)
         {
-            if (String.IsNullOrEmpty(complexName))
+            if (string.IsNullOrEmpty (complexName))
+            {
                 return null;
+            }
 
-            CachedDataItem cachedItem = cachedDataItems[complexName] as CachedDataItem;
-            if (cachedItem != null)
+            if (cachedDataItems[complexName] is CachedDataItem cachedItem)
+            {
                 return cachedItem.column;
+            }
 
-            string[] names = complexName.Split('.');
+            string[] names = complexName.Split ('.');
             cachedItem = cachedDataItems[names[0]] as CachedDataItem;
-            DataSourceBase data = cachedItem != null ? cachedItem.dataSource : GetDataSource(names[0]);
+            var data = cachedItem != null ? cachedItem.dataSource : GetDataSource (names[0]);
 
-            return DataHelper.GetColumn(Dictionary, data, names, true);
+            return DataHelper.GetColumn (Dictionary, data, names, true);
         }
 
-        private object GetColumnValue(string complexName, bool convertNull)
+        private object GetColumnValue (string complexName, bool convertNull)
         {
-            Column column = GetColumn(complexName);
+            var column = GetColumn (complexName);
             if (column == null)
+            {
                 return null;
+            }
 
-            return ConvertToColumnDataType(column.Value, column.DataType, convertNull);
+            return ConvertToColumnDataType (column.Value, column.DataType, convertNull);
         }
 
-        private Variant GetTotalValue(string name, bool convertNull)
+        private Variant GetTotalValue (string name, bool convertNull)
         {
-            object value = Dictionary.Totals.GetValue(name);
+            var value = Dictionary.Totals.GetValue (name);
             if (convertNull && (value == null || value is DBNull))
+            {
                 value = 0;
+            }
 
-            return new Variant(value);
+            return new Variant (value);
         }
 
         /// <summary>
@@ -1524,9 +1506,9 @@ namespace AM.Reporting
         /// string employeeName = (string)report.GetColumnValue("Employees.FirstName");
         /// </code>
         /// </example>
-        public object GetColumnValue(string complexName)
+        public object GetColumnValue (string complexName)
         {
-            return GetColumnValue(complexName, true);
+            return GetColumnValue (complexName, true);
         }
 
         /// <summary>
@@ -1535,9 +1517,9 @@ namespace AM.Reporting
         /// <param name="complexName">The name of the data column including the datasource name.</param>
         /// <returns>If report is running, returns the column value.
         /// Otherwise returns <b>null</b>.</returns>
-        public object GetColumnValueNullable(string complexName)
+        public object GetColumnValueNullable (string complexName)
         {
-            return GetColumnValue(complexName, false);
+            return GetColumnValue (complexName, false);
         }
 
         /// <summary>
@@ -1548,11 +1530,14 @@ namespace AM.Reporting
         /// <remarks>
         /// To find nested parameter, use the "." separator: "MainParameter.NestedParameter"
         /// </remarks>
-        public Parameter GetParameter(string complexName)
+        public Parameter GetParameter (string complexName)
         {
             if (IsRunning)
+            {
                 return cachedDataItems[complexName] as Parameter;
-            return DataHelper.GetParameter(Dictionary, complexName);
+            }
+
+            return DataHelper.GetParameter (Dictionary, complexName);
         }
 
         /// <summary>
@@ -1563,18 +1548,20 @@ namespace AM.Reporting
         /// <remarks>
         /// To find nested parameter, use the "." separator: "MainParameter.NestedParameter"
         /// </remarks>
-        public object GetParameterValue(string complexName)
+        public object GetParameterValue (string complexName)
         {
-            Parameter par = GetParameter(complexName);
+            var par = GetParameter (complexName);
             if (par != null)
             {
                 // avoid InvalidCastException when casting object that is int to double
-                if (par.DataType.Name == "Double" && par.Value.GetType() == typeof(int))
+                if (par.DataType.Name == "Double" && par.Value.GetType() == typeof (int))
                 {
                     return (double)(int)par.Value;
                 }
+
                 return par.Value;
             }
+
             return null;
         }
 
@@ -1603,11 +1590,14 @@ namespace AM.Reporting
         /// report1.Show();
         /// </code>
         /// </example>
-        public void SetParameterValue(string complexName, object value)
+        public void SetParameterValue (string complexName, object value)
         {
-            Parameter par = GetParameter(complexName);
+            var par = GetParameter (complexName);
             if (par == null)
-                par = DataHelper.CreateParameter(Dictionary, complexName);
+            {
+                par = DataHelper.CreateParameter (Dictionary, complexName);
+            }
+
             if (par != null)
             {
                 par.Value = value;
@@ -1620,9 +1610,9 @@ namespace AM.Reporting
         /// </summary>
         /// <param name="complexName">Name of a variable.</param>
         /// <returns>The variable's value if found, otherwise <b>null</b>.</returns>
-        public object GetVariableValue(string complexName)
+        public object GetVariableValue (string complexName)
         {
-            return GetParameterValue(complexName);
+            return GetParameterValue (complexName);
         }
 
         /// <summary>
@@ -1633,9 +1623,9 @@ namespace AM.Reporting
         /// <remarks>This method converts null values to 0 if the <see cref="ConvertNulls"/> property is set to true.
         /// Use the <see cref="GetTotalValueNullable"/> method if you don't want the null conversion.
         /// </remarks>
-        public Variant GetTotalValue(string name)
+        public Variant GetTotalValue (string name)
         {
-            return GetTotalValue(name, ConvertNulls);
+            return GetTotalValue (name, ConvertNulls);
         }
 
         /// <summary>
@@ -1643,9 +1633,9 @@ namespace AM.Reporting
         /// </summary>
         /// <param name="name">Name of total.</param>
         /// <returns>The total's value if found, otherwise <b>null</b>.</returns>
-        public Variant GetTotalValueNullable(string name)
+        public Variant GetTotalValueNullable (string name)
         {
-            return GetTotalValue(name, false);
+            return GetTotalValue (name, false);
         }
 
         /// <summary>
@@ -1653,9 +1643,9 @@ namespace AM.Reporting
         /// </summary>
         /// <param name="alias">Alias name of a datasource.</param>
         /// <returns>The datasource object if found, otherwise <b>null</b>.</returns>
-        public DataSourceBase GetDataSource(string alias)
+        public DataSourceBase GetDataSource (string alias)
         {
-            return Dictionary.FindByAlias(alias) as DataSourceBase;
+            return Dictionary.FindByAlias (alias) as DataSourceBase;
         }
 
         #endregion Script related
@@ -1663,9 +1653,9 @@ namespace AM.Reporting
         #region Public Methods
 
         /// <inheritdoc/>
-        public override void Assign(Base source)
+        public override void Assign (Base source)
         {
-            BaseAssign(source);
+            BaseAssign (source);
         }
 
         /// <summary>
@@ -1673,17 +1663,20 @@ namespace AM.Reporting
         /// </summary>
         public void Abort()
         {
-            SetAborted(true);
+            SetAborted (true);
         }
 
         /// <inheritdoc/>
-        public override Base FindObject(string name)
+        public override Base FindObject (string name)
         {
             foreach (Base c in AllNamedObjects)
             {
-                if (String.Compare(name, c.Name, true) == 0)
+                if (string.Compare (name, c.Name, true) == 0)
+                {
                     return c;
+                }
             }
+
             return null;
         }
 
@@ -1704,8 +1697,10 @@ namespace AM.Reporting
         {
             foreach (Base c in AllObjects)
             {
-                if (c is ReportComponentBase)
-                    (c as ReportComponentBase).Style = (c as ReportComponentBase).Style;
+                if (c is ReportComponentBase @base)
+                {
+                    @base.Style = @base.Style;
+                }
             }
         }
 
@@ -1713,56 +1708,64 @@ namespace AM.Reporting
         /// Sets prepared pages.
         /// </summary>
         /// <param name="pages"></param>
-        public void SetPreparedPages(Preview.PreparedPages pages)
+        public void SetPreparedPages (Preview.PreparedPages pages)
         {
-            preparedPages = pages;
+            PreparedPages = pages;
             if (pages != null)
-                pages.SetReport(this);
+            {
+                pages.SetReport (this);
+            }
         }
 
-        internal void SetAborted(bool value)
+        internal void SetAborted (bool value)
         {
             aborted = value;
         }
 
-        internal void SetOperation(ReportOperation operation)
+        internal void SetOperation (ReportOperation operation)
         {
-            this.operation = operation;
+            this.Operation = operation;
         }
 
         /// <summary>
         /// This method fires the <b>StartReport</b> event and the script code connected
         /// to the <b>StartReportEvent</b>.
         /// </summary>
-        public void OnStartReport(EventArgs e)
+        public void OnStartReport (EventArgs e)
         {
-            SetRunning(true);
+            SetRunning (true);
             if (StartReport != null)
-                StartReport(this, e);
-            InvokeMethod(StartReportEvent, new object[] { this, e });
+            {
+                StartReport (this, e);
+            }
+
+            InvokeMethod (StartReportEvent, new object[] { this, e });
         }
 
         /// <summary>
         /// This method fires the <b>FinishReport</b> event and the script code connected
         /// to the <b>FinishReportEvent</b>.
         /// </summary>
-        public void OnFinishReport(EventArgs e)
+        public void OnFinishReport (EventArgs e)
         {
-            SetRunning(false);
+            SetRunning (false);
             if (FinishReport != null)
-                FinishReport(this, e);
-            InvokeMethod(FinishReportEvent, new object[] { this, e });
+            {
+                FinishReport (this, e);
+            }
+
+            InvokeMethod (FinishReportEvent, new object[] { this, e });
         }
 
         /// <summary>
         /// Runs the Export event.
         /// </summary>
         /// <param name="e">ExportReportEventArgs object.</param>
-        public void OnExportParameters(ExportParametersEventArgs e)
+        public void OnExportParameters (ExportParametersEventArgs e)
         {
             if (ExportParameters != null)
             {
-                ExportParameters(this, e);
+                ExportParameters (this, e);
             }
         }
 
@@ -1773,10 +1776,10 @@ namespace AM.Reporting
         /// <remarks>
         /// For example: <code>report.AddReferencedAssembly("Newtonsoft.Json.dll")</code>
         /// </remarks>
-        public void AddReferencedAssembly(string assembly_name)
+        public void AddReferencedAssembly (string assembly_name)
         {
             string[] assemblies = ReferencedAssemblies;
-            Array.Resize(ref assemblies, assemblies.Length + 1);
+            Array.Resize (ref assemblies, assemblies.Length + 1);
             assemblies[assemblies.Length - 1] = assembly_name;
             ReferencedAssemblies = assemblies;
         }
@@ -1785,84 +1788,131 @@ namespace AM.Reporting
         /// Add the names of the assembly (in addition to the default) that will be used to compile the report script
         /// </summary>
         /// <param name="assembly_names">Assembly's names</param>
-        public void AddReferencedAssembly(IList<string> assembly_names)
+        public void AddReferencedAssembly (IList<string> assembly_names)
         {
             string[] assemblies = ReferencedAssemblies;
-            int oldLength = assemblies.Length;
-            Array.Resize(ref assemblies, oldLength + assembly_names.Count);
-            for (int i = 0; i < assembly_names.Count; i++)
+            var oldLength = assemblies.Length;
+            Array.Resize (ref assemblies, oldLength + assembly_names.Count);
+            for (var i = 0; i < assembly_names.Count; i++)
             {
                 assemblies[oldLength + i] = assembly_names[i];
             }
+
             ReferencedAssemblies = assemblies;
         }
 
         /// <inheritdoc/>
-        public override void Serialize(FRWriter writer)
+        public override void Serialize (FRWriter writer)
         {
-            Report c = writer.DiffObject as Report;
+            var c = writer.DiffObject as Report;
             writer.ItemName = IsAncestor ? "inherited" : ClassName;
             if (BaseReport != c.BaseReport)
             {
                 // when save to the report file, convert absolute path to the base report to relative path
                 // (based on the main report path). Do not convert when saving to the clipboard.
-                string value = writer.SerializeTo != SerializeTo.Undo ? GetRelativePathToBaseReport() : BaseReport;
-                writer.WriteStr("BaseReport", value);
+                var value = writer.SerializeTo != SerializeTo.Undo ? GetRelativePathToBaseReport() : BaseReport;
+                writer.WriteStr ("BaseReport", value);
+
                 // Fix bug with moving child report to another folder without parent report.
                 if (writer.SerializeTo == SerializeTo.Report)
-                    writer.WriteStr("BaseReportAbsolutePath", BaseReport);
+                {
+                    writer.WriteStr ("BaseReportAbsolutePath", BaseReport);
+                }
             }
+
             // always serialize ScriptLanguage because its default value depends on Config.ReportSettings.DefaultLanguage
-            writer.WriteValue("ScriptLanguage", ScriptLanguage);
+            writer.WriteValue ("ScriptLanguage", ScriptLanguage);
             if (ScriptText != c.ScriptText)
-                writer.WritePropertyValue("ScriptText", ScriptText);
-            if (!writer.AreEqual(ReferencedAssemblies, c.ReferencedAssemblies))
-                writer.WriteValue("ReferencedAssemblies", ReferencedAssemblies);
+            {
+                writer.WritePropertyValue ("ScriptText", ScriptText);
+            }
+
+            if (!writer.AreEqual (ReferencedAssemblies, c.ReferencedAssemblies))
+            {
+                writer.WriteValue ("ReferencedAssemblies", ReferencedAssemblies);
+            }
+
             if (ConvertNulls != c.ConvertNulls)
-                writer.WriteBool("ConvertNulls", ConvertNulls);
+            {
+                writer.WriteBool ("ConvertNulls", ConvertNulls);
+            }
+
             if (DoublePass != c.DoublePass)
-                writer.WriteBool("DoublePass", DoublePass);
+            {
+                writer.WriteBool ("DoublePass", DoublePass);
+            }
+
             if (Compressed != c.Compressed)
-                writer.WriteBool("Compressed", Compressed);
+            {
+                writer.WriteBool ("Compressed", Compressed);
+            }
+
             if (UseFileCache != c.UseFileCache)
-                writer.WriteBool("UseFileCache", UseFileCache);
+            {
+                writer.WriteBool ("UseFileCache", UseFileCache);
+            }
+
             if (TextQuality != c.TextQuality)
-                writer.WriteValue("TextQuality", TextQuality);
+            {
+                writer.WriteValue ("TextQuality", TextQuality);
+            }
+
             if (SmoothGraphics != c.SmoothGraphics)
-                writer.WriteBool("SmoothGraphics", SmoothGraphics);
+            {
+                writer.WriteBool ("SmoothGraphics", SmoothGraphics);
+            }
+
             if (Password != c.Password)
-                writer.WriteStr("Password", Password);
+            {
+                writer.WriteStr ("Password", Password);
+            }
+
             if (InitialPageNumber != c.InitialPageNumber)
-                writer.WriteInt("InitialPageNumber", InitialPageNumber);
+            {
+                writer.WriteInt ("InitialPageNumber", InitialPageNumber);
+            }
+
             if (MaxPages != c.MaxPages)
-                writer.WriteInt("MaxPages", MaxPages);
+            {
+                writer.WriteInt ("MaxPages", MaxPages);
+            }
+
             if (StartReportEvent != c.StartReportEvent)
-                writer.WriteStr("StartReportEvent", StartReportEvent);
+            {
+                writer.WriteStr ("StartReportEvent", StartReportEvent);
+            }
+
             if (FinishReportEvent != c.FinishReportEvent)
-                writer.WriteStr("FinishReportEvent", FinishReportEvent);
-            ReportInfo.Serialize(writer, c.ReportInfo);
-            SerializeDesign(writer, c);
+            {
+                writer.WriteStr ("FinishReportEvent", FinishReportEvent);
+            }
+
+            ReportInfo.Serialize (writer, c.ReportInfo);
+            SerializeDesign (writer, c);
             if (Styles.Count > 0)
-                writer.Write(Styles);
-            writer.Write(Dictionary);
+            {
+                writer.Write (Styles);
+            }
+
+            writer.Write (Dictionary);
             if (writer.SaveChildren)
             {
                 foreach (Base child in ChildObjects)
                 {
-                    writer.Write(child);
+                    writer.Write (child);
                 }
             }
         }
 
         /// <inheritdoc/>
-        public override void Deserialize(FRReader reader)
+        public override void Deserialize (FRReader reader)
         {
-            if (reader.HasProperty("BaseReportAbsolutePath"))
+            if (reader.HasProperty ("BaseReportAbsolutePath"))
             {
-                BaseReportAbsolutePath = reader.ReadStr("BaseReportAbsolutePath");
+                BaseReportAbsolutePath = reader.ReadStr ("BaseReportAbsolutePath");
             }
 
-            base.Deserialize(reader);
+            base.Deserialize (reader);
 
             // call OnAfterLoad method of each report object
             foreach (Base c in AllObjects)
@@ -1875,29 +1925,34 @@ namespace AM.Reporting
         /// Saves the report to a stream.
         /// </summary>
         /// <param name="stream">The stream to save to.</param>
-        public void Save(Stream stream)
+        public void Save (Stream stream)
         {
-            using (FRWriter writer = new FRWriter())
+            using (var writer = new FRWriter())
             {
                 if (IsAncestor)
-                    writer.GetDiff += new DiffEventHandler(GetDiff);
-                writer.Write(this);
+                {
+                    writer.GetDiff += new DiffEventHandler (GetDiff);
+                }
+
+                writer.Write (this);
 
                 List<Stream> disposeList = new List<Stream>();
 
                 if (Compressed)
                 {
-                    stream = Compressor.Compress(stream);
-                    disposeList.Add(stream);
+                    stream = Compressor.Compress (stream);
+                    disposeList.Add (stream);
                 }
-                if (!String.IsNullOrEmpty(Password))
-                {
-                    stream = Crypter.Encrypt(stream, Password);
-                    disposeList.Insert(0, stream);
-                }
-                writer.Save(stream);
 
-                foreach (Stream s in disposeList)
+                if (!string.IsNullOrEmpty (Password))
+                {
+                    stream = Crypter.Encrypt (stream, Password);
+                    disposeList.Insert (0, stream);
+                }
+
+                writer.Save (stream);
+
+                foreach (var s in disposeList)
                 {
                     s.Dispose();
                 }
@@ -1908,12 +1963,12 @@ namespace AM.Reporting
         /// Saves the report to a file.
         /// </summary>
         /// <param name="fileName">The name of the file to save to.</param>
-        public void Save(string fileName)
+        public void Save (string fileName)
         {
             FileName = fileName;
-            using (FileStream f = new FileStream(fileName, FileMode.Create))
+            using (var f = new FileStream (fileName, FileMode.Create))
             {
-                Save(f);
+                Save (f);
             }
         }
 
@@ -1921,22 +1976,22 @@ namespace AM.Reporting
         /// Saves the report to a stream with randomized values in data sources.
         /// </summary>
         /// <param name="stream">The stream to save to.</param>
-        public void SaveWithRandomData(Stream stream)
+        public void SaveWithRandomData (Stream stream)
         {
-            FRRandom random = new FRRandom();
-            random.RandomizeDataSources(Dictionary.DataSources);
-            Save(stream);
+            var random = new FRRandom();
+            random.RandomizeDataSources (Dictionary.DataSources);
+            Save (stream);
         }
 
         /// <summary>
         /// Saves the report to a file with randomized values in data sources.
         /// </summary>
         /// <param name="fileName">The name of the file to save to.</param>
-        public void SaveWithRandomData(string fileName)
+        public void SaveWithRandomData (string fileName)
         {
-            FRRandom random = new FRRandom();
-            random.RandomizeDataSources(Dictionary.DataSources);
-            Save(fileName);
+            var random = new FRRandom();
+            random.RandomizeDataSources (Dictionary.DataSources);
+            Save (fileName);
         }
 
         /// <summary>
@@ -1948,43 +2003,48 @@ namespace AM.Reporting
         /// for a password. You also may specify the password in the <see cref="Password"/>
         /// property before loading the report. In this case the report will load silently.
         /// </remarks>
-        public void Load(Stream stream)
+        public void Load (Stream stream)
         {
-            string password = Password;
+            var password = Password;
             Clear();
 
-            using (FRReader reader = new FRReader(this))
+            using (var reader = new FRReader (this))
             {
                 List<Stream> disposeList = new List<Stream>();
-                if (Compressor.IsStreamCompressed(stream))
+                if (Compressor.IsStreamCompressed (stream))
                 {
-                    stream = Compressor.Decompress(stream, true);
-                    disposeList.Add(stream);
+                    stream = Compressor.Decompress (stream, true);
+                    disposeList.Add (stream);
                 }
-                bool crypted = Crypter.IsStreamEncrypted(stream);
+
+                var crypted = Crypter.IsStreamEncrypted (stream);
                 if (crypted)
                 {
-                    if (String.IsNullOrEmpty(password))
+                    if (string.IsNullOrEmpty (password))
                     {
-                        password = ShowPaswordForm(password);
+                        password = ShowPaswordForm (password);
                     }
-                    stream = Crypter.Decrypt(stream, password);
-                    disposeList.Add(stream);
+
+                    stream = Crypter.Decrypt (stream, password);
+                    disposeList.Add (stream);
                 }
 
                 try
                 {
-                    reader.Load(stream);
+                    reader.Load (stream);
                 }
                 catch (Exception e)
                 {
                     if (crypted)
+                    {
                         throw new DecryptException();
+                    }
+
                     throw e;
                 }
                 finally
                 {
-                    foreach (Stream s in disposeList)
+                    foreach (var s in disposeList)
                     {
                         try
                         {
@@ -1996,12 +2056,14 @@ namespace AM.Reporting
                     }
                 }
 
-                reader.Read(this);
+                reader.Read (this);
 
                 foreach (Base c in AllObjects)
                 {
-                    if (c is BandBase)
-                        Validator.ValidateIntersectionAllObjects(c as BandBase);
+                    if (c is BandBase @base)
+                    {
+                        Validator.ValidateIntersectionAllObjects (@base);
+                    }
                 }
             }
         }
@@ -2015,13 +2077,13 @@ namespace AM.Reporting
         /// for a password. You also may specify the password in the <see cref="Password"/>
         /// property before loading the report. In this case the report will load silently.
         /// </remarks>
-        public void Load(string fileName)
+        public void Load (string fileName)
         {
-            this.fileName = "";
-            using (FileStream f = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
+            this.FileName = "";
+            using (var f = new FileStream (fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
-                this.fileName = fileName;
-                Load(f);
+                this.FileName = fileName;
+                Load (f);
             }
         }
 
@@ -2029,25 +2091,27 @@ namespace AM.Reporting
         /// Loads the report from a string.
         /// </summary>
         /// <param name="s">The string that contains a stream in UTF8 or Base64 encoding.</param>
-        public void LoadFromString(string s)
+        public void LoadFromString (string s)
         {
-            if (String.IsNullOrEmpty(s))
+            if (string.IsNullOrEmpty (s))
+            {
                 return;
+            }
 
             byte[] buffer;
-            int startIndex = s.IndexOf("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+            var startIndex = s.IndexOf ("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
             if (startIndex != -1)
             {
-                buffer = Encoding.UTF8.GetBytes(s.Substring(startIndex));
+                buffer = Encoding.UTF8.GetBytes (s.Substring (startIndex));
             }
             else
             {
-                buffer = Convert.FromBase64String(s);
+                buffer = Convert.FromBase64String (s);
             }
 
-            using (MemoryStream stream = new MemoryStream(buffer))
+            using (var stream = new MemoryStream (buffer))
             {
-                Load(stream);
+                Load (stream);
             }
         }
 
@@ -2057,17 +2121,17 @@ namespace AM.Reporting
         /// <returns>The string that contains a stream.</returns>
         public string SaveToString()
         {
-            using (MemoryStream stream = new MemoryStream())
+            using (var stream = new MemoryStream())
             {
-                Save(stream);
+                Save (stream);
 
-                if (Compressed || !String.IsNullOrEmpty(Password))
+                if (Compressed || !string.IsNullOrEmpty (Password))
                 {
-                    return Convert.ToBase64String(stream.ToArray());
+                    return Convert.ToBase64String (stream.ToArray());
                 }
                 else
                 {
-                    return Encoding.UTF8.GetString(stream.ToArray());
+                    return Encoding.UTF8.GetString (stream.ToArray());
                 }
             }
         }
@@ -2078,10 +2142,10 @@ namespace AM.Reporting
         /// <returns>The string that contains a stream.</returns>
         public string SaveToStringBase64()
         {
-            using (MemoryStream stream = new MemoryStream())
+            using (var stream = new MemoryStream())
             {
-                Save(stream);
-                return Convert.ToBase64String(stream.ToArray());
+                Save (stream);
+                return Convert.ToBase64String (stream.ToArray());
             }
         }
 
@@ -2090,10 +2154,10 @@ namespace AM.Reporting
         /// </summary>
         /// <param name="stream">The stream to load from.</param>
         /// <returns>The new report instance.</returns>
-        public static Report FromStream(Stream stream)
+        public static Report FromStream (Stream stream)
         {
-            Report result = new Report();
-            result.Load(stream);
+            var result = new Report();
+            result.Load (stream);
             return result;
         }
 
@@ -2102,10 +2166,10 @@ namespace AM.Reporting
         /// </summary>
         /// <param name="fileName">The name of the file to load from.</param>
         /// <returns>The new report instance.</returns>
-        public static Report FromFile(string fileName)
+        public static Report FromFile (string fileName)
         {
-            Report result = new Report();
-            result.Load(fileName);
+            var result = new Report();
+            result.Load (fileName);
             return result;
         }
 
@@ -2114,10 +2178,10 @@ namespace AM.Reporting
         /// </summary>
         /// <param name="utf8String">The string that contains a stream in UTF8 encoding.</param>
         /// <returns>The new report instance.</returns>
-        public static Report FromString(string utf8String)
+        public static Report FromString (string utf8String)
         {
-            Report result = new Report();
-            result.LoadFromString(utf8String);
+            var result = new Report();
+            result.LoadFromString (utf8String);
             return result;
         }
 
@@ -2134,9 +2198,9 @@ namespace AM.Reporting
         /// report1.RegisterData(dataSet1);
         /// </code>
         /// </example>
-        public void RegisterData(DataSet data)
+        public void RegisterData (DataSet data)
         {
-            Dictionary.RegisterDataSet(data, "Data", false);
+            Dictionary.RegisterDataSet (data, "Data", false);
         }
 
         /// <summary>
@@ -2153,14 +2217,16 @@ namespace AM.Reporting
         /// report1.RegisterData(dataSet1, true);
         /// </code>
         /// </example>
-        public void RegisterData(DataSet data, bool enableAllTables)
+        public void RegisterData (DataSet data, bool enableAllTables)
         {
-            Dictionary.RegisterDataSet(data, "Data", false);
+            Dictionary.RegisterDataSet (data, "Data", false);
             foreach (DataTable table in data.Tables)
             {
-                DataSourceBase ds = Report.GetDataSource(table.TableName);
+                var ds = Report.GetDataSource (table.TableName);
                 if (ds != null)
+                {
                     ds.Enabled = true;
+                }
             }
         }
 
@@ -2180,7 +2246,7 @@ namespace AM.Reporting
         /// report1.RegisterData(dataSet1, "NorthWind");
         /// </code>
         /// </example>
-        public void RegisterData(DataSet data, string name)
+        public void RegisterData (DataSet data, string name)
         {
             if (initializing)
             {
@@ -2188,7 +2254,9 @@ namespace AM.Reporting
                 initializeDataName = name;
             }
             else
-                Dictionary.RegisterDataSet(data, name, false);
+            {
+                Dictionary.RegisterDataSet (data, name, false);
+            }
         }
 
         /// <summary>
@@ -2208,7 +2276,7 @@ namespace AM.Reporting
         /// report1.RegisterData(dataSet1, "NorthWind", true);
         /// </code>
         /// </example>
-        public void RegisterData(DataSet data, string name, bool enableAllTables)
+        public void RegisterData (DataSet data, string name, bool enableAllTables)
         {
             if (initializing)
             {
@@ -2217,12 +2285,14 @@ namespace AM.Reporting
             }
             else
             {
-                Dictionary.RegisterDataSet(data, name, false);
+                Dictionary.RegisterDataSet (data, name, false);
                 foreach (DataTable table in data.Tables)
                 {
-                    DataSourceBase ds = Report.GetDataSource(table.TableName);
+                    var ds = Report.GetDataSource (table.TableName);
                     if (ds != null)
+                    {
                         ds.Enabled = true;
+                    }
                 }
             }
         }
@@ -2238,9 +2308,9 @@ namespace AM.Reporting
         /// report1.RegisterData(dataSet1.Tables["Orders"], "Orders");
         /// </code>
         /// </example>
-        public void RegisterData(DataTable data, string name)
+        public void RegisterData (DataTable data, string name)
         {
-            Dictionary.RegisterDataTable(data, name, false);
+            Dictionary.RegisterDataTable (data, name, false);
         }
 
         /// <summary>
@@ -2254,9 +2324,9 @@ namespace AM.Reporting
         /// report1.RegisterData(myDataView, "OrdersView");
         /// </code>
         /// </example>
-        public void RegisterData(DataView data, string name)
+        public void RegisterData (DataView data, string name)
         {
-            Dictionary.RegisterDataView(data, name, false);
+            Dictionary.RegisterDataView (data, name, false);
         }
 
         /// <summary>
@@ -2275,9 +2345,9 @@ namespace AM.Reporting
         /// report1.RegisterData(myDataRelation, "myRelation");
         /// </code>
         /// </example>
-        public void RegisterData(DataRelation data, string name)
+        public void RegisterData (DataRelation data, string name)
         {
-            Dictionary.RegisterDataRelation(data, name, false);
+            Dictionary.RegisterDataRelation (data, name, false);
         }
 
         /// <summary>
@@ -2290,9 +2360,9 @@ namespace AM.Reporting
         /// <remarks>
         /// This method is obsolete. Use the <see cref="RegisterData(IEnumerable, string)"/> method instead.
         /// </remarks>
-        public void RegisterData(IEnumerable data, string name, BOConverterFlags flags, int maxNestingLevel)
+        public void RegisterData (IEnumerable data, string name, BOConverterFlags flags, int maxNestingLevel)
         {
-            RegisterData(data, name, maxNestingLevel);
+            RegisterData (data, name, maxNestingLevel);
         }
 
         /// <summary>
@@ -2306,7 +2376,7 @@ namespace AM.Reporting
         /// report1.RegisterData(myBusinessObject, "Customers");
         /// </code>
         /// </example>
-        public void RegisterData(IEnumerable data, string name)
+        public void RegisterData (IEnumerable data, string name)
         {
             if (initializing)
             {
@@ -2314,7 +2384,9 @@ namespace AM.Reporting
                 initializeDataName = name;
             }
             else
-                Dictionary.RegisterBusinessObject(data, name, 1, false);
+            {
+                Dictionary.RegisterBusinessObject (data, name, 1, false);
+            }
         }
 
         /// <summary>
@@ -2328,9 +2400,9 @@ namespace AM.Reporting
         /// you create a report in code. In most cases, you don't need to specify the nesting level
         /// because it may be selected in the designer's "Choose Report Data" dialog.
         /// </remarks>
-        public void RegisterData(IEnumerable data, string name, int maxNestingLevel)
+        public void RegisterData (IEnumerable data, string name, int maxNestingLevel)
         {
-            Dictionary.RegisterBusinessObject(data, name, maxNestingLevel, false);
+            Dictionary.RegisterBusinessObject (data, name, maxNestingLevel, false);
         }
 
         /// <summary>
@@ -2344,9 +2416,9 @@ namespace AM.Reporting
         /// report1.RegisterData(myCubeLink, "Orders");
         /// </code>
         /// </example>
-        public void RegisterData(IBaseCubeLink data, string name)
+        public void RegisterData (IBaseCubeLink data, string name)
         {
-            Dictionary.RegisterCubeLink(data, name, false);
+            Dictionary.RegisterCubeLink (data, name, false);
         }
 
         /// <summary>
@@ -2355,7 +2427,7 @@ namespace AM.Reporting
         /// <returns><b>true</b> if report was prepared succesfully.</returns>
         public bool Prepare()
         {
-            return Prepare(false);
+            return Prepare (false);
         }
 
         /// <summary>
@@ -2377,36 +2449,41 @@ namespace AM.Reporting
         /// report.ShowPrepared();
         /// </code>
         /// </example>
-        public bool Prepare(bool append)
+        public bool Prepare (bool append)
         {
-            SetRunning(true);
+            SetRunning (true);
             try
             {
                 if (PreparedPages == null || !append)
                 {
                     ClearPreparedPages();
 
-                    SetPreparedPages(new Preview.PreparedPages(this));
+                    SetPreparedPages (new Preview.PreparedPages (this));
                 }
-                engine = new ReportEngine(this);
+
+                Engine = new ReportEngine (this);
 
                 if (!Config.WebMode)
+                {
                     StartPerformanceCounter();
+                }
 
                 try
                 {
                     Compile();
-                    return Engine.Run(true, append, true);
+                    return Engine.Run (true, append, true);
                 }
                 finally
                 {
                     if (!Config.WebMode)
+                    {
                         StopPerformanceCounter();
+                    }
                 }
             }
             finally
             {
-                SetRunning(false);
+                SetRunning (false);
             }
         }
 
@@ -2415,63 +2492,68 @@ namespace AM.Reporting
         /// </summary>
         /// <param name="pagesLimit">Pages limit. The number of pages equal or less will be prepared.</param>
         /// <returns><b>true</b> if report was prepared succesfully.</returns>
-        public bool Prepare(int pagesLimit)
+        public bool Prepare (int pagesLimit)
         {
-            SetRunning(true);
+            SetRunning (true);
             try
             {
                 ClearPreparedPages();
-                SetPreparedPages(new Preview.PreparedPages(this));
-                engine = new ReportEngine(this);
+                SetPreparedPages (new Preview.PreparedPages (this));
+                Engine = new ReportEngine (this);
 
                 if (!Config.WebMode)
+                {
                     StartPerformanceCounter();
+                }
 
                 try
                 {
                     Compile();
-                    return Engine.Run(true, false, true, pagesLimit);
+                    return Engine.Run (true, false, true, pagesLimit);
                 }
                 finally
                 {
                     if (!Config.WebMode)
+                    {
                         StopPerformanceCounter();
+                    }
                 }
             }
             finally
             {
-                SetRunning(false);
+                SetRunning (false);
             }
         }
 
         /// <summary>
         /// For internal use only.
         /// </summary>
-        [EditorBrowsable(EditorBrowsableState.Never)]
+        [EditorBrowsable (EditorBrowsableState.Never)]
         public void PreparePhase1()
         {
-            bool webDialog = false;
-            SetRunning(true);
-            if (preparedPages != null)
+            var webDialog = false;
+            SetRunning (true);
+            if (PreparedPages != null)
             {
                 // if prepared pages are set before => it's call method again => it's web dialog
                 webDialog = true;
-                preparedPages.Clear();
+                PreparedPages.Clear();
             }
-            SetPreparedPages(new Preview.PreparedPages(this));
-            engine = new ReportEngine(this);
+
+            SetPreparedPages (new Preview.PreparedPages (this));
+            Engine = new ReportEngine (this);
             Compile();
-            Engine.RunPhase1(true, webDialog);
+            Engine.RunPhase1 (true, webDialog);
         }
 
         /// <summary>
         /// For internal use only.
         /// </summary>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public void PreparePhase2(int? pagesLimit = null)
+        [EditorBrowsable (EditorBrowsableState.Never)]
+        public void PreparePhase2 (int? pagesLimit = null)
         {
-            Engine.RunPhase2(pagesLimit);
-            SetRunning(false);
+            Engine.RunPhase2 (pagesLimit);
+            SetRunning (false);
         }
 
         /// <summary>
@@ -2483,7 +2565,7 @@ namespace AM.Reporting
         /// </remarks>
         public void Refresh()
         {
-            needRefresh = true;
+            NeedRefresh = true;
         }
 
         /// <summary>
@@ -2497,21 +2579,21 @@ namespace AM.Reporting
 
         internal void InternalRefresh()
         {
-            SetRunning(true);
+            SetRunning (true);
             try
             {
-                Engine.Run(false, false, false);
+                Engine.Run (false, false, false);
             }
             finally
             {
-                SetRunning(false);
+                SetRunning (false);
             }
         }
 
 
         internal TextRenderingHint GetTextQuality()
         {
-            switch (this.TextQuality)
+            switch (TextQuality)
             {
                 case TextQuality.Regular:
                     return TextRenderingHint.AntiAliasGridFit;
@@ -2537,16 +2619,16 @@ namespace AM.Reporting
         /// Prepare page
         /// </summary>
         /// <param name="page"></param>
-        public void PreparePage(ReportPage page)
+        public void PreparePage (ReportPage page)
         {
-            SetRunning(true);
+            SetRunning (true);
             try
             {
-                Engine.Run(false, false, false, page);
+                Engine.Run (false, false, false, page);
             }
             finally
             {
-                SetRunning(false);
+                SetRunning (false);
             }
         }
 
@@ -2555,9 +2637,9 @@ namespace AM.Reporting
         /// </summary>
         /// <param name="export">The export filter.</param>
         /// <param name="stream">Stream to save export result to.</param>
-        public void Export(ExportBase export, Stream stream)
+        public void Export (ExportBase export, Stream stream)
         {
-            export.Export(this, stream);
+            export.Export (this, stream);
         }
 
         /// <summary>
@@ -2565,77 +2647,89 @@ namespace AM.Reporting
         /// </summary>
         /// <param name="export">The export filter.</param>
         /// <param name="fileName">File name to save export result to.</param>
-        public void Export(ExportBase export, string fileName)
+        public void Export (ExportBase export, string fileName)
         {
-            export.Export(this, fileName);
+            export.Export (this, fileName);
         }
 
         /// <summary>
         /// Saves the prepared report. Report should be prepared using the <see cref="Prepare()"/> method.
         /// </summary>
         /// <param name="fileName">File name to save to.</param>
-        public void SavePrepared(string fileName)
+        public void SavePrepared (string fileName)
         {
             if (PreparedPages != null)
-                PreparedPages.Save(fileName);
+            {
+                PreparedPages.Save (fileName);
+            }
         }
 
         /// <summary>
         /// Saves the prepared report. Report should be prepared using the <see cref="Prepare()"/> method.
         /// </summary>
         /// <param name="stream">Stream to save to.</param>
-        public void SavePrepared(Stream stream)
+        public void SavePrepared (Stream stream)
         {
             if (PreparedPages != null)
-                PreparedPages.Save(stream);
+            {
+                PreparedPages.Save (stream);
+            }
         }
 
         /// <summary>
         /// Loads the prepared report from a .fpx file.
         /// </summary>
         /// <param name="fileName">File name to load form.</param>
-        public void LoadPrepared(string fileName)
+        public void LoadPrepared (string fileName)
         {
-            isLoadPrepared = true;
+            IsLoadPrepared = true;
             if (PreparedPages == null)
-                SetPreparedPages(new AM.Reporting.Preview.PreparedPages(this));
-            PreparedPages.Load(fileName);
+            {
+                SetPreparedPages (new Preview.PreparedPages (this));
+            }
+
+            PreparedPages.Load (fileName);
         }
 
         /// <summary>
         /// Loads the prepared report from a .fpx file.
         /// </summary>
         /// <param name="stream">Stream to load from.</param>
-        public void LoadPrepared(Stream stream)
+        public void LoadPrepared (Stream stream)
         {
-            isLoadPrepared = true;
+            IsLoadPrepared = true;
             if (PreparedPages == null)
-                SetPreparedPages(new AM.Reporting.Preview.PreparedPages(this));
-            PreparedPages.Load(stream);
+            {
+                SetPreparedPages (new Preview.PreparedPages (this));
+            }
+
+            PreparedPages.Load (stream);
         }
 
-#endregion Public Methods
+        #endregion Public Methods
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Report"/> class with default settings.
         /// </summary>
         public Report()
         {
-            pages = new PageCollection(this);
-            reportInfo = new ReportInfo();
+            Pages = new PageCollection (this);
+            ReportInfo = new ReportInfo();
             InitDesign();
-            styles = new StyleCollection();
+            Styles = new StyleCollection();
             Dictionary = new Dictionary();
-            graphicCache = new GraphicCache();
+            GraphicCache = new GraphicCache();
             assemblies = new AssemblyCollection();
-            cachedDataItems = new Hashtable(StringComparer.InvariantCultureIgnoreCase); // needed for case insensitivity
-            storeInResources = true;
-            fileName = "";
-            autoFillDataSet = true;
-            tag = null;
+            cachedDataItems =
+                new Hashtable (StringComparer.InvariantCultureIgnoreCase); // needed for case insensitivity
+            StoreInResources = true;
+            FileName = "";
+            AutoFillDataSet = true;
+            Tag = null;
             ClearReportProperties();
-            SetFlags(Flags.CanMove | Flags.CanResize | Flags.CanDelete | Flags.CanEdit | Flags.CanChangeOrder |
-              Flags.CanChangeParent | Flags.CanCopy, false);
+            SetFlags (Flags.CanMove | Flags.CanResize | Flags.CanDelete | Flags.CanEdit | Flags.CanChangeOrder |
+                      Flags.CanChangeParent | Flags.CanCopy, false);
+
             //FInlineImageCache = new InlineImageCache();
         }
 
@@ -2657,15 +2751,15 @@ namespace AM.Reporting
         /// </summary>
         /// <param name="prefix">Prefix for name</param>
         /// <param name="number">Number from which to start</param>
-        public void PostNameProcess(string prefix, int number)
+        public void PostNameProcess (string prefix, int number)
         {
-            int i = number;
+            var i = number;
 
             foreach (Base obj in AllObjects)
             {
-                if (String.IsNullOrEmpty(obj.Name))
+                if (string.IsNullOrEmpty (obj.Name))
                 {
-                    obj.SetName(prefix + i.ToString());
+                    obj.SetName (prefix + i.ToString());
                     i++;
                 }
             }

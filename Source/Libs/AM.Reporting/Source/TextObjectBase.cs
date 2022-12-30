@@ -1,9 +1,32 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.ComponentModel;
+
 using AM.Reporting.Utils;
 using AM.Reporting.Format;
+
 using System.Windows.Forms;
 using System.Drawing.Design;
+
+#endregion
+
+#nullable enable
 
 namespace AM.Reporting
 {
@@ -100,31 +123,19 @@ namespace AM.Reporting
     public partial class TextObjectBase : BreakableComponent
     {
         #region Fields
+
         private string text;
-        private object value;
-        private bool allowExpressions;
-        private string brackets;
-        private Padding padding;
-        private bool hideZeros;
-        private string hideValue;
-        private string nullValue;
-        private FormatCollection formats;
-        private ProcessAt processAt;
-        private Duplicates duplicates;
-        private bool editable;
+
         #endregion
 
         #region Properties
+
         /// <summary>
         /// Gets or sets a value indicating that the object's text may contain expressions.
         /// </summary>
-        [DefaultValue(true)]
-        [Category("Data")]
-        public bool AllowExpressions
-        {
-            get { return allowExpressions; }
-            set { allowExpressions = value; }
-        }
+        [DefaultValue (true)]
+        [Category ("Data")]
+        public bool AllowExpressions { get; set; }
 
         /// <summary>
         /// Gets or sets the symbols that will be used to find expressions in the object's text.
@@ -134,12 +145,8 @@ namespace AM.Reporting
         /// separated by the comma. You may use another symbols, for example: "&lt;,&gt;" or "&lt;%,%&gt;".
         /// You should use different open and close symbols.
         /// </remarks>
-        [Category("Data")]
-        public string Brackets
-        {
-            get { return brackets; }
-            set { brackets = value; }
-        }
+        [Category ("Data")]
+        public string Brackets { get; set; }
 
         /// <summary>
         /// Gets or sets the object's text.
@@ -149,33 +156,25 @@ namespace AM.Reporting
         /// When report is running, all expressions are calculated and replaced with actual
         /// values, so the text would be "Today is 01.01.2008".
         /// </remarks>
-        [Category("Data")]
+        [Category ("Data")]
         public virtual string Text
         {
-            get { return text; }
-            set { text = value; }
+            get => text;
+            set => text = value;
         }
 
         /// <summary>
         /// Gets or sets padding within the text object.
         /// </summary>
-        [Category("Layout")]
-        public Padding Padding
-        {
-            get { return padding; }
-            set { padding = value; }
-        }
+        [Category ("Layout")]
+        public Padding Padding { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating that zero values must be hidden.
         /// </summary>
-        [Category("Behavior")]
-        [DefaultValue(false)]
-        public bool HideZeros
-        {
-            get { return hideZeros; }
-            set { hideZeros = value; }
-        }
+        [Category ("Behavior")]
+        [DefaultValue (false)]
+        public bool HideZeros { get; set; }
 
         /// <summary>
         /// Gets or sets a value that will be hidden.
@@ -192,22 +191,14 @@ namespace AM.Reporting
         /// if you going to distribute your report worldwide.
         /// </note>
         /// </remarks>
-        [Category("Behavior")]
-        public string HideValue
-        {
-            get { return hideValue; }
-            set { hideValue = value; }
-        }
+        [Category ("Behavior")]
+        public string HideValue { get; set; }
 
         /// <summary>
         /// Gets or sets a string that will be displayed instead of a null value.
         /// </summary>
-        [Category("Behavior")]
-        public string NullValue
-        {
-            get { return nullValue; }
-            set { nullValue = value; }
-        }
+        [Category ("Behavior")]
+        public string NullValue { get; set; }
 
         /// <summary>
         /// Gets or sets the formatter that will be used to format data in the Text object.
@@ -224,19 +215,26 @@ namespace AM.Reporting
         /// text1.Format = new CurrencyFormat();
         /// </code>
         /// </example>
-        [Category("Data")]
-        [Editor("AM.Reporting.TypeEditors.FormatEditor, AM.Reporting", typeof(UITypeEditor))]
+        [Category ("Data")]
+        [Editor ("AM.Reporting.TypeEditors.FormatEditor, AM.Reporting", typeof (UITypeEditor))]
         public FormatBase Format
         {
-            get { return formats.Count == 0 ? new GeneralFormat() : formats[0]; }
+            get => Formats.Count == 0 ? new GeneralFormat() : Formats[0];
             set
             {
                 if (value == null)
+                {
                     value = new GeneralFormat();
-                if (formats.Count == 0)
-                    formats.Add(value);
+                }
+
+                if (Formats.Count == 0)
+                {
+                    Formats.Add (value);
+                }
                 else
-                    formats[0] = value;
+                {
+                    Formats[0] = value;
+                }
             }
         }
 
@@ -263,13 +261,9 @@ namespace AM.Reporting
         /// This option will not work if you set the <see cref="Report.UseFileCache"/> to <b>true</b>.
         /// </note>
         /// </remarks>
-        [Category("Behavior")]
-        [DefaultValue(ProcessAt.Default)]
-        public ProcessAt ProcessAt
-        {
-            get { return processAt; }
-            set { processAt = value; }
-        }
+        [Category ("Behavior")]
+        [DefaultValue (ProcessAt.Default)]
+        public ProcessAt ProcessAt { get; set; }
 
         /// <summary>
         /// Gets the collection of formatters.
@@ -285,62 +279,56 @@ namespace AM.Reporting
         /// text1.Formats.Add(new NumberFormat());
         /// </code>
         /// </remarks>
-        [Browsable(false)]
-        public FormatCollection Formats
-        {
-            get { return formats; }
-        }
+        [Browsable (false)]
+        public FormatCollection Formats { get; }
 
         /// <summary>
         /// Gets or sets a value that determines how to display duplicate values.
         /// </summary>
-        [DefaultValue(Duplicates.Show)]
-        [Category("Behavior")]
-        public Duplicates Duplicates
-        {
-            get { return duplicates; }
-            set { duplicates = value; }
-        }
+        [DefaultValue (Duplicates.Show)]
+        [Category ("Behavior")]
+        public Duplicates Duplicates { get; set; }
 
         /// <summary>
         /// Gets a value of expression contained in the object's text.
         /// </summary>
-        [Browsable(false)]
-        public object Value
-        {
-            get { return value; }
-        }
+        [Browsable (false)]
+        public object Value { get; private set; }
 
         /// <summary>
         /// Gets or sets editable for pdf export
         /// </summary>
-        [Category("Behavior")]
-        [DefaultValue(false)]
-        public bool Editable
-        {
-            get { return editable; }
-            set { editable = value; }
-        }
+        [Category ("Behavior")]
+        [DefaultValue (false)]
+        public bool Editable { get; set; }
+
         #endregion
 
         #region Protected Methods
+
         /// <inheritdoc/>
-        protected override void DeserializeSubItems(FRReader reader)
+        protected override void DeserializeSubItems (FRReader reader)
         {
-            if (String.Compare(reader.ItemName, "Formats", true) == 0)
-                reader.Read(Formats);
+            if (string.Compare (reader.ItemName, "Formats", true) == 0)
+            {
+                reader.Read (Formats);
+            }
             else
-                base.DeserializeSubItems(reader);
+            {
+                base.DeserializeSubItems (reader);
+            }
         }
+
         #endregion
 
         #region Public Methods
-        /// <inheritdoc/>
-        public override void Assign(Base source)
-        {
-            base.Assign(source);
 
-            TextObjectBase src = source as TextObjectBase;
+        /// <inheritdoc/>
+        public override void Assign (Base source)
+        {
+            base.Assign (source);
+
+            var src = source as TextObjectBase;
             Text = src.Text;
             Padding = src.Padding;
             AllowExpressions = src.AllowExpressions;
@@ -349,82 +337,122 @@ namespace AM.Reporting
             HideValue = src.HideValue;
             NullValue = src.NullValue;
             ProcessAt = src.ProcessAt;
-            Formats.Assign(src.Formats);
+            Formats.Assign (src.Formats);
             Duplicates = src.Duplicates;
             Editable = src.Editable;
         }
 
         /// <inheritdoc/>
-        public override void Serialize(FRWriter writer)
+        public override void Serialize (FRWriter writer)
         {
-            TextObjectBase c = writer.DiffObject as TextObjectBase;
-            base.Serialize(writer);
+            var c = writer.DiffObject as TextObjectBase;
+            base.Serialize (writer);
 
             if (Text != c.Text)
-                writer.WriteStr("Text", Text);
+            {
+                writer.WriteStr ("Text", Text);
+            }
+
             if (Padding != c.Padding)
-                writer.WriteValue("Padding", Padding);
+            {
+                writer.WriteValue ("Padding", Padding);
+            }
+
             if (writer.SerializeTo != SerializeTo.Preview)
             {
                 if (AllowExpressions != c.AllowExpressions)
-                    writer.WriteBool("AllowExpressions", AllowExpressions);
+                {
+                    writer.WriteBool ("AllowExpressions", AllowExpressions);
+                }
+
                 if (Brackets != c.Brackets)
-                    writer.WriteStr("Brackets", Brackets);
+                {
+                    writer.WriteStr ("Brackets", Brackets);
+                }
+
                 if (HideZeros != c.HideZeros)
-                    writer.WriteBool("HideZeros", HideZeros);
+                {
+                    writer.WriteBool ("HideZeros", HideZeros);
+                }
+
                 if (HideValue != c.HideValue)
-                    writer.WriteStr("HideValue", HideValue);
+                {
+                    writer.WriteStr ("HideValue", HideValue);
+                }
+
                 if (NullValue != c.NullValue)
-                    writer.WriteStr("NullValue", NullValue);
+                {
+                    writer.WriteStr ("NullValue", NullValue);
+                }
+
                 if (ProcessAt != c.ProcessAt)
-                    writer.WriteValue("ProcessAt", ProcessAt);
+                {
+                    writer.WriteValue ("ProcessAt", ProcessAt);
+                }
+
                 if (Duplicates != c.Duplicates)
-                    writer.WriteValue("Duplicates", Duplicates);
+                {
+                    writer.WriteValue ("Duplicates", Duplicates);
+                }
             }
+
             if (Editable)
-                writer.WriteBool("Editable", Editable);
+            {
+                writer.WriteBool ("Editable", Editable);
+            }
+
             if (Formats.Count > 1)
-                writer.Write(Formats);
+            {
+                writer.Write (Formats);
+            }
             else
-                Format.Serialize(writer, "Format.", c.Format);
+            {
+                Format.Serialize (writer, "Format.", c.Format);
+            }
         }
 
         /// <inheritdoc/>
         public override void ExtractMacros()
         {
-            Text = ExtractDefaultMacros(Text);
+            Text = ExtractDefaultMacros (Text);
         }
 
-        internal void SetValue(object value)
+        internal void SetValue (object value)
         {
-            this.value = value;
+            this.Value = value;
         }
 
-        internal string GetTextWithBrackets(string text)
+        internal string GetTextWithBrackets (string text)
         {
-            string[] brackets = Brackets.Split(',');
+            string[] brackets = Brackets.Split (',');
             return brackets[0] + text + brackets[1];
         }
 
-        internal string GetTextWithoutBrackets(string text)
+        internal string GetTextWithoutBrackets (string text)
         {
-            string[] brackets = Brackets.Split(',');
-            if (text.StartsWith(brackets[0]))
-                text = text.Remove(0, brackets[0].Length);
-            if (text.EndsWith(brackets[1]))
-                text = text.Remove(text.Length - brackets[1].Length);
+            string[] brackets = Brackets.Split (',');
+            if (text.StartsWith (brackets[0]))
+            {
+                text = text.Remove (0, brackets[0].Length);
+            }
+
+            if (text.EndsWith (brackets[1]))
+            {
+                text = text.Remove (text.Length - brackets[1].Length);
+            }
+
             return text;
         }
 
-        internal string FormatValue(object value)
+        internal string FormatValue (object value)
         {
-            return FormatValue(value, 0);
+            return FormatValue (value, 0);
         }
 
-        internal string FormatValue(object value, int formatIndex)
+        internal string FormatValue (object value, int formatIndex)
         {
-            this.value = value;
-            string formattedValue = "";
+            this.Value = value;
+            var formattedValue = "";
             if (value == null || value is DBNull)
             {
                 formattedValue = NullValue;
@@ -432,35 +460,44 @@ namespace AM.Reporting
             else
             {
                 if (formatIndex < Formats.Count)
-                    formattedValue = Formats[formatIndex].FormatValue(value);
+                {
+                    formattedValue = Formats[formatIndex].FormatValue (value);
+                }
                 else
-                    formattedValue = Format.FormatValue(value);
+                {
+                    formattedValue = Format.FormatValue (value);
+                }
 
-                if (!String.IsNullOrEmpty(HideValue))
+                if (!string.IsNullOrEmpty (HideValue))
                 {
                     if (value.ToString() == HideValue)
+                    {
                         formattedValue = "";
+                    }
                 }
+
                 if (HideZeros)
                 {
-                    Variant v = new Variant(value);
+                    var v = new Variant (value);
                     if ((v.IsNumeric && v == 0) || (v.IsDate && v.ToDateTime() == DateTime.MinValue))
+                    {
                         formattedValue = "";
+                    }
                 }
             }
 
             return formattedValue;
         }
 
-        internal string CalcAndFormatExpression(string expression, int expressionIndex)
+        internal string CalcAndFormatExpression (string expression, int expressionIndex)
         {
             try
             {
-                return FormatValue(Report.Calc(expression), expressionIndex);
+                return FormatValue (Report.Calc (expression), expressionIndex);
             }
             catch (Exception e)
             {
-                throw new Exception(Name + ": " + Res.Get("Messages,ErrorInExpression") + ": " + expression,
+                throw new Exception (Name + ": " + Res.Get ("Messages,ErrorInExpression") + ": " + expression,
                     e.InnerException == null ? e : e.InnerException);
             }
         }
@@ -482,14 +519,14 @@ namespace AM.Reporting
         /// </summary>
         public TextObjectBase()
         {
-            allowExpressions = true;
-            brackets = "[,]";
-            padding = new Padding(2, 0, 2, 0);
-            hideValue = "";
-            nullValue = "";
+            AllowExpressions = true;
+            Brackets = "[,]";
+            Padding = new Padding (2, 0, 2, 0);
+            HideValue = "";
+            NullValue = "";
             text = "";
-            formats = new FormatCollection();
-            formats.Add(new GeneralFormat());
+            Formats = new FormatCollection();
+            Formats.Add (new GeneralFormat());
         }
     }
 }

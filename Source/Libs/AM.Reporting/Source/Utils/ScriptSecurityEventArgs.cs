@@ -33,73 +33,31 @@ namespace AM.Reporting.Utils
         /// Gets the report language.
         /// </summary>
         /// <value>The report language.</value>
-        public Language ReportLanguage
-        {
-            get
-            {
-                return Report.ScriptLanguage;
-            }
-        }
-
-        private Report _report;
+        public Language ReportLanguage => Report.ScriptLanguage;
 
         /// <summary>
         /// Gets the report.
         /// </summary>
         /// <value>The report.</value>
-        public Report Report
-        {
-            get
-            {
-                return _report;
-            }
-        }
-
-        private string _reportScript;
+        public Report Report { get; }
 
         /// <summary>
         /// Gets the report script.
         /// </summary>
         /// <value>The report script.</value>
-        public string ReportScript
-        {
-            get
-            {
-                return _reportScript;
-            }
-        }
-
-        private string[] _references;
+        public string ReportScript { get; }
 
         /// <summary>
         /// Gets the references of script.
         /// </summary>
         /// <value>Script references</value>
-        public string[] References
-        {
-            get
-            {
-                return _references;
-            }
-        }
-
-        private bool _isValid = true;
+        public string[] References { get; }
 
         /// <summary>
         /// Gets or sets value if script is allowed to compile
         /// </summary>
         /// <value><c>true</c> if is valid; otherwise, <c>false</c>.</value>
-        public bool IsValid
-        {
-            get
-            {
-                return _isValid;
-            }
-            set
-            {
-                _isValid = value;
-            }
-        }
+        public bool IsValid { get; set; } = true;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:AM.Reporting.Utils.ScriptSecurityEventArgs"/> class.
@@ -107,11 +65,11 @@ namespace AM.Reporting.Utils
         /// <param name="report">Report.</param>
         /// <param name="script">Report's script.</param>
         /// <param name="refs">Report's references.</param>
-        public ScriptSecurityEventArgs(Report report, string script, string[] refs)
+        public ScriptSecurityEventArgs (Report report, string script, string[] refs)
         {
-            _report = report;
-            _reportScript = script;
-            _references = refs;
+            Report = report;
+            ReportScript = script;
+            References = refs;
         }
     }
 }

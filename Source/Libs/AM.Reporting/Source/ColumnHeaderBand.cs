@@ -25,39 +25,41 @@ using System.ComponentModel;
 
 namespace AM.Reporting
 {
-  /// <summary>
-  /// This class represents a column header band.
-  /// </summary>
-  public class ColumnHeaderBand : BandBase
-  {
-    #region Properties
     /// <summary>
-    /// This property is not relevant to this class.
+    /// This class represents a column header band.
     /// </summary>
-    [Browsable(false)]
-    public new bool StartNewPage
+    public class ColumnHeaderBand : BandBase
     {
-      get { return base.StartNewPage; }
-      set { base.StartNewPage = value; }
-    }
+        #region Properties
 
-    /// <summary>
-    /// This property is not relevant to this class.
-    /// </summary>
-    [Browsable(false)]
-    public new bool PrintOnBottom
-    {
-      get { return base.PrintOnBottom; }
-      set { base.PrintOnBottom = value; }
-    }
-    #endregion
+        /// <summary>
+        /// This property is not relevant to this class.
+        /// </summary>
+        [Browsable (false)]
+        public new bool StartNewPage
+        {
+            get => base.StartNewPage;
+            set => base.StartNewPage = value;
+        }
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ColumnHeaderBand"/> class with default settings.
-    /// </summary>
-    public ColumnHeaderBand()
-    {
-      FlagUseStartNewPage = false;
+        /// <summary>
+        /// This property is not relevant to this class.
+        /// </summary>
+        [Browsable (false)]
+        public new bool PrintOnBottom
+        {
+            get => base.PrintOnBottom;
+            set => base.PrintOnBottom = value;
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ColumnHeaderBand"/> class with default settings.
+        /// </summary>
+        public ColumnHeaderBand()
+        {
+            FlagUseStartNewPage = false;
+        }
     }
-  }
 }

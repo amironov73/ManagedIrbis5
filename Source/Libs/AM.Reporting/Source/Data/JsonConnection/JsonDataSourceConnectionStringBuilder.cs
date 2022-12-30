@@ -45,22 +45,21 @@ namespace AM.Reporting.Data.JsonConnection
         {
             get
             {
-                object result;
-                if (TryGetValue("Json", out result) && result != null)
+                if (TryGetValue ("Json", out var result) && result != null)
                 {
-                    if (Regex.IsMatch((string)result, @"^([A-Za-z0-9+\/]{4})*([A-Za-z0-9+\/]{3}=|[A-Za-z0-9+\/]{2}==)?$"))
+                    if (Regex.IsMatch ((string)result,
+                            @"^([A-Za-z0-9+\/]{4})*([A-Za-z0-9+\/]{3}=|[A-Za-z0-9+\/]{2}==)?$"))
                     {
-                        var base64str = (Convert.FromBase64String(result.ToString()));
-                        return System.Text.Encoding.UTF8.GetString(base64str);
+                        var base64str = (Convert.FromBase64String (result.ToString()));
+                        return System.Text.Encoding.UTF8.GetString (base64str);
                     }
+
                     return (string)result;
                 }
+
                 return "";
             }
-            set
-            {
-                base["Json"] = value;
-            }
+            set => base["Json"] = value;
         }
 
         /// <summary>
@@ -70,24 +69,22 @@ namespace AM.Reporting.Data.JsonConnection
         {
             get
             {
-                object result;
-                if (TryGetValue("JsonSchema", out result) && result != null)
+                if (TryGetValue ("JsonSchema", out var result) && result != null)
                 {
-                    if (Regex.IsMatch((string)result, @"^([A-Za-z0-9+\/]{4})*([A-Za-z0-9+\/]{3}=|[A-Za-z0-9+\/]{2}==)?$"))
+                    if (Regex.IsMatch ((string)result,
+                            @"^([A-Za-z0-9+\/]{4})*([A-Za-z0-9+\/]{3}=|[A-Za-z0-9+\/]{2}==)?$"))
                     {
-                        var base64str = (Convert.FromBase64String(result.ToString()));
-                        return System.Text.Encoding.UTF8.GetString(base64str);
+                        var base64str = (Convert.FromBase64String (result.ToString()));
+                        return System.Text.Encoding.UTF8.GetString (base64str);
                     }
+
                     return (string)result;
                 }
+
                 return "";
             }
-            set
-            {
-                base["JsonSchema"] = value;
-            }
+            set => base["JsonSchema"] = value;
         }
-
 
 
         /// <summary>
@@ -97,15 +94,14 @@ namespace AM.Reporting.Data.JsonConnection
         {
             get
             {
-                object result;
-                if (TryGetValue("Encoding", out result) && result != null)
+                if (TryGetValue ("Encoding", out var result) && result != null)
+                {
                     return (string)result;
+                }
+
                 return "";
             }
-            set
-            {
-                base["Encoding"] = value;
-            }
+            set => base["Encoding"] = value;
         }
 
         /// <summary>
@@ -121,44 +117,47 @@ namespace AM.Reporting.Data.JsonConnection
             {
                 var numberformat = CultureInfo.InvariantCulture.NumberFormat;
                 Dictionary<string, string> headers = new Dictionary<string, string>();
-                object result;
-                string header = string.Empty;
+                var header = string.Empty;
                 string[] splittedHeader;
-                int headerIteration = 0;
-                while (TryGetValue("Header" + headerIteration.ToString(numberformat), out result) && result != null)
+                var headerIteration = 0;
+                while (TryGetValue ("Header" + headerIteration.ToString (numberformat), out var result) && result != null)
                 {
                     header = (string)result;
 
-                    if (!string.IsNullOrWhiteSpace(header))
+                    if (!string.IsNullOrWhiteSpace (header))
                     {
-                        splittedHeader = header.Split(':');
+                        splittedHeader = header.Split (':');
 
                         string headerKey = splittedHeader[0], headerVal = splittedHeader[1];
 
-                        if (Regex.IsMatch(headerKey, @"^([A-Za-z0-9+\/]{4})*([A-Za-z0-9+\/]{3}=|[A-Za-z0-9+\/]{2}==)?$"))
+                        if (Regex.IsMatch (headerKey,
+                                @"^([A-Za-z0-9+\/]{4})*([A-Za-z0-9+\/]{3}=|[A-Za-z0-9+\/]{2}==)?$"))
                         {
-                            var base64str = Convert.FromBase64String(headerKey);
-                            headerKey = System.Text.Encoding.UTF8.GetString(base64str);
+                            var base64str = Convert.FromBase64String (headerKey);
+                            headerKey = System.Text.Encoding.UTF8.GetString (base64str);
                         }
 
-                        if (Regex.IsMatch(headerVal, @"^([A-Za-z0-9+\/]{4})*([A-Za-z0-9+\/]{3}=|[A-Za-z0-9+\/]{2}==)?$"))
+                        if (Regex.IsMatch (headerVal,
+                                @"^([A-Za-z0-9+\/]{4})*([A-Za-z0-9+\/]{3}=|[A-Za-z0-9+\/]{2}==)?$"))
                         {
-                            var base64str = Convert.FromBase64String(headerVal);
-                            headerVal = System.Text.Encoding.UTF8.GetString(base64str);
+                            var base64str = Convert.FromBase64String (headerVal);
+                            headerVal = System.Text.Encoding.UTF8.GetString (base64str);
                         }
 
                         headers[headerKey] = headerVal;
                     }
+
                     headerIteration++;
                 }
+
                 return headers;
             }
             set
             {
                 var numberformat = CultureInfo.InvariantCulture.NumberFormat;
-                int headerIteration = 0;
+                var headerIteration = 0;
 
-                while (Remove("Header" + headerIteration.ToString(numberformat)))
+                while (Remove ("Header" + headerIteration.ToString (numberformat)))
                 {
                     headerIteration++;
                 }
@@ -170,17 +169,17 @@ namespace AM.Reporting.Data.JsonConnection
                     {
                         var headerKey = header.Key;
                         var headerVal = header.Value;
-                        if (headerKey.Contains(":"))
+                        if (headerKey.Contains (":"))
                         {
-                            headerKey = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(headerKey));
+                            headerKey = Convert.ToBase64String (System.Text.Encoding.UTF8.GetBytes (headerKey));
                         }
 
-                        if (headerVal.Contains(":"))
+                        if (headerVal.Contains (":"))
                         {
-                            headerVal = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(headerVal));
+                            headerVal = Convert.ToBase64String (System.Text.Encoding.UTF8.GetBytes (headerVal));
                         }
 
-                        base["Header" + headerIteration.ToString(numberformat)] = headerKey + ":" + headerVal;
+                        base["Header" + headerIteration.ToString (numberformat)] = headerKey + ":" + headerVal;
                         headerIteration++;
                     }
                 }
@@ -194,18 +193,15 @@ namespace AM.Reporting.Data.JsonConnection
         {
             get
             {
-                object result;
-                if (TryGetValue("SimpleStructure", out result) && result != null)
+                if (TryGetValue ("SimpleStructure", out var result) && result != null)
+                {
                     return result.ToString().ToLower() == "true";
+                }
+
                 return false;
             }
-            set
-            {
-                base["SimpleStructure"] = value ? "true" : "false";
-            }
+            set => base["SimpleStructure"] = value ? "true" : "false";
         }
-
-
 
         #endregion Public Properties
 
@@ -224,7 +220,7 @@ namespace AM.Reporting.Data.JsonConnection
         /// specified connection string.
         /// </summary>
         /// <param name="connectionString">The connection string.</param>
-        public JsonDataSourceConnectionStringBuilder(string connectionString)
+        public JsonDataSourceConnectionStringBuilder (string connectionString)
             : base()
         {
             ConnectionString = connectionString;

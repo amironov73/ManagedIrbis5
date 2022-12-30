@@ -46,7 +46,7 @@ namespace AM.Reporting.Import.RDL
         private bool firstRun;
         private XmlNode reportNode;
         private string filename;
-        private float sectionWidth = 0.0f;
+        private float sectionWidth;
 
         #endregion // Fields
 
@@ -63,178 +63,191 @@ namespace AM.Reporting.Import.RDL
 
         #region Private Methods
 
-        private void LoadBorderColor(XmlNode borderColorNode)
+        private void LoadBorderColor (XmlNode borderColorNode)
         {
-            XmlNodeList nodeList = borderColorNode.ChildNodes;
+            var nodeList = borderColorNode.ChildNodes;
             foreach (XmlNode node in nodeList)
             {
                 if (node.Name == "Default")
                 {
-                    if (component is ReportComponentBase)
+                    if (component is ReportComponentBase @base)
                     {
-                        (component as ReportComponentBase).Border.Color = UnitsConverter.ConvertColor(node.InnerText);
+                        @base.Border.Color = UnitsConverter.ConvertColor (node.InnerText);
                     }
                 }
                 else if (node.Name == "Top")
                 {
-                    if (component is ReportComponentBase)
+                    if (component is ReportComponentBase @base)
                     {
-                        (component as ReportComponentBase).Border.TopLine.Color = UnitsConverter.ConvertColor(node.InnerText);
+                        @base.Border.TopLine.Color =
+                            UnitsConverter.ConvertColor (node.InnerText);
                     }
                 }
                 else if (node.Name == "Left")
                 {
-                    if (component is ReportComponentBase)
+                    if (component is ReportComponentBase @base)
                     {
-                        (component as ReportComponentBase).Border.LeftLine.Color = UnitsConverter.ConvertColor(node.InnerText);
+                        @base.Border.LeftLine.Color =
+                            UnitsConverter.ConvertColor (node.InnerText);
                     }
                 }
                 else if (node.Name == "Right")
                 {
-                    if (component is ReportComponentBase)
+                    if (component is ReportComponentBase @base)
                     {
-                        (component as ReportComponentBase).Border.RightLine.Color = UnitsConverter.ConvertColor(node.InnerText);
+                        @base.Border.RightLine.Color =
+                            UnitsConverter.ConvertColor (node.InnerText);
                     }
                 }
                 else if (node.Name == "Bottom")
                 {
-                    if (component is ReportComponentBase)
+                    if (component is ReportComponentBase @base)
                     {
-                        (component as ReportComponentBase).Border.BottomLine.Color = UnitsConverter.ConvertColor(node.InnerText);
+                        @base.Border.BottomLine.Color =
+                            UnitsConverter.ConvertColor (node.InnerText);
                     }
                 }
             }
         }
 
-        private void LoadBorderStyle(XmlNode borderStyleNode)
+        private void LoadBorderStyle (XmlNode borderStyleNode)
         {
-            XmlNodeList nodeList = borderStyleNode.ChildNodes;
+            var nodeList = borderStyleNode.ChildNodes;
             foreach (XmlNode node in nodeList)
             {
                 if (node.Name == "Default")
                 {
-                    if (component is ReportComponentBase)
+                    if (component is ReportComponentBase @base)
                     {
-                        (component as ReportComponentBase).Border.Lines = BorderLines.All;
-                        (component as ReportComponentBase).Border.Style = UnitsConverter.ConvertBorderStyle(node.InnerText);
+                        @base.Border.Lines = BorderLines.All;
+                        @base.Border.Style =
+                            UnitsConverter.ConvertBorderStyle (node.InnerText);
                     }
                 }
                 else if (node.Name == "Top")
                 {
-                    if (component is ReportComponentBase)
+                    if (component is ReportComponentBase @base)
                     {
-                        (component as ReportComponentBase).Border.Lines |= BorderLines.Top;
-                        (component as ReportComponentBase).Border.TopLine.Style = UnitsConverter.ConvertBorderStyle(node.InnerText);
+                        @base.Border.Lines |= BorderLines.Top;
+                        @base.Border.TopLine.Style =
+                            UnitsConverter.ConvertBorderStyle (node.InnerText);
                     }
                 }
                 else if (node.Name == "Left")
                 {
-                    if (component is ReportComponentBase)
+                    if (component is ReportComponentBase @base)
                     {
-                        (component as ReportComponentBase).Border.Lines |= BorderLines.Left;
-                        (component as ReportComponentBase).Border.LeftLine.Style = UnitsConverter.ConvertBorderStyle(node.InnerText);
+                        @base.Border.Lines |= BorderLines.Left;
+                        @base.Border.LeftLine.Style =
+                            UnitsConverter.ConvertBorderStyle (node.InnerText);
                     }
                 }
                 else if (node.Name == "Right")
                 {
-                    if (component is ReportComponentBase)
+                    if (component is ReportComponentBase @base)
                     {
-                        (component as ReportComponentBase).Border.Lines |= BorderLines.Right;
-                        (component as ReportComponentBase).Border.RightLine.Style = UnitsConverter.ConvertBorderStyle(node.InnerText);
+                        @base.Border.Lines |= BorderLines.Right;
+                        @base.Border.RightLine.Style =
+                            UnitsConverter.ConvertBorderStyle (node.InnerText);
                     }
                 }
                 else if (node.Name == "Bottom")
                 {
-                    if (component is ReportComponentBase)
+                    if (component is ReportComponentBase @base)
                     {
-                        (component as ReportComponentBase).Border.Lines |= BorderLines.Bottom;
-                        (component as ReportComponentBase).Border.BottomLine.Style = UnitsConverter.ConvertBorderStyle(node.InnerText);
+                        @base.Border.Lines |= BorderLines.Bottom;
+                        @base.Border.BottomLine.Style =
+                            UnitsConverter.ConvertBorderStyle (node.InnerText);
                     }
                 }
             }
         }
 
-        private void LoadBorderWidth(XmlNode borderWidthNode)
+        private void LoadBorderWidth (XmlNode borderWidthNode)
         {
-            XmlNodeList nodeList = borderWidthNode.ChildNodes;
+            var nodeList = borderWidthNode.ChildNodes;
             foreach (XmlNode node in nodeList)
             {
                 if (node.Name == "Default")
                 {
-                    if (component is ReportComponentBase)
+                    if (component is ReportComponentBase @base)
                     {
-                        (component as ReportComponentBase).Border.Width = UnitsConverter.SizeToPixels(node.InnerText);
+                        @base.Border.Width = UnitsConverter.SizeToPixels (node.InnerText);
                     }
                 }
                 else if (node.Name == "Top")
                 {
-                    if (component is ReportComponentBase)
+                    if (component is ReportComponentBase @base)
                     {
-                        (component as ReportComponentBase).Border.TopLine.Width = UnitsConverter.SizeToPixels(node.InnerText);
+                        @base.Border.TopLine.Width =
+                            UnitsConverter.SizeToPixels (node.InnerText);
                     }
                 }
                 else if (node.Name == "Left")
                 {
-                    if (component is ReportComponentBase)
+                    if (component is ReportComponentBase @base)
                     {
-                        (component as ReportComponentBase).Border.LeftLine.Width = UnitsConverter.SizeToPixels(node.InnerText);
+                        @base.Border.LeftLine.Width =
+                            UnitsConverter.SizeToPixels (node.InnerText);
                     }
                 }
                 else if (node.Name == "Right")
                 {
-                    if (component is ReportComponentBase)
+                    if (component is ReportComponentBase @base)
                     {
-                        (component as ReportComponentBase).Border.RightLine.Width = UnitsConverter.SizeToPixels(node.InnerText);
+                        @base.Border.RightLine.Width =
+                            UnitsConverter.SizeToPixels (node.InnerText);
                     }
                 }
                 else if (node.Name == "Bottom")
                 {
-                    if (component is ReportComponentBase)
+                    if (component is ReportComponentBase @base)
                     {
-                        (component as ReportComponentBase).Border.BottomLine.Width = UnitsConverter.SizeToPixels(node.InnerText);
+                        @base.Border.BottomLine.Width =
+                            UnitsConverter.SizeToPixels (node.InnerText);
                     }
                 }
             }
         }
 
-        private void LoadStyle(XmlNode styleNode)
+        private void LoadStyle (XmlNode styleNode)
         {
-            FontStyle fontStyle = FontStyle.Regular;
-            string fontFamily = "Arial";
-            float fontSize = 10.0f;
-            int paddingTop = 0;
-            int paddingLeft = 2;
-            int paddingRight = 2;
-            int paddingBottom = 0;
-            XmlNodeList nodeList = styleNode.ChildNodes;
+            var fontStyle = FontStyle.Regular;
+            var fontFamily = "Arial";
+            var fontSize = 10.0f;
+            var paddingTop = 0;
+            var paddingLeft = 2;
+            var paddingRight = 2;
+            var paddingBottom = 0;
+            var nodeList = styleNode.ChildNodes;
             foreach (XmlNode node in nodeList)
             {
                 if (node.Name == "BorderColor")
                 {
-                    LoadBorderColor(node);
+                    LoadBorderColor (node);
                 }
                 else if (node.Name == "BorderStyle")
                 {
-                    LoadBorderStyle(node);
+                    LoadBorderStyle (node);
                 }
                 else if (node.Name == "BorderWidth")
                 {
-                    LoadBorderWidth(node);
+                    LoadBorderWidth (node);
                 }
                 else if (node.Name == "BackgroundColor")
                 {
-                    if (component is ShapeObject)
+                    if (component is ShapeObject shapeObject)
                     {
-                        (component as ShapeObject).FillColor = UnitsConverter.ConvertColor(node.InnerText);
+                        shapeObject.FillColor = UnitsConverter.ConvertColor (node.InnerText);
                     }
-                    else if (component is TableObject)
+                    else if (component is TableObject tableObject)
                     {
-                        (component as TableObject).FillColor = UnitsConverter.ConvertColor(node.InnerText);
+                        tableObject.FillColor = UnitsConverter.ConvertColor (node.InnerText);
                     }
                 }
                 else if (node.Name == "FontStyle")
                 {
-                    fontStyle = UnitsConverter.ConvertFontStyle(node.InnerText);
+                    fontStyle = UnitsConverter.ConvertFontStyle (node.InnerText);
                 }
                 else if (node.Name == "FontFamily")
                 {
@@ -242,91 +255,93 @@ namespace AM.Reporting.Import.RDL
                 }
                 else if (node.Name == "FontSize")
                 {
-                    fontSize = Convert.ToSingle(UnitsConverter.ConvertFontSize(node.InnerText));
+                    fontSize = Convert.ToSingle (UnitsConverter.ConvertFontSize (node.InnerText));
                 }
                 else if (node.Name == "TextAlign")
                 {
-                    if (component is TextObject)
+                    if (component is TextObject textObject)
                     {
-                        (component as TextObject).HorzAlign = UnitsConverter.ConvertTextAlign(node.InnerText);
+                        textObject.HorzAlign = UnitsConverter.ConvertTextAlign (node.InnerText);
                     }
                 }
                 else if (node.Name == "VerticalAlign")
                 {
-                    if (component is TextObject)
+                    if (component is TextObject textObject)
                     {
-                        (component as TextObject).VertAlign = UnitsConverter.ConvertVerticalAlign(node.InnerText);
+                        textObject.VertAlign = UnitsConverter.ConvertVerticalAlign (node.InnerText);
                     }
                 }
                 else if (node.Name == "WritingMode")
                 {
-                    if (component is TextObject)
+                    if (component is TextObject textObject)
                     {
-                        (component as TextObject).Angle = UnitsConverter.ConvertWritingMode(node.InnerText);
+                        textObject.Angle = UnitsConverter.ConvertWritingMode (node.InnerText);
                     }
                 }
                 else if (node.Name == "Color")
                 {
-                    if (component is TextObject)
+                    if (component is TextObject textObject)
                     {
-                        (component as TextObject).TextColor = UnitsConverter.ConvertColor(node.InnerText);
+                        textObject.TextColor = UnitsConverter.ConvertColor (node.InnerText);
                     }
                 }
                 else if (node.Name == "PaddingLeft")
                 {
-                    paddingLeft = UnitsConverter.SizeToInt(node.InnerText, SizeUnits.Point);
+                    paddingLeft = UnitsConverter.SizeToInt (node.InnerText, SizeUnits.Point);
                 }
                 else if (node.Name == "PaddingRight")
                 {
-                    paddingRight = UnitsConverter.SizeToInt(node.InnerText, SizeUnits.Point);
+                    paddingRight = UnitsConverter.SizeToInt (node.InnerText, SizeUnits.Point);
                 }
                 else if (node.Name == "PaddingTop")
                 {
-                    paddingTop = UnitsConverter.SizeToInt(node.InnerText, SizeUnits.Point);
+                    paddingTop = UnitsConverter.SizeToInt (node.InnerText, SizeUnits.Point);
                 }
                 else if (node.Name == "PaddingBottom")
                 {
-                    paddingBottom = UnitsConverter.SizeToInt(node.InnerText, SizeUnits.Point);
+                    paddingBottom = UnitsConverter.SizeToInt (node.InnerText, SizeUnits.Point);
                 }
             }
-            if (component is TextObject)
+
+            if (component is TextObject o)
             {
-                (component as TextObject).Font = new Font(fontFamily, fontSize, fontStyle);
-                (component as TextObject).Padding = new Padding(paddingLeft, paddingTop, paddingRight, paddingBottom);
+                o.Font = new Font (fontFamily, fontSize, fontStyle);
+                o.Padding = new Padding (paddingLeft, paddingTop, paddingRight, paddingBottom);
             }
-            else if (component is PictureObject)
+            else if (component is PictureObject pictureObject)
             {
-                (component as PictureObject).Padding = new Padding(paddingLeft, paddingTop, paddingRight, paddingBottom);
+                pictureObject.Padding =
+                    new Padding (paddingLeft, paddingTop, paddingRight, paddingBottom);
             }
         }
 
-        private void LoadVisibility(XmlNode visibilityNode)
+        private void LoadVisibility (XmlNode visibilityNode)
         {
-            XmlNodeList nodeList = visibilityNode.ChildNodes;
+            var nodeList = visibilityNode.ChildNodes;
             foreach (XmlNode node in nodeList)
             {
                 if (node.Name == "Hidden")
                 {
-                    component.Visible = !UnitsConverter.BooleanToBool(node.InnerText);
+                    component.Visible = !UnitsConverter.BooleanToBool (node.InnerText);
                 }
             }
         }
 
-        private void LoadPlotArea(XmlNode plotAreaNode)
+        private void LoadPlotArea (XmlNode plotAreaNode)
         {
-            XmlNodeList nodeList = plotAreaNode.ChildNodes;
+            var nodeList = plotAreaNode.ChildNodes;
             foreach (XmlNode node in nodeList)
             {
                 if (node.Name == "Style")
                 {
-                    LoadStyle(node);
+                    LoadStyle (node);
                 }
             }
         }
 
-        private void LoadSubtotal(XmlNode subtotalNode)
+        private void LoadSubtotal (XmlNode subtotalNode)
         {
-            XmlNodeList nodeList = subtotalNode.ChildNodes;
+            var nodeList = subtotalNode.ChildNodes;
             foreach (XmlNode node in nodeList)
             {
                 if (node.Name == "ReportItems")
@@ -335,98 +350,103 @@ namespace AM.Reporting.Import.RDL
                 }
                 else if (node.Name == "Style")
                 {
-                    LoadStyle(node);
+                    LoadStyle (node);
                 }
             }
         }
 
-        private void LoadReportItem(XmlNodeList nodeList)
+        private void LoadReportItem (XmlNodeList nodeList)
         {
             foreach (XmlNode node in nodeList)
             {
                 if (node.Name == "Top")
                 {
-                    component.Top = UnitsConverter.SizeToPixels(node.InnerText);
+                    component.Top = UnitsConverter.SizeToPixels (node.InnerText);
                 }
                 else if (node.Name == "Left")
                 {
-                    component.Left = UnitsConverter.SizeToPixels(node.InnerText);
+                    component.Left = UnitsConverter.SizeToPixels (node.InnerText);
                 }
                 else if (node.Name == "Height")
                 {
-                    component.Height = UnitsConverter.SizeToPixels(node.InnerText);
+                    component.Height = UnitsConverter.SizeToPixels (node.InnerText);
                 }
                 else if (node.Name == "Width")
                 {
-                    component.Width = UnitsConverter.SizeToPixels(node.InnerText);
+                    component.Width = UnitsConverter.SizeToPixels (node.InnerText);
                 }
                 else if (node.Name == "Visibility")
                 {
-                    LoadVisibility(node);
+                    LoadVisibility (node);
                 }
                 else if (node.Name == "Style")
                 {
-                    LoadStyle(node);
+                    LoadStyle (node);
                 }
             }
-            if (parent is TableCell)
+
+            if (parent is TableCell cell)
             {
-                component.Width = (parent as TableCell).Width;
-                component.Height = (parent as TableCell).Height;
+                component.Width = cell.Width;
+                component.Height = cell.Height;
             }
         }
 
-        private void LoadLine(XmlNode lineNode)
+        private void LoadLine (XmlNode lineNode)
         {
-            component = ComponentsFactory.CreateLineObject(lineNode.Attributes["Name"].Value, parent);
-            XmlNodeList nodeList = lineNode.ChildNodes;
-            LoadReportItem(nodeList);
+            component = ComponentsFactory.CreateLineObject (lineNode.Attributes["Name"].Value, parent);
+            var nodeList = lineNode.ChildNodes;
+            LoadReportItem (nodeList);
         }
 
-        private void LoadRectangle(XmlNode rectangleNode)
+        private void LoadRectangle (XmlNode rectangleNode)
         {
-            XmlNodeList nodeList = rectangleNode.ChildNodes;
-            if (RectangleExistReportItem(nodeList))
+            var nodeList = rectangleNode.ChildNodes;
+            if (RectangleExistReportItem (nodeList))
             {
-                LoadContainerRectangle(rectangleNode);
+                LoadContainerRectangle (rectangleNode);
                 return;
             }
-            component = ComponentsFactory.CreateShapeObject(rectangleNode.Attributes["Name"].Value, parent);
+
+            component = ComponentsFactory.CreateShapeObject (rectangleNode.Attributes["Name"].Value, parent);
             (component as ShapeObject).Shape = ShapeKind.Rectangle;
-            LoadReportItem(nodeList);
+            LoadReportItem (nodeList);
             foreach (XmlNode node in nodeList)
             {
                 if (node.Name == "ReportItems")
                 {
-                    LoadReportItems(node);
+                    LoadReportItems (node);
                 }
             }
         }
-        private void LoadContainerRectangle(XmlNode rectangleNode)
+
+        private void LoadContainerRectangle (XmlNode rectangleNode)
         {
-            Base tempParent = parent;
-            component = ComponentsFactory.CreateContainerObject(rectangleNode.Attributes["Name"].Value, parent);
+            var tempParent = parent;
+            component = ComponentsFactory.CreateContainerObject (rectangleNode.Attributes["Name"].Value, parent);
             parent = component;
-            XmlNodeList nodeList = rectangleNode.ChildNodes;
+            var nodeList = rectangleNode.ChildNodes;
             (component as ContainerObject).Border.Lines = BorderLines.All;
             (component as ContainerObject).Border.Color = Color.Black;
-            LoadReportItem(nodeList);
+            LoadReportItem (nodeList);
             foreach (XmlNode node in nodeList)
             {
                 if (node.Name == "ReportItems")
                 {
-                    LoadReportItems(node);
+                    LoadReportItems (node);
                 }
             }
+
             parent = tempParent;
         }
 
-        private bool RectangleExistReportItem(XmlNodeList reportItemsNode)
+        private bool RectangleExistReportItem (XmlNodeList reportItemsNode)
         {
-            foreach(XmlNode node in reportItemsNode)
+            foreach (XmlNode node in reportItemsNode)
             {
-                if(node.Name == "ReportItems")
-                    foreach(XmlNode itemNode in node)
+                if (node.Name == "ReportItems")
+                {
+                    foreach (XmlNode itemNode in node)
                     {
                         switch (itemNode.Name)
                         {
@@ -441,11 +461,13 @@ namespace AM.Reporting.Import.RDL
                                 return true;
                         }
                     }
+                }
             }
+
             return false;
         }
 
-        private void LoadParagraphs(XmlNode paragraphs)
+        private void LoadParagraphs (XmlNode paragraphs)
         {
             firstRun = true;
             foreach (XmlNode paragraph in paragraphs.ChildNodes)
@@ -458,109 +480,149 @@ namespace AM.Reporting.Import.RDL
                         {
                             foreach (XmlNode runsChild in parChild.ChildNodes)
                             {
-                                ParseTextRun(runsChild);
+                                ParseTextRun (runsChild);
                             }
                         }
                     }
                 }
+
                 if (firstRun)
+                {
                     firstRun = false;
+                }
             }
         }
 
-        private void ParseTextRun(XmlNode runsChild)
+        private void ParseTextRun (XmlNode runsChild)
         {
             if (runsChild.Name == "TextRun")
             {
                 foreach (XmlNode runChild in runsChild.ChildNodes)
                 {
                     if (runChild.Name == "Value")
-                        ParseTextBoxValue(runChild);
+                    {
+                        ParseTextBoxValue (runChild);
+                    }
                     else if (runChild.Name == "Style")
-                        ParseTextBoxStyle(runChild);
+                    {
+                        ParseTextBoxStyle (runChild);
+                    }
                 }
             }
         }
 
-        private void ParseTextBoxValue(XmlNode runChild)
+        private void ParseTextBoxValue (XmlNode runChild)
         {
             if (!firstRun)
+            {
                 (component as TextObject).Text += "\r\n";
-            (component as TextObject).Text += GetValue(runChild.InnerText);
+            }
+
+            (component as TextObject).Text += GetValue (runChild.InnerText);
         }
 
-        private void ParseTextBoxStyle(XmlNode runChild)
+        private void ParseTextBoxStyle (XmlNode runChild)
         {
-            FontStyle style = FontStyle.Regular;
-            Color textBoxForeColor = Color.Black;
-            string fontFamily = String.Empty;
-            int fontSize = 0;
+            var style = FontStyle.Regular;
+            var textBoxForeColor = Color.Black;
+            var fontFamily = string.Empty;
+            var fontSize = 0;
             foreach (XmlNode styleChild in runChild.ChildNodes)
             {
                 if (styleChild.Name == "FontFamily")
+                {
                     fontFamily = styleChild.InnerText;
+                }
                 else if (styleChild.Name == "FontSize")
-                    int.TryParse(styleChild.InnerText.Replace("pt", ""), out fontSize);
+                {
+                    int.TryParse (styleChild.InnerText.Replace ("pt", ""), out fontSize);
+                }
                 else if (styleChild.Name == "FontWeight" && styleChild.InnerText == "Bold")
+                {
                     style = style | FontStyle.Bold;
+                }
                 else if (styleChild.Name == "FontStyle" && styleChild.InnerText == "Italic")
+                {
                     style = style | FontStyle.Italic;
+                }
                 else if (styleChild.Name == "TextDecoration" && styleChild.InnerText == "Underline")
+                {
                     style = style | FontStyle.Underline;
-                else if(styleChild.Name == "Color")
-                   textBoxForeColor = ColorTranslator.FromHtml(styleChild.InnerText);
-
+                }
+                else if (styleChild.Name == "Color")
+                {
+                    textBoxForeColor = ColorTranslator.FromHtml (styleChild.InnerText);
+                }
             }
+
             if (fontFamily == string.Empty)
+            {
                 fontFamily = defaultFontFamily;
+            }
+
             if (fontFamily == string.Empty && fontSize == 0)
-                (component as TextObject).Font = new Font((component as TextObject).Font, style);
+            {
+                (component as TextObject).Font = new Font ((component as TextObject).Font, style);
+            }
             else if (fontFamily == string.Empty)
-                (component as TextObject).Font = new Font((component as TextObject).Font.FontFamily, fontSize, style);
+            {
+                (component as TextObject).Font = new Font ((component as TextObject).Font.FontFamily, fontSize, style);
+            }
             else if (fontSize == 0)
-                (component as TextObject).Font = new Font(fontFamily, (component as TextObject).Font.Size, style);
+            {
+                (component as TextObject).Font = new Font (fontFamily, (component as TextObject).Font.Size, style);
+            }
             else
-                (component as TextObject).Font = new Font(fontFamily, fontSize, style);
+            {
+                (component as TextObject).Font = new Font (fontFamily, fontSize, style);
+            }
+
             (component as TextObject).TextColor = textBoxForeColor;
         }
 
-        private string GetValue(string rdlValue)
+        private string GetValue (string rdlValue)
         {
             //=Fields!VATIdentifierCaption.Value
-            string frExpression = "[";
-            if (!string.IsNullOrEmpty(rdlValue) && rdlValue[0] == '=') //is expression
+            var frExpression = "[";
+            if (!string.IsNullOrEmpty (rdlValue) && rdlValue[0] == '=') //is expression
             {
-                if (rdlValue.IndexOf("Fields") == 1) //is sumple data source
+                if (rdlValue.IndexOf ("Fields") == 1) //is sumple data source
                 {
                     frExpression += dataSetName + ".";
 
-                    int fieldStart = rdlValue.IndexOf("!") + 1;
-                    int fieldEnd = rdlValue.Substring(fieldStart).IndexOf(".") - 1;
-                    frExpression += rdlValue.Substring(fieldStart, fieldEnd + 1);
+                    var fieldStart = rdlValue.IndexOf ("!") + 1;
+                    var fieldEnd = rdlValue.Substring (fieldStart).IndexOf (".") - 1;
+                    frExpression += rdlValue.Substring (fieldStart, fieldEnd + 1);
                     frExpression += "]";
                     return frExpression;
                 }
             }
+
             return rdlValue;
         }
 
-        private void LoadTextbox(XmlNode textboxNode)
+        private void LoadTextbox (XmlNode textboxNode)
         {
-            if (parent is TableCell)
-                component = (TableCell)parent;
+            if (parent is TableCell cell)
+            {
+                component = cell;
+            }
             else
-                component = ComponentsFactory.CreateTextObject(textboxNode.Attributes["Name"].Value, parent);
-            XmlNodeList nodeList = textboxNode.ChildNodes;
-            LoadReportItem(nodeList);
+            {
+                component = ComponentsFactory.CreateTextObject (textboxNode.Attributes["Name"].Value, parent);
+            }
+
+            var nodeList = textboxNode.ChildNodes;
+            LoadReportItem (nodeList);
             foreach (XmlNode node in nodeList)
             {
                 if (node.Name == "CanGrow")
                 {
-                    (component as TextObject).CanGrow = UnitsConverter.BooleanToBool(node.InnerText);
+                    (component as TextObject).CanGrow = UnitsConverter.BooleanToBool (node.InnerText);
                 }
                 else if (node.Name == "CanShrink")
                 {
-                    (component as TextObject).CanShrink = UnitsConverter.BooleanToBool(node.InnerText);
+                    (component as TextObject).CanShrink = UnitsConverter.BooleanToBool (node.InnerText);
                 }
                 else if (node.Name == "HideDuplicates")
                 {
@@ -572,149 +634,155 @@ namespace AM.Reporting.Import.RDL
                 }
                 else if (node.Name == "Paragraphs")
                 {
-                    LoadParagraphs(node);
+                    LoadParagraphs (node);
                 }
             }
         }
 
-        private void LoadImage(XmlNode imageNode)
+        private void LoadImage (XmlNode imageNode)
         {
-            component = ComponentsFactory.CreatePictureObject(imageNode.Attributes["Name"].Value, parent);
-            XmlNodeList nodeList = imageNode.ChildNodes;
-            LoadReportItem(nodeList);
-            string name = String.Empty;
+            component = ComponentsFactory.CreatePictureObject (imageNode.Attributes["Name"].Value, parent);
+            var nodeList = imageNode.ChildNodes;
+            LoadReportItem (nodeList);
+            var name = string.Empty;
             foreach (XmlNode node in nodeList)
             {
                 //if (node.Name == "Source")
                 //{
                 //}
-                /*else */if (node.Name == "Value")
+                /*else */
+                if (node.Name == "Value")
                 {
-                    if (File.Exists(node.InnerText))
+                    if (File.Exists (node.InnerText))
                     {
                         (component as PictureObject).ImageLocation = node.InnerText;
                     }
                 }
                 else if (node.Name == "Sizing")
                 {
-                    (component as PictureObject).SizeMode = UnitsConverter.ConvertSizing(node.InnerText);
+                    (component as PictureObject).SizeMode = UnitsConverter.ConvertSizing (node.InnerText);
                 }
             }
         }
 
-        private void LoadSubreport(XmlNode subreportNode)
+        private void LoadSubreport (XmlNode subreportNode)
         {
-            component = ComponentsFactory.CreateSubreportObject(subreportNode.Attributes["Name"].Value, parent);
-            ReportPage subPage = ComponentsFactory.CreateReportPage(Report);
+            component = ComponentsFactory.CreateSubreportObject (subreportNode.Attributes["Name"].Value, parent);
+            var subPage = ComponentsFactory.CreateReportPage (Report);
             (component as SubreportObject).ReportPage = subPage;
-            XmlNodeList nodeList = subreportNode.ChildNodes;
+            var nodeList = subreportNode.ChildNodes;
 
-            string path = Path.GetDirectoryName(filename);
-            string reportName = String.Empty;
+            var path = Path.GetDirectoryName (filename);
+            var reportName = string.Empty;
             foreach (XmlNode node in nodeList)
             {
                 if (node.Name == "ReportName")
+                {
                     reportName = node.InnerText;
-            }
-            string subFilename = Path.Combine(path, reportName + ".rdl");
-            if (!File.Exists(subFilename))
-            {
-                subFilename = Path.Combine(path, reportName + ".rdlc");
-                if (!File.Exists(subFilename))
-                    subFilename = String.Empty;
+                }
             }
 
-            if (!String.IsNullOrEmpty(subFilename))
+            var subFilename = Path.Combine (path, reportName + ".rdl");
+            if (!File.Exists (subFilename))
             {
-                XmlDocument doc = new XmlDocument();
-                doc.Load(subFilename);
+                subFilename = Path.Combine (path, reportName + ".rdlc");
+                if (!File.Exists (subFilename))
+                {
+                    subFilename = string.Empty;
+                }
+            }
+
+            if (!string.IsNullOrEmpty (subFilename))
+            {
+                var doc = new XmlDocument();
+                doc.Load (subFilename);
                 reportNode = doc.LastChild;
-                ReportPage tempPage = page;
+                var tempPage = page;
                 page = subPage;
-                LoadReport(reportNode);
+                LoadReport (reportNode);
                 page = tempPage;
             }
             else
             {
-                DataBand subBand = ComponentsFactory.CreateDataBand(subPage);
+                var subBand = ComponentsFactory.CreateDataBand (subPage);
                 subBand.Height = 2.0f * Utils.Units.Centimeters;
-                LoadReportItem(nodeList);
+                LoadReportItem (nodeList);
             }
         }
 
-        partial void LoadChart(XmlNode chartNode);
+        partial void LoadChart (XmlNode chartNode);
 
-        private void LoadReportItems(XmlNode reportItemsNode)
+        private void LoadReportItems (XmlNode reportItemsNode)
         {
-            XmlNodeList nodeList = reportItemsNode.ChildNodes;
+            var nodeList = reportItemsNode.ChildNodes;
             foreach (XmlNode node in nodeList)
             {
                 if (node.Name == "Line")
                 {
-                    LoadLine(node);
+                    LoadLine (node);
                 }
                 else if (node.Name == "Rectangle")
                 {
-                    LoadRectangle(node);
+                    LoadRectangle (node);
                 }
                 else if (node.Name == "Textbox")
                 {
-                    LoadTextbox(node);
+                    LoadTextbox (node);
                 }
                 else if (node.Name == "Image")
                 {
-                    LoadImage(node);
+                    LoadImage (node);
                 }
                 else if (node.Name == "Subreport")
                 {
-                    LoadSubreport(node);
+                    LoadSubreport (node);
                 }
                 else if (node.Name == "Chart")
                 {
-                    LoadChart(node);
+                    LoadChart (node);
                 }
-                else if (node.Name == "Table" || (node.Name == "Tablix" && !IsTablixMatrix(node)))
+                else if (node.Name == "Table" || (node.Name == "Tablix" && !IsTablixMatrix (node)))
                 {
-                    LoadTable(node);
+                    LoadTable (node);
                 }
-                else if (node.Name == "Matrix" || (node.Name == "Tablix" && IsTablixMatrix(node)))
+                else if (node.Name == "Matrix" || (node.Name == "Tablix" && IsTablixMatrix (node)))
                 {
-                    LoadMatrix(node);
+                    LoadMatrix (node);
                 }
             }
         }
 
-        private void LoadBody(XmlNode bodyNode)
+        private void LoadBody (XmlNode bodyNode)
         {
-            parent = ComponentsFactory.CreateDataBand(page);
+            parent = ComponentsFactory.CreateDataBand (page);
             curBand = (BandBase)parent;
-            XmlNodeList nodeList = bodyNode.ChildNodes;
+            var nodeList = bodyNode.ChildNodes;
             foreach (XmlNode node in nodeList)
             {
                 if (node.Name == "ReportItems")
                 {
-                    LoadReportItems(node);
+                    LoadReportItems (node);
                 }
                 else if (node.Name == "Height")
                 {
-                    (parent as DataBand).Height = UnitsConverter.SizeToPixels(node.InnerText);
+                    (parent as DataBand).Height = UnitsConverter.SizeToPixels (node.InnerText);
                 }
             }
         }
 
-        private void LoadPageSection(XmlNode pageSectionNode)
+        private void LoadPageSection (XmlNode pageSectionNode)
         {
             if (pageSectionNode.Name == "PageHeader")
             {
                 page.PageHeader = new PageHeaderBand();
                 page.PageHeader.CreateUniqueName();
                 page.PageHeader.PrintOn = PrintOn.EvenPages | PrintOn.OddPages | PrintOn.RepeatedBand;
-                XmlNodeList nodeList = pageSectionNode.ChildNodes;
+                var nodeList = pageSectionNode.ChildNodes;
                 foreach (XmlNode node in nodeList)
                 {
                     if (node.Name == "Height")
                     {
-                        page.PageHeader.Height = UnitsConverter.SizeToPixels(node.InnerText);
+                        page.PageHeader.Height = UnitsConverter.SizeToPixels (node.InnerText);
                     }
                     else if (node.Name == "PrintOnFirstPage")
                     {
@@ -733,7 +801,7 @@ namespace AM.Reporting.Import.RDL
                     else if (node.Name == "ReportItems")
                     {
                         parent = page.PageHeader;
-                        LoadReportItems(node);
+                        LoadReportItems (node);
                     }
                 }
             }
@@ -742,12 +810,12 @@ namespace AM.Reporting.Import.RDL
                 page.PageFooter = new PageFooterBand();
                 page.PageFooter.CreateUniqueName();
                 page.PageFooter.PrintOn = PrintOn.EvenPages | PrintOn.OddPages | PrintOn.RepeatedBand;
-                XmlNodeList nodeList = pageSectionNode.ChildNodes;
+                var nodeList = pageSectionNode.ChildNodes;
                 foreach (XmlNode node in nodeList)
                 {
                     if (node.Name == "Height")
                     {
-                        page.PageFooter.Height = UnitsConverter.SizeToPixels(node.InnerText);
+                        page.PageFooter.Height = UnitsConverter.SizeToPixels (node.InnerText);
                     }
                     else if (node.Name == "PrintOnFirstPage")
                     {
@@ -766,54 +834,54 @@ namespace AM.Reporting.Import.RDL
                     else if (node.Name == "ReportItems")
                     {
                         parent = page.PageFooter;
-                        LoadReportItems(node);
+                        LoadReportItems (node);
                     }
                 }
             }
         }
 
-        private void LoadPage(XmlNode pageNode)
+        private void LoadPage (XmlNode pageNode)
         {
-            XmlNodeList nodeList = pageNode.ChildNodes;
-            bool pageWidthLoaded = false;
+            var nodeList = pageNode.ChildNodes;
+            var pageWidthLoaded = false;
             foreach (XmlNode node in nodeList)
             {
                 if (node.Name == "PageHeader")
                 {
-                    LoadPageSection(node);
+                    LoadPageSection (node);
                 }
                 else if (node.Name == "PageFooter")
                 {
-                    LoadPageSection(node);
+                    LoadPageSection (node);
                 }
                 else if (node.Name == "PageHeight")
                 {
-                    page.PaperHeight = UnitsConverter.SizeToMillimeters(node.InnerText);
+                    page.PaperHeight = UnitsConverter.SizeToMillimeters (node.InnerText);
                 }
                 else if (node.Name == "PageWidth")
                 {
-                    page.PaperWidth = UnitsConverter.SizeToMillimeters(node.InnerText);
+                    page.PaperWidth = UnitsConverter.SizeToMillimeters (node.InnerText);
                     pageWidthLoaded = true;
                 }
                 else if (node.Name == "LeftMargin")
                 {
-                    page.LeftMargin = UnitsConverter.SizeToMillimeters(node.InnerText);
+                    page.LeftMargin = UnitsConverter.SizeToMillimeters (node.InnerText);
                 }
                 else if (node.Name == "RightMargin")
                 {
-                    page.RightMargin = UnitsConverter.SizeToMillimeters(node.InnerText);
+                    page.RightMargin = UnitsConverter.SizeToMillimeters (node.InnerText);
                 }
                 else if (node.Name == "TopMargin")
                 {
-                    page.TopMargin = UnitsConverter.SizeToMillimeters(node.InnerText);
+                    page.TopMargin = UnitsConverter.SizeToMillimeters (node.InnerText);
                 }
                 else if (node.Name == "BottomMargin")
                 {
-                    page.BottomMargin = UnitsConverter.SizeToMillimeters(node.InnerText);
+                    page.BottomMargin = UnitsConverter.SizeToMillimeters (node.InnerText);
                 }
                 else if (node.Name == "Style")
                 {
-                    LoadStyle(node);
+                    LoadStyle (node);
                 }
             }
 
@@ -823,22 +891,28 @@ namespace AM.Reporting.Import.RDL
             }
         }
 
-        private void LoadParameters(XmlNode parametersNode)
+        private void LoadParameters (XmlNode parametersNode)
         {
             foreach (XmlNode node in parametersNode.ChildNodes)
             {
-                Parameter parameter = ComponentsFactory.CreateParameter(node.Attributes["Name"].Value, Report);
+                var parameter = ComponentsFactory.CreateParameter (node.Attributes["Name"].Value, Report);
                 foreach (XmlNode subNode in node.ChildNodes)
                 {
                     if (subNode.Name == "DataType")
                     {
-                        Type type = Type.GetType("System." + subNode.InnerText);
+                        var type = Type.GetType ("System." + subNode.InnerText);
                         if (type != null)
+                        {
                             parameter.DataType = type;
+                        }
                         else if (subNode.InnerText == "Integer")
-                            parameter.DataType = typeof(Int32);
+                        {
+                            parameter.DataType = typeof (int);
+                        }
                         else if (subNode.InnerText == "Float")
-                            parameter.DataType = typeof(float);
+                        {
+                            parameter.DataType = typeof (float);
+                        }
                     }
                     else if (subNode.Name == "Prompt")
                     {
@@ -851,26 +925,29 @@ namespace AM.Reporting.Import.RDL
             }
         }
 
-        private XmlNode GetEmbededImageNode(string objectName)
+        private XmlNode GetEmbededImageNode (string objectName)
         {
-            foreach(XmlNode node in reportNode.ChildNodes)
+            foreach (XmlNode node in reportNode.ChildNodes)
             {
-                if(node.Name == "EmbeddedImages")
+                if (node.Name == "EmbeddedImages")
                 {
                     foreach (XmlNode embededImage in node.ChildNodes)
                     {
                         if (embededImage.Attributes[0].InnerText == objectName)
+                        {
                             return embededImage;
+                        }
                     }
                 }
             }
+
             return null;
         }
 
-        private void LoadReport(XmlNode reportNode)
+        private void LoadReport (XmlNode reportNode)
         {
-            int pageNbr = 0;
-            XmlNodeList nodeList = reportNode.ChildNodes;
+            var pageNbr = 0;
+            var nodeList = reportNode.ChildNodes;
             foreach (XmlNode node in nodeList)
             {
                 if (node.Name == "Description")
@@ -884,39 +961,53 @@ namespace AM.Reporting.Import.RDL
                 else if (node.Name == "Body")
                 {
                     if (page == null)
-                        page = ComponentsFactory.CreateReportPage(Report);
-                    LoadBody(node);
+                    {
+                        page = ComponentsFactory.CreateReportPage (Report);
+                    }
+
+                    LoadBody (node);
                 }
                 else if (node.Name == "Page")
                 {
                     if (pageNbr > 0)
-                        page = ComponentsFactory.CreateReportPage(Report);
-                    LoadPage(node);
+                    {
+                        page = ComponentsFactory.CreateReportPage (Report);
+                    }
+
+                    LoadPage (node);
                     pageNbr++;
                 }
                 else if (node.Name == "ReportSections")
                 {
                     if (node.HasChildNodes && node.FirstChild.Name == "ReportSection")
+                    {
                         foreach (XmlNode sectionItem in node.FirstChild)
                         {
                             if (sectionItem.Name == "Body")
                             {
                                 if (page == null)
-                                    page = ComponentsFactory.CreateReportPage(Report);
-                                LoadBody(sectionItem);
+                                {
+                                    page = ComponentsFactory.CreateReportPage (Report);
+                                }
+
+                                LoadBody (sectionItem);
                             }
                             else if (sectionItem.Name == "Page")
                             {
                                 if (pageNbr > 0)
-                                    page = ComponentsFactory.CreateReportPage(Report);
-                                LoadPage(sectionItem);
+                                {
+                                    page = ComponentsFactory.CreateReportPage (Report);
+                                }
+
+                                LoadPage (sectionItem);
                                 pageNbr++;
                             }
                             else if (sectionItem.Name == "Width")
                             {
-                                sectionWidth = UnitsConverter.SizeToMillimeters(sectionItem.InnerText);
+                                sectionWidth = UnitsConverter.SizeToMillimeters (sectionItem.InnerText);
                             }
                         }
+                    }
                 }
                 else if (node.Name == "df:DefaultFontFamily")
                 {
@@ -925,18 +1016,23 @@ namespace AM.Reporting.Import.RDL
                 else if (node.Name == "DataSets")
                 {
                     if (node.HasChildNodes)
+                    {
                         dataSetName = node.FirstChild.Attributes["Name"].Value;
+                    }
                 }
                 else if (node.Name == "ReportParameters")
                 {
                     if (node.HasChildNodes)
-                        LoadParameters(node);
+                    {
+                        LoadParameters (node);
+                    }
                 }
             }
+
             if (page == null)
             {
-                page = ComponentsFactory.CreateReportPage(Report);
-                LoadPage(reportNode);
+                page = ComponentsFactory.CreateReportPage (Report);
+                LoadPage (reportNode);
             }
         }
 
@@ -945,25 +1041,26 @@ namespace AM.Reporting.Import.RDL
         #region Public Methods
 
         /// <inheritdoc/>
-        public override void LoadReport(Report report, string filename)
+        public override void LoadReport (Report report, string filename)
         {
             this.filename = filename;
-            using (FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read))
+            using (var fs = new FileStream (filename, FileMode.Open, FileAccess.Read))
             {
-                LoadReport(report, fs);
+                LoadReport (report, fs);
             }
         }
+
         /// <inheritdoc />
-        public override void LoadReport(Report report, Stream content)
+        public override void LoadReport (Report report, Stream content)
         {
             Report = report;
             Report.Clear();
-            XmlDocument document = new XmlDocument();
-            document.Load(content);
+            var document = new XmlDocument();
+            document.Load (content);
             reportNode = document.LastChild;
             defaultFontFamily = "";
             page = null;
-            LoadReport(reportNode);
+            LoadReport (reportNode);
         }
 
         #endregion // Public Methods

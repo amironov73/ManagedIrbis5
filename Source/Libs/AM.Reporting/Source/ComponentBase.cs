@@ -16,6 +16,7 @@
 #region Using directives
 
 using AM.Reporting.Utils;
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -38,15 +39,11 @@ namespace AM.Reporting
 
         private AnchorStyles anchor;
         private DockStyle dock;
-        private int groupIndex;
         private float height;
         private float left;
-        private string tag;
         private float top;
         private bool visible;
         private string visibleExpression;
-        private bool printable;
-        private string printableExpression;
         private float width;
 
         #endregion Fields
@@ -56,47 +53,32 @@ namespace AM.Reporting
         /// <summary>
         /// Gets the absolute bottom coordinate of the object.
         /// </summary>
-        [Browsable(false)]
-        public float AbsBottom
-        {
-            get { return AbsTop + Height; }
-        }
+        [Browsable (false)]
+        public float AbsBottom => AbsTop + Height;
 
         /// <summary>
         /// Gets the absolute bounding rectangle of the object.
         /// </summary>
-        [Browsable(false)]
-        public RectangleF AbsBounds
-        {
-            get { return new RectangleF(AbsLeft, AbsTop, Width, Height); }
-        }
+        [Browsable (false)]
+        public RectangleF AbsBounds => new RectangleF (AbsLeft, AbsTop, Width, Height);
 
         /// <summary>
         /// Gets the absolute left coordinate of the object.
         /// </summary>
-        [Browsable(false)]
-        public virtual float AbsLeft
-        {
-            get { return (Parent is ComponentBase) ? Left + (Parent as ComponentBase).AbsLeft : Left; }
-        }
+        [Browsable (false)]
+        public virtual float AbsLeft => (Parent is ComponentBase) ? Left + (Parent as ComponentBase).AbsLeft : Left;
 
         /// <summary>
         /// Gets the absolute right coordinate of the object.
         /// </summary>
-        [Browsable(false)]
-        public float AbsRight
-        {
-            get { return AbsLeft + Width; }
-        }
+        [Browsable (false)]
+        public float AbsRight => AbsLeft + Width;
 
         /// <summary>
         /// Gets the absolute top coordinate of the object.
         /// </summary>
-        [Browsable(false)]
-        public virtual float AbsTop
-        {
-            get { return (Parent is ComponentBase) ? Top + (Parent as ComponentBase).AbsTop : Top; }
-        }
+        [Browsable (false)]
+        public virtual float AbsTop => (Parent is ComponentBase) ? Top + (Parent as ComponentBase).AbsTop : Top;
 
         /// <summary>
         /// Gets or sets the edges of the container to which a control is bound and determines how a control
@@ -111,12 +93,12 @@ namespace AM.Reporting
         /// maintain the anchored distance to the top and bottom edges of the band as the height of the band
         /// is increased.</para>
         /// </remarks>
-        [DefaultValue(AnchorStyles.Left | AnchorStyles.Top)]
-        [Category("Layout")]
+        [DefaultValue (AnchorStyles.Left | AnchorStyles.Top)]
+        [Category ("Layout")]
         public virtual AnchorStyles Anchor
         {
-            get { return anchor; }
-            set { anchor = value; }
+            get => anchor;
+            set => anchor = value;
         }
 
         /// <summary>
@@ -125,11 +107,8 @@ namespace AM.Reporting
         /// <remarks>
         /// To change the bottom coordinate, change the <see cref="Top"/> and/or <see cref="Height"/> properties.
         /// </remarks>
-        [Browsable(false)]
-        public float Bottom
-        {
-            get { return Top + Height; }
-        }
+        [Browsable (false)]
+        public float Bottom => Top + Height;
 
         /// <summary>
         /// Gets or sets the bounding rectangle of the object.
@@ -138,10 +117,10 @@ namespace AM.Reporting
         /// Assigning a value to this property is equal to assigning values to the <see cref="Left"/>,
         /// <see cref="Top"/>, <see cref="Width"/>, <see cref="Height"/> properties.
         /// </remarks>
-        [Browsable(false)]
+        [Browsable (false)]
         public RectangleF Bounds
         {
-            get { return new RectangleF(Left, Top, Width, Height); }
+            get => new RectangleF (Left, Top, Width, Height);
             set
             {
                 Left = value.Left;
@@ -157,10 +136,10 @@ namespace AM.Reporting
         /// <remarks>
         /// This property is used in the <see cref="AM.Reporting.Dialog.DialogPage"/> class.
         /// </remarks>
-        [Browsable(false)]
+        [Browsable (false)]
         public virtual SizeF ClientSize
         {
-            get { return new SizeF(Width, Height); }
+            get => new SizeF (Width, Height);
             set
             {
                 Width = value.Width;
@@ -179,18 +158,20 @@ namespace AM.Reporting
         /// <para>A control can be docked to one edge of its parent container or can be docked to all edges and
         /// fill the parent container.</para>
         /// </remarks>
-        [DefaultValue(DockStyle.None)]
-        [Category("Layout")]
+        [DefaultValue (DockStyle.None)]
+        [Category ("Layout")]
         public virtual DockStyle Dock
         {
-            get { return dock; }
+            get => dock;
             set
             {
                 if (dock != value)
                 {
                     dock = value;
                     if (Parent != null)
-                        (Parent as IParent).UpdateLayout(0, 0);
+                    {
+                        (Parent as IParent).UpdateLayout (0, 0);
+                    }
                 }
             }
         }
@@ -203,12 +184,8 @@ namespace AM.Reporting
         /// any object in a group, entire group becomes selected. To reset a group, set the <b>GroupIndex</b>
         /// to 0 (default value).
         /// </remarks>
-        [Browsable(false)]
-        public int GroupIndex
-        {
-            get { return groupIndex; }
-            set { groupIndex = value; }
-        }
+        [Browsable (false)]
+        public int GroupIndex { get; set; }
 
         /// <summary>
         /// Gets or sets the height of the object.
@@ -224,22 +201,27 @@ namespace AM.Reporting
         /// // convert a value to millimeters
         /// MessageBox.Show("Height = " + (text1.Height / Units.Millimeters).ToString() + "mm");
         /// </code></example>
-        [Category("Layout")]
+        [Category ("Layout")]
         public virtual float Height
         {
-            get { return height; }
+            get => height;
             set
             {
-                value = (float)Math.Round(value, 2);
-                if (FloatDiff(height, value))
+                value = (float)Math.Round (value, 2);
+                if (FloatDiff (height, value))
                 {
-                    if (!IsDesigning || !HasRestriction(Restrictions.DontResize))
+                    if (!IsDesigning || !HasRestriction (Restrictions.DontResize))
                     {
                         if (this is IParent)
-                            (this as IParent).UpdateLayout(0, value - height);
+                        {
+                            (this as IParent).UpdateLayout (0, value - height);
+                        }
+
                         height = value;
                         if (Dock != DockStyle.None && Parent != null)
-                            (Parent as IParent).UpdateLayout(0, 0);
+                        {
+                            (Parent as IParent).UpdateLayout (0, 0);
+                        }
                     }
                 }
             }
@@ -264,18 +246,20 @@ namespace AM.Reporting
         /// // convert a value to millimeters
         /// MessageBox.Show("Left = " + (text1.Left / Units.Millimeters).ToString() + "mm");
         /// </code></example>
-        [Category("Layout")]
+        [Category ("Layout")]
         public virtual float Left
         {
-            get { return left; }
+            get => left;
             set
             {
-                value = (float)Math.Round(value, 2);
-                if (!IsDesigning || !HasRestriction(Restrictions.DontMove))
+                value = (float)Math.Round (value, 2);
+                if (!IsDesigning || !HasRestriction (Restrictions.DontMove))
                 {
                     left = value;
                     if (Dock != DockStyle.None && Parent != null)
-                        (Parent as IParent).UpdateLayout(0, 0);
+                    {
+                        (Parent as IParent).UpdateLayout (0, 0);
+                    }
                 }
             }
         }
@@ -286,21 +270,14 @@ namespace AM.Reporting
         /// <remarks>
         /// To change the right coordinate, change the <see cref="Left"/> and/or <see cref="Width"/> properties.
         /// </remarks>
-        [Browsable(false)]
-        public float Right
-        {
-            get { return Left + Width; }
-        }
+        [Browsable (false)]
+        public float Right => Left + Width;
 
         /// <summary>
         /// Gets or sets the Tag string for this component.
         /// </summary>
-        [Category("Design")]
-        public string Tag
-        {
-            get { return tag; }
-            set { tag = value; }
-        }
+        [Category ("Design")]
+        public string Tag { get; set; }
 
         /// <summary>
         /// Gets or sets the top coordinate of the object in relation to its container.
@@ -321,18 +298,20 @@ namespace AM.Reporting
         /// // convert a value to millimeters
         /// MessageBox.Show("Top = " + (text1.Top / Units.Millimeters).ToString() + "mm");
         /// </code></example>
-        [Category("Layout")]
+        [Category ("Layout")]
         public virtual float Top
         {
-            get { return top; }
+            get => top;
             set
             {
-                value = (float)Math.Round(value, 2);
-                if (!IsDesigning || !HasRestriction(Restrictions.DontMove))
+                value = (float)Math.Round (value, 2);
+                if (!IsDesigning || !HasRestriction (Restrictions.DontMove))
                 {
                     top = value;
                     if (Dock != DockStyle.None && Parent != null)
-                        (Parent as IParent).UpdateLayout(0, 0);
+                    {
+                        (Parent as IParent).UpdateLayout (0, 0);
+                    }
                 }
             }
         }
@@ -350,24 +329,24 @@ namespace AM.Reporting
         ///   Text1.Visible = [Orders.Shipped] == true;
         /// }
         /// </code></example>
-        [DefaultValue(true)]
-        [Category("Behavior")]
+        [DefaultValue (true)]
+        [Category ("Behavior")]
         public virtual bool Visible
         {
-            get { return visible; }
-            set { visible = value; }
+            get => visible;
+            set => visible = value;
         }
 
         /// <summary>
         /// Gets or sets a string containing expression that determines should be object displayed in the preview window.
         /// </summary>
-        [DefaultValue("")]
-        [Category("Behavior")]
-        [Editor("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof(UITypeEditor))]
+        [DefaultValue ("")]
+        [Category ("Behavior")]
+        [Editor ("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof (UITypeEditor))]
         public virtual string VisibleExpression
         {
-            get { return visibleExpression; }
-            set { visibleExpression = value; }
+            get => visibleExpression;
+            set => visibleExpression = value;
         }
 
         /// <summary>
@@ -377,25 +356,17 @@ namespace AM.Reporting
         /// Object with Printable = <b>false</b> is still visible in the preview window, but not on the printout.
         /// If you want to hide an object in the preview, set the <see cref="ComponentBase.Visible"/> property to <b>false</b>.
         /// </remarks>
-        [DefaultValue(true)]
-        [Category("Behavior")]
-        public bool Printable
-        {
-            get { return printable; }
-            set { printable = value; }
-        }
+        [DefaultValue (true)]
+        [Category ("Behavior")]
+        public bool Printable { get; set; }
 
         /// <summary>
         /// Gets or sets a string containing expression that determines should be object printed on the printer.
         /// </summary>
-        [DefaultValue("")]
-        [Category("Behavior")]
-        [Editor("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof(UITypeEditor))]
-        public string PrintableExpression
-        {
-            get { return printableExpression; }
-            set { printableExpression = value; }
-        }
+        [DefaultValue ("")]
+        [Category ("Behavior")]
+        [Editor ("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof (UITypeEditor))]
+        public string PrintableExpression { get; set; }
 
         /// <summary>
         /// Gets or sets the width of the object.
@@ -411,22 +382,27 @@ namespace AM.Reporting
         /// // convert a value to millimeters
         /// MessageBox.Show("Width = " + (text1.Width / Units.Millimeters).ToString() + "mm");
         /// </code></example>
-        [Category("Layout")]
+        [Category ("Layout")]
         public virtual float Width
         {
-            get { return width; }
+            get => width;
             set
             {
-                value = (float)Math.Round(value, 2);
-                if (FloatDiff(width, value))
+                value = (float)Math.Round (value, 2);
+                if (FloatDiff (width, value))
                 {
-                    if (!IsDesigning || !HasRestriction(Restrictions.DontResize))
+                    if (!IsDesigning || !HasRestriction (Restrictions.DontResize))
                     {
                         if (this is IParent)
-                            (this as IParent).UpdateLayout(value - width, 0);
+                        {
+                            (this as IParent).UpdateLayout (value - width, 0);
+                        }
+
                         width = value;
                         if (Dock != DockStyle.None && Parent != null)
-                            (Parent as IParent).UpdateLayout(0, 0);
+                        {
+                            (Parent as IParent).UpdateLayout (0, 0);
+                        }
                     }
                 }
             }
@@ -444,10 +420,10 @@ namespace AM.Reporting
             anchor = AnchorStyles.Left | AnchorStyles.Top;
             visible = true;
             visibleExpression = "";
-            printable = true;
-            printableExpression = "";
-            SetFlags(Flags.CanWriteBounds | Flags.HasGlobalName, true);
-            tag = "";
+            Printable = true;
+            PrintableExpression = "";
+            SetFlags (Flags.CanWriteBounds | Flags.HasGlobalName, true);
+            Tag = "";
         }
 
         #endregion Constructors
@@ -455,11 +431,11 @@ namespace AM.Reporting
         #region Public Methods
 
         /// <inheritdoc/>
-        public override void Assign(Base source)
+        public override void Assign (Base source)
         {
-            base.Assign(source);
+            base.Assign (source);
 
-            ComponentBase src = source as ComponentBase;
+            var src = source as ComponentBase;
             Left = src.Left;
             Top = src.Top;
             Width = src.Width;
@@ -474,41 +450,76 @@ namespace AM.Reporting
         }
 
         /// <inheritdoc/>
-        public override void Serialize(FRWriter writer)
+        public override void Serialize (FRWriter writer)
         {
-            ComponentBase c = writer.DiffObject as ComponentBase;
-            base.Serialize(writer);
+            var c = writer.DiffObject as ComponentBase;
+            base.Serialize (writer);
 
             if (Printable != c.Printable)
-                writer.WriteBool("Printable", Printable);
-            if (PrintableExpression != c.PrintableExpression)
-                writer.WriteStr("PrintableExpression", PrintableExpression);
-            if (HasFlag(Flags.CanWriteBounds))
             {
-                if (FloatDiff(Left, c.Left))
-                    writer.WriteFloat("Left", Left);
-                if (FloatDiff(Top, c.Top))
-                    writer.WriteFloat("Top", Top);
-                if (FloatDiff(Width, c.Width))
-                    writer.WriteFloat("Width", Width);
-                if (FloatDiff(Height, c.Height))
-                    writer.WriteFloat("Height", Height);
+                writer.WriteBool ("Printable", Printable);
             }
+
+            if (PrintableExpression != c.PrintableExpression)
+            {
+                writer.WriteStr ("PrintableExpression", PrintableExpression);
+            }
+
+            if (HasFlag (Flags.CanWriteBounds))
+            {
+                if (FloatDiff (Left, c.Left))
+                {
+                    writer.WriteFloat ("Left", Left);
+                }
+
+                if (FloatDiff (Top, c.Top))
+                {
+                    writer.WriteFloat ("Top", Top);
+                }
+
+                if (FloatDiff (Width, c.Width))
+                {
+                    writer.WriteFloat ("Width", Width);
+                }
+
+                if (FloatDiff (Height, c.Height))
+                {
+                    writer.WriteFloat ("Height", Height);
+                }
+            }
+
             if (writer.SerializeTo != SerializeTo.Preview)
             {
                 if (Dock != c.Dock)
-                    writer.WriteValue("Dock", Dock);
+                {
+                    writer.WriteValue ("Dock", Dock);
+                }
+
                 if (Anchor != c.Anchor)
-                    writer.WriteValue("Anchor", Anchor);
+                {
+                    writer.WriteValue ("Anchor", Anchor);
+                }
+
                 if (Visible != c.Visible)
-                    writer.WriteBool("Visible", Visible);
+                {
+                    writer.WriteBool ("Visible", Visible);
+                }
+
                 if (VisibleExpression != c.VisibleExpression)
-                    writer.WriteStr("VisibleExpression", VisibleExpression);
+                {
+                    writer.WriteStr ("VisibleExpression", VisibleExpression);
+                }
+
                 if (GroupIndex != c.GroupIndex)
-                    writer.WriteInt("GroupIndex", GroupIndex);
+                {
+                    writer.WriteInt ("GroupIndex", GroupIndex);
+                }
             }
+
             if (Tag != c.Tag)
-                writer.WriteStr("Tag", Tag);
+            {
+                writer.WriteStr ("Tag", Tag);
+            }
         }
 
         #endregion Public Methods
@@ -518,32 +529,34 @@ namespace AM.Reporting
         /// <inheritdoc/>
         public override string[] GetExpressions()
         {
-            List<string> expressions = new List<string>();
+            var expressions = new List<string>();
 
             string[] baseExpressions = base.GetExpressions();
             if (baseExpressions != null)
             {
-                expressions.AddRange(baseExpressions);
+                expressions.AddRange (baseExpressions);
             }
 
-            if (!String.IsNullOrEmpty(VisibleExpression))
+            if (!string.IsNullOrEmpty (VisibleExpression))
             {
-                string expression = Code.CodeUtils.FixExpressionWithBrackets(VisibleExpression);
+                var expression = Code.CodeUtils.FixExpressionWithBrackets (VisibleExpression);
                 if (expression.ToLower() == "true" || expression.ToLower() == "false")
                 {
                     expression = expression.ToLower();
                 }
-                expressions.Add(expression);
+
+                expressions.Add (expression);
             }
 
-            if (!String.IsNullOrEmpty(PrintableExpression))
+            if (!string.IsNullOrEmpty (PrintableExpression))
             {
-                string expression = Code.CodeUtils.FixExpressionWithBrackets(PrintableExpression);
+                var expression = Code.CodeUtils.FixExpressionWithBrackets (PrintableExpression);
                 if (expression.ToLower() == "true" || expression.ToLower() == "false")
                 {
                     expression = expression.ToLower();
                 }
-                expressions.Add(expression);
+
+                expressions.Add (expression);
             }
 
             return expressions.ToArray();

@@ -23,7 +23,9 @@ using System.Data;
 using System.Data.Common;
 using System.IO;
 using System.Net;
+
 using AM.Reporting.Utils;
+
 using System.Globalization;
 using System.Collections;
 
@@ -48,24 +50,28 @@ namespace AM.Reporting.Data
     public partial class CsvDataConnection : DataConnectionBase
     {
         #region Fields
+
         #endregion Fields
 
         #region Properties
+
         /// <summary>
         /// Gets or sets the path to .csv file.
         /// </summary>
-        [Category("Data")]
+        [Category ("Data")]
         public string CsvFile
         {
             get
             {
-                CsvConnectionStringBuilder builder = new CsvConnectionStringBuilder(ConnectionString);
+                var builder = new CsvConnectionStringBuilder (ConnectionString);
                 return builder.CsvFile;
             }
             set
             {
-                CsvConnectionStringBuilder builder = new CsvConnectionStringBuilder(ConnectionString);
-                builder.CsvFile = value;
+                var builder = new CsvConnectionStringBuilder (ConnectionString)
+                {
+                    CsvFile = value
+                };
                 ConnectionString = builder.ToString();
             }
         }
@@ -73,18 +79,20 @@ namespace AM.Reporting.Data
         /// <summary>
         /// Gets or sets the codepage of the .csv file.
         /// </summary>
-        [Category("Data")]
+        [Category ("Data")]
         public int Codepage
         {
             get
             {
-                CsvConnectionStringBuilder builder = new CsvConnectionStringBuilder(ConnectionString);
+                var builder = new CsvConnectionStringBuilder (ConnectionString);
                 return builder.Codepage;
             }
             set
             {
-                CsvConnectionStringBuilder builder = new CsvConnectionStringBuilder(ConnectionString);
-                builder.Codepage = value;
+                var builder = new CsvConnectionStringBuilder (ConnectionString)
+                {
+                    Codepage = value
+                };
                 ConnectionString = builder.ToString();
             }
         }
@@ -92,18 +100,20 @@ namespace AM.Reporting.Data
         /// <summary>
         /// Gets or sets the separator of the .csv file.
         /// </summary>
-        [Category("Data")]
+        [Category ("Data")]
         public string Separator
         {
             get
             {
-                CsvConnectionStringBuilder builder = new CsvConnectionStringBuilder(ConnectionString);
+                var builder = new CsvConnectionStringBuilder (ConnectionString);
                 return builder.Separator;
             }
             set
             {
-                CsvConnectionStringBuilder builder = new CsvConnectionStringBuilder(ConnectionString);
-                builder.Separator = value;
+                var builder = new CsvConnectionStringBuilder (ConnectionString)
+                {
+                    Separator = value
+                };
                 ConnectionString = builder.ToString();
             }
         }
@@ -111,18 +121,20 @@ namespace AM.Reporting.Data
         /// <summary>
         /// Gets or sets the value indicating that field names should be loaded from the first string of the file.
         /// </summary>
-        [Category("Data")]
+        [Category ("Data")]
         public bool FieldNamesInFirstString
         {
             get
             {
-                CsvConnectionStringBuilder builder = new CsvConnectionStringBuilder(ConnectionString);
+                var builder = new CsvConnectionStringBuilder (ConnectionString);
                 return builder.FieldNamesInFirstString;
             }
             set
             {
-                CsvConnectionStringBuilder builder = new CsvConnectionStringBuilder(ConnectionString);
-                builder.FieldNamesInFirstString = value;
+                var builder = new CsvConnectionStringBuilder (ConnectionString)
+                {
+                    FieldNamesInFirstString = value
+                };
                 ConnectionString = builder.ToString();
             }
         }
@@ -130,18 +142,20 @@ namespace AM.Reporting.Data
         /// <summary>
         /// Gets or sets the value indicating that quotation marks should be removed.
         /// </summary>
-        [Category("Data")]
+        [Category ("Data")]
         public bool RemoveQuotationMarks
         {
             get
             {
-                CsvConnectionStringBuilder builder = new CsvConnectionStringBuilder(ConnectionString);
+                var builder = new CsvConnectionStringBuilder (ConnectionString);
                 return builder.RemoveQuotationMarks;
             }
             set
             {
-                CsvConnectionStringBuilder builder = new CsvConnectionStringBuilder(ConnectionString);
-                builder.RemoveQuotationMarks = value;
+                var builder = new CsvConnectionStringBuilder (ConnectionString)
+                {
+                    RemoveQuotationMarks = value
+                };
                 ConnectionString = builder.ToString();
             }
         }
@@ -150,18 +164,20 @@ namespace AM.Reporting.Data
         /// <summary>
         /// Gets or sets the value indicating that field types fhould be converted.
         /// </summary>
-        [Category("Data")]
+        [Category ("Data")]
         public bool ConvertFieldTypes
         {
             get
             {
-                CsvConnectionStringBuilder builder = new CsvConnectionStringBuilder(ConnectionString);
+                var builder = new CsvConnectionStringBuilder (ConnectionString);
                 return builder.ConvertFieldTypes;
             }
             set
             {
-                CsvConnectionStringBuilder builder = new CsvConnectionStringBuilder(ConnectionString);
-                builder.ConvertFieldTypes = value;
+                var builder = new CsvConnectionStringBuilder (ConnectionString)
+                {
+                    ConvertFieldTypes = value
+                };
                 ConnectionString = builder.ToString();
             }
         }
@@ -169,18 +185,20 @@ namespace AM.Reporting.Data
         /// <summary>
         /// Gets or sets locale name used to auto-convert numeric fields, e.g. "en-US".
         /// </summary>
-        [Category("Data")]
+        [Category ("Data")]
         public string NumberFormat
         {
             get
             {
-                CsvConnectionStringBuilder builder = new CsvConnectionStringBuilder(ConnectionString);
+                var builder = new CsvConnectionStringBuilder (ConnectionString);
                 return builder.NumberFormat;
             }
             set
             {
-                CsvConnectionStringBuilder builder = new CsvConnectionStringBuilder(ConnectionString);
-                builder.NumberFormat = value;
+                var builder = new CsvConnectionStringBuilder (ConnectionString)
+                {
+                    NumberFormat = value
+                };
                 ConnectionString = builder.ToString();
             }
         }
@@ -188,18 +206,20 @@ namespace AM.Reporting.Data
         /// <summary>
         /// Gets or sets locale name used to auto-convert currency fields, e.g. "en-US".
         /// </summary>
-        [Category("Data")]
+        [Category ("Data")]
         public string CurrencyFormat
         {
             get
             {
-                CsvConnectionStringBuilder builder = new CsvConnectionStringBuilder(ConnectionString);
+                var builder = new CsvConnectionStringBuilder (ConnectionString);
                 return builder.CurrencyFormat;
             }
             set
             {
-                CsvConnectionStringBuilder builder = new CsvConnectionStringBuilder(ConnectionString);
-                builder.CurrencyFormat = value;
+                var builder = new CsvConnectionStringBuilder (ConnectionString)
+                {
+                    CurrencyFormat = value
+                };
                 ConnectionString = builder.ToString();
             }
         }
@@ -207,18 +227,20 @@ namespace AM.Reporting.Data
         /// <summary>
         /// Gets or sets locale name used to auto-convert datetime fields, e.g. "en-US".
         /// </summary>
-        [Category("Data")]
+        [Category ("Data")]
         public string DateTimeFormat
         {
             get
             {
-                CsvConnectionStringBuilder builder = new CsvConnectionStringBuilder(ConnectionString);
+                var builder = new CsvConnectionStringBuilder (ConnectionString);
                 return builder.DateTimeFormat;
             }
             set
             {
-                CsvConnectionStringBuilder builder = new CsvConnectionStringBuilder(ConnectionString);
-                builder.DateTimeFormat = value;
+                var builder = new CsvConnectionStringBuilder (ConnectionString)
+                {
+                    DateTimeFormat = value
+                };
                 ConnectionString = builder.ToString();
             }
         }
@@ -242,46 +264,50 @@ namespace AM.Reporting.Data
         /// <inheritdoc/>
         protected override DataSet CreateDataSet()
         {
-            DataSet dataset = base.CreateDataSet();
-            CsvConnectionStringBuilder builder = new CsvConnectionStringBuilder(ConnectionString);
-            List<string> rawLines = CsvUtils.ReadLines(builder);
-            DataTable table = CsvUtils.CreateDataTable(builder, rawLines);
+            var dataset = base.CreateDataSet();
+            var builder = new CsvConnectionStringBuilder (ConnectionString);
+            List<string> rawLines = CsvUtils.ReadLines (builder);
+            var table = CsvUtils.CreateDataTable (builder, rawLines);
             if (table != null)
-                dataset.Tables.Add(table);
+            {
+                dataset.Tables.Add (table);
+            }
+
             return dataset;
         }
 
         /// <inheritdoc/>
-        protected override void SetConnectionString(string value)
+        protected override void SetConnectionString (string value)
         {
             DisposeDataSet();
-            base.SetConnectionString(value);
+            base.SetConnectionString (value);
         }
 
         #endregion Protected Methods
 
         #region Public Methods
 
-
         /// <inheritdoc/>
-        public override void FillTableSchema(DataTable table, string selectCommand, CommandParameterCollection parameters)
+        public override void FillTableSchema (DataTable table, string selectCommand,
+            CommandParameterCollection parameters)
         {
             // do nothing
         }
 
         /// <inheritdoc/>
-        public override void FillTableData(DataTable table, string selectCommand, CommandParameterCollection parameters)
+        public override void FillTableData (DataTable table, string selectCommand,
+            CommandParameterCollection parameters)
         {
             // do nothing
         }
 
         /// <inheritdoc/>
-        public override void CreateTable(TableDataSource source)
+        public override void CreateTable (TableDataSource source)
         {
             if (DataSet.Tables.Count == 1)
             {
                 source.Table = DataSet.Tables[0];
-                base.CreateTable(source);
+                base.CreateTable (source);
             }
             else
             {
@@ -290,13 +316,13 @@ namespace AM.Reporting.Data
         }
 
         /// <inheritdoc/>
-        public override void DeleteTable(TableDataSource source)
+        public override void DeleteTable (TableDataSource source)
         {
             // do nothing
         }
 
         /// <inheritdoc/>
-        public override string QuoteIdentifier(string value, DbConnection connection)
+        public override string QuoteIdentifier (string value, DbConnection connection)
         {
             return value;
         }
@@ -306,12 +332,14 @@ namespace AM.Reporting.Data
         public override string[] GetTableNames()
         {
             string[] result = new string[DataSet.Tables.Count];
-            for (int i = 0; i < DataSet.Tables.Count; i++)
+            for (var i = 0; i < DataSet.Tables.Count; i++)
             {
                 result[i] = DataSet.Tables[i].TableName;
             }
+
             return result;
         }
+
         #endregion Public Methods
     }
 }

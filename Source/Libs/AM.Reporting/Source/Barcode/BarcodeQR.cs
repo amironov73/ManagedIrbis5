@@ -68,18 +68,22 @@ namespace AM.Reporting.Barcode
         /// UTF-8 encoding.
         /// </summary>
         UTF8,
+
         /// <summary>
         /// ISO 8859-1 encoding.
         /// </summary>
         ISO8859_1,
+
         /// <summary>
         /// Shift_JIS encoding.
         /// </summary>
         Shift_JIS,
+
         /// <summary>
         /// Windows-1251 encoding.
         /// </summary>
         Windows_1251,
+
         /// <summary>
         /// cp866 encoding.
         /// </summary>
@@ -92,49 +96,39 @@ namespace AM.Reporting.Barcode
     public class BarcodeQR : Barcode2DBase
     {
         #region Fields
-        private QRCodeErrorCorrection errorCorrection;
-        private QRCodeEncoding encoding;
-        private bool quietZone;
+
         private ByteMatrix matrix;
         private const int PixelSize = 4;
+
         #endregion
 
         #region Properties
+
         /// <summary>
         /// Gets or sets the error correction.
         /// </summary>
-        [DefaultValue(QRCodeErrorCorrection.L)]
-        public QRCodeErrorCorrection ErrorCorrection
-        {
-            get { return errorCorrection; }
-            set { errorCorrection = value; }
-        }
+        [DefaultValue (QRCodeErrorCorrection.L)]
+        public QRCodeErrorCorrection ErrorCorrection { get; set; }
 
         /// <summary>
         /// Gets or sets the encoding used for text conversion.
         /// </summary>
-        [DefaultValue(QRCodeEncoding.UTF8)]
-        public QRCodeEncoding Encoding
-        {
-            get { return encoding; }
-            set { encoding = value; }
-        }
+        [DefaultValue (QRCodeEncoding.UTF8)]
+        public QRCodeEncoding Encoding { get; set; }
 
         /// <summary>
         /// Gets or sets the value indicating that quiet zone must be shown.
         /// </summary>
-        [DefaultValue(true)]
-        public bool QuietZone
-        {
-            get { return quietZone; }
-            set { quietZone = value; }
-        }
+        [DefaultValue (true)]
+        public bool QuietZone { get; set; }
+
         #endregion
 
         #region Private Methods
+
         private ErrorCorrectionLevel GetErrorCorrectionLevel()
         {
-            switch (errorCorrection)
+            switch (ErrorCorrection)
             {
                 case QRCodeErrorCorrection.L:
                     return ErrorCorrectionLevel.L;
@@ -154,7 +148,7 @@ namespace AM.Reporting.Barcode
 
         private string GetEncoding()
         {
-            switch (encoding)
+            switch (Encoding)
             {
                 case QRCodeEncoding.UTF8:
                     return "UTF-8";
@@ -174,71 +168,83 @@ namespace AM.Reporting.Barcode
 
             return "";
         }
+
         #endregion
 
         #region Public Methods
+
         /// <inheritdoc/>
-        public override void Assign(BarcodeBase source)
+        public override void Assign (BarcodeBase source)
         {
-            base.Assign(source);
-            BarcodeQR src = source as BarcodeQR;
+            base.Assign (source);
+            var src = source as BarcodeQR;
 
             ErrorCorrection = src.ErrorCorrection;
             Encoding = src.Encoding;
             QuietZone = src.QuietZone;
         }
 
-        internal override void Serialize(AM.Reporting.Utils.FRWriter writer, string prefix, BarcodeBase diff)
+        internal override void Serialize (FRWriter writer, string prefix, BarcodeBase diff)
         {
-            base.Serialize(writer, prefix, diff);
-            BarcodeQR c = diff as BarcodeQR;
+            base.Serialize (writer, prefix, diff);
+            var c = diff as BarcodeQR;
 
             if (c == null || ErrorCorrection != c.ErrorCorrection)
-                writer.WriteValue(prefix + "ErrorCorrection", ErrorCorrection);
+            {
+                writer.WriteValue (prefix + "ErrorCorrection", ErrorCorrection);
+            }
+
             if (c == null || Encoding != c.Encoding)
-                writer.WriteValue(prefix + "Encoding", Encoding);
+            {
+                writer.WriteValue (prefix + "Encoding", Encoding);
+            }
+
             if (c == null || QuietZone != c.QuietZone)
-                writer.WriteBool(prefix + "QuietZone", QuietZone);
+            {
+                writer.WriteBool (prefix + "QuietZone", QuietZone);
+            }
         }
 
-        internal override void Initialize(string text, bool showText, int angle, float zoom)
+        internal override void Initialize (string text, bool showText, int angle, float zoom)
         {
-            base.Initialize(text, showText, angle, zoom);
-            matrix = QRCodeWriter.encode(base.text, 0, 0, GetErrorCorrectionLevel(), GetEncoding(), QuietZone);
+            base.Initialize (text, showText, angle, zoom);
+            matrix = QRCodeWriter.encode (this.text, 0, 0, GetErrorCorrectionLevel(), GetEncoding(), QuietZone);
         }
 
         internal override SizeF CalcBounds()
         {
-            int textAdd = showText ? 18 : 0;
-            return new SizeF(matrix.Width * PixelSize, matrix.Height * PixelSize + textAdd);
+            var textAdd = showText ? 18 : 0;
+            return new SizeF (matrix.Width * PixelSize, matrix.Height * PixelSize + textAdd);
         }
 
-        internal override void Draw2DBarcode(IGraphics g, float kx, float ky)
+        internal override void Draw2DBarcode (IGraphics g, float kx, float ky)
         {
-            Brush dark = new SolidBrush(Color);
+            Brush dark = new SolidBrush (Color);
 
-            for (int y = 0; y < matrix.Height; y++)
+            for (var y = 0; y < matrix.Height; y++)
             {
-                for (int x = 0; x < matrix.Width; x++)
+                for (var x = 0; x < matrix.Width; x++)
                 {
-                    if (matrix.get_Renamed(x, y) == 0)
+                    if (matrix.get_Renamed (x, y) == 0)
                     {
-                        g.FillRectangle(dark, new RectangleF(
-                        x * PixelSize * kx,
-                        y * PixelSize * ky,
-                        PixelSize * kx,
-                        PixelSize * ky
-                        ));
+                        g.FillRectangle (dark, new RectangleF (
+                                x * PixelSize * kx,
+                                y * PixelSize * ky,
+                                PixelSize * kx,
+                                PixelSize * ky
+                            ));
                     }
                 }
             }
-            if (text.StartsWith("SPC"))
+
+            if (text.StartsWith ("SPC"))
             {
                 ErrorCorrection = QRCodeErrorCorrection.M;
             }
 
             dark.Dispose();
         }
+
         #endregion
 
         /// <summary>

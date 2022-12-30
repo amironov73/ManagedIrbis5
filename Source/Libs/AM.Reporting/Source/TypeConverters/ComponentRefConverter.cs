@@ -33,48 +33,63 @@ namespace AM.Reporting.TypeConverters
         #region Public Methods
 
         /// <inheritdoc/>
-        public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
+        public override bool CanConvertFrom (ITypeDescriptorContext context, Type sourceType)
         {
-            if (sourceType == typeof(string))
-                return true;
-            return base.CanConvertFrom(context, sourceType);
-        }
-
-        /// <inheritdoc/>
-        public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
-        {
-            if (destinationType == typeof(string))
-                return true;
-            return base.CanConvertTo(context, destinationType);
-        }
-
-        /// <inheritdoc/>
-        public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
-        {
-            if (value is string)
+            if (sourceType == typeof (string))
             {
-                if (context != null && context.Instance != null && !String.IsNullOrEmpty((string)value))
+                return true;
+            }
+
+            return base.CanConvertFrom (context, sourceType);
+        }
+
+        /// <inheritdoc/>
+        public override bool CanConvertTo (ITypeDescriptorContext context, Type destinationType)
+        {
+            if (destinationType == typeof (string))
+            {
+                return true;
+            }
+
+            return base.CanConvertTo (context, destinationType);
+        }
+
+        /// <inheritdoc/>
+        public override object ConvertFrom (ITypeDescriptorContext context, CultureInfo culture, object value)
+        {
+            if (value is string s)
+            {
+                if (context != null && context.Instance != null && !string.IsNullOrEmpty (s))
                 {
-                    ComponentBase c = context.Instance as ComponentBase;
-                    Report report = c.Report;
+                    var c = context.Instance as ComponentBase;
+                    var report = c.Report;
                     if (report != null)
-                        return report.FindObject((string)value);
+                    {
+                        return report.FindObject (s);
+                    }
                 }
+
                 return null;
             }
-            return base.ConvertFrom(context, culture, value);
+
+            return base.ConvertFrom (context, culture, value);
         }
 
         /// <inheritdoc/>
-        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
+        public override object ConvertTo (ITypeDescriptorContext context, CultureInfo culture, object value,
+            Type destinationType)
         {
-            if (destinationType == typeof(string))
+            if (destinationType == typeof (string))
             {
                 if (value == null)
+                {
                     return "";
+                }
+
                 return (value as Base).Name;
             }
-            return base.ConvertTo(context, culture, value, destinationType);
+
+            return base.ConvertTo (context, culture, value, destinationType);
         }
 
         #endregion Public Methods

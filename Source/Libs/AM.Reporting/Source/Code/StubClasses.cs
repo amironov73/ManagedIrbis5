@@ -486,9 +486,13 @@ End Namespace
 ";
 
             if (Report.ScriptLanguage == Language.CSharp)
-                scriptText.Append(stubClassesCSharp);
+            {
+                scriptText.Append (stubClassesCSharp);
+            }
             else
-                scriptText.Append(stubClassesVBNet);
+            {
+                scriptText.Append (stubClassesVBNet);
+            }
         }
     }
 }

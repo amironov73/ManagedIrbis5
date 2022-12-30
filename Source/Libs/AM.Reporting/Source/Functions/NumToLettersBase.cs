@@ -29,12 +29,16 @@ namespace AM.Reporting.Functions
     internal abstract class NumToLettersBase
     {
         #region Protected Methods
-        protected string Str(int value, char[] letters)
-        {
-            if (value < 0) return "";
 
-            int n = value;
-            StringBuilder r = new StringBuilder();
+        protected string Str (int value, char[] letters)
+        {
+            if (value < 0)
+            {
+                return "";
+            }
+
+            var n = value;
+            var r = new StringBuilder();
 
             //if (minus)
             //    r.Insert(0, GetMinus() + " ");
@@ -42,18 +46,25 @@ namespace AM.Reporting.Functions
             while (n >= letters.Length)
             {
                 letter = n % letters.Length;
-                r.Insert(0, letters[letter]);
+                r.Insert (0, letters[letter]);
                 n /= letters.Length;
-                if (n < letters.Length) --n;
+                if (n < letters.Length)
+                {
+                    --n;
+                }
             }
-            r.Insert(0, letters[n]);
+
+            r.Insert (0, letters[n]);
 
             return r.ToString();
         }
+
         #endregion
 
         #region Public Methods
-        public abstract string ConvertNumber(int value, bool isUpper);
+
+        public abstract string ConvertNumber (int value, bool isUpper);
+
         #endregion
     }
 }

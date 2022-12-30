@@ -26,7 +26,7 @@ namespace AM.Reporting.Code.CodeDom.Compiler
     {
         public bool GenerateInMemory { get; set; }
         public StringCollection ReferencedAssemblies { get; } = new StringCollection();
-        public TempFileCollection TempFiles { get; set; } = new TempFileCollection("", false);
+        public TempFileCollection TempFiles { get; set; } = new TempFileCollection ("", false);
     }
 }
 

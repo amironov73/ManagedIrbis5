@@ -21,7 +21,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.ComponentModel;
+
 using AM.Reporting.Utils;
+
 using System.CodeDom.Compiler;
 using System.Drawing.Design;
 
@@ -164,26 +166,20 @@ namespace AM.Reporting
     /// <summary>
     /// Represents the root class of the AM.Reporting object's hierarhy.
     /// </summary>
-    [ToolboxItem(false)]
+    [ToolboxItem (false)]
     public abstract partial class Base : Component, IFRSerializable
     {
         #region Fields
+
         private string name;
-        private Restrictions restrictions;
-        private Flags flags;
         private Base parent;
-        private string baseName;
-        private bool isAncestor;
-        private bool isDesigning;
-        private bool isPrinting;
-        private bool isRunning;
-        private Base originalComponent;
-        private string alias;
         private Report report;
         private int zOrder;
+
         #endregion
 
         #region Properties
+
         /// <summary>
         /// Gets or sets the name of the object.
         /// </summary>
@@ -200,28 +196,40 @@ namespace AM.Reporting
         /// </example>
         /// <exception cref="DuplicateNameException" caption="">Another object with such name exists.</exception>
         /// <exception cref="AncestorException" caption="">Rename an object that was introduced in the ancestor report.</exception>
-        [MergableProperty(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        [Category("Design")]
-        [DisplayName("(Name)")]
+        [MergableProperty (false)]
+        [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+        [Category ("Design")]
+        [DisplayName ("(Name)")]
         public virtual string Name
         {
-            get { return name; }
+            get => name;
             set
             {
-                if (String.Compare(name, value, true) == 0)
-                    return;
-                if (value != "" && Report != null && HasFlag(Flags.HasGlobalName))
+                if (string.Compare (name, value, true) == 0)
                 {
-                    Base c = Report.FindObject(value);
-                    if (c != null && c != this)
-                        throw new DuplicateNameException(value);
-                    if (IsAncestor)
-                        throw new AncestorException(name);
-                    if (IsDesigning)
-                        CheckValidIdent(value);
+                    return;
                 }
-                SetName(value);
+
+                if (value != "" && Report != null && HasFlag (Flags.HasGlobalName))
+                {
+                    var c = Report.FindObject (value);
+                    if (c != null && c != this)
+                    {
+                        throw new DuplicateNameException (value);
+                    }
+
+                    if (IsAncestor)
+                    {
+                        throw new AncestorException (name);
+                    }
+
+                    if (IsDesigning)
+                    {
+                        CheckValidIdent (value);
+                    }
+                }
+
+                SetName (value);
             }
         }
 
@@ -232,15 +240,11 @@ namespace AM.Reporting
         /// Use this property to restrict some user actions like move, resize, edit, delete. For example, if
         /// <b>Restriction.DontMove</b> flag is set, user cannot move the object in the designer.
         /// </remarks>
-        [DefaultValue(Restrictions.None)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        [Category("Design")]
-        [Editor("AM.Reporting.TypeEditors.FlagsEditor, AM.Reporting", typeof(UITypeEditor))]
-        public Restrictions Restrictions
-        {
-            get { return restrictions; }
-            set { restrictions = value; }
-        }
+        [DefaultValue (Restrictions.None)]
+        [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+        [Category ("Design")]
+        [Editor ("AM.Reporting.TypeEditors.FlagsEditor, AM.Reporting", typeof (UITypeEditor))]
+        public Restrictions Restrictions { get; set; }
 
         /// <summary>
         /// Gets the flags that allow some functionality in the designer.
@@ -248,11 +252,8 @@ namespace AM.Reporting
         /// <remarks>
         /// Use this property only if you developing a new AM.Reporting object.
         /// </remarks>
-        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public Flags Flags
-        {
-            get { return flags; }
-        }
+        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+        public Flags Flags { get; private set; }
 
         /// <summary>
         /// Gets or sets the parent of the object.
@@ -271,22 +272,24 @@ namespace AM.Reporting
         /// page.Parent = report1;
         /// </code></example>
         /// <exception cref="ParentException" caption="">Parent object cannot contain this object.</exception>
-        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
         public Base Parent
         {
-            get { return parent; }
+            get => parent;
             set
             {
                 if (value != parent)
                 {
                     if (value != null)
                     {
-                        if (value is IParent)
-                            (value as IParent).AddChild(this);
+                        if (value is IParent parent1)
+                        {
+                            parent1.AddChild (this);
+                        }
                     }
                     else
                     {
-                        (parent as IParent).RemoveChild(this);
+                        (parent as IParent).RemoveChild (this);
                     }
                 }
             }
@@ -298,12 +301,8 @@ namespace AM.Reporting
         /// <remarks>
         /// This property is used to automatically create unique object's name. See <see cref="CreateUniqueName"/>
         /// </remarks>
-        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public string BaseName
-        {
-            get { return baseName; }
-            set { baseName = value; }
-        }
+        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+        public string BaseName { get; set; }
 
         /// <summary>
         /// Gets the short type name.
@@ -311,27 +310,32 @@ namespace AM.Reporting
         /// <remarks>
         /// Returns the short type name, such as "TextObject".
         /// </remarks>
-        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public string ClassName
-        {
-            get { return GetType().Name; }
-        }
+        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+        public string ClassName => GetType().Name;
 
         /// <summary>
         /// Gets reference to the parent <see cref="Report"/> object.
         /// </summary>
-        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
         public Report Report
         {
             get
             {
                 if (this is Report)
+                {
                     return this as Report;
+                }
+
                 if (report != null)
+                {
                     return report;
+                }
 
                 if (Parent != null)
+                {
                     return Parent.Report;
+                }
+
                 return null;
             }
         }
@@ -339,21 +343,27 @@ namespace AM.Reporting
         /// <summary>
         /// Gets reference to the parent <see cref="PageBase"/> object.
         /// </summary>
-        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
         public PageBase Page
         {
             get
             {
                 if (this is PageBase)
+                {
                     return (PageBase)this;
+                }
 
-                Base c = Parent;
+                var c = Parent;
                 while (c != null)
                 {
-                    if (c is PageBase)
-                        return (PageBase)c;
+                    if (c is PageBase @base)
+                    {
+                        return @base;
+                    }
+
                     c = c.Parent;
                 }
+
                 return null;
             }
         }
@@ -366,14 +376,17 @@ namespace AM.Reporting
         /// will return only pages that contains in the report, but not page childs such as bands. To return all
         /// child objects, use <see cref="AllObjects"/> property.
         /// </remarks>
-        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
         public ObjectCollection ChildObjects
         {
             get
             {
-                ObjectCollection result = new ObjectCollection();
+                var result = new ObjectCollection();
                 if (this is IParent)
-                    (this as IParent).GetChildObjects(result);
+                {
+                    (this as IParent).GetChildObjects (result);
+                }
+
                 return result;
             }
         }
@@ -386,13 +399,13 @@ namespace AM.Reporting
         /// For example, <b>Report.AllObjects</b> will return all objects that contains in the report - such as
         /// pages, bands, text objects.
         /// </remarks>
-        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
         public ObjectCollection AllObjects
         {
             get
             {
-                ObjectCollection result = new ObjectCollection();
-                EnumObjects(this, result);
+                var result = new ObjectCollection();
+                EnumObjects (this, result);
                 return result;
             }
         }
@@ -405,59 +418,54 @@ namespace AM.Reporting
         /// For example, put two text objects on a band. First object will have <b>ZOrder</b> = 0, second = 1. Setting the
         /// second object's <b>ZOrder</b> to 0 will move it to the back of the first text object.
         /// </remarks>
-        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
         public int ZOrder
         {
             get
             {
                 if (parent != null)
-                    return (parent as IParent).GetChildOrder(this);
+                {
+                    return (parent as IParent).GetChildOrder (this);
+                }
+
                 return zOrder;
             }
             set
             {
                 if (parent != null)
-                    (parent as IParent).SetChildOrder(this, value);
+                {
+                    (parent as IParent).SetChildOrder (this, value);
+                }
                 else
+                {
                     zOrder = value;
+                }
             }
         }
 
         /// <summary>
         /// Gets a value indicating whether the object was introduced in the ancestor report.
         /// </summary>
-        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public bool IsAncestor
-        {
-            get { return isAncestor; }
-        }
+        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+        public bool IsAncestor { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether the object is in the design state.
         /// </summary>
-        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public bool IsDesigning
-        {
-            get { return isDesigning; }
-        }
+        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+        public bool IsDesigning { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether the object is currently printing.
         /// </summary>
-        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public bool IsPrinting
-        {
-            get { return isPrinting; }
-        }
+        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+        public bool IsPrinting { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether the object is currently processed by the report engine.
         /// </summary>
-        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public bool IsRunning
-        {
-            get { return isRunning; }
-        }
+        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+        public bool IsRunning { get; private set; }
 
         /// <summary>
         /// Gets an original component for this object.
@@ -466,37 +474,40 @@ namespace AM.Reporting
         /// This property is used in the preview mode. Each object in the prepared report is bound to its
         /// original (from the report template). This technique is used to minimize the prepared report's size.
         /// </remarks>
-        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public Base OriginalComponent
-        {
-            get { return originalComponent; }
-            set { originalComponent = value; }
-        }
+        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+        public Base OriginalComponent { get; set; }
 
-        internal string Alias
-        {
-            get { return alias; }
-            set { alias = value; }
-        }
+        internal string Alias { get; set; }
+
         #endregion
 
         #region Private Methods
-        private void CheckValidIdent(string value)
+
+        private void CheckValidIdent (string value)
         {
-            if (!CodeGenerator.IsValidLanguageIndependentIdentifier(value))
-                throw new NotValidIdentifierException(value);
+            if (!CodeGenerator.IsValidLanguageIndependentIdentifier (value))
+            {
+                throw new NotValidIdentifierException (value);
+            }
         }
 
-        private void EnumObjects(Base c, ObjectCollection list)
+        private void EnumObjects (Base c, ObjectCollection list)
         {
             if (c != this)
-                list.Add(c);
+            {
+                list.Add (c);
+            }
+
             foreach (Base obj in c.ChildObjects)
-                EnumObjects(obj, list);
+            {
+                EnumObjects (obj, list);
+            }
         }
+
         #endregion
 
         #region Protected Methods
+
         /// <summary>
         /// Helper method, helps to set a reference-type value to the property.
         /// </summary>
@@ -517,16 +528,19 @@ namespace AM.Reporting
         ///   }
         /// }
         /// </code></example>
-        protected void SetProp(Base prop, Base value)
+        protected void SetProp (Base prop, Base value)
         {
             if (prop != value)
             {
                 if (prop != null)
-                    prop.SetParent(null);
+                {
+                    prop.SetParent (null);
+                }
+
                 if (value != null)
                 {
                     value.Parent = null;
-                    value.SetParent(this);
+                    value.SetParent (this);
                 }
             }
         }
@@ -541,9 +555,9 @@ namespace AM.Reporting
         /// This method is needed to compare two float values using some precision (0.001). It is useful
         /// to compare objects' locations and sizes for equality.
         /// </remarks>
-        protected bool FloatDiff(float f1, float f2)
+        protected bool FloatDiff (float f1, float f2)
         {
-            return Math.Abs(f1 - f2) > 0.001;
+            return Math.Abs (f1 - f2) > 0.001;
         }
 
         /// <summary>
@@ -575,16 +589,17 @@ namespace AM.Reporting
         /// }
         /// </code>
         /// </example>
-        protected virtual void DeserializeSubItems(FRReader reader)
+        protected virtual void DeserializeSubItems (FRReader reader)
         {
             if (reader.ReadChildren)
             {
-                Base obj = reader.Read() as Base;
-                if (obj != null)
+                if (reader.Read() is Base obj)
                 {
                     obj.Parent = this;
                     if (IsAncestor && !obj.IsAncestor)
+                    {
                         obj.ZOrder = obj.zOrder;
+                    }
                 }
             }
         }
@@ -594,68 +609,74 @@ namespace AM.Reporting
         /// </summary>
         /// <param name="text">The text containing macros.</param>
         /// <returns>The text with macros replaced with its values.</returns>
-        protected string ExtractDefaultMacros(string text)
+        protected string ExtractDefaultMacros (string text)
         {
             Dictionary<string, object> macroValues = Report.PreparedPages.MacroValues;
-            text = ExtractDefaultMacrosInternal(macroValues, text);
-            text = text.Replace("[TOTALPAGES#]", macroValues["TotalPages#"].ToString());
-            text = text.Replace("[PAGE#]", macroValues["Page#"].ToString());
+            text = ExtractDefaultMacrosInternal (macroValues, text);
+            text = text.Replace ("[TOTALPAGES#]", macroValues["TotalPages#"].ToString());
+            text = text.Replace ("[PAGE#]", macroValues["Page#"].ToString());
             return text;
         }
 
 
-
         /// <inheritdoc/>
-        protected override void Dispose(bool disposing)
+        protected override void Dispose (bool disposing)
         {
             if (disposing)
             {
                 Parent = null;
                 Clear();
             }
-            base.Dispose(disposing);
+
+            base.Dispose (disposing);
         }
+
         #endregion
 
         #region Public Methods
+
         /// <summary>
         /// Set object's flags.
         /// </summary>
         /// <param name="flags">Flag to set.</param>
         /// <param name="value"><b>true</b> to set the flag, <b>false</b> to reset.</param>
-        public void SetFlags(Flags flags, bool value)
+        public void SetFlags (Flags flags, bool value)
         {
             if (value)
-                this.flags |= flags;
+            {
+                this.Flags |= flags;
+            }
             else
-                this.flags &= ~flags;
+            {
+                this.Flags &= ~flags;
+            }
         }
 
-        internal void SetAncestor(bool value)
+        internal void SetAncestor (bool value)
         {
-            isAncestor = value;
+            IsAncestor = value;
         }
 
-        internal void SetDesigning(bool value)
+        internal void SetDesigning (bool value)
         {
-            isDesigning = value;
+            IsDesigning = value;
         }
 
-        internal void SetPrinting(bool value)
+        internal void SetPrinting (bool value)
         {
-            isPrinting = value;
+            IsPrinting = value;
         }
 
-        internal void SetRunning(bool value)
+        internal void SetRunning (bool value)
         {
-            isRunning = value;
+            IsRunning = value;
         }
 
         /// <summary>
         /// Sets the reference to a Report.
         /// </summary>
         /// <param name="value">Report to set.</param>
-        public void SetReport(Report value)
+        public void SetReport (Report value)
         {
             report = value;
         }
@@ -669,7 +690,7 @@ namespace AM.Reporting
         /// </remarks>
         /// <seealso cref="Name">Name Property</seealso>
         /// <param name="value">New name.</param>
-        public virtual void SetName(string value)
+        public virtual void SetName (string value)
         {
             name = value;
         }
@@ -684,12 +705,17 @@ namespace AM.Reporting
         /// </remarks>
         /// <exception cref="ParentException" caption="">Parent object cannot contain this object.</exception>
         /// <param name="value">New parent.</param>
-        public virtual void SetParent(Base value)
+        public virtual void SetParent (Base value)
         {
             if (value != null)
-                if (!(value is IParent) || !(value as IParent).CanContain(this))
-                    throw new ParentException(value, this);
-            SetParentCore(value);
+            {
+                if (!(value is IParent parent1) || !parent1.CanContain (this))
+                {
+                    throw new ParentException (value, this);
+                }
+            }
+
+            SetParentCore (value);
         }
 
         /// <summary>
@@ -700,7 +726,7 @@ namespace AM.Reporting
         /// This method is for internal use only. You can use it if you are developing a new component for AM.Reporting.
         /// This method does not perform any checks, it just sets the new parent.
         /// </remarks>
-        public void SetParentCore(Base value)
+        public void SetParentCore (Base value)
         {
             parent = value;
         }
@@ -719,14 +745,17 @@ namespace AM.Reporting
         /// }
         /// </code>
         /// </example>
-        public virtual Base FindObject(string name)
+        public virtual Base FindObject (string name)
         {
-            ObjectCollection l = AllObjects;
+            var l = AllObjects;
             foreach (Base c in l)
             {
                 if (name == c.Name)
+                {
                     return c;
+                }
             }
+
             return null;
         }
 
@@ -748,19 +777,21 @@ namespace AM.Reporting
         /// </example>
         public void CreateUniqueName()
         {
-            Report report = Report;
+            var report = Report;
             if (report == null)
+            {
                 return;
+            }
 
             string s;
-            int i = 1;
+            var i = 1;
             do
             {
-                s = baseName + i.ToString();
+                s = BaseName + i.ToString();
                 i++;
-            }
-            while (report.FindObject(s) != null);
-            SetName(s);
+            } while (report.FindObject (s) != null);
+
+            SetName (s);
         }
 
         /// <summary>
@@ -771,7 +802,7 @@ namespace AM.Reporting
         /// </remarks>
         public virtual void Clear()
         {
-            ObjectCollection list = ChildObjects;
+            var list = ChildObjects;
             foreach (Base c in list)
             {
                 c.Clear();
@@ -810,28 +841,38 @@ namespace AM.Reporting
         ///   </list>
         /// </remarks>
         /// <param name="writer">Writer object.</param>
-        public virtual void Serialize(FRWriter writer)
+        public virtual void Serialize (FRWriter writer)
         {
-            Base c = writer.DiffObject as Base;
+            var c = writer.DiffObject as Base;
             if (writer.SerializeTo != SerializeTo.Preview)
             {
                 // in the preview mode we don't need to write ItemName and Name properties. Alias is wriiten instead.
-                writer.ItemName = isAncestor &&
-                  (writer.SerializeTo == SerializeTo.Report || writer.SerializeTo == SerializeTo.Undo) ?
-                  "inherited" : ClassName;
+                writer.ItemName = IsAncestor &&
+                                  (writer.SerializeTo == SerializeTo.Report || writer.SerializeTo == SerializeTo.Undo)
+                    ? "inherited"
+                    : ClassName;
                 if (Name != "")
-                    writer.WriteStr("Name", Name);
+                {
+                    writer.WriteStr ("Name", Name);
+                }
+
                 if (Restrictions != c.Restrictions)
-                    writer.WriteValue("Restrictions", Restrictions);
+                {
+                    writer.WriteValue ("Restrictions", Restrictions);
+                }
+
                 if ((writer.SerializeTo == SerializeTo.Report || writer.SerializeTo == SerializeTo.Undo) &&
-                  !IsAncestor && Parent != null && Parent.IsAncestor)
-                    writer.WriteInt("ZOrder", ZOrder);
+                    !IsAncestor && Parent != null && Parent.IsAncestor)
+                {
+                    writer.WriteInt ("ZOrder", ZOrder);
+                }
             }
+
             if (writer.SaveChildren)
             {
                 foreach (Base child in ChildObjects)
                 {
-                    writer.Write(child);
+                    writer.Write (child);
                 }
             }
         }
@@ -864,12 +905,12 @@ namespace AM.Reporting
         ///   </list>
         /// </remarks>
         /// <param name="reader">Reader object.</param>
-        public virtual void Deserialize(FRReader reader)
+        public virtual void Deserialize (FRReader reader)
         {
-            reader.ReadProperties(this);
+            reader.ReadProperties (this);
             while (reader.NextItem())
             {
-                DeserializeSubItems(reader);
+                DeserializeSubItems (reader);
             }
         }
 
@@ -881,20 +922,20 @@ namespace AM.Reporting
         /// an object to the xml and then deserializes it.
         /// </remarks>
         /// <param name="source">Source to assign from.</param>
-        public void BaseAssign(Base source)
+        public void BaseAssign (Base source)
         {
-            bool saveAncestor = source.IsAncestor;
-            source.SetAncestor(false);
+            var saveAncestor = source.IsAncestor;
+            source.SetAncestor (false);
 
             try
             {
-                using (XmlItem xml = new XmlItem())
-                using (FRWriter writer = new FRWriter(xml))
-                using (FRReader reader = new FRReader(Report, xml))
+                using (var xml = new XmlItem())
+                using (var writer = new FRWriter (xml))
+                using (var reader = new FRReader (Report, xml))
                 {
                     writer.SaveChildren = false;
-                    writer.Write(source, this);
-                    reader.Read(this);
+                    writer.Write (source, this);
+                    reader.Read (this);
                 }
 
                 Alias = source.Alias;
@@ -902,7 +943,7 @@ namespace AM.Reporting
             }
             finally
             {
-                source.SetAncestor(saveAncestor);
+                source.SetAncestor (saveAncestor);
             }
         }
 
@@ -926,7 +967,7 @@ namespace AM.Reporting
         /// </code></example>
         /// <seealso cref="AssignAll(Base)">AssignAll Method</seealso>
         /// <param name="source">Source object to copy the contents from.</param>
-        public virtual void Assign(Base source)
+        public virtual void Assign (Base source)
         {
             Restrictions = source.Restrictions;
             Alias = source.Alias;
@@ -948,24 +989,26 @@ namespace AM.Reporting
         /// </code></example>
         /// <seealso cref="Assign"/>
         /// <param name="source">Source object to copy the state from.</param>
-        public void AssignAll(Base source)
+        public void AssignAll (Base source)
         {
-            AssignAll(source, false);
+            AssignAll (source, false);
         }
 
-        internal void AssignAll(Base source, bool assignName)
+        internal void AssignAll (Base source, bool assignName)
         {
             Clear();
-            Assign(source);
+            Assign (source);
             if (assignName)
-                SetName(source.Name);
+            {
+                SetName (source.Name);
+            }
 
             foreach (Base child in source.ChildObjects)
             {
-                Base myChild = Activator.CreateInstance(child.GetType()) as Base;
-                myChild.SetReport(Report);
-                myChild.AssignAll(child, assignName);
-                myChild.SetReport(null);
+                var myChild = Activator.CreateInstance (child.GetType()) as Base;
+                myChild.SetReport (Report);
+                myChild.AssignAll (child, assignName);
+                myChild.SetReport (null);
                 myChild.Parent = this;
             }
         }
@@ -975,15 +1018,19 @@ namespace AM.Reporting
         /// </summary>
         /// <param name="obj">Parent object to check.</param>
         /// <returns>Returns <b>true</b> if the object has given parent in its parent hierarhy.</returns>
-        public bool HasParent(Base obj)
+        public bool HasParent (Base obj)
         {
-            Base parent = Parent;
+            var parent = Parent;
             while (parent != null)
             {
                 if (parent == obj)
+                {
                     return true;
+                }
+
                 parent = parent.Parent;
             }
+
             return false;
         }
 
@@ -992,7 +1039,7 @@ namespace AM.Reporting
         /// </summary>
         /// <param name="flag">Flag to check.</param>
         /// <returns><b>true</b> if <b>Flags</b> property contains specified flag.</returns>
-        public bool HasFlag(Flags flag)
+        public bool HasFlag (Flags flag)
         {
             return (Flags & flag) > 0;
         }
@@ -1003,7 +1050,7 @@ namespace AM.Reporting
         /// </summary>
         /// <param name="restriction">Restriction to check.</param>
         /// <returns><b>true</b> if <b>Restrictions</b> property contains specified restriction.</returns>
-        public bool HasRestriction(Restrictions restriction)
+        public bool HasRestriction (Restrictions restriction)
         {
             return (Restrictions & restriction) > 0;
         }
@@ -1026,13 +1073,18 @@ namespace AM.Reporting
         ///   InvokeEvent(BeforePrintEvent, e);
         /// }
         /// </code></example>
-        public void InvokeEvent(string name, object param)
+        public void InvokeEvent (string name, object param)
         {
-            if (String.IsNullOrEmpty(name))
+            if (string.IsNullOrEmpty (name))
+            {
                 return;
-            Report report = Report;
+            }
+
+            var report = Report;
             if (report != null)
-                report.InvokeMethod(name, new object[] { this, param });
+            {
+                report.InvokeMethod (name, new object[] { this, param });
+            }
         }
 
         /// <summary>
@@ -1109,7 +1161,7 @@ namespace AM.Reporting
         /// At the time of export it is called, only on objects inside the band,
         /// the child objects of converted object will be returned, and the child objects of old object will be ignored.
         /// </remarks>
-        public virtual bool IsHaveToConvert(object sender)
+        public virtual bool IsHaveToConvert (object sender)
         {
             return false;
         }
@@ -1135,32 +1187,37 @@ namespace AM.Reporting
         /// Gets the collection of all child objects, converts objects if necessary
         /// </summary>
         /// <param name="sender">the object or export, that call this convertation</param>
-        public ObjectCollection ForEachAllConvectedObjects(object sender)
+        public ObjectCollection ForEachAllConvectedObjects (object sender)
         {
-            ObjectCollection list = new ObjectCollection();
-            EnumAllConvectedObjects(sender, this, list, 0);
+            var list = new ObjectCollection();
+            EnumAllConvectedObjects (sender, this, list, 0);
             return list;
         }
 
-        private void EnumAllConvectedObjects(object sender, Base c, ObjectCollection list, int convertValue)
+        private void EnumAllConvectedObjects (object sender, Base c, ObjectCollection list, int convertValue)
         {
-
             if (c != this)
             {
-                if (c.IsHaveToConvert(sender))
+                if (c.IsHaveToConvert (sender))
                 {
                     if (convertValue < 10)
                     {
-                        foreach (Base b in c.GetConvertedObjects())
-                            EnumAllConvectedObjects(sender, b, list, convertValue + 1);
-                        return;
+                        foreach (var b in c.GetConvertedObjects())
+                        {
+                            EnumAllConvectedObjects (sender, b, list, convertValue + 1);
+                        }
 
+                        return;
                     }
                 }
-                list.Add(c);
+
+                list.Add (c);
             }
+
             foreach (Base obj in c.ChildObjects)
-                EnumAllConvectedObjects(sender, obj, list, convertValue);
+            {
+                EnumAllConvectedObjects (sender, obj, list, convertValue);
+            }
         }
 
         #endregion
@@ -1171,11 +1228,11 @@ namespace AM.Reporting
         public Base()
         {
             name = "";
-            alias = "";
-            baseName = ClassName;
-            restrictions = new Restrictions();
-            SetFlags(Flags.CanMove | Flags.CanResize | Flags.CanDelete | Flags.CanEdit | Flags.CanChangeOrder |
-             Flags.CanChangeParent | Flags.CanCopy | Flags.CanDraw | Flags.CanShowChildrenInReportTree, true);
+            Alias = "";
+            BaseName = ClassName;
+            Restrictions = new Restrictions();
+            SetFlags (Flags.CanMove | Flags.CanResize | Flags.CanDelete | Flags.CanEdit | Flags.CanChangeOrder |
+                      Flags.CanChangeParent | Flags.CanCopy | Flags.CanDraw | Flags.CanShowChildrenInReportTree, true);
         }
     }
 }

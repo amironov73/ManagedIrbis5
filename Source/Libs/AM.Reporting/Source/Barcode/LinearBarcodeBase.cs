@@ -55,59 +55,58 @@ namespace AM.Reporting.Barcode
     public class LinearBarcodeBase : BarcodeBase
     {
         #region Fields
+
         private float wideBarRatio;
         private float[] modules;
-        private bool calcCheckSum;
-        private bool trim;
         internal RectangleF drawArea;
         internal RectangleF barArea;
-        internal static Font FFont = new Font("Arial", 8);
-        internal static Font FSmallFont = new Font("Arial", 6);
+        internal static Font FFont = new Font ("Arial", 8);
+        internal static Font FSmallFont = new Font ("Arial", 6);
         internal bool textUp;
         internal float ratioMin;
         internal float ratioMax;
         internal float extra1;
         internal float extra2;
         internal string pattern;
+
         #endregion
 
         #region Properties
+
         /// <summary>
         /// Gets or sets a value that determines if the barcode object should calculate
         /// the check digit automatically.
         /// </summary>
-        [DefaultValue(true)]
-        public bool CalcCheckSum
-        {
-            get { return calcCheckSum; }
-            set { calcCheckSum = value; }
-        }
+        [DefaultValue (true)]
+        public bool CalcCheckSum { get; set; }
 
         /// <summary>
         /// Gets or sets a relative width of wide bars in the barcode.
         /// </summary>
-        [DefaultValue(2f)]
+        [DefaultValue (2f)]
         public float WideBarRatio
         {
-            get { return wideBarRatio; }
+            get => wideBarRatio;
             set
             {
                 wideBarRatio = value;
                 if (ratioMin != 0 && wideBarRatio < ratioMin)
+                {
                     wideBarRatio = ratioMin;
+                }
+
                 if (ratioMax != 0 && wideBarRatio > ratioMax)
+                {
                     wideBarRatio = ratioMax;
+                }
             }
         }
 
         /// <summary>
         /// Gets the value indicating that the barcode is numeric.
         /// </summary>
-        [Browsable(false)]
-        public virtual bool IsNumeric
-        {
-            get { return true; }
-        }
+        [Browsable (false)]
+        public virtual bool IsNumeric => true;
 
         /// <summary>
         /// Gets or sets a value indicating that leading/trailing whitespaces must be trimmed.
@@ -115,12 +114,8 @@ namespace AM.Reporting.Barcode
         /// <value>
         ///   <c>true</c> if trim; otherwise, <c>false</c>.
         /// </value>
-        [DefaultValue(true)]
-        public bool Trim
-        {
-            get { return trim; }
-            set { trim = value; }
-        }
+        [DefaultValue (true)]
+        public bool Trim { get; set; }
 
         private string Code
         {
@@ -128,23 +123,28 @@ namespace AM.Reporting.Barcode
             {
                 MakeModules();
                 pattern = GetPattern();
-                if(pattern == null)
+                if (pattern == null)
                 {
-                    MyRes res = new MyRes("Messages");
-                    throw new FormatException(res.Get("BarcodeManyError"));
+                    var res = new MyRes ("Messages");
+                    throw new FormatException (res.Get ("BarcodeManyError"));
                 }
+
                 return pattern;
             }
         }
+
         #endregion
 
         #region Private Methods
-        private void CheckText(string text)
+
+        private void CheckText (string text)
         {
-            foreach (char i in text)
+            foreach (var i in text)
             {
                 if (i < '0' || i > '9')
-                    throw new Exception(Res.Get("Messages,InvalidBarcode2"));
+                {
+                    throw new Exception (Res.Get ("Messages,InvalidBarcode2"));
+                }
             }
         }
 
@@ -156,19 +156,17 @@ namespace AM.Reporting.Barcode
             modules[3] = modules[1] * 2;
         }
 
-        internal virtual void DoLines(string data, IGraphics g, float zoom)
+        internal virtual void DoLines (string data, IGraphics g, float zoom)
         {
-            using (Pen pen = new Pen(Color))
+            using (var pen = new Pen (Color))
             {
                 float currentWidth = 0;
-                foreach (char c in data)
+                foreach (var c in data)
                 {
-                    float width;
-                    BarLineType lt;
-                    OneBarProps(c, out width, out lt);
+                    OneBarProps (c, out var width, out var lt);
 
                     float heightStart = 0;
-                    float heightEnd = barArea.Height;
+                    var heightEnd = barArea.Height;
 
                     if (lt == BarLineType.BlackHalf)
                     {
@@ -199,7 +197,7 @@ namespace AM.Reporting.Barcode
 
                     if (lt == BarLineType.BlackHalf)
                     {
-                        g.DrawLine(pen,
+                        g.DrawLine (pen,
                             currentWidth + width / 2,
                             barArea.Bottom * zoom,
                             currentWidth + width / 2,
@@ -207,7 +205,7 @@ namespace AM.Reporting.Barcode
                     }
                     else if (lt != BarLineType.White)
                     {
-                        g.DrawLine(pen,
+                        g.DrawLine (pen,
                             currentWidth + width / 2,
                             barArea.Top * zoom + heightStart,
                             currentWidth + width / 2,
@@ -219,27 +217,36 @@ namespace AM.Reporting.Barcode
             }
         }
 
-        public string CheckSumModulo10(string data)
+        public string CheckSumModulo10 (string data)
         {
-            int sum = 0;
-            int fak = data.Length;
+            var sum = 0;
+            var fak = data.Length;
 
-            for (int i = 0; i < data.Length; i++)
+            for (var i = 0; i < data.Length; i++)
             {
                 if ((fak % 2) == 0)
-                    sum += int.Parse(data[i].ToString());
+                {
+                    sum += int.Parse (data[i].ToString());
+                }
                 else
-                    sum += int.Parse(data[i].ToString()) * 3;
+                {
+                    sum += int.Parse (data[i].ToString()) * 3;
+                }
+
                 fak--;
             }
 
             if ((sum % 10) == 0)
+            {
                 return data + "0";
+            }
             else
+            {
                 return data + (10 - (sum % 10)).ToString();
+            }
         }
 
-        private void OneBarProps(char code, out float width, out BarLineType lt)
+        private void OneBarProps (char code, out float width, out BarLineType lt)
         {
             switch (code)
             {
@@ -313,52 +320,59 @@ namespace AM.Reporting.Barcode
                 default:
                     // something went wrong  :-(
                     // mistyped pattern table
-                    throw new Exception("Incorrect barcode pattern code: " + code);
+                    throw new Exception ("Incorrect barcode pattern code: " + code);
             }
         }
+
         #endregion
 
         #region Protected Methods
-        internal int CharToInt(char c)
+
+        internal int CharToInt (char c)
         {
-            return int.Parse(Convert.ToString(c));
+            return int.Parse (Convert.ToString (c));
         }
 
-        internal string SetLen(int len)
+        internal string SetLen (int len)
         {
-            string result = "";
+            var result = "";
 
-            for (int i = 0; i < len - text.Length; i++)
+            for (var i = 0; i < len - text.Length; i++)
             {
                 result = "0" + result;
             }
 
             result += text;
-            return result.Substring(0, len);
+            return result.Substring (0, len);
         }
 
-        internal string DoCheckSumming(string data)
+        internal string DoCheckSumming (string data)
         {
-            return CheckSumModulo10(data);
+            return CheckSumModulo10 (data);
         }
 
-        internal string DoCheckSumming(string data, int len)
+        internal string DoCheckSumming (string data, int len)
         {
             if (CalcCheckSum)
-                return DoCheckSumming(SetLen(len - 1));
-            return SetLen(len);
+            {
+                return DoCheckSumming (SetLen (len - 1));
+            }
+
+            return SetLen (len);
         }
 
-        internal string DoConvert(string s)
+        internal string DoConvert (string s)
         {
-            StringBuilder builder = new StringBuilder(s);
+            var builder = new StringBuilder (s);
 
-            for (int i = 0; i < s.Length; i++)
+            for (var i = 0; i < s.Length; i++)
             {
-                int v = s[i] - 1;
+                var v = s[i] - 1;
 
                 if ((i % 2) == 0)
+                {
                     v += 5;
+                }
 
                 builder[i] = (char)v;
             }
@@ -366,32 +380,34 @@ namespace AM.Reporting.Barcode
             return builder.ToString();
         }
 
-        internal string MakeLong(string data)
+        internal string MakeLong (string data)
         {
-            StringBuilder builder = new StringBuilder(data);
+            var builder = new StringBuilder (data);
 
-            for (int i = 0; i < data.Length; i++)
+            for (var i = 0; i < data.Length; i++)
             {
-                char c = builder[i];
+                var c = builder[i];
                 if (c >= '5' && c <= '8')
+                {
                     c = (char)((int)c - (int)'5' + (int)'A');
+                }
+
                 builder[i] = c;
             }
 
             return builder.ToString();
         }
 
-        internal virtual float GetWidth(string code)
+        internal virtual float GetWidth (string code)
         {
             float result = 0;
-            float w;
-            BarLineType lt;
 
-            foreach (char c in code)
+            foreach (var c in code)
             {
-                OneBarProps(c, out w, out lt);
+                OneBarProps (c, out var w, out var lt);
                 result += w;
             }
+
             return result;
         }
 
@@ -399,55 +415,68 @@ namespace AM.Reporting.Barcode
         {
             return "";
         }
+
         #endregion
 
         #region Public Methods
-        /// <inheritdoc/>
-        public override void Assign(BarcodeBase source)
-        {
-            base.Assign(source);
 
-            LinearBarcodeBase src = source as LinearBarcodeBase;
+        /// <inheritdoc/>
+        public override void Assign (BarcodeBase source)
+        {
+            base.Assign (source);
+
+            var src = source as LinearBarcodeBase;
             WideBarRatio = src.WideBarRatio;
             CalcCheckSum = src.CalcCheckSum;
             Trim = src.Trim;
         }
 
-        internal override void Serialize(FRWriter writer, string prefix, BarcodeBase diff)
+        internal override void Serialize (FRWriter writer, string prefix, BarcodeBase diff)
         {
-            base.Serialize(writer, prefix, diff);
-            LinearBarcodeBase c = diff as LinearBarcodeBase;
+            base.Serialize (writer, prefix, diff);
+            var c = diff as LinearBarcodeBase;
 
             if (c == null || WideBarRatio != c.WideBarRatio)
-                writer.WriteValue(prefix + "WideBarRatio", WideBarRatio);
+            {
+                writer.WriteValue (prefix + "WideBarRatio", WideBarRatio);
+            }
+
             if (c == null || CalcCheckSum != c.CalcCheckSum)
-                writer.WriteBool(prefix + "CalcCheckSum", CalcCheckSum);
+            {
+                writer.WriteBool (prefix + "CalcCheckSum", CalcCheckSum);
+            }
+
             if (c == null || Trim != c.Trim)
-                writer.WriteBool(prefix + "Trim", Trim);
+            {
+                writer.WriteBool (prefix + "Trim", Trim);
+            }
         }
 
-        internal override void Initialize(string text, bool showText, int angle, float zoom)
+        internal override void Initialize (string text, bool showText, int angle, float zoom)
         {
-            if(trim)
+            if (Trim)
+            {
                 text = text.Trim();
-            base.Initialize(text, showText, angle, zoom);
+            }
+
+            base.Initialize (text, showText, angle, zoom);
         }
 
         internal override SizeF CalcBounds()
         {
-            float barWidth = GetWidth(Code);
+            var barWidth = GetWidth (Code);
             float extra1 = 0;
             float extra2 = 0;
 
             if (showText)
             {
                 float txtWidth = 0;
-                using (Bitmap bmp = new Bitmap(1, 1))
+                using (var bmp = new Bitmap (1, 1))
                 {
-                    bmp.SetResolution(96, 96);
-                    using (Graphics g = Graphics.FromImage(bmp))
+                    bmp.SetResolution (96, 96);
+                    using (var g = Graphics.FromImage (bmp))
                     {
-                        txtWidth = g.MeasureString(text, FFont, 100000).Width;
+                        txtWidth = g.MeasureString (text, FFont, 100000).Width;
                     }
                 }
 
@@ -459,92 +488,105 @@ namespace AM.Reporting.Barcode
             }
 
             if (this.extra1 != 0)
+            {
                 extra1 = this.extra1;
+            }
+
             if (this.extra2 != 0)
+            {
                 extra2 = this.extra2;
+            }
 
-            drawArea = new RectangleF(0, 0, barWidth + extra1 + extra2, 0);
-            barArea = new RectangleF(extra1, 0, barWidth, 0);
+            drawArea = new RectangleF (0, 0, barWidth + extra1 + extra2, 0);
+            barArea = new RectangleF (extra1, 0, barWidth, 0);
 
-            return new SizeF(drawArea.Width * 1.25f, 0);
+            return new SizeF (drawArea.Width * 1.25f, 0);
         }
 
-        public override void DrawBarcode(IGraphics g, RectangleF displayRect)
+        public override void DrawBarcode (IGraphics g, RectangleF displayRect)
         {
-            float originalWidth = CalcBounds().Width / 1.25f;
-            float width = angle == 90 || angle == 270 ? displayRect.Height : displayRect.Width;
-            float height = angle == 90 || angle == 270 ? displayRect.Width : displayRect.Height;
+            var originalWidth = CalcBounds().Width / 1.25f;
+            var width = angle == 90 || angle == 270 ? displayRect.Height : displayRect.Width;
+            var height = angle == 90 || angle == 270 ? displayRect.Width : displayRect.Height;
             zoom = width / originalWidth;
             barArea.Height = height / zoom;
             if (showText)
             {
                 barArea.Height -= 14;
                 if (textUp)
+                {
                     barArea.Y = 14;
+                }
             }
+
             drawArea.Height = height / zoom;
 
-            IGraphicsState state = g.Save();
+            var state = g.Save();
             try
             {
                 // rotate
-                g.TranslateTransform(displayRect.Left, displayRect.Top);
-                g.RotateTransform(angle);
+                g.TranslateTransform (displayRect.Left, displayRect.Top);
+                g.RotateTransform (angle);
                 switch (angle)
                 {
                     case 90:
-                        g.TranslateTransform(0, -displayRect.Width);
+                        g.TranslateTransform (0, -displayRect.Width);
                         break;
                     case 180:
-                        g.TranslateTransform(-displayRect.Width, -displayRect.Height);
+                        g.TranslateTransform (-displayRect.Width, -displayRect.Height);
                         break;
                     case 270:
-                        g.TranslateTransform(-displayRect.Height, 0);
+                        g.TranslateTransform (-displayRect.Height, 0);
                         break;
                 }
 
-                g.TranslateTransform(barArea.Left * zoom, 0);
-                DoLines(pattern, g, zoom);
+                g.TranslateTransform (barArea.Left * zoom, 0);
+                DoLines (pattern, g, zoom);
                 if (showText)
-                    DrawText(g, text);
+                {
+                    DrawText (g, text);
+                }
             }
             finally
             {
-                g.Restore(state);
+                g.Restore (state);
             }
         }
 
-        internal void DrawString(IGraphics g, float x1, float x2, string s)
+        internal void DrawString (IGraphics g, float x1, float x2, string s)
         {
-            DrawString(g, x1, x2, s, false);
+            DrawString (g, x1, x2, s, false);
         }
 
-        internal void DrawString(IGraphics g, float x1, float x2, string s, bool small)
+        internal void DrawString (IGraphics g, float x1, float x2, string s, bool small)
         {
-            if (String.IsNullOrEmpty(s))
+            if (string.IsNullOrEmpty (s))
+            {
                 return;
+            }
 
             // when we print, .Net automatically scales the font. However, we need to handle this process.
             // Downscale the font to the screen resolution, then scale by required value (Zoom).
-            float fontZoom = 14f / (int)g.MeasureString(s, FFont).Height * zoom;
-            Font font = small ? FSmallFont : FFont;
-            using (Font drawFont = new Font(font.FontFamily, font.Size * fontZoom, font.Style))
+            var fontZoom = 14f / (int)g.MeasureString (s, FFont).Height * zoom;
+            var font = small ? FSmallFont : FFont;
+            using (var drawFont = new Font (font.FontFamily, font.Size * fontZoom, font.Style))
             {
-                SizeF size = g.MeasureString(s, drawFont);
+                var size = g.MeasureString (s, drawFont);
                 size.Width /= zoom;
                 size.Height /= zoom;
 
-                g.DrawString(s, drawFont, new SolidBrush(Color),
-                  (x1 + (x2 - x1 - size.Width) / 2) * zoom,
-                  (textUp ? 0 : drawArea.Height - size.Height) * zoom);
+                g.DrawString (s, drawFont, new SolidBrush (Color),
+                    (x1 + (x2 - x1 - size.Width) / 2) * zoom,
+                    (textUp ? 0 : drawArea.Height - size.Height) * zoom);
             }
         }
 
-        internal virtual void DrawText(IGraphics g, string data)
+        internal virtual void DrawText (IGraphics g, string data)
         {
-            data = StripControlCodes(data);
-            DrawString(g, 0, drawArea.Width, data);
+            data = StripControlCodes (data);
+            DrawString (g, 0, drawArea.Width, data);
         }
+
         #endregion
 
         /// <summary>
@@ -554,8 +596,8 @@ namespace AM.Reporting.Barcode
         {
             modules = new float[4];
             WideBarRatio = 2;
-            calcCheckSum = true;
-            trim = true;
+            CalcCheckSum = true;
+            Trim = true;
         }
     }
 }

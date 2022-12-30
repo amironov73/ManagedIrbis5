@@ -1,9 +1,32 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.ComponentModel;
 using System.IO;
+
 using AM.Reporting.Utils;
 using AM.Reporting.Data;
+
 using System.Drawing.Design;
+
+#endregion
+
+#nullable enable
 
 namespace AM.Reporting
 {
@@ -48,23 +71,17 @@ namespace AM.Reporting
     /// <summary>
     /// This class contains a hyperlink settings.
     /// </summary>
-    [TypeConverter(typeof(AM.Reporting.TypeConverters.FRExpandableObjectConverter))]
+    [TypeConverter (typeof (TypeConverters.FRExpandableObjectConverter))]
     public class Hyperlink
     {
         #region Fields
-        private ReportComponentBase parent;
-        private HyperlinkKind kind;
-        private string expression;
-        private string value;
-        private string detailReportName;
-        private string detailPageName;
-        private string reportParameter;
-        private string valuesSeparator;
+
         private string saveValue;
-        private bool openLinkInNewTab;
+
         #endregion
 
         #region Properties
+
         /// <summary>
         /// Gets or sets the kind of hyperlink.
         /// </summary>
@@ -74,12 +91,8 @@ namespace AM.Reporting
         /// the bookmark defined by other report object, the external report, the other page of this report,
         /// and custom hyperlink.</para>
         /// </remarks>
-        [DefaultValue(HyperlinkKind.URL)]
-        public HyperlinkKind Kind
-        {
-            get { return kind; }
-            set { kind = value; }
-        }
+        [DefaultValue (HyperlinkKind.URL)]
+        public HyperlinkKind Kind { get; set; }
 
         /// <summary>
         /// Gets or sets the expression which value will be used for navigation.
@@ -91,12 +104,8 @@ namespace AM.Reporting
         /// <para>If you want to navigate to some fixed data (URL or page number, for example),
         /// use the <see cref="Value"/> property instead.</para>
         /// </remarks>
-        [Editor("AM.Reporting.TypeEditors.HyperlinkExpressionEditor, AM.Reporting", typeof(UITypeEditor))]
-        public string Expression
-        {
-            get { return expression; }
-            set { expression = value; }
-        }
+        [Editor ("AM.Reporting.TypeEditors.HyperlinkExpressionEditor, AM.Reporting", typeof (UITypeEditor))]
+        public string Expression { get; set; }
 
         /// <summary>
         /// Gets or sets a value that will be used for navigation.
@@ -105,11 +114,7 @@ namespace AM.Reporting
         /// Use this property to specify the fixed data (such as URL, page number etc). If you want to
         /// navigate to some dynamically calculated value, use the <see cref="Expression"/> property instead.
         /// </remarks>
-        public string Value
-        {
-            get { return value; }
-            set { this.value = value; }
-        }
+        public string Value { get; set; }
 
         /// <summary>
         /// Gets or sets a value that indicate should be links open in new tab or not.
@@ -117,11 +122,7 @@ namespace AM.Reporting
         /// <remarks>
         /// It works for HTML-export only!
         /// </remarks>
-        public bool OpenLinkInNewTab
-        {
-            get { return openLinkInNewTab; }
-            set { openLinkInNewTab = value; }
-        }
+        public bool OpenLinkInNewTab { get; set; }
 
         /// <summary>
         /// Gets or sets an external report file name.
@@ -131,12 +132,8 @@ namespace AM.Reporting
         /// <para>When you follow the hyperlink, this report will be loaded and run.
         /// You also may specify the report's parameter in the <see cref="ReportParameter"/> property.</para>
         /// </remarks>
-        [Editor("AM.Reporting.TypeEditors.HyperlinkReportFileEditor, AM.Reporting", typeof(UITypeEditor))]
-        public string DetailReportName
-        {
-            get { return detailReportName; }
-            set { detailReportName = value; }
-        }
+        [Editor ("AM.Reporting.TypeEditors.HyperlinkReportFileEditor, AM.Reporting", typeof (UITypeEditor))]
+        public string DetailReportName { get; set; }
 
         /// <summary>
         /// Gets or sets the name of this report's page.
@@ -147,12 +144,8 @@ namespace AM.Reporting
         /// detailed report. You also may specify the report's parameter in the
         /// <see cref="ReportParameter"/> property.</para>
         /// </remarks>
-        [Editor("AM.Reporting.TypeEditors.HyperlinkReportPageEditor, AM.Reporting", typeof(UITypeEditor))]
-        public string DetailPageName
-        {
-            get { return detailPageName; }
-            set { detailPageName = value; }
-        }
+        [Editor ("AM.Reporting.TypeEditors.HyperlinkReportPageEditor, AM.Reporting", typeof (UITypeEditor))]
+        public string DetailPageName { get; set; }
 
         /// <summary>
         /// Gets or sets a parameter's name that will be set to hyperlink's value.
@@ -175,47 +168,37 @@ namespace AM.Reporting
         /// its <b>DataType</b> property. It is used to convert string values to actual data type.
         /// </para>
         /// </remarks>
-        [Editor("AM.Reporting.TypeEditors.HyperlinkReportParameterEditor, AM.Reporting", typeof(UITypeEditor))]
-        public string ReportParameter
-        {
-            get { return reportParameter; }
-            set { reportParameter = value; }
-        }
+        [Editor ("AM.Reporting.TypeEditors.HyperlinkReportParameterEditor, AM.Reporting", typeof (UITypeEditor))]
+        public string ReportParameter { get; set; }
 
         /// <summary>
         /// Gets or sets a string that will be used as a separator to pass several values
         /// to the external report parameters.
         /// </summary>
-        public string ValuesSeparator
-        {
-            get { return valuesSeparator; }
-            set { valuesSeparator = value; }
-        }
+        public string ValuesSeparator { get; set; }
 
-        internal ReportComponentBase Parent
-        {
-            get { return parent; }
-        }
+        internal ReportComponentBase Parent { get; private set; }
 
-        internal Report Report
-        {
-            get { return parent.Report; }
-        }
+        internal Report Report => Parent.Report;
+
         #endregion
 
         #region Private Methods
+
         private bool ShouldSerializeValuesSeparator()
         {
             return ValuesSeparator != ";";
         }
+
         #endregion
 
         #region Public Methods
+
         /// <summary>
         /// Assigns values from another source.
         /// </summary>
         /// <param name="source">Source to assign from.</param>
-        public void Assign(Hyperlink source)
+        public void Assign (Hyperlink source)
         {
             Kind = source.Kind;
             Expression = source.Expression;
@@ -223,54 +206,60 @@ namespace AM.Reporting
             DetailReportName = source.DetailReportName;
             ReportParameter = source.ReportParameter;
             DetailPageName = source.DetailPageName;
-            OpenLinkInNewTab = source.openLinkInNewTab;
+            OpenLinkInNewTab = source.OpenLinkInNewTab;
         }
 
-        internal bool Equals(Hyperlink h)
+        internal bool Equals (Hyperlink h)
         {
             return h != null && Kind == h.Kind && Expression == h.Expression &&
-              DetailReportName == h.DetailReportName && ReportParameter == h.ReportParameter &&
-              DetailPageName == h.DetailPageName;
+                   DetailReportName == h.DetailReportName && ReportParameter == h.ReportParameter &&
+                   DetailPageName == h.DetailPageName;
         }
 
-        internal void SetParent(ReportComponentBase parent)
+        internal void SetParent (ReportComponentBase parent)
         {
-            this.parent = parent;
+            this.Parent = parent;
         }
 
         internal void Calculate()
         {
-            if (!String.IsNullOrEmpty(Expression))
+            if (!string.IsNullOrEmpty (Expression))
             {
-                object value = Report.Calc(Expression);
+                var value = Report.Calc (Expression);
                 Value = value == null ? "" : value.ToString();
             }
         }
 
-        internal Report GetReport(bool updateParameter)
+        internal Report GetReport (bool updateParameter)
         {
-            Report report = Report.FromFile(DetailReportName);
-            Report.Dictionary.ReRegisterData(report.Dictionary);
+            var report = Report.FromFile (DetailReportName);
+            Report.Dictionary.ReRegisterData (report.Dictionary);
 
             if (updateParameter)
-                SetParameters(report);
+            {
+                SetParameters (report);
+            }
+
             return report;
         }
 
-        internal void SetParameters(Report report)
+        internal void SetParameters (Report report)
         {
-            if (!String.IsNullOrEmpty(ReportParameter))
+            if (!string.IsNullOrEmpty (ReportParameter))
             {
-                Parameter param = report.GetParameter(ReportParameter);
+                var param = report.GetParameter (ReportParameter);
                 if (param != null)
                 {
-                    if (Value.IndexOf(ValuesSeparator) != -1)
+                    if (Value.IndexOf (ValuesSeparator) != -1)
                     {
-                        string[] values = Value.Split(new string[] { ValuesSeparator }, StringSplitOptions.RemoveEmptyEntries);
-                        for (int i = 0; i < values.Length; i++)
+                        string[] values = Value.Split (new string[] { ValuesSeparator },
+                            StringSplitOptions.RemoveEmptyEntries);
+                        for (var i = 0; i < values.Length; i++)
                         {
                             if (i < param.Parameters.Count)
+                            {
                                 param.Parameters[i].AsString = values[i];
+                            }
                         }
                     }
                     else
@@ -281,41 +270,71 @@ namespace AM.Reporting
             }
         }
 
-        internal void Serialize(FRWriter writer, Hyperlink hyperlink)
+        internal void Serialize (FRWriter writer, Hyperlink hyperlink)
         {
             if (Kind != hyperlink.Kind)
-                writer.WriteValue("Hyperlink.Kind", Kind);
+            {
+                writer.WriteValue ("Hyperlink.Kind", Kind);
+            }
+
             if (Expression != hyperlink.Expression)
-                writer.WriteStr("Hyperlink.Expression", Expression);
+            {
+                writer.WriteStr ("Hyperlink.Expression", Expression);
+            }
+
             if (Value != hyperlink.Value)
-                writer.WriteStr("Hyperlink.Value", Value);
+            {
+                writer.WriteStr ("Hyperlink.Value", Value);
+            }
+
             if (DetailReportName != hyperlink.DetailReportName)
             {
                 // when saving to the report file, convert absolute path to the external report to relative path
                 // (based on the main report path).
-                string value = DetailReportName;
-                if (writer.SerializeTo == SerializeTo.Report && Report != null && !String.IsNullOrEmpty(Report.FileName))
-                    value = FileUtils.GetRelativePath(DetailReportName, Path.GetDirectoryName(Report.FileName));
-                writer.WriteStr("Hyperlink.DetailReportName", value);
+                var value = DetailReportName;
+                if (writer.SerializeTo == SerializeTo.Report && Report != null &&
+                    !string.IsNullOrEmpty (Report.FileName))
+                {
+                    value = FileUtils.GetRelativePath (DetailReportName, Path.GetDirectoryName (Report.FileName));
+                }
+
+                writer.WriteStr ("Hyperlink.DetailReportName", value);
             }
+
             if (DetailPageName != hyperlink.DetailPageName)
-                writer.WriteStr("Hyperlink.DetailPageName", DetailPageName);
+            {
+                writer.WriteStr ("Hyperlink.DetailPageName", DetailPageName);
+            }
+
             if (ReportParameter != hyperlink.ReportParameter)
-                writer.WriteStr("Hyperlink.ReportParameter", ReportParameter);
+            {
+                writer.WriteStr ("Hyperlink.ReportParameter", ReportParameter);
+            }
+
             if (ValuesSeparator != hyperlink.ValuesSeparator)
-                writer.WriteStr("Hyperlink.ValuesSeparator", ValuesSeparator);
+            {
+                writer.WriteStr ("Hyperlink.ValuesSeparator", ValuesSeparator);
+            }
+
             if (OpenLinkInNewTab != hyperlink.OpenLinkInNewTab)
-                writer.WriteBool("Hyperlink.OpenLinkInNewTab", OpenLinkInNewTab);
+            {
+                writer.WriteBool ("Hyperlink.OpenLinkInNewTab", OpenLinkInNewTab);
+            }
         }
 
         internal void OnAfterLoad()
         {
             // convert relative path to the external report to absolute path (based on the main report path).
-            if (String.IsNullOrEmpty(DetailReportName) || String.IsNullOrEmpty(Report.FileName))
+            if (string.IsNullOrEmpty (DetailReportName) || string.IsNullOrEmpty (Report.FileName))
+            {
                 return;
+            }
 
-            if (!Path.IsPathRooted(DetailReportName))
-                DetailReportName = Path.GetDirectoryName(Report.FileName) + Path.DirectorySeparatorChar + DetailReportName;
+            if (!Path.IsPathRooted (DetailReportName))
+            {
+                DetailReportName = Path.GetDirectoryName (Report.FileName) + Path.DirectorySeparatorChar +
+                                   DetailReportName;
+            }
         }
 
         internal void SaveState()
@@ -327,17 +346,18 @@ namespace AM.Reporting
         {
             Value = saveValue;
         }
+
         #endregion
 
-        internal Hyperlink(ReportComponentBase parent)
+        internal Hyperlink (ReportComponentBase parent)
         {
-            SetParent(parent);
-            expression = "";
-            value = "";
-            detailReportName = "";
-            detailPageName = "";
-            reportParameter = "";
-            valuesSeparator = ";";
+            SetParent (parent);
+            Expression = "";
+            Value = "";
+            DetailReportName = "";
+            DetailPageName = "";
+            ReportParameter = "";
+            ValuesSeparator = ";";
         }
     }
 }

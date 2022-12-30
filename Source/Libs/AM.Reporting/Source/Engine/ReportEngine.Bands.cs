@@ -34,7 +34,7 @@ namespace AM.Reporting.Engine
 
         #region Private Methods
 
-        private void PrepareBand(BandBase band, bool getData)
+        private void PrepareBand (BandBase band, bool getData)
         {
             if (band.Visible)
             {
@@ -42,22 +42,25 @@ namespace AM.Reporting.Engine
                 {
                     band.GetData();
                 }
-                TranslateObjects(band);
-                RenderInnerSubreports(band);
+
+                TranslateObjects (band);
+                RenderInnerSubreports (band);
                 band.CalcHeight();
             }
         }
 
-        private float CalcHeight(BandBase band)
+        private float CalcHeight (BandBase band)
         {
             // band is already prepared, its Height is ready to use
             if (band.IsRunning)
+            {
                 return band.Height;
+            }
 
             band.SaveState();
             try
             {
-                PrepareBand(band, true);
+                PrepareBand (band, true);
                 return band.Height;
             }
             finally
@@ -66,37 +69,37 @@ namespace AM.Reporting.Engine
             }
         }
 
-        private BandBase CloneBand(BandBase band)
+        private BandBase CloneBand (BandBase band)
         {
             // clone a band and all its objects
-            BandBase cloneBand = Activator.CreateInstance(band.GetType()) as BandBase;
-            cloneBand.Assign(band);
-            cloneBand.SetReport(Report);
-            cloneBand.SetRunning(true);
+            var cloneBand = Activator.CreateInstance (band.GetType()) as BandBase;
+            cloneBand.Assign (band);
+            cloneBand.SetReport (Report);
+            cloneBand.SetRunning (true);
 
             foreach (ReportComponentBase obj in band.Objects)
             {
-                ReportComponentBase cloneObj = Activator.CreateInstance(obj.GetType()) as ReportComponentBase;
-                cloneObj.AssignAll(obj);
-                cloneBand.Objects.Add(cloneObj);
+                var cloneObj = Activator.CreateInstance (obj.GetType()) as ReportComponentBase;
+                cloneObj.AssignAll (obj);
+                cloneBand.Objects.Add (cloneObj);
             }
 
             return cloneBand;
         }
 
-        private void AddToOutputBand(BandBase band, bool getData)
+        private void AddToOutputBand (BandBase band, bool getData)
         {
             band.SaveState();
 
             try
             {
-                PrepareBand(band, getData);
+                PrepareBand (band, getData);
 
                 if (band.Visible)
                 {
-                    outputBand.SetRunning(true);
+                    outputBand.SetRunning (true);
 
-                    BandBase cloneBand = CloneBand(band);
+                    var cloneBand = CloneBand (band);
                     cloneBand.Left = CurX;
                     cloneBand.Top = CurY;
                     cloneBand.Parent = outputBand;
@@ -110,10 +113,11 @@ namespace AM.Reporting.Engine
             }
         }
 
-        private void ShowBandToPreparedPages(BandBase band, bool getData)
+        private void ShowBandToPreparedPages (BandBase band, bool getData)
         {
             // handle "StartNewPage". Skip if it's the first row, avoid empty first page.
-            if ((band.StartNewPage && !(band.Parent is PageHeaderBand || band.Parent is PageFooterBand)) && band.FlagUseStartNewPage && (band.RowNo != 1 || band.FirstRowStartsNewPage) &&
+            if ((band.StartNewPage && !(band.Parent is PageHeaderBand || band.Parent is PageFooterBand)) &&
+                band.FlagUseStartNewPage && (band.RowNo != 1 || band.FirstRowStartsNewPage) &&
                 !band.Repeated)
             {
                 EndColumn();
@@ -122,22 +126,25 @@ namespace AM.Reporting.Engine
             band.SaveState();
             try
             {
-                PrepareBand(band, getData);
+                PrepareBand (band, getData);
 
                 if (band.Visible)
                 {
-                    if (BandHasHardPageBreaks(band))
+                    if (BandHasHardPageBreaks (band))
                     {
-                        foreach (var b in SplitHardPageBreaks(band))
+                        foreach (var b in SplitHardPageBreaks (band))
                         {
                             if (b.StartNewPage)
+                            {
                                 EndColumn();
-                            AddToPreparedPages(b);
+                            }
+
+                            AddToPreparedPages (b);
                         }
                     }
                     else
                     {
-                        AddToPreparedPages(band);
+                        AddToPreparedPages (band);
                     }
                 }
             }
@@ -147,18 +154,18 @@ namespace AM.Reporting.Engine
             }
         }
 
-        private void ShowBand(BandBase band, BandBase outputBand, float offsetX, float offsetY)
+        private void ShowBand (BandBase band, BandBase outputBand, float offsetX, float offsetY)
         {
-            float saveCurX = CurX;
-            float saveCurY = CurY;
-            BandBase saveOutputBand = this.outputBand;
+            var saveCurX = CurX;
+            var saveCurY = CurY;
+            var saveOutputBand = this.outputBand;
             CurX = offsetX;
             CurY = offsetY;
 
             try
             {
                 this.outputBand = outputBand;
-                ShowBand(band);
+                ShowBand (band);
             }
             finally
             {
@@ -175,51 +182,56 @@ namespace AM.Reporting.Engine
         /// <remarks>
         /// After the band is shown, the current position is advanced by the band's height.
         /// </remarks>
-        public void ShowBand(BandBase band)
+        public void ShowBand (BandBase band)
         {
             if (band != null)
-                for (int i = 0; i < band.RepeatBandNTimes; i++)
-                    ShowBand(band, true);
+            {
+                for (var i = 0; i < band.RepeatBandNTimes; i++)
+                    ShowBand (band, true);
+            }
         }
 
-        private void ShowBand(BandBase band, bool getData)
+        private void ShowBand (BandBase band, bool getData)
         {
             if (band == null)
+            {
                 return;
+            }
 
-            BandBase saveCurBand = curBand;
+            var saveCurBand = curBand;
             curBand = band;
 
             try
             {
                 // do we need to keep child?
-                ChildBand child = band.Child;
-                bool showChild = child != null && !(band is DataBand && child.CompleteToNRows > 0) && !child.FillUnusedSpace &&
-                    !(band is DataBand && child.PrintIfDatabandEmpty);
+                var child = band.Child;
+                var showChild = child != null && !(band is DataBand && child.CompleteToNRows > 0) &&
+                                !child.FillUnusedSpace &&
+                                !(band is DataBand && child.PrintIfDatabandEmpty);
                 if (showChild && band.KeepChild)
                 {
-                    StartKeep(band);
+                    StartKeep (band);
                 }
 
                 if (outputBand != null)
                 {
-                    AddToOutputBand(band, getData);
+                    AddToOutputBand (band, getData);
                 }
                 else
                 {
-                    ShowBandToPreparedPages(band, getData);
+                    ShowBandToPreparedPages (band, getData);
                 }
 
-                ProcessTotals(band);
+                ProcessTotals (band);
                 if (band.Visible)
                 {
-                    RenderOuterSubreports(band);
+                    RenderOuterSubreports (band);
                 }
 
                 // show child band. Skip if child is used to fill empty space: it was processed already
                 if (showChild)
                 {
-                    ShowBand(child);
+                    ShowBand (child);
                     if (band.KeepChild)
                     {
                         EndKeep();
@@ -232,31 +244,33 @@ namespace AM.Reporting.Engine
             }
         }
 
-        private void ProcessTotals(BandBase band)
+        private void ProcessTotals (BandBase band)
         {
-            Report.Dictionary.Totals.ProcessBand(band);
+            Report.Dictionary.Totals.ProcessBand (band);
         }
 
         #endregion Private Methods
 
         #region Internal Methods
 
-        internal bool CanPrint(ReportComponentBase obj)
+        internal bool CanPrint (ReportComponentBase obj)
         {
             // Apply visible expression if needed.
-            if (!String.IsNullOrEmpty(obj.VisibleExpression))
+            if (!string.IsNullOrEmpty (obj.VisibleExpression))
             {
                 object expression = null;
+
                 // Calculate expressions with TotalPages only on FinalPass.
-                if (!obj.VisibleExpression.Contains("TotalPages") || (Report.DoublePass && FinalPass))
+                if (!obj.VisibleExpression.Contains ("TotalPages") || (Report.DoublePass && FinalPass))
                 {
-                    expression = Report.Calc(Code.CodeUtils.FixExpressionWithBrackets(obj.VisibleExpression));
+                    expression = Report.Calc (Code.CodeUtils.FixExpressionWithBrackets (obj.VisibleExpression));
                 }
-                if (expression != null && expression is bool)
+
+                if (expression != null && expression is bool b)
                 {
-                    if (!obj.VisibleExpression.Contains("TotalPages"))
+                    if (!obj.VisibleExpression.Contains ("TotalPages"))
                     {
-                        obj.Visible = (bool)expression;
+                        obj.Visible = b;
                     }
                     else if (FirstPass)
                     {
@@ -264,30 +278,30 @@ namespace AM.Reporting.Engine
                     }
                     else
                     {
-                        obj.Visible = (bool)expression;
+                        obj.Visible = b;
                     }
                 }
             }
 
             // Apply exportable expression if needed.
-            if (!String.IsNullOrEmpty(obj.ExportableExpression))
+            if (!string.IsNullOrEmpty (obj.ExportableExpression))
             {
                 object expression = null;
-                expression = Report.Calc(Code.CodeUtils.FixExpressionWithBrackets(obj.ExportableExpression));
-                if (expression is bool)
+                expression = Report.Calc (Code.CodeUtils.FixExpressionWithBrackets (obj.ExportableExpression));
+                if (expression is bool b)
                 {
-                    obj.Exportable = (bool)expression;
+                    obj.Exportable = b;
                 }
             }
 
             // Apply printable expression if needed.
-            if (!String.IsNullOrEmpty(obj.PrintableExpression))
+            if (!string.IsNullOrEmpty (obj.PrintableExpression))
             {
                 object expression = null;
-                expression = Report.Calc(Code.CodeUtils.FixExpressionWithBrackets(obj.PrintableExpression));
-                if (expression is bool)
+                expression = Report.Calc (Code.CodeUtils.FixExpressionWithBrackets (obj.PrintableExpression));
+                if (expression is bool b)
                 {
-                    obj.Printable = (bool)expression;
+                    obj.Printable = b;
                 }
             }
 
@@ -296,15 +310,16 @@ namespace AM.Reporting.Engine
                 return false;
             }
 
-            bool isFirstPage = CurPage == firstReportPage;
-            bool isLastPage = CurPage == TotalPages - 1;
-            bool isRepeated = obj.Band != null && obj.Band.Repeated;
-            bool canPrint = false;
+            var isFirstPage = CurPage == firstReportPage;
+            var isLastPage = CurPage == TotalPages - 1;
+            var isRepeated = obj.Band != null && obj.Band.Repeated;
+            var canPrint = false;
 
             if ((obj.PrintOn & PrintOn.OddPages) > 0 && CurPage % 2 == 1)
             {
                 canPrint = true;
             }
+
             if ((obj.PrintOn & PrintOn.EvenPages) > 0 && CurPage % 2 == 0)
             {
                 canPrint = true;
@@ -316,28 +331,33 @@ namespace AM.Reporting.Engine
                 {
                     canPrint = false;
                 }
+
                 if (obj.PrintOn == PrintOn.LastPage || obj.PrintOn == (PrintOn.LastPage | PrintOn.SinglePage) ||
                     obj.PrintOn == (PrintOn.FirstPage | PrintOn.LastPage))
                 {
                     canPrint = true;
                 }
             }
+
             if (isFirstPage)
             {
                 if ((obj.PrintOn & PrintOn.FirstPage) == 0)
                 {
                     canPrint = false;
                 }
+
                 if (obj.PrintOn == PrintOn.FirstPage || obj.PrintOn == (PrintOn.FirstPage | PrintOn.SinglePage) ||
                     obj.PrintOn == (PrintOn.FirstPage | PrintOn.LastPage))
                 {
                     canPrint = true;
                 }
             }
+
             if (isFirstPage && isLastPage)
             {
                 canPrint = (obj.PrintOn & PrintOn.SinglePage) > 0;
             }
+
             if (isRepeated)
             {
                 canPrint = (obj.PrintOn & PrintOn.RepeatedBand) > 0;
@@ -346,22 +366,24 @@ namespace AM.Reporting.Engine
             return canPrint;
         }
 
-        internal void AddToPreparedPages(BandBase band)
+        internal void AddToPreparedPages (BandBase band)
         {
-            bool isReportSummary = band is ReportSummaryBand;
+            var isReportSummary = band is ReportSummaryBand;
 
             // check if band is service band (e.g. page header/footer/overlay).
-            BandBase mainBand = band;
+            var mainBand = band;
+
             // for child bands, check its parent band.
-            if (band is ChildBand)
+            if (band is ChildBand childBand)
             {
-                mainBand = (band as ChildBand).GetTopParentBand;
+                mainBand = childBand.GetTopParentBand;
             }
-            bool isPageBand = mainBand is PageHeaderBand || mainBand is PageFooterBand || mainBand is OverlayBand;
-            bool isColumnBand = mainBand is ColumnHeaderBand || mainBand is ColumnFooterBand;
+
+            var isPageBand = mainBand is PageHeaderBand || mainBand is PageFooterBand || mainBand is OverlayBand;
+            var isColumnBand = mainBand is ColumnHeaderBand || mainBand is ColumnFooterBand;
 
             // check if we have enough space for a band.
-            bool checkFreeSpace = !isPageBand && !isColumnBand && band.FlagCheckFreeSpace;
+            var checkFreeSpace = !isPageBand && !isColumnBand && band.FlagCheckFreeSpace;
             if (checkFreeSpace && FreeSpace < band.Height)
             {
                 // we don't have enough space. What should we do?
@@ -369,22 +391,24 @@ namespace AM.Reporting.Engine
                 // - if band cannot break, check the band height:
                 //   - it's the first row of a band and is bigger than page: break it immediately.
                 //   - in other case, add a new page/column and tell the band that it must break next time.
-                if (band.CanBreak || band.FlagMustBreak || (band.AbsRowNo == 1 && band.Height > PageHeight - PageFooterHeight))
+                if (band.CanBreak || band.FlagMustBreak ||
+                    (band.AbsRowNo == 1 && band.Height > PageHeight - PageFooterHeight))
                 {
                     // since we don't show the column footer band in the EndLastPage, do it here.
                     if (isReportSummary)
                     {
                         ShowReprintFooters();
-                        ShowBand(page.ColumnFooter);
+                        ShowBand (page.ColumnFooter);
                     }
-                    BreakBand(band);
+
+                    BreakBand (band);
                     return;
                 }
                 else
                 {
                     EndColumn();
                     band.FlagMustBreak = true;
-                    AddToPreparedPages(band);
+                    AddToPreparedPages (band);
                     band.FlagMustBreak = false;
                     return;
                 }
@@ -398,8 +422,9 @@ namespace AM.Reporting.Engine
                     {
                         EndKeep();
                     }
-                    ShowReprintFooters(false);
-                    ShowBand(page.ColumnFooter);
+
+                    ShowReprintFooters (false);
+                    ShowBand (page.ColumnFooter);
                 }
             }
 
@@ -408,15 +433,17 @@ namespace AM.Reporting.Engine
             {
                 // if we reprint a data/group footer, do not include the band height into calculation:
                 // it is already counted in FreeSpace
-                float bandHeight = band.Height;
+                var bandHeight = band.Height;
                 if (band.Repeated)
                 {
                     bandHeight = 0;
                 }
+
                 while (FreeSpace - bandHeight - band.Child.Height >= 0)
                 {
-                    float saveCurY = CurY;
-                    ShowBand(band.Child);
+                    var saveCurY = CurY;
+                    ShowBand (band.Child);
+
                     // nothing was printed, break to avoid an endless loop
                     if (CurY == saveCurY)
                     {
@@ -428,15 +455,18 @@ namespace AM.Reporting.Engine
             // adjust the band location
             if (band is PageFooterBand && !UnlimitedHeight)
             {
-                CurY = PageHeight - GetBandHeightWithChildren(band);
+                CurY = PageHeight - GetBandHeightWithChildren (band);
             }
+
             if (!isPageBand)
             {
                 band.Left += originX + CurX;
             }
+
             if (band.PrintOnBottom)
             {
                 CurY = PageHeight - PageFooterHeight - ColumnFooterHeight;
+
                 // if PrintOnBottom is applied to a band like DataFooter, print it with all its child bands
                 // if PrintOnBottom is applied to a child band, print this band only.
                 if (band is ChildBand)
@@ -445,14 +475,15 @@ namespace AM.Reporting.Engine
                 }
                 else
                 {
-                    CurY -= GetBandHeightWithChildren(band);
+                    CurY -= GetBandHeightWithChildren (band);
                 }
             }
+
             band.Top = CurY;
 
             // shift the band and decrease its width when printing hierarchy
-            float saveLeft = band.Left;
-            float saveWidth = band.Width;
+            var saveLeft = band.Left;
+            var saveWidth = band.Width;
             if (!isPageBand && !isColumnBand)
             {
                 band.Left += hierarchyIndent;
@@ -460,30 +491,30 @@ namespace AM.Reporting.Engine
             }
 
             // add outline
-            AddBandOutline(band);
+            AddBandOutline (band);
 
             // add bookmarks
             band.AddBookmarks();
 
             // put the band to prepared pages. Do not put page bands twice
             // (this may happen when we render a subreport, or append a report to another one).
-            bool bandAdded = true;
-            bool bandAlreadyExists = false;
+            var bandAdded = true;
+            var bandAlreadyExists = false;
             if (isPageBand)
             {
                 if (band is ChildBand)
                 {
-                    bandAlreadyExists = PreparedPages.ContainsBand(band.Name);
+                    bandAlreadyExists = PreparedPages.ContainsBand (band.Name);
                 }
                 else
                 {
-                    bandAlreadyExists = PreparedPages.ContainsBand(band.GetType());
+                    bandAlreadyExists = PreparedPages.ContainsBand (band.GetType());
                 }
             }
 
             if (!bandAlreadyExists)
             {
-                bandAdded = PreparedPages.AddBand(band);
+                bandAdded = PreparedPages.AddBand (band);
             }
 
             // shift CurY

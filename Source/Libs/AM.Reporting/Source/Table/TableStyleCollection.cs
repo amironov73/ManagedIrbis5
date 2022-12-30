@@ -27,38 +27,35 @@ using AM.Reporting.Utils;
 
 namespace AM.Reporting.Table
 {
-  internal class TableStyleCollection : FRCollectionBase
-  {
-    private TableCell defaultStyle;
-
-    public TableCell DefaultStyle
+    internal class TableStyleCollection : FRCollectionBase
     {
-      get { return defaultStyle; }
-    }
+        public TableCell DefaultStyle { get; }
 
-    public TableCell this[int index]
-    {
-      get { return List[index] as TableCell; }
-      set { List[index] = value; }
-    }
+        public TableCell this [int index]
+        {
+            get => List[index] as TableCell;
+            set => List[index] = value;
+        }
 
-    public TableCell Add(TableCell style)
-    {
-      for (int i = 0; i < Count; i++)
-      {
-        if (this[i].Equals(style))
-          return this[i];
-      }
+        public TableCell Add (TableCell style)
+        {
+            for (var i = 0; i < Count; i++)
+            {
+                if (this[i].Equals (style))
+                {
+                    return this[i];
+                }
+            }
 
-      TableCell newStyle = new TableCell();
-      newStyle.Assign(style);
-      List.Add(newStyle);
-      return newStyle;
-    }
+            var newStyle = new TableCell();
+            newStyle.Assign (style);
+            List.Add (newStyle);
+            return newStyle;
+        }
 
-    public TableStyleCollection() : base(null)
-    {
-      defaultStyle = new TableCell();
+        public TableStyleCollection() : base (null)
+        {
+            DefaultStyle = new TableCell();
+        }
     }
-  }
 }

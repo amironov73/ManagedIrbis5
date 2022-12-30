@@ -40,20 +40,21 @@ namespace AM.Reporting.Utils
         /// <param name="assembly">Assembly name.</param>
         /// <param name="resource">Resource name.</param>
         /// <returns>Stream object.</returns>
-        public static Stream GetStream(string assembly, string resource)
+        public static Stream GetStream (string assembly, string resource)
         {
-            string assembly_full_name = assembly;
+            var assembly_full_name = assembly;
 #if MONO
 	  assembly_full_name += ".Mono";
 #endif
-            foreach (Assembly a in AppDomain.CurrentDomain.GetAssemblies())
+            foreach (var a in AppDomain.CurrentDomain.GetAssemblies())
             {
-                AssemblyName name = new AssemblyName(a.FullName);
+                var name = new AssemblyName (a.FullName);
                 if (name.Name == assembly_full_name)
                 {
-                    return a.GetManifestResourceStream(assembly + ".Resources." + resource);
+                    return a.GetManifestResourceStream (assembly + ".Resources." + resource);
                 }
             }
+
             return null;
         }
 
@@ -62,9 +63,9 @@ namespace AM.Reporting.Utils
         /// </summary>
         /// <param name="resource">Resource name.</param>
         /// <returns>Stream object.</returns>
-        public static Stream GetStream(string resource)
+        public static Stream GetStream (string resource)
         {
-            return GetStream("AM.Reporting", resource);
+            return GetStream ("AM.Reporting", resource);
         }
 
         /// <summary>
@@ -73,15 +74,15 @@ namespace AM.Reporting.Utils
         /// <param name="assembly">Assembly name.</param>
         /// <param name="resource">Resource name.</param>
         /// <returns>Stream object.</returns>
-        public static Stream UnpackStream(string assembly, string resource)
+        public static Stream UnpackStream (string assembly, string resource)
         {
-            using (Stream packedStream = GetStream(assembly, resource))
-            using (Stream gzipStream = new GZipStream(packedStream, CompressionMode.Decompress, true))
+            using (var packedStream = GetStream (assembly, resource))
+            using (Stream gzipStream = new GZipStream (packedStream, CompressionMode.Decompress, true))
             {
-                MemoryStream result = new MemoryStream();
+                var result = new MemoryStream();
 
                 const int BUFFER_SIZE = 4096;
-                gzipStream.CopyTo(result, BUFFER_SIZE);
+                gzipStream.CopyTo (result, BUFFER_SIZE);
 
                 result.Position = 0;
                 return result;
@@ -93,9 +94,9 @@ namespace AM.Reporting.Utils
         /// </summary>
         /// <param name="resource">Resource name.</param>
         /// <returns>Stream object.</returns>
-        public static Stream UnpackStream(string resource)
+        public static Stream UnpackStream (string resource)
         {
-            return UnpackStream("AM.Reporting", resource);
+            return UnpackStream ("AM.Reporting", resource);
         }
     }
 }

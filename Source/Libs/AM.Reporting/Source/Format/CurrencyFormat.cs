@@ -19,7 +19,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.ComponentModel;
+
 using AM.Reporting.Utils;
+
 using System.Globalization;
 
 #endregion
@@ -34,62 +36,37 @@ namespace AM.Reporting.Format
     public class CurrencyFormat : FormatBase
     {
         #region Fields
-        private bool useLocale;
-        private int decimalDigits;
-        private string decimalSeparator;
-        private string groupSeparator;
-        private string currencySymbol;
-        private int positivePattern;
-        private int negativePattern;
+
         #endregion
 
         #region Properties
+
         /// <summary>
         /// Gets or sets a value that determines whether to use system locale settings to format a value.
         /// </summary>
-        [DefaultValue(true)]
-        public bool UseLocale
-        {
-            get { return useLocale; }
-            set { useLocale = value; }
-        }
+        [DefaultValue (true)]
+        public bool UseLocale { get; set; }
 
         /// <summary>
         /// Gets or sets the number of decimal places to use in currency values.
         /// </summary>
-        [DefaultValue(2)]
-        public int DecimalDigits
-        {
-            get { return decimalDigits; }
-            set { decimalDigits = value; }
-        }
+        [DefaultValue (2)]
+        public int DecimalDigits { get; set; }
 
         /// <summary>
         /// Gets or sets the string to use as the decimal separator in currency values.
         /// </summary>
-        public string DecimalSeparator
-        {
-            get { return decimalSeparator; }
-            set { decimalSeparator = value; }
-        }
+        public string DecimalSeparator { get; set; }
 
         /// <summary>
         /// Gets or sets the string that separates groups of digits to the left of the decimal in currency values.
         /// </summary>
-        public string GroupSeparator
-        {
-            get { return groupSeparator; }
-            set { groupSeparator = value; }
-        }
+        public string GroupSeparator { get; set; }
 
         /// <summary>
         /// Gets or sets the string to use as the currency symbol.
         /// </summary>
-        public string CurrencySymbol
-        {
-            get { return currencySymbol; }
-            set { currencySymbol = value; }
-        }
+        public string CurrencySymbol { get; set; }
 
         /// <summary>
         /// Gets or sets the format pattern for positive currency values.
@@ -104,12 +81,8 @@ namespace AM.Reporting.Format
         ///   <item><term>3</term><description>n $</description></item>
         /// </list>
         /// </remarks>
-        [DefaultValue(0)]
-        public int PositivePattern
-        {
-            get { return positivePattern; }
-            set { positivePattern = value; }
-        }
+        [DefaultValue (0)]
+        public int PositivePattern { get; set; }
 
         /// <summary>
         /// Gets or sets the format pattern for negative currency values.
@@ -136,41 +109,41 @@ namespace AM.Reporting.Format
         ///   <item><term>15</term><description>(n $)</description></item>
         /// </list>
         /// </remarks>
-        [DefaultValue(0)]
-        public int NegativePattern
-        {
-            get { return negativePattern; }
-            set { negativePattern = value; }
-        }
+        [DefaultValue (0)]
+        public int NegativePattern { get; set; }
+
         #endregion
 
         #region Public Methods
+
         /// <inheritdoc/>
         public override FormatBase Clone()
         {
-            CurrencyFormat result = new CurrencyFormat();
-            result.UseLocale = UseLocale;
-            result.DecimalDigits = DecimalDigits;
-            result.DecimalSeparator = DecimalSeparator;
-            result.GroupSeparator = GroupSeparator;
-            result.CurrencySymbol = CurrencySymbol;
-            result.PositivePattern = PositivePattern;
-            result.NegativePattern = NegativePattern;
+            var result = new CurrencyFormat
+            {
+                UseLocale = UseLocale,
+                DecimalDigits = DecimalDigits,
+                DecimalSeparator = DecimalSeparator,
+                GroupSeparator = GroupSeparator,
+                CurrencySymbol = CurrencySymbol,
+                PositivePattern = PositivePattern,
+                NegativePattern = NegativePattern
+            };
             return result;
         }
 
         /// <inheritdoc/>
-        public override bool Equals(object obj)
+        public override bool Equals (object obj)
         {
-            CurrencyFormat f = obj as CurrencyFormat;
+            var f = obj as CurrencyFormat;
             return f != null &&
-              UseLocale == f.UseLocale &&
-              DecimalDigits == f.DecimalDigits &&
-              DecimalSeparator == f.DecimalSeparator &&
-              GroupSeparator == f.GroupSeparator &&
-              CurrencySymbol == f.CurrencySymbol &&
-              PositivePattern == f.PositivePattern &&
-              NegativePattern == f.NegativePattern;
+                   UseLocale == f.UseLocale &&
+                   DecimalDigits == f.DecimalDigits &&
+                   DecimalSeparator == f.DecimalSeparator &&
+                   GroupSeparator == f.GroupSeparator &&
+                   CurrencySymbol == f.CurrencySymbol &&
+                   PositivePattern == f.PositivePattern &&
+                   NegativePattern == f.NegativePattern;
         }
 
         /// <inheritdoc/>
@@ -180,21 +153,22 @@ namespace AM.Reporting.Format
         }
 
         /// <inheritdoc/>
-        public override string FormatValue(object value)
+        public override string FormatValue (object value)
         {
-            if (value is Variant)
-                value = ((Variant)value).Value;
+            if (value is Variant variant)
+            {
+                value = variant.Value;
+            }
 
-            return String.Format(GetNumberFormatInfo(), "{0:c}", new object[] { value });
+            return string.Format (GetNumberFormatInfo(), "{0:c}", new object[] { value });
         }
 
         internal NumberFormatInfo GetNumberFormatInfo()
         {
-
-            NumberFormatInfo info = new NumberFormatInfo();
+            var info = new NumberFormatInfo();
             if (UseLocale)
             {
-                NumberFormatInfo cultureFormat = CultureInfo.CurrentCulture.NumberFormat;
+                var cultureFormat = CultureInfo.CurrentCulture.NumberFormat;
                 info.CurrencyDecimalDigits = DecimalDigits;
                 info.CurrencyDecimalSeparator = cultureFormat.CurrencyDecimalSeparator;
                 info.CurrencyGroupSizes = cultureFormat.CurrencyGroupSizes;
@@ -213,38 +187,59 @@ namespace AM.Reporting.Format
                 info.CurrencyPositivePattern = PositivePattern;
                 info.CurrencyNegativePattern = NegativePattern;
             }
+
             return info;
         }
 
         internal override string GetSampleValue()
         {
-            return FormatValue(-12345);
+            return FormatValue (-12345);
         }
 
-        internal override void Serialize(FRWriter writer, string prefix, FormatBase format)
+        internal override void Serialize (FRWriter writer, string prefix, FormatBase format)
         {
-            base.Serialize(writer, prefix, format);
-            CurrencyFormat c = format as CurrencyFormat;
+            base.Serialize (writer, prefix, format);
+            var c = format as CurrencyFormat;
 
             if (c == null || UseLocale != c.UseLocale)
-                writer.WriteBool(prefix + "UseLocale", UseLocale);
+            {
+                writer.WriteBool (prefix + "UseLocale", UseLocale);
+            }
+
             if (c == null || DecimalDigits != c.DecimalDigits)
-                writer.WriteInt(prefix + "DecimalDigits", DecimalDigits);
+            {
+                writer.WriteInt (prefix + "DecimalDigits", DecimalDigits);
+            }
 
             if (!UseLocale)
             {
                 if (c == null || DecimalSeparator != c.DecimalSeparator)
-                    writer.WriteStr(prefix + "DecimalSeparator", DecimalSeparator);
+                {
+                    writer.WriteStr (prefix + "DecimalSeparator", DecimalSeparator);
+                }
+
                 if (c == null || GroupSeparator != c.GroupSeparator)
-                    writer.WriteStr(prefix + "GroupSeparator", GroupSeparator);
+                {
+                    writer.WriteStr (prefix + "GroupSeparator", GroupSeparator);
+                }
+
                 if (c == null || CurrencySymbol != c.CurrencySymbol)
-                    writer.WriteStr(prefix + "CurrencySymbol", CurrencySymbol);
+                {
+                    writer.WriteStr (prefix + "CurrencySymbol", CurrencySymbol);
+                }
+
                 if (c == null || PositivePattern != c.PositivePattern)
-                    writer.WriteInt(prefix + "PositivePattern", PositivePattern);
+                {
+                    writer.WriteInt (prefix + "PositivePattern", PositivePattern);
+                }
+
                 if (c == null || NegativePattern != c.NegativePattern)
-                    writer.WriteInt(prefix + "NegativePattern", NegativePattern);
+                {
+                    writer.WriteInt (prefix + "NegativePattern", NegativePattern);
+                }
             }
         }
+
         #endregion
 
         /// <summary>

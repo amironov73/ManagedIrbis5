@@ -1,9 +1,32 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.Drawing;
 using System.Collections.Generic;
 using System.ComponentModel;
+
 using AM.Reporting.Utils;
+
 using System.Drawing.Design;
+
+#endregion
+
+#nullable enable
 
 namespace AM.Reporting
 {
@@ -53,50 +76,26 @@ namespace AM.Reporting
         #endregion // Constants
 
         #region Fields
-        private string exportAlias;
-        private float paperWidth;
-        private float paperHeight;
-        private int rawPaperSize;
+
         private bool landscape;
-        private float leftMargin;
-        private float topMargin;
-        private float rightMargin;
-        private float bottomMargin;
-        private bool mirrorMargins;
-        private PageColumns columns;
-        private FloatCollection guides;
-        private Border border;
         private FillBase fill;
         private Watermark watermark;
-        private bool titleBeforeHeader;
-        private string outlineExpression;
-        private bool printOnPreviousPage;
-        private bool resetPageNumber;
-        private bool extraDesignWidth;
-        private bool startOnOddPage;
-        private bool backPage;
-        private SubreportObject subreport;
         private PageHeaderBand pageHeader;
         private ReportTitleBand reportTitle;
         private ColumnHeaderBand columnHeader;
-        private BandCollection bands;
         private ReportSummaryBand reportSummary;
         private ColumnFooterBand columnFooter;
         private PageFooterBand pageFooter;
         private OverlayBand overlay;
-        private string startPageEvent;
-        private string finishPageEvent;
-        private string manualBuildEvent;
 
         private bool unlimitedHeight;
         private bool printOnRollPaper;
-        private bool unlimitedWidth;
         private float unlimitedHeightValue;
-        private float unlimitedWidthValue;
 
         #endregion
 
         #region Properties
+
         /// <summary>
         /// This event occurs when the report engine starts this page.
         /// </summary>
@@ -115,34 +114,22 @@ namespace AM.Reporting
         /// <summary>
         /// Gets or sets a width of the paper, in millimeters.
         /// </summary>
-        [Category("Paper")]
-        [TypeConverter("AM.Reporting.TypeConverters.PaperConverter, AM.Reporting")]
-        public float PaperWidth
-        {
-            get { return paperWidth; }
-            set { paperWidth = value; }
-        }
+        [Category ("Paper")]
+        [TypeConverter ("AM.Reporting.TypeConverters.PaperConverter, AM.Reporting")]
+        public float PaperWidth { get; set; }
 
         /// <summary>
         /// Gets or sets the page name on export
         /// </summary>
-        [Category("Paper")]
-        public string ExportAlias
-        {
-            get { return exportAlias; }
-            set { exportAlias = value; }
-        }
+        [Category ("Paper")]
+        public string ExportAlias { get; set; }
 
         /// <summary>
         /// Gets or sets a height of the paper, in millimeters.
         /// </summary>
-        [Category("Paper")]
-        [TypeConverter("AM.Reporting.TypeConverters.PaperConverter, AM.Reporting")]
-        public float PaperHeight
-        {
-            get { return paperHeight; }
-            set { paperHeight = value; }
-        }
+        [Category ("Paper")]
+        [TypeConverter ("AM.Reporting.TypeConverters.PaperConverter, AM.Reporting")]
+        public float PaperHeight { get; set; }
 
         /// <summary>
         /// Gets or sets the raw index of a paper size.
@@ -154,97 +141,85 @@ namespace AM.Reporting
         /// <para/>It is not obligatory to set this property. AM.Reporting will select the
         /// necessary paper using the <b>PaperWidth</b> and <b>PaperHeight</b> values.
         /// </remarks>
-        [Category("Paper")]
-        [DefaultValue(0)]
-        public int RawPaperSize
-        {
-            get { return rawPaperSize; }
-            set { rawPaperSize = value; }
-        }
+        [Category ("Paper")]
+        [DefaultValue (0)]
+        public int RawPaperSize { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the page has unlimited height.
         /// </summary>
-        [DefaultValue(false)]
-        [Category("Paper")]
+        [DefaultValue (false)]
+        [Category ("Paper")]
         public bool UnlimitedHeight
         {
-            get { return unlimitedHeight; }
+            get => unlimitedHeight;
             set
             {
                 unlimitedHeight = value;
                 if (!unlimitedHeight)
+                {
                     printOnRollPaper = false;
+                }
             }
         }
 
         /// <summary>
         /// Gets or sets the value indicating whether the unlimited page should be printed on roll paper.
         /// </summary>
-        [DefaultValue(false)]
-        [Category("Paper")]
+        [DefaultValue (false)]
+        [Category ("Paper")]
         public bool PrintOnRollPaper
         {
-            get { return printOnRollPaper; }
+            get => printOnRollPaper;
             set
             {
                 if (unlimitedHeight)
+                {
                     printOnRollPaper = value;
+                }
             }
         }
 
         /// <summary>
         /// Gets or sets a value indicating whether the page has unlimited width.
         /// </summary>
-        [DefaultValue(false)]
-        [Category("Paper")]
-        public bool UnlimitedWidth
-        {
-            get { return unlimitedWidth; }
-            set { unlimitedWidth = value; }
-        }
+        [DefaultValue (false)]
+        [Category ("Paper")]
+        public bool UnlimitedWidth { get; set; }
 
         /// <summary>
         /// Get or set the current height of unlimited page.
         /// </summary>
-        [Browsable(false)]
+        [Browsable (false)]
         public float UnlimitedHeightValue
         {
-            get { return unlimitedHeightValue; }
+            get => unlimitedHeightValue;
             set
             {
                 unlimitedHeightValue = value;
                 if (printOnRollPaper)
+                {
                     PaperHeight = unlimitedHeightValue / Units.Millimeters;
+                }
             }
         }
 
         /// <summary>
         /// Get or set the current width of unlimited page.
         /// </summary>
-        [Browsable(false)]
-        public float UnlimitedWidthValue
-        {
-            get { return unlimitedWidthValue; }
-            set { unlimitedWidthValue = value; }
-        }
+        [Browsable (false)]
+        public float UnlimitedWidthValue { get; set; }
 
         /// <summary>
         /// Gets the current page height in pixels.
         /// </summary>
-        [Browsable(false)]
-        public float HeightInPixels
-        {
-            get
-            {
-                return UnlimitedHeight ? UnlimitedHeightValue : PaperHeight * Units.Millimeters;
-            }
-        }
+        [Browsable (false)]
+        public float HeightInPixels => UnlimitedHeight ? UnlimitedHeightValue : PaperHeight * Units.Millimeters;
 
         /// <summary>
         /// Gets the current page width in pixels.
         /// </summary>
-        [Browsable(false)]
+        [Browsable (false)]
         public float WidthInPixels
         {
             get
@@ -256,8 +231,8 @@ namespace AM.Reporting
                         return UnlimitedWidthValue;
                     }
                 }
-                return PaperWidth * Units.Millimeters;
 
+                return PaperWidth * Units.Millimeters;
             }
         }
 
@@ -267,39 +242,40 @@ namespace AM.Reporting
         /// <remarks>
         /// When you change this property, it will automatically swap paper width and height, as well as paper margins.
         /// </remarks>
-        [DefaultValue(false)]
-        [Category("Paper")]
+        [DefaultValue (false)]
+        [Category ("Paper")]
         public bool Landscape
         {
-            get { return landscape; }
+            get => landscape;
             set
             {
                 if (landscape != value)
                 {
-                    float e = paperWidth;
-                    paperWidth = paperHeight;
-                    paperHeight = e;
+                    var e = PaperWidth;
+                    PaperWidth = PaperHeight;
+                    PaperHeight = e;
 
-                    float m1 = leftMargin;   //     m3
-                    float m2 = rightMargin;  //  m1    m2
-                    float m3 = topMargin;    //     m4
-                    float m4 = bottomMargin; //
+                    var m1 = LeftMargin; //     m3
+                    var m2 = RightMargin; //  m1    m2
+                    var m3 = TopMargin; //     m4
+                    var m4 = BottomMargin; //
 
                     if (value)
                     {
-                        leftMargin = m3;       // rotate counter-clockwise
-                        rightMargin = m4;
-                        topMargin = m2;
-                        bottomMargin = m1;
+                        LeftMargin = m3; // rotate counter-clockwise
+                        RightMargin = m4;
+                        TopMargin = m2;
+                        BottomMargin = m1;
                     }
                     else
                     {
-                        leftMargin = m4;       // rotate clockwise
-                        rightMargin = m3;
-                        topMargin = m1;
-                        bottomMargin = m2;
+                        LeftMargin = m4; // rotate clockwise
+                        RightMargin = m3;
+                        TopMargin = m1;
+                        BottomMargin = m2;
                     }
                 }
+
                 landscape = value;
             }
         }
@@ -307,91 +283,67 @@ namespace AM.Reporting
         /// <summary>
         /// Gets or sets the left page margin, in millimeters.
         /// </summary>
-        [Category("Paper")]
-        [TypeConverter("AM.Reporting.TypeConverters.PaperConverter, AM.Reporting")]
-        public float LeftMargin
-        {
-            get { return leftMargin; }
-            set { leftMargin = value; }
-        }
+        [Category ("Paper")]
+        [TypeConverter ("AM.Reporting.TypeConverters.PaperConverter, AM.Reporting")]
+        public float LeftMargin { get; set; }
 
         /// <summary>
         /// Gets or sets the top page margin, in millimeters.
         /// </summary>
-        [Category("Paper")]
-        [TypeConverter("AM.Reporting.TypeConverters.PaperConverter, AM.Reporting")]
-        public float TopMargin
-        {
-            get { return topMargin; }
-            set { topMargin = value; }
-        }
+        [Category ("Paper")]
+        [TypeConverter ("AM.Reporting.TypeConverters.PaperConverter, AM.Reporting")]
+        public float TopMargin { get; set; }
 
         /// <summary>
         /// Gets or sets the right page margin, in millimeters.
         /// </summary>
-        [Category("Paper")]
-        [TypeConverter("AM.Reporting.TypeConverters.PaperConverter, AM.Reporting")]
-        public float RightMargin
-        {
-            get { return rightMargin; }
-            set { rightMargin = value; }
-        }
+        [Category ("Paper")]
+        [TypeConverter ("AM.Reporting.TypeConverters.PaperConverter, AM.Reporting")]
+        public float RightMargin { get; set; }
 
         /// <summary>
         /// Gets or sets the bottom page margin, in millimeters.
         /// </summary>
-        [Category("Paper")]
-        [TypeConverter("AM.Reporting.TypeConverters.PaperConverter, AM.Reporting")]
-        public float BottomMargin
-        {
-            get { return bottomMargin; }
-            set { bottomMargin = value; }
-        }
+        [Category ("Paper")]
+        [TypeConverter ("AM.Reporting.TypeConverters.PaperConverter, AM.Reporting")]
+        public float BottomMargin { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating that even pages should swap its left and right margins when
         /// previewed or printed.
         /// </summary>
-        [DefaultValue(false)]
-        [Category("Behavior")]
-        public bool MirrorMargins
-        {
-            get { return mirrorMargins; }
-            set { mirrorMargins = value; }
-        }
+        [DefaultValue (false)]
+        [Category ("Behavior")]
+        public bool MirrorMargins { get; set; }
 
         /// <summary>
         /// Gets the page columns settings.
         /// </summary>
-        [Category("Appearance")]
-        public PageColumns Columns
-        {
-            get { return columns; }
-        }
+        [Category ("Appearance")]
+        public PageColumns Columns { get; }
 
         /// <summary>
         /// Gets or sets the page border that will be printed inside the page printing area.
         /// </summary>
-        [Category("Appearance")]
-        public Border Border
-        {
-            get { return border; }
-            set { border = value; }
-        }
+        [Category ("Appearance")]
+        public Border Border { get; set; }
 
 
         /// <summary>
         /// Gets or sets the page background fill.
         /// </summary>
-        [Category("Appearance")]
-        [Editor("AM.Reporting.TypeEditors.FillEditor, AM.Reporting", typeof(UITypeEditor))]
+        [Category ("Appearance")]
+        [Editor ("AM.Reporting.TypeEditors.FillEditor, AM.Reporting", typeof (UITypeEditor))]
         public FillBase Fill
         {
-            get { return fill; }
+            get => fill;
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException("Fill");
+                {
+                    throw new ArgumentNullException ("Fill");
+                }
+
                 fill = value;
             }
         }
@@ -402,15 +354,20 @@ namespace AM.Reporting
         /// <remarks>
         /// To enabled watermark, set its <b>Enabled</b> property to <b>true</b>.
         /// </remarks>
-        [Category("Appearance")]
+        [Category ("Appearance")]
         public Watermark Watermark
         {
-            get { return watermark; }
+            get => watermark;
             set
             {
                 if (watermark != value)
+                {
                     if (watermark != null)
+                    {
                         watermark.Dispose();
+                    }
+                }
+
                 watermark = value;
             }
         }
@@ -419,13 +376,9 @@ namespace AM.Reporting
         /// Gets or sets a value indicating that <b>ReportTitle</b> band should be printed before the
         /// <b>PageHeader</b> band.
         /// </summary>
-        [DefaultValue(true)]
-        [Category("Behavior")]
-        public bool TitleBeforeHeader
-        {
-            get { return titleBeforeHeader; }
-            set { titleBeforeHeader = value; }
-        }
+        [DefaultValue (true)]
+        [Category ("Behavior")]
+        public bool TitleBeforeHeader { get; set; }
 
         /// <summary>
         /// Gets or sets an outline expression.
@@ -433,13 +386,9 @@ namespace AM.Reporting
         /// <remarks>
         /// For more information, see <see cref="BandBase.OutlineExpression"/> property.
         /// </remarks>
-        [Category("Data")]
-        [Editor("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof(UITypeEditor))]
-        public string OutlineExpression
-        {
-            get { return outlineExpression; }
-            set { outlineExpression = value; }
-        }
+        [Category ("Data")]
+        [Editor ("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof (UITypeEditor))]
+        public string OutlineExpression { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether to start to print this page on a free space of the previous page.
@@ -447,13 +396,9 @@ namespace AM.Reporting
         /// <remarks>
         /// This property can be used if you have two or more pages in the report template.
         /// </remarks>
-        [DefaultValue(false)]
-        [Category("Behavior")]
-        public bool PrintOnPreviousPage
-        {
-            get { return printOnPreviousPage; }
-            set { printOnPreviousPage = value; }
-        }
+        [DefaultValue (false)]
+        [Category ("Behavior")]
+        public bool PrintOnPreviousPage { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating that AM.Reporting engine must reset page numbers before printing this page.
@@ -461,13 +406,9 @@ namespace AM.Reporting
         /// <remarks>
         /// This property can be used if you have two or more pages in the report template.
         /// </remarks>
-        [DefaultValue(false)]
-        [Category("Behavior")]
-        public bool ResetPageNumber
-        {
-            get { return resetPageNumber; }
-            set { resetPageNumber = value; }
-        }
+        [DefaultValue (false)]
+        [Category ("Behavior")]
+        public bool ResetPageNumber { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the page has extra width in the report designer.
@@ -475,13 +416,9 @@ namespace AM.Reporting
         /// <remarks>
         /// This property may be useful if you work with such objects as Matrix and Table.
         /// </remarks>
-        [DefaultValue(false)]
-        [Category("Design")]
-        public bool ExtraDesignWidth
-        {
-            get { return extraDesignWidth; }
-            set { extraDesignWidth = value; }
-        }
+        [DefaultValue (false)]
+        [Category ("Design")]
+        public bool ExtraDesignWidth { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this page will start on an odd page only.
@@ -491,35 +428,27 @@ namespace AM.Reporting
         /// means that this page will start to print on an odd page only. If necessary, an empty page
         /// will be added to the prepared report before this page will be printed.
         /// </remarks>
-        [DefaultValue(false)]
-        [Category("Behavior")]
-        public bool StartOnOddPage
-        {
-            get { return startOnOddPage; }
-            set { startOnOddPage = value; }
-        }
+        [DefaultValue (false)]
+        [Category ("Behavior")]
+        public bool StartOnOddPage { get; set; }
 
         /// <summary>
         /// Uses this page as a back page for previously printed pages.
         /// </summary>
-        [DefaultValue(false)]
-        [Category("Behavior")]
-        public bool BackPage
-        {
-            get { return backPage; }
-            set { backPage = value; }
-        }
+        [DefaultValue (false)]
+        [Category ("Behavior")]
+        public bool BackPage { get; set; }
 
         /// <summary>
         /// Gets or sets a report title band.
         /// </summary>
-        [Browsable(false)]
+        [Browsable (false)]
         public ReportTitleBand ReportTitle
         {
-            get { return reportTitle; }
+            get => reportTitle;
             set
             {
-                SetProp(reportTitle, value);
+                SetProp (reportTitle, value);
                 reportTitle = value;
             }
         }
@@ -527,13 +456,13 @@ namespace AM.Reporting
         /// <summary>
         /// Gets or sets a report summary band.
         /// </summary>
-        [Browsable(false)]
+        [Browsable (false)]
         public ReportSummaryBand ReportSummary
         {
-            get { return reportSummary; }
+            get => reportSummary;
             set
             {
-                SetProp(reportSummary, value);
+                SetProp (reportSummary, value);
                 reportSummary = value;
             }
         }
@@ -541,13 +470,13 @@ namespace AM.Reporting
         /// <summary>
         /// Gets or sets a page header band.
         /// </summary>
-        [Browsable(false)]
+        [Browsable (false)]
         public PageHeaderBand PageHeader
         {
-            get { return pageHeader; }
+            get => pageHeader;
             set
             {
-                SetProp(pageHeader, value);
+                SetProp (pageHeader, value);
                 pageHeader = value;
             }
         }
@@ -555,13 +484,13 @@ namespace AM.Reporting
         /// <summary>
         /// Gets or sets a page footer band.
         /// </summary>
-        [Browsable(false)]
+        [Browsable (false)]
         public PageFooterBand PageFooter
         {
-            get { return pageFooter; }
+            get => pageFooter;
             set
             {
-                SetProp(pageFooter, value);
+                SetProp (pageFooter, value);
                 pageFooter = value;
             }
         }
@@ -569,13 +498,13 @@ namespace AM.Reporting
         /// <summary>
         /// Gets or sets a column header band.
         /// </summary>
-        [Browsable(false)]
+        [Browsable (false)]
         public ColumnHeaderBand ColumnHeader
         {
-            get { return columnHeader; }
+            get => columnHeader;
             set
             {
-                SetProp(columnHeader, value);
+                SetProp (columnHeader, value);
                 columnHeader = value;
             }
         }
@@ -583,13 +512,13 @@ namespace AM.Reporting
         /// <summary>
         /// Gets or sets a column footer band.
         /// </summary>
-        [Browsable(false)]
+        [Browsable (false)]
         public ColumnFooterBand ColumnFooter
         {
-            get { return columnFooter; }
+            get => columnFooter;
             set
             {
-                SetProp(columnFooter, value);
+                SetProp (columnFooter, value);
                 columnFooter = value;
             }
         }
@@ -597,13 +526,13 @@ namespace AM.Reporting
         /// <summary>
         /// Gets or sets an overlay band.
         /// </summary>
-        [Browsable(false)]
+        [Browsable (false)]
         public OverlayBand Overlay
         {
-            get { return overlay; }
+            get => overlay;
             set
             {
-                SetProp(overlay, value);
+                SetProp (overlay, value);
                 overlay = value;
             }
         }
@@ -615,11 +544,8 @@ namespace AM.Reporting
         /// The <b>Bands</b> property holds the list of data bands or group headers.
         /// Thus you may add several databands to this property to create master-master reports, for example.
         /// </remarks>
-        [Browsable(false)]
-        public BandCollection Bands
-        {
-            get { return bands; }
-        }
+        [Browsable (false)]
+        public BandCollection Bands { get; }
 
         /// <summary>
         /// Gets or sets the page guidelines.
@@ -628,12 +554,8 @@ namespace AM.Reporting
         /// This property hold all vertical guidelines. The horizontal guidelines are owned by the bands (see
         /// <see cref="BandBase.Guides"/> property).
         /// </remarks>
-        [Browsable(false)]
-        public FloatCollection Guides
-        {
-            get { return guides; }
-            set { guides = value; }
-        }
+        [Browsable (false)]
+        public FloatCollection Guides { get; set; }
 
         /// <summary>
         /// Gets or sets the reference to a parent <b>SubreportObject</b> that owns this page.
@@ -641,71 +563,61 @@ namespace AM.Reporting
         /// <remarks>
         /// This property is <b>null</b> for regular report pages. See the <see cref="SubreportObject"/> for details.
         /// </remarks>
-        [Browsable(false)]
-        public SubreportObject Subreport
-        {
-            get { return subreport; }
-            set { subreport = value; }
-        }
+        [Browsable (false)]
+        public SubreportObject Subreport { get; set; }
 
         /// <summary>
         /// Gets or sets a script event name that will be fired when the report engine starts this page.
         /// </summary>
-        [Category("Build")]
-        public string StartPageEvent
-        {
-            get { return startPageEvent; }
-            set { startPageEvent = value; }
-        }
+        [Category ("Build")]
+        public string StartPageEvent { get; set; }
 
         /// <summary>
         /// Gets or sets a script event name that will be fired when the report engine finished this page.
         /// </summary>
-        [Category("Build")]
-        public string FinishPageEvent
-        {
-            get { return finishPageEvent; }
-            set { finishPageEvent = value; }
-        }
+        [Category ("Build")]
+        public string FinishPageEvent { get; set; }
 
         /// <summary>
         /// Gets or sets a script event name that will be fired when the report engine is about
         /// to print databands in this page.
         /// </summary>
-        [Category("Build")]
-        public string ManualBuildEvent
-        {
-            get { return manualBuildEvent; }
-            set { manualBuildEvent = value; }
-        }
+        [Category ("Build")]
+        public string ManualBuildEvent { get; set; }
 
-        internal bool IsManualBuild
-        {
-            get { return !String.IsNullOrEmpty(manualBuildEvent) || ManualBuild != null; }
-        }
+        internal bool IsManualBuild => !string.IsNullOrEmpty (ManualBuildEvent) || ManualBuild != null;
+
         #endregion
 
         #region Private Methods
-        private void DrawBackground(FRPaintEventArgs e, RectangleF rect)
+
+        private void DrawBackground (FRPaintEventArgs e, RectangleF rect)
         {
             rect.Width *= e.ScaleX;
             rect.Height *= e.ScaleY;
             Brush brush = null;
             if (Fill is SolidFill)
-                brush = e.Cache.GetBrush((Fill as SolidFill).Color);
+            {
+                brush = e.Cache.GetBrush ((Fill as SolidFill).Color);
+            }
             else
-                brush = Fill.CreateBrush(rect, e.ScaleX, e.ScaleY);
+            {
+                brush = Fill.CreateBrush (rect, e.ScaleX, e.ScaleY);
+            }
 
-            e.Graphics.FillRectangle(brush, rect.Left, rect.Top, rect.Width, rect.Height);
+            e.Graphics.FillRectangle (brush, rect.Left, rect.Top, rect.Width, rect.Height);
             if (!(Fill is SolidFill))
+            {
                 brush.Dispose();
+            }
         }
+
         #endregion
 
         #region Protected Methods
 
         /// <inheritdoc/>
-        protected override void Dispose(bool disposing)
+        protected override void Dispose (bool disposing)
         {
             if (disposing)
             {
@@ -713,139 +625,203 @@ namespace AM.Reporting
                 {
                     Subreport.ReportPage = null;
                 }
+
                 if (Watermark != null)
                 {
                     Watermark.Dispose();
                     Watermark = null;
                 }
             }
-            base.Dispose(disposing);
+
+            base.Dispose (disposing);
         }
 
         #endregion
 
         #region IParent
+
         /// <inheritdoc/>
-        public virtual void GetChildObjects(ObjectCollection list)
+        public virtual void GetChildObjects (ObjectCollection list)
         {
             if (TitleBeforeHeader)
             {
-                list.Add(reportTitle);
-                list.Add(pageHeader);
+                list.Add (reportTitle);
+                list.Add (pageHeader);
             }
             else
             {
-                list.Add(pageHeader);
-                list.Add(reportTitle);
+                list.Add (pageHeader);
+                list.Add (reportTitle);
             }
-            list.Add(columnHeader);
-            foreach (BandBase band in bands)
+
+            list.Add (columnHeader);
+            foreach (BandBase band in Bands)
             {
-                list.Add(band);
+                list.Add (band);
             }
-            list.Add(reportSummary);
-            list.Add(columnFooter);
-            list.Add(pageFooter);
-            list.Add(overlay);
+
+            list.Add (reportSummary);
+            list.Add (columnFooter);
+            list.Add (pageFooter);
+            list.Add (overlay);
         }
 
         /// <inheritdoc/>
-        public virtual bool CanContain(Base child)
+        public virtual bool CanContain (Base child)
         {
             if (IsRunning)
+            {
                 return child is BandBase;
+            }
+
             return (child is PageHeaderBand || child is ReportTitleBand || child is ColumnHeaderBand ||
-              child is DataBand || child is GroupHeaderBand || child is ColumnFooterBand ||
-              child is ReportSummaryBand || child is PageFooterBand || child is OverlayBand);
+                    child is DataBand || child is GroupHeaderBand || child is ColumnFooterBand ||
+                    child is ReportSummaryBand || child is PageFooterBand || child is OverlayBand);
         }
 
         /// <inheritdoc/>
-        public virtual void AddChild(Base child)
+        public virtual void AddChild (Base child)
         {
             if (IsRunning)
             {
-                bands.Add(child as BandBase);
+                Bands.Add (child as BandBase);
                 return;
             }
-            if (child is PageHeaderBand)
-                PageHeader = child as PageHeaderBand;
-            if (child is ReportTitleBand)
-                ReportTitle = child as ReportTitleBand;
-            if (child is ColumnHeaderBand)
-                ColumnHeader = child as ColumnHeaderBand;
+
+            if (child is PageHeaderBand band)
+            {
+                PageHeader = band;
+            }
+
+            if (child is ReportTitleBand titleBand)
+            {
+                ReportTitle = titleBand;
+            }
+
+            if (child is ColumnHeaderBand headerBand)
+            {
+                ColumnHeader = headerBand;
+            }
+
             if (child is DataBand || child is GroupHeaderBand)
-                bands.Add(child as BandBase);
-            if (child is ReportSummaryBand)
-                ReportSummary = child as ReportSummaryBand;
-            if (child is ColumnFooterBand)
-                ColumnFooter = child as ColumnFooterBand;
-            if (child is PageFooterBand)
-                PageFooter = child as PageFooterBand;
-            if (child is OverlayBand)
-                Overlay = child as OverlayBand;
+            {
+                Bands.Add (child as BandBase);
+            }
+
+            if (child is ReportSummaryBand summaryBand)
+            {
+                ReportSummary = summaryBand;
+            }
+
+            if (child is ColumnFooterBand footerBand)
+            {
+                ColumnFooter = footerBand;
+            }
+
+            if (child is PageFooterBand pageFooterBand)
+            {
+                PageFooter = pageFooterBand;
+            }
+
+            if (child is OverlayBand overlayBand)
+            {
+                Overlay = overlayBand;
+            }
         }
 
         /// <inheritdoc/>
-        public virtual void RemoveChild(Base child)
+        public virtual void RemoveChild (Base child)
         {
             if (IsRunning)
             {
-                bands.Remove(child as BandBase);
+                Bands.Remove (child as BandBase);
                 return;
             }
-            if (child is PageHeaderBand && pageHeader == child as PageHeaderBand)
+
+            if (child is PageHeaderBand band && pageHeader == band)
+            {
                 PageHeader = null;
-            if (child is ReportTitleBand && reportTitle == child as ReportTitleBand)
+            }
+
+            if (child is ReportTitleBand titleBand && reportTitle == titleBand)
+            {
                 ReportTitle = null;
-            if (child is ColumnHeaderBand && columnHeader == child as ColumnHeaderBand)
+            }
+
+            if (child is ColumnHeaderBand headerBand && columnHeader == headerBand)
+            {
                 ColumnHeader = null;
+            }
+
             if (child is DataBand || child is GroupHeaderBand)
-                bands.Remove(child as BandBase);
-            if (child is ReportSummaryBand && reportSummary == child as ReportSummaryBand)
+            {
+                Bands.Remove (child as BandBase);
+            }
+
+            if (child is ReportSummaryBand summaryBand && reportSummary == summaryBand)
+            {
                 ReportSummary = null;
-            if (child is ColumnFooterBand && columnFooter == child as ColumnFooterBand)
+            }
+
+            if (child is ColumnFooterBand footerBand && columnFooter == footerBand)
+            {
                 ColumnFooter = null;
-            if (child is PageFooterBand && pageFooter == child as PageFooterBand)
+            }
+
+            if (child is PageFooterBand pageFooterBand && pageFooter == pageFooterBand)
+            {
                 PageFooter = null;
-            if (child is OverlayBand && overlay == child as OverlayBand)
+            }
+
+            if (child is OverlayBand overlayBand && overlay == overlayBand)
+            {
                 Overlay = null;
+            }
         }
 
         /// <inheritdoc/>
-        public virtual int GetChildOrder(Base child)
+        public virtual int GetChildOrder (Base child)
         {
-            return bands.IndexOf(child as BandBase);
+            return Bands.IndexOf (child as BandBase);
         }
 
         /// <inheritdoc/>
-        public virtual void SetChildOrder(Base child, int order)
+        public virtual void SetChildOrder (Base child, int order)
         {
-            if (order > bands.Count)
-                order = bands.Count;
-            int oldOrder = child.ZOrder;
+            if (order > Bands.Count)
+            {
+                order = Bands.Count;
+            }
+
+            var oldOrder = child.ZOrder;
             if (oldOrder != -1 && order != -1 && oldOrder != order)
             {
                 if (oldOrder <= order)
+                {
                     order--;
-                bands.Remove(child as BandBase);
-                bands.Insert(order, child as BandBase);
+                }
+
+                Bands.Remove (child as BandBase);
+                Bands.Insert (order, child as BandBase);
             }
         }
 
         /// <inheritdoc/>
-        public virtual void UpdateLayout(float dx, float dy)
+        public virtual void UpdateLayout (float dx, float dy)
         {
             // do nothing
         }
+
         #endregion
 
         #region Public Methods
-        /// <inheritdoc/>
-        public override void Assign(Base source)
-        {
-            base.Assign(source);
 
-            ReportPage src = source as ReportPage;
+        /// <inheritdoc/>
+        public override void Assign (Base source)
+        {
+            base.Assign (source);
+
+            var src = source as ReportPage;
             ExportAlias = src.ExportAlias;
             Landscape = src.Landscape;
             PaperWidth = src.PaperWidth;
@@ -856,12 +832,12 @@ namespace AM.Reporting
             RightMargin = src.RightMargin;
             BottomMargin = src.BottomMargin;
             MirrorMargins = src.MirrorMargins;
-            AssignPreview(src);
-            Columns.Assign(src.Columns);
-            Guides.Assign(src.Guides);
+            AssignPreview (src);
+            Columns.Assign (src.Columns);
+            Guides.Assign (src.Guides);
             Border = src.Border.Clone();
             Fill = src.Fill.Clone();
-            Watermark.Assign(src.Watermark);
+            Watermark.Assign (src.Watermark);
             TitleBeforeHeader = src.TitleBeforeHeader;
             OutlineExpression = src.OutlineExpression;
             PrintOnPreviousPage = src.PrintOnPreviousPage;
@@ -880,83 +856,162 @@ namespace AM.Reporting
         }
 
         /// <inheritdoc/>
-        public override void Serialize(FRWriter writer)
+        public override void Serialize (FRWriter writer)
         {
-            ReportPage c = writer.DiffObject as ReportPage;
-            base.Serialize(writer);
+            var c = writer.DiffObject as ReportPage;
+            base.Serialize (writer);
             if (ExportAlias != c.ExportAlias)
-                writer.WriteStr("ExportAlias", ExportAlias);
+            {
+                writer.WriteStr ("ExportAlias", ExportAlias);
+            }
+
             if (Landscape != c.Landscape)
-                writer.WriteBool("Landscape", Landscape);
-            if (FloatDiff(PaperWidth, c.PaperWidth) || Landscape != c.Landscape)
-                writer.WriteFloat("PaperWidth", PaperWidth);
-            if (FloatDiff(PaperHeight, c.PaperHeight) || Landscape != c.Landscape)
-                writer.WriteFloat("PaperHeight", PaperHeight);
+            {
+                writer.WriteBool ("Landscape", Landscape);
+            }
+
+            if (FloatDiff (PaperWidth, c.PaperWidth) || Landscape != c.Landscape)
+            {
+                writer.WriteFloat ("PaperWidth", PaperWidth);
+            }
+
+            if (FloatDiff (PaperHeight, c.PaperHeight) || Landscape != c.Landscape)
+            {
+                writer.WriteFloat ("PaperHeight", PaperHeight);
+            }
+
             if (RawPaperSize != c.RawPaperSize)
-                writer.WriteInt("RawPaperSize", RawPaperSize);
-            if (FloatDiff(LeftMargin, c.LeftMargin))
-                writer.WriteFloat("LeftMargin", LeftMargin);
-            if (FloatDiff(TopMargin, c.TopMargin))
-                writer.WriteFloat("TopMargin", TopMargin);
-            if (FloatDiff(RightMargin, c.RightMargin))
-                writer.WriteFloat("RightMargin", RightMargin);
-            if (FloatDiff(BottomMargin, c.BottomMargin))
-                writer.WriteFloat("BottomMargin", BottomMargin);
+            {
+                writer.WriteInt ("RawPaperSize", RawPaperSize);
+            }
+
+            if (FloatDiff (LeftMargin, c.LeftMargin))
+            {
+                writer.WriteFloat ("LeftMargin", LeftMargin);
+            }
+
+            if (FloatDiff (TopMargin, c.TopMargin))
+            {
+                writer.WriteFloat ("TopMargin", TopMargin);
+            }
+
+            if (FloatDiff (RightMargin, c.RightMargin))
+            {
+                writer.WriteFloat ("RightMargin", RightMargin);
+            }
+
+            if (FloatDiff (BottomMargin, c.BottomMargin))
+            {
+                writer.WriteFloat ("BottomMargin", BottomMargin);
+            }
+
             if (MirrorMargins != c.MirrorMargins)
-                writer.WriteBool("MirrorMargins", MirrorMargins);
-            WritePreview(writer, c);
-            Columns.Serialize(writer, c.Columns);
+            {
+                writer.WriteBool ("MirrorMargins", MirrorMargins);
+            }
+
+            WritePreview (writer, c);
+            Columns.Serialize (writer, c.Columns);
             if (Guides.Count > 0)
-                writer.WriteValue("Guides", Guides);
-            Border.Serialize(writer, "Border", c.Border);
-            Fill.Serialize(writer, "Fill", c.Fill);
-            Watermark.Serialize(writer, "Watermark", c.Watermark);
+            {
+                writer.WriteValue ("Guides", Guides);
+            }
+
+            Border.Serialize (writer, "Border", c.Border);
+            Fill.Serialize (writer, "Fill", c.Fill);
+            Watermark.Serialize (writer, "Watermark", c.Watermark);
             if (TitleBeforeHeader != c.TitleBeforeHeader)
-                writer.WriteBool("TitleBeforeHeader", TitleBeforeHeader);
+            {
+                writer.WriteBool ("TitleBeforeHeader", TitleBeforeHeader);
+            }
+
             if (OutlineExpression != c.OutlineExpression)
-                writer.WriteStr("OutlineExpression", OutlineExpression);
+            {
+                writer.WriteStr ("OutlineExpression", OutlineExpression);
+            }
+
             if (PrintOnPreviousPage != c.PrintOnPreviousPage)
-                writer.WriteBool("PrintOnPreviousPage", PrintOnPreviousPage);
+            {
+                writer.WriteBool ("PrintOnPreviousPage", PrintOnPreviousPage);
+            }
+
             if (ResetPageNumber != c.ResetPageNumber)
-                writer.WriteBool("ResetPageNumber", ResetPageNumber);
+            {
+                writer.WriteBool ("ResetPageNumber", ResetPageNumber);
+            }
+
             if (ExtraDesignWidth != c.ExtraDesignWidth)
-                writer.WriteBool("ExtraDesignWidth", ExtraDesignWidth);
+            {
+                writer.WriteBool ("ExtraDesignWidth", ExtraDesignWidth);
+            }
+
             if (StartOnOddPage != c.StartOnOddPage)
-                writer.WriteBool("StartOnOddPage", StartOnOddPage);
+            {
+                writer.WriteBool ("StartOnOddPage", StartOnOddPage);
+            }
+
             if (BackPage != c.BackPage)
-                writer.WriteBool("BackPage", BackPage);
+            {
+                writer.WriteBool ("BackPage", BackPage);
+            }
+
             if (StartPageEvent != c.StartPageEvent)
-                writer.WriteStr("StartPageEvent", StartPageEvent);
+            {
+                writer.WriteStr ("StartPageEvent", StartPageEvent);
+            }
+
             if (FinishPageEvent != c.FinishPageEvent)
-                writer.WriteStr("FinishPageEvent", FinishPageEvent);
+            {
+                writer.WriteStr ("FinishPageEvent", FinishPageEvent);
+            }
+
             if (ManualBuildEvent != c.ManualBuildEvent)
-                writer.WriteStr("ManualBuildEvent", ManualBuildEvent);
+            {
+                writer.WriteStr ("ManualBuildEvent", ManualBuildEvent);
+            }
+
             if (UnlimitedHeight != c.UnlimitedHeight)
-                writer.WriteBool("UnlimitedHeight", UnlimitedHeight);
+            {
+                writer.WriteBool ("UnlimitedHeight", UnlimitedHeight);
+            }
+
             if (PrintOnRollPaper != c.PrintOnRollPaper)
-                writer.WriteBool("PrintOnRollPaper", PrintOnRollPaper);
+            {
+                writer.WriteBool ("PrintOnRollPaper", PrintOnRollPaper);
+            }
+
             if (UnlimitedWidth != c.UnlimitedWidth)
-                writer.WriteBool("UnlimitedWidth", UnlimitedWidth);
-            if (FloatDiff(UnlimitedHeightValue, c.UnlimitedHeightValue))
-                writer.WriteFloat("UnlimitedHeightValue", UnlimitedHeightValue);
-            if (FloatDiff(UnlimitedWidthValue, c.UnlimitedWidthValue))
-                writer.WriteFloat("UnlimitedWidthValue", UnlimitedWidthValue);
+            {
+                writer.WriteBool ("UnlimitedWidth", UnlimitedWidth);
+            }
+
+            if (FloatDiff (UnlimitedHeightValue, c.UnlimitedHeightValue))
+            {
+                writer.WriteFloat ("UnlimitedHeightValue", UnlimitedHeightValue);
+            }
+
+            if (FloatDiff (UnlimitedWidthValue, c.UnlimitedWidthValue))
+            {
+                writer.WriteFloat ("UnlimitedWidthValue", UnlimitedWidthValue);
+            }
         }
 
         /// <inheritdoc/>
-        public override void Draw(FRPaintEventArgs e)
+        public override void Draw (FRPaintEventArgs e)
         {
             if (IsDesigning)
+            {
                 return;
+            }
 
-            IGraphics g = e.Graphics;
-            RectangleF pageRect = new RectangleF(0, 0,
-              WidthInPixels - 1 / e.ScaleX, HeightInPixels - 1 / e.ScaleY);
-            RectangleF printableRect = new RectangleF(
-              LeftMargin * Units.Millimeters,
-              TopMargin * Units.Millimeters,
-              (PaperWidth - LeftMargin - RightMargin) * Units.Millimeters,
-              (PaperHeight - TopMargin - BottomMargin) * Units.Millimeters);
+            var g = e.Graphics;
+            var pageRect = new RectangleF (0, 0,
+                WidthInPixels - 1 / e.ScaleX, HeightInPixels - 1 / e.ScaleY);
+            var printableRect = new RectangleF (
+                LeftMargin * Units.Millimeters,
+                TopMargin * Units.Millimeters,
+                (PaperWidth - LeftMargin - RightMargin) * Units.Millimeters,
+                (PaperHeight - TopMargin - BottomMargin) * Units.Millimeters);
 
             // Fix System.OverflowException when drawing unlimited page without preparing.
             if ((UnlimitedHeight || UnlimitedWidth) && !(IsRunning || IsPrinting))
@@ -964,79 +1019,99 @@ namespace AM.Reporting
                 pageRect = printableRect;
             }
 
-            DrawBackground(e, pageRect);
-            Border.Draw(e, printableRect);
+            DrawBackground (e, pageRect);
+            Border.Draw (e, printableRect);
             if (Watermark.Enabled)
             {
                 if (!Watermark.ShowImageOnTop)
-                    Watermark.DrawImage(e, pageRect, Report, IsPrinting);
+                {
+                    Watermark.DrawImage (e, pageRect, Report, IsPrinting);
+                }
+
                 if (!Watermark.ShowTextOnTop)
-                    Watermark.DrawText(e, pageRect, Report, IsPrinting);
+                {
+                    Watermark.DrawText (e, pageRect, Report, IsPrinting);
+                }
             }
 
-            float leftMargin = (int)Math.Round(LeftMargin * Units.Millimeters * e.ScaleX);
-            float topMargin = (int)Math.Round(TopMargin * Units.Millimeters * e.ScaleY);
-            g.TranslateTransform(leftMargin, topMargin);
+            float leftMargin = (int)Math.Round (LeftMargin * Units.Millimeters * e.ScaleX);
+            float topMargin = (int)Math.Round (TopMargin * Units.Millimeters * e.ScaleY);
+            g.TranslateTransform (leftMargin, topMargin);
 
             try
             {
                 foreach (Base c in AllObjects)
                 {
-                    if (c is ReportComponentBase && c.HasFlag(Flags.CanDraw))
+                    if (c is ReportComponentBase @base && @base.HasFlag (Flags.CanDraw))
                     {
-                        ReportComponentBase obj = c as ReportComponentBase;
                         if (!IsPrinting)
                         {
 #if !MONO
-                            if (!obj.IsVisible(e))
+                            if (!@base.IsVisible (e))
+                            {
                                 continue;
+                            }
 #endif
                         }
                         else
                         {
-                            if (!obj.Printable)
+                            if (!@base.Printable)
+                            {
                                 continue;
-                            else if (obj.Parent is BandBase && !(obj.Parent as BandBase).Printable)
+                            }
+                            else if (@base.Parent is BandBase bandBase && !bandBase.Printable)
+                            {
                                 continue;
+                            }
                         }
-                        obj.SetDesigning(false);
-                        obj.SetPrinting(IsPrinting);
-                        obj.Draw(e);
-                        obj.SetPrinting(false);
+
+                        @base.SetDesigning (false);
+                        @base.SetPrinting (IsPrinting);
+                        @base.Draw (e);
+                        @base.SetPrinting (false);
                     }
                 }
             }
             finally
             {
-                g.TranslateTransform(-leftMargin, -topMargin);
+                g.TranslateTransform (-leftMargin, -topMargin);
             }
 
             if (Watermark.Enabled)
             {
                 if (Watermark.ShowImageOnTop)
-                    Watermark.DrawImage(e, pageRect, Report, IsPrinting);
+                {
+                    Watermark.DrawImage (e, pageRect, Report, IsPrinting);
+                }
+
                 if (Watermark.ShowTextOnTop)
-                    Watermark.DrawText(e, pageRect, Report, IsPrinting);
+                {
+                    Watermark.DrawText (e, pageRect, Report, IsPrinting);
+                }
             }
         }
 
         internal void InitializeComponents()
         {
-            ObjectCollection allObjects = AllObjects;
+            var allObjects = AllObjects;
             foreach (Base obj in allObjects)
             {
-                if (obj is ReportComponentBase)
-                    (obj as ReportComponentBase).InitializeComponent();
+                if (obj is ReportComponentBase @base)
+                {
+                    @base.InitializeComponent();
+                }
             }
         }
 
         internal void FinalizeComponents()
         {
-            ObjectCollection allObjects = AllObjects;
+            var allObjects = AllObjects;
             foreach (Base obj in allObjects)
             {
-                if (obj is ReportComponentBase)
-                    (obj as ReportComponentBase).FinalizeComponent();
+                if (obj is ReportComponentBase @base)
+                {
+                    @base.FinalizeComponent();
+                }
             }
         }
 
@@ -1045,8 +1120,10 @@ namespace AM.Reporting
         {
             List<string> expressions = new List<string>();
 
-            if (!String.IsNullOrEmpty(OutlineExpression))
-                expressions.Add(OutlineExpression);
+            if (!string.IsNullOrEmpty (OutlineExpression))
+            {
+                expressions.Add (OutlineExpression);
+            }
 
             return expressions.ToArray();
         }
@@ -1054,37 +1131,46 @@ namespace AM.Reporting
         /// <inheritdoc/>
         public override void ExtractMacros()
         {
-            Watermark.Text = ExtractDefaultMacros(Watermark.Text);
+            Watermark.Text = ExtractDefaultMacros (Watermark.Text);
         }
 
         /// <summary>
         /// This method fires the <b>StartPage</b> event and the script code connected to the <b>StartPageEvent</b>.
         /// </summary>
-        public void OnStartPage(EventArgs e)
+        public void OnStartPage (EventArgs e)
         {
             if (StartPage != null)
-                StartPage(this, e);
-            InvokeEvent(StartPageEvent, e);
+            {
+                StartPage (this, e);
+            }
+
+            InvokeEvent (StartPageEvent, e);
         }
 
         /// <summary>
         /// This method fires the <b>FinishPage</b> event and the script code connected to the <b>FinishPageEvent</b>.
         /// </summary>
-        public void OnFinishPage(EventArgs e)
+        public void OnFinishPage (EventArgs e)
         {
             if (FinishPage != null)
-                FinishPage(this, e);
-            InvokeEvent(FinishPageEvent, e);
+            {
+                FinishPage (this, e);
+            }
+
+            InvokeEvent (FinishPageEvent, e);
         }
 
         /// <summary>
         /// This method fires the <b>ManualBuild</b> event and the script code connected to the <b>ManualBuildEvent</b>.
         /// </summary>
-        public void OnManualBuild(EventArgs e)
+        public void OnManualBuild (EventArgs e)
         {
             if (ManualBuild != null)
-                ManualBuild(this, e);
-            InvokeEvent(ManualBuildEvent, e);
+            {
+                ManualBuild (this, e);
+            }
+
+            InvokeEvent (ManualBuildEvent, e);
         }
 
         /// <summary>
@@ -1092,21 +1178,25 @@ namespace AM.Reporting
         /// </summary>
         public void UpdateBandsWidth()
         {
-            float pageWidth = (PaperWidth - LeftMargin - RightMargin) * Units.Millimeters;
-            float columnWidth = Columns.Width * Units.Millimeters;
+            var pageWidth = (PaperWidth - LeftMargin - RightMargin) * Units.Millimeters;
+            var columnWidth = Columns.Width * Units.Millimeters;
 
             foreach (Base c in AllObjects)
             {
-                BandBase b = c as BandBase;
-                if (b != null)
+                if (c is BandBase b)
                 {
                     if (Columns.Count > 1 && b.IsColumnDependentBand)
+                    {
                         b.Width = columnWidth;
+                    }
                     else
+                    {
                         b.Width = pageWidth;
+                    }
                 }
             }
         }
+
         #endregion
 
         /// <summary>
@@ -1114,29 +1204,29 @@ namespace AM.Reporting
         /// </summary>
         public ReportPage()
         {
-            paperWidth = 210;
-            paperHeight = 297;
-            leftMargin = 10;
-            topMargin = 10;
-            rightMargin = 10;
-            bottomMargin = 10;
+            PaperWidth = 210;
+            PaperHeight = 297;
+            LeftMargin = 10;
+            TopMargin = 10;
+            RightMargin = 10;
+            BottomMargin = 10;
             InitPreview();
-            bands = new BandCollection(this);
-            guides = new FloatCollection();
-            columns = new PageColumns(this);
-            border = new Border();
-            fill = new SolidFill(Color.White);
+            Bands = new BandCollection (this);
+            Guides = new FloatCollection();
+            Columns = new PageColumns (this);
+            Border = new Border();
+            fill = new SolidFill (Color.White);
             watermark = new Watermark();
-            titleBeforeHeader = true;
-            startPageEvent = "";
-            finishPageEvent = "";
-            manualBuildEvent = "";
+            TitleBeforeHeader = true;
+            StartPageEvent = "";
+            FinishPageEvent = "";
+            ManualBuildEvent = "";
             BaseName = "Page";
             unlimitedHeight = false;
             printOnRollPaper = false;
-            unlimitedWidth = false;
+            UnlimitedWidth = false;
             unlimitedHeightValue = MAX_PAPER_SIZE_MM * Units.Millimeters;
-            unlimitedWidthValue = MAX_PAPER_SIZE_MM * Units.Millimeters;
+            UnlimitedWidthValue = MAX_PAPER_SIZE_MM * Units.Millimeters;
         }
     }
 }

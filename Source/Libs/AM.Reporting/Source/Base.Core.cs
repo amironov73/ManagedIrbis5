@@ -30,7 +30,7 @@ namespace AM.Reporting
         /// </summary>
         /// <param name="macroValues"></param>
         /// <param name="text"></param>
-        private string ExtractDefaultMacrosInternal(Dictionary<string, object> macroValues, string text)
+        private string ExtractDefaultMacrosInternal (Dictionary<string, object> macroValues, string text)
         {
             return text;
         }

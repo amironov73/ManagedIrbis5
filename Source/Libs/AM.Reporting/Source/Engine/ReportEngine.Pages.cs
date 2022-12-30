@@ -16,6 +16,7 @@
 #region Using directives
 
 using AM.Reporting.Utils;
+
 using System;
 
 #endregion
@@ -36,70 +37,85 @@ namespace AM.Reporting.Engine
 
         #region Private Methods
 
-        private DataBand FindDeepmostDataBand(ReportPage page)
+        private DataBand FindDeepmostDataBand (ReportPage page)
         {
             DataBand result = null;
             foreach (Base c in page.AllObjects)
             {
-                if (c is DataBand)
-                    result = c as DataBand;
+                if (c is DataBand band)
+                {
+                    result = band;
+                }
             }
+
             return result;
         }
 
-        private void RunReportPage(ReportPage page)
+        private void RunReportPage (ReportPage page)
         {
             this.page = page;
             InitReprint();
             pageNameForRecalc = null;
-            this.page.OnStartPage(EventArgs.Empty);
-            bool previousPage = StartFirstPage();
-            OnStateChanged(this.page, EngineState.ReportPageStarted);
-            OnStateChanged(this.page, EngineState.PageStarted);
+            this.page.OnStartPage (EventArgs.Empty);
+            var previousPage = StartFirstPage();
+            OnStateChanged (this.page, EngineState.ReportPageStarted);
+            OnStateChanged (this.page, EngineState.PageStarted);
 
-            DataBand keepSummaryBand = FindDeepmostDataBand(page);
+            var keepSummaryBand = FindDeepmostDataBand (page);
             if (keepSummaryBand != null)
+            {
                 keepSummaryBand.KeepSummary = true;
+            }
 
             if (this.page.IsManualBuild)
-                this.page.OnManualBuild(EventArgs.Empty);
+            {
+                this.page.OnManualBuild (EventArgs.Empty);
+            }
             else
-                RunBands(page.Bands);
+            {
+                RunBands (page.Bands);
+            }
 
-            OnStateChanged(this.page, EngineState.PageFinished);
-            OnStateChanged(this.page, EngineState.ReportPageFinished);
+            OnStateChanged (this.page, EngineState.PageFinished);
+            OnStateChanged (this.page, EngineState.ReportPageFinished);
             EndLastPage();
+
             //recalculate unlimited
             if (page.UnlimitedHeight || page.UnlimitedWidth)
             {
-                PreparedPages.ModifyPageSize(page.Name);
+                PreparedPages.ModifyPageSize (page.Name);
                 if (previousPage && pageNameForRecalc != null)
-                    PreparedPages.ModifyPageSize(pageNameForRecalc);
+                {
+                    PreparedPages.ModifyPageSize (pageNameForRecalc);
+                }
             }
+
             //recalculate unlimited
-            this.page.OnFinishPage(EventArgs.Empty);
+            this.page.OnFinishPage (EventArgs.Empty);
 
             if (this.page.BackPage)
             {
-                PreparedPages.InterleaveWithBackPage(PreparedPages.CurPage);
+                PreparedPages.InterleaveWithBackPage (PreparedPages.CurPage);
             }
         }
 
-        private bool CalcVisibleExpression(string expression)
+        private bool CalcVisibleExpression (string expression)
         {
-            bool result = true;
+            var result = true;
 
             object expressionObj = null;
+
             // Calculate expressions with TotalPages only on FinalPass.
-            if (!expression.Contains("TotalPages") || (Report.DoublePass && FinalPass))
+            if (!expression.Contains ("TotalPages") || (Report.DoublePass && FinalPass))
             {
-                expressionObj = Report.Calc(Code.CodeUtils.FixExpressionWithBrackets(expression));
+                expressionObj = Report.Calc (Code.CodeUtils.FixExpressionWithBrackets (expression));
             }
-            if (expressionObj != null && expressionObj is bool)
+
+            if (expressionObj != null && expressionObj is bool obj)
             {
-                if (!expression.Contains("TotalPages"))
+                if (!expression.Contains ("TotalPages"))
                 {
-                    result = (bool)expressionObj;
+                    result = obj;
                 }
                 else if (FirstPass)
                 {
@@ -107,7 +123,7 @@ namespace AM.Reporting.Engine
                 }
                 else
                 {
-                    result = (bool)expressionObj;
+                    result = obj;
                 }
             }
 
@@ -121,43 +137,55 @@ namespace AM.Reporting.Engine
         throw new Exception("The trial version is now expired!");
 #endif
 
-            for (int i = 0; i < Report.Pages.Count; i++)
+            for (var i = 0; i < Report.Pages.Count; i++)
             {
-                ReportPage page = Report.Pages[i] as ReportPage;
+                var page = Report.Pages[i] as ReportPage;
 
                 // Calc and apply visible expression if needed.
-                if (page != null && !String.IsNullOrEmpty(page.VisibleExpression))
+                if (page != null && !string.IsNullOrEmpty (page.VisibleExpression))
                 {
-                    page.Visible = CalcVisibleExpression(page.VisibleExpression);
+                    page.Visible = CalcVisibleExpression (page.VisibleExpression);
                 }
 
                 if (page != null && page.Visible && page.Subreport == null)
-                    RunReportPage(page);
+                {
+                    RunReportPage (page);
+                }
+
                 if (Report.Aborted)
+                {
                     break;
+                }
             }
         }
 
-        private void RunBands(BandCollection bands)
+        private void RunBands (BandCollection bands)
         {
-            for (int i = 0; i < bands.Count; i++)
+            for (var i = 0; i < bands.Count; i++)
             {
-                BandBase band = bands[i];
-                if (band is DataBand)
-                    RunDataBand(band as DataBand);
-                else if (band is GroupHeaderBand)
-                    RunGroup(band as GroupHeaderBand);
+                var band = bands[i];
+                if (band is DataBand dataBand)
+                {
+                    RunDataBand (dataBand);
+                }
+                else if (band is GroupHeaderBand headerBand)
+                {
+                    RunGroup (headerBand);
+                }
+
                 if (Report.Aborted)
+                {
                     break;
+                }
             }
         }
 
         private void ShowPageHeader()
         {
-            ShowBand(page.PageHeader);
+            ShowBand (page.PageHeader);
         }
 
-        private void ShowPageFooter(bool startPage)
+        private void ShowPageFooter (bool startPage)
         {
             if (!FirstPass &&
                 CurPage == TotalPages - 1 &&
@@ -169,7 +197,9 @@ namespace AM.Reporting.Engine
                 ShiftLastPage();
             }
             else
-                ShowBand(page.PageFooter);
+            {
+                ShowBand (page.PageFooter);
+            }
         }
 
         private bool StartFirstPage()
@@ -178,31 +208,36 @@ namespace AM.Reporting.Engine
 
             CurX = 0;
             CurY = 0;
-            curColumn = 0;
+            CurColumn = 0;
 
             if (page.ResetPageNumber)
+            {
                 ResetLogicalPageNumber();
+            }
 
-            bool previousPage = page.PrintOnPreviousPage && PreparedPages.Count > 0;
+            var previousPage = page.PrintOnPreviousPage && PreparedPages.Count > 0;
+
             // check that previous page has the same size
             if (previousPage)
             {
-                using (ReportPage page0 = PreparedPages.GetPage(PreparedPages.Count - 1))
+                using (var page0 = PreparedPages.GetPage (PreparedPages.Count - 1))
                 {
-                    if (page0.PaperWidth == this.page.PaperWidth)
+                    if (page0.PaperWidth == page.PaperWidth)
                     {
-                        if (page0.UnlimitedWidth == this.page.UnlimitedWidth)
+                        if (page0.UnlimitedWidth == page.UnlimitedWidth)
                         {
                             previousPage = true;
-                            if (this.page.UnlimitedWidth)
+                            if (page.UnlimitedWidth)
+                            {
                                 pageNameForRecalc = page0.Name;
+                            }
                         }
                         else
                         {
                             previousPage = false;
                         }
                     }
-                    else if (page0.UnlimitedWidth && this.page.UnlimitedWidth)
+                    else if (page0.UnlimitedWidth && page.UnlimitedWidth)
                     {
                         previousPage = true;
                         pageNameForRecalc = page0.Name;
@@ -211,22 +246,25 @@ namespace AM.Reporting.Engine
                     {
                         previousPage = false;
                     }
+
                     if (previousPage)
                     {
-                        if (page0.PaperHeight == this.page.PaperHeight)
+                        if (page0.PaperHeight == page.PaperHeight)
                         {
-                            if (page0.UnlimitedHeight == this.page.UnlimitedHeight)
+                            if (page0.UnlimitedHeight == page.UnlimitedHeight)
                             {
                                 previousPage = true;
-                                if (this.page.UnlimitedHeight)
+                                if (page.UnlimitedHeight)
+                                {
                                     pageNameForRecalc = page0.Name;
+                                }
                             }
                             else
                             {
                                 previousPage = false;
                             }
                         }
-                        else if (page0.UnlimitedHeight && this.page.UnlimitedHeight)
+                        else if (page0.UnlimitedHeight && page.UnlimitedHeight)
                         {
                             previousPage = true;
                         }
@@ -240,19 +278,29 @@ namespace AM.Reporting.Engine
 
             // update CurY or add new page
             if (previousPage)
+            {
                 CurY = PreparedPages.GetLastY();
+            }
             else
             {
-                PreparedPages.AddPage(page);
+                PreparedPages.AddPage (page);
                 if (page.StartOnOddPage && (CurPage % 2) == 1)
-                    PreparedPages.AddPage(page);
+                {
+                    PreparedPages.AddPage (page);
+                }
             }
 
             // page numbers
             if (isFirstReportPage)
+            {
                 firstReportPage = CurPage;
+            }
+
             if (isFirstReportPage && previousPage)
+            {
                 IncLogicalPageNumber();
+            }
+
             isFirstReportPage = false;
 
             OutlineRoot();
@@ -260,26 +308,31 @@ namespace AM.Reporting.Engine
 
             // show report title and page header
             if (previousPage)
-                ShowBand(page.ReportTitle);
+            {
+                ShowBand (page.ReportTitle);
+            }
             else
             {
                 if (page.Overlay != null)
-                    ShowBand(page.Overlay);
+                {
+                    ShowBand (page.Overlay);
+                }
+
                 if (page.TitleBeforeHeader)
                 {
-                    ShowBand(page.ReportTitle);
+                    ShowBand (page.ReportTitle);
                     ShowPageHeader();
                 }
                 else
                 {
                     ShowPageHeader();
-                    ShowBand(page.ReportTitle);
+                    ShowBand (page.ReportTitle);
                 }
             }
 
             // show column header
             columnStartY = CurY;
-            ShowBand(page.ColumnHeader);
+            ShowBand (page.ColumnHeader);
 
             // calculate CurX before starting column event depending on Right to Left or Left to Right layout
             if (Config.RightToLeft)
@@ -292,7 +345,7 @@ namespace AM.Reporting.Engine
             }
 
             // start column event
-            OnStateChanged(page, EngineState.ColumnStarted);
+            OnStateChanged (page, EngineState.ColumnStarted);
             ShowProgress();
             return previousPage;
         }
@@ -300,55 +353,61 @@ namespace AM.Reporting.Engine
         private void EndLastPage()
         {
             // end column event
-            OnStateChanged(page, EngineState.ColumnFinished);
+            OnStateChanged (page, EngineState.ColumnFinished);
 
             if (page.ReportSummary != null)
             {
                 // do not show column footer here! It's a special case and is handled in the ShowBand.
-                ShowBand(page.ReportSummary);
+                ShowBand (page.ReportSummary);
             }
             else
             {
-                ShowBand(page.ColumnFooter);
+                ShowBand (page.ColumnFooter);
             }
 
-            ShowPageFooter(false);
+            ShowPageFooter (false);
             OutlineRoot();
             page.FinalizeComponents();
         }
 
         internal void EndColumn()
         {
-            EndColumn(true);
+            EndColumn (true);
         }
 
-        private void EndColumn(bool showColumnFooter)
+        private void EndColumn (bool showColumnFooter)
         {
             // end column event
-            OnStateChanged(page, EngineState.ColumnFinished);
+            OnStateChanged (page, EngineState.ColumnFinished);
 
             // check keep
-            if (keeping)
+            if (IsKeeping)
+            {
                 CutObjects();
+            }
 
             ShowReprintFooters();
 
             if (showColumnFooter)
-                ShowBand(page.ColumnFooter);
+            {
+                ShowBand (page.ColumnFooter);
+            }
 
-            curColumn++;
+            CurColumn++;
 
-            if (curColumn >= page.Columns.Count)
-                curColumn = 0;
+            if (CurColumn >= page.Columns.Count)
+            {
+                CurColumn = 0;
+            }
 
             // apply Right to Left layot if needed
             if (Config.RightToLeft)
             {
-                curX = page.Columns.Positions[page.Columns.Count - curColumn - 1] * Units.Millimeters;
+                curX = page.Columns.Positions[page.Columns.Count - CurColumn - 1] * Units.Millimeters;
             }
             else
             {
-                curX = curColumn == 0 ? 0 : page.Columns.Positions[curColumn] * Units.Millimeters;
+                curX = CurColumn == 0 ? 0 : page.Columns.Positions[CurColumn] * Units.Millimeters;
             }
 
             if (CurColumn == 0)
@@ -361,24 +420,26 @@ namespace AM.Reporting.Engine
             }
 
             // end keep
-            if (keeping)
+            if (IsKeeping)
+            {
                 PasteObjects();
+            }
         }
 
         private void StartColumn()
         {
             curY = columnStartY;
 
-            ShowBand(page.ColumnHeader);
+            ShowBand (page.ColumnHeader);
             ShowReprintHeaders();
 
             // start column event
-            OnStateChanged(page, EngineState.ColumnStarted);
+            OnStateChanged (page, EngineState.ColumnStarted);
         }
 
         private void EndPage()
         {
-            EndPage(true);
+            EndPage (true);
         }
 
         private void StartPage()
@@ -394,15 +455,18 @@ namespace AM.Reporting.Engine
             }
 
             CurY = 0;
-            curColumn = 0;
+            CurColumn = 0;
 
-            PreparedPages.AddPage(page);
+            PreparedPages.AddPage (page);
             AddPageOutline();
 
             if (page.Overlay != null)
-                ShowBand(page.Overlay);
+            {
+                ShowBand (page.Overlay);
+            }
+
             ShowPageHeader();
-            OnStateChanged(page, EngineState.PageStarted);
+            OnStateChanged (page, EngineState.PageStarted);
 
             columnStartY = CurY;
 
@@ -410,22 +474,29 @@ namespace AM.Reporting.Engine
             ShowProgress();
         }
 
-
         #endregion Private Methods
 
         #region Internal Methods
 
-        internal void EndPage(bool startPage)
+        internal void EndPage (bool startPage)
         {
-            OnStateChanged(page, EngineState.PageFinished);
-            ShowPageFooter(startPage);
+            OnStateChanged (page, EngineState.PageFinished);
+            ShowPageFooter (startPage);
 
             if (pagesLimit > 0 && PreparedPages.Count >= pagesLimit)
+            {
                 Report.Abort();
+            }
+
             if (Report.MaxPages > 0 && PreparedPages.Count >= Report.MaxPages)
+            {
                 Report.Abort();
+            }
+
             if (startPage)
+            {
                 StartPage();
+            }
         }
 
         #endregion Internal Methods

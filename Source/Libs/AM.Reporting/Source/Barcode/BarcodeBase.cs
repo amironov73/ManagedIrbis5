@@ -30,46 +30,43 @@ namespace AM.Reporting.Barcode
     /// <summary>
     /// The base class for all barcodes.
     /// </summary>
-    [TypeConverter(typeof(AM.Reporting.TypeConverters.BarcodeConverter))]
+    [TypeConverter (typeof (TypeConverters.BarcodeConverter))]
     public abstract class BarcodeBase
     {
         #region Fields
+
         internal string text;
         internal int angle;
         internal bool showText;
         internal float zoom;
-        private Color color;
+
         #endregion
 
         #region Properties
+
         /// <summary>
         /// Gets the name of barcode.
         /// </summary>
-        [Browsable(false)]
-        public string Name
-        {
-            get { return Barcodes.GetName(GetType()); }
-        }
+        [Browsable (false)]
+        public string Name => Barcodes.GetName (GetType());
 
         /// <summary>
         /// Gets or sets the color of barcode.
         /// </summary>
-        public Color Color
-        {
-            get { return color; }
-            set { color = value; }
-        }
+        public Color Color { get; set; }
+
         #endregion
 
         #region Public Methods
+
         /// <summary>
         /// Creates the exact copy of this barcode.
         /// </summary>
         /// <returns>The copy of this barcode.</returns>
         public BarcodeBase Clone()
         {
-            BarcodeBase result = Activator.CreateInstance(GetType()) as BarcodeBase;
-            result.Assign(this);
+            var result = Activator.CreateInstance (GetType()) as BarcodeBase;
+            result.Assign (this);
             return result;
         }
 
@@ -77,20 +74,25 @@ namespace AM.Reporting.Barcode
         /// Assigns properties from other, similar barcode.
         /// </summary>
         /// <param name="source">Barcode object to assign properties from.</param>
-        public virtual void Assign(BarcodeBase source)
+        public virtual void Assign (BarcodeBase source)
         {
             Color = source.Color;
         }
 
-        internal virtual void Serialize(FRWriter writer, string prefix, BarcodeBase diff)
+        internal virtual void Serialize (FRWriter writer, string prefix, BarcodeBase diff)
         {
             if (diff.GetType() != GetType())
-                writer.WriteStr("Barcode", Name);
+            {
+                writer.WriteStr ("Barcode", Name);
+            }
+
             if (diff.Color != Color)
-                writer.WriteValue(prefix + "Color", Color);
+            {
+                writer.WriteValue (prefix + "Color", Color);
+            }
         }
 
-        internal virtual void Initialize(string text, bool showText, int angle, float zoom)
+        internal virtual void Initialize (string text, bool showText, int angle, float zoom)
         {
             this.text = text;
             this.showText = showText;
@@ -103,14 +105,15 @@ namespace AM.Reporting.Barcode
             return SizeF.Empty;
         }
 
-        internal virtual string StripControlCodes(string data)
+        internal virtual string StripControlCodes (string data)
         {
             return data;
         }
 
-        public virtual void DrawBarcode(IGraphics g, RectangleF displayRect)
+        public virtual void DrawBarcode (IGraphics g, RectangleF displayRect)
         {
         }
+
         #endregion
 
         /// <summary>
@@ -119,7 +122,7 @@ namespace AM.Reporting.Barcode
         public BarcodeBase()
         {
             text = "";
-            color = Color.Black;
+            Color = Color.Black;
         }
 
         /// <summary>

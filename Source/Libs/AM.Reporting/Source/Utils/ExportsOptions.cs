@@ -30,7 +30,7 @@ namespace AM.Reporting.Utils
     /// </summary>
     public partial class ExportsOptions
     {
-        private static ExportsOptions instance = null;
+        private static ExportsOptions instance;
 
         private List<ExportsTreeNode> menuNodes;
 
@@ -53,13 +53,13 @@ namespace AM.Reporting.Utils
 
         private void RemoveCloudsAndMessengersDuplicatesInMenuNodes()
         {
-            int last = menuNodes.Count - 1;
-            for (int i = last; i >= 0; i--)
+            var last = menuNodes.Count - 1;
+            for (var i = last; i >= 0; i--)
             {
-                ExportsTreeNode node = menuNodes[i];
+                var node = menuNodes[i];
                 if (node.Name == "Cloud" || node.Name == "Messengers")
                 {
-                    menuNodes.Remove(node);
+                    menuNodes.Remove (node);
                 }
             }
         }
@@ -71,7 +71,9 @@ namespace AM.Reporting.Utils
         public static ExportsOptions GetInstance()
         {
             if (instance == null)
+            {
                 instance = new ExportsOptions();
+            }
 
             return instance;
         }
@@ -86,128 +88,100 @@ namespace AM.Reporting.Utils
             private const string EXPORT_ITEM_POSTFIX = ",File";
             private const string CATEGORY_PREFIX = "Export,ExportGroups,";
 
-            private readonly string name;
-            private readonly List<ExportsTreeNode> nodes = new List<ExportsTreeNode>();
-            private readonly Type exportType = null;
-            private readonly int imageIndex = -1;
-            private ObjectInfo tag = null;
-            private bool enabled = true;
-            private readonly bool isExport;
-
             /// <summary>
             /// Gets the name.
             /// </summary>
-            public string Name
-            {
-                get { return name; }
-            }
+            public string Name { get; }
 
             /// <summary>
             /// Gets nodes.
             /// </summary>
-            public List<ExportsTreeNode> Nodes
-            {
-                get { return nodes; }
-            }
+            public List<ExportsTreeNode> Nodes { get; } = new List<ExportsTreeNode>();
 
             /// <summary>
             /// Gets type of the export.
             /// </summary>
-            public Type ExportType
-            {
-                get { return exportType; }
-            }
+            public Type ExportType { get; }
 
             /// <summary>
             /// Gets index of the image.
             /// </summary>
-            public int ImageIndex
-            {
-                get { return imageIndex; }
-            }
+            public int ImageIndex { get; } = -1;
 
             /// <summary>
             /// Gets or sets the tag.
             /// </summary>
-            public ObjectInfo Tag
-            {
-                get { return tag; }
-                set { tag = value; }
-            }
+            public ObjectInfo Tag { get; set; }
 
             /// <summary>
             /// Gets or sets a value that indicates is node enabled.
             /// </summary>
-            public bool Enabled
-            {
-                get { return enabled; }
-                set { enabled = value; }
-            }
+            public bool Enabled { get; set; } = true;
 
             /// <summary>
             /// Gets true if node is export, otherwise false.
             /// </summary>
-            public bool IsExport
+            public bool IsExport { get; }
+
+            public ExportsTreeNode (string name, bool isExport)
             {
-                get { return isExport; }
+                this.Name = name;
+                this.IsExport = isExport;
             }
 
-            public ExportsTreeNode(string name, bool isExport)
+            public ExportsTreeNode (string name, Type exportType, bool isExport)
+                : this (name, isExport)
             {
-                this.name = name;
-                this.isExport = isExport;
+                this.ExportType = exportType;
             }
 
-            public ExportsTreeNode(string name, Type exportType, bool isExport)
-                : this(name, isExport)
+            public ExportsTreeNode (string name, Type exportType, bool isExport, ObjectInfo tag)
+                : this (name, exportType, isExport)
             {
-                this.exportType = exportType;
+                this.Tag = tag;
             }
 
-            public ExportsTreeNode(string name, Type exportType, bool isExport, ObjectInfo tag)
-                : this(name, exportType, isExport)
+            public ExportsTreeNode (string name, int imageIndex, bool isExport)
+                : this (name, isExport)
             {
-                this.tag = tag;
+                this.ImageIndex = imageIndex;
             }
 
-            public ExportsTreeNode(string name, int imageIndex, bool isExport)
-                : this(name, isExport)
+            public ExportsTreeNode (string name, Type exportType, int imageIndex, bool isExport)
+                : this (name, exportType, isExport)
             {
-                this.imageIndex = imageIndex;
+                this.ImageIndex = imageIndex;
             }
 
-            public ExportsTreeNode(string name, Type exportType, int imageIndex, bool isExport)
-                : this(name, exportType, isExport)
+            public ExportsTreeNode (string name, Type exportType, int imageIndex, bool isExport, ObjectInfo tag)
+                : this (name, exportType, imageIndex, isExport)
             {
-                this.imageIndex = imageIndex;
+                this.Tag = tag;
             }
 
-            public ExportsTreeNode(string name, Type exportType, int imageIndex, bool isExport, ObjectInfo tag)
-                : this(name, exportType, imageIndex, isExport)
+            public ExportsTreeNode (string name, Type exportType, int imageIndex, bool enabled, bool isExport)
+                : this (name, exportType, imageIndex, isExport)
             {
-                this.tag = tag;
-            }
-
-            public ExportsTreeNode(string name, Type exportType, int imageIndex, bool enabled, bool isExport)
-                : this(name, exportType, imageIndex, isExport)
-            {
-                this.enabled = enabled;
+                this.Enabled = enabled;
             }
 
             ///<inheritdoc/>
-            public override bool Equals(object obj)
+            public override bool Equals (object obj)
             {
-                if (obj is ExportsTreeNode)
+                if (obj is ExportsTreeNode treeNode)
                 {
-                    ExportsTreeNode Obj = obj as ExportsTreeNode;
-                    bool equalNodes = true;
+                    var equalNodes = true;
 
                     foreach (var node in Nodes)
-                        equalNodes &= node.ContainsIn(Obj.Nodes);
+                    {
+                        equalNodes &= node.ContainsIn (treeNode.Nodes);
+                    }
 
-                    return equalNodes && Obj.Name == Name && Obj.ImageIndex == ImageIndex && Obj.IsExport == isExport && Obj.ExportType == ExportType && Obj.Enabled == Enabled;
+                    return equalNodes && treeNode.Name == Name && treeNode.ImageIndex == ImageIndex && treeNode.IsExport == IsExport &&
+                           treeNode.ExportType == ExportType && treeNode.Enabled == Enabled;
                 }
-                return base.Equals(obj);
+
+                return base.Equals (obj);
             }
 
             /// <summary>
@@ -215,9 +189,9 @@ namespace AM.Reporting.Utils
             /// </summary>
             /// <param name="node"></param>
             /// <returns></returns>
-            public bool ContainsIn(ExportsTreeNode node)
+            public bool ContainsIn (ExportsTreeNode node)
             {
-                return this.Equals(node) || this.ContainsIn(node.Nodes);
+                return Equals (node) || ContainsIn (node.Nodes);
             }
 
             /// <summary>
@@ -225,11 +199,15 @@ namespace AM.Reporting.Utils
             /// </summary>
             /// <param name="nodes"></param>
             /// <returns></returns>
-            public bool ContainsIn(List<ExportsTreeNode> nodes)
+            public bool ContainsIn (List<ExportsTreeNode> nodes)
             {
-                foreach (ExportsTreeNode n in nodes)
-                    if (this.Equals(n) || this.ContainsIn(n))
+                foreach (var n in nodes)
+                {
+                    if (Equals (n) || ContainsIn (n))
+                    {
                         return true;
+                    }
+                }
 
                 return false;
             }
@@ -256,41 +234,42 @@ namespace AM.Reporting.Utils
         /// </summary>
         public void RegisterExports()
         {
-            Queue<ExportsTreeNode> queue = new Queue<ExportsTreeNode>(menuNodes);
+            Queue<ExportsTreeNode> queue = new Queue<ExportsTreeNode> (menuNodes);
 
             while (queue.Count != 0)
             {
-                ExportsTreeNode node = queue.Dequeue();
+                var node = queue.Dequeue();
                 ObjectInfo tag = null;
                 if (node.ExportType != null)
                 {
-                    tag = RegisteredObjects.AddExport(node.ExportType, node.ToString(), node.ImageIndex);
+                    tag = RegisteredObjects.AddExport (node.ExportType, node.ToString(), node.ImageIndex);
                 }
+
                 node.Tag = tag;
-                foreach (ExportsTreeNode nextNode in node.Nodes)
+                foreach (var nextNode in node.Nodes)
                 {
-                    queue.Enqueue(nextNode);
+                    queue.Enqueue (nextNode);
                 }
             }
         }
 
-        private ExportsTreeNode FindItem(string name, Type exportType)
+        private ExportsTreeNode FindItem (string name, Type exportType)
         {
-            Queue<ExportsTreeNode> queue = new Queue<ExportsTreeNode>(menuNodes);
+            Queue<ExportsTreeNode> queue = new Queue<ExportsTreeNode> (menuNodes);
 
             while (queue.Count != 0)
             {
-                ExportsTreeNode node = queue.Dequeue();
+                var node = queue.Dequeue();
 
                 if (exportType != null && node.ExportType == exportType ||
-                    !string.IsNullOrEmpty(name) && node.Name == name)
+                    !string.IsNullOrEmpty (name) && node.Name == name)
                 {
                     return node;
                 }
 
-                foreach (ExportsTreeNode nextNode in node.Nodes)
+                foreach (var nextNode in node.Nodes)
                 {
-                    queue.Enqueue(nextNode);
+                    queue.Enqueue (nextNode);
                 }
             }
 
@@ -302,9 +281,9 @@ namespace AM.Reporting.Utils
         /// </summary>
         /// <param name="name">Export category name.</param>
         /// <param name="enabled">Visibility state.</param>
-        public void SetExportCategoryEnabled(string name, bool enabled)
+        public void SetExportCategoryEnabled (string name, bool enabled)
         {
-            FindItem(name, null).Enabled = enabled;
+            FindItem (name, null).Enabled = enabled;
         }
 
         /// <summary>
@@ -312,9 +291,9 @@ namespace AM.Reporting.Utils
         /// </summary>
         /// <param name="exportType">Export type.</param>
         /// <param name="enabled">Visibility state.</param>
-        public void SetExportEnabled(Type exportType, bool enabled)
+        public void SetExportEnabled (Type exportType, bool enabled)
         {
-            ExportsTreeNode node = FindItem(null, exportType);
+            var node = FindItem (null, exportType);
             if (node != null)
             {
                 node.Enabled = enabled;

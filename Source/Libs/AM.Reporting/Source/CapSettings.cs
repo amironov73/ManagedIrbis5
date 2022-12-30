@@ -62,69 +62,53 @@ namespace AM.Reporting
     /// <summary>
     /// Specifies a start and end line caps.
     /// </summary>
-    [TypeConverter(typeof(AM.Reporting.TypeConverters.FRExpandableObjectConverter))]
+    [TypeConverter (typeof (TypeConverters.FRExpandableObjectConverter))]
     public class CapSettings
     {
-        private float width;
-        private float height;
-        private CapStyle style;
-
         /// <summary>
         /// Gets or sets a width of the cap.
         /// </summary>
-        [DefaultValue(8f)]
-        public float Width
-        {
-            get { return width; }
-            set { width = value; }
-        }
+        [DefaultValue (8f)]
+        public float Width { get; set; }
 
         /// <summary>
         /// Gets or sets a height of the cap.
         /// </summary>
-        [DefaultValue(8f)]
-        public float Height
-        {
-            get { return height; }
-            set { height = value; }
-        }
+        [DefaultValue (8f)]
+        public float Height { get; set; }
 
         /// <summary>
         /// Gets or sets a cap style.
         /// </summary>
-        [DefaultValue(CapStyle.None)]
-        public CapStyle Style
-        {
-            get { return style; }
-            set { style = value; }
-        }
+        [DefaultValue (CapStyle.None)]
+        public CapStyle Style { get; set; }
 
-        internal void GetCustomCapPath(out GraphicsPath path, out float inset)
+        internal void GetCustomCapPath (out GraphicsPath path, out float inset)
         {
             path = new GraphicsPath();
             inset = 0;
             switch (Style)
             {
                 case CapStyle.Arrow:
-                    path.AddLine(new PointF(0, 0), new PointF(-Width, -Height));
-                    path.AddLine(new PointF(0, 0), new PointF(Width, -Height));
+                    path.AddLine (new PointF (0, 0), new PointF (-Width, -Height));
+                    path.AddLine (new PointF (0, 0), new PointF (Width, -Height));
                     break;
 
                 case CapStyle.Circle:
-                    path.AddEllipse(-Width / 2, -Height / 2, Width, Height);
+                    path.AddEllipse (-Width / 2, -Height / 2, Width, Height);
                     inset = Height / 2;
                     break;
 
                 case CapStyle.Square:
-                    path.AddRectangle(new RectangleF(-Width / 2, -Height / 2, Width, Height));
+                    path.AddRectangle (new RectangleF (-Width / 2, -Height / 2, Width, Height));
                     inset = Height / 2;
                     break;
 
                 case CapStyle.Diamond:
-                    path.AddLine(new PointF(0, -Height / 1.4f), new PointF(-Width / 1.4f, 0));
-                    path.AddLine(new PointF(-Width / 1.4f, 0), new PointF(0, Height / 1.4f));
-                    path.AddLine(new PointF(0, Height / 1.4f), new PointF(Width / 1.4f, 0));
-                    path.AddLine(new PointF(Width / 1.4f, 0), new PointF(0, -Height / 1.4f));
+                    path.AddLine (new PointF (0, -Height / 1.4f), new PointF (-Width / 1.4f, 0));
+                    path.AddLine (new PointF (-Width / 1.4f, 0), new PointF (0, Height / 1.4f));
+                    path.AddLine (new PointF (0, Height / 1.4f), new PointF (Width / 1.4f, 0));
+                    path.AddLine (new PointF (Width / 1.4f, 0), new PointF (0, -Height / 1.4f));
                     inset = Height / 1.4f;
                     break;
             }
@@ -134,7 +118,7 @@ namespace AM.Reporting
         /// Assigns values from another source.
         /// </summary>
         /// <param name="source">Source to assign from.</param>
-        public void Assign(CapSettings source)
+        public void Assign (CapSettings source)
         {
             Width = source.Width;
             Height = source.Height;
@@ -147,15 +131,15 @@ namespace AM.Reporting
         /// <returns>Copy of this object.</returns>
         public CapSettings Clone()
         {
-            CapSettings result = new CapSettings();
-            result.Assign(this);
+            var result = new CapSettings();
+            result.Assign (this);
             return result;
         }
 
         /// <inheritdoc/>
-        public override bool Equals(object obj)
+        public override bool Equals (object obj)
         {
-            CapSettings c = obj as CapSettings;
+            var c = obj as CapSettings;
             return c != null && Width == c.Width && Height == c.Height && Style == c.Style;
         }
 
@@ -174,14 +158,22 @@ namespace AM.Reporting
         /// <remarks>
         /// This method is for internal use only.
         /// </remarks>
-        public void Serialize(string prefix, FRWriter writer, CapSettings diff)
+        public void Serialize (string prefix, FRWriter writer, CapSettings diff)
         {
             if (Width != diff.Width)
-                writer.WriteFloat(prefix + ".Width", Width);
+            {
+                writer.WriteFloat (prefix + ".Width", Width);
+            }
+
             if (Height != diff.Height)
-                writer.WriteFloat(prefix + ".Height", Height);
+            {
+                writer.WriteFloat (prefix + ".Height", Height);
+            }
+
             if (Style != diff.Style)
-                writer.WriteValue(prefix + ".Style", Style);
+            {
+                writer.WriteValue (prefix + ".Style", Style);
+            }
         }
 
         /// <summary>
@@ -189,8 +181,8 @@ namespace AM.Reporting
         /// </summary>
         public CapSettings()
         {
-            width = 8;
-            height = 8;
+            Width = 8;
+            Height = 8;
         }
     }
 }

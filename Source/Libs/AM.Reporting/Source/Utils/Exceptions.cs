@@ -28,8 +28,8 @@ namespace AM.Reporting.Utils
     /// </summary>
     public class DuplicateNameException : Exception
     {
-        internal DuplicateNameException(string name)
-          : base(String.Format(Res.Get("Messages,DuplicateName"), name))
+        internal DuplicateNameException (string name)
+            : base (string.Format (Res.Get ("Messages,DuplicateName"), name))
         {
         }
     }
@@ -39,8 +39,8 @@ namespace AM.Reporting.Utils
     /// </summary>
     public class AncestorException : Exception
     {
-        internal AncestorException(string name)
-          : base(String.Format(Res.Get("Messages,RenameAncestor"), name))
+        internal AncestorException (string name)
+            : base (string.Format (Res.Get ("Messages,RenameAncestor"), name))
         {
         }
     }
@@ -54,13 +54,13 @@ namespace AM.Reporting.Utils
         {
         }
 
-        internal SwissQrCodeException(string message)
-            : base(message)
+        internal SwissQrCodeException (string message)
+            : base (message)
         {
         }
 
-        internal SwissQrCodeException(string message, Exception inner)
-            : base(message, inner)
+        internal SwissQrCodeException (string message, Exception inner)
+            : base (message, inner)
         {
         }
     }
@@ -71,7 +71,7 @@ namespace AM.Reporting.Utils
     public class FileFormatException : Exception
     {
         internal FileFormatException()
-          : base(Res.Get("Messages,WrongFileFormat"))
+            : base (Res.Get ("Messages,WrongFileFormat"))
         {
         }
     }
@@ -82,7 +82,7 @@ namespace AM.Reporting.Utils
     public class DecryptException : Exception
     {
         internal DecryptException()
-          : base(Res.Get("Messages,DecryptError"))
+            : base (Res.Get ("Messages,DecryptError"))
         {
         }
     }
@@ -92,8 +92,8 @@ namespace AM.Reporting.Utils
     /// </summary>
     public class CompilerException : Exception
     {
-        internal CompilerException(string message)
-          : base(message)
+        internal CompilerException (string message)
+            : base (message)
         {
         }
     }
@@ -104,8 +104,8 @@ namespace AM.Reporting.Utils
     /// </summary>
     public class ParentException : Exception
     {
-        internal ParentException(Base parent, Base child)
-          : base(String.Format(Res.Get("Messages,ParentError"), parent.GetType().Name, child.GetType().Name))
+        internal ParentException (Base parent, Base child)
+            : base (string.Format (Res.Get ("Messages,ParentError"), parent.GetType().Name, child.GetType().Name))
         {
         }
     }
@@ -116,8 +116,8 @@ namespace AM.Reporting.Utils
     /// </summary>
     public class ClassException : Exception
     {
-        internal ClassException(string name)
-          : base(Res.Get("Messages,CantFindObject") + " " + name)
+        internal ClassException (string name)
+            : base (Res.Get ("Messages,CantFindObject") + " " + name)
         {
         }
     }
@@ -128,8 +128,8 @@ namespace AM.Reporting.Utils
     /// </summary>
     public class DataTableException : Exception
     {
-        internal DataTableException(string alias)
-          : base(alias + ": " + Res.Get("Messages,TableIsNull"))
+        internal DataTableException (string alias)
+            : base (alias + ": " + Res.Get ("Messages,TableIsNull"))
         {
         }
     }
@@ -139,8 +139,8 @@ namespace AM.Reporting.Utils
     /// </summary>
     public class DataNotInitializedException : Exception
     {
-        internal DataNotInitializedException(string alias)
-          : base(alias + ": " + Res.Get("Messages,DataNotInitialized"))
+        internal DataNotInitializedException (string alias)
+            : base (alias + ": " + Res.Get ("Messages,DataNotInitialized"))
         {
         }
     }
@@ -151,7 +151,7 @@ namespace AM.Reporting.Utils
     public class TableManualBuildException : Exception
     {
         internal TableManualBuildException()
-          : base(Res.Get("Messages,TableManualBuildError"))
+            : base (Res.Get ("Messages,TableManualBuildError"))
         {
         }
     }
@@ -161,8 +161,8 @@ namespace AM.Reporting.Utils
     /// </summary>
     public class MatrixValueException : Exception
     {
-        internal MatrixValueException(int count)
-          : base(String.Format(Res.Get("Messages,MatrixValueError"), count))
+        internal MatrixValueException (int count)
+            : base (string.Format (Res.Get ("Messages,MatrixValueError"), count))
         {
         }
     }
@@ -172,8 +172,8 @@ namespace AM.Reporting.Utils
     /// </summary>
     public class NotValidIdentifierException : Exception
     {
-        internal NotValidIdentifierException(string value)
-          : base(String.Format("'{0}' is not valid identifier name", value))
+        internal NotValidIdentifierException (string value)
+            : base (string.Format ("'{0}' is not valid identifier name", value))
         {
         }
     }
@@ -183,8 +183,8 @@ namespace AM.Reporting.Utils
     /// </summary>
     public class UnknownNameException : Exception
     {
-        internal UnknownNameException(string value)
-          : base(String.Format("Unknown name '{0}'", value))
+        internal UnknownNameException (string value)
+            : base (string.Format ("Unknown name '{0}'", value))
         {
         }
     }
@@ -195,7 +195,7 @@ namespace AM.Reporting.Utils
     /// </summary>
     public class CloudStorageException : Exception
     {
-        internal CloudStorageException(string message, Exception innerException) : base(message, innerException)
+        internal CloudStorageException (string message, Exception innerException) : base (message, innerException)
         {
         }
     }
@@ -203,10 +203,10 @@ namespace AM.Reporting.Utils
     /// <summary>
     /// The exception that is thrown when the Group Header has no group condition.
     /// </summary>
-   public class GroupHeaderHasNoGroupCondition : Exception
+    public class GroupHeaderHasNoGroupCondition : Exception
     {
-        internal GroupHeaderHasNoGroupCondition(string name)
-          : base(String.Format(Res.Get("Messages,GroupHeaderHasNoGroupCondition"), name))
+        internal GroupHeaderHasNoGroupCondition (string name)
+            : base (string.Format (Res.Get ("Messages,GroupHeaderHasNoGroupCondition"), name))
         {
         }
     }

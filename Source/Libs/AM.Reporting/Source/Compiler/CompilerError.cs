@@ -26,7 +26,6 @@ namespace AM.Reporting.Code.CodeDom.Compiler
         public int Column { get; set; }
         public string ErrorText { get; set; }
         public string ErrorNumber { get; set; }
-
     }
 }
 

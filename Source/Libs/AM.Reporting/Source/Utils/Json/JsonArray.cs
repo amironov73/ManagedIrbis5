@@ -35,48 +35,36 @@ namespace AM.Reporting.Utils.Json
 
         #region Public Indexers
 
-        public override object this[int index]
+        public override object this [int index]
         {
             get
             {
                 if (index >= 0 && index < Count)
+                {
                     return array[index];
+                }
+
                 return null;
             }
 
-            set
-            {
-                array[index] = value;
-            }
+            set => array[index] = value;
         }
 
         #endregion Public Indexers
 
         #region Public Properties
 
-        public override int Count
-        {
-            get
-            {
-                return array.Count;
-            }
-        }
+        public override int Count => array.Count;
 
-        public override bool IsArray
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public override bool IsArray => true;
 
         #endregion Public Properties
 
         #region Public Methods
 
-        public void Add(object obj)
+        public void Add (object obj)
         {
-            array.Add(obj);
+            array.Add (obj);
         }
 
         public IEnumerator<object> GetEnumerator()
@@ -89,41 +77,47 @@ namespace AM.Reporting.Utils.Json
             return array.GetEnumerator();
         }
 
-        public void Insert(int index, object obj)
+        public void Insert (int index, object obj)
         {
-            array.Insert(index, obj);
+            array.Insert (index, obj);
         }
 
-        public void Remove(int index)
+        public void Remove (int index)
         {
-            array.RemoveAt(index);
+            array.RemoveAt (index);
         }
 
-        public override void WriteTo(StringBuilder sb, int indent)
+        public override void WriteTo (StringBuilder sb, int indent)
         {
-            sb.Append('[');
+            sb.Append ('[');
 
-            bool notFirst = false;
-            foreach (object item in array)
+            var notFirst = false;
+            foreach (var item in array)
             {
                 if (notFirst)
-                    sb.Append(',');
+                {
+                    sb.Append (',');
+                }
+
                 if (indent > 0)
                 {
                     sb.AppendLine();
-                    for (int i = 0; i < indent; i++)
-                        sb.Append(' ');
+                    for (var i = 0; i < indent; i++)
+                        sb.Append (' ');
                 }
-                WriteValue(sb, item, indent);
+
+                WriteValue (sb, item, indent);
                 notFirst = true;
             }
+
             if (indent > 0 && notFirst)
             {
                 sb.AppendLine();
-                for (int i = 2; i < indent; i++)
-                    sb.Append(' ');
+                for (var i = 2; i < indent; i++)
+                    sb.Append (' ');
             }
-            sb.Append(']');
+
+            sb.Append (']');
         }
 
         #endregion Public Methods

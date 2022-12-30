@@ -27,14 +27,17 @@ using System.Collections;
 
 namespace AM.Reporting.Data
 {
-  internal static class CubeHelper
-  {
-    public static CubeSourceBase GetCubeSource(Dictionary dictionary, string complexName)
+    internal static class CubeHelper
     {
-      if (String.IsNullOrEmpty(complexName))
-        return null;
-      string[] names = complexName.Split('.');
-      return dictionary.FindByAlias(names[0]) as CubeSourceBase;
+        public static CubeSourceBase GetCubeSource (Dictionary dictionary, string complexName)
+        {
+            if (string.IsNullOrEmpty (complexName))
+            {
+                return null;
+            }
+
+            string[] names = complexName.Split ('.');
+            return dictionary.FindByAlias (names[0]) as CubeSourceBase;
+        }
     }
-  }
 }

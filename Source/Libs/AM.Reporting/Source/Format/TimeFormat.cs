@@ -33,18 +33,22 @@ namespace AM.Reporting.Format
     public class TimeFormat : CustomFormat
     {
         #region Public Methods
+
         /// <inheritdoc/>
         public override FormatBase Clone()
         {
-            TimeFormat result = new TimeFormat();
-            result.Format = Format;
+            var result = new TimeFormat
+            {
+                Format = Format
+            };
             return result;
         }
 
         internal override string GetSampleValue()
         {
-            return FormatValue(new DateTime(2007, 11, 30, 13, 30, 0));
+            return FormatValue (new DateTime (2007, 11, 30, 13, 30, 0));
         }
+
         #endregion
 
         /// <summary>

@@ -42,11 +42,11 @@ namespace AM.Reporting.Barcode
         /// <summary>
         /// Gets or sets the error correction percent.
         /// </summary>
-        [DefaultValue(33)]
+        [DefaultValue (33)]
         public int ErrorCorrectionPercent
         {
-            get { return errorCorrectionPercent; }
-            set { errorCorrectionPercent = (value < 5) ? 5 : ((value > 95) ? 95 : value); }
+            get => errorCorrectionPercent;
+            set => errorCorrectionPercent = (value < 5) ? 5 : ((value > 95) ? 95 : value);
         }
 
         /// <summary>
@@ -57,55 +57,59 @@ namespace AM.Reporting.Barcode
             ErrorCorrectionPercent = 33;
         }
 
-        internal override void Initialize(string text, bool showText, int angle, float zoom)
+        internal override void Initialize (string text, bool showText, int angle, float zoom)
         {
-            base.Initialize(text, showText, angle, zoom);
+            base.Initialize (text, showText, angle, zoom);
 
-            matrix = Encoder.encode(System.Text.Encoding.ASCII.GetBytes(text), ErrorCorrectionPercent, 0).Matrix;
+            matrix = Encoder.encode (System.Text.Encoding.ASCII.GetBytes (text), ErrorCorrectionPercent, 0).Matrix;
         }
 
         internal override SizeF CalcBounds()
         {
-            int textAdd = showText ? 18 : 0;
-            return new SizeF(matrix.Width * PIXEL_SIZE, matrix.Height * PIXEL_SIZE + textAdd);
+            var textAdd = showText ? 18 : 0;
+            return new SizeF (matrix.Width * PIXEL_SIZE, matrix.Height * PIXEL_SIZE + textAdd);
         }
 
-        internal override void Draw2DBarcode(IGraphics g, float kx, float ky)
+        internal override void Draw2DBarcode (IGraphics g, float kx, float ky)
         {
-            Brush light = Brushes.White;
-            Brush dark = new SolidBrush(Color);
+            var light = Brushes.White;
+            Brush dark = new SolidBrush (Color);
 
-            for (int y = 0; y < matrix.Height; y++)
+            for (var y = 0; y < matrix.Height; y++)
             {
-                for (int x = 0; x < matrix.Width; x++)
+                for (var x = 0; x < matrix.Width; x++)
                 {
-                    bool b = matrix.getRow(y, null)[x];
+                    var b = matrix.getRow (y, null)[x];
 
-                    Brush brush = /*b == true ?*/ dark /*: light*/;
+                    var brush = /*b == true ?*/ dark /*: light*/;
                     if (b == true)
-                        g.FillRectangle(brush, x * PIXEL_SIZE * kx, y * PIXEL_SIZE * ky,
-                                               PIXEL_SIZE * kx,     PIXEL_SIZE * ky);
+                    {
+                        g.FillRectangle (brush, x * PIXEL_SIZE * kx, y * PIXEL_SIZE * ky,
+                            PIXEL_SIZE * kx, PIXEL_SIZE * ky);
+                    }
                 }
             }
+
             dark.Dispose();
         }
 
         /// <inheritdoc/>
-        public override void Assign(BarcodeBase source)
+        public override void Assign (BarcodeBase source)
         {
-            base.Assign(source);
-            BarcodeAztec src = source as BarcodeAztec;
+            base.Assign (source);
+            var src = source as BarcodeAztec;
 
             ErrorCorrectionPercent = src.ErrorCorrectionPercent;
         }
 
-        internal override void Serialize(AM.Reporting.Utils.FRWriter writer, string prefix, BarcodeBase diff)
+        internal override void Serialize (FRWriter writer, string prefix, BarcodeBase diff)
         {
-            base.Serialize(writer, prefix, diff);
-            BarcodeAztec c = diff as BarcodeAztec;
+            base.Serialize (writer, prefix, diff);
 
-            if (c == null || ErrorCorrectionPercent != c.ErrorCorrectionPercent)
-                writer.WriteInt(prefix + "ErrorCorrection", ErrorCorrectionPercent);
+            if (diff is not BarcodeAztec c || ErrorCorrectionPercent != c.ErrorCorrectionPercent)
+            {
+                writer.WriteInt (prefix + "ErrorCorrection", ErrorCorrectionPercent);
+            }
         }
     }
 }

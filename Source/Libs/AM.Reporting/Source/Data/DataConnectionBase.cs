@@ -47,28 +47,28 @@ namespace AM.Reporting.Data
     public abstract partial class DataConnectionBase : DataComponentBase, IParent
     {
         #region Fields
+
         private DataSet dataSet;
-        private TableCollection tables;
-        private bool isSqlBased;
-        private bool canContainProcedures;
         private string connectionString;
-        private string connectionStringExpression;
-        private bool loginPrompt;
-        private int commandTimeout;
         private string lastConnectionString;
+
         #endregion
 
         #region Properties
+
         /// <summary>
         /// Gets an internal <b>DataSet</b> object that contains all data tables.
         /// </summary>
-        [Browsable(false)]
+        [Browsable (false)]
         public DataSet DataSet
         {
             get
             {
                 if (dataSet == null)
+                {
                     dataSet = CreateDataSet();
+                }
+
                 return dataSet;
             }
         }
@@ -81,11 +81,8 @@ namespace AM.Reporting.Data
         /// to this collection or call the <see cref="CreateAllTables()"/> method which will add
         /// all tables available in the database.
         /// </remarks>
-        [Browsable(false)]
-        public TableCollection Tables
-        {
-            get { return tables; }
-        }
+        [Browsable (false)]
+        public TableCollection Tables { get; }
 
         /// <summary>
         /// Gets or sets a connection string that contains all connection parameters.
@@ -106,16 +103,19 @@ namespace AM.Reporting.Data
         /// oleDbConnection1.ConnectionString = builder.ToString();
         /// </code>
         /// </example>
-        [Category("Data")]
+        [Category ("Data")]
         public string ConnectionString
         {
             get
             {
-                if (Report != null && Report.IsRunning && !String.IsNullOrEmpty(ConnectionStringExpression))
-                    return Report.Calc(ConnectionStringExpression).ToString();
+                if (Report != null && Report.IsRunning && !string.IsNullOrEmpty (ConnectionStringExpression))
+                {
+                    return Report.Calc (ConnectionStringExpression).ToString();
+                }
+
                 return connectionString;
             }
-            set { SetConnectionString(Crypter.DecryptString(value)); }
+            set => SetConnectionString (Crypter.DecryptString (value));
         }
 
         /// <summary>
@@ -134,36 +134,21 @@ namespace AM.Reporting.Data
         /// when report is run.
         /// </note>
         /// </remarks>
-        [Category("Data")]
-        [Editor("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof(UITypeEditor))]
-        public string ConnectionStringExpression
-        {
-            get
-            {
-                return connectionStringExpression;
-            }
-            set { connectionStringExpression = value; }
-        }
+        [Category ("Data")]
+        [Editor ("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof (UITypeEditor))]
+        public string ConnectionStringExpression { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicates if this connection is SQL-based.
         /// </summary>
-        [Browsable(false)]
-        public bool IsSqlBased
-        {
-            get { return isSqlBased; }
-            set { isSqlBased = value; }
-        }
+        [Browsable (false)]
+        public bool IsSqlBased { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicates if this connection can contain procedures.
         /// </summary>
-        [Browsable(false)]
-        public bool CanContainProcedures
-        {
-            get { return canContainProcedures; }
-            set { canContainProcedures = value; }
-        }
+        [Browsable (false)]
+        public bool CanContainProcedures { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether a login dialog appears immediately before opening a connection.
@@ -177,75 +162,78 @@ namespace AM.Reporting.Data
         /// <see cref="ConnectionStringExpression"/> property that is bound to the report parameter. In that
         /// case you supply the entire connection string from your application.
         /// </remarks>
-        [Category("Data")]
-        [DefaultValue(false)]
-        public bool LoginPrompt
-        {
-            get { return loginPrompt; }
-            set { loginPrompt = value; }
-        }
+        [Category ("Data")]
+        [DefaultValue (false)]
+        public bool LoginPrompt { get; set; }
 
         /// <summary>
         /// Gets or sets the command timeout, in seconds.
         /// </summary>
-        [Category("Data")]
-        [DefaultValue(30)]
-        public int CommandTimeout
-        {
-            get { return commandTimeout; }
-            set { commandTimeout = value; }
-        }
+        [Category ("Data")]
+        [DefaultValue (30)]
+        public int CommandTimeout { get; set; }
 
         internal List<XmlItem> TablesStructure { get; set; }
+
         #endregion
 
         #region Private Methods
-        private void GetDBObjectNames(string name, List<string> list)
+
+        private void GetDBObjectNames (string name, List<string> list)
         {
             DataTable schema = null;
-            DbConnection conn = GetConnection();
+            var conn = GetConnection();
             try
             {
-                OpenConnection(conn);
-                schema = conn.GetSchema("Tables", new string[] { null, null, null, name });
+                OpenConnection (conn);
+                schema = conn.GetSchema ("Tables", new string[] { null, null, null, name });
             }
             finally
             {
-                DisposeConnection(conn);
+                DisposeConnection (conn);
             }
+
             foreach (DataRow row in schema.Rows)
             {
-                list.Add(row["TABLE_NAME"].ToString());
+                list.Add (row["TABLE_NAME"].ToString());
             }
         }
 
-        private string PrepareSelectCommand(string selectCommand, string tableName, DbConnection connection)
+        private string PrepareSelectCommand (string selectCommand, string tableName, DbConnection connection)
         {
-            if (String.IsNullOrEmpty(selectCommand))
+            if (string.IsNullOrEmpty (selectCommand))
             {
-                selectCommand = "select * from " + QuoteIdentifier(tableName, connection);
+                selectCommand = "select * from " + QuoteIdentifier (tableName, connection);
             }
+
             return selectCommand;
         }
 
-        private TableDataSource FindTableDataSource(DataTable table)
+        private TableDataSource FindTableDataSource (DataTable table)
         {
             foreach (TableDataSource c in Tables)
             {
                 if (c.Table == table)
+                {
                     return c;
+                }
             }
+
             return null;
         }
+
         #endregion
 
         #region Protected Methods
+
         /// <inheritdoc/>
-        protected override void Dispose(bool disposing)
+        protected override void Dispose (bool disposing)
         {
-            base.Dispose(disposing);
+            base.Dispose (disposing);
             if (disposing)
+            {
                 DisposeDataSet();
+            }
         }
 
         /// <summary>
@@ -257,7 +245,7 @@ namespace AM.Reporting.Data
         /// </remarks>
         protected virtual DataSet CreateDataSet()
         {
-            DataSet dataSet = new DataSet();
+            var dataSet = new DataSet();
             dataSet.EnforceConstraints = false;
             return dataSet;
         }
@@ -271,7 +259,10 @@ namespace AM.Reporting.Data
         protected void DisposeDataSet()
         {
             if (dataSet != null)
+            {
                 dataSet.Dispose();
+            }
+
             dataSet = null;
         }
 
@@ -282,7 +273,7 @@ namespace AM.Reporting.Data
         /// <remarks>
         /// Use this method if you need to perform some actions when the connection string is set.
         /// </remarks>
-        protected virtual void SetConnectionString(string value)
+        protected virtual void SetConnectionString (string value)
         {
             connectionString = value;
         }
@@ -297,61 +288,65 @@ namespace AM.Reporting.Data
         /// must get the existing <see cref="ConnectionString"/>, merge specified login information into it
         /// and return the new value.
         /// </remarks>
-        protected virtual string GetConnectionStringWithLoginInfo(string userName, string password)
+        protected virtual string GetConnectionStringWithLoginInfo (string userName, string password)
         {
             return ConnectionString;
         }
+
         #endregion
 
         #region IParent Members
+
         /// <inheritdoc/>
-        public bool CanContain(Base child)
+        public bool CanContain (Base child)
         {
             return child is TableDataSource;
         }
 
         /// <inheritdoc/>
-        public void GetChildObjects(ObjectCollection list)
+        public void GetChildObjects (ObjectCollection list)
         {
             foreach (TableDataSource c in Tables)
             {
-                list.Add(c);
+                list.Add (c);
             }
         }
 
         /// <inheritdoc/>
-        public void AddChild(Base child)
+        public void AddChild (Base child)
         {
-            Tables.Add(child as TableDataSource);
+            Tables.Add (child as TableDataSource);
         }
 
         /// <inheritdoc/>
-        public void RemoveChild(Base child)
+        public void RemoveChild (Base child)
         {
-            Tables.Remove(child as TableDataSource);
+            Tables.Remove (child as TableDataSource);
         }
 
         /// <inheritdoc/>
-        public int GetChildOrder(Base child)
+        public int GetChildOrder (Base child)
         {
             // we don't need to handle database objects' order.
             return 0;
         }
 
         /// <inheritdoc/>
-        public void SetChildOrder(Base child, int order)
+        public void SetChildOrder (Base child, int order)
         {
             // do nothing
         }
 
         /// <inheritdoc/>
-        public void UpdateLayout(float dx, float dy)
+        public void UpdateLayout (float dx, float dy)
         {
             // do nothing
         }
+
         #endregion
 
         #region Public Methods
+
         /// <summary>
         /// Fills the <see cref="Tables"/> collection with all tables available in the database.
         /// </summary>
@@ -361,40 +356,44 @@ namespace AM.Reporting.Data
         /// </remarks>
         public void CreateAllTables()
         {
-            CreateAllTables(true);
+            CreateAllTables (true);
         }
 
         /// <summary>
         /// Fills the <see cref="Tables"/> collection with all tables available in the database.
         /// </summary>
         /// <param name="initSchema">Set to <b>true</b> to initialize each table's schema.</param>
-        public virtual void CreateAllTables(bool initSchema)
+        public virtual void CreateAllTables (bool initSchema)
         {
             List<string> tableNames = new List<string>();
-            tableNames.AddRange(GetTableNames());
-            FilterTables(tableNames);
+            tableNames.AddRange (GetTableNames());
+            FilterTables (tableNames);
 
             List<string> procedureNames = new List<string>();
-            if (canContainProcedures)
-                procedureNames.AddRange(GetProcedureNames());
+            if (CanContainProcedures)
+            {
+                procedureNames.AddRange (GetProcedureNames());
+            }
 
             // remove tables with tablename that does not exist in the connection.
-            for (int i = 0; i < Tables.Count; i++)
+            for (var i = 0; i < Tables.Count; i++)
             {
-                TableDataSource table = Tables[i];
-                bool found = !String.IsNullOrEmpty(table.SelectCommand);
+                var table = Tables[i];
+                var found = !string.IsNullOrEmpty (table.SelectCommand);
+
                 // skip tables with non-empty selectcommand
                 if (!found)
                 {
-                    foreach (string tableName in tableNames)
+                    foreach (var tableName in tableNames)
                     {
-                        if (String.Compare(table.TableName, tableName, true) == 0)
+                        if (string.Compare (table.TableName, tableName, true) == 0)
                         {
                             found = true;
                             break;
                         }
                     }
                 }
+
                 // table name not found between actual tablenames. It may happen if we have edited the connection.
                 if (!found)
                 {
@@ -403,51 +402,60 @@ namespace AM.Reporting.Data
                 }
             }
 
-            int tableNumber = 0;
+            var tableNumber = 0;
+
             // now create tables that are not created yet.
-            foreach (string tableName in tableNames)
+            foreach (var tableName in tableNames)
             {
-                bool found = false;
+                var found = false;
                 foreach (TableDataSource table in Tables)
                 {
-                    if (String.Compare(table.TableName, tableName, true) == 0)
+                    if (string.Compare (table.TableName, tableName, true) == 0)
                     {
                         found = true;
                         break;
                     }
                 }
+
                 if (!found)
                 {
                     TableDataSource table = null;
-                    if (procedureNames.Contains(tableName))
+                    if (procedureNames.Contains (tableName))
                     {
-                        table = CreateProcedure(tableName);
+                        table = CreateProcedure (tableName);
                     }
                     else
+                    {
                         table = new TableDataSource();
+                    }
 
-                    string fixedTableName = tableName.Replace(".", "_").Replace("[", "").Replace("]", "").Replace("\"", "");
+                    var fixedTableName = tableName.Replace (".", "_").Replace ("[", "").Replace ("]", "")
+                        .Replace ("\"", "");
                     if (Report != null)
                     {
-                        table.Name = Report.Dictionary.CreateUniqueName(fixedTableName);
-                        table.Alias = Report.Dictionary.CreateUniqueAlias(table.Alias);
+                        table.Name = Report.Dictionary.CreateUniqueName (fixedTableName);
+                        table.Alias = Report.Dictionary.CreateUniqueAlias (table.Alias);
                     }
                     else
+                    {
                         table.Name = fixedTableName;
+                    }
 
                     table.TableName = tableName;
                     table.Connection = this;
                     if (TablesStructure != null)
                     {
-                        table.Enabled = TablesStructure[tableNumber].Properties.Where(prop => prop.Key == "Enabled").Select(res => res.Value).First() == "true";
+                        table.Enabled = TablesStructure[tableNumber].Properties.Where (prop => prop.Key == "Enabled")
+                            .Select (res => res.Value).First() == "true";
                     }
 
-                    Tables.Add(table);
+                    Tables.Add (table);
                     tableNumber++;
                 }
             }
 
             initSchema = true;
+
             // init table schema
             if (initSchema)
             {
@@ -461,19 +469,19 @@ namespace AM.Reporting.Data
         /// <summary>
         /// Create the stored procedure.
         /// </summary>
-        public virtual TableDataSource CreateProcedure(string tableName)
+        public virtual TableDataSource CreateProcedure (string tableName)
         {
-            ProcedureDataSource table = new ProcedureDataSource();
+            var table = new ProcedureDataSource();
             table.SelectCommand = tableName;
-            DbConnection conn = GetConnection();
+            var conn = GetConnection();
             DataTable shemaParametrs;
             try
             {
-                OpenConnection(conn);
-                shemaParametrs = conn.GetSchema("PROCEDURE_PARAMETRS", new string[] { null, null, tableName });
+                OpenConnection (conn);
+                shemaParametrs = conn.GetSchema ("PROCEDURE_PARAMETRS", new string[] { null, null, tableName });
                 foreach (DataRow row in shemaParametrs.Rows)
                 {
-                    ParameterDirection direction = ParameterDirection.Input;
+                    var direction = ParameterDirection.Input;
                     switch (row["PARAMETER_MODE"].ToString())
                     {
                         case "IN":
@@ -486,17 +494,18 @@ namespace AM.Reporting.Data
                             direction = ParameterDirection.Output;
                             break;
                     }
-                    table.Parameters.Add(new ProcedureParameter()
+
+                    table.Parameters.Add (new ProcedureParameter()
                     {
                         Name = row["PARAMETER_NAME"].ToString(),
-                        DataType = Convert.ToInt32(row["DATA_TYPE"].ToString()),
+                        DataType = Convert.ToInt32 (row["DATA_TYPE"].ToString()),
                         Direction = direction
                     });
                 }
             }
             finally
             {
-                DisposeConnection(conn);
+                DisposeConnection (conn);
             }
 
             return table;
@@ -511,27 +520,33 @@ namespace AM.Reporting.Data
             {
                 foreach (DataRelation relation in DataSet.Relations)
                 {
-                    Relation rel = new Relation();
+                    var rel = new Relation();
                     rel.Name = relation.RelationName;
-                    rel.ParentDataSource = FindTableDataSource(relation.ParentTable);
-                    rel.ChildDataSource = FindTableDataSource(relation.ChildTable);
+                    rel.ParentDataSource = FindTableDataSource (relation.ParentTable);
+                    rel.ChildDataSource = FindTableDataSource (relation.ChildTable);
                     string[] parentColumns = new string[relation.ParentColumns.Length];
                     string[] childColumns = new string[relation.ChildColumns.Length];
-                    for (int i = 0; i < relation.ParentColumns.Length; i++)
+                    for (var i = 0; i < relation.ParentColumns.Length; i++)
                     {
                         parentColumns[i] = relation.ParentColumns[i].Caption;
                     }
-                    for (int i = 0; i < relation.ChildColumns.Length; i++)
+
+                    for (var i = 0; i < relation.ChildColumns.Length; i++)
                     {
                         childColumns[i] = relation.ChildColumns[i].Caption;
                     }
+
                     rel.ParentColumns = parentColumns;
                     rel.ChildColumns = childColumns;
 
-                    if (Report.Dictionary.Relations.FindEqual(rel) == null)
-                        Report.Dictionary.Relations.Add(rel);
+                    if (Report.Dictionary.Relations.FindEqual (rel) == null)
+                    {
+                        Report.Dictionary.Relations.Add (rel);
+                    }
                     else
+                    {
                         rel.Dispose();
+                    }
                 }
             }
         }
@@ -543,10 +558,13 @@ namespace AM.Reporting.Data
         public virtual string[] GetTableNames()
         {
             List<string> list = new List<string>();
-            GetDBObjectNames("TABLE", list);
-            GetDBObjectNames("VIEW", list);
-            if(canContainProcedures)
-                list.AddRange(GetProcedureNames());
+            GetDBObjectNames ("TABLE", list);
+            GetDBObjectNames ("VIEW", list);
+            if (CanContainProcedures)
+            {
+                list.AddRange (GetProcedureNames());
+            }
+
             return list.ToArray();
         }
 
@@ -558,22 +576,22 @@ namespace AM.Reporting.Data
         {
             List<string> list = new List<string>();
             DataTable schema = null;
-            DbConnection conn = GetConnection();
+            var conn = GetConnection();
 
             if (conn != null)
             {
                 try
                 {
-                    OpenConnection(conn);
-                    schema = conn.GetSchema("PROCEDURE");
+                    OpenConnection (conn);
+                    schema = conn.GetSchema ("PROCEDURE");
                     foreach (DataRow row in schema.Rows)
                     {
-                        list.Add(row["PROCEDURE_NAME"].ToString());
+                        list.Add (row["PROCEDURE_NAME"].ToString());
                     }
                 }
                 finally
                 {
-                    DisposeConnection(conn);
+                    DisposeConnection (conn);
                 }
             }
 
@@ -611,23 +629,24 @@ namespace AM.Reporting.Data
         /// in the Config.DesignerSettings.ApplicationConnection.</remarks>
         public DbConnection GetConnection()
         {
-            Type connectionType = GetConnectionType();
+            var connectionType = GetConnectionType();
             if (connectionType != null)
             {
-
-                DbConnection connection = GetDefaultConnection();
+                var connection = GetDefaultConnection();
 
                 if (connection != null)
+                {
                     return connection;
+                }
 
                 // create a new connection object
-                connection = Activator.CreateInstance(connectionType) as DbConnection;
+                connection = Activator.CreateInstance (connectionType) as DbConnection;
                 connection.ConnectionString = ConnectionString;
                 return connection;
             }
+
             return null;
         }
-
 
 
         /// <summary>
@@ -640,12 +659,14 @@ namespace AM.Reporting.Data
         /// property set to <b>true</b>. Once you have entered an user name and password in
         /// this dialog, it will remeber the entered values and will not used anymore in this report session.
         /// </remarks>
-        public void OpenConnection(DbConnection connection)
+        public void OpenConnection (DbConnection connection)
         {
             if (connection.State == ConnectionState.Open)
+            {
                 return;
+            }
 
-            if (!String.IsNullOrEmpty(lastConnectionString))
+            if (!string.IsNullOrEmpty (lastConnectionString))
             {
                 // connection string is already provided, use it and skip other logic.
                 connection.ConnectionString = lastConnectionString;
@@ -653,9 +674,9 @@ namespace AM.Reporting.Data
             else
             {
                 // try the global DatabaseLogin event
-                string oldConnectionString = ConnectionString;
-                DatabaseLoginEventArgs e = new DatabaseLoginEventArgs(ConnectionString);
-                Config.ReportSettings.OnDatabaseLogin(this, e);
+                var oldConnectionString = ConnectionString;
+                var e = new DatabaseLoginEventArgs (ConnectionString);
+                Config.ReportSettings.OnDatabaseLogin (this, e);
 
                 // that event may do the following:
                 // - modify the ConnectionString
@@ -669,38 +690,43 @@ namespace AM.Reporting.Data
                 }
                 else
                 {
-                    if (!String.IsNullOrEmpty(e.UserName) || !String.IsNullOrEmpty(e.Password))
+                    if (!string.IsNullOrEmpty (e.UserName) || !string.IsNullOrEmpty (e.Password))
                     {
                         // the username/password was modified. Get new connection string
-                        lastConnectionString = GetConnectionStringWithLoginInfo(e.UserName, e.Password);
+                        lastConnectionString = GetConnectionStringWithLoginInfo (e.UserName, e.Password);
                     }
                     else if (LoginPrompt)
                     {
-                        ShowLoginForm(lastConnectionString);
+                        ShowLoginForm (lastConnectionString);
                     }
                 }
 
                 // update the connection if it's not done yet
-                if (!String.IsNullOrEmpty(lastConnectionString))
+                if (!string.IsNullOrEmpty (lastConnectionString))
+                {
                     connection.ConnectionString = lastConnectionString;
+                }
             }
 
             connection.Open();
-            Config.ReportSettings.OnAfterDatabaseLogin(this, new AfterDatabaseLoginEventArgs(connection));
+            Config.ReportSettings.OnAfterDatabaseLogin (this, new AfterDatabaseLoginEventArgs (connection));
         }
 
         /// <summary>
         /// Disposes a connection.
         /// </summary>
         /// <param name="connection">The connection to dispose.</param>
-        public void DisposeConnection(DbConnection connection)
+        public void DisposeConnection (DbConnection connection)
         {
-
-            if (ShouldNotDispose(connection))
+            if (ShouldNotDispose (connection))
+            {
                 return;
+            }
 
             if (connection != null)
+            {
                 connection.Dispose();
+            }
         }
 
         /// <summary>
@@ -731,8 +757,8 @@ namespace AM.Reporting.Data
         /// }
         /// </code>
         /// </example>
-        public virtual DbDataAdapter GetAdapter(string selectCommand, DbConnection connection,
-          CommandParameterCollection parameters)
+        public virtual DbDataAdapter GetAdapter (string selectCommand, DbConnection connection,
+            CommandParameterCollection parameters)
         {
             return null;
         }
@@ -756,7 +782,7 @@ namespace AM.Reporting.Data
         /// <param name="value">Identifier to quote.</param>
         /// <param name="connection">The opened DB connection.</param>
         /// <returns>The quoted identifier.</returns>
-        public abstract string QuoteIdentifier(string value, DbConnection connection);
+        public abstract string QuoteIdentifier (string value, DbConnection connection);
 
         /// <summary>
         /// Fills the table schema.
@@ -769,31 +795,35 @@ namespace AM.Reporting.Data
         /// <see cref="GetAdapter"/> methods to fill the table schema. If you create own connection component
         /// that does not use nor connection or adapter, then you need to override this method.
         /// </remarks>
-        public virtual void FillTableSchema(DataTable table, string selectCommand,
-          CommandParameterCollection parameters)
+        public virtual void FillTableSchema (DataTable table, string selectCommand,
+            CommandParameterCollection parameters)
         {
-            DbConnection conn = GetConnection();
+            var conn = GetConnection();
             try
             {
-                OpenConnection(conn);
+                OpenConnection (conn);
 
-                TableDataSource dataSource = FindTableDataSource(table);
+                var dataSource = FindTableDataSource (table);
 
                 // prepare select command
                 if (!(dataSource is ProcedureDataSource))
-                    selectCommand = PrepareSelectCommand(selectCommand, table.TableName, conn);
+                {
+                    selectCommand = PrepareSelectCommand (selectCommand, table.TableName, conn);
+                }
 
                 // read the table schema
-                using (DbDataAdapter adapter = GetAdapter(selectCommand, conn, parameters))
+                using (var adapter = GetAdapter (selectCommand, conn, parameters))
                 {
-                    adapter.SelectCommand.CommandType = dataSource is ProcedureDataSource ? CommandType.StoredProcedure : CommandType.Text;
+                    adapter.SelectCommand.CommandType = dataSource is ProcedureDataSource
+                        ? CommandType.StoredProcedure
+                        : CommandType.Text;
                     adapter.SelectCommand.CommandTimeout = CommandTimeout;
-                    adapter.FillSchema(table, SchemaType.Source);
+                    adapter.FillSchema (table, SchemaType.Source);
                 }
             }
             finally
             {
-                DisposeConnection(conn);
+                DisposeConnection (conn);
             }
         }
 
@@ -808,29 +838,34 @@ namespace AM.Reporting.Data
         /// <see cref="GetAdapter"/> methods to fill the table data. If you create own connection component
         /// that does not use nor connection or adapter, then you need to override this method.
         /// </remarks>
-        public virtual void FillTableData(DataTable table, string selectCommand,
-          CommandParameterCollection parameters)
+        public virtual void FillTableData (DataTable table, string selectCommand,
+            CommandParameterCollection parameters)
         {
-            DbConnection conn = GetConnection();
+            var conn = GetConnection();
             try
             {
-                OpenConnection(conn);
+                OpenConnection (conn);
 
-                TableDataSource dataSource = FindTableDataSource(table);
+                var dataSource = FindTableDataSource (table);
 
                 // prepare select command
                 if (!(dataSource is ProcedureDataSource))
-                    selectCommand = PrepareSelectCommand(selectCommand, table.TableName, conn);
+                {
+                    selectCommand = PrepareSelectCommand (selectCommand, table.TableName, conn);
+                }
 
                 // read the table
-                using (DbDataAdapter adapter = GetAdapter(selectCommand, conn, parameters))
+                using (var adapter = GetAdapter (selectCommand, conn, parameters))
                 {
-                    adapter.SelectCommand.CommandType = FindTableDataSource(table) is ProcedureDataSource ? CommandType.StoredProcedure : CommandType.Text;
+                    adapter.SelectCommand.CommandType = FindTableDataSource (table) is ProcedureDataSource
+                        ? CommandType.StoredProcedure
+                        : CommandType.Text;
                     adapter.SelectCommand.CommandTimeout = CommandTimeout;
                     table.Clear();
-                    adapter.Fill(table);
+                    adapter.Fill (table);
 
-                    if(canContainProcedures)
+                    if (CanContainProcedures)
+                    {
                         foreach (DbParameter dp in adapter.SelectCommand.Parameters)
                         {
                             if (dp.Direction != ParameterDirection.Input)
@@ -840,18 +875,21 @@ namespace AM.Reporting.Data
                                     if (cp.Name == dp.ParameterName)
                                     {
                                         cp.Value = dp.Value;
-                                        Parameter parameter = Report.GetParameter(dataSource.Name + "_" + cp.Name);
+                                        var parameter = Report.GetParameter (dataSource.Name + "_" + cp.Name);
                                         if (parameter != null)
+                                        {
                                             parameter.Value = dp.Value;
+                                        }
                                     }
                                 }
                             }
                         }
+                    }
                 }
             }
             finally
             {
-                DisposeConnection(conn);
+                DisposeConnection (conn);
             }
         }
 
@@ -859,24 +897,24 @@ namespace AM.Reporting.Data
         /// Creates table.
         /// For internal use only.
         /// </summary>
-        public virtual void CreateTable(TableDataSource source)
+        public virtual void CreateTable (TableDataSource source)
         {
             if (source.Table == null)
             {
-                source.Table = new DataTable(source.TableName);
-                DataSet.Tables.Add(source.Table);
+                source.Table = new DataTable (source.TableName);
+                DataSet.Tables.Add (source.Table);
             }
         }
 
-        internal virtual void FillTable(TableDataSource source)
+        internal virtual void FillTable (TableDataSource source)
         {
             if (source.Table != null)
             {
-                bool parametersChanged = false;
+                var parametersChanged = false;
                 foreach (CommandParameter par in source.Parameters)
                 {
-                    object value = par.Value;
-                    if (!Object.Equals(value, par.LastValue))
+                    var value = par.Value;
+                    if (!Equals (value, par.LastValue))
                     {
                         par.LastValue = value;
                         parametersChanged = true;
@@ -884,7 +922,9 @@ namespace AM.Reporting.Data
                 }
 
                 if (source.ForceLoadData || source.Table.Rows.Count == 0 || parametersChanged)
-                    FillTableData(source.Table, source.SelectCommand, source.Parameters);
+                {
+                    FillTableData (source.Table, source.SelectCommand, source.Parameters);
+                }
             }
         }
 
@@ -892,12 +932,15 @@ namespace AM.Reporting.Data
         /// Deletes table.
         /// For internal use only.
         /// </summary>
-        public virtual void DeleteTable(TableDataSource source)
+        public virtual void DeleteTable (TableDataSource source)
         {
             if (source.Table != null)
             {
                 if (dataSet != null)
-                    dataSet.Tables.Remove(source.Table);
+                {
+                    dataSet.Tables.Remove (source.Table);
+                }
+
                 source.Table.Dispose();
                 source.Table = null;
             }
@@ -909,65 +952,89 @@ namespace AM.Reporting.Data
         /// </summary>
         public virtual void Clone()
         {
-            XmlItem item = new XmlItem();
-            using(FRWriter writer = new FRWriter(item))
+            var item = new XmlItem();
+            using (var writer = new FRWriter (item))
             {
                 writer.SerializeTo = SerializeTo.Clipboard;
-                writer.BlobStore = new BlobStore(false);
-                writer.Write(this);
+                writer.BlobStore = new BlobStore (false);
+                writer.Write (this);
             }
-            using (FRReader reader = new FRReader(Report, item))
+
+            using (var reader = new FRReader (Report, item))
             {
                 reader.DeserializeFrom = SerializeTo.Clipboard;
-                reader.BlobStore = new BlobStore(false);
-                var connection = Activator.CreateInstance(this.GetType()) as DataConnectionBase;
-                connection.Parent = this.Parent;
-                connection.SetReport(Report);
-                reader.Read(connection);
+                reader.BlobStore = new BlobStore (false);
+                var connection = Activator.CreateInstance (GetType()) as DataConnectionBase;
+                connection.Parent = Parent;
+                connection.SetReport (Report);
+                reader.Read (connection);
                 connection.CreateUniqueName();
                 foreach (TableDataSource table in connection.Tables)
+                {
                     table.CreateUniqueName();
-                Report.Dictionary.AddChild(connection);
+                }
+
+                Report.Dictionary.AddChild (connection);
             }
         }
 
-        protected void CreateUniqueNames(DataConnectionBase copyTo)
+        protected void CreateUniqueNames (DataConnectionBase copyTo)
         {
-            int i = 1;
+            var i = 1;
             string s;
             do
             {
-                s = this.Alias + i.ToString();
+                s = Alias + i.ToString();
                 i++;
-            }
-            while (Report.Dictionary.FindByAlias(s) != null);
+            } while (Report.Dictionary.FindByAlias (s) != null);
+
             copyTo.Alias = s;
             copyTo.Name = s;
         }
 
         /// <inheritdoc/>
-        public override void Serialize(FRWriter writer)
+        public override void Serialize (FRWriter writer)
         {
             writer.ItemName = ClassName;
             if (Name != "")
-                writer.WriteStr("Name", Name);
+            {
+                writer.WriteStr ("Name", Name);
+            }
+
             if (Restrictions != Restrictions.None)
-                writer.WriteValue("Restrictions", Restrictions);
-            if (!String.IsNullOrEmpty(ConnectionString))
-                writer.WriteStr("ConnectionString", Crypter.EncryptString(ConnectionString));
-            if (!String.IsNullOrEmpty(ConnectionStringExpression))
-                writer.WriteStr("ConnectionStringExpression", ConnectionStringExpression);
+            {
+                writer.WriteValue ("Restrictions", Restrictions);
+            }
+
+            if (!string.IsNullOrEmpty (ConnectionString))
+            {
+                writer.WriteStr ("ConnectionString", Crypter.EncryptString (ConnectionString));
+            }
+
+            if (!string.IsNullOrEmpty (ConnectionStringExpression))
+            {
+                writer.WriteStr ("ConnectionStringExpression", ConnectionStringExpression);
+            }
+
             if (LoginPrompt)
-                writer.WriteBool("LoginPrompt", true);
+            {
+                writer.WriteBool ("LoginPrompt", true);
+            }
+
             if (CommandTimeout != 30)
-                writer.WriteInt("CommandTimeout", CommandTimeout);
-            SerializeDesignExt(writer);
+            {
+                writer.WriteInt ("CommandTimeout", CommandTimeout);
+            }
+
+            SerializeDesignExt (writer);
             if (writer.SaveChildren)
             {
                 foreach (TableDataSource c in Tables)
                 {
                     if (c.Enabled)
-                        writer.Write(c);
+                    {
+                        writer.Write (c);
+                    }
                 }
             }
         }
@@ -977,6 +1044,7 @@ namespace AM.Reporting.Data
         {
             return new string[] { ConnectionStringExpression };
         }
+
         #endregion
 
         /// <summary>
@@ -984,15 +1052,15 @@ namespace AM.Reporting.Data
         /// </summary>
         public DataConnectionBase()
         {
-            tables = new TableCollection(this);
+            Tables = new TableCollection (this);
             connectionString = "";
-            connectionStringExpression = "";
+            ConnectionStringExpression = "";
             IsSqlBased = true;
-            canContainProcedures = false;
-            commandTimeout = 30;
-            SetFlags(Flags.CanEdit, true);
+            CanContainProcedures = false;
+            CommandTimeout = 30;
+            SetFlags (Flags.CanEdit, true);
         }
 
-        partial void SerializeDesignExt(FRWriter writer);
+        partial void SerializeDesignExt (FRWriter writer);
     }
 }

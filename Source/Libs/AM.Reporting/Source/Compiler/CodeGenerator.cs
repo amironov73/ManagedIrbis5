@@ -22,7 +22,7 @@ namespace AM.Reporting.Code.CodeDom.Compiler
 {
     public class CodeGenerator
     {
-        public static bool IsValidLanguageIndependentIdentifier(string value)
+        public static bool IsValidLanguageIndependentIdentifier (string value)
         {
             //TODO o_0 what????
             return true;

@@ -34,8 +34,6 @@ namespace AM.Reporting.Gauge.Linear
     {
         #region Fields
 
-        private bool inverted;
-
         #endregion // Fields
 
         #region Properties
@@ -43,21 +41,17 @@ namespace AM.Reporting.Gauge.Linear
         /// <summary>
         /// Gets or sets the value that specifies inverted gauge or not.
         /// </summary>
-        [Category("Appearance")]
-        public bool Inverted
-        {
-            get { return inverted; }
-            set { inverted = value; }
-        }
+        [Category ("Appearance")]
+        public bool Inverted { get; set; }
 
         /// <summary>
         /// Gets or sets gauge label.
         /// </summary>
-        [Browsable(false)]
+        [Browsable (false)]
         public override GaugeLabel Label
         {
-            get { return base.Label; }
-            set { base.Label = value; }
+            get => base.Label;
+            set => base.Label = value;
         }
 
         #endregion // Properties
@@ -70,11 +64,11 @@ namespace AM.Reporting.Gauge.Linear
         public LinearGauge() : base()
         {
             InitializeComponent();
-            Scale = new LinearScale(this);
-            Pointer = new LinearPointer(this);
+            Scale = new LinearScale (this);
+            Pointer = new LinearPointer (this);
             Height = 2.0f * Units.Centimeters;
             Width = 8.0f * Units.Centimeters;
-            inverted = false;
+            Inverted = false;
         }
 
         #endregion // Constructors
@@ -82,39 +76,39 @@ namespace AM.Reporting.Gauge.Linear
         #region Public Methods
 
         /// <inheritdoc/>
-        public override void Assign(Base source)
+        public override void Assign (Base source)
         {
-            base.Assign(source);
+            base.Assign (source);
 
-            LinearGauge src = source as LinearGauge;
+            var src = source as LinearGauge;
             Inverted = src.Inverted;
         }
 
         /// <inheritdoc/>
-        public override void Draw(FRPaintEventArgs e)
+        public override void Draw (FRPaintEventArgs e)
         {
-            IGraphics g = e.Graphics;
+            var g = e.Graphics;
             if (Report != null && Report.SmoothGraphics)
             {
                 g.InterpolationMode = InterpolationMode.HighQualityBicubic;
                 g.SmoothingMode = SmoothingMode.AntiAlias;
             }
 
-            base.Draw(e);
-            Scale.Draw(e);
-            Pointer.Draw(e);
-            Border.Draw(e, new RectangleF(AbsLeft, AbsTop, Width, Height));
+            base.Draw (e);
+            Scale.Draw (e);
+            Pointer.Draw (e);
+            Border.Draw (e, new RectangleF (AbsLeft, AbsTop, Width, Height));
         }
 
         /// <inheritdoc/>
-        public override void Serialize(FRWriter writer)
+        public override void Serialize (FRWriter writer)
         {
-            LinearGauge c = writer.DiffObject as LinearGauge;
-            base.Serialize(writer);
+            var c = writer.DiffObject as LinearGauge;
+            base.Serialize (writer);
 
             if (Inverted != c.Inverted)
             {
-                writer.WriteBool("Inverted", Inverted);
+                writer.WriteBool ("Inverted", Inverted);
             }
         }
 

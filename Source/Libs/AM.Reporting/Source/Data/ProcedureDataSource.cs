@@ -40,12 +40,18 @@ namespace AM.Reporting.Data
                     if (Parameters != null && Report != null)
                     {
                         if (Connection != null)
-                            Connection.FillTable(this);
+                        {
+                            Connection.FillTable (this);
+                        }
+
                         foreach (CommandParameter parameter in Parameters)
                         {
                             if (parameter.Direction == ParameterDirection.Input)
+                            {
                                 continue;
-                            Report.SetParameterValue(Name + "_" + parameter.Name, parameter.Value);
+                            }
+
+                            Report.SetParameterValue (Name + "_" + parameter.Name, parameter.Value);
                             ReportDesignerSetModified();
                         }
                     }
@@ -53,13 +59,18 @@ namespace AM.Reporting.Data
                 else
                 {
                     if (Parameters != null && Report != null)
+                    {
                         foreach (CommandParameter parameter in Parameters)
                         {
                             if (parameter.Direction == ParameterDirection.Input)
+                            {
                                 continue;
-                            Report.Parameters.Remove(Report.GetParameter(Name + "_" + parameter.Name));
+                            }
+
+                            Report.Parameters.Remove (Report.GetParameter (Name + "_" + parameter.Name));
                             ReportDesignerSetModified();
                         }
+                    }
                 }
             }
         }
@@ -71,12 +82,17 @@ namespace AM.Reporting.Data
             set
             {
                 if (Enabled && Parameters != null && Report != null)
+                {
                     foreach (CommandParameter parameter in Parameters)
                     {
-                        Parameter param = Report.GetParameter(Name + "_" + parameter.Name);
+                        var param = Report.GetParameter (Name + "_" + parameter.Name);
                         if (param != null)
+                        {
                             param.Name = value + "_" + parameter.Name;
+                        }
                     }
+                }
+
                 base.Name = value;
             }
         }

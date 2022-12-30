@@ -26,282 +26,246 @@ using System.ComponentModel;
 
 namespace AM.Reporting.Data
 {
-  /// <summary>
-  /// Represents the collection of system variables.
-  /// </summary>
-  public class SystemVariables : ParameterCollection
-  {
-    internal SystemVariables(Base owner) : base(owner)
-    {
-      Add(new DateVariable());
-      Add(new PageVariable());
-      Add(new TotalPagesVariable());
-      Add(new PageNVariable());
-      Add(new PageNofMVariable());
-      Add(new RowVariable());
-      Add(new AbsRowVariable());
-      Add(new PageMacroVariable());
-      Add(new TotalPagesMacroVariable());
-      Add(new CopyNameMacroVariable());
-      Add(new HierarchyLevelVariable());
-      Add(new HierarchyRowNoVariable());
-    }
-  }
-
-
-  /// <summary>
-  /// Represents the base class for system variables.
-  /// </summary>
-  public class SystemVariable : Parameter
-  {
     /// <summary>
-    /// This property is not relevant to this class.
+    /// Represents the collection of system variables.
     /// </summary>
-    [Browsable(false)]
-    public new string Expression
+    public class SystemVariables : ParameterCollection
     {
-      get { return base.Expression; }
-      set { base.Expression = value; }
+        internal SystemVariables (Base owner) : base (owner)
+        {
+            Add (new DateVariable());
+            Add (new PageVariable());
+            Add (new TotalPagesVariable());
+            Add (new PageNVariable());
+            Add (new PageNofMVariable());
+            Add (new RowVariable());
+            Add (new AbsRowVariable());
+            Add (new PageMacroVariable());
+            Add (new TotalPagesMacroVariable());
+            Add (new CopyNameMacroVariable());
+            Add (new HierarchyLevelVariable());
+            Add (new HierarchyRowNoVariable());
+        }
     }
+
 
     /// <summary>
-    /// This property is not relevant to this class.
+    /// Represents the base class for system variables.
     /// </summary>
-    [Browsable(false)]
-    public new string Description
+    public class SystemVariable : Parameter
     {
-      get { return base.Description; }
-      set { base.Description = value; }
+        /// <summary>
+        /// This property is not relevant to this class.
+        /// </summary>
+        [Browsable (false)]
+        public new string Expression
+        {
+            get => base.Expression;
+            set => base.Expression = value;
+        }
+
+        /// <summary>
+        /// This property is not relevant to this class.
+        /// </summary>
+        [Browsable (false)]
+        public new string Description
+        {
+            get => base.Description;
+            set => base.Description = value;
+        }
+
+        /// <inheritdoc/>
+        public override bool CanContain (Base child)
+        {
+            return false;
+        }
     }
 
-    /// <inheritdoc/>
-    public override bool CanContain(Base child)
+    /// <summary>
+    /// Returns date and time of the report's start.
+    /// </summary>
+    public class DateVariable : SystemVariable
     {
-      return false;
-    }
-  }
+        /// <inheritdoc/>
+        public override object Value => Report.Engine.Date;
 
-  /// <summary>
-  /// Returns date and time of the report's start.
-  /// </summary>
-  public class DateVariable : SystemVariable
-  {
-    /// <inheritdoc/>
-    public override object Value
-    {
-      get { return Report.Engine.Date; }
+        internal DateVariable()
+        {
+            Name = "Date";
+            DataType = typeof (DateTime);
+        }
     }
 
-    internal DateVariable()
+    /// <summary>
+    /// Returns current page number.
+    /// </summary>
+    public class PageVariable : SystemVariable
     {
-      Name = "Date";
-      DataType = typeof(DateTime);
-    }
-  }
+        /// <inheritdoc/>
+        public override object Value => Report.Engine.PageNo;
 
-  /// <summary>
-  /// Returns current page number.
-  /// </summary>
-  public class PageVariable : SystemVariable
-  {
-    /// <inheritdoc/>
-    public override object Value
-    {
-      get { return Report.Engine.PageNo; }
+        internal PageVariable()
+        {
+            Name = "Page";
+            DataType = typeof (int);
+        }
     }
 
-    internal PageVariable()
+    /// <summary>
+    /// Returns total number of pages in the report. To use this variable, you need
+    /// to enable the report's double pass.
+    /// </summary>
+    public class TotalPagesVariable : SystemVariable
     {
-      Name = "Page";
-      DataType = typeof(int);
-    }
-  }
+        /// <inheritdoc/>
+        public override object Value => Report.Engine.TotalPages;
 
-  /// <summary>
-  /// Returns total number of pages in the report. To use this variable, you need
-  /// to enable the report's double pass.
-  /// </summary>
-  public class TotalPagesVariable : SystemVariable
-  {
-    /// <inheritdoc/>
-    public override object Value
-    {
-      get { return Report.Engine.TotalPages; }
+        internal TotalPagesVariable()
+        {
+            Name = "TotalPages";
+            DataType = typeof (int);
+        }
     }
 
-    internal TotalPagesVariable()
+    /// <summary>
+    /// Returns a string containing the current page number in a form "Page N".
+    /// </summary>
+    public class PageNVariable : SystemVariable
     {
-      Name = "TotalPages";
-      DataType = typeof(int);
-    }
-  }
+        /// <inheritdoc/>
+        public override object Value => Report.Engine.PageN;
 
-  /// <summary>
-  /// Returns a string containing the current page number in a form "Page N".
-  /// </summary>
-  public class PageNVariable : SystemVariable
-  {
-    /// <inheritdoc/>
-    public override object Value
-    {
-      get { return Report.Engine.PageN; }
+        internal PageNVariable()
+        {
+            Name = "PageN";
+            DataType = typeof (string);
+        }
     }
 
-    internal PageNVariable()
+    /// <summary>
+    /// Returns a string containing the current page number and total pages in a form "Page N of M".
+    /// To use this variable, you need to enable the report's double pass.
+    /// </summary>
+    public class PageNofMVariable : SystemVariable
     {
-      Name = "PageN";
-      DataType = typeof(string);
-    }
-  }
+        /// <inheritdoc/>
+        public override object Value => Report.Engine.PageNofM;
 
-  /// <summary>
-  /// Returns a string containing the current page number and total pages in a form "Page N of M".
-  /// To use this variable, you need to enable the report's double pass.
-  /// </summary>
-  public class PageNofMVariable : SystemVariable
-  {
-    /// <inheritdoc/>
-    public override object Value
-    {
-      get { return Report.Engine.PageNofM; }
+        internal PageNofMVariable()
+        {
+            Name = "PageNofM";
+            DataType = typeof (string);
+        }
     }
 
-    internal PageNofMVariable()
+    /// <summary>
+    /// Returns data row number inside the group. This value is reset at the start of a new group.
+    /// </summary>
+    public class RowVariable : SystemVariable
     {
-      Name = "PageNofM";
-      DataType = typeof(string);
-    }
-  }
+        /// <inheritdoc/>
+        public override object Value => Report.Engine.RowNo;
 
-  /// <summary>
-  /// Returns data row number inside the group. This value is reset at the start of a new group.
-  /// </summary>
-  public class RowVariable : SystemVariable
-  {
-    /// <inheritdoc/>
-    public override object Value
-    {
-      get { return Report.Engine.RowNo; }
+        internal RowVariable()
+        {
+            Name = "Row#";
+            DataType = typeof (int);
+        }
     }
 
-    internal RowVariable()
+    /// <summary>
+    /// Returns absolute number of data row. This value is never reset at the start of a new group.
+    /// </summary>
+    public class AbsRowVariable : SystemVariable
     {
-      Name = "Row#";
-      DataType = typeof(int);
-    }
-  }
+        /// <inheritdoc/>
+        public override object Value => Report.Engine.AbsRowNo;
 
-  /// <summary>
-  /// Returns absolute number of data row. This value is never reset at the start of a new group.
-  /// </summary>
-  public class AbsRowVariable : SystemVariable
-  {
-    /// <inheritdoc/>
-    public override object Value
-    {
-      get { return Report.Engine.AbsRowNo; }
+        internal AbsRowVariable()
+        {
+            Name = "AbsRow#";
+            DataType = typeof (int);
+        }
     }
 
-    internal AbsRowVariable()
+    /// <summary>
+    /// Returns current page number.
+    /// <para/>This variable is actually a macro. Its value is substituted when the component is viewed in
+    /// the preview window. That means you cannot use it in an expression.
+    /// </summary>
+    public class PageMacroVariable : SystemVariable
     {
-      Name = "AbsRow#";
-      DataType = typeof(int);
-    }
-  }
+        /// <inheritdoc/>
+        public override object Value => "[PAGE#]";
 
-  /// <summary>
-  /// Returns current page number.
-  /// <para/>This variable is actually a macro. Its value is substituted when the component is viewed in
-  /// the preview window. That means you cannot use it in an expression.
-  /// </summary>
-  public class PageMacroVariable : SystemVariable
-  {
-    /// <inheritdoc/>
-    public override object Value
-    {
-      get { return "[PAGE#]"; }
+        internal PageMacroVariable()
+        {
+            Name = "Page#";
+            DataType = typeof (int);
+        }
     }
 
-    internal PageMacroVariable()
+    /// <summary>
+    /// Returns the number of total pages in the report.
+    /// <para/>This variable is actually a macro. Its value is substituted when the component is viewed in
+    /// the preview window. That means you cannot use it in an expression.
+    /// </summary>
+    public class TotalPagesMacroVariable : SystemVariable
     {
-      Name = "Page#";
-      DataType = typeof(int);
-    }
-  }
+        /// <inheritdoc/>
+        public override object Value => "[TOTALPAGES#]";
 
-  /// <summary>
-  /// Returns the number of total pages in the report.
-  /// <para/>This variable is actually a macro. Its value is substituted when the component is viewed in
-  /// the preview window. That means you cannot use it in an expression.
-  /// </summary>
-  public class TotalPagesMacroVariable : SystemVariable
-  {
-    /// <inheritdoc/>
-    public override object Value
-    {
-      get { return "[TOTALPAGES#]"; }
+        internal TotalPagesMacroVariable()
+        {
+            Name = "TotalPages#";
+            DataType = typeof (int);
+        }
     }
 
-    internal TotalPagesMacroVariable()
+    /// <summary>
+    /// Returns the name of the printed copy.
+    /// <para/>This variable is actually a macro. Its value is substituted when the component is viewed in
+    /// the preview window. That means you cannot use it in an expression.
+    /// </summary>
+    public class CopyNameMacroVariable : SystemVariable
     {
-      Name = "TotalPages#";
-      DataType = typeof(int);
-    }
-  }
+        /// <inheritdoc/>
+        public override object Value => "[COPYNAME#]";
 
-  /// <summary>
-  /// Returns the name of the printed copy.
-  /// <para/>This variable is actually a macro. Its value is substituted when the component is viewed in
-  /// the preview window. That means you cannot use it in an expression.
-  /// </summary>
-  public class CopyNameMacroVariable : SystemVariable
-  {
-    /// <inheritdoc/>
-    public override object Value
-    {
-      get { return "[COPYNAME#]"; }
+        internal CopyNameMacroVariable()
+        {
+            Name = "CopyName#";
+            DataType = typeof (string);
+        }
     }
 
-    internal CopyNameMacroVariable()
+    /// <summary>
+    /// Returns a level of hierarchy in the hierarchical report.
+    /// </summary>
+    public class HierarchyLevelVariable : SystemVariable
     {
-      Name = "CopyName#";
-      DataType = typeof(string);
-    }
-  }
+        /// <inheritdoc/>
+        public override object Value => Report.Engine.HierarchyLevel;
 
-  /// <summary>
-  /// Returns a level of hierarchy in the hierarchical report.
-  /// </summary>
-  public class HierarchyLevelVariable : SystemVariable
-  {
-    /// <inheritdoc/>
-    public override object Value
-    {
-      get { return Report.Engine.HierarchyLevel; }
+        internal HierarchyLevelVariable()
+        {
+            Name = "HierarchyLevel";
+            DataType = typeof (int);
+        }
     }
 
-    internal HierarchyLevelVariable()
+    /// <summary>
+    /// Returns the row number like "1.2.1" in the hierarchical report.
+    /// </summary>
+    public class HierarchyRowNoVariable : SystemVariable
     {
-      Name = "HierarchyLevel";
-      DataType = typeof(int);
-    }
-  }
+        /// <inheritdoc/>
+        public override object Value => Report.Engine.HierarchyRowNo;
 
-  /// <summary>
-  /// Returns the row number like "1.2.1" in the hierarchical report.
-  /// </summary>
-  public class HierarchyRowNoVariable : SystemVariable
-  {
-    /// <inheritdoc/>
-    public override object Value
-    {
-      get { return Report.Engine.HierarchyRowNo; }
+        internal HierarchyRowNoVariable()
+        {
+            Name = "HierarchyRow#";
+            DataType = typeof (string);
+        }
     }
-
-    internal HierarchyRowNoVariable()
-    {
-      Name = "HierarchyRow#";
-      DataType = typeof(string);
-    }
-  }
 }

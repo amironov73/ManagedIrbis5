@@ -16,6 +16,7 @@
 #region Using directives
 
 using AM.Reporting.Utils.Json;
+
 using System;
 using System.Data;
 using System.Data.Common;
@@ -45,10 +46,9 @@ namespace AM.Reporting.Data.JsonConnection
 
         #region Private Fields
 
-        private JsonArray jsonInternal = null;
-        private JsonSchema jsonSchema = null;
+        private JsonArray? jsonInternal;
+        private JsonSchema? jsonSchema;
         private string jsonSchemaString = "";
-        private bool simpleStructure;
 
         #endregion Private Fields
 
@@ -59,7 +59,10 @@ namespace AM.Reporting.Data.JsonConnection
             get
             {
                 if (jsonInternal == null)
+                {
                     InitConnection();
+                }
+
                 return jsonInternal;
             }
         }
@@ -69,18 +72,15 @@ namespace AM.Reporting.Data.JsonConnection
             get
             {
                 if (jsonSchema == null)
+                {
                     InitConnection();
+                }
+
                 return jsonSchema;
             }
         }
 
-        internal bool SimpleStructure
-        {
-            get
-            {
-                return simpleStructure;
-            }
-        }
+        internal bool SimpleStructure { get; private set; }
 
         #endregion Internal Properties
 
@@ -99,15 +99,15 @@ namespace AM.Reporting.Data.JsonConnection
         #region Public Methods
 
         /// <inheritdoc/>
-        public override void CreateAllTables(bool initSchema)
+        public override void CreateAllTables (bool initSchema)
         {
-            bool found = false;
+            var found = false;
             foreach (Base b in Tables)
             {
-                if (b is JsonTableDataSource)
+                if (b is JsonTableDataSource source)
                 {
-                    (b as JsonTableDataSource).UpdateSchema = true;
-                    (b as JsonTableDataSource).InitSchema();
+                    source.UpdateSchema = true;
+                    source.InitSchema();
                     found = true;
                     break;
                 }
@@ -115,18 +115,20 @@ namespace AM.Reporting.Data.JsonConnection
 
             if (!found)
             {
-                JsonTableDataSource jsonDataSource = new JsonTableDataSource();
+                var jsonDataSource = new JsonTableDataSource();
 
-                string fixedTableName = TABLE_NAME;
+                var fixedTableName = TABLE_NAME;
                 jsonDataSource.TableName = fixedTableName;
 
                 if (Report != null)
                 {
-                    jsonDataSource.Name = Report.Dictionary.CreateUniqueName(fixedTableName);
-                    jsonDataSource.Alias = Report.Dictionary.CreateUniqueAlias(jsonDataSource.Alias);
+                    jsonDataSource.Name = Report.Dictionary.CreateUniqueName (fixedTableName);
+                    jsonDataSource.Alias = Report.Dictionary.CreateUniqueAlias (jsonDataSource.Alias);
                 }
                 else
+                {
                     jsonDataSource.Name = fixedTableName;
+                }
 
                 jsonDataSource.Parent = this;
                 jsonDataSource.InitSchema();
@@ -149,24 +151,26 @@ namespace AM.Reporting.Data.JsonConnection
         }
 
         /// <inheritdoc/>
-        public override void CreateTable(TableDataSource source)
+        public override void CreateTable (TableDataSource source)
         {
             //throw new NotImplementedException();
         }
 
         /// <inheritdoc/>
-        public override void DeleteTable(TableDataSource source)
+        public override void DeleteTable (TableDataSource source)
         {
             //throw new NotImplementedException();
         }
 
         /// <inheritdoc/>
-        public override void FillTableData(DataTable table, string selectCommand, CommandParameterCollection parameters)
+        public override void FillTableData (DataTable table, string selectCommand,
+            CommandParameterCollection parameters)
         {
         }
 
         /// <inheritdoc/>
-        public override void FillTableSchema(DataTable table, string selectCommand, CommandParameterCollection parameters)
+        public override void FillTableSchema (DataTable table, string selectCommand,
+            CommandParameterCollection parameters)
         {
         }
 
@@ -177,13 +181,13 @@ namespace AM.Reporting.Data.JsonConnection
         }
 
         /// <inheritdoc/>
-        public override string QuoteIdentifier(string value, DbConnection connection)
+        public override string QuoteIdentifier (string value, DbConnection connection)
         {
             return value;
         }
 
         /// <inheritdoc/>
-        public JsonBase GetJson(TableDataSource tableDataSource)
+        public JsonBase GetJson (TableDataSource tableDataSource)
         {
             return Json;
         }
@@ -199,10 +203,10 @@ namespace AM.Reporting.Data.JsonConnection
         }
 
         /// <inheritdoc/>
-        protected override void SetConnectionString(string value)
+        protected override void SetConnectionString (string value)
         {
             jsonInternal = null;
-            base.SetConnectionString(value);
+            base.SetConnectionString (value);
         }
 
         #endregion Protected Methods
@@ -211,15 +215,16 @@ namespace AM.Reporting.Data.JsonConnection
 
         private void InitConnection()
         {
-            InitConnection(false);
+            InitConnection (false);
         }
 
-        private void InitConnection(bool rebuildSchema)
+        private void InitConnection (bool rebuildSchema)
         {
-            JsonDataSourceConnectionStringBuilder builder = new JsonDataSourceConnectionStringBuilder(ConnectionString);
-            simpleStructure = builder.SimpleStructure;
-            JsonBase obj = null;
-            string jsonText = builder.Json.Trim();
+            var
+                builder = new JsonDataSourceConnectionStringBuilder (ConnectionString);
+            SimpleStructure = builder.SimpleStructure;
+            JsonBase? obj = null;
+            var jsonText = builder.Json.Trim();
             if (jsonText.Length > 0)
             {
                 if (!(jsonText[0] == '{' || jsonText[0] == '['))
@@ -239,79 +244,84 @@ namespace AM.Reporting.Data.JsonConnection
 
                     ServicePointManager.Expect100Continue = true;
                     ServicePointManager.SecurityProtocol = (SecurityProtocolType)(0xc0 | 0x300 | 0xc00);
-                    var req = WebRequest.Create(jsonText);
+                    var req = WebRequest.Create (jsonText);
 
                     foreach (var header in builder.Headers)
                     {
-                        req.Headers.Add(header.Key, header.Value);
+                        req.Headers.Add (header.Key, header.Value);
                     }
 
                     using (var response = req.GetResponse() as HttpWebResponse)
                     {
-                        var encoding = Encoding.GetEncoding(response.CharacterSet);
+                        var encoding = Encoding.GetEncoding (response.CharacterSet);
 
                         using (var responseStream = response.GetResponseStream())
-                        using (var reader = new System.IO.StreamReader(responseStream, encoding))
+                        using (var reader = new System.IO.StreamReader (responseStream, encoding))
                             jsonText = reader.ReadToEnd();
                     }
-
                 }
-                obj = JsonBase.FromString(jsonText) as JsonBase;
+
+                obj = JsonBase.FromString (jsonText) as JsonBase;
             }
 
-            string schema = builder.JsonSchema;
+            var schema = builder.JsonSchema;
 
             // have to update schema
-            if (schema != jsonSchemaString || jsonSchema == null || String.IsNullOrEmpty(jsonSchemaString))
+            if (schema != jsonSchemaString || jsonSchema == null || string.IsNullOrEmpty (jsonSchemaString))
             {
-                JsonSchema schemaObj = null;
-                if (String.IsNullOrEmpty(schema) || rebuildSchema)
+                JsonSchema? schemaObj = null;
+                if (string.IsNullOrEmpty (schema) || rebuildSchema)
                 {
                     if (obj != null)
                     {
-                        schemaObj = JsonSchema.FromJson(obj);
-                        JsonObject child = new JsonObject();
-                        schemaObj.Save(child);
+                        schemaObj = JsonSchema.FromJson (obj);
+                        var child = new JsonObject();
+                        schemaObj.Save (child);
                         jsonSchemaString = child.ToString();
                     }
                 }
                 else
                 {
-                    schemaObj = JsonSchema.Load(JsonBase.FromString(schema) as JsonObject);
+                    schemaObj = JsonSchema.Load (JsonBase.FromString (schema) as JsonObject);
                     jsonSchemaString = schema;
                 }
 
                 if (schemaObj == null)
                 {
-                    schemaObj = new JsonSchema();
-                    schemaObj.Type = "array";
+                    schemaObj = new JsonSchema
+                    {
+                        Type = "array"
+                    };
                 }
 
                 if (schemaObj.Type != "array")
                 {
-                    JsonSchema parentSchema = new JsonSchema();
-                    parentSchema.Items = schemaObj;
-                    parentSchema.Type = "array";
+                    var parentSchema = new JsonSchema
+                    {
+                        Items = schemaObj,
+                        Type = "array"
+                    };
                     schemaObj = parentSchema;
                 }
 
                 jsonSchema = schemaObj;
             }
 
-            if (obj is JsonArray)
+            if (obj is JsonArray array)
             {
-                jsonInternal = obj as JsonArray;
+                jsonInternal = array;
             }
             else
             {
-                JsonArray result = new JsonArray();
+                var result = new JsonArray();
                 if (obj != null)
-                    result.Add(obj);
+                {
+                    result.Add (obj);
+                }
+
                 jsonInternal = result;
             }
         }
-
-
 
         #endregion Private Methods
     }

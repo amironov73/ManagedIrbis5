@@ -17,7 +17,9 @@
 
 using System.Drawing;
 using System.Drawing.Drawing2D;
+
 using AM.Reporting.Utils;
+
 using System.ComponentModel;
 
 #endregion
@@ -34,11 +36,11 @@ namespace AM.Reporting.Gauge.Simple
         /// <summary>
         /// Gets or sets gauge label.
         /// </summary>
-        [Browsable(false)]
+        [Browsable (false)]
         public override GaugeLabel Label
         {
-            get { return base.Label; }
-            set { base.Label = value; }
+            get => base.Label;
+            set => base.Label = value;
         }
 
         #region Constructors
@@ -50,8 +52,8 @@ namespace AM.Reporting.Gauge.Simple
         {
             InitializeComponent();
             Value = 75;
-            Scale = new SimpleScale(this);
-            Pointer = new SimplePointer(this);
+            Scale = new SimpleScale (this);
+            Pointer = new SimplePointer (this);
             Height = 2.0f * Units.Centimeters;
             Width = 8.0f * Units.Centimeters;
         }
@@ -61,13 +63,13 @@ namespace AM.Reporting.Gauge.Simple
         #region Public Methods
 
         /// <inheritdoc/>
-        public override void Draw(FRPaintEventArgs e)
+        public override void Draw (FRPaintEventArgs e)
         {
-            base.Draw(e);
-            Scale.Draw(e);
-            Pointer.Draw(e);
-            Border.Draw(e, new RectangleF(AbsLeft, AbsTop, Width, Height));
-            IGraphics g = e.Graphics;
+            base.Draw (e);
+            Scale.Draw (e);
+            Pointer.Draw (e);
+            Border.Draw (e, new RectangleF (AbsLeft, AbsTop, Width, Height));
+            var g = e.Graphics;
 
             if (Report != null && Report.SmoothGraphics)
             {
@@ -75,9 +77,9 @@ namespace AM.Reporting.Gauge.Simple
                 g.SmoothingMode = SmoothingMode.AntiAlias;
             }
 
-            Scale.Draw(e);
-            Pointer.Draw(e);
-            Border.Draw(e, new RectangleF(AbsLeft, AbsTop, Width, Height));
+            Scale.Draw (e);
+            Pointer.Draw (e);
+            Border.Draw (e, new RectangleF (AbsLeft, AbsTop, Width, Height));
         }
 
         #endregion // Public Methods
