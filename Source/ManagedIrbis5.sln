@@ -1324,6 +1324,5 @@ Global
 		{5F6F61C7-0E85-4240-92DF-CFFC7E0CFD5B} = {1E5940AA-0540-4947-8216-45E381E76C72}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {5E077767-1AE0-47E0-AEFB-59E4D7464AD4}
 	EndGlobalSection
 EndGlobal

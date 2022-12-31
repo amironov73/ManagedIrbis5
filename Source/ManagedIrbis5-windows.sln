@@ -257,11 +257,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Peeper", "Apps\Peeper\Peepe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VisualRenumber", "Apps\VisualRenumber\VisualRenumber.csproj", "{915FCFEC-FCB5-4EE4-BE9A-039F89C01BFE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Encryptor", "Apps\Encryptor\Encryptor.csproj", "{EA8DD5B8-5257-4646-87C5-7B056133B9BA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Encryptor", "Apps\Encryptor\Encryptor.csproj", "{EA8DD5B8-5257-4646-87C5-7B056133B9BA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gatekeeper", "Apps\Gatekeeper\Gatekeeper.csproj", "{4918D034-E19F-449B-B44E-B092F4FFE889}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gatekeeper", "Apps\Gatekeeper\Gatekeeper.csproj", "{4918D034-E19F-449B-B44E-B092F4FFE889}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abonement", "Apps\Abonement\Abonement.csproj", "{07922A8D-0821-4183-9422-67FE77405A6D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Abonement", "Apps\Abonement\Abonement.csproj", "{07922A8D-0821-4183-9422-67FE77405A6D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -1701,8 +1701,8 @@ Global
 		{3B1A8A4E-7299-47CD-A1BF-7BEEFA912B17}.Release|x64.Build.0 = Release|Any CPU
 		{3B1A8A4E-7299-47CD-A1BF-7BEEFA912B17}.Release|x86.ActiveCfg = Release|Any CPU
 		{3B1A8A4E-7299-47CD-A1BF-7BEEFA912B17}.Release|x86.Build.0 = Release|Any CPU
-		{915FCFEC-FCB5-4EE4-BE9A-039F89C01BFE}.Debug|Any CPU.ActiveCfg = Debug|x64
-		{915FCFEC-FCB5-4EE4-BE9A-039F89C01BFE}.Debug|Any CPU.Build.0 = Debug|x64
+		{915FCFEC-FCB5-4EE4-BE9A-039F89C01BFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{915FCFEC-FCB5-4EE4-BE9A-039F89C01BFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{915FCFEC-FCB5-4EE4-BE9A-039F89C01BFE}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{915FCFEC-FCB5-4EE4-BE9A-039F89C01BFE}.Debug|x64.Build.0 = Debug|Any CPU
 		{915FCFEC-FCB5-4EE4-BE9A-039F89C01BFE}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -1879,6 +1879,5 @@ Global
 		{07922A8D-0821-4183-9422-67FE77405A6D} = {1E5940AA-0540-4947-8216-45E381E76C72}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {5E077767-1AE0-47E0-AEFB-59E4D7464AD4}
 	EndGlobalSection
 EndGlobal
