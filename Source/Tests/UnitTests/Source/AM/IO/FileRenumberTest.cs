@@ -130,7 +130,7 @@ public sealed class FileRenumberTest
     [Description ("Использование префикса")]
     public void FileRenumber_GenerateNames_8()
     {
-        var renamer = new FileRenumber() { Prefix = "prefix_" };
+        var renamer = new FileRenumber() { Prefix = "prefix_", Start = 1 };
         var sourceFiles = new [] { "hello1", "hello2", "hello100" };
         var generated = renamer.GenerateNames (sourceFiles);
         var expected = new List<FileRenumber.Bunch>()
