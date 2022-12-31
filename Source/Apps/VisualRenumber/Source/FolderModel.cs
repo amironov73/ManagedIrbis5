@@ -47,7 +47,13 @@ public class FolderModel
     public string? Prefix { get; set; }
 
     [Reactive]
+    public string? Suffix { get; set; }
+
+    [Reactive]
     public int GroupWidth { get; set; }
+
+    [Reactive]
+    public int StartNumber { get; set; }
 
     [Reactive]
     public FileItem[]? Files { get; set; }
@@ -71,6 +77,8 @@ public class FolderModel
         Renumber.GroupWidth = GroupWidth;
         Renumber.DryRun = DryRun;
         Renumber.Prefix = Prefix;
+        Renumber.Suffix = Suffix;
+        Renumber.Start = StartNumber;
 
         if (Files is not null)
         {
@@ -220,6 +228,7 @@ public class FolderModel
             pattern = Path.GetFileName (directoryNameWithPattern).ThrowIfNull();
         }
 
+        StartNumber = 1;
         DirectoryName = dirName;
         var unsorted = Directory.GetFiles (dirName, pattern, SearchOption.TopDirectoryOnly);
         var sorted = NumberText.Sort (unsorted).ToArray();

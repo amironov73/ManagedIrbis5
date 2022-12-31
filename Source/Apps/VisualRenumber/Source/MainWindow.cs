@@ -16,6 +16,7 @@
 
 using System;
 using System.ComponentModel;
+using System.Drawing.Printing;
 using System.IO;
 
 using AM;
@@ -107,11 +108,10 @@ public sealed class MainWindow
                 Background = Brushes.LightGray,
                 Children =
                 {
-                    new StackPanel
+                    new WrapPanel
                     {
                         Orientation = Orientation.Horizontal,
                         Margin = new Thickness (5),
-                        Spacing = 5,
 
                         Children =
                         {
@@ -119,40 +119,80 @@ public sealed class MainWindow
                             CreateButton ("check-all.png", () => _model.CheckAll()),
                             CreateButton ("check-none.png", () => _model.CheckNone()),
                             CreateButton ("check-reverse.png", () => _model.CheckReverse()),
-                            new Label
-                            {
-                                Content = "Группа",
-                                VerticalAlignment = VerticalAlignment.Center
-                            },
-                            new NumericUpDown
-                            {
-                                Width = 120,
-                                Minimum = 1,
-                                Maximum = 9,
-                                [!NumericUpDown.ValueProperty] = new Binding (nameof (_model.GroupNumber))
-                            },
-                            new Label
-                            {
-                                Content = "Ширина",
-                                VerticalAlignment = VerticalAlignment.Center
-                            },
-                            new NumericUpDown
-                            {
-                                Width = 120,
-                                Minimum = 0,
-                                Maximum = 9,
-                                [!NumericUpDown.ValueProperty] = new Binding (nameof (_model.GroupWidth))
-                            },
-                            new Label
-                            {
-                                Content = "Префикс",
-                                VerticalAlignment = VerticalAlignment.Center
-                            },
-                            new TextBox
-                            {
-                                Width = 150,
-                                [!TextBox.TextProperty] = new Binding (nameof (_model.Prefix))
-                            },
+                            AvaloniaUtility.HorizontalGroup
+                                (
+                                    new Label
+                                    {
+                                        Content = "Группа",
+                                        VerticalAlignment = VerticalAlignment.Center
+                                    },
+                                    new NumericUpDown
+                                    {
+                                        Width = 120,
+                                        Minimum = 1,
+                                        Maximum = 9,
+                                        [!NumericUpDown.ValueProperty] = new Binding (nameof (_model.GroupNumber))
+                                    }
+                                )
+                                .SetPanelMargin (5),
+                            AvaloniaUtility.HorizontalGroup
+                                (
+                                    new Label
+                                    {
+                                        Content = "Ширина",
+                                        VerticalAlignment = VerticalAlignment.Center
+                                    },
+                                    new NumericUpDown
+                                    {
+                                        Width = 120,
+                                        Minimum = 0,
+                                        Maximum = 9,
+                                        [!NumericUpDown.ValueProperty] = new Binding (nameof (_model.GroupWidth))
+                                    }
+                                )
+                                .SetPanelMargin (5),
+                            AvaloniaUtility.HorizontalGroup
+                                (
+                                    new Label
+                                    {
+                                        Content = "Префикс",
+                                        VerticalAlignment = VerticalAlignment.Center
+                                    },
+                                    new TextBox
+                                    {
+                                        Width = 150,
+                                        [!TextBox.TextProperty] = new Binding (nameof (_model.Prefix))
+                                    }
+                                )
+                                .SetPanelMargin (5),
+                            AvaloniaUtility.HorizontalGroup
+                                (
+                                    new Label
+                                    {
+                                        Content = "Суффикс",
+                                        VerticalAlignment = VerticalAlignment.Center
+                                    },
+                                    new TextBox
+                                    {
+                                        Width = 50,
+                                        [!TextBox.TextProperty] = new Binding (nameof (_model.Suffix))
+                                    }
+                                )
+                                .SetPanelMargin (5),
+                            AvaloniaUtility.HorizontalGroup
+                                (
+                                    new Label
+                                    {
+                                        Content = "Начальный",
+                                        VerticalAlignment = VerticalAlignment.Center
+                                    },
+                                    new TextBox
+                                    {
+                                        Width = 50,
+                                        [!TextBox.TextProperty] = new Binding (nameof  (_model.StartNumber))
+                                    }
+                                )
+                                .SetPanelMargin (5),
                             new CheckBox
                             {
                                 Content = "Сухой",

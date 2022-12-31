@@ -145,10 +145,22 @@ public sealed class FileRenumber
     public int Delta { get; set; }
 
     /// <summary>
+    /// Начальный номер.
+    /// </summary>
+    [JsonPropertyName ("start")]
+    public int Start { get; set; }
+
+    /// <summary>
     /// Префикс (отменяет использование оригинальных имен файлов).
     /// </summary>
     [JsonPropertyName ("prefix")]
     public string? Prefix { get; set; }
+
+    /// <summary>
+    /// Суффикс (работает при наличии префикса).
+    /// </summary>
+    [JsonPropertyName ("suffix")]
+    public string? Suffix { get; set; }
 
     #endregion
 
@@ -218,7 +230,7 @@ public sealed class FileRenumber
             return result;
         }
 
-        var counter = 0;
+        var counter = Start;
         foreach (var sourceFile in sourceFiles)
         {
             var extension = Path.GetExtension (sourceFile);
@@ -230,7 +242,7 @@ public sealed class FileRenumber
                 ? oldName.Substring (0, match.Index)
                   + value.ToString (pattern, CultureInfo.InvariantCulture)
                   + oldName.Substring (match.Index + match.Length)
-                : Prefix + (++counter).ToString (pattern, CultureInfo.InvariantCulture);
+                : Prefix + (counter++).ToString (pattern, CultureInfo.InvariantCulture) + Suffix;
             newName += extension;
 
             if (string.CompareOrdinal (oldName, newName) != 0)

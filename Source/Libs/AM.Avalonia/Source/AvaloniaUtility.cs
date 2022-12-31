@@ -746,6 +746,23 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
+    /// Простая группировка элементов по горизонтали..
+    /// </summary>
+    public static StackPanel HorizontalGroup
+        (
+            params IControl[] controls
+        )
+    {
+        var result = new StackPanel
+        {
+            Orientation = Orientation.Horizontal
+        };
+        result.Children.AddRange (controls);
+
+        return result;
+    }
+
+    /// <summary>
     /// Установка наклонного начертания для текстового блока.
     /// </summary>
     public static T Italic<T>
@@ -1010,14 +1027,14 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
-    /// Установка полей внутри контрола.
+    /// Установка полей снаружи контрола.
     /// </summary>
     public static T SetMargin<T>
         (
             this T control,
             Thickness thickness
         )
-        where T : ContentControl
+        where T: ContentControl
     {
         Sure.NotNull (control);
 
@@ -1027,7 +1044,7 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
-    /// Установка полей внутри контрола.
+    /// Установка полей снаружи контрола.
     /// </summary>
     public static T SetMargin<T>
         (
@@ -1044,7 +1061,7 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
-    /// Установка полей внутри контрола.
+    /// Установка полей снаружи контрола.
     /// </summary>
     public static T SetMargin<T>
         (
@@ -1062,7 +1079,7 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
-    /// Установка полей внутри контрола.
+    /// Установка полей снаружи контрола.
     /// </summary>
     public static T SetMargin<T>
         (
@@ -1082,14 +1099,14 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
-    /// Установка полей вокруг текстового блока.
+    /// Установка полей внутри текстового блока.
     /// </summary>
     public static T SetPadding<T>
         (
             this T block,
             Thickness thickness
         )
-        where T : TextBlock
+        where T: TextBlock
     {
         Sure.NotNull (block);
 
@@ -1099,14 +1116,14 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
-    /// Установка полей вокруг текстового блока.
+    /// Установка полей внутри текстового блока.
     /// </summary>
     public static T SetPadding<T>
         (
             this T block,
             double thickness
         )
-        where T : TextBlock
+        where T: TextBlock
     {
         Sure.NotNull (block);
 
@@ -1116,7 +1133,7 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
-    /// Установка полей вокруг текстового блока.
+    /// Установка полей внутри текстового блока.
     /// </summary>
     public static T SetPadding<T>
         (
@@ -1124,7 +1141,7 @@ public static class AvaloniaUtility
             double horizontal,
             double vertical
         )
-        where T : TextBlock
+        where T: TextBlock
     {
         Sure.NotNull (block);
 
@@ -1134,7 +1151,7 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
-    /// Установка полей вокруг текстового блока.
+    /// Установка полей внутри текстового блока.
     /// </summary>
     public static T SetPadding<T>
         (
@@ -1144,13 +1161,64 @@ public static class AvaloniaUtility
             double right,
             double bottom
         )
-        where T : TextBlock
+        where T: TextBlock
     {
         Sure.NotNull (block);
 
         block.Padding = new Thickness (left, top, right, bottom);
 
         return block;
+    }
+
+    /// <summary>
+    /// Установка полей снаружи панели.
+    /// </summary>
+    public static T SetPanelMargin<T>
+        (
+            this T control,
+            Thickness thickness
+        )
+        where T: Panel
+    {
+        Sure.NotNull (control);
+
+        control.Margin = thickness;
+
+        return control;
+    }
+
+    /// <summary>
+    /// Установка полей снаружи панели.
+    /// </summary>
+    public static T SetPanelMargin<T>
+        (
+            this T control,
+            double uniform
+        )
+        where T: Panel
+    {
+        Sure.NotNull (control);
+
+        control.Margin = new Thickness (uniform);
+
+        return control;
+    }
+    /// <summary>
+    /// Установка полей снаружи панели.
+    /// </summary>
+    public static T SetPanelMargin<T>
+        (
+            this T control,
+            double horizontal,
+            double vertical
+        )
+        where T: Panel
+    {
+        Sure.NotNull (control);
+
+        control.Margin = new Thickness (horizontal, vertical);
+
+        return control;
     }
 
     /// <summary>
