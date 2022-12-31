@@ -145,30 +145,30 @@ namespace AM.Reporting
         }
 
         /// <inheritdoc/>
-        public override void Draw (FRPaintEventArgs e)
+        public override void Draw (FRPaintEventArgs eventArgs)
         {
             if (Math.Abs (Width) < 1 || Math.Abs (Height) < 1)
             {
                 return;
             }
 
-            var g = e.Graphics;
-            var x = (AbsLeft + Border.Width / 2) * e.ScaleX;
-            var y = (AbsTop + Border.Width / 2) * e.ScaleY;
-            var dx = (Width - Border.Width) * e.ScaleX - 1;
-            var dy = (Height - Border.Width) * e.ScaleY - 1;
+            var g = eventArgs.Graphics;
+            var x = (AbsLeft + Border.Width / 2) * eventArgs.ScaleX;
+            var y = (AbsTop + Border.Width / 2) * eventArgs.ScaleY;
+            var dx = (Width - Border.Width) * eventArgs.ScaleX - 1;
+            var dy = (Height - Border.Width) * eventArgs.ScaleY - 1;
             var x1 = x + dx;
             var y1 = y + dy;
 
-            var pen = e.Cache.GetPen (Border.Color, Border.Width * e.ScaleX, Border.DashStyle);
+            var pen = eventArgs.Cache.GetPen (Border.Color, Border.Width * eventArgs.ScaleX, Border.DashStyle);
             Brush brush = null;
             if (Fill is SolidFill)
             {
-                brush = e.Cache.GetBrush ((Fill as SolidFill).Color);
+                brush = eventArgs.Cache.GetBrush ((Fill as SolidFill).Color);
             }
             else
             {
-                brush = Fill.CreateBrush (new RectangleF (x, y, dx, dy), e.ScaleX, e.ScaleY);
+                brush = Fill.CreateBrush (new RectangleF (x, y, dx, dy), eventArgs.ScaleX, eventArgs.ScaleY);
             }
 
             var report = Report;
@@ -192,7 +192,7 @@ namespace AM.Reporting
                     }
                     else
                     {
-                        min = Math.Min (min, Curve * e.ScaleX * 10);
+                        min = Math.Min (min, Curve * eventArgs.ScaleX * 10);
                     }
 
                     var gp = GetRoundRectPath (x, y, x1, y1, min);

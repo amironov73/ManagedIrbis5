@@ -371,7 +371,7 @@ namespace AM.Reporting.Export.Html
         {
             float top = 0;
 
-            if (obj.Font.FontFamily.Name == "Wingdings" || obj.Font.FontFamily.Name == "Webdings")
+            if (obj.Font.FontFamily.Name is "Wingdings" or "Webdings")
             {
                 obj.Text = WingdingsToUnicodeConverter.Convert (obj.Text);
             }

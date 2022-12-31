@@ -572,10 +572,7 @@ namespace AM.Reporting.Code
                         if (!DataHelper.IsValidColumn (Report.Dictionary, expr))
                         {
                             var replaceString = text.Brackets[0] + expr + text.Brackets[2];
-                            if (Config.CompilerSettings.ExceptionBehaviour ==
-                                CompilerExceptionBehaviour.ShowExceptionMessage ||
-                                Config.CompilerSettings.ExceptionBehaviour ==
-                                CompilerExceptionBehaviour.ReplaceExpressionWithPlaceholder)
+                            if (Config.CompilerSettings.ExceptionBehaviour is CompilerExceptionBehaviour.ShowExceptionMessage or CompilerExceptionBehaviour.ReplaceExpressionWithPlaceholder)
                             {
                                 result = result.Replace (replaceString, Config.CompilerSettings.Placeholder);
                             }

@@ -1424,16 +1424,16 @@ namespace AM.Reporting
                         dt == typeof (float) ||
                         dt == typeof (double) ||
                         dt == typeof (decimal));
-                    if ((dt == typeof (byte) && (sd < byte.MinValue || sd > byte.MaxValue)) ||
-                        (dt == typeof (sbyte) && (sd < sbyte.MinValue || sd > sbyte.MaxValue)) ||
-                        (dt == typeof (short) && (sd < short.MinValue || sd > short.MaxValue)) ||
-                        (dt == typeof (ushort) && (sd < ushort.MinValue || sd > ushort.MaxValue)) ||
-                        (dt == typeof (int) && (sd < int.MinValue || sd > int.MaxValue)) ||
-                        (dt == typeof (uint) && (sd < uint.MinValue || sd > uint.MaxValue)) ||
-                        (dt == typeof (long) && (sd < long.MinValue || sd > long.MaxValue)) ||
-                        (dt == typeof (ulong) && (sd < ulong.MinValue || sd > ulong.MaxValue)) ||
-                        (dt == typeof (float) && (sd < float.MinValue || sd > float.MaxValue)) ||
-                        (dt == typeof (decimal) && (sd < (double)decimal.MinValue || sd > (double)decimal.MaxValue)))
+                    if ((dt == typeof (byte) && sd is < byte.MinValue or > byte.MaxValue) ||
+                        (dt == typeof (sbyte) && sd is < sbyte.MinValue or > sbyte.MaxValue) ||
+                        (dt == typeof (short) && sd is < short.MinValue or > short.MaxValue) ||
+                        (dt == typeof (ushort) && sd is < ushort.MinValue or > ushort.MaxValue) ||
+                        (dt == typeof (int) && sd is < int.MinValue or > int.MaxValue) ||
+                        (dt == typeof (uint) && sd is < uint.MinValue or > uint.MaxValue) ||
+                        (dt == typeof (long) && sd is < long.MinValue or > long.MaxValue) ||
+                        (dt == typeof (ulong) && sd is < ulong.MinValue or > ulong.MaxValue) ||
+                        (dt == typeof (float) && sd is < float.MinValue or > float.MaxValue) ||
+                        (dt == typeof (decimal) && sd is < (double)decimal.MinValue or > (double)decimal.MaxValue))
                     {
                         expandminmax = true;
                     }
@@ -1499,22 +1499,22 @@ namespace AM.Reporting
                                     lmax = int.MaxValue;
                                 }
 
-                                if (sd < long.MinValue || sd > long.MaxValue ||
+                                if (sd is < long.MinValue or > long.MaxValue ||
                                     lmin < long.MinValue || lmax > long.MaxValue)
                                 {
                                     ret = sd;
                                 }
-                                else if (sd < int.MinValue || sd > int.MaxValue ||
+                                else if (sd is < int.MinValue or > int.MaxValue ||
                                          lmin < int.MinValue || lmax > int.MaxValue)
                                 {
                                     ret = (long)sd;
                                 }
-                                else if (sd < short.MinValue || sd > short.MaxValue ||
+                                else if (sd is < short.MinValue or > short.MaxValue ||
                                          lmin < short.MinValue || lmax > short.MaxValue)
                                 {
                                     ret = (int)sd;
                                 }
-                                else if (sd < sbyte.MinValue || sd > sbyte.MaxValue ||
+                                else if (sd is < sbyte.MinValue or > sbyte.MaxValue ||
                                          lmin < sbyte.MinValue || lmax > sbyte.MaxValue)
                                 {
                                     ret = (short)sd;
@@ -1538,22 +1538,22 @@ namespace AM.Reporting
                                     lmax = uint.MaxValue;
                                 }
 
-                                if (sd < ulong.MinValue || sd > ulong.MaxValue ||
+                                if (sd is < ulong.MinValue or > ulong.MaxValue ||
                                     lmax > ulong.MaxValue)
                                 {
                                     ret = sd;
                                 }
-                                else if (sd < uint.MinValue || sd > uint.MaxValue ||
+                                else if (sd is < uint.MinValue or > uint.MaxValue ||
                                          lmax > uint.MaxValue)
                                 {
                                     ret = (ulong)sd;
                                 }
-                                else if (sd < ushort.MinValue || sd > ushort.MaxValue ||
+                                else if (sd is < ushort.MinValue or > ushort.MaxValue ||
                                          lmax > ushort.MaxValue)
                                 {
                                     ret = (uint)sd;
                                 }
-                                else if (sd < byte.MinValue || sd > byte.MaxValue ||
+                                else if (sd is < byte.MinValue or > byte.MaxValue ||
                                          lmax > byte.MaxValue)
                                 {
                                     ret = (ushort)sd;
@@ -2469,37 +2469,14 @@ namespace AM.Reporting
                 val = val.ToLower().Trim();
                 var sTrue = true.ToString().ToLower();
                 var sFalse = false.ToString().ToLower();
-                if (val == "" ||
-                    val == "false" ||
-                    val == "f" ||
-                    val == "0" ||
-                    val == "no" ||
-                    val == "n" ||
-                    val == "off" ||
-                    val == "negative" ||
-                    val == "neg" ||
-                    val == "disabled" ||
-                    val == "incorrect" ||
-                    val == "wrong" ||
-                    val == "left" ||
+                if (val is "" or "false" or "f" or "0" or "no" or "n" or "off" or "negative" or "neg" or "disabled" or "incorrect" or "wrong" or "left" ||
                     val == sFalse)
                 {
                     ret = false;
                     return ret;
                 }
 
-                if (val == "true" ||
-                    val == "t" ||
-                    val == "1" ||
-                    val == "-1" ||
-                    val == "yes" ||
-                    val == "y" ||
-                    val == "positive" ||
-                    val == "pos" ||
-                    val == "on" ||
-                    val == "enabled" ||
-                    val == "correct" ||
-                    val == "right" ||
+                if (val is "true" or "t" or "1" or "-1" or "yes" or "y" or "positive" or "pos" or "on" or "enabled" or "correct" or "right" ||
                     val == sTrue)
                 {
                     ret = true;

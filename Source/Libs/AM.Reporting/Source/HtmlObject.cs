@@ -146,13 +146,13 @@ namespace AM.Reporting
 
 
         /// <inheritdoc/>
-        public override void Draw (FRPaintEventArgs e)
+        public override void Draw (FRPaintEventArgs eventArgs)
         {
-            base.Draw (e);
-            DrawText (e);
-            DrawMarkers (e);
-            Border.Draw (e, new RectangleF (AbsLeft, AbsTop, Width, Height));
-            DrawDesign (e);
+            base.Draw (eventArgs);
+            DrawText (eventArgs);
+            DrawMarkers (eventArgs);
+            Border.Draw (eventArgs, new RectangleF (AbsLeft, AbsTop, Width, Height));
+            DrawDesign (eventArgs);
         }
 
         /// <inheritdoc/>

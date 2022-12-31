@@ -585,7 +585,7 @@ namespace AM.Reporting.Export.Image
             ExportObj (band);
             foreach (Base c in band.ForEachAllConvectedObjects (this))
             {
-                if (!(c is Table.TableColumn || c is Table.TableCell || c is Table.TableRow))
+                if (!(c is Table.TableColumn or Table.TableCell or Table.TableRow))
                 {
                     ExportObj (c);
                 }

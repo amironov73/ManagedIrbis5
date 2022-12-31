@@ -818,7 +818,7 @@ namespace AM.Reporting.Barcode
 
         private void CalculateErrorCorrection (int dest)
         {
-            if (errorLevel < 0 || errorLevel > 8)
+            if (errorLevel is < 0 or > 8)
             {
                 errorLevel = 0;
             }
@@ -1243,11 +1243,11 @@ namespace AM.Reporting.Barcode
                     if (lastP != startN)
                     {
                         c = (char)(bytes[lastP] & 0xff);
-                        lastTxt = (c >= ' ' && c < 127) || c == '\r' || c == '\n' || c == '\t';
+                        lastTxt = (c >= ' ' && c < 127) || c is '\r' or '\n' or '\t';
                         for (j = lastP; j < startN; ++j)
                         {
                             c = (char)(bytes[j] & 0xff);
-                            txt = (c >= ' ' && c < 127) || c == '\r' || c == '\n' || c == '\t';
+                            txt = (c >= ' ' && c < 127) || c is '\r' or '\n' or '\t';
                             if (txt != lastTxt)
                             {
                                 segmentList.Add (lastTxt ? 'T' : 'B', lastP, j);
@@ -1274,11 +1274,11 @@ namespace AM.Reporting.Barcode
             if (lastP != startN)
             {
                 c = (char)(bytes[lastP] & 0xff);
-                lastTxt = (c >= ' ' && c < 127) || c == '\r' || c == '\n' || c == '\t';
+                lastTxt = (c >= ' ' && c < 127) || c is '\r' or '\n' or '\t';
                 for (j = lastP; j < startN; ++j)
                 {
                     c = (char)(bytes[j] & 0xff);
-                    txt = (c >= ' ' && c < 127) || c == '\r' || c == '\n' || c == '\t';
+                    txt = (c >= ' ' && c < 127) || c is '\r' or '\n' or '\t';
                     if (txt != lastTxt)
                     {
                         segmentList.Add (lastTxt ? 'T' : 'B', lastP, j);
@@ -1386,7 +1386,7 @@ namespace AM.Reporting.Barcode
                 for (k = v.start; k < v.end; ++k)
                 {
                     c = (char)(bytes[k] & 0xff);
-                    if (c < '0' || c > '9')
+                    if (c is < '0' or > '9')
                     {
                         break;
                     }

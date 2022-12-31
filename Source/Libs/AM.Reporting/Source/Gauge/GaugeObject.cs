@@ -259,13 +259,13 @@ namespace AM.Reporting.Gauge
         /// <summary>
         /// Draws the gauge.
         /// </summary>
-        /// <param name="e">Draw event arguments.</param>
-        public override void Draw (FRPaintEventArgs e)
+        /// <param name="eventArgs">Draw event arguments.</param>
+        public override void Draw (FRPaintEventArgs eventArgs)
         {
-            base.Draw (e);
-            Scale.Draw (e);
-            Pointer.Draw (e);
-            Border.Draw (e, new RectangleF (AbsLeft, AbsTop, Width, Height));
+            base.Draw (eventArgs);
+            Scale.Draw (eventArgs);
+            Pointer.Draw (eventArgs);
+            Border.Draw (eventArgs, new RectangleF (AbsLeft, AbsTop, Width, Height));
         }
 
         /// <inheritdoc/>

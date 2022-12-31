@@ -440,7 +440,7 @@ namespace AM.Reporting.Utils
                 displayRect.Y = -DisplayRect.Height / 2;
 
                 // rotate displayrect if angle is 90 or 270
-                if (Angle is >= 90 and < 180 || Angle is >= 270 and < 360)
+                if (Angle is >= 90 and < 180 or >= 270 and < 360)
                 {
                     displayRect = new RectangleF (DisplayRect.Y, DisplayRect.X, DisplayRect.Height, DisplayRect.Width);
                 }
@@ -1079,7 +1079,7 @@ namespace AM.Reporting.Utils
                         }
                     }
 
-                    if (lastChar == ' ' || lastChar == '\t' || i == text.Length - 1)
+                    if (lastChar is ' ' or '\t' || i == text.Length - 1)
                     {
                         // finish the last word
                         var isLastWord = i == text.Length - 1;
@@ -2233,7 +2233,7 @@ namespace AM.Reporting.Utils
             rect.X = -rect.Width / 2;
             rect.Y = -rect.Height / 2;
 
-            if (angle is >= 90 and < 180 || angle is >= 270 and < 360)
+            if (angle is >= 90 and < 180 or >= 270 and < 360)
             {
                 rect = new RectangleF (rect.Y, rect.X, rect.Height, rect.Width);
             }

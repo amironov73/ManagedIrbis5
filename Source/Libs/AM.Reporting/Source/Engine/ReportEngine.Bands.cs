@@ -116,7 +116,7 @@ namespace AM.Reporting.Engine
         private void ShowBandToPreparedPages (BandBase band, bool getData)
         {
             // handle "StartNewPage". Skip if it's the first row, avoid empty first page.
-            if ((band.StartNewPage && !(band.Parent is PageHeaderBand || band.Parent is PageFooterBand)) &&
+            if ((band.StartNewPage && !(band.Parent is PageHeaderBand or PageFooterBand)) &&
                 band.FlagUseStartNewPage && (band.RowNo != 1 || band.FirstRowStartsNewPage) &&
                 !band.Repeated)
             {
@@ -381,8 +381,8 @@ namespace AM.Reporting.Engine
                 mainBand = childBand.GetTopParentBand;
             }
 
-            var isPageBand = mainBand is PageHeaderBand || mainBand is PageFooterBand || mainBand is OverlayBand;
-            var isColumnBand = mainBand is ColumnHeaderBand || mainBand is ColumnFooterBand;
+            var isPageBand = mainBand is PageHeaderBand or PageFooterBand or OverlayBand;
+            var isColumnBand = mainBand is ColumnHeaderBand or ColumnFooterBand;
 
             // check if we have enough space for a band.
             var checkFreeSpace = !isPageBand && !isColumnBand && band.FlagCheckFreeSpace;

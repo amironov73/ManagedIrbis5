@@ -349,7 +349,7 @@ namespace AM.Reporting.Barcode.Aztec
                 result.Add (stateNoBinary.shiftAndAppend (MODE_PUNCT, pairCode));
             }
 
-            if (pairCode == 3 || pairCode == 4)
+            if (pairCode is 3 or 4)
             {
                 // both characters are in DIGITS.  Sometimes better to just add two digits
                 var digit_state = stateNoBinary

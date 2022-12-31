@@ -674,9 +674,7 @@ namespace AM.Reporting
                 return child is BandBase;
             }
 
-            return (child is PageHeaderBand || child is ReportTitleBand || child is ColumnHeaderBand ||
-                    child is DataBand || child is GroupHeaderBand || child is ColumnFooterBand ||
-                    child is ReportSummaryBand || child is PageFooterBand || child is OverlayBand);
+            return child is PageHeaderBand or ReportTitleBand or ColumnHeaderBand or DataBand or GroupHeaderBand or ColumnFooterBand or ReportSummaryBand or PageFooterBand or OverlayBand;
         }
 
         /// <inheritdoc/>
@@ -703,7 +701,7 @@ namespace AM.Reporting
                 ColumnHeader = headerBand;
             }
 
-            if (child is DataBand || child is GroupHeaderBand)
+            if (child is DataBand or GroupHeaderBand)
             {
                 Bands.Add (child as BandBase);
             }
@@ -753,7 +751,7 @@ namespace AM.Reporting
                 ColumnHeader = null;
             }
 
-            if (child is DataBand || child is GroupHeaderBand)
+            if (child is DataBand or GroupHeaderBand)
             {
                 Bands.Remove (child as BandBase);
             }
@@ -997,16 +995,16 @@ namespace AM.Reporting
         }
 
         /// <inheritdoc/>
-        public override void Draw (FRPaintEventArgs e)
+        public override void Draw (FRPaintEventArgs eventArgs)
         {
             if (IsDesigning)
             {
                 return;
             }
 
-            var g = e.Graphics;
+            var g = eventArgs.Graphics;
             var pageRect = new RectangleF (0, 0,
-                WidthInPixels - 1 / e.ScaleX, HeightInPixels - 1 / e.ScaleY);
+                WidthInPixels - 1 / eventArgs.ScaleX, HeightInPixels - 1 / eventArgs.ScaleY);
             var printableRect = new RectangleF (
                 LeftMargin * Units.Millimeters,
                 TopMargin * Units.Millimeters,
@@ -1019,23 +1017,23 @@ namespace AM.Reporting
                 pageRect = printableRect;
             }
 
-            DrawBackground (e, pageRect);
-            Border.Draw (e, printableRect);
+            DrawBackground (eventArgs, pageRect);
+            Border.Draw (eventArgs, printableRect);
             if (Watermark.Enabled)
             {
                 if (!Watermark.ShowImageOnTop)
                 {
-                    Watermark.DrawImage (e, pageRect, Report, IsPrinting);
+                    Watermark.DrawImage (eventArgs, pageRect, Report, IsPrinting);
                 }
 
                 if (!Watermark.ShowTextOnTop)
                 {
-                    Watermark.DrawText (e, pageRect, Report, IsPrinting);
+                    Watermark.DrawText (eventArgs, pageRect, Report, IsPrinting);
                 }
             }
 
-            float leftMargin = (int)Math.Round (LeftMargin * Units.Millimeters * e.ScaleX);
-            float topMargin = (int)Math.Round (TopMargin * Units.Millimeters * e.ScaleY);
+            float leftMargin = (int)Math.Round (LeftMargin * Units.Millimeters * eventArgs.ScaleX);
+            float topMargin = (int)Math.Round (TopMargin * Units.Millimeters * eventArgs.ScaleY);
             g.TranslateTransform (leftMargin, topMargin);
 
             try
@@ -1047,7 +1045,7 @@ namespace AM.Reporting
                         if (!IsPrinting)
                         {
 #if !MONO
-                            if (!@base.IsVisible (e))
+                            if (!@base.IsVisible (eventArgs))
                             {
                                 continue;
                             }
@@ -1067,7 +1065,7 @@ namespace AM.Reporting
 
                         @base.SetDesigning (false);
                         @base.SetPrinting (IsPrinting);
-                        @base.Draw (e);
+                        @base.Draw (eventArgs);
                         @base.SetPrinting (false);
                     }
                 }
@@ -1081,12 +1079,12 @@ namespace AM.Reporting
             {
                 if (Watermark.ShowImageOnTop)
                 {
-                    Watermark.DrawImage (e, pageRect, Report, IsPrinting);
+                    Watermark.DrawImage (eventArgs, pageRect, Report, IsPrinting);
                 }
 
                 if (Watermark.ShowTextOnTop)
                 {
-                    Watermark.DrawText (e, pageRect, Report, IsPrinting);
+                    Watermark.DrawText (eventArgs, pageRect, Report, IsPrinting);
                 }
             }
         }

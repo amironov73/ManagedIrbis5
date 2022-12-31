@@ -76,7 +76,7 @@ namespace AM.Reporting.Data
                 dataComponents[@base.ReferenceName] = @base;
             }
 
-            if ((b is DataComponentBase || b is Relation) && (b as DataComponentBase).Alias != null)
+            if (b is DataComponentBase or Relation && (b as DataComponentBase).Alias != null)
             {
                 aliases[(b as DataComponentBase).Alias] = b;
             }
@@ -137,7 +137,7 @@ namespace AM.Reporting.Data
             Base result = null;
             if (aliases.TryGetValue (alias, out result))
             {
-                if ((result is DataConnectionBase || result is Relation))
+                if (result is DataConnectionBase or Relation)
                 {
                     return result as DataComponentBase;
                 }
@@ -159,7 +159,7 @@ namespace AM.Reporting.Data
             Base result = null;
             if (allObjects.TryGetValue (name, out result))
             {
-                if (result is DataConnectionBase || result is DataSourceBase || result is Relation ||
+                if (result is DataConnectionBase or DataSourceBase or Relation ||
                     (result is Parameter && result.Parent == dictionary) || result is Total)
                 {
                     return result;

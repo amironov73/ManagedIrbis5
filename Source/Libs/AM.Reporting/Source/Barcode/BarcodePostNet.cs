@@ -107,7 +107,7 @@ namespace AM.Reporting.Barcode
 
             foreach (var i in text)
             {
-                if (i is >= '0' and <= '9' || (i == '-'))
+                if (i is >= '0' and <= '9' or '-')
                 {
                     encoded += i;
                     weight++;

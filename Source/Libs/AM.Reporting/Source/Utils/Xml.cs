@@ -795,7 +795,7 @@ namespace AM.Reporting.Utils
                                     continue;
                                 }
 
-                                if (c == '=' || c == '>')
+                                if (c is '=' or '>')
                                 {
                                     break;
                                 }

@@ -398,7 +398,7 @@ namespace AM.Reporting.Barcode.QRCode
         // Check if "value" is valid.
         private static bool isValidValue (int value_Renamed)
         {
-            return (value_Renamed == -1 || value_Renamed == 0 || value_Renamed == 1); // Dark (black).
+            return value_Renamed is -1 or 0 or 1; // Dark (black).
         }
 
         private static void embedTimingPatterns (ByteMatrix matrix)

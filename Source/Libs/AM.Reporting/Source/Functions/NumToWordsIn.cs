@@ -174,7 +174,7 @@ namespace AM.Reporting.Functions
             long val;
 
             //if its third or
-            if (counter == 3 || counter == 4)
+            if (counter is 3 or 4)
             {
                 shouldReturnMany = true;
             }

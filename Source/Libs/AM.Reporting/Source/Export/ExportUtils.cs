@@ -633,7 +633,7 @@ namespace AM.Reporting.Export
                     sb.Append ("=").AppendLine();
                 }
 
-                if (c < 9 || c == 61 || c > 126)
+                if (c is < 9 or 61 or > 126)
                 {
                     sb.Append ("=").Append (XCONV[(c >> 4)].ToString()).Append (XCONV[(c & 0xF)].ToString());
                     length += 3;

@@ -112,7 +112,7 @@ namespace AM.Reporting.Barcode.Aztec
             var token = this.Token;
             var mode = this.Mode;
             var bitCount = this.BitCount;
-            if (this.Mode == HighLevelEncoder.MODE_PUNCT || this.Mode == HighLevelEncoder.MODE_DIGIT)
+            if (this.Mode is HighLevelEncoder.MODE_PUNCT or HighLevelEncoder.MODE_DIGIT)
             {
                 //assert binaryShiftByteCount == 0;
                 var latch = HighLevelEncoder.LATCH_TABLE[mode][HighLevelEncoder.MODE_UPPER];
@@ -122,7 +122,7 @@ namespace AM.Reporting.Barcode.Aztec
             }
 
             var deltaBitCount =
-                (BinaryShiftByteCount == 0 || BinaryShiftByteCount == 31) ? 18 :
+                BinaryShiftByteCount is 0 or 31 ? 18 :
                 (BinaryShiftByteCount == 62) ? 9 : 8;
             var result = new State (token, mode, BinaryShiftByteCount + 1, bitCount + deltaBitCount);
             if (result.BinaryShiftByteCount == 2047 + 31)

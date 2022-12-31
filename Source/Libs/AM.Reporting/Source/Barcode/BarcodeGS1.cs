@@ -408,7 +408,7 @@ namespace AM.Reporting.Barcode
             /* Use GS1 subset width algorithm */
             for (var i = 0; i < 4; i++)
             {
-                if ((i == 0) || (i == 2))
+                if (i is 0 or 2)
                 {
                     List<int> widths;
                     widths = GetGS1Widths (v_odd[i], ModulesOdd[dataGroup[i]], 4, WidthsOdd[dataGroup[i]], 1);
@@ -735,7 +735,7 @@ namespace AM.Reporting.Barcode
                 data = data.Remove (13, 1);
             }
 
-            if (!long.TryParse (data, out var result) || data.Length != 13 || result > 1999999999999 || result < 0)
+            if (!long.TryParse (data, out var result) || data.Length != 13 || result is > 1999999999999 or < 0)
             {
                 throw new FormatException (Res.Get ("Messages,InvalidBarcode2"));
             }

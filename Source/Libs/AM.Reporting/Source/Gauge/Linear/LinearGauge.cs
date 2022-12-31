@@ -85,19 +85,19 @@ namespace AM.Reporting.Gauge.Linear
         }
 
         /// <inheritdoc/>
-        public override void Draw (FRPaintEventArgs e)
+        public override void Draw (FRPaintEventArgs eventArgs)
         {
-            var g = e.Graphics;
+            var g = eventArgs.Graphics;
             if (Report is { SmoothGraphics: true })
             {
                 g.InterpolationMode = InterpolationMode.HighQualityBicubic;
                 g.SmoothingMode = SmoothingMode.AntiAlias;
             }
 
-            base.Draw (e);
-            Scale.Draw (e);
-            Pointer.Draw (e);
-            Border.Draw (e, new RectangleF (AbsLeft, AbsTop, Width, Height));
+            base.Draw (eventArgs);
+            Scale.Draw (eventArgs);
+            Pointer.Draw (eventArgs);
+            Border.Draw (eventArgs, new RectangleF (AbsLeft, AbsTop, Width, Height));
         }
 
         /// <inheritdoc/>

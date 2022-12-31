@@ -410,8 +410,8 @@ namespace AM.Reporting.Barcode
             // if we have only one character, use SHIFT code to switch encoding. Do not change current encoding.
             if (encoding != firstCharEncoding &&
                 numChars == 1 &&
-                (encoding == Encoding.A || encoding == Encoding.B) &&
-                (firstCharEncoding == Encoding.A || firstCharEncoding == Encoding.B))
+                encoding is Encoding.A or Encoding.B &&
+                firstCharEncoding is Encoding.A or Encoding.B)
             {
                 prefix = "&S;";
             }
@@ -483,7 +483,7 @@ namespace AM.Reporting.Barcode
             if (code[index] == '&' && index + 2 < code.Length && code[index + 2] == ';')
             {
                 var c = code[index + 1].ToString().ToUpper()[0];
-                if (c == 'A' || c == 'B' || c == 'C' || c == 'S' || c == '1' || c == '2' || c == '3' || c == '4')
+                if (c is 'A' or 'B' or 'C' or 'S' or '1' or '2' or '3' or '4')
                 {
                     index += 3;
                     return "&" + c + ";";

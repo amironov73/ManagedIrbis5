@@ -91,7 +91,7 @@ namespace AM.Reporting.Engine
 
             if (IsKeeping)
             {
-                if (band is DataHeaderBand || band is GroupHeaderBand)
+                if (band is DataHeaderBand or GroupHeaderBand)
                 {
                     keepReprintHeaders.Add (band);
                 }
@@ -102,7 +102,7 @@ namespace AM.Reporting.Engine
             }
             else
             {
-                if (band is DataHeaderBand || band is GroupHeaderBand)
+                if (band is DataHeaderBand or GroupHeaderBand)
                 {
                     reprintHeaders.Add (band);
                 }

@@ -319,7 +319,7 @@ namespace AM.Reporting.Barcode.Aztec
         /// <param name="numBits">bits from value to append</param>
         public void appendBits (int value, int numBits)
         {
-            if (numBits < 0 || numBits > 32)
+            if (numBits is < 0 or > 32)
             {
                 throw new ArgumentException ("Num bits must be between 0 and 32");
             }

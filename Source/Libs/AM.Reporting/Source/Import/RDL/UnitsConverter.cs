@@ -249,7 +249,7 @@ namespace AM.Reporting.Import.RDL
         /// <returns>The ContentAlignment value.</returns>
         public static ContentAlignment ConvertTextAndVerticalAlign (string textAlign, string vertAlign)
         {
-            if (textAlign == "General" || textAlign == "Center")
+            if (textAlign is "General" or "Center")
             {
                 if (vertAlign == "Top")
                 {

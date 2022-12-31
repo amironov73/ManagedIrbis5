@@ -2469,7 +2469,7 @@ namespace AM.Reporting.Utils
 
                     this.Text = GetString (text);
 
-                    if (ff.FontFamily.Name == "Wingdings" || ff.FontFamily.Name == "Webdings")
+                    if (ff.FontFamily.Name is "Wingdings" or "Webdings")
                     {
                         this.Text = WingdingsToUnicodeConverter.Convert (this.Text);
                     }

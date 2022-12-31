@@ -218,7 +218,7 @@ namespace AM.Reporting.Barcode.QRCode
             for (var i = 0; i < length; i += 2)
             {
                 var byte1 = bytes[i] & 0xFF;
-                if ((byte1 < 0x81 || byte1 > 0x9F) && (byte1 < 0xE0 || byte1 > 0xEB))
+                if (byte1 is < 0x81 or > 0x9F && byte1 is < 0xE0 or > 0xEB)
                 {
                     return false;
                 }

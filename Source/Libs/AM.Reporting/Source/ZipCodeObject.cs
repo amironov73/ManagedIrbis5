@@ -256,18 +256,18 @@ namespace AM.Reporting
         }
 
         /// <inheritdoc/>
-        public override void Draw (FRPaintEventArgs e)
+        public override void Draw (FRPaintEventArgs eventArgs)
         {
             Width = ((ShowMarkers ? 1 : 0) + SegmentCount) * Spacing;
             Height = (ShowMarkers ? SegmentHeight + Units.Millimeters * 4 : SegmentHeight) + Border.Width;
 
-            base.Draw (e);
+            base.Draw (eventArgs);
 
             float offsetX = 0;
             if (ShowMarkers)
             {
                 // draw starting marker
-                DrawSegment (e, -1, 0);
+                DrawSegment (eventArgs, -1, 0);
                 offsetX += Spacing;
             }
 
@@ -282,7 +282,7 @@ namespace AM.Reporting
                     symbol = (int)ch - (int)'0';
                 }
 
-                DrawSegment (e, symbol, offsetX);
+                DrawSegment (eventArgs, symbol, offsetX);
                 offsetX += Spacing;
             }
         }

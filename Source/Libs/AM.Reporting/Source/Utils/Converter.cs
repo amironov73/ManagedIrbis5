@@ -158,7 +158,7 @@ namespace AM.Reporting.Utils
                 return value;
             }
 
-            if (value == null || value == "")
+            if (value is null or "")
             {
                 return null;
             }

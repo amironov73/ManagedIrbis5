@@ -834,7 +834,7 @@ namespace AM.Reporting
                 // data objects are not included into AllObjects list. Include named items separately.
                 foreach (Base c in Dictionary.AllObjects)
                 {
-                    if (c is DataConnectionBase || c is DataSourceBase || c is Relation || c is CubeSourceBase)
+                    if (c is DataConnectionBase or DataSourceBase or Relation or CubeSourceBase)
                     {
                         allObjects.Add (c);
                     }
@@ -1072,7 +1072,7 @@ namespace AM.Reporting
         /// <inheritdoc/>
         public bool CanContain (Base child)
         {
-            return child is PageBase || child is Dictionary;
+            return child is PageBase or Data.Dictionary;
         }
 
         /// <inheritdoc/>
@@ -1354,7 +1354,7 @@ namespace AM.Reporting
             else if (cachedObject is Total total)
             {
                 var val = total.Value;
-                if (ConvertNulls && (val == null || val is DBNull))
+                if (ConvertNulls && val is null or DBNull)
                 {
                     val = 0;
                 }
@@ -1370,7 +1370,7 @@ namespace AM.Reporting
 
         private object ConvertToColumnDataType (object val, Type dataType, bool convertNulls)
         {
-            if (val == null || val is DBNull)
+            if (val is null or DBNull)
             {
                 if (convertNulls)
                 {
@@ -1484,7 +1484,7 @@ namespace AM.Reporting
         private Variant GetTotalValue (string name, bool convertNull)
         {
             var value = Dictionary.Totals.GetValue (name);
-            if (convertNull && (value == null || value is DBNull))
+            if (convertNull && value is null or DBNull)
             {
                 value = 0;
             }

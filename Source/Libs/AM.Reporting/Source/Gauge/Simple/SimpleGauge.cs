@@ -63,13 +63,13 @@ namespace AM.Reporting.Gauge.Simple
         #region Public Methods
 
         /// <inheritdoc/>
-        public override void Draw (FRPaintEventArgs e)
+        public override void Draw (FRPaintEventArgs eventArgs)
         {
-            base.Draw (e);
-            Scale.Draw (e);
-            Pointer.Draw (e);
-            Border.Draw (e, new RectangleF (AbsLeft, AbsTop, Width, Height));
-            var g = e.Graphics;
+            base.Draw (eventArgs);
+            Scale.Draw (eventArgs);
+            Pointer.Draw (eventArgs);
+            Border.Draw (eventArgs, new RectangleF (AbsLeft, AbsTop, Width, Height));
+            var g = eventArgs.Graphics;
 
             if (Report is { SmoothGraphics: true })
             {
@@ -77,9 +77,9 @@ namespace AM.Reporting.Gauge.Simple
                 g.SmoothingMode = SmoothingMode.AntiAlias;
             }
 
-            Scale.Draw (e);
-            Pointer.Draw (e);
-            Border.Draw (e, new RectangleF (AbsLeft, AbsTop, Width, Height));
+            Scale.Draw (eventArgs);
+            Pointer.Draw (eventArgs);
+            Border.Draw (eventArgs, new RectangleF (AbsLeft, AbsTop, Width, Height));
         }
 
         #endregion // Public Methods

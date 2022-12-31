@@ -141,7 +141,7 @@ namespace AM.Reporting.Barcode
         {
             foreach (var i in text)
             {
-                if (i < '0' || i > '9')
+                if (i is < '0' or > '9')
                 {
                     throw new Exception (Res.Get ("Messages,InvalidBarcode2"));
                 }
@@ -506,8 +506,8 @@ namespace AM.Reporting.Barcode
         public override void DrawBarcode (IGraphics g, RectangleF displayRect)
         {
             var originalWidth = CalcBounds().Width / 1.25f;
-            var width = angle == 90 || angle == 270 ? displayRect.Height : displayRect.Width;
-            var height = angle == 90 || angle == 270 ? displayRect.Width : displayRect.Height;
+            var width = angle is 90 or 270 ? displayRect.Height : displayRect.Width;
+            var height = angle is 90 or 270 ? displayRect.Width : displayRect.Height;
             zoom = width / originalWidth;
             barArea.Height = height / zoom;
             if (showText)

@@ -445,12 +445,12 @@ namespace AM.Reporting
         }
 
         /// <inheritdoc/>
-        public override void Draw (FRPaintEventArgs e)
+        public override void Draw (FRPaintEventArgs eventArgs)
         {
-            DrawBackground (e);
-            DrawMarkers (e);
-            Border.Draw (e, new RectangleF (AbsLeft, AbsTop, Width, Height));
-            base.Draw (e);
+            DrawBackground (eventArgs);
+            DrawMarkers (eventArgs);
+            Border.Draw (eventArgs, new RectangleF (AbsLeft, AbsTop, Width, Height));
+            base.Draw (eventArgs);
         }
 
         #endregion

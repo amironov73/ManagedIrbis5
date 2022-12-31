@@ -177,7 +177,7 @@ namespace AM.Reporting.Data
         public object Value => GetValue();
 
         private bool IsPageFooter =>
-            PrintOn is PageFooterBand || PrintOn is ColumnFooterBand ||
+            PrintOn is PageFooterBand or ColumnFooterBand ||
             ((PrintOn is HeaderFooterBandBase) && (PrintOn as HeaderFooterBandBase).RepeatOnEveryPage);
 
         private bool IsInsideHierarchy =>
@@ -220,7 +220,7 @@ namespace AM.Reporting.Data
 
         private void AddValue (object value)
         {
-            if (value == null || value is DBNull)
+            if (value is null or DBNull)
             {
                 return;
             }

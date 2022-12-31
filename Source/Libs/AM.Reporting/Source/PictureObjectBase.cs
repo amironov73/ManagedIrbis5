@@ -410,14 +410,14 @@ namespace AM.Reporting
         }
 
         /// <inheritdoc/>
-        public override void Draw (FRPaintEventArgs e)
+        public override void Draw (FRPaintEventArgs eventArgs)
         {
             UpdateAutoSize();
-            base.Draw (e);
-            DrawImage (e);
-            DrawMarkers (e);
-            Border.Draw (e, new RectangleF (AbsLeft, AbsTop, Width, Height));
-            DrawDesign (e);
+            base.Draw (eventArgs);
+            DrawImage (eventArgs);
+            DrawMarkers (eventArgs);
+            Border.Draw (eventArgs, new RectangleF (AbsLeft, AbsTop, Width, Height));
+            DrawDesign (eventArgs);
         }
 
         public abstract void DrawImage (FRPaintEventArgs e);
@@ -446,7 +446,7 @@ namespace AM.Reporting
                 case PictureBoxSizeMode.AutoSize:
                     rect.Width = imageWidth * scaleX;
                     rect.Height = imageHeight * scaleY;
-                    if (Angle == 90 || Angle == 180)
+                    if (Angle is 90 or 180)
                     {
                         rect.X -= rect.Width - drawRect.Width;
                     }
@@ -841,7 +841,7 @@ namespace AM.Reporting
         /// <param name="drawRect"></param>
         internal virtual void DrawImageInternal (FRPaintEventArgs e, RectangleF drawRect)
         {
-            var rotate = Angle == 90 || Angle == 270;
+            var rotate = Angle is 90 or 270;
             var imageWidth = ImageWidth; //rotate ? Image.Height : Image.Width;
             var imageHeight = ImageHeight; //rotate ? Image.Width : Image.Height;
 

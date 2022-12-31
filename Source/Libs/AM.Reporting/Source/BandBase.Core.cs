@@ -2,14 +2,9 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
-/*
+/* BandBase.Core.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,15 +18,17 @@ using System.Drawing;
 
 #nullable enable
 
-namespace AM.Reporting
+namespace AM.Reporting;
+
+partial class BandBase
 {
-    partial class BandBase
+    /// <inheritdoc cref="ReportComponentBase.Draw" />
+    public override void Draw
+        (
+            FRPaintEventArgs eventArgs
+        )
     {
-        /// <inheritdoc/>
-        public override void Draw (FRPaintEventArgs e)
-        {
-            DrawBackground (e);
-            Border.Draw (e, new RectangleF (AbsLeft, AbsTop, Width, Height));
-        }
+        DrawBackground (eventArgs);
+        Border.Draw (eventArgs, new RectangleF (AbsLeft, AbsTop, Width, Height));
     }
 }

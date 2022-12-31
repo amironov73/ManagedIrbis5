@@ -54,7 +54,7 @@ namespace AM.Reporting.Import.RDL
                 var nodeList = tableColumnsNode.ChildNodes;
                 foreach (XmlNode node in nodeList)
                 {
-                    if (node.Name == "TableColumn" || node.Name == "TablixColumn")
+                    if (node.Name is "TableColumn" or "TablixColumn")
                     {
                         if (component is TableObject tableObject)
                         {
@@ -73,7 +73,7 @@ namespace AM.Reporting.Import.RDL
             var nodeList = tableCellNode.ChildNodes;
             foreach (XmlNode node in nodeList)
             {
-                if (node.Name == "ReportItems" || node.Name == "CellContents")
+                if (node.Name is "ReportItems" or "CellContents")
                 {
                     var tempParent = parent;
                     var tempComponent = component;
@@ -97,7 +97,7 @@ namespace AM.Reporting.Import.RDL
             var nodeList = tableCellsNode.ChildNodes;
             foreach (XmlNode node in nodeList)
             {
-                if (node.Name == "TableCell" || node.Name == "TablixCell")
+                if (node.Name is "TableCell" or "TablixCell")
                 {
                     LoadTableCell (node, ref col);
                     col++;
@@ -110,7 +110,7 @@ namespace AM.Reporting.Import.RDL
             var nodeList = tableRowNode.ChildNodes;
             foreach (XmlNode node in nodeList)
             {
-                if (node.Name == "TableCells" || node.Name == "TablixCells")
+                if (node.Name is "TableCells" or "TablixCells")
                 {
                     LoadTableCells (node);
                 }
@@ -130,7 +130,7 @@ namespace AM.Reporting.Import.RDL
             var nodeList = tableRowsNode.ChildNodes;
             foreach (XmlNode node in nodeList)
             {
-                if (node.Name == "TableRow" || node.Name == "TablixRow")
+                if (node.Name is "TableRow" or "TablixRow")
                 {
                     if (component is TableObject tableObject)
                     {
@@ -149,7 +149,7 @@ namespace AM.Reporting.Import.RDL
                 var nodeList = headerNode.ChildNodes;
                 foreach (XmlNode node in nodeList)
                 {
-                    if (node.Name == "TableRows" || node.Name == "TablixRows")
+                    if (node.Name is "TableRows" or "TablixRows")
                     {
                         LoadTableRows (node);
                     }

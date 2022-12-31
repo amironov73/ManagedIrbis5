@@ -28,7 +28,7 @@ namespace AM.Reporting
         /// <summary>
         /// Draws the object.
         /// </summary>
-        /// <param name="e">Paint event args.</param>
+        /// <param name="eventArgs">Paint event args.</param>
         /// <remarks>
         /// <para>This method is widely used in the AM.Reporting. It is called each time when the object needs to draw
         /// or print itself.</para>
@@ -38,7 +38,7 @@ namespace AM.Reporting
         /// pens, fonts, brushes, string formats that was used before. If the item with requested parameters
         /// exists in the cache, it will be returned (instead of create new item and then dispose it).</para>
         /// </remarks>
-        public virtual void Draw (FRPaintEventArgs e)
+        public virtual void Draw (FRPaintEventArgs eventArgs)
         {
         }
     }

@@ -479,9 +479,7 @@ namespace AM.Reporting.Matrix
 
                     templateCell.GetData();
                     if (string.IsNullOrEmpty (templateCell.Hyperlink.Expression) &&
-                        (templateCell.Hyperlink.Kind == HyperlinkKind.DetailReport ||
-                         templateCell.Hyperlink.Kind == HyperlinkKind.DetailPage ||
-                         templateCell.Hyperlink.Kind == HyperlinkKind.Custom))
+                        templateCell.Hyperlink.Kind is HyperlinkKind.DetailReport or HyperlinkKind.DetailPage or HyperlinkKind.Custom)
                     {
                         templateCell.Hyperlink.Value = templateCell.Text;
                     }
@@ -1002,9 +1000,7 @@ namespace AM.Reporting.Matrix
                             templateCell.Text = templateCell.FormatValue (value);
                             templateCell.SaveState();
                             if (string.IsNullOrEmpty (templateCell.Hyperlink.Expression) &&
-                                (templateCell.Hyperlink.Kind == HyperlinkKind.DetailReport ||
-                                 templateCell.Hyperlink.Kind == HyperlinkKind.DetailPage ||
-                                 templateCell.Hyperlink.Kind == HyperlinkKind.Custom))
+                                templateCell.Hyperlink.Kind is HyperlinkKind.DetailReport or HyperlinkKind.DetailPage or HyperlinkKind.Custom)
                             {
                                 var hyperlinkValue = "";
                                 var separator = templateCell.Hyperlink.ValuesSeparator;

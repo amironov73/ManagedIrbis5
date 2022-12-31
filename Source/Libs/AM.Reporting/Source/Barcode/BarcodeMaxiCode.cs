@@ -486,7 +486,7 @@ namespace AM.Reporting.Barcode
          */
         public void setMode (int mode)
         {
-            if (mode < 2 || mode > 6)
+            if (mode is < 2 or > 6)
             {
                 throw new ArgumentOutOfRangeException ("Invalid MaxiCode mode: " + mode);
             }
@@ -512,7 +512,7 @@ namespace AM.Reporting.Barcode
          */
         public void setStructuredAppendPosition (int position)
         {
-            if (position < 1 || position > 8)
+            if (position is < 1 or > 8)
             {
                 throw new ArgumentOutOfRangeException ("Invalid MaxiCode structured append position: " + position);
             }
@@ -540,7 +540,7 @@ namespace AM.Reporting.Barcode
          */
         public void setStructuredAppendTotal (int total)
         {
-            if (total < 1 || total > 8)
+            if (total is < 1 or > 8)
             {
                 throw new ArgumentOutOfRangeException ("Invalid MaxiCode structured append total: " + total);
             }
@@ -631,7 +631,7 @@ namespace AM.Reporting.Barcode
             // insert primary message if this is a structured carrier message; insert mode otherwise
             codewords = new int[character.Length];
             character.CopyTo (codewords, 0);
-            if (mode == 2 || mode == 3)
+            if (mode is 2 or 3)
             {
                 var _primary = getPrimaryCodewords();
                 if (_primary == null)
@@ -654,7 +654,7 @@ namespace AM.Reporting.Barcode
                 flag[1] = ((structuredAppendPosition - 1) << 3) | (structuredAppendTotal - 1); // position + total
 
                 int index;
-                if (mode == 2 || mode == 3)
+                if (mode is 2 or 3)
                 {
                     index = 10; // first two data symbols in the secondary message
                 }
@@ -1126,7 +1126,7 @@ namespace AM.Reporting.Barcode
             }
 
             /* Find candidates for number compression (not allowed in primary message in modes 2 and 3). */
-            if (mode == 2 || mode == 3)
+            if (mode is 2 or 3)
             {
                 j = 9;
             }
@@ -1363,12 +1363,12 @@ namespace AM.Reporting.Barcode
             }
 
             /* Make sure we haven't exceeded the maximum data Length. */
-            if ((mode == 2 || mode == 3) && Length > 84)
+            if (mode is 2 or 3 && Length > 84)
             {
                 return false;
             }
 
-            if ((mode == 4 || mode == 6) && Length > 93)
+            if (mode is 4 or 6 && Length > 93)
             {
                 return false;
             }

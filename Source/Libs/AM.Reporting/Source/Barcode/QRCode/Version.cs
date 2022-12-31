@@ -77,7 +77,7 @@ namespace AM.Reporting.Barcode.QRCode
 
         public static Version getVersionForNumber (int versionNumber)
         {
-            if (versionNumber < 1 || versionNumber > 40)
+            if (versionNumber is < 1 or > 40)
             {
                 throw new ArgumentException();
             }

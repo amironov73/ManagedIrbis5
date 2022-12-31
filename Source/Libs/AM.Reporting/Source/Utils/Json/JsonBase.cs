@@ -456,7 +456,7 @@ namespace AM.Reporting
                 }
             }
 
-            if (reader.Char < '0' || '9' < reader.Char)
+            if (reader.Char is < '0' or > '9')
             {
                 throw reader.ThrowFormat ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9');
             }
@@ -469,7 +469,7 @@ namespace AM.Reporting
                     throw reader.ThrowEOF ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9');
                 }
 
-                if (reader.Char < '0' || '9' < reader.Char)
+                if (reader.Char is < '0' or > '9')
                 {
                     break;
                 }
@@ -483,7 +483,7 @@ namespace AM.Reporting
                     throw reader.ThrowEOF ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9');
                 }
 
-                if (reader.Char < '0' || '9' < reader.Char)
+                if (reader.Char is < '0' or > '9')
                 {
                     throw reader.ThrowFormat ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9');
                 }
@@ -496,14 +496,14 @@ namespace AM.Reporting
                         throw reader.ThrowEOF ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9');
                     }
 
-                    if (reader.Char < '0' || '9' < reader.Char)
+                    if (reader.Char is < '0' or > '9')
                     {
                         break;
                     }
                 }
             }
 
-            if (reader.Char == 'e' || reader.Char == 'E')
+            if (reader.Char is 'e' or 'E')
             {
                 reader.ReadNext();
                 if (reader.IsEOF)
@@ -531,7 +531,7 @@ namespace AM.Reporting
                     }
                 }
 
-                if (reader.Char < '0' || '9' < reader.Char)
+                if (reader.Char is < '0' or > '9')
                 {
                     if (signed)
                     {
@@ -551,7 +551,7 @@ namespace AM.Reporting
                         throw reader.ThrowEOF ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9');
                     }
 
-                    if (reader.Char < '0' || '9' < reader.Char)
+                    if (reader.Char is < '0' or > '9')
                     {
                         break;
                     }
@@ -675,17 +675,7 @@ namespace AM.Reporting
 
         private static bool IsNumber (object item)
         {
-            return item is float
-                   || item is double
-                   || item is sbyte
-                   || item is byte
-                   || item is short
-                   || item is ushort
-                   || item is int
-                   || item is uint
-                   || item is long
-                   || item is ulong
-                   || item is decimal;
+            return item is float or double or sbyte or byte or short or ushort or int or uint or long or ulong or decimal;
         }
 
         #endregion Private Methods

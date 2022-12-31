@@ -580,8 +580,8 @@ namespace AM.Reporting.Engine
             {
                 var idColumnValue = dataBand.DataSource[idColumn];
                 var parentIdColumnValue = dataBand.DataSource[parentIdColumn];
-                var id = (idColumnValue == null || idColumnValue is DBNull) ? "" : idColumnValue.ToString();
-                var parentId = (parentIdColumnValue == null || parentIdColumnValue is DBNull)
+                var id = idColumnValue is null or DBNull ? "" : idColumnValue.ToString();
+                var parentId = parentIdColumnValue is null or DBNull
                     ? ""
                     : parentIdColumnValue.ToString();
 

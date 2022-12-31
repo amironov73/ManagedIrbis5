@@ -596,8 +596,8 @@ namespace AM.Reporting.Data
         {
             foreach (Base c in AllObjects)
             {
-                if (c is DataConnectionBase || c is DataSourceBase || c is Relation ||
-                    (c is Parameter && c.Parent == this) || c is Total || c is CubeSourceBase)
+                if (c is DataConnectionBase or DataSourceBase or Relation ||
+                    (c is Parameter && c.Parent == this) || c is Total or CubeSourceBase)
                 {
                     // check complete match or match without case sensitivity
                     if (name == c.Name || name.ToLower() == c.Name.ToLower())
@@ -619,7 +619,7 @@ namespace AM.Reporting.Data
         {
             foreach (Base c in AllObjects)
             {
-                if (c is DataConnectionBase || c is Relation)
+                if (c is DataConnectionBase or Relation)
                 {
                     // check complete match or match without case sensitivity
                     if (alias == (c as DataComponentBase).Alias ||
@@ -691,8 +691,7 @@ namespace AM.Reporting.Data
             var childObjects = ChildObjects;
             foreach (Base c in childObjects)
             {
-                if (c is Parameter || c is Total || c is CubeSourceBase ||
-                    c is DataComponentBase { Enabled: true })
+                if (c is Parameter or Total or CubeSourceBase or DataComponentBase { Enabled: true })
                 {
                     writer.Write (c);
                 }
@@ -796,8 +795,7 @@ namespace AM.Reporting.Data
         /// <inheritdoc/>
         public bool CanContain (Base child)
         {
-            return child is DataConnectionBase || child is DataSourceBase || child is Relation || child is Parameter ||
-                   child is Total || child is CubeSourceBase;
+            return child is DataConnectionBase or DataSourceBase or Relation or Parameter or Total or CubeSourceBase;
         }
 
         /// <inheritdoc/>

@@ -81,8 +81,7 @@ namespace AM.Reporting.Gauge.Radial
             var angle = (Parent.Value - Parent.Minimum) / scale.StepValue * scale.MajorStep * RadialGauge.Radians;
             if ((Parent as RadialGauge).Type == RadialGaugeType.Semicircle)
             {
-                if ((Parent as RadialGauge).Position == RadialGaugePosition.Bottom ||
-                    (Parent as RadialGauge).Position == RadialGaugePosition.Top)
+                if ((Parent as RadialGauge).Position is RadialGaugePosition.Bottom or RadialGaugePosition.Top)
                 {
                     startAngle = -90 * RadialGauge.Radians;
                     if ((Parent as RadialGauge).Position == RadialGaugePosition.Bottom)

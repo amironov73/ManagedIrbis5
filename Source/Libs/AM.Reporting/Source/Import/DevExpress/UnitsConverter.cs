@@ -167,27 +167,23 @@ namespace AM.Reporting.Import.DevExpress
         /// <returns>The LineStyle value.</returns>
         public static LineStyle ConvertBorderDashStyle (string borderDashStyle)
         {
-            if (borderDashStyle == "DevExpress.XtraPrinting.BorderDashStyle.Dot" || borderDashStyle.Equals ("Dot"))
+            if (borderDashStyle is "DevExpress.XtraPrinting.BorderDashStyle.Dot" or "Dot")
             {
                 return LineStyle.Dot;
             }
-            else if (borderDashStyle == "DevExpress.XtraPrinting.BorderDashStyle.Dash" ||
-                     borderDashStyle.Equals ("Dash"))
+            else if (borderDashStyle is "DevExpress.XtraPrinting.BorderDashStyle.Dash" or "Dash")
             {
                 return LineStyle.Dash;
             }
-            else if (borderDashStyle == "DevExpress.XtraPrinting.BorderDashStyle.DashDot" ||
-                     borderDashStyle.Equals ("DashDot"))
+            else if (borderDashStyle is "DevExpress.XtraPrinting.BorderDashStyle.DashDot" or "DashDot")
             {
                 return LineStyle.DashDot;
             }
-            else if (borderDashStyle == "DevExpress.XtraPrinting.BorderDashStyle.DashDotDot" ||
-                     borderDashStyle.Equals ("DashDotDot"))
+            else if (borderDashStyle is "DevExpress.XtraPrinting.BorderDashStyle.DashDotDot" or "DashDotDot")
             {
                 return LineStyle.DashDotDot;
             }
-            else if (borderDashStyle == "DevExpress.XtraPrinting.BorderDashStyle.Double" ||
-                     borderDashStyle.Equals ("Double"))
+            else if (borderDashStyle is "DevExpress.XtraPrinting.BorderDashStyle.Double" or "Double")
             {
                 return LineStyle.Double;
             }
@@ -278,23 +274,23 @@ namespace AM.Reporting.Import.DevExpress
         /// <returns>The PictureBoxSizeMode value.</returns>
         public static PictureBoxSizeMode ConvertImageSizeMode (string sizeMode)
         {
-            if (sizeMode == "DevExpress.XtraPrinting.ImageSizeMode.StretchImage" || sizeMode == "StretchImage")
+            if (sizeMode is "DevExpress.XtraPrinting.ImageSizeMode.StretchImage" or "StretchImage")
             {
                 return PictureBoxSizeMode.StretchImage;
             }
-            else if (sizeMode == "DevExpress.XtraPrinting.ImageSizeMode.AutoSize" || sizeMode == "AutoSize")
+            else if (sizeMode is "DevExpress.XtraPrinting.ImageSizeMode.AutoSize" or "AutoSize")
             {
                 return PictureBoxSizeMode.AutoSize;
             }
-            else if (sizeMode == "DevExpress.XtraPrinting.ImageSizeMode.CenterImage" || sizeMode == "CenterImage")
+            else if (sizeMode is "DevExpress.XtraPrinting.ImageSizeMode.CenterImage" or "CenterImage")
             {
                 return PictureBoxSizeMode.CenterImage;
             }
-            else if (sizeMode == "DevExpress.XtraPrinting.ImageSizeMode.ZoomImage" || sizeMode == "ZoomImage")
+            else if (sizeMode is "DevExpress.XtraPrinting.ImageSizeMode.ZoomImage" or "ZoomImage")
             {
                 return PictureBoxSizeMode.Zoom;
             }
-            else if (sizeMode == "DevExpress.XtraPrinting.ImageSizeMode.Squeeze" || sizeMode == "Squeeze")
+            else if (sizeMode is "DevExpress.XtraPrinting.ImageSizeMode.Squeeze" or "Squeeze")
             {
                 return PictureBoxSizeMode.Zoom;
             }

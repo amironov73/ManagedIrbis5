@@ -1018,7 +1018,7 @@ namespace AM.Reporting.Barcode
             for (j = 0; j < n; ++j)
             {
                 c = text[ptrIn++] & 0xff;
-                if (c < '0' || c > '9')
+                if (c is < '0' or > '9')
                 {
                     return -1;
                 }

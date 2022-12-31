@@ -76,7 +76,7 @@ namespace AM.Reporting.Barcode.QRCode
         // Append one bit to the bit vector.
         public void appendBit (int bit)
         {
-            if (!(bit == 0 || bit == 1))
+            if (!(bit is 0 or 1))
             {
                 throw new ArgumentException ("Bad bit");
             }
@@ -107,7 +107,7 @@ namespace AM.Reporting.Barcode.QRCode
         // - appendBits(0xff, 8) adds 11111111.
         public void appendBits (int value_Renamed, int numBits)
         {
-            if (numBits < 0 || numBits > 32)
+            if (numBits is < 0 or > 32)
             {
                 throw new ArgumentException ("Num bits must be between 0 and 32");
             }

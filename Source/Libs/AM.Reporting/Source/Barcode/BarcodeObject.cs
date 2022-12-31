@@ -344,7 +344,7 @@ namespace AM.Reporting.Barcode
             size.Height *= Zoom;
             if (AutoSize)
             {
-                if (Angle == 0 || Angle == 180)
+                if (Angle is 0 or 180)
                 {
                     Width = size.Width + Padding.Horizontal;
                     if (size.Height > 0)
@@ -352,7 +352,7 @@ namespace AM.Reporting.Barcode
                         Height = size.Height + Padding.Vertical;
                     }
                 }
-                else if (Angle == 90 || Angle == 270)
+                else if (Angle is 90 or 270)
                 {
                     Height = size.Width + Padding.Vertical;
                     if (size.Height > 0)
@@ -416,7 +416,7 @@ namespace AM.Reporting.Barcode
         }
 
         /// <inheritdoc/>
-        public override void Draw (FRPaintEventArgs e)
+        public override void Draw (FRPaintEventArgs eventArgs)
         {
             var error = false;
             var errorText = "";
@@ -439,10 +439,10 @@ namespace AM.Reporting.Barcode
                 }
             }
 
-            base.Draw (e);
+            base.Draw (eventArgs);
             if (!error)
             {
-                DrawBarcode (e);
+                DrawBarcode (eventArgs);
             }
             else
             {
@@ -451,7 +451,7 @@ namespace AM.Reporting.Barcode
                     try
                     {
                         barcode.text = barcode.GetDefaultValue();
-                        DrawBarcode (e);
+                        DrawBarcode (eventArgs);
                         error = false;
                     }
                     catch
@@ -462,13 +462,13 @@ namespace AM.Reporting.Barcode
 
                 if (error)
                 {
-                    e.Graphics.DrawString (errorText, DrawUtils.DefaultReportFont, Brushes.Red,
-                        new RectangleF (AbsLeft * e.ScaleX, AbsTop * e.ScaleY, Width * e.ScaleX, Height * e.ScaleY));
+                    eventArgs.Graphics.DrawString (errorText, DrawUtils.DefaultReportFont, Brushes.Red,
+                        new RectangleF (AbsLeft * eventArgs.ScaleX, AbsTop * eventArgs.ScaleY, Width * eventArgs.ScaleX, Height * eventArgs.ScaleY));
                 }
             }
 
-            DrawMarkers (e);
-            Border.Draw (e, new RectangleF (AbsLeft, AbsTop, Width, Height));
+            DrawMarkers (eventArgs);
+            Border.Draw (eventArgs, new RectangleF (AbsLeft, AbsTop, Width, Height));
         }
 
         /// <inheritdoc/>

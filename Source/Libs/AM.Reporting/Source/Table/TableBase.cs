@@ -468,7 +468,7 @@ namespace AM.Reporting.Table
         }
 
         /// <inheritdoc/>
-        public override void Draw (FRPaintEventArgs e)
+        public override void Draw (FRPaintEventArgs eventArgs)
         {
             if (ColumnCount == 0 || RowCount == 0)
             {
@@ -480,24 +480,24 @@ namespace AM.Reporting.Table
             Height = Rows[Rows.Count - 1].Bottom;
             lockColumnRowChange = false;
 
-            base.Draw (e);
+            base.Draw (eventArgs);
 
             // draw table Right to Left if needed
             if (Config.RightToLeft)
             {
-                DrawTableRtl (e);
+                DrawTableRtl (eventArgs);
 
                 // !! ����������� ������ !!
                 //Border.Draw(e, new RectangleF(FLeftRtl - Width + AbsLeft, AbsTop, Width, Height));
-                Border.Draw (e, new RectangleF (AbsLeft, AbsTop, Width, Height));
+                Border.Draw (eventArgs, new RectangleF (AbsLeft, AbsTop, Width, Height));
             }
             else
             {
-                DrawTable (e);
-                Border.Draw (e, new RectangleF (AbsLeft, AbsTop, Width, Height));
+                DrawTable (eventArgs);
+                Border.Draw (eventArgs, new RectangleF (AbsLeft, AbsTop, Width, Height));
             }
 
-            DrawDesign (e);
+            DrawDesign (eventArgs);
         }
 
         /// <inheritdoc/>
@@ -771,7 +771,7 @@ namespace AM.Reporting.Table
         /// <inheritdoc/>
         public bool CanContain (Base child)
         {
-            return child is TableRow || child is TableColumn || child is TableCell;
+            return child is TableRow or TableColumn or TableCell;
         }
 
         /// <inheritdoc/>

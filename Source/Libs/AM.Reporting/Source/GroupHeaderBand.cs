@@ -299,9 +299,9 @@ namespace AM.Reporting
         {
             return base.CanContain (child) ||
                    (child is DataBand && nestedGroup == null && data == null) ||
-                   (child is GroupHeaderBand && (nestedGroup == null || nestedGroup is GroupHeaderBand) &&
+                   (child is GroupHeaderBand && nestedGroup is null or GroupHeaderBand &&
                     data == null) ||
-                   child is GroupFooterBand || child is DataHeaderBand || child is DataFooterBand;
+                   child is GroupFooterBand or DataHeaderBand or DataFooterBand;
         }
 
         /// <inheritdoc/>

@@ -71,10 +71,10 @@ namespace AM.Reporting.Gauge.Simple.Progress
         #region Public Methods
 
         /// <inheritdoc/>
-        public override void Draw (FRPaintEventArgs e)
+        public override void Draw (FRPaintEventArgs eventArgs)
         {
-            base.Draw (e);
-            Label.Draw (e);
+            base.Draw (eventArgs);
+            Label.Draw (eventArgs);
         }
 
         #endregion // Public Methods

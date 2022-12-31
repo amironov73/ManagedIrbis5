@@ -295,11 +295,11 @@ namespace AM.Reporting
         }
 
         /// <inheritdoc/>
-        public override void Draw (FRPaintEventArgs e)
+        public override void Draw (FRPaintEventArgs eventArgs)
         {
             using (var table = GetTable())
             {
-                table.Draw (e);
+                table.Draw (eventArgs);
             }
         }
 

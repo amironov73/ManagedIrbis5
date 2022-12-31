@@ -707,10 +707,10 @@ namespace AM.Reporting
         }
 
         /// <inheritdoc/>
-        public override void Draw (FRPaintEventArgs e)
+        public override void Draw (FRPaintEventArgs eventArgs)
         {
-            DrawBackground (e);
-            base.Draw (e);
+            DrawBackground (eventArgs);
+            base.Draw (eventArgs);
         }
 
         /// <summary>

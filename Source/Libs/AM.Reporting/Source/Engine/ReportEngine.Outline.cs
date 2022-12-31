@@ -65,7 +65,7 @@ namespace AM.Reporting.Engine
 
         private void OutlineUp (BandBase band)
         {
-            if (band is DataBand || band is GroupHeaderBand)
+            if (band is DataBand or GroupHeaderBand)
             {
                 if (!string.IsNullOrEmpty (band.OutlineExpression))
                 {

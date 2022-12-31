@@ -31,7 +31,7 @@ using System.Windows.Forms;
 namespace AM.Reporting;
 
 /// <summary>
-/// Base class for all bands.
+/// Базовый класс для всех полос.
 /// </summary>
 public abstract partial class BandBase
     : BreakableComponent, IParent
@@ -343,7 +343,7 @@ public abstract partial class BandBase
             return child is ReportComponentBase;
         }
 
-        return (child is ReportComponentBase and not BandBase || child is ChildBand);
+        return child is ReportComponentBase and not BandBase or ChildBand;
     }
 
     /// <inheritdoc/>
@@ -687,9 +687,7 @@ public abstract partial class BandBase
                 }
             }
 
-            if (b is DataHeaderBand || b is DataBand || b is DataFooterBand ||
-                b is GroupHeaderBand || b is GroupFooterBand ||
-                b is ColumnHeaderBand || b is ColumnFooterBand || b is ReportSummaryBand)
+            if (b is DataHeaderBand or Reporting.DataBand or DataFooterBand or GroupHeaderBand or GroupFooterBand or ColumnHeaderBand or ColumnFooterBand or ReportSummaryBand)
             {
                 return true;
             }
@@ -974,15 +972,13 @@ public abstract partial class BandBase
                     canBreak = false;
                     if (obj is BreakableComponent { CanBreak: true } breakable)
                     {
-                        using (var clone = (Activator.CreateInstance (breakable.GetType()) as BreakableComponent)!)
-                        {
-                            clone.AssignAll (breakable);
-                            clone.Height = breakLine - clone.Top;
+                        using var clone = (Activator.CreateInstance (breakable.GetType()) as BreakableComponent)!;
+                        clone.AssignAll (breakable);
+                        clone.Height = breakLine - clone.Top;
 
-                            // to allow access to the Report
-                            clone.Parent = breakTo;
-                            canBreak = clone.Break (null);
-                        }
+                        // to allow access to the Report
+                        clone.Parent = breakTo;
+                        canBreak = clone.Break (null);
                     }
                 }
 

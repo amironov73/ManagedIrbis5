@@ -337,8 +337,7 @@ namespace AM.Reporting
         /// <inheritdoc/>
         public override bool CanContain (Base child)
         {
-            return base.CanContain (child) || (child is DataHeaderBand || child is DataFooterBand ||
-                                               child is DataBand || child is GroupHeaderBand);
+            return base.CanContain (child) || child is DataHeaderBand or DataFooterBand or Reporting.DataBand or GroupHeaderBand;
         }
 
         /// <inheritdoc/>
@@ -358,7 +357,7 @@ namespace AM.Reporting
             {
                 Footer = footerBand;
             }
-            else if (child is DataBand || child is GroupHeaderBand)
+            else if (child is Reporting.DataBand or GroupHeaderBand)
             {
                 Bands.Add (child as BandBase);
             }
@@ -387,7 +386,7 @@ namespace AM.Reporting
                 Footer = null;
             }
 
-            if (child is DataBand || child is GroupHeaderBand)
+            if (child is Reporting.DataBand or GroupHeaderBand)
             {
                 Bands.Remove (child as BandBase);
             }

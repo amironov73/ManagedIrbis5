@@ -202,13 +202,13 @@ namespace AM.Reporting
         }
 
         /// <inheritdoc/>
-        public override void Draw (FRPaintEventArgs e)
+        public override void Draw (FRPaintEventArgs eventArgs)
         {
             switch (Points.Count)
             {
                 case 0:
                 case 1:
-                    var g = e.Graphics;
+                    var g = eventArgs.Graphics;
                     var x = AbsLeft + CenterX;
                     var y = AbsTop + CenterY;
                     if (Points.Count == 1)
@@ -217,17 +217,17 @@ namespace AM.Reporting
                         y += Points[0].Y;
                     }
 
-                    g.DrawLine (Pens.Black, x * e.ScaleX - 6, y * e.ScaleY, x * e.ScaleX + 6, y * e.ScaleY);
-                    g.DrawLine (Pens.Black, x * e.ScaleX, y * e.ScaleY - 6, x * e.ScaleX, y * e.ScaleY + 6);
+                    g.DrawLine (Pens.Black, x * eventArgs.ScaleX - 6, y * eventArgs.ScaleY, x * eventArgs.ScaleX + 6, y * eventArgs.ScaleY);
+                    g.DrawLine (Pens.Black, x * eventArgs.ScaleX, y * eventArgs.ScaleY - 6, x * eventArgs.ScaleX, y * eventArgs.ScaleY + 6);
                     break;
 
                 default:
-                    DoDrawPoly (e);
-                    DrawDesign0 (e);
+                    DoDrawPoly (eventArgs);
+                    DrawDesign0 (eventArgs);
                     break;
             }
 
-            DrawDesign1 (e);
+            DrawDesign1 (eventArgs);
         }
 
         /// <summary>

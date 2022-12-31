@@ -722,7 +722,7 @@ namespace AM.Reporting
             float width = 0;
             if (WordWrap)
             {
-                if (Angle == 90 || Angle == 270)
+                if (Angle is 90 or 270)
                 {
                     width = Height - Padding.Vertical;
                 }
@@ -1386,13 +1386,13 @@ namespace AM.Reporting
 
 
         /// <inheritdoc/>
-        public override void Draw (FRPaintEventArgs e)
+        public override void Draw (FRPaintEventArgs eventArgs)
         {
-            base.Draw (e);
-            DrawText (e);
-            DrawMarkers (e);
-            Border.Draw (e, new RectangleF (AbsLeft, AbsTop, Width, Height));
-            DrawDesign (e);
+            base.Draw (eventArgs);
+            DrawText (eventArgs);
+            DrawMarkers (eventArgs);
+            Border.Draw (eventArgs, new RectangleF (AbsLeft, AbsTop, Width, Height));
+            DrawDesign (eventArgs);
         }
 
         /// <inheritdoc/>
@@ -1775,7 +1775,7 @@ namespace AM.Reporting
         /// <returns>The width, in pixels.</returns>
         public float CalcWidth()
         {
-            if (Angle == 90 || Angle == 270)
+            if (Angle is 90 or 270)
             {
                 return InternalCalcHeight();
             }
@@ -1786,7 +1786,7 @@ namespace AM.Reporting
         /// <inheritdoc/>
         public override float CalcHeight()
         {
-            if (Angle == 90 || Angle == 270)
+            if (Angle is 90 or 270)
             {
                 return InternalCalcWidth();
             }

@@ -57,7 +57,7 @@ namespace AM.Reporting.Utils
             for (var i = last; i >= 0; i--)
             {
                 var node = menuNodes[i];
-                if (node.Name == "Cloud" || node.Name == "Messengers")
+                if (node.Name is "Cloud" or "Messengers")
                 {
                     menuNodes.Remove (node);
                 }

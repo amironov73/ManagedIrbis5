@@ -84,17 +84,17 @@ namespace AM.Reporting
         }
 
         /// <inheritdoc/>
-        public override void Draw (FRPaintEventArgs e)
+        public override void Draw (FRPaintEventArgs eventArgs)
         {
-            var g = e.Graphics;
+            var g = eventArgs.Graphics;
 
             // draw marker when inserting a line
             if (Width == 0 && Height == 0)
             {
-                g.DrawLine (Pens.Black, AbsLeft * e.ScaleX - 6, AbsTop * e.ScaleY, AbsLeft * e.ScaleX + 6,
-                    AbsTop * e.ScaleY);
-                g.DrawLine (Pens.Black, AbsLeft * e.ScaleX, AbsTop * e.ScaleY - 6, AbsLeft * e.ScaleX,
-                    AbsTop * e.ScaleY + 6);
+                g.DrawLine (Pens.Black, AbsLeft * eventArgs.ScaleX - 6, AbsTop * eventArgs.ScaleY, AbsLeft * eventArgs.ScaleX + 6,
+                    AbsTop * eventArgs.ScaleY);
+                g.DrawLine (Pens.Black, AbsLeft * eventArgs.ScaleX, AbsTop * eventArgs.ScaleY - 6, AbsLeft * eventArgs.ScaleX,
+                    AbsTop * eventArgs.ScaleY + 6);
                 return;
             }
 
@@ -105,7 +105,7 @@ namespace AM.Reporting
                 g.SmoothingMode = SmoothingMode.AntiAlias;
             }
 
-            var pen = e.Cache.GetPen (Border.Color, Border.Width * e.ScaleX, Border.DashStyle);
+            var pen = eventArgs.Cache.GetPen (Border.Color, Border.Width * eventArgs.ScaleX, Border.DashStyle);
 
             var width = Width;
             var height = Height;
@@ -121,10 +121,10 @@ namespace AM.Reporting
                 }
             }
 
-            var x1 = AbsLeft * e.ScaleX;
-            var y1 = AbsTop * e.ScaleY;
-            var x2 = (AbsLeft + width) * e.ScaleX;
-            var y2 = (AbsTop + height) * e.ScaleY;
+            var x1 = AbsLeft * eventArgs.ScaleX;
+            var y1 = AbsTop * eventArgs.ScaleY;
+            var x2 = (AbsLeft + width) * eventArgs.ScaleX;
+            var y2 = (AbsTop + height) * eventArgs.ScaleY;
 
             if (StartCap.Style == CapStyle.None && EndCap.Style == CapStyle.None)
             {
@@ -135,7 +135,7 @@ namespace AM.Reporting
                 // draw line caps manually. It is necessary for correct svg rendering
                 var angle = (float)(Math.Atan2 (x2 - x1, y2 - y1) / Math.PI * 180);
                 var len = (float)Math.Sqrt ((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
-                var scale = Border.Width * e.ScaleX;
+                var scale = Border.Width * eventArgs.ScaleX;
 
                 var state = g.Save();
                 g.TranslateTransform (x1, y1);
@@ -159,7 +159,7 @@ namespace AM.Reporting
                 g.DrawLine (pen, 0, y, 0, len);
                 g.Restore (state);
 
-                pen = e.Cache.GetPen (Border.Color, 1, Border.DashStyle);
+                pen = eventArgs.Cache.GetPen (Border.Color, 1, Border.DashStyle);
                 if (StartCap.Style != CapStyle.None)
                 {
                     state = g.Save();

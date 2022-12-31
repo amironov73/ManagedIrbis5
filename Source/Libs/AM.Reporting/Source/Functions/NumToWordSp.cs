@@ -146,7 +146,7 @@ namespace AM.Reporting.Functions
             }
 
             val = val % 100;
-            if (counter == 3 || counter == 4 || counter == 5)
+            if (counter is 3 or 4 or 5)
             {
                 _useUn = true;
             }

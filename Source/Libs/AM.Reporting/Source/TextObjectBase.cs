@@ -453,7 +453,7 @@ namespace AM.Reporting
         {
             this.Value = value;
             var formattedValue = "";
-            if (value == null || value is DBNull)
+            if (value is null or DBNull)
             {
                 formattedValue = NullValue;
             }
