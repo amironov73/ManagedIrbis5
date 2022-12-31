@@ -307,7 +307,7 @@ namespace AM.Reporting.Table
         {
             saveVisible = Visible;
             var parent = Parent as BandBase;
-            saveStateSkipped = !Visible || (parent != null && !parent.Visible);
+            saveStateSkipped = !Visible || parent is { Visible: false };
             if (saveStateSkipped)
             {
                 return;
@@ -517,7 +517,7 @@ namespace AM.Reporting.Table
                 throw new TableManualBuildException();
             }
 
-            if (!Report.Engine.UnlimitedHeight && !Report.Engine.UnlimitedWidth)
+            if (Report.Engine is { UnlimitedHeight: false, UnlimitedWidth: false })
             {
                 helper.PageBreak();
             }

@@ -555,7 +555,9 @@ namespace AM.Reporting
                     float scaleToMin = 1;
 
                     for (var i = 0; i < 4; i++)
+                    {
                         p[i] = rotateVector (p[i], Angle);
+                    }
 
                     for (var i = 0; i < 4; i++)
                     {

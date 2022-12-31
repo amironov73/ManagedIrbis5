@@ -145,7 +145,10 @@ namespace AM.Reporting.Export.Html
             {
                 styles.AppendLine (HTMLGetStylesHeader());
                 for (var i = prevStyleListIndex; i < cssStyles.Count; i++)
+                {
                     styles.Append (HTMLGetStyleHeader (i, PageNumber)).Append (cssStyles[i]).AppendLine ("}");
+                }
+
                 styles.AppendLine (HTMLGetStylesFooter());
             }
         }
@@ -172,12 +175,12 @@ namespace AM.Reporting.Export.Html
                         onclick = "click";
                     }
 
-                    if (obj is CheckBoxObject checkBoxObject && checkBoxObject.Editable)
+                    if (obj is CheckBoxObject { Editable: true })
                     {
                         onclick = "checkbox_click";
                     }
 
-                    if (obj is TextObject textObject && textObject.Editable)
+                    if (obj is TextObject { Editable: true })
                     {
                         onclick = "text_edit";
                     }
@@ -775,7 +778,7 @@ namespace AM.Reporting.Export.Html
             var color = Color.Transparent;
             var tempObj = obj;
 
-            if (obj.Parent is BandBase && obj.Band.Fill.IsTransparent)
+            if (obj is { Parent: BandBase, Band.Fill.IsTransparent: true })
             {
                 color = Color.White;
             }
@@ -786,12 +789,12 @@ namespace AM.Reporting.Export.Html
             else
             {
                 var i = 0;
-                while (tempObj != null && tempObj.Fill.IsTransparent && !(tempObj.Parent is BandBase) && i < 10)
+                while (tempObj is { Fill.IsTransparent: true, Parent: not BandBase } && i < 10)
                 {
                     i++;
                     tempObj = tempObj.Parent as ReportComponentBase;
 
-                    if (tempObj != null && !tempObj.Fill.IsTransparent)
+                    if (tempObj is { Fill.IsTransparent: false })
                     {
                         color = tempObj.FillColor;
                         break;
@@ -886,7 +889,7 @@ namespace AM.Reporting.Export.Html
                 }
             }
 
-            if (!(obj is PolyLineObject))
+            if (obj is not PolyLineObject)
             {
                 if (obj.Fill is SolidFill)
                 {
@@ -936,7 +939,7 @@ namespace AM.Reporting.Export.Html
                         }
                         else
                         {
-                            if (textcell is TextObject textObject && !textObject.TextOutline.Enabled &&
+                            if (textcell is TextObject { TextOutline.Enabled: false } textObject &&
                                 IsMemo (textcell))
                             {
                                 LayerText (Page, textObject);
@@ -960,8 +963,7 @@ namespace AM.Reporting.Export.Html
         {
             if (Obj is TextObject aObj)
             {
-                return (aObj.Angle == 0) && (aObj.FontWidthRatio == 1) && (!aObj.TextOutline.Enabled) &&
-                       (!aObj.Underlines);
+                return (aObj.Angle == 0) && aObj is { FontWidthRatio: 1, TextOutline.Enabled: false, Underlines: false };
             }
 
             return false;
@@ -1070,12 +1072,12 @@ namespace AM.Reporting.Export.Html
 
                 htmlPage.Append ("\">");
 
-                if (reportPage.Watermark.Enabled && !reportPage.Watermark.ShowImageOnTop)
+                if (reportPage.Watermark is { Enabled: true, ShowImageOnTop: false })
                 {
                     Watermark (htmlPage, reportPage, false);
                 }
 
-                if (reportPage.Watermark.Enabled && !reportPage.Watermark.ShowTextOnTop)
+                if (reportPage.Watermark is { Enabled: true, ShowTextOnTop: false })
                 {
                     Watermark (htmlPage, reportPage, true);
                 }
@@ -1085,12 +1087,12 @@ namespace AM.Reporting.Export.Html
         private void ExportHTMLPageLayeredEnd (HTMLData d)
         {
             // to do
-            if (d.page.Watermark.Enabled && d.page.Watermark.ShowImageOnTop)
+            if (d.page.Watermark is { Enabled: true, ShowImageOnTop: true })
             {
                 Watermark (htmlPage, d.page, false);
             }
 
-            if (d.page.Watermark.Enabled && d.page.Watermark.ShowTextOnTop)
+            if (d.page.Watermark is { Enabled: true, ShowTextOnTop: true })
             {
                 Watermark (htmlPage, d.page, true);
             }
@@ -1118,7 +1120,7 @@ namespace AM.Reporting.Export.Html
                     SetExportableAdvMatrix (c);
                 }
 
-                if (c is ReportComponentBase @base && @base.Exportable)
+                if (c is ReportComponentBase { Exportable: true } @base)
                 {
                     var obj = @base;
 
@@ -1159,7 +1161,7 @@ namespace AM.Reporting.Export.Html
                         }
                         else if (obj is TableBase table)
                         {
-                            if (table.ColumnCount > 0 && table.RowCount > 0)
+                            if (table is { ColumnCount: > 0, RowCount: > 0 })
                             {
                                 using (var tableback = new TextObject())
                                 {
@@ -1172,9 +1174,15 @@ namespace AM.Reporting.Export.Html
                                     float tableHeight = 0;
 
                                     for (var i = 0; i < table.ColumnCount; i++)
+                                    {
                                         tableWidth += table[i, 0].Width;
+                                    }
+
                                     for (var i = 0; i < table.RowCount; i++)
+                                    {
                                         tableHeight += table.Rows[i].Height;
+                                    }
+
                                     tableback.Width = (tableWidth < table.Width) ? tableWidth : table.Width;
                                     tableback.Height = tableHeight;
                                     LayerText (htmlPage, tableback);

@@ -408,7 +408,10 @@ namespace AM.Reporting.Barcode.Aztec
                 var leftOffset = oldBitsLen * 32 - Size;
                 var mask = 1;
                 for (var i = 0; i < 31 - leftOffset; i++)
+                {
                     mask = (mask << 1) | 1;
+                }
+
                 var currentInt = (newBits[0] >> leftOffset) & mask;
                 for (var i = 1; i < oldBitsLen; i++)
                 {

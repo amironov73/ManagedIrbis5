@@ -71,7 +71,7 @@ namespace AM.Reporting.Gauge.Simple
             Border.Draw (e, new RectangleF (AbsLeft, AbsTop, Width, Height));
             var g = e.Graphics;
 
-            if (Report != null && Report.SmoothGraphics)
+            if (Report is { SmoothGraphics: true })
             {
                 g.InterpolationMode = InterpolationMode.HighQualityBicubic;
                 g.SmoothingMode = SmoothingMode.AntiAlias;

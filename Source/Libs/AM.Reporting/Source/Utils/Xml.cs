@@ -1046,7 +1046,7 @@ namespace AM.Reporting.Utils
             item.WriteProps (sb);
 
             // end
-            if (item.Count == 0 && item.Value == "")
+            if (item is { Count: 0, Value: "" })
             {
                 sb.Append ("/>");
             }
@@ -1076,7 +1076,9 @@ namespace AM.Reporting.Utils
 
             WriteItem (rootItem, level);
             for (var i = 0; i < rootItem.Count; i++)
+            {
                 DoWrite (rootItem[i], level + 2);
+            }
 
             if (rootItem.Count > 0)
             {

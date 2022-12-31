@@ -117,7 +117,10 @@ namespace AM.Reporting
                 var result = new List<byte>();
                 result.Add (0);
                 for (var i = 1; i < Points.Count; i++)
+                {
                     result.Add (1);
+                }
+
                 return result.ToArray();
             }
         }
@@ -444,7 +447,7 @@ namespace AM.Reporting
                         {
                             delta = (float)Math.Sqrt (delta);
                             var t_1 = RecalculateBounds_Solve (prev.X, p_1.X, p_2.X, point.X, -delta);
-                            if (0 < t_1 && t_1 < 1)
+                            if (t_1 is > 0 and < 1)
                             {
                                 var x = RecalculateBounds_Value (prev.X, p_1.X, p_2.X, point.X, t_1);
                                 if (x < left)
@@ -458,7 +461,7 @@ namespace AM.Reporting
                             }
 
                             var t_2 = RecalculateBounds_Solve (prev.X, p_1.X, p_2.X, point.X, delta);
-                            if (0 < t_2 && t_2 < 1)
+                            if (t_2 is > 0 and < 1)
                             {
                                 var x = RecalculateBounds_Value (prev.X, p_1.X, p_2.X, point.X, t_2);
                                 if (x < left)
@@ -478,7 +481,7 @@ namespace AM.Reporting
                         {
                             delta = (float)Math.Sqrt (delta);
                             var t_1 = RecalculateBounds_Solve (prev.Y, p_1.Y, p_2.Y, point.Y, -delta);
-                            if (0 < t_1 && t_1 < 1)
+                            if (t_1 is > 0 and < 1)
                             {
                                 var y = RecalculateBounds_Value (prev.Y, p_1.Y, p_2.Y, point.Y, t_1);
                                 if (y < top)
@@ -492,7 +495,7 @@ namespace AM.Reporting
                             }
 
                             var t_2 = RecalculateBounds_Solve (prev.Y, p_1.Y, p_2.Y, point.Y, delta);
-                            if (0 < t_2 && t_2 < 1)
+                            if (t_2 is > 0 and < 1)
                             {
                                 var y = RecalculateBounds_Value (prev.Y, p_1.Y, p_2.Y, point.Y, t_2);
                                 if (y < top)
@@ -597,7 +600,7 @@ namespace AM.Reporting
         {
             var g = e.Graphics;
             var report = Report;
-            if (report != null && report.SmoothGraphics)
+            if (report is { SmoothGraphics: true })
             {
                 g.InterpolationMode = InterpolationMode.HighQualityBicubic;
                 g.SmoothingMode = SmoothingMode.AntiAlias;
@@ -605,7 +608,7 @@ namespace AM.Reporting
 
             drawPoly (e);
 
-            if (report != null && report.SmoothGraphics)
+            if (report is { SmoothGraphics: true })
             {
                 g.InterpolationMode = InterpolationMode.Default;
                 g.SmoothingMode = SmoothingMode.Default;

@@ -55,7 +55,7 @@ namespace AM.Reporting.TypeConverters
         {
             if (value is string s)
             {
-                if (context != null && context.Instance != null && !string.IsNullOrEmpty (s))
+                if (context is { Instance: { } } && !string.IsNullOrEmpty (s))
                 {
                     var c = context.Instance as ComponentBase;
                     var report = c.Report;

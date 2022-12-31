@@ -72,7 +72,7 @@ namespace AM.Reporting.Engine
                     subreport.Visible = CalcVisibleExpression (subreport.VisibleExpression);
                 }
 
-                if (subreport != null && subreport.Visible && subreport.PrintOnParent)
+                if (subreport is { Visible: true, PrintOnParent: true })
                 {
                     RenderInnerSubreport (parentBand, subreport);
                 }
@@ -101,7 +101,7 @@ namespace AM.Reporting.Engine
                         subreport.Visible = CalcVisibleExpression (subreport.VisibleExpression);
                     }
 
-                    if (subreport != null && subreport.Visible && !subreport.PrintOnParent)
+                    if (subreport is { Visible: true, PrintOnParent: false })
                     {
                         hasSubreports = true;
 

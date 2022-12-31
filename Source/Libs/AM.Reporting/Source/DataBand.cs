@@ -93,7 +93,7 @@ namespace AM.Reporting
         {
             get
             {
-                if (dataSource != null && !dataSource.Enabled)
+                if (dataSource is { Enabled: false })
                 {
                     return null;
                 }

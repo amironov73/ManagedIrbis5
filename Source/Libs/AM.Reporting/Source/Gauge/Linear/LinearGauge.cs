@@ -88,7 +88,7 @@ namespace AM.Reporting.Gauge.Linear
         public override void Draw (FRPaintEventArgs e)
         {
             var g = e.Graphics;
-            if (Report != null && Report.SmoothGraphics)
+            if (Report is { SmoothGraphics: true })
             {
                 g.InterpolationMode = InterpolationMode.HighQualityBicubic;
                 g.SmoothingMode = SmoothingMode.AntiAlias;

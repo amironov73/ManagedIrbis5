@@ -268,7 +268,7 @@ namespace AM.Reporting
                 obj.OnAfterData();
 
                 // break the component if it is of BreakableComponent an has non-empty BreakTo property
-                if (obj is BreakableComponent component && component.BreakTo != null &&
+                if (obj is BreakableComponent { BreakTo: { } } component &&
                     component.BreakTo.GetType() == component.GetType())
                 {
                     component.Break (component.BreakTo);

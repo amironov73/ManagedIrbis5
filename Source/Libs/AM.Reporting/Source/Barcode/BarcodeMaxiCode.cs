@@ -112,8 +112,10 @@ namespace AM.Reporting.Barcode
                 var points = new PointF[hex.pointX.Length];
 
                 for (var i = 0; i < hex.pointX.Length; i++)
+                {
                     points[i] = new PointF (FieldSizeFactor * kx * (float)hex.pointX[i],
                         FieldSizeFactor * ky * (float)hex.pointY[i]);
+                }
 
                 g.FillPolygon (b, points);
             }
@@ -1329,20 +1331,20 @@ namespace AM.Reporting.Barcode
             {
                 insert (0, 27); // ECI
 
-                if ((eciMode >= 0) && (eciMode <= 31))
+                if (eciMode is >= 0 and <= 31)
                 {
                     insert (1, eciMode & 0x1F);
                     Length += 2;
                 }
 
-                if ((eciMode >= 32) && (eciMode <= 1023))
+                if (eciMode is >= 32 and <= 1023)
                 {
                     insert (1, 0x20 + (eciMode >> 6));
                     insert (2, eciMode & 0x3F);
                     Length += 3;
                 }
 
-                if ((eciMode >= 1024) && (eciMode <= 32767))
+                if (eciMode is >= 1024 and <= 32767)
                 {
                     insert (1, 0x30 + (eciMode >> 12));
                     insert (2, (eciMode >> 6) & 0x3F);
@@ -1350,7 +1352,7 @@ namespace AM.Reporting.Barcode
                     Length += 4;
                 }
 
-                if ((eciMode >= 32768) && (eciMode <= 999999))
+                if (eciMode is >= 32768 and <= 999999)
                 {
                     insert (1, 0x38 + (eciMode >> 18));
                     insert (2, (eciMode >> 12) & 0x3F);

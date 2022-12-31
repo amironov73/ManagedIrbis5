@@ -410,11 +410,13 @@ namespace AM.Reporting.Export.Html
                                 var item = new PicsArchiveItem (ImageFileName, PictureStream);
                                 var founded = false;
                                 for (var i = 0; i < picsArchive.Count; i++)
+                                {
                                     if (item.FileName == picsArchive[i].FileName)
                                     {
                                         founded = true;
                                         break;
                                     }
+                                }
 
                                 if (!founded)
                                 {

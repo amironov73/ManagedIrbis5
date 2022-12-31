@@ -245,11 +245,15 @@ namespace AM.Reporting.Table
             if (cellDuplicates == CellDuplicates.Clear)
             {
                 for (var x = 0; x < colSpan; x++)
-                for (var y = 0; y < rowSpan; y++)
-                    if (!(x == 0 && y == 0))
+                {
+                    for (var y = 0; y < rowSpan; y++)
                     {
-                        GetCellData (x + startX, y + startY).Text = "";
+                        if (!(x == 0 && y == 0))
+                        {
+                            GetCellData (x + startX, y + startY).Text = "";
+                        }
                     }
+                }
             }
             else if (cellDuplicates == CellDuplicates.Merge ||
                      (cellDuplicates == CellDuplicates.MergeNonEmpty && !string.IsNullOrEmpty (cellText)))
@@ -308,7 +312,7 @@ namespace AM.Reporting.Table
                 SortedList<float, TableBase> tables = new SortedList<float, TableBase>();
                 foreach (Base obj in senderBand.Objects)
                 {
-                    if (obj is TableBase table && table.ResultTable != null)
+                    if (obj is TableBase { ResultTable: { } } table)
                     {
                         try
                         {

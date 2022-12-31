@@ -633,15 +633,15 @@ namespace AM.Reporting
                                         'c', 'd', 'e', 'f', 'A', 'B', 'C', 'D', 'E', 'F');
                                 }
 
-                                if ('0' <= reader.Char && reader.Char <= '9')
+                                if (reader.Char is >= '0' and <= '9')
                                 {
                                     number = number * 0x10 + (int)(reader.Char - '0');
                                 }
-                                else if ('a' <= reader.Char && reader.Char <= 'f')
+                                else if (reader.Char is >= 'a' and <= 'f')
                                 {
                                     number = number * 0x10 + 10 + (int)(reader.Char - 'a');
                                 }
-                                else if ('A' <= reader.Char && reader.Char <= 'F')
+                                else if (reader.Char is >= 'A' and <= 'F')
                                 {
                                     number = number * 0x10 + 10 + (int)(reader.Char - 'A');
                                 }

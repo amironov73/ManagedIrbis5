@@ -71,7 +71,7 @@ namespace AM.Reporting.Data
 
         private void AddBaseToDictionary (Base b)
         {
-            if (b is DataComponentBase @base && @base.ReferenceName != null)
+            if (b is DataComponentBase { ReferenceName: { } } @base)
             {
                 dataComponents[@base.ReferenceName] = @base;
             }

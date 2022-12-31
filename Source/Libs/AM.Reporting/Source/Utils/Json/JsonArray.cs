@@ -103,7 +103,9 @@ namespace AM.Reporting.Utils.Json
                 {
                     sb.AppendLine();
                     for (var i = 0; i < indent; i++)
+                    {
                         sb.Append (' ');
+                    }
                 }
 
                 WriteValue (sb, item, indent);
@@ -114,7 +116,9 @@ namespace AM.Reporting.Utils.Json
             {
                 sb.AppendLine();
                 for (var i = 2; i < indent; i++)
+                {
                     sb.Append (' ');
+                }
             }
 
             sb.Append (']');

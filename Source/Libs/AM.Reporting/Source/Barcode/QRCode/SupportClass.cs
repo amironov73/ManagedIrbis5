@@ -142,7 +142,9 @@ namespace AM.Reporting.Barcode.QRCode
             {
                 sbyteArray = new sbyte[byteArray.Length];
                 for (var index = 0; index < byteArray.Length; index++)
+                {
                     sbyteArray[index] = (sbyte)byteArray[index];
+                }
             }
 
             return sbyteArray;

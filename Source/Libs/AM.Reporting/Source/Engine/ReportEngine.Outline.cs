@@ -48,7 +48,7 @@ namespace AM.Reporting.Engine
             if (band.Visible && !string.IsNullOrEmpty (band.OutlineExpression) && !band.Repeated)
             {
                 AddOutline (Converter.ToString (Report.Calc (band.OutlineExpression)), CurPage, CurY);
-                if (!(band is DataBand) && !(band is GroupHeaderBand))
+                if (band is not DataBand && band is not GroupHeaderBand)
                 {
                     OutlineUp();
                 }

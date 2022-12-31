@@ -141,11 +141,13 @@ namespace AM.Reporting.Utils
             if (result)
             {
                 for (var i = 0; i < list.Count; i++)
+                {
                     if (List[i] != list.List[i])
                     {
                         result = false;
                         break;
                     }
+                }
             }
 
             return result;
@@ -159,7 +161,9 @@ namespace AM.Reporting.Utils
         {
             list.Clear();
             for (var i = 0; i < Count; i++)
+            {
                 list.Add (List[i] as Base);
+            }
         }
 
         /// <inheritdoc/>

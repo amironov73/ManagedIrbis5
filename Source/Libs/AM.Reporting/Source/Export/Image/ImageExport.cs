@@ -567,12 +567,12 @@ namespace AM.Reporting.Export.Image
             g.ScaleTransform (1, zoomY / zoomX);
 
             // export bottom watermark
-            if (page.Watermark.Enabled && !page.Watermark.ShowImageOnTop)
+            if (page.Watermark is { Enabled: true, ShowImageOnTop: false })
             {
                 AddImageWatermark (page);
             }
 
-            if (page.Watermark.Enabled && !page.Watermark.ShowTextOnTop)
+            if (page.Watermark is { Enabled: true, ShowTextOnTop: false })
             {
                 AddTextWatermark (page);
             }
@@ -594,7 +594,7 @@ namespace AM.Reporting.Export.Image
 
         private void ExportObj (Base obj)
         {
-            if (obj is ReportComponentBase @base && @base.Exportable)
+            if (obj is ReportComponentBase { Exportable: true } @base)
             {
                 @base.Draw (new FRPaintEventArgs (g, zoomX, zoomX, Report.GraphicCache));
             }
@@ -604,12 +604,12 @@ namespace AM.Reporting.Export.Image
         protected override void ExportPageEnd (ReportPage page)
         {
             // export top watermark
-            if (page.Watermark.Enabled && page.Watermark.ShowImageOnTop)
+            if (page.Watermark is { Enabled: true, ShowImageOnTop: true })
             {
                 AddImageWatermark (page);
             }
 
-            if (page.Watermark.Enabled && page.Watermark.ShowTextOnTop)
+            if (page.Watermark is { Enabled: true, ShowTextOnTop: true })
             {
                 AddTextWatermark (page);
             }

@@ -187,7 +187,9 @@ namespace AM.Reporting.Engine
             if (band != null)
             {
                 for (var i = 0; i < band.RepeatBandNTimes; i++)
+                {
                     ShowBand (band, true);
+                }
             }
         }
 
@@ -266,7 +268,7 @@ namespace AM.Reporting.Engine
                     expression = Report.Calc (Code.CodeUtils.FixExpressionWithBrackets (obj.VisibleExpression));
                 }
 
-                if (expression != null && expression is bool b)
+                if (expression is bool b)
                 {
                     if (!obj.VisibleExpression.Contains ("TotalPages"))
                     {
@@ -312,7 +314,7 @@ namespace AM.Reporting.Engine
 
             var isFirstPage = CurPage == firstReportPage;
             var isLastPage = CurPage == TotalPages - 1;
-            var isRepeated = obj.Band != null && obj.Band.Repeated;
+            var isRepeated = obj.Band is { Repeated: true };
             var canPrint = false;
 
             if ((obj.PrintOn & PrintOn.OddPages) > 0 && CurPage % 2 == 1)
@@ -429,7 +431,7 @@ namespace AM.Reporting.Engine
             }
 
             // check if we have a child band with FillUnusedSpace flag
-            if (band.Child != null && band.Child.FillUnusedSpace)
+            if (band.Child is { FillUnusedSpace: true })
             {
                 // if we reprint a data/group footer, do not include the band height into calculation:
                 // it is already counted in FreeSpace
@@ -518,7 +520,7 @@ namespace AM.Reporting.Engine
             }
 
             // shift CurY
-            if (bandAdded && !(mainBand is OverlayBand))
+            if (bandAdded && mainBand is not OverlayBand)
             {
                 CurY += band.Height;
             }

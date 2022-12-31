@@ -328,7 +328,9 @@ namespace AM.Reporting.Barcode
             int i, j, p, x, y, xs, ys, z;
             var xByte = (dm.width + 7) / 8;
             for (var k = 0; k < image.Length; ++k)
+            {
                 image[k] = 0;
+            }
 
             //alignment patterns
             //dotted horizontal line
@@ -422,7 +424,7 @@ namespace AM.Reporting.Barcode
 
         private static bool IsDigit (int c)
         {
-            return c >= '0' && c <= '9';
+            return c is >= '0' and <= '9';
         }
 
         private static int AsciiEncodation (byte[] text, int textOffset, int textLength, byte[] data, int dataOffset,
@@ -545,7 +547,10 @@ namespace AM.Reporting.Barcode
                     }
 
                     for (k = 0; k < count; ++k)
+                    {
                         x[ptrIn - k - 1] = 100;
+                    }
+
                     count = 0;
                 }
             }
@@ -556,7 +561,10 @@ namespace AM.Reporting.Barcode
             }
 
             for (k = 0; k < count; ++k)
+            {
                 x[ptrIn - k - 1] = 100;
+            }
+
             ptrIn = 0;
             c = 0;
             for (; ptrIn < textLength; ++ptrIn)
@@ -1389,7 +1397,10 @@ namespace AM.Reporting.Barcode
                 int row, col, chr;
                 /* First, fill the array[] with invalid entries */
                 for (var k = 0; k < array.Length; ++k)
+                {
                     array[k] = (short)0;
+                }
+
                 /* Starting in the correct location for character #1, bit 8,... */
                 chr = 1;
                 row = 4;
@@ -1644,7 +1655,11 @@ namespace AM.Reporting.Barcode
             {
                 int i, j, k;
 
-                for (i = 0; i <= nc; i++) ncout[i] = 0;
+                for (i = 0; i <= nc; i++)
+                {
+                    ncout[i] = 0;
+                }
+
                 for (i = 0; i < nd; i++)
                 {
                     k = (ncout[0] ^ wd[i]) & 0xff;
@@ -1672,11 +1687,16 @@ namespace AM.Reporting.Barcode
                 {
                     int n, p = 0;
                     for (n = b; n < nd; n += blocks)
+                    {
                         buf[p++] = wd[n];
+                    }
+
                     ReedSolomonBlock (buf, p, ecc, nc, c);
                     p = 0;
                     for (n = b; n < nc * blocks; n += blocks)
+                    {
                         wd[nd + n] = ecc[p++];
+                    }
                 }
             }
         }

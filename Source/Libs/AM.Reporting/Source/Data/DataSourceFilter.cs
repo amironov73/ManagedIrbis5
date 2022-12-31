@@ -151,7 +151,7 @@ namespace AM.Reporting.Data
                 }
 
                 // check if element is DateTime[] array
-                if (value is DateTime time && element.Value is DateTime[] times && times.Length == 2)
+                if (value is DateTime time && element.Value is DateTime[] { Length: 2 } times)
                 {
                     // Check if value is within range.
                     var elementValDateTime1 = times[0];

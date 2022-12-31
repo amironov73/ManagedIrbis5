@@ -259,7 +259,7 @@ namespace AM.Reporting.Barcode
 
         private bool IsDigit (char c)
         {
-            return c >= '0' && c <= '9';
+            return c is >= '0' and <= '9';
         }
 
         private bool IsFourOrMoreDigits (string code, int index, out int numDigits)

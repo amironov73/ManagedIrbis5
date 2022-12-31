@@ -440,12 +440,12 @@ namespace AM.Reporting.Gauge.Radial
             Pointer.Draw (e);
             Label.Draw (e);
             DrawMarkers (e);
-            if (!(Fill is SolidFill))
+            if (Fill is not SolidFill)
             {
                 brush.Dispose();
             }
 
-            if (Report != null && Report.SmoothGraphics)
+            if (Report is { SmoothGraphics: true })
             {
                 g.InterpolationMode = InterpolationMode.HighQualityBicubic;
                 g.SmoothingMode = SmoothingMode.AntiAlias;

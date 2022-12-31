@@ -77,7 +77,7 @@ namespace AM.Reporting.Engine
             dataBand.DataSource.First();
 
             var rowCount = dataBand.DataSource.RowCount;
-            if (dataBand.IsDatasourceEmpty && dataBand.PrintIfDatasourceEmpty)
+            if (dataBand is { IsDatasourceEmpty: true, PrintIfDatasourceEmpty: true })
             {
                 rowCount = 1;
             }
@@ -221,7 +221,7 @@ namespace AM.Reporting.Engine
             }
 
             // print child if databand is empty
-            if (child != null && child.PrintIfDatabandEmpty && dataBand.IsDatasourceEmpty)
+            if (child is { PrintIfDatabandEmpty: true } && dataBand.IsDatasourceEmpty)
             {
                 ShowBand (child);
             }
@@ -262,7 +262,7 @@ namespace AM.Reporting.Engine
                     ResetLogicalPageNumber();
                 }
 
-                if (dataBand.Footer != null && dataBand.CanBreak)
+                if (dataBand is { Footer: { }, CanBreak: true })
                 {
                     if (dataBand.Footer.KeepWithData && dataBand.Footer.Height + dataBand.Height > FreeSpace)
                     {
@@ -706,12 +706,9 @@ namespace AM.Reporting.Engine
             }
 
             var footer = dataBand.Footer;
-            if (footer != null)
+            if (footer is { RepeatOnEveryPage: true })
             {
-                if (footer.RepeatOnEveryPage)
-                {
-                    AddReprint (footer);
-                }
+                AddReprint (footer);
             }
         }
 

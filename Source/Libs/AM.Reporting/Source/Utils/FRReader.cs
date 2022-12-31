@@ -282,7 +282,7 @@ namespace AM.Reporting.Utils
                 curRoot = curItem;
                 GetProps();
 
-                if (Report != null && Report.IsAncestor)
+                if (Report is { IsAncestor: true })
                 {
                     result = Report.FindObject (ReadStr ("Name"));
                 }
@@ -469,7 +469,7 @@ namespace AM.Reporting.Utils
             }
 
             // speed optimization, for use in the preview mode
-            if (obj is TextObject textObject && props.Length == 1 && props[0].Key == "x")
+            if (obj is TextObject textObject && props is [{ Key: "x" } _])
             {
                 textObject.Text = props[0].Value;
                 return;

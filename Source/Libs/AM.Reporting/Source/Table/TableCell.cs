@@ -466,7 +466,7 @@ namespace AM.Reporting.Table
                 insideSpan = Table.IsInsideSpan (this);
             }
 
-            return !insideSpan && child is ReportComponentBase && !(child is BandBase) && child != Table;
+            return !insideSpan && child is ReportComponentBase and not BandBase && child != Table;
         }
 
         /// <inheritdoc/>

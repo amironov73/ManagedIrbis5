@@ -129,7 +129,7 @@ namespace AM.Reporting.Matrix
                 }
             }
 
-            if (Matrix.CellsSideBySide && Matrix.Data.Cells.Count > 1)
+            if (Matrix is { CellsSideBySide: true, Data.Cells.Count: > 1 })
             {
                 BodyWidth *= Matrix.Data.Cells.Count;
             }
@@ -143,7 +143,7 @@ namespace AM.Reporting.Matrix
                 }
             }
 
-            if (!Matrix.CellsSideBySide && Matrix.Data.Cells.Count > 1)
+            if (Matrix is { CellsSideBySide: false, Data.Cells.Count: > 1 })
             {
                 BodyHeight *= Matrix.Data.Cells.Count;
             }
@@ -521,7 +521,9 @@ namespace AM.Reporting.Matrix
 
                     // correct evenStyleIndices
                     for (var i = level + 1; i < evenStyleIndices.Length; i++)
+                    {
                         evenStyleIndices[i]++;
+                    }
                 }
 
                 PrintHeaderCell (item, resultCell, evenStyleIndices[level] % 2 != 0);
@@ -552,7 +554,7 @@ namespace AM.Reporting.Matrix
                     var resultCell = ResultTable.GetCellData (left, top);
 
                     if (root.TemplateColumn != null && descr.TemplateColumn != null &&
-                        cellHeaderDescriptor.TemplateColumn != null && cellHeaderDescriptor.TemplateRow != null)
+                        cellHeaderDescriptor is { TemplateColumn: { }, TemplateRow: { } })
                     {
                         templateCell = Matrix[
                             root.TemplateColumn.Index +
@@ -622,7 +624,9 @@ namespace AM.Reporting.Matrix
 
                     // correct evenStyleIndices
                     for (var i = level + 1; i < evenStyleIndices.Length; i++)
+                    {
                         evenStyleIndices[i]++;
+                    }
                 }
 
                 PrintHeaderCell (item, resultCell, evenStyleIndices[level] % 2 != 0);
@@ -653,7 +657,7 @@ namespace AM.Reporting.Matrix
                     var resultCell = ResultTable.GetCellData (left, top);
 
                     if (root.TemplateRow != null && descr.TemplateRow != null &&
-                        cellHeaderDescriptor.TemplateColumn != null && cellHeaderDescriptor.TemplateRow != null)
+                        cellHeaderDescriptor is { TemplateColumn: { }, TemplateRow: { } })
                     {
                         templateCell = Matrix[cellHeaderDescriptor.TemplateColumn.Index,
                             root.TemplateRow.Index +

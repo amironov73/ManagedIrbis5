@@ -539,7 +539,9 @@ namespace AM.Reporting.Export.Html
         {
             PreparedPages.Clear();
             for (var i = 0; i < Count; i++)
+            {
                 PreparedPages.Add (new HTMLPageData());
+            }
         }
 
         private void StartSaveStreams()

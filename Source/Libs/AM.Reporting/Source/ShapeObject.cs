@@ -172,7 +172,7 @@ namespace AM.Reporting
             }
 
             var report = Report;
-            if (report != null && report.SmoothGraphics && Shape != ShapeKind.Rectangle)
+            if (report is { SmoothGraphics: true } && Shape != ShapeKind.Rectangle)
             {
                 g.InterpolationMode = InterpolationMode.HighQualityBicubic;
                 g.SmoothingMode = SmoothingMode.AntiAlias;
@@ -222,12 +222,12 @@ namespace AM.Reporting
                     break;
             }
 
-            if (!(Fill is SolidFill))
+            if (Fill is not SolidFill)
             {
                 brush.Dispose();
             }
 
-            if (report != null && report.SmoothGraphics)
+            if (report is { SmoothGraphics: true })
             {
                 g.InterpolationMode = InterpolationMode.Default;
                 g.SmoothingMode = SmoothingMode.Default;

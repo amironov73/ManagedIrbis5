@@ -108,7 +108,7 @@ namespace AM.Reporting.Data
         {
             get
             {
-                if (Report != null && Report.IsRunning && !string.IsNullOrEmpty (ConnectionStringExpression))
+                if (Report is { IsRunning: true } && !string.IsNullOrEmpty (ConnectionStringExpression))
                 {
                     return Report.Calc (ConnectionStringExpression).ToString();
                 }
@@ -806,7 +806,7 @@ namespace AM.Reporting.Data
                 var dataSource = FindTableDataSource (table);
 
                 // prepare select command
-                if (!(dataSource is ProcedureDataSource))
+                if (dataSource is not ProcedureDataSource)
                 {
                     selectCommand = PrepareSelectCommand (selectCommand, table.TableName, conn);
                 }
@@ -849,7 +849,7 @@ namespace AM.Reporting.Data
                 var dataSource = FindTableDataSource (table);
 
                 // prepare select command
-                if (!(dataSource is ProcedureDataSource))
+                if (dataSource is not ProcedureDataSource)
                 {
                     selectCommand = PrepareSelectCommand (selectCommand, table.TableName, conn);
                 }

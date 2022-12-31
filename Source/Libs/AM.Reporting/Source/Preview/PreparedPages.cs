@@ -678,7 +678,7 @@ namespace AM.Reporting.Preview
             BlobStore = new BlobStore (report != null ? report.UseFileCache : false);
             pageCache = new PageCache (this);
             MacroValues = new Dictionary<string, object>();
-            if (this.Report != null && this.Report.UseFileCache)
+            if (this.Report is { UseFileCache: true })
             {
                 tempFileName = Config.CreateTempFile ("");
                 TempFile = new FileStream (tempFileName, FileMode.OpenOrCreate, FileAccess.ReadWrite);

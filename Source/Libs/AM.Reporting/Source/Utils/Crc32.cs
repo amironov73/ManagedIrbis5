@@ -98,7 +98,10 @@ namespace AM.Reporting.Utils
             var OldPos = Stream.Position;
             Stream.Position = 0;
             for (var i = 0; i < Stream.Length; i++)
+            {
                 crc = (uint)((crc >> 8) ^ Table[(byte)((crc & 0xff) ^ Stream.ReadByte())]);
+            }
+
             Stream.Position = OldPos;
             return ~crc;
         }
@@ -149,7 +152,10 @@ namespace AM.Reporting.Utils
         public static uint Update (uint crc, byte[] ByteArray, int offset, int count)
         {
             for (var i = offset; i < count; i++)
+            {
                 crc = (uint)((crc >> 8) ^ Table[(byte)(((crc) & 0xff) ^ ByteArray[i])]);
+            }
+
             return crc;
         }
 

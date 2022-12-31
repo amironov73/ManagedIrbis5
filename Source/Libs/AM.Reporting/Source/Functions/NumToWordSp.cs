@@ -155,7 +155,7 @@ namespace AM.Reporting.Functions
                 _useUn = false;
             }
 
-            if (val > 20 && val < 30)
+            if (val is > 20 and < 30)
             {
                 r.Append (sep100_10 + fixedWords21To29[val - 21]);
             }

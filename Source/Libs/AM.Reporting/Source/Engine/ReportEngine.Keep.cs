@@ -54,7 +54,7 @@ namespace AM.Reporting.Engine
         private void StartKeep (BandBase band)
         {
             // do not keep the first row on a page, avoid empty first page
-            if (IsKeeping || (band != null && band.AbsRowNo == 1 && !band.FirstRowStartsNewPage))
+            if (IsKeeping || band is { AbsRowNo: 1, FirstRowStartsNewPage: false })
             {
                 return;
             }

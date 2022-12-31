@@ -111,7 +111,7 @@ namespace AM.Reporting.Engine
                 expressionObj = Report.Calc (Code.CodeUtils.FixExpressionWithBrackets (expression));
             }
 
-            if (expressionObj != null && expressionObj is bool obj)
+            if (expressionObj is bool obj)
             {
                 if (!expression.Contains ("TotalPages"))
                 {
@@ -147,7 +147,7 @@ namespace AM.Reporting.Engine
                     page.Visible = CalcVisibleExpression (page.VisibleExpression);
                 }
 
-                if (page != null && page.Visible && page.Subreport == null)
+                if (page is { Visible: true, Subreport: null })
                 {
                     RunReportPage (page);
                 }

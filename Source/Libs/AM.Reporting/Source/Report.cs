@@ -1667,11 +1667,11 @@ namespace AM.Reporting
         }
 
         /// <inheritdoc/>
-        public override Base FindObject (string name)
+        public override Base? FindObject (string name)
         {
             foreach (Base c in AllNamedObjects)
             {
-                if (string.Compare (name, c.Name, true) == 0)
+                if (String.Compare (name, c.Name, StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     return c;
                 }

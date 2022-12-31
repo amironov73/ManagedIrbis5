@@ -156,7 +156,10 @@ namespace AM.Reporting.Matrix
             List<MatrixHeaderItem> terminalItems = rootItem.GetTerminalItems();
             var result = new int[terminalItems.Count];
             for (var i = 0; i < result.Length; i++)
+            {
                 result[i] = terminalItems[i].Index;
+            }
+
             return result;
         }
 

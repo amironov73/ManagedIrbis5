@@ -183,7 +183,7 @@ namespace AM.Reporting.Data
         private bool IsInsideHierarchy =>
             Report.Engine.HierarchyLevel > 1 &&
             !Name.StartsWith (subPrefix) &&
-            PrintOn != null && PrintOn.ParentDataBand != null && PrintOn.ParentDataBand.IsHierarchical;
+            PrintOn is { ParentDataBand: { IsHierarchical: true } };
 
         #endregion
 
@@ -426,7 +426,7 @@ namespace AM.Reporting.Data
 
             var value = TotalType == TotalType.Count ? null : Report.Calc (Expression);
             AddValue (value);
-            if (TotalType != TotalType.Avg || (value != null && !(value is DBNull)))
+            if (TotalType != TotalType.Avg || (value != null && value is not DBNull))
             {
                 count++;
             }
@@ -455,7 +455,7 @@ namespace AM.Reporting.Data
         private void Execute (object val)
         {
             AddValue (val);
-            if (value != null && !(value is DBNull))
+            if (value != null && value is not DBNull)
             {
                 count++;
             }

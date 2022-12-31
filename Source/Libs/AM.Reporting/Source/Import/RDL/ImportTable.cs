@@ -588,20 +588,17 @@ namespace AM.Reporting.Import.RDL
                 {
                     footerNode = node.Clone();
                 }
-                else if (node.Name == "TablixBody")
+                else if (node is { Name: "TablixBody", HasChildNodes: true })
                 {
-                    if (node.HasChildNodes)
+                    foreach (XmlNode bodyChild in node.ChildNodes)
                     {
-                        foreach (XmlNode bodyChild in node.ChildNodes)
+                        if (bodyChild.Name == "TablixColumns")
                         {
-                            if (bodyChild.Name == "TablixColumns")
-                            {
-                                tableColumnsNode = bodyChild.Clone();
-                            }
-                            else if (bodyChild.Name == "TablixRows")
-                            {
-                                tableRowsNode = node.Clone();
-                            }
+                            tableColumnsNode = bodyChild.Clone();
+                        }
+                        else if (bodyChild.Name == "TablixRows")
+                        {
+                            tableRowsNode = node.Clone();
                         }
                     }
                 }

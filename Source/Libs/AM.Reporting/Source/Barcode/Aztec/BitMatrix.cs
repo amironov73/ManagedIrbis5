@@ -383,7 +383,7 @@ namespace AM.Reporting.Barcode.Aztec
 
         public override bool Equals (object obj)
         {
-            if (!(obj is BitMatrix other))
+            if (obj is not BitMatrix other)
             {
                 return false;
             }

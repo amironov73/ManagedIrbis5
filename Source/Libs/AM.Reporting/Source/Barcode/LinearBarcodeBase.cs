@@ -387,7 +387,7 @@ namespace AM.Reporting.Barcode
             for (var i = 0; i < data.Length; i++)
             {
                 var c = builder[i];
-                if (c >= '5' && c <= '8')
+                if (c is >= '5' and <= '8')
                 {
                     c = (char)((int)c - (int)'5' + (int)'A');
                 }

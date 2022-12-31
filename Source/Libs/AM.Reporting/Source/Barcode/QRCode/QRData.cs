@@ -1055,13 +1055,13 @@ namespace AM.Reporting.Barcode.QRCode
 
             _Reference = parameters.Reference;
 
-            if (parameters.AlternativeProcedure1 != null && parameters.AlternativeProcedure1.Length > 100)
+            if (parameters.AlternativeProcedure1 is { Length: > 100 })
             {
                 throw new SwissQrCodeException (res.Get ("SwissAltProcedureLength"));
             }
 
             AlternativeProcedure1 = parameters.AlternativeProcedure1;
-            if (parameters.AlternativeProcedure2 != null && parameters.AlternativeProcedure2.Length > 100)
+            if (parameters.AlternativeProcedure2 is { Length: > 100 })
             {
                 throw new SwissQrCodeException (res.Get ("SwissAltProcedureLength"));
             }

@@ -91,7 +91,7 @@ namespace AM.Reporting.Data
         {
             get
             {
-                if (!string.IsNullOrEmpty (Expression) && Report != null && Report.IsRunning)
+                if (!string.IsNullOrEmpty (Expression) && Report is { IsRunning: true })
                 {
                     value = Report.Calc (Expression);
                 }

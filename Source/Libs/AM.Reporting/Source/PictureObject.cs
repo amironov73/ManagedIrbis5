@@ -420,7 +420,7 @@ namespace AM.Reporting
                 g.ResetClip();
                 g.SetClip (drawRect);
                 var report = Report;
-                if (report != null && report.SmoothGraphics)
+                if (report is { SmoothGraphics: true })
                 {
                     g.InterpolationMode = InterpolationMode.HighQualityBicubic;
                     g.SmoothingMode = SmoothingMode.AntiAlias;

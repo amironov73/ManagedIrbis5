@@ -180,7 +180,7 @@ namespace AM.Reporting.Utils
 
         public static Image Load (byte[] bytes)
         {
-            if (bytes != null && bytes.Length > 0)
+            if (bytes is { Length: > 0 })
             {
                 try
                 {

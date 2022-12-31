@@ -520,8 +520,7 @@ namespace AM.Reporting.Data
         {
             foreach (Relation relation in Relations)
             {
-                relation.Enabled = relation.ParentDataSource != null && relation.ParentDataSource.Enabled &&
-                                   relation.ChildDataSource != null && relation.ChildDataSource.Enabled;
+                relation.Enabled = relation is { ParentDataSource: { Enabled: true }, ChildDataSource: { Enabled: true } };
             }
         }
 
@@ -693,7 +692,7 @@ namespace AM.Reporting.Data
             foreach (Base c in childObjects)
             {
                 if (c is Parameter || c is Total || c is CubeSourceBase ||
-                    (c is DataComponentBase @base && @base.Enabled))
+                    c is DataComponentBase { Enabled: true })
                 {
                     writer.Write (c);
                 }

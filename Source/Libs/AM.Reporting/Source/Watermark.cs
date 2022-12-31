@@ -202,7 +202,7 @@ namespace AM.Reporting
 
         private bool ShouldSerializeTextFill()
         {
-            return !(TextFill is SolidFill) || (TextFill as SolidFill).Color != Color.LightGray;
+            return TextFill is not SolidFill || (TextFill as SolidFill).Color != Color.LightGray;
         }
 
         private bool ShouldSerializeImage()

@@ -537,15 +537,15 @@ namespace AM.Reporting.Import.RDL
                 {
                     int.TryParse (styleChild.InnerText.Replace ("pt", ""), out fontSize);
                 }
-                else if (styleChild.Name == "FontWeight" && styleChild.InnerText == "Bold")
+                else if (styleChild is { Name: "FontWeight", InnerText: "Bold" })
                 {
                     style = style | FontStyle.Bold;
                 }
-                else if (styleChild.Name == "FontStyle" && styleChild.InnerText == "Italic")
+                else if (styleChild is { Name: "FontStyle", InnerText: "Italic" })
                 {
                     style = style | FontStyle.Italic;
                 }
-                else if (styleChild.Name == "TextDecoration" && styleChild.InnerText == "Underline")
+                else if (styleChild is { Name: "TextDecoration", InnerText: "Underline" })
                 {
                     style = style | FontStyle.Underline;
                 }
@@ -1020,12 +1020,9 @@ namespace AM.Reporting.Import.RDL
                         dataSetName = node.FirstChild.Attributes["Name"].Value;
                     }
                 }
-                else if (node.Name == "ReportParameters")
+                else if (node is { Name: "ReportParameters", HasChildNodes: true })
                 {
-                    if (node.HasChildNodes)
-                    {
-                        LoadParameters (node);
-                    }
+                    LoadParameters (node);
                 }
             }
 

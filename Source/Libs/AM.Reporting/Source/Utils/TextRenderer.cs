@@ -440,7 +440,7 @@ namespace AM.Reporting.Utils
                 displayRect.Y = -DisplayRect.Height / 2;
 
                 // rotate displayrect if angle is 90 or 270
-                if ((Angle >= 90 && Angle < 180) || (Angle >= 270 && Angle < 360))
+                if (Angle is >= 90 and < 180 || Angle is >= 270 and < 360)
                 {
                     displayRect = new RectangleF (DisplayRect.Y, DisplayRect.X, DisplayRect.Height, DisplayRect.Width);
                 }
@@ -1415,7 +1415,7 @@ namespace AM.Reporting.Utils
                     }
 
                     word.AdjustRuns();
-                    if (Renderer.RightToLeft && Renderer.PDFMode)
+                    if (Renderer is { RightToLeft: true, PDFMode: true })
                     {
                         word.Left -= word.Width;
                     }
@@ -2233,7 +2233,7 @@ namespace AM.Reporting.Utils
             rect.X = -rect.Width / 2;
             rect.Y = -rect.Height / 2;
 
-            if ((angle >= 90 && angle < 180) || (angle >= 270 && angle < 360))
+            if (angle is >= 90 and < 180 || angle is >= 270 and < 360)
             {
                 rect = new RectangleF (rect.Y, rect.X, rect.Height, rect.Width);
             }

@@ -305,92 +305,92 @@ namespace AM.Reporting.Barcode
             var data4 = (int)(right % 1597);
 
 
-            if ((data1 >= 0) && (data1 <= 160))
+            if (data1 is >= 0 and <= 160)
             {
                 dataGroup[0] = 0;
             }
 
-            if ((data1 >= 161) && (data1 <= 960))
+            if (data1 is >= 161 and <= 960)
             {
                 dataGroup[0] = 1;
             }
 
-            if ((data1 >= 961) && (data1 <= 2014))
+            if (data1 is >= 961 and <= 2014)
             {
                 dataGroup[0] = 2;
             }
 
-            if ((data1 >= 2015) && (data1 <= 2714))
+            if (data1 is >= 2015 and <= 2714)
             {
                 dataGroup[0] = 3;
             }
 
-            if ((data1 >= 2715) && (data1 <= 2840))
+            if (data1 is >= 2715 and <= 2840)
             {
                 dataGroup[0] = 4;
             }
 
-            if ((data2 >= 0) && (data2 <= 335))
+            if (data2 is >= 0 and <= 335)
             {
                 dataGroup[1] = 5;
             }
 
-            if ((data2 >= 336) && (data2 <= 1035))
+            if (data2 is >= 336 and <= 1035)
             {
                 dataGroup[1] = 6;
             }
 
-            if ((data2 >= 1036) && (data2 <= 1515))
+            if (data2 is >= 1036 and <= 1515)
             {
                 dataGroup[1] = 7;
             }
 
-            if ((data2 >= 1516) && (data2 <= 1596))
+            if (data2 is >= 1516 and <= 1596)
             {
                 dataGroup[1] = 8;
             }
 
-            if ((data4 >= 0) && (data4 <= 335))
+            if (data4 is >= 0 and <= 335)
             {
                 dataGroup[3] = 5;
             }
 
-            if ((data4 >= 336) && (data4 <= 1035))
+            if (data4 is >= 336 and <= 1035)
             {
                 dataGroup[3] = 6;
             }
 
-            if ((data4 >= 1036) && (data4 <= 1515))
+            if (data4 is >= 1036 and <= 1515)
             {
                 dataGroup[3] = 7;
             }
 
-            if ((data4 >= 1516) && (data4 <= 1596))
+            if (data4 is >= 1516 and <= 1596)
             {
                 dataGroup[3] = 8;
             }
 
-            if ((data3 >= 0) && (data3 <= 160))
+            if (data3 is >= 0 and <= 160)
             {
                 dataGroup[2] = 0;
             }
 
-            if ((data3 >= 161) && (data3 <= 960))
+            if (data3 is >= 161 and <= 960)
             {
                 dataGroup[2] = 1;
             }
 
-            if ((data3 >= 961) && (data3 <= 2014))
+            if (data3 is >= 961 and <= 2014)
             {
                 dataGroup[2] = 2;
             }
 
-            if ((data3 >= 2015) && (data3 <= 2714))
+            if (data3 is >= 2015 and <= 2714)
             {
                 dataGroup[2] = 3;
             }
 
-            if ((data3 >= 2715) && (data3 <= 2840))
+            if (data3 is >= 2715 and <= 2840)
             {
                 dataGroup[2] = 4;
             }
@@ -498,7 +498,10 @@ namespace AM.Reporting.Barcode
         {
             float width = 0;
             for (var x = 0; x < EncodedData[0].Length; x++)
+            {
                 width += EncodedData[0][x] - '0';
+            }
+
             return width * WideBarRatio;
         }
 
@@ -530,16 +533,26 @@ namespace AM.Reporting.Barcode
                 if (i % 2 == 0)
                 {
                     for (var x = 0; x < EncodedData[0][i] - '0'; x++)
+                    {
                         bars[0] += "0";
+                    }
+
                     for (var x = 0; x < EncodedData[2][i] - '0'; x++)
+                    {
                         bars[1] += "1";
+                    }
                 }
                 else
                 {
                     for (var x = 0; x < EncodedData[0][i] - '0'; x++)
+                    {
                         bars[0] += "1";
+                    }
+
                     for (var x = 0; x < EncodedData[2][i] - '0'; x++)
+                    {
                         bars[1] += "0";
+                    }
                 }
             }
 
@@ -577,7 +590,10 @@ namespace AM.Reporting.Barcode
         {
             float width = 0;
             for (var x = 0; x < EncodedData[0].Length; x++)
+            {
                 width += EncodedData[0][x] - '0';
+            }
+
             return width * WideBarRatio;
         }
     }
@@ -607,7 +623,7 @@ namespace AM.Reporting.Barcode
                 {
                     for (var x = 0; x < EncodedData[0][i] - '0'; x++)
                     {
-                        if (i > 5 && i < 9)
+                        if (i is > 5 and < 9)
                         {
                             if (nextBarBlack)
                             {
@@ -628,7 +644,7 @@ namespace AM.Reporting.Barcode
 
                     for (var x = 0; x < EncodedData[4][i] - '0'; x++)
                     {
-                        if (i > 15 && i < 19)
+                        if (i is > 15 and < 19)
                         {
                             if (nextBarWhite)
                             {
@@ -671,7 +687,10 @@ namespace AM.Reporting.Barcode
         {
             float width = 0;
             for (var x = 0; x < EncodedData[0].Length; x++)
+            {
                 width += EncodedData[0][x] - '0';
+            }
+
             return width * WideBarRatio;
         }
 
@@ -1035,7 +1054,10 @@ namespace AM.Reporting.Barcode
         {
             float width = 0;
             for (var x = 0; x < EncodedData[0].Length; x++)
+            {
                 width += EncodedData[0][x] - '0';
+            }
+
             return width * WideBarRatio;
         }
     }

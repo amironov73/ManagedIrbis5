@@ -188,7 +188,7 @@ namespace AM.Reporting.Utils.Json
                 obj["items"] = child;
             }
 
-            if (Properties != null && Properties.Count > 0)
+            if (Properties is { Count: > 0 })
             {
                 var child = new JsonObject();
                 obj["properties"] = child;

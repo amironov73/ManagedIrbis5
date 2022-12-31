@@ -470,25 +470,25 @@ namespace AM.Reporting
         internal void ZoomBorder (float zoom)
         {
             LeftLine.Width *= zoom;
-            if (LeftLine.Width > 0 && LeftLine.Width < 1)
+            if (LeftLine.Width is > 0 and < 1)
             {
                 LeftLine.Width = 1;
             }
 
             RightLine.Width *= zoom;
-            if (RightLine.Width > 0 && RightLine.Width < 1)
+            if (RightLine.Width is > 0 and < 1)
             {
                 RightLine.Width = 1;
             }
 
             TopLine.Width *= zoom;
-            if (TopLine.Width > 0 && TopLine.Width < 1)
+            if (TopLine.Width is > 0 and < 1)
             {
                 TopLine.Width = 1;
             }
 
             BottomLine.Width *= zoom;
-            if (BottomLine.Width > 0 && BottomLine.Width < 1)
+            if (BottomLine.Width is > 0 and < 1)
             {
                 BottomLine.Width = 1;
             }

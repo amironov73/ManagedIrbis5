@@ -826,7 +826,10 @@ namespace AM.Reporting.Barcode
             var A = ERROR_LEVEL[errorLevel];
             var Alength = 2 << errorLevel;
             for (var k = 0; k < Alength; ++k)
+            {
                 codewords[dest + k] = 0;
+            }
+
             var lastE = Alength - 1;
             for (var k = 0; k < lenCodewords; ++k)
             {
@@ -840,7 +843,9 @@ namespace AM.Reporting.Barcode
             }
 
             for (var k = 0; k < Alength; ++k)
+            {
                 codewords[dest + k] = (MOD - codewords[dest + k]) % MOD;
+            }
         }
 
         private static int GetTextTypeAndValue (byte[] input, int maxLength, int idx)
@@ -851,12 +856,12 @@ namespace AM.Reporting.Barcode
             }
 
             var c = (char)(input[idx] & 0xff);
-            if (c >= 'A' && c <= 'Z')
+            if (c is >= 'A' and <= 'Z')
             {
                 return (ALPHA + c - 'A');
             }
 
-            if (c >= 'a' && c <= 'z')
+            if (c is >= 'a' and <= 'z')
             {
                 return (LOWER + c - 'a');
             }
@@ -1073,14 +1078,19 @@ namespace AM.Reporting.Barcode
             int ni, k;
             cwPtr += retLast + 1;
             for (k = 0; k <= retLast; ++k)
+            {
                 codewords[ret + k] = 0;
+            }
+
             codewords[ret + retLast] = 1;
             length += start;
             for (ni = start; ni < length; ++ni)
             {
                 // multiply by 10
                 for (k = retLast; k >= 0; --k)
+                {
                     codewords[ret + k] *= 10;
+                }
 
                 // add the digit
                 codewords[ret + retLast] += input[ni] - '0';
@@ -1134,13 +1144,18 @@ namespace AM.Reporting.Barcode
             int ni, k;
             cwPtr += retLast + 1;
             for (k = 0; k <= retLast; ++k)
+            {
                 codewords[ret + k] = 0;
+            }
+
             length += start;
             for (ni = start; ni < length; ++ni)
             {
                 // multiply by 256
                 for (k = retLast; k >= 0; --k)
+                {
                     codewords[ret + k] *= 256;
+                }
 
                 // add the digit
                 codewords[ret + retLast] += (int)bytes[ni] & 0xff;
@@ -1170,7 +1185,9 @@ namespace AM.Reporting.Barcode
                 if (size < 6)
                 {
                     for (j = 0; j < size; ++j)
+                    {
                         codewords[cwPtr++] = (int)bytes[k + j] & 0xff;
+                    }
                 }
                 else
                 {
@@ -1210,7 +1227,7 @@ namespace AM.Reporting.Barcode
             for (k = 0; k < textLength; ++k)
             {
                 c = (char)(bytes[k] & 0xff);
-                if (c >= '0' && c <= '9')
+                if (c is >= '0' and <= '9')
                 {
                     if (nd == 0)
                     {

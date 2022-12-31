@@ -170,7 +170,7 @@ namespace AM.Reporting.Barcode.QRCode
             for (var i = 0; i < content.Length; ++i)
             {
                 var c = content[i];
-                if (c >= '0' && c <= '9')
+                if (c is >= '0' and <= '9')
                 {
                     hasNumeric = true;
                 }
@@ -668,11 +668,11 @@ namespace AM.Reporting.Barcode.QRCode
                 var byte2 = bytes[i + 1] & 0xFF;
                 var code = (byte1 << 8) | byte2;
                 var subtracted = -1;
-                if (code >= 0x8140 && code <= 0x9ffc)
+                if (code is >= 0x8140 and <= 0x9ffc)
                 {
                     subtracted = code - 0x8140;
                 }
-                else if (code >= 0xe040 && code <= 0xebbf)
+                else if (code is >= 0xe040 and <= 0xebbf)
                 {
                     subtracted = code - 0xc140;
                 }

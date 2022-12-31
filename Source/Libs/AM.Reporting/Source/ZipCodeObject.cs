@@ -277,7 +277,7 @@ namespace AM.Reporting
             foreach (var ch in text)
             {
                 var symbol = -1;
-                if (ch >= '0' && ch <= '9')
+                if (ch is >= '0' and <= '9')
                 {
                     symbol = (int)ch - (int)'0';
                 }

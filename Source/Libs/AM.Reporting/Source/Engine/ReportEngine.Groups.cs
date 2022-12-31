@@ -91,12 +91,9 @@ namespace AM.Reporting.Engine
             }
 
             var footer = groupBand.Footer;
-            if (footer != null)
+            if (footer is { RepeatOnEveryPage: true })
             {
-                if (footer.RepeatOnEveryPage)
-                {
-                    AddReprint (footer);
-                }
+                AddReprint (footer);
             }
         }
 
@@ -138,12 +135,9 @@ namespace AM.Reporting.Engine
             }
 
             var footer = header.GroupFooter;
-            if (footer != null)
+            if (footer is { RepeatOnEveryPage: true })
             {
-                if (footer.RepeatOnEveryPage)
-                {
-                    AddReprint (footer);
-                }
+                AddReprint (footer);
             }
         }
 
@@ -177,7 +171,7 @@ namespace AM.Reporting.Engine
                 EndKeep();
             }
 
-            if (footer != null && footer.KeepWithData)
+            if (footer is { KeepWithData: true })
             {
                 EndKeep();
             }

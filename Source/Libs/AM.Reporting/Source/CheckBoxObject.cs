@@ -385,7 +385,7 @@ namespace AM.Reporting
             else if (!string.IsNullOrEmpty (Expression))
             {
                 var value = Report.Calc (Expression);
-                Checked = value is bool b && b == true;
+                Checked = value is bool and true;
             }
 
             if (!Checked && HideIfUnchecked)

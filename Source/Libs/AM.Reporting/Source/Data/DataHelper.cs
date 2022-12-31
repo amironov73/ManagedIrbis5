@@ -127,7 +127,9 @@ namespace AM.Reporting.Data
             // try full name first
             var columnName = string.Empty;
             for (var j = i; j < names.Length; j++)
+            {
                 columnName += (columnName.Length == 0 ? "" : ".") + names[j];
+            }
 
             var column = columns.FindByAlias (columnName);
             if (column != null)
@@ -163,7 +165,7 @@ namespace AM.Reporting.Data
         public static bool IsSimpleColumn (Dictionary dictionary, string complexName)
         {
             var column = GetColumn (dictionary, complexName);
-            return column != null && column.Parent is DataSourceBase @base &&
+            return column is { Parent: DataSourceBase @base } &&
                    @base.FullName + "." + column.Alias == complexName;
         }
 

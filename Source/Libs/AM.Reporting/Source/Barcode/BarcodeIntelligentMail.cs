@@ -191,7 +191,11 @@ namespace AM.Reporting.Barcode
                 codewordArray[0][1] += 659;
             }
 
-            for (short i = 0; i <= 9; i++) ad[i] = new decimal[3];
+            for (short i = 0; i <= 9; i++)
+            {
+                ad[i] = new decimal[3];
+            }
+
             for (short i = 0; i <= 9; i++)
             {
                 if (codewordArray[i][1] >= (decimal)(entries2Of13 + entries5Of13))
@@ -206,10 +210,12 @@ namespace AM.Reporting.Barcode
             }
 
             for (short i = 0; i <= 9; i++)
+            {
                 if ((fcs & 1 << i) != 0)
                 {
                     ad[i][1] = ~(int)ad[i][1] & 8191;
                 }
+            }
 
             for (short i = 0; i <= 64; i++)
             {
@@ -262,7 +268,11 @@ namespace AM.Reporting.Barcode
             decimal[][] da = new decimal[11][];
             try
             {
-                for (short i = 0; i <= 9; i++) da[i] = new decimal[3];
+                for (short i = 0; i <= 9; i++)
+                {
+                    da[i] = new decimal[3];
+                }
+
                 return da;
             }
             finally
@@ -279,10 +289,12 @@ namespace AM.Reporting.Barcode
             {
                 var k1 = 0;
                 for (var l1 = 0; l1 <= 12; l1++)
+                {
                     if ((k & 1 << l1) != 0)
                     {
                         k1 += 1;
                     }
+                }
 
                 if (k1 == i)
                 {
@@ -467,7 +479,10 @@ namespace AM.Reporting.Barcode
         string TrimOff (string source, string bad)
         {
             for (int i = 0, l = bad.Length - 1; i <= l; i++)
+            {
                 source = source.Replace (bad.Substring (i, 1), string.Empty);
+            }
+
             return source;
         }
     }

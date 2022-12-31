@@ -52,7 +52,9 @@ namespace AM.Reporting.Barcode
             var result = "51";
 
             for (var i = 0; i < text.Length; i++)
+            {
                 result += tabelle_PostNet[CharToInt (text[i])];
+            }
 
             result += "5";
 
@@ -105,26 +107,26 @@ namespace AM.Reporting.Barcode
 
             foreach (var i in text)
             {
-                if (((i >= '0') && (i <= '9')) || (i == '-'))
+                if (i is >= '0' and <= '9' || (i == '-'))
                 {
                     encoded += i;
                     weight++;
                 }
                 else
                 {
-                    if ((i >= 'A') && (i <= 'J'))
+                    if (i is >= 'A' and <= 'J')
                     {
                         encoded += 'a';
                         encoded += (char)(i - 'A' + '0');
                     }
 
-                    if ((i >= 'K') && (i <= 'T'))
+                    if (i is >= 'K' and <= 'T')
                     {
                         encoded += 'b';
                         encoded += (char)(i - 'K' + '0');
                     }
 
-                    if ((i >= 'U') && (i <= 'Z'))
+                    if (i is >= 'U' and <= 'Z')
                     {
                         encoded += 'c';
                         encoded += (char)(i - 'U' + '0');

@@ -593,7 +593,7 @@ namespace AM.Reporting.Matrix
                 match = Report.Calc (Filter);
             }
 
-            if (match is bool b && b == true)
+            if (match is bool and true)
             {
                 Helper.AddDataRow();
             }
@@ -794,7 +794,7 @@ namespace AM.Reporting.Matrix
         {
             saveVisible = Visible;
             var parent = Parent as BandBase;
-            if (!Visible || (parent != null && !parent.Visible))
+            if (!Visible || parent is { Visible: false })
             {
                 return;
             }
@@ -840,7 +840,7 @@ namespace AM.Reporting.Matrix
         public override void RestoreState()
         {
             var parent = Parent as BandBase;
-            if (!saveVisible || (parent != null && !parent.Visible))
+            if (!saveVisible || parent is { Visible: false })
             {
                 return;
             }

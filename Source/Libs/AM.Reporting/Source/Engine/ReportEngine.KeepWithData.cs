@@ -99,7 +99,7 @@ namespace AM.Reporting.Engine
 
         private bool NeedKeepFirstRow (DataBand dataBand)
         {
-            return dataBand.Header != null && dataBand.Header.KeepWithData;
+            return dataBand.Header is { KeepWithData: true };
         }
 
         private bool NeedKeepFirstRow (GroupHeaderBand groupBand)
@@ -115,7 +115,7 @@ namespace AM.Reporting.Engine
             }
 
             var dataBand = groupBand.GroupDataBand;
-            if (dataBand.Header != null && dataBand.Header.KeepWithData)
+            if (dataBand.Header is { KeepWithData: true })
             {
                 return true;
             }

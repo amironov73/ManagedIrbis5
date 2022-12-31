@@ -104,7 +104,7 @@ namespace AM.Reporting.Export
                 return decimal.TryParse (text, NumberStyles.Currency, currencyFormat.GetNumberFormatInfo(),
                     out value);
             }
-            else if (format is CustomFormat && !(format is DateFormat))
+            else if (format is CustomFormat and not DateFormat)
             {
                 return decimal.TryParse (text, out value);
             }
@@ -156,7 +156,9 @@ namespace AM.Reporting.Export
                 {
                     fm_str += "."; // f.DecimalSeparator;
                     for (var i = 0; i < f.CurrencyDecimalDigits; i++)
+                    {
                         fm_str += "0";
+                    }
                 }
 
                 var currency_symbol = "&quot;" + f.CurrencySymbol + "&quot;";
@@ -345,7 +347,9 @@ namespace AM.Reporting.Export
                 {
                     fm_str += "."; // f.DecimalSeparator;
                     for (var i = 0; i < f.NumberDecimalDigits; i++)
+                    {
                         fm_str += "0";
+                    }
                 }
 
                 var positive_pattern = "";
@@ -408,7 +412,9 @@ namespace AM.Reporting.Export
                 {
                     pattern += ".";
                     for (var i = 0; i < percentFormat.DecimalDigits; i++)
+                    {
                         pattern += "0";
+                    }
                 }
 
                 return pattern + "%";
@@ -837,7 +843,10 @@ namespace AM.Reporting.Export
             var result = new FastString (str.Length);
             int i, j;
             for (j = 0, i = str.Length - 1; i >= 0; i--, j++)
+            {
                 result.Append (str[i]);
+            }
+
             return result.ToString();
         }
 
@@ -872,7 +881,10 @@ namespace AM.Reporting.Export
         {
             var result = new byte[source.Length];
             for (var i = 0; i < source.Length; i++)
+            {
                 result[i] = (byte)source[i];
+            }
+
             return result;
         }
 

@@ -143,7 +143,7 @@ namespace AM.Reporting.Barcode.QRCode
         // Check if "mask_pattern" is valid.
         public static bool isValidMaskPattern (int maskPattern)
         {
-            return maskPattern >= 0 && maskPattern < NUM_MASK_PATTERNS;
+            return maskPattern is >= 0 and < NUM_MASK_PATTERNS;
         }
     }
 }

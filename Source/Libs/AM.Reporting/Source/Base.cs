@@ -171,10 +171,10 @@ namespace AM.Reporting
     {
         #region Fields
 
-        private string name;
-        private Base parent;
-        private Report report;
-        private int zOrder;
+        private string _name;
+        private Base? _parent;
+        private Report? _report;
+        private int _zOrder;
 
         #endregion
 
@@ -202,10 +202,10 @@ namespace AM.Reporting
         [DisplayName ("(Name)")]
         public virtual string Name
         {
-            get => name;
+            get => _name;
             set
             {
-                if (string.Compare (name, value, true) == 0)
+                if (string.Compare (_name, value, StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     return;
                 }
@@ -220,7 +220,7 @@ namespace AM.Reporting
 
                     if (IsAncestor)
                     {
-                        throw new AncestorException (name);
+                        throw new AncestorException (_name);
                     }
 
                     if (IsDesigning)
@@ -273,12 +273,12 @@ namespace AM.Reporting
         /// </code></example>
         /// <exception cref="ParentException" caption="">Parent object cannot contain this object.</exception>
         [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
-        public Base Parent
+        public Base? Parent
         {
-            get => parent;
+            get => _parent;
             set
             {
-                if (value != parent)
+                if (value != _parent)
                 {
                     if (value != null)
                     {
@@ -289,7 +289,7 @@ namespace AM.Reporting
                     }
                     else
                     {
-                        (parent as IParent).RemoveChild (this);
+                        (_parent as IParent)?.RemoveChild (this);
                     }
                 }
             }
@@ -317,18 +317,18 @@ namespace AM.Reporting
         /// Gets reference to the parent <see cref="Report"/> object.
         /// </summary>
         [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
-        public Report Report
+        public Report? Report
         {
             get
             {
-                if (this is Report)
-                {
-                    return this as Report;
-                }
-
-                if (report != null)
+                if (this is Report report)
                 {
                     return report;
+                }
+
+                if (_report != null)
+                {
+                    return _report;
                 }
 
                 if (Parent != null)
@@ -344,7 +344,7 @@ namespace AM.Reporting
         /// Gets reference to the parent <see cref="PageBase"/> object.
         /// </summary>
         [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
-        public PageBase Page
+        public PageBase? Page
         {
             get
             {
@@ -382,9 +382,9 @@ namespace AM.Reporting
             get
             {
                 var result = new ObjectCollection();
-                if (this is IParent)
+                if (this is IParent parent)
                 {
-                    (this as IParent).GetChildObjects (result);
+                    parent.GetChildObjects (result);
                 }
 
                 return result;
@@ -423,22 +423,22 @@ namespace AM.Reporting
         {
             get
             {
-                if (parent != null)
+                if (_parent is IParent parent)
                 {
-                    return (parent as IParent).GetChildOrder (this);
+                    return parent.GetChildOrder (this);
                 }
 
-                return zOrder;
+                return _zOrder;
             }
             set
             {
-                if (parent != null)
+                if (_parent is IParent parent)
                 {
-                    (parent as IParent).SetChildOrder (this, value);
+                    parent.SetChildOrder (this, value);
                 }
                 else
                 {
-                    zOrder = value;
+                    _zOrder = value;
                 }
             }
         }
@@ -528,7 +528,11 @@ namespace AM.Reporting
         ///   }
         /// }
         /// </code></example>
-        protected void SetProp (Base prop, Base value)
+        protected void SetProp
+            (
+                Base? prop,
+                Base? value
+            )
         {
             if (prop != value)
             {
@@ -598,7 +602,7 @@ namespace AM.Reporting
                     obj.Parent = this;
                     if (IsAncestor && !obj.IsAncestor)
                     {
-                        obj.ZOrder = obj.zOrder;
+                        obj.ZOrder = obj._zOrder;
                     }
                 }
             }
@@ -611,7 +615,7 @@ namespace AM.Reporting
         /// <returns>The text with macros replaced with its values.</returns>
         protected string ExtractDefaultMacros (string text)
         {
-            Dictionary<string, object> macroValues = Report.PreparedPages.MacroValues;
+            var macroValues = Report!.PreparedPages.MacroValues;
             text = ExtractDefaultMacrosInternal (macroValues, text);
             text = text.Replace ("[TOTALPAGES#]", macroValues["TotalPages#"].ToString());
             text = text.Replace ("[PAGE#]", macroValues["Page#"].ToString());
@@ -678,7 +682,7 @@ namespace AM.Reporting
         /// <param name="value">Report to set.</param>
         public void SetReport (Report value)
         {
-            report = value;
+            _report = value;
         }
 
         /// <summary>
@@ -692,7 +696,7 @@ namespace AM.Reporting
         /// <param name="value">New name.</param>
         public virtual void SetName (string value)
         {
-            name = value;
+            _name = value;
         }
 
         /// <summary>
@@ -705,11 +709,11 @@ namespace AM.Reporting
         /// </remarks>
         /// <exception cref="ParentException" caption="">Parent object cannot contain this object.</exception>
         /// <param name="value">New parent.</param>
-        public virtual void SetParent (Base value)
+        public virtual void SetParent (Base? value)
         {
             if (value != null)
             {
-                if (!(value is IParent parent1) || !parent1.CanContain (this))
+                if (value is not IParent parent1 || !parent1.CanContain (this))
                 {
                     throw new ParentException (value, this);
                 }
@@ -726,9 +730,9 @@ namespace AM.Reporting
         /// This method is for internal use only. You can use it if you are developing a new component for AM.Reporting.
         /// This method does not perform any checks, it just sets the new parent.
         /// </remarks>
-        public void SetParentCore (Base value)
+        public void SetParentCore (Base? value)
         {
-            parent = value;
+            _parent = value;
         }
 
         /// <summary>
@@ -745,7 +749,7 @@ namespace AM.Reporting
         /// }
         /// </code>
         /// </example>
-        public virtual Base FindObject (string name)
+        public virtual Base? FindObject (string name)
         {
             var l = AllObjects;
             foreach (Base c in l)
@@ -862,7 +866,7 @@ namespace AM.Reporting
                 }
 
                 if ((writer.SerializeTo == SerializeTo.Report || writer.SerializeTo == SerializeTo.Undo) &&
-                    !IsAncestor && Parent != null && Parent.IsAncestor)
+                    !IsAncestor && Parent is { IsAncestor: true })
                 {
                     writer.WriteInt ("ZOrder", ZOrder);
                 }
@@ -1227,7 +1231,7 @@ namespace AM.Reporting
         /// </summary>
         public Base()
         {
-            name = "";
+            _name = "";
             Alias = "";
             BaseName = ClassName;
             Restrictions = new Restrictions();

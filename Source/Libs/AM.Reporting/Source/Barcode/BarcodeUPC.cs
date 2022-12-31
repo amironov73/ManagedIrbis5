@@ -74,7 +74,9 @@ namespace AM.Reporting.Barcode
                 if (tabelle_UPC_E0[c, i] == "E")
                 {
                     for (var j = 0; j <= 3; j++)
+                    {
                         result += tabelle_EAN_C[CharToInt (text[i])][3 - j];
+                    }
                 }
                 else
                 {
@@ -118,7 +120,9 @@ namespace AM.Reporting.Barcode
                 else
                 {
                     for (var j = 0; j <= 3; j++)
+                    {
                         result += tabelle_EAN_C[CharToInt (text[i])][3 - j];
+                    }
                 }
             }
 
@@ -237,7 +241,9 @@ namespace AM.Reporting.Barcode
                 if (mS[i] == 'E')
                 {
                     for (var j = 0; j <= 3; j++)
+                    {
                         result += tabelle_EAN_C[CharToInt (tmp[i])][3 - j];
+                    }
                 }
                 else
                 {
@@ -282,7 +288,9 @@ namespace AM.Reporting.Barcode
                 if (tabelle_UPC_E0[CharToInt (c), 1 + i] == "E")
                 {
                     for (var j = 0; j <= 3; j++)
+                    {
                         result += tabelle_EAN_C[CharToInt (tmp[i])][3 - j];
+                    }
                 }
                 else
                 {

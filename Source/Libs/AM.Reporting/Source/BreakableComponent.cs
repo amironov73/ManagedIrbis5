@@ -134,7 +134,7 @@ namespace AM.Reporting
         /// object.
         /// </para>
         /// </remarks>
-        public virtual bool Break (BreakableComponent breakTo)
+        public virtual bool Break (BreakableComponent? breakTo)
         {
             return false;
         }

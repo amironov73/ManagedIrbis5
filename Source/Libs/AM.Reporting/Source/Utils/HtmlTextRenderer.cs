@@ -468,7 +468,10 @@ namespace AM.Reporting.Utils
 
                     var secondPart = new StringBuilder();
                     for (var i = arr.Length - 1; i >= 0; i--)
+                    {
                         secondPart.Append (arr[i].ToString());
+                    }
+
                     secondPart.Append (text.Substring (reader.Position));
                     endOnEnter = reader.Character.Char == '\n';
                     result = secondPart.ToString();
@@ -488,7 +491,10 @@ namespace AM.Reporting.Utils
                                 if (el.name == reader.Element.name)
                                 {
                                     for (var i = 0; i < enumIndex; i++)
+                                    {
                                         elements.Pop();
+                                    }
+
                                     break;
                                 }
                                 else
@@ -1111,7 +1117,10 @@ namespace AM.Reporting.Utils
                                     if (el.name == element.name)
                                     {
                                         for (var i = 0; i < enumIndex; i++)
+                                        {
                                             elements.Pop();
+                                        }
+
                                         break;
                                     }
                                     else
@@ -1319,7 +1328,7 @@ namespace AM.Reporting.Utils
                 return line;
             }
 
-            if (line.Words.Count == 1 && line.Words[0].Type == WordType.Normal)
+            if (line.Words is [{ Type: WordType.Normal }])
             {
                 var word = line.Words[0];
                 var width = word.Runs.Count > 0 ? word.Runs[0].Left : 0;
@@ -2013,7 +2022,7 @@ namespace AM.Reporting.Utils
                 }
 
                 var lastWord = Words.Count > 0 ? Words[Words.Count - 1] : null;
-                if (lastWord != null && lastWord.Type == WordType.WhiteSpace)
+                if (lastWord is { Type: WordType.WhiteSpace })
                 {
                     foreach (var r in lastWord.Runs)
                     {
@@ -2547,7 +2556,10 @@ namespace AM.Reporting.Utils
                 {
                     var list = new List<CharWithIndex>();
                     for (var i = 0; i < point; i++)
+                    {
                         list.Add (chars[i]);
+                    }
+
                     r = new RunText (renderer, word, style, list, left, charIndex);
                     if (r.Width > availableWidth)
                     {
@@ -2578,11 +2590,17 @@ namespace AM.Reporting.Utils
                 {
                     var list = new List<CharWithIndex>();
                     for (var i = point; i < size; i++)
+                    {
                         list.Add (chars[i]);
+                    }
+
                     secondPart = new RunText (renderer, word, style, list, left + r.Width, charIndex);
                     list.Clear();
                     for (var i = 0; i < point; i++)
+                    {
                         list.Add (chars[i]);
+                    }
+
                     r = new RunText (renderer, word, style, list, left, charIndex);
                     return r;
                 }
@@ -2896,7 +2914,7 @@ namespace AM.Reporting.Utils
                     return true;
                 }
 
-                if ('A' <= c && c <= 'Z')
+                if (c is >= 'A' and <= 'Z')
                 {
                     return true;
                 }
@@ -2906,7 +2924,7 @@ namespace AM.Reporting.Utils
                     return true;
                 }
 
-                if ('a' <= c && c <= 'z')
+                if (c is >= 'a' and <= 'z')
                 {
                     return true;
                 }
@@ -2921,7 +2939,7 @@ namespace AM.Reporting.Utils
                     return true; //
                 }
 
-                if ('0' <= c && c <= '9')
+                if (c is >= '0' and <= '9')
                 {
                     return true; //
                 }
@@ -2931,67 +2949,67 @@ namespace AM.Reporting.Utils
                     return true; //
                 }
 
-                if ('\u00C0' <= c && c <= '\u00D6')
+                if (c is >= '\u00C0' and <= '\u00D6')
                 {
                     return true;
                 }
 
-                if ('\u00D8' <= c && c <= '\u00F6')
+                if (c is >= '\u00D8' and <= '\u00F6')
                 {
                     return true;
                 }
 
-                if ('\u00F8' <= c && c <= '\u02FF')
+                if (c is >= '\u00F8' and <= '\u02FF')
                 {
                     return true;
                 }
 
-                if ('\u0300' <= c && c <= '\u036F')
+                if (c is >= '\u0300' and <= '\u036F')
                 {
                     return true; //
                 }
 
-                if ('\u0370' <= c && c <= '\u037D')
+                if (c is >= '\u0370' and <= '\u037D')
                 {
                     return true;
                 }
 
-                if ('\u037F' <= c && c <= '\u1FFF')
+                if (c is >= '\u037F' and <= '\u1FFF')
                 {
                     return true;
                 }
 
-                if ('\u200C' <= c && c <= '\u200D')
+                if (c is >= '\u200C' and <= '\u200D')
                 {
                     return true;
                 }
 
-                if ('\u203F' <= c && c <= '\u2040')
+                if (c is >= '\u203F' and <= '\u2040')
                 {
                     return true; //
                 }
 
-                if ('\u2070' <= c && c <= '\u218F')
+                if (c is >= '\u2070' and <= '\u218F')
                 {
                     return true;
                 }
 
-                if ('\u2C00' <= c && c <= '\u2FEF')
+                if (c is >= '\u2C00' and <= '\u2FEF')
                 {
                     return true;
                 }
 
-                if ('\u3001' <= c && c <= '\uD7FF')
+                if (c is >= '\u3001' and <= '\uD7FF')
                 {
                     return true;
                 }
 
-                if ('\uF900' <= c && c <= '\uFDCF')
+                if (c is >= '\uF900' and <= '\uFDCF')
                 {
                     return true;
                 }
 
-                if ('\uFDF0' <= c && c <= '\uFFFD')
+                if (c is >= '\uFDF0' and <= '\uFFFD')
                 {
                     return true;
                 }
@@ -3006,7 +3024,7 @@ namespace AM.Reporting.Utils
                     return true;
                 }
 
-                if ('A' <= c && c <= 'Z')
+                if (c is >= 'A' and <= 'Z')
                 {
                     return true;
                 }
@@ -3016,62 +3034,62 @@ namespace AM.Reporting.Utils
                     return true;
                 }
 
-                if ('a' <= c && c <= 'z')
+                if (c is >= 'a' and <= 'z')
                 {
                     return true;
                 }
 
-                if ('\u00C0' <= c && c <= '\u00D6')
+                if (c is >= '\u00C0' and <= '\u00D6')
                 {
                     return true;
                 }
 
-                if ('\u00D8' <= c && c <= '\u00F6')
+                if (c is >= '\u00D8' and <= '\u00F6')
                 {
                     return true;
                 }
 
-                if ('\u00F8' <= c && c <= '\u02FF')
+                if (c is >= '\u00F8' and <= '\u02FF')
                 {
                     return true;
                 }
 
-                if ('\u0370' <= c && c <= '\u037D')
+                if (c is >= '\u0370' and <= '\u037D')
                 {
                     return true;
                 }
 
-                if ('\u037F' <= c && c <= '\u1FFF')
+                if (c is >= '\u037F' and <= '\u1FFF')
                 {
                     return true;
                 }
 
-                if ('\u200C' <= c && c <= '\u200D')
+                if (c is >= '\u200C' and <= '\u200D')
                 {
                     return true;
                 }
 
-                if ('\u2070' <= c && c <= '\u218F')
+                if (c is >= '\u2070' and <= '\u218F')
                 {
                     return true;
                 }
 
-                if ('\u2C00' <= c && c <= '\u2FEF')
+                if (c is >= '\u2C00' and <= '\u2FEF')
                 {
                     return true;
                 }
 
-                if ('\u3001' <= c && c <= '\uD7FF')
+                if (c is >= '\u3001' and <= '\uD7FF')
                 {
                     return true;
                 }
 
-                if ('\uF900' <= c && c <= '\uFDCF')
+                if (c is >= '\uF900' and <= '\uFDCF')
                 {
                     return true;
                 }
 
-                if ('\uFDF0' <= c && c <= '\uFFFD')
+                if (c is >= '\uFDF0' and <= '\uFFFD')
                 {
                     return true;
                 }
@@ -3167,7 +3185,11 @@ namespace AM.Reporting.Utils
                         //read attributes
                         for (; i <= to && line[i] != '>' && line[i] != '/'; i++)
                         {
-                            for (; i <= to && line[i] == ' '; i++) ;
+                            for (; i <= to && line[i] == ' '; i++)
+                            {
+                                ;
+                            }
+
                             if (line[i] == '>' || line[i] == '/')
                             {
                                 i--;
@@ -3181,10 +3203,12 @@ namespace AM.Reporting.Utils
 
                                 var attrNameStartIndex = i;
                                 for (i++; i <= to && line[i] != '='; i++)
+                                {
                                     if (!IsCanBeFirstCharacterInTagName (line[i]))
                                     {
                                         return null;
                                     }
+                                }
 
                                 var attrNameEndIndex = i; //index of =
                                 i++;

@@ -148,8 +148,10 @@ namespace AM.Reporting
 
             RegisteredObjects.AddCategory ("ReportPage,Barcodes", 123, 9, "Objects,BarcodeObject");
             for (var i = 0; i <= Barcodes.Items.Length - 1; i++)
+            {
                 RegisteredObjects.Add (typeof (BarcodeObject), "ReportPage,Barcodes", 123,
                     Barcodes.Items[i].barcodeName, i);
+            }
 
             RegisteredObjects.InternalAdd (typeof (CheckBoxObject), "ReportPage", 124, 10);
             RegisteredObjects.InternalAdd (typeof (ZipCodeObject), "ReportPage", 129, 14);

@@ -523,7 +523,7 @@ namespace AM.Reporting.CrossView
         {
             saveVisible = Visible;
             var parent = Parent as BandBase;
-            if (!Visible || (parent != null && !parent.Visible))
+            if (!Visible || parent is { Visible: false })
             {
                 return;
             }
@@ -562,7 +562,7 @@ namespace AM.Reporting.CrossView
         public override void RestoreState()
         {
             var parent = Parent as BandBase;
-            if (!saveVisible || (parent != null && !parent.Visible))
+            if (!saveVisible || parent is { Visible: false })
             {
                 return;
             }

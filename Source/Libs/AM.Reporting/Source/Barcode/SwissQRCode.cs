@@ -170,7 +170,7 @@ namespace AM.Reporting.Barcode
                 throw new SwissQrCodeException (res.Get ("SwissRefTextTypeNon"));
             }
 
-            if (referenceTextType == ReferenceTextType.QrReference && reference != null && (reference.Length > 27))
+            if (referenceTextType == ReferenceTextType.QrReference && reference is { Length: > 27 })
             {
                 throw new SwissQrCodeException (res.Get ("SwissRefQRLength"));
             }
@@ -186,8 +186,7 @@ namespace AM.Reporting.Barcode
                 throw new SwissQrCodeException (res.Get ("SwissRefQRCheckSum"));
             }
 
-            if (referenceTextType == ReferenceTextType.CreditorReferenceIso11649 && reference != null &&
-                (reference.Length > 25))
+            if (referenceTextType == ReferenceTextType.CreditorReferenceIso11649 && reference is { Length: > 25 })
             {
                 throw new SwissQrCodeException (res.Get ("SwissRefISOLength"));
             }
@@ -638,7 +637,7 @@ namespace AM.Reporting.Barcode
             {
                 var ibanCleared = iban.ToUpper().Replace (" ", "").Replace ("-", "");
                 var possibleQrIid = Convert.ToInt32 (ibanCleared.Substring (4, 5));
-                foundQrIid = possibleQrIid >= 30000 && possibleQrIid <= 31999;
+                foundQrIid = possibleQrIid is >= 30000 and <= 31999;
             }
             catch
             {

@@ -635,7 +635,7 @@ namespace AM.Reporting.Data
 
             // fill rows, emulate relation
             Rows.Clear();
-            if (relation != null && relation.Enabled)
+            if (relation is { Enabled: true })
             {
                 if (useAllParentRows)
                 {
@@ -674,7 +674,7 @@ namespace AM.Reporting.Data
                 {
                     CurrentRowNo = i;
                     var match = Report.Calc (filter);
-                    if (match is bool b && !b)
+                    if (match is bool and false)
                     {
                         Rows.RemoveAt (i);
                         i--;
@@ -689,7 +689,7 @@ namespace AM.Reporting.Data
             }
 
             // sort data rows
-            if (sort != null && sort.Count > 0)
+            if (sort is { Count: > 0 })
             {
                 string[] expressions = new string[sort.Count];
                 var descending = new bool[sort.Count];

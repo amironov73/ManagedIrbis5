@@ -1286,7 +1286,7 @@ namespace AM.Reporting
                     g.TextRenderingHint = report.GetTextQuality();
                 }
 
-                if (textRect.Width > 0 && textRect.Height > 0)
+                if (textRect is { Width: > 0, Height: > 0 })
                 {
                     switch (TextRenderType)
                     {
@@ -1377,7 +1377,7 @@ namespace AM.Reporting
                     }
                 }
 
-                if (!(TextFill is SolidFill))
+                if (TextFill is not SolidFill)
                 {
                     textBrush.Dispose();
                 }

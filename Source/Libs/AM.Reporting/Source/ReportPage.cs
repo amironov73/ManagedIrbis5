@@ -606,7 +606,7 @@ namespace AM.Reporting
             }
 
             e.Graphics.FillRectangle (brush, rect.Left, rect.Top, rect.Width, rect.Height);
-            if (!(Fill is SolidFill))
+            if (Fill is not SolidFill)
             {
                 brush.Dispose();
             }
@@ -1059,7 +1059,7 @@ namespace AM.Reporting
                             {
                                 continue;
                             }
-                            else if (@base.Parent is BandBase bandBase && !bandBase.Printable)
+                            else if (@base.Parent is BandBase { Printable: false })
                             {
                                 continue;
                             }

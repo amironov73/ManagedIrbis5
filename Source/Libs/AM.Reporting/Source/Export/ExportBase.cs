@@ -209,7 +209,9 @@ namespace AM.Reporting.Export
             else if (!Parse (PageNumbers, total))
             {
                 for (var i = 0; i < total; i++)
+                {
                     pages.Add (i);
+                }
             }
 
             // remove invalid page numbers
@@ -486,8 +488,7 @@ namespace AM.Reporting.Export
                     foreach (var obj in ppage.GetPageItems (page, false))
                     {
                         var band = obj as BandBase;
-                        if (ShiftNonExportable && topShift != 0 && obj is BandBase &&
-                            !(obj is PageFooterBand) && !band.PrintOnBottom)
+                        if (ShiftNonExportable && topShift != 0 && obj is BandBase and not PageFooterBand && !band.PrintOnBottom)
                         {
                             band.Top -= topShift;
                         }

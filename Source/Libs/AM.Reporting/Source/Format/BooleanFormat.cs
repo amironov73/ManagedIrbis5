@@ -84,12 +84,12 @@ namespace AM.Reporting.Format
                 value = variant.Value;
             }
 
-            if (value is bool b && b == false)
+            if (value is bool and false)
             {
                 return FalseText;
             }
 
-            if (value is bool value1 && value1 == true)
+            if (value is bool and true)
             {
                 return TrueText;
             }

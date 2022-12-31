@@ -41,7 +41,7 @@ namespace AM.Reporting.Engine
             // - skip subreports
             foreach (Base c in band.Objects)
             {
-                if (c is BandBase @base && @base.CanBreak)
+                if (c is BandBase { CanBreak: true } @base)
                 {
                     if (@base.HasBorder || @base.HasFill)
                     {
@@ -54,7 +54,7 @@ namespace AM.Reporting.Engine
 
                     foreach (ReportComponentBase obj in @base.Objects)
                     {
-                        if (!(obj is BandBase))
+                        if (obj is not BandBase)
                         {
                             var cloneObj =
                                 Activator.CreateInstance (obj.GetType()) as ReportComponentBase;
@@ -72,7 +72,7 @@ namespace AM.Reporting.Engine
                         }
                     }
                 }
-                else if (!(c is SubreportObject))
+                else if (c is not SubreportObject)
                 {
                     var cloneObj = Activator.CreateInstance (c.GetType()) as Base;
                     cloneObj.AssignAll (c);

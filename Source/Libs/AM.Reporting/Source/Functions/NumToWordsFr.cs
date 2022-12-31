@@ -97,11 +97,11 @@ namespace AM.Reporting.Functions
             {
                 r.Append (sep100_10 + GetFixedWords (info.male, val));
             }
-            else if (val > 70 && val < 80)
+            else if (val is > 70 and < 80)
             {
                 r.Append (sep100_10 + fixedWords71to79[val - 71]);
             }
-            else if (val > 90 && val < 100)
+            else if (val is > 90 and < 100)
             {
                 r.Append (sep100_10 + fixedWords91to99[val - 91]);
             }

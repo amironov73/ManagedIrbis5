@@ -48,7 +48,7 @@ namespace AM.Reporting.Preview
 
         private Base CloneObjects (Base source, Base parent)
         {
-            if (source is ReportComponentBase @base && !@base.FlagPreviewVisible)
+            if (source is ReportComponentBase { FlagPreviewVisible: false })
             {
                 return null;
             }

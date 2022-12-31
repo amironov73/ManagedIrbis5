@@ -53,7 +53,7 @@ namespace AM.Reporting.TypeConverters
 
         public override object ConvertFrom (ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            if (context != null && context.Instance is CommandParameter parameter && value is string s)
+            if (context is { Instance: CommandParameter parameter } && value is string s)
             {
                 var dataType = parameter.GetUnderlyingDataType;
                 if (dataType != null)
@@ -68,7 +68,7 @@ namespace AM.Reporting.TypeConverters
         public override object ConvertTo (ITypeDescriptorContext context, CultureInfo culture, object value,
             Type destinationType)
         {
-            if (context != null && context.Instance is CommandParameter parameter && destinationType == typeof (string))
+            if (context is { Instance: CommandParameter parameter } && destinationType == typeof (string))
             {
                 var dataType = parameter.GetUnderlyingDataType;
                 if (dataType != null)

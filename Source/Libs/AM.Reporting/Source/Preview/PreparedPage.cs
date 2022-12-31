@@ -509,7 +509,7 @@ namespace AM.Reporting.Preview
             {
                 var xi = xmlItem[i];
 
-                if (preparedPages.Dictionary.GetOriginalObject (xi.Name) is BandBase obj && !(obj is PageFooterBand) && !(obj is OverlayBand))
+                if (preparedPages.Dictionary.GetOriginalObject (xi.Name) is BandBase obj and not PageFooterBand and not OverlayBand)
                 {
                     var s = xi.GetProp ("t");
                     var top = (s != "") ? Converter.StringToFloat (s) : obj.Top;

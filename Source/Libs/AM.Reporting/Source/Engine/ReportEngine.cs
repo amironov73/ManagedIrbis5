@@ -301,12 +301,9 @@ namespace AM.Reporting.Engine
         {
             foreach (Base c in Report.Dictionary.AllObjects)
             {
-                if (c is DataSourceBase data)
+                if (c is DataSourceBase { RowCount: > 0 } data)
                 {
-                    if (data.RowCount > 0)
-                    {
-                        data.First();
-                    }
+                    data.First();
                 }
             }
         }
@@ -413,7 +410,7 @@ namespace AM.Reporting.Engine
                 RunReportPages (page);
 
                 ResetLogicalPageNumber();
-                if (Report.DoublePass && !Report.Aborted)
+                if (Report is { DoublePass: true, Aborted: false })
                 {
                     FinalPass = true;
                     PrepareToSecondPass();
@@ -482,7 +479,7 @@ namespace AM.Reporting.Engine
                 RunReportPages();
 
                 ResetLogicalPageNumber();
-                if (Report.DoublePass && !Report.Aborted)
+                if (Report is { DoublePass: true, Aborted: false })
                 {
                     FinalPass = true;
                     PrepareToSecondPass();

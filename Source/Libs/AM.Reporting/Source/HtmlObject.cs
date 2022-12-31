@@ -136,7 +136,7 @@ namespace AM.Reporting
                     g.TextRenderingHint = report.GetTextQuality();
                 }
 
-                if (textRect.Width > 0 && textRect.Height > 0)
+                if (textRect is { Width: > 0, Height: > 0 })
                 {
                     // use simple rendering
                     g.DrawString (text, font, textBrush, textRect, format);

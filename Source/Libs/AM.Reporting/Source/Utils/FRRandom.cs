@@ -710,6 +710,7 @@ namespace AM.Reporting.Utils
                     var ds = table.DataSet;
                     var length = table.Rows.Count;
                     for (var c = 0; c < table.Columns.Count; c++)
+                    {
                         foreach (DataColumn column in table.Columns)
                         {
                             if (column.Unique)
@@ -721,6 +722,7 @@ namespace AM.Reporting.Utils
                                 }
                             }
                         }
+                    }
 
                     foreach (DataRelation dr in ds.Relations)
                     {
@@ -768,7 +770,7 @@ namespace AM.Reporting.Utils
                         for (var r = 0; r < table.Rows.Count; r++)
                         {
                             var val = table.Rows[r][c];
-                            if (val != null && !(val is DBNull) && !dict[column.ColumnName].ContainsOrigin (val))
+                            if (val != null && val is not DBNull && !dict[column.ColumnName].ContainsOrigin (val))
                             {
                                 object randomVal;
                                 do
@@ -802,7 +804,7 @@ namespace AM.Reporting.Utils
                         for (var r = 0; r < table.Rows.Count; r++)
                         {
                             var val = table.Rows[r][c];
-                            if (val != null && !(val is DBNull))
+                            if (val != null && val is not DBNull)
                             {
                                 if (uniquesAndRelations.ContainsKey (table.Columns[c].ColumnName))
                                 {

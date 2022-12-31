@@ -160,7 +160,7 @@ namespace AM.Reporting.Data
             OnLoad();
 
             var parent = ParentDataSource;
-            var isMasterDetail = parent != null && parent.RowCount > 0;
+            var isMasterDetail = parent is { RowCount: > 0 };
 
             if (isMasterDetail)
             {
@@ -169,7 +169,7 @@ namespace AM.Reporting.Data
             else
             {
                 // ensure that parent is loaded
-                if (parent != null && parent.InternalRows.Count == 0)
+                if (parent is { InternalRows.Count: 0 })
                 {
                     parent.Init();
                 }
@@ -223,7 +223,7 @@ namespace AM.Reporting.Data
             for (var i = 0; i < Columns.Count; i++)
             {
                 var column = Columns[i];
-                if (!(column is BusinessObjectDataSource) && dataSourceNames.Contains (column.PropName))
+                if (column is not BusinessObjectDataSource && dataSourceNames.Contains (column.PropName))
                 {
                     column.Dispose();
                     i--;

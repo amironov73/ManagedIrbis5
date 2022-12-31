@@ -647,7 +647,7 @@ namespace AM.Reporting.CrossView
         public void UpdateDescriptors()
         {
             var needClearTemporaryDescriptors = false;
-            if (!CrossView.Data.SourceAssigned && (CrossView.Data.Columns.Count == 0))
+            if (CrossView.Data is { SourceAssigned: false, Columns.Count: 0 })
             {
                 needClearTemporaryDescriptors = true;
                 CrossView.Data.columnDescriptorsIndexes = new int[] { 0 };
