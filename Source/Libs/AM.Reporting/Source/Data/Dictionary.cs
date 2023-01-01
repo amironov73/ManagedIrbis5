@@ -699,7 +699,7 @@ namespace AM.Reporting.Data
         }
 
         /// <inheritdoc/>
-        public override void Deserialize (FRReader reader)
+        public override void Deserialize (ReportReader reader)
         {
             base.Deserialize (reader);
             ReRegisterData();
@@ -737,7 +737,7 @@ namespace AM.Reporting.Data
         public void Load (Stream stream)
         {
             Clear();
-            using (var reader = new FRReader (Report))
+            using (var reader = new ReportReader (Report))
             {
                 reader.Load (stream);
                 reader.Read (this);

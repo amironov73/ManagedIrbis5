@@ -93,7 +93,7 @@ namespace AM.Reporting
             }
         }
 
-        public virtual void Deserialize (FRReader reader, string prefix)
+        public virtual void Deserialize (ReportReader reader, string prefix)
         {
         }
 
@@ -1134,7 +1134,7 @@ namespace AM.Reporting
         }
 
         /// <inheritdoc/>
-        public override void Deserialize (FRReader reader, string prefix)
+        public override void Deserialize (ReportReader reader, string prefix)
         {
             base.Deserialize (reader, prefix);
             if (reader.HasProperty (prefix + ".ImageIndex"))

@@ -896,7 +896,7 @@ namespace AM.Reporting
         ///
         /// </summary>
         /// <param name="reader"></param>
-        public override void Deserialize (FRReader reader)
+        public override void Deserialize (ReportReader reader)
         {
             base.Deserialize (reader);
             Fill.Deserialize (reader, "Fill");

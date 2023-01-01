@@ -59,7 +59,7 @@ namespace AM.Reporting.Preview
             var clone = Activator.CreateInstance (source.GetType()) as Base;
             using (var xml = new XmlItem())
             using (var writer = new ReportWriter (xml))
-            using (var reader = new FRReader (null, xml))
+            using (var reader = new ReportReader (null, xml))
             {
                 reader.DeserializeFrom = SerializeTo.SourcePages;
                 writer.SaveChildren = false;
@@ -150,7 +150,7 @@ namespace AM.Reporting.Preview
             Clear();
             for (var i = 0; i < rootItem.Count; i++)
             {
-                using (var reader = new FRReader (null, rootItem[i]))
+                using (var reader = new ReportReader (null, rootItem[i]))
                 {
                     pages.Add (reader.Read() as ReportPage);
                 }

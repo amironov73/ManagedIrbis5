@@ -35,7 +35,7 @@ namespace AM.Reporting.Format
     /// The format is used to format expression value in a <see cref="TextObject"/> object.
     /// </remarks>
     [TypeConverter (typeof (TypeConverters.FormatConverter))]
-    public abstract class FormatBase : IFRSerializable
+    public abstract class FormatBase : IReportSerializable
     {
         #region Properties
 
@@ -80,7 +80,7 @@ namespace AM.Reporting.Format
         }
 
         /// <inheritdoc/>
-        public void Deserialize (FRReader reader)
+        public void Deserialize (ReportReader reader)
         {
             reader.ReadProperties (this);
         }

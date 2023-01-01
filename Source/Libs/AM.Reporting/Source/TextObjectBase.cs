@@ -307,7 +307,7 @@ namespace AM.Reporting
         #region Protected Methods
 
         /// <inheritdoc/>
-        protected override void DeserializeSubItems (FRReader reader)
+        protected override void DeserializeSubItems (ReportReader reader)
         {
             if (string.Compare (reader.ItemName, "Formats", true) == 0)
             {

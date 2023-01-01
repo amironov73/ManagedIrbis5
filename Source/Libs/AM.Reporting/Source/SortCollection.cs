@@ -32,7 +32,7 @@ namespace AM.Reporting
     /// <summary>
     /// Represents a collection of sort conditions used in the <see cref="DataBand.Sort"/>.
     /// </summary>
-    public class SortCollection : CollectionBase, IFRSerializable
+    public class SortCollection : CollectionBase, IReportSerializable
     {
         /// <summary>
         /// Gets or sets the element at the specified index.
@@ -122,7 +122,7 @@ namespace AM.Reporting
         }
 
         /// <inheritdoc/>
-        public void Deserialize (FRReader reader)
+        public void Deserialize (ReportReader reader)
         {
             Clear();
             while (reader.NextItem())

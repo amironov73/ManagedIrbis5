@@ -31,7 +31,7 @@ namespace AM.Reporting.Matrix
     /// <summary>
     /// Represents a collection of matrix header descriptors used in the <see cref="MatrixObject"/>.
     /// </summary>
-    public class MatrixHeader : CollectionBase, IFRSerializable
+    public class MatrixHeader : CollectionBase, IReportSerializable
     {
         private int nextIndex;
 
@@ -316,7 +316,7 @@ namespace AM.Reporting.Matrix
         }
 
         /// <inheritdoc/>
-        public void Deserialize (FRReader reader)
+        public void Deserialize (ReportReader reader)
         {
             Clear();
             while (reader.NextItem())

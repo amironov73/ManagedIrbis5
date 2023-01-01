@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* Xml.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -67,30 +67,19 @@ namespace AM.Reporting.Utils
     /// </summary>
     public class XmlItem : IDisposable
     {
-        private List<XmlItem> items;
-        private XmlItem parent;
-        private XmlProperty[] properties;
+        private List<XmlItem>? _items;
+        private XmlItem? _parent;
+        private XmlProperty[]? _properties;
 
         /// <summary>
         /// Gets a number of children in this node.
         /// </summary>
-        public int Count => items == null ? 0 : items.Count;
+        public int Count => _items?.Count ?? 0;
 
         /// <summary>
         /// Gets a list of children in this node.
         /// </summary>
-        public List<XmlItem> Items
-        {
-            get
-            {
-                if (items == null)
-                {
-                    items = new List<XmlItem>();
-                }
-
-                return items;
-            }
-        }
+        public List<XmlItem> Items => _items ??= new List<XmlItem>();
 
         /// <summary>
         /// Gets a child node with specified index.
@@ -112,31 +101,23 @@ namespace AM.Reporting.Utils
         /// </summary>
         public XmlProperty[] Properties
         {
-            get
-            {
-                if (properties == null)
-                {
-                    properties = new XmlProperty[0];
-                }
-
-                return properties;
-            }
-            set => properties = value;
+            get => _properties ??= Array.Empty<XmlProperty>();
+            set => _properties = value;
         }
 
         /// <summary>
         /// Gets or sets the parent for this node.
         /// </summary>
-        public XmlItem Parent
+        public XmlItem? Parent
         {
-            get => parent;
+            get => _parent;
             set
             {
-                if (parent != value)
+                if (_parent != value)
                 {
-                    if (parent != null)
+                    if (_parent != null)
                     {
-                        parent.Items.Remove (this);
+                        _parent.Items.Remove (this);
                     }
 
                     if (value != null)
@@ -145,7 +126,7 @@ namespace AM.Reporting.Utils
                     }
                 }
 
-                parent = value;
+                _parent = value;
             }
         }
 
@@ -179,14 +160,14 @@ namespace AM.Reporting.Utils
         /// </summary>
         public void Clear()
         {
-            if (items != null)
+            if (_items != null)
             {
-                items.Clear();
+                _items.Clear();
                 /*        while (Items.Count > 0)
                         {
                           Items[0].Dispose();
                         }  */
-                items = null;
+                _items = null;
             }
         }
 
@@ -231,7 +212,7 @@ namespace AM.Reporting.Utils
         {
             for (var i = 0; i < Count; i++)
             {
-                if (string.Compare (Items[i].Name, name, true) == 0)
+                if (String.Compare (Items[i].Name, name, StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     return i;
                 }
@@ -251,7 +232,7 @@ namespace AM.Reporting.Utils
         /// </remarks>
         public XmlItem FindItem (string name)
         {
-            XmlItem result = null;
+            XmlItem? result;
             var i = Find (name);
             if (i == -1)
             {
@@ -292,7 +273,7 @@ namespace AM.Reporting.Utils
 
         internal string GetProp (string key, bool convertFromXml)
         {
-            if (properties == null || properties.Length == 0)
+            if (_properties == null || _properties.Length == 0)
             {
                 return "";
             }
@@ -300,7 +281,7 @@ namespace AM.Reporting.Utils
             // property key should be trimmed
             key = key.Trim();
 
-            foreach (var kv in properties)
+            foreach (var kv in _properties)
             {
                 if (kv.Key == key)
                 {
@@ -313,13 +294,13 @@ namespace AM.Reporting.Utils
 
         internal void WriteProps (FastString sb)
         {
-            if (properties == null || properties.Length == 0)
+            if (_properties == null || _properties.Length == 0)
             {
                 return;
             }
 
             sb.Append (" ");
-            foreach (var kv in properties)
+            foreach (var kv in _properties)
             {
                 //if (string.IsNullOrWhiteSpace(kv.Key))
                 if (string.IsNullOrEmpty (kv.Key) || kv.Key.Trim().Length == 0)
@@ -341,23 +322,23 @@ namespace AM.Reporting.Utils
         /// </summary>
         public void ClearProps()
         {
-            properties = null;
+            _properties = null;
         }
 
         internal void CopyPropsTo (XmlItem item)
         {
-            if (properties == null)
+            if (_properties == null)
             {
-                item.properties = null;
+                item._properties = null;
                 return;
             }
 
-            item.properties = (XmlProperty[])properties.Clone();
+            item._properties = (XmlProperty[])_properties.Clone();
         }
 
         internal bool IsNullOrEmptyProps()
         {
-            return properties == null || properties.Length == 0;
+            return _properties == null || _properties.Length == 0;
         }
 
         /// <summary>
@@ -375,24 +356,24 @@ namespace AM.Reporting.Utils
             // property key should be trimmed
             key = key.Trim();
 
-            if (properties == null)
+            if (_properties == null)
             {
-                properties = new XmlProperty[1];
-                properties[0] = XmlProperty.Create (key, value);
+                _properties = new XmlProperty[1];
+                _properties[0] = XmlProperty.Create (key, value);
                 return;
             }
 
-            for (var i = 0; i < properties.Length; i++)
+            for (var i = 0; i < _properties.Length; i++)
             {
-                if (properties[i].Key == key)
+                if (_properties[i].Key == key)
                 {
-                    properties[i] = XmlProperty.Create (key, value);
+                    _properties[i] = XmlProperty.Create (key, value);
                     return;
                 }
             }
 
-            Array.Resize<XmlProperty> (ref properties, properties.Length + 1);
-            properties[properties.Length - 1] = XmlProperty.Create (key, value);
+            Array.Resize<XmlProperty> (ref _properties, _properties.Length + 1);
+            _properties[^1] = XmlProperty.Create (key, value);
         }
 
         /// <summary>
@@ -402,7 +383,7 @@ namespace AM.Reporting.Utils
         /// <returns>Returns true if property is removed, false otherwise.</returns>
         public bool RemoveProp (string key)
         {
-            if (properties == null || properties.Length == 0)
+            if (_properties == null || _properties.Length == 0)
             {
                 return false;
             }
@@ -410,23 +391,23 @@ namespace AM.Reporting.Utils
             // property key should be trimmed
             key = key.Trim();
 
-            if (properties.Length == 1 && properties[0].Key == key)
+            if (_properties.Length == 1 && _properties[0].Key == key)
             {
-                properties = null;
+                _properties = null;
                 return true;
             }
 
-            if (properties[properties.Length - 1].Key == key)
+            if (_properties[^1].Key == key)
             {
-                Array.Resize<XmlProperty> (ref properties, properties.Length - 1);
+                Array.Resize<XmlProperty> (ref _properties, _properties.Length - 1);
                 return true;
             }
 
             var target = -1;
 
-            for (var i = 0; i < properties.Length; i++)
+            for (var i = 0; i < _properties.Length; i++)
             {
-                if (properties[i].Key == key)
+                if (_properties[i].Key == key)
                 {
                     target = i;
                     break;
@@ -435,12 +416,12 @@ namespace AM.Reporting.Utils
 
             if (target != -1)
             {
-                for (var i = target; i < properties.Length - 1; i++)
+                for (var i = target; i < _properties.Length - 1; i++)
                 {
-                    properties[i] = properties[i + 1];
+                    _properties[i] = _properties[i + 1];
                 }
 
-                Array.Resize<XmlProperty> (ref properties, properties.Length - 1);
+                Array.Resize<XmlProperty> (ref _properties, _properties.Length - 1);
                 return true;
             }
 

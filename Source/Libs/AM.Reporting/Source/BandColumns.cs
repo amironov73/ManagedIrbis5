@@ -4,6 +4,8 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable CompareOfFloatsByEqualityOperator
+// ReSharper disable LocalizableElement
+// ReSharper disable MemberCanBePrivate.Global
 
 /* BandColumns.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -104,7 +106,7 @@ public class BandColumns
     #region Private members
 
     private int _count;
-    private DataBand _dataBand;
+    private readonly DataBand _dataBand;
 
     #endregion
 
@@ -117,6 +119,8 @@ public class BandColumns
             BandColumns source
         )
     {
+        Sure.NotNull (source);
+
         Count = source.Count;
         Width = source.Width;
         Layout = source.Layout;

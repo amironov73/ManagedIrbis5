@@ -32,7 +32,7 @@ namespace AM.Reporting
     /// <summary>
     /// Represents a collection of the <see cref="StyleCollection"/> objects.
     /// </summary>
-    public class StyleSheet : CollectionBase, IFRSerializable
+    public class StyleSheet : CollectionBase, IReportSerializable
     {
         /// <summary>
         /// Gets or sets the element at the specified index.
@@ -179,7 +179,7 @@ namespace AM.Reporting
         /// <remarks>
         /// This method is for internal use only.
         /// </remarks>
-        public void Deserialize (FRReader reader)
+        public void Deserialize (ReportReader reader)
         {
             while (reader.NextItem())
             {
@@ -221,7 +221,7 @@ namespace AM.Reporting
         public void Load (Stream stream)
         {
             Clear();
-            using (var reader = new FRReader (null))
+            using (var reader = new ReportReader (null))
             {
                 reader.Load (stream);
                 reader.Read (this);

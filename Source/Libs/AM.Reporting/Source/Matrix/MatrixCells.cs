@@ -31,7 +31,7 @@ namespace AM.Reporting.Matrix
     /// <summary>
     /// Represents a collection of matrix data descriptors used in the <see cref="MatrixObject"/>.
     /// </summary>
-    public class MatrixCells : CollectionBase, IFRSerializable
+    public class MatrixCells : CollectionBase, IReportSerializable
     {
         private List<ArrayList>[] rows;
 
@@ -306,7 +306,7 @@ namespace AM.Reporting.Matrix
         }
 
         /// <inheritdoc/>
-        public void Deserialize (FRReader reader)
+        public void Deserialize (ReportReader reader)
         {
             Clear();
             while (reader.NextItem())

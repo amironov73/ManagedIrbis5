@@ -33,7 +33,7 @@ namespace AM.Reporting
     /// Represents a collection of highlight conditions used in the <see cref="TextObject.Highlight"/> property
     /// of the <see cref="TextObject"/>.
     /// </summary>
-    public class ConditionCollection : CollectionBase, IFRSerializable
+    public class ConditionCollection : CollectionBase, IReportSerializable
     {
         /// <summary>
         /// Gets or sets the element at the specified index.
@@ -130,7 +130,7 @@ namespace AM.Reporting
         }
 
         /// <inheritdoc/>
-        public void Deserialize (FRReader reader)
+        public void Deserialize (ReportReader reader)
         {
             Clear();
             while (reader.NextItem())

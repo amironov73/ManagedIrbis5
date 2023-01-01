@@ -766,7 +766,7 @@ namespace AM.Reporting.Data
         }
 
         /// <inheritdoc/>
-        public override void Deserialize (FRReader reader)
+        public override void Deserialize (ReportReader reader)
         {
             // the Clear is needed to avoid duplicate columns in the inherited report
             // when the same datasource is exists in both base and inherited report

@@ -32,7 +32,7 @@ namespace AM.Reporting.Matrix
     /// The base class for matrix element descriptors such as <see cref="MatrixHeaderDescriptor"/> and
     /// <see cref="MatrixCellDescriptor"/>.
     /// </summary>
-    public class MatrixDescriptor : IFRSerializable
+    public class MatrixDescriptor : IReportSerializable
     {
         #region Fields
 
@@ -111,7 +111,7 @@ namespace AM.Reporting.Matrix
         }
 
         /// <inheritdoc/>
-        public void Deserialize (FRReader reader)
+        public void Deserialize (ReportReader reader)
         {
             reader.ReadProperties (this);
         }

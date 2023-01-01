@@ -144,7 +144,7 @@ namespace AM.Reporting.Utils
         /// </summary>
         /// <param name="obj">The object to serialize.</param>
         /// <remarks>
-        /// The object must implement the <see cref="IFRSerializable"/> interface. This method
+        /// The object must implement the <see cref="IReportSerializable"/> interface. This method
         /// invokes the <b>Serialize</b> method of the object.
         /// </remarks>
         /// <example>This example demonstrates the use of writer.
@@ -174,7 +174,7 @@ namespace AM.Reporting.Utils
         /// }
         /// </code>
         /// </example>
-        public void Write (IFRSerializable obj)
+        public void Write (IReportSerializable obj)
         {
             Write (obj, null);
         }
@@ -184,7 +184,7 @@ namespace AM.Reporting.Utils
         /// </summary>
         /// <param name="obj">The object to serialize.</param>
         /// <param name="diff">The etalon object.</param>
-        public void Write (IFRSerializable obj, object diff)
+        public void Write (IReportSerializable obj, object diff)
         {
             if (obj == null)
             {

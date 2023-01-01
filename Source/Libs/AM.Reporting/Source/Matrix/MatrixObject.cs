@@ -604,7 +604,7 @@ namespace AM.Reporting.Matrix
         #region Protected Methods
 
         /// <inheritdoc/>
-        protected override void DeserializeSubItems (FRReader reader)
+        protected override void DeserializeSubItems (ReportReader reader)
         {
             if (string.Compare (reader.ItemName, "MatrixColumns", true) == 0)
             {

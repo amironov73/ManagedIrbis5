@@ -3,6 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable UnusedMember.Global
 
 /* BandCollection.cs --
  * Ars Magna project, http://arsmagna.ru

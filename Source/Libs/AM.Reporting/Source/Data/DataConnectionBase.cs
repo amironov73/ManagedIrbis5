@@ -960,7 +960,7 @@ namespace AM.Reporting.Data
                 writer.Write (this);
             }
 
-            using (var reader = new FRReader (Report, item))
+            using (var reader = new ReportReader (Report, item))
             {
                 reader.DeserializeFrom = SerializeTo.Clipboard;
                 reader.BlobStore = new BlobStore (false);

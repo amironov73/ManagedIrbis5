@@ -122,7 +122,7 @@ namespace AM.Reporting.Preview
             return true;
         }
 
-        private Base ReadObject (Base parent, XmlItem item, bool readChildren, FRReader reader)
+        private Base ReadObject (Base parent, XmlItem item, bool readChildren, ReportReader reader)
         {
             var objName = item.Name;
 
@@ -187,7 +187,7 @@ namespace AM.Reporting.Preview
 
         #region Internal Methods
 
-        internal ReportPage ReadPage (Base parent, XmlItem item, bool readchild, FRReader reader)
+        internal ReportPage ReadPage (Base parent, XmlItem item, bool readchild, ReportReader reader)
         {
             var page = ReadObject (parent, item, false, reader) as ReportPage;
             if (readchild)
@@ -205,7 +205,7 @@ namespace AM.Reporting.Preview
         {
             Load();
             ReportPage page;
-            using (var reader = new FRReader (null))
+            using (var reader = new ReportReader (null))
             {
                 reader.DeserializeFrom = SerializeTo.Preview;
                 reader.ReadChildren = false;
@@ -285,7 +285,7 @@ namespace AM.Reporting.Preview
                     }
                 }
 
-                using (var reader = new FRReader (null))
+                using (var reader = new ReportReader (null))
                 {
                     reader.DeserializeFrom = SerializeTo.Preview;
                     reader.ReadChildren = false;
@@ -311,7 +311,7 @@ namespace AM.Reporting.Preview
 
         internal string GetName()
         {
-            using (var reader = new FRReader (null))
+            using (var reader = new ReportReader (null))
             {
                 reader.DeserializeFrom = SerializeTo.Preview;
                 reader.ReadChildren = false;
@@ -324,7 +324,7 @@ namespace AM.Reporting.Preview
         internal void ReCalcSizes()
         {
             var item = xmlItem;
-            using (var reader = new FRReader (null, item))
+            using (var reader = new ReportReader (null, item))
             {
                 reader.DeserializeFrom = SerializeTo.Preview;
                 reader.BlobStore = preparedPages.BlobStore;
@@ -423,7 +423,7 @@ namespace AM.Reporting.Preview
         {
             Load();
             ReportPage page;
-            using (var reader = new FRReader (null))
+            using (var reader = new ReportReader (null))
             {
                 reader.DeserializeFrom = SerializeTo.Preview;
                 reader.ReadChildren = false;

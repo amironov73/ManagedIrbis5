@@ -161,7 +161,8 @@ public enum Flags
 /// Represents the root class of the AM.Reporting object's hierarhy.
 /// </summary>
 [ToolboxItem (false)]
-public abstract partial class Base : Component, IFRSerializable
+public abstract partial class Base
+    : Component, IReportSerializable
 {
     #region Fields
 
@@ -586,7 +587,7 @@ public abstract partial class Base : Component, IFRSerializable
     /// }
     /// </code>
     /// </example>
-    protected virtual void DeserializeSubItems (FRReader reader)
+    protected virtual void DeserializeSubItems (ReportReader reader)
     {
         if (reader.ReadChildren)
         {
@@ -902,7 +903,7 @@ public abstract partial class Base : Component, IFRSerializable
     ///   </list>
     /// </remarks>
     /// <param name="reader">Reader object.</param>
-    public virtual void Deserialize (FRReader reader)
+    public virtual void Deserialize (ReportReader reader)
     {
         reader.ReadProperties (this);
         while (reader.NextItem())
@@ -928,7 +929,7 @@ public abstract partial class Base : Component, IFRSerializable
         {
             using (var xml = new XmlItem())
             using (var writer = new ReportWriter (xml))
-            using (var reader = new FRReader (Report!, xml))
+            using (var reader = new ReportReader (Report!, xml))
             {
                 writer.SaveChildren = false;
                 writer.Write (source, this);

@@ -31,7 +31,7 @@ namespace AM.Reporting.CrossView
     /// <summary>
     /// Represents a collection of CrossView data descriptors used in the <see cref="CrossViewObject"/>.
     /// </summary>
-    public class CrossViewCells : CollectionBase, IFRSerializable
+    public class CrossViewCells : CollectionBase, IReportSerializable
     {
         /// <summary>
         /// Gets or sets the element at the specified index.
@@ -138,7 +138,7 @@ namespace AM.Reporting.CrossView
         }
 
         /// <inheritdoc/>
-        public void Deserialize (FRReader reader)
+        public void Deserialize (ReportReader reader)
         {
             Clear();
             while (reader.NextItem())

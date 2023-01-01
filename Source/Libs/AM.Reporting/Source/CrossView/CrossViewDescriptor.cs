@@ -32,7 +32,7 @@ namespace AM.Reporting.CrossView
     /// The base class for matrix element descriptors such as <see cref="CrossViewHeaderDescriptor"/> and
     /// <see cref="CrossViewCellDescriptor"/>.
     /// </summary>
-    public class CrossViewDescriptor : IFRSerializable
+    public class CrossViewDescriptor : IReportSerializable
     {
         #region Fields
 
@@ -111,7 +111,7 @@ namespace AM.Reporting.CrossView
         }
 
         /// <inheritdoc/>
-        public void Deserialize (FRReader reader)
+        public void Deserialize (ReportReader reader)
         {
             reader.ReadProperties (this);
         }

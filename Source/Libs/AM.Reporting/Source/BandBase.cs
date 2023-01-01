@@ -2,12 +2,11 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
+// ReSharper disable EventNeverSubscribedTo.Global
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable MemberCanBeProtected.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
 
 /* BandBase.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -19,10 +18,9 @@ using System;
 using System.Drawing;
 using System.ComponentModel;
 using System.Collections.Generic;
+using System.Windows.Forms;
 
 using AM.Reporting.Utils;
-
-using System.Windows.Forms;
 
 #endregion
 
@@ -36,19 +34,7 @@ namespace AM.Reporting;
 public abstract partial class BandBase
     : BreakableComponent, IParent
 {
-    #region Fields
-
-    private ChildBand? _child;
-    private int _rowNumber;
-    private int _absRowNo;
-    private bool _repeated;
-    private bool _updatingLayout;
-    private bool _flagCheckFreeSpace;
-    private int _savedOriginalObjectsCount;
-
-    #endregion
-
-    #region Properties
+    #region Events
 
     /// <summary>
     /// This event occurs before the band layouts its child objects.
@@ -59,6 +45,10 @@ public abstract partial class BandBase
     /// This event occurs after the child objects layout was finished.
     /// </summary>
     public event EventHandler? AfterLayout;
+
+    #endregion
+
+    #region Properties
 
     /// <summary>
     /// Gets or sets a value indicating that the band should be printed from a new page.
@@ -316,6 +306,45 @@ public abstract partial class BandBase
             return 0;
         }
     }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BandBase"/> class with default settings.
+    /// </summary>
+    protected BandBase()
+    {
+        Objects = new ReportComponentCollection (this);
+        Guides = new FloatCollection();
+        BeforeLayoutEvent = "";
+        AfterLayoutEvent = "";
+        OutlineExpression = "";
+        CanBreak = false;
+        ShiftMode = ShiftMode.Never;
+        if (BaseName.EndsWith ("Band"))
+        {
+            BaseName = ClassName.Remove (ClassName.IndexOf ("Band", StringComparison.Ordinal));
+        }
+
+        SetFlags (Flags.CanMove | Flags.CanChangeOrder | Flags.CanChangeParent | Flags.CanCopy | Flags.CanGroup,
+            false);
+        FlagUseStartNewPage = true;
+        FlagCheckFreeSpace = true;
+    }
+
+    #endregion
+
+    #region Private members
+
+    private ChildBand? _child;
+    private int _rowNumber;
+    private int _absRowNo;
+    private bool _repeated;
+    private bool _updatingLayout;
+    private bool _flagCheckFreeSpace;
+    private int _savedOriginalObjectsCount;
 
     #endregion
 
@@ -762,9 +791,9 @@ public abstract partial class BandBase
 
         SetRunning (false);
 
-        var collection_clone = new ReportComponentCollection();
-        Objects.CopyTo (collection_clone);
-        foreach (ReportComponentBase obj in collection_clone)
+        var collectionClone = new ReportComponentCollection();
+        Objects.CopyTo (collectionClone);
+        foreach (ReportComponentBase obj in collectionClone)
         {
             obj.OnAfterPrint (EventArgs.Empty);
             obj.RestoreState();
@@ -1116,27 +1145,4 @@ public abstract partial class BandBase
     }
 
     #endregion
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="BandBase"/> class with default settings.
-    /// </summary>
-    protected BandBase()
-    {
-        Objects = new ReportComponentCollection (this);
-        Guides = new FloatCollection();
-        BeforeLayoutEvent = "";
-        AfterLayoutEvent = "";
-        OutlineExpression = "";
-        CanBreak = false;
-        ShiftMode = ShiftMode.Never;
-        if (BaseName.EndsWith ("Band"))
-        {
-            BaseName = ClassName.Remove (ClassName.IndexOf ("Band", StringComparison.Ordinal));
-        }
-
-        SetFlags (Flags.CanMove | Flags.CanChangeOrder | Flags.CanChangeParent | Flags.CanCopy | Flags.CanGroup,
-            false);
-        FlagUseStartNewPage = true;
-        FlagCheckFreeSpace = true;
-    }
 }

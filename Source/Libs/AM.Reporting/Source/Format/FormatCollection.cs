@@ -33,7 +33,7 @@ namespace AM.Reporting.Format
     /// Represents a collection of formats used by the <see cref="TextObject"/> and <see cref="RichObject"/>
     /// objects.
     /// </summary>
-    public class FormatCollection : CollectionBase, IFRSerializable
+    public class FormatCollection : CollectionBase, IReportSerializable
     {
         /// <summary>
         /// Gets or sets the element at the specified index.
@@ -130,7 +130,7 @@ namespace AM.Reporting.Format
         }
 
         /// <inheritdoc/>
-        public void Deserialize (FRReader reader)
+        public void Deserialize (ReportReader reader)
         {
             Clear();
             while (reader.NextItem())

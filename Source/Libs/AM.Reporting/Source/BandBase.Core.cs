@@ -10,9 +10,9 @@
 
 #region Using directives
 
-using AM.Reporting.Utils;
-
 using System.Drawing;
+
+using AM.Reporting.Utils;
 
 #endregion
 
@@ -28,6 +28,8 @@ partial class BandBase
             FRPaintEventArgs eventArgs
         )
     {
+        Sure.NotNull (eventArgs);
+
         DrawBackground (eventArgs);
         Border.Draw (eventArgs, new RectangleF (AbsLeft, AbsTop, Width, Height));
     }

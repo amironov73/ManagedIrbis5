@@ -259,7 +259,7 @@ namespace AM.Reporting.Export
         private void RestoreSettings()
         {
             var root = Config.Root.FindItem ("Preview").FindItem ("Exports").FindItem (ClassName);
-            using (var reader = new FRReader (null, root))
+            using (var reader = new ReportReader (null, root))
             {
                 reader.Read (this);
             }

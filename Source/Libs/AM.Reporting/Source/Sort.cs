@@ -30,7 +30,7 @@ namespace AM.Reporting
     /// <summary>
     /// Represents a sort condition used in the <see cref="DataBand.Sort"/>.
     /// </summary>
-    public class Sort : IFRSerializable
+    public class Sort : IReportSerializable
     {
         /// <summary>
         /// Gets or sets an expression used to sort data band rows.
@@ -69,7 +69,7 @@ namespace AM.Reporting
         /// <remarks>
         /// This method is for internal use only.
         /// </remarks>
-        public void Deserialize (FRReader reader)
+        public void Deserialize (ReportReader reader)
         {
             reader.ReadProperties (this);
         }

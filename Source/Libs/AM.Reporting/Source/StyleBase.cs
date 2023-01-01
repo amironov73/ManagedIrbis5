@@ -28,7 +28,7 @@ namespace AM.Reporting
     /// <summary>
     /// Represents the base class for the report style or the highlight condition.
     /// </summary>
-    public partial class StyleBase : IFRSerializable
+    public partial class StyleBase : IReportSerializable
     {
         #region Private Fields
 
@@ -118,7 +118,7 @@ namespace AM.Reporting
         /// <remarks>
         /// This method is for internal use only.
         /// </remarks>
-        public void Deserialize (FRReader reader)
+        public void Deserialize (ReportReader reader)
         {
             reader.ReadProperties (this);
             Fill.Deserialize (reader, "Fill");

@@ -159,7 +159,7 @@ namespace AM.Reporting
         }
 
         /// <inheritdoc/>
-        public override void Deserialize (FRReader reader)
+        public override void Deserialize (ReportReader reader)
         {
             base.Deserialize (reader);
             Points.Clear();

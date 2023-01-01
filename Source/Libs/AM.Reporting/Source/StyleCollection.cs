@@ -32,7 +32,7 @@ namespace AM.Reporting
     /// <summary>
     /// Represents a collection of styles used in the <see cref="Report.Styles"/>.
     /// </summary>
-    public class StyleCollection : CollectionBase, IFRSerializable
+    public class StyleCollection : CollectionBase, IReportSerializable
     {
         /// <summary>
         /// Gets or sets the name of the style.
@@ -162,7 +162,7 @@ namespace AM.Reporting
         }
 
         /// <inheritdoc/>
-        public void Deserialize (FRReader reader)
+        public void Deserialize (ReportReader reader)
         {
             Clear();
             Name = "";
@@ -206,7 +206,7 @@ namespace AM.Reporting
         /// <param name="stream">Stream to load from.</param>
         public void Load (Stream stream)
         {
-            using (var reader = new FRReader (null))
+            using (var reader = new ReportReader (null))
             {
                 reader.Load (stream);
                 reader.Read (this);

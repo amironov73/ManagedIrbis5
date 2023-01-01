@@ -1054,7 +1054,7 @@ namespace AM.Reporting
         #region Protected Methods
 
         /// <inheritdoc/>
-        protected override void DeserializeSubItems (FRReader reader)
+        protected override void DeserializeSubItems (ReportReader reader)
         {
             if (string.Compare (reader.ItemName, "Highlight", true) == 0)
             {
@@ -1624,7 +1624,7 @@ namespace AM.Reporting
 
 
         /// <inheritdoc/>
-        public override void Deserialize (FRReader reader)
+        public override void Deserialize (ReportReader reader)
         {
             base.Deserialize (reader);
             TextFill.Deserialize (reader, "TextFill");

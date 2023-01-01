@@ -1045,7 +1045,7 @@ namespace AM.Reporting
         }
 
         /// <inheritdoc/>
-        protected override void DeserializeSubItems (FRReader reader)
+        protected override void DeserializeSubItems (ReportReader reader)
         {
             if (string.Compare (reader.ItemName, "ScriptText", true) == 0)
             {
@@ -1905,7 +1905,7 @@ namespace AM.Reporting
         }
 
         /// <inheritdoc/>
-        public override void Deserialize (FRReader reader)
+        public override void Deserialize (ReportReader reader)
         {
             if (reader.HasProperty ("BaseReportAbsolutePath"))
             {
@@ -2008,7 +2008,7 @@ namespace AM.Reporting
             var password = Password;
             Clear();
 
-            using (var reader = new FRReader (this))
+            using (var reader = new ReportReader (this))
             {
                 List<Stream> disposeList = new List<Stream>();
                 if (Compressor.IsStreamCompressed (stream))
