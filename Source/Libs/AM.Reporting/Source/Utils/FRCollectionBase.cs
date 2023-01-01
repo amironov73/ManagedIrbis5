@@ -29,12 +29,13 @@ namespace AM.Reporting.Utils
     /// <summary>
     /// Represents a collection of AM.Reporting base objects.
     /// </summary>
-    public class FRCollectionBase : CollectionBase
+    public class FRCollectionBase
+        : CollectionBase
     {
         /// <summary>
         /// Gets an owner of this collection.
         /// </summary>
-        public Base Owner { get; }
+        public Base? Owner { get; }
 
         /// <summary>
         /// Adds the specified elements to the end of this collection.
@@ -209,7 +210,7 @@ namespace AM.Reporting.Utils
         /// Initializes a new instance of the <b>FRCollectionBase</b> class with specified owner.
         /// </summary>
         /// <param name="owner">The owner of this collection.</param>
-        public FRCollectionBase (Base owner)
+        public FRCollectionBase (Base? owner)
         {
             this.Owner = owner;
         }

@@ -923,7 +923,7 @@ namespace AM.Reporting.Export.Html
         #endregion Protected methods
 
         /// <inheritdoc/>
-        public override void Serialize (FRWriter writer)
+        public override void Serialize (ReportWriter writer)
         {
             base.Serialize (writer);
             writer.WriteBool ("Layers", Layers);

@@ -64,9 +64,9 @@ namespace AM.Reporting.Utils
 
     internal class DiffEventArgs
     {
-        public object Object { get; set; }
+        public object? Object { get; set; }
 
-        public object DiffObject { get; set; }
+        public object? DiffObject { get; set; }
     }
 
     internal delegate void DiffEventHandler (object sender, DiffEventArgs e);
@@ -75,18 +75,19 @@ namespace AM.Reporting.Utils
     /// <summary>
     /// The writer used to serialize object's properties to a report file.
     /// </summary>
-    public class FRWriter : IDisposable
+    public class ReportWriter
+        : IDisposable
     {
         #region Fields
 
-        private XmlDocument doc;
-        private XmlItem root;
-        private XmlItem curItem;
+        private XmlDocument _document;
+        private XmlItem _root;
+        private XmlItem _currentItem;
 
         private XmlItem curRoot;
 
         //private StringBuilder FText;
-        private Hashtable diffObjects;
+        private Hashtable _diffObjects;
 
         #endregion
 
@@ -101,8 +102,8 @@ namespace AM.Reporting.Utils
         /// </summary>
         public string ItemName
         {
-            get => curItem.Name;
-            set => curItem.Name = value;
+            get => _currentItem.Name;
+            set => _currentItem.Name = value;
         }
 
         /// <summary>
@@ -190,7 +191,7 @@ namespace AM.Reporting.Utils
                 return;
             }
 
-            var saveCurItem = curItem;
+            var saveCurItem = _currentItem;
             var saveCurRoot = curRoot;
 
             //StringBuilder saveText = FText;
@@ -198,13 +199,13 @@ namespace AM.Reporting.Utils
             try
             {
                 //FText = new StringBuilder();
-                curItem = curItem == null ? root : curItem.Add();
-                curRoot = curItem;
+                _currentItem = _currentItem == null ? _root : _currentItem.Add();
+                curRoot = _currentItem;
                 DiffObject = diff;
                 if (obj is Base @base && SerializeTo == SerializeTo.Preview)
                 {
                     DiffObject = @base.OriginalComponent;
-                    curItem.Name = DiffObject != null ? @base.Alias : @base.ClassName;
+                    _currentItem.Name = DiffObject != null ? @base.Alias : @base.ClassName;
                 }
 
                 if (GetDiff != null)
@@ -222,12 +223,12 @@ namespace AM.Reporting.Utils
                     try
                     {
                         var objType = obj.GetType();
-                        if (!diffObjects.Contains (objType))
+                        if (!_diffObjects.Contains (objType))
                         {
-                            diffObjects[objType] = Activator.CreateInstance (objType);
+                            _diffObjects[objType] = Activator.CreateInstance (objType);
                         }
 
-                        DiffObject = diffObjects[objType];
+                        DiffObject = _diffObjects[objType];
                     }
                     catch
                     {
@@ -242,7 +243,7 @@ namespace AM.Reporting.Utils
                 //          FText.Remove(FText.Length - 1, 1);
                 //FCurRoot.Text = FText.ToString();
                 //FText = saveText;
-                curItem = saveCurItem;
+                _currentItem = saveCurItem;
                 curRoot = saveCurRoot;
                 DiffObject = saveDiffObject;
             }
@@ -364,7 +365,7 @@ namespace AM.Reporting.Utils
         /// </remarks>
         public void WritePropertyValue (string name, string value)
         {
-            var item = curItem.Add();
+            var item = _currentItem.Add();
             item.Name = name;
             item.Value = value;
         }
@@ -397,8 +398,8 @@ namespace AM.Reporting.Utils
         /// </summary>
         public void Dispose()
         {
-            doc.Dispose();
-            foreach (var obj in diffObjects.Values)
+            _document.Dispose();
+            foreach (var obj in _diffObjects.Values)
             {
                 if (obj is IDisposable disposable)
                 {
@@ -413,9 +414,9 @@ namespace AM.Reporting.Utils
         /// <param name="stream">Stream to save to.</param>
         public void Save (Stream stream)
         {
-            doc.AutoIndent = SerializeTo == SerializeTo.Report;
-            doc.WriteHeader = WriteHeader;
-            doc.Save (stream);
+            _document.AutoIndent = SerializeTo == SerializeTo.Report;
+            _document.WriteHeader = WriteHeader;
+            _document.Save (stream);
         }
 
         #endregion
@@ -423,15 +424,15 @@ namespace AM.Reporting.Utils
         /// <summary>
         /// Initializes a new instance of the <b>FRWriter</b> class with default settings.
         /// </summary>
-        public FRWriter()
+        public ReportWriter()
         {
-            doc = new XmlDocument();
-            root = doc.Root;
+            _document = new XmlDocument();
+            _root = _document.Root;
 
             //FText = new StringBuilder();
             SaveChildren = true;
             WriteHeader = true;
-            diffObjects = new Hashtable();
+            _diffObjects = new Hashtable();
         }
 
         /// <summary>
@@ -439,9 +440,9 @@ namespace AM.Reporting.Utils
         /// receive writer's output.
         /// </summary>
         /// <param name="root">The xml item that will receive writer's output.</param>
-        public FRWriter (XmlItem root) : this()
+        public ReportWriter (XmlItem root) : this()
         {
-            this.root = root;
+            this._root = root;
         }
     }
 }

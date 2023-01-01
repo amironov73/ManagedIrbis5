@@ -683,7 +683,7 @@ namespace AM.Reporting.Export.Image
         #region Public Methods
 
         /// <inheritdoc/>
-        public override void Serialize (FRWriter writer)
+        public override void Serialize (ReportWriter writer)
         {
             base.Serialize (writer);
             writer.WriteValue ("ImageFormat", ImageFormat);

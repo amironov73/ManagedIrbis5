@@ -158,7 +158,7 @@ namespace AM.Reporting
         /// <remarks>
         /// This method is for internal use only.
         /// </remarks>
-        public void Serialize (string prefix, FRWriter writer, CapSettings diff)
+        public void Serialize (string prefix, ReportWriter writer, CapSettings diff)
         {
             if (Width != diff.Width)
             {

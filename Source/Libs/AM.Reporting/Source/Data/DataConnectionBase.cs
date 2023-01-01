@@ -953,7 +953,7 @@ namespace AM.Reporting.Data
         public virtual void Clone()
         {
             var item = new XmlItem();
-            using (var writer = new FRWriter (item))
+            using (var writer = new ReportWriter (item))
             {
                 writer.SerializeTo = SerializeTo.Clipboard;
                 writer.BlobStore = new BlobStore (false);
@@ -993,7 +993,7 @@ namespace AM.Reporting.Data
         }
 
         /// <inheritdoc/>
-        public override void Serialize (FRWriter writer)
+        public override void Serialize (ReportWriter writer)
         {
             writer.ItemName = ClassName;
             if (Name != "")
@@ -1061,6 +1061,6 @@ namespace AM.Reporting.Data
             SetFlags (Flags.CanEdit, true);
         }
 
-        partial void SerializeDesignExt (FRWriter writer);
+        partial void SerializeDesignExt (ReportWriter writer);
     }
 }

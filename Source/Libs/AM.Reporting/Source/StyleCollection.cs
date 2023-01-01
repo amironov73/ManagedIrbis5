@@ -147,7 +147,7 @@ namespace AM.Reporting
         }
 
         /// <inheritdoc/>
-        public void Serialize (FRWriter writer)
+        public void Serialize (ReportWriter writer)
         {
             writer.ItemName = "Styles";
             if (!string.IsNullOrEmpty (Name))
@@ -181,7 +181,7 @@ namespace AM.Reporting
         /// <param name="stream">Stream to save to.</param>
         public void Save (Stream stream)
         {
-            using (var writer = new FRWriter())
+            using (var writer = new ReportWriter())
             {
                 writer.Write (this);
                 writer.Save (stream);

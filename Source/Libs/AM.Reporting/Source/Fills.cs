@@ -85,7 +85,7 @@ namespace AM.Reporting
         /// <remarks>
         /// This method is for internal use only.
         /// </remarks>
-        public virtual void Serialize (FRWriter writer, string prefix, FillBase fill)
+        public virtual void Serialize (ReportWriter writer, string prefix, FillBase fill)
         {
             if (fill.GetType() != GetType())
             {
@@ -166,7 +166,7 @@ namespace AM.Reporting
         }
 
         /// <inheritdoc/>
-        public override void Serialize (FRWriter writer, string prefix, FillBase fill)
+        public override void Serialize (ReportWriter writer, string prefix, FillBase fill)
         {
             base.Serialize (writer, prefix, fill);
 
@@ -333,7 +333,7 @@ namespace AM.Reporting
         }
 
         /// <inheritdoc/>
-        public override void Serialize (FRWriter writer, string prefix, FillBase fill)
+        public override void Serialize (ReportWriter writer, string prefix, FillBase fill)
         {
             base.Serialize (writer, prefix, fill);
             var c = fill as LinearGradientFill;
@@ -505,7 +505,7 @@ namespace AM.Reporting
         }
 
         /// <inheritdoc/>
-        public override void Serialize (FRWriter writer, string prefix, FillBase fill)
+        public override void Serialize (ReportWriter writer, string prefix, FillBase fill)
         {
             base.Serialize (writer, prefix, fill);
             var c = fill as PathGradientFill;
@@ -608,7 +608,7 @@ namespace AM.Reporting
         }
 
         /// <inheritdoc/>
-        public override void Serialize (FRWriter writer, string prefix, FillBase fill)
+        public override void Serialize (ReportWriter writer, string prefix, FillBase fill)
         {
             base.Serialize (writer, prefix, fill);
             var c = fill as HatchFill;
@@ -745,7 +745,7 @@ namespace AM.Reporting
         }
 
         /// <inheritdoc/>
-        public override void Serialize (FRWriter writer, string prefix, FillBase fill)
+        public override void Serialize (ReportWriter writer, string prefix, FillBase fill)
         {
             base.Serialize (writer, prefix, fill);
             var c = fill as GlassFill;
@@ -1047,7 +1047,7 @@ namespace AM.Reporting
         }
 
         /// <inheritdoc/>
-        public override void Serialize (FRWriter writer, string prefix, FillBase fill)
+        public override void Serialize (ReportWriter writer, string prefix, FillBase fill)
         {
             base.Serialize (writer, prefix, fill);
             var c = fill as TextureFill;

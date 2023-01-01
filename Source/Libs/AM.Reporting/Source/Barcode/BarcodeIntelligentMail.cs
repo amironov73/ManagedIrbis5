@@ -71,7 +71,7 @@ namespace AM.Reporting.Barcode
             return "12345678901234567890";
         }
 
-        internal override void Serialize (FRWriter writer, string prefix, BarcodeBase diff)
+        internal override void Serialize (ReportWriter writer, string prefix, BarcodeBase diff)
         {
             base.Serialize (writer, prefix, diff);
             if (diff is not BarcodeIntelligentMail c || QuietZone != c.QuietZone)

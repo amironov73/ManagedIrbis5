@@ -132,7 +132,7 @@ namespace AM.Reporting
         /// <remarks>
         /// This method is for internal use only.
         /// </remarks>
-        public virtual void Serialize (FRWriter writer)
+        public virtual void Serialize (ReportWriter writer)
         {
             var c = writer.DiffObject as StyleBase;
 

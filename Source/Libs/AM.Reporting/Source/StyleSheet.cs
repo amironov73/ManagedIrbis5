@@ -163,7 +163,7 @@ namespace AM.Reporting
         /// <remarks>
         /// This method is for internal use only.
         /// </remarks>
-        public void Serialize (FRWriter writer)
+        public void Serialize (ReportWriter writer)
         {
             writer.ItemName = "StyleSheet";
             foreach (StyleCollection s in this)
@@ -195,7 +195,7 @@ namespace AM.Reporting
         /// <param name="stream">Stream to save to.</param>
         public void Save (Stream stream)
         {
-            using (var writer = new FRWriter())
+            using (var writer = new ReportWriter())
             {
                 writer.Write (this);
                 writer.Save (stream);

@@ -58,7 +58,7 @@ namespace AM.Reporting.Preview
             string objName;
             var clone = Activator.CreateInstance (source.GetType()) as Base;
             using (var xml = new XmlItem())
-            using (var writer = new FRWriter (xml))
+            using (var writer = new ReportWriter (xml))
             using (var reader = new FRReader (null, xml))
             {
                 reader.DeserializeFrom = SerializeTo.SourcePages;
@@ -162,7 +162,7 @@ namespace AM.Reporting.Preview
             rootItem.Clear();
             for (var i = 0; i < pages.Count; i++)
             {
-                using (var writer = new FRWriter (rootItem.Add()))
+                using (var writer = new ReportWriter (rootItem.Add()))
                 {
                     writer.Write (pages[i]);
                 }

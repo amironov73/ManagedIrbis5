@@ -102,7 +102,7 @@ namespace AM.Reporting.Format
             return FormatValue (false);
         }
 
-        internal override void Serialize (FRWriter writer, string prefix, FormatBase format)
+        internal override void Serialize (ReportWriter writer, string prefix, FormatBase format)
         {
             base.Serialize (writer, prefix, format);
             var c = format as BooleanFormat;

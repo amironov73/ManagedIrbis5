@@ -287,7 +287,7 @@ namespace AM.Reporting
         /// <remarks>
         /// This method is for internal use only.
         /// </remarks>
-        public void Serialize (FRWriter writer, string prefix, Watermark c)
+        public void Serialize (ReportWriter writer, string prefix, Watermark c)
         {
             if (Enabled != c.Enabled)
             {

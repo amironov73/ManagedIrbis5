@@ -120,7 +120,7 @@ namespace AM.Reporting
         }
 
         /// <inheritdoc/>
-        public void Serialize (FRWriter writer)
+        public void Serialize (ReportWriter writer)
         {
             writer.ItemName = "Highlight";
             foreach (HighlightCondition c in this)

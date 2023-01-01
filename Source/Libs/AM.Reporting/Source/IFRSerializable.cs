@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -36,7 +36,7 @@ namespace AM.Reporting
         /// Serializes the object.
         /// </summary>
         /// <param name="writer">Writer object.</param>
-        void Serialize (FRWriter writer);
+        void Serialize (ReportWriter writer);
 
         /// <summary>
         /// Deserializes the object.

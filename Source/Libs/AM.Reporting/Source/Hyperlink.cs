@@ -270,7 +270,7 @@ namespace AM.Reporting
             }
         }
 
-        internal void Serialize (FRWriter writer, Hyperlink hyperlink)
+        internal void Serialize (ReportWriter writer, Hyperlink hyperlink)
         {
             if (Kind != hyperlink.Kind)
             {

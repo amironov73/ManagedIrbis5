@@ -701,7 +701,7 @@ namespace AM.Reporting.Gauge.Radial
         }
 
         /// <inheritdoc/>
-        public override void Serialize (FRWriter writer, string prefix, GaugeScale diff)
+        public override void Serialize (ReportWriter writer, string prefix, GaugeScale diff)
         {
             base.Serialize (writer, prefix, diff);
 

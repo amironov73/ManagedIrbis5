@@ -1802,7 +1802,7 @@ namespace AM.Reporting
         }
 
         /// <inheritdoc/>
-        public override void Serialize (FRWriter writer)
+        public override void Serialize (ReportWriter writer)
         {
             var c = writer.DiffObject as Report;
             writer.ItemName = IsAncestor ? "inherited" : ClassName;
@@ -1927,7 +1927,7 @@ namespace AM.Reporting
         /// <param name="stream">The stream to save to.</param>
         public void Save (Stream stream)
         {
-            using (var writer = new FRWriter())
+            using (var writer = new ReportWriter())
             {
                 if (IsAncestor)
                 {

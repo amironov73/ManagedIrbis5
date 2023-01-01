@@ -685,7 +685,7 @@ namespace AM.Reporting.Data
         }
 
         /// <inheritdoc/>
-        public override void Serialize (FRWriter writer)
+        public override void Serialize (ReportWriter writer)
         {
             writer.ItemName = ClassName;
             var childObjects = ChildObjects;
@@ -711,7 +711,7 @@ namespace AM.Reporting.Data
         /// <param name="stream">Stream to save to.</param>
         public void Save (Stream stream)
         {
-            using (var writer = new FRWriter())
+            using (var writer = new ReportWriter())
             {
                 writer.Write (this);
                 writer.Save (stream);

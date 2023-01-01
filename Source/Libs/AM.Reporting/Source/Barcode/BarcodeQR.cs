@@ -184,7 +184,7 @@ namespace AM.Reporting.Barcode
             QuietZone = src.QuietZone;
         }
 
-        internal override void Serialize (FRWriter writer, string prefix, BarcodeBase diff)
+        internal override void Serialize (ReportWriter writer, string prefix, BarcodeBase diff)
         {
             base.Serialize (writer, prefix, diff);
             var c = diff as BarcodeQR;

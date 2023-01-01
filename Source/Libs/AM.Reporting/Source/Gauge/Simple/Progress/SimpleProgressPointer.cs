@@ -169,7 +169,7 @@ namespace AM.Reporting.Gauge.Simple.Progress
         }
 
         /// <inheritdoc />
-        public override void Serialize (FRWriter writer, string prefix, GaugePointer diff)
+        public override void Serialize (ReportWriter writer, string prefix, GaugePointer diff)
         {
             base.Serialize (writer, prefix, diff);
 

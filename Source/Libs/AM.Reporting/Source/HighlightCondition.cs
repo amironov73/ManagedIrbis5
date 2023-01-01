@@ -64,7 +64,7 @@ namespace AM.Reporting
         #region Public Methods
 
         /// <inheritdoc/>
-        public override void Serialize (FRWriter writer)
+        public override void Serialize (ReportWriter writer)
         {
             var c = writer.DiffObject as HighlightCondition;
             writer.ItemName = "Condition";

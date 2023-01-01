@@ -92,7 +92,7 @@ namespace AM.Reporting.Format
             return "";
         }
 
-        internal override void Serialize (FRWriter writer, string prefix, FormatBase format)
+        internal override void Serialize (ReportWriter writer, string prefix, FormatBase format)
         {
             base.Serialize (writer, prefix, format);
 

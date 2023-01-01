@@ -101,7 +101,7 @@ namespace AM.Reporting.Gauge.Linear
         }
 
         /// <inheritdoc/>
-        public override void Serialize (FRWriter writer)
+        public override void Serialize (ReportWriter writer)
         {
             var c = writer.DiffObject as LinearGauge;
             base.Serialize (writer);

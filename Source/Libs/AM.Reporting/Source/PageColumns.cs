@@ -117,7 +117,7 @@ namespace AM.Reporting
             Positions.Assign (source.Positions);
         }
 
-        internal void Serialize (FRWriter writer, PageColumns c)
+        internal void Serialize (ReportWriter writer, PageColumns c)
         {
             if (Count != c.Count)
             {

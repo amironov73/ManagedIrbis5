@@ -128,7 +128,7 @@ namespace AM.Reporting.CrossView
         }
 
         /// <inheritdoc/>
-        public void Serialize (FRWriter writer)
+        public void Serialize (ReportWriter writer)
         {
             writer.ItemName = Name;
             foreach (CrossViewCellDescriptor d in this)

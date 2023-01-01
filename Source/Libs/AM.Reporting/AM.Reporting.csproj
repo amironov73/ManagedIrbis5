@@ -18,4 +18,8 @@
     <PackageReference Include="System.Text.Encoding.CodePages" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
+  </ItemGroup>
+
 </Project>

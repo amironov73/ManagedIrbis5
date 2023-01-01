@@ -291,7 +291,7 @@ namespace AM.Reporting.Data
         }
 
         /// <inheritdoc/>
-        public override void Serialize (FRWriter writer)
+        public override void Serialize (ReportWriter writer)
         {
             var c = writer.DiffObject as Total;
             base.Serialize (writer);

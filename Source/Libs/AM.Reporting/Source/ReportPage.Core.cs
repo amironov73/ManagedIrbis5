@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -43,7 +43,7 @@ namespace AM.Reporting
         /// </summary>
         /// <param name="writer"></param>
         /// <param name="reportPage"></param>
-        partial void WritePreview (FRWriter writer, ReportPage reportPage);
+        partial void WritePreview (ReportWriter writer, ReportPage reportPage);
 
         #endregion Private Methods
     }

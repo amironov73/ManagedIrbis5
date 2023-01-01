@@ -52,7 +52,7 @@ namespace AM.Reporting
         /// <remarks>
         /// This method is for internal use only.
         /// </remarks>
-        public void Serialize (FRWriter writer)
+        public void Serialize (ReportWriter writer)
         {
             writer.ItemName = "Sort";
             writer.WriteStr ("Expression", Expression);

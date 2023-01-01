@@ -196,7 +196,7 @@ namespace AM.Reporting.Format
             return FormatValue (-12345);
         }
 
-        internal override void Serialize (FRWriter writer, string prefix, FormatBase format)
+        internal override void Serialize (ReportWriter writer, string prefix, FormatBase format)
         {
             base.Serialize (writer, prefix, format);
             var c = format as CurrencyFormat;

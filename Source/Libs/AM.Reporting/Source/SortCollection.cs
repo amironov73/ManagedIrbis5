@@ -112,7 +112,7 @@ namespace AM.Reporting
         }
 
         /// <inheritdoc/>
-        public void Serialize (FRWriter writer)
+        public void Serialize (ReportWriter writer)
         {
             writer.ItemName = "Sort";
             foreach (Sort s in this)

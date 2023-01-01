@@ -100,7 +100,7 @@ namespace AM.Reporting
         }
 
         /// <inheritdoc/>
-        public override void Serialize (FRWriter writer)
+        public override void Serialize (ReportWriter writer)
         {
             var c = writer.DiffObject as BreakableComponent;
             base.Serialize (writer);

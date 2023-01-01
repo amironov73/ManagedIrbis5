@@ -97,7 +97,7 @@ namespace AM.Reporting.Preview
             }
 
             item = item.Add();
-            using (var writer = new FRWriter (item))
+            using (var writer = new ReportWriter (item))
             {
                 writer.SerializeTo = SerializeTo.Preview;
                 writer.SaveChildren = false;
@@ -169,7 +169,7 @@ namespace AM.Reporting.Preview
         private void UpdateUnlimitedPage (Base obj, XmlItem item)
         {
             item.Clear();
-            using (var writer = new FRWriter (item))
+            using (var writer = new ReportWriter (item))
             {
                 writer.SerializeTo = SerializeTo.Preview;
                 writer.SaveChildren = false;
@@ -380,7 +380,7 @@ namespace AM.Reporting.Preview
 
                     pageSize = new SizeF (page.WidthInPixels, page.HeightInPixels);
 
-                    using (var writer = new FRWriter (item))
+                    using (var writer = new ReportWriter (item))
                     {
                         writer.SerializeTo = SerializeTo.Preview;
                         writer.SaveChildren = false;
@@ -403,7 +403,7 @@ namespace AM.Reporting.Preview
             // page == null when we load prepared report from a file
             if (page != null)
             {
-                using (var writer = new FRWriter (xmlItem))
+                using (var writer = new ReportWriter (xmlItem))
                 {
                     writer.SerializeTo = SerializeTo.Preview;
                     writer.SaveChildren = false;

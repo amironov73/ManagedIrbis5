@@ -100,7 +100,7 @@ namespace AM.Reporting.Matrix
         }
 
         /// <inheritdoc/>
-        public virtual void Serialize (FRWriter writer)
+        public virtual void Serialize (ReportWriter writer)
         {
             var c = writer.DiffObject as MatrixDescriptor;
 

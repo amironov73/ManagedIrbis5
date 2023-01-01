@@ -148,7 +148,7 @@ namespace AM.Reporting.Matrix
         }
 
         /// <inheritdoc/>
-        public override void Serialize (FRWriter writer)
+        public override void Serialize (ReportWriter writer)
         {
             var c = writer.DiffObject as MatrixHeaderDescriptor;
             base.Serialize (writer);

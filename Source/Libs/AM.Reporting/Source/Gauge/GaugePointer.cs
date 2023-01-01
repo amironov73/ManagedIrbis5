@@ -115,7 +115,7 @@ namespace AM.Reporting.Gauge
         /// <remarks>
         /// This method is for internal use only.
         /// </remarks>
-        public virtual void Serialize (FRWriter writer, string prefix, GaugePointer diff)
+        public virtual void Serialize (ReportWriter writer, string prefix, GaugePointer diff)
         {
             Fill.Serialize (writer, prefix + ".Fill", diff.Fill);
             if (BorderWidth != diff.BorderWidth)

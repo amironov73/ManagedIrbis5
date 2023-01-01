@@ -838,7 +838,7 @@ public abstract partial class Base : Component, IFRSerializable
     ///   </list>
     /// </remarks>
     /// <param name="writer">Writer object.</param>
-    public virtual void Serialize (FRWriter writer)
+    public virtual void Serialize (ReportWriter writer)
     {
         var c = (writer.DiffObject as Base)!;
         if (writer.SerializeTo != SerializeTo.Preview)
@@ -927,7 +927,7 @@ public abstract partial class Base : Component, IFRSerializable
         try
         {
             using (var xml = new XmlItem())
-            using (var writer = new FRWriter (xml))
+            using (var writer = new ReportWriter (xml))
             using (var reader = new FRReader (Report!, xml))
             {
                 writer.SaveChildren = false;

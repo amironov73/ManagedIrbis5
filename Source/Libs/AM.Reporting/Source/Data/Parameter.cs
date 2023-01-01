@@ -192,7 +192,7 @@ namespace AM.Reporting.Data
         }
 
         /// <inheritdoc/>
-        public override void Serialize (FRWriter writer)
+        public override void Serialize (ReportWriter writer)
         {
             base.Serialize (writer);
             writer.WriteValue ("DataType", DataType);

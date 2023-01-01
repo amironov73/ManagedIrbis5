@@ -249,7 +249,7 @@ namespace AM.Reporting.Export
         private void SaveSettings()
         {
             var root = Config.Root.FindItem ("Preview").FindItem ("Exports").FindItem (ClassName);
-            using (var writer = new FRWriter (root))
+            using (var writer = new ReportWriter (root))
             {
                 root.Clear();
                 writer.Write (this);
@@ -341,7 +341,7 @@ namespace AM.Reporting.Export
         }
 
         /// <inheritdoc/>
-        public override void Serialize (FRWriter writer)
+        public override void Serialize (ReportWriter writer)
         {
             writer.WriteValue ("PageRange", PageRange);
             writer.WriteStr ("PageNumbers", PageNumbers);

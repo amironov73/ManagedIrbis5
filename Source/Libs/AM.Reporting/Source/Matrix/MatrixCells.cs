@@ -296,7 +296,7 @@ namespace AM.Reporting.Matrix
         }
 
         /// <inheritdoc/>
-        public void Serialize (FRWriter writer)
+        public void Serialize (ReportWriter writer)
         {
             writer.ItemName = Name;
             foreach (MatrixCellDescriptor d in this)

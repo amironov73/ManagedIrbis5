@@ -151,7 +151,7 @@ namespace AM.Reporting.Gauge
         /// <remarks>
         /// This method is for internal use only.
         /// </remarks>
-        public virtual void Serialize (FRWriter writer, string prefix, GaugeLabel diff)
+        public virtual void Serialize (ReportWriter writer, string prefix, GaugeLabel diff)
         {
             if (Text != diff.Text)
             {

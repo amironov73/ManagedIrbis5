@@ -64,7 +64,7 @@ namespace AM.Reporting.Format
 
         internal abstract string GetSampleValue();
 
-        internal virtual void Serialize (FRWriter writer, string prefix, FormatBase format)
+        internal virtual void Serialize (ReportWriter writer, string prefix, FormatBase format)
         {
             if (format.GetType() != GetType())
             {
@@ -73,7 +73,7 @@ namespace AM.Reporting.Format
         }
 
         /// <inheritdoc/>
-        public void Serialize (FRWriter writer)
+        public void Serialize (ReportWriter writer)
         {
             writer.ItemName = GetType().Name;
             Serialize (writer, "", writer.DiffObject as FormatBase);

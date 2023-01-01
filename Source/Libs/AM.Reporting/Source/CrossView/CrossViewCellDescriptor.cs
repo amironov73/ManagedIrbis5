@@ -162,7 +162,7 @@ namespace AM.Reporting.CrossView
         }
 
         /// <inheritdoc/>
-        public override void Serialize (FRWriter writer)
+        public override void Serialize (ReportWriter writer)
         {
             var c = writer.DiffObject as CrossViewCellDescriptor;
             base.Serialize (writer);

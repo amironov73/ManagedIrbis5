@@ -100,7 +100,7 @@ namespace AM.Reporting.CrossView
         }
 
         /// <inheritdoc/>
-        public virtual void Serialize (FRWriter writer)
+        public virtual void Serialize (ReportWriter writer)
         {
             var c = writer.DiffObject as CrossViewDescriptor;
 

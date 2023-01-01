@@ -234,7 +234,7 @@ namespace AM.Reporting.Barcode
             PrintCheckSum = src.PrintCheckSum;
         }
 
-        internal override void Serialize (FRWriter writer, string prefix, BarcodeBase diff)
+        internal override void Serialize (ReportWriter writer, string prefix, BarcodeBase diff)
         {
             base.Serialize (writer, prefix, diff);
 
@@ -305,7 +305,7 @@ namespace AM.Reporting.Barcode
 
         #endregion
 
-        internal override void Serialize (FRWriter writer, string prefix, BarcodeBase diff)
+        internal override void Serialize (ReportWriter writer, string prefix, BarcodeBase diff)
         {
             base.Serialize (writer, prefix, diff);
 
@@ -492,7 +492,7 @@ namespace AM.Reporting.Barcode
             DrawString (g, 0, drawArea.Width, data.Insert (1, " ").Insert (4, " ").Insert (10, " ").Insert (16, " "));
         }
 
-        internal override void Serialize (FRWriter writer, string prefix, BarcodeBase diff)
+        internal override void Serialize (ReportWriter writer, string prefix, BarcodeBase diff)
         {
             base.Serialize (writer, prefix, diff);
 

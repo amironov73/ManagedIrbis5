@@ -97,7 +97,7 @@ namespace AM.Reporting.Barcode
             QuietZone = src.QuietZone;
         }
 
-        internal override void Serialize (Utils.FRWriter writer, string prefix, BarcodeBase diff)
+        internal override void Serialize (Utils.ReportWriter writer, string prefix, BarcodeBase diff)
         {
             base.Serialize (writer, prefix, diff);
             if (diff is not BarcodePharmacode c || QuietZone != c.QuietZone)

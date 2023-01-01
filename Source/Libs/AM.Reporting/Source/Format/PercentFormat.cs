@@ -192,7 +192,7 @@ namespace AM.Reporting.Format
             return FormatValue (1.23f);
         }
 
-        internal override void Serialize (FRWriter writer, string prefix, FormatBase format)
+        internal override void Serialize (ReportWriter writer, string prefix, FormatBase format)
         {
             base.Serialize (writer, prefix, format);
             var c = format as PercentFormat;

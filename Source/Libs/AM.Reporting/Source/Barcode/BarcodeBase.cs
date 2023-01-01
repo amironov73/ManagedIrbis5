@@ -79,7 +79,7 @@ namespace AM.Reporting.Barcode
             Color = source.Color;
         }
 
-        internal virtual void Serialize (FRWriter writer, string prefix, BarcodeBase diff)
+        internal virtual void Serialize (ReportWriter writer, string prefix, BarcodeBase diff)
         {
             if (diff.GetType() != GetType())
             {

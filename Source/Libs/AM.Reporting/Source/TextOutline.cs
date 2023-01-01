@@ -141,7 +141,7 @@ namespace AM.Reporting
         /// <param name="writer">Writer object.</param>
         /// <param name="prefix">TextOutline property name.</param>
         /// <param name="diff">Another TextOutline to compare with.</param>
-        public void Serialize (FRWriter writer, string prefix, TextOutline diff)
+        public void Serialize (ReportWriter writer, string prefix, TextOutline diff)
         {
             if (Enabled != diff.Enabled)
             {

@@ -120,7 +120,7 @@ namespace AM.Reporting.Format
         }
 
         /// <inheritdoc/>
-        public void Serialize (FRWriter writer)
+        public void Serialize (ReportWriter writer)
         {
             writer.ItemName = "Formats";
             foreach (FormatBase c in this)

@@ -548,7 +548,7 @@ namespace AM.Reporting
         }
 
         /// <inheritdoc/>
-        public override void Serialize (FRWriter writer)
+        public override void Serialize (ReportWriter writer)
         {
             Border.SimpleBorder = true;
             base.Serialize (writer);

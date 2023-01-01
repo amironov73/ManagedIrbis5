@@ -50,7 +50,7 @@ namespace AM.Reporting
         /// </summary>
         /// <param name="writer"></param>
         /// <param name="report"></param>
-        partial void SerializeDesign (FRWriter writer, Report report);
+        partial void SerializeDesign (ReportWriter writer, Report report);
 
         /// <summary>
         /// Does nothing

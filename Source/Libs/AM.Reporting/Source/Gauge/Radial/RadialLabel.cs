@@ -41,7 +41,7 @@ namespace AM.Reporting.Gauge.Radial
             base.Assign (src);
         }
 
-        public override void Serialize (FRWriter writer, string prefix, GaugeLabel diff)
+        public override void Serialize (ReportWriter writer, string prefix, GaugeLabel diff)
         {
             base.Serialize (writer, prefix, diff);
         }

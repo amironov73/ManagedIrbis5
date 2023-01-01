@@ -344,7 +344,7 @@ namespace AM.Reporting.Table
         }
 
         /// <inheritdoc/>
-        public override void Serialize (FRWriter writer)
+        public override void Serialize (ReportWriter writer)
         {
             var c = writer.DiffObject as TableRow;
             serializingToPreview = writer.SerializeTo == SerializeTo.Preview;

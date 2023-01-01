@@ -419,7 +419,7 @@ namespace AM.Reporting.CrossView
         }
 
         /// <inheritdoc/>
-        public override void Serialize (FRWriter writer)
+        public override void Serialize (ReportWriter writer)
         {
             if (writer.SerializeTo != SerializeTo.SourcePages)
             {

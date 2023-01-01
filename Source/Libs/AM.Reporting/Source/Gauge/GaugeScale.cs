@@ -119,7 +119,7 @@ namespace AM.Reporting.Gauge
         /// <remarks>
         /// This method is for internal use only.
         /// </remarks>
-        public virtual void Serialize (FRWriter writer, string prefix, GaugeScale diff)
+        public virtual void Serialize (ReportWriter writer, string prefix, GaugeScale diff)
         {
             TextFill.Serialize (writer, prefix + ".TextFill", diff.TextFill);
             if ((writer.SerializeTo != SerializeTo.Preview || !Font.Equals (diff.Font)) &&
@@ -235,7 +235,7 @@ namespace AM.Reporting.Gauge
         /// <remarks>
         /// This method is for internal use only.
         /// </remarks>
-        public virtual void Serialize (FRWriter writer, string prefix, ScaleTicks diff)
+        public virtual void Serialize (ReportWriter writer, string prefix, ScaleTicks diff)
         {
             if (Length != diff.Length)
             {

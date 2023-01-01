@@ -265,7 +265,7 @@ namespace AM.Reporting
             }
         }
 
-        internal void Serialize (FRWriter writer, string prefix, BorderLine c)
+        internal void Serialize (ReportWriter writer, string prefix, BorderLine c)
         {
             if (Color != c.Color)
             {
@@ -535,7 +535,7 @@ namespace AM.Reporting
         /// <remarks>
         /// This method is for internal use only.
         /// </remarks>
-        public void Serialize (FRWriter writer, string prefix, Border c)
+        public void Serialize (ReportWriter writer, string prefix, Border c)
         {
             if (Shadow != c.Shadow)
             {

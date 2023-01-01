@@ -431,7 +431,7 @@ namespace AM.Reporting.Barcode
             Trim = src.Trim;
         }
 
-        internal override void Serialize (FRWriter writer, string prefix, BarcodeBase diff)
+        internal override void Serialize (ReportWriter writer, string prefix, BarcodeBase diff)
         {
             base.Serialize (writer, prefix, diff);
             var c = diff as LinearBarcodeBase;

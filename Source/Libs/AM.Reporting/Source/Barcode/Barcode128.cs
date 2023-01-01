@@ -665,7 +665,7 @@ namespace AM.Reporting.Barcode
             AutoEncode = (source as Barcode128).AutoEncode;
         }
 
-        internal override void Serialize (FRWriter writer, string prefix, BarcodeBase diff)
+        internal override void Serialize (ReportWriter writer, string prefix, BarcodeBase diff)
         {
             base.Serialize (writer, prefix, diff);
 

@@ -336,7 +336,7 @@ namespace AM.Reporting.Gauge.Simple
         }
 
         /// <inheritdoc/>
-        public override void Serialize (FRWriter writer, string prefix, GaugeScale diff)
+        public override void Serialize (ReportWriter writer, string prefix, GaugeScale diff)
         {
             base.Serialize (writer, prefix, diff);
 
@@ -410,7 +410,7 @@ namespace AM.Reporting.Gauge.Simple
         /// <remarks>
         /// This method is for internal use only.
         /// </remarks>
-        public virtual void Serialize (FRWriter writer, string prefix, SimpleSubScale diff)
+        public virtual void Serialize (ReportWriter writer, string prefix, SimpleSubScale diff)
         {
             if (Enabled != diff.Enabled)
             {

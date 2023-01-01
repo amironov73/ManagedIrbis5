@@ -205,7 +205,7 @@ namespace AM.Reporting
             SaveMode = SaveMode.All;
         }
 
-        internal void Serialize (FRWriter writer, ReportInfo c)
+        internal void Serialize (ReportWriter writer, ReportInfo c)
         {
             if (Name != c.Name)
             {
