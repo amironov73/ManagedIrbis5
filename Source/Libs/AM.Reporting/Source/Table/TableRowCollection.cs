@@ -31,7 +31,7 @@ namespace AM.Reporting.Table
     /// <summary>
     /// Represents a collection of <see cref="TableRow"/> objects.
     /// </summary>
-    public class TableRowCollection : FRCollectionBase
+    public class TableRowCollection : ReportCollectionBase
     {
         /// <summary>
         /// Gets a row with specified index.

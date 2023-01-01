@@ -30,7 +30,7 @@ namespace AM.Reporting
     /// <summary>
     /// Holds the list of objects of <see cref="Base"/> type.
     /// </summary>
-    public class ObjectCollection : FRCollectionBase
+    public class ObjectCollection : ReportCollectionBase
     {
         /// <summary>
         /// Gets or sets the element at the specified index.

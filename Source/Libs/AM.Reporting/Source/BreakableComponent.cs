@@ -30,11 +30,12 @@ namespace AM.Reporting
     /// <summary>
     /// Base class for report components that can break across pages.
     /// </summary>
-    public class BreakableComponent : ReportComponentBase
+    public class BreakableComponent
+        : ReportComponentBase
     {
         #region Fields
 
-        private BreakableComponent breakTo;
+        private BreakableComponent? breakTo;
 
         #endregion
 
@@ -54,7 +55,7 @@ namespace AM.Reporting
         [Category ("Behavior")]
         [TypeConverter (typeof (TypeConverters.ComponentRefConverter))]
         [Editor ("AM.Reporting.TypeEditors.BandComponentRefEditor, AM.Reporting", typeof (UITypeEditor))]
-        public BreakableComponent BreakTo
+        public BreakableComponent? BreakTo
         {
             get => breakTo;
             set
@@ -63,12 +64,12 @@ namespace AM.Reporting
                 {
                     if (breakTo != null)
                     {
-                        breakTo.Disposed -= new EventHandler (BreakTo_Disposed);
+                        breakTo.Disposed -= BreakTo_Disposed;
                     }
 
                     if (value != null)
                     {
-                        value.Disposed += new EventHandler (BreakTo_Disposed);
+                        value.Disposed += BreakTo_Disposed;
                     }
                 }
 
@@ -80,7 +81,7 @@ namespace AM.Reporting
 
         #region Private Methods
 
-        private void BreakTo_Disposed (object sender, EventArgs e)
+        private void BreakTo_Disposed (object? sender, EventArgs eventArgs)
         {
             breakTo = null;
         }

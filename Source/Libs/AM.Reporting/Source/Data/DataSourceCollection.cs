@@ -31,7 +31,7 @@ namespace AM.Reporting.Data
     /// <summary>
     /// Represents the collection of <see cref="DataSourceBase"/> objects.
     /// </summary>
-    public class DataSourceCollection : FRCollectionBase
+    public class DataSourceCollection : ReportCollectionBase
     {
         /// <summary>
         /// Gets or sets a data source.

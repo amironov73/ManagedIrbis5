@@ -31,7 +31,7 @@ namespace AM.Reporting.Data
     /// <summary>
     /// Represents the collection of <see cref="TableDataSource"/> objects.
     /// </summary>
-    public class TableCollection : FRCollectionBase
+    public class TableCollection : ReportCollectionBase
     {
         /// <summary>
         /// Gets or sets a data table.

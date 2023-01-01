@@ -31,7 +31,7 @@ namespace AM.Reporting
     /// <summary>
     /// Holds the list of objects of <see cref="PageBase"/> type.
     /// </summary>
-    public class PageCollection : FRCollectionBase
+    public class PageCollection : ReportCollectionBase
     {
         /// <summary>
         /// Gets or sets the element at the specified index.

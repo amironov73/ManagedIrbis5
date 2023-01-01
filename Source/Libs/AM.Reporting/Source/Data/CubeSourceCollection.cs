@@ -31,7 +31,7 @@ namespace AM.Reporting.Data
     /// <summary>
     /// Represents the collection of <see cref="CubeSourceBase"/> objects.
     /// </summary>
-    public class CubeSourceCollection : FRCollectionBase
+    public class CubeSourceCollection : ReportCollectionBase
     {
         /// <summary>
         /// Gets or sets a data source.

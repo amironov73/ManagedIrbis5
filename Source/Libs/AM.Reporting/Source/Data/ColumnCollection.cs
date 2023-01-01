@@ -31,7 +31,7 @@ namespace AM.Reporting.Data
     /// <summary>
     /// Represents the collection of <see cref="Column"/> objects.
     /// </summary>
-    public class ColumnCollection : FRCollectionBase
+    public class ColumnCollection : ReportCollectionBase
     {
         /// <summary>
         /// Gets or sets a column.

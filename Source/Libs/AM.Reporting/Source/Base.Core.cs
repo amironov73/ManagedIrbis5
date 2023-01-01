@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* Base.Core.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,18 +21,17 @@ using System.Collections.Generic;
 
 #nullable enable
 
-namespace AM.Reporting
+namespace AM.Reporting;
+
+partial class Base
 {
-    partial class Base
+    /// <summary>
+    /// Does nothing
+    /// </summary>
+    /// <param name="macroValues"></param>
+    /// <param name="text"></param>
+    private string ExtractDefaultMacrosInternal (Dictionary<string, object> macroValues, string text)
     {
-        /// <summary>
-        /// Does nothing
-        /// </summary>
-        /// <param name="macroValues"></param>
-        /// <param name="text"></param>
-        private string ExtractDefaultMacrosInternal (Dictionary<string, object> macroValues, string text)
-        {
-            return text;
-        }
+        return text;
     }
 }

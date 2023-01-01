@@ -35,7 +35,7 @@ namespace AM.Reporting.Data
     /// This class is used to store the list of parameters defined in the datasource. See the
     /// <see cref="TableDataSource.Parameters"/> property for more details.
     /// </remarks>
-    public class CommandParameterCollection : FRCollectionBase
+    public class CommandParameterCollection : ReportCollectionBase
     {
         /// <summary>
         /// Gets or sets a parameter.

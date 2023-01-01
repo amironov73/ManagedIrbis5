@@ -31,7 +31,7 @@ namespace AM.Reporting.Data
     /// <summary>
     /// Represents the collection of <see cref="Parameter"/> objects.
     /// </summary>
-    public class ParameterCollection : FRCollectionBase
+    public class ParameterCollection : ReportCollectionBase
     {
         /// <summary>
         /// Gets or sets a parameter.

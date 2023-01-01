@@ -8,7 +8,7 @@
 // ReSharper disable MemberCanBeProtected.Global
 // ReSharper disable PropertyCanBeMadeInitOnly.Global
 
-/* BandBase.cs --
+/* BandBase.cs -- базовый класс для всех полос отчета
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -29,7 +29,7 @@ using AM.Reporting.Utils;
 namespace AM.Reporting;
 
 /// <summary>
-/// Базовый класс для всех полос.
+/// Базовый класс для всех полос отчета.
 /// </summary>
 public abstract partial class BandBase
     : BreakableComponent, IParent
@@ -1069,7 +1069,7 @@ public abstract partial class BandBase
     {
         base.GetData();
 
-        var list = new FRCollectionBase();
+        var list = new ReportCollectionBase();
         Objects.CopyTo (list);
         foreach (ReportComponentBase obj in list)
         {

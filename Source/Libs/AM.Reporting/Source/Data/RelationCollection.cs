@@ -31,7 +31,7 @@ namespace AM.Reporting.Data
     /// <summary>
     /// Represents the collection of <see cref="Relation"/> objects.
     /// </summary>
-    public class RelationCollection : FRCollectionBase
+    public class RelationCollection : ReportCollectionBase
     {
         /// <summary>
         /// Gets or sets a relation.

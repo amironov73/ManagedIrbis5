@@ -31,7 +31,7 @@ namespace AM.Reporting
     /// <summary>
     /// Holds the list of objects of <see cref="ReportComponentBase"/> type.
     /// </summary>
-    public class ReportComponentCollection : FRCollectionBase
+    public class ReportComponentCollection : ReportCollectionBase
     {
         /// <summary>
         /// Gets or sets the element at the specified index.

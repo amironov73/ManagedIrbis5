@@ -31,7 +31,7 @@ namespace AM.Reporting.Data
     /// <summary>
     /// Represents the collection of <see cref="DataConnectionBase"/> objects.
     /// </summary>
-    public class ConnectionCollection : FRCollectionBase
+    public class ConnectionCollection : ReportCollectionBase
     {
         /// <summary>
         /// Gets or sets a data connection.

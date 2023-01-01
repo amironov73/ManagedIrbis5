@@ -28,38 +28,6 @@ using AM.Reporting.Utils;
 namespace AM.Reporting
 {
     /// <summary>
-    /// Specifies a line cap style.
-    /// </summary>
-    public enum CapStyle
-    {
-        /// <summary>
-        /// Specifies a line without a cap.
-        /// </summary>
-        None,
-
-        /// <summary>
-        /// Specifies a line with a circle cap.
-        /// </summary>
-        Circle,
-
-        /// <summary>
-        /// Specifies a line with a square cap.
-        /// </summary>
-        Square,
-
-        /// <summary>
-        /// Specifies a line with a diamond cap.
-        /// </summary>
-        Diamond,
-
-
-        /// <summary>
-        /// Specifies a line with an arrow cap.
-        /// </summary>
-        Arrow
-    }
-
-    /// <summary>
     /// Specifies a start and end line caps.
     /// </summary>
     [TypeConverter (typeof (TypeConverters.FRExpandableObjectConverter))]

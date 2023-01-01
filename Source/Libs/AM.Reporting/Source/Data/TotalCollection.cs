@@ -30,7 +30,7 @@ namespace AM.Reporting.Data
     /// <summary>
     /// Represents the collection of <see cref="Total"/> objects.
     /// </summary>
-    public class TotalCollection : FRCollectionBase
+    public class TotalCollection : ReportCollectionBase
     {
         /// <summary>
         /// Gets or sets a total.

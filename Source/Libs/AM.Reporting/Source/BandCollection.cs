@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable UnusedMember.Global
 
-/* BandCollection.cs --
+/* BandCollection.cs -- коллекция полос отчета
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,10 +20,10 @@ using AM.Reporting.Utils;
 namespace AM.Reporting;
 
 /// <summary>
-/// Represents a collection of bands.
+/// Коллекция полос отчета.
 /// </summary>
 public class BandCollection
-    : FRCollectionBase
+    : ReportCollectionBase
 {
     #region Properties
 

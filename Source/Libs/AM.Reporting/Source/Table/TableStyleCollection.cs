@@ -27,7 +27,7 @@ using AM.Reporting.Utils;
 
 namespace AM.Reporting.Table
 {
-    internal class TableStyleCollection : FRCollectionBase
+    internal class TableStyleCollection : ReportCollectionBase
     {
         public TableCell DefaultStyle { get; }
 
