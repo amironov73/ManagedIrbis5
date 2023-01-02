@@ -36,7 +36,7 @@ namespace AM.Reporting.Data;
 public class BusinessObjectDataSource
     : DataSourceBase
 {
-    #region Properties
+    #region Events
 
     /// <summary>
     /// Occurs when AM.Reporting engine loads data source with data from a business object.
@@ -45,15 +45,19 @@ public class BusinessObjectDataSource
     /// Use this event if you want to implement load-on-demand. Event handler must load the data into
     /// your business object.
     /// </remarks>
-    public event LoadBusinessObjectEventHandler LoadBusinessObject;
+    public event LoadBusinessObjectEventHandler? LoadBusinessObject;
 
     #endregion
 
-    #region Private Methods
+    #region Private methods
 
-    private void LoadData (IEnumerable enumerable, ArrayList rows)
+    private void LoadData
+        (
+            IEnumerable? enumerable,
+            IList rows
+        )
     {
-        if (enumerable == null)
+        if (enumerable is null)
         {
             return;
         }
@@ -69,26 +73,26 @@ public class BusinessObjectDataSource
 
     private void OnLoadBusinessObject()
     {
-        if (LoadBusinessObject != null)
-        {
-            LoadBusinessObject (this, new LoadBusinessObjectEventArgs (Value));
-        }
+        LoadBusinessObject?.Invoke (this, new LoadBusinessObjectEventArgs (Value));
     }
 
     #endregion
 
-    #region Protected Methods
+    #region Protected methods
 
-    /// <inheritdoc/>
-    protected override object GetValue (string alias)
+    /// <inheritdoc cref="DataSourceBase.GetValue(string)"/>
+    protected override object? GetValue
+        (
+            string alias
+        )
     {
-        string[] colAliases = alias.Split ('.');
-        Column column = this;
+        var colAliases = alias.Split ('.');
+        Column? column = this;
 
         foreach (var colAlias in colAliases)
         {
             column = column.Columns.FindByAlias (colAlias);
-            if (column == null)
+            if (column is null)
             {
                 return null;
             }
@@ -98,37 +102,40 @@ public class BusinessObjectDataSource
     }
 
 
-    /// <inheritdoc/>
-    protected override object GetValue (Column column)
+    /// <inheritdoc cref="DataSourceBase.GetValue(AM.Reporting.Data.Column)"/>
+    protected override object? GetValue
+        (
+            Column? column
+        )
     {
-        if (column == null)
+        if (column is null)
         {
             return null;
         }
 
         // check if column is a list value
-        if (column.PropDescriptor == null && column.PropName == "Value")
+        if (column.PropDescriptor is null && column.PropertyName == "Value")
         {
             return CurrentRow;
         }
 
         // get nested columns in right order
-        List<Column> columns = new List<Column>();
+        var columns = new List<Column>();
         while (column != this)
         {
-            columns.Insert (0, column);
-            column = column.Parent as Column;
+            columns.Insert (0, column!);
+            column = column!.Parent as Column;
         }
 
         var obj = CurrentRow;
         foreach (var c in columns)
         {
-            if (obj == null)
+            if (obj is null)
             {
                 return null;
             }
 
-            obj = c.PropDescriptor.GetValue (obj);
+            obj = c.PropDescriptor!.GetValue (obj);
         }
 
         return obj;
@@ -136,16 +143,19 @@ public class BusinessObjectDataSource
 
     #endregion
 
-    #region Public Methods
+    #region Public methods
 
-    /// <inheritdoc/>
+    /// <inheritdoc cref="DataSourceBase.InitSchema"/>
     public override void InitSchema()
     {
         // do nothing; the schema was initialized when we register a business object.
     }
 
-    /// <inheritdoc/>
-    public override void LoadData (ArrayList rows)
+    /// <inheritdoc cref="DataSourceBase.LoadData"/>
+    public override void LoadData
+        (
+            IList rows
+        )
     {
         rows.Clear();
 
@@ -167,7 +177,7 @@ public class BusinessObjectDataSource
                 parent.Init();
             }
 
-            if (parent == null)
+            if (parent is null)
             {
                 // this is a root business object, its Reference property contains IEnumerable.
                 LoadData (Reference as IEnumerable, rows);
@@ -196,8 +206,8 @@ public class BusinessObjectDataSource
         // compatibility with old reports: try to use last part of ReferenceName as a value for PropName
         if (!string.IsNullOrEmpty (ReferenceName) && ReferenceName.Contains ("."))
         {
-            string[] names = ReferenceName.Split ('.');
-            PropName = names[names.Length - 1];
+            var names = ReferenceName.Split ('.');
+            PropertyName = names[names.Length - 1];
             ReferenceName = "";
         }
 
@@ -207,7 +217,7 @@ public class BusinessObjectDataSource
         {
             if (column is BusinessObjectDataSource)
             {
-                dataSourceNames.Add (column.PropName);
+                dataSourceNames.Add (column.PropertyName);
             }
         }
 
@@ -216,7 +226,7 @@ public class BusinessObjectDataSource
         for (var i = 0; i < Columns.Count; i++)
         {
             var column = Columns[i];
-            if (column is not BusinessObjectDataSource && dataSourceNames.Contains (column.PropName))
+            if (column is not BusinessObjectDataSource && dataSourceNames.Contains (column.PropertyName))
             {
                 column.Dispose();
                 i--;

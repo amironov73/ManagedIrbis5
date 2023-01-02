@@ -292,7 +292,7 @@ namespace AM.Reporting.Data
         }
 
         /// <inheritdoc/>
-        public override void LoadData (ArrayList rows)
+        public override void LoadData (IList rows)
         {
             if (Connection != null)
             {

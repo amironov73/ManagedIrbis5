@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* Column.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,456 +22,372 @@ using System.Drawing;
 using AM.Reporting.Utils;
 using AM.Reporting.Format;
 
-using System.Drawing.Design;
-
 #endregion
 
 #nullable enable
 
-namespace AM.Reporting.Data
+namespace AM.Reporting.Data;
+
+/// <summary>
+/// This class represents a single data column in a <see cref="DataSourceBase"/>.
+/// </summary>
+public class Column
+    : DataComponentBase, IParent
 {
+    #region Properties
+
     /// <summary>
-    /// Specifies the format for the column value.
+    /// Gets or sets the business object property name which this column is bound to.
     /// </summary>
-    public enum ColumnFormat
+    [Browsable (false)]
+    public string PropertyName { get; set; }
+
+    /// <summary>
+    /// Gets or sets the business object property descriptor which this column is bound to.
+    /// </summary>
+    [Browsable (false)]
+    public PropertyDescriptor? PropDescriptor { get; set; }
+
+    /// <summary>
+    /// Gets or sets the type of data supplied by this column.
+    /// </summary>
+    [TypeConverter (typeof (TypeConverters.DataTypeConverter))]
+    public Type DataType { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value that specifies the type of a control that will be created
+    /// when you drop this column on a report page.
+    /// </summary>
+    /// <remarks>
+    /// If you need to specify the custom type, use the <see cref="CustomBindableControl"/> property instead.
+    /// </remarks>
+    [DefaultValue (ColumnBindableControl.Text)]
+    public ColumnBindableControl BindableControl { get; set; }
+
+    /// <summary>
+    /// Gets or sets a name of custom bindable control.
+    /// </summary>
+    /// <remarks>
+    /// Use this property if you want to bind a column to custom object type. You need to
+    /// specify the type name of your object; that object must be registered in AM.Reporting using the
+    /// <b>RegisteredObjects.Add</b> method.
+    /// </remarks>
+    public string? CustomBindableControl
     {
-        /// <summary>
-        /// The format will be determined automatically depending on the column's DataType.
-        /// </summary>
-        Auto,
-
-        /// <summary>
-        /// Specifies the General format (no formatting).
-        /// </summary>
-        General,
-
-        /// <summary>
-        /// Specifies the Number format.
-        /// </summary>
-        Number,
-
-        /// <summary>
-        /// Specifies the Currency format.
-        /// </summary>
-        Currency,
-
-        /// <summary>
-        /// Specifies the Date format.
-        /// </summary>
-        Date,
-
-        /// <summary>
-        /// Specifies the Time format.
-        /// </summary>
-        Time,
-
-        /// <summary>
-        /// Specifies the Percent format.
-        /// </summary>
-        Percent,
-
-        /// <summary>
-        /// Specifies the Boolean format.
-        /// </summary>
-        Boolean
+        get => _customBindableControl;
+        set
+        {
+            _customBindableControl = value;
+            if (!string.IsNullOrEmpty (value))
+            {
+                BindableControl = ColumnBindableControl.Custom;
+            }
+        }
     }
 
     /// <summary>
-    /// Specifies the type of an object that will be created when you drop the
-    /// data column on a report page.
+    /// Gets or sets the format of this column.
     /// </summary>
-    public enum ColumnBindableControl
-    {
-        /// <summary>
-        /// The column will create the <see cref="TextObject"/> object.
-        /// </summary>
-        Text,
-
-        /// <summary>
-        /// The column will create the <see cref="RichObject"/> object.
-        /// </summary>
-        RichText,
-
-        /// <summary>
-        /// The column will create the <see cref="PictureObject"/> object.
-        /// </summary>
-        Picture,
-
-        /// <summary>
-        /// The column will create the <see cref="CheckBoxObject"/> object.
-        /// </summary>
-        CheckBox,
-
-        /// <summary>
-        /// The column will create the custom object, specified in the
-        /// <see cref="Column.CustomBindableControl"/> property.
-        /// </summary>
-        Custom
-    }
+    /// <remarks>
+    /// This property is used when you drag a column from the Data window to the report page.
+    /// AM.Reporting will create a "Text" object and set its "Format" property to the corresponding format.
+    /// By default, this property is set to <b>Auto</b>. It means that the format will be determined
+    /// automatically depending on the <see cref="DataType"/> property.
+    /// </remarks>
+    [DefaultValue (ColumnFormat.Auto)]
+    public ColumnFormat Format { get; set; }
 
     /// <summary>
-    /// This class represents a single data column in a <see cref="DataSourceBase"/>.
+    /// Gets or sets expression of the calculated column.
     /// </summary>
-    public partial class Column : DataComponentBase, IParent
+    /// <remarks>
+    /// This property is used if the <see cref="Calculated"/> property is <b>true</b>.
+    /// </remarks>
+    public string Expression { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value that indicates whether this column is calculated.
+    /// </summary>
+    /// <remarks>
+    /// You should specify the <see cref="Expression"/> property for calculated columns.
+    /// </remarks>
+    [DefaultValue (false)]
+    public bool Calculated { get; set; }
+
+    /// <summary>
+    /// Gets the collection of child columns.
+    /// </summary>
+    [Browsable (false)]
+    public ColumnCollection Columns { get; }
+
+    /// <summary>
+    /// Gets or sets the tag value.
+    /// </summary>
+    [Browsable (false)]
+    internal object? Tag { get; set; }
+
+    internal object? Value
     {
-        #region Fields
-
-        private string customBindableControl;
-
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// Gets or sets the business object property name which this column is bound to.
-        /// </summary>
-        [Browsable (false)]
-        public string PropName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the business object property descriptor which this column is bound to.
-        /// </summary>
-        [Browsable (false)]
-        public PropertyDescriptor PropDescriptor { get; set; }
-
-        /// <summary>
-        /// Gets or sets the type of data supplied by this column.
-        /// </summary>
-        [TypeConverter (typeof (TypeConverters.DataTypeConverter))]
-        [Category ("Data")]
-        [Editor ("AM.Reporting.TypeEditors.DataTypeEditor, AM.Reporting", typeof (UITypeEditor))]
-        public Type DataType { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value that specifies the type of a control that will be created
-        /// when you drop this column on a report page.
-        /// </summary>
-        /// <remarks>
-        /// If you need to specify the custom type, use the <see cref="CustomBindableControl"/> property instead.
-        /// </remarks>
-        [DefaultValue (ColumnBindableControl.Text)]
-        [Category ("Design")]
-        public ColumnBindableControl BindableControl { get; set; }
-
-        /// <summary>
-        /// Gets or sets a name of custom bindable control.
-        /// </summary>
-        /// <remarks>
-        /// Use this property if you want to bind a column to custom object type. You need to
-        /// specify the type name of your object; that object must be registered in AM.Reporting using the
-        /// <b>RegisteredObjects.Add</b> method.
-        /// </remarks>
-        [Category ("Design")]
-        public string CustomBindableControl
+        get
         {
-            get => customBindableControl;
-            set
+            if (Calculated)
             {
-                customBindableControl = value;
-                if (!string.IsNullOrEmpty (value))
+                if (!string.IsNullOrEmpty (Expression))
                 {
-                    BindableControl = ColumnBindableControl.Custom;
+                    return Report!.Calc (Expression);
                 }
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the format of this column.
-        /// </summary>
-        /// <remarks>
-        /// This property is used when you drag a column from the Data window to the report page.
-        /// AM.Reporting will create a "Text" object and set its "Format" property to the corresponding format.
-        /// By default, this property is set to <b>Auto</b>. It means that the format will be determined
-        /// automatically depending on the <see cref="DataType"/> property.
-        /// </remarks>
-        [DefaultValue (ColumnFormat.Auto)]
-        [Category ("Design")]
-        public ColumnFormat Format { get; set; }
-
-        /// <summary>
-        /// Gets or sets expression of the calculated column.
-        /// </summary>
-        /// <remarks>
-        /// This property is used if the <see cref="Calculated"/> property is <b>true</b>.
-        /// </remarks>
-        [Category ("Data")]
-        [Editor ("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof (UITypeEditor))]
-        public string Expression { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value that indicates whether this column is calculated.
-        /// </summary>
-        /// <remarks>
-        /// You should specify the <see cref="Expression"/> property for calculated columns.
-        /// </remarks>
-        [DefaultValue (false)]
-        [Category ("Data")]
-        public bool Calculated { get; set; }
-
-        /// <summary>
-        /// Gets the collection of child columns.
-        /// </summary>
-        [Browsable (false)]
-        public ColumnCollection Columns { get; }
-
-        /// <summary>
-        /// Gets or sets the tag value.
-        /// </summary>
-        [Browsable (false)]
-        internal object Tag { get; set; }
-
-        internal object Value
-        {
-            get
-            {
-                if (Calculated)
-                {
-                    if (!string.IsNullOrEmpty (Expression))
-                    {
-                        return Report.Calc (Expression);
-                    }
-                }
-                else
-                {
-                    var dataSource = ParentDataSource;
-                    if (dataSource != null)
-                    {
-                        return dataSource[this];
-                    }
-                }
-
-                return null;
-            }
-        }
-
-        internal DataSourceBase ParentDataSource
-        {
-            get
-            {
-                var parent = Parent;
-                while (parent != null)
-                {
-                    if (parent is DataSourceBase @base)
-                    {
-                        return @base;
-                    }
-
-                    parent = parent.Parent;
-                }
-
-                return null;
-            }
-        }
-
-        internal string FullName
-        {
-            get
-            {
-                if (Parent is Column)
-                {
-                    return (Parent as Column).FullName + "." + Alias;
-                }
-
-                return Alias;
-            }
-        }
-
-        #endregion
-
-        #region Public Methods
-
-        /// <inheritdoc/>
-        public override void SetName (string value)
-        {
-            base.SetName (value);
-            if (string.IsNullOrEmpty (PropName))
-            {
-                PropName = Name;
-            }
-        }
-
-        internal Column FindByPropName (string propName)
-        {
-            foreach (Column c in Columns)
-            {
-                if (c.PropName == propName)
-                {
-                    return c;
-                }
-            }
-
-            return null;
-        }
-
-        internal void SetBindableControlType (Type type)
-        {
-            if (type == typeof (byte[]) || typeof (Image).IsAssignableFrom (type))
-            {
-                BindableControl = ColumnBindableControl.Picture;
-            }
-            else if (type == typeof (bool))
-            {
-                BindableControl = ColumnBindableControl.CheckBox;
             }
             else
             {
-                BindableControl = ColumnBindableControl.Text;
-            }
-        }
-
-        internal FormatBase GetFormat()
-        {
-            switch (Format)
-            {
-                case ColumnFormat.Auto:
-                    if (DataType == typeof (decimal))
-                    {
-                        return new CurrencyFormat();
-                    }
-                    else if (DataType == typeof (float) || DataType == typeof (double))
-                    {
-                        return new NumberFormat();
-                    }
-                    else if (DataType == typeof (DateTime))
-                    {
-                        return new DateFormat();
-                    }
-
-                    break;
-
-                case ColumnFormat.Number:
-                    return new NumberFormat();
-
-                case ColumnFormat.Currency:
-                    return new CurrencyFormat();
-
-                case ColumnFormat.Date:
-                    return new DateFormat();
-
-                case ColumnFormat.Time:
-                    return new TimeFormat();
-
-                case ColumnFormat.Percent:
-                    return new PercentFormat();
-
-                case ColumnFormat.Boolean:
-                    return new BooleanFormat();
-            }
-
-            return new GeneralFormat();
-        }
-
-        /// <inheritdoc/>
-        public override void Serialize (ReportWriter writer)
-        {
-            base.Serialize (writer);
-            writer.WriteValue ("DataType", DataType);
-            if (PropName != Name)
-            {
-                writer.WriteStr ("PropName", PropName);
-            }
-
-            if (BindableControl != ColumnBindableControl.Text)
-            {
-                writer.WriteValue ("BindableControl", BindableControl);
-            }
-
-            if (!string.IsNullOrEmpty (CustomBindableControl))
-            {
-                writer.WriteStr ("CustomBindableControl", CustomBindableControl);
-            }
-
-            if (Format != ColumnFormat.Auto)
-            {
-                writer.WriteValue ("Format", Format);
-            }
-
-            if (Calculated)
-            {
-                writer.WriteBool ("Calculated", Calculated);
-                writer.WriteStr ("Expression", Expression);
-            }
-        }
-
-        /// <inheritdoc/>
-        public override string[] GetExpressions()
-        {
-            if (Calculated)
-            {
-                return new string[] { Expression };
+                var dataSource = ParentDataSource;
+                if (dataSource != null)
+                {
+                    return dataSource[this];
+                }
             }
 
             return null;
         }
+    }
 
-        #endregion
-
-        #region IParent Members
-
-        /// <inheritdoc/>
-        public virtual bool CanContain (Base child)
+    internal DataSourceBase? ParentDataSource
+    {
+        get
         {
-            return child is Column;
-        }
-
-        /// <inheritdoc/>
-        public virtual void GetChildObjects (ObjectCollection list)
-        {
-            foreach (Column c in Columns)
+            var parent = Parent;
+            while (parent != null)
             {
-                list.Add (c);
+                if (parent is DataSourceBase @base)
+                {
+                    return @base;
+                }
+
+                parent = parent.Parent;
             }
-        }
 
-        /// <inheritdoc/>
-        public virtual void AddChild (Base child)
-        {
-            if (child is Column column)
-            {
-                Columns.Add (column);
-            }
-        }
-
-        /// <inheritdoc/>
-        public virtual void RemoveChild (Base child)
-        {
-            if (child is Column column)
-            {
-                Columns.Remove (column);
-            }
-        }
-
-        /// <inheritdoc/>
-        public int GetChildOrder (Base child)
-        {
-            return 0;
-        }
-
-        /// <inheritdoc/>
-        public void SetChildOrder (Base child, int order)
-        {
-            // do nothing
-        }
-
-        /// <inheritdoc/>
-        public void UpdateLayout (float dx, float dy)
-        {
-            // do nothing
-        }
-
-        #endregion
-
-        /// <summary>
-        /// Initializes a new instance of the <b>Column</b> class with default settings.
-        /// </summary>
-        public Column()
-        {
-            DataType = typeof (int);
-            PropName = "";
-            BindableControl = ColumnBindableControl.Text;
-            CustomBindableControl = "";
-            Expression = "";
-            Columns = new ColumnCollection (this);
+            return null;
         }
     }
+
+    internal string FullName
+    {
+        get
+        {
+            if (Parent is Column)
+            {
+                return (Parent as Column)!.FullName + "." + Alias;
+            }
+
+            return Alias;
+        }
+    }
+
+    #endregion
+
+    #region Construciton
+
+    /// <summary>
+    /// Initializes a new instance of the <b>Column</b> class with default settings.
+    /// </summary>
+    public Column()
+    {
+        DataType = typeof (int);
+        PropertyName = "";
+        BindableControl = ColumnBindableControl.Text;
+        CustomBindableControl = "";
+        Expression = "";
+        Columns = new ColumnCollection (this);
+    }
+
+    #endregion
+
+
+    #region Private members
+
+    private string? _customBindableControl;
+
+    #endregion
+
+    #region Public Methods
+
+    /// <inheritdoc/>
+    public override void SetName (string value)
+    {
+        base.SetName (value);
+        if (string.IsNullOrEmpty (PropertyName))
+        {
+            PropertyName = Name;
+        }
+    }
+
+    internal Column? FindByPropName (string propName)
+    {
+        foreach (Column c in Columns)
+        {
+            if (c.PropertyName == propName)
+            {
+                return c;
+            }
+        }
+
+        return null;
+    }
+
+    internal void SetBindableControlType (Type type)
+    {
+        if (type == typeof (byte[]) || typeof (Image).IsAssignableFrom (type))
+        {
+            BindableControl = ColumnBindableControl.Picture;
+        }
+        else if (type == typeof (bool))
+        {
+            BindableControl = ColumnBindableControl.CheckBox;
+        }
+        else
+        {
+            BindableControl = ColumnBindableControl.Text;
+        }
+    }
+
+    internal FormatBase GetFormat()
+    {
+        switch (Format)
+        {
+            case ColumnFormat.Auto:
+                if (DataType == typeof (decimal))
+                {
+                    return new CurrencyFormat();
+                }
+                else if (DataType == typeof (float) || DataType == typeof (double))
+                {
+                    return new NumberFormat();
+                }
+                else if (DataType == typeof (DateTime))
+                {
+                    return new DateFormat();
+                }
+
+                break;
+
+            case ColumnFormat.Number:
+                return new NumberFormat();
+
+            case ColumnFormat.Currency:
+                return new CurrencyFormat();
+
+            case ColumnFormat.Date:
+                return new DateFormat();
+
+            case ColumnFormat.Time:
+                return new TimeFormat();
+
+            case ColumnFormat.Percent:
+                return new PercentFormat();
+
+            case ColumnFormat.Boolean:
+                return new BooleanFormat();
+        }
+
+        return new GeneralFormat();
+    }
+
+    /// <inheritdoc/>
+    public override void Serialize (ReportWriter writer)
+    {
+        base.Serialize (writer);
+        writer.WriteValue ("DataType", DataType);
+        if (PropertyName != Name)
+        {
+            writer.WriteStr ("PropName", PropertyName);
+        }
+
+        if (BindableControl != ColumnBindableControl.Text)
+        {
+            writer.WriteValue ("BindableControl", BindableControl);
+        }
+
+        if (!string.IsNullOrEmpty (CustomBindableControl))
+        {
+            writer.WriteStr ("CustomBindableControl", CustomBindableControl);
+        }
+
+        if (Format != ColumnFormat.Auto)
+        {
+            writer.WriteValue ("Format", Format);
+        }
+
+        if (Calculated)
+        {
+            writer.WriteBool ("Calculated", Calculated);
+            writer.WriteStr ("Expression", Expression);
+        }
+    }
+
+    /// <inheritdoc/>
+    public override string[]? GetExpressions()
+    {
+        if (Calculated)
+        {
+            return new [] { Expression };
+        }
+
+        return null;
+    }
+
+    #endregion
+
+    #region IParent Members
+
+    /// <inheritdoc/>
+    public virtual bool CanContain (Base child)
+    {
+        return child is Column;
+    }
+
+    /// <inheritdoc/>
+    public virtual void GetChildObjects (ObjectCollection list)
+    {
+        foreach (Column c in Columns)
+        {
+            list.Add (c);
+        }
+    }
+
+    /// <inheritdoc/>
+    public virtual void AddChild (Base child)
+    {
+        if (child is Column column)
+        {
+            Columns.Add (column);
+        }
+    }
+
+    /// <inheritdoc/>
+    public virtual void RemoveChild (Base child)
+    {
+        if (child is Column column)
+        {
+            Columns.Remove (column);
+        }
+    }
+
+    /// <inheritdoc/>
+    public int GetChildOrder (Base child)
+    {
+        return 0;
+    }
+
+    /// <inheritdoc/>
+    public void SetChildOrder (Base child, int order)
+    {
+        // do nothing
+    }
+
+    /// <inheritdoc/>
+    public void UpdateLayout (float dx, float dy)
+    {
+        // do nothing
+    }
+
+    #endregion
 }

@@ -403,7 +403,7 @@ namespace AM.Reporting.Data
         /// </summary>
         /// <param name="alias">The column alias.</param>
         /// <returns>An object that contains the data.</returns>
-        protected virtual object GetValue (string alias)
+        protected virtual object? GetValue (string alias)
         {
             if (columnIndices[alias] is not Column column)
             {
@@ -419,7 +419,7 @@ namespace AM.Reporting.Data
         /// </summary>
         /// <param name="column">The column.</param>
         /// <returns>An object that contains the data.</returns>
-        protected abstract object GetValue (Column column);
+        protected abstract object? GetValue (Column column);
 
         #endregion
 
@@ -440,7 +440,7 @@ namespace AM.Reporting.Data
         /// This method is used to support the AM.Reporting.Net infrastructure. Do not call it directly.
         /// </remarks>
         /// <param name="rows">Rows to fill with data.</param>
-        public abstract void LoadData (ArrayList rows);
+        public abstract void LoadData (IList rows);
 
         internal void LoadData()
         {

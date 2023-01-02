@@ -47,7 +47,7 @@ namespace AM.Reporting.Data
             // do nothing
         }
 
-        public override void LoadData (ArrayList rows)
+        public override void LoadData (IList rows)
         {
             rows.Clear();
             for (var i = 0; i < VirtualRowsCount; i++)

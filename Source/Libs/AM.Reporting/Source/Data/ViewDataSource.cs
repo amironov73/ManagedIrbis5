@@ -118,7 +118,7 @@ namespace AM.Reporting.Data
         }
 
         /// <inheritdoc/>
-        public override void LoadData (ArrayList rows)
+        public override void LoadData (IList rows)
         {
             // custom load data via Load event
             OnLoad();

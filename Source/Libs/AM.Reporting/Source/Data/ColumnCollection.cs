@@ -67,7 +67,7 @@ namespace AM.Reporting.Data
         /// </summary>
         /// <param name="alias">The alias of a column.</param>
         /// <returns>The <see cref="Column"/> object if found; otherwise <b>null</b>.</returns>
-        public Column FindByAlias (string alias)
+        public Column? FindByAlias (string alias)
         {
             foreach (Column c in this)
             {

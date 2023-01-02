@@ -36,7 +36,7 @@ namespace AM.Reporting.Data.JsonConnection
     {
         #region Private Fields
 
-        private JsonArray _json;
+        private JsonArray? _json;
         private string tableData;
 
         #endregion Private Fields
@@ -76,7 +76,7 @@ namespace AM.Reporting.Data.JsonConnection
 
         #region Internal Properties
 
-        internal JsonArray Json
+        internal JsonArray? Json
         {
             get
             {
@@ -166,7 +166,7 @@ namespace AM.Reporting.Data.JsonConnection
         }
 
         /// <inheritdoc/>
-        public override void LoadData (ArrayList rows)
+        public override void LoadData (IList rows)
         {
             Json = null;
 
@@ -192,17 +192,17 @@ namespace AM.Reporting.Data.JsonConnection
             {
                 if (jsonTableDataSource.SimpleStructure)
                 {
-                    if (!string.IsNullOrEmpty (column.PropName))
+                    if (!string.IsNullOrEmpty (column.PropertyName))
                     {
                         var obj = jsonTableDataSource.Json[
                             jsonTableDataSource.CurrentIndex];
 
-                        return (obj as JsonBase)[column.PropName];
+                        return (obj as JsonBase)[column.PropertyName];
                     }
                 }
                 else
                 {
-                    switch (column.PropName)
+                    switch (column.PropertyName)
                     {
                         case "item":
                             return jsonTableDataSource.Json[
@@ -214,12 +214,12 @@ namespace AM.Reporting.Data.JsonConnection
                 }
             }
 
-            if (parentColumn is Column @base && !string.IsNullOrEmpty (column.PropName))
+            if (parentColumn is Column @base && !string.IsNullOrEmpty (column.PropertyName))
             {
                 var json = GetJsonBaseByColumn (@base.Parent, @base);
                 if (json is JsonBase jsonBase)
                 {
-                    return jsonBase[column.PropName];
+                    return jsonBase[column.PropertyName];
                 }
             }
 
@@ -230,7 +230,7 @@ namespace AM.Reporting.Data.JsonConnection
         {
             if (parentColumn is JsonTableDataSource source)
             {
-                switch (column.PropName)
+                switch (column.PropertyName)
                 {
                     case "index":
                         return source.CurrentIndex;
@@ -258,7 +258,7 @@ namespace AM.Reporting.Data.JsonConnection
                             var c = new Column();
                             c.Name = kv.Key;
                             c.Alias = kv.Key;
-                            c.PropName = kv.Key;
+                            c.PropertyName = kv.Key;
                             c.DataType = kv.Value.DataType;
                             c = UpdateColumn (table, c, saveColumns);
                             InitSchema (c, kv.Value, simpleStructure);
@@ -268,7 +268,7 @@ namespace AM.Reporting.Data.JsonConnection
                             Column c = new JsonTableDataSource();
                             c.Name = kv.Key;
                             c.Alias = kv.Key;
-                            c.PropName = kv.Key;
+                            c.PropertyName = kv.Key;
                             c.DataType = kv.Value.DataType;
                             c = UpdateColumn (table, c, saveColumns);
 
@@ -279,7 +279,7 @@ namespace AM.Reporting.Data.JsonConnection
                             var c = new Column();
                             c.Name = kv.Key;
                             c.Alias = kv.Key;
-                            c.PropName = kv.Key;
+                            c.PropertyName = kv.Key;
                             c.DataType = kv.Value.DataType;
                             c.SetBindableControlType (c.DataType);
                             UpdateColumn (table, c, saveColumns);
@@ -314,7 +314,7 @@ namespace AM.Reporting.Data.JsonConnection
                     var c = new Column();
                     c.Name = "index";
                     c.Alias = "index";
-                    c.PropName = "index";
+                    c.PropertyName = "index";
                     c.DataType = typeof (int);
                     UpdateColumn (table, c, saveColumns);
                 }
@@ -341,7 +341,7 @@ namespace AM.Reporting.Data.JsonConnection
 
                     c.Name = "item";
                     c.Alias = "item";
-                    c.PropName = "item";
+                    c.PropertyName = "item";
                     c.DataType = items.DataType;
                     c = UpdateColumn (table, c, saveColumns);
 
@@ -355,7 +355,7 @@ namespace AM.Reporting.Data.JsonConnection
                     var c = new Column();
                     c.Name = "array";
                     c.Alias = "array";
-                    c.PropName = "array";
+                    c.PropertyName = "array";
                     c.DataType = typeof (JsonBase);
                     UpdateColumn (table, c, saveColumns);
                 }
@@ -385,9 +385,9 @@ namespace AM.Reporting.Data.JsonConnection
                 if (source.SimpleStructure)
                 {
                     var parentJson = source.Json[source.CurrentIndex];
-                    if (parentJson is JsonBase @base && !string.IsNullOrEmpty (column.PropName))
+                    if (parentJson is JsonBase @base && !string.IsNullOrEmpty (column.PropertyName))
                     {
-                        return @base[column.PropName];
+                        return @base[column.PropertyName];
                     }
                 }
                 else
@@ -398,9 +398,9 @@ namespace AM.Reporting.Data.JsonConnection
             else if (parentColumn is Column @base)
             {
                 var parentJson = GetJson (@base.Parent, @base);
-                if (parentJson is JsonBase jsonBase && !string.IsNullOrEmpty (column.PropName))
+                if (parentJson is JsonBase jsonBase && !string.IsNullOrEmpty (column.PropertyName))
                 {
-                    return jsonBase[column.PropName];
+                    return jsonBase[column.PropertyName];
                 }
             }
 
@@ -444,7 +444,7 @@ namespace AM.Reporting.Data.JsonConnection
         {
             foreach (Column child in table.Columns)
             {
-                if (child.PropName == c.PropName)
+                if (child.PropertyName == c.PropertyName)
                 {
                     child.DataType = c.DataType;
                     list.Add (child);

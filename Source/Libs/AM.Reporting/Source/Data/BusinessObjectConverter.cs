@@ -162,7 +162,7 @@ namespace AM.Reporting.Data
             }
 
             childColumn.DataType = itemType;
-            childColumn.PropName = "Value";
+            childColumn.PropertyName = "Value";
             childColumn.PropDescriptor = null;
 
             return childColumn;
@@ -237,7 +237,7 @@ namespace AM.Reporting.Data
                 childColumn.Name = isEnumerable ? dictionary.CreateUniqueName (prop.Name) : prop.Name;
                 childColumn.Alias = prop.DisplayName;
                 childColumn.DataType = type;
-                childColumn.PropName = prop.Name;
+                childColumn.PropertyName = prop.Name;
                 childColumn.PropDescriptor = prop;
                 childColumn.SetBindableControlType (type);
                 childColumn.Enabled = !isEnumerable || nestingLevel < maxNestingLevel;
@@ -326,7 +326,7 @@ namespace AM.Reporting.Data
 
                     // update column's prop data - the schema may be changed
                     childColumn.DataType = prop.PropertyType;
-                    childColumn.PropName = prop.Name;
+                    childColumn.PropertyName = prop.Name;
                     childColumn.PropDescriptor = prop;
 
                     if (childColumn.Enabled && !isSimpleProperty)
@@ -342,7 +342,7 @@ namespace AM.Reporting.Data
                     var c = column.Columns[i];
 
                     // delete columns with empty descriptors, except the "Value" columns
-                    if (c.PropDescriptor == null && c.PropName != "Value")
+                    if (c.PropDescriptor == null && c.PropertyName != "Value")
                     {
                         column.Columns.RemoveAt (i);
                         i--;
