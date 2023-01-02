@@ -98,7 +98,7 @@ namespace AM.Reporting
         /// Creates a strongly typed object that readily casts a primitive
         /// object to the other primitive types when possible.
         /// </summary>
-        public Variant (object value)
+        public Variant (object? value)
         {
             if (value == DBNull.Value)
             {
@@ -119,7 +119,7 @@ namespace AM.Reporting
         /// The actual value being stored in its original <see cref="System.Type"/>,
         /// returned as an <see cref="Object"/>.
         /// </summary>
-        public object Value { get; }
+        public object? Value { get; }
 
         /// <summary>
         /// The <see cref="System.Type"/> of the <see cref="Value"/> property.

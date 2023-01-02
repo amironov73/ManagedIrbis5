@@ -20,7 +20,7 @@ public class LoadBusinessObjectEventArgs
     /// <summary>
     /// Parent object for this data source.
     /// </summary>
-    public object Parent { get; set; }
+    public object? Parent { get; set; }
 
     #endregion
 
@@ -32,7 +32,7 @@ public class LoadBusinessObjectEventArgs
     /// <param name="parent"></param>
     internal LoadBusinessObjectEventArgs
         (
-            object parent
+            object? parent
         )
     {
         Parent = parent;

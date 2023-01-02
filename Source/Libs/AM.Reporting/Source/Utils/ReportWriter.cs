@@ -254,7 +254,7 @@ namespace AM.Reporting.Utils
         /// </summary>
         /// <param name="name">Property name.</param>
         /// <param name="value">Property value.</param>
-        public void WriteStr (string name, string value)
+        public void WriteStr (string name, string? value)
         {
             curRoot.SetProp (PropName (name), value);
 

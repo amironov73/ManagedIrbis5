@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* Converter.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -239,7 +239,7 @@ namespace AM.Reporting.Utils
         /// form: &amp;lt;, &amp;gt;. To convert such string back to original form, use the
         /// <see cref="FromXml"/> method.
         /// </remarks>
-        public static string ToXml (string s)
+        public static string ToXml (string? s)
         {
             return ToXml (s, true);
         }
@@ -250,7 +250,7 @@ namespace AM.Reporting.Utils
         /// <param name="s">The string to convert.</param>
         /// <param name="convertCrlf">Determines whether it is necessary to convert cr-lf symbols to xml form.</param>
         /// <returns>The result string.</returns>
-        public static string ToXml (string s, bool convertCrlf)
+        public static string ToXml (string? s, bool convertCrlf)
         {
             var result = new FastString (s.Length);
             for (var i = 0; i < s.Length; i++)
