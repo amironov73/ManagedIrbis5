@@ -2360,7 +2360,7 @@ namespace AM.Reporting
         /// <remarks>
         /// This method is obsolete. Use the <see cref="RegisterData(IEnumerable, string)"/> method instead.
         /// </remarks>
-        public void RegisterData (IEnumerable data, string name, BOConverterFlags flags, int maxNestingLevel)
+        public void RegisterData (IEnumerable data, string name, BusinessObjectConverterFlags flags, int maxNestingLevel)
         {
             RegisterData (data, name, maxNestingLevel);
         }

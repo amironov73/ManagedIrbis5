@@ -30,51 +30,6 @@ using System.Windows.Forms;
 
 namespace AM.Reporting.Data
 {
-    /// <summary>
-    /// <b>Obsolete</b>. Specifies a set of flags used to convert business objects into datasources.
-    /// </summary>
-    [Flags]
-    public enum BOConverterFlags
-    {
-        /// <summary>
-        /// Specifies no actions.
-        /// </summary>
-        None,
-
-        /// <summary>
-        /// Allows using the fields of a business object.
-        /// </summary>
-        AllowFields,
-
-        /// <summary>
-        /// Allows using properties of a business object with <b>BrowsableAttribute</b> only.
-        /// </summary>
-        BrowsableOnly
-    }
-
-
-    /// <summary>
-    /// Specifies a kind of property.
-    /// </summary>
-    public enum PropertyKind
-    {
-        /// <summary>
-        /// Specifies the property of a simple type (such as integer).
-        /// </summary>
-        Simple,
-
-        /// <summary>
-        /// Specifies the complex property such as class with own properties.
-        /// </summary>
-        Complex,
-
-        /// <summary>
-        /// Specifies the property which is a list of objects (is of IEnumerable type).
-        /// </summary>
-        Enumerable
-    }
-
-
     internal partial class BusinessObjectConverter
     {
         private Dictionary dictionary;
