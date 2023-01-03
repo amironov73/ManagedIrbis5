@@ -7,7 +7,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
+// ReSharper disable UnusedMember.Global
 
 /* SecurityUtility.cs -- вспомогательные методы для обеспечения безопасности
  * Ars Magna project, http://arsmagna.ru

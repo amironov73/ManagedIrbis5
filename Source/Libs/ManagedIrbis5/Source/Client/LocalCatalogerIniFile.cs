@@ -102,7 +102,7 @@ public sealed class LocalCatalogerIniFile
                 ?? MagnaSection[nameof (UserName)];
             if (!string.IsNullOrEmpty (result))
             {
-                result = IrbisUtility.DecryptConnectionString (result);
+                result = IrbisUtility.Decrypt (result);
             }
 
             return result;
@@ -121,7 +121,7 @@ public sealed class LocalCatalogerIniFile
                 ?? MagnaSection[nameof (UserPassword)];
             if (!string.IsNullOrEmpty (result))
             {
-                result = IrbisUtility.DecryptConnectionString (result);
+                result = IrbisUtility.Decrypt (result);
             }
 
             return result;

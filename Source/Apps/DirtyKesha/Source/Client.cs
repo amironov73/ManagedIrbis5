@@ -152,11 +152,11 @@ internal sealed class Client
     /// <summary>
     /// Подключение к серверу ИРБИС.
     /// </summary>
-    /// <returns></returns>
     private static async Task<IAsyncProvider?> GetIrbis()
     {
         var connection = ConnectionFactory.Shared.CreateAsyncConnection();
         var connectionString = Program.Configuration["connection"].ThrowIfNullOrEmpty();
+        connectionString = IrbisUtility.Decrypt (connectionString);
         connection.ParseConnectionString (connectionString);
         await connection.ConnectAsync();
 
@@ -373,6 +373,7 @@ internal sealed class Client
             (
                 message.Chat.Id,
                 ChatAction.Typing,
+                null,
                 token
             );
 
@@ -397,6 +398,7 @@ internal sealed class Client
                 (
                     chatId,
                     book,
+                    null,
                     ParseMode.Html,
                     cancellationToken: token
                 );

@@ -64,19 +64,59 @@ public static class IrbisUtility
     #region Public methods
 
     /// <summary>
+    /// Кодирование строки подключения.
+    /// </summary>
+    /// <param name="plainText">Строка подключения.</param>
+    /// <param name="password">Пароль. Если <c>null</c>,
+    /// то используется пароль по умолчанию.</param>
+    /// <returns>Зашифрованная строка подключения.</returns>
+    public static string Encrypt
+        (
+            string plainText,
+            string? password = null
+        )
+    {
+        // Пустая строка зашифрованной быть не может
+        if (string.IsNullOrEmpty (plainText))
+        {
+            return plainText;
+        }
+
+        if (plainText[0] == '!')
+        {
+            // строка уже в Base64
+            return plainText;
+        }
+
+        if (plainText[0] == '?')
+        {
+            // строка уже зашифрована
+            return plainText;
+        }
+
+        if (string.IsNullOrEmpty (password))
+        {
+            password = "irbis";
+        }
+
+        return "?" + SecurityUtility.Encrypt (plainText, password);
+    }
+
+    /// <summary>
     /// Декодирование строки подключения, если она закодирована или зашифрована.
     /// </summary>
     /// <param name="possiblyEncrypted">Строка подключения, возможно, закодированная
     /// или зашифрованная.</param>
-    /// <param name="password">Пароль. Если <c>null</c>, то используется пароль по умолчанию.</param>
+    /// <param name="password">Пароль. Если <c>null</c>,
+    /// то используется пароль по умолчанию.</param>
     /// <returns>Расшифрованная строка подключения.</returns>
-    public static string DecryptConnectionString
+    public static string Decrypt
         (
             string possiblyEncrypted,
             string? password = null
         )
     {
-        // Пустая строка зашифрованной быть не может.
+        // Пустая строка зашифрованной быть не может
         if (string.IsNullOrEmpty (possiblyEncrypted))
         {
             return possiblyEncrypted;

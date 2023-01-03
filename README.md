@@ -10,7 +10,7 @@ Currently supports:
 * .NET SDK 7.0.100 and higher
 
 ```c#
-using System;                                   
+using System;
 using ManagedIrbis;
 using static System.Console;
 
@@ -20,7 +20,12 @@ try
 
     connection.Host = args.Length == 0 ? "127.0.0.1" : args[0];
     connection.Username = "librarian";
-    connection.Password = "secret";
+    connection.Password = Unprotect ("AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAA7Y"
+        + "lugeufz0q6dEVZ2IU\"1VQQAAAACAAAAAAAQZgAAAAEAACAAAAA8e8k2wKE0v"
+        + "RcEGD9KoNCyMNIZnMUuoAfUT/8JXaAaTQAAAAAOgAAAAAIAACAAAABAR7ioUp"
+        + "WbfoiIdl80dvBGuVmzyFV4P8CnitMMomAE+hAAAAB04x4wxbpLY+pAuUt3dY6"
+        + "TQAAAAOa/TIcrih6RxQGbR3XMWzEJNCiT4Lpvz4ZamsPOOHPl4dk5mQmxUSNa"
+        + "/2B/9VkTGC7i2ocUAKorH6fhaZgrNzc=");
 
     var success = await connection.ConnectAsync();
     if (!success)
@@ -96,5 +101,5 @@ return 0;
 
 ### Documentation (in russian)
 
-[![Badge](https://readthedocs.org/projects/managedirbis5/badge/)](https://managedirbis5.readthedocs.io/) 
+[![Badge](https://readthedocs.org/projects/managedirbis5/badge/)](https://managedirbis5.readthedocs.io/)
 

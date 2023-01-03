@@ -24,6 +24,7 @@ using System.Linq;
 
 using AM;
 using AM.Collections;
+using AM.Configuration;
 using AM.Scripting.Barsik;
 
 using ManagedIrbis.AppServices;
@@ -107,9 +108,11 @@ public sealed class IrbisLib
         { "create_record", new FunctionDescriptor ("create_record", CreateRecord) },
         { "delete_database", new FunctionDescriptor ("delete_database", DeleteDatabase) },
         { "database_info", new FunctionDescriptor ("database_info", DatabaseInfo) },
-        { "database_stat", new FunctionDescriptor ("database_stat", Disconnect) },
+        { "database_stat", new FunctionDescriptor ("database_stat", DatabaseStat) },
+        { "decrypt", new FunctionDescriptor ("decrypt", Decrypt) },
         { "disconnect", new FunctionDescriptor ("disconnect", Disconnect) },
         { "eat_whitespace", new FunctionDescriptor ("eat_whitespace", EatLastWhitespace) },
+        { "encrypt", new FunctionDescriptor ("encrypt", Encrypt) },
         { "error_description", new FunctionDescriptor ("error_description", ErrorDescription) },
         { "flush_output", new FunctionDescriptor ("flush_output", FlushOutput) },
         { "fm", new FunctionDescriptor ("fm", FM) },
@@ -130,6 +133,7 @@ public sealed class IrbisLib
         { "max_mfn", new FunctionDescriptor ("max_mfn", MaxMfn) },
         { "parse_book", new FunctionDescriptor ("parse_book", ParseBook) },
         { "ping", new FunctionDescriptor ("ping", Ping) },
+        { "protect", new FunctionDescriptor ("protect", Protect) },
         { "put_d", new FunctionDescriptor ("put_d", PutDelimited) },
         { "put_p", new FunctionDescriptor ("put_p", PutPrefix) },
         { "put_ps", new FunctionDescriptor ("put_ps", PutPrefixSuffix) },
@@ -149,6 +153,7 @@ public sealed class IrbisLib
         { "set_mark", new FunctionDescriptor ("set_mark", SetMark) },
         { "sub_field", new FunctionDescriptor ("sub_field", GetSubfield) },
         { "truncate_database", new FunctionDescriptor ("truncate_database", TruncateDatabase) },
+        { "unprotect", new FunctionDescriptor ("unprotect", Unprotect) },
         { "unlock_database", new FunctionDescriptor ("unlock_database", UnlockDatabase) },
         { "write_record", new FunctionDescriptor ("write_record", WriteRecord) },
     };
@@ -741,6 +746,24 @@ public sealed class IrbisLib
     }
 
     /// <summary>
+    /// Раскодирование строки подключения либо пароля.
+    /// </summary>
+    public static dynamic? Decrypt
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (Compute (context, args, 0) is string { Length: > 0 } encrypted )
+        {
+            var password = Compute (context, args, 1) as string;
+            return IrbisUtility.Decrypt (encrypted, password);
+        }
+
+        return null;
+    }
+
+    /// <summary>
     /// Удаление базы данных.
     /// </summary>
     public static dynamic? DeleteDatabase
@@ -789,6 +812,24 @@ public sealed class IrbisLib
         if (TryGetOutput (context, out var output))
         {
             output.EatLastWhitespace();
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Шифрование строки подключения.
+    /// </summary>
+    public static dynamic? Encrypt
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (Compute (context, args, 0) is string { Length: > 0 } plainText)
+        {
+            var password = Compute (context, args, 1) as string;
+            return IrbisUtility.Encrypt (plainText, password);
         }
 
         return null;
@@ -1538,6 +1579,23 @@ public sealed class IrbisLib
     }
 
     /// <summary>
+    /// Простейшая защита строки подключения.
+    /// </summary>
+    public static dynamic? Protect
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (Compute (context, args, 0) is string { Length: > 0 } plainText)
+        {
+            return ConfigurationUtility.Protect (plainText);
+        }
+
+        return Compute (context, args, 0);
+    }
+
+    /// <summary>
     /// Чтение записи.
     /// Запись помещается в <code>record</code>.
     /// </summary>
@@ -1885,6 +1943,23 @@ public sealed class IrbisLib
         var databaseName = Compute (context, args, 0) as string;
 
         return connection.UnlockDatabase (databaseName);
+    }
+
+    /// <summary>
+    /// Снятие защиты со строки подключения.
+    /// </summary>
+    public static dynamic? Unprotect
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (Compute (context, args, 0) is string { Length: > 0 } protectedText)
+        {
+            return ConfigurationUtility.Unprotect (protectedText);
+        }
+
+        return Compute (context, args, 0);
     }
 
     /// <summary>

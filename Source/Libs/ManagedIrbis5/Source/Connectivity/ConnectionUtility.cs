@@ -136,7 +136,7 @@ public static class ConnectionUtility
 
         if (result is not null)
         {
-            result = IrbisUtility.DecryptConnectionString
+            result = IrbisUtility.Decrypt
                 (
                     result
                 );
@@ -164,7 +164,7 @@ public static class ConnectionUtility
             return candidate;
         }
 
-        var result = IrbisUtility.DecryptConnectionString
+        var result = IrbisUtility.Decrypt
             (
                 candidate
             );
@@ -214,7 +214,7 @@ public static class ConnectionUtility
 
         if (!string.IsNullOrEmpty (result))
         {
-            result = IrbisUtility.DecryptConnectionString
+            result = IrbisUtility.Decrypt
                 (
                     result
                 );
