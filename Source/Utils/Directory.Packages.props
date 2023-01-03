@@ -115,7 +115,7 @@
     <PackageVersion Include="System.Security.Cryptography.ProtectedData" Version="7.0.0" />
     <PackageVersion Include="System.Security.Permissions" Version="7.0.0" />
     <PackageVersion Include="System.Text.Encoding.CodePages" Version="7.0.0" />
-    <PackageVersion Include="Telegram.Bot" Version="18.0.0" />
+    <PackageVersion Include="Telegram.Bot" Version="19.0.0-preview.2" />
     <PackageVersion Include="Telegram.Bot.Extensions.Polling" Version="1.0.2" />
     <PackageVersion Include="Topshelf" Version="4.3.0" />
     <PackageVersion Include="Topshelf.NLog" Version="4.3.0" />
