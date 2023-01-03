@@ -7,7 +7,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
+// ReSharper disable UnusedMember.Global
 
 /*
  * Ars Magna project, http://arsmagna.ru
@@ -49,7 +49,7 @@ namespace AM.Reporting.Data
         /// </summary>
         /// <param name="name">The name of a CubeSource.</param>
         /// <returns>The <see cref="CubeSourceBase"/> object if found; otherwise <b>null</b>.</returns>
-        public CubeSourceBase FindByName (string name)
+        public CubeSourceBase? FindByName (string name)
         {
             foreach (CubeSourceBase c in this)
             {
@@ -67,7 +67,7 @@ namespace AM.Reporting.Data
         /// </summary>
         /// <param name="alias">The alias of a CubeSource.</param>
         /// <returns>The <see cref="CubeSourceBase"/> object if found; otherwise <b>null</b>.</returns>
-        public CubeSourceBase FindByAlias (string alias)
+        public CubeSourceBase? FindByAlias (string alias)
         {
             foreach (CubeSourceBase c in this)
             {

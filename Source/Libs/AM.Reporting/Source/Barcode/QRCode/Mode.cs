@@ -69,13 +69,13 @@ namespace AM.Reporting.Barcode.QRCode
         public static readonly Mode FNC1_SECOND_POSITION = new Mode (null, 0x09, "FNC1_SECOND_POSITION");
 
         //UPGRADE_NOTE: Final was removed from the declaration of 'characterCountBitsForVersions '. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1003'"
-        private int[] characterCountBitsForVersions;
+        private readonly int[]? characterCountBitsForVersions;
 
         //UPGRADE_NOTE: Final was removed from the declaration of 'bits '. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1003'"
 
         //UPGRADE_NOTE: Final was removed from the declaration of 'name '. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1003'"
 
-        private Mode (int[] characterCountBitsForVersions, int bits, string name)
+        private Mode (int[]? characterCountBitsForVersions, int bits, string name)
         {
             this.characterCountBitsForVersions = characterCountBitsForVersions;
             this.Bits = bits;

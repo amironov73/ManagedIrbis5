@@ -18,11 +18,7 @@
 using System;
 using System.IO;
 using System.Collections;
-using System.Drawing;
-using System.ComponentModel;
-using System.Reflection;
-using System.Collections.Generic;
-using System.Text;
+using System.Diagnostics;
 using System.Globalization;
 
 #endregion
@@ -80,30 +76,30 @@ namespace AM.Reporting.Utils
     {
         #region Fields
 
-        private XmlDocument _document;
-        private XmlItem _root;
-        private XmlItem _currentItem;
+        private readonly XmlDocument _document;
+        private readonly XmlItem _root;
+        private XmlItem? _currentItem;
 
         private XmlItem curRoot;
 
         //private StringBuilder FText;
-        private Hashtable _diffObjects;
+        private readonly Hashtable _diffObjects;
 
         #endregion
 
         #region Properties
 
-        internal event DiffEventHandler GetDiff;
+        internal event DiffEventHandler? GetDiff;
 
-        internal BlobStore BlobStore { get; set; }
+        internal BlobStore? BlobStore { get; set; }
 
         /// <summary>
         /// Gets or sets current xml item name.
         /// </summary>
         public string ItemName
         {
-            get => _currentItem.Name;
-            set => _currentItem.Name = value;
+            get => _currentItem!.Name;
+            set => _currentItem!.Name = value;
         }
 
         /// <summary>
@@ -114,7 +110,7 @@ namespace AM.Reporting.Utils
         /// <summary>
         /// Gets the ethalon object to compare with.
         /// </summary>
-        public object DiffObject { get; private set; }
+        public object? DiffObject { get; private set; }
 
         /// <summary>
         /// Gets or sets a value that determines whether is necessary to serialize child objects.
@@ -184,7 +180,7 @@ namespace AM.Reporting.Utils
         /// </summary>
         /// <param name="obj">The object to serialize.</param>
         /// <param name="diff">The etalon object.</param>
-        public void Write (IReportSerializable obj, object diff)
+        public void Write (IReportSerializable? obj, object? diff)
         {
             if (obj == null)
             {
@@ -230,8 +226,9 @@ namespace AM.Reporting.Utils
 
                         DiffObject = _diffObjects[objType];
                     }
-                    catch
+                    catch (Exception exception)
                     {
+                        Debug.WriteLine (exception.Message);
                     }
                 }
 
@@ -329,7 +326,7 @@ namespace AM.Reporting.Utils
         /// </summary>
         /// <param name="name">Property name.</param>
         /// <param name="value">Property value.</param>
-        public void WriteValue (string name, object value)
+        public void WriteValue (string name, object? value)
         {
             curRoot.SetProp (PropName (name), value != null ? Converter.ToString (value) : "null");
 
@@ -344,7 +341,7 @@ namespace AM.Reporting.Utils
         /// </summary>
         /// <param name="name">Property name.</param>
         /// <param name="value">Property value.</param>
-        public void WriteRef (string name, Base value)
+        public void WriteRef (string name, Base? value)
         {
             curRoot.SetProp (PropName (name), value != null ? value.Name : "null");
 
@@ -365,7 +362,7 @@ namespace AM.Reporting.Utils
         /// </remarks>
         public void WritePropertyValue (string name, string value)
         {
-            var item = _currentItem.Add();
+            var item = _currentItem!.Add();
             item.Name = name;
             item.Value = value;
         }
@@ -376,7 +373,7 @@ namespace AM.Reporting.Utils
         /// <param name="obj1">The first object.</param>
         /// <param name="obj2">The second object.</param>
         /// <returns><b>true</b> if objects will be serialized to the same value.</returns>
-        public bool AreEqual (object obj1, object obj2)
+        public bool AreEqual (object? obj1, object? obj2)
         {
             if (obj1 == obj2)
             {

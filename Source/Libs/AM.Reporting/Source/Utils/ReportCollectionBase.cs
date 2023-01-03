@@ -185,7 +185,7 @@ public class ReportCollectionBase
     /// <param name="value">Object to remove.</param>
     public void Remove
         (
-            Base value
+            Base? value
         )
     {
         if (Contains (value))
@@ -215,7 +215,7 @@ public class ReportCollectionBase
     /// <returns><b>true</b> if object is found in the collection; otherwise, <b>false</b>.</returns>
     public bool Contains
         (
-            Base value
+            Base? value
         )
     {
         return List.Contains (value);

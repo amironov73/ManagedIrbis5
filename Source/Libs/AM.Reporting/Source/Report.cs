@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* Report.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -28,751 +28,626 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Text;
 using System.IO;
 using System.Security;
 using System.Text;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
 
-namespace AM.Reporting
+namespace AM.Reporting;
+
+/// <summary>
+/// Represents a report object.
+/// </summary>
+/// <remarks>
+/// <para>The instance of this class contains a report. Here are some common
+/// actions that can be performed with this object:</para>
+/// <list type="bullet">
+///   <item>
+///     <description>To load a report, use the <see cref="Load(string)"/>
+///     method or call static <see cref="FromFile"/> method. </description>
+///   </item>
+///   <item>
+///     <description>To save a report, call the <see cref="Save(string)"/> method.</description>
+///   </item>
+///   <item>
+///     <description>To register application dataset for use it in a report, call one of the
+///     <b>RegisterData</b> methods.</description>
+///   </item>
+///   <item>
+///     <description>To pass some parameter to a report, use the
+///     <see cref="SetParameterValue"/> method.</description>
+///   </item>
+///   <item>
+///     <description>To design a report, call the Design method.</description>
+///   </item>
+///   <item>
+///     <description>To run a report and preview it, call the Show method.
+///     Another way is to call the <see cref="Prepare()"/> method, then call the
+///     ShowPrepared method.</description>
+///   </item>
+///   <item>
+///     <description>To run a report and print it, call the Print method.
+///     Another way is to call the <see cref="Prepare()"/> method, then call the
+///     PrintPrepared method.</description>
+///   </item>
+///   <item>
+///     <description>To load/save prepared report, use one of the <b>LoadPrepared</b> and
+///     <b>SavePrepared</b> methods.</description>
+///   </item>
+///   <item>
+///     <description>To set up some global properties, use the <see cref="Config"/> static class
+///     or EnvironmentSettings component that you can use in the Visual Studio IDE.
+///     </description>
+///   </item>
+/// </list>
+/// <para/>The report consists of one or several report pages (pages of the
+/// <see cref="ReportPage"/> type) and/or dialog forms (pages of the <see cref="DialogPage"/> type).
+/// They are stored in the <see cref="Pages"/> collection. In turn, each page may contain report
+/// objects. See the example below how to create a simple report in code.
+/// </remarks>
+/// <example>This example shows how to create a report instance, load it from a file,
+/// register the application data, run and preview.
+/// <code>
+/// Report report = new Report();
+/// report.Load("reportfile.frx");
+/// report.RegisterData(application_dataset);
+/// report.Show();
+/// </code>
+/// <para/>This example shows how to create simple report in code.
+/// <code>
+/// Report report = new Report();
+/// // create the report page
+/// ReportPage page = new ReportPage();
+/// page.Name = "ReportPage1";
+/// // set paper width and height. Note: these properties are measured in millimeters.
+/// page.PaperWidth = 210;
+/// page.PaperHeight = 297;
+/// // add a page to the report
+/// report.Pages.Add(page);
+/// // create report title
+/// page.ReportTitle = new ReportTitleBand();
+/// page.ReportTitle.Name = "ReportTitle1";
+/// page.ReportTitle.Height = Units.Millimeters * 10;
+/// // create Text object and put it to the title
+/// TextObject text = new TextObject();
+/// text.Name = "Text1";
+/// text.Bounds = new RectangleF(0, 0, Units.Millimeters * 100, Units.Millimeters * 5);
+/// page.ReportTitle.Objects.Add(text);
+/// // create data band
+/// DataBand data = new DataBand();
+/// data.Name = "Data1";
+/// data.Height = Units.Millimeters * 10;
+/// // add data band to a page
+/// page.Bands.Add(data);
+/// </code>
+/// </example>
+[PublicAPI]
+public partial class Report
+    : Base, IParent, ISupportInitialize
 {
+    #region Events
+
     /// <summary>
-    /// Specifies the language of the report's script.
+    /// Occurs when calc execution is started.
     /// </summary>
-    public enum Language
-    {
-        /// <summary>
-        /// The C# language.
-        /// </summary>
-        CSharp,
-
-        /// <summary>
-        /// The VisualBasic.Net language.
-        /// </summary>
-        Vb
-    }
+    public event CustomCalcEventHandler? CustomCalc;
 
     /// <summary>
-    /// Specifies the quality of text rendering.
+    /// Occurs when report execution is started.
     /// </summary>
-    public enum TextQuality
-    {
-        /// <summary>
-        /// The default text quality, depends on system settings.
-        /// </summary>
-        Default,
-
-        /// <summary>
-        /// The regular quality.
-        /// </summary>
-        Regular,
-
-        /// <summary>
-        /// The "ClearType" quality.
-        /// </summary>
-        ClearType,
-
-        /// <summary>
-        /// The AntiAlias quality. This mode may be used to produce the WYSIWYG text.
-        /// </summary>
-        AntiAlias,
-
-        /// <summary>
-        /// The "SingleBitPerPixel" quality.
-        /// </summary>
-        SingleBPP,
-
-
-        /// <summary>
-        /// The "SingleBitPerPixelGridFit" quality.
-        /// </summary>
-        SingleBPPGridFit
-    }
+    public event EventHandler? StartReport;
 
     /// <summary>
-    /// Specifies the report operation.
-    /// </summary>
-    public enum ReportOperation
-    {
-        /// <summary>
-        /// Specifies no operation.
-        /// </summary>
-        None,
-
-        /// <summary>
-        /// The report is running.
-        /// </summary>
-        Running,
-
-        /// <summary>
-        /// The report is printing.
-        /// </summary>
-        Printing,
-
-        /// <summary>
-        /// The report is exporting.
-        /// </summary>
-        Exporting
-    }
-
-    /// <summary>
-    /// Specifies the page range to print/export.
-    /// </summary>
-    public enum PageRange
-    {
-        /// <summary>
-        /// Print all pages.
-        /// </summary>
-        All,
-
-        /// <summary>
-        /// Print current page.
-        /// </summary>
-        Current,
-
-        /// <summary>
-        /// Print pages specified in the <b>PageNumbers</b> property of the <b>PrintSettings</b>.
-        /// </summary>
-        PageNumbers
-    }
-
-    /// <summary>
-    /// Represents a report object.
+    /// Occurs when report is inherited and trying to load a base report.
     /// </summary>
     /// <remarks>
-    /// <para>The instance of this class contains a report. Here are some common
-    /// actions that can be performed with this object:</para>
-    /// <list type="bullet">
-    ///   <item>
-    ///     <description>To load a report, use the <see cref="Load(string)"/>
-    ///     method or call static <see cref="FromFile"/> method. </description>
-    ///   </item>
-    ///   <item>
-    ///     <description>To save a report, call the <see cref="Save(string)"/> method.</description>
-    ///   </item>
-    ///   <item>
-    ///     <description>To register application dataset for use it in a report, call one of the
-    ///     <b>RegisterData</b> methods.</description>
-    ///   </item>
-    ///   <item>
-    ///     <description>To pass some parameter to a report, use the
-    ///     <see cref="SetParameterValue"/> method.</description>
-    ///   </item>
-    ///   <item>
-    ///     <description>To design a report, call the <see cref="Design()"/> method.</description>
-    ///   </item>
-    ///   <item>
-    ///     <description>To run a report and preview it, call the <see cref="Show()"/> method.
-    ///     Another way is to call the <see cref="Prepare()"/> method, then call the
-    ///     <see cref="ShowPrepared()"/> method.</description>
-    ///   </item>
-    ///   <item>
-    ///     <description>To run a report and print it, call the <see cref="Print"/> method.
-    ///     Another way is to call the <see cref="Prepare()"/> method, then call the
-    ///     <see cref="PrintPrepared()"/> method.</description>
-    ///   </item>
-    ///   <item>
-    ///     <description>To load/save prepared report, use one of the <b>LoadPrepared</b> and
-    ///     <b>SavePrepared</b> methods.</description>
-    ///   </item>
-    ///   <item>
-    ///     <description>To set up some global properties, use the <see cref="Config"/> static class
-    ///     or <see cref="EnvironmentSettings"/> component that you can use in the Visual Studio IDE.
-    ///     </description>
-    ///   </item>
-    /// </list>
-    /// <para/>The report consists of one or several report pages (pages of the
-    /// <see cref="ReportPage"/> type) and/or dialog forms (pages of the <see cref="DialogPage"/> type).
-    /// They are stored in the <see cref="Pages"/> collection. In turn, each page may contain report
-    /// objects. See the example below how to create a simple report in code.
+    /// Typical use of this event is to load the base report from a database instead of a file.
     /// </remarks>
-    /// <example>This example shows how to create a report instance, load it from a file,
-    /// register the application data, run and preview.
+    public event CustomLoadEventHandler? LoadBaseReport;
+
+    /// <summary>
+    /// Occurs when report execution is finished.
+    /// </summary>
+    public event EventHandler? FinishReport;
+
+    /// <summary>
+    /// Occurs before export to set custom export parameters.
+    /// </summary>
+    public event EventHandler<ExportParametersEventArgs>? ExportParameters;
+
+    #endregion
+
+    #region Fields
+
+    private Dictionary? _dictionary;
+    private string _baseReport;
+    private Report? _baseReportObject;
+    private Language _scriptLanguage;
+    private string[]? _referencedAssemblies;
+    private readonly Hashtable _cachedDataItems;
+    private readonly AssemblyCollection _assemblies;
+    private bool _aborted;
+    private Bitmap? _measureBitmap;
+    private IGraphics? _measureGraphics;
+    private int _tickCount;
+    private bool _needCompile;
+    private bool _initializing;
+    private object _initializeData;
+    private string _initializeDataName;
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Gets the pages contained in this report.
+    /// </summary>
+    /// <remarks>
+    /// This property contains pages of all types (report and dialog). Use the <b>is/as</b> operators
+    /// if you want to work with pages of <b>ReportPage</b> type.
+    /// </remarks>
+    /// <example>The following code demonstrates how to access the first report page:
     /// <code>
-    /// Report report = new Report();
-    /// report.Load("reportfile.frx");
-    /// report.RegisterData(application_dataset);
-    /// report.Show();
-    /// </code>
-    /// <para/>This example shows how to create simple report in code.
-    /// <code>
-    /// Report report = new Report();
-    /// // create the report page
-    /// ReportPage page = new ReportPage();
-    /// page.Name = "ReportPage1";
-    /// // set paper width and height. Note: these properties are measured in millimeters.
-    /// page.PaperWidth = 210;
-    /// page.PaperHeight = 297;
-    /// // add a page to the report
-    /// report.Pages.Add(page);
-    /// // create report title
-    /// page.ReportTitle = new ReportTitleBand();
-    /// page.ReportTitle.Name = "ReportTitle1";
-    /// page.ReportTitle.Height = Units.Millimeters * 10;
-    /// // create Text object and put it to the title
-    /// TextObject text = new TextObject();
-    /// text.Name = "Text1";
-    /// text.Bounds = new RectangleF(0, 0, Units.Millimeters * 100, Units.Millimeters * 5);
-    /// page.ReportTitle.Objects.Add(text);
-    /// // create data band
-    /// DataBand data = new DataBand();
-    /// data.Name = "Data1";
-    /// data.Height = Units.Millimeters * 10;
-    /// // add data band to a page
-    /// page.Bands.Add(data);
+    /// ReportPage page1 = report1.Pages[0] as ReportPage;
     /// </code>
     /// </example>
-    public partial class Report : Base, IParent, ISupportInitialize
+    [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+    public PageCollection Pages { get; }
+
+    /// <summary>
+    /// Gets the report's data.
+    /// </summary>
+    /// <remarks>
+    /// The dictionary contains all data items such as connections, data sources, parameters,
+    /// system variables.
+    /// </remarks>
+    [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+    public Dictionary? Dictionary
     {
-        #region Fields
-
-        private Dictionary dictionary;
-        private string baseReport;
-        private Report baseReportObject;
-        private Language scriptLanguage;
-        private string[] referencedAssemblies;
-        private Hashtable cachedDataItems;
-        private AssemblyCollection assemblies;
-        private bool aborted;
-        private Bitmap measureBitmap;
-        private IGraphics measureGraphics;
-        private int tickCount;
-        private bool needCompile;
-        private bool initializing;
-        private object initializeData;
-        private string initializeDataName;
-
-        #endregion Fields
-
-        #region Properties
-
-        /// <summary>
-        /// Occurs when calc execution is started.
-        /// </summary>
-        public event CustomCalcEventHandler CustomCalc;
-
-        /// <summary>
-        /// Occurs when report is inherited and trying to load a base report.
-        /// </summary>
-        /// <remarks>
-        /// Typical use of this event is to load the base report from a database instead of a file.
-        /// </remarks>
-        public event CustomLoadEventHandler LoadBaseReport;
-
-        /// <summary>
-        /// Occurs when report execution is started.
-        /// </summary>
-        public event EventHandler StartReport;
-
-        /// <summary>
-        /// Occurs when report execution is finished.
-        /// </summary>
-        public event EventHandler FinishReport;
-
-        /// <summary>
-        /// Occurs before export to set custom export parameters.
-        /// </summary>
-        public event EventHandler<ExportParametersEventArgs> ExportParameters;
-
-        /// <summary>
-        /// Gets the pages contained in this report.
-        /// </summary>
-        /// <remarks>
-        /// This property contains pages of all types (report and dialog). Use the <b>is/as</b> operators
-        /// if you want to work with pages of <b>ReportPage</b> type.
-        /// </remarks>
-        /// <example>The following code demonstrates how to access the first report page:
-        /// <code>
-        /// ReportPage page1 = report1.Pages[0] as ReportPage;
-        /// </code>
-        /// </example>
-        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
-        public PageCollection Pages { get; }
-
-        /// <summary>
-        /// Gets the report's data.
-        /// </summary>
-        /// <remarks>
-        /// The dictionary contains all data items such as connections, data sources, parameters,
-        /// system variables.
-        /// </remarks>
-        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
-        public Dictionary Dictionary
+        get => _dictionary;
+        set
         {
-            get => dictionary;
-            set
+            SetProp (_dictionary, value);
+            _dictionary = value;
+        }
+    }
+
+    /// <summary>
+    /// Gets the collection of report parameters.
+    /// </summary>
+    /// <remarks>
+    /// <para>Parameters are displayed in the "Data" window under the "Parameters" node.</para>
+    /// <para>Typical use of parameters is to pass some static data from the application to the report.
+    /// You can print such data, use it in the data row filter, script etc. </para>
+    /// <para>Another way to use parameters is to define some reusable piece of code, for example,
+    /// to define an expression that will return the concatenation of first and second employee name.
+    /// In this case, you set the parameter's <b>Expression</b> property to something like this:
+    /// [Employees.FirstName] + " " + [Employees.LastName]. Now this parameter may be used in the report
+    /// to print full employee name. Each time you access such parameter, it will calculate the expression
+    /// and return its value. </para>
+    /// <para>You can create nested parameters. To do this, add the new <b>Parameter</b> to the
+    /// <b>Parameters</b> collection of the root parameter. To access the nested parameter, you may use the
+    /// <see cref="GetParameter"/> method.</para>
+    /// <para>To get or set the parameter's value, use the <see cref="GetParameterValue"/> and
+    /// <see cref="SetParameterValue"/> methods. To set the parameter's expression, use the
+    /// <see cref="GetParameter"/> method that returns a <b>Parameter</b> object and set its
+    /// <b>Expression</b> property.</para>
+    /// </remarks>
+    [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+    public ParameterCollection? Parameters => _dictionary?.Parameters;
+
+    /// <summary>
+    /// Gets or sets the report information such as report name, author, description etc.
+    /// </summary>
+    [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+    public ReportInfo ReportInfo { get; set; }
+
+    /// <summary>
+    /// Gets or sets the base report file name.
+    /// </summary>
+    /// <remarks>
+    /// This property contains the name of a report file this report is inherited from.
+    /// <b>Note:</b> setting this property to non-empty value will clear the report and
+    /// load the base file into it.
+    /// </remarks>
+    [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+    public string BaseReport
+    {
+        get => _baseReport;
+        set => SetBaseReport (value);
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether Report is prepared
+    /// </summary>
+    [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+    public bool IsPrepared => PreparedPages != null && PreparedPages.Count != 0;
+
+    /// <summary>
+    /// Gets or sets the absolute path to the parent report.
+    /// </summary>
+    /// <remarks>
+    /// This property contains the absolute path to the parent report.
+    /// </remarks>
+    [Browsable (true), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+    public string BaseReportAbsolutePath { get; set; }
+
+    /// <summary>
+    /// Gets or sets the name of a file the report was loaded from.
+    /// </summary>
+    /// <remarks>
+    /// This property is used to support the AM.Reporting.Net infrastructure;
+    /// typically you don't need to use it.
+    /// </remarks>
+    [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+    public string FileName { get; set; }
+
+    /// <summary>
+    /// Gets or sets the report script.
+    /// </summary>
+    /// <remarks>
+    /// <para>The script contains the <b>ReportScript</b> class that contains all report objects'
+    /// event handlers and own items such as private fields, properties, methods etc. The script
+    /// contains only items written by you. Unlike other report generators, the script does not
+    /// contain report objects declarations, initialization code. It is added automatically when
+    /// you run the report.</para>
+    /// <para>By default this property contains an empty script text. You may see it in the designer
+    /// when you switch to the Code window.</para>
+    /// <para>If you set this property programmatically, you have to declare the <b>AM.Reporting</b>
+    /// namespace and the <b>ReportScript</b> class in it. Do not declare report items (such as bands,
+    /// objects, etc) in the <b>ReportScript</b> class: the report engine does this automatically when
+    /// you run the report.</para>
+    /// <para><b>Security note:</b> since the report script is compiled into .NET assembly, it allows
+    /// you to do ANYTHING. For example, you may create a script that will read/write files from/to a disk.
+    /// </para>
+    /// </remarks>
+    [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+    public string ScriptText { get; set; }
+
+    /// <summary>
+    /// Gets or sets the script language of this report.
+    /// </summary>
+    /// <remarks>
+    /// Note: changing this property will reset the report script to default empty script.
+    /// </remarks>
+    [DefaultValue (Language.CSharp)]
+    [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+    public Language ScriptLanguage
+    {
+        get => _scriptLanguage;
+        set
+        {
+            var needClear = _scriptLanguage != value;
+            _scriptLanguage = value;
+            if (_scriptLanguage == Language.CSharp)
             {
-                SetProp (dictionary, value);
-                dictionary = value;
+                CodeHelper = new CsCodeHelper (this);
+            }
+            else
+            {
+                CodeHelper = new VbCodeHelper (this);
+            }
+
+            if (needClear)
+            {
+                ScriptText = CodeHelper.EmptyScript();
             }
         }
+    }
 
-        /// <summary>
-        /// Gets the collection of report parameters.
-        /// </summary>
-        /// <remarks>
-        /// <para>Parameters are displayed in the "Data" window under the "Parameters" node.</para>
-        /// <para>Typical use of parameters is to pass some static data from the application to the report.
-        /// You can print such data, use it in the data row filter, script etc. </para>
-        /// <para>Another way to use parameters is to define some reusable piece of code, for example,
-        /// to define an expression that will return the concatenation of first and second employee name.
-        /// In this case, you set the parameter's <b>Expression</b> property to something like this:
-        /// [Employees.FirstName] + " " + [Employees.LastName]. Now this parameter may be used in the report
-        /// to print full employee name. Each time you access such parameter, it will calculate the expression
-        /// and return its value. </para>
-        /// <para>You can create nested parameters. To do this, add the new <b>Parameter</b> to the
-        /// <b>Parameters</b> collection of the root parameter. To access the nested parameter, you may use the
-        /// <see cref="GetParameter"/> method.</para>
-        /// <para>To get or set the parameter's value, use the <see cref="GetParameterValue"/> and
-        /// <see cref="SetParameterValue"/> methods. To set the parameter's expression, use the
-        /// <see cref="GetParameter"/> method that returns a <b>Parameter</b> object and set its
-        /// <b>Expression</b> property.</para>
-        /// </remarks>
-        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
-        public ParameterCollection Parameters => dictionary.Parameters;
+    /// <summary>
+    /// Gets or sets a value indicating whether the null DB value must be converted to zero, false or
+    /// empty string depending on the data column type.
+    /// </summary>
+    /// <remarks>
+    /// This property is <b>true</b> by default. If you set it to <b>false</b>, you should check
+    /// the DB value before you do something with it (for example, typecast it to any type, use it
+    /// in a expression etc.)
+    /// </remarks>
+    [DefaultValue (true)]
+    [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+    public bool ConvertNulls { get; set; }
 
-        /// <summary>
-        /// Gets or sets the report information such as report name, author, description etc.
-        /// </summary>
-        [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
-        [SRCategory ("Design")]
-        public ReportInfo ReportInfo { get; set; }
+    /// <summary>
+    /// Gets or sets a value that specifies whether the report engine should perform the second pass.
+    /// </summary>
+    /// <remarks>
+    /// <para>Typically the second pass is necessary to print the number of total pages. It also
+    /// may be used to perform some calculations on the first pass and print its results on the
+    /// second pass.</para>
+    /// <para>Use the <b>Engine.FirstPass</b>, <b>Engine.FinalPass</b> properties to determine which
+    /// pass the engine is performing now.</para>
+    /// </remarks>
+    [DefaultValue (false)]
+    [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+    public bool DoublePass { get; set; }
 
-        /// <summary>
-        /// Gets or sets the base report file name.
-        /// </summary>
-        /// <remarks>
-        /// This property contains the name of a report file this report is inherited from.
-        /// <b>Note:</b> setting this property to non-empty value will clear the report and
-        /// load the base file into it.
-        /// </remarks>
-        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
-        public string BaseReport
+    /// <summary>
+    /// Gets or sets a value that specifies whether to compress the report file.
+    /// </summary>
+    /// <remarks>
+    /// The report file is compressed using the Gzip algorithm. So you can open the
+    /// compressed report in any zip-compatible archiver.
+    /// </remarks>
+    [DefaultValue (false)]
+    [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+    public bool Compressed { get; set; }
+
+    /// <summary>
+    /// Returns a bool value depending on the .frx or .fpx report was loaded
+    /// </summary>
+    public bool IsLoadPrepared { get; private set; }
+
+    /// <summary>
+    /// Gets or sets a value that specifies whether to use the file cache rather than memory
+    /// to store the prepared report pages.
+    /// </summary>
+    [DefaultValue (false)]
+    [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+    public bool UseFileCache { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value that specifies the quality of text rendering.
+    /// </summary>
+    /// <remarks>
+    /// <b>Note:</b> the default property value is <b>TextQuality.Default</b>. That means the report
+    /// may look different depending on OS settings. This property does not affect the printout.
+    /// </remarks>
+    [DefaultValue (TextQuality.Default)]
+    [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+    public TextQuality TextQuality { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value that specifies if the graphic objects such as bitmaps
+    /// and shapes should be displayed smoothly.
+    /// </summary>
+    [DefaultValue (false)]
+    [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+    public bool SmoothGraphics { get; set; }
+
+    /// <summary>
+    /// Gets or sets the report password.
+    /// </summary>
+    /// <remarks>
+    /// <para>When you try to load the password-protected report, you will be asked
+    /// for a password. You also may specify the password in this property before loading
+    /// the report. In this case the report will load silently.</para>
+    /// <para>Password-protected report file is crypted using Rijndael algorithm.
+    /// Do not forget your password! It will be hard or even impossible to open
+    /// the protected file in this case.</para>
+    /// </remarks>
+    [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+    public string Password { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether it is necessary to automatically fill
+    /// DataSet registered with <b>RegisterData</b> call.
+    /// </summary>
+    /// <remarks>
+    /// If this property is <b>true</b> (by default), AM.Reporting will automatically fill
+    /// the DataSet with data when you trying to run a report. Set it to <b>false</b> if
+    /// you want to fill the DataSet by yourself.
+    /// </remarks>
+    [DefaultValue (true)]
+    public bool AutoFillDataSet { get; set; }
+
+    /// <summary>
+    /// Gets or sets the maximum number of generated pages in a prepared report.
+    /// </summary>
+    /// <remarks>
+    /// Use this property to limit the number of pages in a prepared report.
+    /// </remarks>
+    [DefaultValue (0)]
+    public int MaxPages { get; set; }
+
+    /// <summary>
+    /// Gets or sets the collection of styles used in this report.
+    /// </summary>
+    [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+    public StyleCollection Styles { get; set; }
+
+    /// <summary>
+    /// Gets or sets an array of assembly names that will be used to compile the report script.
+    /// </summary>
+    /// <remarks>
+    /// By default this property contains the following assemblies: "System.dll", "System.Drawing.dll",
+    /// "System.Windows.Forms.dll", "System.Data.dll", "System.Xml.dll". If your script uses some types
+    /// from another assemblies, you have to add them to this property.
+    /// </remarks>
+    [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+    public string[]? ReferencedAssemblies
+    {
+        get => _referencedAssemblies;
+        set
         {
-            get => baseReport;
-            set => SetBaseReport (value);
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether Report is prepared
-        /// </summary>
-        [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
-        public bool IsPrepared => PreparedPages != null && PreparedPages.Count != 0;
-
-        /// <summary>
-        /// Gets or sets the absolute path to the parent report.
-        /// </summary>
-        /// <remarks>
-        /// This property contains the absolute path to the parent report.
-        /// </remarks>
-        [Browsable (true), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
-        public string BaseReportAbsolutePath { get; set; }
-
-        /// <summary>
-        /// Gets or sets the name of a file the report was loaded from.
-        /// </summary>
-        /// <remarks>
-        /// This property is used to support the AM.Reporting.Net infrastructure;
-        /// typically you don't need to use it.
-        /// </remarks>
-        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
-        public string FileName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the report script.
-        /// </summary>
-        /// <remarks>
-        /// <para>The script contains the <b>ReportScript</b> class that contains all report objects'
-        /// event handlers and own items such as private fields, properties, methods etc. The script
-        /// contains only items written by you. Unlike other report generators, the script does not
-        /// contain report objects declarations, initialization code. It is added automatically when
-        /// you run the report.</para>
-        /// <para>By default this property contains an empty script text. You may see it in the designer
-        /// when you switch to the Code window.</para>
-        /// <para>If you set this property programmatically, you have to declare the <b>AM.Reporting</b>
-        /// namespace and the <b>ReportScript</b> class in it. Do not declare report items (such as bands,
-        /// objects, etc) in the <b>ReportScript</b> class: the report engine does this automatically when
-        /// you run the report.</para>
-        /// <para><b>Security note:</b> since the report script is compiled into .NET assembly, it allows
-        /// you to do ANYTHING. For example, you may create a script that will read/write files from/to a disk.
-        /// To restrict such operations, use the <see cref="ScriptRestrictions"/> property.</para>
-        /// </remarks>
-        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
-        public string ScriptText { get; set; }
-
-        /// <summary>
-        /// Gets or sets the script language of this report.
-        /// </summary>
-        /// <remarks>
-        /// Note: changing this property will reset the report script to default empty script.
-        /// </remarks>
-        [DefaultValue (Language.CSharp)]
-        [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
-        [SRCategory ("Script")]
-        public Language ScriptLanguage
-        {
-            get => scriptLanguage;
-            set
+            if (value != null)
             {
-                var needClear = scriptLanguage != value;
-                scriptLanguage = value;
-                if (scriptLanguage == Language.CSharp)
+                // fix for old reports with "System.Windows.Forms.DataVisualization" in referenced assemblies
+                for (var i = 0; i < value.Length; i++)
                 {
-                    CodeHelper = new CsCodeHelper (this);
-                }
-                else
-                {
-                    CodeHelper = new VbCodeHelper (this);
-                }
-
-                if (needClear)
-                {
-                    ScriptText = CodeHelper.EmptyScript();
+                    value[i] = value[i].Replace ("System.Windows.Forms.DataVisualization",
+                        "AM.Reporting.DataVisualization");
                 }
             }
+
+            _referencedAssemblies = value;
         }
+    }
 
-        /// <summary>
-        /// Gets or sets a value indicating whether the null DB value must be converted to zero, false or
-        /// empty string depending on the data column type.
-        /// </summary>
-        /// <remarks>
-        /// This property is <b>true</b> by default. If you set it to <b>false</b>, you should check
-        /// the DB value before you do something with it (for example, typecast it to any type, use it
-        /// in a expression etc.)
-        /// </remarks>
-        [DefaultValue (true)]
-        [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
-        [SRCategory ("Engine")]
-        public bool ConvertNulls { get; set; }
+    /// <summary>
+    /// Gets or sets a script event name that will be fired when the report starts.
+    /// </summary>
+    [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+    [SRCategory ("Build")]
+    public string StartReportEvent { get; set; }
 
-        /// <summary>
-        /// Gets or sets a value that specifies whether the report engine should perform the second pass.
-        /// </summary>
-        /// <remarks>
-        /// <para>Typically the second pass is necessary to print the number of total pages. It also
-        /// may be used to perform some calculations on the first pass and print its results on the
-        /// second pass.</para>
-        /// <para>Use the <b>Engine.FirstPass</b>, <b>Engine.FinalPass</b> properties to determine which
-        /// pass the engine is performing now.</para>
-        /// </remarks>
-        [DefaultValue (false)]
-        [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
-        [SRCategory ("Engine")]
-        public bool DoublePass { get; set; }
+    /// <summary>
+    /// Gets or sets a script event name that will be fired when the report is finished.
+    /// </summary>
+    [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+    [SRCategory ("Build")]
+    public string FinishReportEvent { get; set; }
 
-        /// <summary>
-        /// Gets or sets a value that specifies whether to compress the report file.
-        /// </summary>
-        /// <remarks>
-        /// The report file is compressed using the Gzip algorithm. So you can open the
-        /// compressed report in any zip-compatible archiver.
-        /// </remarks>
-        [DefaultValue (false)]
-        [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
-        [SRCategory ("Misc")]
-        public bool Compressed { get; set; }
-
-        /// <summary>
-        /// Returns a bool value depending on the .frx or .fpx report was loaded
-        /// </summary>
-        public bool IsLoadPrepared { get; private set; }
-
-        /// <summary>
-        /// Gets or sets a value that specifies whether to use the file cache rather than memory
-        /// to store the prepared report pages.
-        /// </summary>
-        [DefaultValue (false)]
-        [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
-        [SRCategory ("Engine")]
-        public bool UseFileCache { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value that specifies the quality of text rendering.
-        /// </summary>
-        /// <remarks>
-        /// <b>Note:</b> the default property value is <b>TextQuality.Default</b>. That means the report
-        /// may look different depending on OS settings. This property does not affect the printout.
-        /// </remarks>
-        [DefaultValue (TextQuality.Default)]
-        [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
-        [SRCategory ("Misc")]
-        public TextQuality TextQuality { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value that specifies if the graphic objects such as bitmaps
-        /// and shapes should be displayed smoothly.
-        /// </summary>
-        [DefaultValue (false)]
-        [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
-        [SRCategory ("Misc")]
-        public bool SmoothGraphics { get; set; }
-
-        /// <summary>
-        /// Gets or sets the report password.
-        /// </summary>
-        /// <remarks>
-        /// <para>When you try to load the password-protected report, you will be asked
-        /// for a password. You also may specify the password in this property before loading
-        /// the report. In this case the report will load silently.</para>
-        /// <para>Password-protected report file is crypted using Rijndael algorithm.
-        /// Do not forget your password! It will be hard or even impossible to open
-        /// the protected file in this case.</para>
-        /// </remarks>
-        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
-        public string Password { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether it is necessary to automatically fill
-        /// DataSet registered with <b>RegisterData</b> call.
-        /// </summary>
-        /// <remarks>
-        /// If this property is <b>true</b> (by default), AM.Reporting will automatically fill
-        /// the DataSet with data when you trying to run a report. Set it to <b>false</b> if
-        /// you want to fill the DataSet by yourself.
-        /// </remarks>
-        [DefaultValue (true)]
-        [SRCategory ("Misc")]
-        public bool AutoFillDataSet { get; set; }
-
-        /// <summary>
-        /// Gets or sets the maximum number of generated pages in a prepared report.
-        /// </summary>
-        /// <remarks>
-        /// Use this property to limit the number of pages in a prepared report.
-        /// </remarks>
-        [DefaultValue (0)]
-        [SRCategory ("Misc")]
-        public int MaxPages { get; set; }
-
-        /// <summary>
-        /// Gets or sets the collection of styles used in this report.
-        /// </summary>
-        [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
-        [SRCategory ("Misc")]
-        public StyleCollection Styles { get; set; }
-
-        /// <summary>
-        /// Gets or sets an array of assembly names that will be used to compile the report script.
-        /// </summary>
-        /// <remarks>
-        /// By default this property contains the following assemblies: "System.dll", "System.Drawing.dll",
-        /// "System.Windows.Forms.dll", "System.Data.dll", "System.Xml.dll". If your script uses some types
-        /// from another assemblies, you have to add them to this property.
-        /// </remarks>
-        [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
-        [SRCategory ("Script")]
-        public string[] ReferencedAssemblies
+    /// <summary>
+    /// Gets a value indicating that report execution was aborted.
+    /// </summary>
+    [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+    public bool Aborted
+    {
+        get
         {
-            get => referencedAssemblies;
-            set
+            Config.DoEvent();
+            return _aborted;
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets a value that determines whether to store the report in the application resources.
+    /// Use this property in the MS Visual Studio IDE only.
+    /// </summary>
+    /// <remarks>
+    /// By default this property is <b>true</b>. When set to <b>false</b>, you should store your report
+    /// in a file.
+    /// </remarks>
+    [DefaultValue (true)]
+    [SRCategory ("Design")]
+    public bool StoreInResources { get; set; }
+
+    /// <summary>
+    /// Gets or sets the resource string that contains the report.
+    /// </summary>
+    /// <remarks>
+    /// This property is used by the MS Visual Studio to store the report. Do not use it directly.
+    /// </remarks>
+    [Browsable (false)]
+    [Localizable (true)]
+    public string ReportResourceString
+    {
+        get
+        {
+            if (!StoreInResources)
             {
-                if (value != null)
+                return "";
+            }
+
+            return SaveToString();
+        }
+        set
+        {
+            if (string.IsNullOrEmpty (value))
+            {
+                Clear();
+                return;
+            }
+
+            LoadFromString (value);
+        }
+    }
+
+    /// <summary>
+    /// Gets a value indicating that this report contains dialog forms.
+    /// </summary>
+    [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+    public bool HasDialogs
+    {
+        get
+        {
+            foreach (PageBase page in Pages)
+            {
+                if (page is DialogPage)
                 {
-                    // fix for old reports with "System.Windows.Forms.DataVisualization" in referenced assemblies
-                    for (var i = 0; i < value.Length; i++)
-                    {
-                        value[i] = value[i].Replace ("System.Windows.Forms.DataVisualization",
-                            "AM.Reporting.DataVisualization");
-                    }
+                    return true;
                 }
-
-                referencedAssemblies = value;
             }
+
+            return false;
         }
+    }
 
-        /// <summary>
-        /// Gets or sets a script event name that will be fired when the report starts.
-        /// </summary>
-        [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
-        [SRCategory ("Build")]
-        public string StartReportEvent { get; set; }
+    /// <summary>
+    /// Gets a reference to the graphics cache for this report.
+    /// </summary>
+    /// <remarks>
+    /// This property is used to support the AM.Reporting.Net infrastructure. Do not use it directly.
+    /// </remarks>
+    [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+    public GraphicCache? GraphicCache { get; private set; }
 
-        /// <summary>
-        /// Gets or sets a script event name that will be fired when the report is finished.
-        /// </summary>
-        [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
-        [SRCategory ("Build")]
-        public string FinishReportEvent { get; set; }
+    /// <summary>
+    /// Gets a pages of the prepared report.
+    /// </summary>
+    [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+    public Preview.PreparedPages? PreparedPages { get; private set; }
 
-        /// <summary>
-        /// Gets a value indicating that report execution was aborted.
-        /// </summary>
-        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
-        public bool Aborted
+    /// <summary>
+    /// Gets a reference to the report engine.
+    /// </summary>
+    /// <remarks>
+    /// This property can be used when report is running. In other cases it returns <b>null</b>.
+    /// </remarks>
+    [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+    public ReportEngine Engine { get; private set; }
+
+    /// <summary>
+    /// Gets or sets the initial page number for PageN/PageNofM system variables.
+    /// </summary>
+    [DefaultValue (1)]
+    [SRCategory ("Engine")]
+    public int InitialPageNumber { get; set; }
+
+    /// <summary>
+    /// This property is not relevant to this class.
+    /// </summary>
+    [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+    public new string Name => base.Name;
+
+    /// <summary>
+    /// This property is not relevant to this class.
+    /// </summary>
+    [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+    public new Restrictions Restrictions
+    {
+        get => base.Restrictions;
+        set => base.Restrictions = value;
+    }
+
+    /// <summary>
+    /// Gets the report operation that is currently performed.
+    /// </summary>
+    [Browsable (false)]
+    public ReportOperation Operation { get; private set; }
+
+    /// <summary>
+    /// Gets or sets the Tag object of the report.
+    /// </summary>
+    [Browsable (false)]
+    public object? Tag { get; set; }
+
+    private string[] DefaultAssemblies
+    {
+        get
         {
-            get
+            return new string[]
             {
-                Config.DoEvent();
-                return aborted;
-            }
-        }
+                "System.dll",
 
-        /// <summary>
-        /// Gets or sets a value that determines whether to store the report in the application resources.
-        /// Use this property in the MS Visual Studio IDE only.
-        /// </summary>
-        /// <remarks>
-        /// By default this property is <b>true</b>. When set to <b>false</b>, you should store your report
-        /// in a file.
-        /// </remarks>
-        [DefaultValue (true)]
-        [SRCategory ("Design")]
-        public bool StoreInResources { get; set; }
+                "System.Drawing.dll",
 
-        /// <summary>
-        /// Gets or sets the resource string that contains the report.
-        /// </summary>
-        /// <remarks>
-        /// This property is used by the MS Visual Studio to store the report. Do not use it directly.
-        /// </remarks>
-        [Browsable (false)]
-        [Localizable (true)]
-        public string ReportResourceString
-        {
-            get
-            {
-                if (!StoreInResources)
-                {
-                    return "";
-                }
+                "System.Data.dll",
 
-                return SaveToString();
-            }
-            set
-            {
-                if (string.IsNullOrEmpty (value))
-                {
-                    Clear();
-                    return;
-                }
+                "System.Xml.dll",
 
-                LoadFromString (value);
-            }
-        }
-
-        /// <summary>
-        /// Gets a value indicating that this report contains dialog forms.
-        /// </summary>
-        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
-        public bool HasDialogs
-        {
-            get
-            {
-                foreach (PageBase page in Pages)
-                {
-                    if (page is DialogPage)
-                    {
-                        return true;
-                    }
-                }
-
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets a set of permissions that will be restricted for the script code.
-        /// </summary>
-        /// <remarks>
-        /// Since the report script is compiled into .NET assembly, it allows you to do ANYTHING.
-        /// For example, you may create a script that will read/write files from/to a disk. This property
-        /// is used to restrict such operations.
-        /// <example>This example shows how to restrict the file IO operations in a script:
-        /// <code>
-        /// using System.Security;
-        /// using System.Security.Permissions;
-        /// ...
-        /// PermissionSet ps = new PermissionSet(PermissionState.None);
-        /// ps.AddPermission(new FileIOPermission(PermissionState.Unrestricted));
-        /// report1.ScriptRestrictions = ps;
-        /// report1.Prepare();
-        /// </code>
-        /// </example>
-        /// </remarks>
-        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
-        public PermissionSet ScriptRestrictions { get; set; }
-
-        /// <summary>
-        /// Gets a reference to the graphics cache for this report.
-        /// </summary>
-        /// <remarks>
-        /// This property is used to support the AM.Reporting.Net infrastructure. Do not use it directly.
-        /// </remarks>
-        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
-        public GraphicCache GraphicCache { get; private set; }
-
-        /// <summary>
-        /// Gets a pages of the prepared report.
-        /// </summary>
-        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
-        public Preview.PreparedPages PreparedPages { get; private set; }
-
-        /// <summary>
-        /// Gets a reference to the report engine.
-        /// </summary>
-        /// <remarks>
-        /// This property can be used when report is running. In other cases it returns <b>null</b>.
-        /// </remarks>
-        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
-        public ReportEngine Engine { get; private set; }
-
-        /// <summary>
-        /// Gets or sets the initial page number for PageN/PageNofM system variables.
-        /// </summary>
-        [DefaultValue (1)]
-        [SRCategory ("Engine")]
-        public int InitialPageNumber { get; set; }
-
-        /// <summary>
-        /// This property is not relevant to this class.
-        /// </summary>
-        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
-        public new string Name => base.Name;
-
-        /// <summary>
-        /// This property is not relevant to this class.
-        /// </summary>
-        [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
-        public new Restrictions Restrictions
-        {
-            get => base.Restrictions;
-            set => base.Restrictions = value;
-        }
-
-        /// <summary>
-        /// Gets the report operation that is currently performed.
-        /// </summary>
-        [Browsable (false)]
-        public ReportOperation Operation { get; private set; }
-
-        /// <summary>
-        /// Gets or sets the Tag object of the report.
-        /// </summary>
-        [Browsable (false)]
-        public object Tag { get; set; }
-
-        private string[] DefaultAssemblies
-        {
-            get
-            {
-                return new string[]
-                {
-                    "System.dll",
-
-                    "System.Drawing.dll",
-
-                    "System.Data.dll",
-
-                    "System.Xml.dll",
-
-                    "AM.Reporting.Compat.dll",
+                "AM.Reporting.Compat.dll",
 #if !CROSSPLATFORM
-                    "System.Windows.Forms.dll",
+                "System.Windows.Forms.dll",
 #endif
 
 #if CROSSPLATFORM || COREWIN
@@ -782,1993 +657,1984 @@ namespace AM.Reporting
 #if MSCHART
                     "AM.Reporting.DataVisualization.dll"
 #endif
-                };
-            }
+            };
         }
+    }
 
-        internal CodeHelperBase CodeHelper { get; private set; }
+    internal CodeHelperBase CodeHelper { get; private set; }
 
-        public IGraphics MeasureGraphics
+    public IGraphics MeasureGraphics
+    {
+        get
         {
-            get
+            if (_measureGraphics == null)
             {
-                if (measureGraphics == null)
-                {
 #if CROSSPLATFORM || MONO
                     measureBitmap = new Bitmap(1, 1);
                     measureGraphics = new GdiGraphics(measureBitmap);
 #else
-                    measureGraphics = GdiGraphics.FromGraphics (Graphics.FromHwnd (nint.Zero));
+                _measureGraphics = GdiGraphics.FromGraphics (Graphics.FromHwnd (nint.Zero));
 #endif
-                }
+            }
 
-                return measureGraphics;
+            return _measureGraphics;
+        }
+    }
+
+    public string GetReportName
+    {
+        get
+        {
+            var result = ReportInfo.Name;
+            if (string.IsNullOrEmpty (result))
+            {
+                result = Path.GetFileNameWithoutExtension (FileName);
+            }
+
+            return result;
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets the flag for refresh.
+    /// </summary>
+    public bool NeedRefresh { get; set; }
+
+    internal ObjectCollection AllNamedObjects
+    {
+        get
+        {
+            var allObjects = AllObjects;
+
+            // data objects are not included into AllObjects list. Include named items separately.
+            foreach (Base c in Dictionary!.AllObjects)
+            {
+                if (c is DataConnectionBase or DataSourceBase or Relation or CubeSourceBase)
+                {
+                    allObjects.Add (c);
+                }
+            }
+
+            return allObjects;
+        }
+    }
+
+    #endregion Properties
+
+    #region Private Methods
+
+    private bool ShouldSerializeReferencedAssemblies()
+    {
+        return ReferencedAssemblies is not null
+            && Converter.ToString (ReferencedAssemblies) != Converter.ToString (DefaultAssemblies);
+    }
+
+    // convert absolute path to the base report to relative path (based on the main report path).
+    private string GetRelativePathToBaseReport()
+    {
+        var path = string.Empty;
+        if (!string.IsNullOrEmpty (FileName))
+        {
+            try
+            {
+                path = Path.GetDirectoryName (FileName);
+            }
+            catch (Exception exception)
+            {
+                Debug.WriteLine (exception.Message);
             }
         }
 
-        public string GetReportName
+        if (!string.IsNullOrEmpty (path))
         {
-            get
+            try
             {
-                var result = ReportInfo.Name;
-                if (string.IsNullOrEmpty (result))
-                {
-                    result = Path.GetFileNameWithoutExtension (FileName);
-                }
-
-                return result;
+                return FileUtils.GetRelativePath (BaseReport, path);
+            }
+            catch (Exception exception)
+            {
+                Debug.WriteLine (exception.Message);
             }
         }
 
-        /// <summary>
-        /// Gets or sets the flag for refresh.
-        /// </summary>
-        public bool NeedRefresh { get; set; }
+        return BaseReport;
+    }
 
-        internal ObjectCollection AllNamedObjects
+    private void SetBaseReport (string value)
+    {
+        _baseReport = value;
+        if (_baseReportObject != null)
         {
-            get
-            {
-                var allObjects = AllObjects;
-
-                // data objects are not included into AllObjects list. Include named items separately.
-                foreach (Base c in Dictionary.AllObjects)
-                {
-                    if (c is DataConnectionBase or DataSourceBase or Relation or CubeSourceBase)
-                    {
-                        allObjects.Add (c);
-                    }
-                }
-
-                return allObjects;
-            }
+            _baseReportObject.Dispose();
+            _baseReportObject = null;
         }
 
-        #endregion Properties
-
-        #region Private Methods
-
-        private bool ShouldSerializeReferencedAssemblies()
+        // detach the base report
+        if (string.IsNullOrEmpty (value))
         {
-            return Converter.ToString (ReferencedAssemblies) != Converter.ToString (DefaultAssemblies);
-        }
-
-        // convert absolute path to the base report to relative path (based on the main report path).
-        private string GetRelativePathToBaseReport()
-        {
-            var path = "";
-            if (!string.IsNullOrEmpty (FileName))
-            {
-                try
-                {
-                    path = Path.GetDirectoryName (FileName);
-                }
-                catch
-                {
-                }
-            }
-
-            if (!string.IsNullOrEmpty (path))
-            {
-                try
-                {
-                    return FileUtils.GetRelativePath (BaseReport, path);
-                }
-                catch
-                {
-                }
-            }
-
-            return BaseReport;
-        }
-
-        private void SetBaseReport (string value)
-        {
-            baseReport = value;
-            if (baseReportObject != null)
-            {
-                baseReportObject.Dispose();
-                baseReportObject = null;
-            }
-
-            // detach the base report
-            if (string.IsNullOrEmpty (value))
-            {
-                foreach (Base c in AllObjects)
-                {
-                    c.SetAncestor (false);
-                }
-
-                SetAncestor (false);
-                return;
-            }
-
-            var saveFileName = FileName;
-            if (LoadBaseReport != null)
-            {
-                LoadBaseReport (this, new CustomLoadEventArgs (value, this));
-            }
-            else
-            {
-                // convert the relative path to absolute path (based on the main report path).
-                if (!Path.IsPathRooted (value))
-                {
-                    var fullPath = Path.GetFullPath (Path.GetDirectoryName (FileName));
-
-                    // since directory path separator for Win OS is  '\' and for Unix OS is '/'
-                    // we have to modify the incoming path string with actual for current OS path separator
-                    value = Path.Combine (fullPath, GetFixedSeparatedPath (value));
-                }
-
-                if (!File.Exists (value) && File.Exists (BaseReportAbsolutePath))
-                {
-                    value = BaseReportAbsolutePath;
-                }
-
-                Load (value);
-            }
-
-            FileName = saveFileName;
-            baseReport = "";
-            Password = "";
-            baseReportObject = Activator.CreateInstance (GetType()) as Report;
-            baseReportObject.AssignAll (this, true);
-
-            // set Ancestor & CanChangeParent flags
             foreach (Base c in AllObjects)
             {
-                c.SetAncestor (true);
+                c.SetAncestor (false);
             }
 
-            SetAncestor (true);
-            baseReport = value;
+            SetAncestor (false);
+            return;
         }
 
-        private static string GetFixedSeparatedPath (string baseReport)
+        var saveFileName = FileName;
+        if (LoadBaseReport != null)
         {
-            return baseReport.Replace ('/', Path.DirectorySeparatorChar).Replace ('\\', Path.DirectorySeparatorChar);
+            LoadBaseReport (this, new CustomLoadEventArgs (value, this));
         }
-
-        private void GetDiff (object sender, DiffEventArgs e)
+        else
         {
-            if (baseReportObject != null)
+            // convert the relative path to absolute path (based on the main report path).
+            if (!Path.IsPathRooted (value))
             {
-                if (e.Object is Report)
+                var fullPath = Path.GetFullPath (Path.GetDirectoryName (FileName)!);
+
+                // since directory path separator for Win OS is  '\' and for Unix OS is '/'
+                // we have to modify the incoming path string with actual for current OS path separator
+                value = Path.Combine (fullPath, GetFixedSeparatedPath (value));
+            }
+
+            if (!File.Exists (value) && File.Exists (BaseReportAbsolutePath))
+            {
+                value = BaseReportAbsolutePath;
+            }
+
+            Load (value);
+        }
+
+        FileName = saveFileName;
+        _baseReport = "";
+        Password = "";
+        _baseReportObject = Activator.CreateInstance (GetType()) as Report;
+        _baseReportObject!.AssignAll (this, true);
+
+        // set Ancestor & CanChangeParent flags
+        foreach (Base c in AllObjects)
+        {
+            c.SetAncestor (true);
+        }
+
+        SetAncestor (true);
+        _baseReport = value;
+    }
+
+    private static string GetFixedSeparatedPath (string baseReport)
+    {
+        return baseReport.Replace ('/', Path.DirectorySeparatorChar).Replace ('\\', Path.DirectorySeparatorChar);
+    }
+
+    private void GetDiff (object sender, DiffEventArgs e)
+    {
+        if (_baseReportObject != null)
+        {
+            if (e.Object is Report)
+            {
+                e.DiffObject = _baseReportObject;
+            }
+            else if (e.Object is Base @base)
+            {
+                e.DiffObject = _baseReportObject.FindObject (@base.Name);
+            }
+        }
+    }
+
+    private void StartPerformanceCounter()
+    {
+        _tickCount = Environment.TickCount;
+    }
+
+    private void StopPerformanceCounter()
+    {
+        _tickCount = Environment.TickCount - _tickCount;
+    }
+
+    private void ClearReportProperties()
+    {
+        ReportInfo.Clear();
+        Dictionary?.Clear();
+        if (IsDesigning)
+        {
+            ScriptLanguage = Config.ReportSettings.DefaultLanguage;
+        }
+        else
+        {
+            ScriptLanguage = Language.CSharp;
+        }
+
+        ScriptText = CodeHelper.EmptyScript();
+        BaseReport = "";
+        BaseReportAbsolutePath = "";
+        DoublePass = false;
+        ConvertNulls = true;
+        Compressed = false;
+        TextQuality = TextQuality.Default;
+        SmoothGraphics = false;
+        Password = "";
+        InitialPageNumber = 1;
+        MaxPages = 0;
+        ClearDesign();
+        Styles.Clear();
+        Styles.Name = "";
+        ReferencedAssemblies = DefaultAssemblies;
+        StartReportEvent = "";
+        FinishReportEvent = "";
+        _needCompile = true;
+    }
+
+    #endregion Private Methods
+
+    #region Protected Methods
+
+    /// <inheritdoc/>
+    protected override void Dispose (bool disposing)
+    {
+        if (disposing)
+        {
+            if (GraphicCache != null)
+            {
+                GraphicCache.Dispose();
+            }
+
+            GraphicCache = null;
+            if (_measureGraphics != null)
+            {
+                _measureGraphics.Dispose();
+            }
+
+            _measureGraphics = null;
+            if (_measureBitmap != null)
+            {
+                _measureBitmap.Dispose();
+            }
+
+            _measureBitmap = null;
+            DisposeDesign();
+            if (PreparedPages != null)
+            {
+                PreparedPages.Dispose();
+            }
+        }
+
+        base.Dispose (disposing);
+    }
+
+    /// <inheritdoc/>
+    protected override void DeserializeSubItems (ReportReader reader)
+    {
+        if (string.Compare (reader.ItemName, "ScriptText", StringComparison.OrdinalIgnoreCase) == 0)
+        {
+            ScriptText = reader.ReadPropertyValue();
+        }
+        else if (string.Compare (reader.ItemName, "Dictionary", StringComparison.OrdinalIgnoreCase) == 0)
+        {
+            reader.Read (Dictionary!);
+        }
+        else if (string.Compare (reader.ItemName, "Styles", StringComparison.OrdinalIgnoreCase) == 0)
+        {
+            reader.Read (Styles);
+        }
+        else
+        {
+            base.DeserializeSubItems (reader);
+        }
+    }
+
+    #endregion Protected Methods
+
+    #region IParent
+
+    /// <inheritdoc/>
+    public bool CanContain (Base child)
+    {
+        return child is PageBase or Data.Dictionary;
+    }
+
+    /// <inheritdoc/>
+    public void GetChildObjects (ObjectCollection list)
+    {
+        foreach (PageBase page in Pages)
+        {
+            list.Add (page);
+        }
+    }
+
+    /// <inheritdoc/>
+    public void AddChild (Base obj)
+    {
+        if (obj is PageBase @base)
+        {
+            Pages.Add (@base);
+        }
+        else if (obj is Dictionary dictionary1)
+        {
+            Dictionary = dictionary1;
+        }
+    }
+
+    /// <inheritdoc/>
+    public void RemoveChild (Base obj)
+    {
+        if (obj is PageBase @base)
+        {
+            Pages.Remove (@base);
+        }
+        else if (obj is Dictionary dictionary1 && dictionary1 == _dictionary)
+        {
+            Dictionary = null;
+        }
+    }
+
+    /// <inheritdoc/>
+    public virtual int GetChildOrder (Base child)
+    {
+        if (child is PageBase @base)
+        {
+            return Pages.IndexOf (@base);
+        }
+
+        return 0;
+    }
+
+    /// <inheritdoc/>
+    public virtual void SetChildOrder (Base child, int order)
+    {
+        if (child is PageBase @base)
+        {
+            if (order > Pages.Count)
+            {
+                order = Pages.Count;
+            }
+
+            var oldOrder = @base.ZOrder;
+            if (oldOrder != -1 && order != -1 && oldOrder != order)
+            {
+                if (oldOrder <= order)
                 {
-                    e.DiffObject = baseReportObject;
-                }
-                else if (e.Object is Base @base)
-                {
-                    e.DiffObject = baseReportObject.FindObject (@base.Name);
-                }
-            }
-        }
-
-        private void StartPerformanceCounter()
-        {
-            tickCount = Environment.TickCount;
-        }
-
-        private void StopPerformanceCounter()
-        {
-            tickCount = Environment.TickCount - tickCount;
-        }
-
-        private void ClearReportProperties()
-        {
-            ReportInfo.Clear();
-            Dictionary.Clear();
-            if (IsDesigning)
-            {
-                ScriptLanguage = Config.ReportSettings.DefaultLanguage;
-            }
-            else
-            {
-                ScriptLanguage = Language.CSharp;
-            }
-
-            ScriptText = CodeHelper.EmptyScript();
-            BaseReport = "";
-            BaseReportAbsolutePath = "";
-            DoublePass = false;
-            ConvertNulls = true;
-            Compressed = false;
-            TextQuality = TextQuality.Default;
-            SmoothGraphics = false;
-            Password = "";
-            InitialPageNumber = 1;
-            MaxPages = 0;
-            ClearDesign();
-            Styles.Clear();
-            Styles.Name = "";
-            ReferencedAssemblies = DefaultAssemblies;
-            StartReportEvent = "";
-            FinishReportEvent = "";
-            needCompile = true;
-        }
-
-        #endregion Private Methods
-
-        #region Protected Methods
-
-        /// <inheritdoc/>
-        protected override void Dispose (bool disposing)
-        {
-            if (disposing)
-            {
-                if (GraphicCache != null)
-                {
-                    GraphicCache.Dispose();
+                    order--;
                 }
 
-                GraphicCache = null;
-                if (measureGraphics != null)
-                {
-                    measureGraphics.Dispose();
-                }
-
-                measureGraphics = null;
-                if (measureBitmap != null)
-                {
-                    measureBitmap.Dispose();
-                }
-
-                measureBitmap = null;
-                DisposeDesign();
-                if (PreparedPages != null)
-                {
-                    PreparedPages.Dispose();
-                }
-            }
-
-            base.Dispose (disposing);
-        }
-
-        /// <inheritdoc/>
-        protected override void DeserializeSubItems (ReportReader reader)
-        {
-            if (string.Compare (reader.ItemName, "ScriptText", true) == 0)
-            {
-                ScriptText = reader.ReadPropertyValue();
-            }
-            else if (string.Compare (reader.ItemName, "Dictionary", true) == 0)
-            {
-                reader.Read (Dictionary);
-            }
-            else if (string.Compare (reader.ItemName, "Styles", true) == 0)
-            {
-                reader.Read (Styles);
-            }
-            else
-            {
-                base.DeserializeSubItems (reader);
-            }
-        }
-
-        #endregion Protected Methods
-
-        #region IParent
-
-        /// <inheritdoc/>
-        public bool CanContain (Base child)
-        {
-            return child is PageBase or Data.Dictionary;
-        }
-
-        /// <inheritdoc/>
-        public void GetChildObjects (ObjectCollection list)
-        {
-            foreach (PageBase page in Pages)
-            {
-                list.Add (page);
-            }
-        }
-
-        /// <inheritdoc/>
-        public void AddChild (Base obj)
-        {
-            if (obj is PageBase @base)
-            {
-                Pages.Add (@base);
-            }
-            else if (obj is Dictionary dictionary1)
-            {
-                Dictionary = dictionary1;
-            }
-        }
-
-        /// <inheritdoc/>
-        public void RemoveChild (Base obj)
-        {
-            if (obj is PageBase @base)
-            {
                 Pages.Remove (@base);
-            }
-            else if (obj is Dictionary dictionary1 && dictionary1 == dictionary)
-            {
-                Dictionary = null;
+                Pages.Insert (order, @base);
             }
         }
+    }
 
-        /// <inheritdoc/>
-        public virtual int GetChildOrder (Base child)
+    /// <inheritdoc/>
+    public virtual void UpdateLayout (float dx, float dy)
+    {
+        // do nothing
+    }
+
+    #endregion IParent
+
+    #region ISupportInitialize Members
+
+    /// <inheritdoc/>
+    public void BeginInit()
+    {
+        _initializing = true;
+    }
+
+    /// <inheritdoc/>
+    public void EndInit()
+    {
+        _initializing = false;
+        Dictionary!.RegisterData (_initializeData, _initializeDataName, false);
+    }
+
+    #endregion ISupportInitialize Members
+
+    #region Script related
+
+    private void FillDataSourceCache()
+    {
+        _cachedDataItems.Clear();
+        var dictionaryObjects = Dictionary!.AllObjects;
+        foreach (Parameter c in Dictionary.SystemVariables)
         {
-            if (child is PageBase @base)
-            {
-                return Pages.IndexOf (@base);
-            }
-
-            return 0;
+            dictionaryObjects.Add (c);
         }
 
-        /// <inheritdoc/>
-        public virtual void SetChildOrder (Base child, int order)
+        foreach (Base c in dictionaryObjects)
         {
-            if (child is PageBase @base)
+            if (c is DataSourceBase data)
             {
-                if (order > Pages.Count)
+                var cachedItem = new CachedDataItem
                 {
-                    order = Pages.Count;
-                }
+                    dataSource = data
+                };
+                _cachedDataItems[data.FullName] = cachedItem;
 
-                var oldOrder = @base.ZOrder;
-                if (oldOrder != -1 && order != -1 && oldOrder != order)
+                for (var i = 0; i < data.Columns.Count; i++)
                 {
-                    if (oldOrder <= order)
+                    cachedItem = new CachedDataItem
                     {
-                        order--;
-                    }
-
-                    Pages.Remove (@base);
-                    Pages.Insert (order, @base);
-                }
-            }
-        }
-
-        /// <inheritdoc/>
-        public virtual void UpdateLayout (float dx, float dy)
-        {
-            // do nothing
-        }
-
-        #endregion IParent
-
-        #region ISupportInitialize Members
-
-        /// <inheritdoc/>
-        public void BeginInit()
-        {
-            initializing = true;
-        }
-
-        /// <inheritdoc/>
-        public void EndInit()
-        {
-            initializing = false;
-            Dictionary.RegisterData (initializeData, initializeDataName, false);
-        }
-
-        #endregion ISupportInitialize Members
-
-        #region Script related
-
-        private void FillDataSourceCache()
-        {
-            cachedDataItems.Clear();
-            var dictionaryObjects = Dictionary.AllObjects;
-            foreach (Parameter c in Dictionary.SystemVariables)
-            {
-                dictionaryObjects.Add (c);
-            }
-
-            foreach (Base c in dictionaryObjects)
-            {
-                if (c is DataSourceBase data)
-                {
-                    var cachedItem = new CachedDataItem
-                    {
-                        dataSource = data
+                        dataSource = data,
+                        column = data.Columns[i]
                     };
-                    cachedDataItems[data.FullName] = cachedItem;
-
-                    for (var i = 0; i < data.Columns.Count; i++)
-                    {
-                        cachedItem = new CachedDataItem
-                        {
-                            dataSource = data,
-                            column = data.Columns[i]
-                        };
-                        cachedDataItems[data.FullName + "." + data.Columns[i].Alias] = cachedItem;
-                    }
+                    _cachedDataItems[data.FullName + "." + data.Columns[i]!.Alias] = cachedItem;
                 }
-                else if (c is Parameter parameter)
-                {
-                    cachedDataItems[parameter.FullName] = c;
-                }
-                else if (c is Total total)
-                {
-                    cachedDataItems[total.Name] = c;
-                }
+            }
+            else if (c is Parameter parameter)
+            {
+                _cachedDataItems[parameter.FullName] = c;
+            }
+            else if (c is Total total)
+            {
+                _cachedDataItems[total.Name] = c;
             }
         }
+    }
 
-        internal void Compile()
+    internal void Compile()
+    {
+        FillDataSourceCache();
+
+        if (_needCompile)
         {
-            FillDataSourceCache();
-
-            if (needCompile)
-            {
-                var descriptor = new AssemblyDescriptor (this, ScriptText);
-                assemblies.Clear();
-                assemblies.Add (descriptor);
-                descriptor.AddObjects();
-                descriptor.AddExpressions();
-                descriptor.AddFunctions();
-                descriptor.Compile();
-            }
-            else
-            {
-                InternalInit();
-            }
-        }
-
-        /// <summary>
-        /// Initializes the report's fields.
-        /// </summary>
-        /// <remarks>
-        /// This method is for internal use only.
-        /// </remarks>
-        protected void InternalInit()
-        {
-            needCompile = false;
-
-            var descriptor = new AssemblyDescriptor (this, CodeHelper.EmptyScript());
-            assemblies.Clear();
-            assemblies.Add (descriptor);
-            descriptor.InitInstance (this);
-        }
-
-        /// <summary>
-        /// Generates the file (.cs or .vb) that contains the report source code.
-        /// </summary>
-        /// <param name="fileName">Name of the file.</param>
-        /// <remarks>
-        /// Use this method to generate the report source code. This code can be attached to your project.
-        /// In this case, you will need to call the following code to run a report:
-        /// <code>
-        /// SimpleListReport report = new SimpleListReport();
-        /// report.RegisterData(your_dataset);
-        /// report.Show();
-        /// </code>
-        /// </remarks>
-        public void GenerateReportAssembly (string fileName)
-        {
-            // create the class name
-            var className = "";
-            const string punctuation = " ~`!@#$%^&*()-=+[]{},.<>/?;:'\"\\|";
-            foreach (var c in Path.GetFileNameWithoutExtension (fileName))
-            {
-                if (!punctuation.Contains (c.ToString()))
-                {
-                    className += c;
-                }
-            }
-
             var descriptor = new AssemblyDescriptor (this, ScriptText);
+            _assemblies.Clear();
+            _assemblies.Add (descriptor);
             descriptor.AddObjects();
             descriptor.AddExpressions();
             descriptor.AddFunctions();
+            descriptor.Compile();
+        }
+        else
+        {
+            InternalInit();
+        }
+    }
 
-            var reportClassText = descriptor.GenerateReportClass (className);
-            File.WriteAllText (fileName, reportClassText, Encoding.UTF8);
+    /// <summary>
+    /// Initializes the report's fields.
+    /// </summary>
+    /// <remarks>
+    /// This method is for internal use only.
+    /// </remarks>
+    protected void InternalInit()
+    {
+        _needCompile = false;
+
+        var descriptor = new AssemblyDescriptor (this, CodeHelper.EmptyScript());
+        _assemblies.Clear();
+        _assemblies.Add (descriptor);
+        descriptor.InitInstance (this);
+    }
+
+    /// <summary>
+    /// Generates the file (.cs or .vb) that contains the report source code.
+    /// </summary>
+    /// <param name="fileName">Name of the file.</param>
+    /// <remarks>
+    /// Use this method to generate the report source code. This code can be attached to your project.
+    /// In this case, you will need to call the following code to run a report:
+    /// <code>
+    /// SimpleListReport report = new SimpleListReport();
+    /// report.RegisterData(your_dataset);
+    /// report.Show();
+    /// </code>
+    /// </remarks>
+    public void GenerateReportAssembly (string fileName)
+    {
+        // create the class name
+        var className = "";
+        const string punctuation = " ~`!@#$%^&*()-=+[]{},.<>/?;:'\"\\|";
+        foreach (var c in Path.GetFileNameWithoutExtension (fileName))
+        {
+            if (!punctuation.Contains (c.ToString()))
+            {
+                className += c;
+            }
         }
 
-        /// <summary>
-        /// Calculates an expression and returns the result.
-        /// </summary>
-        /// <param name="expression">The expression to calculate.</param>
-        /// <returns>If report is running, returns the result of calculation.
-        /// Otherwise returns <b>null</b>.</returns>
-        /// <remarks>
-        /// <para>The expression may be any valid expression such as "1 + 2". The expression
-        /// is calculated in the report script's <b>ReportScript</b> class instance context,
-        /// so you may refer to any objects available in this context: private fields,
-        /// methods, report objects.</para>
-        /// </remarks>
-        public object Calc (string expression)
+        var descriptor = new AssemblyDescriptor (this, ScriptText);
+        descriptor.AddObjects();
+        descriptor.AddExpressions();
+        descriptor.AddFunctions();
+
+        var reportClassText = descriptor.GenerateReportClass (className);
+        File.WriteAllText (fileName, reportClassText, Encoding.UTF8);
+    }
+
+    /// <summary>
+    /// Calculates an expression and returns the result.
+    /// </summary>
+    /// <param name="expression">The expression to calculate.</param>
+    /// <returns>If report is running, returns the result of calculation.
+    /// Otherwise returns <b>null</b>.</returns>
+    /// <remarks>
+    /// <para>The expression may be any valid expression such as "1 + 2". The expression
+    /// is calculated in the report script's <b>ReportScript</b> class instance context,
+    /// so you may refer to any objects available in this context: private fields,
+    /// methods, report objects.</para>
+    /// </remarks>
+    public object? Calc (string expression)
+    {
+        return Calc (expression, 0);
+    }
+
+    /// <summary>
+    /// Calculates an expression and returns the result.
+    /// </summary>
+    /// <param name="expression">The expression to calculate.</param>
+    /// <param name="value">The value of currently printing object.</param>
+    /// <returns>If report is running, returns the result of calculation.
+    /// Otherwise returns <b>null</b>.</returns>
+    /// <remarks>
+    /// Do not call this method directly. Use the <b>Calc(string expression)</b> method instead.
+    /// </remarks>
+    public object? Calc (string expression, Variant value)
+    {
+        if (!IsRunning)
         {
-            return Calc (expression, 0);
+            return null;
         }
 
-        /// <summary>
-        /// Calculates an expression and returns the result.
-        /// </summary>
-        /// <param name="expression">The expression to calculate.</param>
-        /// <param name="value">The value of currently printing object.</param>
-        /// <returns>If report is running, returns the result of calculation.
-        /// Otherwise returns <b>null</b>.</returns>
-        /// <remarks>
-        /// Do not call this method directly. Use the <b>Calc(string expression)</b> method instead.
-        /// </remarks>
-        public object Calc (string expression, Variant value)
+        if (string.IsNullOrEmpty (expression) || string.IsNullOrEmpty (expression.Trim()))
         {
-            if (!IsRunning)
-            {
-                return null;
-            }
-
-            if (string.IsNullOrEmpty (expression) || string.IsNullOrEmpty (expression.Trim()))
-            {
-                return null;
-            }
-
-            var expr = expression;
-            if (expr.StartsWith ("[") && expr.EndsWith ("]"))
-            {
-                expr = expression.Substring (1, expression.Length - 2);
-            }
-
-            // check cached items first
-            var cachedObject = cachedDataItems[expr];
-
-            if (cachedObject is CachedDataItem cachedItem)
-            {
-                var data = cachedItem.dataSource;
-                var column = cachedItem.column;
-
-                var val = ConvertToColumnDataType (column.Value, column.DataType, ConvertNulls);
-
-                if (CustomCalc != null)
-                {
-                    var e = new CustomCalcEventArgs (expr, val, this);
-                    CustomCalc (this, e);
-                    val = e.CalculatedObject;
-                }
-
-                return val;
-            }
-            else if (cachedObject is Parameter parameter)
-            {
-                return parameter.Value;
-            }
-            else if (cachedObject is Total total)
-            {
-                var val = total.Value;
-                if (ConvertNulls && val is null or DBNull)
-                {
-                    val = 0;
-                }
-
-                total.ExecuteTotal (val);
-
-                return val;
-            }
-
-            // calculate the expression
-            return CalcExpression (expression, value);
+            return null;
         }
 
-        private object ConvertToColumnDataType (object val, Type dataType, bool convertNulls)
+        var expr = expression;
+        if (expr.StartsWith ("[") && expr.EndsWith ("]"))
         {
-            if (val is null or DBNull)
+            expr = expression.Substring (1, expression.Length - 2);
+        }
+
+        // check cached items first
+        var cachedObject = _cachedDataItems[expr];
+
+        if (cachedObject is CachedDataItem cachedItem)
+        {
+            var data = cachedItem.dataSource;
+            var column = cachedItem.column;
+
+            var val = ConvertToColumnDataType (column!.Value!, column.DataType, ConvertNulls);
+
+            if (CustomCalc != null)
             {
-                if (convertNulls)
-                {
-                    val = Converter.ConvertNull (dataType);
-                }
-            }
-            else
-            {
-                if (val is IConvertible)
-                {
-                    var t = Nullable.GetUnderlyingType (dataType);
-                    try
-                    {
-                        val = Convert.ChangeType (val, t != null ? t : dataType);
-                    }
-                    catch (InvalidCastException)
-                    {
-                        // do nothing
-                    }
-                    catch (FormatException)
-                    {
-                        // do nothing
-                    }
-                }
+                var e = new CustomCalcEventArgs (expr, val, this);
+                CustomCalc (this, e);
+                val = e.CalculatedObject;
             }
 
             return val;
         }
-
-        /// <summary>
-        /// Returns an expression value.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="value">The value of currently printing object.</param>
-        /// <returns>Returns the result of calculation.</returns>
-        /// <remarks>
-        /// This method is for internal use only, do not call it directly.
-        /// </remarks>
-        protected virtual object CalcExpression (string expression, Variant value)
+        else if (cachedObject is Parameter parameter)
         {
-            if (expression.ToLower() == "true" || expression.ToLower() == "false")
+            return parameter.Value;
+        }
+        else if (cachedObject is Total total)
+        {
+            var val = total.Value;
+            if (ConvertNulls && val is null or DBNull)
             {
-                expression = expression.ToLower();
+                val = 0;
             }
 
-            // try to calculate the expression
-            foreach (AssemblyDescriptor d in assemblies)
-            {
-                if (d.ContainsExpression (expression))
-                {
-                    return d.CalcExpression (expression, value);
-                }
-            }
+            total.ExecuteTotal (val);
 
-            // expression not found. Probably it was added after the start of the report.
-            // Compile new assembly containing this expression.
-            var descriptor = new AssemblyDescriptor (this, CodeHelper.EmptyScript());
-            assemblies.Add (descriptor);
-            descriptor.AddObjects();
-            descriptor.AddSingleExpression (expression);
-            descriptor.AddFunctions();
-            descriptor.Compile();
-            return descriptor.CalcExpression (expression, value);
+            return val;
         }
 
-        /// <summary>
-        /// Invokes the script method with given name.
-        /// </summary>
-        /// <param name="name">The name of the script method.</param>
-        /// <param name="parms">The method parameters.</param>
-        public object InvokeMethod (string name, object[] parms)
+        // calculate the expression
+        return CalcExpression (expression, value);
+    }
+
+    private object? ConvertToColumnDataType (object val, Type dataType, bool convertNulls)
+    {
+        if (val is null or DBNull)
         {
-            if (assemblies.Count > 0)
+            if (convertNulls)
             {
-                return assemblies[0].InvokeMethod (name, parms);
-            }
-
-            return null;
-        }
-
-        private Column GetColumn (string complexName)
-        {
-            if (string.IsNullOrEmpty (complexName))
-            {
-                return null;
-            }
-
-            if (cachedDataItems[complexName] is CachedDataItem cachedItem)
-            {
-                return cachedItem.column;
-            }
-
-            string[] names = complexName.Split ('.');
-            cachedItem = cachedDataItems[names[0]] as CachedDataItem;
-            var data = cachedItem != null ? cachedItem.dataSource : GetDataSource (names[0]);
-
-            return DataHelper.GetColumn (Dictionary, data, names, true);
-        }
-
-        private object GetColumnValue (string complexName, bool convertNull)
-        {
-            var column = GetColumn (complexName);
-            if (column == null)
-            {
-                return null;
-            }
-
-            return ConvertToColumnDataType (column.Value, column.DataType, convertNull);
-        }
-
-        private Variant GetTotalValue (string name, bool convertNull)
-        {
-            var value = Dictionary.Totals.GetValue (name);
-            if (convertNull && value is null or DBNull)
-            {
-                value = 0;
-            }
-
-            return new Variant (value);
-        }
-
-        /// <summary>
-        /// Gets the data column's value. Automatically converts null value to 0, false or ""
-        /// depending on the column type.
-        /// </summary>
-        /// <param name="complexName">The name of the data column including the datasource name.</param>
-        /// <returns>If report is running, returns the column value. Otherwise returns <b>null</b>.</returns>
-        /// <remarks>
-        /// The return value of this method does not depend on the <see cref="ConvertNulls"/> property.
-        /// </remarks>
-        /// <example>
-        /// <code>
-        /// string employeeName = (string)report.GetColumnValue("Employees.FirstName");
-        /// </code>
-        /// </example>
-        public object GetColumnValue (string complexName)
-        {
-            return GetColumnValue (complexName, true);
-        }
-
-        /// <summary>
-        /// Gets the data column's value. This method does not convert null values.
-        /// </summary>
-        /// <param name="complexName">The name of the data column including the datasource name.</param>
-        /// <returns>If report is running, returns the column value.
-        /// Otherwise returns <b>null</b>.</returns>
-        public object GetColumnValueNullable (string complexName)
-        {
-            return GetColumnValue (complexName, false);
-        }
-
-        /// <summary>
-        /// Gets the report parameter with given name.
-        /// </summary>
-        /// <param name="complexName">The name of the parameter.</param>
-        /// <returns>The <see cref="Parameter"/> object if found, otherwise <b>null</b>.</returns>
-        /// <remarks>
-        /// To find nested parameter, use the "." separator: "MainParameter.NestedParameter"
-        /// </remarks>
-        public Parameter GetParameter (string complexName)
-        {
-            if (IsRunning)
-            {
-                return cachedDataItems[complexName] as Parameter;
-            }
-
-            return DataHelper.GetParameter (Dictionary, complexName);
-        }
-
-        /// <summary>
-        /// Gets a value of the parameter with given name.
-        /// </summary>
-        /// <param name="complexName">The name of the parameter.</param>
-        /// <returns>The parameter's value if found, otherwise <b>null</b>.</returns>
-        /// <remarks>
-        /// To find nested parameter, use the "." separator: "MainParameter.NestedParameter"
-        /// </remarks>
-        public object GetParameterValue (string complexName)
-        {
-            var par = GetParameter (complexName);
-            if (par != null)
-            {
-                // avoid InvalidCastException when casting object that is int to double
-                if (par.DataType.Name == "Double" && par.Value.GetType() == typeof (int))
-                {
-                    return (double)(int)par.Value;
-                }
-
-                return par.Value;
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Sets the parameter's value.
-        /// </summary>
-        /// <param name="complexName">The name of the parameter.</param>
-        /// <param name="value">Value to set.</param>
-        /// <remarks>
-        /// Use this method to pass a value to the parameter that you've created in the "Data" window.
-        /// Such parameter may be used everythere in a report; for example, you can print its value
-        /// or use it in expressions.
-        /// <para/>You should call this method <b>after</b> the report was loaded and <b>before</b> you run it.
-        /// <para/>To access a nested parameter, use the "." separator: "MainParameter.NestedParameter"
-        /// <note type="caution">
-        /// This method will create the parameter if it does not exist.
-        /// </note>
-        /// </remarks>
-        /// <example>This example shows how to pass a value to the parameter with "MyParam" name:
-        /// <code>
-        /// // load the report
-        /// report1.Load("report.frx");
-        /// // setup the parameter
-        /// report1.SetParameterValue("MyParam", 10);
-        /// // show the report
-        /// report1.Show();
-        /// </code>
-        /// </example>
-        public void SetParameterValue (string complexName, object value)
-        {
-            var par = GetParameter (complexName);
-            if (par == null)
-            {
-                par = DataHelper.CreateParameter (Dictionary, complexName);
-            }
-
-            if (par != null)
-            {
-                par.Value = value;
-                par.Expression = "";
+                val = Converter.ConvertNull (dataType);
             }
         }
-
-        /// <summary>
-        /// Gets a value of the system variable with specified name.
-        /// </summary>
-        /// <param name="complexName">Name of a variable.</param>
-        /// <returns>The variable's value if found, otherwise <b>null</b>.</returns>
-        public object GetVariableValue (string complexName)
+        else
         {
-            return GetParameterValue (complexName);
-        }
-
-        /// <summary>
-        /// Gets a value of the total with specified name.
-        /// </summary>
-        /// <param name="name">Name of total.</param>
-        /// <returns>The total's value if found, otherwise <b>0</b>.</returns>
-        /// <remarks>This method converts null values to 0 if the <see cref="ConvertNulls"/> property is set to true.
-        /// Use the <see cref="GetTotalValueNullable"/> method if you don't want the null conversion.
-        /// </remarks>
-        public Variant GetTotalValue (string name)
-        {
-            return GetTotalValue (name, ConvertNulls);
-        }
-
-        /// <summary>
-        /// Gets a value of the total with specified name.
-        /// </summary>
-        /// <param name="name">Name of total.</param>
-        /// <returns>The total's value if found, otherwise <b>null</b>.</returns>
-        public Variant GetTotalValueNullable (string name)
-        {
-            return GetTotalValue (name, false);
-        }
-
-        /// <summary>
-        /// Gets the datasource with specified name.
-        /// </summary>
-        /// <param name="alias">Alias name of a datasource.</param>
-        /// <returns>The datasource object if found, otherwise <b>null</b>.</returns>
-        public DataSourceBase GetDataSource (string alias)
-        {
-            return Dictionary.FindByAlias (alias) as DataSourceBase;
-        }
-
-        #endregion Script related
-
-        #region Public Methods
-
-        /// <inheritdoc/>
-        public override void Assign (Base source)
-        {
-            BaseAssign (source);
-        }
-
-        /// <summary>
-        /// Aborts the report execution.
-        /// </summary>
-        public void Abort()
-        {
-            SetAborted (true);
-        }
-
-        /// <inheritdoc/>
-        public override Base? FindObject (string name)
-        {
-            foreach (Base c in AllNamedObjects)
+            if (val is IConvertible)
             {
-                if (String.Compare (name, c.Name, StringComparison.OrdinalIgnoreCase) == 0)
-                {
-                    return c;
-                }
-            }
-
-            return null;
-        }
-
-        /// <inheritdoc/>
-        public override void Clear()
-        {
-            base.Clear();
-            ClearReportProperties();
-        }
-
-        /// <summary>
-        /// Updates the report component's styles.
-        /// </summary>
-        /// <remarks>
-        /// Call this method if you change the <see cref="Styles"/> collection.
-        /// </remarks>
-        public void ApplyStyles()
-        {
-            foreach (Base c in AllObjects)
-            {
-                if (c is ReportComponentBase @base)
-                {
-                    @base.Style = @base.Style;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Sets prepared pages.
-        /// </summary>
-        /// <param name="pages"></param>
-        public void SetPreparedPages (Preview.PreparedPages pages)
-        {
-            PreparedPages = pages;
-            if (pages != null)
-            {
-                pages.SetReport (this);
-            }
-        }
-
-        internal void SetAborted (bool value)
-        {
-            aborted = value;
-        }
-
-        internal void SetOperation (ReportOperation operation)
-        {
-            this.Operation = operation;
-        }
-
-        /// <summary>
-        /// This method fires the <b>StartReport</b> event and the script code connected
-        /// to the <b>StartReportEvent</b>.
-        /// </summary>
-        public void OnStartReport (EventArgs e)
-        {
-            SetRunning (true);
-            if (StartReport != null)
-            {
-                StartReport (this, e);
-            }
-
-            InvokeMethod (StartReportEvent, new object[] { this, e });
-        }
-
-        /// <summary>
-        /// This method fires the <b>FinishReport</b> event and the script code connected
-        /// to the <b>FinishReportEvent</b>.
-        /// </summary>
-        public void OnFinishReport (EventArgs e)
-        {
-            SetRunning (false);
-            if (FinishReport != null)
-            {
-                FinishReport (this, e);
-            }
-
-            InvokeMethod (FinishReportEvent, new object[] { this, e });
-        }
-
-        /// <summary>
-        /// Runs the Export event.
-        /// </summary>
-        /// <param name="e">ExportReportEventArgs object.</param>
-        public void OnExportParameters (ExportParametersEventArgs e)
-        {
-            if (ExportParameters != null)
-            {
-                ExportParameters (this, e);
-            }
-        }
-
-        /// <summary>
-        /// Add the name of the assembly (in addition to the default) that will be used to compile the report script
-        /// </summary>
-        /// <param name="assembly_name">Assembly name</param>
-        /// <remarks>
-        /// For example: <code>report.AddReferencedAssembly("Newtonsoft.Json.dll")</code>
-        /// </remarks>
-        public void AddReferencedAssembly (string assembly_name)
-        {
-            string[] assemblies = ReferencedAssemblies;
-            Array.Resize (ref assemblies, assemblies.Length + 1);
-            assemblies[assemblies.Length - 1] = assembly_name;
-            ReferencedAssemblies = assemblies;
-        }
-
-        /// <summary>
-        /// Add the names of the assembly (in addition to the default) that will be used to compile the report script
-        /// </summary>
-        /// <param name="assembly_names">Assembly's names</param>
-        public void AddReferencedAssembly (IList<string> assembly_names)
-        {
-            string[] assemblies = ReferencedAssemblies;
-            var oldLength = assemblies.Length;
-            Array.Resize (ref assemblies, oldLength + assembly_names.Count);
-            for (var i = 0; i < assembly_names.Count; i++)
-            {
-                assemblies[oldLength + i] = assembly_names[i];
-            }
-
-            ReferencedAssemblies = assemblies;
-        }
-
-        /// <inheritdoc/>
-        public override void Serialize (ReportWriter writer)
-        {
-            var c = writer.DiffObject as Report;
-            writer.ItemName = IsAncestor ? "inherited" : ClassName;
-            if (BaseReport != c.BaseReport)
-            {
-                // when save to the report file, convert absolute path to the base report to relative path
-                // (based on the main report path). Do not convert when saving to the clipboard.
-                var value = writer.SerializeTo != SerializeTo.Undo ? GetRelativePathToBaseReport() : BaseReport;
-                writer.WriteStr ("BaseReport", value);
-
-                // Fix bug with moving child report to another folder without parent report.
-                if (writer.SerializeTo == SerializeTo.Report)
-                {
-                    writer.WriteStr ("BaseReportAbsolutePath", BaseReport);
-                }
-            }
-
-            // always serialize ScriptLanguage because its default value depends on Config.ReportSettings.DefaultLanguage
-            writer.WriteValue ("ScriptLanguage", ScriptLanguage);
-            if (ScriptText != c.ScriptText)
-            {
-                writer.WritePropertyValue ("ScriptText", ScriptText);
-            }
-
-            if (!writer.AreEqual (ReferencedAssemblies, c.ReferencedAssemblies))
-            {
-                writer.WriteValue ("ReferencedAssemblies", ReferencedAssemblies);
-            }
-
-            if (ConvertNulls != c.ConvertNulls)
-            {
-                writer.WriteBool ("ConvertNulls", ConvertNulls);
-            }
-
-            if (DoublePass != c.DoublePass)
-            {
-                writer.WriteBool ("DoublePass", DoublePass);
-            }
-
-            if (Compressed != c.Compressed)
-            {
-                writer.WriteBool ("Compressed", Compressed);
-            }
-
-            if (UseFileCache != c.UseFileCache)
-            {
-                writer.WriteBool ("UseFileCache", UseFileCache);
-            }
-
-            if (TextQuality != c.TextQuality)
-            {
-                writer.WriteValue ("TextQuality", TextQuality);
-            }
-
-            if (SmoothGraphics != c.SmoothGraphics)
-            {
-                writer.WriteBool ("SmoothGraphics", SmoothGraphics);
-            }
-
-            if (Password != c.Password)
-            {
-                writer.WriteStr ("Password", Password);
-            }
-
-            if (InitialPageNumber != c.InitialPageNumber)
-            {
-                writer.WriteInt ("InitialPageNumber", InitialPageNumber);
-            }
-
-            if (MaxPages != c.MaxPages)
-            {
-                writer.WriteInt ("MaxPages", MaxPages);
-            }
-
-            if (StartReportEvent != c.StartReportEvent)
-            {
-                writer.WriteStr ("StartReportEvent", StartReportEvent);
-            }
-
-            if (FinishReportEvent != c.FinishReportEvent)
-            {
-                writer.WriteStr ("FinishReportEvent", FinishReportEvent);
-            }
-
-            ReportInfo.Serialize (writer, c.ReportInfo);
-            SerializeDesign (writer, c);
-            if (Styles.Count > 0)
-            {
-                writer.Write (Styles);
-            }
-
-            writer.Write (Dictionary);
-            if (writer.SaveChildren)
-            {
-                foreach (Base child in ChildObjects)
-                {
-                    writer.Write (child);
-                }
-            }
-        }
-
-        /// <inheritdoc/>
-        public override void Deserialize (ReportReader reader)
-        {
-            if (reader.HasProperty ("BaseReportAbsolutePath"))
-            {
-                BaseReportAbsolutePath = reader.ReadStr ("BaseReportAbsolutePath");
-            }
-
-            base.Deserialize (reader);
-
-            // call OnAfterLoad method of each report object
-            foreach (Base c in AllObjects)
-            {
-                c.OnAfterLoad();
-            }
-        }
-
-        /// <summary>
-        /// Saves the report to a stream.
-        /// </summary>
-        /// <param name="stream">The stream to save to.</param>
-        public void Save (Stream stream)
-        {
-            using (var writer = new ReportWriter())
-            {
-                if (IsAncestor)
-                {
-                    writer.GetDiff += new DiffEventHandler (GetDiff);
-                }
-
-                writer.Write (this);
-
-                List<Stream> disposeList = new List<Stream>();
-
-                if (Compressed)
-                {
-                    stream = Compressor.Compress (stream);
-                    disposeList.Add (stream);
-                }
-
-                if (!string.IsNullOrEmpty (Password))
-                {
-                    stream = Crypter.Encrypt (stream, Password);
-                    disposeList.Insert (0, stream);
-                }
-
-                writer.Save (stream);
-
-                foreach (var s in disposeList)
-                {
-                    s.Dispose();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Saves the report to a file.
-        /// </summary>
-        /// <param name="fileName">The name of the file to save to.</param>
-        public void Save (string fileName)
-        {
-            FileName = fileName;
-            using (var f = new FileStream (fileName, FileMode.Create))
-            {
-                Save (f);
-            }
-        }
-
-        /// <summary>
-        /// Saves the report to a stream with randomized values in data sources.
-        /// </summary>
-        /// <param name="stream">The stream to save to.</param>
-        public void SaveWithRandomData (Stream stream)
-        {
-            var random = new FRRandom();
-            random.RandomizeDataSources (Dictionary.DataSources);
-            Save (stream);
-        }
-
-        /// <summary>
-        /// Saves the report to a file with randomized values in data sources.
-        /// </summary>
-        /// <param name="fileName">The name of the file to save to.</param>
-        public void SaveWithRandomData (string fileName)
-        {
-            var random = new FRRandom();
-            random.RandomizeDataSources (Dictionary.DataSources);
-            Save (fileName);
-        }
-
-        /// <summary>
-        /// Loads report from a stream.
-        /// </summary>
-        /// <param name="stream">The stream to load from.</param>
-        /// <remarks>
-        /// When you try to load the password-protected report, you will be asked
-        /// for a password. You also may specify the password in the <see cref="Password"/>
-        /// property before loading the report. In this case the report will load silently.
-        /// </remarks>
-        public void Load (Stream stream)
-        {
-            var password = Password;
-            Clear();
-
-            using (var reader = new ReportReader (this))
-            {
-                List<Stream> disposeList = new List<Stream>();
-                if (Compressor.IsStreamCompressed (stream))
-                {
-                    stream = Compressor.Decompress (stream, true);
-                    disposeList.Add (stream);
-                }
-
-                var crypted = Crypter.IsStreamEncrypted (stream);
-                if (crypted)
-                {
-                    if (string.IsNullOrEmpty (password))
-                    {
-                        password = ShowPaswordForm (password);
-                    }
-
-                    stream = Crypter.Decrypt (stream, password);
-                    disposeList.Add (stream);
-                }
-
+                var t = Nullable.GetUnderlyingType (dataType);
                 try
                 {
-                    reader.Load (stream);
+                    val = Convert.ChangeType (val, t != null ? t : dataType);
                 }
-                catch (Exception e)
+                catch (InvalidCastException)
                 {
-                    if (crypted)
-                    {
-                        throw new DecryptException();
-                    }
-
-                    throw e;
+                    // do nothing
                 }
-                finally
+                catch (FormatException)
                 {
-                    foreach (var s in disposeList)
-                    {
-                        try
-                        {
-                            s.Dispose();
-                        }
-                        catch
-                        {
-                        }
-                    }
-                }
-
-                reader.Read (this);
-
-                foreach (Base c in AllObjects)
-                {
-                    if (c is BandBase @base)
-                    {
-                        Validator.ValidateIntersectionAllObjects (@base);
-                    }
+                    // do nothing
                 }
             }
         }
 
-        /// <summary>
-        /// Loads the report from a file.
-        /// </summary>
-        /// <param name="fileName">The name of the file to load from.</param>
-        /// <remarks>
-        /// When you try to load the password-protected report, you will be asked
-        /// for a password. You also may specify the password in the <see cref="Password"/>
-        /// property before loading the report. In this case the report will load silently.
-        /// </remarks>
-        public void Load (string fileName)
+        return val;
+    }
+
+    /// <summary>
+    /// Returns an expression value.
+    /// </summary>
+    /// <param name="expression">The expression.</param>
+    /// <param name="value">The value of currently printing object.</param>
+    /// <returns>Returns the result of calculation.</returns>
+    /// <remarks>
+    /// This method is for internal use only, do not call it directly.
+    /// </remarks>
+    protected virtual object CalcExpression (string expression, Variant value)
+    {
+        if (expression.ToLower() == "true" || expression.ToLower() == "false")
         {
-            this.FileName = "";
-            using (var f = new FileStream (fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
+            expression = expression.ToLower();
+        }
+
+        // try to calculate the expression
+        foreach (AssemblyDescriptor d in _assemblies)
+        {
+            if (d.ContainsExpression (expression))
             {
-                this.FileName = fileName;
-                Load (f);
+                return d.CalcExpression (expression, value);
             }
         }
 
-        /// <summary>
-        /// Loads the report from a string.
-        /// </summary>
-        /// <param name="s">The string that contains a stream in UTF8 or Base64 encoding.</param>
-        public void LoadFromString (string s)
+        // expression not found. Probably it was added after the start of the report.
+        // Compile new assembly containing this expression.
+        var descriptor = new AssemblyDescriptor (this, CodeHelper.EmptyScript());
+        _assemblies.Add (descriptor);
+        descriptor.AddObjects();
+        descriptor.AddSingleExpression (expression);
+        descriptor.AddFunctions();
+        descriptor.Compile();
+        return descriptor.CalcExpression (expression, value);
+    }
+
+    /// <summary>
+    /// Invokes the script method with given name.
+    /// </summary>
+    /// <param name="name">The name of the script method.</param>
+    /// <param name="parms">The method parameters.</param>
+    public object? InvokeMethod (string name, object[] parms)
+    {
+        if (_assemblies.Count > 0)
         {
-            if (string.IsNullOrEmpty (s))
+            return _assemblies[0].InvokeMethod (name, parms);
+        }
+
+        return null;
+    }
+
+    private Column? GetColumn (string complexName)
+    {
+        if (string.IsNullOrEmpty (complexName))
+        {
+            return null;
+        }
+
+        if (_cachedDataItems[complexName] is CachedDataItem cachedItem)
+        {
+            return cachedItem.column;
+        }
+
+        string[] names = complexName.Split ('.');
+        cachedItem = _cachedDataItems[names[0]] as CachedDataItem;
+        var data = cachedItem != null ? cachedItem.dataSource : GetDataSource (names[0]);
+
+        return DataHelper.GetColumn (Dictionary, data, names, true);
+    }
+
+    private object? GetColumnValue (string complexName, bool convertNull)
+    {
+        var column = GetColumn (complexName);
+        if (column == null)
+        {
+            return null;
+        }
+
+        return ConvertToColumnDataType (column.Value!, column.DataType, convertNull);
+    }
+
+    private Variant GetTotalValue (string name, bool convertNull)
+    {
+        var value = Dictionary!.Totals.GetValue (name);
+        if (convertNull && value is null or DBNull)
+        {
+            value = 0;
+        }
+
+        return new Variant (value);
+    }
+
+    /// <summary>
+    /// Gets the data column's value. Automatically converts null value to 0, false or ""
+    /// depending on the column type.
+    /// </summary>
+    /// <param name="complexName">The name of the data column including the datasource name.</param>
+    /// <returns>If report is running, returns the column value. Otherwise returns <b>null</b>.</returns>
+    /// <remarks>
+    /// The return value of this method does not depend on the <see cref="ConvertNulls"/> property.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// string employeeName = (string)report.GetColumnValue("Employees.FirstName");
+    /// </code>
+    /// </example>
+    public object? GetColumnValue (string complexName)
+    {
+        return GetColumnValue (complexName, true);
+    }
+
+    /// <summary>
+    /// Gets the data column's value. This method does not convert null values.
+    /// </summary>
+    /// <param name="complexName">The name of the data column including the datasource name.</param>
+    /// <returns>If report is running, returns the column value.
+    /// Otherwise returns <b>null</b>.</returns>
+    public object? GetColumnValueNullable (string complexName)
+    {
+        return GetColumnValue (complexName, false);
+    }
+
+    /// <summary>
+    /// Gets the report parameter with given name.
+    /// </summary>
+    /// <param name="complexName">The name of the parameter.</param>
+    /// <returns>The <see cref="Parameter"/> object if found, otherwise <b>null</b>.</returns>
+    /// <remarks>
+    /// To find nested parameter, use the "." separator: "MainParameter.NestedParameter"
+    /// </remarks>
+    public Parameter? GetParameter (string complexName)
+    {
+        if (IsRunning)
+        {
+            return _cachedDataItems[complexName] as Parameter;
+        }
+
+        return DataHelper.GetParameter (Dictionary!, complexName);
+    }
+
+    /// <summary>
+    /// Gets a value of the parameter with given name.
+    /// </summary>
+    /// <param name="complexName">The name of the parameter.</param>
+    /// <returns>The parameter's value if found, otherwise <b>null</b>.</returns>
+    /// <remarks>
+    /// To find nested parameter, use the "." separator: "MainParameter.NestedParameter"
+    /// </remarks>
+    public object? GetParameterValue (string complexName)
+    {
+        var par = GetParameter (complexName);
+        if (par != null)
+        {
+            // avoid InvalidCastException when casting object that is int to double
+            if (par.DataType.Name == "Double" && par.Value is int intValue)
             {
-                return;
+                return (double) intValue;
             }
 
-            byte[] buffer;
-            var startIndex = s.IndexOf ("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
-            if (startIndex != -1)
+            return par.Value;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Sets the parameter's value.
+    /// </summary>
+    /// <param name="complexName">The name of the parameter.</param>
+    /// <param name="value">Value to set.</param>
+    /// <remarks>
+    /// Use this method to pass a value to the parameter that you've created in the "Data" window.
+    /// Such parameter may be used everythere in a report; for example, you can print its value
+    /// or use it in expressions.
+    /// <para/>You should call this method <b>after</b> the report was loaded and <b>before</b> you run it.
+    /// <para/>To access a nested parameter, use the "." separator: "MainParameter.NestedParameter"
+    /// <note type="caution">
+    /// This method will create the parameter if it does not exist.
+    /// </note>
+    /// </remarks>
+    /// <example>This example shows how to pass a value to the parameter with "MyParam" name:
+    /// <code>
+    /// // load the report
+    /// report1.Load("report.frx");
+    /// // setup the parameter
+    /// report1.SetParameterValue("MyParam", 10);
+    /// // show the report
+    /// report1.Show();
+    /// </code>
+    /// </example>
+    public void SetParameterValue (string complexName, object value)
+    {
+        var par = GetParameter (complexName);
+        if (par == null)
+        {
+            par = DataHelper.CreateParameter (Dictionary!, complexName);
+        }
+
+        if (par != null)
+        {
+            par.Value = value;
+            par.Expression = "";
+        }
+    }
+
+    /// <summary>
+    /// Gets a value of the system variable with specified name.
+    /// </summary>
+    /// <param name="complexName">Name of a variable.</param>
+    /// <returns>The variable's value if found, otherwise <b>null</b>.</returns>
+    public object? GetVariableValue (string complexName)
+    {
+        return GetParameterValue (complexName);
+    }
+
+    /// <summary>
+    /// Gets a value of the total with specified name.
+    /// </summary>
+    /// <param name="name">Name of total.</param>
+    /// <returns>The total's value if found, otherwise <b>0</b>.</returns>
+    /// <remarks>This method converts null values to 0 if the <see cref="ConvertNulls"/> property is set to true.
+    /// Use the <see cref="GetTotalValueNullable"/> method if you don't want the null conversion.
+    /// </remarks>
+    public Variant GetTotalValue (string name)
+    {
+        return GetTotalValue (name, ConvertNulls);
+    }
+
+    /// <summary>
+    /// Gets a value of the total with specified name.
+    /// </summary>
+    /// <param name="name">Name of total.</param>
+    /// <returns>The total's value if found, otherwise <b>null</b>.</returns>
+    public Variant GetTotalValueNullable (string name)
+    {
+        return GetTotalValue (name, false);
+    }
+
+    /// <summary>
+    /// Gets the datasource with specified name.
+    /// </summary>
+    /// <param name="alias">Alias name of a datasource.</param>
+    /// <returns>The datasource object if found, otherwise <b>null</b>.</returns>
+    public DataSourceBase GetDataSource (string alias)
+    {
+        return Dictionary!.FindByAlias (alias) as DataSourceBase;
+    }
+
+    #endregion Script related
+
+    #region Public Methods
+
+    /// <inheritdoc/>
+    public override void Assign (Base source)
+    {
+        BaseAssign (source);
+    }
+
+    /// <summary>
+    /// Aborts the report execution.
+    /// </summary>
+    public void Abort()
+    {
+        SetAborted (true);
+    }
+
+    /// <inheritdoc/>
+    public override Base? FindObject (string name)
+    {
+        foreach (Base c in AllNamedObjects)
+        {
+            if (String.Compare (name, c.Name, StringComparison.OrdinalIgnoreCase) == 0)
             {
-                buffer = Encoding.UTF8.GetBytes (s.Substring (startIndex));
+                return c;
+            }
+        }
+
+        return null;
+    }
+
+    /// <inheritdoc/>
+    public override void Clear()
+    {
+        base.Clear();
+        ClearReportProperties();
+    }
+
+    /// <summary>
+    /// Updates the report component's styles.
+    /// </summary>
+    /// <remarks>
+    /// Call this method if you change the <see cref="Styles"/> collection.
+    /// </remarks>
+    public void ApplyStyles()
+    {
+        foreach (Base c in AllObjects)
+        {
+            if (c is ReportComponentBase @base)
+            {
+                @base.Style = @base.Style;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Sets prepared pages.
+    /// </summary>
+    /// <param name="pages"></param>
+    public void SetPreparedPages (Preview.PreparedPages? pages)
+    {
+        PreparedPages = pages;
+        if (pages != null)
+        {
+            pages.SetReport (this);
+        }
+    }
+
+    internal void SetAborted (bool value)
+    {
+        _aborted = value;
+    }
+
+    internal void SetOperation (ReportOperation operation)
+    {
+        this.Operation = operation;
+    }
+
+    /// <summary>
+    /// This method fires the <b>StartReport</b> event and the script code connected
+    /// to the <b>StartReportEvent</b>.
+    /// </summary>
+    public void OnStartReport (EventArgs e)
+    {
+        SetRunning (true);
+        if (StartReport != null)
+        {
+            StartReport (this, e);
+        }
+
+        InvokeMethod (StartReportEvent, new object[] { this, e });
+    }
+
+    /// <summary>
+    /// This method fires the <b>FinishReport</b> event and the script code connected
+    /// to the <b>FinishReportEvent</b>.
+    /// </summary>
+    public void OnFinishReport (EventArgs e)
+    {
+        SetRunning (false);
+        if (FinishReport != null)
+        {
+            FinishReport (this, e);
+        }
+
+        InvokeMethod (FinishReportEvent, new object[] { this, e });
+    }
+
+    /// <summary>
+    /// Runs the Export event.
+    /// </summary>
+    /// <param name="e">ExportReportEventArgs object.</param>
+    public void OnExportParameters (ExportParametersEventArgs e)
+    {
+        if (ExportParameters != null)
+        {
+            ExportParameters (this, e);
+        }
+    }
+
+    /// <summary>
+    /// Add the name of the assembly (in addition to the default) that will be used to compile the report script
+    /// </summary>
+    /// <param name="assembly_name">Assembly name</param>
+    /// <remarks>
+    /// For example: <code>report.AddReferencedAssembly("Newtonsoft.Json.dll")</code>
+    /// </remarks>
+    public void AddReferencedAssembly (string assembly_name)
+    {
+        string[]? assemblies = ReferencedAssemblies;
+        Array.Resize (ref assemblies, (assemblies?.Length ?? 0) + 1);
+        assemblies[^1] = assembly_name;
+        ReferencedAssemblies = assemblies;
+    }
+
+    /// <summary>
+    /// Add the names of the assembly (in addition to the default) that will be used to compile the report script
+    /// </summary>
+    /// <param name="assembly_names">Assembly's names</param>
+    public void AddReferencedAssembly (IList<string> assembly_names)
+    {
+        string[]? assemblies = ReferencedAssemblies;
+        var oldLength = assemblies?.Length ?? 0;
+        Array.Resize (ref assemblies, oldLength + assembly_names.Count);
+        for (var i = 0; i < assembly_names.Count; i++)
+        {
+            assemblies[oldLength + i] = assembly_names[i];
+        }
+
+        ReferencedAssemblies = assemblies;
+    }
+
+    /// <inheritdoc/>
+    public override void Serialize (ReportWriter writer)
+    {
+        var c = (writer.DiffObject as Report)!;
+        writer.ItemName = IsAncestor ? "inherited" : ClassName;
+        if (BaseReport != c.BaseReport)
+        {
+            // when save to the report file, convert absolute path to the base report to relative path
+            // (based on the main report path). Do not convert when saving to the clipboard.
+            var value = writer.SerializeTo != SerializeTo.Undo ? GetRelativePathToBaseReport() : BaseReport;
+            writer.WriteStr ("BaseReport", value);
+
+            // Fix bug with moving child report to another folder without parent report.
+            if (writer.SerializeTo == SerializeTo.Report)
+            {
+                writer.WriteStr ("BaseReportAbsolutePath", BaseReport);
+            }
+        }
+
+        // always serialize ScriptLanguage because its default value depends on Config.ReportSettings.DefaultLanguage
+        writer.WriteValue ("ScriptLanguage", ScriptLanguage);
+        if (ScriptText != c.ScriptText)
+        {
+            writer.WritePropertyValue ("ScriptText", ScriptText);
+        }
+
+        if (!writer.AreEqual (ReferencedAssemblies, c.ReferencedAssemblies))
+        {
+            writer.WriteValue ("ReferencedAssemblies", ReferencedAssemblies);
+        }
+
+        if (ConvertNulls != c.ConvertNulls)
+        {
+            writer.WriteBool ("ConvertNulls", ConvertNulls);
+        }
+
+        if (DoublePass != c.DoublePass)
+        {
+            writer.WriteBool ("DoublePass", DoublePass);
+        }
+
+        if (Compressed != c.Compressed)
+        {
+            writer.WriteBool ("Compressed", Compressed);
+        }
+
+        if (UseFileCache != c.UseFileCache)
+        {
+            writer.WriteBool ("UseFileCache", UseFileCache);
+        }
+
+        if (TextQuality != c.TextQuality)
+        {
+            writer.WriteValue ("TextQuality", TextQuality);
+        }
+
+        if (SmoothGraphics != c.SmoothGraphics)
+        {
+            writer.WriteBool ("SmoothGraphics", SmoothGraphics);
+        }
+
+        if (Password != c.Password)
+        {
+            writer.WriteStr ("Password", Password);
+        }
+
+        if (InitialPageNumber != c.InitialPageNumber)
+        {
+            writer.WriteInt ("InitialPageNumber", InitialPageNumber);
+        }
+
+        if (MaxPages != c.MaxPages)
+        {
+            writer.WriteInt ("MaxPages", MaxPages);
+        }
+
+        if (StartReportEvent != c.StartReportEvent)
+        {
+            writer.WriteStr ("StartReportEvent", StartReportEvent);
+        }
+
+        if (FinishReportEvent != c.FinishReportEvent)
+        {
+            writer.WriteStr ("FinishReportEvent", FinishReportEvent);
+        }
+
+        ReportInfo.Serialize (writer, c.ReportInfo);
+        SerializeDesign (writer, c);
+        if (Styles.Count > 0)
+        {
+            writer.Write (Styles);
+        }
+
+        writer.Write (Dictionary!);
+        if (writer.SaveChildren)
+        {
+            foreach (Base child in ChildObjects)
+            {
+                writer.Write (child);
+            }
+        }
+    }
+
+    /// <inheritdoc/>
+    public override void Deserialize (ReportReader reader)
+    {
+        if (reader.HasProperty ("BaseReportAbsolutePath"))
+        {
+            BaseReportAbsolutePath = reader.ReadStr ("BaseReportAbsolutePath");
+        }
+
+        base.Deserialize (reader);
+
+        // call OnAfterLoad method of each report object
+        foreach (Base c in AllObjects)
+        {
+            c.OnAfterLoad();
+        }
+    }
+
+    /// <summary>
+    /// Saves the report to a stream.
+    /// </summary>
+    /// <param name="stream">The stream to save to.</param>
+    public void Save (Stream stream)
+    {
+        using (var writer = new ReportWriter())
+        {
+            if (IsAncestor)
+            {
+                writer.GetDiff += new DiffEventHandler (GetDiff);
+            }
+
+            writer.Write (this);
+
+            List<Stream> disposeList = new List<Stream>();
+
+            if (Compressed)
+            {
+                stream = Compressor.Compress (stream);
+                disposeList.Add (stream);
+            }
+
+            if (!string.IsNullOrEmpty (Password))
+            {
+                stream = Crypter.Encrypt (stream, Password);
+                disposeList.Insert (0, stream);
+            }
+
+            writer.Save (stream);
+
+            foreach (var s in disposeList)
+            {
+                s.Dispose();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Saves the report to a file.
+    /// </summary>
+    /// <param name="fileName">The name of the file to save to.</param>
+    public void Save (string fileName)
+    {
+        FileName = fileName;
+        using (var f = new FileStream (fileName, FileMode.Create))
+        {
+            Save (f);
+        }
+    }
+
+    /// <summary>
+    /// Saves the report to a stream with randomized values in data sources.
+    /// </summary>
+    /// <param name="stream">The stream to save to.</param>
+    public void SaveWithRandomData (Stream stream)
+    {
+        var random = new FRRandom();
+        random.RandomizeDataSources (Dictionary!.DataSources);
+        Save (stream);
+    }
+
+    /// <summary>
+    /// Saves the report to a file with randomized values in data sources.
+    /// </summary>
+    /// <param name="fileName">The name of the file to save to.</param>
+    public void SaveWithRandomData (string fileName)
+    {
+        var random = new FRRandom();
+        random.RandomizeDataSources (Dictionary!.DataSources);
+        Save (fileName);
+    }
+
+    /// <summary>
+    /// Loads report from a stream.
+    /// </summary>
+    /// <param name="stream">The stream to load from.</param>
+    /// <remarks>
+    /// When you try to load the password-protected report, you will be asked
+    /// for a password. You also may specify the password in the <see cref="Password"/>
+    /// property before loading the report. In this case the report will load silently.
+    /// </remarks>
+    public void Load (Stream stream)
+    {
+        var password = Password;
+        Clear();
+
+        using (var reader = new ReportReader (this))
+        {
+            List<Stream> disposeList = new List<Stream>();
+            if (Compressor.IsStreamCompressed (stream))
+            {
+                stream = Compressor.Decompress (stream, true);
+                disposeList.Add (stream);
+            }
+
+            var crypted = Crypter.IsStreamEncrypted (stream);
+            if (crypted)
+            {
+                if (string.IsNullOrEmpty (password))
+                {
+                    password = ShowPaswordForm (password);
+                }
+
+                stream = Crypter.Decrypt (stream, password);
+                disposeList.Add (stream);
+            }
+
+            try
+            {
+                reader.Load (stream);
+            }
+            catch (Exception)
+            {
+                if (crypted)
+                {
+                    throw new DecryptException();
+                }
+
+                throw;
+            }
+            finally
+            {
+                foreach (var s in disposeList)
+                {
+                    try
+                    {
+                        s.Dispose();
+                    }
+                    catch (Exception exception)
+                    {
+                        Debug.WriteLine (exception.Message);
+                    }
+                }
+            }
+
+            reader.Read (this);
+
+            foreach (Base c in AllObjects)
+            {
+                if (c is BandBase @base)
+                {
+                    Validator.ValidateIntersectionAllObjects (@base);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Loads the report from a file.
+    /// </summary>
+    /// <param name="fileName">The name of the file to load from.</param>
+    /// <remarks>
+    /// When you try to load the password-protected report, you will be asked
+    /// for a password. You also may specify the password in the <see cref="Password"/>
+    /// property before loading the report. In this case the report will load silently.
+    /// </remarks>
+    public void Load (string fileName)
+    {
+        this.FileName = "";
+        using (var f = new FileStream (fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
+        {
+            this.FileName = fileName;
+            Load (f);
+        }
+    }
+
+    /// <summary>
+    /// Loads the report from a string.
+    /// </summary>
+    /// <param name="s">The string that contains a stream in UTF8 or Base64 encoding.</param>
+    public void LoadFromString (string s)
+    {
+        if (string.IsNullOrEmpty (s))
+        {
+            return;
+        }
+
+        byte[] buffer;
+        var startIndex = s.IndexOf ("<?xml version=\"1.0\" encoding=\"utf-8\"?>", StringComparison.Ordinal);
+        if (startIndex != -1)
+        {
+            buffer = Encoding.UTF8.GetBytes (s.Substring (startIndex));
+        }
+        else
+        {
+            buffer = Convert.FromBase64String (s);
+        }
+
+        using (var stream = new MemoryStream (buffer))
+        {
+            Load (stream);
+        }
+    }
+
+    /// <summary>
+    /// Saves the report to a string.
+    /// </summary>
+    /// <returns>The string that contains a stream.</returns>
+    public string SaveToString()
+    {
+        using (var stream = new MemoryStream())
+        {
+            Save (stream);
+
+            if (Compressed || !string.IsNullOrEmpty (Password))
+            {
+                return Convert.ToBase64String (stream.ToArray());
             }
             else
             {
-                buffer = Convert.FromBase64String (s);
+                return Encoding.UTF8.GetString (stream.ToArray());
             }
+        }
+    }
 
-            using (var stream = new MemoryStream (buffer))
+    /// <summary>
+    /// Saves the report to a string using the Base64 encoding.
+    /// </summary>
+    /// <returns>The string that contains a stream.</returns>
+    public string SaveToStringBase64()
+    {
+        using (var stream = new MemoryStream())
+        {
+            Save (stream);
+            return Convert.ToBase64String (stream.ToArray());
+        }
+    }
+
+    /// <summary>
+    /// Creates the report instance and loads the report from a stream.
+    /// </summary>
+    /// <param name="stream">The stream to load from.</param>
+    /// <returns>The new report instance.</returns>
+    public static Report FromStream (Stream stream)
+    {
+        var result = new Report();
+        result.Load (stream);
+        return result;
+    }
+
+    /// <summary>
+    /// Creates the report instance and loads the report from a file.
+    /// </summary>
+    /// <param name="fileName">The name of the file to load from.</param>
+    /// <returns>The new report instance.</returns>
+    public static Report FromFile (string fileName)
+    {
+        var result = new Report();
+        result.Load (fileName);
+        return result;
+    }
+
+    /// <summary>
+    /// Creates the report instance and loads the report from a string.
+    /// </summary>
+    /// <param name="utf8String">The string that contains a stream in UTF8 encoding.</param>
+    /// <returns>The new report instance.</returns>
+    public static Report FromString (string utf8String)
+    {
+        var result = new Report();
+        result.LoadFromString (utf8String);
+        return result;
+    }
+
+    /// <summary>
+    /// Registers the application dataset with all its tables and relations to use it in the report.
+    /// </summary>
+    /// <param name="data">The application data.</param>
+    /// <remarks>
+    /// If you register more than one dataset, use the <see cref="RegisterData(DataSet, string)"/> method.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// report1.Load("report.frx");
+    /// report1.RegisterData(dataSet1);
+    /// </code>
+    /// </example>
+    public void RegisterData (DataSet data)
+    {
+        Dictionary!.RegisterDataSet (data, "Data", false);
+    }
+
+    /// <summary>
+    /// Registers the application dataset with all its tables and relations to use it in the report and enables all its tables.
+    /// </summary>
+    /// <param name="data">The application data.</param>
+    /// <param name="enableAllTables">The boolean value indicating whether all tables should be enabled.</param>
+    /// <remarks>
+    /// If you register more than one dataset, use the <see cref="RegisterData(DataSet, string)"/> method.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// report1.Load("report.frx");
+    /// report1.RegisterData(dataSet1, true);
+    /// </code>
+    /// </example>
+    public void RegisterData (DataSet data, bool enableAllTables)
+    {
+        Dictionary!.RegisterDataSet (data, "Data", false);
+        foreach (DataTable table in data.Tables)
+        {
+            var ds = Report?.GetDataSource (table.TableName);
+            if (ds is not null)
             {
-                Load (stream);
+                ds.Enabled = true;
             }
         }
+    }
 
-        /// <summary>
-        /// Saves the report to a string.
-        /// </summary>
-        /// <returns>The string that contains a stream.</returns>
-        public string SaveToString()
+    /// <summary>
+    /// Registers the application dataset with specified name.
+    /// </summary>
+    /// <param name="data">The application data.</param>
+    /// <param name="name">The name of the data.</param>
+    /// <remarks>
+    /// Use this method if you register more than one dataset. You may specify any value
+    /// for the <b>name</b> parameter: it is not displayed anywhere in the designer and used only
+    /// to load/save a report. The name must be persistent and unique for each registered dataset.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// report1.Load("report.frx");
+    /// report1.RegisterData(dataSet1, "NorthWind");
+    /// </code>
+    /// </example>
+    public void RegisterData (DataSet data, string name)
+    {
+        if (_initializing)
         {
-            using (var stream = new MemoryStream())
-            {
-                Save (stream);
-
-                if (Compressed || !string.IsNullOrEmpty (Password))
-                {
-                    return Convert.ToBase64String (stream.ToArray());
-                }
-                else
-                {
-                    return Encoding.UTF8.GetString (stream.ToArray());
-                }
-            }
+            _initializeData = data;
+            _initializeDataName = name;
         }
-
-        /// <summary>
-        /// Saves the report to a string using the Base64 encoding.
-        /// </summary>
-        /// <returns>The string that contains a stream.</returns>
-        public string SaveToStringBase64()
+        else
         {
-            using (var stream = new MemoryStream())
-            {
-                Save (stream);
-                return Convert.ToBase64String (stream.ToArray());
-            }
+            Dictionary!.RegisterDataSet (data, name, false);
         }
+    }
 
-        /// <summary>
-        /// Creates the report instance and loads the report from a stream.
-        /// </summary>
-        /// <param name="stream">The stream to load from.</param>
-        /// <returns>The new report instance.</returns>
-        public static Report FromStream (Stream stream)
+    /// <summary>
+    /// Registers the application dataset with specified name and enables all its tables.
+    /// </summary>
+    /// <param name="data">The application data.</param>
+    /// <param name="name">The name of the data.</param>
+    /// <param name="enableAllTables">The boolean value indicating whether all tables should be enabled.</param>
+    /// <remarks>
+    /// Use this method if you register more than one dataset. You may specify any value
+    /// for the <b>name</b> parameter: it is not displayed anywhere in the designer and used only
+    /// to load/save a report. The name must be persistent and unique for each registered dataset.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// report1.Load("report.frx");
+    /// report1.RegisterData(dataSet1, "NorthWind", true);
+    /// </code>
+    /// </example>
+    public void RegisterData (DataSet data, string name, bool enableAllTables)
+    {
+        if (_initializing)
         {
-            var result = new Report();
-            result.Load (stream);
-            return result;
+            _initializeData = data;
+            _initializeDataName = name;
         }
-
-        /// <summary>
-        /// Creates the report instance and loads the report from a file.
-        /// </summary>
-        /// <param name="fileName">The name of the file to load from.</param>
-        /// <returns>The new report instance.</returns>
-        public static Report FromFile (string fileName)
+        else
         {
-            var result = new Report();
-            result.Load (fileName);
-            return result;
-        }
-
-        /// <summary>
-        /// Creates the report instance and loads the report from a string.
-        /// </summary>
-        /// <param name="utf8String">The string that contains a stream in UTF8 encoding.</param>
-        /// <returns>The new report instance.</returns>
-        public static Report FromString (string utf8String)
-        {
-            var result = new Report();
-            result.LoadFromString (utf8String);
-            return result;
-        }
-
-        /// <summary>
-        /// Registers the application dataset with all its tables and relations to use it in the report.
-        /// </summary>
-        /// <param name="data">The application data.</param>
-        /// <remarks>
-        /// If you register more than one dataset, use the <see cref="RegisterData(DataSet, string)"/> method.
-        /// </remarks>
-        /// <example>
-        /// <code>
-        /// report1.Load("report.frx");
-        /// report1.RegisterData(dataSet1);
-        /// </code>
-        /// </example>
-        public void RegisterData (DataSet data)
-        {
-            Dictionary.RegisterDataSet (data, "Data", false);
-        }
-
-        /// <summary>
-        /// Registers the application dataset with all its tables and relations to use it in the report and enables all its tables.
-        /// </summary>
-        /// <param name="data">The application data.</param>
-        /// <param name="enableAllTables">The boolean value indicating whether all tables should be enabled.</param>
-        /// <remarks>
-        /// If you register more than one dataset, use the <see cref="RegisterData(DataSet, string)"/> method.
-        /// </remarks>
-        /// <example>
-        /// <code>
-        /// report1.Load("report.frx");
-        /// report1.RegisterData(dataSet1, true);
-        /// </code>
-        /// </example>
-        public void RegisterData (DataSet data, bool enableAllTables)
-        {
-            Dictionary.RegisterDataSet (data, "Data", false);
+            Dictionary!.RegisterDataSet (data, name, false);
             foreach (DataTable table in data.Tables)
             {
-                var ds = Report.GetDataSource (table.TableName);
-                if (ds != null)
+                var ds = Report?.GetDataSource (table.TableName);
+                if (ds is not null)
                 {
                     ds.Enabled = true;
                 }
             }
         }
+    }
 
-        /// <summary>
-        /// Registers the application dataset with specified name.
-        /// </summary>
-        /// <param name="data">The application data.</param>
-        /// <param name="name">The name of the data.</param>
-        /// <remarks>
-        /// Use this method if you register more than one dataset. You may specify any value
-        /// for the <b>name</b> parameter: it is not displayed anywhere in the designer and used only
-        /// to load/save a report. The name must be persistent and unique for each registered dataset.
-        /// </remarks>
-        /// <example>
-        /// <code>
-        /// report1.Load("report.frx");
-        /// report1.RegisterData(dataSet1, "NorthWind");
-        /// </code>
-        /// </example>
-        public void RegisterData (DataSet data, string name)
+    /// <summary>
+    /// Registers the application data table to use it in the report.
+    /// </summary>
+    /// <param name="data">The application data.</param>
+    /// <param name="name">The name of the data.</param>
+    /// <example>
+    /// <code>
+    /// report1.Load("report.frx");
+    /// report1.RegisterData(dataSet1.Tables["Orders"], "Orders");
+    /// </code>
+    /// </example>
+    public void RegisterData (DataTable data, string name)
+    {
+        Dictionary!.RegisterDataTable (data, name, false);
+    }
+
+    /// <summary>
+    /// Registers the application data view to use it in the report.
+    /// </summary>
+    /// <param name="data">The application data.</param>
+    /// <param name="name">The name of the data.</param>
+    /// <example>
+    /// <code>
+    /// report1.Load("report.frx");
+    /// report1.RegisterData(myDataView, "OrdersView");
+    /// </code>
+    /// </example>
+    public void RegisterData (DataView data, string name)
+    {
+        Dictionary!.RegisterDataView (data, name, false);
+    }
+
+    /// <summary>
+    /// Registers the application data relation to use it in the report.
+    /// </summary>
+    /// <param name="data">The application data.</param>
+    /// <param name="name">The name of the data.</param>
+    /// <remarks>
+    /// You may specify any value for the <b>name</b> parameter: it is not displayed anywhere
+    /// in the designer and used only to load/save a report. The name must be persistent
+    /// and unique for each registered relation.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// report1.Load("report.frx");
+    /// report1.RegisterData(myDataRelation, "myRelation");
+    /// </code>
+    /// </example>
+    public void RegisterData (DataRelation data, string name)
+    {
+        Dictionary!.RegisterDataRelation (data, name, false);
+    }
+
+    /// <summary>
+    /// <b>Obsolete</b>. Registers the application business object to use it in the report.
+    /// </summary>
+    /// <param name="data">Application data.</param>
+    /// <param name="name">Name of the data.</param>
+    /// <param name="flags">Not used.</param>
+    /// <param name="maxNestingLevel">Maximum nesting level of business objects.</param>
+    /// <remarks>
+    /// This method is obsolete. Use the <see cref="RegisterData(IEnumerable, string)"/> method instead.
+    /// </remarks>
+    public void RegisterData (IEnumerable data, string name, BusinessObjectConverterFlags flags, int maxNestingLevel)
+    {
+        RegisterData (data, name, maxNestingLevel);
+    }
+
+    /// <summary>
+    /// Registers the application business object to use it in the report.
+    /// </summary>
+    /// <param name="data">Application data.</param>
+    /// <param name="name">Name of the data.</param>
+    /// <example>
+    /// <code>
+    /// report1.Load("report.frx");
+    /// report1.RegisterData(myBusinessObject, "Customers");
+    /// </code>
+    /// </example>
+    public void RegisterData (IEnumerable data, string name)
+    {
+        if (_initializing)
         {
-            if (initializing)
-            {
-                initializeData = data;
-                initializeDataName = name;
-            }
-            else
-            {
-                Dictionary.RegisterDataSet (data, name, false);
-            }
+            _initializeData = data;
+            _initializeDataName = name;
         }
-
-        /// <summary>
-        /// Registers the application dataset with specified name and enables all its tables.
-        /// </summary>
-        /// <param name="data">The application data.</param>
-        /// <param name="name">The name of the data.</param>
-        /// <param name="enableAllTables">The boolean value indicating whether all tables should be enabled.</param>
-        /// <remarks>
-        /// Use this method if you register more than one dataset. You may specify any value
-        /// for the <b>name</b> parameter: it is not displayed anywhere in the designer and used only
-        /// to load/save a report. The name must be persistent and unique for each registered dataset.
-        /// </remarks>
-        /// <example>
-        /// <code>
-        /// report1.Load("report.frx");
-        /// report1.RegisterData(dataSet1, "NorthWind", true);
-        /// </code>
-        /// </example>
-        public void RegisterData (DataSet data, string name, bool enableAllTables)
+        else
         {
-            if (initializing)
-            {
-                initializeData = data;
-                initializeDataName = name;
-            }
-            else
-            {
-                Dictionary.RegisterDataSet (data, name, false);
-                foreach (DataTable table in data.Tables)
-                {
-                    var ds = Report.GetDataSource (table.TableName);
-                    if (ds != null)
-                    {
-                        ds.Enabled = true;
-                    }
-                }
-            }
+            Dictionary!.RegisterBusinessObject (data, name, 1, false);
         }
+    }
 
-        /// <summary>
-        /// Registers the application data table to use it in the report.
-        /// </summary>
-        /// <param name="data">The application data.</param>
-        /// <param name="name">The name of the data.</param>
-        /// <example>
-        /// <code>
-        /// report1.Load("report.frx");
-        /// report1.RegisterData(dataSet1.Tables["Orders"], "Orders");
-        /// </code>
-        /// </example>
-        public void RegisterData (DataTable data, string name)
+    /// <summary>
+    /// Registers the application business object to use it in the report.
+    /// </summary>
+    /// <param name="data">Application data.</param>
+    /// <param name="name">Name of the data.</param>
+    /// <param name="maxNestingLevel">Maximum nesting level of business objects.</param>
+    /// <remarks>
+    /// This method creates initial datasource with specified nesting level. It is useful if
+    /// you create a report in code. In most cases, you don't need to specify the nesting level
+    /// because it may be selected in the designer's "Choose Report Data" dialog.
+    /// </remarks>
+    public void RegisterData (IEnumerable data, string name, int maxNestingLevel)
+    {
+        Dictionary!.RegisterBusinessObject (data, name, maxNestingLevel, false);
+    }
+
+    /// <summary>
+    /// Registers the application cube link to use it in the report.
+    /// </summary>
+    /// <param name="data">The application data.</param>
+    /// <param name="name">The name of the data.</param>
+    /// <example>
+    /// <code>
+    /// report1.Load("report.frx");
+    /// report1.RegisterData(myCubeLink, "Orders");
+    /// </code>
+    /// </example>
+    public void RegisterData (IBaseCubeLink data, string name)
+    {
+        Dictionary!.RegisterCubeLink (data, name, false);
+    }
+
+    /// <summary>
+    /// Prepares the report.
+    /// </summary>
+    /// <returns><b>true</b> if report was prepared succesfully.</returns>
+    public bool Prepare()
+    {
+        return Prepare (false);
+    }
+
+    /// <summary>
+    /// Prepares the report.
+    /// </summary>
+    /// <param name="append">Specifies whether the new report should be added to a
+    /// report that was prepared before.</param>
+    /// <returns><b>true</b> if report was prepared succesfully.</returns>
+    /// <remarks>
+    /// Use this method to merge prepared reports.
+    /// </remarks>
+    /// <example>This example shows how to merge two reports and preview the result:
+    /// <code>
+    /// Report report = new Report();
+    /// report.Load("report1.frx");
+    /// report.Prepare();
+    /// report.Load("report2.frx");
+    /// report.Prepare(true);
+    /// report.ShowPrepared();
+    /// </code>
+    /// </example>
+    public bool Prepare (bool append)
+    {
+        SetRunning (true);
+        try
         {
-            Dictionary.RegisterDataTable (data, name, false);
-        }
-
-        /// <summary>
-        /// Registers the application data view to use it in the report.
-        /// </summary>
-        /// <param name="data">The application data.</param>
-        /// <param name="name">The name of the data.</param>
-        /// <example>
-        /// <code>
-        /// report1.Load("report.frx");
-        /// report1.RegisterData(myDataView, "OrdersView");
-        /// </code>
-        /// </example>
-        public void RegisterData (DataView data, string name)
-        {
-            Dictionary.RegisterDataView (data, name, false);
-        }
-
-        /// <summary>
-        /// Registers the application data relation to use it in the report.
-        /// </summary>
-        /// <param name="data">The application data.</param>
-        /// <param name="name">The name of the data.</param>
-        /// <remarks>
-        /// You may specify any value for the <b>name</b> parameter: it is not displayed anywhere
-        /// in the designer and used only to load/save a report. The name must be persistent
-        /// and unique for each registered relation.
-        /// </remarks>
-        /// <example>
-        /// <code>
-        /// report1.Load("report.frx");
-        /// report1.RegisterData(myDataRelation, "myRelation");
-        /// </code>
-        /// </example>
-        public void RegisterData (DataRelation data, string name)
-        {
-            Dictionary.RegisterDataRelation (data, name, false);
-        }
-
-        /// <summary>
-        /// <b>Obsolete</b>. Registers the application business object to use it in the report.
-        /// </summary>
-        /// <param name="data">Application data.</param>
-        /// <param name="name">Name of the data.</param>
-        /// <param name="flags">Not used.</param>
-        /// <param name="maxNestingLevel">Maximum nesting level of business objects.</param>
-        /// <remarks>
-        /// This method is obsolete. Use the <see cref="RegisterData(IEnumerable, string)"/> method instead.
-        /// </remarks>
-        public void RegisterData (IEnumerable data, string name, BusinessObjectConverterFlags flags, int maxNestingLevel)
-        {
-            RegisterData (data, name, maxNestingLevel);
-        }
-
-        /// <summary>
-        /// Registers the application business object to use it in the report.
-        /// </summary>
-        /// <param name="data">Application data.</param>
-        /// <param name="name">Name of the data.</param>
-        /// <example>
-        /// <code>
-        /// report1.Load("report.frx");
-        /// report1.RegisterData(myBusinessObject, "Customers");
-        /// </code>
-        /// </example>
-        public void RegisterData (IEnumerable data, string name)
-        {
-            if (initializing)
-            {
-                initializeData = data;
-                initializeDataName = name;
-            }
-            else
-            {
-                Dictionary.RegisterBusinessObject (data, name, 1, false);
-            }
-        }
-
-        /// <summary>
-        /// Registers the application business object to use it in the report.
-        /// </summary>
-        /// <param name="data">Application data.</param>
-        /// <param name="name">Name of the data.</param>
-        /// <param name="maxNestingLevel">Maximum nesting level of business objects.</param>
-        /// <remarks>
-        /// This method creates initial datasource with specified nesting level. It is useful if
-        /// you create a report in code. In most cases, you don't need to specify the nesting level
-        /// because it may be selected in the designer's "Choose Report Data" dialog.
-        /// </remarks>
-        public void RegisterData (IEnumerable data, string name, int maxNestingLevel)
-        {
-            Dictionary.RegisterBusinessObject (data, name, maxNestingLevel, false);
-        }
-
-        /// <summary>
-        /// Registers the application cube link to use it in the report.
-        /// </summary>
-        /// <param name="data">The application data.</param>
-        /// <param name="name">The name of the data.</param>
-        /// <example>
-        /// <code>
-        /// report1.Load("report.frx");
-        /// report1.RegisterData(myCubeLink, "Orders");
-        /// </code>
-        /// </example>
-        public void RegisterData (IBaseCubeLink data, string name)
-        {
-            Dictionary.RegisterCubeLink (data, name, false);
-        }
-
-        /// <summary>
-        /// Prepares the report.
-        /// </summary>
-        /// <returns><b>true</b> if report was prepared succesfully.</returns>
-        public bool Prepare()
-        {
-            return Prepare (false);
-        }
-
-        /// <summary>
-        /// Prepares the report.
-        /// </summary>
-        /// <param name="append">Specifies whether the new report should be added to a
-        /// report that was prepared before.</param>
-        /// <returns><b>true</b> if report was prepared succesfully.</returns>
-        /// <remarks>
-        /// Use this method to merge prepared reports.
-        /// </remarks>
-        /// <example>This example shows how to merge two reports and preview the result:
-        /// <code>
-        /// Report report = new Report();
-        /// report.Load("report1.frx");
-        /// report.Prepare();
-        /// report.Load("report2.frx");
-        /// report.Prepare(true);
-        /// report.ShowPrepared();
-        /// </code>
-        /// </example>
-        public bool Prepare (bool append)
-        {
-            SetRunning (true);
-            try
-            {
-                if (PreparedPages == null || !append)
-                {
-                    ClearPreparedPages();
-
-                    SetPreparedPages (new Preview.PreparedPages (this));
-                }
-
-                Engine = new ReportEngine (this);
-
-                if (!Config.WebMode)
-                {
-                    StartPerformanceCounter();
-                }
-
-                try
-                {
-                    Compile();
-                    return Engine.Run (true, append, true);
-                }
-                finally
-                {
-                    if (!Config.WebMode)
-                    {
-                        StopPerformanceCounter();
-                    }
-                }
-            }
-            finally
-            {
-                SetRunning (false);
-            }
-        }
-
-        /// <summary>
-        /// Prepares the report with pages limit.
-        /// </summary>
-        /// <param name="pagesLimit">Pages limit. The number of pages equal or less will be prepared.</param>
-        /// <returns><b>true</b> if report was prepared succesfully.</returns>
-        public bool Prepare (int pagesLimit)
-        {
-            SetRunning (true);
-            try
+            if (PreparedPages == null || !append)
             {
                 ClearPreparedPages();
-                SetPreparedPages (new Preview.PreparedPages (this));
-                Engine = new ReportEngine (this);
 
+                SetPreparedPages (new Preview.PreparedPages (this));
+            }
+
+            Engine = new ReportEngine (this);
+
+            if (!Config.WebMode)
+            {
+                StartPerformanceCounter();
+            }
+
+            try
+            {
+                Compile();
+                return Engine.Run (true, append, true);
+            }
+            finally
+            {
                 if (!Config.WebMode)
                 {
-                    StartPerformanceCounter();
+                    StopPerformanceCounter();
                 }
-
-                try
-                {
-                    Compile();
-                    return Engine.Run (true, false, true, pagesLimit);
-                }
-                finally
-                {
-                    if (!Config.WebMode)
-                    {
-                        StopPerformanceCounter();
-                    }
-                }
-            }
-            finally
-            {
-                SetRunning (false);
             }
         }
-
-        /// <summary>
-        /// For internal use only.
-        /// </summary>
-        [EditorBrowsable (EditorBrowsableState.Never)]
-        public void PreparePhase1()
+        finally
         {
-            var webDialog = false;
-            SetRunning (true);
-            if (PreparedPages != null)
-            {
-                // if prepared pages are set before => it's call method again => it's web dialog
-                webDialog = true;
-                PreparedPages.Clear();
-            }
-
-            SetPreparedPages (new Preview.PreparedPages (this));
-            Engine = new ReportEngine (this);
-            Compile();
-            Engine.RunPhase1 (true, webDialog);
-        }
-
-        /// <summary>
-        /// For internal use only.
-        /// </summary>
-        [EditorBrowsable (EditorBrowsableState.Never)]
-        public void PreparePhase2 (int? pagesLimit = null)
-        {
-            Engine.RunPhase2 (pagesLimit);
             SetRunning (false);
         }
+    }
 
-        /// <summary>
-        /// Refresh the current report.
-        /// </summary>
-        /// <remarks>
-        /// Call this method in the Click or MouseUp event handler of a report object to refresh
-        /// the currently previewed report. Report will be generated again, but without dialog forms.
-        /// </remarks>
-        public void Refresh()
+    /// <summary>
+    /// Prepares the report with pages limit.
+    /// </summary>
+    /// <param name="pagesLimit">Pages limit. The number of pages equal or less will be prepared.</param>
+    /// <returns><b>true</b> if report was prepared succesfully.</returns>
+    public bool Prepare (int pagesLimit)
+    {
+        SetRunning (true);
+        try
         {
-            NeedRefresh = true;
-        }
+            ClearPreparedPages();
+            SetPreparedPages (new Preview.PreparedPages (this));
+            Engine = new ReportEngine (this);
 
-        /// <summary>
-        ///  Refresh prepared report after interactive actions.
-        /// </summary>
-        public void InteractiveRefresh()
-        {
-            PreparedPages.ClearPageCache();
-            InternalRefresh();
-        }
+            if (!Config.WebMode)
+            {
+                StartPerformanceCounter();
+            }
 
-        internal void InternalRefresh()
-        {
-            SetRunning (true);
             try
             {
-                Engine.Run (false, false, false);
+                Compile();
+                return Engine.Run (true, false, true, pagesLimit);
             }
             finally
             {
-                SetRunning (false);
-            }
-        }
-
-
-        internal TextRenderingHint GetTextQuality()
-        {
-            switch (TextQuality)
-            {
-                case TextQuality.Regular:
-                    return TextRenderingHint.AntiAliasGridFit;
-
-                case TextQuality.ClearType:
-                    return TextRenderingHint.ClearTypeGridFit;
-
-                case TextQuality.AntiAlias:
-                    return TextRenderingHint.AntiAlias;
-
-                case TextQuality.SingleBPP:
-                    return TextRenderingHint.SingleBitPerPixel;
-
-                case TextQuality.SingleBPPGridFit:
-                    return TextRenderingHint.SingleBitPerPixelGridFit;
-            }
-
-            return TextRenderingHint.SystemDefault;
-        }
-
-
-        /// <summary>
-        /// Prepare page
-        /// </summary>
-        /// <param name="page"></param>
-        public void PreparePage (ReportPage page)
-        {
-            SetRunning (true);
-            try
-            {
-                Engine.Run (false, false, false, page);
-            }
-            finally
-            {
-                SetRunning (false);
-            }
-        }
-
-        /// <summary>
-        /// Exports a report. Report should be prepared using the <see cref="Prepare()"/> method.
-        /// </summary>
-        /// <param name="export">The export filter.</param>
-        /// <param name="stream">Stream to save export result to.</param>
-        public void Export (ExportBase export, Stream stream)
-        {
-            export.Export (this, stream);
-        }
-
-        /// <summary>
-        /// Exports a report. Report should be prepared using the <see cref="Prepare()"/> method.
-        /// </summary>
-        /// <param name="export">The export filter.</param>
-        /// <param name="fileName">File name to save export result to.</param>
-        public void Export (ExportBase export, string fileName)
-        {
-            export.Export (this, fileName);
-        }
-
-        /// <summary>
-        /// Saves the prepared report. Report should be prepared using the <see cref="Prepare()"/> method.
-        /// </summary>
-        /// <param name="fileName">File name to save to.</param>
-        public void SavePrepared (string fileName)
-        {
-            if (PreparedPages != null)
-            {
-                PreparedPages.Save (fileName);
-            }
-        }
-
-        /// <summary>
-        /// Saves the prepared report. Report should be prepared using the <see cref="Prepare()"/> method.
-        /// </summary>
-        /// <param name="stream">Stream to save to.</param>
-        public void SavePrepared (Stream stream)
-        {
-            if (PreparedPages != null)
-            {
-                PreparedPages.Save (stream);
-            }
-        }
-
-        /// <summary>
-        /// Loads the prepared report from a .fpx file.
-        /// </summary>
-        /// <param name="fileName">File name to load form.</param>
-        public void LoadPrepared (string fileName)
-        {
-            IsLoadPrepared = true;
-            if (PreparedPages == null)
-            {
-                SetPreparedPages (new Preview.PreparedPages (this));
-            }
-
-            PreparedPages.Load (fileName);
-        }
-
-        /// <summary>
-        /// Loads the prepared report from a .fpx file.
-        /// </summary>
-        /// <param name="stream">Stream to load from.</param>
-        public void LoadPrepared (Stream stream)
-        {
-            IsLoadPrepared = true;
-            if (PreparedPages == null)
-            {
-                SetPreparedPages (new Preview.PreparedPages (this));
-            }
-
-            PreparedPages.Load (stream);
-        }
-
-        #endregion Public Methods
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Report"/> class with default settings.
-        /// </summary>
-        public Report()
-        {
-            Pages = new PageCollection (this);
-            ReportInfo = new ReportInfo();
-            InitDesign();
-            Styles = new StyleCollection();
-            Dictionary = new Dictionary();
-            GraphicCache = new GraphicCache();
-            assemblies = new AssemblyCollection();
-            cachedDataItems =
-                new Hashtable (StringComparer.InvariantCultureIgnoreCase); // needed for case insensitivity
-            StoreInResources = true;
-            FileName = "";
-            AutoFillDataSet = true;
-            Tag = null;
-            ClearReportProperties();
-            SetFlags (Flags.CanMove | Flags.CanResize | Flags.CanDelete | Flags.CanEdit | Flags.CanChangeOrder |
-                      Flags.CanChangeParent | Flags.CanCopy, false);
-
-            //FInlineImageCache = new InlineImageCache();
-        }
-
-        static Report()
-        {
-            Config.Init();
-        }
-
-        /// <summary>
-        /// Ensure that static constructor is called.
-        /// </summary>
-        public static void EnsureInit()
-        {
-            // do nothing, just ensure that static constructor is called.
-        }
-
-        /// <summary>
-        /// Create name for all unnamed elements with prefix and start with number
-        /// </summary>
-        /// <param name="prefix">Prefix for name</param>
-        /// <param name="number">Number from which to start</param>
-        public void PostNameProcess (string prefix, int number)
-        {
-            var i = number;
-
-            foreach (Base obj in AllObjects)
-            {
-                if (string.IsNullOrEmpty (obj.Name))
+                if (!Config.WebMode)
                 {
-                    obj.SetName (prefix + i.ToString());
-                    i++;
+                    StopPerformanceCounter();
                 }
             }
         }
-
-        private class CachedDataItem
+        finally
         {
-            public DataSourceBase dataSource;
-            public Column column;
+            SetRunning (false);
         }
+    }
+
+    /// <summary>
+    /// For internal use only.
+    /// </summary>
+    [EditorBrowsable (EditorBrowsableState.Never)]
+    public void PreparePhase1()
+    {
+        var webDialog = false;
+        SetRunning (true);
+        if (PreparedPages != null)
+        {
+            // if prepared pages are set before => it's call method again => it's web dialog
+            webDialog = true;
+            PreparedPages.Clear();
+        }
+
+        SetPreparedPages (new Preview.PreparedPages (this));
+        Engine = new ReportEngine (this);
+        Compile();
+        Engine.RunPhase1 (true, webDialog);
+    }
+
+    /// <summary>
+    /// For internal use only.
+    /// </summary>
+    [EditorBrowsable (EditorBrowsableState.Never)]
+    public void PreparePhase2 (int? pagesLimit = null)
+    {
+        Engine.RunPhase2 (pagesLimit);
+        SetRunning (false);
+    }
+
+    /// <summary>
+    /// Refresh the current report.
+    /// </summary>
+    /// <remarks>
+    /// Call this method in the Click or MouseUp event handler of a report object to refresh
+    /// the currently previewed report. Report will be generated again, but without dialog forms.
+    /// </remarks>
+    public void Refresh()
+    {
+        NeedRefresh = true;
+    }
+
+    /// <summary>
+    ///  Refresh prepared report after interactive actions.
+    /// </summary>
+    public void InteractiveRefresh()
+    {
+        PreparedPages?.ClearPageCache();
+        InternalRefresh();
+    }
+
+    internal void InternalRefresh()
+    {
+        SetRunning (true);
+        try
+        {
+            Engine.Run (false, false, false);
+        }
+        finally
+        {
+            SetRunning (false);
+        }
+    }
+
+
+    internal TextRenderingHint GetTextQuality()
+    {
+        return TextQuality switch
+        {
+            TextQuality.Regular => TextRenderingHint.AntiAliasGridFit,
+            TextQuality.ClearType => TextRenderingHint.ClearTypeGridFit,
+            TextQuality.AntiAlias => TextRenderingHint.AntiAlias,
+            TextQuality.SingleBPP => TextRenderingHint.SingleBitPerPixel,
+            TextQuality.SingleBPPGridFit => TextRenderingHint.SingleBitPerPixelGridFit,
+            _ => TextRenderingHint.SystemDefault
+        };
+    }
+
+
+    /// <summary>
+    /// Prepare page
+    /// </summary>
+    /// <param name="page"></param>
+    public void PreparePage (ReportPage page)
+    {
+        SetRunning (true);
+        try
+        {
+            Engine.Run (false, false, false, page);
+        }
+        finally
+        {
+            SetRunning (false);
+        }
+    }
+
+    /// <summary>
+    /// Exports a report. Report should be prepared using the <see cref="Prepare()"/> method.
+    /// </summary>
+    /// <param name="export">The export filter.</param>
+    /// <param name="stream">Stream to save export result to.</param>
+    public void Export (ExportBase export, Stream stream)
+    {
+        export.Export (this, stream);
+    }
+
+    /// <summary>
+    /// Exports a report. Report should be prepared using the <see cref="Prepare()"/> method.
+    /// </summary>
+    /// <param name="export">The export filter.</param>
+    /// <param name="fileName">File name to save export result to.</param>
+    public void Export (ExportBase export, string fileName)
+    {
+        export.Export (this, fileName);
+    }
+
+    /// <summary>
+    /// Saves the prepared report. Report should be prepared using the <see cref="Prepare()"/> method.
+    /// </summary>
+    /// <param name="fileName">File name to save to.</param>
+    public void SavePrepared (string fileName)
+    {
+        PreparedPages?.Save (fileName);
+    }
+
+    /// <summary>
+    /// Saves the prepared report. Report should be prepared using the <see cref="Prepare()"/> method.
+    /// </summary>
+    /// <param name="stream">Stream to save to.</param>
+    public void SavePrepared (Stream stream)
+    {
+        PreparedPages?.Save (stream);
+    }
+
+    /// <summary>
+    /// Loads the prepared report from a .fpx file.
+    /// </summary>
+    /// <param name="fileName">File name to load form.</param>
+    public void LoadPrepared (string fileName)
+    {
+        IsLoadPrepared = true;
+        if (PreparedPages is null)
+        {
+            SetPreparedPages (new Preview.PreparedPages (this));
+        }
+
+        PreparedPages?.Load (fileName);
+    }
+
+    /// <summary>
+    /// Loads the prepared report from a .fpx file.
+    /// </summary>
+    /// <param name="stream">Stream to load from.</param>
+    public void LoadPrepared (Stream stream)
+    {
+        IsLoadPrepared = true;
+        if (PreparedPages is null)
+        {
+            SetPreparedPages (new Preview.PreparedPages (this));
+        }
+
+        PreparedPages?.Load (stream);
+    }
+
+    #endregion Public Methods
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Report"/> class with default settings.
+    /// </summary>
+    public Report()
+    {
+        Pages = new PageCollection (this);
+        ReportInfo = new ReportInfo();
+        InitDesign();
+        Styles = new StyleCollection();
+        Dictionary = new Dictionary();
+        GraphicCache = new GraphicCache();
+        _assemblies = new AssemblyCollection();
+        _cachedDataItems =
+            new Hashtable (StringComparer.InvariantCultureIgnoreCase); // needed for case insensitivity
+        StoreInResources = true;
+        FileName = "";
+        AutoFillDataSet = true;
+        Tag = null;
+        ClearReportProperties();
+        SetFlags (Flags.CanMove | Flags.CanResize | Flags.CanDelete | Flags.CanEdit | Flags.CanChangeOrder |
+                  Flags.CanChangeParent | Flags.CanCopy, false);
+
+        //FInlineImageCache = new InlineImageCache();
+    }
+
+    static Report()
+    {
+        Config.Init();
+    }
+
+    /// <summary>
+    /// Ensure that static constructor is called.
+    /// </summary>
+    public static void EnsureInit()
+    {
+        // do nothing, just ensure that static constructor is called.
+    }
+
+    /// <summary>
+    /// Create name for all unnamed elements with prefix and start with number
+    /// </summary>
+    /// <param name="prefix">Prefix for name</param>
+    /// <param name="number">Number from which to start</param>
+    public void PostNameProcess
+        (
+            string prefix,
+            int number
+        )
+    {
+        var i = number;
+
+        foreach (Base obj in AllObjects)
+        {
+            if (string.IsNullOrEmpty (obj.Name))
+            {
+                obj.SetName (prefix + i.ToString());
+                i++;
+            }
+        }
+    }
+
+    private class CachedDataItem
+    {
+        public DataSourceBase? dataSource;
+        public Column? column;
     }
 }

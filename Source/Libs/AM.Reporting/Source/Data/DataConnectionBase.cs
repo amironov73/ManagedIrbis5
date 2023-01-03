@@ -181,7 +181,7 @@ namespace AM.Reporting.Data
 
         private void GetDBObjectNames (string name, List<string> list)
         {
-            DataTable schema = null;
+            DataTable? schema = null;
             var conn = GetConnection();
             try
             {
@@ -209,7 +209,7 @@ namespace AM.Reporting.Data
             return selectCommand;
         }
 
-        private TableDataSource FindTableDataSource (DataTable table)
+        private TableDataSource? FindTableDataSource (DataTable table)
         {
             foreach (TableDataSource c in Tables)
             {

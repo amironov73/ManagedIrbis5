@@ -57,7 +57,7 @@ namespace AM.Reporting.Data
         /// Gets or sets the underlying <b>DataTable</b> object.
         /// </summary>
         [Browsable (false)]
-        public DataTable Table { get; set; }
+        public DataTable? Table { get; set; }
 
         /// <summary>
         /// Gets or sets the table name.

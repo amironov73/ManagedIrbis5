@@ -42,9 +42,9 @@ namespace AM.Reporting
     {
         #region Fields
 
-        private DataHeaderBand header;
-        private DataFooterBand footer;
-        private DataSourceBase dataSource;
+        private DataHeaderBand? _header;
+        private DataFooterBand? _footer;
+        private DataSourceBase? _dataSource;
 
         #endregion
 
@@ -54,13 +54,13 @@ namespace AM.Reporting
         /// Gets or sets a header band.
         /// </summary>
         [Browsable (false)]
-        public DataHeaderBand Header
+        public DataHeaderBand? Header
         {
-            get => header;
+            get => _header;
             set
             {
-                SetProp (header, value);
-                header = value;
+                SetProp (_header, value);
+                _header = value;
             }
         }
 
@@ -74,13 +74,13 @@ namespace AM.Reporting
         /// Gets or sets a footer band.
         /// </summary>
         [Browsable (false)]
-        public DataFooterBand Footer
+        public DataFooterBand? Footer
         {
-            get => footer;
+            get => _footer;
             set
             {
-                SetProp (footer, value);
-                footer = value;
+                SetProp (_footer, value);
+                _footer = value;
             }
         }
 
@@ -89,33 +89,33 @@ namespace AM.Reporting
         /// Please note: data source have to be enabled.
         /// </summary>
         [Category ("Data")]
-        public DataSourceBase DataSource
+        public DataSourceBase? DataSource
         {
             get
             {
-                if (dataSource is { Enabled: false })
+                if (_dataSource is { Enabled: false })
                 {
                     return null;
                 }
 
-                return dataSource;
+                return _dataSource;
             }
             set
             {
-                if (dataSource != value)
+                if (_dataSource != value)
                 {
-                    if (dataSource != null)
+                    if (_dataSource != null)
                     {
-                        dataSource.Disposed -= new EventHandler (DataSource_Disposed);
+                        _dataSource.Disposed -= DataSource_Disposed;
                     }
 
                     if (value != null)
                     {
-                        value.Disposed += new EventHandler (DataSource_Disposed);
+                        value.Disposed += DataSource_Disposed;
                     }
                 }
 
-                dataSource = value;
+                _dataSource = value;
             }
         }
 
@@ -290,9 +290,9 @@ namespace AM.Reporting
 
         #region Private Methods
 
-        private void DataSource_Disposed (object sender, EventArgs e)
+        private void DataSource_Disposed (object? sender, EventArgs eventArgs)
         {
-            dataSource = null;
+            _dataSource = null;
         }
 
         #endregion
@@ -302,7 +302,7 @@ namespace AM.Reporting
         /// <inheritdoc/>
         protected override void DeserializeSubItems (ReportReader reader)
         {
-            if (string.Compare (reader.ItemName, "Sort", true) == 0)
+            if (String.Compare (reader.ItemName, "Sort", StringComparison.OrdinalIgnoreCase) == 0)
             {
                 reader.Read (Sort);
             }
@@ -325,13 +325,13 @@ namespace AM.Reporting
                 return;
             }
 
-            list.Add (header);
+            list.Add (_header);
             foreach (BandBase band in Bands)
             {
                 list.Add (band);
             }
 
-            list.Add (footer);
+            list.Add (_footer);
         }
 
         /// <inheritdoc/>
@@ -376,12 +376,12 @@ namespace AM.Reporting
                 return;
             }
 
-            if (child is DataHeaderBand band && header == band)
+            if (child is DataHeaderBand band && _header == band)
             {
                 Header = null;
             }
 
-            if (child is DataFooterBand footerBand && footer == footerBand)
+            if (child is DataFooterBand footerBand && _footer == footerBand)
             {
                 Footer = null;
             }
@@ -440,7 +440,7 @@ namespace AM.Reporting
         {
             base.Assign (source);
 
-            var src = source as DataBand;
+            var src = (DataBand) source;
             DataSource = src.DataSource;
             RowCount = src.RowCount;
             MaxRows = src.MaxRows;
@@ -481,7 +481,7 @@ namespace AM.Reporting
         /// <inheritdoc/>
         public override void Serialize (ReportWriter writer)
         {
-            var c = writer.DiffObject as DataBand;
+            var c = (DataBand) writer.DiffObject;
             base.Serialize (writer);
             if (writer.SerializeTo == SerializeTo.Preview)
             {
