@@ -59,7 +59,7 @@ namespace AM.Reporting
     /// </example>
     public partial class SubreportObject : ReportComponentBase
     {
-        private ReportPage reportPage;
+        private ReportPage? _reportPage;
 
         #region Properties
 
@@ -68,11 +68,10 @@ namespace AM.Reporting
         /// </summary>
 
         //[Browsable(false)]
-        [Editor ("AM.Reporting.TypeEditors.SubreportPageEditor, AM.Reporting", typeof (UITypeEditor))]
         [TypeConverter (typeof (TypeConverters.ComponentRefConverter))]
-        public ReportPage ReportPage
+        public ReportPage? ReportPage
         {
-            get => reportPage;
+            get => _reportPage;
             set
             {
                 if (value == Page)
@@ -80,7 +79,7 @@ namespace AM.Reporting
                     return;
                 }
 
-                if (reportPage != null && value != reportPage)
+                if (_reportPage != null && value != _reportPage)
                 {
                     RemoveSubReport (false);
                 }
@@ -91,7 +90,7 @@ namespace AM.Reporting
                     value.PageName = Name;
                 }
 
-                reportPage = value;
+                _reportPage = value;
             }
         }
 
@@ -109,7 +108,7 @@ namespace AM.Reporting
 
         private void RemoveSubReport (bool delete)
         {
-            if (reportPage != null)
+            if (_reportPage != null)
             {
                 if (Report != null)
                 {
@@ -117,30 +116,30 @@ namespace AM.Reporting
                     {
                         if (obj is SubreportObject subReport && obj != this)
                         {
-                            if (subReport.ReportPage == reportPage)
+                            if (subReport.ReportPage == _reportPage)
                             {
-                                reportPage.Subreport = subReport;
-                                reportPage.PageName = subReport.Name;
-                                reportPage = null;
+                                _reportPage.Subreport = subReport;
+                                _reportPage.PageName = subReport.Name;
+                                _reportPage = null;
                                 break;
                             }
                         }
                     }
                 }
 
-                if (reportPage != null)
+                if (_reportPage != null)
                 {
                     if (delete && Report != null)
                     {
-                        reportPage.Dispose();
+                        _reportPage.Dispose();
                     }
                     else
                     {
-                        reportPage.Subreport = null;
-                        reportPage.PageName = reportPage.Name;
+                        _reportPage.Subreport = null;
+                        _reportPage.PageName = _reportPage.Name;
                     }
 
-                    reportPage = null;
+                    _reportPage = null;
                 }
             }
         }

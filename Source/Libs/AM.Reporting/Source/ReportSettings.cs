@@ -48,23 +48,27 @@ namespace AM.Reporting
     [TypeConverter (typeof (TypeConverters.FRExpandableObjectConverter))]
     public partial class ReportSettings
     {
-        /// <include file='Resources/doc.xml' path='//CodeDoc/Topics/EnvironmentSettings/DatabaseLogin/*'/>
-        public event DatabaseLoginEventHandler DatabaseLogin;
+        #region Events
+
+        /// <summary>
+        ///
+        /// </summary>
+        public event DatabaseLoginEventHandler? DatabaseLogin;
 
         /// <summary>
         /// Occurs after the database connection is established.
         /// </summary>
-        public event AfterDatabaseLoginEventHandler AfterDatabaseLogin;
+        public event AfterDatabaseLoginEventHandler? AfterDatabaseLogin;
 
         /// <summary>
         /// Occurs when discovering the business object's structure.
         /// </summary>
-        public event FilterPropertiesEventHandler FilterBusinessObjectProperties;
+        public event FilterPropertiesEventHandler? FilterBusinessObjectProperties;
 
         /// <summary>
         /// Occurs when determining the kind of business object's property.
         /// </summary>
-        public event GetPropertyKindEventHandler GetBusinessObjectPropertyKind;
+        public event GetPropertyKindEventHandler? GetBusinessObjectPropertyKind;
 
         /// <summary>
         /// Occurs when discovering the structure of business object of ICustomTypeDescriptor type
@@ -73,7 +77,9 @@ namespace AM.Reporting
         /// <remarks>
         /// The event handler must return an instance of that type.
         /// </remarks>
-        public event GetTypeInstanceEventHandler GetBusinessObjectTypeInstance;
+        public event GetTypeInstanceEventHandler? GetBusinessObjectTypeInstance;
+
+        #endregion
 
         /// <summary>
         /// Gets or sets the default script language.
@@ -100,36 +106,40 @@ namespace AM.Reporting
         [DefaultValue ("")]
         public string ImageLocationRoot { get; set; }
 
-        internal void OnAfterDatabaseLogin (DataConnectionBase sender, AfterDatabaseLoginEventArgs e)
+        internal void OnAfterDatabaseLogin
+            (
+                DataConnectionBase sender,
+                AfterDatabaseLoginEventArgs eventArgs
+            )
         {
-            if (AfterDatabaseLogin != null)
-            {
-                AfterDatabaseLogin (sender, e);
-            }
+            AfterDatabaseLogin?.Invoke (sender, eventArgs);
         }
 
-        internal void OnFilterBusinessObjectProperties (object sender, FilterPropertiesEventArgs e)
+        internal void OnFilterBusinessObjectProperties
+            (
+                object? sender,
+                FilterPropertiesEventArgs eventArgs
+            )
         {
-            if (FilterBusinessObjectProperties != null)
-            {
-                FilterBusinessObjectProperties (sender, e);
-            }
+            FilterBusinessObjectProperties?.Invoke (sender, eventArgs);
         }
 
-        internal void OnGetBusinessObjectPropertyKind (object sender, GetPropertyKindEventArgs e)
+        internal void OnGetBusinessObjectPropertyKind
+            (
+                object? sender,
+                GetPropertyKindEventArgs eventArgs
+            )
         {
-            if (GetBusinessObjectPropertyKind != null)
-            {
-                GetBusinessObjectPropertyKind (sender, e);
-            }
+            GetBusinessObjectPropertyKind?.Invoke (sender, eventArgs);
         }
 
-        internal void OnGetBusinessObjectTypeInstance (object sender, GetTypeInstanceEventArgs e)
+        internal void OnGetBusinessObjectTypeInstance
+            (
+                object? sender,
+                GetTypeInstanceEventArgs eventArgs
+            )
         {
-            if (GetBusinessObjectTypeInstance != null)
-            {
-                GetBusinessObjectTypeInstance (sender, e);
-            }
+            GetBusinessObjectTypeInstance?.Invoke (sender, eventArgs);
         }
 
         /// <summary>

@@ -110,7 +110,7 @@ namespace AM.Reporting.Data.JsonConnection
         {
             get
             {
-                if (currentRow is int row)
+                if (_currentRow is int row)
                 {
                     return row;
                 }

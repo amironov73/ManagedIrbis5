@@ -76,7 +76,6 @@ namespace AM.Reporting.Data
         /// </summary>
         [TypeConverter (typeof (TypeConverters.DataTypeConverter))]
         [Category ("Data")]
-        [Editor ("AM.Reporting.TypeEditors.DataTypeEditor, AM.Reporting", typeof (UITypeEditor))]
         public Type DataType { get; set; }
 
         /// <summary>
@@ -133,7 +132,6 @@ namespace AM.Reporting.Data
         /// This expression will be calculated each time you access a parameter's <b>Value</b>.
         /// </remarks>
         [Category ("Data")]
-        [Editor ("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof (UITypeEditor))]
         public string Expression { get; set; }
 
         /// <summary>

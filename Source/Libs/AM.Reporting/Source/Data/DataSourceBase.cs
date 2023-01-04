@@ -35,17 +35,16 @@ namespace AM.Reporting.Data
     /// Base class for all datasources such as <see cref="TableDataSource"/>.
     /// </summary>
     [TypeConverter (typeof (TypeConverters.DataSourceConverter))]
-    [Editor ("AM.Reporting.TypeEditors.DataSourceEditor, AM.Reporting", typeof (UITypeEditor))]
     public abstract class DataSourceBase : Column
     {
         #region Fields
 
-        private int currentRowNo;
-        protected object currentRow;
-        private Hashtable columnIndices;
-        private Hashtable rowIndices;
-        private Hashtable relation_SortedChildRows;
-        private static bool FShowAccessDataMessage;
+        private int _currentRowNo;
+        protected object _currentRow;
+        private readonly Hashtable _columnIndices;
+        private readonly Hashtable _rowIndices;
+        private Hashtable _relationSortedChildRows;
+        private static bool _fShowAccessDataMessage;
 
         #endregion
 
@@ -125,7 +124,7 @@ namespace AM.Reporting.Data
                     Init();
                 }
 
-                return currentRow;
+                return _currentRow;
             }
         }
 
@@ -139,17 +138,17 @@ namespace AM.Reporting.Data
         [Browsable (false)]
         public int CurrentRowNo
         {
-            get => currentRowNo;
+            get => _currentRowNo;
             set
             {
-                currentRowNo = value;
+                _currentRowNo = value;
                 if (value >= 0 && value < Rows.Count)
                 {
-                    currentRow = Rows[value];
+                    _currentRow = Rows[value];
                 }
                 else
                 {
-                    currentRow = null;
+                    _currentRow = null;
                 }
             }
         }
@@ -288,16 +287,16 @@ namespace AM.Reporting.Data
                 childColumns[i] = Columns.FindByAlias (relation.ChildColumns[i]);
             }
 
-            if (relation_SortedChildRows == null)
+            if (_relationSortedChildRows == null)
             {
-                relation_SortedChildRows = new Hashtable();
+                _relationSortedChildRows = new Hashtable();
             }
 
             // sort the child table at the first run. Use relation columns to sort.
-            if (relation_SortedChildRows[relation] is not SortedList<Indices, ArrayList> sortedChildRows)
+            if (_relationSortedChildRows[relation] is not SortedList<Indices, ArrayList> sortedChildRows)
             {
                 sortedChildRows = new SortedList<Indices, ArrayList>();
-                relation_SortedChildRows[relation] = sortedChildRows;
+                _relationSortedChildRows[relation] = sortedChildRows;
                 foreach (var row in InternalRows)
                 {
                     SetCurrentRow (row);
@@ -405,10 +404,10 @@ namespace AM.Reporting.Data
         /// <returns>An object that contains the data.</returns>
         protected virtual object? GetValue (string alias)
         {
-            if (columnIndices[alias] is not Column column)
+            if (_columnIndices[alias] is not Column column)
             {
                 column = Columns.FindByAlias (alias);
-                columnIndices[alias] = column;
+                _columnIndices[alias] = column;
             }
 
             return GetValue (column);
@@ -459,7 +458,7 @@ namespace AM.Reporting.Data
 
         internal void SetCurrentRow (object row)
         {
-            currentRow = row;
+            _currentRow = row;
         }
 
         internal void FindParentRow (Relation relation)
@@ -484,16 +483,16 @@ namespace AM.Reporting.Data
             // improve performance for single column index
             if (columnCount == 1)
             {
-                if (rowIndices.Count == 0)
+                if (_rowIndices.Count == 0)
                 {
                     foreach (var row in InternalRows)
                     {
                         SetCurrentRow (row);
-                        rowIndices[this[relation.ParentColumns[0]]] = row;
+                        _rowIndices[this[relation.ParentColumns[0]]] = row;
                     }
                 }
 
-                result = rowIndices[childValues[0]];
+                result = _rowIndices[childValues[0]];
                 if (result != null)
                 {
                     SetCurrentRow (result);
@@ -524,7 +523,7 @@ namespace AM.Reporting.Data
 
             if (columnCount == 1)
             {
-                rowIndices[childValues[0]] = result;
+                _rowIndices[childValues[0]] = result;
             }
 
             SetCurrentRow (result);
@@ -617,7 +616,7 @@ namespace AM.Reporting.Data
 
         internal void Init (Relation relation, string filter, SortCollection sort, bool useAllParentRows)
         {
-            if (FShowAccessDataMessage)
+            if (_fShowAccessDataMessage)
             {
                 Config.ReportSettings.OnProgress (Report, Res.Get ("Messages,AccessingData"));
             }
@@ -663,7 +662,7 @@ namespace AM.Reporting.Data
             }
 
             // filter data rows
-            if (FShowAccessDataMessage && Rows.Count > 10000)
+            if (_fShowAccessDataMessage && Rows.Count > 10000)
             {
                 Config.ReportSettings.OnProgress (Report, Res.Get ("Messages,PreparingData"));
             }
@@ -702,7 +701,7 @@ namespace AM.Reporting.Data
                 Rows.Sort (new RowComparer (Report, this, expressions, descending));
             }
 
-            FShowAccessDataMessage = false;
+            _fShowAccessDataMessage = false;
             First();
         }
 
@@ -776,13 +775,13 @@ namespace AM.Reporting.Data
 
         internal void ClearData()
         {
-            columnIndices.Clear();
-            rowIndices.Clear();
+            _columnIndices.Clear();
+            _rowIndices.Clear();
             InternalRows.Clear();
             Rows.Clear();
             AdditionalFilter.Clear();
-            relation_SortedChildRows = null;
-            FShowAccessDataMessage = true;
+            _relationSortedChildRows = null;
+            _fShowAccessDataMessage = true;
         }
 
         /// <inheritdoc/>
@@ -801,8 +800,8 @@ namespace AM.Reporting.Data
             InternalRows = new ArrayList();
             Rows = new ArrayList();
             AdditionalFilter = new Hashtable();
-            columnIndices = new Hashtable();
-            rowIndices = new Hashtable();
+            _columnIndices = new Hashtable();
+            _rowIndices = new Hashtable();
             SetFlags (Flags.HasGlobalName, true);
         }
 

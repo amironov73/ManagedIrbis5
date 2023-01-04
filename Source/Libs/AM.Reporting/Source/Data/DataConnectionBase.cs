@@ -135,7 +135,6 @@ namespace AM.Reporting.Data
         /// </note>
         /// </remarks>
         [Category ("Data")]
-        [Editor ("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof (UITypeEditor))]
         public string ConnectionStringExpression { get; set; }
 
         /// <summary>

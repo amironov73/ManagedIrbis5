@@ -119,7 +119,6 @@ namespace AM.Reporting.CrossView
         /// Gets or sets a matrix style.
         /// </summary>
         [Category ("Appearance")]
-        [Editor ("AM.Reporting.TypeEditors.CrossViewStyleEditor, AM.Reporting", typeof (UITypeEditor))]
         public new string Style
         {
             get => style;

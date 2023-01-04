@@ -3,7 +3,6 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
 /* BusinessObjectConverterFlags.cs --

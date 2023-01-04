@@ -33,7 +33,6 @@ namespace AM.Reporting.Data
     /// Base class for all CubeSources such as <see cref="SliceCubeSource"/>.
     /// </summary>
     [TypeConverter (typeof (TypeConverters.CubeSourceConverter))]
-    [Editor ("AM.Reporting.TypeEditors.CubeSourceEditor, AM.Reporting", typeof (UITypeEditor))]
     public abstract class CubeSourceBase : DataComponentBase
     {
         #region Fields

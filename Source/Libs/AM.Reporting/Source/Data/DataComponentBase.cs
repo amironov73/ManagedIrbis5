@@ -75,7 +75,7 @@ namespace AM.Reporting.Data
         /// This property is used to support AM.Reporting.Net infrastructure. Do not use it directly.
         /// </remarks>
         [Browsable (false)]
-        public object Reference { get; set; }
+        public object? Reference { get; set; }
 
         /// <summary>
         /// Gets a value indicates that this object has an alias.

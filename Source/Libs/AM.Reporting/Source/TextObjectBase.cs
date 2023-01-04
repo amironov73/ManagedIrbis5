@@ -216,7 +216,6 @@ namespace AM.Reporting
         /// </code>
         /// </example>
         [Category ("Data")]
-        [Editor ("AM.Reporting.TypeEditors.FormatEditor, AM.Reporting", typeof (UITypeEditor))]
         public FormatBase Format
         {
             get => Formats.Count == 0 ? new GeneralFormat() : Formats[0];

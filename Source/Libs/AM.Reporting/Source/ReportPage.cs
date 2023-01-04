@@ -564,7 +564,7 @@ namespace AM.Reporting
         /// This property is <b>null</b> for regular report pages. See the <see cref="SubreportObject"/> for details.
         /// </remarks>
         [Browsable (false)]
-        public SubreportObject Subreport { get; set; }
+        public SubreportObject? Subreport { get; set; }
 
         /// <summary>
         /// Gets or sets a script event name that will be fired when the report engine starts this page.

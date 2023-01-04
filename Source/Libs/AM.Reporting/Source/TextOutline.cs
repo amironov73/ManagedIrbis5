@@ -59,7 +59,6 @@ namespace AM.Reporting
         /// <summary>
         /// Gets or sets the outline color.
         /// </summary>
-        [Editor ("AM.Reporting.TypeEditors.ColorEditor, AM.Reporting", typeof (UITypeEditor))]
         public Color Color { get; set; }
 
         /// <summary>

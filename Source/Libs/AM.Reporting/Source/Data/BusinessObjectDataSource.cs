@@ -101,7 +101,6 @@ public class BusinessObjectDataSource
         return GetValue (column);
     }
 
-
     /// <inheritdoc cref="DataSourceBase.GetValue(AM.Reporting.Data.Column)"/>
     protected override object? GetValue
         (
@@ -207,7 +206,7 @@ public class BusinessObjectDataSource
         if (!string.IsNullOrEmpty (ReferenceName) && ReferenceName.Contains ("."))
         {
             var names = ReferenceName.Split ('.');
-            PropertyName = names[names.Length - 1];
+            PropertyName = names[^1];
             ReferenceName = "";
         }
 
@@ -226,7 +225,7 @@ public class BusinessObjectDataSource
         for (var i = 0; i < Columns.Count; i++)
         {
             var column = Columns[i];
-            if (column is not BusinessObjectDataSource && dataSourceNames.Contains (column.PropertyName))
+            if (column is not BusinessObjectDataSource && dataSourceNames.Contains (column!.PropertyName))
             {
                 column.Dispose();
                 i--;

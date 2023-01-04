@@ -468,14 +468,14 @@ namespace AM.Reporting
             return new PathGradientFill (CenterColor, EdgeColor, Style);
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="object.GetHashCode"/>
         public override int GetHashCode()
         {
             return CenterColor.GetHashCode() ^ (EdgeColor.GetHashCode() << 1) ^ ((Style.GetHashCode() + 1) << 2);
         }
 
-        /// <inheritdoc/>
-        public override bool Equals (object obj)
+        /// <inheritdoc cref="object.Equals(object?)"/>
+        public override bool Equals (object? obj)
         {
             var f = obj as PathGradientFill;
             return f != null && CenterColor == f.CenterColor && EdgeColor == f.EdgeColor && Style == f.Style;
@@ -558,7 +558,6 @@ namespace AM.Reporting
         /// <summary>
         /// Gets or sets the foreground color.
         /// </summary>
-        [Editor ("AM.Reporting.TypeEditors.ColorEditor, AM.Reporting", typeof (UITypeEditor))]
         public Color ForeColor
         {
             get => foreColor;
@@ -568,7 +567,6 @@ namespace AM.Reporting
         /// <summary>
         /// Gets or sets the background color.
         /// </summary>
-        [Editor ("AM.Reporting.TypeEditors.ColorEditor, AM.Reporting", typeof (UITypeEditor))]
         public Color BackColor
         {
             get => backColor;
@@ -588,14 +586,14 @@ namespace AM.Reporting
             return new HatchFill (ForeColor, BackColor, Style);
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="object.GetHashCode"/>
         public override int GetHashCode()
         {
             return ForeColor.GetHashCode() ^ (BackColor.GetHashCode() << 1) ^ ((Style.GetHashCode() + 1) << 2);
         }
 
-        /// <inheritdoc/>
-        public override bool Equals (object obj)
+        /// <inheritdoc cref="object.Equals(object?)"/>
+        public override bool Equals (object? obj)
         {
             var f = obj as HatchFill;
             return f != null && ForeColor == f.ForeColor && BackColor == f.BackColor && Style == f.Style;
@@ -663,7 +661,6 @@ namespace AM.Reporting
         /// Gets or sets the fill color.
         /// </summary>
 
-        [Editor ("AM.Reporting.TypeEditors.ColorEditor, AM.Reporting", typeof (UITypeEditor))]
         public Color Color
         {
             get => color;
@@ -794,11 +791,11 @@ namespace AM.Reporting
     {
         #region Fields
 
-        private Image image;
-        private int imageWidth;
-        private int imageHeight;
-        private byte[] imageData;
-        private static string dummyImageHash;
+        private Image? _image;
+        private int _imageWidth;
+        private int _imageHeight;
+        private byte[]? _imageData;
+        private static readonly string _dummyImageHash;
 
         #endregion // Fields
 
@@ -816,24 +813,24 @@ namespace AM.Reporting
         {
             get
             {
-                if (imageWidth <= 0)
+                if (_imageWidth <= 0)
                 {
                     ForceLoadImage();
                 }
 
-                return imageWidth;
+                return _imageWidth;
             }
             set
             {
-                if (value != imageWidth && value > 0)
+                if (value != _imageWidth && value > 0)
                 {
-                    if (PreserveAspectRatio && imageHeight > 0 && imageWidth > 0)
+                    if (PreserveAspectRatio && _imageHeight > 0 && _imageWidth > 0)
                     {
-                        imageHeight = (int)(imageHeight * (float)value / imageWidth);
+                        _imageHeight = (int)(_imageHeight * (float)value / _imageWidth);
                     }
 
-                    imageWidth = value;
-                    ResizeImage (imageWidth, ImageHeight);
+                    _imageWidth = value;
+                    ResizeImage (_imageWidth, ImageHeight);
                 }
             }
         }
@@ -845,24 +842,24 @@ namespace AM.Reporting
         {
             get
             {
-                if (imageHeight <= 0)
+                if (_imageHeight <= 0)
                 {
                     ForceLoadImage();
                 }
 
-                return imageHeight;
+                return _imageHeight;
             }
             set
             {
-                if (value != imageHeight && value > 0)
+                if (value != _imageHeight && value > 0)
                 {
-                    if (PreserveAspectRatio && imageWidth > 0 && imageHeight > 0)
+                    if (PreserveAspectRatio && _imageWidth > 0 && _imageHeight > 0)
                     {
-                        imageWidth = (int)(imageWidth * (float)value / imageHeight);
+                        _imageWidth = (int)(_imageWidth * (float)value / _imageHeight);
                     }
 
-                    imageHeight = value;
-                    ResizeImage (imageWidth, ImageHeight);
+                    _imageHeight = value;
+                    ResizeImage (_imageWidth, ImageHeight);
                 }
             }
         }
@@ -882,7 +879,7 @@ namespace AM.Reporting
         /// </summary>
         public byte[] ImageData
         {
-            get => imageData;
+            get => _imageData;
             set => SetImageData (value);
         }
 
@@ -904,25 +901,25 @@ namespace AM.Reporting
 
         private void Clear()
         {
-            if (image != null)
+            if (_image != null)
             {
-                image.Dispose();
+                _image.Dispose();
             }
 
-            image = null;
-            imageData = null;
+            _image = null;
+            _imageData = null;
         }
 
         private void ResizeImage (int width, int height)
         {
-            if (imageData == null || width <= 0 || height <= 0)
+            if (_imageData == null || width <= 0 || height <= 0)
             {
                 return;
             }
             else
             {
-                image = ImageHelper.Load (imageData);
-                image = new Bitmap (image, width, height);
+                _image = ImageHelper.Load (_imageData);
+                _image = new Bitmap (_image, width, height);
             }
         }
 
@@ -933,7 +930,7 @@ namespace AM.Reporting
 
         private void ForceLoadImage()
         {
-            var data = imageData;
+            var data = _imageData;
             if (data == null)
             {
                 return;
@@ -942,15 +939,15 @@ namespace AM.Reporting
             var saveImageData = data;
 
             // imageData will be reset after this line, keep it
-            image = ImageHelper.Load (data);
-            if (imageWidth <= 0 && imageHeight <= 0)
+            _image = ImageHelper.Load (data);
+            if (_imageWidth <= 0 && _imageHeight <= 0)
             {
-                imageWidth = image.Width;
-                imageHeight = image.Height;
+                _imageWidth = _image.Width;
+                _imageHeight = _image.Height;
             }
-            else if (imageWidth != image.Width || imageHeight != image.Height)
+            else if (_imageWidth != _image.Width || _imageHeight != _image.Height)
             {
-                ResizeImage (imageWidth, imageHeight);
+                ResizeImage (_imageWidth, _imageHeight);
             }
 
             data = saveImageData;
@@ -967,9 +964,9 @@ namespace AM.Reporting
         public void SetImageData (byte[] data)
         {
             ResetImageIndex();
-            image = null;
-            imageData = data;
-            ResizeImage (imageWidth, imageHeight);
+            _image = null;
+            _imageData = data;
+            ResizeImage (_imageWidth, _imageHeight);
         }
 
         /// <summary>
@@ -988,14 +985,14 @@ namespace AM.Reporting
         /// <inheritdoc/>
         public override FillBase Clone()
         {
-            var f = new TextureFill (imageData.Clone() as byte[], ImageWidth, ImageHeight, PreserveAspectRatio,
+            var f = new TextureFill ((_imageData!.Clone() as byte[])!, ImageWidth, ImageHeight, PreserveAspectRatio,
                 WrapMode, ImageOffsetX, ImageOffsetY);
 
             //f.ImageIndex = ImageIndex;
             return f;
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="object.GetHashCode"/>
         public override int GetHashCode()
         {
             return ImageData.GetHashCode() ^ (ImageWidth.GetHashCode() << 1) ^
@@ -1006,8 +1003,8 @@ namespace AM.Reporting
                    ((ImageOffsetY.GetHashCode() + 1) << 60);
         }
 
-        /// <inheritdoc/>
-        public override bool Equals (object obj)
+        /// <inheritdoc cref="object.Equals(object?)"/>
+        public override bool Equals (object? obj)
         {
             var f = obj as TextureFill;
             return f != null && ImageData == f.ImageData &&
@@ -1022,12 +1019,12 @@ namespace AM.Reporting
         /// <inheritdoc/>
         public override Brush CreateBrush (RectangleF rect)
         {
-            if (image == null)
+            if (_image is null)
             {
                 ForceLoadImage();
             }
 
-            var brush = new TextureBrush (image, WrapMode);
+            var brush = new TextureBrush (_image!, WrapMode);
             brush.TranslateTransform (rect.Left + ImageOffsetX, rect.Top + ImageOffsetY);
             return brush;
         }
@@ -1035,12 +1032,12 @@ namespace AM.Reporting
         /// <inheritdoc/>
         public override Brush CreateBrush (RectangleF rect, float scaleX, float scaleY)
         {
-            if (image == null)
+            if (_image is null)
             {
                 ForceLoadImage();
             }
 
-            var brush = new TextureBrush (image, WrapMode);
+            var brush = new TextureBrush (_image!, WrapMode);
             brush.TranslateTransform (rect.Left + ImageOffsetX * scaleX, rect.Top + ImageOffsetY * scaleY);
             brush.ScaleTransform (scaleX, scaleY);
             return brush;
@@ -1091,12 +1088,12 @@ namespace AM.Reporting
                     // previous BlobStore item and is not -1.
                     if (ImageIndex == -1 || ImageIndex >= writer.BlobStore.Count)
                     {
-                        var bytes = imageData;
+                        var bytes = _imageData;
                         if (bytes == null)
                         {
                             using (var stream = new MemoryStream())
                             {
-                                ImageHelper.Save (image, stream, ImageFormat.Png);
+                                ImageHelper.Save (_image, stream, ImageFormat.Png);
                                 bytes = stream.ToArray();
                             }
                         }
@@ -1104,7 +1101,7 @@ namespace AM.Reporting
                         if (bytes != null)
                         {
                             var imgHash = BitConverter.ToString (new Murmur3().ComputeHash (bytes));
-                            if (imgHash != dummyImageHash)
+                            if (imgHash != _dummyImageHash)
                             {
                                 ImageIndex = writer.BlobStore.AddOrUpdate (bytes, imgHash.Replace ("-", string.Empty));
                             }
@@ -1113,10 +1110,10 @@ namespace AM.Reporting
                 }
                 else
                 {
-                    if (imageData != null)
+                    if (_imageData != null)
                     {
-                        var hash = BitConverter.ToString (new Murmur3().ComputeHash (imageData));
-                        if (hash != dummyImageHash)
+                        var hash = BitConverter.ToString (new Murmur3().ComputeHash (_imageData));
+                        if (hash != _dummyImageHash)
                         {
                             if (c == null || !writer.AreEqual (ImageData, c.ImageData))
                             {
@@ -1166,12 +1163,12 @@ namespace AM.Reporting
         /// <inheritdoc/>
         public override void Draw (FRPaintEventArgs e, RectangleF rect)
         {
-            if (image == null)
+            if (_image == null)
             {
                 ForceLoadImage();
             }
 
-            if (image == null)
+            if (_image == null)
             {
                 return;
             }
@@ -1224,15 +1221,15 @@ namespace AM.Reporting
         {
             PreserveAspectRatio = preserveAspectRatio;
             WrapMode = wrapMode;
-            imageWidth = width;
-            imageHeight = height;
+            _imageWidth = width;
+            _imageHeight = height;
             ImageOffsetX = imageOffsetX;
             ImageOffsetY = imageOffsetY;
         }
 
         static TextureFill()
         {
-            dummyImageHash = "62-57-78-BF-92-9F-81-12-C0-43-6B-5D-B1-D8-04-DD";
+            _dummyImageHash = "62-57-78-BF-92-9F-81-12-C0-43-6B-5D-B1-D8-04-DD";
         }
 
         #endregion //Constructors

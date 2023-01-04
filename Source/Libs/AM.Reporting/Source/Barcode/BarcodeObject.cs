@@ -114,7 +114,6 @@ namespace AM.Reporting.Barcode
         /// Gets or sets the barcode type.
         /// </summary>
         [Category ("Appearance")]
-        [Editor ("AM.Reporting.TypeEditors.BarcodeEditor, AM.Reporting", typeof (UITypeEditor))]
         public BarcodeBase Barcode
         {
             get => barcode;
@@ -207,14 +206,12 @@ namespace AM.Reporting.Barcode
         /// Value must be in the form "Datasource.Column".
         /// </remarks>
         [Category ("Data")]
-        [Editor ("AM.Reporting.TypeEditors.DataColumnEditor, AM.Reporting", typeof (UITypeEditor))]
         public string DataColumn { get; set; }
 
         /// <summary>
         /// Gets or sets an expression that contains the barcode data.
         /// </summary>
         [Category ("Data")]
-        [Editor ("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof (UITypeEditor))]
         public string Expression { get; set; }
 
         /// <summary>
@@ -241,7 +238,6 @@ namespace AM.Reporting.Barcode
         /// Gets or sets the barcode data.
         /// </summary>
         [Category ("Data")]
-        [Editor ("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof (UITypeEditor))]
         public string Text { get; set; }
 
         /// <summary>

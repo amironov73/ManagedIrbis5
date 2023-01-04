@@ -90,7 +90,7 @@ namespace AM.Reporting
         {
             Expression = expression;
             CalculatedObject = Object;
-            this.Report = report;
+            Report = report;
         }
     }
 
@@ -178,7 +178,7 @@ namespace AM.Reporting
         /// <param name="connectionString">The connection string.</param>
         public DatabaseLoginEventArgs (string connectionString)
         {
-            this.ConnectionString = connectionString;
+            ConnectionString = connectionString;
             UserName = "";
             Password = "";
         }
@@ -190,7 +190,7 @@ namespace AM.Reporting
     /// </summary>
     /// <param name="sender">The source of the event.</param>
     /// <param name="e">The event data.</param>
-    public delegate void DatabaseLoginEventHandler (object sender, DatabaseLoginEventArgs e);
+    public delegate void DatabaseLoginEventHandler (object? sender, DatabaseLoginEventArgs eventArgs);
 
 
     /// <summary>
@@ -210,7 +210,7 @@ namespace AM.Reporting
         /// <param name="connection">The connection object.</param>
         public AfterDatabaseLoginEventArgs (DbConnection connection)
         {
-            this.Connection = connection;
+            Connection = connection;
         }
     }
 
@@ -219,7 +219,7 @@ namespace AM.Reporting
     /// </summary>
     /// <param name="sender">The source of the event.</param>
     /// <param name="e">The event data.</param>
-    public delegate void AfterDatabaseLoginEventHandler (object sender, AfterDatabaseLoginEventArgs e);
+    public delegate void AfterDatabaseLoginEventHandler (object? sender, AfterDatabaseLoginEventArgs eventArgs);
 
 
     /// <summary>
@@ -239,7 +239,7 @@ namespace AM.Reporting
 
         internal FilterPropertiesEventArgs (PropertyDescriptor property)
         {
-            this.Property = property;
+            Property = property;
             Skip = false;
         }
     }
@@ -249,7 +249,7 @@ namespace AM.Reporting
     /// </summary>
     /// <param name="sender">The source of the event.</param>
     /// <param name="e">The event data.</param>
-    public delegate void FilterPropertiesEventHandler (object sender, FilterPropertiesEventArgs e);
+    public delegate void FilterPropertiesEventHandler (object? sender, FilterPropertiesEventArgs eventArgs);
 
 
     /// <summary>
@@ -285,7 +285,7 @@ namespace AM.Reporting
     /// </summary>
     /// <param name="sender">The source of the event.</param>
     /// <param name="e">The event data.</param>
-    public delegate void GetPropertyKindEventHandler (object sender, GetPropertyKindEventArgs e);
+    public delegate void GetPropertyKindEventHandler (object? sender, GetPropertyKindEventArgs e);
 
 
     /// <summary>
@@ -314,12 +314,13 @@ namespace AM.Reporting
     /// </summary>
     /// <param name="sender">The source of the event.</param>
     /// <param name="e">The event data.</param>
-    public delegate void GetTypeInstanceEventHandler (object sender, GetTypeInstanceEventArgs e);
+    public delegate void GetTypeInstanceEventHandler (object? sender, GetTypeInstanceEventArgs e);
 
     /// <summary>
     /// Event arguments for custom Export parameters
     /// </summary>
-    public class ExportParametersEventArgs : EventArgs
+    public class ExportParametersEventArgs
+        : EventArgs
     {
         /// <summary>
         /// Used to set custom export parameters

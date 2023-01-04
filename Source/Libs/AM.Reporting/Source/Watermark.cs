@@ -159,7 +159,6 @@ namespace AM.Reporting
         /// <summary>
         /// Gets or sets a text fill.
         /// </summary>
-        [Editor ("AM.Reporting.TypeEditors.FillEditor, AM.Reporting", typeof (UITypeEditor))]
         public FillBase TextFill
         {
             get => TextObject.TextFill;

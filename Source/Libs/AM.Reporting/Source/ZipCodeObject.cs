@@ -15,15 +15,12 @@
 
 #region Using directives
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 
 using AM.Reporting.Utils;
-
-using System.Drawing.Design;
 
 #endregion
 
@@ -38,7 +35,8 @@ namespace AM.Reporting
     /// This object is mainly used in Russia to print postal index on envelopes. It complies with the
     /// GOST R 51506-99.
     /// </remarks>
-    public partial class ZipCodeObject : ReportComponentBase
+    public partial class ZipCodeObject
+        : ReportComponentBase
     {
         #region Fields
 
@@ -100,14 +98,12 @@ namespace AM.Reporting
         /// Value must be in the form "Datasource.Column".
         /// </remarks>
         [Category ("Data")]
-        [Editor ("AM.Reporting.TypeEditors.DataColumnEditor, AM.Reporting", typeof (UITypeEditor))]
         public string DataColumn { get; set; }
 
         /// <summary>
         /// Gets or sets an expression that contains the zip code.
         /// </summary>
         [Category ("Data")]
-        [Editor ("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof (UITypeEditor))]
         public string Expression { get; set; }
 
         /// <summary>
@@ -406,34 +402,34 @@ namespace AM.Reporting
         {
             FDigits = new List<Point[]>();
             FDigits.Add (new Point[]
-                { new Point (0, 0), new Point (5, 0), new Point (5, 10), new Point (0, 10), new Point (0, 0) });
-            FDigits.Add (new Point[] { new Point (0, 5), new Point (5, 0), new Point (5, 10) });
+                { new (0, 0), new (5, 0), new (5, 10), new (0, 10), new (0, 0) });
+            FDigits.Add (new Point[] { new (0, 5), new (5, 0), new (5, 10) });
             FDigits.Add (new Point[]
-                { new Point (0, 0), new Point (5, 0), new Point (5, 5), new Point (0, 10), new Point (5, 10) });
+                { new (0, 0), new (5, 0), new (5, 5), new (0, 10), new (5, 10) });
             FDigits.Add (new Point[]
-                { new Point (0, 0), new Point (5, 0), new Point (0, 5), new Point (5, 5), new Point (0, 10) });
+                { new (0, 0), new (5, 0), new (0, 5), new (5, 5), new (0, 10) });
             FDigits.Add (new Point[]
-                { new Point (0, 0), new Point (0, 5), new Point (5, 5), new Point (5, 0), new Point (5, 10) });
+                { new (0, 0), new (0, 5), new (5, 5), new (5, 0), new (5, 10) });
             FDigits.Add (new Point[]
             {
-                new Point (5, 0), new Point (0, 0), new Point (0, 5), new Point (5, 5), new Point (5, 10),
-                new Point (0, 10)
+                new (5, 0), new (0, 0), new (0, 5), new (5, 5), new (5, 10),
+                new (0, 10)
             });
             FDigits.Add (new Point[]
             {
-                new Point (5, 0), new Point (0, 5), new Point (0, 10), new Point (5, 10), new Point (5, 5),
-                new Point (0, 5)
+                new (5, 0), new (0, 5), new (0, 10), new (5, 10), new (5, 5),
+                new (0, 5)
             });
-            FDigits.Add (new Point[] { new Point (0, 0), new Point (5, 0), new Point (0, 5), new Point (0, 10) });
+            FDigits.Add (new Point[] { new (0, 0), new (5, 0), new (0, 5), new (0, 10) });
             FDigits.Add (new Point[]
             {
-                new Point (0, 5), new Point (0, 0), new Point (5, 0), new Point (5, 10), new Point (0, 10),
-                new Point (0, 5), new Point (5, 5)
+                new (0, 5), new (0, 0), new (5, 0), new (5, 10), new (0, 10),
+                new (0, 5), new (5, 5)
             });
             FDigits.Add (new Point[]
             {
-                new Point (5, 5), new Point (0, 5), new Point (0, 0), new Point (5, 0), new Point (5, 5),
-                new Point (0, 10)
+                new (5, 5), new (0, 5), new (0, 0), new (5, 0), new (5, 5),
+                new (0, 10)
             });
         }
     }
