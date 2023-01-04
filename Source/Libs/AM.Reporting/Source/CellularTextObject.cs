@@ -32,7 +32,7 @@ namespace AM.Reporting
     /// Represents a text object which draws each symbol of text in its own cell.
     /// </summary>
     /// <remarks>
-    /// <para/>The text may be aligned to left or right side, or centered. Use the <see cref="HorzAlign"/>
+    /// <para/>The text may be aligned to left or right side, or centered. Use the <see cref="HorizontalAlign"/>
     /// property to do this. The "justify" align is not supported now, as well as vertical alignment.
     /// <para/>The cell size is defined in the <see cref="CellWidth"/> and <see cref="CellHeight"/> properties.
     /// These properties are 0 by default, in this case the size of cell is calculated automatically based
@@ -178,8 +178,8 @@ namespace AM.Reporting
                     cell.Fill = Fill.Clone();
                     cell.Font = Font;
                     cell.TextFill = TextFill.Clone();
-                    cell.HorzAlign = HorzAlign.Center;
-                    cell.VertAlign = VertAlign.Center;
+                    cell.HorizontalAlign = HorizontalAlign.Center;
+                    cell.VerticalAlign = VerticalAlign.Center;
                 }
             }
 
@@ -236,11 +236,11 @@ namespace AM.Reporting
             }
 
             var offset = 0;
-            if (HorzAlign == HorzAlign.Right)
+            if (HorizontalAlign == HorizontalAlign.Right)
             {
                 offset = table.ColumnCount - text.Length;
             }
-            else if (HorzAlign == HorzAlign.Center)
+            else if (HorizontalAlign == HorizontalAlign.Center)
             {
                 offset = (table.ColumnCount - text.Length) / 2;
             }

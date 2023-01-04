@@ -662,13 +662,13 @@ namespace AM.Reporting.Import.StimulSoft
 
             if (xmlObject["HorAlignment"] != null)
             {
-                textObject.HorzAlign =
+                textObject.HorizontalAlign =
                     UnitsConverter.ConvertTextAlignmentToHorzAlign (xmlObject["HorAlignment"].InnerText);
             }
 
             if (xmlObject["VertAlignment"] != null)
             {
-                textObject.VertAlign =
+                textObject.VerticalAlign =
                     UnitsConverter.ConvertTextAlignmentToVertAlign (xmlObject["VertAlignment"].InnerText);
             }
 
@@ -1212,12 +1212,12 @@ namespace AM.Reporting.Import.StimulSoft
 
             if (node["HorAlignment"] == null)
             {
-                result.HorzAlign = HorzAlign.Center;
+                result.HorizontalAlign = HorizontalAlign.Center;
             }
 
             if (node["VertAlignment"] == null)
             {
-                result.VertAlign = VertAlign.Center;
+                result.VerticalAlign = VerticalAlign.Center;
             }
 
             return result;

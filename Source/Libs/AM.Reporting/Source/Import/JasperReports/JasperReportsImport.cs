@@ -464,14 +464,14 @@ namespace AM.Reporting.Import.JasperReports
             {
                 if (xmlObject["textElement"].Attributes["textAlignment"] != null)
                 {
-                    textObject.HorzAlign =
+                    textObject.HorizontalAlign =
                         UnitsConverter.ConvertTextAlignmentToHorzAlign (xmlObject["textElement"]
                             .Attributes["textAlignment"].Value);
                 }
 
                 if (xmlObject["textElement"].Attributes["verticalAlignment"] != null)
                 {
-                    textObject.VertAlign =
+                    textObject.VerticalAlign =
                         UnitsConverter.ConvertTextAlignmentToVertAlign (xmlObject["textElement"]
                             .Attributes["verticalAlignment"].Value);
                 }
@@ -819,14 +819,14 @@ namespace AM.Reporting.Import.JasperReports
             {
                 if (node["textElement"].Attributes["textAlignment"] != null)
                 {
-                    result.HorzAlign =
+                    result.HorizontalAlign =
                         UnitsConverter.ConvertTextAlignmentToHorzAlign (node["textElement"].Attributes["textAlignment"]
                             .Value);
                 }
 
                 if (node["textElement"].Attributes["verticalAlignment"] != null)
                 {
-                    result.VertAlign =
+                    result.VerticalAlign =
                         UnitsConverter.ConvertTextAlignmentToVertAlign (node["textElement"]
                             .Attributes["verticalAlignment"].Value);
                 }

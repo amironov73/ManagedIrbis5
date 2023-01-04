@@ -17,7 +17,6 @@
 
 using System;
 using System.ComponentModel;
-using System.Drawing.Design;
 
 using AM.Reporting.Utils;
 
@@ -35,7 +34,7 @@ namespace AM.Reporting
     {
         #region Fields
 
-        private BreakableComponent? breakTo;
+        private BreakableComponent? _breakTo;
 
         #endregion
 
@@ -54,17 +53,16 @@ namespace AM.Reporting
         /// </summary>
         [Category ("Behavior")]
         [TypeConverter (typeof (TypeConverters.ComponentRefConverter))]
-        [Editor ("AM.Reporting.TypeEditors.BandComponentRefEditor, AM.Reporting", typeof (UITypeEditor))]
         public BreakableComponent? BreakTo
         {
-            get => breakTo;
+            get => _breakTo;
             set
             {
-                if (breakTo != value)
+                if (_breakTo != value)
                 {
-                    if (breakTo != null)
+                    if (_breakTo != null)
                     {
-                        breakTo.Disposed -= BreakTo_Disposed;
+                        _breakTo.Disposed -= BreakTo_Disposed;
                     }
 
                     if (value != null)
@@ -73,7 +71,7 @@ namespace AM.Reporting
                     }
                 }
 
-                breakTo = value;
+                _breakTo = value;
             }
         }
 
@@ -83,7 +81,7 @@ namespace AM.Reporting
 
         private void BreakTo_Disposed (object? sender, EventArgs eventArgs)
         {
-            breakTo = null;
+            _breakTo = null;
         }
 
         #endregion

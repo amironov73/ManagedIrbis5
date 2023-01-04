@@ -218,7 +218,6 @@ namespace AM.Reporting
         /// for each data row. When the value of this condition is changed, AM.Reporting starts a new group.
         /// </remarks>
         [Category ("Data")]
-        [Editor ("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof (UITypeEditor))]
         public string Condition { get; set; }
 
         /// <summary>

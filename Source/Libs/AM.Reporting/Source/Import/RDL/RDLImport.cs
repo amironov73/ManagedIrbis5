@@ -261,14 +261,14 @@ namespace AM.Reporting.Import.RDL
                 {
                     if (component is TextObject textObject)
                     {
-                        textObject.HorzAlign = UnitsConverter.ConvertTextAlign (node.InnerText);
+                        textObject.HorizontalAlign = UnitsConverter.ConvertTextAlign (node.InnerText);
                     }
                 }
                 else if (node.Name == "VerticalAlign")
                 {
                     if (component is TextObject textObject)
                     {
-                        textObject.VertAlign = UnitsConverter.ConvertVerticalAlign (node.InnerText);
+                        textObject.VerticalAlign = UnitsConverter.ConvertVerticalAlign (node.InnerText);
                     }
                 }
                 else if (node.Name == "WritingMode")

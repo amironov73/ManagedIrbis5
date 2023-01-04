@@ -201,8 +201,8 @@ namespace AM.Reporting.CrossView
             cell.AllowExpressions = false;
             cell.Font = DrawUtils.DefaultReportFont;
             cell.Text = text;
-            cell.HorzAlign = HorzAlign.Center;
-            cell.VertAlign = VertAlign.Center;
+            cell.HorizontalAlign = HorizontalAlign.Center;
+            cell.VerticalAlign = VerticalAlign.Center;
             ApplyStyle (cell, "Header");
             return cell;
         }
@@ -212,8 +212,8 @@ namespace AM.Reporting.CrossView
             var cell = new TableCell();
             cell.AllowExpressions = false;
             cell.Font = DrawUtils.DefaultReportFont;
-            cell.HorzAlign = HorzAlign.Right;
-            cell.VertAlign = VertAlign.Center;
+            cell.HorizontalAlign = HorizontalAlign.Right;
+            cell.VerticalAlign = VerticalAlign.Center;
             ApplyStyle (cell, "Body");
             return cell;
         }
@@ -224,8 +224,8 @@ namespace AM.Reporting.CrossView
             cell.Text = text;
             cell.Font = DrawUtils.DefaultReportFont;
             cell.TextFill = new SolidFill (Color.Gray);
-            cell.HorzAlign = HorzAlign.Center;
-            cell.VertAlign = VertAlign.Center;
+            cell.HorizontalAlign = HorizontalAlign.Center;
+            cell.VerticalAlign = VerticalAlign.Center;
             cell.SetFlags (Flags.CanEdit, false);
         }
 

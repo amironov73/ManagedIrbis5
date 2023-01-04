@@ -283,8 +283,8 @@ namespace AM.Reporting.Table
             return cell != null &&
                    Fill.Equals (cell.Fill) &&
                    TextFill.Equals (cell.TextFill) &&
-                   HorzAlign == cell.HorzAlign &&
-                   VertAlign == cell.VertAlign &&
+                   HorizontalAlign == cell.HorizontalAlign &&
+                   VerticalAlign == cell.VerticalAlign &&
                    Border.Equals (cell.Border) &&
                    Font.Equals (cell.Font) &&
                    Formats.Equals (cell.Formats) &&

@@ -751,7 +751,7 @@ namespace AM.Reporting.Barcode
             return "";
         }
 
-        public static Type GetType (string name)
+        public static Type? GetType (string name)
         {
             foreach (var item in Items)
             {

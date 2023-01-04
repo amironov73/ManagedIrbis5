@@ -166,10 +166,10 @@ namespace AM.Reporting.Import.DevExpress
                     {
                         if (component as TextObject != null)
                         {
-                            (component as TextObject).HorzAlign =
+                            (component as TextObject).HorizontalAlign =
                                 UnitsConverter.ConvertTextAlignmentToHorzAlign (GetAttribute (styleNode,
                                     "TextAlignment"));
-                            (component as TextObject).VertAlign =
+                            (component as TextObject).VerticalAlign =
                                 UnitsConverter.ConvertTextAlignmentToVertAlign (GetAttribute (styleNode,
                                     "TextAlignment"));
                         }
@@ -368,8 +368,8 @@ namespace AM.Reporting.Import.DevExpress
             text.Text = GetAttribute (node, "Text");
             text.FillColor = UnitsConverter.ConvertBackColor (GetAttribute (node, "BackColor"));
             text.TextColor = UnitsConverter.ConvertColor (GetAttribute (node, "ForeColor"));
-            text.HorzAlign = UnitsConverter.ConvertTextAlignmentToHorzAlign (GetAttribute (node, "TextAlignment"));
-            text.VertAlign = UnitsConverter.ConvertTextAlignmentToVertAlign (GetAttribute (node, "TextAlignment"));
+            text.HorizontalAlign = UnitsConverter.ConvertTextAlignmentToHorzAlign (GetAttribute (node, "TextAlignment"));
+            text.VerticalAlign = UnitsConverter.ConvertTextAlignmentToVertAlign (GetAttribute (node, "TextAlignment"));
             ApplyStyle (node, text);
         }
 
@@ -522,8 +522,8 @@ namespace AM.Reporting.Import.DevExpress
             cell.Text = GetAttribute (node, "Text");
             cell.FillColor = UnitsConverter.ConvertBackColor (GetAttribute (node, "BackColor"));
             cell.TextColor = UnitsConverter.ConvertColor (GetAttribute (node, "ForeColor"));
-            cell.HorzAlign = UnitsConverter.ConvertTextAlignmentToHorzAlign (GetAttribute (node, "TextAlignment"));
-            cell.VertAlign = UnitsConverter.ConvertTextAlignmentToVertAlign (GetAttribute (node, "TextAlignment"));
+            cell.HorizontalAlign = UnitsConverter.ConvertTextAlignmentToHorzAlign (GetAttribute (node, "TextAlignment"));
+            cell.VerticalAlign = UnitsConverter.ConvertTextAlignmentToVertAlign (GetAttribute (node, "TextAlignment"));
             cell.Font = LoadFontXml (GetAttribute (node, "Font"));
             ApplyStyle (node, cell);
             LoadObjects (node, cell);

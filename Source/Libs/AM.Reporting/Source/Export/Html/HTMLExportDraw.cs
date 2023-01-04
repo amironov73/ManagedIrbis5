@@ -218,36 +218,36 @@ namespace AM.Reporting.Export.Html
             return false;
         }
 
-        private void HTMLAlign (FastString sb, HorzAlign horzAlign, VertAlign vertAlign, bool wordWrap)
+        private void HTMLAlign (FastString sb, HorizontalAlign horizontalAlign, VerticalAlign verticalAlign, bool wordWrap)
         {
             sb.Append ("text-align:");
-            if (horzAlign == HorzAlign.Left)
+            if (horizontalAlign == HorizontalAlign.Left)
             {
                 sb.Append ("Left");
             }
-            else if (horzAlign == HorzAlign.Right)
+            else if (horizontalAlign == HorizontalAlign.Right)
             {
                 sb.Append ("Right");
             }
-            else if (horzAlign == HorzAlign.Center)
+            else if (horizontalAlign == HorizontalAlign.Center)
             {
                 sb.Append ("Center");
             }
-            else if (horzAlign == HorzAlign.Justify)
+            else if (horizontalAlign == HorizontalAlign.Justify)
             {
                 sb.Append ("Justify");
             }
 
             sb.Append (";vertical-align:");
-            if (vertAlign == VertAlign.Top)
+            if (verticalAlign == VerticalAlign.Top)
             {
                 sb.Append ("Top");
             }
-            else if (vertAlign == VertAlign.Bottom)
+            else if (verticalAlign == VerticalAlign.Bottom)
             {
                 sb.Append ("Bottom");
             }
-            else if (vertAlign == VertAlign.Center)
+            else if (verticalAlign == VerticalAlign.Center)
             {
                 sb.Append ("Middle");
             }
@@ -299,8 +299,8 @@ namespace AM.Reporting.Export.Html
                 .Append (" { ").ToString();
         }
 
-        private void HTMLGetStyle (FastString style, Font Font, Color TextColor, Color FillColor, HorzAlign HAlign,
-            VertAlign VAlign,
+        private void HTMLGetStyle (FastString style, Font Font, Color TextColor, Color FillColor, HorizontalAlign HAlign,
+            VerticalAlign VAlign,
             Border Border, Padding Padding, bool RTL, bool wordWrap, float LineHeight, float ParagraphOffset)
         {
             HTMLFontStyle (style, Font, LineHeight);

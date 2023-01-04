@@ -2,12 +2,9 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedMember.Global
 
 /*
  * Ars Magna project, http://arsmagna.ru
@@ -22,7 +19,6 @@ using System.ComponentModel;
 using AM.Reporting.Utils;
 
 using System.Reflection;
-using System.Drawing.Design;
 
 #endregion
 
@@ -79,7 +75,7 @@ namespace AM.Reporting
     {
         #region Fields
 
-        private float previewPictureRatio;
+        private float _previewPictureRatio;
 
         #endregion
 
@@ -104,9 +100,6 @@ namespace AM.Reporting
         /// Gets or sets the report description.
         /// </summary>
 
-        [Editor (
-            "System.ComponentModel.Design.MultilineStringEditor, System.Design, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
-            typeof (UITypeEditor))]
         public string Description { get; set; }
 
         /// <summary>
@@ -137,7 +130,7 @@ namespace AM.Reporting
         [DefaultValue (0.1f)]
         public float PreviewPictureRatio
         {
-            get => previewPictureRatio;
+            get => _previewPictureRatio;
             set
             {
                 if (value <= 0)
@@ -145,7 +138,7 @@ namespace AM.Reporting
                     value = 0.05f;
                 }
 
-                previewPictureRatio = value;
+                _previewPictureRatio = value;
             }
         }
 
@@ -157,9 +150,6 @@ namespace AM.Reporting
         /// <summary>
         /// Gets or sets the Tag string object for this report file.
         /// </summary>
-        [Editor (
-            "System.ComponentModel.Design.MultilineStringEditor, System.Design, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
-            typeof (UITypeEditor))]
         public string Tag { get; set; }
 
         /// <summary>
@@ -172,8 +162,8 @@ namespace AM.Reporting
         {
             get
             {
-                var asm = new AssemblyName (GetType().Assembly.FullName);
-                return asm.Version.ToString();
+                var asm = new AssemblyName (GetType().Assembly.FullName!);
+                return asm.Version!.ToString();
             }
         }
 
@@ -200,7 +190,7 @@ namespace AM.Reporting
             Created = SystemFake.DateTime.Now;
             Modified = SystemFake.DateTime.Now;
             SavePreviewPicture = false;
-            previewPictureRatio = 0.1f;
+            _previewPictureRatio = 0.1f;
             CreatorVersion = CurrentVersion;
             SaveMode = SaveMode.All;
         }

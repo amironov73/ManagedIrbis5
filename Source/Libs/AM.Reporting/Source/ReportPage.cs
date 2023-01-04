@@ -22,8 +22,6 @@ using System.ComponentModel;
 
 using AM.Reporting.Utils;
 
-using System.Drawing.Design;
-
 #endregion
 
 #nullable enable
@@ -333,16 +331,12 @@ namespace AM.Reporting
         /// Gets or sets the page background fill.
         /// </summary>
         [Category ("Appearance")]
-        [Editor ("AM.Reporting.TypeEditors.FillEditor, AM.Reporting", typeof (UITypeEditor))]
         public FillBase Fill
         {
             get => fill;
             set
             {
-                if (value == null)
-                {
-                    throw new ArgumentNullException ("Fill");
-                }
+                Sure.NotNull (value);
 
                 fill = value;
             }
@@ -387,7 +381,6 @@ namespace AM.Reporting
         /// For more information, see <see cref="BandBase.OutlineExpression"/> property.
         /// </remarks>
         [Category ("Data")]
-        [Editor ("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof (UITypeEditor))]
         public string OutlineExpression { get; set; }
 
         /// <summary>

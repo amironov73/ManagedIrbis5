@@ -2,12 +2,8 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
+// ReSharper disable CompareOfFloatsByEqualityOperator
 
 /*
  * Ars Magna project, http://arsmagna.ru
@@ -19,7 +15,6 @@ using System;
 using System.Text;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Text;
 using System.Drawing.Drawing2D;
 using System.ComponentModel;
 
@@ -28,7 +23,6 @@ using AM.Reporting.Format;
 using AM.Reporting.Code;
 
 using System.Windows.Forms;
-using System.Drawing.Design;
 
 #endregion
 
@@ -39,7 +33,7 @@ namespace AM.Reporting
     /// <summary>
     /// Specifies the horizontal alignment of a text in the TextObject object.
     /// </summary>
-    public enum HorzAlign
+    public enum HorizontalAlign
     {
         /// <summary>
         /// Specifies that text is aligned in the left of the layout rectangle.
@@ -65,7 +59,7 @@ namespace AM.Reporting
     /// <summary>
     /// Specifies the vertical alignment of a text in the TextObject object.
     /// </summary>
-    public enum VertAlign
+    public enum VerticalAlign
     {
         /// <summary>
         /// Specifies that text is aligned in the top of the layout rectangle.
@@ -115,8 +109,8 @@ namespace AM.Reporting
     [TypeConverter (typeof (TypeConverters.FRExpandableObjectConverter))]
     public class ParagraphFormat
     {
-        private float firstLineIndent;
-        private float lineSpacing;
+        private float _firstLineIndent;
+        private float _lineSpacing;
 
         /// <summary>
         /// The first line on each paragraph, not effect if value less then  0
@@ -126,12 +120,12 @@ namespace AM.Reporting
         [TypeConverter ("AM.Reporting.TypeConverters.UnitsConverter, AM.Reporting")]
         public float FirstLineIndent
         {
-            get => firstLineIndent;
+            get => _firstLineIndent;
             set
             {
                 if (value >= 0)
                 {
-                    firstLineIndent = value;
+                    _firstLineIndent = value;
                 }
             }
         }
@@ -144,12 +138,12 @@ namespace AM.Reporting
         [TypeConverter ("AM.Reporting.TypeConverters.UnitsConverter, AM.Reporting")]
         public float LineSpacing
         {
-            get => lineSpacing;
+            get => _lineSpacing;
             set
             {
                 if (value >= 0)
                 {
-                    lineSpacing = value;
+                    _lineSpacing = value;
                 }
             }
         }
@@ -168,12 +162,12 @@ namespace AM.Reporting
         [DefaultValue (0f)]
         public float LineSpacingMultiple
         {
-            get => lineSpacing / 100f;
+            get => _lineSpacing / 100f;
             set
             {
                 if (value >= 0)
                 {
-                    lineSpacing = value * 100f;
+                    _lineSpacing = value * 100f;
                 }
             }
         }
@@ -198,14 +192,14 @@ namespace AM.Reporting
             };
             if (LineSpacingType == LineSpacingType.Multiple)
             {
-                clone.lineSpacing = lineSpacing;
+                clone._lineSpacing = _lineSpacing;
             }
             else
             {
-                clone.lineSpacing = lineSpacing * scale;
+                clone._lineSpacing = _lineSpacing * scale;
             }
 
-            clone.firstLineIndent = firstLineIndent * scale;
+            clone._firstLineIndent = _firstLineIndent * scale;
             clone.SkipFirstLineIndent = SkipFirstLineIndent;
             return clone;
         }
@@ -213,17 +207,18 @@ namespace AM.Reporting
         internal void Assign (ParagraphFormat p)
         {
             LineSpacingType = p.LineSpacingType;
-            lineSpacing = p.lineSpacing;
-            firstLineIndent = p.firstLineIndent;
+            _lineSpacing = p._lineSpacing;
+            _firstLineIndent = p._firstLineIndent;
             SkipFirstLineIndent = p.SkipFirstLineIndent;
         }
 
-        public override bool Equals (object obj)
+        /// <inheritdoc cref="object.Equals(object?)"/>
+        public override bool Equals (object? obj)
         {
             var format = obj as ParagraphFormat;
             return format != null &&
-                   firstLineIndent == format.firstLineIndent &&
-                   lineSpacing == format.lineSpacing &&
+                   _firstLineIndent == format._firstLineIndent &&
+                   _lineSpacing == format._lineSpacing &&
                    LineSpacingType == format.LineSpacingType &&
                    SkipFirstLineIndent == format.SkipFirstLineIndent;
         }
@@ -233,8 +228,8 @@ namespace AM.Reporting
             unchecked
             {
                 var hashCode = -1051315095;
-                hashCode = hashCode * -1521134295 + firstLineIndent.GetHashCode();
-                hashCode = hashCode * -1521134295 + lineSpacing.GetHashCode();
+                hashCode = hashCode * -1521134295 + _firstLineIndent.GetHashCode();
+                hashCode = hashCode * -1521134295 + _lineSpacing.GetHashCode();
                 hashCode = hashCode * -1521134295 + LineSpacingType.GetHashCode();
                 hashCode = hashCode * -1521134295 + SkipFirstLineIndent.GetHashCode();
                 return hashCode;
@@ -306,16 +301,16 @@ namespace AM.Reporting
     {
         #region Fields
 
-        private Font font;
-        private FillBase textFill;
-        private TextOutline textOutline;
-        private float fontWidthRatio;
-        private FloatCollection tabPositions;
-        private FillBase savedTextFill;
-        private Font savedFont;
-        private string savedText;
-        private FormatBase savedFormat;
-        private InlineImageCache inlineImageCache;
+        private Font _font;
+        private FillBase _textFill;
+        private TextOutline _textOutline;
+        private float _fontWidthRatio;
+        private FloatCollection _floatCollection;
+        private FillBase _savedTextFill;
+        private Font _savedFont;
+        private string _savedText;
+        private FormatBase _savedFormat;
+        private InlineImageCache _inlineImageCache;
 
         #endregion
 
@@ -361,23 +356,22 @@ namespace AM.Reporting
         /// <summary>
         /// Gets or sets the horizontal alignment of a text in the TextObject object.
         /// </summary>
-        [DefaultValue (HorzAlign.Left)]
+        [DefaultValue (HorizontalAlign.Left)]
         [Category ("Appearance")]
-        public HorzAlign HorzAlign { get; set; }
+        public HorizontalAlign HorizontalAlign { get; set; }
 
         /// <summary>
         /// Gets or sets the vertical alignment of a text in the TextObject object.
         /// </summary>
-        [DefaultValue (VertAlign.Top)]
+        [DefaultValue (VerticalAlign.Top)]
         [Category ("Appearance")]
-        public VertAlign VertAlign { get; set; }
+        public VerticalAlign VerticalAlign { get; set; }
 
         /// <summary>
         /// Gets or sets the text angle, in degrees.
         /// </summary>
         [DefaultValue (0)]
         [Category ("Appearance")]
-        [Editor ("AM.Reporting.TypeEditors.AngleEditor, AM.Reporting", typeof (UITypeEditor))]
         public int Angle { get; set; }
 
         /// <summary>
@@ -407,10 +401,10 @@ namespace AM.Reporting
         [Category ("Appearance")]
         public Font Font
         {
-            get => font;
+            get => _font;
             set
             {
-                font = value;
+                _font = value;
                 if (!string.IsNullOrEmpty (Style))
                 {
                     Style = "";
@@ -424,16 +418,16 @@ namespace AM.Reporting
         /// <remarks>Use collection methods to add or remove TAB positions.</remarks>
         public FloatCollection TabPositions
         {
-            get => tabPositions;
+            get => _floatCollection;
             set
             {
                 if (value == null)
                 {
-                    tabPositions.Clear();
+                    _floatCollection.Clear();
                 }
                 else
                 {
-                    tabPositions = value;
+                    _floatCollection = value;
                 }
             }
         }
@@ -449,18 +443,14 @@ namespace AM.Reporting
         /// Use the <see cref="TextColor"/> property to set the solid text color.
         /// </remarks>
         [Category ("Appearance")]
-        [Editor ("AM.Reporting.TypeEditors.FillEditor, AM.Reporting", typeof (UITypeEditor))]
         public FillBase TextFill
         {
-            get => textFill;
+            get => _textFill;
             set
             {
-                if (value == null)
-                {
-                    throw new ArgumentNullException ("TextFill");
-                }
+                Sure.NotNull (value);
 
-                textFill = value;
+                _textFill = value;
                 if (!string.IsNullOrEmpty (Style))
                 {
                     Style = "";
@@ -472,18 +462,14 @@ namespace AM.Reporting
         /// Gets or sets the text outline.
         /// </summary>
         [Category ("Appearance")]
-        [Editor ("AM.Reporting.TypeEditors.OutlineEditor, AM.Reporting", typeof (UITypeEditor))]
         public TextOutline TextOutline
         {
-            get => textOutline;
+            get => _textOutline;
             set
             {
-                if (value == null)
-                {
-                    throw new ArgumentNullException ("TextOutline");
-                }
+                Sure.NotNull (value);
 
-                textOutline = value;
+                _textOutline = value;
                 if (!string.IsNullOrEmpty (Style))
                 {
                     Style = "";
@@ -523,16 +509,16 @@ namespace AM.Reporting
         [Category ("Appearance")]
         public float FontWidthRatio
         {
-            get => fontWidthRatio;
+            get => _fontWidthRatio;
             set
             {
                 if (value > 0)
                 {
-                    fontWidthRatio = value;
+                    _fontWidthRatio = value;
                 }
                 else
                 {
-                    fontWidthRatio = 1;
+                    _fontWidthRatio = 1;
                 }
             }
         }
@@ -584,7 +570,6 @@ namespace AM.Reporting
         /// </code>
         /// </remarks>
         [Category ("Data")]
-        [Editor ("AM.Reporting.TypeEditors.HighlightEditor, AM.Reporting", typeof (UITypeEditor))]
         public ConditionCollection Highlight { get; }
 
         /// <summary>
@@ -665,7 +650,7 @@ namespace AM.Reporting
         [TypeConverter ("AM.Reporting.TypeConverters.UnitsConverter, AM.Reporting")]
         public float ParagraphOffset { get; set; }
 
-        internal bool IsAdvancedRendererNeeded => HorzAlign == HorzAlign.Justify || Wysiwyg || LineHeight != 0 || HasHtmlTags;
+        internal bool IsAdvancedRendererNeeded => HorizontalAlign == HorizontalAlign.Justify || Wysiwyg || LineHeight != 0 || HasHtmlTags;
 
         internal bool PreserveLastLineSpace { get; set; }
 
@@ -677,12 +662,12 @@ namespace AM.Reporting
         {
             get
             {
-                if (inlineImageCache == null)
+                if (_inlineImageCache == null)
                 {
-                    inlineImageCache = new InlineImageCache();
+                    _inlineImageCache = new InlineImageCache();
                 }
 
-                return inlineImageCache;
+                return _inlineImageCache;
             }
         }
 
@@ -774,7 +759,7 @@ namespace AM.Reporting
 
                     var renderer = new AdvancedTextRenderer (Text, g, font, Brushes.Black, Pens.Black,
                         new RectangleF (0, 0, width, 100000), GetStringFormat (report.GraphicCache, 0),
-                        HorzAlign, VertAlign, LineHeight, Angle, FontWidthRatio, false, Wysiwyg, HasHtmlTags, false,
+                        HorizontalAlign, VerticalAlign, LineHeight, Angle, FontWidthRatio, false, Wysiwyg, HasHtmlTags, false,
                         96f / DrawUtils.ScreenDpi,
                         96f / DrawUtils.ScreenDpi, InlineImageCache);
                     var height = renderer.CalcHeight();
@@ -873,7 +858,7 @@ namespace AM.Reporting
 
                     Text = HtmlTextRenderer.BreakHtml (Text, charactersFitted, out result, out endOnEnter);
 
-                    if (HorzAlign == HorzAlign.Justify && !endOnEnter && result != "")
+                    if (HorizontalAlign == HorizontalAlign.Justify && !endOnEnter && result != "")
                     {
                         if (Text.EndsWith (" "))
                         {
@@ -933,7 +918,7 @@ namespace AM.Reporting
                 if (IsAdvancedRendererNeeded)
                 {
                     var renderer = new AdvancedTextRenderer (Text, g, font, Brushes.Black, Pens.Black,
-                        textRect, format, HorzAlign, VertAlign, LineHeight, Angle, FontWidthRatio, false, Wysiwyg,
+                        textRect, format, HorizontalAlign, VerticalAlign, LineHeight, Angle, FontWidthRatio, false, Wysiwyg,
                         HasHtmlTags, false, 96f / DrawUtils.ScreenDpi,
                         96f / DrawUtils.ScreenDpi, InlineImageCache);
                     renderer.CalcHeight (out charactersFitted, out htmlStyle);
@@ -980,7 +965,7 @@ namespace AM.Reporting
                 Text = Text.Substring (0, charactersFitted);
 
 
-                if (HorzAlign == HorzAlign.Justify && !Text.EndsWith ("\n") && result != "")
+                if (HorizontalAlign == HorizontalAlign.Justify && !Text.EndsWith ("\n") && result != "")
                 {
                     if (Text.EndsWith (" "))
                     {
@@ -1084,21 +1069,21 @@ namespace AM.Reporting
         internal StringFormat GetStringFormat (GraphicCache cache, StringFormatFlags flags, float scale)
         {
             var align = StringAlignment.Near;
-            if (HorzAlign == HorzAlign.Center)
+            if (HorizontalAlign == HorizontalAlign.Center)
             {
                 align = StringAlignment.Center;
             }
-            else if (HorzAlign == HorzAlign.Right)
+            else if (HorizontalAlign == HorizontalAlign.Right)
             {
                 align = StringAlignment.Far;
             }
 
             var lineAlign = StringAlignment.Near;
-            if (VertAlign == VertAlign.Center)
+            if (VerticalAlign == VerticalAlign.Center)
             {
                 lineAlign = StringAlignment.Center;
             }
-            else if (VertAlign == VertAlign.Bottom)
+            else if (VerticalAlign == VerticalAlign.Bottom)
             {
                 lineAlign = StringAlignment.Far;
             }
@@ -1140,8 +1125,8 @@ namespace AM.Reporting
 
             var src = source as TextObject;
             AutoWidth = src.AutoWidth;
-            HorzAlign = src.HorzAlign;
-            VertAlign = src.VertAlign;
+            HorizontalAlign = src.HorizontalAlign;
+            VerticalAlign = src.VerticalAlign;
             Angle = src.Angle;
             RightToLeft = src.RightToLeft;
             WordWrap = src.WordWrap;
@@ -1162,7 +1147,7 @@ namespace AM.Reporting
             AutoShrink = src.AutoShrink;
             AutoShrinkMinSize = src.AutoShrinkMinSize;
             ParagraphOffset = src.ParagraphOffset;
-            inlineImageCache = src.inlineImageCache;
+            _inlineImageCache = src._inlineImageCache;
             ParagraphFormat.Assign (src.ParagraphFormat);
         }
 
@@ -1208,16 +1193,16 @@ namespace AM.Reporting
             HtmlTextRenderer.RendererContext context;
             context.text = text;
             context.g = g;
-            context.font = font.FontFamily;
-            context.size = font.Size;
-            context.style = font.Style; // no keep
+            context.font = _font.FontFamily;
+            context.size = _font.Size;
+            context.style = _font.Style; // no keep
             context.color = TextColor; // no keep
-            context.underlineColor = textOutline.Color;
+            context.underlineColor = _textOutline.Color;
             context.rect = textRect;
             context.underlines = Underlines;
             context.format = format; // no keep
-            context.horzAlign = HorzAlign;
-            context.vertAlign = VertAlign;
+            context.horizontalAlign = HorizontalAlign;
+            context.verticalAlign = VerticalAlign;
             context.paragraphFormat = ParagraphFormat.MultipleScale (formatScale);
             context.forceJustify = ForceJustify;
             context.scale = scale * 96f / DrawUtils.ScreenDpi;
@@ -1275,9 +1260,9 @@ namespace AM.Reporting
                 }
 
                 Pen outlinePen = null;
-                if (textOutline.Enabled)
+                if (_textOutline.Enabled)
                 {
-                    outlinePen = e.Cache.GetPen (textOutline.Color, textOutline.Width * e.ScaleX, textOutline.Style);
+                    outlinePen = e.Cache.GetPen (_textOutline.Color, _textOutline.Width * e.ScaleX, _textOutline.Style);
                 }
 
                 var report = Report;
@@ -1318,7 +1303,7 @@ namespace AM.Reporting
                                 // use advanced rendering
                                 var advancedRenderer = new AdvancedTextRenderer (text, g, font,
                                     textBrush,
-                                    outlinePen, textRect, format, HorzAlign, VertAlign, LineHeight * e.ScaleY, Angle,
+                                    outlinePen, textRect, format, HorizontalAlign, VerticalAlign, LineHeight * e.ScaleY, Angle,
                                     FontWidthRatio, ForceJustify, Wysiwyg, HasHtmlTags, false,
                                     e.ScaleX * 96f / DrawUtils.ScreenDpi,
                                     IsPrinting ? 1 : e.ScaleX * 96f / DrawUtils.ScreenDpi, InlineImageCache,
@@ -1415,16 +1400,16 @@ namespace AM.Reporting
         public override void SaveStyle()
         {
             base.SaveStyle();
-            savedTextFill = TextFill;
-            savedFont = Font;
+            _savedTextFill = TextFill;
+            _savedFont = Font;
         }
 
         /// <inheritdoc/>
         public override void RestoreStyle()
         {
             base.RestoreStyle();
-            TextFill = savedTextFill;
-            Font = savedFont;
+            TextFill = _savedTextFill;
+            Font = _savedFont;
         }
 
         /// <inheritdoc/>
@@ -1465,14 +1450,14 @@ namespace AM.Reporting
                 writer.WriteFloat ("AutoShrinkMinSize", AutoShrinkMinSize);
             }
 
-            if (HorzAlign != c.HorzAlign)
+            if (HorizontalAlign != c.HorizontalAlign)
             {
-                writer.WriteValue ("HorzAlign", HorzAlign);
+                writer.WriteValue ("HorzAlign", HorizontalAlign);
             }
 
-            if (VertAlign != c.VertAlign)
+            if (VerticalAlign != c.VerticalAlign)
             {
-                writer.WriteValue ("VertAlign", VertAlign);
+                writer.WriteValue ("VertAlign", VerticalAlign);
             }
 
             if (Angle != c.Angle)
@@ -1753,20 +1738,20 @@ namespace AM.Reporting
         public override void SaveState()
         {
             base.SaveState();
-            savedText = Text;
-            savedTextFill = TextFill;
-            savedFont = Font;
-            savedFormat = Format;
+            _savedText = Text;
+            _savedTextFill = TextFill;
+            _savedFont = Font;
+            _savedFormat = Format;
         }
 
         /// <inheritdoc/>
         public override void RestoreState()
         {
             base.RestoreState();
-            Text = savedText;
-            TextFill = savedTextFill;
-            Font = savedFont;
-            Format = savedFormat;
+            Text = _savedText;
+            TextFill = _savedTextFill;
+            Font = _savedFont;
+            Format = _savedFormat;
         }
 
         /// <summary>
@@ -1906,7 +1891,7 @@ namespace AM.Reporting
                         (Height - Padding.Vertical));
                     var format = GetStringFormat (Report.GraphicCache, StringFormatFlags.LineLimit);
                     renderer = new AdvancedTextRenderer (Text, g, Font, Brushes.Black, Pens.Black,
-                        textRect, format, HorzAlign, VertAlign, LineHeight, Angle, FontWidthRatio,
+                        textRect, format, HorizontalAlign, VerticalAlign, LineHeight, Angle, FontWidthRatio,
                         ForceJustify, Wysiwyg, HasHtmlTags, false, 1, 1,
                         InlineImageCache);
                     foreach (var obj in GetPictureFromHtmlText (renderer))
@@ -1996,13 +1981,13 @@ namespace AM.Reporting
         {
             ParagraphFormat = new ParagraphFormat();
             WordWrap = true;
-            font = DrawUtils.DefaultReportFont;
-            textFill = new SolidFill (Color.Black);
-            textOutline = new TextOutline();
+            _font = DrawUtils.DefaultReportFont;
+            _textFill = new SolidFill (Color.Black);
+            _textOutline = new TextOutline();
             Trimming = StringTrimming.None;
-            fontWidthRatio = 1;
+            _fontWidthRatio = 1;
             TabWidth = 58;
-            tabPositions = new FloatCollection();
+            _floatCollection = new FloatCollection();
             Clip = true;
             Highlight = new ConditionCollection();
             FlagSerializeStyle = false;

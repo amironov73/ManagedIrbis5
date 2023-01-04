@@ -403,24 +403,24 @@ namespace AM.Reporting.Import.StimulSoft
         /// </summary>
         /// <param name="textAlignment">The StimulSoft TextAlignment value.</param>
         /// <returns>The HorzAlign value.</returns>
-        public static HorzAlign ConvertTextAlignmentToHorzAlign (string textAlignment)
+        public static HorizontalAlign ConvertTextAlignmentToHorzAlign (string textAlignment)
         {
             if (textAlignment.Contains ("Center"))
             {
-                return HorzAlign.Center;
+                return HorizontalAlign.Center;
             }
 
             if (textAlignment.Contains ("Width"))
             {
-                return HorzAlign.Justify;
+                return HorizontalAlign.Justify;
             }
 
             if (textAlignment.Contains ("Right"))
             {
-                return HorzAlign.Right;
+                return HorizontalAlign.Right;
             }
 
-            return HorzAlign.Left;
+            return HorizontalAlign.Left;
         }
 
 
@@ -668,19 +668,19 @@ namespace AM.Reporting.Import.StimulSoft
         /// </summary>
         /// <param name="textAlignment">The StimulSoft TextAlignment value.</param>
         /// <returns>The VertAlign value.</returns>
-        public static VertAlign ConvertTextAlignmentToVertAlign (string textAlignment)
+        public static VerticalAlign ConvertTextAlignmentToVertAlign (string textAlignment)
         {
             if (textAlignment.Contains ("Center"))
             {
-                return VertAlign.Center;
+                return VerticalAlign.Center;
             }
 
             if (textAlignment.Contains ("Bottom"))
             {
-                return VertAlign.Bottom;
+                return VerticalAlign.Bottom;
             }
 
-            return VertAlign.Top;
+            return VerticalAlign.Top;
         }
 
         /// <summary>

@@ -301,7 +301,7 @@ namespace AM.Reporting.Import.ListAndLabel
             //{
             //    textObj.TextColor = Color.FromName(GetValueLL("Color=LL.Color.", fontIndex));
             //}
-            textObj.HorzAlign = UnitsConverter.ConvertTextAlign (GetValueLL ("Align", fontIndex));
+            textObj.HorizontalAlign = UnitsConverter.ConvertTextAlign (GetValueLL ("Align", fontIndex));
             textObj.Text = RemoveQuotes (GetValueLL ("Text", fontIndex));
             LoadBorder (startIndex, textObj.Border);
         }

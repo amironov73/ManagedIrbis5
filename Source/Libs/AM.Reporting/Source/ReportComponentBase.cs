@@ -175,7 +175,6 @@ namespace AM.Reporting
         /// </summary>
         [DefaultValue ("")]
         [Category ("Behavior")]
-        [Editor ("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof (UITypeEditor))]
         public virtual string ExportableExpression
         {
             get => exportableExpression;
@@ -256,7 +255,6 @@ namespace AM.Reporting
         /// </remarks>
 
         [Category ("Navigation")]
-        [Editor ("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof (UITypeEditor))]
         public string Bookmark { get; set; }
 
         /// <summary>
@@ -275,7 +273,6 @@ namespace AM.Reporting
         /// property instead of <b>Expression</b>.</para>
         /// </remarks>
         [Category ("Navigation")]
-        [Editor ("AM.Reporting.TypeEditors.HyperlinkEditor, AM.Reporting", typeof (UITypeEditor))]
         public Hyperlink Hyperlink { get; set; }
 
         /// <summary>
@@ -330,7 +327,6 @@ namespace AM.Reporting
         /// </remarks>
 
         [Category ("Appearance")]
-        [Editor ("AM.Reporting.TypeEditors.StyleEditor, AM.Reporting", typeof (UITypeEditor))]
         public string Style
         {
             get => style;
@@ -348,7 +344,6 @@ namespace AM.Reporting
         /// Style with this name must exist in the <see cref="Report.Styles"/> collection.
         /// </remarks>
         [Category ("Appearance")]
-        [Editor ("AM.Reporting.TypeEditors.StyleEditor, AM.Reporting", typeof (UITypeEditor))]
         public string EvenStyle { get; set; }
 
         /// <summary>
@@ -359,7 +354,6 @@ namespace AM.Reporting
         /// </remarks>
 
         [Category ("Appearance")]
-        [Editor ("AM.Reporting.TypeEditors.StyleEditor, AM.Reporting", typeof (UITypeEditor))]
         public string HoverStyle { get; set; }
 
         /// <summary>
@@ -390,7 +384,6 @@ namespace AM.Reporting
         [DefaultValue (PrintOn.FirstPage | PrintOn.LastPage | PrintOn.OddPages | PrintOn.EvenPages |
                        PrintOn.RepeatedBand | PrintOn.SinglePage)]
         [Category ("Behavior")]
-        [Editor ("AM.Reporting.TypeEditors.FlagsEditor, AM.Reporting", typeof (UITypeEditor))]
         public PrintOn PrintOn { get; set; }
 
         /// <summary>

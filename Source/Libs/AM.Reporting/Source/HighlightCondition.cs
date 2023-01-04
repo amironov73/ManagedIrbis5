@@ -16,11 +16,8 @@
 #region Using directives
 
 using System.Drawing;
-using System.ComponentModel;
 
 using AM.Reporting.Utils;
-
-using System.Drawing.Design;
 
 #endregion
 
@@ -47,7 +44,6 @@ namespace AM.Reporting
         /// This property can contain any valid boolean expression. If value of this expression is <b>true</b>,
         /// the fill and font settings will be applied to the <b>TextObject</b>.
         /// </remarks>
-        [Editor ("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof (UITypeEditor))]
         public string Expression { get; set; }
 
         /// <summary>

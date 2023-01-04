@@ -693,14 +693,14 @@ namespace AM.Reporting
             return new GlassFill (Color, Blend, Hatch);
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="object.GetHashCode"/>
         public override int GetHashCode()
         {
             return Color.GetHashCode() ^ (Blend.GetHashCode() + 1) ^ ((Hatch.GetHashCode() + 1) << 2);
         }
 
-        /// <inheritdoc/>
-        public override bool Equals (object obj)
+        /// <inheritdoc cref="object.Equals(object?)"/>
+        public override bool Equals (object? obj)
         {
             var f = obj as GlassFill;
             return f != null && Color == f.Color && Blend == f.Blend && Hatch == f.Hatch;

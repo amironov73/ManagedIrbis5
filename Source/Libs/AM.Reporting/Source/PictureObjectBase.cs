@@ -19,7 +19,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Drawing.Design;
 using System.IO;
 using System.Windows.Forms;
 
@@ -119,7 +118,6 @@ namespace AM.Reporting
         /// Gets or sets the data column name to get the image from.
         /// </summary>
         [Category ("Data")]
-        [Editor ("AM.Reporting.TypeEditors.DataColumnEditor, AM.Reporting", typeof (UITypeEditor))]
         public string DataColumn { get; set; }
 
         /// <summary>
@@ -179,7 +177,6 @@ namespace AM.Reporting
         /// The path will be savetd to the <see cref="ImageLocation"/> property.
         /// </remarks>
         [Category ("Data")]
-        [Editor ("AM.Reporting.TypeEditors.ExpressionEditor, AM.Reporting", typeof (UITypeEditor))]
         public string ImageSourceExpression
         {
             get => imageSourceExpression;

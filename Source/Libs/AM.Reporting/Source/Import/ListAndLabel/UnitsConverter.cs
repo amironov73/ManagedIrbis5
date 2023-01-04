@@ -79,19 +79,19 @@ namespace AM.Reporting.Import.ListAndLabel
         /// </summary>
         /// <param name="str">The List and Label text Align value as string.</param>
         /// <returns>A HorzAlign value.</returns>
-        public static HorzAlign ConvertTextAlign (string str)
+        public static HorizontalAlign ConvertTextAlign (string str)
         {
-            var align = HorzAlign.Left;
+            var align = HorizontalAlign.Left;
             switch (str)
             {
                 case "1":
-                    align = HorzAlign.Center;
+                    align = HorizontalAlign.Center;
                     break;
                 case "2":
-                    align = HorzAlign.Right;
+                    align = HorizontalAlign.Right;
                     break;
                 default:
-                    align = HorzAlign.Left;
+                    align = HorizontalAlign.Left;
                     break;
             }
 

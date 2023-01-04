@@ -16,7 +16,6 @@
 #region Using directives
 
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.ComponentModel;
 using System.Drawing.Drawing2D;
@@ -26,7 +25,6 @@ using System.Drawing.Imaging;
 using AM.Reporting.Utils;
 
 using System.Windows.Forms;
-using System.Drawing.Design;
 
 #endregion
 
@@ -45,20 +43,20 @@ namespace AM.Reporting
     ///     property to do this;</description>
     ///   </item>
     ///   <item>
-    ///     <description>picture that is stored in the database BLOb field. Use the <see cref="DataColumn"/>
+    ///     <description>picture that is stored in the database BLOb field. Use the DataColumn
     ///     property to specify the name of data column you want to show;</description>
     ///   </item>
     ///   <item>
-    ///     <description>picture that is stored in the local disk file. Use the <see cref="ImageLocation"/>
+    ///     <description>picture that is stored in the local disk file. Use the ImageLocation
     ///     property to specify the name of the file;</description>
     ///   </item>
     ///   <item>
-    ///     <description>picture that is stored in the Web. Use the <see cref="ImageLocation"/>
+    ///     <description>picture that is stored in the Web. Use the ImageLocation"
     ///     property to specify the picture's URL.</description>
     ///   </item>
     /// </list>
-    /// <para/>Use the <see cref="SizeMode"/> property to specify a size mode. The <see cref="MaxWidth"/>
-    /// and <see cref="MaxHeight"/> properties can be used to restrict the image size if <b>SizeMode</b>
+    /// <para/>Use the SizeMode property to specify a size mode. The MaxWidth
+    /// and MaxHeight properties can be used to restrict the image size if <b>SizeMode</b>
     /// is set to <b>AutoSize</b>.
     /// <para/>The <see cref="TransparentColor"/> property can be used to display an image with
     /// transparent background. Use the <see cref="Transparency"/> property if you want to display
@@ -68,15 +66,15 @@ namespace AM.Reporting
     {
         #region Fields
 
-        private Image image;
+        private Image? _image;
 
-        private int imageIndex;
+        private int _imageIndex;
 
-        private Color transparentColor;
-        private float transparency;
-        private byte[] imageData;
-        private Bitmap grayscaleBitmap;
-        private ImageFormat imageFormat;
+        private Color _transparentColor;
+        private float _transparency;
+        private byte[]? _imageData;
+        private Bitmap? _grayscaleBitmap;
+        private ImageFormat _imageFormat;
 
         #endregion
 
@@ -95,18 +93,17 @@ namespace AM.Reporting
         /// </code>
         /// </remarks>
         [Category ("Data")]
-        [Editor ("AM.Reporting.TypeEditors.ImageEditor, AM.Reporting", typeof (UITypeEditor))]
-        public virtual Image Image
+        public virtual Image? Image
         {
-            get => image;
+            get => _image;
             set
             {
-                image = value;
-                imageData = null;
+                _image = value;
+                _imageData = null;
                 UpdateAutoSize();
                 UpdateTransparentImage();
                 ResetImageIndex();
-                imageFormat = CheckImageFormat();
+                _imageFormat = CheckImageFormat();
                 ShouldDisposeImage = false;
             }
         }
@@ -117,10 +114,10 @@ namespace AM.Reporting
         [Category ("Data")]
         public virtual ImageFormat ImageFormat
         {
-            get => imageFormat;
+            get => _imageFormat;
             set
             {
-                if (image == null)
+                if (_image == null)
                 {
                     return;
                 }
@@ -128,8 +125,8 @@ namespace AM.Reporting
                 var wasC = false;
                 using (var stream = new MemoryStream())
                 {
-                    wasC = ImageHelper.SaveAndConvert (Image, stream, value);
-                    imageData = stream.ToArray();
+                    wasC = ImageHelper.SaveAndConvert (Image!, stream, value);
+                    _imageData = stream.ToArray();
                 }
 
                 if (!wasC)
@@ -138,7 +135,7 @@ namespace AM.Reporting
                 }
 
                 ForceLoadImage();
-                imageFormat = CheckImageFormat();
+                _imageFormat = CheckImageFormat();
             }
         }
 
@@ -153,10 +150,10 @@ namespace AM.Reporting
             set
             {
                 base.Grayscale = value;
-                if (!value && grayscaleBitmap != null)
+                if (!value && _grayscaleBitmap != null)
                 {
-                    grayscaleBitmap.Dispose();
-                    grayscaleBitmap = null;
+                    _grayscaleBitmap.Dispose();
+                    _grayscaleBitmap = null;
                 }
             }
         }
@@ -172,13 +169,12 @@ namespace AM.Reporting
         /// Gets or sets the color of the image that will be treated as transparent.
         /// </summary>
         [Category ("Appearance")]
-        [Editor ("AM.Reporting.TypeEditors.ColorEditor, AM.Reporting", typeof (UITypeEditor))]
         public Color TransparentColor
         {
-            get => transparentColor;
+            get => _transparentColor;
             set
             {
-                transparentColor = value;
+                _transparentColor = value;
                 UpdateTransparentImage();
             }
         }
@@ -193,7 +189,7 @@ namespace AM.Reporting
         [Category ("Appearance")]
         public float Transparency
         {
-            get => transparency;
+            get => _transparency;
             set
             {
                 if (value < 0)
@@ -206,7 +202,7 @@ namespace AM.Reporting
                     value = 1;
                 }
 
-                transparency = value;
+                _transparency = value;
                 UpdateTransparentImage();
             }
         }
@@ -281,35 +277,35 @@ namespace AM.Reporting
             }
 
             ImageFormat format = null;
-            if (ImageFormat.Jpeg.Equals (image.RawFormat))
+            if (ImageFormat.Jpeg.Equals (_image.RawFormat))
             {
                 format = ImageFormat.Jpeg;
             }
-            else if (ImageFormat.Gif.Equals (image.RawFormat))
+            else if (ImageFormat.Gif.Equals (_image.RawFormat))
             {
                 format = ImageFormat.Gif;
             }
-            else if (ImageFormat.Png.Equals (image.RawFormat))
+            else if (ImageFormat.Png.Equals (_image.RawFormat))
             {
                 format = ImageFormat.Png;
             }
-            else if (ImageFormat.Emf.Equals (image.RawFormat))
+            else if (ImageFormat.Emf.Equals (_image.RawFormat))
             {
                 format = ImageFormat.Emf;
             }
-            else if (ImageFormat.Icon.Equals (image.RawFormat))
+            else if (ImageFormat.Icon.Equals (_image.RawFormat))
             {
                 format = ImageFormat.Icon;
             }
-            else if (ImageFormat.Tiff.Equals (image.RawFormat))
+            else if (ImageFormat.Tiff.Equals (_image.RawFormat))
             {
                 format = ImageFormat.Tiff;
             }
-            else if (ImageFormat.Bmp.Equals (image.RawFormat) || ImageFormat.MemoryBmp.Equals (image.RawFormat))
+            else if (ImageFormat.Bmp.Equals (_image.RawFormat) || ImageFormat.MemoryBmp.Equals (_image.RawFormat))
             {
                 format = ImageFormat.Bmp;
             }
-            else if (ImageFormat.Wmf.Equals (image.RawFormat))
+            else if (ImageFormat.Wmf.Equals (_image.RawFormat))
             {
                 format = ImageFormat.Wmf;
             }
@@ -374,9 +370,9 @@ namespace AM.Reporting
                 Transparency = src.Transparency;
                 Tile = src.Tile;
                 Image = src.Image == null ? null : src.Image.Clone() as Image;
-                if (src.Image == null && src.imageData != null)
+                if (src.Image == null && src._imageData != null)
                 {
-                    imageData = src.imageData;
+                    _imageData = src._imageData;
                 }
 
                 ShouldDisposeImage = true;
@@ -478,18 +474,18 @@ namespace AM.Reporting
 
             if (Grayscale)
             {
-                if (GrayscaleHash != image.GetHashCode() || grayscaleBitmap == null)
+                if (GrayscaleHash != image.GetHashCode() || _grayscaleBitmap == null)
                 {
-                    if (grayscaleBitmap != null)
+                    if (_grayscaleBitmap != null)
                     {
-                        grayscaleBitmap.Dispose();
+                        _grayscaleBitmap.Dispose();
                     }
 
-                    grayscaleBitmap = ImageHelper.GetGrayscaleBitmap (image);
+                    _grayscaleBitmap = ImageHelper.GetGrayscaleBitmap (image);
                     GrayscaleHash = image.GetHashCode();
                 }
 
-                image = grayscaleBitmap;
+                image = _grayscaleBitmap;
             }
 
             //graphics.DrawImage(image, new PointF[] { upperLeft, upperRight, lowerLeft });
@@ -530,7 +526,7 @@ namespace AM.Reporting
         /// <param name="data"></param>
         public void SetImageData (byte[] data)
         {
-            imageData = data;
+            _imageData = data;
 
             // if autosize is on, load the image.
             if (SizeMode == PictureBoxSizeMode.AutoSize)
@@ -579,14 +575,14 @@ namespace AM.Reporting
                         // check FImageIndex >= writer.BlobStore.Count is needed when we close the designer
                         // and run it again, the BlobStore is empty, but FImageIndex is pointing to
                         // previous BlobStore item and is not -1.
-                        if (imageIndex == -1 || imageIndex >= writer.BlobStore.Count)
+                        if (_imageIndex == -1 || _imageIndex >= writer.BlobStore.Count)
                         {
-                            var bytes = imageData;
+                            var bytes = _imageData;
                             if (bytes == null)
                             {
                                 using (var stream = new MemoryStream())
                                 {
-                                    ImageHelper.Save (Image, stream, imageFormat);
+                                    ImageHelper.Save (Image, stream, _imageFormat);
                                     bytes = stream.ToArray();
                                 }
                             }
@@ -594,15 +590,15 @@ namespace AM.Reporting
                             if (bytes != null)
                             {
                                 var imgHash = BitConverter.ToString (new Murmur3().ComputeHash (bytes));
-                                imageIndex = writer.BlobStore.AddOrUpdate (bytes, imgHash);
+                                _imageIndex = writer.BlobStore.AddOrUpdate (bytes, imgHash);
                             }
                         }
                     }
                     else
                     {
-                        if (Image == null && imageData != null)
+                        if (Image == null && _imageData != null)
                         {
-                            writer.WriteStr ("Image", Convert.ToBase64String (imageData));
+                            writer.WriteStr ("Image", Convert.ToBase64String (_imageData));
                         }
                         else if (!writer.AreEqual (Image, c.Image))
                         {
@@ -612,7 +608,7 @@ namespace AM.Reporting
 
                     if (writer.BlobStore != null || writer.SerializeTo == SerializeTo.Undo)
                     {
-                        writer.WriteInt ("ImageIndex", imageIndex);
+                        writer.WriteInt ("ImageIndex", _imageIndex);
                     }
                 }
             }
@@ -624,13 +620,13 @@ namespace AM.Reporting
             base.Deserialize (reader);
             if (reader.HasProperty ("ImageIndex"))
             {
-                imageIndex = reader.ReadInt ("ImageIndex");
-                if (reader.BlobStore != null && imageIndex != -1)
+                _imageIndex = reader.ReadInt ("ImageIndex");
+                if (reader.BlobStore != null && _imageIndex != -1)
                 {
                     //int saveIndex = FImageIndex;
                     //Image = ImageHelper.Load(reader.BlobStore.Get(FImageIndex));
                     //FImageIndex = saveIndex;
-                    SetImageData (reader.BlobStore.Get (imageIndex));
+                    SetImageData (reader.BlobStore.Get (_imageIndex));
                 }
             }
         }
@@ -683,7 +679,7 @@ namespace AM.Reporting
 
         protected override void ResetImageIndex()
         {
-            imageIndex = -1;
+            _imageIndex = -1;
         }
 
         #endregion
@@ -713,7 +709,7 @@ namespace AM.Reporting
             {
                 // reset the image
                 Image = null;
-                imageData = null;
+                _imageData = null;
 
                 var data = Report.GetColumnValueNullable (DataColumn);
                 if (data is byte[] bytes)
@@ -743,16 +739,16 @@ namespace AM.Reporting
         /// </remarks>
         public void ForceLoadImage()
         {
-            if (imageData == null)
+            if (_imageData == null)
             {
                 return;
             }
 
-            var saveImageData = imageData;
+            var saveImageData = _imageData;
 
             // FImageData will be reset after this line, keep it
-            Image = ImageHelper.Load (imageData);
-            imageData = saveImageData;
+            Image = ImageHelper.Load (_imageData);
+            _imageData = saveImageData;
             ShouldDisposeImage = true;
         }
 
@@ -763,7 +759,7 @@ namespace AM.Reporting
         /// </summary>
         public PictureObject()
         {
-            transparentColor = Color.Transparent;
+            _transparentColor = Color.Transparent;
             SetFlags (Flags.HasSmartTag, true);
             ResetImageIndex();
         }

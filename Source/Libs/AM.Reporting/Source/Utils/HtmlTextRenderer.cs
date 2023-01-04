@@ -48,8 +48,8 @@ namespace AM.Reporting.Utils
             internal RectangleF rect;
             internal bool underlines;
             internal StringFormat format; // no keep
-            internal HorzAlign horzAlign;
-            internal VertAlign vertAlign;
+            internal HorizontalAlign horizontalAlign;
+            internal VerticalAlign verticalAlign;
             internal ParagraphFormat paragraphFormat;
             internal bool forceJustify;
             internal float scale;
@@ -87,7 +87,7 @@ namespace AM.Reporting.Utils
         private string text;
         private Color underlineColor;
         private List<LineFColor> underlines;
-        private VertAlign vertAlign;
+        private VerticalAlign _verticalAlign;
         private StyleDescriptor initalStyle;
         private FastString cacheString = new FastString (100);
         private bool isPrinting;
@@ -106,7 +106,7 @@ namespace AM.Reporting.Utils
 
         public float FontScale { get; set; }
 
-        public HorzAlign HorzAlign { get; }
+        public HorizontalAlign HorizontalAlign { get; }
 
         public ParagraphFormat ParagraphFormat { get; }
 
@@ -179,8 +179,8 @@ namespace AM.Reporting.Utils
             displayRect = context.rect;
             everUnderlines = context.underlines;
             format = context.format;
-            HorzAlign = context.horzAlign;
-            vertAlign = context.vertAlign;
+            HorizontalAlign = context.horizontalAlign;
+            _verticalAlign = context.verticalAlign;
             ParagraphFormat = context.paragraphFormat;
             forceJustify = context.forceJustify;
             Scale = context.scale;
@@ -249,7 +249,7 @@ namespace AM.Reporting.Utils
 
         public HtmlTextRenderer (string text, IGraphics g, FontFamily font, float size,
             FontStyle style, Color color, Color underlineColor, RectangleF rect, bool underlines,
-            StringFormat format, HorzAlign horzAlign, VertAlign vertAlign,
+            StringFormat format, HorizontalAlign horizontalAlign, VerticalAlign verticalAlign,
             ParagraphFormat paragraphFormat, bool forceJustify, float scale, float fontScale, InlineImageCache cache,
             bool isPrinting = false, bool isDifferentTabPositions = false)
         {
@@ -285,8 +285,8 @@ namespace AM.Reporting.Utils
                 StringFormatFlags.NoClip | StringFormatFlags.FitBlackBox | StringFormatFlags.LineLimit;
 
             //FFormat.FormatFlags |= StringFormatFlags.NoFontFallback;
-            this.HorzAlign = horzAlign;
-            this.vertAlign = vertAlign;
+            this.HorizontalAlign = horizontalAlign;
+            this._verticalAlign = verticalAlign;
             this.ParagraphFormat = paragraphFormat;
             this.font = font;
             this.size = size;
@@ -608,11 +608,11 @@ namespace AM.Reporting.Utils
 
             // calculate Y offset
             var offsetY = displayRect.Top;
-            if (vertAlign == VertAlign.Center)
+            if (_verticalAlign == VerticalAlign.Center)
             {
                 offsetY += (displayRect.Height - height) / 2;
             }
-            else if (vertAlign == VertAlign.Bottom)
+            else if (_verticalAlign == VerticalAlign.Bottom)
             {
                 offsetY += (displayRect.Height - height) - 1;
             }
@@ -1577,7 +1577,7 @@ namespace AM.Reporting.Utils
 
             public float Height { get; set; }
 
-            public HorzAlign HorzAlign { get; private set; }
+            public HorizontalAlign HorizontalAlign { get; private set; }
 
             public float LineSpacing { get; set; }
 
@@ -1643,19 +1643,19 @@ namespace AM.Reporting.Utils
 
             #region Internal Methods
 
-            internal void AlignWords (HorzAlign align)
+            internal void AlignWords (HorizontalAlign align)
             {
-                HorzAlign = align;
+                HorizontalAlign = align;
                 var width = CalcWidth();
                 var left = Words.Count > 0 && Words[0].Runs.Count > 0 ? Words[0].Runs[0].Left : 0;
                 width += left;
                 this.Width = width;
                 switch (align)
                 {
-                    case HorzAlign.Left:
+                    case HorizontalAlign.Left:
                         break;
 
-                    case HorzAlign.Right:
+                    case HorizontalAlign.Right:
                     {
                         var delta = Renderer.displayRect.Width - width;
                         foreach (var w in Words)
@@ -1668,7 +1668,7 @@ namespace AM.Reporting.Utils
                     }
                         break;
 
-                    case HorzAlign.Center:
+                    case HorizontalAlign.Center:
                     {
                         var delta = (Renderer.displayRect.Width - width) / 2f;
                         foreach (var w in Words)
@@ -1681,7 +1681,7 @@ namespace AM.Reporting.Utils
                     }
                         break;
 
-                    case HorzAlign.Justify:
+                    case HorizontalAlign.Justify:
                     {
                         var spaces = 0;
                         var tab_index = -1;
@@ -2090,10 +2090,10 @@ namespace AM.Reporting.Utils
             {
                 for (var i = 0; i < Lines.Count; i++)
                 {
-                    var align = Renderer.HorzAlign;
-                    if (align == HorzAlign.Justify && i == Lines.Count - 1 && !forceJustify)
+                    var align = Renderer.HorizontalAlign;
+                    if (align == HorizontalAlign.Justify && i == Lines.Count - 1 && !forceJustify)
                     {
-                        align = HorzAlign.Left;
+                        align = HorizontalAlign.Left;
                     }
 
                     Lines[i].AlignWords (align);

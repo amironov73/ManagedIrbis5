@@ -385,8 +385,8 @@ namespace AM.Reporting
             TextObject = new TextObject();
 
             PictureObject.ShowErrorImage = false;
-            TextObject.HorzAlign = HorzAlign.Center;
-            TextObject.VertAlign = VertAlign.Center;
+            TextObject.HorizontalAlign = HorizontalAlign.Center;
+            TextObject.VerticalAlign = VerticalAlign.Center;
             ImageSize = WatermarkImageSize.Zoom;
             Font = new Font (DrawUtils.DefaultReportFont.Name, 60);
             TextFill = new SolidFill (Color.FromArgb (40, Color.Gray));

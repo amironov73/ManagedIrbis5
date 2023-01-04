@@ -42,7 +42,7 @@ namespace AM.Reporting.Export.Html
         }
 
         private string GetStyle (Font Font, Color TextColor, Color FillColor,
-            bool RTL, HorzAlign HAlign, Border Border, bool WordWrap, float LineHeight, float Width, float Height,
+            bool RTL, HorizontalAlign HAlign, Border Border, bool WordWrap, float LineHeight, float Width, float Height,
             bool Clip)
         {
             var style = new FastString (256);
@@ -62,15 +62,15 @@ namespace AM.Reporting.Export.Html
             }
 
             style.Append ("text-align:");
-            if (HAlign == HorzAlign.Left)
+            if (HAlign == HorizontalAlign.Left)
             {
                 style.Append (RTL ? "right" : "left");
             }
-            else if (HAlign == HorzAlign.Right)
+            else if (HAlign == HorizontalAlign.Right)
             {
                 style.Append (RTL ? "left" : "right");
             }
-            else if (HAlign == HorzAlign.Center)
+            else if (HAlign == HorizontalAlign.Center)
             {
                 style.Append ("center");
             }
@@ -109,17 +109,17 @@ namespace AM.Reporting.Export.Html
             if (obj is TextObject textObj)
             {
                 style = GetStyle (textObj.Font, textObj.TextColor, textObj.FillColor,
-                    textObj.RightToLeft, textObj.HorzAlign, textObj.Border, textObj.WordWrap, textObj.LineHeight,
+                    textObj.RightToLeft, textObj.HorizontalAlign, textObj.Border, textObj.WordWrap, textObj.LineHeight,
                     textObj.Width, textObj.Height, textObj.Clip);
             }
             else if (obj is HtmlObject htmlObj)
             {
                 style = GetStyle (DrawUtils.DefaultTextObjectFont, Color.Black, htmlObj.FillColor,
-                    false, HorzAlign.Left, htmlObj.Border, true, 0, htmlObj.Width, htmlObj.Height, false);
+                    false, HorizontalAlign.Left, htmlObj.Border, true, 0, htmlObj.Width, htmlObj.Height, false);
             }
             else
             {
-                style = GetStyle (null, Color.White, obj.FillColor, false, HorzAlign.Center, obj.Border, false, 0,
+                style = GetStyle (null, Color.White, obj.FillColor, false, HorizontalAlign.Center, obj.Border, false, 0,
                     obj.Width, obj.Height, false);
             }
 
@@ -382,11 +382,11 @@ namespace AM.Reporting.Export.Html
 
                     using (var htmlTextRenderer = obj.GetHtmlTextRenderer (Zoom, Zoom))
                     {
-                        if (obj.VertAlign == VertAlign.Center)
+                        if (obj.VerticalAlign == VerticalAlign.Center)
                         {
                             top = (obj.Height - htmlTextRenderer.CalcHeight()) / 2;
                         }
-                        else if (obj.VertAlign == VertAlign.Bottom)
+                        else if (obj.VerticalAlign == VerticalAlign.Bottom)
                         {
                             top = obj.Height - htmlTextRenderer.CalcHeight();
                         }
@@ -402,7 +402,7 @@ namespace AM.Reporting.Export.Html
 
                     break;
                 default:
-                    if (obj.VertAlign != VertAlign.Top)
+                    if (obj.VerticalAlign != VerticalAlign.Top)
                     {
                         var g = htmlMeasureGraphics;
                         using (var f = new Font (obj.Font.FontFamily, obj.Font.Size * DrawUtils.ScreenDpiFX,
@@ -415,7 +415,7 @@ namespace AM.Reporting.Export.Html
                             var format = obj.GetStringFormat (Report.GraphicCache, 0);
                             Brush textBrush = Report.GraphicCache.GetBrush (obj.TextColor);
                             var renderer = new AdvancedTextRenderer (obj.Text, g, f, textBrush, null,
-                                textRect, format, obj.HorzAlign, obj.VertAlign, obj.LineHeight, obj.Angle,
+                                textRect, format, obj.HorizontalAlign, obj.VerticalAlign, obj.LineHeight, obj.Angle,
                                 obj.FontWidthRatio,
                                 obj.ForceJustify, obj.Wysiwyg, obj.HasHtmlTags, false, Zoom, Zoom,
                                 obj.InlineImageCache);
@@ -433,7 +433,7 @@ namespace AM.Reporting.Export.Html
                                         top = renderer.Paragraphs[0].Lines[0].Top - obj.AbsTop;
                                         height = renderer.CalcHeight();
 
-                                        if (obj.VertAlign == VertAlign.Center)
+                                        if (obj.VerticalAlign == VerticalAlign.Center)
                                         {
                                             top = (obj.Height - height - obj.Padding.Bottom + obj.Padding.Top) / 2;
 
@@ -451,7 +451,7 @@ namespace AM.Reporting.Export.Html
                                                 }
                                             }
                                         }
-                                        else if (obj.VertAlign == VertAlign.Bottom)
+                                        else if (obj.VerticalAlign == VerticalAlign.Bottom)
                                         {
                                             // (float)(Math.Round(obj.Font.Size * 96 / 72) / 2
                                             // necessary to compensate for paragraph offset error in GetSpanText method below
@@ -508,7 +508,7 @@ namespace AM.Reporting.Export.Html
 
                     sb.Append ("overflow:hidden;");
                     sb.Append ("line-height:").Append (line.Height.ToString (HtmlTextRenderer.CultureInfo)).Append ("px;");
-                    if (line.HorzAlign == HorzAlign.Justify)
+                    if (line.HorizontalAlign == HorizontalAlign.Justify)
                     {
                         sb.Append ("text-align-last:justify;");
                     }

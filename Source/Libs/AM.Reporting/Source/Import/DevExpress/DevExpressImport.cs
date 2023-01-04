@@ -483,9 +483,9 @@ namespace AM.Reporting.Import.DevExpress
             text.FillColor = UnitsConverter.ConvertBackColor (GetPropertyValue ("BackColor", description));
             text.TextColor = UnitsConverter.ConvertColor (GetPropertyValue ("ForeColor", description));
             text.Text = GetPropertyValue ("Text", description).Replace ("\"", "");
-            text.HorzAlign =
+            text.HorizontalAlign =
                 UnitsConverter.ConvertTextAlignmentToHorzAlign (GetPropertyValue ("TextAlignment", description));
-            text.VertAlign =
+            text.VerticalAlign =
                 UnitsConverter.ConvertTextAlignmentToVertAlign (GetPropertyValue ("TextAlignment", description));
             text.Font = LoadFont (description);
             ApplyStyleByName (text, GetPropertyValue ("StyleName", description).Replace ("\"", ""));
@@ -498,9 +498,9 @@ namespace AM.Reporting.Import.DevExpress
             cell.FillColor = UnitsConverter.ConvertBackColor (GetPropertyValue ("BackColor", description));
             cell.TextColor = UnitsConverter.ConvertColor (GetPropertyValue ("ForeColor", description));
             cell.Text = GetPropertyValue ("Text", description).Replace ("\"", "");
-            cell.HorzAlign =
+            cell.HorizontalAlign =
                 UnitsConverter.ConvertTextAlignmentToHorzAlign (GetPropertyValue ("TextAlignment", description));
-            cell.VertAlign =
+            cell.VerticalAlign =
                 UnitsConverter.ConvertTextAlignmentToVertAlign (GetPropertyValue ("TextAlignment", description));
             cell.Font = LoadFont (description);
             ApplyStyleByName (cell, GetPropertyValue ("StyleName", description).Replace ("\"", ""));

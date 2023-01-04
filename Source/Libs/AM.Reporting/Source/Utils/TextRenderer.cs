@@ -93,9 +93,9 @@ namespace AM.Reporting.Utils
 
         public StringFormat Format { get; }
 
-        public HorzAlign HorzAlign { get; }
+        public HorizontalAlign HorizontalAlign { get; }
 
-        public VertAlign VertAlign { get; }
+        public VerticalAlign VerticalAlign { get; }
 
         public float LineHeight { get; }
 
@@ -239,11 +239,11 @@ namespace AM.Reporting.Utils
 
             // calculate Y offset
             var offsetY = DisplayRect.Top;
-            if (VertAlign == VertAlign.Center)
+            if (VerticalAlign == VerticalAlign.Center)
             {
                 offsetY += (DisplayRect.Height - height) / 2;
             }
-            else if (VertAlign == VertAlign.Bottom)
+            else if (VerticalAlign == VerticalAlign.Bottom)
             {
                 offsetY += (DisplayRect.Height - height) - 1;
             }
@@ -375,7 +375,7 @@ namespace AM.Reporting.Utils
         #endregion
 
         public AdvancedTextRenderer (string text, IGraphics g, Font font, Brush brush, Pen outlinePen,
-            RectangleF rect, StringFormat format, HorzAlign horzAlign, VertAlign vertAlign,
+            RectangleF rect, StringFormat format, HorizontalAlign horizontalAlign, VerticalAlign verticalAlign,
             float lineHeight, int angle, float widthRatio,
             bool forceJustify, bool wysiwyg, bool htmlTags, bool pdfMode,
             float scale, float fontScale, InlineImageCache cache, bool isPrinting = false)
@@ -391,8 +391,8 @@ namespace AM.Reporting.Utils
             this.OutlinePen = outlinePen;
             displayRect = rect;
             this.Format = format;
-            this.HorzAlign = horzAlign;
-            this.VertAlign = vertAlign;
+            this.HorizontalAlign = horizontalAlign;
+            this.VerticalAlign = verticalAlign;
             this.LineHeight = lineHeight;
             FontLineHeight = font.GetHeight (g.Graphics);
             if (this.LineHeight == 0)
@@ -1179,10 +1179,10 @@ namespace AM.Reporting.Utils
             {
                 for (var i = 0; i < Lines.Count; i++)
                 {
-                    var align = Renderer.HorzAlign;
-                    if (align == HorzAlign.Justify && i == Lines.Count - 1 && !forceJustify)
+                    var align = Renderer.HorizontalAlign;
+                    if (align == HorizontalAlign.Justify && i == Lines.Count - 1 && !forceJustify)
                     {
-                        align = HorzAlign.Left;
+                        align = HorizontalAlign.Left;
                     }
 
                     Lines[i].AlignWords (align);
@@ -1315,7 +1315,7 @@ namespace AM.Reporting.Utils
                 else if ((Renderer.Font.Style & style) > 0)
                 {
                     var lineWidth = Width;
-                    if (Renderer.HorzAlign == HorzAlign.Justify && (!Last || (paragraph.Last && Renderer.ForceJustify)))
+                    if (Renderer.HorizontalAlign == HorizontalAlign.Justify && (!Last || (paragraph.Last && Renderer.ForceJustify)))
                     {
                         lineWidth = Renderer.DisplayRect.Width - Renderer.SpaceWidth;
                     }
@@ -1328,12 +1328,12 @@ namespace AM.Reporting.Utils
 
             #region Public Methods
 
-            public void AlignWords (HorzAlign align)
+            public void AlignWords (HorizontalAlign align)
             {
                 Width = 0;
 
                 // handle each word
-                if (align == HorzAlign.Justify || HasTabs || Renderer.Wysiwyg || Renderer.HtmlTags)
+                if (align == HorizontalAlign.Justify || HasTabs || Renderer.Wysiwyg || Renderer.HtmlTags)
                 {
                     float left = 0;
                     Word word = null;
@@ -1374,7 +1374,7 @@ namespace AM.Reporting.Utils
                 }
 
                 var rectWidth = Renderer.DisplayRect.Width;
-                if (align == HorzAlign.Justify)
+                if (align == HorizontalAlign.Justify)
                 {
                     var delta = (rectWidth - Width - Renderer.SpaceWidth) / (Words.Count - 1);
                     var curDelta = delta;
@@ -1387,11 +1387,11 @@ namespace AM.Reporting.Utils
                 else
                 {
                     float delta = 0;
-                    if (align == HorzAlign.Center)
+                    if (align == HorizontalAlign.Center)
                     {
                         delta = (rectWidth - Width) / 2;
                     }
-                    else if (align == HorzAlign.Right)
+                    else if (align == HorizontalAlign.Right)
                     {
                         delta = rectWidth - Width - Renderer.SpaceWidth;
                     }

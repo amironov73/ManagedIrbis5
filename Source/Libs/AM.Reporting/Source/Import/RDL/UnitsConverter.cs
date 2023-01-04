@@ -174,18 +174,18 @@ namespace AM.Reporting.Import.RDL
         /// </summary>
         /// <param name="textAlign">The RDL TextAlign value.</param>
         /// <returns>The HorzAlign value.</returns>
-        public static HorzAlign ConvertTextAlign (string textAlign)
+        public static HorizontalAlign ConvertTextAlign (string textAlign)
         {
             if (textAlign == "Center")
             {
-                return HorzAlign.Center;
+                return HorizontalAlign.Center;
             }
             else if (textAlign == "Right")
             {
-                return HorzAlign.Right;
+                return HorizontalAlign.Right;
             }
 
-            return HorzAlign.Left;
+            return HorizontalAlign.Left;
         }
 
         /// <summary>
@@ -193,18 +193,18 @@ namespace AM.Reporting.Import.RDL
         /// </summary>
         /// <param name="verticalAlign">The RDL VerticalAlign value.</param>
         /// <returns>The VertAlign value.</returns>
-        public static VertAlign ConvertVerticalAlign (string verticalAlign)
+        public static VerticalAlign ConvertVerticalAlign (string verticalAlign)
         {
             if (verticalAlign == "Middle")
             {
-                return VertAlign.Center;
+                return VerticalAlign.Center;
             }
             else if (verticalAlign == "Bottom")
             {
-                return VertAlign.Bottom;
+                return VerticalAlign.Bottom;
             }
 
-            return VertAlign.Top;
+            return VerticalAlign.Top;
         }
 
         /// <summary>
