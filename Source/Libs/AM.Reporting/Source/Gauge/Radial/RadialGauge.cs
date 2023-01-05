@@ -18,7 +18,6 @@
 using System;
 using System.ComponentModel;
 using System.Drawing;
-using System.Drawing.Design;
 using System.Drawing.Drawing2D;
 
 using AM.Reporting.Utils;
@@ -187,7 +186,6 @@ namespace AM.Reporting.Gauge.Radial
         /// Gats or sets the Radial Gauge position. Doesn't work for Full Radial Gauge.
         /// </summary>
         [Category ("Appearance")]
-        [Editor ("AM.Reporting.TypeEditors.FlagsEditor, AM.Reporting", typeof (UITypeEditor))]
         public RadialGaugePosition Position
         {
             get => position;

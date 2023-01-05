@@ -48,7 +48,10 @@ namespace AM.Reporting.Data
         /// </summary>
         /// <param name="name">The name of a total.</param>
         /// <returns>The <see cref="Total"/> object if found; otherwise <b>null</b>.</returns>
-        public Total FindByName (string name)
+        public Total? FindByName
+            (
+                string name
+            )
         {
             foreach (Total c in this)
             {
@@ -137,8 +140,10 @@ namespace AM.Reporting.Data
         /// Initializes a new instance of the <see cref="TotalCollection"/> class with default settings.
         /// </summary>
         /// <param name="owner">The owner of this collection.</param>
-        public TotalCollection (Base owner) : base (owner)
+        public TotalCollection (Base? owner)
+            : base (owner)
         {
+            // пустое тело конструктора
         }
     }
 }

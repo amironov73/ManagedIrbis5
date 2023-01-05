@@ -18,13 +18,10 @@
 using System;
 using System.Data;
 using System.ComponentModel;
-using System.Reflection;
 using System.Collections;
+using System.IO;
 
 using AM.Reporting.Utils;
-
-using System.IO;
-using System.Drawing.Design;
 
 #endregion
 
@@ -73,7 +70,6 @@ namespace AM.Reporting.Data
         /// property.
         /// </remarks>
         [Category ("Data")]
-        [Editor ("AM.Reporting.TypeEditors.SqlEditor, AM.Reporting", typeof (UITypeEditor))]
         public string SelectCommand { get; set; }
 
         /// <summary>
@@ -97,14 +93,13 @@ namespace AM.Reporting.Data
         /// This way is not good because you hardcode the report object's name.
         /// </remarks>
         [Category ("Data")]
-        [Editor ("AM.Reporting.TypeEditors.CommandParametersEditor, AM.Reporting", typeof (UITypeEditor))]
         public CommandParameterCollection Parameters { get; set; }
 
         /// <summary>
         /// Gets or sets the parent <see cref="DataConnectionBase"/> object.
         /// </summary>
         [Browsable (false)]
-        public DataConnectionBase Connection
+        public DataConnectionBase? Connection
         {
             get => IgnoreConnection ? null : Parent as DataConnectionBase;
             set => Parent = value;
@@ -235,7 +230,7 @@ namespace AM.Reporting.Data
         }
 
         /// <inheritdoc/>
-        protected override object GetValue (Column column)
+        protected override object? GetValue (Column? column)
         {
             if (column == null)
             {
