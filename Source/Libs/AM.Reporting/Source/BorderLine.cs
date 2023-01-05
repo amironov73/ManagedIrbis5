@@ -112,7 +112,7 @@ public class BorderLine
         return Color.GetHashCode() ^ Style.GetHashCode() ^ Width.GetHashCode();
     }
 
-    internal void Draw (FRPaintEventArgs e, float x, float y, float x1, float y1,
+    internal void Draw (PaintEventArgs e, float x, float y, float x1, float y1,
         bool reverseGaps, bool gap1, bool gap2)
     {
         var g = e.Graphics;

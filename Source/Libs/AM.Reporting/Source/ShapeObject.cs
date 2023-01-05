@@ -145,7 +145,7 @@ namespace AM.Reporting
         }
 
         /// <inheritdoc/>
-        public override void Draw (FRPaintEventArgs eventArgs)
+        public override void Draw (PaintEventArgs eventArgs)
         {
             if (Math.Abs (Width) < 1 || Math.Abs (Height) < 1)
             {

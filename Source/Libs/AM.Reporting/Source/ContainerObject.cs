@@ -22,6 +22,8 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 
+using PaintEventArgs = AM.Reporting.Utils.PaintEventArgs;
+
 #endregion
 
 #nullable enable
@@ -445,7 +447,7 @@ namespace AM.Reporting
         }
 
         /// <inheritdoc/>
-        public override void Draw (FRPaintEventArgs eventArgs)
+        public override void Draw (PaintEventArgs eventArgs)
         {
             DrawBackground (eventArgs);
             DrawMarkers (eventArgs);

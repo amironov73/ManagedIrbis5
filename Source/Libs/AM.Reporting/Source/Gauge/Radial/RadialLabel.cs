@@ -46,7 +46,7 @@ namespace AM.Reporting.Gauge.Radial
             base.Serialize (writer, prefix, diff);
         }
 
-        public override void Draw (FRPaintEventArgs e)
+        public override void Draw (PaintEventArgs e)
         {
             if ((Parent as RadialGauge).Type == RadialGaugeType.Circle)
             {

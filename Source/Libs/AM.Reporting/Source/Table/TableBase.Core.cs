@@ -31,31 +31,31 @@ namespace AM.Reporting.Table
         /// Does nothing
         /// </summary>
         /// <param name="e"></param>
-        partial void DrawDesign (FRPaintEventArgs e);
+        partial void DrawDesign (PaintEventArgs e);
 
         /// <summary>
         /// Does nothing
         /// </summary>
         /// <param name="e"></param>
-        partial void DrawDesign_Borders (FRPaintEventArgs e);
+        partial void DrawDesign_Borders (PaintEventArgs e);
 
         /// <summary>
         /// Does nothing
         /// </summary>
         /// <param name="e"></param>
-        partial void DrawDesign_BordersRtl (FRPaintEventArgs e);
+        partial void DrawDesign_BordersRtl (PaintEventArgs e);
 
         /// <summary>
         /// Does nothing
         /// </summary>
         /// <param name="e"></param>
-        partial void DrawDesign_SelectedCells (FRPaintEventArgs e);
+        partial void DrawDesign_SelectedCells (PaintEventArgs e);
 
         /// <summary>
         /// Does nothing
         /// </summary>
         /// <param name="e"></param>
-        partial void DrawDesign_SelectedCellsRtl (FRPaintEventArgs e);
+        partial void DrawDesign_SelectedCellsRtl (PaintEventArgs e);
 
         #endregion Private Methods
     }

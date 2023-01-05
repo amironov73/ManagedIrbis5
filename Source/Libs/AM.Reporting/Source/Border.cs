@@ -323,7 +323,7 @@ public class Border
     /// <remarks>
     /// This method is for internal use only.
     /// </remarks>
-    public void Draw (FRPaintEventArgs e, RectangleF rect)
+    public void Draw (PaintEventArgs e, RectangleF rect)
     {
         var g = e.Graphics;
         rect.X *= e.ScaleX;

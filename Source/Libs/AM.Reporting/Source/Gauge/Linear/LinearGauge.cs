@@ -85,7 +85,7 @@ namespace AM.Reporting.Gauge.Linear
         }
 
         /// <inheritdoc/>
-        public override void Draw (FRPaintEventArgs eventArgs)
+        public override void Draw (PaintEventArgs eventArgs)
         {
             var g = eventArgs.Graphics;
             if (Report is { SmoothGraphics: true })

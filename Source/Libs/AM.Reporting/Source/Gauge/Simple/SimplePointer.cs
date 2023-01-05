@@ -96,7 +96,7 @@ namespace AM.Reporting.Gauge.Simple
 
         #region Internal Methods
 
-        internal virtual void DrawHorz (FRPaintEventArgs e)
+        internal virtual void DrawHorz (PaintEventArgs e)
         {
             var g = e.Graphics;
             var pen = e.Cache.GetPen (BorderColor, BorderWidth * e.ScaleX, DashStyle.Solid);
@@ -112,7 +112,7 @@ namespace AM.Reporting.Gauge.Simple
             g.FillAndDrawRectangle (pen, brush, Left, Top, Width, Height);
         }
 
-        internal virtual void DrawVert (FRPaintEventArgs e)
+        internal virtual void DrawVert (PaintEventArgs e)
         {
             var g = e.Graphics;
             var pen = e.Cache.GetPen (BorderColor, BorderWidth * e.ScaleY, DashStyle.Solid);
@@ -144,7 +144,7 @@ namespace AM.Reporting.Gauge.Simple
         }
 
         /// <inheritdoc/>
-        public override void Draw (FRPaintEventArgs e)
+        public override void Draw (PaintEventArgs e)
         {
             base.Draw (e);
 

@@ -32,7 +32,7 @@ namespace AM.Reporting
         /// </summary>
         /// <param name="g"></param>
         /// <param name="e"></param>
-        protected void DrawErrorImage (IGraphics g, FRPaintEventArgs e)
+        protected void DrawErrorImage (IGraphics g, PaintEventArgs e)
         {
         }
 
@@ -40,6 +40,6 @@ namespace AM.Reporting
         /// Does nothing
         /// </summary>
         /// <param name="e"></param>
-        partial void DrawDesign (FRPaintEventArgs e);
+        partial void DrawDesign (PaintEventArgs e);
     }
 }

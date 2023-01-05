@@ -170,7 +170,7 @@ namespace AM.Reporting.Gauge.Radial
             }
         }
 
-        private void DrawText (FRPaintEventArgs e, string text, Brush brush, float x, float y, HorAlign hAlign,
+        private void DrawText (PaintEventArgs e, string text, Brush brush, float x, float y, HorAlign hAlign,
             VertAlign vAlign)
         {
             var g = e.Graphics;
@@ -240,7 +240,7 @@ namespace AM.Reporting.Gauge.Radial
             return new PointF (pointX, pointY);
         }
 
-        private void DrawMajorTicks (FRPaintEventArgs e)
+        private void DrawMajorTicks (PaintEventArgs e)
         {
             center = (Parent as RadialGauge).Center;
             StepValue = (Parent.Maximum - Parent.Minimum) / (MajorTicks.Count - 1);
@@ -578,7 +578,7 @@ namespace AM.Reporting.Gauge.Radial
             }
         }
 
-        private void DrawMinorTicks (FRPaintEventArgs e)
+        private void DrawMinorTicks (PaintEventArgs e)
         {
             var g = e.Graphics;
             var pen = e.Cache.GetPen (MinorTicks.Color, MinorTicks.Width * e.ScaleX, DashStyle.Solid);
@@ -667,7 +667,7 @@ namespace AM.Reporting.Gauge.Radial
         }
 
         /// <inheritdoc/>
-        public override void Draw (FRPaintEventArgs e)
+        public override void Draw (PaintEventArgs e)
         {
             base.Draw (e);
             if ((Parent as RadialGauge).Type == RadialGaugeType.Circle)

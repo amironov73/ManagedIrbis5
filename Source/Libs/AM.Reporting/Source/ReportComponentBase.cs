@@ -25,6 +25,8 @@ using AM.Reporting.Utils;
 using System.Windows.Forms;
 using System.Drawing.Design;
 
+using PaintEventArgs = AM.Reporting.Utils.PaintEventArgs;
+
 #endregion
 
 #nullable enable
@@ -684,7 +686,7 @@ namespace AM.Reporting
         /// Draws the object's background.
         /// </summary>
         /// <param name="e">Draw event arguments.</param>
-        public void DrawBackground (FRPaintEventArgs e)
+        public void DrawBackground (PaintEventArgs e)
         {
             if (Width < 0.01 || Height < 0.01)
             {
@@ -700,7 +702,7 @@ namespace AM.Reporting
         }
 
         /// <inheritdoc/>
-        public override void Draw (FRPaintEventArgs eventArgs)
+        public override void Draw (PaintEventArgs eventArgs)
         {
             DrawBackground (eventArgs);
             base.Draw (eventArgs);
@@ -710,7 +712,7 @@ namespace AM.Reporting
         /// Determines if the object is visible on current drawing surface.
         /// </summary>
         /// <param name="e">Draw event arguments.</param>
-        public virtual bool IsVisible (FRPaintEventArgs e)
+        public virtual bool IsVisible (PaintEventArgs e)
         {
             var objRect = new RectangleF (AbsLeft * e.ScaleX, AbsTop * e.ScaleY,
                 Width * e.ScaleX + 1, Height * e.ScaleY + 1);

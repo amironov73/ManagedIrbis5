@@ -75,7 +75,7 @@ namespace AM.Reporting.Gauge.Simple.Progress
         }
 
         /// <inheritdoc />
-        public override void Draw (FRPaintEventArgs e)
+        public override void Draw (PaintEventArgs e)
         {
             base.Draw (e);
             var x = (Parent.AbsLeft + Parent.Border.Width / 2) * e.ScaleX;

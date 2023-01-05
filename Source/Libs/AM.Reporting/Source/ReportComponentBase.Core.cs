@@ -29,7 +29,7 @@ namespace AM.Reporting
         /// Does nothing
         /// </summary>
         /// <param name="e">Draw event arguments.</param>
-        public void DrawMarkers (FRPaintEventArgs e)
+        public void DrawMarkers (PaintEventArgs e)
         {
         }
 
@@ -46,7 +46,7 @@ namespace AM.Reporting
         /// </summary>
         /// <param name="e"></param>
         /// <returns></returns>
-        protected bool DrawIntersectBackground (FRPaintEventArgs e)
+        protected bool DrawIntersectBackground (PaintEventArgs e)
         {
             return false;
         }

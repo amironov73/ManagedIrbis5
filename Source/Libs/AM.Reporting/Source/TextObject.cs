@@ -24,6 +24,8 @@ using AM.Reporting.Code;
 
 using System.Windows.Forms;
 
+using PaintEventArgs = AM.Reporting.Utils.PaintEventArgs;
+
 #endregion
 
 #nullable enable
@@ -675,7 +677,7 @@ namespace AM.Reporting
 
         #region Private Methods
 
-        private void DrawUnderlines (FRPaintEventArgs e)
+        private void DrawUnderlines (PaintEventArgs e)
         {
             if (!Underlines || Angle != 0)
             {
@@ -1226,7 +1228,7 @@ namespace AM.Reporting
         /// Draws a text.
         /// </summary>
         /// <param name="e">Paint event data.</param>
-        public void DrawText (FRPaintEventArgs e)
+        public void DrawText (PaintEventArgs e)
         {
             var text = GetDisplayText();
             if (!string.IsNullOrEmpty (text))
@@ -1371,7 +1373,7 @@ namespace AM.Reporting
 
 
         /// <inheritdoc/>
-        public override void Draw (FRPaintEventArgs eventArgs)
+        public override void Draw (PaintEventArgs eventArgs)
         {
             base.Draw (eventArgs);
             DrawText (eventArgs);

@@ -67,7 +67,7 @@ namespace AM.Reporting.Gauge.Linear
 
         #region Private Methods
 
-        private void DrawMajorTicksHorz (FRPaintEventArgs e)
+        private void DrawMajorTicksHorz (PaintEventArgs e)
         {
             var g = e.Graphics;
             var pen = e.Cache.GetPen (MajorTicks.Color, MajorTicks.Width * e.ScaleX, DashStyle.Solid);
@@ -99,7 +99,7 @@ namespace AM.Reporting.Gauge.Linear
             brush.Dispose();
         }
 
-        private void DrawMinorTicksHorz (FRPaintEventArgs e)
+        private void DrawMinorTicksHorz (PaintEventArgs e)
         {
             var g = e.Graphics;
             var pen = e.Cache.GetPen (MinorTicks.Color, MinorTicks.Width * e.ScaleX, DashStyle.Solid);
@@ -118,7 +118,7 @@ namespace AM.Reporting.Gauge.Linear
             }
         }
 
-        private void DrawMajorTicksVert (FRPaintEventArgs e)
+        private void DrawMajorTicksVert (PaintEventArgs e)
         {
             var g = e.Graphics;
             var pen = e.Cache.GetPen (MajorTicks.Color, MajorTicks.Width * e.ScaleX, DashStyle.Solid);
@@ -151,7 +151,7 @@ namespace AM.Reporting.Gauge.Linear
             brush.Dispose();
         }
 
-        private void DrawMinorTicksVert (FRPaintEventArgs e)
+        private void DrawMinorTicksVert (PaintEventArgs e)
         {
             var g = e.Graphics;
             var pen = e.Cache.GetPen (MinorTicks.Color, MinorTicks.Width * e.ScaleX, DashStyle.Solid);
@@ -185,7 +185,7 @@ namespace AM.Reporting.Gauge.Linear
         }
 
         /// <inheritdoc/>
-        public override void Draw (FRPaintEventArgs e)
+        public override void Draw (PaintEventArgs e)
         {
             base.Draw (e);
 

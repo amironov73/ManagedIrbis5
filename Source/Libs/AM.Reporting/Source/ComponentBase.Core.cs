@@ -38,7 +38,7 @@ namespace AM.Reporting
         /// pens, fonts, brushes, string formats that was used before. If the item with requested parameters
         /// exists in the cache, it will be returned (instead of create new item and then dispose it).</para>
         /// </remarks>
-        public virtual void Draw (FRPaintEventArgs eventArgs)
+        public virtual void Draw (PaintEventArgs eventArgs)
         {
         }
     }

@@ -116,7 +116,7 @@ namespace AM.Reporting
 
         #region Private Methods
 
-        private void DrawSegmentGrid (FRPaintEventArgs e, float offsetX, float offsetY)
+        private void DrawSegmentGrid (PaintEventArgs e, float offsetX, float offsetY)
         {
             var g = e.Graphics;
             var saveSmoothing = g.SmoothingMode;
@@ -156,7 +156,7 @@ namespace AM.Reporting
             g.SmoothingMode = saveSmoothing;
         }
 
-        private void DrawReferenceLine (FRPaintEventArgs e, float offsetX)
+        private void DrawReferenceLine (PaintEventArgs e, float offsetX)
         {
             var g = e.Graphics;
             Brush b = e.Cache.GetBrush (Border.Color);
@@ -174,7 +174,7 @@ namespace AM.Reporting
             }
         }
 
-        private void DrawSegment (FRPaintEventArgs e, int symbol, float offsetX)
+        private void DrawSegment (PaintEventArgs e, int symbol, float offsetX)
         {
             var g = e.Graphics;
             float offsetY = 0;
@@ -252,7 +252,7 @@ namespace AM.Reporting
         }
 
         /// <inheritdoc/>
-        public override void Draw (FRPaintEventArgs eventArgs)
+        public override void Draw (PaintEventArgs eventArgs)
         {
             Width = ((ShowMarkers ? 1 : 0) + SegmentCount) * Spacing;
             Height = (ShowMarkers ? SegmentHeight + Units.Millimeters * 4 : SegmentHeight) + Border.Width;

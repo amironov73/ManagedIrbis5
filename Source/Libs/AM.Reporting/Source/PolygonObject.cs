@@ -56,7 +56,7 @@ namespace AM.Reporting
         /// Draw polyline path to graphics
         /// </summary>
         /// <param name="e">Event arguments</param>
-        protected override void drawPoly (FRPaintEventArgs e)
+        protected override void drawPoly (PaintEventArgs e)
         {
             var x = (AbsLeft + Border.Width / 2) * e.ScaleX;
             var y = (AbsTop + Border.Width / 2) * e.ScaleY;

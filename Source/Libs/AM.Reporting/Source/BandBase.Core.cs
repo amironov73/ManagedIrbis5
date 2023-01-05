@@ -25,7 +25,7 @@ partial class BandBase
     /// <inheritdoc cref="ReportComponentBase.Draw" />
     public override void Draw
         (
-            FRPaintEventArgs eventArgs
+            PaintEventArgs eventArgs
         )
     {
         Sure.NotNull (eventArgs);

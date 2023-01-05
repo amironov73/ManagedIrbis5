@@ -317,9 +317,9 @@ namespace AM.Reporting.Table
 
         #region Private Methods
 
-        private delegate void DrawCellProc (FRPaintEventArgs e, TableCell cell);
+        private delegate void DrawCellProc (PaintEventArgs e, TableCell cell);
 
-        private void DrawCells (FRPaintEventArgs e, DrawCellProc proc)
+        private void DrawCells (PaintEventArgs e, DrawCellProc proc)
         {
             float top = 0;
 
@@ -348,7 +348,7 @@ namespace AM.Reporting.Table
             }
         }
 
-        private void DrawCellsRtl (FRPaintEventArgs e, DrawCellProc proc)
+        private void DrawCellsRtl (PaintEventArgs e, DrawCellProc proc)
         {
             float top = 0;
 
@@ -410,22 +410,22 @@ namespace AM.Reporting.Table
             }
         }
 
-        private void DrawFill (FRPaintEventArgs e, TableCell cell)
+        private void DrawFill (PaintEventArgs e, TableCell cell)
         {
             cell.DrawBackground (e);
         }
 
-        private void DrawText (FRPaintEventArgs e, TableCell cell)
+        private void DrawText (PaintEventArgs e, TableCell cell)
         {
             cell.DrawText (e);
         }
 
-        private void DrawBorders (FRPaintEventArgs e, TableCell cell)
+        private void DrawBorders (PaintEventArgs e, TableCell cell)
         {
             cell.Border.Draw (e, cell.AbsBounds);
         }
 
-        private void DrawTable (FRPaintEventArgs e)
+        private void DrawTable (PaintEventArgs e)
         {
             DrawCells (e, DrawFill);
             DrawCells (e, DrawText);
@@ -435,7 +435,7 @@ namespace AM.Reporting.Table
             DrawDesign_SelectedCells (e);
         }
 
-        private void DrawTableRtl (FRPaintEventArgs e)
+        private void DrawTableRtl (PaintEventArgs e)
         {
             DrawCellsRtl (e, DrawFill);
             DrawCellsRtl (e, DrawText);
@@ -468,7 +468,7 @@ namespace AM.Reporting.Table
         }
 
         /// <inheritdoc/>
-        public override void Draw (FRPaintEventArgs eventArgs)
+        public override void Draw (PaintEventArgs eventArgs)
         {
             if (ColumnCount == 0 || RowCount == 0)
             {
@@ -501,7 +501,7 @@ namespace AM.Reporting.Table
         }
 
         /// <inheritdoc/>
-        public override bool IsVisible (FRPaintEventArgs e)
+        public override bool IsVisible (PaintEventArgs e)
         {
             if (RowCount == 0 || ColumnCount == 0)
             {

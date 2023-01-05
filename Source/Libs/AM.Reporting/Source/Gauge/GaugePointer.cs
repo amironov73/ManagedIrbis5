@@ -102,7 +102,7 @@ namespace AM.Reporting.Gauge
         /// Draws the gauge pointer.
         /// </summary>
         /// <param name="e">Draw event arguments.</param>
-        public virtual void Draw (FRPaintEventArgs e)
+        public virtual void Draw (PaintEventArgs e)
         {
         }
 

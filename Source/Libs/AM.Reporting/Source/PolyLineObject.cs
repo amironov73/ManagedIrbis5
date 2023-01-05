@@ -202,7 +202,7 @@ namespace AM.Reporting
         }
 
         /// <inheritdoc/>
-        public override void Draw (FRPaintEventArgs eventArgs)
+        public override void Draw (PaintEventArgs eventArgs)
         {
             switch (Points.Count)
             {
@@ -596,7 +596,7 @@ namespace AM.Reporting
 
         #region Internal Methods
 
-        internal void DoDrawPoly (FRPaintEventArgs e)
+        internal void DoDrawPoly (PaintEventArgs e)
         {
             var g = e.Graphics;
             var report = Report;
@@ -652,7 +652,7 @@ namespace AM.Reporting
         /// Draw polyline path to graphics
         /// </summary>
         /// <param name="e">Event arguments</param>
-        protected virtual void drawPoly (FRPaintEventArgs e)
+        protected virtual void drawPoly (PaintEventArgs e)
         {
             Pen pen;
             if (polygonSelectionMode == PolygonSelectionMode.MoveAndScale)

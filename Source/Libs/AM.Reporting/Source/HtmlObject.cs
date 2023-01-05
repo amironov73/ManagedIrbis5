@@ -112,7 +112,7 @@ namespace AM.Reporting
         /// Draws a text.
         /// </summary>
         /// <param name="e">Paint event data.</param>
-        public void DrawText (FRPaintEventArgs e)
+        public void DrawText (PaintEventArgs e)
         {
             var text = Text;
             if (!string.IsNullOrEmpty (text))
@@ -146,7 +146,7 @@ namespace AM.Reporting
 
 
         /// <inheritdoc/>
-        public override void Draw (FRPaintEventArgs eventArgs)
+        public override void Draw (PaintEventArgs eventArgs)
         {
             base.Draw (eventArgs);
             DrawText (eventArgs);

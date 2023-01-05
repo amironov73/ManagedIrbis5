@@ -29,6 +29,6 @@ namespace AM.Reporting
         /// Does nothing
         /// </summary>
         /// <param name="e"></param>
-        partial void DrawDesign (FRPaintEventArgs e);
+        partial void DrawDesign (PaintEventArgs e);
     }
 }

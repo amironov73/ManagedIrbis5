@@ -28,13 +28,13 @@ namespace AM.Reporting.Gauge.Radial
 {
     internal class RadialUtils
     {
-        public static Font GetFont (FRPaintEventArgs e, GaugeObject gauge, Font font)
+        public static Font GetFont (PaintEventArgs e, GaugeObject gauge, Font font)
         {
             return e.Cache.GetFont (font.FontFamily,
                 gauge.IsPrinting ? font.Size : font.Size * e.ScaleX * 96f / DrawUtils.ScreenDpi, font.Style);
         }
 
-        public static SizeF GetStringSize (FRPaintEventArgs e, GaugeObject gauge, Font font, string text)
+        public static SizeF GetStringSize (PaintEventArgs e, GaugeObject gauge, Font font, string text)
         {
             return e.Graphics.MeasureString (text, GetFont (e, gauge, font));
         }

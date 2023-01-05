@@ -63,7 +63,7 @@ namespace AM.Reporting.Gauge.Simple
         #region Public Methods
 
         /// <inheritdoc/>
-        public override void Draw (FRPaintEventArgs eventArgs)
+        public override void Draw (PaintEventArgs eventArgs)
         {
             base.Draw (eventArgs);
             Scale.Draw (eventArgs);

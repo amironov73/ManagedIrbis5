@@ -26,6 +26,8 @@ using AM.Reporting.Utils;
 
 using System.Windows.Forms;
 
+using PaintEventArgs = AM.Reporting.Utils.PaintEventArgs;
+
 #endregion
 
 #nullable enable
@@ -384,7 +386,7 @@ namespace AM.Reporting
         /// Draws the image.
         /// </summary>
         /// <param name="e">Paint event args.</param>
-        public override void DrawImage (FRPaintEventArgs e)
+        public override void DrawImage (PaintEventArgs e)
         {
             var g = e.Graphics;
             if (Image == null)

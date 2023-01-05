@@ -31,13 +31,13 @@ namespace AM.Reporting
         /// Does nothing
         /// </summary>
         /// <param name="e"></param>
-        partial void DrawDesign0 (FRPaintEventArgs e);
+        partial void DrawDesign0 (PaintEventArgs e);
 
         /// <summary>
         /// Does nothing
         /// </summary>
         /// <param name="e"></param>
-        partial void DrawDesign1 (FRPaintEventArgs e);
+        partial void DrawDesign1 (PaintEventArgs e);
 
         /// <summary>
         /// Does nothing

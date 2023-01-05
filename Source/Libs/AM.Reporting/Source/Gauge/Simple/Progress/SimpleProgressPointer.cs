@@ -85,7 +85,7 @@ namespace AM.Reporting.Gauge.Simple.Progress
             smallPointerWidthRatio = 0.1f;
         }
 
-        internal override void DrawHorz (FRPaintEventArgs e)
+        internal override void DrawHorz (PaintEventArgs e)
         {
             var g = e.Graphics;
             var pen = e.Cache.GetPen (BorderColor, BorderWidth * e.ScaleX, DashStyle.Solid);
@@ -120,7 +120,7 @@ namespace AM.Reporting.Gauge.Simple.Progress
             g.FillAndDrawRectangle (pen, brush, Left, Top, Width, Height);
         }
 
-        internal override void DrawVert (FRPaintEventArgs e)
+        internal override void DrawVert (PaintEventArgs e)
         {
             var g = e.Graphics;
             var pen = e.Cache.GetPen (BorderColor, BorderWidth * e.ScaleY, DashStyle.Solid);

@@ -535,12 +535,12 @@ namespace AM.Reporting.Export.Image
             g.FillRegion (Brushes.Transparent, new Region (new RectangleF (0, curOriginY, width, height)));
             if (bigImage != null && curOriginY + height * 2 > bigImage.Height)
             {
-                page.Fill.Draw (new FRPaintEventArgs (g, 1, 1, Report.GraphicCache),
+                page.Fill.Draw (new PaintEventArgs (g, 1, 1, Report.GraphicCache),
                     new RectangleF (0, curOriginY, widthK, bigImage.Height - curOriginY));
             }
             else
             {
-                page.Fill.Draw (new FRPaintEventArgs (g, 1, 1, Report.GraphicCache),
+                page.Fill.Draw (new PaintEventArgs (g, 1, 1, Report.GraphicCache),
                     new RectangleF (0, curOriginY, widthK, height + PaddingNonSeparatePages * 2));
             }
 
@@ -596,7 +596,7 @@ namespace AM.Reporting.Export.Image
         {
             if (obj is ReportComponentBase { Exportable: true } @base)
             {
-                @base.Draw (new FRPaintEventArgs (g, zoomX, zoomX, Report.GraphicCache));
+                @base.Draw (new PaintEventArgs (g, zoomX, zoomX, Report.GraphicCache));
             }
         }
 
@@ -635,7 +635,7 @@ namespace AM.Reporting.Export.Image
 
         private void AddImageWatermark (ReportPage page)
         {
-            page.Watermark.DrawImage (new FRPaintEventArgs (g, zoomX, zoomX, Report.GraphicCache),
+            page.Watermark.DrawImage (new PaintEventArgs (g, zoomX, zoomX, Report.GraphicCache),
                 new RectangleF (-page.LeftMargin * Units.Millimeters, -page.TopMargin * Units.Millimeters,
                     width / zoomX, height / zoomY),
                 page.Report, false);
@@ -648,7 +648,7 @@ namespace AM.Reporting.Export.Image
                 return;
             }
 
-            page.Watermark.DrawText (new FRPaintEventArgs (g, zoomX, zoomX, Report.GraphicCache),
+            page.Watermark.DrawText (new PaintEventArgs (g, zoomX, zoomX, Report.GraphicCache),
                 new RectangleF (-page.LeftMargin * Units.Millimeters, -page.TopMargin * Units.Millimeters,
                     width / zoomX, height / zoomY),
                 page.Report, false);

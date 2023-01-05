@@ -26,6 +26,8 @@ using System.Windows.Forms;
 
 using AM.Reporting.Export;
 
+using PaintEventArgs = AM.Reporting.Utils.PaintEventArgs;
+
 #endregion
 
 #nullable enable
@@ -702,7 +704,7 @@ namespace AM.Reporting.Export.Html
 
                             var oldLines = obj.Border.Lines;
                             obj.Border.Lines = BorderLines.None;
-                            obj.Draw (new FRPaintEventArgs (g, Zoom * zoom, Zoom * zoom, Report.GraphicCache));
+                            obj.Draw (new PaintEventArgs (g, Zoom * zoom, Zoom * zoom, Report.GraphicCache));
                             obj.Border.Lines = oldLines;
                         }
 
@@ -989,12 +991,12 @@ namespace AM.Reporting.Export.Html
                     g.Clear (Color.Transparent);
                     if (drawText)
                     {
-                        page.Watermark.DrawText (new FRPaintEventArgs (g, 1f, 1f, Report.GraphicCache),
+                        page.Watermark.DrawText (new PaintEventArgs (g, 1f, 1f, Report.GraphicCache),
                             new RectangleF (0, 0, pictureWatermark.Width, pictureWatermark.Height), Report, true);
                     }
                     else
                     {
-                        page.Watermark.DrawImage (new FRPaintEventArgs (g, 1f, 1f, Report.GraphicCache),
+                        page.Watermark.DrawImage (new PaintEventArgs (g, 1f, 1f, Report.GraphicCache),
                             new RectangleF (0, 0, pictureWatermark.Width, pictureWatermark.Height), Report, true);
                     }
 

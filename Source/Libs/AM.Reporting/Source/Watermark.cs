@@ -24,6 +24,8 @@ using AM.Reporting.Utils;
 using System.Windows.Forms;
 using System.Drawing.Design;
 
+using PaintEventArgs = AM.Reporting.Utils.PaintEventArgs;
+
 #endregion
 
 #nullable enable
@@ -220,7 +222,7 @@ namespace AM.Reporting
         /// <param name="displayRect"></param>
         /// <param name="report"></param>
         /// <param name="isPrinting"></param>
-        public virtual void DrawImage (FRPaintEventArgs e, RectangleF displayRect, Report report, bool isPrinting)
+        public virtual void DrawImage (PaintEventArgs e, RectangleF displayRect, Report report, bool isPrinting)
         {
             PictureObject.SetReport (report);
             PictureObject.Bounds = displayRect;
@@ -251,7 +253,7 @@ namespace AM.Reporting
         /// <param name="displayRect"></param>
         /// <param name="report"></param>
         /// <param name="isPrinting"></param>
-        public void DrawText (FRPaintEventArgs e, RectangleF displayRect, Report report, bool isPrinting)
+        public void DrawText (PaintEventArgs e, RectangleF displayRect, Report report, bool isPrinting)
         {
             TextObject.SetReport (report);
             TextObject.Bounds = displayRect;

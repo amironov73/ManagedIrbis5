@@ -24,6 +24,8 @@ using System.Windows.Forms;
 
 using AM.Reporting.Utils;
 
+using PaintEventArgs = AM.Reporting.Utils.PaintEventArgs;
+
 #endregion
 
 #nullable enable
@@ -407,7 +409,7 @@ namespace AM.Reporting
         }
 
         /// <inheritdoc/>
-        public override void Draw (FRPaintEventArgs eventArgs)
+        public override void Draw (PaintEventArgs eventArgs)
         {
             UpdateAutoSize();
             base.Draw (eventArgs);
@@ -417,7 +419,7 @@ namespace AM.Reporting
             DrawDesign (eventArgs);
         }
 
-        public abstract void DrawImage (FRPaintEventArgs e);
+        public abstract void DrawImage (PaintEventArgs e);
 
         /// <summary>
         /// gets points for transform this image
@@ -836,7 +838,7 @@ namespace AM.Reporting
         /// </summary>
         /// <param name="e"></param>
         /// <param name="drawRect"></param>
-        internal virtual void DrawImageInternal (FRPaintEventArgs e, RectangleF drawRect)
+        internal virtual void DrawImageInternal (PaintEventArgs e, RectangleF drawRect)
         {
             var rotate = Angle is 90 or 270;
             var imageWidth = ImageWidth; //rotate ? Image.Height : Image.Width;

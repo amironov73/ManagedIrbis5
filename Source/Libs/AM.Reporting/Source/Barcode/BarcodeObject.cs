@@ -30,6 +30,8 @@ using System.Drawing.Design;
 
 using AM.Reporting.Barcode.QRCode;
 
+using PaintEventArgs = AM.Reporting.Utils.PaintEventArgs;
+
 #endregion
 
 #nullable enable
@@ -283,7 +285,7 @@ namespace AM.Reporting.Barcode
             barcode.Initialize (Text, ShowText, Angle, Zoom);
         }
 
-        private void DrawBarcode (FRPaintEventArgs e)
+        private void DrawBarcode (PaintEventArgs e)
         {
             var displayRect = new RectangleF (
                 (AbsLeft + Padding.Left) * e.ScaleX,
@@ -412,7 +414,7 @@ namespace AM.Reporting.Barcode
         }
 
         /// <inheritdoc/>
-        public override void Draw (FRPaintEventArgs eventArgs)
+        public override void Draw (PaintEventArgs eventArgs)
         {
             var error = false;
             var errorText = "";

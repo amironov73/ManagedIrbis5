@@ -110,7 +110,7 @@ namespace AM.Reporting
         /// </summary>
         /// <param name="e">Draw event arguments.</param>
         /// <param name="rect">Drawing rectangle.</param>
-        public virtual void Draw (FRPaintEventArgs e, RectangleF rect)
+        public virtual void Draw (PaintEventArgs e, RectangleF rect)
         {
             rect = new RectangleF (rect.Left * e.ScaleX, rect.Top * e.ScaleY, rect.Width * e.ScaleX,
                 rect.Height * e.ScaleY);
@@ -177,7 +177,7 @@ namespace AM.Reporting
         }
 
         /// <inheritdoc/>
-        public override void Draw (FRPaintEventArgs e, RectangleF rect)
+        public override void Draw (PaintEventArgs e, RectangleF rect)
         {
             if (Color == Color.Transparent)
             {
@@ -707,7 +707,7 @@ namespace AM.Reporting
         }
 
         /// <inheritdoc/>
-        public override void Draw (FRPaintEventArgs e, RectangleF rect)
+        public override void Draw (PaintEventArgs e, RectangleF rect)
         {
             rect = new RectangleF (rect.Left * e.ScaleX, rect.Top * e.ScaleY, rect.Width * e.ScaleX,
                 rect.Height * e.ScaleY);
@@ -1161,7 +1161,7 @@ namespace AM.Reporting
         }
 
         /// <inheritdoc/>
-        public override void Draw (FRPaintEventArgs e, RectangleF rect)
+        public override void Draw (PaintEventArgs e, RectangleF rect)
         {
             if (_image == null)
             {

@@ -584,7 +584,7 @@ namespace AM.Reporting
 
         #region Private Methods
 
-        private void DrawBackground (FRPaintEventArgs e, RectangleF rect)
+        private void DrawBackground (PaintEventArgs e, RectangleF rect)
         {
             rect.Width *= e.ScaleX;
             rect.Height *= e.ScaleY;
@@ -988,7 +988,7 @@ namespace AM.Reporting
         }
 
         /// <inheritdoc/>
-        public override void Draw (FRPaintEventArgs eventArgs)
+        public override void Draw (PaintEventArgs eventArgs)
         {
             if (IsDesigning)
             {

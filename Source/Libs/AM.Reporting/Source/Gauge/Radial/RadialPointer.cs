@@ -65,7 +65,7 @@ namespace AM.Reporting.Gauge.Radial
 
         #region Private Methods
 
-        private void DrawHorz (FRPaintEventArgs e)
+        private void DrawHorz (PaintEventArgs e)
         {
             var g = e.Graphics;
             var pen = e.Cache.GetPen (BorderColor, BorderWidth * e.ScaleX, DashStyle.Solid);
@@ -216,7 +216,7 @@ namespace AM.Reporting.Gauge.Radial
         }
 
         /// <inheritdoc/>
-        public override void Draw (FRPaintEventArgs e)
+        public override void Draw (PaintEventArgs e)
         {
             base.Draw (e);
             DrawHorz (e);
