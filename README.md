@@ -13,6 +13,7 @@ Currently supports:
 using System;
 using ManagedIrbis;
 using static System.Console;
+using static ManagedIrbis.IrbisUtility;
 
 try
 {
@@ -30,7 +31,7 @@ try
     var success = await connection.ConnectAsync();
     if (!success)
     {
-        // не получилось подключиться, жалуемся и завершаемся
+        // Can't connect to the IRBIS64 server, print the error message and exit with error code
         await Error.WriteLineAsync ("Can't connect");
         await Error.WriteLineAsync (IrbisException.GetErrorDescription (connection.LastError));
         return 1;
@@ -38,8 +39,8 @@ try
 
     await Out.WriteLineAsync ("Successfully connected");
 
-    // Ищем все книги, автором которых является А. С. Пушкин
-    // Обратите внимание на двойные кавычки в тексте запроса
+    // We are looking for all books authored by A. S. Pushkin
+    // Notice the double quotes in the query text
     var found = await connection.SearchAsync
         (
             "\"A=ПУШКИН$\""
@@ -47,21 +48,21 @@ try
 
     await Out.WriteLineAsync ($"Найдено записей: {found.Length}");
 
-    // Чтобы не распечатывать все найденные записи,
-    // отберем только 10 первых
+    // In order not to print all found records, 
+    // we will select only the first 10
     foreach (var mfn in found[..10])
     {
-        // Получаем запись из базы данных
+        // Get the record from the IRBIS64 server
         var record = await connection.ReadRecordAsync (mfn);
 
         if (record is not null)
         {
-            // Извлекаем из записи интересующее нас поле и подполе
+            // Extract from the record the field and subfield
             var title = record.FM (200, 'a');
             await Out.WriteLineAsync ($"Title: {title}");
         }
 
-        // Форматируем запись средствами сервера
+        // Format the record using the IRBIS64 server
         var description = await connection.FormatRecordAsync
             (
                 "@brief",
@@ -69,10 +70,10 @@ try
             );
         await Out.WriteLineAsync ($"Биб. описание: {description}");
 
-        await Out.WriteLineAsync(); // Добавляем пустую строку
+        await Out.WriteLineAsync(); // Add empty line
     }
 
-    // Отключаемся от сервера
+    // Disconnect from the server
     await connection.DisposeAsync();
     await Out.WriteLineAsync ("Successfully disconnected");
 }
@@ -102,4 +103,3 @@ return 0;
 ### Documentation (in russian)
 
 [![Badge](https://readthedocs.org/projects/managedirbis5/badge/)](https://managedirbis5.readthedocs.io/)
-
