@@ -24,15 +24,15 @@
 
     <!-- Централизованное управление пакетами -->
     <ItemGroup>
-        <PackageReference Include="HtmlAgilityPack"/>
-        <PackageReference Include="Newtonsoft.Json"/>
-        <PackageReference Include="Microsoft.Extensions.Logging"/>
-        <PackageReference Include="RestSharp"/>
+        <PackageReference Include="HtmlAgilityPack" />
+        <PackageReference Include="Newtonsoft.Json" />
+        <PackageReference Include="Microsoft.Extensions.Logging" />
+        <PackageReference Include="RestSharp" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\AM.Core5\AM.Core5.csproj"/>
-        <ProjectReference Include="..\ManagedIrbis5\ManagedIrbis5.csproj"/>
+        <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
+        <ProjectReference Include="..\ManagedIrbis5\ManagedIrbis5.csproj" />
     </ItemGroup>
 
 </Project>

@@ -88,18 +88,20 @@ public sealed class EthalonBbkClient
         var uri = new Uri (BaseUri);
         var origin = uri.Scheme + "://" + uri.Host;
 
-        var restClient = new RestClient (BaseUri)
-            {
-                Timeout = -1
-            };
-        var request = new RestRequest (Method.POST);
+        var options = new RestClientOptions (BaseUri)
+        {
+            ThrowOnAnyError = true,
+            MaxTimeout = 10_000,
+            UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36"
+        };
+        var restClient = new RestClient (options);
+        var request = new RestRequest();
         request.AddHeader ("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
         request.AddHeader ("Accept-Language", "ru,en-US;q=0.9,en;q=0.8,ja;q=0.7");
         request.AddHeader ("Cache-Control", "max-age=0");
         request.AddHeader ("Content-Type", "application/x-www-form-urlencoded");
         request.AddHeader ("Origin", origin);
         request.AddHeader ("Referer", BaseUri);
-        restClient.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36";
         request.AddParameter ("find", "Искать");
         request.AddParameter ("fields[0].searchField", field);
         request.AddParameter ("fields[0].compare", compare);
@@ -109,9 +111,10 @@ public sealed class EthalonBbkClient
         request.AddParameter ("fields[0].deactivate", "false");
         request.AddParameter ("checkForDelete", "");
 
-        var response = restClient.Execute (request);
+        var response = restClient.Post (request);
+        var content = response.Content.ThrowIfNullOrEmpty();
 
-        return response.Content;
+        return content;
     }
 
     /// <summary>
@@ -131,18 +134,20 @@ public sealed class EthalonBbkClient
         var uri = new Uri (BaseUri);
         var origin = uri.Scheme + "://" + uri.Host;
 
-        var restClient = new RestClient (BaseUri)
-            {
-                Timeout = -1
-            };
-        var request = new RestRequest (Method.POST);
+        var options = new RestClientOptions (BaseUri)
+        {
+            ThrowOnAnyError = true,
+            MaxTimeout = 10_000,
+            UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36"
+        };
+        var restClient = new RestClient (options);
+        var request = new RestRequest();
         request.AddHeader ("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
         request.AddHeader ("Accept-Language", "ru,en-US;q=0.9,en;q=0.8,ja;q=0.7");
         request.AddHeader ("Cache-Control", "max-age=0");
         request.AddHeader ("Content-Type", "application/x-www-form-urlencoded");
         request.AddHeader ("Origin", origin);
         request.AddHeader ("Referer", BaseUri);
-        restClient.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36";
         request.AddParameter ("find", "Искать");
         request.AddParameter ("fields[0].searchField", field);
         request.AddParameter ("fields[0].compare", compare);
@@ -153,8 +158,9 @@ public sealed class EthalonBbkClient
         request.AddParameter ("checkForDelete", "");
 
         var response = await restClient.ExecuteAsync (request);
+        var content = response.Content.ThrowIfNullOrEmpty();
 
-        return response.Content;
+        return content;
     }
 
     /// <summary>

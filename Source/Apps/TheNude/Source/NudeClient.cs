@@ -75,17 +75,18 @@ public sealed class NudeClient
         }
 
         const string baseUri = "https://www.thenude.com/index.php";
-        var client = new RestClient (baseUri)
+        var options = new RestClientOptions (baseUri)
         {
-            Timeout = -1,
+            ThrowOnAnyError = true,
+            MaxTimeout = 10_000,
             UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36"
         };
         if (proxy is not null)
         {
-            client.Proxy = proxy;
+            options.Proxy = proxy;
         }
-
-        var request = new RestRequest (Method.GET);
+        var client = new RestClient (options);
+        var request = new RestRequest ();
         request.AddHeader ("authority", "www.thenude.com");
         request.AddHeader ("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
         request.AddHeader ("accept-language", "en-US;q=0.9,en;q=0.8,ja;q=0.7");
@@ -104,14 +105,20 @@ public sealed class NudeClient
         request.AddParameter ("m_exact", exact ? "on" : "off");
 
 
-        var response = client.Execute (request);
+        var response = client.Get (request);
         if (!response.IsSuccessful)
         {
             return null;
         }
 
+        var content = response.Content;
+        if (string.IsNullOrEmpty (content))
+        {
+            return null;
+        }
+
         var document = new HtmlDocument();
-        document.LoadHtml (response.Content);
+        document.LoadHtml (content);
 
         return document;
     }
@@ -119,7 +126,7 @@ public sealed class NudeClient
     /// <summary>
     /// Разбор полученного ответа сайта.
     /// </summary>
-    public ModelInfo[]? ParseModels
+    public ModelInfo[] ParseModels
         (
             HtmlDocument? document
         )

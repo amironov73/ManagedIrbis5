@@ -61,21 +61,32 @@ public sealed class SimplestGoogleTranslateClient
         Sure.NotNullNorEmpty (targetLanguage);
         Sure.NotNullNorEmpty (originalText);
 
-        var client = new RestClient (BaseUrl);
-        var request = new RestRequest (Method.GET)
+        var options = new RestClientOptions (BaseUrl)
+        {
+            ThrowOnAnyError = true,
+            MaxTimeout = 1_000
+        };
+        var client = new RestClient (options);
+        var request = new RestRequest ()
             .AddParameter ("client", "gtx")
             .AddParameter ("sl", sourceLanguage)
             .AddParameter ("tl", targetLanguage)
             .AddParameter ("dt", "t")
             .AddParameter ("q", originalText);
 
-        var response = client.Execute (request);
+        var response = client.Get (request);
         if (!response.IsSuccessful)
         {
             return null;
         }
 
-        var document = System.Text.Json.JsonDocument.Parse (response.Content);
+        var content = response.Content;
+        if (string.IsNullOrEmpty (content))
+        {
+            return null;
+        }
+
+        var document = System.Text.Json.JsonDocument.Parse (content);
         var result = document.RootElement[0][0][0].GetString();
 
         return result;

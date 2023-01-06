@@ -51,19 +51,30 @@ public sealed class FishTextClient
     {
         Sure.InRange (amount, 1, 500);
 
-        var client = new RestClient (BaseUrl);
-        var request = new RestRequest (Method.GET)
+        var options = new RestClientOptions (BaseUrl)
+        {
+            ThrowOnAnyError = true,
+            MaxTimeout = 1_000,
+        };
+        var client = new RestClient (options);
+        var request = new RestRequest()
             .AddParameter ("type", "sentence")
             .AddParameter ("number", amount.ToInvariantString())
             .AddParameter ("format", "json");
 
-        var response = client.Execute (request);
+        var response = client.Get (request);
         if (!response.IsSuccessful)
         {
             return null;
         }
 
-        var document = System.Text.Json.JsonDocument.Parse (response.Content);
+        var content = response.Content;
+        if (string.IsNullOrEmpty (content))
+        {
+            return null;
+        }
+
+        var document = System.Text.Json.JsonDocument.Parse (content);
         var status = document.RootElement.GetProperty ("status").GetString();
         if (status != "success")
         {

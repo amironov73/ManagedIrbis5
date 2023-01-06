@@ -120,7 +120,8 @@ public class ViafClient
         var request = new RestRequest ("/viaf/AutoSuggest?query={name}");
         request.AddUrlSegment ("name", name);
         var response = Connection.Execute (request);
-        var viaf = JsonSerializer.Deserialize<ViafSuggestResponse> (response.Content)
+        var content = response.Content.ThrowIfNullOrEmpty();
+        var viaf = JsonSerializer.Deserialize<ViafSuggestResponse> (content)
             .ThrowIfNull();
 
         return viaf.SuggestResults.ThrowIfNull();
@@ -147,7 +148,8 @@ public class ViafClient
         request.AddUrlSegment ("id", recordId);
         request.AddHeader ("Accept", "application/json");
         var response = Connection.Execute (request);
-        var obj =  JsonDocument.Parse (response.Content);
+        var content = response.Content.ThrowIfNullOrEmpty();
+        var obj =  JsonDocument.Parse (content);
         var result = ViafData.Parse (obj);
 
         return result;
