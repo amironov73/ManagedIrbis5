@@ -37,8 +37,8 @@
     <PackageVersion Include="coverlet.msbuild" Version="3.2.0" />
     <PackageVersion Include="DynamicData" Version="7.12.1" />
     <PackageVersion Include="DynamicData.ReactiveUI" Version="6.11.0.2613" />
-    <PackageVersion Include="Google.Protobuf" Version="3.21.9" />
-    <PackageVersion Include="Grpc.Tools" Version="2.50.0" />
+    <PackageVersion Include="Google.Protobuf" Version="3.21.12" />
+    <PackageVersion Include="Grpc.Tools" Version="2.51.0" />
     <PackageVersion Include="GridExtra.Avalonia" Version="0.9.1" />
     <PackageVersion Include="HtmlAgilityPack" Version="1.11.46" />
     <PackageVersion Include="linq2db" Version="3.7.0" />
@@ -67,7 +67,7 @@
     <PackageVersion Include="Microsoft.Extensions.ObjectPool" Version="7.0.1" />
     <PackageVersion Include="Microsoft.Extensions.Options" Version="7.0.0" />
     <PackageVersion Include="Microsoft.IO.RecyclableMemoryStream" Version="2.2.1" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.4.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.4.1" />
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="1.1.1" />
     <PackageVersion Include="Microsoft.Windows.Compatibility" Version="7.0.0" />
     <PackageVersion Include="Mono.Posix.NETStandard" Version="1.0.0" />
