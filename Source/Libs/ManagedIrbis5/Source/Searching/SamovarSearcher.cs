@@ -14,6 +14,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 
 using AM;
@@ -22,6 +23,8 @@ using AM.Collections;
 using AM.Text;
 
 using ManagedIrbis.Identifiers;
+using ManagedIrbis.ImportExport;
+using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Providers;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -88,14 +91,56 @@ public class SamovarSearcher
 
     #endregion
 
-    #region Public methods
+    #region Private members
+
+    private bool _Search
+        (
+            IList<Bagel> result,
+            ISyncProvider connection,
+            string expression,
+            SamovarOptions options
+        )
+    {
+        if (string.IsNullOrEmpty (expression))
+        {
+            return false;
+        }
+
+        var parameters = new SearchParameters
+        {
+            Expression = expression,
+            Format = IrbisFormat.All,
+            Database = connection.Database.ThrowIfNull()
+        };
+        var found = connection.Search (parameters);
+        if (found is null)
+        {
+            return false;
+        }
+
+        foreach (var item in found)
+        {
+            var record = new Record();
+            record = ProtocolText.ParseResponseForAllFormat (item.Text, record);
+            if (record is not null)
+            {
+                var bagel = new Bagel
+                {
+                    Record = record
+                };
+                result.Add (bagel);
+            }
+        }
+
+        return true;
+    }
 
     /// <summary>
     /// Построение бесхитростного выражения.
     /// </summary>
     /// <param name="query">Выражение на естественном языке</param>
     /// <param name="withTrimming">С усечением?</param>
-    public string BuildStraightExpression
+    private string _BuildStraightExpression
         (
             string query,
             bool withTrimming
@@ -106,14 +151,31 @@ public class SamovarSearcher
             return string.Empty;
         }
 
-        query = query.Trim();
+        query = new Sparcer().SparceText (query);
         if (string.IsNullOrEmpty (query))
         {
             return string.Empty;
         }
 
-        return string.Empty;
+        var first = true;
+        var result = new StringBuilder();
+        foreach (var prefix in Prefixes)
+        {
+            if (!first)
+            {
+                result.Append (" + ");
+            }
+
+            result.Append (Q.WrapIfNeeded (prefix + query));
+            first = false;
+        }
+
+        return result.ToString();
     }
+
+    #endregion
+
+    #region Public methods
 
     /// <summary>
     /// Поиск записей.
@@ -135,7 +197,6 @@ public class SamovarSearcher
 
         options ??= new ();
 
-
         var database = connection.EnsureDatabase (options.Database);
         var outputLimit = options.OutputLimit;
         if (outputLimit < 1)
@@ -143,13 +204,22 @@ public class SamovarSearcher
             outputLimit = 500;
         }
 
-        var expression = BuildStraightExpression (query, false);
-        if (string.IsNullOrWhiteSpace (expression))
+        var result = new List<Bagel>();
+        var expression = _BuildStraightExpression (query, false);
+        if (!_Search (result, connection, expression, options))
         {
             return Array.Empty<Bagel>();
         }
 
-        return Array.Empty<Bagel>();
+        var evaluator = ServiceProvider.GetService <IRelevanceEvaluator>()
+            ?? new StandardRelevanceEvaluator (ServiceProvider, expression);
+
+        foreach (var bagel in result)
+        {
+            bagel.Rating = evaluator.EvaluateRelevance (bagel.Record!);
+        }
+
+        return result.ToArray();
     }
 
     #endregion

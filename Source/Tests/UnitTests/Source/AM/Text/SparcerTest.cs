@@ -93,7 +93,6 @@ public sealed class SparcerTest
         Assert.AreEqual ("hello) world", sparcer.SparceText ("hello  )world"));
     }
 
-    [Ignore]
     [TestMethod]
     [Description ("Нормализация пробелов вокруг открывающей скобки")]
     public void Sparcer_SparceText_8()
@@ -103,5 +102,41 @@ public sealed class SparcerTest
         Assert.AreEqual ("hello (world", sparcer.SparceText ("hello(world"));
         Assert.AreEqual ("hello (world", sparcer.SparceText ("hello ( world"));
         Assert.AreEqual ("hello (world", sparcer.SparceText ("hello  (world"));
+    }
+
+    [TestMethod]
+    [Description ("Нормализация пробелов вокруг запятой")]
+    public void Sparcer_SparceText_9()
+    {
+        var sparcer = new Sparcer();
+        Assert.AreEqual ("hello, world", sparcer.SparceText ("hello, world"));
+        Assert.AreEqual ("hello, world", sparcer.SparceText ("hello,world"));
+        Assert.AreEqual ("hello, world", sparcer.SparceText ("hello , world"));
+        Assert.AreEqual ("hello, world", sparcer.SparceText ("hello  ,world"));
+    }
+
+    [TestMethod]
+    [Description ("Нормализация пробелов вокруг кавычек")]
+    public void Sparcer_SparceText_10()
+    {
+        var sparcer = new Sparcer();
+        Assert.AreEqual ("hello \"world", sparcer.SparceText ("hello\"world"));
+        Assert.AreEqual ("hello \"\" world", sparcer.SparceText ("hello\"\"world"));
+    }
+
+    [TestMethod]
+    [Description ("Нормализация пробелов вокруг минуса")]
+    public void Sparcer_SparceText_11()
+    {
+        var sparcer = new Sparcer();
+        Assert.AreEqual ("hello)- world", sparcer.SparceText ("hello)- world"));
+    }
+
+    [TestMethod]
+    [Description ("Нормализация пробелов вокруг цифр")]
+    public void Sparcer_SparceText_12()
+    {
+        var sparcer = new Sparcer();
+        Assert.AreEqual ("123)456", sparcer.SparceText ("123)456"));
     }
 }

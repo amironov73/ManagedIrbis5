@@ -37,7 +37,7 @@ public sealed class Bagel
     /// <summary>
     /// Рейтинг найденной записи.
     /// </summary>
-    public int Rating { get; set; }
+    public double Rating { get; set; }
 
     #endregion
 }

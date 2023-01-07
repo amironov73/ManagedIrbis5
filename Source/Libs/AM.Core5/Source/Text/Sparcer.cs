@@ -43,6 +43,13 @@ public sealed class Sparcer
 
     #endregion
 
+    #region Private members
+
+    private static char Normalize (char chr)
+        => chr != '\0' && chr < ' '  ? ' ' : chr;
+
+    #endregion
+
     #region Public methods
 
     /// <summary>
@@ -69,13 +76,12 @@ public sealed class Sparcer
 
         var result = new StringBuilder (input.Length);
         var quot = false;
-        var apos = false;
 
         for (var i = 0; i < input.Length; i++)
         {
-            var chr = input[i];
-            var next = i < input.Length - 1 ? input[i + 1] : '\0';
-            var prev = i > 0 ? input[i - 1] : '\0';
+            var chr = Normalize (input[i]);
+            var next = Normalize (i < input.Length - 1 ? input[i + 1] : '\0');
+            var prev = Normalize (i > 0 ? input[i - 1] : '\0');
             if (chr == ' ')
             {
                 if (next == ' ')
@@ -83,7 +89,7 @@ public sealed class Sparcer
                     continue;
                 }
 
-                if (SpaceAfter.Contains (next))
+                if (SpaceAfter.Contains (next) || SpaceBefore.Contains (prev))
                 {
                     continue;
                 }
@@ -112,30 +118,6 @@ public sealed class Sparcer
                 quot = !quot;
                 continue;
             }
-            else if (chr == '\'')
-            {
-                if (apos)
-                {
-                    result.Append (chr);
-                    if (next != ' '
-                        && !SpaceAfter.Contains (next))
-                    {
-                        result.Append (' ');
-                    }
-                }
-                else
-                {
-                    if (prev != ' ')
-                    {
-                        result.Append (' ');
-                    }
-
-                    result.Append (chr);
-                }
-
-                apos = !apos;
-                continue;
-            }
             else if (SpaceBefore.Contains (chr))
             {
                 if (prev != ' ' && i > 0
@@ -161,16 +143,20 @@ public sealed class Sparcer
                 if (next != ' '
                     && !SpaceBefore.Contains (next)
                     && !SpaceAfter.Contains (next))
-                    result.Append (' ');
                 {
-                    continue;
+                    result.Append (' ');
+
                 }
+
+                continue;
             }
 
             result.Append (chr);
         }
 
-        return result.ToString().TrimEnd();
+        result.TrimEnd();
+
+        return result.ToString();
     }
 
     #endregion
