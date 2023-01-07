@@ -68,9 +68,9 @@ namespace AM.Reporting.Engine
 
         private void RunDataBand (DataBand dataBand)
         {
-            if (page.Columns.Count > 1 && Report.Engine.UnlimitedHeight)
+            if (_page.Columns.Count > 1 && Report.Engine.UnlimitedHeight)
             {
-                dataBand.Columns.Count = page.Columns.Count;
+                dataBand.Columns.Count = _page.Columns.Count;
             }
 
             dataBand.InitDataSource();
@@ -639,10 +639,10 @@ namespace AM.Reporting.Engine
         private void ShowHierarchy (DataBand dataBand, HierarchyItem rootItem, int level, string fullRowNo)
         {
             var saveLevel = HierarchyLevel;
-            var saveIndent = hierarchyIndent;
+            var saveIndent = _hierarchyIndent;
             var saveRowNo = HierarchyRowNo;
             HierarchyLevel = level;
-            hierarchyIndent = dataBand.Indent * (level - 1);
+            _hierarchyIndent = dataBand.Indent * (level - 1);
 
             try
             {
@@ -677,7 +677,7 @@ namespace AM.Reporting.Engine
             finally
             {
                 HierarchyLevel = saveLevel;
-                hierarchyIndent = saveIndent;
+                _hierarchyIndent = saveIndent;
                 HierarchyRowNo = saveRowNo;
             }
         }

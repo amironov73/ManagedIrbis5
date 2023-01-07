@@ -39,13 +39,13 @@ namespace AM.Reporting.Engine
 
         private void RenderInnerSubreport (BandBase parentBand, SubreportObject subreport)
         {
-            var saveOutputBand = outputBand;
+            var saveOutputBand = _outputBand;
             var saveCurX = CurX;
             var saveCurY = CurY;
 
             try
             {
-                outputBand = parentBand;
+                _outputBand = parentBand;
                 CurX = subreport.Left;
                 CurY = subreport.Top;
 
@@ -53,7 +53,7 @@ namespace AM.Reporting.Engine
             }
             finally
             {
-                outputBand = saveOutputBand;
+                _outputBand = saveOutputBand;
                 CurX = saveCurX;
                 CurY = saveCurY;
             }
@@ -82,7 +82,7 @@ namespace AM.Reporting.Engine
         private void RenderOuterSubreports (BandBase parentBand)
         {
             var saveCurY = CurY;
-            var saveOriginX = originX;
+            var saveOriginX = _originX;
             var saveCurPage = CurPage;
 
             float maxY = 0;
@@ -108,7 +108,7 @@ namespace AM.Reporting.Engine
                         // restore start position
                         CurPage = saveCurPage;
                         CurY = saveCurY - subreport.Height;
-                        originX = saveOriginX + subreport.Left;
+                        _originX = saveOriginX + subreport.Left;
 
                         // do not upload generated pages to the file cache
                         PreparedPages.CanUploadToCache = false;
@@ -139,7 +139,7 @@ namespace AM.Reporting.Engine
                     CurY = maxY;
                 }
 
-                originX = saveOriginX;
+                _originX = saveOriginX;
                 PreparedPages.CanUploadToCache = true;
             }
         }

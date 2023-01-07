@@ -25,47 +25,6 @@ using System.Collections.Generic;
 
 namespace AM.Reporting.Engine
 {
-    internal enum EngineState
-    {
-        ReportStarted,
-        ReportFinished,
-        ReportPageStarted,
-        ReportPageFinished,
-        PageStarted,
-        PageFinished,
-        ColumnStarted,
-        ColumnFinished,
-        BlockStarted,
-        BlockFinished,
-        GroupStarted,
-        GroupFinished
-    }
-
-    internal class EngineStateChangedEventArgs
-    {
-        #region Fields
-
-        #endregion Fields
-
-        #region Properties
-
-        public ReportEngine Engine { get; }
-
-        public EngineState State { get; }
-
-        #endregion Properties
-
-        #region Constructors
-
-        internal EngineStateChangedEventArgs (ReportEngine engine, EngineState state)
-        {
-            this.Engine = engine;
-            this.State = state;
-        }
-
-        #endregion Constructors
-    }
-
     internal delegate void EngineStateChangedEventHandler (object sender, EngineStateChangedEventArgs e);
 
     internal class ProcessInfo
@@ -181,26 +140,26 @@ namespace AM.Reporting.Engine
     {
         #region Fields
 
-        private List<ProcessInfo> objectsToProcess;
+        private readonly List<ProcessInfo> _objectsToProcess;
 
         #endregion Fields
 
         #region Events
 
-        internal event EngineStateChangedEventHandler StateChanged;
+        internal event EngineStateChangedEventHandler? StateChanged;
 
         #endregion Events
 
-        #region Private Methods
+        #region Private methods
 
         private void ProcessObjects (object sender, EngineState state)
         {
-            for (var i = 0; i < objectsToProcess.Count; i++)
+            for (var i = 0; i < _objectsToProcess.Count; i++)
             {
-                var info = objectsToProcess[i];
+                var info = _objectsToProcess[i];
                 if (info.Process (sender, state))
                 {
-                    objectsToProcess.RemoveAt (i);
+                    _objectsToProcess.RemoveAt (i);
                     i--;
                 }
             }
@@ -209,15 +168,12 @@ namespace AM.Reporting.Engine
         private void OnStateChanged (object sender, EngineState state)
         {
             ProcessObjects (sender, state);
-            if (StateChanged != null)
-            {
-                StateChanged (sender, new EngineStateChangedEventArgs (this, state));
-            }
+            StateChanged?.Invoke (sender, new EngineStateChangedEventArgs (this, state));
         }
 
-        #endregion Private Methods
+        #endregion
 
-        #region Internal Methods
+        #region Internal methods
 
         internal void AddObjectToProcess (Base obj, XmlItem item)
         {
@@ -226,12 +182,12 @@ namespace AM.Reporting.Engine
                 return;
             }
 
-            objectsToProcess.Add (new ProcessInfo (textObj, item));
+            _objectsToProcess.Add (new ProcessInfo (textObj, item));
         }
 
-        #endregion Internal Methods
+        #endregion
 
-        #region Public Methods
+        #region Public methods
 
         /// <summary>
         /// Processes the specified text object which <b>ProcessAt</b> property is set to <b>Custom</b>.
@@ -239,18 +195,18 @@ namespace AM.Reporting.Engine
         /// <param name="obj">The text object to process.</param>
         public void ProcessObject (TextObjectBase obj)
         {
-            for (var i = 0; i < objectsToProcess.Count; i++)
+            for (var i = 0; i < _objectsToProcess.Count; i++)
             {
-                var info = objectsToProcess[i];
+                var info = _objectsToProcess[i];
                 if (info.TextObject == obj)
                 {
                     info.Process();
-                    objectsToProcess.RemoveAt (i);
+                    _objectsToProcess.RemoveAt (i);
                     break;
                 }
             }
         }
 
-        #endregion Public Methods
+        #endregion
     }
 }

@@ -2,14 +2,9 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
-/*
+/* ReportEngine.Break.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,183 +18,190 @@ using System.Windows.Forms;
 
 #nullable enable
 
-namespace AM.Reporting.Engine
+namespace AM.Reporting.Engine;
+
+public partial class ReportEngine
 {
-    public partial class ReportEngine
+    #region Private Methods
+
+    private void BreakBand
+        (
+            BandBase band
+        )
     {
-        #region Private Methods
+        var cloneBand = (BandBase) Activator.CreateInstance (band.GetType()).ThrowIfNull();
+        cloneBand.Assign (band);
+        cloneBand.SetRunning (true);
+        cloneBand.FlagMustBreak = band.FlagMustBreak;
 
-        private void BreakBand (BandBase band)
+        // clone band objects:
+        // - remove bands that can break, convert them to Text objects if necessary
+        // - skip subreports
+        foreach (Base c in band.Objects)
         {
-            var cloneBand = Activator.CreateInstance (band.GetType()) as BandBase;
-            cloneBand.Assign (band);
-            cloneBand.SetRunning (true);
-            cloneBand.FlagMustBreak = band.FlagMustBreak;
-
-            // clone band objects:
-            // - remove bands that can break, convert them to Text objects if necessary
-            // - skip subreports
-            foreach (Base c in band.Objects)
+            if (c is BandBase { CanBreak: true } @base)
             {
-                if (c is BandBase { CanBreak: true } @base)
+                if (@base.HasBorder || @base.HasFill)
                 {
-                    if (@base.HasBorder || @base.HasFill)
-                    {
-                        var textObj = new TextObject();
-                        textObj.Bounds = @base.Bounds;
-                        textObj.Border = @base.Border.Clone();
-                        textObj.Fill = @base.Fill.Clone();
-                        cloneBand.Objects.Add (textObj);
-                    }
-
-                    foreach (ReportComponentBase obj in @base.Objects)
-                    {
-                        if (obj is not BandBase)
-                        {
-                            var cloneObj =
-                                Activator.CreateInstance (obj.GetType()) as ReportComponentBase;
-                            cloneObj.AssignAll (obj);
-                            cloneObj.Anchor = AnchorStyles.Left | AnchorStyles.Top;
-                            cloneObj.Dock = DockStyle.None;
-                            cloneObj.Left = obj.AbsLeft - band.AbsLeft;
-                            cloneObj.Top = obj.AbsTop - band.AbsTop;
-                            if (cloneObj is TextObject textObject)
-                            {
-                                textObject.Highlight.Clear();
-                            }
-
-                            cloneBand.Objects.Add (cloneObj);
-                        }
-                    }
+                    var textObj = new TextObject();
+                    textObj.Bounds = @base.Bounds;
+                    textObj.Border = @base.Border.Clone();
+                    textObj.Fill = @base.Fill.Clone();
+                    cloneBand.Objects.Add (textObj);
                 }
-                else if (c is not SubreportObject)
+
+                foreach (ReportComponentBase obj in @base.Objects)
                 {
-                    var cloneObj = Activator.CreateInstance (c.GetType()) as Base;
-                    cloneObj.AssignAll (c);
-                    cloneObj.Parent = cloneBand;
+                    if (obj is not BandBase)
+                    {
+                        var cloneObj = (ReportComponentBase) Activator.CreateInstance (obj.GetType()).ThrowIfNull();
+                        cloneObj.AssignAll (obj);
+                        cloneObj.Anchor = AnchorStyles.Left | AnchorStyles.Top;
+                        cloneObj.Dock = DockStyle.None;
+                        cloneObj.Left = obj.AbsLeft - band.AbsLeft;
+                        cloneObj.Top = obj.AbsTop - band.AbsTop;
+                        if (cloneObj is TextObject textObject)
+                        {
+                            textObject.Highlight.Clear();
+                        }
+
+                        cloneBand.Objects.Add (cloneObj);
+                    }
                 }
             }
-
-            var breakTo = Activator.CreateInstance (band.GetType()) as BandBase;
-            breakTo.Assign (band);
-            breakTo.SetRunning (true);
-            breakTo.Child = null;
-            breakTo.CanGrow = true;
-            breakTo.StartNewPage = false;
-            breakTo.OutlineExpression = "";
-            breakTo.BeforePrintEvent = "";
-            breakTo.BeforeLayoutEvent = "";
-            breakTo.AfterPrintEvent = "";
-            breakTo.AfterLayoutEvent = "";
-
-            // breakTo must be breaked because it will print on a new page.
-            breakTo.FlagMustBreak = true;
-
-            // to allow clone and breaked bands to access Report
-            cloneBand.SetReport (Report);
-            breakTo.SetReport (Report);
-
-            try
+            else if (c is not SubreportObject)
             {
-                // (case: object with Anchor = bottom on a breakable band)
-                // disable re-layout
-                cloneBand.SetUpdatingLayout (true);
-                cloneBand.Height = FreeSpace;
-                cloneBand.SetUpdatingLayout (false);
+                var cloneObj = (Base) Activator.CreateInstance (c.GetType()).ThrowIfNull();
+                cloneObj.AssignAll (c);
+                cloneObj.Parent = cloneBand;
+            }
+        }
 
-                if (cloneBand.Break (breakTo))
+        var breakTo = (BandBase) Activator.CreateInstance (band.GetType()).ThrowIfNull();
+        breakTo.Assign (band);
+        breakTo.SetRunning (true);
+        breakTo.Child = null;
+        breakTo.CanGrow = true;
+        breakTo.StartNewPage = false;
+        breakTo.OutlineExpression = string.Empty;
+        breakTo.BeforePrintEvent = string.Empty;
+        breakTo.BeforeLayoutEvent = string.Empty;
+        breakTo.AfterPrintEvent = string.Empty;
+        breakTo.AfterLayoutEvent = string.Empty;
+
+        // breakTo must be breaked because it will print on a new page.
+        breakTo.FlagMustBreak = true;
+
+        // to allow clone and breaked bands to access Report
+        cloneBand.SetReport (Report);
+        breakTo.SetReport (Report);
+
+        try
+        {
+            // (case: object with Anchor = bottom on a breakable band)
+            // disable re-layout
+            cloneBand.SetUpdatingLayout (true);
+            cloneBand.Height = FreeSpace;
+            cloneBand.SetUpdatingLayout (false);
+
+            if (cloneBand.Break (breakTo))
+            {
+                AddToPreparedPages (cloneBand);
+                EndColumn();
+
+                // CalcHeight fixes the height of objects in the remaining part
+                breakTo.CalcHeight();
+                AddToPreparedPages (breakTo);
+            }
+            else
+            {
+                if (cloneBand.FlagMustBreak)
                 {
-                    AddToPreparedPages (cloneBand);
-                    EndColumn();
-
-                    // CalcHeight fixes the height of objects in the remaining part
-                    breakTo.CalcHeight();
+                    // show band as is
+                    breakTo.FlagCheckFreeSpace = false;
                     AddToPreparedPages (breakTo);
                 }
                 else
                 {
-                    if (cloneBand.FlagMustBreak)
-                    {
-                        // show band as is
-                        breakTo.FlagCheckFreeSpace = false;
-                        AddToPreparedPages (breakTo);
-                    }
-                    else
-                    {
-                        EndColumn();
-                        breakTo.CalcHeight();
-                        AddToPreparedPages (breakTo);
-                    }
+                    EndColumn();
+                    breakTo.CalcHeight();
+                    AddToPreparedPages (breakTo);
                 }
             }
-            finally
+        }
+        finally
+        {
+            cloneBand.Dispose();
+            breakTo.Dispose();
+        }
+    }
+
+    private bool BandHasHardPageBreaks
+        (
+            BandBase band
+        )
+    {
+        foreach (var obj in band.Objects)
+        {
+            if (((ReportComponentBase) obj).PageBreak)
             {
-                cloneBand.Dispose();
-                breakTo.Dispose();
+                return true;
             }
         }
 
-        private bool BandHasHardPageBreaks (BandBase band)
+        return false;
+    }
+
+    private BandBase[] SplitHardPageBreaks
+        (
+            BandBase band
+        )
+    {
+        var parts = new List<BandBase>();
+
+        BandBase? cloneBand = null;
+        float offsetY = 0;
+
+        foreach (ReportComponentBase c in band.Objects)
         {
-            foreach (var obj in band.Objects)
+            if (c.PageBreak)
             {
-                if ((obj as ReportComponentBase).PageBreak)
+                if (cloneBand != null)
                 {
-                    return true;
+                    cloneBand.Height = c.Top - offsetY;
                 }
+
+                cloneBand = null;
+                offsetY = c.Top;
             }
 
-            return false;
-        }
-
-        private BandBase[] SplitHardPageBreaks (BandBase band)
-        {
-            List<BandBase> parts = new List<BandBase>();
-
-            BandBase cloneBand = null;
-            float offsetY = 0;
-
-            foreach (ReportComponentBase c in band.Objects)
+            if (cloneBand == null)
             {
+                cloneBand = (BandBase) Activator.CreateInstance (band.GetType()).ThrowIfNull();
+                cloneBand.Assign (band);
+                cloneBand.SetRunning (true);
                 if (c.PageBreak)
                 {
-                    if (cloneBand != null)
-                    {
-                        cloneBand.Height = c.Top - offsetY;
-                    }
-
-                    cloneBand = null;
-                    offsetY = c.Top;
+                    cloneBand.StartNewPage = true;
+                    cloneBand.FirstRowStartsNewPage = true;
                 }
 
-                if (cloneBand == null)
-                {
-                    cloneBand = Activator.CreateInstance (band.GetType()) as BandBase;
-                    cloneBand.Assign (band);
-                    cloneBand.SetRunning (true);
-                    if (c.PageBreak)
-                    {
-                        cloneBand.StartNewPage = true;
-                        cloneBand.FirstRowStartsNewPage = true;
-                    }
-
-                    parts.Add (cloneBand);
-                }
-
-                var cloneObj = Activator.CreateInstance (c.GetType()) as ReportComponentBase;
-                cloneObj.AssignAll (c);
-                cloneObj.Top = c.Top - offsetY;
-                cloneObj.Parent = cloneBand;
+                parts.Add (cloneBand);
             }
 
-            if (cloneBand != null)
-            {
-                cloneBand.Height = band.Height - offsetY;
-            }
-
-            return parts.ToArray();
+            var cloneObj = (ReportComponentBase) Activator.CreateInstance (c.GetType()).ThrowIfNull();
+            cloneObj.AssignAll (c);
+            cloneObj.Top = c.Top - offsetY;
+            cloneObj.Parent = cloneBand;
         }
 
-        #endregion Private Methods
+        if (cloneBand != null)
+        {
+            cloneBand.Height = band.Height - offsetY;
+        }
+
+        return parts.ToArray();
     }
+
+    #endregion Private Methods
 }

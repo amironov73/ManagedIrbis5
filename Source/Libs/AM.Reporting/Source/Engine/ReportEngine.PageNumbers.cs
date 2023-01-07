@@ -84,13 +84,13 @@ namespace AM.Reporting.Engine
 
         private int GetLogicalPageNumber()
         {
-            var index = CurPage - firstReportPage;
+            var index = CurPage - _firstReportPage;
             return pageNumbers[index].pageNo + Report.InitialPageNumber - 1;
         }
 
         private int GetLogicalTotalPages()
         {
-            var index = CurPage - firstReportPage;
+            var index = CurPage - _firstReportPage;
             return pageNumbers[index].totalPages + Report.InitialPageNumber - 1;
         }
 
@@ -101,7 +101,7 @@ namespace AM.Reporting.Engine
         internal void IncLogicalPageNumber()
         {
             logicalPageNo++;
-            var index = CurPage - firstReportPage;
+            var index = CurPage - _firstReportPage;
             if (FirstPass || index >= pageNumbers.Count)
             {
                 var info = new PageNumberInfo (logicalPageNo);

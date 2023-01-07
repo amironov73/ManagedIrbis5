@@ -27,10 +27,10 @@ namespace AM.Reporting.Engine
     {
         #region Fields
 
-        private List<BandBase> reprintHeaders;
-        private List<BandBase> keepReprintHeaders;
-        private List<BandBase> reprintFooters;
-        private List<BandBase> keepReprintFooters;
+        private List<BandBase> _reprintHeaders;
+        private List<BandBase> _keepReprintHeaders;
+        private List<BandBase> _reprintFooters;
+        private List<BandBase> _keepReprintFooters;
 
         #endregion Fields
 
@@ -38,25 +38,25 @@ namespace AM.Reporting.Engine
 
         private void InitReprint()
         {
-            reprintHeaders = new List<BandBase>();
-            keepReprintHeaders = new List<BandBase>();
-            reprintFooters = new List<BandBase>();
-            keepReprintFooters = new List<BandBase>();
+            _reprintHeaders = new List<BandBase>();
+            _keepReprintHeaders = new List<BandBase>();
+            _reprintFooters = new List<BandBase>();
+            _keepReprintFooters = new List<BandBase>();
         }
 
         private void ShowReprintHeaders()
         {
-            var saveOriginX = originX;
+            var saveOriginX = _originX;
 
-            foreach (var band in reprintHeaders)
+            foreach (var band in _reprintHeaders)
             {
                 band.Repeated = true;
-                originX = band.ReprintOffset;
+                _originX = band.ReprintOffset;
                 ShowBand (band);
                 band.Repeated = false;
             }
 
-            originX = saveOriginX;
+            _originX = saveOriginX;
         }
 
         private void ShowReprintFooters()
@@ -66,96 +66,96 @@ namespace AM.Reporting.Engine
 
         private void ShowReprintFooters (bool repeated)
         {
-            var saveOriginX = originX;
+            var saveOriginX = _originX;
 
             // show footers in reverse order
-            for (var i = reprintFooters.Count - 1; i >= 0; i--)
+            for (var i = _reprintFooters.Count - 1; i >= 0; i--)
             {
-                var band = reprintFooters[i];
+                var band = _reprintFooters[i];
                 band.Repeated = repeated;
                 band.FlagCheckFreeSpace = false;
-                originX = band.ReprintOffset;
+                _originX = band.ReprintOffset;
                 ShowBand (band);
                 band.Repeated = false;
                 band.FlagCheckFreeSpace = true;
             }
 
-            originX = saveOriginX;
+            _originX = saveOriginX;
         }
 
         private void AddReprint (BandBase band)
         {
             // save current offset and use it later when reprinting a band.
             // it is required when printing subreports
-            band.ReprintOffset = originX;
+            band.ReprintOffset = _originX;
 
             if (IsKeeping)
             {
                 if (band is DataHeaderBand or GroupHeaderBand)
                 {
-                    keepReprintHeaders.Add (band);
+                    _keepReprintHeaders.Add (band);
                 }
                 else
                 {
-                    keepReprintFooters.Add (band);
+                    _keepReprintFooters.Add (band);
                 }
             }
             else
             {
                 if (band is DataHeaderBand or GroupHeaderBand)
                 {
-                    reprintHeaders.Add (band);
+                    _reprintHeaders.Add (band);
                 }
                 else
                 {
-                    reprintFooters.Add (band);
+                    _reprintFooters.Add (band);
                 }
             }
         }
 
         private void RemoveReprint (BandBase band)
         {
-            if (keepReprintHeaders.Contains (band))
+            if (_keepReprintHeaders.Contains (band))
             {
-                keepReprintHeaders.Remove (band);
+                _keepReprintHeaders.Remove (band);
             }
 
-            if (reprintHeaders.Contains (band))
+            if (_reprintHeaders.Contains (band))
             {
-                reprintHeaders.Remove (band);
+                _reprintHeaders.Remove (band);
             }
 
-            if (keepReprintFooters.Contains (band))
+            if (_keepReprintFooters.Contains (band))
             {
-                keepReprintFooters.Remove (band);
+                _keepReprintFooters.Remove (band);
             }
 
-            if (reprintFooters.Contains (band))
+            if (_reprintFooters.Contains (band))
             {
-                reprintFooters.Remove (band);
+                _reprintFooters.Remove (band);
             }
         }
 
         private void StartKeepReprint()
         {
-            keepReprintHeaders.Clear();
-            keepReprintFooters.Clear();
+            _keepReprintHeaders.Clear();
+            _keepReprintFooters.Clear();
         }
 
         private void EndKeepReprint()
         {
-            foreach (var band in keepReprintHeaders)
+            foreach (var band in _keepReprintHeaders)
             {
-                reprintHeaders.Add (band);
+                _reprintHeaders.Add (band);
             }
 
-            foreach (var band in keepReprintFooters)
+            foreach (var band in _keepReprintFooters)
             {
-                reprintFooters.Add (band);
+                _reprintFooters.Add (band);
             }
 
-            keepReprintHeaders.Clear();
-            keepReprintFooters.Clear();
+            _keepReprintHeaders.Clear();
+            _keepReprintFooters.Clear();
         }
 
         private float GetFootersHeight()
@@ -163,7 +163,7 @@ namespace AM.Reporting.Engine
             float result = 0;
             var saveRepeated = false;
 
-            foreach (var band in reprintFooters)
+            foreach (var band in _reprintFooters)
             {
                 saveRepeated = band.Repeated;
                 band.Repeated = true;
@@ -171,7 +171,7 @@ namespace AM.Reporting.Engine
                 band.Repeated = saveRepeated;
             }
 
-            foreach (var band in keepReprintFooters)
+            foreach (var band in _keepReprintFooters)
             {
                 saveRepeated = band.Repeated;
                 band.Repeated = true;

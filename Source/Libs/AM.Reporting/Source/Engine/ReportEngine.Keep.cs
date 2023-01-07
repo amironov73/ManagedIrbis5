@@ -21,106 +21,105 @@ using AM.Reporting.Utils;
 
 #nullable enable
 
-namespace AM.Reporting.Engine
+namespace AM.Reporting.Engine;
+
+public partial class ReportEngine
 {
-    public partial class ReportEngine
+    #region Fields
+
+    private int _keepPosition;
+    private XmlItem _keepOutline;
+    private int _keepBookmarks;
+    private float _keepCurX;
+    private float _keepDeltaY;
+
+    #endregion Fields
+
+    #region Properties
+
+    /// <summary>
+    /// Returns true of keeping is enabled
+    /// </summary>
+    public bool IsKeeping { get; private set; }
+
+    /// <summary>
+    /// Returns keeping position
+    /// </summary>
+    public float KeepCurY { get; private set; }
+
+    #endregion Properties
+
+    #region Private Methods
+
+    private void StartKeep (BandBase band)
     {
-        #region Fields
-
-        private int keepPosition;
-        private XmlItem keepOutline;
-        private int keepBookmarks;
-        private float keepCurX;
-        private float keepDeltaY;
-
-        #endregion Fields
-
-        #region Properties
-
-        /// <summary>
-        /// Returns true of keeping is enabled
-        /// </summary>
-        public bool IsKeeping { get; private set; }
-
-        /// <summary>
-        /// Returns keeping position
-        /// </summary>
-        public float KeepCurY { get; private set; }
-
-        #endregion Properties
-
-        #region Private Methods
-
-        private void StartKeep (BandBase band)
+        // do not keep the first row on a page, avoid empty first page
+        if (IsKeeping || band is { AbsRowNo: 1, FirstRowStartsNewPage: false })
         {
-            // do not keep the first row on a page, avoid empty first page
-            if (IsKeeping || band is { AbsRowNo: 1, FirstRowStartsNewPage: false })
-            {
-                return;
-            }
-
-            IsKeeping = true;
-
-            keepPosition = PreparedPages.CurPosition;
-            keepOutline = PreparedPages.Outline.CurPosition;
-            keepBookmarks = PreparedPages.Bookmarks.CurPosition;
-            KeepCurY = CurY;
-            Report.Dictionary.Totals.StartKeep();
-            StartKeepReprint();
+            return;
         }
 
-        private void CutObjects()
-        {
-            keepCurX = CurX;
-            keepDeltaY = CurY - KeepCurY;
-            PreparedPages.CutObjects (keepPosition);
-            CurY = KeepCurY;
-        }
+        IsKeeping = true;
 
-        private void PasteObjects()
-        {
-            PreparedPages.PasteObjects (CurX - keepCurX, CurY - KeepCurY);
-            PreparedPages.Outline.Shift (keepOutline, CurY);
-            PreparedPages.Bookmarks.Shift (keepBookmarks, CurY);
-            EndKeep();
-            CurY += keepDeltaY;
-        }
-
-        #endregion Private Methods
-
-        #region Public Methods
-
-        /// <summary>
-        /// Starts the keep mechanism.
-        /// </summary>
-        /// <remarks>
-        /// Use this method along with the <see cref="EndKeep"/> method if you want to keep
-        /// several bands together. Call <b>StartKeep</b> method before printing the first band
-        /// you want to keep, then call the <b>EndKeep</b> method after printing the last band you want to keep.
-        /// </remarks>
-        public void StartKeep()
-        {
-            StartKeep (null);
-        }
-
-        /// <summary>
-        /// Ends the keep mechanism.
-        /// </summary>
-        /// <remarks>
-        /// Use this method along with the <see cref="StartKeep()"/> method if you want to keep
-        /// several bands together. Call <b>StartKeep</b> method before printing the first band
-        /// you want to keep, then call the <b>EndKeep</b> method after printing the last band you want to keep.
-        /// </remarks>
-        public void EndKeep()
-        {
-            if (IsKeeping)
-            {
-                Report.Dictionary.Totals.EndKeep();
-                EndKeepReprint();
-                IsKeeping = false;
-            }
-        }
-
-        #endregion Public Methods
+        _keepPosition = PreparedPages.CurPosition;
+        _keepOutline = PreparedPages.Outline.CurPosition;
+        _keepBookmarks = PreparedPages.Bookmarks.CurPosition;
+        KeepCurY = CurY;
+        Report.Dictionary.Totals.StartKeep();
+        StartKeepReprint();
     }
+
+    private void CutObjects()
+    {
+        _keepCurX = CurX;
+        _keepDeltaY = CurY - KeepCurY;
+        PreparedPages.CutObjects (_keepPosition);
+        CurY = KeepCurY;
+    }
+
+    private void PasteObjects()
+    {
+        PreparedPages.PasteObjects (CurX - _keepCurX, CurY - KeepCurY);
+        PreparedPages.Outline.Shift (_keepOutline, CurY);
+        PreparedPages.Bookmarks.Shift (_keepBookmarks, CurY);
+        EndKeep();
+        CurY += _keepDeltaY;
+    }
+
+    #endregion Private Methods
+
+    #region Public Methods
+
+    /// <summary>
+    /// Starts the keep mechanism.
+    /// </summary>
+    /// <remarks>
+    /// Use this method along with the <see cref="EndKeep"/> method if you want to keep
+    /// several bands together. Call <b>StartKeep</b> method before printing the first band
+    /// you want to keep, then call the <b>EndKeep</b> method after printing the last band you want to keep.
+    /// </remarks>
+    public void StartKeep()
+    {
+        StartKeep (null);
+    }
+
+    /// <summary>
+    /// Ends the keep mechanism.
+    /// </summary>
+    /// <remarks>
+    /// Use this method along with the <see cref="StartKeep()"/> method if you want to keep
+    /// several bands together. Call <b>StartKeep</b> method before printing the first band
+    /// you want to keep, then call the <b>EndKeep</b> method after printing the last band you want to keep.
+    /// </remarks>
+    public void EndKeep()
+    {
+        if (IsKeeping)
+        {
+            Report.Dictionary.Totals.EndKeep();
+            EndKeepReprint();
+            IsKeeping = false;
+        }
+    }
+
+    #endregion Public Methods
 }
