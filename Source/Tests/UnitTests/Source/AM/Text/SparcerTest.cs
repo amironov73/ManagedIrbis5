@@ -129,7 +129,11 @@ public sealed class SparcerTest
     public void Sparcer_SparceText_11()
     {
         var sparcer = new Sparcer();
-        Assert.AreEqual ("hello)- world", sparcer.SparceText ("hello)- world"));
+        Assert.AreEqual ("hello) - world", sparcer.SparceText ("hello)- world"));
+        Assert.AreEqual ("hello-world", sparcer.SparceText ("hello-world"));
+        Assert.AreEqual ("hello - world", sparcer.SparceText ("hello - world"));
+        Assert.AreEqual ("hello - world", sparcer.SparceText ("hello -world"));
+        Assert.AreEqual ("hello - world", sparcer.SparceText ("hello- world"));
     }
 
     [TestMethod]

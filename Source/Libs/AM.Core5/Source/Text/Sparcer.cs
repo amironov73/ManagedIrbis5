@@ -118,6 +118,22 @@ public sealed class Sparcer
                 quot = !quot;
                 continue;
             }
+            else if (chr == '-')
+            {
+                if (prev == ' ' && next != ' ')
+                {
+                    result.Append (chr);
+                    result.Append (' ');
+                    continue;
+                }
+
+                if (next == ' ' && prev != ' ')
+                {
+                    result.Append (' ');
+                    result.Append (chr);
+                    continue;
+                }
+            }
             else if (SpaceBefore.Contains (chr))
             {
                 if (prev != ' ' && i > 0
