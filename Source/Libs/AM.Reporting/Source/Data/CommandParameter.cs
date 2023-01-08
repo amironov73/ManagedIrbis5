@@ -2,12 +2,9 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
+// ReSharper disable VirtualMemberCallInConstructor
 
 /* CommandParameter.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -34,15 +31,12 @@ namespace AM.Reporting.Data;
 public class CommandParameter
     : Base
 {
+    #region Nested classes
+
     private enum ParamValue
     {
         Uninitialized
     }
-
-    #region Fields
-
-    private string? _defaultValue;
-    private object? value;
 
     #endregion
 
@@ -91,7 +85,7 @@ public class CommandParameter
         set
         {
             _defaultValue = value;
-            this.value = null;
+            this._value = null;
         }
     }
 
@@ -105,17 +99,12 @@ public class CommandParameter
         {
             if (!string.IsNullOrEmpty (Expression) && Report!.IsRunning)
             {
-                value = Report.Calc (Expression);
+                _value = Report.Calc (Expression);
             }
 
-            if (value is null)
-            {
-                value = new Variant (DefaultValue);
-            }
-
-            return value;
+            return _value ??= new Variant (DefaultValue);
         }
-        set => this.value = value;
+        set => _value = value;
     }
 
     /// <summary>
@@ -141,16 +130,42 @@ public class CommandParameter
         }
     }
 
-    internal object LastValue { get; set; }
+    internal object? LastValue { get; set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CommandParameter"/> class with default settings.
+    /// </summary>
+    public CommandParameter()
+    {
+        Expression = string.Empty;
+        DefaultValue = string.Empty;
+        SetFlags (Flags.CanEdit | Flags.CanCopy, false);
+    }
+
+    #endregion
+
+    #region Private members
+
+    private string? _defaultValue;
+    private object? _value;
 
     #endregion
 
     #region Public Methods
 
-    /// <inheritdoc/>
-    public override void Serialize (ReportWriter writer)
+    /// <inheritdoc cref="Base.Serialize"/>
+    public override void Serialize
+        (
+            ReportWriter writer
+        )
     {
-        var c = (writer.DiffObject as CommandParameter)!;
+        Sure.NotNull (writer);
+
+        var c = (CommandParameter) writer.DiffObject.ThrowIfNull();
         base.Serialize (writer);
 
         if (DataType != c.DataType)
@@ -179,9 +194,14 @@ public class CommandParameter
         }
     }
 
-    /// <inheritdoc/>
-    public override void Assign (Base source)
+    /// <inheritdoc cref="Base.Assign"/>
+    public override void Assign
+        (
+            Base source
+        )
     {
+        Sure.NotNull (source);
+
         base.Assign (source);
         var src = (source as CommandParameter)!;
         Name = src.Name;
@@ -204,14 +224,4 @@ public class CommandParameter
     }
 
     #endregion
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="CommandParameter"/> class with default settings.
-    /// </summary>
-    public CommandParameter()
-    {
-        Expression = "";
-        DefaultValue = "";
-        SetFlags (Flags.CanEdit | Flags.CanCopy, false);
-    }
 }

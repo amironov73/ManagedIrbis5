@@ -48,7 +48,7 @@ namespace AM.Reporting.Data
             for (var i = 0; i < table.Columns.Count; i++)
             {
                 // gather types here
-                Dictionary<Type, int> types = new Dictionary<Type, int>();
+                var types = new Dictionary<Type, int>();
 
                 // check all values in the column
                 for (var j = 0; j < lines.Count; j++)
@@ -168,7 +168,7 @@ namespace AM.Reporting.Data
                 return null;
             }
 
-            List<string> lines = new List<string>();
+            var lines = new List<string>();
             if (maxLines == 0)
             {
                 maxLines = int.MaxValue;
@@ -199,19 +199,23 @@ namespace AM.Reporting.Data
             return lines;
         }
 
-        internal static DataTable CreateDataTable (CsvConnectionStringBuilder builder, List<string> rawLines)
+        internal static DataTable? CreateDataTable
+            (
+                CsvConnectionStringBuilder builder,
+                List<string>? rawLines
+            )
         {
-            if (rawLines == null)
+            if (rawLines is null)
             {
                 return null;
             }
 
             // split each line to array of values
-            List<string[]> lines = new List<string[]>();
+            var lines = new List<string[]>();
             for (var i = 0; i < rawLines.Count; i++)
             {
                 var line = rawLines[i];
-                string[] values = line.Split (builder.Separator.ToCharArray());
+                var values = line.Split (builder.Separator.ToCharArray());
                 if (builder.RemoveQuotationMarks)
                 {
                     for (var j = 0; j < values.Length; j++)
@@ -244,7 +248,7 @@ namespace AM.Reporting.Data
 
             var table = new DataTable (tableName);
 
-            string[] fields = lines[0];
+            var fields = lines[0];
 
             // create table columns
             for (var i = 0; i < fields.Length; i++)
