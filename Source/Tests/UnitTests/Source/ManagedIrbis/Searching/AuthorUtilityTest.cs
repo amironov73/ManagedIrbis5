@@ -53,6 +53,25 @@ public sealed class AuthorUtilityTest
     }
 
     [TestMethod]
+    [Description ("Двойная фамилия")]
+    public void AuthorUtility_WithComma_5()
+    {
+        Assert.AreEqual ("Римский-Корсаков", AuthorUtility.WithComma ("Римский-Корсаков"));
+        Assert.AreEqual ("Римский-Корсаков, Николай Андреевич", AuthorUtility.WithComma ("Римский-Корсаков Николай Андреевич"));
+        Assert.AreEqual ("Римский-Корсаков, Николай Андреевич", AuthorUtility.WithComma ("Римский-Корсаков, Николай Андреевич"));
+    }
+
+    [TestMethod]
+    [Description ("Обработка лишних символов")]
+    public void AuthorUtility_WithComma_6()
+    {
+        Assert.AreEqual ("Иванов, Иван Иванович", AuthorUtility.WithComma ("  Иванов  Иван Иванович  "));
+        Assert.AreEqual ("Иванов, Иван Иванович", AuthorUtility.WithComma ("  Иванов  ,  Иван Иванович  "));
+
+        Assert.AreEqual ("Иванов, Иван Иванович", AuthorUtility.WithComma ("Иванов (Иван Иванович)"));
+    }
+
+    [TestMethod]
     [Description ("Пустая строка")]
     public void AuthorUtility_WithoutComma_1()
     {
@@ -81,6 +100,25 @@ public sealed class AuthorUtilityTest
     {
         Assert.AreEqual ("Иванов Иван Иванович", AuthorUtility.WithoutComma ("Иванов Иван Иванович"));
         Assert.AreEqual ("Иванов Иван Иванович", AuthorUtility.WithoutComma ("Иванов, Иван Иванович"));
+    }
+
+    [TestMethod]
+    [Description ("Двойная фамилия")]
+    public void AuthorUtility_WithoutComma_5()
+    {
+        Assert.AreEqual ("Римский-Корсаков", AuthorUtility.WithoutComma ("Римский-Корсаков"));
+        Assert.AreEqual ("Римский-Корсаков Николай Андреевич", AuthorUtility.WithoutComma ("Римский-Корсаков Николай Андреевич"));
+        Assert.AreEqual ("Римский-Корсаков Николай Андреевич", AuthorUtility.WithoutComma ("Римский-Корсаков, Николай Андреевич"));
+    }
+
+    [TestMethod]
+    [Description ("Обработка лишних символов")]
+    public void AuthorUtility_WithoutComma_6()
+    {
+        Assert.AreEqual ("Иванов Иван Иванович", AuthorUtility.WithoutComma ("  Иванов  Иван Иванович  "));
+        Assert.AreEqual ("Иванов Иван Иванович", AuthorUtility.WithoutComma ("  Иванов  ,  Иван Иванович  "));
+
+        Assert.AreEqual ("Иванов Иван Иванович", AuthorUtility.WithoutComma ("Иванов (Иван Иванович)"));
     }
 
     [TestMethod]
@@ -131,6 +169,38 @@ public sealed class AuthorUtilityTest
             (
                 new[] { "Иванов, Иван Иванович", "Иванов Иван Иванович" },
                 AuthorUtility.WithAndWithoutComma ("Иванов, Иван Иванович")
+            );
+    }
+
+    [TestMethod]
+    [Description ("Двойная фамилия")]
+    public void AuthorUtility_WithAndWithoutComma_5()
+    {
+        CollectionAssert.AreEqual
+            (
+                new[] { "Римский-Корсаков, Николай Андреевич", "Римский-Корсаков Николай Андреевич" },
+                AuthorUtility.WithAndWithoutComma ("Римский-Корсаков Николай Андреевич")
+            );
+        CollectionAssert.AreEqual
+            (
+                new[] { "Римский-Корсаков, Николай Андреевич", "Римский-Корсаков Николай Андреевич" },
+                AuthorUtility.WithAndWithoutComma ("Римский-Корсаков, Николай Андреевич")
+            );
+    }
+
+    [TestMethod]
+    [Description ("Обработка лишних символов")]
+    public void AuthorUtility_WithAndWithoutComma_6()
+    {
+        CollectionAssert.AreEqual
+            (
+                new[] { "Иванов, Иван Иванович", "Иванов Иван Иванович" },
+                AuthorUtility.WithAndWithoutComma ("  Иванов  Иван  Иванович  ")
+            );
+        CollectionAssert.AreEqual
+            (
+                new[] { "Иванов, Иван Иванович", "Иванов Иван Иванович" },
+                AuthorUtility.WithAndWithoutComma ("  Иванов , Иван  Иванович  ")
             );
     }
 }
