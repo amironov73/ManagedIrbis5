@@ -15,20 +15,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 
 using AM;
 using AM.AOT.Stemming;
 using AM.Collections;
 using AM.Text;
 
-using ManagedIrbis.Identifiers;
 using ManagedIrbis.ImportExport;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Providers;
 
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 #endregion
 
@@ -42,6 +39,11 @@ namespace ManagedIrbis.Searching;
 public class SamovarSearcher
 {
     #region Properties
+
+    /// <summary>
+    /// Префикс, применяемый для поиска по автору.
+    /// </summary>
+    public string? AuthorPrefix { get; set; }
 
     /// <summary>
     /// Список применяемых префиксов.
@@ -80,10 +82,10 @@ public class SamovarSearcher
 
         ServiceProvider = serviceProvider;
         Suffix = "$";
+        AuthorPrefix = CommonSearches.AuthorPrefix;
         Prefixes = new List<string>
         {
             CommonSearches.KeywordPrefix,
-            CommonSearches.AuthorPrefix,
             CommonSearches.CollectivePrefix,
             CommonSearches.TitlePrefix
         };
@@ -98,7 +100,8 @@ public class SamovarSearcher
             IList<Bagel> result,
             ISyncProvider connection,
             string expression,
-            SamovarOptions options
+            SamovarOptions options,
+            double rating
         )
     {
         if (string.IsNullOrEmpty (expression))
@@ -126,7 +129,8 @@ public class SamovarSearcher
             {
                 var bagel = new Bagel
                 {
-                    Record = record
+                    Record = record,
+                    Rating = rating
                 };
                 result.Add (bagel);
             }
@@ -157,17 +161,43 @@ public class SamovarSearcher
             return string.Empty;
         }
 
+        var suffix = withTrimming ? Suffix : string.Empty;
         var first = true;
         var result = new StringBuilder();
         foreach (var prefix in Prefixes)
         {
+            if (prefix.SameString (AuthorPrefix))
+            {
+                // поиск по автору будет отработан отдельно
+                continue;
+            }
+
             if (!first)
             {
                 result.Append (" + ");
             }
 
-            result.Append (Q.WrapIfNeeded (prefix + query));
+            result.Append (Q.WrapIfNeeded (prefix + query + suffix));
             first = false;
+        }
+
+        if (!string.IsNullOrEmpty (AuthorPrefix))
+        {
+            var authorNames = AuthorUtility.WithAndWithoutComma (query);
+            if (!authorNames.IsNullOrEmpty())
+            {
+                foreach (var author in authorNames)
+                {
+                    if (!first)
+                    {
+                        result.Append (" + ");
+                    }
+
+                    result.Append (Q.WrapIfNeeded (AuthorPrefix + author + suffix));
+                    first = false;
+                }
+
+            }
         }
 
         return result.ToString();
@@ -197,7 +227,7 @@ public class SamovarSearcher
 
         options ??= new ();
 
-        var database = connection.EnsureDatabase (options.Database);
+        // var database = connection.EnsureDatabase (options.Database);
         var outputLimit = options.OutputLimit;
         if (outputLimit < 1)
         {
@@ -206,20 +236,34 @@ public class SamovarSearcher
 
         var result = new List<Bagel>();
         var expression = _BuildStraightExpression (query, false);
-        if (!_Search (result, connection, expression, options))
+        if (!_Search (result, connection, expression, options, 1_000))
         {
             return Array.Empty<Bagel>();
         }
 
+        if (result.Count < outputLimit)
+        {
+            expression = _BuildStraightExpression (query, true);
+            if (!_Search (result, connection, expression, options, 500))
+            {
+                return Array.Empty<Bagel>();
+            }
+        }
+
         var evaluator = ServiceProvider.GetService <IRelevanceEvaluator>()
-            ?? new StandardRelevanceEvaluator (ServiceProvider, expression);
+                        ?? new StandardRelevanceEvaluator (ServiceProvider, expression);
 
         foreach (var bagel in result)
         {
-            bagel.Rating = evaluator.EvaluateRelevance (bagel.Record!);
+            if (bagel.Rating == 0)
+            {
+                bagel.Rating = evaluator.EvaluateRelevance (bagel.Record!);
+            }
         }
 
-        return result.ToArray();
+        result.Sort (Bagel.ReverseComparer);
+
+        return result.Take (outputLimit).ToArray();
     }
 
     #endregion
