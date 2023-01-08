@@ -2,14 +2,10 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
 
-/*
+/* CsvConnectionStringBuilder.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,192 +19,197 @@ using System.Globalization;
 
 #nullable enable
 
-namespace AM.Reporting.Data
+namespace AM.Reporting.Data;
+
+/// <summary>
+/// Represents the CsvDataConnection connection string builder.
+/// </summary>
+/// <remarks>
+/// Use this class to parse connection string returned by the <b>CsvDataConnection</b> class.
+/// </remarks>
+public class CsvConnectionStringBuilder
+    : DbConnectionStringBuilder
 {
+    #region Properties
+
     /// <summary>
-    /// Represents the CsvDataConnection connection string builder.
+    /// Gets or sets the path to .csv file.
     /// </summary>
-    /// <remarks>
-    /// Use this class to parse connection string returned by the <b>CsvDataConnection</b> class.
-    /// </remarks>
-    public class CsvConnectionStringBuilder : DbConnectionStringBuilder
+    public string CsvFile
     {
-        #region Properties
-
-        /// <summary>
-        /// Gets or sets the path to .csv file.
-        /// </summary>
-        public string CsvFile
+        get
         {
-            get
+            if (TryGetValue ("CsvFile", out var csvFile))
             {
-                if (TryGetValue ("CsvFile", out var csvFile))
-                {
-                    return (string)csvFile;
-                }
-
-                return "";
+                return (string)csvFile;
             }
-            set => base["CsvFile"] = value;
+
+            return "";
         }
-
-        /// <summary>
-        /// Gets or sets the codepage of .csv file.
-        /// </summary>
-        public int Codepage
-        {
-            get
-            {
-                if (TryGetValue ("Codepage", out var codepage))
-                {
-                    return int.Parse ((string)codepage);
-                }
-
-                return Encoding.Default.CodePage;
-            }
-            set => base["Codepage"] = value;
-        }
-
-        /// <summary>
-        /// Gets or sets the separator.
-        /// </summary>
-        public string Separator
-        {
-            get
-            {
-                if (TryGetValue ("Separator", out var separator))
-                {
-                    return (string)separator;
-                }
-
-                return ";";
-            }
-            set => base["Separator"] = value;
-        }
-
-        /// <summary>
-        /// Gets or sets the value indicating that field names should be loaded from the first string of the file.
-        /// </summary>
-        public bool FieldNamesInFirstString
-        {
-            get
-            {
-                if (TryGetValue ("FieldNamesInFirstString", out var fieldNamesInFirstString))
-                {
-                    return fieldNamesInFirstString.ToString().ToLower() == "true";
-                }
-
-                return false;
-            }
-            set => base["FieldNamesInFirstString"] = value.ToString().ToLower();
-        }
-
-        /// <summary>
-        /// Gets or sets the value indicating that quotation marks should be removed.
-        /// </summary>
-        public bool RemoveQuotationMarks
-        {
-            get
-            {
-                if (TryGetValue ("RemoveQuotationMarks", out var removeQuotationMarks))
-                {
-                    return removeQuotationMarks.ToString().ToLower() == "true";
-                }
-
-                return true;
-            }
-            set => base["RemoveQuotationMarks"] = value.ToString().ToLower();
-        }
-
-        /// <summary>
-        /// Gets or sets the value indicating that field types should be converted.
-        /// </summary>
-        public bool ConvertFieldTypes
-        {
-            get
-            {
-                if (TryGetValue ("ConvertFieldTypes", out var convertFieldTypes))
-                {
-                    return convertFieldTypes.ToString().ToLower() == "true";
-                }
-
-                return true;
-            }
-            set => base["ConvertFieldTypes"] = value.ToString().ToLower();
-        }
-
-        /// <summary>
-        /// Gets or sets locale name used to auto-convert numeric fields, e.g. "en-US".
-        /// </summary>
-        public string NumberFormat
-        {
-            get
-            {
-                if (TryGetValue ("NumberFormat", out var numberFormat))
-                {
-                    return numberFormat.ToString();
-                }
-
-                return CultureInfo.CurrentCulture.Name;
-            }
-            set => base["NumberFormat"] = value;
-        }
-
-        /// <summary>
-        /// Gets or sets locale name used to auto-convert currency fields, e.g. "en-US".
-        /// </summary>
-        public string CurrencyFormat
-        {
-            get
-            {
-                if (TryGetValue ("CurrencyFormat", out var currencyFormat))
-                {
-                    return currencyFormat.ToString();
-                }
-
-                return CultureInfo.CurrentCulture.Name;
-            }
-            set => base["CurrencyFormat"] = value;
-        }
-
-        /// <summary>
-        /// Gets or sets locale name used to auto-convert datetime fields, e.g. "en-US".
-        /// </summary>
-        public string DateTimeFormat
-        {
-            get
-            {
-                if (TryGetValue ("DateTimeFormat", out var dateTimeFormat))
-                {
-                    return dateTimeFormat.ToString();
-                }
-
-                return CultureInfo.CurrentCulture.Name;
-            }
-            set => base["DateTimeFormat"] = value;
-        }
-
-        #endregion Properties
-
-        #region Constructors
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CsvConnectionStringBuilder"/> class.
-        /// </summary>
-        public CsvConnectionStringBuilder()
-        {
-            ConnectionString = "";
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CsvConnectionStringBuilder"/> class with a specified connection string.
-        /// </summary>
-        /// <param name="connectionString">The connection string.</param>
-        public CsvConnectionStringBuilder (string connectionString) : base()
-        {
-            ConnectionString = connectionString;
-        }
-
-        #endregion Constructors
+        set => base["CsvFile"] = value;
     }
+
+    /// <summary>
+    /// Gets or sets the codepage of .csv file.
+    /// </summary>
+    public int Codepage
+    {
+        get
+        {
+            if (TryGetValue ("Codepage", out var codepage))
+            {
+                return int.Parse ((string)codepage);
+            }
+
+            return Encoding.Default.CodePage;
+        }
+        set => base["Codepage"] = value;
+    }
+
+    /// <summary>
+    /// Gets or sets the separator.
+    /// </summary>
+    public string Separator
+    {
+        get
+        {
+            if (TryGetValue ("Separator", out var separator))
+            {
+                return (string)separator;
+            }
+
+            return ";";
+        }
+        set => base["Separator"] = value;
+    }
+
+    /// <summary>
+    /// Gets or sets the value indicating that field names should be loaded from the first string of the file.
+    /// </summary>
+    public bool FieldNamesInFirstString
+    {
+        get
+        {
+            if (TryGetValue ("FieldNamesInFirstString", out var fieldNamesInFirstString))
+            {
+                return fieldNamesInFirstString.ToString()!.ToLower() == "true";
+            }
+
+            return false;
+        }
+        set => base["FieldNamesInFirstString"] = value.ToString().ToLower();
+    }
+
+    /// <summary>
+    /// Gets or sets the value indicating that quotation marks should be removed.
+    /// </summary>
+    public bool RemoveQuotationMarks
+    {
+        get
+        {
+            if (TryGetValue ("RemoveQuotationMarks", out var removeQuotationMarks))
+            {
+                return removeQuotationMarks.ToString()!.ToLower() == "true";
+            }
+
+            return true;
+        }
+        set => base["RemoveQuotationMarks"] = value.ToString().ToLower();
+    }
+
+    /// <summary>
+    /// Gets or sets the value indicating that field types should be converted.
+    /// </summary>
+    public bool ConvertFieldTypes
+    {
+        get
+        {
+            if (TryGetValue ("ConvertFieldTypes", out var convertFieldTypes))
+            {
+                return convertFieldTypes.ToString()!.ToLower() == "true";
+            }
+
+            return true;
+        }
+        set => base["ConvertFieldTypes"] = value.ToString().ToLower();
+    }
+
+    /// <summary>
+    /// Gets or sets locale name used to auto-convert numeric fields, e.g. "en-US".
+    /// </summary>
+    public string NumberFormat
+    {
+        get
+        {
+            if (TryGetValue ("NumberFormat", out var numberFormat))
+            {
+                return numberFormat.ToString()!;
+            }
+
+            return CultureInfo.CurrentCulture.Name;
+        }
+        set => base["NumberFormat"] = value;
+    }
+
+    /// <summary>
+    /// Gets or sets locale name used to auto-convert currency fields, e.g. "en-US".
+    /// </summary>
+    public string CurrencyFormat
+    {
+        get
+        {
+            if (TryGetValue ("CurrencyFormat", out var currencyFormat))
+            {
+                return currencyFormat.ToString()!;
+            }
+
+            return CultureInfo.CurrentCulture.Name;
+        }
+        set => base["CurrencyFormat"] = value;
+    }
+
+    /// <summary>
+    /// Gets or sets locale name used to auto-convert datetime fields, e.g. "en-US".
+    /// </summary>
+    public string DateTimeFormat
+    {
+        get
+        {
+            if (TryGetValue ("DateTimeFormat", out var dateTimeFormat))
+            {
+                return dateTimeFormat.ToString()!;
+            }
+
+            return CultureInfo.CurrentCulture.Name;
+        }
+        set => base["DateTimeFormat"] = value;
+    }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CsvConnectionStringBuilder"/> class.
+    /// </summary>
+    public CsvConnectionStringBuilder()
+    {
+        ConnectionString = string.Empty;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CsvConnectionStringBuilder"/> class with a specified connection string.
+    /// </summary>
+    /// <param name="connectionString">The connection string.</param>
+    public CsvConnectionStringBuilder
+        (
+            string connectionString
+        )
+    {
+        Sure.NotNullNorEmpty (connectionString);
+
+        ConnectionString = connectionString;
+    }
+
+    #endregion
 }

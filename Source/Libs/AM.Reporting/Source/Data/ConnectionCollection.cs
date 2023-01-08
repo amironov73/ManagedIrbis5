@@ -2,23 +2,14 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
+// ReSharper disable UnusedMember.Global
 
-/*
+/* ConnectionCollection.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
-
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Collections;
 
 using AM.Reporting.Utils;
 
@@ -26,30 +17,43 @@ using AM.Reporting.Utils;
 
 #nullable enable
 
-namespace AM.Reporting.Data
-{
-    /// <summary>
-    /// Represents the collection of <see cref="DataConnectionBase"/> objects.
-    /// </summary>
-    public class ConnectionCollection : ReportCollectionBase
-    {
-        /// <summary>
-        /// Gets or sets a data connection.
-        /// </summary>
-        /// <param name="index">The index of a data connection in this collection.</param>
-        /// <returns>The data connection with specified index.</returns>
-        public DataConnectionBase this [int index]
-        {
-            get => List[index] as DataConnectionBase;
-            set => List[index] = value;
-        }
+namespace AM.Reporting.Data;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ConnectionCollection"/> class with default settings.
-        /// </summary>
-        /// <param name="owner">The owner of this collection.</param>
-        public ConnectionCollection (Base owner) : base (owner)
-        {
-        }
+/// <summary>
+/// Represents the collection of <see cref="DataConnectionBase"/> objects.
+/// </summary>
+public class ConnectionCollection
+    : ReportCollectionBase
+{
+    #region Properties
+
+    /// <summary>
+    /// Gets or sets a data connection.
+    /// </summary>
+    /// <param name="index">The index of a data connection in this collection.</param>
+    /// <returns>The data connection with specified index.</returns>
+    public DataConnectionBase this [int index]
+    {
+        get => (DataConnectionBase) List[index]!;
+        set => List[index] = value;
     }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ConnectionCollection"/> class with default settings.
+    /// </summary>
+    /// <param name="owner">The owner of this collection.</param>
+    public ConnectionCollection
+        (
+            Base owner
+        )
+        : base (owner)
+    {
+        // пустое тело конструктора
+    }
+
+    #endregion
 }
