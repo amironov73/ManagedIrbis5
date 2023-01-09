@@ -34,11 +34,17 @@ using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.LogicalTree;
 using Avalonia.Markup.Xaml.MarkupExtensions;
+using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Styling;
 using Avalonia.Themes.Fluent;
+using Avalonia.Themes.Simple;
+
+using Material.Colors;
+using Material.Styles.Themes;
+using Material.Styles.Themes.Base;
 
 using Microsoft.Extensions.Logging;
 
@@ -252,7 +258,7 @@ public static class AvaloniaUtility
     /// <summary>
     /// Создание Fluent-темы.
     /// </summary>
-    public static FluentTheme CreateFluentTheme
+    public static IStyle CreateFluentTheme
         (
             bool light = true
         )
@@ -263,7 +269,60 @@ public static class AvaloniaUtility
                 ? "avares://Avalonia.Themes.Fluent/FluentLight.xaml"
                 : "avares://Avalonia.Themes.Fluent/FluentDark.xaml"
             ));
+    }
 
+    /// <summary>
+    /// Создание Material-темы.
+    /// </summary>
+    public static IStyle CreateMaterialTheme
+        (
+            bool light = true
+        )
+    {
+        var baseMode = light ? BaseThemeMode.Light : BaseThemeMode.Dark;
+        var uri = new Uri ("avares://Material.Styles/MaterialToolKit.xaml");
+        var result = new MaterialTheme (uri)
+        {
+            BaseTheme = baseMode,
+            PrimaryColor = PrimaryColor.Blue,
+            SecondaryColor = SecondaryColor.Teal
+        };
+
+        return result;
+    }
+
+    /// <summary>
+    /// Создание Simple-темы.
+    /// </summary>
+    public static IStyle CreateSimpleTheme
+        (
+            bool light = true
+        )
+    {
+        var mode = light ? SimpleThemeMode.Light : SimpleThemeMode.Dark;
+        var uri = new Uri ("avares://Avalonia.Themes.Simple/SimpleTheme.xaml");
+        var result = new SimpleTheme (uri)
+        {
+            Mode = mode
+        };
+
+        return result;
+    }
+
+    /// <summary>
+    /// Создание Citrus-темы.
+    /// </summary>
+    public static IStyle CreateCitrusTheme()
+    {
+        // к сожалению, тема Citrus устарела и не совместима с 11.x
+
+        var uri = new Uri ("avares://Citrus.Avalonia/Citrus.xaml");
+        var result = new StyleInclude (uri)
+        {
+            Source = uri
+        };
+
+        return result;
     }
 
     /// <summary>

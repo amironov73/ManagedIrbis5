@@ -34,7 +34,12 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml.Styling;
+using Avalonia.Media;
 using Avalonia.ThemeManager;
+
+using Material.Colors;
+using Material.Styles.Themes;
+using Material.Styles.Themes.Base;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -58,10 +63,10 @@ public class AvaloniaApplication
 {
     #region Properties
 
-    /// <summary>
-    /// Менеджер тем.
-    /// </summary>
-    public IThemeManager ThemeManager { get; internal set; }
+    // /// <summary>
+    // /// Менеджер тем.
+    // /// </summary>
+    // public IThemeManager ThemeManager { get; internal set; }
 
     /// <summary>
     /// Главное окно.
@@ -90,7 +95,7 @@ public class AvaloniaApplication
         _hostBuilder = Host.CreateDefaultBuilder();
         Windows = new List<Window>();
         Args = Array.Empty<string>();
-        ThemeManager = null!;
+        // ThemeManager = null!;
         EarlyInitialization();
     }
 
@@ -273,9 +278,34 @@ public class AvaloniaApplication
     /// <inheritdoc cref="Application.Initialize"/>
     public override void Initialize()
     {
-        ThemeManager = new FluentThemeManager();
-        ThemeManager.Initialize (this);
-        // Current!.Styles.Add (new FluentTheme (new Uri("avares://Avalonia.Themes.Fluent/FluentLight.xaml")));
+        if (DesktopApplication._useMaterialTheme)
+        {
+            var uri = new Uri ("avares://Material.Styles/MaterialToolKit.xaml");
+            var theme = new MaterialTheme (uri)
+            {
+                BaseTheme = BaseThemeMode.Light,
+                PrimaryColor = PrimaryColor.Blue,
+                SecondaryColor = SecondaryColor.Teal
+            };
+            Current!.Styles.Add (theme);
+        }
+        else if (DesktopApplication._useCitrusTheme)
+        {
+            var theme = AvaloniaUtility.CreateCitrusTheme();
+            Current!.Styles.Add (theme);
+        }
+        else if (DesktopApplication._useSimpleTheme)
+        {
+            var theme = AvaloniaUtility.CreateSimpleTheme();
+            Current!.Styles.Add (theme);
+        }
+        else
+        {
+            var themeManager = new FluentThemeManager();
+            themeManager.Initialize (this);
+
+            // Current!.Styles.Add (new FluentTheme (new Uri("avares://Avalonia.Themes.Fluent/FluentLight.xaml")));
+        }
 
         if (!string.IsNullOrEmpty (DesktopApplication._applicationName))
         {
@@ -296,10 +326,25 @@ public class AvaloniaApplication
             throw new ApplicationException ("Initialization failed");
         }
 
-        var darkMode = Configuration.GetValue ("dark-mode", false);
-        if (darkMode)
+        // var darkMode = Configuration.GetValue ("dark-mode", false);
+        // if (darkMode)
+        // {
+        //     ThemeManager.Switch (1);
+        // }
+
+        if (DesktopApplication._useMaterialTheme)
         {
-            ThemeManager.Switch (1);
+            var primary = PrimaryColor.DeepPurple;
+            var primaryColor = SwatchHelper.Lookup[(MaterialColor) primary];
+
+            var secondary = SecondaryColor.Teal;
+            var secondaryColor = SwatchHelper.Lookup[(MaterialColor) secondary];
+
+            var baseTheme = Theme.Light;
+            ITheme theme = Theme.Create (baseTheme, primaryColor, secondaryColor);
+
+            var themeBootstrap = this.LocateMaterialTheme<MaterialThemeBase>();
+            themeBootstrap.CurrentTheme = theme;
         }
 
         // стили для датагрида

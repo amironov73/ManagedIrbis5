@@ -14,8 +14,6 @@ using System;
 
 using AM.Avalonia.AppServices;
 
-using Avalonia;
-
 #endregion
 
 #nullable enable
@@ -37,6 +35,7 @@ internal sealed class Program
         )
     {
         DesktopApplication.BuildAvaloniaApp (args)
+            .UseMaterialTheme()
             .UseMainWindow<MainWindow>()
             .WithApplicationName()
             .WithNativeMenu()

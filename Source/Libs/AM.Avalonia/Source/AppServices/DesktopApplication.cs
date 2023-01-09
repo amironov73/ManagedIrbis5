@@ -78,6 +78,9 @@ public sealed class DesktopApplication
     private Func<AvaloniaApplication, Window> _windowCreator;
     internal static string? _applicationName;
     internal static NativeMenu? _nativeMenu;
+    internal static bool _useCitrusTheme;
+    internal static bool _useMaterialTheme;
+    internal static bool _useSimpleTheme;
 
     #endregion
 
@@ -173,6 +176,36 @@ public sealed class DesktopApplication
         where TWindow: Window, new()
     {
         _windowCreator = _ => new TWindow();
+
+        return this;
+    }
+
+    /// <summary>
+    /// Использовать тему Citrus.
+    /// </summary>
+    public DesktopApplication UseCitrusTheme()
+    {
+        _useCitrusTheme = true;
+
+        return this;
+    }
+
+    /// <summary>
+    /// Использовать тему Material.
+    /// </summary>
+    public DesktopApplication UseMaterialTheme()
+    {
+        _useMaterialTheme = true;
+
+        return this;
+    }
+
+    /// <summary>
+    /// Использовать тему Simple.
+    /// </summary>
+    public DesktopApplication UseSimpleTheme()
+    {
+        _useSimpleTheme = true;
 
         return this;
     }

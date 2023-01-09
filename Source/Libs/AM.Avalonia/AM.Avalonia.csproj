@@ -12,7 +12,7 @@
     <ItemGroup>
         <AvaloniaResource Include="Assets\**" />
     </ItemGroup>
-    
+
     <PropertyGroup>
         <Description>Avalonia support for Ars Magna</Description>
         <Title>Avalonia support for Ars Magna</Title>
@@ -48,12 +48,15 @@
         <PackageReference Include="Avalonia.ReactiveUI" />
         <PackageReference Include="Avalonia.ThemeManager" />
         <PackageReference Include="Avalonia.Themes.Fluent" />
+        <PackageReference Include="Avalonia.Themes.Simple" />
         <PackageReference Include="Avalonia.Xaml.Behaviors" />
         <PackageReference Include="Avalonia.Xaml.Interactions" />
         <PackageReference Include="Avalonia.Xaml.Interactivity" />
+        <PackageReference Include="Citrus.Avalonia" />
         <PackageReference Include="DynamicData" />
         <PackageReference Include="DynamicData.ReactiveUI" />
         <PackageReference Include="GridExtra.Avalonia" />
+        <PackageReference Include="Material.Avalonia" />
         <PackageReference Include="Microsoft.Extensions.Logging" />
         <PackageReference Include="Newtonsoft.Json" />
         <PackageReference Include="ReactiveHistory" />
