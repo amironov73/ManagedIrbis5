@@ -3,13 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable MemberCanBeProtected.Global
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable UnusedParameter.Local
+// ReSharper disable UnusedMember.Global
 
 /* BusyWindow.cs -- окно с полоской "приложение чем-то занято"
  * Ars Magna project, http://arsmagna.ru
@@ -22,8 +16,14 @@ using System.Threading.Tasks;
 
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Presenters;
+using Avalonia.Controls.Templates;
+using Avalonia.Data;
+using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Threading;
+
+using ReactiveUI;
 
 #endregion
 
@@ -70,19 +70,9 @@ public class BusyWindow
     }
 
     /// <summary>
-    /// Описание свойство "содержимое окна".
+    /// Содержимое окна как Avalonia-контрол.
     /// </summary>
-    public static readonly StyledProperty<object?> WindowContentProperty
-        = AvaloniaProperty.Register<BusyWindow, object?> (nameof (WindowContent));
-
-    /// <summary>
-    /// Содержимое окна.
-    /// </summary>
-    public object? WindowContent
-    {
-        get => _centralControl.Content;
-        set => _centralControl.Content = value;
-    }
+    public InputElement? WindowContent => Content as InputElement;
 
     #endregion
 
@@ -97,20 +87,26 @@ public class BusyWindow
         {
             HorizontalAlignment = HorizontalAlignment.Stretch,
             IsVisible = false,
-            Height = 17
+            Height = 17,
+            [!BusyStripe.TextProperty] = HeaderProperty
+                .WhenAnyValue (x=>x).ToBinding()
         };
-        _centralControl = new UserControl();
-        Content = new DockPanel
-        {
-            HorizontalAlignment = HorizontalAlignment.Stretch,
-            VerticalAlignment = VerticalAlignment.Stretch,
-
-            Children =
+        Template = new FuncControlTemplate ((_, _) =>
+            new DockPanel
             {
-                _busyStripe.DockTop(),
-                _centralControl
-            }
-        };
+                [!BackgroundProperty] = new TemplateBinding (BackgroundProperty),
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Stretch,
+
+                Children =
+                {
+                    _busyStripe.DockTop(),
+                    new ContentPresenter
+                    {
+                        [!ContentProperty] = new TemplateBinding (ContentProperty)
+                    }
+                }
+            });
     }
 
     #endregion
@@ -118,7 +114,6 @@ public class BusyWindow
     #region Private members
 
     private readonly BusyStripe _busyStripe;
-    private readonly UserControl _centralControl;
 
     #endregion
 
@@ -140,7 +135,11 @@ public class BusyWindow
                 (() =>
                 {
                     _busyStripe.Active = true;
-                    _centralControl.IsEnabled = false;
+                    var content = WindowContent;
+                    if (content is not null)
+                    {
+                        content.IsEnabled = false;
+                    }
                 });
 
             await action();
@@ -151,7 +150,11 @@ public class BusyWindow
                 (() =>
                 {
                     _busyStripe.Active = false;
-                    _centralControl.IsEnabled = true;
+                    var content = WindowContent;
+                    if (content is not null)
+                    {
+                        content.IsEnabled = true;
+                    }
                 });
         }
     }

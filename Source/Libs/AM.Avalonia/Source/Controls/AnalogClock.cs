@@ -149,13 +149,16 @@ public sealed class AnalogClock
             hour -= 12;
         }
 
-        DrawClockHand (context, bounds, FractionToAngle (hour / 12.0), 0.5 * size, Brushes.Black, 6.0);
-
         var minute = now.Minute;
-        DrawClockHand (context, bounds, FractionToAngle (minute / 60.0), 0.65 * size, Brushes.Black, 3.0);
-
         var second = now.Second;
-        DrawClockHand (context, bounds, FractionToAngle (second / 60.0), 0.8 * size, Brushes.Red, 1.0);
+        DrawClockHand (context, bounds,
+            FractionToAngle ((hour + minute / 60.0) / 12.0),
+            0.5 * size, Brushes.Black, 6.0);
+        DrawClockHand (context, bounds, FractionToAngle (minute / 60.0),
+            0.65 * size, Brushes.Black, 3.0);
+
+        DrawClockHand (context, bounds, FractionToAngle (second / 60.0),
+            0.8 * size, Brushes.Red, 1.0);
 
         for (var digit = 1; digit < 13; digit++)
         {

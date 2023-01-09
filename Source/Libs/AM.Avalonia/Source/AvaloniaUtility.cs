@@ -312,14 +312,22 @@ public static class AvaloniaUtility
     /// <summary>
     /// Создание Citrus-темы.
     /// </summary>
-    public static IStyle CreateCitrusTheme()
+    public static IStyle CreateCitrusTheme
+        (
+            string variant = "Citrus.axaml"
+        )
     {
-        // к сожалению, тема Citrus устарела и не совместима с 11.x
-
-        var uri = new Uri ("avares://Citrus.Avalonia/Citrus.xaml");
-        var result = new StyleInclude (uri)
+        var simple = CreateSimpleTheme();
+        var uri = new Uri ($"avares://AM.Avalonia/Styles/Citrus/{variant}");
+        var citrus = new StyleInclude (uri)
         {
             Source = uri
+        };
+
+        var result = new Styles
+        {
+            simple,
+            citrus
         };
 
         return result;

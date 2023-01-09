@@ -34,8 +34,8 @@ internal class App
 
         // Current!.Styles.Add (AvaloniaUtility.CreateFluentTheme());
         //Current!.Styles.Add (AvaloniaUtility.CreateMaterialTheme());
-        Current!.Styles.Add (AvaloniaUtility.CreateSimpleTheme());
-        // Current!.Styles.Add (AvaloniaUtility.CreateCitrusTheme());
+        // Current!.Styles.Add (AvaloniaUtility.CreateSimpleTheme());
+        Current!.Styles.Add (AvaloniaUtility.CreateCitrusTheme());
     }
 
     public override void OnFrameworkInitializationCompleted()

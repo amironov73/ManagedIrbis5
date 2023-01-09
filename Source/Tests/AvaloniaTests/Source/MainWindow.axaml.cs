@@ -402,7 +402,7 @@ public partial class MainWindow
             Title = "BusyWindow demo",
             Width = 300,
             Height = 220,
-            WindowContent = new DockPanel
+            Content = new DockPanel
             {
                 Margin = new Thickness (10),
                 Children =
