@@ -3,7 +3,9 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable CompareOfFloatsByEqualityOperator
 // ReSharper disable IdentifierTypo
+// ReSharper disable NonReadonlyMemberInGetHashCode
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 

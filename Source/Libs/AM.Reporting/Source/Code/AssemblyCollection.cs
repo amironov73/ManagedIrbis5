@@ -2,77 +2,96 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
-/*
+/* AssemblyCollection.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Collections;
 
 #endregion
 
 #nullable enable
 
-namespace AM.Reporting.Code
+namespace AM.Reporting.Code;
+
+internal class AssemblyCollection
+    : CollectionBase
 {
-    internal class AssemblyCollection : CollectionBase
+    public AssemblyDescriptor this [int index]
     {
-        public AssemblyDescriptor this [int index]
+        get => (AssemblyDescriptor) List[index]!;
+        set => List[index] = value;
+    }
+
+    public void AddRange
+        (
+            AssemblyDescriptor[] range
+        )
+    {
+        Sure.NotNull (range);
+
+        foreach (var t in range)
         {
-            get => List[index] as AssemblyDescriptor;
-            set => List[index] = value;
+            Add (t);
+        }
+    }
+
+    public int Add
+        (
+            AssemblyDescriptor? value
+        )
+    {
+        if (value is null)
+        {
+            return -1;
         }
 
-        public void AddRange (AssemblyDescriptor[] range)
-        {
-            foreach (var t in range)
-            {
-                Add (t);
-            }
-        }
+        return List.Add (value);
+    }
 
-        public int Add (AssemblyDescriptor value)
+    public void Insert
+        (
+            int index,
+            AssemblyDescriptor? value
+        )
+    {
+        if (value is not null)
         {
-            if (value == null)
-            {
-                return -1;
-            }
-
-            return List.Add (value);
+            List.Insert (index, value);
         }
+    }
 
-        public void Insert (int index, AssemblyDescriptor value)
-        {
-            if (value != null)
-            {
-                List.Insert (index, value);
-            }
-        }
+    public void Remove
+        (
+            AssemblyDescriptor value
+        )
+    {
+        Sure.NotNull (value);
 
-        public void Remove (AssemblyDescriptor value)
-        {
-            List.Remove (value);
-        }
+        List.Remove (value);
+    }
 
-        public int IndexOf (AssemblyDescriptor value)
-        {
-            return List.IndexOf (value);
-        }
+    public int IndexOf
+        (
+            AssemblyDescriptor value
+        )
+    {
+        Sure.NotNull (value);
 
-        public bool Contains (AssemblyDescriptor value)
-        {
-            return List.Contains (value);
-        }
+        return List.IndexOf (value);
+    }
+
+    public bool Contains
+        (
+            AssemblyDescriptor value
+        )
+    {
+        Sure.NotNull (value);
+
+        return List.Contains (value);
     }
 }

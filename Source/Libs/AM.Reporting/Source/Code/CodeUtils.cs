@@ -30,43 +30,6 @@ using AM.Reporting.Utils;
 namespace AM.Reporting.Code
 {
     /// <summary>
-    /// This class is used to pass find arguments to some methods of the <b>CodeUtils</b> class.
-    /// </summary>
-    public class FindTextArgs
-    {
-        /// <summary>
-        /// The start position of the search. After the search, this property points to
-        /// the begin of an expression.
-        /// </summary>
-        public int StartIndex { get; set; }
-
-        /// <summary>
-        /// After the search, this property points to the end of an expression.
-        /// </summary>
-        public int EndIndex { get; set; }
-
-        /// <summary>
-        /// The char sequence used to find the expression's begin.
-        /// </summary>
-        public string OpenBracket { get; set; }
-
-        /// <summary>
-        /// The char sequence used to find the expression's end.
-        /// </summary>
-        public string CloseBracket { get; set; }
-
-        /// <summary>
-        /// The text with embedded expressions.
-        /// </summary>
-        public FastString Text { get; set; }
-
-        /// <summary>
-        /// The last found expression.
-        /// </summary>
-        public string FoundText { get; set; }
-    }
-
-    /// <summary>
     /// This static class contains methods that may be used to find expressions embedded
     /// in the object's text.
     /// </summary>

@@ -2,14 +2,10 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
+// ReSharper disable UnusedMemberInSuper.Global
 
-/*
+/* CodeHelper.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -18,104 +14,98 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Reflection;
 using System.CodeDom.Compiler;
 
 using AM.Reporting.Data;
-using AM.Reporting.Engine;
-using AM.Reporting.Utils;
 
 #endregion
 
 #nullable enable
 
-namespace AM.Reporting.Code
+namespace AM.Reporting.Code;
+
+internal abstract class CodeHelperBase
 {
-    internal abstract partial class CodeHelperBase
+    #region Properties
+
+    public Report Report { get; }
+
+    #endregion
+
+    #region Protected Methods
+
+    protected string StripEventHandlers
+        (
+            Hashtable events
+        )
     {
-        #region Fields
-
-        #endregion
-
-        #region Properties
-
-        public Report Report { get; }
-
-        #endregion
-
-        #region Protected Methods
-
-        protected string StripEventHandlers (Hashtable events)
+        using (var report = new Report())
         {
-            using (var report = new Report())
+            report.LoadFromString (Report.SaveToString());
+            report.ScriptText = EmptyScript();
+
+            var list = new List<Base>();
+            foreach (Base c in report.AllObjects)
             {
-                report.LoadFromString (Report.SaveToString());
-                report.ScriptText = EmptyScript();
+                list.Add (c);
+            }
 
-                List<Base> list = new List<Base>();
-                foreach (Base c in report.AllObjects)
+            list.Add (report);
+
+            foreach (var c in list)
+            {
+                var props = c.GetType().GetProperties (BindingFlags.Public | BindingFlags.Instance);
+                foreach (var info in props)
                 {
-                    list.Add (c);
-                }
-
-                list.Add (report);
-
-                foreach (var c in list)
-                {
-                    PropertyInfo[] props = c.GetType().GetProperties (BindingFlags.Public | BindingFlags.Instance);
-                    foreach (var info in props)
+                    if (info.PropertyType == typeof (string) && info.Name.EndsWith ("Event"))
                     {
-                        if (info.PropertyType == typeof (string) && info.Name.EndsWith ("Event"))
+                        var value = (string?) info.GetValue (c, null);
+                        if (!string.IsNullOrEmpty (value))
                         {
-                            var value = (string)info.GetValue (c, null);
-                            if (!string.IsNullOrEmpty (value))
+                            var cName = c.Name + ".";
+                            if (c is Report)
                             {
-                                var cName = c.Name + ".";
-                                if (c is Report)
-                                {
-                                    cName = "";
-                                }
-
-                                events.Add (cName + info.Name.Replace ("Event", ""), value);
-                                info.SetValue (c, "", null);
+                                cName = "";
                             }
+
+                            events.Add (cName + info.Name.Replace ("Event", ""), value);
+                            info.SetValue (c, "", null);
                         }
                     }
                 }
-
-                return report.SaveToString();
             }
+
+            return report.SaveToString();
         }
+    }
 
-        protected abstract string GetTypeDeclaration (Type type);
+    protected abstract string GetTypeDeclaration (Type type);
 
-        #endregion
+    #endregion
 
+    #region Public Methods
 
-        #region Public Methods
+    public abstract string EmptyScript();
+    public abstract CodeDomProvider GetCodeProvider();
+    public abstract int GetPositionToInsertOwnItems (string scriptText);
+    public abstract string AddField (Type type, string name);
+    public abstract string BeginCalcExpression();
+    public abstract string AddExpression (string expr, string value);
+    public abstract string EndCalcExpression();
+    public abstract string ReplaceColumnName (string name, Type type);
+    public abstract string ReplaceParameterName (Parameter parameter);
+    public abstract string ReplaceVariableName (Parameter parameter);
+    public abstract string ReplaceTotalName (string name);
+    public abstract string GenerateInitializeMethod();
+    public abstract string ReplaceClassName (string scriptText, string className);
+    public abstract string GetMethodSignature (MethodInfo info, bool fullForm);
+    public abstract string GetMethodSignatureAndBody (MethodInfo info);
 
-        public abstract string EmptyScript();
-        public abstract CodeDomProvider GetCodeProvider();
-        public abstract int GetPositionToInsertOwnItems (string scriptText);
-        public abstract string AddField (Type type, string name);
-        public abstract string BeginCalcExpression();
-        public abstract string AddExpression (string expr, string value);
-        public abstract string EndCalcExpression();
-        public abstract string ReplaceColumnName (string name, Type type);
-        public abstract string ReplaceParameterName (Parameter parameter);
-        public abstract string ReplaceVariableName (Parameter parameter);
-        public abstract string ReplaceTotalName (string name);
-        public abstract string GenerateInitializeMethod();
-        public abstract string ReplaceClassName (string scriptText, string className);
-        public abstract string GetMethodSignature (MethodInfo info, bool fullForm);
-        public abstract string GetMethodSignatureAndBody (MethodInfo info);
+    #endregion
 
-        #endregion
-
-        public CodeHelperBase (Report report)
-        {
-            this.Report = report;
-        }
+    public CodeHelperBase (Report report)
+    {
+        Report = report;
     }
 }
