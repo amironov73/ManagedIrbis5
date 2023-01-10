@@ -419,10 +419,7 @@ internal sealed class Client
         {
             var keyboard = new InlineKeyboardMarkup
                 (
-                    new InlineKeyboardButton ("заказать")
-                    {
-                        CallbackData = "MFN книги"
-                    }
+                    InlineKeyboardButton.WithCallbackData ("заказ", "MFN книги")
                 );
 
             var answer = new SendMessageRequest (chatId, book)

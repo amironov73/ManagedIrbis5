@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using AM;
+using AM.Collections;
 using AM.Scripting.Barsik;
 
 using static AM.Scripting.Barsik.Builtins;
@@ -107,7 +108,7 @@ public sealed class IstuLib
     #region Public methods
 
     /// <summary>
-    /// Добавление разделителя областей описания.
+    /// Получение экземпляра объекта книгохранилища.
     /// </summary>
     public static dynamic GetStorehouse
         (
@@ -115,7 +116,7 @@ public sealed class IstuLib
             dynamic?[] args
         )
     {
-        if (TryGetStorehouse (context, out var storehouse))
+        if (args.IsNullOrEmpty() && TryGetStorehouse (context, out var storehouse))
         {
             return storehouse;
         }

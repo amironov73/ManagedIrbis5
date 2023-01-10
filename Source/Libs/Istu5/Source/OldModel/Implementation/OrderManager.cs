@@ -4,10 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
 /* OrderManager.cs -- менеджер заказов для для книговыдачи
  * Ars Magna project, http://arsmagna.ru
@@ -17,6 +13,8 @@
 
 using System;
 using System.Linq;
+
+using AM;
 
 using Istu.OldModel.Interfaces;
 
@@ -78,15 +76,29 @@ public sealed class OrderManager
     public Order[] ListAllOrders() => Orders.ToArray();
 
     /// <inheritdoc cref="IOrderManager.ListOrdersByStatus"/>
-    public Order[] ListOrdersByStatus (string status) =>
-        Orders.Where (order => order.Status == status).ToArray();
+    public Order[] ListOrdersByStatus
+        (
+            string status
+        )
+    {
+        Sure.NotNullNorEmpty (status);
+
+        return Orders.Where (order => order.Status == status).ToArray();
+    }
 
     /// <inheritdoc cref="IOrderManager.ListNewOrders"/>
     public Order[] ListNewOrders() => ListOrdersByStatus (Order.NewOrder);
 
     /// <inheritdoc cref="IOrderManager.ListOrdersForReader"/>
-    public Order[] ListOrdersForReader (string ticket) =>
-        Orders.Where (order => order.Ticket == ticket).ToArray();
+    public Order[] ListOrdersForReader
+        (
+            string ticket
+        )
+    {
+        Sure.NotNullNorEmpty (ticket);
+
+        return Orders.Where (order => order.Ticket == ticket).ToArray();
+    }
 
     /// <inheritdoc cref="IOrderManager.CreateOrder"/>
     public bool CreateOrder
@@ -95,6 +107,8 @@ public sealed class OrderManager
             bool throwOnVerify = true
         )
     {
+        Sure.NotNull (order);
+
         if (order.Verify (throwOnVerify))
         {
             var db = _GetDb();
@@ -104,10 +118,18 @@ public sealed class OrderManager
         }
 
         return false;
-    } // method CreateOrder
+    }
 
     /// <inheritdoc cref="IOrderManager.DeleteOrder"/>
-    public int DeleteOrder (int id) => Orders.Delete (order => order.Id == id);
+    public int DeleteOrder
+        (
+            int id
+        )
+    {
+        Sure.NonNegative (id);
+
+        return Orders.Delete (order => order.Id == id);
+    }
 
     /// <inheritdoc cref="IOrderManager.SetOrderStatus"/>
     public int SetOrderStatus
@@ -129,7 +151,7 @@ public sealed class OrderManager
             );
 
         return result;
-    } // method SetOrderStatus
+    }
 
     /// <inheritdoc cref="IOrderManager.UpdateOrder"/>
     public int UpdateOrder
@@ -138,6 +160,8 @@ public sealed class OrderManager
             bool throwOnVerify = true
         )
     {
+        Sure.NotNull (order);
+
         if (order.Verify (throwOnVerify))
         {
             var db = _GetDb();
@@ -145,7 +169,7 @@ public sealed class OrderManager
         }
 
         return -1;
-    } // method UpdateOrder
+    }
 
     #endregion
 
@@ -159,7 +183,7 @@ public sealed class OrderManager
             _dataConnection.Dispose();
             _dataConnection = null;
         }
-    } // method Dispose
+    }
 
     #endregion
 }

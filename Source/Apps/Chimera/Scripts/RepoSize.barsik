@@ -1,0 +1,26 @@
+﻿//
+// Вычисление размера репозитория НТБ ИРНИТУ
+//
+
+connect ("host=127.0.0.1;port=6666;user=librarian;password=secret;db=PERIO;")
+if (!is_connected())
+{
+    error ("Not connected")
+    exit()
+}
+
+//=================================
+
+r = search_count ("VRL=ASP * TEK=HTTP://$")
+println (r)
+
+r = search_count ("VRL=ASP * TEK=$")
+println (r)
+
+r = search_count ("VRL=ASP")
+println (r)
+
+//=================================
+
+disconnect()
+println ("THAT'S ALL, FOLKS!")
