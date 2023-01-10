@@ -40,8 +40,10 @@ using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
+using Telegram.Bot.Requests;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 
 #endregion
 
@@ -169,7 +171,7 @@ internal sealed class Client
     private static async Task RegisterBookOrder
         (
             ITelegramBotClient client,
-            long chatId,
+            ChatId chatId,
             User? user,
             string encodedIndex,
             CancellationToken token
@@ -307,6 +309,21 @@ internal sealed class Client
             );
     }
 
+    private static async Task HandleCallbackQueryAsync
+        (
+            ITelegramBotClient client,
+            Update update,
+            CallbackQuery callbackQuery,
+            CancellationToken token
+        )
+    {
+        User? user = null;
+        ChatId chatId = 0L;
+        var bookId = "1234";
+
+        await RegisterBookOrder (client, chatId, user, bookId, token);
+    }
+
     /// <summary>
     /// Ответ на запрос пользователя.
     /// </summary>
@@ -317,6 +334,12 @@ internal sealed class Client
             CancellationToken token
         )
     {
+        if (update.CallbackQuery is { } callbackQuery)
+        {
+            await HandleCallbackQueryAsync (client, update, callbackQuery, token);
+            return;
+        }
+
         // Only process Message updates: https://core.telegram.org/bots/api#message
         if (update.Message is not { } message)
         {
@@ -362,12 +385,12 @@ internal sealed class Client
             return;
         }
 
-        if (messageText.StartsWith ("//"))
-        {
-            // заказ на книгу
-            await RegisterBookOrder (client, chatId, message.From, messageText, token);
-            return;
-        }
+        // if (messageText.StartsWith ("//"))
+        // {
+        //     // заказ на книгу
+        //     await RegisterBookOrder (client, chatId, message.From, messageText, token);
+        //     return;
+        // }
 
         await client.SendChatActionAsync
             (
@@ -394,14 +417,37 @@ internal sealed class Client
 
         foreach (var book in found)
         {
-            await client.SendTextMessageAsync
+            var keyboard = new InlineKeyboardMarkup
                 (
-                    chatId,
-                    book,
-                    null,
-                    ParseMode.Html,
-                    cancellationToken: token
+                    new InlineKeyboardButton ("заказать")
+                    {
+                        CallbackData = "MFN книги"
+                    }
                 );
+
+            var answer = new SendMessageRequest (chatId, book)
+            {
+                ParseMode = ParseMode.Html,
+                // Entities = entities,
+                // DisableWebPagePreview = disableWebPagePreview,
+                // DisableNotification = disableNotification,
+                // ProtectContent = protectContent,
+                // ReplyToMessageId = replyToMessageId,
+                // AllowSendingWithoutReply = allowSendingWithoutReply,
+                ReplyMarkup = keyboard,
+                // MessageThreadId = messageThreadId,
+            };
+
+            await client.MakeRequestAsync (answer, token);
+
+            // await client.SendTextMessageAsync
+            //     (
+            //         chatId,
+            //         book,
+            //         null,
+            //         ParseMode.Html,
+            //         cancellationToken: token
+            //     );
         }
     }
 

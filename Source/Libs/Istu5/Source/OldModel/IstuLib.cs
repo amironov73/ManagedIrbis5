@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using AM;
 using AM.Scripting.Barsik;
@@ -56,6 +57,7 @@ public sealed class IstuLib
     public static readonly Dictionary<string, FunctionDescriptor> Registry = new ()
     {
         { "get_storehouse", new FunctionDescriptor ("get_storehouse", GetStorehouse) },
+        { "podsob_by_ticket", new FunctionDescriptor ("podsob_by_ticket", PodsobByTicket) },
         { "reader_by_email", new FunctionDescriptor ("reader_by_email", ReaderByEmail) },
         { "reader_by_telegram", new FunctionDescriptor ("reader_by_telegram", ReaderByTelegramId) },
     };
@@ -123,6 +125,35 @@ public sealed class IstuLib
         context.SetDefine (StorehouseDefineName, storehouse);
 
         return storehouse;
+    }
+
+    /// <summary>
+    /// Отбор книг по читательскому билету.
+    /// </summary>
+    public static dynamic? PodsobByTicket
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (!TryGetStorehouse (context, out var storehouse))
+        {
+            return null;
+        }
+
+        var ticket = Compute (context, args, 0) as string;
+        if (string.IsNullOrEmpty (ticket))
+        {
+            return null;
+        }
+
+        var kladovka = storehouse.GetKladovka();
+        var podsob = kladovka.GetPodsob();
+        var found = podsob
+            .Where (book => book.Ticket == ticket)
+            .ToArray();
+
+        return found;
     }
 
     /// <summary>

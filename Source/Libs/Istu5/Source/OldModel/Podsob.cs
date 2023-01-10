@@ -31,7 +31,7 @@ namespace Istu.OldModel;
 /// </summary>
 [Table]
 [Serializable]
-[DebuggerDisplay ("{Inventory}: {Ticket}: {Moment}")]
+[DebuggerDisplay ("{Inventory}: {Ticket}: {When}")]
 public class Podsob
 {
     #region Properties
@@ -58,7 +58,7 @@ public class Podsob
     /// Дата выдачи.
     /// </summary>
     [Column ("whe")]
-    public DateTime Moment { get; set; }
+    public string? When { get; set; }
 
     /// <summary>
     /// Идентификатор оператора.

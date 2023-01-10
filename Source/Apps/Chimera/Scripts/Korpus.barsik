@@ -1,0 +1,31 @@
+﻿//
+// Читальный зал литературы по культуре и искусству
+// Список литературы, числящейся за читальным залом
+//
+
+connect ("host=127.0.0.1;port=6666;user=librarian;password=secret;db=ISTU;")
+if (!is_connected())
+{
+    error ("Not connected")
+    exit()
+}
+
+get_storehouse ("Data Source=center;Initial Catalog=kladovka;User ID=librarian;Password=secret;")
+
+//=================================
+
+books = podsob_by_ticket ("к")
+foreach (book in books)
+{
+    r = search_read_one ("IN=" + book.Inventory)
+    if (r)
+    {
+        f = format_record (r.Mfn, "@brief")
+        println (book.Inventory, "\t", f)
+    }
+}
+
+//=================================
+
+disconnect()
+println ("THAT'S ALL, FOLKS!")
