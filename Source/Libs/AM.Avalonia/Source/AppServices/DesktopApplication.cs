@@ -81,6 +81,7 @@ public sealed class DesktopApplication
     internal static bool _useCitrusTheme;
     internal static bool _useMaterialTheme;
     internal static bool _useSimpleTheme;
+    internal static Func<Window, object>? _createView;
 
     #endregion
 
@@ -176,6 +177,21 @@ public sealed class DesktopApplication
         where TWindow: Window, new()
     {
         _windowCreator = _ => new TWindow();
+
+        return this;
+    }
+
+    /// <summary>
+    /// Включение "живого просмотра".
+    /// </summary>
+    public DesktopApplication UseLiveView
+        (
+            Func<Window, object> createView
+        )
+    {
+        Sure.NotNull (createView);
+
+        _createView = createView;
 
         return this;
     }

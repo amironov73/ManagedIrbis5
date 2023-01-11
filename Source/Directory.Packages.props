@@ -44,6 +44,7 @@
     <PackageVersion Include="GridExtra.Avalonia" Version="0.9.1" />
     <PackageVersion Include="HtmlAgilityPack" Version="1.11.46" />
     <PackageVersion Include="linq2db" Version="3.7.0" />
+    <PackageVersion Include="Live.Avalonia" Version="1.3.1" />
     <PackageVersion Include="MailKit" Version="3.4.3" />
     <PackageVersion Include="Material.Avalonia" Version="3.0.0-avalonia11-preview2.137-nightly" />
     <PackageVersion Include="MaxMind.GeoIP2" Version="5.1.0" />

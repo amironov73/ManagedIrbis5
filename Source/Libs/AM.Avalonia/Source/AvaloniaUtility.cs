@@ -830,6 +830,18 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
+    /// Релизная или отладочная версия сборки?
+    /// </summary>
+    public static bool IsProduction()
+    {
+#if DEBUG
+        return false;
+#else
+        return true;
+#endif
+    }
+
+    /// <summary>
     /// Установка наклонного начертания для текстового блока.
     /// </summary>
     public static T Italic<T>

@@ -21,7 +21,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Reactive;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -34,8 +36,9 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml.Styling;
-using Avalonia.Media;
 using Avalonia.ThemeManager;
+
+using Live.Avalonia;
 
 using Material.Colors;
 using Material.Styles.Themes;
@@ -48,6 +51,8 @@ using Microsoft.Extensions.Logging;
 
 using NLog.Extensions.Logging;
 
+using ReactiveUI;
+
 #endregion
 
 #nullable enable
@@ -59,7 +64,8 @@ namespace AM.Avalonia.AppServices;
 /// </summary>
 public class AvaloniaApplication
     : Application,
-    IMagnaApplication
+    IMagnaApplication,
+    ILiveView
 {
     #region Properties
 
@@ -273,6 +279,16 @@ public class AvaloniaApplication
 
     #endregion
 
+    #region ILiveView members
+
+    /// <inheritdoc cref="ILiveView.CreateView"/>
+    public object CreateView (Window window)
+    {
+        return DesktopApplication._createView! (window);
+    }
+
+    #endregion
+
     #region Application members
 
     /// <inheritdoc cref="Application.Initialize"/>
@@ -357,12 +373,37 @@ public class AvaloniaApplication
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            MainWindow = DesktopApplication._instance.CreateMainWindow (this);
-            MainWindow.Closed += (_, _) =>
+            if (Debugger.IsAttached || AvaloniaUtility.IsProduction()
+                || DesktopApplication._createView is null)
             {
-                var lifetime =  RequireService<IHostApplicationLifetime>();
-                lifetime.StopApplication();
-            };
+
+                MainWindow = DesktopApplication._instance.CreateMainWindow (this);
+                MainWindow.Closed += (_, _) =>
+                {
+                    var lifetime = RequireService<IHostApplicationLifetime>();
+                    lifetime.StopApplication();
+                };
+            }
+            else
+            {
+                // Here, we create a new LiveViewHost, located in the 'Live.Avalonia'
+                // namespace, and pass an ILiveView implementation to it. The ILiveView
+                // implementation should have a parameterless constructor! Next, we
+                // start listening for any changes in the source files. And then, we
+                // show the LiveViewHost window. Simple enough, huh?
+                var window = new LiveViewHost (this, Console.WriteLine);
+                window.StartWatchingSourceFilesForHotReloading();
+                window.Show();
+                MainWindow = window;
+            }
+
+            // Here we subscribe to ReactiveUI default exception handler to avoid app
+            // termination in case if we do something wrong in our view models. See:
+            // https://www.reactiveui.net/docs/handbook/default-exception-handler/
+            //
+            // In case if you are using another MV* framework, please refer to its
+            // documentation explaining global exception handling.
+            RxApp.DefaultExceptionHandler = Observer.Create<Exception> (Console.WriteLine);
 
             desktop.MainWindow = MainWindow;
         }
@@ -560,7 +601,7 @@ public class AvaloniaApplication
 
         Cleanup();
 
-        MainWindow?.Close();
+        MainWindow.Close();
         var lifetime = ApplicationHost.Services
             .GetRequiredService<IHostApplicationLifetime>()
             .ThrowIfNull ();
