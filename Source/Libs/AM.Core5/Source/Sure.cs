@@ -309,7 +309,7 @@ public static class Sure
 
     /// <summary>
     /// Проверка, попадают ли <paramref name="index"/>
-    /// и <param name="count"></param> в допустимые диапазоны
+    /// и <paramref name="count"/> в допустимые диапазоны
     /// для данного списка.
     /// </summary>
     /// <param name="index">Стартовый индекс.</param>

@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
 /* MagnaTarget.cs -- специальная цель для перехвата логов
@@ -58,6 +59,7 @@ public sealed class MagnaTarget
 
             configuration.AddRuleForAllLevels (target);
             LogManager.ReconfigExistingLoggers();
+            _rulesAdded = true;
         }
     }
 
@@ -106,5 +108,4 @@ public sealed class MagnaTarget
     }
 
     #endregion
-
 }
