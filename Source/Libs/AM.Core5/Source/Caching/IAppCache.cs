@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMemberInSuper.Global
 
-/*
+/* IAppCache.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 

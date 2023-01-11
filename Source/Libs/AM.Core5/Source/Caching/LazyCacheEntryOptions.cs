@@ -3,12 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable NonReadonlyMemberInGetHashCode
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UseNullableAnnotationInsteadOfAttribute
 
 /* LazyCacheEntryOptions.cs --
  * Ars Magna project, http://arsmagna.ru

@@ -3,14 +3,9 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable NonReadonlyMemberInGetHashCode
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UseNullableAnnotationInsteadOfAttribute
 
-/*
+/* MemoryCacheEntryOptionsExtension.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -46,6 +41,7 @@ public static class LazyCacheEntryOptionsExtension
         )
     {
         Sure.NotNull (option);
+        Sure.Defined (mode);
 
         var delay = absoluteExpiration.Subtract (DateTimeOffset.UtcNow);
         option.AbsoluteExpiration = absoluteExpiration;
@@ -70,6 +66,7 @@ public static class LazyCacheEntryOptionsExtension
         )
     {
         Sure.NotNull (option);
+        Sure.Defined (mode);
 
         option.AbsoluteExpirationRelativeToNow = absoluteExpiration;
         option.ExpirationMode = mode;

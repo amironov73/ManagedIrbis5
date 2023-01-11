@@ -3,14 +3,8 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable NonReadonlyMemberInGetHashCode
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNullableAnnotationInsteadOfAttribute
 
-/*
+/* AsyncLazy.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -29,7 +23,6 @@ namespace AM.Caching;
 /// <summary>
 ///     See https://blogs.msdn.microsoft.com/pfxteam/2011/01/15/asynclazyt/
 /// </summary>
-/// <typeparam name="T"></typeparam>
 public class AsyncLazy<T>
     : Lazy<Task<T>>
 {

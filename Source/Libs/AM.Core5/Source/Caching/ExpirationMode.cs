@@ -3,13 +3,10 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable UnusedMember.Global
 
-/*
+/* ExpirationMode.cs --
  * Ars Magna project, http://arsmagna.ru
  */
-
-#nullable enable
 
 namespace AM.Caching;
 
