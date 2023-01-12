@@ -2,22 +2,13 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
-/*
+/* CrossViewDescriptor.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
-
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 using AM.Reporting.Table;
 using AM.Reporting.Utils;
@@ -26,96 +17,107 @@ using AM.Reporting.Utils;
 
 #nullable enable
 
-namespace AM.Reporting.CrossView
+namespace AM.Reporting.CrossView;
+
+/// <summary>
+/// The base class for matrix element descriptors such as <see cref="CrossViewHeaderDescriptor"/> and
+/// <see cref="CrossViewCellDescriptor"/>.
+/// </summary>
+public class CrossViewDescriptor
+    : IReportSerializable
 {
+    #region Properties
+
     /// <summary>
-    /// The base class for matrix element descriptors such as <see cref="CrossViewHeaderDescriptor"/> and
-    /// <see cref="CrossViewCellDescriptor"/>.
+    /// Gets or sets an expression which value will be used to fill the matrix.
     /// </summary>
-    public class CrossViewDescriptor : IReportSerializable
+    /// <remarks>
+    /// <b>Expression</b> may be any valid expression. Usually it's a data column:
+    /// <c>[DataSource.Column]</c>.
+    /// </remarks>
+    public string? Expression { get; set; }
+
+    /// <summary>
+    /// Gets or sets the template column bound to this descriptor.
+    /// </summary>
+    /// <remarks>
+    /// This property is for internal use; usually you don't need to use it.
+    /// </remarks>
+    public TableColumn? TemplateColumn { get; set; }
+
+    /// <summary>
+    /// Gets or sets the template row bound to this descriptor.
+    /// </summary>
+    /// <remarks>
+    /// This property is for internal use; usually you don't need to use it.
+    /// </remarks>
+    public TableRow? TemplateRow { get; set; }
+
+    /// <summary>
+    /// Gets or sets the template cell bound to this descriptor.
+    /// </summary>
+    /// <remarks>
+    /// Using this property, you may access the matrix cell which is bound to
+    /// this descriptor. It may be useful to change the cell's appearance.
+    /// <note>
+    /// Before using this property, you must initialize the matrix descriptors by
+    /// calling the <see cref="CrossViewObject.BuildTemplate"/> method.
+    /// </note>
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// CrossViewObject crossView;
+    /// // change the fill color of the first matrix cell
+    /// crossView.Data.Cells[0].TemplateCell.Fill = new SolidFill(Color.Red);
+    /// </code>
+    /// </example>
+    public TableCell? TemplateCell { get; set; }
+
+    #endregion
+
+    #region Public Methods
+
+    /// <summary>
+    /// Assigns values from another descriptor.
+    /// </summary>
+    /// <param name="source">Descriptor to assign values from.</param>
+    public virtual void Assign
+        (
+            CrossViewDescriptor source
+        )
     {
-        #region Fields
+        Sure.NotNull (source);
 
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// Gets or sets an expression which value will be used to fill the matrix.
-        /// </summary>
-        /// <remarks>
-        /// <b>Expression</b> may be any valid expression. Usually it's a data column:
-        /// <c>[DataSource.Column]</c>.
-        /// </remarks>
-        public string Expression { get; set; }
-
-        /// <summary>
-        /// Gets or sets the template column bound to this descriptor.
-        /// </summary>
-        /// <remarks>
-        /// This property is for internal use; usually you don't need to use it.
-        /// </remarks>
-        public TableColumn TemplateColumn { get; set; }
-
-        /// <summary>
-        /// Gets or sets the template row bound to this descriptor.
-        /// </summary>
-        /// <remarks>
-        /// This property is for internal use; usually you don't need to use it.
-        /// </remarks>
-        public TableRow TemplateRow { get; set; }
-
-        /// <summary>
-        /// Gets or sets the template cell bound to this descriptor.
-        /// </summary>
-        /// <remarks>
-        /// Using this property, you may access the matrix cell which is bound to
-        /// this descriptor. It may be useful to change the cell's appearance.
-        /// <note>
-        /// Before using this property, you must initialize the matrix descriptors by
-        /// calling the <see cref="CrossViewObject.BuildTemplate"/> method.
-        /// </note>
-        /// </remarks>
-        /// <example>
-        /// <code>
-        /// CrossViewObject crossView;
-        /// // change the fill color of the first matrix cell
-        /// crossView.Data.Cells[0].TemplateCell.Fill = new SolidFill(Color.Red);
-        /// </code>
-        /// </example>
-        public TableCell TemplateCell { get; set; }
-
-        #endregion
-
-        #region Public Methods
-
-        /// <summary>
-        /// Assigns values from another descriptor.
-        /// </summary>
-        /// <param name="source">Descriptor to assign values from.</param>
-        public virtual void Assign (CrossViewDescriptor source)
-        {
-            Expression = source.Expression;
-            TemplateCell = source.TemplateCell;
-        }
-
-        /// <inheritdoc/>
-        public virtual void Serialize (ReportWriter writer)
-        {
-            var c = writer.DiffObject as CrossViewDescriptor;
-
-            if (Expression != c.Expression)
-            {
-                writer.WriteStr ("Expression", Expression);
-            }
-        }
-
-        /// <inheritdoc/>
-        public void Deserialize (ReportReader reader)
-        {
-            reader.ReadProperties (this);
-        }
-
-        #endregion
+        Expression = source.Expression;
+        TemplateCell = source.TemplateCell;
     }
+
+    /// <inheritdoc/>
+    public virtual void Serialize
+        (
+            ReportWriter writer
+        )
+    {
+        Sure.NotNull (writer);
+
+        var c = (CrossViewDescriptor) writer.DiffObject!;
+
+        if (Expression != c.Expression)
+        {
+            writer.WriteStr ("Expression", Expression);
+        }
+    }
+
+    /// <inheritdoc/>
+    public void Deserialize
+        (
+            ReportReader reader
+        )
+    {
+        Sure.NotNull (reader);
+
+        reader.ReadProperties (this);
+    }
+
+    #endregion
 }

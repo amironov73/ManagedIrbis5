@@ -150,9 +150,9 @@ namespace AM.Reporting.CrossView
 
             foreach (CrossViewCellDescriptor descr in CrossView.Data.Cells)
             {
-                descr.TemplateColumn = CrossView.Columns[x + descr.x];
-                descr.TemplateRow = CrossView.Rows[y + descr.y];
-                descr.TemplateCell = CrossView[x + descr.x, y + descr.y];
+                descr.TemplateColumn = CrossView.Columns[x + descr.X];
+                descr.TemplateRow = CrossView.Rows[y + descr.Y];
+                descr.TemplateCell = CrossView[x + descr.X, y + descr.Y];
             }
         }
 

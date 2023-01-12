@@ -2,12 +2,7 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /*
  * Ars Magna project, http://arsmagna.ru
@@ -16,7 +11,6 @@
 #region Using directives
 
 using System;
-using System.Collections;
 
 using AM.Reporting.Data;
 
@@ -46,93 +40,58 @@ namespace AM.Reporting.CrossView
 
         #region FastCube properties (temporary)
 
-        private CubeSourceBase cubeSource;
+        /// <summary>
+        ///
+        /// </summary>
+        public int XAxisFieldsCount => CubeSource?.XAxisFieldsCount ?? 0;
 
         /// <summary>
         ///
         /// </summary>
-        public int XAxisFieldsCount => cubeSource != null ? cubeSource.XAxisFieldsCount : 0;
+        public int YAxisFieldsCount => CubeSource?.YAxisFieldsCount ?? 0;
 
         /// <summary>
         ///
         /// </summary>
-        public int YAxisFieldsCount => cubeSource != null ? cubeSource.YAxisFieldsCount : 0;
+        public int MeasuresCount => CubeSource?.MeasuresCount ?? 0;
 
         /// <summary>
         ///
         /// </summary>
-        public int MeasuresCount => cubeSource != null ? cubeSource.MeasuresCount : 0;
+        public int MeasuresLevel => CubeSource?.MeasuresLevel ?? 0;
 
         /// <summary>
         ///
         /// </summary>
-        public int MeasuresLevel => cubeSource != null ? cubeSource.MeasuresLevel : 0;
+        public bool MeasuresInXAxis => CubeSource?.MeasuresInXAxis ?? false;
 
         /// <summary>
         ///
         /// </summary>
-        public bool MeasuresInXAxis => cubeSource != null ? cubeSource.MeasuresInXAxis : false;
+        public bool MeasuresInYAxis => CubeSource?.MeasuresInYAxis ?? false;
 
         /// <summary>
         ///
         /// </summary>
-        public bool MeasuresInYAxis => cubeSource != null ? cubeSource.MeasuresInYAxis : false;
+        public int DataColumnCount => CubeSource?.DataColumnCount ?? 0;
 
         /// <summary>
         ///
         /// </summary>
-        public int DataColumnCount => cubeSource != null ? cubeSource.DataColumnCount : 0;
+        public int DataRowCount => CubeSource?.DataRowCount ?? 0;
 
         /// <summary>
         ///
         /// </summary>
-        public int DataRowCount => cubeSource != null ? cubeSource.DataRowCount : 0;
+        public bool SourceAssigned => CubeSource != null;
 
-        /// <summary>
-        ///
-        /// </summary>
-        public bool SourceAssigned => cubeSource != null;
-#if !DOTNET_4
-        private string intArrayToString (int[] intArray)
-        {
-            var res = "";
-            foreach (var item in intArray)
-            {
-                if (res != "")
-                {
-                    res += ",";
-                }
-
-                res += item.ToString();
-            }
-
-            return res;
-        }
-
-        private int[] stringToIntArray (string str)
-        {
-            string[] strArray = str.Split (',');
-            var res = new int[strArray.Length];
-            for (var i = 0; i < strArray.Length; i++)
-            {
-                res[i] = int.Parse (strArray[i]);
-            }
-
-            return res;
-        }
-#endif
         /// <summary>
         ///
         /// </summary>
         public string ColumnDescriptorsIndexes
         {
-#if DOTNET_4
-      get { return string.Join(",", columnDescriptorsIndexes); }
-      set { columnDescriptorsIndexes = Array.ConvertAll(value.Split(','), int.Parse); }
-#else
-            get { return intArrayToString (columnDescriptorsIndexes); }
-            set { columnDescriptorsIndexes = stringToIntArray (value); }
-#endif
+            get => string.Join (",", columnDescriptorsIndexes);
+            set => columnDescriptorsIndexes = Array.ConvertAll (value.Split (','), int.Parse);
         }
 
         /// <summary>
@@ -140,13 +99,8 @@ namespace AM.Reporting.CrossView
         /// </summary>
         public string RowDescriptorsIndexes
         {
-#if DOTNET_4
-      get { return string.Join(",", rowDescriptorsIndexes); }
-      set { rowDescriptorsIndexes = Array.ConvertAll(value.Split(','), int.Parse); }
-#else
-            get { return intArrayToString (rowDescriptorsIndexes); }
-            set { rowDescriptorsIndexes = stringToIntArray (value); }
-#endif
+            get => string.Join (",", rowDescriptorsIndexes);
+            set => rowDescriptorsIndexes = Array.ConvertAll (value.Split (','), int.Parse);
         }
 
         /// <summary>
@@ -154,13 +108,8 @@ namespace AM.Reporting.CrossView
         /// </summary>
         public string ColumnTerminalIndexes
         {
-#if DOTNET_4
-      get { return string.Join(",", columnTerminalIndexes); }
-      set { columnTerminalIndexes = Array.ConvertAll(value.Split(','), int.Parse); }
-#else
-            get { return intArrayToString (columnTerminalIndexes); }
-            set { columnTerminalIndexes = stringToIntArray (value); }
-#endif
+            get => string.Join (",", columnTerminalIndexes);
+            set => columnTerminalIndexes = Array.ConvertAll (value.Split (','), int.Parse);
         }
 
         /// <summary>
@@ -168,33 +117,18 @@ namespace AM.Reporting.CrossView
         /// </summary>
         public string RowTerminalIndexes
         {
-#if DOTNET_4
-      get { return string.Join(",", rowTerminalIndexes); }
-      set { rowTerminalIndexes = Array.ConvertAll(value.Split(','), int.Parse); }
-#else
-            get { return intArrayToString (rowTerminalIndexes); }
-            set { rowTerminalIndexes = stringToIntArray (value); }
-#endif
+            get => string.Join (",", rowTerminalIndexes);
+            set => rowTerminalIndexes = Array.ConvertAll (value.Split (','), int.Parse);
         }
 
-        internal CubeSourceBase CubeSource
-        {
-            get => cubeSource;
-            set
-            {
-                if (cubeSource != value)
-                {
-                    cubeSource = value;
-                }
-            }
-        }
+        internal CubeSourceBase? CubeSource { get; set; }
 
         internal void CreateDescriptors()
         {
-            columnDescriptorsIndexes = new int[0];
-            rowDescriptorsIndexes = new int[0];
-            columnTerminalIndexes = new int[0];
-            rowTerminalIndexes = new int[0];
+            columnDescriptorsIndexes = Array.Empty<int>();
+            rowDescriptorsIndexes = Array.Empty<int>();
+            columnTerminalIndexes = Array.Empty<int>();
+            rowTerminalIndexes = Array.Empty<int>();
             CrossViewHeaderDescriptor crossViewHeaderDescriptor;
             Columns.Clear();
             Rows.Clear();
@@ -220,7 +154,7 @@ namespace AM.Reporting.CrossView
                                 if (k == i)
                                 {
                                     crossViewHeaderDescriptor = new CrossViewHeaderDescriptor ("",
-                                        CubeSource.GetMeasureName (j), false, false, true)
+                                            CubeSource.GetMeasureName (j), false, false, true)
                                         {
                                             cellsize = 1,
                                             levelsize = XAxisFieldsCount - i
@@ -229,8 +163,9 @@ namespace AM.Reporting.CrossView
                                 else
                                 {
                                     crossViewHeaderDescriptor = new CrossViewHeaderDescriptor (
-                                        CubeSource.GetXAxisFieldName (k), CubeSource.GetMeasureName (j), false, false,
-                                        true)
+                                            CubeSource.GetXAxisFieldName (k), CubeSource.GetMeasureName (j), false,
+                                            false,
+                                            true)
                                         {
                                             cellsize = (XAxisFieldsCount - i),
                                             levelsize = 1
@@ -260,7 +195,7 @@ namespace AM.Reporting.CrossView
                         for (var j = 0; j < MeasuresCount; j++)
                         {
                             crossViewHeaderDescriptor = new CrossViewHeaderDescriptor (CubeSource.GetXAxisFieldName (i),
-                                "", false, false, false)
+                                    "", false, false, false)
                                 {
                                     level = i,
                                     levelsize = 1,
@@ -312,11 +247,11 @@ namespace AM.Reporting.CrossView
                 {
                     crossViewHeaderDescriptor =
                         new CrossViewHeaderDescriptor (CubeSource.GetXAxisFieldName (i), "", false, false, false)
-                            {
-                                level = i,
-                                levelsize = 1,
-                                cell = cell
-                            };
+                        {
+                            level = i,
+                            levelsize = 1,
+                            cell = cell
+                        };
                     if (MeasuresInXAxis)
                     {
                         crossViewHeaderDescriptor.cellsize = (XAxisFieldsCount - i - 1) * MeasuresCount;
@@ -405,7 +340,7 @@ namespace AM.Reporting.CrossView
                                 if (k == i)
                                 {
                                     crossViewHeaderDescriptor = new CrossViewHeaderDescriptor ("",
-                                        CubeSource.GetMeasureName (j), false, false, true)
+                                            CubeSource.GetMeasureName (j), false, false, true)
                                         {
                                             cellsize = 1,
                                             levelsize = YAxisFieldsCount - i
@@ -414,8 +349,9 @@ namespace AM.Reporting.CrossView
                                 else
                                 {
                                     crossViewHeaderDescriptor = new CrossViewHeaderDescriptor (
-                                        CubeSource.GetYAxisFieldName (k), CubeSource.GetMeasureName (j), false, false,
-                                        true)
+                                            CubeSource.GetYAxisFieldName (k), CubeSource.GetMeasureName (j), false,
+                                            false,
+                                            true)
                                         {
                                             cellsize = (YAxisFieldsCount - i),
                                             levelsize = 1
@@ -445,7 +381,7 @@ namespace AM.Reporting.CrossView
                         for (var j = 0; j < MeasuresCount; j++)
                         {
                             crossViewHeaderDescriptor = new CrossViewHeaderDescriptor (CubeSource.GetYAxisFieldName (i),
-                                "", false, false, false)
+                                    "", false, false, false)
                                 {
                                     level = i,
                                     levelsize = 1,
@@ -497,11 +433,11 @@ namespace AM.Reporting.CrossView
                 {
                     crossViewHeaderDescriptor =
                         new CrossViewHeaderDescriptor (CubeSource.GetYAxisFieldName (i), "", false, false, false)
-                            {
-                                level = i,
-                                levelsize = 1,
-                                cell = cell
-                            };
+                        {
+                            level = i,
+                            levelsize = 1,
+                            cell = cell
+                        };
                     if (MeasuresInYAxis)
                     {
                         crossViewHeaderDescriptor.cellsize = (YAxisFieldsCount - i - 1) * MeasuresCount;
@@ -582,14 +518,14 @@ namespace AM.Reporting.CrossView
                 for (var j = 0; j < rowTerminalIndexes.Length; j++)
                 {
                     crossViewCellDescriptor = new CrossViewCellDescriptor (Columns[columnTerminalIndexes[i]].fieldName,
-                        Rows[rowTerminalIndexes[j]].fieldName,
-                        Columns[columnTerminalIndexes[i]].measureName + Rows[rowTerminalIndexes[j]].measureName,
-                        Columns[columnTerminalIndexes[i]].isTotal, Rows[rowTerminalIndexes[j]].isTotal,
-                        Columns[columnTerminalIndexes[i]].isGrandTotal, Rows[rowTerminalIndexes[j]].isGrandTotal)
- {
-     x = i,
-     y = j
- };
+                            Rows[rowTerminalIndexes[j]].fieldName,
+                            Columns[columnTerminalIndexes[i]].measureName + Rows[rowTerminalIndexes[j]].measureName,
+                            Columns[columnTerminalIndexes[i]].isTotal, Rows[rowTerminalIndexes[j]].isTotal,
+                            Columns[columnTerminalIndexes[i]].isGrandTotal, Rows[rowTerminalIndexes[j]].isGrandTotal)
+                        {
+                            X = i,
+                            Y = j
+                        };
                     Cells.Add (crossViewCellDescriptor);
                 }
             }

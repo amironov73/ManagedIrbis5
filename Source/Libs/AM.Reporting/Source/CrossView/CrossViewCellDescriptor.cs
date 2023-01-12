@@ -2,264 +2,220 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
-/*
+/* CrossViewCellDescriptor.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-using AM.Reporting.Table;
 using AM.Reporting.Utils;
 
 #endregion
 
 #nullable enable
 
-namespace AM.Reporting.CrossView
+namespace AM.Reporting.CrossView;
+
+/// <summary>
+/// The descriptor that is used to describe one CrossView data cell.
+/// </summary>
+/// <remarks>
+/// The <see cref="CrossViewCellDescriptor"/> class is used to define one data cell of the CrossView.
+/// To set visual appearance of the data cell, use the <see cref="CrossViewDescriptor.TemplateCell"/>
+/// property.
+/// <para/>The collection of descriptors used to represent the CrossView data cells is stored
+/// in the <b>CrossViewObject.Data.Cells</b> property.
+/// </remarks>
+public class CrossViewCellDescriptor
+    : CrossViewDescriptor
 {
+    #region Properties
+
     /// <summary>
-    /// The descriptor that is used to describe one CrossView data cell.
+    /// Gets a value indicating that this is the "GrandTotal" element on X axis.
     /// </summary>
-    /// <remarks>
-    /// The <see cref="CrossViewCellDescriptor"/> class is used to define one data cell of the CrossView.
-    /// To set visual appearance of the data cell, use the <see cref="CrossViewDescriptor.TemplateCell"/>
-    /// property.
-    /// <para/>The collection of descriptors used to represent the CrossView data cells is stored
-    /// in the <b>CrossViewObject.Data.Cells</b> property.
-    /// </remarks>
-    public class CrossViewCellDescriptor : CrossViewDescriptor
+    public bool IsXGrandTotal { set; get; }
+
+    /// <summary>
+    /// Gets a value indicating that this is the "GrandTotal" element on Y axis.
+    /// </summary>
+    public bool IsYGrandTotal { set; get; }
+
+    /// <summary>
+    /// Gets a value indicating that this is the "Total" element on X axis.
+    /// </summary>
+    public bool IsXTotal { set; get; }
+
+    /// <summary>
+    /// Gets a value indicating that this is the "Total" element on Y axis.
+    /// </summary>
+    public bool IsYTotal { set; get; }
+
+    /// <summary>
+    /// Gets the name of field in X axis.
+    /// </summary>
+    public string XFieldName { set; get; }
+
+    /// <summary>
+    /// Gets the name of field in Y axis.
+    /// </summary>
+    public string YFieldName { set; get; }
+
+    /// <summary>
+    /// Gets the name of measure in cube.
+    /// </summary>
+    public string MeasureName { set; get; }
+
+    /// <summary>
+    /// Gets the x coordinate.
+    /// </summary>
+    public int X { set; get; }
+
+    /// <summary>
+    /// Gets the y coordinate.
+    /// </summary>
+    public int Y { set; get; }
+
+    #endregion
+
+    #region Public Methods
+
+    /// <inheritdoc/>
+    public override void Assign
+        (
+            CrossViewDescriptor source
+        )
     {
-        #region Fields
+        Sure.NotNull (source);
 
-        internal string xFieldName;
-        internal string yFieldName;
-        internal string measureName;
-        internal bool isXGrandTotal;
-        internal bool isYGrandTotal;
-        internal bool isXTotal;
-        internal bool isYTotal;
-#pragma warning disable FR0001 // Field names must be longer than 2 characters.
-        internal int x;
-        internal int y;
-#pragma warning restore FR0001 // Field names must be longer than 2 characters.
-
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// Gets a value indicating that this is the "GrandTotal" element on X axis.
-        /// </summary>
-        public bool IsXGrandTotal
+        base.Assign (source);
+        if (source is CrossViewCellDescriptor src)
         {
-            set => isXGrandTotal = value;
-            get => isXGrandTotal;
+            IsXTotal = src.IsXTotal;
+            IsYTotal = src.IsYTotal;
+            IsXGrandTotal = src.IsXGrandTotal;
+            IsYGrandTotal = src.IsYGrandTotal;
+            XFieldName = src.XFieldName;
+            YFieldName = src.YFieldName;
+            MeasureName = src.MeasureName;
+            X = src.X;
+            Y = src.Y;
+        }
+    }
+
+    /// <inheritdoc/>
+    public override void Serialize
+        (
+            ReportWriter writer
+        )
+    {
+        Sure.NotNull (writer);
+
+        var c = (CrossViewCellDescriptor) writer.DiffObject!;
+        base.Serialize (writer);
+        writer.ItemName = "Cell";
+        if (IsXTotal != c.IsXTotal)
+        {
+            writer.WriteBool ("IsXTotal", IsXTotal);
         }
 
-        /// <summary>
-        /// Gets a value indicating that this is the "GrandTotal" element on Y axis.
-        /// </summary>
-        public bool IsYGrandTotal
+        if (IsYTotal != c.IsYTotal)
         {
-            set => isYGrandTotal = value;
-            get => isYGrandTotal;
+            writer.WriteBool ("IsYTotal", IsYTotal);
         }
 
-        /// <summary>
-        /// Gets a value indicating that this is the "Total" element on X axis.
-        /// </summary>
-        public bool IsXTotal
+        if (IsXGrandTotal != c.IsXGrandTotal)
         {
-            set => isXTotal = value;
-            get => isXTotal;
+            writer.WriteBool ("IsXGrandTotal", IsXGrandTotal);
         }
 
-        /// <summary>
-        /// Gets a value indicating that this is the "Total" element on Y axis.
-        /// </summary>
-        public bool IsYTotal
+        if (IsYGrandTotal != c.IsYGrandTotal)
         {
-            set => isYTotal = value;
-            get => isYTotal;
+            writer.WriteBool ("IsYGrandTotal", IsYGrandTotal);
         }
 
-        /// <summary>
-        /// Gets the name of field in X axis.
-        /// </summary>
-        public string XFieldName
+        if (XFieldName != c.XFieldName)
         {
-            set => xFieldName = value;
-            get => xFieldName;
+            writer.WriteStr ("XFieldName", XFieldName);
         }
 
-        /// <summary>
-        /// Gets the name of field in Y axis.
-        /// </summary>
-        public string YFieldName
+        if (YFieldName != c.YFieldName)
         {
-            set => yFieldName = value;
-            get => yFieldName;
+            writer.WriteStr ("YFieldName", YFieldName);
         }
 
-        /// <summary>
-        /// Gets the name of measure in cube.
-        /// </summary>
-        public string MeasureName
+        if (MeasureName != c.MeasureName)
         {
-            set => measureName = value;
-            get => measureName;
+            writer.WriteStr ("MeasureName", MeasureName);
         }
 
-        /// <summary>
-        /// Gets the x coordinate.
-        /// </summary>
-        public int X
+        if (X != c.X)
         {
-            set => x = value;
-            get => x;
+            writer.WriteInt ("X", X);
         }
 
-        /// <summary>
-        /// Gets the y coordinate.
-        /// </summary>
-        public int Y
+        if (Y != c.Y)
         {
-            set => y = value;
-            get => y;
+            writer.WriteInt ("Y", Y);
+        }
+    }
+
+    #endregion
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CrossViewCellDescriptor"/> class
+    /// </summary>
+    /// <param name="xFieldName">The Field Name in X axis.</param>
+    /// <param name="yFieldName">The Field Name in Y axis.</param>
+    /// <param name="measureName">The Measure Name.</param>
+    /// <param name="isXTotal">Indicates the "XTotal" element.</param>
+    /// <param name="isYTotal">Indicates the "YTotal" element.</param>
+    /// <param name="isXGrandTotal">Indicates the "XGrandTotal" element.</param>
+    /// <param name="isYGrandTotal">Indicates the "YGrandTotal" element.</param>
+    public CrossViewCellDescriptor
+        (
+            string xFieldName,
+            string yFieldName,
+            string measureName,
+            bool isXTotal,
+            bool isYTotal,
+            bool isXGrandTotal,
+            bool isYGrandTotal
+        )
+    {
+        IsXGrandTotal = isXGrandTotal;
+        IsYGrandTotal = isYGrandTotal;
+        MeasureName = measureName;
+        if (isXGrandTotal)
+        {
+            XFieldName = "";
+            IsXTotal = false;
+        }
+        else
+        {
+            XFieldName = xFieldName;
+            IsXTotal = isXTotal;
         }
 
-        #endregion
-
-        #region Public Methods
-
-        /// <inheritdoc/>
-        public override void Assign (CrossViewDescriptor source)
+        if (isYGrandTotal)
         {
-            base.Assign (source);
-            if (source is CrossViewCellDescriptor src)
-            {
-                isXTotal = src.isXTotal;
-                isYTotal = src.isYTotal;
-                isXGrandTotal = src.isXGrandTotal;
-                isYGrandTotal = src.isYGrandTotal;
-                xFieldName = src.xFieldName;
-                yFieldName = src.yFieldName;
-                measureName = src.measureName;
-                x = src.x;
-                y = src.y;
-            }
+            YFieldName = "";
+            IsYTotal = false;
         }
-
-        /// <inheritdoc/>
-        public override void Serialize (ReportWriter writer)
+        else
         {
-            var c = writer.DiffObject as CrossViewCellDescriptor;
-            base.Serialize (writer);
-            writer.ItemName = "Cell";
-            if (IsXTotal != c.IsXTotal)
-            {
-                writer.WriteBool ("IsXTotal", IsXTotal);
-            }
-
-            if (IsYTotal != c.IsYTotal)
-            {
-                writer.WriteBool ("IsYTotal", IsYTotal);
-            }
-
-            if (IsXGrandTotal != c.IsXGrandTotal)
-            {
-                writer.WriteBool ("IsXGrandTotal", IsXGrandTotal);
-            }
-
-            if (IsYGrandTotal != c.IsYGrandTotal)
-            {
-                writer.WriteBool ("IsYGrandTotal", IsYGrandTotal);
-            }
-
-            if (XFieldName != c.XFieldName)
-            {
-                writer.WriteStr ("XFieldName", XFieldName);
-            }
-
-            if (YFieldName != c.YFieldName)
-            {
-                writer.WriteStr ("YFieldName", YFieldName);
-            }
-
-            if (MeasureName != c.MeasureName)
-            {
-                writer.WriteStr ("MeasureName", MeasureName);
-            }
-
-            if (X != c.X)
-            {
-                writer.WriteInt ("X", X);
-            }
-
-            if (Y != c.Y)
-            {
-                writer.WriteInt ("Y", Y);
-            }
+            YFieldName = yFieldName;
+            IsYTotal = isYTotal;
         }
+    }
 
-        #endregion
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CrossViewCellDescriptor"/> class
-        /// </summary>
-        /// <param name="xFieldName">The Field Name in X axis.</param>
-        /// <param name="yFieldName">The Field Name in Y axis.</param>
-        /// <param name="measureName">The Measure Name.</param>
-        /// <param name="isXTotal">Indicates the "XTotal" element.</param>
-        /// <param name="isYTotal">Indicates the "YTotal" element.</param>
-        /// <param name="isXGrandTotal">Indicates the "XGrandTotal" element.</param>
-        /// <param name="isYGrandTotal">Indicates the "YGrandTotal" element.</param>
-        public CrossViewCellDescriptor (string xFieldName, string yFieldName, string measureName, bool isXTotal,
-            bool isYTotal, bool isXGrandTotal, bool isYGrandTotal)
-        {
-            this.isXGrandTotal = isXGrandTotal;
-            this.isYGrandTotal = isYGrandTotal;
-            this.measureName = measureName;
-            if (isXGrandTotal)
-            {
-                this.xFieldName = "";
-                this.isXTotal = false;
-            }
-            else
-            {
-                this.xFieldName = xFieldName;
-                this.isXTotal = isXTotal;
-            }
-
-            if (isYGrandTotal)
-            {
-                this.yFieldName = "";
-                this.isYTotal = false;
-            }
-            else
-            {
-                this.yFieldName = yFieldName;
-                this.isYTotal = isYTotal;
-            }
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CrossViewCellDescriptor"/> class
-        /// </summary>
-        public CrossViewCellDescriptor()
-            : this ("", "", "", false, false, false, false)
-        {
-        }
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CrossViewCellDescriptor"/> class
+    /// </summary>
+    public CrossViewCellDescriptor()
+        : this ("", "", "", false, false, false, false)
+    {
     }
 }
