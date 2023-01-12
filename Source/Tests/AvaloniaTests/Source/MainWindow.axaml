@@ -2,7 +2,7 @@
 
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Width="400"
+        Width="500"
         Height="300"
         x:Class="AvaloniaTests.MainWindow"
         Title="Avalonia Tests">
@@ -138,6 +138,12 @@
             Name="ProgressRingButton"
             Click="ProgressRingButton_OnClick">
             ProgressRing
+        </Button>
+
+        <Button
+            Name="CompactNumericUpDownButton"
+            Click="CompactNumericUpDownButton_OnClick">
+            CompactNumericUpDown
         </Button>
 
     </WrapPanel>

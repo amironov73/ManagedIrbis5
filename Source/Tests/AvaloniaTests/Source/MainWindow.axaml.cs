@@ -621,4 +621,13 @@ public partial class MainWindow
     {
         new ProgressRingDemo().Show (this);
     }
+
+    private void CompactNumericUpDownButton_OnClick
+        (
+            object? sender,
+            RoutedEventArgs eventArgs
+        )
+    {
+        new CompactNumericUpDownDemo().Show (this);
+    }
 }

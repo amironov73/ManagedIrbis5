@@ -22,8 +22,6 @@ public class ProgressRingDemo
             Window owner
         )
     {
-        MagnaTarget.AddToNlogConfiguration();
-
         var ring = new ProgressRing
         {
             Width = 100,
@@ -61,5 +59,4 @@ public class ProgressRingDemo
 
         await window.ShowDialog (owner);
     }
-
 }
