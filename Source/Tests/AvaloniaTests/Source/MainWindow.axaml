@@ -146,6 +146,12 @@
             CompactNumericUpDown
         </Button>
 
+        <Button
+            Name="ProgressStripeButton"
+            Click="ProgressStripeButton_OnClick">
+            ProgressStripe
+        </Button>
+
     </WrapPanel>
 
 </Window>

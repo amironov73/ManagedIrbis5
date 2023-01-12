@@ -630,4 +630,13 @@ public partial class MainWindow
     {
         new CompactNumericUpDownDemo().Show (this);
     }
+
+    private void ProgressStripeButton_OnClick
+        (
+            object? sender,
+            RoutedEventArgs eventArgs
+        )
+    {
+        new ProgressStripeDemo().Show (this);
+    }
 }

@@ -4,7 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
-/* CompactNumericUpDown.cs --
+/* CompactTextBox.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,12 +22,13 @@ using ReactiveUI;
 
 #nullable enable
 
+
 namespace AM.Avalonia.Controls;
 
 /// <summary>
-/// Компактный NumericUpDown.
+/// Компактный TextBox.
 /// </summary>
-public class CompactNumericUpDown
+public class CompactTextBox
     : UserControl
 {
     #region Properties
@@ -35,8 +36,8 @@ public class CompactNumericUpDown
     /// <summary>
     /// Описание свойства <see cref="Value"/>.
     /// </summary>
-    public static readonly DirectProperty<CompactNumericUpDown, decimal?> ValueProperty =
-        AvaloniaProperty.RegisterDirect<CompactNumericUpDown, decimal?>
+    public static readonly DirectProperty<CompactTextBox, string?> ValueProperty =
+        AvaloniaProperty.RegisterDirect<CompactTextBox, string?>
             (
                 nameof (Value),
                 x => x.Value,
@@ -48,8 +49,8 @@ public class CompactNumericUpDown
     /// <summary>
     /// Описание свойства <see cref="Caption"/>.
     /// </summary>
-    public static readonly DirectProperty<CompactNumericUpDown, string?> CaptionProperty =
-        AvaloniaProperty.RegisterDirect<CompactNumericUpDown, string?>
+    public static readonly DirectProperty<CompactTextBox, string?> CaptionProperty =
+        AvaloniaProperty.RegisterDirect<CompactTextBox, string?>
             (
                 nameof (Caption),
                 x => x.Caption,
@@ -69,9 +70,9 @@ public class CompactNumericUpDown
     /// <summary>
     /// Значение.
     /// </summary>
-    public decimal? Value
+    public string? Value
     {
-        get => (decimal?) _valueLabel.Content;
+        get => (string?) _valueLabel.Content;
         set => _valueLabel.Content = value;
     }
 
@@ -87,7 +88,7 @@ public class CompactNumericUpDown
     /// <summary>
     ///
     /// </summary>
-    public CompactNumericUpDown()
+    public CompactTextBox()
     {
         var hand = new Cursor (StandardCursorType.Hand);
         Cursor = hand;
@@ -107,7 +108,7 @@ public class CompactNumericUpDown
         };
         _valueLabel.PointerPressed += Pointer_Pressed;
 
-        _numericUpDown = new NumericUpDown
+        _textBox = new TextBox
         {
             Width = 130
         };
@@ -135,7 +136,7 @@ public class CompactNumericUpDown
                     Children =
                     {
                         _flyoutLabel,
-                        _numericUpDown,
+                        _textBox,
                         new Button
                         {
                             Content = "x",
@@ -160,7 +161,7 @@ public class CompactNumericUpDown
     private readonly Label _flyoutLabel;
     private readonly Label _captionLabel;
     private readonly Label _valueLabel;
-    private readonly NumericUpDown _numericUpDown;
+    private readonly TextBox _textBox;
 
     private void Pointer_Pressed (object? sender, PointerPressedEventArgs eventArgs)
     {
@@ -173,7 +174,7 @@ public class CompactNumericUpDown
     private void OpenFlyout()
     {
         _flyoutLabel.Content = Caption;
-        _numericUpDown.Value = Value;
+        _textBox.Text = Value;
         Flyout.ShowAt(this);
     }
 
@@ -183,8 +184,9 @@ public class CompactNumericUpDown
     private void CloseFlyout()
     {
         Flyout.Hide();
-        SetValue (ValueProperty, _numericUpDown.Value);
+        SetValue (ValueProperty, _textBox.Text);
     }
 
     #endregion
+
 }
