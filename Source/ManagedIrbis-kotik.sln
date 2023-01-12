@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libs", "Libs", "{DE280C88-253E-4398-B9BC-8EE858E9F49D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AM.Core5", "Libs\AM.Core5\AM.Core5.csproj", "{7AD726E3-38F3-45B2-8AD9-82C882411D7B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AM.Kotik", "Libs\AM.Kotik\AM.Kotik.csproj", "{5245779E-D1BE-49CF-BA33-5ECD8C1C297F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7AD726E3-38F3-45B2-8AD9-82C882411D7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7AD726E3-38F3-45B2-8AD9-82C882411D7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7AD726E3-38F3-45B2-8AD9-82C882411D7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7AD726E3-38F3-45B2-8AD9-82C882411D7B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5245779E-D1BE-49CF-BA33-5ECD8C1C297F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5245779E-D1BE-49CF-BA33-5ECD8C1C297F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5245779E-D1BE-49CF-BA33-5ECD8C1C297F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5245779E-D1BE-49CF-BA33-5ECD8C1C297F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7AD726E3-38F3-45B2-8AD9-82C882411D7B} = {DE280C88-253E-4398-B9BC-8EE858E9F49D}
+		{5245779E-D1BE-49CF-BA33-5ECD8C1C297F} = {DE280C88-253E-4398-B9BC-8EE858E9F49D}
+	EndGlobalSection
+EndGlobal
