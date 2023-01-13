@@ -63,16 +63,16 @@ public sealed class OrParser<TResult>
     public override bool TryParse
         (
             ParseState state,
-            out TResult? result
+            out TResult result
         )
     {
-        result = default;
+        result = default!;
 
         var location = state.Location;
         foreach (var parser in _alternatives)
         {
             state.Location = location;
-            if (parser.TryParse (state, out result))
+            if (parser.TryParse (state, out result!))
             {
                 return true;
             }

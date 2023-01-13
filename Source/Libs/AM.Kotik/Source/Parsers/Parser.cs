@@ -4,8 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 
 /* Parser.cs -- базовы класс для парсеров
@@ -15,6 +13,8 @@
 #region Using directives
 
 using System.Diagnostics.CodeAnalysis;
+
+using AM.Results;
 
 #endregion
 
@@ -31,14 +31,57 @@ public abstract class Parser<TResult>
     #region Public methods
 
     /// <summary>
-    /// Разбор входного потока.
+    /// Разбор входного потока (попытка).
     /// </summary>
     public abstract bool TryParse
         (
             ParseState state,
-            [MaybeNullWhen (false)] out TResult? result
+            [MaybeNullWhen (false)] out TResult result
         );
 
-    #endregion
+    /// <summary>
+    /// Разбор входного
+    /// </summary>
+    public Result<TResult> Parse
+        (
+            ParseState state,
+            bool advance = false
+        )
+    {
+        if (!TryParse (state, out var temporary))
+        {
+            return Result<TResult>.Failure();
+        }
 
+        if (advance)
+        {
+            state.Advance();
+        }
+
+        return new Result<TResult> (temporary);
+    }
+
+    /// <summary>
+    /// Разбор входного
+    /// </summary>
+    public TResult ParseOrThrow
+        (
+            ParseState state,
+            bool advance = false
+        )
+    {
+        if (!TryParse (state, out var temporary))
+        {
+            throw new SyntaxException();
+        }
+
+        if (advance)
+        {
+            state.Advance();
+        }
+
+        return new Result<TResult> (temporary).Value;
+    }
+
+    #endregion
 }

@@ -79,6 +79,24 @@ public sealed class Token
     #region Public methods
 
     /// <summary>
+    /// Число (неважно со знаком или без)?
+    /// </summary>
+    public bool IsNumber() => Kind is TokenKind.Int32 or TokenKind.Int64
+            or TokenKind.Single or TokenKind.Double or TokenKind.Decimal
+            or TokenKind.UInt32 or TokenKind.UInt64;
+
+    /// <summary>
+    /// Число со знаком?
+    /// </summary>
+    public bool IsSignedNumber() => Kind is TokenKind.Int32 or TokenKind.Int64
+            or TokenKind.Single or TokenKind.Double or TokenKind.Decimal;
+
+    /// <summary>
+    /// Число без знака?
+    /// </summary>
+    public bool IsUnsignedNumber() => Kind is TokenKind.UInt32 or TokenKind.UInt64;
+
+    /// <summary>
     /// Конец текста?
     /// </summary>
     public bool IsEot()
@@ -177,6 +195,11 @@ public sealed class Token
 
         return false;
     }
+
+    /// <summary>
+    /// Токен с новым значением.
+    /// </summary>
+    public Token WithNewValue (string? value) => new (Kind, value, Line, Column);
 
     #endregion
 

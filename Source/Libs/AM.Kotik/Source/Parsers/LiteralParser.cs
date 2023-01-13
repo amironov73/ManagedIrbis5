@@ -1,0 +1,114 @@
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+
+/* LiteralParser.cs -- парсит литералы
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
+using System.Globalization;
+
+#endregion
+
+#nullable enable
+
+namespace AM.Kotik;
+
+/// <summary>
+/// Парсит литералы.
+/// </summary>
+public sealed class LiteralParser
+    : Parser<object>
+{
+    #region Parser<TResult> members
+
+    /// <inheritdoc cref="Parser{TResult}.TryParse"/>
+    public override bool TryParse
+        (
+            ParseState state,
+            out object result
+        )
+    {
+        result = null!;
+
+        if (!state.HasCurrent)
+        {
+            return false;
+        }
+
+        var current = state.Current;
+        var value = current.Value!;
+        var invariant = CultureInfo.InvariantCulture;
+        switch (current.Kind)
+        {
+            case TokenKind.Char:
+                result = value[0];
+                break;
+
+            case TokenKind.String:
+                result = value;
+                break;
+
+            case TokenKind.Int32:
+                result = int.Parse (value, invariant);
+                break;
+
+            case TokenKind.UInt32:
+                result = uint.Parse (value, invariant);
+                break;
+
+            case TokenKind.Int64:
+                result = long.Parse (value, invariant);
+                break;
+
+            case TokenKind.UInt64:
+                result = ulong.Parse (value, invariant);
+                break;
+
+            case TokenKind.Single:
+                result = float.Parse (value, invariant);
+                break;
+
+            case TokenKind.Double:
+                result = double.Parse (value, invariant);
+                break;
+
+            case TokenKind.Decimal:
+                result = decimal.Parse (value, invariant);
+                break;
+
+            case TokenKind.ReservedWord:
+                switch (value)
+                {
+                    case "null":
+                        result = null!;
+                        break;
+
+                    case "true":
+                        result = true;
+                        break;
+
+                    case "false":
+                        result = false;
+                        break;
+
+                    default:
+                        return false;
+                }
+
+                break;
+
+            default:
+                return false;
+        }
+
+        return true;
+    }
+
+    #endregion
+}

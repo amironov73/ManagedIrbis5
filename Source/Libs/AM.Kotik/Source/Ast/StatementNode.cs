@@ -1,0 +1,63 @@
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedMember.Global
+
+/* StatementNode.cs -- базовый класс для стейтментов
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#nullable enable
+
+namespace AM.Kotik;
+
+/// <summary>
+/// Базовый класс для стейтментов.
+/// </summary>
+public class StatementNode
+    : AstNode
+{
+    #region Private members
+
+    /// <summary>
+    /// Вызывается перед выполнением стейтмента.
+    /// </summary>
+    protected virtual void PreExecute
+        (
+            Context context
+        )
+    {
+        Sure.NotNull (context);
+
+        // пока этот метод не выполняет никаких действий
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Выполнение действий, связанных с данным узом,
+    /// в определенном контексте.
+    /// </summary>
+    /// <param name="context">Контекст исполнения программы.
+    /// </param>
+    public virtual void Execute
+        (
+            Context context
+        )
+    {
+        Sure.NotNull (context);
+
+        PreExecute (context);
+
+        // больше никаких действий на данном уровне не нужно
+    }
+
+    #endregion
+}

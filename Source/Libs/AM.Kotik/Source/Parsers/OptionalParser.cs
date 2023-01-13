@@ -5,48 +5,41 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* ChainParser.cs -- парсер для последовательностей
+/* OptionalParser.cs -- парсер, который безболезненно может зафейлиться
  * Ars Magna project, http://arsmagna.ru
  */
-
-#region Using directives
-
-using System;
-using System.Diagnostics.CodeAnalysis;
-
-#endregion
 
 #nullable enable
 
 namespace AM.Kotik;
 
 /// <summary>
-/// Парсер для последовательностей.
+/// Парсер, который безболезненно может зафейлиться.
 /// </summary>
-public sealed class ChainParser<TResult>
+public sealed class OptionalParser<TResult>
     : Parser<TResult>
     where TResult: class
 {
-    #region Construction
+    #region Construciton
 
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public ChainParser
+    public OptionalParser
         (
-            params Parser<TResult>[] parsers
+            Parser<TResult> parser
         )
     {
-        Sure.AssertState (parsers.Length != 0);
+        Sure.NotNull (parser);
 
-        _parsers = parsers;
+        _parser = parser;
     }
 
     #endregion
 
     #region Private members
 
-    private readonly Parser<TResult>[] _parsers;
+    private readonly Parser<TResult> _parser;
 
     #endregion
 
@@ -61,19 +54,13 @@ public sealed class ChainParser<TResult>
     {
         result = default!;
 
-        var location = state.Location;
-        foreach (var parser in _parsers)
+        if (_parser.TryParse (state, out var temporary))
         {
-            if (!parser.TryParse (state, out result!))
-            {
-                state.Location = location;
-                return false;
-            }
-
-            state.Advance();
+            result = temporary;
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     #endregion

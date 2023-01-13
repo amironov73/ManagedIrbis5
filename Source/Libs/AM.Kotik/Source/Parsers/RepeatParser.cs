@@ -5,14 +5,13 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* ChainParser.cs -- парсер для последовательностей
+/* RepeatParser.cs -- парсер для повторяющихся значений
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
-using System.Diagnostics.CodeAnalysis;
+using System.Collections.Generic;
 
 #endregion
 
@@ -21,10 +20,10 @@ using System.Diagnostics.CodeAnalysis;
 namespace AM.Kotik;
 
 /// <summary>
-/// Парсер для последовательностей.
+/// Парсер для повторяющихся значений.
 /// </summary>
-public sealed class ChainParser<TResult>
-    : Parser<TResult>
+public sealed class RepeatParser<TResult>
+    : Parser<IEnumerable<TResult>>
     where TResult: class
 {
     #region Construction
@@ -32,21 +31,26 @@ public sealed class ChainParser<TResult>
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public ChainParser
+    public RepeatParser
         (
-            params Parser<TResult>[] parsers
+            Parser<TResult> parser,
+            int count
         )
     {
-        Sure.AssertState (parsers.Length != 0);
+        Sure.NotNull (parser);
+        Sure.Positive (count);
 
-        _parsers = parsers;
+        _parser = parser;
+        _count = count;
     }
 
     #endregion
 
     #region Private members
 
-    private readonly Parser<TResult>[] _parsers;
+    private readonly int _count;
+
+    private readonly Parser<TResult> _parser;
 
     #endregion
 
@@ -56,22 +60,31 @@ public sealed class ChainParser<TResult>
     public override bool TryParse
         (
             ParseState state,
-            out TResult result
+            out IEnumerable<TResult> result
         )
     {
         result = default!;
 
+        var list = new List<TResult>();
         var location = state.Location;
-        foreach (var parser in _parsers)
+        for (var i = 0; i < _count; i++)
         {
-            if (!parser.TryParse (state, out result!))
+            if (i != 0 && !state.Advance())
             {
                 state.Location = location;
                 return false;
             }
 
-            state.Advance();
+            if (!_parser.TryParse (state, out var temporary))
+            {
+                state.Location = location;
+                return false;
+            }
+
+            list.Add (temporary);
         }
+
+        result = list;
 
         return true;
     }

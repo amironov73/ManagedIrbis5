@@ -2,14 +2,9 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassWithVirtualMembersNeverInherited.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable NonReadonlyMemberInGetHashCode
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
 
 /* Tokenizer.cs -- генерализованный токенайзер
  * Ars Magna project, http://arsmagna.ru
@@ -30,7 +25,7 @@ namespace AM.Kotik;
 /// <summary>
 /// Генерализованный токенайзер.
 /// </summary>
-public class Tokenizer
+public sealed class Tokenizer
 {
     #region Private members
 
@@ -67,7 +62,7 @@ public class Tokenizer
         "/=", "=="
     };
 
-    private bool IsEOF => _navigator.IsEOF;
+    private bool IsEof => _navigator.IsEOF;
 
     private char PeekChar() => _navigator.PeekChar();
 
@@ -75,21 +70,16 @@ public class Tokenizer
 
     private bool SkipWhitespace() => _navigator.SkipWhitespace();
 
-    #endregion
-
-    #region Protected members
-
     /// <summary>
     /// Пропускаем комментарии.
     /// </summary>
     /// <returns><c>true</c>, если были встречены комментарии.
     /// </returns>
-    protected virtual bool SkipComments()
+    private bool SkipComments()
     {
         if (PeekChar() == '/')
         {
             var nextChar = _navigator.LookAhead();
-
 
             // комментарий до конца строки
             if (nextChar == '/')
@@ -103,7 +93,13 @@ public class Tokenizer
             if (nextChar == '*')
             {
                 // проматываем всё до конца
+                var position = _navigator.Position;
                 _navigator.ReadTo ("*/");
+                if (_navigator.Position == position)
+                {
+                    throw new SyntaxException (_navigator);
+                }
+
                 return true;
             }
         }
@@ -115,7 +111,7 @@ public class Tokenizer
     /// Разбор единичного символа в кавычках.
     /// </summary>
     /// <returns><c>null</c>, если в текущей позиции не символ.</returns>
-    protected virtual Token? ParseCharacter()
+    private Token? ParseCharacter()
     {
         if (PeekChar() != '\'')
         {
@@ -135,7 +131,7 @@ public class Tokenizer
     /// <summary>
     /// Разбор обычной строки (пока без экранирования).
     /// </summary>
-    protected virtual Token? ParseString()
+    private Token? ParseString()
     {
         if (PeekChar() != '"')
         {
@@ -145,7 +141,7 @@ public class Tokenizer
         ReadChar(); // съедаем открывающую кавычку
         char chr = default;
         var builder = new StringBuilder();
-        while (!IsEOF)
+        while (!IsEof)
         {
             chr = ReadChar();
             if (chr == '"')
@@ -167,7 +163,7 @@ public class Tokenizer
     /// <summary>
     /// Разбор числа.
     /// </summary>
-    protected virtual Token? ParseNumber()
+    private Token? ParseNumber()
     {
         char chr = PeekChar();
         if (!chr.IsArabicDigit())
@@ -176,7 +172,7 @@ public class Tokenizer
         }
 
         var builder = new StringBuilder();
-        while (!IsEOF)
+        while (!IsEof)
         {
             chr = PeekChar();
             if (!chr.IsArabicDigit())
@@ -195,7 +191,7 @@ public class Tokenizer
             isFloat = true;
             builder.Append (ReadChar());
 
-            while (!IsEOF)
+            while (!IsEof)
             {
                 chr = PeekChar();
                 if (!chr.IsArabicDigit())
@@ -219,18 +215,18 @@ public class Tokenizer
             if (chr is 'F' or 'f')
             {
                 isF = true;
-                builder.Append (ReadChar());
+                ReadChar();
             }
 
             if (chr is 'M' or 'm')
             {
                 isM = true;
-                builder.Append (ReadChar());
+                ReadChar();
             }
         }
         else
         {
-            while (!IsEOF)
+            while (!IsEof)
             {
                 var canContinue = true;
                 switch (chr)
@@ -240,7 +236,7 @@ public class Tokenizer
                         if (isU || isF || isFloat || isM)
                         {
                             // нельзя указывать больше одного раза
-                            throw new FormatException();
+                            throw new SyntaxException (_navigator);
                         }
 
                         isU = true;
@@ -251,7 +247,7 @@ public class Tokenizer
                         if (isL || isF || isFloat || isM)
                         {
                             // нельзя указывать больше одного раза
-                            throw new FormatException();
+                            throw new SyntaxException (_navigator);
                         }
 
                         isL = true;
@@ -259,9 +255,9 @@ public class Tokenizer
 
                     case 'f':
                     case 'F':
-                        if (isU || isL || isM)
+                        if (isU || isF || isL || isM)
                         {
-                            throw new FormatException();
+                            throw new SyntaxException (_navigator);
                         }
 
                         isFloat = true;
@@ -270,9 +266,9 @@ public class Tokenizer
 
                     case 'm':
                     case 'M':
-                        if (isU || isL || isF)
+                        if (isU || isL || isF || isM)
                         {
-                            throw new FormatException();
+                            throw new SyntaxException (_navigator);
                         }
 
                         isM = true;
@@ -288,7 +284,7 @@ public class Tokenizer
                     break;
                 }
 
-                builder.Append (ReadChar());
+                ReadChar();
                 chr = PeekChar();
             }
         }
@@ -323,7 +319,7 @@ public class Tokenizer
     /// <summary>
     /// Разбор терма.
     /// </summary>
-    protected virtual Token? ParseTerm()
+    private Token? ParseTerm()
     {
         string? previousGood = null;
         var line = _navigator.Line;
@@ -405,7 +401,7 @@ public class Tokenizer
     /// Разбор идентификатора.
     /// </summary>
     /// <returns><c>null</c>, если в текущей позиции не идентификатор.</returns>
-    protected virtual Token? ParseIdentifier()
+    private Token? ParseIdentifier()
     {
         var firstChar = PeekChar();
         if (Array.IndexOf (_firstIdentifierLetter, firstChar) < 0)
@@ -418,7 +414,7 @@ public class Tokenizer
         var column = _navigator.Column;
         builder.Append (ReadChar());
 
-        while (!IsEOF)
+        while (!IsEof)
         {
             if (Array.IndexOf (_nextIdentifierLetter, PeekChar()) < 0)
             {
@@ -441,6 +437,45 @@ public class Tokenizer
             );
     }
 
+    private List<Token> Refine
+        (
+            IList<Token> source
+        )
+    {
+        var result = new List<Token> (source.Count);
+        for (var index = 0; index < source.Count; index++)
+        {
+            var token = source[index];
+            if (token is { Kind: TokenKind.Term, Value: "-" })
+            {
+                var next = source!.SafeAt (index + 1);
+                if (next is not null && next.IsSignedNumber())
+                {
+                    var prev = source!.SafeAt (index - 1)?.Kind;
+                    if (prev is null or TokenKind.Term)
+                    {
+                        result.Add (next.WithNewValue ("-" + next.Value));
+                        index++;
+                    }
+                    else
+                    {
+                        result.Add (token);
+                    }
+                }
+                else
+                {
+                    result.Add (token);
+                }
+            }
+            else
+            {
+                result.Add (token);
+            }
+        }
+
+        return result;
+    }
+
     #endregion
 
     #region Public methods
@@ -458,7 +493,7 @@ public class Tokenizer
         var result = new List<Token>();
         _navigator = new Text.TextNavigator (text);
 
-        while (!IsEOF)
+        while (!IsEof)
         {
             if (!SkipWhitespace())
             {
@@ -479,6 +514,8 @@ public class Tokenizer
 
             result.Add (token);
         }
+
+        result = Refine (result);
 
         return result;
     }

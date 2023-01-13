@@ -12,6 +12,12 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
+#region Using directives
+
+using System;
+
+#endregion
+
 #nullable enable
 
 namespace AM.Results;
@@ -105,18 +111,75 @@ public readonly struct Success<T>
 /// </summary>
 public readonly struct Result<T>
 {
+    #region Properties
+
     /// <summary>
-    /// Конструктор.
+    /// Признак успешного завершения.
     /// </summary>
-    public Result(T value)
-    {
-        Value = value;
-    }
+    public bool IsSuccess { get; }
+
+    /// <summary>
+    /// Сообщение об ошибке.
+    /// </summary>
+    public string? Message { get; init; }
 
     /// <summary>
     /// Хранимое значение.
     /// </summary>
-    public T Value { get; }
+    public T Value
+    {
+        get
+        {
+            if (!IsSuccess)
+            {
+                throw new InvalidOperationException();
+            }
+
+            return _value;
+        }
+    }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор для случая успеха.
+    /// </summary>
+    public Result
+        (
+            T value
+        )
+    {
+        IsSuccess = true;
+        _value = value;
+    }
+
+    #endregion
+
+    #region Private members
+
+    private readonly T _value;
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Сбой.
+    /// </summary>
+    public static Result<T> Failure
+        (
+            string? message = null
+        )
+    {
+        return new Result<T>
+        {
+            Message = message
+        };
+    }
+
+    #endregion
 }
 
 /// <summary>

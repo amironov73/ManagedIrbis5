@@ -17,6 +17,9 @@
 #region Using directives
 
 using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 #endregion
 
@@ -32,12 +35,23 @@ public sealed class ParseState
     #region Construction
 
     /// <summary>
-    /// Конструктор по умолчанию.
+    /// Конструктор.
     /// </summary>
-    internal ParseState()
+    public ParseState
+        (
+            IEnumerable<Token> tokens
+        )
     {
-        // пустое тело конструктора
+        Sure.NotNull (tokens);
+
+        _tokens = tokens.ToArray();
     }
+
+    #endregion
+
+    #region Private members
+
+    private readonly Token[] _tokens;
 
     #endregion
 
@@ -53,22 +67,26 @@ public sealed class ParseState
     /// <summary>
     /// Есть текущий токен или уже достигнут конец входного потока?
     /// </summary>
-    public bool HasCurrent => throw new NotImplementedException();
+    public bool HasCurrent => Location < _tokens.Length;
 
     /// <summary>
     /// Текущий токен.
     /// </summary>
-    public Token Current => throw new NotImplementedException();
+    public Token Current => HasCurrent
+        ? _tokens[Location]
+        : throw new IndexOutOfRangeException();
 
     /// <summary>
     /// Продвижение вперед во входном потоке на указанное количество токенов.
     /// </summary>
-    public void Advance
+    public bool Advance
         (
             int count = 1
         )
     {
         Location += count;
+
+        return Location < _tokens.Length;
     }
 
     /// <summary>
@@ -79,12 +97,17 @@ public sealed class ParseState
             int count
         )
     {
-        throw new NotImplementedException();
+        var position = Location + count;
+
+        return position < _tokens.Length
+            ? _tokens.AsSpan (position, 1)
+            : default;
     }
 
     /// <summary>
     /// Вывод строки отладочного текста.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public void Trace
         (
             string line

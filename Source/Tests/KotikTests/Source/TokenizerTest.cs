@@ -10,6 +10,8 @@ using AM.Kotik;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+#nullable enable
+
 namespace KotikTests;
 
 [TestClass]
@@ -63,6 +65,22 @@ public class TokenizerTest
         Assert.AreEqual ("==", tokens[0].Value);
         Assert.AreEqual (TokenKind.Term, tokens[1].Kind);
         Assert.AreEqual ("==", tokens[1].Value);
+
+        tokens = tokenizer.Tokenize (" ++ x ");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (2, tokens.Count);
+        Assert.AreEqual (TokenKind.Term, tokens[0].Kind);
+        Assert.AreEqual ("++", tokens[0].Value);
+        Assert.AreEqual (TokenKind.Identifier, tokens[1].Kind);
+        Assert.AreEqual ("x", tokens[1].Value);
+
+        tokens = tokenizer.Tokenize (" x ++ ");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (2, tokens.Count);
+        Assert.AreEqual (TokenKind.Identifier, tokens[0].Kind);
+        Assert.AreEqual ("x", tokens[0].Value);
+        Assert.AreEqual (TokenKind.Term, tokens[1].Kind);
+        Assert.AreEqual ("++", tokens[1].Value);
     }
 
     [TestMethod]
@@ -81,7 +99,7 @@ public class TokenizerTest
 
     [TestMethod]
     [Description ("32-битное целое число со знаком")]
-    public void BarsikTokenizer_Tokenize_5()
+    public void Tokenizer_Tokenize_5()
     {
         var tokenizer = new Tokenizer();
         var tokens = tokenizer.Tokenize (" 1234 ");
@@ -104,303 +122,561 @@ public class TokenizerTest
 
         tokens = tokenizer.Tokenize ("-1234");
         Assert.IsNotNull (tokens);
-        Assert.AreEqual (2, tokens.Count);
-        Assert.AreEqual (TokenKind.Term, tokens[0].Kind);
-        Assert.AreEqual ("-", tokens[0].Value);
-        Assert.AreEqual (TokenKind.Int32, tokens[1].Kind);
-        Assert.AreEqual ("1234", tokens[1].Value);
+        Assert.AreEqual (1, tokens.Count);
+        Assert.AreEqual (TokenKind.Int32, tokens[0].Kind);
+        Assert.AreEqual ("-1234", tokens[0].Value);
+
+        tokens = tokenizer.Tokenize ("-1234 -4567");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (3, tokens.Count);
+        Assert.AreEqual (TokenKind.Int32, tokens[0].Kind);
+        Assert.AreEqual ("-1234", tokens[0].Value);
+        Assert.AreEqual (TokenKind.Term, tokens[1].Kind);
+        Assert.AreEqual ("-", tokens[1].Value);
+        Assert.AreEqual (TokenKind.Int32, tokens[2].Kind);
+        Assert.AreEqual ("4567", tokens[2].Value);
+
+        tokens = tokenizer.Tokenize ("-1234 + -4567");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (3, tokens.Count);
+        Assert.AreEqual (TokenKind.Int32, tokens[0].Kind);
+        Assert.AreEqual ("-1234", tokens[0].Value);
+        Assert.AreEqual (TokenKind.Term, tokens[1].Kind);
+        Assert.AreEqual ("+", tokens[1].Value);
+        Assert.AreEqual (TokenKind.Int32, tokens[2].Kind);
+        Assert.AreEqual ("-4567", tokens[2].Value);
+
+        Assert.ThrowsException<SyntaxException>
+            (
+                () => tokenizer.Tokenize ("12uu")
+            );
+        Assert.ThrowsException<SyntaxException>
+            (
+                () => tokenizer.Tokenize ("12ll")
+            );
+        Assert.ThrowsException<SyntaxException>
+            (
+                () => tokenizer.Tokenize ("12fl")
+            );
+        Assert.ThrowsException<SyntaxException>
+            (
+                () => tokenizer.Tokenize ("12fm")
+            );
+        Assert.ThrowsException<SyntaxException>
+            (
+                () => tokenizer.Tokenize ("12ff")
+            );
+        Assert.ThrowsException<SyntaxException>
+            (
+                () => tokenizer.Tokenize ("12mm")
+            );
     }
-
-
-
-#if NOTDEF
-
 
     [TestMethod]
     [Description ("64-битное целое число со знаком")]
-    public void BarsikTokenizer_Tokenize_6()
+    public void Tokenizer_Tokenize_6()
     {
-        var tokens = BarsikTokenizer.Tokenize ("1234l");
+        var tokenizer = new Tokenizer();
+        var tokens = tokenizer.Tokenize (" 1234l ");
         Assert.IsNotNull (tokens);
         Assert.AreEqual (1, tokens.Count);
-        Assert.AreEqual (BarsikToken.Int64, tokens[0].Kind);
-        Assert.AreEqual ("1234l".AsMemory(), tokens[0].Value);
+        Assert.AreEqual (TokenKind.Int64, tokens[0].Kind);
+        Assert.AreEqual ("1234", tokens[0].Value);
 
-        tokens = BarsikTokenizer.Tokenize ("1234L");
-        Assert.IsNotNull (tokens);
-        Assert.AreEqual (1, tokens.Count);
-        Assert.AreEqual (BarsikToken.Int64, tokens[0].Kind);
-        Assert.AreEqual ("1234L".AsMemory(), tokens[0].Value);
-
-        Assert.ThrowsException<FormatException>
-            (
-                () => BarsikTokenizer.Tokenize ("123ll")
-            );
-        Assert.ThrowsException<FormatException>
-            (
-                () => BarsikTokenizer.Tokenize ("123lL")
-            );
-
-        tokens = BarsikTokenizer.Tokenize ("1234l ");
-        Assert.IsNotNull (tokens);
-        Assert.AreEqual (1, tokens.Count);
-        Assert.AreEqual (BarsikToken.Int64, tokens[0].Kind);
-        Assert.AreEqual ("1234l", tokens[0].Value.ToString());
-
-        tokens = BarsikTokenizer.Tokenize ("1234l(");
+        tokens = tokenizer.Tokenize ("1234l(");
         Assert.IsNotNull (tokens);
         Assert.AreEqual (2, tokens.Count);
-        Assert.AreEqual (BarsikToken.Int64, tokens[0].Kind);
-        Assert.AreEqual ("1234l", tokens[0].Value.ToString());
+        Assert.AreEqual (TokenKind.Int64, tokens[0].Kind);
+        Assert.AreEqual ("1234", tokens[0].Value);
 
-        tokens = BarsikTokenizer.Tokenize ("1234l+");
+        tokens = tokenizer.Tokenize ("1234l+");
         Assert.IsNotNull (tokens);
         Assert.AreEqual (2, tokens.Count);
-        Assert.AreEqual (BarsikToken.Int64, tokens[0].Kind);
-        Assert.AreEqual ("1234l", tokens[0].Value.ToString());
+        Assert.AreEqual (TokenKind.Int64, tokens[0].Kind);
+        Assert.AreEqual ("1234", tokens[0].Value);
+
+        tokens = tokenizer.Tokenize ("-1234l");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (1, tokens.Count);
+        Assert.AreEqual (TokenKind.Int64, tokens[0].Kind);
+        Assert.AreEqual ("-1234", tokens[0].Value);
+
+        tokens = tokenizer.Tokenize ("-1234l -4567l");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (3, tokens.Count);
+        Assert.AreEqual (TokenKind.Int64, tokens[0].Kind);
+        Assert.AreEqual ("-1234", tokens[0].Value);
+        Assert.AreEqual (TokenKind.Term, tokens[1].Kind);
+        Assert.AreEqual ("-", tokens[1].Value);
+        Assert.AreEqual (TokenKind.Int64, tokens[2].Kind);
+        Assert.AreEqual ("4567", tokens[2].Value);
+
+        tokens = tokenizer.Tokenize ("-1234l + -4567l");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (3, tokens.Count);
+        Assert.AreEqual (TokenKind.Int64, tokens[0].Kind);
+        Assert.AreEqual ("-1234", tokens[0].Value);
+        Assert.AreEqual (TokenKind.Term, tokens[1].Kind);
+        Assert.AreEqual ("+", tokens[1].Value);
+        Assert.AreEqual (TokenKind.Int64, tokens[2].Kind);
+        Assert.AreEqual ("-4567", tokens[2].Value);
     }
 
     [TestMethod]
     [Description ("32-битное целое число без знака")]
-    public void BarsikTokenizer_Tokenize_7()
+    public void Tokenizer_Tokenize_7()
     {
-        var tokens = BarsikTokenizer.Tokenize ("1234u");
+        var tokenizer = new Tokenizer();
+        var tokens = tokenizer.Tokenize (" 1234u ");
         Assert.IsNotNull (tokens);
         Assert.AreEqual (1, tokens.Count);
-        Assert.AreEqual (BarsikToken.UInt32, tokens[0].Kind);
-        Assert.AreEqual ("1234u".AsMemory(), tokens[0].Value);
+        Assert.AreEqual (TokenKind.UInt32, tokens[0].Kind);
+        Assert.AreEqual ("1234", tokens[0].Value);
 
-        tokens = BarsikTokenizer.Tokenize ("1234U");
-        Assert.IsNotNull (tokens);
-        Assert.AreEqual (1, tokens.Count);
-        Assert.AreEqual (BarsikToken.UInt32, tokens[0].Kind);
-        Assert.AreEqual ("1234U".AsMemory(), tokens[0].Value);
-
-        Assert.ThrowsException<FormatException>
-            (
-                () => BarsikTokenizer.Tokenize ("123uu")
-            );
-        Assert.ThrowsException<FormatException>
-            (
-                () => BarsikTokenizer.Tokenize ("123uU")
-            );
-
-        tokens = BarsikTokenizer.Tokenize ("1234u ");
-        Assert.IsNotNull (tokens);
-        Assert.AreEqual (1, tokens.Count);
-        Assert.AreEqual (BarsikToken.UInt32, tokens[0].Kind);
-        Assert.AreEqual ("1234u", tokens[0].Value.ToString());
-
-        tokens = BarsikTokenizer.Tokenize ("1234u(");
+        tokens = tokenizer.Tokenize ("1234u(");
         Assert.IsNotNull (tokens);
         Assert.AreEqual (2, tokens.Count);
-        Assert.AreEqual (BarsikToken.UInt32, tokens[0].Kind);
-        Assert.AreEqual ("1234u", tokens[0].Value.ToString());
+        Assert.AreEqual (TokenKind.UInt32, tokens[0].Kind);
+        Assert.AreEqual ("1234", tokens[0].Value);
 
-        tokens = BarsikTokenizer.Tokenize ("1234u+");
+        tokens = tokenizer.Tokenize ("1234u+");
         Assert.IsNotNull (tokens);
         Assert.AreEqual (2, tokens.Count);
-        Assert.AreEqual (BarsikToken.UInt32, tokens[0].Kind);
-        Assert.AreEqual ("1234u", tokens[0].Value.ToString());
+        Assert.AreEqual (TokenKind.UInt32, tokens[0].Kind);
+        Assert.AreEqual ("1234", tokens[0].Value);
+
+        tokens = tokenizer.Tokenize ("-1234u");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (2, tokens.Count);
+        Assert.AreEqual (TokenKind.Term, tokens[0].Kind);
+        Assert.AreEqual ("-", tokens[0].Value);
+        Assert.AreEqual (TokenKind.UInt32, tokens[1].Kind);
+        Assert.AreEqual ("1234", tokens[1].Value);
+
+        tokens = tokenizer.Tokenize ("-1234u -4567u");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (4, tokens.Count);
+        Assert.AreEqual (TokenKind.Term, tokens[0].Kind);
+        Assert.AreEqual ("-", tokens[0].Value);
+        Assert.AreEqual (TokenKind.UInt32, tokens[1].Kind);
+        Assert.AreEqual ("1234", tokens[1].Value);
+        Assert.AreEqual (TokenKind.Term, tokens[2].Kind);
+        Assert.AreEqual ("-", tokens[2].Value);
+        Assert.AreEqual (TokenKind.UInt32, tokens[3].Kind);
+        Assert.AreEqual ("4567", tokens[3].Value);
+
+        tokens = tokenizer.Tokenize ("-1234u + -4567u");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (5, tokens.Count);
+        Assert.AreEqual (TokenKind.Term, tokens[0].Kind);
+        Assert.AreEqual ("-", tokens[0].Value);
+        Assert.AreEqual (TokenKind.UInt32, tokens[1].Kind);
+        Assert.AreEqual ("1234", tokens[1].Value);
+        Assert.AreEqual (TokenKind.Term, tokens[2].Kind);
+        Assert.AreEqual ("+", tokens[2].Value);
+        Assert.AreEqual (TokenKind.Term, tokens[3].Kind);
+        Assert.AreEqual ("-", tokens[3].Value);
+        Assert.AreEqual (TokenKind.UInt32, tokens[4].Kind);
+        Assert.AreEqual ("4567", tokens[4].Value);
     }
 
     [TestMethod]
     [Description ("64-битное целое число без знака")]
-    public void BarsikTokenizer_Tokenize_8()
+    public void Tokenizer_Tokenize_8()
     {
-        var tokens = BarsikTokenizer.Tokenize ("1234lu");
+        var tokenizer = new Tokenizer();
+        var tokens = tokenizer.Tokenize (" 1234ul ");
         Assert.IsNotNull (tokens);
         Assert.AreEqual (1, tokens.Count);
-        Assert.AreEqual (BarsikToken.UInt64, tokens[0].Kind);
-        Assert.AreEqual ("1234lu".AsMemory(), tokens[0].Value);
+        Assert.AreEqual (TokenKind.UInt64, tokens[0].Kind);
+        Assert.AreEqual ("1234", tokens[0].Value);
 
-        tokens = BarsikTokenizer.Tokenize ("1234LU");
-        Assert.IsNotNull (tokens);
-        Assert.AreEqual (1, tokens.Count);
-        Assert.AreEqual (BarsikToken.UInt64, tokens[0].Kind);
-        Assert.AreEqual ("1234LU".AsMemory(), tokens[0].Value);
-
-        tokens = BarsikTokenizer.Tokenize ("1234ul");
-        Assert.IsNotNull (tokens);
-        Assert.AreEqual (1, tokens.Count);
-        Assert.AreEqual (BarsikToken.UInt64, tokens[0].Kind);
-        Assert.AreEqual ("1234ul".AsMemory(), tokens[0].Value);
-
-        tokens = BarsikTokenizer.Tokenize ("1234UL");
-        Assert.IsNotNull (tokens);
-        Assert.AreEqual (1, tokens.Count);
-        Assert.AreEqual (BarsikToken.UInt64, tokens[0].Kind);
-        Assert.AreEqual ("1234UL".AsMemory(), tokens[0].Value);
-
-        Assert.ThrowsException<FormatException>
-            (
-                () => BarsikTokenizer.Tokenize ("123lul")
-            );
-        Assert.ThrowsException<FormatException>
-            (
-                () => BarsikTokenizer.Tokenize ("123ulU")
-            );
-
-        tokens = BarsikTokenizer.Tokenize ("1234lu ");
-        Assert.IsNotNull (tokens);
-        Assert.AreEqual (1, tokens.Count);
-        Assert.AreEqual (BarsikToken.UInt64, tokens[0].Kind);
-        Assert.AreEqual ("1234lu", tokens[0].Value.ToString());
-
-        tokens = BarsikTokenizer.Tokenize ("1234lu(");
+        tokens = tokenizer.Tokenize ("1234ul(");
         Assert.IsNotNull (tokens);
         Assert.AreEqual (2, tokens.Count);
-        Assert.AreEqual (BarsikToken.UInt64, tokens[0].Kind);
-        Assert.AreEqual ("1234lu", tokens[0].Value.ToString());
+        Assert.AreEqual (TokenKind.UInt64, tokens[0].Kind);
+        Assert.AreEqual ("1234", tokens[0].Value);
 
-        tokens = BarsikTokenizer.Tokenize ("1234lu+");
+        tokens = tokenizer.Tokenize ("1234ul+");
         Assert.IsNotNull (tokens);
         Assert.AreEqual (2, tokens.Count);
-        Assert.AreEqual (BarsikToken.UInt64, tokens[0].Kind);
-        Assert.AreEqual ("1234lu", tokens[0].Value.ToString());
-    }
+        Assert.AreEqual (TokenKind.UInt64, tokens[0].Kind);
+        Assert.AreEqual ("1234", tokens[0].Value);
 
-    [TestMethod]
-    [Description ("Простое арифметическое выражение")]
-    public void BarsikTokenizer_Tokenize_9()
-    {
-        var tokens = BarsikTokenizer.Tokenize ("12+34");
+        tokens = tokenizer.Tokenize ("-1234ul");
         Assert.IsNotNull (tokens);
-        Assert.AreEqual (3, tokens.Count);
-        Assert.AreEqual (BarsikToken.Int32, tokens[0].Kind);
-        Assert.AreEqual ("+", tokens[1].Kind);
-        Assert.AreEqual (BarsikToken.Int32, tokens[2].Kind);
+        Assert.AreEqual (2, tokens.Count);
+        Assert.AreEqual (TokenKind.Term, tokens[0].Kind);
+        Assert.AreEqual ("-", tokens[0].Value);
+        Assert.AreEqual (TokenKind.UInt64, tokens[1].Kind);
+        Assert.AreEqual ("1234", tokens[1].Value);
 
-        tokens = BarsikTokenizer.Tokenize (" 12 + 34 ");
+        tokens = tokenizer.Tokenize ("-1234ul -4567ul");
         Assert.IsNotNull (tokens);
-        Assert.AreEqual (3, tokens.Count);
-        Assert.AreEqual (BarsikToken.Int32, tokens[0].Kind);
-        Assert.AreEqual ("+", tokens[1].Kind);
-        Assert.AreEqual (BarsikToken.Int32, tokens[2].Kind);
+        Assert.AreEqual (4, tokens.Count);
+        Assert.AreEqual (TokenKind.Term, tokens[0].Kind);
+        Assert.AreEqual ("-", tokens[0].Value);
+        Assert.AreEqual (TokenKind.UInt64, tokens[1].Kind);
+        Assert.AreEqual ("1234", tokens[1].Value);
+        Assert.AreEqual (TokenKind.Term, tokens[2].Kind);
+        Assert.AreEqual ("-", tokens[2].Value);
+        Assert.AreEqual (TokenKind.UInt64, tokens[3].Kind);
+        Assert.AreEqual ("4567", tokens[3].Value);
+
+        tokens = tokenizer.Tokenize ("-1234ul + -4567ul");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (5, tokens.Count);
+        Assert.AreEqual (TokenKind.Term, tokens[0].Kind);
+        Assert.AreEqual ("-", tokens[0].Value);
+        Assert.AreEqual (TokenKind.UInt64, tokens[1].Kind);
+        Assert.AreEqual ("1234", tokens[1].Value);
+        Assert.AreEqual (TokenKind.Term, tokens[2].Kind);
+        Assert.AreEqual ("+", tokens[2].Value);
+        Assert.AreEqual (TokenKind.Term, tokens[3].Kind);
+        Assert.AreEqual ("-", tokens[3].Value);
+        Assert.AreEqual (TokenKind.UInt64, tokens[4].Kind);
+        Assert.AreEqual ("4567", tokens[4].Value);
     }
 
     [TestMethod]
     [Description ("Идентификатор")]
-    public void BarsikTokenizer_Tokenize_10()
+    public void Tokenizer_Tokenize_10()
     {
-        var tokens = BarsikTokenizer.Tokenize ("hello");
+        var tokenizer = new Tokenizer();
+        var tokens = tokenizer.Tokenize ("hello");
         Assert.IsNotNull (tokens);
         Assert.AreEqual (1, tokens.Count);
-        Assert.AreEqual (BarsikToken.Identifier, tokens[0].Kind);
-        Assert.AreEqual ("hello".AsMemory(), tokens[0].Value);
+        Assert.AreEqual (TokenKind.Identifier, tokens[0].Kind);
+        Assert.AreEqual ("hello", tokens[0].Value);
 
-        tokens = BarsikTokenizer.Tokenize (" hello ");
+        tokens = tokenizer.Tokenize (" hello ");
         Assert.IsNotNull (tokens);
         Assert.AreEqual (1, tokens.Count);
-        Assert.AreEqual (BarsikToken.Identifier, tokens[0].Kind);
-        Assert.AreEqual ("hello", tokens[0].Value.ToString());
+        Assert.AreEqual (TokenKind.Identifier, tokens[0].Kind);
+        Assert.AreEqual ("hello", tokens[0].Value);
 
-        tokens = BarsikTokenizer.Tokenize ("hello(");
+        tokens = tokenizer.Tokenize ("hello(");
         Assert.IsNotNull (tokens);
         Assert.AreEqual (2, tokens.Count);
-        Assert.AreEqual (BarsikToken.Identifier, tokens[0].Kind);
-        Assert.AreEqual ("hello", tokens[0].Value.ToString());
-        Assert.AreEqual ("(", tokens[1].Kind);
+        Assert.AreEqual (TokenKind.Identifier, tokens[0].Kind);
+        Assert.AreEqual ("hello", tokens[0].Value);
+        Assert.AreEqual (TokenKind.Term, tokens[1].Kind);
+        Assert.AreEqual ("(", tokens[1].Value);
 
-        tokens = BarsikTokenizer.Tokenize ("hello(world");
+        tokens = tokenizer.Tokenize ("hello(world");
         Assert.IsNotNull (tokens);
         Assert.AreEqual (3, tokens.Count);
-        Assert.AreEqual (BarsikToken.Identifier, tokens[0].Kind);
-        Assert.AreEqual ("hello", tokens[0].Value.ToString());
-        Assert.AreEqual ("(", tokens[1].Kind);
-        Assert.AreEqual (BarsikToken.Identifier, tokens[2].Kind);
-        Assert.AreEqual ("world", tokens[2].Value.ToString());
+        Assert.AreEqual (TokenKind.Identifier, tokens[0].Kind);
+        Assert.AreEqual ("hello", tokens[0].Value);
+        Assert.AreEqual (TokenKind.Term, tokens[1].Kind);
+        Assert.AreEqual ("(", tokens[1].Value);
+        Assert.AreEqual (TokenKind.Identifier, tokens[2].Kind);
+        Assert.AreEqual ("world", tokens[2].Value);
 
-        Assert.ThrowsException<FormatException>
+        Assert.ThrowsException<SyntaxException>
             (
-                () => BarsikTokenizer.Tokenize ("№")
+                () => tokenizer.Tokenize ("№")
             );
-        Assert.ThrowsException<FormatException>
+        Assert.ThrowsException<SyntaxException>
             (
-                () => BarsikTokenizer.Tokenize ("hello№")
+                () => tokenizer.Tokenize ("hello№")
             );
     }
 
     [TestMethod]
     [Description ("Одиночный символ")]
-    public void BarsikTokenizer_Tokenize_11()
+    public void Tokenizer_Tokenize_11()
     {
-        var tokens = BarsikTokenizer.Tokenize ("'a'");
+        var tokenizer = new Tokenizer();
+        var tokens = tokenizer.Tokenize ("'a'");
         Assert.IsNotNull (tokens);
         Assert.AreEqual (1, tokens.Count);
-        Assert.AreEqual (BarsikToken.Char, tokens[0].Kind);
-        Assert.AreEqual ("a", tokens[0].Value.ToString());
+        Assert.AreEqual (TokenKind.Char, tokens[0].Kind);
+        Assert.AreEqual ("a", tokens[0].Value);
 
-        Assert.ThrowsException<FormatException>
+        Assert.ThrowsException<SyntaxException>
             (
-                () => BarsikTokenizer.Tokenize ("''")
+                () => tokenizer.Tokenize ("''")
             );
-        Assert.ThrowsException<FormatException>
+        Assert.ThrowsException<SyntaxException>
             (
-                () => BarsikTokenizer.Tokenize ("'a")
+                () => tokenizer.Tokenize ("'a")
             );
-        Assert.ThrowsException<FormatException>
+        Assert.ThrowsException<SyntaxException>
             (
-                () => BarsikTokenizer.Tokenize ("'a)")
+                () => tokenizer.Tokenize ("'a)")
             );
     }
 
     [TestMethod]
     [Description ("Строка символов")]
-    public void BarsikTokenizer_Tokenize_12()
+    public void Tokenizer_Tokenize_12()
     {
-        var tokens = BarsikTokenizer.Tokenize ("\"a\"");
+        var tokenizer = new Tokenizer();
+        var tokens = tokenizer.Tokenize ("\"a\"");
         Assert.IsNotNull (tokens);
         Assert.AreEqual (1, tokens.Count);
-        Assert.AreEqual (BarsikToken.String, tokens[0].Kind);
-        Assert.AreEqual ("a", tokens[0].Value.ToString());
+        Assert.AreEqual (TokenKind.String, tokens[0].Kind);
+        Assert.AreEqual ("a", tokens[0].Value);
 
-        tokens = BarsikTokenizer.Tokenize ("\"\"");
+        tokens = tokenizer.Tokenize ("\"\"");
         Assert.IsNotNull (tokens);
         Assert.AreEqual (1, tokens.Count);
-        Assert.AreEqual (BarsikToken.String, tokens[0].Kind);
-        Assert.AreEqual (string.Empty, tokens[0].Value.ToString());
+        Assert.AreEqual (TokenKind.String, tokens[0].Kind);
+        Assert.AreEqual (string.Empty, tokens[0].Value);
 
-        tokens = BarsikTokenizer.Tokenize ("\"hello\"");
+        tokens = tokenizer.Tokenize ("\"hello\"");
         Assert.IsNotNull (tokens);
         Assert.AreEqual (1, tokens.Count);
-        Assert.AreEqual (BarsikToken.String, tokens[0].Kind);
-        Assert.AreEqual ("hello", tokens[0].Value.ToString());
+        Assert.AreEqual (TokenKind.String, tokens[0].Kind);
+        Assert.AreEqual ("hello", tokens[0].Value);
 
-        tokens = BarsikTokenizer.Tokenize (" \"hello\" ");
+        tokens = tokenizer.Tokenize (" \"hello\" ");
         Assert.IsNotNull (tokens);
         Assert.AreEqual (1, tokens.Count);
-        Assert.AreEqual (BarsikToken.String, tokens[0].Kind);
-        Assert.AreEqual ("hello", tokens[0].Value.ToString());
+        Assert.AreEqual (TokenKind.String, tokens[0].Kind);
+        Assert.AreEqual ("hello", tokens[0].Value);
+
+        Assert.ThrowsException<SyntaxException>
+            (
+                () => tokenizer.Tokenize (" \"hello ")
+            );
     }
 
     [TestMethod]
     [Description ("Число с плавающей точкой двойной точности")]
-    public void BarsikTokenizer_Tokeninze_13()
+    public void Tokenizer_Tokenize_13()
     {
-        var tokens = BarsikTokenizer.Tokenize ("123.45");
+        var tokenizer = new Tokenizer();
+        var tokens = tokenizer.Tokenize (" 123.45 ");
         Assert.IsNotNull (tokens);
         Assert.AreEqual (1, tokens.Count);
-        Assert.AreEqual (BarsikToken.Double, tokens[0].Kind);
-        Assert.AreEqual ("123.45".AsMemory(), tokens[0].Value);
+        Assert.AreEqual (TokenKind.Double, tokens[0].Kind);
+        Assert.AreEqual ("123.45", tokens[0].Value);
+
+        tokens = tokenizer.Tokenize ("123.45(");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (2, tokens.Count);
+        Assert.AreEqual (TokenKind.Double, tokens[0].Kind);
+        Assert.AreEqual ("123.45", tokens[0].Value);
+
+        tokens = tokenizer.Tokenize ("123.45+");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (2, tokens.Count);
+        Assert.AreEqual (TokenKind.Double, tokens[0].Kind);
+        Assert.AreEqual ("123.45", tokens[0].Value);
+
+        tokens = tokenizer.Tokenize ("-123.45");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (1, tokens.Count);
+        Assert.AreEqual (TokenKind.Double, tokens[0].Kind);
+        Assert.AreEqual ("-123.45", tokens[0].Value);
+
+        tokens = tokenizer.Tokenize ("-123.45 -456.78");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (3, tokens.Count);
+        Assert.AreEqual (TokenKind.Double, tokens[0].Kind);
+        Assert.AreEqual ("-123.45", tokens[0].Value);
+        Assert.AreEqual (TokenKind.Term, tokens[1].Kind);
+        Assert.AreEqual ("-", tokens[1].Value);
+        Assert.AreEqual (TokenKind.Double, tokens[2].Kind);
+        Assert.AreEqual ("456.78", tokens[2].Value);
+
+        tokens = tokenizer.Tokenize ("-123.45 + -456.78");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (3, tokens.Count);
+        Assert.AreEqual (TokenKind.Double, tokens[0].Kind);
+        Assert.AreEqual ("-123.45", tokens[0].Value);
+        Assert.AreEqual (TokenKind.Term, tokens[1].Kind);
+        Assert.AreEqual ("+", tokens[1].Value);
+        Assert.AreEqual (TokenKind.Double, tokens[2].Kind);
+        Assert.AreEqual ("-456.78", tokens[2].Value);
     }
 
     [TestMethod]
     [Description ("Число с плавающей точкой одинарной точности")]
-    public void BarsikTokenizer_Tokeninze_14()
+    public void Tokenizer_Tokenize_14()
     {
-        var tokens = BarsikTokenizer.Tokenize ("123.45f");
+        var tokenizer = new Tokenizer();
+        var tokens = tokenizer.Tokenize (" 123.45f ");
         Assert.IsNotNull (tokens);
         Assert.AreEqual (1, tokens.Count);
-        Assert.AreEqual (BarsikToken.Single, tokens[0].Kind);
-        Assert.AreEqual ("123.45f".AsMemory(), tokens[0].Value);
+        Assert.AreEqual (TokenKind.Single, tokens[0].Kind);
+        Assert.AreEqual ("123.45", tokens[0].Value);
 
-        tokens = BarsikTokenizer.Tokenize ("123.45F");
+        tokens = tokenizer.Tokenize ("123.45f(");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (2, tokens.Count);
+        Assert.AreEqual (TokenKind.Single, tokens[0].Kind);
+        Assert.AreEqual ("123.45", tokens[0].Value);
+
+        tokens = tokenizer.Tokenize ("123.45f+");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (2, tokens.Count);
+        Assert.AreEqual (TokenKind.Single, tokens[0].Kind);
+        Assert.AreEqual ("123.45", tokens[0].Value);
+
+        tokens = tokenizer.Tokenize ("-123.45f");
         Assert.IsNotNull (tokens);
         Assert.AreEqual (1, tokens.Count);
-        Assert.AreEqual (BarsikToken.Single, tokens[0].Kind);
-        Assert.AreEqual ("123.45F".AsMemory(), tokens[0].Value);
+        Assert.AreEqual (TokenKind.Single, tokens[0].Kind);
+        Assert.AreEqual ("-123.45", tokens[0].Value);
+
+        tokens = tokenizer.Tokenize ("-123.45f -456.78f");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (3, tokens.Count);
+        Assert.AreEqual (TokenKind.Single, tokens[0].Kind);
+        Assert.AreEqual ("-123.45", tokens[0].Value);
+        Assert.AreEqual (TokenKind.Term, tokens[1].Kind);
+        Assert.AreEqual ("-", tokens[1].Value);
+        Assert.AreEqual (TokenKind.Single, tokens[2].Kind);
+        Assert.AreEqual ("456.78", tokens[2].Value);
+
+        tokens = tokenizer.Tokenize ("-123.45f + -456.78f");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (3, tokens.Count);
+        Assert.AreEqual (TokenKind.Single, tokens[0].Kind);
+        Assert.AreEqual ("-123.45", tokens[0].Value);
+        Assert.AreEqual (TokenKind.Term, tokens[1].Kind);
+        Assert.AreEqual ("+", tokens[1].Value);
+        Assert.AreEqual (TokenKind.Single, tokens[2].Kind);
+        Assert.AreEqual ("-456.78", tokens[2].Value);
     }
 
-#endif
+    [TestMethod]
+    [Description ("Число с фиксированной точкой")]
+    public void Tokenizer_Tokenize_15()
+    {
+        var tokenizer = new Tokenizer();
+        var tokens = tokenizer.Tokenize (" 123.45m ");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (1, tokens.Count);
+        Assert.AreEqual (TokenKind.Decimal, tokens[0].Kind);
+        Assert.AreEqual ("123.45", tokens[0].Value);
+
+        tokens = tokenizer.Tokenize (" 123m ");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (1, tokens.Count);
+        Assert.AreEqual (TokenKind.Decimal, tokens[0].Kind);
+        Assert.AreEqual ("123", tokens[0].Value);
+
+        tokens = tokenizer.Tokenize ("123.45m(");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (2, tokens.Count);
+        Assert.AreEqual (TokenKind.Decimal, tokens[0].Kind);
+        Assert.AreEqual ("123.45", tokens[0].Value);
+
+        tokens = tokenizer.Tokenize ("123.45m+");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (2, tokens.Count);
+        Assert.AreEqual (TokenKind.Decimal, tokens[0].Kind);
+        Assert.AreEqual ("123.45", tokens[0].Value);
+
+        tokens = tokenizer.Tokenize ("-123.45m");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (1, tokens.Count);
+        Assert.AreEqual (TokenKind.Decimal, tokens[0].Kind);
+        Assert.AreEqual ("-123.45", tokens[0].Value);
+
+        tokens = tokenizer.Tokenize ("-123.45m -456.78m");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (3, tokens.Count);
+        Assert.AreEqual (TokenKind.Decimal, tokens[0].Kind);
+        Assert.AreEqual ("-123.45", tokens[0].Value);
+        Assert.AreEqual (TokenKind.Term, tokens[1].Kind);
+        Assert.AreEqual ("-", tokens[1].Value);
+        Assert.AreEqual (TokenKind.Decimal, tokens[2].Kind);
+        Assert.AreEqual ("456.78", tokens[2].Value);
+
+        tokens = tokenizer.Tokenize ("-123.45m + -456.78m");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (3, tokens.Count);
+        Assert.AreEqual (TokenKind.Decimal, tokens[0].Kind);
+        Assert.AreEqual ("-123.45", tokens[0].Value);
+        Assert.AreEqual (TokenKind.Term, tokens[1].Kind);
+        Assert.AreEqual ("+", tokens[1].Value);
+        Assert.AreEqual (TokenKind.Decimal, tokens[2].Kind);
+        Assert.AreEqual ("-456.78", tokens[2].Value);
+    }
+
+    [TestMethod]
+    [Description ("Зарезервированные слова")]
+    public void Tokenizer_Tokenize_16()
+    {
+        var tokenizer = new Tokenizer();
+        var tokens = tokenizer.Tokenize (" using true false ");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (3, tokens.Count);
+        Assert.AreEqual (TokenKind.ReservedWord, tokens[0].Kind);
+        Assert.AreEqual ("using", tokens[0].Value);
+        Assert.AreEqual (TokenKind.ReservedWord, tokens[1].Kind);
+        Assert.AreEqual ("true", tokens[1].Value);
+        Assert.AreEqual (TokenKind.ReservedWord, tokens[2].Kind);
+        Assert.AreEqual ("false", tokens[2].Value);
+
+        tokens = tokenizer.Tokenize (" Using True False ");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (3, tokens.Count);
+        Assert.AreEqual (TokenKind.Identifier, tokens[0].Kind);
+        Assert.AreEqual ("Using", tokens[0].Value);
+        Assert.AreEqual (TokenKind.Identifier, tokens[1].Kind);
+        Assert.AreEqual ("True", tokens[1].Value);
+        Assert.AreEqual (TokenKind.Identifier, tokens[2].Kind);
+        Assert.AreEqual ("False", tokens[2].Value);
+
+        tokens = tokenizer.Tokenize (" ,using-true-false ) ");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (7, tokens.Count);
+        Assert.AreEqual (TokenKind.Term, tokens[0].Kind);
+        Assert.AreEqual (",", tokens[0].Value);
+        Assert.AreEqual (TokenKind.ReservedWord, tokens[1].Kind);
+        Assert.AreEqual ("using", tokens[1].Value);
+        Assert.AreEqual (TokenKind.Term, tokens[2].Kind);
+        Assert.AreEqual ("-", tokens[2].Value);
+        Assert.AreEqual (TokenKind.ReservedWord, tokens[3].Kind);
+        Assert.AreEqual ("true", tokens[3].Value);
+        Assert.AreEqual (TokenKind.Term, tokens[4].Kind);
+        Assert.AreEqual ("-", tokens[4].Value);
+        Assert.AreEqual (TokenKind.ReservedWord, tokens[5].Kind);
+        Assert.AreEqual ("false", tokens[5].Value);
+        Assert.AreEqual (TokenKind.Term, tokens[6].Kind);
+        Assert.AreEqual (")", tokens[6].Value);
+    }
+
+    [TestMethod]
+    [Description ("Комментарии")]
+    public void Tokenizer_Tokenize_17()
+    {
+        var tokenizer = new Tokenizer();
+        var tokens = tokenizer.Tokenize ("1 /* Comment */ 2u");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (2, tokens.Count);
+        Assert.AreEqual (TokenKind.Int32, tokens[0].Kind);
+        Assert.AreEqual ("1", tokens[0].Value);
+        Assert.AreEqual (TokenKind.UInt32, tokens[1].Kind);
+        Assert.AreEqual ("2", tokens[1].Value);
+
+        tokens = tokenizer.Tokenize ("1 //Comment  \n 2u");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (2, tokens.Count);
+        Assert.AreEqual (TokenKind.Int32, tokens[0].Kind);
+        Assert.AreEqual ("1", tokens[0].Value);
+        Assert.AreEqual (TokenKind.UInt32, tokens[1].Kind);
+        Assert.AreEqual ("2", tokens[1].Value);
+
+        tokens = tokenizer.Tokenize ("1 / 2u");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (3, tokens.Count);
+        Assert.AreEqual (TokenKind.Int32, tokens[0].Kind);
+        Assert.AreEqual ("1", tokens[0].Value);
+        Assert.AreEqual (TokenKind.Term, tokens[1].Kind);
+        Assert.AreEqual ("/", tokens[1].Value);
+        Assert.AreEqual (TokenKind.UInt32, tokens[2].Kind);
+        Assert.AreEqual ("2", tokens[2].Value);
+
+        Assert.ThrowsException<SyntaxException>
+            (
+                () => tokenizer.Tokenize ("1 /*Comment  \n 2u")
+            );
+    }
 }
