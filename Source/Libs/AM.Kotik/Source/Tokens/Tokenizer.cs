@@ -64,7 +64,7 @@ public class Tokenizer
     {
         "!", ";", ":", ",", "(", ")", "+", "-", "*", "/", "[", "]",
         "{", "}", "|", "%", "~", "=", "++", "--", "+=", "-=", "*=",
-        "/="
+        "/=", "=="
     };
 
     private bool IsEOF => _navigator.IsEOF;
@@ -350,6 +350,10 @@ public class Tokenizer
 
             if (count == 0)
             {
+                if (builder.Length != 0)
+                {
+                    builder.Length--;
+                }
                 return MakeToken (previousGood);
             }
 

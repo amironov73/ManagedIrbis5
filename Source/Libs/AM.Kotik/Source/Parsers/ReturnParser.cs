@@ -24,6 +24,7 @@ namespace AM.Kotik;
 /// </summary>
 internal sealed class ReturnParser<TResult>
     : Parser<TResult>
+    where TResult: class
 {
     #region Construction
 

@@ -20,7 +20,7 @@ namespace AM.Kotik;
 /// <summary>
 /// Известные виды токенов.
 /// </summary>
-internal static class TokenKind
+public static class TokenKind
 {
     #region Constants
 

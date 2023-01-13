@@ -5,12 +5,13 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* FailParser.cs -- вечно фейлящийся парсер
+/* ChainParser.cs -- парсер для последовательностей
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
+using System;
 using System.Diagnostics.CodeAnalysis;
 
 #endregion
@@ -20,9 +21,9 @@ using System.Diagnostics.CodeAnalysis;
 namespace AM.Kotik;
 
 /// <summary>
-/// Вечно фейлящийся парсер.
+/// Парсер для последовательностей.
 /// </summary>
-internal sealed class FailParser<TResult>
+public sealed class ChainParser<TResult>
     : Parser<TResult>
     where TResult: class
 {
@@ -31,36 +32,48 @@ internal sealed class FailParser<TResult>
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public FailParser
+    public ChainParser
         (
-            string message
+            params Parser<TResult>[] parsers
         )
     {
-        Sure.NotNullNorEmpty (message);
+        Sure.AssertState (parsers.Length != 0);
 
-        _message = message;
+        _parsers = parsers;
     }
 
     #endregion
 
     #region Private members
 
-    private readonly string _message;
+    private readonly Parser<TResult>[] _parsers;
 
     #endregion
 
-    #region Parser<TToken, TResult> members
+    #region Parser<TResult> members
 
     /// <inheritdoc cref="Parser{TResult}.TryParse"/>
     public override bool TryParse
         (
             ParseState state,
-            [MaybeNullWhen (false)] out TResult result
+            out TResult? result
         )
     {
         result = default;
 
-        return false;
+        var location = state.Location;
+        foreach (var parser in _parsers)
+        {
+            if (!parser.TryParse (state, out result))
+            {
+                state.Location = location;
+                return false;
+            }
+
+            state.Advance();
+        }
+
+        return true;
     }
 
     #endregion

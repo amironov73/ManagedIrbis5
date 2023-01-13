@@ -14,19 +14,18 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 
-using AM;
-
 #endregion
 
-namespace AM.Kotik;
-
 #nullable enable
+
+namespace AM.Kotik;
 
 /// <summary>
 /// Парсер с проверкой произвольного условия.
 /// </summary>
 public sealed class AssertParser<TResult>
     : Parser<TResult>
+    where TResult: class
 {
     #region Construction
 
@@ -68,17 +67,20 @@ public sealed class AssertParser<TResult>
             [MaybeNullWhen (false)] out TResult result
         )
     {
-        if (!_inner.TryParse (state, out result))
+        result = default;
+
+        if (!_inner.TryParse (state, out var temporary))
         {
             return false;
         }
 
-        if (!_predicate (result!))
+        if (!_predicate (temporary!))
         {
             // state.SetError(Maybe.Nothing<TToken>(), false, state.Location, _message(result!));
-            result = default;
             return false;
         }
+
+        result = temporary!;
 
         return true;
     }

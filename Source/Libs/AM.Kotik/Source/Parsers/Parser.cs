@@ -26,6 +26,7 @@ namespace AM.Kotik;
 /// Базовый класс для парсеров.
 /// </summary>
 public abstract class Parser<TResult>
+    where TResult: class
 {
     #region Public methods
 
@@ -35,7 +36,7 @@ public abstract class Parser<TResult>
     public abstract bool TryParse
         (
             ParseState state,
-            [MaybeNullWhen (false)] out TResult result
+            [MaybeNullWhen (false)] out TResult? result
         );
 
     #endregion

@@ -48,7 +48,7 @@ public sealed class ParseState
     /// Проще говоря, текущее абсолютное смещение от начала
     /// входного потока.
     /// </summary>
-    public int Location => throw new NotImplementedException();
+    public int Location { get; set; }
 
     /// <summary>
     /// Есть текущий токен или уже достигнут конец входного потока?
@@ -68,7 +68,7 @@ public sealed class ParseState
             int count = 1
         )
     {
-        throw new NotImplementedException();
+        Location += count;
     }
 
     /// <summary>
@@ -78,30 +78,6 @@ public sealed class ParseState
         (
             int count
         )
-    {
-        throw new NotImplementedException();
-    }
-
-    /// <summary>
-    /// Запоминание текущей позиции в потоке.
-    /// </summary>
-    public void PushBookmark()
-    {
-        throw new NotImplementedException();
-    }
-
-    /// <summary>
-    /// Забывание текущей позиции в потоке.
-    /// </summary>
-    public void PopBookmark()
-    {
-        throw new NotImplementedException();
-    }
-
-    /// <summary>
-    /// Возврат к ранее запомненной позиции в потоке.
-    /// </summary>
-    public void Rewind()
     {
         throw new NotImplementedException();
     }
