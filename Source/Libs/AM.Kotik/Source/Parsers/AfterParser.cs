@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* OptionalParser.cs -- парсер, который безболезненно может зафейлиться
+/* AfterParser.cs -- парсит сочетание "нужное после ненужного"
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -14,24 +14,25 @@
 namespace AM.Kotik;
 
 /// <summary>
-/// Парсер, который безболезненно может зафейлиться.
+/// Парсит сочетание "нужное после ненужного".
 /// </summary>
-public sealed class OptionalParser<TResult>
+public sealed class AfterParser<TAfter, TResult>
     : Parser<TResult>
+    where TAfter: class
     where TResult: class
 {
-    #region Construciton
+    #region Construction
 
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public OptionalParser
+    public AfterParser
         (
-            Parser<TResult> parser
+            Parser<TResult> parser,
+            Parser<TAfter> other
         )
     {
-        Sure.NotNull (parser);
-
+        _other = other;
         _parser = parser;
     }
 
@@ -40,6 +41,7 @@ public sealed class OptionalParser<TResult>
     #region Private members
 
     private readonly Parser<TResult> _parser;
+    private readonly Parser<TAfter> _other;
 
     #endregion
 
@@ -53,16 +55,26 @@ public sealed class OptionalParser<TResult>
         )
     {
         result = default!;
+        if (!state.HasCurrent)
+        {
+            return false;
+        }
 
         var location = state.Location;
-        if (_parser.TryParse (state, out var temporary))
-        {
-            result = temporary;
-        }
-        else
+        if (!_other.TryParse (state, out _))
         {
             state.Location = location;
+            return false;
         }
+
+        state.Advance();
+        if (!_parser.TryParse (state, out var temporary))
+        {
+            state.Location = location;
+            return false;
+        }
+
+        result = temporary;
 
         return true;
     }

@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* OptionalParser.cs -- парсер, который безболезненно может зафейлиться
+/* TraceParser.cs -- трассирующий парсер
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -14,9 +14,9 @@
 namespace AM.Kotik;
 
 /// <summary>
-/// Парсер, который безболезненно может зафейлиться.
+/// Трассирующий парсер.
 /// </summary>
-public sealed class OptionalParser<TResult>
+public sealed class TraceParser<TResult>
     : Parser<TResult>
     where TResult: class
 {
@@ -25,13 +25,13 @@ public sealed class OptionalParser<TResult>
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public OptionalParser
+    public TraceParser
         (
-            Parser<TResult> parser
+            Parser<TResult> parser,
+            string? message
         )
     {
-        Sure.NotNull (parser);
-
+        _message = message;
         _parser = parser;
     }
 
@@ -39,6 +39,7 @@ public sealed class OptionalParser<TResult>
 
     #region Private members
 
+    private readonly string? _message;
     private readonly Parser<TResult> _parser;
 
     #endregion
@@ -54,15 +55,26 @@ public sealed class OptionalParser<TResult>
     {
         result = default!;
 
-        var location = state.Location;
-        if (_parser.TryParse (state, out var temporary))
+        if (!string.IsNullOrEmpty (_message))
         {
-            result = temporary;
+            state.Trace (_message);
         }
-        else
+
+        state.Trace
+            (
+                !state.HasCurrent
+                    ? "!HasCurrent"
+                    : state.Current.ToString()
+            );
+
+        if (!_parser.TryParse (state, out var temporary))
         {
-            state.Location = location;
+            state.Trace ($"Failure");
+            return false;
         }
+
+        result = temporary!;
+        state.Trace ($"Success: {temporary}");
 
         return true;
     }

@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* BeforeParser.cs -- парсит сочетание "нужное перед прочим"
+/* BeforeParser.cs -- парсит сочетание "нужное перед ненужным"
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -14,7 +14,7 @@
 namespace AM.Kotik;
 
 /// <summary>
-/// Парсит сочетание "нужное перед прочим".
+/// Парсит сочетание "нужное перед ненужным".
 /// </summary>
 public sealed class BeforeParser<TBefore, TResult>
     : Parser<TResult>

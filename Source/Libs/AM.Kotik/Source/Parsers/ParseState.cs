@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
 
 #endregion
@@ -39,12 +40,14 @@ public sealed class ParseState
     /// </summary>
     public ParseState
         (
-            IEnumerable<Token> tokens
+            IEnumerable<Token> tokens,
+            TextWriter? traceOutput = null
         )
     {
         Sure.NotNull (tokens);
 
         _tokens = tokens.ToArray();
+        _traceOutput = traceOutput;
     }
 
     #endregion
@@ -52,6 +55,7 @@ public sealed class ParseState
     #region Private members
 
     private readonly Token[] _tokens;
+    private readonly TextWriter? _traceOutput;
 
     #endregion
 
@@ -113,9 +117,7 @@ public sealed class ParseState
             string line
         )
     {
-        line.NotUsed();
-
-        // TODO реализовать
+        _traceOutput?.WriteLine (line);
     }
 
     #endregion
