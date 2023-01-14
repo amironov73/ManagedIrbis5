@@ -84,4 +84,28 @@ public sealed class GrammarTest
                 () => literal.ParseOrThrow (state, true)
             );
     }
+
+    [TestMethod]
+    [Description ("Термы")]
+    public void Grammar_Term_1()
+    {
+        var state = _GetState ("+ ++ - --");
+        var parser = Grammar.Term ("+", "++", "-", "--");
+        Assert.AreEqual ("+", parser.ParseOrThrow (state, true));
+        Assert.AreEqual ("++", parser.ParseOrThrow (state, true));
+        Assert.AreEqual ("-", parser.ParseOrThrow (state, true));
+        Assert.AreEqual ("--", parser.ParseOrThrow (state, true));
+        Assert.IsFalse (state.HasCurrent);
+    }
+
+    [TestMethod]
+    [Description ("Зарезервированные слова")]
+    public void Grammar_Reserved_1()
+    {
+        var state = _GetState ("using for break");
+        Assert.AreEqual ("using", Grammar.Reserved ("using").ParseOrThrow (state, true));
+        Assert.AreEqual ("for", Grammar.Reserved ("for").ParseOrThrow (state, true));
+        Assert.AreEqual ("break", Grammar.Reserved ("break").ParseOrThrow (state, true));
+        Assert.IsFalse (state.HasCurrent);
+    }
 }

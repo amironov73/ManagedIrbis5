@@ -31,5 +31,15 @@ public static class Grammar
     /// </summary>
     public static readonly LiteralParser Literal = new ();
 
+    /// <summary>
+    /// Разбор перечисленных терминов.
+    /// </summary>
+    public static TermParser Term (params string[] terms) => new (terms);
+
+    /// <summary>
+    /// Разбор зарезервированного слова.
+    /// </summary>
+    public static ReservedWordParser Reserved (string word) => new (word);
+
     #endregion
 }

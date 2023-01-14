@@ -373,6 +373,18 @@ public class TokenizerTest
         Assert.AreEqual (TokenKind.Identifier, tokens[2].Kind);
         Assert.AreEqual ("world", tokens[2].Value);
 
+        tokens = tokenizer.Tokenize ("у попа была собака");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (4, tokens.Count);
+        Assert.AreEqual (TokenKind.Identifier, tokens[0].Kind);
+        Assert.AreEqual ("у", tokens[0].Value);
+        Assert.AreEqual (TokenKind.Identifier, tokens[1].Kind);
+        Assert.AreEqual ("попа", tokens[1].Value);
+        Assert.AreEqual (TokenKind.Identifier, tokens[2].Kind);
+        Assert.AreEqual ("была", tokens[2].Value);
+        Assert.AreEqual (TokenKind.Identifier, tokens[3].Kind);
+        Assert.AreEqual ("собака", tokens[3].Value);
+
         Assert.ThrowsException<SyntaxException>
             (
                 () => tokenizer.Tokenize ("№")
@@ -437,6 +449,12 @@ public class TokenizerTest
         Assert.AreEqual (TokenKind.String, tokens[0].Kind);
         Assert.AreEqual ("hello", tokens[0].Value);
 
+        tokens = tokenizer.Tokenize (" \"у попа была собака\" ");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (1, tokens.Count);
+        Assert.AreEqual (TokenKind.String, tokens[0].Kind);
+        Assert.AreEqual ("у попа была собака", tokens[0].Value);
+
         Assert.ThrowsException<SyntaxException>
             (
                 () => tokenizer.Tokenize (" \"hello ")
@@ -491,6 +509,30 @@ public class TokenizerTest
         Assert.AreEqual ("+", tokens[1].Value);
         Assert.AreEqual (TokenKind.Double, tokens[2].Kind);
         Assert.AreEqual ("-456.78", tokens[2].Value);
+
+        tokens = tokenizer.Tokenize ("1.23e-45 1.23E-45 1.23e+45 1e23");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (4, tokens.Count);
+        Assert.AreEqual (TokenKind.Double, tokens[0].Kind);
+        Assert.AreEqual ("1.23e-45", tokens[0].Value);
+        Assert.AreEqual (TokenKind.Double, tokens[1].Kind);
+        Assert.AreEqual ("1.23E-45", tokens[1].Value);
+        Assert.AreEqual (TokenKind.Double, tokens[2].Kind);
+        Assert.AreEqual ("1.23e+45", tokens[2].Value);
+        Assert.AreEqual (TokenKind.Double, tokens[3].Kind);
+        Assert.AreEqual ("1e23", tokens[3].Value);
+
+        tokens = tokenizer.Tokenize ("1. .1 1.e23 .1e23");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (4, tokens.Count);
+        Assert.AreEqual (TokenKind.Double, tokens[0].Kind);
+        Assert.AreEqual ("1.", tokens[0].Value);
+        Assert.AreEqual (TokenKind.Double, tokens[1].Kind);
+        Assert.AreEqual (".1", tokens[1].Value);
+        Assert.AreEqual (TokenKind.Double, tokens[2].Kind);
+        Assert.AreEqual ("1.e23", tokens[2].Value);
+        Assert.AreEqual (TokenKind.Double, tokens[3].Kind);
+        Assert.AreEqual (".1e23", tokens[3].Value);
     }
 
     [TestMethod]
@@ -541,6 +583,30 @@ public class TokenizerTest
         Assert.AreEqual ("+", tokens[1].Value);
         Assert.AreEqual (TokenKind.Single, tokens[2].Kind);
         Assert.AreEqual ("-456.78", tokens[2].Value);
+
+        tokens = tokenizer.Tokenize ("1.23e-45f 1.23E-45f 1.23e+45f 1e23f");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (4, tokens.Count);
+        Assert.AreEqual (TokenKind.Single, tokens[0].Kind);
+        Assert.AreEqual ("1.23e-45", tokens[0].Value);
+        Assert.AreEqual (TokenKind.Single, tokens[1].Kind);
+        Assert.AreEqual ("1.23E-45", tokens[1].Value);
+        Assert.AreEqual (TokenKind.Single, tokens[2].Kind);
+        Assert.AreEqual ("1.23e+45", tokens[2].Value);
+        Assert.AreEqual (TokenKind.Single, tokens[3].Kind);
+        Assert.AreEqual ("1e23", tokens[3].Value);
+
+        tokens = tokenizer.Tokenize ("1.f .1f 1.e23f .1e23f");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (4, tokens.Count);
+        Assert.AreEqual (TokenKind.Single, tokens[0].Kind);
+        Assert.AreEqual ("1.", tokens[0].Value);
+        Assert.AreEqual (TokenKind.Single, tokens[1].Kind);
+        Assert.AreEqual (".1", tokens[1].Value);
+        Assert.AreEqual (TokenKind.Single, tokens[2].Kind);
+        Assert.AreEqual ("1.e23", tokens[2].Value);
+        Assert.AreEqual (TokenKind.Single, tokens[3].Kind);
+        Assert.AreEqual (".1e23", tokens[3].Value);
     }
 
     [TestMethod]
@@ -597,6 +663,30 @@ public class TokenizerTest
         Assert.AreEqual ("+", tokens[1].Value);
         Assert.AreEqual (TokenKind.Decimal, tokens[2].Kind);
         Assert.AreEqual ("-456.78", tokens[2].Value);
+
+        tokens = tokenizer.Tokenize ("1.23e-45m 1.23E-45m 1.23e+45m 1e23m");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (4, tokens.Count);
+        Assert.AreEqual (TokenKind.Decimal, tokens[0].Kind);
+        Assert.AreEqual ("1.23e-45", tokens[0].Value);
+        Assert.AreEqual (TokenKind.Decimal, tokens[1].Kind);
+        Assert.AreEqual ("1.23E-45", tokens[1].Value);
+        Assert.AreEqual (TokenKind.Decimal, tokens[2].Kind);
+        Assert.AreEqual ("1.23e+45", tokens[2].Value);
+        Assert.AreEqual (TokenKind.Decimal, tokens[3].Kind);
+        Assert.AreEqual ("1e23", tokens[3].Value);
+
+        tokens = tokenizer.Tokenize ("1.m .1m 1.e23m .1e23m");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (4, tokens.Count);
+        Assert.AreEqual (TokenKind.Decimal, tokens[0].Kind);
+        Assert.AreEqual ("1.", tokens[0].Value);
+        Assert.AreEqual (TokenKind.Decimal, tokens[1].Kind);
+        Assert.AreEqual (".1", tokens[1].Value);
+        Assert.AreEqual (TokenKind.Decimal, tokens[2].Kind);
+        Assert.AreEqual ("1.e23", tokens[2].Value);
+        Assert.AreEqual (TokenKind.Decimal, tokens[3].Kind);
+        Assert.AreEqual (".1e23", tokens[3].Value);
     }
 
     [TestMethod]

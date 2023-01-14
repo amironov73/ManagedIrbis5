@@ -165,13 +165,21 @@ public sealed class Tokenizer
     /// </summary>
     private Token? ParseNumber()
     {
+        StringBuilder builder;
+        var isFloat = false;
         char chr = PeekChar();
         if (!chr.IsArabicDigit())
         {
+            if (chr is '.' && _navigator.LookAhead (1).IsArabicDigit())
+            {
+                builder = new StringBuilder();
+                goto IS_FLOAT;
+            }
+
             return null;
         }
 
-        var builder = new StringBuilder();
+        builder = new StringBuilder();
         while (!IsEof)
         {
             chr = PeekChar();
@@ -183,13 +191,40 @@ public sealed class Tokenizer
             builder.Append (ReadChar());
         }
 
-        var isFloat = false;
-
         // дробное число
-        if (chr == '.')
+        IS_FLOAT: if (chr == '.')
         {
             isFloat = true;
             builder.Append (ReadChar());
+
+            while (!IsEof)
+            {
+                chr = PeekChar();
+                if (!chr.IsArabicDigit())
+                {
+                    break;
+                }
+
+                builder.Append (ReadChar());
+            }
+        }
+
+        // экспонента
+        if (chr is 'e' or 'E')
+        {
+            isFloat = true;
+            builder.Append (ReadChar());
+            chr = PeekChar();
+
+            if (chr is '+' or '-')
+            {
+                builder.Append (ReadChar());
+                chr = PeekChar();
+                if (!chr.IsArabicDigit())
+                {
+                    throw new SyntaxException (_navigator);
+                }
+            }
 
             while (!IsEof)
             {
@@ -350,6 +385,7 @@ public sealed class Tokenizer
                 {
                     builder.Length--;
                 }
+
                 return MakeToken (previousGood);
             }
 

@@ -97,6 +97,152 @@ public sealed class Token
     public bool IsUnsignedNumber() => Kind is TokenKind.UInt32 or TokenKind.UInt64;
 
     /// <summary>
+    /// Это терм вообще?
+    /// </summary>
+    public bool IsTerm() => Kind is TokenKind.Term;
+
+    /// <summary>
+    /// Это указанный терм?
+    /// </summary>
+    public bool IsTerm
+        (
+            string term
+        )
+        => Kind is TokenKind.Term && string.CompareOrdinal (Value, term) == 0;
+
+    /// <summary>
+    /// Это один из перечисленных термов?
+    /// </summary>
+    public bool IsTerm
+        (
+            string term1,
+            string term2
+        )
+        => Kind is TokenKind.Term
+        &&
+            (
+                string.CompareOrdinal (Value, term1) == 0
+                || string.CompareOrdinal (Value, term2) == 0
+            );
+
+    /// <summary>
+    /// Это один из перечисленных термов?
+    /// </summary>
+    public bool IsTerm
+        (
+            string term1,
+            string term2,
+            string term3
+        )
+        => Kind is TokenKind.Term
+        &&
+            (
+                string.CompareOrdinal (Value, term1) == 0
+                || string.CompareOrdinal (Value, term2) == 0
+                || string.CompareOrdinal (Value, term3) == 0
+            );
+
+    /// <summary>
+    /// Это один из перечисленных термов?
+    /// </summary>
+    public bool IsTerm
+        (
+            params string[] terms
+        )
+    {
+        if (Kind is not TokenKind.Term)
+        {
+            return false;
+        }
+
+        foreach (var term in terms)
+        {
+            if (string.CompareOrdinal (Value, term) == 0)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Это вообще идентификатор?
+    /// </summary>
+    public bool IsIdentifier() => Kind is TokenKind.Identifier;
+
+    /// <summary>
+    /// Это вообще зарезервированное слово?
+    /// </summary>
+    public bool IsReservedWord() => Kind is TokenKind.ReservedWord;
+
+    /// <summary>
+    /// Это указанне зарезервированное слово?
+    /// </summary>
+    public bool IsReservedWord
+        (
+            string reserved
+        )
+        => Kind is TokenKind.ReservedWord
+           && string.CompareOrdinal (Value, reserved) == 0;
+
+    /// <summary>
+    /// Это одно из перечисленных зарезервированных слов?
+    /// </summary>
+    public bool IsReservedWord
+        (
+            string reserved1,
+            string reserved2
+        )
+        => Kind is TokenKind.ReservedWord
+           &&
+           (
+               string.CompareOrdinal (Value, reserved1) == 0
+               || string.CompareOrdinal (Value, reserved2) == 0
+           );
+
+    /// <summary>
+    /// Это одно из перечисленных зарезервированных слов?
+    /// </summary>
+    public bool IsReservedWord
+        (
+            string reserved1,
+            string reserved2,
+            string reserved3
+        )
+        => Kind is TokenKind.ReservedWord
+           &&
+           (
+               string.CompareOrdinal (Value, reserved1) == 0
+               || string.CompareOrdinal (Value, reserved2) == 0
+               || string.CompareOrdinal (Value, reserved3) == 0
+           );
+
+    /// <summary>
+    /// Это одно из перечисленных зарезервированных слов?
+    /// </summary>
+    public bool IsReservedWord
+        (
+            params string[] words
+        )
+    {
+        if (Kind is not TokenKind.ReservedWord)
+        {
+            return false;
+        }
+
+        foreach (var word in words)
+        {
+            if (string.CompareOrdinal (Value, word) == 0)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
     /// Конец текста?
     /// </summary>
     public bool IsEot()
