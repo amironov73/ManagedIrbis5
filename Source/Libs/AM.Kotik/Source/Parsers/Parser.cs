@@ -321,6 +321,20 @@ public static class Parser
     public static readonly LiteralParser Literal = new ();
 
     /// <summary>
+    /// Преобразование разобранного значения.
+    /// </summary>
+    public static Parser<TResult> Map<TIntermediate, TResult>
+        (
+            this Parser<TIntermediate> parser,
+            Func<TIntermediate, TResult> function
+        )
+        where TIntermediate: class
+        where TResult: class
+    {
+        return new MapParser<TIntermediate, TResult> (parser, function);
+    }
+
+    /// <summary>
     /// Опциональный парсер.
     /// </summary>
     public static Parser<TResult> Optional<TResult>
@@ -341,6 +355,13 @@ public static class Parser
     /// Зарезервированное слово.
     /// </summary>
     public static ReservedWordParser Reserved (string word) => new (word);
+
+    /// <summary>
+    /// Немедленный возврат значения.
+    /// </summary>
+    public static Parser<TResult> Return<TResult> (TResult result)
+        where TResult: class
+        => new ReturnParser<TResult> (result);
 
     /// <summary>
     /// Трассировка парсера.

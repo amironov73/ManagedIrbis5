@@ -75,15 +75,14 @@ public sealed class ChainParserTest
         Assert.AreEqual ("hello_1_using", parser.ParseOrThrow (state));
     }
 
-    [Ignore]
     [TestMethod]
     [Description ("Цепочка из трех парсеров - успешно")]
     public void ChainParser_Three_2()
     {
         var state = _GetState ("hello using", true);
-        var reserved = Reserved ("using").Trace();
-        var parser = Chain (Identifier.Trace(), Literal.Trace().Optional(), reserved,
-            (x1, x2, x3) => x1 + "_" + x2 + "_" + x3);
+        var reserved = Reserved ("using");
+        var parser = Chain (Identifier, Literal.Optional(), reserved,
+            (x1, x2, x3) => x1 + "_" + x2 + "_" + x3).End();
         Assert.AreEqual ("hello__using", parser.ParseOrThrow (state));
     }
 

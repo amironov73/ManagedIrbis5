@@ -5,41 +5,49 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* OptionalParser.cs -- парсер, который безболезненно может зафейлиться
+/* MapParser.cs -- парсер, преобразующий результат
  * Ars Magna project, http://arsmagna.ru
  */
+
+#region Using directives
+
+using System;
+
+#endregion
 
 #nullable enable
 
 namespace AM.Kotik;
 
 /// <summary>
-/// Парсер, который безболезненно может зафейлиться.
+/// Парсер, преобразующий результат.
 /// </summary>
-public sealed class OptionalParser<TResult>
+public sealed class MapParser<TIntermediate, TResult>
     : Parser<TResult>
+    where TIntermediate: class
     where TResult: class
 {
-    #region Construciton
+    #region Construction
 
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public OptionalParser
+    public MapParser
         (
-            Parser<TResult> parser
+            Parser<TIntermediate> parser,
+            Func<TIntermediate, TResult> function
         )
     {
-        Sure.NotNull (parser);
-
         _parser = parser;
+        _function = function;
     }
 
     #endregion
 
     #region Private members
 
-    private readonly Parser<TResult> _parser;
+    private readonly Parser<TIntermediate> _parser;
+    private readonly Func<TIntermediate, TResult> _function;
 
     #endregion
 
@@ -53,18 +61,12 @@ public sealed class OptionalParser<TResult>
         )
     {
         result = default!;
+        if (!_parser.TryParse (state, out var intermediate))
+        {
+            return false;
+        }
 
-        var location = state.Location;
-        if (_parser.TryParse (state, out var temporary))
-        {
-            result = temporary;
-        }
-        else
-        {
-            // запрещаем продвижение
-            state.EnableAdvance = false;
-            state.Location = location;
-        }
+        result = _function (intermediate);
 
         return true;
     }

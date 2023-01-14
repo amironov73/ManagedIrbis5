@@ -63,7 +63,7 @@ public sealed class TraceParser<TResult>
         state.Trace
             (
                 !state.HasCurrent
-                    ? "!HasCurrent"
+                    ? "EOT"
                     : state.Current.ToString()
             );
 

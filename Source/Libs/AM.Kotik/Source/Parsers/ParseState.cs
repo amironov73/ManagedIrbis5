@@ -33,6 +33,15 @@ namespace AM.Kotik;
 /// </summary>
 public sealed class ParseState
 {
+    #region Properties
+
+    /// <summary>
+    /// Разрешение на продвижение (для <see cref="OptionalParser{TResult}"/>.
+    /// </summary>
+    public bool EnableAdvance { get; set; }
+
+    #endregion
+
     #region Construction
 
     /// <summary>
@@ -46,6 +55,7 @@ public sealed class ParseState
     {
         Sure.NotNull (tokens);
 
+        EnableAdvance = true; // по умолчанию продвижение разрешено
         _tokens = tokens.ToArray();
         _traceOutput = traceOutput;
     }
@@ -88,7 +98,12 @@ public sealed class ParseState
             int count = 1
         )
     {
-        Location += count;
+        if (EnableAdvance)
+        {
+            Location += count;
+        }
+
+        EnableAdvance = true;
 
         return Location < _tokens.Length;
     }
@@ -118,6 +133,21 @@ public sealed class ParseState
         )
     {
         _traceOutput?.WriteLine (line);
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString()
+    {
+        if (HasCurrent)
+        {
+            return Current.ToString();
+        }
+
+        return "EOT";
     }
 
     #endregion
