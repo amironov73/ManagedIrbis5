@@ -85,3 +85,39 @@ public abstract class Parser<TResult>
 
     #endregion
 }
+
+/// <summary>
+/// Полезные методы расширения.
+/// </summary>
+public static class Parser
+{
+    #region Public methods
+
+    /// <summary>
+    /// "Нужное перед прочим".
+    /// </summary>
+    public static Parser<TResult> Before<TBefore, TResult>
+        (
+            this Parser<TResult> parser,
+            Parser<TBefore> before
+        )
+        where TBefore: class
+        where TResult: class
+    {
+        return new BeforeParser<TBefore, TResult> (parser, before);
+    }
+
+    /// <summary>
+    /// Проверка успешного окончания разбора.
+    /// </summary>
+    public static Parser<TResult> End<TResult>
+        (
+            this Parser<TResult> parser
+        )
+        where TResult: class
+    {
+        return new BeforeParser<Unit, TResult> (parser, new EndParser());
+    }
+
+    #endregion
+}

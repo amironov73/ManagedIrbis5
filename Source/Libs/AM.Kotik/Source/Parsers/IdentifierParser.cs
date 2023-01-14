@@ -5,38 +5,43 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* EndParser.cs -- парсер, ожидающий конца текста
+/* IdentifierParser.cs -- парсит идентификаторы
  * Ars Magna project, http://arsmagna.ru
  */
-
-#region Using directives
-
-using System.Diagnostics.CodeAnalysis;
-
-#endregion
 
 #nullable enable
 
 namespace AM.Kotik;
 
 /// <summary>
-/// Парсер, ожидающий конец текста.
+/// Парсит идентификаторы.
 /// </summary>
-internal sealed class EndParser
-    : Parser<Unit>
+public sealed class IdentifierParser
+    : Parser<string>
 {
-    #region Parser<TToken, TResult> members
+    #region Parser<TResult> members
 
     /// <inheritdoc cref="Parser{TResult}.TryParse"/>
     public override bool TryParse
         (
             ParseState state,
-            [MaybeNullWhen (false)] out Unit result
+            out string result
         )
     {
-        result = Unit.Value;
+        result = default!;
+        if (!state.HasCurrent)
+        {
+            return false;
+        }
 
-        return !state.HasCurrent;
+        var current = state.Current;
+        if (current.IsIdentifier())
+        {
+            result = current.Value!;
+            return true;
+        }
+
+        return false;
     }
 
     #endregion

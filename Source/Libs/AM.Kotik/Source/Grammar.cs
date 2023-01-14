@@ -41,5 +41,10 @@ public static class Grammar
     /// </summary>
     public static ReservedWordParser Reserved (string word) => new (word);
 
+    /// <summary>
+    /// Разбор идентификаторов.
+    /// </summary>
+    public static readonly IdentifierParser Identifier = new ();
+
     #endregion
 }

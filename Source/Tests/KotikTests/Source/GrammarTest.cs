@@ -108,4 +108,82 @@ public sealed class GrammarTest
         Assert.AreEqual ("break", Grammar.Reserved ("break").ParseOrThrow (state, true));
         Assert.IsFalse (state.HasCurrent);
     }
+
+    [TestMethod]
+    [Description ("Успешная проверка окончания")]
+    public void Grammar_End_1()
+    {
+        var state = _GetState (" hello ");
+        var parser = Grammar.Identifier.End();
+        Assert.AreEqual ("hello", parser.ParseOrThrow (state));
+    }
+
+    [TestMethod]
+    [Description ("Неуспешная роверка окончания")]
+    public void Grammar_End_2()
+    {
+        var state = _GetState (" hello world");
+        var parser = Grammar.Identifier.End();
+        Assert.ThrowsException<SyntaxException>
+            (
+                () => parser.ParseOrThrow (state)
+            );
+    }
+
+    [TestMethod]
+    [Description ("Неуспешная роверка окончания")]
+    public void Grammar_End_3()
+    {
+        var state = _GetState (" 1 hello");
+        var parser = Grammar.Identifier.End();
+        Assert.ThrowsException<SyntaxException>
+            (
+                () => parser.ParseOrThrow (state)
+            );
+    }
+
+    [TestMethod]
+    [Description ("Неуспешная роверка окончания")]
+    public void Grammar_End_4()
+    {
+        var state = _GetState (" 1");
+        var parser = Grammar.Identifier.End();
+        Assert.ThrowsException<SyntaxException>
+            (
+                () => parser.ParseOrThrow (state)
+            );
+    }
+
+    [TestMethod]
+    [Description ("Неуспешная роверка окончания")]
+    public void Grammar_End_5()
+    {
+        var state = _GetState (string.Empty);
+        var parser = Grammar.Identifier.End();
+        Assert.ThrowsException<SyntaxException>
+            (
+                () => parser.ParseOrThrow (state)
+            );
+    }
+
+    [TestMethod]
+    [Description ("Нужное перед ненужным - успешно")]
+    public void Grammar_Before_1()
+    {
+        var state = _GetState ("hello 1");
+        var parser = Grammar.Identifier.Before (Grammar.Literal).End();
+        Assert.AreEqual ("hello", parser.ParseOrThrow (state));
+    }
+
+    [TestMethod]
+    [Description ("Нужное перед ненужным - неуспешно")]
+    public void Grammar_Before_2()
+    {
+        var state = _GetState ("hello world");
+        var parser = Grammar.Identifier.Before (Grammar.Literal).End();
+        Assert.ThrowsException<SyntaxException>
+            (
+                () => parser.ParseOrThrow (state)
+            );
+    }
 }
