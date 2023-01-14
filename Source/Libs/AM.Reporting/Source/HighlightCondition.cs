@@ -98,7 +98,7 @@ namespace AM.Reporting
         }
 
         /// <inheritdoc/>
-        public override bool Equals (object obj)
+        public override bool Equals (object? obj)
         {
             var c = obj as HighlightCondition;
             return c != null && Expression == c.Expression && Border.Equals (c.Border) && Fill.Equals (c.Fill) &&

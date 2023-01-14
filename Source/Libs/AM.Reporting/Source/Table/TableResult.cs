@@ -295,7 +295,11 @@ namespace AM.Reporting.Table
             }
         }
 
-        internal void GeneratePages (object sender, EventArgs e)
+        internal void GeneratePages
+            (
+                object? sender,
+                EventArgs eventArgs
+            )
         {
             isFirstRow = false;
             if (Skip)

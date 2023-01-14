@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.ComponentModel;
 using System.Collections;
+using System.Diagnostics;
 
 using AM.Reporting.Utils;
 
@@ -607,14 +608,13 @@ namespace AM.Reporting.Data
             Init (relation, filter, sort, false);
         }
 
-        internal void Init (DataSourceBase parentData, string filter, SortCollection sort, bool useAllParentRows)
+        internal void Init (DataSourceBase? parentData, string filter, SortCollection sort, bool useAllParentRows)
         {
-            var relation =
-                parentData != null ? DataHelper.FindRelation (Report.Dictionary, parentData, this) : null;
+            var relation = parentData != null ? DataHelper.FindRelation (Report.Dictionary, parentData, this) : null;
             Init (relation, filter, sort, useAllParentRows);
         }
 
-        internal void Init (Relation relation, string filter, SortCollection sort, bool useAllParentRows)
+        internal void Init (Relation? relation, string filter, SortCollection sort, bool useAllParentRows)
         {
             if (_fShowAccessDataMessage)
             {
@@ -626,8 +626,9 @@ namespace AM.Reporting.Data
             {
                 InitSchema();
             }
-            catch
+            catch (Exception exception)
             {
+                Debug.WriteLine (exception.Message);
             }
 
             LoadData();

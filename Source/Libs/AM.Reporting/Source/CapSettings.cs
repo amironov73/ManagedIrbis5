@@ -105,7 +105,7 @@ namespace AM.Reporting
         }
 
         /// <inheritdoc/>
-        public override bool Equals (object obj)
+        public override bool Equals (object? obj)
         {
             var c = obj as CapSettings;
             return c != null && Width == c.Width && Height == c.Height && Style == c.Style;

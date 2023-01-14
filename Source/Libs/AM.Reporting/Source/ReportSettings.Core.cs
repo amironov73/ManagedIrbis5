@@ -42,7 +42,7 @@ namespace AM.Reporting
         /// </summary>
         /// <param name="report"></param>
         /// <param name="str"></param>
-        internal void OnProgress (Report report, string str)
+        internal void OnProgress (Report? report, string str)
         {
         }
 
@@ -50,7 +50,7 @@ namespace AM.Reporting
         /// Does nothing
         /// </summary>
         /// <param name="report"></param>
-        internal void OnProgress (Report report, string str, int int1, int int2)
+        internal void OnProgress (Report? report, string str, int int1, int int2)
         {
         }
 

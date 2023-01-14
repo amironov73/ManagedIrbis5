@@ -941,7 +941,11 @@ public abstract partial class Base
     ///   InvokeEvent(BeforePrintEvent, e);
     /// }
     /// </code></example>
-    public void InvokeEvent (string name, object param)
+    public void InvokeEvent
+        (
+            string? name,
+            object param
+        )
     {
         if (string.IsNullOrEmpty (name))
         {

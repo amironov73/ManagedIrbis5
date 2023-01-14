@@ -307,7 +307,7 @@ namespace AM.Reporting.Table
         /// </code>
         /// </remarks>
         [Browsable (false)]
-        public TableResult ResultTable { get; private set; }
+        public TableResult? ResultTable { get; private set; }
 
         internal TableCellData PrintingCell { get; set; }
 
@@ -515,7 +515,7 @@ namespace AM.Reporting.Table
             return e.Graphics.IsVisible (objRect);
         }
 
-        internal void SetResultTable (TableResult table)
+        internal void SetResultTable (TableResult? table)
         {
             ResultTable = table;
         }
