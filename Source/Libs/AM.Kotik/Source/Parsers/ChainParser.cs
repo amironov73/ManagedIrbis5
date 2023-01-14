@@ -77,7 +77,6 @@ public sealed class ChainParser<TFirst, TSecond, TResult>
             return false;
         }
 
-        state.Advance();
         if (!_second.TryParse (state, out var second))
         {
             state.Location = location;
@@ -154,14 +153,12 @@ public sealed class ChainParser<TFirst, TSecond, TThird, TResult>
             return false;
         }
 
-        state.Advance();
         if (!_second.TryParse (state, out var second))
         {
             state.Location = location;
             return false;
         }
 
-        state.Advance();
         if (!_third.TryParse (state, out var third))
         {
             state.Location = location;
@@ -242,21 +239,18 @@ public sealed class ChainParser<T1, T2, T3, T4, TResult>
             return false;
         }
 
-        state.Advance();
         if (!_second.TryParse (state, out var second))
         {
             state.Location = location;
             return false;
         }
 
-        state.Advance();
         if (!_third.TryParse (state, out var third))
         {
             state.Location = location;
             return false;
         }
 
-        state.Advance();
         if (!_fourth.TryParse (state, out var fourth))
         {
             state.Location = location;
@@ -341,28 +335,24 @@ public sealed class ChainParser<T1, T2, T3, T4, T5, TResult>
             return false;
         }
 
-        state.Advance();
         if (!_second.TryParse (state, out var second))
         {
             state.Location = location;
             return false;
         }
 
-        state.Advance();
         if (!_third.TryParse (state, out var third))
         {
             state.Location = location;
             return false;
         }
 
-        state.Advance();
         if (!_fourth.TryParse (state, out var fourth))
         {
             state.Location = location;
             return false;
         }
 
-        state.Advance();
         if (!_fifth.TryParse (state, out var fifth))
         {
             state.Location = location;
@@ -451,35 +441,30 @@ public sealed class ChainParser<T1, T2, T3, T4, T5, T6, TResult>
             return false;
         }
 
-        state.Advance();
         if (!_second.TryParse (state, out var second))
         {
             state.Location = location;
             return false;
         }
 
-        state.Advance();
         if (!_third.TryParse (state, out var third))
         {
             state.Location = location;
             return false;
         }
 
-        state.Advance();
         if (!_fourth.TryParse (state, out var fourth))
         {
             state.Location = location;
             return false;
         }
 
-        state.Advance();
         if (!_fifth.TryParse (state, out var fifth))
         {
             state.Location = location;
             return false;
         }
 
-        state.Advance();
         if (!_sixth.TryParse (state, out var sixth))
         {
             state.Location = location;
@@ -572,42 +557,36 @@ public sealed class ChainParser<T1, T2, T3, T4, T5, T6, T7, TResult>
             return false;
         }
 
-        state.Advance();
         if (!_second.TryParse (state, out var second))
         {
             state.Location = location;
             return false;
         }
 
-        state.Advance();
         if (!_third.TryParse (state, out var third))
         {
             state.Location = location;
             return false;
         }
 
-        state.Advance();
         if (!_fourth.TryParse (state, out var fourth))
         {
             state.Location = location;
             return false;
         }
 
-        state.Advance();
         if (!_fifth.TryParse (state, out var fifth))
         {
             state.Location = location;
             return false;
         }
 
-        state.Advance();
         if (!_sixth.TryParse (state, out var sixth))
         {
             state.Location = location;
             return false;
         }
 
-        state.Advance();
         if (!_seventh.TryParse (state, out var seventh))
         {
             state.Location = location;
@@ -704,49 +683,42 @@ public sealed class ChainParser<T1, T2, T3, T4, T5, T6, T7, T8, TResult>
             return false;
         }
 
-        state.Advance();
         if (!_second.TryParse (state, out var second))
         {
             state.Location = location;
             return false;
         }
 
-        state.Advance();
         if (!_third.TryParse (state, out var third))
         {
             state.Location = location;
             return false;
         }
 
-        state.Advance();
         if (!_fourth.TryParse (state, out var fourth))
         {
             state.Location = location;
             return false;
         }
 
-        state.Advance();
         if (!_fifth.TryParse (state, out var fifth))
         {
             state.Location = location;
             return false;
         }
 
-        state.Advance();
         if (!_sixth.TryParse (state, out var sixth))
         {
             state.Location = location;
             return false;
         }
 
-        state.Advance();
         if (!_seventh.TryParse (state, out var seventh))
         {
             state.Location = location;
             return false;
         }
 
-        state.Advance();
         if (!_eighth.TryParse (state, out var eighth))
         {
             state.Location = location;

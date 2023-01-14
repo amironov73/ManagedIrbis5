@@ -34,10 +34,10 @@ public sealed class GrammarTest
     {
         var state = _GetState (" null hello ");
         var literal = Grammar.Literal;
-        Assert.IsNull (literal.ParseOrThrow (state, true));
+        Assert.IsNull (literal.ParseOrThrow (state));
         Assert.ThrowsException<SyntaxException>
             (
-                () => literal.ParseOrThrow (state, true)
+                () => literal.ParseOrThrow (state)
             );
     }
 
@@ -47,11 +47,11 @@ public sealed class GrammarTest
     {
         var state = _GetState (" true false hello ");
         var literal = Grammar.Literal;
-        Assert.AreEqual (true, literal.ParseOrThrow (state, true));
-        Assert.AreEqual (false, literal.ParseOrThrow (state, true));
+        Assert.AreEqual (true, literal.ParseOrThrow (state));
+        Assert.AreEqual (false, literal.ParseOrThrow (state));
         Assert.ThrowsException<SyntaxException>
             (
-                () => literal.ParseOrThrow (state, true)
+                () => literal.ParseOrThrow (state)
             );
     }
 
@@ -61,12 +61,12 @@ public sealed class GrammarTest
     {
         var state = _GetState (" 1, -1 hello ");
         var literal = Grammar.Literal;
-        Assert.AreEqual (1, literal.ParseOrThrow (state, true));
+        Assert.AreEqual (1, literal.ParseOrThrow (state));
         state.Advance();
-        Assert.AreEqual (-1, literal.ParseOrThrow (state, true));
+        Assert.AreEqual (-1, literal.ParseOrThrow (state));
         Assert.ThrowsException<SyntaxException>
             (
-                () => literal.ParseOrThrow (state, true)
+                () => literal.ParseOrThrow (state)
             );
     }
 
@@ -76,12 +76,12 @@ public sealed class GrammarTest
     {
         var state = _GetState (" 1l, -1L hello ");
         var literal = Grammar.Literal;
-        Assert.AreEqual (1L, literal.ParseOrThrow (state, true));
+        Assert.AreEqual (1L, literal.ParseOrThrow (state));
         state.Advance();
-        Assert.AreEqual (-1L, literal.ParseOrThrow (state, true));
+        Assert.AreEqual (-1L, literal.ParseOrThrow (state));
         Assert.ThrowsException<SyntaxException>
             (
-                () => literal.ParseOrThrow (state, true)
+                () => literal.ParseOrThrow (state)
             );
     }
 
@@ -91,10 +91,10 @@ public sealed class GrammarTest
     {
         var state = _GetState ("+ ++ - --");
         var parser = Grammar.Term ("+", "++", "-", "--");
-        Assert.AreEqual ("+", parser.ParseOrThrow (state, true));
-        Assert.AreEqual ("++", parser.ParseOrThrow (state, true));
-        Assert.AreEqual ("-", parser.ParseOrThrow (state, true));
-        Assert.AreEqual ("--", parser.ParseOrThrow (state, true));
+        Assert.AreEqual ("+", parser.ParseOrThrow (state));
+        Assert.AreEqual ("++", parser.ParseOrThrow (state));
+        Assert.AreEqual ("-", parser.ParseOrThrow (state));
+        Assert.AreEqual ("--", parser.ParseOrThrow (state));
         Assert.IsFalse (state.HasCurrent);
     }
 
@@ -103,9 +103,9 @@ public sealed class GrammarTest
     public void Grammar_Reserved_1()
     {
         var state = _GetState ("using for break");
-        Assert.AreEqual ("using", Grammar.Reserved ("using").ParseOrThrow (state, true));
-        Assert.AreEqual ("for", Grammar.Reserved ("for").ParseOrThrow (state, true));
-        Assert.AreEqual ("break", Grammar.Reserved ("break").ParseOrThrow (state, true));
+        Assert.AreEqual ("using", Grammar.Reserved ("using").ParseOrThrow (state));
+        Assert.AreEqual ("for", Grammar.Reserved ("for").ParseOrThrow (state));
+        Assert.AreEqual ("break", Grammar.Reserved ("break").ParseOrThrow (state));
         Assert.IsFalse (state.HasCurrent);
     }
 

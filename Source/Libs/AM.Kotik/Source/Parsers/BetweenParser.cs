@@ -71,14 +71,12 @@ public sealed class BetweenParser<TBefore, TResult, TAfter>
             return false;
         }
 
-        state.Advance();
         if (!_inside.TryParse (state, out var temporary))
         {
             state.Location = location;
             return false;
         }
 
-        state.Advance();
         if (!_after.TryParse (state, out _))
         {
             state.Location = location;

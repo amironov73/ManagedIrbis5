@@ -38,6 +38,7 @@ public sealed class IdentifierParser
         if (current.IsIdentifier())
         {
             result = current.Value!;
+            state.Advance();
             return true;
         }
 

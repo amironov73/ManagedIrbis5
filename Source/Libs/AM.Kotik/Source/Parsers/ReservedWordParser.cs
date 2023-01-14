@@ -55,6 +55,7 @@ public sealed class ReservedWordParser
         if (state.HasCurrent && state.Current.IsReservedWord(_expected))
         {
             result = _expected;
+            state.Advance();
             return true;
         }
 

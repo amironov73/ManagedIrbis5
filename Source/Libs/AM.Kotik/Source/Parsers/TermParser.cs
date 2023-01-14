@@ -64,12 +64,14 @@ public sealed class TermParser
         if (_expected is null)
         {
             result = current.Value!;
+            state.Advance();
             return true;
         }
 
         if (current.IsTerm (_expected))
         {
             result = current.Value!;
+            state.Advance();
             return true;
         }
 

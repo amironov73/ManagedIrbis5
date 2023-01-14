@@ -69,7 +69,7 @@ public sealed class RepeatParser<TResult>
         var location = state.Location;
         for (var i = 0; i < _count; i++)
         {
-            if (i != 0 && !state.Advance())
+            if (i != 0)
             {
                 state.Location = location;
                 return false;

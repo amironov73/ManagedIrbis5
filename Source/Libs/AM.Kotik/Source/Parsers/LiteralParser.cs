@@ -48,38 +48,47 @@ public sealed class LiteralParser
         {
             case TokenKind.Char:
                 result = value[0];
+                state.Advance();
                 break;
 
             case TokenKind.String:
                 result = value;
+                state.Advance();
                 break;
 
             case TokenKind.Int32:
                 result = int.Parse (value, invariant);
+                state.Advance();
                 break;
 
             case TokenKind.UInt32:
                 result = uint.Parse (value, invariant);
+                state.Advance();
                 break;
 
             case TokenKind.Int64:
                 result = long.Parse (value, invariant);
+                state.Advance();
                 break;
 
             case TokenKind.UInt64:
                 result = ulong.Parse (value, invariant);
+                state.Advance();
                 break;
 
             case TokenKind.Single:
                 result = float.Parse (value, invariant);
+                state.Advance();
                 break;
 
             case TokenKind.Double:
                 result = double.Parse (value, invariant);
+                state.Advance();
                 break;
 
             case TokenKind.Decimal:
                 result = decimal.Parse (value, invariant);
+                state.Advance();
                 break;
 
             case TokenKind.ReservedWord:
@@ -87,14 +96,17 @@ public sealed class LiteralParser
                 {
                     case "null":
                         result = null!;
+                        state.Advance();
                         break;
 
                     case "true":
                         result = true;
+                        state.Advance();
                         break;
 
                     case "false":
                         result = false;
+                        state.Advance();
                         break;
 
                     default:

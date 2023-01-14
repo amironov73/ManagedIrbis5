@@ -67,7 +67,6 @@ public sealed class BeforeParser<TBefore, TResult>
             return false;
         }
 
-        state.Advance();
         if (!_other.TryParse (state, out _))
         {
             state.Location = location;

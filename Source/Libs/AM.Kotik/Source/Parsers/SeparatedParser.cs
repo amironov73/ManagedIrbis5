@@ -75,17 +75,11 @@ public sealed class SeparatedParser<TResult, TSeparator>
             }
 
             list.Add (item);
-            if (!state.Advance())
+
+            if (!_separatorParser.TryParse (state, out _))
             {
                 break;
             }
-
-            if (!_separatorParser.TryParse (state, out var _))
-            {
-                break;
-            }
-
-            state.Advance();
         }
 
         if (list.Count == 0)

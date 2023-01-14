@@ -67,7 +67,6 @@ public sealed class AfterParser<TAfter, TResult>
             return false;
         }
 
-        state.Advance();
         if (!_parser.TryParse (state, out var temporary))
         {
             state.Location = location;

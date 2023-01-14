@@ -57,12 +57,11 @@ public sealed class OptionalParser<TResult>
         var location = state.Location;
         if (_parser.TryParse (state, out var temporary))
         {
+            // вложенный парсер уже продвинул state
             result = temporary;
         }
         else
         {
-            // запрещаем продвижение
-            state.EnableAdvance = false;
             state.Location = location;
         }
 

@@ -45,18 +45,12 @@ public abstract class Parser<TResult>
     /// </summary>
     public Result<TResult> Parse
         (
-            ParseState state,
-            bool advance = false
+            ParseState state
         )
     {
         if (!TryParse (state, out var temporary))
         {
             return Result<TResult>.Failure();
-        }
-
-        if (advance)
-        {
-            state.Advance();
         }
 
         return new Result<TResult> (temporary);
@@ -67,18 +61,12 @@ public abstract class Parser<TResult>
     /// </summary>
     public TResult ParseOrThrow
         (
-            ParseState state,
-            bool advance = false
+            ParseState state
         )
     {
         if (!TryParse (state, out var temporary))
         {
             throw new SyntaxException();
-        }
-
-        if (advance)
-        {
-            state.Advance();
         }
 
         return new Result<TResult> (temporary).Value;
