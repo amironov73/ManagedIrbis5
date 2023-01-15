@@ -22,7 +22,7 @@ namespace AM.Kotik;
 /// <summary>
 /// Парсер, возвращающий всегда одно и то же значение.
 /// </summary>
-internal sealed class ReturnParser<TResult>
+public sealed class ReturnParser<TResult>
     : Parser<TResult>
     where TResult: class
 {

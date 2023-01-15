@@ -115,6 +115,50 @@ public abstract class Parser<TResult>
     }
 
     /// <summary>
+    /// Парсинг последовательности однообразных токенов.
+    /// </summary>
+    public Parser<IEnumerable<TResult>> Repeat
+        (
+            int minCount = 0,
+            int maxCount = int.MaxValue
+        )
+    {
+        return new RepeatParser<TResult> (this, minCount, maxCount);
+    }
+
+    /// <summary>
+    /// Парсинг разделенных однообразных токенов.
+    /// </summary>
+    public Parser<IEnumerable<TResult>> Separated<TSeparator>
+        (
+            Parser<TSeparator> separator,
+            int minCount = 0,
+            int maxCount = int.MaxValue
+        )
+        where TSeparator: class
+    {
+        return new SeparatedParser<TResult, TSeparator, string> (this, separator,
+            null, minCount, maxCount);
+    }
+
+    /// <summary>
+    /// Парсинг разделенных однообразных токенов.
+    /// </summary>
+    public Parser<IEnumerable<TResult>> Separated<TSeparator, TDelimiter>
+        (
+            Parser<TSeparator> separator,
+            Parser<TDelimiter> delimiter,
+            int minCount = 0,
+            int maxCount = int.MaxValue
+        )
+        where TSeparator: class
+        where TDelimiter: class
+    {
+        return new SeparatedParser<TResult, TSeparator, TDelimiter> (this, separator,
+            delimiter, minCount, maxCount);
+    }
+
+    /// <summary>
     /// Разбор входного потока (попытка).
     /// </summary>
     public abstract bool TryParse
