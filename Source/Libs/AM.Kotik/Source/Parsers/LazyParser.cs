@@ -5,61 +5,60 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* FailParser.cs -- вечно фейлящийся парсер
+/* LazyParser.cs -- парсер с отложенной инициализацией
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
+using System;
 using System.Diagnostics.CodeAnalysis;
 
 #endregion
 
 #nullable enable
 
-namespace AM.Kitten;
+namespace AM.Kotik;
 
 /// <summary>
-/// Вечно фейлящийся парсер.
+/// Парсер с отложенной инициализацией. Нужен для создания ссылок
+/// при определении грамматики в коде.
 /// </summary>
-internal sealed class FailParser<TToken, TResult>
-    : Parser<TToken, TResult>
+public sealed class LazyParser<TResult>
+    : Parser<TResult>
+    where TResult: class
 {
     #region Construction
 
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public FailParser
+    public LazyParser
         (
-            string message
+            Func<Parser<TResult>> function
         )
     {
-        Sure.NotNullNorEmpty (message);
-
-        _message = message;
+        _lazy = new Lazy<Parser<TResult>> (function);
     }
 
     #endregion
 
     #region Private members
 
-    private readonly string _message;
+    private readonly Lazy<Parser<TResult>> _lazy;
 
     #endregion
 
-    #region Parser<TToken, TResult> members
+    #region Parser<TResult> members
 
-    /// <inheritdoc cref="Parser{TToken,TResult}.TryParse"/>
+    /// <inheritdoc cref="Parser{TResult}.TryParse"/>
     public override bool TryParse
         (
-            ParseState<TToken> state,
+            ParseState state,
             [MaybeNullWhen (false)] out TResult result
         )
     {
-        result = default;
-
-        return false;
+        return _lazy.Value.TryParse (state, out result);
     }
 
     #endregion

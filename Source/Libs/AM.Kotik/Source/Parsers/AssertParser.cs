@@ -80,7 +80,8 @@ public sealed class AssertParser<TResult>
             return false;
         }
 
-        result = temporary!;
+        // state продвигается вложенным парсером
+        result = temporary;
 
         return true;
     }

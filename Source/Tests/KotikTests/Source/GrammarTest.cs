@@ -16,18 +16,8 @@ namespace KotikTests;
 
 [TestClass]
 public sealed class GrammarTest
+    : CommonParserTest
 {
-    private ParseState _GetState
-        (
-            string text
-        )
-    {
-        var tokenizer = new Tokenizer();
-        var tokens = tokenizer.Tokenize (text);
-
-        return new ParseState (tokens);
-    }
-
     [TestMethod]
     [Description ("null")]
     public void Grammar_Literal_1()

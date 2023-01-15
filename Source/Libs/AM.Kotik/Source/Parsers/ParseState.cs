@@ -96,7 +96,7 @@ public sealed class ParseState
     /// <summary>
     /// Заглядывание вперед на указанное количество токенов.
     /// </summary>
-    public ReadOnlySpan<Token> LookAhead
+    public Token? LookAhead
         (
             int count
         )
@@ -104,8 +104,8 @@ public sealed class ParseState
         var position = Location + count;
 
         return position < _tokens.Length
-            ? _tokens.AsSpan (position, 1)
-            : default;
+            ? _tokens[position]
+            : null;
     }
 
     /// <summary>

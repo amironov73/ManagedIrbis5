@@ -22,7 +22,7 @@ namespace AM.Kotik;
 /// <summary>
 /// Вечно фейлящийся парсер.
 /// </summary>
-internal sealed class FailParser<TResult>
+public sealed class FailParser<TResult>
     : Parser<TResult>
     where TResult: class
 {

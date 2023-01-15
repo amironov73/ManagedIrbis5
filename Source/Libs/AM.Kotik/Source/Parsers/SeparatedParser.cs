@@ -22,10 +22,11 @@ namespace AM.Kotik;
 /// <summary>
 /// Парсер для повторяющихся значений, разделенных между собой чем-нибудь.
 /// </summary>
-public sealed class SeparatedParser<TResult, TSeparator>
-    : Parser<IEnumerable <TResult>>
-    where TResult: class
-    where TSeparator: class
+public sealed class SeparatedParser<TResult, TSeparator, TDelimiter>
+    : Parser<IEnumerable<TResult>>
+    where TResult : class
+    where TSeparator : class
+    where TDelimiter : class
 {
     #region Construction
 
@@ -35,22 +36,31 @@ public sealed class SeparatedParser<TResult, TSeparator>
     public SeparatedParser
         (
             Parser<TResult> itemParser,
-            Parser<TSeparator> separatorParser
+            Parser<TSeparator> separatorParser,
+            Parser<TDelimiter>? delimiterParser = null,
+            int mininum = 0,
+            int maximum = int.MaxValue
         )
     {
         Sure.NotNull (itemParser);
         Sure.NotNull (separatorParser);
 
+        _mininum = mininum;
+        _maximum = maximum;
         _itemParser = itemParser;
         _separatorParser = separatorParser;
+        _delimiterParser = delimiterParser;
     }
 
     #endregion
 
     #region Private members
 
+    private readonly int _mininum;
+    private readonly int _maximum;
     private readonly Parser<TResult> _itemParser;
     private readonly Parser<TSeparator> _separatorParser;
+    private readonly Parser<TDelimiter>? _delimiterParser;
 
     #endregion
 
@@ -60,7 +70,7 @@ public sealed class SeparatedParser<TResult, TSeparator>
     public override bool TryParse
         (
             ParseState state,
-            out IEnumerable <TResult> result
+            out IEnumerable<TResult> result
         )
     {
         result = default!;
@@ -69,8 +79,29 @@ public sealed class SeparatedParser<TResult, TSeparator>
         var location = state.Location;
         while (state.HasCurrent)
         {
+            if (_delimiterParser is not null
+                && _delimiterParser.TryParse (state, out _))
+            {
+                break;
+            }
+
+            if (list.Count >= _maximum)
+            {
+                if (_delimiterParser is not null)
+                {
+                    state.Location = location;
+                    return false;
+                }
+                break;
+            }
+
             if (!_itemParser.TryParse (state, out var item))
             {
+                if (_delimiterParser is not null)
+                {
+                    state.Location = location;
+                    return false;
+                }
                 break;
             }
 
@@ -82,12 +113,13 @@ public sealed class SeparatedParser<TResult, TSeparator>
             }
         }
 
-        if (list.Count == 0)
+        if (list.Count < _mininum)
         {
             state.Location = location;
             return false;
         }
 
+        // state продвигается вложенными парсерами
         result = list;
 
         return true;

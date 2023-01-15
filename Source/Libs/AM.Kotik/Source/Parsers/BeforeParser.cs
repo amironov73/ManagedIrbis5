@@ -11,6 +11,8 @@
 
 #nullable enable
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace AM.Kotik;
 
 /// <summary>
@@ -51,10 +53,10 @@ public sealed class BeforeParser<TBefore, TResult>
     public override bool TryParse
         (
             ParseState state,
-            out TResult result
+            [MaybeNullWhen (false)] out TResult result
         )
     {
-        result = default!;
+        result = default;
         if (!state.HasCurrent)
         {
             return false;
@@ -73,6 +75,7 @@ public sealed class BeforeParser<TBefore, TResult>
             return false;
         }
 
+        // state продвигается вложенными парсерами
         result = temporary;
 
         return true;

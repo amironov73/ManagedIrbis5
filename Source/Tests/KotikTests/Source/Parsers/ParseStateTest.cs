@@ -6,11 +6,15 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
+#region Using directives
+
 using System;
+
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using AM.Kotik;
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+#endregion
 
 #nullable enable
 
@@ -70,13 +74,11 @@ public sealed class ParseStateTest
         var state = new ParseState (tokens);
 
         var value = state.LookAhead (1);
-        Assert.IsFalse (value.IsEmpty);
-        Assert.AreEqual (1, value.Length);
-        Assert.AreEqual (TokenKind.String, value[0].Kind);
-        Assert.AreEqual ("b", value[0].Value);
+        Assert.IsNotNull (value);
+        Assert.AreEqual (TokenKind.String, value.Kind);
+        Assert.AreEqual ("b", value.Value);
 
         value = state.LookAhead (2);
-        Assert.IsTrue (value.IsEmpty);
-        Assert.AreEqual (0, value.Length);
+        Assert.IsNull (value);
     }
 }

@@ -6,7 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
-using System;
+#region Using directives
 
 using AM.Kotik;
 
@@ -14,26 +14,16 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using static AM.Kotik.Parser;
 
+#endregion
+
 #nullable enable
 
 namespace KotikTests;
 
 [TestClass]
 public sealed class ChainParserTest
+    : CommonParserTest
 {
-    private ParseState _GetState
-        (
-            string text,
-            bool enableTracing = false
-        )
-    {
-        var tokenizer = new Tokenizer();
-        var tokens = tokenizer.Tokenize (text);
-        var traceOutput = enableTracing ? Console.Out : null;
-
-        return new ParseState (tokens, traceOutput);
-    }
-
     [TestMethod]
     [Description ("Цепочка из двух парсеров - успешно")]
     public void ChainParser_Two_1()

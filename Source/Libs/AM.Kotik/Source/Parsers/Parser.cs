@@ -13,6 +13,7 @@
 #region Using directives
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 using AM.Results;
@@ -32,16 +33,57 @@ public abstract class Parser<TResult>
     #region Public methods
 
     /// <summary>
-    /// Разбор входного потока (попытка).
+    /// Подключение альтернативы.
     /// </summary>
-    public abstract bool TryParse
+    public Parser<TResult> Or
         (
-            ParseState state,
-            [MaybeNullWhen (false)] out TResult result
-        );
+            Parser<TResult> other
+        )
+    {
+        return new OneOfParser<TResult> (this, other);
+    }
 
     /// <summary>
-    /// Разбор входного
+    /// Подключение альтернатив.
+    /// </summary>
+    public Parser<TResult> Or
+        (
+            Parser<TResult> other1,
+            Parser<TResult> other2
+        )
+    {
+        return new OneOfParser<TResult> (this, other1, other2);
+    }
+
+    /// <summary>
+    /// Подключение альтернатив.
+    /// </summary>
+    public Parser<TResult> Or
+        (
+            Parser<TResult> other1,
+            Parser<TResult> other2,
+            Parser<TResult> other3
+        )
+    {
+        return new OneOfParser<TResult> (this, other1, other2, other3);
+    }
+
+    /// <summary>
+    /// Подключение альтернатив.
+    /// </summary>
+    public Parser<TResult> Or
+        (
+            params Parser<TResult>[] others
+        )
+    {
+        var list = new List<Parser<TResult>> (others);
+        list.Insert (0, this);
+
+        return new OneOfParser<TResult> (list.ToArray());
+    }
+
+    /// <summary>
+    /// Разбор входного потока.
     /// </summary>
     public Result<TResult> Parse
         (
@@ -71,6 +113,15 @@ public abstract class Parser<TResult>
 
         return new Result<TResult> (temporary).Value;
     }
+
+    /// <summary>
+    /// Разбор входного потока (попытка).
+    /// </summary>
+    public abstract bool TryParse
+        (
+            ParseState state,
+            [MaybeNullWhen (false)] out TResult result
+        );
 
     #endregion
 }
@@ -299,9 +350,26 @@ public static class Parser
     }
 
     /// <summary>
+    /// Индикация сбоя.
+    /// </summary>
+    public static Parser<Unit> Fail (string message) => new FailParser<Unit> (message);
+
+    /// <summary>
     /// Идентификатор.
     /// </summary>
     public static readonly IdentifierParser Identifier = new ();
+
+    /// <summary>
+    /// Парсер с отложенной инициализацией.
+    /// </summary>
+    public static Parser<TResult> Lazy<TResult>
+        (
+            Func<Parser<TResult>> function
+        )
+        where TResult: class
+    {
+        return new LazyParser<TResult> (function);
+    }
 
     /// <summary>
     /// Литерал.
@@ -323,6 +391,60 @@ public static class Parser
     }
 
     /// <summary>
+    /// Парсинг альтернатив.
+    /// </summary>
+    public static Parser<TResult> OneOf<TResult>
+        (
+            Parser<TResult> first,
+            Parser<TResult> second
+        )
+        where TResult: class
+    {
+        return new OneOfParser<TResult> (first, second);
+    }
+
+    /// <summary>
+    /// Парсинг альтернатив.
+    /// </summary>
+    public static Parser<TResult> OneOf<TResult>
+        (
+            Parser<TResult> first,
+            Parser<TResult> second,
+            Parser<TResult> third
+        )
+        where TResult: class
+    {
+        return new OneOfParser<TResult> (first, second, third);
+    }
+
+    /// <summary>
+    /// Парсинг альтернатив.
+    /// </summary>
+    public static Parser<TResult> OneOf<TResult>
+        (
+            Parser<TResult> first,
+            Parser<TResult> second,
+            Parser<TResult> third,
+            Parser<TResult> fourth
+        )
+        where TResult: class
+    {
+        return new OneOfParser<TResult> (first, second, third, fourth);
+    }
+
+    /// <summary>
+    /// Парсинг альтернатив.
+    /// </summary>
+    public static Parser<TResult> OneOf<TResult>
+        (
+            params Parser<TResult>[] parsers
+        )
+        where TResult : class
+    {
+        return new OneOfParser<TResult> (parsers);
+    }
+
+    /// <summary>
     /// Опциональный парсер.
     /// </summary>
     public static Parser<TResult> Optional<TResult>
@@ -335,11 +457,6 @@ public static class Parser
     }
 
     /// <summary>
-    /// Терм.
-    /// </summary>
-    public static TermParser Term (params string[] terms) => new (terms);
-
-    /// <summary>
     /// Зарезервированное слово.
     /// </summary>
     public static ReservedWordParser Reserved (string word) => new (word);
@@ -350,6 +467,11 @@ public static class Parser
     public static Parser<TResult> Return<TResult> (TResult result)
         where TResult: class
         => new ReturnParser<TResult> (result);
+
+    /// <summary>
+    /// Терм.
+    /// </summary>
+    public static TermParser Term (params string[] terms) => new (terms);
 
     /// <summary>
     /// Трассировка парсера.

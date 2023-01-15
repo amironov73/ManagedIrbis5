@@ -11,15 +11,13 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 
-/* OrParser.cs -- парсинг альтернатив
+/* OneOfParser.cs -- парсинг альтернатив
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Diagnostics.CodeAnalysis;
 
 #endregion
 
@@ -28,9 +26,9 @@ using System.Text;
 namespace AM.Kotik;
 
 /// <summary>
-/// Парсинг альтернатив.
+/// Парсинг альтернатив, результат выдает первая из сработавших.
 /// </summary>
-public sealed class OrParser<TResult>
+public sealed class OneOfParser<TResult>
     : Parser<TResult>
     where TResult: class
 {
@@ -39,7 +37,7 @@ public sealed class OrParser<TResult>
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public OrParser
+    public OneOfParser
         (
             params Parser<TResult>[] alternatives
         )
@@ -63,10 +61,10 @@ public sealed class OrParser<TResult>
     public override bool TryParse
         (
             ParseState state,
-            out TResult result
+            [MaybeNullWhen (false)] out TResult result
         )
     {
-        result = default!;
+        result = default;
 
         var location = state.Location;
         foreach (var parser in _alternatives)
