@@ -34,21 +34,24 @@ public sealed class RepeatParser<TResult>
     public RepeatParser
         (
             Parser<TResult> parser,
-            int count
+            int minCount = 0,
+            int maxCount = int.MaxValue
         )
     {
         Sure.NotNull (parser);
-        Sure.Positive (count);
+        Sure.NonNegative (minCount);
 
         _parser = parser;
-        _count = count;
+        _minCount = minCount;
+        _maxCount = maxCount;
     }
 
     #endregion
 
     #region Private members
 
-    private readonly int _count;
+    private readonly int _minCount;
+    private readonly int _maxCount;
 
     private readonly Parser<TResult> _parser;
 
@@ -67,18 +70,22 @@ public sealed class RepeatParser<TResult>
 
         var list = new List<TResult>();
         var location = state.Location;
-        for (var i = 0; i < _count; i++)
+        for (var i = 0; i < _minCount; i++)
         {
-            if (i != 0)
+            if (!_parser.TryParse (state, out var temporary))
             {
                 state.Location = location;
                 return false;
             }
 
+            list.Add (temporary);
+        }
+
+        while (list.Count < _maxCount)
+        {
             if (!_parser.TryParse (state, out var temporary))
             {
-                state.Location = location;
-                return false;
+                break;
             }
 
             list.Add (temporary);
