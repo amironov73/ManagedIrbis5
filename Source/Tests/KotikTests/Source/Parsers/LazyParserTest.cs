@@ -29,7 +29,7 @@ public sealed class LazyParserTest
     public void LazyParser_Parse_1()
     {
         var state = _GetState ("hello world");
-        var parser = Parser.Lazy (() => Parser.Identifier.Repeat()).End();
+        var parser = Parser.Lazy (() => Parser.Identifier.Repeated()).End();
         var tokens = parser.ParseOrThrow (state).ToArray();
         Assert.IsNotNull (tokens);
         Assert.AreEqual (2, tokens.Length);
@@ -43,7 +43,7 @@ public sealed class LazyParserTest
     {
         var state = _GetState ("hello, world");
         var comma = Parser.Term (",");
-        var parser = Parser.Lazy (() => Parser.Identifier.Separated(comma)).End();
+        var parser = Parser.Lazy (() => Parser.Identifier.SeparatedBy(comma)).End();
         var tokens = parser.ParseOrThrow (state).ToArray();
         Assert.IsNotNull (tokens);
         Assert.AreEqual (2, tokens.Length);

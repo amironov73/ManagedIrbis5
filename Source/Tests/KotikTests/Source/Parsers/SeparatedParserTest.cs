@@ -163,4 +163,46 @@ public sealed class SeparatedParserTest
                 mininum:4);
         parser.ParseOrThrow (state);
     }
+
+    [TestMethod]
+    [Description ("Ограничитель задан, но отсутствует")]
+    public void SeparatedParserTest_Parse_9()
+    {
+        var state = _GetState (" у, попа, была 1");
+        var identifier = Parser.Identifier;
+        var comma = Parser.Term (",");
+        var semicolon = Parser.Term (";");
+        var parser = identifier.SeparatedBy (comma, semicolon);
+        var tokens = parser.ParseOrThrow (state).ToArray();
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (3, tokens.Length);
+        Assert.AreEqual ("у", tokens[0]);
+        Assert.AreEqual ("попа", tokens[1]);
+        Assert.AreEqual ("была", tokens[2]);
+    }
+
+    [TestMethod]
+    [Description ("Вложенные последовательности")]
+    public void SeparatedParserTest_Parse_10()
+    {
+        var state = _GetState (" у, попа, была; собака, он, ее;");
+        var identifier = Parser.Identifier;
+        var comma = Parser.Term (",");
+        var semicolon = Parser.Term (";");
+        var inner = identifier.SeparatedBy (comma);
+        var outer = inner.SeparatedBy (semicolon);
+        var tokens = outer.ParseOrThrow (state).ToArray();
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (2, tokens.Length);
+        var first = tokens[0].ToArray();
+        Assert.AreEqual (3, first.Length);
+        Assert.AreEqual ("у", first[0]);
+        Assert.AreEqual ("попа", first[1]);
+        Assert.AreEqual ("была", first[2]);
+        var second = tokens[1].ToArray();
+        Assert.AreEqual (3, second.Length);
+        Assert.AreEqual ("собака", second[0]);
+        Assert.AreEqual ("он", second[1]);
+        Assert.AreEqual ("ее", second[2]);
+    }
 }

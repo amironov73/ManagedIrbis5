@@ -117,7 +117,7 @@ public abstract class Parser<TResult>
     /// <summary>
     /// Парсинг последовательности однообразных токенов.
     /// </summary>
-    public Parser<IEnumerable<TResult>> Repeat
+    public Parser<IEnumerable<TResult>> Repeated
         (
             int minCount = 0,
             int maxCount = int.MaxValue
@@ -129,7 +129,7 @@ public abstract class Parser<TResult>
     /// <summary>
     /// Парсинг разделенных однообразных токенов.
     /// </summary>
-    public Parser<IEnumerable<TResult>> Separated<TSeparator>
+    public Parser<IEnumerable<TResult>> SeparatedBy<TSeparator>
         (
             Parser<TSeparator> separator,
             int minCount = 0,
@@ -144,7 +144,7 @@ public abstract class Parser<TResult>
     /// <summary>
     /// Парсинг разделенных однообразных токенов.
     /// </summary>
-    public Parser<IEnumerable<TResult>> Separated<TSeparator, TDelimiter>
+    public Parser<IEnumerable<TResult>> SeparatedBy<TSeparator, TDelimiter>
         (
             Parser<TSeparator> separator,
             Parser<TDelimiter> delimiter,
@@ -382,6 +382,40 @@ public static class Parser
     }
 
     /// <summary>
+    /// Выражение в угловых скобках.
+    /// </summary>
+    public static Parser<TResult> CornerBrackets<TResult>
+        (
+            this Parser<TResult> parser
+        )
+        where TResult: class
+    {
+        return new BetweenParser<string, TResult, string>
+            (
+                Term ("<"),
+                parser,
+                Term (">")
+            );
+    }
+
+    /// <summary>
+    /// Выражение в фигурных скобках.
+    /// </summary>
+    public static Parser<TResult> CurlyBrackets<TResult>
+        (
+            this Parser<TResult> parser
+        )
+        where TResult: class
+    {
+        return new BetweenParser<string, TResult, string>
+            (
+                Term ("{"),
+                parser,
+                Term ("}")
+            );
+    }
+
+    /// <summary>
     /// Проверка успешного окончания разбора.
     /// </summary>
     public static Parser<TResult> End<TResult>
@@ -511,6 +545,40 @@ public static class Parser
     public static Parser<TResult> Return<TResult> (TResult result)
         where TResult: class
         => new ReturnParser<TResult> (result);
+
+    /// <summary>
+    /// Выражение в круглых скобках.
+    /// </summary>
+    public static Parser<TResult> RoundBrackets<TResult>
+        (
+            this Parser<TResult> parser
+        )
+        where TResult: class
+    {
+        return new BetweenParser<string, TResult, string>
+            (
+                Term ("("),
+                parser,
+                Term (")")
+            );
+    }
+
+    /// <summary>
+    /// Выражение в квадратных скобках.
+    /// </summary>
+    public static Parser<TResult> SquareBrackets<TResult>
+        (
+            this Parser<TResult> parser
+        )
+        where TResult: class
+    {
+        return new BetweenParser<string, TResult, string>
+            (
+                Term ("["),
+                parser,
+                Term ("]")
+            );
+    }
 
     /// <summary>
     /// Терм.
