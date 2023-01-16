@@ -56,6 +56,32 @@ public static class ExpressionBuilder
     }
 
     /// <summary>
+    /// Построение
+    /// </summary>
+    public static Parser<AtomNode> Build
+        (
+            string[][] levels,
+            Func<AtomNode, string, AtomNode, AtomNode> function
+        )
+    {
+        Sure.AssertState (!levels.IsNullOrEmpty());
+        Sure.NotNull (function);
+
+        var expr = new DynamicParser<AtomNode> (() => null!);
+        var result = LeftAssociative (expr, levels[0], function);
+        for (var i = 1; i < levels.Length; i++)
+        {
+            result = LeftAssociative (result, levels[i], function);
+        }
+
+        var literal = Grammar.Literal;
+        var parenthesis = result.RoundBrackets();
+        expr.Inner = () => literal.Or (parenthesis);
+
+        return result;
+    }
+
+    /// <summary>
     /// Формирует лево-ассоциативный оператор.
     /// </summary>
     public static Parser<TResult> LeftAssociative<TResult>

@@ -8,8 +8,6 @@
 
 #region Using directives
 
-using System;
-
 using AM.Kotik;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -81,14 +79,24 @@ public sealed class InfixOperatorTest
     {
         var state = _GetState ("12 * 3 + 45 * 6");
         var parser = new InfixOperator<object>
-                (
-                    Parser.Literal,
-                    new[] { "*", "/" },
-                    IntegerArithmetic,
-                    BinaryOperatorType.LeftAssociative
-                );
+            (
+                Parser.Literal,
+                new[] { "*", "/" },
+                IntegerArithmetic,
+                BinaryOperatorType.LeftAssociative
+            );
+            // .End() не надо!
+
         var result = (int) parser.ParseOrThrow (state);
         Assert.AreEqual (36, result);
+
+        state = _GetState ("12 * 3 * 4 + 5 * 6");
+        result = (int) parser.ParseOrThrow (state);
+        Assert.AreEqual (144, result);
+
+        state = _GetState ("12 + 5 * 6");
+        result = (int) parser.ParseOrThrow (state);
+        Assert.AreEqual (12, result);
     }
 
     [TestMethod]
@@ -110,7 +118,8 @@ public sealed class InfixOperatorTest
                     IntegerArithmetic,
                     BinaryOperatorType.LeftAssociative
                 );
-        var result = (int) addition.ParseOrThrow (state);
+        var parser = addition.End();
+        var result = (int) parser.ParseOrThrow (state);
         Assert.AreEqual (306, result);
     }
 
@@ -133,8 +142,9 @@ public sealed class InfixOperatorTest
                 IntegerArithmetic,
                 BinaryOperatorType.LeftAssociative
             );
-        var parenthesis = addition.RoundBrackets().End();
-        var value = (int) parenthesis.ParseOrThrow (state);
+        var parenthesis = addition.RoundBrackets();
+        var parser = parenthesis.End();
+        var value = (int) parser.ParseOrThrow (state);
         Assert.AreEqual (46, value);
     }
 
@@ -161,12 +171,13 @@ public sealed class InfixOperatorTest
             );
         var parenthesis = addition.RoundBrackets();
         expr.Inner = () => literal.Or (parenthesis);
+        var parser = addition.End();
 
-        var value = (int) addition.ParseOrThrow (state);
+        var value = (int) parser.ParseOrThrow (state);
         Assert.AreEqual (230, value);
 
         state = _GetState ("(1 + 2) * (3 * 4 - 5)");
-        value = (int)addition.ParseOrThrow (state);
+        value = (int) parser.ParseOrThrow (state);
         Assert.AreEqual (21, value);
     }
 }

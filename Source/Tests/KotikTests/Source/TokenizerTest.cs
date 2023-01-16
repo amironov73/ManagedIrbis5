@@ -278,6 +278,26 @@ public class TokenizerTest
         Assert.AreEqual ("-", tokens[3].Value);
         Assert.AreEqual (TokenKind.UInt32, tokens[4].Kind);
         Assert.AreEqual ("4567", tokens[4].Value);
+
+        tokens = tokenizer.Tokenize ("0x1234 0xABCDEF 0xabcdef");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (3, tokens.Count);
+        Assert.AreEqual (TokenKind.Hex32, tokens[0].Kind);
+        Assert.AreEqual ("1234", tokens[0].Value);
+        Assert.AreEqual (TokenKind.Hex32, tokens[1].Kind);
+        Assert.AreEqual ("ABCDEF", tokens[1].Value);
+        Assert.AreEqual (TokenKind.Hex32, tokens[2].Kind);
+        Assert.AreEqual ("abcdef", tokens[2].Value);
+
+        tokens = tokenizer.Tokenize ("0x12_34 0x_ABC_DEF_ 0x_abc_def_");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (3, tokens.Count);
+        Assert.AreEqual (TokenKind.Hex32, tokens[0].Kind);
+        Assert.AreEqual ("1234", tokens[0].Value);
+        Assert.AreEqual (TokenKind.Hex32, tokens[1].Kind);
+        Assert.AreEqual ("ABCDEF", tokens[1].Value);
+        Assert.AreEqual (TokenKind.Hex32, tokens[2].Kind);
+        Assert.AreEqual ("abcdef", tokens[2].Value);
     }
 
     [TestMethod]
@@ -336,6 +356,26 @@ public class TokenizerTest
         Assert.AreEqual ("-", tokens[3].Value);
         Assert.AreEqual (TokenKind.UInt64, tokens[4].Kind);
         Assert.AreEqual ("4567", tokens[4].Value);
+
+        tokens = tokenizer.Tokenize ("0x1234L 0xABCDEFL 0xabcdefl");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (3, tokens.Count);
+        Assert.AreEqual (TokenKind.Hex64, tokens[0].Kind);
+        Assert.AreEqual ("1234", tokens[0].Value);
+        Assert.AreEqual (TokenKind.Hex64, tokens[1].Kind);
+        Assert.AreEqual ("ABCDEF", tokens[1].Value);
+        Assert.AreEqual (TokenKind.Hex64, tokens[2].Kind);
+        Assert.AreEqual ("abcdef", tokens[2].Value);
+
+        tokens = tokenizer.Tokenize ("0x12_34l 0x_ABC_DEF_l 0x_abc_def_l");
+        Assert.IsNotNull (tokens);
+        Assert.AreEqual (3, tokens.Count);
+        Assert.AreEqual (TokenKind.Hex64, tokens[0].Kind);
+        Assert.AreEqual ("1234", tokens[0].Value);
+        Assert.AreEqual (TokenKind.Hex64, tokens[1].Kind);
+        Assert.AreEqual ("ABCDEF", tokens[1].Value);
+        Assert.AreEqual (TokenKind.Hex64, tokens[2].Kind);
+        Assert.AreEqual ("abcdef", tokens[2].Value);
     }
 
     [TestMethod]

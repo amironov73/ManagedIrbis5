@@ -5,26 +5,28 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* ConstantNode.cs -- константное значение
+/* VariableNode.cs -- ссылка на переменную
  * Ars Magna project, http://arsmagna.ru
  */
 
 #nullable enable
 
+using System;
+
 namespace AM.Kotik;
 
 /// <summary>
-/// Хранимое константное значение.
+/// Ссылка на переменную.
 /// </summary>
-public sealed class ConstantNode
+public sealed class VariableNode
     : AtomNode
 {
     #region Properties
 
     /// <summary>
-    /// Собственно хранимое значение.
+    /// Имя переменной.
     /// </summary>
-    public object? Value { get; private set; }
+    public string Name { get; }
 
     #endregion
 
@@ -33,29 +35,14 @@ public sealed class ConstantNode
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public ConstantNode
+    public VariableNode
         (
-            object? value
+            string name
         )
     {
-        Value = value;
-    }
+        Sure.NotNullNorEmpty (name);
 
-    #endregion
-
-    #region Public methods
-
-    /// <summary>
-    /// Изменение значения константы.
-    /// </summary>
-    public ConstantNode ChangeValue
-        (
-            object? newValue
-        )
-    {
-        Value = newValue;
-
-        return this;
+        Name = name;
     }
 
     #endregion
@@ -63,12 +50,24 @@ public sealed class ConstantNode
     #region AtomNode members
 
     /// <inheritdoc cref="AtomNode.Compute"/>
-    public override dynamic? Compute
+    public override dynamic Compute
         (
             Context context
         )
     {
-        return Value;
+        throw new NotImplementedException();
+
+    }
+
+    /// <inheritdoc cref="AtomNode.Assign"/>
+    public override dynamic Assign
+        (
+            Context context,
+            string operation,
+            dynamic? value
+        )
+    {
+        throw new NotImplementedException();
     }
 
     #endregion
@@ -78,7 +77,7 @@ public sealed class ConstantNode
     /// <inheritdoc cref="object.ToString"/>
     public override string ToString()
     {
-        return $"constant '{Value}'";
+        return $"variable '{Name}'";
     }
 
     #endregion

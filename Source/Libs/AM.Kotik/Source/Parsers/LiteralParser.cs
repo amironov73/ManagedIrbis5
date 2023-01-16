@@ -11,6 +11,7 @@
 
 #region Using directives
 
+using System;
 using System.Globalization;
 
 #endregion
@@ -74,6 +75,14 @@ public sealed class LiteralParser
             case TokenKind.UInt64:
                 result = ulong.Parse (value, invariant);
                 state.Advance();
+                break;
+
+            case TokenKind.Hex32:
+                result = Convert.ToUInt32 (value, 16);
+                break;
+
+            case TokenKind.Hex64:
+                result = Convert.ToUInt64 (value, 16);
                 break;
 
             case TokenKind.Single:

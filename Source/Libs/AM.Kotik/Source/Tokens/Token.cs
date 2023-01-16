@@ -83,7 +83,8 @@ public sealed class Token
     /// </summary>
     public bool IsNumber() => Kind is TokenKind.Int32 or TokenKind.Int64
             or TokenKind.Single or TokenKind.Double or TokenKind.Decimal
-            or TokenKind.UInt32 or TokenKind.UInt64;
+            or TokenKind.UInt32 or TokenKind.UInt64 or TokenKind.Hex32
+            or TokenKind.Int64;
 
     /// <summary>
     /// Число со знаком?
@@ -94,7 +95,8 @@ public sealed class Token
     /// <summary>
     /// Число без знака?
     /// </summary>
-    public bool IsUnsignedNumber() => Kind is TokenKind.UInt32 or TokenKind.UInt64;
+    public bool IsUnsignedNumber() => Kind is TokenKind.UInt32 or TokenKind.UInt64
+            or TokenKind.Hex32 or TokenKind.Int64;
 
     /// <summary>
     /// Это терм вообще?

@@ -29,7 +29,15 @@ public static class Grammar
     /// <summary>
     /// Разбор литералов.
     /// </summary>
-    public static readonly LiteralParser Literal = new ();
+    public static readonly LiteralParser LiteralValue = new ();
+
+    /// <summary>
+    /// Порождение константного узла.
+    /// </summary>
+    public static readonly Parser<AtomNode> Literal = LiteralValue.Map
+        (
+            x => (AtomNode) new ConstantNode (x)
+        );
 
     /// <summary>
     /// Разбор перечисленных терминов.
@@ -45,6 +53,29 @@ public static class Grammar
     /// Разбор идентификаторов.
     /// </summary>
     public static readonly IdentifierParser Identifier = new ();
+
+    /// <summary>
+    /// Ссылка на переменную.
+    /// </summary>
+    public static readonly Parser<VariableNode> Variable = Identifier.Map
+        (
+            x => new VariableNode (x)
+        );
+
+    /// <summary>
+    /// Выражение.
+    /// </summary>
+    public static readonly Parser<AtomNode> Expression = ExpressionBuilder.Build
+        (
+            new[]
+            {
+                new[] { "<<", ">>" },
+                new[] { "&", "|" },
+                new[] { "*", "/", "%" },
+                new[] { "+", "-" },
+            },
+            ((left, operation, right) => new BinaryNode (left, operation, right))
+        );
 
     #endregion
 }

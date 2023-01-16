@@ -36,7 +36,8 @@ public sealed class ExpressionBuilderTest
                     new[] { "+", "-" },
                 },
                 IntegerArithmetic
-            );
+            )
+            .End();
         var value = (int) parser.ParseOrThrow (state);
         Assert.AreEqual (21, value);
 

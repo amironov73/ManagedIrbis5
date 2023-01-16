@@ -23,7 +23,7 @@ public sealed class GrammarTest
     public void Grammar_Literal_1()
     {
         var state = _GetState (" null hello ");
-        var literal = Grammar.Literal;
+        var literal = Grammar.LiteralValue;
         Assert.IsNull (literal.ParseOrThrow (state));
         Assert.ThrowsException<SyntaxException>
             (
@@ -36,7 +36,7 @@ public sealed class GrammarTest
     public void Grammar_Literal_2()
     {
         var state = _GetState (" true false hello ");
-        var literal = Grammar.Literal;
+        var literal = Grammar.LiteralValue;
         Assert.AreEqual (true, literal.ParseOrThrow (state));
         Assert.AreEqual (false, literal.ParseOrThrow (state));
         Assert.ThrowsException<SyntaxException>
@@ -50,7 +50,7 @@ public sealed class GrammarTest
     public void Grammar_Literal_3()
     {
         var state = _GetState (" 1, -1 hello ");
-        var literal = Grammar.Literal;
+        var literal = Grammar.LiteralValue;
         Assert.AreEqual (1, literal.ParseOrThrow (state));
         state.Advance();
         Assert.AreEqual (-1, literal.ParseOrThrow (state));
@@ -65,7 +65,7 @@ public sealed class GrammarTest
     public void Grammar_Literal_4()
     {
         var state = _GetState (" 1l, -1L hello ");
-        var literal = Grammar.Literal;
+        var literal = Grammar.LiteralValue;
         Assert.AreEqual (1L, literal.ParseOrThrow (state));
         state.Advance();
         Assert.AreEqual (-1L, literal.ParseOrThrow (state));
@@ -73,6 +73,24 @@ public sealed class GrammarTest
             (
                 () => literal.ParseOrThrow (state)
             );
+    }
+
+    [TestMethod]
+    [Description ("Hex32")]
+    public void Grammar_Literal_5()
+    {
+        var state = _GetState ("0x123_456");
+        var literal = Grammar.LiteralValue;
+        Assert.AreEqual (0x123_456u, literal.ParseOrThrow (state));
+    }
+
+    [TestMethod]
+    [Description ("Hex64")]
+    public void Grammar_Literal_6()
+    {
+        var state = _GetState ("0x123_456_789L");
+        var literal = Grammar.LiteralValue;
+        Assert.AreEqual (0x123_456_789ul, literal.ParseOrThrow (state));
     }
 
     [TestMethod]
@@ -161,7 +179,7 @@ public sealed class GrammarTest
     public void Grammar_Before_1()
     {
         var state = _GetState ("hello 1");
-        var parser = Grammar.Identifier.Before (Grammar.Literal).End();
+        var parser = Grammar.Identifier.Before (Grammar.LiteralValue).End();
         Assert.AreEqual ("hello", parser.ParseOrThrow (state));
     }
 
@@ -170,7 +188,7 @@ public sealed class GrammarTest
     public void Grammar_Before_2()
     {
         var state = _GetState ("hello world");
-        var parser = Grammar.Identifier.Before (Grammar.Literal).End();
+        var parser = Grammar.Identifier.Before (Grammar.LiteralValue).End();
         Assert.ThrowsException<SyntaxException>
             (
                 () => parser.ParseOrThrow (state)
