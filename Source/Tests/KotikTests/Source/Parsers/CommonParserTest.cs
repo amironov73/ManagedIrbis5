@@ -20,6 +20,31 @@ namespace KotikTests;
 
 public class CommonParserTest
 {
+    protected static object IntegerArithmetic
+        (
+            object leftOperand,
+            string operationCode,
+            object rightOperand
+        )
+    {
+        var left = (int) leftOperand;
+        var right = (int) rightOperand;
+        var result = operationCode switch
+        {
+            "+" => left + right,
+            "-" => left - right,
+            "*" => left * right,
+            "/" => left / right,
+            "&" => left & right,
+            "|" => left | right,
+            "<<" => left << right,
+            ">>" => left >> right,
+            _ => throw new InvalidOperationException()
+        };
+
+        return result;
+    }
+
     protected ParseState _GetState
         (
             string text,

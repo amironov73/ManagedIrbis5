@@ -36,13 +36,13 @@ public sealed class InfixOperator<TResult>
     public InfixOperator
         (
             Parser<TResult> item,
-            string[] allowedTerms,
+            string[] operations,
             [MaybeNullWhen (false)] Func<TResult, string, TResult, TResult> function,
             BinaryOperatorType operatorType
         )
     {
         _itemParser = item;
-        _termParser = Parser.Term (allowedTerms);
+        _operationParser = Parser.Term (operations);
         _function = function;
         _operatorType = operatorType;
     }
@@ -52,7 +52,7 @@ public sealed class InfixOperator<TResult>
     #region Private members
 
     private readonly Parser<TResult> _itemParser;
-    private readonly Parser<string> _termParser;
+    private readonly Parser<string> _operationParser;
     private readonly Func<TResult, string, TResult, TResult> _function;
     private readonly BinaryOperatorType _operatorType;
 
@@ -80,7 +80,7 @@ public sealed class InfixOperator<TResult>
             return false;
         }
 
-        if (!_termParser.TryParse (state, out var code))
+        if (!_operationParser.TryParse (state, out var code))
         {
             // если не удалось распарсить операцию,
             // выдаем только левый операнд
@@ -106,7 +106,7 @@ public sealed class InfixOperator<TResult>
         while (state.HasCurrent)
         {
             var location2 = state.Location;
-            if (!_termParser.TryParse (state, out code))
+            if (!_operationParser.TryParse (state, out code))
             {
                 state.Location = location2;
                 break;

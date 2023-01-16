@@ -24,27 +24,6 @@ namespace KotikTests;
 public sealed class InfixOperatorTest
     : CommonParserTest
 {
-    private static object IntegerArithmetic
-        (
-            object leftOperand,
-            string operationCode,
-            object rightOperand
-        )
-    {
-        var left = (int) leftOperand;
-        var right = (int) rightOperand;
-        var result = operationCode switch
-        {
-            "+" => left + right,
-            "-" => left - right,
-            "*" => left * right,
-            "/" => left / right,
-            _ => throw new InvalidOperationException()
-        };
-
-        return result;
-    }
-
     [TestMethod]
     [Description ("Сложение двух целых")]
     public void InfixOperator_Parse_1()
@@ -159,7 +138,6 @@ public sealed class InfixOperatorTest
         Assert.AreEqual (46, value);
     }
 
-    [Ignore]
     [TestMethod]
     [Description ("Круглые скобки в составе выражения")]
     public void InfixOperator_Parse_7()
@@ -182,10 +160,13 @@ public sealed class InfixOperatorTest
                 BinaryOperatorType.LeftAssociative
             );
         var parenthesis = addition.RoundBrackets();
-        var math = literal.Or (parenthesis);
-        expr.Inner = () => math.Trace();
+        expr.Inner = () => literal.Or (parenthesis);
 
-        var value = (int) math.ParseOrThrow (state);
+        var value = (int) addition.ParseOrThrow (state);
         Assert.AreEqual (230, value);
+
+        state = _GetState ("(1 + 2) * (3 * 4 - 5)");
+        value = (int)addition.ParseOrThrow (state);
+        Assert.AreEqual (21, value);
     }
 }
