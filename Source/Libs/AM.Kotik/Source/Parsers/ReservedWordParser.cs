@@ -9,6 +9,12 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
+#region Using directives
+
+using System.Diagnostics.CodeAnalysis;
+
+#endregion
+
 #nullable enable
 
 namespace AM.Kotik;
@@ -48,18 +54,20 @@ public sealed class ReservedWordParser
     public override bool TryParse
         (
             ParseState state,
-            out string result
+            [MaybeNullWhen (false)] out string result
         )
     {
-        result = default!;
+        result = default;
+        DebugHook (state);
+
         if (state.HasCurrent && state.Current.IsReservedWord(_expected))
         {
             result = _expected;
             state.Advance();
-            return true;
+            return DebugSuccess (state, true);
         }
 
-        return false;
+        return DebugSuccess (state, false);
     }
 
     #endregion

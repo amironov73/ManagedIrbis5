@@ -61,35 +61,44 @@ public sealed class BetweenParser<TBefore, TResult, TAfter>
         )
     {
         result = default;
+        DebugHook (state);
         if (!state.HasCurrent)
         {
-            return false;
+            return DebugSuccess (state, false);
         }
 
         var location = state.Location;
         if (!_before.TryParse (state, out _))
         {
             state.Location = location;
-            return false;
+            return DebugSuccess (state, false);
         }
 
         if (!_inside.TryParse (state, out var temporary))
         {
             state.Location = location;
-            return false;
+            return DebugSuccess (state, false);
         }
 
         if (!_after.TryParse (state, out _))
         {
             state.Location = location;
-            return false;
+            return DebugSuccess (state, false);
         }
 
         // state продвигается вложенными парсерами
         result = temporary;
 
-        return true;
+        return DebugSuccess (state, true);
     }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="Parser{TResult}.ToString"/>
+    public override string ToString() =>
+        $"{GetType().Name}: {_before} {_inside} {_after}";
 
     #endregion
 }

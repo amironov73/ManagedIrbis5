@@ -25,6 +25,31 @@ public class StatementBase
     #region Private members
 
     /// <summary>
+    /// Номер строки, в которой находится стейтмент в исходном тексте скрипта.
+    /// </summary>
+    public int Line { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="line"></param>
+    public StatementBase
+        (
+            int line
+        )
+    {
+        Line = line;
+    }
+
+    #endregion
+
+    #region Private members
+
+    /// <summary>
     /// Вызывается перед выполнением стейтмента.
     /// </summary>
     protected virtual void PreExecute
@@ -58,6 +83,13 @@ public class StatementBase
 
         // больше никаких действий на данном уровне не нужно
     }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="AstNode.ToString"/>
+    public override string ToString() => $"{base.ToString()} at line {Line}";
 
     #endregion
 }

@@ -33,6 +33,34 @@ namespace AM.Kotik;
 /// </summary>
 public sealed class ParseState
 {
+    #region Properties
+
+    /// <summary>
+    /// Возвращает общее количество обработанных токенов.
+    /// Проще говоря, текущее абсолютное смещение от начала
+    /// входного потока.
+    /// </summary>
+    public int Location { get; set; }
+
+    /// <summary>
+    /// Есть текущий токен или уже достигнут конец входного потока?
+    /// </summary>
+    public bool HasCurrent => Location < _tokens.Length;
+
+    /// <summary>
+    /// Текущий токен.
+    /// </summary>
+    public Token Current => HasCurrent
+        ? _tokens[Location]
+        : throw new IndexOutOfRangeException();
+
+    /// <summary>
+    /// Поток для отладочной печати.
+    /// </summary>
+    public TextWriter? DebugOutput { get; set; }
+
+    #endregion
+
     #region Construction
 
     /// <summary>
@@ -62,25 +90,6 @@ public sealed class ParseState
     #region Public methods
 
     /// <summary>
-    /// Возвращает общее количество обработанных токенов.
-    /// Проще говоря, текущее абсолютное смещение от начала
-    /// входного потока.
-    /// </summary>
-    public int Location { get; set; }
-
-    /// <summary>
-    /// Есть текущий токен или уже достигнут конец входного потока?
-    /// </summary>
-    public bool HasCurrent => Location < _tokens.Length;
-
-    /// <summary>
-    /// Текущий токен.
-    /// </summary>
-    public Token Current => HasCurrent
-        ? _tokens[Location]
-        : throw new IndexOutOfRangeException();
-
-    /// <summary>
     /// Продвижение вперед во входном потоке на указанное количество токенов.
     /// </summary>
     public bool Advance
@@ -91,6 +100,41 @@ public sealed class ParseState
         Location += count;
 
         return Location < _tokens.Length;
+    }
+
+    /// <summary>
+    /// Отладочный вывод текущей позиции в исходном коде скрипта.
+    /// </summary>
+    public void DebugCurrentPosition
+        (
+            object parser
+        )
+    {
+        if (DebugOutput is not null)
+        {
+            var current = HasCurrent ? Current.ToString() : "EOT";
+
+            DebugOutput.WriteLine ($"{parser}: {current} <<");
+        }
+    }
+
+    /// <summary>
+    /// Отладочный вывод признака успешности выполнения парсинга.
+    /// </summary>
+    public bool DebugSuccess
+        (
+            object parser,
+            bool success
+        )
+    {
+        if (DebugOutput is not null)
+        {
+            var current = HasCurrent ? Current.ToString() : "EOT";
+
+            DebugOutput.WriteLine ($"{parser}: {current} >> {success}");
+        }
+
+        return success;
     }
 
     /// <summary>

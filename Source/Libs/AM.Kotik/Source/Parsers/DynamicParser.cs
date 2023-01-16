@@ -63,8 +63,9 @@ public sealed class DynamicParser<TResult>
         )
     {
         result = default;
+        DebugHook (state);
 
-        return Inner().TryParse (state, out result);
+        return DebugSuccess (state, Inner().TryParse (state, out result));
     }
 
     #endregion

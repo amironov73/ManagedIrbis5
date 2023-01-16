@@ -59,8 +59,9 @@ public sealed class FailParser<TResult>
         )
     {
         result = default;
+        DebugHook (state);
 
-        return false;
+        return DebugSuccess (state, false);
     }
 
     #endregion

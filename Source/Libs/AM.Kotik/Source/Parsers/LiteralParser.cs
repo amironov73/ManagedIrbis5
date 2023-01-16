@@ -36,10 +36,10 @@ public sealed class LiteralParser
         )
     {
         result = null!;
-
+        DebugHook (state);
         if (!state.HasCurrent)
         {
-            return false;
+            return DebugSuccess (state, false);
         }
 
         var current = state.Current;
@@ -119,16 +119,16 @@ public sealed class LiteralParser
                         break;
 
                     default:
-                        return false;
+                        return DebugSuccess(state, false);
                 }
 
                 break;
 
             default:
-                return false;
+                return DebugSuccess(state, false);
         }
 
-        return true;
+        return DebugSuccess(state, true);
     }
 
     #endregion

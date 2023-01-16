@@ -58,7 +58,10 @@ public sealed class LazyParser<TResult>
             [MaybeNullWhen (false)] out TResult result
         )
     {
-        return _lazy.Value.TryParse (state, out result);
+        DebugHook (state);
+
+        // TODO: отобразить правильно
+        return DebugSuccess (state, _lazy.Value.TryParse (state, out result));
     }
 
     #endregion

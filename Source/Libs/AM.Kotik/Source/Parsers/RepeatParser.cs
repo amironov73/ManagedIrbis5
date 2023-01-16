@@ -67,6 +67,7 @@ public sealed class RepeatParser<TResult>
         )
     {
         result = default!;
+        DebugHook (state);
 
         var list = new List<TResult>();
         var location = state.Location;
@@ -75,7 +76,7 @@ public sealed class RepeatParser<TResult>
             if (!_parser.TryParse (state, out var temporary))
             {
                 state.Location = location;
-                return false;
+                return DebugSuccess (state, false);
             }
 
             list.Add (temporary);
@@ -93,7 +94,7 @@ public sealed class RepeatParser<TResult>
 
         result = list;
 
-        return true;
+        return DebugSuccess (state, true);
     }
 
     #endregion

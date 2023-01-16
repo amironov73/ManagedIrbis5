@@ -74,7 +74,7 @@ public static class ExpressionBuilder
             result = LeftAssociative (result, levels[i], function);
         }
 
-        var literal = Grammar.Literal;
+        var literal = Grammar.Literal.Or (Grammar.Variable);
         var parenthesis = result.RoundBrackets();
         expr.Inner = () => literal.Or (parenthesis);
 

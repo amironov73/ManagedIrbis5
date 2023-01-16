@@ -35,8 +35,9 @@ internal sealed class EndParser
         )
     {
         result = Unit.Value;
+        DebugHook (state);
 
-        return !state.HasCurrent;
+        return DebugSuccess (state, !state.HasCurrent);
     }
 
     #endregion

@@ -68,22 +68,23 @@ public sealed class AssertParser<TResult>
         )
     {
         result = default;
+        DebugHook (state);
 
         if (!_inner.TryParse (state, out var temporary))
         {
-            return false;
+            return DebugSuccess (state, false);
         }
 
         if (!_predicate (temporary!))
         {
             // state.SetError(Maybe.Nothing<TToken>(), false, state.Location, _message(result!));
-            return false;
+            return DebugSuccess (state, false);
         }
 
         // state продвигается вложенным парсером
         result = temporary;
 
-        return true;
+        return DebugSuccess (state, true);
     }
 
     #endregion

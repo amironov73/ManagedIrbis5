@@ -35,8 +35,10 @@ public sealed class SimpleStatement
     /// </summary>
     public SimpleStatement
         (
+            int line,
             ExpressionNode expression
         )
+        : base (line)
     {
         _expression = expression;
     }
@@ -72,7 +74,7 @@ public sealed class SimpleStatement
             TextWriter writer
         )
     {
-        base.DumpHierarchyItem (name, level, writer);
+        base.DumpHierarchyItem (name, level, writer, ToString());
 
        _expression.DumpHierarchyItem ("Expression", level + 1, writer);
     }

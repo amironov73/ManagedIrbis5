@@ -9,6 +9,14 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
+#region Using directives
+
+using System.Diagnostics.CodeAnalysis;
+
+using AM.Collections;
+
+#endregion
+
 #nullable enable
 
 namespace AM.Kotik;
@@ -46,36 +54,55 @@ public sealed class TermParser
     public override bool TryParse
         (
             ParseState state,
-            out string result
+            [MaybeNullWhen (false)] out string result
         )
     {
-        result = default!;
+        result = default;
+        DebugHook (state);
         if (!state.HasCurrent)
         {
-            return false;
+            return DebugSuccess (state, false);
         }
 
         var current = state.Current;
         if (!current.IsTerm())
         {
-            return false;
+            return DebugSuccess (state, false);
         }
 
         if (_expected is null)
         {
             result = current.Value!;
+            var final = DebugSuccess (state, true);
             state.Advance();
-            return true;
+            return final;
         }
 
         if (current.IsTerm (_expected))
         {
             result = current.Value!;
+            var final = DebugSuccess (state, true);
             state.Advance();
-            return true;
+            return final;
         }
 
-        return false;
+        return DebugSuccess (state, false);
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString()
+    {
+        if (_expected.IsNullOrEmpty())
+        {
+            return GetType().Name;
+        }
+
+        var expected = string.Join (", ", _expected);
+        return $"{GetType().Name}: {expected}";
     }
 
     #endregion

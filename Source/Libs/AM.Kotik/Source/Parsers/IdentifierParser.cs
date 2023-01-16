@@ -29,20 +29,22 @@ public sealed class IdentifierParser
         )
     {
         result = default!;
+        DebugHook (state);
         if (!state.HasCurrent)
         {
-            return false;
+            return DebugSuccess (state, false);
         }
 
         var current = state.Current;
         if (current.IsIdentifier())
         {
             result = current.Value!;
+            var final = DebugSuccess (state, true);
             state.Advance();
-            return true;
+            return final;
         }
 
-        return false;
+        return DebugSuccess(state, false);
     }
 
     #endregion

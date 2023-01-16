@@ -12,6 +12,7 @@
 #region Using directives
 
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 #endregion
 
@@ -70,10 +71,11 @@ public sealed class SeparatedParser<TResult, TSeparator, TDelimiter>
     public override bool TryParse
         (
             ParseState state,
-            out IEnumerable<TResult> result
+            [MaybeNullWhen(false)] out IEnumerable<TResult> result
         )
     {
-        result = default!;
+        result = default;
+        DebugHook (state);
 
         var list = new List<TResult>();
         var location = state.Location;
@@ -90,7 +92,7 @@ public sealed class SeparatedParser<TResult, TSeparator, TDelimiter>
                 if (_delimiterParser is not null)
                 {
                     state.Location = location;
-                    return false;
+                    return DebugSuccess(state, false);
                 }
                 break;
             }
@@ -100,7 +102,7 @@ public sealed class SeparatedParser<TResult, TSeparator, TDelimiter>
                 if (_delimiterParser is not null)
                 {
                     state.Location = location;
-                    return false;
+                    return DebugSuccess(state, false);
                 }
                 break;
             }
@@ -116,13 +118,13 @@ public sealed class SeparatedParser<TResult, TSeparator, TDelimiter>
         if (list.Count < _mininum)
         {
             state.Location = location;
-            return false;
+            return DebugSuccess(state, false);
         }
 
         // state продвигается вложенными парсерами
         result = list;
 
-        return true;
+        return DebugSuccess(state, true);
     }
 
     #endregion

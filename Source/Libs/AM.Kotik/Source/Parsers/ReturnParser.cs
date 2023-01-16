@@ -57,8 +57,9 @@ public sealed class ReturnParser<TResult>
         )
     {
         result = _result;
+        DebugHook (state);
 
-        return true;
+        return DebugSuccess (state, true);
     }
 
     #endregion

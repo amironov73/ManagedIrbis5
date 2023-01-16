@@ -65,28 +65,38 @@ public sealed class ChainParser<TFirst, TSecond, TResult>
         )
     {
         result = default!;
+        DebugHook (state);
         if (!state.HasCurrent)
         {
-            return false;
+            return DebugSuccess (state, false);
         }
 
         var location = state.Location;
         if (!_first.TryParse (state, out var first))
         {
             state.Location = location;
-            return false;
+            return DebugSuccess (state, false);
         }
 
         if (!_second.TryParse (state, out var second))
         {
             state.Location = location;
-            return false;
+            return DebugSuccess (state, false);
         }
 
         result = _function (first, second);
 
-        return true;
+        // TODO правильно отобразить
+        return DebugSuccess (state, true);
     }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="Parser{TResult}.ToString"/>
+    public override string ToString() =>
+        $"{GetType().Name}: {_first} {_second}";
 
     #endregion
 }
@@ -141,34 +151,44 @@ public sealed class ChainParser<TFirst, TSecond, TThird, TResult>
         )
     {
         result = default!;
+        DebugHook (state);
         if (!state.HasCurrent)
         {
-            return false;
+            return DebugSuccess (state, false);
         }
 
         var location = state.Location;
         if (!_first.TryParse (state, out var first))
         {
             state.Location = location;
-            return false;
+            return DebugSuccess (state, false);
         }
 
         if (!_second.TryParse (state, out var second))
         {
             state.Location = location;
-            return false;
+            return DebugSuccess (state, false);
         }
 
         if (!_third.TryParse (state, out var third))
         {
             state.Location = location;
-            return false;
+            return DebugSuccess (state, false);
         }
 
         result = _function (first, second, third);
 
-        return true;
+        // TODO правильно отобразить
+        return DebugSuccess (state, true);
     }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="Parser{TResult}.ToString"/>
+    public override string ToString() =>
+        $"{GetType().Name}: {_first} {_second} {_third}";
 
     #endregion
 }
@@ -227,48 +247,58 @@ public sealed class ChainParser<T1, T2, T3, T4, TResult>
         )
     {
         result = default!;
+        DebugHook (state);
         if (!state.HasCurrent)
         {
-            return false;
+            return DebugSuccess (state, false);
         }
 
         var location = state.Location;
         if (!_first.TryParse (state, out var first))
         {
             state.Location = location;
-            return false;
+            return DebugSuccess (state, false);
         }
 
         if (!_second.TryParse (state, out var second))
         {
             state.Location = location;
-            return false;
+            return DebugSuccess (state, false);
         }
 
         if (!_third.TryParse (state, out var third))
         {
             state.Location = location;
-            return false;
+            return DebugSuccess (state, false);
         }
 
         if (!_fourth.TryParse (state, out var fourth))
         {
             state.Location = location;
-            return false;
+            return DebugSuccess (state, false);
         }
 
         result = _function (first, second, third, fourth);
 
-        return true;
+        // TODO правильно отобразить
+        return DebugSuccess (state, true);
     }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="Parser{TResult}.ToString"/>
+    public override string ToString() =>
+        $"{GetType().Name}: {_first} {_second} {_third} {_fourth}";
 
     #endregion
 }
 
-/// <summary>
-/// Парсер для последовательностей.
-/// </summary>
-public sealed class ChainParser<T1, T2, T3, T4, T5, TResult>
+    /// <summary>
+    /// Парсер для последовательностей.
+    /// </summary>
+    public sealed class ChainParser<T1, T2, T3, T4, T5, TResult>
     : Parser<TResult>
     where T1: class
     where T2: class
@@ -323,54 +353,63 @@ public sealed class ChainParser<T1, T2, T3, T4, T5, TResult>
         )
     {
         result = default!;
+        DebugHook (state);
         if (!state.HasCurrent)
         {
-            return false;
+            return DebugSuccess (state, false);
         }
 
         var location = state.Location;
         if (!_first.TryParse (state, out var first))
         {
             state.Location = location;
-            return false;
+            return DebugSuccess (state, false);
         }
 
         if (!_second.TryParse (state, out var second))
         {
             state.Location = location;
-            return false;
+            return DebugSuccess (state, false);
         }
 
         if (!_third.TryParse (state, out var third))
         {
             state.Location = location;
-            return false;
+            return DebugSuccess (state, false);
         }
 
         if (!_fourth.TryParse (state, out var fourth))
         {
             state.Location = location;
-            return false;
+            return DebugSuccess (state, false);
         }
 
         if (!_fifth.TryParse (state, out var fifth))
         {
             state.Location = location;
-            return false;
+            return DebugSuccess (state, false);
         }
 
         result = _function (first, second, third, fourth, fifth);
 
-        return true;
+        return DebugSuccess (state, true);
     }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="Parser{TResult}.ToString"/>
+    public override string ToString() =>
+        $"{GetType().Name}: {_first} {_second} {_third} {_fourth} {_fifth}";
 
     #endregion
 }
 
-/// <summary>
-/// Парсер для последовательностей.
-/// </summary>
-public sealed class ChainParser<T1, T2, T3, T4, T5, T6, TResult>
+    /// <summary>
+    /// Парсер для последовательностей.
+    /// </summary>
+    public sealed class ChainParser<T1, T2, T3, T4, T5, T6, TResult>
     : Parser<TResult>
     where T1: class
     where T2: class
@@ -429,52 +468,61 @@ public sealed class ChainParser<T1, T2, T3, T4, T5, T6, TResult>
         )
     {
         result = default!;
+        DebugHook (state);
         if (!state.HasCurrent)
         {
-            return false;
+            return DebugSuccess (state, false);
         }
 
         var location = state.Location;
         if (!_first.TryParse (state, out var first))
         {
             state.Location = location;
-            return false;
+            return DebugSuccess (state, false);
         }
 
         if (!_second.TryParse (state, out var second))
         {
             state.Location = location;
-            return false;
+            return DebugSuccess (state, false);
         }
 
         if (!_third.TryParse (state, out var third))
         {
             state.Location = location;
-            return false;
+            return DebugSuccess (state, false);
         }
 
         if (!_fourth.TryParse (state, out var fourth))
         {
             state.Location = location;
-            return false;
+            return DebugSuccess (state, false);
         }
 
         if (!_fifth.TryParse (state, out var fifth))
         {
             state.Location = location;
-            return false;
+            return DebugSuccess (state, false);
         }
 
         if (!_sixth.TryParse (state, out var sixth))
         {
             state.Location = location;
-            return false;
+            return DebugSuccess (state, false);
         }
 
         result = _function (first, second, third, fourth, fifth, sixth);
 
-        return true;
+        return DebugSuccess (state, true);
     }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="Parser{TResult}.ToString"/>
+    public override string ToString() =>
+        $"{GetType().Name}: {_first} {_second} {_third} {_fourth} {_fifth} {_sixth}";
 
     #endregion
 }
@@ -545,58 +593,68 @@ public sealed class ChainParser<T1, T2, T3, T4, T5, T6, T7, TResult>
         )
     {
         result = default!;
+        DebugHook (state);
         if (!state.HasCurrent)
         {
-            return false;
+            return DebugSuccess (state, false);
         }
 
         var location = state.Location;
         if (!_first.TryParse (state, out var first))
         {
             state.Location = location;
-            return false;
+            return DebugSuccess (state, false);
         }
 
         if (!_second.TryParse (state, out var second))
         {
             state.Location = location;
-            return false;
+            return DebugSuccess (state, false);
         }
 
         if (!_third.TryParse (state, out var third))
         {
             state.Location = location;
-            return false;
+            return DebugSuccess (state, false);
         }
 
         if (!_fourth.TryParse (state, out var fourth))
         {
             state.Location = location;
-            return false;
+            return DebugSuccess (state, false);
         }
 
         if (!_fifth.TryParse (state, out var fifth))
         {
             state.Location = location;
-            return false;
+            return DebugSuccess (state, false);
         }
 
         if (!_sixth.TryParse (state, out var sixth))
         {
             state.Location = location;
-            return false;
+            return DebugSuccess (state, false);
         }
 
         if (!_seventh.TryParse (state, out var seventh))
         {
             state.Location = location;
-            return false;
+            return DebugSuccess (state, false);
         }
 
         result = _function (first, second, third, fourth, fifth, sixth, seventh);
 
-        return true;
+        // TODO правильно отобразить
+        return DebugSuccess (state, true);
     }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="Parser{TResult}.ToString"/>
+    public override string ToString() =>
+        $"{GetType().Name}: {_first} {_second} {_third} {_fourth} {_fifth} {_sixth} {_seventh}";
 
     #endregion
 }
@@ -671,65 +729,75 @@ public sealed class ChainParser<T1, T2, T3, T4, T5, T6, T7, T8, TResult>
         )
     {
         result = default!;
+        DebugHook (state);
         if (!state.HasCurrent)
         {
-            return false;
+            return DebugSuccess (state, false);
         }
 
         var location = state.Location;
         if (!_first.TryParse (state, out var first))
         {
             state.Location = location;
-            return false;
+            return DebugSuccess (state, false);
         }
 
         if (!_second.TryParse (state, out var second))
         {
             state.Location = location;
-            return false;
+            return DebugSuccess (state, false);
         }
 
         if (!_third.TryParse (state, out var third))
         {
             state.Location = location;
-            return false;
+            return DebugSuccess (state, false);
         }
 
         if (!_fourth.TryParse (state, out var fourth))
         {
             state.Location = location;
-            return false;
+            return DebugSuccess (state, false);
         }
 
         if (!_fifth.TryParse (state, out var fifth))
         {
             state.Location = location;
-            return false;
+            return DebugSuccess (state, false);
         }
 
         if (!_sixth.TryParse (state, out var sixth))
         {
             state.Location = location;
-            return false;
+            return DebugSuccess (state, false);
         }
 
         if (!_seventh.TryParse (state, out var seventh))
         {
             state.Location = location;
-            return false;
+            return DebugSuccess (state, false);
         }
 
         if (!_eighth.TryParse (state, out var eighth))
         {
             state.Location = location;
-            return false;
+            return DebugSuccess (state, false);
         }
 
         result = _function (first, second, third, fourth, fifth, sixth,
             seventh, eighth);
 
-        return true;
+        // TODO правильно отобразить
+        return DebugSuccess (state, true);
     }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="Parser{TResult}.ToString"/>
+    public override string ToString() =>
+        $"{GetType().Name}: {_first} {_second} {_third} {_fourth} {_fifth} {_sixth} {_seventh} {_eighth}";
 
     #endregion
 }

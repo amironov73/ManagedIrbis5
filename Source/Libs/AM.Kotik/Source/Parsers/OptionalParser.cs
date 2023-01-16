@@ -53,6 +53,7 @@ public sealed class OptionalParser<TResult>
         )
     {
         result = default!;
+        DebugHook (state);
 
         var location = state.Location;
         if (_parser.TryParse (state, out var temporary))
@@ -65,7 +66,7 @@ public sealed class OptionalParser<TResult>
             state.Location = location;
         }
 
-        return true;
+        return DebugSuccess (state, true);
     }
 
     #endregion

@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
 using AM.Results;
@@ -30,6 +31,33 @@ namespace AM.Kotik;
 public abstract class Parser<TResult>
     where TResult: class
 {
+    #region Protected members
+
+    /// <summary>
+    /// Отладочная печать текущей позции в исходном коде скрипта.
+    /// </summary>
+    protected internal void DebugHook
+        (
+            ParseState state
+        )
+    {
+        // state.DebugCurrentPosition (this);
+    }
+
+    /// <summary>
+    /// Отладочная печать текущей признака успешности выполнения парсинга.
+    /// </summary>
+    protected internal bool DebugSuccess
+        (
+            ParseState state,
+            bool success
+        )
+    {
+        return state.DebugSuccess (this, success);
+    }
+
+    #endregion
+
     #region Public methods
 
     /// <summary>
@@ -166,6 +194,13 @@ public abstract class Parser<TResult>
             ParseState state,
             [MaybeNullWhen (false)] out TResult result
         );
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString() => GetType().Name;
 
     #endregion
 }
@@ -533,6 +568,11 @@ public static class Parser
     {
         return new OptionalParser<TResult> (parser);
     }
+
+    /// <summary>
+    /// Выдает текущую позицию в исходном тексте скрипта.
+    /// </summary>
+    public static readonly SourcePositionParser Position = new ();
 
     /// <summary>
     /// Зарезервированное слово.

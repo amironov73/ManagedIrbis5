@@ -18,6 +18,7 @@
 #region Using directives
 
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 
 #endregion
 
@@ -65,6 +66,7 @@ public sealed class OneOfParser<TResult>
         )
     {
         result = default;
+        DebugHook (state);
 
         var location = state.Location;
         foreach (var parser in _alternatives)
@@ -72,12 +74,39 @@ public sealed class OneOfParser<TResult>
             state.Location = location;
             if (parser.TryParse (state, out result!))
             {
-                return true;
+                return DebugSuccess (state, true);
             }
 
         }
 
-        return false;
+        // TODO отобразить правильно
+        return DebugSuccess (state, false);
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="Parser{TResult}.ToString"/>
+    public override string ToString()
+    {
+        var builder = new StringBuilder();
+        builder.Append (GetType().Name);
+        builder.Append (':');
+
+        var first = true;
+        foreach (var alternative in _alternatives)
+        {
+            if (!first)
+            {
+                builder.Append (", ");
+            }
+
+            builder.Append (alternative);
+            first = false;
+        }
+
+        return builder.ToString();
     }
 
     #endregion

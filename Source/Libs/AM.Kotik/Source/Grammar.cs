@@ -11,6 +11,7 @@
 
 #region Using directives
 
+using System;
 using System.Collections.Generic;
 
 #endregion
@@ -57,9 +58,9 @@ public static class Grammar
     /// <summary>
     /// Ссылка на переменную.
     /// </summary>
-    public static readonly Parser<VariableNode> Variable = Identifier.Map
+    public static readonly Parser<AtomNode> Variable = Identifier.Map
         (
-            x => new VariableNode (x)
+            x => (AtomNode) new VariableNode (x)
         );
 
     /// <summary>
@@ -80,7 +81,7 @@ public static class Grammar
     /// <summary>
     /// Выражение без присваивания.
     /// </summary>
-    public static Parser<ExpressionNode> Expression = BasicExpression.Map
+    public static readonly Parser<ExpressionNode> Expression = BasicExpression.Map
         (
             x => new ExpressionNode (null, null, x)
         );
@@ -102,8 +103,18 @@ public static class Grammar
     /// </summary>
     public static readonly Parser<StatementBase> SimpleStatement = Parser.OneOf
         (
-            Assignment.Map (x => (StatementBase) new SimpleStatement (x)),
-            Expression.Map (x => (StatementBase) new SimpleStatement (x))
+            Parser.Chain
+                (
+                    Parser.Position,
+                    Assignment,
+                    (pos, x) => (StatementBase) new SimpleStatement (pos.Line, x)
+                ),
+            Parser.Chain
+                (
+                    Parser.Position,
+                    Expression,
+                    (pos, x) => (StatementBase) new SimpleStatement (pos.Line, x)
+                )
         );
 
     /// <summary>
@@ -128,7 +139,10 @@ public static class Grammar
 
         var tokenizer = new Tokenizer();
         var tokens = tokenizer.Tokenize (sourceText);
-        var state = new ParseState (tokens);
+        var state = new ParseState (tokens)
+        {
+            DebugOutput = Console.Out
+        };
         var result = Program.ParseOrThrow (state);
 
         return result;
