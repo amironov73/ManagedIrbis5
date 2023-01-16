@@ -11,6 +11,8 @@
 
 #nullable enable
 
+using System.IO;
+
 namespace AM.Kotik;
 
 /// <summary>
@@ -73,12 +75,27 @@ public sealed class ConstantNode
 
     #endregion
 
+    #region AtomNode members
+
+    /// <inheritdoc cref="AstNode.DumpHierarchyItem(string?,int,System.IO.TextWriter)"/>
+    internal override void DumpHierarchyItem
+        (
+            string? name,
+            int level,
+            TextWriter writer
+        )
+    {
+        base.DumpHierarchyItem (name, level, writer, ToString());
+    }
+
+    #endregion
+
     #region Object members
 
     /// <inheritdoc cref="object.ToString"/>
     public override string ToString()
     {
-        return $"constant '{Value}'";
+        return $"ConstantNode '{Value}'";
     }
 
     #endregion

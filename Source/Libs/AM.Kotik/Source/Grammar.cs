@@ -63,9 +63,9 @@ public static class Grammar
         );
 
     /// <summary>
-    /// Выражение.
+    /// Базовое выражение.
     /// </summary>
-    public static readonly Parser<AtomNode> Expression = ExpressionBuilder.Build
+    public static readonly Parser<AtomNode> BasicExpression = ExpressionBuilder.Build
         (
             new[]
             {
@@ -76,6 +76,63 @@ public static class Grammar
             },
             ((left, operation, right) => new BinaryNode (left, operation, right))
         );
+
+    /// <summary>
+    /// Выражение без присваивания.
+    /// </summary>
+    public static Parser<ExpressionNode> Expression = BasicExpression.Map
+        (
+            x => new ExpressionNode (null, null, x)
+        );
+
+    /// <summary>
+    /// Присваивание.
+    /// </summary>
+    public static readonly Parser<ExpressionNode> Assignment = Parser.Chain
+        (
+            Identifier,
+            Parser.Term ("="),
+            BasicExpression,
+            (variable, operation, expression) =>
+                new ExpressionNode (variable, operation, expression)
+        );
+
+    /// <summary>
+    /// Простой стейтмент.
+    /// </summary>
+    public static readonly Parser<StatementBase> SimpleStatement = Parser.OneOf
+        (
+            Assignment.Map (x => (StatementBase) new SimpleStatement (x)),
+            Expression.Map (x => (StatementBase) new SimpleStatement (x))
+        );
+
+    /// <summary>
+    /// Программа в целом.
+    /// </summary>
+    public static readonly Parser<ProgramNode> Program = new RepeatParser<StatementBase>
+        (
+            SimpleStatement
+        )
+        .Map (x => new ProgramNode (x))
+        .End();
+
+    /// <summary>
+    /// Разбор программы.
+    /// </summary>
+    public static ProgramNode ParseProgram
+        (
+            string sourceText
+        )
+    {
+        Sure.NotNull (sourceText);
+
+        var tokenizer = new Tokenizer();
+        var tokens = tokenizer.Tokenize (sourceText);
+        var state = new ParseState (tokens);
+        var result = Program.ParseOrThrow (state);
+
+        return result;
+    }
 
     #endregion
 }

@@ -8,7 +8,7 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 
-/* StatementNode.cs -- базовый класс для стейтментов
+/* StatementBase.cs -- базовый класс для стейтментов
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,7 +19,7 @@ namespace AM.Kotik;
 /// <summary>
 /// Базовый класс для стейтментов.
 /// </summary>
-public class StatementNode
+public class StatementBase
     : AstNode
 {
     #region Private members

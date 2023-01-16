@@ -5,13 +5,12 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* VariableNode.cs -- ссылка на переменную
+/* ExpressionNode.cs -- выражение
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
 using System.IO;
 
 #endregion
@@ -21,68 +20,49 @@ using System.IO;
 namespace AM.Kotik;
 
 /// <summary>
-/// Ссылка на переменную.
+/// Выражение.
 /// </summary>
-public sealed class VariableNode
+public /* не sealed */ class ExpressionNode
     : AtomNode
 {
-    #region Properties
-
-    /// <summary>
-    /// Имя переменной.
-    /// </summary>
-    public string Name { get; }
-
-    #endregion
-
-    #region Construction
+    #region Construciton
 
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public VariableNode
+    public ExpressionNode
         (
-            string name
+            string? variable,
+            string? operation,
+            AtomNode expression
         )
     {
-        Sure.NotNullNorEmpty (name);
-
-        Name = name;
+        _variable = variable;
+        _operation = operation;
+        _expression = expression;
     }
+
+    #endregion
+
+    #region Private members
+
+    private readonly string? _variable;
+    private readonly string? _operation;
+    private readonly AtomNode _expression;
 
     #endregion
 
     #region AtomNode members
 
     /// <inheritdoc cref="AtomNode.Compute"/>
-    public override dynamic Compute
+    public override dynamic? Compute
         (
             Context context
         )
     {
-        throw new NotImplementedException();
-
-    }
-
-    /// <inheritdoc cref="AtomNode.Assign"/>
-    public override dynamic Assign
-        (
-            Context context,
-            string operation,
-            dynamic? value
-        )
-    {
-        throw new NotImplementedException();
-    }
-
-    #endregion
-
-    #region Object members
-
-    /// <inheritdoc cref="object.ToString"/>
-    public override string ToString()
-    {
-        return $"VariableNode '{Name}'";
+        _variable.NotUsed();
+        _operation.NotUsed();
+        return _expression.Compute (context);
     }
 
     #endregion
@@ -98,6 +78,10 @@ public sealed class VariableNode
         )
     {
         base.DumpHierarchyItem (name, level, writer, ToString());
+
+        DumpHierarchyItem ("Variable", level + 1, writer, _variable.ToVisibleString());
+        DumpHierarchyItem ("Operation", level + 1, writer, _operation.ToVisibleString());
+        _expression.DumpHierarchyItem ("Expression", level + 1, writer);
     }
 
     #endregion

@@ -15,6 +15,7 @@
 #region Using directives
 
 using System;
+using System.IO;
 
 #endregion
 
@@ -27,6 +28,7 @@ namespace AM.Kotik;
 /// возможно, константные.
 /// </summary>
 public abstract class AtomNode
+    : AstNode
 {
     #region Public methods
 

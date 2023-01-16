@@ -12,7 +12,7 @@
 
 #region Using directives
 
-using System;
+using System.IO;
 
 #endregion
 
@@ -25,5 +25,54 @@ namespace AM.Kotik;
 /// </summary>
 public abstract class AstNode
 {
-    // пустое тело класса
+    #region Public methods
+
+    /// <summary>
+    /// Общая реализация дампа узла.
+    /// </summary>
+    internal void DumpHierarchyItem
+        (
+            string? name,
+            int level,
+            TextWriter writer,
+            string? value
+        )
+    {
+        for (var i = 0; i < level; i++)
+        {
+            writer.Write ("| ");
+        }
+
+        writer.Write ("+ ");
+
+        if (!string.IsNullOrEmpty (name))
+        {
+            writer.Write (name);
+            writer.Write (": ");
+        }
+
+        writer.WriteLine (value);
+    }
+
+    /// <summary>
+    /// Дамп узла как элемента иерархии.
+    /// </summary>
+    internal virtual void DumpHierarchyItem
+        (
+            string? name,
+            int level,
+            TextWriter writer
+        )
+    {
+        DumpHierarchyItem (name, level, writer, GetType().Name);
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString() => GetType().Name;
+
+    #endregion
 }

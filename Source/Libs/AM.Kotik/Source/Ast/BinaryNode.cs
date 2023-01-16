@@ -9,9 +9,14 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-#nullable enable
+#region Using directives
 
 using System;
+using System.IO;
+
+#endregion
+
+#nullable enable
 
 namespace AM.Kotik;
 
@@ -69,6 +74,25 @@ public sealed class BinaryNode
         };
 
         return result;
+    }
+
+    #endregion
+
+    #region AstNode members
+
+    /// <inheritdoc cref="AstNode.DumpHierarchyItem(string?,int,System.IO.TextWriter,string?)"/>
+    internal override void DumpHierarchyItem
+        (
+            string? name,
+            int level,
+            TextWriter writer
+        )
+    {
+        base.DumpHierarchyItem (name, level, writer, ToString());
+
+        _left.DumpHierarchyItem ("Left", level + 1, writer);
+        DumpHierarchyItem ("Op", level + 1, writer, _operation);
+        _right.DumpHierarchyItem ("Right", level + 1, writer);
     }
 
     #endregion

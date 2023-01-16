@@ -14,7 +14,9 @@
 
 #region Using directives
 
+using System;
 using System.Collections.Generic;
+using System.IO;
 
 #endregion
 
@@ -34,7 +36,7 @@ public sealed class ProgramNode
     /// <summary>
     /// Стейтменты, из которых состоит прогамма.
     /// </summary>
-    public List<StatementNode> Statements { get; internal set; }
+    public List<StatementBase> Statements { get; internal set; }
 
     #endregion
 
@@ -45,17 +47,30 @@ public sealed class ProgramNode
     /// </summary>
     public ProgramNode
         (
-            IEnumerable<StatementNode> statements
+            IEnumerable<StatementBase> statements
         )
     {
         Sure.NotNull (statements);
 
-        Statements = new List<StatementNode> (statements);
+        Statements = new List<StatementBase> (statements);
     }
 
     #endregion
 
     #region Public members
+
+    /// <summary>
+    /// Дамп синтаксического дерева.
+    /// </summary>
+    public void Dump
+        (
+            TextWriter? writer = null
+        )
+    {
+        writer ??= Console.Out;
+
+        DumpHierarchyItem (null, 0, writer);
+    }
 
     /// <summary>
     /// Выполнение действий, предусмотренных данной программой.
@@ -71,6 +86,26 @@ public sealed class ProgramNode
         foreach (var statement in Statements)
         {
             statement.Execute (context);
+        }
+    }
+
+    #endregion
+
+    #region AstNode members
+
+    /// <inheritdoc cref="AstNode.DumpHierarchyItem(string?,int,System.IO.TextWriter,string?)"/>
+    internal override void DumpHierarchyItem
+        (
+            string? name,
+            int level,
+            TextWriter writer
+        )
+    {
+        base.DumpHierarchyItem (name, level, writer, "Program");
+
+        foreach (var statement in Statements)
+        {
+            statement.DumpHierarchyItem ("Statement", level + 1, writer);
         }
     }
 
