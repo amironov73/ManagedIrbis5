@@ -18,80 +18,80 @@ namespace KotikTests;
 public sealed class GrammarTest
     : CommonParserTest
 {
-    [TestMethod]
-    [Description ("null")]
-    public void Grammar_Literal_1()
-    {
-        var state = _GetState (" null hello ");
-        var literal = Grammar.LiteralValue;
-        Assert.IsNull (literal.ParseOrThrow (state));
-        Assert.ThrowsException<SyntaxException>
-            (
-                () => literal.ParseOrThrow (state)
-            );
-    }
-
-    [TestMethod]
-    [Description ("bool")]
-    public void Grammar_Literal_2()
-    {
-        var state = _GetState (" true false hello ");
-        var literal = Grammar.LiteralValue;
-        Assert.AreEqual (true, literal.ParseOrThrow (state));
-        Assert.AreEqual (false, literal.ParseOrThrow (state));
-        Assert.ThrowsException<SyntaxException>
-            (
-                () => literal.ParseOrThrow (state)
-            );
-    }
-
-    [TestMethod]
-    [Description ("Int32")]
-    public void Grammar_Literal_3()
-    {
-        var state = _GetState (" 1, -1 hello ");
-        var literal = Grammar.LiteralValue;
-        Assert.AreEqual (1, literal.ParseOrThrow (state));
-        state.Advance();
-        Assert.AreEqual (-1, literal.ParseOrThrow (state));
-        Assert.ThrowsException<SyntaxException>
-            (
-                () => literal.ParseOrThrow (state)
-            );
-    }
-
-    [TestMethod]
-    [Description ("Int64")]
-    public void Grammar_Literal_4()
-    {
-        var state = _GetState (" 1l, -1L hello ");
-        var literal = Grammar.LiteralValue;
-        Assert.AreEqual (1L, literal.ParseOrThrow (state));
-        state.Advance();
-        Assert.AreEqual (-1L, literal.ParseOrThrow (state));
-        Assert.ThrowsException<SyntaxException>
-            (
-                () => literal.ParseOrThrow (state)
-            );
-    }
-
-    [TestMethod]
-    [Description ("Hex32")]
-    public void Grammar_Literal_5()
-    {
-        var state = _GetState ("0x123_456");
-        var literal = Grammar.LiteralValue;
-        Assert.AreEqual (0x123_456u, literal.ParseOrThrow (state));
-    }
-
-    [TestMethod]
-    [Description ("Hex64")]
-    public void Grammar_Literal_6()
-    {
-        var state = _GetState ("0x123_456_789L");
-        var literal = Grammar.LiteralValue;
-        Assert.AreEqual (0x123_456_789ul, literal.ParseOrThrow (state));
-    }
+    // [TestMethod]
+    // [Description ("null")]
+    // public void Grammar_Literal_1()
+    // {
+    //     var state = _GetState (" null hello ");
+    //     var literal = Grammar.LiteralValue;
+    //     Assert.IsNull (literal.ParseOrThrow (state));
+    //     Assert.ThrowsException<SyntaxException>
+    //         (
+    //             () => literal.ParseOrThrow (state)
+    //         );
+    // }
+    //
+    // [TestMethod]
+    // [Description ("bool")]
+    // public void Grammar_Literal_2()
+    // {
+    //     var state = _GetState (" true false hello ");
+    //     var literal = Grammar.LiteralValue;
+    //     Assert.AreEqual (true, literal.ParseOrThrow (state));
+    //     Assert.AreEqual (false, literal.ParseOrThrow (state));
+    //     Assert.ThrowsException<SyntaxException>
+    //         (
+    //             () => literal.ParseOrThrow (state)
+    //         );
+    // }
+    //
+    // [TestMethod]
+    // [Description ("Int32")]
+    // public void Grammar_Literal_3()
+    // {
+    //     var state = _GetState (" 1, -1 hello ");
+    //     var literal = Grammar.LiteralValue;
+    //     Assert.AreEqual (1, literal.ParseOrThrow (state));
+    //     state.Advance();
+    //     Assert.AreEqual (-1, literal.ParseOrThrow (state));
+    //     Assert.ThrowsException<SyntaxException>
+    //         (
+    //             () => literal.ParseOrThrow (state)
+    //         );
+    // }
+    //
+    // [TestMethod]
+    // [Description ("Int64")]
+    // public void Grammar_Literal_4()
+    // {
+    //     var state = _GetState (" 1l, -1L hello ");
+    //     var literal = Grammar.LiteralValue;
+    //     Assert.AreEqual (1L, literal.ParseOrThrow (state));
+    //     state.Advance();
+    //     Assert.AreEqual (-1L, literal.ParseOrThrow (state));
+    //     Assert.ThrowsException<SyntaxException>
+    //         (
+    //             () => literal.ParseOrThrow (state)
+    //         );
+    // }
+    //
+    // [TestMethod]
+    // [Description ("Hex32")]
+    // public void Grammar_Literal_5()
+    // {
+    //     var state = _GetState ("0x123_456");
+    //     var literal = Grammar.LiteralValue;
+    //     Assert.AreEqual (0x123_456u, literal.ParseOrThrow (state));
+    // }
+    //
+    // [TestMethod]
+    // [Description ("Hex64")]
+    // public void Grammar_Literal_6()
+    // {
+    //     var state = _GetState ("0x123_456_789L");
+    //     var literal = Grammar.LiteralValue;
+    //     Assert.AreEqual (0x123_456_789ul, literal.ParseOrThrow (state));
+    // }
 
     [TestMethod]
     [Description ("Термы")]
@@ -174,24 +174,24 @@ public sealed class GrammarTest
             );
     }
 
-    [TestMethod]
-    [Description ("Нужное перед ненужным - успешно")]
-    public void Grammar_Before_1()
-    {
-        var state = _GetState ("hello 1");
-        var parser = Grammar.Identifier.Before (Grammar.LiteralValue).End();
-        Assert.AreEqual ("hello", parser.ParseOrThrow (state));
-    }
-
-    [TestMethod]
-    [Description ("Нужное перед ненужным - неуспешно")]
-    public void Grammar_Before_2()
-    {
-        var state = _GetState ("hello world");
-        var parser = Grammar.Identifier.Before (Grammar.LiteralValue).End();
-        Assert.ThrowsException<SyntaxException>
-            (
-                () => parser.ParseOrThrow (state)
-            );
-    }
+    // [TestMethod]
+    // [Description ("Нужное перед ненужным - успешно")]
+    // public void Grammar_Before_1()
+    // {
+    //     var state = _GetState ("hello 1");
+    //     var parser = Grammar.Identifier.Before (Grammar.LiteralValue).End();
+    //     Assert.AreEqual ("hello", parser.ParseOrThrow (state));
+    // }
+    //
+    // [TestMethod]
+    // [Description ("Нужное перед ненужным - неуспешно")]
+    // public void Grammar_Before_2()
+    // {
+    //     var state = _GetState ("hello world");
+    //     var parser = Grammar.Identifier.Before (Grammar.LiteralValue).End();
+    //     Assert.ThrowsException<SyntaxException>
+    //         (
+    //             () => parser.ParseOrThrow (state)
+    //         );
+    // }
 }

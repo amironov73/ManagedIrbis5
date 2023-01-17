@@ -1,6 +1,7 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable ArgumentsStyleLiteral
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
@@ -12,7 +13,7 @@
 #region Using directives
 
 using System;
-using System.Collections.Generic;
+using System.Linq;
 
 #endregion
 
@@ -25,17 +26,23 @@ namespace AM.Kotik;
 /// </summary>
 public static class Grammar
 {
+    #region Private members
+
+
+
+    #endregion
+
     #region Public methods and properties
 
-    /// <summary>
-    /// Разбор литералов.
-    /// </summary>
-    public static readonly LiteralParser LiteralValue = new ();
+    // /// <summary>
+    // /// Разбор литералов.
+    // /// </summary>
+    // public static readonly LiteralParser LiteralValue = new ();
 
     /// <summary>
     /// Порождение константного узла.
     /// </summary>
-    public static readonly Parser<AtomNode> Literal = LiteralValue.Map
+    public static readonly Parser<AtomNode> Literal = new LiteralParser().Map
         (
             x => (AtomNode) new ConstantNode (x)
         );
@@ -91,11 +98,30 @@ public static class Grammar
     /// </summary>
     public static readonly Parser<ExpressionNode> Assignment = Parser.Chain
         (
-            Identifier,
-            Parser.Term ("="),
+            // x1 = x2 = ...
+            new RepeatParser<Tuple<string, string>>
+                (
+                    Parser.Chain
+                        (
+                            Identifier,
+                            Parser.Term ("="),
+                            Tuple.Create
+                        ),
+                    minCount: 1
+                ),
             BasicExpression,
-            (variable, operation, expression) =>
-                new ExpressionNode (new VariableNode (variable), operation, expression)
+            (tuples, e) =>
+            {
+                var expr = e;
+
+                foreach (var tuple in tuples)
+                {
+                    expr = new ExpressionNode (new VariableNode (tuple.Item1), tuple.Item2, expr);
+
+                }
+
+                return (ExpressionNode) expr;
+            }
         );
 
     /// <summary>
@@ -115,6 +141,40 @@ public static class Grammar
                     Expression,
                     (pos, x) => (StatementBase) new SimpleStatement (pos.Line, x)
                 )
+        );
+
+    /// <summary>
+    /// Блок стейтментов.
+    /// </summary>
+    public static readonly Parser<StatementBase> Block = Parser.OneOf
+        (
+            Parser.Chain
+                (
+                    Parser.Position,
+                    SimpleStatement.Repeated (minCount: 1).CurlyBrackets(),
+                    (pos, lines) =>
+                        (StatementBase) new Block (pos.Line, lines.ToArray())
+                ),
+            SimpleStatement
+        );
+
+    /// <summary>
+    /// Цикл for.
+    /// </summary>
+    public static readonly Parser<StatementBase> ForStatement = Parser.Chain
+        (
+            Parser.Position,            // 1
+            Parser.Reserved ("for"),    // 2
+            Parser.Term ("("),          // 3
+            Assignment,                 // 4
+            Parser.Term (";"),          // 5
+            Expression,                 // 6
+            Parser.Term (";"),          // 7
+            Assignment.Or (Expression), // 8
+            Parser.Term (")"),          // 9
+            Block,                      // 10
+            (_1, _, _, _4, _, _6, _, _8, _, _10) =>
+                (StatementBase) new ForStatement (_1.Line, _4, _6, _8, _10)
         );
 
     /// <summary>
