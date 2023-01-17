@@ -60,6 +60,7 @@ public static class ExpressionBuilder
     /// </summary>
     public static Parser<AtomNode> Build
         (
+            Parser<AtomNode> root,
             string[][] levels,
             Func<AtomNode, string, AtomNode, AtomNode> function
         )
@@ -74,9 +75,8 @@ public static class ExpressionBuilder
             result = LeftAssociative (result, levels[i], function);
         }
 
-        var literal = Grammar.Literal.Or (Grammar.Variable);
         var parenthesis = result.RoundBrackets();
-        expr.Inner = () => literal.Or (parenthesis);
+        expr.Inner = () => root.Or (parenthesis);
 
         return result;
     }

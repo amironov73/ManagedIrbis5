@@ -28,7 +28,13 @@ public static class Grammar
 {
     #region Private members
 
-
+    private static Parser<StatementBase> BuildStatement (Parser<ExpressionNode> innerParser) =>
+        Parser.Chain
+            (
+                Parser.Position,
+                innerParser,
+                (pos, x) => (StatementBase) new SimpleStatement (pos.Line, x)
+            );
 
     #endregion
 
@@ -67,10 +73,17 @@ public static class Grammar
         .Labeled ("Variable");
 
     /// <summary>
+    /// Корневое выражение.
+    /// </summary>
+    public static readonly Parser<AtomNode> Root = Literal.Or (Variable)
+        .Labeled ("Root");
+
+    /// <summary>
     /// Базовое выражение.
     /// </summary>
     public static readonly Parser<AtomNode> BasicExpression = ExpressionBuilder.Build
         (
+            Root,
             new[]
             {
                 new[] { "<<", ">>" },
@@ -79,7 +92,7 @@ public static class Grammar
                 new[] { "+", "-" },
                 new[] { "<", ">", "<=", ">=", "==", "!=" },
             },
-            ((left, operation, right) => new BinaryNode (left, operation, right))
+            (left, operation, right) => new BinaryNode (left, operation, right)
         )
         .Labeled ("BasicExpression");
 
@@ -125,22 +138,28 @@ public static class Grammar
         .Labeled ("Assignment");
 
     /// <summary>
+    /// Преобразование типа.
+    /// </summary>
+    public static Parser<UnaryNode> Cast = Identifier
+        .RoundBrackets()
+        .Map (x => (UnaryNode) new CastNode (x, null!))
+        .Labeled ("Cast");
+
+    /// <summary>
+    /// Обращение по индексу
+    /// </summary>
+    public static readonly Parser<UnaryNode> Index = Expression
+        .SquareBrackets()
+        .Map (x => (UnaryNode) new IndexNode (null!, x))
+        .Labeled ("Index");
+
+    /// <summary>
     /// Простой стейтмент.
     /// </summary>
     public static readonly Parser<StatementBase> SimpleStatement = Parser.OneOf
         (
-            Parser.Chain
-                (
-                    Parser.Position,
-                    Assignment,
-                    (pos, x) => (StatementBase) new SimpleStatement (pos.Line, x)
-                ),
-            Parser.Chain
-                (
-                    Parser.Position,
-                    Expression,
-                    (pos, x) => (StatementBase) new SimpleStatement (pos.Line, x)
-                )
+            BuildStatement (Assignment),
+            BuildStatement (Expression)
         )
         .Labeled ("SimpleStatement");
 
@@ -193,12 +212,10 @@ public static class Grammar
         (
             Parser.Position, // 1
             Parser.Reserved ("while"), // 2
-            Parser.Term ("("), // 3
-            Expression.Instance ("Condition"), // 4
-            Parser.Term (")"), // 5
-            Block.Instance ("Body"), // 6
-            (_1, _2, _3, _4, _5, _6) =>
-                (StatementBase) new WhileNode (_1.Line, _4, (Block) _6)
+            Expression.Instance ("Condition").RoundBrackets(), // 3
+            Block.Instance ("Body"), // 4
+            (_1, _2, _3, _4) =>
+                (StatementBase) new WhileNode (_1.Line, _3, (Block) _4)
         )
         .Labeled ("While");
 

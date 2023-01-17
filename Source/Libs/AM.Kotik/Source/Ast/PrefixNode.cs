@@ -4,19 +4,26 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
 
-/* PostfixNode.cs -- постфиксная операция
+/* PrefixNode.cs -- префиксная операция
  * Ars Magna project, http://arsmagna.ru
  */
+
+#region Using directives
+
+using System;
+
+#endregion
 
 #nullable enable
 
 namespace AM.Kotik;
 
 /// <summary>
-/// Постфиксная операция, например, инкремент.
+/// Префиксная операция.
 /// </summary>
-public abstract class PostfixNode
+public abstract class PrefixNode
     : UnaryNode
 {
     // пустое тело класса
