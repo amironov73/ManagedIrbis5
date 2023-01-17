@@ -8,13 +8,13 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 
-/* Block.cs -- блок стейтментов
+/* UsingNode.cs -- блок using
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System.Collections.Generic;
+using System;
 using System.IO;
 
 #endregion
@@ -24,9 +24,9 @@ using System.IO;
 namespace AM.Kotik;
 
 /// <summary>
-/// Блок стейтментов.
+/// Блок using.
 /// </summary>
-public sealed class Block
+public sealed class UsingNode
     : StatementBase
 {
     #region Construction
@@ -34,25 +34,35 @@ public sealed class Block
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public Block
+    public UsingNode
         (
             int line,
-            StatementBase[] statements
+            string variableName,
+            AtomNode initialization,
+            Block body
         )
         : base (line)
     {
-        _statements = statements;
+        Sure.NotNullNorEmpty (variableName);
+        Sure.NotNull (initialization);
+        Sure.NotNull (body);
+
+        _variableName = variableName;
+        _initialization = initialization;
+        _body = body;
     }
 
     #endregion
 
     #region Private members
 
-    private readonly StatementBase[] _statements;
+    private readonly string _variableName;
+    private readonly AtomNode _initialization;
+    private readonly Block _body;
 
     #endregion
 
-    #region StatementBase members
+    #region Statement members
 
     /// <inheritdoc cref="StatementBase.Execute"/>
     public override void Execute
@@ -60,7 +70,27 @@ public sealed class Block
             Context context
         )
     {
-        // TODO реализовать
+        PreExecute (context);
+
+        var variable = _initialization.Compute (context);
+
+        var contextToUse = context;
+        if (!contextToUse.TryGetVariable (_variableName, out _))
+        {
+            var childContext = context.CreateChildContext();
+            childContext.Variables[_variableName] = variable;
+            contextToUse = childContext;
+        }
+
+        foreach (var statement in _body)
+        {
+            statement.Execute (contextToUse);
+        }
+
+        if (variable is IDisposable disposable)
+        {
+            disposable.Dispose();
+        }
     }
 
     #endregion
@@ -77,22 +107,8 @@ public sealed class Block
     {
         base.DumpHierarchyItem (name, level, writer, ToString());
 
-        foreach (var statement in _statements)
-        {
-            statement.DumpHierarchyItem ("Statement", level + 1, writer);
-        }
-    }
-
-    #endregion
-
-    #region Public methods
-
-    /// <summary>
-    /// Перечисление элементов.
-    /// </summary>
-    public IEnumerator<StatementBase> GetEnumerator()
-    {
-        return ((IEnumerable<StatementBase>)_statements).GetEnumerator();
+        DumpHierarchyItem ("Variable", level + 1, writer, _variableName);
+        _body.DumpHierarchyItem ("Block", level + 1, writer);
     }
 
     #endregion

@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* ReservedWordParser.cs -- парсит зарезервированное слово
+/* ParserInstance.cs -- обертка над парсером
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,31 +20,34 @@ using System.Diagnostics.CodeAnalysis;
 namespace AM.Kotik;
 
 /// <summary>
-/// Парсит зарезервированное слово
+/// Обертка над парсером (для облегчения отладки).
 /// </summary>
-public sealed class ReservedWordParser
-    : Parser<string>
+public sealed class ParserInstance<TResult>
+    : Parser<TResult>
+    where TResult: class
 {
     #region Construction
 
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public ReservedWordParser
+    public ParserInstance
         (
-            string expected
+            Parser<TResult> inner,
+            string label
         )
     {
-        Sure.NotNull (expected);
+        Sure.NotNullNorEmpty (label);
 
-        _expected = expected;
+        _inner = inner;
+        Label = label;
     }
 
     #endregion
 
     #region Private members
 
-    private readonly string _expected;
+    private readonly Parser<TResult> _inner;
 
     #endregion
 
@@ -54,21 +57,10 @@ public sealed class ReservedWordParser
     public override bool TryParse
         (
             ParseState state,
-            [MaybeNullWhen (false)] out string result
+            [MaybeNullWhen (false)] out TResult result
         )
     {
-        using var _ = state.Enter (this);
-        result = default;
-        DebugHook (state);
-
-        if (state.HasCurrent && state.Current.IsReservedWord (_expected))
-        {
-            result = _expected;
-            state.Advance();
-            return DebugSuccess (state, true);
-        }
-
-        return DebugSuccess (state, false);
+        return _inner.TryParse (state, out result);
     }
 
     #endregion
@@ -76,7 +68,7 @@ public sealed class ReservedWordParser
     #region Object members
 
     /// <inheritdoc cref="Parser{TResult}.ToString"/>
-    public override string ToString() => $"Reserved {_expected}";
+    public override string ToString() => Label!;
 
     #endregion
 }

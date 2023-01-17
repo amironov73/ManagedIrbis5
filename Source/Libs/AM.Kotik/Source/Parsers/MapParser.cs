@@ -12,6 +12,7 @@
 #region Using directives
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 #endregion
 
@@ -57,30 +58,20 @@ public sealed class MapParser<TIntermediate, TResult>
     public override bool TryParse
         (
             ParseState state,
-            out TResult result
+            [MaybeNullWhen (false)] out TResult result
         )
     {
-        using var _ = state.Enter (this);
-        result = default!;
-        DebugHook (state);
+        result = default;
         if (!_parser.TryParse (state, out var temporary))
         {
-            return DebugSuccess (state, false);
+            return false;
         }
 
         // продвижение state выполнил вложенный парсер
         result = _function (temporary);
 
-        return DebugSuccess (state, true);
+        return true;
     }
 
     #endregion
-
-    // #region Object members
-    //
-    // /// <inheritdoc cref="Parser{TResult}.ToString"/>
-    // public override string ToString() =>
-    //     $"{GetType().Name}: {_parser}";
-    //
-    // #endregion
 }

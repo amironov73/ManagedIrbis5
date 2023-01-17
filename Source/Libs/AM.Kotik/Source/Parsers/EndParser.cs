@@ -25,7 +25,7 @@ namespace AM.Kotik;
 internal sealed class EndParser
     : Parser<Unit>
 {
-    #region Parser<TToken, TResult> members
+    #region Parser<TResult> members
 
     /// <inheritdoc cref="Parser{TResult}.TryParse"/>
     public override bool TryParse
@@ -40,6 +40,13 @@ internal sealed class EndParser
 
         return DebugSuccess (state, !state.HasCurrent);
     }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="Parser{TResult}.ToString"/>
+    public override string ToString() => "End";
 
     #endregion
 }

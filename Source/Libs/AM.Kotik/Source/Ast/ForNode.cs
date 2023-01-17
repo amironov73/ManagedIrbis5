@@ -8,13 +8,12 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 
-/* Block.cs -- блок стейтментов
+/* ForNode.cs -- цикл for
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System.Collections.Generic;
 using System.IO;
 
 #endregion
@@ -24,9 +23,9 @@ using System.IO;
 namespace AM.Kotik;
 
 /// <summary>
-/// Блок стейтментов.
+/// Цикл for.
 /// </summary>
-public sealed class Block
+public sealed class ForNode
     : StatementBase
 {
     #region Construction
@@ -34,21 +33,30 @@ public sealed class Block
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public Block
+    public ForNode
         (
             int line,
-            StatementBase[] statements
+            ExpressionNode init,
+            ExpressionNode condition,
+            ExpressionNode step,
+            Block body
         )
-        : base (line)
+        : base(line)
     {
-        _statements = statements;
+        _init = init;
+        _condition = condition;
+        _step = step;
+        _body = body;
     }
 
     #endregion
 
     #region Private members
 
-    private readonly StatementBase[] _statements;
+    private readonly ExpressionNode _init;
+    private readonly ExpressionNode _condition;
+    private readonly ExpressionNode _step;
+    private readonly Block _body;
 
     #endregion
 
@@ -60,7 +68,28 @@ public sealed class Block
             Context context
         )
     {
-        // TODO реализовать
+        PreExecute (context);
+
+        _init.Compute (context);
+        // var success = false;
+        while (KotikUtility.ToBoolean (_condition.Compute (context)))
+        {
+            // success = true;
+            foreach (var statement in _body)
+            {
+                statement.Execute (context);
+            }
+
+            _step.Compute (context);
+        }
+
+        // if (!success && _else is not null)
+        // {
+        //     foreach (var statement in _else)
+        //     {
+        //         statement.Execute (context);
+        //     }
+        // }
     }
 
     #endregion
@@ -77,22 +106,10 @@ public sealed class Block
     {
         base.DumpHierarchyItem (name, level, writer, ToString());
 
-        foreach (var statement in _statements)
-        {
-            statement.DumpHierarchyItem ("Statement", level + 1, writer);
-        }
-    }
-
-    #endregion
-
-    #region Public methods
-
-    /// <summary>
-    /// Перечисление элементов.
-    /// </summary>
-    public IEnumerator<StatementBase> GetEnumerator()
-    {
-        return ((IEnumerable<StatementBase>)_statements).GetEnumerator();
+        _init.DumpHierarchyItem ("Init", level + 1, writer);
+        _condition.DumpHierarchyItem ("Condition", level + 1, writer);
+        _step.DumpHierarchyItem ("Advance", level + 1, writer);
+        _body.DumpHierarchyItem ("Block", level + 1, writer);
     }
 
     #endregion

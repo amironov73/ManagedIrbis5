@@ -30,6 +30,15 @@ namespace AM.Kotik;
 public abstract class Parser<TResult>
     where TResult: class
 {
+    #region Properties
+
+    /// <summary>
+    /// Метка для упрощения отладки.
+    /// </summary>
+    public string? Label { get; set; }
+
+    #endregion
+
     #region Protected members
 
     /// <summary>
@@ -58,6 +67,24 @@ public abstract class Parser<TResult>
     #endregion
 
     #region Public methods
+
+    /// <summary>
+    /// Создание псевдо-экземпляра.
+    /// </summary>
+    public Parser<TResult> Instance (string label) => new ParserInstance<TResult> (this, label);
+
+    /// <summary>
+    /// Пометка парсера для упрощения отладки.
+    /// </summary>
+    public Parser<TResult> Labeled
+        (
+            string label
+        )
+    {
+        Label = label;
+
+        return this;
+    }
 
     /// <summary>
     /// Подключение альтернативы.
@@ -199,7 +226,7 @@ public abstract class Parser<TResult>
     #region Object members
 
     /// <inheritdoc cref="object.ToString"/>
-    public override string ToString() => GetType().Name;
+    public override string ToString() => Label ?? GetType().Name;
 
     #endregion
 }

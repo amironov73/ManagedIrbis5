@@ -70,6 +70,14 @@ public sealed class BinaryNode
             "*" => left * right,
             "/" => left / right,
             "%" => left % right,
+            "<" => left < right,
+            ">" => left > right,
+            "<=" => left <= right,
+            ">=" => left >= right,
+            "==" => left == right,
+            "!=" => left != right,
+            "||" => left || right,
+            "&&" => left && right,
             _ => throw new InvalidOperationException()
         };
 

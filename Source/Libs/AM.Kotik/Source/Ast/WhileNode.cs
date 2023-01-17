@@ -8,7 +8,7 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 
-/* ForStatement.cs -- цикл for
+/* WhileNode.cs -- цикл while
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,9 +23,9 @@ using System.IO;
 namespace AM.Kotik;
 
 /// <summary>
-/// Цикл for.
+/// Цикл while.
 /// </summary>
-public sealed class ForStatement
+public sealed class WhileNode
     : StatementBase
 {
     #region Construction
@@ -33,30 +33,27 @@ public sealed class ForStatement
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public ForStatement
+    /// <param name="line">Номер строки в исходном тексте.</param>
+    /// <param name="condition">Условие.</param>
+    /// <param name="body">Тело цикла.</param>
+    public WhileNode
         (
             int line,
-            ExpressionNode init,
-            ExpressionNode condition,
-            ExpressionNode advance,
-            StatementBase block
+            AtomNode condition,
+            Block body
         )
-        : base(line)
+        : base (line)
     {
-        _init = init;
         _condition = condition;
-        _advance = advance;
-        _block = block;
+        _body = body;
     }
 
     #endregion
 
     #region Private members
 
-    private readonly ExpressionNode _init;
-    private readonly ExpressionNode _condition;
-    private readonly ExpressionNode _advance;
-    private readonly StatementBase _block;
+    private readonly AtomNode _condition;
+    private readonly Block _body;
 
     #endregion
 
@@ -68,7 +65,15 @@ public sealed class ForStatement
             Context context
         )
     {
-        // TODO реализовать
+        PreExecute (context);
+
+        while (KotikUtility.ToBoolean (_condition.Compute (context)))
+        {
+            foreach (var statement in _body)
+            {
+                statement.Execute (context);
+            }
+        }
     }
 
     #endregion
@@ -85,10 +90,8 @@ public sealed class ForStatement
     {
         base.DumpHierarchyItem (name, level, writer, ToString());
 
-        _init.DumpHierarchyItem ("Init", level + 1, writer);
         _condition.DumpHierarchyItem ("Condition", level + 1, writer);
-        _advance.DumpHierarchyItem ("Advance", level + 1, writer);
-        _block.DumpHierarchyItem ("Block", level + 1, writer);
+        _body.DumpHierarchyItem ("Block", level + 1, writer);
     }
 
     #endregion

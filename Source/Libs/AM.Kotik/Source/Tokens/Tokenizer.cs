@@ -59,7 +59,7 @@ public sealed class Tokenizer
     {
         "!", ";", ":", ",", "(", ")", "+", "-", "*", "/", "[", "]",
         "{", "}", "|", "%", "~", "=", "++", "--", "+=", "-=", "*=",
-        "/=", "==", "<", ">", "<<", ">>", "<=", ">="
+        "/=", "==", "<", ">", "<<", ">>", "<=", ">=", "||", "&&"
     };
 
     private bool IsEof => _navigator.IsEOF;
@@ -113,6 +113,8 @@ public sealed class Tokenizer
     /// <returns><c>null</c>, если в текущей позиции не символ.</returns>
     private Token? ParseCharacter()
     {
+        var line = _navigator.Line;
+        var column = _navigator.Column;
         if (PeekChar() != '\'')
         {
             return null;
@@ -125,7 +127,7 @@ public sealed class Tokenizer
             throw new SyntaxException (_navigator);
         }
 
-        return new Token (TokenKind.Char, result.ToString());
+        return new Token (TokenKind.Char, result.ToString(), line, column);
     }
 
     /// <summary>
@@ -133,6 +135,9 @@ public sealed class Tokenizer
     /// </summary>
     private Token? ParseString()
     {
+        var line = _navigator.Line;
+        var column = _navigator.Column;
+
         if (PeekChar() != '"')
         {
             return null;
@@ -157,7 +162,7 @@ public sealed class Tokenizer
             throw new SyntaxException (_navigator);
         }
 
-        return new Token (TokenKind.String, builder.ToString());
+        return new Token (TokenKind.String, builder.ToString(), line, column);
     }
 
     /// <summary>
@@ -166,6 +171,8 @@ public sealed class Tokenizer
     private Token? ParseNumber()
     {
         StringBuilder builder;
+        var line = _navigator.Line;
+        var column = _navigator.Column;
         var isFloat = false;
         char chr = PeekChar();
         if (!chr.IsArabicDigit())
@@ -212,7 +219,7 @@ public sealed class Tokenizer
                 hex = TokenKind.Hex64;
             }
 
-            return new Token (hex, builder.ToString());
+            return new Token (hex, builder.ToString(), line, column);
         }
 
         while (!IsEof)
@@ -394,7 +401,9 @@ public sealed class Tokenizer
         var result = new Token
             (
                 kind,
-                builder.ToString()
+                builder.ToString(),
+                line,
+                column
             );
 
         return result;

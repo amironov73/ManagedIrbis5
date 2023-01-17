@@ -91,14 +91,6 @@ public sealed class ChainParser<TFirst, TSecond, TResult>
     }
 
     #endregion
-
-    // #region Object members
-    //
-    // /// <inheritdoc cref="Parser{TResult}.ToString"/>
-    // public override string ToString() =>
-    //     $"{GetType().Name}: {_first} {_second}";
-    //
-    // #endregion
 }
 
 /// <summary>
@@ -183,14 +175,6 @@ public sealed class ChainParser<TFirst, TSecond, TThird, TResult>
     }
 
     #endregion
-
-    // #region Object members
-    //
-    // /// <inheritdoc cref="Parser{TResult}.ToString"/>
-    // public override string ToString() =>
-    //     $"{GetType().Name}: {_first} {_second} {_third}";
-    //
-    // #endregion
 }
 
 /// <summary>
@@ -285,14 +269,6 @@ public sealed class ChainParser<T1, T2, T3, T4, TResult>
     }
 
     #endregion
-
-    // #region Object members
-    //
-    // /// <inheritdoc cref="Parser{TResult}.ToString"/>
-    // public override string ToString() =>
-    //     $"{GetType().Name}: {_first} {_second} {_third} {_fourth}";
-    //
-    // #endregion
 }
 
     /// <summary>
@@ -397,14 +373,6 @@ public sealed class ChainParser<T1, T2, T3, T4, TResult>
     }
 
     #endregion
-
-    // #region Object members
-    //
-    // /// <inheritdoc cref="Parser{TResult}.ToString"/>
-    // public override string ToString() =>
-    //     $"{GetType().Name}: {_first} {_second} {_third} {_fourth} {_fifth}";
-    //
-    // #endregion
 }
 
     /// <summary>
@@ -519,14 +487,6 @@ public sealed class ChainParser<T1, T2, T3, T4, TResult>
     }
 
     #endregion
-
-    // #region Object members
-    //
-    // /// <inheritdoc cref="Parser{TResult}.ToString"/>
-    // public override string ToString() =>
-    //     $"{GetType().Name}: {_first} {_second} {_third} {_fourth} {_fifth} {_sixth}";
-    //
-    // #endregion
 }
 
 /// <summary>
@@ -651,14 +611,6 @@ public sealed class ChainParser<T1, T2, T3, T4, T5, T6, T7, TResult>
     }
 
     #endregion
-
-    // #region Object members
-    //
-    // /// <inheritdoc cref="Parser{TResult}.ToString"/>
-    // public override string ToString() =>
-    //     $"{GetType().Name}: {_first} {_second} {_third} {_fourth} {_fifth} {_sixth} {_seventh}";
-    //
-    // #endregion
 }
 
 /// <summary>
@@ -794,14 +746,6 @@ public sealed class ChainParser<T1, T2, T3, T4, T5, T6, T7, T8, TResult>
     }
 
     #endregion
-
-    // #region Object members
-    //
-    // /// <inheritdoc cref="Parser{TResult}.ToString"/>
-    // public override string ToString() =>
-    //     $"{GetType().Name}: {_first} {_second} {_third} {_fourth} {_fifth} {_sixth} {_seventh} {_eighth}";
-    //
-    // #endregion
 }
 
 /// <summary>

@@ -62,11 +62,9 @@ public sealed class DynamicParser<TResult>
             [MaybeNullWhen (false)] out TResult result
         )
     {
-        using var _ = state.Enter (this);
         result = default;
-        DebugHook (state);
 
-        return DebugSuccess (state, Inner().TryParse (state, out result));
+        return Inner().TryParse (state, out result);
     }
 
     #endregion
