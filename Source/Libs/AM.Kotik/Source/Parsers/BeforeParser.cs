@@ -56,6 +56,7 @@ public sealed class BeforeParser<TBefore, TResult>
             [MaybeNullWhen (false)] out TResult result
         )
     {
+        using var level = state.Enter (this);
         result = default;
         DebugHook (state);
         if (!state.HasCurrent)
@@ -84,11 +85,11 @@ public sealed class BeforeParser<TBefore, TResult>
 
     #endregion
 
-    #region Object members
-
-    /// <inheritdoc cref="Parser{TResult}.ToString"/>
-    public override string ToString() =>
-        $"{GetType().Name}: {_parser} {_other}";
-
-    #endregion
+    // #region Object members
+    //
+    // /// <inheritdoc cref="Parser{TResult}.ToString"/>
+    // public override string ToString() =>
+    //     $"{GetType().Name}: {_parser} {_other}";
+    //
+    // #endregion
 }

@@ -46,7 +46,7 @@ public abstract class AtomNode
     public virtual dynamic? Assign
         (
             Context context,
-            string operation,
+            string? operation,
             dynamic? value
         )
     {

@@ -119,16 +119,16 @@ public sealed class LiteralParser
                         break;
 
                     default:
-                        return DebugSuccess(state, false);
+                        return DebugSuccess (state, false);
                 }
 
                 break;
 
             default:
-                return DebugSuccess(state, false);
+                return DebugSuccess (state, false);
         }
 
-        return DebugSuccess(state, true);
+        return DebugSuccess (state, true);
     }
 
     #endregion

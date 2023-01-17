@@ -9,6 +9,12 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
+#region Using directives
+
+using System.Diagnostics.CodeAnalysis;
+
+#endregion
+
 #nullable enable
 
 namespace AM.Kotik;
@@ -49,9 +55,10 @@ public sealed class OptionalParser<TResult>
     public override bool TryParse
         (
             ParseState state,
-            out TResult result
+            [MaybeNullWhen (false)] out TResult result
         )
     {
+        using var _ = state.Enter (this);
         result = default!;
         DebugHook (state);
 

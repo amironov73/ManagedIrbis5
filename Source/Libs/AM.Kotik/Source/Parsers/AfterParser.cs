@@ -60,6 +60,7 @@ public sealed class AfterParser<TAfter, TResult>
             [MaybeNullWhen (false)] out TResult result
         )
     {
+        using var level = state.Enter (this);
         result = default;
         DebugHook (state);
         if (!state.HasCurrent)
@@ -88,11 +89,11 @@ public sealed class AfterParser<TAfter, TResult>
 
     #endregion
 
-    #region Object members
-
-    /// <inheritdoc cref="Parser{TResult}.ToString"/>
-    public override string ToString() =>
-        $"{GetType().Name}: {_other} {_parser}";
-
-    #endregion
+    // #region Object members
+    //
+    // /// <inheritdoc cref="Parser{TResult}.ToString"/>
+    // public override string ToString() =>
+    //     $"{GetType().Name}: {_other} {_parser}";
+    //
+    // #endregion
 }

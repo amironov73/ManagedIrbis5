@@ -15,6 +15,11 @@
 #region Using directives
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Dynamic;
+using System.Globalization;
+using System.IO;
 
 #endregion
 
@@ -91,6 +96,224 @@ public static class KotikUtility
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Вывод на печать Expando-объекта.
+    /// </summary>
+    public static void PrintExpando
+        (
+            TextWriter output,
+            ExpandoObject? expando
+        )
+    {
+        if (expando is null)
+        {
+            output.Write ("(null)");
+            return;
+        }
+
+        var dictionary = (IDictionary<string, object?>)expando;
+        output.Write ("{");
+
+        var keys = dictionary.Keys;
+        var first = true;
+        foreach (var key in keys)
+        {
+            if (!first)
+            {
+                output.Write (", ");
+            }
+
+            PrintObject (output, key);
+            output.Write (": ");
+            PrintObject (output, dictionary[key]);
+
+            first = false;
+        }
+
+        output.Write ("}");
+    }
+
+    /// <summary>
+    /// Вывод на печать произвольного объекта.
+    /// </summary>
+    public static void PrintObject
+        (
+            TextWriter output,
+            object? value
+        )
+    {
+        if (value is null)
+        {
+            output.Write ("(null)");
+            return;
+        }
+
+        if (value is bool b)
+        {
+            output.Write (b ? "true" : "false");
+            return;
+        }
+
+        if (value is string)
+        {
+            output.Write (value);
+            return;
+        }
+
+        if (value is ExpandoObject expando)
+        {
+            PrintExpando (output, expando);
+            return;
+        }
+
+        if (value is Array array)
+        {
+            PrintArray (output, array);
+            return;
+        }
+
+        var type = value.GetType();
+        if (type.IsPrimitive)
+        {
+            if (value is IFormattable formattable)
+            {
+                output.Write (formattable.ToString (null, CultureInfo.InvariantCulture));
+            }
+            else
+            {
+                output.Write (value);
+            }
+
+            return;
+        }
+
+        switch (value)
+        {
+            case IDictionary dictionary:
+                PrintDictionary (output, dictionary);
+                break;
+
+            case IEnumerable sequence:
+                PrintSequence (output, sequence);
+                break;
+
+            case IFormattable formattable:
+                output.Write (formattable.ToString (null, CultureInfo.InvariantCulture));
+                break;
+
+            default:
+                output.Write (value);
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Вывод массива на печать.
+    /// </summary>
+    public static void PrintArray
+        (
+            TextWriter output,
+            Array? array
+        )
+    {
+        if (array is null)
+        {
+            output.Write ("(null)");
+            return;
+        }
+
+        output.Write ("[");
+        for (var i = 0; i < array.Length; i++)
+        {
+            if (i != 0)
+            {
+                output.Write (", ");
+            }
+
+            PrintObject (output, array.GetValue (i));
+        }
+
+        output.Write ("]");
+    }
+
+    /// <summary>
+    /// Вывод на печать словаря.
+    /// </summary>
+    public static void PrintDictionary
+        (
+            TextWriter output,
+            IDictionary? dictionary
+        )
+    {
+        if (dictionary is null)
+        {
+            output.Write ("(null)");
+            return;
+        }
+
+        output.Write ("{");
+
+        var first = true;
+        foreach (DictionaryEntry entry in dictionary)
+        {
+            if (!first)
+            {
+                output.Write (", ");
+            }
+
+            PrintObject (output, entry.Key);
+            output.Write (": ");
+            PrintObject (output, entry.Value);
+
+            first = false;
+        }
+
+        output.Write ("}");
+    }
+
+    /// <summary>
+    /// Вывод на печать последовательности.
+    /// </summary>
+    public static void PrintSequence
+        (
+            TextWriter output,
+            IEnumerable? sequence
+        )
+    {
+        if (sequence is null)
+        {
+            output.Write ("(null)");
+            return;
+        }
+
+        if (sequence is IDictionary dictionary)
+        {
+            PrintDictionary (output, dictionary);
+            return;
+        }
+
+        if (sequence is string)
+        {
+            output.Write (sequence);
+            return;
+        }
+
+        var first = true;
+        output.Write ("[");
+        foreach (var item in sequence)
+        {
+            if (!first)
+            {
+                output.Write (", ");
+            }
+
+            PrintObject (output, item);
+            first = false;
+        }
+
+        output.Write ("]");
     }
 
     #endregion

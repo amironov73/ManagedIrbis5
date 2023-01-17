@@ -74,6 +74,7 @@ public sealed class SeparatedParser<TResult, TSeparator, TDelimiter>
             [MaybeNullWhen(false)] out IEnumerable<TResult> result
         )
     {
+        using var level = state.Enter (this);
         result = default;
         DebugHook (state);
 
@@ -92,7 +93,7 @@ public sealed class SeparatedParser<TResult, TSeparator, TDelimiter>
                 if (_delimiterParser is not null)
                 {
                     state.Location = location;
-                    return DebugSuccess(state, false);
+                    return DebugSuccess (state, false);
                 }
                 break;
             }
@@ -102,7 +103,7 @@ public sealed class SeparatedParser<TResult, TSeparator, TDelimiter>
                 if (_delimiterParser is not null)
                 {
                     state.Location = location;
-                    return DebugSuccess(state, false);
+                    return DebugSuccess (state, false);
                 }
                 break;
             }
@@ -118,13 +119,13 @@ public sealed class SeparatedParser<TResult, TSeparator, TDelimiter>
         if (list.Count < _mininum)
         {
             state.Location = location;
-            return DebugSuccess(state, false);
+            return DebugSuccess (state, false);
         }
 
         // state продвигается вложенными парсерами
         result = list;
 
-        return DebugSuccess(state, true);
+        return DebugSuccess (state, true);
     }
 
     #endregion

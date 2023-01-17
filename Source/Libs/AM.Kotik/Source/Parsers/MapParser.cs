@@ -60,27 +60,27 @@ public sealed class MapParser<TIntermediate, TResult>
             out TResult result
         )
     {
+        using var _ = state.Enter (this);
         result = default!;
         DebugHook (state);
         if (!_parser.TryParse (state, out var temporary))
         {
-            return DebugSuccess(state, false);
+            return DebugSuccess (state, false);
         }
 
         // продвижение state выполнил вложенный парсер
         result = _function (temporary);
 
-        // TODO отобразить правильно
-        return DebugSuccess(state, true);
+        return DebugSuccess (state, true);
     }
 
     #endregion
 
-    #region Object members
-
-    /// <inheritdoc cref="Parser{TResult}.ToString"/>
-    public override string ToString() =>
-        $"{GetType().Name}: {_parser}";
-
-    #endregion
+    // #region Object members
+    //
+    // /// <inheritdoc cref="Parser{TResult}.ToString"/>
+    // public override string ToString() =>
+    //     $"{GetType().Name}: {_parser}";
+    //
+    // #endregion
 }

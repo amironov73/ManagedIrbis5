@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable LocalizableElement
 
 /* Program.cs -- точка входа в программу
  * Ars Magna project, http://arsmagna.ru
@@ -31,9 +32,12 @@ internal static class Program
     {
         var sourceText = File.ReadAllText (fileName);
         var program = Grammar.ParseProgram (sourceText);
+        Console.WriteLine (new string ('=', 70));
         program.Dump();
         var context = new Context (Console.In, Console.Out, Console.Error);
         program.Execute (context);
+        Console.WriteLine (new string ('=', 70));
+        context.DumpVariables();
     }
 
     public static void Main

@@ -55,24 +55,70 @@ public sealed class VariableNode
     #region AtomNode members
 
     /// <inheritdoc cref="AtomNode.Compute"/>
-    public override dynamic Compute
+    public override dynamic? Compute
         (
             Context context
         )
     {
-        throw new NotImplementedException();
+        if (context.TryGetVariable (Name, out var value))
+        {
+            return value;
+        }
 
+        // var type = context.FindType (Name);
+        // if (type is not null)
+        // {
+        //     return type;
+        // }
+        //
+        // if (context.FindFunction (Name, out var descriptor))
+        // {
+        //     // это может быть именем функции
+        //     return descriptor;
+        // }
+
+        context.Error.WriteLine ($"Variable or type '{Name}' not defined");
+
+        return null;
     }
 
     /// <inheritdoc cref="AtomNode.Assign"/>
-    public override dynamic Assign
+    public override dynamic? Assign
         (
             Context context,
-            string operation,
+            string? operation,
             dynamic? value
         )
     {
-        throw new NotImplementedException();
+        dynamic? variableValue = null;
+
+        if (operation != "=")
+        {
+            if (!context.TryGetVariable (Name, out variableValue))
+            {
+                context.Error.WriteLine ($"Variable {Name} not found");
+            }
+        }
+
+        value = operation switch
+        {
+            "=" => value,
+            "+=" => variableValue + value,
+            "-=" => variableValue - value,
+            "*=" => variableValue * value,
+            "/=" => variableValue / value,
+            "%=" => variableValue % value,
+            "&=" => variableValue & value,
+            "|=" => variableValue | value,
+            "^=" => variableValue ^ value,
+            "<<=" => variableValue << value,
+            ">>=" => variableValue >> value,
+            _ => throw new InvalidOperationException()
+        };
+
+        context.SetVariable (Name, value);
+
+        return value;
     }
 
     #endregion

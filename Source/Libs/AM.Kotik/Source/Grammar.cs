@@ -95,7 +95,7 @@ public static class Grammar
             Parser.Term ("="),
             BasicExpression,
             (variable, operation, expression) =>
-                new ExpressionNode (variable, operation, expression)
+                new ExpressionNode (new VariableNode (variable), operation, expression)
         );
 
     /// <summary>

@@ -58,6 +58,7 @@ public sealed class FailParser<TResult>
             [MaybeNullWhen (false)] out TResult result
         )
     {
+        using var _ = state.Enter (this);
         result = default;
         DebugHook (state);
 

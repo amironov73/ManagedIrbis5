@@ -33,6 +33,49 @@ namespace AM.Kotik;
 /// </summary>
 public sealed class ParseState
 {
+    #region Nested structures
+
+    /// <summary>
+    /// Уровень вложенности состояния (для отладочной печати "лесенкой").
+    /// </summary>
+    public readonly struct Level
+        : IDisposable
+    {
+        #region Construction
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        internal Level
+            (
+                ParseState state
+            )
+        {
+            _state = state;
+            _state._level++;
+        }
+
+        #endregion
+
+        #region Private members
+
+        private readonly ParseState _state;
+
+        #endregion
+
+        #region IDisposable members
+
+        /// <inheritdoc cref="IDisposable.Dispose"/>
+        public void Dispose()
+        {
+            _state._level--;
+        }
+
+        #endregion
+    }
+
+    #endregion
+
     #region Properties
 
     /// <summary>
@@ -84,6 +127,7 @@ public sealed class ParseState
 
     private readonly Token[] _tokens;
     private readonly TextWriter? _traceOutput;
+    private int _level;
 
     #endregion
 
@@ -112,6 +156,11 @@ public sealed class ParseState
     {
         if (DebugOutput is not null)
         {
+            for (var i = 0; i < _level; i++)
+            {
+                DebugOutput.Write ("| ");
+            }
+
             var current = HasCurrent ? Current.ToString() : "EOT";
 
             DebugOutput.WriteLine ($"{parser}: {current} <<");
@@ -129,12 +178,28 @@ public sealed class ParseState
     {
         if (DebugOutput is not null)
         {
-            var current = HasCurrent ? Current.ToString() : "EOT";
+            for (var i = 0; i < _level; i++)
+            {
+                DebugOutput.Write ("| ");
+            }
 
-            DebugOutput.WriteLine ($"{parser}: {current} >> {success}");
+            DebugOutput.WriteLine ($"{parser}  >> {success}");
         }
 
         return success;
+    }
+
+    /// <summary>
+    /// Вход на уровень.
+    /// </summary>
+    public Level Enter
+        (
+            object parser
+        )
+    {
+        DebugCurrentPosition (parser);
+
+        return new Level (this);
     }
 
     /// <summary>

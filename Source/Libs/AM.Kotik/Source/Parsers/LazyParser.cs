@@ -58,9 +58,9 @@ public sealed class LazyParser<TResult>
             [MaybeNullWhen (false)] out TResult result
         )
     {
+        using var _ = state.Enter (this);
         DebugHook (state);
 
-        // TODO: отобразить правильно
         return DebugSuccess (state, _lazy.Value.TryParse (state, out result));
     }
 

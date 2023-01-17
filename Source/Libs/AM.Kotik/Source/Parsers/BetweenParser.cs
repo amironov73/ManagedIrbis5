@@ -60,6 +60,7 @@ public sealed class BetweenParser<TBefore, TResult, TAfter>
             [MaybeNullWhen (false)] out TResult result
         )
     {
+        using var level = state.Enter (this);
         result = default;
         DebugHook (state);
         if (!state.HasCurrent)
@@ -94,11 +95,11 @@ public sealed class BetweenParser<TBefore, TResult, TAfter>
 
     #endregion
 
-    #region Object members
-
-    /// <inheritdoc cref="Parser{TResult}.ToString"/>
-    public override string ToString() =>
-        $"{GetType().Name}: {_before} {_inside} {_after}";
-
-    #endregion
+    // #region Object members
+    //
+    // /// <inheritdoc cref="Parser{TResult}.ToString"/>
+    // public override string ToString() =>
+    //     $"{GetType().Name}: {_before} {_inside} {_after}";
+    //
+    // #endregion
 }

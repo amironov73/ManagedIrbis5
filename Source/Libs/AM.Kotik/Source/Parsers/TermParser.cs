@@ -57,6 +57,7 @@ public sealed class TermParser
             [MaybeNullWhen (false)] out string result
         )
     {
+        using var _ = state.Enter (this);
         result = default;
         DebugHook (state);
         if (!state.HasCurrent)

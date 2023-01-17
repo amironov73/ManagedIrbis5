@@ -34,6 +34,7 @@ internal sealed class EndParser
             [MaybeNullWhen (false)] out Unit result
         )
     {
+        using var _ = state.Enter (this);
         result = Unit.Value;
         DebugHook (state);
 

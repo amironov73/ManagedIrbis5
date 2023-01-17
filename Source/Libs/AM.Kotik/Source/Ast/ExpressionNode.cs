@@ -32,12 +32,12 @@ public /* не sealed */ class ExpressionNode
     /// </summary>
     public ExpressionNode
         (
-            string? variable,
+            AtomNode? target,
             string? operation,
             AtomNode expression
         )
     {
-        _variable = variable;
+        _target = target;
         _operation = operation;
         _expression = expression;
     }
@@ -46,7 +46,7 @@ public /* не sealed */ class ExpressionNode
 
     #region Private members
 
-    private readonly string? _variable;
+    private readonly AtomNode? _target;
     private readonly string? _operation;
     private readonly AtomNode _expression;
 
@@ -60,9 +60,13 @@ public /* не sealed */ class ExpressionNode
             Context context
         )
     {
-        _variable.NotUsed();
-        _operation.NotUsed();
-        return _expression.Compute (context);
+        var value = _expression.Compute (context);
+        if (_target is not null)
+        {
+            value = _target.Assign (context, _operation, value);
+        }
+
+        return value;
     }
 
     #endregion
@@ -79,7 +83,7 @@ public /* не sealed */ class ExpressionNode
     {
         base.DumpHierarchyItem (name, level, writer, ToString());
 
-        DumpHierarchyItem ("Variable", level + 1, writer, _variable.ToVisibleString());
+        DumpHierarchyItem ("Variable", level + 1, writer, _target.ToVisibleString());
         DumpHierarchyItem ("Operation", level + 1, writer, _operation.ToVisibleString());
         _expression.DumpHierarchyItem ("Expression", level + 1, writer);
     }

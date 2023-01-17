@@ -57,10 +57,11 @@ public sealed class ReservedWordParser
             [MaybeNullWhen (false)] out string result
         )
     {
+        using var _ = state.Enter (this);
         result = default;
         DebugHook (state);
 
-        if (state.HasCurrent && state.Current.IsReservedWord(_expected))
+        if (state.HasCurrent && state.Current.IsReservedWord (_expected))
         {
             result = _expected;
             state.Advance();

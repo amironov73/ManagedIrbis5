@@ -65,6 +65,7 @@ public sealed class OneOfParser<TResult>
             [MaybeNullWhen (false)] out TResult result
         )
     {
+        using var _ = state.Enter (this);
         result = default;
         DebugHook (state);
 
@@ -79,35 +80,34 @@ public sealed class OneOfParser<TResult>
 
         }
 
-        // TODO отобразить правильно
         return DebugSuccess (state, false);
     }
 
     #endregion
 
-    #region Object members
-
-    /// <inheritdoc cref="Parser{TResult}.ToString"/>
-    public override string ToString()
-    {
-        var builder = new StringBuilder();
-        builder.Append (GetType().Name);
-        builder.Append (':');
-
-        var first = true;
-        foreach (var alternative in _alternatives)
-        {
-            if (!first)
-            {
-                builder.Append (", ");
-            }
-
-            builder.Append (alternative);
-            first = false;
-        }
-
-        return builder.ToString();
-    }
-
-    #endregion
+    // #region Object members
+    //
+    // /// <inheritdoc cref="Parser{TResult}.ToString"/>
+    // public override string ToString()
+    // {
+    //     var builder = new StringBuilder();
+    //     builder.Append (GetType().Name);
+    //     builder.Append (':');
+    //
+    //     var first = true;
+    //     foreach (var alternative in _alternatives)
+    //     {
+    //         if (!first)
+    //         {
+    //             builder.Append (", ");
+    //         }
+    //
+    //         builder.Append (alternative);
+    //         first = false;
+    //     }
+    //
+    //     return builder.ToString();
+    // }
+    //
+    // #endregion
 }

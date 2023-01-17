@@ -9,6 +9,12 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
+#region Using directives
+
+using System.Diagnostics.CodeAnalysis;
+
+#endregion
+
 #nullable enable
 
 namespace AM.Kotik;
@@ -50,30 +56,24 @@ public sealed class TraceParser<TResult>
     public override bool TryParse
         (
             ParseState state,
-            out TResult result
+            [MaybeNullWhen (false)] out TResult result
         )
     {
-        result = default!;
+        result = default;
 
         if (!string.IsNullOrEmpty (_message))
         {
             state.Trace (_message);
         }
 
-        state.Trace
-            (
-                !state.HasCurrent
-                    ? "EOT"
-                    : state.Current.ToString()
-            );
-
+        state.DebugCurrentPosition (this);
         if (!_parser.TryParse (state, out var temporary))
         {
-            state.Trace ($"Failure");
+            state.Trace ("Failure");
             return false;
         }
 
-        result = temporary!;
+        result = temporary;
         state.Trace ($"Success: {temporary}");
 
         return true;

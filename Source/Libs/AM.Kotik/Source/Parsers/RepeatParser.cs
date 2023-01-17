@@ -66,6 +66,7 @@ public sealed class RepeatParser<TResult>
             out IEnumerable<TResult> result
         )
     {
+        using var _ = state.Enter (this);
         result = default!;
         DebugHook (state);
 

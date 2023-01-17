@@ -64,6 +64,7 @@ public sealed class ChainParser<TFirst, TSecond, TResult>
             out TResult result
         )
     {
+        using var _ = state.Enter (this);
         result = default!;
         DebugHook (state);
         if (!state.HasCurrent)
@@ -86,19 +87,18 @@ public sealed class ChainParser<TFirst, TSecond, TResult>
 
         result = _function (first, second);
 
-        // TODO правильно отобразить
         return DebugSuccess (state, true);
     }
 
     #endregion
 
-    #region Object members
-
-    /// <inheritdoc cref="Parser{TResult}.ToString"/>
-    public override string ToString() =>
-        $"{GetType().Name}: {_first} {_second}";
-
-    #endregion
+    // #region Object members
+    //
+    // /// <inheritdoc cref="Parser{TResult}.ToString"/>
+    // public override string ToString() =>
+    //     $"{GetType().Name}: {_first} {_second}";
+    //
+    // #endregion
 }
 
 /// <summary>
@@ -150,6 +150,7 @@ public sealed class ChainParser<TFirst, TSecond, TThird, TResult>
             out TResult result
         )
     {
+        using var _ = state.Enter (this);
         result = default!;
         DebugHook (state);
         if (!state.HasCurrent)
@@ -178,19 +179,18 @@ public sealed class ChainParser<TFirst, TSecond, TThird, TResult>
 
         result = _function (first, second, third);
 
-        // TODO правильно отобразить
         return DebugSuccess (state, true);
     }
 
     #endregion
 
-    #region Object members
-
-    /// <inheritdoc cref="Parser{TResult}.ToString"/>
-    public override string ToString() =>
-        $"{GetType().Name}: {_first} {_second} {_third}";
-
-    #endregion
+    // #region Object members
+    //
+    // /// <inheritdoc cref="Parser{TResult}.ToString"/>
+    // public override string ToString() =>
+    //     $"{GetType().Name}: {_first} {_second} {_third}";
+    //
+    // #endregion
 }
 
 /// <summary>
@@ -246,6 +246,7 @@ public sealed class ChainParser<T1, T2, T3, T4, TResult>
             out TResult result
         )
     {
+        using var _ = state.Enter (this);
         result = default!;
         DebugHook (state);
         if (!state.HasCurrent)
@@ -280,19 +281,18 @@ public sealed class ChainParser<T1, T2, T3, T4, TResult>
 
         result = _function (first, second, third, fourth);
 
-        // TODO правильно отобразить
         return DebugSuccess (state, true);
     }
 
     #endregion
 
-    #region Object members
-
-    /// <inheritdoc cref="Parser{TResult}.ToString"/>
-    public override string ToString() =>
-        $"{GetType().Name}: {_first} {_second} {_third} {_fourth}";
-
-    #endregion
+    // #region Object members
+    //
+    // /// <inheritdoc cref="Parser{TResult}.ToString"/>
+    // public override string ToString() =>
+    //     $"{GetType().Name}: {_first} {_second} {_third} {_fourth}";
+    //
+    // #endregion
 }
 
     /// <summary>
@@ -352,6 +352,7 @@ public sealed class ChainParser<T1, T2, T3, T4, TResult>
             out TResult result
         )
     {
+        using var _ = state.Enter (this);
         result = default!;
         DebugHook (state);
         if (!state.HasCurrent)
@@ -397,13 +398,13 @@ public sealed class ChainParser<T1, T2, T3, T4, TResult>
 
     #endregion
 
-    #region Object members
-
-    /// <inheritdoc cref="Parser{TResult}.ToString"/>
-    public override string ToString() =>
-        $"{GetType().Name}: {_first} {_second} {_third} {_fourth} {_fifth}";
-
-    #endregion
+    // #region Object members
+    //
+    // /// <inheritdoc cref="Parser{TResult}.ToString"/>
+    // public override string ToString() =>
+    //     $"{GetType().Name}: {_first} {_second} {_third} {_fourth} {_fifth}";
+    //
+    // #endregion
 }
 
     /// <summary>
@@ -467,6 +468,7 @@ public sealed class ChainParser<T1, T2, T3, T4, TResult>
             out TResult result
         )
     {
+        using var _ = state.Enter (this);
         result = default!;
         DebugHook (state);
         if (!state.HasCurrent)
@@ -518,13 +520,13 @@ public sealed class ChainParser<T1, T2, T3, T4, TResult>
 
     #endregion
 
-    #region Object members
-
-    /// <inheritdoc cref="Parser{TResult}.ToString"/>
-    public override string ToString() =>
-        $"{GetType().Name}: {_first} {_second} {_third} {_fourth} {_fifth} {_sixth}";
-
-    #endregion
+    // #region Object members
+    //
+    // /// <inheritdoc cref="Parser{TResult}.ToString"/>
+    // public override string ToString() =>
+    //     $"{GetType().Name}: {_first} {_second} {_third} {_fourth} {_fifth} {_sixth}";
+    //
+    // #endregion
 }
 
 /// <summary>
@@ -592,6 +594,7 @@ public sealed class ChainParser<T1, T2, T3, T4, T5, T6, T7, TResult>
             out TResult result
         )
     {
+        using var _ = state.Enter (this);
         result = default!;
         DebugHook (state);
         if (!state.HasCurrent)
@@ -644,19 +647,18 @@ public sealed class ChainParser<T1, T2, T3, T4, T5, T6, T7, TResult>
 
         result = _function (first, second, third, fourth, fifth, sixth, seventh);
 
-        // TODO правильно отобразить
         return DebugSuccess (state, true);
     }
 
     #endregion
 
-    #region Object members
-
-    /// <inheritdoc cref="Parser{TResult}.ToString"/>
-    public override string ToString() =>
-        $"{GetType().Name}: {_first} {_second} {_third} {_fourth} {_fifth} {_sixth} {_seventh}";
-
-    #endregion
+    // #region Object members
+    //
+    // /// <inheritdoc cref="Parser{TResult}.ToString"/>
+    // public override string ToString() =>
+    //     $"{GetType().Name}: {_first} {_second} {_third} {_fourth} {_fifth} {_sixth} {_seventh}";
+    //
+    // #endregion
 }
 
 /// <summary>
@@ -728,6 +730,7 @@ public sealed class ChainParser<T1, T2, T3, T4, T5, T6, T7, T8, TResult>
             out TResult result
         )
     {
+        using var _ = state.Enter (this);
         result = default!;
         DebugHook (state);
         if (!state.HasCurrent)
@@ -787,17 +790,16 @@ public sealed class ChainParser<T1, T2, T3, T4, T5, T6, T7, T8, TResult>
         result = _function (first, second, third, fourth, fifth, sixth,
             seventh, eighth);
 
-        // TODO правильно отобразить
         return DebugSuccess (state, true);
     }
 
     #endregion
 
-    #region Object members
-
-    /// <inheritdoc cref="Parser{TResult}.ToString"/>
-    public override string ToString() =>
-        $"{GetType().Name}: {_first} {_second} {_third} {_fourth} {_fifth} {_sixth} {_seventh} {_eighth}";
-
-    #endregion
+    // #region Object members
+    //
+    // /// <inheritdoc cref="Parser{TResult}.ToString"/>
+    // public override string ToString() =>
+    //     $"{GetType().Name}: {_first} {_second} {_third} {_fourth} {_fifth} {_sixth} {_seventh} {_eighth}";
+    //
+    // #endregion
 }

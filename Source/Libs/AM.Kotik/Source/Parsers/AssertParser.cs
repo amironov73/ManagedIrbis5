@@ -67,6 +67,7 @@ public sealed class AssertParser<TResult>
             [MaybeNullWhen (false)] out TResult result
         )
     {
+        using var _ = state.Enter (this);
         result = default;
         DebugHook (state);
 

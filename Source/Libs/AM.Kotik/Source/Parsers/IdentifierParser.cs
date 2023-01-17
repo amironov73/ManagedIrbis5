@@ -28,8 +28,8 @@ public sealed class IdentifierParser
             out string result
         )
     {
+        using var _ = state.Enter (this);
         result = default!;
-        DebugHook (state);
         if (!state.HasCurrent)
         {
             return DebugSuccess (state, false);
@@ -44,7 +44,7 @@ public sealed class IdentifierParser
             return final;
         }
 
-        return DebugSuccess(state, false);
+        return DebugSuccess (state, false);
     }
 
     #endregion
