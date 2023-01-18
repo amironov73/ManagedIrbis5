@@ -61,7 +61,8 @@ public static class ExpressionBuilder
     public static Parser<AtomNode> Build
         (
             Parser<AtomNode> root,
-            HalfParser<AtomNode>[] unaryOps,
+            Parser<Func<AtomNode, AtomNode>>[] prefixOps,
+            Parser<Func<AtomNode, AtomNode>>[] postfixOps,
             string[][] binaryOps,
             Func<AtomNode, string, AtomNode, AtomNode> function
         )
@@ -71,9 +72,9 @@ public static class ExpressionBuilder
 
         var expr = new DynamicParser<AtomNode> (() => null!);
         var result = (Parser<AtomNode>) expr;
-        if (!unaryOps.IsNullOrEmpty())
+        if (!postfixOps.IsNullOrEmpty())
         {
-            result = new UnaryParser<AtomNode> (expr, unaryOps);
+            result = new UnaryParser<AtomNode> (expr, postfixOps);
         }
 
         foreach (var binaryOp in binaryOps)

@@ -13,6 +13,7 @@
 #region Using directives
 
 using System;
+using System.Collections;
 
 #endregion
 
@@ -79,6 +80,11 @@ public sealed class IndexNode
         if (obj is Array array && index is int integerIndex)
         {
             return array.GetValue (integerIndex);
+        }
+
+        if (obj is IList list && index is int integerIndex2)
+        {
+            return list[integerIndex2];
         }
 
         throw new NotImplementedException();

@@ -93,15 +93,22 @@ public static class Grammar
     private static readonly Parser<AtomNode> BasicExpression = ExpressionBuilder.Build
             (
                 Atom,
-                new HalfParser<AtomNode>[]
+                new Parser<Func<AtomNode, AtomNode>>[0],
+                new []
                 {
-                    new (
-                            Term ("++", "--").Map (x => (AtomNode)new IncrementNode (false, false)),
-                            (target, incr) =>
-                            {
-                                ((IncrementNode)incr).Target = target;
-                                return incr;
-                            }
+                    Term ("++", "--").Map<string, Func<AtomNode, AtomNode>>
+                        (
+                            x => target => new IncrementNode (target, x, false)
+                        ),
+
+                    Parser.Lazy (() => Cast!).Map<string, Func<AtomNode, AtomNode>>
+                        (
+                            x => target => new CastNode (x, target)
+                        ),
+
+                    Parser.Lazy (() => Index!).Map<ExpressionNode, Func<AtomNode, AtomNode>>
+                        (
+                            x => target => new IndexNode (target, x)
                         )
                 },
                 new[]
@@ -216,17 +223,15 @@ public static class Grammar
     /// <summary>
     /// Преобразование типа.
     /// </summary>
-    private static Parser<UnaryNode> Cast = Identifier
+    private static readonly Parser<string> Cast = Identifier
         .RoundBrackets()
-        .Map (x => (UnaryNode)new CastNode (x, null!))
         .Labeled ("Cast");
 
     /// <summary>
     /// Обращение по индексу
     /// </summary>
-    private static readonly Parser<UnaryNode> Index = Expression
+    private static readonly Parser<ExpressionNode> Index = Expression
         .SquareBrackets()
-        .Map (x => (UnaryNode)new IndexNode (null!, x))
         .Labeled ("Index");
 
     /// <summary>
@@ -242,7 +247,7 @@ public static class Grammar
     /// <summary>
     /// Блок стейтментов.
     /// </summary>
-    public static readonly Parser<StatementBase> Block = Parser.Lazy
+    private static readonly Parser<StatementBase> Block = Parser.Lazy
             (
                 () => Parser.OneOf
                     (
@@ -298,7 +303,7 @@ public static class Grammar
     /// <summary>
     /// Условный оператор if-then-else.
     /// </summary>
-    public static readonly Parser<StatementBase> IfStatement = Parser.Chain
+    private static readonly Parser<StatementBase> IfStatement = Parser.Chain
             (
                 Parser.Position, // 1
                 Parser.Reserved ("if"), // 2
@@ -315,7 +320,7 @@ public static class Grammar
     /// <summary>
     /// Блок using.
     /// </summary>
-    public static readonly Parser<StatementBase> UsingStatement = Parser.Chain
+    private static readonly Parser<StatementBase> UsingStatement = Parser.Chain
             (
                 Parser.Position, // 1
                 Parser.Reserved ("using"), // 2
@@ -333,7 +338,7 @@ public static class Grammar
     /// <summary>
     /// Стейтмент вообще.
     /// </summary>
-    public static readonly Parser<StatementBase> GenericStatement = Parser.Lazy
+    private static readonly Parser<StatementBase> GenericStatement = Parser.Lazy
             (
                 () =>
                     Parser.OneOf
@@ -351,7 +356,7 @@ public static class Grammar
     /// <summary>
     /// Программа в целом.
     /// </summary>
-    public static readonly Parser<ProgramNode> Program = new RepeatParser<StatementBase>
+    private static readonly Parser<ProgramNode> Program = new RepeatParser<StatementBase>
             (
                 GenericStatement
             )

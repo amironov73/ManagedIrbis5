@@ -3,7 +3,6 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable ConditionIsAlwaysTrueOrFalse
 // ReSharper disable IdentifierTypo
 // ReSharper disable LocalizableElement
 // ReSharper disable UnusedMember.Global
@@ -28,15 +27,6 @@ namespace AM.Kotik;
 public sealed class IncrementNode
     : UnaryNode
 {
-    #region Properties
-
-    /// <summary>
-    ///
-    /// </summary>
-    public AtomNode? Target { get; set; }
-
-    #endregion
-
     #region Construction
 
     /// <summary>
@@ -44,11 +34,13 @@ public sealed class IncrementNode
     /// </summary>
     public IncrementNode
         (
-            bool decrement,
+            AtomNode target,
+            string operation,
             bool prefix
         )
     {
-        _decrement = decrement;
+        _target = target;
+        _operation = operation;
         _prefix = prefix;
     }
 
@@ -56,7 +48,8 @@ public sealed class IncrementNode
 
     #region Private members
 
-    private readonly bool _decrement;
+    private readonly AtomNode _target;
+    private readonly string _operation;
     private readonly bool _prefix;
 
     #endregion
@@ -69,9 +62,9 @@ public sealed class IncrementNode
             Context context
         )
     {
-        var target = Target!.Compute (context);
+        var target = _target.Compute (context);
 
-        Console.WriteLine ($"Increment: {_decrement} {_prefix}");
+        Console.WriteLine ($"Increment: {_operation} {_prefix}");
 
         return target;
     }

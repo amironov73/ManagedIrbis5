@@ -38,7 +38,7 @@ public sealed class UnaryParser<TResult>
     public UnaryParser
         (
             Parser<TResult> root,
-            HalfParser<TResult>[] allowed
+            Parser<Func<TResult, TResult>>[] allowed
         )
     {
         _root = root;
@@ -50,7 +50,7 @@ public sealed class UnaryParser<TResult>
     #region Private members
 
     private readonly Parser<TResult> _root;
-    private readonly HalfParser<TResult>[] _allowed;
+    private readonly Parser<Func<TResult, TResult>>[] _allowed;
 
     #endregion
 
@@ -70,16 +70,16 @@ public sealed class UnaryParser<TResult>
         var total = false;
         if (_root.TryParse (state, out var finalResult))
         {
+            total = true;
             while (true)
             {
                 var flag = false;
                 foreach (var one in _allowed)
                 {
-                    if (one.Parser.TryParse (state, out var temporary))
+                    if (one.TryParse (state, out var func))
                     {
-                        finalResult = one.Applier (finalResult, temporary);
+                        finalResult = func (finalResult);
                         flag = true;
-                        total = true;
                         break;
                     }
                 }
