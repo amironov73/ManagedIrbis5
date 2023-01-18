@@ -3,16 +3,18 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable ConditionIsAlwaysTrueOrFalse
 // ReSharper disable IdentifierTypo
+// ReSharper disable LocalizableElement
 // ReSharper disable UnusedMember.Global
 
-/* ListNode.cs -- создание списка вида [1, 2, 3]
+/* NewNode.cs -- оператор new
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System.Collections.Generic;
+using System;
 
 #endregion
 
@@ -21,9 +23,9 @@ using System.Collections.Generic;
 namespace AM.Kotik;
 
 /// <summary>
-/// Создание списка вида `[1, 2, 3]`.
+/// Оператор `new`.
 /// </summary>
-public sealed class ListNode
+public sealed class NewNode
     : AtomNode
 {
     #region Construction
@@ -31,40 +33,35 @@ public sealed class ListNode
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public ListNode
+    public NewNode
         (
-            IEnumerable<ExpressionNode>? items
+            string typeName,
+            ExpressionNode[] constructorArguments
         )
     {
-        _items = new ();
-        if (items is not null)
-        {
-            _items.AddRange (items);
-        }
+        _typeName = typeName;
+        _constructorArguments = constructorArguments;
     }
 
     #endregion
 
     #region Private members
 
-    private readonly List<ExpressionNode> _items;
+    private readonly string _typeName;
+    private readonly ExpressionNode[] _constructorArguments;
 
     #endregion
 
     #region AtomNode members
 
-    /// <inheritdoc cref="AtomNode.Compute"/>
-    public override dynamic Compute
+    /// <inheritdoc cref="Compute"/>
+    public override dynamic? Compute
         (
             Context context
         )
     {
-        var result = new BarsikList();
-        foreach (var item in _items)
-        {
-            var value = item.Compute (context);
-            result.Add (value);
-        }
+        var type = Type.GetType (_typeName, true)!;
+        var result = Activator.CreateInstance (type);
 
         return result;
     }

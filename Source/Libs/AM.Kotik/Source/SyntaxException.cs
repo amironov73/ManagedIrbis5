@@ -82,6 +82,7 @@ public sealed class SyntaxException
 
         Line = navigator.Line;
         Column = navigator.Column;
+        _text = navigator.GetRemainingText().ToString().SafeSubstring (0, 10) + Environment.NewLine;
     }
 
     /// <summary>
@@ -138,6 +139,12 @@ public sealed class SyntaxException
 
     #endregion
 
+    #region Private members
+
+    private readonly string? _text;
+
+    #endregion
+
     #region Object members
 
     /// <inheritdoc cref="Exception.ToString"/>
@@ -145,11 +152,18 @@ public sealed class SyntaxException
     {
         var result = base.ToString();
 
-        return Line > 0
+        result = Line > 0
             ? Column > 0
                 ? $"[{Line}: {Column}]" + result
                 : $"[{Line}]" + result
             : result;
+
+        if (!string.IsNullOrEmpty (_text))
+        {
+            result += " " + _text;
+        }
+
+        return result;
     }
 
     #endregion

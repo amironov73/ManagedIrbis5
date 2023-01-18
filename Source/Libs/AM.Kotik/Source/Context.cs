@@ -87,7 +87,28 @@ public sealed class Context
 
     #region Private members
 
+    /// <summary>
+    /// Конструирование типа, если необходимо.
+    /// </summary>
+    private Type ConstructType
+        (
+            Type mainType,
+            Type[]? typeArguments
+        )
+    {
+        if (typeArguments is null)
+        {
+            return mainType;
+        }
 
+        if (!mainType.IsGenericType)
+        {
+            // TODO более осмысленная реакция
+            return mainType;
+        }
+
+        return mainType.MakeGenericType (typeArguments);
+    }
 
     #endregion
 
@@ -125,6 +146,200 @@ public sealed class Context
                         : $"{key}: {value.GetType().Name} = {value}"
                 );
         }
+    }
+
+    /// <summary>
+    /// Получение типа по его имени.
+    /// </summary>
+    public Type? FindType
+        (
+            AtomNode node,
+            IEnumerable<AtomNode>? typeArgs = null
+        )
+    {
+        Sure.NotNull (node);
+
+        string[]? args = null;
+        if (typeArgs is not null)
+        {
+            var list = new List<string>();
+            foreach (var argNode in typeArgs)
+            {
+                if (argNode is VariableNode varNode)
+                {
+                    if (TryGetVariable (varNode.Name, out var varValue))
+                    {
+                        if (varValue is Type alreadyType)
+                        {
+                            list.Add (alreadyType.AssemblyQualifiedName.ThrowIfNullOrEmpty ());
+                        }
+                        else if (varValue is string strValue && !string.IsNullOrEmpty (strValue))
+                        {
+                            list.Add (strValue);
+                        }
+                        else
+                        {
+                            throw new BarsikException();
+                        }
+                    }
+                    else
+                    {
+                        list.Add (varNode.Name.ThrowIfNullOrEmpty ());
+                    }
+                }
+                else
+                {
+                    var one = (argNode.Compute (this) as string).ThrowIfNullOrEmpty();
+                    list.Add (one);
+                }
+            }
+
+            args = list.ToArray();
+        }
+
+        if (node is VariableNode variableNode)
+        {
+            if (TryGetVariable (variableNode.Name, out var variableValue))
+            {
+                if (variableValue is Type alreadyHaveType)
+                {
+                    return alreadyHaveType;
+                }
+
+                if (variableValue is string typeName1)
+                {
+                    return FindType (typeName1, args);
+                }
+            }
+
+            return FindType (variableNode.Name);
+        }
+
+        var value = node.Compute (this);
+        if (value is string typeName2)
+        {
+            return FindType (typeName2, args);
+        }
+
+        var typeName3 = KotikUtility.ToString (value);
+
+        return FindType (typeName3, args);
+    }
+
+    /// <summary>
+    /// Получение типа по его имени.
+    /// </summary>
+    public Type? FindType
+        (
+            string name,
+            string[]? arguments = null
+        )
+    {
+        Sure.NotNullNorEmpty (name);
+
+        switch (name)
+        {
+            case "bool": return typeof (bool);
+            case "byte": return typeof (byte);
+            case "sbyte": return typeof (sbyte);
+            case "short": return typeof (short);
+            case "char": return typeof (char);
+            case "ushort": return typeof (ushort);
+            case "int": return typeof (int);
+            case "uint": return typeof (uint);
+            case "long": return typeof (long);
+            case "ulong": return typeof (ulong);
+            case "decimal": return typeof (decimal);
+            case "float": return typeof (float);
+            case "double": return typeof (double);
+            case "object": return typeof (object);
+            case "string": return typeof (string);
+
+            // наши псевдо-типы
+            case "list": return typeof (BarsikList);
+            case "dict": return typeof (BarsikDictionary);
+        }
+
+        Type[]? typeArguments = null;
+        if (arguments is not null)
+        {
+            var list = new List<Type>();
+            foreach (var oneArgument in arguments)
+            {
+                var foundType = FindType (oneArgument);
+                if (foundType is null)
+                {
+                    // TODO более осмысленная реакция на ошибку
+                    return null;
+                }
+
+                list.Add (foundType);
+            }
+
+            typeArguments = list.ToArray();
+        }
+
+        // if (typeArguments is not null && !name.Contains ('`'))
+        // {
+        //     // TODO разбирать на имя типа и сборку
+        //     name += $"`{typeArguments.Length}";
+        // }
+
+        var result = Type.GetType (name, false);
+        if (result is not null)
+        {
+            return ConstructType (result, typeArguments);
+        }
+
+        // var topContext = GetTopContext();
+        // var interpreter = topContext.Interpreter.ThrowIfNull();
+        // if (!name.Contains ('.'))
+        // {
+        //     // это не полное имя, так что попробуем приписать к нему
+        //     // различные пространства имен
+        //     foreach (var ns in topContext.Namespaces.Keys)
+        //     {
+        //         var fullName = ns + "." + name;
+        //         result = Type.GetType (fullName, false);
+        //         if (result is not null)
+        //         {
+        //             return ConstructType (result, typeArguments);
+        //         }
+        //     }
+        // }
+
+        // if (!name.Contains (','))
+        // {
+        //     // это не assembly-qualified name, так что попробуем
+        //     // приписать к нему загруженные нами сборки
+        //     foreach (var asm in interpreter.Assemblies.Values)
+        //     {
+        //         var asmName = asm.GetName().Name;
+        //         var fullName = name + ", " + asmName;
+        //         result = Type.GetType (fullName, false);
+        //         if (result is not null)
+        //         {
+        //             return ConstructType (result, typeArguments);
+        //         }
+        //
+        //         if (!name.Contains ('.'))
+        //         {
+        //             // это не полное имя, так что попробуем приписать к нему
+        //             // различные пространства имен
+        //             foreach (var ns in topContext.Namespaces.Keys)
+        //             {
+        //                 fullName = ns + "." + name + ", " + asmName;
+        //                 result = Type.GetType (fullName, false);
+        //                 if (result is not null)
+        //                 {
+        //                     return ConstructType (result, typeArguments);
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
+
+        return null;
     }
 
     /// <summary>

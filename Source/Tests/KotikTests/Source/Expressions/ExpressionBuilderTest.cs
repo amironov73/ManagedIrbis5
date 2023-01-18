@@ -28,6 +28,7 @@ public sealed class ExpressionBuilderTest
         var state = _GetState ("(1 + 2) * (3 * 4 - 5)");
         var parser = ExpressionBuilder.Build
             (
+                Parser.Literal,
                 new[]
                 {
                     new[] { "<<", ">>" },
