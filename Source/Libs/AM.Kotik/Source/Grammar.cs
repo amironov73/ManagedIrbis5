@@ -93,18 +93,28 @@ public static class Grammar
     private static readonly Parser<AtomNode> BasicExpression = ExpressionBuilder.Build
             (
                 Atom,
-                new Parser<Func<AtomNode, AtomNode>>[0],
+                new []
+                {
+                    Term ("-").Map<string, Func<AtomNode, AtomNode>>
+                        (
+                            _ => target => new MinusNode (target)
+                        )
+                        .Labeled ("UnaryMinus"),
+
+                    Parser.Lazy (() => Cast!).Map<string, Func<AtomNode, AtomNode>>
+                            (
+                                x => target => new CastNode (x, target)
+                            )
+                        .Labeled ("Cast")
+
+                },
                 new []
                 {
                     Term ("++", "--").Map<string, Func<AtomNode, AtomNode>>
                         (
                             x => target => new IncrementNode (target, x, false)
-                        ),
-
-                    Parser.Lazy (() => Cast!).Map<string, Func<AtomNode, AtomNode>>
-                        (
-                            x => target => new CastNode (x, target)
-                        ),
+                        )
+                        .Labeled ("PostfixIncrement"),
 
                     Parser.Lazy (() => Index!).Map<ExpressionNode, Func<AtomNode, AtomNode>>
                         (

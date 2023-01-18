@@ -13,7 +13,8 @@ for (i = 0; i < 10; i = i + 1)
 }
 
 j = 1
-while (j < 256) j = j * 2
+while (j < 256) j *= 2
+j = -j
 
 l = [1, 2, 3]
 d = {1: "one", 2: "two", 3: "three"}
@@ -23,4 +24,5 @@ builder2 = new "System.Text.StringBuilder" ()
 
 x1++
 x2--
-l[1]
+item = l[1]
+l[1] = 111

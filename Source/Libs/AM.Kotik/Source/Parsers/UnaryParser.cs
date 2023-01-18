@@ -15,6 +15,7 @@
 #region Using directives
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 #endregion
@@ -37,10 +38,15 @@ public sealed class UnaryParser<TResult>
     /// </summary>
     public UnaryParser
         (
+            bool isPrefix,
             Parser<TResult> root,
             Parser<Func<TResult, TResult>>[] allowed
         )
     {
+        Sure.NotNull (root);
+        Sure.NotNull (allowed);
+
+        _isPrefix = isPrefix;
         _root = root;
         _allowed = allowed;
     }
@@ -49,6 +55,7 @@ public sealed class UnaryParser<TResult>
 
     #region Private members
 
+    private readonly bool _isPrefix;
     private readonly Parser<TResult> _root;
     private readonly Parser<Func<TResult, TResult>>[] _allowed;
 
@@ -68,9 +75,10 @@ public sealed class UnaryParser<TResult>
         DebugHook (state);
 
         var total = false;
-        if (_root.TryParse (state, out var finalResult))
+
+        Stack<Func<TResult, TResult>>? stack = _isPrefix ? new Stack<Func<TResult, TResult>>() : null;
+        if (_isPrefix)
         {
-            total = true;
             while (true)
             {
                 var flag = false;
@@ -78,7 +86,7 @@ public sealed class UnaryParser<TResult>
                 {
                     if (one.TryParse (state, out var func))
                     {
-                        finalResult = func (finalResult);
+                        stack!.Push (func);
                         flag = true;
                         break;
                     }
@@ -87,6 +95,42 @@ public sealed class UnaryParser<TResult>
                 if (!flag)
                 {
                     break;
+                }
+            }
+        }
+
+        if (_root.TryParse (state, out var finalResult))
+        {
+            total = true;
+
+            if (!_isPrefix)
+            {
+                while (true)
+                {
+                    var flag = false;
+                    foreach (var one in _allowed)
+                    {
+                        if (one.TryParse (state, out var func))
+                        {
+                            finalResult = func (finalResult);
+             
+                            flag = true;
+                            break;
+                        }
+                    }
+
+                    if (!flag)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            if (_isPrefix)
+            {
+                while (stack!.TryPop (out var func))
+                {
+                    finalResult = func (finalResult);
                 }
             }
 

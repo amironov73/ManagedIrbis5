@@ -72,9 +72,15 @@ public static class ExpressionBuilder
 
         var expr = new DynamicParser<AtomNode> (() => null!);
         var result = (Parser<AtomNode>) expr;
+
+        if (!prefixOps.IsNullOrEmpty())
+        {
+            result = new UnaryParser<AtomNode> (isPrefix: true, result, prefixOps);
+        }
+
         if (!postfixOps.IsNullOrEmpty())
         {
-            result = new UnaryParser<AtomNode> (expr, postfixOps);
+            result = new UnaryParser<AtomNode> (isPrefix: false, result, postfixOps);
         }
 
         foreach (var binaryOp in binaryOps)
@@ -91,7 +97,7 @@ public static class ExpressionBuilder
     /// <summary>
     /// Формирует лево-ассоциативный оператор.
     /// </summary>
-    public static Parser<TResult> LeftAssociative<TResult>
+    private static Parser<TResult> LeftAssociative<TResult>
         (
             Parser<TResult> item,
             string[] operations,
