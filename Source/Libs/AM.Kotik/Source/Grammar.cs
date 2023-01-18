@@ -5,6 +5,8 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StaticMemberInitializerReferesToMemberBelow
 
 /* Grammar.cs -- грамматика языка
  * Ars Magna project, http://arsmagna.ru
@@ -43,7 +45,7 @@ public static class Grammar
     /// <summary>
     /// Порождение константного узла.
     /// </summary>
-    public static readonly Parser<AtomNode> Literal = new LiteralParser().Map
+    private static readonly Parser<AtomNode> Literal = new LiteralParser().Map
         (
             x => (AtomNode) new ConstantNode (x)
         );
@@ -66,7 +68,7 @@ public static class Grammar
     /// <summary>
     /// Ссылка на переменную.
     /// </summary>
-    public static readonly Parser<AtomNode> Variable = Identifier.Map
+    private static readonly Parser<AtomNode> Variable = Identifier.Map
         (
             x => (AtomNode) new VariableNode (x)
         )
@@ -75,15 +77,21 @@ public static class Grammar
     /// <summary>
     /// Корневое выражение.
     /// </summary>
-    public static readonly Parser<AtomNode> Root = Literal.Or (Variable)
-        .Labeled ("Root");
+    private static readonly Parser<AtomNode> Atom = Parser.OneOf
+        (
+            Literal,
+            Variable,
+            Parser.Lazy (() => List!),
+            Parser.Lazy (() => Dictionary!)
+        )
+        .Labeled ("Atom");
 
     /// <summary>
     /// Базовое выражение.
     /// </summary>
-    public static readonly Parser<AtomNode> BasicExpression = ExpressionBuilder.Build
+    private static readonly Parser<AtomNode> BasicExpression = ExpressionBuilder.Build
         (
-            Root,
+            Atom,
             new[]
             {
                 new[] { "<<", ">>" },
@@ -99,16 +107,46 @@ public static class Grammar
     /// <summary>
     /// Выражение без присваивания.
     /// </summary>
-    public static readonly Parser<ExpressionNode> Expression = BasicExpression.Map
+    private static readonly Parser<ExpressionNode> Expression = BasicExpression.Map
         (
             x => new ExpressionNode (null, null, x)
         )
         .Labeled ("Expression");
 
     /// <summary>
+    /// Пара "ключ и значение" для словаря.
+    /// </summary>
+    private static readonly Parser<KeyValueNode> KeyAndValue = Parser.Chain
+        (
+            Expression.Instance ("Key"), // 1
+            Term (":"), // 2
+            Expression.Instance ("Value"), // 3
+            (_1, _, _3) => new KeyValueNode (_1, _3)
+        )
+        .Labeled ("KeyAndValue");
+
+    /// <summary>
+    /// Словарь вида `{1: "one", 2: "two", 3: "three"}`.
+    /// </summary>
+    private static readonly Parser<AtomNode> Dictionary = KeyAndValue
+        .SeparatedBy (Term (","))
+        .CurlyBrackets()
+        .Labeled ("Dictionary")
+        .Map (x => (AtomNode) new DictionaryNode (x));
+
+    /// <summary>
+    /// Список вида `[1, 2, 3]`.
+    /// </summary>
+    private static readonly Parser<AtomNode> List = Expression
+        .SeparatedBy (Term (","))
+        .SquareBrackets()
+        .Labeled ("List")
+        .Map (x => (AtomNode) new ListNode (x));
+
+    /// <summary>
     /// Присваивание.
     /// </summary>
-    public static readonly Parser<ExpressionNode> Assignment = Parser.Chain
+    private static readonly Parser<ExpressionNode> Assignment = Parser.Chain
         (
             // x1 = x2 = ...
             new RepeatParser<Tuple<string, string>>
@@ -140,7 +178,7 @@ public static class Grammar
     /// <summary>
     /// Преобразование типа.
     /// </summary>
-    public static Parser<UnaryNode> Cast = Identifier
+    private static Parser<UnaryNode> Cast = Identifier
         .RoundBrackets()
         .Map (x => (UnaryNode) new CastNode (x, null!))
         .Labeled ("Cast");
@@ -148,7 +186,7 @@ public static class Grammar
     /// <summary>
     /// Обращение по индексу
     /// </summary>
-    public static readonly Parser<UnaryNode> Index = Expression
+    private static readonly Parser<UnaryNode> Index = Expression
         .SquareBrackets()
         .Map (x => (UnaryNode) new IndexNode (null!, x))
         .Labeled ("Index");
@@ -156,7 +194,7 @@ public static class Grammar
     /// <summary>
     /// Простой стейтмент.
     /// </summary>
-    public static readonly Parser<StatementBase> SimpleStatement = Parser.OneOf
+    private static readonly Parser<StatementBase> SimpleStatement = Parser.OneOf
         (
             BuildStatement (Assignment),
             BuildStatement (Expression)
@@ -188,7 +226,7 @@ public static class Grammar
     /// <summary>
     /// Цикл for.
     /// </summary>
-    public static readonly Parser<StatementBase> ForStatement = Parser.Chain
+    private static readonly Parser<StatementBase> ForStatement = Parser.Chain
         (
             Parser.Position, // 1
             Parser.Reserved ("for"), // 2
@@ -208,7 +246,7 @@ public static class Grammar
     /// <summary>
     /// Цикл while.
     /// </summary>
-    public static readonly Parser<StatementBase> WhileStatement = Parser.Chain
+    private static readonly Parser<StatementBase> WhileStatement = Parser.Chain
         (
             Parser.Position, // 1
             Parser.Reserved ("while"), // 2

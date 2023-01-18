@@ -14,3 +14,6 @@ for (i = 0; i < 10; i = i + 1)
 
 j = 1
 while (j < 256) j = j * 2
+
+l = [1, 2, 3]
+d = {1: "one", 2: "two", 3: "three"}
