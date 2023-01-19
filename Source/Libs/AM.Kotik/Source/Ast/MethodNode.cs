@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 #endregion
 
@@ -38,7 +39,7 @@ public sealed class MethodNode
         (
             AtomNode thisObject,
             string methodName,
-            AtomNode[] arguments
+            ExpressionNode[] arguments
         )
     {
         Sure.NotNull (thisObject);
@@ -56,7 +57,7 @@ public sealed class MethodNode
 
     private readonly AtomNode _thisObject;
     private readonly string _methodName;
-    private readonly AtomNode[] _arguments;
+    private readonly ExpressionNode[] _arguments;
 
     #endregion
 
@@ -109,6 +110,28 @@ public sealed class MethodNode
         var result = instanceMethod.Invoke (thisValue, argumentValues.ToArray());
 
         return result;
+    }
+
+    #endregion
+
+    #region AstNode members
+
+    /// <inheritdoc cref="AstNode.DumpHierarchyItem(string?,int,System.IO.TextWriter)"/>
+    internal override void DumpHierarchyItem
+        (
+            string? name,
+            int level,
+            TextWriter writer
+        )
+    {
+        base.DumpHierarchyItem (name, level, writer);
+
+        _thisObject.DumpHierarchyItem ("This", level + 1, writer);
+        DumpHierarchyItem ("Method", level + 1, writer, _methodName);
+        foreach (var argument in _arguments)
+        {
+            argument.DumpHierarchyItem ("Arg", level + 1, writer);
+        }
     }
 
     #endregion

@@ -81,10 +81,23 @@ public /* не sealed */ class ExpressionNode
             TextWriter writer
         )
     {
-        base.DumpHierarchyItem (name, level, writer, ToString());
+        var whatIam = ToString();
+        if (_operation is not null)
+        {
+            whatIam = "Assignment";
+        }
+        base.DumpHierarchyItem (name, level, writer, whatIam);
 
-        DumpHierarchyItem ("Variable", level + 1, writer, _target.ToVisibleString());
-        DumpHierarchyItem ("Operation", level + 1, writer, _operation.ToVisibleString());
+        if (_target is not null)
+        {
+            DumpHierarchyItem ("Variable", level + 1, writer, _target.ToVisibleString());
+        }
+
+        if (_operation is not null)
+        {
+            DumpHierarchyItem ("Operation", level + 1, writer, _operation.ToVisibleString());
+        }
+
         _expression.DumpHierarchyItem ("Expression", level + 1, writer);
     }
 

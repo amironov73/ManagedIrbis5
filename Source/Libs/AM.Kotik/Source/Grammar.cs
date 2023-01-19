@@ -15,6 +15,7 @@
 #region Using directives
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 #endregion
@@ -108,6 +109,7 @@ public static class Grammar
                 Atom,
                 new []
                 {
+                    // префиксные операции
                     Term ("-").Map<string, Func<AtomNode, AtomNode>>
                         (
                             _ => target => new MinusNode (target)
@@ -128,6 +130,7 @@ public static class Grammar
                 },
                 new []
                 {
+                    // постфиксные операции
                     Term ("++", "--").Map<string, Func<AtomNode, AtomNode>>
                         (
                             x => target => new IncrementNode (target, x, false)
@@ -136,11 +139,14 @@ public static class Grammar
 
                     Parser.Lazy (() => Index!).Labeled ("Index"),
 
-                    Parser.Lazy (() => Property!).Labeled ("Property")
+                    Parser.Lazy (() => MethodCall).Labeled ("MethodCall"),
+
+                    Parser.Lazy (() => Property!).Labeled ("Property"),
 
                 },
                 new[]
                 {
+                    // бинарные операции
                     new[] { "<<", ">>" },
                     new[] { "&", "|" },
                     new[] { "*", "/", "%" },
@@ -278,18 +284,33 @@ public static class Grammar
             .Labeled ("Index");
 
     /// <summary>
+    /// Вызов метода объекта.
+    /// </summary>
+    private static readonly Parser<Func<AtomNode, AtomNode>> MethodCall =
+        Parser.Chain<string, string, IEnumerable<ExpressionNode>, Func<AtomNode, AtomNode>>
+            (
+                Term ("."),
+                Identifier,
+                Parser.Lazy (() => Expression!)
+                    .SeparatedBy (Term (","))
+                    .RoundBrackets(),
+                (_, name, args) => target => new MethodNode (target, name, args.ToArray())
+            )
+            .Labeled ("MethodCall");
+
+    /// <summary>
     /// Вызов свободной функции, например, `println`.
     /// </summary>
     private static readonly Parser<AtomNode> FunctionCall =
         Parser.Chain
-                (
-                    Identifier,
-                    Parser.Lazy (() => Expression!)
-                        .SeparatedBy (Term (","))
-                        .RoundBrackets(),
-                    (name, args) =>
-                        (AtomNode) new CallNode (name, args.ToArray())
-                )
+            (
+                Identifier,
+                Parser.Lazy (() => Expression!)
+                    .SeparatedBy (Term (","))
+                    .RoundBrackets(),
+                (name, args) =>
+                    (AtomNode) new CallNode (name, args.ToArray())
+            )
             .Labeled ("FunctionCall");
 
     /// <summary>

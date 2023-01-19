@@ -19,6 +19,8 @@ l = [1, 2, 3]
 d = {1: "one", 2: "two", 3: "three"}
 c1 = l.Count
 c2 = d.Count
+l.Add (4)
+l.Add (5)
 
 builder1 = new System.Text.StringBuilder ()
 builder2 = new "System.Text.StringBuilder" ()

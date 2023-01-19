@@ -34,6 +34,7 @@ internal static class Program
         var program = Grammar.ParseProgram (sourceText);
         Console.WriteLine (new string ('=', 70));
         program.Dump();
+        Console.WriteLine(new string('=', 70));
         var context = new Context (Console.In, Console.Out, Console.Error);
         program.Execute (context);
         Console.WriteLine (new string ('=', 70));
