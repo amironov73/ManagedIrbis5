@@ -7,7 +7,7 @@
 
   <PropertyGroup>
     <AvaloniaVersion>11.0.0-preview4</AvaloniaVersion>
-    <CommunityToolkitVersion>8.1.0-preview3</CommunityToolkitVersion>
+    <CommunityToolkitVersion>8.1.0</CommunityToolkitVersion>
   </PropertyGroup>
 
   <!-- Централизованное управление пакетами -->
@@ -24,11 +24,13 @@
     <PackageVersion Include="Avalonia.Skia" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.ThemeManager" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
+    <PackageVersion Include="Avalonia.Themes.Simple" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Xaml.Behaviors" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Xaml.Interactions" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Xaml.Interactivity" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="BCrypt.Net-Next.StrongName" Version="4.0.3" />
-    <PackageVersion Include="BenchmarkDotNet" Version="0.13.3" />
+    <PackageVersion Include="BenchmarkDotNet" Version="0.13.4" />
+    <PackageVersion Include="Citrus.Avalonia" Version="1.6.1" />
     <PackageVersion Include="CommunityToolkit.Common" Version="$(CommunityToolkitVersion)" />
     <PackageVersion Include="CommunityToolkit.Diagnostics" Version="$(CommunityToolkitVersion)" />
     <PackageVersion Include="CommunityToolkit.HighPerformance" Version="$(CommunityToolkitVersion)" />
@@ -42,11 +44,12 @@
     <PackageVersion Include="GridExtra.Avalonia" Version="0.9.1" />
     <PackageVersion Include="HtmlAgilityPack" Version="1.11.46" />
     <PackageVersion Include="linq2db" Version="3.7.0" />
+    <PackageVersion Include="Live.Avalonia" Version="1.3.1" />
     <PackageVersion Include="MailKit" Version="3.4.3" />
-    <PackageVersion Include="MimeKit" Version="3.4.3" />
+    <PackageVersion Include="Material.Avalonia" Version="3.0.0-avalonia11-preview2.137-nightly" />
     <PackageVersion Include="MaxMind.GeoIP2" Version="5.1.0" />
-    <PackageVersion Include="Microsoft.AspNetCore.Components.Web" Version="7.0.1" />
-    <PackageVersion Include="Microsoft.AspNetCore.Razor.Language" Version="6.0.12" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.Web" Version="7.0.2" />
+    <PackageVersion Include="Microsoft.AspNetCore.Razor.Language" Version="6.0.13" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.4.0" />
     <PackageVersion Include="Microsoft.DotNet.ILCompiler" Version="7.0.0-rc.2.22472.3" />
     <PackageVersion Include="Microsoft.DotNet.PlatformAbstractions" Version="3.1.6" />
@@ -61,15 +64,16 @@
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="7.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Hosting.Systemd" Version="7.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Hosting.WindowsServices" Version="7.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Localization" Version="7.0.1" />
+    <PackageVersion Include="Microsoft.Extensions.Localization" Version="7.0.2" />
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="7.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="7.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.ObjectPool" Version="7.0.1" />
+    <PackageVersion Include="Microsoft.Extensions.ObjectPool" Version="7.0.2" />
     <PackageVersion Include="Microsoft.Extensions.Options" Version="7.0.0" />
     <PackageVersion Include="Microsoft.IO.RecyclableMemoryStream" Version="2.2.1" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.4.1" />
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="1.1.1" />
     <PackageVersion Include="Microsoft.Windows.Compatibility" Version="7.0.0" />
+    <PackageVersion Include="MimeKit" Version="3.4.3" />
     <PackageVersion Include="Mono.Posix.NETStandard" Version="1.0.0" />
     <PackageVersion Include="Moq" Version="4.18.4" />
     <PackageVersion Include="MSTest.TestAdapter" Version="3.0.2" />
@@ -94,7 +98,7 @@
     <PackageVersion Include="ReactiveUI.Fody" Version="18.3.1" />
     <PackageVersion Include="RestSharp" Version="108.0.3" />
     <PackageVersion Include="RestSharp.Authenticators.Digest" Version="1.3.1" />
-    <PackageVersion Include="Rookout" Version="0.1.127" />
+    <PackageVersion Include="Rookout" Version="0.1.128" />
     <PackageVersion Include="SixLabors.ImageSharp" Version="2.1.3" />
     <PackageVersion Include="SixLabors.Fonts" Version="1.0.0-beta19" />
     <PackageVersion Include="SkiaSharp" Version="2.88.3" />
@@ -104,7 +108,7 @@
     <PackageVersion Include="SkiaSharp.NativeAssets.Win32" Version="2.88.3" />
     <PackageVersion Include="SharpCompress" Version="0.32.2" />
     <PackageVersion Include="SharpZipLib" Version="1.4.1" />
-    <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageVersion Include="System.CodeDom" Version="7.0.0" />
     <PackageVersion Include="System.CommandLine" Version="2.0.0-beta3.22114.1" />
     <PackageVersion Include="System.Configuration.ConfigurationManager" Version="7.0.0" />
