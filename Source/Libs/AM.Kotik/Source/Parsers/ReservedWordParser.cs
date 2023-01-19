@@ -32,11 +32,9 @@ public sealed class ReservedWordParser
     /// </summary>
     public ReservedWordParser
         (
-            string expected
+            string? expected
         )
     {
-        Sure.NotNull (expected);
-
         _expected = expected;
     }
 
@@ -44,7 +42,7 @@ public sealed class ReservedWordParser
 
     #region Private members
 
-    private readonly string _expected;
+    private readonly string? _expected;
 
     #endregion
 
@@ -61,11 +59,24 @@ public sealed class ReservedWordParser
         result = default;
         DebugHook (state);
 
-        if (state.HasCurrent && state.Current.IsReservedWord (_expected))
+        if (state.HasCurrent)
         {
-            result = _expected;
-            state.Advance();
-            return DebugSuccess (state, true);
+            if (string.IsNullOrEmpty (_expected))
+            {
+                if (state.Current.Kind == TokenKind.ReservedWord)
+                {
+                    result = state.Current.Value;
+                    state.Advance();
+                    return DebugSuccess (state, true);
+                }
+            }
+            else if (state.Current.IsReservedWord (_expected))
+            {
+                result = _expected;
+                state.Advance();
+                return DebugSuccess (state, true);
+            }
+
         }
 
         return DebugSuccess (state, false);

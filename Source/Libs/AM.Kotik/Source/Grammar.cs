@@ -6,6 +6,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable RedundantSuppressNullableWarningExpression
 // ReSharper disable StaticMemberInitializerReferesToMemberBelow
 
 /* Grammar.cs -- грамматика языка
@@ -59,7 +60,7 @@ public static class Grammar
     /// <summary>
     /// Разбор зарезервированного слова.
     /// </summary>
-    public static ReservedWordParser Reserved (string word) => new (word);
+    public static ReservedWordParser Reserved (string? word) => new (word);
 
     /// <summary>
     /// Разбор идентификаторов.
@@ -95,10 +96,16 @@ public static class Grammar
     private static readonly Parser<AtomNode> LeftExpression = ExpressionBuilder.Build
         (
             Atom,
+            // префиксные операции не предусмотрены
             Array.Empty<Parser<Func<AtomNode, AtomNode>>>(),
-            new [] { Parser.Lazy (() => Index!) },
-            new [] { new string[] {} },
-            (left, operation, right) => new BinaryNode (left, operation, right)
+            new[]
+            {
+                // постфиксные операции
+                Parser.Lazy (() => Index!),
+                Parser.Lazy (() => Property!)
+            },
+            // бинарные операции не предусмотрены
+            Array.Empty<Parser<Func<AtomNode, string, AtomNode, AtomNode>>>()
         );
 
     /// <summary>
@@ -107,53 +114,46 @@ public static class Grammar
     private static readonly Parser<AtomNode> BasicExpression = ExpressionBuilder.Build
             (
                 Atom,
-                new []
+                new[]
                 {
                     // префиксные операции
-                    Term ("-").Map<string, Func<AtomNode, AtomNode>>
+                    Operator.Unary
                         (
+                            Term ("-"),
+                            "UnaryMinus",
                             _ => target => new MinusNode (target)
+                        ),
+
+                    Operator.Increment ("PrefixIncrement", true),
+
+                    Operator.Unary
+                        (
+                            Parser.OneOf (Identifier, Reserved (null))
+                                .RoundBrackets(),
+                            "Cast",
+                            x => target => new CastNode (x, target)
                         )
-                        .Labeled ("UnaryMinus"),
-
-                    Term ("++", "--").Map<string, Func<AtomNode, AtomNode>>
-                            (
-                                x => target => new IncrementNode (target, x, true)
-                            )
-                        .Labeled ("PrefixIncrement"),
-
-                    Parser.Lazy (() => Cast!).Map<string, Func<AtomNode, AtomNode>>
-                            (
-                                x => target => new CastNode (x, target)
-                            )
-                        .Labeled ("Cast")
                 },
-                new []
+                new[]
                 {
                     // постфиксные операции
-                    Term ("++", "--").Map<string, Func<AtomNode, AtomNode>>
-                        (
-                            x => target => new IncrementNode (target, x, false)
-                        )
-                        .Labeled ("PostfixIncrement"),
+                    Operator.Increment ("PostfixIncrement", false),
 
-                    Parser.Lazy (() => Index!).Labeled ("Index"),
+                    Parser.Lazy (() => Index!),
 
                     Parser.Lazy (() => MethodCall).Labeled ("MethodCall"),
 
                     Parser.Lazy (() => Property!).Labeled ("Property"),
-
                 },
                 new[]
                 {
                     // бинарные операции
-                    new[] { "<<", ">>" },
-                    new[] { "&", "|" },
-                    new[] { "*", "/", "%" },
-                    new[] { "+", "-" },
-                    new[] { "<", ">", "<=", ">=", "==", "!=" },
-                },
-                (left, operation, right) => new BinaryNode (left, operation, right)
+                    Operator.LeftAssociative ("Shift", "<<", ">>"),
+                    Operator.LeftAssociative ("Bitwise", "&", "|", "^"),
+                    Operator.LeftAssociative ("Multiplication", "*", "/", "%" ),
+                    Operator.LeftAssociative ("Addition", "+", "-" ),
+                    Operator.LeftAssociative ("Comparison", "<", ">", "<=", ">=", "==", "!=" )
+                }
             )
         .Labeled ("BasicExpression");
 
@@ -255,47 +255,40 @@ public static class Grammar
         .Labeled ("Assignment");
 
     /// <summary>
-    /// Преобразование типа.
-    /// </summary>
-    private static readonly Parser<string> Cast = Identifier
-        .RoundBrackets()
-        .Labeled ("Cast");
-
-    /// <summary>
     /// Обращение к свойству объекта.
     /// </summary>
     private static readonly Parser<Func<AtomNode, AtomNode>> Property =
-        Identifier.After (Term ("."))
-            .Map<string, Func<AtomNode, AtomNode>>
-                (
-                    name => target => new PropertyNode (target, name)
-                )
-            .Labeled ("Property");
+        Operator.Unary
+            (
+                Identifier.After (Term (".")),
+                "Property",
+                name => target => new PropertyNode (target, name)
+            );
 
     /// <summary>
-    /// Обращение по индексу.
+    /// Обращение к элементу массива/списка по индексу.
     /// </summary>
     private static readonly Parser<Func<AtomNode, AtomNode>> Index =
-        Parser.Lazy (() => Expression!.SquareBrackets())
-            .Map<ExpressionNode, Func<AtomNode, AtomNode>>
-                (
-                    x => target => new IndexNode (target, x)
-                )
-            .Labeled ("Index");
+        Operator.Unary
+            (
+                Parser.Lazy (() => Expression!).SquareBrackets(),
+                "Index",
+                x => target => new IndexNode (target, x)
+            );
 
     /// <summary>
     /// Вызов метода объекта.
     /// </summary>
     private static readonly Parser<Func<AtomNode, AtomNode>> MethodCall =
         Parser.Chain<string, string, IEnumerable<ExpressionNode>, Func<AtomNode, AtomNode>>
-            (
-                Term ("."),
-                Identifier,
-                Parser.Lazy (() => Expression!)
-                    .SeparatedBy (Term (","))
-                    .RoundBrackets(),
-                (_, name, args) => target => new MethodNode (target, name, args.ToArray())
-            )
+                (
+                    Term ("."),
+                    Identifier,
+                    Parser.Lazy (() => Expression!)
+                        .SeparatedBy (Term (","))
+                        .RoundBrackets(),
+                    (_, name, args) => target => new MethodNode (target, name, args.ToArray())
+                )
             .Labeled ("MethodCall");
 
     /// <summary>
@@ -303,14 +296,14 @@ public static class Grammar
     /// </summary>
     private static readonly Parser<AtomNode> FunctionCall =
         Parser.Chain
-            (
-                Identifier,
-                Parser.Lazy (() => Expression!)
-                    .SeparatedBy (Term (","))
-                    .RoundBrackets(),
-                (name, args) =>
-                    (AtomNode) new CallNode (name, args.ToArray())
-            )
+                (
+                    Identifier,
+                    Parser.Lazy (() => Expression!)
+                        .SeparatedBy (Term (","))
+                        .RoundBrackets(),
+                    (name, args) =>
+                        (AtomNode)new CallNode (name, args.ToArray())
+                )
             .Labeled ("FunctionCall");
 
     /// <summary>

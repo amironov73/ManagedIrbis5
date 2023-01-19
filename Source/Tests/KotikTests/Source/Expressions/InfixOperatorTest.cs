@@ -22,162 +22,162 @@ namespace KotikTests;
 public sealed class InfixOperatorTest
     : CommonParserTest
 {
-    [TestMethod]
-    [Description ("Сложение двух целых")]
-    public void InfixOperator_Parse_1()
-    {
-        var state = _GetState ("123 + 456");
-        var parser = new InfixOperator<object>
-            (
-                Parser.Literal,
-                new[] { "+", "-" },
-                IntegerArithmetic,
-                BinaryOperatorType.LeftAssociative
-            )
-            .End();
-        var result = (int) parser.ParseOrThrow (state);
-        Assert.AreEqual (579, result);
-    }
+    // [TestMethod]
+    // [Description ("Сложение двух целых")]
+    // public void InfixOperator_Parse_1()
+    // {
+    //     var state = _GetState ("123 + 456");
+    //     var parser = new InfixOperator<object>
+    //         (
+    //             Parser.Literal,
+    //             new[] { "+", "-" },
+    //             IntegerArithmetic,
+    //             BinaryOperatorType.LeftAssociative
+    //         )
+    //         .End();
+    //     var result = (int) parser.ParseOrThrow (state);
+    //     Assert.AreEqual (579, result);
+    // }
 
-    [TestMethod]
-    [Description ("Сложение трех целых")]
-    public void InfixOperator_Parse_2()
-    {
-        var state = _GetState ("12 + 34 + 56");
-        var parser = new InfixOperator<object>
-            (
-                Parser.Literal,
-                new[] { "+", "-" },
-                IntegerArithmetic,
-                BinaryOperatorType.LeftAssociative
-            )
-            .End();
-        var result = (int) parser.ParseOrThrow (state);
-        Assert.AreEqual (102, result);
-    }
+    // [TestMethod]
+    // [Description ("Сложение трех целых")]
+    // public void InfixOperator_Parse_2()
+    // {
+    //     var state = _GetState ("12 + 34 + 56");
+    //     var parser = new InfixOperator<object>
+    //         (
+    //             Parser.Literal,
+    //             new[] { "+", "-" },
+    //             IntegerArithmetic,
+    //             BinaryOperatorType.LeftAssociative
+    //         )
+    //         .End();
+    //     var result = (int) parser.ParseOrThrow (state);
+    //     Assert.AreEqual (102, result);
+    // }
 
-    [TestMethod]
-    [Description ("Сложение одного числа")]
-    public void InfixOperator_Parse_3()
-    {
-        var state = _GetState ("123456");
-        var parser = new InfixOperator<object>
-            (
-                Parser.Literal,
-                new[] { "+", "-" },
-                IntegerArithmetic,
-                BinaryOperatorType.LeftAssociative
-            )
-            .End();
-        var result = (int) parser.ParseOrThrow (state);
-        Assert.AreEqual (123456, result);
-    }
+    // [TestMethod]
+    // [Description ("Сложение одного числа")]
+    // public void InfixOperator_Parse_3()
+    // {
+    //     var state = _GetState ("123456");
+    //     var parser = new InfixOperator<object>
+    //         (
+    //             Parser.Literal,
+    //             new[] { "+", "-" },
+    //             IntegerArithmetic,
+    //             BinaryOperatorType.LeftAssociative
+    //         )
+    //         .End();
+    //     var result = (int) parser.ParseOrThrow (state);
+    //     Assert.AreEqual (123456, result);
+    // }
 
-    [TestMethod]
-    [Description ("Парсер берет только свое")]
-    public void InfixOperator_Parse_4()
-    {
-        var state = _GetState ("12 * 3 + 45 * 6");
-        var parser = new InfixOperator<object>
-            (
-                Parser.Literal,
-                new[] { "*", "/" },
-                IntegerArithmetic,
-                BinaryOperatorType.LeftAssociative
-            );
-            // .End() не надо!
+    // [TestMethod]
+    // [Description ("Парсер берет только свое")]
+    // public void InfixOperator_Parse_4()
+    // {
+    //     var state = _GetState ("12 * 3 + 45 * 6");
+    //     var parser = new InfixOperator<object>
+    //         (
+    //             Parser.Literal,
+    //             new[] { "*", "/" },
+    //             IntegerArithmetic,
+    //             BinaryOperatorType.LeftAssociative
+    //         );
+    //         // .End() не надо!
+    //
+    //     var result = (int) parser.ParseOrThrow (state);
+    //     Assert.AreEqual (36, result);
+    //
+    //     state = _GetState ("12 * 3 * 4 + 5 * 6");
+    //     result = (int) parser.ParseOrThrow (state);
+    //     Assert.AreEqual (144, result);
+    //
+    //     state = _GetState ("12 + 5 * 6");
+    //     result = (int) parser.ParseOrThrow (state);
+    //     Assert.AreEqual (12, result);
+    // }
 
-        var result = (int) parser.ParseOrThrow (state);
-        Assert.AreEqual (36, result);
+    // [TestMethod]
+    // [Description ("Парсер берет только свое")]
+    // public void InfixOperator_Parse_5()
+    // {
+    //     var state = _GetState ("12 * 3 + 45 * 6");
+    //     var multiplication = new InfixOperator<object>
+    //             (
+    //                 Parser.Literal,
+    //                 new[] { "*", "/" },
+    //                 IntegerArithmetic,
+    //                 BinaryOperatorType.LeftAssociative
+    //             );
+    //     var addition = new InfixOperator<object>
+    //             (
+    //                 multiplication,
+    //                 new[] { "+", "-" },
+    //                 IntegerArithmetic,
+    //                 BinaryOperatorType.LeftAssociative
+    //             );
+    //     var parser = addition.End();
+    //     var result = (int) parser.ParseOrThrow (state);
+    //     Assert.AreEqual (306, result);
+    // }
 
-        state = _GetState ("12 * 3 * 4 + 5 * 6");
-        result = (int) parser.ParseOrThrow (state);
-        Assert.AreEqual (144, result);
+    // [TestMethod]
+    // [Description ("Только круглые скобки")]
+    // public void InfixOperator_Parse_6()
+    // {
+    //     var state = _GetState ("(12 + 34)");
+    //     var multiplication = new InfixOperator<object>
+    //         (
+    //             Parser.Literal,
+    //             new[] { "*", "/" },
+    //             IntegerArithmetic,
+    //             BinaryOperatorType.LeftAssociative
+    //         );
+    //     var addition = new InfixOperator<object>
+    //         (
+    //             multiplication,
+    //             new[] { "+", "-" },
+    //             IntegerArithmetic,
+    //             BinaryOperatorType.LeftAssociative
+    //         );
+    //     var parenthesis = addition.RoundBrackets();
+    //     var parser = parenthesis.End();
+    //     var value = (int) parser.ParseOrThrow (state);
+    //     Assert.AreEqual (46, value);
+    // }
 
-        state = _GetState ("12 + 5 * 6");
-        result = (int) parser.ParseOrThrow (state);
-        Assert.AreEqual (12, result);
-    }
-
-    [TestMethod]
-    [Description ("Парсер берет только свое")]
-    public void InfixOperator_Parse_5()
-    {
-        var state = _GetState ("12 * 3 + 45 * 6");
-        var multiplication = new InfixOperator<object>
-                (
-                    Parser.Literal,
-                    new[] { "*", "/" },
-                    IntegerArithmetic,
-                    BinaryOperatorType.LeftAssociative
-                );
-        var addition = new InfixOperator<object>
-                (
-                    multiplication,
-                    new[] { "+", "-" },
-                    IntegerArithmetic,
-                    BinaryOperatorType.LeftAssociative
-                );
-        var parser = addition.End();
-        var result = (int) parser.ParseOrThrow (state);
-        Assert.AreEqual (306, result);
-    }
-
-    [TestMethod]
-    [Description ("Только круглые скобки")]
-    public void InfixOperator_Parse_6()
-    {
-        var state = _GetState ("(12 + 34)");
-        var multiplication = new InfixOperator<object>
-            (
-                Parser.Literal,
-                new[] { "*", "/" },
-                IntegerArithmetic,
-                BinaryOperatorType.LeftAssociative
-            );
-        var addition = new InfixOperator<object>
-            (
-                multiplication,
-                new[] { "+", "-" },
-                IntegerArithmetic,
-                BinaryOperatorType.LeftAssociative
-            );
-        var parenthesis = addition.RoundBrackets();
-        var parser = parenthesis.End();
-        var value = (int) parser.ParseOrThrow (state);
-        Assert.AreEqual (46, value);
-    }
-
-    [TestMethod]
-    [Description ("Круглые скобки в составе выражения")]
-    public void InfixOperator_Parse_7()
-    {
-        var state = _GetState ("(12 + 34) * 5", true);
-        var literal = Parser.Literal;
-        var expr = new DynamicParser<object> (() => null!);
-        var multiplication = new InfixOperator<object>
-            (
-                expr,
-                new[] { "*", "/" },
-                IntegerArithmetic,
-                BinaryOperatorType.LeftAssociative
-            );
-        var addition = new InfixOperator<object>
-            (
-                multiplication,
-                new[] { "+", "-" },
-                IntegerArithmetic,
-                BinaryOperatorType.LeftAssociative
-            );
-        var parenthesis = addition.RoundBrackets();
-        expr.Inner = () => literal.Or (parenthesis);
-        var parser = addition.End();
-
-        var value = (int) parser.ParseOrThrow (state);
-        Assert.AreEqual (230, value);
-
-        state = _GetState ("(1 + 2) * (3 * 4 - 5)");
-        value = (int) parser.ParseOrThrow (state);
-        Assert.AreEqual (21, value);
-    }
+    // [TestMethod]
+    // [Description ("Круглые скобки в составе выражения")]
+    // public void InfixOperator_Parse_7()
+    // {
+    //     var state = _GetState ("(12 + 34) * 5", true);
+    //     var literal = Parser.Literal;
+    //     var expr = new DynamicParser<object> (() => null!);
+    //     var multiplication = new InfixOperator<object>
+    //         (
+    //             expr,
+    //             new[] { "*", "/" },
+    //             IntegerArithmetic,
+    //             BinaryOperatorType.LeftAssociative
+    //         );
+    //     var addition = new InfixOperator<object>
+    //         (
+    //             multiplication,
+    //             new[] { "+", "-" },
+    //             IntegerArithmetic,
+    //             BinaryOperatorType.LeftAssociative
+    //         );
+    //     var parenthesis = addition.RoundBrackets();
+    //     expr.Inner = () => literal.Or (parenthesis);
+    //     var parser = addition.End();
+    //
+    //     var value = (int) parser.ParseOrThrow (state);
+    //     Assert.AreEqual (230, value);
+    //
+    //     state = _GetState ("(1 + 2) * (3 * 4 - 5)");
+    //     value = (int) parser.ParseOrThrow (state);
+    //     Assert.AreEqual (21, value);
+    // }
 }

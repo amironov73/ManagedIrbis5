@@ -36,13 +36,13 @@ public sealed class InfixOperator<TResult>
     public InfixOperator
         (
             Parser<TResult> item,
-            string[] operations,
+            Parser<string> operations,
             [MaybeNullWhen (false)] Func<TResult, string, TResult, TResult> function,
             BinaryOperatorType operatorType
         )
     {
         _itemParser = item;
-        _operationParser = Parser.Term (operations);
+        _operationParser = operations;
         _function = function;
         _operatorType = operatorType;
     }
