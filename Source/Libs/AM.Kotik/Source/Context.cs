@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 
@@ -43,6 +44,11 @@ public sealed class Context
     public Dictionary<string, dynamic?> Variables { get; }
 
     /// <summary>
+    /// Дефайны.
+    /// </summary>
+    public Dictionary<string, dynamic?> Defines { get; }
+
+    /// <summary>
     /// Стандартный входной поток.
     /// </summary>
     public TextReader Input { get; set; }
@@ -56,6 +62,11 @@ public sealed class Context
     /// Стандартный поток ошибок.
     /// </summary>
     public TextWriter Error { get; set; }
+
+    /// <summary>
+    /// Функции.
+    /// </summary>
+    public Dictionary<string, FunctionDescriptor> Functions { get; }
 
     #endregion
 
@@ -78,9 +89,11 @@ public sealed class Context
 
         Parent = parent;
         Variables = new ();
+        Defines = new ();
         Input = input;
         Output = output;
         Error = error;
+        Functions = new ();
     }
 
     #endregion
@@ -146,6 +159,39 @@ public sealed class Context
                         : $"{key}: {value.GetType().Name} = {value}"
                 );
         }
+    }
+
+    /// <summary>
+    /// Поиск функции с указанным именем.
+    /// Отличается тем, что не швыряется исключениями.
+    /// </summary>
+    public bool FindFunction
+        (
+            string name,
+            [MaybeNullWhen (false)] out FunctionDescriptor result
+        )
+    {
+        Sure.NotNullNorEmpty (name);
+
+        if (Functions.TryGetValue (name, out result))
+        {
+            return true;
+        }
+
+        for (var context = Parent; context is not null; context = context.Parent)
+        {
+            if (context.Functions.TryGetValue (name, out result))
+            {
+                return true;
+            }
+        }
+
+        if (Builtins.Registry.TryGetValue (name, out result))
+        {
+            return true;
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -343,6 +389,24 @@ public sealed class Context
     }
 
     /// <summary>
+    /// Поиск функции в текущем и в родительском контекстах.
+    /// </summary>
+    public FunctionDescriptor GetFunction
+        (
+            string name
+        )
+    {
+        Sure.NotNullNorEmpty (name);
+
+        if (!FindFunction (name, out var result))
+        {
+            throw new Exception ($"Function {name} not found");
+        }
+
+        return result;
+    }
+
+    /// <summary>
     /// Получение топового контекста, используемого как свалка
     /// для регистрации модулей и сборок.
     /// </summary>
@@ -397,6 +461,42 @@ public sealed class Context
     public void Reset()
     {
         Variables.Clear();
+    }
+
+    /// <summary>
+    /// Установка значения дефайна
+    /// (с сохранением места в контексте).
+    /// </summary>
+    public void SetDefine
+        (
+            string name,
+            dynamic? value
+        )
+    {
+        Sure.NotNullNorEmpty (name);
+
+        if (Builtins.IsBuiltinFunction (name))
+        {
+            throw new BarsikException ($"{name} used by builtin function");
+        }
+
+        Variables.Remove (name);
+        if (Defines.ContainsKey (name))
+        {
+            Defines[name] = value;
+            return;
+        }
+
+        for (var context = Parent; context is not null; context = context.Parent)
+        {
+            Variables.Remove (name);
+            if (Defines.ContainsKey (name))
+            {
+                Variables[name] = value;
+            }
+        }
+
+        Defines[name] = value;
     }
 
     /// <summary>

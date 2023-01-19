@@ -164,6 +164,12 @@ public sealed class IndexNode
             return value;
         }
 
+        if (obj is IList list && index is int integerIndex2)
+        {
+            list[integerIndex2] = value;
+            return value;
+        }
+
         throw new NotImplementedException();
 
         // var type = ((object) obj).GetType();
@@ -196,5 +202,4 @@ public sealed class IndexNode
     }
 
     #endregion
-
 }

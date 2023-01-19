@@ -4,8 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable LocalizableElement
-// ReSharper disable UnusedMember.Global
 
 /* IncrementNode.cs -- оператор инкремента/декремента
  * Ars Magna project, http://arsmagna.ru
@@ -39,6 +37,8 @@ public sealed class IncrementNode
             bool prefix
         )
     {
+        Sure.NotNull (target);
+
         _target = target;
         _operation = operation;
         _prefix = prefix;
@@ -63,10 +63,22 @@ public sealed class IncrementNode
         )
     {
         var target = _target.Compute (context);
+        var result = target;
 
-        Console.WriteLine ($"Increment: {_operation} {_prefix}");
+        target = _operation switch
+        {
+            "++" => target + 1,
+            "--" => target - 1,
+            _ => throw new InvalidOperationException()
+        };
 
-        return target;
+        _target.Assign (context, "=", target);
+        if (_prefix)
+        {
+            result = target;
+        }
+
+        return result;
     }
 
     #endregion

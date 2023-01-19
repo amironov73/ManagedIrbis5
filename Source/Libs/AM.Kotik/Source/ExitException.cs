@@ -17,7 +17,7 @@ using System;
 
 #nullable enable
 
-namespace AM.Scripting.Barsik;
+namespace AM.Kotik;
 
 /// <summary>
 /// Исключение, используемое для завершения скрипта.

@@ -106,7 +106,7 @@ public static class ExpressionBuilder
         where TResult: class
     {
         Sure.NotNull (item);
-        Sure.AssertState (!operations.IsNullOrEmpty());
+        Sure.NotNull (operations);
         Sure.NotNull (function);
 
         return new InfixOperator<TResult>

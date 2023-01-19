@@ -80,12 +80,25 @@ public static class Grammar
     private static readonly Parser<AtomNode> Atom = Parser.OneOf
             (
                 Literal,
+                Parser.Lazy (() => FunctionCall!),
                 Variable,
                 Parser.Lazy (() => List!),
                 Parser.Lazy (() => Dictionary!),
                 Parser.Lazy (() => New!)
             )
         .Labeled ("Atom");
+
+    /// <summary>
+    /// Выражение, стоящее слева от знака присваивания.
+    /// </summary>
+    private static readonly Parser<AtomNode> LeftExpression = ExpressionBuilder.Build
+        (
+            Atom,
+            Array.Empty<Parser<Func<AtomNode, AtomNode>>>(),
+            new [] { Parser.Lazy (() => Index!) },
+            new [] { new string[] {} },
+            (left, operation, right) => new BinaryNode (left, operation, right)
+        );
 
     /// <summary>
     /// Базовое выражение.
@@ -101,12 +114,17 @@ public static class Grammar
                         )
                         .Labeled ("UnaryMinus"),
 
+                    Term ("++", "--").Map<string, Func<AtomNode, AtomNode>>
+                            (
+                                x => target => new IncrementNode (target, x, true)
+                            )
+                        .Labeled ("PrefixIncrement"),
+
                     Parser.Lazy (() => Cast!).Map<string, Func<AtomNode, AtomNode>>
                             (
                                 x => target => new CastNode (x, target)
                             )
                         .Labeled ("Cast")
-
                 },
                 new []
                 {
@@ -116,10 +134,10 @@ public static class Grammar
                         )
                         .Labeled ("PostfixIncrement"),
 
-                    Parser.Lazy (() => Index!).Map<ExpressionNode, Func<AtomNode, AtomNode>>
-                        (
-                            x => target => new IndexNode (target, x)
-                        )
+                    Parser.Lazy (() => Index!).Labeled ("Index"),
+
+                    Parser.Lazy (() => Property!).Labeled ("Property")
+
                 },
                 new[]
                 {
@@ -205,11 +223,11 @@ public static class Grammar
             (
 
                 // x1 = x2 = ...
-                new RepeatParser<Tuple<string, string>>
+                new RepeatParser<Tuple<AtomNode, string>>
                     (
                         Parser.Chain
                             (
-                                Identifier,
+                                LeftExpression,
                                 Parser.Term ("=", "+=", "-=", "*=", "/="),
                                 Tuple.Create
                             ),
@@ -222,7 +240,7 @@ public static class Grammar
 
                     foreach (var tuple in tuples)
                     {
-                        expr = new ExpressionNode (new VariableNode (tuple.Item1), tuple.Item2, expr);
+                        expr = new ExpressionNode (tuple.Item1, tuple.Item2, expr);
                     }
 
                     return (ExpressionNode)expr;
@@ -238,11 +256,41 @@ public static class Grammar
         .Labeled ("Cast");
 
     /// <summary>
-    /// Обращение по индексу
+    /// Обращение к свойству объекта.
     /// </summary>
-    private static readonly Parser<ExpressionNode> Index = Expression
-        .SquareBrackets()
-        .Labeled ("Index");
+    private static readonly Parser<Func<AtomNode, AtomNode>> Property =
+        Identifier.After (Term ("."))
+            .Map<string, Func<AtomNode, AtomNode>>
+                (
+                    name => target => new PropertyNode (target, name)
+                )
+            .Labeled ("Property");
+
+    /// <summary>
+    /// Обращение по индексу.
+    /// </summary>
+    private static readonly Parser<Func<AtomNode, AtomNode>> Index =
+        Parser.Lazy (() => Expression!.SquareBrackets())
+            .Map<ExpressionNode, Func<AtomNode, AtomNode>>
+                (
+                    x => target => new IndexNode (target, x)
+                )
+            .Labeled ("Index");
+
+    /// <summary>
+    /// Вызов свободной функции, например, `println`.
+    /// </summary>
+    private static readonly Parser<AtomNode> FunctionCall =
+        Parser.Chain
+                (
+                    Identifier,
+                    Parser.Lazy (() => Expression!)
+                        .SeparatedBy (Term (","))
+                        .RoundBrackets(),
+                    (name, args) =>
+                        (AtomNode) new CallNode (name, args.ToArray())
+                )
+            .Labeled ("FunctionCall");
 
     /// <summary>
     /// Простой стейтмент.

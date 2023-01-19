@@ -35,15 +35,14 @@ public sealed class PropertyNode
     /// </summary>
     public PropertyNode
         (
-            AtomNode obj,
-            AtomNode propertyName
+            AtomNode target,
+            string propertyName
         )
     {
-        Sure.NotNull (obj);
+        Sure.NotNull (target);
         Sure.NotNull (propertyName);
 
-        // TODO хранение имени свойства в AtomNode -- костыль!
-        _obj = obj;
+        _target = target;
         _propertyName = propertyName;
     }
 
@@ -51,8 +50,8 @@ public sealed class PropertyNode
 
     #region Private members
 
-    private readonly AtomNode _obj;
-    private readonly AtomNode _propertyName;
+    private readonly AtomNode _target;
+    private readonly string _propertyName;
 
     #endregion
 
@@ -64,36 +63,26 @@ public sealed class PropertyNode
             Context context
         )
     {
-        var obj = _obj.Compute (context);
+        var obj = _target.Compute (context);
         if (obj is null)
         {
             return null;
         }
 
-        string? propertyName;
-        if (_propertyName is VariableNode variableNode)
-        {
-            propertyName = variableNode.Name;
-        }
-        else
-        {
-            propertyName = _propertyName.Compute (context);
-        }
-
-        if (string.IsNullOrEmpty (propertyName))
+        if (string.IsNullOrEmpty (_propertyName))
         {
             return null;
         }
 
         if (obj is Type type)
         {
-            var propertyInfo = type.GetProperty (propertyName);
+            var propertyInfo = type.GetProperty (_propertyName);
             if (propertyInfo is not null)
             {
                 return propertyInfo.GetValue (null);
             }
 
-            var fieldInfo = type.GetField (propertyName);
+            var fieldInfo = type.GetField (_propertyName);
             if (fieldInfo is not null)
             {
                 return fieldInfo.GetValue (null);
@@ -107,7 +96,7 @@ public sealed class PropertyNode
             #pragma warning disable CS8619
             ((IDictionary<string, object>) expando).TryGetValue
                 (
-                    propertyName,
+                    _propertyName,
                     out var expandoResult
                 );
             #pragma warning restore CS8619
@@ -116,13 +105,13 @@ public sealed class PropertyNode
         }
 
         type = ((object) obj).GetType();
-        var property = type.GetProperty (propertyName);
+        var property = type.GetProperty (_propertyName);
         if (property is not null)
         {
             return property.GetValue (obj);
         }
 
-        var field = type.GetField (propertyName);
+        var field = type.GetField (_propertyName);
         if (field is not null)
         {
             return field.GetValue (obj);
@@ -139,30 +128,20 @@ public sealed class PropertyNode
             dynamic? value
         )
     {
-        var obj = _obj.Compute (context);
+        var obj = _target.Compute (context);
         if (obj is null)
         {
             return null;
         }
 
-        string? propertyName;
-        if (_propertyName is VariableNode variableNode)
-        {
-            propertyName = variableNode.Name;
-        }
-        else
-        {
-            propertyName = _propertyName.Compute (context);
-        }
-
-        if (string.IsNullOrEmpty (propertyName))
+        if (string.IsNullOrEmpty (_propertyName))
         {
             return null;
         }
 
         if (obj is Type type)
         {
-            var propertyInfo = type.GetProperty (propertyName);
+            var propertyInfo = type.GetProperty (_propertyName);
             if (propertyInfo is not null)
             {
                 propertyInfo.SetValue (null, value);
@@ -170,7 +149,7 @@ public sealed class PropertyNode
                 return value;
             }
 
-            var fieldInfo = type.GetField (propertyName);
+            var fieldInfo = type.GetField (_propertyName);
             if (fieldInfo is not null)
             {
                 fieldInfo.SetValue (null, value);
@@ -184,14 +163,14 @@ public sealed class PropertyNode
         if (obj is ExpandoObject expando)
         {
             #pragma warning disable CS8619
-            ((IDictionary<string, object>) expando)[propertyName] = value!;
+            ((IDictionary<string, object>) expando)[_propertyName] = value!;
             #pragma warning restore CS8619
 
             return value;
         }
 
         type = ((object) obj).GetType();
-        var property = type.GetProperty (propertyName);
+        var property = type.GetProperty (_propertyName);
         if (property is not null)
         {
             property.SetValue (obj, value);
@@ -199,7 +178,7 @@ public sealed class PropertyNode
             return value;
         }
 
-        var field = type.GetField (propertyName);
+        var field = type.GetField (_propertyName);
         if (field is not null)
         {
             field.SetValue (obj, value);
