@@ -14,7 +14,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
+
+using AM.Text;
 
 #endregion
 
@@ -63,14 +66,13 @@ public sealed class Tokenizer
 
     #region Private members
 
-    // пространство имен нужно, чтобы не делать using
-    // а если сделать using, то пересекутся имена классов
-    // вроде Token
-    private Text.TextNavigator _navigator = null!;
+    private TextNavigator _navigator = null!;
 
     private bool IsEof => _navigator.IsEOF;
 
     private char PeekChar() => _navigator.PeekChar();
+
+    private char PeekChar (int delta) => _navigator.LookAhead (delta);
 
     private char ReadChar() => _navigator.ReadChar();
 
@@ -79,7 +81,7 @@ public sealed class Tokenizer
     /// <summary>
     /// Проверка, не является ли указанный текст зарезервированным словом.
     /// </summary>
-    public bool IsReservedWord
+    private bool IsReservedWord
         (
             string text
         )
@@ -149,12 +151,60 @@ public sealed class Tokenizer
 
         ReadChar(); // съедаем открывающий апостроф
         var result = ReadChar();
-        if (ReadChar() != '\'')
+        var chr = ReadChar();
+        if (chr == '\\')
+        {
+            // TODO реализовать
+        }
+
+        if (chr != '\'')
         {
             throw new SyntaxException (_navigator);
         }
 
         return new Token (TokenKind.Char, result.ToString(), line, column);
+    }
+
+    /// <summary>
+    /// Разбор сырой строки формата """Строка""".
+    /// </summary>
+    /// <returns><c>null</c>, если в текущей позиции не сырая строка.</returns>
+    private Token? ParseRawString()
+    {
+        var line = _navigator.Line;
+        var column = _navigator.Column;
+
+        if (PeekChar() != '"' || PeekChar (1) != '"' || PeekChar (2) != '"')
+        {
+            return null;
+        }
+
+        ReadChar(); // съедаем открывающие кавычки
+        ReadChar();
+        ReadChar();
+
+        var success = false;
+        var builder = new StringBuilder();
+        while (!IsEof)
+        {
+            var chr = ReadChar();
+            if (chr == '"' && PeekChar() == '"' && PeekChar (1) == '"')
+            {
+                ReadChar();
+                ReadChar();
+                success = true;
+                break;
+            }
+
+            builder.Append (chr);
+        }
+
+        if (!success)
+        {
+            throw new SyntaxException (_navigator);
+        }
+
+        return new Token (TokenKind.String, builder.ToString(), line, column);
     }
 
     /// <summary>
@@ -176,6 +226,13 @@ public sealed class Tokenizer
         while (!IsEof)
         {
             chr = ReadChar();
+            if (chr == '\\')
+            {
+                builder.Append (chr);
+                builder.Append (ReadChar());
+                continue;
+            }
+
             if (chr == '"')
             {
                 break;
@@ -189,7 +246,10 @@ public sealed class Tokenizer
             throw new SyntaxException (_navigator);
         }
 
-        return new Token (TokenKind.String, builder.ToString(), line, column);
+        var text = builder.ToString();
+        text = UnescapeText (text);
+
+        return new Token (TokenKind.String, text, line, column);
     }
 
     /// <summary>
@@ -449,7 +509,7 @@ public sealed class Tokenizer
         while (true)
         {
             var chr = _navigator.LookAhead (builder.Length);
-            if (chr == Text.TextNavigator.EOF)
+            if (chr == TextNavigator.EOF)
             {
                 return MakeToken (previousGood);
             }
@@ -601,6 +661,66 @@ public sealed class Tokenizer
         return result;
     }
 
+    /// <summary>
+    /// Преобразует строку, содержащую escape-последовательности,
+    /// к нормальному виду.
+    /// </summary>
+    public static string UnescapeText
+        (
+            string text
+        )
+    {
+        if (string.IsNullOrEmpty (text))
+        {
+            return text;
+        }
+
+        var navigator = new TextNavigator (text);
+        var builder = StringBuilderPool.Shared.Get();
+        builder.EnsureCapacity (text.Length);
+
+        while (!navigator.IsEOF)
+        {
+            var c = navigator.ReadChar();
+            if (c == '\\')
+            {
+                var c2 = navigator.ReadChar();
+                c2 = c2 switch
+                {
+                    'a' => '\a',
+                    'b' => '\b',
+                    'f' => '\f',
+                    'n' => '\n',
+                    'r' => '\r',
+                    't' => '\t',
+                    'u' => ParseUnicode(),
+                    'v' => '\v',
+                    '\'' => '\'',
+                    '"' => '"',
+                    '\\' => '\\',
+                    '0' => '\0',
+                    _ => '?'
+                };
+                builder.Append (c2);
+            }
+            else
+            {
+                builder.Append (c);
+            }
+        }
+
+        return builder.ReturnShared();
+
+        char ParseUnicode()
+        {
+            return (char) int.Parse
+                (
+                    navigator.ReadString (4).Span,
+                    NumberStyles.HexNumber
+                );
+        }
+    }
+
     #endregion
 
     #region Public methods
@@ -616,7 +736,7 @@ public sealed class Tokenizer
         Sure.NotNull (text);
 
         var result = new List<Token>();
-        _navigator = new Text.TextNavigator (text);
+        _navigator = new TextNavigator (text);
 
         while (!IsEof)
         {
@@ -631,11 +751,12 @@ public sealed class Tokenizer
             }
 
             var token = ParseCharacter()
-                        ?? ParseString()
-                        ?? ParseNumber()
-                        ?? ParseTerm()
-                        ?? ParseIdentifier()
-                        ?? throw new SyntaxException (_navigator);
+                ?? ParseRawString()
+                ?? ParseString()
+                ?? ParseNumber()
+                ?? ParseTerm()
+                ?? ParseIdentifier()
+                ?? throw new SyntaxException (_navigator);
 
             result.Add (token);
         }

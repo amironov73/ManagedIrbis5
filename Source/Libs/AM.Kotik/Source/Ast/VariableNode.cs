@@ -22,6 +22,7 @@ namespace AM.Kotik;
 
 /// <summary>
 /// Ссылка на переменную.
+/// На самом деле может оказаться также ссылкой на тип или функцию.
 /// </summary>
 public sealed class VariableNode
     : AtomNode
@@ -65,17 +66,17 @@ public sealed class VariableNode
             return value;
         }
 
-        // var type = context.FindType (Name);
-        // if (type is not null)
-        // {
-        //     return type;
-        // }
-        //
-        // if (context.FindFunction (Name, out var descriptor))
-        // {
-        //     // это может быть именем функции
-        //     return descriptor;
-        // }
+        var type = context.FindType (Name);
+        if (type is not null)
+        {
+            return type;
+        }
+
+        if (context.FindFunction (Name, out var descriptor))
+        {
+            // это может быть именем функции
+            return descriptor;
+        }
 
         context.Error.WriteLine ($"Variable or type '{Name}' not defined");
 
@@ -123,16 +124,6 @@ public sealed class VariableNode
 
     #endregion
 
-    #region Object members
-
-    /// <inheritdoc cref="object.ToString"/>
-    public override string ToString()
-    {
-        return $"VariableNode '{Name}'";
-    }
-
-    #endregion
-
     #region AstNode members
 
     /// <inheritdoc cref="AstNode.DumpHierarchyItem(string?,int,System.IO.TextWriter,string?)"/>
@@ -144,6 +135,16 @@ public sealed class VariableNode
         )
     {
         base.DumpHierarchyItem (name, level, writer, ToString());
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString()
+    {
+        return $"VariableNode '{Name}'";
     }
 
     #endregion

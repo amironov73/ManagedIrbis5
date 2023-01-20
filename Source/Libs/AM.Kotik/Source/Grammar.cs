@@ -313,48 +313,47 @@ public static class Grammar
     /// <summary>
     /// Вызов свободной функции, например, `println`.
     /// </summary>
-    private static readonly Parser<AtomNode> FunctionCall =
-        Parser.Chain
-                (
-                    Identifier,
-                    Parser.Lazy (() => Expression!)
-                        .SeparatedBy (Term (","))
-                        .RoundBrackets(),
-                    (name, args) =>
-                        (AtomNode)new CallNode (name, args.ToArray())
-                )
-            .Labeled ("FunctionCall");
+    private static readonly Parser<AtomNode> FunctionCall = Parser.Chain
+        (
+            Identifier,
+            Parser.Lazy (() => Expression!)
+                .SeparatedBy (Term (","))
+                .RoundBrackets(),
+            (name, args) =>
+                (AtomNode)new CallNode (name, args.ToArray())
+        )
+        .Labeled ("FunctionCall");
 
     /// <summary>
     /// Простой стейтмент.
     /// </summary>
     private static readonly Parser<StatementBase> SimpleStatement = Parser.OneOf
-            (
-                BuildStatement (Assignment),
-                BuildStatement (Expression)
-            )
+        (
+            BuildStatement (Assignment),
+            BuildStatement (Expression)
+        )
         .Labeled ("SimpleStatement");
 
     /// <summary>
     /// Блок стейтментов.
     /// </summary>
     private static readonly Parser<StatementBase> Block = Parser.Lazy
-            (
-                () => Parser.OneOf
-                    (
-                        Parser.Chain
-                            (
-                                Parser.Position,
-                                GenericStatement!.Repeated (minCount: 1).CurlyBrackets(),
-                                (pos, lines) =>
-                                    (StatementBase)new Block (pos.Line, lines.ToArray())
-                            ),
-                        SimpleStatement.Map
-                            (
-                                x => (StatementBase)new Block (x.Line, new[] { x })
-                            )
-                    )
-            )
+        (
+            () => Parser.OneOf
+                (
+                    Parser.Chain
+                        (
+                            Parser.Position,
+                            GenericStatement!.Repeated (minCount: 1).CurlyBrackets(),
+                            (pos, lines) =>
+                                (StatementBase)new Block (pos.Line, lines.ToArray())
+                        ),
+                    SimpleStatement.Map
+                        (
+                            x => (StatementBase)new Block (x.Line, new[] { x })
+                        )
+                )
+        )
         .Labeled ("Block");
 
     /// <summary>
@@ -387,12 +386,13 @@ public static class Grammar
             Parser.Reserved ("foreach"), // 2
             Parser.Term ("("), // 3
             Identifier, // 4
-            Parser.Reserved ("in"), // 5
+            Parser.Term ("in"), // 5
             Expression.Labeled ("Enumerable"), // 6
             Parser.Term (")"), // 7
             Block.Instance ("Body"), // 8
-            (_1, _, _, _4, _, _6, _, _8) =>
-                (StatementBase) new ForEachNode (_1.Line, _4, _6, _8)
+            Block.Before (Parser.Reserved ("else")).Optional(), // 9
+            (_1, _, _, _4, _, _6, _, _8, _9) =>
+                (StatementBase) new ForEachNode (_1.Line, _4, _6, _8, _9)
         )
         .Labeled ("ForEach");
 
@@ -431,17 +431,30 @@ public static class Grammar
         .Labeled ("Semicolon");
 
     /// <summary>
+    /// Возврат значения из функции.
+    /// </summary>
+    private static readonly Parser<StatementBase> ReturnStatement = Parser.Chain
+        (
+            Parser.Position, // position
+            Reserved ("return"),
+            Expression.Instance ("ReturnValue").Optional(), // value
+            (position, _, value) => (StatementBase) new ReturnNode (position.Line, value)
+        )
+        .Labeled ("Return");
+
+    /// <summary>
     /// Цикл while.
     /// </summary>
     private static readonly Parser<StatementBase> WhileStatement = Parser.Chain
-            (
-                Parser.Position, // 1
-                Parser.Reserved ("while"), // 2
-                Expression.Instance ("Condition").RoundBrackets(), // 3
-                Block.Instance ("Body"), // 4
-                (_1, _, _3, _4) =>
-                    (StatementBase)new WhileNode (_1.Line, _3, (Block)_4)
-            )
+        (
+            Parser.Position, // 1
+            Parser.Reserved ("while"), // 2
+            Expression.Instance ("Condition").RoundBrackets(), // 3
+            Block.Instance ("Body"), // 4
+            Block.Before (Parser.Reserved ("else")).Optional(), // 5
+            (_1, _, _3, _4, _5) =>
+                (StatementBase) new WhileNode (_1.Line, _3, _4, _5)
+        )
         .Labeled ("While");
 
     /// <summary>
@@ -495,23 +508,24 @@ public static class Grammar
     /// Стейтмент вообще.
     /// </summary>
     private static readonly Parser<StatementBase> GenericStatement = Parser.Lazy
-            (
-                () =>
-                    Parser.OneOf
-                            (
-                                SimpleStatement,
-                                ForStatement,
-                                ForEachStatement,
-                                WhileStatement,
-                                IfStatement,
-                                UsingStatement,
-                                FunctionDefinition,
-                                BreakStatement,
-                                ContinueStatement,
-                                SemicolonStatement
-                            )
-                        .Labeled ("StatementKind")
-            )
+        (
+            () =>
+                Parser.OneOf
+                        (
+                            SimpleStatement,
+                            ForStatement,
+                            ForEachStatement,
+                            WhileStatement,
+                            IfStatement,
+                            UsingStatement,
+                            FunctionDefinition,
+                            BreakStatement,
+                            ContinueStatement,
+                            ReturnStatement,
+                            SemicolonStatement
+                        )
+                    .Labeled ("StatementKind")
+        )
         .Labeled ("GenericStatement");
 
     /// <summary>

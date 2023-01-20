@@ -36,7 +36,8 @@ sealed class ForEachNode
             int line,
             string variableName,
             AtomNode enumerable,
-            StatementBase body
+            StatementBase body,
+            StatementBase? elseBody
         )
         : base (line)
     {
@@ -46,6 +47,7 @@ sealed class ForEachNode
         _variableName = variableName;
         _enumerable = enumerable;
         _body = body;
+        _elseBody = elseBody;
     }
 
     #endregion
@@ -55,6 +57,7 @@ sealed class ForEachNode
     private readonly string _variableName;
     private readonly AtomNode _enumerable;
     private readonly StatementBase _body;
+    private readonly StatementBase? _elseBody;
 
     #endregion
 
@@ -76,8 +79,10 @@ sealed class ForEachNode
 
         try
         {
+            var success = false;
             foreach (var value in enumerable)
             {
+                success = true;
                 context.Variables[_variableName] = value;
                 try
                 {
@@ -87,6 +92,11 @@ sealed class ForEachNode
                 {
                     Debug.WriteLine ("foreach-continue");
                 }
+            }
+
+            if (!success && _elseBody is not null)
+            {
+                _elseBody.Execute (context);
             }
         }
         catch (BreakException)

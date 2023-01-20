@@ -103,7 +103,7 @@ public sealed class StdLib
         { "type", new FunctionDescriptor ("type", Type_) },
         { "unprotect", new FunctionDescriptor ("unprotect", Unrotect) },
         // { "unsubscribe", new FunctionDescriptor ("unsubscribe", Unsubscribe) },
-        // { "use", new FunctionDescriptor ("use", Use) },
+        { "use", new FunctionDescriptor ("use", Use) },
     };
 
     #endregion
@@ -1294,42 +1294,42 @@ public sealed class StdLib
     //     return null;
     // }
 
-    // /// <summary>
-    // /// Подключение/отключение пространств имен.
-    // /// </summary>
-    // public static dynamic Use
-    //     (
-    //         Context context,
-    //         dynamic?[] args
-    //     )
-    // {
-    //     var topContext = context.GetTopContext();
-    //     for (var i = 0; i < args.Length; i++)
-    //     {
-    //         var name = Compute (context, args, i) as string;
-    //         if (!string.IsNullOrWhiteSpace (name))
-    //         {
-    //             name = name.Trim();
-    //             if (!string.IsNullOrEmpty (name))
-    //             {
-    //                 if (name.StartsWith ('-'))
-    //                 {
-    //                     name = name.Substring (1);
-    //                     if (!string.IsNullOrEmpty (name))
-    //                     {
-    //                         topContext.Namespaces.Remove (name);
-    //                     }
-    //                 }
-    //                 else
-    //                 {
-    //                     topContext.Namespaces[name] = null;
-    //                 }
-    //             }
-    //         }
-    //     }
-    //
-    //     return context.Namespaces.Keys;
-    // }
+    /// <summary>
+    /// Подключение/отключение пространств имен.
+    /// </summary>
+    public static dynamic Use
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var topContext = context.GetTopContext();
+        for (var i = 0; i < args.Length; i++)
+        {
+            var name = Compute (context, args, i) as string;
+            if (!string.IsNullOrWhiteSpace (name))
+            {
+                name = name.Trim();
+                if (!string.IsNullOrEmpty (name))
+                {
+                    if (name.StartsWith ('-'))
+                    {
+                        name = name.Substring (1);
+                        if (!string.IsNullOrEmpty (name))
+                        {
+                            topContext.Namespaces.Remove (name);
+                        }
+                    }
+                    else
+                    {
+                        topContext.Namespaces[name] = null;
+                    }
+                }
+            }
+        }
+
+        return context.Namespaces.Keys;
+    }
 
     #endregion
 

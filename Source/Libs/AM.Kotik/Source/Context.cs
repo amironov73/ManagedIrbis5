@@ -400,11 +400,11 @@ public sealed class Context
             typeArguments = list.ToArray();
         }
 
-        // if (typeArguments is not null && !name.Contains ('`'))
-        // {
-        //     // TODO разбирать на имя типа и сборку
-        //     name += $"`{typeArguments.Length}";
-        // }
+        if (typeArguments is not null && !name.Contains ('`'))
+        {
+            // TODO разбирать на имя типа и сборку
+            name += $"`{typeArguments.Length}";
+        }
 
         var result = Type.GetType (name, false);
         if (result is not null)
@@ -412,53 +412,53 @@ public sealed class Context
             return ConstructType (result, typeArguments);
         }
 
-        // var topContext = GetTopContext();
-        // var interpreter = topContext.Interpreter.ThrowIfNull();
-        // if (!name.Contains ('.'))
-        // {
-        //     // это не полное имя, так что попробуем приписать к нему
-        //     // различные пространства имен
-        //     foreach (var ns in topContext.Namespaces.Keys)
-        //     {
-        //         var fullName = ns + "." + name;
-        //         result = Type.GetType (fullName, false);
-        //         if (result is not null)
-        //         {
-        //             return ConstructType (result, typeArguments);
-        //         }
-        //     }
-        // }
+        var topContext = GetTopContext();
+        var interpreter = topContext.Interpreter.ThrowIfNull();
+        if (!name.Contains ('.'))
+        {
+            // это не полное имя, так что попробуем приписать к нему
+            // различные пространства имен
+            foreach (var ns in topContext.Namespaces.Keys)
+            {
+                var fullName = ns + "." + name;
+                result = Type.GetType (fullName, false);
+                if (result is not null)
+                {
+                    return ConstructType (result, typeArguments);
+                }
+            }
+        }
 
-        // if (!name.Contains (','))
-        // {
-        //     // это не assembly-qualified name, так что попробуем
-        //     // приписать к нему загруженные нами сборки
-        //     foreach (var asm in interpreter.Assemblies.Values)
-        //     {
-        //         var asmName = asm.GetName().Name;
-        //         var fullName = name + ", " + asmName;
-        //         result = Type.GetType (fullName, false);
-        //         if (result is not null)
-        //         {
-        //             return ConstructType (result, typeArguments);
-        //         }
-        //
-        //         if (!name.Contains ('.'))
-        //         {
-        //             // это не полное имя, так что попробуем приписать к нему
-        //             // различные пространства имен
-        //             foreach (var ns in topContext.Namespaces.Keys)
-        //             {
-        //                 fullName = ns + "." + name + ", " + asmName;
-        //                 result = Type.GetType (fullName, false);
-        //                 if (result is not null)
-        //                 {
-        //                     return ConstructType (result, typeArguments);
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
+        if (!name.Contains (','))
+        {
+            // это не assembly-qualified name, так что попробуем
+            // приписать к нему загруженные нами сборки
+            foreach (var asm in interpreter.Assemblies.Values)
+            {
+                var asmName = asm.GetName().Name;
+                var fullName = name + ", " + asmName;
+                result = Type.GetType (fullName, false);
+                if (result is not null)
+                {
+                    return ConstructType (result, typeArguments);
+                }
+
+                if (!name.Contains ('.'))
+                {
+                    // это не полное имя, так что попробуем приписать к нему
+                    // различные пространства имен
+                    foreach (var ns in topContext.Namespaces.Keys)
+                    {
+                        fullName = ns + "." + name + ", " + asmName;
+                        result = Type.GetType (fullName, false);
+                        if (result is not null)
+                        {
+                            return ConstructType (result, typeArguments);
+                        }
+                    }
+                }
+            }
+        }
 
         return null;
     }

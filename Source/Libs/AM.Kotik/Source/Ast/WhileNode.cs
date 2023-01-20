@@ -34,16 +34,19 @@ public sealed class WhileNode
     /// <param name="line">Номер строки в исходном тексте.</param>
     /// <param name="condition">Условие.</param>
     /// <param name="body">Тело цикла.</param>
+    /// <param name="elseBody">Выполняется, если тело цикла не сработало ни разу.</param>
     public WhileNode
         (
             int line,
             AtomNode condition,
-            Block body
+            StatementBase body,
+            StatementBase? elseBody
         )
         : base (line)
     {
         _condition = condition;
         _body = body;
+        _elseBody = elseBody;
     }
 
     #endregion
@@ -51,7 +54,8 @@ public sealed class WhileNode
     #region Private members
 
     private readonly AtomNode _condition;
-    private readonly Block _body;
+    private readonly StatementBase _body;
+    private readonly StatementBase? _elseBody;
 
     #endregion
 
@@ -67,8 +71,10 @@ public sealed class WhileNode
 
         try
         {
+            var success = false;
             while (KotikUtility.ToBoolean (_condition.Compute (context)))
             {
+                success = true;
                 try
                 {
                     _body.Execute (context);
@@ -77,6 +83,11 @@ public sealed class WhileNode
                 {
                     Debug.WriteLine ("while-continue");
                 }
+            }
+
+            if (!success && _elseBody is not null)
+            {
+                _elseBody.Execute (context);
             }
         }
         catch (BreakException)
