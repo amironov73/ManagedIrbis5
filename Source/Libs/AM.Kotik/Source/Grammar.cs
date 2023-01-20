@@ -95,7 +95,7 @@ public static class Grammar
     /// </summary>
     private static readonly Parser<AtomNode> LeftExpression = ExpressionBuilder.Build
         (
-            Atom,
+            Parser.Lazy (() => Atom),
             // префиксные операции не предусмотрены
             Array.Empty<Parser<Func<AtomNode, AtomNode>>>(),
             new[]
@@ -105,7 +105,7 @@ public static class Grammar
                 Parser.Lazy (() => Property!)
             },
             // бинарные операции не предусмотрены
-            Array.Empty<Parser<Func<AtomNode, string, AtomNode, AtomNode>>>()
+            Array.Empty<InfixOperator<AtomNode>>()
         );
 
     /// <summary>
@@ -141,7 +141,7 @@ public static class Grammar
 
                     Parser.Lazy (() => Index!),
 
-                    Parser.Lazy (() => MethodCall).Labeled ("MethodCall"),
+                    Parser.Lazy (() => MethodCall!).Labeled ("MethodCall"),
 
                     Parser.Lazy (() => Property!).Labeled ("Property"),
                 },
@@ -367,7 +367,7 @@ public static class Grammar
                 Parser.Reserved ("while"), // 2
                 Expression.Instance ("Condition").RoundBrackets(), // 3
                 Block.Instance ("Body"), // 4
-                (_1, _2, _3, _4) =>
+                (_1, _, _3, _4) =>
                     (StatementBase)new WhileNode (_1.Line, _3, (Block)_4)
             )
         .Labeled ("While");
@@ -402,7 +402,7 @@ public static class Grammar
                 Expression.Instance ("Init"), // 6
                 Parser.Term (")"), // 7
                 Block.Instance ("Body"), // 8
-                (_1, _, _3, _4, _, _6, _, _8) =>
+                (_1, _, _, _4, _, _6, _, _8) =>
                     (StatementBase)new UsingNode (_1.Line, _4, _6, (Block)_8)
             )
         .Labeled ("Using");

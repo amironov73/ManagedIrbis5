@@ -6,17 +6,17 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
 
-/* BinaryOperatorType.cs -- тип бинарного оператора
+/* InfixOperatorKind.cs -- вид инфиксного оператора
  * Ars Magna project, http://arsmagna.ru
  */
 
 namespace AM.Kotik;
 
 /// <summary>
-/// Ассоциативность бинарного оператора: левоассоциативный, правоассоциативный
-/// или неассоциативный.
+/// Ассоциативность инфиксного (бинарного) оператора: 
+/// левоассоциативный, правоассоциативный/ или неассоциативный.
 /// </summary>
-public enum BinaryOperatorType
+public enum InfixOperatorKind
 {
     /// <summary>
     /// Неассоциативный оператор.

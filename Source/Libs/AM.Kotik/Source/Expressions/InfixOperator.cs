@@ -13,7 +13,6 @@
 #region Using directives
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 
 #endregion
 
@@ -22,12 +21,35 @@ using System.Diagnostics.CodeAnalysis;
 namespace AM.Kotik;
 
 /// <summary>
-///
+/// 
 /// </summary>
 public sealed class InfixOperator<TResult>
-    : Parser<TResult>
     where TResult: class
 {
+    #region Properties
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public Parser<string> Operation { get; }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    public Func<TResult, string, TResult, TResult> Function { get; }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    public InfixOperatorKind Kind { get; }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    public string Label { get; }
+
+    #endregion
+
     #region Construction
 
     /// <summary>
@@ -35,100 +57,20 @@ public sealed class InfixOperator<TResult>
     /// </summary>
     public InfixOperator
         (
-            Parser<TResult> item,
-            Parser<string> operations,
-            [MaybeNullWhen (false)] Func<TResult, string, TResult, TResult> function,
-            BinaryOperatorType operatorType
+            Parser<string> operation, 
+            Func<TResult, string, TResult, TResult> function,
+            string label,
+            InfixOperatorKind kind = InfixOperatorKind.LeftAssociative
         )
     {
-        _itemParser = item;
-        _operationParser = operations;
-        _function = function;
-        _operatorType = operatorType;
-    }
-
-    #endregion
-
-    #region Private members
-
-    private readonly Parser<TResult> _itemParser;
-    private readonly Parser<string> _operationParser;
-    private readonly Func<TResult, string, TResult, TResult> _function;
-    private readonly BinaryOperatorType _operatorType;
-
-    #endregion
-
-    #region Parser<TResult> members
-
-    /// <inheritdoc cref="Parser{TResult}.TryParse"/>
-    public override bool TryParse
-        (
-            ParseState state,
-            [MaybeNullWhen (false)] out TResult result
-        )
-    {
-        result = default;
-        if (!state.HasCurrent)
-        {
-            return false;
-        }
-
-        var location = state.Location;
-        if (!_itemParser.TryParse (state, out var left))
-        {
-            state.Location = location;
-            return false;
-        }
-
-        if (!_operationParser.TryParse (state, out var code))
-        {
-            // если не удалось распарсить операцию,
-            // выдаем только левый операнд
-            result = left;
-            return true;
-        }
-
-        if (!_itemParser.TryParse (state, out var right))
-        {
-            state.Location = location;
-            return false;
-        }
-
-        // продвижение state выполняют встроенные парсеры
-        var temporary = _function (left, code, right);
-
-        if (_operatorType == BinaryOperatorType.NonAssociative)
-        {
-            result = temporary;
-            return true;
-        }
-
-        while (state.HasCurrent)
-        {
-            var location2 = state.Location;
-            if (!_operationParser.TryParse (state, out code))
-            {
-                state.Location = location2;
-                break;
-            }
-
-            if (!_itemParser.TryParse (state, out right))
-            {
-                state.Location = location;
-                return false;
-            }
-
-            temporary = _operatorType switch
-            {
-                BinaryOperatorType.LeftAssociative => _function (temporary, code, right),
-                BinaryOperatorType.RightAssociative => _function (right, code, temporary),
-                _ => throw new InvalidOperationException()
-            };
-        }
-
-        result = temporary;
-
-        return true;
+        Sure.NotNull (operation);
+        Sure.NotNull (function);
+        Sure.NotNullNorEmpty (label);
+        
+        Operation = operation;
+        Function = function;
+        Kind = kind;
+        Label = label;
     }
 
     #endregion

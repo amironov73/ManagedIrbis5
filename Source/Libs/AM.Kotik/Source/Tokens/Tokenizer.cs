@@ -27,41 +27,46 @@ namespace AM.Kotik;
 /// </summary>
 public sealed class Tokenizer
 {
+    #region Properties
+
+    /// <summary>
+    /// Настройки токенизации.
+    /// </summary>
+    public TokenizerSettings Settings { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public Tokenizer()
+    {
+        Settings = TokenizerSettings.CreateDefault();
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public Tokenizer
+        (
+            TokenizerSettings settings
+        )
+    {
+        Sure.NotNull (settings);
+        
+        Settings = settings;
+    }
+
+    #endregion
+    
     #region Private members
 
     // пространство имен нужно, чтобы не делать using
     // а если сделать using, то пересекутся имена классов
     // вроде Token
     private Text.TextNavigator _navigator = null!;
-
-    private static readonly char[] _firstIdentifierLetter =
-        (
-            "abcdefghijklmnopqrstuvwxyz"
-            + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            + "абвгдеёжзийклмнопрстуфхцчшщъыьэюя"
-            + "АБСГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
-            + "_$"
-        )
-        .ToCharArray();
-
-    private static readonly char[] _nextIdentifierLetter =
-        (
-            "abcdefghijklmnopqrstuvwxyz"
-            + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            + "0123456789"
-            + "абвгдеёжзийклмнопрстуфхцчшщъыьэюя"
-            + "АБСГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
-            + "_$"
-        )
-        .ToCharArray();
-
-    private static readonly string[] _knownTerms =
-    {
-        "!", ";", ":", ",", "(", ")", "+", "-", "*", "/", "[", "]",
-        "{", "}", "|", "%", "~", "=", "++", "--", "+=", "-=", "*=",
-        "/=", "==", "<", ">", "<<", ">>", "<=", ">=", "||", "&&",
-        ".", ","
-    };
 
     private bool IsEof => _navigator.IsEOF;
 
@@ -419,6 +424,7 @@ public sealed class Tokenizer
         var line = _navigator.Line;
         var column = _navigator.Column;
         var builder = new StringBuilder();
+        var knownTerms = Settings.KnownTerms;
         while (true)
         {
             var chr = _navigator.LookAhead (builder.Length);
@@ -430,7 +436,8 @@ public sealed class Tokenizer
             builder.Append (chr);
             var text = builder.ToString();
             var count = 0;
-            foreach (var known in _knownTerms)
+            
+            foreach (var known in knownTerms)
             {
                 if (known.StartsWith (text))
                 {
@@ -450,7 +457,7 @@ public sealed class Tokenizer
 
             if (count == 1)
             {
-                foreach (var known in _knownTerms)
+                foreach (var known in knownTerms)
                 {
                     if (known == text)
                     {
@@ -460,7 +467,7 @@ public sealed class Tokenizer
             }
 
             previousGood = null;
-            foreach (var known in _knownTerms)
+            foreach (var known in knownTerms)
             {
                 if (known == text)
                 {
@@ -499,7 +506,9 @@ public sealed class Tokenizer
     private Token? ParseIdentifier()
     {
         var firstChar = PeekChar();
-        if (Array.IndexOf (_firstIdentifierLetter, firstChar) < 0)
+        var firstIdentifierLetter = Settings.FirstIdentifierLetter;
+        var nextIdentifierLetter = Settings.NextIdentifierLetter;
+        if (Array.IndexOf (firstIdentifierLetter, firstChar) < 0)
         {
             return null;
         }
@@ -511,7 +520,7 @@ public sealed class Tokenizer
 
         while (!IsEof)
         {
-            if (Array.IndexOf (_nextIdentifierLetter, PeekChar()) < 0)
+            if (Array.IndexOf (nextIdentifierLetter, PeekChar()) < 0)
             {
                 break;
             }
@@ -582,7 +591,7 @@ public sealed class Tokenizer
         (
             string text
         )
-    {
+    { 
         Sure.NotNull (text);
 
         var result = new List<Token>();

@@ -49,13 +49,13 @@ public static class Operator
     }
 
     /// <summary>
-    /// Создание бинарного оператора.
+    /// Создание инфиксного (бинарного) оператора.
     /// </summary>
-    public static Parser<Func<AtomNode, TResult, AtomNode, AtomNode>> LeftAssociative<TResult>
+    public static InfixOperator<TResult> LeftAssociative<TResult>
         (
-            Parser<TResult> parser,
+            Parser<string> parser,
             string label,
-            Func<AtomNode, TResult, AtomNode, AtomNode> function
+            Func<TResult, string, TResult, TResult> function
         )
         where TResult: class
     {
@@ -63,19 +63,18 @@ public static class Operator
         Sure.NotNullNorEmpty (label);
         Sure.NotNull (function);
 
-        throw new NotImplementedException();
-
-        // return Parser.Lazy
-        //     (
-        //         () => parser.Map (function)
-        //     )
-        //     .Labeled (label);
+        return new InfixOperator<TResult>
+            (
+                parser,
+                function,
+                label
+            );
     }
 
     /// <summary>
     /// Создание бинарного оператора.
     /// </summary>
-    public static Parser<Func<AtomNode, string, AtomNode, AtomNode>> LeftAssociative
+    public static InfixOperator<AtomNode> LeftAssociative
         (
             string label,
             params string[] operations
@@ -84,7 +83,7 @@ public static class Operator
         Sure.NotNullNorEmpty (label);
         Sure.AssertState (!operations.IsNullOrEmpty());
 
-        return LeftAssociative
+        return LeftAssociative<AtomNode>
             (
                 new TermParser (operations),
                 label,

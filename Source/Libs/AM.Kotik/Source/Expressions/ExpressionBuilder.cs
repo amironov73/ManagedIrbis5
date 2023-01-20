@@ -29,32 +29,6 @@ public static class ExpressionBuilder
 {
     #region Public methods
 
-    // /// <summary>
-    // /// Построение
-    // /// </summary>
-    // public static Parser<object> Build
-    //     (
-    //         Parser<object> root,
-    //         string[][] levels,
-    //         Func<object, string, object, object> function
-    //     )
-    // {
-    //     Sure.AssertState (!levels.IsNullOrEmpty());
-    //     Sure.NotNull (function);
-    //
-    //     var expr = new DynamicParser<object> (() => null!);
-    //     var result = LeftAssociative (expr, levels[0], function);
-    //     for (var i = 1; i < levels.Length; i++)
-    //     {
-    //         result = LeftAssociative (result, levels[i], function);
-    //     }
-    //
-    //     var parenthesis = result.RoundBrackets();
-    //     expr.Inner = () => root.Or (parenthesis);
-    //
-    //     return result;
-    // }
-
     /// <summary>
     /// Построение
     /// </summary>
@@ -63,12 +37,12 @@ public static class ExpressionBuilder
             Parser<AtomNode> root,
             Parser<Func<AtomNode, AtomNode>>[] prefixOps,
             Parser<Func<AtomNode, AtomNode>>[] postfixOps,
-            Parser<Func<AtomNode, string, AtomNode, AtomNode>>[] binaryOps
+            InfixOperator<AtomNode>[] infixOps
         )
     {
         Sure.NotNull (prefixOps);
         Sure.NotNull (postfixOps);
-        Sure.NotNull (binaryOps);
+        Sure.NotNull (infixOps);
 
         var expr = new DynamicParser<AtomNode> (() => null!);
         var result = (Parser<AtomNode>) expr;
@@ -83,16 +57,9 @@ public static class ExpressionBuilder
             result = new UnaryParser<AtomNode> (isPrefix: false, result, postfixOps);
         }
 
-        foreach (var binaryOp in binaryOps)
+        foreach (var op in infixOps)
         {
-            // result = new InfixOperator
-            //     (
-            //         result,
-            //         binaryOp,
-            //         function,
-            //         BinaryOperatorType.LeftAssociative
-            //     )
-            //     LeftAssociative (result, binaryOp, function);
+            result = new InfixParser<AtomNode> (result, op.Operation, op.Function, op.Kind);
         }
 
         var parenthesis = result.RoundBrackets();
@@ -100,30 +67,6 @@ public static class ExpressionBuilder
 
         return result;
     }
-
-    // /// <summary>
-    // /// Формирует лево-ассоциативный оператор.
-    // /// </summary>
-    // private static Parser<TResult> LeftAssociative<TResult>
-    //     (
-    //         Parser<TResult> item,
-    //         string[] operations,
-    //         Func<TResult, string, TResult, TResult> function
-    //     )
-    //     where TResult: class
-    // {
-    //     Sure.NotNull (item);
-    //     Sure.NotNull (operations);
-    //     Sure.NotNull (function);
-    //
-    //     return new InfixOperator<TResult>
-    //         (
-    //             item,
-    //             operations,
-    //             function,
-    //             BinaryOperatorType.LeftAssociative
-    //         );
-    // }
 
     #endregion
 }
