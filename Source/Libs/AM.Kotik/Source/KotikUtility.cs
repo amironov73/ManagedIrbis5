@@ -17,6 +17,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Dynamic;
 using System.Globalization;
 using System.IO;
@@ -137,6 +138,12 @@ public static class KotikUtility
                     continue;
                 }
 
+                if (fileName == "-p")
+                {
+                    interpreter.ParsingDebugOutput = Console.Out;
+                    continue;
+                }
+
                 if (fileName == "-e")
                 {
                     var sourceCode = string.Join (' ', args.Skip (index + 1));
@@ -165,6 +172,11 @@ public static class KotikUtility
         }
         catch (Exception exception)
         {
+            if (Debugger.IsAttached)
+            {
+                throw;
+            }
+
             exceptionHandler?.Invoke (interpreter, exception);
             return 1;
         }

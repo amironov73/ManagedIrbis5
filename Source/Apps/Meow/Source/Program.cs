@@ -63,7 +63,7 @@ internal static class Program
                 },
                 (_, exception) =>
                 {
-                    Console.WriteLine (exception);
+                    Console.Error.WriteLine (exception);
                 },
                 interpreter =>
                 {

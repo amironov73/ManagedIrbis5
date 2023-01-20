@@ -508,6 +508,80 @@ public static class Parser
     }
 
     /// <summary>
+    /// Цепочка из одиннадцати парсеров.
+    /// </summary>
+    public static Parser<TResult> Chain<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, TResult>
+        (
+            Parser<T1> first,
+            Parser<T2> second,
+            Parser<T3> third,
+            Parser<T4> fourth,
+            Parser<T5> fifth,
+            Parser<T6> sixth,
+            Parser<T7> seventh,
+            Parser<T8> eight,
+            Parser<T9> nineth,
+            Parser<T10> tenth,
+            Parser<T11> eleventh,
+            Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, TResult> function
+        )
+        where T1: class
+        where T2: class
+        where T3: class
+        where T4: class
+        where T5: class
+        where T6: class
+        where T7: class
+        where T8: class
+        where T9: class
+        where T10: class
+        where T11: class
+        where TResult: class
+    {
+        return new ChainParser<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, TResult>
+            (first, second, third, fourth, fifth, sixth, seventh, eight, nineth,
+                tenth, eleventh, function);
+    }
+
+    /// <summary>
+    /// Цепочка из двенадцати парсеров.
+    /// </summary>
+    public static Parser<TResult> Chain<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, TResult>
+        (
+            Parser<T1> first,
+            Parser<T2> second,
+            Parser<T3> third,
+            Parser<T4> fourth,
+            Parser<T5> fifth,
+            Parser<T6> sixth,
+            Parser<T7> seventh,
+            Parser<T8> eight,
+            Parser<T9> nineth,
+            Parser<T10> tenth,
+            Parser<T11> eleventh,
+            Parser<T12> twelveth,
+            Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, TResult> function
+        )
+        where T1: class
+        where T2: class
+        where T3: class
+        where T4: class
+        where T5: class
+        where T6: class
+        where T7: class
+        where T8: class
+        where T9: class
+        where T10: class
+        where T11: class
+        where T12: class
+        where TResult: class
+    {
+        return new ChainParser<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, TResult>
+            (first, second, third, fourth, fifth, sixth, seventh, eight, nineth,
+                tenth, eleventh, twelveth, function);
+    }
+
+    /// <summary>
     /// Выражение в угловых скобках.
     /// </summary>
     public static Parser<TResult> CornerBrackets<TResult>

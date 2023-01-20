@@ -163,6 +163,8 @@ public static class Grammar
             new[]
             {
                 // бинарные операции
+                Operator.NonAssociative ("Shuttle", "<=>"),
+                Operator.NonAssociative ("in", "in", "is"),
                 Operator.LeftAssociative ("Shift", "<<", ">>"),
                 Operator.LeftAssociative ("Bitwise", "&", "|", "^"),
                 Operator.LeftAssociative ("Multiplication", "*", "/", "%" ),
@@ -370,10 +372,63 @@ public static class Grammar
                 Assignment.Or (Expression).Labeled ("Step"), // 8
                 Parser.Term (")"), // 9
                 Block.Instance ("Body"), // 10
-                (_1, _, _, _4, _, _6, _, _8, _, _10) =>
-                    (StatementBase)new ForNode (_1.Line, _4, _6, _8, (Block)_10)
+                Block.Before (Parser.Reserved ("else")).Optional(), // 11
+                (_1, _, _, _4, _, _6, _, _8, _, _10, _11) =>
+                    (StatementBase) new ForNode (_1.Line, _4, _6, _8, _10, _11)
             )
         .Labeled ("For");
+
+    /// <summary>
+    /// Цикл foreach.
+    /// </summary>
+    private static readonly Parser<StatementBase> ForEachStatement = Parser.Chain
+        (
+            Parser.Position, // 1
+            Parser.Reserved ("foreach"), // 2
+            Parser.Term ("("), // 3
+            Identifier, // 4
+            Parser.Reserved ("in"), // 5
+            Expression.Labeled ("Enumerable"), // 6
+            Parser.Term (")"), // 7
+            Block.Instance ("Body"), // 8
+            (_1, _, _, _4, _, _6, _, _8) =>
+                (StatementBase) new ForEachNode (_1.Line, _4, _6, _8)
+        )
+        .Labeled ("ForEach");
+
+    /// <summary>
+    /// Оператор break.
+    /// </summary>
+    private static readonly Parser<StatementBase> BreakStatement = Parser.Chain
+        (
+            Parser.Position, // position
+            Reserved ("break"),
+            (position, _) => (StatementBase) new BreakNode (position.Line)
+        )
+        .Labeled ("Break");
+
+    /// <summary>
+    /// Оператор continue.
+    /// </summary>
+    private static readonly Parser<StatementBase> ContinueStatement = Parser.Chain
+        (
+            Parser.Position, // position
+            Reserved ("continue"),
+            (position, _) => (StatementBase) new ContinueNode (position.Line)
+        )
+        .Labeled ("Break");
+
+    /// <summary>
+    /// Точка с запятой. Не выполняет никаких действий,
+    /// введена только для совместимости.
+    /// </summary>
+    private static readonly Parser<StatementBase> SemicolonStatement = Parser.Chain
+        (
+            Parser.Position, // position
+            Term (";"),
+            (position, _) => (StatementBase) new SemicolonNode (position.Line)
+        )
+        .Labeled ("Semicolon");
 
     /// <summary>
     /// Цикл while.
@@ -446,10 +501,14 @@ public static class Grammar
                             (
                                 SimpleStatement,
                                 ForStatement,
+                                ForEachStatement,
                                 WhileStatement,
                                 IfStatement,
                                 UsingStatement,
-                                FunctionDefinition
+                                FunctionDefinition,
+                                BreakStatement,
+                                ContinueStatement,
+                                SemicolonStatement
                             )
                         .Labeled ("StatementKind")
             )

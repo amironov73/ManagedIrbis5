@@ -14,6 +14,7 @@
 
 #region Using directives
 
+using System.Diagnostics;
 using System.IO;
 
 #endregion
@@ -39,7 +40,8 @@ public sealed class ForNode
             ExpressionNode init,
             ExpressionNode condition,
             ExpressionNode step,
-            Block body
+            StatementBase body,
+            StatementBase? elseBody
         )
         : base(line)
     {
@@ -47,6 +49,7 @@ public sealed class ForNode
         _condition = condition;
         _step = step;
         _body = body;
+        _elseBody = elseBody;
     }
 
     #endregion
@@ -56,7 +59,8 @@ public sealed class ForNode
     private readonly ExpressionNode _init;
     private readonly ExpressionNode _condition;
     private readonly ExpressionNode _step;
-    private readonly Block _body;
+    private readonly StatementBase _body;
+    private readonly StatementBase? _elseBody;
 
     #endregion
 
@@ -71,25 +75,35 @@ public sealed class ForNode
         PreExecute (context);
 
         _init.Compute (context);
-        // var success = false;
-        while (KotikUtility.ToBoolean (_condition.Compute (context)))
+        var success = false;
+        try
         {
-            // success = true;
-            foreach (var statement in _body)
+
+            while (KotikUtility.ToBoolean (_condition.Compute (context)))
             {
-                statement.Execute (context);
+                success = true;
+                try
+                {
+                    _body.Execute (context);
+                }
+                catch (ContinueException)
+                {
+                    Debug.WriteLine ("for-continue");
+                }
+
+                _step.Compute (context);
             }
 
-            _step.Compute (context);
-        }
+            if (!success && _elseBody is not null)
+            {
+                _elseBody.Execute (context);
+            }
 
-        // if (!success && _else is not null)
-        // {
-        //     foreach (var statement in _else)
-        //     {
-        //         statement.Execute (context);
-        //     }
-        // }
+        }
+        catch (BreakException)
+        {
+            Debug.WriteLine ("for-break");
+        }
     }
 
     #endregion

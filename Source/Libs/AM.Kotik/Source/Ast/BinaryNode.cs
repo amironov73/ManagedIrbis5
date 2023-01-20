@@ -5,13 +5,14 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* BinaryNode.cs -- бинарная операция
+/* BinaryNode.cs -- бинарная инфиксная операция
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
+using System.Collections;
 using System.IO;
 
 #endregion
@@ -21,7 +22,7 @@ using System.IO;
 namespace AM.Kotik;
 
 /// <summary>
-/// Бинарная операция, например, сложение.
+/// Бинарная инфиксная операция, например, сложение.
 /// </summary>
 public sealed class BinaryNode
     : AtomNode
@@ -51,6 +52,72 @@ public sealed class BinaryNode
     private readonly string _operation;
     private readonly AtomNode _right;
 
+    /// <summary>
+    /// Оператор сравнения.
+    /// </summary>
+    private static dynamic? Shuttle
+        (
+            Context context,
+            dynamic? left,
+            dynamic? right
+        )
+    {
+        context.NotUsed();
+
+        return OmnipotentComparer.Default.Compare (left, right);
+    }
+
+    /// <summary>
+    /// Расширенная операция "В".
+    /// </summary>
+    /// <param name="context">Контекст.</param>
+    /// <param name="left">Что ищем.</param>
+    /// <param name="right">Где ищем.</param>
+    private static dynamic? In
+        (
+            Context context,
+            dynamic? left,
+            dynamic? right
+        )
+    {
+        context.NotUsed();
+
+        if (left is null || right is null)
+        {
+            return false;
+        }
+
+        if (right is string text)
+        {
+            if (left is char chr)
+            {
+                return text.Contains (chr);
+            }
+
+            if (left is string sub)
+            {
+                return text.Contains (sub);
+            }
+        }
+
+        if (right is Array array)
+        {
+            return Array.IndexOf (array, (object) left) >= 0;
+        }
+
+        if (right is IDictionary dictionary)
+        {
+            return dictionary.Contains ((object) left);
+        }
+
+        if (right is IList list)
+        {
+            return list.Contains ((object) left);
+        }
+
+        return false;
+    }
+
     #endregion
 
     #region AtomNode members
@@ -61,9 +128,9 @@ public sealed class BinaryNode
             Context context
         )
     {
-        dynamic? left = _left.Compute (context);
-        dynamic? right = _right.Compute (context);
-        dynamic? result = _operation switch
+        var left = _left.Compute (context);
+        var right = _right.Compute (context);
+        var result = _operation switch
         {
             "+" => left + right,
             "-" => left - right,
@@ -78,6 +145,8 @@ public sealed class BinaryNode
             "!=" => left != right,
             "||" => left || right,
             "&&" => left && right,
+            "in" => In (context, left, right),
+            "<=>" => Shuttle (context, left, right),
             _ => throw new InvalidOperationException()
         };
 

@@ -5,14 +5,14 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* WhileNode.cs -- цикл while
+/* ForEachNode.cs -- цикл foreach
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
+using System.Collections;
 using System.Diagnostics;
-using System.IO;
 
 #endregion
 
@@ -21,9 +21,9 @@ using System.IO;
 namespace AM.Kotik;
 
 /// <summary>
-/// Цикл while.
+/// Цикл foreach.
 /// </summary>
-public sealed class WhileNode
+sealed class ForEachNode
     : StatementBase
 {
     #region Construction
@@ -31,18 +31,20 @@ public sealed class WhileNode
     /// <summary>
     /// Конструктор.
     /// </summary>
-    /// <param name="line">Номер строки в исходном тексте.</param>
-    /// <param name="condition">Условие.</param>
-    /// <param name="body">Тело цикла.</param>
-    public WhileNode
+    public ForEachNode
         (
             int line,
-            AtomNode condition,
-            Block body
+            string variableName,
+            AtomNode enumerable,
+            StatementBase body
         )
         : base (line)
     {
-        _condition = condition;
+        Sure.NotNullNorEmpty (variableName);
+        Sure.NotNull (enumerable);
+
+        _variableName = variableName;
+        _enumerable = enumerable;
         _body = body;
     }
 
@@ -50,12 +52,13 @@ public sealed class WhileNode
 
     #region Private members
 
-    private readonly AtomNode _condition;
-    private readonly Block _body;
+    private readonly string _variableName;
+    private readonly AtomNode _enumerable;
+    private readonly StatementBase _body;
 
     #endregion
 
-    #region StatementBase members
+    #region StatementNode members
 
     /// <inheritdoc cref="StatementBase.Execute"/>
     public override void Execute
@@ -65,42 +68,31 @@ public sealed class WhileNode
     {
         PreExecute (context);
 
+        var enumerable = _enumerable.Compute (context);
+        if (enumerable is null or not IEnumerable)
+        {
+            return;
+        }
+
         try
         {
-            while (KotikUtility.ToBoolean (_condition.Compute (context)))
+            foreach (var value in enumerable)
             {
+                context.Variables[_variableName] = value;
                 try
                 {
                     _body.Execute (context);
                 }
                 catch (ContinueException)
                 {
-                    Debug.WriteLine ("while-continue");
+                    Debug.WriteLine ("foreach-continue");
                 }
             }
         }
         catch (BreakException)
         {
-            Debug.WriteLine ("while-break");
+            Debug.WriteLine ("foreach-break");
         }
-    }
-
-    #endregion
-
-    #region AstNode members
-
-    /// <inheritdoc cref="AstNode.DumpHierarchyItem(string?,int,System.IO.TextWriter,string?)"/>
-    internal override void DumpHierarchyItem
-        (
-            string? name,
-            int level,
-            TextWriter writer
-        )
-    {
-        base.DumpHierarchyItem (name, level, writer, ToString());
-
-        _condition.DumpHierarchyItem ("Condition", level + 1, writer);
-        _body.DumpHierarchyItem ("Block", level + 1, writer);
     }
 
     #endregion

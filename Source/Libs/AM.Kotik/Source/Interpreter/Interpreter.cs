@@ -157,6 +157,10 @@ public sealed class Interpreter
         Sure.NotNull (sourceCode);
 
         var program = Grammar.ParseProgram (sourceCode, ParsingDebugOutput);
+
+        // отделяем отладочную печать парсеров от прочего вывода
+        ParsingDebugOutput?.WriteLine (new string ('=', 60));
+
         var result = Execute (program, Context);
 
         return result;

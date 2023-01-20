@@ -1047,3 +1047,343 @@ public sealed class ChainParser<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, TResult
 
     #endregion
 }
+
+/// <summary>
+/// Парсер для последовательностей.
+/// </summary>
+public sealed class ChainParser<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, TResult>
+    : Parser<TResult>
+    where T1: class
+    where T2: class
+    where T3: class
+    where T4: class
+    where T5: class
+    where T6: class
+    where T7: class
+    where T8: class
+    where T9: class
+    where T10: class
+    where T11: class
+    where TResult: class
+{
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public ChainParser
+        (
+            Parser<T1> first,
+            Parser<T2> second,
+            Parser<T3> third,
+            Parser<T4> fourth,
+            Parser<T5> fifth,
+            Parser<T6> sixth,
+            Parser<T7> seventh,
+            Parser<T8> eighth,
+            Parser<T9> nineth,
+            Parser<T10> tenth,
+            Parser<T11> eleventh,
+            Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, TResult> function
+        )
+    {
+        _first = first;
+        _second = second;
+        _third = third;
+        _fourth = fourth;
+        _fifth = fifth;
+        _sixth = sixth;
+        _seventh = seventh;
+        _eighth = eighth;
+        _nineth = nineth;
+        _tenth = tenth;
+        _eleventh = eleventh;
+        _function = function;
+    }
+
+    #endregion
+
+    #region Private members
+
+    private readonly Parser<T1> _first;
+    private readonly Parser<T2> _second;
+    private readonly Parser<T3> _third;
+    private readonly Parser<T4> _fourth;
+    private readonly Parser<T5> _fifth;
+    private readonly Parser<T6> _sixth;
+    private readonly Parser<T7> _seventh;
+    private readonly Parser<T8> _eighth;
+    private readonly Parser<T9> _nineth;
+    private readonly Parser<T10> _tenth;
+    private readonly Parser<T11> _eleventh;
+    private readonly Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, TResult> _function;
+
+    #endregion
+
+    #region Parser<TResult> members
+
+    /// <inheritdoc cref="Parser{TResult}.TryParse"/>
+    public override bool TryParse
+        (
+            ParseState state,
+            out TResult result
+        )
+    {
+        using var _ = state.Enter (this);
+        result = default!;
+        DebugHook (state);
+        if (!state.HasCurrent)
+        {
+            return DebugSuccess (state, false);
+        }
+
+        var location = state.Location;
+        if (!_first.TryParse (state, out var first))
+        {
+            state.Location = location;
+            return DebugSuccess (state, false);
+        }
+
+        if (!_second.TryParse (state, out var second))
+        {
+            state.Location = location;
+            return DebugSuccess (state, false);
+        }
+
+        if (!_third.TryParse (state, out var third))
+        {
+            state.Location = location;
+            return DebugSuccess (state, false);
+        }
+
+        if (!_fourth.TryParse (state, out var fourth))
+        {
+            state.Location = location;
+            return DebugSuccess (state, false);
+        }
+
+        if (!_fifth.TryParse (state, out var fifth))
+        {
+            state.Location = location;
+            return DebugSuccess (state, false);
+        }
+
+        if (!_sixth.TryParse (state, out var sixth))
+        {
+            state.Location = location;
+            return DebugSuccess (state, false);
+        }
+
+        if (!_seventh.TryParse (state, out var seventh))
+        {
+            state.Location = location;
+            return DebugSuccess (state, false);
+        }
+
+        if (!_eighth.TryParse (state, out var eighth))
+        {
+            state.Location = location;
+            return DebugSuccess (state, false);
+        }
+
+        if (!_nineth.TryParse (state, out var nineth))
+        {
+            state.Location = location;
+            return DebugSuccess (state, false);
+        }
+
+        if (!_tenth.TryParse (state, out var tenth))
+        {
+            state.Location = location;
+            return DebugSuccess (state, false);
+        }
+
+        if (!_eleventh.TryParse (state, out var eleventh))
+        {
+            state.Location = location;
+            return DebugSuccess (state, false);
+        }
+
+        result = _function (first, second, third, fourth, fifth, sixth,
+            seventh, eighth, nineth, tenth, eleventh);
+
+        return DebugSuccess (state, true);
+    }
+
+    #endregion
+}
+
+/// <summary>
+/// Парсер для последовательностей.
+/// </summary>
+public sealed class ChainParser<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, TResult>
+    : Parser<TResult>
+    where T1: class
+    where T2: class
+    where T3: class
+    where T4: class
+    where T5: class
+    where T6: class
+    where T7: class
+    where T8: class
+    where T9: class
+    where T10: class
+    where T11: class
+    where T12: class
+    where TResult: class
+{
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public ChainParser
+        (
+            Parser<T1> first,
+            Parser<T2> second,
+            Parser<T3> third,
+            Parser<T4> fourth,
+            Parser<T5> fifth,
+            Parser<T6> sixth,
+            Parser<T7> seventh,
+            Parser<T8> eighth,
+            Parser<T9> nineth,
+            Parser<T10> tenth,
+            Parser<T11> eleventh,
+            Parser<T12> twelveth,
+            Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, TResult> function
+        )
+    {
+        _first = first;
+        _second = second;
+        _third = third;
+        _fourth = fourth;
+        _fifth = fifth;
+        _sixth = sixth;
+        _seventh = seventh;
+        _eighth = eighth;
+        _nineth = nineth;
+        _tenth = tenth;
+        _eleventh = eleventh;
+        _twelveth = twelveth;
+        _function = function;
+    }
+
+    #endregion
+
+    #region Private members
+
+    private readonly Parser<T1> _first;
+    private readonly Parser<T2> _second;
+    private readonly Parser<T3> _third;
+    private readonly Parser<T4> _fourth;
+    private readonly Parser<T5> _fifth;
+    private readonly Parser<T6> _sixth;
+    private readonly Parser<T7> _seventh;
+    private readonly Parser<T8> _eighth;
+    private readonly Parser<T9> _nineth;
+    private readonly Parser<T10> _tenth;
+    private readonly Parser<T11> _eleventh;
+    private readonly Parser<T12> _twelveth;
+    private readonly Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, TResult> _function;
+
+    #endregion
+
+    #region Parser<TResult> members
+
+    /// <inheritdoc cref="Parser{TResult}.TryParse"/>
+    public override bool TryParse
+        (
+            ParseState state,
+            out TResult result
+        )
+    {
+        using var _ = state.Enter (this);
+        result = default!;
+        DebugHook (state);
+        if (!state.HasCurrent)
+        {
+            return DebugSuccess (state, false);
+        }
+
+        var location = state.Location;
+        if (!_first.TryParse (state, out var first))
+        {
+            state.Location = location;
+            return DebugSuccess (state, false);
+        }
+
+        if (!_second.TryParse (state, out var second))
+        {
+            state.Location = location;
+            return DebugSuccess (state, false);
+        }
+
+        if (!_third.TryParse (state, out var third))
+        {
+            state.Location = location;
+            return DebugSuccess (state, false);
+        }
+
+        if (!_fourth.TryParse (state, out var fourth))
+        {
+            state.Location = location;
+            return DebugSuccess (state, false);
+        }
+
+        if (!_fifth.TryParse (state, out var fifth))
+        {
+            state.Location = location;
+            return DebugSuccess (state, false);
+        }
+
+        if (!_sixth.TryParse (state, out var sixth))
+        {
+            state.Location = location;
+            return DebugSuccess (state, false);
+        }
+
+        if (!_seventh.TryParse (state, out var seventh))
+        {
+            state.Location = location;
+            return DebugSuccess (state, false);
+        }
+
+        if (!_eighth.TryParse (state, out var eighth))
+        {
+            state.Location = location;
+            return DebugSuccess (state, false);
+        }
+
+        if (!_nineth.TryParse (state, out var nineth))
+        {
+            state.Location = location;
+            return DebugSuccess (state, false);
+        }
+
+        if (!_tenth.TryParse (state, out var tenth))
+        {
+            state.Location = location;
+            return DebugSuccess (state, false);
+        }
+
+        if (!_eleventh.TryParse (state, out var eleventh))
+        {
+            state.Location = location;
+            return DebugSuccess (state, false);
+        }
+
+        if (!_twelveth.TryParse (state, out var twelveth))
+        {
+            state.Location = location;
+            return DebugSuccess (state, false);
+        }
+
+        result = _function (first, second, third, fourth, fifth, sixth,
+            seventh, eighth, nineth, tenth, eleventh, twelveth);
+
+        return DebugSuccess (state, true);
+    }
+
+    #endregion
+}

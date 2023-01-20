@@ -60,7 +60,12 @@ public sealed class Block
             Context context
         )
     {
-        // TODO реализовать
+        PreExecute (context);
+
+        foreach (var statement in _statements)
+        {
+            statement.Execute (context);
+        }
     }
 
     #endregion
@@ -92,7 +97,7 @@ public sealed class Block
     /// </summary>
     public IEnumerator<StatementBase> GetEnumerator()
     {
-        return ((IEnumerable<StatementBase>)_statements).GetEnumerator();
+        return ((IEnumerable<StatementBase>) _statements).GetEnumerator();
     }
 
     #endregion
