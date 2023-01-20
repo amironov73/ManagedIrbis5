@@ -4,6 +4,11 @@ y = (1 + 2) * (3 + 4)
 x1 + x2 + y
 z = x1 < y
 
+func SayHello (who)
+{
+    println ("Hello, ", who)
+}
+
 if (x1) x2 = x2 + 1
 else x2 = x2 - 1
 
@@ -31,5 +36,8 @@ x1++
 x2--
 item = l[1]
 l[1] = 111
+
+hehe = 1 < 2
+haha = !hehe
 
 println ("That's all, Folks!")

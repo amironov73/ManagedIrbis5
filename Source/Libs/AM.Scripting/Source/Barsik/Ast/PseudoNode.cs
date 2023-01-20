@@ -9,7 +9,11 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
+#region Using directives
+
 using Pidgin;
+
+#endregion
 
 #nullable enable
 

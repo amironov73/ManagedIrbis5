@@ -104,7 +104,7 @@ public static class Grammar
                 Parser.Lazy (() => Index!),
                 Parser.Lazy (() => Property!)
             },
-            // бинарные операции не предусмотрены
+            // инфиксные операции не предусмотрены
             Array.Empty<InfixOperator<AtomNode>>()
         );
 
@@ -112,64 +112,80 @@ public static class Grammar
     /// Базовое выражение.
     /// </summary>
     private static readonly Parser<AtomNode> BasicExpression = ExpressionBuilder.Build
-            (
-                Atom,
-                new[]
-                {
-                    // префиксные операции
-                    Operator.Unary
-                        (
-                            Term ("-"),
-                            "UnaryMinus",
-                            _ => target => new MinusNode (target)
-                        ),
+        (
+            Parser.Lazy (() => Atom),
+            new[]
+            {
+                // префиксные операции
+                Operator.Unary
+                    (
+                        Term ("-"),
+                        "UnaryMinus",
+                        _ => target => new MinusNode (target)
+                    ),
+                
+                Operator.Unary
+                    (
+                        Term ("!"),
+                        "Bang",
+                        _ => target => new BangNode (target)
+                    ),
 
-                    Operator.Increment ("PrefixIncrement", true),
+                Operator.Unary
+                    (
+                        Term ("~"),
+                        "Tilda",
+                        _ => target => new TildaNode (target)
+                    ),
 
-                    Operator.Unary
-                        (
-                            Parser.OneOf (Identifier, Reserved (null))
-                                .RoundBrackets(),
-                            "Cast",
-                            x => target => new CastNode (x, target)
-                        )
-                },
-                new[]
-                {
-                    // постфиксные операции
-                    Operator.Increment ("PostfixIncrement", false),
+                Operator.Increment ("PrefixIncrement", true),
 
-                    Parser.Lazy (() => Index!),
+                Operator.Unary
+                    (
+                        Parser.OneOf (Identifier, Reserved (null))
+                            .RoundBrackets(),
+                        "Cast",
+                        x => target => new CastNode (x, target)
+                    )
+            },
+            new[]
+            {
+                // постфиксные операции
+                Operator.Increment ("PostfixIncrement", false),
 
-                    Parser.Lazy (() => MethodCall!).Labeled ("MethodCall"),
+                Parser.Lazy (() => Index!),
 
-                    Parser.Lazy (() => Property!).Labeled ("Property"),
-                },
-                new[]
-                {
-                    // бинарные операции
-                    Operator.LeftAssociative ("Shift", "<<", ">>"),
-                    Operator.LeftAssociative ("Bitwise", "&", "|", "^"),
-                    Operator.LeftAssociative ("Multiplication", "*", "/", "%" ),
-                    Operator.LeftAssociative ("Addition", "+", "-" ),
-                    Operator.LeftAssociative ("Comparison", "<", ">", "<=", ">=", "==", "!=" )
-                }
-            )
+                Parser.Lazy (() => MethodCall!).Labeled ("MethodCall"),
+
+                Parser.Lazy (() => Property!).Labeled ("Property"),
+            },
+            new[]
+            {
+                // бинарные операции
+                Operator.LeftAssociative ("Shift", "<<", ">>"),
+                Operator.LeftAssociative ("Bitwise", "&", "|", "^"),
+                Operator.LeftAssociative ("Multiplication", "*", "/", "%" ),
+                Operator.LeftAssociative ("Addition", "+", "-" ),
+                Operator.LeftAssociative ("Comparison", "<", ">", "<=", ">=", "==", "!=" )
+            }
+        )
         .Labeled ("BasicExpression");
 
     /// <summary>
     /// Выражение без присваивания.
     /// </summary>
     private static readonly Parser<ExpressionNode> Expression = BasicExpression.Map
-            (
-                x => new ExpressionNode (null, null, x)
-            )
+        (
+            x => new ExpressionNode (null, null, x)
+        )
         .Labeled ("Expression");
 
     /// <summary>
     /// Имя типа в формате `Namespace.Subspace.Typename`.
     /// </summary>
-    private static readonly Parser<string> TypeName = (Identifier.SeparatedBy
+    private static readonly Parser<string> TypeName = 
+        (
+            Identifier.SeparatedBy
                 (
                     Term ("."),
                     minCount: 1
@@ -407,6 +423,18 @@ public static class Grammar
             )
         .Labeled ("Using");
 
+    private static readonly Parser<StatementBase> FunctionDefinition = Parser.Chain
+        (
+            Parser.Position, // 1
+            Reserved ("func"), // 2
+            Identifier, // 3
+            Identifier.SeparatedBy (Term (",")).RoundBrackets(), // 4
+            Block, // 5
+            (_1, _, _3, _4, _5) => 
+                (StatementBase) new FunctionDefinitionNode (_1.Line, _3, _4.ToArray(), _5)
+        )
+        .Labeled ("FunctionDefinition");
+
     /// <summary>
     /// Стейтмент вообще.
     /// </summary>
@@ -419,7 +447,8 @@ public static class Grammar
                                 ForStatement,
                                 WhileStatement,
                                 IfStatement,
-                                UsingStatement
+                                UsingStatement,
+                                FunctionDefinition
                             )
                         .Labeled ("StatementKind")
             )
