@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections;
+using System.Reflection;
 
 #endregion
 
@@ -87,35 +88,33 @@ public sealed class IndexNode
             return list[integerIndex2];
         }
 
-        throw new NotImplementedException();
+        var type = ((object) obj).GetType();
+        ParameterInfo[]? parameters;
+        PropertyInfo? indexer = null;
+        foreach (var property in type.GetProperties (BindingFlags.Instance | BindingFlags.Public))
+        {
+            parameters = property.GetIndexParameters();
+            if (parameters.Length != 0)
+            {
+                indexer = property;
+                break;
+            }
+        }
 
-        // var type = ((object) obj).GetType();
-        // ParameterInfo[]? parameters;
-        // PropertyInfo? indexer = null;
-        // foreach (var property in type.GetProperties (BindingFlags.Instance | BindingFlags.Public))
-        // {
-        //     parameters = property.GetIndexParameters();
-        //     if (parameters.Length != 0)
-        //     {
-        //         indexer = property;
-        //         break;
-        //     }
-        // }
-        //
-        // if (indexer is null)
-        // {
-        //     return null;
-        // }
-        //
-        // var method = indexer.GetGetMethod();
-        // if (method is null)
-        // {
-        //     return null;
-        // }
-        //
-        // var result = method.Invoke (obj, new object? [] { index });
-        //
-        // return result;
+        if (indexer is null)
+        {
+            return null;
+        }
+
+        var method = indexer.GetGetMethod();
+        if (method is null)
+        {
+            return null;
+        }
+
+        var result = method.Invoke (obj, new object? [] { index });
+
+        return result;
     }
 
     /// <inheritdoc cref="AtomNode.Assign"/>
@@ -170,35 +169,33 @@ public sealed class IndexNode
             return value;
         }
 
-        throw new NotImplementedException();
+        var type = ((object) obj).GetType();
+        ParameterInfo[]? parameters;
+        PropertyInfo? indexer = null;
+        foreach (var property in type.GetProperties (BindingFlags.Instance | BindingFlags.Public))
+        {
+            parameters = property.GetIndexParameters();
+            if (parameters.Length != 0)
+            {
+                indexer = property;
+                break;
+            }
+        }
 
-        // var type = ((object) obj).GetType();
-        // ParameterInfo[]? parameters;
-        // PropertyInfo? indexer = null;
-        // foreach (var property in type.GetProperties (BindingFlags.Instance | BindingFlags.Public))
-        // {
-        //     parameters = property.GetIndexParameters();
-        //     if (parameters.Length != 0)
-        //     {
-        //         indexer = property;
-        //         break;
-        //     }
-        // }
-        //
-        // if (indexer is null)
-        // {
-        //     return null;
-        // }
-        //
-        // var method = indexer.GetSetMethod();
-        // if (method is null)
-        // {
-        //     return null;
-        // }
-        //
-        // var result = method.Invoke (obj, new object? [] { index, value });
-        //
-        // return value;
+        if (indexer is null)
+        {
+            return null;
+        }
+
+        var method = indexer.GetSetMethod();
+        if (method is null)
+        {
+            return null;
+        }
+
+        var result = method.Invoke (obj, new object? [] { index, value });
+
+        return value;
     }
 
     #endregion

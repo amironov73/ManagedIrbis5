@@ -14,6 +14,7 @@
 
 using System;
 using System.IO;
+using System.Text;
 
 using AM.Kotik;
 
@@ -41,14 +42,36 @@ internal static class Program
         context.DumpVariables();
     }
 
-    public static void Main
+    public static int Main
         (
             string[] args
         )
     {
-        foreach (var fileName in args)
-        {
-            ExecuteScript (fileName);
-        }
+        Encoding.RegisterProvider (CodePagesEncodingProvider.Instance);
+
+        // foreach (var fileName in args)
+        // {
+        //     ExecuteScript (fileName);
+        // }
+
+        var result = KotikUtility.CreateAndRunInterpreter
+            (
+                args,
+                interpreter =>
+                {
+                    interpreter.WithStdLib();
+                },
+                (_, exception) =>
+                {
+                    Console.WriteLine (exception);
+                },
+                interpreter =>
+                {
+                    interpreter.Context.DumpVariables();
+                }
+            );
+
+        return result;
+
     }
 }

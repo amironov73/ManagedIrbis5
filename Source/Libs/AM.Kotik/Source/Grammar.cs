@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 #endregion
@@ -123,7 +124,7 @@ public static class Grammar
                         "UnaryMinus",
                         _ => target => new MinusNode (target)
                     ),
-                
+
                 Operator.Unary
                     (
                         Term ("!"),
@@ -183,7 +184,7 @@ public static class Grammar
     /// <summary>
     /// Имя типа в формате `Namespace.Subspace.Typename`.
     /// </summary>
-    private static readonly Parser<string> TypeName = 
+    private static readonly Parser<string> TypeName =
         (
             Identifier.SeparatedBy
                 (
@@ -430,7 +431,7 @@ public static class Grammar
             Identifier, // 3
             Identifier.SeparatedBy (Term (",")).RoundBrackets(), // 4
             Block, // 5
-            (_1, _, _3, _4, _5) => 
+            (_1, _, _3, _4, _5) =>
                 (StatementBase) new FunctionDefinitionNode (_1.Line, _3, _4.ToArray(), _5)
         )
         .Labeled ("FunctionDefinition");
@@ -466,12 +467,39 @@ public static class Grammar
         .End()
         .Labeled ("Program");
 
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Разбор текста выражения.
+    /// </summary>
+    public static AtomNode ParseExpression
+        (
+            string sourceCode,
+            TextWriter? debugOutput = null
+        )
+    {
+        Sure.NotNull (sourceCode);
+
+        var tokenizer = new Tokenizer();
+        var tokens = tokenizer.Tokenize (sourceCode);
+        var state = new ParseState (tokens)
+        {
+            DebugOutput = debugOutput
+        };
+        var result = Expression.End().ParseOrThrow (state);
+
+        return result;
+    }
+
     /// <summary>
     /// Разбор программы.
     /// </summary>
     public static ProgramNode ParseProgram
         (
-            string sourceText
+            string sourceText,
+            TextWriter? debugOutput = null
         )
     {
         Sure.NotNull (sourceText);
@@ -480,7 +508,7 @@ public static class Grammar
         var tokens = tokenizer.Tokenize (sourceText);
         var state = new ParseState (tokens)
         {
-            DebugOutput = Console.Out
+            DebugOutput = debugOutput
         };
         var result = Program.ParseOrThrow (state);
 

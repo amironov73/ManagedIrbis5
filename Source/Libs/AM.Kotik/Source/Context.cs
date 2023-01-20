@@ -19,6 +19,10 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+
+using AM.Collections;
+using AM.IO;
 
 #endregion
 
@@ -32,6 +36,11 @@ namespace AM.Kotik;
 public sealed class Context
 {
     #region Properties
+
+    /// <summary>
+    /// Интерпретатор, к которому привязан контекст.
+    /// </summary>
+    public Interpreter? Interpreter { get; internal set; }
 
     /// <summary>
     /// Родительский контекст.
@@ -68,6 +77,11 @@ public sealed class Context
     /// </summary>
     public Dictionary<string, FunctionDescriptor> Functions { get; }
 
+    /// <summary>
+    /// Используемые пространства имен.
+    /// </summary>
+    public Dictionary<string, object?> Namespaces { get; }
+
     #endregion
 
     #region Construction
@@ -94,11 +108,22 @@ public sealed class Context
         Output = output;
         Error = error;
         Functions = new ();
+        Namespaces = new ();
+
+        var comparer = OperatingSystem.IsWindows()
+            ? StringComparer.InvariantCultureIgnoreCase
+            : StringComparer.InvariantCulture;
+        _inclusions = new (comparer);
     }
 
     #endregion
 
     #region Private members
+
+    /// <summary>
+    /// Здесь запоминаются вложенные скрипты.
+    /// </summary>
+    internal readonly Dictionary<string, ProgramNode> _inclusions;
 
     /// <summary>
     /// Конструирование типа, если необходимо.
@@ -123,9 +148,40 @@ public sealed class Context
         return mainType.MakeGenericType (typeArguments);
     }
 
+    /// <summary>
+    /// Делаем контекст внимательным к выводу текста.
+    /// </summary>
+    internal void MakeAttentive()
+    {
+        if (Output is not AttentiveWriter)
+        {
+            Output = new AttentiveWriter (Output);
+        }
+    }
+
     #endregion
 
     #region Public methods
+
+    /// <summary>
+    /// Подключение модуля.
+    /// </summary>
+    public Context AttachModule
+        (
+            IBarsikModule instance
+        )
+    {
+        Sure.NotNull (instance);
+
+        var interpreter = GetTopContext().Interpreter.ThrowIfNull();
+        if (instance.AttachModule (interpreter))
+        {
+            // Output.WriteLine ($"Module loaded: {instance}");
+            interpreter.Modules.Add (instance);
+        }
+
+        return this;
+    }
 
     /// <summary>
     /// Создание контекста-потомка.
@@ -139,6 +195,25 @@ public sealed class Context
                 Error,
                 this
             );
+    }
+
+    /// <summary>
+    /// Дамп пространств имен.
+    /// </summary>
+    public void DumpNamespaces()
+    {
+        var keys = Namespaces.Keys.ToArray();
+        if (keys.IsNullOrEmpty())
+        {
+            Output.WriteLine ("(no namespaces)");
+            return;
+        }
+
+        Array.Sort (keys);
+        foreach (var key in keys)
+        {
+            Output.WriteLine (key);
+        }
     }
 
     /// <summary>
@@ -420,6 +495,136 @@ public sealed class Context
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// Загрузка сборки.
+    /// </summary>
+    public Assembly? LoadAssembly
+        (
+            string name
+        )
+    {
+        Sure.NotNullNorEmpty (name);
+
+        name = name.Trim();
+        if (string.IsNullOrEmpty (name))
+        {
+            throw new BarsikException();
+        }
+
+        var interpreter = GetTopContext().Interpreter.ThrowIfNull();
+        if (interpreter.Assemblies.ContainsKey (name))
+        {
+            // уже загружено, пропускаем
+            return interpreter.Assemblies [name];
+        }
+
+        var allAssemblies = AppDomain.CurrentDomain.GetAssemblies();
+        foreach (var asm in allAssemblies)
+        {
+            var asmName = asm.GetName().Name;
+            if (asmName.SameString (name))
+            {
+                interpreter.Assemblies.Add (name, asm);
+                return asm;
+            }
+        }
+
+        Assembly? result = null;
+        if (File.Exists (name))
+        {
+            var fullPath = Path.GetFullPath (name);
+            result = Assembly.LoadFile (fullPath);
+        }
+        else
+        {
+            try
+            {
+                result = Assembly.Load (name);
+            }
+            catch
+            {
+                // просто съедаем исключение
+            }
+        }
+
+        if (result is not null)
+        {
+            interpreter.Assemblies.Add (name, result);
+            return result;
+        }
+
+        var extension = Path.GetExtension (name);
+        if (string.IsNullOrEmpty (extension))
+        {
+            name += ".dll";
+        }
+        else
+        {
+            if (extension.ToLowerInvariant () != ".dll")
+            {
+                name += ".dll";
+            }
+        }
+
+        foreach (var part in interpreter.Pathes)
+        {
+            var fullPath = Path.GetFullPath (Path.Combine (part, name));
+            if (File.Exists (fullPath))
+            {
+                result = Assembly.LoadFile (fullPath);
+                interpreter.Assemblies.Add (name, result);
+
+                return result;
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Загрузка модуля.
+    /// </summary>
+    public void LoadModule
+        (
+            string moduleName
+        )
+    {
+        // TODO добавить выгрузку модулей
+
+        Sure.NotNullNorEmpty (moduleName);
+
+        foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+        {
+            var interpreter = GetTopContext().Interpreter.ThrowIfNull();
+            var types = assembly.GetTypes()
+                .Where (type => type.IsAssignableTo (typeof (IBarsikModule)))
+                .ToArray();
+            foreach (var type in types)
+            {
+                var alreadyHave = false;
+                foreach (var module in interpreter.Modules)
+                {
+                    if (module.GetType() == type)
+                    {
+                        alreadyHave = true;
+                        break;
+                    }
+                }
+
+                if (alreadyHave)
+                {
+                    continue;
+                }
+
+                var instance = (IBarsikModule?) Activator.CreateInstance (type);
+                if (instance is not null)
+                {
+                    AttachModule (instance);
+                }
+            }
+        }
     }
 
     /// <summary>

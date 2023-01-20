@@ -13,8 +13,6 @@
 #region Using directives
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 #endregion
 
@@ -43,7 +41,12 @@ public sealed class TokenizerSettings
     /// Распознаваемые термы.
     /// </summary>
     public string[] KnownTerms { get; set; }
-    
+
+    /// <summary>
+    /// Зарезервированные (ключевые) слова.
+    /// </summary>
+    public string[] ReservedWords { get; set; }
+
     #endregion
 
     #region Construction
@@ -85,10 +88,26 @@ public sealed class TokenizerSettings
             "/=", "==", "<", ">", "<<", ">>", "<=", ">=", "||", "&&",
             ".", ","
         };
+
+        ReservedWords = new []
+        {
+            "abstract", "and", "as", "async", "await", "base", "bool", "break",
+            "byte", "case", "catch", "char", "checked", "class", "const",
+            "continue", "decimal", "default", "delegate", "do", "double",
+            "else", "enum", "event", "explicit", "extern", "false", "finally",
+            "fixed", "float", "for", "foreach", "func", "goto", "if", "implicit",
+            "in", "int", "interface", "internal", "is", "lock", "long",
+            "namespace", "new", "null", "object", "operator", "or", "out",
+            "override", "params", "private", "protected", "public", "readonly",
+            "ref", "return", "sbyte", "sealed", "short", "sizeof", "stackalloc",
+            "static", "string", "struct", "switch", "this", "throw", "true",
+            "try", "typeof", "uint", "ulong", "unchecked", "unsafe", "ushort",
+            "using", "virtual", "void", "volatile", "while", "with"
+        };
     }
 
     #endregion
-    
+
     #region Public methods
 
     /// <summary>
@@ -97,6 +116,32 @@ public sealed class TokenizerSettings
     public static TokenizerSettings CreateDefault()
     {
         return new TokenizerSettings();
+    }
+
+    /// <summary>
+    /// Чтение настроек из JSON-файла.
+    /// </summary>
+    public static TokenizerSettings Load
+        (
+            string fileName
+        )
+    {
+        Sure.FileExists (fileName);
+
+        throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// Сохранение настроек в JSON-файл.
+    /// </summary>
+    public void Save
+        (
+            string fileName
+        )
+    {
+        Sure.NotNullNorEmpty (fileName);
+
+        throw new NotImplementedException();
     }
 
     #endregion

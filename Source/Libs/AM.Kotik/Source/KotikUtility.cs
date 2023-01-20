@@ -20,6 +20,8 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 
 using AM.Text;
 
@@ -34,70 +36,157 @@ namespace AM.Kotik;
 /// </summary>
 public static class KotikUtility
 {
-    #region Properties
-
-    /// <summary>
-    /// Ключевые слова Барсика.
-    /// </summary>
-    public static string[] ReservedWords { get; } =
-    {
-        "abstract", "and", "as", "async", "await", "base", "bool", "break",
-        "byte", "case", "catch", "char", "checked", "class", "const",
-        "continue", "decimal", "default", "delegate", "do", "double",
-        "else", "enum", "event", "explicit", "extern", "false", "finally",
-        "fixed", "float", "for", "foreach", "func", "goto", "if", "implicit",
-        "in", "int", "interface", "internal", "is", "lock", "long",
-        "namespace", "new", "null", "object", "operator", "or", "out",
-        "override", "params", "private", "protected", "public", "readonly",
-        "ref", "return", "sbyte", "sealed", "short", "sizeof", "stackalloc",
-        "static", "string", "struct", "switch", "this", "throw", "true",
-        "try", "typeof", "uint", "ulong", "unchecked", "unsafe", "ushort",
-        "using", "virtual", "void", "volatile", "while", "with"
-    };
-
-    #endregion
-
     #region Public methods
 
     /// <summary>
-    /// Проверка, не является ли указанный текст зарезервированным словом.
+    /// Динамический вызов произвольного метода.
     /// </summary>
-    public static bool IsReservedWord
+    /// <param name="context">Контекст интерпретатора.</param>
+    /// <param name="target">Класс или экземпляр.</param>
+    /// <param name="methodName">Имя метода.</param>
+    /// <param name="args">Аргументы (уже подготовленные).</param>
+    /// <returns>Результат вызова.</returns>
+    public static dynamic? CallAnyMethod
         (
-            string text
+            Context context,
+            object? target,
+            string methodName,
+            params object?[] args
         )
     {
-        Sure.NotNull (text);
+        Sure.NotNull (context);
+        Sure.NotNull (target);
+        Sure.NotNullNorEmpty (methodName);
 
-        foreach (var word in ReservedWords)
+        bool staticCall;
+        Type targetType;
+        if (target is Type type)
         {
-            if (string.CompareOrdinal (word, text) == 0)
-            {
-                return true;
-            }
+            staticCall = true;
+            targetType = type;
+        }
+        else
+        {
+            staticCall = false;
+            targetType = target!.GetType();
         }
 
-        return false;
+        var argTypes = new List<Type>();
+        foreach (var o in args)
+        {
+            var argType = o is null ? typeof (object) : o.GetType();
+            argTypes.Add (argType);
+        }
+
+        var bindingFlags = BindingFlags.Public | BindingFlags.NonPublic;
+        bindingFlags |= staticCall ? BindingFlags.Static : BindingFlags.Instance;
+        var method = targetType.GetMethod (methodName, bindingFlags, argTypes.ToArray());
+        if (method is null)
+        {
+            context.Error.WriteLine ($"Can't find method {methodName}");
+            return null;
+        }
+
+        return method.Invoke (target, args);
     }
 
     /// <summary>
-    /// Проверка, не является ли указанный текст зарезервированным словом.
+    /// Создание и запуск интерпретатора.
     /// </summary>
-    public static bool IsReservedWord
+    /// <param name="args">Аргументы командной строки.</param>
+    /// <param name="configure">Опциональная конфигурация интерпретатора.</param>
+    /// <param name="exceptionHandler">Опциональный обработчик исключений.</param>
+    /// <param name="dumper">Опциональный обработчик дампа переменных.</param>
+    /// <returns>Код возврата.</returns>
+    public static int CreateAndRunInterpreter
         (
-            ReadOnlyMemory<char> text
+            string[] args,
+            Action<Interpreter>? configure = null,
+            Action<Interpreter, Exception>? exceptionHandler = null,
+            Action<Interpreter>? dumper = null
         )
     {
-        var textSpan = text.Span;
-        foreach (var word in ReservedWords)
+        var interpreter = new Interpreter();
+        configure?.Invoke (interpreter);
+
+        try
         {
-            if (Utility.CompareSpans (word.AsSpan(), textSpan) == 0)
+            var dump = false;
+            var index = 0;
+
+            if (args.Length == 0)
             {
-                return true;
+                var result = DoRepl (interpreter);
+                if (result.ExitCode != 0)
+                {
+                    interpreter.Context.Error.WriteLine (result);
+                }
+            }
+
+            foreach (var fileName in args)
+            {
+                if (fileName == "-d")
+                {
+                    dump = true;
+                    continue;
+                }
+
+                if (fileName == "-r")
+                {
+                    DoRepl (interpreter);
+                    continue;
+                }
+
+                if (fileName == "-e")
+                {
+                    var sourceCode = string.Join (' ', args.Skip (index + 1));
+                    interpreter.Execute (sourceCode);
+                    break;
+                }
+
+                var result = interpreter.ExecuteFile (fileName);
+                if (result.ExitCode != 0)
+                {
+                    interpreter.Context.Error.WriteLine (result);
+                }
+
+                if (result.ExitRequested)
+                {
+                    break;
+                }
+
+                index++;
+            }
+
+            if (dump)
+            {
+                dumper?.Invoke (interpreter);
             }
         }
+        catch (Exception exception)
+        {
+            exceptionHandler?.Invoke (interpreter, exception);
+            return 1;
+        }
 
-        return false;
+        return 0;
+    }
+
+    /// <summary>
+    /// Запуск REPL на указанном интерпретаторе.
+    /// </summary>
+    public static ExecutionResult DoRepl
+        (
+            Interpreter interpreter
+        )
+    {
+        Sure.NotNull (interpreter);
+
+        var version = Interpreter.FileVersion;
+        interpreter.Context.Output.WriteLine ($"Meow interpreter {version}");
+        interpreter.Context.Output.WriteLine ("Press ENTER twice to exit");
+
+        return new Repl (interpreter).Loop();
     }
 
     /// <summary>

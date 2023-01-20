@@ -55,12 +55,12 @@ public sealed class Tokenizer
         )
     {
         Sure.NotNull (settings);
-        
+
         Settings = settings;
     }
 
     #endregion
-    
+
     #region Private members
 
     // пространство имен нужно, чтобы не делать using
@@ -75,6 +75,27 @@ public sealed class Tokenizer
     private char ReadChar() => _navigator.ReadChar();
 
     private bool SkipWhitespace() => _navigator.SkipWhitespace();
+
+    /// <summary>
+    /// Проверка, не является ли указанный текст зарезервированным словом.
+    /// </summary>
+    public bool IsReservedWord
+        (
+            string text
+        )
+    {
+        Sure.NotNull (text);
+
+        foreach (var word in Settings.ReservedWords)
+        {
+            if (string.CompareOrdinal (word, text) == 0)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     /// <summary>
     /// Пропускаем комментарии.
@@ -436,7 +457,7 @@ public sealed class Tokenizer
             builder.Append (chr);
             var text = builder.ToString();
             var count = 0;
-            
+
             foreach (var known in knownTerms)
             {
                 if (known.StartsWith (text))
@@ -532,7 +553,7 @@ public sealed class Tokenizer
 
         return new Token
             (
-                KotikUtility.IsReservedWord (value)
+                IsReservedWord (value)
                     ? TokenKind.ReservedWord
                     : TokenKind.Identifier,
                 value,
@@ -591,7 +612,7 @@ public sealed class Tokenizer
         (
             string text
         )
-    { 
+    {
         Sure.NotNull (text);
 
         var result = new List<Token>();
