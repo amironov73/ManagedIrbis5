@@ -39,7 +39,7 @@ public sealed class MethodNode
         (
             AtomNode thisObject,
             string methodName,
-            ExpressionNode[] arguments
+            AtomNode[] arguments
         )
     {
         Sure.NotNull (thisObject);
@@ -57,7 +57,7 @@ public sealed class MethodNode
 
     private readonly AtomNode _thisObject;
     private readonly string _methodName;
-    private readonly ExpressionNode[] _arguments;
+    private readonly AtomNode[] _arguments;
 
     #endregion
 

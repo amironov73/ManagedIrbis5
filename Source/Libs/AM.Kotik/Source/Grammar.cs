@@ -33,12 +33,12 @@ public static class Grammar
 {
     #region Private members
 
-    private static Parser<StatementBase> BuildStatement (Parser<ExpressionNode> innerParser) =>
+    private static Parser<StatementBase> BuildStatement (Parser<AtomNode> innerParser) =>
         Parser.Chain
             (
                 Parser.Position,
                 innerParser,
-                (pos, x) => (StatementBase)new SimpleStatement (pos.Line, x)
+                (pos, x) => (StatementBase) new SimpleStatement (pos.Line, x)
             );
 
     #endregion
@@ -50,30 +50,32 @@ public static class Grammar
     /// </summary>
     private static readonly Parser<AtomNode> Literal = new LiteralParser().Map
         (
-            x => (AtomNode)new ConstantNode (x)
+            x => (AtomNode) new ConstantNode (x)
         );
 
     /// <summary>
     /// Разбор перечисленных терминов.
     /// </summary>
-    public static TermParser Term (params string[] terms) => new (terms);
+    private static TermParser Term (params string[] terms) => new (terms);
 
     /// <summary>
     /// Разбор зарезервированного слова.
     /// </summary>
-    public static ReservedWordParser Reserved (string? word) => new (word);
+    /// <param name="word"><c>null</c> означает "любое зарезервированное слово".
+    /// </param>
+    private static ReservedWordParser Reserved (string? word) => new (word);
 
     /// <summary>
     /// Разбор идентификаторов.
     /// </summary>
-    public static readonly IdentifierParser Identifier = new ();
+    private static readonly IdentifierParser Identifier = new ();
 
     /// <summary>
     /// Ссылка на переменную.
     /// </summary>
     private static readonly Parser<AtomNode> Variable = Identifier.Map
             (
-                x => (AtomNode)new VariableNode (x)
+                x => (AtomNode) new VariableNode (x)
             )
         .Labeled ("Variable");
 
@@ -94,28 +96,33 @@ public static class Grammar
     /// <summary>
     /// Выражение, стоящее слева от знака присваивания.
     /// </summary>
-    private static readonly Parser<AtomNode> LeftExpression = ExpressionBuilder.Build
+    private static readonly Parser<AtomNode> LeftHand = ExpressionBuilder.Build
         (
-            Parser.Lazy (() => Atom),
+            root: Parser.Lazy (() => Atom),
+            
             // префиксные операции не предусмотрены
-            Array.Empty<Parser<Func<AtomNode, AtomNode>>>(),
-            new[]
+            prefixOps: Array.Empty<Parser<Func<AtomNode, AtomNode>>>(),
+            
+            postfixOps: new[]
             {
                 // постфиксные операции
                 Parser.Lazy (() => Index!),
                 Parser.Lazy (() => Property!)
             },
+            
             // инфиксные операции не предусмотрены
-            Array.Empty<InfixOperator<AtomNode>>()
-        );
+            infixOps: Array.Empty<InfixOperator<AtomNode>>()
+        )
+        .Labeled ("LeftHand");
 
     /// <summary>
-    /// Базовое выражение.
+    /// Правая часть оператора присваивания.
     /// </summary>
-    private static readonly Parser<AtomNode> BasicExpression = ExpressionBuilder.Build
+    private static readonly Parser<AtomNode> Expression = ExpressionBuilder.Build
         (
-            Parser.Lazy (() => Atom),
-            new[]
+            root: Parser.Lazy (() => Atom),
+            
+            prefixOps: new[]
             {
                 // префиксные операции
                 Operator.Unary
@@ -128,8 +135,8 @@ public static class Grammar
                 Operator.Unary
                     (
                         Term ("!"),
-                        "Bang",
-                        _ => target => new BangNode (target)
+                        "PrefixBang",
+                        _ => target => new PrefixBangNode (target)
                     ),
 
                 Operator.Unary
@@ -149,52 +156,58 @@ public static class Grammar
                         x => target => new CastNode (x, target)
                     )
             },
-            new[]
+            
+            postfixOps: new[]
             {
                 // постфиксные операции
                 Operator.Increment ("PostfixIncrement", false),
 
+                Operator.Unary
+                    (
+                        Term ("!"),
+                        "PostfixBang",
+                        _ => target => new PostfixBangNode (target)
+                    ),
+                
                 Parser.Lazy (() => Index!),
 
                 Parser.Lazy (() => MethodCall!).Labeled ("MethodCall"),
 
                 Parser.Lazy (() => Property!).Labeled ("Property"),
             },
-            new[]
+            
+            infixOps: new[]
             {
-                // бинарные операции
+                // инфиксные операции
                 Operator.NonAssociative ("Shuttle", "<=>"),
-                Operator.NonAssociative ("in", "in", "is"),
+                Operator.NonAssociative ("In/is", "in", "is"),
                 Operator.LeftAssociative ("Shift", "<<", ">>"),
                 Operator.LeftAssociative ("Bitwise", "&", "|", "^"),
                 Operator.LeftAssociative ("Multiplication", "*", "/", "%" ),
                 Operator.LeftAssociative ("Addition", "+", "-" ),
-                Operator.LeftAssociative ("Comparison", "<", ">", "<=", ">=", "==", "!=" )
+                Operator.LeftAssociative ("Comparison", "<", ">", "<=", ">=", "==", "!=", "<>" )
             }
         )
-        .Labeled ("BasicExpression");
+        .Labeled ("Expression");
 
     /// <summary>
-    /// Выражение без присваивания.
+    /// Именованный аргумент функции.
     /// </summary>
-    private static readonly Parser<ExpressionNode> Expression = BasicExpression.Map
+    private static readonly Parser<AtomNode> NamedArgument = Parser.Chain
         (
-            x => new ExpressionNode (null, null, x)
+            Identifier,
+            Term (":"),
+            Parser.Lazy (() => Expression),
+            (name, _, expr) => (AtomNode) new NamedArgumentNode (name, expr)
         )
-        .Labeled ("Expression");
+        .Labeled ("NamedArg");
 
     /// <summary>
     /// Имя типа в формате `Namespace.Subspace.Typename`.
     /// </summary>
     private static readonly Parser<string> TypeName =
-        (
-            Identifier.SeparatedBy
-                (
-                    Term ("."),
-                    minCount: 1
-                )
+        Identifier.SeparatedBy (Term ("."), minCount: 1)
             .Map (x => string.Join ('.', x))
-        )
         .Or (new LiteralParser().Map (x => (string)x))
         .Labeled ("TypeName");
 
@@ -202,25 +215,25 @@ public static class Grammar
     /// Оператор new.
     /// </summary>
     private static readonly Parser<AtomNode> New = Parser.Chain
-            (
-                Reserved ("new"),
-                TypeName,
-                Expression.SeparatedBy (Term (",")).RoundBrackets(),
-                (_, _2, _3) =>
-                    (AtomNode)new NewNode (_2, _3.ToArray())
-            )
+        (
+            Reserved ("new"),
+            TypeName,
+            Expression.SeparatedBy (Term (",")).RoundBrackets(),
+            (_, _2, _3) =>
+                (AtomNode) new NewNode (_2, _3.ToArray())
+        )
         .Labeled ("New");
 
     /// <summary>
     /// Пара "ключ и значение" для словаря.
     /// </summary>
     private static readonly Parser<KeyValueNode> KeyAndValue = Parser.Chain
-            (
-                Expression.Instance ("Key"), // 1
-                Term (":"), // 2
-                Expression.Instance ("Value"), // 3
-                (_1, _, _3) => new KeyValueNode (_1, _3)
-            )
+        (
+            Expression.Instance ("Key"), // 1
+            Term (":"), // 2
+            Expression.Instance ("Value"), // 3
+            (_1, _, _3) => new KeyValueNode (_1, _3)
+        )
         .Labeled ("KeyAndValue");
 
     /// <summary>
@@ -230,7 +243,7 @@ public static class Grammar
         .SeparatedBy (Term (","))
         .CurlyBrackets()
         .Labeled ("Dictionary")
-        .Map (x => (AtomNode)new DictionaryNode (x));
+        .Map (x => (AtomNode) new DictionaryNode (x.ToArray()));
 
     /// <summary>
     /// Список вида `[1, 2, 3]`.
@@ -239,76 +252,74 @@ public static class Grammar
         .SeparatedBy (Term (","))
         .SquareBrackets()
         .Labeled ("List")
-        .Map (x => (AtomNode)new ListNode (x));
+        .Map (x => (AtomNode) new ListNode (x.ToArray()));
 
     /// <summary>
     /// Присваивание.
     /// </summary>
-    private static readonly Parser<ExpressionNode> Assignment = Parser.Chain
-            (
-
-                // x1 = x2 = ...
-                new RepeatParser<Tuple<AtomNode, string>>
-                    (
-                        Parser.Chain
-                            (
-                                LeftExpression,
-                                Parser.Term ("=", "+=", "-=", "*=", "/="),
-                                Tuple.Create
-                            ),
-                        minCount: 1
-                    ),
-                BasicExpression,
-                (tuples, e) =>
+    private static readonly Parser<AtomNode> Assignment = Parser.Chain
+        (
+            new RepeatParser<Tuple<AtomNode, string>>
+                (
+                    // x1 = x2 = ...
+                    Parser.Chain
+                        (
+                            LeftHand,
+                            Parser.Term ("=", "+=", "-=", "*=", "/="),
+                            Tuple.Create
+                        ),
+                    minCount: 0
+                ),
+            
+            Expression,
+            
+            (tuples, expr) =>
+            {
+                // TODO присваивание должно идти в обратном порядке
+                foreach (var tuple in tuples)
                 {
-                    var expr = e;
-
-                    foreach (var tuple in tuples)
-                    {
-                        expr = new ExpressionNode (tuple.Item1, tuple.Item2, expr);
-                    }
-
-                    return (ExpressionNode)expr;
+                    expr = new ExpressionNode (tuple.Item1, tuple.Item2, expr);
                 }
-            )
+
+                return expr;
+            }
+        )
         .Labeled ("Assignment");
 
     /// <summary>
     /// Обращение к свойству объекта.
     /// </summary>
-    private static readonly Parser<Func<AtomNode, AtomNode>> Property =
-        Operator.Unary
-            (
-                Identifier.After (Term (".")),
-                "Property",
-                name => target => new PropertyNode (target, name)
-            );
+    private static readonly Parser<Func<AtomNode, AtomNode>> Property = Operator.Unary
+        (
+            Identifier.After (Term (".")),
+            "Property",
+            name => target => new PropertyNode (target, name)
+        );
 
     /// <summary>
     /// Обращение к элементу массива/списка по индексу.
     /// </summary>
-    private static readonly Parser<Func<AtomNode, AtomNode>> Index =
-        Operator.Unary
-            (
-                Parser.Lazy (() => Expression!).SquareBrackets(),
-                "Index",
-                x => target => new IndexNode (target, x)
-            );
+    private static readonly Parser<Func<AtomNode, AtomNode>> Index = Operator.Unary
+        (
+            Parser.Lazy (() => Expression!).SquareBrackets(),
+            "Index",
+            x => target => new IndexNode (target, x)
+        );
 
     /// <summary>
     /// Вызов метода объекта.
     /// </summary>
     private static readonly Parser<Func<AtomNode, AtomNode>> MethodCall =
-        Parser.Chain<string, string, IEnumerable<ExpressionNode>, Func<AtomNode, AtomNode>>
-                (
-                    Term ("."),
-                    Identifier,
-                    Parser.Lazy (() => Expression!)
-                        .SeparatedBy (Term (","))
-                        .RoundBrackets(),
-                    (_, name, args) => target => new MethodNode (target, name, args.ToArray())
-                )
-            .Labeled ("MethodCall");
+        Parser.Chain<string, string, IEnumerable<AtomNode>, Func<AtomNode, AtomNode>>
+        (
+            Term ("."),
+            Identifier,
+            Parser.Lazy (() => Expression!)
+                .SeparatedBy (Term (","))
+                .RoundBrackets(),
+            (_, name, args) => target => new MethodNode (target, name, args.ToArray())
+        )
+        .Labeled ("MethodCall");
 
     /// <summary>
     /// Вызов свободной функции, например, `println`.
@@ -316,23 +327,19 @@ public static class Grammar
     private static readonly Parser<AtomNode> FunctionCall = Parser.Chain
         (
             Identifier,
-            Parser.Lazy (() => Expression!)
+            Parser.Lazy (() => Expression!.Or (NamedArgument!))
                 .SeparatedBy (Term (","))
                 .RoundBrackets(),
             (name, args) =>
-                (AtomNode)new CallNode (name, args.ToArray())
+                (AtomNode) new CallNode (name, args.ToArray())
         )
         .Labeled ("FunctionCall");
 
     /// <summary>
     /// Простой стейтмент.
     /// </summary>
-    private static readonly Parser<StatementBase> SimpleStatement = Parser.OneOf
-        (
-            BuildStatement (Assignment),
-            BuildStatement (Expression)
-        )
-        .Labeled ("SimpleStatement");
+    private static readonly Parser<StatementBase> SimpleStatement = 
+        BuildStatement (Assignment).Labeled ("SimpleStatement");
 
     /// <summary>
     /// Блок стейтментов.
@@ -341,14 +348,17 @@ public static class Grammar
         (
             () => Parser.OneOf
                 (
+                    // произвольное количество стейтментов внутри фигурных скобок
                     Parser.Chain
                         (
                             Parser.Position,
-                            GenericStatement!.Repeated (minCount: 1).CurlyBrackets(),
+                            GenericStatement!.Repeated (minCount: 0).CurlyBrackets(),
                             (pos, lines) =>
                                 (StatementBase)new Block (pos.Line, lines.ToArray())
                         ),
-                    SimpleStatement.Map
+                    
+                    // либо единственный стейтмент без фигурных скобок
+                    GenericStatement!.Map
                         (
                             x => (StatementBase)new Block (x.Line, new[] { x })
                         )
@@ -360,21 +370,21 @@ public static class Grammar
     /// Цикл for.
     /// </summary>
     private static readonly Parser<StatementBase> ForStatement = Parser.Chain
-            (
-                Parser.Position, // 1
-                Parser.Reserved ("for"), // 2
-                Parser.Term ("("), // 3
-                Assignment.Instance ("Init"), // 4
-                Parser.Term (";"), // 5
-                Expression.Instance ("Condition"), // 6
-                Parser.Term (";"), // 7
-                Assignment.Or (Expression).Labeled ("Step"), // 8
-                Parser.Term (")"), // 9
-                Block.Instance ("Body"), // 10
-                Block.Before (Parser.Reserved ("else")).Optional(), // 11
-                (_1, _, _, _4, _, _6, _, _8, _, _10, _11) =>
-                    (StatementBase) new ForNode (_1.Line, _4, _6, _8, _10, _11)
-            )
+        (
+            Parser.Position, // 1
+            Parser.Reserved ("for"), // 2
+            Parser.Term ("("), // 3
+            Assignment.Instance ("Init"), // 4
+            Parser.Term (";"), // 5
+            Expression.Instance ("Condition"), // 6
+            Parser.Term (";"), // 7
+            Assignment.Or (Expression).Labeled ("Step"), // 8
+            Parser.Term (")"), // 9
+            Block.Instance ("Body"), // 10
+            Block.Before (Parser.Reserved ("else")).Optional(), // 11
+            (_1, _, _, _4, _, _6, _, _8, _, _10, _11) =>
+                (StatementBase) new ForNode (_1.Line, _4, _6, _8, _10, _11)
+        )
         .Labeled ("For");
 
     /// <summary>
@@ -461,35 +471,35 @@ public static class Grammar
     /// Условный оператор if-then-else.
     /// </summary>
     private static readonly Parser<StatementBase> IfStatement = Parser.Chain
-            (
-                Parser.Position, // 1
-                Parser.Reserved ("if"), // 2
-                Parser.Term ("("), // 3
-                Expression.Instance ("Condition"), // 4
-                Parser.Term (")"), // 5
-                Block.Instance ("Then"), // 6
-                Block.Instance ("Else").After (Parser.Reserved ("else")).Optional(), // 7
-                (_1, _, _, _4, _, _6, _7) =>
-                    (StatementBase)new IfNode (_1.Line, _4, (Block)_6, (Block)_7)
-            )
+        (
+            Parser.Position, // 1
+            Parser.Reserved ("if"), // 2
+            Parser.Term ("("), // 3
+            Expression.Instance ("Condition"), // 4
+            Parser.Term (")"), // 5
+            Block.Instance ("Then"), // 6
+            Block.Instance ("Else").After (Parser.Reserved ("else")).Optional(), // 7
+            (_1, _, _, _4, _, _6, _7) =>
+                (StatementBase)new IfNode (_1.Line, _4, (Block)_6, (Block)_7)
+        )
         .Labeled ("If");
 
     /// <summary>
     /// Блок using.
     /// </summary>
     private static readonly Parser<StatementBase> UsingStatement = Parser.Chain
-            (
-                Parser.Position, // 1
-                Parser.Reserved ("using"), // 2
-                Parser.Term ("("), // 3
-                Parser.Identifier, // 4
-                Parser.Term ("="), // 5
-                Expression.Instance ("Init"), // 6
-                Parser.Term (")"), // 7
-                Block.Instance ("Body"), // 8
-                (_1, _, _, _4, _, _6, _, _8) =>
-                    (StatementBase)new UsingNode (_1.Line, _4, _6, (Block)_8)
-            )
+        (
+            Parser.Position, // 1
+            Parser.Reserved ("using"), // 2
+            Parser.Term ("("), // 3
+            Parser.Identifier, // 4
+            Parser.Term ("="), // 5
+            Expression.Instance ("Init"), // 6
+            Parser.Term (")"), // 7
+            Block.Instance ("Body"), // 8
+            (_1, _, _, _4, _, _6, _, _8) =>
+                (StatementBase)new UsingNode (_1.Line, _4, _6, (Block)_8)
+        )
         .Labeled ("Using");
 
     private static readonly Parser<StatementBase> FunctionDefinition = Parser.Chain
@@ -509,22 +519,21 @@ public static class Grammar
     /// </summary>
     private static readonly Parser<StatementBase> GenericStatement = Parser.Lazy
         (
-            () =>
-                Parser.OneOf
-                        (
-                            SimpleStatement,
-                            ForStatement,
-                            ForEachStatement,
-                            WhileStatement,
-                            IfStatement,
-                            UsingStatement,
-                            FunctionDefinition,
-                            BreakStatement,
-                            ContinueStatement,
-                            ReturnStatement,
-                            SemicolonStatement
-                        )
-                    .Labeled ("StatementKind")
+            () => Parser.OneOf
+                (
+                    SimpleStatement,
+                    ForStatement,
+                    ForEachStatement,
+                    WhileStatement,
+                    IfStatement,
+                    UsingStatement,
+                    FunctionDefinition,
+                    BreakStatement,
+                    ContinueStatement,
+                    ReturnStatement,
+                    SemicolonStatement
+                )
+                .Labeled ("StatementKind")
         )
         .Labeled ("GenericStatement");
 
@@ -532,9 +541,9 @@ public static class Grammar
     /// Программа в целом.
     /// </summary>
     private static readonly Parser<ProgramNode> Program = new RepeatParser<StatementBase>
-            (
-                GenericStatement
-            )
+        (
+            GenericStatement
+        )
         .Labeled ("Statements")
         .Map (x => new ProgramNode (x))
         .End()
@@ -557,10 +566,7 @@ public static class Grammar
 
         var tokenizer = new Tokenizer();
         var tokens = tokenizer.Tokenize (sourceCode);
-        var state = new ParseState (tokens)
-        {
-            DebugOutput = debugOutput
-        };
+        var state = new ParseState (tokens) { DebugOutput = debugOutput };
         var result = Expression.End().ParseOrThrow (state);
 
         return result;
@@ -579,10 +585,7 @@ public static class Grammar
 
         var tokenizer = new Tokenizer();
         var tokens = tokenizer.Tokenize (sourceText);
-        var state = new ParseState (tokens)
-        {
-            DebugOutput = debugOutput
-        };
+        var state = new ParseState (tokens) { DebugOutput = debugOutput };
         var result = Program.ParseOrThrow (state);
 
         return result;

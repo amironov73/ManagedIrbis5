@@ -36,7 +36,7 @@ public sealed class CallNode
     public CallNode
         (
             string name,
-            ExpressionNode[] arguments
+            AtomNode[] arguments
         )
     {
         Sure.NotNullNorEmpty (name);
@@ -50,7 +50,7 @@ public sealed class CallNode
     #region Private members
 
     private readonly string _name;
-    private readonly ExpressionNode[] _arguments;
+    private readonly AtomNode[] _arguments;
     private FunctionDescriptor? _function;
 
     #endregion

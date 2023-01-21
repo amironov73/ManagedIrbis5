@@ -12,7 +12,7 @@
 
 #region Using directives
 
-using System.Collections.Generic;
+using System.IO;
 
 #endregion
 
@@ -33,21 +33,19 @@ public sealed class ListNode
     /// </summary>
     public ListNode
         (
-            IEnumerable<ExpressionNode>? items
+            AtomNode[] items
         )
     {
-        _items = new ();
-        if (items is not null)
-        {
-            _items.AddRange (items);
-        }
+        Sure.NotNull (items);
+        
+        _items = items;
     }
 
     #endregion
 
     #region Private members
 
-    private readonly List<ExpressionNode> _items;
+    private readonly AtomNode[] _items;
 
     #endregion
 
@@ -67,6 +65,26 @@ public sealed class ListNode
         }
 
         return result;
+    }
+
+    #endregion
+
+    #region AstNode members
+
+    /// <inheritdoc cref="AstNode.DumpHierarchyItem(string?,int,System.IO.TextWriter)"/>
+    internal override void DumpHierarchyItem 
+        (
+            string? name, 
+            int level, 
+            TextWriter writer
+        )
+    {
+        base.DumpHierarchyItem (name, level, writer);
+
+        for (var i = 0; i < _items.Length; i++)
+        {
+            _items[i].DumpHierarchyItem (i.ToInvariantString(), level + 1, writer);
+        }
     }
 
     #endregion

@@ -39,6 +39,27 @@ public static class Builtins
     #region Private members
 
     /// <summary>
+    /// Вычисление аргумента по его имени.
+    /// </summary>
+    public static object? Compute
+        (
+            Context context,
+            dynamic?[] args,
+            string name
+        )
+    {
+        foreach (var arg in args)
+        {
+            if (arg is NamedArgumentNode named)
+            {
+                return named.RealCompute (context);
+            }
+        }
+
+        return null;
+    }
+    
+    /// <summary>
     /// Вычисление аргумента по соответствующему индексу.
     /// </summary>
     public static object? Compute

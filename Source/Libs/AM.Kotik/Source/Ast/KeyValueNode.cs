@@ -9,6 +9,12 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
+#region Using directives
+
+using System.IO;
+
+#endregion
+
 #nullable enable
 
 namespace AM.Kotik;
@@ -17,6 +23,7 @@ namespace AM.Kotik;
 /// Узел AST для хранения пары "ключ-значение".
 /// </summary>
 public sealed class KeyValueNode
+    : AstNode
 {
     #region Properties
 
@@ -45,6 +52,24 @@ public sealed class KeyValueNode
     {
         Key = key;
         Value = value;
+    }
+
+    #endregion
+
+    #region AstNode members
+
+    /// <inheritdoc cref="AstNode.DumpHierarchyItem(string?,int,System.IO.TextWriter)"/>
+    internal override void DumpHierarchyItem 
+        (
+            string? name, 
+            int level, 
+            TextWriter writer
+        )
+    {
+        base.DumpHierarchyItem (name, level, writer);
+        
+        Key.DumpHierarchyItem ("Key", level + 1, writer);
+        Value.DumpHierarchyItem ("Value", level + 1, writer);
     }
 
     #endregion

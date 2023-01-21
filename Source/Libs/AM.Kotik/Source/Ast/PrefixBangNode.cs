@@ -6,20 +6,24 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
 
-/* BangNode.cs -- логическое отрицание
+/* PrefixBangNode.cs -- логическое отрицание
  * Ars Magna project, http://arsmagna.ru
  */
 
-#nullable enable
+#region Using directives
 
 using System.IO;
+
+#endregion
+
+#nullable enable
 
 namespace AM.Kotik;
 
 /// <summary>
 /// Логическое отрицание.
 /// </summary>
-public sealed class BangNode
+public sealed class PrefixBangNode
     : UnaryNode
 {
     #region Construction
@@ -27,7 +31,7 @@ public sealed class BangNode
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public BangNode
+    public PrefixBangNode
         (
             AtomNode inner
         )

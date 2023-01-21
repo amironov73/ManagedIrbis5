@@ -36,7 +36,7 @@ public sealed class SimpleStatement
     public SimpleStatement
         (
             int line,
-            ExpressionNode expression
+            AtomNode expression
         )
         : base (line)
     {
@@ -47,7 +47,7 @@ public sealed class SimpleStatement
 
     #region Private members
 
-    private readonly ExpressionNode _expression;
+    private readonly AtomNode _expression;
 
     #endregion
 

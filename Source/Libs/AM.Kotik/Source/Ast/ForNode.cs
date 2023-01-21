@@ -37,9 +37,9 @@ public sealed class ForNode
     public ForNode
         (
             int line,
-            ExpressionNode init,
-            ExpressionNode condition,
-            ExpressionNode step,
+            AtomNode init,
+            AtomNode condition,
+            AtomNode step,
             StatementBase body,
             StatementBase? elseBody
         )
@@ -56,9 +56,9 @@ public sealed class ForNode
 
     #region Private members
 
-    private readonly ExpressionNode _init;
-    private readonly ExpressionNode _condition;
-    private readonly ExpressionNode _step;
+    private readonly AtomNode _init;
+    private readonly AtomNode _condition;
+    private readonly AtomNode _step;
     private readonly StatementBase _body;
     private readonly StatementBase? _elseBody;
 

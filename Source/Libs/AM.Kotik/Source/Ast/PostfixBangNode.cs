@@ -6,12 +6,13 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
 
-/* DictionaryNode.cs -- создание словаря вида {1: "one", 2: "two", 3: "three"}
+/* PostfixBangNode.cs -- проверка на null
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
+using System;
 using System.IO;
 
 #endregion
@@ -21,72 +22,70 @@ using System.IO;
 namespace AM.Kotik;
 
 /// <summary>
-/// Создание словаря вида `{1: "one", 2: "two", 3: "three"}`.
+/// Проверка на null.
 /// </summary>
-public sealed class DictionaryNode
-    : AtomNode
+public sealed class PostfixBangNode
+    : UnaryNode
 {
     #region Construction
 
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public DictionaryNode
+    public PostfixBangNode
         (
-            KeyValueNode[] items
+            AtomNode inner
         )
     {
-        Sure.NotNull (items);
-        
-        _items = items;
+        Sure.NotNull (inner);
+
+        _inner = inner;
     }
 
     #endregion
 
     #region Private members
 
-    private readonly KeyValueNode[] _items;
+    private readonly AtomNode _inner;
 
     #endregion
 
     #region AtomNode members
 
     /// <inheritdoc cref="AtomNode.Compute"/>
-    public override dynamic Compute
+    public override dynamic? Compute
         (
             Context context
         )
     {
-        var result = new BarsikDictionary();
-        foreach (var item in _items)
+        Sure.NotNull (context);
+
+        var value = _inner.Compute (context);
+        if (value is null)
         {
-            var key = item.Key.Compute (context);
-            var value = item.Value.Compute (context);
-            result.Add (key!, value);
+            throw new NullReferenceException();
         }
 
-        return result;
+        return value;
     }
 
     #endregion
-    
+
     #region AstNode members
 
     /// <inheritdoc cref="AstNode.DumpHierarchyItem(string?,int,System.IO.TextWriter)"/>
-    internal override void DumpHierarchyItem 
+    internal override void DumpHierarchyItem
         (
-            string? name, 
-            int level, 
+            string? name,
+            int level,
             TextWriter writer
         )
     {
         base.DumpHierarchyItem (name, level, writer);
 
-        for (var i = 0; i < _items.Length; i++)
-        {
-            _items[i].DumpHierarchyItem (i.ToInvariantString(), level + 1, writer);
-        }
+        _inner.DumpHierarchyItem ("Inner", level + 1, writer);
     }
 
     #endregion
+    
 }

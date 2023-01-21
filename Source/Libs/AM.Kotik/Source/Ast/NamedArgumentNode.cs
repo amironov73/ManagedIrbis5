@@ -6,7 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
 
-/* DictionaryNode.cs -- создание словаря вида {1: "one", 2: "two", 3: "three"}
+/* NamedParameterNode.cs -- именованный аргумент функции
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,55 +21,76 @@ using System.IO;
 namespace AM.Kotik;
 
 /// <summary>
-/// Создание словаря вида `{1: "one", 2: "two", 3: "three"}`.
+/// Именованный аргумент функции.
 /// </summary>
-public sealed class DictionaryNode
+public sealed class NamedArgumentNode
     : AtomNode
 {
+    #region Properties
+
+    /// <summary>
+    /// Имя параметра.
+    /// </summary>
+    public string Name { get; }
+
+    #endregion
+    
     #region Construction
 
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public DictionaryNode
+    public NamedArgumentNode
         (
-            KeyValueNode[] items
+            string name, 
+            AtomNode innerNode
         )
     {
-        Sure.NotNull (items);
+        Sure.NotNullNorEmpty (name);
+        Sure.NotNull (innerNode);
         
-        _items = items;
+        _innerNode = innerNode;
+        Name = name;
     }
 
     #endregion
 
     #region Private members
 
-    private readonly KeyValueNode[] _items;
+    private readonly AtomNode _innerNode;
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Реальное вычисление значения аргумента.
+    /// </summary>
+    public dynamic? RealCompute
+        (
+            Context context
+        )
+    {
+        return _innerNode.Compute (context);
+    }
 
     #endregion
 
     #region AtomNode members
 
     /// <inheritdoc cref="AtomNode.Compute"/>
-    public override dynamic Compute
+    public override dynamic Compute 
         (
             Context context
         )
     {
-        var result = new BarsikDictionary();
-        foreach (var item in _items)
-        {
-            var key = item.Key.Compute (context);
-            var value = item.Value.Compute (context);
-            result.Add (key!, value);
-        }
-
-        return result;
+        // фокус, чтобы сохранить имя аргумента
+        
+        return this;
     }
 
     #endregion
-    
+
     #region AstNode members
 
     /// <inheritdoc cref="AstNode.DumpHierarchyItem(string?,int,System.IO.TextWriter)"/>
@@ -81,11 +102,9 @@ public sealed class DictionaryNode
         )
     {
         base.DumpHierarchyItem (name, level, writer);
-
-        for (var i = 0; i < _items.Length; i++)
-        {
-            _items[i].DumpHierarchyItem (i.ToInvariantString(), level + 1, writer);
-        }
+        
+        DumpHierarchyItem ("Name", level + 1, writer, Name);
+        _innerNode.DumpHierarchyItem ("Value", level + 1, writer);
     }
 
     #endregion

@@ -36,7 +36,7 @@ public sealed class NewNode
     public NewNode
         (
             string typeName,
-            ExpressionNode[] constructorArguments
+            AtomNode[] constructorArguments
         )
     {
         _typeName = typeName;
@@ -48,7 +48,7 @@ public sealed class NewNode
     #region Private members
 
     private readonly string _typeName;
-    private readonly ExpressionNode[] _constructorArguments;
+    private readonly AtomNode[] _constructorArguments;
 
     #endregion
 
