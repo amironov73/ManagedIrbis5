@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
+using AM.Collections;
 using AM.Results;
 
 #endregion
@@ -42,18 +43,20 @@ public abstract class Parser<TResult>
     #region Protected members
 
     /// <summary>
-    /// Отладочная печать текущей позции в исходном коде скрипта.
+    /// Отладочная зацепка, вызывается перед началом разбора
+    /// текущего токена.
     /// </summary>
     protected internal void DebugHook
         (
             ParseState state
         )
     {
-        // state.DebugCurrentPosition (this);
+        // пустое тело метода, переопределите в потомке, если нужно
     }
 
     /// <summary>
     /// Отладочная печать текущей признака успешности выполнения парсинга.
+    /// Вызывается после окончания разбора текущего токена.
     /// </summary>
     protected internal bool DebugSuccess
         (
@@ -70,17 +73,35 @@ public abstract class Parser<TResult>
 
     /// <summary>
     /// Создание псевдо-экземпляра.
+    /// Этот вызов нужен, чтобы защитить статические экземпляры
+    /// парсеров, используемые для разных нужд.
+    /// В прочих случаях можно без проблем использовать метод.
+    /// <see cref="Labeled"/>.
     /// </summary>
-    public Parser<TResult> Instance (string label) => new ParserInstance<TResult> (this, label);
+    public Parser<TResult> Instance 
+        (
+            string label
+        )
+    {
+        Sure.NotNullNorEmpty (label);
+        
+        return new ParserInstance<TResult> (this, label);
+    }
 
     /// <summary>
     /// Пометка парсера для упрощения отладки.
+    /// Предупреждение: не используйте больше одного раза для
+    /// одного экземпляра парсера, т.к . результат предыдущего
+    /// вызова будет потерян. Пометить один экземпляр разными
+    /// метками можно с помощью вызова <see cref="Instance"/>.
     /// </summary>
     public Parser<TResult> Labeled
         (
             string label
         )
     {
+        Sure.NotNull (label);
+        
         Label = label;
 
         return this;
@@ -94,6 +115,8 @@ public abstract class Parser<TResult>
             Parser<TResult> other
         )
     {
+        Sure.NotNull (other);
+        
         return new OneOfParser<TResult> (this, other);
     }
 
@@ -106,6 +129,9 @@ public abstract class Parser<TResult>
             Parser<TResult> other2
         )
     {
+        Sure.NotNull (other1);
+        Sure.NotNull (other2);
+        
         return new OneOfParser<TResult> (this, other1, other2);
     }
 
@@ -119,6 +145,10 @@ public abstract class Parser<TResult>
             Parser<TResult> other3
         )
     {
+        Sure.NotNull (other1);
+        Sure.NotNull (other2);
+        Sure.NotNull (other3);
+        
         return new OneOfParser<TResult> (this, other1, other2, other3);
     }
 
@@ -130,6 +160,8 @@ public abstract class Parser<TResult>
             params Parser<TResult>[] others
         )
     {
+        Sure.AssertState (!others.IsNullOrEmpty());
+        
         var list = new List<Parser<TResult>> (others);
         list.Insert (0, this);
 
@@ -137,13 +169,15 @@ public abstract class Parser<TResult>
     }
 
     /// <summary>
-    /// Разбор входного потока.
+    /// Разбор потока токенов с текущей позиции.
     /// </summary>
     public Result<TResult> Parse
         (
             ParseState state
         )
     {
+        Sure.NotNull (state);
+        
         if (!TryParse (state, out var temporary))
         {
             return Result<TResult>.Failure();
@@ -153,16 +187,18 @@ public abstract class Parser<TResult>
     }
 
     /// <summary>
-    /// Разбор входного
+    /// Разбор потока токенов с текущей позиции.
     /// </summary>
     public TResult ParseOrThrow
         (
             ParseState state
         )
     {
+        Sure.NotNull (state);
+        
         if (!TryParse (state, out var temporary))
         {
-            throw new SyntaxException();
+            throw new SyntaxException (state);
         }
 
         return new Result<TResult> (temporary).Value;
@@ -177,6 +213,9 @@ public abstract class Parser<TResult>
             int maxCount = int.MaxValue
         )
     {
+        Sure.NonNegative (minCount);
+        Sure.NonNegative (maxCount);
+        
         return new RepeatParser<TResult> (this, minCount, maxCount);
     }
 
@@ -191,8 +230,18 @@ public abstract class Parser<TResult>
         )
         where TSeparator: class
     {
-        return new SeparatedParser<TResult, TSeparator, string> (this, separator,
-            null, minCount, maxCount);
+        Sure.NotNull (separator);
+        Sure.NonNegative (minCount);
+        Sure.NonNegative (maxCount);
+        
+        return new SeparatedParser<TResult, TSeparator, string> 
+            (
+                itemParser: this, 
+                separator,
+                delimiterParser: null, 
+                minCount, 
+                maxCount
+            );
     }
 
     /// <summary>
@@ -208,12 +257,26 @@ public abstract class Parser<TResult>
         where TSeparator: class
         where TDelimiter: class
     {
-        return new SeparatedParser<TResult, TSeparator, TDelimiter> (this, separator,
-            delimiter, minCount, maxCount);
+        Sure.NotNull (separator);
+        Sure.NotNull (delimiter);
+        Sure.NonNegative (minCount);
+        Sure.NonNegative (maxCount);
+        
+        return new SeparatedParser<TResult, TSeparator, TDelimiter> 
+            (
+                this, 
+                separator,
+                delimiter, 
+                minCount, 
+                maxCount
+            );
     }
 
     /// <summary>
     /// Разбор входного потока (попытка).
+    /// Является правилом хорошего тона, чтобы парсер
+    /// восстанавливал состояние <paramref name="state"/>,
+    /// если возвращает <c>false</c>.
     /// </summary>
     public abstract bool TryParse
         (

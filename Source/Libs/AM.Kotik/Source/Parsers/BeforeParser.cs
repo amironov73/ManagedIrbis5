@@ -17,6 +17,9 @@ namespace AM.Kotik;
 
 /// <summary>
 /// Парсит сочетание "нужное перед ненужным".
+/// Например, "число перед скобкой", когда число
+/// нам нужно, а от скобки требуется лишь её существование.
+/// Ещё пример применения - "нечто перед концом текста".
 /// </summary>
 public sealed class BeforeParser<TBefore, TResult>
     : Parser<TResult>
@@ -30,20 +33,23 @@ public sealed class BeforeParser<TBefore, TResult>
     /// </summary>
     public BeforeParser
         (
-            Parser<TResult> parser,
-            Parser<TBefore> other
+            Parser<TResult> useful,
+            Parser<TBefore> concomitant
         )
     {
-        _other = other;
-        _parser = parser;
+        Sure.NotNull (useful);
+        Sure.NotNull (concomitant);
+        
+        _concomitant = concomitant;
+        _useful = useful;
     }
 
     #endregion
 
     #region Private members
 
-    private readonly Parser<TResult> _parser;
-    private readonly Parser<TBefore> _other;
+    private readonly Parser<TResult> _useful;
+    private readonly Parser<TBefore> _concomitant;
 
     #endregion
 
@@ -65,31 +71,22 @@ public sealed class BeforeParser<TBefore, TResult>
         }
 
         var location = state.Location;
-        if (!_parser.TryParse (state, out var temporary))
+        if (!_useful.TryParse (state, out var temporary))
         {
             state.Location = location;
             return DebugSuccess (state, false);
         }
 
-        if (!_other.TryParse (state, out _))
+        if (!_concomitant.TryParse (state, out _))
         {
             state.Location = location;
             return DebugSuccess (state, false);
         }
 
-        // state продвигается вложенными парсерами
         result = temporary;
 
         return DebugSuccess (state, true);
     }
 
     #endregion
-
-    // #region Object members
-    //
-    // /// <inheritdoc cref="Parser{TResult}.ToString"/>
-    // public override string ToString() =>
-    //     $"{GetType().Name}: {_parser} {_other}";
-    //
-    // #endregion
 }

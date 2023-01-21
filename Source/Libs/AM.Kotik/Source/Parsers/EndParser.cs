@@ -22,6 +22,13 @@ namespace AM.Kotik;
 /// <summary>
 /// Парсер, ожидающий конец текста.
 /// </summary>
+/// <example>
+/// Типичное применение выглядит так
+///
+/// <code>
+/// someparser.Before (new EndParser()).ParseOrThrow (state);
+/// </code>
+/// </example>
 internal sealed class EndParser
     : Parser<Unit>
 {

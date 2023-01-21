@@ -21,6 +21,7 @@ namespace AM.Kotik;
 
 /// <summary>
 /// Вечно фейлящийся парсер.
+/// Введен "на всякий случай".
 /// </summary>
 public sealed class FailParser<TResult>
     : Parser<TResult>

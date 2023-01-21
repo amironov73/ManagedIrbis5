@@ -59,17 +59,18 @@ public sealed class OptionalParser<TResult>
         )
     {
         using var _ = state.Enter (this);
-        result = default!;
+        result = default;
         DebugHook (state);
 
         var location = state.Location;
         if (_parser.TryParse (state, out var temporary))
         {
-            // вложенный парсер уже продвинул state
             result = temporary;
         }
         else
         {
+            // откатываем state на всякий случай
+            // (вдруг вложенный парсер забыл это сделать?!)
             state.Location = location;
         }
 

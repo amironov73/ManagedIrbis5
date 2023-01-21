@@ -72,6 +72,5 @@ internal static class Program
             );
 
         return result;
-
     }
 }

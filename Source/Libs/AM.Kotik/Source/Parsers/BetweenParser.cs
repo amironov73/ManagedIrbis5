@@ -17,6 +17,8 @@ namespace AM.Kotik;
 
 /// <summary>
 /// Парсит сочетание "перед - внутри - после".
+/// Например, "число внутри скобок", когда число
+/// нам нужно, а от скобок требуется лишь их существование.
 /// </summary>
 public sealed class BetweenParser<TBefore, TResult, TAfter>
     : Parser<TResult>
@@ -36,6 +38,10 @@ public sealed class BetweenParser<TBefore, TResult, TAfter>
             Parser<TAfter> after
         )
     {
+        Sure.NotNull (before);
+        Sure.NotNull (inside);
+        Sure.NotNull (after);
+        
         _before = before;
         _inside = inside;
         _after = after;
@@ -87,19 +93,10 @@ public sealed class BetweenParser<TBefore, TResult, TAfter>
             return DebugSuccess (state, false);
         }
 
-        // state продвигается вложенными парсерами
         result = temporary;
 
         return DebugSuccess (state, true);
     }
 
     #endregion
-
-    // #region Object members
-    //
-    // /// <inheritdoc cref="Parser{TResult}.ToString"/>
-    // public override string ToString() =>
-    //     $"{GetType().Name}: {_before} {_inside} {_after}";
-    //
-    // #endregion
 }

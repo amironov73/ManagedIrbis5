@@ -4,7 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
 
 /* ExpressionBuilder.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -64,7 +63,7 @@ public static class ExpressionBuilder
         }
 
         var parenthesis = result.RoundBrackets();
-        expr.Inner = () => root.Or (parenthesis);
+        expr.Function = () => root.Or (parenthesis);
 
         return result;
     }

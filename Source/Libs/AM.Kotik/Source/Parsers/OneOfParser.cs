@@ -2,14 +2,8 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassWithVirtualMembersNeverInherited.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable NonReadonlyMemberInGetHashCode
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
 
 /* OneOfParser.cs -- парсинг альтернатив
  * Ars Magna project, http://arsmagna.ru
@@ -18,7 +12,6 @@
 #region Using directives
 
 using System.Diagnostics.CodeAnalysis;
-using System.Text;
 
 #endregion
 
@@ -43,6 +36,7 @@ public sealed class OneOfParser<TResult>
             params Parser<TResult>[] alternatives
         )
     {
+        Sure.NotNull (alternatives);
         Sure.AssertState (alternatives.Length != 0);
 
         _alternatives = alternatives;
@@ -84,30 +78,4 @@ public sealed class OneOfParser<TResult>
     }
 
     #endregion
-
-    // #region Object members
-    //
-    // /// <inheritdoc cref="Parser{TResult}.ToString"/>
-    // public override string ToString()
-    // {
-    //     var builder = new StringBuilder();
-    //     builder.Append (GetType().Name);
-    //     builder.Append (':');
-    //
-    //     var first = true;
-    //     foreach (var alternative in _alternatives)
-    //     {
-    //         if (!first)
-    //         {
-    //             builder.Append (", ");
-    //         }
-    //
-    //         builder.Append (alternative);
-    //         first = false;
-    //     }
-    //
-    //     return builder.ToString();
-    // }
-    //
-    // #endregion
 }

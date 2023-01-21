@@ -4,11 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedMember.Local
-// ReSharper disable UseNameofExpression
 
 /* ParseState.cs -- хранит состояние в процессе разбора
  * Ars Magna project, http://arsmagna.ru
@@ -21,6 +16,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 #endregion
 
@@ -234,7 +230,32 @@ public sealed class ParseState
     #region Object members
 
     /// <inheritdoc cref="object.ToString"/>
-    public override string ToString() => HasCurrent ? Current.ToString() : "EOT";
+    public override string ToString()
+    {
+        if (!HasCurrent)
+        {
+            return "EOT";
+        }
+
+        var builder = new StringBuilder();
+        for (var i = 0; i < 5; i++)
+        {
+            var token = LookAhead (i);
+            if (token is null)
+            {
+                break;
+            }
+
+            if (builder.Length != 0)
+            {
+                builder.Append (' ');
+            }
+
+            builder.Append (token);
+        }
+
+        return builder.ToString();
+    }
 
     #endregion
 }

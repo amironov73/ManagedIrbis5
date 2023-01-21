@@ -4,15 +4,15 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
 
-/* InfixOperator.cs --
+/* InfixOperator.cs -- инфиксный парсер
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 #endregion
@@ -22,7 +22,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace AM.Kotik;
 
 /// <summary>
-///
+/// Инфиксный парсер для разбора бинарных операций.
 /// </summary>
 public sealed class InfixParser<TResult>
     : Parser<TResult>
@@ -35,14 +35,19 @@ public sealed class InfixParser<TResult>
     /// </summary>
     public InfixParser
         (
-            Parser<TResult> item,
-            Parser<string> operations,
+            Parser<TResult> itemParser,
+            Parser<string> operationsParser,
             Func<TResult, string, TResult, TResult> function,
             InfixOperatorKind operatorKind
         )
     {
-        _itemParser = item;
-        _operationParser = operations;
+        Sure.NotNull (itemParser);
+        Sure.NotNull (operationsParser);
+        Sure.NotNull (function);
+        Sure.Defined (operatorKind);
+        
+        _itemParser = itemParser;
+        _operationParser = operationsParser;
         _function = function;
         _operatorKind = operatorKind;
     }
@@ -84,23 +89,34 @@ public sealed class InfixParser<TResult>
         {
             // если не удалось распарсить операцию,
             // выдаем только левый операнд
+            // такая вот у нас защита от рекурсии :)
             result = left;
             return true;
         }
 
-        if (!_itemParser.TryParse (state, out var right))
+        if (!_itemParser.TryParse(state, out var right))
         {
             state.Location = location;
             return false;
         }
 
-        // продвижение state выполняют встроенные парсеры
-        var temporary = _function (left, code, right);
-
-        if (_operatorKind == InfixOperatorKind.NonAssociative)
+        List<ValueTuple<TResult, string>>? list = null;
+        TResult? temporary = left;
+        if (_operatorKind is InfixOperatorKind.RightAssociative)
         {
-            result = temporary;
-            return true;
+            list = new ()
+            {
+                new ValueTuple<TResult, string>(right, code)
+            };
+        }
+        else
+        {
+            temporary = _function (left, code, right);
+            if (_operatorKind == InfixOperatorKind.NonAssociative)
+            {
+                result = temporary;
+                return true;
+            }
         }
 
         while (state.HasCurrent)
@@ -118,15 +134,30 @@ public sealed class InfixParser<TResult>
                 return false;
             }
 
-            temporary = _operatorKind switch
+            switch (_operatorKind)
             {
-                InfixOperatorKind.LeftAssociative => _function (temporary, code, right),
-                InfixOperatorKind.RightAssociative => _function (right, code, temporary),
-                _ => throw new InvalidOperationException()
-            };
+                case InfixOperatorKind.LeftAssociative:
+                    temporary = _function (temporary, code, right);
+                    break;
+                
+                case InfixOperatorKind.RightAssociative:
+                    list!.Add (new ValueTuple<TResult, string> (right, code));
+                    break;
+                
+                default:
+                    throw new InvalidOperationException();
+            }
         }
 
-        result = temporary;
+        if (_operatorKind is InfixOperatorKind.RightAssociative)
+        {
+            for (var i = list!.Count - 1; i >= 0; i--)
+            {
+                temporary = _function (temporary, list[i].Item2, list[i].Item1);
+            }
+        }
+
+        result = temporary!;
 
         return true;
     }

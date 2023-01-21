@@ -61,13 +61,16 @@ public sealed class MapParser<TIntermediate, TResult>
             [MaybeNullWhen (false)] out TResult result
         )
     {
+        // не выполняем отладочных вызовов, чтобы не засорять логи
+        // предполагаем, что все нужные отладочные вызовы будут
+        // сделаны вложенным парсером
+        
         result = default;
         if (!_parser.TryParse (state, out var temporary))
         {
             return false;
         }
 
-        // продвижение state выполнил вложенный парсер
         result = _function (temporary);
 
         return true;

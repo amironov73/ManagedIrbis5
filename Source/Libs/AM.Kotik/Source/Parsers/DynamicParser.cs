@@ -21,7 +21,11 @@ using System.Diagnostics.CodeAnalysis;
 namespace AM.Kotik;
 
 /// <summary>
-/// Парсер, поведение которого может меняться
+/// Парсер, поведение которого может меняться.
+/// Придуман исключительно для разруливания проблемы циклических ссылок
+/// при построении сложного парсера на стеке.
+/// При построении парсера на статических переменных можно использовать
+/// <see cref="LazyParser{TResult}"/>.
 /// </summary>
 public sealed class DynamicParser<TResult>
     : Parser<TResult>
@@ -31,8 +35,18 @@ public sealed class DynamicParser<TResult>
 
     /// <summary>
     /// Функция, вычисляющая парсер.
+    /// Обратите внимание, функцию в любой момент можно поменять.
     /// </summary>
-    public Func<Parser<TResult>> Inner { get; set; }
+    public Func<Parser<TResult>> Function
+    {
+        get => _function;
+        set
+        {
+            Sure.NotNull (value);
+
+            _function = value;
+        }
+    }
 
     #endregion
 
@@ -48,8 +62,14 @@ public sealed class DynamicParser<TResult>
     {
         Sure.NotNull (inner);
 
-        Inner = inner;
+        _function = inner;
     }
+
+    #endregion
+
+    #region Private members
+
+    private Func<Parser<TResult>> _function;
 
     #endregion
 
@@ -64,7 +84,7 @@ public sealed class DynamicParser<TResult>
     {
         result = default;
 
-        return Inner().TryParse (state, out result);
+        return Function().TryParse (state, out result);
     }
 
     #endregion

@@ -12,6 +12,7 @@
 #region Using directives
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 #endregion
 
@@ -40,6 +41,10 @@ public sealed class ChainParser<TFirst, TSecond, TResult>
             Func<TFirst, TSecond, TResult> function
         )
     {
+        Sure.NotNull (first);
+        Sure.NotNull (second);
+        Sure.NotNull (function);
+        
         _first = first;
         _second = second;
         _function = function;
@@ -61,11 +66,11 @@ public sealed class ChainParser<TFirst, TSecond, TResult>
     public override bool TryParse
         (
             ParseState state,
-            out TResult result
+            [MaybeNullWhen (false)] out TResult result
         )
     {
         using var _ = state.Enter (this);
-        result = default!;
+        result = default;
         DebugHook (state);
         if (!state.HasCurrent)
         {
@@ -116,6 +121,11 @@ public sealed class ChainParser<TFirst, TSecond, TThird, TResult>
             Func<TFirst, TSecond, TThird, TResult> function
         )
     {
+        Sure.NotNull (first);
+        Sure.NotNull (second);
+        Sure.NotNull (third);
+        Sure.NotNull (function);
+        
         _first = first;
         _second = second;
         _third = third;
@@ -139,11 +149,11 @@ public sealed class ChainParser<TFirst, TSecond, TThird, TResult>
     public override bool TryParse
         (
             ParseState state,
-            out TResult result
+            [MaybeNullWhen (false)] out TResult result
         )
     {
         using var _ = state.Enter (this);
-        result = default!;
+        result = default;
         DebugHook (state);
         if (!state.HasCurrent)
         {
@@ -202,6 +212,12 @@ public sealed class ChainParser<T1, T2, T3, T4, TResult>
             Func<T1, T2, T3, T4, TResult> function
         )
     {
+        Sure.NotNull (first);
+        Sure.NotNull (second);
+        Sure.NotNull (third);
+        Sure.NotNull (fourth);
+        Sure.NotNull (function);
+        
         _first = first;
         _second = second;
         _third = third;
@@ -227,11 +243,11 @@ public sealed class ChainParser<T1, T2, T3, T4, TResult>
     public override bool TryParse
         (
             ParseState state,
-            out TResult result
+            [MaybeNullWhen (false)] out TResult result
         )
     {
         using var _ = state.Enter (this);
-        result = default!;
+        result = default;
         DebugHook (state);
         if (!state.HasCurrent)
         {
@@ -271,10 +287,10 @@ public sealed class ChainParser<T1, T2, T3, T4, TResult>
     #endregion
 }
 
-    /// <summary>
-    /// Парсер для последовательностей.
-    /// </summary>
-    public sealed class ChainParser<T1, T2, T3, T4, T5, TResult>
+/// <summary>
+/// Парсер для последовательностей.
+/// </summary>
+public sealed class ChainParser<T1, T2, T3, T4, T5, TResult>
     : Parser<TResult>
     where T1: class
     where T2: class
@@ -298,6 +314,13 @@ public sealed class ChainParser<T1, T2, T3, T4, TResult>
             Func<T1, T2, T3, T4, T5, TResult> function
         )
     {
+        Sure.NotNull (first);
+        Sure.NotNull (second);
+        Sure.NotNull (third);
+        Sure.NotNull (fourth);
+        Sure.NotNull (fifth);
+        Sure.NotNull (function);
+        
         _first = first;
         _second = second;
         _third = third;
@@ -325,11 +348,11 @@ public sealed class ChainParser<T1, T2, T3, T4, TResult>
     public override bool TryParse
         (
             ParseState state,
-            out TResult result
+            [MaybeNullWhen (false)] out TResult result
         )
     {
         using var _ = state.Enter (this);
-        result = default!;
+        result = default;
         DebugHook (state);
         if (!state.HasCurrent)
         {
@@ -375,10 +398,10 @@ public sealed class ChainParser<T1, T2, T3, T4, TResult>
     #endregion
 }
 
-    /// <summary>
-    /// Парсер для последовательностей.
-    /// </summary>
-    public sealed class ChainParser<T1, T2, T3, T4, T5, T6, TResult>
+/// <summary>
+/// Парсер для последовательностей.
+/// </summary>
+public sealed class ChainParser<T1, T2, T3, T4, T5, T6, TResult>
     : Parser<TResult>
     where T1: class
     where T2: class
@@ -404,6 +427,14 @@ public sealed class ChainParser<T1, T2, T3, T4, TResult>
             Func<T1, T2, T3, T4, T5, T6, TResult> function
         )
     {
+        Sure.NotNull (first);
+        Sure.NotNull (second);
+        Sure.NotNull (third);
+        Sure.NotNull (fourth);
+        Sure.NotNull (fifth);
+        Sure.NotNull (sixth);
+        Sure.NotNull (function);
+        
         _first = first;
         _second = second;
         _third = third;
@@ -433,11 +464,11 @@ public sealed class ChainParser<T1, T2, T3, T4, TResult>
     public override bool TryParse
         (
             ParseState state,
-            out TResult result
+            [MaybeNullWhen (false)] out TResult result
         )
     {
         using var _ = state.Enter (this);
-        result = default!;
+        result = default;
         DebugHook (state);
         if (!state.HasCurrent)
         {
@@ -520,6 +551,15 @@ public sealed class ChainParser<T1, T2, T3, T4, T5, T6, T7, TResult>
             Func<T1, T2, T3, T4, T5, T6, T7, TResult> function
         )
     {
+        Sure.NotNull (first);
+        Sure.NotNull (second);
+        Sure.NotNull (third);
+        Sure.NotNull (fourth);
+        Sure.NotNull (fifth);
+        Sure.NotNull (sixth);
+        Sure.NotNull (seventh);
+        Sure.NotNull (function);
+        
         _first = first;
         _second = second;
         _third = third;
@@ -551,11 +591,11 @@ public sealed class ChainParser<T1, T2, T3, T4, T5, T6, T7, TResult>
     public override bool TryParse
         (
             ParseState state,
-            out TResult result
+            [MaybeNullWhen (false)] out TResult result
         )
     {
         using var _ = state.Enter (this);
-        result = default!;
+        result = default;
         DebugHook (state);
         if (!state.HasCurrent)
         {
@@ -646,6 +686,16 @@ public sealed class ChainParser<T1, T2, T3, T4, T5, T6, T7, T8, TResult>
             Func<T1, T2, T3, T4, T5, T6, T7, T8, TResult> function
         )
     {
+        Sure.NotNull (first);
+        Sure.NotNull (second);
+        Sure.NotNull (third);
+        Sure.NotNull (fourth);
+        Sure.NotNull (fifth);
+        Sure.NotNull (sixth);
+        Sure.NotNull (seventh);
+        Sure.NotNull (eighth);
+        Sure.NotNull (function);
+        
         _first = first;
         _second = second;
         _third = third;
@@ -679,11 +729,11 @@ public sealed class ChainParser<T1, T2, T3, T4, T5, T6, T7, T8, TResult>
     public override bool TryParse
         (
             ParseState state,
-            out TResult result
+            [MaybeNullWhen (false)] out TResult result
         )
     {
         using var _ = state.Enter (this);
-        result = default!;
+        result = default;
         DebugHook (state);
         if (!state.HasCurrent)
         {
@@ -783,6 +833,17 @@ public sealed class ChainParser<T1, T2, T3, T4, T5, T6, T7, T8, T9, TResult>
             Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, TResult> function
         )
     {
+        Sure.NotNull (first);
+        Sure.NotNull (second);
+        Sure.NotNull (third);
+        Sure.NotNull (fourth);
+        Sure.NotNull (fifth);
+        Sure.NotNull (sixth);
+        Sure.NotNull (seventh);
+        Sure.NotNull (eighth);
+        Sure.NotNull (nineth);
+        Sure.NotNull (function);
+        
         _first = first;
         _second = second;
         _third = third;
@@ -818,11 +879,11 @@ public sealed class ChainParser<T1, T2, T3, T4, T5, T6, T7, T8, T9, TResult>
     public override bool TryParse
         (
             ParseState state,
-            out TResult result
+            [MaybeNullWhen (false)] out TResult result
         )
     {
         using var _ = state.Enter (this);
-        result = default!;
+        result = default;
         DebugHook (state);
         if (!state.HasCurrent)
         {
@@ -930,6 +991,18 @@ public sealed class ChainParser<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, TResult
             Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, TResult> function
         )
     {
+        Sure.NotNull (first);
+        Sure.NotNull (second);
+        Sure.NotNull (third);
+        Sure.NotNull (fourth);
+        Sure.NotNull (fifth);
+        Sure.NotNull (sixth);
+        Sure.NotNull (seventh);
+        Sure.NotNull (eighth);
+        Sure.NotNull (nineth);
+        Sure.NotNull (tenth);
+        Sure.NotNull (function);
+        
         _first = first;
         _second = second;
         _third = third;
@@ -967,11 +1040,11 @@ public sealed class ChainParser<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, TResult
     public override bool TryParse
         (
             ParseState state,
-            out TResult result
+            [MaybeNullWhen (false)] out TResult result
         )
     {
         using var _ = state.Enter (this);
-        result = default!;
+        result = default;
         DebugHook (state);
         if (!state.HasCurrent)
         {
@@ -1087,6 +1160,19 @@ public sealed class ChainParser<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, TR
             Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, TResult> function
         )
     {
+        Sure.NotNull (first);
+        Sure.NotNull (second);
+        Sure.NotNull (third);
+        Sure.NotNull (fourth);
+        Sure.NotNull (fifth);
+        Sure.NotNull (sixth);
+        Sure.NotNull (seventh);
+        Sure.NotNull (eighth);
+        Sure.NotNull (nineth);
+        Sure.NotNull (tenth);
+        Sure.NotNull (eleventh);
+        Sure.NotNull (function);
+        
         _first = first;
         _second = second;
         _third = third;
@@ -1126,11 +1212,11 @@ public sealed class ChainParser<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, TR
     public override bool TryParse
         (
             ParseState state,
-            out TResult result
+            [MaybeNullWhen (false)] out TResult result
         )
     {
         using var _ = state.Enter (this);
-        result = default!;
+        result = default;
         DebugHook (state);
         if (!state.HasCurrent)
         {
@@ -1254,6 +1340,20 @@ public sealed class ChainParser<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T1
             Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, TResult> function
         )
     {
+        Sure.NotNull (first);
+        Sure.NotNull (second);
+        Sure.NotNull (third);
+        Sure.NotNull (fourth);
+        Sure.NotNull (fifth);
+        Sure.NotNull (sixth);
+        Sure.NotNull (seventh);
+        Sure.NotNull (eighth);
+        Sure.NotNull (nineth);
+        Sure.NotNull (tenth);
+        Sure.NotNull (eleventh);
+        Sure.NotNull (twelveth);
+        Sure.NotNull (function);
+        
         _first = first;
         _second = second;
         _third = third;
@@ -1295,11 +1395,11 @@ public sealed class ChainParser<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T1
     public override bool TryParse
         (
             ParseState state,
-            out TResult result
+            [MaybeNullWhen (false)] out TResult result
         )
     {
         using var _ = state.Enter (this);
-        result = default!;
+        result = default;
         DebugHook (state);
         if (!state.HasCurrent)
         {

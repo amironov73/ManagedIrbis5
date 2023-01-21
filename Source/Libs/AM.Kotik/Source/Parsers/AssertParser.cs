@@ -76,13 +76,12 @@ public sealed class AssertParser<TResult>
             return DebugSuccess (state, false);
         }
 
-        if (!_predicate (temporary!))
+        if (!_predicate (temporary))
         {
             // state.SetError(Maybe.Nothing<TToken>(), false, state.Location, _message(result!));
             return DebugSuccess (state, false);
         }
 
-        // state продвигается вложенным парсером
         result = temporary;
 
         return DebugSuccess (state, true);

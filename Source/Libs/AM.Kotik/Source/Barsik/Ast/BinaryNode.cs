@@ -130,6 +130,7 @@ public sealed class BinaryNode
     {
         var left = _left.Compute (context);
         var right = _right.Compute (context);
+
         var result = _operation switch
         {
             "+" => left + right,
@@ -149,6 +150,8 @@ public sealed class BinaryNode
             "<=>" => Shuttle (context, left, right),
             _ => throw new InvalidOperationException()
         };
+
+        // context.Output.WriteLine ($"Compute {left} {_operation} {right} = {result}");
 
         return result;
     }

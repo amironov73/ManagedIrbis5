@@ -21,6 +21,8 @@ namespace AM.Kotik;
 
 /// <summary>
 /// Парсит сочетание "нужное после ненужного".
+/// Например, "число после скобки", когда число
+/// нам нужно, а от скобки требуется лишь её существование.
 /// </summary>
 public sealed class AfterParser<TAfter, TResult>
     : Parser<TResult>
@@ -34,20 +36,23 @@ public sealed class AfterParser<TAfter, TResult>
     /// </summary>
     public AfterParser
         (
-            Parser<TResult> parser,
-            Parser<TAfter> other
+            Parser<TResult> useful,
+            Parser<TAfter> concomitant
         )
     {
-        _other = other;
-        _parser = parser;
+        Sure.NotNull (useful);
+        Sure.NotNull (concomitant);
+        
+        _concomitant = concomitant;
+        _useful = useful;
     }
 
     #endregion
 
     #region Private members
 
-    private readonly Parser<TResult> _parser;
-    private readonly Parser<TAfter> _other;
+    private readonly Parser<TResult> _useful;
+    private readonly Parser<TAfter> _concomitant;
 
     #endregion
 
@@ -69,19 +74,18 @@ public sealed class AfterParser<TAfter, TResult>
         }
 
         var location = state.Location;
-        if (!_other.TryParse (state, out _))
+        if (!_concomitant.TryParse (state, out _))
         {
             state.Location = location;
             return DebugSuccess (state, false);
         }
 
-        if (!_parser.TryParse (state, out var temporary))
+        if (!_useful.TryParse (state, out var temporary))
         {
             state.Location = location;
             return DebugSuccess (state, false);
         }
 
-        // state продвигается вложенными парсерами
         result = temporary;
 
         return DebugSuccess (state, true);

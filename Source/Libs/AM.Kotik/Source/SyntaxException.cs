@@ -105,7 +105,7 @@ public sealed class SyntaxException
         (
             string? message
         )
-        : base(message)
+        : base (message)
     {
         // пустое тело конструктора
     }
@@ -118,7 +118,8 @@ public sealed class SyntaxException
             string? message,
             int line,
             int column
-        ) : base(message)
+        ) 
+        : base (message)
     {
         Line = line;
         Column = column;
@@ -135,6 +136,18 @@ public sealed class SyntaxException
         : base (message, innerException)
     {
         // пустое тело конструктора
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public SyntaxException 
+        (
+            ParseState state
+        )
+        : base (state.ToString())
+    {
+        // пустое тело метода
     }
 
     #endregion

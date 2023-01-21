@@ -113,6 +113,7 @@ public static class KotikUtility
         try
         {
             var dump = false;
+            var dumpAst = false;
             var index = 0;
 
             if (args.Length == 0)
@@ -132,13 +133,19 @@ public static class KotikUtility
                     continue;
                 }
 
+                if (fileName == "--dump-ast")
+                {
+                    dumpAst = true;
+                    continue;
+                }
+
                 if (fileName == "-r")
                 {
                     DoRepl (interpreter);
                     continue;
                 }
 
-                if (fileName == "-p")
+                if (fileName == "--debug-parser")
                 {
                     interpreter.ParsingDebugOutput = Console.Out;
                     continue;
@@ -147,11 +154,11 @@ public static class KotikUtility
                 if (fileName == "-e")
                 {
                     var sourceCode = string.Join (' ', args.Skip (index + 1));
-                    interpreter.Execute (sourceCode);
+                    interpreter.Execute (sourceCode, dumpAst);
                     break;
                 }
 
-                var result = interpreter.ExecuteFile (fileName);
+                var result = interpreter.ExecuteFile (fileName, dumpAst);
                 if (result.ExitCode != 0)
                 {
                     interpreter.Context.Error.WriteLine (result);

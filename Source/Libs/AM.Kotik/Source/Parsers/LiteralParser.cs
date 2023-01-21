@@ -12,6 +12,7 @@
 #region Using directives
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 #endregion
@@ -32,10 +33,10 @@ public sealed class LiteralParser
     public override bool TryParse
         (
             ParseState state,
-            out object result
+            [MaybeNullWhen (false)] out object result
         )
     {
-        result = null!;
+        result = default;
         DebugHook (state);
         if (!state.HasCurrent)
         {

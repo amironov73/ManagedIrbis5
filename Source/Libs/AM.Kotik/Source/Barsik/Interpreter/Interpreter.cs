@@ -151,12 +151,17 @@ public sealed class Interpreter
     /// </summary>
     public ExecutionResult Execute
         (
-            string sourceCode
+            string sourceCode,
+            bool dumpAst = false
         )
     {
         Sure.NotNull (sourceCode);
 
         var program = Grammar.ParseProgram (sourceCode, ParsingDebugOutput);
+        if (dumpAst)
+        {
+            program.Dump (Context.Output);
+        }
 
         // отделяем отладочную печать парсеров от прочего вывода
         ParsingDebugOutput?.WriteLine (new string ('=', 60));
@@ -258,13 +263,16 @@ public sealed class Interpreter
     /// с последующим исполнением.
     /// </summary>
     /// <param name="fileName">Имя файла скрипта.</param>
+    /// <param name="dumpAst">Вывести дамп синтаксического дерева
+    /// для контроля разбора.</param>
     /// <remarks>
     /// Скрипт-файл может начинаться с "#!", эта строка будет проигнорирована.
     /// Такой трюк позволяет сделать запускаемыми Barsuk-скрипты.
     /// </remarks>
     public ExecutionResult ExecuteFile
         (
-            string fileName
+            string fileName,
+            bool dumpAst = false
         )
     {
         Sure.FileExists (fileName);
@@ -280,7 +288,7 @@ public sealed class Interpreter
             var sourceCode = File.ReadAllText (fileName);
             // удаляем shebanh
             sourceCode = KotikUtility.RemoveShebang (sourceCode);
-            result = Execute (sourceCode);
+            result = Execute (sourceCode, dumpAst);
         }
         catch (ReturnException exception)
         {

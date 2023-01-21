@@ -101,6 +101,8 @@ public sealed class VariableNode
             }
         }
 
+        // context.Output.WriteLine ($"AssignVariable {Name} ({variableValue}) {operation} {value}");
+
         value = operation switch
         {
             "=" => value,
