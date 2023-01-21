@@ -30,7 +30,7 @@ using AM.Text;
 
 #nullable enable
 
-namespace AM.Kotik;
+namespace AM.Kotik.Barsik;
 
 /// <summary>
 /// Полезные методы для Барсика.

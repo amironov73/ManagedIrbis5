@@ -6,15 +6,13 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
 
-/* Operator.cs --
+/* Operator.cs -- создание неспецифичных операторов
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
-
-using AM.Collections;
 
 #endregion
 
@@ -23,30 +21,12 @@ using AM.Collections;
 namespace AM.Kotik;
 
 /// <summary>
-///
+/// Создание неспецифичных операторов (работающих с произвольным
+/// типом данных).
 /// </summary>
 public static class Operator
 {
     #region Public methods
-
-    /// <summary>
-    /// Создание унарного оператора.
-    /// </summary>
-    public static Parser<Func<AtomNode, AtomNode>> Increment
-        (
-            string label,
-            bool isPrefix
-        )
-    {
-        Sure.NotNullNorEmpty (label);
-
-        return Unary
-            (
-                new TermParser (new [] {"++", "--"}),
-                label,
-                x => target => new IncrementNode (target, x, isPrefix)
-            );
-    }
 
     /// <summary>
     /// Создание инфиксного (бинарного) оператора.
@@ -67,27 +47,8 @@ public static class Operator
             (
                 parser,
                 function,
-                label
-            );
-    }
-
-    /// <summary>
-    /// Создание бинарного оператора.
-    /// </summary>
-    public static InfixOperator<AtomNode> LeftAssociative
-        (
-            string label,
-            params string[] operations
-        )
-    {
-        Sure.NotNullNorEmpty (label);
-        Sure.AssertState (!operations.IsNullOrEmpty());
-
-        return LeftAssociative<AtomNode>
-            (
-                new TermParser (operations),
                 label,
-                (left, operation, right) => new BinaryNode (left, operation, right)
+                InfixOperatorKind.LeftAssociative
             );
     }
 
@@ -116,26 +77,6 @@ public static class Operator
     }
 
     /// <summary>
-    /// Создание бинарного оператора.
-    /// </summary>
-    public static InfixOperator<AtomNode> NonAssociative
-        (
-            string label,
-            params string[] operations
-        )
-    {
-        Sure.NotNullNorEmpty (label);
-        Sure.AssertState (!operations.IsNullOrEmpty());
-
-        return NonAssociative<AtomNode>
-            (
-                new TermParser (operations),
-                label,
-                (left, operation, right) => new BinaryNode (left, operation, right)
-            );
-    }
-
-    /// <summary>
     /// Создание инфиксного (бинарного) оператора.
     /// </summary>
     public static InfixOperator<TResult> RightAssociative<TResult>
@@ -160,34 +101,13 @@ public static class Operator
     }
 
     /// <summary>
-    /// Создание бинарного оператора.
-    /// </summary>
-    public static InfixOperator<AtomNode> RightAssociative
-        (
-            string label,
-            params string[] operations
-        )
-    {
-        Sure.NotNullNorEmpty (label);
-        Sure.AssertState (!operations.IsNullOrEmpty());
-
-        return RightAssociative<AtomNode>
-            (
-                new TermParser (operations),
-                label,
-                (left, operation, right) => new BinaryNode (left, operation, right)
-            );
-    }
-
-    
-    /// <summary>
     /// Создание унарного оператора.
     /// </summary>
-    public static Parser<Func<AtomNode, AtomNode>> Unary<TResult>
+    public static Parser<Func<TResult, TResult>> Unary<TResult>
         (
             Parser<TResult> parser,
             string label,
-            Func<TResult, Func<AtomNode, AtomNode>> function
+            Func<TResult, Func<TResult, TResult>> function
         )
         where TResult: class
     {

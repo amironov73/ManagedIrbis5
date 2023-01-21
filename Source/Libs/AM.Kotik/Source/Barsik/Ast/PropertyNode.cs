@@ -20,7 +20,7 @@ using System.Dynamic;
 
 #nullable enable
 
-namespace AM.Kotik;
+namespace AM.Kotik.Barsik;
 
 /// <summary>
 /// Обращение к свойству объекта.

@@ -18,7 +18,7 @@ using System;
 
 #nullable enable
 
-namespace AM.Kotik;
+namespace AM.Kotik.Barsik;
 
 /// <summary>
 /// Префиксная операция.

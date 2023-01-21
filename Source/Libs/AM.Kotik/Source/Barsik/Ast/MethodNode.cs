@@ -22,7 +22,7 @@ using System.IO;
 
 #nullable enable
 
-namespace AM.Kotik;
+namespace AM.Kotik.Barsik;
 
 /// <summary>
 /// Вызов метода объекта.

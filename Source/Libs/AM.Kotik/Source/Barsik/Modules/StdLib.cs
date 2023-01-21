@@ -32,13 +32,13 @@ using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-using static AM.Kotik.Builtins;
+using static AM.Kotik.Barsik.Builtins;
 
 #endregion
 
 #nullable enable
 
-namespace AM.Kotik;
+namespace AM.Kotik.Barsik;
 
 /// <summary>
 /// Стандартная библиотека (включая небезопасные функции).

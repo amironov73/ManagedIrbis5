@@ -10,11 +10,15 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-#nullable enable
+#region Using directives
 
 using System.IO;
 
-namespace AM.Kotik;
+#endregion
+
+#nullable enable
+
+namespace AM.Kotik.Barsik;
 
 /// <summary>
 /// Унарный минус (смена знака числа).

@@ -24,7 +24,7 @@ using System.Linq;
 
 #nullable enable
 
-namespace AM.Kotik;
+namespace AM.Kotik.Barsik;
 
 /// <summary>
 /// Грамматика языка.
@@ -354,13 +354,13 @@ public static class Grammar
                             Parser.Position,
                             GenericStatement!.Repeated (minCount: 0).CurlyBrackets(),
                             (pos, lines) =>
-                                (StatementBase)new Block (pos.Line, lines.ToArray())
+                                (StatementBase)new BlockNode (pos.Line, lines.ToArray())
                         ),
                     
                     // либо единственный стейтмент без фигурных скобок
                     GenericStatement!.Map
                         (
-                            x => (StatementBase)new Block (x.Line, new[] { x })
+                            x => (StatementBase)new BlockNode (x.Line, new[] { x })
                         )
                 )
         )
@@ -480,7 +480,7 @@ public static class Grammar
             Block.Instance ("Then"), // 6
             Block.Instance ("Else").After (Parser.Reserved ("else")).Optional(), // 7
             (_1, _, _, _4, _, _6, _7) =>
-                (StatementBase)new IfNode (_1.Line, _4, (Block)_6, (Block)_7)
+                (StatementBase)new IfNode (_1.Line, _4, _6, _7)
         )
         .Labeled ("If");
 
@@ -498,7 +498,7 @@ public static class Grammar
             Parser.Term (")"), // 7
             Block.Instance ("Body"), // 8
             (_1, _, _, _4, _, _6, _, _8) =>
-                (StatementBase)new UsingNode (_1.Line, _4, _6, (Block)_8)
+                (StatementBase)new UsingNode (_1.Line, _4, _6, _8)
         )
         .Labeled ("Using");
 

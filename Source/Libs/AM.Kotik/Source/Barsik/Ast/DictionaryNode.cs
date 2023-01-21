@@ -18,7 +18,7 @@ using System.IO;
 
 #nullable enable
 
-namespace AM.Kotik;
+namespace AM.Kotik.Barsik;
 
 /// <summary>
 /// Создание словаря вида `{1: "one", 2: "two", 3: "three"}`.

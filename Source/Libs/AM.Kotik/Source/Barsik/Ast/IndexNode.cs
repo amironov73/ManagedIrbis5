@@ -20,7 +20,7 @@ using System.Reflection;
 
 #nullable enable
 
-namespace AM.Kotik;
+namespace AM.Kotik.Barsik;
 
 /// <summary>
 /// Обращение к элементу по индексу.

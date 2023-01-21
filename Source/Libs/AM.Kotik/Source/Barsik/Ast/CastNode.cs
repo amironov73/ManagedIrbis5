@@ -19,7 +19,7 @@ using System.Globalization;
 
 #nullable enable
 
-namespace AM.Kotik;
+namespace AM.Kotik.Barsik;
 
 /// <summary>
 /// Преобразование типа.

@@ -14,7 +14,7 @@
 
 using System.IO;
 
-namespace AM.Kotik;
+namespace AM.Kotik.Barsik;
 
 /// <summary>
 /// Инверсия битов.

@@ -9,14 +9,18 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-#nullable enable
+#region Using directives
 
 using System.IO;
 
-namespace AM.Kotik;
+#endregion
+
+#nullable enable
+
+namespace AM.Kotik.Barsik;
 
 /// <summary>
-/// Псевдо-узел AST: определение функции в скрипте
+/// Псевдо-узел AST: определение функции в скрипте.
 /// </summary>
 public sealed class FunctionDefinitionNode
     : PseudoNode

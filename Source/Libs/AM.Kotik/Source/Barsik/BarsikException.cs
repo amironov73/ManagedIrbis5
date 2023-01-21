@@ -18,7 +18,7 @@ using System.Runtime.Serialization;
 
 #nullable enable
 
-namespace AM.Kotik;
+namespace AM.Kotik.Barsik;
 
 /// <summary>
 /// Специфичное для Barsik исключение.

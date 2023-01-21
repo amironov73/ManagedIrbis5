@@ -18,7 +18,7 @@ using System.IO;
 
 #nullable enable
 
-namespace AM.Kotik;
+namespace AM.Kotik.Barsik;
 
 /// <summary>
 /// Создание списка вида `[1, 2, 3]`.

@@ -18,7 +18,7 @@ using System.Linq;
 
 #nullable enable
 
-namespace AM.Kotik;
+namespace AM.Kotik.Barsik;
 
 /// <summary>
 /// Определение функции в скрипте Барсик.

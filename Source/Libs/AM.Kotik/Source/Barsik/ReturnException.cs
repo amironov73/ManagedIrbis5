@@ -17,7 +17,7 @@ using System;
 
 #nullable enable
 
-namespace AM.Kotik;
+namespace AM.Kotik.Barsik;
 
 /// <summary>
 /// Исключение, используемое для возврата значений.

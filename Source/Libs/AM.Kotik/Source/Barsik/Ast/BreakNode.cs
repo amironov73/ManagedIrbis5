@@ -11,7 +11,7 @@
 
 #nullable enable
 
-namespace AM.Kotik;
+namespace AM.Kotik.Barsik;
 
 /// <summary>
 /// Досрочный выход из цикла.

@@ -59,7 +59,7 @@ public sealed class InfixOperator<TResult>
             Parser<string> operation, 
             Func<TResult, string, TResult, TResult> function,
             string label,
-            InfixOperatorKind kind = InfixOperatorKind.LeftAssociative
+            InfixOperatorKind kind
         )
     {
         Sure.NotNull (operation);

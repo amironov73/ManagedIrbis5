@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* ExpressionNode.cs -- выражение
+/* ExpressionNode.cs -- выражение (возможно, с присваиванием значения переменной)
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,10 +17,10 @@ using System.IO;
 
 #nullable enable
 
-namespace AM.Kotik;
+namespace AM.Kotik.Barsik;
 
 /// <summary>
-/// Выражение.
+/// Выражение (возможно, с присваиванием значения переменной).
 /// </summary>
 public /* не sealed */ class ExpressionNode
     : AtomNode

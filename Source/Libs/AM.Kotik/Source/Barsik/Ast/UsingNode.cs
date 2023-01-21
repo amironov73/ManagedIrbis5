@@ -21,7 +21,7 @@ using System.IO;
 
 #nullable enable
 
-namespace AM.Kotik;
+namespace AM.Kotik.Barsik;
 
 /// <summary>
 /// Блок using.
@@ -39,7 +39,7 @@ public sealed class UsingNode
             int line,
             string variableName,
             AtomNode initialization,
-            Block body
+            StatementBase body
         )
         : base (line)
     {
@@ -58,7 +58,7 @@ public sealed class UsingNode
 
     private readonly string _variableName;
     private readonly AtomNode _initialization;
-    private readonly Block _body;
+    private readonly StatementBase _body;
 
     #endregion
 
@@ -82,11 +82,7 @@ public sealed class UsingNode
             contextToUse = childContext;
         }
 
-        foreach (var statement in _body)
-        {
-            statement.Execute (contextToUse);
-        }
-
+        _body.Execute (contextToUse);
         if (variable is IDisposable disposable)
         {
             disposable.Dispose();

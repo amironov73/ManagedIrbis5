@@ -20,7 +20,7 @@ using System.IO;
 
 #nullable enable
 
-namespace AM.Kotik;
+namespace AM.Kotik.Barsik;
 
 /// <summary>
 /// Условный оператор if-then-else.
@@ -37,8 +37,8 @@ public sealed class IfNode
         (
             int line,
             AtomNode condition,
-            Block thenBlock,
-            Block? elseBlock
+            StatementBase thenBlock,
+            StatementBase? elseBlock
         )
         : base (line)
     {
@@ -56,8 +56,8 @@ public sealed class IfNode
     #region Private members
 
     private readonly AtomNode _condition;
-    private readonly Block _thenBlock;
-    private readonly Block? _elseBlock;
+    private readonly StatementBase _thenBlock;
+    private readonly StatementBase? _elseBlock;
 
     #endregion
 
@@ -73,10 +73,7 @@ public sealed class IfNode
 
         if (KotikUtility.ToBoolean (_condition.Compute (context)))
         {
-            foreach (var statement in _thenBlock)
-            {
-                statement.Execute (context);
-            }
+            _thenBlock.Execute (context);
         }
         else
         {
@@ -100,10 +97,7 @@ public sealed class IfNode
 
             if (!handled && _elseBlock is not null)
             {
-                foreach (var statement in _elseBlock)
-                {
-                    statement.Execute (context);
-                }
+                _elseBlock.Execute (context);
             }
         }
     }
@@ -131,5 +125,4 @@ public sealed class IfNode
     }
 
     #endregion
-
 }

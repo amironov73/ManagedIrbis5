@@ -21,12 +21,12 @@ using System.IO;
 
 #nullable enable
 
-namespace AM.Kotik;
+namespace AM.Kotik.Barsik;
 
 /// <summary>
 /// Блок стейтментов.
 /// </summary>
-public sealed class Block
+public sealed class BlockNode
     : StatementBase
 {
     #region Construction
@@ -34,7 +34,7 @@ public sealed class Block
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public Block
+    public BlockNode
         (
             int line,
             StatementBase[] statements

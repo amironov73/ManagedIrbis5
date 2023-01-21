@@ -11,7 +11,7 @@
 
 #nullable enable
 
-namespace AM.Kotik;
+namespace AM.Kotik.Barsik;
 
 /// <summary>
 /// Постфиксная операция, например, инкремент.
