@@ -35,7 +35,7 @@ public static class Operator
     public static Parser<Func<AtomNode, AtomNode>> Increment
         (
             string label,
-            bool prefix
+            bool isPrefix
         )
     {
         Sure.NotNullNorEmpty (label);
@@ -44,7 +44,7 @@ public static class Operator
             (
                 new TermParser (new [] {"++", "--"}),
                 label,
-                x => target => new IncrementNode (target, x, true)
+                x => target => new IncrementNode (target, x, isPrefix)
             );
     }
 

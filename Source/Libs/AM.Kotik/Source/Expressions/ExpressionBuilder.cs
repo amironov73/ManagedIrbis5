@@ -32,34 +32,35 @@ public static class ExpressionBuilder
     /// <summary>
     /// Построение
     /// </summary>
-    public static Parser<AtomNode> Build
+    public static Parser<TNode> Build<TNode>
         (
-            Parser<AtomNode> root,
-            Parser<Func<AtomNode, AtomNode>>[] prefixOps,
-            Parser<Func<AtomNode, AtomNode>>[] postfixOps,
-            InfixOperator<AtomNode>[] infixOps
+            Parser<TNode> root,
+            Parser<Func<TNode, TNode>>[] prefixOps,
+            Parser<Func<TNode, TNode>>[] postfixOps,
+            InfixOperator<TNode>[] infixOps
         )
+        where TNode: class
     {
         Sure.NotNull (prefixOps);
         Sure.NotNull (postfixOps);
         Sure.NotNull (infixOps);
 
-        var expr = new DynamicParser<AtomNode> (() => null!);
-        var result = (Parser<AtomNode>) expr;
+        var expr = new DynamicParser<TNode> (() => null!);
+        var result = (Parser<TNode>) expr;
 
         if (!prefixOps.IsNullOrEmpty())
         {
-            result = new UnaryParser<AtomNode> (isPrefix: true, result, prefixOps);
+            result = new UnaryParser<TNode> (isPrefix: true, result, prefixOps);
         }
 
         if (!postfixOps.IsNullOrEmpty())
         {
-            result = new UnaryParser<AtomNode> (isPrefix: false, result, postfixOps);
+            result = new UnaryParser<TNode> (isPrefix: false, result, postfixOps);
         }
 
         foreach (var op in infixOps)
         {
-            result = new InfixParser<AtomNode> (result, op.Operation, op.Function, op.Kind);
+            result = new InfixParser<TNode> (result, op.Operation, op.Function, op.Kind);
         }
 
         var parenthesis = result.RoundBrackets();
