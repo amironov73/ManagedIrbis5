@@ -22,10 +22,6 @@ try
     connection.Host = args.Length == 0 ? "127.0.0.1" : args[0];
     connection.Username = "librarian";
     connection.Password = Unprotect ("AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAA7Y"
-        + "lugeufz0q6dEVZ2IU\"1VQQAAAACAAAAAAAQZgAAAAEAACAAAAA8e8k2wKE0v"
-        + "RcEGD9KoNCyMNIZnMUuoAfUT/8JXaAaTQAAAAAOgAAAAAIAACAAAABAR7ioUp"
-        + "WbfoiIdl80dvBGuVmzyFV4P8CnitMMomAE+hAAAAB04x4wxbpLY+pAuUt3dY6"
-        + "TQAAAAOa/TIcrih6RxQGbR3XMWzEJNCiT4Lpvz4ZamsPOOHPl4dk5mQmxUSNa"
         + "/2B/9VkTGC7i2ocUAKorH6fhaZgrNzc=");
 
     var success = await connection.ConnectAsync();
@@ -46,7 +42,7 @@ try
             "\"A=ПУШКИН$\""
         );
 
-    await Out.WriteLineAsync ($"Найдено записей: {found.Length}");
+    await Out.WriteLineAsync ($"Records found: {found.Length}");
 
     // In order not to print all found records, 
     // we will select only the first 10
@@ -68,7 +64,7 @@ try
                 "@brief",
                 mfn
             );
-        await Out.WriteLineAsync ($"Биб. описание: {description}");
+        await Out.WriteLineAsync ($"Bibliorgaphical description: {description}");
 
         await Out.WriteLineAsync(); // Add empty line
     }

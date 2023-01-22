@@ -83,6 +83,12 @@ public sealed class Interpreter
     /// Инициализируется значением переменной окружения "BARSIK_PATH".
     /// </summary>
     public List<string> Pathes { get; }
+    
+    /// <summary>
+    /// Настройки интерпретатора.
+    /// Применяются перед началом разбора и исполнения скрипта.
+    /// </summary>
+    public InterpreterSettings Settings { get; }
 
     #endregion
 
@@ -95,12 +101,14 @@ public sealed class Interpreter
         (
             TextReader? input = null,
             TextWriter? output = null,
-            TextWriter? error = null
+            TextWriter? error = null,
+            InterpreterSettings? settings = null
         )
     {
         input ??= Console.In;
         output ??= Console.Out;
         error ??= Console.Error;
+        Settings =  settings ?? InterpreterSettings.CreateDefault();
         AllowNewOperator = true;
         Modules = new ();
         Assemblies = new ();
