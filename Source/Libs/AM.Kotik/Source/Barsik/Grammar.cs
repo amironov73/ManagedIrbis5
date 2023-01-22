@@ -181,11 +181,13 @@ public static class Grammar
                 // инфиксные операции
                 Operator.NonAssociative ("Shuttle", "<=>"),
                 Operator.NonAssociative ("In/is", "in", "is"),
+                Operator.LeftAssociative ("Coalesce", "??"),
                 Operator.LeftAssociative ("Shift", "<<", ">>"),
                 Operator.LeftAssociative ("Bitwise", "&", "|", "^"),
                 Operator.LeftAssociative ("Multiplication", "*", "/", "%" ),
                 Operator.LeftAssociative ("Addition", "+", "-" ),
-                Operator.LeftAssociative ("Comparison", "<", ">", "<=", ">=", "==", "!=", "<>" )
+                Operator.LeftAssociative ("Comparison", "<", ">", "<=", ">=", "==", "!=", "<>", 
+                    "===", "!==" )
             }
         )
         .Labeled ("Expression");
