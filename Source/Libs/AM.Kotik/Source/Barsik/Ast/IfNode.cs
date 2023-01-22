@@ -25,6 +25,23 @@ namespace AM.Kotik.Barsik;
 /// <summary>
 /// Условный оператор if-then-else.
 /// </summary>
+/// <remarks>
+/// Структура условного оператора:
+/// <code>
+/// if (condition)
+/// {
+///  // блок then
+/// }
+/// else if (condition)
+/// {
+///  // произвольное количество (включая 0) блоков else if
+/// }
+/// else
+/// {
+///   опциональный блок else
+/// }
+/// </code>
+/// </remarks>
 public sealed class IfNode
     : StatementBase
 {
@@ -38,17 +55,18 @@ public sealed class IfNode
             int line,
             AtomNode condition,
             StatementBase thenBlock,
+            IfNode[]? elseIfArray, 
             StatementBase? elseBlock
         )
         : base (line)
     {
+        Sure.NotNull (condition);
+        Sure.NotNull (thenBlock);
+        
         _condition = condition;
+        _elseIfArray = elseIfArray;
         _thenBlock = thenBlock;
-
-        if (elseBlock is not null)
-        {
-            _elseBlock = elseBlock;
-        }
+        _elseBlock = elseBlock;
     }
 
     #endregion
@@ -57,6 +75,7 @@ public sealed class IfNode
 
     private readonly AtomNode _condition;
     private readonly StatementBase _thenBlock;
+    private readonly IfNode[]? _elseIfArray;
     private readonly StatementBase? _elseBlock;
 
     #endregion
@@ -79,25 +98,21 @@ public sealed class IfNode
         {
             var handled = false;
 
-            // if (_elseIfBlocks is not null)
-            // {
-            //     foreach (var block in _elseIfBlocks)
-            //     {
-            //         if (BarsikUtility.ToBoolean (block._condition.Compute (context)))
-            //         {
-            //             foreach (var statement in block._thenBlock)
-            //             {
-            //                 statement.Execute (context);
-            //             }
-            //
-            //             handled = true;
-            //         }
-            //     }
-            // }
-
-            if (!handled && _elseBlock is not null)
+            if (_elseIfArray is not null)
             {
-                _elseBlock.Execute (context);
+                foreach (var block in _elseIfArray)
+                {
+                    if (KotikUtility.ToBoolean (block._condition.Compute (context)))
+                    {
+                        block._thenBlock.Execute (context);
+                        handled = true;
+                    }
+                }
+            }
+
+            if (!handled)
+            {
+                _elseBlock?.Execute (context);
             }
         }
     }
@@ -118,10 +133,15 @@ public sealed class IfNode
 
         _condition.DumpHierarchyItem ("Condition", level + 1, writer);
         _thenBlock.DumpHierarchyItem ("Then", level + 1, writer);
-        if (_elseBlock is not null)
+        if (_elseIfArray is not null)
         {
-            _elseBlock.DumpHierarchyItem ("Else", level + 1, writer);
+            foreach (var elseIf in _elseIfArray)
+            {
+                elseIf.DumpHierarchyItem ("ElseIf", level + 1, writer);
+            }
         }
+
+        _elseBlock?.DumpHierarchyItem ("Else", level + 1, writer);
     }
 
     #endregion

@@ -400,7 +400,7 @@ public static class Grammar
     private static readonly Parser<StatementBase> ForStatement = Parser.Chain
         (
             Parser.Position, // 1
-            Parser.Reserved ("for"), // 2
+            Reserved ("for"), // 2
             Parser.Term ("("), // 3
             Assignment.Instance ("Init"), // 4
             Parser.Term (";"), // 5
@@ -409,7 +409,7 @@ public static class Grammar
             Assignment.Or (Expression).Labeled ("Step"), // 8
             Parser.Term (")"), // 9
             Block.Instance ("Body"), // 10
-            Block.Before (Parser.Reserved ("else")).Optional(), // 11
+            Block.Before (Reserved ("else")).Optional(), // 11
             (_1, _, _, _4, _, _6, _, _8, _, _10, _11) =>
                 (StatementBase) new ForNode (_1.Line, _4, _6, _8, _10, _11)
         )
@@ -421,14 +421,14 @@ public static class Grammar
     private static readonly Parser<StatementBase> ForEachStatement = Parser.Chain
         (
             Parser.Position, // 1
-            Parser.Reserved ("foreach"), // 2
+            Reserved ("foreach"), // 2
             Parser.Term ("("), // 3
             Identifier, // 4
             Parser.Term ("in"), // 5
             Expression.Labeled ("Enumerable"), // 6
             Parser.Term (")"), // 7
             Block.Instance ("Body"), // 8
-            Block.Before (Parser.Reserved ("else")).Optional(), // 9
+            Block.Before (Reserved ("else")).Optional(), // 9
             (_1, _, _, _4, _, _6, _, _8, _9) =>
                 (StatementBase) new ForEachNode (_1.Line, _4, _6, _8, _9)
         )
@@ -486,7 +486,7 @@ public static class Grammar
     private static readonly Parser<StatementBase> WhileStatement = Parser.Chain
         (
             Parser.Position, // 1
-            Parser.Reserved ("while"), // 2
+            Reserved ("while"), // 2
             Expression.Instance ("Condition").RoundBrackets(), // 3
             Block.Instance ("Body"), // 4
             Block.Before (Parser.Reserved ("else")).Optional(), // 5
@@ -496,19 +496,30 @@ public static class Grammar
         .Labeled ("While");
 
     /// <summary>
+    /// Блок `else if`
+    /// </summary>
+    private static readonly Parser<IfNode> ElseIf = Parser.Chain
+        (
+            Parser.Position, // position
+            Reserved ("else").Before (Reserved ("if")), // 2
+            Expression.Instance ("Condition").RoundBrackets(), // condition
+            Block.Instance ("Body"), // body
+            (position, _, condition, body) => new IfNode (position.Line, condition, body, null, null)
+        )
+        .Labeled ("ElseIf");
+
+    /// <summary>
     /// Условный оператор if-then-else.
     /// </summary>
     private static readonly Parser<StatementBase> IfStatement = Parser.Chain
         (
-            Parser.Position, // 1
-            Parser.Reserved ("if"), // 2
-            Parser.Term ("("), // 3
-            Expression.Instance ("Condition"), // 4
-            Parser.Term (")"), // 5
-            Block.Instance ("Then"), // 6
-            Block.Instance ("Else").After (Parser.Reserved ("else")).Optional(), // 7
-            (_1, _, _, _4, _, _6, _7) =>
-                (StatementBase)new IfNode (_1.Line, _4, _6, _7)
+            Parser.Position.Before (Reserved ("if")), // position
+            Expression.Instance ("Condition").RoundBrackets(), // condition
+            Block.Instance ("Then"), // thenBlock
+            ElseIf.Repeated (minCount: 0), // elseIf
+            Block.Instance ("Else").After (Reserved ("else")).Optional(), // elseBlock
+            (position, condition, thenBlock, elseIf, elseBlock) =>
+                (StatementBase) new IfNode (position.Line, condition, thenBlock, elseIf.ToArray(), elseBlock)
         )
         .Labeled ("If");
 
@@ -517,28 +528,26 @@ public static class Grammar
     /// </summary>
     private static readonly Parser<StatementBase> UsingStatement = Parser.Chain
         (
-            Parser.Position, // 1
-            Parser.Reserved ("using"), // 2
-            Parser.Term ("("), // 3
-            Parser.Identifier, // 4
-            Parser.Term ("="), // 5
-            Expression.Instance ("Init"), // 6
-            Parser.Term (")"), // 7
-            Block.Instance ("Body"), // 8
-            (_1, _, _, _4, _, _6, _, _8) =>
-                (StatementBase)new UsingNode (_1.Line, _4, _6, _8)
+            Parser.Position.Before (Reserved ("using")), // 1
+            Parser.Term ("("), // 2
+            Parser.Identifier, // 3
+            Parser.Term ("="), // 4
+            Expression.Instance ("Init"), // 5
+            Parser.Term (")"), // 6
+            Block.Instance ("Body"), // 7
+            (_1, _, _3, _, _5, _, _7) =>
+                (StatementBase)new UsingNode (_1.Line, _3, _5, _7)
         )
         .Labeled ("Using");
 
     private static readonly Parser<StatementBase> FunctionDefinition = Parser.Chain
         (
-            Parser.Position, // 1
-            Reserved ("func"), // 2
-            Identifier, // 3
-            Identifier.SeparatedBy (Term (",")).RoundBrackets(), // 4
-            Block, // 5
-            (_1, _, _3, _4, _5) =>
-                (StatementBase) new FunctionDefinitionNode (_1.Line, _3, _4.ToArray(), _5)
+            Parser.Position.Before (Reserved ("func")), // 1
+            Identifier, // 2
+            Identifier.SeparatedBy (Term (",")).RoundBrackets(), // 3
+            Block, // 4
+            (_1, _2, _3, _4) =>
+                (StatementBase) new FunctionDefinitionNode (_1.Line, _2, _3.ToArray(), _4)
         )
         .Labeled ("FunctionDefinition");
 
