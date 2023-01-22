@@ -58,6 +58,11 @@ public static class TokenKind
     public const string Format = "format";
 
     /// <summary>
+    /// Внешний по отношению к Barsik код.
+    /// </summary>
+    public const string External = "external";
+
+    /// <summary>
     /// Альтернативная строка <c>`hello world`</c>.
     /// </summary>
     public const string AltString = "alt";

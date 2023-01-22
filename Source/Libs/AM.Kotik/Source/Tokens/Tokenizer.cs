@@ -299,6 +299,42 @@ public sealed class Tokenizer
     }
 
     /// <summary>
+    /// Внеший код.
+    /// </summary>
+    private Token? ParseExternal()
+    {
+        var line = _navigator.Line;
+        var column = _navigator.Column;
+
+        if (PeekChar() != '`')
+        {
+            return null;
+        }
+
+        ReadChar(); // съедаем открывающую кавычку
+        char chr = default;
+        var builder = new StringBuilder();
+        while (!IsEof)
+        {
+            chr = ReadChar();
+            if (chr == '`')
+            {
+                break;
+            }
+
+            builder.Append (chr);
+        }
+
+        if (chr != '`')
+        {
+            throw new SyntaxException (_navigator);
+        }
+        
+        var text = builder.ToString();
+        return new Token (TokenKind.External, text, line, column);
+    }
+
+    /// <summary>
     /// Разбор числа.
     /// </summary>
     private Token? ParseNumber()
@@ -800,6 +836,7 @@ public sealed class Tokenizer
                 ?? ParseRawString()
                 ?? ParseString()
                 ?? ParseFormat()
+                ?? ParseExternal()
                 ?? ParseNumber()
                 ?? ParseTerm()
                 ?? ParseIdentifier()

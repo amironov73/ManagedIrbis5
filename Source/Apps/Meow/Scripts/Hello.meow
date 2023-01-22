@@ -22,6 +22,8 @@ j = 1
 while (j < 256) j *= 2
 j = -j
 
+`some external code`
+
 o1 = ? i2 : "this is true" : "this is false"
 
 l = [1, 2, 3]

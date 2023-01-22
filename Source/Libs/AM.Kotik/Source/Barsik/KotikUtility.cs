@@ -151,6 +151,27 @@ public static class KotikUtility
                     continue;
                 }
 
+                if (fileName == "--external")
+                {
+                    // TODO установка обработчика внешнего кода
+                    index++;
+                    continue;
+                }
+
+                if (fileName == "--use-namespace")
+                {
+                    interpreter.Context.Namespaces.Add (args[index + 1], null);
+                    index++;
+                    continue;
+                }
+
+                if (fileName == "--load-assembly")
+                {
+                    interpreter.Context.LoadAssembly (args[index + 1]);
+                    index++;
+                    continue;
+                }
+
                 if (fileName == "--eval")
                 {
                     var sourceCode = string.Join (' ', args.Skip (index + 1));

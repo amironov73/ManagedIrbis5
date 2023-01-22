@@ -68,10 +68,10 @@ public sealed class Interpreter
     /// </summary>
     public Dictionary<string, Assembly> Assemblies { get; }
 
-    // /// <summary>
-    // /// Обработчик внешнего кода.
-    // /// </summary>
-    // public ExternalCodeHandler? ExternalCodeHandler { get; set; }
+    /// <summary>
+    /// Обработчик внешнего кода.
+    /// </summary>
+    public ExternalCodeHandler? ExternalCodeHandler { get; set; }
 
     /// <summary>
     /// Произвольные пользовательские данные, свяазанные с данным интерпретатором.

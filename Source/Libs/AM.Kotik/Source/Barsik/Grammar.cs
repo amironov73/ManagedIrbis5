@@ -60,7 +60,7 @@ public static class Grammar
         (
             x => (AtomNode) new FormatNode (x)
         );
-
+    
     /// <summary>
     /// Разбор перечисленных терминов.
     /// </summary>
@@ -543,6 +543,17 @@ public static class Grammar
         .Labeled ("FunctionDefinition");
 
     /// <summary>
+    /// Внешний по отношению к Барсику код.
+    /// </summary>
+    private static readonly Parser<StatementBase> ExternalCode = Parser.Chain
+        (
+            Parser.Position, // position
+            new ExternalParser(), // source
+            (position, source) => (StatementBase) new ExternalNode (position.Line, source)
+        )
+        .Labeled ("ExternalCode");
+
+    /// <summary>
     /// Стейтмент вообще.
     /// </summary>
     private static readonly Parser<StatementBase> GenericStatement = Parser.Lazy
@@ -559,6 +570,7 @@ public static class Grammar
                     BreakStatement,
                     ContinueStatement,
                     ReturnStatement,
+                    ExternalCode,
                     SemicolonStatement
                 )
                 .Labeled ("StatementKind")
