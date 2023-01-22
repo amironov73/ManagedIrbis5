@@ -85,6 +85,7 @@ public static class Grammar
     private static readonly Parser<AtomNode> Atom = Parser.OneOf
             (
                 Literal,
+                // Parser.Lazy (() => Ternary!),
                 Parser.Lazy (() => FunctionCall!),
                 Variable,
                 Parser.Lazy (() => List!),
@@ -92,6 +93,22 @@ public static class Grammar
                 Parser.Lazy (() => New!)
             )
         .Labeled ("Atom");
+
+    /// <summary>
+    /// Тернарный оператор `условие ? истина : ложь`.
+    /// </summary>
+    /// <remarks>Вызывает переполнение стека.</remarks>
+    private static readonly Parser<AtomNode> Ternary = Parser.Chain
+        (
+            Parser.Lazy (() => Expression!), // condition
+            Term ("?"),
+            Parser.Lazy (() => Expression!), // trueValue
+            Term (":"),
+            Parser.Lazy (() => Expression!), // falseValue
+            (condition, _, trueValue, _, falseValue) => 
+                (AtomNode) new TernaryNode (condition, trueValue, falseValue)
+        )
+        .Labeled ("Ternary");
 
     /// <summary>
     /// Выражение, стоящее слева от знака присваивания.
@@ -187,7 +204,7 @@ public static class Grammar
                 Operator.LeftAssociative ("Multiplication", "*", "/", "%" ),
                 Operator.LeftAssociative ("Addition", "+", "-" ),
                 Operator.LeftAssociative ("Comparison", "<", ">", "<=", ">=", "==", "!=", "<>", 
-                    "===", "!==" )
+                    "===", "!==", "~~", "~~~" )
             }
         )
         .Labeled ("Expression");

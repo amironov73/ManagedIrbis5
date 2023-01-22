@@ -10,9 +10,13 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-#nullable enable
+#region Using directives
 
 using System.IO;
+
+#endregion
+
+#nullable enable
 
 namespace AM.Kotik.Barsik;
 
