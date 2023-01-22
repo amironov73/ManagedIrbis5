@@ -54,6 +54,14 @@ public static class Grammar
         );
 
     /// <summary>
+    /// Форматная строка.
+    /// </summary>
+    private static readonly Parser<AtomNode> Format = new FormatParser().Map
+        (
+            x => (AtomNode) new FormatNode (x)
+        );
+
+    /// <summary>
     /// Разбор перечисленных терминов.
     /// </summary>
     private static TermParser Term (params string[] terms) => new (terms);
@@ -85,7 +93,8 @@ public static class Grammar
     private static readonly Parser<AtomNode> Atom = Parser.OneOf
             (
                 Literal,
-                // Parser.Lazy (() => Ternary!),
+                Format,
+                Parser.Lazy (() => Ternary!),
                 Parser.Lazy (() => FunctionCall!),
                 Variable,
                 Parser.Lazy (() => List!),
@@ -95,17 +104,17 @@ public static class Grammar
         .Labeled ("Atom");
 
     /// <summary>
-    /// Тернарный оператор `условие ? истина : ложь`.
+    /// Тернарный оператор `? условие : истина : ложь`.
     /// </summary>
-    /// <remarks>Вызывает переполнение стека.</remarks>
     private static readonly Parser<AtomNode> Ternary = Parser.Chain
         (
-            Parser.Lazy (() => Expression!), // condition
             Term ("?"),
+            Parser.Lazy (() => Expression!), // condition
+            Term (":"),
             Parser.Lazy (() => Expression!), // trueValue
             Term (":"),
             Parser.Lazy (() => Expression!), // falseValue
-            (condition, _, trueValue, _, falseValue) => 
+            (_, condition, _, trueValue, _, falseValue) => 
                 (AtomNode) new TernaryNode (condition, trueValue, falseValue)
         )
         .Labeled ("Ternary");

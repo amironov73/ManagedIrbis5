@@ -21,7 +21,7 @@ using System.IO;
 namespace AM.Kotik.Barsik;
 
 /// <summary>
-/// Тернарный оператор `условие ? истина : ложь`.
+/// Тернарный оператор `? условие : истина : ложь`.
 /// </summary>
 public sealed class TernaryNode
     : AtomNode
@@ -66,7 +66,7 @@ public sealed class TernaryNode
         )
     {
         var value = _condition.Compute (context);
-        var result = value
+        var result = KotikUtility.ToBoolean (value)
             ? _trueValue.Compute (context)
             : _falseValue.Compute (context);
 

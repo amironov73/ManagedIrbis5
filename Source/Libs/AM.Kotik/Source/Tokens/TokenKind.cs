@@ -53,6 +53,11 @@ public static class TokenKind
     public const string RawString = "raw";
 
     /// <summary>
+    /// Форматная строка вида `$"{z} = {x} + {y}"`.
+    /// </summary>
+    public const string Format = "format";
+
+    /// <summary>
     /// Альтернативная строка <c>`hello world`</c>.
     /// </summary>
     public const string AltString = "alt";

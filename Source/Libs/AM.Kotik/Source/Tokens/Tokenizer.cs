@@ -253,6 +253,52 @@ public sealed class Tokenizer
     }
 
     /// <summary>
+    /// Разбор строки формата.
+    /// </summary>
+    private Token? ParseFormat()
+    {
+        var line = _navigator.Line;
+        var column = _navigator.Column;
+
+        if (PeekChar() != '$' || PeekChar (1) != '"')
+        {
+            return null;
+        }
+
+        ReadChar(); // съедаем доллар
+        ReadChar(); // съедаем открывающую кавычку
+        char chr = default;
+        var builder = new StringBuilder();
+        while (!IsEof)
+        {
+            chr = ReadChar();
+            if (chr == '\\')
+            {
+                builder.Append (chr);
+                builder.Append (ReadChar());
+                continue;
+            }
+
+            if (chr == '"')
+            {
+                break;
+            }
+
+            builder.Append (chr);
+        }
+
+        if (chr != '"')
+        {
+            throw new SyntaxException (_navigator);
+        }
+
+        var text = builder.ToString();
+        text = UnescapeText (text);
+
+        return new Token (TokenKind.Format, text, line, column);
+    }
+
+    /// <summary>
     /// Разбор числа.
     /// </summary>
     private Token? ParseNumber()
@@ -753,6 +799,7 @@ public sealed class Tokenizer
             var token = ParseCharacter()
                 ?? ParseRawString()
                 ?? ParseString()
+                ?? ParseFormat()
                 ?? ParseNumber()
                 ?? ParseTerm()
                 ?? ParseIdentifier()

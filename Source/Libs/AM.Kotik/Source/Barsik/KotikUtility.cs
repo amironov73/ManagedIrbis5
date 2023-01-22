@@ -127,7 +127,7 @@ public static class KotikUtility
 
             foreach (var fileName in args)
             {
-                if (fileName == "-d")
+                if (fileName == "--dump-variables")
                 {
                     dump = true;
                     continue;
@@ -139,7 +139,7 @@ public static class KotikUtility
                     continue;
                 }
 
-                if (fileName == "-r")
+                if (fileName == "--repl")
                 {
                     DoRepl (interpreter);
                     continue;
@@ -151,7 +151,7 @@ public static class KotikUtility
                     continue;
                 }
 
-                if (fileName == "-e")
+                if (fileName == "--eval")
                 {
                     var sourceCode = string.Join (' ', args.Skip (index + 1));
                     interpreter.Execute (sourceCode, dumpAst);
@@ -174,6 +174,7 @@ public static class KotikUtility
 
             if (dump)
             {
+                interpreter.Context.Output.WriteLine (new string ('=', 60));
                 dumper?.Invoke (interpreter);
             }
         }

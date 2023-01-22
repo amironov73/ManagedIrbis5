@@ -161,6 +161,7 @@ public sealed class Interpreter
         if (dumpAst)
         {
             program.Dump (Context.Output);
+            Context.Output.WriteLine (new string ('=', 60));
         }
 
         // отделяем отладочную печать парсеров от прочего вывода

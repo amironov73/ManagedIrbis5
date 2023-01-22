@@ -1,0 +1,4 @@
+﻿hello = "hi"
+world = "world of .NET"
+println ($"{hello}, {world}!")
+
