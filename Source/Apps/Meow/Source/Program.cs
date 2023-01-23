@@ -26,21 +26,21 @@ namespace Meow;
 
 internal static class Program
 {
-    private static void ExecuteScript
-        (
-            string fileName
-        )
-    {
-        var sourceText = File.ReadAllText (fileName);
-        var program = Grammar.ParseProgram (sourceText);
-        Console.WriteLine (new string ('=', 70));
-        program.Dump();
-        Console.WriteLine(new string('=', 70));
-        var context = new Context (Console.In, Console.Out, Console.Error);
-        program.Execute (context);
-        Console.WriteLine (new string ('=', 70));
-        context.DumpVariables();
-    }
+    //private static void ExecuteScript
+    //    (
+    //        string fileName
+    //    )
+    //{
+    //    var sourceText = File.ReadAllText (fileName);
+    //    var program = Grammar.ParseProgram (sourceText);
+    //    Console.WriteLine (new string ('=', 70));
+    //    program.Dump();
+    //    Console.WriteLine(new string('=', 70));
+    //    var context = new Context (Console.In, Console.Out, Console.Error);
+    //    program.Execute (context);
+    //    Console.WriteLine (new string ('=', 70));
+    //    context.DumpVariables();
+    //}
 
     public static int Main
         (

@@ -155,7 +155,7 @@ public sealed class Interpreter
     {
         Sure.NotNull (sourceCode);
 
-        var node = Grammar.ParseExpression (sourceCode, ParsingDebugOutput);
+        var node = Grammar.ParseExpression (sourceCode, Tokenizer, ParsingDebugOutput);
 
         return node;
     }
@@ -171,7 +171,7 @@ public sealed class Interpreter
     {
         Sure.NotNull (sourceCode);
 
-        var program = Grammar.ParseProgram (sourceCode, ParsingDebugOutput);
+        var program = Grammar.ParseProgram (sourceCode, Tokenizer, ParsingDebugOutput);
         if (dumpAst)
         {
             program.Dump (Context.Output);
@@ -301,7 +301,7 @@ public sealed class Interpreter
             Context.Defines["__DIR__"] = Path.GetDirectoryName (fullPath);
 
             var sourceCode = File.ReadAllText (fileName);
-            // удаляем shebanh
+            // удаляем shebang
             sourceCode = KotikUtility.RemoveShebang (sourceCode);
             result = Execute (sourceCode, dumpAst);
         }
@@ -331,19 +331,6 @@ public sealed class Interpreter
         }
 
         return result;
-    }
-
-    /// <summary>
-    /// Разбор текста программы.
-    /// </summary>
-    public static ProgramNode ParseProgram
-        (
-            string sourceCode
-        )
-    {
-        Sure.NotNull (sourceCode);
-
-        return Grammar.ParseProgram (sourceCode);
     }
 
     /// <summary>

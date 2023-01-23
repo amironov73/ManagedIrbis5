@@ -608,12 +608,12 @@ public static class Grammar
     public static AtomNode ParseExpression
         (
             string sourceCode,
+            Tokenizer tokenizer,
             TextWriter? debugOutput = null
         )
     {
         Sure.NotNull (sourceCode);
 
-        var tokenizer = new Tokenizer();
         var tokens = tokenizer.Tokenize (sourceCode);
         var state = new ParseState (tokens) { DebugOutput = debugOutput };
         var result = Expression.End().ParseOrThrow (state);
@@ -627,12 +627,12 @@ public static class Grammar
     public static ProgramNode ParseProgram
         (
             string sourceText,
+            Tokenizer tokenizer,
             TextWriter? debugOutput = null
         )
     {
         Sure.NotNull (sourceText);
 
-        var tokenizer = new Tokenizer();
         var tokens = tokenizer.Tokenize (sourceText);
         var state = new ParseState (tokens) { DebugOutput = debugOutput };
         var result = Program.ParseOrThrow (state);

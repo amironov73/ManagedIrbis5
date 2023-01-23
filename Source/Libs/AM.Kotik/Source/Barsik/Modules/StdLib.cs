@@ -153,6 +153,8 @@ public sealed class StdLib
         )
     {
         var topContext = context.GetTopContext();
+        var interpreter = topContext.Interpreter.ThrowIfNull();
+        var tokenizer = interpreter.Tokenizer;
         if (!topContext._inclusions.TryGetValue (fileName, out var program))
         {
             if (!File.Exists (fileName))
@@ -161,11 +163,10 @@ public sealed class StdLib
             }
 
             var sourceCode = File.ReadAllText (fileName);
-            program = Grammar.ParseProgram (sourceCode);
+            program = Grammar.ParseProgram (sourceCode, tokenizer);
             topContext._inclusions[fileName] = program;
         }
 
-        var interpreter = topContext.Interpreter.ThrowIfNull();
         // TODO отрабатывать ExitException
         interpreter.Execute (program, context);
 
@@ -421,7 +422,10 @@ public sealed class StdLib
                 return null;
             }
 
-            var expression = Grammar.ParseExpression (sourceCode);
+            var topContext = context.GetTopContext();
+            var interpreter = topContext.Interpreter.ThrowIfNull();
+            var tokenizer = interpreter.Tokenizer;
+            var expression = Grammar.ParseExpression (sourceCode, tokenizer);
             var result = expression.Compute (context);
 
             return result;
@@ -451,7 +455,10 @@ public sealed class StdLib
                 return null;
             }
 
-            var program = Interpreter.ParseProgram (sourceCode);
+            var topContext = context.GetTopContext();
+            var interpreter = topContext.Interpreter.ThrowIfNull();
+            var tokenizer = interpreter.Tokenizer;
+            var program = Grammar.ParseProgram (sourceCode, tokenizer);
             foreach (var statement in program.Statements)
             {
                 statement.Execute (context);

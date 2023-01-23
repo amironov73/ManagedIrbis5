@@ -101,6 +101,8 @@ public static class KotikUtility
     {
         settings ??= TokenizerSettings.CreateDefault();
         var result = new Tokenizer (settings);
+        result.WhitespaceHandler = new StandardWhitespaceHandler();
+        result.CommentHandler = new StandardCommentHandler();
         result.Tokenizers.Add (new CharacterTokenizer());
         result.Tokenizers.Add (new RawStringTokenizer());
         result.Tokenizers.Add (new StringTokenizer());
