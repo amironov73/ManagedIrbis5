@@ -63,11 +63,6 @@ public sealed class IndexNode
             Context context
         )
     {
-        // if (!context.TryGetVariable (_variableName, out var obj))
-        // {
-        //     return null;
-        // }
-
         var obj = _obj.Compute (context);
         if (obj is null)
         {
@@ -193,6 +188,7 @@ public sealed class IndexNode
             return null;
         }
 
+        // TODO почему возвращается value, а не result?
         var result = method.Invoke (obj, new object? [] { index, value });
 
         return value;

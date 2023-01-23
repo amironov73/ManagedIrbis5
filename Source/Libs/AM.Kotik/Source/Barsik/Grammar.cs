@@ -99,7 +99,8 @@ public static class Grammar
                 Variable,
                 Parser.Lazy (() => List!),
                 Parser.Lazy (() => Dictionary!),
-                Parser.Lazy (() => New!)
+                Parser.Lazy (() => New!),
+                Parser.Lazy (() => Throw!)
             )
         .Labeled ("Atom");
 
@@ -362,6 +363,15 @@ public static class Grammar
                 (AtomNode) new CallNode (name, args.ToArray())
         )
         .Labeled ("FunctionCall");
+
+    /// <summary>
+    /// Оператор throw.
+    /// </summary>
+    private static readonly Parser<AtomNode> Throw = Parser.Lazy (() => Atom!)
+        .RoundBrackets()
+        .After (Reserved ("throw"))
+        .Map (x => (AtomNode) new ThrowNode (x))
+        .Labeled ("Throw");
 
     /// <summary>
     /// Блок catch.

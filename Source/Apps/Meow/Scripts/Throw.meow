@@ -1,0 +1,17 @@
+try
+{
+    throw ("Hello, exception")
+}
+catch (e)
+{
+    println (e.Message)
+}
+
+try
+{
+    throw (123)
+}
+catch (e)
+{
+    println (e.Message)
+}
