@@ -425,19 +425,14 @@ public static class Grammar
     /// </summary>
     private static readonly Parser<StatementBase> ForStatement = Parser.Chain
         (
-            Parser.Position, // 1
-            Reserved ("for"), // 2
-            Parser.Term ("("), // 3
-            Assignment.Instance ("Init"), // 4
-            Parser.Term (";"), // 5
-            Expression.Instance ("Condition"), // 6
-            Parser.Term (";"), // 7
-            Assignment.Or (Expression).Labeled ("Step"), // 8
-            Parser.Term (")"), // 9
-            Block.Instance ("Body"), // 10
-            Block.Before (Reserved ("else")).Optional(), // 11
-            (_1, _, _, _4, _, _6, _, _8, _, _10, _11) =>
-                (StatementBase) new ForNode (_1.Line, _4, _6, _8, _10, _11)
+            Parser.Position.Before (Reserved ("for")), // position
+            Assignment.After (Parser.Term ("(")), // init
+            Expression.Between (Term (";"), Term (";")), // condition
+            Assignment.Or (Expression).Labeled ("Step").Before (Term (")")), // step
+            Block, // body
+            Block.Before (Reserved ("else")).Optional(), // elseBlock
+            (position, init, condition, step, body, elseBlock) =>
+                (StatementBase) new ForNode (position.Line, init, condition, step, body, elseBlock)
         )
         .Labeled ("For");
 
@@ -446,17 +441,13 @@ public static class Grammar
     /// </summary>
     private static readonly Parser<StatementBase> ForEachStatement = Parser.Chain
         (
-            Parser.Position, // 1
-            Reserved ("foreach"), // 2
-            Parser.Term ("("), // 3
-            Identifier, // 4
-            Parser.Term ("in"), // 5
-            Expression.Labeled ("Enumerable"), // 6
-            Parser.Term (")"), // 7
-            Block.Instance ("Body"), // 8
-            Block.Before (Reserved ("else")).Optional(), // 9
-            (_1, _, _, _4, _, _6, _, _8, _9) =>
-                (StatementBase) new ForEachNode (_1.Line, _4, _6, _8, _9)
+            Parser.Position.Before (Reserved ("foreach")), // position
+            Identifier.After (Parser.Term ("(")), // variable
+            Expression.After (Term ("in")), // sequence
+            Block.After (Parser.Term (")")), // body
+            Block.Before (Reserved ("else")).Optional(), // elseBlock
+            (position, variable, sequence, body, elseBlock) =>
+                (StatementBase) new ForEachNode (position.Line, variable, sequence, body, elseBlock)
         )
         .Labeled ("ForEach");
 

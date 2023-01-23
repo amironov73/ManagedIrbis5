@@ -1,0 +1,10 @@
+﻿func main()
+{
+    println ("Hello from func main!")
+}
+
+println ("__NAME__ = ", __NAME__)
+if (__NAME__ == "__MAIN__")
+{
+    main()
+}

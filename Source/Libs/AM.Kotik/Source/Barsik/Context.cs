@@ -716,23 +716,23 @@ public sealed class Context
     {
         Sure.NotNullNorEmpty (name);
 
-        // if (Builtins.IsBuiltinFunction (name))
-        // {
-        //     throw new BarsikException ($"{name} used by builtin function");
-        // }
-        //
-        // if (Defines.ContainsKey (name))
-        // {
-        //     throw new BarsikException ($"Can't redefine {name}");
-        // }
+        if (Builtins.IsBuiltinFunction (name))
+        {
+            throw new BarsikException ($"{name} used by builtin function");
+        }
 
-        // for (var context = Parent; context is not null; context = context.Parent)
-        // {
-        //     if (Defines.ContainsKey (name))
-        //     {
-        //         throw new BarsikException ($"Can't redefine {name}");
-        //     }
-        // }
+        if (Defines.ContainsKey (name))
+        {
+            throw new BarsikException ($"Can't redefine {name}");
+        }
+
+        for (var context = Parent; context is not null; context = context.Parent)
+        {
+            if (Defines.ContainsKey (name))
+            {
+                throw new BarsikException ($"Can't redefine {name}");
+            }
+        }
 
         if (Variables.ContainsKey (name))
         {
@@ -763,7 +763,7 @@ public sealed class Context
     {
         Sure.NotNullNorEmpty (name);
 
-        if (//Defines.TryGetValue (name, out value) ||
+        if (Defines.TryGetValue (name, out value) ||
             Variables.TryGetValue (name, out value))
         {
             return true;
