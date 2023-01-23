@@ -34,14 +34,14 @@ public sealed class InterpreterSettings
     /// </summary>
     [JsonPropertyName ("debug-pa")]
     public bool DebugParser { get; set; }
-    
+
     /// <summary>
     /// Вывод дампа синтаксического дерева перед исполнением
     /// каждого скрипта.
     /// </summary>
     [JsonPropertyName ("dump-ast")]
     public bool DumpAst { get; set; }
-    
+
     /// <summary>
     /// Вывод дампа всех переменных после исполнения скрипта.
     /// </summary>
@@ -54,7 +54,7 @@ public sealed class InterpreterSettings
     /// </summary>
     [JsonPropertyName ("evaluate-expression")]
     public string? EvaluateExpression { get; set; }
-    
+
     /// <summary>
     /// Загрузка сборок перед началом разбора и выполнения скриптов.
     /// </summary>
@@ -72,13 +72,13 @@ public sealed class InterpreterSettings
     /// Настройки токенайзера.
     /// </summary>
     [JsonPropertyName ("tokenizer")]
-    public TokenizerSettings TokenizerSettings { get; set; }
+    public TokenizerSettings? TokenizerSettings { get; set; }
 
     /// <summary>
     /// Добавление пространств перед исполнением скриптов.
     /// </summary>
     [JsonPropertyName ("use-namespaces")]
-    public string[]? UseNamespaces{ get; set; }
+    public string[]? UseNamespaces { get; set; }
 
     #endregion
 
@@ -89,7 +89,7 @@ public sealed class InterpreterSettings
     /// </summary>
     public InterpreterSettings()
     {
-        TokenizerSettings = TokenizerSettings.CreateDefault();
+        // пустое тело конструктора
     }
 
     #endregion

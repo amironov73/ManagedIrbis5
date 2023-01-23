@@ -30,10 +30,30 @@ public sealed class AggregatingTokenizer
 {
     #region Properties
 
+    /// <inheritdoc cref="SubTokenizer.Settings"/>
+    public override TokenizerSettings Settings
+    {
+        get => _settings;
+        set
+        {
+            _settings = value;
+            foreach (var tokenizer in Tokenizers)
+            {
+                tokenizer.Settings = value;
+            }
+        }
+    }
+
     /// <summary>
     /// Список вложенных токенайзеров.
     /// </summary>
     public List<SubTokenizer> Tokenizers { get; } = new ();
+
+    #endregion
+
+    #region Private members
+
+    private TokenizerSettings _settings = null!;
 
     #endregion
 

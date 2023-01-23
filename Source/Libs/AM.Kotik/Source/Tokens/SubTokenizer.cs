@@ -27,17 +27,47 @@ namespace AM.Kotik;
 /// </summary>
 public abstract class SubTokenizer
 {
+    #region Properties
+
+    /// <summary>
+    /// Настройки.
+    /// </summary>
+    public virtual TokenizerSettings Settings { get; set; } = null!;
+
+    #endregion
+
     #region Protected members
 
     /// <summary>
     /// Навигатор по тексту.
     /// </summary>
-    protected TextNavigator _navigator = null;
+    protected TextNavigator _navigator = null!;
 
     /// <summary>
     ///
     /// </summary>
     protected bool IsEof => _navigator.IsEOF;
+
+    /// <summary>
+    /// Проверка, не является ли указанный текст зарезервированным словом.
+    /// </summary>
+    protected bool IsReservedWord
+        (
+            string text
+        )
+    {
+        Sure.NotNull (text);
+
+        foreach (var word in Settings.ReservedWords)
+        {
+            if (string.CompareOrdinal (word, text) == 0)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     /// <summary>
     ///

@@ -83,12 +83,17 @@ public sealed class Interpreter
     /// Инициализируется значением переменной окружения "BARSIK_PATH".
     /// </summary>
     public List<string> Pathes { get; }
-    
+
     /// <summary>
     /// Настройки интерпретатора.
     /// Применяются перед началом разбора и исполнения скрипта.
     /// </summary>
     public InterpreterSettings Settings { get; }
+
+    /// <summary>
+    /// Токенайзер.
+    /// </summary>
+    public Tokenizer Tokenizer { get; set; }
 
     #endregion
 
@@ -109,6 +114,7 @@ public sealed class Interpreter
         output ??= Console.Out;
         error ??= Console.Error;
         Settings =  settings ?? InterpreterSettings.CreateDefault();
+        Tokenizer = KotikUtility.CreateTokenizer (Settings.TokenizerSettings);
         AllowNewOperator = true;
         Modules = new ();
         Assemblies = new ();

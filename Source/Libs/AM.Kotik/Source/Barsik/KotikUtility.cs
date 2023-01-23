@@ -92,6 +92,28 @@ public static class KotikUtility
     }
 
     /// <summary>
+    /// Создание токенайзера, подходящего для Барсика.
+    /// </summary>
+    public static Tokenizer CreateTokenizer
+        (
+            TokenizerSettings? settings = null
+        )
+    {
+        settings ??= TokenizerSettings.CreateDefault();
+        var result = new Tokenizer (settings);
+        result.Tokenizers.Add (new CharacterTokenizer());
+        result.Tokenizers.Add (new RawStringTokenizer());
+        result.Tokenizers.Add (new StringTokenizer());
+        result.Tokenizers.Add (new FormatTokenizer());
+        result.Tokenizers.Add (new ExternalTokenizer());
+        result.Tokenizers.Add (new NumberTokenizer());
+        result.Tokenizers.Add (new TermTokenizer());
+        result.Tokenizers.Add (new IdentifierTokenizer());
+
+        return result;
+    }
+
+    /// <summary>
     /// Создание и запуск интерпретатора.
     /// </summary>
     /// <param name="args">Аргументы командной строки.</param>
