@@ -100,7 +100,8 @@ public static class Grammar
                 Parser.Lazy (() => List!),
                 Parser.Lazy (() => Dictionary!),
                 Parser.Lazy (() => New!),
-                Parser.Lazy (() => Throw!)
+                Parser.Lazy (() => Throw!),
+                Parser.Lazy (() => Lambda!)
             )
         .Labeled ("Atom");
 
@@ -363,6 +364,18 @@ public static class Grammar
                 (AtomNode) new CallNode (name, args.ToArray())
         )
         .Labeled ("FunctionCall");
+
+    /// <summary>
+    /// Определение лямбда-функции
+    /// </summary>
+    private static readonly Parser<AtomNode> Lambda = Parser.Chain
+        (
+            Reserved ("lambda"),
+            Identifier.SeparatedBy (Term (",")).RoundBrackets(),
+            Parser.Lazy (() => Block!),
+            (_, args, body) => (AtomNode) new LambdaNode (args.ToArray(), body)
+        )
+        .Labeled ("Lambda");
 
     /// <summary>
     /// Оператор throw.

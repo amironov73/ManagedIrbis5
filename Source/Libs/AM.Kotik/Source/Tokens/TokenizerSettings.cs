@@ -97,7 +97,7 @@ public sealed class TokenizerSettings
             "continue", "decimal", "default", "delegate", "do", "double",
             "else", "enum", "event", "explicit", "extern", "false", "finally",
             "fixed", "float", "for", "foreach", "func", "goto", "if", "implicit",
-            "in", "int", "interface", "internal", "is", "lock", "long",
+            "in", "int", "interface", "internal", "is", "lambda", "lock", "long",
             "namespace", "new", "null", "object", "operator", "or", "out",
             "override", "params", "private", "protected", "public", "readonly",
             "ref", "return", "sbyte", "sealed", "short", "sizeof", "stackalloc",

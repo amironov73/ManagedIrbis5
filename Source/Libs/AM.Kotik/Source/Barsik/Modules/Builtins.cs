@@ -58,7 +58,7 @@ public static class Builtins
 
         return null;
     }
-    
+
     /// <summary>
     /// Вычисление аргумента по соответствующему индексу.
     /// </summary>
@@ -532,6 +532,33 @@ public static class Builtins
         }
 
         FunctionDescriptor? descriptor = null;
+        if (args[0] is LambdaNode lambda)
+        {
+            if (Compute (context, args, 1) is not IEnumerable source0)
+            {
+                return null;
+            }
+            var child0 = context.CreateChildContext();
+            var index0 = 0;
+            var callArgs0 = new dynamic?[3];
+            var result0 = new BarsikList();
+            foreach (var current in source0)
+            {
+                callArgs0[0] = current;
+                callArgs0[1] = index0;
+                callArgs0[2] = source0;
+                var retval = KotikUtility.ToBoolean (lambda.Adapter (child0, callArgs0));
+                if (retval)
+                {
+                    result0.Add (current);
+                }
+
+                index0++;
+            }
+
+            return result0;
+        }
+
         if (args[0] is VariableNode node
             && !context.FindFunction (node.Name, out descriptor))
         {
