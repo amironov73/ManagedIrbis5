@@ -60,7 +60,7 @@ public static class Grammar
         (
             x => (AtomNode) new FormatNode (x)
         );
-    
+
     /// <summary>
     /// Разбор перечисленных терминов.
     /// </summary>
@@ -114,7 +114,7 @@ public static class Grammar
             Parser.Lazy (() => Expression!), // trueValue
             Term (":"),
             Parser.Lazy (() => Expression!), // falseValue
-            (_, condition, _, trueValue, _, falseValue) => 
+            (_, condition, _, trueValue, _, falseValue) =>
                 (AtomNode) new TernaryNode (condition, trueValue, falseValue)
         )
         .Labeled ("Ternary");
@@ -125,17 +125,17 @@ public static class Grammar
     private static readonly Parser<AtomNode> LeftHand = ExpressionBuilder.Build
         (
             root: Parser.Lazy (() => Atom),
-            
+
             // префиксные операции не предусмотрены
             prefixOps: Array.Empty<Parser<Func<AtomNode, AtomNode>>>(),
-            
+
             postfixOps: new[]
             {
                 // постфиксные операции
                 Parser.Lazy (() => Index!),
                 Parser.Lazy (() => Property!)
             },
-            
+
             // инфиксные операции не предусмотрены
             infixOps: Array.Empty<InfixOperator<AtomNode>>()
         )
@@ -147,7 +147,7 @@ public static class Grammar
     private static readonly Parser<AtomNode> Expression = ExpressionBuilder.Build
         (
             root: Parser.Lazy (() => Atom),
-            
+
             prefixOps: new[]
             {
                 // префиксные операции
@@ -182,7 +182,7 @@ public static class Grammar
                         x => target => new CastNode (x, target)
                     )
             },
-            
+
             postfixOps: new[]
             {
                 // постфиксные операции
@@ -194,14 +194,14 @@ public static class Grammar
                         "PostfixBang",
                         _ => target => new PostfixBangNode (target)
                     ),
-                
+
                 Parser.Lazy (() => Index!),
 
                 Parser.Lazy (() => MethodCall!).Labeled ("MethodCall"),
 
                 Parser.Lazy (() => Property!).Labeled ("Property"),
             },
-            
+
             infixOps: new[]
             {
                 // инфиксные операции
@@ -212,7 +212,7 @@ public static class Grammar
                 Operator.LeftAssociative ("Bitwise", "&", "|", "^"),
                 Operator.LeftAssociative ("Multiplication", "*", "/", "%" ),
                 Operator.LeftAssociative ("Addition", "+", "-" ),
-                Operator.LeftAssociative ("Comparison", "<", ">", "<=", ">=", "==", "!=", "<>", 
+                Operator.LeftAssociative ("Comparison", "<", ">", "<=", ">=", "==", "!=", "<>",
                     "===", "!==", "~~", "~~~" )
             }
         )
@@ -298,9 +298,9 @@ public static class Grammar
                         ),
                     minCount: 0
                 ),
-            
+
             Expression,
-            
+
             (tuples, expr) =>
             {
                 // TODO присваивание должно идти в обратном порядке
@@ -364,9 +364,35 @@ public static class Grammar
         .Labeled ("FunctionCall");
 
     /// <summary>
+    /// Блок catch.
+    /// </summary>
+    private static readonly Parser<TryNode.CatchBlock> CatchClause = Parser.Chain
+        (
+            Identifier.RoundBrackets().After (Reserved ("catch")), // name
+            Parser.Lazy (() => Block!), // body
+            (name, body) => new TryNode.CatchBlock (name, body)
+        )
+        .Optional();
+
+    /// <summary>
+    /// Блок try-catch-finally.
+    /// </summary>
+    private static readonly Parser<StatementBase> TryCatchFinally = Parser.Chain
+        (
+            Parser.Position.Before (Reserved ("try")), // position
+            Parser.Lazy (() => Block!), // tryBlock,
+            CatchClause, // catchBlock
+            Parser.Lazy (() => Block!).After (Reserved ("finally"))
+                .Optional(), // finallyBlock
+            (position, tryBlock, catchBlock, finallyBlock) => (StatementBase)
+                new TryNode (position.Line, tryBlock, catchBlock, finallyBlock)
+        )
+        .Labeled ("TryCatchFinally");
+
+    /// <summary>
     /// Простой стейтмент.
     /// </summary>
-    private static readonly Parser<StatementBase> SimpleStatement = 
+    private static readonly Parser<StatementBase> SimpleStatement =
         BuildStatement (Assignment).Labeled ("SimpleStatement");
 
     /// <summary>
@@ -384,7 +410,7 @@ public static class Grammar
                             (pos, lines) =>
                                 (StatementBase)new BlockNode (pos.Line, lines.ToArray())
                         ),
-                    
+
                     // либо единственный стейтмент без фигурных скобок
                     GenericStatement!.Map
                         (
@@ -580,6 +606,7 @@ public static class Grammar
                     ContinueStatement,
                     ReturnStatement,
                     ExternalCode,
+                    TryCatchFinally,
                     SemicolonStatement
                 )
                 .Labeled ("StatementKind")

@@ -34,7 +34,7 @@ public static class TokenKind
     /// <summary>
     /// Идентификатор.
     /// </summary>
-    public const string Identifier = "idenfier";
+    public const string Identifier = "identifier";
 
     /// <summary>
     /// Один символ в одиночных кавычках.
