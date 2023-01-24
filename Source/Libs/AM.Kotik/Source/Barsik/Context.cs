@@ -82,6 +82,12 @@ public sealed class Context
     /// </summary>
     public Dictionary<string, object?> Namespaces { get; }
 
+    /// <summary>
+    /// Опциональный префикс, используемый, например, в операторе "new"
+    /// при инициализации свойств свежесозданного объекта.
+    /// </summary>
+    public AtomNode? With { get; set; }
+
     #endregion
 
     #region Construction

@@ -41,10 +41,6 @@ public static class Grammar
                 (pos, x) => (StatementBase) new SimpleStatement (pos.Line, x)
             );
 
-    #endregion
-
-    #region Public methods and properties
-
     /// <summary>
     /// Порождение константного узла.
     /// </summary>
@@ -603,6 +599,31 @@ public static class Grammar
         .Labeled ("ExternalCode");
 
     /// <summary>
+    /// with-присваивание.
+    /// </summary>
+    private static readonly Parser<StatementBase> WithAssignment = Parser.Chain
+        (
+            Parser.Position.Before (Term (".")), // position
+            Identifier.Before (Term ("=")), // property
+            Expression, // expression
+            (position, property, expression) =>
+                (StatementBase)new WithAssignmentNode (position.Line, property, expression)
+        )
+        .Labeled ("WithAssignment");
+
+    /// <summary>
+    /// Блок with.
+    /// </summary>
+    private static readonly Parser<StatementBase> With = Parser.Chain
+        (
+            Parser.Position.Before (Reserved ("with")), // position,
+            LeftHand, // center
+            Block, // body
+            (position, center, body) => (StatementBase) new WithNode (position.Line, center, body)
+        )
+        .Labeled ("With");
+
+    /// <summary>
     /// Стейтмент вообще.
     /// </summary>
     private static readonly Parser<StatementBase> GenericStatement = Parser.Lazy
@@ -621,6 +642,8 @@ public static class Grammar
                     ReturnStatement,
                     ExternalCode,
                     TryCatchFinally,
+                    With,
+                    WithAssignment,
                     SemicolonStatement
                 )
                 .Labeled ("StatementKind")

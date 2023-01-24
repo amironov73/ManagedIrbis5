@@ -1,0 +1,12 @@
+﻿use ("System.Text")
+
+builder = new StringBuilder()
+builder.Append ("Hello")
+with (builder)
+{
+    .Capacity = 10; // точка с запятой тут нужна!
+    .Length = 0;
+}
+
+println (builder.Capacity)
+println (builder.Length)
