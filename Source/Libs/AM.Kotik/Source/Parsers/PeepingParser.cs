@@ -74,28 +74,38 @@ public sealed class PeepingParser<TPeep, TResult>
         }
 
         var offset = state.Location;
-        var flag = false;
-        for (var delta = 0; delta < int.MaxValue; delta++)
+        var delta = 0;
+        while (state.HasCurrent)
         {
-            state.Location = offset + delta;
-            if (_peepFor.TryParse (state, out _))
+            var found = false;
+            for (; delta < int.MaxValue; delta++)
             {
-                flag = true;
+                state.Location = offset + delta;
+                if (!state.HasCurrent)
+                {
+                    break;
+                }
+
+                if (_peepFor.TryParse (state, out _))
+                {
+                    // парсер продвинул state, значит, нам продвигать не надо
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found)
+            {
                 break;
             }
-        }
 
-        if (!flag)
-        {
-            state.Location = offset;
-            return DebugSuccess (state, false);
-        }
+            var slice = state.Slice (offset, state.Location - offset - 1);
+            if (_mainParser.TryParse (slice, out result) && !slice.HasCurrent)
+            {
+                return DebugSuccess (state, true);
+            }
 
-        var slice = state.Slice (offset, state.Location - offset);
-        if (_mainParser.TryParse (slice, out result))
-        {
-            state.Advance();
-            return DebugSuccess (state, true);
+            delta++;
         }
 
         state.Location = offset;

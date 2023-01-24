@@ -224,7 +224,7 @@ public sealed class ParseState
     {
         Sure.InRange (offset, _tokens);
         Sure.NonNegative (count);
-        Sure.InRange (offset + count, _tokens);
+        Sure.InRange (offset + count - 1, _tokens);
 
         var tokens = _tokens.GetSlice (offset, count);
         var result = new ParseState (tokens, DebugOutput);

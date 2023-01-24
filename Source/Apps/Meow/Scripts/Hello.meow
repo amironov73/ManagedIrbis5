@@ -24,7 +24,7 @@ j = -j
 
 `some external code`
 
-o1 = ? i2 : "this is true" : "this is false"
+o1 = i2 ? "this is true" : "this is false"
 
 l = [1, 2, 3]
 d = {1: "one", 2: "two", 3: "three"}

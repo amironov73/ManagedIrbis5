@@ -8,14 +8,14 @@
 
     <!-- Централизованное управление пакетами -->
     <ItemGroup>
-        <PackageReference Include="Microsoft.NET.Test.Sdk"/>
-        <PackageReference Include="MSTest.TestAdapter"/>
-        <PackageReference Include="MSTest.TestFramework"/>
-        <PackageReference Include="coverlet.collector"/>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" />
+        <PackageReference Include="MSTest.TestAdapter" />
+        <PackageReference Include="MSTest.TestFramework" />
+        <PackageReference Include="coverlet.collector" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\Libs\AM.Kotik\AM.Kotik.csproj"/>
+        <ProjectReference Include="..\..\Libs\AM.Kotik\AM.Kotik.csproj" />
     </ItemGroup>
 
 </Project>

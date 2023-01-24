@@ -99,12 +99,19 @@ public sealed class Tokenizer
     /// <returns></returns>
     public static Tokenizer CreateDefault()
     {
-        var result = new Tokenizer (TokenizerSettings.CreateDefault());
-        result.Tokenizers.Add (new CharacterTokenizer());
-        result.Tokenizers.Add (new StringTokenizer());
-        result.Tokenizers.Add (new NumberTokenizer());
-        result.Tokenizers.Add (new TermTokenizer());
-        result.Tokenizers.Add (new IdentifierTokenizer());
+        var result = new Tokenizer (TokenizerSettings.CreateDefault())
+        {
+            Tokenizers =
+            {
+                new CharacterTokenizer(),
+                new StringTokenizer(),
+                new NumberTokenizer(),
+                new TermTokenizer(),
+                new IdentifierTokenizer()
+            },
+            WhitespaceHandler = new StandardWhitespaceHandler(),
+            CommentHandler = new StandardCommentHandler()
+        };
 
         return result;
     }

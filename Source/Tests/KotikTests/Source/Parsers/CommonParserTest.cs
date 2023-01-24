@@ -51,7 +51,7 @@ public class CommonParserTest
             bool enableTracing = false
         )
     {
-        var tokenizer = new Tokenizer();
+        var tokenizer = Tokenizer.CreateDefault();
         var tokens = tokenizer.Tokenize (text);
         var traceOutput = enableTracing ? Console.Out : null;
 

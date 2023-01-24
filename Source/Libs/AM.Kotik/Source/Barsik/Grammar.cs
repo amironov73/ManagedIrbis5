@@ -106,13 +106,15 @@ public static class Grammar
     /// </summary>
     private static readonly Parser<AtomNode> Ternary = Parser.Chain
         (
-            Term ("?"),
-            Parser.Lazy (() => Expression!), // condition
-            Term (":"),
+            new PeepingParser<string, AtomNode>
+                (
+                    Term ("?"),
+                    Parser.Lazy (() => Expression!)
+                ), // condition
             Parser.Lazy (() => Expression!), // trueValue
             Term (":"),
             Parser.Lazy (() => Expression!), // falseValue
-            (_, condition, _, trueValue, _, falseValue) =>
+            (condition, trueValue, _, falseValue) =>
                 (AtomNode) new TernaryNode (condition, trueValue, falseValue)
         )
         .Labeled ("Ternary");
