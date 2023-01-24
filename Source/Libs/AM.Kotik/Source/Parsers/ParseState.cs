@@ -214,6 +214,25 @@ public sealed class ParseState
     }
 
     /// <summary>
+    /// Создание среза.
+    /// </summary>
+    public ParseState Slice
+        (
+            int offset,
+            int count
+        )
+    {
+        Sure.InRange (offset, _tokens);
+        Sure.NonNegative (count);
+        Sure.InRange (offset + count, _tokens);
+
+        var tokens = _tokens.GetSlice (offset, count);
+        var result = new ParseState (tokens, DebugOutput);
+
+        return result;
+    }
+
+    /// <summary>
     /// Вывод строки отладочного текста.
     /// </summary>
     [ExcludeFromCodeCoverage]
