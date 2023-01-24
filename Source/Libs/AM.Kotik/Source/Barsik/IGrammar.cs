@@ -1,0 +1,50 @@
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable ArgumentsStyleLiteral
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable RedundantSuppressNullableWarningExpression
+// ReSharper disable StaticMemberInitializerReferesToMemberBelow
+
+/* IGrammar.cs -- интерфейс грамматики
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
+using System.IO;
+
+#endregion
+
+#nullable enable
+
+namespace AM.Kotik.Barsik;
+
+/// <summary>
+/// Интерфейс грамматики.
+/// </summary>
+public interface IGrammar
+{
+    /// <summary>
+    /// Разбор текста выражения.
+    /// </summary>
+    AtomNode ParseExpression
+        (
+            string sourceCode,
+            Tokenizer tokenizer,
+            TextWriter? debugOutput = null
+        );
+
+    /// <summary>
+    /// Разбор программы.
+    /// </summary>
+    ProgramNode ParseProgram
+        (
+            string sourceText,
+            Tokenizer tokenizer,
+            TextWriter? debugOutput = null
+        );
+}

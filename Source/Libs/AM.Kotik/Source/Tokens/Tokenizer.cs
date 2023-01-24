@@ -157,6 +157,13 @@ public sealed class Tokenizer
                 break;
             }
 
+            // после комментариев могут быть пробелы
+            WhitespaceHandler?.SkipWhitespace();
+            if (IsEof)
+            {
+                break;
+            }
+
             Token? token = null;
             foreach (var tokenizer in Tokenizers)
             {

@@ -95,6 +95,11 @@ public sealed class Interpreter
     /// </summary>
     public Tokenizer Tokenizer { get; set; }
 
+    /// <summary>
+    /// Грамматика.
+    /// </summary>
+    public IGrammar Grammar { get; set; }
+
     #endregion
 
     #region Construction
@@ -107,7 +112,8 @@ public sealed class Interpreter
             TextReader? input = null,
             TextWriter? output = null,
             TextWriter? error = null,
-            InterpreterSettings? settings = null
+            InterpreterSettings? settings = null,
+            IGrammar? grammar = null
         )
     {
         input ??= Console.In;
@@ -115,6 +121,7 @@ public sealed class Interpreter
         error ??= Console.Error;
         Settings =  settings ?? InterpreterSettings.CreateDefault();
         Tokenizer = KotikUtility.CreateTokenizer (Settings.TokenizerSettings);
+        Grammar = grammar ?? new Grammar();
         AllowNewOperator = true;
         Modules = new ();
         Assemblies = new ();

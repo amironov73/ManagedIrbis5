@@ -163,7 +163,7 @@ public sealed class StdLib
             }
 
             var sourceCode = File.ReadAllText (fileName);
-            program = Grammar.ParseProgram (sourceCode, tokenizer);
+            program = interpreter.Grammar.ParseProgram (sourceCode, tokenizer);
             topContext._inclusions[fileName] = program;
         }
 
@@ -425,7 +425,7 @@ public sealed class StdLib
             var topContext = context.GetTopContext();
             var interpreter = topContext.Interpreter.ThrowIfNull();
             var tokenizer = interpreter.Tokenizer;
-            var expression = Grammar.ParseExpression (sourceCode, tokenizer);
+            var expression = interpreter.Grammar.ParseExpression (sourceCode, tokenizer);
             var result = expression.Compute (context);
 
             return result;
@@ -458,7 +458,7 @@ public sealed class StdLib
             var topContext = context.GetTopContext();
             var interpreter = topContext.Interpreter.ThrowIfNull();
             var tokenizer = interpreter.Tokenizer;
-            var program = Grammar.ParseProgram (sourceCode, tokenizer);
+            var program = interpreter.Grammar.ParseProgram (sourceCode, tokenizer);
             foreach (var statement in program.Statements)
             {
                 statement.Execute (context);
