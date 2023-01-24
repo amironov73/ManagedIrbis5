@@ -15,6 +15,8 @@
 
 #region Using directives
 
+using System;
+using System.Collections.Generic;
 using System.IO;
 
 #endregion
@@ -28,6 +30,31 @@ namespace AM.Kotik.Barsik;
 /// </summary>
 public interface IGrammar
 {
+    /// <summary>
+    /// Дополнительно распознаваемые вычислимые выражения.
+    /// </summary>
+    IList<Parser<AtomNode>> AdditionalAtoms { get; }
+
+    /// <summary>
+    /// Дополнительно распознаваемые инфиксные операции.
+    /// </summary>
+    IList<InfixOperator<AtomNode>> AdditionalInfix { get; }
+
+    /// <summary>
+    /// Дополнительно распознаваемые постфиксные операции.
+    /// </summary>
+    IList<Parser<Func<AtomNode, AtomNode>>> AdditionalPostfix { get; }
+
+    /// <summary>
+    /// Дополнительно распознаваемые префиксные операции.
+    /// </summary>
+    IList<Parser<Func<AtomNode, AtomNode>>> AdditionalPrefix { get; }
+
+    /// <summary>
+    /// Дополнительно распознаваемые стейтменты.
+    /// </summary>
+    IList<Parser<StatementBase>> AdditionalStatements { get; }
+
     /// <summary>
     /// Разбор текста выражения.
     /// </summary>
@@ -47,4 +74,9 @@ public interface IGrammar
             Tokenizer tokenizer,
             TextWriter? debugOutput = null
         );
+
+    /// <summary>
+    /// Пересоздание грамматики после внесения изменений.
+    /// </summary>
+    void RebuildGrammar();
 }

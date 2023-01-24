@@ -20,30 +20,30 @@ using System;
 namespace AM.Kotik;
 
 /// <summary>
-/// 
+///
 /// </summary>
-public sealed class InfixOperator<TResult>
+public class InfixOperator<TResult>
     where TResult: class
 {
     #region Properties
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public Parser<string> Operation { get; }
-    
+
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public Func<TResult, string, TResult, TResult> Function { get; }
-    
+
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public InfixOperatorKind Kind { get; }
-    
+
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public string Label { get; }
 
@@ -56,7 +56,7 @@ public sealed class InfixOperator<TResult>
     /// </summary>
     public InfixOperator
         (
-            Parser<string> operation, 
+            Parser<string> operation,
             Func<TResult, string, TResult, TResult> function,
             string label,
             InfixOperatorKind kind
@@ -65,7 +65,7 @@ public sealed class InfixOperator<TResult>
         Sure.NotNull (operation);
         Sure.NotNull (function);
         Sure.NotNullNorEmpty (label);
-        
+
         Operation = operation;
         Function = function;
         Kind = kind;

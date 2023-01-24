@@ -29,7 +29,7 @@ public static class ExpressionBuilder
     #region Public methods
 
     /// <summary>
-    /// Построение
+    /// Построение выражения.
     /// </summary>
     public static Parser<TNode> Build<TNode>
         (

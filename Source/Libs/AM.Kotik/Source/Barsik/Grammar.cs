@@ -20,6 +20,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
+using AM.Kotik.Barsik.Parsers;
+
 #endregion
 
 #nullable enable
@@ -32,6 +34,26 @@ namespace AM.Kotik.Barsik;
 public sealed class Grammar
     : IGrammar
 {
+    #region Properties
+
+    /// <inheritdoc cref="IGrammar.AdditionalAtoms"/>
+    public IList<Parser<AtomNode>> AdditionalAtoms { get; }
+
+    /// <inheritdoc cref="AdditionalInfix"/>
+    public IList<InfixOperator<AtomNode>> AdditionalInfix { get; }
+
+    /// <inheritdoc cref="IGrammar.AdditionalPostfix"/>
+    public IList<Parser<Func<AtomNode, AtomNode>>> AdditionalPostfix { get; }
+
+    /// <inheritdoc cref="IGrammar.AdditionalPrefix"/>
+    public IList<Parser<Func<AtomNode, AtomNode>>> AdditionalPrefix { get; }
+
+
+    /// <inheritdoc cref="IGrammar.AdditionalStatements"/>
+    public IList<Parser<StatementBase>> AdditionalStatements { get; }
+
+    #endregion
+
     #region Construction
 
     /// <summary>
@@ -39,6 +61,106 @@ public sealed class Grammar
     /// </summary>
     public Grammar()
     {
+        AdditionalAtoms = new List<Parser<AtomNode>>();
+        AdditionalInfix = new List<InfixOperator<AtomNode>>();
+        AdditionalPostfix = new List<Parser<Func<AtomNode, AtomNode>>>();
+        AdditionalPrefix = new List<Parser<Func<AtomNode, AtomNode>>>();
+        AdditionalStatements = new List<Parser<StatementBase>>();
+
+        RebuildGrammar();
+    }
+
+    #endregion
+
+    #region Private members
+
+    private InfixOperator<AtomNode>[] BuildInfixOperatorsArray
+        (
+            params InfixOperator<AtomNode>[] mainOperators
+        )
+    {
+        if (AdditionalInfix.Count == 0)
+        {
+            return mainOperators;
+        }
+
+        var result = new List<InfixOperator<AtomNode>>();
+        result.AddRange (AdditionalInfix);
+        result.AddRange (mainOperators);
+
+        return result.ToArray();
+    }
+
+    private Parser<StatementBase> BuildStatement (Parser<AtomNode> innerParser) =>
+        Parser.Chain
+            (
+                Parser.Position,
+                innerParser,
+                (pos, x) => (StatementBase) new SimpleStatement (pos.Line, x)
+            );
+
+    /// <summary>
+    /// Порождение константного узла.
+    /// </summary>
+    private readonly Parser<AtomNode> Literal = new LiteralParser().Map
+        (
+            x => (AtomNode) new ConstantNode (x)
+        );
+
+    /// <summary>
+    /// Форматная строка.
+    /// </summary>
+    private readonly Parser<AtomNode> Format = new FormatParser().Map
+        (
+            x => (AtomNode) new FormatNode (x)
+        );
+
+    /// <summary>
+    /// Разбор перечисленных терминов.
+    /// </summary>
+    private TermParser Term (params string[] terms) => new (terms);
+
+    /// <summary>
+    /// Разбор зарезервированного слова.
+    /// </summary>
+    /// <param name="word"><c>null</c> означает "любое зарезервированное слово".
+    /// </param>
+    private ReservedWordParser Reserved (string? word) => new (word);
+
+    /// <summary>
+    /// Разбор идентификаторов.
+    /// </summary>
+    private readonly IdentifierParser Identifier = new ();
+
+    /// <summary>
+    /// Выражение.
+    /// </summary>
+    private Parser<AtomNode> Expression = null!;
+
+    /// <summary>
+    /// Стейтмент вообще.
+    /// </summary>
+    private Parser<StatementBase> GenericStatement = null!;
+
+    /// <summary>
+    /// Программа в целом.
+    /// </summary>
+    private Parser<ProgramNode> Program = null!;
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Пересоздание грамматики.
+    /// </summary>
+    public void RebuildGrammar()
+    {
+        var additionalAtoms = new AdditionalAtomParser (this);
+        var additionalPostfix = new AdditionalPostfixParser (this);
+        var additionalPrefix = new AdditionalPrefixParser (this);
+        var additionalStatements = new AdditionalStatementParser (this);
+
         var variable = Identifier.Map (x => (AtomNode)new VariableNode (x))
             .Labeled ("Variable");
 
@@ -62,11 +184,11 @@ public sealed class Grammar
             .Labeled ("Throw");
 
         var namedArgument  = Parser.Chain
-                (
-                    Identifier.Before (Term (":")),
-                    expression,
-                    (name, expr) => (AtomNode) new NamedArgumentNode (name, expr)
-                )
+            (
+                Identifier.Before (Term (":")),
+                expression,
+                (name, expr) => (AtomNode) new NamedArgumentNode (name, expr)
+            )
             .Labeled ("NamedArg");
 
         var typeName = Identifier.SeparatedBy (Term ("."), minCount: 1)
@@ -75,19 +197,19 @@ public sealed class Grammar
             .Labeled ("TypeName");
 
         var newOperator  = Parser.Chain
-                (
-                    typeName.After (Reserved ("new")),
-                    expression.SeparatedBy (Term (",")).RoundBrackets(),
-                    (name, args) => (AtomNode) new NewNode (name, args.ToArray())
-                )
+            (
+                typeName.After (Reserved ("new")),
+                expression.SeparatedBy (Term (",")).RoundBrackets(),
+                (name, args) => (AtomNode) new NewNode (name, args.ToArray())
+            )
             .Labeled ("New");
 
         var keyAndValue  = Parser.Chain
-                (
-                    expression.Before (Term (":")),
-                    expression,
-                    (key, value) => new KeyValueNode (key, value)
-                )
+            (
+                expression.Before (Term (":")),
+                expression,
+                (key, value) => new KeyValueNode (key, value)
+            )
             .Labeled ("KeyAndValue");
 
         var dictionary  = keyAndValue.SeparatedBy (Term (",")).CurlyBrackets()
@@ -130,16 +252,17 @@ public sealed class Grammar
             .Labeled ("FunctionCall");
 
         var lambda  = Parser.Chain
-                (
-                    Reserved ("lambda"),
-                    Identifier.SeparatedBy (Term (",")).RoundBrackets(),
-                    block,
-                    (_, args, body) => (AtomNode) new LambdaNode (args.ToArray(), body)
-                )
+            (
+                Reserved ("lambda"),
+                Identifier.SeparatedBy (Term (",")).RoundBrackets(),
+                block,
+                (_, args, body) => (AtomNode) new LambdaNode (args.ToArray(), body)
+            )
             .Labeled ("Lambda");
 
         atom.Function = () => Parser.OneOf
             (
+                additionalAtoms,
                 Literal,
                 Format,
                 ternary,
@@ -154,22 +277,22 @@ public sealed class Grammar
             .Labeled ("Atom");
 
         var leftHand  = ExpressionBuilder.Build
-                (
-                    root: atom,
+            (
+                root: atom,
 
-                    // префиксные операции не предусмотрены
-                    prefixOps: Array.Empty<Parser<Func<AtomNode, AtomNode>>>(),
+                // префиксные операции не предусмотрены
+                prefixOps: Array.Empty<Parser<Func<AtomNode, AtomNode>>>(),
 
-                    postfixOps: new[]
-                    {
-                        // постфиксные операции
-                        index,
-                        property
-                    },
+                postfixOps: new[]
+                {
+                    // постфиксные операции
+                    index,
+                    property
+                },
 
-                    // инфиксные операции не предусмотрены
-                    infixOps: Array.Empty<InfixOperator<AtomNode>>()
-                )
+                // инфиксные операции не предусмотрены
+                infixOps: Array.Empty<InfixOperator<AtomNode>>()
+            )
             .Labeled ("LeftHand");
 
         expression.Function = () => ExpressionBuilder.Build
@@ -179,6 +302,8 @@ public sealed class Grammar
             prefixOps: new[]
             {
                 // префиксные операции
+                additionalPrefix,
+
                 Operator.Unary
                     (
                         Term ("-"),
@@ -214,6 +339,8 @@ public sealed class Grammar
             postfixOps: new[]
             {
                 // постфиксные операции
+                additionalPostfix,
+
                 Operator.Increment ("PostfixIncrement", false),
 
                 Operator.Unary
@@ -228,19 +355,19 @@ public sealed class Grammar
                 property,
             },
 
-            infixOps: new[]
-            {
-                // инфиксные операции
-                Operator.NonAssociative ("Shuttle", "<=>"),
-                Operator.NonAssociative ("In/is", "in", "is"),
-                Operator.LeftAssociative ("Coalesce", "??"),
-                Operator.LeftAssociative ("Shift", "<<", ">>"),
-                Operator.LeftAssociative ("Bitwise", "&", "|", "^"),
-                Operator.LeftAssociative ("Multiplication", "*", "/", "%" ),
-                Operator.LeftAssociative ("Addition", "+", "-" ),
-                Operator.LeftAssociative ("Comparison", "<", ">", "<=", ">=", "==", "!=", "<>",
-                    "===", "!==", "~~", "~~~" )
-            }
+            infixOps: BuildInfixOperatorsArray
+                (
+                    // инфиксные операции
+                    Operator.NonAssociative ("Shuttle", "<=>"),
+                    Operator.NonAssociative ("In/is", "in", "is"),
+                    Operator.LeftAssociative ("Coalesce", "??"),
+                    Operator.LeftAssociative ("Shift", "<<", ">>"),
+                    Operator.LeftAssociative ("Bitwise", "&", "|", "^"),
+                    Operator.LeftAssociative ("Multiplication", "*", "/", "%" ),
+                    Operator.LeftAssociative ("Addition", "+", "-" ),
+                    Operator.LeftAssociative ("Comparison", "<", ">", "<=", ">=", "==",
+                        "!=", "<>", "===", "!==", "~~", "~~~" )
+                )
         )
         .Labeled ("Expression");
         Expression = expression;
@@ -443,6 +570,7 @@ public sealed class Grammar
 
         GenericStatement = Parser.OneOf
             (
+                additionalStatements,
                 simpleStatement,
                 forStatement,
                 forEachStatement,
@@ -469,70 +597,6 @@ public sealed class Grammar
             .End()
             .Labeled ("Program");
     }
-
-    #endregion
-
-    #region Private members
-
-    private Parser<StatementBase> BuildStatement (Parser<AtomNode> innerParser) =>
-        Parser.Chain
-            (
-                Parser.Position,
-                innerParser,
-                (pos, x) => (StatementBase) new SimpleStatement (pos.Line, x)
-            );
-
-    /// <summary>
-    /// Порождение константного узла.
-    /// </summary>
-    private readonly Parser<AtomNode> Literal = new LiteralParser().Map
-        (
-            x => (AtomNode) new ConstantNode (x)
-        );
-
-    /// <summary>
-    /// Форматная строка.
-    /// </summary>
-    private readonly Parser<AtomNode> Format = new FormatParser().Map
-        (
-            x => (AtomNode) new FormatNode (x)
-        );
-
-    /// <summary>
-    /// Разбор перечисленных терминов.
-    /// </summary>
-    private TermParser Term (params string[] terms) => new (terms);
-
-    /// <summary>
-    /// Разбор зарезервированного слова.
-    /// </summary>
-    /// <param name="word"><c>null</c> означает "любое зарезервированное слово".
-    /// </param>
-    private ReservedWordParser Reserved (string? word) => new (word);
-
-    /// <summary>
-    /// Разбор идентификаторов.
-    /// </summary>
-    private readonly IdentifierParser Identifier = new ();
-
-    /// <summary>
-    /// Выражение.
-    /// </summary>
-    private readonly Parser<AtomNode> Expression;
-
-    /// <summary>
-    /// Стейтмент вообще.
-    /// </summary>
-    private readonly Parser<StatementBase> GenericStatement;
-
-    /// <summary>
-    /// Программа в целом.
-    /// </summary>
-    private readonly Parser<ProgramNode> Program;
-
-    #endregion
-
-    #region Public methods
 
     /// <summary>
     /// Разбор текста выражения.
