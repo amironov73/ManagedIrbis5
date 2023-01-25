@@ -12,7 +12,11 @@
 
 #region Using directives
 
+using System;
 using System.IO;
+
+using AM.Kotik.Barsik.Diagnostics;
+using AM.Runtime.Mere;
 
 #endregion
 
@@ -24,8 +28,21 @@ namespace AM.Kotik.Barsik;
 /// Абстрактный узел AST.
 /// </summary>
 public abstract class AstNode
+    : IMereSerializable
 {
     #region Public methods
+
+    /// <summary>
+    /// Получение информации об AST-узле.
+    /// </summary>
+    public virtual AstNodeInfo GetNodeInfo()
+    {
+        throw new NotImplementedException();
+    }
+
+    #endregion
+    
+    #region Internal methods
 
     /// <summary>
     /// Общая реализация дампа узла.
@@ -69,6 +86,28 @@ public abstract class AstNode
 
     #endregion
 
+    #region IMereSerializable members
+
+    /// <inheritdoc cref="IMereSerializable.MereSerialize"/>
+    public virtual void MereSerialize
+        (
+            BinaryWriter writer
+        )
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <inheritdoc cref="IMereSerializable.MereDeserialize"/>
+    public virtual void MereDeserialize
+        (
+            BinaryReader reader
+        )
+    {
+        throw new NotImplementedException();
+    }
+
+    #endregion
+    
     #region Object members
 
     /// <inheritdoc cref="object.ToString"/>

@@ -11,6 +11,8 @@
 
 #nullable enable
 
+using AM.Kotik.Barsik.Diagnostics;
+
 namespace AM.Kotik.Barsik;
 
 /// <summary>
@@ -47,6 +49,16 @@ internal sealed class BreakNode
 
         throw new BreakException();
     }
+
+    #endregion
+
+    #region AstNode members
+
+    /// <inheritdoc cref="AstNode.GetNodeInfo"/>
+    public override AstNodeInfo GetNodeInfo() => new (this)
+    {
+        Name = "break"
+    };
 
     #endregion
 }

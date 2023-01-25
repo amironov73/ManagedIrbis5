@@ -27,7 +27,6 @@ namespace AM.Scripting.Barsik;
 /// </summary>
 public abstract class AstNode
     : IMereSerializable
-
 {
     #region IMereSerializable members
 

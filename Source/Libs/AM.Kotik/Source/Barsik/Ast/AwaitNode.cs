@@ -11,7 +11,10 @@
 
 #region Using directives
 
+using System.IO;
 using System.Threading.Tasks;
+
+using AM.Kotik.Barsik.Diagnostics;
 
 #endregion
 
@@ -74,6 +77,33 @@ internal sealed class AwaitNode
 
         return value;
     }
+
+    #endregion
+
+    #region AstNode members
+
+    /// <inheritdoc cref="AstNode.DumpHierarchyItem(string?,int,System.IO.TextWriter)"/>
+    internal override void DumpHierarchyItem 
+        (
+            string? name, 
+            int level, 
+            TextWriter writer
+        )
+    {
+        base.DumpHierarchyItem (name, level, writer);
+        
+        _inner.DumpHierarchyItem ("Inner", level + 1, writer);
+    }
+
+    /// <inheritdoc cref="AstNode.GetNodeInfo"/>
+    public override AstNodeInfo GetNodeInfo() => new (this)
+        {
+            Name = "await",
+            Children =
+            {
+                _inner.GetNodeInfo()
+            }
+        };
 
     #endregion
 }

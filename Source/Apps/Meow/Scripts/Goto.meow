@@ -1,5 +1,14 @@
-﻿goto DONE
+﻿x = 1
+y = 2
 
-println ("Hello")
+for (i = 0; i < 10; i++)
+{
+    if (i == 5) goto DONE
+    println ($"i = {i}")
+}
 
-DONE: println ("That's all folks")
+println ("This line not printed")
+
+DONE:
+println ($"i = {i}")
+println ("That's all folks")

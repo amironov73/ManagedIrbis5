@@ -16,6 +16,7 @@ using System.Collections;
 using System.IO;
 using System.Text.RegularExpressions;
 
+using AM.Kotik.Barsik.Diagnostics;
 using AM.Text;
 
 #endregion
@@ -80,7 +81,7 @@ public sealed class BinaryNode
     /// <summary>
     /// Сравнеие текстов с точностью до регистра символов.
     /// </summary>
-    private static dynamic? Same
+    private static dynamic Same
         (
             Context context,
             dynamic? left,
@@ -414,7 +415,7 @@ public sealed class BinaryNode
     /// <summary>
     /// Расширенная операция сдвига влево.
     /// </summary>
-    private static dynamic? LeftShift2
+    private static dynamic LeftShift2
         (
             Context context,
             dynamic? left,
@@ -609,6 +610,23 @@ public sealed class BinaryNode
         DumpHierarchyItem ("Op", level + 1, writer, _operation);
         _right.DumpHierarchyItem ("Right", level + 1, writer);
     }
+
+    /// <inheritdoc cref="AstNode.GetNodeInfo"/>
+    public override AstNodeInfo GetNodeInfo() => new (this)
+        {
+            Name = "binary operation",
+            Children =
+            {
+                new AstNodeInfo
+                {
+                    Name = "operation",
+                    Description = _operation
+                },
+                
+                _left.GetNodeInfo().WithName ("left"),
+                _right.GetNodeInfo().WithName ("right")
+            }
+        };
 
     #endregion
 }

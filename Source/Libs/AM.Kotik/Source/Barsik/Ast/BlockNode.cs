@@ -17,6 +17,8 @@
 using System.Collections.Generic;
 using System.IO;
 
+using AM.Kotik.Barsik.Diagnostics;
+
 #endregion
 
 #nullable enable
@@ -120,6 +122,22 @@ public sealed class BlockNode
         {
             statement.DumpHierarchyItem ("Statement", level + 1, writer);
         }
+    }
+
+    /// <inheritdoc cref="AstNode.GetNodeInfo"/>
+    public override AstNodeInfo GetNodeInfo()
+    {
+        var result = new AstNodeInfo (this)
+        {
+            Name = "block"
+        };
+
+        foreach (var statement in _statements)
+        {
+            result.Children.Add (statement.GetNodeInfo());
+        }
+
+        return result;
     }
 
     #endregion

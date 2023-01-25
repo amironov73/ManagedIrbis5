@@ -13,7 +13,7 @@
 
 #nullable enable
 
-namespace AM.Kotik.Barsik;
+namespace AM.Kotik.Barsik.Diagnostics;
 
 /// <summary>
 /// Точка останова в скрипте.

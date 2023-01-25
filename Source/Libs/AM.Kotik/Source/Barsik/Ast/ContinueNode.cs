@@ -11,6 +11,8 @@
 
 #nullable enable
 
+using AM.Kotik.Barsik.Diagnostics;
+
 namespace AM.Kotik.Barsik;
 
 /// <summary>
@@ -50,4 +52,13 @@ internal sealed class ContinueNode
 
     #endregion
 
+    #region AstNode members
+
+    /// <inheritdoc cref="AstNode.GetNodeInfo"/>
+    public override AstNodeInfo GetNodeInfo() => new (this)
+    {
+        Name = "continue"
+    };
+
+    #endregion
 }

@@ -13,6 +13,8 @@
 
 using System.IO;
 
+using AM.Kotik.Barsik.Diagnostics;
+
 #endregion
 
 #nullable enable
@@ -91,6 +93,13 @@ internal sealed class ConstantNode
     {
         base.DumpHierarchyItem (name, level, writer, ToString());
     }
+
+    /// <inheritdoc cref="AstNode.GetNodeInfo"/>
+    public override AstNodeInfo GetNodeInfo() => new (this)
+    {
+        Name = "constant",
+        Description = Value.ToVisibleString()
+    };
 
     #endregion
 

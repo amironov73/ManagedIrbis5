@@ -97,12 +97,12 @@ public sealed class StdLib
         { "readdir", new FunctionDescriptor ("readdir", ReadDirectory) },
         { "remove", new FunctionDescriptor ("remove", RemoveFile) },
         { "rename", new FunctionDescriptor ("rename", RenameFile) },
-        // { "subscribe", new FunctionDescriptor ("subscribe", Subscribe) },
+        { "subscribe", new FunctionDescriptor ("subscribe", Subscribe) },
         { "system", new FunctionDescriptor ("system", System_) },
         { "tmpfile", new FunctionDescriptor ("tmpfile", TemporaryFile) },
         { "type", new FunctionDescriptor ("type", Type_) },
         { "unprotect", new FunctionDescriptor ("unprotect", Unrotect) },
-        // { "unsubscribe", new FunctionDescriptor ("unsubscribe", Unsubscribe) },
+        { "unsubscribe", new FunctionDescriptor ("unsubscribe", Unsubscribe) },
         { "use", new FunctionDescriptor ("use", Use) },
     };
 
@@ -1127,47 +1127,47 @@ public sealed class StdLib
         return 0;
     }
 
-    // /// <summary>
-    // /// Подписка на событие объекта.
-    // /// </summary>
-    // public static dynamic Subscribe
-    //     (
-    //         Context context,
-    //         dynamic?[] args
-    //     )
-    // {
-    //     if (args.Length < 3)
-    //     {
-    //         throw new BarsikException ("Can't subscribe");
-    //     }
-    //
-    //     var target = Compute (context, args, 0);
-    //     if (target is null)
-    //     {
-    //         throw new BarsikException ("Can't subscribe");
-    //     }
-    //
-    //     var eventName = Compute (context, args, 1) as string;
-    //     if (string.IsNullOrEmpty (eventName))
-    //     {
-    //         throw new BarsikException ("Can't subscribe");
-    //     }
-    //
-    //     var handler = Compute (context, args, 2);
-    //     if (handler is LambdaNode lambda)
-    //     {
-    //         // лямбда-функция
-    //         return new EventPad (context, target, eventName, lambda.Adapter);
-    //     }
-    //
-    //     if (handler is FunctionDescriptor descriptor)
-    //     {
-    //         // свободная функция
-    //         return new EventPad (context, target, eventName, descriptor.CallPoint);
-    //     }
-    //
-    //     throw new BarsikException ("Can't subscribe");
-    // }
+    /// <summary>
+    /// Подписка на событие объекта.
+    /// </summary>
+    public static dynamic Subscribe
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (args.Length < 3)
+        {
+            throw new BarsikException ("Can't subscribe");
+        }
+    
+        var target = Compute (context, args, 0);
+        if (target is null)
+        {
+            throw new BarsikException ("Can't subscribe");
+        }
+    
+        var eventName = Compute (context, args, 1) as string;
+        if (string.IsNullOrEmpty (eventName))
+        {
+            throw new BarsikException ("Can't subscribe");
+        }
+    
+        var handler = Compute (context, args, 2);
+        if (handler is LambdaNode lambda)
+        {
+            // лямбда-функция
+            return new EventPad (context, target, eventName, lambda.Adapter);
+        }
+    
+        if (handler is FunctionDescriptor descriptor)
+        {
+            // свободная функция
+            return new EventPad (context, target, eventName, descriptor.CallPoint);
+        }
+    
+        throw new BarsikException ("Can't subscribe");
+    }
 
     /// <summary>
     /// Выполнение внешней программы и получение ее выходного потока.
@@ -1281,25 +1281,25 @@ public sealed class StdLib
         return null;
     }
 
-    // /// <summary>
-    // /// Отписка от нативного события.
-    // /// </summary>
-    // public static dynamic? Unsubscribe
-    //     (
-    //         Context context,
-    //         dynamic?[] args
-    //     )
-    // {
-    //     foreach (var one in args)
-    //     {
-    //         if (one is EventPad pad)
-    //         {
-    //             pad.Unsubscribe();
-    //         }
-    //     }
-    //
-    //     return null;
-    // }
+    /// <summary>
+    /// Отписка от нативного события.
+    /// </summary>
+    public static dynamic? Unsubscribe
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        foreach (var one in args)
+        {
+            if (one is EventPad pad)
+            {
+                pad.Unsubscribe();
+            }
+        }
+    
+        return null;
+    }
 
     /// <summary>
     /// Подключение/отключение пространств имен.
@@ -1385,10 +1385,7 @@ public sealed class StdLib
     #region Object members
 
     /// <inheritdoc cref="object.ToString"/>
-    public override string ToString()
-    {
-        return Description;
-    }
+    public override string ToString() => Description;
 
     #endregion
 }

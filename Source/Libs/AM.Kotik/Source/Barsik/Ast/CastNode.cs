@@ -14,6 +14,9 @@
 
 using System;
 using System.Globalization;
+using System.IO;
+
+using AM.Kotik.Barsik.Diagnostics;
 
 #endregion
 
@@ -182,6 +185,35 @@ internal sealed class CastNode
 
         return Convert.ChangeType (operandValue, targetType);
     }
+
+    #endregion
+
+    #region AstNode members
+
+    /// <inheritdoc cref="AstNode.DumpHierarchyItem(string?,int,System.IO.TextWriter)"/>
+    internal override void DumpHierarchyItem 
+        (
+            string? name, 
+            int level, 
+            TextWriter writer
+        )
+    {
+        base.DumpHierarchyItem (name, level, writer);
+        
+        DumpHierarchyItem ("Type", level + 1, writer, _typeName);
+        _operand.DumpHierarchyItem ("Operand", level + 1, writer);
+    }
+
+    /// <inheritdoc cref="AstNode.GetNodeInfo"/>
+    public override AstNodeInfo GetNodeInfo() => new (this)
+    {
+        Name = "cast",
+        Description = _typeName,
+        Children =
+        {
+            _operand.GetNodeInfo().WithName ("operand")
+        }
+    };
 
     #endregion
 }

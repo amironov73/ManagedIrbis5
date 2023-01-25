@@ -14,6 +14,8 @@
 using System.Collections.Generic;
 using System.IO;
 
+using AM.Kotik.Barsik.Diagnostics;
+
 #endregion
 
 #nullable enable
@@ -74,7 +76,7 @@ internal sealed class CallNode
             throw new BarsikException ($"Unexpected variable {_name}");
         }
 
-        _function ??= context.GetFunction (_name).ThrowIfNull ();
+        _function ??= context.GetFunction (_name).ThrowIfNull ($"Can't find function {_name}");
 
         var args = new List<dynamic?>();
         foreach (var node in _arguments)
@@ -109,6 +111,22 @@ internal sealed class CallNode
         {
             argument.DumpHierarchyItem ("Arg", level + 1, writer);
         }
+    }
+    /// <inheritdoc cref="AstNode.GetNodeInfo"/>
+    public override AstNodeInfo GetNodeInfo()
+    {
+        var result = new AstNodeInfo (this)
+        {
+            Name = "call",
+            Description = _name
+        };
+
+        foreach (var argument in _arguments)
+        {
+            result.Children.Add (argument.GetNodeInfo());
+        }
+
+        return result;
     }
 
     #endregion
