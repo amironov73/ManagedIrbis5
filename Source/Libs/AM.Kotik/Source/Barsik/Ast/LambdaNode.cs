@@ -32,7 +32,7 @@ internal sealed class LambdaNode
     /// </summary>
     public LambdaNode
         (
-            string[] argumentNames,
+            IList<string> argumentNames,
             StatementBase body
         )
     {
@@ -47,7 +47,7 @@ internal sealed class LambdaNode
 
     #region Private members
 
-    internal readonly string[] argumentNames;
+    internal readonly IList<string> argumentNames;
     internal readonly StatementBase body;
 
     #endregion
@@ -60,7 +60,7 @@ internal sealed class LambdaNode
     public dynamic? Adapter
         (
             Context context,
-            dynamic?[] arguments
+            IList<dynamic?> arguments
         )
     {
         Sure.NotNull (context);
@@ -72,7 +72,7 @@ internal sealed class LambdaNode
             var index = 0;
             foreach (var argumentName in argumentNames)
             {
-                if (index >= arguments.Length)
+                if (index >= arguments.Count)
                 {
                     break;
                 }

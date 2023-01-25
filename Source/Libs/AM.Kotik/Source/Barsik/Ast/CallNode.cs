@@ -38,7 +38,7 @@ internal sealed class CallNode
     public CallNode
         (
             string name,
-            AtomNode[] arguments
+            IList<AtomNode> arguments
         )
     {
         Sure.NotNullNorEmpty (name);
@@ -52,7 +52,7 @@ internal sealed class CallNode
     #region Private members
 
     private readonly string _name;
-    private readonly AtomNode[] _arguments;
+    private readonly IList<AtomNode> _arguments;
     private FunctionDescriptor? _function;
 
     #endregion

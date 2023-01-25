@@ -12,6 +12,7 @@
 
 #region Using directives
 
+using System.Collections.Generic;
 using System.IO;
 
 #endregion
@@ -33,11 +34,11 @@ internal sealed class DictionaryNode
     /// </summary>
     public DictionaryNode
         (
-            KeyValueNode[] items
+            IList<KeyValueNode> items
         )
     {
         Sure.NotNull (items);
-        
+
         _items = items;
     }
 
@@ -45,7 +46,7 @@ internal sealed class DictionaryNode
 
     #region Private members
 
-    private readonly KeyValueNode[] _items;
+    private readonly IList<KeyValueNode> _items;
 
     #endregion
 
@@ -69,20 +70,20 @@ internal sealed class DictionaryNode
     }
 
     #endregion
-    
+
     #region AstNode members
 
     /// <inheritdoc cref="AstNode.DumpHierarchyItem(string?,int,System.IO.TextWriter)"/>
-    internal override void DumpHierarchyItem 
+    internal override void DumpHierarchyItem
         (
-            string? name, 
-            int level, 
+            string? name,
+            int level,
             TextWriter writer
         )
     {
         base.DumpHierarchyItem (name, level, writer);
 
-        for (var i = 0; i < _items.Length; i++)
+        for (var i = 0; i < _items.Count; i++)
         {
             _items[i].DumpHierarchyItem (i.ToInvariantString(), level + 1, writer);
         }

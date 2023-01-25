@@ -107,6 +107,7 @@ public sealed class Repl
         error ??= Console.Error;
         Interpreter = new Interpreter (Input, output, error);
         Echo = true;
+        _input = new ReplInput (Input, output, null);
     }
 
     /// <summary>
@@ -120,13 +121,16 @@ public sealed class Repl
     {
         interpreter.Context.MakeAttentive();
         Interpreter = interpreter;
-        Input = input ?? Console.In;
+        Input = input ?? interpreter.Context.Input;
         Echo = true;
+        _input = new ReplInput (Input, interpreter.Context.Output, interpreter.Grammar);
     }
 
     #endregion
 
     #region Private members
+
+    private readonly ReplInput _input;
 
     private ExecutionResult ExecuteCore
         (
@@ -208,6 +212,10 @@ public sealed class Repl
                     // TODO вывести список загруженных сборок
                     break;
 
+                case "#d":
+                    // TODO переключить состояние DumpAst
+                    break;
+
                 case "#e":
                     Echo = !Echo;
                     var onoff = Echo ? "on" : "off";
@@ -242,8 +250,8 @@ public sealed class Repl
 
         while (true)
         {
-            Output.Write ("> ");
-            var line = Input.ReadLine();
+            // TODO брать приглашение из interpreter.Settings
+            var line = _input.ReadLine ("> ", "... ");
             if (string.IsNullOrWhiteSpace (line))
             {
                 if ((++emptyLineCounter) == 2)

@@ -6,6 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable StringLiteralTypo
 
 /* Interpreter.cs -- интерпретатор Барсика
  * Ars Magna project, http://arsmagna.ru
@@ -37,6 +38,7 @@ public sealed class Interpreter
     /// <summary>
     /// Поток для отладочного вывода при парсинге скрипта.
     /// </summary>
+    // TODO перенести в Settings
     public TextWriter? ParsingDebugOutput { get; set; }
 
     /// <summary>
@@ -57,6 +59,7 @@ public sealed class Interpreter
     /// <summary>
     /// Разрешение использовать оператор <c>new</c>.
     /// </summary>
+    // TODO перенести в Settings
     public bool AllowNewOperator { get; set; }
 
     /// <summary>
@@ -83,6 +86,7 @@ public sealed class Interpreter
     /// Пути для поиска скриптов, модулей  и т. д.
     /// Инициализируется значением переменной окружения "BARSIK_PATH".
     /// </summary>
+    // TODO перенести в Settings
     public List<string> Pathes { get; }
 
     /// <summary>
@@ -94,11 +98,13 @@ public sealed class Interpreter
     /// <summary>
     /// Токенайзер.
     /// </summary>
+    // TODO перенести в Settings
     public Tokenizer Tokenizer { get; set; }
 
     /// <summary>
     /// Грамматика.
     /// </summary>
+    // TODO перенести в Settings
     public IGrammar Grammar { get; set; }
 
     #endregion
@@ -180,6 +186,21 @@ public sealed class Interpreter
     }
 
     /// <summary>
+    /// Создание интерпретатора согласно настройкам,
+    /// заданным в командной строке.
+    /// </summary>
+    public static Interpreter CreateInterpreter
+        (
+            string[] args
+        )
+    {
+        Sure.NotNull (args);
+
+        var settings = InterpreterSettings.FromCommandLine (args);
+        return new Interpreter (settings: settings);
+    }
+
+    /// <summary>
     /// Создание и запуск интерпретатора.
     /// </summary>
     /// <param name="args">Аргументы командной строки.</param>
@@ -193,16 +214,17 @@ public sealed class Interpreter
             Action<Interpreter, Exception>? exceptionHandler = null
         )
     {
-        var settings = InterpreterSettings.FromCommandLine (args);
-        var interpreter = new Interpreter (settings: settings);
+        Sure.NotNull (args);
+
+        var interpreter = CreateInterpreter (args);
         configure?.Invoke (interpreter);
 
         try
         {
             interpreter.ApplySettings();
-            foreach (var scriptFile in settings.ScriptFiles)
+            foreach (var scriptFile in interpreter.Settings.ScriptFiles)
             {
-                var executionResult = interpreter.ExecuteFile (scriptFile, settings.DumpAst);
+                var executionResult = interpreter.ExecuteFile (scriptFile);
                 if (executionResult.ExitRequested)
                 {
                     if (!string.IsNullOrEmpty (executionResult.Message))
@@ -214,7 +236,7 @@ public sealed class Interpreter
                 }
             }
 
-            if (settings.ReplMode)
+            if (interpreter.Settings.ReplMode)
             {
                 interpreter.DoRepl();
             }
@@ -238,8 +260,7 @@ public sealed class Interpreter
     /// </summary>
     public ExecutionResult DoRepl()
     {
-        var version = Interpreter.FileVersion;
-        Context.Output.WriteLine ($"Meow interpreter {version}");
+        Context.Output.WriteLine ($"Meow interpreter {FileVersion}");
         Context.Output.WriteLine ("Press ENTER twice to exit");
 
         return new Repl (this).Loop();
@@ -256,6 +277,12 @@ public sealed class Interpreter
         Sure.NotNull (sourceCode);
 
         var node = Grammar.ParseExpression (sourceCode, Tokenizer, ParsingDebugOutput);
+        if (Settings.DumpAst)
+        {
+            Context.Output.WriteLine (new string ('=', 60));
+            node.DumpHierarchyItem (null, 0, Context.Output);
+            Context.Output.WriteLine (new string ('=', 60));
+        }
 
         return node;
     }
@@ -265,14 +292,13 @@ public sealed class Interpreter
     /// </summary>
     public ExecutionResult Execute
         (
-            string sourceCode,
-            bool dumpAst = false
+            string sourceCode
         )
     {
         Sure.NotNull (sourceCode);
 
         var program = Grammar.ParseProgram (sourceCode, Tokenizer, ParsingDebugOutput);
-        if (dumpAst)
+        if (Settings.DumpAst)
         {
             program.Dump (Context.Output);
             Context.Output.WriteLine (new string ('=', 60));
@@ -378,16 +404,13 @@ public sealed class Interpreter
     /// с последующим исполнением.
     /// </summary>
     /// <param name="fileName">Имя файла скрипта.</param>
-    /// <param name="dumpAst">Вывести дамп синтаксического дерева
-    /// для контроля разбора.</param>
     /// <remarks>
     /// Скрипт-файл может начинаться с "#!", эта строка будет проигнорирована.
     /// Такой трюк позволяет сделать запускаемыми Barsuk-скрипты.
     /// </remarks>
     public ExecutionResult ExecuteFile
         (
-            string fileName,
-            bool dumpAst = false
+            string fileName
         )
     {
         Sure.FileExists (fileName);
@@ -403,7 +426,7 @@ public sealed class Interpreter
             var sourceCode = File.ReadAllText (fileName);
             // удаляем shebang
             sourceCode = KotikUtility.RemoveShebang (sourceCode);
-            result = Execute (sourceCode, dumpAst);
+            result = Execute (sourceCode);
         }
         catch (ReturnException exception)
         {

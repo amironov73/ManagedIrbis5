@@ -39,7 +39,7 @@ public sealed class BlockNode
     public BlockNode
         (
             int line,
-            StatementBase[] statements
+            IList<StatementBase> statements
         )
         : base (line)
     {
@@ -50,16 +50,16 @@ public sealed class BlockNode
 
     #region Private members
 
-    private readonly StatementBase[] _statements;
+    private readonly IList<StatementBase> _statements;
 
-    private int? FindLabel 
+    private int? FindLabel
         (
             string label
         )
     {
-        for (var i = 0; i < _statements.Length; i++)
+        for (var i = 0; i < _statements.Count; i++)
         {
-            if (_statements[i] is LabelNode labelNode 
+            if (_statements[i] is LabelNode labelNode
                 && string.CompareOrdinal (label, labelNode.Name) == 0)
             {
                 return i;
@@ -82,7 +82,7 @@ public sealed class BlockNode
         PreExecute (context);
 
         var index = 0;
-        while (index < _statements.Length)
+        while (index < _statements.Count)
         {
             var statement = _statements[index];
             try
@@ -147,10 +147,7 @@ public sealed class BlockNode
     /// <summary>
     /// Перечисление элементов.
     /// </summary>
-    public IEnumerator<StatementBase> GetEnumerator()
-    {
-        return ((IEnumerable<StatementBase>) _statements).GetEnumerator();
-    }
+    public IEnumerator<StatementBase> GetEnumerator() => _statements.GetEnumerator();
 
     #endregion
 }

@@ -113,22 +113,22 @@ public sealed class Grammar
     /// <summary>
     /// Выражение.
     /// </summary>
-    private DynamicParser<AtomNode> Expression = null!;
+    private readonly ParserHolder<AtomNode> Expression = new (null!);
 
     /// <summary>
     /// Блок стейтментов.
     /// </summary>
-    private DynamicParser<StatementBase> Block = null!;
+    private readonly ParserHolder<StatementBase> Block = new(null!);
 
     /// <summary>
     /// Стейтмент вообще.
     /// </summary>
-    private Parser<StatementBase> GenericStatement = null!;
+    private readonly ParserHolder<StatementBase> GenericStatement = new (null!);
 
     /// <summary>
     /// Вычисляемый узел.
     /// </summary>
-    private DynamicParser<AtomNode> Atom = null!;
+    private readonly ParserHolder<AtomNode> Atom = new (null!);
 
     /// <summary>
     /// Программа в целом.
@@ -145,10 +145,6 @@ public sealed class Grammar
 
         var variable = Identifier.Map (x => (AtomNode)new VariableNode (x))
             .Labeled ("Variable");
-
-        Atom = new DynamicParser<AtomNode> (() => null!);
-        Expression = new DynamicParser<AtomNode> (() => null!);
-        Block = new DynamicParser<StatementBase> (() => null!);
 
         var ternary = Parser.Chain
             (
@@ -541,7 +537,6 @@ public sealed class Grammar
         Statements.Add (withAssignment);
         Statements.Add (gotoStatement);
         Statements.Add (semicolonStatement);
-
     }
 
     #endregion
@@ -564,9 +559,9 @@ public sealed class Grammar
     /// </summary>
     public void Rebuild()
     {
-        Atom.Function = () => Parser.OneOf (Atoms.ToArray()).Labeled ("Atom");
+        Atom.Value = Parser.OneOf (Atoms.ToArray()).Labeled ("Atom");
 
-        Expression.Function = () => ExpressionBuilder.Build
+        Expression.Value = ExpressionBuilder.Build
             (
                 root: Atom,
                 Prefixes,
@@ -575,7 +570,7 @@ public sealed class Grammar
             )
         .Labeled ("Expression");
 
-        Block.Function = () => Parser.OneOf
+        Block.Value = Parser.OneOf
             (
                 // произвольное количество стейтментов внутри фигурных скобок
                 Parser.Chain
@@ -594,7 +589,7 @@ public sealed class Grammar
             )
             .Labeled ("Block");
 
-        GenericStatement = Parser.OneOf (Statements.ToArray());
+        GenericStatement.Value = Parser.OneOf (Statements.ToArray());
 
         Program  = new RepeatParser<StatementBase>
                 (
