@@ -18,7 +18,7 @@ namespace AM.Kotik.Barsik;
 /// Она не выполняет никаких действий
 /// и введена исключительно для совместимости.
 /// </summary>
-public sealed class SemicolonNode
+internal sealed class SemicolonNode
     : StatementBase
 {
     #region Construction

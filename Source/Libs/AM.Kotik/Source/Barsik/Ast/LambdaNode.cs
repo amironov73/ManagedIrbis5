@@ -22,7 +22,7 @@ namespace AM.Kotik.Barsik;
 /// <summary>
 /// Определение лямбда-функции.
 /// </summary>
-public sealed class LambdaNode
+internal sealed class LambdaNode
     : AtomNode
 {
     #region Construction

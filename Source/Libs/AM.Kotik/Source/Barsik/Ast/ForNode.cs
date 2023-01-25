@@ -26,7 +26,7 @@ namespace AM.Kotik.Barsik;
 /// <summary>
 /// Цикл for.
 /// </summary>
-public sealed class ForNode
+internal sealed class ForNode
     : StatementBase
 {
     #region Construction

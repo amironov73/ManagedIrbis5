@@ -23,7 +23,7 @@ namespace AM.Kotik.Barsik;
 /// <summary>
 /// Цикл foreach.
 /// </summary>
-sealed class ForEachNode
+internal sealed class ForEachNode
     : StatementBase
 {
     #region Construction

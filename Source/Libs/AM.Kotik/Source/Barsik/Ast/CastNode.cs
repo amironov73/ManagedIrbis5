@@ -24,7 +24,7 @@ namespace AM.Kotik.Barsik;
 /// <summary>
 /// Преобразование типа.
 /// </summary>
-public sealed class CastNode
+internal sealed class CastNode
     : PrefixNode
 {
     #region Construction

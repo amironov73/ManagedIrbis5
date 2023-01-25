@@ -25,7 +25,7 @@ namespace AM.Kotik.Barsik;
 /// <summary>
 /// Блок with.
 /// </summary>
-public sealed class WithNode
+internal sealed class WithNode
     : StatementBase
 {
     #region Construction

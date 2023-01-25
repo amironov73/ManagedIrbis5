@@ -23,7 +23,7 @@ namespace AM.Kotik.Barsik;
 /// <summary>
 /// Тернарный оператор `? условие : истина : ложь`.
 /// </summary>
-public sealed class TernaryNode
+internal sealed class TernaryNode
     : AtomNode
 {
     #region Construction

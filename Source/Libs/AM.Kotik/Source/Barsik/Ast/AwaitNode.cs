@@ -4,15 +4,14 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
 
-/* MinusNode.cs -- унарный минус (смена знака числа)
+/* AwaitNode.cs -- оператор await
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System.IO;
+using System.Threading.Tasks;
 
 #endregion
 
@@ -21,23 +20,21 @@ using System.IO;
 namespace AM.Kotik.Barsik;
 
 /// <summary>
-/// Унарный минус (смена знака числа).
+/// Оператор await.
 /// </summary>
-internal sealed class MinusNode
-    : UnaryNode
+internal sealed class AwaitNode
+    : AtomNode
 {
     #region Construction
 
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public MinusNode
+    public AwaitNode
         (
             AtomNode inner
         )
     {
-        Sure.NotNull (inner);
-
         _inner = inner;
     }
 
@@ -46,6 +43,14 @@ internal sealed class MinusNode
     #region Private members
 
     private readonly AtomNode _inner;
+
+    private async void _DoAwait
+        (
+            Task task
+        )
+    {
+        await task;
+    }
 
     #endregion
 
@@ -57,28 +62,17 @@ internal sealed class MinusNode
             Context context
         )
     {
-        Sure.NotNull (context);
+        // TODO реализовать асинхронно
 
         var value = _inner.Compute (context);
+        if (value is Task task)
+        {
+            _DoAwait (task);
 
-        return -value;
-    }
+            return null;
+        }
 
-    #endregion
-
-    #region AstNode members
-
-    /// <inheritdoc cref="AstNode.DumpHierarchyItem(string?,int,System.IO.TextWriter)"/>
-    internal override void DumpHierarchyItem
-        (
-            string? name,
-            int level,
-            TextWriter writer
-        )
-    {
-        base.DumpHierarchyItem (name, level, writer);
-
-        _inner.DumpHierarchyItem ("Inner", level + 1, writer);
+        return value;
     }
 
     #endregion

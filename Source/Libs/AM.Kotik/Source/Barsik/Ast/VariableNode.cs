@@ -24,7 +24,7 @@ namespace AM.Kotik.Barsik;
 /// Ссылка на переменную.
 /// На самом деле может оказаться также ссылкой на тип или функцию.
 /// </summary>
-public sealed class VariableNode
+internal sealed class VariableNode
     : AtomNode
 {
     #region Properties

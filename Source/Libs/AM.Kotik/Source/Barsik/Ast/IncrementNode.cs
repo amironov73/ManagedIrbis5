@@ -22,7 +22,7 @@ namespace AM.Kotik.Barsik;
 /// <summary>
 /// Оператор инкремента/декремента (префиксного/постфиксного).
 /// </summary>
-public sealed class IncrementNode
+internal sealed class IncrementNode
     : UnaryNode
 {
     #region Construction

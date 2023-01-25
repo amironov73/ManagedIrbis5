@@ -57,6 +57,27 @@ public sealed class ProgramNode
 
     #endregion
 
+    #region Private members
+
+    private int? FindLabel 
+        (
+            string label
+        )
+    {
+        for (var i = 0; i < Statements.Count; i++)
+        {
+            if (Statements[i] is LabelNode labelNode 
+                && string.CompareOrdinal (label, labelNode.Name) == 0)
+            {
+                return i;
+            }
+        }
+
+        return null;
+    }
+
+    #endregion
+
     #region Public members
 
     /// <summary>
@@ -83,9 +104,26 @@ public sealed class ProgramNode
     {
         Sure.NotNull (context);
 
-        foreach (var statement in Statements)
+        var index = 0;
+        while (index < Statements.Count)
         {
-            statement.Execute (context);
+            var statement = Statements[index];
+            try
+            {
+                statement.Execute (context);
+                index++;
+            }
+            catch (GotoException gotoException)
+            {
+                var whereLabel = FindLabel (gotoException.Label);
+                if (!whereLabel.HasValue)
+                {
+                    // передаем исключение наверх
+                    throw;
+                }
+
+                index = whereLabel.Value;
+            }
         }
     }
 

@@ -23,7 +23,7 @@ namespace AM.Kotik.Barsik;
 /// <summary>
 /// Именованный аргумент функции.
 /// </summary>
-public sealed class NamedArgumentNode
+internal sealed class NamedArgumentNode
     : AtomNode
 {
     #region Properties

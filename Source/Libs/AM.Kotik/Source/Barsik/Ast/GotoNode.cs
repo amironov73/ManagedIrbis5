@@ -5,53 +5,53 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* KeyValueNode.cs -- узел для хранения пары "ключ-значение"
+/* GotoNode.cs -- оператор goto
  * Ars Magna project, http://arsmagna.ru
  */
 
-#region Using directives
+#nullable enable
 
 using System.IO;
-
-#endregion
-
-#nullable enable
 
 namespace AM.Kotik.Barsik;
 
 /// <summary>
-/// Узел AST для хранения пары "ключ-значение".
+/// Оператор goto.
 /// </summary>
-internal sealed class KeyValueNode
-    : AstNode
+internal sealed class GotoNode
+    : StatementBase
 {
-    #region Properties
-
-    /// <summary>
-    /// Ключ.
-    /// </summary>
-    public AtomNode Key { get; }
-
-    /// <summary>
-    /// Значение.
-    /// </summary>
-    public AtomNode Value { get; }
-
-    #endregion
-
     #region Construction
 
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public KeyValueNode
+    public GotoNode
         (
-            AtomNode key,
-            AtomNode value
-        )
+            int line,
+            string label
+        ) 
+        : base (line)
     {
-        Key = key;
-        Value = value;
+        _label = label;
+    }
+
+    #endregion
+    
+    #region Private members
+
+    private readonly string _label;
+
+    #endregion
+
+    #region StatementBase members
+
+    /// <inheritdoc cref="StatementBase.Execute"/>
+    public override void Execute (Context context)
+    {
+        base.Execute (context);
+
+        throw new GotoException (_label);
     }
 
     #endregion
@@ -68,8 +68,7 @@ internal sealed class KeyValueNode
     {
         base.DumpHierarchyItem (name, level, writer);
         
-        Key.DumpHierarchyItem ("Key", level + 1, writer);
-        Value.DumpHierarchyItem ("Value", level + 1, writer);
+        DumpHierarchyItem ("Label:", level + 1, writer, _label);
     }
 
     #endregion

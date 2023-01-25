@@ -16,7 +16,7 @@ namespace AM.Kotik.Barsik;
 /// <summary>
 /// Досрочное завершение текущей итерации цикла.
 /// </summary>
-public sealed class ContinueNode
+internal sealed class ContinueNode
     : StatementBase
 {
     #region Construction

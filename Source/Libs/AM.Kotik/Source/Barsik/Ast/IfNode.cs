@@ -42,7 +42,7 @@ namespace AM.Kotik.Barsik;
 /// }
 /// </code>
 /// </remarks>
-public sealed class IfNode
+internal sealed class IfNode
     : StatementBase
 {
     #region Construction

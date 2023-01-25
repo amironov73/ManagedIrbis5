@@ -23,7 +23,7 @@ namespace AM.Kotik.Barsik;
 /// <summary>
 /// Цикл while.
 /// </summary>
-public sealed class WhileNode
+internal sealed class WhileNode
     : StatementBase
 {
     #region Construction

@@ -27,7 +27,7 @@ namespace AM.Kotik.Barsik;
 /// <summary>
 /// Вызов метода объекта.
 /// </summary>
-public sealed class MethodNode
+internal sealed class MethodNode
     : UnaryNode
 {
     #region Construction

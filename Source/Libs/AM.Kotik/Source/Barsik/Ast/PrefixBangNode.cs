@@ -23,7 +23,7 @@ namespace AM.Kotik.Barsik;
 /// <summary>
 /// Логическое отрицание.
 /// </summary>
-public sealed class PrefixBangNode
+internal sealed class PrefixBangNode
     : UnaryNode
 {
     #region Construction

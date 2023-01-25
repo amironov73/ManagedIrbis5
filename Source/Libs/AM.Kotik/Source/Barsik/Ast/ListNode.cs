@@ -23,7 +23,7 @@ namespace AM.Kotik.Barsik;
 /// <summary>
 /// Создание списка вида `[1, 2, 3]`.
 /// </summary>
-public sealed class ListNode
+internal sealed class ListNode
     : AtomNode
 {
     #region Construction

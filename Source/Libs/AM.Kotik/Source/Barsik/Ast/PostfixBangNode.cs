@@ -24,7 +24,7 @@ namespace AM.Kotik.Barsik;
 /// <summary>
 /// Проверка на null.
 /// </summary>
-public sealed class PostfixBangNode
+internal sealed class PostfixBangNode
     : UnaryNode
 {
     #region Construction

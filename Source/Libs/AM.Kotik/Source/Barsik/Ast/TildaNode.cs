@@ -23,7 +23,7 @@ namespace AM.Kotik.Barsik;
 /// <summary>
 /// Инверсия битов.
 /// </summary>
-public sealed class TildaNode
+internal sealed class TildaNode
     : UnaryNode
 {
     #region Construction

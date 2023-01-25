@@ -23,7 +23,7 @@ namespace AM.Kotik.Barsik;
 /// <summary>
 /// Блок try-catch-finally
 /// </summary>
-public sealed class TryNode
+internal sealed class TryNode
     : StatementBase
 {
     #region NestedTypes

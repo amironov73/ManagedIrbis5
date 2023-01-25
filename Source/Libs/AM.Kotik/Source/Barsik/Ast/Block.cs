@@ -50,6 +50,23 @@ public sealed class BlockNode
 
     private readonly StatementBase[] _statements;
 
+    private int? FindLabel 
+        (
+            string label
+        )
+    {
+        for (var i = 0; i < _statements.Length; i++)
+        {
+            if (_statements[i] is LabelNode labelNode 
+                && string.CompareOrdinal (label, labelNode.Name) == 0)
+            {
+                return i;
+            }
+        }
+
+        return null;
+    }
+
     #endregion
 
     #region StatementBase members
@@ -62,9 +79,26 @@ public sealed class BlockNode
     {
         PreExecute (context);
 
-        foreach (var statement in _statements)
+        var index = 0;
+        while (index < _statements.Length)
         {
-            statement.Execute (context);
+            var statement = _statements[index];
+            try
+            {
+                statement.Execute (context);
+                index++;
+            }
+            catch (GotoException gotoException)
+            {
+                var whereLabel = FindLabel (gotoException.Label);
+                if (!whereLabel.HasValue)
+                {
+                    // передаем исключение наверх
+                    throw;
+                }
+
+                index = whereLabel.Value;
+            }
         }
     }
 

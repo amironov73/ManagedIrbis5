@@ -25,7 +25,7 @@ namespace AM.Kotik.Barsik;
 /// <summary>
 /// Простой стейтмент.
 /// </summary>
-public sealed class SimpleStatement
+internal sealed class SimpleStatement
     : StatementBase
 {
     #region Construction

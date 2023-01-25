@@ -25,7 +25,7 @@ namespace AM.Kotik.Barsik;
 /// <summary>
 /// Обращение к элементу по индексу.
 /// </summary>
-public sealed class IndexNode
+internal sealed class IndexNode
     : PostfixNode
 {
     #region Construction

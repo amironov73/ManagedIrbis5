@@ -23,7 +23,7 @@ namespace AM.Kotik.Barsik;
 /// <summary>
 /// Вызов свободной функции, например, `println`.
 /// </summary>
-public sealed class CallNode
+internal sealed class CallNode
     : AtomNode
 {
     #region Construction

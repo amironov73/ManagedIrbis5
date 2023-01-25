@@ -25,7 +25,7 @@ namespace AM.Kotik.Barsik;
 /// <summary>
 /// Оператор `new`.
 /// </summary>
-public sealed class NewNode
+internal sealed class NewNode
     : AtomNode
 {
     #region Construction

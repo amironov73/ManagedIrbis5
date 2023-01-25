@@ -22,7 +22,7 @@ namespace AM.Kotik.Barsik;
 /// <summary>
 /// Хранимое константное значение.
 /// </summary>
-public sealed class ConstantNode
+internal sealed class ConstantNode
     : AtomNode
 {
     #region Properties

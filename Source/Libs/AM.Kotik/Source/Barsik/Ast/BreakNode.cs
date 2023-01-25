@@ -16,7 +16,7 @@ namespace AM.Kotik.Barsik;
 /// <summary>
 /// Досрочный выход из цикла.
 /// </summary>
-public sealed class BreakNode
+internal sealed class BreakNode
     : StatementBase
 {
     #region Construction

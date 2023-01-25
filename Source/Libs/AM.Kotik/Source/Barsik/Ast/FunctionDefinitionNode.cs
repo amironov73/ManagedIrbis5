@@ -22,7 +22,7 @@ namespace AM.Kotik.Barsik;
 /// <summary>
 /// Псевдо-узел AST: определение функции в скрипте.
 /// </summary>
-public sealed class FunctionDefinitionNode
+internal sealed class FunctionDefinitionNode
     : PseudoNode
 {
     #region Properties

@@ -22,7 +22,7 @@ namespace AM.Kotik.Barsik;
 /// <summary>
 /// Возврат значения из функции.
 /// </summary>
-public sealed class ReturnNode
+internal sealed class ReturnNode
     : StatementBase
 {
     #region Construction

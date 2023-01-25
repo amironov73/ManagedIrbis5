@@ -22,7 +22,7 @@ namespace AM.Kotik.Barsik;
 /// <summary>
 /// Выражение (возможно, с присваиванием значения переменной).
 /// </summary>
-public /* не sealed */ class ExpressionNode
+internal sealed class ExpressionNode
     : AtomNode
 {
     #region Construciton

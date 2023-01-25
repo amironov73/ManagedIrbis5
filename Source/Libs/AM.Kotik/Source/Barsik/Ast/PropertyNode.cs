@@ -25,7 +25,7 @@ namespace AM.Kotik.Barsik;
 /// <summary>
 /// Обращение к свойству объекта.
 /// </summary>
-public sealed class PropertyNode
+internal sealed class PropertyNode
     : UnaryNode
 {
     #region Construction

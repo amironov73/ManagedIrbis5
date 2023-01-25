@@ -23,7 +23,7 @@ namespace AM.Kotik.Barsik;
 /// <summary>
 /// Создание словаря вида `{1: "one", 2: "two", 3: "three"}`.
 /// </summary>
-public sealed class DictionaryNode
+internal sealed class DictionaryNode
     : AtomNode
 {
     #region Construction

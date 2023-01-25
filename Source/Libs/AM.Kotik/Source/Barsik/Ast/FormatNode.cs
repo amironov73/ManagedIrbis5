@@ -25,7 +25,7 @@ namespace AM.Kotik.Barsik;
 /// <summary>
 /// Строка форматирования вида `$"{z} = {x} + {y}"`.
 /// </summary>
-public sealed class FormatNode
+internal sealed class FormatNode
     : AtomNode
 {
     #region Construction

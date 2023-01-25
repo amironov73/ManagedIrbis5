@@ -1,0 +1,5 @@
+﻿goto DONE
+
+println ("Hello")
+
+DONE: println ("That's all folks")

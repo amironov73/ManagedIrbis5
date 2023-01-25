@@ -260,6 +260,9 @@ public sealed class Grammar
             )
             .Labeled ("Lambda");
 
+        var awaitOperator = expression.After (Reserved ("await"))
+            .Map (x => (AtomNode)new AwaitNode (x));
+
         atom.Function = () => Parser.OneOf
             (
                 additionalAtoms,
@@ -272,6 +275,7 @@ public sealed class Grammar
                 dictionary,
                 newOperator,
                 throwOperator,
+                awaitOperator,
                 lambda
             )
             .Labeled ("Atom");
@@ -483,6 +487,22 @@ public sealed class Grammar
             )
             .Labeled ("Return");
 
+        var labelStatement = Parser.Chain
+            (
+                Parser.Position,
+                Identifier.Before (Term (":")),
+                (position, label) => (StatementBase) new LabelNode (position.Line, label)
+            )
+            .Labeled ("Label");
+
+        var gotoStatement = Parser.Chain
+            (
+                Parser.Position,
+                Identifier.After (Reserved ("goto")),
+                (position, label) => (StatementBase) new GotoNode (position.Line, label)
+            )
+            .Labeled ("Goto");
+
         var whileStatement = Parser.Chain
             (
                 Parser.Position.Before (Reserved ("while")),
@@ -571,6 +591,7 @@ public sealed class Grammar
         GenericStatement = Parser.OneOf
             (
                 additionalStatements,
+                labelStatement,
                 simpleStatement,
                 forStatement,
                 forEachStatement,
@@ -585,6 +606,7 @@ public sealed class Grammar
                 tryCatchFinally,
                 with,
                 withAssignment,
+                gotoStatement,
                 semicolonStatement
             );
 

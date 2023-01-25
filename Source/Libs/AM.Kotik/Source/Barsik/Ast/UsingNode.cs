@@ -26,7 +26,7 @@ namespace AM.Kotik.Barsik;
 /// <summary>
 /// Блок using.
 /// </summary>
-public sealed class UsingNode
+internal sealed class UsingNode
     : StatementBase
 {
     #region Construction

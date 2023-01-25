@@ -27,7 +27,7 @@ namespace AM.Kotik.Barsik;
 /// <summary>
 /// with-присваивание.
 /// </summary>
-public sealed class WithAssignmentNode
+internal sealed class WithAssignmentNode
     : StatementBase
 {
     #region Construction

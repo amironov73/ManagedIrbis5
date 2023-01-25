@@ -5,37 +5,28 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* KeyValueNode.cs -- узел для хранения пары "ключ-значение"
+/* LabelNode.cs -- псевдо-узел: метка для оператора goto
  * Ars Magna project, http://arsmagna.ru
  */
 
-#region Using directives
+#nullable enable
 
 using System.IO;
-
-#endregion
-
-#nullable enable
 
 namespace AM.Kotik.Barsik;
 
 /// <summary>
-/// Узел AST для хранения пары "ключ-значение".
+/// Псевдо-узел: метка для оператора goto.
 /// </summary>
-internal sealed class KeyValueNode
-    : AstNode
+internal sealed class LabelNode
+    : PseudoNode
 {
     #region Properties
 
     /// <summary>
-    /// Ключ.
+    /// Имя метки.
     /// </summary>
-    public AtomNode Key { get; }
-
-    /// <summary>
-    /// Значение.
-    /// </summary>
-    public AtomNode Value { get; }
+    public string Name { get; }
 
     #endregion
 
@@ -44,14 +35,16 @@ internal sealed class KeyValueNode
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public KeyValueNode
+    public LabelNode
         (
-            AtomNode key,
-            AtomNode value
-        )
+            int line, 
+            string name
+        ) 
+        : base (line)
     {
-        Key = key;
-        Value = value;
+        Sure.NotNullNorEmpty (name);
+        
+        Name = name;
     }
 
     #endregion
@@ -68,8 +61,7 @@ internal sealed class KeyValueNode
     {
         base.DumpHierarchyItem (name, level, writer);
         
-        Key.DumpHierarchyItem ("Key", level + 1, writer);
-        Value.DumpHierarchyItem ("Value", level + 1, writer);
+        DumpHierarchyItem ("Name", level + 1, writer, Name);
     }
 
     #endregion
