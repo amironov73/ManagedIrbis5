@@ -20,8 +20,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-using AM.Kotik.Barsik.Parsers;
-
 #endregion
 
 #nullable enable
@@ -36,21 +34,20 @@ public sealed class Grammar
 {
     #region Properties
 
-    /// <inheritdoc cref="IGrammar.AdditionalAtoms"/>
-    public IList<Parser<AtomNode>> AdditionalAtoms { get; }
+    /// <inheritdoc cref="IGrammar.Atoms"/>
+    public IList<Parser<AtomNode>> Atoms { get; }
 
-    /// <inheritdoc cref="AdditionalInfix"/>
-    public IList<InfixOperator<AtomNode>> AdditionalInfix { get; }
+    /// <inheritdoc cref="IGrammar.Infixes"/>
+    public IList<InfixOperator<AtomNode>> Infixes { get; }
 
-    /// <inheritdoc cref="IGrammar.AdditionalPostfix"/>
-    public IList<Parser<Func<AtomNode, AtomNode>>> AdditionalPostfix { get; }
+    /// <inheritdoc cref="IGrammar.Postfixes"/>
+    public IList<Parser<Func<AtomNode, AtomNode>>> Postfixes { get; }
 
-    /// <inheritdoc cref="IGrammar.AdditionalPrefix"/>
-    public IList<Parser<Func<AtomNode, AtomNode>>> AdditionalPrefix { get; }
+    /// <inheritdoc cref="IGrammar.Prefixes"/>
+    public IList<Parser<Func<AtomNode, AtomNode>>> Prefixes { get; }
 
-
-    /// <inheritdoc cref="IGrammar.AdditionalStatements"/>
-    public IList<Parser<StatementBase>> AdditionalStatements { get; }
+    /// <inheritdoc cref="IGrammar.Statements"/>
+    public IList<Parser<StatementBase>> Statements { get; }
 
     #endregion
 
@@ -61,35 +58,16 @@ public sealed class Grammar
     /// </summary>
     public Grammar()
     {
-        AdditionalAtoms = new List<Parser<AtomNode>>();
-        AdditionalInfix = new List<InfixOperator<AtomNode>>();
-        AdditionalPostfix = new List<Parser<Func<AtomNode, AtomNode>>>();
-        AdditionalPrefix = new List<Parser<Func<AtomNode, AtomNode>>>();
-        AdditionalStatements = new List<Parser<StatementBase>>();
-
-        RebuildGrammar();
+        Atoms = new List<Parser<AtomNode>>();
+        Infixes = new List<InfixOperator<AtomNode>>();
+        Postfixes = new List<Parser<Func<AtomNode, AtomNode>>>();
+        Prefixes = new List<Parser<Func<AtomNode, AtomNode>>>();
+        Statements = new List<Parser<StatementBase>>();
     }
 
     #endregion
 
     #region Private members
-
-    private InfixOperator<AtomNode>[] BuildInfixOperatorsArray
-        (
-            params InfixOperator<AtomNode>[] mainOperators
-        )
-    {
-        if (AdditionalInfix.Count == 0)
-        {
-            return mainOperators;
-        }
-
-        var result = new List<InfixOperator<AtomNode>>();
-        result.AddRange (AdditionalInfix);
-        result.AddRange (mainOperators);
-
-        return result.ToArray();
-    }
 
     private Parser<StatementBase> BuildStatement (Parser<AtomNode> innerParser) =>
         Parser.Chain
@@ -135,7 +113,12 @@ public sealed class Grammar
     /// <summary>
     /// Выражение.
     /// </summary>
-    private Parser<AtomNode> Expression = null!;
+    private DynamicParser<AtomNode> Expression = null!;
+
+    /// <summary>
+    /// Блок стейтментов.
+    /// </summary>
+    private DynamicParser<StatementBase> Block = null!;
 
     /// <summary>
     /// Стейтмент вообще.
@@ -143,42 +126,41 @@ public sealed class Grammar
     private Parser<StatementBase> GenericStatement = null!;
 
     /// <summary>
+    /// Вычисляемый узел.
+    /// </summary>
+    private DynamicParser<AtomNode> Atom = null!;
+
+    /// <summary>
     /// Программа в целом.
     /// </summary>
     private Parser<ProgramNode> Program = null!;
 
-    #endregion
-
-    #region Public methods
-
-    /// <summary>
-    /// Пересоздание грамматики.
-    /// </summary>
-    public void RebuildGrammar()
+    private void ApplyDefaults()
     {
-        var additionalAtoms = new AdditionalAtomParser (this);
-        var additionalPostfix = new AdditionalPostfixParser (this);
-        var additionalPrefix = new AdditionalPrefixParser (this);
-        var additionalStatements = new AdditionalStatementParser (this);
+        Atoms.Clear();
+        Infixes.Clear();
+        Postfixes.Clear();
+        Prefixes.Clear();
+        Statements.Clear();
 
         var variable = Identifier.Map (x => (AtomNode)new VariableNode (x))
             .Labeled ("Variable");
 
-        var atom = new DynamicParser<AtomNode> (() => null!);
-        var expression = new DynamicParser<AtomNode> (() => null!);
-        var block = new DynamicParser<StatementBase> (() => null!);
+        Atom = new DynamicParser<AtomNode> (() => null!);
+        Expression = new DynamicParser<AtomNode> (() => null!);
+        Block = new DynamicParser<StatementBase> (() => null!);
 
         var ternary = Parser.Chain
             (
-                new PeepingParser<string, AtomNode> (Term ("?"), expression),
-                expression,
-                expression.After (Term (":")),
+                new PeepingParser<string, AtomNode> (Term ("?"), Expression),
+                Expression,
+                Expression.After (Term (":")),
                 (condition, trueValue, falseValue) =>
                     (AtomNode) new TernaryNode (condition, trueValue, falseValue)
             )
             .Labeled ("Ternary");
 
-        var throwOperator = atom.RoundBrackets()
+        var throwOperator = Atom.RoundBrackets()
             .After (Reserved ("throw"))
             .Map (x => (AtomNode) new ThrowNode (x))
             .Labeled ("Throw");
@@ -186,7 +168,7 @@ public sealed class Grammar
         var namedArgument  = Parser.Chain
             (
                 Identifier.Before (Term (":")),
-                expression,
+                Expression,
                 (name, expr) => (AtomNode) new NamedArgumentNode (name, expr)
             )
             .Labeled ("NamedArg");
@@ -199,15 +181,15 @@ public sealed class Grammar
         var newOperator  = Parser.Chain
             (
                 typeName.After (Reserved ("new")),
-                expression.SeparatedBy (Term (",")).RoundBrackets(),
+                Expression.SeparatedBy (Term (",")).RoundBrackets(),
                 (name, args) => (AtomNode) new NewNode (name, args.ToArray())
             )
             .Labeled ("New");
 
         var keyAndValue  = Parser.Chain
             (
-                expression.Before (Term (":")),
-                expression,
+                Expression.Before (Term (":")),
+                Expression,
                 (key, value) => new KeyValueNode (key, value)
             )
             .Labeled ("KeyAndValue");
@@ -216,7 +198,7 @@ public sealed class Grammar
             .Labeled ("Dictionary")
             .Map (x => (AtomNode) new DictionaryNode (x.ToArray()));
 
-        var list  = expression.SeparatedBy (Term (",")).SquareBrackets()
+        var list  = Expression.SeparatedBy (Term (",")).SquareBrackets()
             .Labeled ("List")
             .Map (x => (AtomNode) new ListNode (x.ToArray()));
 
@@ -229,7 +211,7 @@ public sealed class Grammar
 
         var index  = Operator.Unary
             (
-                expression.SquareBrackets(),
+                Expression.SquareBrackets(),
                 "Index",
                 x => target => new IndexNode (target, x)
             );
@@ -238,7 +220,7 @@ public sealed class Grammar
             (
                 Term ("."),
                 Identifier,
-                expression.SeparatedBy (Term (",")).RoundBrackets(),
+                Expression.SeparatedBy (Term (",")).RoundBrackets(),
                 (_, name, args) => target => new MethodNode (target, name, args.ToArray())
             )
             .Labeled ("MethodCall");
@@ -246,7 +228,7 @@ public sealed class Grammar
         var functionCall  = Parser.Chain
             (
                 Identifier,
-                expression.Or (namedArgument).SeparatedBy (Term (",")).RoundBrackets(),
+                Expression.Or (namedArgument).SeparatedBy (Term (",")).RoundBrackets(),
                 (name, args) => (AtomNode) new CallNode (name, args.ToArray())
             )
             .Labeled ("FunctionCall");
@@ -255,34 +237,84 @@ public sealed class Grammar
             (
                 Reserved ("lambda"),
                 Identifier.SeparatedBy (Term (",")).RoundBrackets(),
-                block,
+                Block,
                 (_, args, body) => (AtomNode) new LambdaNode (args.ToArray(), body)
             )
             .Labeled ("Lambda");
 
-        var awaitOperator = expression.After (Reserved ("await"))
+        var awaitOperator = Expression.After (Reserved ("await"))
             .Map (x => (AtomNode)new AwaitNode (x));
 
-        atom.Function = () => Parser.OneOf
+        Atoms.Add (Literal);
+        Atoms.Add (Format);
+        Atoms.Add (ternary);
+        Atoms.Add (functionCall);
+        Atoms.Add (variable);
+        Atoms.Add (list);
+        Atoms.Add (dictionary);
+        Atoms.Add (newOperator);
+        Atoms.Add (throwOperator);
+        Atoms.Add (awaitOperator);
+        Atoms.Add (lambda);
+
+        //===================================================
+
+        Prefixes.Add (Operator.Unary
             (
-                additionalAtoms,
-                Literal,
-                Format,
-                ternary,
-                functionCall,
-                variable,
-                list,
-                dictionary,
-                newOperator,
-                throwOperator,
-                awaitOperator,
-                lambda
-            )
-            .Labeled ("Atom");
+                Term ("-"),
+                "UnaryMinus",
+                _ => target => new MinusNode (target)
+            ));
+        Prefixes.Add(Operator.Unary
+            (
+                Term("!"),
+                "PrefixBang",
+                _ => target => new PrefixBangNode (target)
+            ));
+        Prefixes.Add (Operator.Unary
+            (
+                Term ("~"),
+                "Tilda",
+                _ => target => new TildaNode (target)
+            ));
+        Prefixes.Add (Operator.Increment ("PrefixIncrement", true));
+        Prefixes.Add (Operator.Unary
+            (
+                Parser.OneOf (Identifier, Reserved (null))
+                    .RoundBrackets(),
+                "Cast",
+                x => target => new CastNode (x, target)
+            ));
+
+        //===================================================
+
+        Postfixes.Add (Operator.Increment ("PostfixIncrement", false));
+        Postfixes.Add (Operator.Unary
+            (
+                Term ("!"),
+                "PostfixBang",
+                _ => target => new PostfixBangNode (target)
+            ));
+        Postfixes.Add (index);
+        Postfixes.Add (methodCall);
+        Postfixes.Add (property);
+
+        //===================================================
+
+        Infixes.Add (Operator.NonAssociative ("Shuttle", "<=>"));
+        Infixes.Add (Operator.NonAssociative ("In/is", "in", "is"));
+        Infixes.Add (Operator.LeftAssociative ("Coalesce", "??"));
+        Infixes.Add (Operator.LeftAssociative ("Shift", "<<", ">>"));
+        Infixes.Add (Operator.LeftAssociative ("Bitwise", "&", "|", "^"));
+        Infixes.Add (Operator.LeftAssociative ("Multiplication", "*", "/", "%" ));
+        Infixes.Add (Operator.LeftAssociative ("Addition", "+", "-" ));
+        Infixes.Add (Operator.LeftAssociative ("Comparison", "<", ">", "<=", ">=", "==", "!=", "<>", "===", "!==", "~~", "~~~" ));
+
+        //===================================================
 
         var leftHand  = ExpressionBuilder.Build
             (
-                root: atom,
+                root: Atom,
 
                 // префиксные операции не предусмотрены
                 prefixOps: Array.Empty<Parser<Func<AtomNode, AtomNode>>>(),
@@ -299,83 +331,6 @@ public sealed class Grammar
             )
             .Labeled ("LeftHand");
 
-        expression.Function = () => ExpressionBuilder.Build
-        (
-            root: atom,
-
-            prefixOps: new[]
-            {
-                // префиксные операции
-                additionalPrefix,
-
-                Operator.Unary
-                    (
-                        Term ("-"),
-                        "UnaryMinus",
-                        _ => target => new MinusNode (target)
-                    ),
-
-                Operator.Unary
-                    (
-                        Term ("!"),
-                        "PrefixBang",
-                        _ => target => new PrefixBangNode (target)
-                    ),
-
-                Operator.Unary
-                    (
-                        Term ("~"),
-                        "Tilda",
-                        _ => target => new TildaNode (target)
-                    ),
-
-                Operator.Increment ("PrefixIncrement", true),
-
-                Operator.Unary
-                    (
-                        Parser.OneOf (Identifier, Reserved (null))
-                            .RoundBrackets(),
-                        "Cast",
-                        x => target => new CastNode (x, target)
-                    )
-            },
-
-            postfixOps: new[]
-            {
-                // постфиксные операции
-                additionalPostfix,
-
-                Operator.Increment ("PostfixIncrement", false),
-
-                Operator.Unary
-                    (
-                        Term ("!"),
-                        "PostfixBang",
-                        _ => target => new PostfixBangNode (target)
-                    ),
-
-                index,
-                methodCall,
-                property,
-            },
-
-            infixOps: BuildInfixOperatorsArray
-                (
-                    // инфиксные операции
-                    Operator.NonAssociative ("Shuttle", "<=>"),
-                    Operator.NonAssociative ("In/is", "in", "is"),
-                    Operator.LeftAssociative ("Coalesce", "??"),
-                    Operator.LeftAssociative ("Shift", "<<", ">>"),
-                    Operator.LeftAssociative ("Bitwise", "&", "|", "^"),
-                    Operator.LeftAssociative ("Multiplication", "*", "/", "%" ),
-                    Operator.LeftAssociative ("Addition", "+", "-" ),
-                    Operator.LeftAssociative ("Comparison", "<", ">", "<=", ">=", "==",
-                        "!=", "<>", "===", "!==", "~~", "~~~" )
-                )
-        )
-        .Labeled ("Expression");
-        Expression = expression;
-
         var assignment  = Parser.Chain
             (
                 new RepeatParser<Tuple<AtomNode, string>>
@@ -390,7 +345,7 @@ public sealed class Grammar
                         minCount: 0
                     ),
 
-                expression,
+                Expression,
 
                 (tuples, expr) =>
                 {
@@ -408,7 +363,7 @@ public sealed class Grammar
         var catchClause = Parser.Chain
             (
                 Identifier.RoundBrackets().After (Reserved ("catch")),
-                block,
+                Block,
                 (name, body) => new TryNode.CatchBlock (name, body)
             )
             .Optional();
@@ -416,9 +371,9 @@ public sealed class Grammar
         var tryCatchFinally = Parser.Chain
             (
                 Parser.Position.Before (Reserved ("try")),
-                block,
+                Block,
                 catchClause,
-                block.After (Reserved ("finally")).Optional(),
+                Block.After (Reserved ("finally")).Optional(),
                 (position, tryBlock, catchBlock, finallyBlock) => (StatementBase)
                     new TryNode (position.Line, tryBlock, catchBlock, finallyBlock)
             )
@@ -426,33 +381,14 @@ public sealed class Grammar
 
         var simpleStatement = BuildStatement (assignment).Labeled ("SimpleStatement");
 
-        block.Function = () =>Parser.OneOf
-            (
-                // произвольное количество стейтментов внутри фигурных скобок
-                Parser.Chain
-                    (
-                        Parser.Position,
-                        GenericStatement!.Repeated (minCount: 0).CurlyBrackets(),
-                        (pos, lines) =>
-                            (StatementBase)new BlockNode (pos.Line, lines.ToArray())
-                    ),
-
-                // либо единственный стейтмент без фигурных скобок
-                GenericStatement!.Map
-                    (
-                        x => (StatementBase)new BlockNode (x.Line, new[] { x })
-                    )
-            )
-            .Labeled ("Block");
-
         var forStatement = Parser.Chain
             (
                 Parser.Position.Before (Reserved ("for")),
                 assignment.After (Parser.Term ("(")),
-                expression.Between (Term (";"), Term (";")),
-                assignment.Or (expression).Before (Term (")")),
-                block,
-                block.Before (Reserved ("else")).Optional(),
+                Expression.Between (Term (";"), Term (";")),
+                assignment.Or (Expression).Before (Term (")")),
+                Block,
+                Block.Before (Reserved ("else")).Optional(),
                 (position, init, condition, step, body, elseBlock) =>
                     (StatementBase) new ForNode (position.Line, init, condition, step, body, elseBlock)
             )
@@ -462,9 +398,9 @@ public sealed class Grammar
                 (
                     Parser.Position.Before (Reserved ("foreach")),
                     Identifier.After (Parser.Term ("(")),
-                    expression.After (Term ("in")),
-                    block.After (Parser.Term (")")),
-                    block.Before (Reserved ("else")).Optional(),
+                    Expression.After (Term ("in")),
+                    Block.After (Parser.Term (")")),
+                    Block.Before (Reserved ("else")).Optional(),
                     (position, name, sequence, body, elseBlock) =>
                         (StatementBase) new ForEachNode (position.Line, name, sequence, body, elseBlock)
                 )
@@ -482,7 +418,7 @@ public sealed class Grammar
         var returnStatement = Parser.Chain
             (
                 Parser.Position.Before (Reserved ("return")),
-                expression.Optional(),
+                Expression.Optional(),
                 (position, value) => (StatementBase)new ReturnNode (position.Line, value)
             )
             .Labeled ("Return");
@@ -506,9 +442,9 @@ public sealed class Grammar
         var whileStatement = Parser.Chain
             (
                 Parser.Position.Before (Reserved ("while")),
-                expression.RoundBrackets(),
-                block,
-                block.After (Reserved ("else")).Optional(),
+                Expression.RoundBrackets(),
+                Block,
+                Block.After (Reserved ("else")).Optional(),
                 (position, condition, body, elseBody) =>
                     (StatementBase) new WhileNode (position.Line, condition, body, elseBody)
             )
@@ -518,8 +454,8 @@ public sealed class Grammar
             (
                 Parser.Position,
                 Reserved ("else").Before (Reserved ("if")),
-                expression.RoundBrackets(),
-                block,
+                Expression.RoundBrackets(),
+                Block,
                 (position, _, condition, body) => new IfNode (position.Line, condition, body, null, null)
             )
             .Labeled ("ElseIf");
@@ -527,10 +463,10 @@ public sealed class Grammar
         var ifStatement = Parser.Chain
             (
                 Parser.Position.Before (Reserved ("if")),
-                expression.RoundBrackets(),
-                block,
+                Expression.RoundBrackets(),
+                Block,
                 elseIf.Repeated (minCount: 0),
-                block.After (Reserved ("else")).Optional(),
+                Block.After (Reserved ("else")).Optional(),
                 (position, condition, thenBlock, other, elseBlock) =>
                     (StatementBase) new IfNode (position.Line, condition, thenBlock, other.ToArray(), elseBlock)
             )
@@ -542,9 +478,9 @@ public sealed class Grammar
                 Parser.Term ("("),
                 Parser.Identifier,
                 Parser.Term ("="),
-                expression,
+                Expression,
                 Parser.Term (")"),
-                block,
+                Block,
                 (position, _, name, _, expr, _, body) =>
                     (StatementBase) new UsingNode (position.Line, name, expr, body)
             )
@@ -555,7 +491,7 @@ public sealed class Grammar
                 Parser.Position.Before (Reserved ("func")),
                 Identifier,
                 Identifier.SeparatedBy (Term (",")).RoundBrackets(),
-                block,
+                Block,
                 (position, name, args, body) =>
                     (StatementBase) new FunctionDefinitionNode (position.Line, name, args.ToArray(), body)
             )
@@ -573,7 +509,7 @@ public sealed class Grammar
             (
                 Parser.Position.Before (Term (".")),
                 Identifier.Before (Term ("=")),
-                expression,
+                Expression,
                 (position, prop, expr) =>
                     (StatementBase) new WithAssignmentNode (position.Line, prop, expr)
             )
@@ -583,32 +519,82 @@ public sealed class Grammar
             (
                 Parser.Position.Before (Reserved ("with")),
                 leftHand,
-                block,
+                Block,
                 (position, center, body) => (StatementBase) new WithNode (position.Line, center, body)
             )
             .Labeled ("With");
 
-        GenericStatement = Parser.OneOf
+        Statements.Add (labelStatement);
+        Statements.Add (simpleStatement);
+        Statements.Add (forStatement);
+        Statements.Add (forEachStatement);
+        Statements.Add (whileStatement);
+        Statements.Add (ifStatement);
+        Statements.Add (usingStatement);
+        Statements.Add (functionDefinition);
+        Statements.Add (breakStatement);
+        Statements.Add (continueStatement);
+        Statements.Add (returnStatement);
+        Statements.Add (externalCode);
+        Statements.Add (tryCatchFinally);
+        Statements.Add (with);
+        Statements.Add (withAssignment);
+        Statements.Add (gotoStatement);
+        Statements.Add (semicolonStatement);
+
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Создание грамматики по умолчанию для Барсика.
+    /// </summary>
+    public static Grammar CreateDefaultBarsikGrammar()
+    {
+        var result = new Grammar();
+        result.ApplyDefaults();
+
+        return result;
+    }
+
+    /// <summary>
+    /// Пересоздание грамматики.
+    /// </summary>
+    public void Rebuild()
+    {
+        Atom.Function = () => Parser.OneOf (Atoms.ToArray()).Labeled ("Atom");
+
+        Expression.Function = () => ExpressionBuilder.Build
             (
-                additionalStatements,
-                labelStatement,
-                simpleStatement,
-                forStatement,
-                forEachStatement,
-                whileStatement,
-                ifStatement,
-                usingStatement,
-                functionDefinition,
-                breakStatement,
-                continueStatement,
-                returnStatement,
-                externalCode,
-                tryCatchFinally,
-                with,
-                withAssignment,
-                gotoStatement,
-                semicolonStatement
-            );
+                root: Atom,
+                Prefixes,
+                Postfixes,
+                Infixes
+            )
+        .Labeled ("Expression");
+
+        Block.Function = () => Parser.OneOf
+            (
+                // произвольное количество стейтментов внутри фигурных скобок
+                Parser.Chain
+                    (
+                        Parser.Position,
+                        GenericStatement!.Repeated (minCount: 0).CurlyBrackets(),
+                        (pos, lines) =>
+                            (StatementBase)new BlockNode (pos.Line, lines.ToArray())
+                    ),
+
+                // либо единственный стейтмент без фигурных скобок
+                GenericStatement!.Map
+                    (
+                        x => (StatementBase)new BlockNode (x.Line, new[] { x })
+                    )
+            )
+            .Labeled ("Block");
+
+        GenericStatement = Parser.OneOf (Statements.ToArray());
 
         Program  = new RepeatParser<StatementBase>
                 (

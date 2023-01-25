@@ -122,7 +122,9 @@ public sealed class Interpreter
         error ??= Console.Error;
         Settings =  settings ?? InterpreterSettings.CreateDefault();
         Tokenizer = KotikUtility.CreateTokenizerForBarsik (Settings.TokenizerSettings);
-        Grammar = grammar ?? new Grammar();
+        Grammar = grammar
+                  ?? Settings.Grammar
+                  ?? AM.Kotik.Barsik.Grammar.CreateDefaultBarsikGrammar();
         AllowNewOperator = true;
         Modules = new ();
         Assemblies = new ();
@@ -155,6 +157,7 @@ public sealed class Interpreter
 
     /// <summary>
     /// Применение настроек (которые не были применены ранее).
+    /// Рекомендуется вызывать перед началом работы со скриптами.
     /// </summary>
     public void ApplySettings()
     {
@@ -172,6 +175,8 @@ public sealed class Interpreter
         {
             ParsingDebugOutput = Context.Output;
         }
+
+        Grammar.Rebuild();
     }
 
     /// <summary>

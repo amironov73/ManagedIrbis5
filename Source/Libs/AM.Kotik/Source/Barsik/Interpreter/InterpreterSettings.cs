@@ -60,6 +60,12 @@ public sealed class InterpreterSettings
     public string? EvaluateExpression { get; set; }
 
     /// <summary>
+    /// Грамматика.
+    /// </summary>
+    [JsonIgnore]
+    public IGrammar? Grammar { get; set; }
+
+    /// <summary>
     /// Загрузка сборок перед началом разбора и выполнения скриптов.
     /// </summary>
     [JsonPropertyName ("load-assemblies")]
@@ -141,6 +147,11 @@ public sealed class InterpreterSettings
             else if (arg == "--dump-ast")
             {
                 result.DumpAst = true;
+            }
+            else if (arg == "--grammar")
+            {
+                // TODO установка нестандартной грамматики
+                index++;
             }
             else if (arg == "--repl")
             {

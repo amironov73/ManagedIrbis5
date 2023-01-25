@@ -12,6 +12,7 @@
 #region Using directives
 
 using System;
+using System.Collections.Generic;
 
 using AM.Collections;
 
@@ -34,9 +35,9 @@ public static class ExpressionBuilder
     public static Parser<TNode> Build<TNode>
         (
             Parser<TNode> root,
-            Parser<Func<TNode, TNode>>[] prefixOps,
-            Parser<Func<TNode, TNode>>[] postfixOps,
-            InfixOperator<TNode>[] infixOps
+            IList<Parser<Func<TNode, TNode>>> prefixOps,
+            IList<Parser<Func<TNode, TNode>>> postfixOps,
+            IList<InfixOperator<TNode>> infixOps
         )
         where TNode: class
     {
@@ -47,12 +48,12 @@ public static class ExpressionBuilder
         var expr = new DynamicParser<TNode> (() => null!);
         var result = (Parser<TNode>) expr;
 
-        if (!prefixOps.IsNullOrEmpty())
+        if (prefixOps.Count != 0)
         {
             result = new UnaryParser<TNode> (isPrefix: true, result, prefixOps);
         }
 
-        if (!postfixOps.IsNullOrEmpty())
+        if (postfixOps.Count != 0)
         {
             result = new UnaryParser<TNode> (isPrefix: false, result, postfixOps);
         }

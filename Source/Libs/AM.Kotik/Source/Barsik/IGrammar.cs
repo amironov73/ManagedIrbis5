@@ -33,27 +33,27 @@ public interface IGrammar
     /// <summary>
     /// Дополнительно распознаваемые вычислимые выражения.
     /// </summary>
-    IList<Parser<AtomNode>> AdditionalAtoms { get; }
+    IList<Parser<AtomNode>> Atoms { get; }
 
     /// <summary>
     /// Дополнительно распознаваемые инфиксные операции.
     /// </summary>
-    IList<InfixOperator<AtomNode>> AdditionalInfix { get; }
+    IList<InfixOperator<AtomNode>> Infixes { get; }
 
     /// <summary>
     /// Дополнительно распознаваемые постфиксные операции.
     /// </summary>
-    IList<Parser<Func<AtomNode, AtomNode>>> AdditionalPostfix { get; }
+    IList<Parser<Func<AtomNode, AtomNode>>> Postfixes { get; }
 
     /// <summary>
     /// Дополнительно распознаваемые префиксные операции.
     /// </summary>
-    IList<Parser<Func<AtomNode, AtomNode>>> AdditionalPrefix { get; }
+    IList<Parser<Func<AtomNode, AtomNode>>> Prefixes { get; }
 
     /// <summary>
     /// Дополнительно распознаваемые стейтменты.
     /// </summary>
-    IList<Parser<StatementBase>> AdditionalStatements { get; }
+    IList<Parser<StatementBase>> Statements { get; }
 
     /// <summary>
     /// Разбор текста выражения.
@@ -78,5 +78,5 @@ public interface IGrammar
     /// <summary>
     /// Пересоздание грамматики после внесения изменений.
     /// </summary>
-    void RebuildGrammar();
+    void Rebuild();
 }

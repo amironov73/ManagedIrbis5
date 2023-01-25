@@ -40,7 +40,7 @@ public sealed class UnaryParser<TResult>
         (
             bool isPrefix,
             Parser<TResult> root,
-            Parser<Func<TResult, TResult>>[] allowed
+            IList<Parser<Func<TResult, TResult>>> allowed
         )
     {
         Sure.NotNull (root);
@@ -57,7 +57,7 @@ public sealed class UnaryParser<TResult>
 
     private readonly bool _isPrefix;
     private readonly Parser<TResult> _root;
-    private readonly Parser<Func<TResult, TResult>>[] _allowed;
+    private readonly IList<Parser<Func<TResult, TResult>>> _allowed;
 
     #endregion
 
@@ -113,7 +113,7 @@ public sealed class UnaryParser<TResult>
                         if (one.TryParse (state, out var func))
                         {
                             finalResult = func (finalResult);
-             
+
                             flag = true;
                             break;
                         }
