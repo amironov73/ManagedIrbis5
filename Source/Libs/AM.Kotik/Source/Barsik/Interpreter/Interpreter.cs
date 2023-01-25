@@ -15,6 +15,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -120,7 +121,7 @@ public sealed class Interpreter
         output ??= Console.Out;
         error ??= Console.Error;
         Settings =  settings ?? InterpreterSettings.CreateDefault();
-        Tokenizer = KotikUtility.CreateTokenizer (Settings.TokenizerSettings);
+        Tokenizer = KotikUtility.CreateTokenizerForBarsik (Settings.TokenizerSettings);
         Grammar = grammar ?? new Grammar();
         AllowNewOperator = true;
         Modules = new ();
@@ -151,6 +152,93 @@ public sealed class Interpreter
     #endregion
 
     #region Public methods
+
+    /// <summary>
+    /// Применение настроек (которые не были применены ранее).
+    /// </summary>
+    public void ApplySettings()
+    {
+        foreach (var assembly in Settings.LoadAssemblies)
+        {
+            Context.LoadAssembly (assembly);
+        }
+
+        foreach (var ns in Settings.UseNamespaces)
+        {
+            Context.Namespaces.Add (ns, null);
+        }
+
+        if (Settings.DebugParser)
+        {
+            ParsingDebugOutput = Context.Output;
+        }
+    }
+
+    /// <summary>
+    /// Создание и запуск интерпретатора.
+    /// </summary>
+    /// <param name="args">Аргументы командной строки.</param>
+    /// <param name="configure">Опциональная конфигурация интерпретатора.</param>
+    /// <param name="exceptionHandler">Опциональный обработчик исключений.</param>
+    /// <returns>Код возврата.</returns>
+    public static int CreateAndRunInterpreter
+        (
+            string[] args,
+            Action<Interpreter>? configure = null,
+            Action<Interpreter, Exception>? exceptionHandler = null
+        )
+    {
+        var settings = InterpreterSettings.FromCommandLine (args);
+        var interpreter = new Interpreter (settings: settings);
+        configure?.Invoke (interpreter);
+
+        try
+        {
+            interpreter.ApplySettings();
+            foreach (var scriptFile in settings.ScriptFiles)
+            {
+                var executionResult = interpreter.ExecuteFile (scriptFile, settings.DumpAst);
+                if (executionResult.ExitRequested)
+                {
+                    if (!string.IsNullOrEmpty (executionResult.Message))
+                    {
+                        interpreter.Context.Output.WriteLine (executionResult.Message);
+                    }
+
+                    return executionResult.ExitCode;
+                }
+            }
+
+            if (settings.ReplMode)
+            {
+                interpreter.DoRepl();
+            }
+        }
+        catch (Exception exception)
+        {
+            if (Debugger.IsAttached)
+            {
+                throw;
+            }
+
+            exceptionHandler?.Invoke (interpreter, exception);
+            return 1;
+        }
+
+        return 0;
+    }
+
+    /// <summary>
+    /// Запуск REPL на указанном интерпретаторе.
+    /// </summary>
+    public ExecutionResult DoRepl()
+    {
+        var version = Interpreter.FileVersion;
+        Context.Output.WriteLine ($"Meow interpreter {version}");
+        Context.Output.WriteLine ("Press ENTER twice to exit");
+
+        return new Repl (this).Loop();
+    }
 
     /// <summary>
     /// Вычисление значения переменной.
@@ -257,6 +345,8 @@ public sealed class Interpreter
             result.Message = exception.Message;
         }
 
+        Settings.VariableDumper?.DumpContext (Context);
+
         return result;
     }
 
@@ -268,9 +358,7 @@ public sealed class Interpreter
     {
         var executablePath = AppContext.BaseDirectory;
 
-        // ReSharper disable StringLiteralTypo
-        var autoexec = Path.Combine (executablePath, "autoexec.barsik");
-        // ReSharper restore StringLiteralTypo
+        var autoexec = Path.Combine (executablePath, "autoexec.meow");
 
         if (File.Exists (autoexec))
         {

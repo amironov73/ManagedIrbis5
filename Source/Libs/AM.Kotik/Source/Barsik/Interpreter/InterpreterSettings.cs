@@ -14,7 +14,11 @@
 #region Using directive
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json.Serialization;
+
+using AM.Kotik.Barsik.Diagnostics;
 
 #endregion
 
@@ -46,7 +50,7 @@ public sealed class InterpreterSettings
     /// Вывод дампа всех переменных после исполнения скрипта.
     /// </summary>
     [JsonPropertyName ("dump-variables")]
-    public bool DumpVariables { get; set; }
+    public IBarsikDumper? VariableDumper { get; set; }
 
     /// <summary>
     /// Вычисление выражения, заданного в командной строке
@@ -59,8 +63,12 @@ public sealed class InterpreterSettings
     /// Загрузка сборок перед началом разбора и выполнения скриптов.
     /// </summary>
     [JsonPropertyName ("load-assemblies")]
-    public string[]? LoadAssemblies { get; set; }
+    public List<string> LoadAssemblies { get; set; }
 
+    /// <summary>
+    /// Файлы скриптов, подлежащие выполнению.
+    /// </summary>
+    public List<string> ScriptFiles { get; set; }
 
     /// <summary>
     /// Запуск REPL.
@@ -78,7 +86,7 @@ public sealed class InterpreterSettings
     /// Добавление пространств перед исполнением скриптов.
     /// </summary>
     [JsonPropertyName ("use-namespaces")]
-    public string[]? UseNamespaces { get; set; }
+    public List<string> UseNamespaces { get; set; }
 
     #endregion
 
@@ -89,7 +97,9 @@ public sealed class InterpreterSettings
     /// </summary>
     public InterpreterSettings()
     {
-        // пустое тело конструктора
+        LoadAssemblies = new ();
+        ScriptFiles = new ();
+        UseNamespaces = new ();
     }
 
     #endregion
@@ -102,6 +112,75 @@ public sealed class InterpreterSettings
     public static InterpreterSettings CreateDefault()
     {
         return new InterpreterSettings();
+    }
+
+    /// <summary>
+    /// Получение настроек из аргументов командной строки.
+    /// </summary>
+    public static InterpreterSettings FromCommandLine
+        (
+            string[] args
+        )
+    {
+        Sure.NotNull (args);
+
+        var result = CreateDefault();
+        if (args.Length == 0)
+        {
+            result.ReplMode = true;
+        }
+
+        for (var index = 0; index < args.Length; index++)
+        {
+            var arg = args[index];
+
+            if (arg == "--dump-variables")
+            {
+                result.VariableDumper = new StandardDumper();
+            }
+            else if (arg == "--dump-ast")
+            {
+                result.DumpAst = true;
+            }
+            else if (arg == "--repl")
+            {
+                result.ReplMode = true;
+            }
+            else if (arg == "--debug-parser")
+            {
+                result.DebugParser = true;
+            }
+            else if (arg == "--external")
+            {
+                // TODO установка обработчика внешнего кода
+                index++;
+            }
+            else if (arg == "--use-namespace")
+            {
+                result.UseNamespaces.Add (args[index + 1]);
+                index++;
+            }
+            else if (arg == "--load-assembly")
+            {
+                result.LoadAssemblies.Add (args[index + 1]);
+                index++;
+            }
+            else if (arg == "--eval")
+            {
+                result.EvaluateExpression = string.Join (' ', args.Skip (index + 1));
+                break;
+            }
+            else if (arg.StartsWith ("-"))
+            {
+                throw new BarsikException ($"Unknown option {arg}");
+            }
+            else
+            {
+                result.ScriptFiles.Add (arg);
+            }
+        }
+
+        return result;
     }
 
     /// <summary>

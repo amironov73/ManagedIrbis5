@@ -13,7 +13,6 @@
 #region Using directives
 
 using System;
-using System.IO;
 using System.Text;
 
 using AM.Kotik.Barsik;
@@ -33,7 +32,7 @@ internal static class Program
     {
         Encoding.RegisterProvider (CodePagesEncodingProvider.Instance);
 
-        var result = KotikUtility.CreateAndRunInterpreter
+        var result = Interpreter.CreateAndRunInterpreter
             (
                 args,
                 interpreter =>
@@ -43,10 +42,6 @@ internal static class Program
                 (_, exception) =>
                 {
                     Console.Error.WriteLine (exception);
-                },
-                interpreter =>
-                {
-                    interpreter.Context.DumpVariables();
                 }
             );
 
