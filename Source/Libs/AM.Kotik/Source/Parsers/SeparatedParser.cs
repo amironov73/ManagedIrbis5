@@ -24,7 +24,7 @@ namespace AM.Kotik;
 /// Парсер для повторяющихся значений, разделенных между собой чем-нибудь.
 /// </summary>
 public sealed class SeparatedParser<TResult, TSeparator, TDelimiter>
-    : Parser<IEnumerable<TResult>>
+    : Parser<IList<TResult>>
     where TResult : class
     where TSeparator : class
     where TDelimiter : class
@@ -71,7 +71,7 @@ public sealed class SeparatedParser<TResult, TSeparator, TDelimiter>
     public override bool TryParse
         (
             ParseState state,
-            [MaybeNullWhen(false)] out IEnumerable<TResult> result
+            [MaybeNullWhen(false)] out IList<TResult> result
         )
     {
         using var level = state.Enter (this);

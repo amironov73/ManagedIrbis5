@@ -18,7 +18,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 #endregion
 
@@ -178,7 +177,7 @@ public sealed class Grammar
             (
                 typeName.After (Reserved ("new")),
                 Expression.SeparatedBy (Term (",")).RoundBrackets(),
-                (name, args) => (AtomNode) new NewNode (name, args.ToArray())
+                (name, args) => (AtomNode) new NewNode (name, args)
             )
             .Labeled ("New");
 
@@ -192,11 +191,11 @@ public sealed class Grammar
 
         var dictionary  = keyAndValue.SeparatedBy (Term (",")).CurlyBrackets()
             .Labeled ("Dictionary")
-            .Map (x => (AtomNode) new DictionaryNode (x.ToArray()));
+            .Map (x => (AtomNode) new DictionaryNode (x));
 
         var list  = Expression.SeparatedBy (Term (",")).SquareBrackets()
             .Labeled ("List")
-            .Map (x => (AtomNode) new ListNode (x.ToArray()));
+            .Map (x => (AtomNode) new ListNode (x));
 
         var property  = Operator.Unary
             (
@@ -212,12 +211,12 @@ public sealed class Grammar
                 x => target => new IndexNode (target, x)
             );
 
-        var methodCall = Parser.Chain<string, string, IEnumerable<AtomNode>, Func<AtomNode, AtomNode>>
+        var methodCall = Parser.Chain<string, string, IList<AtomNode>, Func<AtomNode, AtomNode>>
             (
                 Term ("."),
                 Identifier,
                 Expression.SeparatedBy (Term (",")).RoundBrackets(),
-                (_, name, args) => target => new MethodNode (target, name, args.ToArray())
+                (_, name, args) => target => new MethodNode (target, name, args)
             )
             .Labeled ("MethodCall");
 
@@ -225,7 +224,7 @@ public sealed class Grammar
             (
                 Identifier,
                 Expression.Or (namedArgument).SeparatedBy (Term (",")).RoundBrackets(),
-                (name, args) => (AtomNode) new CallNode (name, args.ToArray())
+                (name, args) => (AtomNode) new CallNode (name, args)
             )
             .Labeled ("FunctionCall");
 
@@ -234,7 +233,7 @@ public sealed class Grammar
                 Reserved ("lambda"),
                 Identifier.SeparatedBy (Term (",")).RoundBrackets(),
                 Block,
-                (_, args, body) => (AtomNode) new LambdaNode (args.ToArray(), body)
+                (_, args, body) => (AtomNode) new LambdaNode (args, body)
             )
             .Labeled ("Lambda");
 
@@ -305,6 +304,7 @@ public sealed class Grammar
         Infixes.Add (Operator.LeftAssociative ("Multiplication", "*", "/", "%" ));
         Infixes.Add (Operator.LeftAssociative ("Addition", "+", "-" ));
         Infixes.Add (Operator.LeftAssociative ("Comparison", "<", ">", "<=", ">=", "==", "!=", "<>", "===", "!==", "~~", "~~~" ));
+        Infixes.Add (Operator.LeftAssociative ("And/Or", "&&", "||"));
 
         //===================================================
 
@@ -464,7 +464,7 @@ public sealed class Grammar
                 elseIf.Repeated (minCount: 0),
                 Block.After (Reserved ("else")).Optional(),
                 (position, condition, thenBlock, other, elseBlock) =>
-                    (StatementBase) new IfNode (position.Line, condition, thenBlock, other.ToArray(), elseBlock)
+                    (StatementBase) new IfNode (position.Line, condition, thenBlock, other, elseBlock)
             )
             .Labeled ("If");
 
@@ -489,7 +489,7 @@ public sealed class Grammar
                 Identifier.SeparatedBy (Term (",")).RoundBrackets(),
                 Block,
                 (position, name, args, body) =>
-                    (StatementBase) new FunctionDefinitionNode (position.Line, name, args.ToArray(), body)
+                    (StatementBase) new FunctionDefinitionNode (position.Line, name, args, body)
             )
             .Labeled ("FunctionDefinition");
 
@@ -511,7 +511,7 @@ public sealed class Grammar
             )
             .Labeled ("WithAssignment");
 
-        var with = Parser.Chain
+        var withStatement = Parser.Chain
             (
                 Parser.Position.Before (Reserved ("with")),
                 leftHand,
@@ -519,6 +519,14 @@ public sealed class Grammar
                 (position, center, body) => (StatementBase) new WithNode (position.Line, center, body)
             )
             .Labeled ("With");
+
+        var localStatement = Parser.Chain
+            (
+                Parser.Position.Before (Reserved ("local")),
+                Identifier.SeparatedBy (Term (","), minCount:1),
+                (position, names) => (StatementBase) new LocalNode (position.Line, names)
+            )
+            .Labeled ("Local");
 
         Statements.Add (labelStatement);
         Statements.Add (simpleStatement);
@@ -533,9 +541,10 @@ public sealed class Grammar
         Statements.Add (returnStatement);
         Statements.Add (externalCode);
         Statements.Add (tryCatchFinally);
-        Statements.Add (with);
+        Statements.Add (withStatement);
         Statements.Add (withAssignment);
         Statements.Add (gotoStatement);
+        Statements.Add (localStatement);
         Statements.Add (semicolonStatement);
     }
 
@@ -559,7 +568,7 @@ public sealed class Grammar
     /// </summary>
     public void Rebuild()
     {
-        Atom.Value = Parser.OneOf (Atoms.ToArray()).Labeled ("Atom");
+        Atom.Value = Parser.OneOf (Atoms).Labeled ("Atom");
 
         Expression.Value = ExpressionBuilder.Build
             (
@@ -578,7 +587,7 @@ public sealed class Grammar
                         Parser.Position,
                         GenericStatement!.Repeated (minCount: 0).CurlyBrackets(),
                         (pos, lines) =>
-                            (StatementBase)new BlockNode (pos.Line, lines.ToArray())
+                            (StatementBase)new BlockNode (pos.Line, lines)
                     ),
 
                 // либо единственный стейтмент без фигурных скобок
@@ -589,7 +598,7 @@ public sealed class Grammar
             )
             .Labeled ("Block");
 
-        GenericStatement.Value = Parser.OneOf (Statements.ToArray());
+        GenericStatement.Value = Parser.OneOf (Statements);
 
         Program  = new RepeatParser<StatementBase>
                 (

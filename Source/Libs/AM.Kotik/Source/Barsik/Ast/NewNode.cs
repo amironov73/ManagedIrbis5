@@ -15,6 +15,7 @@
 #region Using directives
 
 using System;
+using System.Collections.Generic;
 
 #endregion
 
@@ -36,7 +37,7 @@ internal sealed class NewNode
     public NewNode
         (
             string typeName,
-            AtomNode[] constructorArguments
+            IList<AtomNode> constructorArguments
         )
     {
         _typeName = typeName;
@@ -48,7 +49,7 @@ internal sealed class NewNode
     #region Private members
 
     private readonly string _typeName;
-    private readonly AtomNode[] _constructorArguments;
+    private readonly IList<AtomNode> _constructorArguments;
 
     #endregion
 

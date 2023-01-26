@@ -87,7 +87,16 @@ internal sealed class CallNode
             args.Add (arg);
         }
 
-        var result = _function.CallPoint (context, args.ToArray());
+        dynamic? result;
+        try
+        {
+            result = _function.CallPoint (context, args.ToArray());
+        }
+        catch (GotoException exception)
+        {
+            // не позволяем goto сбежать из функции
+            throw new BarsikException ($"Can't find label {exception.Label}");
+        }
 
         return result;
     }

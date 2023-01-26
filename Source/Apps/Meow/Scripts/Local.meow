@@ -1,0 +1,18 @@
+﻿x = 1
+
+for (i = 0; i < 10; i++)
+{
+    local x
+    x = i * 10
+    println ("for x=", x)
+}
+
+func some()
+{
+    local x
+    x = 123
+    println ("func x=", x)
+}
+
+some()
+println ("global x=", x)

@@ -17,11 +17,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Dynamic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 
 using AM.Text;
@@ -486,6 +484,49 @@ public static class KotikUtility
             IDictionary dictionary => dictionary.Count,
             _ => 1
         };
+    }
+
+    #endregion
+
+    #region Internal methods
+
+    /// <summary>
+    /// Применение определений функций к указанному контексту.
+    /// </summary>
+    internal static Context ApplyFunctionDefinitions
+        (
+            Context context,
+            IList<FunctionDefinitionNode> functionNodes
+        )
+    {
+        if (functionNodes.Count != 0)
+        {
+            context = context.CreateChildContext();
+        }
+
+        foreach (var node in functionNodes)
+        {
+            var name = node.Name;
+            if (Builtins.IsBuiltinFunction (name))
+            {
+                throw new BarsikException ($"{name} used by builtin function");
+            }
+
+            var definition = new FunctionDefinition
+                (
+                    name,
+                    node._argumentNames,
+                    node._body
+                );
+            var descriptor = new FunctionDescriptor
+                (
+                    name,
+                    definition.CreateCallPoint()
+                );
+            context.Functions[name] = descriptor;
+        }
+
+        return context;
     }
 
     #endregion

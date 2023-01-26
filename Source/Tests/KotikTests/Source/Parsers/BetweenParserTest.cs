@@ -57,7 +57,7 @@ public sealed class BetweenParserTest
                 identifier,
                 comma
             );
-        var parser = new BetweenParser<string, IEnumerable<string>, string>
+        var parser = new BetweenParser<string, IList<string>, string>
             (
                 brackets,
                 identifiers,

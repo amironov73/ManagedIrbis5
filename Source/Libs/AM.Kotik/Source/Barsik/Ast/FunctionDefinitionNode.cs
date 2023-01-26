@@ -11,6 +11,7 @@
 
 #region Using directives
 
+using System.Collections.Generic;
 using System.IO;
 
 #endregion
@@ -43,7 +44,7 @@ internal sealed class FunctionDefinitionNode
         (
             int line,
             string functionName,
-            string[] argumentNames,
+            IList<string> argumentNames,
             StatementBase body
         )
         : base (line)
@@ -61,7 +62,7 @@ internal sealed class FunctionDefinitionNode
 
     #region Private members
 
-    internal readonly string[] _argumentNames;
+    internal readonly IList<string> _argumentNames;
     internal readonly StatementBase _body;
 
     #endregion
@@ -69,31 +70,31 @@ internal sealed class FunctionDefinitionNode
     #region AstNode members
 
     /// <inheritdoc cref="AstNode.DumpHierarchyItem(string?,int,System.IO.TextWriter)"/>
-    internal override void DumpHierarchyItem 
+    internal override void DumpHierarchyItem
         (
-            string? name, 
-            int level, 
+            string? name,
+            int level,
             TextWriter writer
         )
     {
         base.DumpHierarchyItem (name, level, writer);
-        
+
         DumpHierarchyItem ("Name", level + 1, writer, Name);
         foreach (var argumentName in _argumentNames)
         {
             DumpHierarchyItem ("Arg", level + 1, writer, argumentName);
         }
-        
+
         _body.DumpHierarchyItem ("Body", level + 1, writer);
     }
 
     #endregion
-    
+
     #region Object members
 
     /// <inheritdoc cref="AstNode.ToString"/>
     public override string ToString() => $"Function Definition at line {Line}";
 
     #endregion
-    
+
 }

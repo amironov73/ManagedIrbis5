@@ -46,7 +46,7 @@ public sealed class BinaryNode
         Sure.NotNull (left);
         Sure.NotNull (operation);
         Sure.NotNull (right);
-        
+
         _left = left;
         _operation = operation;
         _right = right;
@@ -61,7 +61,7 @@ public sealed class BinaryNode
     private readonly AtomNode _right;
 
     /// <summary>
-    /// Оператор сравнения вида `left &lt;=&gt;`.
+    /// Оператор сравнения вида `left &lt;=&gt; right`.
     /// Возвращает 0, если операнды равны, иначе значение
     /// меньше 0 (если левый операнд меньше) или больше 0
     /// (если левый операнд больше).
@@ -74,6 +74,12 @@ public sealed class BinaryNode
         )
     {
         context.NotUsed();
+
+        if (left is string leftString && right is string rightString)
+        {
+            // строки сравниваются без учета культуры
+            return string.CompareOrdinal (leftString, rightString);
+        }
 
         return OmnipotentComparer.Default.Compare (left, right);
     }
@@ -127,7 +133,7 @@ public sealed class BinaryNode
         // для всех прочих типов данных оператор не реализован
         throw new NotImplementedException();
     }
-    
+
     /// <summary>
     /// Расширенная операция сложения.
     /// Включает в себя, кроме прочего, сложение
@@ -194,6 +200,11 @@ public sealed class BinaryNode
             return result;
         }
 
+        // Обратите внимание: благодаря магии DLR
+        // работают такие неочевидные вещи как
+        // `"1" + 2` или `1 + "2"`.
+        // В принципе, они работают и в C#, но вдруг
+        // для кого-нибудь это будет открытием.
         return left + right;
     }
 
@@ -247,6 +258,7 @@ public sealed class BinaryNode
 
         if (left is string leftString && right is string rightString)
         {
+            // строки сравниваются без учета культуры
             return string.CompareOrdinal (leftString, rightString) < 0;
         }
 
@@ -265,6 +277,7 @@ public sealed class BinaryNode
 
         if (left is string leftString && right is string rightString)
         {
+            // строки сравниваются без учета культуры
             return string.CompareOrdinal (leftString, rightString) <= 0;
         }
 
@@ -283,6 +296,7 @@ public sealed class BinaryNode
 
         if (left is string leftString && right is string rightString)
         {
+            // строки сравниваются без учета культуры
             return string.CompareOrdinal (leftString, rightString) > 0;
         }
 
@@ -301,13 +315,14 @@ public sealed class BinaryNode
 
         if (left is string leftString && right is string rightString)
         {
+            // строки сравниваются без учета культуры
             return string.CompareOrdinal (leftString, rightString) >= 0;
         }
 
         // return left >= right;
         return OmnipotentComparer.Default.Compare (left, right) >= 0;
     }
-    
+
     /// <summary>
     /// Расширенная операция сравнение на равенство.
     /// </summary>
@@ -322,13 +337,14 @@ public sealed class BinaryNode
 
         if (left is string leftString && right is string rightString)
         {
+            // строки сравниваются без учета культуры
             return string.CompareOrdinal (leftString, rightString) == 0;
         }
 
         // return left == right;
         return OmnipotentComparer.Default.Compare (left, right) == 0;
     }
-    
+
     /// <summary>
     /// Расширенная операция "В".
     /// </summary>
@@ -411,37 +427,7 @@ public sealed class BinaryNode
         // TODO дополнить полезными расширениями
         return left >> right;
     }
-    
-    /// <summary>
-    /// Расширенная операция сдвига влево.
-    /// </summary>
-    private static dynamic LeftShift2
-        (
-            Context context,
-            dynamic? left,
-            dynamic? right
-        )
-    {
-        context.NotUsed();
 
-        throw new NotImplementedException();
-    }
-
-    /// <summary>
-    /// Расширенная операция сдвига вправо.
-    /// </summary>
-    private static dynamic? RightShift2
-        (
-            Context context,
-            dynamic? left,
-            dynamic? right
-        )
-    {
-        context.NotUsed();
-
-        throw new NotImplementedException();
-    }
-    
     /// <summary>
     /// Проверка приводимости типа.
     /// </summary>
@@ -482,7 +468,7 @@ public sealed class BinaryNode
 
         return leftType.IsAssignableTo (rightType);
     }
-    
+
     /// <summary>
     /// Равенство адресов в памяти.
     /// </summary>
@@ -518,11 +504,38 @@ public sealed class BinaryNode
         }
 
         var pattern = KotikUtility.ToString ((object?) right);
+        var timeout = TimeSpan.FromSeconds (1);
 
-        return Regex.IsMatch (input, pattern);
+        return Regex.IsMatch (input, pattern, RegexOptions.None, timeout);
     }
 
-    private static dynamic? Coalesce
+    // TODO задействовать для чего-нибудь другого
+    // /// <summary>
+    // /// Оператор слияния `1 ?? 2`.
+    // /// Возвращает первый из аргументов, не выдающий ложь
+    // /// с точки зрения Барсика. Если все аргументы ложны,
+    // /// выдает последний из них.
+    // /// </summary>
+    // private static dynamic? Coalesce
+    //     (
+    //         Context context,
+    //         dynamic? left,
+    //         dynamic? right
+    //     )
+    // {
+    //     context.NotUsed();
+    //
+    //     var result = KotikUtility.ToBoolean (left) ? left : right;
+    //
+    //     return result;
+    // }
+
+    /// <summary>
+    /// Оператор "или". Работает по-питоновски:
+    /// `"a" || "b"` выдает `"a"`,
+    /// `"" || "b"` выдает `"b"`.
+    /// </summary>
+    private static dynamic? Or
         (
             Context context,
             dynamic? left,
@@ -532,6 +545,25 @@ public sealed class BinaryNode
         context.NotUsed();
 
         var result = KotikUtility.ToBoolean (left) ? left : right;
+
+        return result;
+    }
+
+    /// <summary>
+    /// Оператор "и". Работает по-питоновски:
+    /// `"a" &amp;&amp; "b"` выдает `"b"`,
+    /// `"" &amp;&amp; "b"` выдает `""`.
+    /// </summary>
+    private static dynamic? And
+        (
+            Context context,
+            dynamic? left,
+            dynamic? right
+        )
+    {
+        context.NotUsed();
+
+        var result = KotikUtility.ToBoolean (right) ? left : right;
 
         return result;
     }
@@ -566,12 +598,10 @@ public sealed class BinaryNode
             "!==" => !StrictEquality (context, left, right),
             "<<" => LeftShift (context, left, right),
             ">>" => RightShift (context, left, right),
-            "<<<" => LeftShift2 (context, left, right),
-            ">>>" => RightShift2 (context, left, right),
             "|" => left | right,
-            "||" => left || right,
+            "||" => Or (context, left, right),
             "&" => left & right,
-            "&&" => left && right,
+            "&&" => And (context, left, right),
             "^" => left ^ right,
             "^^" => KotikUtility.ToBoolean (left) != KotikUtility.ToBoolean (right),
             "~" => throw new NotImplementedException(),
@@ -582,8 +612,9 @@ public sealed class BinaryNode
             "same" => Same (context, left, right),
             "<=>" => Shuttle (context, left, right),
             "<:>" => throw new NotImplementedException(),
+            "<+>" => throw new NotImplementedException(),
             "@" => throw new NotImplementedException(),
-            "??" => Coalesce (context, left, right),
+            // "??" => Coalesce (context, left, right),
             _ => throw new InvalidOperationException ($"Unknown operator {_operation}")
         };
 
@@ -622,7 +653,7 @@ public sealed class BinaryNode
                     Name = "operation",
                     Description = _operation
                 },
-                
+
                 _left.GetNodeInfo().WithName ("left"),
                 _right.GetNodeInfo().WithName ("right")
             }

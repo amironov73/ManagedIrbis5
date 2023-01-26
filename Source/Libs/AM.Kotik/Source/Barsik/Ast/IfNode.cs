@@ -14,6 +14,7 @@
 
 #region Using directives
 
+using System.Collections.Generic;
 using System.IO;
 
 #endregion
@@ -55,14 +56,14 @@ internal sealed class IfNode
             int line,
             AtomNode condition,
             StatementBase thenBlock,
-            IfNode[]? elseIfArray, 
+            IList<IfNode>? elseIfArray,
             StatementBase? elseBlock
         )
         : base (line)
     {
         Sure.NotNull (condition);
         Sure.NotNull (thenBlock);
-        
+
         _condition = condition;
         _elseIfArray = elseIfArray;
         _thenBlock = thenBlock;
@@ -75,7 +76,7 @@ internal sealed class IfNode
 
     private readonly AtomNode _condition;
     private readonly StatementBase _thenBlock;
-    private readonly IfNode[]? _elseIfArray;
+    private readonly IList<IfNode>? _elseIfArray;
     private readonly StatementBase? _elseBlock;
 
     #endregion

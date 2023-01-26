@@ -16,6 +16,7 @@
 
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 using AM.Kotik.Barsik.Diagnostics;
 
@@ -43,7 +44,9 @@ public sealed class BlockNode
         )
         : base (line)
     {
-        _statements = statements;
+        _locals = new ();
+        _functions = new ();
+        _statements = ExtractPseudoNodes (statements);
     }
 
     #endregion
@@ -51,6 +54,40 @@ public sealed class BlockNode
     #region Private members
 
     private readonly IList<StatementBase> _statements;
+    private readonly List<LocalNode> _locals;
+    private readonly List<FunctionDefinitionNode> _functions;
+
+    private IList<StatementBase> ExtractPseudoNodes
+        (
+            IList<StatementBase> statements
+        )
+    {
+        if (!statements.Any (x => x is PseudoNode))
+        {
+            return statements;
+        }
+
+        var result = new List<StatementBase>();
+        foreach (var statement in statements)
+        {
+            switch (statement)
+            {
+                case LocalNode localNode:
+                    _locals.Add (localNode);
+                    break;
+
+                case FunctionDefinitionNode functionNode:
+                    _functions.Add (functionNode);
+                    break;
+
+                default:
+                    result.Add (statement);
+                    break;
+            }
+        }
+
+        return result;
+    }
 
     private int? FindLabel
         (
@@ -80,6 +117,13 @@ public sealed class BlockNode
         )
     {
         PreExecute (context);
+
+        foreach (var local in _locals)
+        {
+            context = local.ApplyTo (context);
+        }
+
+        context = KotikUtility.ApplyFunctionDefinitions (context, _functions);
 
         var index = 0;
         while (index < _statements.Count)

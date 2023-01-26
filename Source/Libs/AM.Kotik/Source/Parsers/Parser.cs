@@ -78,13 +78,13 @@ public abstract class Parser<TResult>
     /// В прочих случаях можно без проблем использовать метод.
     /// <see cref="Labeled"/>.
     /// </summary>
-    public Parser<TResult> Instance 
+    public Parser<TResult> Instance
         (
             string label
         )
     {
         Sure.NotNullNorEmpty (label);
-        
+
         return new ParserInstance<TResult> (this, label);
     }
 
@@ -101,7 +101,7 @@ public abstract class Parser<TResult>
         )
     {
         Sure.NotNull (label);
-        
+
         Label = label;
 
         return this;
@@ -116,7 +116,7 @@ public abstract class Parser<TResult>
         )
     {
         Sure.NotNull (other);
-        
+
         return new OneOfParser<TResult> (this, other);
     }
 
@@ -131,7 +131,7 @@ public abstract class Parser<TResult>
     {
         Sure.NotNull (other1);
         Sure.NotNull (other2);
-        
+
         return new OneOfParser<TResult> (this, other1, other2);
     }
 
@@ -148,7 +148,7 @@ public abstract class Parser<TResult>
         Sure.NotNull (other1);
         Sure.NotNull (other2);
         Sure.NotNull (other3);
-        
+
         return new OneOfParser<TResult> (this, other1, other2, other3);
     }
 
@@ -161,7 +161,7 @@ public abstract class Parser<TResult>
         )
     {
         Sure.AssertState (!others.IsNullOrEmpty());
-        
+
         var list = new List<Parser<TResult>> (others);
         list.Insert (0, this);
 
@@ -177,7 +177,7 @@ public abstract class Parser<TResult>
         )
     {
         Sure.NotNull (state);
-        
+
         if (!TryParse (state, out var temporary))
         {
             return Result<TResult>.Failure();
@@ -195,7 +195,7 @@ public abstract class Parser<TResult>
         )
     {
         Sure.NotNull (state);
-        
+
         if (!TryParse (state, out var temporary))
         {
             throw new SyntaxException (state);
@@ -207,7 +207,7 @@ public abstract class Parser<TResult>
     /// <summary>
     /// Парсинг последовательности однообразных токенов.
     /// </summary>
-    public Parser<IEnumerable<TResult>> Repeated
+    public Parser<IList<TResult>> Repeated
         (
             int minCount = 0,
             int maxCount = int.MaxValue
@@ -215,14 +215,14 @@ public abstract class Parser<TResult>
     {
         Sure.NonNegative (minCount);
         Sure.NonNegative (maxCount);
-        
+
         return new RepeatParser<TResult> (this, minCount, maxCount);
     }
 
     /// <summary>
     /// Парсинг разделенных однообразных токенов.
     /// </summary>
-    public Parser<IEnumerable<TResult>> SeparatedBy<TSeparator>
+    public Parser<IList<TResult>> SeparatedBy<TSeparator>
         (
             Parser<TSeparator> separator,
             int minCount = 0,
@@ -233,13 +233,13 @@ public abstract class Parser<TResult>
         Sure.NotNull (separator);
         Sure.NonNegative (minCount);
         Sure.NonNegative (maxCount);
-        
-        return new SeparatedParser<TResult, TSeparator, string> 
+
+        return new SeparatedParser<TResult, TSeparator, string>
             (
-                itemParser: this, 
+                itemParser: this,
                 separator,
-                delimiterParser: null, 
-                minCount, 
+                delimiterParser: null,
+                minCount,
                 maxCount
             );
     }
@@ -247,7 +247,7 @@ public abstract class Parser<TResult>
     /// <summary>
     /// Парсинг разделенных однообразных токенов.
     /// </summary>
-    public Parser<IEnumerable<TResult>> SeparatedBy<TSeparator, TDelimiter>
+    public Parser<IList<TResult>> SeparatedBy<TSeparator, TDelimiter>
         (
             Parser<TSeparator> separator,
             Parser<TDelimiter> delimiter,
@@ -261,13 +261,13 @@ public abstract class Parser<TResult>
         Sure.NotNull (delimiter);
         Sure.NonNegative (minCount);
         Sure.NonNegative (maxCount);
-        
-        return new SeparatedParser<TResult, TSeparator, TDelimiter> 
+
+        return new SeparatedParser<TResult, TSeparator, TDelimiter>
             (
-                this, 
+                this,
                 separator,
-                delimiter, 
-                minCount, 
+                delimiter,
+                minCount,
                 maxCount
             );
     }
@@ -779,6 +779,18 @@ public static class Parser
     public static Parser<TResult> OneOf<TResult>
         (
             params Parser<TResult>[] parsers
+        )
+        where TResult : class
+    {
+        return new OneOfParser<TResult> (parsers);
+    }
+
+    /// <summary>
+    /// Парсинг альтернатив.
+    /// </summary>
+    public static Parser<TResult> OneOf<TResult>
+        (
+            IList<Parser<TResult>> parsers
         )
         where TResult : class
     {

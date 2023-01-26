@@ -11,6 +11,7 @@
 
 #region Using directives
 
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 #endregion
@@ -42,11 +43,25 @@ public sealed class OneOfParser<TResult>
         _alternatives = alternatives;
     }
 
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public OneOfParser
+        (
+            IList<Parser<TResult>> alternatives
+        )
+    {
+        Sure.NotNull (alternatives);
+        Sure.AssertState (alternatives.Count != 0);
+
+        _alternatives = alternatives;
+    }
+
     #endregion
 
     #region Private members
 
-    private readonly Parser<TResult>[] _alternatives;
+    private readonly IList<Parser<TResult>> _alternatives;
 
     #endregion
 

@@ -39,7 +39,7 @@ internal sealed class MethodNode
         (
             AtomNode thisObject,
             string methodName,
-            AtomNode[] arguments
+            IList<AtomNode> arguments
         )
     {
         Sure.NotNull (thisObject);
@@ -57,7 +57,7 @@ internal sealed class MethodNode
 
     private readonly AtomNode _thisObject;
     private readonly string _methodName;
-    private readonly AtomNode[] _arguments;
+    private readonly IList<AtomNode> _arguments;
 
     #endregion
 

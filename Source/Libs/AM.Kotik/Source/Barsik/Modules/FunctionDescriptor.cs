@@ -75,10 +75,8 @@ public sealed class FunctionDescriptor
     #region Object members
 
     /// <inheritdoc cref="object.ToString"/>
-    public override string ToString()
-    {
-        return Name;
-    }
+    public override string ToString() =>
+        Utility.JoinNonEmpty (": ", Name, Description);
 
     #endregion
 }

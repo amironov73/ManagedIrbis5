@@ -12,7 +12,7 @@
 #region Using directives
 
 using System;
-using System.Linq;
+using System.Collections.Generic;
 
 #endregion
 
@@ -33,7 +33,7 @@ sealed class FunctionDefinition
     public FunctionDefinition
         (
             string name,
-            string[] arguments,
+            IList<string> arguments,
             StatementBase body
         )
     {
@@ -42,7 +42,7 @@ sealed class FunctionDefinition
         Sure.NotNull (body);
 
         _name = name;
-        _arguments = arguments.ToArray();
+        _arguments = arguments;
         _body = body;
     }
 
@@ -54,7 +54,7 @@ sealed class FunctionDefinition
     private readonly string _name;
 
     // имена аргументов
-    private readonly string[] _arguments;
+    private readonly IList<string> _arguments;
 
     // тело функции
     private readonly StatementBase _body;

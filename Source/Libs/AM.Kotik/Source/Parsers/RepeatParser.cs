@@ -23,7 +23,7 @@ namespace AM.Kotik;
 /// Парсер для повторяющихся значений.
 /// </summary>
 public sealed class RepeatParser<TResult>
-    : Parser<IEnumerable<TResult>>
+    : Parser<IList<TResult>>
     where TResult: class
 {
     #region Construction
@@ -63,7 +63,7 @@ public sealed class RepeatParser<TResult>
     public override bool TryParse
         (
             ParseState state,
-            out IEnumerable<TResult> result
+            out IList<TResult> result
         )
     {
         using var _ = state.Enter (this);

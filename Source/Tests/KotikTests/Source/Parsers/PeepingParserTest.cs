@@ -50,7 +50,7 @@ public sealed class PeepingParserTest
         var state = _GetState ("hello world!");
         var bang = Parser.Term ("!");
         var identifier = Parser.Identifier;
-        var parser = new PeepingParser<string, IEnumerable<string>>
+        var parser = new PeepingParser<string, IList<string>>
             (
                 bang,
                 identifier.Repeated()

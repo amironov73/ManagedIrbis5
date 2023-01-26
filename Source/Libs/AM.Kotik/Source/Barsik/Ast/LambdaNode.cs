@@ -83,6 +83,11 @@ internal sealed class LambdaNode
 
             body.Execute (lambdaContext);
         }
+        catch (GotoException exception)
+        {
+            // не позволяем goto сбежать из лямбды
+            throw new BarsikException ($"Can't find label {exception.Label}");
+        }
         catch (ReturnException exception)
         {
             return exception.Value;
@@ -119,6 +124,11 @@ internal sealed class LambdaNode
             }
 
             body.Execute (innerContext);
+        }
+        catch (GotoException exception)
+        {
+            // не позволяем goto сбежать из лямбды
+            throw new BarsikException ($"Can't find label {exception.Label}");
         }
         catch (ReturnException exception)
         {
