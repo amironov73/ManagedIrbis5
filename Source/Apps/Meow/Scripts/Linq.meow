@@ -1,0 +1,12 @@
+﻿numbers = [3, 4, 1, 2, 5, 0, 7, 6]
+
+evenTen = from x in numbers
+where x % 2 == 0 && x > 0
+orderby x descending
+select x * 10
+
+println (evenTen)
+
+asArray = to_array (evenTen)
+asArray = sort (asArray)
+println (asArray)

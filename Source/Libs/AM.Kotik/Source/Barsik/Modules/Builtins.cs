@@ -165,6 +165,8 @@ public static class Builtins
         { "println", new FunctionDescriptor ("println", PrintLine) },
         { "readln", new FunctionDescriptor ("readln", ReadLine) },
         { "reduce", new FunctionDescriptor ("reduce", Reduce, false) },
+        { "sort", new FunctionDescriptor ("reduce", Sort) },
+        { "to_array", new FunctionDescriptor ("to_array", ToArray) },
         { "trace", new FunctionDescriptor ("trace", Trace_) },
         { "trim", new FunctionDescriptor ("trim", Trim) },
         { "warn", new FunctionDescriptor ("warn", Warn) },
@@ -960,6 +962,72 @@ public static class Builtins
         return result;
     }
 
+    /// <summary>
+    /// Сортировка.
+    /// </summary>
+    public static dynamic Sort
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var result = new BarsikList();
+
+        if (Compute (context, args, 0) is IEnumerable enumerable)
+        {
+            foreach (var item in enumerable)
+            {
+                result.Add (item);
+            }
+        }
+        else
+        {
+            foreach (var item in args)
+            {
+                result.Add (item);
+            }
+        }
+
+        result.Sort ((left, right) =>
+            OmnipotentComparer.Default.Compare (left, right));
+
+        return result;
+    }
+
+    /// <summary>
+    /// Формирование массива из последовательности.
+    /// </summary>
+    public static dynamic? ToArray
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (args.Length == 0)
+        {
+            return Array.Empty<object>();
+        }
+
+        var value = Compute (context, args, 0);
+
+        var result = new List<dynamic?>();
+        if (value is IEnumerable enumerable)
+        {
+            foreach (var item in enumerable)
+            {
+                result.Add (item);
+            }
+
+            return result.ToArray();
+        }
+
+        foreach (var item in args)
+        {
+            result.Add (item);
+        }
+
+        return null;
+    }
 
     /// <summary>
     /// Трассировочное сообщение.

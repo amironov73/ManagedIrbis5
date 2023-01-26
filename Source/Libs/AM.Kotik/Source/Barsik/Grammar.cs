@@ -8,6 +8,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable RedundantSuppressNullableWarningExpression
 // ReSharper disable StaticMemberInitializerReferesToMemberBelow
+// ReSharper disable StringLiteralTypo
 
 /* Grammar.cs -- грамматика языка
  * Ars Magna project, http://arsmagna.ru
@@ -249,6 +250,26 @@ public sealed class Grammar
         var awaitOperator = Expression.After (Reserved ("await"))
             .Map (x => (AtomNode)new AwaitNode (x));
 
+        var orderBy = Parser.Chain
+            (
+                Expression.After (Reserved ("orderby")),
+                Reserved ("descending").Optional(),
+                (clause, descending) =>
+                    new LinqNode.OrderClause (clause, !string.IsNullOrEmpty (descending))
+            );
+
+        var linq = Parser.Chain
+            (
+                Identifier.After (Reserved ("from")),
+                Atom.After (Term ("in")),
+                Expression.After (Reserved ("where")).Optional(),
+                orderBy.Optional(),
+                Expression.After (Reserved ("select")),
+                (name, sequence, whereClause, orderClause, selectClause) =>
+                    (AtomNode) new LinqNode (name, sequence, whereClause, orderClause, selectClause)
+            )
+            .Labeled ("Linq");
+
         Atoms.Add (Literal);
         Atoms.Add (Format);
         Atoms.Add (ternary);
@@ -259,6 +280,7 @@ public sealed class Grammar
         Atoms.Add (newOperator);
         Atoms.Add (throwOperator);
         Atoms.Add (awaitOperator);
+        Atoms.Add (linq);
         Atoms.Add (lambda);
 
         //===================================================
@@ -564,7 +586,8 @@ public sealed class Grammar
                 Term ("}"),
                 (position, value, cases, defaultCase, _) =>
                     (StatementBase) new SwitchNode (position.Line, value, cases, defaultCase)
-            ).Labeled ("Switch");
+            )
+            .Labeled ("Switch");
 
         Statements.Add (labelStatement);
         Statements.Add (simpleStatement);
