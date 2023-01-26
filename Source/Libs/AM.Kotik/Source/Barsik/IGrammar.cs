@@ -66,6 +66,16 @@ public interface IGrammar
         );
 
     /// <summary>
+    /// Разбор текста стейтмента.
+    /// </summary>
+    StatementBase ParseStatement
+        (
+            string sourceCode,
+            Tokenizer tokenizer,
+            TextWriter? debugOutput = null
+        );
+
+    /// <summary>
     /// Разбор программы.
     /// </summary>
     ProgramNode ParseProgram

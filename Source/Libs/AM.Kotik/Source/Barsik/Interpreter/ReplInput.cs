@@ -16,6 +16,7 @@
 #region Using directives
 
 using System.IO;
+using System.Text;
 
 #endregion
 
@@ -37,24 +38,46 @@ public sealed class ReplInput
         (
             TextReader reader,
             TextWriter writer,
-            IGrammar? grammar
+            Interpreter interpreter
         )
     {
         Sure.NotNull (reader);
         Sure.NotNull (writer);
+        Sure.NotNull (interpreter);
 
         _reader = reader;
         _writer = writer;
-        _grammar = grammar;
+        _interpreter = interpreter;
     }
 
     #endregion
 
     #region Private members
 
-    private readonly IGrammar? _grammar;
+    private readonly Interpreter _interpreter;
     private readonly TextReader _reader;
     private readonly TextWriter _writer;
+
+    private bool CheckExpression
+        (
+            StringBuilder expression
+        )
+    {
+        try
+        {
+            _interpreter.Grammar.ParseStatement
+                (
+                    expression.ToString(),
+                    _interpreter.Tokenizer
+                );
+        }
+        catch
+        {
+            return false;
+        }
+
+        return true;
+    }
 
     #endregion
 
@@ -63,21 +86,40 @@ public sealed class ReplInput
     /// <summary>
     /// Ввод строки.
     /// </summary>
-    public string? ReadLine
-        (
-            string? firstPrompt,
-            string? continuePrompt
-        )
+    public string ReadLine()
     {
-        _grammar.NotUsed();
-        continuePrompt.NotUsed();
-
-        if (!string.IsNullOrEmpty (firstPrompt))
+        var builder = new StringBuilder();
+        var first = true;
+        while (true)
         {
-            _writer.Write (firstPrompt);
+            var prompt = first ? _interpreter.Settings.MainPrompt
+                : _interpreter.Settings.SecondaryPrompt;
+            if (!string.IsNullOrEmpty (prompt))
+            {
+                _writer.Write (prompt);
+            }
+
+            first = false;
+
+            var line = _reader.ReadLine();
+            if (string.IsNullOrEmpty (line))
+            {
+                break;
+            }
+
+            if (builder.Length != 0)
+            {
+                builder.AppendLine();
+            }
+
+            builder.Append (line);
+            if (CheckExpression (builder))
+            {
+                break;
+            }
         }
 
-        return _reader.ReadLine();
+        return builder.ToString();
     }
 
     #endregion

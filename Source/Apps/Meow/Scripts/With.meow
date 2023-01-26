@@ -1,8 +1,8 @@
 ﻿builder = new System.Text.StringBuilder()
 builder.Append ("Hello")
-with (builder)
+with builder
 {
-    .Capacity = 10
+    .Capacity = 10; // точка с запятой нужна!
     .Length = 0
 }
 

@@ -669,6 +669,25 @@ public sealed class Grammar
     }
 
     /// <summary>
+    /// Разбор текста стейтмента.
+    /// </summary>
+    public StatementBase ParseStatement
+        (
+            string sourceCode,
+            Tokenizer tokenizer,
+            TextWriter? debugOutput = null
+        )
+    {
+        Sure.NotNull (sourceCode);
+
+        var tokens = tokenizer.Tokenize (sourceCode);
+        var state = new ParseState (tokens) { DebugOutput = debugOutput };
+        var result = GenericStatement.End().ParseOrThrow (state);
+
+        return result;
+    }
+
+    /// <summary>
     /// Разбор программы.
     /// </summary>
     public ProgramNode ParseProgram

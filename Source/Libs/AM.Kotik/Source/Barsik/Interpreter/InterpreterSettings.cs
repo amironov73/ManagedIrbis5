@@ -94,6 +94,18 @@ public sealed class InterpreterSettings
     [JsonPropertyName ("use-namespaces")]
     public List<string> UseNamespaces { get; set; }
 
+    /// <summary>
+    /// Основное приглашение к вводу.
+    /// </summary>
+    [JsonPropertyName ("main-prompt")]
+    public string? MainPrompt { get; set; }
+
+    /// <summary>
+    /// Дополнительное приглашение к вводу.
+    /// </summary>
+    [JsonPropertyName ("secondary-prompt")]
+    public string? SecondaryPrompt { get; set; }
+
     #endregion
 
     #region Construciton
@@ -106,6 +118,8 @@ public sealed class InterpreterSettings
         LoadAssemblies = new ();
         ScriptFiles = new ();
         UseNamespaces = new ();
+        MainPrompt = "> ";
+        SecondaryPrompt = "... ";
     }
 
     #endregion

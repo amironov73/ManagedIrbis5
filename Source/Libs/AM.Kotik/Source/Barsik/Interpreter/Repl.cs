@@ -107,7 +107,7 @@ public sealed class Repl
         error ??= Console.Error;
         Interpreter = new Interpreter (Input, output, error);
         Echo = true;
-        _input = new ReplInput (Input, output, null);
+        _input = new ReplInput (Input, output, Interpreter);
     }
 
     /// <summary>
@@ -123,7 +123,12 @@ public sealed class Repl
         Interpreter = interpreter;
         Input = input ?? interpreter.Context.Input;
         Echo = true;
-        _input = new ReplInput (Input, interpreter.Context.Output, interpreter.Grammar);
+        _input = new ReplInput
+            (
+                Input,
+                interpreter.Context.Output,
+                interpreter
+            );
     }
 
     #endregion
@@ -131,31 +136,6 @@ public sealed class Repl
     #region Private members
 
     private readonly ReplInput _input;
-
-    private ExecutionResult ExecuteCore
-        (
-            string line
-        )
-    {
-        Sure.NotNull (line);
-
-        try
-        {
-            return Interpreter.Execute (line);
-
-        }
-        catch (Exception)
-        {
-            if (!line.Contains (';'))
-            {
-                return Interpreter.Execute (line + ";");
-            }
-            else
-            {
-                throw;
-            }
-        }
-    }
 
     #endregion
 
@@ -231,7 +211,7 @@ public sealed class Repl
                     break;
 
                 default:
-                    ExecuteCore (sourceCode);
+                    Interpreter.Execute (sourceCode);
                     break;
             }
         }
@@ -250,11 +230,10 @@ public sealed class Repl
 
         while (true)
         {
-            // TODO брать приглашение из interpreter.Settings
-            var line = _input.ReadLine ("> ", "... ");
+            var line = _input.ReadLine ();
             if (string.IsNullOrWhiteSpace (line))
             {
-                if ((++emptyLineCounter) == 2)
+                if (++emptyLineCounter == 2)
                 {
                     break;
                 }
