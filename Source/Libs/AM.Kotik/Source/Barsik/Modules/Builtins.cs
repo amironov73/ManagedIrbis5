@@ -157,7 +157,6 @@ public static class Builtins
         { "have_var", new FunctionDescriptor ("havevar", HaveVariable, false) },
         { "iif", new FunctionDescriptor ("iif", Iif) },
         { "len", new FunctionDescriptor ("len", Length) },
-        { "local", new FunctionDescriptor ("local", Local, false) },
         { "map", new FunctionDescriptor ("map", Map, false) },
         { "max", new FunctionDescriptor ("max", Max) },
         { "min", new FunctionDescriptor ("min", Min) },
@@ -690,40 +689,6 @@ public static class Builtins
         var value = Compute (context, args, 0);
 
         return KotikUtility.GetLength (value);
-    }
-
-    /// <summary>
-    /// Введение локальных переменных.
-    /// </summary>
-    public static dynamic? Local
-        (
-            Context context,
-            dynamic?[] args
-        )
-    {
-        for (var i = 0; i < args.Length; i++)
-        {
-            if (args[i] is VariableNode node)
-            {
-                var name = node.Name;
-                if (!string.IsNullOrEmpty (name)
-                    && !context.Variables.ContainsKey (name))
-                {
-                    context.Variables[name] = null;
-                }
-            }
-            else
-            {
-                var name = Compute (context, args, i) as string;
-                if (!string.IsNullOrEmpty (name)
-                    && !context.Variables.ContainsKey (name))
-                {
-                    context.Variables[name] = null;
-                }
-            }
-        }
-
-        return null;
     }
 
     /// <summary>

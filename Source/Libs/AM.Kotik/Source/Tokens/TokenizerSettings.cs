@@ -96,14 +96,15 @@ public sealed class TokenizerSettings
             "byte", "case", "catch", "char", "checked", "class", "const",
             "continue", "decimal", "default", "delegate", "do", "double",
             "else", "enum", "event", "explicit", "extern", "false", "finally",
-            "fixed", "float", "for", "foreach", "func", "goto", "if", "implicit",
-            "in", "int", "interface", "internal", "is", "lambda", "local", "lock",
-            "long", "namespace", "new", "null", "object", "operator", "or", "out",
-            "override", "params", "private", "protected", "public", "readonly",
-            "ref", "return", "sbyte", "sealed", "short", "sizeof", "stackalloc",
-            "static", "string", "struct", "switch", "this", "throw", "true",
-            "try", "typeof", "uint", "ulong", "unchecked", "unsafe", "ushort",
-            "using", "virtual", "void", "volatile", "while", "with"
+            "fixed", "float", "for", "foreach", "from", "func", "goto", "groupby",
+            "if", "implicit", "in", "int", "interface", "internal", "is", "lambda",
+            "local", "lock", "long", "namespace", "new", "null", "object",
+            "operator", "or", "orderby", "out", "override", "params", "private",
+            "protected", "public", "readonly", "ref", "return", "sbyte", "sealed",
+            "select", "short", "sizeof", "stackalloc", "static", "string", "struct",
+            "switch", "this", "throw", "true", "try", "typeof", "uint", "ulong",
+            "unchecked", "unsafe", "ushort", "using", "virtual", "void", "volatile",
+            "where", "while", "with"
         };
     }
 

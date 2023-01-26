@@ -25,6 +25,15 @@ using System.IO;
 
 namespace AM.Kotik.Barsik;
 
+/*
+   Незадействованные операции
+
+   ?? и ???
+   \
+   <+> и аналоги
+
+ */
+
 /// <summary>
 /// Грамматика языка.
 /// </summary>
@@ -391,15 +400,15 @@ public sealed class Grammar
             .Labeled ("For");
 
         var forEachStatement = Parser.Chain
-                (
-                    Parser.Position.Before (Reserved ("foreach")),
-                    Identifier.After (Parser.Term ("(")),
-                    Expression.After (Term ("in")),
-                    Block.After (Parser.Term (")")),
-                    Block.Before (Reserved ("else")).Optional(),
-                    (position, name, sequence, body, elseBlock) =>
-                        (StatementBase) new ForEachNode (position.Line, name, sequence, body, elseBlock)
-                )
+            (
+                Parser.Position.Before (Reserved ("foreach")),
+                Identifier.After (Parser.Term ("(")),
+                Expression.After (Term ("in")),
+                Block.After (Parser.Term (")")),
+                Block.Before (Reserved ("else")).Optional(),
+                (position, name, sequence, body, elseBlock) =>
+                    (StatementBase) new ForEachNode (position.Line, name, sequence, body, elseBlock)
+            )
             .Labeled ("ForEach");
 
         var breakStatement = Parser.Position.Before (Reserved ("break"))
@@ -528,6 +537,35 @@ public sealed class Grammar
             )
             .Labeled ("Local");
 
+        var caseClause = Parser.Chain
+            (
+                Reserved ("case"),
+                Atom.Before (Term (":")),
+                Block,
+                (_, condition, body) => new CaseNode (condition, body)
+            )
+            .Labeled ("Case");
+
+        var defaultClause = Parser.Chain
+            (
+                Reserved ("default"),
+                Term (":"),
+                Block,
+                (_, _, body) => body
+            )
+            .Labeled ("Default");
+
+        var switchStatement = Parser.Chain
+            (
+                Parser.Position.Before (Reserved ("switch")),
+                Expression.RoundBrackets().Before (Term ("{")),
+                caseClause.Repeated(),
+                defaultClause.Optional(),
+                Term ("}"),
+                (position, value, cases, defaultCase, _) =>
+                    (StatementBase) new SwitchNode (position.Line, value, cases, defaultCase)
+            ).Labeled ("Switch");
+
         Statements.Add (labelStatement);
         Statements.Add (simpleStatement);
         Statements.Add (forStatement);
@@ -545,6 +583,7 @@ public sealed class Grammar
         Statements.Add (withAssignment);
         Statements.Add (gotoStatement);
         Statements.Add (localStatement);
+        Statements.Add (switchStatement);
         Statements.Add (semicolonStatement);
     }
 
