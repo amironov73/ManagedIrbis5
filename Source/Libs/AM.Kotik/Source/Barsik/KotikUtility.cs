@@ -106,6 +106,7 @@ public static class KotikUtility
         result.Tokenizers.Add (new StringTokenizer());
         result.Tokenizers.Add (new FormatTokenizer());
         result.Tokenizers.Add (new ExternalTokenizer());
+        result.Tokenizers.Add (new HexTokenizer());
         result.Tokenizers.Add (new NumberTokenizer());
         result.Tokenizers.Add (new TermTokenizer());
         result.Tokenizers.Add (new IdentifierTokenizer());

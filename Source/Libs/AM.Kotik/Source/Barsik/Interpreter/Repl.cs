@@ -152,7 +152,7 @@ public sealed class Repl
     {
         try
         {
-            var node = Interpreter.Evaluate (sourceCode);
+            var node = Interpreter.EvaluateAtom (sourceCode);
             if (node != null!)
             {
                 result = node.Compute (Context);

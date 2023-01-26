@@ -46,9 +46,9 @@ public sealed class Interpreter
     /// </summary>
     public static string AssemblyVersion = ThisAssembly.AssemblyVersion;
 
-        /// <summary>
-        /// Версия сборки.
-        /// </summary>
+    /// <summary>
+    /// Версия сборки.
+    /// </summary>
     public static string FileVersion = ThisAssembly.AssemblyFileVersion;
 
     /// <summary>
@@ -269,7 +269,7 @@ public sealed class Interpreter
     /// <summary>
     /// Вычисление значения переменной.
     /// </summary>
-    public AtomNode Evaluate
+    public AtomNode EvaluateAtom
         (
             string sourceCode
         )

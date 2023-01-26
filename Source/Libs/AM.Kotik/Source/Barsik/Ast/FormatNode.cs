@@ -67,7 +67,7 @@ internal sealed class FormatNode
             result.Append (specification.Prefix);
             if (!string.IsNullOrEmpty (specification.Value))
             {
-                var atom = interpreter.Evaluate (specification.Value);
+                var atom = interpreter.EvaluateAtom (specification.Value);
                 var value = atom.Compute (context);
                 if (value is not null)
                 {

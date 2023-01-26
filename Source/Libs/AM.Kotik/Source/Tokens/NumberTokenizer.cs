@@ -48,41 +48,6 @@ public sealed class NumberTokenizer
         }
 
         builder = new StringBuilder();
-
-        // префикс '0x'
-        if (chr == '0' && _navigator.LookAhead (1) is 'x')
-        {
-            ReadChar();
-            ReadChar();
-
-            var hex = TokenKind.Hex32;
-            while (!IsEof)
-            {
-                chr = PeekChar();
-
-                if (chr is '_')
-                {
-                    ReadChar();
-                    continue;
-                }
-
-                if (!"0123456789ABCDEFabcdef".Contains (chr))
-                {
-                    break;
-                }
-
-                builder.Append (ReadChar());
-            }
-
-            if (chr is 'L' or 'l')
-            {
-                ReadChar();
-                hex = TokenKind.Hex64;
-            }
-
-            return new Token (hex, builder.ToString(), line, column);
-        }
-
         while (!IsEof)
         {
             chr = PeekChar();
