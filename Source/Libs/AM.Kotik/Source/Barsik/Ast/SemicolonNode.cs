@@ -11,7 +11,7 @@
 
 #nullable enable
 
-namespace AM.Kotik.Barsik;
+namespace AM.Kotik.Barsik.Ast;
 
 /// <summary>
 /// Псевдо-узел AST: точка с запятой.

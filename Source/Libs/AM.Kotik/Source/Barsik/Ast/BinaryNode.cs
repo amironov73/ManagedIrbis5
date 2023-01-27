@@ -23,7 +23,7 @@ using AM.Text;
 
 #nullable enable
 
-namespace AM.Kotik.Barsik;
+namespace AM.Kotik.Barsik.Ast;
 
 /// <summary>
 /// Бинарная инфиксная операция, например, сложение.

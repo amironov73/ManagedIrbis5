@@ -18,7 +18,7 @@ using System.IO;
 
 #nullable enable
 
-namespace AM.Kotik.Barsik;
+namespace AM.Kotik.Barsik.Ast;
 
 /// <summary>
 /// Блок try-catch-finally
@@ -28,10 +28,31 @@ internal sealed class TryNode
 {
     #region NestedTypes
 
-    /// <summary>
-    /// Блок catch.
-    /// </summary>
-    public sealed record CatchBlock (string Name, StatementBase Body);
+    internal sealed class CatchBlock
+        : AstNode
+    {
+        #region Properties
+
+        public string Name { get; }
+
+        public StatementBase Body { get; }
+
+        #endregion
+
+        #region Construction
+
+        public CatchBlock
+            (
+                string name,
+                StatementBase body
+            )
+        {
+            Name = name;
+            Body = body;
+        }
+
+        #endregion
+    }
 
     #endregion
 

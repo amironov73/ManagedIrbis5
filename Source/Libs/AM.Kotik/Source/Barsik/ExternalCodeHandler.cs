@@ -9,6 +9,12 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
+#region Using directive
+
+using AM.Kotik.Barsik.Ast;
+
+#endregion
+
 #nullable enable
 
 namespace AM.Kotik.Barsik;

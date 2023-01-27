@@ -18,7 +18,7 @@ using System.Diagnostics;
 
 #nullable enable
 
-namespace AM.Kotik.Barsik;
+namespace AM.Kotik.Barsik.Ast;
 
 /// <summary>
 /// Цикл foreach.

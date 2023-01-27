@@ -17,7 +17,7 @@ using System;
 
 #nullable enable
 
-namespace AM.Kotik.Barsik;
+namespace AM.Kotik.Barsik.Ast;
 
 /// <summary>
 /// Выполнение некоторого внешнего по отношению к Барсику кода.

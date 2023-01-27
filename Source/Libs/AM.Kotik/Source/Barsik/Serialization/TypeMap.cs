@@ -16,6 +16,8 @@ using System;
 using System.Linq;
 using System.Reflection;
 
+using AM.Kotik.Barsik.Ast;
+
 #endregion
 
 #nullable enable
@@ -70,29 +72,33 @@ internal sealed class TypeMap
         new() { Code=20, Type=typeof (KeyValueNode) },
         new() { Code=21, Type=typeof (LabelNode) },
         new() { Code=22, Type=typeof (LambdaNode) },
-        new() { Code=23, Type=typeof (ListNode) },
-        new() { Code=24, Type=typeof (MethodNode) },
-        new() { Code=25, Type=typeof (MinusNode) },
-        new() { Code=26, Type=typeof (NamedArgumentNode) },
-        new() { Code=27, Type=typeof (NewNode) },
-        new() { Code=28, Type=typeof (PostfixBangNode) },
-        new() { Code=29, Type=typeof (PostfixNode) },
-        new() { Code=30, Type=typeof (PrefixBangNode) },
-        new() { Code=31, Type=typeof (PrefixNode) },
-        new() { Code=32, Type=typeof (ProgramNode) },
-        new() { Code=33, Type=typeof (PropertyNode) },
-        new() { Code=34, Type=typeof (ReturnNode) },
-        new() { Code=35, Type=typeof (SemicolonNode) },
-        new() { Code=36, Type=typeof (SimpleStatement) },
-        new() { Code=37, Type=typeof (TernaryNode) },
-        new() { Code=38, Type=typeof (ThrowNode) },
-        new() { Code=39, Type=typeof (TildaNode) },
-        new() { Code=40, Type=typeof (TryNode) },
-        new() { Code=41, Type=typeof (UsingNode) },
-        new() { Code=42, Type=typeof (VariableNode) },
-        new() { Code=43, Type=typeof (WhileNode) },
-        new() { Code=44, Type=typeof (WithAssignmentNode) },
-        new() { Code=45, Type=typeof (WithNode) },
+        new() { Code=23, Type=typeof (LinqNode) },
+        new() { Code=24, Type=typeof (LinqNode.OrderClause) },
+        new() { Code=25, Type=typeof (ListNode) },
+        new() { Code=26, Type=typeof (MethodNode) },
+        new() { Code=27, Type=typeof (MinusNode) },
+        new() { Code=28, Type=typeof (NamedArgumentNode) },
+        new() { Code=29, Type=typeof (NewNode) },
+        new() { Code=30, Type=typeof (PostfixBangNode) },
+        new() { Code=31, Type=typeof (PostfixNode) },
+        new() { Code=32, Type=typeof (PrefixBangNode) },
+        new() { Code=33, Type=typeof (PrefixNode) },
+        new() { Code=34, Type=typeof (ProgramNode) },
+        new() { Code=35, Type=typeof (PropertyNode) },
+        new() { Code=36, Type=typeof (ReturnNode) },
+        new() { Code=37, Type=typeof (SemicolonNode) },
+        new() { Code=38, Type=typeof (SimpleStatement) },
+        new() { Code=39, Type=typeof (SwitchNode) },
+        new() { Code=40, Type=typeof (TernaryNode) },
+        new() { Code=41, Type=typeof (ThrowNode) },
+        new() { Code=42, Type=typeof (TildaNode) },
+        new() { Code=43, Type=typeof (TryNode) },
+        new() { Code=44, Type=typeof (TryNode.CatchBlock) },
+        new() { Code=45, Type=typeof (UsingNode) },
+        new() { Code=46, Type=typeof (VariableNode) },
+        new() { Code=47, Type=typeof (WhileNode) },
+        new() { Code=48, Type=typeof (WithAssignmentNode) },
+        new() { Code=49, Type=typeof (WithNode) },
     };
 
     /// <summary>

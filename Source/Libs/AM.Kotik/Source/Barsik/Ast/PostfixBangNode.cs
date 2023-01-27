@@ -19,7 +19,7 @@ using System.IO;
 
 #nullable enable
 
-namespace AM.Kotik.Barsik;
+namespace AM.Kotik.Barsik.Ast;
 
 /// <summary>
 /// Проверка на null.

@@ -17,7 +17,7 @@ using System.Collections.Generic;
 
 #nullable enable
 
-namespace AM.Kotik.Barsik;
+namespace AM.Kotik.Barsik.Ast;
 
 /// <summary>
 /// Определение лямбда-функции.

@@ -19,7 +19,7 @@ using System.IO;
 
 #nullable enable
 
-namespace AM.Kotik.Barsik;
+namespace AM.Kotik.Barsik.Ast;
 
 /// <summary>
 /// Создание списка вида `[1, 2, 3]`.

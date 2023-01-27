@@ -19,7 +19,7 @@ using AM.Kotik.Barsik.Diagnostics;
 
 #nullable enable
 
-namespace AM.Kotik.Barsik;
+namespace AM.Kotik.Barsik.Ast;
 
 /// <summary>
 /// Хранимое константное значение.

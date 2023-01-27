@@ -15,6 +15,7 @@
 using System;
 
 using AM.Collections;
+using AM.Kotik.Barsik.Ast;
 
 #endregion
 
@@ -90,7 +91,7 @@ public static class Operator
                 InfixOperatorKind.NonAssociative
             );
     }
-    
+
     /// <summary>
     /// Создание бинарного оператора.
     /// </summary>
@@ -112,7 +113,7 @@ public static class Operator
             );
     }
 
-    
+
     /// <summary>
     /// Создание унарного оператора.
     /// </summary>

@@ -14,7 +14,7 @@
 
 #nullable enable
 
-namespace AM.Kotik.Barsik;
+namespace AM.Kotik.Barsik.Ast;
 
 /// <summary>
 /// Базовый класс для стейтментов.

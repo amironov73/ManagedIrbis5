@@ -9,11 +9,15 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-#nullable enable
+#region Using directives
 
 using System.IO;
 
-namespace AM.Kotik.Barsik;
+#endregion
+
+#nullable enable
+
+namespace AM.Kotik.Barsik.Ast;
 
 /// <summary>
 /// Псевдо-узел: метка для оператора goto.

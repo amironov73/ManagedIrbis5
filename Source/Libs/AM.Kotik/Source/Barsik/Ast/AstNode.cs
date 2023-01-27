@@ -22,7 +22,7 @@ using AM.Runtime.Mere;
 
 #nullable enable
 
-namespace AM.Kotik.Barsik;
+namespace AM.Kotik.Barsik.Ast;
 
 /// <summary>
 /// Абстрактный узел AST.

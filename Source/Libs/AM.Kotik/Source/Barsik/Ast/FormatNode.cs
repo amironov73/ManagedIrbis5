@@ -20,7 +20,7 @@ using System.Text;
 
 #nullable enable
 
-namespace AM.Kotik.Barsik;
+namespace AM.Kotik.Barsik.Ast;
 
 /// <summary>
 /// Строка форматирования вида `$"{z} = {x} + {y}"`.

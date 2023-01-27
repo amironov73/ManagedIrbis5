@@ -20,6 +20,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
+using AM.Kotik.Barsik.Ast;
+
 #endregion
 
 #nullable enable

@@ -17,6 +17,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
+using AM.Kotik.Barsik.Ast;
+
 using Microsoft.Extensions.Logging;
 
 #endregion
@@ -73,7 +75,7 @@ public static class BarsikSerializer
     {
         Sure.NotNull (writer);
         Sure.NotNull (node);
-        
+
         var nodeType = node.GetType();
         var mapping = TypeMap.FindType (nodeType);
 

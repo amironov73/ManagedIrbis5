@@ -22,7 +22,7 @@ using System.Dynamic;
 
 #nullable enable
 
-namespace AM.Kotik.Barsik;
+namespace AM.Kotik.Barsik.Ast;
 
 /// <summary>
 /// with-присваивание.

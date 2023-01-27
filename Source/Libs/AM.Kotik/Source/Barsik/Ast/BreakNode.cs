@@ -9,11 +9,15 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-#nullable enable
+#region Using directives
 
 using AM.Kotik.Barsik.Diagnostics;
 
-namespace AM.Kotik.Barsik;
+#endregion
+
+#nullable enable
+
+namespace AM.Kotik.Barsik.Ast;
 
 /// <summary>
 /// Досрочный выход из цикла.

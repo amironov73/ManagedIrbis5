@@ -26,6 +26,7 @@ using System.Text;
 
 using AM.Configuration;
 using AM.IO;
+using AM.Kotik.Barsik.Ast;
 
 using Microsoft.Extensions.Caching.Memory;
 
@@ -1140,32 +1141,32 @@ public sealed class StdLib
         {
             throw new BarsikException ("Can't subscribe");
         }
-    
+
         var target = Compute (context, args, 0);
         if (target is null)
         {
             throw new BarsikException ("Can't subscribe");
         }
-    
+
         var eventName = Compute (context, args, 1) as string;
         if (string.IsNullOrEmpty (eventName))
         {
             throw new BarsikException ("Can't subscribe");
         }
-    
+
         var handler = Compute (context, args, 2);
         if (handler is LambdaNode lambda)
         {
             // лямбда-функция
             return new EventPad (context, target, eventName, lambda.Adapter);
         }
-    
+
         if (handler is FunctionDescriptor descriptor)
         {
             // свободная функция
             return new EventPad (context, target, eventName, descriptor.CallPoint);
         }
-    
+
         throw new BarsikException ("Can't subscribe");
     }
 
@@ -1297,7 +1298,7 @@ public sealed class StdLib
                 pad.Unsubscribe();
             }
         }
-    
+
         return null;
     }
 

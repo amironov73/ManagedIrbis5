@@ -22,7 +22,7 @@ using System.IO;
 
 #nullable enable
 
-namespace AM.Kotik.Barsik;
+namespace AM.Kotik.Barsik.Ast;
 
 /// <summary>
 /// Корневой узел AST, означающий всю программу,

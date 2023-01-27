@@ -73,9 +73,10 @@ internal static class Grammar
                 return new Computable { Value = value };
             });
 
-    private static readonly Parser<Func<Computable, Computable>> _unaryMinus = Operator.Unary
+    private static readonly Parser<Func<Computable, Computable>> _unaryMinus =
+        Operator.Unary<string, Computable>
         (
-            Term ("-").Map<string, Computable> (_ => null!),
+            Term ("-"),
             "UnaryMinus",
             _ => target => new Computable { Value = -target.Value }
         );

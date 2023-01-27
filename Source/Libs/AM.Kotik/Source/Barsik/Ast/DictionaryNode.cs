@@ -19,7 +19,7 @@ using System.IO;
 
 #nullable enable
 
-namespace AM.Kotik.Barsik;
+namespace AM.Kotik.Barsik.Ast;
 
 /// <summary>
 /// Создание словаря вида `{1: "one", 2: "two", 3: "three"}`.

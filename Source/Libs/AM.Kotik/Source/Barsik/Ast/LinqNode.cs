@@ -18,7 +18,7 @@ using System.Collections.Generic;
 
 #nullable enable
 
-namespace AM.Kotik.Barsik;
+namespace AM.Kotik.Barsik.Ast;
 
 /*
 
@@ -37,7 +37,31 @@ internal sealed class LinqNode
 {
     #region NestedClasses
 
-    public record OrderClause (AtomNode Expression, bool Descending);
+    internal sealed class OrderClause
+        : AstNode
+    {
+        #region Properties
+
+        public AtomNode Expression { get; }
+
+        public bool Descending { get; }
+
+        #endregion
+
+        #region Construction
+
+        public OrderClause
+            (
+                AtomNode expression,
+                bool descending
+            )
+        {
+            Expression = expression;
+            Descending = descending;
+        }
+
+        #endregion
+    }
 
     #endregion
 

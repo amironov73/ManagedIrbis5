@@ -103,13 +103,14 @@ public static class Operator
     /// <summary>
     /// Создание унарного оператора.
     /// </summary>
-    public static Parser<Func<TResult, TResult>> Unary<TResult>
+    public static Parser<Func<TResult, TResult>> Unary<TOperation, TResult>
         (
-            Parser<TResult> parser,
+            Parser<TOperation> parser,
             string label,
-            Func<TResult, Func<TResult, TResult>> function
+            Func<TOperation, Func<TResult, TResult>> function
         )
         where TResult: class
+        where TOperation: class
     {
         Sure.NotNull (parser);
         Sure.NotNullNorEmpty (label);
