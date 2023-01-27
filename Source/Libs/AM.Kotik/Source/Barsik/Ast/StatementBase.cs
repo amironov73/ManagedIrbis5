@@ -59,7 +59,26 @@ public class StatementBase
     {
         Sure.NotNull (context);
 
-        // пока этот метод не выполняет никаких действий
+        // трассировка
+        var topContext = context.GetTopContext();
+        var interpreter = topContext.Interpreter;
+        var debugger = interpreter?.ScriptDebugger;
+
+        if (debugger is not null)
+        {
+            if (debugger.Breakpoints.TryGetValue (this, out var breakpoint))
+            {
+                if (breakpoint.Trace)
+                {
+                    debugger.Trace (context, this);
+                }
+
+                if (breakpoint.Break)
+                {
+                    debugger.Raise (context, this);
+                }
+            }
+        }
     }
 
     #endregion

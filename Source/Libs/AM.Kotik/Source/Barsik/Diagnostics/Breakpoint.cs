@@ -43,6 +43,11 @@ public sealed class Breakpoint
     /// </summary>
     public bool Break { get; set; }
 
+    /// <summary>
+    /// Условие остановки (опционально).
+    /// </summary>
+    public string? Condition { get; set; }
+
     #endregion
 
     #region Constructor

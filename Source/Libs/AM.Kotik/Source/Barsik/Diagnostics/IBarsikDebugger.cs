@@ -13,13 +13,15 @@
 
 #region Using directives
 
+using System.Collections.Generic;
+
 using AM.Kotik.Barsik.Ast;
 
 #endregion
 
 #nullable enable
 
-namespace AM.Kotik.Barsik;
+namespace AM.Kotik.Barsik.Diagnostics;
 
 /// <summary>
 /// Интерфейс отладчика для Барсика.
@@ -27,16 +29,60 @@ namespace AM.Kotik.Barsik;
 public interface IBarsikDebugger
 {
     /// <summary>
+    /// Точки останова.
+    /// </summary>
+    Dictionary<StatementBase, Breakpoint> Breakpoints { get; }
+
+    /// <summary>
+    /// Вычисление значения переменной.
+    /// </summary>
+    void Evaluate (string? expression);
+
+    /// <summary>
+    /// Загрузка скрипта.
+    /// </summary>
+    void Load (string? fileName);
+
+    /// <summary>
+    /// Выполнение одного стейтмента без захода в функции.
+    /// </summary>
+    void Next();
+
+    /// <summary>
+    /// Вывод переменной.
+    /// </summary>
+    void Print (string? what);
+
+    /// <summary>
     /// Пробуждение отладчика при наступлении какого-нибудь события.
     /// </summary>
-    public void Raise
+    void Raise
         (
             Context context,
             StatementBase? statement
         );
 
     /// <summary>
+    /// Запуск скрипта на выполнение до конца или до первой точки останова.
+    /// </summary>
+    void Run();
+
+    /// <summary>
+    /// Задание точки останова.
+    /// </summary>
+    void SetBreakPoint (int line);
+
+    /// <summary>
+    /// Выполнение одного стейтмента с заходом в функции.
+    /// </summary>
+    void Step();
+
+    /// <summary>
     /// Трассировка.
     /// </summary>
-    public void Trace (StatementBase statement);
+    void Trace
+        (
+            Context context,
+            StatementBase statement
+        );
 }

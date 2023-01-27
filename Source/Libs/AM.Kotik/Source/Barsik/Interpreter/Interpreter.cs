@@ -22,6 +22,7 @@ using System.Linq;
 using System.Reflection;
 
 using AM.Kotik.Barsik.Ast;
+using AM.Kotik.Barsik.Diagnostics;
 
 #endregion
 
@@ -36,6 +37,11 @@ public sealed class Interpreter
     : IDisposable
 {
     #region Properties
+
+    /// <summary>
+    /// Отладчик скрипта.
+    /// </summary>
+    public IBarsikDebugger? ScriptDebugger { get; set; }
 
     /// <summary>
     /// Поток для отладочного вывода при парсинге скрипта.
