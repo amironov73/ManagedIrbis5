@@ -51,6 +51,11 @@ public sealed class Token
     /// </summary>
     public string? Value { get; }
 
+    /// <summary>
+    /// Произвольные пользовательские данные.
+    /// </summary>
+    public object? UserData { get; set; }
+
     #endregion
 
     #region Construction
