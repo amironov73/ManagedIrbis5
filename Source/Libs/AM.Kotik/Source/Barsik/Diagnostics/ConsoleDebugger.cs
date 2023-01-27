@@ -82,6 +82,7 @@ public sealed class ConsoleDebugger
         Sure.NotNull (interpreter);
 
         _interpreter = interpreter;
+        _interpreter.ScriptDebugger = this;
         Breakpoints = new ();
     }
 
@@ -108,6 +109,8 @@ public sealed class ConsoleDebugger
             Console.WriteLine (exception);
         }
 
+        Console.WriteLine ("Script execution completed");
+
         _scriptThread = null;
     }
 
@@ -118,10 +121,11 @@ public sealed class ConsoleDebugger
     /// <summary>
     /// Цикл ввод-вычисление-печать.
     /// </summary>
-    public void Repl()
+    public void DoRepl()
     {
         while (true)
         {
+            Console.WriteLine("! ");
             var line = Console.ReadLine();
             if (string.IsNullOrWhiteSpace (line))
             {

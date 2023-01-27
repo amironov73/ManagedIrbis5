@@ -226,6 +226,11 @@ public sealed class Interpreter
 
         var interpreter = CreateInterpreter (args);
         configure?.Invoke (interpreter);
+        ConsoleDebugger? debugger = null;
+        if (interpreter.Settings.StartDebugger)
+        {
+            debugger = new ConsoleDebugger (interpreter);
+        }
 
         try
         {
@@ -246,7 +251,14 @@ public sealed class Interpreter
 
             if (interpreter.Settings.ReplMode)
             {
-                interpreter.DoRepl();
+                if (debugger is not null)
+                {
+                    debugger.DoRepl();
+                }
+                else
+                {
+                    interpreter.DoRepl();
+                }
             }
         }
         catch (Exception exception)

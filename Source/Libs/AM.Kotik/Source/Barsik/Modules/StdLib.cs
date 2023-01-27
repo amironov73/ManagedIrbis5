@@ -27,6 +27,7 @@ using System.Text;
 using AM.Configuration;
 using AM.IO;
 using AM.Kotik.Barsik.Ast;
+using AM.Text;
 
 using Microsoft.Extensions.Caching.Memory;
 
@@ -93,6 +94,7 @@ public sealed class StdLib
         { "json_encode", new FunctionDescriptor ("json_encode", JsonEncode) },
         { "load", new FunctionDescriptor ("load", LoadAssembly) },
         { "module", new FunctionDescriptor ("module", LoadModule) },
+        { "number_text", new FunctionDescriptor ("number_text", NumberText_) },
         { "protect", new FunctionDescriptor ("protect", Protect) },
         { "put_cache", new FunctionDescriptor ("put_cache", PutCache) },
         { "readdir", new FunctionDescriptor ("readdir", ReadDirectory) },
@@ -988,6 +990,32 @@ public sealed class StdLib
                 name = name.Trim();
                 context.LoadModule (name);
             }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Преобразование в смесь текста с числами.
+    /// </summary>
+    public static dynamic? NumberText_
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var value = Compute (context, args, 0);
+        if (value is string text)
+        {
+            return new NumberText (text);
+        }
+        else if (value is int int32)
+        {
+            return new NumberText().AppendChunk (int32);
+        }
+        else if (value is long int64)
+        {
+            return new NumberText().AppendChunk (int64);
         }
 
         return null;

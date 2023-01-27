@@ -34,6 +34,11 @@ public sealed class InterpreterSettings
     #region Properties
 
     /// <summary>
+    /// Запускать отладчик.
+    /// </summary>
+    public bool StartDebugger { get; set; }
+
+    /// <summary>
     /// Отладочная печать во время разбора скрипта.
     /// </summary>
     [JsonPropertyName ("debug-pa")]
@@ -189,6 +194,10 @@ public sealed class InterpreterSettings
             {
                 result.LoadAssemblies.Add (args[index + 1]);
                 index++;
+            }
+            else if (arg == "--debugger")
+            {
+                result.StartDebugger = true;
             }
             else if (arg == "--eval")
             {
