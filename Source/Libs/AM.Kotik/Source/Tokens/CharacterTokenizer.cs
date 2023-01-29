@@ -12,7 +12,7 @@
 
 #region Using directives
 
-using AM.Text;
+using System.Text;
 
 #endregion
 
@@ -43,7 +43,31 @@ public sealed class CharacterTokenizer
         var chr = ReadChar();
         if (chr == '\\')
         {
-            // TODO реализовать
+            var builder = new StringBuilder();
+            builder.Append (chr);
+            if (IsEof)
+            {
+                throw new SyntaxException (_navigator);
+            }
+
+            builder.Append (ReadChar());
+            while (!IsEof)
+            {
+                chr = ReadChar();
+                if (chr == '\'')
+                {
+                    break;
+                }
+
+                builder.Append (chr);
+            }
+
+            var text = UnescapeText (builder.ToString()).ThrowIfNullOrEmpty();
+            if (text.Length != 1)
+            {
+                throw new SyntaxException (_navigator);
+            }
+            result = text[0];
         }
 
         if (chr != '\'')

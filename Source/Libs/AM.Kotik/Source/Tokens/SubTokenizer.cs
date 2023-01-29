@@ -87,11 +87,33 @@ public abstract class SubTokenizer
     /// <returns></returns>
     protected char ReadChar() => _navigator.ReadChar();
 
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Попытка разбора токена в текущей позиции.
+    /// </summary>
+    public abstract Token? Parse();
+
+    /// <summary>
+    /// Начало разбора текста.
+    /// </summary>
+    public virtual void StartParsing
+        (
+            TextNavigator navigator
+        )
+    {
+        Sure.NotNull (navigator);
+
+        _navigator = navigator;
+    }
+
     /// <summary>
     /// Преобразует строку, содержащую escape-последовательности,
     /// к нормальному виду.
     /// </summary>
-    protected static string UnescapeText
+    public static string UnescapeText
         (
             string text
         )
@@ -145,28 +167,6 @@ public abstract class SubTokenizer
                     NumberStyles.HexNumber
                 );
         }
-    }
-
-    #endregion
-
-    #region Public methods
-
-    /// <summary>
-    /// Попытка разбора токена в текущей позиции.
-    /// </summary>
-    public abstract Token? Parse();
-
-    /// <summary>
-    /// Начало разбора текста.
-    /// </summary>
-    public virtual void StartParsing
-        (
-            TextNavigator navigator
-        )
-    {
-        Sure.NotNull (navigator);
-
-        _navigator = navigator;
     }
 
     #endregion

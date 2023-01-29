@@ -70,7 +70,7 @@ public sealed class PeepingParser<TPeep, TResult>
         DebugHook (state);
         if (!state.HasCurrent)
         {
-            return false;
+            return DebugSuccess (state, false);
         }
 
         var offset = state.Location;
