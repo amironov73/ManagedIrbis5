@@ -45,7 +45,7 @@
     <PackageVersion Include="HtmlAgilityPack" Version="1.11.46" />
     <PackageVersion Include="linq2db" Version="3.7.0" />
     <PackageVersion Include="Live.Avalonia" Version="1.3.1" />
-    <PackageVersion Include="MailKit" Version="3.4.3" />
+    <PackageVersion Include="MailKit" Version="3.5.0" />
     <PackageVersion Include="Material.Avalonia" Version="3.0.0-avalonia11-preview2.137-nightly" />
     <PackageVersion Include="MaxMind.GeoIP2" Version="5.1.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Components.Web" Version="7.0.2" />
@@ -73,7 +73,7 @@
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.4.1" />
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="1.1.1" />
     <PackageVersion Include="Microsoft.Windows.Compatibility" Version="7.0.0" />
-    <PackageVersion Include="MimeKit" Version="3.4.3" />
+    <PackageVersion Include="MimeKit" Version="3.5.0" />
     <PackageVersion Include="Mono.Posix.NETStandard" Version="1.0.0" />
     <PackageVersion Include="Moq" Version="4.18.4" />
     <PackageVersion Include="MSTest.TestAdapter" Version="3.0.2" />
