@@ -14,6 +14,8 @@
 
 using System.Text;
 
+using AM.Text;
+
 #endregion
 
 #nullable enable
@@ -62,7 +64,7 @@ public sealed class CharacterTokenizer
                 builder.Append (chr);
             }
 
-            var text = UnescapeText (builder.ToString()).ThrowIfNullOrEmpty();
+            var text = TextUtility.UnescapeText (builder.ToString()).ThrowIfNullOrEmpty();
             if (text.Length != 1)
             {
                 throw new SyntaxException (_navigator);

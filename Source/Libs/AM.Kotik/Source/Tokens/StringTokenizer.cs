@@ -14,6 +14,8 @@
 
 using System.Text;
 
+using AM.Text;
+
 #endregion
 
 #nullable enable
@@ -66,7 +68,7 @@ public sealed class StringTokenizer
         }
 
         var text = builder.ToString();
-        text = UnescapeText (text);
+        text = TextUtility.UnescapeText (text);
 
         return new Token (TokenKind.String, text, line, column);
     }

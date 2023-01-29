@@ -11,6 +11,7 @@
 #region Using directives
 
 using System;
+using System.Globalization;
 using System.Text;
 
 #endregion
@@ -355,6 +356,139 @@ public static class TextUtility
         }
 
         return builder;
+    }
+
+    /// <summary>
+    /// Экранирование в строке специальных символов,
+    /// таких как <c>\n</c>.
+    /// </summary>
+    public static string? EscapeText
+        (
+            string? text
+        )
+    {
+        if (string.IsNullOrEmpty (text))
+        {
+            return text;
+        }
+
+        var builder = StringBuilderPool.Shared.Get();
+        builder.EnsureCapacity (text.Length);
+
+        foreach (var c in text)
+        {
+            switch (c)
+            {
+                case '\a':
+                    builder.Append ("\\a");
+                    break;
+
+                case '\b':
+                    builder.Append ("\\b");
+                    break;
+
+                case '\f':
+                    builder.Append ("\\f");
+                    break;
+
+                case '\n':
+                    builder.Append ("\\n");
+                    break;
+
+                case '\r':
+                    builder.Append ("\\r");
+                    break;
+
+                case '\t':
+                    builder.Append ("\\t");
+                    break;
+
+                case '\v':
+                    builder.Append ("\\v");
+                    break;
+
+                case '\\':
+                    builder.Append ("\\\\");
+                    break;
+
+                case '"':
+                    builder.Append ("\\\"");
+                    break;
+
+                default:
+                    if (c < ' ')
+                    {
+                        builder.Append ($"\\u{((int) c):xxxx}");
+                    }
+                    else
+                    {
+                        builder.Append (c);
+                    }
+                    break;
+            }
+        }
+
+        return builder.ReturnShared();
+    }
+
+    /// <summary>
+    /// Преобразует строку, содержащую escape-последовательности,
+    /// к нормальному виду.
+    /// </summary>
+    public static string UnescapeText
+        (
+            string text
+        )
+    {
+        if (string.IsNullOrEmpty (text))
+        {
+            return text;
+        }
+
+        var navigator = new TextNavigator (text);
+        var builder = StringBuilderPool.Shared.Get();
+        builder.EnsureCapacity (text.Length);
+
+        while (!navigator.IsEOF)
+        {
+            var c = navigator.ReadChar();
+            if (c == '\\')
+            {
+                var c2 = navigator.ReadChar();
+                c2 = c2 switch
+                {
+                    'a' => '\a',
+                    'b' => '\b',
+                    'f' => '\f',
+                    'n' => '\n',
+                    'r' => '\r',
+                    't' => '\t',
+                    'u' => ParseUnicode(),
+                    'v' => '\v',
+                    '\'' => '\'',
+                    '"' => '"',
+                    '\\' => '\\',
+                    '0' => '\0',
+                    _ => '?'
+                };
+                builder.Append (c2);
+            }
+            else
+            {
+                builder.Append (c);
+            }
+        }
+
+        return builder.ReturnShared();
+
+        char ParseUnicode()
+        {
+            return (char) int.Parse
+                (
+                    navigator.ReadString (4).Span,
+                    NumberStyles.HexNumber
+                );
+        }
     }
 
     #endregion

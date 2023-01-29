@@ -16,6 +16,8 @@
 
 using System.Diagnostics.CodeAnalysis;
 
+using AM.Text;
+
 #endregion
 
 #nullable enable
@@ -78,7 +80,7 @@ sealed class EscapeParser
         }
 
         state.Advance();
-        result = SubTokenizer.UnescapeText (current.Value.ThrowIfNull());
+        result = TextUtility.UnescapeText (current.Value.ThrowIfNull());
 
         return DebugSuccess (state, true);
     }
