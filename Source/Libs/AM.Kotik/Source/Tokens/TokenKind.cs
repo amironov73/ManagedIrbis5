@@ -22,6 +22,11 @@ public static class TokenKind
     #region Constants
 
     /// <summary>
+    /// Директива.
+    /// </summary>
+    public const string Directive = "directive";
+
+    /// <summary>
     /// Терм, например, "{" или "++".
     /// </summary>
     public const string Term = "term";

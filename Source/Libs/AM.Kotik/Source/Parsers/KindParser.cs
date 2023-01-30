@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* SimplestParser.cs -- простейший парсер, полагающийся на результат, оставленный токенайзером
+/* KindParser.cs -- токенайзер, возвращающий токен определенного вида
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -13,42 +13,38 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-using AM;
-using AM.Kotik;
-
 #endregion
 
 #nullable enable
 
-namespace MicroPft.Parsers;
+namespace AM.Kotik.Parsers;
 
 /// <summary>
-/// Простейший парсер, полагающийся на результат, оставленный токенайзером.
+/// Токенайзер, возвращающий токен определенного вида.
 /// </summary>
-public sealed class SimplestParser<TResult>
-    : Parser<TResult>
-    where TResult: class
+public sealed class KindParser
+    : Parser<Token>
 {
-    #region Construction
+    #region Construciton
 
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public SimplestParser
+    public KindParser
         (
-            string expectedTokenKind
+            string expected
         )
     {
-        Sure.NotNullNorEmpty (expectedTokenKind);
+        Sure.NotNullNorEmpty (expected);
 
-        _expectedTokenKind = expectedTokenKind;
+        _expected = expected;
     }
 
     #endregion
 
     #region Private members
 
-    private readonly string _expectedTokenKind;
+    private readonly string _expected;
 
     #endregion
 
@@ -58,19 +54,20 @@ public sealed class SimplestParser<TResult>
     public override bool TryParse
         (
             ParseState state,
-            [MaybeNullWhen (false)] out TResult result
+            [MaybeNullWhen (false)] out Token result
         )
     {
-        result = null!;
+        result = default;
         if (!state.HasCurrent)
         {
             return false;
         }
 
         var current = state.Current;
-        if (current.Kind == _expectedTokenKind)
+        if (current.Kind == _expected)
         {
-            result = (TResult) current.UserData.ThrowIfNull();
+            state.Advance();
+            result = current;
             return true;
         }
 

@@ -1,0 +1,3 @@
+﻿#dir1 arg1
+
+println ("Hello")

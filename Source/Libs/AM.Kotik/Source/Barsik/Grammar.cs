@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
+using AM.Kotik.Parsers;
 using AM.Kotik.Barsik.Ast;
 
 #endregion
@@ -80,13 +81,12 @@ public sealed class Grammar
 
     #region Private members
 
-    private Parser<StatementBase> BuildStatement (Parser<AtomNode> innerParser) =>
-        Parser.Chain
-            (
-                Parser.Position,
-                innerParser,
-                (pos, x) => (StatementBase) new SimpleStatement (pos.Line, x)
-            );
+    private Parser<StatementBase> BuildStatement (Parser<AtomNode> innerParser) => Parser.Chain
+        (
+            Parser.Position,
+            innerParser,
+            (pos, x) => (StatementBase) new SimpleStatement (pos.Line, x)
+        );
 
     /// <summary>
     /// Порождение константного узла.
@@ -591,6 +591,16 @@ public sealed class Grammar
             )
             .Labeled ("Switch");
 
+        var directive = Parser.Chain
+            (
+                Parser.Position,
+                new KindParser (TokenKind.Directive),
+                (pos, token) => (StatementBase) new DirectiveNode (pos.Line, token.Value!,
+                    (string?) token.UserData)
+            )
+        .Labeled ("Directive");
+
+
         Statements.Add (labelStatement); // метка должна быть до любого стейтмента!
         Statements.Add (simpleStatement);
         Statements.Add (forStatement);
@@ -609,6 +619,7 @@ public sealed class Grammar
         Statements.Add (gotoStatement);
         Statements.Add (localStatement);
         Statements.Add (switchStatement);
+        Statements.Add (directive);
         Statements.Add (semicolonStatement);
     }
 

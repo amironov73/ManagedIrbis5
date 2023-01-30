@@ -185,35 +185,7 @@ public sealed class Repl
 
         try
         {
-            var trimmed = sourceCode.Trim();
-            switch (trimmed)
-            {
-                case "#a":
-                    // TODO вывести список загруженных сборок
-                    break;
-
-                case "#d":
-                    // TODO переключить состояние DumpAst
-                    break;
-
-                case "#e":
-                    Echo = !Echo;
-                    var onoff = Echo ? "on" : "off";
-                    Interpreter.Context.Output.WriteLine ($"Echo is {onoff} now");
-                    break;
-
-                case "#v":
-                    Interpreter.Context.DumpVariables();
-                    break;
-
-                case "#u":
-                    Interpreter.Context.DumpNamespaces();
-                    break;
-
-                default:
-                    Interpreter.Execute (sourceCode);
-                    break;
-            }
+            Interpreter.Execute (sourceCode);
         }
         catch (Exception exception)
         {

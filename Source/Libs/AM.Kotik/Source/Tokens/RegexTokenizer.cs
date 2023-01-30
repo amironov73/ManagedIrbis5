@@ -21,7 +21,7 @@ using AM.Kotik;
 
 #nullable enable
 
-namespace MicroPft.Parsers;
+namespace AM.Kotik;
 
 /// <summary>
 /// Токенайзер на регулярных выражениях.
