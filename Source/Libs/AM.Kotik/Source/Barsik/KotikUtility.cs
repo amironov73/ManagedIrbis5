@@ -109,6 +109,7 @@ public static class KotikUtility
         result.Tokenizers.Add (new ExternalTokenizer());
         result.Tokenizers.Add (new HexTokenizer());
         result.Tokenizers.Add (new NumberTokenizer());
+        result.Tokenizers.Add (new IntegerTokenizer()); // integer должен быть после number
         result.Tokenizers.Add (new TermTokenizer());
         result.Tokenizers.Add (new IdentifierTokenizer());
 

@@ -98,6 +98,11 @@ public static class TokenKind
     public const string Hex64 = "hex64";
 
     /// <summary>
+    /// Длинное целое число в десятеричной системе без префикса, суффикс 'B'.
+    /// </summary>
+    public const string BigInteger = "big-integer";
+
+    /// <summary>
     /// Число с плавающей точкой с одинарной точностью.
     /// </summary>
     public const string Single = "single";

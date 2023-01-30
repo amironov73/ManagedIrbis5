@@ -591,7 +591,7 @@ public sealed class Grammar
             )
             .Labeled ("Switch");
 
-        Statements.Add (labelStatement);
+        Statements.Add (labelStatement); // метка должна быть до любого стейтмента!
         Statements.Add (simpleStatement);
         Statements.Add (forStatement);
         Statements.Add (forEachStatement);

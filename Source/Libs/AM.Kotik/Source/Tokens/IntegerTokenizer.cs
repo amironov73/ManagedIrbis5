@@ -6,13 +6,11 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
-/* BigIntegerTokenizer.cs -- токенайзер для BigInteger
+/* IntegerTokenizer.cs -- токенайзер для целых чисел
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
-
-using System.Numerics;
 
 using AM.Text;
 
@@ -23,19 +21,17 @@ using AM.Text;
 namespace AM.Kotik;
 
 /// <summary>
-/// Токенайзер для <see cref="BigInteger"/>.
+/// Токенайзер для целых чисел.
 /// </summary>
-public sealed class BigIntegerTokenizer
+public sealed class IntegerTokenizer
     : SubTokenizer
 {
-    #region SubTokenizer members
-
     /// <inheritdoc cref="SubTokenizer.Parse"/>
     public override Token? Parse()
     {
         var line = _navigator.Line;
         var column = _navigator.Column;
-        var position = _navigator.Position;
+
         var chr = PeekChar();
         if (!chr.IsArabicDigit())
         {
@@ -61,19 +57,45 @@ public sealed class BigIntegerTokenizer
             builder.Append (ReadChar());
         }
 
-        chr = PeekChar();
-        if (chr is not 'b' and not 'B') // TODO подобрать подходящий суффикс
+        var isLong = false;
+        var isUnsigned = false;
+        while (!IsEof)
         {
-            _navigator.RestorePosition (position);
-            StringBuilderPool.Shared.Return (builder);
-            return null;
+            chr = PeekChar();
+            if (chr is 'l' or 'L')
+            {
+                if (isLong)
+                {
+                    StringBuilderPool.Shared.Return (builder);
+                    throw new SyntaxException (_navigator);
+                }
+
+                ReadChar();
+                isLong = true;
+            }
+            else if (chr is 'u' or 'U')
+            {
+                if (isUnsigned)
+                {
+                    StringBuilderPool.Shared.Return (builder);
+                    throw new SyntaxException (_navigator);
+                }
+
+                ReadChar();
+                isUnsigned = true;
+            }
+            else
+            {
+                break;
+            }
         }
 
-        ReadChar();
+        var kind = isLong ? isUnsigned ? TokenKind.UInt64 : TokenKind.Int64
+            : isUnsigned ? TokenKind.UInt32 : TokenKind.Int32;
 
         var result = new Token
             (
-                TokenKind.BigInteger,
+                kind,
                 builder.ReturnShared(),
                 line,
                 column
@@ -81,6 +103,4 @@ public sealed class BigIntegerTokenizer
 
         return result;
     }
-
-    #endregion
 }

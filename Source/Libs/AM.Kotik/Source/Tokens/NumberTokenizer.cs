@@ -6,7 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
-/* NumberTokenizer.cs -- токенайзер для чисел
+/* NumberTokenizer.cs -- токенайзер для дробных чисел
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,7 +21,7 @@ using System.Text;
 namespace AM.Kotik;
 
 /// <summary>
-/// Токенайзер для целых и дробных чисел (включая шестнадцатиричные).
+/// Токенайзер для дробных чисел.
 /// </summary>
 public sealed class NumberTokenizer
     : SubTokenizer
@@ -31,23 +31,28 @@ public sealed class NumberTokenizer
     /// <inheritdoc cref="SubTokenizer.Parse"/>
     public override Token? Parse()
     {
-        StringBuilder builder;
         var line = _navigator.Line;
         var column = _navigator.Column;
-        var isFloat = false;
+        var position = _navigator.Position;
+        var digit = false; // флаг: нам встретилась как минимум одна цифра
+        var dot = false; // флаг: нам встретилась точка
+        var exponent = false; // флаг: нам встретилась экспонента
         char chr = PeekChar();
-        if (!chr.IsArabicDigit())
+        if (chr == '.')
         {
-            if (chr is '.' && _navigator.LookAhead (1).IsArabicDigit())
-            {
-                builder = new StringBuilder();
-                goto IS_FLOAT;
-            }
-
+            dot = true;
+        }
+        else if (chr.IsArabicDigit())
+        {
+            digit = true;
+        }
+        else
+        {
             return null;
         }
 
-        builder = new StringBuilder();
+        var builder = new StringBuilder();
+        builder.Append (ReadChar());
         while (!IsEof)
         {
             chr = PeekChar();
@@ -58,7 +63,20 @@ public sealed class NumberTokenizer
                 continue;
             }
 
-            if (!chr.IsArabicDigit())
+            if (chr == '.')
+            {
+                if (dot)
+                {
+                    throw new SyntaxException (_navigator);
+                }
+
+                dot = true;
+            }
+            else if (chr.IsArabicDigit())
+            {
+                digit = true;
+            }
+            else
             {
                 break;
             }
@@ -66,35 +84,10 @@ public sealed class NumberTokenizer
             builder.Append (ReadChar());
         }
 
-        // дробное число
-        IS_FLOAT: if (chr == '.')
-        {
-            isFloat = true;
-            builder.Append (ReadChar());
-
-            while (!IsEof)
-            {
-                chr = PeekChar();
-
-                if (chr is '_')
-                {
-                    ReadChar();
-                    continue;
-                }
-
-                if (!chr.IsArabicDigit())
-                {
-                    break;
-                }
-
-                builder.Append (ReadChar());
-            }
-        }
-
         // экспонента
         if (chr is 'e' or 'E')
         {
-            isFloat = true;
+            exponent = true;
             builder.Append (ReadChar());
             chr = PeekChar();
 
@@ -120,109 +113,32 @@ public sealed class NumberTokenizer
             }
         }
 
-        var isU = false;
-        var isL = false;
-        var isF = false;
-        var isM = false;
+        if (!dot && !exponent)
+        {
+            // это целое число
+            _navigator.RestorePosition (position);
+            return null;
+        }
+
+        if (!digit)
+        {
+            throw new SyntaxException (_navigator);
+        }
 
         // суффиксы
-        if (isFloat)
+        var kind = TokenKind.Double;
+        chr = PeekChar();
+        if (chr is 'F' or 'f')
         {
-            chr = PeekChar();
-            if (chr is 'F' or 'f')
-            {
-                isF = true;
-                ReadChar();
-            }
-
-            if (chr is 'M' or 'm')
-            {
-                isM = true;
-                ReadChar();
-            }
-        }
-        else
-        {
-            while (!IsEof)
-            {
-                var canContinue = true;
-                switch (chr)
-                {
-                    case 'u':
-                    case 'U':
-                        if (isU || isF || isFloat || isM)
-                        {
-                            // нельзя указывать больше одного раза
-                            throw new SyntaxException (_navigator);
-                        }
-
-                        isU = true;
-                        break;
-
-                    case 'l':
-                    case 'L':
-                        if (isL || isF || isFloat || isM)
-                        {
-                            // нельзя указывать больше одного раза
-                            throw new SyntaxException (_navigator);
-                        }
-
-                        isL = true;
-                        break;
-
-                    case 'f':
-                    case 'F':
-                        if (isU || isF || isL || isM)
-                        {
-                            throw new SyntaxException (_navigator);
-                        }
-
-                        isFloat = true;
-                        isF = true;
-                        break;
-
-                    case 'm':
-                    case 'M':
-                        if (isU || isL || isF || isM)
-                        {
-                            throw new SyntaxException (_navigator);
-                        }
-
-                        isM = true;
-                        break;
-
-                    default:
-                        canContinue = false;
-                        break;
-                }
-
-                if (!canContinue)
-                {
-                    break;
-                }
-
-                ReadChar();
-                chr = PeekChar();
-            }
+            kind = TokenKind.Single;
+            ReadChar();
         }
 
-        var kind = isFloat
-            ? (
-                isM
-                    ? TokenKind.Decimal
-                    : isF
-                        ? TokenKind.Single
-                        : TokenKind.Double
-            )
-            : (
-                isM
-                    ? TokenKind.Decimal
-                    : isL
-                        ? isU ? TokenKind.UInt64 : TokenKind.Int64
-                        : isU
-                            ? TokenKind.UInt32
-                            : TokenKind.Int32
-            );
+        if (chr is 'M' or 'm')
+        {
+            kind = TokenKind.Decimal;
+            ReadChar();
+        }
 
         var result = new Token
             (

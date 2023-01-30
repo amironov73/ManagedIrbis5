@@ -106,6 +106,7 @@ public sealed class Tokenizer
                 new CharacterTokenizer(),
                 new StringTokenizer(),
                 new NumberTokenizer(),
+                new IntegerTokenizer(), // integer должен быть после number
                 new TermTokenizer(),
                 new IdentifierTokenizer()
             },
