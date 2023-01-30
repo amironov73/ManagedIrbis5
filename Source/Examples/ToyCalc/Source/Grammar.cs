@@ -104,6 +104,7 @@ internal static class Grammar
         Tokenizers =
         {
             new NumberTokenizer(),
+            new IntegerTokenizer(),
             new TermTokenizer()
         }
     };

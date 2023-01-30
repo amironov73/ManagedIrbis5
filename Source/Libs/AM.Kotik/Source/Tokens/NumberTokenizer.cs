@@ -122,7 +122,9 @@ public sealed class NumberTokenizer
 
         if (!digit)
         {
-            throw new SyntaxException (_navigator);
+            // это не похоже на число
+            _navigator.RestorePosition(position);
+            return null;
         }
 
         // суффиксы
