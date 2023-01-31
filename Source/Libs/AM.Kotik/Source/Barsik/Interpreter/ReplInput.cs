@@ -65,10 +65,10 @@ public sealed class ReplInput
     {
         try
         {
-            _interpreter.Grammar.ParseStatement
+            _interpreter.Settings.Grammar.ParseStatement
                 (
                     expression.ToString(),
-                    _interpreter.Tokenizer
+                    _interpreter.Settings.Tokenizer
                 );
         }
         catch

@@ -23,7 +23,6 @@ using System.Reflection;
 
 using AM.Kotik.Barsik.Ast;
 using AM.Kotik.Barsik.Diagnostics;
-using AM.Kotik.Barsik.Directives;
 
 #endregion
 
@@ -43,11 +42,6 @@ public sealed class Interpreter
     /// Произвольные пользовательские данные.
     /// </summary>
     public Dictionary<string, object?> UserData { get; }
-
-    /// <summary>
-    /// Известные директивы.
-    /// </summary>
-    public List<DirectiveBase> KnownDirectives { get; set; }
 
     /// <summary>
     /// Отладчик скрипта.
@@ -114,18 +108,6 @@ public sealed class Interpreter
     /// </summary>
     public InterpreterSettings Settings { get; }
 
-    /// <summary>
-    /// Токенайзер.
-    /// </summary>
-    // TODO перенести в Settings
-    public Tokenizer Tokenizer { get; set; }
-
-    /// <summary>
-    /// Грамматика.
-    /// </summary>
-    // TODO перенести в Settings
-    public IGrammar Grammar { get; set; }
-
     #endregion
 
     #region Construction
@@ -138,31 +120,17 @@ public sealed class Interpreter
             TextReader? input = null,
             TextWriter? output = null,
             TextWriter? error = null,
-            InterpreterSettings? settings = null,
-            IGrammar? grammar = null
+            InterpreterSettings? settings = null
         )
     {
         input ??= Console.In;
         output ??= Console.Out;
         error ??= Console.Error;
         Settings =  settings ?? InterpreterSettings.CreateDefault();
-        Tokenizer = KotikUtility.CreateTokenizerForBarsik (Settings.TokenizerSettings);
-        Grammar = grammar
-                  ?? Settings.Grammar
-                  ?? AM.Kotik.Barsik.Grammar.CreateDefaultBarsikGrammar();
         AllowNewOperator = true;
         Modules = new ();
         Assemblies = new ();
         Auxiliary = new ();
-        KnownDirectives = new ()
-        {
-            new AssemblyDirective(),
-            new AstDirective(),
-            new EchoDirective(),
-            new ModuleDirective(),
-            new NamespaceDirective(),
-            new VariableDirective(),
-        };
         UserData = new ();
 
         Context = new (input, output, error)
@@ -211,7 +179,7 @@ public sealed class Interpreter
             ParsingDebugOutput = Context.Output;
         }
 
-        Grammar.Rebuild();
+        Settings.Grammar.Rebuild();
     }
 
     /// <summary>
@@ -317,7 +285,12 @@ public sealed class Interpreter
     {
         Sure.NotNull (sourceCode);
 
-        var node = Grammar.ParseExpression (sourceCode, Tokenizer, ParsingDebugOutput);
+        var node = Settings.Grammar.ParseExpression
+            (
+                sourceCode,
+                Settings.Tokenizer,
+                ParsingDebugOutput
+            );
         if (Settings.DumpAst)
         {
             Context.Output.WriteLine (new string ('=', 60));
@@ -333,12 +306,19 @@ public sealed class Interpreter
     /// </summary>
     public ExecutionResult Execute
         (
-            string sourceCode
+            string sourceCode,
+            bool requireEnd = true
         )
     {
         Sure.NotNull (sourceCode);
 
-        var program = Grammar.ParseProgram (sourceCode, Tokenizer, ParsingDebugOutput);
+        var program = Settings.Grammar.ParseProgram
+            (
+                sourceCode,
+                Settings.Tokenizer,
+                requireEnd,
+                ParsingDebugOutput
+            );
         if (Settings.DumpAst)
         {
             program.Dump (Context.Output);

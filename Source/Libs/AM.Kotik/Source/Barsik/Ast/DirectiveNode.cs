@@ -65,7 +65,7 @@ public sealed class DirectiveNode
         var topContext = context.GetTopContext();
         var interpreter = topContext.Interpreter.ThrowIfNull();
         var success = false;
-        foreach (var directive in interpreter.KnownDirectives)
+        foreach (var directive in interpreter.Settings.KnownDirectives)
         {
             if (directive.Recognize (_command, _argument))
             {

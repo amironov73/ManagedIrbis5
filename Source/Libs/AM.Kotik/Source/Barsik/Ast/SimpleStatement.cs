@@ -28,6 +28,15 @@ namespace AM.Kotik.Barsik.Ast;
 internal sealed class SimpleStatement
     : StatementBase
 {
+    #region Properties
+
+    /// <summary>
+    /// Выражение.
+    /// </summary>
+    public AtomNode Expression;
+
+    #endregion
+
     #region Construction
 
     /// <summary>
@@ -40,14 +49,8 @@ internal sealed class SimpleStatement
         )
         : base (line)
     {
-        _expression = expression;
+        Expression = expression;
     }
-
-    #endregion
-
-    #region Private members
-
-    private readonly AtomNode _expression;
 
     #endregion
 
@@ -59,7 +62,7 @@ internal sealed class SimpleStatement
             Context context
         )
     {
-        _expression.Compute (context);
+        Expression.Compute (context);
     }
 
     #endregion
@@ -76,7 +79,7 @@ internal sealed class SimpleStatement
     {
         base.DumpHierarchyItem (name, level, writer, ToString());
 
-       _expression.DumpHierarchyItem ("Expression", level + 1, writer);
+       Expression.DumpHierarchyItem ("Expression", level + 1, writer);
     }
 
     #endregion

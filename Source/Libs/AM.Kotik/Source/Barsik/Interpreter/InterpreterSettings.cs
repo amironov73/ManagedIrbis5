@@ -19,6 +19,7 @@ using System.Linq;
 using System.Text.Json.Serialization;
 
 using AM.Kotik.Barsik.Diagnostics;
+using AM.Kotik.Barsik.Directives;
 
 #endregion
 
@@ -36,12 +37,13 @@ public sealed class InterpreterSettings
     /// <summary>
     /// Запускать отладчик.
     /// </summary>
+    [JsonPropertyName ("start-debugger")]
     public bool StartDebugger { get; set; }
 
     /// <summary>
     /// Отладочная печать во время разбора скрипта.
     /// </summary>
-    [JsonPropertyName ("debug-pa")]
+    [JsonPropertyName ("debug-parser")]
     public bool DebugParser { get; set; }
 
     /// <summary>
@@ -65,10 +67,9 @@ public sealed class InterpreterSettings
     public string? EvaluateExpression { get; set; }
 
     /// <summary>
-    /// Грамматика.
+    /// Известные директивы.
     /// </summary>
-    [JsonIgnore]
-    public IGrammar? Grammar { get; set; }
+    public List<DirectiveBase> KnownDirectives { get; set; }
 
     /// <summary>
     /// Загрузка сборок перед началом разбора и выполнения скриптов.
@@ -111,6 +112,18 @@ public sealed class InterpreterSettings
     [JsonPropertyName ("secondary-prompt")]
     public string? SecondaryPrompt { get; set; }
 
+    /// <summary>
+    /// Грамматика.
+    /// </summary>
+    [JsonIgnore]
+    public IGrammar Grammar { get; set; }
+
+    /// <summary>
+    /// Токенайзер.
+    /// </summary>
+    [JsonIgnore]
+    public Tokenizer Tokenizer { get; set; }
+
     #endregion
 
     #region Construciton
@@ -120,6 +133,9 @@ public sealed class InterpreterSettings
     /// </summary>
     public InterpreterSettings()
     {
+        Tokenizer = new Tokenizer();
+        Grammar = new Grammar();
+        KnownDirectives = new ();
         LoadAssemblies = new ();
         ScriptFiles = new ();
         UseNamespaces = new ();
@@ -136,7 +152,20 @@ public sealed class InterpreterSettings
     /// </summary>
     public static InterpreterSettings CreateDefault()
     {
-        return new InterpreterSettings();
+        var result = new InterpreterSettings();
+
+        result.Tokenizer = KotikUtility.CreateTokenizerForBarsik (result.TokenizerSettings);
+        result.Grammar = AM.Kotik.Barsik.Grammar.CreateDefaultBarsikGrammar();
+
+        // директивы по умолчанию
+        result.KnownDirectives.Add (new AssemblyDirective());
+        result.KnownDirectives.Add (new AstDirective());
+        result.KnownDirectives.Add (new EchoDirective());
+        result.KnownDirectives.Add (new ModuleDirective());
+        result.KnownDirectives.Add (new NamespaceDirective());
+        result.KnownDirectives.Add (new VariableDirective());
+
+        return result;
     }
 
     /// <summary>

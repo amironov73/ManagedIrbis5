@@ -206,7 +206,7 @@ public sealed class ConsoleDebugger
         Sure.FileExists (fileName);
 
         var sourceCode = File.ReadAllText (fileName);
-        _program = _interpreter.Grammar.ParseProgram (sourceCode, _interpreter.Tokenizer);
+        _program = _interpreter.Settings.Grammar.ParseProgram (sourceCode, _interpreter.Settings.Tokenizer);
     }
 
     /// <inheritdoc cref="IBarsikDebugger.Next"/>

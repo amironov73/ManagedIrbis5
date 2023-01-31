@@ -679,9 +679,7 @@ public sealed class Grammar
                 (
                     GenericStatement
                 )
-            .Labeled ("Statements")
             .Map (x => new ProgramNode (x))
-            .End()
             .Labeled ("Program");
     }
 
@@ -730,6 +728,7 @@ public sealed class Grammar
         (
             string sourceText,
             Tokenizer tokenizer,
+            bool requireEnd = true,
             TextWriter? debugOutput = null
         )
     {
@@ -737,7 +736,12 @@ public sealed class Grammar
 
         var tokens = tokenizer.Tokenize (sourceText);
         var state = new ParseState (tokens) { DebugOutput = debugOutput };
-        var result = Program.ParseOrThrow (state);
+        var program = Program;
+        if (requireEnd)
+        {
+            program = program.End();
+        }
+        var result = program.ParseOrThrow (state);
 
         return result;
     }

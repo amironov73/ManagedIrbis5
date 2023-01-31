@@ -20,6 +20,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Text;
@@ -65,7 +66,7 @@ public sealed class StdLib
     public static readonly Dictionary<string, FunctionDescriptor> Registry = new ()
     {
         { "array", new FunctionDescriptor ("array", Array_) },
-        // { "bon_decode", new FunctionDescriptor ("bon_decode", BonDecode) },
+        { "bon_decode", new FunctionDescriptor ("bon_decode", BonDecode) },
         { "call", new FunctionDescriptor ("call", CallAnyMethod) },
         { "chdir", new FunctionDescriptor ("chdir", ChangeDirectory) },
         { "combine_path", new FunctionDescriptor ("combine_path", CombinePath) },
@@ -157,7 +158,7 @@ public sealed class StdLib
     {
         var topContext = context.GetTopContext();
         var interpreter = topContext.Interpreter.ThrowIfNull();
-        var tokenizer = interpreter.Tokenizer;
+        var tokenizer = interpreter.Settings.Tokenizer;
         if (!topContext._inclusions.TryGetValue (fileName, out var program))
         {
             if (!File.Exists (fileName))
@@ -166,7 +167,7 @@ public sealed class StdLib
             }
 
             var sourceCode = File.ReadAllText (fileName);
-            program = interpreter.Grammar.ParseProgram (sourceCode, tokenizer);
+            program = interpreter.Settings.Grammar.ParseProgram (sourceCode, tokenizer);
             topContext._inclusions[fileName] = program;
         }
 
@@ -215,56 +216,57 @@ public sealed class StdLib
         return Array.CreateInstance (type, length);
     }
 
-    // /// <summary>
-    // /// Декодирование BON-объекта.
-    // /// </summary>
-    // public static dynamic? BonDecode
-    //     (
-    //         Context context,
-    //         dynamic?[] args
-    //     )
-    // {
-    //     var bon = ComputeAll (context, args);
-    //     if (string.IsNullOrWhiteSpace (bon))
-    //     {
-    //         return null;
-    //     }
-    //
-    //     var interpreter = context.Interpreter;
-    //     if (interpreter is null)
-    //     {
-    //         context.Error.WriteLine ("Interpreter is null");
-    //         return null;
-    //     }
-    //
-    //     dynamic? value;
-    //     var program = Grammar.ParseProgram (bon);
-    //     if (program.Statements.Count == 1)
-    //     {
-    //         var expression = interpreter.Evaluate (bon);
-    //         value = expression.Compute (context);
-    //     }
-    //     else
-    //     {
-    //         // изготавливаем укороченный вариант программы
-    //         var shortProgram = new ProgramNode
-    //             (
-    //                 program.Statements.SkipLast (1)
-    //             );
-    //         var last = program.Statements.Last() as ExpressionNode;
-    //         if (last is null)
-    //         {
-    //             // последний стейтмент должен быть выражением
-    //             context.Error.WriteLine ("Last statement must be expression");
-    //             return null;
-    //         }
-    //
-    //         interpreter.Execute (shortProgram, context);
-    //         value = last.Expression.Compute (context);
-    //     }
-    //
-    //     return value;
-    // }
+    /// <summary>
+    /// Декодирование BON-объекта.
+    /// </summary>
+    public static dynamic? BonDecode
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var bon = ComputeAll (context, args);
+        if (string.IsNullOrWhiteSpace (bon))
+        {
+            return null;
+        }
+
+        var topContext = context.GetTopContext();
+        var interpreter = topContext.Interpreter;
+        if (interpreter is null)
+        {
+            context.Error.WriteLine ("Interpreter is null");
+            return null;
+        }
+
+        dynamic? value;
+        var program = interpreter.Settings.Grammar.ParseProgram (bon, interpreter.Settings.Tokenizer);
+        if (program.Statements.Count == 1)
+        {
+            var expression = interpreter.EvaluateAtom (bon);
+            value = expression.Compute (context);
+        }
+        else
+        {
+            // изготавливаем укороченный вариант программы
+            var shortProgram = new ProgramNode
+                (
+                    program.Statements.SkipLast (1)
+                );
+            var last = program.Statements.Last() as SimpleStatement;
+            if (last is null)
+            {
+                // последний стейтмент должен быть выражением
+                context.Error.WriteLine ("Last statement must be expression");
+                return null;
+            }
+
+            interpreter.Execute (shortProgram, context);
+            value = last.Expression.Compute (context);
+        }
+
+        return value;
+    }
 
     /// <summary>
     /// Динамический вызов произвольного метода.
@@ -427,8 +429,8 @@ public sealed class StdLib
 
             var topContext = context.GetTopContext();
             var interpreter = topContext.Interpreter.ThrowIfNull();
-            var tokenizer = interpreter.Tokenizer;
-            var expression = interpreter.Grammar.ParseExpression (sourceCode, tokenizer);
+            var tokenizer = interpreter.Settings.Tokenizer;
+            var expression = interpreter.Settings.Grammar.ParseExpression (sourceCode, tokenizer);
             var result = expression.Compute (context);
 
             return result;
@@ -460,12 +462,9 @@ public sealed class StdLib
 
             var topContext = context.GetTopContext();
             var interpreter = topContext.Interpreter.ThrowIfNull();
-            var tokenizer = interpreter.Tokenizer;
-            var program = interpreter.Grammar.ParseProgram (sourceCode, tokenizer);
-            foreach (var statement in program.Statements)
-            {
-                statement.Execute (context);
-            }
+            var tokenizer = interpreter.Settings.Tokenizer;
+            var program = interpreter.Settings.Grammar.ParseProgram (sourceCode, tokenizer);
+            program.Execute (context);
         }
         catch (Exception exception)
         {
