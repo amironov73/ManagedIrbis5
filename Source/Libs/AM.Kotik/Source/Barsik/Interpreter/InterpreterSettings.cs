@@ -6,6 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable StringLiteralTypo
 
 /* InterpreterSettings.cs -- настройки интерпретатора
  * Ars Magna project, http://arsmagna.ru

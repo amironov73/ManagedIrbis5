@@ -17,10 +17,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Threading;
 
 using AM.Kotik.Barsik.Ast;
+using AM.Text;
 
 #endregion
 
@@ -94,8 +97,9 @@ public sealed class ConsoleDebugger
     private ProgramNode? _program;
     private Thread? _scriptThread;
     private StatementBase? _currentStatement;
+    private string[]? _sourceLines;
 
-    private void _RunProgram()
+    private void RunProgram()
     {
         try
         {
@@ -114,6 +118,44 @@ public sealed class ConsoleDebugger
         _scriptThread = null;
     }
 
+    /// <summary>
+    /// Задание точки останова.
+    /// </summary>
+    private void SetBreakpoint
+        (
+            string? where
+        )
+    {
+        if (_program is null
+            || string.IsNullOrWhiteSpace (where))
+        {
+            return;
+        }
+
+        if (int.TryParse (where, CultureInfo.InvariantCulture, out var lineNumber))
+        {
+            var statement = KotikUtility.FindStatementAt (_program, lineNumber);
+            if (statement is not null)
+            {
+                if (!Breakpoints.ContainsKey (statement))
+                {
+                    var breakpoint = new Breakpoint (statement)
+                    {
+                        Break = true
+                    };
+                    Breakpoints[statement] = breakpoint;
+                }
+
+                var sourceLine = _sourceLines.SafeAt (statement.Line - 1);
+                Console.WriteLine ($"{statement}: {sourceLine}");
+            }
+            else
+            {
+                Console.WriteLine ($"Can't find statement at {where}");
+            }
+        }
+    }
+
     #endregion
 
     #region Public methods
@@ -125,7 +167,7 @@ public sealed class ConsoleDebugger
     {
         while (true)
         {
-            Console.WriteLine("! ");
+            Console.Write ("! ");
             var line = Console.ReadLine();
             if (string.IsNullOrWhiteSpace (line))
             {
@@ -149,8 +191,22 @@ public sealed class ConsoleDebugger
                 case "exit":
                     goto DONE;
 
+                case "i":
+                case "info":
+                    if (other == "b")
+                    {
+                        ListBreakpoints();
+                    }
+
+                    break;
+
                 case "load":
                     Load (other);
+                    break;
+
+                case "r":
+                case "run":
+                    Run();
                     break;
 
                 default:
@@ -163,16 +219,24 @@ public sealed class ConsoleDebugger
     }
 
     /// <summary>
-    /// Задание точки останова.
+    /// Получение списка точек останова.
     /// </summary>
-    private void SetBreakpoint
-        (
-            string? where
-        )
+    public void ListBreakpoints()
     {
-        if (string.IsNullOrWhiteSpace (where))
+        var breakpoints = Breakpoints.Values
+            .OrderBy (it => it.Statement.Line)
+            .ToArray();
+
+        foreach (var breakpoint in breakpoints)
         {
-            return;
+            var statement = breakpoint.Statement;
+            var sourceLine = _sourceLines.SafeAt(statement.Line - 1);
+            Console.WriteLine ($"{statement}: {sourceLine}");
+        }
+
+        if (breakpoints.Length == 0)
+        {
+            Console.WriteLine ("(no breakpoints)");
         }
     }
 
@@ -190,6 +254,33 @@ public sealed class ConsoleDebugger
         {
             return;
         }
+
+        try
+        {
+            var atom = _interpreter.EvaluateAtom (expression);
+            Console.WriteLine (atom);
+            var value = atom.Compute (_interpreter.Context);
+            KotikUtility.PrintObject (Console.Out, value);
+            Console.WriteLine();
+        }
+        catch (Exception exception)
+        {
+            Console.WriteLine ($"ERROR: {exception.Message}");
+        }
+    }
+
+    /// <inheritdoc cref="IBarsikDebugger.ExecuteFile"/>
+    public ExecutionResult ExecuteFile
+        (
+            string filename
+        )
+    {
+        Sure.FileExists(filename);
+
+        Load(filename);
+        Run();
+
+        return new ExecutionResult();
     }
 
     /// <inheritdoc cref="Load"/>
@@ -206,6 +297,7 @@ public sealed class ConsoleDebugger
         Sure.FileExists (fileName);
 
         var sourceCode = File.ReadAllText (fileName);
+        _sourceLines = sourceCode.SplitLines();
         _program = _interpreter.Settings.Grammar.ParseProgram (sourceCode, _interpreter.Settings.Tokenizer);
     }
 
@@ -213,6 +305,17 @@ public sealed class ConsoleDebugger
     public void Next()
     {
         Console.WriteLine ("Next");
+    }
+
+    /// <inheritdoc cref="IBarsikDebugger.PreTrace"/>
+    public void PreTrace
+        (
+            Context context,
+            StatementBase statement
+        )
+    {
+        var sourceLine = _sourceLines.SafeAt (statement.Line - 1);
+        Console.WriteLine ($"{statement}: {sourceLine}");
     }
 
     /// <inheritdoc cref="Print"/>
@@ -246,9 +349,9 @@ public sealed class ConsoleDebugger
 
         if (_scriptThread is null)
         {
-            _scriptThread = new Thread (_RunProgram)
+            _scriptThread = new Thread (RunProgram)
             {
-                IsBackground = true,
+                // IsBackground = true,
                 Name = "ScriptExecution"
             };
             _scriptThread.Start();
@@ -277,7 +380,8 @@ public sealed class ConsoleDebugger
             StatementBase statement
         )
     {
-        context.Output.WriteLine (statement);
+        var sourceLine = _sourceLines.SafeAt (statement.Line);
+        context.Output.WriteLine ($"{statement}: {sourceLine}");
     }
 
     #endregion

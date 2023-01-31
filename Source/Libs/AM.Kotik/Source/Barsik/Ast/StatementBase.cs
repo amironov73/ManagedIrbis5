@@ -66,6 +66,7 @@ public class StatementBase
 
         if (debugger is not null)
         {
+            debugger.PreTrace (context, this);
             if (debugger.Breakpoints.TryGetValue (this, out var breakpoint))
             {
                 if (breakpoint.Trace)

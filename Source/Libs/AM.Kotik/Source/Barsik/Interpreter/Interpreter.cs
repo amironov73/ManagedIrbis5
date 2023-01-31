@@ -226,7 +226,9 @@ public sealed class Interpreter
             interpreter.ApplySettings();
             foreach (var scriptFile in interpreter.Settings.ScriptFiles)
             {
-                var executionResult = interpreter.ExecuteFile (scriptFile);
+                var executionResult = debugger is not null
+                    ? debugger.ExecuteFile (scriptFile)
+                    : interpreter.ExecuteFile (scriptFile);
                 if (executionResult.ExitRequested)
                 {
                     if (!string.IsNullOrEmpty (executionResult.Message))

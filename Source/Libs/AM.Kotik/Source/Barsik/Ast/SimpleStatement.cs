@@ -62,6 +62,8 @@ internal sealed class SimpleStatement
             Context context
         )
     {
+        base.Execute (context);
+
         Expression.Compute (context);
     }
 

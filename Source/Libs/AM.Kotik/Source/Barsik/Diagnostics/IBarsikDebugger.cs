@@ -34,6 +34,11 @@ public interface IBarsikDebugger
     Dictionary<StatementBase, Breakpoint> Breakpoints { get; }
 
     /// <summary>
+    /// Загрузка файла скрипта с немедленным запуском на выполнение.
+    /// </summary>
+    ExecutionResult ExecuteFile (string filename);
+
+    /// <summary>
     /// Вычисление значения переменной.
     /// </summary>
     void Evaluate (string? expression);
@@ -47,6 +52,15 @@ public interface IBarsikDebugger
     /// Выполнение одного стейтмента без захода в функции.
     /// </summary>
     void Next();
+
+    /// <summary>
+    /// Пре-трассировка.
+    /// </summary>
+    void PreTrace
+        (
+            Context context,
+            StatementBase statement
+        );
 
     /// <summary>
     /// Вывод переменной.
