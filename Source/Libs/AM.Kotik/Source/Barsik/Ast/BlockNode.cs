@@ -31,17 +31,17 @@ namespace AM.Kotik.Barsik.Ast;
 /// </summary>
 public class BlockNode
     : StatementBase,
-    IBlock
+    IStatementBlock
 {
     #region Properties
 
-    /// <inheritdoc cref="IBlock.Functions"/>
+    /// <inheritdoc cref="IStatementBlock.Functions"/>
     public IList<FunctionDefinitionNode> Functions { get; set; }
 
-    /// <inheritdoc cref="IBlock.Locals"/>
+    /// <inheritdoc cref="IStatementBlock.Locals"/>
     public IList<LocalNode> Locals { get; set; }
 
-    /// <inheritdoc cref="IBlock.Statements"/>
+    /// <inheritdoc cref="IStatementBlock.Statements"/>
     public IList<StatementBase> Statements { get; set; }
 
     #endregion
@@ -63,7 +63,7 @@ public class BlockNode
         Functions = null!;
         Locals = null!;
         Statements = statements;
-        ((IBlock) this).RefineStatements();
+        ((IStatementBlock) this).RefineStatements();
     }
 
     #endregion
@@ -95,7 +95,7 @@ public class BlockNode
     {
         PreExecute (context);
 
-        context = ((IBlock) this).ApplyTo (context);
+        context = ((IStatementBlock) this).ApplyTo (context);
 
         var index = 0;
         while (index < Statements.Count)
@@ -108,7 +108,7 @@ public class BlockNode
             }
             catch (GotoException gotoException)
             {
-                var whereLabel = ((IBlock) this).FindLabel (gotoException.Label);
+                var whereLabel = ((IStatementBlock) this).FindLabel (gotoException.Label);
                 if (!whereLabel.HasValue)
                 {
                     // передаем исключение наверх

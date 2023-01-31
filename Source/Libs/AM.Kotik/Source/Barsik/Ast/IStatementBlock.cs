@@ -23,7 +23,7 @@ namespace AM.Kotik.Barsik.Ast;
 /// <summary>
 /// Интерфейс блока стейтментов.
 /// </summary>
-public interface IBlock
+public interface IStatementBlock
 {
     /// <summary>
     /// Функции, входящие в блок.
@@ -63,19 +63,17 @@ public interface IBlock
     /// <summary>
     /// Поиск стейтмента с указанной меткой.
     /// </summary>
-    /// <param name="label"></param>
-    /// <returns></returns>
     int? FindLabel
         (
             string label
         )
     {
-        for (var i = 0; i < Statements.Count; i++)
+        for (var index = 0; index < Statements.Count; index++)
         {
-            if (Statements[i] is LabelNode labelNode
+            if (Statements[index] is LabelNode labelNode
                 && string.CompareOrdinal (label, labelNode.Name) == 0)
             {
-                return i;
+                return index;
             }
         }
 
@@ -97,7 +95,7 @@ public interface IBlock
                 return statement;
             }
 
-            if (statement is IBlock subBlock)
+            if (statement is IStatementBlock subBlock)
             {
                 var result = subBlock.FindStatementAt (lineNumber);
                 if (result is not null)
@@ -107,9 +105,13 @@ public interface IBlock
             }
         }
 
-        foreach (var function in Functions)
+        foreach (IStatementBlock function in Functions)
         {
-            // var result = function.Fin
+            var result = function.FindStatementAt (lineNumber);
+            if (result is not null)
+            {
+                return result;
+            }
         }
 
         return null;
@@ -120,11 +122,6 @@ public interface IBlock
     /// </summary>
     void RefineStatements()
     {
-        if (!Statements.Any (x => x is PseudoNode))
-        {
-            return;
-        }
-
         Locals = Statements.Where (x => x is LocalNode)
             .Cast<LocalNode>().ToList();
 

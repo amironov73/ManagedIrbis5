@@ -25,20 +25,32 @@ namespace AM.Kotik.Barsik.Ast;
 /// </summary>
 public sealed class FunctionDefinitionNode
     : PseudoNode,
-    IBlock
+    IStatementBlock
 {
     #region Properties
 
-    /// <inheritdoc cref="IBlock.Functions"/>
-    IList<FunctionDefinitionNode> IBlock.Functions { get; set; }
+    /// <inheritdoc cref="IStatementBlock.Functions"/>
+    IList<FunctionDefinitionNode> IStatementBlock.Functions
+    {
+        get => Body.Functions;
+        set => Body.Functions = value;
+    }
 
-    /// <inheritdoc cref="IBlock.Locals"/>
-    IList<LocalNode> IBlock.Locals { get; set; }
+    /// <inheritdoc cref="IStatementBlock.Locals"/>
+    IList<LocalNode> IStatementBlock.Locals
+    {
+        get => Body.Locals;
+        set => Body.Locals = value;
+    }
 
-    /// <inheritdoc cref="IBlock.Statements"/>
-    IList<StatementBase> IBlock.Statements { get; set; }
+    /// <inheritdoc cref="IStatementBlock.Statements"/>
+    IList<StatementBase> IStatementBlock.Statements
+    {
+        get => Body.Statements;
+        set => Body.Statements = value;
+    }
 
-    /// <inheritdoc cref="IBlock.Statements"/>
+    /// <inheritdoc cref="IStatementBlock.Statements"/>
     public BlockNode Body { get; set; }
 
     /// <summary>
