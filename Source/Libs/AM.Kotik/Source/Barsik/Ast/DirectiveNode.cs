@@ -62,31 +62,21 @@ public sealed class DirectiveNode
     {
         base.Execute (context);
 
-        // TODO реализовать отдельными командами
-        // context.Output.WriteLine ($"Directive {_command}: {_argument}");
-        switch (_command)
+        var topContext = context.GetTopContext();
+        var interpreter = topContext.Interpreter.ThrowIfNull();
+        var success = false;
+        foreach (var directive in interpreter.KnownDirectives)
         {
-            case "a":
-                // TODO вывести список загруженных сборок
-                break;
+            if (directive.Recognize (_command, _argument))
+            {
+                directive.Execute (context, _argument);
+                success = true;
+            }
+        }
 
-            case "d":
-                // TODO переключить состояние DumpAst
-                break;
-
-            case "e":
-                // Echo = !Echo;
-                // var onoff = Echo ? "on" : "off";
-                // Interpreter.Context.Output.WriteLine ($"Echo is {onoff} now");
-                break;
-
-            case "v":
-                context.DumpVariables();
-                break;
-
-            case "u":
-                context.DumpNamespaces();
-                break;
+        if (!success)
+        {
+            context.Error.WriteLine ($"Unknown directive {_command}");
         }
     }
 

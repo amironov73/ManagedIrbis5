@@ -23,6 +23,7 @@ using System.Reflection;
 
 using AM.Kotik.Barsik.Ast;
 using AM.Kotik.Barsik.Diagnostics;
+using AM.Kotik.Barsik.Directives;
 
 #endregion
 
@@ -37,6 +38,16 @@ public sealed class Interpreter
     : IDisposable
 {
     #region Properties
+
+    /// <summary>
+    /// Произвольные пользовательские данные.
+    /// </summary>
+    public Dictionary<string, object?> UserData { get; }
+
+    /// <summary>
+    /// Известные директивы.
+    /// </summary>
+    public List<DirectiveBase> KnownDirectives { get; set; }
 
     /// <summary>
     /// Отладчик скрипта.
@@ -143,6 +154,15 @@ public sealed class Interpreter
         Modules = new ();
         Assemblies = new ();
         Auxiliary = new ();
+        KnownDirectives = new ()
+        {
+            new DumpNamespacesDirective(),
+            new DumpVariablesDirective(),
+            new ListAssembliesDirective(),
+            new ToggleEchoDirective(),
+            new ToggleDumpAstDirective()
+        };
+        UserData = new ();
 
         Context = new (input, output, error)
         {

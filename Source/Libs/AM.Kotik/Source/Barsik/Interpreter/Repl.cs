@@ -106,6 +106,7 @@ public sealed class Repl
         output = new AttentiveWriter (output ?? Console.Out);
         error ??= Console.Error;
         Interpreter = new Interpreter (Input, output, error);
+        Interpreter.UserData["repl"] = this;
         Echo = true;
         _input = new ReplInput (Input, output, Interpreter);
     }
@@ -121,6 +122,7 @@ public sealed class Repl
     {
         interpreter.Context.MakeAttentive();
         Interpreter = interpreter;
+        Interpreter.UserData["repl"] = this;
         Input = input ?? interpreter.Context.Input;
         Echo = true;
         _input = new ReplInput
