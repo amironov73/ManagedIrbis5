@@ -6,7 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
 
-/* ToggleEchoDirective.cs -- переключение флага "Echo"
+/* NamespaceDirective.cs -- дамп пространств имен
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,9 +21,9 @@ using System;
 namespace AM.Kotik.Barsik.Directives;
 
 /// <summary>
-/// Директива: переключение флага "Echo".
+/// Директива: дамп пространств имен.
 /// </summary>
-public sealed class ToggleEchoDirective
+public sealed class NamespaceDirective
     : DirectiveBase
 {
     #region Construction
@@ -31,8 +31,8 @@ public sealed class ToggleEchoDirective
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public ToggleEchoDirective()
-        : base ("echo")
+    public NamespaceDirective()
+        : base ("ns")
     {
         // пустое тело метода
     }
@@ -48,26 +48,7 @@ public sealed class ToggleEchoDirective
             string? argument
         )
     {
-        var topContext = context.GetTopContext();
-        var interpreter = topContext.Interpreter;
-        if (interpreter is not null)
-        {
-            var repl = (Repl) interpreter.UserData["repl"].ThrowIfNull();
-
-            var echo = repl.Echo;
-            if (argument.SameString ("on"))
-            {
-                echo = true;
-            }
-            else if (argument.SameString ("off"))
-            {
-                echo = false;
-            }
-
-            var onoff = echo ? "on" : "off";
-            repl.Echo = echo;
-            interpreter.Context.Output.WriteLine ($"Echo is {onoff} now");
-        }
+        context.DumpNamespaces();
     }
 
     #endregion

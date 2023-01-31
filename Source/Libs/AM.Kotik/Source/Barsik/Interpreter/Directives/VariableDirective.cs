@@ -6,7 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
 
-/* ToggleDumpAstDirective.cs -- переключение флага "Dump AST"
+/* VariableDirective.cs -- дамп переменных
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,9 +21,9 @@ using System;
 namespace AM.Kotik.Barsik.Directives;
 
 /// <summary>
-/// Директива: переключение флага "Dump AST".
+/// Директива: дамп переменных.
 /// </summary>
-public sealed class ToggleDumpAstDirective
+public sealed class VariableDirective
     : DirectiveBase
 {
     #region Construction
@@ -31,8 +31,8 @@ public sealed class ToggleDumpAstDirective
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public ToggleDumpAstDirective()
-        : base ("ast")
+    public VariableDirective()
+        : base ("var")
     {
         // пустое тело метода
     }
@@ -48,15 +48,7 @@ public sealed class ToggleDumpAstDirective
             string? argument
         )
     {
-        var topContext = context.GetTopContext();
-        var interpreter = topContext.Interpreter;
-        if (interpreter is not null)
-        {
-            var flag = !interpreter.Settings.DumpAst;
-            var onoff = flag ? "on" : "off";
-            interpreter.Settings.DumpAst = flag;
-            context.Output.WriteLine ($"Dump AST is {onoff} now");
-        }
+        context.DumpVariables();
     }
 
     #endregion

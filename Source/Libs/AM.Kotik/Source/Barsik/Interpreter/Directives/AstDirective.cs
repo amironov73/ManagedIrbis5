@@ -6,16 +6,13 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
 
-/* ListAssembliesDirective.cs -- вывод списка загруженных сборок
+/* AstDirective.cs -- переключение флага "Dump AST"
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.Loader;
 
 #endregion
 
@@ -24,9 +21,9 @@ using System.Runtime.Loader;
 namespace AM.Kotik.Barsik.Directives;
 
 /// <summary>
-/// Директива: вывод списка загруженных сборок.
+/// Директива: переключение флага "Dump AST".
 /// </summary>
-public sealed class ListAssembliesDirective
+public sealed class AstDirective
     : DirectiveBase
 {
     #region Construction
@@ -34,8 +31,8 @@ public sealed class ListAssembliesDirective
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public ListAssembliesDirective()
-        : base ("asm")
+    public AstDirective()
+        : base ("ast")
     {
         // пустое тело метода
     }
@@ -51,13 +48,14 @@ public sealed class ListAssembliesDirective
             string? argument
         )
     {
-        var assemblies = AppDomain.CurrentDomain.GetAssemblies()
-            .OrderBy (asm => asm.FullName)
-            .ToArray();
-        
-        foreach (var assembly in assemblies)
+        var topContext = context.GetTopContext();
+        var interpreter = topContext.Interpreter;
+        if (interpreter is not null)
         {
-            context.Output.WriteLine (assembly.FullName);
+            var flag = !interpreter.Settings.DumpAst;
+            var onoff = flag ? "on" : "off";
+            interpreter.Settings.DumpAst = flag;
+            context.Output.WriteLine ($"Dump AST is {onoff} now");
         }
     }
 

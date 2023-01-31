@@ -156,11 +156,12 @@ public sealed class Interpreter
         Auxiliary = new ();
         KnownDirectives = new ()
         {
-            new DumpNamespacesDirective(),
-            new DumpVariablesDirective(),
-            new ListAssembliesDirective(),
-            new ToggleEchoDirective(),
-            new ToggleDumpAstDirective()
+            new AssemblyDirective(),
+            new AstDirective(),
+            new EchoDirective(),
+            new ModuleDirective(),
+            new NamespaceDirective(),
+            new VariableDirective(),
         };
         UserData = new ();
 

@@ -6,7 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
 
-/* DumpNamespacesDirective.cs -- дамп пространств имен
+/* EchoDirective.cs -- переключение флага "Echo"
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,9 +21,9 @@ using System;
 namespace AM.Kotik.Barsik.Directives;
 
 /// <summary>
-/// Директива: дамп пространств имен.
+/// Директива: переключение флага "Echo".
 /// </summary>
-public sealed class DumpNamespacesDirective
+public sealed class EchoDirective
     : DirectiveBase
 {
     #region Construction
@@ -31,8 +31,8 @@ public sealed class DumpNamespacesDirective
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public DumpNamespacesDirective()
-        : base ("ns")
+    public EchoDirective()
+        : base ("echo")
     {
         // пустое тело метода
     }
@@ -48,7 +48,26 @@ public sealed class DumpNamespacesDirective
             string? argument
         )
     {
-        context.DumpNamespaces();
+        var topContext = context.GetTopContext();
+        var interpreter = topContext.Interpreter;
+        if (interpreter is not null)
+        {
+            var repl = (Repl) interpreter.UserData["repl"].ThrowIfNull();
+
+            var echo = repl.Echo;
+            if (argument.SameString ("on"))
+            {
+                echo = true;
+            }
+            else if (argument.SameString ("off"))
+            {
+                echo = false;
+            }
+
+            var onoff = echo ? "on" : "off";
+            repl.Echo = echo;
+            interpreter.Context.Output.WriteLine ($"Echo is {onoff} now");
+        }
     }
 
     #endregion

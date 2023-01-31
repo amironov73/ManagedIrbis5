@@ -241,6 +241,11 @@ public sealed class Context
                         : $"{key}: {value.GetType().Name} = {value}"
                 );
         }
+
+        if (keys.Length == 0)
+        {
+            Output.WriteLine ("(no variables in the context)");
+        }
     }
 
     /// <summary>
@@ -598,8 +603,6 @@ public sealed class Context
             string moduleName
         )
     {
-        // TODO добавить выгрузку модулей
-
         Sure.NotNullNorEmpty (moduleName);
 
         foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
@@ -783,6 +786,38 @@ public sealed class Context
             {
                 return true;
             }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Выгрузка модуля.
+    /// </summary>
+    public bool UnloadModule
+        (
+            string moduleName
+        )
+    {
+        Sure.NotNullNorEmpty (moduleName);
+
+        var interpreter = GetTopContext().Interpreter.ThrowIfNull();
+        IBarsikModule? found = null;
+        foreach (var module in interpreter.Modules)
+        {
+            if (module.GetType().Name.SameString (moduleName))
+            {
+                found = module;
+                break;
+            }
+        }
+
+        if (found is not null)
+        {
+            found.DetachModule (interpreter);
+            interpreter.Modules.Remove (found);
+
+            return true;
         }
 
         return false;

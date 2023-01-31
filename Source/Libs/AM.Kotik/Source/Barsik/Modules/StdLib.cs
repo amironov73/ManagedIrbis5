@@ -1372,7 +1372,7 @@ public sealed class StdLib
     #region IBarsikModule members
 
     /// <inheritdoc cref="IBarsikModule.Description"/>
-    public string Description => "StdLib";
+    public string Description => "Standard library for Barsik";
 
     /// <inheritdoc cref="IBarsikModule.Version"/>
     public Version Version { get; } = new (1, 0);
