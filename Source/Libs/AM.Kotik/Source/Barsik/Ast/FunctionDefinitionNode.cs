@@ -23,10 +23,23 @@ namespace AM.Kotik.Barsik.Ast;
 /// <summary>
 /// Псевдо-узел AST: определение функции в скрипте.
 /// </summary>
-internal sealed class FunctionDefinitionNode
-    : PseudoNode
+public sealed class FunctionDefinitionNode
+    : PseudoNode,
+    IBlock
 {
     #region Properties
+
+    /// <inheritdoc cref="IBlock.Functions"/>
+    IList<FunctionDefinitionNode> IBlock.Functions { get; set; }
+
+    /// <inheritdoc cref="IBlock.Locals"/>
+    IList<LocalNode> IBlock.Locals { get; set; }
+
+    /// <inheritdoc cref="IBlock.Statements"/>
+    IList<StatementBase> IBlock.Statements { get; set; }
+
+    /// <inheritdoc cref="IBlock.Statements"/>
+    public BlockNode Body { get; set; }
 
     /// <summary>
     /// Имя функции.
@@ -45,7 +58,7 @@ internal sealed class FunctionDefinitionNode
             int line,
             string functionName,
             IList<string> argumentNames,
-            StatementBase body
+            BlockNode body
         )
         : base (line)
     {
@@ -55,7 +68,7 @@ internal sealed class FunctionDefinitionNode
 
         Name = functionName;
         _argumentNames = argumentNames;
-        _body = body;
+        Body = body;
     }
 
     #endregion
@@ -63,7 +76,6 @@ internal sealed class FunctionDefinitionNode
     #region Private members
 
     internal readonly IList<string> _argumentNames;
-    internal readonly StatementBase _body;
 
     #endregion
 
@@ -85,7 +97,7 @@ internal sealed class FunctionDefinitionNode
             DumpHierarchyItem ("Arg", level + 1, writer, argumentName);
         }
 
-        _body.DumpHierarchyItem ("Body", level + 1, writer);
+        Body.DumpHierarchyItem ("Body", level + 1, writer);
     }
 
     #endregion

@@ -251,10 +251,9 @@ public sealed class StdLib
             // изготавливаем укороченный вариант программы
             var shortProgram = new ProgramNode
                 (
-                    program.Statements.SkipLast (1)
+                    program.Statements.SkipLast (1).ToArray()
                 );
-            var last = program.Statements.Last() as SimpleStatement;
-            if (last is null)
+            if (program.Statements.Last() is not SimpleStatement last)
             {
                 // последний стейтмент должен быть выражением
                 context.Error.WriteLine ("Last statement must be expression");

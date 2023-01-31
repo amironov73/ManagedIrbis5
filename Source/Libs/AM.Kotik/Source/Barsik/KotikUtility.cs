@@ -584,7 +584,7 @@ public static class KotikUtility
                 (
                     name,
                     node._argumentNames,
-                    node._body
+                    node.Body
                 );
             var descriptor = new FunctionDescriptor
                 (

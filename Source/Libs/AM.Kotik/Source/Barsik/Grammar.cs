@@ -522,7 +522,7 @@ public sealed class Grammar
                 Identifier.SeparatedBy (Term (",")).RoundBrackets(),
                 Block,
                 (position, name, args, body) =>
-                    (StatementBase) new FunctionDefinitionNode (position.Line, name, args, body)
+                    (StatementBase) new FunctionDefinitionNode (position.Line, name, args, (BlockNode) body)
             )
             .Labeled ("FunctionDefinition");
 

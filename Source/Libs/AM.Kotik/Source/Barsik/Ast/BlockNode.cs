@@ -14,9 +14,9 @@
 
 #region Using directives
 
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 using AM.Kotik.Barsik.Diagnostics;
 
@@ -29,9 +29,23 @@ namespace AM.Kotik.Barsik.Ast;
 /// <summary>
 /// Блок стейтментов.
 /// </summary>
-public sealed class BlockNode
-    : StatementBase
+public class BlockNode
+    : StatementBase,
+    IBlock
 {
+    #region Properties
+
+    /// <inheritdoc cref="IBlock.Functions"/>
+    public IList<FunctionDefinitionNode> Functions { get; set; }
+
+    /// <inheritdoc cref="IBlock.Locals"/>
+    public IList<LocalNode> Locals { get; set; }
+
+    /// <inheritdoc cref="IBlock.Statements"/>
+    public IList<StatementBase> Statements { get; set; }
+
+    #endregion
+
     #region Construction
 
     /// <summary>
@@ -44,66 +58,29 @@ public sealed class BlockNode
         )
         : base (line)
     {
-        _locals = new ();
-        _functions = new ();
-        _statements = ExtractPseudoNodes (statements);
+        Sure.NotNull (statements);
+
+        Functions = null!;
+        Locals = null!;
+        Statements = statements;
+        ((IBlock) this).RefineStatements();
     }
 
     #endregion
 
-    #region Private members
+    #region Public methods
 
-    private readonly IList<StatementBase> _statements;
-    private readonly List<LocalNode> _locals;
-    private readonly List<FunctionDefinitionNode> _functions;
-
-    private IList<StatementBase> ExtractPseudoNodes
+    /// <summary>
+    /// Дамп синтаксического дерева.
+    /// </summary>
+    public void Dump
         (
-            IList<StatementBase> statements
+            TextWriter? writer = null
         )
     {
-        if (!statements.Any (x => x is PseudoNode))
-        {
-            return statements;
-        }
+        writer ??= Console.Out;
 
-        var result = new List<StatementBase>();
-        foreach (var statement in statements)
-        {
-            switch (statement)
-            {
-                case LocalNode localNode:
-                    _locals.Add (localNode);
-                    break;
-
-                case FunctionDefinitionNode functionNode:
-                    _functions.Add (functionNode);
-                    break;
-
-                default:
-                    result.Add (statement);
-                    break;
-            }
-        }
-
-        return result;
-    }
-
-    private int? FindLabel
-        (
-            string label
-        )
-    {
-        for (var i = 0; i < _statements.Count; i++)
-        {
-            if (_statements[i] is LabelNode labelNode
-                && string.CompareOrdinal (label, labelNode.Name) == 0)
-            {
-                return i;
-            }
-        }
-
-        return null;
+        DumpHierarchyItem (null, 0, writer);
     }
 
     #endregion
@@ -118,17 +95,12 @@ public sealed class BlockNode
     {
         PreExecute (context);
 
-        foreach (var local in _locals)
-        {
-            context = local.ApplyTo (context);
-        }
-
-        context = KotikUtility.ApplyFunctionDefinitions (context, _functions);
+        context = ((IBlock) this).ApplyTo (context);
 
         var index = 0;
-        while (index < _statements.Count)
+        while (index < Statements.Count)
         {
-            var statement = _statements[index];
+            var statement = Statements[index];
             try
             {
                 statement.Execute (context);
@@ -136,7 +108,7 @@ public sealed class BlockNode
             }
             catch (GotoException gotoException)
             {
-                var whereLabel = FindLabel (gotoException.Label);
+                var whereLabel = ((IBlock) this).FindLabel (gotoException.Label);
                 if (!whereLabel.HasValue)
                 {
                     // передаем исключение наверх
@@ -162,7 +134,7 @@ public sealed class BlockNode
     {
         base.DumpHierarchyItem (name, level, writer, ToString());
 
-        foreach (var statement in _statements)
+        foreach (var statement in Statements)
         {
             statement.DumpHierarchyItem ("Statement", level + 1, writer);
         }
@@ -176,7 +148,7 @@ public sealed class BlockNode
             Name = "block"
         };
 
-        foreach (var statement in _statements)
+        foreach (var statement in Statements)
         {
             result.Children.Add (statement.GetNodeInfo());
         }
@@ -191,7 +163,7 @@ public sealed class BlockNode
     /// <summary>
     /// Перечисление элементов.
     /// </summary>
-    public IEnumerator<StatementBase> GetEnumerator() => _statements.GetEnumerator();
+    public IEnumerator<StatementBase> GetEnumerator() => Statements.GetEnumerator();
 
     #endregion
 }
