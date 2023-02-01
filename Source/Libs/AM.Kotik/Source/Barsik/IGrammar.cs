@@ -86,6 +86,7 @@ public interface IGrammar
             string sourceText,
             Tokenizer tokenizer,
             bool requireEnd = true,
+            bool dumpTokens = false,
             TextWriter? debugOutput = null
         );
 

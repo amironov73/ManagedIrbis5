@@ -1,0 +1,7 @@
+﻿println (empty ())
+println (empty (null))
+println (empty (array()))
+println (empty (array (1)))
+println (empty (""))
+println (empty ("hello"))
+println (empty (1))

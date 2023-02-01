@@ -1,0 +1,23 @@
+﻿load ("System.Collections")
+
+l1 = new "System.Collections.Generic.List`1" <int>()
+println (l1.GetType())
+
+l1.Add (1)
+l1.Add (2)
+l1.Add (3)
+
+foreach (x in l1)
+  println (x)
+
+t = type ("System.Collections.Generic.List`1", "int")
+println (t)
+
+l2 = new t()
+l2.Add (4)
+l2.Add (5)
+l2.Add (6)
+
+foreach (x in l2)
+  println (x)
+

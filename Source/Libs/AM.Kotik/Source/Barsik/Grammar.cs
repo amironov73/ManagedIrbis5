@@ -190,7 +190,9 @@ public sealed class Grammar
             (
                 typeName.After (Reserved ("new")),
                 Expression.SeparatedBy (Term (",")).RoundBrackets(),
-                (name, args) => (AtomNode) new NewNode (name, args)
+                Block.Optional(),
+                (name, args, init) =>
+                    (AtomNode) new NewNode (name, args, init)
             )
             .Labeled ("New");
 
@@ -337,7 +339,7 @@ public sealed class Grammar
         Infixes.Add (Operator.LeftAssociative ("Bitwise", "&", "|", "^"));
         Infixes.Add (Operator.LeftAssociative ("Multiplication", "*", "/", "%" ));
         Infixes.Add (Operator.LeftAssociative ("Addition", "+", "-" ));
-        Infixes.Add (Operator.LeftAssociative ("Comparison", "<", ">", "<=", ">=", "==", "!=", "<>", "===", "!==", "~~", "~~~" ));
+        Infixes.Add (Operator.LeftAssociative ("Comparison", "<", ">", "<=", ">=", "==", "!=", "<>", "===", "!==", "!", "~~", "~~~", "same" ));
         Infixes.Add (Operator.LeftAssociative ("And/Or", "&&", "||"));
 
         //===================================================
@@ -418,7 +420,7 @@ public sealed class Grammar
                 Expression.Between (Term (";"), Term (";")),
                 assignment.Or (Expression).Before (Term (")")),
                 Block,
-                Block.Before (Reserved ("else")).Optional(),
+                Block.After (Reserved ("else")).Optional(),
                 (position, init, condition, step, body, elseBlock) =>
                     (StatementBase) new ForNode (position.Line, init, condition, step, body, elseBlock)
             )
@@ -730,12 +732,17 @@ public sealed class Grammar
             string sourceText,
             Tokenizer tokenizer,
             bool requireEnd = true,
+            bool dumpTokens = false,
             TextWriter? debugOutput = null
         )
     {
         Sure.NotNull (sourceText);
 
         var tokens = tokenizer.Tokenize (sourceText);
+        if (dumpTokens)
+        {
+            KotikUtility.DumpTokens (tokens, debugOutput);
+        }
         var state = new ParseState (tokens) { DebugOutput = debugOutput };
         var program = Program;
         if (requireEnd)

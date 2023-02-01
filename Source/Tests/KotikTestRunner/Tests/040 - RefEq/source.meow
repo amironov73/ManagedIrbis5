@@ -1,0 +1,6 @@
+﻿x = "hello"
+y = x
+println (x === y)
+
+y = "hello"
+println (x === y)

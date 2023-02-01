@@ -37,11 +37,13 @@ internal sealed class NewNode
     public NewNode
         (
             string typeName,
-            IList<AtomNode> constructorArguments
+            IList<AtomNode> constructorArguments,
+            StatementBase? initialization
         )
     {
         _typeName = typeName;
         _constructorArguments = constructorArguments;
+        _initialization = initialization;
     }
 
     #endregion
@@ -50,6 +52,7 @@ internal sealed class NewNode
 
     private readonly string _typeName;
     private readonly IList<AtomNode> _constructorArguments;
+    private readonly StatementBase? _initialization;
 
     #endregion
 
@@ -61,8 +64,55 @@ internal sealed class NewNode
             Context context
         )
     {
-        var type = Type.GetType (_typeName, true)!;
-        var result = Activator.CreateInstance (type);
+        var interpreter = context.GetTopContext().Interpreter.ThrowIfNull();
+        if (!interpreter.AllowNewOperator)
+        {
+            throw new BarsikException ("Operator NEW is not allowed");
+        }
+
+        var type = context.FindType (_typeName, null);
+        if (type is null)
+        {
+            context.Error.WriteLine($"Type '{_typeName}' not found");
+            return null;
+        }
+
+        object? result;
+        if (_constructorArguments.Count == 0)
+        {
+            result = Activator.CreateInstance (type);
+        }
+        else
+        {
+            var parameters = new List<object?>();
+            foreach (var argument in _constructorArguments)
+            {
+                var parameter = (object?) argument.Compute (context);
+                parameters.Add (parameter);
+            }
+
+            result = Activator.CreateInstance (type, parameters.ToArray());
+        }
+
+        if (_initialization is not null)
+        {
+            var previousCenter = context.With;
+            var centerName = "$" + Guid.NewGuid().ToString ("N");
+            context = context.CreateChildContext();
+            context.SetVariable (centerName, result);
+            var center = new VariableNode (centerName);
+            context.With = center;
+
+            try
+            {
+                _initialization.Execute (context);
+            }
+            finally
+            {
+                context.With = previousCenter;
+                context.RemoveVariable (centerName);
+            }
+        }
 
         return result;
     }

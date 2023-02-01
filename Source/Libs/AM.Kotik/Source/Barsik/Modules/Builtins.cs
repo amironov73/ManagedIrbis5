@@ -20,6 +20,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Globalization;
+using System.Text.RegularExpressions;
 
 using AM.Kotik.Barsik.Ast;
 using AM.Text;
@@ -166,6 +167,7 @@ public static class Builtins
         { "println", new FunctionDescriptor ("println", PrintLine) },
         { "readln", new FunctionDescriptor ("readln", ReadLine) },
         { "reduce", new FunctionDescriptor ("reduce", Reduce, false) },
+        { "regex", new FunctionDescriptor ("reduce", Regex_) },
         { "sort", new FunctionDescriptor ("reduce", Sort) },
         { "to_array", new FunctionDescriptor ("to_array", ToArray) },
         { "trace", new FunctionDescriptor ("trace", Trace_) },
@@ -961,6 +963,23 @@ public static class Builtins
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// Создание регулярного выражения.
+    /// </summary>
+    public static dynamic? Regex_
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (Compute (context, args, 0) is string text)
+        {
+            return new Regex (text);
+        }
+
+        return null;
     }
 
     /// <summary>

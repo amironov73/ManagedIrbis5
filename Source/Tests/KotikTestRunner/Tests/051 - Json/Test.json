@@ -1,0 +1,8 @@
+﻿{
+  "first": 1,
+  "second": [1, 2, 3],
+  "third": {
+    "fourth": 1.23,
+    "fifth": "some text"
+  }
+}

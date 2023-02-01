@@ -1,0 +1,29 @@
+﻿x = 1_234
+println (x.GetType(), ", ", x)
+
+x = -1_234
+println (x.GetType(), ", ", x)
+
+x = 1_234u
+println (x.GetType(), ", ", x)
+
+x = 1_234U
+println (x.GetType(), ", ", x)
+
+x = 1_234_567_890_123_L
+println (x.GetType(), ", ", x)
+
+x = -1_234_567_890_123_L
+println (x.GetType(), ", ", x)
+
+x = 1_234_567_890_123_ul
+println (x.GetType(), ", ", x)
+
+x = 1_234_567_890_123_lu
+println (x.GetType(), ", ", x)
+
+x = 1_234_567_890_123_UL
+println (x.GetType(), ", ", x)
+
+x = 1_234_567_890_123_UL
+println (x.GetType(), ", ", x)

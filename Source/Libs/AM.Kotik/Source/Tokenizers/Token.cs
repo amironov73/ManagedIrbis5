@@ -102,7 +102,8 @@ public sealed class Token
     /// Число со знаком?
     /// </summary>
     public bool IsSignedNumber() => Kind is TokenKind.Int32 or TokenKind.Int64
-            or TokenKind.Single or TokenKind.Double or TokenKind.Decimal;
+            or TokenKind.Single or TokenKind.Double or TokenKind.Decimal
+            or TokenKind.BigInteger;
 
     /// <summary>
     /// Число без знака?

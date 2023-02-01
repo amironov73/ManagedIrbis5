@@ -14,6 +14,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Numerics;
 
 using AM.Kotik.Tokenizers;
 
@@ -100,6 +101,11 @@ public sealed class LiteralParser
 
             case TokenKind.Decimal:
                 result = decimal.Parse (value, invariant);
+                state.Advance();
+                break;
+
+            case TokenKind.BigInteger:
+                result = BigInteger.Parse (value, invariant);
                 state.Advance();
                 break;
 

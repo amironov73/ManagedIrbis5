@@ -77,7 +77,7 @@ public static class TestUtility
     /// <summary>
     /// Имя файла с исходным кодом.
     /// </summary>
-    public const string SourceFileName = "source.barsik";
+    public const string SourceFileName = "source.meow";
 
     #endregion
 

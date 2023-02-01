@@ -41,27 +41,25 @@ public sealed class CharacterTokenizer
 
         ReadChar(); // съедаем открывающий апостроф
         var result = ReadChar();
-        var chr = ReadChar();
-        if (chr == '\\')
+        if (result == '\\')
         {
-            var builder = StringBuilderPool.Shared.Get();
-            builder.Append (chr);
             if (IsEof)
             {
-                StringBuilderPool.Shared.Return (builder);
                 throw new SyntaxException (navigator);
             }
 
-            builder.Append (ReadChar());
+            var builder = StringBuilderPool.Shared.Get();
+            builder.Append (result);
             while (!IsEof)
             {
-                chr = ReadChar();
-                if (chr == '\'')
+                result = PeekChar();
+                if (result == '\'')
                 {
                     break;
                 }
 
-                builder.Append (chr);
+                ReadChar();
+                builder.Append (result);
             }
 
             var text = TextUtility.UnescapeText (builder.ReturnShared()).ThrowIfNullOrEmpty();
@@ -72,7 +70,7 @@ public sealed class CharacterTokenizer
             result = text[0];
         }
 
-        if (chr != '\'')
+        if (ReadChar() != '\'')
         {
             throw new SyntaxException (navigator);
         }

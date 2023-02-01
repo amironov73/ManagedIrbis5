@@ -1,0 +1,8 @@
+﻿fileName = combine_path (__DIR__, "Test.bon")
+// println (fileName)
+
+content = file_get_contents (fileName)
+obj = bon_decode (content)
+println (obj["name"])
+println (obj["age"])
+println (obj["date"])

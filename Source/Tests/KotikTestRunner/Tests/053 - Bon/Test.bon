@@ -1,0 +1,5 @@
+﻿{
+    "name": "Alexey " + "Mironov",
+    "age": 50 - 1,
+    "date": now()
+}

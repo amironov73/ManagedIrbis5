@@ -138,6 +138,12 @@ public sealed class InterpreterSettings
     [JsonIgnore]
     public bool BarsorMode { get; set; }
 
+    /// <summary>
+    /// Выводить дамп токенов перед началом разбора программы.
+    /// </summary>
+    [JsonIgnore]
+    public bool DumpTokens { get; set; }
+
     #endregion
 
     #region Construciton
@@ -258,6 +264,10 @@ public sealed class InterpreterSettings
             else if (arg is "--barsor")
             {
                 result.BarsorMode = true;
+            }
+            else if (arg is "--dump-tokens")
+            {
+                result.DumpTokens = true;
             }
             else if (arg.StartsWith ("-"))
             {

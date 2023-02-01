@@ -193,11 +193,11 @@ public class Tokenizer
 
             if (token is null)
             {
-                // костыль с двумя попытками сделан
+                // костыль с несколькими попытками сделан
                 // для считывания переводов строки и пробелов в конце скрипта
                 // иначе CommentTokenizer возвращает null
                 // и токенизация падает с синтаксической ошибкой
-                if (++attempts == 2)
+                if (++attempts == 10)
                 {
                     throw new SyntaxException (navigator);
                 }

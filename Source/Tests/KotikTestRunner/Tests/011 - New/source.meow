@@ -1,0 +1,21 @@
+﻿use ("System.Text")
+
+println ("Have builder? ", have_var (builder))
+
+builder = new StringBuilder()
+{
+    .Capacity = 10
+}
+
+println ("Have builder? ", have_var (builder))
+
+for (i = 0; i < 10; i++)
+{
+    builder.Append (i)
+}
+
+println ("Result is ", builder)
+
+delete (builder)
+println ("Have builder? ", have_var (builder))
+

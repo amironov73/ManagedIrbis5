@@ -1,0 +1,5 @@
+Hello from main
+Hello from function
+a=1, b=2 c=3
+Sum is 6
+Result is 6

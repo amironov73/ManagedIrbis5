@@ -1,0 +1,13 @@
+use ("System")
+
+/*
+ * Первая успешно вызванная функция :)
+ */
+
+today = DateTime.Now
+today = format ("{0:d}", today)
+println ("Сегодня: ", today)
+
+// другой способ
+today = format ("{0:d}", type ("DateTime").Now)
+println ("Сегодня: ", today)

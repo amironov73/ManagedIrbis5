@@ -13,6 +13,8 @@
 
 using System;
 
+using AM.Text;
+
 #endregion
 
 #nullable enable
@@ -52,6 +54,38 @@ internal sealed class IncrementNode
     private readonly string _operation;
     private readonly bool _prefix;
 
+    private static dynamic DoIncrement
+        (
+            dynamic value
+        )
+    {
+        if (value is string text)
+        {
+            var number = new NumberText (text);
+            number.Increment();
+
+            return number.ToString();
+        }
+
+        return (value + 1);
+    }
+
+    private static dynamic DoDecrement
+        (
+            dynamic value
+        )
+    {
+        if (value is string text)
+        {
+            var number = new NumberText (text);
+            number.Increment();
+
+            return number.ToString();
+        }
+
+        return (value - 1);
+    }
+
     #endregion
 
     #region AtomNode members
@@ -67,8 +101,8 @@ internal sealed class IncrementNode
 
         target = _operation switch
         {
-            "++" => target + 1,
-            "--" => target - 1,
+            "++" => DoIncrement (target),
+            "--" => DoDecrement (target),
             _ => throw new InvalidOperationException()
         };
 

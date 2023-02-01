@@ -1,0 +1,9 @@
+﻿println ('a' is char)
+println ('a' is byte)
+println ("+-" is string)
+println ("+-" is decimal)
+println (10 is int)
+println (1.0 is double)
+
+x = 1 + 2
+println (x is int)

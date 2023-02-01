@@ -161,6 +161,8 @@ public sealed class Interpreter
 
     #region Private members
 
+    private bool _settinsWasApplied;
+
     private static void HighlightToConsole 
         (
             string sourceCode,
@@ -236,6 +238,7 @@ public sealed class Interpreter
         }
 
         Settings.Grammar.Rebuild();
+        _settinsWasApplied = true;
     }
 
     /// <summary>
@@ -280,7 +283,7 @@ public sealed class Interpreter
             {
                 var sourceCode = File.ReadAllText (fileName);
                 var programNode = barsor.ParseTemplate (sourceCode);
-                programNode.Execute (interpreter.Context);
+                interpreter.Execute (programNode);
             }
 
             return 0;
@@ -400,6 +403,7 @@ public sealed class Interpreter
                 sourceCode,
                 Settings.Tokenizer,
                 requireEnd,
+                Settings.DumpTokens,
                 ParsingDebugOutput
             );
         if (Settings.DumpAst)
@@ -426,6 +430,11 @@ public sealed class Interpreter
         )
     {
         Sure.NotNull (program);
+
+        if (!_settinsWasApplied)
+        {
+            ApplySettings();
+        }
 
         context ??= Context;
         var haveDefinitions = false;
@@ -569,6 +578,11 @@ public sealed class Interpreter
         ExecutionResult result;
         try
         {
+            if (!_settinsWasApplied)
+            {
+                ApplySettings();
+            }
+
             var fullPath = Path.GetFullPath (fileName);
             Context.Defines["__NAME__"] = "__MAIN__";
             Context.Defines["__FILE__"] = fullPath;

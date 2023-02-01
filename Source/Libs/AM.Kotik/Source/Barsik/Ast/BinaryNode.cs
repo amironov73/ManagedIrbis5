@@ -78,7 +78,8 @@ public sealed class BinaryNode
         if (left is string leftString && right is string rightString)
         {
             // строки сравниваются без учета культуры
-            return string.CompareOrdinal (leftString, rightString);
+            var result = string.CompareOrdinal (leftString, rightString);
+            return result > 0 ? 1 : result < 0 ? -1 : 0;
         }
 
         return OmnipotentComparer.Default.Compare (left, right);

@@ -1,0 +1,3 @@
+﻿println ((double) "1.23")
+println ((int) 1.23)
+println ((string) 1.23)

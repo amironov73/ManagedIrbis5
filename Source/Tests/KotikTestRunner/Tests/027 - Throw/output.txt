@@ -1,0 +1,4 @@
+Inside try block 1
+Hello, exception
+Inside try block 2
+123

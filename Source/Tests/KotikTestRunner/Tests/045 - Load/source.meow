@@ -1,0 +1,3 @@
+﻿asm = load ("System.Console")
+color = asm.GetType ("System.ConsoleColor")
+println (color)

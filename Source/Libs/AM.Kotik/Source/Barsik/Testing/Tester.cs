@@ -69,7 +69,6 @@ public class Tester
             throw new DirectoryNotFoundException (folder);
         }
 
-
         var allResults = new List<TestResult>();
         var directories = Directory.GetDirectories
             (

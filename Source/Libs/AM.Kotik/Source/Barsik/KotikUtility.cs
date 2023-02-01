@@ -112,6 +112,7 @@ public static class KotikUtility
                 new StringTokenizer(),
                 new FormatTokenizer(),
                 new ExternalTokenizer(),
+                new BigIntegerTokenizer(), // должен быть до integer
                 new HexTokenizer(),
                 new NumberTokenizer(),
                 new IntegerTokenizer(), // integer должен быть после number
@@ -121,6 +122,26 @@ public static class KotikUtility
         };
 
         return result;
+    }
+
+    /// <summary>
+    /// Дамп токенов.
+    /// </summary>
+    public static void DumpTokens
+        (
+            IEnumerable<Token> tokens,
+            TextWriter? output = null
+        )
+    {
+        Sure.NotNull (tokens);
+        output ??= Console.Out;
+
+        foreach (var token in tokens)
+        {
+            output.WriteLine (token);
+        }
+
+        output.WriteLine (new string ('=', 60));
     }
 
     /// <summary>

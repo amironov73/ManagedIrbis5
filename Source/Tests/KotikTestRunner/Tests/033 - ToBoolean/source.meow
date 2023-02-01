@@ -1,0 +1,13 @@
+﻿x = 3;
+while (x)
+{
+    println (x);
+    x--;
+}
+
+for (x = 3; x; x--)
+{
+    println (x);
+}
+
+println ("done");

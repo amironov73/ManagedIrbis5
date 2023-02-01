@@ -29,8 +29,17 @@ namespace AM.Kotik.Barsik;
     HTML-атрибуты и содержимое, включающие адреса электронной почты, 
     не расценивают символ '@' как символ перехода.
 
-    Неявные Razor выражения начинаются с @:
+    Неявные Razor выражения начинаются с '@':
+
     <p>@DateTime.Now</p>
+
+    Неявные выражения не должны содержать пробелов.
+
+    Явные Razor выражения состоят из символа '@' со сбалансированной скобкой:
+
+    <p>Last week this time: @(DateTime.Now - TimeSpan.FromDays(7))</p>
+
+
 
  */
 
@@ -100,6 +109,8 @@ public sealed class BarsorParser
         )
     {
         Sure.NotNull (templateText);
+
+        // TODO не покупаться на @ в именах и в значениях атрибутов.
 
         var grammar = _interpreter.Settings.Grammar;
         var tokenizer = _interpreter.Settings.Tokenizer;

@@ -1,0 +1,19 @@
+﻿try
+{
+    println ("Inside try block 1")
+    throw ("Hello, exception")
+}
+catch (e)
+{
+    println (e.Message)
+}
+
+try
+{
+    println ("Inside try block 2")
+    throw (123)
+}
+catch (e)
+{
+    println (e.Message)
+}

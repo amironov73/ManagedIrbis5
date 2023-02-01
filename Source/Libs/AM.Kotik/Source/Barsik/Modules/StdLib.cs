@@ -89,6 +89,7 @@ public sealed class StdLib
         { "get_cache", new FunctionDescriptor ("get_cache", GetCache) },
         { "getcwd", new FunctionDescriptor ("getcwd", GetCurrentDirectory) },
         { "host", new FunctionDescriptor ("host", Host) },
+        { "html_encode", new FunctionDescriptor ("html_encode", HtmlEncode) },
         { "require", new FunctionDescriptor ("require", Include) },
         { "join", new FunctionDescriptor ("join", Join) },
         { "json_decode", new FunctionDescriptor ("json_decode", JsonDecode) },
@@ -826,6 +827,26 @@ public sealed class StdLib
         return Magna.Host;
     }
 
+    /// <summary>
+    /// HTML-кодирование строки.
+    /// </summary>
+    public static dynamic? HtmlEncode
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var value = Compute (context, args, 0);
+        if (value is null)
+        {
+            return value;
+        }
+
+        var text = KotikUtility.ToString (value);
+
+        return HtmlText.Encode (text);
+    }
+    
     /// <summary>
     /// Загрузка указанного скрипта.
     /// </summary>
