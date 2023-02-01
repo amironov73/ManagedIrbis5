@@ -23,7 +23,6 @@ using System.Linq;
 using System.Threading;
 
 using AM.Kotik.Barsik.Ast;
-using AM.Text;
 
 #endregion
 
@@ -134,7 +133,7 @@ public sealed class ConsoleDebugger
 
         if (int.TryParse (where, CultureInfo.InvariantCulture, out var lineNumber))
         {
-            var statement = KotikUtility.FindStatementAt (_program, lineNumber);
+            var statement = ((IStatementBlock) _program).FindStatementAt (lineNumber);
             if (statement is not null)
             {
                 if (!Breakpoints.ContainsKey (statement))

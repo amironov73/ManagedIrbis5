@@ -73,7 +73,7 @@ public sealed class DirectiveTokenizer
         _navigator.SkipWhile (' ', '\t');
         var argument = _navigator.ReadLine().ToString();
 
-        return new Token (TokenKind.Directive, command, line, column)
+        return new Token (TokenKind.Directive, command, line, column, position)
         {
             UserData = argument
         };

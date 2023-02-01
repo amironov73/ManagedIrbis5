@@ -76,7 +76,8 @@ public sealed class BigIntegerTokenizer
                 TokenKind.BigInteger,
                 builder.ReturnShared(),
                 line,
-                column
+                column,
+                position
             );
 
         return result;

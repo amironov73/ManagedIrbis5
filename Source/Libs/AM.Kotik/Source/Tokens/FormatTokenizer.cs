@@ -12,8 +12,6 @@
 
 #region Using directives
 
-using System.Text;
-
 using AM.Text;
 
 #endregion
@@ -33,6 +31,7 @@ public sealed class FormatTokenizer
     /// <inheritdoc cref="SubTokenizer.Parse"/>
     public override Token? Parse()
     {
+        var offset = _navigator.Position;
         var line = _navigator.Line;
         var column = _navigator.Column;
 
@@ -44,7 +43,7 @@ public sealed class FormatTokenizer
         ReadChar(); // съедаем доллар
         ReadChar(); // съедаем открывающую кавычку
         char chr = default;
-        var builder = new StringBuilder();
+        var builder = StringBuilderPool.Shared.Get();
         while (!IsEof)
         {
             chr = ReadChar();
@@ -65,13 +64,14 @@ public sealed class FormatTokenizer
 
         if (chr != '"')
         {
+            StringBuilderPool.Shared.Return (builder);
             throw new SyntaxException (_navigator);
         }
 
-        var text = builder.ToString();
+        var text = builder.ReturnShared();
         text = TextUtility.UnescapeText (text);
 
-        return new Token (TokenKind.Format, text, line, column);
+        return new Token (TokenKind.Format, text, line, column, offset);
     }
 
     #endregion

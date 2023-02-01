@@ -120,68 +120,6 @@ public static class KotikUtility
     }
 
     /// <summary>
-    /// Поиск стейтмента в указанной строке.
-    /// </summary>
-    public static StatementBase? FindStatementAt
-        (
-            BlockNode block,
-            int lineNumber
-        )
-    {
-        Sure.NotNull (block);
-
-        foreach (var statement in block)
-        {
-            if (statement.Line == lineNumber)
-            {
-                return statement;
-            }
-
-            if (statement is BlockNode subBlock)
-            {
-                var result = FindStatementAt (subBlock, lineNumber);
-                if (result is not null)
-                {
-                    return result;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    /// <summary>
-    /// Поиск стейтмента в указанной строке.
-    /// </summary>
-    public static StatementBase? FindStatementAt
-        (
-            ProgramNode program,
-            int lineNumber
-        )
-    {
-        Sure.NotNull (program);
-
-        foreach (var statement in program.Statements)
-        {
-            if (statement.Line == lineNumber)
-            {
-                return statement;
-            }
-
-            if (statement is BlockNode block)
-            {
-                var result = FindStatementAt (block, lineNumber);
-                if (result is not null)
-                {
-                    return result;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    /// <summary>
     /// Вывод на печать Expando-объекта.
     /// </summary>
     public static void PrintExpando
@@ -196,7 +134,7 @@ public static class KotikUtility
             return;
         }
 
-        var dictionary = (IDictionary<string, object?>)expando;
+        var dictionary = (IDictionary<string, object?>) expando;
         output.Write ("{");
 
         var keys = dictionary.Keys;

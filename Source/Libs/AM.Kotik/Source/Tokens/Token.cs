@@ -30,6 +30,11 @@ public sealed class Token
     : IEquatable<Token>
 {
     #region Properties
+    
+    /// <summary>
+    /// Смещение от начала текста (в символах).
+    /// </summary>
+    public int Offset { get; }
 
     /// <summary>
     /// Номер строки, начинается с 1.
@@ -54,7 +59,7 @@ public sealed class Token
     /// <summary>
     /// Произвольные пользовательские данные.
     /// </summary>
-    public object? UserData { get; set; }
+    public object? UserData { get; init; }
 
     #endregion
 
@@ -68,7 +73,8 @@ public sealed class Token
             string kind,
             string? value,
             int line = 0,
-            int column = 0
+            int column = 0,
+            int offset = 0
         )
     {
         Sure.NotNullNorEmpty (kind);
@@ -77,6 +83,7 @@ public sealed class Token
         Value = value;
         Line = line;
         Column = column;
+        Offset = offset;
     }
 
     #endregion

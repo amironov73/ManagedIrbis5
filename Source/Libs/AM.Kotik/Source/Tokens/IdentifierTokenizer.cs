@@ -32,6 +32,7 @@ public sealed class IdentifierTokenizer
     /// <inheritdoc cref="SubTokenizer.Parse"/>
     public override Token? Parse()
     {
+        var offset = _navigator.Position;
         var firstChar = PeekChar();
         var firstIdentifierLetter = Settings.FirstIdentifierLetter;
         var nextIdentifierLetter = Settings.NextIdentifierLetter;
@@ -62,7 +63,8 @@ public sealed class IdentifierTokenizer
                 IsReservedWord (value) ? TokenKind.ReservedWord : TokenKind.Identifier,
                 value,
                 line,
-                column
+                column,
+                offset
             );
     }
 

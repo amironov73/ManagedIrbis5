@@ -29,6 +29,7 @@ public sealed class IntegerTokenizer
     /// <inheritdoc cref="SubTokenizer.Parse"/>
     public override Token? Parse()
     {
+        var offset = _navigator.Position;
         var line = _navigator.Line;
         var column = _navigator.Column;
 
@@ -98,7 +99,8 @@ public sealed class IntegerTokenizer
                 kind,
                 builder.ReturnShared(),
                 line,
-                column
+                column,
+                offset
             );
 
         return result;

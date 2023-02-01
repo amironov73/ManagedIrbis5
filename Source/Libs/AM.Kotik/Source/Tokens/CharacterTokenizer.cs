@@ -12,8 +12,6 @@
 
 #region Using directives
 
-using System.Text;
-
 using AM.Text;
 
 #endregion
@@ -33,6 +31,7 @@ public sealed class CharacterTokenizer
     /// <inheritdoc cref="SubTokenizer.Parse"/>
     public override Token? Parse()
     {
+        var offset = _navigator.Position;
         var line = _navigator.Line;
         var column = _navigator.Column;
         if (PeekChar() != '\'')
@@ -45,10 +44,11 @@ public sealed class CharacterTokenizer
         var chr = ReadChar();
         if (chr == '\\')
         {
-            var builder = new StringBuilder();
+            var builder = StringBuilderPool.Shared.Get();
             builder.Append (chr);
             if (IsEof)
             {
+                StringBuilderPool.Shared.Return (builder);
                 throw new SyntaxException (_navigator);
             }
 
@@ -64,7 +64,7 @@ public sealed class CharacterTokenizer
                 builder.Append (chr);
             }
 
-            var text = TextUtility.UnescapeText (builder.ToString()).ThrowIfNullOrEmpty();
+            var text = TextUtility.UnescapeText (builder.ReturnShared()).ThrowIfNullOrEmpty();
             if (text.Length != 1)
             {
                 throw new SyntaxException (_navigator);
@@ -77,7 +77,7 @@ public sealed class CharacterTokenizer
             throw new SyntaxException (_navigator);
         }
 
-        return new Token (TokenKind.Char, result.ToString(), line, column);
+        return new Token (TokenKind.Char, result.ToString(), line, column, offset);
     }
 
     #endregion

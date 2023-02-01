@@ -12,7 +12,7 @@
 
 #region Using directives
 
-using System.Text;
+using AM.Text;
 
 #endregion
 
@@ -31,46 +31,54 @@ public sealed class HexTokenizer
     /// <inheritdoc cref="SubTokenizer.Parse"/>
     public override Token? Parse()
     {
+        var offset = _navigator.Position;
         var line = _navigator.Line;
         var column = _navigator.Column;
-        var builder = new StringBuilder();
-        
+
         // префикс '0x'
         var chr = PeekChar();
-        if (chr == '0' && _navigator.LookAhead (1) is 'x' or 'X')
+        if (chr != '0' || _navigator.LookAhead (1) is 'x' or 'X')
         {
-            ReadChar();
-            ReadChar();
-
-            var hex = TokenKind.Hex32;
-            while (!IsEof)
-            {
-                chr = PeekChar();
-
-                if (chr is '_')
-                {
-                    ReadChar();
-                    continue;
-                }
-
-                if (!"0123456789ABCDEFabcdef".Contains (chr))
-                {
-                    break;
-                }
-
-                builder.Append (ReadChar());
-            }
-
-            if (chr is 'L' or 'l')
-            {
-                ReadChar();
-                hex = TokenKind.Hex64;
-            }
-
-            return new Token (hex, builder.ToString(), line, column);
+            return null;
         }
 
-        return null;
+        ReadChar();
+        ReadChar();
+
+        var builder = StringBuilderPool.Shared.Get();
+        var kind = TokenKind.Hex32;
+        while (!IsEof)
+        {
+            chr = PeekChar();
+
+            if (chr is '_')
+            {
+                ReadChar();
+                continue;
+            }
+
+            if (!"0123456789ABCDEFabcdef".Contains (chr))
+            {
+                break;
+            }
+
+            builder.Append (ReadChar());
+        }
+
+        if (chr is 'L' or 'l')
+        {
+            ReadChar();
+            kind = TokenKind.Hex64;
+        }
+
+        return new Token 
+            (
+                kind, 
+                builder.ReturnShared(), 
+                line, 
+                column, 
+                offset
+            );
     }
 
     #endregion
