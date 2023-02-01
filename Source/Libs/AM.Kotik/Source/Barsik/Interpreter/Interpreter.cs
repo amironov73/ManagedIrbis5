@@ -272,6 +272,20 @@ public sealed class Interpreter
         var interpreter = CreateInterpreter (args);
         configure?.Invoke (interpreter);
 
+        if (interpreter.Settings.BarsorMode)
+        {
+            interpreter.ApplySettings();
+            var barsor = new BarsorParser (interpreter);
+            foreach (var fileName in interpreter.Settings.ScriptFiles)
+            {
+                var sourceCode = File.ReadAllText (fileName);
+                var programNode = barsor.ParseTemplate (sourceCode);
+                programNode.Execute (interpreter.Context);
+            }
+
+            return 0;
+        }
+
         if (interpreter.Settings.Highlight is not null)
         {
             foreach (var file in interpreter.Settings.ScriptFiles)

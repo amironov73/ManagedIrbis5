@@ -1,0 +1,5 @@
+﻿console.log ('Hello, World!');
+@{
+    for (i = 0; i < 10; i++)
+        println ("console.log (", i + 1, ");")
+}console.log ('Goodbye, World!');

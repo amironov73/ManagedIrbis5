@@ -131,6 +131,12 @@ public sealed class InterpreterSettings
     /// </summary>
     [JsonIgnore]
     public string? Highlight { get; set; }
+    
+    /// <summary>
+    /// Режим Barsor.
+    /// </summary>
+    [JsonIgnore]
+    public bool BarsorMode { get; set; }
 
     #endregion
 
@@ -196,58 +202,62 @@ public sealed class InterpreterSettings
         {
             var arg = args[index];
 
-            if (arg == "--dump-variables")
+            if (arg is "--dump-variables")
             {
                 result.VariableDumper = new StandardDumper();
             }
-            else if (arg == "--dump-ast")
+            else if (arg is "--dump-ast")
             {
                 result.DumpAst = true;
             }
-            else if (arg == "--grammar")
+            else if (arg is "--grammar")
             {
                 // TODO установка нестандартной грамматики
                 index++;
             }
-            else if (arg == "--repl")
+            else if (arg is "--repl")
             {
                 result.ReplMode = true;
             }
-            else if (arg == "--debug-parser")
+            else if (arg is "--debug-parser")
             {
                 result.DebugParser = true;
             }
-            else if (arg == "--external")
+            else if (arg is "--external")
             {
                 // TODO установка обработчика внешнего кода
                 index++;
             }
-            else if (arg == "--use-namespace")
+            else if (arg is "--use-namespace")
             {
                 result.UseNamespaces.Add (args[index + 1]);
                 index++;
             }
-            else if (arg == "--load-assembly")
+            else if (arg is "--load-assembly")
             {
                 result.LoadAssemblies.Add (args[index + 1]);
                 index++;
             }
-            else if (arg == "--debugger")
+            else if (arg is "--debugger")
             {
                 result.StartDebugger = true;
             }
-            else if (arg == "--eval")
+            else if (arg is "--eval")
             {
                 result.EvaluateExpression = string.Join (' ', args.Skip (index + 1));
                 break;
             }
-            else if (arg == "--highlight-html")
+            else if (arg is "--highlight-html")
             {
                 result.Highlight = "html";
             }
             else if (arg is "--higlight-console" or "--highlight")
             {
                 result.Highlight = "console";
+            }
+            else if (arg is "--barsor")
+            {
+                result.BarsorMode = true;
             }
             else if (arg.StartsWith ("-"))
             {

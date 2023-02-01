@@ -22,13 +22,44 @@ using AM.Text;
 
 namespace AM.Kotik.Barsik;
 
+/*
+    Razor - это синтаксис разметки для внедрения кода на основе .NET в веб-страницы.
+    Razor поддерживает C# и использует '@' символ для перехода с HTML на C#.
+    Чтобы экранировать символ '@' в Razor разметке, надо удвоить его.
+    HTML-атрибуты и содержимое, включающие адреса электронной почты, 
+    не расценивают символ '@' как символ перехода.
+
+    Неявные Razor выражения начинаются с @:
+    <p>@DateTime.Now</p>
+
+ */
+
 /// <summary>
 /// Аналог Blazor, только для Barsik.
 /// </summary>
 public sealed class BarsorParser
 {
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public BarsorParser
+        (
+            Interpreter interpreter
+        )
+    {
+        Sure.NotNull (interpreter);
+        
+        _interpreter = interpreter;
+    }
+
+    #endregion
+    
     #region Private members
 
+    private readonly Interpreter _interpreter;
+    
     /// <summary>
     /// Вызов <c>print</c> с указанным текстом.
     /// </summary>
@@ -70,8 +101,8 @@ public sealed class BarsorParser
     {
         Sure.NotNull (templateText);
 
-        var grammar = Grammar.CreateDefaultBarsikGrammar();
-        var tokenizer = KotikUtility.CreateTokenizerForBarsik();
+        var grammar = _interpreter.Settings.Grammar;
+        var tokenizer = _interpreter.Settings.Tokenizer;
         var statements = new List<StatementBase>();
         var navigator = new ValueTextNavigator (templateText);
         while (!navigator.IsEOF)
@@ -81,6 +112,7 @@ public sealed class BarsorParser
             {
                 navigator.ReadChar();
                 nextChar = navigator.PeekChar();
+                
                 if (nextChar == '{')
                 {
                     navigator.ReadChar();
@@ -92,11 +124,13 @@ public sealed class BarsorParser
                         statements.AddRange (subProgram.Statements);
                     }
                 }
+                
                 else if (nextChar == '@')
                 {
                     var statement = Print ("@");
                     statements.Add (statement);
                 }
+                
                 else if (nextChar == '(')
                 {
                     navigator.ReadChar();
@@ -109,6 +143,7 @@ public sealed class BarsorParser
                         statements.Add (statement);
                     }
                 }
+                
                 else
                 {
                     var source = navigator.ReadUntil (' ', '\t', '\r', '\n', '<');

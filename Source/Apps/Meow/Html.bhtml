@@ -1,0 +1,13 @@
+﻿<html lang="ru">
+<head>
+    <title>Цикл FOR</title>
+</head>
+<body>
+    <h1>Цикл FOR</h1>
+    <p>Текст до цикла</p>
+@{
+    for (i = 0; i < 10; i++)
+        println ("\t<p>Строка ", i + 1, "</p>")
+}    <p>Текст после цикла</p>
+</body>
+</html>
