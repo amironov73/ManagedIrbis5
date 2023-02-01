@@ -31,7 +31,7 @@ namespace MicroPft.Tokenizers;
 internal sealed class FieldTokenizer
     : Tokenizer
 {
-    #region SubTokenizer members
+    #region Tokenizer members
 
     /// <inheritdoc cref="Tokenizer.Parse"/>
     public override Token? Parse()

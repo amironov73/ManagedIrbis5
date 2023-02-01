@@ -10,6 +10,12 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
+#region Using directives
+
+using System.Collections.Generic;
+
+#endregion
+
 #nullable enable
 
 namespace AM.Kotik.Tokenizers;
@@ -39,11 +45,35 @@ public sealed class CommentTokenizer
     
     #region Private members
 
-    private readonly bool _eatComments;
+    private bool _eatComments;
 
     #endregion
 
-    #region SubTokenizer members
+    #region Public methods
+
+    /// <summary>
+    /// Установка переключателя `eat`.
+    /// </summary>
+    public static void SwitchEat
+        (
+            IEnumerable<Tokenizer> tokenizers,
+            bool eat
+        )
+    {
+        Sure.NotNull (tokenizers);
+        
+        foreach (var tokenizer in tokenizers)
+        {
+            if (tokenizer is CommentTokenizer commentTokenizer)
+            {
+                commentTokenizer._eatComments = eat;
+            }
+        }
+    }
+
+    #endregion
+
+    #region Tokenizer members
 
     /// <inheritdoc cref="Tokenizer.Parse"/>
     public override Token? Parse()
@@ -60,8 +90,16 @@ public sealed class CommentTokenizer
             if (nextChar == '/')
             {
                 // съедаем всю текущую строку до конца
-                navigator.ReadLine();
-                
+                while (!IsEof)
+                {
+                    if (PeekChar() is '\r' or '\n')
+                    {
+                        break;
+                    }
+
+                    ReadChar();
+                }
+
                 return _eatComments
                     ? null
                     : new Token

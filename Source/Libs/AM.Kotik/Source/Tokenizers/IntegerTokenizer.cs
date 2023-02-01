@@ -26,6 +26,8 @@ namespace AM.Kotik.Tokenizers;
 public sealed class IntegerTokenizer
     : Tokenizer
 {
+    #region Tokenizer members
+
     /// <inheritdoc cref="Tokenizer.Parse"/>
     public override Token? Parse()
     {
@@ -115,4 +117,6 @@ public sealed class IntegerTokenizer
 
         return result;
     }
+
+    #endregion
 }

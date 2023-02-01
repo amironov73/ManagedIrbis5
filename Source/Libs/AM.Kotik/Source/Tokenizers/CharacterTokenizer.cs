@@ -26,7 +26,7 @@ namespace AM.Kotik.Tokenizers;
 public sealed class CharacterTokenizer
     : Tokenizer
 {
-    #region SubTokenizer methods
+    #region Tokenizer methods
 
     /// <inheritdoc cref="Tokenizer.Parse"/>
     public override Token? Parse()

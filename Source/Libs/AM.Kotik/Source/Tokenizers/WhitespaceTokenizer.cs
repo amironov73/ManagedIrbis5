@@ -10,6 +10,12 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
+#region Using directives
+
+using System.Collections.Generic;
+
+#endregion
+
 #nullable enable
 
 namespace AM.Kotik.Tokenizers;
@@ -39,11 +45,35 @@ public sealed class WhitespaceTokenizer
     
     #region Private members
 
-    private readonly bool _eatWhitespace;
+    private bool _eatWhitespace;
 
     #endregion
 
-    #region SubTokenizer members
+    #region Public methods
+
+    /// <summary>
+    /// Установка переключателя `eat`.
+    /// </summary>
+    public static void SwitchEat
+        (
+            IEnumerable<Tokenizer> tokenizers,
+            bool eat
+        )
+    {
+        Sure.NotNull (tokenizers);
+        
+        foreach (var tokenizer in tokenizers)
+        {
+            if (tokenizer is WhitespaceTokenizer whitespaceTokenizer)
+            {
+                whitespaceTokenizer._eatWhitespace = eat;
+            }
+        }
+    }
+
+    #endregion
+    
+    #region Tokenizer members
 
     /// <inheritdoc cref="Tokenizer.Parse"/>
     public override Token? Parse()

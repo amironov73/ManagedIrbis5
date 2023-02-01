@@ -23,6 +23,9 @@ using System.Reflection;
 
 using AM.Kotik.Barsik.Ast;
 using AM.Kotik.Barsik.Diagnostics;
+using AM.Kotik.Highlighting;
+using AM.Kotik.Tokenizers;
+using AM.Text;
 
 #endregion
 
@@ -156,6 +159,59 @@ public sealed class Interpreter
 
     #endregion
 
+    #region Private members
+
+    private static void HighlightToConsole 
+        (
+            string sourceCode,
+            Tokenizer tokenizer
+        )
+    {
+        var highlighter = new ScriptHighlighter<ConsoleColor>
+        {
+            Tokenizer = tokenizer,
+            Colors = GetConsoleColors(),
+            MainColor = ConsoleColor.Gray
+        };
+        var spans = highlighter.Highlight (sourceCode);
+        var saveColor = Console.ForegroundColor;
+        foreach (var textSpan in spans)
+        {
+            Console.ForegroundColor = textSpan.Highlight;
+            Console.Write (textSpan.Fragment);
+        }
+
+        Console.ForegroundColor = saveColor;
+    }
+
+    private static void HighlightToHtml 
+        (
+            string sourceCode,
+            TextWriter output,
+            Tokenizer tokenizer
+        )
+    {
+        var highlighter = new ScriptHighlighter<string>
+        {
+            Tokenizer = tokenizer,
+            Colors = GetHtmlColors(),
+            MainColor = "#D3D3D3"
+        };
+        var spans = highlighter.Highlight (sourceCode);
+        output.WriteLine ("<pre style=\"background: black;\">");
+        foreach (var textSpan in spans)
+        {
+            output.Write ($"<span style=\"color:{textSpan.Highlight};\">");
+            output.Write (HtmlText.Encode (textSpan.Fragment));
+            // output.Write (textSpan.Fragment);
+            output.Write ("</span>");
+        }
+
+        output.WriteLine ("</pre>");
+    }
+
+    #endregion
+
     #region Public methods
 
     /// <summary>
@@ -212,9 +268,20 @@ public sealed class Interpreter
         )
     {
         Sure.NotNull (args);
-
+        
         var interpreter = CreateInterpreter (args);
         configure?.Invoke (interpreter);
+
+        if (interpreter.Settings.Highlight is not null)
+        {
+            foreach (var file in interpreter.Settings.ScriptFiles)
+            {
+                HighlightFile (file, interpreter.Settings.Highlight);
+            }
+            
+            return 0;
+        }
+        
         ConsoleDebugger? debugger = null;
         if (interpreter.Settings.StartDebugger)
         {
@@ -423,6 +490,53 @@ public sealed class Interpreter
     }
 
     /// <summary>
+    /// Раскраска исходного кода из указанного файле.
+    /// </summary>
+    public static void HighlightFile
+        (
+            string fileName,
+            string higlighterKind = "html",
+            TextWriter? output = null
+        )
+    {
+        Sure.FileExists (fileName);
+        Sure.NotNullNorEmpty (higlighterKind);
+
+        var sourceCode = File.ReadAllText (fileName);
+        HighlightSourceCode (sourceCode, higlighterKind, output);
+    }
+
+    /// <summary>
+    /// Раскраска исходного кода.
+    /// </summary>
+    public static void HighlightSourceCode
+        (
+            string sourceCode,
+            string higlighterKind = "html",
+            TextWriter? output = null
+        )
+    {
+        Sure.NotNull (sourceCode);
+        Sure.NotNullNorEmpty (higlighterKind);
+        output ??= Console.Out;
+
+        var tokenizer = KotikUtility.CreateTokenizerForBarsik();
+        CommentTokenizer.SwitchEat (tokenizer.Tokenizers, false);
+        WhitespaceTokenizer.SwitchEat (tokenizer.Tokenizers, false);
+
+        switch (higlighterKind)
+        {
+            case "html":
+                HighlightToHtml (sourceCode, output, tokenizer);
+                break;
+
+            case "console":
+                HighlightToConsole(sourceCode, tokenizer);
+                break;
+        }
+    }
+
+    /// <summary>
     /// Загрузка исходного кода из указанного файла
     /// с последующим исполнением.
     /// </summary>
@@ -478,6 +592,60 @@ public sealed class Interpreter
 
         return result;
     }
+
+    /// <summary>
+    /// Получение цветовой схемы для подсвечивания исходного кода скриптов.
+    /// </summary>
+    /// <returns></returns>
+    public static Dictionary<string, ConsoleColor> GetConsoleColors() => new ()
+    {
+        [TokenKind.Char] = ConsoleColor.Green,
+        [TokenKind.String] = ConsoleColor.Green,
+        [TokenKind.RawString] = ConsoleColor.Green,
+        [TokenKind.Format] = ConsoleColor.Green,
+        [TokenKind.Comment] = ConsoleColor.DarkGreen,
+        [TokenKind.Decimal] = ConsoleColor.Cyan,
+        [TokenKind.Int32] = ConsoleColor.Cyan,
+        [TokenKind.Int64] = ConsoleColor.Cyan,
+        [TokenKind.UInt32] = ConsoleColor.Cyan,
+        [TokenKind.UInt64] = ConsoleColor.Cyan,
+        [TokenKind.Hex32] = ConsoleColor.Cyan,
+        [TokenKind.Hex64] = ConsoleColor.Cyan,
+        [TokenKind.BigInteger] = ConsoleColor.Cyan,
+        [TokenKind.Single] = ConsoleColor.Cyan,
+        [TokenKind.Double] = ConsoleColor.Cyan,
+        [TokenKind.Identifier] = ConsoleColor.White,
+        [TokenKind.ReservedWord] = ConsoleColor.Yellow,
+        [TokenKind.External] = ConsoleColor.Magenta,
+        [TokenKind.Directive] = ConsoleColor.Red,
+    };
+
+    /// <summary>
+    /// Получение цветовой схемы для подсвечивания исходного кода скриптов.
+    /// </summary>
+    /// <returns></returns>
+    public static Dictionary<string, string> GetHtmlColors() => new ()
+    {
+        [TokenKind.Char] = "#00FF00",
+        [TokenKind.String] = "#00FF00",
+        [TokenKind.RawString] = "#00FF00",
+        [TokenKind.Format] = "#00FF00",
+        [TokenKind.Comment] = "#00C000",
+        [TokenKind.Decimal] = "#00FFFF",
+        [TokenKind.Int32] = "#00FFFF",
+        [TokenKind.Int64] = "#00FFFF",
+        [TokenKind.UInt32] = "#00FFFF",
+        [TokenKind.UInt64] = "#00FFFF",
+        [TokenKind.Hex32] = "#00FFFF",
+        [TokenKind.Hex64] = "#00FFFF",
+        [TokenKind.BigInteger] = "#00FFFF",
+        [TokenKind.Single] = "#00FFFF",
+        [TokenKind.Double] = "#00FFFF",
+        [TokenKind.Identifier] = "#FFFFFF",
+        [TokenKind.ReservedWord] = "#FFFF00",
+        [TokenKind.External] = "#FF0000",
+        [TokenKind.Directive] = "#FF0000",
+    };
 
     /// <summary>
     /// Сброс состояния интерпретатора.

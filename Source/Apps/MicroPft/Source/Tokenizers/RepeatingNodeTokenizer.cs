@@ -33,7 +33,7 @@ namespace MicroPft.Tokenizers;
 public sealed class RepeatingNodeTokenizer
     : Tokenizer
 {
-    #region SubTokeninzer members
+    #region Tokeninzer members
 
     /// <inheritdoc cref="Tokenizer.Parse"/>
     public override Token? Parse()

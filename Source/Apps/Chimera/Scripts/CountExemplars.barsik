@@ -1,0 +1,47 @@
+﻿//
+// Подсчет количества экземпляров в книжном фонде
+//
+
+connect("host=127.0.0.1;port=6666;user=librarian;password=secret;db=IBIS;")
+if (!is_connected())
+{
+    error ("Not connected")
+    exit()
+}
+
+//=================================
+
+xpression = "(IN=16$ + IN=17$ + IN=18$) * MHR=ФКХ"
+// xpression = "IN=И$ * MHR=ФКХ"
+books = search (xpression)
+println ("Books found: ", len (books))
+
+books = batch_read (books)
+counter = 0
+foreach (book in books)
+{
+    foreach (one in get_exemplars (book))
+    {
+        status = one.Status
+        number = one.Number
+        if (number)
+        {        
+            if (one.Place == "ФКХ"
+                and have_subfield (one.Field, 'h')
+                and len (number) == 7 and number > "16"
+                and (status == "0" or status == "1" or status == "5" or status == "9"))
+            {
+                counter = counter + 1
+                println (one)
+            }
+        }
+    }
+}
+
+println()
+println ("Total=", counter)
+
+//=================================
+
+disconnect()
+println ("THAT'S ALL, FOLKS!")

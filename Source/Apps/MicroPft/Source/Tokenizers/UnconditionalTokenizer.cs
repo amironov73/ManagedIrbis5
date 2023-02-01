@@ -31,7 +31,7 @@ namespace MicroPft.Tokenizers;
 public sealed class UnconditionalTokenizer
     : Tokenizer
 {
-    #region SubTokeninzer members
+    #region Tokeninzer members
 
     /// <inheritdoc cref="Tokenizer.Parse"/>
     public override Token? Parse()

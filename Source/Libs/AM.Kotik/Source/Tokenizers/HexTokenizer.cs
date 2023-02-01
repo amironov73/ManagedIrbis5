@@ -26,7 +26,7 @@ namespace AM.Kotik.Tokenizers;
 public sealed class HexTokenizer
     : Tokenizer
 {
-    #region SubTokenizer members
+    #region Tokenizer members
 
     /// <inheritdoc cref="Tokenizer.Parse"/>
     public override Token? Parse()

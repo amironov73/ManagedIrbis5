@@ -72,7 +72,7 @@ public sealed class RegexTokenizer
 
     #endregion
 
-    #region SubTokeninzer members
+    #region Tokeninzer members
 
     /// <inheritdoc cref="Tokenizer.Parse"/>
     public override Token? Parse()

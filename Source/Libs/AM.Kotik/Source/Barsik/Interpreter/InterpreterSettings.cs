@@ -125,6 +125,12 @@ public sealed class InterpreterSettings
     /// </summary>
     [JsonIgnore]
     public Tokenizer Tokenizer { get; set; }
+    
+    /// <summary>
+    /// Нужно раскрасить исходный код скрипта?
+    /// </summary>
+    [JsonIgnore]
+    public string? Highlight { get; set; }
 
     #endregion
 
@@ -234,6 +240,14 @@ public sealed class InterpreterSettings
             {
                 result.EvaluateExpression = string.Join (' ', args.Skip (index + 1));
                 break;
+            }
+            else if (arg == "--highlight-html")
+            {
+                result.Highlight = "html";
+            }
+            else if (arg is "--higlight-console" or "--highlight")
+            {
+                result.Highlight = "console";
             }
             else if (arg.StartsWith ("-"))
             {
