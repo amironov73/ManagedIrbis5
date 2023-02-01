@@ -13,6 +13,7 @@ using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using AM.Kotik;
+using AM.Kotik.Tokenizers;
 
 #endregion
 

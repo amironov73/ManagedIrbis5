@@ -19,7 +19,7 @@ using System.Text;
 
 #nullable enable
 
-namespace AM.Kotik;
+namespace AM.Kotik.Tokenizers;
 
 /// <summary>
 /// Токенайзер для идентификаторов.

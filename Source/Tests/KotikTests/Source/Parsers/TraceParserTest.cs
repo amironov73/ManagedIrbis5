@@ -12,6 +12,7 @@ using System.IO;
 using System.Text;
 
 using AM.Kotik;
+using AM.Kotik.Tokenizers;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

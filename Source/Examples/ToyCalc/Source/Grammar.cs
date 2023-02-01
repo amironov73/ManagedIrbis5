@@ -15,6 +15,7 @@
 using System;
 
 using AM.Kotik;
+using AM.Kotik.Tokenizers;
 
 #endregion
 
@@ -99,10 +100,9 @@ internal static class Grammar
         })
     {
         Refiner = null,
-        CommentHandler = null,
-        WhitespaceHandler = new StandardWhitespaceHandler(),
         Tokenizers =
         {
+            new WhitespaceTokenizer(),
             new NumberTokenizer(),
             new IntegerTokenizer(),
             new TermTokenizer()

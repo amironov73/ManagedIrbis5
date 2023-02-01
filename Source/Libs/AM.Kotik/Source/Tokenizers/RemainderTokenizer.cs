@@ -11,7 +11,7 @@
 
 #nullable enable
 
-namespace AM.Kotik;
+namespace AM.Kotik.Tokenizers;
 
 /// <summary>
 /// Выдает оставшуюся часть текста

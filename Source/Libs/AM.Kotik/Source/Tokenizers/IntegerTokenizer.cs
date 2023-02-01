@@ -18,7 +18,7 @@ using AM.Text;
 
 #nullable enable
 
-namespace AM.Kotik;
+namespace AM.Kotik.Tokenizers;
 
 /// <summary>
 /// Токенайзер для целых чисел.
@@ -85,14 +85,24 @@ public sealed class IntegerTokenizer
                 ReadChar();
                 isUnsigned = true;
             }
+            else if (chr is '.' or 'e' or 'E' or 'f' or 'F' or 'm' or 'M')
+            {
+                // это число с плавающей (или фиксированной) точкой
+                StringBuilderPool.Shared.Return (builder);
+                _navigator.RestorePosition (offset);
+                return null;
+            }
             else
             {
                 break;
             }
         }
 
-        var kind = isLong ? isUnsigned ? TokenKind.UInt64 : TokenKind.Int64
-            : isUnsigned ? TokenKind.UInt32 : TokenKind.Int32;
+        var kind = isLong
+            ? isUnsigned
+                ? TokenKind.UInt64 : TokenKind.Int64
+            : isUnsigned
+                ? TokenKind.UInt32 : TokenKind.Int32;
 
         var result = new Token
             (

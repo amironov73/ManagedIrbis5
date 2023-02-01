@@ -18,7 +18,7 @@ using AM.Text;
 
 #nullable enable
 
-namespace AM.Kotik;
+namespace AM.Kotik.Tokenizers;
 
 /// <summary>
 /// Токенайзер для чисел в шестнадцатеричной системе счичления.
@@ -34,10 +34,10 @@ public sealed class HexTokenizer
         var offset = _navigator.Position;
         var line = _navigator.Line;
         var column = _navigator.Column;
-
+ 
         // префикс '0x'
         var chr = PeekChar();
-        if (chr != '0' || _navigator.LookAhead (1) is 'x' or 'X')
+        if (chr != '0' || _navigator.LookAhead (1) is not ('x' or 'X'))
         {
             return null;
         }

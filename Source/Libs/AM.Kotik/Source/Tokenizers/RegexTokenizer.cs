@@ -21,7 +21,7 @@ using AM.Kotik;
 
 #nullable enable
 
-namespace AM.Kotik;
+namespace AM.Kotik.Tokenizers;
 
 /// <summary>
 /// Токенайзер на регулярных выражениях.

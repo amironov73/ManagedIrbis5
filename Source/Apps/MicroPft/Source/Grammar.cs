@@ -22,9 +22,10 @@ using System.Globalization;
 using AM;
 using AM.Kotik;
 using AM.Kotik.Parsers;
+using AM.Kotik.Tokenizers;
 
 using MicroPft.Ast;
-using MicroPft.Tokens;
+using MicroPft.Tokenizers;
 
 #endregion
 
@@ -252,6 +253,7 @@ internal static class Grammar
         {
             Tokenizers =
             {
+                new WhitespaceTokenizer(),
                 new FieldTokenizer(),
                 new RegexTokenizer ("c", "[Cc]\\d+"),
                 new RegexTokenizer ("conditional", "[|][^|]*?[|]"),
@@ -259,8 +261,7 @@ internal static class Grammar
                 new RegexTokenizer ("x", "[Xx]\\d+"),
                 new RepeatingNodeTokenizer(),
                 new UnconditionalTokenizer()
-            },
-            WhitespaceHandler = new StandardWhitespaceHandler()
+            }
         };
         var tokens = tokeninzer.Tokenize (text);
         var state = new ParseState (tokens);

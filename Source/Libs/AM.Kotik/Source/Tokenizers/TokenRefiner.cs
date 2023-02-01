@@ -18,7 +18,7 @@ using System.Collections.Generic;
 
 #nullable enable
 
-namespace AM.Kotik;
+namespace AM.Kotik.Tokenizers;
 
 /// <summary>
 /// Абстрактный пересборщик токенов.

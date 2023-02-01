@@ -12,7 +12,7 @@
 
 #nullable enable
 
-namespace AM.Kotik;
+namespace AM.Kotik.Tokenizers;
 
 /// <summary>
 /// Известные виды токенов.
@@ -21,6 +21,16 @@ public static class TokenKind
 {
     #region Constants
 
+    /// <summary>
+    /// Комментарий.
+    /// </summary>
+    public const string Comment = "comment";
+
+    /// <summary>
+    /// Пробелы.
+    /// </summary>
+    public const string Whitespace = "whitespace";
+    
     /// <summary>
     /// Директива.
     /// </summary>

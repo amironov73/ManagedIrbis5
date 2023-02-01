@@ -6,11 +6,13 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
-/* FormatTokenizer.cs -- токенайзер для форматных строк
+/* BigIntegerTokenizer.cs -- токенайзер для BigInteger
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
+
+using System.Numerics;
 
 using AM.Text;
 
@@ -18,12 +20,12 @@ using AM.Text;
 
 #nullable enable
 
-namespace AM.Kotik;
+namespace AM.Kotik.Tokenizers;
 
 /// <summary>
-/// Токенайзер для форматных строк.
+/// Токенайзер для <see cref="BigInteger"/>.
 /// </summary>
-public sealed class FormatTokenizer
+public sealed class BigIntegerTokenizer
     : SubTokenizer
 {
     #region SubTokenizer members
@@ -31,47 +33,54 @@ public sealed class FormatTokenizer
     /// <inheritdoc cref="SubTokenizer.Parse"/>
     public override Token? Parse()
     {
-        var offset = _navigator.Position;
         var line = _navigator.Line;
         var column = _navigator.Column;
-
-        if (PeekChar() != '$' || PeekChar (1) != '"')
+        var position = _navigator.Position;
+        var chr = PeekChar();
+        if (!chr.IsArabicDigit())
         {
             return null;
         }
 
-        ReadChar(); // съедаем доллар
-        ReadChar(); // съедаем открывающую кавычку
-        char chr = default;
         var builder = StringBuilderPool.Shared.Get();
         while (!IsEof)
         {
-            chr = ReadChar();
-            if (chr == '\\')
+            chr = PeekChar();
+
+            if (chr is '_')
             {
-                builder.Append (chr);
-                builder.Append (ReadChar());
+                ReadChar();
                 continue;
             }
 
-            if (chr == '"')
+            if (!chr.IsArabicDigit())
             {
                 break;
             }
 
-            builder.Append (chr);
+            builder.Append (ReadChar());
         }
 
-        if (chr != '"')
+        chr = PeekChar();
+        if (chr is not 'b' and not 'B') // TODO подобрать подходящий суффикс
         {
+            _navigator.RestorePosition (position);
             StringBuilderPool.Shared.Return (builder);
-            throw new SyntaxException (_navigator);
+            return null;
         }
 
-        var text = builder.ReturnShared();
-        text = TextUtility.UnescapeText (text);
+        ReadChar();
 
-        return new Token (TokenKind.Format, text, line, column, offset);
+        var result = new Token
+            (
+                TokenKind.BigInteger,
+                builder.ReturnShared(),
+                line,
+                column,
+                position
+            );
+
+        return result;
     }
 
     #endregion

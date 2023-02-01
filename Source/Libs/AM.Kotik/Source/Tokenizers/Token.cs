@@ -21,7 +21,7 @@ using System.Collections.Generic;
 
 #nullable enable
 
-namespace AM.Kotik;
+namespace AM.Kotik.Tokenizers;
 
 /// <summary>
 /// Токен состоит из вида и значения.

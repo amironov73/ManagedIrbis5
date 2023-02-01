@@ -23,6 +23,7 @@ using System.IO;
 using System.Reflection;
 
 using AM.Kotik.Barsik.Ast;
+using AM.Kotik.Tokenizers;
 using AM.Text;
 
 #endregion
@@ -101,20 +102,23 @@ public static class KotikUtility
         settings ??= TokenizerSettings.CreateDefault();
         var result = new Tokenizer (settings)
         {
-            WhitespaceHandler = new StandardWhitespaceHandler(),
-            CommentHandler = new StandardCommentHandler()
+            Tokenizers =
+            {
+                new WhitespaceTokenizer(),
+                new CommentTokenizer(),
+                new DirectiveTokenizer(),
+                new CharacterTokenizer(),
+                new RawStringTokenizer(),
+                new StringTokenizer(),
+                new FormatTokenizer(),
+                new ExternalTokenizer(),
+                new HexTokenizer(),
+                new NumberTokenizer(),
+                new IntegerTokenizer(), // integer должен быть после number
+                new TermTokenizer(),
+                new IdentifierTokenizer(),
+            }
         };
-        result.Tokenizers.Add (new DirectiveTokenizer());
-        result.Tokenizers.Add (new CharacterTokenizer());
-        result.Tokenizers.Add (new RawStringTokenizer());
-        result.Tokenizers.Add (new StringTokenizer());
-        result.Tokenizers.Add (new FormatTokenizer());
-        result.Tokenizers.Add (new ExternalTokenizer());
-        result.Tokenizers.Add (new HexTokenizer());
-        result.Tokenizers.Add (new NumberTokenizer());
-        result.Tokenizers.Add (new IntegerTokenizer()); // integer должен быть после number
-        result.Tokenizers.Add (new TermTokenizer());
-        result.Tokenizers.Add (new IdentifierTokenizer());
 
         return result;
     }

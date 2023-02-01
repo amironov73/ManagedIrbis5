@@ -6,11 +6,13 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
-/* CommentHandler.cs -- абстрактный обработчик комментариев
+/* SubTokenizer.cs -- абстрактный вложенный токенайзер
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
+
+using System.Globalization;
 
 using AM.Text;
 
@@ -18,13 +20,22 @@ using AM.Text;
 
 #nullable enable
 
-namespace AM.Kotik;
+namespace AM.Kotik.Tokenizers;
 
 /// <summary>
-/// Абстрактный обработчик комментариев.
+/// Абстрактный вложенный токенайзер.
 /// </summary>
-public abstract class CommentHandler
+public abstract class SubTokenizer
 {
+    #region Properties
+
+    /// <summary>
+    /// Настройки.
+    /// </summary>
+    public virtual TokenizerSettings Settings { get; set; } = null!;
+
+    #endregion
+
     #region Protected members
 
     /// <summary>
@@ -36,6 +47,27 @@ public abstract class CommentHandler
     ///
     /// </summary>
     protected bool IsEof => _navigator.IsEOF;
+
+    /// <summary>
+    /// Проверка, не является ли указанный текст зарезервированным словом.
+    /// </summary>
+    protected bool IsReservedWord
+        (
+            string text
+        )
+    {
+        Sure.NotNull (text);
+
+        foreach (var word in Settings.ReservedWords)
+        {
+            if (string.CompareOrdinal (word, text) == 0)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     /// <summary>
     ///
@@ -57,18 +89,17 @@ public abstract class CommentHandler
 
     #endregion
 
-    #region Public members
-
+    #region Public methods
 
     /// <summary>
-    /// Парсинг комментариев.
+    /// Попытка разбора токена в текущей позиции.
     /// </summary>
-    public abstract Token? ParseComments();
+    public abstract Token? Parse();
 
     /// <summary>
     /// Начало разбора текста.
     /// </summary>
-    public void StartParsing
+    public virtual void StartParsing
         (
             TextNavigator navigator
         )

@@ -17,7 +17,7 @@
 
 using System.Text;
 
-using AM.Kotik;
+using AM.Kotik.Tokenizers;
 
 using MicroPft.Ast;
 
@@ -25,7 +25,7 @@ using MicroPft.Ast;
 
 #nullable enable
 
-namespace MicroPft.Tokens;
+namespace MicroPft.Tokenizers;
 
 /// <summary>
 /// Разбирает повторяющийся литерал.

@@ -20,7 +20,7 @@ using AM.Text;
 
 #nullable enable
 
-namespace AM.Kotik;
+namespace AM.Kotik.Tokenizers;
 
 /// <summary>
 /// Генерализованный токенайзер.
@@ -28,11 +28,6 @@ namespace AM.Kotik;
 public sealed class Tokenizer
 {
     #region Properties
-
-    /// <summary>
-    /// Обработчик комментариев.
-    /// </summary>
-    public CommentHandler? CommentHandler { get; set; }
 
     /// <summary>
     /// Настройки токенизации.
@@ -48,11 +43,6 @@ public sealed class Tokenizer
     /// Пересборщик токенов.
     /// </summary>
     public TokenRefiner? Refiner { get; set; }
-
-    /// <summary>
-    /// Обработчик пробелов.
-    /// </summary>
-    public WhitespaceHandler? WhitespaceHandler { get; set; }
 
     #endregion
 
@@ -103,15 +93,15 @@ public sealed class Tokenizer
         {
             Tokenizers =
             {
+                new WhitespaceTokenizer(),
+                new CommentTokenizer(),
                 new CharacterTokenizer(),
                 new StringTokenizer(),
                 new NumberTokenizer(),
-                new IntegerTokenizer(), // integer должен быть после number
+                new IntegerTokenizer(),
                 new TermTokenizer(),
                 new IdentifierTokenizer()
-            },
-            WhitespaceHandler = new StandardWhitespaceHandler(),
-            CommentHandler = new StandardCommentHandler()
+            }
         };
 
         return result;
@@ -130,41 +120,15 @@ public sealed class Tokenizer
         var result = new List<Token>();
         _navigator = new TextNavigator (text);
 
-        WhitespaceHandler?.StartParsing (_navigator);
-        CommentHandler?.StartParsing (_navigator);
         foreach (var tokenizer in Tokenizers)
         {
             tokenizer.Settings = Settings;
             tokenizer.StartParsing (_navigator);
         }
 
+        var attempts = 0;
         while (!IsEof)
         {
-            WhitespaceHandler?.SkipWhitespace();
-            if (IsEof)
-            {
-                break;
-            }
-
-            var comment = CommentHandler?.ParseComments();
-            if (comment is not null)
-            {
-                result.Add (comment);
-                continue;
-            }
-
-            if (IsEof)
-            {
-                break;
-            }
-
-            // после комментариев могут быть пробелы
-            WhitespaceHandler?.SkipWhitespace();
-            if (IsEof)
-            {
-                break;
-            }
-
             Token? token = null;
             foreach (var tokenizer in Tokenizers)
             {
@@ -177,10 +141,20 @@ public sealed class Tokenizer
 
             if (token is null)
             {
-                throw new SyntaxException (_navigator);
+                // костыль с двумя попытками сделан
+                // для считывания переводов строки и пробелов в конце скрипта
+                // иначе CommentTokenizer возвращает null
+                // и токенизация падает с синтаксической ошибкой
+                if (++attempts == 2)
+                {
+                    throw new SyntaxException (_navigator);
+                }
             }
-
-            result.Add (token);
+            else
+            {
+                attempts = 0;
+                result.Add (token);
+            }
         }
 
         if (Refiner is not null)

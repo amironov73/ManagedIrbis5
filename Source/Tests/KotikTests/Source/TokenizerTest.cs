@@ -7,6 +7,7 @@
 // ReSharper disable StringLiteralTypo
 
 using AM.Kotik;
+using AM.Kotik.Tokenizers;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
