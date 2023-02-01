@@ -12,6 +12,7 @@
 
 #region Using directives
 
+using System;
 using System.Collections.Generic;
 
 using AM.Text;
@@ -25,19 +26,19 @@ namespace AM.Kotik.Tokenizers;
 /// <summary>
 /// Генерализованный токенайзер.
 /// </summary>
-public sealed class Tokenizer
+public class Tokenizer
 {
     #region Properties
 
     /// <summary>
     /// Настройки токенизации.
     /// </summary>
-    public TokenizerSettings Settings { get; }
+    public TokenizerSettings Settings { get; protected set; }
 
     /// <summary>
     /// Токенайзеры для конкретных типов токенов.
     /// </summary>
-    public List<SubTokenizer> Tokenizers { get; }
+    public List<Tokenizer> Tokenizers { get; }
 
     /// <summary>
     /// Пересборщик токенов.
@@ -75,9 +76,51 @@ public sealed class Tokenizer
 
     #region Private members
 
-    private TextNavigator _navigator = null!;
+    /// <summary>
+    /// Навигатор по символам.
+    /// </summary>
+    protected TextNavigator navigator = null!;
 
-    private bool IsEof => _navigator.IsEOF;
+    /// <summary>
+    /// Достигнут конец текста?
+    /// </summary>
+    protected bool IsEof => navigator.IsEOF;
+
+    /// <summary>
+    /// Проверка, не является ли указанный текст зарезервированным словом.
+    /// </summary>
+    protected bool IsReservedWord
+        (
+            string text
+        )
+    {
+        Sure.NotNull (text);
+
+        foreach (var word in Settings.ReservedWords)
+        {
+            if (string.CompareOrdinal (word, text) == 0)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Считывание текущего символа без передвижения по тексту.
+    /// </summary>
+    protected char PeekChar() => navigator.PeekChar();
+
+    /// <summary>
+    /// Подсматривание на несколько символов вперед.
+    /// </summary>
+    protected char PeekChar (int delta) => navigator.LookAhead (delta);
+
+    /// <summary>
+    /// Считывание текущего символа с переходом к следующему.
+    /// </summary>
+    protected char ReadChar() => navigator.ReadChar();
 
     #endregion
 
@@ -108,6 +151,15 @@ public sealed class Tokenizer
     }
 
     /// <summary>
+    /// Разбор токена в текущей позиции.
+    /// Метод должен быть переопределен в потомках.
+    /// </summary>
+    public virtual Token? Parse()
+    {
+        throw new NotImplementedException();
+    }
+    
+    /// <summary>
     /// Разбор текста на токены.
     /// </summary>
     public List<Token> Tokenize
@@ -118,12 +170,12 @@ public sealed class Tokenizer
         Sure.NotNull (text);
 
         var result = new List<Token>();
-        _navigator = new TextNavigator (text);
+        navigator = new TextNavigator (text);
 
         foreach (var tokenizer in Tokenizers)
         {
             tokenizer.Settings = Settings;
-            tokenizer.StartParsing (_navigator);
+            tokenizer.navigator = navigator;
         }
 
         var attempts = 0;
@@ -147,7 +199,7 @@ public sealed class Tokenizer
                 // и токенизация падает с синтаксической ошибкой
                 if (++attempts == 2)
                 {
-                    throw new SyntaxException (_navigator);
+                    throw new SyntaxException (navigator);
                 }
             }
             else

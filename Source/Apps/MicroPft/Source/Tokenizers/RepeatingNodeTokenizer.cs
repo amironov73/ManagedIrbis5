@@ -31,16 +31,16 @@ namespace MicroPft.Tokenizers;
 /// Разбирает повторяющийся литерал.
 /// </summary>
 public sealed class RepeatingNodeTokenizer
-    : SubTokenizer
+    : Tokenizer
 {
     #region SubTokeninzer members
 
-    /// <inheritdoc cref="SubTokenizer.Parse"/>
+    /// <inheritdoc cref="Tokenizer.Parse"/>
     public override Token? Parse()
     {
-        var line = _navigator.Line;
-        var column = _navigator.Column;
-        var position = _navigator.SavePosition();
+        var line = navigator.Line;
+        var column = navigator.Column;
+        var position = navigator.SavePosition();
 
         var chr = PeekChar();
         var plus = false;
@@ -48,19 +48,19 @@ public sealed class RepeatingNodeTokenizer
         {
             plus = true;
             ReadChar();
-            _navigator.SkipWhitespace();
+            navigator.SkipWhitespace();
             chr = PeekChar();
         }
 
         if (IsEof)
         {
-            _navigator.RestorePosition (position);
+            navigator.RestorePosition (position);
             return null;
         }
 
         if (chr != '|')
         {
-            _navigator.RestorePosition (position);
+            navigator.RestorePosition (position);
             return null;
         }
 
@@ -80,11 +80,11 @@ public sealed class RepeatingNodeTokenizer
 
         if (chr != '|')
         {
-            _navigator.RestorePosition (position);
+            navigator.RestorePosition (position);
             return null;
         }
 
-        _navigator.SkipWhitespace();
+        navigator.SkipWhitespace();
         chr = PeekChar();
         if (chr == '+')
         {
@@ -92,9 +92,9 @@ public sealed class RepeatingNodeTokenizer
             plus = true;
         }
 
-        var textLength = _navigator.Position - position;
-        var text = _navigator.Substring (position, textLength).ToString();
-        return new Token ("field", text, line, column)
+        var textLength = navigator.Position - position;
+        var text = navigator.Substring (position, textLength).ToString();
+        return new Token ("field", text, line, column, position)
         {
             UserData = new RepeatingNode (value.ToString(), plus)
         };

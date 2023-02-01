@@ -24,14 +24,14 @@ namespace AM.Kotik.Tokenizers;
 /// Токенайзер для целых чисел.
 /// </summary>
 public sealed class IntegerTokenizer
-    : SubTokenizer
+    : Tokenizer
 {
-    /// <inheritdoc cref="SubTokenizer.Parse"/>
+    /// <inheritdoc cref="Tokenizer.Parse"/>
     public override Token? Parse()
     {
-        var offset = _navigator.Position;
-        var line = _navigator.Line;
-        var column = _navigator.Column;
+        var offset = navigator.Position;
+        var line = navigator.Line;
+        var column = navigator.Column;
 
         var chr = PeekChar();
         if (!chr.IsArabicDigit())
@@ -68,7 +68,7 @@ public sealed class IntegerTokenizer
                 if (isLong)
                 {
                     StringBuilderPool.Shared.Return (builder);
-                    throw new SyntaxException (_navigator);
+                    throw new SyntaxException (navigator);
                 }
 
                 ReadChar();
@@ -79,7 +79,7 @@ public sealed class IntegerTokenizer
                 if (isUnsigned)
                 {
                     StringBuilderPool.Shared.Return (builder);
-                    throw new SyntaxException (_navigator);
+                    throw new SyntaxException (navigator);
                 }
 
                 ReadChar();
@@ -89,7 +89,7 @@ public sealed class IntegerTokenizer
             {
                 // это число с плавающей (или фиксированной) точкой
                 StringBuilderPool.Shared.Return (builder);
-                _navigator.RestorePosition (offset);
+                navigator.RestorePosition (offset);
                 return null;
             }
             else

@@ -26,21 +26,22 @@ namespace AM.Kotik.Tokenizers;
 /// Токенайзер для термов.
 /// </summary>
 public sealed class TermTokenizer
-    : SubTokenizer
+    : Tokenizer
 {
     #region SubTokenizer members
 
-    /// <inheritdoc cref="SubTokenizer.Parse"/>
+    /// <inheritdoc cref="Tokenizer.Parse"/>
     public override Token? Parse()
     {
         string? previousGood = null;
-        var line = _navigator.Line;
-        var column = _navigator.Column;
+        var line = navigator.Line;
+        var column = navigator.Column;
+        var offset = navigator.Position;
         var builder = new StringBuilder();
         var knownTerms = Settings.KnownTerms;
         while (true)
         {
-            var chr = _navigator.LookAhead (builder.Length);
+            var chr = navigator.LookAhead (builder.Length);
             if (chr == TextNavigator.EOF)
             {
                 return MakeToken (previousGood);
@@ -107,7 +108,8 @@ public sealed class TermTokenizer
                     TokenKind.Term,
                     tokenValue,
                     line,
-                    column
+                    column,
+                    offset
                 );
         }
     }

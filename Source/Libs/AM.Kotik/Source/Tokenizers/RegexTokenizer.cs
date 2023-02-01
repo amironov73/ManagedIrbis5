@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
 
 /* RegexTokenizer.cs -- токенайзер на регулярных выражениях
  * Ars Magna project, http://arsmagna.ru
@@ -13,9 +14,6 @@
 
 using System;
 using System.Text.RegularExpressions;
-
-using AM;
-using AM.Kotik;
 
 #endregion
 
@@ -27,7 +25,7 @@ namespace AM.Kotik.Tokenizers;
 /// Токенайзер на регулярных выражениях.
 /// </summary>
 public sealed class RegexTokenizer
-    : SubTokenizer
+    : Tokenizer
 {
     #region Construction
 
@@ -76,18 +74,18 @@ public sealed class RegexTokenizer
 
     #region SubTokeninzer members
 
-    /// <inheritdoc cref="SubTokenizer.Parse"/>
+    /// <inheritdoc cref="Tokenizer.Parse"/>
     public override Token? Parse()
     {
-        var line = _navigator.Line;
-        var column = _navigator.Column;
-        var position = _navigator.SavePosition();
+        var line = navigator.Line;
+        var column = navigator.Column;
+        var position = navigator.SavePosition();
 
         var goodLength = 0;
-        var maxLength = Math.Min (_maxLength, _navigator.Length - _navigator.Position);
+        var maxLength = Math.Min (_maxLength, navigator.Length - navigator.Position);
         for (var length = 1; length < maxLength; length++)
         {
-            var slice = _navigator.Substring (position, length).Span;
+            var slice = navigator.Substring (position, length).Span;
             if (_regex.IsMatch (slice))
             {
                 goodLength = length;
@@ -96,8 +94,8 @@ public sealed class RegexTokenizer
 
         if (goodLength != 0)
         {
-            _navigator.RestorePosition (position + goodLength);
-            var text = _navigator.Substring (position, goodLength).ToString();
+            navigator.RestorePosition (position + goodLength);
+            var text = navigator.Substring (position, goodLength).ToString();
             return new Token (_kind, text, line, column);
         }
 

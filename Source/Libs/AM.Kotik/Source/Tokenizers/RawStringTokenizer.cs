@@ -12,7 +12,7 @@
 
 #region Using directives
 
-using System.Text;
+using AM.Text;
 
 #endregion
 
@@ -24,15 +24,15 @@ namespace AM.Kotik.Tokenizers;
 /// Токенайзер для сырых строк.
 /// </summary>
 public sealed class RawStringTokenizer
-    : SubTokenizer
+    : Tokenizer
 {
     #region SubTokenizer members
 
-    /// <inheritdoc cref="SubTokenizer.Parse"/>
+    /// <inheritdoc cref="Tokenizer.Parse"/>
     public override Token? Parse()
     {
-        var line = _navigator.Line;
-        var column = _navigator.Column;
+        var line = navigator.Line;
+        var column = navigator.Column;
 
         if (PeekChar() != '"' || PeekChar (1) != '"' || PeekChar (2) != '"')
         {
@@ -44,7 +44,7 @@ public sealed class RawStringTokenizer
         ReadChar();
 
         var success = false;
-        var builder = new StringBuilder();
+        var builder = StringBuilderPool.Shared.Get();
         while (!IsEof)
         {
             var chr = ReadChar();
@@ -61,10 +61,11 @@ public sealed class RawStringTokenizer
 
         if (!success)
         {
-            throw new SyntaxException (_navigator);
+            StringBuilderPool.Shared.Return (builder);
+            throw new SyntaxException (navigator);
         }
 
-        return new Token (TokenKind.String, builder.ToString(), line, column);
+        return new Token (TokenKind.String, builder.ReturnShared(), line, column);
     }
 
     #endregion

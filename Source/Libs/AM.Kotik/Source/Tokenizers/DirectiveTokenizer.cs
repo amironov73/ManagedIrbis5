@@ -18,16 +18,16 @@ namespace AM.Kotik.Tokenizers;
 /// Токенайзер для директив.
 /// </summary>
 public sealed class DirectiveTokenizer
-    : SubTokenizer
+    : Tokenizer
 {
     #region SubTokenizer members
 
-    /// <inheritdoc cref="SubTokenizer.Parse"/>
+    /// <inheritdoc cref="Tokenizer.Parse"/>
     public override Token? Parse()
     {
-        var line = _navigator.Line;
-        var column = _navigator.Column;
-        var position = _navigator.Position;
+        var line = navigator.Line;
+        var column = navigator.Column;
+        var position = navigator.Position;
         if (PeekChar() != '#')
         {
             return null;
@@ -36,7 +36,7 @@ public sealed class DirectiveTokenizer
         // директива должна быть первым токеном в строке
         // до нее могут быть только пробелы
         var atStart = false;
-        var sourceCode = _navigator.Text;
+        var sourceCode = navigator.Text;
         for (var lineStart = position - 1;; lineStart--)
         {
             if (lineStart < 0)
@@ -60,18 +60,18 @@ public sealed class DirectiveTokenizer
 
         if (!atStart)
         {
-            throw new SyntaxException (_navigator);
+            throw new SyntaxException (navigator);
         }
 
         ReadChar();
-        var command = _navigator.ReadWord().ToString();
+        var command = navigator.ReadWord().ToString();
         if (string.IsNullOrEmpty (command))
         {
             return null;
         }
 
-        _navigator.SkipWhile (' ', '\t');
-        var argument = _navigator.ReadLine().ToString();
+        navigator.SkipWhile (' ', '\t');
+        var argument = navigator.ReadLine().ToString();
 
         return new Token (TokenKind.Directive, command, line, column, position)
         {

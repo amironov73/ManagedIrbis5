@@ -18,7 +18,7 @@ namespace AM.Kotik.Tokenizers;
 /// Токенайзер для пробелов.
 /// </summary>
 public sealed class WhitespaceTokenizer
-    : SubTokenizer
+    : Tokenizer
 {
     #region Construction
 
@@ -45,25 +45,25 @@ public sealed class WhitespaceTokenizer
 
     #region SubTokenizer members
 
-    /// <inheritdoc cref="SubTokenizer.Parse"/>
+    /// <inheritdoc cref="Tokenizer.Parse"/>
     public override Token? Parse()
     {
-        var line = _navigator.Line;
-        var column = _navigator.Column;
-        var offset = _navigator.Position;
+        var line = navigator.Line;
+        var column = navigator.Column;
+        var offset = navigator.Position;
 
-        _navigator.SkipWhitespace();
+        navigator.SkipWhitespace();
         if (_eatWhitespace)
         {
             return null;
         }
 
-        if (_navigator.Position != offset)
+        if (navigator.Position != offset)
         {
             return new Token
                 (
                     TokenKind.Whitespace,
-                    _navigator.Substring (offset, _navigator.Position - offset).ToString(),
+                    navigator.Substring (offset, navigator.Position - offset).ToString(),
                     line,
                     column,
                     offset

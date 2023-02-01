@@ -24,16 +24,16 @@ namespace AM.Kotik.Tokenizers;
 /// Токенайзер для отдельных символов.
 /// </summary>
 public sealed class CharacterTokenizer
-    : SubTokenizer
+    : Tokenizer
 {
     #region SubTokenizer methods
 
-    /// <inheritdoc cref="SubTokenizer.Parse"/>
+    /// <inheritdoc cref="Tokenizer.Parse"/>
     public override Token? Parse()
     {
-        var offset = _navigator.Position;
-        var line = _navigator.Line;
-        var column = _navigator.Column;
+        var offset = navigator.Position;
+        var line = navigator.Line;
+        var column = navigator.Column;
         if (PeekChar() != '\'')
         {
             return null;
@@ -49,7 +49,7 @@ public sealed class CharacterTokenizer
             if (IsEof)
             {
                 StringBuilderPool.Shared.Return (builder);
-                throw new SyntaxException (_navigator);
+                throw new SyntaxException (navigator);
             }
 
             builder.Append (ReadChar());
@@ -67,14 +67,14 @@ public sealed class CharacterTokenizer
             var text = TextUtility.UnescapeText (builder.ReturnShared()).ThrowIfNullOrEmpty();
             if (text.Length != 1)
             {
-                throw new SyntaxException (_navigator);
+                throw new SyntaxException (navigator);
             }
             result = text[0];
         }
 
         if (chr != '\'')
         {
-            throw new SyntaxException (_navigator);
+            throw new SyntaxException (navigator);
         }
 
         return new Token (TokenKind.Char, result.ToString(), line, column, offset);

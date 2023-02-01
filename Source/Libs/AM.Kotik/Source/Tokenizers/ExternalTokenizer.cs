@@ -24,16 +24,16 @@ namespace AM.Kotik.Tokenizers;
 /// Токенайзер для внешнего кода.
 /// </summary>
 public sealed class ExternalTokenizer
-    : SubTokenizer
+    : Tokenizer
 {
     #region SubTokenizer members
 
-    /// <inheritdoc cref="SubTokenizer.Parse"/>
+    /// <inheritdoc cref="Tokenizer.Parse"/>
     public override Token? Parse()
     {
-        var offset = _navigator.Position;
-        var line = _navigator.Line;
-        var column = _navigator.Column;
+        var offset = navigator.Position;
+        var line = navigator.Line;
+        var column = navigator.Column;
 
         if (PeekChar() != '`')
         {
@@ -57,7 +57,7 @@ public sealed class ExternalTokenizer
         if (chr != '`')
         {
             StringBuilderPool.Shared.Return (builder);
-            throw new SyntaxException (_navigator);
+            throw new SyntaxException (navigator);
         }
 
         return new Token 

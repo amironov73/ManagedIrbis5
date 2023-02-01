@@ -10,14 +10,6 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-#region Using directives
-
-using System;
-
-using AM.Text;
-
-#endregion
-
 #nullable enable
 
 namespace AM.Kotik.Tokenizers;
@@ -26,7 +18,7 @@ namespace AM.Kotik.Tokenizers;
 /// Токенайзер для комментариев.
 /// </summary>
 public sealed class CommentTokenizer
-    : SubTokenizer
+    : Tokenizer
 {
     #region Construction
 
@@ -53,29 +45,29 @@ public sealed class CommentTokenizer
 
     #region SubTokenizer members
 
-    /// <inheritdoc cref="SubTokenizer.Parse"/>
+    /// <inheritdoc cref="Tokenizer.Parse"/>
     public override Token? Parse()
     {
-        var line = _navigator.Line;
-        var column = _navigator.Column;
-        var offset = _navigator.Position;
+        var line = navigator.Line;
+        var column = navigator.Column;
+        var offset = navigator.Position;
         
         if (PeekChar() == '/')
         {
-            var nextChar = _navigator.LookAhead();
+            var nextChar = navigator.LookAhead();
 
             // комментарий до конца строки
             if (nextChar == '/')
             {
                 // съедаем всю текущую строку до конца
-                _navigator.ReadLine();
+                navigator.ReadLine();
                 
                 return _eatComments
                     ? null
                     : new Token
                         (
                             TokenKind.Comment,
-                            _navigator.Substring (offset, _navigator.Position - offset).ToString(),
+                            navigator.Substring (offset, navigator.Position - offset).ToString(),
                             line,
                             column,
                             offset
@@ -86,11 +78,11 @@ public sealed class CommentTokenizer
             if (nextChar == '*')
             {
                 // проматываем всё до конца
-                var position = _navigator.Position;
-                _navigator.ReadTo ("*/");
-                if (_navigator.Position == position)
+                var position = navigator.Position;
+                navigator.ReadTo ("*/");
+                if (navigator.Position == position)
                 {
-                    throw new SyntaxException (_navigator);
+                    throw new SyntaxException (navigator);
                 }
 
                 return _eatComments
@@ -98,7 +90,7 @@ public sealed class CommentTokenizer
                     : new Token 
                         (
                             TokenKind.Comment,
-                            _navigator.Substring (offset, _navigator.Position - offset).ToString(),
+                            navigator.Substring (offset, navigator.Position - offset).ToString(),
                             line,
                             column,
                             offset

@@ -13,7 +13,8 @@
 #region Using directives
 
 using System;
-using System.Text;
+
+using AM.Text;
 
 #endregion
 
@@ -25,14 +26,13 @@ namespace AM.Kotik.Tokenizers;
 /// Токенайзер для идентификаторов.
 /// </summary>
 public sealed class IdentifierTokenizer
-    : SubTokenizer
+    : Tokenizer
 {
     #region SubTokenizer members
 
-    /// <inheritdoc cref="SubTokenizer.Parse"/>
+    /// <inheritdoc cref="Tokenizer.Parse"/>
     public override Token? Parse()
     {
-        var offset = _navigator.Position;
         var firstChar = PeekChar();
         var firstIdentifierLetter = Settings.FirstIdentifierLetter;
         var nextIdentifierLetter = Settings.NextIdentifierLetter;
@@ -41,11 +41,11 @@ public sealed class IdentifierTokenizer
             return null;
         }
 
-        var builder = new StringBuilder();
-        var line = _navigator.Line;
-        var column = _navigator.Column;
+        var line = navigator.Line;
+        var column = navigator.Column;
+        var offset = navigator.Position;
+        var builder = StringBuilderPool.Shared.Get();
         builder.Append (ReadChar());
-
         while (!IsEof)
         {
             if (Array.IndexOf (nextIdentifierLetter, PeekChar()) < 0)
@@ -56,7 +56,7 @@ public sealed class IdentifierTokenizer
             builder.Append (ReadChar());
         }
 
-        var value = builder.ToString();
+        var value = builder.ReturnShared();
 
         return new Token
             (

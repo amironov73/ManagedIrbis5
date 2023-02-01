@@ -29,17 +29,16 @@ namespace MicroPft.Tokenizers;
 /// Разбирает спецификацию поля.
 /// </summary>
 internal sealed class FieldTokenizer
-    : SubTokenizer
+    : Tokenizer
 {
     #region SubTokenizer members
 
-    /// <inheritdoc cref="SubTokenizer.Parse"/>
+    /// <inheritdoc cref="Tokenizer.Parse"/>
     public override Token? Parse()
     {
-        var line = _navigator.Line;
-        var column = _navigator.Column;
-        var position = _navigator.SavePosition();
-
+        var line = navigator.Line;
+        var column = navigator.Column;
+        var position = navigator.SavePosition();
         var chr = char.ToLowerInvariant (PeekChar());
         if (chr is not 'v' and not 'd' and not 'n')
         {
@@ -63,7 +62,7 @@ internal sealed class FieldTokenizer
 
         if (tag == 0)
         {
-            _navigator.RestorePosition (position);
+            navigator.RestorePosition (position);
             return null;
         }
 
@@ -73,7 +72,7 @@ internal sealed class FieldTokenizer
             ReadChar();
             if (IsEof)
             {
-                _navigator.RestorePosition (position);
+                navigator.RestorePosition (position);
                 return null;
             }
 
@@ -86,7 +85,7 @@ internal sealed class FieldTokenizer
         {
             if (IsEof)
             {
-                _navigator.RestorePosition (position);
+                navigator.RestorePosition (position);
                 return null;
             }
 
@@ -105,7 +104,7 @@ internal sealed class FieldTokenizer
 
             if (offset == 0)
             {
-                _navigator.RestorePosition (position);
+                navigator.RestorePosition (position);
                 return null;
             }
         }
@@ -115,7 +114,7 @@ internal sealed class FieldTokenizer
         {
             if (IsEof)
             {
-                _navigator.RestorePosition (position);
+                navigator.RestorePosition (position);
                 return null;
             }
 
@@ -134,7 +133,7 @@ internal sealed class FieldTokenizer
 
             if (length == 0)
             {
-                _navigator.RestorePosition (position);
+                navigator.RestorePosition (position);
                 return null;
             }
         }
@@ -143,7 +142,7 @@ internal sealed class FieldTokenizer
         {
             if (offset != 0 || IsEof)
             {
-                _navigator.RestorePosition (position);
+                navigator.RestorePosition (position);
                 return null;
             }
 
@@ -162,14 +161,14 @@ internal sealed class FieldTokenizer
 
             if (offset == 0)
             {
-                _navigator.RestorePosition (position);
+                navigator.RestorePosition (position);
                 return null;
             }
         }
 
-        var textLength = _navigator.Position - position;
-        var text = _navigator.Substring (position, textLength).ToString();
-        return new Token ("field", text, line, column)
+        var textLength = navigator.Position - position;
+        var text = navigator.Substring (position, textLength).ToString();
+        return new Token ("field", text, line, column, offset)
         {
             UserData = new FieldNode (command, tag, code, offset, length)
         };

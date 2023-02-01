@@ -12,7 +12,7 @@
 
 #region Using directives
 
-using System.Text;
+using AM.Text;
 
 #endregion
 
@@ -24,20 +24,20 @@ namespace AM.Kotik.Tokenizers;
 /// Токенайзер для дробных чисел.
 /// </summary>
 public sealed class NumberTokenizer
-    : SubTokenizer
+    : Tokenizer
 {
     #region SubTokenizer members
 
-    /// <inheritdoc cref="SubTokenizer.Parse"/>
+    /// <inheritdoc cref="Tokenizer.Parse"/>
     public override Token? Parse()
     {
-        var line = _navigator.Line;
-        var column = _navigator.Column;
-        var position = _navigator.Position;
+        var line = navigator.Line;
+        var column = navigator.Column;
+        var position = navigator.Position;
         var digit = false; // флаг: нам встретилась как минимум одна цифра
         var dot = false; // флаг: нам встретилась точка
         var exponent = false; // флаг: нам встретилась экспонента
-        char chr = PeekChar();
+        var chr = PeekChar();
         if (chr == '.')
         {
             dot = true;
@@ -51,7 +51,7 @@ public sealed class NumberTokenizer
             return null;
         }
 
-        var builder = new StringBuilder();
+        var builder = StringBuilderPool.Shared.Get();
         builder.Append (ReadChar());
         while (!IsEof)
         {
@@ -67,7 +67,8 @@ public sealed class NumberTokenizer
             {
                 if (dot)
                 {
-                    throw new SyntaxException (_navigator);
+                    StringBuilderPool.Shared.Return (builder);
+                    throw new SyntaxException (navigator);
                 }
 
                 dot = true;
@@ -97,7 +98,8 @@ public sealed class NumberTokenizer
                 chr = PeekChar();
                 if (!chr.IsArabicDigit())
                 {
-                    throw new SyntaxException (_navigator);
+                    StringBuilderPool.Shared.Return (builder);
+                    throw new SyntaxException (navigator);
                 }
             }
 
@@ -115,15 +117,17 @@ public sealed class NumberTokenizer
 
         if (!dot && !exponent)
         {
-            // это целое число
-            _navigator.RestorePosition (position);
+            // это целое число, для них есть отдельный токенайзер
+            navigator.RestorePosition (position);
+            StringBuilderPool.Shared.Return (builder);
             return null;
         }
 
         if (!digit)
         {
             // это не похоже на число
-            _navigator.RestorePosition(position);
+            navigator.RestorePosition(position);
+            StringBuilderPool.Shared.Return (builder);
             return null;
         }
 
@@ -145,7 +149,7 @@ public sealed class NumberTokenizer
         var result = new Token
             (
                 kind,
-                builder.ToString(),
+                builder.ReturnShared(),
                 line,
                 column
             );

@@ -29,21 +29,21 @@ namespace MicroPft.Tokenizers;
 /// Разбирает безусловный литерал.
 /// </summary>
 public sealed class UnconditionalTokenizer
-    : SubTokenizer
+    : Tokenizer
 {
     #region SubTokeninzer members
 
-    /// <inheritdoc cref="SubTokenizer.Parse"/>
+    /// <inheritdoc cref="Tokenizer.Parse"/>
     public override Token? Parse()
     {
-        var line = _navigator.Line;
-        var column = _navigator.Column;
-        var position = _navigator.SavePosition();
+        var line = navigator.Line;
+        var column = navigator.Column;
+        var position = navigator.SavePosition();
 
         var chr = PeekChar();
         if (chr != '\'')
         {
-            _navigator.RestorePosition (position);
+            navigator.RestorePosition (position);
             return null;
         }
 
@@ -59,13 +59,13 @@ public sealed class UnconditionalTokenizer
 
         if (chr != '\'')
         {
-            _navigator.RestorePosition (position);
+            navigator.RestorePosition (position);
             return null;
         }
 
-        var textLength = _navigator.Position - position - 2;
-        var text = _navigator.Substring (position + 1, textLength).ToString();
-        return new Token ("field", text, line, column)
+        var textLength = navigator.Position - position - 2;
+        var text = navigator.Substring (position + 1, textLength).ToString();
+        return new Token ("field", text, line, column, position)
         {
             UserData = new UnconditionalNode (text)
         };

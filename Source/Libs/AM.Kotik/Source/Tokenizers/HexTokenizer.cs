@@ -24,29 +24,28 @@ namespace AM.Kotik.Tokenizers;
 /// Токенайзер для чисел в шестнадцатеричной системе счичления.
 /// </summary>
 public sealed class HexTokenizer
-    : SubTokenizer
+    : Tokenizer
 {
     #region SubTokenizer members
 
-    /// <inheritdoc cref="SubTokenizer.Parse"/>
+    /// <inheritdoc cref="Tokenizer.Parse"/>
     public override Token? Parse()
     {
-        var offset = _navigator.Position;
-        var line = _navigator.Line;
-        var column = _navigator.Column;
+        var offset = navigator.Position;
+        var line = navigator.Line;
+        var column = navigator.Column;
  
         // префикс '0x'
         var chr = PeekChar();
-        if (chr != '0' || _navigator.LookAhead (1) is not ('x' or 'X'))
+        if (chr != '0' || navigator.LookAhead (1) is not ('x' or 'X'))
         {
             return null;
         }
-
-        ReadChar();
-        ReadChar();
-
+        
         var builder = StringBuilderPool.Shared.Get();
         var kind = TokenKind.Hex32;
+        ReadChar();
+        ReadChar();
         while (!IsEof)
         {
             chr = PeekChar();

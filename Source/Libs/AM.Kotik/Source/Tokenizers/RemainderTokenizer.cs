@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable UnusedType.Global
 
 /* RemainderTokenizer.cs -- выдает оставшуюся часть текста
  * Ars Magna project, http://arsmagna.ru
@@ -18,18 +19,19 @@ namespace AM.Kotik.Tokenizers;
 /// (либо пустую строку, если достигнут конец текста).
 /// </summary>
 public sealed class RemainderTokenizer
-    : SubTokenizer
+    : Tokenizer
 {
     #region SubTokenizer members
 
-    /// <inheritdoc cref="SubTokenizer.Parse"/>
+    /// <inheritdoc cref="Tokenizer.Parse"/>
     public override Token Parse()
     {
-        var line = _navigator.Line;
-        var column = _navigator.Column;
-        var text = _navigator.GetRemainingText().ToString();
+        var line = navigator.Line;
+        var column = navigator.Column;
+        var offset = navigator.Position;
+        var text = navigator.GetRemainingText().ToString();
 
-        return new Token ("remainder", text, line, column);
+        return new Token ("remainder", text, line, column, offset);
     }
 
     #endregion

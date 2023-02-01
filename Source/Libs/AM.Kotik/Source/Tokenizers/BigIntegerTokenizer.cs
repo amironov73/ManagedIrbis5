@@ -26,16 +26,16 @@ namespace AM.Kotik.Tokenizers;
 /// Токенайзер для <see cref="BigInteger"/>.
 /// </summary>
 public sealed class BigIntegerTokenizer
-    : SubTokenizer
+    : Tokenizer
 {
     #region SubTokenizer members
 
-    /// <inheritdoc cref="SubTokenizer.Parse"/>
+    /// <inheritdoc cref="Tokenizer.Parse"/>
     public override Token? Parse()
     {
-        var line = _navigator.Line;
-        var column = _navigator.Column;
-        var position = _navigator.Position;
+        var line = navigator.Line;
+        var column = navigator.Column;
+        var position = navigator.Position;
         var chr = PeekChar();
         if (!chr.IsArabicDigit())
         {
@@ -64,7 +64,7 @@ public sealed class BigIntegerTokenizer
         chr = PeekChar();
         if (chr is not 'b' and not 'B') // TODO подобрать подходящий суффикс
         {
-            _navigator.RestorePosition (position);
+            navigator.RestorePosition (position);
             StringBuilderPool.Shared.Return (builder);
             return null;
         }

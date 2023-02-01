@@ -12,8 +12,6 @@
 
 #region Using directives
 
-using System.Text;
-
 using AM.Text;
 
 #endregion
@@ -26,16 +24,16 @@ namespace AM.Kotik.Tokenizers;
 /// Токенайзер для обычных строк.
 /// </summary>
 public sealed class StringTokenizer
-    : SubTokenizer
+    : Tokenizer
 {
     #region SubTokenizer members
 
-    /// <inheritdoc cref="SubTokenizer.Parse"/>
+    /// <inheritdoc cref="Tokenizer.Parse"/>
     public override Token? Parse()
     {
-        var line = _navigator.Line;
-        var column = _navigator.Column;
-
+        var line = navigator.Line;
+        var column = navigator.Column;
+        var offset = navigator.Position;
         if (PeekChar() != '"')
         {
             return null;
@@ -43,7 +41,7 @@ public sealed class StringTokenizer
 
         ReadChar(); // съедаем открывающую кавычку
         char chr = default;
-        var builder = new StringBuilder();
+        var builder = StringBuilderPool.Shared.Get();
         while (!IsEof)
         {
             chr = ReadChar();
@@ -64,13 +62,14 @@ public sealed class StringTokenizer
 
         if (chr != '"')
         {
-            throw new SyntaxException (_navigator);
+            StringBuilderPool.Shared.Return (builder);
+            throw new SyntaxException (navigator);
         }
 
-        var text = builder.ToString();
+        var text = builder.ReturnShared();
         text = TextUtility.UnescapeText (text);
 
-        return new Token (TokenKind.String, text, line, column);
+        return new Token (TokenKind.String, text, line, column, offset);
     }
 
     #endregion
