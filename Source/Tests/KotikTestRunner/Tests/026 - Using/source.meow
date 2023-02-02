@@ -1,6 +1,6 @@
 ﻿println ("Before")
 
-using (m = new "System.IO.MemoryStream" ())
+using (m = new System.IO.MemoryStream ())
 {
     m.WriteByte ((byte) 31)
     m.WriteByte ((byte) 32)

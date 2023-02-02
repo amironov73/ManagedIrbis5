@@ -12,6 +12,7 @@
 
 #region Using directives
 
+using System;
 using System.Text;
 
 using AM.Text;
@@ -38,6 +39,8 @@ public sealed class TermTokenizer
         var column = navigator.Column;
         var offset = navigator.Position;
         var builder = new StringBuilder();
+        var firstIdentifierLetter = Settings.FirstIdentifierLetter;
+        var nextIdentifierLetter = Settings.NextIdentifierLetter;
         var knownTerms = Settings.KnownTerms;
         while (true)
         {
@@ -71,6 +74,13 @@ public sealed class TermTokenizer
 
             if (count == 1)
             {
+                if (CheckTextIsIdentifier (text)
+                    && CheckCharIsIdentifier (navigator.LookAhead (builder.Length)))
+                {
+                    // это идентификатор, а не терм
+                    return null;
+                }
+
                 foreach (var known in knownTerms)
                 {
                     if (known == text)
@@ -89,6 +99,29 @@ public sealed class TermTokenizer
                     break;
                 }
             }
+        }
+
+        bool CheckCharIsIdentifier (char chr)
+        {
+            return Array.IndexOf (nextIdentifierLetter, chr) >= 0;
+        }
+
+        bool CheckTextIsIdentifier (string suspect)
+        {
+            if (Array.IndexOf (firstIdentifierLetter, suspect[0]) < 0)
+            {
+                return false;
+            }
+
+            for (var i = 1; i < suspect.Length; i++)
+            {
+                if (Array.IndexOf (nextIdentifierLetter, suspect[i]) < 0)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         Token? MakeToken (string? tokenValue)

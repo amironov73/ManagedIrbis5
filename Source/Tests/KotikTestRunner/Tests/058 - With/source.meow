@@ -1,6 +1,6 @@
 ﻿use ("System.Text")
 
-builder = new StringBuilder();
+builder = new StringBuilder()
 builder.Append ("Hello")
 with (builder)
 {

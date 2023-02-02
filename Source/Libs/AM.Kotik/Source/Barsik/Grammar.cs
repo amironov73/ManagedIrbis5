@@ -128,7 +128,12 @@ public sealed class Grammar
     private readonly ParserHolder<AtomNode> Expression = new (null!);
 
     /// <summary>
-    /// Блок стейтментов.
+    /// Блок стейтментов, обязательно в фигурных скобках.
+    /// </summary>
+    private readonly ParserHolder<StatementBase> CurlyBlock = new (null!);
+
+    /// <summary>
+    /// Блок стейтментов, как в фигурных скобках, так и без них.
     /// </summary>
     private readonly ParserHolder<StatementBase> Block = new(null!);
 
@@ -181,16 +186,21 @@ public sealed class Grammar
             )
             .Labeled ("NamedArg");
 
-        var typeName = Identifier.SeparatedBy (Term ("."), minCount: 1)
-            .Map (x => string.Join ('.', x))
-            .Or (new LiteralParser().Map (x => (string) x))
-            .Labeled ("TypeName");
+        var typeName = Parser.OneOf
+            (
+                Identifier.SeparatedBy (Term ("."), minCount: 1)
+                    .Map (x => string.Join('.', x)),
+                Reserved (null),
+                new LiteralParser().Map (x => (string) x)
+            );
+
+        var reserved = Reserved (null).Map (x => (AtomNode) new TypeNode (x));
 
         var newOperator  = Parser.Chain
             (
                 typeName.After (Reserved ("new")),
                 Expression.SeparatedBy (Term (",")).RoundBrackets(),
-                Block.Optional(),
+                CurlyBlock.Optional(),
                 (name, args, init) =>
                     (AtomNode) new NewNode (name, args, init)
             )
@@ -282,6 +292,7 @@ public sealed class Grammar
         Atoms.Add (variable);
         Atoms.Add (list);
         Atoms.Add (dictionary);
+        // Atoms.Add (reserved);
         Atoms.Add (newOperator);
         Atoms.Add (throwOperator);
         Atoms.Add (awaitOperator);
@@ -395,7 +406,7 @@ public sealed class Grammar
         var catchClause = Parser.Chain
             (
                 Identifier.RoundBrackets().After (Reserved ("catch")),
-                Block,
+                CurlyBlock,
                 (name, body) => new TryNode.CatchBlock (name, body)
             )
             .Optional();
@@ -403,9 +414,9 @@ public sealed class Grammar
         var tryCatchFinally = Parser.Chain
             (
                 Parser.Position.Before (Reserved ("try")),
-                Block,
+                CurlyBlock,
                 catchClause,
-                Block.After (Reserved ("finally")).Optional(),
+                CurlyBlock.After (Reserved ("finally")).Optional(),
                 (position, tryBlock, catchBlock, finallyBlock) => (StatementBase)
                     new TryNode (position.Line, tryBlock, catchBlock, finallyBlock)
             )
@@ -551,7 +562,7 @@ public sealed class Grammar
             (
                 Parser.Position.Before (Reserved ("with")),
                 leftHand,
-                Block,
+                CurlyBlock,
                 (position, center, body) => (StatementBase) new WithNode (position.Line, center, body)
             )
             .Labeled ("With");
@@ -657,22 +668,26 @@ public sealed class Grammar
             )
         .Labeled ("Expression");
 
+        // произвольное количество стейтментов внутри фигурных скобок
+        CurlyBlock.Value = Parser.Chain
+            (
+                Parser.Position,
+                GenericStatement!.Repeated (minCount: 0).CurlyBrackets(),
+                (pos, lines) =>
+                    (StatementBase)new BlockNode (pos.Line, lines)
+            );
+
+        // единственный стейтмент без фигурных скобок
+        var singleStatementBlock = GenericStatement!.Map
+            (
+                x => (StatementBase)new BlockNode (x.Line, new[] { x })
+            );
+
+        // блок стейтментов как в фигурных скобках, так и в виде единственного стейтмента    
         Block.Value = Parser.OneOf
             (
-                // произвольное количество стейтментов внутри фигурных скобок
-                Parser.Chain
-                    (
-                        Parser.Position,
-                        GenericStatement!.Repeated (minCount: 0).CurlyBrackets(),
-                        (pos, lines) =>
-                            (StatementBase)new BlockNode (pos.Line, lines)
-                    ),
-
-                // либо единственный стейтмент без фигурных скобок
-                GenericStatement!.Map
-                    (
-                        x => (StatementBase)new BlockNode (x.Line, new[] { x })
-                    )
+                CurlyBlock,
+                singleStatementBlock
             )
             .Labeled ("Block");
 
