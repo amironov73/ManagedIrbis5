@@ -178,7 +178,7 @@ public sealed class Grammar
             .Map (x => (AtomNode) new ThrowNode (x))
             .Labeled ("Throw");
 
-        var namedArgument  = Parser.Chain
+        var namedArgument = Parser.Chain
             (
                 Identifier.Before (Term (":")),
                 Expression,
@@ -190,13 +190,11 @@ public sealed class Grammar
             (
                 Identifier.SeparatedBy (Term ("."), minCount: 1)
                     .Map (x => string.Join('.', x)),
-                Reserved (null),
-                new LiteralParser().Map (x => (string) x)
-            );
+                Reserved (null)
+            )
+            .Labeled ("TypeName");
 
-        var reserved = Reserved (null).Map (x => (AtomNode) new TypeNode (x));
-
-        var newOperator  = Parser.Chain
+        var newOperator = Parser.Chain
             (
                 typeName.After (Reserved ("new")),
                 Expression.SeparatedBy (Term (",")).RoundBrackets(),
@@ -206,7 +204,7 @@ public sealed class Grammar
             )
             .Labeled ("New");
 
-        var keyAndValue  = Parser.Chain
+        var keyAndValue = Parser.Chain
             (
                 Expression.Before (Term (":")),
                 Expression,
@@ -214,27 +212,43 @@ public sealed class Grammar
             )
             .Labeled ("KeyAndValue");
 
-        var dictionary  = keyAndValue.SeparatedBy (Term (",")).CurlyBrackets()
+        var dictionary = keyAndValue.SeparatedBy (Term (",")).CurlyBrackets()
             .Labeled ("Dictionary")
             .Map (x => (AtomNode) new DictionaryNode (x));
 
-        var list  = Expression.SeparatedBy (Term (",")).SquareBrackets()
+        var list = Expression.SeparatedBy (Term (",")).SquareBrackets()
             .Labeled ("List")
             .Map (x => (AtomNode) new ListNode (x));
 
-        var property  = Operator.Unary
+        var property = Operator.Unary
             (
                 Identifier.After (Term (".")),
                 "Property",
                 name => target => new PropertyNode (target, name)
             );
 
-        var index  = Operator.Unary
+        var index = Operator.Unary
             (
                 Expression.SquareBrackets(),
                 "Index",
                 x => target => new IndexNode (target, x)
             );
+
+        var isType = Parser.Chain<string, string, Func<AtomNode, AtomNode>>
+            (
+                Term ("is"),
+                typeName,
+                (_, name) => target => new IsNode (target, name)
+            )
+            .Labeled ("IsType");
+
+        var isValue = Parser.Chain<string, AtomNode, Func<AtomNode, AtomNode>>
+            (
+                Term ("is"),
+                Expression,
+                (_, other) => target => new IsNode (target, other)
+            )
+            .Labeled ("IsValue");
 
         var methodCall = Parser.Chain<string, string, IList<AtomNode>, Func<AtomNode, AtomNode>>
             (
@@ -292,7 +306,6 @@ public sealed class Grammar
         Atoms.Add (variable);
         Atoms.Add (list);
         Atoms.Add (dictionary);
-        // Atoms.Add (reserved);
         Atoms.Add (newOperator);
         Atoms.Add (throwOperator);
         Atoms.Add (awaitOperator);
@@ -337,6 +350,8 @@ public sealed class Grammar
                 "PostfixBang",
                 _ => target => new PostfixBangNode (target)
             ));
+        Postfixes.Add (isType);
+        Postfixes.Add (isValue);
         Postfixes.Add (index);
         Postfixes.Add (methodCall);
         Postfixes.Add (property);
@@ -344,7 +359,7 @@ public sealed class Grammar
         //===================================================
 
         Infixes.Add (Operator.NonAssociative ("Shuttle", "<=>"));
-        Infixes.Add (Operator.NonAssociative ("In/is", "in", "is"));
+        Infixes.Add (Operator.NonAssociative ("In", "in"));
         Infixes.Add (Operator.LeftAssociative ("Coalesce", "??"));
         Infixes.Add (Operator.LeftAssociative ("Shift", "<<", ">>"));
         Infixes.Add (Operator.LeftAssociative ("Bitwise", "&", "|", "^"));
