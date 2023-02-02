@@ -1,0 +1,12 @@
+﻿println ("Before")
+
+using (memory = new MemoryStream ())
+{
+    memory.WriteByte ((byte) 31)
+    memory.WriteByte ((byte) 32)
+    memory.WriteByte ((byte) 33)
+
+    println (memory.Position)
+}
+
+println ("After")

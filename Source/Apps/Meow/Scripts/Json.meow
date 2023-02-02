@@ -1,0 +1,8 @@
+﻿fileName = combine_path (__DIR__, "Test.json")
+// println (fileName)
+content = file_get_contents (fileName)
+obj = json_decode (content)
+println (obj["first"].Value)
+println (obj["second"][1].Value)
+println (obj["third"]["fourth"].Value)
+println (obj["third"]["fifth"].Value)

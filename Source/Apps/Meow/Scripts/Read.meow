@@ -1,0 +1,9 @@
+﻿file = fopen ("New.meow", "rt")
+line = "true"
+while (line)
+{
+    line = file.ReadLine()
+    println (line)
+}
+
+dispose (file)

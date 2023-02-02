@@ -253,13 +253,11 @@ public sealed class InterpreterSettings
             }
             else if (arg is "--use-namespace")
             {
-                result.UseNamespaces.Add (args[index + 1]);
-                index++;
+                result.UseNamespaces.Add (args[++index]);
             }
             else if (arg is "--load-assembly")
             {
-                result.LoadAssemblies.Add (args[index + 1]);
-                index++;
+                result.LoadAssemblies.Add (args[++index]);
             }
             else if (arg is "--debugger")
             {
@@ -285,6 +283,15 @@ public sealed class InterpreterSettings
             else if (arg is "--dump-tokens")
             {
                 result.DumpTokens = true;
+            }
+            else if (arg is "--path")
+            {
+                result.Pathes.Add (args[++index]);
+            }
+            else if (arg is "--include")
+            {
+                // TODO добавление инклюда
+                index++;
             }
             else if (arg.StartsWith ("-"))
             {

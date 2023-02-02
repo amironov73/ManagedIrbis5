@@ -1,5 +1,2 @@
-﻿use ("System.Collections.Generic")
-
-list = new List<int> ()
-
+﻿list = new List<int> ()
 println (list)
