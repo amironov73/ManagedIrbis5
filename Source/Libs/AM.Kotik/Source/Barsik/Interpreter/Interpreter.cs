@@ -229,7 +229,7 @@ public sealed class Interpreter
 
         foreach (var ns in Settings.UseNamespaces)
         {
-            Context.Namespaces.Add (ns, null);
+            Context.Namespaces.TryAdd (ns, null);
         }
 
         if (Settings.DebugParser)

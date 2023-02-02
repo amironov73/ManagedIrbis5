@@ -1,7 +1,7 @@
 ﻿needle = "ibis"
 haystack = ["PAZK", "SPEC", "IBIS", "PVK"]
 
-if (needle same haystack)
+if (needle ~ haystack)
 {
    println ("Got it")
 }

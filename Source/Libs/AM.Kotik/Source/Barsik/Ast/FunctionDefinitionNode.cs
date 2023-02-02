@@ -29,6 +29,13 @@ public sealed class FunctionDefinitionNode
 {
     #region Properties
 
+    /// <inheritdoc cref="IStatementBlock.Directives"/>
+    IList<DirectiveNode> IStatementBlock.Directives
+    {
+        get => Body.Directives;
+        set => Body.Directives = value;
+    }
+
     /// <inheritdoc cref="IStatementBlock.Functions"/>
     IList<FunctionDefinitionNode> IStatementBlock.Functions
     {
@@ -120,5 +127,4 @@ public sealed class FunctionDefinitionNode
     public override string ToString() => $"Function Definition at line {Line}";
 
     #endregion
-
 }

@@ -2,7 +2,3 @@ System.Collections.Generic.List`1[System.Int32]
 1
 2
 3
-System.Collections.Generic.List`1[System.Int32]
-4
-5
-6

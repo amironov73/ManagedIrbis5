@@ -1377,7 +1377,7 @@ public sealed class StdLib
                     }
                     else
                     {
-                        topContext.Namespaces[name] = null;
+                        topContext.Namespaces.TryAdd (name, null);
                     }
                 }
             }

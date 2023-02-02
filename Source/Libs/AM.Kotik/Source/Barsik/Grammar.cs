@@ -197,10 +197,11 @@ public sealed class Grammar
         var newOperator = Parser.Chain
             (
                 typeName.After (Reserved ("new")),
+                typeName.SeparatedBy (Term (",")).CornerBrackets().Optional(),
                 Expression.SeparatedBy (Term (",")).RoundBrackets(),
                 CurlyBlock.Optional(),
-                (name, args, init) =>
-                    (AtomNode) new NewNode (name, args, init)
+                (name, typeArgs, constructorArgs, init) =>
+                    (AtomNode) new NewNode (name, typeArgs, constructorArgs, init)
             )
             .Labeled ("New");
 
@@ -365,7 +366,7 @@ public sealed class Grammar
         Infixes.Add (Operator.LeftAssociative ("Bitwise", "&", "|", "^"));
         Infixes.Add (Operator.LeftAssociative ("Multiplication", "*", "/", "%" ));
         Infixes.Add (Operator.LeftAssociative ("Addition", "+", "-" ));
-        Infixes.Add (Operator.LeftAssociative ("Comparison", "<", ">", "<=", ">=", "==", "!=", "<>", "===", "!==", "!", "~~", "~~~", "same" ));
+        Infixes.Add (Operator.LeftAssociative ("Comparison", "<", ">", "<=", ">=", "==", "!=", "<>", "===", "!==", "!", "~" ));
         Infixes.Add (Operator.LeftAssociative ("And/Or", "&&", "||"));
 
         //===================================================

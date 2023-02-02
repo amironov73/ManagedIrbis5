@@ -17,6 +17,8 @@ using System.Text;
 
 using AM.Text;
 
+using static System.Net.Mime.MediaTypeNames;
+
 #endregion
 
 #nullable enable
@@ -74,13 +76,6 @@ public sealed class TermTokenizer
 
             if (count == 1)
             {
-                if (CheckTextIsIdentifier (text)
-                    && CheckCharIsIdentifier (navigator.LookAhead (builder.Length)))
-                {
-                    // это идентификатор, а не терм
-                    return null;
-                }
-
                 foreach (var known in knownTerms)
                 {
                     if (known == text)
@@ -128,6 +123,13 @@ public sealed class TermTokenizer
         {
             if (tokenValue is null)
             {
+                return null;
+            }
+
+            if (CheckTextIsIdentifier (tokenValue)
+                && CheckCharIsIdentifier (navigator.LookAhead (tokenValue.Length)))
+            {
+                // это идентификатор, а не терм
                 return null;
             }
 

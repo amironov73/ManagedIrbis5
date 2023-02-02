@@ -176,13 +176,18 @@ public sealed class InterpreterSettings
 
         result.Tokenizer = KotikUtility.CreateTokenizerForBarsik (result.TokenizerSettings);
         result.Grammar = AM.Kotik.Barsik.Grammar.CreateDefaultBarsikGrammar();
-
+        
+        result.UseNamespaces.Add ("System");
+        result.UseNamespaces.Add ("System.Collections.Generic");
+        result.UseNamespaces.Add ("System.IO");
+        
         // директивы по умолчанию
         result.KnownDirectives.Add (new AssemblyDirective());
         result.KnownDirectives.Add (new AstDirective());
         result.KnownDirectives.Add (new EchoDirective());
         result.KnownDirectives.Add (new ModuleDirective());
         result.KnownDirectives.Add (new NamespaceDirective());
+        result.KnownDirectives.Add (new UseDirective());
         result.KnownDirectives.Add (new VariableDirective());
 
         return result;

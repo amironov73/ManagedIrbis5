@@ -76,7 +76,7 @@ public sealed class FunctionDescriptor
 
     /// <inheritdoc cref="object.ToString"/>
     public override string ToString() =>
-        Utility.JoinNonEmpty (": ", Name, Description);
+        Utility.JoinNonEmpty (": ",  "func " + Name, Description);
 
     #endregion
 }

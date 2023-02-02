@@ -162,10 +162,7 @@ public sealed class BinaryNode
 
                 foreach (DictionaryEntry entry in rightDictionary)
                 {
-                    if (!result.ContainsKey (entry.Key))
-                    {
-                        result.Add (entry.Key, entry.Value);
-                    }
+                    result.TryAdd (entry.Key, entry.Value);
                 }
 
                 return result;
@@ -430,47 +427,6 @@ public sealed class BinaryNode
     }
 
     /// <summary>
-    /// Проверка приводимости типа.
-    /// </summary>
-    private static dynamic Is
-        (
-            Context context,
-            dynamic? left,
-            dynamic? right
-        )
-    {
-        if (left is null)
-        {
-            return false;
-        }
-
-        var leftType = ((object) left).GetType();
-
-        Type? rightType = null;
-        if (right is Type alreadyHaveType)
-        {
-            rightType = alreadyHaveType;
-        }
-
-        if (right is string typeName)
-        {
-            rightType = context.FindType (typeName);
-        }
-
-        if (rightType is null)
-        {
-            return false;
-        }
-
-        if (leftType == rightType)
-        {
-            return true;
-        }
-
-        return leftType.IsAssignableTo (rightType);
-    }
-
-    /// <summary>
     /// Равенство адресов в памяти.
     /// </summary>
     private static dynamic? StrictEquality
@@ -605,16 +561,10 @@ public sealed class BinaryNode
             "&&" => And (context, left, right),
             "^" => left ^ right,
             "^^" => KotikUtility.ToBoolean (left) != KotikUtility.ToBoolean (right),
-            "~" => throw new NotImplementedException(),
+            "~" => Same (context, left, right),
             "~~" => RegexMatch (context, left, right),
-            "~~~" => throw new NotImplementedException(),
             "in" => In (context, left, right),
-            "is" => Is (context, left, right),
-            "same" => Same (context, left, right),
             "<=>" => Shuttle (context, left, right),
-            "<:>" => throw new NotImplementedException(),
-            "<+>" => throw new NotImplementedException(),
-            "@" => throw new NotImplementedException(),
             // "??" => Coalesce (context, left, right),
             _ => throw new InvalidOperationException ($"Unknown operator {_operation}")
         };

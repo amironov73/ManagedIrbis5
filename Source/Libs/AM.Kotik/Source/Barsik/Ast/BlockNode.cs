@@ -35,6 +35,9 @@ public class BlockNode
 {
     #region Properties
 
+    /// <inheritdoc cref="IStatementBlock.Directives"/>
+    public IList<DirectiveNode> Directives { get; set; }
+
     /// <inheritdoc cref="IStatementBlock.Functions"/>
     public IList<FunctionDefinitionNode> Functions { get; set; }
 
@@ -60,6 +63,7 @@ public class BlockNode
     {
         Sure.NotNull (statements);
 
+        Directives = null!;
         Functions = null!;
         Locals = null!;
         Statements = statements;

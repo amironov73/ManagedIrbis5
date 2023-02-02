@@ -1,6 +1,5 @@
-﻿use ("System")
-use ("System.Text")
-use ("System.Text.RegularExpressions")
+﻿#use System.Text
+#use System.Text.RegularExpressions
 println (use())
 
 use ("-System.Text.RegularExpressions")

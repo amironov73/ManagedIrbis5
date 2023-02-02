@@ -37,11 +37,13 @@ internal sealed class NewNode
     public NewNode
         (
             string typeName,
+            IList<string>? typeArguments,
             IList<AtomNode> constructorArguments,
             StatementBase? initialization
         )
     {
         _typeName = typeName;
+        _typeArguments = typeArguments;
         _constructorArguments = constructorArguments;
         _initialization = initialization;
     }
@@ -51,6 +53,7 @@ internal sealed class NewNode
     #region Private members
 
     private readonly string _typeName;
+    private readonly IList<string>? _typeArguments;
     private readonly IList<AtomNode> _constructorArguments;
     private readonly StatementBase? _initialization;
 
@@ -70,7 +73,7 @@ internal sealed class NewNode
             throw new BarsikException ("Operator NEW is not allowed");
         }
 
-        var type = context.FindType (_typeName, null);
+        var type = context.FindType (_typeName, _typeArguments);
         if (type is null)
         {
             context.Error.WriteLine($"Type '{_typeName}' not found");

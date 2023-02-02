@@ -14,6 +14,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using AM.Kotik.Barsik.Directives;
+
 #endregion
 
 #nullable enable
@@ -25,6 +27,11 @@ namespace AM.Kotik.Barsik.Ast;
 /// </summary>
 public interface IStatementBlock
 {
+    /// <summary>
+    /// Директивы.
+    /// </summary>
+    IList<DirectiveNode> Directives { get; set; }
+
     /// <summary>
     /// Функции, входящие в блок.
     /// </summary>
@@ -49,6 +56,11 @@ public interface IStatementBlock
         )
     {
         Sure.NotNull (context);
+
+        foreach (var directive in Directives)
+        {
+            directive.Execute (context);
+        }
 
         foreach (var local in Locals)
         {
@@ -122,6 +134,9 @@ public interface IStatementBlock
     /// </summary>
     void RefineStatements()
     {
+        Directives = Statements.Where (x => x is DirectiveNode)
+            .Cast<DirectiveNode>().ToList();
+        
         Locals = Statements.Where (x => x is LocalNode)
             .Cast<LocalNode>().ToList();
 

@@ -286,86 +286,8 @@ public sealed class Context
     /// </summary>
     public Type? FindType
         (
-            AtomNode node,
-            IEnumerable<AtomNode>? typeArgs = null
-        )
-    {
-        Sure.NotNull (node);
-
-        string[]? args = null;
-        if (typeArgs is not null)
-        {
-            var list = new List<string>();
-            foreach (var argNode in typeArgs)
-            {
-                if (argNode is VariableNode varNode)
-                {
-                    if (TryGetVariable (varNode.Name, out var varValue))
-                    {
-                        if (varValue is Type alreadyType)
-                        {
-                            list.Add (alreadyType.AssemblyQualifiedName.ThrowIfNullOrEmpty ());
-                        }
-                        else if (varValue is string strValue && !string.IsNullOrEmpty (strValue))
-                        {
-                            list.Add (strValue);
-                        }
-                        else
-                        {
-                            throw new BarsikException();
-                        }
-                    }
-                    else
-                    {
-                        list.Add (varNode.Name.ThrowIfNullOrEmpty ());
-                    }
-                }
-                else
-                {
-                    var one = (argNode.Compute (this) as string).ThrowIfNullOrEmpty();
-                    list.Add (one);
-                }
-            }
-
-            args = list.ToArray();
-        }
-
-        if (node is VariableNode variableNode)
-        {
-            if (TryGetVariable (variableNode.Name, out var variableValue))
-            {
-                if (variableValue is Type alreadyHaveType)
-                {
-                    return alreadyHaveType;
-                }
-
-                if (variableValue is string typeName1)
-                {
-                    return FindType (typeName1, args);
-                }
-            }
-
-            return FindType (variableNode.Name);
-        }
-
-        var value = node.Compute (this);
-        if (value is string typeName2)
-        {
-            return FindType (typeName2, args);
-        }
-
-        var typeName3 = KotikUtility.ToString (value);
-
-        return FindType (typeName3, args);
-    }
-
-    /// <summary>
-    /// Получение типа по его имени.
-    /// </summary>
-    public Type? FindType
-        (
             string name,
-            string[]? arguments = null
+            IList<string>? arguments = null
         )
     {
         Sure.NotNullNorEmpty (name);
