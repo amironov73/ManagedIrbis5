@@ -1,5 +1,4 @@
-﻿use ("System")
-println (Environment.CurrentDirectory)
+﻿println (Environment.CurrentDirectory)
 try
 {
     include ("Subscript.meow")

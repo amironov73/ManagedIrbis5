@@ -366,7 +366,7 @@ public sealed class Grammar
         Infixes.Add (Operator.LeftAssociative ("Bitwise", "&", "|", "^"));
         Infixes.Add (Operator.LeftAssociative ("Multiplication", "*", "/", "%" ));
         Infixes.Add (Operator.LeftAssociative ("Addition", "+", "-" ));
-        Infixes.Add (Operator.LeftAssociative ("Comparison", "<", ">", "<=", ">=", "==", "!=", "<>", "===", "!==", "!", "~" ));
+        Infixes.Add (Operator.LeftAssociative ("Comparison", "<", ">", "<=", ">=", "==", "!=", "<>", "===", "!==", "!", "~", "~~" ));
         Infixes.Add (Operator.LeftAssociative ("And/Or", "&&", "||"));
 
         //===================================================

@@ -110,7 +110,7 @@ public sealed class TermTokenizer
 
             for (var i = 1; i < suspect.Length; i++)
             {
-                if (Array.IndexOf (nextIdentifierLetter, suspect[i]) < 0)
+                if (Array.IndexOf (nextIdentifierLetter!, suspect[i]) < 0)
                 {
                     return false;
                 }

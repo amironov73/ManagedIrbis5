@@ -44,8 +44,41 @@ namespace AM.Kotik.Barsik.Ast;
 /// </code>
 /// </remarks>
 internal sealed class IfNode
-    : StatementBase
+    : StatementBase,
+    IStatementBlock
 {
+    #region Properties
+
+    /// <inheritdoc cref="IStatementBlock.Directives"/>
+    IList<DirectiveNode> IStatementBlock.Directives
+    {
+        get => _summary.Directives;
+        set => _summary.Directives = value;
+    }
+
+    /// <inheritdoc cref="IStatementBlock.Functions"/>
+    IList<FunctionDefinitionNode> IStatementBlock.Functions
+    {
+        get => _summary.Functions;
+        set => _summary.Functions = value;
+    }
+
+    /// <inheritdoc cref="IStatementBlock.Locals"/>
+    IList<LocalNode> IStatementBlock.Locals
+    {
+        get => _summary.Locals;
+        set => _summary.Locals = value;
+    }
+
+    /// <inheritdoc cref="IStatementBlock.Statements"/>
+    IList<StatementBase> IStatementBlock.Statements
+    {
+        get => _summary.Statements;
+        set => _summary.Statements = value;
+    }
+
+    #endregion
+    
     #region Construction
 
     /// <summary>
@@ -68,6 +101,33 @@ internal sealed class IfNode
         _elseIfArray = elseIfArray;
         _thenBlock = thenBlock;
         _elseBlock = elseBlock;
+
+        if (elseBlock is not null || elseIfArray is not null)
+        {
+            // сооружаем псевдоблок, хранящий в себе стейтменты из двух блоков
+            var summary = new List<StatementBase>();
+            summary.AddRange (((IStatementBlock) thenBlock).Statements);
+            if (elseIfArray is not null)
+            {
+                foreach (var node in elseIfArray)
+                {
+                    summary.AddRange (((IStatementBlock) node).Statements);
+                }
+            }
+
+            if (elseBlock is not null)
+            {
+                summary.AddRange (((IStatementBlock) elseBlock).Statements);
+            }
+            
+            _summary = new BlockNode (0, summary);
+        }
+        else
+        {
+            _summary = (BlockNode) thenBlock;
+        }
+
+        ((IStatementBlock) _summary).RefineStatements();
     }
 
     #endregion
@@ -78,6 +138,7 @@ internal sealed class IfNode
     private readonly StatementBase _thenBlock;
     private readonly IList<IfNode>? _elseIfArray;
     private readonly StatementBase? _elseBlock;
+    private readonly BlockNode _summary;
 
     #endregion
 

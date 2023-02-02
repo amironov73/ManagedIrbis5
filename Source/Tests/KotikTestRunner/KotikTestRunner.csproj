@@ -5,7 +5,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\Libs\AM.Kotik\AM.Kotik.csproj"/>
+        <ProjectReference Include="..\..\Libs\AM.Kotik\AM.Kotik.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="Subscript.meow">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>

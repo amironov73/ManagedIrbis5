@@ -14,6 +14,7 @@
 
 #region Using directives
 
+using System.Collections.Generic;
 using System.IO;
 
 #endregion
@@ -26,8 +27,41 @@ namespace AM.Kotik.Barsik.Ast;
 /// Блок with.
 /// </summary>
 internal sealed class WithNode
-    : StatementBase
+    : StatementBase,
+    IStatementBlock
 {
+    #region Properties
+
+    /// <inheritdoc cref="IStatementBlock.Directives"/>
+    IList<DirectiveNode> IStatementBlock.Directives
+    {
+        get => _body.Directives;
+        set => _body.Directives = value;
+    }
+
+    /// <inheritdoc cref="IStatementBlock.Functions"/>
+    IList<FunctionDefinitionNode> IStatementBlock.Functions
+    {
+        get => _body.Functions;
+        set => _body.Functions = value;
+    }
+
+    /// <inheritdoc cref="IStatementBlock.Locals"/>
+    IList<LocalNode> IStatementBlock.Locals
+    {
+        get => _body.Locals;
+        set => _body.Locals = value;
+    }
+
+    /// <inheritdoc cref="IStatementBlock.Statements"/>
+    IList<StatementBase> IStatementBlock.Statements
+    {
+        get => _body.Statements;
+        set => _body.Statements = value;
+    }
+
+    #endregion
+
     #region Construction
 
     /// <summary>
@@ -45,7 +79,7 @@ internal sealed class WithNode
         Sure.NotNull (body);
 
         _center = center;
-        _body = body;
+        _body = (BlockNode) body;
     }
 
     #endregion
@@ -53,8 +87,7 @@ internal sealed class WithNode
     #region Private members
 
     private readonly AtomNode _center;
-
-    private readonly StatementBase _body;
+    private readonly BlockNode _body;
 
     #endregion
 

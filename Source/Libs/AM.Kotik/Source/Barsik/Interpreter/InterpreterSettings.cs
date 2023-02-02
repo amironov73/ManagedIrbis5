@@ -143,6 +143,12 @@ public sealed class InterpreterSettings
     /// </summary>
     [JsonIgnore]
     public bool DumpTokens { get; set; }
+    
+    /// <summary>
+    /// Пути для поиска суб-скриптов.
+    /// </summary>
+    [JsonPropertyName ("path")]
+    public List<string> Pathes { get; set; }
 
     #endregion
 
@@ -161,6 +167,7 @@ public sealed class InterpreterSettings
         UseNamespaces = new ();
         MainPrompt = "> ";
         SecondaryPrompt = "... ";
+        Pathes = new ();
     }
 
     #endregion
@@ -176,17 +183,22 @@ public sealed class InterpreterSettings
 
         result.Tokenizer = KotikUtility.CreateTokenizerForBarsik (result.TokenizerSettings);
         result.Grammar = AM.Kotik.Barsik.Grammar.CreateDefaultBarsikGrammar();
-        
+
+        result.Pathes.Add ("include");
+
         result.UseNamespaces.Add ("System");
         result.UseNamespaces.Add ("System.Collections.Generic");
         result.UseNamespaces.Add ("System.IO");
-        
+        result.UseNamespaces.Add ("System.Text");
+
         // директивы по умолчанию
         result.KnownDirectives.Add (new AssemblyDirective());
         result.KnownDirectives.Add (new AstDirective());
         result.KnownDirectives.Add (new EchoDirective());
+        result.KnownDirectives.Add (new IncludeDirective());
         result.KnownDirectives.Add (new ModuleDirective());
         result.KnownDirectives.Add (new NamespaceDirective());
+        result.KnownDirectives.Add (new PathDirective());
         result.KnownDirectives.Add (new UseDirective());
         result.KnownDirectives.Add (new VariableDirective());
 

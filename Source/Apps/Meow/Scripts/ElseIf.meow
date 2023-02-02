@@ -1,0 +1,19 @@
+﻿x = 1
+y = 2
+
+if (y == 1)
+{
+    print ("y == 1")
+}
+else if (x == y)
+{
+    print ("x == y")
+}
+else if (y == 2)
+{
+    print ("y == 2")
+}
+else
+{
+    print ("else")
+}

@@ -12,6 +12,7 @@
 #region Using directives
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 #endregion
@@ -24,7 +25,8 @@ namespace AM.Kotik.Barsik.Ast;
 /// Блок try-catch-finally
 /// </summary>
 internal sealed class TryNode
-    : StatementBase
+    : StatementBase,
+    IStatementBlock
 {
     #region NestedTypes
 
@@ -56,6 +58,38 @@ internal sealed class TryNode
 
     #endregion
 
+    #region Properties
+
+    /// <inheritdoc cref="IStatementBlock.Directives"/>
+    IList<DirectiveNode> IStatementBlock.Directives
+    {
+        get => _summary.Directives;
+        set => _summary.Directives = value;
+    }
+
+    /// <inheritdoc cref="IStatementBlock.Functions"/>
+    IList<FunctionDefinitionNode> IStatementBlock.Functions
+    {
+        get => _summary.Functions;
+        set => _summary.Functions = value;
+    }
+
+    /// <inheritdoc cref="IStatementBlock.Locals"/>
+    IList<LocalNode> IStatementBlock.Locals
+    {
+        get => _summary.Locals;
+        set => _summary.Locals = value;
+    }
+
+    /// <inheritdoc cref="IStatementBlock.Statements"/>
+    IList<StatementBase> IStatementBlock.Statements
+    {
+        get => _summary.Statements;
+        set => _summary.Statements = value;
+    }
+
+    #endregion
+
     #region Construction
 
     /// <summary>
@@ -72,20 +106,46 @@ internal sealed class TryNode
     {
         Sure.NotNull (tryBlock);
 
-        _tryBlock = tryBlock;
+        _tryBlock = (BlockNode) tryBlock;
         _variableName = catchBlock?.Name;
-        _catchBlock = catchBlock?.Body;
-        _finallyBlock = finallyBlock;
+        _catchBlock = (BlockNode?) catchBlock?.Body;
+        _finallyBlock = (BlockNode?) finallyBlock;
+
+        if (catchBlock is not null || finallyBlock is not null)
+        {
+            // сооружаем псевдоблок, хранящий в себе стейтменты из двух блоков
+            var summary = new List<StatementBase>();
+            summary.AddRange (((IStatementBlock) tryBlock).Statements);
+
+            if (catchBlock is not null)
+            {
+                summary.AddRange (((IStatementBlock) catchBlock.Body).Statements);
+            }
+
+            if (finallyBlock is not null)
+            {
+                summary.AddRange (((IStatementBlock) finallyBlock).Statements);
+            }
+
+            _summary = new BlockNode (0, summary);
+        }
+        else
+        {
+            _summary = (BlockNode) tryBlock;
+        }
+
+        ((IStatementBlock) _summary).RefineStatements();
     }
 
     #endregion
 
     #region Private members
 
-    private readonly StatementBase _tryBlock;
+    private readonly BlockNode _tryBlock;
     private readonly string? _variableName;
-    private readonly StatementBase? _catchBlock;
-    private readonly StatementBase? _finallyBlock;
+    private readonly BlockNode? _catchBlock;
+    private readonly BlockNode? _finallyBlock;
+    private readonly BlockNode _summary;
 
     #endregion
 

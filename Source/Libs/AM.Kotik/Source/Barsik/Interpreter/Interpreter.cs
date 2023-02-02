@@ -20,6 +20,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Xml.Linq;
 
 using AM.Kotik.Barsik.Ast;
 using AM.Kotik.Barsik.Diagnostics;
@@ -212,6 +213,29 @@ public sealed class Interpreter
         output.WriteLine ("</pre>");
     }
 
+    private bool TryInclude
+        (
+            string fileName
+        )
+    {
+        if (!Context._inclusions.TryGetValue (fileName, out var program))
+        {
+            if (!File.Exists (fileName))
+            {
+                return false;
+            }
+
+            var sourceCode = File.ReadAllText(fileName);
+            program = Settings.Grammar.ParseProgram (sourceCode, Settings.Tokenizer);
+            Context._inclusions[fileName] = program;
+        }
+
+        // TODO отрабатывать ExitException?
+        Execute (program, Context);
+
+        return true;
+    }
+
     #endregion
 
     #region Public methods
@@ -226,6 +250,9 @@ public sealed class Interpreter
         {
             Context.LoadAssembly (assembly);
         }
+
+        Pathes.Clear();
+        Pathes.AddRange (Settings.Pathes);
 
         foreach (var ns in Settings.UseNamespaces)
         {
@@ -674,6 +701,50 @@ public sealed class Interpreter
         [TokenKind.External] = "#FF0000",
         [TokenKind.Directive] = "#FF0000",
     };
+
+    /// <summary>
+    /// Вложение скрипта.
+    /// </summary>
+    public void Include
+        (
+            string fileName
+        )
+    {
+        Sure.NotNullNorEmpty (fileName);
+
+        var extension = Path.GetExtension (fileName);
+        if (string.IsNullOrEmpty(extension))
+        {
+            fileName += ".meow";
+        }
+
+        if (TryInclude (fileName)
+            && !Path.IsPathRooted (fileName))
+        {
+            return;
+        }
+
+        foreach (var part in Pathes)
+        {
+            var fullPath = Path.Combine (part, fileName);
+            if (TryInclude (fullPath))
+            {
+                return;
+            }
+        }
+        
+        // пытаемся загрузить файл рядом со скриптом
+        if (Context.TryGetVariable ("__DIR__", out var scriptDir))
+        {
+            var fullPath = Path.Combine (scriptDir, fileName);
+            if (TryInclude (fullPath))
+            {
+                return;
+            }
+        }
+
+        Context.Error.WriteLine ($"Can't include '{fileName}'");
+    }
 
     /// <summary>
     /// Сброс состояния интерпретатора.

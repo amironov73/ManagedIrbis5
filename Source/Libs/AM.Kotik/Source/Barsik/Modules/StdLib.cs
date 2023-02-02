@@ -90,7 +90,7 @@ public sealed class StdLib
         { "getcwd", new FunctionDescriptor ("getcwd", GetCurrentDirectory) },
         { "host", new FunctionDescriptor ("host", Host) },
         { "html_encode", new FunctionDescriptor ("html_encode", HtmlEncode) },
-        { "require", new FunctionDescriptor ("require", Include) },
+        { "include", new FunctionDescriptor ("include", Include) },
         { "join", new FunctionDescriptor ("join", Join) },
         { "json_decode", new FunctionDescriptor ("json_decode", JsonDecode) },
         { "json_encode", new FunctionDescriptor ("json_encode", JsonEncode) },
@@ -102,6 +102,7 @@ public sealed class StdLib
         { "readdir", new FunctionDescriptor ("readdir", ReadDirectory) },
         { "remove", new FunctionDescriptor ("remove", RemoveFile) },
         { "rename", new FunctionDescriptor ("rename", RenameFile) },
+        { "require", new FunctionDescriptor ("require", Include) },
         { "subscribe", new FunctionDescriptor ("subscribe", Subscribe) },
         { "system", new FunctionDescriptor ("system", System_) },
         { "tmpfile", new FunctionDescriptor ("tmpfile", TemporaryFile) },
@@ -149,33 +150,6 @@ public sealed class StdLib
         }
 
         return false;
-    }
-
-    private static bool _Include
-        (
-            Context context,
-            string fileName
-        )
-    {
-        var topContext = context.GetTopContext();
-        var interpreter = topContext.Interpreter.ThrowIfNull();
-        var tokenizer = interpreter.Settings.Tokenizer;
-        if (!topContext._inclusions.TryGetValue (fileName, out var program))
-        {
-            if (!File.Exists (fileName))
-            {
-                return false;
-            }
-
-            var sourceCode = File.ReadAllText (fileName);
-            program = interpreter.Settings.Grammar.ParseProgram (sourceCode, tokenizer);
-            topContext._inclusions[fileName] = program;
-        }
-
-        // TODO отрабатывать ExitException
-        interpreter.Execute (program, context);
-
-        return true;
     }
 
     #endregion
@@ -858,40 +832,16 @@ public sealed class StdLib
     {
         for (var i = 0; i < args.Length; i++)
         {
-            var name = Compute (context, args, i) as string;
-            if (!string.IsNullOrWhiteSpace (name))
+            var fileName = Compute (context, args, i) as string;
+            if (!string.IsNullOrWhiteSpace (fileName))
             {
-                name = name.Trim();
-                var extension = Path.GetExtension (name);
-                if (string.IsNullOrEmpty (extension))
+                fileName = fileName.Trim();
+                var topContext = context.GetTopContext();
+                var interpreter = topContext.Interpreter;
+                if (interpreter is not null)
                 {
-                    name += ".barsik";
+                    interpreter.Include (fileName);
                 }
-
-                if (!_Include (context, name)
-                    && !Path.IsPathRooted (name))
-                {
-                    var interpreter = context.GetTopContext().Interpreter.ThrowIfNull();
-                    foreach (var part in interpreter.Pathes)
-                    {
-                        var fullPath = Path.Combine (part, name);
-                        if (_Include (context, fullPath))
-                        {
-                            return null;
-                        }
-                    }
-                }
-
-                // пытаемся загрузить файл рядом со скриптом
-                if (context.TryGetVariable ("__DIR__", out var scriptDir))
-                {
-                    var fullPath = Path.Combine (scriptDir, name);
-                    if (_Include (context, fullPath))
-                    {
-                        return null;
-                    }
-                }
-
             }
         }
 
