@@ -1,0 +1,23 @@
+#use AM.Kotik.Barsik
+
+artists = [
+    new Artist ("Билибин", 1876),
+    new Artist ("Вальк", 1918),
+    new Artist ("Васнецов", 1900),
+    new Artist ("Верейский", 1915),
+    new Artist ("Герасимов", 1881),
+    new Artist ("Дейнека", 1899)
+]
+
+println (artists)
+
+byName = from a in artists
+orderby a.Name descending
+select a;
+
+println (byName)
+
+byYear = from a in artists
+group a by a.Year;
+
+println (byYear)

@@ -288,15 +288,23 @@ public sealed class Grammar
                     new LinqNode.OrderClause (clause, !string.IsNullOrEmpty (descending))
             );
 
+        var groupBy = Parser.Chain
+            (
+                Expression.After (Reserved ("group")),
+                Expression.After (Reserved ("by")),
+                (expr, by) => new LinqNode.GroupClause (expr, by)
+            );
+
         var linq = Parser.Chain
             (
                 Identifier.After (Reserved ("from")),
                 Atom.After (Term ("in")),
                 Expression.After (Reserved ("where")).Optional(),
                 orderBy.Optional(),
-                Expression.After (Reserved ("select")),
-                (name, sequence, whereClause, orderClause, selectClause) =>
-                    (AtomNode) new LinqNode (name, sequence, whereClause, orderClause, selectClause)
+                groupBy.Optional(),
+                Expression.After (Reserved ("select")).Optional(),
+                (name, sequence, whereClause, orderClause, groupClause, selectClause) =>
+                    (AtomNode) new LinqNode (name, sequence, whereClause, orderClause, selectClause, groupClause)
             )
             .Labeled ("Linq");
 

@@ -93,11 +93,11 @@ public sealed class TokenizerSettings
         ReservedWords = new []
         {
             "abstract", "and", "as", "async", "await", "base", "bool", "break",
-            "byte", "case", "catch", "char", "checked", "class", "const",
+            "by", "byte", "case", "catch", "char", "checked", "class", "const",
             "continue", "decimal", "default", "delegate", "descending", "do",
             "double", "else", "enum", "event", "explicit", "extern", "false",
             "finally", "fixed", "float", "for", "foreach", "from", "func", "goto",
-            "groupby", "if", "implicit", "in", "int", "interface", "internal", "is",
+            "group", "if", "implicit", "in", "int", "interface", "internal", "is",
             "lambda", "local", "lock", "long", "namespace", "new", "null", "object",
             "operator", "or", "orderby", "out", "override", "params", "private",
             "protected", "public", "readonly", "ref", "return", "sbyte", "sealed",
