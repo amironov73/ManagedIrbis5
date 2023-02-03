@@ -280,6 +280,13 @@ public sealed class Grammar
         var awaitOperator = Expression.After (Reserved ("await"))
             .Map (x => (AtomNode)new AwaitNode (x));
 
+        var fromClause = Parser.Chain
+            (
+                Identifier.After (Reserved ("from")),
+                Atom.After (Term ("in")),
+                (variable, sequence) => new LinqNode.FromClause (variable, sequence)
+            );
+        
         var orderBy = Parser.Chain
             (
                 Expression.After (Reserved ("orderby")),
@@ -297,14 +304,13 @@ public sealed class Grammar
 
         var linq = Parser.Chain
             (
-                Identifier.After (Reserved ("from")),
-                Atom.After (Term ("in")),
+                fromClause,
                 Expression.After (Reserved ("where")).Optional(),
                 orderBy.Optional(),
                 groupBy.Optional(),
                 Expression.After (Reserved ("select")).Optional(),
-                (name, sequence, whereClause, orderClause, groupClause, selectClause) =>
-                    (AtomNode) new LinqNode (name, sequence, whereClause, orderClause, selectClause, groupClause)
+                (fromClause, whereClause, orderClause, groupClause, selectClause) =>
+                    (AtomNode) new LinqNode (fromClause, whereClause, orderClause, selectClause, groupClause)
             )
             .Labeled ("Linq");
 

@@ -6571,5 +6571,73 @@ public static class Utility
         return true;
     }
 
+    /// <summary>
+    /// Произвести все возможные пермутации из элемента списка списков.
+    /// </summary>
+    public static IEnumerable<IReadOnlyList<T>> Permute<T> 
+        (
+            IReadOnlyList<IReadOnlyList<T>> list
+        )
+    {
+        Sure.NotNull (list);
+        
+        var rank = list.Count;
+        if (rank == 0)
+        {
+            yield break;
+        }
+
+        for (var i = 0; i < rank; i++)
+        {
+            Sure.NotNull (list[i]);
+            
+            if (list[i].Count == 0)
+            {
+                yield break;
+            }
+        }
+    
+        var indexes = new List<int> (rank);
+        for (var i = 0; i < rank; i++)
+        {
+            indexes.Add (0);
+        }
+
+        var current = new List<T> (rank);
+        while (true)
+        {
+            NEXT_ITERATION:
+            current.Clear();
+            for (var i = 0; i < rank; i++)
+            {
+                current.Add (list[i][indexes[i]]);
+            }
+
+            yield return current;
+
+            var level = rank - 1;
+            while (true)
+            {
+                indexes[level]++;
+                if (indexes[level] < list[level].Count)
+                {
+                    goto NEXT_ITERATION;
+                }
+
+                for (var i = level; i < rank; i++)
+                {
+                    indexes[i] = 0;
+                }
+
+                if (level == 0)
+                {
+                    yield break;
+                }
+
+                level--;
+            }
+        }
+    }
+    
     #endregion
 }

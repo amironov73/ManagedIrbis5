@@ -34,6 +34,12 @@ namespace AM.Kotik.Barsik.Ast;
 
   from person in people //required
   group person by person.Age; // required
+  
+  несколько источников
+  
+  from a in firstSequence
+  from b in secondSequence
+  select a + b;
 
  */
 
@@ -45,6 +51,40 @@ internal sealed class LinqNode
 {
     #region NestedClasses
 
+    internal sealed class FromClause
+    {
+        #region Proprerties
+
+        /// <summary>
+        /// Имя переменной.
+        /// </summary>
+        public string VariableName { get; }
+        
+        /// <summary>
+        /// Последовательность.
+        /// </summary>
+        public AtomNode Sequence { get; }
+
+        #endregion
+
+        #region Construction
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        public FromClause
+            (
+                string variableName, 
+                AtomNode sequence
+            )
+        {
+            VariableName = variableName;
+            Sequence = sequence;
+        }
+
+        #endregion
+    }
+    
     internal sealed class Grouped
         : IGrouping<object?, object?>
     {
@@ -167,16 +207,14 @@ internal sealed class LinqNode
     /// </summary>
     public LinqNode
         (
-            string variableName,
-            AtomNode sequence,
+            FromClause fromClause,
             AtomNode? whereClause,
             OrderClause? orderClause,
             AtomNode? selectClause,
             GroupClause? groupClause
         )
     {
-        Sure.NotNullNorEmpty (variableName);
-        Sure.NotNull (sequence);
+        Sure.NotNull (fromClause);
 
         if (selectClause is null && groupClause is null)
         {
@@ -188,8 +226,7 @@ internal sealed class LinqNode
             throw new SyntaxException ("Can't handle select and group simultaneously");
         }
 
-        _variableName = variableName;
-        _sequence = sequence;
+        _fromClause = fromClause;
         _whereClause = whereClause;
         _orderClause = orderClause;
         _selectClause = selectClause;
@@ -200,8 +237,7 @@ internal sealed class LinqNode
 
     #region Private members
 
-    private readonly string _variableName;
-    private readonly AtomNode _sequence;
+    private readonly FromClause _fromClause; 
     private readonly AtomNode? _whereClause;
     private readonly OrderClause? _orderClause;
     private readonly AtomNode? _selectClause;
@@ -217,7 +253,7 @@ internal sealed class LinqNode
             Context context
         )
     {
-        var sequence = _sequence.Compute (context);
+        var sequence = _fromClause.Sequence.Compute (context);
         if (sequence is not IEnumerable)
         {
             sequence = new [] { sequence };
@@ -225,13 +261,13 @@ internal sealed class LinqNode
 
         context = context.CreateChildContext();
         var variables = context.Variables;
-        variables[_variableName] = null;
+        variables[_fromClause.VariableName] = null;
 
         // in и where (если есть)
         var temporary = new BarsikList();
         foreach (var item in sequence)
         {
-            variables[_variableName] = item;
+            variables[_fromClause.VariableName] = item;
             var success = _whereClause is null
                 || KotikUtility.ToBoolean (_whereClause.Compute (context));
             if (success)
@@ -246,7 +282,7 @@ internal sealed class LinqNode
             var list = new List<KeyValuePair<dynamic, dynamic>>();
             foreach (var one in temporary)
             {
-                variables[_variableName] = one;
+                variables[_fromClause.VariableName] = one;
                 var key = _orderClause.Expression.Compute (context);
                 var pair = new KeyValuePair<dynamic, dynamic> (key, one);
                 list.Add (pair);
@@ -275,7 +311,7 @@ internal sealed class LinqNode
             var result = new BarsikList();
             foreach (var one in temporary)
             {
-                variables[_variableName] = one;
+                variables[_fromClause.VariableName] = one;
                 var selected = _selectClause.Compute (context);
                 result.Add (selected);
             }
@@ -288,7 +324,7 @@ internal sealed class LinqNode
             var result = new GroupedList();
             foreach (var one in temporary)
             {
-                variables[_variableName] = one;
+                variables[_fromClause.VariableName] = one;
                 var key = _groupClause.By.Compute (context);
                 var value = _groupClause.Expression.Compute (context);
                 result.Add (key, value);

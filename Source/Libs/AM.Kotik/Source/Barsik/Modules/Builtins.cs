@@ -19,6 +19,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 using AM.Kotik.Barsik.Ast;
@@ -163,6 +164,7 @@ public static class Builtins
         { "now", new FunctionDescriptor ("now", Now) },
         { "print", new FunctionDescriptor ("print", Print) },
         { "println", new FunctionDescriptor ("println", PrintLine) },
+        { "range", new FunctionDescriptor ("range", Range_) },
         { "readln", new FunctionDescriptor ("readln", ReadLine) },
         { "reduce", new FunctionDescriptor ("reduce", Reduce, false) },
         { "regex", new FunctionDescriptor ("reduce", Regex_) },
@@ -879,6 +881,24 @@ public static class Builtins
         context.Output?.WriteLine();
 
         return null;
+    }
+
+    /// <summary>
+    /// Аналог `range` из Python.
+    /// </summary>
+    private static dynamic Range_
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var count = KotikUtility.ToInt32 (Compute (context, args, 0));
+        if (count <= 0)
+        {
+            return Array.Empty<object>();
+        }
+
+        return Enumerable.Range (0, count);
     }
 
     /// <summary>
