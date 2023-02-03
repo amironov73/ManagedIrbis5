@@ -84,7 +84,7 @@ public static class KotikUtility
         var method = targetType.GetMethod (methodName, bindingFlags, argTypes.ToArray());
         if (method is null)
         {
-            context.Error.WriteLine ($"Can't find method {methodName}");
+            context.Error?.WriteLine ($"Can't find method {methodName}");
             return null;
         }
 

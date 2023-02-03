@@ -12,8 +12,6 @@
 
 #region Using directives
 
-using System;
-
 using AM.Text;
 
 #endregion
@@ -50,8 +48,7 @@ public sealed class ModuleDirective
             string? argument
         )
     {
-        var topContext = context.GetTopContext();
-        var interpreter = topContext.Interpreter;
+        var interpreter = context.Interpreter;
         if (interpreter is not null)
         {
             if (string.IsNullOrEmpty (argument))
@@ -59,12 +56,12 @@ public sealed class ModuleDirective
                 var modules = interpreter.Modules;
                 foreach (var module in modules)
                 {
-                    context.Output.WriteLine ($"{module.GetType().Name}: {module.Description} v{module.Version}");
+                    context.Output?.WriteLine ($"{module.GetType().Name}: {module.Description} v{module.Version}");
                 }
 
                 if (modules.Count == 0)
                 {
-                    context.Output.WriteLine ("(no modules loaded)");
+                    context.Output?.WriteLine ("(no modules loaded)");
                 }
             }
             else
@@ -79,7 +76,7 @@ public sealed class ModuleDirective
                     if (subCommand.SameString ("unload"))
                     {
                         var success = interpreter.Context.UnloadModule (subArgument);
-                        context.Output.WriteLine ($"Unload module {subArgument}: {success}");
+                        context.Output?.WriteLine ($"Unload module {subArgument}: {success}");
                     }
                 }
                 else

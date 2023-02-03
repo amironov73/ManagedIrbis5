@@ -63,11 +63,10 @@ public sealed class ExternalNode
     {
         PreExecute (context);
 
-        var interpreter = context.GetTopContext().Interpreter.ThrowIfNull();
-        var handler = interpreter.ExternalCodeHandler;
+        var handler = context.Interpreter?.ExternalCodeHandler;
         if (handler is null)
         {
-            context.Error.WriteLine ("Missing external code handler");
+            context.Error?.WriteLine ("Missing external code handler");
             return;
         }
 
@@ -77,7 +76,7 @@ public sealed class ExternalNode
         }
         catch (Exception exception)
         {
-            context.Error.WriteLine (exception.Message);
+            context.Error?.WriteLine (exception.Message);
         }
     }
 

@@ -67,7 +67,7 @@ internal sealed class NewNode
             Context context
         )
     {
-        var interpreter = context.GetTopContext().Interpreter.ThrowIfNull();
+        var interpreter = context.Interpreter.ThrowIfNull();
         if (!interpreter.AllowNewOperator)
         {
             throw new BarsikException ("Operator NEW is not allowed");
@@ -76,7 +76,7 @@ internal sealed class NewNode
         var type = context.FindType (_typeName, _typeArguments);
         if (type is null)
         {
-            context.Error.WriteLine($"Type '{_typeName}' not found");
+            context.Error?.WriteLine($"Type '{_typeName}' not found");
             return null;
         }
 

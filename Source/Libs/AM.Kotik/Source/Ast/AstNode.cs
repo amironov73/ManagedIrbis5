@@ -15,7 +15,6 @@
 using System;
 using System.IO;
 
-using AM.Kotik.Barsik.Diagnostics;
 using AM.Runtime.Mere;
 
 #endregion

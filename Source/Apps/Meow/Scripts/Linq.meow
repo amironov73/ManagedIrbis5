@@ -1,4 +1,6 @@
-﻿numbers = [3, 4, 1, 2, 5, 0, 7, 6]
+﻿#use AM.Kotik.Barsik
+
+numbers = [3, 4, 1, 2, 5, 0, 7, 6]
 
 evenTen = from x in numbers
 where x % 2 == 0 && x > 0
@@ -6,7 +8,30 @@ orderby x descending
 select x * 10
 
 println (evenTen)
+println ("==========================================")
 
 asArray = to_array (evenTen)
 asArray = sort (asArray)
 println (asArray)
+println ("==========================================")
+
+artists = Artist.RussianArtists()
+// println (artists)
+// println ("==========================================")
+
+byName = from a in artists
+orderby a.Name descending
+select a;
+
+foreach (one in byName) println (one.Name)
+println ("==========================================")
+
+byYear = from a in artists
+group a by a.Category;
+
+foreach (one in byYear) 
+{
+  println (one.Key)
+  foreach (two in one) println ("\t", two)
+}
+println ("==========================================")

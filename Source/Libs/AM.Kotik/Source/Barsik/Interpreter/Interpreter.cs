@@ -21,6 +21,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
+using AM.IO;
 using AM.Kotik.Barsik.Ast;
 using AM.Kotik.Barsik.Diagnostics;
 using AM.Kotik.Highlighting;
@@ -41,6 +42,26 @@ public sealed class Interpreter
 {
     #region Properties
 
+    /// <summary>
+    /// Стандартный входной поток.
+    /// </summary>
+    public TextReader Input { get; set; }
+
+    /// <summary>
+    /// Стандартный выходной поток.
+    /// </summary>
+    public TextWriter Output { get; set; }
+
+    /// <summary>
+    /// Стандартный поток ошибок.
+    /// </summary>
+    public TextWriter Error { get; set; }
+
+    /// <summary>
+    /// Дефайны.
+    /// </summary>
+    public Dictionary<string, dynamic?> Defines { get; }
+    
     /// <summary>
     /// Произвольные пользовательские данные.
     /// </summary>
@@ -126,20 +147,17 @@ public sealed class Interpreter
             InterpreterSettings? settings = null
         )
     {
-        input ??= Console.In;
-        output ??= Console.Out;
-        error ??= Console.Error;
+        Input = input ?? Console.In;
+        Output = output ?? Console.Out;
+        Error = error ?? Console.Error;
         Settings =  settings ?? InterpreterSettings.CreateDefault();
         AllowNewOperator = true;
+        Defines = new ();
         Modules = new ();
         Assemblies = new ();
         Auxiliary = new ();
         UserData = new ();
-
-        Context = new (input, output, error)
-        {
-            Interpreter = this
-        };
+        Context = new () { Interpreter = this };
 
         var path = Environment.GetEnvironmentVariable ("BARSIK_PATH") ?? string.Empty;
         Pathes = new (path.Split
@@ -149,12 +167,12 @@ public sealed class Interpreter
             ));
 
         // устанавливаем значения стандартных переменных
-        Context.SetDefine ("__NAME__", string.Empty);
-        Context.SetDefine ("__DIR__", string.Empty);
-        Context.SetDefine ("__FILE__", string.Empty);
-        Context.SetDefine ("__DOTNET__", Environment.Version);
-        Context.SetDefine ("__ROOT__", AppContext.BaseDirectory);
-        Context.SetDefine ("__VER__", Assembly.GetExecutingAssembly().GetName().Version);
+        SetDefine ("__NAME__", string.Empty);
+        SetDefine ("__DIR__", string.Empty);
+        SetDefine ("__FILE__", string.Empty);
+        SetDefine ("__DOTNET__", Environment.Version);
+        SetDefine ("__ROOT__", AppContext.BaseDirectory);
+        SetDefine ("__VER__", Assembly.GetExecutingAssembly().GetName().Version);
     }
 
     #endregion
@@ -235,6 +253,17 @@ public sealed class Interpreter
         return true;
     }
 
+    /// <summary>
+    /// Делаем контекст внимательным к выводу текста.
+    /// </summary>
+    internal void MakeAttentive()
+    {
+        if (Output is not AttentiveWriter)
+        {
+            Output = new AttentiveWriter (Output);
+        }
+    }
+
     #endregion
 
     #region Public methods
@@ -260,7 +289,7 @@ public sealed class Interpreter
 
         if (Settings.DebugParser)
         {
-            ParsingDebugOutput = Context.Output;
+            ParsingDebugOutput = Output;
         }
 
         Settings.Grammar.Rebuild();
@@ -343,7 +372,7 @@ public sealed class Interpreter
                 {
                     if (!string.IsNullOrEmpty (executionResult.Message))
                     {
-                        interpreter.Context.Output.WriteLine (executionResult.Message);
+                        interpreter.Output.WriteLine (executionResult.Message);
                     }
 
                     return executionResult.ExitCode;
@@ -381,8 +410,8 @@ public sealed class Interpreter
     /// </summary>
     public ExecutionResult DoRepl()
     {
-        Context.Output.WriteLine ($"Meow interpreter {FileVersion}");
-        Context.Output.WriteLine ("Press ENTER twice to exit");
+        Output.WriteLine ($"Meow interpreter {FileVersion}");
+        Output.WriteLine ("Press ENTER twice to exit");
 
         return new Repl (this).Loop();
     }
@@ -405,9 +434,9 @@ public sealed class Interpreter
             );
         if (Settings.DumpAst)
         {
-            Context.Output.WriteLine (new string ('=', 60));
-            node.DumpHierarchyItem (null, 0, Context.Output);
-            Context.Output.WriteLine (new string ('=', 60));
+            Output.WriteLine (new string ('=', 60));
+            node.DumpHierarchyItem (null, 0, Output);
+            Output.WriteLine (new string ('=', 60));
         }
 
         return node;
@@ -434,8 +463,8 @@ public sealed class Interpreter
             );
         if (Settings.DumpAst)
         {
-            program.Dump (Context.Output);
-            Context.Output.WriteLine (new string ('=', 60));
+            program.Dump (Output);
+            Output.WriteLine (new string ('=', 60));
         }
 
         // отделяем отладочную печать парсеров от прочего вывода
@@ -610,9 +639,9 @@ public sealed class Interpreter
             }
 
             var fullPath = Path.GetFullPath (fileName);
-            Context.Defines["__NAME__"] = "__MAIN__";
-            Context.Defines["__FILE__"] = fullPath;
-            Context.Defines["__DIR__"] = Path.GetDirectoryName (fullPath);
+            Defines["__NAME__"] = "__MAIN__";
+            Defines["__FILE__"] = fullPath;
+            Defines["__DIR__"] = Path.GetDirectoryName (fullPath);
 
             var sourceCode = File.ReadAllText (fileName);
             result = Execute (sourceCode);
@@ -637,9 +666,9 @@ public sealed class Interpreter
         }
         finally
         {
-            Context.Defines["__NAME__"] = string.Empty;
-            Context.Defines["__FILE__"] = string.Empty;
-            Context.Defines["__DIR__"] = string.Empty;
+            Defines["__NAME__"] = string.Empty;
+            Defines["__FILE__"] = string.Empty;
+            Defines["__DIR__"] = string.Empty;
         }
 
         return result;
@@ -740,7 +769,7 @@ public sealed class Interpreter
             }
         }
 
-        Context.Error.WriteLine ($"Can't include '{fileName}'");
+        Error.WriteLine ($"Can't include '{fileName}'");
     }
 
     /// <summary>
@@ -749,6 +778,29 @@ public sealed class Interpreter
     public void Reset()
     {
         Context.Reset();
+    }
+
+    /// <summary>
+    /// Установка значения дефайна
+    /// (с сохранением места в контексте).
+    /// </summary>
+    public void SetDefine
+        (
+            string name,
+            dynamic? value
+        )
+    {
+        Sure.NotNullNorEmpty (name);
+
+        if (Builtins.IsBuiltinFunction (name))
+        {
+            throw new BarsikException ($"{name} used by builtin function");
+        }
+
+        // TODO пройтись по всем контекстам
+        Context.Variables.Remove (name);
+
+        Defines[name] = value;
     }
 
     /// <summary>

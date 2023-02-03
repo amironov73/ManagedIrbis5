@@ -44,8 +44,7 @@ public sealed class IncludeDirective
             string? argument
         )
     {
-        var topContext = context.GetTopContext();
-        var interpreter = topContext.Interpreter;
+        var interpreter = context.Interpreter;
         if (interpreter is null)
         {
             return;
@@ -56,13 +55,13 @@ public sealed class IncludeDirective
             var pathes = interpreter.Pathes;
             if (pathes.IsNullOrEmpty())
             {
-                context.Output.WriteLine ("(no include pathes)");
+                context.Output?.WriteLine ("(no include pathes)");
                 return;
             }
             
             foreach (var path in pathes)
             {
-                context.Output.WriteLine (path);
+                context.Output?.WriteLine (path);
             }
 
             return;

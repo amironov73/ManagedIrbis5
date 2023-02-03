@@ -22,7 +22,6 @@ using System.Linq;
 using System.Reflection;
 
 using AM.Collections;
-using AM.IO;
 using AM.Kotik.Barsik.Ast;
 
 #endregion
@@ -44,6 +43,21 @@ public sealed class Context
     public Interpreter? Interpreter { get; internal set; }
 
     /// <summary>
+    /// Выходной поток, ассоциированный с интерпретатором.
+    /// </summary>
+    public TextWriter? Output => Interpreter?.Output;
+
+    /// <summary>
+    /// Поток ошибок, ассоциированный с интерпретатором.
+    /// </summary>
+    public TextWriter? Error => Interpreter?.Error;
+
+    /// <summary>
+    /// Входной поток, ассоциированный с интерпретатором.
+    /// </summary>
+    public TextReader? Input => Interpreter?.Input;
+
+    /// <summary>
     /// Родительский контекст.
     /// </summary>
     public Context? Parent { get; }
@@ -52,26 +66,6 @@ public sealed class Context
     /// Переменные.
     /// </summary>
     public Dictionary<string, dynamic?> Variables { get; }
-
-    /// <summary>
-    /// Дефайны.
-    /// </summary>
-    public Dictionary<string, dynamic?> Defines { get; }
-
-    /// <summary>
-    /// Стандартный входной поток.
-    /// </summary>
-    public TextReader Input { get; set; }
-
-    /// <summary>
-    /// Стандартный выходной поток.
-    /// </summary>
-    public TextWriter Output { get; set; }
-
-    /// <summary>
-    /// Стандартный поток ошибок.
-    /// </summary>
-    public TextWriter Error { get; set; }
 
     /// <summary>
     /// Функции.
@@ -98,22 +92,12 @@ public sealed class Context
     /// </summary>
     public Context
         (
-            TextReader input,
-            TextWriter output,
-            TextWriter error,
             Context? parent = null
         )
     {
-        Sure.NotNull (input);
-        Sure.NotNull (output);
-        Sure.NotNull (error);
-
         Parent = parent;
+        Interpreter = parent?.Interpreter;
         Variables = new ();
-        Defines = new ();
-        Input = input;
-        Output = output;
-        Error = error;
         Functions = new ();
         Namespaces = new ();
 
@@ -155,17 +139,6 @@ public sealed class Context
         return mainType.MakeGenericType (typeArguments);
     }
 
-    /// <summary>
-    /// Делаем контекст внимательным к выводу текста.
-    /// </summary>
-    internal void MakeAttentive()
-    {
-        if (Output is not AttentiveWriter)
-        {
-            Output = new AttentiveWriter (Output);
-        }
-    }
-
     #endregion
 
     #region Public methods
@@ -195,13 +168,7 @@ public sealed class Context
     /// </summary>
     public Context CreateChildContext ()
     {
-        return new Context
-            (
-                Input,
-                Output,
-                Error,
-                this
-            );
+        return new Context (this);
     }
 
     /// <summary>
@@ -209,17 +176,18 @@ public sealed class Context
     /// </summary>
     public void DumpNamespaces()
     {
+        var interpreter = GetTopContext().Interpreter;
         var keys = Namespaces.Keys.ToArray();
         if (keys.IsNullOrEmpty())
         {
-            Output.WriteLine ("(no namespaces)");
+            interpreter?.Output.WriteLine ("(no namespaces)");
             return;
         }
 
         Array.Sort (keys);
         foreach (var key in keys)
         {
-            Output.WriteLine (key);
+            interpreter?.Output.WriteLine (key);
         }
     }
 
@@ -231,10 +199,11 @@ public sealed class Context
         var keys = Variables.Keys.ToArray();
 
         Array.Sort (keys);
+        var interpreter = GetTopContext().Interpreter;
         foreach (var key in keys)
         {
             var value = Variables[key];
-            Output.WriteLine
+            interpreter?.Output.WriteLine
                 (
                     value is null
                         ? $"{key}: (null)"
@@ -244,7 +213,7 @@ public sealed class Context
 
         if (keys.Length == 0)
         {
-            Output.WriteLine ("(no variables in the context)");
+            interpreter?.Output.WriteLine ("(no variables in the context)");
         }
     }
 
@@ -568,7 +537,11 @@ public sealed class Context
         )
     {
         var value = node.Compute (this);
-        KotikUtility.PrintObject (Output, value);
+        var interpreter = GetTopContext().Interpreter;
+        if (interpreter is not null)
+        {
+            KotikUtility.PrintObject (interpreter.Output, value);
+        }
     }
 
     /// <summary>
@@ -601,42 +574,6 @@ public sealed class Context
     }
 
     /// <summary>
-    /// Установка значения дефайна
-    /// (с сохранением места в контексте).
-    /// </summary>
-    public void SetDefine
-        (
-            string name,
-            dynamic? value
-        )
-    {
-        Sure.NotNullNorEmpty (name);
-
-        if (Builtins.IsBuiltinFunction (name))
-        {
-            throw new BarsikException ($"{name} used by builtin function");
-        }
-
-        Variables.Remove (name);
-        if (Defines.ContainsKey (name))
-        {
-            Defines[name] = value;
-            return;
-        }
-
-        for (var context = Parent; context is not null; context = context.Parent)
-        {
-            Variables.Remove (name);
-            if (Defines.ContainsKey (name))
-            {
-                Variables[name] = value;
-            }
-        }
-
-        Defines[name] = value;
-    }
-
-    /// <summary>
     /// Установка значения переменной
     /// (с сохранением ее места в контексте).
     /// </summary>
@@ -653,17 +590,10 @@ public sealed class Context
             throw new BarsikException ($"{name} used by builtin function");
         }
 
-        if (Defines.ContainsKey (name))
+        var interpreter = GetTopContext().Interpreter.ThrowIfNull();
+        if (interpreter.Defines.ContainsKey (name))
         {
             throw new BarsikException ($"Can't redefine {name}");
-        }
-
-        for (var context = Parent; context is not null; context = context.Parent)
-        {
-            if (Defines.ContainsKey (name))
-            {
-                throw new BarsikException ($"Can't redefine {name}");
-            }
         }
 
         if (Variables.ContainsKey (name))
@@ -695,7 +625,8 @@ public sealed class Context
     {
         Sure.NotNullNorEmpty (name);
 
-        if (Defines.TryGetValue (name, out value) ||
+        var interpreter = GetTopContext().Interpreter.ThrowIfNull();
+        if (interpreter.Defines.TryGetValue (name, out value) ||
             Variables.TryGetValue (name, out value))
         {
             return true;

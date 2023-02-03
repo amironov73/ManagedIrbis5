@@ -32,9 +32,13 @@ public sealed class StandardDumper
     {
         Sure.NotNull (context);
 
-        context.Output.WriteLine (new string ('=', 60));
-        context.DumpVariables();
-        context.Output.WriteLine (new string ('=', 60));
+        var output = context.Output;
+        if (output is not null)
+        {
+            output.WriteLine (new string ('=', 60));
+            context.DumpVariables();
+            output.WriteLine (new string ('=', 60));
+        }
     }
 
     #endregion

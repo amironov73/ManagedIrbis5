@@ -288,6 +288,7 @@ internal sealed class LinqNode
             var result = new GroupedList();
             foreach (var one in temporary)
             {
+                variables[_variableName] = one;
                 var key = _groupClause.By.Compute (context);
                 var value = _groupClause.Expression.Compute (context);
                 result.Add (key, value);

@@ -54,7 +54,7 @@ public sealed class StdLib
     /// <summary>
     /// Имя дефайна, хранящего кэш.
     /// </summary>
-    public const string CacheDefineName = "$cache";
+    private const string CacheDefineName = "$cache";
 
     #endregion
 
@@ -63,13 +63,14 @@ public sealed class StdLib
     /// <summary>
     /// Реестр стандартных функций.
     /// </summary>
-    public static readonly Dictionary<string, FunctionDescriptor> Registry = new ()
+    private static readonly Dictionary<string, FunctionDescriptor> _registry = new ()
     {
         { "array", new FunctionDescriptor ("array", Array_) },
         { "bon_decode", new FunctionDescriptor ("bon_decode", BonDecode) },
         { "call", new FunctionDescriptor ("call", CallAnyMethod) },
         { "chdir", new FunctionDescriptor ("chdir", ChangeDirectory) },
         { "combine_path", new FunctionDescriptor ("combine_path", CombinePath) },
+        { "curl", new FunctionDescriptor ("curl", Curl) },
         { "dir_exists", new FunctionDescriptor ("dir_exists", DirectoryExists) },
         { "dirname", new FunctionDescriptor ("dirname", DirectoryName) },
         { "eval", new FunctionDescriptor ("eval", Evaluate) },
@@ -133,7 +134,7 @@ public sealed class StdLib
         {
             if (verbose)
             {
-                context.Error.WriteLine ($"Variable {CacheDefineName} not found");
+                context.Error?.WriteLine ($"Variable {CacheDefineName} not found");
             }
             return false;
         }
@@ -146,20 +147,16 @@ public sealed class StdLib
 
         if (verbose)
         {
-            context.Error.WriteLine ($"Bad value of {CacheDefineName}: {value}");
+            context.Error?.WriteLine ($"Bad value of {CacheDefineName}: {value}");
         }
 
         return false;
     }
 
-    #endregion
-
-    #region Public methods
-
     /// <summary>
     /// Создание массива.
     /// </summary>
-    public static dynamic? Array_
+    private static dynamic? Array_
         (
             Context context,
             dynamic?[] args
@@ -183,7 +180,7 @@ public sealed class StdLib
             type = context.FindType (typeName);
             if (type is null)
             {
-                context.Error.WriteLine ($"Can't find type {typeName}");
+                context.Error?.WriteLine ($"Can't find type {typeName}");
                 return null;
             }
         }
@@ -194,7 +191,7 @@ public sealed class StdLib
     /// <summary>
     /// Декодирование BON-объекта.
     /// </summary>
-    public static dynamic? BonDecode
+    private static dynamic? BonDecode
         (
             Context context,
             dynamic?[] args
@@ -206,11 +203,10 @@ public sealed class StdLib
             return null;
         }
 
-        var topContext = context.GetTopContext();
-        var interpreter = topContext.Interpreter;
+        var interpreter = context.Interpreter;
         if (interpreter is null)
         {
-            context.Error.WriteLine ("Interpreter is null");
+            context.Error?.WriteLine ("Interpreter is null");
             return null;
         }
 
@@ -231,7 +227,7 @@ public sealed class StdLib
             if (program.Statements.Last() is not SimpleStatement last)
             {
                 // последний стейтмент должен быть выражением
-                context.Error.WriteLine ("Last statement must be expression");
+                context.Error?.WriteLine ("Last statement must be expression");
                 return null;
             }
 
@@ -245,7 +241,7 @@ public sealed class StdLib
     /// <summary>
     /// Динамический вызов произвольного метода.
     /// </summary>
-    public static dynamic? CallAnyMethod
+    private static dynamic? CallAnyMethod
         (
             Context context,
             dynamic?[] args
@@ -268,7 +264,7 @@ public sealed class StdLib
             target = context.FindType (typeName);
             if (target is null)
             {
-                context.Error.WriteLine ($"Can't find type {typeName}");
+                context.Error?.WriteLine ($"Can't find type {typeName}");
                 return null;
             }
         }
@@ -292,7 +288,7 @@ public sealed class StdLib
     /// <summary>
     /// Изменение текущей директории.
     /// </summary>
-    public static dynamic? ChangeDirectory
+    private static dynamic? ChangeDirectory
         (
             Context context,
             dynamic?[] args
@@ -311,7 +307,7 @@ public sealed class StdLib
         }
         catch (Exception exception)
         {
-            context.Error.WriteLine ($"Error changing directory: {exception.Message}");
+            context.Error?.WriteLine ($"Error changing directory: {exception.Message}");
         }
 
         return Environment.CurrentDirectory;
@@ -320,7 +316,7 @@ public sealed class StdLib
     /// <summary>
     /// Создание пути по его компонентам.
     /// </summary>
-    public static dynamic? CombinePath
+    private static dynamic? CombinePath
         (
             Context context,
             dynamic?[] args
@@ -349,9 +345,27 @@ public sealed class StdLib
     }
 
     /// <summary>
+    /// Аналог curl.
+    /// </summary>
+    private static dynamic? Curl
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (Compute (context, args, 0) is string url)
+        {
+            var client = new HttpClient();
+            return client.GetStringAsync (url).GetAwaiter().GetResult();
+        }
+
+        return null;
+    }
+
+    /// <summary>
     /// Проверка существования папки.
     /// </summary>
-    public static dynamic DirectoryExists
+    private static dynamic DirectoryExists
         (
             Context context,
             dynamic?[] args
@@ -369,7 +383,7 @@ public sealed class StdLib
     /// <summary>
     /// Проверка существования папки.
     /// </summary>
-    public static dynamic? DirectoryName
+    private static dynamic? DirectoryName
         (
             Context context,
             dynamic?[] args
@@ -387,7 +401,7 @@ public sealed class StdLib
     /// <summary>
     /// Вычисление значения выражения.
     /// </summary>
-    public static dynamic? Evaluate
+    private static dynamic? Evaluate
         (
             Context context,
             dynamic?[] args
@@ -401,8 +415,7 @@ public sealed class StdLib
                 return null;
             }
 
-            var topContext = context.GetTopContext();
-            var interpreter = topContext.Interpreter.ThrowIfNull();
+            var interpreter = context.Interpreter.ThrowIfNull();
             var tokenizer = interpreter.Settings.Tokenizer;
             var expression = interpreter.Settings.Grammar.ParseExpression (sourceCode, tokenizer);
             var result = expression.Compute (context);
@@ -411,7 +424,7 @@ public sealed class StdLib
         }
         catch (Exception exception)
         {
-            context.Error.WriteLine (exception.Message);
+            context.Error?.WriteLine (exception.Message);
         }
 
         return null;
@@ -420,7 +433,7 @@ public sealed class StdLib
     /// <summary>
     /// Динамическое исполнение скрипта.
     /// </summary>
-    public static dynamic? Execute //-V3009
+    private static dynamic? Execute //-V3009
         (
             Context context,
             dynamic?[] args
@@ -434,15 +447,14 @@ public sealed class StdLib
                 return null;
             }
 
-            var topContext = context.GetTopContext();
-            var interpreter = topContext.Interpreter.ThrowIfNull();
+            var interpreter = context.Interpreter.ThrowIfNull();
             var tokenizer = interpreter.Settings.Tokenizer;
             var program = interpreter.Settings.Grammar.ParseProgram (sourceCode, tokenizer);
             program.Execute (context);
         }
         catch (Exception exception)
         {
-            context.Error.WriteLine (exception.Message);
+            context.Error?.WriteLine (exception.Message);
         }
 
         return null;
@@ -451,7 +463,7 @@ public sealed class StdLib
     /// <summary>
     /// Сброс кэша на диск.
     /// </summary>
-    public static dynamic? Fflush
+    private static dynamic? Fflush
         (
             Context context,
             dynamic?[] args
@@ -468,7 +480,7 @@ public sealed class StdLib
     /// <summary>
     /// Чтение строки из потока.
     /// </summary>
-    public static dynamic? Fgets
+    private static dynamic? Fgets
         (
             Context context,
             dynamic?[] args
@@ -485,7 +497,7 @@ public sealed class StdLib
     /// <summary>
     /// Проверка существования файла.
     /// </summary>
-    public static dynamic FileExists
+    private static dynamic FileExists
         (
             Context context,
             dynamic?[] args
@@ -503,7 +515,7 @@ public sealed class StdLib
     /// <summary>
     /// Чтение всего файла как строки.
     /// </summary>
-    public static dynamic? FileGetContents
+    private static dynamic? FileGetContents
         (
             Context context,
             dynamic?[] args
@@ -536,7 +548,7 @@ public sealed class StdLib
         }
         catch (Exception exception)
         {
-            context.Error.WriteLine ($"Error reading file {fileName}: {exception.Message}");
+            context.Error?.WriteLine ($"Error reading file {fileName}: {exception.Message}");
         }
 
         return null;
@@ -545,7 +557,7 @@ public sealed class StdLib
     /// <summary>
     /// Запись всего файла как одной большой строки.
     /// </summary>
-    public static dynamic? FilePutContents //-V3009
+    private static dynamic? FilePutContents //-V3009
         (
             Context context,
             dynamic?[] args
@@ -575,7 +587,7 @@ public sealed class StdLib
         }
         catch (Exception exception)
         {
-            context.Error.WriteLine ($"Error writing file {fileName}: {exception.Message}");
+            context.Error?.WriteLine ($"Error writing file {fileName}: {exception.Message}");
         }
 
         return null;
@@ -584,7 +596,7 @@ public sealed class StdLib
     /// <summary>
     /// Открытие файла.
     /// </summary>
-    public static dynamic? Fopen
+    private static dynamic? Fopen
         (
             Context context,
             dynamic?[] args
@@ -627,7 +639,7 @@ public sealed class StdLib
     /// <summary>
     /// Запись строки в поток.
     /// </summary>
-    public static dynamic? Fputs
+    private static dynamic? Fputs
         (
             Context context,
             dynamic?[] args
@@ -645,7 +657,7 @@ public sealed class StdLib
     /// <summary>
     /// Чтение из файла.
     /// </summary>
-    public static dynamic? Fread
+    private static dynamic? Fread
         (
             Context context,
             dynamic?[] args
@@ -676,7 +688,7 @@ public sealed class StdLib
     /// <summary>
     /// Позиционирование в файле.
     /// </summary>
-    public static dynamic? Fseek
+    private static dynamic? Fseek
         (
             Context context,
             dynamic?[] args
@@ -695,7 +707,7 @@ public sealed class StdLib
     /// <summary>
     /// Получение текущей позиции в файле.
     /// </summary>
-    public static dynamic? Ftell
+    private static dynamic? Ftell
         (
             Context context,
             dynamic?[] args
@@ -713,7 +725,7 @@ public sealed class StdLib
     /// <summary>
     /// Доступ к хосту.
     /// </summary>
-    public static dynamic? FullPath
+    private static dynamic? FullPath
         (
             Context context,
             dynamic?[] args
@@ -731,7 +743,7 @@ public sealed class StdLib
     /// <summary>
     /// Запись в файл.
     /// </summary>
-    public static dynamic? Fwrite
+    private static dynamic? Fwrite
         (
             Context context,
             dynamic?[] args
@@ -758,7 +770,7 @@ public sealed class StdLib
     /// <summary>
     /// Получение значения из кэша.
     /// </summary>
-    public static dynamic? GetCache
+    private static dynamic? GetCache
         (
             Context context,
             dynamic?[] args
@@ -780,7 +792,7 @@ public sealed class StdLib
     /// <summary>
     /// Получение текущей директории.
     /// </summary>
-    public static dynamic GetCurrentDirectory
+    private static dynamic GetCurrentDirectory
         (
             Context context,
             dynamic?[] args
@@ -792,7 +804,7 @@ public sealed class StdLib
     /// <summary>
     /// Доступ к хосту.
     /// </summary>
-    public static dynamic Host
+    private static dynamic Host
         (
             Context context,
             dynamic?[] args
@@ -804,7 +816,7 @@ public sealed class StdLib
     /// <summary>
     /// HTML-кодирование строки.
     /// </summary>
-    public static dynamic? HtmlEncode
+    private static dynamic? HtmlEncode
         (
             Context context,
             dynamic?[] args
@@ -824,7 +836,7 @@ public sealed class StdLib
     /// <summary>
     /// Загрузка указанного скрипта.
     /// </summary>
-    public static dynamic? Include //-V3009
+    private static dynamic? Include //-V3009
         (
             Context context,
             dynamic?[] args
@@ -836,12 +848,8 @@ public sealed class StdLib
             if (!string.IsNullOrWhiteSpace (fileName))
             {
                 fileName = fileName.Trim();
-                var topContext = context.GetTopContext();
-                var interpreter = topContext.Interpreter;
-                if (interpreter is not null)
-                {
-                    interpreter.Include (fileName);
-                }
+                var interpreter = context.Interpreter;
+                interpreter?.Include (fileName);
             }
         }
 
@@ -851,7 +859,7 @@ public sealed class StdLib
     /// <summary>
     /// Декодирование JSON.
     /// </summary>
-    public static dynamic? Join
+    private static dynamic? Join
         (
             Context context,
             dynamic?[] args
@@ -890,7 +898,7 @@ public sealed class StdLib
     /// <summary>
     /// Декодирование JSON.
     /// </summary>
-    public static dynamic? JsonDecode
+    private static dynamic? JsonDecode
         (
             Context context,
             dynamic?[] args
@@ -908,7 +916,7 @@ public sealed class StdLib
     /// <summary>
     /// Коодирование JSON.
     /// </summary>
-    public static dynamic JsonEncode
+    private static dynamic JsonEncode
         (
             Context context,
             dynamic?[] args
@@ -922,7 +930,7 @@ public sealed class StdLib
     /// <summary>
     /// Загрузка указанной сборки.
     /// </summary>
-    public static dynamic? LoadAssembly
+    private static dynamic? LoadAssembly
         (
             Context context,
             dynamic?[] args
@@ -945,7 +953,7 @@ public sealed class StdLib
     /// <summary>
     /// Загрузка указанного модуля.
     /// </summary>
-    public static dynamic? LoadModule
+    private static dynamic? LoadModule
         (
             Context context,
             dynamic?[] args
@@ -967,7 +975,7 @@ public sealed class StdLib
     /// <summary>
     /// Преобразование в смесь текста с числами.
     /// </summary>
-    public static dynamic? NumberText_
+    private static dynamic? NumberText_
         (
             Context context,
             dynamic?[] args
@@ -993,7 +1001,7 @@ public sealed class StdLib
     /// <summary>
     /// Простейшая защита чувствительных данных вроде строк подключения.
     /// </summary>
-    public static dynamic? Protect
+    private static dynamic? Protect
         (
             Context context,
             dynamic?[] args
@@ -1015,7 +1023,7 @@ public sealed class StdLib
     /// <summary>
     /// Помещение значения в кэш.
     /// </summary>
-    public static dynamic? PutCache
+    private static dynamic? PutCache
         (
             Context context,
             dynamic?[] args
@@ -1050,7 +1058,7 @@ public sealed class StdLib
     /// <summary>
     /// Чтение списка файлов в указанной директории.
     /// </summary>
-    public static dynamic ReadDirectory
+    private static dynamic ReadDirectory
         (
             Context context,
             dynamic?[] args
@@ -1067,7 +1075,7 @@ public sealed class StdLib
     /// <summary>
     /// Удаление файлов.
     /// </summary>
-    public static dynamic? RemoveFile
+    private static dynamic? RemoveFile
         (
             Context context,
             dynamic?[] args
@@ -1084,7 +1092,7 @@ public sealed class StdLib
                 }
                 catch (Exception exception)
                 {
-                    context.Error.WriteLine ($"Error removing file {path}: {exception.Message}");
+                    context.Error?.WriteLine ($"Error removing file {path}: {exception.Message}");
                 }
             }
         }
@@ -1095,7 +1103,7 @@ public sealed class StdLib
     /// <summary>
     /// Переименование файла.
     /// </summary>
-    public static dynamic? RenameFile
+    private static dynamic? RenameFile
         (
             Context context,
             dynamic?[] args
@@ -1118,7 +1126,7 @@ public sealed class StdLib
         }
         catch (Exception exception)
         {
-            context.Error.WriteLine ($"Error renaming {oldName} to {newName}: {exception.Message}");
+            context.Error?.WriteLine ($"Error renaming {oldName} to {newName}: {exception.Message}");
             return 1;
         }
 
@@ -1128,7 +1136,7 @@ public sealed class StdLib
     /// <summary>
     /// Подписка на событие объекта.
     /// </summary>
-    public static dynamic Subscribe
+    private static dynamic Subscribe
         (
             Context context,
             dynamic?[] args
@@ -1170,7 +1178,7 @@ public sealed class StdLib
     /// <summary>
     /// Выполнение внешней программы и получение ее выходного потока.
     /// </summary>
-    public static dynamic? System_
+    private static dynamic? System_
         (
             Context context,
             dynamic?[] args
@@ -1212,7 +1220,7 @@ public sealed class StdLib
     /// <summary>
     /// Выдача типа по его имени.
     /// </summary>
-    public static dynamic TemporaryFile
+    private static dynamic TemporaryFile
         (
             Context context,
             dynamic?[] args
@@ -1224,7 +1232,7 @@ public sealed class StdLib
     /// <summary>
     /// Выдача типа по его имени.
     /// </summary>
-    public static dynamic? Type_
+    private static dynamic? Type_
         (
             Context context,
             dynamic?[] args
@@ -1260,7 +1268,7 @@ public sealed class StdLib
     /// <summary>
     /// Расшифровка чувствительных данных.
     /// </summary>
-    public static dynamic? Unrotect
+    private static dynamic? Unrotect
         (
             Context context,
             dynamic?[] args
@@ -1282,7 +1290,7 @@ public sealed class StdLib
     /// <summary>
     /// Отписка от нативного события.
     /// </summary>
-    public static dynamic? Unsubscribe
+    private static dynamic? Unsubscribe
         (
             Context context,
             dynamic?[] args
@@ -1302,7 +1310,7 @@ public sealed class StdLib
     /// <summary>
     /// Подключение/отключение пространств имен.
     /// </summary>
-    public static dynamic Use
+    private static dynamic Use
         (
             Context context,
             dynamic?[] args
@@ -1355,7 +1363,7 @@ public sealed class StdLib
         Sure.NotNull (interpreter);
 
         var context = interpreter.Context.ThrowIfNull();
-        foreach (var descriptor in Registry)
+        foreach (var descriptor in _registry)
         {
             context.Functions[descriptor.Key] = descriptor.Value;
         }
@@ -1372,7 +1380,7 @@ public sealed class StdLib
         Sure.NotNull (interpreter);
 
         var context = interpreter.Context.ThrowIfNull();
-        foreach (var descriptor in Registry)
+        foreach (var descriptor in _registry)
         {
             context.Functions.Remove (descriptor.Key);
         }

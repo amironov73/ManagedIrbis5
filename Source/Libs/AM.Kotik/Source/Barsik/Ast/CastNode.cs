@@ -17,7 +17,6 @@ using System.Globalization;
 using System.IO;
 
 using AM.Kotik.Ast;
-using AM.Kotik.Barsik.Diagnostics;
 
 #endregion
 
@@ -69,7 +68,7 @@ internal sealed class CastNode
         var targetType = context.FindType (_typeName);
         if (targetType is null)
         {
-            context.Error.WriteLine ($"Type {_typeName} not found");
+            context.Error?.WriteLine ($"Type {_typeName} not found");
             return null;
         }
 

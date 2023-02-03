@@ -76,12 +76,12 @@ public sealed class Repl
     /// <summary>
     /// Абстракция стандартного вывода.
     /// </summary>
-    public AttentiveWriter Output => (AttentiveWriter) Context.Output;
+    public AttentiveWriter? Output => (AttentiveWriter?) Context.Output;
 
     /// <summary>
     /// Абстракция потока ошибок.
     /// </summary>
-    public TextWriter Error => Context.Error;
+    public TextWriter? Error => Context.Error;
 
     /// <summary>
     /// Абстракция входного потока.
@@ -120,15 +120,15 @@ public sealed class Repl
             TextReader? input = null
         )
     {
-        interpreter.Context.MakeAttentive();
+        interpreter.MakeAttentive();
         Interpreter = interpreter;
         Interpreter.UserData["repl"] = this;
-        Input = input ?? interpreter.Context.Input;
+        Input = input ?? interpreter.Input;
         Echo = true;
         _input = new ReplInput
             (
                 Input,
-                interpreter.Context.Output,
+                interpreter.Output,
                 interpreter
             );
     }
@@ -191,7 +191,7 @@ public sealed class Repl
         }
         catch (Exception exception)
         {
-            Error.WriteLine ($"ERROR: {exception.Message}");
+            Error?.WriteLine ($"ERROR: {exception.Message}");
         }
     }
 
@@ -229,16 +229,16 @@ public sealed class Repl
                         if (Echo != suppressEcho)
                         {
                             KotikUtility.PrintObject (Output, result);
-                            Output.WriteLine();
+                            Output?.WriteLine();
                         }
                     }
                     else
                     {
-                        Output.ResetCounter();
+                        Output?.ResetCounter();
                         Execute (line);
-                        if (Output.Counter != 0)
+                        if (Output?.Counter != 0)
                         {
-                            Output.WriteLine();
+                            Output?.WriteLine();
                         }
                     }
                 }

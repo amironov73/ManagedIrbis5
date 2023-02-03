@@ -64,8 +64,7 @@ public sealed class DirectiveNode
     {
         base.Execute (context);
 
-        var topContext = context.GetTopContext();
-        var interpreter = topContext.Interpreter.ThrowIfNull();
+        var interpreter = context.Interpreter.ThrowIfNull();
         var success = false;
         foreach (var directive in interpreter.Settings.KnownDirectives)
         {
@@ -78,7 +77,7 @@ public sealed class DirectiveNode
 
         if (!success)
         {
-            context.Error.WriteLine ($"Unknown directive {_command}");
+            context.Error?.WriteLine ($"Unknown directive {_command}");
         }
     }
 

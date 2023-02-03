@@ -10,14 +10,6 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-#region Using directives
-
-using System;
-using System.Collections;
-using System.Reflection;
-
-#endregion
-
 #nullable enable
 
 namespace AM.Kotik.Barsik.Ast;

@@ -10,12 +10,6 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-#region Using directives
-
-using System;
-
-#endregion
-
 #nullable enable
 
 namespace AM.Kotik.Barsik.Directives;
@@ -48,8 +42,7 @@ public sealed class EchoDirective
             string? argument
         )
     {
-        var topContext = context.GetTopContext();
-        var interpreter = topContext.Interpreter;
+        var interpreter = context.Interpreter;
         if (interpreter is not null)
         {
             var repl = (Repl) interpreter.UserData["repl"].ThrowIfNull();
@@ -66,7 +59,7 @@ public sealed class EchoDirective
 
             var onoff = echo ? "on" : "off";
             repl.Echo = echo;
-            interpreter.Context.Output.WriteLine ($"Echo is {onoff} now");
+            context.Output?.WriteLine ($"Echo is {onoff} now");
         }
     }
 

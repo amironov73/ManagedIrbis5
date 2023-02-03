@@ -63,7 +63,7 @@ internal sealed class FormatNode
     {
         var result = new StringBuilder();
 
-        var interpreter = context.GetTopContext().Interpreter.ThrowIfNull ();
+        var interpreter = context.Interpreter.ThrowIfNull();
         foreach (var specification in _specification)
         {
             result.Append (specification.Prefix);

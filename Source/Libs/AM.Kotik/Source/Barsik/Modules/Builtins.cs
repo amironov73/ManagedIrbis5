@@ -18,7 +18,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
@@ -177,7 +176,7 @@ public static class Builtins
     /// <summary>
     /// Применение функции.
     /// </summary>
-    public static dynamic? Apply
+    private static dynamic? Apply
         (
             Context context,
             dynamic?[] args
@@ -185,7 +184,7 @@ public static class Builtins
     {
         if (args.Length < 1)
         {
-            context.Error.WriteLine ("Too few arguments for apply");
+            context.Error?.WriteLine ("Too few arguments for apply");
             return null;
         }
 
@@ -224,7 +223,7 @@ public static class Builtins
     /// <summary>
     /// Проверка условия.
     /// </summary>
-    public static dynamic? Assert_
+    private static dynamic? Assert_
         (
             Context context,
             dynamic?[] args
@@ -260,7 +259,7 @@ public static class Builtins
     /// Метод bind() создаёт новую функцию, для которой (все или часть) аргументы
     /// зафиксированы указанными значениями.
     /// </summary>
-    public static dynamic? Bind
+    private static dynamic? Bind
         (
             Context context,
             dynamic?[] args
@@ -268,7 +267,7 @@ public static class Builtins
     {
         if (args.Length < 1)
         {
-            context.Error.WriteLine ("Too few arguments for apply");
+            context.Error?.WriteLine ("Too few arguments for apply");
             return null;
         }
 
@@ -309,7 +308,7 @@ public static class Builtins
     /// <summary>
     /// Символ с указанным кодом.
     /// </summary>
-    public static dynamic? Chr
+    private static dynamic? Chr
         (
             Context context,
             dynamic?[] args
@@ -327,7 +326,7 @@ public static class Builtins
     /// <summary>
     /// Выдача отладочного сообщения.
     /// </summary>
-    public static dynamic? Debug_
+    private static dynamic? Debug_
         (
             Context context,
             dynamic?[] args
@@ -343,7 +342,7 @@ public static class Builtins
     /// Задание дефайна.
     /// В отличие от переменной, дефайн не может быть пере-присвоен.
     /// </summary>
-    public static dynamic? Define
+    private static dynamic? Define
         (
             Context context,
             dynamic?[] args
@@ -375,7 +374,7 @@ public static class Builtins
         }
 
         var value = Compute (context, args, 1);
-        context.SetDefine (name, value);
+        context.GetTopContext().Interpreter.ThrowIfNull().SetDefine (name, value);
 
         return null;
     }
@@ -383,7 +382,7 @@ public static class Builtins
     /// <summary>
     /// Удаление из текущего контекста указанной переменной.
     /// </summary>
-    public static dynamic? Delete
+    private static dynamic? Delete
         (
             Context context,
             dynamic?[] args
@@ -420,7 +419,7 @@ public static class Builtins
     /// <summary>
     /// Освобождение ресурса(ов).
     /// </summary>
-    public static dynamic? Dispose
+    private static dynamic? Dispose
         (
             Context context,
             dynamic?[] args
@@ -441,7 +440,7 @@ public static class Builtins
     /// <summary>
     /// Определение, не пустая ли строка/массив/список/словарь.
     /// </summary>
-    public static dynamic? Empty
+    private static dynamic? Empty
         (
             Context context,
             dynamic?[] args
@@ -461,7 +460,7 @@ public static class Builtins
     /// <summary>
     /// Выдача сообщения в поток ошибок.
     /// </summary>
-    public static dynamic? Error_
+    private static dynamic? Error_
         (
             Context context,
             dynamic?[] args
@@ -470,7 +469,7 @@ public static class Builtins
         var text = ComputeAll (context, args);
         if (!string.IsNullOrEmpty (text))
         {
-            context.Error.WriteLine (text);
+            context.Error?.WriteLine (text);
         }
 
         return null;
@@ -479,7 +478,7 @@ public static class Builtins
     /// <summary>
     /// Досрочное завершение скрипта.
     /// </summary>
-    public static dynamic Exit
+    private static dynamic Exit
         (
             Context context,
             dynamic?[] args
@@ -509,7 +508,7 @@ public static class Builtins
     /// <summary>
     /// Фильтрация коллекции.
     /// </summary>
-    public static dynamic? Filter
+    private static dynamic? Filter
         (
             Context context,
             dynamic?[] args
@@ -517,7 +516,7 @@ public static class Builtins
     {
         if (args.Length < 2)
         {
-            context.Error.WriteLine ("Too few arguments for filter");
+            context.Error?.WriteLine ("Too few arguments for filter");
             return null;
         }
 
@@ -595,7 +594,7 @@ public static class Builtins
     /// <summary>
     /// Форматирование.
     /// </summary>
-    public static dynamic Format
+    private static dynamic Format
         (
             Context context,
             dynamic?[] args
@@ -622,7 +621,7 @@ public static class Builtins
     /// <summary>
     /// Возврат первого непустого аргумента
     /// </summary>
-    public static dynamic? Iif
+    private static dynamic? Iif
         (
             Context context,
             dynamic?[] args
@@ -644,7 +643,7 @@ public static class Builtins
     /// Проверка существования переменной с указанным именем
     /// (в любом контексте).
     /// </summary>
-    public static dynamic? HaveVariable
+    private static dynamic? HaveVariable
         (
             Context context,
             dynamic?[] args
@@ -671,7 +670,7 @@ public static class Builtins
     /// <summary>
     /// Вычисление длины объекта.
     /// </summary>
-    public static dynamic Length
+    private static dynamic Length
         (
             Context context,
             dynamic?[] args
@@ -685,7 +684,7 @@ public static class Builtins
     /// <summary>
     /// Отображение коллекции.
     /// </summary>
-    public static dynamic? Map
+    private static dynamic? Map
         (
             Context context,
             dynamic?[] args
@@ -693,7 +692,7 @@ public static class Builtins
     {
         if (args.Length < 2)
         {
-            context.Error.WriteLine ("Too few arguments for map");
+            context.Error?.WriteLine ("Too few arguments for map");
             return null;
         }
 
@@ -741,7 +740,7 @@ public static class Builtins
     /// <summary>
     /// Поиск максимального значения среди перечисленных.
     /// </summary>
-    public static dynamic? Max
+    private static dynamic? Max
         (
             Context context,
             dynamic?[] args
@@ -787,7 +786,7 @@ public static class Builtins
     /// <summary>
     /// Поиск минимального значения среди перечисленных.
     /// </summary>
-    public static dynamic? Min
+    private static dynamic? Min
         (
             Context context,
             dynamic?[] args
@@ -833,7 +832,7 @@ public static class Builtins
     /// <summary>
     /// Текущие дата и время.
     /// </summary>
-    public static dynamic Now
+    private static dynamic Now
         (
             Context context,
             dynamic?[] args
@@ -852,7 +851,7 @@ public static class Builtins
     /// <summary>
     /// Вывод данных в стандартный поток.
     /// </summary>
-    public static dynamic? Print
+    private static dynamic? Print
         (
             Context context,
             dynamic?[] args
@@ -870,14 +869,14 @@ public static class Builtins
     /// Вывод данных в стандартный поток
     /// с добавлением перевода строки.
     /// </summary>
-    public static dynamic? PrintLine
+    private static dynamic? PrintLine
         (
             Context context,
             dynamic?[] args
         )
     {
         Print (context, args);
-        context.Output.WriteLine();
+        context.Output?.WriteLine();
 
         return null;
     }
@@ -885,19 +884,19 @@ public static class Builtins
     /// <summary>
     /// Чтение строки из стандартного входного потока.
     /// </summary>
-    public static dynamic? ReadLine
+    private static dynamic? ReadLine
         (
             Context context,
             dynamic?[] args
         )
     {
-        return context.Input.ReadLine();
+        return context.Input?.ReadLine();
     }
 
     /// <summary>
     /// Аккумулирование элементов коллекции.
     /// </summary>
-    public static dynamic? Reduce
+    private static dynamic? Reduce
         (
             Context context,
             dynamic?[] args
@@ -905,7 +904,7 @@ public static class Builtins
     {
         if (args.Length < 3)
         {
-            context.Error.WriteLine ("Too few arguments for reduce");
+            context.Error?.WriteLine ("Too few arguments for reduce");
             return null;
         }
 
@@ -954,7 +953,7 @@ public static class Builtins
     /// <summary>
     /// Создание регулярного выражения.
     /// </summary>
-    public static dynamic? Regex_
+    private static dynamic? Regex_
         (
             Context context,
             dynamic?[] args
@@ -971,7 +970,7 @@ public static class Builtins
     /// <summary>
     /// Сортировка.
     /// </summary>
-    public static dynamic Sort
+    private static dynamic Sort
         (
             Context context,
             dynamic?[] args
@@ -1003,7 +1002,7 @@ public static class Builtins
     /// <summary>
     /// Формирование массива из последовательности.
     /// </summary>
-    public static dynamic? ToArray
+    private static dynamic? ToArray
         (
             Context context,
             dynamic?[] args
@@ -1038,7 +1037,7 @@ public static class Builtins
     /// <summary>
     /// Трассировочное сообщение.
     /// </summary>
-    public static dynamic? Trace_
+    private static dynamic? Trace_
         (
             Context context,
             dynamic?[] args
@@ -1056,7 +1055,7 @@ public static class Builtins
     /// <summary>
     /// Обрезка начальных и конечных пробелов в строке.
     /// </summary>
-    public static dynamic? Trim
+    private static dynamic? Trim
         (
             Context context,
             dynamic?[] args
@@ -1072,7 +1071,7 @@ public static class Builtins
     /// <summary>
     /// Предупреждающее сообщение.
     /// </summary>
-    public static dynamic? Warn
+    private static dynamic? Warn
         (
             Context context,
             dynamic?[] args

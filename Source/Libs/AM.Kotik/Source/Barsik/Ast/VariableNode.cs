@@ -80,7 +80,7 @@ internal sealed class VariableNode
             return descriptor;
         }
 
-        context.Error.WriteLine ($"Variable or type '{Name}' not defined");
+        context.Error?.WriteLine ($"Variable or type '{Name}' not defined");
 
         return null;
     }
@@ -99,7 +99,7 @@ internal sealed class VariableNode
         {
             if (!context.TryGetVariable (Name, out variableValue))
             {
-                context.Error.WriteLine ($"Variable {Name} not found");
+                context.Error?.WriteLine ($"Variable {Name} not found");
             }
         }
 

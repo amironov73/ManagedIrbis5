@@ -43,7 +43,7 @@ public class StatementBase
     ///
     /// </summary>
     /// <param name="line"></param>
-    public StatementBase
+    protected StatementBase
         (
             int line
         )
@@ -66,9 +66,7 @@ public class StatementBase
         Sure.NotNull (context);
 
         // трассировка
-        var topContext = context.GetTopContext();
-        var interpreter = topContext.Interpreter;
-        var debugger = interpreter?.ScriptDebugger;
+        var debugger = context.Interpreter?.ScriptDebugger;
 
         if (debugger is not null)
         {

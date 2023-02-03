@@ -334,7 +334,7 @@ public sealed class ConsoleDebugger
         )
     {
         _currentStatement = statement;
-        context.Output.WriteLine ("Raise");
+        context.Output?.WriteLine ("Raise");
     }
 
     /// <inheritdoc cref="IBarsikDebugger.Run"/>
@@ -380,7 +380,7 @@ public sealed class ConsoleDebugger
         )
     {
         var sourceLine = _sourceLines.SafeAt (statement.Line);
-        context.Output.WriteLine ($"{statement}: {sourceLine}");
+        context.Output?.WriteLine ($"{statement}: {sourceLine}");
     }
 
     #endregion

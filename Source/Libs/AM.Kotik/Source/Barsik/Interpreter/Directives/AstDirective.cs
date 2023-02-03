@@ -48,14 +48,13 @@ public sealed class AstDirective
             string? argument
         )
     {
-        var topContext = context.GetTopContext();
-        var interpreter = topContext.Interpreter;
+        var interpreter = context.Interpreter;
         if (interpreter is not null)
         {
             var flag = !interpreter.Settings.DumpAst;
             var onoff = flag ? "on" : "off";
             interpreter.Settings.DumpAst = flag;
-            context.Output.WriteLine ($"Dump AST is {onoff} now");
+            context.Output?.WriteLine ($"Dump AST is {onoff} now");
         }
     }
 
