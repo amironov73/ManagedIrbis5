@@ -9,13 +9,20 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
+#region Using directives
+
+using JetBrains.Annotations;
+
+#endregion
+
 #nullable enable
 
-namespace AM.Kotik.Barsik;
+namespace AM.Kotik.Barsik.Samples;
 
 /// <summary>
 /// Тестовый класс для опытов.
 /// </summary>
+[UsedImplicitly]
 public sealed class Artist
 {
     #region Properties

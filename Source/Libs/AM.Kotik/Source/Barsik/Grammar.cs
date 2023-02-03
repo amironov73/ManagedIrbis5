@@ -284,7 +284,7 @@ public sealed class Grammar
             (
                 Identifier.After (Reserved ("from")),
                 Atom.After (Term ("in")),
-                (variable, sequence) => new LinqNode.FromClause (variable, sequence)
+                (varName, sequence) => new LinqNode.FromClause (varName, sequence)
             );
         
         var orderBy = Parser.Chain
@@ -304,13 +304,13 @@ public sealed class Grammar
 
         var linq = Parser.Chain
             (
-                fromClause,
+                fromClause.Repeated (minCount: 1),
                 Expression.After (Reserved ("where")).Optional(),
                 orderBy.Optional(),
                 groupBy.Optional(),
                 Expression.After (Reserved ("select")).Optional(),
-                (fromClause, whereClause, orderClause, groupClause, selectClause) =>
-                    (AtomNode) new LinqNode (fromClause, whereClause, orderClause, selectClause, groupClause)
+                (fromClauses, whereClause, orderClause, groupClause, selectClause) =>
+                    (AtomNode) new LinqNode (fromClauses, whereClause, orderClause, selectClause, groupClause)
             )
             .Labeled ("Linq");
 
