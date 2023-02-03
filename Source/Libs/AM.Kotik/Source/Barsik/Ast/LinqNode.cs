@@ -263,14 +263,26 @@ internal sealed class LinqNode
         var rank = _fromClauses.Count;
         var variables = context.Variables;
         var sequences = new List<IReadOnlyList<dynamic?>>();
+        var interpreter = context.Interpreter.ThrowIfNull();
         foreach (var clause in _fromClauses)
         {
-            // TODO проверить имена переменных
             for (var i = 0; i < rank; i++)
             {
-                variables[_fromClauses[i].VariableName] = null;
+                var variableName = _fromClauses[i].VariableName;
+
+                // переменная не должна упоминаться в родительских контекстах
+                Sure.AssertState (!context.Parent!.TryGetVariable (variableName, out _));
+
+                // это должно быть lvalue
+                Sure.AssertState (interpreter.EnsureVariableCanBeAssigned (context, variableName));
+
+                // имя переменной не должно повторяться в текущем контексте
+                var count = _fromClauses.Count (x => x.VariableName == variableName);
+                Sure.AssertState (count == 1);
+
+                variables[variableName] = null;
             }
-            
+
             var computed = (IEnumerable<dynamic?>)clause.Sequence.Compute (context)!;
             IReadOnlyList<dynamic?> sequence;
             if (computed is IReadOnlyList<dynamic?> readOnlyList)

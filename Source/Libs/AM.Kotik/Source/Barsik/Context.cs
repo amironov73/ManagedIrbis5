@@ -40,7 +40,8 @@ public sealed class Context
     /// <summary>
     /// Интерпретатор, к которому привязан контекст.
     /// </summary>
-    public Interpreter? Interpreter { get; internal set; }
+    // TODO сделать только get
+    public Interpreter? Interpreter { get; internal init; }
 
     /// <summary>
     /// Выходной поток, ассоциированный с интерпретатором.
@@ -417,10 +418,10 @@ public sealed class Context
         }
 
         var interpreter = GetTopContext().Interpreter.ThrowIfNull();
-        if (interpreter.Assemblies.ContainsKey (name))
+        if (interpreter.Assemblies.TryGetValue (name, out var foundAssembly))
         {
             // уже загружено, пропускаем
-            return interpreter.Assemblies [name];
+            return foundAssembly;
         }
 
         var allAssemblies = AppDomain.CurrentDomain.GetAssemblies();

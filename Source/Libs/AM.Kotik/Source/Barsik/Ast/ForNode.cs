@@ -81,6 +81,11 @@ internal sealed class ForNode
         )
         : base(line)
     {
+        Sure.NotNull (init);
+        Sure.NotNull (condition);
+        Sure.NotNull (step);
+        Sure.NotNull (body);
+        
         _init = init;
         _condition = condition;
         _step = step;

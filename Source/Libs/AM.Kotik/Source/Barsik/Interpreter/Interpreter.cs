@@ -181,6 +181,35 @@ public sealed class Interpreter
 
     private bool _settinsWasApplied;
 
+    internal bool EnsureVariableCanBeAssigned
+        (
+            Context context,
+            string variableName
+        )
+    {
+        Sure.NotNull (context);
+        Sure.NotNullNorEmpty (variableName);
+
+        var tokenizerSettings = Settings.Tokenizer.Settings;
+        if (tokenizerSettings.KnownTerms.Contains (variableName)
+            || tokenizerSettings.ReservedWords.Contains (variableName))
+        {
+            return false;
+        }
+        
+        if (Defines.ContainsKey (variableName))
+        {
+            return false;
+        }
+        
+        if (context.FindFunction (variableName, out _))
+        {
+            return false;
+        }
+
+        return true;
+    }
+    
     private static void HighlightToConsole 
         (
             string sourceCode,

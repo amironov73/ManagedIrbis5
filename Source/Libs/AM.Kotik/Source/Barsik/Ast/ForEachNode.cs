@@ -121,6 +121,14 @@ internal sealed class ForEachNode
     {
         PreExecute (context);
 
+        // переменная не должна упоминаться в родительских контекстах
+        context = context.CreateChildContext();
+        Sure.AssertState (!context.Parent!.TryGetVariable (_variableName, out _));
+
+        // это должно быть lvalue
+        var interpreter = context.Interpreter.ThrowIfNull();
+        Sure.AssertState (interpreter.EnsureVariableCanBeAssigned (context, _variableName));
+
         var enumerable = _enumerable.Compute (context);
         if (enumerable is null or not IEnumerable)
         {
