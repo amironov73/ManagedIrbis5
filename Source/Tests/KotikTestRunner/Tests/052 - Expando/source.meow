@@ -1,6 +1,4 @@
-﻿x = expando()
-x.hello = "world"
-x.barsik = "cool"
+﻿x = new { .hello = "world"; .barsik = "cool" }
 
 println (x.barsik, ", ", x.hello)
 println (x.nosuch)

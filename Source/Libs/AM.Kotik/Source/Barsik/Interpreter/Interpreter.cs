@@ -20,7 +20,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Xml.Linq;
 
 using AM.Kotik.Barsik.Ast;
 using AM.Kotik.Barsik.Diagnostics;
@@ -616,8 +615,6 @@ public sealed class Interpreter
             Context.Defines["__DIR__"] = Path.GetDirectoryName (fullPath);
 
             var sourceCode = File.ReadAllText (fileName);
-            // удаляем shebang
-            sourceCode = KotikUtility.RemoveShebang (sourceCode);
             result = Execute (sourceCode);
         }
         catch (ReturnException exception)

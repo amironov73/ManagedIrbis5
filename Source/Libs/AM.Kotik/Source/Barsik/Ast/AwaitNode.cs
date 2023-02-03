@@ -14,6 +14,7 @@
 using System.IO;
 using System.Threading.Tasks;
 
+using AM.Kotik.Ast;
 using AM.Kotik.Barsik.Diagnostics;
 
 #endregion

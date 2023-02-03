@@ -18,7 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-using AM.Kotik.Barsik.Diagnostics;
+using AM.Kotik.Ast;
 
 #endregion
 

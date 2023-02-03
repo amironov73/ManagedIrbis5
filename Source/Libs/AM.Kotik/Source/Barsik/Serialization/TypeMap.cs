@@ -16,6 +16,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 
+using AM.Kotik.Ast;
 using AM.Kotik.Barsik.Ast;
 
 #endregion

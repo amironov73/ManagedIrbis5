@@ -199,6 +199,7 @@ public sealed class InterpreterSettings
         result.KnownDirectives.Add (new ModuleDirective());
         result.KnownDirectives.Add (new NamespaceDirective());
         result.KnownDirectives.Add (new PathDirective());
+        result.KnownDirectives.Add (new ShebangDirective());
         result.KnownDirectives.Add (new UseDirective());
         result.KnownDirectives.Add (new VariableDirective());
 

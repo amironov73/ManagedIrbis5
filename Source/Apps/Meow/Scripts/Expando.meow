@@ -1,0 +1,7 @@
+﻿x = new 
+{ 
+    .hello = "world"; 
+    .barsik = "cool" 
+}
+
+println (x)

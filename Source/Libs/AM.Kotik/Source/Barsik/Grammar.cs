@@ -308,6 +308,10 @@ public sealed class Grammar
             )
             .Labeled ("Linq");
 
+        var expando = CurlyBlock.After (Reserved ("new"))
+            .Map (init => (AtomNode) new ExpandoNode (init))
+            .Labeled ("Expando");
+
         Atoms.Add (Literal);
         Atoms.Add (Format);
         Atoms.Add (ternary);
@@ -319,6 +323,7 @@ public sealed class Grammar
         Atoms.Add (throwOperator);
         Atoms.Add (awaitOperator);
         Atoms.Add (linq);
+        Atoms.Add (expando);
         Atoms.Add (lambda);
 
         //===================================================

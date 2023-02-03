@@ -11,7 +11,7 @@
 
 #region Using directives
 
-using AM.Kotik.Barsik.Diagnostics;
+using AM.Kotik.Ast;
 
 #endregion
 

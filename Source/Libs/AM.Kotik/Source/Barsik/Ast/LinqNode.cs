@@ -11,10 +11,11 @@
 
 #region Using directives
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+
+using AM.Kotik.Ast;
 
 #endregion
 

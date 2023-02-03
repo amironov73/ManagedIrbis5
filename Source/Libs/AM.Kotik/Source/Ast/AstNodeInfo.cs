@@ -16,13 +16,11 @@
 using AM.Collections;
 using AM.Text.Output;
 
-using AM.Kotik.Barsik.Ast;
-
 #endregion
 
 #nullable enable
 
-namespace AM.Kotik.Barsik.Diagnostics;
+namespace AM.Kotik.Ast;
 
 /// <summary>
 /// Информация об узле синтаксического дерева.

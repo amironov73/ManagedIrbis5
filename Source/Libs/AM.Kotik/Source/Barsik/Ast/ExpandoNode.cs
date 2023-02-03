@@ -4,14 +4,17 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 
-/* MinusNode.cs -- унарный минус (смена знака числа)
+/* ExpandoNode.cs -- создание объекта анонимного типа
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
+using System.Dynamic;
 using System.IO;
 
 using AM.Kotik.Ast;
@@ -23,51 +26,56 @@ using AM.Kotik.Ast;
 namespace AM.Kotik.Barsik.Ast;
 
 /// <summary>
-/// Унарный минус (смена знака числа).
+/// Создание объекта анонимного типа.
 /// </summary>
-internal sealed class MinusNode
-    : UnaryNode
+public sealed class ExpandoNode
+    : AtomNode
 {
     #region Construction
 
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public MinusNode
+    public ExpandoNode
         (
-            AtomNode inner
+            StatementBase initialization
         )
     {
-        Sure.NotNull (inner);
-
-        _inner = inner;
+        Sure.NotNull (initialization);
+        
+        _initialization = initialization;
     }
 
     #endregion
-
+    
     #region Private members
 
-    private readonly AtomNode _inner;
+    private readonly StatementBase _initialization;
 
     #endregion
 
     #region AtomNode members
 
     /// <inheritdoc cref="AtomNode.Compute"/>
-    public override dynamic? Compute
+    public override dynamic Compute 
         (
             Context context
         )
     {
-        Sure.NotNull (context);
+        const string variableName = "$object";
+        var result = new ExpandoObject();
 
-        var value = _inner.Compute (context);
-
-        return -value;
+        var initializationContext = context.CreateChildContext();
+        initializationContext.Variables[variableName] = result;
+        var variableNode = new VariableNode (variableName);
+        initializationContext.With = variableNode;
+        _initialization.Execute (initializationContext);
+        
+        return result;
     }
 
     #endregion
-
+    
     #region AstNode members
 
     /// <inheritdoc cref="AstNode.DumpHierarchyItem(string?,int,System.IO.TextWriter)"/>
@@ -80,7 +88,7 @@ internal sealed class MinusNode
     {
         base.DumpHierarchyItem (name, level, writer);
 
-        _inner.DumpHierarchyItem ("Inner", level + 1, writer);
+        _initialization.DumpHierarchyItem ("Initialization", level + 1, writer);
     }
 
     #endregion

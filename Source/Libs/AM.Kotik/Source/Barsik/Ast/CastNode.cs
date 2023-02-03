@@ -16,6 +16,7 @@ using System;
 using System.Globalization;
 using System.IO;
 
+using AM.Kotik.Ast;
 using AM.Kotik.Barsik.Diagnostics;
 
 #endregion

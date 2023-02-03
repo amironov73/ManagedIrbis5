@@ -18,6 +18,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
+using AM.Kotik.Ast;
+
 #endregion
 
 #nullable enable

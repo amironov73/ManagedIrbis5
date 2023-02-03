@@ -16,7 +16,7 @@ using System.Collections;
 using System.IO;
 using System.Text.RegularExpressions;
 
-using AM.Kotik.Barsik.Diagnostics;
+using AM.Kotik.Ast;
 using AM.Text;
 
 #endregion

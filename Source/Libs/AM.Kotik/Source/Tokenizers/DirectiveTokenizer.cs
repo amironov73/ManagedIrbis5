@@ -64,7 +64,10 @@ public sealed class DirectiveTokenizer
         }
 
         ReadChar();
-        var command = navigator.ReadWord().ToString();
+        // обрабатываем специальным образом псевдодирективу `#!`
+        var command = navigator.PeekChar() == '!'
+            ? "!"
+            : navigator.ReadWord().ToString();
         if (string.IsNullOrEmpty (command))
         {
             return null;

@@ -17,7 +17,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-using AM.Kotik.Barsik.Ast;
+using AM.Kotik.Ast;
 
 using Microsoft.Extensions.Logging;
 

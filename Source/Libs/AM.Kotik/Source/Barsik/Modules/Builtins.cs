@@ -153,7 +153,6 @@ public static class Builtins
         { "error", new FunctionDescriptor ("error", Error_) },
         { "empty", new FunctionDescriptor ("empty", Empty) },
         { "exit", new FunctionDescriptor ("exit", Exit) },
-        { "expando", new FunctionDescriptor ("expando", Expando) },
         { "filter", new FunctionDescriptor ("filter", Filter, false) },
         { "format", new FunctionDescriptor ("format", Format) },
         { "have_var", new FunctionDescriptor ("havevar", HaveVariable, false) },
@@ -505,19 +504,6 @@ public static class Builtins
         }
 
         throw new ExitException (exitCode, message);
-    }
-
-    /// <summary>
-    /// Создание Expando-объекта.
-    /// Подходит для хранения всего подряд.
-    /// </summary>
-    public static dynamic Expando
-        (
-            Context context,
-            dynamic?[] args
-        )
-    {
-        return new ExpandoObject ();
     }
 
     /// <summary>
