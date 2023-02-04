@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <AvaloniaVersion>11.0.0-preview4</AvaloniaVersion>
+    <AvaloniaVersion>11.0.0-preview5</AvaloniaVersion>
     <CommunityToolkitVersion>8.1.0</CommunityToolkitVersion>
   </PropertyGroup>
 
@@ -22,7 +22,7 @@
     <PackageVersion Include="Avalonia.Markup.Xaml.Loader" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.ReactiveUI" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Skia" Version="$(AvaloniaVersion)" />
-    <PackageVersion Include="Avalonia.ThemeManager" Version="$(AvaloniaVersion)" />
+    <!-- PackageVersion Include="Avalonia.ThemeManager" Version="$(AvaloniaVersion)" / -->
     <PackageVersion Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Themes.Simple" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Xaml.Behaviors" Version="$(AvaloniaVersion)" />
