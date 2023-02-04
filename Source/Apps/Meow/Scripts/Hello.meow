@@ -34,7 +34,6 @@ l.Add (4)
 l.Add (5)
 
 builder1 = new System.Text.StringBuilder ()
-builder2 = new "System.Text.StringBuilder" ()
 
 x1++
 x2--
