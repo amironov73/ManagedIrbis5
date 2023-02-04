@@ -10,6 +10,7 @@
 
 #region Using directives
 
+using System;
 using System.Linq;
 
 using AM;
@@ -64,7 +65,8 @@ internal class FolderModel
     {
         Sure.DirectoryExists (folderName);
 
-        return LoadFolder (new BclStorageFolder (folderName));
+        throw new NotImplementedException();
+        // return LoadFolder (new BclStorageFolder (folderName));
     }
 
     public static FolderModel LoadFolder

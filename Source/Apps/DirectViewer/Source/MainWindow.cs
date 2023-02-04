@@ -145,15 +145,15 @@ public sealed class MainWindow
         ReadInitialData();
     }
 
-    protected override void OnClosing (CancelEventArgs e)
-    {
-        if (_provider != null!)
-        {
-            _provider.Dispose();
-        }
-
-        base.OnClosing (e);
-    }
+    // protected override void OnClosing (CancelEventArgs e)
+    // {
+    //     if (_provider != null!)
+    //     {
+    //         _provider.Dispose();
+    //     }
+    //
+    //     base.OnClosing (e);
+    // }
 
     #endregion
 

@@ -37,7 +37,7 @@ public sealed class App
     /// <inheritdoc cref="Application.Initialize"/>
     public override void Initialize()
     {
-        Styles.Add (new FluentTheme (new Uri("avares://Avalonia.Themes.Fluent/FluentLight.xaml")));
+        // Styles.Add (new FluentTheme (new Uri("avares://Avalonia.Themes.Fluent/FluentLight.xaml")));
 
         // стили для датагрида
         var uri = new Uri ("avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml");

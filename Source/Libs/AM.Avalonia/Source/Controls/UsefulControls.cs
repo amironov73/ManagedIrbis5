@@ -51,7 +51,7 @@ public static class UsefulControls
     {
         return new ItemsControl
         {
-            ItemsPanel = new FuncTemplate<IPanel> (() => new WrapPanel
+            ItemsPanel = new FuncTemplate<Panel> (() => new WrapPanel
             {
                 Orientation = orientation
             }),
@@ -76,7 +76,7 @@ public static class UsefulControls
     public static ItemsControl HorizontalWrappingItemsControl<TItem>
         (
             IEnumerable<TItem>? items,
-            Func<TItem, INameScope, IControl?> itemTemplate,
+            Func<TItem, INameScope, Control?> itemTemplate,
             Orientation orientation = Orientation.Horizontal
         )
     {
@@ -84,7 +84,7 @@ public static class UsefulControls
 
         return new ItemsControl
         {
-            ItemsPanel = new FuncTemplate<IPanel> (() => new WrapPanel
+            ItemsPanel = new FuncTemplate<Panel> (() => new WrapPanel
             {
                 Orientation = orientation
             }),
@@ -115,7 +115,7 @@ public static class UsefulControls
     {
         return new ListBox
         {
-            ItemsPanel = new FuncTemplate<IPanel> (() => new WrapPanel
+            ItemsPanel = new FuncTemplate<Panel> (() => new WrapPanel
             {
                 Orientation = orientation
             }),
@@ -140,7 +140,7 @@ public static class UsefulControls
     public static ListBox HorizontalWrappingListBox<TItem>
         (
             IEnumerable<TItem>? items,
-            Func<TItem, INameScope, IControl?> itemTemplate,
+            Func<TItem, INameScope, Control?> itemTemplate,
             Orientation orientation = Orientation.Horizontal
         )
     {
@@ -148,7 +148,7 @@ public static class UsefulControls
 
         return new ListBox
         {
-            ItemsPanel = new FuncTemplate<IPanel> (() => new WrapPanel
+            ItemsPanel = new FuncTemplate<Panel> (() => new WrapPanel
             {
                 Orientation = orientation
             }),

@@ -36,7 +36,7 @@ public sealed class App
     /// <inheritdoc cref="Application.Initialize"/>
     public override void Initialize()
     {
-        Current!.Styles.Add (new FluentTheme (new Uri ("avares://Avalonia.Themes.Fluent/FluentLight.xaml")));
+        // Current!.Styles.Add (new FluentTheme (new Uri ("avares://Avalonia.Themes.Fluent/FluentLight.xaml")));
     }
 
     /// <inheritdoc cref="Application.OnFrameworkInitializationCompleted"/>

@@ -258,10 +258,10 @@ public sealed class MainWindow
         var result = await StorageProvider.OpenFolderPickerAsync (options);
         if (result.Count != 0)
         {
-            if (result[0].TryGetUri (out var uri))
-            {
-                _model.ReadDirectory (uri.LocalPath);
-            }
+            // if (result[0].TryGetUri (out var uri))
+            // {
+            //     _model.ReadDirectory (uri.LocalPath);
+            // }
         }
     }
 

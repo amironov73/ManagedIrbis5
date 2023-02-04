@@ -64,7 +64,7 @@ public class NotificationMessageContainer
     /// <exception cref="NullReferenceException">Dependency object is not of valid type - expected NotificationMessageContainer.</exception>
     private static void ManagerPropertyChangedCallback
         (
-            IAvaloniaObject dependencyObject,
+            AvaloniaObject dependencyObject,
             AvaloniaPropertyChangedEventArgs dependencyPropertyChangedEventArgs
         )
     {

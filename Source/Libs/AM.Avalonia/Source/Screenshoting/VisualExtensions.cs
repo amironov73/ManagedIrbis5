@@ -42,13 +42,13 @@ public static class VisualExtensions
     /// <param name="layoutables"></param>
     /// <param name="size"></param>
     /// <returns></returns>
-    public static IEnumerable<ILayoutable> Layout
+    public static IEnumerable<Layoutable> Layout
         (
-            this IEnumerable<ILayoutable> layoutables,
+            this IEnumerable<Layoutable> layoutables,
             Size size
         )
     {
-        var enumerable = layoutables as ILayoutable[] ?? layoutables.ToArray();
+        var enumerable = layoutables as Layoutable[] ?? layoutables.ToArray();
         foreach (var layoutable in enumerable)
         {
             layoutable.Measure (size);
@@ -66,7 +66,7 @@ public static class VisualExtensions
     /// <returns></returns>
     public static IEnumerable<T> FindAllVisuals<T>
         (
-            this IVisual root
+            this Visual root
         )
     {
         var result = new List<T>();
@@ -83,11 +83,11 @@ public static class VisualExtensions
     /// <typeparam name="T"></typeparam>
     private static void FindAllVisuals<T>
         (
-            IVisual root,
+            Visual root,
             ICollection<T> result
         )
     {
-        if (root is ILayoutable l)
+        if (root is Layoutable l)
         {
             l.ApplyTemplate();
         }
@@ -97,9 +97,9 @@ public static class VisualExtensions
             result.Add (t);
         }
 
-        foreach (var child in root.VisualChildren)
-        {
-            FindAllVisuals (child, result);
-        }
+        // foreach (var child in root.VisualChildren)
+        // {
+        //     FindAllVisuals (child, result);
+        // }
     }
 }

@@ -148,27 +148,27 @@ public sealed class MainWindow
                 new ListBox
                 {
                     Margin = new Thickness (5),
-                    ItemsPanel = new FuncTemplate<IPanel>
+                    ItemsPanel = new FuncTemplate<Panel>
                         (
                             () => new WrapPanel { Orientation = Orientation.Horizontal }
                         ),
                     ItemTemplate = new FuncDataTemplate<ModelInfo> ((_, _) => new ModelControl()),
-                    [!ItemsRepeater.ItemsProperty] = new Binding (nameof (ViewModel.Models))
+                    // [!ItemsRepeater.ItemsProperty] = new Binding (nameof (ViewModel.Models))
                 },
             }
         };
     }
 
-    /// <inheritdoc cref="Window.OnClosing"/>
-    protected override void OnClosing
-        (
-            CancelEventArgs eventArgs
-        )
-    {
-        base.OnClosing (eventArgs);
-
-        ThumbnailLoader.Instance.SaveThumbnails();
-    }
+    // /// <inheritdoc cref="Window.OnClosing"/>
+    // protected override void OnClosing
+    //     (
+    //         CancelEventArgs eventArgs
+    //     )
+    // {
+    //     base.OnClosing (eventArgs);
+    //
+    //     ThumbnailLoader.Instance.SaveThumbnails();
+    // }
 
     #endregion
 

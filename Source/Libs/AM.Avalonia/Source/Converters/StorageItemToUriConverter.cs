@@ -51,10 +51,10 @@ public sealed class StorageItemToUriConverter
             CultureInfo culture
         )
     {
-        if (value is IStorageItem item && item.TryGetUri (out var uri))
-        {
-            return uri.ToString();
-        }
+        // if (value is IStorageItem item && item.TryGetUri (out var uri))
+        // {
+        //     return uri.ToString();
+        // }
 
         return null;
     }

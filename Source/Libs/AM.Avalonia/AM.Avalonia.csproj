@@ -46,12 +46,13 @@
         <PackageReference Include="Avalonia.Diagnostics" />
         <PackageReference Include="Avalonia.Markup.Xaml.Loader" />
         <PackageReference Include="Avalonia.ReactiveUI" />
-        <PackageReference Include="Avalonia.ThemeManager" />
+        <!-- PackageReference Include="Avalonia.ThemeManager" / -->
         <PackageReference Include="Avalonia.Themes.Fluent" />
         <PackageReference Include="Avalonia.Themes.Simple" />
         <PackageReference Include="Avalonia.Xaml.Behaviors" />
         <PackageReference Include="Avalonia.Xaml.Interactions" />
         <PackageReference Include="Avalonia.Xaml.Interactivity" />
+        <PackageReference Include="CommunityToolkit.Mvvm" />
         <PackageReference Include="Citrus.Avalonia" />
         <PackageReference Include="DynamicData" />
         <PackageReference Include="DynamicData.ReactiveUI" />

@@ -34,9 +34,9 @@ public static class ImageLoader
 
     static ImageLoader()
     {
-        SourceProperty.Changed
-            .Where (args => args.IsEffectiveValueChange)
-            .Subscribe (args => OnSourceChanged ((Image)args.Sender, args.NewValue.Value));
+        // SourceProperty.Changed
+        //     .Where (args => args.IsEffectiveValueChange)
+        //     .Subscribe (args => OnSourceChanged ((Image)args.Sender, args.NewValue.Value));
     }
 
     private static async void OnSourceChanged (Image sender, string? url)

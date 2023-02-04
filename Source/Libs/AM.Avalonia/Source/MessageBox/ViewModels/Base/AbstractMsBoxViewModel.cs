@@ -108,7 +108,7 @@ public abstract class AbstractMsBoxViewModel
         await AvaloniaLocator.Current.GetService<IClipboard>().SetTextAsync(ContentMessage);
     }
 
-    [NotifyPropertyChangedInvocator]
+    // [NotifyPropertyChangedInvocator]
     protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

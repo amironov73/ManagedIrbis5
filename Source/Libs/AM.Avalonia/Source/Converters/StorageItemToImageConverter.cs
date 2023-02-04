@@ -54,20 +54,20 @@ public sealed class StorageItemToImageConverter
             CultureInfo culture
         )
     {
-        if (value is IStorageItem item && item.TryGetUri (out var uri))
-        {
-            try
-            {
-                using var stream = File.OpenRead (uri.LocalPath);
-                var image = new Bitmap (stream);
-
-                return image;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine (ex);
-            }
-        }
+        // if (value is IStorageItem item && item.TryGetUri (out var uri))
+        // {
+        //     try
+        //     {
+        //         using var stream = File.OpenRead (uri.LocalPath);
+        //         var image = new Bitmap (stream);
+        //
+        //         return image;
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         Debug.WriteLine (ex);
+        //     }
+        // }
 
         return null;
     }

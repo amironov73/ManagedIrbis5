@@ -21,6 +21,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using Avalonia;
 using Avalonia.Media;
 using Avalonia.Rendering;
 using Avalonia.Skia;
@@ -38,38 +39,38 @@ namespace AM.Avalonia.Screenshoting;
 /// </summary>
 public static class Screenshoter
 {
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="fileName"></param>
-    /// <param name="visuals"></param>
-    public static void ToPdfFile (string fileName, params IVisual[] visuals) =>
-        ToPdfFile (fileName, visuals.AsEnumerable());
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="fileName"></param>
-    /// <param name="visuals"></param>
-    public static void ToPdfFile
-        (
-            string fileName,
-            IEnumerable<IVisual> visuals
-        )
-    {
-        using var doc = SKDocument.CreatePdf (fileName);
-        foreach (var visual in visuals)
-        {
-            var bounds = visual.Bounds;
-            var page = doc.BeginPage ((float) bounds.Width, (float) bounds.Height);
-            using var context = new DrawingContext
-                (
-                    DrawingContextHelper.WrapSkiaCanvas (page, SkiaPlatform.DefaultDpi)
-                );
-            ImmediateRenderer.Render (visual, context);
-            doc.EndPage();
-        }
-
-        doc.Close();
-    }
+    // /// <summary>
+    // ///
+    // /// </summary>
+    // /// <param name="fileName"></param>
+    // /// <param name="visuals"></param>
+    // public static void ToPdfFile (string fileName, params Visual[] visuals) =>
+    //     ToPdfFile (fileName, visuals.AsEnumerable());
+    //
+    // /// <summary>
+    // ///
+    // /// </summary>
+    // /// <param name="fileName"></param>
+    // /// <param name="visuals"></param>
+    // public static void ToPdfFile
+    //     (
+    //         string fileName,
+    //         IEnumerable<Visual> visuals
+    //     )
+    // {
+    //     using var doc = SKDocument.CreatePdf (fileName);
+    //     foreach (var visual in visuals)
+    //     {
+    //         var bounds = visual.Bounds;
+    //         var page = doc.BeginPage ((float) bounds.Width, (float) bounds.Height);
+    //         using var context = new DrawingContext
+    //             (
+    //                 DrawingContextHelper.WrapSkiaCanvas (page, SkiaPlatform.DefaultDpi)
+    //             );
+    //         ImmediateRenderer.Render (visual, context);
+    //         doc.EndPage();
+    //     }
+    //
+    //     doc.Close();
+    // }
 }

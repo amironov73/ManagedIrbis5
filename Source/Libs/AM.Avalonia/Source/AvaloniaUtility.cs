@@ -95,40 +95,40 @@ public static class AvaloniaUtility
         return control;
     }
 
-    /// <summary>
-    /// Получение ресурса по указанному URL.
-    /// </summary>
-    public static ResourceInclude? AsResource
-        (
-            this string url
-        )
-    {
-        Sure.NotNullNorEmpty (url);
+    ///// <summary>
+    ///// Получение ресурса по указанному URL.
+    ///// </summary>
+    //public static ResourceInclude? AsResource
+    //    (
+    //        this string url
+    //    )
+    //{
+    //    Sure.NotNullNorEmpty (url);
 
-        return new Uri (url).AsResource();
-    }
+    //    return new Uri (url).AsResource();
+    //}
 
-    /// <summary>
-    /// Получение ресурса по указанному URL.
-    /// </summary>
-    public static ResourceInclude? AsResource
-        (
-            this Uri uri
-        )
-    {
-        Sure.NotNull (uri);
+    ///// <summary>
+    ///// Получение ресурса по указанному URL.
+    ///// </summary>
+    //public static ResourceInclude? AsResource
+    //    (
+    //        this Uri uri
+    //    )
+    //{
+    //    Sure.NotNull (uri);
 
-        try
-        {
-            return new ResourceInclude { Source = uri };
-        }
-        catch (Exception exception)
-        {
-            Magna.Logger.LogDebug (exception, "URI as resource");
-        }
+    //    try
+    //    {
+    //        return new ResourceInclude { Source = uri };
+    //    }
+    //    catch (Exception exception)
+    //    {
+    //        Magna.Logger.LogDebug (exception, "URI as resource");
+    //    }
 
-        return default;
-    }
+    //    return default;
+    //}
 
     /// <summary>
     /// Присваивание указанной переменной.
@@ -228,48 +228,48 @@ public static class AvaloniaUtility
         return control;
     }
 
-    /// <summary>
-    /// Создание темы для контрола, основанной на теме для указанного типа.
-    /// </summary>
-    /// <returns></returns>
-    public static ControlTheme? CreateControlTheme
-        (
-            Type baseControlType,
-            Type actualControlType
-        )
-    {
-        Sure.NotNull (baseControlType);
-        Sure.NotNull (actualControlType);
+    ///// <summary>
+    ///// Создание темы для контрола, основанной на теме для указанного типа.
+    ///// </summary>
+    ///// <returns></returns>
+    //public static ControlTheme? CreateControlTheme
+    //    (
+    //        Type baseControlType,
+    //        Type actualControlType
+    //    )
+    //{
+    //    Sure.NotNull (baseControlType);
+    //    Sure.NotNull (actualControlType);
 
-        var basedOn = GetControlTheme (baseControlType);
-        if (basedOn is null)
-        {
-            return null;
-        }
+    //    var basedOn = GetControlTheme (baseControlType);
+    //    if (basedOn is null)
+    //    {
+    //        return null;
+    //    }
 
-        var result = new ControlTheme (actualControlType)
-        {
-            BasedOn = basedOn
-        };
+    //    var result = new ControlTheme (actualControlType)
+    //    {
+    //        BasedOn = basedOn
+    //    };
 
-        return result;
-    }
+    //    return result;
+    //}
 
-    /// <summary>
-    /// Создание Fluent-темы.
-    /// </summary>
-    public static IStyle CreateFluentTheme
-        (
-            bool light = true
-        )
-    {
-        return new FluentTheme (new Uri
-            (
-                light
-                ? "avares://Avalonia.Themes.Fluent/FluentLight.xaml"
-                : "avares://Avalonia.Themes.Fluent/FluentDark.xaml"
-            ));
-    }
+    ///// <summary>
+    ///// Создание Fluent-темы.
+    ///// </summary>
+    //public static IStyle CreateFluentTheme
+    //    (
+    //        bool light = true
+    //    )
+    //{
+    //    return new FluentTheme (new Uri
+    //        (
+    //            light
+    //            ? "avares://Avalonia.Themes.Fluent/FluentLight.xaml"
+    //            : "avares://Avalonia.Themes.Fluent/FluentDark.xaml"
+    //        ));
+    //}
 
     /// <summary>
     /// Создание Material-темы.
@@ -291,47 +291,47 @@ public static class AvaloniaUtility
         return result;
     }
 
-    /// <summary>
-    /// Создание Simple-темы.
-    /// </summary>
-    public static IStyle CreateSimpleTheme
-        (
-            bool light = true
-        )
-    {
-        var mode = light ? SimpleThemeMode.Light : SimpleThemeMode.Dark;
-        var uri = new Uri ("avares://Avalonia.Themes.Simple/SimpleTheme.xaml");
-        var result = new SimpleTheme (uri)
-        {
-            Mode = mode
-        };
+    ///// <summary>
+    ///// Создание Simple-темы.
+    ///// </summary>
+    //public static IStyle CreateSimpleTheme
+    //    (
+    //        bool light = true
+    //    )
+    //{
+    //    var mode = light ? SimpleThemeMode.Light : SimpleThemeMode.Dark;
+    //    var uri = new Uri ("avares://Avalonia.Themes.Simple/SimpleTheme.xaml");
+    //    var result = new SimpleTheme (uri)
+    //    {
+    //        Mode = mode
+    //    };
 
-        return result;
-    }
+    //    return result;
+    //}
 
-    /// <summary>
-    /// Создание Citrus-темы.
-    /// </summary>
-    public static IStyle CreateCitrusTheme
-        (
-            string variant = "Citrus.axaml"
-        )
-    {
-        var simple = CreateSimpleTheme();
-        var uri = new Uri ($"avares://AM.Avalonia/Styles/Citrus/{variant}");
-        var citrus = new StyleInclude (uri)
-        {
-            Source = uri
-        };
+    ///// <summary>
+    ///// Создание Citrus-темы.
+    ///// </summary>
+    //public static IStyle CreateCitrusTheme
+    //    (
+    //        string variant = "Citrus.axaml"
+    //    )
+    //{
+    //    var simple = CreateSimpleTheme();
+    //    var uri = new Uri ($"avares://AM.Avalonia/Styles/Citrus/{variant}");
+    //    var citrus = new StyleInclude (uri)
+    //    {
+    //        Source = uri
+    //    };
 
-        var result = new Styles
-        {
-            simple,
-            citrus
-        };
+    //    var result = new Styles
+    //    {
+    //        simple,
+    //        citrus
+    //    };
 
-        return result;
-    }
+    //    return result;
+    //}
 
     /// <summary>
     /// Создание простого грида.
@@ -670,34 +670,34 @@ public static class AvaloniaUtility
         return (Thickness) found;
     }
 
-    /// <summary>
-    /// Получение темы для контрола указанного типа.
-    /// </summary>
-    public static ControlTheme? GetControlTheme
-        (
-            Type controlType
-        )
-    {
-        Sure.NotNull (controlType);
+    ///// <summary>
+    ///// Получение темы для контрола указанного типа.
+    ///// </summary>
+    //public static ControlTheme? GetControlTheme
+    //    (
+    //        Type controlType
+    //    )
+    //{
+    //    Sure.NotNull (controlType);
 
-        while (controlType.IsAssignableTo (typeof (Control)))
-        {
-            if (Application.Current!.Styles.TryGetResource (controlType, out var result))
-            {
-                return result as ControlTheme;
-            }
+    //    while (controlType.IsAssignableTo (typeof (Control)))
+    //    {
+    //        if (Application.Current!.Styles.TryGetResource (controlType, out var result))
+    //        {
+    //            return result as ControlTheme;
+    //        }
 
-            var baseType = controlType.BaseType;
-            if (baseType is null)
-            {
-                break;
-            }
+    //        var baseType = controlType.BaseType;
+    //        if (baseType is null)
+    //        {
+    //            break;
+    //        }
 
-            controlType = baseType;
-        }
+    //        controlType = baseType;
+    //    }
 
-        return null;
-    }
+    //    return null;
+    //}
 
     /// <summary>
     /// Получение главного окна приложения (если оно есть, конечно).
@@ -717,7 +717,7 @@ public static class AvaloniaUtility
     /// </summary>
     public static TDataContext? GetParentDataContext<TDataContext>
         (
-            this IControl control
+            this Control control
         )
         where TDataContext: class
     {
@@ -741,9 +741,9 @@ public static class AvaloniaUtility
     /// Поиск родительского контрола с контекстом данных
     /// указанного типа.
     /// </summary>
-    public static IControl? GetParentWithDataContext<TDataContext>
+    public static Control? GetParentWithDataContext<TDataContext>
         (
-            this IControl control
+            this Control control
         )
         where TDataContext: class
     {
@@ -768,9 +768,9 @@ public static class AvaloniaUtility
     /// </summary>
     public static TParent? GetParentOfType<TParent>
         (
-            this IControl control
+            this Control control
         )
-        where TParent : class, IControl
+        where TParent : Control
     {
         Sure.NotNull (control);
 
@@ -793,7 +793,7 @@ public static class AvaloniaUtility
     /// </summary>
     public static Window GetWindow
         (
-            this IControl control
+            this Control control
         )
     {
         Sure.NotNull (control);
@@ -817,7 +817,7 @@ public static class AvaloniaUtility
     /// </summary>
     public static StackPanel HorizontalGroup
         (
-            params IControl[] controls
+            params Control[] controls
         )
     {
         var result = new StackPanel
@@ -878,7 +878,7 @@ public static class AvaloniaUtility
     /// </summary>
     public static Bitmap? LoadBitmapFromAssets
         (
-            this IControl control,
+            this Control control,
             string assetName
         )
     {

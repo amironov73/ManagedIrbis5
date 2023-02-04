@@ -80,16 +80,16 @@ public class PropertyGrid
     /// </summary>
     public PropertyGrid()
     {
-        var grayBackground = AvaloniaUtility.CreateControlTheme
-            (
-                typeof (DataGridCell),
-                typeof (DataGridCell)
-            );
-        grayBackground?.Setters.Add (new Setter
-            (
-                BackgroundProperty,
-                Brushes.LightGray
-            ));
+        // var grayBackground = AvaloniaUtility.CreateControlTheme
+        //     (
+        //         typeof (DataGridCell),
+        //         typeof (DataGridCell)
+        //     );
+        // grayBackground?.Setters.Add (new Setter
+        //     (
+        //         BackgroundProperty,
+        //         Brushes.LightGray
+        //     ));
 
         _dataGrid = new DataGrid
         {
@@ -106,7 +106,7 @@ public class PropertyGrid
                     FontWeight = FontWeight.Bold,
                     Width = new DataGridLength (2, DataGridLengthUnitType.Star),
                     Binding = new Binding (nameof (PropertyModel.Name)),
-                    CellTheme = grayBackground
+                    //CellTheme = grayBackground
                 },
 
                 new DataGridTextColumn
@@ -116,7 +116,7 @@ public class PropertyGrid
                     HeaderTemplate = BoldLabel(),
                     Width = new DataGridLength (2, DataGridLengthUnitType.Star),
                     Binding = new Binding (nameof (PropertyModel.Type)),
-                    CellTheme = grayBackground
+                    //CellTheme = grayBackground
                 },
 
                 new DataGridTextColumn

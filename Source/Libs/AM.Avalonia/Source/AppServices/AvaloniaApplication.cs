@@ -36,7 +36,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml.Styling;
-using Avalonia.ThemeManager;
+// using Avalonia.ThemeManager;
 
 using Live.Avalonia;
 
@@ -307,18 +307,18 @@ public class AvaloniaApplication
         }
         else if (DesktopApplication._useCitrusTheme)
         {
-            var theme = AvaloniaUtility.CreateCitrusTheme();
-            Current!.Styles.Add (theme);
+            // var theme = AvaloniaUtility.CreateCitrusTheme();
+            // Current!.Styles.Add (theme);
         }
         else if (DesktopApplication._useSimpleTheme)
         {
-            var theme = AvaloniaUtility.CreateSimpleTheme();
-            Current!.Styles.Add (theme);
+            // var theme = AvaloniaUtility.CreateSimpleTheme();
+            // Current!.Styles.Add (theme);
         }
         else
         {
-            var themeManager = new FluentThemeManager();
-            themeManager.Initialize (this);
+            // var themeManager = new FluentThemeManager();
+            // themeManager.Initialize (this);
 
             // Current!.Styles.Add (new FluentTheme (new Uri("avares://Avalonia.Themes.Fluent/FluentLight.xaml")));
         }

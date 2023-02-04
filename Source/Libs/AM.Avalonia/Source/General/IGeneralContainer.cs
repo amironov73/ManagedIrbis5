@@ -46,5 +46,5 @@ public interface IGeneralContainer
     /// <summary>
     /// Рабочая область.
     /// </summary>
-    IControl? WorkingArea { get; }
+    Control? WorkingArea { get; }
 }

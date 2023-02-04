@@ -71,24 +71,24 @@ public sealed class MainWindow
                         .CenterControl()
                         .OnClick ((_, _) =>
                         {
-                            var lightTheme = new FluentTheme (new Uri ("avares://Avalonia.Themes.Fluent/FluentLight.xaml"));
-                            var styles = Application.Current!.Styles;
-                            styles.Clear();
-                            styles.Add (lightTheme);
-                            InvalidateStyles();
-                            InvalidateVisual();
+                            // var lightTheme = new FluentTheme (new Uri ("avares://Avalonia.Themes.Fluent/FluentLight.xaml"));
+                            // var styles = Application.Current!.Styles;
+                            // styles.Clear();
+                            // styles.Add (lightTheme);
+                            // InvalidateStyles();
+                            // InvalidateVisual();
                         }),
 
                     new Button { Content = "Темная тема" }
                         .CenterControl()
                         .OnClick ((_, _) =>
                         {
-                            var darkTheme = new FluentTheme (new Uri ("avares://Avalonia.Themes.Fluent/FluentDark.xaml"));
-                            var styles = Application.Current!.Styles;
-                            styles.Clear();
-                            styles.Add (darkTheme);
-                            InvalidateStyles();
-                            InvalidateVisual();
+                            // var darkTheme = new FluentTheme (new Uri ("avares://Avalonia.Themes.Fluent/FluentDark.xaml"));
+                            // var styles = Application.Current!.Styles;
+                            // styles.Clear();
+                            // styles.Add (darkTheme);
+                            // InvalidateStyles();
+                            // InvalidateVisual();
                         })
                 );
     }
