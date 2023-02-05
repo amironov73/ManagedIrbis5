@@ -4,9 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnusedMember.Global
 
 /* ForNode.cs -- цикл for
  * Ars Magna project, http://arsmagna.ru
@@ -73,17 +70,14 @@ internal sealed class ForNode
     public ForNode
         (
             int line,
-            AtomNode init,
-            AtomNode condition,
-            AtomNode step,
+            AtomNode? init,
+            AtomNode? condition,
+            AtomNode? step,
             StatementBase body,
             StatementBase? elseBody
         )
         : base(line)
     {
-        Sure.NotNull (init);
-        Sure.NotNull (condition);
-        Sure.NotNull (step);
         Sure.NotNull (body);
         
         _init = init;
@@ -112,12 +106,20 @@ internal sealed class ForNode
 
     #region Private members
 
-    private readonly AtomNode _init;
-    private readonly AtomNode _condition;
-    private readonly AtomNode _step;
+    private readonly AtomNode? _init;
+    private readonly AtomNode? _condition;
+    private readonly AtomNode? _step;
     private readonly StatementBase _body;
     private readonly StatementBase? _elseBody;
     private readonly BlockNode _summary;
+
+    private bool CheckCondition 
+        (
+            Context context
+        )
+    {
+        return _condition is null || (bool) KotikUtility.ToBoolean (_condition.Compute (context));
+    }
 
     #endregion
 
@@ -131,11 +133,11 @@ internal sealed class ForNode
     {
         PreExecute (context);
 
-        _init.Compute (context);
+        _init?.Compute (context);
         var success = false;
         try
         {
-            while (KotikUtility.ToBoolean (_condition.Compute (context)))
+            while (CheckCondition (context))
             {
                 success = true;
                 try
@@ -147,7 +149,7 @@ internal sealed class ForNode
                     Debug.WriteLine ("for-continue");
                 }
 
-                _step.Compute (context);
+                _step?.Compute (context);
             }
 
             if (!success && _elseBody is not null)
@@ -176,9 +178,9 @@ internal sealed class ForNode
     {
         base.DumpHierarchyItem (name, level, writer, ToString());
 
-        _init.DumpHierarchyItem ("Init", level + 1, writer);
-        _condition.DumpHierarchyItem ("Condition", level + 1, writer);
-        _step.DumpHierarchyItem ("Advance", level + 1, writer);
+        _init?.DumpHierarchyItem ("Init", level + 1, writer);
+        _condition?.DumpHierarchyItem ("Condition", level + 1, writer);
+        _step?.DumpHierarchyItem ("Advance", level + 1, writer);
         _body.DumpHierarchyItem ("Block", level + 1, writer);
     }
 

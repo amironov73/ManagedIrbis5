@@ -462,9 +462,9 @@ public sealed class Grammar
         var forStatement = Parser.Chain
             (
                 Parser.Position.Before (Reserved ("for")),
-                assignment.After (Parser.Term ("(")),
-                Expression.Between (Term (";"), Term (";")),
-                assignment.Or (Expression).Before (Term (")")),
+                assignment.Optional().After (Parser.Term ("(")),
+                Expression.Optional().Between (Term (";"), Term (";")),
+                assignment.Or (Expression).Optional().Before (Term (")")),
                 Block,
                 Block.After (Reserved ("else")).Optional(),
                 (position, init, condition, step, body, elseBlock) =>
