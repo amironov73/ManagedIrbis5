@@ -46,6 +46,9 @@ public class EpubBookRef
         isDisposed = false;
     }
 
+    /// <summary>
+    /// Деструктор.
+    /// </summary>
     ~EpubBookRef()
     {
         Dispose (false);

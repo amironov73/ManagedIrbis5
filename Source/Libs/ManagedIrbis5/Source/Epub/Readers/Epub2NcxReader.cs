@@ -45,19 +45,19 @@ internal static class Epub2NcxReader
         )
     {
         var result = new Epub2Ncx();
-        var tocId = package.Spine.Toc;
+        var tocId = package.Spine!.Toc;
         if (string.IsNullOrEmpty (tocId))
         {
             return null;
         }
 
-        var tocManifestItem = package.Manifest.FirstOrDefault (item => item.Id.SameString (tocId));
+        var tocManifestItem = package.Manifest!.FirstOrDefault (item => item.Id.SameString (tocId));
         if (tocManifestItem == null)
         {
             throw new Epub2NcxException ($"EPUB parsing error: TOC item {tocId} not found in EPUB manifest.");
         }
 
-        var tocFileEntryPath = ZipPathUtils.Combine (contentDirectoryPath, tocManifestItem.Href);
+        var tocFileEntryPath = ZipPathUtils.Combine (contentDirectoryPath, tocManifestItem.Href!);
         var tocFileEntry = epubFile.GetEntry (tocFileEntryPath);
         if (tocFileEntry == null)
         {

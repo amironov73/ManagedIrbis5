@@ -184,8 +184,14 @@ public sealed class MobiHeader
     /// <summary>
     ///
     /// </summary>
-    public MobiHeader (FileStream stream, int mobiHeaderSize)
+    public MobiHeader 
+        (
+            FileStream stream, 
+            int mobiHeaderSize
+        )
     {
+        ExthHeader = null!;
+
         _stream = stream;
         _mobiHeaderSize = mobiHeaderSize;
 
@@ -194,6 +200,8 @@ public sealed class MobiHeader
 
     private void LoadMobiHeader()
     {
+        // ReSharper disable MustUseReturnValue
+        
         _stream.Read (_compression, 0, _compression.Length);
         _stream.Read (_unused0, 0, _unused0.Length);
         _stream.Read (_textLength, 0, _textLength.Length);
@@ -234,6 +242,8 @@ public sealed class MobiHeader
         _restOfMobiHeader = new byte[HeaderLength + 16 - 132];
         _stream.Read (_restOfMobiHeader, 0, _restOfMobiHeader.Length);
 
+        // ReSharper restore MustUseReturnValue
+
         var exthHeaderExists = GetExthHeaderExists();
         if (exthHeaderExists)
         {
@@ -243,8 +253,12 @@ public sealed class MobiHeader
         var exthHeaderSize = exthHeaderExists ? ExthHeader.Size : 0;
         var currentOffset = 132 + _restOfMobiHeader.Length + exthHeaderSize;
 
+        // ReSharper disable MustUseReturnValue
+
         _remainder = new byte[_mobiHeaderSize - currentOffset];
         _stream.Read (_remainder, 0, _remainder.Length);
+
+        // ReSharper restore MustUseReturnValue
 
         var fullNameIndexInRemainder = ByteUtils.GetInt32 (_fullNameOffset) - currentOffset;
         var fullNameLength = ByteUtils.GetInt32 (_fullNameLength);
@@ -327,7 +341,7 @@ public sealed class MobiHeader
     /// </summary>
     public string GetExthRecordValue (int type)
     {
-        if (ExthHeader == null || ExthHeader.Records == null)
+        if (ExthHeader == null! || ExthHeader.Records == null!)
         {
             return "";
         }
@@ -385,7 +399,7 @@ public sealed class MobiHeader
         outStream.Write (_exthFlags, 0, _exthFlags.Length);
         outStream.Write (_restOfMobiHeader, 0, _restOfMobiHeader.Length);
 
-        if (ExthHeader != null)
+        if (ExthHeader != null!)
         {
             ExthHeader.Write (outStream);
         }

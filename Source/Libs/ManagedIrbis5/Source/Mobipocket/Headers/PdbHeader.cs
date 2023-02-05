@@ -148,6 +148,7 @@ public sealed class PdbHeader
     /// </summary>
     public PdbHeader (FileStream stream)
     {
+        Records = null!;
         _stream = stream;
 
         LoadPdbHeader();
@@ -248,9 +249,13 @@ public class PdbRecord
     /// </summary>
     private void LoadRecordInfo()
     {
+        // ReSharper disable MustUseReturnValue
+        
         _stream.Read (_offset, 0, _offset.Length);
         _stream.Read (_attributes, 0, _attributes.Length);
         _stream.Read (_uniqueId, 0, _uniqueId.Length);
+        
+        // ReSharper restore MustUseReturnValue
     }
 
     /// <summary>

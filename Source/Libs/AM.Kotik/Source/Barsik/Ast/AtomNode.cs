@@ -8,7 +8,7 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 
-/* AtomNode.cs -- узел, в котором происходят какие-то вычисления
+/* AtomNode.cs -- узел, в котором происходят некие вычисления
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,7 +25,7 @@ using AM.Kotik.Ast;
 namespace AM.Kotik.Barsik.Ast;
 
 /// <summary>
-/// Узел, в котором происходят какие-то вычисления,
+/// Узел, в котором происходят некие вычисления,
 /// возможно, константные.
 /// </summary>
 public abstract class AtomNode

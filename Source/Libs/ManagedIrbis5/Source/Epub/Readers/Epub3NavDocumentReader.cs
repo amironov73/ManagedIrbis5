@@ -38,7 +38,7 @@ internal static class Epub3NavDocumentReader
         )
     {
         var result = new Epub3NavDocument();
-        var navManifestItem = package.Manifest.FirstOrDefault
+        var navManifestItem = package.Manifest!.FirstOrDefault
             (
                 item => item.Properties != null!
                         && item.Properties.Contains (ManifestProperty.NAV)
@@ -55,7 +55,7 @@ internal static class Epub3NavDocumentReader
             }
         }
 
-        var navFileEntryPath = ZipPathUtils.Combine (contentDirectoryPath, navManifestItem.Href);
+        var navFileEntryPath = ZipPathUtils.Combine (contentDirectoryPath, navManifestItem.Href!);
         var navFileEntry = epubFile.GetEntry (navFileEntryPath);
         if (navFileEntry == null)
         {

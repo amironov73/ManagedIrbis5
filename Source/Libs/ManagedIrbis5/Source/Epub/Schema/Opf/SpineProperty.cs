@@ -26,10 +26,24 @@ using System.Linq;
 
 namespace ManagedIrbis.Epub.Schema;
 
+/// <summary>
+/// 
+/// </summary>
 public enum SpineProperty
 {
+    /// <summary>
+    /// 
+    /// </summary>
     PAGE_SPREAD_LEFT = 1,
+
+    /// <summary>
+    /// 
+    /// </summary>
     PAGE_SPREAD_RIGHT,
+
+    /// <summary>
+    /// 
+    /// </summary>
     UNKNOWN
 }
 
@@ -46,14 +60,11 @@ internal static class SpinePropertyParser
 
     public static SpineProperty ParseProperty(string stringValue)
     {
-        switch (stringValue.ToLowerInvariant())
+        return stringValue.ToLowerInvariant() switch
         {
-            case "page-spread-left":
-                return SpineProperty.PAGE_SPREAD_LEFT;
-            case "page-spread-right":
-                return SpineProperty.PAGE_SPREAD_RIGHT;
-            default:
-                return SpineProperty.UNKNOWN;
-        }
+            "page-spread-left" => SpineProperty.PAGE_SPREAD_LEFT,
+            "page-spread-right" => SpineProperty.PAGE_SPREAD_RIGHT,
+            _ => SpineProperty.UNKNOWN
+        };
     }
 }

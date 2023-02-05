@@ -65,8 +65,13 @@ public sealed class ExthHeader
     /// <summary>
     ///
     /// </summary>
-    public ExthHeader (FileStream stream)
+    public ExthHeader 
+        (
+            FileStream stream
+        )
     {
+        Records = null!;
+        
         _stream = stream;
 
         LoadExthHeader();
@@ -77,6 +82,8 @@ public sealed class ExthHeader
     /// </summary>
     private void LoadExthHeader()
     {
+        // ReSharper disable MustUseReturnValue
+
         _stream.Read (_identifier, 0, _identifier.Length);
 
         if (Identifier != "EXTH")
@@ -86,7 +93,7 @@ public sealed class ExthHeader
 
         _stream.Read (_headerLength, 0, _headerLength.Length);
         _stream.Read (_recordCount, 0, _recordCount.Length);
-
+        
         Records = new List<ExthRecord>();
 
         for (var i = 0; i < RecordCount; i++)
@@ -97,6 +104,8 @@ public sealed class ExthHeader
 
         var padding = new byte[GetPaddingSize (GetDataSize())];
         _stream.Read (padding, 0, padding.Length);
+
+        // ReSharper restore MustUseReturnValue
     }
 
     private int GetSize()
@@ -186,8 +195,13 @@ public sealed class ExthRecord
     ///
     /// </summary>
     /// <param name="stream"></param>
-    public ExthRecord (FileStream stream)
+    public ExthRecord 
+        (
+            FileStream stream
+        )
     {
+        Data = null!;
+
         _stream = stream;
 
         LoadExthRecords();
@@ -195,12 +209,16 @@ public sealed class ExthRecord
 
     private void LoadExthRecords()
     {
+        // ReSharper disable MustUseReturnValue
+
         _stream.Read (_type, 0, _type.Length);
         _stream.Read (_length, 0, _length.Length);
-
+        
         Data = new byte[Length - 8];
 
         _stream.Read (Data, 0, Data.Length);
+
+        // ReSharper restore MustUseReturnValue
     }
 
     private int GetSize()

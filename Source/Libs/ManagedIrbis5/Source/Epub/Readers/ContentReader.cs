@@ -37,11 +37,11 @@ internal static class ContentReader
             Fonts = new Dictionary<string, EpubByteContentFileRef>(),
             AllFiles = new Dictionary<string, EpubContentFileRef>()
         };
-        foreach (var manifestItem in bookRef.Schema!.Package!.Manifest)
+        foreach (var manifestItem in bookRef.Schema!.Package!.Manifest!)
         {
             var fileName = manifestItem.Href;
             var contentMimeType = manifestItem.MediaType;
-            var contentType = GetContentTypeByContentMimeType (contentMimeType);
+            var contentType = GetContentTypeByContentMimeType (contentMimeType!);
             switch (contentType)
             {
                 case EpubContentType.XHTML_1_1:
@@ -54,14 +54,14 @@ internal static class ContentReader
                     var epubTextContentFile = new EpubTextContentFileRef
                         (
                             bookRef,
-                            fileName,
+                            fileName!,
                             contentType,
-                            contentMimeType
+                            contentMimeType!
                         );
                     switch (contentType)
                     {
                         case EpubContentType.XHTML_1_1:
-                            result.Html[fileName] = epubTextContentFile;
+                            result.Html[fileName!] = epubTextContentFile;
                             if (result.NavigationHtmlFile == null && manifestItem.Properties != null!
                                 && manifestItem.Properties.Contains (ManifestProperty.NAV))
                             {
@@ -70,32 +70,32 @@ internal static class ContentReader
 
                             break;
                         case EpubContentType.CSS:
-                            result.Css[fileName] = epubTextContentFile;
+                            result.Css[fileName!] = epubTextContentFile;
                             break;
                     }
 
-                    result.AllFiles[fileName] = epubTextContentFile;
+                    result.AllFiles[fileName!] = epubTextContentFile;
                     break;
 
                 default:
                     var epubByteContentFile =
-                        new EpubByteContentFileRef (bookRef, fileName, contentType, contentMimeType);
+                        new EpubByteContentFileRef (bookRef, fileName!, contentType, contentMimeType!);
                     switch (contentType)
                     {
                         case EpubContentType.IMAGE_GIF:
                         case EpubContentType.IMAGE_JPEG:
                         case EpubContentType.IMAGE_PNG:
                         case EpubContentType.IMAGE_SVG:
-                            result.Images[fileName] = epubByteContentFile;
+                            result.Images[fileName!] = epubByteContentFile;
                             break;
 
                         case EpubContentType.FONT_TRUETYPE:
                         case EpubContentType.FONT_OPENTYPE:
-                            result.Fonts[fileName] = epubByteContentFile;
+                            result.Fonts[fileName!] = epubByteContentFile;
                             break;
                     }
 
-                    result.AllFiles[fileName] = epubByteContentFile;
+                    result.AllFiles[fileName!] = epubByteContentFile;
                     break;
             }
         }

@@ -173,7 +173,7 @@ public sealed class PooledRecord
         throw new NotImplementedException();
     }
 
-    /// <inheritdoc cref="IRecord.FM"/>
+    /// <inheritdoc cref="IRecord.FM(int)"/>
     public string? FM
         (
             int tag
@@ -265,9 +265,9 @@ public sealed class PooledRecord
         Version = 0;
         Status = RecordStatus.None;
 
-        // ReSharper disable ConditionIsAlwaysTrueOrFalse
+        // ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
         if (Fields is not null)
-        // ReSharper restore ConditionIsAlwaysTrueOrFalse
+        // ReSharper restore ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
         {
             foreach (var field in Fields)
             {

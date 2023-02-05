@@ -65,7 +65,7 @@ internal static class BookCoverReader
             IReadOnlyDictionary<string, EpubByteContentFileRef> imageContentRefs
         )
     {
-        var metaItems = epubSchema.Package!.Metadata.MetaItems;
+        var metaItems = epubSchema.Package!.Metadata!.MetaItems;
         if (metaItems == null! || !metaItems.Any())
         {
             return null;
@@ -82,7 +82,7 @@ internal static class BookCoverReader
             throw new EpubPackageException ("Incorrect EPUB metadata: cover item content is missing.");
         }
 
-        var coverManifestItem = epubSchema.Package.Manifest.FirstOrDefault (manifestItem =>
+        var coverManifestItem = epubSchema.Package.Manifest!.FirstOrDefault (manifestItem =>
             manifestItem.Id.SameString (coverMetaItem.Content));
         if (coverManifestItem == null)
         {
@@ -109,9 +109,9 @@ internal static class BookCoverReader
             IReadOnlyDictionary<string, EpubByteContentFileRef> imageContentRefs
         )
     {
-        foreach (var guideReference in epubSchema.Package!.Guide)
+        foreach (var guideReference in epubSchema.Package!.Guide!)
         {
-            if (guideReference.Type.ToLowerInvariant() == "cover" && imageContentRefs.TryGetValue (guideReference.Href,
+            if (guideReference.Type!.ToLowerInvariant() == "cover" && imageContentRefs.TryGetValue (guideReference.Href!,
                     out var coverImageContentFileRef))
             {
                 return coverImageContentFileRef;
@@ -127,7 +127,7 @@ internal static class BookCoverReader
             IReadOnlyDictionary<string, EpubByteContentFileRef> imageContentRefs
         )
     {
-        var coverManifestItem = epubSchema.Package!.Manifest.FirstOrDefault (manifestItem =>
+        var coverManifestItem = epubSchema.Package!.Manifest!.FirstOrDefault (manifestItem =>
                 manifestItem.Properties != null!
                 && manifestItem.Properties.Contains (ManifestProperty.COVER_IMAGE));
         if (coverManifestItem == null || coverManifestItem.Href == null!)
