@@ -22,57 +22,56 @@ using System.Windows.Forms;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Shows list of attachments.
+/// </summary>
+public partial class AttachmentBox
+    : Form
 {
+    #region Construction
+
     /// <summary>
-    /// Shows list of attachments.
+    /// Constructor.
     /// </summary>
-    public partial class AttachmentBox
-        : Form
+    public AttachmentBox
+        (
+            IEnumerable<BinaryAttachment> attachments
+        )
     {
-        #region Construction
+        InitializeComponent();
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public AttachmentBox
-            (
-                IEnumerable<BinaryAttachment> attachments
-            )
+        _listBox.Items.AddRange (attachments.ToArray());
+    }
+
+    #endregion
+
+    #region Private members
+
+    private void _saveButton_Click
+        (
+            object sender,
+            EventArgs e
+        )
+    {
+        if (_listBox.SelectedItem is BinaryAttachment attachment)
         {
-            InitializeComponent();
-
-            _listBox.Items.AddRange(attachments.ToArray());
-        }
-
-        #endregion
-
-        #region Private members
-
-        private void _saveButton_Click
-            (
-                object sender,
-                EventArgs e
-            )
-        {
-            if (_listBox.SelectedItem is BinaryAttachment attachment)
+            var rc = _saveFileDialog.ShowDialog (this);
+            if (rc == DialogResult.OK)
             {
-                var rc = _saveFileDialog.ShowDialog(this);
-                if (rc == DialogResult.OK)
+                if (attachment.Content is { } content)
                 {
-                    if (attachment.Content is { } content)
-                    {
-                        var fileName = _saveFileDialog.FileName;
-                        File.WriteAllBytes
+                    var fileName = _saveFileDialog.FileName;
+                    File.WriteAllBytes
                         (
                             fileName,
                             content
                         );
-                    }
                 }
             }
         }
-
-        #endregion
     }
+
+    #endregion
 }

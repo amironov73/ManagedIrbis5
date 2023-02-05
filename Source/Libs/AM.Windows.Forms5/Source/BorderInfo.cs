@@ -2,12 +2,9 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* BorderInfo.cs -- информация о границе контрола
  * Ars Magna project, http://arsmagna.ru
@@ -116,7 +113,8 @@ public class BorderInfo
     /// <summary>
     /// Editor for <see cref="BorderInfo"/>.
     /// </summary>
-    public class Editor : UITypeEditor
+    public sealed class Editor 
+        : UITypeEditor
     {
         /// <inheritdoc />
         public override UITypeEditorEditStyle GetEditStyle
@@ -135,18 +133,18 @@ public class BorderInfo
                 object? value
             )
         {
-            var borderInfo = (BorderInfo) value!;
+            Sure.NotNull (value);
 
-            if (ReferenceEquals (provider, null))
+            var borderInfo = (BorderInfo) value.ThrowIfNull();
+
+            if (provider is null)
             {
                 return borderInfo;
             }
 
-            var editorService = (IWindowsFormsEditorService?)provider.GetService
-                (
-                    typeof (IWindowsFormsEditorService)
-                );
-            if (editorService != null)
+            var editorService = (IWindowsFormsEditorService?)
+                provider.GetService (typeof (IWindowsFormsEditorService));
+            if (editorService is not null)
             {
                 var form = new BorderInfoControl
                     (
@@ -155,7 +153,7 @@ public class BorderInfo
                     );
                 editorService.DropDownControl (form);
 
-                if (form.Result != null)
+                if (form.Result is not null)
                 {
                     return form.Result;
                 }
@@ -167,15 +165,13 @@ public class BorderInfo
         /// <inheritdoc />
         public override void PaintValue
             (
-                PaintValueEventArgs e
+                PaintValueEventArgs eventArgs
             )
         {
-            var graphics = e.Graphics;
-            using (var font = new Font ("Arial", 8))
-            using (Brush brush = new SolidBrush (Color.Black))
-            {
-                graphics.DrawString ("Not implemented", font, brush, 0, 0);
-            }
+            var graphics = eventArgs.Graphics;
+            using var font = new Font ("Arial", 8);
+            using Brush brush = new SolidBrush (Color.Black);
+            graphics.DrawString ("Not implemented", font, brush, 0, 0);
         }
 
         /// <inheritdoc />
