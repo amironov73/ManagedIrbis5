@@ -52,7 +52,7 @@ public abstract class AtomNode
         )
     {
         // по умолчанию узлы не поддерживают присваивание
-        throw new NotSupportedException();
+        throw new NotSupportedException ($"Assignment in {GetType().FullName}");
     }
 
     #endregion

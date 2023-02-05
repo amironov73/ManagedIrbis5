@@ -12,7 +12,9 @@
 #region Using directives
 
 using System;
+using System.IO;
 
+using AM.Kotik.Ast;
 using AM.Text;
 
 #endregion
@@ -113,6 +115,25 @@ internal sealed class IncrementNode
         }
 
         return result;
+    }
+
+    #endregion
+
+    #region AstNode members
+
+    /// <inheritdoc cref="AstNode.DumpHierarchyItem(string?,int,System.IO.TextWriter)"/>
+    internal override void DumpHierarchyItem
+        (
+            string? name,
+            int level,
+            TextWriter writer
+        )
+    {
+        base.DumpHierarchyItem (name, level, writer);
+
+        _target.DumpHierarchyItem ("Target", level + 1, writer);
+        DumpHierarchyItem ("Operation", level + 1, writer, _operation);
+        DumpHierarchyItem ("Prefix", level + 1, writer, _prefix.ToInvariantString());
     }
 
     #endregion
