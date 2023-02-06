@@ -280,13 +280,32 @@ public sealed class Grammar
         var awaitOperator = Expression.After (Reserved ("await"))
             .Map (x => (AtomNode)new AwaitNode (x));
 
+        var letClause = Parser.Chain
+            (
+                Identifier.After (Reserved ("let")),
+                Expression.After (Term ("=")),
+                (varName, expr) => new LinqNode.LetClause (varName, expr)
+            );
+        
         var fromClause = Parser.Chain
             (
                 Identifier.After (Reserved ("from")),
                 Atom.After (Term ("in")),
-                (varName, sequence) => new LinqNode.FromClause (varName, sequence)
+                letClause.Optional(),
+                (varName, sequence, letClause_) =>
+                    new LinqNode.FromClause (varName, sequence, letClause_)
             );
-        
+
+        var joinClause = Parser.Chain
+            (
+                Identifier.After (Reserved ("join")),
+                Atom.After (Term ("in")),
+                Atom.After (Reserved ("on")),
+                Atom.After (Reserved ("equals")),
+                (varName, sequence, on, equals) => 
+                    new LinqNode.JoinClause (varName, sequence, on, equals)
+            );
+
         var orderBy = Parser.Chain
             (
                 Expression.After (Reserved ("orderby")),
@@ -305,12 +324,13 @@ public sealed class Grammar
         var linq = Parser.Chain
             (
                 fromClause.Repeated (minCount: 1),
+                joinClause.Repeated (minCount: 0),
                 Expression.After (Reserved ("where")).Optional(),
                 orderBy.Optional(),
                 groupBy.Optional(),
                 Expression.After (Reserved ("select")).Optional(),
-                (fromClauses, whereClause, orderClause, groupClause, selectClause) =>
-                    (AtomNode) new LinqNode (fromClauses, whereClause, orderClause, selectClause, groupClause)
+                (fromClauses, join_, whereClause, orderClause, groupClause, selectClause) =>
+                    (AtomNode) new LinqNode (fromClauses, join_, whereClause, orderClause, selectClause, groupClause)
             )
             .Labeled ("Linq");
 

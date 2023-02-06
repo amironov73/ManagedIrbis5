@@ -95,16 +95,16 @@ public sealed class TokenizerSettings
             "abstract", "and", "as", "async", "await", "base", "bool", "break",
             "by", "byte", "case", "catch", "char", "checked", "class", "const",
             "continue", "decimal", "default", "delegate", "descending", "do",
-            "double", "else", "enum", "event", "explicit", "extern", "false",
-            "finally", "fixed", "float", "for", "foreach", "from", "func", "goto",
-            "group", "if", "implicit", "in", "int", "interface", "internal", "is",
-            "lambda", "local", "lock", "long", "namespace", "new", "null", "object",
-            "operator", "or", "orderby", "out", "override", "params", "private",
-            "protected", "public", "readonly", "ref", "return", "sbyte", "sealed",
-            "select", "short", "sizeof", "stackalloc", "static", "string", "struct",
-            "switch", "this", "throw", "true", "try", "typeof", "uint", "ulong",
-            "unchecked", "unsafe", "ushort", "using", "virtual", "void", "volatile",
-            "where", "while", "with"
+            "double", "else", "enum", "equals", "event", "explicit", "extern",
+            "false", "finally", "fixed", "float", "for", "foreach", "from", "func",
+            "goto", "group", "if", "implicit", "in", "int", "interface", "internal",
+            "is", "join", "lambda", "let", "local", "lock", "long", "namespace",
+            "new", "null", "object", "on", "operator", "or", "orderby", "out",
+            "override", "params", "private", "protected", "public", "readonly", "ref",
+            "return", "sbyte", "sealed", "select", "short", "sizeof", "stackalloc",
+            "static", "string", "struct", "switch", "this", "throw", "true", "try",
+            "typeof", "uint", "ulong", "unchecked", "unsafe", "ushort", "using",
+            "virtual", "void", "volatile", "where", "while", "with"
         };
     }
 

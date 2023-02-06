@@ -13,6 +13,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 using AM.Kotik.Ast;
@@ -26,6 +27,7 @@ namespace AM.Kotik.Barsik.Ast;
 /*
 
   from score in scores //required
+  let len = score.Length // optional
   where score > 80 // optional
   orderby score // optional
   select score; //must end with select or group
@@ -41,6 +43,12 @@ namespace AM.Kotik.Barsik.Ast;
   from b in secondSequence
   select a + b;
 
+  соединение
+
+  from category in categories
+  join product in products on category.Id equals product.CategoryId
+  select new { .Category = category.Id; .Product = product.Name }
+
  */
 
 /// <summary>
@@ -51,7 +59,64 @@ internal sealed class LinqNode
 {
     #region NestedClasses
 
+    internal sealed class LetClause
+        : AstNode
+    {
+        #region Properties
+
+        /// <summary>
+        /// Имя переменной.
+        /// </summary>
+        public string VariableName { get; }
+        
+        /// <summary>
+        /// Выражение, присваиваемое переменной.
+        /// </summary>
+        public AtomNode Expression { get; }
+
+        #endregion
+
+        #region Construction
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        public LetClause
+            (
+                string variableName, 
+                AtomNode expression
+            )
+        {
+            Sure.NotNullNorEmpty (variableName);
+            Sure.NotNull (expression);
+            
+            VariableName = variableName;
+            Expression = expression;
+        }
+
+        #endregion
+
+        #region AstNode members
+
+        /// <inheritdoc cref="AstNode.DumpHierarchyItem(string?,int,System.IO.TextWriter)"/>
+        internal override void DumpHierarchyItem 
+            (
+                string? name, 
+                int level, 
+                TextWriter writer
+            )
+        {
+            base.DumpHierarchyItem (name, level, writer);
+            
+            DumpHierarchyItem ("Variable", level + 1, writer, VariableName);
+            Expression.DumpHierarchyItem ("Expression", level + 1, writer);
+        }
+
+        #endregion
+    }
+    
     internal sealed class FromClause
+        : AstNode
     {
         #region Proprerties
 
@@ -64,6 +129,11 @@ internal sealed class LinqNode
         /// Последовательность.
         /// </summary>
         public AtomNode Sequence { get; }
+        
+        /// <summary>
+        /// Клауза let.
+        /// </summary>
+        public LetClause? LetClause { get; }
 
         #endregion
 
@@ -74,12 +144,105 @@ internal sealed class LinqNode
         /// </summary>
         public FromClause
             (
-                string variableName, 
-                AtomNode sequence
+                string variableName,
+                AtomNode sequence,
+                LetClause letClause
+            )
+        {
+            Sure.NotNullNorEmpty (variableName);
+            Sure.NotNull (sequence);
+            
+            VariableName = variableName;
+            Sequence = sequence;
+            LetClause = letClause;
+        }
+
+        #endregion
+
+        #region AstNode members
+
+        /// <inheritdoc cref="AstNode.DumpHierarchyItem(string?,int,System.IO.TextWriter)"/>
+        internal override void DumpHierarchyItem 
+            (
+                string? name, 
+                int level, 
+                TextWriter writer
+            )
+        {
+            base.DumpHierarchyItem (name, level, writer);
+            
+            DumpHierarchyItem ("Variable", level + 1, writer, VariableName);
+            Sequence.DumpHierarchyItem ("Sequence", level + 1, writer);
+            LetClause?.DumpHierarchyItem ("Let", level + 1, writer);
+        }
+
+        #endregion
+    }
+
+    internal sealed class JoinClause
+        : AstNode
+    {
+        #region Properties
+
+        /// <summary>
+        /// Имя переменной.
+        /// </summary>
+        public string VariableName { get; }
+        
+        /// <summary>
+        /// Последовательность.
+        /// </summary>
+        public AtomNode Sequence { get; }
+        
+        /// <summary>
+        /// Предложение on.
+        /// </summary>
+        public AtomNode On { get; }
+        
+        /// <summary>
+        /// Предложение equals.
+        /// </summary>
+        public AtomNode EqualsTo { get; }
+
+        #endregion
+
+        #region Construction
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        public JoinClause
+            (
+                string variableName,
+                AtomNode sequence,
+                AtomNode on,
+                AtomNode equals
             )
         {
             VariableName = variableName;
             Sequence = sequence;
+            On = on;
+            EqualsTo = equals;
+        }
+
+        #endregion
+
+        #region AstNode members
+
+        /// <inheritdoc cref="AstNode.DumpHierarchyItem(string?,int,System.IO.TextWriter)"/>
+        internal override void DumpHierarchyItem 
+            (
+                string? name, 
+                int level, 
+                TextWriter writer
+            )
+        {
+            base.DumpHierarchyItem (name, level, writer);
+            
+            DumpHierarchyItem ("Variable", level + 1, writer, VariableName);
+            Sequence.DumpHierarchyItem ("Sequence", level + 1, writer);
+            On.DumpHierarchyItem ("On", level + 1, writer);
+            EqualsTo.DumpHierarchyItem ("Equals", level + 1, writer);
         }
 
         #endregion
@@ -171,9 +334,28 @@ internal sealed class LinqNode
         }
 
         #endregion
+
+        #region AstNode members
+
+        /// <inheritdoc cref="AstNode.DumpHierarchyItem(string?,int,System.IO.TextWriter)"/>
+        internal override void DumpHierarchyItem 
+            (
+                string? name, 
+                int level, 
+                TextWriter writer
+            )
+        {
+            base.DumpHierarchyItem (name, level, writer);
+            
+            Expression.DumpHierarchyItem ("Expression", level + 1, writer);
+            DumpHierarchyItem ("Descending", level + 1, writer, Descending.ToInvariantString());
+        }
+
+        #endregion
     }
 
     internal sealed class GroupClause
+        : AstNode
     {
         #region Properties
 
@@ -196,6 +378,24 @@ internal sealed class LinqNode
         }
 
         #endregion
+        
+        #region AstNode members
+
+        /// <inheritdoc cref="AstNode.DumpHierarchyItem(string?,int,System.IO.TextWriter)"/>
+        internal override void DumpHierarchyItem 
+            (
+                string? name, 
+                int level, 
+                TextWriter writer
+            )
+        {
+            base.DumpHierarchyItem (name, level, writer);
+            
+            Expression.DumpHierarchyItem ("Expression", level + 1, writer);
+            By.DumpHierarchyItem ("By", level + 1, writer);
+        }
+
+        #endregion
     }
 
     #endregion
@@ -208,6 +408,7 @@ internal sealed class LinqNode
     public LinqNode
         (
             IList<FromClause> fromClauses,
+            IList<JoinClause> joinClauses,
             AtomNode? whereClause,
             OrderClause? orderClause,
             AtomNode? selectClause,
@@ -232,6 +433,7 @@ internal sealed class LinqNode
         }
 
         _fromClauses = fromClauses;
+        _joinClauses = joinClauses;
         _whereClause = whereClause;
         _orderClause = orderClause;
         _selectClause = selectClause;
@@ -242,7 +444,8 @@ internal sealed class LinqNode
 
     #region Private members
 
-    private readonly IList<FromClause> _fromClauses; 
+    private readonly IList<FromClause> _fromClauses;
+    private readonly IList<JoinClause> _joinClauses;
     private readonly AtomNode? _whereClause;
     private readonly OrderClause? _orderClause;
     private readonly AtomNode? _selectClause;
@@ -260,13 +463,15 @@ internal sealed class LinqNode
     {
         context = context.CreateChildContext();
 
-        var rank = _fromClauses.Count;
+        var fromRank = _fromClauses.Count;
+        var joinRank = _joinClauses.Count;
+        var rank = fromRank + joinRank;
         var variables = context.Variables;
         var sequences = new List<IReadOnlyList<dynamic?>>();
         var interpreter = context.Interpreter.ThrowIfNull();
         foreach (var clause in _fromClauses)
         {
-            for (var i = 0; i < rank; i++)
+            for (var i = 0; i < fromRank; i++)
             {
                 var variableName = _fromClauses[i].VariableName;
 
@@ -283,7 +488,46 @@ internal sealed class LinqNode
                 variables[variableName] = null;
             }
 
-            var computed = (IEnumerable<dynamic?>)clause.Sequence.Compute (context)!;
+            var computed = (IEnumerable<dynamic?>) clause.Sequence.Compute (context)!;
+            IReadOnlyList<dynamic?> sequence;
+            if (computed is IReadOnlyList<dynamic?> readOnlyList)
+            {
+                sequence = readOnlyList;
+            }
+            else
+            {
+                sequence = computed.ToList();
+            }
+
+            if (clause.LetClause is { } letClause)
+            {
+                var variableName = letClause.VariableName;
+                variables[variableName] = letClause.Expression.Compute (context);
+            }
+            
+            sequences.Add (sequence);
+        }
+        
+        foreach (var clause in _joinClauses)
+        {
+            for (var i = 0; i < joinRank; i++)
+            {
+                var variableName = _joinClauses[i].VariableName;
+
+                // переменная не должна упоминаться в родительских контекстах
+                Sure.AssertState (!context.Parent!.TryGetVariable (variableName, out _));
+
+                // это должно быть lvalue
+                Sure.AssertState (interpreter.EnsureVariableCanBeAssigned (context, variableName));
+
+                // имя переменной не должно повторяться в текущем контексте
+                var count = _fromClauses.Count (x => x.VariableName == variableName);
+                Sure.AssertState (count == 1);
+
+                variables[variableName] = null;
+            }
+
+            var computed = (IEnumerable<dynamic?>) clause.Sequence.Compute (context)!;
             IReadOnlyList<dynamic?> sequence;
             if (computed is IReadOnlyList<dynamic?> readOnlyList)
             {
@@ -296,6 +540,8 @@ internal sealed class LinqNode
 
             sequences.Add (sequence);
         }
+
+        // TODO сделать join
 
         // in и where (если есть)
         var temporary = new List<IReadOnlyList<dynamic?>>();
