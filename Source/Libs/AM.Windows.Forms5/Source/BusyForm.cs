@@ -4,8 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 /* BusyForm.cs -- диалог "ИРБИС занят, подождите"
  * Ars Magna project, http://arsmagna.ru
@@ -20,67 +18,65 @@ using System.Windows.Forms;
 
 #nullable enable
 
-namespace ManagedIrbis.WinForms
+namespace ManagedIrbis.WinForms;
+
+/// <summary>
+/// Диалог "ИРБИС занят, подождите"
+/// </summary>
+public partial class BusyForm
+    : Form
 {
+    #region Events
+
     /// <summary>
-    /// Диалог "ИРБИС занят, подождите"
+    /// Break button pressed.
     /// </summary>
-    public partial class BusyForm
-        : Form
+    public event EventHandler? BreakPressed;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public BusyForm()
     {
-        #region Events
-
-        /// <summary>
-        /// Break button pressed.
-        /// </summary>
-        public event EventHandler? BreakPressed;
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public BusyForm()
-        {
-            InitializeComponent();
-        }
-
-        #endregion
-
-        #region Private members
-
-        private void _breakButton_Click(object sender, EventArgs e)
-            => BreakPressed?.Invoke(this, e);
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Set form title.
-        /// </summary>
-        public void SetTitle
-            (
-                string title
-            )
-        {
-            Text = title;
-        }
-
-        /// <summary>
-        /// Set form message.
-        /// </summary>
-        public void SetMessage
-            (
-                string message
-            )
-        {
-            _messageLabel.Text = message;
-        }
-
-        #endregion
-
+        InitializeComponent();
     }
+
+    #endregion
+
+    #region Private members
+
+    private void _breakButton_Click (object sender, EventArgs e)
+        => BreakPressed?.Invoke (this, e);
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Установка заголовка.
+    /// </summary>
+    public void SetTitle
+        (
+            string title
+        )
+    {
+        Text = title;
+    }
+
+    /// <summary>
+    /// Установка сообщения.
+    /// </summary>
+    public void SetMessage
+        (
+            string message
+        )
+    {
+        _messageLabel.Text = message;
+    }
+
+    #endregion
 }

@@ -77,7 +77,7 @@ public sealed class BusyManager
     #region Construction
 
     /// <summary>
-    /// Конструкторs.
+    /// Конструктор.
     /// </summary>
     public BusyManager
         (

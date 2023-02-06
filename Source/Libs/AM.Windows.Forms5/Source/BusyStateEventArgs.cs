@@ -2,14 +2,10 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
-/* BusyStateEventArgs.cs --
+/* BusyStateEventArgs.cs -- аргументы для события "занято"
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,30 +19,44 @@ using AM.Threading;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Аргументы для события "занято".
+/// </summary>
+public sealed class BusyStateEventArgs
+    : EventArgs
 {
+    #region Properties
+
     /// <summary>
-    ///
+    /// Состояние.
     /// </summary>
-    public sealed class BusyStateEventArgs
-        : EventArgs
+    public BusyState State { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public BusyStateEventArgs 
+        (
+            BusyState state
+        )
     {
-        #region Properties
-
-        /// <summary>
-        /// State.
-        /// </summary>
-        public BusyState State { get; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public BusyStateEventArgs ( BusyState state ) => State = state;
-
-        #endregion
+        Sure.NotNull (state);
+        
+        State = state;
     }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString() => State.ToString();
+
+    #endregion
 }
