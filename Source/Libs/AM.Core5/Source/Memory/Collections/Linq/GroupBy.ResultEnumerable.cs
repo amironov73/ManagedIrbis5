@@ -74,7 +74,11 @@ internal sealed class GroupedResultEnumerable<TSource, TKey, TResult>
 
     private void Dispose()
     {
-        if (_count == 0) return;
+        if (_count == 0)
+        {
+            return;
+        }
+
         _count--;
 
         if (_count == 0)
@@ -95,9 +99,11 @@ internal sealed class GroupedResultEnumerable<TSource, TKey, TResult>
         private GroupedResultEnumerable<TSource, TKey, TResult> _parent = default!;
         private IPoolingEnumerator<KeyValuePair<TKey, PoolingGrouping>> _enumerator = default!;
 
-        public GroupedResultEnumerator Init (
-            GroupedResultEnumerable<TSource, TKey, TResult> parent,
-            PoolingDictionary<TKey, PoolingGrouping> src)
+        public GroupedResultEnumerator Init 
+            (
+                GroupedResultEnumerable<TSource, TKey, TResult> parent,
+                PoolingDictionary<TKey, PoolingGrouping> src
+            )
         {
             _src = src;
             _parent = parent;
@@ -115,9 +121,12 @@ internal sealed class GroupedResultEnumerable<TSource, TKey, TResult>
             }
 
             // cleanup collection
-            _src?.Dispose();
-            Pool<PoolingDictionary<TKey, PoolingGrouping>>.Return (_src);
-            _src = default!;
+            if (_src != null!)
+            {
+                _src.Dispose();
+                Pool<PoolingDictionary<TKey, PoolingGrouping>>.Return (_src);
+                _src = default!;
+            }
 
             _enumerator?.Dispose();
             _enumerator = default!;
@@ -163,9 +172,12 @@ internal sealed class GroupedResultEnumerable<TSource, TKey, TResult>
 
         public void Dispose()
         {
-            _elements?.Dispose();
-            Pool<PoolingList<TSource>>.Return (_elements);
-            _elements = default!;
+            if (_elements != null!)
+            {
+                _elements.Dispose();
+                Pool<PoolingList<TSource>>.Return (_elements);
+                _elements = default!;
+            }
 
             Key = default!;
         }

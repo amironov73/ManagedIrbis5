@@ -59,9 +59,14 @@ internal class ExceptExprEnumerable<T> : IPoolingEnumerable<T>
         if (_count == 0)
         {
             _src = default!;
-            _except?.Dispose();
-            Pool<PoolingDictionary<T, int>>.Return (_except);
-            _except = default!;
+
+            if (_except != null!)
+            {
+                _except.Dispose();
+                Pool<PoolingDictionary<T, int>>.Return (_except);
+                _except = default!;
+            }
+
             Pool<ExceptExprEnumerable<T>>.Return (this);
         }
     }

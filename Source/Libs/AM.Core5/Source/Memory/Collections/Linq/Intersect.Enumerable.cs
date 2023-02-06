@@ -60,8 +60,11 @@ internal class IntersectExprEnumerable<T>
         if (_count == 0)
         {
             _src = default!;
-            _second?.Dispose();
-            Pool<PoolingDictionary<T, int>>.Return (_second);
+            if (_second != null!)
+            {
+                _second.Dispose();
+                Pool<PoolingDictionary<T, int>>.Return (_second);
+            }
 
             _second = default!;
             Pool<IntersectExprEnumerable<T>>.Return (this);
@@ -114,9 +117,12 @@ internal class IntersectExprEnumerable<T>
             _src?.Dispose();
             _src = default!;
 
-            _alreadyDoneItems?.Dispose();
-            Pool<PoolingDictionary<T, int>>.Return (_alreadyDoneItems);
-            _alreadyDoneItems = default!;
+            if (_alreadyDoneItems != null!)
+            {
+                _alreadyDoneItems.Dispose();
+                Pool<PoolingDictionary<T, int>>.Return (_alreadyDoneItems);
+                _alreadyDoneItems = default!;
+            }
 
             _parent?.Dispose();
             _parent = default!;

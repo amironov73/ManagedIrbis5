@@ -30,7 +30,7 @@ public static class ControlUtility
     #region Public methods
 
     /// <summary>
-    /// Find focused control.
+    /// Нахождение контрола, который имеет фокус ввода.
     /// </summary>
     /// <remarks>Borrowed from StackOverflow:
     /// http://stackoverflow.com/questions/435433/what-is-the-preferred-way-to-find-focused-control-in-winforms-app
@@ -51,10 +51,13 @@ public static class ControlUtility
     }
 
     /// <summary>
-    /// Invoke specified <paramref name="action"/>
-    /// strictly in UI thread for specified
-    /// <paramref name="control"/>.
+    /// Вызов указанного действия <paramref name="action"/>
+    /// строго в потоке пользовательского интерфейса
+    /// для указанного контрола <paramref name="control"/>.
     /// </summary>
+    /// <param name="control">Контрол, для которого
+    /// выполняется действие.</param>
+    /// <param name="action">Требуемое действие.</param>
     public static void InvokeIfRequired
         (
             this Control? control,

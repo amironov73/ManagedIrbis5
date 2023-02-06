@@ -56,11 +56,10 @@ internal sealed class GroupedEnumerable<TSource, TKey, TElement>
         var tmpDict = Pool<PoolingDictionary<TKey, PoolingGrouping>>.Get()
             .Init (0, _comparer);
 
-        PoolingGrouping grp;
         foreach (var item in _source)
         {
             var key = _keySelector (item);
-            if (!tmpDict.TryGetValue (key, out grp))
+            if (!tmpDict.TryGetValue (key, out var grp))
             {
                 tmpDict[key] = grp = Pool<PoolingGrouping>.Get().Init (key);
             }
@@ -114,15 +113,24 @@ internal sealed class GroupedEnumerable<TSource, TKey, TElement>
             }
 
             // cleanup collection
-            _src?.Dispose();
-            Pool<PoolingDictionary<TKey, PoolingGrouping>>.Return (_src);
-            _src = default!;
+            if (_src != null!)
+            {
+                _src.Dispose();
+                Pool<PoolingDictionary<TKey, PoolingGrouping>>.Return (_src);
+                _src = default!;
+            }
 
-            _enumerator?.Dispose();
-            _enumerator = default!;
+            if (_enumerator != null!)
+            {
+                _enumerator.Dispose();
+                _enumerator = default!;
+            }
 
-            _parent?.Dispose();
-            _parent = default!;
+            if (_parent != null!)
+            {
+                _parent.Dispose();
+                _parent = default!;
+            }
 
             Pool<PoolingGroupingEnumerator>.Return (this);
         }
@@ -157,7 +165,7 @@ internal sealed class GroupedEnumerable<TSource, TKey, TElement>
         /// <summary>
         ///
         /// </summary>
-        public TKey Key { get; private set; }
+        public TKey Key { get; private set; } = default!;
 
         public void Dispose()
         {

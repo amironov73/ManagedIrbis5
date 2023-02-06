@@ -51,9 +51,13 @@ internal class ReverseExprEnumerable<T>
         _count--;
         if (_count == 0)
         {
-            _src?.Dispose();
-            Pool<PoolingList<T>>.Return (_src);
-            _src = default!;
+            if (_src != null!)
+            {
+                _src.Dispose();
+                Pool<PoolingList<T>>.Return (_src);
+                _src = default!;
+            }
+
             Pool<ReverseExprEnumerable<T>>.Return (this);
         }
     }

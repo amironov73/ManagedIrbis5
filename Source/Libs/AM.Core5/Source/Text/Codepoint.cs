@@ -552,7 +552,7 @@ public readonly struct Codepoint
         return chars.SequenceCompareTo (other.AsSpan());
     }
 
-    /// <inheritdoc cref="IEquatable{T}.Equals(T?)"/>
+    /// <inheritdoc cref="IEquatable{T}.Equals(T)"/>
     public bool Equals (char other)
     {
         Span<ushort> words = stackalloc ushort[2];

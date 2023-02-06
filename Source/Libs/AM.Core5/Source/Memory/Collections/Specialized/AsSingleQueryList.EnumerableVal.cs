@@ -84,8 +84,12 @@ public static partial class AsSingleQueryList
             public void Dispose()
             {
                 _enumerator?.Dispose();
-                _src?.Dispose();
-                Pool<PoolingList<T>>.Return (_src);
+                if (_src is not null)
+                {
+                    _src.Dispose();
+                    Pool<PoolingList<T>>.Return (_src);
+                }
+                
                 Pool<EnumeratorVal>.Return (this);
                 _src = default;
             }
