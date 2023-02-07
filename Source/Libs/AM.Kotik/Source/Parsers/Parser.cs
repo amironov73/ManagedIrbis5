@@ -870,12 +870,11 @@ public static class Parser
     /// </summary>
     public static TraceParser<TResult> Trace<TResult>
         (
-            this Parser<TResult> parser,
-            string? message = null
+            this Parser<TResult> parser
         )
         where TResult: class
     {
-        return new TraceParser<TResult> (parser, message);
+        return new TraceParser<TResult> (parser);
     }
 
     #endregion

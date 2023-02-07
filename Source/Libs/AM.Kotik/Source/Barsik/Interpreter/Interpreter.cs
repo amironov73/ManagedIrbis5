@@ -61,7 +61,7 @@ public sealed class Interpreter
     /// Дефайны.
     /// </summary>
     public Dictionary<string, dynamic?> Defines { get; }
-    
+
     /// <summary>
     /// Произвольные пользовательские данные.
     /// </summary>
@@ -196,12 +196,12 @@ public sealed class Interpreter
         {
             return false;
         }
-        
+
         if (Defines.ContainsKey (variableName))
         {
             return false;
         }
-        
+
         if (context.FindFunction (variableName, out _))
         {
             return false;
@@ -209,8 +209,8 @@ public sealed class Interpreter
 
         return true;
     }
-    
-    private static void HighlightToConsole 
+
+    private static void HighlightToConsole
         (
             string sourceCode,
             Tokenizer tokenizer
@@ -233,7 +233,7 @@ public sealed class Interpreter
         Console.ForegroundColor = saveColor;
     }
 
-    private static void HighlightToHtml 
+    private static void HighlightToHtml
         (
             string sourceCode,
             TextWriter output,
@@ -355,7 +355,7 @@ public sealed class Interpreter
         )
     {
         Sure.NotNull (args);
-        
+
         var interpreter = CreateInterpreter (args);
         configure?.Invoke (interpreter);
 
@@ -379,10 +379,10 @@ public sealed class Interpreter
             {
                 HighlightFile (file, interpreter.Settings.Highlight);
             }
-            
+
             return 0;
         }
-        
+
         ConsoleDebugger? debugger = null;
         if (interpreter.Settings.StartDebugger)
         {
@@ -482,12 +482,14 @@ public sealed class Interpreter
     {
         Sure.NotNull (sourceCode);
 
+        var traceOutput = Settings.ReportParsedStatements ? Output : null;
         var program = Settings.Grammar.ParseProgram
             (
                 sourceCode,
                 Settings.Tokenizer,
                 requireEnd,
                 Settings.DumpTokens,
+                traceOutput,
                 ParsingDebugOutput
             );
         if (Settings.DumpAst)
@@ -787,7 +789,7 @@ public sealed class Interpreter
                 return;
             }
         }
-        
+
         // пытаемся загрузить файл рядом со скриптом
         if (Context.TryGetVariable ("__DIR__", out var scriptDir))
         {

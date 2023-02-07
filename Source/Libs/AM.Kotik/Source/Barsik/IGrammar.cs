@@ -87,6 +87,7 @@ public interface IGrammar
             Tokenizer tokenizer,
             bool requireEnd = true,
             bool dumpTokens = false,
+            TextWriter? traceOutput = null,
             TextWriter? debugOutput = null
         );
 

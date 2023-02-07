@@ -125,13 +125,13 @@ public sealed class InterpreterSettings
     /// </summary>
     [JsonIgnore]
     public Tokenizer Tokenizer { get; set; }
-    
+
     /// <summary>
     /// Нужно раскрасить исходный код скрипта?
     /// </summary>
     [JsonIgnore]
     public string? Highlight { get; set; }
-    
+
     /// <summary>
     /// Режим Barsor.
     /// </summary>
@@ -141,9 +141,15 @@ public sealed class InterpreterSettings
     /// <summary>
     /// Выводить дамп токенов перед началом разбора программы.
     /// </summary>
-    [JsonIgnore]
+    [JsonPropertyName ("dump-tokens")]
     public bool DumpTokens { get; set; }
-    
+
+    /// <summary>
+    /// Отчитываться об успешно разобранных стейтментах.
+    /// </summary>
+    [JsonPropertyName ("report-parsed-statements")]
+    public bool ReportParsedStatements { get; set; }
+
     /// <summary>
     /// Пути для поиска суб-скриптов.
     /// </summary>
@@ -284,6 +290,10 @@ public sealed class InterpreterSettings
             else if (arg is "--dump-tokens")
             {
                 result.DumpTokens = true;
+            }
+            else if (arg is "--report-statements")
+            {
+                result.ReportParsedStatements = true;
             }
             else if (arg is "--path")
             {

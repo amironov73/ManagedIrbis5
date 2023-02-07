@@ -286,7 +286,7 @@ public sealed class Grammar
                 Expression.After (Term ("=")),
                 (varName, expr) => new LinqNode.LetClause (varName, expr)
             );
-        
+
         var fromClause = Parser.Chain
             (
                 Identifier.After (Reserved ("from")),
@@ -302,7 +302,7 @@ public sealed class Grammar
                 Atom.After (Term ("in")),
                 Atom.After (Reserved ("on")),
                 Atom.After (Reserved ("equals")),
-                (varName, sequence, on, equals) => 
+                (varName, sequence, on, equals) =>
                     new LinqNode.JoinClause (varName, sequence, on, equals)
             );
 
@@ -669,7 +669,6 @@ public sealed class Grammar
             )
         .Labeled ("Directive");
 
-
         Statements.Add (labelStatement); // метка должна быть до любого стейтмента!
         Statements.Add (simpleStatement);
         Statements.Add (forStatement);
@@ -738,7 +737,7 @@ public sealed class Grammar
                 x => (StatementBase)new BlockNode (x.Line, new[] { x })
             );
 
-        // блок стейтментов как в фигурных скобках, так и в виде единственного стейтмента    
+        // блок стейтментов как в фигурных скобках, так и в виде единственного стейтмента
         Block.Value = Parser.OneOf
             (
                 CurlyBlock,
@@ -746,12 +745,9 @@ public sealed class Grammar
             )
             .Labeled ("Block");
 
-        GenericStatement.Value = Parser.OneOf (Statements);
+        GenericStatement.Value = Parser.OneOf (Statements).Trace();
 
-        Program  = new RepeatParser<StatementBase>
-                (
-                    GenericStatement
-                )
+        Program  = new RepeatParser<StatementBase> (GenericStatement)
             .Map (x => new ProgramNode (x))
             .Labeled ("Program");
     }
@@ -803,6 +799,7 @@ public sealed class Grammar
             Tokenizer tokenizer,
             bool requireEnd = true,
             bool dumpTokens = false,
+            TextWriter? traceOutput = null,
             TextWriter? debugOutput = null
         )
     {
@@ -813,7 +810,8 @@ public sealed class Grammar
         {
             KotikUtility.DumpTokens (tokens, debugOutput);
         }
-        var state = new ParseState (tokens) { DebugOutput = debugOutput };
+
+        var state = new ParseState (tokens, traceOutput) { DebugOutput = debugOutput };
         var program = Program;
         if (requireEnd)
         {

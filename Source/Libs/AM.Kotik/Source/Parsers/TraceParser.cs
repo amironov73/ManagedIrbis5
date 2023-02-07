@@ -33,11 +33,9 @@ public sealed class TraceParser<TResult>
     /// </summary>
     public TraceParser
         (
-            Parser<TResult> parser,
-            string? message
+            Parser<TResult> parser
         )
     {
-        _message = message;
         _parser = parser;
     }
 
@@ -45,7 +43,6 @@ public sealed class TraceParser<TResult>
 
     #region Private members
 
-    private readonly string? _message;
     private readonly Parser<TResult> _parser;
 
     #endregion
@@ -61,20 +58,14 @@ public sealed class TraceParser<TResult>
     {
         result = default;
 
-        if (!string.IsNullOrEmpty (_message))
-        {
-            state.Trace (_message);
-        }
-
         state.DebugCurrentPosition (this);
         if (!_parser.TryParse (state, out var temporary))
         {
-            state.Trace ("Failure");
             return false;
         }
 
+        state.Trace (temporary.ToVisibleString());
         result = temporary;
-        state.Trace ($"Success: {temporary}");
 
         return true;
     }

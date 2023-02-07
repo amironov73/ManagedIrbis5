@@ -77,6 +77,12 @@ public sealed class ParseState
     #region Properties
 
     /// <summary>
+    /// Произвольные пользовательские данные,
+    /// организованные в виде словаря.
+    /// </summary>
+    public Dictionary<string, object?> UserData { get; }
+
+    /// <summary>
     /// Возвращает общее количество обработанных токенов.
     /// Проще говоря, текущее абсолютное смещение от начала
     /// входного потока.
@@ -115,6 +121,7 @@ public sealed class ParseState
     {
         Sure.NotNull (tokens);
 
+        UserData = new ();
         _tokens = tokens.ToArray();
         _traceOutput = traceOutput;
     }
