@@ -1,14 +1,14 @@
-﻿t = true;
-f = false;
+﻿t = true
+f = false
 
-println (t, " ", f);
+println (t, " ", f)
 
 if (t)
 {
-    println ("Can be");
+    println ("Can be")
 }
 
 if (f)
 {
-    println ("Can't be");
+    println ("Can't be")
 }

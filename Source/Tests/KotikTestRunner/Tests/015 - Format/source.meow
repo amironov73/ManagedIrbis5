@@ -1,5 +1,5 @@
-﻿a = 1;
-b = 2;
-c = a + b;
-d = format ("{0} + {1} = {2}", a, b, c);
-println (d);
+﻿a = 1
+b = 2
+c = a + b
+d = format ("{0} + {1} = {2}", a, b, c)
+println (d)

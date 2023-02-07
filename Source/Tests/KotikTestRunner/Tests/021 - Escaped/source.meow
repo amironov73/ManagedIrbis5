@@ -1,2 +1,2 @@
-﻿x = "hello\t,\nworld";
-print (x);
+﻿x = "hello\t,\nworld"
+print (x)

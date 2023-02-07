@@ -10,7 +10,7 @@ func sum (a, b, c)
     result = a + b + c
     println ("Sum is ", result)
 
-    return result;
+    return result
 }
 
 println ("Hello from main")

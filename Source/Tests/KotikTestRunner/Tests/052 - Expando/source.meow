@@ -1,4 +1,8 @@
-﻿x = new { .hello = "world"; .barsik = "cool" }
+﻿x = new 
+{ 
+  .hello = "world"; // точка с запятой тут нужна!
+  .barsik = "cool" 
+}
 
 println (x.barsik, ", ", x.hello)
 println (x.nosuch)

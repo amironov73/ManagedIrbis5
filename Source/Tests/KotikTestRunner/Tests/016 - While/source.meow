@@ -1,12 +1,12 @@
-﻿println ("------");
+﻿println ("------")
 
-i = 0;
-j = 10;
+i = 0
+j = 10
 
 while (i < j)
 {
-    i = i + 1;
-    println (i);
+    i = i + 1
+    println (i)
 }
 
-println ("------");
+println ("------")
