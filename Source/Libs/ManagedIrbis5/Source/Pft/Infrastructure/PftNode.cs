@@ -43,7 +43,6 @@ namespace ManagedIrbis.Pft.Infrastructure
     /// <summary>
     /// AST item
     /// </summary>
-
     public class PftNode
         : IVerifiable,
         ICloneable
@@ -144,6 +143,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public PftNode()
         {
+            // пустое тело конструтора
         }
 
         /// <summary>

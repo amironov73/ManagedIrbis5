@@ -15,6 +15,7 @@
 using System;
 using System.IO;
 
+using AM.Kotik.Compilation;
 using AM.Runtime.Mere;
 
 #endregion
@@ -32,6 +33,42 @@ public abstract class AstNode
     #region Public methods
 
     /// <summary>
+    /// Прием посетителя.
+    /// </summary>
+    public virtual bool AcceptVisitor
+        (
+            AstVisitor visitor
+        )
+    {
+        Sure.NotNull (visitor);
+
+        return visitor.VisitNode (this);
+    }
+
+    /// <summary>
+    /// Сравнение с информацией об AST-узле.
+    /// Необходимо для автоматизированных тестов парсера.
+    /// </summary>
+    public virtual bool CompareTo
+        (
+            AstNodeInfo nodeInfo
+        )
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// Транспиляция узла в C#.
+    /// </summary>
+    public virtual void Compile
+        (
+            ScriptCompiler compiler
+        )
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <summary>
     /// Получение информации об AST-узле.
     /// </summary>
     public virtual AstNodeInfo GetNodeInfo()
@@ -40,7 +77,7 @@ public abstract class AstNode
     }
 
     #endregion
-    
+
     #region Internal methods
 
     /// <summary>
@@ -106,7 +143,7 @@ public abstract class AstNode
     }
 
     #endregion
-    
+
     #region Object members
 
     /// <inheritdoc cref="object.ToString"/>

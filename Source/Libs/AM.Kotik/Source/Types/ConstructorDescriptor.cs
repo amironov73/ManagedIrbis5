@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* MethodDescriptor.cs -- описание метода
+/* ConstructorDescriptor.cs -- описание конструктора
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -18,23 +18,14 @@ using AM.Text;
 
 #endregion
 
-#nullable enable
-
-namespace AM.Kotik;
-
-// TODO поддержать generic-методы
+namespace AM.Kotik.Types;
 
 /// <summary>
-/// Описание метода.
+/// Описание конструктора.
 /// </summary>
-public sealed class MethodDescriptor
+public sealed class ConstructorDescriptor
 {
     #region Properties
-
-    /// <summary>
-    /// Имя метода.
-    /// </summary>
-    public required string Name { get; init; }
 
     /// <summary>
     /// Аргументы.
@@ -48,15 +39,10 @@ public sealed class MethodDescriptor
     /// <inheritdoc cref="object.Equals(object?)"/>
     public override bool Equals
         (
-             object? obj
+            object? obj
         )
     {
-        if (obj is not MethodDescriptor other)
-        {
-            return false;
-        }
-
-        if (Name != other.Name)
+        if (obj is not ConstructorDescriptor other)
         {
             return false;
         }
@@ -86,7 +72,6 @@ public sealed class MethodDescriptor
     public override int GetHashCode()
     {
         var result = new HashCode();
-        result.Add (Name);
         if (!Arguments.IsNullOrEmpty())
         {
             foreach (var parameter in Arguments)
@@ -103,11 +88,11 @@ public sealed class MethodDescriptor
     {
         if (Arguments.IsNullOrEmpty())
         {
-            return $"{Name}()";
+            return $"Constructor()";
         }
 
         var builder = StringBuilderPool.Shared.Get();
-        builder.Append (Name);
+        builder.Append ("Constructor");
         builder.Append ('(');
         builder.AppendList (Arguments);
         builder.Append (')');
