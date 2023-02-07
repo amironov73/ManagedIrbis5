@@ -4,8 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable UnusedMember.Global
 
 /* ClipboardMonitor.cs -- следит за изменениями в буфере обмена
    Ars Magna project, http://arsmagna.ru */
@@ -37,7 +35,7 @@ public sealed class ClipboardMonitor
     #region Events
 
     /// <summary>
-    /// Clipboard contents changed.
+    /// Событие, возникающее при изменении данных в буфере обмена.
     /// </summary>
     public event EventHandler<ClipboardChangedEventArgs>? ClipboardChanged;
 

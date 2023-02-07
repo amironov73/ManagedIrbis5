@@ -2,11 +2,7 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 /* Clocks.cs -- simple analog clock control
  * Ars Magna project, http://arsmagna.ru
@@ -27,7 +23,7 @@ using System.Windows.Forms;
 namespace AM.Windows.Forms;
 
 /// <summary>
-/// Simple analog clock control.
+/// Простое управление аналоговыми часами.
 /// </summary>
 [ToolboxBitmap (typeof (Clocks), "Images.Clocks.bmp")]
 [System.ComponentModel.DesignerCategory ("Code")]
@@ -37,7 +33,7 @@ public sealed class Clocks
     #region Construction
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Clocks"/> class.
+    /// Конструктор по умолчанию.
     /// </summary>
     public Clocks()
     {
@@ -62,7 +58,7 @@ public sealed class Clocks
     void _timer_Tick
         (
             object? sender,
-            EventArgs e
+            EventArgs eventArgs
         )
     {
         Invalidate();
@@ -72,24 +68,10 @@ public sealed class Clocks
 
     #region Control members
 
-    /// <summary>
-    /// Gets the default size of the control.
-    /// </summary>
-    /// <value></value>
-    /// <returns>The default
-    /// <see cref="T:System.Drawing.Size"/>
-    /// of the control.</returns>
+    /// <inheritdoc cref="Control.DefaultSize"/>
     protected override Size DefaultSize => new (90, 90);
 
-    /// <summary>
-    /// Releases the unmanaged resources used by the
-    /// <see cref="T:System.Windows.Forms.Control"/>
-    /// and its child controls and optionally releases
-    /// the managed resources.
-    /// </summary>
-    /// <param name="disposing">true to release both
-    /// managed and unmanaged resources; false to release
-    /// only unmanaged resources.</param>
+    /// <inheritdoc cref="Control.Dispose(bool)"/>
     protected override void Dispose
         (
             bool disposing
@@ -99,10 +81,7 @@ public sealed class Clocks
         _timer.Dispose();
     }
 
-    /// <summary>
-    /// Performs the work of setting the specified
-    /// bounds of this control.
-    /// </summary>
+    /// <inheritdoc cref="Control.SetBoundsCore"/>
     protected override void SetBoundsCore
         (
             int x,
@@ -116,11 +95,7 @@ public sealed class Clocks
         base.SetBoundsCore (x, y, min, min, specified);
     }
 
-    /// <summary>
-    /// Raises the
-    /// <see cref="E:System.Windows.Forms.Control.Paint"/>
-    /// event.
-    /// </summary>
+    /// <inheritdoc cref="Control.OnPaint"/>
     protected override void OnPaint
         (
             PaintEventArgs e

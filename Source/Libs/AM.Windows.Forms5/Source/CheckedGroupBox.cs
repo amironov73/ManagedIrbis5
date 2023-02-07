@@ -2,14 +2,10 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
-/* CheckedGroupBox.cs --
+/* CheckedGroupBox.cs -- группа с CheckBox в заголовке
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,8 +13,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -26,133 +22,111 @@ using System.Windows.Forms;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Группа <see cref="GroupBox"/> с <see cref="CheckBox"/> в заголовке.
+/// </summary>
+[System.ComponentModel.DesignerCategory ("Code")]
+public class CheckedGroupBox
+    : GroupBox
 {
+    #region Events
+
     /// <summary>
-    /// <see cref="GroupBox"/> with <see cref="CheckBox"/>
-    /// in caption.
+    /// Событие, возникающее при изменении состояния <see cref="CheckBox.Checked"/> у
+    /// <see cref="CheckBox"/> в заголовке группы.
     /// </summary>
-    // ReSharper disable RedundantNameQualifier
-    [System.ComponentModel.DesignerCategory("Code")]
-    // ReSharper restore RedundantNameQualifier
-    public class CheckedGroupBox
-        : GroupBox
+    public event EventHandler? CheckedChanged;
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Получение состояния "отмечено" в заголовке группы.
+    /// </summary>
+    [System.ComponentModel.DefaultValue (true)]
+    public bool Checked
     {
-        #region Events
+        get => _checkBox.Checked;
+        set => _checkBox.Checked = value;
+    }
 
-        /// <summary>
-        ///
-        /// </summary>
-        public event EventHandler? CheckedChanged;
-
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// Gets a value indicating whether this <see cref="CheckedGroupBox"/>
-        /// is checked.
-        /// </summary>
-        /// <value><c>true</c> if checked;
-        /// otherwise, <c>false</c>.</value>
-        [DefaultValue(true)]
-        public bool Checked
+    /// <summary>
+    /// Текст заголовка группы.
+    /// </summary>
+    [AllowNull]
+    public override string Text
+    {
+        get => _checkBox.Text;
+        [DebuggerStepThrough]
+        set
         {
-            [DebuggerStepThrough]
-            get
-            {
-                return _checkBox.Checked;
-            }
-            [DebuggerStepThrough]
-            set
-            {
-                _checkBox.Checked = value;
-            }
+            _checkBox.Text = value;
+            OnTextChanged (EventArgs.Empty);
+        }
+    }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public CheckedGroupBox()
+    {
+        _savedState = new Dictionary<Control, bool>();
+        _checkBox = new CheckBox
+        {
+            Text = base.Text,
+            Left = 5,
+            AutoSize = true,
+            ForeColor = SystemColors.ControlText,
+            Checked = true,
+            ThreeState = false,
+            Parent = this
+        };
+        _checkBox.CheckedChanged += _checkBox_CheckedChanged;
+    }
+
+    #endregion
+
+    #region Private members
+
+    private readonly CheckBox _checkBox;
+    private readonly Dictionary<Control, bool> _savedState;
+
+    private void _checkBox_CheckedChanged
+        (
+            object? sender,
+            EventArgs eventArgs
+        )
+    {
+        if (!_checkBox.Checked)
+        {
+            _savedState.Clear();
         }
 
-        /// <summary>
-        /// </summary>
-        /// <value></value>
-        public override string Text
+        foreach (Control control in Controls)
         {
-            [DebuggerStepThrough]
-            get
+            if (control != _checkBox)
             {
-                return _checkBox.Text;
-            }
-            [DebuggerStepThrough]
-            set
-            {
-                _checkBox.Text = value;
-                OnTextChanged(EventArgs.Empty);
-            }
-        }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CheckedGroupBox"/> class.
-        /// </summary>
-        public CheckedGroupBox()
-        {
-            _savedState = new Dictionary<Control, bool>();
-            _checkBox = new CheckBox
-            {
-                Text = base.Text,
-                Left = 5,
-                AutoSize = true,
-                ForeColor = SystemColors.ControlText,
-                Checked = true,
-                ThreeState = false,
-                Parent = this
-            };
-            _checkBox.CheckedChanged += _checkBox_CheckedChanged;
-        }
-
-        #endregion
-
-        #region Private members
-
-        private readonly CheckBox _checkBox;
-        private readonly Dictionary<Control, bool> _savedState;
-
-        private void _checkBox_CheckedChanged
-            (
-                object? sender,
-                EventArgs e
-            )
-        {
-            if (!_checkBox.Checked)
-            {
-                _savedState.Clear();
-            }
-            foreach (Control control in Controls)
-            {
-                if (control != _checkBox)
+                if (_checkBox.Checked)
                 {
-                    if (_checkBox.Checked)
-                    {
-                        if (_savedState.ContainsKey(control))
-                        {
-                            control.Enabled = _savedState[control];
-                        }
-                        else
-                        {
-                            control.Enabled = true;
-                        }
-                    }
-                    else
-                    {
-                        _savedState.Add(control, control.Enabled);
-                        control.Enabled = false;
-                    }
+                    control.Enabled = !_savedState.TryGetValue (control, out var value) || value;
+                }
+                else
+                {
+                    _savedState.Add (control, control.Enabled);
+                    control.Enabled = false;
                 }
             }
-            CheckedChanged?.Invoke(this, e);
         }
 
-        #endregion
+        CheckedChanged?.Invoke (this, eventArgs);
     }
+
+    #endregion
 }

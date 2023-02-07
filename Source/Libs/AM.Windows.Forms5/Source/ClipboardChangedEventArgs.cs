@@ -37,7 +37,7 @@ public sealed class ClipboardChangedEventArgs
     #region Construction
 
     /// <summary>
-    /// Конструктор.
+    /// Конструктор по умолчанию.
     /// </summary>
     public ClipboardChangedEventArgs
         (

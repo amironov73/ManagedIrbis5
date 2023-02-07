@@ -10,9 +10,14 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-#nullable enable
+#region Using directives
 
 using AM.Collections;
+
+
+#endregion
+
+#nullable enable
 
 namespace AM.Kotik.Barsik.Directives;
 
