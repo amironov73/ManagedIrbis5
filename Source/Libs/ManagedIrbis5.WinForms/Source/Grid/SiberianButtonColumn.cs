@@ -7,32 +7,33 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* SiberianButtonColumn.cs --
+/* SiberianButtonColumn.cs -- столбец ячеек с кнопками
  * Ars Magna project, http://arsmagna.ru
  */
 
 #nullable enable
 
-namespace ManagedIrbis.WinForms.Grid
+namespace ManagedIrbis.WinForms.Grid;
+
+/// <summary>
+/// Столбец ячеек с кнопками.
+/// </summary>
+public class SiberianButtonColumn
+    : SiberianColumn
 {
-    /// <summary>
-    ///
-    /// </summary>
-    public class SiberianButtonColumn
-        : SiberianColumn
+    #region SiberianColumn members
+
+    /// <inheritdoc/>
+    public override SiberianCell CreateCell()
     {
-        #region SiberianColumn members
-
-        /// <inheritdoc/>
-        public override SiberianCell CreateCell()
+        var result = new SiberianButtonCell
         {
-            SiberianCell result = new SiberianButtonCell();
-            result.Column = this;
+            Column = this
+        };
 
-            return result;
-        }
-
-        #endregion
-
+        return result;
     }
+
+    #endregion
+
 }

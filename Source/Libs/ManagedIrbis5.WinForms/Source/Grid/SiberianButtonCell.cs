@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* SiberianButtonCell.cs --
+/* SiberianButtonCell.cs -- ячейка с кнопкой
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,44 +20,43 @@ using System.Windows.Forms.VisualStyles;
 
 #nullable enable
 
-namespace ManagedIrbis.WinForms.Grid
+namespace ManagedIrbis.WinForms.Grid;
+
+/// <summary>
+/// Ячейка с кнопкой.
+/// </summary>
+public class SiberianButtonCell
+    : SiberianCell
 {
+    #region Properties
+
     /// <summary>
-    ///
+    /// Текст в ячейке.
     /// </summary>
-    public class SiberianButtonCell
-        : SiberianCell
+    public string? Text { get; set; }
+
+    #endregion
+
+    #region SiberianCell members
+
+    /// <inheritdoc cref="SiberianCell.OnPaint"/>
+    public override void OnPaint
+        (
+            PaintEventArgs args
+        )
     {
-        #region Properties
+        var graphics = args.Graphics;
+        var rectangle = args.ClipRectangle;
 
-        /// <summary>
-        /// Text.
-        /// </summary>
-        public string? Text { get; set; }
-
-        #endregion
-
-        #region SiberianCell members
-
-        /// <inheritdoc/>
-        public override void OnPaint
+        ButtonRenderer.DrawButton
             (
-                PaintEventArgs args
-            )
-        {
-            var graphics = args.Graphics;
-            var rectangle = args.ClipRectangle;
-
-            ButtonRenderer.DrawButton
-                (
-                    graphics,
-                    rectangle,
-                    false,
-                    PushButtonState.Default
-                );
-        }
-
-        #endregion
-
+                graphics,
+                rectangle,
+                false,
+                PushButtonState.Default
+            );
     }
+
+    #endregion
+
 }
