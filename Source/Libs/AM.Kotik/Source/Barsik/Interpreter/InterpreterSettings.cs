@@ -23,6 +23,8 @@ using AM.Kotik.Barsik.Diagnostics;
 using AM.Kotik.Barsik.Directives;
 using AM.Kotik.Tokenizers;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -65,6 +67,7 @@ public sealed class InterpreterSettings
     /// Вычисление выражения, заданного в командной строке
     /// (перед любыми скриптами).
     /// </summary>
+    [UsedImplicitly]
     [JsonPropertyName ("evaluate-expression")]
     public string? EvaluateExpression { get; set; }
 
@@ -93,6 +96,7 @@ public sealed class InterpreterSettings
     /// <summary>
     /// Настройки токенайзера.
     /// </summary>
+    [UsedImplicitly]
     [JsonPropertyName ("tokenizer")]
     public TokenizerSettings? TokenizerSettings { get; set; }
 

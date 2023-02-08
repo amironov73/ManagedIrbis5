@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* DummyClass.cs -- тестовый класс для опытов
+/* Artist.cs -- тестовый класс для опытов: сведения о художнике
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,10 +17,10 @@ using JetBrains.Annotations;
 
 #nullable enable
 
-namespace AM.Kotik.Barsik.Samples;
+namespace SampleData;
 
 /// <summary>
-/// Тестовый класс для опытов.
+/// Тестовый класс для опытов: сведения о художнике.
 /// </summary>
 [UsedImplicitly]
 public sealed class Artist
@@ -30,16 +30,19 @@ public sealed class Artist
     /// <summary>
     /// Имя.
     /// </summary>
+    [UsedImplicitly]
     public string? Name { get; set; }
     
     /// <summary>
     /// Год рождения.
     /// </summary>
+    [UsedImplicitly]
     public int Year { get; set; }
     
     /// <summary>
     /// Категория.
     /// </summary>
+    [UsedImplicitly]
     public string? Category { get; set; }
 
     #endregion
@@ -76,6 +79,7 @@ public sealed class Artist
     /// <summary>
     /// Русские художники.
     /// </summary>
+    [UsedImplicitly]
     public static Artist[] RussianArtists() => new Artist[]
     {
         new ("Билибин, Иван Яковлевич", 1876, "Иллюстратор"),
