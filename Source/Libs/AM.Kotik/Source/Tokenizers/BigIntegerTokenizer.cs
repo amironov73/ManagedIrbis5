@@ -12,9 +12,12 @@
 
 #region Using directives
 
+using System;
 using System.Numerics;
 
 using AM.Text;
+
+using CommunityToolkit.HighPerformance.Buffers;
 
 #endregion
 
@@ -42,7 +45,8 @@ public sealed class BigIntegerTokenizer
             return null;
         }
 
-        var builder = StringBuilderPool.Shared.Get();
+        Span<char> buffer = stackalloc char[16];
+        var builder = new ValueStringBuilder (buffer);
         while (!IsEof)
         {
             chr = PeekChar();
@@ -65,16 +69,17 @@ public sealed class BigIntegerTokenizer
         if (chr is not 'b' and not 'B') // TODO подобрать подходящий суффикс
         {
             navigator.RestorePosition (position);
-            StringBuilderPool.Shared.Return (builder);
             return null;
         }
 
         ReadChar();
+        var span = builder.AsSpan();
+        var value = StringPool.Shared.GetOrAdd (span);
 
         var result = new Token
             (
                 TokenKind.BigInteger,
-                builder.ReturnShared(),
+                value,
                 line,
                 column,
                 position

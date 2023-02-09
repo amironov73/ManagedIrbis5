@@ -12,7 +12,11 @@
 
 #region Using directives
 
+using System;
+
 using AM.Text;
+
+using CommunityToolkit.HighPerformance.Buffers;
 
 #endregion
 
@@ -51,7 +55,8 @@ public sealed class NumberTokenizer
             return null;
         }
 
-        var builder = StringBuilderPool.Shared.Get();
+        Span<char> buffer = stackalloc char[16];
+        var builder = new ValueStringBuilder (buffer);
         builder.Append (ReadChar());
         while (!IsEof)
         {
@@ -67,7 +72,6 @@ public sealed class NumberTokenizer
             {
                 if (dot)
                 {
-                    StringBuilderPool.Shared.Return (builder);
                     throw new SyntaxException (navigator);
                 }
 
@@ -98,7 +102,6 @@ public sealed class NumberTokenizer
                 chr = PeekChar();
                 if (!chr.IsArabicDigit())
                 {
-                    StringBuilderPool.Shared.Return (builder);
                     throw new SyntaxException (navigator);
                 }
             }
@@ -119,7 +122,6 @@ public sealed class NumberTokenizer
         {
             // это целое число, для них есть отдельный токенайзер
             navigator.RestorePosition (position);
-            StringBuilderPool.Shared.Return (builder);
             return null;
         }
 
@@ -127,7 +129,6 @@ public sealed class NumberTokenizer
         {
             // это не похоже на число
             navigator.RestorePosition(position);
-            StringBuilderPool.Shared.Return (builder);
             return null;
         }
 
@@ -146,10 +147,13 @@ public sealed class NumberTokenizer
             ReadChar();
         }
 
+        var span = builder.AsSpan();
+        var value = StringPool.Shared.GetOrAdd (span);
+
         var result = new Token
             (
                 kind,
-                builder.ReturnShared(),
+                value,
                 line,
                 column
             );

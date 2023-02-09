@@ -21,6 +21,10 @@
     <PropertyGroup Condition="'$(Configuration)'=='Release'">
         <DocumentationFile>bin\Release\AM.Kotik.xml</DocumentationFile>
     </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="CommunityToolkit.HighPerformance" />
+    </ItemGroup>
     
     <ItemGroup>
         <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />

@@ -12,6 +12,8 @@
 
 #region Using directives
 
+using System;
+
 using AM.Text;
 
 #endregion
@@ -48,8 +50,11 @@ public sealed class CharacterTokenizer
                 throw new SyntaxException (navigator);
             }
 
-            var builder = StringBuilderPool.Shared.Get();
-            builder.Append (result);
+            Span<char> buffer1 = stackalloc char[8];
+            Span<char> buffer2 = stackalloc char[8];
+            var builder1 = new ValueStringBuilder (buffer1);
+            var builder2 = new ValueStringBuilder (buffer2);
+            builder1.Append (result);
             while (!IsEof)
             {
                 result = PeekChar();
@@ -59,15 +64,17 @@ public sealed class CharacterTokenizer
                 }
 
                 ReadChar();
-                builder.Append (result);
+                builder1.Append (result);
             }
 
-            var text = TextUtility.UnescapeText (builder.ReturnShared()).ThrowIfNullOrEmpty();
-            if (text.Length != 1)
+            var raw = builder1.AsSpan();
+            TextUtility.UnescapeText (ref builder2, raw);
+            var unescaped = builder2.AsSpan();
+            if (unescaped.Length != 1)
             {
                 throw new SyntaxException (navigator);
             }
-            result = text[0];
+            result = unescaped[0];
         }
 
         if (ReadChar() != '\'')

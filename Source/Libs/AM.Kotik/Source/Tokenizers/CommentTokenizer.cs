@@ -100,12 +100,14 @@ public sealed class CommentTokenizer
                     ReadChar();
                 }
 
+                var memory = navigator.Substring (offset, navigator.Position - offset);
+
                 return _eatComments
                     ? null
                     : new Token
                         (
                             TokenKind.Comment,
-                            navigator.Substring (offset, navigator.Position - offset).ToString(),
+                            memory.ToString(),
                             line,
                             column,
                             offset
@@ -123,12 +125,14 @@ public sealed class CommentTokenizer
                     throw new SyntaxException (navigator);
                 }
 
+                var memory = navigator.Substring (offset, navigator.Position - offset);
+
                 return _eatComments
                     ? null
                     : new Token 
                         (
                             TokenKind.Comment,
-                            navigator.Substring (offset, navigator.Position - offset).ToString(),
+                            memory.ToString(),
                             line,
                             column,
                             offset

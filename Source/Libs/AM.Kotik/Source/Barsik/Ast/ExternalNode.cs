@@ -12,6 +12,9 @@
 #region Using directives
 
 using System;
+using System.IO;
+
+using AM.Kotik.Ast;
 
 #endregion
 
@@ -78,6 +81,23 @@ public sealed class ExternalNode
         {
             context.Error?.WriteLine (exception.Message);
         }
+    }
+
+    #endregion
+
+    #region AstNode members
+
+    /// <inheritdoc cref="AstNode.DumpHierarchyItem(string?,int,System.IO.TextWriter)"/>
+    internal override void DumpHierarchyItem 
+        (
+            string? name, 
+            int level, 
+            TextWriter writer
+        )
+    {
+        base.DumpHierarchyItem (name, level, writer);
+        
+        DumpHierarchyItem ("Code", level + 1, writer, Code);
     }
 
     #endregion

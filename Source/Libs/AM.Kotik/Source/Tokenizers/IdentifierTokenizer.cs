@@ -14,7 +14,7 @@
 
 using System;
 
-using AM.Text;
+using CommunityToolkit.HighPerformance.Buffers;
 
 #endregion
 
@@ -33,10 +33,9 @@ public sealed class IdentifierTokenizer
     /// <inheritdoc cref="Tokenizer.Parse"/>
     public override Token? Parse()
     {
-        var firstChar = PeekChar();
         var firstIdentifierLetter = Settings.FirstIdentifierLetter;
         var nextIdentifierLetter = Settings.NextIdentifierLetter;
-        if (Array.IndexOf (firstIdentifierLetter, firstChar) < 0)
+        if (Array.IndexOf (firstIdentifierLetter, PeekChar()) < 0)
         {
             return null;
         }
@@ -44,8 +43,7 @@ public sealed class IdentifierTokenizer
         var line = navigator.Line;
         var column = navigator.Column;
         var offset = navigator.Position;
-        var builder = StringBuilderPool.Shared.Get();
-        builder.Append (ReadChar());
+        ReadChar();
         while (!IsEof)
         {
             if (Array.IndexOf (nextIdentifierLetter, PeekChar()) < 0)
@@ -53,10 +51,12 @@ public sealed class IdentifierTokenizer
                 break;
             }
 
-            builder.Append (ReadChar());
+            ReadChar();
         }
 
-        var value = builder.ReturnShared();
+        var length = navigator.Position - offset;
+        var memory = navigator.Substring (offset, length);
+        var value = StringPool.Shared.GetOrAdd (memory.Span);
 
         return new Token
             (

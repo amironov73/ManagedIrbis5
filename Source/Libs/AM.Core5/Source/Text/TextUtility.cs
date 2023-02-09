@@ -435,6 +435,59 @@ public static class TextUtility
     /// Преобразует строку, содержащую escape-последовательности,
     /// к нормальному виду.
     /// </summary>
+    public static void UnescapeText
+        (
+            ref ValueStringBuilder builder,
+            ReadOnlySpan<char> text
+        )
+    {
+        if (text.IsEmpty)
+        {
+            return;
+        }
+
+        var navigator = new ValueTextNavigator (text);
+        builder.EnsureCapacity (text.Length);
+
+        while (!navigator.IsEOF)
+        {
+            var c = navigator.ReadChar();
+            if (c == '\\')
+            {
+                var c2 = navigator.ReadChar();
+                c2 = c2 switch
+                {
+                    'a' => '\a',
+                    'b' => '\b',
+                    'f' => '\f',
+                    'n' => '\n',
+                    'r' => '\r',
+                    't' => '\t',
+                    'u' => (char) int.Parse
+                        (
+                            navigator.ReadString (4),
+                            NumberStyles.HexNumber
+                        ),
+                    'v' => '\v',
+                    '\'' => '\'',
+                    '"' => '"',
+                    '\\' => '\\',
+                    '0' => '\0',
+                    _ => '?'
+                };
+                builder.Append (c2);
+            }
+            else
+            {
+                builder.Append (c);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Преобразует строку, содержащую escape-последовательности,
+    /// к нормальному виду.
+    /// </summary>
     public static string UnescapeText
         (
             string text

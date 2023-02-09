@@ -12,7 +12,11 @@
 
 #region Using directives
 
+using System;
+
 using AM.Text;
+
+using CommunityToolkit.HighPerformance.Buffers;
 
 #endregion
 
@@ -41,8 +45,9 @@ public sealed class HexTokenizer
         {
             return null;
         }
-        
-        var builder = StringBuilderPool.Shared.Get();
+
+        Span<char> buffer = stackalloc char[16];
+        var builder = new ValueStringBuilder (buffer);
         var kind = TokenKind.Hex32;
         ReadChar();
         ReadChar();
@@ -70,10 +75,13 @@ public sealed class HexTokenizer
             kind = TokenKind.Hex64;
         }
 
+        var span = builder.AsSpan();
+        var value = StringPool.Shared.GetOrAdd (span);
+
         return new Token 
             (
                 kind, 
-                builder.ReturnShared(), 
+                value, 
                 line, 
                 column, 
                 offset

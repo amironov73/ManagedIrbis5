@@ -10,6 +10,12 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
+#region Using directives
+
+using CommunityToolkit.HighPerformance.Buffers;
+
+#endregion
+
 #nullable enable
 
 namespace AM.Kotik.Tokenizers;
@@ -74,7 +80,8 @@ public sealed class DirectiveTokenizer
         }
 
         navigator.SkipWhile (' ', '\t');
-        var argument = navigator.ReadLine().ToString();
+        var memory = navigator.ReadLine();
+        var argument = StringPool.Shared.GetOrAdd (memory.Span);
 
         return new Token (TokenKind.Directive, command, line, column, position)
         {

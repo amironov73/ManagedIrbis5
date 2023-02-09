@@ -14,6 +14,8 @@
 
 using AM.Text;
 
+using CommunityToolkit.HighPerformance.Buffers;
+
 #endregion
 
 #nullable enable
@@ -42,7 +44,6 @@ public sealed class ExternalTokenizer
 
         ReadChar(); // съедаем открывающую кавычку
         char chr = default;
-        var builder = StringBuilderPool.Shared.Get();
         while (!IsEof)
         {
             chr = ReadChar();
@@ -50,20 +51,20 @@ public sealed class ExternalTokenizer
             {
                 break;
             }
-
-            builder.Append (chr);
         }
 
         if (chr != '`')
         {
-            StringBuilderPool.Shared.Return (builder);
             throw new SyntaxException (navigator);
         }
 
+        var memory = navigator.Substring (offset + 1, navigator.Position - offset - 2);
+        var value = StringPool.Shared.GetOrAdd (memory.Span);
+        
         return new Token 
             (
-                TokenKind.External, 
-                builder.ReturnShared(), 
+                TokenKind.External,
+                value,
                 line, 
                 column, 
                 offset

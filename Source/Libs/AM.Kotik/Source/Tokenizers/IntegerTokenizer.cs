@@ -12,7 +12,11 @@
 
 #region Using directives
 
+using System;
+
 using AM.Text;
+
+using CommunityToolkit.HighPerformance.Buffers;
 
 #endregion
 
@@ -41,7 +45,8 @@ public sealed class IntegerTokenizer
             return null;
         }
 
-        var builder = StringBuilderPool.Shared.Get();
+        Span<char> buffer = stackalloc char[16];
+        var builder = new ValueStringBuilder (buffer);
         while (!IsEof)
         {
             chr = PeekChar();
@@ -69,7 +74,6 @@ public sealed class IntegerTokenizer
             {
                 if (isLong)
                 {
-                    StringBuilderPool.Shared.Return (builder);
                     throw new SyntaxException (navigator);
                 }
 
@@ -80,7 +84,6 @@ public sealed class IntegerTokenizer
             {
                 if (isUnsigned)
                 {
-                    StringBuilderPool.Shared.Return (builder);
                     throw new SyntaxException (navigator);
                 }
 
@@ -90,7 +93,6 @@ public sealed class IntegerTokenizer
             else if (chr is '.' or 'e' or 'E' or 'f' or 'F' or 'm' or 'M')
             {
                 // это число с плавающей (или фиксированной) точкой
-                StringBuilderPool.Shared.Return (builder);
                 navigator.RestorePosition (offset);
                 return null;
             }
@@ -106,10 +108,13 @@ public sealed class IntegerTokenizer
             : isUnsigned
                 ? TokenKind.UInt32 : TokenKind.Int32;
 
+        var span = builder.AsSpan();
+        var value = StringPool.Shared.GetOrAdd (span);
+
         var result = new Token
             (
                 kind,
-                builder.ReturnShared(),
+                value,
                 line,
                 column,
                 offset
