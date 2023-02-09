@@ -30,16 +30,16 @@ public sealed class DataGridDemo
             Window owner
         )
     {
-        // var grayBackground = AvaloniaUtility.CreateControlTheme
-        //     (
-        //         typeof (DataGridCell),
-        //         typeof (DataGridCell)
-        //     );
-        // grayBackground?.Setters.Add (new Setter
-        //     (
-        //         TemplatedControl.BackgroundProperty,
-        //         Brushes.LightGray
-        //     ));
+        var grayBackground = AvaloniaUtility.CreateControlTheme
+            (
+                typeof (DataGridCell),
+                typeof (DataGridCell)
+            );
+        grayBackground?.Setters.Add (new Setter
+            (
+                TemplatedControl.BackgroundProperty,
+                Brushes.LightGray
+            ));
 
         var dataGrid = new DataGrid
         {
@@ -55,7 +55,7 @@ public sealed class DataGridDemo
                     Binding = new Binding (nameof (People.FirstName)),
                     Width = DataGridLength.Auto,
                     IsReadOnly = true,
-                    // CellTheme = grayBackground
+                    CellTheme = grayBackground
                 },
 
                 new DataGridTextColumn

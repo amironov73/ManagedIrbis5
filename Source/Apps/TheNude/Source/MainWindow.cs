@@ -101,7 +101,6 @@ public sealed class MainWindow
                 new Border
                     {
                         BorderBrush = Brushes.Black,
-                        Background = Brushes.AliceBlue,
                         BorderThickness = new Thickness (0,0, 0, 1),
 
                         Child =

@@ -95,40 +95,41 @@ public static class AvaloniaUtility
         return control;
     }
 
-    ///// <summary>
-    ///// Получение ресурса по указанному URL.
-    ///// </summary>
-    //public static ResourceInclude? AsResource
-    //    (
-    //        this string url
-    //    )
-    //{
-    //    Sure.NotNullNorEmpty (url);
+    /// <summary>
+    /// Получение ресурса по указанному URL.
+    /// </summary>
+    public static ResourceInclude? AsResource
+        (
+            this string url
+        )
+    {
+        Sure.NotNullNorEmpty (url);
 
-    //    return new Uri (url).AsResource();
-    //}
+        return new Uri (url).AsResource();
+    }
 
-    ///// <summary>
-    ///// Получение ресурса по указанному URL.
-    ///// </summary>
-    //public static ResourceInclude? AsResource
-    //    (
-    //        this Uri uri
-    //    )
-    //{
-    //    Sure.NotNull (uri);
+    /// <summary>
+    /// Получение ресурса по указанному URL.
+    /// </summary>
+    public static ResourceInclude? AsResource
+        (
+            this Uri uri
+        )
+    {
+        Sure.NotNull (uri);
 
-    //    try
-    //    {
-    //        return new ResourceInclude { Source = uri };
-    //    }
-    //    catch (Exception exception)
-    //    {
-    //        Magna.Logger.LogDebug (exception, "URI as resource");
-    //    }
+        try
+        {
+            // TODO разобраться с аргументом конструктора и Source
+            return new ResourceInclude (uri) { Source = uri };
+        }
+        catch (Exception exception)
+        {
+            Magna.Logger.LogDebug (exception, "URI as resource");
+        }
 
-    //    return default;
-    //}
+        return default;
+    }
 
     /// <summary>
     /// Присваивание указанной переменной.
@@ -228,48 +229,51 @@ public static class AvaloniaUtility
         return control;
     }
 
-    ///// <summary>
-    ///// Создание темы для контрола, основанной на теме для указанного типа.
-    ///// </summary>
-    ///// <returns></returns>
-    //public static ControlTheme? CreateControlTheme
-    //    (
-    //        Type baseControlType,
-    //        Type actualControlType
-    //    )
-    //{
-    //    Sure.NotNull (baseControlType);
-    //    Sure.NotNull (actualControlType);
+    /// <summary>
+    /// Создание темы для контрола, основанной на теме для указанного типа.
+    /// </summary>
+    /// <returns></returns>
+    public static ControlTheme? CreateControlTheme
+        (
+            Type baseControlType,
+            Type actualControlType
+        )
+    {
+        Sure.NotNull (baseControlType);
+        Sure.NotNull (actualControlType);
 
-    //    var basedOn = GetControlTheme (baseControlType);
-    //    if (basedOn is null)
-    //    {
-    //        return null;
-    //    }
+        var basedOn = GetControlTheme (baseControlType);
+        if (basedOn is null)
+        {
+            return null;
+        }
 
-    //    var result = new ControlTheme (actualControlType)
-    //    {
-    //        BasedOn = basedOn
-    //    };
+        var result = new ControlTheme (actualControlType)
+        {
+            BasedOn = basedOn
+        };
 
-    //    return result;
-    //}
+        return result;
+    }
 
-    ///// <summary>
-    ///// Создание Fluent-темы.
-    ///// </summary>
-    //public static IStyle CreateFluentTheme
-    //    (
-    //        bool light = true
-    //    )
-    //{
-    //    return new FluentTheme (new Uri
-    //        (
-    //            light
-    //            ? "avares://Avalonia.Themes.Fluent/FluentLight.xaml"
-    //            : "avares://Avalonia.Themes.Fluent/FluentDark.xaml"
-    //        ));
-    //}
+    /// <summary>
+    /// Создание Fluent-темы.
+    /// </summary>
+    public static IStyle CreateFluentTheme
+        (
+            bool light = true
+        )
+    {
+        // TODO разобраться с light
+        return new FluentTheme();
+
+        // return new FluentTheme (new Uri
+        //     (
+        //         light
+        //         ? "avares://Avalonia.Themes.Fluent/FluentLight.xaml"
+        //         : "avares://Avalonia.Themes.Fluent/FluentDark.xaml"
+        //     ));
+    }
 
     /// <summary>
     /// Создание Material-темы.
@@ -291,47 +295,50 @@ public static class AvaloniaUtility
         return result;
     }
 
-    ///// <summary>
-    ///// Создание Simple-темы.
-    ///// </summary>
-    //public static IStyle CreateSimpleTheme
-    //    (
-    //        bool light = true
-    //    )
-    //{
-    //    var mode = light ? SimpleThemeMode.Light : SimpleThemeMode.Dark;
-    //    var uri = new Uri ("avares://Avalonia.Themes.Simple/SimpleTheme.xaml");
-    //    var result = new SimpleTheme (uri)
-    //    {
-    //        Mode = mode
-    //    };
+    /// <summary>
+    /// Создание Simple-темы.
+    /// </summary>
+    public static IStyle CreateSimpleTheme
+        (
+            bool light = true
+        )
+    {
+        // TODO разобраться с light
+        return new SimpleTheme();
 
-    //    return result;
-    //}
+        // var mode = light ? SimpleThemeMode.Light : SimpleThemeMode.Dark;
+        // var uri = new Uri ("avares://Avalonia.Themes.Simple/SimpleTheme.xaml");
+        // var result = new SimpleTheme (uri)
+        // {
+        //     Mode = mode
+        // };
 
-    ///// <summary>
-    ///// Создание Citrus-темы.
-    ///// </summary>
-    //public static IStyle CreateCitrusTheme
-    //    (
-    //        string variant = "Citrus.axaml"
-    //    )
-    //{
-    //    var simple = CreateSimpleTheme();
-    //    var uri = new Uri ($"avares://AM.Avalonia/Styles/Citrus/{variant}");
-    //    var citrus = new StyleInclude (uri)
-    //    {
-    //        Source = uri
-    //    };
+        // return result;
+    }
 
-    //    var result = new Styles
-    //    {
-    //        simple,
-    //        citrus
-    //    };
+    /// <summary>
+    /// Создание Citrus-темы.
+    /// </summary>
+    public static IStyle CreateCitrusTheme
+        (
+            string variant = "Citrus.axaml"
+        )
+    {
+        var simple = CreateSimpleTheme();
+        var uri = new Uri ($"avares://AM.Avalonia/Styles/Citrus/{variant}");
+        var citrus = new StyleInclude (uri)
+        {
+            Source = uri
+        };
 
-    //    return result;
-    //}
+        var result = new Styles
+        {
+            simple,
+            citrus
+        };
+
+        return result;
+    }
 
     /// <summary>
     /// Создание простого грида.
@@ -670,34 +677,35 @@ public static class AvaloniaUtility
         return (Thickness) found;
     }
 
-    ///// <summary>
-    ///// Получение темы для контрола указанного типа.
-    ///// </summary>
-    //public static ControlTheme? GetControlTheme
-    //    (
-    //        Type controlType
-    //    )
-    //{
-    //    Sure.NotNull (controlType);
+    /// <summary>
+    /// Получение темы для контрола указанного типа.
+    /// </summary>
+    public static ControlTheme? GetControlTheme
+        (
+            Type controlType
+        )
+    {
+        Sure.NotNull (controlType);
 
-    //    while (controlType.IsAssignableTo (typeof (Control)))
-    //    {
-    //        if (Application.Current!.Styles.TryGetResource (controlType, out var result))
-    //        {
-    //            return result as ControlTheme;
-    //        }
+        while (controlType.IsAssignableTo (typeof (Control)))
+        {
+            // TODO разобраться с аргументом ThemeVariant
+            if (Application.Current!.Styles.TryGetResource (controlType, null, out var result))
+            {
+                return result as ControlTheme;
+            }
 
-    //        var baseType = controlType.BaseType;
-    //        if (baseType is null)
-    //        {
-    //            break;
-    //        }
+            var baseType = controlType.BaseType;
+            if (baseType is null)
+            {
+                break;
+            }
 
-    //        controlType = baseType;
-    //    }
+            controlType = baseType;
+        }
 
-    //    return null;
-    //}
+        return null;
+    }
 
     /// <summary>
     /// Получение главного окна приложения (если оно есть, конечно).
