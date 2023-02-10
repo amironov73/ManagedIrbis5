@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable NonReadonlyMemberInGetHashCode
 
 /* MemberDescriptor.cs -- описание члена типа (свойства или поля)
  * Ars Magna project, http://arsmagna.ru
@@ -29,28 +30,40 @@ public sealed class MemberDescriptor
     /// <summary>
     /// Тип, которому принадлежит член.
     /// </summary>
-    public required Type Type { get; init; }
-    
+    public Type? Type { get; set; }
+
     /// <summary>
     /// Имя члена.
     /// </summary>
-    public required string MemberName { get; init; }
+    public string? Name { get; set; }
 
     #endregion
-    
+
+    #region Public methods
+
+    /// <summary>
+    /// Создание полной копии описания.
+    /// </summary>
+    public MemberDescriptor Clone()
+    {
+        return (MemberDescriptor) MemberwiseClone();
+    }
+
+    #endregion
+
     #region Object members
 
     /// <inheritdoc cref="object.Equals(object?)"/>
     public override bool Equals (object? obj) => 
         obj is MemberDescriptor other 
         && Type == other.Type 
-        && MemberName == other.MemberName;
+        && Name == other.Name;
 
     /// <inheritdoc cref="object.GetHashCode"/>
-    public override int GetHashCode() => HashCode.Combine (Type, MemberName);
+    public override int GetHashCode() => HashCode.Combine (Type, Name);
 
     /// <inheritdoc cref="object.ToString"/>
-    public override string ToString() => $"{Type}::{MemberName}";
+    public override string ToString() => $"{Type?.FullName}::{Name}";
 
     #endregion
 }

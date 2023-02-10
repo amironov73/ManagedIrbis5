@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable NonReadonlyMemberInGetHashCode
 
 /* ConstructorDescriptor.cs -- описание конструктора
  * Ars Magna project, http://arsmagna.ru
@@ -28,9 +29,26 @@ public sealed class ConstructorDescriptor
     #region Properties
 
     /// <summary>
+    /// Тип.
+    /// </summary>
+    public Type? Type { get; set; }
+    
+    /// <summary>
     /// Аргументы.
     /// </summary>
-    public Type[]? Arguments { get; init; }
+    public Type[]? Arguments { get; set; }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Создание полной копии дескриптора.
+    /// </summary>
+    public ConstructorDescriptor Clone()
+    {
+        return (ConstructorDescriptor) MemberwiseClone();
+    }
 
     #endregion
 
@@ -43,6 +61,11 @@ public sealed class ConstructorDescriptor
         )
     {
         if (obj is not ConstructorDescriptor other)
+        {
+            return false;
+        }
+
+        if (Type != other.Type)
         {
             return false;
         }
@@ -72,6 +95,7 @@ public sealed class ConstructorDescriptor
     public override int GetHashCode()
     {
         var result = new HashCode();
+        result.Add (Type);
         if (!Arguments.IsNullOrEmpty())
         {
             foreach (var parameter in Arguments)
@@ -92,7 +116,7 @@ public sealed class ConstructorDescriptor
         }
 
         var builder = StringBuilderPool.Shared.Get();
-        builder.Append ("Constructor");
+        builder.Append (Type?.FullName);
         builder.Append ('(');
         builder.AppendList (Arguments);
         builder.Append (')');

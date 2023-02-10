@@ -58,7 +58,7 @@ public sealed class MemberCache
         Sure.NotNull (descriptor);
         Sure.NotNull (propertyOrField);
 
-        _dictionary[descriptor] = propertyOrField;
+        _dictionary[descriptor.Clone()] = propertyOrField;
     }
     
     /// <summary>

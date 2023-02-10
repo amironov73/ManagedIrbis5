@@ -57,7 +57,7 @@ public sealed class MethodCache
         Sure.NotNull (descriptor);
         Sure.NotNull (method);
 
-        _dictionary[descriptor] = method;
+        _dictionary[descriptor.Clone()] = method;
     }
     
     /// <summary>

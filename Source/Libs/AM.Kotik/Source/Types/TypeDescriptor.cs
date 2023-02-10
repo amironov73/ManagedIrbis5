@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable NonReadonlyMemberInGetHashCode
 
 /* TypeDescriptor.cs -- описание типа
  * Ars Magna project, http://arsmagna.ru
@@ -32,12 +33,24 @@ public sealed class TypeDescriptor
     /// <summary>
     /// Имя типа.
     /// </summary>
-    public required string TypeName { get; init; }
+    public string? TypeName { get; set; }
     
     /// <summary>
     /// Параметры обобщенного типа (опционально).
     /// </summary>
-    public string[]? GenericParameters { get; init; }
+    public string[]? GenericParameters { get; set; }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Создание полной копии дескриптора.
+    /// </summary>
+    public TypeDescriptor Clone()
+    {
+        return (TypeDescriptor) MemberwiseClone();
+    }
 
     #endregion
 
@@ -101,7 +114,7 @@ public sealed class TypeDescriptor
     {
         if (GenericParameters.IsNullOrEmpty())
         {
-            return TypeName;
+            return TypeName.ToVisibleString();
         }
         
         var builder = StringBuilderPool.Shared.Get();

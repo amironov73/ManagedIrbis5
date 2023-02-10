@@ -44,7 +44,6 @@ public interface IResolver
     /// </summary>
     ConstructorInfo? ResolveConstructor
         (
-            Type type,
             ConstructorDescriptor descriptor
         );
 
@@ -53,7 +52,6 @@ public interface IResolver
     /// </summary>
     PropertyOrField? ResolveMember
         (
-            Type type,
             MemberDescriptor descriptor
         );
 
@@ -62,7 +60,6 @@ public interface IResolver
     /// </summary>
     MethodInfo? ResolveMethod
         (
-            Type type,
             MethodDescriptor descriptor
         );
 

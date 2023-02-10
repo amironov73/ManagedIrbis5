@@ -5,32 +5,32 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* TypeCache.cs -- кэш типов
+/* ConstructorCache.cs -- кеш конструкторов
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 #endregion
 
 #nullable enable
 
-namespace AM.Kotik;
+namespace AM.Kotik.Types;
 
 /// <summary>
-/// Кэш типов.
+/// Кеш конструкторов.
 /// </summary>
-public sealed class TypeCache
+public sealed class ConstructorCache
 {
     #region Construction
 
     /// <summary>
     /// Конструктор по умолчанию.
     /// </summary>
-    public TypeCache()
+    public ConstructorCache()
     {
         _dictionary = new ();
     }
@@ -39,25 +39,25 @@ public sealed class TypeCache
     
     #region Private members
 
-    private readonly Dictionary<TypeDescriptor, Type> _dictionary;
+    private readonly Dictionary<ConstructorDescriptor, ConstructorInfo> _dictionary;
 
     #endregion
-
+    
     #region Public methods
 
     /// <summary>
-    /// Добавление типа в кэш.
+    /// Добавление конструктора в кэш.
     /// </summary>
     public void Add 
         (
-            TypeDescriptor descriptor,
-            Type type
+            ConstructorDescriptor descriptor,
+            ConstructorInfo constructor
         )
     {
         Sure.NotNull (descriptor);
-        Sure.NotNull (type);
+        Sure.NotNull (constructor);
 
-        _dictionary[descriptor.Clone()] = type;
+        _dictionary[descriptor.Clone()] = constructor;
     }
     
     /// <summary>
@@ -69,17 +69,17 @@ public sealed class TypeCache
     }
 
     /// <summary>
-    /// Попытка получения типа по его дескриптору.
+    /// Попытка получения конструктора по его дескриптору.
     /// </summary>
-    public bool TryGetType
+    public bool TryGetConstructor
         (
-            TypeDescriptor descriptor,
-            out Type? type
+            ConstructorDescriptor descriptor,
+            out ConstructorInfo? constructor
         )
     {
         Sure.NotNull (descriptor);
 
-        return _dictionary.TryGetValue (descriptor, out type);
+        return _dictionary.TryGetValue (descriptor, out constructor);
     }
 
     #endregion
