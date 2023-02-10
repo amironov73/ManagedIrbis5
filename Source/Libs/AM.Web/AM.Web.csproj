@@ -28,6 +28,7 @@
 
     <!-- Централизованное управление пакетами -->
     <ItemGroup>
+        <PackageReference Include="linq2db" />
         <PackageReference Include="MaxMind.GeoIP2" />
         <PackageReference Include="Microsoft.AspNetCore.Razor.Language" />
         <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" />
@@ -41,6 +42,7 @@
         <PackageReference Include="Newtonsoft.Json" />
         <PackageReference Include="ReactiveUI" />
         <PackageReference Include="ReactiveUI.Fody" />
+        <PackageReference Include="System.Data.SqlClient" />
     </ItemGroup>
 
     <ItemGroup>
