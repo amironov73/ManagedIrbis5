@@ -30,21 +30,22 @@ using AM.Kotik.Tokenizers;
 
 namespace AM.Kotik.Barsik;
 
-/*
-   Незадействованные операции
-
-   ?? и ???
-   \
-   <+> и аналоги
-
- */
-
 /// <summary>
 /// Грамматика языка.
 /// </summary>
 public sealed class Grammar
     : IGrammar
 {
+    #region Constants
+
+    /// <summary>
+    /// Метка, используемая для запоминания последнего
+    /// успешно разобранного стейтмента.
+    /// </summary>
+    private const string LastStatementKey = "last-statement";
+
+    #endregion
+    
     #region Properties
 
     /// <inheritdoc cref="IGrammar.Atoms"/>
@@ -82,12 +83,29 @@ public sealed class Grammar
 
     #region Private members
 
-    private Parser<StatementBase> BuildStatement (Parser<AtomNode> innerParser) => Parser.Chain
+    /// <summary>
+    /// Создаем новое исключение с более полезной информацией о том,
+    /// где произошел затык. В частности, мы пытаемся извлечь информацию
+    /// о последнем успешно разобранном стейтменте. Надеюсь, проблема
+    /// где-то после него, а не как обычно рапортуют комбинаторные парсеры
+    /// "в первой строке".
+    /// </summary>
+    /// <returns>Если создать новое исключение не удалось,
+    /// возвращается <c>null</c>.</returns>
+    private static Exception? EnhanceException 
         (
-            Parser.Position,
-            innerParser,
-            (pos, x) => (StatementBase) new SimpleStatement (pos.Line, x)
-        );
+            Exception innerException,
+            ParseState state
+        )
+    {
+        if (state.UserData.TryGetValue (LastStatementKey, out var lastStatement))
+        {
+            var message = $"Last statement: {lastStatement}";
+            return new SyntaxException (message, innerException);
+        }
+
+        return null;
+    }
 
     /// <summary>
     /// Порождение константного узла.
@@ -477,7 +495,13 @@ public sealed class Grammar
             )
             .Labeled ("TryCatchFinally");
 
-        var simpleStatement = BuildStatement (assignment).Labeled ("SimpleStatement");
+        var simpleStatement = Parser.Chain
+            (
+                Parser.Position,
+                assignment,
+                (pos, x) => (StatementBase) new SimpleStatement (pos.Line, x)
+            )
+            .Labeled ("SimpleStatement");
 
         var forStatement = Parser.Chain
             (
@@ -745,7 +769,7 @@ public sealed class Grammar
             )
             .Labeled ("Block");
 
-        GenericStatement.Value = Parser.OneOf (Statements).Trace();
+        GenericStatement.Value = Parser.OneOf (Statements).Remember (LastStatementKey);
 
         Program  = new RepeatParser<StatementBase> (GenericStatement)
             .Map (x => new ProgramNode (x))
@@ -812,14 +836,28 @@ public sealed class Grammar
         }
 
         var state = new ParseState (tokens, traceOutput) { DebugOutput = debugOutput };
-        var program = Program;
-        if (requireEnd)
+        try
         {
-            program = program.End();
-        }
-        var result = program.ParseOrThrow (state);
+            var program = Program;
+            if (requireEnd)
+            {
+                program = program.End();
+            }
 
-        return result;
+            var result = program.ParseOrThrow (state);
+
+            return result;
+        }
+        catch (Exception exception)
+        {
+            var enhanced = EnhanceException (exception, state);
+            if (enhanced is not null)
+            {
+                throw enhanced;
+            }
+
+            throw;
+        }
     }
 
     #endregion

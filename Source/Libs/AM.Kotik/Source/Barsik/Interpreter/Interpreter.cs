@@ -482,14 +482,13 @@ public sealed class Interpreter
     {
         Sure.NotNull (sourceCode);
 
-        var traceOutput = Settings.ReportParsedStatements ? Output : null;
         var program = Settings.Grammar.ParseProgram
             (
                 sourceCode,
                 Settings.Tokenizer,
                 requireEnd,
                 Settings.DumpTokens,
-                traceOutput,
+                traceOutput: null,
                 ParsingDebugOutput
             );
         if (Settings.DumpAst)

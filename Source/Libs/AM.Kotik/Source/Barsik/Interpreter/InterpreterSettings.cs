@@ -149,12 +149,6 @@ public sealed class InterpreterSettings
     public bool DumpTokens { get; set; }
 
     /// <summary>
-    /// Отчитываться об успешно разобранных стейтментах.
-    /// </summary>
-    [JsonPropertyName ("report-parsed-statements")]
-    public bool ReportParsedStatements { get; set; }
-
-    /// <summary>
     /// Пути для поиска суб-скриптов.
     /// </summary>
     [JsonPropertyName ("path")]
@@ -294,10 +288,6 @@ public sealed class InterpreterSettings
             else if (arg is "--dump-tokens")
             {
                 result.DumpTokens = true;
-            }
-            else if (arg is "--report-statements")
-            {
-                result.ReportParsedStatements = true;
             }
             else if (arg is "--path")
             {

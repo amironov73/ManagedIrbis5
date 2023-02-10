@@ -17,7 +17,10 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 using AM.Collections;
+using AM.Kotik.Parsers;
 using AM.Results;
+
+using JetBrains.Annotations;
 
 #endregion
 
@@ -36,6 +39,7 @@ public abstract class Parser<TResult>
     /// <summary>
     /// Метка для упрощения отладки.
     /// </summary>
+    [UsedImplicitly]
     public string? Label { get; set; }
 
     #endregion
@@ -46,7 +50,7 @@ public abstract class Parser<TResult>
     /// Отладочная зацепка, вызывается перед началом разбора
     /// текущего токена.
     /// </summary>
-    protected internal void DebugHook
+    protected void DebugHook
         (
             ParseState state
         )
@@ -204,6 +208,20 @@ public abstract class Parser<TResult>
         return new Result<TResult> (temporary).Value;
     }
 
+    /// <summary>
+    /// Запоминание успешного выполнения парсера
+    /// в <see cref="ParseState"/> под указанным ключом.
+    /// </summary>
+    public Parser<TResult> Remember 
+        (
+            string key
+        )
+    {
+        Sure.NotNullNorEmpty (key);
+
+        return new RememberParser<TResult> (key, this);
+    }
+    
     /// <summary>
     /// Парсинг последовательности однообразных токенов.
     /// </summary>
