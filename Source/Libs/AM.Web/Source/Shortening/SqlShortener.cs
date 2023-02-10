@@ -160,17 +160,22 @@ public sealed class SqlShortener
     {
         Sure.NotNullNorEmpty (fullLink);
 
-        var linkData = new LinkData
-        {
-            Moment = DateTime.Now,
-            FullLink = fullLink,
-            ShortLink = CreateShortLink (fullLink),
-            Description = description,
-            Counter = 0
-        };
-
         using var connection = ConnectToDatabase();
-        connection.Insert (linkData);
+        var table = GetTable (connection);
+        var linkData = table.FirstOrDefault (row => row.FullLink == fullLink);
+        if (linkData is null)
+        {
+            linkData = new LinkData
+            {
+                Moment = DateTime.Now,
+                FullLink = fullLink,
+                ShortLink = CreateShortLink (fullLink),
+                Description = description,
+                Counter = 0
+            };
+            connection.Insert (linkData);
+        }
+
         _logger.LogInformation 
             (
                 "ShortenLink {FullLink} to {ShortLink}", 
@@ -178,7 +183,7 @@ public sealed class SqlShortener
                 linkData.ShortLink
             );
 
-        return linkData.ShortLink;
+        return linkData.ShortLink.ThrowIfNullOrEmpty();
     }
 
     /// <inheritdoc cref="ILinkShortener.GetFullLink"/>
