@@ -2,14 +2,10 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
-/* DragMoveUtility.cs --
+/* DragMoveUtility.cs -- включение поведения перетаскивания
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -18,100 +14,105 @@
 using System.ComponentModel;
 using System.Windows.Forms;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Предоставляет дополнительное свойство элементам
+/// управления для включения или отключения перетаскивания.
+/// </summary>
+/// <remarks>
+/// Borrowed from http://www.thomaslevesque.com/2009/05/06/windows-forms-automatically-drag-and-drop-controls-dragmove/
+/// </remarks>
+[PublicAPI]
+[ProvideProperty ("EnableDragMove", typeof (Control))]
+public partial class DragMoveProvider
+    : Component,
+    IExtenderProvider
 {
     /// <summary>
-    /// Provides an extra property for controls
-    /// to enable or disable the DragMove behavior.
+    /// Initializes a new instance of the DragMoveProvider
+    ///  class without a specified container.
     /// </summary>
-    /// <remarks>
-    /// Borrowed from http://www.thomaslevesque.com/2009/05/06/windows-forms-automatically-drag-and-drop-controls-dragmove/
-    /// </remarks>
-    [ProvideProperty("EnableDragMove", typeof(Control))]
-    public partial class DragMoveProvider
-        : Component,
-        IExtenderProvider
+    public DragMoveProvider()
     {
-        /// <summary>
-        /// Initializes a new instance of the DragMoveProvider
-        ///  class without a specified container.
-        /// </summary>
-        public DragMoveProvider()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the DragMoveProvider
-        /// class with a specified container.
-        /// <param name="container">An IContainer that
-        /// represents the container of the DragMoveProvider.
-        /// </param>
-        /// </summary>
-        public DragMoveProvider
-            (
-                IContainer container
-            )
-        {
-            container.Add(this);
+    /// <summary>
+    /// Initializes a new instance of the DragMoveProvider
+    /// class with a specified container.
+    /// <param name="container">An IContainer that
+    /// represents the container of the DragMoveProvider.
+    /// </param>
+    /// </summary>
+    public DragMoveProvider
+        (
+            IContainer container
+        )
+    {
+        container.Add (this);
 
-            InitializeComponent();
-        }
+        InitializeComponent();
+    }
 
-        #region IExtenderProvider Members
+    #region IExtenderProvider members
 
-        /// <summary>
-        /// Renvoie true si le DragMoveProvider peut fournir une propriété d'extension à l'objet cible spécifié.
-        /// </summary>
-        /// <param name="extendee">L'objet cible auquel ajouter une propriété d'extension.</param>
-        /// <returns>true si le DragMoveProvider peut fournir une ou plusieurs propriété d'extensions ; sinon, false.</returns>
-        public bool CanExtend(object extendee)
-        {
-            return extendee is Control;
-        }
+    /// <summary>
+    /// Renvoie true si le DragMoveProvider peut fournir une propriété d'extension à l'objet cible spécifié.
+    /// </summary>
+    /// <param name="extendee">L'objet cible auquel ajouter une propriété d'extension.</param>
+    /// <returns>true si le DragMoveProvider peut fournir une ou plusieurs propriété d'extensions ; sinon, false.</returns>
+    public bool CanExtend 
+        (
+            object extendee
+        )
+    {
+        return extendee is Control;
+    }
 
-        #endregion
+    #endregion
 
-        /// <summary>
-        /// Retrieves a value indicating whether
-        /// the DragMove behavior is enabled
-        /// on the specified control.
-        /// </summary>
-        /// <param name="control">The Control for which
-        /// to retrieve DragMove status</param>
-        /// <returns>true if the DragMove behavior
-        /// is enabled for this control ; otherwise, false.
-        /// </returns>
-        [DefaultValue(false)]
-        public bool GetEnableDragMove
-            (
-                Control control
-            )
-        {
-            return control.IsDragMoveEnabled();
-        }
+    /// <summary>
+    /// Retrieves a value indicating whether
+    /// the DragMove behavior is enabled
+    /// on the specified control.
+    /// </summary>
+    /// <param name="control">The Control for which
+    /// to retrieve DragMove status</param>
+    /// <returns>true if the DragMove behavior
+    /// is enabled for this control ; otherwise, false.
+    /// </returns>
+    [DefaultValue (false)]
+    public bool GetEnableDragMove
+        (
+            Control control
+        )
+    {
+        return control.IsDragMoveEnabled();
+    }
 
-        /// <summary>
-        /// Enable or disables the DragMove behavior
-        /// for the specified control.
-        /// </summary>
-        /// <param name="control">The control for which
-        /// to enable or disable the DragMove behavior.
-        /// </param>
-        /// <param name="value">A value indicating
-        /// if the DragMove behavior must be enabled
-        /// or disabled for this control.</param>
-        public void SetEnableDragMove
-            (
-                Control control,
-                bool value
-            )
-        {
-            control.EnableDragMove(value);
-        }
+    /// <summary>
+    /// Enable or disables the DragMove behavior
+    /// for the specified control.
+    /// </summary>
+    /// <param name="control">The control for which
+    /// to enable or disable the DragMove behavior.
+    /// </param>
+    /// <param name="value">A value indicating
+    /// if the DragMove behavior must be enabled
+    /// or disabled for this control.</param>
+    public void SetEnableDragMove
+        (
+            Control control,
+            bool value
+        )
+    {
+        control.EnableDragMove (value);
     }
 }
