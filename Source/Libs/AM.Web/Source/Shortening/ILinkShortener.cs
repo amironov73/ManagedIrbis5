@@ -14,14 +14,6 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-#region Using directives
-
-using System.Text.Json.Serialization;
-
-using JetBrains.Annotations;
-
-#endregion
-
 #nullable enable
 
 namespace AM.Web.Shortening;
@@ -34,28 +26,45 @@ public interface ILinkShortener
     /// <summary>
     /// Сокращение указанной ссылки.
     /// </summary>
-    string ShortenLink (string fullLink, string? description);
+    string ShortenLink
+        (
+            string fullLink,
+            string? description
+        );
 
     /// <summary>
     /// Получение полной ссылки по указанному короткому варианту.
     /// </summary>
-    string? GetFullLink (string shortLink, bool count);
+    string? GetFullLink
+        (
+            string shortLink,
+            bool count
+        );
 
     /// <summary>
     /// Получение полной информации о ссылке
     /// по указанному короткому варианту.
     /// </summary>
-    LinkData? GetLinkData (string shortLink);
+    LinkData? GetLinkData
+        (
+            string shortLink
+        );
 
     /// <summary>
     /// Добавление ссылки в базу.
     /// </summary>
-    int InsertLink (LinkData linkData);
+    int InsertLink
+        (
+            LinkData linkData
+        );
     
     /// <summary>
     /// Удаление указанной ссылки.
     /// </summary>
-    void DeleteLink (string shortLink);
+    void DeleteLink
+        (
+            string shortLink
+        );
 
     /// <summary>
     /// Получение сведений обо всех ссылках.

@@ -65,31 +65,44 @@ public sealed class InMemoryShortener
     #region Public methods
 
     /// <summary>
-    /// 
+    /// Получение глобального экземпляра, возможно,
+    /// с загрузкой состояния из указанного файла.
     /// </summary>
-    /// <param name="fileName"></param>
-    /// <returns></returns>
-    public static InMemoryShortener GetInstance 
+    public static InMemoryShortener GetInstance
         (
-            string? fileName = null
+            string? fileName
         )
     {
         if (_instance is not null)
         {
             return _instance;
         }
-        
-        fileName ??= "links.json";
 
-        var data = JsonUtility.ReadObjectFromFile<LinkData[]> (fileName);
         _instance = new InMemoryShortener();
-        _instance._linkData.AddRange (data);
-        if (data.Length != 0)
+        if (!string.IsNullOrEmpty (fileName))
         {
-            _instance._nextId = data.Max (row => row.Id) + 1;
+            var data = JsonUtility.ReadObjectFromFile<LinkData[]> (fileName);
+            _instance._linkData.AddRange (data);
+            if (data.Length != 0)
+            {
+                _instance._nextId = data.Max (row => row.Id) + 1;
+            }
         }
 
         return _instance;
+    }
+
+    /// <summary>
+    /// Сохранение состояния в указанный файл.
+    /// </summary>
+    public void SaveState
+        (
+            string fileName
+        )
+    {
+        Sure.NotNullNorEmpty (fileName);
+        
+        JsonUtility.SaveObjectToFile (_linkData.ToArray(), fileName);
     }
 
     #endregion

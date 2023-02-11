@@ -10,7 +10,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UseNameofExpression
 
-/* SqlShortener.cs -- сокращатель ссылок, работающий поверх MSSQL
+/* MssqlShortener.cs -- сокращатель ссылок, работающий поверх MSSQL
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -36,7 +36,7 @@ namespace AM.Web.Shortening;
 /// <summary>
 /// Сокращатель ссылок, работающий поверх MSSQL.
 /// </summary>
-public sealed class SqlShortener
+public sealed class MsSqlShortener
     : ShortenerBase
 {
     #region Construction
@@ -44,7 +44,7 @@ public sealed class SqlShortener
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public SqlShortener
+    public MsSqlShortener
         (
             IServiceProvider serviceProvider,
             IConfiguration configuration,
@@ -53,9 +53,9 @@ public sealed class SqlShortener
     {
         _serviceProvider = serviceProvider;
         _configuration = configuration;
-        _logger = serviceProvider.GetRequiredService<ILogger<SqlShortener>>();
+        _logger = serviceProvider.GetRequiredService<ILogger<MsSqlShortener>>();
 
-        _logger.LogTrace (nameof (SqlShortener) + "::Constructor");
+        _logger.LogTrace (nameof (MsSqlShortener) + "::Constructor");
 
         _connectionString = (connectionString ?? _configuration["links"]).ThrowIfNullOrEmpty();
     }
@@ -72,7 +72,7 @@ public sealed class SqlShortener
     /// <summary>
     /// Глобальный экземпляр.
     /// </summary>
-    private static SqlShortener? _instance;
+    private static MsSqlShortener? _instance;
     
     /// <summary>
     /// Подключается к MSSQL.
@@ -95,7 +95,7 @@ public sealed class SqlShortener
             Magna.Logger.LogError
                 (
                     exception,
-                    nameof (SqlShortener) + "::" + nameof (GetMsSqlConnection)
+                    nameof (MsSqlShortener) + "::" + nameof (GetMsSqlConnection)
                 );
             throw;
         }
@@ -108,20 +108,20 @@ public sealed class SqlShortener
     /// <summary>
     /// Получение (возможно, нового) экземпляра.
     /// </summary>
-    public static SqlShortener GetInstance
+    public static MsSqlShortener GetInstance
         (
             IServiceProvider serviceProvider,
             IConfiguration configuration,
             string? connnectionString = null
         )
     {
-        return _instance ??= new SqlShortener (serviceProvider, configuration, connnectionString);
+        return _instance ??= new MsSqlShortener (serviceProvider, configuration, connnectionString);
     }
 
     /// <summary>
     /// Получение (возможно, нового) экземпляра.
     /// </summary>
-    public static SqlShortener GetInstance
+    public static MsSqlShortener GetInstance
         (
             string? connnectionString = null
         )
@@ -130,7 +130,7 @@ public sealed class SqlShortener
         {
             var serviceProvider = Magna.Host.Services;
             var configuration = Magna.Configuration;
-            _instance = new SqlShortener (serviceProvider, configuration, connnectionString);
+            _instance = new MsSqlShortener (serviceProvider, configuration, connnectionString);
         }
 
         return _instance;
