@@ -4,10 +4,8 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable RedundantNameQualifier
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
+// ReSharper disable VirtualMemberCallInConstructor
 
 /* DropDownControl.cs -- контрол с выпадающей частью
  * Ars Magna project, http://arsmagna.ru
@@ -16,14 +14,9 @@
 #region Using directives
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.IO;
-using System.Text.RegularExpressions;
 using System.Windows.Forms;
-
-// using RC = AM.Windows.Forms.Properties.Resources;
 
 #endregion
 
@@ -38,6 +31,8 @@ namespace AM.Windows.Forms;
 public class DropDownControl
     : Control
 {
+    #region Events
+
     /// <summary>
     /// Fired after the drop down is closed.
     /// </summary>
@@ -48,6 +43,9 @@ public class DropDownControl
     /// </summary>
     public event EventHandler? DropDownOpened;
 
+    #endregion
+
+    #region Enums
 
     /// <summary>
     /// Side to which the drop down is aligned.
@@ -91,29 +89,31 @@ public class DropDownControl
         Dropped
     }
 
-    DropDownContainer dropContainer;
-    Control _dropDownItem;
-    bool closedWhileInControl;
-    private Size storedSize;
+    #endregion
+
+    private DropDownContainer? _dropContainer;
+    private Control _dropDownItem;
+    private bool _closedWhileInControl;
+    private Size _storedSize;
 
     /// <summary>
     /// Possible drop states
     /// </summary>
     protected DropStateOption DropState { get; private set; }
 
-    private string _Text;
+    private string _text;
 
     /// <summary>
     /// Text displayed in the drop down
     /// </summary>
     public new string Text
     {
-        get { return _Text; }
+        get => _text;
         set
         {
-            if (_Text != value)
+            if (_text != value)
             {
-                _Text = value;
+                _text = value;
                 Invalidate();
             }
         }
@@ -124,15 +124,15 @@ public class DropDownControl
     /// </summary>
     public DropDownControl()
     {
-        storedSize = Size;
+        _storedSize = Size;
         BackColor = Color.White;
         Text = Name;
 
         //HACK: Added to appease CS8618 x must contain a not-null value when exiting constructor
-        dropContainer = null!;
+        _dropContainer = null!;
         PropertyChanged = null!;
         _dropDownItem = null!;
-        _Text = Text;
+        _text = Text;
     }
 
     /// <summary>
@@ -146,10 +146,10 @@ public class DropDownControl
             throw new Exception ("The drop down item has already been implemented!");
         }
 
-        _DesignView = false;
+        _designView = false;
         DropState = DropStateOption.Closed;
-        Size = _AnchorSize;
-        AnchorClientBounds = new Rectangle (2, 2, _AnchorSize.Width - 21, _AnchorSize.Height - 4);
+        Size = _anchorSize;
+        AnchorClientBounds = new Rectangle (2, 2, _anchorSize.Width - 21, _anchorSize.Height - 4);
 
         //removes the dropDown item from the controls list so it
         //won't be seen until the drop-down window is active
@@ -161,19 +161,19 @@ public class DropDownControl
         _dropDownItem = dropDownItem;
     }
 
-    private Size _AnchorSize = new (121, 21);
+    private Size _anchorSize = new (121, 21);
 
     /// <summary>
     /// Anchor size
     /// </summary>
     public Size AnchorSize
     {
-        get { return _AnchorSize; }
+        get => _anchorSize;
         set
         {
-            if (value != _AnchorSize)
+            if (value != _anchorSize)
             {
-                _AnchorSize = value;
+                _anchorSize = value;
                 Invalidate();
             }
         }
@@ -185,7 +185,7 @@ public class DropDownControl
     public DockSideOption DockSide { get; set; }
 
 
-    private bool _DesignView = true;
+    private bool _designView = true;
 
     /// <summary>
     /// Design view
@@ -193,24 +193,24 @@ public class DropDownControl
     [DefaultValue (false)]
     protected bool DesignView
     {
-        get { return _DesignView; }
+        get => _designView;
         set
         {
-            if (_DesignView == value)
+            if (_designView == value)
             {
                 return;
             }
 
-            _DesignView = value;
+            _designView = value;
 
-            if (_DesignView)
+            if (_designView)
             {
-                Size = storedSize;
+                Size = _storedSize;
             }
             else
             {
-                storedSize = Size;
-                Size = _AnchorSize;
+                _storedSize = Size;
+                Size = _anchorSize;
             }
         }
     }
@@ -237,15 +237,15 @@ public class DropDownControl
     protected override void OnResize (EventArgs e)
     {
         base.OnResize (e);
-        _AnchorSize.Width = Width;
-        if (_DesignView)
+        _anchorSize.Width = Width;
+        if (_designView)
         {
-            storedSize = Size;
+            _storedSize = Size;
         }
         else
         {
-            _AnchorSize.Height = Height;
-            AnchorClientBounds = new Rectangle (2, 2, _AnchorSize.Width - 21, _AnchorSize.Height - 4);
+            _anchorSize.Height = Height;
+            AnchorClientBounds = new Rectangle (2, 2, _anchorSize.Width - 21, _anchorSize.Height - 4);
         }
 
         //[14/02/19] Added to fix 'streaking' redraw issue when resizing - e.g. when anchored on resizeable form.
@@ -288,18 +288,18 @@ public class DropDownControl
     {
         get
         {
-            if (dropContainer != null)
+            if (_dropContainer != null)
             {
                 return false;
             }
 
-            if (dropContainer == null && closedWhileInControl)
+            if (_dropContainer == null && _closedWhileInControl)
             {
-                closedWhileInControl = false;
+                _closedWhileInControl = false;
                 return false;
             }
 
-            return !closedWhileInControl;
+            return !_closedWhileInControl;
         }
     }
 
@@ -319,12 +319,12 @@ public class DropDownControl
             return;
         }
 
-        dropContainer = new DropDownContainer (_dropDownItem) { Bounds = GetDropDownBounds() };
-        dropContainer.DropStateChange += new DropDownContainer.DropWindowArgs (DropContainer_DropStateChange);
-        dropContainer.FormClosed += new FormClosedEventHandler (DropContainer_Closed);
+        _dropContainer = new DropDownContainer (_dropDownItem) { Bounds = GetDropDownBounds() };
+        _dropContainer.DropStateChange += DropContainer_DropStateChange;
+        _dropContainer.FormClosed += DropContainer_Closed;
         // ParentForm.Move += new EventHandler (ParentForm_Move);
         DropState = DropStateOption.Dropping;
-        dropContainer.Show (this);
+        _dropContainer.Show (this);
         DropState = DropStateOption.Dropped;
         Invalidate();
         DropDownOpened?.Invoke (this, EventArgs.Empty);
@@ -332,7 +332,7 @@ public class DropDownControl
 
     void ParentForm_Move (object? sender, EventArgs e)
     {
-        dropContainer.Bounds = GetDropDownBounds();
+        _dropContainer!.Bounds = GetDropDownBounds();
     }
 
     /// <summary>
@@ -340,11 +340,11 @@ public class DropDownControl
     /// </summary>
     public void CloseDropDown()
     {
-        if (dropContainer != null)
+        if (_dropContainer != null)
         {
             DropState = DropStateOption.Closing;
-            dropContainer.Freeze = false;
-            dropContainer.Close();
+            _dropContainer.freeze = false;
+            _dropContainer.Close();
         }
     }
 
@@ -355,19 +355,19 @@ public class DropDownControl
 
     void DropContainer_Closed (object? sender, FormClosedEventArgs e)
     {
-        if (!dropContainer.IsDisposed)
+        if (!_dropContainer!.IsDisposed)
         {
-            dropContainer.DropStateChange -= DropContainer_DropStateChange;
-            dropContainer.FormClosed -= DropContainer_Closed;
+            _dropContainer.DropStateChange -= DropContainer_DropStateChange;
+            _dropContainer.FormClosed -= DropContainer_Closed;
             // ParentForm.Move -= ParentForm_Move;
-            dropContainer.Dispose();
+            _dropContainer.Dispose();
         }
 
-        dropContainer = null!;
-        closedWhileInControl = (RectangleToScreen (ClientRectangle).Contains (Cursor.Position));
+        _dropContainer = null!;
+        _closedWhileInControl = (RectangleToScreen (ClientRectangle).Contains (Cursor.Position));
         DropState = DropStateOption.Closed;
         Invalidate();
-        DropDownClosed?.Invoke (this, new EventArgs());
+        DropDownClosed?.Invoke (this, EventArgs.Empty);
     }
 
     /// <summary>
@@ -377,14 +377,14 @@ public class DropDownControl
     protected virtual Rectangle GetDropDownBounds()
     {
         Size inflatedDropSize = new (_dropDownItem.Width + 2, _dropDownItem.Height + 2);
-        Rectangle screenBounds = DockSide == DockSideOption.Left
+        var screenBounds = DockSide == DockSideOption.Left
             ? new Rectangle (this.Parent.PointToScreen (new Point (this.Bounds.X, this.Bounds.Bottom)),
                 inflatedDropSize)
             : new Rectangle (
                 this.Parent.PointToScreen (new Point (this.Bounds.Right - _dropDownItem.Width, this.Bounds.Bottom)),
                 inflatedDropSize);
 
-        Rectangle workingArea = Screen.GetWorkingArea (screenBounds);
+        var workingArea = Screen.GetWorkingArea (screenBounds);
 
         //make sure we're completely in the top-left working area
         if (screenBounds.X < workingArea.X)
@@ -424,25 +424,25 @@ public class DropDownControl
         //Thanks to codeproject member: Mathiyazhagan for catching this. :)
         if (ComboBoxRenderer.IsSupported)
         {
-            ComboBoxRenderer.DrawTextBox (e.Graphics, new Rectangle (new Point (0, 0), _AnchorSize), GetState());
+            ComboBoxRenderer.DrawTextBox (e.Graphics, new Rectangle (new Point (0, 0), _anchorSize), GetState());
             ComboBoxRenderer.DrawDropDownButton (e.Graphics,
-                new Rectangle (_AnchorSize.Width - 19, 2, 18, _AnchorSize.Height - 4), GetState());
+                new Rectangle (_anchorSize.Width - 19, 2, 18, _anchorSize.Height - 4), GetState());
         }
         else
         {
             ControlPaint.DrawComboButton (e.Graphics,
-                new Rectangle (_AnchorSize.Width - 19, 2, 18, _AnchorSize.Height - 4),
+                new Rectangle (_anchorSize.Width - 19, 2, 18, _anchorSize.Height - 4),
                 Enabled ? ButtonState.Normal : ButtonState.Inactive);
         }
 
         using (Brush b = new SolidBrush (BackColor)) e.Graphics.FillRectangle (b, AnchorClientBounds);
 
-        TextRenderer.DrawText (e.Graphics, _Text, Font, AnchorClientBounds, ForeColor, TextFormatFlags.WordEllipsis);
+        TextRenderer.DrawText (e.Graphics, _text, Font, AnchorClientBounds, ForeColor, TextFormatFlags.WordEllipsis);
     }
 
     private System.Windows.Forms.VisualStyles.ComboBoxState GetState()
     {
-        return mousePressed || dropContainer != null
+        return mousePressed || _dropContainer != null
             ? System.Windows.Forms.VisualStyles.ComboBoxState.Pressed
             : System.Windows.Forms.VisualStyles.ComboBoxState.Normal;
     }
@@ -453,12 +453,12 @@ public class DropDownControl
     /// <param name="remainVisible"></param>
     public void FreezeDropDown (bool remainVisible)
     {
-        if (dropContainer != null)
+        if (_dropContainer != null)
         {
-            dropContainer.Freeze = true;
+            _dropContainer.freeze = true;
             if (!remainVisible)
             {
-                dropContainer.Visible = false;
+                _dropContainer.Visible = false;
             }
         }
     }
@@ -468,20 +468,21 @@ public class DropDownControl
     /// </summary>
     public void UnFreezeDropDown()
     {
-        if (dropContainer != null)
+        if (_dropContainer != null)
         {
-            dropContainer.Freeze = false;
-            if (!dropContainer.Visible)
+            _dropContainer.freeze = false;
+            if (!_dropContainer.Visible)
             {
-                dropContainer.Visible = true;
+                _dropContainer.Visible = true;
             }
         }
     }
 
-    internal sealed class DropDownContainer : Form, IMessageFilter
+    internal sealed class DropDownContainer
+        : Form,
+            IMessageFilter
     {
-        public bool Freeze;
-
+        public bool freeze;
 
         public DropDownContainer (Control dropDownItem)
         {
@@ -495,7 +496,7 @@ public class DropDownControl
 
         public bool PreFilterMessage (ref Message m)
         {
-            if (!Freeze && Visible && (ActiveForm == null || !ActiveForm.Equals (this)))
+            if (!freeze && Visible && (ActiveForm == null || !ActiveForm.Equals (this)))
             {
                 OnDropStateChange (DropStateOption.Closing);
                 Close();

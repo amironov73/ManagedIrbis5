@@ -2,12 +2,8 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable RedundantNameQualifier
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 /* DriveComboBox.cs -- ComboBox that contains list of installed drives
  * Ars Magna project, http://arsmagna.ru
