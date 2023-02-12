@@ -2,23 +2,16 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable CoVariantArrayConversion
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable PropertyCanBeMadeInitOnly.Global
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
-/* EnumComboBox.cs --
+/* EnumComboBox.cs -- ComboBox, отображающий элементы заданного перечисления
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
-using System.ComponentModel;
 using System.Windows.Forms;
 
 using AM.Reflection;
@@ -27,103 +20,99 @@ using AM.Reflection;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// <see cref="ComboBox"/>, отображающий элементы заданного перечисления
+/// </summary>
+[System.ComponentModel.DesignerCategory ("Code")]
+public class EnumComboBox
+    : ComboBox
 {
+    #region Properties
+
+    private Type? _enumType;
+
     /// <summary>
-    ///
+    /// Получение и установка типа перечисления.
     /// </summary>
-    // ReSharper disable RedundantNameQualifier
-    [System.ComponentModel.DesignerCategory("Code")]
-    // ReSharper restore RedundantNameQualifier
-    public class EnumComboBox
-        : ComboBox
+    [System.ComponentModel.DefaultValue (null)]
+    [System.ComponentModel.TypeConverter (typeof (EnumTypeConverter))]
+    public Type? EnumType
     {
-        #region Properties
+        get => _enumType;
+        set => _SetEnumType (value);
+    }
 
-        private Type? _enumType;
-
-        /// <summary>
-        /// Gets or sets the type of the enum.
-        /// </summary>
-        /// <value>The type of the enum.</value>
-        [DefaultValue(null)]
-        [TypeConverter(typeof(EnumTypeConverter))]
-        public Type? EnumType
+    /// <summary>
+    /// Получение и установка текущего выбранного значения.
+    /// </summary>
+    public int? Value
+    {
+        get
         {
-            get => _enumType;
-            set => _SetEnumType(value);
-        }
-
-        /// <summary>
-        /// Gets or sets the value.
-        /// </summary>
-        /// <value>The value.</value>
-        public int? Value
-        {
-            get
+            int? result = null;
+            var member = (EnumMemberInfo?) SelectedItem;
+            if (member != null)
             {
-                int? result = null;
-                var member = (EnumMemberInfo?)SelectedItem;
-                if (member != null)
-                {
-                    result = member.Value;
-                }
-                return result;
+                result = member.Value;
             }
-            set
+
+            return result;
+        }
+        set
+        {
+            if (value == null)
             {
-                if (value == null)
+                SelectedItem = null;
+            }
+            else
+            {
+                foreach (EnumMemberInfo info in Items)
                 {
-                    SelectedItem = null;
-                }
-                else
-                {
-                    foreach (EnumMemberInfo info in Items)
+                    if (info.Value == value)
                     {
-                        if (info.Value == value)
-                        {
-                            SelectedItem = info;
-                            break;
-                        }
+                        SelectedItem = info;
+                        break;
                     }
                 }
             }
         }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Default constructor.
-        /// </summary>
-        public EnumComboBox()
-        {
-            _SetupControl();
-        }
-
-        #endregion
-
-        #region Private members
-
-        private void _SetupControl()
-        {
-            DropDownStyle = ComboBoxStyle.DropDownList;
-        }
-
-        private void _SetEnumType
-            (
-                Type? enumType
-            )
-        {
-            _enumType = enumType;
-            var members = enumType is null
-                ? Array.Empty<EnumMemberInfo>()
-                : EnumMemberInfo.Parse(enumType);
-            Items.Clear();
-            Items.AddRange(members);
-        }
-
-        #endregion
     }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public EnumComboBox()
+    {
+        _SetupControl();
+    }
+
+    #endregion
+
+    #region Private members
+
+    private void _SetupControl()
+    {
+        DropDownStyle = ComboBoxStyle.DropDownList;
+    }
+
+    private void _SetEnumType
+        (
+            Type? enumType
+        )
+    {
+        _enumType = enumType;
+        var members = enumType is null
+            ? Array.Empty<EnumMemberInfo>()
+            : EnumMemberInfo.Parse (enumType);
+        Items.Clear();
+        Items.AddRange (members);
+    }
+
+    #endregion
 }
