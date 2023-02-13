@@ -4,11 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
 /* LinkData.cs -- информация о сокращенной ссылке
  * Ars Magna project, http://arsmagna.ru
@@ -86,6 +81,14 @@ public sealed class LinkData
     [UsedImplicitly]
     [JsonPropertyName ("counter")]
     public int Counter { get; set; }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString() =>
+        System.Text.Json.JsonSerializer.Serialize (this);
 
     #endregion
 }

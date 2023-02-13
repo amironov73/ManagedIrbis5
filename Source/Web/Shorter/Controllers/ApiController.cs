@@ -34,8 +34,8 @@ public class ApiController
             [FromBody] LinkData? linkData
         )
     {
-        // _logger.LogTrace ("Add {LinkData}", linkData);
-        
+        _logger.LogInformation ("Add {LinkData}", linkData);
+
         if (linkData is null)
         {
             return NoContent();
@@ -53,14 +53,14 @@ public class ApiController
         return new JsonResult (shortLink);
     }
     
-    [Route ("go/{shortLink}/{count:bool?}")]
-    public ActionResult Go
+    [Route ("get/{shortLink}/{count:bool?}")]
+    public ActionResult Get
         (
             string? shortLink,
             bool count = true
         )
     {
-        // _logger.LogTrace ("Go {ShortLink}, {Count}", shortLink, count);
+        _logger.LogInformation ("Go {ShortLink}, {Count}", shortLink, count);
         
         if (string.IsNullOrWhiteSpace (shortLink))
         {
@@ -68,9 +68,8 @@ public class ApiController
         }
 
         var fullLink = _shortener.GetFullLink (shortLink, count);
-        return Ok (fullLink);
 
-        // return new RedirectResult ("https://google.com", false);
+        return new JsonResult (fullLink);
     }
     
     [Route ("list/{shortLink?}")]
@@ -79,7 +78,7 @@ public class ApiController
             string? shortLink
         )
     {
-        // _logger.LogTrace ("List {ShortLink}", shortLink);
+        _logger.LogInformation ("List {ShortLink}", shortLink);
         
         if (string.IsNullOrWhiteSpace (shortLink))
         {

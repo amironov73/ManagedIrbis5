@@ -1,7 +1,5 @@
 ﻿@page
-@using AM.Web.Shortening
 @model Shorter.Pages.Add
-@inject ILinkShortener Shortener
 
 @{
     // Layout = null;
@@ -22,29 +20,32 @@
         <label class="form-label">Ссылка</label>
         <input id="full" class="form-control" type="text"/>
         <br/>
-        <input class="btn btn-primary" type="submit"/>
+        <input class="btn btn-primary" type="submit" value="Сократить"/>
     </form>
     <br/>
 
     <div id="result" style="display: none;">
         <span id="short"></span>
+        <button onclick="copyToClipboard()">Копи</button>
     </div>
 </div>
 
 <script type="text/javascript">
 function handleAdd() {
-    const description = $("#description").val()
-    const fullLink = $("#full").val()
+    const descriptionItem = $("#description")
+    const fullItem = $("#full")
+    const description = descriptionItem.val()
+    const fullLink = fullItem.val()
 
     $("#result").hide()
-    $("#short").val ("")
+    $("#short").text ("")
 
-    if (!fullLink) {
+    if (!description || !fullLink) {
         return true
-
     }
-    $("#description").val("")
-    $("#full").val("")
+
+    descriptionItem.val("")
+    fullItem.val("")
 
     const data = {
         description: description,
@@ -52,12 +53,12 @@ function handleAdd() {
     }
 
     $.ajax({
-        url: "/api/add",
+        url: "api/add",
         contentType: "application/json; charset=utf-8",
         dataType: "json",
         data: JSON.stringify (data),
         type: "POST",
-        success: function (result, status, xhr) {
+        success: function (result) {
             $("#result").show()
             $("#short").text (result)
         },
@@ -68,6 +69,15 @@ function handleAdd() {
     })
 
     return true
+}
+
+function copyToClipboard() {
+    const shortLink = $("#short").text()
+    if (shortLink) {
+        navigator.clipboard.writeText (shortLink)
+    }
+    
+    return true;
 }
 </script>
 

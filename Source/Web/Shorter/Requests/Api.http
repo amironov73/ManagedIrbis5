@@ -3,7 +3,7 @@ GET http://localhost:19897/api/list
 
 
 ### Получение полной ссылки
-GET http://localhost:19897/api/go/googl
+GET http://localhost:19897/api/get/googl
 
 
 ### Добавление нового сокращения
