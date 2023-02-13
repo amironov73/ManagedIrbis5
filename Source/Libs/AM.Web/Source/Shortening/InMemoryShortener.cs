@@ -157,7 +157,7 @@ public sealed class InMemoryShortener
             linkData.Counter++;
         }
 
-        return linkData.ShortLink.ThrowIfNullOrEmpty();
+        return linkData.FullLink.ThrowIfNullOrEmpty();
     }
 
     /// <inheritdoc cref="ShortenerBase.GetLinkData"/>

@@ -1,0 +1,17 @@
+[
+  {
+    "id": 1,
+    "full": "https://google.com",
+    "description": "Google",
+    "short": "googl",
+    "counter": 100
+  },
+
+  {
+    "id": 2,
+    "full": "https://istu.edu",
+    "description": "Irkutsk state technical university",
+    "short": "istu",
+    "counter": 50
+  }
+]

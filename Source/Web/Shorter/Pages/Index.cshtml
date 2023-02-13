@@ -1,7 +1,26 @@
 ﻿@page
+@using AM.Web.Shortening
 @model IndexModel
+@inject ILinkShortener Shortener
 @{
     ViewData["Title"] = "Тут";
+}
+
+@{
+    var shortLink = Model.ShortLink;
+    if (!string.IsNullOrEmpty (shortLink))
+    {
+        shortLink = shortLink.Trim();
+    }
+
+    if (!string.IsNullOrWhiteSpace (shortLink))
+    {
+        var fullLink = Shortener.GetFullLink (shortLink, true);
+        if (!string.IsNullOrEmpty (fullLink))
+        {
+            Response.Redirect (fullLink, false);
+        }
+    }
 }
 
 <div class="text-center">

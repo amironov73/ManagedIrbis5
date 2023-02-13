@@ -1,0 +1,13 @@
+﻿### Получение списка
+GET http://localhost:19897/api/list
+
+
+### Получение полной ссылки
+GET http://localhost:19897/api/go/googl
+
+
+### Добавление нового сокращения
+POST http://localhost:19897/api/add
+Content-Type: application/json
+
+{ "full" : "https://istu.edu", "description": "Some description" }

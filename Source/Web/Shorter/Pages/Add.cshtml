@@ -1,5 +1,7 @@
 ﻿@page
+@using AM.Web.Shortening
 @model Shorter.Pages.Add
+@inject ILinkShortener Shortener
 
 @{
     // Layout = null;
@@ -14,14 +16,60 @@
 <body>
 <h4>Добавление ссылки</h4>
 <div>
-    <form>
+    <form action="javascript:handleAdd()">
         <label class="form-label">Описание</label>
-        <input class="form-control" type="text"/>
+        <input id="description" class="form-control" type="text"/>
         <label class="form-label">Ссылка</label>
-        <input class="form-control" type="text"/>
+        <input id="full" class="form-control" type="text"/>
         <br/>
         <input class="btn btn-primary" type="submit"/>
     </form>
+    <br/>
+
+    <div id="result" style="display: none;">
+        <span id="short"></span>
+    </div>
 </div>
+
+<script type="text/javascript">
+function handleAdd() {
+    const description = $("#description").val()
+    const fullLink = $("#full").val()
+
+    $("#result").hide()
+    $("#short").val ("")
+
+    if (!fullLink) {
+        return true
+
+    }
+    $("#description").val("")
+    $("#full").val("")
+
+    const data = {
+        description: description,
+        full: fullLink
+    }
+
+    $.ajax({
+        url: "/api/add",
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        data: JSON.stringify (data),
+        type: "POST",
+        success: function (result, status, xhr) {
+            $("#result").show()
+            $("#short").text (result)
+        },
+        error: function (xhr, status, error) {
+            $("#result").show()
+            $("#short").text (error)
+        }
+    })
+
+    return true
+}
+</script>
+
 </body>
 </html>

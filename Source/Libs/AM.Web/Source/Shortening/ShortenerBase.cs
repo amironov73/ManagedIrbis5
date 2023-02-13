@@ -45,7 +45,16 @@ public abstract class ShortenerBase
         // в данный момент генерируемая короткая ссылка
         // никак не зависит от полной версии
         var bytes = BitConverter.GetBytes (DateTime.Now.ToOADate());
-        return Convert.ToBase64String (bytes);
+        var result = Convert.ToBase64String (bytes);
+
+        // Используем изменённый Base64 для URL, где не используется
+        // заполнение знаком '=' и символы '+' и '/' соответственно
+        // заменяются на '*' и '-'.
+        result = result.Replace ("=", string.Empty);
+        result = result.Replace ('+', '*');
+        result = result.Replace ('/', '~');
+
+        return result;
     }
 
     #endregion

@@ -1,0 +1,43 @@
+﻿@page
+@using AM.Web.Shortening
+@model Shorter.Pages.List
+@inject ILinkShortener Shortener
+
+@{
+    // Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html lang="ru">
+<head>
+    <title>Список сокращений</title>
+</head>
+<body>
+<div>
+    <h3>Список сокращенный ссылок</h3>
+
+    <table class="table">
+        <tr>
+            <th>№</th>
+            <th>Короткая</th>
+            <th>Полная ссылка</th>
+            <th>Описание</th>
+            <th></th>
+        </tr>
+        @foreach (var one in Shortener.GetAllLinks())
+        {
+            <tr>
+                <td>@one.Id</td>
+                <td>@one.ShortLink</td>
+                <td>
+                    <a href="@one.FullLink" target="_blank">@one.FullLink</a>
+                </td>
+                <td>@one.Description</td>
+                <td>@one.Counter</td>
+            </tr>
+        }
+    </table>
+</div>
+</body>
+</html>
