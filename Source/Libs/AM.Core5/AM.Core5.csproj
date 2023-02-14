@@ -29,6 +29,7 @@
     <!-- Централизованное управление пакетами -->
     <ItemGroup>
         <PackageReference Include="Autofac" />
+        <PackageReference Include="CommunityToolkit.HighPerformance" />
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" />
         <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
         <PackageReference Include="Microsoft.Extensions.Configuration" />
