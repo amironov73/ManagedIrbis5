@@ -1,0 +1,46 @@
+﻿//
+// Подсчет количества экземпляров, изданных ИРНИТУ
+//
+
+connect("host=127.0.0.1;port=6666;user=librarian;password=secret;db=ISTU;")
+if (!is_connected())
+{
+    error ("Not connected")
+    exit()
+}
+
+//=================================
+
+xpression = "(O=ИРНИТУ$ + O=ИРГТУ$) * (HD=J$ + K=метод$)"
+books = search (xpression)
+println ("Books found: ", len (books))
+
+books = batch_read (books)
+totalUch = 0
+totalSci = 0
+
+foreach (book in books)
+{
+    uch = 0
+    sci = 0
+    brief = format_record ("@brief", book.Mfn)
+    foreach (one in get_exemplars (book))
+    {
+        c = one.GetTotalCount()
+        if (one.Status same "U")
+            uch = uch + c
+        else
+            sci = sci + c
+    }
+    println (brief, "\t", uch, "\t", sci)
+    totalUch += uch
+    totalSci += sci
+}
+
+println ("Учебных: ", totalUch)
+println ("Научных: ", totalSci)
+
+//=================================
+
+disconnect()
+println ("THAT'S ALL, FOLKS!")
