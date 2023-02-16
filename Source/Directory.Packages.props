@@ -46,7 +46,7 @@
     <PackageVersion Include="linq2db" Version="3.7.0" />
     <PackageVersion Include="Live.Avalonia" Version="1.3.1" />
     <PackageVersion Include="MailKit" Version="3.5.0" />
-    <PackageVersion Include="Material.Avalonia" Version="3.0.0-avalonia11-preview2.137-nightly" />
+    <PackageVersion Include="Material.Avalonia" Version="3.0.0-avalonia11-preview3.145-nightly" />
     <PackageVersion Include="MaxMind.GeoIP2" Version="5.1.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Components.Web" Version="7.0.3" />
     <PackageVersion Include="Microsoft.AspNetCore.Razor.Language" Version="6.0.14" />
@@ -99,7 +99,7 @@
     <PackageVersion Include="ReactiveUI.Fody" Version="18.3.1" />
     <PackageVersion Include="RestSharp" Version="108.0.3" />
     <PackageVersion Include="RestSharp.Authenticators.Digest" Version="1.3.1" />
-    <PackageVersion Include="Rookout" Version="0.1.128" />
+    <PackageVersion Include="Rookout" Version="0.1.130" />
     <PackageVersion Include="SixLabors.ImageSharp" Version="2.1.3" />
     <PackageVersion Include="SixLabors.Fonts" Version="1.0.0-beta19" />
     <PackageVersion Include="SkiaSharp" Version="2.88.3" />
@@ -118,7 +118,7 @@
     <PackageVersion Include="System.Memory" Version="4.5.5" />
     <PackageVersion Include="System.Resources.Extensions" Version="7.0.0" />
     <PackageVersion Include="System.Security.Cryptography.Pkcs" Version="7.0.0" />
-    <PackageVersion Include="System.Security.Cryptography.ProtectedData" Version="7.0.0" />
+    <PackageVersion Include="System.Security.Cryptography.ProtectedData" Version="7.0.1" />
     <PackageVersion Include="System.Security.Permissions" Version="7.0.0" />
     <PackageVersion Include="System.Text.Encoding.CodePages" Version="7.0.0" />
     <PackageVersion Include="Telegram.Bot" Version="19.0.0-preview.2" />
