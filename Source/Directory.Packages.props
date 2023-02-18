@@ -81,9 +81,9 @@
     <PackageVersion Include="MSTest.TestFramework" Version="3.0.2" />
     <PackageVersion Include="Nerdbank.GitVersioning" Version="3.5.119" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.2" />
-    <PackageVersion Include="NLog" Version="5.1.1" />
-    <PackageVersion Include="NLog.Extensions.Logging" Version="5.2.1" />
-    <PackageVersion Include="NLog.Schema" Version="5.1.1" />
+    <PackageVersion Include="NLog" Version="5.1.2" />
+    <PackageVersion Include="NLog.Extensions.Logging" Version="5.2.2" />
+    <PackageVersion Include="NLog.Schema" Version="5.1.2" />
     <PackageVersion Include="NuGet.Common" Version="6.4.0" />
     <PackageVersion Include="NuGet.Configuration" Version="6.4.0" />
     <PackageVersion Include="NuGet.DependencyResolver.Core" Version="6.4.0" />
