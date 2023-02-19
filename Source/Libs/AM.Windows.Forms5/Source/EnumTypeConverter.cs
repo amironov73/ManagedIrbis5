@@ -2,8 +2,9 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
 
-/* EnumTypeConverter.cs --
+/* EnumTypeConverter.cs -- конвертер для типа перечисления
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,148 +18,101 @@ using System.Globalization;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Конвертер для типа перечисления.
+/// </summary>
+internal sealed class EnumTypeConverter
+    : TypeConverter
 {
-    /// <summary>
-    ///
-    /// </summary>
-    internal sealed class EnumTypeConverter
-        : TypeConverter
+    /// <inheritdoc cref="TypeConverter.CanConvertFrom(System.ComponentModel.ITypeDescriptorContext?,System.Type)"/>
+    public override bool CanConvertFrom
+        (
+            ITypeDescriptorContext? context,
+            Type sourceType
+        )
     {
-        /// <summary>
-        /// Returns whether this converter can convert
-        /// an object of the given type to the type
-        /// of this converter, using the specified context.
-        /// </summary>
-        /// <param name="context">An
-        /// <see cref="T:System.ComponentModel.ITypeDescriptorContext"/>
-        /// that provides a format context.</param>
-        /// <param name="sourceType">A <see cref="T:System.Type"/>
-        /// that represents the type you want to convert from.</param>
-        /// <returns>
-        /// true if this converter can perform the conversion;
-        /// otherwise, false.
-        /// </returns>
-        public override bool CanConvertFrom
-            (
-                ITypeDescriptorContext? context,
-                Type sourceType
-            )
+        if ((sourceType == typeof (string))
+            || (sourceType == typeof (Type)))
         {
-            if ((sourceType == typeof(string))
-                 || (sourceType == typeof(Type)))
-            {
-                return true;
-            }
-
-            return base.CanConvertFrom(context, sourceType);
+            return true;
         }
 
-        /// <summary>
-        /// Returns whether this converter can convert
-        /// the object to the specified type, using
-        /// the specified context.
-        /// </summary>
-        /// <param name="context">An
-        /// <see cref="T:System.ComponentModel.ITypeDescriptorContext"/>
-        /// that provides a format context.</param>
-        /// <param name="destinationType">A <see cref="T:System.Type"/>
-        /// that represents the type you want to convert to.</param>
-        /// <returns>
-        /// true if this converter can perform the conversion;
-        /// otherwise, false.
-        /// </returns>
-        public override bool CanConvertTo
-            (
-                ITypeDescriptorContext? context,
-                Type? destinationType
-            )
-        {
-            if ((destinationType == typeof(string))
-                 || (destinationType == typeof(Type)))
-            {
-                return true;
-            }
+        return base.CanConvertFrom (context, sourceType);
+    }
 
-            return base.CanConvertTo(context, destinationType);
+    /// <inheritdoc cref="TypeConverter.CanConvertTo(System.ComponentModel.ITypeDescriptorContext?,System.Type?)"/>
+    public override bool CanConvertTo
+        (
+            ITypeDescriptorContext? context,
+            Type? destinationType
+        )
+    {
+        if ((destinationType == typeof (string))
+            || (destinationType == typeof (Type)))
+        {
+            return true;
         }
 
-        /// <summary>
-        /// Converts the given object to the type of this converter, using the specified context and culture information.
-        /// </summary>
-        /// <param name="context">An <see cref="T:System.ComponentModel.ITypeDescriptorContext"></see> that provides a format context.</param>
-        /// <param name="culture">The <see cref="T:System.Globalization.CultureInfo"></see> to use as the current culture.</param>
-        /// <param name="value">The <see cref="T:System.Object"></see> to convert.</param>
-        /// <returns>
-        /// An <see cref="T:System.Object"></see> that represents the converted value.
-        /// </returns>
-        /// <exception cref="T:System.NotSupportedException">The conversion cannot be performed. </exception>
-        public override object? ConvertFrom
-            (
-                ITypeDescriptorContext? context,
-                CultureInfo? culture,
-                object value
-            )
+        return base.CanConvertTo (context, destinationType);
+    }
+
+    /// <inheritdoc cref="TypeConverter.ConvertFrom(System.ComponentModel.ITypeDescriptorContext?,System.Globalization.CultureInfo?,object)"/>
+    public override object? ConvertFrom
+        (
+            ITypeDescriptorContext? context,
+            CultureInfo? culture,
+            object value
+        )
+    {
+        var s = value as string;
+        if (!string.IsNullOrEmpty (s))
         {
-            var s = value as string;
-            if (!string.IsNullOrEmpty(s))
-            {
-                return Type.GetType(s);
-            }
-
-            if (value is Type t)
-            {
-                return t.FullName;
-            }
-
-            return base.ConvertFrom
-                (
-                    context,
-                    culture,
-                    value
-                );
+            return Type.GetType (s);
         }
 
-        /// <summary>
-        /// Converts the given value object to the specified type, using the specified context and culture information.
-        /// </summary>
-        /// <param name="context">An <see cref="T:System.ComponentModel.ITypeDescriptorContext"></see> that provides a format context.</param>
-        /// <param name="culture">A <see cref="T:System.Globalization.CultureInfo"></see>. If null is passed, the current culture is assumed.</param>
-        /// <param name="value">The <see cref="T:System.Object"></see> to convert.</param>
-        /// <param name="destinationType">The <see cref="T:System.Type"></see> to convert the value parameter to.</param>
-        /// <returns>
-        /// An <see cref="T:System.Object"></see> that represents the converted value.
-        /// </returns>
-        /// <exception cref="T:System.NotSupportedException">The conversion cannot be performed. </exception>
-        /// <exception cref="T:System.ArgumentNullException">The destinationType parameter is null. </exception>
-        public override object? ConvertTo
-            (
-                ITypeDescriptorContext? context,
-                CultureInfo? culture,
-                object? value,
-                Type destinationType
-            )
+        if (value is Type t)
         {
-            var s = value as string;
-            if (!string.IsNullOrEmpty(s)
-                 && (destinationType == typeof(Type)))
-            {
-                return Type.GetType(s);
-            }
-
-            if ((value is Type t)
-                && (destinationType == typeof(string)))
-            {
-                return t.FullName;
-            }
-
-            return base.ConvertTo
-                (
-                    context,
-                    culture,
-                    value,
-                    destinationType
-                );
+            return t.FullName;
         }
+
+        return base.ConvertFrom
+            (
+                context,
+                culture,
+                value
+            );
+    }
+
+    /// <inheritdoc cref="TypeConverter.ConvertTo(System.ComponentModel.ITypeDescriptorContext?,System.Globalization.CultureInfo?,object?,System.Type)"/>
+    public override object? ConvertTo
+        (
+            ITypeDescriptorContext? context,
+            CultureInfo? culture,
+            object? value,
+            Type destinationType
+        )
+    {
+        var s = value as string;
+        if (!string.IsNullOrEmpty (s)
+            && (destinationType == typeof (Type)))
+        {
+            return Type.GetType (s);
+        }
+
+        if ((value is Type t)
+            && (destinationType == typeof (string)))
+        {
+            return t.FullName;
+        }
+
+        return base.ConvertTo
+            (
+                context,
+                culture,
+                value,
+                destinationType
+            );
     }
 }
