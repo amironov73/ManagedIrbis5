@@ -34,12 +34,6 @@ namespace AM.Linux;
 [SupportedOSPlatform ("linux")]
 public static class LinuxUtility
 {
-    #region Private members
-
-
-
-    #endregion
-
     #region Public methods
 
     /// <summary>
