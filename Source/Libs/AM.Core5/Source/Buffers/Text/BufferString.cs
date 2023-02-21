@@ -12,7 +12,6 @@
 #region Using directives
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -27,18 +26,22 @@ using AM.Collections;
 namespace AM.Buffers.Text;
 
 /// <summary>
-/// 
+///
 /// </summary>
 public static partial class BufferString
 {
-    static Encoding UTF8NoBom = new UTF8Encoding (false);
+    private static readonly Encoding _utf8NoBom = new UTF8Encoding (false);
 
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
-    internal static void AppendChars<TBufferWriter> (ref TBufferWriter sb, ReadOnlySpan<char> chars)
+    internal static void AppendChars<TBufferWriter>
+        (
+            ref TBufferWriter sb,
+            ReadOnlySpan<char> chars
+        )
         where TBufferWriter : System.Buffers.IBufferWriter<byte>
     {
-        var span = sb.GetSpan (UTF8NoBom.GetMaxByteCount (chars.Length));
-        sb.Advance (UTF8NoBom.GetBytes (chars, span));
+        var span = sb.GetSpan (_utf8NoBom.GetMaxByteCount (chars.Length));
+        sb.Advance (_utf8NoBom.GetBytes (chars, span));
     }
 
     /// <summary>Create the Utf16 string StringBuilder.</summary>
@@ -107,24 +110,52 @@ public static partial class BufferString
         return JoinInternal (s, values);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="separator"></param>
+    /// <param name="values"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
     public static string Join<T> (char separator, ICollection<T> values)
     {
         ReadOnlySpan<char> s = stackalloc char[1] { separator };
         return JoinInternal (s, values.AsEnumerable());
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="separator"></param>
+    /// <param name="values"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
     public static string Join<T> (char separator, IList<T> values)
     {
         ReadOnlySpan<char> s = stackalloc char[1] { separator };
         return JoinInternal (s, values);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="separator"></param>
+    /// <param name="values"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
     public static string Join<T> (char separator, IReadOnlyList<T> values)
     {
         ReadOnlySpan<char> s = stackalloc char[1] { separator };
         return JoinInternal (s, values);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="separator"></param>
+    /// <param name="values"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
     public static string Join<T> (char separator, IReadOnlyCollection<T> values)
     {
         ReadOnlySpan<char> s = stackalloc char[1] { separator };
@@ -149,21 +180,49 @@ public static partial class BufferString
         return JoinInternal (separator.AsSpan(), values);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="separator"></param>
+    /// <param name="values"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
     public static string Join<T> (string separator, ICollection<T> values)
     {
         return JoinInternal (separator.AsSpan(), values.AsEnumerable());
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="separator"></param>
+    /// <param name="values"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
     public static string Join<T> (string separator, IList<T> values)
     {
         return JoinInternal (separator.AsSpan(), values);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="separator"></param>
+    /// <param name="values"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
     public static string Join<T> (string separator, IReadOnlyList<T> values)
     {
         return JoinInternal (separator.AsSpan(), values);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="separator"></param>
+    /// <param name="values"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
     public static string Join<T> (string separator, IReadOnlyCollection<T> values)
     {
         return JoinInternal (separator.AsSpan(), values.AsEnumerable());
@@ -232,16 +291,21 @@ public static partial class BufferString
         return JoinInternal (separator, readOnlyList);
     }
 
-    static string JoinInternal<T> (ReadOnlySpan<char> separator, IReadOnlyList<T> values)
+    static string JoinInternal<T>
+        (
+            ReadOnlySpan<char> separator,
+            IReadOnlyList<T> values
+        )
     {
         var count = values.Count;
         if (count == 0)
         {
             return string.Empty;
         }
-        else if (typeof (T) == typeof (string) && count == 1)
+
+        if (typeof (T) == typeof (string) && count == 1)
         {
-            return Unsafe.As<string> (values[0]);
+            return Unsafe.As<string> (values[0])!;
         }
 
         var sb = new Utf16ValueStringBuilder (true);
@@ -256,15 +320,20 @@ public static partial class BufferString
         }
     }
 
-    static string JoinInternal<T> (ReadOnlySpan<char> separator, ReadOnlySpan<T> values)
+    static string JoinInternal<T>
+        (
+            ReadOnlySpan<char> separator,
+            ReadOnlySpan<T> values
+        )
     {
         if (values.Length == 0)
         {
             return string.Empty;
         }
-        else if (typeof (T) == typeof (string) && values.Length == 1)
+
+        if (typeof (T) == typeof (string) && values.Length == 1)
         {
-            return Unsafe.As<string> (values[0]);
+            return Unsafe.As<string> (values[0])!;
         }
 
         var sb = new Utf16ValueStringBuilder (true);
@@ -279,7 +348,11 @@ public static partial class BufferString
         }
     }
 
-    static string JoinInternal<T> (ReadOnlySpan<char> separator, IEnumerable<T> values)
+    static string JoinInternal<T>
+        (
+            ReadOnlySpan<char> separator,
+            IEnumerable<T> values
+        )
     {
         var sb = new Utf16ValueStringBuilder (true);
         try

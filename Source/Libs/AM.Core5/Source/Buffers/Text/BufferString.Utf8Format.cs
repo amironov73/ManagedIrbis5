@@ -48,8 +48,8 @@ public static partial class BufferString
                 if (i != format.Length && format[i + 1] == '{')
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                     i = i + 1; // skip escaped '{'
                     copyFrom = i;
@@ -58,8 +58,8 @@ public static partial class BufferString
                 else
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                 }
 
@@ -85,8 +85,8 @@ public static partial class BufferString
                 if (i + 1 < format.Length && format[i + 1] == '}')
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                     i = i + 1; // skip escaped '}'
                     copyFrom = i;
@@ -104,8 +104,8 @@ public static partial class BufferString
             var copyLength = format.Length - copyFrom;
             if (copyLength > 0)
             {
-                var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(copyLength));
-                var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, copyLength), buffer);
+                var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(copyLength));
+                var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, copyLength), buffer);
                 bufferWriter.Advance(written);
             }
         }
@@ -133,8 +133,8 @@ public static partial class BufferString
                 if (i != format.Length && format[i + 1] == '{')
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                     i = i + 1; // skip escaped '{'
                     copyFrom = i;
@@ -143,8 +143,8 @@ public static partial class BufferString
                 else
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                 }
 
@@ -173,8 +173,8 @@ public static partial class BufferString
                 if (i + 1 < format.Length && format[i + 1] == '}')
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                     i = i + 1; // skip escaped '}'
                     copyFrom = i;
@@ -192,8 +192,8 @@ public static partial class BufferString
             var copyLength = format.Length - copyFrom;
             if (copyLength > 0)
             {
-                var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(copyLength));
-                var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, copyLength), buffer);
+                var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(copyLength));
+                var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, copyLength), buffer);
                 bufferWriter.Advance(written);
             }
         }
@@ -221,8 +221,8 @@ public static partial class BufferString
                 if (i != format.Length && format[i + 1] == '{')
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                     i = i + 1; // skip escaped '{'
                     copyFrom = i;
@@ -231,8 +231,8 @@ public static partial class BufferString
                 else
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                 }
 
@@ -264,8 +264,8 @@ public static partial class BufferString
                 if (i + 1 < format.Length && format[i + 1] == '}')
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                     i = i + 1; // skip escaped '}'
                     copyFrom = i;
@@ -283,8 +283,8 @@ public static partial class BufferString
             var copyLength = format.Length - copyFrom;
             if (copyLength > 0)
             {
-                var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(copyLength));
-                var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, copyLength), buffer);
+                var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(copyLength));
+                var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, copyLength), buffer);
                 bufferWriter.Advance(written);
             }
         }
@@ -312,8 +312,8 @@ public static partial class BufferString
                 if (i != format.Length && format[i + 1] == '{')
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                     i = i + 1; // skip escaped '{'
                     copyFrom = i;
@@ -322,8 +322,8 @@ public static partial class BufferString
                 else
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                 }
 
@@ -358,8 +358,8 @@ public static partial class BufferString
                 if (i + 1 < format.Length && format[i + 1] == '}')
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                     i = i + 1; // skip escaped '}'
                     copyFrom = i;
@@ -377,8 +377,8 @@ public static partial class BufferString
             var copyLength = format.Length - copyFrom;
             if (copyLength > 0)
             {
-                var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(copyLength));
-                var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, copyLength), buffer);
+                var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(copyLength));
+                var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, copyLength), buffer);
                 bufferWriter.Advance(written);
             }
         }
@@ -406,8 +406,8 @@ public static partial class BufferString
                 if (i != format.Length && format[i + 1] == '{')
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                     i = i + 1; // skip escaped '{'
                     copyFrom = i;
@@ -416,8 +416,8 @@ public static partial class BufferString
                 else
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                 }
 
@@ -455,8 +455,8 @@ public static partial class BufferString
                 if (i + 1 < format.Length && format[i + 1] == '}')
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                     i = i + 1; // skip escaped '}'
                     copyFrom = i;
@@ -474,8 +474,8 @@ public static partial class BufferString
             var copyLength = format.Length - copyFrom;
             if (copyLength > 0)
             {
-                var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(copyLength));
-                var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, copyLength), buffer);
+                var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(copyLength));
+                var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, copyLength), buffer);
                 bufferWriter.Advance(written);
             }
         }
@@ -503,8 +503,8 @@ public static partial class BufferString
                 if (i != format.Length && format[i + 1] == '{')
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                     i = i + 1; // skip escaped '{'
                     copyFrom = i;
@@ -513,8 +513,8 @@ public static partial class BufferString
                 else
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                 }
 
@@ -555,8 +555,8 @@ public static partial class BufferString
                 if (i + 1 < format.Length && format[i + 1] == '}')
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                     i = i + 1; // skip escaped '}'
                     copyFrom = i;
@@ -574,8 +574,8 @@ public static partial class BufferString
             var copyLength = format.Length - copyFrom;
             if (copyLength > 0)
             {
-                var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(copyLength));
-                var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, copyLength), buffer);
+                var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(copyLength));
+                var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, copyLength), buffer);
                 bufferWriter.Advance(written);
             }
         }
@@ -603,8 +603,8 @@ public static partial class BufferString
                 if (i != format.Length && format[i + 1] == '{')
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                     i = i + 1; // skip escaped '{'
                     copyFrom = i;
@@ -613,8 +613,8 @@ public static partial class BufferString
                 else
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                 }
 
@@ -658,8 +658,8 @@ public static partial class BufferString
                 if (i + 1 < format.Length && format[i + 1] == '}')
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                     i = i + 1; // skip escaped '}'
                     copyFrom = i;
@@ -677,8 +677,8 @@ public static partial class BufferString
             var copyLength = format.Length - copyFrom;
             if (copyLength > 0)
             {
-                var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(copyLength));
-                var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, copyLength), buffer);
+                var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(copyLength));
+                var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, copyLength), buffer);
                 bufferWriter.Advance(written);
             }
         }
@@ -706,8 +706,8 @@ public static partial class BufferString
                 if (i != format.Length && format[i + 1] == '{')
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                     i = i + 1; // skip escaped '{'
                     copyFrom = i;
@@ -716,8 +716,8 @@ public static partial class BufferString
                 else
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                 }
 
@@ -764,8 +764,8 @@ public static partial class BufferString
                 if (i + 1 < format.Length && format[i + 1] == '}')
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                     i = i + 1; // skip escaped '}'
                     copyFrom = i;
@@ -783,8 +783,8 @@ public static partial class BufferString
             var copyLength = format.Length - copyFrom;
             if (copyLength > 0)
             {
-                var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(copyLength));
-                var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, copyLength), buffer);
+                var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(copyLength));
+                var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, copyLength), buffer);
                 bufferWriter.Advance(written);
             }
         }
@@ -812,8 +812,8 @@ public static partial class BufferString
                 if (i != format.Length && format[i + 1] == '{')
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                     i = i + 1; // skip escaped '{'
                     copyFrom = i;
@@ -822,8 +822,8 @@ public static partial class BufferString
                 else
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                 }
 
@@ -873,8 +873,8 @@ public static partial class BufferString
                 if (i + 1 < format.Length && format[i + 1] == '}')
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                     i = i + 1; // skip escaped '}'
                     copyFrom = i;
@@ -892,8 +892,8 @@ public static partial class BufferString
             var copyLength = format.Length - copyFrom;
             if (copyLength > 0)
             {
-                var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(copyLength));
-                var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, copyLength), buffer);
+                var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(copyLength));
+                var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, copyLength), buffer);
                 bufferWriter.Advance(written);
             }
         }
@@ -921,8 +921,8 @@ public static partial class BufferString
                 if (i != format.Length && format[i + 1] == '{')
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                     i = i + 1; // skip escaped '{'
                     copyFrom = i;
@@ -931,8 +931,8 @@ public static partial class BufferString
                 else
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                 }
 
@@ -985,8 +985,8 @@ public static partial class BufferString
                 if (i + 1 < format.Length && format[i + 1] == '}')
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                     i = i + 1; // skip escaped '}'
                     copyFrom = i;
@@ -1004,8 +1004,8 @@ public static partial class BufferString
             var copyLength = format.Length - copyFrom;
             if (copyLength > 0)
             {
-                var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(copyLength));
-                var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, copyLength), buffer);
+                var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(copyLength));
+                var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, copyLength), buffer);
                 bufferWriter.Advance(written);
             }
         }
@@ -1033,8 +1033,8 @@ public static partial class BufferString
                 if (i != format.Length && format[i + 1] == '{')
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                     i = i + 1; // skip escaped '{'
                     copyFrom = i;
@@ -1043,8 +1043,8 @@ public static partial class BufferString
                 else
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                 }
 
@@ -1100,8 +1100,8 @@ public static partial class BufferString
                 if (i + 1 < format.Length && format[i + 1] == '}')
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                     i = i + 1; // skip escaped '}'
                     copyFrom = i;
@@ -1119,8 +1119,8 @@ public static partial class BufferString
             var copyLength = format.Length - copyFrom;
             if (copyLength > 0)
             {
-                var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(copyLength));
-                var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, copyLength), buffer);
+                var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(copyLength));
+                var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, copyLength), buffer);
                 bufferWriter.Advance(written);
             }
         }
@@ -1148,8 +1148,8 @@ public static partial class BufferString
                 if (i != format.Length && format[i + 1] == '{')
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                     i = i + 1; // skip escaped '{'
                     copyFrom = i;
@@ -1158,8 +1158,8 @@ public static partial class BufferString
                 else
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                 }
 
@@ -1218,8 +1218,8 @@ public static partial class BufferString
                 if (i + 1 < format.Length && format[i + 1] == '}')
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                     i = i + 1; // skip escaped '}'
                     copyFrom = i;
@@ -1237,8 +1237,8 @@ public static partial class BufferString
             var copyLength = format.Length - copyFrom;
             if (copyLength > 0)
             {
-                var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(copyLength));
-                var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, copyLength), buffer);
+                var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(copyLength));
+                var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, copyLength), buffer);
                 bufferWriter.Advance(written);
             }
         }
@@ -1266,8 +1266,8 @@ public static partial class BufferString
                 if (i != format.Length && format[i + 1] == '{')
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                     i = i + 1; // skip escaped '{'
                     copyFrom = i;
@@ -1276,8 +1276,8 @@ public static partial class BufferString
                 else
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                 }
 
@@ -1339,8 +1339,8 @@ public static partial class BufferString
                 if (i + 1 < format.Length && format[i + 1] == '}')
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                     i = i + 1; // skip escaped '}'
                     copyFrom = i;
@@ -1358,8 +1358,8 @@ public static partial class BufferString
             var copyLength = format.Length - copyFrom;
             if (copyLength > 0)
             {
-                var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(copyLength));
-                var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, copyLength), buffer);
+                var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(copyLength));
+                var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, copyLength), buffer);
                 bufferWriter.Advance(written);
             }
         }
@@ -1387,8 +1387,8 @@ public static partial class BufferString
                 if (i != format.Length && format[i + 1] == '{')
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                     i = i + 1; // skip escaped '{'
                     copyFrom = i;
@@ -1397,8 +1397,8 @@ public static partial class BufferString
                 else
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                 }
 
@@ -1463,8 +1463,8 @@ public static partial class BufferString
                 if (i + 1 < format.Length && format[i + 1] == '}')
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                     i = i + 1; // skip escaped '}'
                     copyFrom = i;
@@ -1482,8 +1482,8 @@ public static partial class BufferString
             var copyLength = format.Length - copyFrom;
             if (copyLength > 0)
             {
-                var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(copyLength));
-                var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, copyLength), buffer);
+                var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(copyLength));
+                var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, copyLength), buffer);
                 bufferWriter.Advance(written);
             }
         }
@@ -1511,8 +1511,8 @@ public static partial class BufferString
                 if (i != format.Length && format[i + 1] == '{')
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                     i = i + 1; // skip escaped '{'
                     copyFrom = i;
@@ -1521,8 +1521,8 @@ public static partial class BufferString
                 else
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                 }
 
@@ -1590,8 +1590,8 @@ public static partial class BufferString
                 if (i + 1 < format.Length && format[i + 1] == '}')
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                     i = i + 1; // skip escaped '}'
                     copyFrom = i;
@@ -1609,8 +1609,8 @@ public static partial class BufferString
             var copyLength = format.Length - copyFrom;
             if (copyLength > 0)
             {
-                var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(copyLength));
-                var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, copyLength), buffer);
+                var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(copyLength));
+                var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, copyLength), buffer);
                 bufferWriter.Advance(written);
             }
         }
@@ -1638,8 +1638,8 @@ public static partial class BufferString
                 if (i != format.Length && format[i + 1] == '{')
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                     i = i + 1; // skip escaped '{'
                     copyFrom = i;
@@ -1648,8 +1648,8 @@ public static partial class BufferString
                 else
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                 }
 
@@ -1720,8 +1720,8 @@ public static partial class BufferString
                 if (i + 1 < format.Length && format[i + 1] == '}')
                 {
                     var size = i - copyFrom;
-                    var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(size));
-                    var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
+                    var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(size));
+                    var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, size), buffer);
                     bufferWriter.Advance(written);
                     i = i + 1; // skip escaped '}'
                     copyFrom = i;
@@ -1739,8 +1739,8 @@ public static partial class BufferString
             var copyLength = format.Length - copyFrom;
             if (copyLength > 0)
             {
-                var buffer = bufferWriter.GetSpan(UTF8NoBom.GetMaxByteCount(copyLength));
-                var written = UTF8NoBom.GetBytes(format.AsSpan(copyFrom, copyLength), buffer);
+                var buffer = bufferWriter.GetSpan(_utf8NoBom.GetMaxByteCount(copyLength));
+                var written = _utf8NoBom.GetBytes(format.AsSpan(copyFrom, copyLength), buffer);
                 bufferWriter.Advance(written);
             }
         }

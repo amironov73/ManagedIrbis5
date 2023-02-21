@@ -23,54 +23,67 @@ using System.Text;
 namespace AM.Buffers.Text;
 
 internal static class EnumUtil<T>
-    // where T : Enum
+    where T: notnull
 {
     const string InvalidName = "$";
 
-    static readonly Dictionary<T, string> names;
-    static readonly Dictionary<T, byte[]> utf8names;
+    static readonly Dictionary<T, string> _names;
+    static readonly Dictionary<T, byte[]> _utf8Names;
 
     static EnumUtil()
     {
-        var enumNames = Enum.GetNames(typeof(T));
-        var values = Enum.GetValues(typeof(T));
-        names = new Dictionary<T, string>(enumNames.Length);
-        utf8names = new Dictionary<T, byte[]>(enumNames.Length);
-        for (int i = 0; i < enumNames.Length; i++)
+        var enumNames = Enum.GetNames (typeof (T));
+        var values = Enum.GetValues (typeof (T));
+        _names = new Dictionary<T, string> (enumNames.Length);
+        _utf8Names = new Dictionary<T, byte[]> (enumNames.Length);
+        for (var i = 0; i < enumNames.Length; i++)
         {
-            if (names.ContainsKey((T)values.GetValue(i)))
+            var key = (T) values.GetValue (i).ThrowIfNull();
+            if (_names.ContainsKey (key))
             {
                 // already registered = invalid.
-                names[(T)values.GetValue(i)] = InvalidName;
-                utf8names[(T)values.GetValue(i)] = Array.Empty<byte>(); // byte[0] == Invalid.
+                _names[key] = InvalidName;
+                _utf8Names[key] = Array.Empty<byte>(); // byte[0] == Invalid.
             }
             else
             {
-                names.Add((T)values.GetValue(i), enumNames[i]);
-                utf8names.Add((T)values.GetValue(i), Encoding.UTF8.GetBytes(enumNames[i]));
+                _names.Add (key, enumNames[i]);
+                _utf8Names.Add (key, Encoding.UTF8.GetBytes (enumNames[i]));
             }
         }
     }
 
-    public static bool TryFormatUtf16(T value, Span<char> dest, out int written, ReadOnlySpan<char> _)
+    public static bool TryFormatUtf16
+        (
+            T value,
+            Span<char> dest,
+            out int written,
+            ReadOnlySpan<char> _
+        )
     {
-        if (!names.TryGetValue(value, out var v) || v == InvalidName)
+        if (!_names.TryGetValue (value, out var v) || v == InvalidName)
         {
-            v = value!.ToString(); // T is Enum, not null always
+            v = value.ToString(); // T is Enum, not null always
         }
 
-        written = v.Length;
-        return v.AsSpan().TryCopyTo(dest);
+        written = v?.Length ?? 0;
+        return v.AsSpan().TryCopyTo (dest);
     }
 
-    public static bool TryFormatUtf8(T value, Span<byte> dest, out int written, StandardFormat _)
+    public static bool TryFormatUtf8
+        (
+            T value,
+            Span<byte> dest,
+            out int written,
+            StandardFormat _
+        )
     {
-        if (!utf8names.TryGetValue(value, out var v) || v.Length == 0)
+        if (!_utf8Names.TryGetValue (value, out var v) || v.Length == 0)
         {
-            v = Encoding.UTF8.GetBytes(value!.ToString());
+            v = Encoding.UTF8.GetBytes (value.ToString()!);
         }
 
         written = v.Length;
-        return v.AsSpan().TryCopyTo(dest);
+        return v.AsSpan().TryCopyTo (dest);
     }
 }

@@ -26,20 +26,24 @@ using System.Threading.Tasks;
 namespace AM.Buffers.Text;
 
 /// <summary>
-/// 
+///
 /// </summary>
 public partial struct Utf8ValueStringBuilder
     : IDisposable, IBufferWriter<byte>, IResettableBufferWriter<byte>
 {
+    /// <summary>
+    ///
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public delegate bool TryFormat<T> (T value, Span<byte> destination, out int written, StandardFormat format);
 
     const int ThreadStaticBufferSize = 64444;
     const int DefaultBufferSize = 65536; // use 64K default buffer.
-    static Encoding UTF8NoBom = new UTF8Encoding (false);
+    static readonly Encoding UTF8NoBom = new UTF8Encoding (false);
 
-    static byte newLine1;
-    static byte newLine2;
-    static bool crlf;
+    private static readonly byte _newLine1;
+    private static readonly byte _newLine2;
+    private static readonly bool _crlf;
 
     static Utf8ValueStringBuilder()
     {
@@ -47,15 +51,15 @@ public partial struct Utf8ValueStringBuilder
         if (newLine.Length == 1)
         {
             // cr or lf
-            newLine1 = newLine[0];
-            crlf = false;
+            _newLine1 = newLine[0];
+            _crlf = false;
         }
         else
         {
             // crlf(windows)
-            newLine1 = newLine[0];
-            newLine2 = newLine[1];
-            crlf = true;
+            _newLine1 = newLine[0];
+            _newLine2 = newLine[1];
+            _crlf = true;
         }
     }
 
@@ -140,11 +144,18 @@ public partial struct Utf8ValueStringBuilder
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public void Clear()
     {
         index = 0;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="sizeHint"></param>
     public void TryGrow (int sizeHint)
     {
         if (buffer!.Length < index + sizeHint)
@@ -153,6 +164,10 @@ public partial struct Utf8ValueStringBuilder
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="sizeHint"></param>
     public void Grow (int sizeHint)
     {
         var nextSize = buffer!.Length * 2;
@@ -176,17 +191,17 @@ public partial struct Utf8ValueStringBuilder
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public void AppendLine()
     {
-        if (crlf)
+        if (_crlf)
         {
             if (buffer!.Length - index < 2) Grow (2);
-            buffer[index] = newLine1;
-            buffer[index + 1] = newLine2;
+            buffer[index] = _newLine1;
+            buffer[index + 1] = _newLine2;
             index += 2;
         }
         else
         {
             if (buffer!.Length - index < 1) Grow (1);
-            buffer[index] = newLine1;
+            buffer[index] = _newLine1;
             index += 1;
         }
     }
