@@ -94,6 +94,7 @@
     <PackageVersion Include="NuGet.Protocol" Version="6.4.0" />
     <PackageVersion Include="Pidgin" Version="3.1.0" />
     <PackageVersion Include="Polly" Version="7.2.3" />
+    <PackageVersion Include="RadLine" Version="0.6.0" />
     <PackageVersion Include="ReactiveHistory" Version="0.10.7" />
     <PackageVersion Include="ReactiveUI" Version="18.3.1" />
     <PackageVersion Include="ReactiveUI.Fody" Version="18.3.1" />
@@ -109,6 +110,7 @@
     <PackageVersion Include="SkiaSharp.NativeAssets.Win32" Version="2.88.3" />
     <PackageVersion Include="SharpCompress" Version="0.32.2" />
     <PackageVersion Include="SharpZipLib" Version="1.4.1" />
+    <PackageVersion Include="Spectre.Console" Version="0.46.1-preview.0.7" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageVersion Include="System.CodeDom" Version="7.0.0" />
     <PackageVersion Include="System.CommandLine" Version="2.0.0-beta3.22114.1" />

@@ -20,6 +20,10 @@ using System.IO;
 
 using AM.IO;
 
+using RadLine;
+
+using Spectre.Console;
+
 #endregion
 
 #nullable enable
@@ -109,6 +113,10 @@ public sealed class Repl
         Interpreter.UserData["repl"] = this;
         Echo = true;
         _input = new ReplInput (Input, output, Interpreter);
+        if (LineEditor.IsSupported (AnsiConsole.Console))
+        {
+            _radInput = new RadInput();
+        }
     }
 
     /// <summary>
@@ -131,6 +139,10 @@ public sealed class Repl
                 interpreter.Output,
                 interpreter
             );
+        if (LineEditor.IsSupported (AnsiConsole.Console))
+        {
+            _radInput = new RadInput();
+        }
     }
 
     #endregion
@@ -138,6 +150,7 @@ public sealed class Repl
     #region Private members
 
     private readonly ReplInput _input;
+    private readonly RadInput? _radInput;
 
     #endregion
 
@@ -196,6 +209,19 @@ public sealed class Repl
     }
 
     /// <summary>
+    /// Чтение одной строки пользовательского ввода.
+    /// </summary>
+    public string? ReadLine()
+    {
+        if (_radInput is not null)
+        {
+            return _radInput.ReadLine();
+        }
+
+        return _input.ReadLine();
+    }
+
+    /// <summary>
     /// Прокрутка цикла. Выход -- две пустые строки подряд.
     /// </summary>
     public ExecutionResult Loop()
@@ -204,7 +230,7 @@ public sealed class Repl
 
         while (true)
         {
-            var line = _input.ReadLine ();
+            var line = ReadLine();
             if (string.IsNullOrWhiteSpace (line))
             {
                 if (++emptyLineCounter == 2)
