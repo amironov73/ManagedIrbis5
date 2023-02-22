@@ -4,12 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedParameter.Local
 
 /* LinuxUtility.cs -- полезные методы для Linux
  * Ars Magna project, http://arsmagna.ru
@@ -17,10 +11,11 @@
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Runtime.Versioning;
+
+using JetBrains.Annotations;
+
+using Mono.Unix.Native;
 
 #endregion
 
@@ -31,6 +26,7 @@ namespace AM.Linux;
 /// <summary>
 /// Полезные методы для Linux.
 /// </summary>
+[PublicAPI]
 [SupportedOSPlatform ("linux")]
 public static class LinuxUtility
 {
@@ -41,8 +37,21 @@ public static class LinuxUtility
     /// </summary>
     public static bool IsRoot()
     {
-        return Mono.Unix.Native.Syscall.geteuid() == 0;
+        return Syscall.geteuid() == 0;
     }
 
+
+    /// <summary>
+    /// Выяснение версии операционной системы.
+    /// </summary>
+    public static Utsname? Uname()
+    {
+        if (Syscall.uname (out var uname) < 0)
+        {
+            return null;
+        }
+
+        return uname;
+    }
     #endregion
 }
