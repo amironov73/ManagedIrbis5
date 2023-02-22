@@ -11,6 +11,7 @@
 
 #region Using directives
 
+using System.IO;
 using System.Runtime.Versioning;
 
 using AM.IO.PropFiles;
@@ -106,12 +107,17 @@ public sealed class OsRelease
     /// <summary>
     /// Чтение файла <c>/etc/os-release</c>.
     /// </summary>
-    public static OsRelease ReadFile
+    public static OsRelease? ReadFile
         (
             string fileName = "/etc/os-release"
         )
     {
-        Sure.FileExists (fileName);
+        Sure.NotNullNorEmpty (fileName);
+
+        if (!File.Exists (fileName))
+        {
+            return null;
+        }
 
         var result = new OsRelease();
         PropFile.Read (result, fileName);

@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
+// ReSharper disable StringLiteralTypo
 
 /* LsbRelease.cs -- файл /etc/lsb-release
  * Ars Magna project, http://arsmagna.ru
@@ -11,6 +12,7 @@
 
 #region Using directives
 
+using System.IO;
 using System.Runtime.Versioning;
 
 using AM.IO.PropFiles;
@@ -64,12 +66,17 @@ public sealed class LsbRelease
     /// <summary>
     /// Чтение файла <c>/etc/lsb-release</c>.
     /// </summary>
-    public static LsbRelease ReadFile
+    public static LsbRelease? ReadFile
         (
             string fileName = "/etc/lsb-release"
         )
     {
-        Sure.FileExists (fileName);
+        Sure.NotNullNorEmpty (fileName);
+
+        if (!File.Exists (fileName))
+        {
+            return null;
+        }
 
         var result = new LsbRelease();
         PropFile.Read (result, fileName);
