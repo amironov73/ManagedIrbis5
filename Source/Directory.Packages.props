@@ -8,6 +8,7 @@
   <PropertyGroup>
     <AvaloniaVersion>11.0.0-preview5</AvaloniaVersion>
     <CommunityToolkitVersion>8.1.0</CommunityToolkitVersion>
+    <NugetVersion>6.5.0</NugetVersion>
   </PropertyGroup>
 
   <!-- Централизованное управление пакетами -->
@@ -84,14 +85,14 @@
     <PackageVersion Include="NLog" Version="5.1.2" />
     <PackageVersion Include="NLog.Extensions.Logging" Version="5.2.2" />
     <PackageVersion Include="NLog.Schema" Version="5.1.2" />
-    <PackageVersion Include="NuGet.Common" Version="6.4.0" />
-    <PackageVersion Include="NuGet.Configuration" Version="6.4.0" />
-    <PackageVersion Include="NuGet.DependencyResolver.Core" Version="6.4.0" />
-    <PackageVersion Include="NuGet.Frameworks" Version="6.4.0" />
-    <PackageVersion Include="NuGet.LibraryModel" Version="6.4.0" />
-    <PackageVersion Include="NuGet.Packaging" Version="6.4.0" />
-    <PackageVersion Include="NuGet.ProjectModel" Version="6.4.0" />
-    <PackageVersion Include="NuGet.Protocol" Version="6.4.0" />
+    <PackageVersion Include="NuGet.Common" Version="$(NugetVersion)" />
+    <PackageVersion Include="NuGet.Configuration" Version="$(NugetVersion)" />
+    <PackageVersion Include="NuGet.DependencyResolver.Core" Version="$(NugetVersion)" />
+    <PackageVersion Include="NuGet.Frameworks" Version="$(NugetVersion)" />
+    <PackageVersion Include="NuGet.LibraryModel" Version="$(NugetVersion)" />
+    <PackageVersion Include="NuGet.Packaging" Version="$(NugetVersion)" />
+    <PackageVersion Include="NuGet.ProjectModel" Version="$(NugetVersion)" />
+    <PackageVersion Include="NuGet.Protocol" Version="$(NugetVersion)" />
     <PackageVersion Include="Pidgin" Version="3.1.0" />
     <PackageVersion Include="Polly" Version="7.2.3" />
     <PackageVersion Include="RadLine" Version="0.6.0" />
