@@ -18,6 +18,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -30,27 +32,45 @@ namespace AM.Buffers.Text;
 /// <remarks>
 /// It's important to make sure the writer is always properly disposed.
 /// </remarks>
-public sealed class ZStringWriter : TextWriter
+[PublicAPI]
+public sealed class ZStringWriter
+    : TextWriter
 {
-    private Utf16ValueStringBuilder sb;
-    private bool isOpen;
-    private UnicodeEncoding? encoding;
+    #region Construction
 
     /// <summary>
-    /// Creates a new instance using <see cref="CultureInfo.CurrentCulture"/> as format provider.
+    /// Конструктор.
     /// </summary>
-    public ZStringWriter() : this (CultureInfo.CurrentCulture)
+    public ZStringWriter()
+        : this (CultureInfo.CurrentCulture)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
-    /// Creates a new instance with given format provider.
+    /// Конструктор.
     /// </summary>
-    public ZStringWriter (IFormatProvider formatProvider) : base (formatProvider)
+    public ZStringWriter
+        (
+            IFormatProvider formatProvider
+        )
+        : base (formatProvider)
     {
-        sb = BufferString.CreateStringBuilder();
-        isOpen = true;
+        _builder = BufferString.CreateStringBuilder();
+        _isOpen = true;
     }
+
+    #endregion
+
+    #region Private members
+
+    private Utf16ValueStringBuilder _builder;
+    private bool _isOpen;
+    private UnicodeEncoding? _encoding;
+
+    #endregion
+
+    #region TextWriter members
 
     /// <summary>
     /// Disposes this instance, operations are no longer allowed.
@@ -60,38 +80,43 @@ public sealed class ZStringWriter : TextWriter
         Dispose (true);
     }
 
-    protected override void Dispose (bool disposing)
+    /// <inheritdoc cref="TextWriter.Dispose(bool)"/>
+    protected override void Dispose
+        (
+            bool disposing
+        )
     {
-        sb.Dispose();
-        isOpen = false;
+        _builder.Dispose();
+        _isOpen = false;
         base.Dispose (disposing);
     }
 
-    public override Encoding Encoding => encoding = encoding ?? new UnicodeEncoding (false, false);
+    /// <inheritdoc cref="TextWriter.Encoding"/>
+    public override Encoding Encoding =>
+        _encoding ??= new UnicodeEncoding (false, false);
 
-    public override void Write (char value)
+    /// <inheritdoc cref="TextWriter.Write(char)"/>
+    public override void Write
+        (
+            char value
+        )
     {
         AssertNotDisposed();
 
-        sb.Append (value);
+        _builder.Append (value);
     }
 
-    public override void Write (char[] buffer, int index, int count)
+    /// <inheritdoc cref="TextWriter.Write(char[],int,int)"/>
+    public override void Write
+        (
+            char[] buffer,
+            int index,
+            int count
+        )
     {
-        if (buffer == null)
-        {
-            throw new ArgumentNullException (nameof (buffer));
-        }
-
-        if (index < 0)
-        {
-            throw new ArgumentOutOfRangeException (nameof (index));
-        }
-
-        if (count < 0)
-        {
-            throw new ArgumentOutOfRangeException (nameof (count));
-        }
+        Sure.NotNull (buffer);
+        Sure.NonNegative (index);
+        Sure.NonNegative (count);
 
         if (buffer.Length - index < count)
         {
@@ -100,70 +125,108 @@ public sealed class ZStringWriter : TextWriter
 
         AssertNotDisposed();
 
-        sb.Append (buffer, index, count);
+        _builder.Append (buffer, index, count);
     }
 
-    public override void Write (string value)
+    /// <inheritdoc cref="TextWriter.Write(string?)"/>
+    public override void Write
+        (
+            string? value
+        )
     {
         AssertNotDisposed();
 
         if (value != null)
         {
-            sb.Append (value);
+            _builder.Append (value);
         }
     }
 
-    public override Task WriteAsync (char value)
+    /// <inheritdoc cref="TextWriter.WriteAsync(char)"/>
+    public override Task WriteAsync
+        (
+            char value
+        )
     {
         Write (value);
         return Task.CompletedTask;
     }
 
-    public override Task WriteAsync (string value)
+    /// <inheritdoc cref="TextWriter.WriteAsync(string?)"/>
+    public override Task WriteAsync
+        (
+            string? value
+        )
     {
         Write (value);
         return Task.CompletedTask;
     }
 
-    public override Task WriteAsync (char[] buffer, int index, int count)
+    /// <inheritdoc cref="TextWriter.WriteAsync(char[],int,int)"/>
+    public override Task WriteAsync
+        (
+            char[] buffer,
+            int index,
+            int count
+        )
     {
         Write (buffer, index, count);
         return Task.CompletedTask;
     }
 
-    public override Task WriteLineAsync (char value)
+    /// <inheritdoc cref="TextWriter.WriteLineAsync(char)"/>
+    public override Task WriteLineAsync
+        (
+            char value
+        )
     {
         WriteLine (value);
         return Task.CompletedTask;
     }
 
-    public override Task WriteLineAsync (string value)
+    /// <inheritdoc cref="TextWriter.WriteLineAsync(string?)"/>
+    public override Task WriteLineAsync
+        (
+            string? value
+        )
     {
         WriteLine (value);
         return Task.CompletedTask;
     }
 
-    public override Task WriteLineAsync (char[] buffer, int index, int count)
+    /// <inheritdoc cref="TextWriter.WriteLineAsync(char[],int,int)"/>
+    public override Task WriteLineAsync
+        (
+            char[] buffer,
+            int index,
+            int count
+        )
     {
         WriteLine (buffer, index, count);
         return Task.CompletedTask;
     }
 
-    public override void Write (bool value)
+    /// <inheritdoc cref="TextWriter.Write(bool)"/>
+    public override void Write
+        (
+            bool value
+        )
     {
         AssertNotDisposed();
-        sb.Append (value);
+        _builder.Append (value);
     }
 
-    public override void Write (decimal value)
+    /// <inheritdoc cref="TextWriter.Write(decimal)"/>
+    public override void Write
+        (
+            decimal value
+        )
     {
         AssertNotDisposed();
-        sb.Append (value);
+        _builder.Append (value);
     }
 
-    /// <summary>
-    /// No-op.
-    /// </summary>
+    /// <inheritdoc cref="TextWriter.FlushAsync"/>
     public override Task FlushAsync()
     {
         return Task.CompletedTask;
@@ -174,28 +237,38 @@ public sealed class ZStringWriter : TextWriter
     /// </summary>
     public override string ToString()
     {
-        return sb.ToString();
+        return _builder.ToString();
     }
 
-#if !NETSTANDARD2_0
-#if !UNITY_2018_3_OR_NEWER
-
-    public override void Write (ReadOnlySpan<char> buffer)
+    /// <inheritdoc cref="TextWriter.Write(System.ReadOnlySpan{char})"/>
+    public override void Write
+        (
+            ReadOnlySpan<char> buffer
+        )
     {
         AssertNotDisposed();
 
-        sb.Append (buffer);
+        _builder.Append (buffer);
     }
 
-    public override void WriteLine (ReadOnlySpan<char> buffer)
+    /// <inheritdoc cref="TextWriter.WriteLine(System.ReadOnlySpan{char})"/>
+    public override void WriteLine
+        (
+            ReadOnlySpan<char> buffer
+        )
     {
         AssertNotDisposed();
 
-        sb.Append (buffer);
+        _builder.Append (buffer);
         WriteLine();
     }
 
-    public override Task WriteAsync (ReadOnlyMemory<char> buffer, CancellationToken cancellationToken = default)
+    /// <inheritdoc cref="TextWriter.WriteAsync(System.ReadOnlyMemory{char},System.Threading.CancellationToken)"/>
+    public override Task WriteAsync
+        (
+            ReadOnlyMemory<char> buffer,
+            CancellationToken cancellationToken = default
+        )
     {
         if (cancellationToken.IsCancellationRequested)
         {
@@ -206,7 +279,12 @@ public sealed class ZStringWriter : TextWriter
         return Task.CompletedTask;
     }
 
-    public override Task WriteLineAsync (ReadOnlyMemory<char> buffer, CancellationToken cancellationToken = default)
+    /// <inheritdoc cref="TextWriter.WriteLineAsync(System.ReadOnlyMemory{char},System.Threading.CancellationToken)"/>
+    public override Task WriteLineAsync
+        (
+            ReadOnlyMemory<char> buffer,
+            CancellationToken cancellationToken = default
+        )
     {
         if (cancellationToken.IsCancellationRequested)
         {
@@ -216,14 +294,14 @@ public sealed class ZStringWriter : TextWriter
         WriteLine (buffer.Span);
         return Task.CompletedTask;
     }
-#endif
-#endif
 
     private void AssertNotDisposed()
     {
-        if (!isOpen)
+        if (!_isOpen)
         {
-            throw new ObjectDisposedException (nameof (sb));
+            throw new ObjectDisposedException (nameof (_builder));
         }
     }
+
+    #endregion
 }
