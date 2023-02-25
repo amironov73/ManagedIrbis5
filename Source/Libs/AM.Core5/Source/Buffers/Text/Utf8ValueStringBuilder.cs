@@ -4,8 +4,10 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable LocalizableElement
 
-/* Utf8StringBuilder.cs --
+/* Utf8StringBuilder.cs -- собирает строку в кодировке UTF-8
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,6 +21,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -26,24 +30,101 @@ using System.Threading.Tasks;
 namespace AM.Buffers.Text;
 
 /// <summary>
-///
+/// Собирает строку в кодировке UTF-8.
 /// </summary>
+[PublicAPI]
 public partial struct Utf8ValueStringBuilder
     : IDisposable, IBufferWriter<byte>, IResettableBufferWriter<byte>
 {
+    #region Constants
+
+    private const int ThreadStaticBufferSize = 64444;
+    private const int DefaultBufferSize = 65536; // use 64K default buffer.
+
+    #endregion
+    
+    #region Delegates
+
     /// <summary>
     ///
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public delegate bool TryFormat<T> (T value, Span<byte> destination, out int written, StandardFormat format);
+    public delegate bool TryFormat<in T> 
+        (
+            T value,
+            Span<byte> destination,
+            out int written,
+            StandardFormat format
+        );
+    
+    #endregion
 
-    const int ThreadStaticBufferSize = 64444;
-    const int DefaultBufferSize = 65536; // use 64K default buffer.
-    static readonly Encoding UTF8NoBom = new UTF8Encoding (false);
+    #region Nested classes
 
-    private static readonly byte _newLine1;
-    private static readonly byte _newLine2;
-    private static readonly bool _crlf;
+    /// <summary>
+    /// Кеш.
+    /// </summary>
+    public static class FormatterCache<T>
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        public static TryFormat<T> TryFormatDelegate;
+
+        static FormatterCache()
+        {
+            var formatter = (TryFormat<T>?)CreateFormatter (typeof (T));
+            if (formatter == null)
+            {
+                if (typeof (T).IsEnum)
+                {
+                    formatter = EnumUtil<T>.TryFormatUtf8;
+                }
+                else
+                {
+                    formatter = TryFormatDefault;
+                }
+            }
+
+            TryFormatDelegate = formatter;
+        }
+
+        private static bool TryFormatDefault
+            (
+                T value,
+                Span<byte> dest,
+                out int written,
+                StandardFormat format
+            )
+        {
+            if (value == null)
+            {
+                written = 0;
+                return true;
+            }
+
+            var s = typeof (T) == typeof (string)
+                ? Unsafe.As<string> (value)
+                :
+                (value is IFormattable formattable && format != default)
+                    ?
+                    formattable.ToString (format.ToString(), null)
+                    :
+                    value.ToString();
+
+            // also use this length when result is false.
+            written = UTF8NoBom.GetMaxByteCount (s.ThrowIfNull().Length);
+            if (dest.Length < written)
+            {
+                return false;
+            }
+
+            written = UTF8NoBom.GetBytes (s.AsSpan(), dest);
+            return true;
+        }
+    }
+    
+    #endregion
 
     static Utf8ValueStringBuilder()
     {
@@ -63,25 +144,51 @@ public partial struct Utf8ValueStringBuilder
         }
     }
 
-    [ThreadStatic] static byte[]? scratchBuffer;
+    #region Private members
 
+    private static readonly Encoding UTF8NoBom = new UTF8Encoding (false);
+
+    private static readonly byte _newLine1;
+    private static readonly byte _newLine2;
+    private static readonly bool _crlf;
+    
+    [ThreadStatic] private static byte[]? _scratchBuffer;
     [ThreadStatic] internal static bool scratchBufferUsed;
+    
+    private byte[]? _buffer;
+    private int _index;
+    private readonly bool _disposeImmediately;
 
-    byte[]? buffer;
-    int index;
-    bool disposeImmediately;
+    static TryFormat<T?> CreateNullableFormatter<T>() 
+        where T: struct
+    {
+        return (T? x, Span<byte> destination, out int written, StandardFormat format) =>
+        {
+            if (x == null)
+            {
+                written = 0;
+                return true;
+            }
+
+            return FormatterCache<T>.TryFormatDelegate (x.Value, destination, out written, format);
+        };
+    }
+
+    #endregion
+
+    #region Public methods
 
     /// <summary>Length of written buffer.</summary>
-    public int Length => index;
+    public int Length => _index;
 
     /// <summary>Get the written buffer data.</summary>
-    public ReadOnlySpan<byte> AsSpan() => buffer.AsSpan (0, index);
+    public ReadOnlySpan<byte> AsSpan() => _buffer.AsSpan (0, _index);
 
     /// <summary>Get the written buffer data.</summary>
-    public ReadOnlyMemory<byte> AsMemory() => buffer.AsMemory (0, index);
+    public ReadOnlyMemory<byte> AsMemory() => _buffer.AsMemory (0, _index);
 
     /// <summary>Get the written buffer data.</summary>
-    public ArraySegment<byte> AsArraySegment() => new ArraySegment<byte> (buffer, 0, index);
+    public ArraySegment<byte> AsArraySegment() => new (_buffer.ThrowIfNull(), 0, _index);
 
     /// <summary>
     /// Initializes a new instance
@@ -94,7 +201,10 @@ public partial struct Utf8ValueStringBuilder
     /// See the README.md
     /// </exception>
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
-    public Utf8ValueStringBuilder (bool disposeImmediately)
+    public Utf8ValueStringBuilder 
+        (
+            bool disposeImmediately
+        )
     {
         if (disposeImmediately && scratchBufferUsed)
         {
@@ -104,11 +214,7 @@ public partial struct Utf8ValueStringBuilder
         byte[]? buf;
         if (disposeImmediately)
         {
-            buf = scratchBuffer;
-            if (buf == null)
-            {
-                buf = scratchBuffer = new byte[ThreadStaticBufferSize];
-            }
+            buf = _scratchBuffer ??= new byte[ThreadStaticBufferSize];
 
             scratchBufferUsed = true;
         }
@@ -117,9 +223,9 @@ public partial struct Utf8ValueStringBuilder
             buf = ArrayPool<byte>.Shared.Rent (DefaultBufferSize);
         }
 
-        buffer = buf;
-        index = 0;
-        this.disposeImmediately = disposeImmediately;
+        _buffer = buf;
+        _index = 0;
+        _disposeImmediately = disposeImmediately;
     }
 
     /// <summary>
@@ -128,16 +234,16 @@ public partial struct Utf8ValueStringBuilder
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public void Dispose()
     {
-        if (buffer != null)
+        if (_buffer != null)
         {
-            if (buffer.Length != ThreadStaticBufferSize)
+            if (_buffer.Length != ThreadStaticBufferSize)
             {
-                ArrayPool<byte>.Shared.Return (buffer);
+                ArrayPool<byte>.Shared.Return (_buffer);
             }
 
-            buffer = null;
-            index = 0;
-            if (disposeImmediately)
+            _buffer = null;
+            _index = 0;
+            if (_disposeImmediately)
             {
                 scratchBufferUsed = false;
             }
@@ -149,7 +255,7 @@ public partial struct Utf8ValueStringBuilder
     /// </summary>
     public void Clear()
     {
-        index = 0;
+        _index = 0;
     }
 
     /// <summary>
@@ -158,7 +264,7 @@ public partial struct Utf8ValueStringBuilder
     /// <param name="sizeHint"></param>
     public void TryGrow (int sizeHint)
     {
-        if (buffer!.Length < index + sizeHint)
+        if (_buffer!.Length < _index + sizeHint)
         {
             Grow (sizeHint);
         }
@@ -170,21 +276,21 @@ public partial struct Utf8ValueStringBuilder
     /// <param name="sizeHint"></param>
     public void Grow (int sizeHint)
     {
-        var nextSize = buffer!.Length * 2;
+        var nextSize = _buffer!.Length * 2;
         if (sizeHint != 0)
         {
-            nextSize = Math.Max (nextSize, index + sizeHint);
+            nextSize = Math.Max (nextSize, _index + sizeHint);
         }
 
         var newBuffer = ArrayPool<byte>.Shared.Rent (nextSize);
 
-        buffer.CopyTo (newBuffer, 0);
-        if (buffer.Length != ThreadStaticBufferSize)
+        _buffer.CopyTo (newBuffer, 0);
+        if (_buffer.Length != ThreadStaticBufferSize)
         {
-            ArrayPool<byte>.Shared.Return (buffer);
+            ArrayPool<byte>.Shared.Return (_buffer);
         }
 
-        buffer = newBuffer;
+        _buffer = newBuffer;
     }
 
     /// <summary>Appends the default line terminator to the end of this instance.</summary>
@@ -193,16 +299,16 @@ public partial struct Utf8ValueStringBuilder
     {
         if (_crlf)
         {
-            if (buffer!.Length - index < 2) Grow (2);
-            buffer[index] = _newLine1;
-            buffer[index + 1] = _newLine2;
-            index += 2;
+            if (_buffer!.Length - _index < 2) Grow (2);
+            _buffer[_index] = _newLine1;
+            _buffer[_index + 1] = _newLine2;
+            _index += 2;
         }
         else
         {
-            if (buffer!.Length - index < 1) Grow (1);
-            buffer[index] = _newLine1;
-            index += 1;
+            if (_buffer!.Length - _index < 1) Grow (1);
+            _buffer[_index] = _newLine1;
+            _index += 1;
         }
     }
 
@@ -211,17 +317,20 @@ public partial struct Utf8ValueStringBuilder
     public unsafe void Append (char value)
     {
         var maxLen = UTF8NoBom.GetMaxByteCount (1);
-        if (buffer!.Length - index < maxLen)
+        if (_buffer!.Length - _index < maxLen)
         {
             Grow (maxLen);
         }
 
-        fixed (byte* bp = &buffer[index])
+        fixed (byte* bp = &_buffer[_index])
         {
-            index += UTF8NoBom.GetBytes (&value, 1, bp, maxLen);
+            _index += UTF8NoBom.GetBytes (&value, 1, bp, maxLen);
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public void Append (char value, int repeatCount)
     {
@@ -241,11 +350,11 @@ public partial struct Utf8ValueStringBuilder
             Span<byte> utf8Bytes = stackalloc byte[maxLen];
             ReadOnlySpan<char> chars = stackalloc char[1] { value };
 
-            int len = UTF8NoBom.GetBytes (chars, utf8Bytes);
+            var len = UTF8NoBom.GetBytes (chars, utf8Bytes);
 
             TryGrow (len * repeatCount);
 
-            for (int i = 0; i < repeatCount; i++)
+            for (var i = 0; i < repeatCount; i++)
             {
                 utf8Bytes.CopyTo (GetSpan (len));
                 Advance (len);
@@ -261,8 +370,11 @@ public partial struct Utf8ValueStringBuilder
         AppendLine();
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
-    public void Append (string value, int startIndex, int count)
+    public void Append (string? value, int startIndex, int count)
     {
         if (value == null)
         {
@@ -299,14 +411,17 @@ public partial struct Utf8ValueStringBuilder
     public void Append (ReadOnlySpan<char> value)
     {
         var maxLen = UTF8NoBom.GetMaxByteCount (value.Length);
-        if (buffer!.Length - index < maxLen)
+        if (_buffer!.Length - _index < maxLen)
         {
             Grow (maxLen);
         }
 
-        index += UTF8NoBom.GetBytes (value, buffer.AsSpan (index));
+        _index += UTF8NoBom.GetBytes (value, _buffer.AsSpan (_index));
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public void AppendLine (ReadOnlySpan<char> value)
     {
@@ -314,30 +429,33 @@ public partial struct Utf8ValueStringBuilder
         AppendLine();
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public void AppendLiteral (ReadOnlySpan<byte> value)
     {
-        if ((buffer!.Length - index) < value.Length)
+        if ((_buffer!.Length - _index) < value.Length)
         {
             Grow (value.Length);
         }
 
-        value.CopyTo (buffer.AsSpan (index));
-        index += value.Length;
+        value.CopyTo (_buffer.AsSpan (_index));
+        _index += value.Length;
     }
 
     /// <summary>Appends the string representation of a specified value to this instance.</summary>
     public void Append<T> (T value)
     {
-        if (!FormatterCache<T>.TryFormatDelegate (value, buffer.AsSpan (index), out var written, default))
+        if (!FormatterCache<T>.TryFormatDelegate (value, _buffer.AsSpan (_index), out var written, default))
         {
             Grow (written);
-            if (!FormatterCache<T>.TryFormatDelegate (value, buffer.AsSpan (index), out written, default))
+            if (!FormatterCache<T>.TryFormatDelegate (value, _buffer.AsSpan (_index), out written, default))
             {
                 ThrowArgumentException (nameof (value));
             }
         }
 
-        index += written;
+        _index += written;
     }
 
     /// <summary>Appends the string representation of a specified value followed by the default line terminator to the end of this instance.</summary>
@@ -352,7 +470,7 @@ public partial struct Utf8ValueStringBuilder
     /// <summary>Copy inner buffer to the bufferWriter.</summary>
     public void CopyTo (IBufferWriter<byte> bufferWriter)
     {
-        var destination = bufferWriter.GetSpan (index);
+        var destination = bufferWriter.GetSpan (_index);
         TryCopyTo (destination, out var written);
         bufferWriter.Advance (written);
     }
@@ -360,71 +478,74 @@ public partial struct Utf8ValueStringBuilder
     /// <summary>Copy inner buffer to the destination span.</summary>
     public bool TryCopyTo (Span<byte> destination, out int bytesWritten)
     {
-        if (destination.Length < index)
+        if (destination.Length < _index)
         {
             bytesWritten = 0;
             return false;
         }
 
-        bytesWritten = index;
-        buffer.AsSpan (0, index).CopyTo (destination);
+        bytesWritten = _index;
+        _buffer.AsSpan (0, _index).CopyTo (destination);
         return true;
     }
 
     /// <summary>Write inner buffer to stream.</summary>
     public Task WriteToAsync (Stream stream)
     {
-        return stream.WriteAsync (buffer, 0, index);
+        return stream.WriteAsync (_buffer.ThrowIfNull(), 0, _index);
     }
 
     /// <summary>Write inner buffer to stream.</summary>
     public Task WriteToAsync (Stream stream, CancellationToken cancellationToken)
     {
-        return stream.WriteAsync (buffer, 0, index, cancellationToken);
+        return stream.WriteAsync (_buffer.ThrowIfNull(), 0, _index, cancellationToken);
     }
 
     /// <summary>Encode the innner utf8 buffer to a System.String.</summary>
     public override string ToString()
     {
-        if (index == 0)
+        if (_index == 0)
             return string.Empty;
 
-        return UTF8NoBom.GetString (buffer, 0, index);
+        return UTF8NoBom.GetString (_buffer.ThrowIfNull(), 0, _index);
     }
 
     // IBufferWriter
 
     /// <summary>IBufferWriter.GetMemory.</summary>
-    public Memory<byte> GetMemory (int sizeHint)
+    public Memory<byte> GetMemory 
+        (
+            int sizeHint
+        )
     {
-        if ((buffer!.Length - index) < sizeHint)
+        if ((_buffer!.Length - _index) < sizeHint)
         {
             Grow (sizeHint);
         }
 
-        return buffer.AsMemory (index);
+        return _buffer.AsMemory (_index);
     }
 
     /// <summary>IBufferWriter.GetSpan.</summary>
     public Span<byte> GetSpan (int sizeHint)
     {
-        if ((buffer!.Length - index) < sizeHint)
+        if ((_buffer!.Length - _index) < sizeHint)
         {
             Grow (sizeHint);
         }
 
-        return buffer.AsSpan (index);
+        return _buffer.AsSpan (_index);
     }
 
     /// <summary>IBufferWriter.Advance.</summary>
     public void Advance (int count)
     {
-        index += count;
+        _index += count;
     }
 
     void IResettableBufferWriter<byte>.Reset()
     {
-        index = 0;
+        _index = 0;
     }
 
     void ThrowArgumentException (string paramName)
@@ -449,18 +570,18 @@ public partial struct Utf8ValueStringBuilder
         {
             width *= -1;
 
-            if (!FormatterCache<T>.TryFormatDelegate (arg, buffer.AsSpan (index), out var charsWritten, format))
+            if (!FormatterCache<T>.TryFormatDelegate (arg, _buffer.AsSpan (_index), out var charsWritten, format))
             {
                 Grow (charsWritten);
-                if (!FormatterCache<T>.TryFormatDelegate (arg, buffer.AsSpan (index), out charsWritten, format))
+                if (!FormatterCache<T>.TryFormatDelegate (arg, _buffer.AsSpan (_index), out charsWritten, format))
                 {
                     ThrowArgumentException (argName);
                 }
             }
 
-            index += charsWritten;
+            _index += charsWritten;
 
-            int padding = width - charsWritten;
+            var padding = width - charsWritten;
             if (width > 0 && padding > 0)
             {
                 Append (' ', padding); // TODO Fill Method is too slow.
@@ -471,13 +592,13 @@ public partial struct Utf8ValueStringBuilder
             if (typeof (T) == typeof (string))
             {
                 var s = Unsafe.As<string> (arg);
-                int padding = width - s.Length;
+                var padding = width - s.ThrowIfNull().Length;
                 if (padding > 0)
                 {
                     Append (' ', padding); // TODO Fill Method is too slow.
                 }
 
-                Append (s);
+                Append (s.ThrowIfNull());
             }
             else
             {
@@ -492,7 +613,7 @@ public partial struct Utf8ValueStringBuilder
                     }
                 }
 
-                int padding = width - charsWritten;
+                var padding = width - charsWritten;
                 if (padding > 0)
                 {
                     Append (' ', padding); // TODO Fill Method is too slow.
@@ -512,76 +633,13 @@ public partial struct Utf8ValueStringBuilder
         FormatterCache<T>.TryFormatDelegate = formatMethod;
     }
 
-    static TryFormat<T?> CreateNullableFormatter<T>() where T : struct
-    {
-        return new TryFormat<T?> ((T? x, Span<byte> destination, out int written, StandardFormat format) =>
-        {
-            if (x == null)
-            {
-                written = 0;
-                return true;
-            }
-
-            return FormatterCache<T>.TryFormatDelegate (x.Value, destination, out written, format);
-        });
-    }
-
     /// <summary>
     /// Supports the Nullable type for a given struct type.
     /// </summary>
     public static void EnableNullableFormat<T>() where T : struct
     {
-        RegisterTryFormat<T?> (CreateNullableFormatter<T>());
+        RegisterTryFormat (CreateNullableFormatter<T>());
     }
-
-    public static class FormatterCache<T>
-    {
-        public static TryFormat<T> TryFormatDelegate;
-
-        static FormatterCache()
-        {
-            var formatter = (TryFormat<T>?)CreateFormatter (typeof (T));
-            if (formatter == null)
-            {
-                if (typeof (T).IsEnum)
-                {
-                    formatter = new TryFormat<T> (EnumUtil<T>.TryFormatUtf8);
-                }
-                else
-                {
-                    formatter = new TryFormat<T> (TryFormatDefault);
-                }
-            }
-
-            TryFormatDelegate = formatter;
-        }
-
-        static bool TryFormatDefault (T value, Span<byte> dest, out int written, StandardFormat format)
-        {
-            if (value == null)
-            {
-                written = 0;
-                return true;
-            }
-
-            var s = typeof (T) == typeof (string)
-                ? Unsafe.As<string> (value)
-                :
-                (value is IFormattable formattable && format != default)
-                    ?
-                    formattable.ToString (format.ToString(), null)
-                    :
-                    value.ToString();
-
-            // also use this length when result is false.
-            written = UTF8NoBom.GetMaxByteCount (s.Length);
-            if (dest.Length < written)
-            {
-                return false;
-            }
-
-            written = UTF8NoBom.GetBytes (s.AsSpan(), dest);
-            return true;
-        }
-    }
+    
+    #endregion
 }

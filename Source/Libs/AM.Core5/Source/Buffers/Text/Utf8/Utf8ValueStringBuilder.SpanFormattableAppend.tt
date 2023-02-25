@@ -19,10 +19,10 @@ namespace AM.Buffers.Text
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Append(<#= t.FullName #> value)
         {
-            if(!Utf8Formatter.TryFormat(value, buffer.AsSpan(index), out var written))
+            if(!Utf8Formatter.TryFormat(value, _buffer.AsSpan(index), out var written))
             {
                 Grow(written);
-                if(!Utf8Formatter.TryFormat(value, buffer.AsSpan(index), out written))
+                if(!Utf8Formatter.TryFormat(value, _buffer.AsSpan(index), out written))
                 {
                     ThrowArgumentException(nameof(value));
                 }
@@ -34,10 +34,10 @@ namespace AM.Buffers.Text
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Append(<#= t.FullName #> value, StandardFormat format)
         {
-            if(!Utf8Formatter.TryFormat(value, buffer.AsSpan(index), out var written, format))
+            if(!Utf8Formatter.TryFormat(value, _buffer.AsSpan(index), out var written, format))
             {
                 Grow(written);
-                if(!Utf8Formatter.TryFormat(value, buffer.AsSpan(index), out written, format))
+                if(!Utf8Formatter.TryFormat(value, _buffer.AsSpan(index), out written, format))
                 {
                     ThrowArgumentException(nameof(value));
                 }
