@@ -7,7 +7,6 @@
         <ApplicationManifest>app.manifest</ApplicationManifest>
         <ApplicationIcon>Assets/number.ico</ApplicationIcon>
         <InvariantGlobalization>true</InvariantGlobalization>
-        <PublishAot>true</PublishAot>
     </PropertyGroup>
 
     <ItemGroup>
