@@ -228,11 +228,29 @@ public class FolderModel
             pattern = Path.GetFileName (directoryNameWithPattern).ThrowIfNull();
         }
 
+        var dirnameWithoutSlash = dirName;
+        var lastChar = dirnameWithoutSlash.LastChar();
+        if (lastChar == Path.DirectorySeparatorChar)
+        {
+            dirnameWithoutSlash = dirnameWithoutSlash.Remove (dirnameWithoutSlash.Length - 1);
+        }
+
+        var prefix = Path.GetFileName (dirnameWithoutSlash);
+        if (!string.IsNullOrEmpty (prefix))
+        {
+            prefix += '-';
+        }
+
+        Prefix = prefix;
         StartNumber = 1;
+        GroupWidth = 3;
+        DryRun = false;
         DirectoryName = dirName;
         var unsorted = Directory.GetFiles (dirName, pattern, SearchOption.TopDirectoryOnly);
         var sorted = NumberText.Sort (unsorted).ToArray();
-        Files = sorted.Select (one =>
+        Files = sorted
+            .Where (one => !one.Contains ('!'))
+            .Select (one =>
         {
             var fileName = Path.GetFileName (one);
             return new FileItem

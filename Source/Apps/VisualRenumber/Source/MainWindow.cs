@@ -27,6 +27,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
+using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
@@ -215,6 +216,19 @@ public sealed class MainWindow
         };
 
         _model.PropertyChanged += _Refresh;
+    }
+
+    protected override void OnKeyDown 
+        (
+            KeyEventArgs eventArgs
+        )
+    {
+        base.OnKeyDown (eventArgs);
+
+        if (eventArgs is { Key: Key.Escape, KeyModifiers: KeyModifiers.None })
+        {
+            Close();
+        }
     }
 
     #endregion
