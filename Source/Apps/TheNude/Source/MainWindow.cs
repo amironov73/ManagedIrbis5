@@ -52,6 +52,8 @@ public sealed class MainWindow
     {
         base.OnInitialized();
 
+        this.AttachDevTools();
+
         Task.Run (() => ThumbnailLoader.Instance.LoadThumbnails())
             .NotUsed();
 
@@ -71,7 +73,7 @@ public sealed class MainWindow
             {
                 BorderBrush = Brushes.Black,
                 BorderThickness = new Thickness (0, 1, 0, 0),
-                Padding = new Thickness (5),
+                Padding = new Thickness (5),                
                 Background = Brushes.AliceBlue,
                 Child = new StackPanel
                 {
@@ -81,6 +83,7 @@ public sealed class MainWindow
                     {
                         new Label
                         {
+                            Foreground = Brushes.Black,
                             [!ContentProperty] = new Binding (nameof (ViewModel.ModelCount))
                             {
                                 StringFormat = "Всего найдено: {0}"
@@ -152,7 +155,7 @@ public sealed class MainWindow
                             () => new WrapPanel { Orientation = Orientation.Horizontal }
                         ),
                     ItemTemplate = new FuncDataTemplate<ModelInfo> ((_, _) => new ModelControl()),
-                    // [!ItemsRepeater.ItemsProperty] = new Binding (nameof (ViewModel.Models))
+                    [!ItemsRepeater.ItemsProperty] = new Binding (nameof (ViewModel.Models))
                 },
             }
         };

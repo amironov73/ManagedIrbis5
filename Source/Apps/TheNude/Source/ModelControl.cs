@@ -69,6 +69,7 @@ public class ModelControl
                         {
                             HorizontalAlignment = HorizontalAlignment.Center,
                             HorizontalContentAlignment = HorizontalAlignment.Center,
+                            Foreground = Brushes.Black,
                             FontWeight = FontWeight.Bold,
                             [!ContentProperty] = new Binding (nameof (ViewModel.Name))
                         }
@@ -77,6 +78,7 @@ public class ModelControl
                     // псевдонимы
                     new TextBlock
                     {
+                        Foreground = Brushes.Black,
                         TextWrapping = TextWrapping.Wrap,
                         [!TextBlock.TextProperty] = new Binding (nameof (ViewModel.Aka))
                         {
