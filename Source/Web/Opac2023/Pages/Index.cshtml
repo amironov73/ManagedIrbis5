@@ -1,0 +1,73 @@
+﻿@page
+@model Opac2023.Pages.Index
+
+<div class="row">
+    <div class="col-lg-8 offset-lg-2 mt-3">
+
+        <div class="input-group">
+            <div class="form-control">
+                <label for="database-selector" class="form-control">База данных: </label>
+            </div>
+            <select id="database-selector" class="btn btn-outline-primary">
+            </select>
+            <button id="add-row" class="btn btn-sm btn-outline-secondary"
+                    style="width: 5em;"
+                    data-bs-toggle="tooltip" data-bs-placement="top"
+                    title="добавление строки">
+                <i class="fas fa-plus"></i>
+            </button>
+        </div>
+
+        <form id="main-form" autocomplete="off">
+            <div id="input-container"></div>
+
+            <div class="input-group-text">
+                <label for="how-many">ограничить&nbsp;</label>
+                <select id="how-many" class="form-select" style="width: 5em;">
+                    <option value="10">10</option>
+                    <option value="50" selected>50</option>
+                    <option value="100">100</option>
+                    <option value="500">500</option>
+                </select>
+                &nbsp;
+                <label for="format-selector" class="form-check-label">формат выдачи&nbsp;</label>
+                <select id="format-selector" class="form-control" style="width: 10em;">
+                    <option value="@@" selected>полный</option>
+                    <option value="@@infow_h">информационный</option>
+                    <option value="@@brief">краткий</option>
+                </select>
+                &nbsp;
+                <!-- input id="full-text" type="checkbox" class="form-check-input"
+                       data-bs-toggle="tooltip" data-bs-placement="top"
+                       title="только документы с полным текстом">
+                &nbsp;
+                <label for="full-text">полный текст</label -->
+            </div>
+
+            <div class="input-group mt-3 mb-3">
+                <button type="submit" class="btn btn-primary form-control">Поиск</button>
+                <button type="reset" class="btn btn-outline-primary form-control">Сброс</button>
+            </div>
+
+        </form>
+
+        <div id="busy-indicator" class="text-center mb-5" style="display: none;">
+            <h2>
+                <img id="arctic-fox" src="~/arctic-fox.gif" alt="полярная лиса">
+            </h2>
+        </div>
+
+        <div id="error-indicator" class="text-center text-danger mb-5" style="display: none;">
+            <h2 id="errorMessage">Произошла ошибка</h2>
+        </div>
+
+    </div>
+
+</div>
+
+<div class="row">
+    <div class="col">
+        <div id="result-container">
+        </div>
+    </div>
+</div>
