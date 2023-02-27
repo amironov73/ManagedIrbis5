@@ -43,10 +43,10 @@ test_script:
 - dotnet run  --no-restore --no-build --configuration Release --project Source/Tests/BarsikTestRunner/BarsikTestRunner.csproj
 
 after_build:
-- dotnet pack    --no-restore --no-build --configuration Release --property:PackageOutputPath=NuGet   Source\ManagedIrbis5-publish.sln
-- dotnet pack    --no-restore --no-build --configuration Release --property:PackageOutputPath=NuGet   Source\Libs\TinyClient\TinyClient.csproj
-- dotnet publish --no-restore --no-build --configuration Release --property:PackageOutputPath=Publish Source\ManagedIrbis5-publish.sln
-- dotnet publish --no-restore --no-build --configuration Release --property:PackageOutputPath=Publish Source\Libs\TinyClient\TinyClient.csproj
+- dotnet pack    --no-restore --no-build --configuration Release --property:PackageOutputPath=%APPVEYOR_BUILD_FOLDER%\NuGet   Source\ManagedIrbis5-publish.sln
+- dotnet pack    --no-restore --no-build --configuration Release --property:PackageOutputPath=%APPVEYOR_BUILD_FOLDER%\NuGet   Source\Libs\TinyClient\TinyClient.csproj
+- dotnet publish --no-restore --no-build --configuration Release --property:PackageOutputPath=%APPVEYOR_BUILD_FOLDER%\Publish Source\ManagedIrbis5-publish.sln
+- dotnet publish --no-restore --no-build --configuration Release --property:PackageOutputPath=%APPVEYOR_BUILD_FOLDER%\Publish Source\Libs\TinyClient\TinyClient.csproj
 
 artifacts:
   - path: 'NuGet\'
