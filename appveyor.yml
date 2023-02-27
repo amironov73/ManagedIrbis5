@@ -45,8 +45,8 @@ test_script:
 after_build:
 - dotnet pack    --no-restore --no-build --configuration Release --property:PackageOutputPath=%APPVEYOR_BUILD_FOLDER%\NuGet   Source\ManagedIrbis5-publish.sln
 - dotnet pack    --no-restore --no-build --configuration Release --property:PackageOutputPath=%APPVEYOR_BUILD_FOLDER%\NuGet   Source\Libs\TinyClient\TinyClient.csproj
-- dotnet publish --no-restore --no-build --configuration Release --output Publish Source\ManagedIrbis5-publish.sln
-- dotnet publish --no-restore --no-build --configuration Release --output Publish Source\Libs\TinyClient\TinyClient.csproj
+- dotnet publish --no-restore --no-build --configuration Release --property:PublishDir=%APPVEYOR_BUILD_FOLDER%\Publish        Source\ManagedIrbis5-publish.sln
+- dotnet publish --no-restore --no-build --configuration Release --property:PublishDir=%APPVEYOR_BUILD_FOLDER%\Publish        Source\Libs\TinyClient\TinyClient.csproj
 
 artifacts:
   - path: 'NuGet\'
