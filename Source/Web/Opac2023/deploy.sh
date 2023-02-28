@@ -51,7 +51,7 @@ systemctl enable "$SERVICE" # включаем автоматический за
 # создаем конфигурацию NGINX
 rm -f "/etc/nginx/$SERVICE.conf" 2> /dev/null
 ln -s "$INSTALL_ROOT/$SERVICE.conf" /etc/nginx
-if nginx -t
+if ! nginx -t
 then
     echo "Problem with NGINX configuration"
     exit 1

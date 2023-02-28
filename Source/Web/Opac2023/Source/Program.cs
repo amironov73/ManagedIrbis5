@@ -3,6 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable IdentifierTypo
+// ReSharper disable StringLiteralTypo
 
 #region Using directives
 
@@ -21,6 +22,8 @@ namespace Opac2023;
 
 internal sealed class Program
 {
+    private const string OpacEnableSpecificOrigins = "OpacEnableSpecificOrigins";
+
     public static int Main
         (
             string[] args
@@ -34,6 +37,15 @@ internal sealed class Program
                 options.Cookie.Name = Constants.AuthenticationScheme;
                 options.ExpireTimeSpan = TimeSpan.FromHours (1);
             });
+
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy(name: OpacEnableSpecificOrigins,
+                policy  =>
+                {
+                    policy.WithOrigins ("https://library.istu.edu");
+                });
+        });
 
         var app = builder.Build();
 
@@ -62,6 +74,7 @@ internal sealed class Program
                 | ForwardedHeaders.XForwardedProto
         });
 
+        app.UseCors (OpacEnableSpecificOrigins);
         app.UseAuthentication();
         app.UseAuthorization ();
 

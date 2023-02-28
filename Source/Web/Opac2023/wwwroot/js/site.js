@@ -1,5 +1,5 @@
 ﻿// путь к бэк-энду
-const baseURL = 'http://elib.istu.edu/Jsoner.php'
+const baseURL = 'https://library.istu.edu/Jsoner.php'
 
 let scenarios = [] // сценарии поиска
 let inputRows = [] // строки со значениями поисковых атрибутов
