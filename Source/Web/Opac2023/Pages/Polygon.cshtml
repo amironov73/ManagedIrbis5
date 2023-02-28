@@ -1,0 +1,34 @@
+﻿@page
+@model Opac2023.Pages.Polygon
+
+<div class="row">
+    <h3>Список баз данных</h3>
+    <div id="database-list"></div>
+
+
+</div>
+
+<script type="text/javascript">
+    const documentURL = new URL (document.URL)
+    const apiURL = documentURL.protocol + '//' + documentURL.host + '/api/'
+
+    setTimeout(function () {
+        const databaseList = document.getElementById ('database-list')
+        databaseList.innerHTML = ''
+        axios.get (apiURL + 'db')
+        .then (function (response) {
+            var list = document.createElement ("select")
+            for (const db of response.data) {
+                const element = document.createElement ('option')
+                element.textContent = db.name + ' - ' + db.description
+                element.value = db.name
+                list.appendChild (element)
+            }
+            databaseList.appendChild (list)
+        })
+    })
+
+
+
+
+</script>

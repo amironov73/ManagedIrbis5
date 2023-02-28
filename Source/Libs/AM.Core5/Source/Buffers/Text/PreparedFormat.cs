@@ -3405,6 +3405,8 @@ public sealed partial class Utf8PreparedFormat<T1, T2, T3, T4, T5, T6, T7, T8, T
             }
         }
     }
+
+    #endregion
 }
 
 /// <summary>

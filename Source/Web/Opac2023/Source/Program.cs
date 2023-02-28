@@ -30,6 +30,7 @@ internal sealed class Program
         )
     {
         var builder = WebApplication.CreateBuilder (args);
+        builder.Services.AddControllers();
         builder.Services.AddRazorPages();
         builder.Services.AddAuthentication (Constants.AuthenticationScheme)
             .AddCookie (Constants.AuthenticationScheme, options =>
@@ -66,6 +67,7 @@ internal sealed class Program
 
         app.UseStaticFiles();
         app.UseRouting();
+        app.MapControllers();
         app.MapRazorPages();
 
         app.UseForwardedHeaders (new ForwardedHeadersOptions

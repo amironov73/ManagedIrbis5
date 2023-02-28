@@ -1,4 +1,4 @@
-﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable IdentifierTypo
@@ -13,17 +13,18 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Opac2023.Pages;
 
-public class Index : PageModel
+public class Polygon
+    : PageModel
 {
-    public Index (ILogger<Index> logger)
+    public Polygon (ILogger<Polygon> logger)
     {
         _logger = logger;
     }
 
     private readonly ILogger _logger;
-    
+
     public void OnGet()
     {
-        _logger.LogInformation ("GET Index");
+        _logger.LogInformation ("GET Polygon");
     }
 }
