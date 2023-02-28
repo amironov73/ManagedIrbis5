@@ -58,7 +58,7 @@ namespace ManagedIrbis;
 [DebuggerDisplay ("{Prefix} {Name}")]
 public sealed class SearchScenario
     : IHandmadeSerializable,
-        IVerifiable
+    IVerifiable
 {
     #region Properties
 

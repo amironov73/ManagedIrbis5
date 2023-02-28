@@ -8,6 +8,7 @@
 #region Using directives
 
 using AM;
+using AM.Collections;
 using AM.IO;
 
 using ManagedIrbis;
@@ -97,16 +98,49 @@ public sealed class ApiController
 
         if (string.IsNullOrEmpty (text))
         {
+            _logger.LogInformation ("Scenarios: common");
             iniFile = connection.IniFile.ThrowIfNull();
         }
         else
         {
+            _logger.LogInformation ("Scenarios: specific");
             iniFile = new IniFile();
             iniFile.Read (new StringReader (text));
         }
 
         var result = SearchScenario.ParseIniFile (iniFile);
+        if (result.IsNullOrEmpty())
+        {
+            _logger.LogInformation ("Scenarios: fallback");
+            iniFile = connection.IniFile.ThrowIfNull();
+            result = SearchScenario.ParseIniFile (iniFile);
+        }
 
         return new JsonResult (result);
+    }
+
+    [HttpGet ("brief/{database}/{expression}")]
+    public IActionResult SearchBrief
+        (
+            string database,
+            string expression
+        )
+    {
+        _logger.LogInformation ("Search {Database}: {Expression}", database, expression);
+
+        using var connection = GetConnection();
+        var parameters = new SearchParameters
+        {
+            Database = connection.EnsureDatabase (database),
+            Format = IrbisFormat.Brief,
+            Expression = expression
+        };
+        var found = connection.Search (parameters);
+        if (found is null)
+        {
+            return new JsonResult (Array.Empty<FoundItem>());
+        }
+
+        return new JsonResult (found);
     }
 }
