@@ -263,6 +263,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Abonement", "Apps\Abonement
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleData", "Libs\SampleData\SampleData.csproj", "{51EB8BE6-F653-4BC3-8719-681C7107EFEE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExemplarCounter", "Apps\ExemplarCounter\ExemplarCounter.csproj", "{7542569B-E4D3-4B3D-A62D-8B6A8E48496E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1749,6 +1751,18 @@ Global
 		{51EB8BE6-F653-4BC3-8719-681C7107EFEE}.Release|x64.Build.0 = Release|Any CPU
 		{51EB8BE6-F653-4BC3-8719-681C7107EFEE}.Release|x86.ActiveCfg = Release|Any CPU
 		{51EB8BE6-F653-4BC3-8719-681C7107EFEE}.Release|x86.Build.0 = Release|Any CPU
+		{7542569B-E4D3-4B3D-A62D-8B6A8E48496E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7542569B-E4D3-4B3D-A62D-8B6A8E48496E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7542569B-E4D3-4B3D-A62D-8B6A8E48496E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7542569B-E4D3-4B3D-A62D-8B6A8E48496E}.Debug|x64.Build.0 = Debug|Any CPU
+		{7542569B-E4D3-4B3D-A62D-8B6A8E48496E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7542569B-E4D3-4B3D-A62D-8B6A8E48496E}.Debug|x86.Build.0 = Debug|Any CPU
+		{7542569B-E4D3-4B3D-A62D-8B6A8E48496E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7542569B-E4D3-4B3D-A62D-8B6A8E48496E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7542569B-E4D3-4B3D-A62D-8B6A8E48496E}.Release|x64.ActiveCfg = Release|Any CPU
+		{7542569B-E4D3-4B3D-A62D-8B6A8E48496E}.Release|x64.Build.0 = Release|Any CPU
+		{7542569B-E4D3-4B3D-A62D-8B6A8E48496E}.Release|x86.ActiveCfg = Release|Any CPU
+		{7542569B-E4D3-4B3D-A62D-8B6A8E48496E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1877,6 +1891,7 @@ Global
 		{4918D034-E19F-449B-B44E-B092F4FFE889} = {1E5940AA-0540-4947-8216-45E381E76C72}
 		{07922A8D-0821-4183-9422-67FE77405A6D} = {1E5940AA-0540-4947-8216-45E381E76C72}
 		{51EB8BE6-F653-4BC3-8719-681C7107EFEE} = {F7FE7B9E-2592-439F-A9CF-DA7D8D3DBC91}
+		{7542569B-E4D3-4B3D-A62D-8B6A8E48496E} = {1E5940AA-0540-4947-8216-45E381E76C72}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection
