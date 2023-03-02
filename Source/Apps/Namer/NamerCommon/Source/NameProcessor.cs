@@ -44,7 +44,9 @@ public sealed class NameProcessor
     {
         new LiteralPart(),
         new CounterPart(),
-        new ExtensionPart()
+        new ExtensionPart(),
+        new RegexPart(),
+        new NumberPart()
     };
 
     #endregion
@@ -179,7 +181,27 @@ public sealed class NameProcessor
             DirectoryInfo directory
         )
     {
+        Sure.NotNull (context);
+        Sure.NotNull (directory);
+        
         return Render (context, directory.EnumerateFiles());
+    }
+
+    /// <summary>
+    /// Рендер имен для указанной директории.
+    /// </summary>
+    public IEnumerable<NamePair> Render
+        (
+            NamingContext context,
+            DirectoryInfo directory,
+            string pattern
+        )
+    {
+        Sure.NotNull (context);
+        Sure.NotNull (directory);
+        Sure.NotNullNorEmpty (pattern);
+
+        return Render (context, directory.EnumerateFiles (pattern));
     }
 
     /// <summary>

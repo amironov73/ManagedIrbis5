@@ -11,6 +11,9 @@
 
 #region Using directives
 
+using AM;
+using AM.Parameters;
+
 using JetBrains.Annotations;
 
 #endregion
@@ -24,7 +27,7 @@ namespace NamerCommon;
 /// </summary>
 [PublicAPI]
 public sealed class FilenamePart
-    : NamePart
+    : ProcessingPart
 {
     #region Properties
 
@@ -33,18 +36,22 @@ public sealed class FilenamePart
 
     /// <inheritdoc cref="NamePart.Title"/>
     public override string Title => "Имя";
-
+    
     #endregion
 
     #region NamePart members
 
-    /// <inheritdoc cref="NamePart.Parse"/>
     public override NamePart Parse
         (
             string text
         )
     {
-        return new FilenamePart();
+        Sure.NotNull (text);
+
+        var result = new FilenamePart();
+        Parse (result, text);
+
+        return result;
     }
 
     /// <inheritdoc cref="NamePart.Render"/>
@@ -54,7 +61,7 @@ public sealed class FilenamePart
             FileInfo fileInfo
         )
     {
-        return fileInfo.Name;
+        return Render (fileInfo.Name);
     }
 
     #endregion

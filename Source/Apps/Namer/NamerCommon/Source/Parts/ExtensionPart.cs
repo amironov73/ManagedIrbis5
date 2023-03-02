@@ -11,6 +11,8 @@
 
 #region Using directives
 
+using AM;
+
 using JetBrains.Annotations;
 
 #endregion
@@ -24,7 +26,7 @@ namespace NamerCommon;
 /// </summary>
 [PublicAPI]
 public sealed class ExtensionPart
-    : NamePart
+    : ProcessingPart
 {
     #region Properties
 
@@ -44,7 +46,12 @@ public sealed class ExtensionPart
             string text
         )
     {
-        return new ExtensionPart();
+        Sure.NotNull (text);
+        
+        var result = new ExtensionPart();
+        Parse (result, text);
+
+        return result;
     }
 
     /// <inheritdoc cref="NamePart.Render"/>
@@ -54,7 +61,7 @@ public sealed class ExtensionPart
             FileInfo fileInfo
         )
     {
-        return fileInfo.Extension;
+        return Render (fileInfo.Extension);
     }
 
     #endregion

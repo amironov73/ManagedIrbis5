@@ -5,13 +5,16 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* CounterPart.cs -- счетчик
+/* NumberPart.cs -- число в составе имени файла
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
+using System.Text.RegularExpressions;
+
 using AM;
+using AM.Collections;
 using AM.Parameters;
 
 using JetBrains.Annotations;
@@ -23,34 +26,35 @@ using JetBrains.Annotations;
 namespace NamerCommon;
 
 /// <summary>
-/// Счетчик.
+/// Число в составе имени файла.
 /// </summary>
 [PublicAPI]
-public sealed class CounterPart
+public sealed class NumberPart
     : NamePart
 {
     #region Properties
 
-    /// <inheritdoc cref="Designation"/>
-    public override string Designation => "counter";
+    /// <inheritdoc cref="NamePart.Designation"/>
+    public override string Designation => "number";
 
     /// <inheritdoc cref="NamePart.Title"/>
-    public override string Title => "Счетчик";
+    public override string Title => "Число";
 
     /// <summary>
-    /// Начальное значение счетчика.
+    /// Индекс группы.
     /// </summary>
-    public int InitialValue { get; set; }
+    public int Index { get; set; }
 
     /// <summary>
-    /// Значение счетчика.
-    /// </summary>
-    public int CurrentValue { get; set; }
-
-    /// <summary>
-    /// Ширина.
+    /// Ширина группы.
     /// </summary>
     public int Width { get; set; }
+    
+    #endregion
+
+    #region Private members
+
+    private readonly Regex _regex = new (@"\d+");
 
     #endregion
 
@@ -64,15 +68,15 @@ public sealed class CounterPart
     {
         Sure.NotNull (text);
 
-        var result = new CounterPart();
         var parameters = ParameterUtility.ParseString (text);
+        var result = new NumberPart();
         foreach (var parameter in parameters)
         {
             parameter.Verify (true);
             switch (parameter.Name)
             {
-                case "start":
-                    result.InitialValue = parameter.Value!.ParseInt32 ();
+                case "index":
+                    result.Index = parameter.Value!.ParseInt32();
                     break;
 
                 case "width":
@@ -94,22 +98,44 @@ public sealed class CounterPart
             FileInfo fileInfo
         )
     {
-        var value = ++CurrentValue;
+        Sure.NotNull (context);
+        Sure.NotNull (fileInfo);
+
+        Match match;
+        if (Index > 0)
+        {
+            var matches = _regex.Matches (fileInfo.Name);
+            if (matches.IsNullOrEmpty())
+            {
+                return string.Empty;
+            }
+
+            var temp = matches!.SafeAt (Index);
+            if (temp is null)
+            {
+                return string.Empty;
+            }
+
+            match = temp;
+        }
+        else
+        {
+            match = _regex.Match (fileInfo.Name);
+        }
+
+        if (!match.Success)
+        {
+            return string.Empty;
+        }
 
         if (Width > 0)
         {
+            var value = match.Value.ParseInt32();
             var format = new string ('0', Width);
             return value.ToInvariantString (format);
         }
-        
-        return value.ToInvariantString();
-    }
 
-    /// <inheritdoc cref="NamePart.Reset"/>
-    public override void Reset()
-    {
-        base.Reset();
-        CurrentValue = InitialValue;
+        return match.Value;
     }
 
     #endregion
