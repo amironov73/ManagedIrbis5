@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NamerCommon", "NamerCommon\NamerCommon.csproj", "{FFF468C7-967F-4CE6-B582-1FE6E93516A2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NamerConsole", "NamerConsole\NamerConsole.csproj", "{562FE15C-229A-4465-8571-47C8C516F6C7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AM.Core5", "..\..\Libs\AM.Core5\AM.Core5.csproj", "{44C8DC98-00A6-4863-919B-69BD1F153342}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FFF468C7-967F-4CE6-B582-1FE6E93516A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FFF468C7-967F-4CE6-B582-1FE6E93516A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FFF468C7-967F-4CE6-B582-1FE6E93516A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FFF468C7-967F-4CE6-B582-1FE6E93516A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{562FE15C-229A-4465-8571-47C8C516F6C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{562FE15C-229A-4465-8571-47C8C516F6C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{562FE15C-229A-4465-8571-47C8C516F6C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{562FE15C-229A-4465-8571-47C8C516F6C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44C8DC98-00A6-4863-919B-69BD1F153342}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44C8DC98-00A6-4863-919B-69BD1F153342}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44C8DC98-00A6-4863-919B-69BD1F153342}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44C8DC98-00A6-4863-919B-69BD1F153342}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
