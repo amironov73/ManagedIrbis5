@@ -13,7 +13,11 @@
 
 #region Using directives
 
+using AM.IO;
+
 using NamerCommon;
+
+using Spectre.Console;
 
 #endregion
 
@@ -26,6 +30,31 @@ namespace NamerConsole;
 /// </summary>
 internal static class Program
 {
+    private static bool RenameImpl<T>
+        (
+            Folder folder,
+            NamePair pair,
+            T? arg
+        )
+    {
+        var oldName = Path.Combine (folder.DirectoryName!, pair.Old);
+        var newName = Path.Combine (folder.DirectoryName!, pair.New);
+
+        var result = FileUtility.TryMove (oldName, newName);
+        var color = result ? Color.Green : Color.Red;
+        var style = new Style (color);
+        AnsiConsole.Write ("  ");
+        AnsiConsole.Write (new Text ($"{pair.Old} => {pair.New}", style));
+        if (!result)
+        {
+            AnsiConsole.Write (new Text (" ERROR", new Style (Color.Red)));
+        }
+
+        AnsiConsole.WriteLine();
+
+        return result;
+    }
+    
     public static void Main
         (
             string[] args
@@ -43,6 +72,7 @@ internal static class Program
 
         foreach (var dirName in directories)
         {
+            processor.Reset();
             var directory = new DirectoryInfo (dirName);
             var pairs = processor.Render (context, directory);
             var folder = new Folder (dirName, pairs);
@@ -59,7 +89,10 @@ internal static class Program
                 }
                 else
                 {
-                    folder.Rename();
+                    AnsiConsole.Write (new Text (folder.DirectoryName!, new Style (Color.Aqua)));
+                    AnsiConsole.WriteLine();
+                    folder.Rename<object> (RenameImpl, null);
+                    AnsiConsole.WriteLine();
                 }
             }
         }

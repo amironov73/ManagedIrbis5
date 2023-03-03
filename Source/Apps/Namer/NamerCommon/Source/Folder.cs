@@ -55,6 +55,15 @@ public class Folder
     #region Construction
 
     /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public Folder()
+    {
+        DirectoryName = Directory.GetCurrentDirectory();
+        Files = Array.Empty<NamePair>();
+    }
+
+    /// <summary>
     /// Конструктор.
     /// </summary>
     public Folder
@@ -81,7 +90,10 @@ public class Folder
             T? arg
         )
     {
-        return FileUtility.TryMove (pair.Old, pair.New);
+        var oldName = Path.Combine (folder.DirectoryName!, pair.Old);
+        var newName = Path.Combine (folder.DirectoryName!, pair.New);
+
+        return FileUtility.TryMove (oldName, newName);
     }
 
     #endregion
@@ -151,6 +163,12 @@ public class Folder
                 continue;
             }
 
+            if (!pair.ValidateNewName())
+            {
+                pair.ErrorMessage = "Invalid name";
+                continue;
+            }
+
             var any = Files.Any
                 (
                     pair,
@@ -210,9 +228,9 @@ public class Folder
         var result = true;
         foreach (var pair in Files)
         {
-            if (!pair.IsChecked || !string.IsNullOrEmpty (pair.ErrorMessage))
+            if (!pair.IsChecked || pair.HasError)
             {
-                // пропускаем данную пару
+                // пропускаем пары с ошибками и без отметок
                 continue;
             }
             

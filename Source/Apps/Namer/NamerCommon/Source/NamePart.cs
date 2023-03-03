@@ -77,6 +77,21 @@ public abstract class NamePart
         );
 
     /// <summary>
+    /// Валидация.
+    /// </summary>
+    /// <returns>
+    /// Сообщение об ошибке либо <c>null</c>.
+    /// </returns>
+    public virtual string? Validate
+        (
+            NamingContext context,
+            FileInfo fileInfo
+        )
+    {
+        return null;
+    }
+    
+    /// <summary>
     /// Сброс состояния (опциональный).
     /// </summary>
     public virtual void Reset()

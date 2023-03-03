@@ -41,9 +41,19 @@ public sealed class NumberPart
     public override string Title => "Число";
 
     /// <summary>
+    /// Добавка.
+    /// </summary>
+    public int Delta { get; set; }
+    
+    /// <summary>
     /// Индекс группы.
     /// </summary>
     public int Index { get; set; }
+
+    /// <summary>
+    /// Обязательно?
+    /// </summary>
+    public bool Required { get; set; }
 
     /// <summary>
     /// Ширина группы.
@@ -75,8 +85,17 @@ public sealed class NumberPart
             parameter.Verify (true);
             switch (parameter.Name)
             {
+                case "delta":
+                    result.Delta = parameter.Value!.ParseInt32();
+                    break;
+
                 case "index":
                     result.Index = parameter.Value!.ParseInt32();
+                    break;
+
+                case "require":
+                case "required":
+                    result.Required = true;
                     break;
 
                 case "width":
@@ -101,15 +120,20 @@ public sealed class NumberPart
         Sure.NotNull (context);
         Sure.NotNull (fileInfo);
 
+        var matches = _regex.Matches (fileInfo.Name);
+        if (matches.IsNullOrEmpty())
+        {
+            if (Required)
+            {
+                throw new ApplicationException();
+            }
+
+            return string.Empty;
+        }
+
         Match match;
         if (Index > 0)
         {
-            var matches = _regex.Matches (fileInfo.Name);
-            if (matches.IsNullOrEmpty())
-            {
-                return string.Empty;
-            }
-
             var temp = matches!.SafeAt (Index);
             if (temp is null)
             {
@@ -120,7 +144,7 @@ public sealed class NumberPart
         }
         else
         {
-            match = _regex.Match (fileInfo.Name);
+            match = matches.Last();
         }
 
         if (!match.Success)
@@ -130,7 +154,7 @@ public sealed class NumberPart
 
         if (Width > 0)
         {
-            var value = match.Value.ParseInt32();
+            var value = match.Value.ParseInt32() + Delta;
             var format = new string ('0', Width);
             return value.ToInvariantString (format);
         }

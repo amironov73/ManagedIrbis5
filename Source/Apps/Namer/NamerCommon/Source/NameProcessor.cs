@@ -14,9 +14,13 @@
 using System.Text;
 
 using AM;
+using AM.IO;
 using AM.Text;
 
 using JetBrains.Annotations;
+
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
 #endregion
 
@@ -29,6 +33,7 @@ namespace NamerCommon;
 /// </summary>
 [PublicAPI]
 public sealed class NameProcessor
+    : ReactiveObject
 {
     #region Properties
 
@@ -36,6 +41,12 @@ public sealed class NameProcessor
     /// Холостой запуск?
     /// </summary>
     public bool DryRun { get; set; }
+
+    /// <summary>
+    /// Спецификация в текстовом виде (для справки).
+    /// </summary>
+    [Reactive]
+    public string? Specification { get; set; }
     
     /// <summary>
     /// Элементы имени.
@@ -108,6 +119,68 @@ public sealed class NameProcessor
     #region Public methods
 
     /// <summary>
+    /// Проверка файла, применимы ли к нему задуманные трансформации.
+    /// </summary>
+    /// <returns>Сообщение об ошибке либо <c>null</c>.</returns>
+    public string? CheckFile
+        (
+            NamingContext context,
+            FileInfo fileInfo
+        )
+    {
+        Sure.NotNull (context);
+        Sure.NotNull (fileInfo);
+
+        foreach (var part in Parts)
+        {
+            var errorMessage = part.Validate (context, fileInfo);
+            if (!string.IsNullOrEmpty (errorMessage))
+            {
+                return errorMessage;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Рекурсивное обнаружиение подпапок.
+    /// </summary>
+    public List<string> DiscoverFolders
+        (
+            IEnumerable<string> directories
+        )
+    {
+        Sure.NotNull (directories);
+
+        var result = new List<string>();
+        foreach (var directory in directories)
+        {
+            var dirName = PathUtility.StripTrailingBackslash (directory);
+            if (!Directory.Exists (dirName))
+            {
+                throw new DirectoryNotFoundException (directory);
+            }
+
+            if (Directory.EnumerateFiles (dirName).Any())
+            {
+                result.Add (dirName);
+            }
+
+            var subdirs = Directory.GetDirectories (dirName, "*", SearchOption.AllDirectories);
+            foreach (var subdir in subdirs)
+            {
+                if (Directory.EnumerateFiles (subdir).Any())
+                {
+                    result.Add (subdir);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
     /// Разбор командной строки.
     /// </summary>
     /// <param name="context">Контекст.</param>
@@ -122,8 +195,8 @@ public sealed class NameProcessor
         Sure.NotNull (context);
         Sure.NotNull (args);
 
+        var recursive = false;
         var result = new List<string>();
-        var haveSpecification = false;
         for (var i = 0; i < args.Length; i++)
         {
             var arg = args[i];
@@ -153,22 +226,32 @@ public sealed class NameProcessor
                             );
                         break;
 
+                    case "--recursive":
+                        recursive = true;
+                        break;
+                    
                     default:
                         throw new ApplicationException();
                 }
             }
             else
             {
-                if (!haveSpecification)
+                if (string.IsNullOrEmpty (Specification))
                 {
+                    Specification = arg;
                     ParseSpecification (arg);
-                    haveSpecification = true;
                 }
                 else
                 {
+                    arg = PathUtility.StripTrailingBackslash (arg);
                     result.Add (arg);
                 }
             }
+        }
+
+        if (recursive)
+        {
+            result = DiscoverFolders (result);
         }
 
         return result;
@@ -184,6 +267,7 @@ public sealed class NameProcessor
     {
         Sure.NotNullNorEmpty (specification);
 
+        Parts.Clear();
         var navigator = new TextNavigator (specification);
         while (!navigator.IsEOF)
         {
@@ -205,6 +289,11 @@ public sealed class NameProcessor
                 navigator.ReadChar(); // съедаем закрывающую скобку
                 Parts.Add (ParsePart (text.ToString()));
             }
+        }
+
+        if (Parts.Count == 0)
+        {
+            throw new ApplicationException();
         }
     }
     
@@ -245,6 +334,13 @@ public sealed class NameProcessor
         {
             if (!context.CanPass (file))
             {
+                continue;
+            }
+
+            var errorMessage = CheckFile (context, file);
+            if (!string.IsNullOrEmpty (errorMessage))
+            {
+                // TODO помещать в список?
                 continue;
             }
             

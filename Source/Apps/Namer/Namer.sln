@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NamerConsole", "NamerConsol
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AM.Core5", "..\..\Libs\AM.Core5\AM.Core5.csproj", "{44C8DC98-00A6-4863-919B-69BD1F153342}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Namer", "Namer\Namer.csproj", "{7DEA9D5A-5E0B-40CC-9ABD-CB51CCD16DA1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AM.Avalonia", "..\..\Libs\AM.Avalonia\AM.Avalonia.csproj", "{390AF861-2937-460F-9686-3526356885CC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +34,13 @@ Global
 		{44C8DC98-00A6-4863-919B-69BD1F153342}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{44C8DC98-00A6-4863-919B-69BD1F153342}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{44C8DC98-00A6-4863-919B-69BD1F153342}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7DEA9D5A-5E0B-40CC-9ABD-CB51CCD16DA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DEA9D5A-5E0B-40CC-9ABD-CB51CCD16DA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7DEA9D5A-5E0B-40CC-9ABD-CB51CCD16DA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7DEA9D5A-5E0B-40CC-9ABD-CB51CCD16DA1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{390AF861-2937-460F-9686-3526356885CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{390AF861-2937-460F-9686-3526356885CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{390AF861-2937-460F-9686-3526356885CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{390AF861-2937-460F-9686-3526356885CC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -12,6 +12,8 @@
 
 #region Using directives
 
+using System.Text;
+
 using AM;
 
 using JetBrains.Annotations;
@@ -61,6 +63,11 @@ public sealed class NamePair
     public required string New { get; init; }
 
     /// <summary>
+    /// Есть ошибка?
+    /// </summary>
+    public bool HasError => !string.IsNullOrEmpty (ErrorMessage);
+    
+    /// <summary>
     /// Совпадают ли новое и старое имена?
     /// </summary>
     public bool IsSame => OperatingSystem.IsWindows()
@@ -69,16 +76,44 @@ public sealed class NamePair
 
     #endregion
 
+    #region Private member
+
+    private static bool GoodChar (char chr) => chr is >= '0' and <= '9'
+        or >= 'A' and <= 'Z' or >= 'a' and <= 'z' or '=' or '-'
+        or '_' or '!' or '(' or ')' or '[' or ']' or '.';
+
+    #endregion
+
     #region Public methods
+
+    /// <summary>
+    /// Валидация имени файла.
+    /// </summary>
+    public bool ValidateNewName()
+    {
+        if (string.IsNullOrEmpty (New))
+        {
+            return false;
+        }
+
+        foreach (var chr in New)
+        {
+            if (!GoodChar (chr))
+            {
+                return false;
+            }
+        }
+        
+        return true;
+    }
 
     /// <summary>
     /// Рендеринг пар имен файлов.
     /// </summary>
     public void Render()
     {
-        var same = Old.SameStringSensitive (New);
         var color = IsChecked
-            ? same
+            ? IsSame
                 ? Color.Grey : Color.Green
             : Color.Grey;
         var style = new Style (color);
@@ -93,6 +128,23 @@ public sealed class NamePair
         }
 
         AnsiConsole.WriteLine();
+    }
+
+    #endregion
+
+    #region Object members
+
+    public override string ToString()
+    {
+        var builder = new StringBuilder();
+        var mark = IsChecked ? "[x]" : "[ ]";
+        builder.Append ($"{Old} => {New} {mark}");
+        if (!string.IsNullOrEmpty (ErrorMessage))
+        {
+            builder.Append ($" {ErrorMessage}");
+        }
+
+        return builder.ToString();
     }
 
     #endregion
