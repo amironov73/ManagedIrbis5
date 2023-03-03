@@ -113,7 +113,9 @@ public sealed class MainWindow
                             specificationBox,
                             CreateButton ("refresh.png", _ApplySpecification)
                         )
-                        .SetPanelMargin (5)
+                        .SetPanelMargin (5),
+                        
+                        CreateButton ("runner.png", _Run)
                     }
                 }
             }
@@ -197,7 +199,7 @@ public sealed class MainWindow
         };
     }
 
-    private async void _Refresh()
+    private void _Refresh()
     {
         var pairs = _processor.Render (_context, _directory);
         _folder.DirectoryName = _currentPath;
@@ -205,7 +207,7 @@ public sealed class MainWindow
         _folder.CheckNames();
     }
 
-    private async void _ApplySpecification()
+    private void _ApplySpecification()
     {
         if (_processor.Specification is { } specification)
         {
@@ -246,5 +248,16 @@ public sealed class MainWindow
         }
     }
 
+    private void _Run()
+    {
+        if (_folder.CheckNames())
+        {
+            if (_folder.Rename())
+            {
+                _folder.ClearChecked();
+            }
+        }
+    }
+    
     #endregion
 }
