@@ -5,14 +5,13 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* FilenamePart.cs -- собственно имя файла
+/* ExtPart.cs -- расширение имени файла
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using AM;
-using AM.Parameters;
 
 using JetBrains.Annotations;
 
@@ -23,32 +22,33 @@ using JetBrains.Annotations;
 namespace NamerCommon;
 
 /// <summary>
-/// Собственно имя файла.
+/// Расширение имени файла.
 /// </summary>
 [PublicAPI]
-public sealed class FilenamePart
+public sealed class ExtPart
     : SystemPart
 {
     #region Properties
 
     /// <inheritdoc cref="NamePart.Designation"/>
-    public override string Designation => "name";
+    public override string Designation => "ext";
 
     /// <inheritdoc cref="NamePart.Title"/>
-    public override string Title => "Имя";
-    
+    public override string Title => "Расширение";
+
     #endregion
 
     #region NamePart members
 
+    /// <inheritdoc cref="NamePart.Parse"/>
     public override NamePart Parse
         (
             string text
         )
     {
         Sure.NotNull (text);
-
-        var result = new FilenamePart();
+        
+        var result = new ExtPart();
         Parse (result, text);
 
         return result;
@@ -61,7 +61,10 @@ public sealed class FilenamePart
             FileInfo fileInfo
         )
     {
-        return Render (fileInfo.Name);
+        Sure.NotNull (context);
+        Sure.NotNull (fileInfo);
+        
+        return Render (fileInfo.Extension);
     }
 
     #endregion

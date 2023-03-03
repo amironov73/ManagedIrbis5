@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* ExtensionPart.cs -- расширение имени файла
+/* DirPart.cs -- родительская директория файла
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,19 +22,19 @@ using JetBrains.Annotations;
 namespace NamerCommon;
 
 /// <summary>
-/// Расширение имени файла.
+/// Родительская директория файла.
 /// </summary>
 [PublicAPI]
-public sealed class ExtensionPart
-    : ProcessingPart
+public sealed class DirPart
+    : SystemPart
 {
     #region Properties
 
     /// <inheritdoc cref="NamePart.Designation"/>
-    public override string Designation => "ext";
+    public override string Designation => "dir";
 
     /// <inheritdoc cref="NamePart.Title"/>
-    public override string Title => "Расширение";
+    public override string Title => "Директория";
 
     #endregion
 
@@ -48,7 +48,7 @@ public sealed class ExtensionPart
     {
         Sure.NotNull (text);
         
-        var result = new ExtensionPart();
+        var result = new DirPart();
         Parse (result, text);
 
         return result;
@@ -61,6 +61,9 @@ public sealed class ExtensionPart
             FileInfo fileInfo
         )
     {
+        Sure.NotNull (context);
+        Sure.NotNull (fileInfo);
+        
         return Render (fileInfo.Extension);
     }
 

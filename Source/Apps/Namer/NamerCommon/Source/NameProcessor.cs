@@ -40,13 +40,14 @@ public sealed class NameProcessor
     /// <summary>
     /// Распознаваемые элементы имени.
     /// </summary>
-    public static List<NamePart> KnownParts => new ()
+    public static List<NamePart> KnownParts => new()
     {
-        new LiteralPart(),
         new CounterPart(),
-        new ExtensionPart(),
+        new DirPart(),
+        new ExtPart(),
+        new LiteralPart(),
+        new NumberPart(),
         new RegexPart(),
-        new NumberPart()
     };
 
     #endregion
@@ -99,9 +100,69 @@ public sealed class NameProcessor
     #region Public methods
 
     /// <summary>
+    /// Разбор командной строки.
+    /// </summary>
+    /// <param name="context">Контекст.</param>
+    /// <param name="args">Аргументы командной строки.</param>
+    /// <returns>Список папок для обработки.</returns>
+    public List<string> ParseCommandLine
+        (
+            NamingContext context,
+            string[] args
+        )
+    {
+        Sure.NotNull (context);
+        Sure.NotNull (args);
+
+        var result = new List<string>();
+        var haveSpecification = false;
+        for (var i = 0; i < args.Length; i++)
+        {
+            var arg = args[i];
+            if (arg.StartsWith ("--"))
+            {
+                // это опция
+                switch (arg)
+                {
+                    case "--exclude":
+                        context.Filters.Add 
+                            (
+                                new ExcludeFilter (args[++i])
+                            );
+                        break;
+
+                    case "--include":
+                        context.Filters.Add 
+                            (
+                                new IncludeFilter (args[++i])
+                            );
+                        break;
+
+                    default:
+                        throw new ApplicationException();
+                }
+            }
+            else
+            {
+                if (!haveSpecification)
+                {
+                    ParseSpecification (arg);
+                    haveSpecification = true;
+                }
+                else
+                {
+                    result.Add (arg);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
     /// Разбор спецификации.
     /// </summary>
-    public void Parse
+    public void ParseSpecification
         (
             string specification
         )
@@ -141,6 +202,9 @@ public sealed class NameProcessor
             FileInfo fileInfo
         )
     {
+        Sure.NotNull (context);
+        Sure.NotNull (fileInfo);
+
         var builder = new StringBuilder();
         foreach (var part in Parts)
         {
@@ -159,8 +223,16 @@ public sealed class NameProcessor
             IEnumerable<FileInfo> files
         )
     {
+        Sure.NotNull (context);
+        Sure.NotNull ((object) files);
+
         foreach (var file in files)
         {
+            if (!context.CanPass (file))
+            {
+                continue;
+            }
+            
             var newName = Render (context, file);
             var pair = new NamePair
             {

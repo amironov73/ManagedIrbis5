@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* ProcessingPart.cs -- часть, которая умеет обрабатываться
+/* SystemPart.cs -- часть имени, принадлежащая файловой системе
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,9 +23,11 @@ using JetBrains.Annotations;
 namespace NamerCommon;
 
 /// <summary>
-/// Часть, которая умеет обрабатываться.
+/// Часть имени, принадлежащая файловой системе,
+/// например, расширение.
 /// </summary>
-public abstract class ProcessingPart
+[PublicAPI]
+public abstract class SystemPart
     : NamePart
 {
     #region Properties
@@ -54,7 +56,7 @@ public abstract class ProcessingPart
     /// </summary>
     protected bool Parse 
         (
-            ProcessingPart part,
+            SystemPart part,
             string text
         )
     {

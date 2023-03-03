@@ -11,6 +11,8 @@
 
 #region Using directives
 
+using AM;
+
 using JetBrains.Annotations;
 
 #endregion
@@ -28,9 +30,9 @@ public sealed class NamingContext
     #region Properties
 
     /// <summary>
-    /// Произвольные пользовательские данные.
+    /// Фильтры.
     /// </summary>
-    public Dictionary<string, object?> UserData { get; }
+    public List<FileFilter> Filters { get; }
 
     #endregion
 
@@ -41,7 +43,32 @@ public sealed class NamingContext
     /// </summary>
     public NamingContext()
     {
-        UserData = new ();
+        Filters = new();
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Проверка файла на прохождение через фильтры.
+    /// </summary>
+    public bool CanPass
+        (
+            FileInfo fileInfo
+        )
+    {
+        Sure.NotNull (fileInfo);
+
+        foreach (var filter in Filters)
+        {
+            if (!filter.CanPass (fileInfo))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     #endregion

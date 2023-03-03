@@ -4,6 +4,8 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable LocalizableElement
+// ReSharper disable StringLiteralTypo
 
 /* Program.cs -- точка входа в программу
  * Ars Magna project, http://arsmagna.ru
@@ -31,17 +33,17 @@ internal static class Program
     {
         if (args.Length < 2)
         {
+            Console.WriteLine ("NamerConsole [options] <specification> <directory> ...");
             return;
         }
 
-        var specification = args[0];
         var processor = new NameProcessor();
-        processor.Parse (specification);
         var context = new NamingContext();
+        var directories = processor.ParseCommandLine (context, args);
 
-        for (var i = 1; i < args.Length; i++)
+        foreach (var dirName in directories)
         {
-            var directory = new DirectoryInfo (args[i]);
+            var directory = new DirectoryInfo (dirName);
             var pairs = processor.Render (context, directory);
             NamePair.Render (pairs);
         }
