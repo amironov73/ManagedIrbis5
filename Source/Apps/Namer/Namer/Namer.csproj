@@ -7,6 +7,7 @@
         <ApplicationManifest>app.manifest</ApplicationManifest>
         <ApplicationIcon>Assets/number.ico</ApplicationIcon>
         <InvariantGlobalization>true</InvariantGlobalization>
+        <PublishSingleFile>true</PublishSingleFile>
     </PropertyGroup>
 
     <ItemGroup>
@@ -47,6 +48,18 @@
         <ProjectReference Include="..\..\..\Libs\AM.Core5\AM.Core5.csproj" />
         <ProjectReference Include="..\..\..\Libs\AM.Avalonia\AM.Avalonia.csproj" />
         <ProjectReference Include="..\NamerCommon\NamerCommon.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="specifications.txt">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="include.txt">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="exclude.txt">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>

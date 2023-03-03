@@ -296,7 +296,7 @@ public sealed class NameProcessor
             throw new ApplicationException();
         }
     }
-    
+
     /// <summary>
     /// Рендер имени в указанном контексте.
     /// </summary>

@@ -1,0 +1,4 @@
+﻿<linker>
+  <assembly fullname="NamerConsole" preserve="All" />
+  <assembly fullname="NamerCommon" preserve="All" />
+</linker>

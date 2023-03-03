@@ -15,20 +15,19 @@
 #region Using directives
 
 using System;
-using System.ComponentModel;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 
 using AM;
 using AM.Avalonia;
+using AM.IO;
 
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
-using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
@@ -50,6 +49,14 @@ namespace Namer;
 public sealed class MainWindow
     : Window
 {
+    #region Constants
+
+    private const string SpecificationsFileName = "specifications.txt";
+    private const string IncludeFileName = "include.txt";
+    private const string ExcludeFileName = "exclude.txt";
+
+    #endregion
+    
     #region Construction
 
     /// <summary>
@@ -69,6 +76,9 @@ public sealed class MainWindow
         _processor = new NameProcessor();
         _folder = new Folder();
         DataContext = _folder;
+        _specifications = new ();
+        _LoadIncludeExclude();
+        _PreLoadSpecifications();
     }
 
     #endregion
@@ -80,7 +90,7 @@ public sealed class MainWindow
     {
         base.OnInitialized();
 
-        var specificationBox = new TextBox
+        _currentSpecBox = new TextBox
         {
             Width = 250,
             [!TextBox.TextProperty] = new Binding
@@ -89,7 +99,18 @@ public sealed class MainWindow
                 Path = nameof (NameProcessor.Specification)
             }
         };
-        specificationBox.TextChanged += (sender, args) => _ApplySpecification();
+        _currentSpecBox.TextChanged += (_, _) => _ApplySpecification();
+
+        _specListBox = new ComboBox
+        {
+            Width = 250,
+            [!ItemsControl.ItemsProperty] = new Binding
+            {
+                Source = _specifications,
+                Path = "."
+            }
+        };
+        _specListBox.SelectionChanged += _SpecificationSelected;
 
         var toolbar = new Panel
         {
@@ -107,13 +128,20 @@ public sealed class MainWindow
                         CreateButton ("check-all.png", () => _folder.CheckAll()),
                         CreateButton ("check-none.png", () => _folder.CheckNone()),
                         CreateButton ("check-reverse.png", () => _folder.CheckReverse()),
-                        
+
                         AvaloniaUtility.HorizontalGroup 
-                        (
-                            specificationBox,
-                            CreateButton ("refresh.png", _ApplySpecification)
-                        )
-                        .SetPanelMargin (5),
+                            (
+                                _specListBox,
+                                CreateButton ("save.png", _SaveCurrentSpecification)
+                            )
+                            .SetPanelMargin (5),
+
+                        AvaloniaUtility.HorizontalGroup 
+                            (
+                                _currentSpecBox,
+                                CreateButton ("refresh.png", _ApplySpecification)
+                            )
+                            .SetPanelMargin (5),
                         
                         CreateButton ("runner.png", _Run)
                     }
@@ -126,7 +154,7 @@ public sealed class MainWindow
         {
             HorizontalAlignment = HorizontalAlignment.Stretch,
             [!ItemsControl.ItemsProperty] = new Binding (nameof (_folder.Files)),
-            ItemTemplate = new FuncDataTemplate<NamePair> ((data, ns) => new PairControl()),
+            ItemTemplate = new FuncDataTemplate<NamePair> ((_, _) => new PairControl()),
             Styles =
             {
                 new Style (x => x.OfType<ListBoxItem>())
@@ -151,24 +179,24 @@ public sealed class MainWindow
             }
         };
 
-        if (Application.Current?.ApplicationLifetime is ClassicDesktopStyleApplicationLifetime lifetime)
+        if (Application.Current?.ApplicationLifetime
+            is ClassicDesktopStyleApplicationLifetime { Args: { Length: not 0 } args })
         {
-            if (lifetime.Args is { Length: not 0 } args)
+            var folders = _processor.ParseCommandLine (_context, args);
+            if (folders is { Count: not 0 })
             {
-                var folders = _processor.ParseCommandLine (_context, args);
-                if (folders is { Count: not 0 })
-                {
-                    _ReadFolder (folders.First());
-                }
+                _ReadFolder (folders.First());
             }
         }
-
     }
 
     #endregion
 
     #region Private members
 
+    private readonly ObservableCollection<string> _specifications;
+    private TextBox _currentSpecBox = null!;
+    private ComboBox _specListBox = null!;
     private string _currentPath = null!;
     private DirectoryInfo _directory = null!;
     private readonly NamingContext _context;
@@ -201,6 +229,7 @@ public sealed class MainWindow
 
     private void _Refresh()
     {
+        _processor.Reset();
         var pairs = _processor.Render (_context, _directory);
         _folder.DirectoryName = _currentPath;
         _folder.Files = pairs.ToArray();
@@ -258,6 +287,70 @@ public sealed class MainWindow
             }
         }
     }
+
+    private void _PreLoadSpecifications()
+    {
+        _specifications.Clear();
+        if (File.Exists (SpecificationsFileName))
+        {
+            foreach (var line in File.ReadLines (SpecificationsFileName))
+            {
+                if (!string.IsNullOrWhiteSpace (line))
+                {
+                    _specifications.Add (line.Trim());
+                }
+            }
+        }
+    }
     
+    private void _SaveCurrentSpecification()
+    {
+        if (_currentSpecBox.Text is { Length: not 0 } spec)
+        {
+            FileUtility.Touch (SpecificationsFileName);
+            var nl = Environment.NewLine;
+            File.AppendAllText (SpecificationsFileName, nl + spec + nl);
+            _specifications.Add (spec);
+        }
+    }
+
+    private void _SpecificationSelected
+        (
+            object? sender,
+            SelectionChangedEventArgs eventArgs
+        )
+    {
+        if (_specListBox.SelectedItem is string spec)
+        {
+            _processor.Specification = spec;
+            _ApplySpecification();
+        }
+    }
+
+    private void _LoadIncludeExclude()
+    {
+        if (File.Exists (IncludeFileName))
+        {
+            foreach (var line in File.ReadLines (IncludeFileName))
+            {
+                if (!string.IsNullOrWhiteSpace (line))
+                {
+                    _context.Filters.Add (new IncludeFilter (line.Trim()));
+                }
+            }
+        }
+        
+        if (File.Exists (ExcludeFileName))
+        {
+            foreach (var line in File.ReadLines (ExcludeFileName))
+            {
+                if (!string.IsNullOrWhiteSpace (line))
+                {
+                    _context.Filters.Add (new ExcludeFilter (line.Trim()));
+                }
+            }
+        }
+    }
+
     #endregion
 }
