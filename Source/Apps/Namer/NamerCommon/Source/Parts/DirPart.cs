@@ -12,6 +12,7 @@
 #region Using directives
 
 using AM;
+using AM.IO;
 
 using JetBrains.Annotations;
 
@@ -63,8 +64,20 @@ public sealed class DirPart
     {
         Sure.NotNull (context);
         Sure.NotNull (fileInfo);
-        
-        return Render (fileInfo.Extension);
+
+        var result = fileInfo.DirectoryName;
+        if (!string.IsNullOrEmpty (result))
+        {
+            result = PathUtility.StripTrailingBackslash (result);
+            result = Path.GetFileName (result);
+        }
+
+        if (string.IsNullOrEmpty (result))
+        {
+            return string.Empty;
+        }
+
+        return Render (result);
     }
 
     #endregion

@@ -6,8 +6,19 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\..\Libs\AM.Core5\AM.Core5.csproj" />
   </ItemGroup>
 
+  <!-- Централизованное управление пакетами -->
+  <ItemGroup>
+    <PackageReference Include="Spectre.Console" />
+    <PackageReference Include="ReactiveUI" />
+    <PackageReference Include="ReactiveUI.Fody" />
+  </ItemGroup>
+  
 </Project>

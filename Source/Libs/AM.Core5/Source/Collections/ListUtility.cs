@@ -21,6 +21,8 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 
+using JetBrains.Annotations;
+
 using Microsoft.Extensions.Logging;
 
 #endregion
@@ -33,6 +35,7 @@ namespace AM.Collections;
 /// Работа со списками <see cref="List{T}"/> и массивами.
 /// </summary>
 /// <remarks>Borrowed from Json.NET.</remarks>
+[PublicAPI]
 public static class ListUtility
 {
     #region Public methods
@@ -145,6 +148,57 @@ public static class ListUtility
                 list.Add (value);
             }
         }
+    }
+
+    /// <summary>
+    /// Есть ли в коллекции хотя бы один элемент,
+    /// удовлетворяющий заданному условию?
+    /// </summary>
+    public static bool Any<T1, T2>
+        (
+            this IEnumerable<T1> collection,
+            T2 arg,
+            Func<T1, T2, bool> predicate
+        )
+    {
+        Sure.NotNull (collection);
+        Sure.NotNull (predicate);
+
+        foreach (var item in collection)
+        {
+            if (predicate (item, arg))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Есть ли в коллекции хотя бы один элемент,
+    /// удовлетворяющий заданному условию?
+    /// </summary>
+    public static bool Any<T1, T2, T3>
+        (
+            this IEnumerable<T1> collection,
+            T2 arg1,
+            T3 arg2,
+            Func<T1, T2, T3, bool> predicate
+        )
+    {
+        Sure.NotNull (collection);
+        Sure.NotNull (predicate);
+
+        foreach (var item in collection)
+        {
+            if (predicate (item, arg1, arg2))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -274,6 +328,59 @@ public static class ListUtility
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Подсчет количества элементов в коллекции,
+    /// удовлетворяющих заданному условию.
+    /// </summary>
+    public static int Count<T1, T2> 
+        (
+            this IEnumerable<T1> collection,
+            T2 arg,
+            Func<T1, T2, bool> predicate
+        )
+    {
+        Sure.NotNull (collection);
+        Sure.NotNull (predicate);
+
+        var result = 0;
+        foreach (var item in collection)
+        {
+            if (predicate (item, arg))
+            {
+                result++;
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Подсчет количества элементов в коллекции,
+    /// удовлетворяющих заданному условию.
+    /// </summary>
+    public static int Count<T1, T2, T3> 
+        (
+            this IEnumerable<T1> collection,
+            T2 arg1,
+            T3 arg2,
+            Func<T1, T2, T3, bool> predicate
+        )
+    {
+        Sure.NotNull (collection);
+        Sure.NotNull (predicate);
+
+        var result = 0;
+        foreach (var item in collection)
+        {
+            if (predicate (item, arg1, arg2))
+            {
+                result++;
+            }
+        }
+
+        return result;
     }
 
     /// <summary>

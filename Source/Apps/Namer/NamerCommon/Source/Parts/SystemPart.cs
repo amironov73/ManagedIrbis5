@@ -11,8 +11,11 @@
 
 #region Using directives
 
+using System.Text;
+
 using AM;
 using AM.Parameters;
+using AM.Text;
 
 using JetBrains.Annotations;
 
@@ -33,9 +36,19 @@ public abstract class SystemPart
     #region Properties
 
     /// <summary>
+    /// Флаг: капитализация.
+    /// </summary>
+    public bool Capitalize { get; set; }
+
+    /// <summary>
     /// Флаг: преобразование к нижнему регистру.
     /// </summary>
     public bool ToLower { get; set; }
+
+    /// <summary>
+    /// Флаг: преобразование к верхнему регистру.
+    /// </summary>
+    public bool ToUpper { get; set; }
 
     /// <summary>
     /// Начальная позиция.
@@ -49,12 +62,94 @@ public abstract class SystemPart
 
     #endregion
 
+    #region Private members
+
+    private static string[] _dontCapitalize =
+    {
+        "a", "about", "and", "as", "at", "but", "by", "for",
+        "from", "in", "into", "neither", "nor", "of", "on",
+        "or", "since", "than", "that", "the", "to", "until",
+        "while", "with", "within"
+    };
+
+    private static bool MustBeLowercase
+        (
+            TextNavigator navigator,
+            string word
+        )
+    {
+        if (navigator.Position == 0)
+        {
+            return false;
+        }
+
+        foreach (var one in _dontCapitalize)
+        {
+            if (string.Compare (word, one, StringComparison.OrdinalIgnoreCase) == 0)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    
+    private static string CapitalizeWord
+        (
+            TextNavigator navigator,
+            string word
+        )
+    {
+        if (MustBeLowercase (navigator, word))
+        {
+            return word.ToLowerInvariant();
+        }
+
+        var builder = new StringBuilder();
+        builder.Append (char.ToUpperInvariant (word[0]));
+        for (var i = 1; i < word.Length; i++)
+        {
+            builder.Append (char.ToLowerInvariant (word[i]));
+        }
+        
+        return builder.ToString();
+    }
+    
+    private static string CapitalizeText
+        (
+            string text
+        )
+    {
+        Sure.NotNull (text);
+        
+        var builder = new StringBuilder();
+        var navigator = new TextNavigator (text);
+
+        while (!navigator.IsEOF)
+        {
+            while (!navigator.IsEOF && !navigator.IsLetter())
+            {
+                builder.Append (navigator.ReadChar());
+            }
+
+            var word = navigator.ReadWord();
+            if (!word.IsEmpty)
+            {
+                builder.Append (CapitalizeWord (navigator, word.ToString()));
+            }
+        }
+
+        return builder.ToString();
+    }
+
+    #endregion
+    
     #region Protected members
 
     /// <summary>
-    /// 
+    /// Разбор опции для элемента имени.
     /// </summary>
-    protected bool Parse 
+    protected bool Parse
         (
             SystemPart part,
             string text
@@ -66,16 +161,24 @@ public abstract class SystemPart
             parameter.Verify (true);
             switch (parameter.Name)
             {
+                case "capitalize":
+                    part.Capitalize = true;
+                    break;
+
                 case "lower":
                     part.ToLower = true;
-                    break;
-                
-                case "start":
-                    part.Start = parameter.Value!.ParseInt32 ();
                     break;
 
                 case "length":
                     part.Length = parameter.Value!.ParseInt32();
+                    break;
+
+                case "start":
+                    part.Start = parameter.Value!.ParseInt32 ();
+                    break;
+
+                case "upper":
+                    part.ToUpper = true;
                     break;
 
                 default:
@@ -87,7 +190,7 @@ public abstract class SystemPart
     }
 
     /// <summary>
-    /// 
+    /// Рендер элемента имени.
     /// </summary>
     protected string Render
         (
@@ -97,13 +200,13 @@ public abstract class SystemPart
         var start = Start;
         if (start < 0)
         {
-            start = value.Length - start;
+            start = value.Length + start;
         }
 
         var length = Length;
         if (length < 0)
         {
-            length = value.Length - length;
+            length = value.Length + length;
         }
 
         if (Start != 0)
@@ -118,6 +221,16 @@ public abstract class SystemPart
             {
                 value = value.Substring (0, length);
             }
+        }
+
+        if (Capitalize)
+        {
+            value = CapitalizeText (value);
+        }
+
+        if (ToUpper)
+        {
+            value = value.ToUpperInvariant();
         }
 
         if (ToLower)

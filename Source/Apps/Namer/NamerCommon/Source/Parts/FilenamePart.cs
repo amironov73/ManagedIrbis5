@@ -61,7 +61,7 @@ public sealed class FilenamePart
             FileInfo fileInfo
         )
     {
-        return Render (fileInfo.Name);
+        return Render (NameWithoutExtension (fileInfo.Name));
     }
 
     #endregion

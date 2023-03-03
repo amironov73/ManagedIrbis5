@@ -45,7 +45,23 @@ internal static class Program
         {
             var directory = new DirectoryInfo (dirName);
             var pairs = processor.Render (context, directory);
-            NamePair.Render (pairs);
+            var folder = new Folder (dirName, pairs);
+            if (processor.DryRun)
+            {
+                folder.CheckNames();
+                folder.Render();
+            }
+            else
+            {
+                if (!folder.CheckNames())
+                {
+                    folder.Render (errorsOnly: true);
+                }
+                else
+                {
+                    folder.Rename();
+                }
+            }
         }
     }
 }

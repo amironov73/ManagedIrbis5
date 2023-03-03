@@ -11,6 +11,8 @@
 
 #region Using directives
 
+using AM;
+
 using JetBrains.Annotations;
 
 #endregion
@@ -40,6 +42,22 @@ public abstract class NamePart
     #endregion
 
     #region Public methods
+
+    /// <summary>
+    /// Получение имени без расширения.
+    /// </summary>
+    public static string NameWithoutExtension
+        (
+            string nameWithExtension
+        )
+    {
+        Sure.NotNullNorEmpty (nameWithExtension);
+
+        var position = nameWithExtension.LastIndexOf ('.');
+        return position < 0
+            ? nameWithExtension
+            : nameWithExtension.Remove (position);
+    }
 
     /// <summary>
     /// Разбор текста.

@@ -12,7 +12,14 @@
 
 #region Using directives
 
+using AM;
+
 using JetBrains.Annotations;
+
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
+
+using Spectre.Console;
 
 #endregion
 
@@ -25,18 +32,40 @@ namespace NamerCommon;
 /// </summary>
 [PublicAPI]
 public sealed class NamePair
+    : ReactiveObject
 {
     #region Properties
 
     /// <summary>
+    /// Элемент отмечен?
+    /// </summary>
+    [Reactive]
+    public bool IsChecked { get; set; }
+
+    /// <summary>
+    /// Ошибка?
+    /// </summary>
+    [Reactive]
+    public string? ErrorMessage { get; set; }
+    
+    /// <summary>
     /// Старое имя файла.
     /// </summary>
+    [Reactive]
     public required string Old { get; init; }
 
     /// <summary>
     /// Новое имя файла.
     /// </summary>
+    [Reactive]
     public required string New { get; init; }
+
+    /// <summary>
+    /// Совпадают ли новое и старое имена?
+    /// </summary>
+    public bool IsSame => OperatingSystem.IsWindows()
+        ? Old.SameString (New)
+        : Old.SameStringSensitive (New);
 
     #endregion
 
@@ -45,15 +74,25 @@ public sealed class NamePair
     /// <summary>
     /// Рендеринг пар имен файлов.
     /// </summary>
-    public static void Render
-        (
-            IEnumerable<NamePair> pairs
-        )
+    public void Render()
     {
-        foreach (var pair in pairs)
+        var same = Old.SameStringSensitive (New);
+        var color = IsChecked
+            ? same
+                ? Color.Grey : Color.Green
+            : Color.Grey;
+        var style = new Style (color);
+
+        AnsiConsole.Write (new Text (Old, style));
+        AnsiConsole.Write (" => ");
+        AnsiConsole.Write (new Text (New, style));
+        if (!string.IsNullOrEmpty (ErrorMessage))
         {
-            Console.WriteLine ($"{pair.Old} => {pair.New}");
+            AnsiConsole.Write (' ');
+            AnsiConsole.Write (new Text (ErrorMessage, new Style (Color.Red)));
         }
+
+        AnsiConsole.WriteLine();
     }
 
     #endregion

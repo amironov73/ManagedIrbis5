@@ -5,13 +5,11 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* RegexPart.cs -- регулярное выражение
+/* RemovePart.cs -- удаление части имени файла
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
-
-using System.Text.RegularExpressions;
 
 using AM;
 
@@ -23,39 +21,26 @@ using JetBrains.Annotations;
 
 namespace NamerCommon;
 
-/*
-    ОПЦИИ РЕГУЛЯРНОГО ВЫРАЖЕНИЯ
-
-    задаются так: "(?imnsx-imnsx)"
-
-    i = IgnoreCase
-    m = Multiline
-    s = Singleline
-    n = ExplicitCapture
-    x = IgnorePatternWhitespace
-
- */
-
 /// <summary>
-/// Регулярное выражение.
+/// Удаление части имени файла.
 /// </summary>
 [PublicAPI]
-public sealed class RegexPart
+public sealed class RemovePart
     : NamePart
 {
     #region Properties
 
     /// <inheritdoc cref="NamePart.Designation"/>
-    public override string Designation => "regex";
+    public override string Designation => "remove";
 
     /// <inheritdoc cref="NamePart.Title"/>
-    public override string Title => "Регулярное выражение";
-    
-    /// <summary>
-    /// Искомый шаблон.
-    /// </summary>
-    public Regex? Pattern { get; set; }
+    public override string Title => "Удаление";
 
+    /// <summary>
+    /// Удаляемое значение.
+    /// </summary>
+    public string? Value { get; set; }
+    
     #endregion
 
     #region NamePart members
@@ -66,11 +51,11 @@ public sealed class RegexPart
             string text
         )
     {
-        Sure.NotNullNorEmpty (text);
+        Sure.NotNull (text);
 
-        var result = new RegexPart
+        var result = new RemovePart
         {
-            Pattern = new Regex (text)
+            Value = text
         };
 
         return result;
@@ -86,13 +71,13 @@ public sealed class RegexPart
         Sure.NotNull (context);
         Sure.NotNull (fileInfo);
 
-        var match = Pattern.ThrowIfNull().Match (fileInfo.Name);
-        if (!match.Success)
+        var result = fileInfo.Name;
+        if (!string.IsNullOrEmpty (Value))
         {
-            return string.Empty;
+            result = result.Replace (Value, string.Empty);
         }
 
-        return match.Value;
+        return result;
     }
 
     #endregion

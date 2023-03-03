@@ -33,6 +33,11 @@ public sealed class NameProcessor
     #region Properties
 
     /// <summary>
+    /// Холостой запуск?
+    /// </summary>
+    public bool DryRun { get; set; }
+    
+    /// <summary>
     /// Элементы имени.
     /// </summary>
     public List<NamePart> Parts { get; }
@@ -45,9 +50,12 @@ public sealed class NameProcessor
         new CounterPart(),
         new DirPart(),
         new ExtPart(),
+        new FilenamePart(),
         new LiteralPart(),
         new NumberPart(),
         new RegexPart(),
+        new RemovePart(),
+        new ReplacePart()
     };
 
     #endregion
@@ -124,6 +132,13 @@ public sealed class NameProcessor
                 // это опция
                 switch (arg)
                 {
+                    case "--check":
+                    case "--check-only":
+                    case "--dry":
+                    case "--dry-run":
+                        DryRun = true;
+                        break;
+
                     case "--exclude":
                         context.Filters.Add 
                             (
@@ -236,6 +251,7 @@ public sealed class NameProcessor
             var newName = Render (context, file);
             var pair = new NamePair
             {
+                IsChecked = true,
                 Old = file.Name,
                 New = newName
             };
