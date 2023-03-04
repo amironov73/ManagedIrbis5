@@ -18,6 +18,8 @@ using Avalonia.Data;
 using Avalonia.Media;
 using Avalonia.Threading;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -27,6 +29,7 @@ namespace AM.Avalonia.Controls;
 /// <summary>
 /// Полоска прогресса.
 /// </summary>
+[PublicAPI]
 public class ProgressStripe
     : Control
 {
@@ -35,8 +38,8 @@ public class ProgressStripe
     /// <summary>
     /// Описание свойства <see cref="Active"/>.
     /// </summary>
-    public static readonly DirectProperty<BusyStripe, bool> ActiveProperty
-        = AvaloniaProperty.RegisterDirect<BusyStripe, bool>
+    public static readonly DirectProperty<ProgressStripe, bool> ActiveProperty
+        = AvaloniaProperty.RegisterDirect<ProgressStripe, bool>
             (
                 nameof (Active),
                 x => x.Active,
@@ -57,22 +60,22 @@ public class ProgressStripe
     }
 
     /// <summary>
-    /// Описание свойства <see cref="Value"/>.
+    /// Описание свойства <see cref="Percentage"/>.
     /// </summary>
-    public static readonly DirectProperty<ProgressStripe, double> ValueProperty =
+    public static readonly DirectProperty<ProgressStripe, double> PercentageProperty =
         AvaloniaProperty.RegisterDirect<ProgressStripe, double>
             (
-                nameof (Value),
-                x => x.Value,
-                (x, v) => x.Value = v,
+                nameof (Percentage),
+                x => x.Percentage,
+                (x, v) => x.Percentage = v,
                 defaultBindingMode: BindingMode.TwoWay,
                 enableDataValidation: true
             );
 
     /// <summary>
-    /// Значение прогресса.
+    /// Процент выполненного действия (величина прогресса в процентах).
     /// </summary>
-    public double Value { get; set; }
+    public double Percentage { get; set; }
 
     #endregion
 
@@ -80,8 +83,8 @@ public class ProgressStripe
 
     static ProgressStripe()
     {
-        AffectsArrange<BusyStripe> (ActiveProperty);
-        AffectsRender<BusyStripe> (ValueProperty);
+        AffectsArrange<ProgressStripe> (ActiveProperty);
+        AffectsRender<ProgressStripe> (PercentageProperty);
     }
 
     #endregion
@@ -102,7 +105,7 @@ public class ProgressStripe
     {
         Sure.NotNull (context);
 
-        var value = Math.Clamp (Value, 0, 100);
+        var value = Math.Clamp (Percentage, 0, 100);
         var width = Bounds.Width * value / 100;
         context.FillRectangle (Brushes.LightGreen, new Rect (0, 0, Bounds.Width, Bounds.Height));
         context.FillRectangle (Brushes.Green, new Rect (0, 0, width, Bounds.Height));
@@ -133,7 +136,7 @@ public class ProgressStripe
     {
         Dispatcher.UIThread.InvokeAsync (() =>
         {
-            Value = value;
+            Percentage = value;
             InvalidateVisual();
         });
     }

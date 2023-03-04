@@ -18,9 +18,11 @@ using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 using AM;
 using AM.Avalonia;
+using AM.Avalonia.Controls;
 using AM.IO;
 
 using Avalonia;
@@ -91,6 +93,23 @@ public sealed class MainWindow
     {
         base.OnInitialized();
 
+        var progressStripe = new ProgressStripe
+        {
+            Height = 10,
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            [!ProgressStripe.ActiveProperty] = new Binding
+            {
+                Source = _folder,
+                Path = nameof (Folder.Active)
+            },
+            [!ProgressStripe.PercentageProperty] = new Binding
+            {
+                Source = _folder,
+                Path = nameof (Folder.Percentage)
+            }
+        }
+        .DockTop();
+
         _currentSpecBox = new TextBox
         {
             Width = 250,
@@ -144,7 +163,7 @@ public sealed class MainWindow
                             )
                             .SetPanelMargin (5),
 
-                        CreateButton ("runner.png", _Run)
+                        CreateButton ("runner.png", _RunAsync)
                     }
                 }
             }
@@ -221,6 +240,7 @@ public sealed class MainWindow
             Children =
             {
                 toolbar,
+                progressStripe,
                 statusBar,
                 _fileListBox
             }
@@ -238,7 +258,7 @@ public sealed class MainWindow
     }
 
     /// <inheritdoc cref="InputElement.OnKeyDown"/>
-    protected override void OnKeyDown
+    protected override async void OnKeyDown
         (
             KeyEventArgs eventArgs
         )
@@ -252,7 +272,7 @@ public sealed class MainWindow
                 break;
             
             case { Key: Key.F2, KeyModifiers: KeyModifiers.None }:
-                _Run();
+                await _RunAsync();
                 break;
         }
     }
@@ -270,6 +290,29 @@ public sealed class MainWindow
     private readonly NameProcessor _processor;
     private readonly Folder _folder;
     private ListBox _fileListBox = null!;
+
+    private Button CreateButton
+        (
+            string assetName,
+            Func<Task> action
+        )
+    {
+        Sure.NotNullNorEmpty (assetName);
+        Sure.NotNull (action);
+
+        assetName = Path.Combine ("Assets", assetName);
+        return new Button
+        {
+            Content = new Image
+            {
+                Width = 24,
+                Height = 24,
+                Source = this.LoadBitmapFromAssets (assetName).ThrowIfNull()
+            },
+            Background = Brushes.Transparent,
+            Command = ReactiveCommand.CreateFromTask (action)
+        };
+    }
 
     private Button CreateButton
         (
@@ -344,11 +387,11 @@ public sealed class MainWindow
         }
     }
 
-    private void _Run()
+    private async Task _RunAsync()
     {
         if (_folder.CheckNames())
         {
-            if (_folder.Rename())
+            if (await _folder.RenameAsync())
             {
                 _folder.ClearChecked();
             }

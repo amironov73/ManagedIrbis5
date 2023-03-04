@@ -45,6 +45,18 @@ public class Folder
     #region Properties
 
     /// <summary>
+    /// Выполняется переименование?
+    /// </summary>
+    [Reactive]
+    public bool Active { get; set; }
+
+    /// <summary>
+    /// Процент выполненного переименования.
+    /// </summary>
+    [Reactive]
+    public double Percentage { get; set; }
+
+    /// <summary>
     /// Имя директории.
     /// </summary>
     [Reactive]
@@ -249,6 +261,11 @@ public class Folder
     public bool Rename() => Rename<object> (RenameImpl, null);
 
     /// <summary>
+    /// Асинхронное переименование.
+    /// </summary>
+    public Task<bool> RenameAsync() => Task.Run (Rename);
+
+    /// <summary>
     /// Переименование.
     /// </summary>
     public bool Rename<T>
@@ -268,25 +285,38 @@ public class Folder
         }
 
         var result = true;
-        foreach (var pair in Files)
+        try
         {
-            if (!pair.IsChecked || pair.HasError)
+            var counter = 0;
+            Percentage = 0;
+            Active = true;
+            foreach (var pair in Files)
             {
-                // пропускаем пары с ошибками и без отметок
-                continue;
-            }
-            
-            if (pair.IsSame)
-            {
-                // переименования не требуется
-                continue;
-            }
+                counter++;
+                Percentage = 100.0 * counter / Files.Count;
 
-            if (!action (this, pair, argument))
-            {
-                result = false;
-                break;
+                if (!pair.IsChecked || pair.HasError)
+                {
+                    // пропускаем пары с ошибками и без отметок
+                    continue;
+                }
+
+                if (pair.IsSame)
+                {
+                    // переименования не требуется
+                    continue;
+                }
+
+                if (!action (this, pair, argument))
+                {
+                    result = false;
+                    break;
+                }
             }
+        }
+        finally
+        {
+            Active = false;
         }
 
         return result;
