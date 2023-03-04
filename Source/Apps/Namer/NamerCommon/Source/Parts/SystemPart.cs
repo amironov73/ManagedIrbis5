@@ -114,7 +114,14 @@ public abstract class SystemPart
         
         return builder.ToString();
     }
-    
+
+    private static char FixChar (char chr) => chr switch
+    {
+        <= ' ' => '_',
+        > 'z' => '_',
+        _ => chr
+    };
+
     private static string CapitalizeText
         (
             string text
@@ -129,7 +136,7 @@ public abstract class SystemPart
         {
             while (!navigator.IsEOF && !navigator.IsLetter())
             {
-                builder.Append (navigator.ReadChar());
+                builder.Append (FixChar (navigator.ReadChar()));
             }
 
             var word = navigator.ReadWord();

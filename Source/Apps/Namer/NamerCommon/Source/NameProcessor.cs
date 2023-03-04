@@ -219,6 +219,11 @@ public sealed class NameProcessor
                             );
                         break;
 
+                    case "--folder":
+                        arg = PathUtility.StripTrailingBackslash (args[++i]);
+                        result.Add (arg);
+                        break;
+
                     case "--include":
                         context.Filters.Add 
                             (
@@ -229,7 +234,13 @@ public sealed class NameProcessor
                     case "--recursive":
                         recursive = true;
                         break;
-                    
+
+                    case "--specification":
+                        arg = args[++i];
+                        Specification = arg;
+                        ParseSpecification (arg);
+                        break;
+
                     default:
                         throw new ApplicationException();
                 }

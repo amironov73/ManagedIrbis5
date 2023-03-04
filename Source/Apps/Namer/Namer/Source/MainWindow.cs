@@ -28,6 +28,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
+using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
@@ -121,7 +122,7 @@ public sealed class MainWindow
                 {
                     Orientation = Orientation.Horizontal,
                     Margin = new Thickness (5),
-                    
+
                     Children =
                     {
                         CreateButton ("open.png", _OpenFolder),
@@ -142,13 +143,58 @@ public sealed class MainWindow
                                 CreateButton ("refresh.png", _ApplySpecification)
                             )
                             .SetPanelMargin (5),
-                        
+
                         CreateButton ("runner.png", _Run)
                     }
                 }
             }
         }
         .DockTop();
+
+        var statusBar = new StackPanel
+        {
+            Background = Brushes.LightGray,
+            Orientation = Orientation.Horizontal,
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            Children =
+            {
+                new TextBlock
+                {
+                    Foreground = Brushes.Green,
+                    Padding = new Thickness (5),
+                    [!TextBlock.TextProperty] = new Binding
+                    {
+                        Source = _folder,
+                        Path = nameof (Folder.CheckedCount),
+                        StringFormat = "Отмечено: {0}"
+                    }
+                },
+
+                new TextBlock
+                {
+                    Foreground = Brushes.Blue,
+                    Padding = new Thickness (5),
+                    [!TextBlock.TextProperty] = new Binding
+                    {
+                        Source = _folder,
+                        Path = nameof (Folder.ErrorCount),
+                        StringFormat = "Ошибки: {0}"
+                    }
+                },
+
+                new TextBlock
+                {
+                    Foreground = Brushes.Black,
+                    Padding = new Thickness (5),
+                    [!TextBlock.TextProperty] = new Binding
+                    {
+                        Source = _folder,
+                        Path = nameof (Folder.DirectoryName)
+                    }
+                }
+            }
+        }
+        .DockBottom();
 
         _fileListBox = new ListBox
         {
@@ -167,7 +213,7 @@ public sealed class MainWindow
                 }
             }
         };
-        
+
         Content = new DockPanel
         {
             HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -175,6 +221,7 @@ public sealed class MainWindow
             Children =
             {
                 toolbar,
+                statusBar,
                 _fileListBox
             }
         };
@@ -187,6 +234,26 @@ public sealed class MainWindow
             {
                 _ReadFolder (folders.First());
             }
+        }
+    }
+
+    /// <inheritdoc cref="InputElement.OnKeyDown"/>
+    protected override void OnKeyDown
+        (
+            KeyEventArgs eventArgs
+        )
+    {
+        base.OnKeyDown (eventArgs);
+
+        switch (eventArgs)
+        {
+            case { Key: Key.Escape, KeyModifiers: KeyModifiers.None }:
+                Close();
+                break;
+            
+            case { Key: Key.F2, KeyModifiers: KeyModifiers.None }:
+                _Run();
+                break;
         }
     }
 
@@ -232,7 +299,7 @@ public sealed class MainWindow
         _processor.Reset();
         var pairs = _processor.Render (_context, _directory);
         _folder.DirectoryName = _currentPath;
-        _folder.Files = pairs.ToArray();
+        _folder.Assign (pairs.ToArray());
         _folder.CheckNames();
     }
 

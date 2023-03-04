@@ -12,9 +12,15 @@
 
 #region Using directives
 
+using System.Collections.ObjectModel;
+using System.Reactive.Linq;
+
 using AM;
 using AM.Collections;
 using AM.IO;
+
+using DynamicData;
+using DynamicData.Binding;
 
 using JetBrains.Annotations;
 
@@ -47,8 +53,19 @@ public class Folder
     /// <summary>
     /// Файлы.
     /// </summary>
-    [Reactive]
-    public NamePair[]? Files { get; set; }
+    public ObservableCollection<NamePair> Files { get; }
+
+    /// <summary>
+    /// Количество помеченных.
+    /// </summary>
+    [ObservableAsProperty]
+    public int CheckedCount => 0;
+
+    /// <summary>
+    /// Количество ошибок.
+    /// </summary>
+    [ObservableAsProperty]
+    public int ErrorCount => 0;
 
     #endregion
 
@@ -59,8 +76,9 @@ public class Folder
     /// </summary>
     public Folder()
     {
-        DirectoryName = Directory.GetCurrentDirectory();
-        Files = Array.Empty<NamePair>();
+        DirectoryName = string.Empty;
+        Files = new ObservableCollection<NamePair>();
+        CreateProperties();
     }
 
     /// <summary>
@@ -76,12 +94,29 @@ public class Folder
         Sure.NotNull (files);
         
         DirectoryName = directoryName;
-        Files = files.ToArray();
+        Files = new ObservableCollection<NamePair> (files);
+        CreateProperties();
     }
 
     #endregion
 
     #region Private members
+
+    private void CreateProperties()
+    {
+        // TODO исправить
+        Files
+            .ToObservableChangeSet (x => x.IsChecked)
+            .ToCollection()
+            .Select (x => x.Count (y => y.HasError))
+            .ToPropertyEx (this, x => x.ErrorCount);
+
+        Files
+            .ToObservableChangeSet (x => x.HasError)
+            .ToCollection()
+            .Select (x => x.Count (y => y.IsChecked))
+            .ToPropertyEx (this, x => x.CheckedCount);
+    }
 
     private static bool RenameImpl<T>
         (
@@ -101,16 +136,30 @@ public class Folder
     #region Public methods
 
     /// <summary>
+    /// Присваивание перечня файлов.
+    /// </summary>
+    public void Assign
+        (
+            IEnumerable<NamePair> files
+        )
+    {
+        Sure.NotNull (files);
+
+        Files.Clear();
+        foreach (var file in files)
+        {
+            Files.Add (file);
+        }
+    }
+    
+    /// <summary>
     /// Отметка всех файлов.
     /// </summary>
     public void CheckAll()
     {
-        if (Files is not null)
+        foreach (var item in Files)
         {
-            foreach (var item in Files)
-            {
-                item.IsChecked = true;
-            }
+            item.IsChecked = true;
         }
     }
 
@@ -119,12 +168,9 @@ public class Folder
     /// </summary>
     public void CheckNone()
     {
-        if (Files is not null)
+        foreach (var item in Files)
         {
-            foreach (var item in Files)
-            {
-                item.IsChecked = false;
-            }
+            item.IsChecked = false;
         }
     }
 
@@ -133,12 +179,9 @@ public class Folder
     /// </summary>
     public void CheckReverse()
     {
-        if (Files is not null)
+        foreach (var item in Files)
         {
-            foreach (var item in Files)
-            {
-                item.IsChecked = !item.IsChecked;
-            }
+            item.IsChecked = !item.IsChecked;
         }
     }
     
@@ -147,8 +190,7 @@ public class Folder
     /// </summary>
     public bool CheckNames()
     {
-        if (Files is null
-            || string.IsNullOrEmpty (DirectoryName))
+        if (string.IsNullOrEmpty (DirectoryName))
         {
             return false;
         }
@@ -197,7 +239,8 @@ public class Folder
     /// </summary>
     public void ClearChecked()
     {
-        Files = Files?.Where (item => !item.IsChecked).ToArray();
+        var notChecked = Files.Where (x => !x.IsChecked).ToArray();
+        Assign (notChecked);
     }
 
     /// <summary>
@@ -219,8 +262,7 @@ public class Folder
             return false;
         }
 
-        if (Files is null
-            || string.IsNullOrEmpty (DirectoryName))
+        if (string.IsNullOrEmpty (DirectoryName))
         {
             return false;
         }
@@ -264,18 +306,15 @@ public class Folder
             AnsiConsole.WriteLine();
         }
 
-        if (Files is not null)
+        foreach (var file in Files)
         {
-            foreach (var file in Files)
+            if (errorsOnly && string.IsNullOrEmpty (file.ErrorMessage))
             {
-                if (errorsOnly && string.IsNullOrEmpty (file.ErrorMessage))
-                {
-                    continue;
-                }
-
-                AnsiConsole.Write ("  ");
-                file.Render();
+                continue;
             }
+
+            AnsiConsole.Write ("  ");
+            file.Render();
         }
         
         AnsiConsole.WriteLine();
