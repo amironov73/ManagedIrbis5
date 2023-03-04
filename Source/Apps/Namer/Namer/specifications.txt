@@ -1,7 +1,7 @@
 ﻿{name}.jpg
 {name:capitalize}.jpg
-{dir}-{counter:width=4}{regex:!}{ext}
-{dir}-{number:width=4}{regex:!}{ext}
+{dir:smart}-{counter:width=4}{regex:!}{ext}
+{dir:smart}-{number:width=4}{regex:!}{ext}
 AmourAngels-{counter:width=4}{regex:!}{ext}
 ShowyBeauty-{counter:width=4}{regex:!}{ext}
 ExclusiveTeenPorn-{counter:width=4}{regex:!}{ext}

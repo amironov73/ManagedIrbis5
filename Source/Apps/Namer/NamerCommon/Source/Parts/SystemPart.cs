@@ -36,6 +36,11 @@ public abstract class SystemPart
     #region Properties
 
     /// <summary>
+    /// Флаг: попытка хитро определить заглавие.
+    /// </summary>
+    public bool Smart { get; set; }
+    
+    /// <summary>
     /// Флаг: капитализация.
     /// </summary>
     public bool Capitalize { get; set; }
@@ -75,10 +80,11 @@ public abstract class SystemPart
     private static bool MustBeLowercase
         (
             TextNavigator navigator,
+            int position,
             string word
         )
     {
-        if (navigator.Position == 0)
+        if (position == 0)
         {
             return false;
         }
@@ -97,10 +103,11 @@ public abstract class SystemPart
     private static string CapitalizeWord
         (
             TextNavigator navigator,
+            int position,
             string word
         )
     {
-        if (MustBeLowercase (navigator, word))
+        if (MustBeLowercase (navigator, position, word))
         {
             return word.ToLowerInvariant();
         }
@@ -122,6 +129,28 @@ public abstract class SystemPart
         _ => chr
     };
 
+    private static string Smartify
+        (
+            string text
+        )
+    {
+        Sure.NotNull (text);
+
+        var index = text.LastIndexOf ('-');
+        if (index < 0)
+        {
+            return CapitalizeText (text);
+        }
+
+        var candidate = text.Substring (index + 1);
+        if (string.IsNullOrWhiteSpace (candidate))
+        {
+            return CapitalizeText (text);
+        }
+
+        return CapitalizeText (candidate.Trim());
+    }
+    
     private static string CapitalizeText
         (
             string text
@@ -139,10 +168,11 @@ public abstract class SystemPart
                 builder.Append (FixChar (navigator.ReadChar()));
             }
 
+            var position = navigator.Position;
             var word = navigator.ReadWord();
             if (!word.IsEmpty)
             {
-                builder.Append (CapitalizeWord (navigator, word.ToString()));
+                builder.Append (CapitalizeWord (navigator, position, word.ToString()));
             }
         }
 
@@ -180,6 +210,10 @@ public abstract class SystemPart
                     part.Length = parameter.Value!.ParseInt32();
                     break;
 
+                case "smart":
+                    part.Smart = true;
+                    break;
+                
                 case "start":
                     part.Start = parameter.Value!.ParseInt32 ();
                     break;
@@ -228,6 +262,11 @@ public abstract class SystemPart
             {
                 value = value.Substring (0, length);
             }
+        }
+
+        if (Smart)
+        {
+            value = Smartify (value);
         }
 
         if (Capitalize)

@@ -261,11 +261,6 @@ public class Folder
     public bool Rename() => Rename<object> (RenameImpl, null);
 
     /// <summary>
-    /// Асинхронное переименование.
-    /// </summary>
-    public Task<bool> RenameAsync() => Task.Run (Rename);
-
-    /// <summary>
     /// Переименование.
     /// </summary>
     public bool Rename<T>
@@ -321,7 +316,53 @@ public class Folder
 
         return result;
     }
-    
+
+    /// <summary>
+    /// Переименование.
+    /// </summary>
+    public async Task<bool> RenameAsync
+        (
+            Func<Folder, NamePair, double, Task<bool>> action
+        )
+    {
+        if (!CheckNames())
+        {
+            return false;
+        }
+
+        if (string.IsNullOrEmpty (DirectoryName))
+        {
+            return false;
+        }
+
+        var result = true;
+        var counter = 0;
+        foreach (var pair in Files)
+        {
+            counter++;
+            if (!pair.IsChecked || pair.HasError)
+            {
+                // пропускаем пары с ошибками и без отметок
+                continue;
+            }
+        
+            if (pair.IsSame)
+            {
+                // переименования не требуется
+                continue;
+            }
+
+            var percentage = 100.0 * counter / Files.Count;
+            if (!await action (this, pair, percentage))
+            {
+                result = false;
+                break;
+            }
+        }
+
+        return result;
+    }
+
     /// <summary>
     /// Вывод на консоль.
     /// </summary>

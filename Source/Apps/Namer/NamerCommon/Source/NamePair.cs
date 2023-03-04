@@ -66,13 +66,11 @@ public sealed class NamePair
     /// Есть ошибка?
     /// </summary>
     public bool HasError => !string.IsNullOrEmpty (ErrorMessage);
-    
+
     /// <summary>
     /// Совпадают ли новое и старое имена?
     /// </summary>
-    public bool IsSame => OperatingSystem.IsWindows()
-        ? Old.SameString (New)
-        : Old.SameStringSensitive (New);
+    public bool IsSame => Old.SameStringSensitive (New);
 
     #endregion
 

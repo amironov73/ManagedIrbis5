@@ -11,6 +11,7 @@
 #region Using directives
 
 using System;
+using System.Diagnostics;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -106,9 +107,12 @@ public class ProgressStripe
         Sure.NotNull (context);
 
         var value = Math.Clamp (Percentage, 0, 100);
-        var width = Bounds.Width * value / 100;
-        context.FillRectangle (Brushes.LightGreen, new Rect (0, 0, Bounds.Width, Bounds.Height));
-        context.FillRectangle (Brushes.Green, new Rect (0, 0, width, Bounds.Height));
+        var boundsWidth = Bounds.Width;
+        var width = boundsWidth * value / 100;
+        Debug.WriteLine ($"Value={value}, Bounds.Width={boundsWidth}, Width={width}");
+
+        context.FillRectangle (Brushes.LightGreen, new Rect (0, 0, boundsWidth, Bounds.Height));
+        context.FillRectangle (Brushes.Blue, new Rect (0, 0, width, Bounds.Height));
     }
 
     #endregion

@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -35,6 +36,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Avalonia.Styling;
+using Avalonia.Threading;
 
 using ReactiveUI;
 
@@ -93,9 +95,9 @@ public sealed class MainWindow
     {
         base.OnInitialized();
 
-        var progressStripe = new ProgressStripe
+        _progressStripe = new ProgressStripe
         {
-            Height = 10,
+            Height = 5,
             HorizontalAlignment = HorizontalAlignment.Stretch,
             [!ProgressStripe.ActiveProperty] = new Binding
             {
@@ -240,7 +242,7 @@ public sealed class MainWindow
             Children =
             {
                 toolbar,
-                progressStripe,
+                _progressStripe,
                 statusBar,
                 _fileListBox
             }
@@ -271,8 +273,24 @@ public sealed class MainWindow
                 Close();
                 break;
             
+            case { Key: Key.Enter, KeyModifiers: KeyModifiers.None }:
+                _OpenCurrentFile();
+                break;
+
             case { Key: Key.F2, KeyModifiers: KeyModifiers.None }:
                 await _RunAsync();
+                break;
+
+            case { Key: Key.F3, KeyModifiers: KeyModifiers.None }:
+                _currentSpecBox.Focus();
+                break;
+
+            case { Key: Key.F4, KeyModifiers: KeyModifiers.None }:
+                _OpenFolder();
+                break;
+
+            case { Key: Key.F5, KeyModifiers: KeyModifiers.None }:
+                _Refresh();
                 break;
         }
     }
@@ -281,6 +299,7 @@ public sealed class MainWindow
 
     #region Private members
 
+    private ProgressStripe _progressStripe = null!;
     private readonly ObservableCollection<string> _specifications;
     private TextBox _currentSpecBox = null!;
     private ComboBox _specListBox = null!;
@@ -291,6 +310,27 @@ public sealed class MainWindow
     private readonly Folder _folder;
     private ListBox _fileListBox = null!;
 
+    private async Task<bool> RenameImplAsync
+        (
+            Folder folder,
+            NamePair pair,
+            double percentage
+        )
+    {
+        var oldName = Path.Combine (folder.DirectoryName!, pair.Old);
+        var newName = Path.Combine (folder.DirectoryName!, pair.New);
+
+        var result = FileUtility.TryMove (oldName, newName);
+        await Dispatcher.UIThread.InvokeAsync (() =>
+        {
+            _progressStripe.Percentage = percentage;
+            _progressStripe.InvalidateVisual();
+        });
+        await Task.Yield();
+
+        return result;
+    }
+    
     private Button CreateButton
         (
             string assetName,
@@ -391,19 +431,22 @@ public sealed class MainWindow
     {
         if (_folder.CheckNames())
         {
-            if (await _folder.RenameAsync())
+            await Dispatcher.UIThread.InvokeAsync (() => _progressStripe.Active = true);
+            if (await _folder.RenameAsync (RenameImplAsync))
             {
                 _folder.ClearChecked();
             }
+            await Dispatcher.UIThread.InvokeAsync(() => _progressStripe.Active = false);
         }
     }
 
     private void _PreLoadSpecifications()
     {
         _specifications.Clear();
-        if (File.Exists (SpecificationsFileName))
+        var fileName = Path.Combine (AppContext.BaseDirectory, SpecificationsFileName);
+        if (File.Exists (fileName))
         {
-            foreach (var line in File.ReadLines (SpecificationsFileName))
+            foreach (var line in File.ReadLines (fileName))
             {
                 if (!string.IsNullOrWhiteSpace (line))
                 {
@@ -439,9 +482,10 @@ public sealed class MainWindow
 
     private void _LoadIncludeExclude()
     {
-        if (File.Exists (IncludeFileName))
+        var fileName = Path.Combine (AppContext.BaseDirectory, IncludeFileName);
+        if (File.Exists (fileName))
         {
-            foreach (var line in File.ReadLines (IncludeFileName))
+            foreach (var line in File.ReadLines (fileName))
             {
                 if (!string.IsNullOrWhiteSpace (line))
                 {
@@ -449,16 +493,31 @@ public sealed class MainWindow
                 }
             }
         }
-        
-        if (File.Exists (ExcludeFileName))
+
+        fileName = Path.Combine (AppContext.BaseDirectory, ExcludeFileName);
+        if (File.Exists (fileName))
         {
-            foreach (var line in File.ReadLines (ExcludeFileName))
+            foreach (var line in File.ReadLines (fileName))
             {
                 if (!string.IsNullOrWhiteSpace (line))
                 {
                     _context.Filters.Add (new ExcludeFilter (line.Trim()));
                 }
             }
+        }
+    }
+
+    private void _OpenCurrentFile()
+    {
+        if (_fileListBox.SelectedItem is NamePair { Old: { Length: not 0 } currentFile})
+        {
+            var fileName = Path.Combine (_folder.DirectoryName!, currentFile);
+            var processStartInfo = new ProcessStartInfo
+            {
+                FileName = fileName,
+                UseShellExecute = true
+            };
+            Process.Start (processStartInfo)?.Dispose();
         }
     }
 
