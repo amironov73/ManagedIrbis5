@@ -57,11 +57,9 @@ public sealed class MainWindow
     #region Constants
 
     private const string SpecificationsFileName = "specifications.txt";
-    private const string IncludeFileName = "include.txt";
-    private const string ExcludeFileName = "exclude.txt";
 
     #endregion
-    
+
     #region Construction
 
     /// <summary>
@@ -77,11 +75,11 @@ public sealed class MainWindow
         Height = MinHeight = 550;
 
         _context = new NamingContext();
+        _context.LoadDefaultIncludeExclude();
         _processor = new NameProcessor();
         _folder = new Folder();
         DataContext = _folder;
         _specifications = new ();
-        _LoadIncludeExclude();
         _PreLoadSpecifications();
     }
 
@@ -94,21 +92,11 @@ public sealed class MainWindow
     {
         base.OnInitialized();
 
-        _progressStripe = new ProgressStripe
-        {
-            Height = 5,
-            HorizontalAlignment = HorizontalAlignment.Stretch,
-            [!ProgressStripe.ActiveProperty] = new Binding
-            {
-                Source = _folder,
-                Path = nameof (Folder.Active)
-            },
-            [!ProgressStripe.PercentageProperty] = new Binding
-            {
-                Source = _folder,
-                Path = nameof (Folder.Percentage)
-            }
-        }
+        var foreground = Brushes.Black;
+        var background = Brushes.LightGray;
+
+        _progressStripe = new ProgressStripe { Height = 5, Active = false }
+        .StretchHorizontally()
         .DockTop();
 
         _currentSpecBox = new TextBox
@@ -135,11 +123,11 @@ public sealed class MainWindow
 
         var toolbar = new Border
         {
-            BorderBrush = Brushes.Black,
+            BorderBrush = foreground,
             BorderThickness = new Thickness (0, 0, 0, 1),
             Child = new Panel
             {
-                Background = Brushes.LightGray,
+                Background = background,
                 Children =
                 {
                     new WrapPanel
@@ -154,14 +142,14 @@ public sealed class MainWindow
                             CreateButton ("check-none.png", () => _folder.CheckNone()),
                             CreateButton ("check-reverse.png", () => _folder.CheckReverse()),
 
-                            AvaloniaUtility.HorizontalGroup 
+                            AvaloniaUtility.HorizontalGroup
                                 (
                                     _specListBox,
                                     CreateButton ("save.png", _SaveCurrentSpecification)
                                 )
                                 .SetPanelMargin (5),
 
-                            AvaloniaUtility.HorizontalGroup 
+                            AvaloniaUtility.HorizontalGroup
                                 (
                                     _currentSpecBox,
                                     CreateButton ("refresh.png", _ApplySpecification)
@@ -178,11 +166,11 @@ public sealed class MainWindow
 
         var statusBar = new Border
         {
-            BorderBrush = Brushes.Black,
+            BorderBrush = foreground,
             BorderThickness = new Thickness (0, 1, 0, 0),
             Child = new StackPanel
             {
-                Background = Brushes.LightGray,
+                Background = background,
                 Orientation = Orientation.Horizontal,
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 Children =
@@ -201,7 +189,7 @@ public sealed class MainWindow
 
                     new TextBlock
                     {
-                        Foreground = Brushes.Blue,
+                        Foreground = Brushes.Red,
                         Padding = new Thickness (5),
                         [!TextBlock.TextProperty] = new Binding
                         {
@@ -213,7 +201,7 @@ public sealed class MainWindow
 
                     new TextBlock
                     {
-                        Foreground = Brushes.Black,
+                        Foreground = foreground,
                         Padding = new Thickness (5),
                         [!TextBlock.TextProperty] = new Binding
                         {
@@ -304,7 +292,7 @@ public sealed class MainWindow
                 eventArgs.Handled = true;
                 Close();
                 break;
-            
+
             case { Key: Key.Enter, KeyModifiers: KeyModifiers.None }:
                 eventArgs.Handled = true;
                 _OpenCurrentFile();
@@ -357,7 +345,16 @@ public sealed class MainWindow
         var oldName = Path.Combine (folder.DirectoryName!, pair.Old);
         var newName = Path.Combine (folder.DirectoryName!, pair.New);
 
-        File.Move (oldName, newName);
+        try
+        {
+            File.Move (oldName, newName);
+        }
+        catch (Exception exception)
+        {
+            Debug.WriteLine (exception);
+            return false;
+        }
+
         await Dispatcher.UIThread.InvokeAsync (() =>
         {
             _progressStripe.Percentage = percentage;
@@ -367,7 +364,7 @@ public sealed class MainWindow
 
         return true;
     }
-    
+
     private Button CreateButton
         (
             string assetName,
@@ -448,7 +445,7 @@ public sealed class MainWindow
         _directory = new DirectoryInfo (path);
         _Refresh();
     }
-    
+
     private async void _OpenFolder()
     {
         if (!StorageProvider.CanPickFolder)
@@ -492,7 +489,7 @@ public sealed class MainWindow
             }
         }
     }
-    
+
     private void _SaveCurrentSpecification()
     {
         if (_currentSpecBox.Text is { Length: not 0 } spec)
@@ -514,33 +511,6 @@ public sealed class MainWindow
         {
             _processor.Specification = spec;
             _ApplySpecification();
-        }
-    }
-
-    private void _LoadIncludeExclude()
-    {
-        var fileName = Path.Combine (AppContext.BaseDirectory, IncludeFileName);
-        if (File.Exists (fileName))
-        {
-            foreach (var line in File.ReadLines (fileName))
-            {
-                if (!string.IsNullOrWhiteSpace (line))
-                {
-                    _context.Filters.Add (new IncludeFilter (line.Trim()));
-                }
-            }
-        }
-
-        fileName = Path.Combine (AppContext.BaseDirectory, ExcludeFileName);
-        if (File.Exists (fileName))
-        {
-            foreach (var line in File.ReadLines (fileName))
-            {
-                if (!string.IsNullOrWhiteSpace (line))
-                {
-                    _context.Filters.Add (new ExcludeFilter (line.Trim()));
-                }
-            }
         }
     }
 

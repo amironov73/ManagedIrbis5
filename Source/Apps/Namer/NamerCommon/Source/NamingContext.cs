@@ -27,6 +27,13 @@ namespace NamerCommon;
 [PublicAPI]
 public sealed class NamingContext
 {
+    #region Constants
+
+    private const string IncludeFileName = "include.txt";
+    private const string ExcludeFileName = "exclude.txt";
+
+    #endregion
+
     #region Properties
 
     /// <summary>
@@ -49,6 +56,33 @@ public sealed class NamingContext
     #endregion
 
     #region Public methods
+
+    public void LoadDefaultIncludeExclude()
+    {
+        var fileName = Path.Combine (AppContext.BaseDirectory, IncludeFileName);
+        if (File.Exists (fileName))
+        {
+            foreach (var line in File.ReadLines (fileName))
+            {
+                if (!string.IsNullOrWhiteSpace (line))
+                {
+                    Filters.Add (new IncludeFilter (line.Trim()));
+                }
+            }
+        }
+
+        fileName = Path.Combine (AppContext.BaseDirectory, ExcludeFileName);
+        if (File.Exists (fileName))
+        {
+            foreach (var line in File.ReadLines (fileName))
+            {
+                if (!string.IsNullOrWhiteSpace (line))
+                {
+                    Filters.Add (new ExcludeFilter (line.Trim()));
+                }
+            }
+        }
+    }
 
     /// <summary>
     /// Проверка файла на прохождение через фильтры.

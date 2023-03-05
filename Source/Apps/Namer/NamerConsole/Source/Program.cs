@@ -13,8 +13,6 @@
 
 #region Using directives
 
-using AM.IO;
-
 using NamerCommon;
 
 using Spectre.Console;
@@ -30,6 +28,18 @@ namespace NamerConsole;
 /// </summary>
 internal static class Program
 {
+    private static void ReportRename
+        (
+            NamePair pair,
+            Color color
+        )
+    {
+        var style = new Style (color);
+        AnsiConsole.Write ("  ");
+        AnsiConsole.Write (new Text ($"{pair.Old} => {pair.New}", style));
+        AnsiConsole.WriteLine();
+    }
+
     private static bool RenameImpl<T>
         (
             Folder folder,
@@ -40,23 +50,23 @@ internal static class Program
         var oldName = Path.Combine (folder.DirectoryName!, pair.Old);
         var newName = Path.Combine (folder.DirectoryName!, pair.New);
 
-        // var result = FileUtility.TryMove (oldName, newName);
-        File.Move (oldName, newName);
-        // var color = result ? Color.Green : Color.Red;
-        var color = Color.Green;
-        var style = new Style (color);
-        AnsiConsole.Write ("  ");
-        AnsiConsole.Write (new Text ($"{pair.Old} => {pair.New}", style));
-        //if (!result)
-        //{
-        //    AnsiConsole.Write (new Text (" ERROR", new Style (Color.Red)));
-        //}
+        try
+        {
+            File.Move (oldName, newName);
+        }
+        catch (Exception exception)
+        {
+            ReportRename (pair, Color.Red);
+            AnsiConsole.WriteException (exception, ExceptionFormats.ShortenEverything);
 
-        AnsiConsole.WriteLine();
+            return false;
+        }
+
+        ReportRename (pair, Color.Green);
 
         return true;
     }
-    
+
     public static void Main
         (
             string[] args
@@ -70,8 +80,9 @@ internal static class Program
 
         var processor = new NameProcessor();
         var context = new NamingContext();
-        var directories = processor.ParseCommandLine (context, args);
+        context.LoadDefaultIncludeExclude();
 
+        var directories = processor.ParseCommandLine (context, args);
         foreach (var dirName in directories)
         {
             processor.Reset();
