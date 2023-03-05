@@ -320,15 +320,16 @@ public sealed class MainWindow
         var oldName = Path.Combine (folder.DirectoryName!, pair.Old);
         var newName = Path.Combine (folder.DirectoryName!, pair.New);
 
-        var result = FileUtility.TryMove (oldName, newName);
+        // var result = FileUtility.TryMove (oldName, newName);
+        File.Move (oldName, newName);
         await Dispatcher.UIThread.InvokeAsync (() =>
         {
             _progressStripe.Percentage = percentage;
             _progressStripe.InvalidateVisual();
         });
-        await Task.Yield();
+        await Task.Delay (20);
 
-        return result;
+        return true;
     }
     
     private Button CreateButton
