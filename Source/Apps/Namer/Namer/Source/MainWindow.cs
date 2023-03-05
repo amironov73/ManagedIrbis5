@@ -70,7 +70,6 @@ public sealed class MainWindow
     public MainWindow()
     {
         this.AttachDevTools();
-
         this.SetWindowIcon ("Assets/number.ico");
 
         Title = "Пакетное переименование файлов";
@@ -134,83 +133,93 @@ public sealed class MainWindow
         };
         _specListBox.SelectionChanged += _SpecificationSelected;
 
-        var toolbar = new Panel
+        var toolbar = new Border
         {
-            Background = Brushes.LightGray,
-            Children =
+            BorderBrush = Brushes.Black,
+            BorderThickness = new Thickness (0, 0, 0, 1),
+            Child = new Panel
             {
-                new WrapPanel
+                Background = Brushes.LightGray,
+                Children =
                 {
-                    Orientation = Orientation.Horizontal,
-                    Margin = new Thickness (5),
-
-                    Children =
+                    new WrapPanel
                     {
-                        CreateButton ("open.png", _OpenFolder),
-                        CreateButton ("check-all.png", () => _folder.CheckAll()),
-                        CreateButton ("check-none.png", () => _folder.CheckNone()),
-                        CreateButton ("check-reverse.png", () => _folder.CheckReverse()),
+                        Orientation = Orientation.Horizontal,
+                        Margin = new Thickness (5),
 
-                        AvaloniaUtility.HorizontalGroup 
-                            (
-                                _specListBox,
-                                CreateButton ("save.png", _SaveCurrentSpecification)
-                            )
-                            .SetPanelMargin (5),
+                        Children =
+                        {
+                            CreateButton ("open.png", _OpenFolder),
+                            CreateButton ("check-all.png", () => _folder.CheckAll()),
+                            CreateButton ("check-none.png", () => _folder.CheckNone()),
+                            CreateButton ("check-reverse.png", () => _folder.CheckReverse()),
 
-                        AvaloniaUtility.HorizontalGroup 
-                            (
-                                _currentSpecBox,
-                                CreateButton ("refresh.png", _ApplySpecification)
-                            )
-                            .SetPanelMargin (5),
+                            AvaloniaUtility.HorizontalGroup 
+                                (
+                                    _specListBox,
+                                    CreateButton ("save.png", _SaveCurrentSpecification)
+                                )
+                                .SetPanelMargin (5),
 
-                        CreateButton ("runner.png", _RunAsync)
+                            AvaloniaUtility.HorizontalGroup 
+                                (
+                                    _currentSpecBox,
+                                    CreateButton ("refresh.png", _ApplySpecification)
+                                )
+                                .SetPanelMargin (5),
+
+                            CreateButton ("runner.png", _RunAsync)
+                        }
                     }
                 }
             }
         }
         .DockTop();
 
-        var statusBar = new StackPanel
+        var statusBar = new Border
         {
-            Background = Brushes.LightGray,
-            Orientation = Orientation.Horizontal,
-            HorizontalAlignment = HorizontalAlignment.Stretch,
-            Children =
+            BorderBrush = Brushes.Black,
+            BorderThickness = new Thickness (0, 1, 0, 0),
+            Child = new StackPanel
             {
-                new TextBlock
+                Background = Brushes.LightGray,
+                Orientation = Orientation.Horizontal,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                Children =
                 {
-                    Foreground = Brushes.Green,
-                    Padding = new Thickness (5),
-                    [!TextBlock.TextProperty] = new Binding
+                    new TextBlock
                     {
-                        Source = _folder,
-                        Path = nameof (Folder.CheckedCount),
-                        StringFormat = "Отмечено: {0}"
-                    }
-                },
+                        Foreground = Brushes.Green,
+                        Padding = new Thickness (5),
+                        [!TextBlock.TextProperty] = new Binding
+                        {
+                            Source = _folder,
+                            Path = nameof (Folder.CheckedCount),
+                            StringFormat = "Отмечено: {0}"
+                        }
+                    },
 
-                new TextBlock
-                {
-                    Foreground = Brushes.Blue,
-                    Padding = new Thickness (5),
-                    [!TextBlock.TextProperty] = new Binding
+                    new TextBlock
                     {
-                        Source = _folder,
-                        Path = nameof (Folder.ErrorCount),
-                        StringFormat = "Ошибки: {0}"
-                    }
-                },
+                        Foreground = Brushes.Blue,
+                        Padding = new Thickness (5),
+                        [!TextBlock.TextProperty] = new Binding
+                        {
+                            Source = _folder,
+                            Path = nameof (Folder.ErrorCount),
+                            StringFormat = "Ошибки: {0}"
+                        }
+                    },
 
-                new TextBlock
-                {
-                    Foreground = Brushes.Black,
-                    Padding = new Thickness (5),
-                    [!TextBlock.TextProperty] = new Binding
+                    new TextBlock
                     {
-                        Source = _folder,
-                        Path = nameof (Folder.DirectoryName)
+                        Foreground = Brushes.Black,
+                        Padding = new Thickness (5),
+                        [!TextBlock.TextProperty] = new Binding
+                        {
+                            Source = _folder,
+                            Path = nameof (Folder.DirectoryName)
+                        }
                     }
                 }
             }
@@ -221,7 +230,20 @@ public sealed class MainWindow
         {
             HorizontalAlignment = HorizontalAlignment.Stretch,
             [!ItemsControl.ItemsProperty] = new Binding (nameof (_folder.Files)),
-            ItemTemplate = new FuncDataTemplate<NamePair> ((_, _) => new PairControl()),
+            ItemTemplate = new FuncDataTemplate<NamePair> ((_, _) =>
+            {
+                var result = new PairControl();
+                result.PointerPressed += (_, eventArgs) =>
+                {
+                    if (eventArgs is { ClickCount: >= 2, KeyModifiers: KeyModifiers.None })
+                    {
+                        _OpenCurrentFile();
+                        eventArgs.Handled = true;
+                    }
+                };
+
+                return result;
+            }),
             Styles =
             {
                 new Style (x => x.OfType<ListBoxItem>())
@@ -232,6 +254,15 @@ public sealed class MainWindow
                         new Setter (PaddingProperty, new Thickness (10, 0))
                     }
                 }
+            }
+        };
+        _fileListBox.KeyDown += (_, eventArgs) =>
+        {
+            switch (eventArgs)
+            {
+                case { Key: Key.Space, KeyModifiers: KeyModifiers.None }:
+                    _ToggleMark();
+                    break;
             }
         };
 
@@ -270,26 +301,32 @@ public sealed class MainWindow
         switch (eventArgs)
         {
             case { Key: Key.Escape, KeyModifiers: KeyModifiers.None }:
+                eventArgs.Handled = true;
                 Close();
                 break;
             
             case { Key: Key.Enter, KeyModifiers: KeyModifiers.None }:
+                eventArgs.Handled = true;
                 _OpenCurrentFile();
                 break;
 
             case { Key: Key.F2, KeyModifiers: KeyModifiers.None }:
+                eventArgs.Handled = true;
                 await _RunAsync();
                 break;
 
             case { Key: Key.F3, KeyModifiers: KeyModifiers.None }:
+                eventArgs.Handled = true;
                 _currentSpecBox.Focus();
                 break;
 
             case { Key: Key.F4, KeyModifiers: KeyModifiers.None }:
+                eventArgs.Handled = true;
                 _OpenFolder();
                 break;
 
             case { Key: Key.F5, KeyModifiers: KeyModifiers.None }:
+                eventArgs.Handled = true;
                 _Refresh();
                 break;
         }
@@ -320,7 +357,6 @@ public sealed class MainWindow
         var oldName = Path.Combine (folder.DirectoryName!, pair.Old);
         var newName = Path.Combine (folder.DirectoryName!, pair.New);
 
-        // var result = FileUtility.TryMove (oldName, newName);
         File.Move (oldName, newName);
         await Dispatcher.UIThread.InvokeAsync (() =>
         {
@@ -519,6 +555,14 @@ public sealed class MainWindow
                 UseShellExecute = true
             };
             Process.Start (processStartInfo)?.Dispose();
+        }
+    }
+
+    private void _ToggleMark()
+    {
+        if (_fileListBox.SelectedItem is NamePair pair)
+        {
+            pair.IsChecked = !pair.IsChecked;
         }
     }
 

@@ -12,15 +12,9 @@
 
 #region Using directives
 
-using System.Collections.ObjectModel;
-using System.Reactive.Linq;
-
 using AM;
 using AM.Collections;
 using AM.IO;
-
-using DynamicData;
-using DynamicData.Binding;
 
 using JetBrains.Annotations;
 
@@ -65,19 +59,19 @@ public class Folder
     /// <summary>
     /// Файлы.
     /// </summary>
-    public ObservableCollection<NamePair> Files { get; }
+    public ItemPropertyTrackingCollection<NamePair> Files { get; }
 
     /// <summary>
     /// Количество помеченных.
     /// </summary>
-    [ObservableAsProperty]
-    public int CheckedCount => 0;
+    [Reactive]
+    public int CheckedCount { get; set; }
 
     /// <summary>
     /// Количество ошибок.
     /// </summary>
-    [ObservableAsProperty]
-    public int ErrorCount => 0;
+    [Reactive]
+    public int ErrorCount { get; set; }
 
     #endregion
 
@@ -89,7 +83,7 @@ public class Folder
     public Folder()
     {
         DirectoryName = string.Empty;
-        Files = new ObservableCollection<NamePair>();
+        Files = new();
         CreateProperties();
     }
 
@@ -106,7 +100,7 @@ public class Folder
         Sure.NotNull (files);
         
         DirectoryName = directoryName;
-        Files = new ObservableCollection<NamePair> (files);
+        Files = new (files);
         CreateProperties();
     }
 
@@ -114,20 +108,16 @@ public class Folder
 
     #region Private members
 
+    private void CountElements()
+    {
+        ErrorCount = Files.Count (x => x.HasError);
+        CheckedCount = Files.Count (x => x.IsChecked);
+    }
+    
     private void CreateProperties()
     {
-        // TODO исправить
-        Files
-            .ToObservableChangeSet (x => x.IsChecked)
-            .ToCollection()
-            .Select (x => x.Count (y => y.HasError))
-            .ToPropertyEx (this, x => x.ErrorCount);
-
-        Files
-            .ToObservableChangeSet (x => x.HasError)
-            .ToCollection()
-            .Select (x => x.Count (y => y.IsChecked))
-            .ToPropertyEx (this, x => x.CheckedCount);
+        Files.CollectionChanged += (_, _) => CountElements();
+        Files.ItemPropertyChanged += (_, _) => CountElements();
     }
 
     private static bool RenameImpl<T>
