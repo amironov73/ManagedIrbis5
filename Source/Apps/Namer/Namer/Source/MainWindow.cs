@@ -77,6 +77,13 @@ public sealed class MainWindow
         _processor = new NameProcessor();
         _folder = new Folder();
         DataContext = _folder;
+        _folder.Files.ItemPropertyChanged += (_, eventArgs) =>
+        {
+            if (eventArgs.PropertyName == nameof (NamePair.IsChecked))
+            {
+                _folder.CheckNames();
+            }
+        };
         _specifications = new ();
         _PreLoadSpecifications();
     }
@@ -353,7 +360,6 @@ public sealed class MainWindow
     private readonly NamingContext _context;
     private readonly NameProcessor _processor;
     private readonly Folder _folder;
-    // private ListBox _fileListBox = null!;
     private DataGrid _dataGrid = null!;
 
     private async Task<bool> RenameImplAsync

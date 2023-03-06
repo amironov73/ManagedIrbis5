@@ -12,6 +12,8 @@
 
 #region Using directives
 
+using System.Diagnostics;
+
 using AM;
 using AM.Collections;
 using AM.IO;
@@ -37,18 +39,6 @@ public class Folder
     : ReactiveObject
 {
     #region Properties
-
-    /// <summary>
-    /// Выполняется переименование?
-    /// </summary>
-    [Reactive]
-    public bool Active { get; set; }
-
-    /// <summary>
-    /// Процент выполненного переименования.
-    /// </summary>
-    [Reactive]
-    public double Percentage { get; set; }
 
     /// <summary>
     /// Имя директории.
@@ -98,7 +88,7 @@ public class Folder
     {
         Sure.DirectoryExists (directoryName);
         Sure.NotNull (files);
-        
+
         DirectoryName = directoryName;
         Files = new (files);
         CreateProperties();
@@ -113,7 +103,7 @@ public class Folder
         ErrorCount = Files.Count (x => x.HasError);
         CheckedCount = Files.Count (x => x.IsChecked);
     }
-    
+
     private void CreateProperties()
     {
         Files.CollectionChanged += (_, _) => CountElements();
@@ -153,7 +143,7 @@ public class Folder
             Files.Add (file);
         }
     }
-    
+
     /// <summary>
     /// Отметка всех файлов.
     /// </summary>
@@ -186,7 +176,7 @@ public class Folder
             item.IsChecked = !item.IsChecked;
         }
     }
-    
+
     /// <summary>
     /// Проверка имен.
     /// </summary>
@@ -201,6 +191,12 @@ public class Folder
         foreach (var pair in Files)
         {
             pair.ErrorMessage = null;
+            if (!pair.IsChecked)
+            {
+                // неотмеченные пары не берем в расчет
+                continue;
+            }
+
             if (pair.IsSame)
             {
                 // переименования не требуется
@@ -216,7 +212,8 @@ public class Folder
             var any = Files.Any
                 (
                     pair,
-                    static (x, p) => x.Old != p.Old && (x.New == p.New || x.Old == x.New)
+                    static (x, p) => x.IsChecked
+                        && x.Old != p.Old && (x.New == p.New || x.Old == x.New)
                 );
             if (any)
             {
@@ -270,16 +267,8 @@ public class Folder
         }
 
         var result = true;
-        try
-        {
-            var counter = 0;
-            Percentage = 0;
-            Active = true;
             foreach (var pair in Files)
             {
-                counter++;
-                Percentage = 100.0 * counter / Files.Count;
-
                 if (!pair.IsChecked || pair.HasError)
                 {
                     // пропускаем пары с ошибками и без отметок
@@ -292,17 +281,21 @@ public class Folder
                     continue;
                 }
 
-                if (!action (this, pair, argument))
+                try
                 {
+                    if (!action (this, pair, argument))
+                    {
+                        result = false;
+                        break;
+                    }
+                }
+                catch (Exception exception)
+                {
+                    Debug.WriteLine (exception);
                     result = false;
                     break;
                 }
             }
-        }
-        finally
-        {
-            Active = false;
-        }
 
         return result;
     }
@@ -335,7 +328,7 @@ public class Folder
                 // пропускаем пары с ошибками и без отметок
                 continue;
             }
-        
+
             if (pair.IsSame)
             {
                 // переименования не требуется
@@ -377,7 +370,7 @@ public class Folder
             AnsiConsole.Write ("  ");
             file.Render();
         }
-        
+
         AnsiConsole.WriteLine();
     }
 
