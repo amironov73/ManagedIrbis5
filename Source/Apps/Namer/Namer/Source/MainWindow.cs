@@ -29,13 +29,11 @@ using AM.IO;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Controls.Templates;
 using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
-using Avalonia.Styling;
 using Avalonia.Threading;
 
 using ReactiveUI;
@@ -214,43 +212,63 @@ public sealed class MainWindow
         }
         .DockBottom();
 
-        _fileListBox = new ListBox
+        _dataGrid = new DataGrid
         {
+            IsReadOnly = true,
+            AutoGenerateColumns = false,
+            SelectionMode = DataGridSelectionMode.Single,
             HorizontalAlignment = HorizontalAlignment.Stretch,
-            [!ItemsControl.ItemsProperty] = new Binding (nameof (_folder.Files)),
-            ItemTemplate = new FuncDataTemplate<NamePair> ((_, _) =>
+            HorizontalGridLinesBrush = Brushes.Gray,
+            VerticalGridLinesBrush = Brushes.Gray,
+            GridLinesVisibility = DataGridGridLinesVisibility.All,
+            [!DataGrid.ItemsProperty] = new Binding (nameof (_folder.Files)),
+            Columns =
             {
-                var result = new PairControl();
-                result.PointerPressed += (_, eventArgs) =>
+                new DataGridCheckBoxColumn
                 {
-                    if (eventArgs is { ClickCount: >= 2, KeyModifiers: KeyModifiers.None })
-                    {
-                        _OpenCurrentFile();
-                        eventArgs.Handled = true;
-                    }
-                };
+                    MinWidth = 40,
+                    Width = new DataGridLength (40, DataGridLengthUnitType.Pixel),
+                    Binding = new Binding (nameof (NamePair.IsChecked))
+                },
 
-                return result;
-            }),
-            Styles =
-            {
-                new Style (x => x.OfType<ListBoxItem>())
+                new DataGridTextColumn
                 {
-                    Setters =
-                    {
-                        new Setter (MarginProperty, new Thickness (0)),
-                        new Setter (PaddingProperty, new Thickness (10, 0))
-                    }
+                    Header = "Старое имя",
+                    Width = new DataGridLength (1, DataGridLengthUnitType.Star),
+                    Binding = new Binding (nameof (NamePair.Old))
+                },
+
+                new DataGridTextColumn
+                {
+                    Header = "Новое имя",
+                    Width = new DataGridLength (1, DataGridLengthUnitType.Star),
+                    Binding = new Binding (nameof (NamePair.New))
+                },
+
+                new DataGridTextColumn
+                {
+                    Foreground = Brushes.Red,
+                    Header = "Сообщение об ошибке",
+                    Width = new DataGridLength (1, DataGridLengthUnitType.Star),
+                    Binding = new Binding (nameof (NamePair.ErrorMessage))
                 }
             }
         };
-        _fileListBox.KeyDown += (_, eventArgs) =>
+        _dataGrid.KeyDown += (_, eventArgs) =>
         {
             switch (eventArgs)
             {
                 case { Key: Key.Space, KeyModifiers: KeyModifiers.None }:
+                    eventArgs.Handled = true;
                     _ToggleMark();
                     break;
+            }
+        };
+        _dataGrid.CellPointerPressed += (_, eventArgs) =>
+        {
+            if (eventArgs.PointerPressedEventArgs is { ClickCount: >= 2, KeyModifiers: KeyModifiers.None })
+            {
+                _OpenCurrentFile();
             }
         };
 
@@ -263,7 +281,7 @@ public sealed class MainWindow
                 toolbar,
                 _progressStripe,
                 statusBar,
-                _fileListBox
+                _dataGrid
             }
         };
 
@@ -293,11 +311,6 @@ public sealed class MainWindow
                 Close();
                 break;
 
-            case { Key: Key.Enter, KeyModifiers: KeyModifiers.None }:
-                eventArgs.Handled = true;
-                _OpenCurrentFile();
-                break;
-
             case { Key: Key.F2, KeyModifiers: KeyModifiers.None }:
                 eventArgs.Handled = true;
                 await _RunAsync();
@@ -317,6 +330,11 @@ public sealed class MainWindow
                 eventArgs.Handled = true;
                 _Refresh();
                 break;
+
+            case { Key: Key.F10, KeyModifiers: KeyModifiers.None }:
+                eventArgs.Handled = true;
+                _OpenCurrentFile();
+                break;
         }
     }
 
@@ -333,7 +351,8 @@ public sealed class MainWindow
     private readonly NamingContext _context;
     private readonly NameProcessor _processor;
     private readonly Folder _folder;
-    private ListBox _fileListBox = null!;
+    // private ListBox _fileListBox = null!;
+    private DataGrid _dataGrid = null!;
 
     private async Task<bool> RenameImplAsync
         (
@@ -516,7 +535,7 @@ public sealed class MainWindow
 
     private void _OpenCurrentFile()
     {
-        if (_fileListBox.SelectedItem is NamePair { Old: { Length: not 0 } currentFile})
+        if (_dataGrid.SelectedItem is NamePair { Old: { Length: not 0 } currentFile})
         {
             var fileName = Path.Combine (_folder.DirectoryName!, currentFile);
             var processStartInfo = new ProcessStartInfo
@@ -530,7 +549,7 @@ public sealed class MainWindow
 
     private void _ToggleMark()
     {
-        if (_fileListBox.SelectedItem is NamePair pair)
+        if (_dataGrid.SelectedItem is NamePair pair)
         {
             pair.IsChecked = !pair.IsChecked;
         }

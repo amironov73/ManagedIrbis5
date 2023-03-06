@@ -10,12 +10,15 @@
 
 #region Using directives
 
+using System;
+
 using AM.Avalonia;
 using AM.Avalonia.Dialogs;
 
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Markup.Xaml.Styling;
 
 #endregion
 
@@ -33,6 +36,14 @@ internal class App
         SetValue (NativeMenu.MenuProperty, nativeMenu);
 
         Current!.Styles.Add (AvaloniaUtility.CreateFluentTheme());
+
+        var gridUri = new Uri ("avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml");
+        var includeGrid = new StyleInclude (gridUri)
+        {
+            Source = gridUri
+        };
+        Current!.Styles.Add (includeGrid);
+
         //Current!.Styles.Add (AvaloniaUtility.CreateMaterialTheme());
         // Current!.Styles.Add (AvaloniaUtility.CreateSimpleTheme());
         // Current!.Styles.Add (AvaloniaUtility.CreateCitrusTheme());
