@@ -39,7 +39,7 @@ public abstract class SystemPart
     /// Флаг: попытка хитро определить заглавие.
     /// </summary>
     public bool Smart { get; set; }
-    
+
     /// <summary>
     /// Флаг: капитализация.
     /// </summary>
@@ -99,7 +99,7 @@ public abstract class SystemPart
 
         return false;
     }
-    
+
     private static string CapitalizeWord
         (
             TextNavigator navigator,
@@ -118,7 +118,7 @@ public abstract class SystemPart
         {
             builder.Append (char.ToLowerInvariant (word[i]));
         }
-        
+
         return builder.ToString();
     }
 
@@ -150,14 +150,14 @@ public abstract class SystemPart
 
         return CapitalizeText (candidate.Trim());
     }
-    
+
     private static string CapitalizeText
         (
             string text
         )
     {
         Sure.NotNull (text);
-        
+
         var builder = new StringBuilder();
         var navigator = new TextNavigator (text);
 
@@ -180,7 +180,7 @@ public abstract class SystemPart
     }
 
     #endregion
-    
+
     #region Protected members
 
     /// <summary>
@@ -192,10 +192,11 @@ public abstract class SystemPart
             string text
         )
     {
-        var parameters = ParameterUtility.ParseString (text);
+        var result = true;
+
+        var parameters = ParameterUtility.SimpleParseString (text);
         foreach (var parameter in parameters)
         {
-            parameter.Verify (true);
             switch (parameter.Name)
             {
                 case "capitalize":
@@ -213,7 +214,7 @@ public abstract class SystemPart
                 case "smart":
                     part.Smart = true;
                     break;
-                
+
                 case "start":
                     part.Start = parameter.Value!.ParseInt32 ();
                     break;
@@ -223,11 +224,12 @@ public abstract class SystemPart
                     break;
 
                 default:
-                    return false;
+                    result = false;
+                    break;
             }
         }
 
-        return true;
+        return result;
     }
 
     /// <summary>

@@ -154,6 +154,63 @@ public static class ParameterUtility
     }
 
     /// <summary>
+    /// Упрощенный вариант разбора, не заморачивается экранированием символов.
+    /// </summary>
+    public static Parameter[] SimpleParseString
+        (
+            string text
+        )
+    {
+        var result = new List<Parameter>();
+        var navigator = new TextNavigator (text);
+        navigator.SkipWhitespace();
+
+        while (!navigator.IsEOF)
+        {
+            while (true)
+            {
+                var flag = false;
+                if (navigator.IsWhiteSpace())
+                {
+                    flag = true;
+                    navigator.SkipWhitespace();
+                }
+
+                if (navigator.PeekChar() == ValueSeparator)
+                {
+                    flag = true;
+                    navigator.SkipChar (ValueSeparator);
+                }
+
+                if (!flag)
+                {
+                    break;
+                }
+            }
+
+            var nameMemory = navigator.ReadUntil
+                (
+                    NameSeparator,
+                    ValueSeparator
+                );
+            if (nameMemory.IsEmpty)
+            {
+                break;
+            }
+
+            var name = nameMemory.ToString().Trim();
+            navigator.SkipChar (NameSeparator);
+            navigator.SkipWhitespace();
+
+            var value = navigator.ReadUntil (ValueSeparator);
+            var parameter = new Parameter (name, value.ToString());
+            result.Add (parameter);
+        }
+
+        return result.ToArray();
+    }
+
+    /// <summary>
     /// Parse specified string.
     /// </summary>
     public static Parameter[] ParseString

@@ -13,6 +13,7 @@
 
 using AM;
 using AM.IO;
+using AM.Parameters;
 
 using JetBrains.Annotations;
 
@@ -37,6 +38,21 @@ public sealed class DirPart
     /// <inheritdoc cref="NamePart.Title"/>
     public override string Title => "Директория";
 
+    /// <summary>
+    /// Уровень директории.
+    /// </summary>
+    public int Level { get; set; }
+
+    /// <summary>
+    /// Опциональный текст после.
+    /// </summary>
+    public string? After { get; set; }
+
+    /// <summary>
+    /// Опциональный текст перед.
+    /// </summary>
+    public string? Before { get; set; }
+
     #endregion
 
     #region NamePart members
@@ -48,9 +64,29 @@ public sealed class DirPart
         )
     {
         Sure.NotNull (text);
-        
+
         var result = new DirPart();
-        Parse (result, text);
+        if (!Parse (result, text))
+        {
+            var parameters = ParameterUtility.SimpleParseString (text);
+            foreach (var parameter in parameters)
+            {
+                switch (parameter.Name)
+                {
+                    case "after":
+                        result.After = parameter.Value;
+                        break;
+
+                    case "before":
+                        result.Before = parameter.Value;
+                        break;
+
+                    case "level":
+                        result.Level = parameter.Value!.ParseInt32();
+                        break;
+                }
+            }
+        }
 
         return result;
     }
@@ -69,15 +105,26 @@ public sealed class DirPart
         if (!string.IsNullOrEmpty (result))
         {
             result = PathUtility.StripTrailingBackslash (result);
-            result = Path.GetFileName (result);
+            var level = Level;
+            while (level > 1)
+            {
+                result = Path.GetDirectoryName (result);
+                if (string.IsNullOrEmpty (result))
+                {
+                    return string.Empty;
+                }
+
+                level--;
+            }
         }
 
+        result = Path.GetFileName (result);
         if (string.IsNullOrEmpty (result))
         {
             return string.Empty;
         }
 
-        return Render (result);
+        return Before + Render (result) + After;
     }
 
     #endregion

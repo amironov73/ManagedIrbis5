@@ -216,6 +216,8 @@ public sealed class MainWindow
         {
             IsReadOnly = true,
             AutoGenerateColumns = false,
+            CanUserResizeColumns = true,
+            CanUserSortColumns = false,
             SelectionMode = DataGridSelectionMode.Single,
             HorizontalAlignment = HorizontalAlignment.Stretch,
             HorizontalGridLinesBrush = Brushes.Gray,

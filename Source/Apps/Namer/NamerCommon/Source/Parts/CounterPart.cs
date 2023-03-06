@@ -48,6 +48,11 @@ public sealed class CounterPart
     public int CurrentValue { get; set; }
 
     /// <summary>
+    /// Уровень.
+    /// </summary>
+    public int Level { get; set; }
+
+    /// <summary>
     /// Ширина.
     /// </summary>
     public int Width { get; set; }
@@ -101,7 +106,7 @@ public sealed class CounterPart
             var format = new string ('0', Width);
             return value.ToInvariantString (format);
         }
-        
+
         return value.ToInvariantString();
     }
 
