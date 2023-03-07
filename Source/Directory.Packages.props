@@ -30,7 +30,7 @@
     <PackageVersion Include="Avalonia.Xaml.Interactions" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Xaml.Interactivity" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="BCrypt.Net-Next.StrongName" Version="4.0.3" />
-    <PackageVersion Include="BenchmarkDotNet" Version="0.13.4" />
+    <PackageVersion Include="BenchmarkDotNet" Version="0.13.5" />
     <PackageVersion Include="Citrus.Avalonia" Version="1.6.1" />
     <PackageVersion Include="CommunityToolkit.Common" Version="$(CommunityToolkitVersion)" />
     <PackageVersion Include="CommunityToolkit.Diagnostics" Version="$(CommunityToolkitVersion)" />
@@ -110,7 +110,7 @@
     <PackageVersion Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="2.88.3" />
     <PackageVersion Include="SkiaSharp.NativeAssets.Win32" Version="2.88.3" />
     <PackageVersion Include="SharpCompress" Version="0.32.2" />
-    <PackageVersion Include="SharpZipLib" Version="1.4.1" />
+    <PackageVersion Include="SharpZipLib" Version="1.4.2" />
     <PackageVersion Include="Spectre.Console" Version="0.46.1-preview.0.7" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageVersion Include="System.CodeDom" Version="7.0.0" />
