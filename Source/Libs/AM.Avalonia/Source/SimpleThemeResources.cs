@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable UnusedMember.Global
 
-/* FluentThemeResources.cs -- доступ к ресурсам темы Fluent
+/* SimpleThemeResources.cs -- доступ к ресурсам темы Simple
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -14,6 +14,8 @@
 using Avalonia.Controls;
 using Avalonia.Media;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -21,9 +23,10 @@ using Avalonia.Media;
 namespace AM.Avalonia;
 
 /// <summary>
-/// Доступ к ресурсам темы Fluent.
+/// Доступ к ресурсам темы Simple.
 /// </summary>
-public class FluentThemeResources
+[PublicAPI]
+public sealed class SimpleThemeResources
     : IThemeResources
 {
     #region Construction
@@ -31,7 +34,7 @@ public class FluentThemeResources
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public FluentThemeResources
+    public SimpleThemeResources
         (
             IResourceHost resourceHost
         )
@@ -52,28 +55,28 @@ public class FluentThemeResources
     #region IThemeResources members
 
     /// <inheritdoc cref="IThemeResources.CurrentThemeName"/>
-    public string CurrentThemeName => "Fluent";
+    public string CurrentThemeName => "Simple";
 
     /// <inheritdoc cref="ThemeBackgroundColor"/>
     public Color ThemeBackgroundColor =>
-        (Color) _resourceHost.FindResource ("SystemBaseHighColor")!;
+        (Color) _resourceHost.FindResource ("ThemeBackgroundColor")!;
 
     /// <inheritdoc cref="IThemeResources.ThemeBackgroundBrush"/>
     public Brush ThemeBackgroundBrush =>
-        (Brush) _resourceHost.FindResource ("SystemControlBackgroundBaseHighBrush")!;
+        (Brush) _resourceHost.FindResource ("ThemeBackgroundBrush")!;
 
     /// <inheritdoc cref="IThemeResources.ThemeForegroundColor"/>
     public Color ThemeForegroundColor =>
-        (Color) _resourceHost.FindResource ("SystemAltHighColor")!;
+        (Color) _resourceHost.FindResource ("ThemeForegroundColor")!;
 
     public Brush ThemeForegroundBrush =>
-        (Brush) _resourceHost.FindResource ("SystemControlForegroundBaseHighBrush")!;
+        (Brush) _resourceHost.FindResource ("ThemeForegroundBrush")!;
 
     public Color HighlightColor =>
-        (Color) _resourceHost.FindResource ("SystemAccentColor")!;
+        (Color) _resourceHost.FindResource ("HighlightColor")!;
 
     public Brush HighlightBrush =>
-        (Brush) _resourceHost.FindResource ("SystemControlBackgroundAccentBrush")!;
+        (Brush) _resourceHost.FindResource ("HighlightBrush")!;
 
     #endregion
 }

@@ -797,6 +797,20 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
+    /// Получение доступа к ресурсам темы.
+    /// </summary>
+    public static IThemeResources GetThemeResources
+        (
+            IResourceHost resourceHost
+        )
+    {
+        Sure.NotNull (resourceHost);
+
+        // TODO определять текущую тему
+        return new FluentThemeResources (resourceHost);
+    }
+
+    /// <summary>
     /// Получение окна, которому принадлежит указанный контрол.
     /// </summary>
     public static Window GetWindow
@@ -833,6 +847,23 @@ public static class AvaloniaUtility
             Orientation = Orientation.Horizontal
         };
         result.Children.AddRange (controls);
+
+        return result;
+    }
+
+    /// <summary>
+    /// Включение ссылки на стили DataGrid.
+    /// </summary>
+    public static IStyle IncludeDataGridStyles
+        (
+            string theme = "Fluent"
+        )
+    {
+        var gridUri = new Uri ($"avares://Avalonia.Controls.DataGrid/Themes/{theme}.xaml");
+        var result = new StyleInclude (gridUri)
+        {
+            Source = gridUri
+        };
 
         return result;
     }
