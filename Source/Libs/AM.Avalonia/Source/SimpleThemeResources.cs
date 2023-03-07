@@ -69,12 +69,15 @@ public sealed class SimpleThemeResources
     public Color ThemeForegroundColor =>
         (Color) _resourceHost.FindResource ("ThemeForegroundColor")!;
 
+    /// <inheritdoc cref="IThemeResources.ThemeForegroundBrush"/>
     public Brush ThemeForegroundBrush =>
         (Brush) _resourceHost.FindResource ("ThemeForegroundBrush")!;
 
+    /// <inheritdoc cref="IThemeResources.HighlightColor"/>
     public Color HighlightColor =>
         (Color) _resourceHost.FindResource ("HighlightColor")!;
 
+    /// <inheritdoc cref="IThemeResources.HighlightBrush"/>
     public Brush HighlightBrush =>
         (Brush) _resourceHost.FindResource ("HighlightBrush")!;
 

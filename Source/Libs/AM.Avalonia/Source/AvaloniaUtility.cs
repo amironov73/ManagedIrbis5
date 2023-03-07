@@ -806,8 +806,20 @@ public static class AvaloniaUtility
     {
         Sure.NotNull (resourceHost);
 
-        // TODO определять текущую тему
-        return new FluentThemeResources (resourceHost);
+        foreach (var style in Application.Current!.Styles)
+        {
+            if (style is FluentTheme)
+            {
+                return new FluentThemeResources (resourceHost);
+            }
+
+            if (style is SimpleTheme)
+            {
+                return new SimpleThemeResources (resourceHost);
+            }
+        }
+        
+        return new FallbackThemeResources();
     }
 
     /// <summary>

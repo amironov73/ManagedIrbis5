@@ -3,6 +3,8 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable StringLiteralTypo
 
 /* App.cs -- создание приложения Avalonia
  * Ars Magna project, http://arsmagna.ru
@@ -10,15 +12,13 @@
 
 #region Using directives
 
-using System;
-
+using AM;
 using AM.Avalonia;
 using AM.Avalonia.Dialogs;
 
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Markup.Xaml.Styling;
 
 #endregion
 
@@ -35,12 +35,9 @@ internal class App
         var nativeMenu = AboutDialog.BuildNativeMenuAboutApplication();
         SetValue (NativeMenu.MenuProperty, nativeMenu);
 
-        Current!.Styles.Add (AvaloniaUtility.CreateFluentTheme());
-        Current!.Styles.Add (AvaloniaUtility.IncludeDataGrid());
-
-        //Current!.Styles.Add (AvaloniaUtility.CreateMaterialTheme());
-        // Current!.Styles.Add (AvaloniaUtility.CreateSimpleTheme());
-        // Current!.Styles.Add (AvaloniaUtility.CreateCitrusTheme());
+        var currentApp = Current.ThrowIfNull();
+        currentApp.Styles.Add (AvaloniaUtility.CreateFluentTheme());
+        currentApp.Styles.Add (AvaloniaUtility.IncludeDataGridStyles());
     }
 
     public override void OnFrameworkInitializationCompleted()

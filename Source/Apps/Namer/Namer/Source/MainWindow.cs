@@ -34,6 +34,7 @@ using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
+using Avalonia.Styling;
 using Avalonia.Threading;
 
 using ReactiveUI;
@@ -97,8 +98,9 @@ public sealed class MainWindow
     {
         base.OnInitialized();
 
-        var foreground = Brushes.Black;
-        var background = Brushes.LightGray;
+        var theme = AvaloniaUtility.GetThemeResources (this);
+        var foreground = theme.ThemeForegroundBrush;
+        var background = theme.ThemeBackgroundBrush;
 
         _progressStripe = new ProgressStripe { Height = 5, Active = false }
         .StretchHorizontally()
@@ -221,7 +223,6 @@ public sealed class MainWindow
 
         _dataGrid = new DataGrid
         {
-            IsReadOnly = true,
             AutoGenerateColumns = false,
             CanUserResizeColumns = true,
             CanUserSortColumns = false,
@@ -242,6 +243,7 @@ public sealed class MainWindow
 
                 new DataGridTextColumn
                 {
+                    IsReadOnly = true,
                     Header = "Старое имя",
                     Width = new DataGridLength (1, DataGridLengthUnitType.Star),
                     Binding = new Binding (nameof (NamePair.Old))
@@ -256,6 +258,7 @@ public sealed class MainWindow
 
                 new DataGridTextColumn
                 {
+                    IsReadOnly = true,
                     Foreground = Brushes.Red,
                     Header = "Сообщение об ошибке",
                     Width = new DataGridLength (1, DataGridLengthUnitType.Star),
@@ -278,6 +281,17 @@ public sealed class MainWindow
             if (eventArgs.PointerPressedEventArgs is { ClickCount: >= 2, KeyModifiers: KeyModifiers.None })
             {
                 _OpenCurrentFile();
+            }
+        };
+
+        // возня вокруг заголовков столбцов, не желающих самостоятельно подхватывать цвета темной темы
+        _dataGrid.ColumnHeaderTheme = new ControlTheme (typeof (DataGridColumnHeader))
+        {
+            BasedOn = AvaloniaUtility.GetControlTheme (typeof (DataGridColumnHeader)),
+            Setters =
+            {
+                new Setter (BackgroundProperty, background),
+                new Setter (ForegroundProperty, foreground)
             }
         };
 

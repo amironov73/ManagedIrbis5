@@ -66,12 +66,15 @@ public class FluentThemeResources
     public Color ThemeForegroundColor =>
         (Color) _resourceHost.FindResource ("SystemAltHighColor")!;
 
+    /// <inheritdoc cref="IThemeResources.ThemeForegroundBrush"/>
     public Brush ThemeForegroundBrush =>
-        (Brush) _resourceHost.FindResource ("SystemControlForegroundBaseHighBrush")!;
+        (Brush) _resourceHost.FindResource ("SystemControlBackgroundAltHighBrush")!;
 
+    /// <inheritdoc cref="IThemeResources.HighlightColor"/>
     public Color HighlightColor =>
         (Color) _resourceHost.FindResource ("SystemAccentColor")!;
 
+    /// <inheritdoc cref="IThemeResources.HighlightBrush"/>
     public Brush HighlightBrush =>
         (Brush) _resourceHost.FindResource ("SystemControlBackgroundAccentBrush")!;
 
