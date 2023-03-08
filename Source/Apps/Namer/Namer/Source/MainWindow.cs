@@ -34,7 +34,7 @@ using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
-using Avalonia.Styling;
+// using Avalonia.Styling;
 using Avalonia.Threading;
 
 using ReactiveUI;
@@ -98,9 +98,9 @@ public sealed class MainWindow
     {
         base.OnInitialized();
 
-        var theme = AvaloniaUtility.GetThemeResources (this);
-        var foreground = theme.ThemeForegroundBrush;
-        var background = theme.ThemeBackgroundBrush;
+        // var theme = AvaloniaUtility.GetThemeResources (this);
+        // var foreground = theme.ThemeForegroundBrush;
+        // var background = theme.ThemeBackgroundBrush;
 
         _progressStripe = new ProgressStripe { Height = 5, Active = false }
         .StretchHorizontally()
@@ -130,11 +130,11 @@ public sealed class MainWindow
 
         var toolbar = new Border
         {
-            BorderBrush = foreground,
+            // BorderBrush = foreground,
             BorderThickness = new Thickness (0, 0, 0, 1),
             Child = new Panel
             {
-                Background = background,
+                // Background = background,
                 Children =
                 {
                     new WrapPanel
@@ -173,11 +173,11 @@ public sealed class MainWindow
 
         var statusBar = new Border
         {
-            BorderBrush = foreground,
+            // BorderBrush = foreground,
             BorderThickness = new Thickness (0, 1, 0, 0),
             Child = new StackPanel
             {
-                Background = background,
+                // Background = background,
                 Orientation = Orientation.Horizontal,
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 Children =
@@ -208,7 +208,7 @@ public sealed class MainWindow
 
                     new TextBlock
                     {
-                        Foreground = foreground,
+                        // Foreground = foreground,
                         Padding = new Thickness (5),
                         [!TextBlock.TextProperty] = new Binding
                         {
@@ -285,15 +285,15 @@ public sealed class MainWindow
         };
 
         // возня вокруг заголовков столбцов, не желающих самостоятельно подхватывать цвета темной темы
-        _dataGrid.ColumnHeaderTheme = new ControlTheme (typeof (DataGridColumnHeader))
-        {
-            BasedOn = AvaloniaUtility.GetControlTheme (typeof (DataGridColumnHeader)),
-            Setters =
-            {
-                new Setter (BackgroundProperty, background),
-                new Setter (ForegroundProperty, foreground)
-            }
-        };
+        // _dataGrid.ColumnHeaderTheme = new ControlTheme (typeof (DataGridColumnHeader))
+        // {
+        //     BasedOn = AvaloniaUtility.GetControlTheme (typeof (DataGridColumnHeader)),
+        //     Setters =
+        //     {
+        //         new Setter (BackgroundProperty, background),
+        //         new Setter (ForegroundProperty, foreground)
+        //     }
+        // };
 
         Content = new DockPanel
         {

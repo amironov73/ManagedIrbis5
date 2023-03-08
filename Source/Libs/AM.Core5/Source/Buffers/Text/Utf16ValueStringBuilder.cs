@@ -184,7 +184,7 @@ public partial struct Utf16ValueStringBuilder
     /// </c> or <c>ZString.CreateStringBuilder(notNested: true)</c> is nested.
     /// </exception>
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
-    public Utf16ValueStringBuilder 
+    public Utf16ValueStringBuilder
         (
             bool disposeImmediately
         )
