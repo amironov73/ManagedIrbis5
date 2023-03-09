@@ -4,7 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
 
 /* NaiveResolver.cs -- простейший наивный резольвер
  * Ars Magna project, http://arsmagna.ru
@@ -19,6 +18,8 @@ using System.Reflection;
 using AM.Kotik.Barsik;
 using AM.Reflection;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -28,6 +29,7 @@ namespace AM.Kotik.Types;
 /// <summary>
 /// Простейший наивный резольвер типов.
 /// </summary>
+[PublicAPI]
 public class NaiveResolver
     : IResolver
 {
@@ -118,7 +120,7 @@ public class NaiveResolver
         const BindingFlags flags = BindingFlags.Instance | BindingFlags.Static
             | BindingFlags.Public | BindingFlags.NonPublic;
         var arguments = descriptor.Arguments ?? Array.Empty<Type>();
-        return type.GetMethod 
+        return type.GetMethod
             (
                 name,
                 flags,

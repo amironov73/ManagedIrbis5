@@ -48,7 +48,7 @@ public sealed class ModuleDirective
             string? argument
         )
     {
-        var interpreter = context.Interpreter;
+        var interpreter = context.GetTopContext().Interpreter;
         if (interpreter is not null)
         {
             if (string.IsNullOrEmpty (argument))
@@ -75,13 +75,13 @@ public sealed class ModuleDirective
                     var subArgument = navigator.GetRemainingText().ToString();
                     if (subCommand.SameString ("unload"))
                     {
-                        var success = interpreter.Context.UnloadModule (subArgument);
+                        var success = interpreter.UnloadModule (subArgument);
                         context.Output?.WriteLine ($"Unload module {subArgument}: {success}");
                     }
                 }
                 else
                 {
-                    interpreter.Context.LoadModule (argument);
+                    interpreter.LoadModule (argument);
                 }
             }
         }

@@ -17,6 +17,8 @@ using System.Reflection;
 
 using AM.Reflection;
 
+using JetBrains.Annotations;
+
 using Microsoft.Extensions.ObjectPool;
 
 #endregion
@@ -28,6 +30,7 @@ namespace AM.Kotik.Types;
 /// <summary>
 /// Кеширующий резольвер типов.
 /// </summary>
+[PublicAPI]
 public sealed class CachingResolver
     : NaiveResolver
 {
@@ -38,7 +41,7 @@ public sealed class CachingResolver
     private readonly MemberCache _memberCache = new ();
     private readonly TypeCache _typeCache = new ();
 
-    private readonly DefaultObjectPool<ConstructorDescriptor> _constructorPool 
+    private readonly DefaultObjectPool<ConstructorDescriptor> _constructorPool
         = new (new DefaultPooledObjectPolicy<ConstructorDescriptor>());
 
     private readonly DefaultObjectPool<MemberDescriptor> _memberPool

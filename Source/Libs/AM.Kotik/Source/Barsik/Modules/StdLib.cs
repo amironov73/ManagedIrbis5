@@ -965,7 +965,7 @@ public sealed class StdLib
             if (!string.IsNullOrWhiteSpace (name))
             {
                 name = name.Trim();
-                context.LoadModule (name);
+                context.GetTopContext().Interpreter!.LoadModule (name);
             }
         }
 

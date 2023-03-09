@@ -28,6 +28,8 @@ using AM.Kotik.Highlighting;
 using AM.Kotik.Tokenizers;
 using AM.Text;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -37,6 +39,7 @@ namespace AM.Kotik.Barsik;
 /// <summary>
 /// Интерпретатор Барсика.
 /// </summary>
+[PublicAPI]
 public sealed class Interpreter
     : IDisposable
 {
@@ -326,6 +329,23 @@ public sealed class Interpreter
     }
 
     /// <summary>
+    /// Подключение модуля.
+    /// </summary>
+    public void AttachModule
+        (
+            IBarsikModule instance
+        )
+    {
+        Sure.NotNull (instance);
+
+        if (instance.AttachModule (this))
+        {
+            // Output.WriteLine ($"Module loaded: {instance}");
+            Modules.Add (instance);
+        }
+    }
+
+    /// <summary>
     /// Создание интерпретатора согласно настройкам,
     /// заданным в командной строке.
     /// </summary>
@@ -598,53 +618,6 @@ public sealed class Interpreter
     }
 
     /// <summary>
-    /// Раскраска исходного кода из указанного файле.
-    /// </summary>
-    public static void HighlightFile
-        (
-            string fileName,
-            string higlighterKind = "html",
-            TextWriter? output = null
-        )
-    {
-        Sure.FileExists (fileName);
-        Sure.NotNullNorEmpty (higlighterKind);
-
-        var sourceCode = File.ReadAllText (fileName);
-        HighlightSourceCode (sourceCode, higlighterKind, output);
-    }
-
-    /// <summary>
-    /// Раскраска исходного кода.
-    /// </summary>
-    public static void HighlightSourceCode
-        (
-            string sourceCode,
-            string higlighterKind = "html",
-            TextWriter? output = null
-        )
-    {
-        Sure.NotNull (sourceCode);
-        Sure.NotNullNorEmpty (higlighterKind);
-        output ??= Console.Out;
-
-        var tokenizer = KotikUtility.CreateTokenizerForBarsik();
-        CommentTokenizer.SwitchEat (tokenizer.Tokenizers, false);
-        WhitespaceTokenizer.SwitchEat (tokenizer.Tokenizers, false);
-
-        switch (higlighterKind)
-        {
-            case "html":
-                HighlightToHtml (sourceCode, output, tokenizer);
-                break;
-
-            case "console":
-                HighlightToConsole(sourceCode, tokenizer);
-                break;
-        }
-    }
-
-    /// <summary>
     /// Загрузка исходного кода из указанного файла
     /// с последующим исполнением.
     /// </summary>
@@ -759,7 +732,54 @@ public sealed class Interpreter
     };
 
     /// <summary>
-    /// Вложение скрипта.
+    /// Раскраска исходного кода из указанного файле.
+    /// </summary>
+    public static void HighlightFile
+        (
+            string fileName,
+            string higlighterKind = "html",
+            TextWriter? output = null
+        )
+    {
+        Sure.FileExists (fileName);
+        Sure.NotNullNorEmpty (higlighterKind);
+
+        var sourceCode = File.ReadAllText (fileName);
+        HighlightSourceCode (sourceCode, higlighterKind, output);
+    }
+
+    /// <summary>
+    /// Раскраска исходного кода.
+    /// </summary>
+    public static void HighlightSourceCode
+        (
+            string sourceCode,
+            string higlighterKind = "html",
+            TextWriter? output = null
+        )
+    {
+        Sure.NotNull (sourceCode);
+        Sure.NotNullNorEmpty (higlighterKind);
+        output ??= Console.Out;
+
+        var tokenizer = KotikUtility.CreateTokenizerForBarsik();
+        CommentTokenizer.SwitchEat (tokenizer.Tokenizers, false);
+        WhitespaceTokenizer.SwitchEat (tokenizer.Tokenizers, false);
+
+        switch (higlighterKind)
+        {
+            case "html":
+                HighlightToHtml (sourceCode, output, tokenizer);
+                break;
+
+            case "console":
+                HighlightToConsole (sourceCode, tokenizer);
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Вложение скрипта - файла на диске.
     /// </summary>
     public void Include
         (
@@ -769,17 +789,24 @@ public sealed class Interpreter
         Sure.NotNullNorEmpty (fileName);
 
         var extension = Path.GetExtension (fileName);
-        if (string.IsNullOrEmpty(extension))
+        if (string.IsNullOrEmpty (extension))
         {
             fileName += ".meow";
         }
 
-        if (TryInclude (fileName)
-            && !Path.IsPathRooted (fileName))
+        // сначала пытаемся найти в текущей директории
+        // или по полному пути (если он указан)
+        if (TryInclude (fileName))
         {
             return;
         }
+        
+        if (Path.IsPathRooted (fileName))
+        {
+            throw new BarsikException ($"Can't include '{fileName}'");
+        }
 
+        // ищем по путям (INCLUDE)
         foreach (var part in Pathes)
         {
             var fullPath = Path.Combine (part, fileName);
@@ -799,9 +826,51 @@ public sealed class Interpreter
             }
         }
 
-        Error.WriteLine ($"Can't include '{fileName}'");
+        throw new BarsikException ($"Can't include '{fileName}'");
     }
 
+    /// <summary>
+    /// Загрузка модуля.
+    /// </summary>
+    public void LoadModule
+        (
+            string moduleName
+        )
+    {
+        Sure.NotNullNorEmpty (moduleName);
+
+        foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+        {
+            var types = assembly.GetTypes()
+                .Where (type => type.IsAssignableTo (typeof (IBarsikModule)))
+                .ToArray();
+            foreach (var type in types)
+            {
+                var alreadyHave = false;
+                foreach (var module in Modules)
+                {
+                    if (module.GetType() == type)
+                    {
+                        alreadyHave = true;
+                        break;
+                    }
+                }
+
+                if (alreadyHave || type.Name != moduleName)
+                {
+                    continue;
+                }
+
+                var instance = (IBarsikModule?) Activator.CreateInstance (type);
+                if (instance is not null)
+                {
+                    AttachModule (instance);
+                }
+            }
+        }
+    }
+
+    
     /// <summary>
     /// Сброс состояния интерпретатора.
     /// </summary>
@@ -834,12 +903,51 @@ public sealed class Interpreter
     }
 
     /// <summary>
+    /// Выгрузка модуля.
+    /// </summary>
+    public bool UnloadModule
+        (
+            string moduleName
+        )
+    {
+        Sure.NotNullNorEmpty (moduleName);
+
+        IBarsikModule? found = null;
+        foreach (var module in Modules)
+        {
+            if (module.GetType().Name.SameString (moduleName))
+            {
+                found = module;
+                break;
+            }
+        }
+
+        if (found is not null)
+        {
+            found.DetachModule (this);
+            Modules.Remove (found);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
     /// Подключение стандартной библиотеки.
     /// </summary>
     /// <returns><c>this</c>.</returns>
     public Interpreter WithStdLib()
     {
-        Context.AttachModule (new StdLib());
+        foreach (var module in Modules)
+        {
+            if (module is StdLib)
+            {
+                return this;
+            }
+        }
+
+        AttachModule (new StdLib());
 
         return this;
     }

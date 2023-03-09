@@ -4,11 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedMember.Local
-// ReSharper disable UseNameofExpression
 
 /* IBarsikModule.cs -- интерфейс Барсик-модуля
  * Ars Magna project, http://arsmagna.ru
@@ -40,12 +35,13 @@ public interface IBarsikModule
     Version Version { get; }
 
     /// <summary>
-    /// Инициализация модуля в интерпретаторе.
+    /// Инициализация модуля при загрузке в интерпретатор.
     /// </summary>
     bool AttachModule (Interpreter interpreter);
 
     /// <summary>
-    /// Освобождение (деинициализация) модуля в интерпретаторе.
+    /// Освобождение (деинициализация) модуля
+    /// при выгрузке из интерпретатора.
     /// </summary>
     void DetachModule (Interpreter interpreter);
 }

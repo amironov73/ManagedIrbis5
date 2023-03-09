@@ -145,26 +145,6 @@ public sealed class Context
     #region Public methods
 
     /// <summary>
-    /// Подключение модуля.
-    /// </summary>
-    public Context AttachModule
-        (
-            IBarsikModule instance
-        )
-    {
-        Sure.NotNull (instance);
-
-        var interpreter = GetTopContext().Interpreter.ThrowIfNull();
-        if (instance.AttachModule (interpreter))
-        {
-            // Output.WriteLine ($"Module loaded: {instance}");
-            interpreter.Modules.Add (instance);
-        }
-
-        return this;
-    }
-
-    /// <summary>
     /// Создание контекста-потомка.
     /// </summary>
     public Context CreateChildContext ()
@@ -488,48 +468,6 @@ public sealed class Context
     }
 
     /// <summary>
-    /// Загрузка модуля.
-    /// </summary>
-    public void LoadModule
-        (
-            string moduleName
-        )
-    {
-        Sure.NotNullNorEmpty (moduleName);
-
-        foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-        {
-            var interpreter = GetTopContext().Interpreter.ThrowIfNull();
-            var types = assembly.GetTypes()
-                .Where (type => type.IsAssignableTo (typeof (IBarsikModule)))
-                .ToArray();
-            foreach (var type in types)
-            {
-                var alreadyHave = false;
-                foreach (var module in interpreter.Modules)
-                {
-                    if (module.GetType() == type)
-                    {
-                        alreadyHave = true;
-                        break;
-                    }
-                }
-
-                if (alreadyHave)
-                {
-                    continue;
-                }
-
-                var instance = (IBarsikModule?) Activator.CreateInstance (type);
-                if (instance is not null)
-                {
-                    AttachModule (instance);
-                }
-            }
-        }
-    }
-
-    /// <summary>
     /// Вывод на печать значения AST-узла.
     /// </summary>
     public void Print
@@ -640,38 +578,6 @@ public sealed class Context
             {
                 return true;
             }
-        }
-
-        return false;
-    }
-
-    /// <summary>
-    /// Выгрузка модуля.
-    /// </summary>
-    public bool UnloadModule
-        (
-            string moduleName
-        )
-    {
-        Sure.NotNullNorEmpty (moduleName);
-
-        var interpreter = GetTopContext().Interpreter.ThrowIfNull();
-        IBarsikModule? found = null;
-        foreach (var module in interpreter.Modules)
-        {
-            if (module.GetType().Name.SameString (moduleName))
-            {
-                found = module;
-                break;
-            }
-        }
-
-        if (found is not null)
-        {
-            found.DetachModule (interpreter);
-            interpreter.Modules.Remove (found);
-
-            return true;
         }
 
         return false;
