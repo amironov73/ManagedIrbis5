@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Onna", "Onna\Onna.csproj", "{D7259F3D-03E0-445C-A48C-D4AB86945ABA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AM.Core5", "..\..\Libs\AM.Core5\AM.Core5.csproj", "{AFC18FAE-2D78-45C8-9E0A-720FF1547EFE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AM.Avalonia", "..\..\Libs\AM.Avalonia\AM.Avalonia.csproj", "{75A7BA06-BE61-4155-8FCB-2FCF27831FDE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D7259F3D-03E0-445C-A48C-D4AB86945ABA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7259F3D-03E0-445C-A48C-D4AB86945ABA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7259F3D-03E0-445C-A48C-D4AB86945ABA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7259F3D-03E0-445C-A48C-D4AB86945ABA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AFC18FAE-2D78-45C8-9E0A-720FF1547EFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AFC18FAE-2D78-45C8-9E0A-720FF1547EFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AFC18FAE-2D78-45C8-9E0A-720FF1547EFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AFC18FAE-2D78-45C8-9E0A-720FF1547EFE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75A7BA06-BE61-4155-8FCB-2FCF27831FDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75A7BA06-BE61-4155-8FCB-2FCF27831FDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75A7BA06-BE61-4155-8FCB-2FCF27831FDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75A7BA06-BE61-4155-8FCB-2FCF27831FDE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
