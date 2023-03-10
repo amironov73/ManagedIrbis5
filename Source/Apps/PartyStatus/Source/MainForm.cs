@@ -157,7 +157,7 @@ public partial class MainForm
                     : "Невозможно установить соединение с сервером"
             );
 
-        if (!ReferenceEquals (_menu, null))
+        if (_menu is not null)
         {
             _statusBox.Items.AddRange (_menu.Entries.ToArray());
             if (_menu.Entries.Count != 0)
@@ -179,7 +179,7 @@ public partial class MainForm
         WriteLine ($"MFN={mfn}");
 
         var record = provider.ReadRecord (mfn);
-        if (ReferenceEquals (record, null))
+        if (record is null)
         {
             return;
         }

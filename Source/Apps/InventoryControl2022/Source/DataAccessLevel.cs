@@ -893,7 +893,7 @@ namespace InventoryControl
                     "\"I={0}\"",
                     index
                 );
-            if (ReferenceEquals(main, null))
+            if (main is null)
             {
                 return false;
             }
@@ -942,7 +942,7 @@ namespace InventoryControl
             RecordField field = record.Fields
                 .FirstOrDefault(f => f.GetFirstSubFieldValue('b')
                     .SameString(number));
-            if (ReferenceEquals(field, null))
+            if (field is null)
             {
                 WriteLine
                     (
@@ -1013,7 +1013,7 @@ namespace InventoryControl
             )
         {
             EnsureDatabaseOpen();
-            if (ReferenceEquals(books, null))
+            if (books is null)
             {
                 throw new ArgumentNullException(nameof(books));
             }
@@ -1069,22 +1069,22 @@ namespace InventoryControl
                 BookInfo[] books
             )
         {
-            if (ReferenceEquals(books, null))
+            if (books is null)
             {
-                throw new ArgumentNullException(nameof(books));
+                throw new ArgumentNullException (nameof (books));
             }
 
             WriteDelimiter();
 
-            var grouped = books.GroupBy(b => b.CheckedDate)
-                .OrderBy(g => g.Key);
+            var grouped = books.GroupBy (b => b.CheckedDate)
+                .OrderBy (g => g.Key);
             foreach (var g in grouped)
             {
                 WriteLine
                     (
                         "{0} ({1}): {2}",
                         g.Key.ToShortDateString(),
-                        g.Key.ToString("ddd"),
+                        g.Key.ToString ("ddd"),
                         g.Count()
                     );
             }

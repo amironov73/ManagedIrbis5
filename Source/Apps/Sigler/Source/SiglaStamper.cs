@@ -101,7 +101,7 @@ public sealed class SiglaStamper
             .GetField (910)
             .GetField ('b', number)
             .FirstOrDefault();
-        if (ReferenceEquals (field, null))
+        if (field is null)
         {
             Output.WriteLine ("{0}: no 910", number);
 

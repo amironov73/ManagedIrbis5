@@ -108,7 +108,7 @@ static class Program
             Record record
         )
     {
-        if (ReferenceEquals (_titleProgram, null))
+        if (_titleProgram is null)
         {
             var source = File.ReadAllText ("title.pft", IrbisEncoding.Ansi);
             _titleProgram = PftUtility.CompileProgram (source);
@@ -126,7 +126,7 @@ static class Program
             Record record
         )
     {
-        if (ReferenceEquals (_briefProgram, null))
+        if (_briefProgram is null)
         {
             var source = File.ReadAllText ("sbrief_istu.pft", IrbisEncoding.Ansi);
             _briefProgram = PftUtility.CompileProgram (source);
@@ -143,7 +143,7 @@ static class Program
             Record record
         )
     {
-        if (ReferenceEquals (_headingProgram, null))
+        if (_headingProgram is null)
         {
             var source = File.ReadAllText ("heading.pft", IrbisEncoding.Ansi);
             _headingProgram = PftUtility.CompileProgram (source);
@@ -160,7 +160,7 @@ static class Program
             Record record
         )
     {
-        if (ReferenceEquals (_authorsProgram, null))
+        if (_authorsProgram is null)
         {
             var source = File.ReadAllText ("authors.pft", IrbisEncoding.Ansi);
             _authorsProgram = PftUtility.CompileProgram (source);
@@ -214,7 +214,7 @@ static class Program
             Record record
         )
     {
-        if (ReferenceEquals (_exemplarsProgram, null))
+        if (_exemplarsProgram is null)
         {
             var source = File.ReadAllText ("exemplars.pft", IrbisEncoding.Ansi);
             _exemplarsProgram = PftUtility.CompileProgram (source);
@@ -231,7 +231,7 @@ static class Program
             Record record
         )
     {
-        if (ReferenceEquals (_linkProgram, null))
+        if (_linkProgram is null)
         {
             var source = File.ReadAllText ("link.pft", IrbisEncoding.Ansi);
             _linkProgram = PftUtility.CompileProgram (source);
@@ -248,7 +248,7 @@ static class Program
             Record record
         )
     {
-        if (ReferenceEquals (_typeProgram, null))
+        if (_typeProgram is null)
         {
             var source = File.ReadAllText ("type.pft", IrbisEncoding.Ansi);
             _typeProgram = PftUtility.CompileProgram (source);
@@ -256,7 +256,7 @@ static class Program
 
         var formatter = _GetFormatter (_typeProgram);
         var formatted = formatter.FormatRecord (record);
-        var result = formatted.Contains ("1")
+        var result = formatted.Contains ('1')
             ? "электронный"
             : "традиционный";
 

@@ -103,26 +103,22 @@ namespace InventoryControl
             )
         {
             ChairInfo place = CurrentPlace;
-            if (ReferenceEquals(place, null))
+            if (place is null)
             {
-                ShowMessage
-                    (
-                        "Не выбран фонд"
-                    );
+                ShowMessage ("Не выбран фонд");
                 return;
             }
 
             Stopwatch stopwatch = new Stopwatch();
             WriteDelimiter();
-            WriteLine("Извлечение начато");
+            WriteLine ("Извлечение начато");
             stopwatch.Start();
             try
             {
                 _taskbarAssistant.ProgressCurrentValue = 0;
                 _taskbarAssistant.ProgressMaximumValue = 100;
-                _taskbarAssistant.ProgressMode
-                    = TaskbarButtonProgressMode.Normal;
-                _dal.ExtractExemplars(_SetProgress);
+                _taskbarAssistant.ProgressMode = TaskbarButtonProgressMode.Normal;
+                _dal.ExtractExemplars (_SetProgress);
             }
             catch (Exception ex)
             {
@@ -173,7 +169,7 @@ namespace InventoryControl
             )
         {
             ChairInfo place = CurrentPlace;
-            if (!ReferenceEquals(place, null))
+            if (place is not null)
             {
                 _dal.Place = place.Code;
                 string filename = _dal.FixFileName(place.Code);
@@ -205,7 +201,7 @@ namespace InventoryControl
             )
         {
             ChairInfo place = CurrentPlace;
-            if (ReferenceEquals(place, null))
+            if (place is null)
             {
                 ShowMessage("Не выбран фонд");
             }
@@ -399,9 +395,9 @@ namespace InventoryControl
             )
         {
             ChairInfo place = CurrentPlace;
-            if (ReferenceEquals(place, null))
+            if (place is null)
             {
-                ShowMessage("Не выбран фонд");
+                ShowMessage ("Не выбран фонд");
                 return;
             }
 
@@ -426,7 +422,7 @@ namespace InventoryControl
             )
         {
             ChairInfo place = CurrentPlace;
-            if (ReferenceEquals(place, null))
+            if (place is null)
             {
                 ShowMessage("Не выбран фонд");
                 return;

@@ -148,7 +148,7 @@ class Program
             .GetField ('b', number)
             .FirstOrDefault();
 
-        if (ReferenceEquals (found, null))
+        if (found is null)
         {
             Console.Write (" <missing>");
         }
