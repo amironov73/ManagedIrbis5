@@ -23,14 +23,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\AM.Core5\AM.Core5.csproj"/>
+        <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
     </ItemGroup>
 
     <!-- Централизованное управление пакетами -->
     <ItemGroup>
-        <PackageReference Include="HtmlAgilityPack"/>
-        <PackageReference Include="Newtonsoft.Json"/>
-        <PackageReference Include="RestSharp"/>
+        <PackageReference Include="HtmlAgilityPack" />
+        <PackageReference Include="Newtonsoft.Json" />
+        <PackageReference Include="RestSharp" />
     </ItemGroup>
 
 </Project>
