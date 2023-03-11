@@ -183,7 +183,7 @@ public class QuarterlyOrderInfoTest
         //Assert.AreEqual(first.Currency, second.Currency);
         Assert.AreEqual (first.PeriodicityCode, second.PeriodicityCode);
         Assert.AreEqual (first.PeriodicityNumber, second.PeriodicityNumber);
-        if (ReferenceEquals (first.UnknownSubfields, null))
+        if (first.UnknownSubfields is null)
         {
             Assert.IsNull (second.UnknownSubfields);
         }

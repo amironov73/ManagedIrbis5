@@ -83,7 +83,7 @@ public sealed class MappedInvertedFile64Test
         {
             next = inverted.ReadNext (next);
         }
-        while (!ReferenceEquals (next, null));
+        while (next is not null);
 
         Assert.IsNull (next);
     }

@@ -185,7 +185,7 @@ public sealed class OrderedExemplarInfoTest
         Assert.AreEqual (first.FifthPoint, second.FifthPoint);
 
         // TODO: fix
-        if (ReferenceEquals (first.UnknownSubfields, null))
+        if (first.UnknownSubfields is null)
         {
             Assert.IsNull (second.UnknownSubfields);
         }

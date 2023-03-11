@@ -144,7 +144,7 @@ public class ArrivalsInfoTest
         Assert.AreEqual (first.OnBalanceWithoutPeriodicals, second.OnBalanceWithoutPeriodicals.EmptyToNull());
         Assert.AreEqual (first.Educational, second.Educational);
 
-        if (ReferenceEquals (first.UnknownSubFields, null))
+        if (first.UnknownSubFields is null)
         {
             Assert.IsNull (second.UnknownSubFields);
         }
