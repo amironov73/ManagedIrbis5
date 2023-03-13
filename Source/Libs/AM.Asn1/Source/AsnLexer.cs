@@ -270,7 +270,7 @@ public sealed class AsnLexer
         )
     {
         var result = _navigator?.ReadUntilNoCrLf (stop);
-        if (ReferenceEquals (result, null))
+        if (result is null)
         {
             ThrowSyntax();
         }

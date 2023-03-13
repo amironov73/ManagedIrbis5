@@ -115,8 +115,6 @@ public class Button
     /// <summary>
     ///
     /// </summary>
-    /// <param name="parameter"></param>
-    /// <returns></returns>
     public bool CanExecute (object? parameter)
     {
         return IsEnabled && IsVisible;
@@ -129,8 +127,8 @@ public class Button
     public void Execute (object? parameter)
     {
         var buttonArgs = new ButtonArgs (this);
-        onClickSubject?.OnNext (buttonArgs);
-        clickedSubject?.OnNext (buttonArgs);
+        onClickSubject.OnNext (buttonArgs);
+        clickedSubject.OnNext (buttonArgs);
     }
 
     /// <summary>
@@ -157,26 +155,23 @@ public class Button
         )
     {
         var button = obj as Button;
-        return button != null && (button.GetType() == GetType() && Equals (button.Name, Name));
+        return button != null && button.GetType() == GetType() && Equals (button.Name, Name);
     }
 
     /// <inheritdoc cref="object.GetHashCode"/>
     public override int GetHashCode()
     {
-        return GetType().GetHashCode() ^ Name.GetHashCode();
+        return HashCode.Combine (GetType(), Name);
     }
 
     /// <summary>
     /// Оператор равенства.
     /// </summary>
-    /// <param name="button1"></param>
-    /// <param name="button2"></param>
-    /// <returns></returns>
-    public static bool operator == (Button button1, Button button2)
+    public static bool operator == (Button? button1, Button? button2)
     {
-        if (ReferenceEquals (button1, null))
+        if (button1 is null)
         {
-            return ReferenceEquals (button2, null);
+            return button2 is null;
         }
 
         return button1.Equals (button2);
@@ -185,10 +180,7 @@ public class Button
     /// <summary>
     /// Оператор неравенства.
     /// </summary>
-    /// <param name="button1"></param>
-    /// <param name="button2"></param>
-    /// <returns></returns>
-    public static bool operator != (Button button1, Button button2)
+    public static bool operator != (Button? button1, Button? button2)
     {
         return !(button1 == button2);
     }

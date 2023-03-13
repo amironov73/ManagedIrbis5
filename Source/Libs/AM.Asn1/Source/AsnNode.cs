@@ -6,6 +6,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable NonReadonlyMemberInGetHashCode
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
@@ -17,6 +18,7 @@
 
 #region Using directives
 
+using System;
 using System.Collections.Generic;
 
 using AM.Text;
@@ -140,19 +142,7 @@ public class AsnNode
     /// <inheritdoc cref="object.GetHashCode" />
     public override int GetHashCode()
     {
-        unchecked
-        {
-            var hashCode = Column;
-            hashCode = (hashCode * 397) ^ LineNumber;
-            hashCode = (hashCode * 397) ^
-                       (
-                           Text != null
-                               ? Text.GetHashCode()
-                               : 0
-                       );
-
-            return hashCode;
-        }
+        return HashCode.Combine (Column, LineNumber, Text);
     }
 
     /// <inheritdoc cref="object.ToString" />

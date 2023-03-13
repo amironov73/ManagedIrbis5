@@ -92,12 +92,9 @@ public sealed class AsnNodeCollection
             AsnNode item
         )
     {
-        if (!ReferenceEquals (item.Parent, null))
+        if (item.Parent is not null && !ReferenceEquals (item.Parent, Parent))
         {
-            if (!ReferenceEquals (item.Parent, Parent))
-            {
-                throw new AsnException();
-            }
+            throw new AsnException();
         }
 
         item.Parent = Parent;
@@ -111,12 +108,9 @@ public sealed class AsnNodeCollection
             AsnNode item
         )
     {
-        if (!ReferenceEquals (item.Parent, null))
+        if (item.Parent is not null && !ReferenceEquals (item.Parent, Parent))
         {
-            if (!ReferenceEquals (item.Parent, Parent))
-            {
-                throw new AsnException();
-            }
+            throw new AsnException();
         }
 
         if (index < Count)
