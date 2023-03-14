@@ -33,6 +33,8 @@ internal sealed class Program
         //     builder.Services.AddHostedService<Worker>();
         // }
 
+        builder.Services.AddDistributedMemoryCache();
+        builder.Services.AddSession();
         builder.Services.AddRazorPages();
 
         var app = builder.Build();
@@ -53,6 +55,7 @@ internal sealed class Program
         }
 
         app.UseStaticFiles();
+        app.UseSession();
         app.UseRouting();
         app.MapRazorPages();
 
