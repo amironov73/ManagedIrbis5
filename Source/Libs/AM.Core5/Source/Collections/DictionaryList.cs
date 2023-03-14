@@ -73,9 +73,7 @@ public class DictionaryList<TKey, TValue>
             {
                 var result = GetValues (key);
 
-                return ReferenceEquals (result, null)
-                    ? Array.Empty<TValue>()
-                    : result.ToArray();
+                return result?.ToArray() ?? Array.Empty<TValue>();
             }
         }
     }

@@ -4,10 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
+
 
 /* Listtility.cs -- работа со списками List
  * Ars Magna project, http://arsmagna.ru
@@ -334,7 +331,7 @@ public static class ListUtility
     /// Подсчет количества элементов в коллекции,
     /// удовлетворяющих заданному условию.
     /// </summary>
-    public static int Count<T1, T2> 
+    public static int Count<T1, T2>
         (
             this IEnumerable<T1> collection,
             T2 arg,
@@ -360,7 +357,7 @@ public static class ListUtility
     /// Подсчет количества элементов в коллекции,
     /// удовлетворяющих заданному условию.
     /// </summary>
-    public static int Count<T1, T2, T3> 
+    public static int Count<T1, T2, T3>
         (
             this IEnumerable<T1> collection,
             T2 arg1,
@@ -470,7 +467,7 @@ public static class ListUtility
             this IList<T>? list
         )
     {
-        if (ReferenceEquals (list, null))
+        if (list is null)
         {
             Magna.Logger.LogError
                 (
@@ -510,7 +507,7 @@ public static class ListUtility
             string message
         )
     {
-        if (ReferenceEquals (list, null))
+        if (list is null)
         {
             Magna.Logger.LogError
                 (
@@ -549,7 +546,7 @@ public static class ListUtility
             this T[]? array
         )
     {
-        if (ReferenceEquals (array, null))
+        if (array is null)
         {
             Magna.Logger.LogError
                 (
@@ -589,7 +586,7 @@ public static class ListUtility
             string message
         )
     {
-        if (ReferenceEquals (array, null))
+        if (array is null)
         {
             Magna.Logger.LogError
                 (

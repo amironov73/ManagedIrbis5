@@ -4,10 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
+
 
 /* DictionaryUtility.cs -- вспомогательные методы для работы со словарями
  * Ars Magna project, http://arsmagna.ru
@@ -50,7 +47,7 @@ public static class DictionaryUtility
     {
         foreach (var dictionary in dictionaries)
         {
-            if (ReferenceEquals (dictionary, null))
+            if (dictionary is null)
             {
                 Magna.Logger.LogError
                     (
@@ -90,7 +87,7 @@ public static class DictionaryUtility
     {
         foreach (var dictionary in dictionaries)
         {
-            if (ReferenceEquals (dictionary, null))
+            if (dictionary is null)
             {
                 Magna.Logger.LogError
                     (
@@ -133,7 +130,7 @@ public static class DictionaryUtility
     {
         foreach (var dictionary in dictionaries)
         {
-            if (ReferenceEquals (dictionary, null))
+            if (dictionary is null)
             {
                 Magna.Logger.LogError
                     (

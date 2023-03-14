@@ -91,8 +91,7 @@ public class CloneableDictionary<TKey, TValue>
                 keyCopy = (TKey)((ICloneable)keyCopy).Clone();
             }
 
-            if (cloneValues
-                && !ReferenceEquals (valueCopy, null))
+            if (cloneValues && valueCopy is not null)
             {
                 valueCopy = (TValue)((ICloneable)valueCopy).Clone();
             }
