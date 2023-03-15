@@ -4,10 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable PropertyCanBeMadeInitOnly.Global
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
+// ReSharper disable NonReadonlyFieldInGetHashCode
 
 /* Pair.cs -- holds pair of objects of given types
  * Ars Magna project, http://arsmagna.ru
@@ -22,6 +19,8 @@ using System.Diagnostics;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
+using JetBrains.Annotations;
+
 using Microsoft.Extensions.Logging;
 
 #endregion
@@ -35,12 +34,11 @@ namespace AM.Collections;
 /// </summary>
 /// <typeparam name="T1">Type of first object.</typeparam>
 /// <typeparam name="T2">Type of second object.</typeparam>
-[DebuggerDisplay("{First};{Second}")]
-//[TypeConverter(typeof(IndexableConverter))]
+[PublicAPI]
 public class Pair<T1, T2>
     : IList,
-    IIndexable<object>,
-    IReadOnly<Pair<T1, T2>>
+        IIndexable<object>,
+        IReadOnly<Pair<T1, T2>>
 {
     #region Properties
 
@@ -50,8 +48,8 @@ public class Pair<T1, T2>
     /// First element of the pair.
     /// </summary>
     /// <value>Value of first element.</value>
-    [XmlElement("first")]
-    [JsonPropertyName("first")]
+    [XmlElement ("first")]
+    [JsonPropertyName ("first")]
     public T1? First
     {
         get => _first;
@@ -69,8 +67,8 @@ public class Pair<T1, T2>
     /// Second element of the pair.
     /// </summary>
     /// <value>Value of second element.</value>
-    [XmlElement("second")]
-    [JsonPropertyName("second")]
+    [XmlElement ("second")]
+    [JsonPropertyName ("second")]
     public T2? Second
     {
         get => _second;
@@ -162,7 +160,7 @@ public class Pair<T1, T2>
         Magna.Logger.LogError
             (
                 nameof (Pair<T1, T2>) + "::Add"
-                + ": not supported"
+                                      + ": not supported"
             );
 
         throw new NotSupportedException();
@@ -174,10 +172,9 @@ public class Pair<T1, T2>
             object? value
         )
     {
-        foreach (object o in this)
+        foreach (var o in this)
         {
-            if (!ReferenceEquals(o, null)
-                && o.Equals(value))
+            if (o?.Equals (value) ?? false)
             {
                 return true;
             }
@@ -192,7 +189,7 @@ public class Pair<T1, T2>
         Magna.Logger.LogError
             (
                 nameof (Pair<T1, T2>) + "::Clear"
-                + ": not supported"
+                                      + ": not supported"
             );
 
         throw new NotSupportedException();
@@ -207,13 +204,11 @@ public class Pair<T1, T2>
         var index = 0;
         foreach (var o in this)
         {
-            if (!ReferenceEquals(o, null))
+            if (o?.Equals (value) ?? false)
             {
-                if (o.Equals(value))
-                {
-                    return index;
-                }
+                return index;
             }
+
             index++;
         }
 
@@ -230,7 +225,7 @@ public class Pair<T1, T2>
         Magna.Logger.LogError
             (
                 nameof (Pair<T1, T2>) + "::Insert"
-                + ": not supported"
+                                      + ": not supported"
             );
 
         throw new NotSupportedException();
@@ -245,7 +240,7 @@ public class Pair<T1, T2>
         Magna.Logger.LogError
             (
                 nameof (Pair<T1, T2>) + "::Remove"
-                + ": not supported"
+                                      + ": not supported"
             );
 
         throw new NotSupportedException();
@@ -260,14 +255,14 @@ public class Pair<T1, T2>
         Magna.Logger.LogError
             (
                 nameof (Pair<T1, T2>) + "::RemoveAt"
-                + ": not supported"
+                                      + ": not supported"
             );
 
         throw new NotSupportedException();
     }
 
     /// <inheritdoc cref="IList.this"/>
-    public object? this[int index]
+    public object? this [int index]
     {
         get
         {
@@ -283,11 +278,11 @@ public class Pair<T1, T2>
                     Magna.Logger.LogError
                         (
                             nameof (Pair<T1, T2>) + "::Indexer"
-                            + "index={Index} is out of range",
+                                                  + "index={Index} is out of range",
                             index
                         );
 
-                    throw new ArgumentOutOfRangeException(nameof(index));
+                    throw new ArgumentOutOfRangeException (nameof (index));
             }
         }
         set
@@ -297,7 +292,7 @@ public class Pair<T1, T2>
                 Magna.Logger.LogError
                     (
                         nameof (Pair<T1, T2>) + "::Indexer"
-                        + ": is read-only"
+                                              + ": is read-only"
                     );
 
                 throw new NotSupportedException();
@@ -317,11 +312,11 @@ public class Pair<T1, T2>
                     Magna.Logger.LogError
                         (
                             nameof (Pair<T1, T2>) + "::Indexer"
-                            + ": index={Index} is out of range",
+                                                  + ": index={Index} is out of range",
                             index
                         );
 
-                    throw new ArgumentOutOfRangeException(nameof(index));
+                    throw new ArgumentOutOfRangeException (nameof (index));
             }
         }
     }
@@ -341,8 +336,8 @@ public class Pair<T1, T2>
             int index
         )
     {
-        array.SetValue(First, index);
-        array.SetValue(Second, index + 1);
+        array.SetValue (First, index);
+        array.SetValue (Second, index + 1);
     }
 
     /// <inheritdoc cref="ICollection.Count" />
@@ -386,7 +381,7 @@ public class Pair<T1, T2>
     /// <inheritdoc cref="IReadOnly{T}.AsReadOnly" />
     public Pair<T1, T2> AsReadOnly()
     {
-        return new Pair<T1, T2>(First, Second, true);
+        return new Pair<T1, T2> (First, Second, true);
     }
 
     /// <inheritdoc cref="IReadOnly{T}.SetReadOnly" />
@@ -402,7 +397,7 @@ public class Pair<T1, T2>
         {
             Magna.Logger.LogError
                 (
-                    nameof (Pair<T1, T2>) + "::" + nameof(ThrowIfReadOnly)
+                    nameof (Pair<T1, T2>) + "::" + nameof (ThrowIfReadOnly)
                 );
 
             throw new ReadOnlyException();
@@ -419,8 +414,8 @@ public class Pair<T1, T2>
             Pair<T1, T2> other
         )
     {
-        return EqualityComparer<T1>.Default.Equals(_first, other._first)
-               && EqualityComparer<T2>.Default.Equals(_second, other._second);
+        return EqualityComparer<T1>.Default.Equals (_first, other._first)
+               && EqualityComparer<T2>.Default.Equals (_second, other._second);
     }
 
     #endregion
@@ -428,14 +423,14 @@ public class Pair<T1, T2>
     #region Object members
 
     ///<inheritdoc cref="object.Equals(object)" />
-    public override bool Equals(object? obj)
+    public override bool Equals (object? obj)
     {
-        if (ReferenceEquals(null, obj))
+        if (obj is null)
         {
             return false;
         }
 
-        if (ReferenceEquals(this, obj))
+        if (ReferenceEquals (this, obj))
         {
             return true;
         }
@@ -445,22 +440,11 @@ public class Pair<T1, T2>
             return false;
         }
 
-        return Equals((Pair<T1, T2>)obj);
+        return Equals ((Pair<T1, T2>)obj);
     }
 
     ///<inheritdoc cref="object.GetHashCode" />
-    public override int GetHashCode()
-    {
-        // ReSharper disable NonReadonlyFieldInGetHashCode
-        unchecked
-        {
-            var first = _first is null ? 0 : EqualityComparer<T1>.Default.GetHashCode(_first);
-            var second = _second is null ? 0 : EqualityComparer<T2>.Default.GetHashCode(_second);
-
-            return (first * 397) ^ second;
-        }
-        // ReSharper restore NonReadonlyFieldInGetHashCode
-    }
+    public override int GetHashCode() => HashCode.Combine (_first, _second);
 
     ///<inheritdoc cref="object.ToString" />
     public override string ToString()

@@ -175,7 +175,7 @@ public sealed class VirtualList<T>
 
         _Retrieve (index);
         var result = default (T);
-        if (!ReferenceEquals (_cache, null)
+        if (_cache is not null
             && index >= _cacheIndex
             && index <= _cacheIndex + _cacheLength)
         {
@@ -234,12 +234,12 @@ public sealed class VirtualList<T>
             T item
         )
     {
-        if (ReferenceEquals (_cache, null))
+        if (_cache is null)
         {
             GetItem (0);
         }
 
-        if (ReferenceEquals (_cache, null))
+        if (_cache is null)
         {
             return false;
         }
@@ -283,12 +283,12 @@ public sealed class VirtualList<T>
     /// <inheritdoc cref="IEnumerable{T}.GetEnumerator" />
     public IEnumerator<T> GetEnumerator()
     {
-        if (ReferenceEquals (_cache, null))
+        if (_cache is null)
         {
             GetItem (0);
         }
 
-        //if (ReferenceEquals(_cache, null))
+        //if (_cache is null)
         //{
         //    throw new InvalidOperationException();
         //}
@@ -305,12 +305,12 @@ public sealed class VirtualList<T>
     /// <inheritdoc cref="IList{T}.IndexOf" />
     public int IndexOf (T item)
     {
-        if (ReferenceEquals (_cache, null))
+        if (_cache is null)
         {
             GetItem (0);
         }
 
-        if (ReferenceEquals (_cache, null))
+        if (_cache is null)
         {
             return -1;
         }
