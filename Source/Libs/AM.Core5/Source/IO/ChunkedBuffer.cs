@@ -4,12 +4,8 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
-/* ChunkedBuffer.cs -- аналог MemoryStream на коротких чанках
+/* ChunkedBuffer.cs -- аналог MemoryStream на коротких блоках
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -28,7 +24,7 @@ namespace AM.IO;
 
 /// <summary>
 /// Аналог <see cref="System.IO.MemoryStream"/>,
-/// использующий короткие чанки с данными.
+/// использующий короткие блоки с данными.
 /// </summary>
 public sealed class ChunkedBuffer
 {
@@ -44,21 +40,14 @@ public sealed class ChunkedBuffer
     #region Nested classes
 
     /// <summary>
-    /// Chunk of bytes.
+    /// Непрерывный блок памяти.
     /// </summary>
-    class Chunk
+    private sealed class Chunk
     {
-        public readonly byte[] Buffer;
+        public readonly byte[] buffer;
+        public Chunk? next;
 
-        public Chunk? Next;
-
-        public Chunk
-            (
-                int size
-            )
-        {
-            Buffer = new byte[size];
-        }
+        public Chunk (int size) => buffer = new byte[size];
     }
 
     #endregion
@@ -66,18 +55,18 @@ public sealed class ChunkedBuffer
     #region Properties
 
     /// <summary>
-    /// Chunk size.
+    /// Размер блоков.
     /// </summary>
     public int ChunkSize => _chunkSize;
 
     /// <summary>
-    /// End of data?
+    /// Достигнут конец?
     /// </summary>
     public bool Eof
     {
         get
         {
-            if (ReferenceEquals (_current, null))
+            if (_current is null)
             {
                 return true;
             }
@@ -92,7 +81,7 @@ public sealed class ChunkedBuffer
     }
 
     /// <summary>
-    /// Total length.
+    /// Общая длина записанных данных в байтах.
     /// </summary>
     public int Length
     {
@@ -102,9 +91,8 @@ public sealed class ChunkedBuffer
 
             for (
                     var chunk = _first;
-                    !ReferenceEquals (chunk, null)
-                    && !ReferenceEquals (chunk, _last);
-                    chunk = chunk.Next
+                    chunk is not null && !ReferenceEquals (chunk, _last);
+                    chunk = chunk.next
                 )
             {
                 result += _chunkSize;
@@ -128,7 +116,7 @@ public sealed class ChunkedBuffer
             int chunkSize = DefaultChunkSize
         )
     {
-        Sure.Positive (chunkSize, nameof (chunkSize));
+        Sure.Positive (chunkSize);
 
         _chunkSize = chunkSize;
     }
@@ -150,12 +138,12 @@ public sealed class ChunkedBuffer
             return false;
         }
 
-        if (ReferenceEquals (_current, null))
+        if (_current is null)
         {
-            throw new ArsMagnaException ("_current == null");
+            throw new ArsMagnaException ("_current is null");
         }
 
-        _current = _current.Next;
+        _current = _current.next;
         _read = 0;
 
         return true;
@@ -164,19 +152,19 @@ public sealed class ChunkedBuffer
     private void _AppendChunk()
     {
         var newChunk = new Chunk (_chunkSize);
-        if (ReferenceEquals (_first, null))
+        if (_first is null)
         {
             _first = newChunk;
             _current = newChunk;
         }
         else
         {
-            if (ReferenceEquals (_last, null))
+            if (_last is null)
             {
-                throw new ArsMagnaException ("_last == null");
+                throw new ArsMagnaException ("_last is null");
             }
 
-            _last.Next = newChunk;
+            _last.next = newChunk;
         }
 
         _last = newChunk;
@@ -188,7 +176,7 @@ public sealed class ChunkedBuffer
     #region Public methods
 
     /// <summary>
-    /// Copy data from the stream.
+    /// Вычитывание данных из заданного потока.
     /// </summary>
     public void CopyFrom
         (
@@ -196,7 +184,7 @@ public sealed class ChunkedBuffer
             int bufferSize
         )
     {
-        Sure.Positive (bufferSize, nameof (bufferSize));
+        Sure.Positive (bufferSize);
 
         var buffer = new byte[bufferSize];
         int read;
@@ -207,11 +195,11 @@ public sealed class ChunkedBuffer
     }
 
     /// <summary>
-    /// Peek one byte.
+    /// Подглядывание следующего байта.
     /// </summary>
     public int Peek()
     {
-        if (ReferenceEquals (_current, null))
+        if (_current is null)
         {
             return -1;
         }
@@ -231,16 +219,16 @@ public sealed class ChunkedBuffer
             }
         }
 
-        return _current.Buffer[_read];
+        return _current.buffer[_read];
     }
 
     /// <summary>
-    /// Read array of bytes.
+    /// Чтение данных в указанный массив.
     /// </summary>
     public int Read (byte[] buffer) => Read (buffer, 0, buffer.Length);
 
     /// <summary>
-    /// Read bytes.
+    /// Чтение данных в указанный массив.
     /// </summary>
     public int Read
         (
@@ -249,14 +237,15 @@ public sealed class ChunkedBuffer
             int count
         )
     {
-        Sure.NonNegative (offset, nameof (offset));
+        Sure.NotNull (buffer);
+        Sure.NonNegative (offset);
 
         if (count <= 0)
         {
             return 0;
         }
 
-        if (ReferenceEquals (_current, null))
+        if (_current is null)
         {
             return 0;
         }
@@ -279,7 +268,7 @@ public sealed class ChunkedBuffer
             var portion = Math.Min (count, remaining);
             Array.Copy
                 (
-                    _current.Buffer,
+                    _current.buffer,
                     _read,
                     buffer,
                     offset,
@@ -295,11 +284,11 @@ public sealed class ChunkedBuffer
     }
 
     /// <summary>
-    /// Read one byte.
+    /// Побайтовое чтение.
     /// </summary>
     public int ReadByte()
     {
-        if (ReferenceEquals (_current, null))
+        if (_current is null)
         {
             return -1;
         }
@@ -319,23 +308,25 @@ public sealed class ChunkedBuffer
             }
         }
 
-        return _current.Buffer[_read++];
+        return _current.buffer[_read++];
     }
 
     /// <summary>
-    /// Read one line from the current position.
+    /// Чтение строки.
     /// </summary>
     public string? ReadLine
         (
             Encoding encoding
         )
     {
+        Sure.NotNull (encoding);
+
         if (Eof)
         {
             return null;
         }
 
-        if (ReferenceEquals (_current, null))
+        if (_current is null)
         {
             return null;
         }
@@ -344,7 +335,7 @@ public sealed class ChunkedBuffer
         byte found = 0;
         while (found == 0)
         {
-            var buffer = _current.Buffer;
+            var buffer = _current.buffer;
             int stop = ReferenceEquals (_current, _last)
                 ? _position
                 : _chunkSize;
@@ -386,7 +377,7 @@ public sealed class ChunkedBuffer
     }
 
     /// <summary>
-    /// Rewind to the beginning.
+    /// Перемотка к началу.
     /// </summary>
     public void Rewind()
     {
@@ -395,13 +386,15 @@ public sealed class ChunkedBuffer
     }
 
     /// <summary>
-    /// Get internal buffers.
+    /// Доступ к внутренним буферам данных.
     /// </summary>
     public byte[][] ToArrays
         (
             int prefix
         )
     {
+        Sure.NonNegative (prefix);
+
         var result = new List<byte[]>();
 
         for (var i = 0; i < prefix; i++)
@@ -411,23 +404,22 @@ public sealed class ChunkedBuffer
 
         for (
                 var chunk = _first;
-                !ReferenceEquals (chunk, null)
-                && !ReferenceEquals (chunk, _last);
-                chunk = chunk.Next
+                chunk is not null && !ReferenceEquals (chunk, _last);
+                chunk = chunk.next
             )
         {
-            result.Add (chunk.Buffer);
+            result.Add (chunk.buffer);
         }
 
         if (_position != 0)
         {
-            if (ReferenceEquals (_last, null))
+            if (_last is null)
             {
-                throw new ArsMagnaException ("_last == null");
+                throw new ArsMagnaException ("_last is null");
             }
 
             var chunk = new byte[_position];
-            Array.Copy (_last.Buffer, 0, chunk, 0, _position);
+            Array.Copy (_last.buffer, 0, chunk, 0, _position);
             result.Add (chunk);
         }
 
@@ -435,7 +427,7 @@ public sealed class ChunkedBuffer
     }
 
     /// <summary>
-    /// Get all data as one big array of bytes.
+    /// Получение всех записанных данных в виде одного большого массива.
     /// </summary>
     public byte[] ToBigArray()
     {
@@ -444,25 +436,24 @@ public sealed class ChunkedBuffer
         var offset = 0;
         for (
                 var chunk = _first;
-                !ReferenceEquals (chunk, null)
-                && !ReferenceEquals (chunk, _last);
-                chunk = chunk.Next
+                chunk is not null && !ReferenceEquals (chunk, _last);
+                chunk = chunk.next
             )
         {
-            Array.Copy (chunk.Buffer, 0, result, offset, _chunkSize);
+            Array.Copy (chunk.buffer, 0, result, offset, _chunkSize);
             offset += _chunkSize;
         }
 
         if (_position != 0)
         {
-            if (ReferenceEquals (_last, null))
+            if (_last is null)
             {
-                throw new ArsMagnaException ("_last == null");
+                throw new ArsMagnaException ("_last is null");
             }
 
             Array.Copy
                 (
-                    _last.Buffer,
+                    _last.buffer,
                     0,
                     result,
                     offset,
@@ -474,15 +465,13 @@ public sealed class ChunkedBuffer
     }
 
     /// <summary>
-    /// Write a block of bytes to the current stream
-    /// using data read from a buffer.
+    /// Вывод массива байтов в текущую позицию.
     /// </summary>
     public void Write (byte[] buffer) => Write (buffer, 0, buffer.Length);
 
 
     /// <summary>
-    /// Write a block of bytes to the current stream
-    /// using data read from a buffer.
+    /// Вывод массива байтов в текущую позицию.
     /// </summary>
     public void Write
         (
@@ -491,14 +480,15 @@ public sealed class ChunkedBuffer
             int count
         )
     {
-        Sure.NonNegative (offset, nameof (offset));
+        Sure.NotNull (buffer);
+        Sure.NonNegative (offset);
 
         if (count <= 0)
         {
             return;
         }
 
-        if (ReferenceEquals (_first, null))
+        if (_first is null)
         {
             _AppendChunk();
         }
@@ -512,9 +502,9 @@ public sealed class ChunkedBuffer
                 free = _chunkSize;
             }
 
-            if (ReferenceEquals (_last, null))
+            if (_last is null)
             {
-                throw new ArsMagnaException ("_last == null");
+                throw new ArsMagnaException ("_last is null");
             }
 
             var portion = Math.Min (count, free);
@@ -522,7 +512,7 @@ public sealed class ChunkedBuffer
                 (
                     buffer,
                     offset,
-                    _last.Buffer,
+                    _last.buffer,
                     _position,
                     portion
                 );
@@ -534,7 +524,7 @@ public sealed class ChunkedBuffer
     }
 
     /// <summary>
-    /// Write the text with encoding.
+    /// Вывод в поток текста с указанной кодировкой.
     /// </summary>
     public void Write
         (
@@ -542,20 +532,23 @@ public sealed class ChunkedBuffer
             Encoding encoding
         )
     {
+        Sure.NotNull (text);
+        Sure.NotNull (encoding);
+
         var bytes = encoding.GetBytes (text);
 
         Write (bytes);
     }
 
     /// <summary>
-    /// Write a byte to the current stream at the current position.
+    /// Вывод в поток байта в текущей позиции.
     /// </summary>
     public void WriteByte
         (
             byte value
         )
     {
-        if (ReferenceEquals (_first, null))
+        if (_first is null)
         {
             _AppendChunk();
         }
@@ -565,12 +558,12 @@ public sealed class ChunkedBuffer
             _AppendChunk();
         }
 
-        if (ReferenceEquals (_last, null))
+        if (_last is null)
         {
-            throw new ArsMagnaException ("_last == null");
+            throw new ArsMagnaException ("_last is null");
         }
 
-        _last.Buffer[_position++] = value;
+        _last.buffer[_position++] = value;
     }
 
     #endregion
