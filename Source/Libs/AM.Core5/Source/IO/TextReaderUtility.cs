@@ -110,7 +110,7 @@ public static class TextReaderUtility
         Sure.NotNull (reader);
 
         var result = reader.ReadLine();
-        if (ReferenceEquals (result, null))
+        if (result is null)
         {
             Magna.Logger.LogError
                 (

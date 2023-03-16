@@ -472,7 +472,7 @@ public class IniFile
                 }
             }
 
-            if (ReferenceEquals (target, null))
+            if (target is null)
             {
                 target = new Line (key, value);
                 _lines.Add (target);
@@ -494,7 +494,7 @@ public class IniFile
         {
             CheckKeyName (key);
 
-            if (ReferenceEquals (value, null))
+            if (value is null)
             {
                 Remove (key);
             }
@@ -746,7 +746,7 @@ public class IniFile
         foreach (var thisSection in this)
         {
             var name = thisSection.Name;
-            if (!ReferenceEquals (name, null) && name.Length != 0)
+            if (!string.IsNullOrEmpty (name))
             {
                 var otherSection = iniFile.GetOrCreateSection (name);
                 thisSection.ApplyTo (otherSection);
@@ -883,7 +883,7 @@ public class IniFile
         )
     {
         var section = GetSection (sectionName);
-        var result = ReferenceEquals (section, null)
+        var result = section is null
             ? defaultValue
             : section.GetValue (keyName, defaultValue);
 
@@ -901,7 +901,7 @@ public class IniFile
         )
     {
         var section = GetSection (sectionName);
-        var result = ReferenceEquals (section, null)
+        var result = section is null
             ? defaultValue
             : section.GetValue (keyName, defaultValue);
 
@@ -924,7 +924,7 @@ public class IniFile
         }
 
         var found = GetSection (sectionName);
-        if (ReferenceEquals (found, null))
+        if (found is null)
         {
             _sections.Add (section);
         }
