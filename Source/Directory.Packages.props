@@ -49,7 +49,7 @@
     <PackageVersion Include="MailKit" Version="3.5.0" />
     <PackageVersion Include="Material.Avalonia" Version="3.0.0-avalonia11-preview3.145-nightly" />
     <PackageVersion Include="MaxMind.GeoIP2" Version="5.1.0" />
-    <PackageVersion Include="Microsoft.AspNetCore.Components.Web" Version="7.0.3" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.Web" Version="7.0.4" />
     <PackageVersion Include="Microsoft.AspNetCore.Razor.Language" Version="6.0.14" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.4.0" />
     <PackageVersion Include="Microsoft.DotNet.ILCompiler" Version="7.0.0-rc.2.22472.3" />
@@ -65,10 +65,10 @@
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
     <PackageVersion Include="Microsoft.Extensions.Hosting.Systemd" Version="7.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Hosting.WindowsServices" Version="7.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Localization" Version="7.0.3" />
+    <PackageVersion Include="Microsoft.Extensions.Localization" Version="7.0.4" />
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="7.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="7.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.ObjectPool" Version="7.0.3" />
+    <PackageVersion Include="Microsoft.Extensions.ObjectPool" Version="7.0.4" />
     <PackageVersion Include="Microsoft.Extensions.Options" Version="7.0.1" />
     <PackageVersion Include="Microsoft.IO.RecyclableMemoryStream" Version="2.3.1" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.4.1" />
