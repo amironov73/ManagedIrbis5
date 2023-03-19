@@ -222,7 +222,7 @@ public sealed class BusyManager
         Magna.Logger.LogDebug (nameof (BusyManager) + "::" + nameof (_FormCleanup) + ": enter");
         _DebugThreadId();
 
-        if (!ReferenceEquals (_waitForm, null))
+        if (_waitForm is not null)
         {
             if (_waitForm.InvokeRequired)
             {

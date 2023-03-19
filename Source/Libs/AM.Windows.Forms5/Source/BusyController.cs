@@ -116,13 +116,13 @@ public class BusyController
             BusyState? state
         )
     {
-        if (!ReferenceEquals (_state, null))
+        if (_state is not null)
         {
             _state.StateChanged -= _StateChanged;
         }
 
         _state = state;
-        if (!ReferenceEquals (state, null))
+        if (state is not null)
         {
             state.StateChanged += _StateChanged;
         }
@@ -225,10 +225,12 @@ public class BusyController
             Action action
         )
     {
+        Sure.NotNull (action);
+
         var result = false;
 
         var state = State;
-        if (!ReferenceEquals (state, null))
+        if (state is not null)
         {
             try
             {
@@ -237,7 +239,9 @@ public class BusyController
                 UpdateControlState (false);
                 ApplicationUtility.Run
                     (
-                        () => state.Run (action)
+                        (x, y) => x.Run (y),
+                        state,
+                        action
                     );
 
                 Magna.Logger.LogTrace ("BusyController::Run: " + "normal after");
@@ -281,7 +285,7 @@ public class BusyController
     {
         var result = false;
         var state = State;
-        if (!ReferenceEquals (state, null))
+        if (state is not null)
         {
             try
             {
