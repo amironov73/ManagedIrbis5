@@ -12,6 +12,7 @@
 #region Using directives
 
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Forms;
 
@@ -55,6 +56,24 @@ public class BindingListSource<T>
 
     #endregion
 
+    #region Public methods
+
+    /// <summary>
+    /// Добавление нескольких элементов.
+    /// </summary>
+    public void AddRange
+        (
+            IReadOnlyList<T> items
+        )
+    {
+        foreach (var item in items)
+        {
+            Add (item);
+        }
+    }
+
+    #endregion
+
     #region InnerList delegating members
 
     /// <inheritdoc cref="System.ComponentModel.BindingList{T}.ResetBindings"/>
@@ -70,7 +89,7 @@ public class BindingListSource<T>
     public void Add (T item)
     {
         object? value = item;
-        if (value == null)
+        if (value is null)
         {
             throw new ArgumentNullException (nameof (item));
         }

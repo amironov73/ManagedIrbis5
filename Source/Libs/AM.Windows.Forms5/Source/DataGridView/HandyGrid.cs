@@ -53,6 +53,9 @@ public sealed class HandyGrid
         AllowUserToOrderColumns = false;
         AllowUserToResizeColumns = false;
         ReadOnly = true;
+
+        // запрещаем выделение текущей колонки
+        ColumnHeadersDefaultCellStyle.SelectionBackColor = ColumnHeadersDefaultCellStyle.BackColor;
     }
 
     #endregion
@@ -115,9 +118,10 @@ public sealed class HandyGrid
 
         _firstType = type;
         DataSource = null;
-        AutoGenerateColumns = true;
-        DataSource = obj;
         AutoGenerateColumns = false;
+        DataSource = obj;
+        Columns.Clear();
+
         var list = new List<KeyValuePair<int, DataGridViewColumn>>();
         var properties = type.GetProperties
             (
@@ -126,12 +130,6 @@ public sealed class HandyGrid
 
         foreach (var pinfo in properties)
         {
-            var column = Columns[pinfo.Name];
-            if (column is null)
-            {
-                continue;
-            }
-
             var hca = (HiddenColumnAttribute?)Attribute.GetCustomAttribute
                 (
                     pinfo,
@@ -139,9 +137,13 @@ public sealed class HandyGrid
                 );
             if (hca is not null && hca.Hidden)
             {
-                Columns.Remove (column);
                 continue;
             }
+
+            var column = new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = pinfo.Name
+            };
 
             var roca = (ReadOnlyColumnAttribute?)Attribute.GetCustomAttribute
                 (

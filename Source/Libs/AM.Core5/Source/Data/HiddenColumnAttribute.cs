@@ -46,6 +46,7 @@ public sealed class HiddenColumnAttribute
     public HiddenColumnAttribute()
         : this (true)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
