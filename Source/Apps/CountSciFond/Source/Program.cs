@@ -1,14 +1,11 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable AccessToDisposedClosure
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* Program.cs -- точка входа в программу
  * Ars Magna project, http://arsmagna.ru
@@ -18,30 +15,21 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using System.Threading;
 
 using AM;
 
 using Istu.OldModel;
-using Istu.OldModel.Implementation;
-
-using LinqToDB.Data;
 
 using ManagedIrbis;
 using ManagedIrbis.Batch;
 using ManagedIrbis.Fields;
-using ManagedIrbis.Records;
 
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 using Spectre.Console;
-
-using CM = System.Configuration.ConfigurationManager;
 
 #endregion
 
@@ -57,7 +45,7 @@ internal sealed class Program
     public static IConfiguration Configuration { get; private set; } = null!;
 
     /// <summary>
-    /// Хост приложения
+    /// Хост приложения.
     /// </summary>
     public static IHost ApplicationHost { get; private set; } = null!;
 
@@ -95,22 +83,15 @@ internal sealed class Program
         {
             Initialize (args);
 
-            using var connection = new SyncConnection
-            {
-                Host = "172.20.1.186",
-                Port = 6666,
-                Username = "miron",
-                Password = "miron",
-                Database = "ISTU",
-                Workstation = Workstation.Cataloger.ToString()
-            };
+            using var connection = ConnectionFactory.Shared.CreateSyncConnection();
+            var connectionString = Configuration["irbis-connection"].ThrowIfNullOrEmpty();
+            connection.ParseConnectionString (connectionString);
             if (!connection.Connect())
             {
                 AnsiConsole.MarkupLine ("[red]Невозможно подключиться[/]");
                 return;
             }
 
-            var configuration = RecordConfiguration.GetDefault();
             var storehouse = Storehouse.GetInstance
                 (
                     ApplicationHost.Services,
@@ -118,8 +99,8 @@ internal sealed class Program
                 );
             var specialReaders = new HashSet<string>();
             var podsobFonds = new HashSet<string>();
-            var maxMfn = 10_000; // connection.GetMaxMfn();
-            var irbisExepmlars = new List<string>();
+            var maxMfn = connection.GetMaxMfn();
+            var irbisExepmlars = new HashSet<string>();
 
             AnsiConsole.Progress()
                 .AutoClear (false)
@@ -133,22 +114,17 @@ internal sealed class Program
                     )
                 .Start (context =>
                 {
-                    //var batch = BatchRecordReader.WholeDatabase (connection, connection.EnsureDatabase(), 1_000);
-                    var batch = BatchRecordReader.Interval (connection,
-                        database: connection.EnsureDatabase(),
-                        lastMfn: maxMfn,
-                        batchSize:1_000);
+                    var batch = BatchRecordReader.WholeDatabase
+                        (
+                            connection,
+                            database: connection.EnsureDatabase(),
+                            batchSize: 1_000
+                        );
                     var task = context.AddTask ($"Чтение {maxMfn} записей");
                     task.MaxValue = maxMfn;
                     foreach (var record in batch)
                     {
                         task.Value = record.Mfn;
-
-                        var worklist = configuration.GetWorksheet (record);
-                        if (!IrbisUtility.IsBook (worklist))
-                        {
-                            continue;
-                        }
 
                         var exemplars = ExemplarInfo.ParseRecord (record);
                         foreach (var exemplar in exemplars)
@@ -167,14 +143,36 @@ internal sealed class Program
                         }
                     }
                 });
-            AnsiConsole.WriteLine ("Экземпляры загружены");
+            AnsiConsole.WriteLine ("Книги загружены");
+
+            var translatorCount = 0;
+            AnsiConsole.Status()
+                .Start ("Загрузка транслятора", _ =>
+                {
+                    var found = storehouse.GetKladovka().GetTranslator()
+                        .Select (it => it.Inventory.ToInvariantString()).ToArray();
+                    foreach (var one in found)
+                    {
+                        if (!irbisExepmlars.Contains (one))
+                        {
+                            irbisExepmlars.Add (one);
+                            translatorCount++;
+                        }
+                    }
+
+                    AnsiConsole.WriteLine ("Транслятор обработан");
+                });
 
             AnsiConsole.Status()
-                .Start ("Загрузка читателей", context =>
+                .Start ("Загрузка читателей", _ =>
                 {
-                    var found = storehouse.GetKladovka().GetReaders().Where (it => it.Category == "служебная запись");
-                    var filtered = found.Select (it => it.Ticket).Where (it => !string.IsNullOrEmpty (it));
-                    foreach (var one in filtered)
+                    var found = storehouse.GetKladovka().GetReaders()
+                        .Where (it => it.Category == "служебная запись")
+                        .Select (it => it.Ticket)
+                        .ToArray()
+                        .Where (it => !string.IsNullOrEmpty (it))
+                        .ToArray();
+                    foreach (var one in found)
                     {
                         specialReaders.Add (one!);
                     }
@@ -182,21 +180,25 @@ internal sealed class Program
                     var readerList = string.Join (", ", specialReaders);
                     AnsiConsole.WriteLine ($"Спецчитатели: {readerList}");
                 });
+
             AnsiConsole.Status()
-                .Start ("Загрузка выдач", context =>
+                .Start ("Загрузка выдач", _ =>
                 {
-                    var found = storehouse.GetKladovka().GetPodsob().ToArray();
-                    var selected = found
-                        .Where (it => !string.IsNullOrEmpty (it.Ticket) && specialReaders.Contains (it.Ticket))
-                        .Select (it => it.Inventory.ToInvariantString());
-                    foreach (var one in selected)
+                    var found = storehouse.GetKladovka().GetPodsob()
+                        .ToArray()
+                        .Where (it => !string.IsNullOrEmpty (it.Ticket)
+                                      && specialReaders.Contains (it.Ticket))
+                        .Select (it => it.Inventory.ToInvariantString())
+                        .ToArray();
+                    foreach (var one in found)
                     {
                         podsobFonds.Add (one);
                     }
                     AnsiConsole.WriteLine ("Выдачи загружены");
                 });
 
-            var counter = 0;
+            var sifted = 0; // отсеянные экземпляры
+            var screenedOut = 0; // экземпляры, успешно прошедшие отсеивание
             AnsiConsole.Progress()
                 .AutoClear (false)
                 .HideCompleted (false)
@@ -209,27 +211,36 @@ internal sealed class Program
                     )
                 .Start (context =>
                 {
-                    var task = context.AddTask ("Отсеивание");
+                    var task = context.AddTask ("Отсев");
                     task.MaxValue = irbisExepmlars.Count;
-                    for (var i = 0; i < irbisExepmlars.Count; i++)
+                    var exemplars = irbisExepmlars.ToArray();
+                    for (var i = 0; i < exemplars.Length; i++)
                     {
                         task.Value = i;
-                        var exemplar = irbisExepmlars[i];
+                        var exemplar = exemplars[i];
                         if (!podsobFonds.Contains (exemplar))
                         {
-                            counter++;
+                            screenedOut++;
+                        }
+                        else
+                        {
+                            sifted++;
                         }
                     }
 
-                    AnsiConsole.WriteLine ("Экземпляры отсеяны");
+                    task.Value = task.MaxValue;
+                    AnsiConsole.WriteLine ("Отсев завершен");
                 });
 
             var table = new Table();
             table.AddColumn ("[blue]Показатель[/]");
             table.AddColumn (new TableColumn ("[blue]Количество[/]").RightAligned());
             table.AddRow ("В базе данных", $"[yellow]{irbisExepmlars.Count}[/]");
+            table.AddRow ("Из транслятора", $"[yellow]{translatorCount}[/]");
             table.AddRow ("Спецчитателей", $"[yellow]{specialReaders.Count}[/]");
             table.AddRow ("В подсобных фондах", $"[yellow]{podsobFonds.Count}[/]");
+            table.AddRow ("Отсеянных", $"[yellow]{sifted}[/]");
+            table.AddRow ("Прошедших отсеивание", $"[yellow]{screenedOut}[/]");
 
             AnsiConsole.WriteLine();
             AnsiConsole.Write (table);

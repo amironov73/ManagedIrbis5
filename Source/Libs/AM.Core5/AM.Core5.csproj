@@ -49,6 +49,7 @@
         <PackageReference Include="ReactiveUI" />
         <PackageReference Include="ReactiveUI.Fody" />
         <PackageReference Include="Rookout" />
+        <PackageReference Include="Spectre.Console" />
         <PackageReference Include="System.CommandLine" />
         <PackageReference Include="System.Configuration.ConfigurationManager" />
         <PackageReference Include="System.Security.Cryptography.ProtectedData" />
