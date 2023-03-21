@@ -1188,7 +1188,7 @@ public class InternPool
             return IsSubsetOfInternPool (otherAsSet);
         }
 
-        (var uniqueCount, var unfoundCount) = CheckUniqueAndUnfoundElements (other, returnIfUnfound: false);
+        var (uniqueCount, unfoundCount) = CheckUniqueAndUnfoundElements (other, returnIfUnfound: false);
         return uniqueCount == Count && unfoundCount >= 0;
     }
 

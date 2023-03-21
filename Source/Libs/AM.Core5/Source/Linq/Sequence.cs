@@ -487,7 +487,7 @@ public static class Sequence
     {
         foreach (var item in sequence)
         {
-            if (!ReferenceEquals (item, null))
+            if (item is not null)
             {
                 yield return item;
             }

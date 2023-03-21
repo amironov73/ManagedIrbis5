@@ -22,6 +22,7 @@
 
 #region Using directives
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -56,23 +57,31 @@ public class SequenceEqualityComparer<T>
     /// <param name="x"></param>
     /// <param name="y"></param>
     /// <returns></returns>
-    public bool Equals (IList<T>? x, IList<T>? y)
+    public bool Equals
+        (
+            IList<T>? x,
+            IList<T>? y
+        )
     {
-        return ReferenceEquals (x, y) || (x != null && y != null && x.SequenceEqual (y, _elementComparer));
+        return ReferenceEquals (x, y) || x is not null && y is not null && x.SequenceEqual (y, _elementComparer);
     }
 
     /// <inheritdoc cref="IEqualityComparer{T}.GetHashCode(T)"/>
     public int GetHashCode (IList<T>? obj)
     {
-        if (obj == null)
-        {
-            return 0;
-        }
+        return HashCode.Combine (obj);
 
-        // Will not throw an OverflowException
-        unchecked
-        {
-            return obj.Where (e => e != null).Select (_elementComparer.GetHashCode!).Aggregate (17, (a, b) => 23 * a + b);
-        }
+        // if (obj is null)
+        // {
+        //     return 0;
+        // }
+        //
+        // // Will not throw an OverflowException
+        // unchecked
+        // {
+        //     return obj.Where (e => e is not null)
+        //         .Select (_elementComparer.GetHashCode!)
+        //         .Aggregate (17, (a, b) => 23 * a + b);
+        // }
     }
 }

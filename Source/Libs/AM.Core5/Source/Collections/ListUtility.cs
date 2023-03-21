@@ -5,7 +5,6 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 
-
 /* Listtility.cs -- работа со списками List
  * Ars Magna project, http://arsmagna.ru
  */
