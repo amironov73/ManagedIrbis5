@@ -91,6 +91,7 @@ public class BusyStripe
     private float _position;
     private readonly float _speed = 0.05f;
     private bool _back;
+    private bool? _saveVisible;
 
     private void _timer_Tick
         (
@@ -125,6 +126,17 @@ public class BusyStripe
                 (
                     () =>
                     {
+                        if (state && !Visible)
+                        {
+                            _saveVisible = Visible;
+                            Visible = true;
+                        }
+
+                        if (!state && _saveVisible.HasValue)
+                        {
+                            Visible = _saveVisible.Value;
+                        }
+
                         Moving = state;
                         Invalidate();
                     }

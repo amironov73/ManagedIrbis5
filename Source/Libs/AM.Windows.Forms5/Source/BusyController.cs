@@ -228,7 +228,6 @@ public class BusyController
         Sure.NotNull (action);
 
         var result = false;
-
         var state = State;
         if (state is not null)
         {

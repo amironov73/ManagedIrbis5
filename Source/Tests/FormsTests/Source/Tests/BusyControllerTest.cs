@@ -70,10 +70,7 @@ public sealed class BusyControllerTest
         stripe.SubscribeTo (state);
         form.Controls.Add (stripe);
 
-        var controller = new BusyController
-        {
-            State = state
-        };
+        var controller = new BusyController (state);
         controller.Controls.Add (firstButton);
         controller.Controls.Add (secondButton);
         controller.ExceptionOccur += (_, args) => { ExceptionBox.Show (ownerWindow, args.Exception); };

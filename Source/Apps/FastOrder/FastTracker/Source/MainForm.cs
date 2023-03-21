@@ -8,7 +8,7 @@
 // ReSharper disable LocalizableElement
 // ReSharper disable StringLiteralTypo
 
-/* MainForm.cs -- главная форма программы
+/* MainForm.cs -- РіР»Р°РІРЅР°СЏ С„РѕСЂРјР° РїСЂРѕРіСЂР°РјРјС‹
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -35,7 +35,7 @@ using Istu.OldModel;
 namespace FastTracker;
 
 /// <summary>
-/// Главная форма программы.
+/// Р“Р»Р°РІРЅР°СЏ С„РѕСЂРјР° РїСЂРѕРіСЂР°РјРјС‹.
 /// </summary>
 internal sealed class MainForm
     : Form
@@ -43,7 +43,7 @@ internal sealed class MainForm
     #region Construction
 
     /// <summary>
-    /// Конструктор.
+    /// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ.
     /// </summary>
     public MainForm()
     {
@@ -51,34 +51,43 @@ internal sealed class MainForm
         MinimumSize = formSize;
         Size = formSize;
 
-        Text = "Отслеживание заказов";
+        Text = "РћС‚СЃР»РµР¶РёРІР°РЅРёРµ Р·Р°РєР°Р·РѕРІ";
         var panel = new TableLayoutPanel
         {
-            BackColor = Color.AntiqueWhite,
             Dock = DockStyle.Fill
         };
-
-        _busyStripe = new BusyStripe
-        {
-            Dock = DockStyle.Top,
-            Text = "Обновление данных на сервере"
-        };
-        Controls.Add (_busyStripe);
-
+        panel.ColumnCount = 1;
+        panel.ColumnStyles.Add (new ColumnStyle (SizeType.Percent, 100));
+        panel.RowCount = 3;
+        panel.RowStyles.Add (new RowStyle (SizeType.AutoSize));
+        panel.RowStyles.Add (new RowStyle (SizeType.AutoSize));
+        panel.RowStyles.Add (new RowStyle (SizeType.Percent, 100));
 
         var toolbar = new ToolStrip
         {
             Dock = DockStyle.Top,
             Items =
             {
-                new ToolStripButton ("Обновить").OnClick (SomeReaction),
-                new ToolStripButton ("Распечатать").OnClick (SomeReaction),
-                new ToolStripButton ("Выполнить").OnClick (SomeReaction),
-                new ToolStripButton ("Отказать").OnClick (SomeReaction),
-                new ToolStripButton ("Удалить").OnClick (SomeReaction),
+                new ToolStripButton ("РћР±РЅРѕРІРёС‚СЊ").OnClick (SomeReaction),
+                new ToolStripButton ("Р Р°СЃРїРµС‡Р°С‚Р°С‚СЊ").OnClick (SomeReaction),
+                new ToolStripButton ("Р’С‹РґР°С‚СЊ").OnClick (SomeReaction),
+                new ToolStripButton ("РћС‚РєР°Р·Р°С‚СЊ").OnClick (SomeReaction),
+                new ToolStripButton ("РЈРґР°Р»РёС‚СЊ").OnClick (SomeReaction),
             }
         };
-        Controls.Add (toolbar);
+        panel.Controls.Add (toolbar, 0, 0);
+
+        _busyState = new BusyState();
+        var busyStripe = new BusyStripe
+        {
+            // Visible = false,
+            Dock = DockStyle.Top,
+            Height = 6,
+            ForeColor = Color.LimeGreen,
+            // Text = "РћР±РЅРѕРІР»РµРЅРёРµ РґР°РЅРЅС‹С… РЅР° СЃРµСЂРІРµСЂРµ"
+        };
+        busyStripe.SubscribeTo (_busyState);
+        panel.Controls.Add (busyStripe, 0, 1);
 
         var orders = FakeData.FakeOrderSource.GetOrders();
         _dataSource = new BindingListSource<Order>();
@@ -89,7 +98,7 @@ internal sealed class MainForm
             // DataSource = orders
         };
         _gridView.SetDataObject (orders);
-        panel.Controls.Add (_gridView);
+        panel.Controls.Add (_gridView, 0, 2);
 
         Controls.Add (panel);
     }
@@ -98,17 +107,22 @@ internal sealed class MainForm
 
     #region Private members
 
-    private readonly BusyStripe _busyStripe;
+    private readonly BusyState _busyState;
     private readonly HandyGrid _gridView;
     private readonly BindingListSource<Order> _dataSource;
 
-    private void SomeReaction
+    private async void SomeReaction
         (
             object? sender,
             EventArgs eventArgs
         )
     {
-        MessageBox.Show ("Выполнили");
+        var controller = new BusyController (_busyState);
+        await controller.RunAsync (() =>
+        {
+            Thread.Sleep (3000);
+        });
+        MessageBox.Show ("Р’С‹РїРѕР»РЅРёР»Рё");
     }
 
     #endregion

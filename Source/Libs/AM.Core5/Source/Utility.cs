@@ -5414,6 +5414,24 @@ public static class Utility
     }
 
     /// <summary>
+    /// Начинается ли данная строка с указанной подстроки?
+    /// </summary>
+    [Pure]
+    public static bool SafeStarts
+        (
+            this string? text,
+            string? supposed
+        )
+    {
+        if (string.IsNullOrEmpty (text) || string.IsNullOrEmpty (supposed))
+        {
+            return false;
+        }
+
+        return text.StartsWith (supposed);
+    }
+
+    /// <summary>
     /// Безопасный триминг строки.
     /// </summary>
     [Pure]
@@ -6574,13 +6592,13 @@ public static class Utility
     /// <summary>
     /// Произвести все возможные пермутации из элемента списка списков.
     /// </summary>
-    public static IEnumerable<IReadOnlyList<T>> Permute<T> 
+    public static IEnumerable<IReadOnlyList<T>> Permute<T>
         (
             IReadOnlyList<IReadOnlyList<T>> list
         )
     {
         Sure.NotNull (list);
-        
+
         var rank = list.Count;
         if (rank == 0)
         {
@@ -6590,13 +6608,13 @@ public static class Utility
         for (var i = 0; i < rank; i++)
         {
             Sure.NotNull (list[i]);
-            
+
             if (list[i].Count == 0)
             {
                 yield break;
             }
         }
-    
+
         var indexes = new List<int> (rank);
         for (var i = 0; i < rank; i++)
         {
@@ -6638,6 +6656,6 @@ public static class Utility
             }
         }
     }
-    
+
     #endregion
 }
