@@ -51,7 +51,9 @@ public sealed class EnumComboBox
             }
 
             FillItems (value);
-            SetAndRaise (EnumTypeProperty, ref _enumType, value);
+            // TODO implement
+            // SetAndRaise (EnumTypeProperty, ref _enumType, value);
+            _enumType = value;
         }
     }
 

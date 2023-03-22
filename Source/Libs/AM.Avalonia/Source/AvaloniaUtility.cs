@@ -760,9 +760,10 @@ public static class AvaloniaUtility
         var parent = control.Parent;
         while (parent is not null)
         {
-            if (parent.DataContext is TDataContext)
+            if (parent.DataContext is TDataContext
+                && parent is Control parentControl)
             {
-                return parent;
+                return parentControl;
             }
 
             parent = parent.Parent;
@@ -818,7 +819,7 @@ public static class AvaloniaUtility
                 return new SimpleThemeResources (resourceHost);
             }
         }
-        
+
         return new FallbackThemeResources();
     }
 

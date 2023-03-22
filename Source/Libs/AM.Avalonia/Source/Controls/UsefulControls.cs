@@ -12,6 +12,7 @@
 #region Using directives
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 using Avalonia.Controls;
@@ -44,7 +45,7 @@ public static class UsefulControls
     /// <returns>Созданный список.</returns>
     public static ItemsControl HorizontalWrappingItemsControl<TItem>
         (
-            IEnumerable<TItem>? items,
+            IList? items,
             IDataTemplate? itemTemplate,
             Orientation orientation = Orientation.Horizontal
         )
@@ -75,7 +76,7 @@ public static class UsefulControls
     /// <returns>Созданный список.</returns>
     public static ItemsControl HorizontalWrappingItemsControl<TItem>
         (
-            IEnumerable<TItem>? items,
+            IList? items,
             Func<TItem, INameScope, Control?> itemTemplate,
             Orientation orientation = Orientation.Horizontal
         )
@@ -108,7 +109,7 @@ public static class UsefulControls
     /// <returns>Созданный список.</returns>
     public static ListBox HorizontalWrappingListBox<TItem>
         (
-            IEnumerable<TItem>? items,
+            IList? items,
             IDataTemplate? itemTemplate,
             Orientation orientation = Orientation.Horizontal
         )
@@ -139,7 +140,7 @@ public static class UsefulControls
     /// <returns>Созданный список.</returns>
     public static ListBox HorizontalWrappingListBox<TItem>
         (
-            IEnumerable<TItem>? items,
+            IList? items,
             Func<TItem, INameScope, Control?> itemTemplate,
             Orientation orientation = Orientation.Horizontal
         )

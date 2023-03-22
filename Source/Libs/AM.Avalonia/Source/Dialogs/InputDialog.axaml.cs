@@ -33,7 +33,7 @@ namespace AM.Avalonia.Dialogs;
 /// <summary>
 /// Простой диалог ввода строкового значения.
 /// </summary>
-public sealed class InputDialog
+public sealed partial class InputDialog
     : Window
 {
     #region Properties
