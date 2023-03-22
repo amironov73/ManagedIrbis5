@@ -4,9 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable UnusedType.Global
 
 /* InputLanguageIndicator.cs -- индикатор языка ввода
  * Ars Magna project, http://arsmagna.ru
@@ -18,6 +15,8 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -27,6 +26,7 @@ namespace AM.Windows.Forms;
 /// <summary>
 /// Индикатор языка ввода.
 /// </summary>
+[PublicAPI]
 [System.ComponentModel.DesignerCategory ("Code")]
 public sealed class InputLanguageIndicator
     : Control
@@ -39,7 +39,7 @@ public sealed class InputLanguageIndicator
     public InputLanguageIndicator()
     {
         SetStyle (ControlStyles.OptimizedDoubleBuffer, true);
-        SetStyle (ControlStyles.Selectable, true);
+        SetStyle (ControlStyles.Selectable, false);
 
         ForeColor = Color.White;
         BackColor = Color.Blue;
@@ -106,8 +106,8 @@ public sealed class InputLanguageIndicator
     {
         get
         {
-            var height = 22;
-            var width = height;
+            const int height = 22;
+            const int width = height;
             return new Size (width, height);
         }
     }
@@ -128,11 +128,11 @@ public sealed class InputLanguageIndicator
     /// <inheritdoc cref="Control.OnKeyDown" />
     protected override void OnKeyDown
         (
-            KeyEventArgs e
+            KeyEventArgs eventArgs
         )
     {
-        base.OnKeyDown (e);
-        switch (e.KeyData)
+        base.OnKeyDown (eventArgs);
+        switch (eventArgs.KeyData)
         {
             case Keys.Space:
             case Keys.Enter:

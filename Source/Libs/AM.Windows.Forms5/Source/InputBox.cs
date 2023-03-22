@@ -2,14 +2,8 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedParameter.Local
 
 /* InputBox.cs -- простой диалог для ввода строкового значения
  * Ars Magna project, http://arsmagna.ru
@@ -18,6 +12,8 @@
 #region Using directives
 
 using System.Windows.Forms;
+
+using JetBrains.Annotations;
 
 #endregion
 
@@ -28,13 +24,14 @@ namespace AM.Windows.Forms;
 /// <summary>
 /// Простой диалог для ввода строкового значения.
 /// </summary>
+[PublicAPI]
 public sealed class InputBox
     : Form
 {
     #region Properties
 
     /// <summary>
-    /// Character for password entry.
+    /// Символ, который нужно использовать при вводе пароля.
     /// </summary>
     public static char PasswordChar { get; set; } = '*';
 
@@ -51,15 +48,15 @@ public sealed class InputBox
 
     #region Private members
 
-    private Panel? panel1;
-    private Label? topLabel;
-    private TextBox? inputTextBox;
-    private Button? okButton;
-    private Button? cancelButton;
-    private ImageList? imageList1;
-    private Label? promptLabel;
-    private PictureBox? pictureBox1;
-    private System.ComponentModel.IContainer? components;
+    private Panel? _mainPanel;
+    private Label? _topLabel;
+    private TextBox? _inputTextBox;
+    private Button? _okButton;
+    private Button? _cancelButton;
+    private ImageList? _imageList;
+    private Label? _promptLabel;
+    private PictureBox? _pictureBox1;
+    private System.ComponentModel.IContainer? _components;
 
     /// <summary>
     /// Required method for Designer support - do not modify
@@ -67,108 +64,117 @@ public sealed class InputBox
     /// </summary>
     private void InitializeComponent()
     {
-        components = new System.ComponentModel.Container();
-        var resources = new System.ComponentModel.ComponentResourceManager(typeof(InputBox));
-        panel1 = new Panel();
-        pictureBox1 = new PictureBox();
-        topLabel = new Label();
-        promptLabel = new Label();
-        inputTextBox = new TextBox();
-        imageList1 = new ImageList(components);
-        okButton = new Button();
-        cancelButton = new Button();
-        panel1.SuspendLayout();
-        ((System.ComponentModel.ISupportInitialize)(pictureBox1)).BeginInit();
+        _components = new System.ComponentModel.Container();
+        var resources = new System.ComponentModel.ComponentResourceManager (typeof (InputBox));
+        _mainPanel = new Panel();
+        _pictureBox1 = new PictureBox();
+        _topLabel = new Label();
+        _promptLabel = new Label();
+        _inputTextBox = new TextBox();
+        _imageList = new ImageList (_components);
+        _okButton = new Button();
+        _cancelButton = new Button();
+        _mainPanel.SuspendLayout();
+        ((System.ComponentModel.ISupportInitialize)(_pictureBox1)).BeginInit();
         SuspendLayout();
+
         //
         // panel1
         //
-        resources.ApplyResources(panel1, "panel1");
-        panel1.BackColor = System.Drawing.Color.White;
-        panel1.BorderStyle = BorderStyle.FixedSingle;
-        panel1.Controls.Add(pictureBox1);
-        panel1.Controls.Add(topLabel);
-        panel1.Name = "panel1";
+        resources.ApplyResources (_mainPanel, "_mainPanel");
+        _mainPanel.BackColor = System.Drawing.Color.White;
+        _mainPanel.BorderStyle = BorderStyle.FixedSingle;
+        _mainPanel.Controls.Add (_pictureBox1);
+        _mainPanel.Controls.Add (_topLabel);
+        _mainPanel.Name = "_mainPanel";
+
         //
         // pictureBox1
         //
-        resources.ApplyResources(pictureBox1, "pictureBox1");
-        pictureBox1.Name = "pictureBox1";
-        pictureBox1.TabStop = false;
+        resources.ApplyResources (_pictureBox1, "_pictureBox1");
+        _pictureBox1.Name = "_pictureBox1";
+        _pictureBox1.TabStop = false;
+
         //
         // topLabel
         //
-        resources.ApplyResources(topLabel, "topLabel");
-        topLabel.Name = "topLabel";
+        resources.ApplyResources (_topLabel, "_topLabel");
+        _topLabel.Name = "_topLabel";
+
         //
         // promptLabel
         //
-        resources.ApplyResources(promptLabel, "promptLabel");
-        promptLabel.Name = "promptLabel";
+        resources.ApplyResources (_promptLabel, "_promptLabel");
+        _promptLabel.Name = "_promptLabel";
+
         //
         // inputTextBox
         //
-        resources.ApplyResources(inputTextBox, "inputTextBox");
-        inputTextBox.Name = "inputTextBox";
+        resources.ApplyResources (_inputTextBox, "_inputTextBox");
+        _inputTextBox.Name = "_inputTextBox";
+
         //
         // imageList1
         //
-        imageList1.ImageStream = ((ImageListStreamer?)(resources.GetObject("imageList1.ImageStream")));
-        imageList1.TransparentColor = System.Drawing.Color.White;
-        imageList1.Images.SetKeyName(0, "");
-        imageList1.Images.SetKeyName(1, "");
+        _imageList.ImageStream = ((ImageListStreamer?)(resources.GetObject ("_imageList.ImageStream")));
+        _imageList.TransparentColor = System.Drawing.Color.White;
+        _imageList.Images.SetKeyName (0, "");
+        _imageList.Images.SetKeyName (1, "");
+
         //
         // okButton
         //
-        resources.ApplyResources(okButton, "okButton");
-        okButton.DialogResult = DialogResult.OK;
-        okButton.ImageList = imageList1;
-        okButton.Name = "okButton";
+        resources.ApplyResources (_okButton, "_okButton");
+        _okButton.DialogResult = DialogResult.OK;
+        _okButton.ImageList = _imageList;
+        _okButton.Name = "_okButton";
+
         //
         // cancelButton
         //
-        resources.ApplyResources(cancelButton, "cancelButton");
-        cancelButton.DialogResult = DialogResult.Cancel;
-        cancelButton.ImageList = imageList1;
-        cancelButton.Name = "cancelButton";
+        resources.ApplyResources (_cancelButton, "_cancelButton");
+        _cancelButton.DialogResult = DialogResult.Cancel;
+        _cancelButton.ImageList = _imageList;
+        _cancelButton.Name = "_cancelButton";
+
         //
         // InputBox
         //
-        AcceptButton = okButton;
-        resources.ApplyResources(this, "$this");
-        CancelButton = cancelButton;
+        AcceptButton = _okButton;
+        resources.ApplyResources (this, "$this");
+        CancelButton = _cancelButton;
         ControlBox = false;
-        Controls.Add(cancelButton);
-        Controls.Add(okButton);
-        Controls.Add(inputTextBox);
-        Controls.Add(promptLabel);
-        Controls.Add(panel1);
+        Controls.Add (_cancelButton);
+        Controls.Add (_okButton);
+        Controls.Add (_inputTextBox);
+        Controls.Add (_promptLabel);
+        Controls.Add (_mainPanel);
         FormBorderStyle = FormBorderStyle.FixedDialog;
         MaximizeBox = false;
         MinimizeBox = false;
         Name = "InputBox";
         ShowInTaskbar = false;
         SizeGripStyle = SizeGripStyle.Hide;
-        panel1.ResumeLayout(false);
-        ((System.ComponentModel.ISupportInitialize)(pictureBox1)).EndInit();
-        ResumeLayout(false);
+        _mainPanel.ResumeLayout (false);
+        ((System.ComponentModel.ISupportInitialize)(_pictureBox1)).EndInit();
+        ResumeLayout (false);
         PerformLayout();
-
     }
 
     /// <summary>
     /// Clean up any resources being used.
     /// </summary>
-    protected override void Dispose(bool disposing)
+    protected override void Dispose
+        (
+            bool disposing
+        )
     {
         if (disposing)
         {
-            if (components != null)
-            {
-                components.Dispose();
-            }
+            _components?.Dispose();
         }
-        base.Dispose(disposing);
+
+        base.Dispose (disposing);
     }
 
     #endregion
@@ -217,18 +223,19 @@ public sealed class InputBox
         )
     {
         using var box = new InputBox();
-        if (!ReferenceEquals(topText, null))
+        if (topText is not null)
         {
-            box.topLabel!.Text = topText;
+            box._topLabel!.Text = topText;
         }
 
         box.Text = caption;
-        box.promptLabel!.Text = prompt;
-        box.inputTextBox!.Text = theValue;
+        box._promptLabel!.Text = prompt;
+        box._inputTextBox!.Text = theValue;
+
         // box.inputTextBox!.PasswordChar = PasswordChar;
 
         var result = box.ShowDialog();
-        theValue = box.inputTextBox.Text;
+        theValue = box._inputTextBox.Text;
 
         return result;
     }
