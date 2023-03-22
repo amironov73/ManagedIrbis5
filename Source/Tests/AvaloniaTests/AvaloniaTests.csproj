@@ -28,14 +28,6 @@
         <PackageReference Include="Avalonia.ReactiveUI" />
         <PackageReference Include="ReactiveUI" />
         <PackageReference Include="ReactiveUI.Fody" />
-        <PackageReference Include="XamlNameReferenceGenerator" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <Compile Update="Source\MainWindow.axaml.cs">
-            <DependentUpon>MainWindow.axaml</DependentUpon>
-            <SubType>Code</SubType>
-        </Compile>
     </ItemGroup>
 
     <ItemGroup>

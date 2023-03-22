@@ -865,6 +865,20 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
+    /// Включение ссылки на наши стили.
+    /// </summary>
+    public static IStyle IncludeArsMagnaStyles ()
+    {
+        var uri = new Uri ("avares://AM.Avalonia/Styles.axaml");
+        var result = new StyleInclude (uri)
+        {
+            Source = uri
+        };
+
+        return result;
+    }
+
+    /// <summary>
     /// Включение ссылки на стили DataGrid.
     /// </summary>
     public static IStyle IncludeDataGridStyles

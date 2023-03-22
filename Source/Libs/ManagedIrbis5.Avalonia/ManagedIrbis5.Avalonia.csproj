@@ -48,13 +48,6 @@
         <PackageReference Include="ReactiveUI.Fody" />
         <PackageReference Include="SkiaSharp" />
         <PackageReference Include="Microsoft.Extensions.Logging" />
-        <PackageReference Include="XamlNameReferenceGenerator" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <Compile Update="Source\FieldEditorWindow.axaml.cs">
-            <DependentUpon>FieldEditorWindow.axaml</DependentUpon>
-        </Compile>
     </ItemGroup>
 
 </Project>
