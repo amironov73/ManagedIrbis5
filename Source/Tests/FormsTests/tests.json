@@ -112,6 +112,10 @@
     "title": "PlainTextEditor"
   },
   {
+    "class": "FormsTests.PlainTextFormTest",
+    "title": "PlainTextForm"
+  },
+  {
     "class": "FormsTests.RichTextEditorTest",
     "title": "RichTextEditor"
   },

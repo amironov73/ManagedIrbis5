@@ -4,11 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable VirtualMemberCallInConstructor
+// ReSharper disable LocalizableElement
 
 /* PlainTextForm.cs -- форма для демонстрации простого текста
  * Ars Magna project, http://arsmagna.ru
@@ -16,7 +12,10 @@
 
 #region Using directives
 
+using System.Diagnostics.CodeAnalysis;
 using System.Windows.Forms;
+
+using JetBrains.Annotations;
 
 #endregion
 
@@ -29,7 +28,8 @@ namespace AM.Windows.Forms;
 /// некоторого простого текста, например,
 /// лицензионного соглашения или простейшего отчета.
 /// </summary>
-public sealed partial class PlainTextForm
+[PublicAPI]
+public sealed class PlainTextForm
     : Form
 {
     #region Properties
@@ -37,15 +37,25 @@ public sealed partial class PlainTextForm
     /// <summary>
     /// Текстовый редактор, используемый для отображения текста.
     /// </summary>
-    public PlainTextEditor Editor => _textControl;
+    public PlainTextEditor Editor => _textControl!;
+
+    /// <summary>
+    /// Заголовок формы.
+    /// </summary>
+    public string Title
+    {
+        get => base.Text;
+        set => base.Text = value;
+    }
 
     /// <inheritdoc cref="Control.Text" />
-    public override string? Text
+    [AllowNull]
+    public override string Text
     {
-        get => _textControl?.Text;
+        get => _textControl?.Text ?? string.Empty;
         set
         {
-            if (!ReferenceEquals (_textControl, null))
+            if (_textControl is not null)
             {
                 _textControl.Text = value ?? string.Empty;
             }
@@ -69,11 +79,25 @@ public sealed partial class PlainTextForm
     /// </summary>
     public PlainTextForm
         (
-            string? text
+            string text
         )
         : this()
     {
         Text = text;
+    }
+
+    #endregion
+
+    #region Private members
+
+    private PlainTextEditor? _textControl;
+
+    private void InitializeComponent()
+    {
+        Title = "Редактор плоского текста";
+
+        _textControl = new PlainTextEditor { Dock = DockStyle.Fill };
+        Controls.Add (_textControl);
     }
 
     #endregion
@@ -99,7 +123,7 @@ public sealed partial class PlainTextForm
     public static DialogResult ShowDialog
         (
             IWin32Window? owner,
-            string? text,
+            string text,
             bool maximized = false
         )
     {

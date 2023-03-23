@@ -4,10 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
 
 /* PlainTextEditor.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -17,229 +13,246 @@
 
 using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
 
 using AM.Windows.Forms.Printing;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Редактор для плоского текста с панелью инструментов.
+/// </summary>
+[PublicAPI]
+public partial class PlainTextEditor
+    : UserControl
 {
-    /// <summary>
-    ///
-    /// </summary>
-    public partial class PlainTextEditor
-        : UserControl
+    #region Properties
+
+    private string? FileName { get; set; }
+
+    /// <inheritdoc cref="UserControl.Text"/>
+    [AllowNull]
+    public override string Text
     {
-        #region Properties
-
-        private string? FileName { get; set; }
-
-        /// <inheritdoc />
-        public override string Text
+        get => _textBox.Text;
+        set
         {
-            get => _textBox.Text;
-            set => _textBox.Text = value;
+            _textBox.Text = value;
+            _textBox.Select (0, 0);
         }
-
-        /// <summary>
-        /// Text box.
-        /// </summary>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-        public TextBox TextBox => _textBox;
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PlainTextEditor()
-        {
-            InitializeComponent();
-        }
-
-        #endregion
-
-        #region Private members
-
-        private void _newToolStripButton_Click
-            (
-                object sender,
-                EventArgs e
-            )
-        {
-            Clear();
-        }
-
-        private void _openToolStripButton_Click
-            (
-                object sender,
-                EventArgs e
-            )
-        {
-            LoadFromFile();
-        }
-
-        private void _saveToolStripButton_Click
-            (
-                object sender,
-                EventArgs e
-            )
-        {
-            SaveToFile();
-        }
-
-        private void _printToolStripButton_Click
-            (
-                object sender,
-                EventArgs e
-            )
-        {
-            Print();
-        }
-
-        private void _cutToolStripButton_Click
-            (
-                object sender,
-                EventArgs e
-            )
-        {
-            Cut();
-        }
-
-        private void _copyToolStripButton_Click
-            (
-                object sender,
-                EventArgs e
-            )
-        {
-            Copy();
-        }
-
-        private void _pasteToolStripButton_Click
-            (
-                object sender,
-                EventArgs e
-            )
-        {
-            Paste();
-        }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Add the button to the toolbox.
-        /// </summary>
-        public PlainTextEditor AddButton
-            (
-                ToolStripButton button
-            )
-        {
-            _toolStrip.Items.Add(button);
-
-            return this;
-        }
-
-        /// <summary>
-        /// Clear the text area.
-        /// </summary>
-        public void Clear()
-        {
-            _textBox.Clear();
-        }
-
-        /// <summary>
-        /// Copy selected text to the clipboard.
-        /// </summary>
-        public void Copy()
-        {
-            _textBox.Copy();
-        }
-
-        /// <summary>
-        /// Cut selected text to the clipboard.
-        /// </summary>
-        public void Cut()
-        {
-            _textBox.Cut();
-        }
-
-        /// <summary>
-        /// Load text from file.
-        /// </summary>
-        public void LoadFromFile()
-        {
-            if (_openFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                FileName = _openFileDialog.FileName.ThrowIfNull();
-
-                LoadFromFile (FileName);
-            }
-        }
-
-        /// <summary>
-        /// Load text from the file.
-        /// </summary>
-        public void LoadFromFile
-            (
-                string fileName
-            )
-        {
-            Text = File.ReadAllText (fileName, Encoding.UTF8);
-        }
-
-        /// <summary>
-        /// Paste text from the clipboard.
-        /// </summary>
-        public void Paste()
-        {
-            _textBox.Paste();
-        }
-
-        /// <summary>
-        /// Print the text.
-        /// </summary>
-        public void Print()
-        {
-            var printer = new PlainTextPrinter();
-            printer.Print(Text);
-        }
-
-        /// <summary>
-        /// Save the text to file.
-        /// </summary>
-        public void SaveToFile()
-        {
-            if (string.IsNullOrEmpty(FileName))
-            {
-                if (_saveFileDialog.ShowDialog() != DialogResult.OK)
-                {
-                    return;
-                }
-                FileName = _saveFileDialog.FileName.ThrowIfNull();
-            }
-            SaveToFile(FileName);
-        }
-
-        /// <summary>
-        /// Save the text to the file.
-        /// </summary>
-        public void SaveToFile
-            (
-                string fileName
-            )
-        {
-            File.WriteAllText(fileName, Text, Encoding.UTF8);
-        }
-
-        #endregion
     }
+
+    /// <summary>
+    /// Контрол, содержащий текст.
+    /// </summary>
+    [DesignerSerializationVisibility (DesignerSerializationVisibility.Content)]
+    public TextBox TextBox => _textBox;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public PlainTextEditor()
+    {
+        InitializeComponent();
+    }
+
+    #endregion
+
+    #region Private members
+
+    private void _newToolStripButton_Click
+        (
+            object sender,
+            EventArgs eventArgs
+        )
+    {
+        Clear();
+    }
+
+    private void _openToolStripButton_Click
+        (
+            object sender,
+            EventArgs eventArgs
+        )
+    {
+        LoadFromFile();
+    }
+
+    private void _saveToolStripButton_Click
+        (
+            object sender,
+            EventArgs eventArgs
+        )
+    {
+        SaveToFile();
+    }
+
+    private void _printToolStripButton_Click
+        (
+            object sender,
+            EventArgs eventArgs
+        )
+    {
+        Print();
+    }
+
+    private void _cutToolStripButton_Click
+        (
+            object sender,
+            EventArgs eventArgs
+        )
+    {
+        Cut();
+    }
+
+    private void _copyToolStripButton_Click
+        (
+            object sender,
+            EventArgs eventArgs
+        )
+    {
+        Copy();
+    }
+
+    private void _pasteToolStripButton_Click
+        (
+            object sender,
+            EventArgs eventArgs
+        )
+    {
+        Paste();
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Добавление кнопки на панель инструментов.
+    /// </summary>
+    public PlainTextEditor AddButton
+        (
+            ToolStripButton button
+        )
+    {
+        Sure.NotNull (button);
+
+        _toolStrip.Items.Add (button);
+
+        return this;
+    }
+
+    /// <summary>
+    /// Удаление всего текста.
+    /// </summary>
+    public void Clear()
+    {
+        _textBox.Clear();
+    }
+
+    /// <summary>
+    /// Копирование выделенного фрагмента в буфер обмена.
+    /// </summary>
+    public void Copy()
+    {
+        _textBox.Copy();
+    }
+
+    /// <summary>
+    /// Вырезание выделенного фрагмента
+    /// и помещение его в буфер обмена.
+    /// </summary>
+    public void Cut()
+    {
+        _textBox.Cut();
+    }
+
+    /// <summary>
+    /// Загрузка текста из файла с запросом имени файла.
+    /// </summary>
+    public void LoadFromFile()
+    {
+        if (_openFileDialog.ShowDialog() == DialogResult.OK)
+        {
+            FileName = _openFileDialog.FileName.ThrowIfNull();
+
+            LoadFromFile (FileName);
+        }
+    }
+
+    /// <summary>
+    /// Загрузка текста из указанного файла.
+    /// </summary>
+    public void LoadFromFile
+        (
+            string fileName
+        )
+    {
+        Sure.FileExists (fileName);
+
+        Text = File.ReadAllText (fileName, Encoding.UTF8);
+    }
+
+    /// <summary>
+    /// Вставка текста из буфера обмена.
+    /// </summary>
+    public void Paste()
+    {
+        _textBox.Paste();
+    }
+
+    /// <summary>
+    /// Вывод на печать.
+    /// </summary>
+    public void Print()
+    {
+        var printer = new PlainTextPrinter();
+        printer.Print (Text);
+    }
+
+    /// <summary>
+    /// Сохранение текста в файл с запросом имени файла.
+    /// </summary>
+    public void SaveToFile()
+    {
+        if (string.IsNullOrEmpty (FileName))
+        {
+            if (_saveFileDialog.ShowDialog() != DialogResult.OK)
+            {
+                return;
+            }
+
+            FileName = _saveFileDialog.FileName.ThrowIfNull();
+        }
+
+        SaveToFile (FileName);
+    }
+
+    /// <summary>
+    /// Сохранение текста в указанный фаул.
+    /// </summary>
+    public void SaveToFile
+        (
+            string fileName
+        )
+    {
+        Sure.NotNullNorEmpty (fileName);
+
+        File.WriteAllText (fileName, Text, Encoding.UTF8);
+    }
+
+    #endregion
 }

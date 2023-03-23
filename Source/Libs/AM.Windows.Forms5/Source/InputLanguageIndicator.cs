@@ -119,7 +119,7 @@ public sealed class InputLanguageIndicator
         )
     {
         base.Dispose (disposing);
-        if (!ReferenceEquals (_form, null))
+        if (_form is not null)
         {
             _form.InputLanguageChanged -= _InputLanguageChanged;
         }
