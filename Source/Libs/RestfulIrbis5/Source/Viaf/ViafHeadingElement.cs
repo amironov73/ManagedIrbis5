@@ -15,67 +15,58 @@
 #region Using directives
 
 using System;
-using AM;
-using AM.Json;
+
+using Newtonsoft.Json.Linq;
 
 #endregion
 
 #nullable enable
 
-namespace RestfulIrbis.Viaf
+namespace RestfulIrbis.Viaf;
+
+/// <summary>
+///
+/// </summary>
+public class ViafHeadingElement
 {
+    #region Public methods
+
     /// <summary>
-    ///
+    /// Parse the object.
     /// </summary>
-    public class ViafHeadingElement
+    public static ViafHeadingElement Parse
+        (
+            JObject obj
+        )
     {
-        #region Public methods
+        throw new NotImplementedException();
 
-        /// <summary>
-        /// Parse the object.
-        /// </summary>
-        public static ViafHeadingElement Parse
-            (
-                // TODO: implement
-                object obj
-                // JObject obj
-            )
-        {
-            return new ViafHeadingElement
-            {
-            };
-        }
-
-        /// <summary>
-        /// Parse the array.
-        /// </summary>
-        public static ViafHeadingElement[] Parse
-            (
-                // TODO: implement
-                object[] array
-                // JArray? array
-            )
-        {
-            /*
-
-            if (ReferenceEquals(array, null))
-            {
-                return new ViafHeadingElement[0];
-            }
-
-            ViafHeadingElement[] result = new ViafHeadingElement[array.Count];
-            for (int i = 0; i < array.Count; i++)
-            {
-                result[i] = Parse((JObject)array[i]);
-            }
-
-            return result;
-
-            */
-
-            throw new NotImplementedException();
-        }
-
-        #endregion
+        // return new ViafHeadingElement
+        // {
+        // };
     }
+
+    /// <summary>
+    /// Parse the array.
+    /// </summary>
+    public static ViafHeadingElement[] Parse
+        (
+            JArray? array
+        )
+    {
+        if (array is null)
+        {
+            return Array.Empty<ViafHeadingElement>();
+        }
+
+        var result = new ViafHeadingElement[array.Count];
+        for (var i = 0; i < array.Count; i++)
+        {
+            result[i] = Parse ((JObject) array[i]);
+        }
+
+        return result;
+    }
+
+    #endregion
 }

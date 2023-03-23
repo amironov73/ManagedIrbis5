@@ -5,8 +5,6 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Local
-// ReSharper disable UnusedMember.Global
 
 /* OsmiUtility.cs -- полезные методы для работы с системой OSMI Cards
  * Ars Magna project, http://arsmagna.ru
@@ -20,6 +18,8 @@ using System.Web;
 
 using AM;
 using AM.IO;
+
+using JetBrains.Annotations;
 
 using ManagedIrbis;
 using ManagedIrbis.Readers;
@@ -39,6 +39,7 @@ namespace RestfulIrbis.OsmiCards;
 /// <summary>
 /// Полезные методы для работы с системой OSMI Cards.
 /// </summary>
+[PublicAPI]
 public static class OsmiUtility
 {
     #region Private members
@@ -52,7 +53,9 @@ public static class OsmiUtility
             string label
         )
     {
-        var result = (JObject?)obj["values"].ThrowIfNull()
+        Sure.NotNull (obj);
+
+        var result = (JObject?) obj["values"].ThrowIfNull()
             .FirstOrDefault
                 (
                     token => token["label"]?.Value<string>() == label
@@ -85,10 +88,14 @@ public static class OsmiUtility
             DicardsConfiguration config
         )
     {
-        var name = reader.FamilyName.ThrowIfNull ("name");
-        var fio = reader.FullName.ThrowIfNull ("fio");
+        Sure.NotNull (templateObject);
+        Sure.NotNull (reader);
+        Sure.NotNullNorEmpty (ticket);
+        Sure.NotNull (config);
 
-        var result = (JObject)templateObject.DeepClone();
+        var name = reader.FamilyName.ThrowIfNull();
+        var fio = reader.FullName.ThrowIfNull();
+        var result = (JObject) templateObject.DeepClone();
 
         JObject? block = null;
         if (!string.IsNullOrEmpty (config.FioField))
@@ -96,7 +103,7 @@ public static class OsmiUtility
             block = FindLabel (result, config.FioField);
         }
 
-        if (!ReferenceEquals (block, null))
+        if (block is not null)
         {
             block["value"] = fio;
         }
@@ -107,7 +114,7 @@ public static class OsmiUtility
             block = FindLabel (result, config.CabinetField);
         }
 
-        if (!ReferenceEquals (block, null))
+        if (block is not null)
         {
             var cabinetUrl = config.CabinetUrl;
             if (string.IsNullOrEmpty (cabinetUrl))
@@ -134,7 +141,7 @@ public static class OsmiUtility
             block = FindLabel (result, config.CatalogField);
         }
 
-        if (!ReferenceEquals (block, null))
+        if (block is not null)
         {
             var catalogUrl = config.CatalogUrl;
             if (string.IsNullOrEmpty (catalogUrl))
@@ -197,6 +204,9 @@ public static class OsmiUtility
             DicardsConfiguration config
         )
     {
+        Sure.NotNull (record);
+        Sure.NotNull (config);
+
         var idTag = config.ReaderId.SafeToInt32 (30);
         var result = record.FM (idTag).ThrowIfNullOrEmpty();
 
@@ -212,6 +222,9 @@ public static class OsmiUtility
             DicardsConfiguration config
         )
     {
+        Sure.NotNull (reader);
+        Sure.NotNull (config);
+
         var record = reader.Record.ThrowIfNull();
         var result = GetReaderId (record, config);
 
