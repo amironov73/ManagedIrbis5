@@ -375,6 +375,21 @@ public sealed class ReaderController
         return Ok();
     }
 
+    /// <summary>
+    /// Получение QR-кода по номеру билета.
+    /// </summary>
+    /// <param name="ticket">Номер билета</param>
+    [HttpGet ("qrcode/{ticket}")]
+    public IActionResult GetQrCode
+        (
+            string ticket
+        )
+    {
+        var bytes = OldUtility.SaveQrCodeToMemory (ticket);
+
+        return File (bytes, "image/png", "ticket.png");
+    }
+
 /*
 
         /// <summary>

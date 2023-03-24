@@ -17,6 +17,8 @@
 
 using System;
 
+using JetBrains.Annotations;
+
 using LinqToDB.Mapping;
 
 #endregion
@@ -28,6 +30,7 @@ namespace Istu.OldModel;
 /// <summary>
 /// Информация о читателе.
 /// </summary>
+[PublicAPI]
 [Table (Name = "readers")]
 public sealed class Reader
 {

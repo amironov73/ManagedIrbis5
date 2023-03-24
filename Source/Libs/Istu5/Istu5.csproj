@@ -24,13 +24,14 @@
 
     <!-- Централизованное управление пакетами -->
     <ItemGroup>
-        <PackageReference Include="linq2db"/>
-        <PackageReference Include="System.Data.SqlClient"/>
+        <PackageReference Include="linq2db" />
+        <PackageReference Include="SkiaSharp.QrCode" />
+        <PackageReference Include="System.Data.SqlClient" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\AM.Core5\AM.Core5.csproj"/>
-        <ProjectReference Include="..\ManagedIrbis5\ManagedIrbis5.csproj"/>
+        <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
+        <ProjectReference Include="..\ManagedIrbis5\ManagedIrbis5.csproj" />
     </ItemGroup>
 
     <ItemGroup>
