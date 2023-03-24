@@ -1,0 +1,42 @@
+﻿//
+// Список книг, изданных ИРНИТУ
+//
+
+connect("host=127.0.0.1;port=6666;user=librarian;password=secret;db=ISTU;")
+if (!is_connected())
+{
+    error ("Not connected")
+    exit()
+}
+
+//=================================
+
+xpression = "O=ИРНИТУ$ * (G=2020 + G=2021) * TEK=http$"
+books = search (xpression)
+println ("Books found: ", len (books))
+
+books = batch_read (books)
+
+foreach (book in books)
+{
+    subtitle = fm (book, 200, 'e')
+    good = true
+    if (subtitle ~ "метод")
+        good = false
+    if (subtitle ~ "моногр")
+        good = false
+    if (subtitle ~ "реком")
+        good = false
+    if (subtitle ~ "ТЕСТ")
+        good = false
+    if (good)
+    {
+        brief = format_record ("@brief", book.Mfn)
+        println (brief)
+    }
+}
+
+//=================================
+
+disconnect()
+println ("THAT'S ALL, FOLKS!")
