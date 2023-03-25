@@ -57,7 +57,7 @@ namespace ManagedIrbis;
 /// </summary>
 public class AlphabetTable
     : IVerifiable,
-        IHandmadeSerializable
+    IHandmadeSerializable
 {
     #region Constants
 
@@ -148,11 +148,8 @@ public class AlphabetTable
             Path = IrbisPath.System,
             FileName = fileName
         };
-        var text = client.ReadTextFileAsync
-                (
-                    specification
-                )
-            .Result
+        var text = client.ReadTextFileAsync (specification)
+            .GetAwaiter().GetResult()
             .ThrowIfNull ($"Alphabet table: {fileName}");
 
         using var reader = new StringReader (text);
@@ -164,8 +161,6 @@ public class AlphabetTable
     #endregion
 
     #region Private members
-
-    private static readonly object _lock = new ();
 
     private static AlphabetTable? _instance;
 
@@ -235,7 +230,8 @@ public class AlphabetTable
     #region Public methods
 
     /// <summary>
-    /// Получение глобального экземпляра таблицы <see cref="AlphabetTable"/>.
+    /// Получение глобального экземпляра таблицы
+    /// <see cref="AlphabetTable"/>.
     /// </summary>
     public static AlphabetTable GetInstance
         (
@@ -244,18 +240,9 @@ public class AlphabetTable
     {
         Sure.NotNull (connection);
 
-        lock (_lock)
-        {
-            if (ReferenceEquals (_instance, null))
-            {
-                lock (_lock)
-                {
-                    _instance ??= new AlphabetTable (connection);
-                }
-            }
+        _instance ??= new AlphabetTable (connection);
 
-            return _instance;
-        }
+        return _instance;
     }
 
     /// <summary>
@@ -313,10 +300,7 @@ public class AlphabetTable
     /// </summary>
     public static void ResetInstance()
     {
-        lock (_lock)
-        {
-            _instance = null;
-        }
+        _instance = null;
     }
 
     /// <summary>
@@ -437,7 +421,7 @@ public class AlphabetTable
             string fileName
         )
     {
-        Sure.NotNullNorEmpty (fileName, nameof (fileName));
+        Sure.NotNullNorEmpty (fileName);
 
         using var writer = TextWriterUtility.Create
             (
@@ -465,11 +449,7 @@ public class AlphabetTable
                 writer.Write (" ");
             }
 
-            writer.Write
-                (
-                    "{0:000}",
-                    b
-                );
+            writer.Write ("{0:000}", b);
             count++;
             if (count == 32)
             {
@@ -521,7 +501,6 @@ public class AlphabetTable
         var verifier = new Verifier<AlphabetTable> (this, throwOnError);
 
         verifier.Assert (_table.Length != 0);
-
         for (var i = 0; i < _table.Length; i++)
         {
             var value = _table[i];
