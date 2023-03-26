@@ -16,12 +16,15 @@
 #region Using directives
 
 using System;
-using System.Text.Json.Serialization;
+
+using Newtonsoft.Json;
 
 using AM;
 using AM.Text;
 
 using ManagedIrbis.Reports;
+
+using Newtonsoft.Json.Linq;
 
 #endregion
 
@@ -39,50 +42,54 @@ public class BiblioChapter
     #region Properties
 
     /// <summary>
-    /// Whether the chapter is active?
+    /// Активна ли данная глава?
+    /// Главы можно временно отключать
+    /// по каким-либо соображениям.
     /// </summary>
-    [JsonPropertyName ("active")]
+    [JsonProperty ("active")]
     public bool Active { get; set; }
 
     /// <inheritdoc cref="IAttributable.Attributes" />
-    [JsonPropertyName ("attr")]
+    [JsonProperty ("attr")]
     public ReportAttributes Attributes { get; private set; }
 
     /// <summary>
-    /// Children chapters.
+    /// Дочерние главы (не элементы!).
+    /// Дочерние главы неактивной главы не рендерятся.
     /// </summary>
-    [JsonPropertyName ("children")]
+    [JsonProperty ("children")]
     public ChapterCollection Children { get; private set; }
 
     /// <summary>
-    /// Title of the chapter.
+    /// Заголавие главы.
     /// </summary>
-    [JsonPropertyName ("title")]
+    [JsonProperty ("title")]
     public string? Title { get; set; }
 
     /// <summary>
-    /// Parent chapter (if any).
+    /// Родительская глава (опционально).
     /// </summary>
     [JsonIgnore]
     public BiblioChapter? Parent { get; internal set; }
 
     /// <summary>
-    ///
+    /// Элементы, составляющие данную главу
+    /// (не дочерние главы!).
     /// </summary>
     [JsonIgnore]
     public ItemCollection? Items { get; protected internal set; }
 
     /// <summary>
-    /// Whether the chapter is for service purpose?
+    /// Предназначена ли глава для служебных целей?
     /// </summary>
     [JsonIgnore]
     public virtual bool IsServiceChapter => false;
 
     /// <summary>
-    /// Special settings associated with the chapter
-    /// and its children.
+    /// Специальные настройки, связанные с главой
+    /// и ее дочерними элементами.
     /// </summary>
-    [JsonPropertyName ("settings")]
+    [JsonProperty ("settings")]
     public SpecialSettings? Settings { get; set; }
 
     #endregion
@@ -90,7 +97,7 @@ public class BiblioChapter
     #region Construction
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор.
     /// </summary>
     public BiblioChapter()
     {
@@ -150,13 +157,15 @@ public class BiblioChapter
     }
 
     /// <summary>
-    /// Render children chapters.
+    /// Рендеринг дочерник глав.
     /// </summary>
     protected virtual void RenderChildren
         (
             BiblioContext context
         )
     {
+        Sure.NotNull (context);
+
         foreach (var child in Children)
         {
             if (child.Active)
@@ -174,14 +183,14 @@ public class BiblioChapter
             BiblioContext context
         )
     {
-        var processor = context.Processor
-            .ThrowIfNull();
-        var report = processor.Report
-            .ThrowIfNull();
+        Sure.NotNull (context);
+
+        var processor = context.Processor.ThrowIfNull();
+        var report = processor.Report.ThrowIfNull();
 
         if (!string.IsNullOrEmpty (Title))
         {
-            ReportBand title = new ParagraphBand
+            var title = new ParagraphBand
             {
                 StyleSpecification = @"\s1\plain\f1\fs40\sb400\sa400\b "
             };
@@ -195,19 +204,19 @@ public class BiblioChapter
     #region Public methods
 
     /// <summary>
-    /// Build dictionaries.
+    /// Построение словарей.
     /// </summary>
     public virtual void BuildDictionary
         (
             BiblioContext context
         )
     {
-        /*
+        Sure.NotNull (context);
 
-        AbstractOutput log = context.Log;
-        log.WriteLine("Begin build dictionaries {0}", this);
+        var log = context.Log;
+        log.WriteLine ("Begin build dictionaries {0}", this);
 
-        foreach (BiblioChapter child in Children)
+        foreach (var child in Children)
         {
             if (child.Active)
             {
@@ -215,27 +224,23 @@ public class BiblioChapter
             }
         }
 
-        log.WriteLine("End build dictionaries {0}", this);
-
-        */
-
-        throw new NotImplementedException();
+        log.WriteLine ("End build dictionaries {0}", this);
     }
 
     /// <summary>
-    /// Build <see cref="BiblioItem"/>s.
+    /// Построение элементов главы <see cref="BiblioItem"/>s.
     /// </summary>
     public virtual void BuildItems
         (
             BiblioContext context
         )
     {
-        /*
+        Sure.NotNull (context);
 
-        AbstractOutput log = context.Log;
-        log.WriteLine("Begin build items {0}", this);
+        var log = context.Log;
+        log.WriteLine ("Begin build items {0}", this);
 
-        foreach (BiblioChapter child in Children)
+        foreach (var child in Children)
         {
             if (child.Active)
             {
@@ -243,15 +248,11 @@ public class BiblioChapter
             }
         }
 
-        log.WriteLine("End build items {0}", this);
-
-        */
-
-        throw new NotImplementedException();
+        log.WriteLine ("End build items {0}", this);
     }
 
     /// <summary>
-    /// Clean gathered records.
+    /// Очистка собранных записей.
     /// </summary>
     public virtual void CleanRecords
         (
@@ -259,33 +260,30 @@ public class BiblioChapter
             RecordCollection records
         )
     {
-        /*
+        Sure.NotNull (context);
+        Sure.NotNull (records);
 
-        BiblioDocument document = context.Document
-            .ThrowIfNull("context.Document");
-        JArray array = (JArray)document.CommonSettings
+        var document = context.Document.ThrowIfNull();
+        var array = (JArray?) document.CommonSettings
             .SelectToken("$.removeTags");
-        int[] tags = new int[0];
-        if (!ReferenceEquals(array, null))
+        var tags = Array.Empty<int>();
+        if (array is not null)
         {
-            tags = array.ToObject<int[]>();
+            tags = array.ToObject<int[]>().ThrowIfNull();
         }
+
         if (tags.Length == 0)
         {
             return;
         }
 
-        foreach (Record record in records)
+        foreach (var record in records)
         {
-            foreach (int tag in tags)
+            foreach (var tag in tags)
             {
-                record.RemoveField(tag);
+                record.RemoveField (tag);
             }
         }
-
-        */
-
-        throw new NotImplementedException();
     }
 
     /// <summary>
@@ -401,6 +399,8 @@ public class BiblioChapter
             Action<BiblioChapter> action
         )
     {
+        Sure.NotNull (action);
+
         action (this);
         foreach (var child in Children)
         {

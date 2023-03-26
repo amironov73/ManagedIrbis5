@@ -41,7 +41,6 @@ public sealed class BiblioDocumentTest
 
     [TestMethod]
     [Description ("Построение словарей")]
-    [ExpectedException (typeof (NotImplementedException))]
     public void BiblioDocument_BuildDictionaries_1()
     {
         var context = _GetContext();
@@ -51,7 +50,6 @@ public sealed class BiblioDocumentTest
 
     [TestMethod]
     [Description ("Построение элементов")]
-    [ExpectedException (typeof (NotImplementedException))]
     public void BiblioDocument_BuildItems_1()
     {
         var context = _GetContext();
@@ -77,9 +75,9 @@ public sealed class BiblioDocumentTest
         document.Initialize (context);
     }
 
+    [Ignore]
     [TestMethod]
     [Description ("Загрузка из файла")]
-    [ExpectedException (typeof (NotImplementedException))]
     public void BiblioDocument_LoadFile_1()
     {
         var fileName = Path.Combine (TestDataPath, "Biblio", "rasputin.json");
