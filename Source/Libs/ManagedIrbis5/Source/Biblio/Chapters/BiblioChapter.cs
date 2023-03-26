@@ -22,6 +22,8 @@ using Newtonsoft.Json;
 using AM;
 using AM.Text;
 
+using JetBrains.Annotations;
+
 using ManagedIrbis.Reports;
 
 using Newtonsoft.Json.Linq;
@@ -35,6 +37,7 @@ namespace ManagedIrbis.Biblio;
 /// <summary>
 /// Базовый класс для глав библиографического указателя.
 /// </summary>
+[PublicAPI]
 public class BiblioChapter
     : IAttributable,
     IVerifiable

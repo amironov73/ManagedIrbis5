@@ -4,10 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable PropertyCanBeMadeInitOnly.Global
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 /* ChapterCollection.cs -- коллекция глав
  * Ars Magna project, http://arsmagna.ru
@@ -16,11 +12,14 @@
 #region Using directives
 
 using System.Collections.ObjectModel;
-using System.Text.Json.Serialization;
 using System.Xml.Serialization;
+
+using Newtonsoft.Json;
 
 using AM;
 using AM.Collections;
+
+using JetBrains.Annotations;
 
 #endregion
 
@@ -31,6 +30,7 @@ namespace ManagedIrbis.Biblio;
 /// <summary>
 /// Коллекция глав.
 /// </summary>
+[PublicAPI]
 public sealed class ChapterCollection
     : NonNullCollection<BiblioChapter>,
     IVerifiable
@@ -38,7 +38,7 @@ public sealed class ChapterCollection
     #region Properties
 
     /// <summary>
-    /// Parent.
+    /// Родительская глава.
     /// </summary>
     [XmlIgnore]
     [JsonIgnore]
@@ -53,14 +53,15 @@ public sealed class ChapterCollection
     #region Construction
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор по умолчанию.
     /// </summary>
     public ChapterCollection()
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор.
     /// </summary>
     public ChapterCollection
         (

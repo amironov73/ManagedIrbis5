@@ -30,7 +30,7 @@ using Microsoft.Extensions.Logging;
 
 #nullable enable
 
-namespace Studen.Controllers;
+namespace Restaurant.Controllers;
 
 /// <summary>
 /// Контроллер API для доступа к БД читателей.

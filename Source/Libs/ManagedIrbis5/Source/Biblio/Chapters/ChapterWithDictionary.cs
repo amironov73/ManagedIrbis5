@@ -4,9 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 /* ChapterWithDictionary.cs -- глава со словарем
  * Ars Magna project, http://arsmagna.ru
@@ -18,11 +15,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Text.Json.Serialization;
+
+using Newtonsoft.Json;
 
 using AM;
 using AM.Linq;
 using AM.Text;
+
+using JetBrains.Annotations;
 
 using ManagedIrbis.Reports;
 
@@ -33,45 +33,46 @@ using ManagedIrbis.Reports;
 namespace ManagedIrbis.Biblio;
 
 /// <summary>
-///
+/// Глова со словарем.
 /// </summary>
+[PublicAPI]
 public class ChapterWithDictionary
     : BiblioChapter
 {
     #region Properties
 
     /// <summary>
-    /// Dictionary.
+    /// Словарь.
     /// </summary>
     public BiblioDictionary Dictionary { get; private set; }
 
     /// <summary>
-    /// Dictionary.
+    /// Коллекция терминов.
     /// </summary>
     public TermCollection Terms { get; private set; }
 
     /// <summary>
-    /// OrderBy expression.
+    /// Выражение, используемое для упорядочения элементjd словаря.
     /// </summary>
-    [JsonPropertyName ("orderBy")]
+    [JsonProperty ("orderBy")]
     public string? OrderByClause { get; set; }
 
     /// <summary>
-    /// Select expression.
+    /// Выражение, используемое для отбора элементов словаря.
     /// </summary>
-    [JsonPropertyName ("select")]
+    [JsonProperty ("select")]
     public string? SelectClause { get; set; }
 
     /// <summary>
-    /// Extended format.
+    /// Расширенный формат.
     /// </summary>
-    [JsonPropertyName ("extended")]
+    [JsonProperty ("extended")]
     public string? ExtendedFormat { get; set; }
 
     /// <summary>
     /// Entries to exclude.
     /// </summary>
-    [JsonPropertyName ("exclude")]
+    [JsonProperty ("exclude")]
     public List<string> ExcludeList { get; private set; }
 
     /// <inheritdoc cref="BiblioChapter.IsServiceChapter" />
@@ -82,13 +83,13 @@ public class ChapterWithDictionary
     #region Construction
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор по умолчанию.
     /// </summary>
     public ChapterWithDictionary()
     {
-        Dictionary = new BiblioDictionary();
-        Terms = new TermCollection();
-        ExcludeList = new List<string>();
+        Dictionary = new ();
+        Terms = new ();
+        ExcludeList = new ();
     }
 
     #endregion
@@ -227,10 +228,6 @@ public class ChapterWithDictionary
 
     #endregion
 
-    #region Public methods
-
-    #endregion
-
     #region BiblioChapter members
 
     /// <inheritdoc cref="BiblioChapter.BuildDictionary" />
@@ -239,6 +236,8 @@ public class ChapterWithDictionary
             BiblioContext context
         )
     {
+        Sure.NotNull (context);
+
         var log = context.Log;
         log.WriteLine ("Begin build dictionary {0}", this);
 
@@ -259,6 +258,8 @@ public class ChapterWithDictionary
             BiblioContext context
         )
     {
+        Sure.NotNull (context);
+
         var log = context.Log;
         log.WriteLine ("Begin gather terms {0}", this);
 

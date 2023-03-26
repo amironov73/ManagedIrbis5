@@ -4,10 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ResSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* NewtonsoftUtility.cs -- возня с Newtonsoft.Json
  * Ars Magna project, http://arsmagna.ru
@@ -50,21 +46,21 @@ public static class NewtonsoftUtility
             string assembly
         )
     {
-        Sure.NotNull(obj);
-        Sure.NotNullNorEmpty(nameSpace);
-        Sure.NotNullNorEmpty(assembly);
+        Sure.NotNull (obj);
+        Sure.NotNullNorEmpty (nameSpace);
+        Sure.NotNullNorEmpty (assembly);
 
         var values = obj
-            .SelectTokens("$..$type")
+            .SelectTokens ("$..$type")
             .OfType<JValue>();
         foreach (var value in values)
         {
             if (value.Value is not null)
             {
                 var typeName = value.Value.ToString();
-                if (!string.IsNullOrEmpty(typeName))
+                if (!string.IsNullOrEmpty (typeName))
                 {
-                    if (!typeName.Contains('.'))
+                    if (!typeName.Contains ('.'))
                     {
                         typeName = nameSpace
                                    + "."
@@ -88,11 +84,11 @@ public static class NewtonsoftUtility
             Action<JProperty> resolver
         )
     {
-        Sure.NotNull(obj);
-        Sure.NotNull(resolver);
+        Sure.NotNull (obj);
+        Sure.NotNull (resolver);
 
         var values = obj
-            .SelectTokens("$..$include")
+            .SelectTokens ("$..$include")
             .OfType<JValue>()
             .ToArray();
 
@@ -100,7 +96,7 @@ public static class NewtonsoftUtility
         {
             if (value.Parent is not null)
             {
-                var property = (JProperty) value.Parent;
+                var property = (JProperty)value.Parent;
                 resolver (property);
             }
         }
@@ -115,10 +111,10 @@ public static class NewtonsoftUtility
             JObject obj
         )
     {
-        Sure.NotNull(obj);
+        Sure.NotNull (obj);
 
         var tokens = obj
-            .SelectTokens("$..$include")
+            .SelectTokens ("$..$include")
             .ToArray();
 
         foreach (var token in tokens)
@@ -126,7 +122,7 @@ public static class NewtonsoftUtility
             if (token.Parent != null)
             {
                 var property = (JProperty)token.Parent;
-                Resolve(property);
+                Resolve (property);
             }
         }
     }
@@ -141,15 +137,15 @@ public static class NewtonsoftUtility
             string newName
         )
     {
-        Sure.NotNull(obj);
-        Sure.NotNullNorEmpty(newName);
+        Sure.NotNull (obj);
+        Sure.NotNullNorEmpty (newName);
 
-        void Resolver(JProperty prop)
+        void Resolver (JProperty prop)
         {
-            Resolve(prop, newName);
+            Resolve (prop, newName);
         }
 
-        Include(obj, Resolver);
+        Include (obj, Resolver);
     }
 
     /// <summary>
@@ -161,10 +157,10 @@ public static class NewtonsoftUtility
             string fileName
         )
     {
-        Sure.FileExists(fileName, nameof(fileName));
+        Sure.FileExists (fileName, nameof (fileName));
 
-        var text = File.ReadAllText(fileName);
-        var result = JArray.Parse(text);
+        var text = File.ReadAllText (fileName);
+        var result = JArray.Parse (text);
 
         return result;
     }
@@ -178,10 +174,10 @@ public static class NewtonsoftUtility
             string fileName
         )
     {
-        Sure.NotNullNorEmpty(fileName);
+        Sure.NotNullNorEmpty (fileName);
 
-        var text = File.ReadAllText(fileName);
-        var result = JObject.Parse(text);
+        var text = File.ReadAllText (fileName);
+        var result = JObject.Parse (text);
 
         return result;
     }
@@ -195,10 +191,10 @@ public static class NewtonsoftUtility
             string fileName
         )
     {
-        Sure.FileExists(fileName);
+        Sure.FileExists (fileName);
 
-        var text = File.ReadAllText(fileName);
-        var result = JsonConvert.DeserializeObject<T>(text);
+        var text = File.ReadAllText (fileName);
+        var result = JsonConvert.DeserializeObject<T> (text);
 
         return result!;
     }
@@ -213,11 +209,11 @@ public static class NewtonsoftUtility
             string fileName
         )
     {
-        Sure.NotNull(array);
-        Sure.NotNullNorEmpty(fileName);
+        Sure.NotNull (array);
+        Sure.NotNullNorEmpty (fileName);
 
-        var text = array.ToString(Formatting.Indented);
-        File.WriteAllText(fileName, text);
+        var text = array.ToString (Formatting.Indented);
+        File.WriteAllText (fileName, text);
     }
 
     /// <summary>
@@ -229,11 +225,11 @@ public static class NewtonsoftUtility
             string fileName
         )
     {
-        Sure.NotNull(obj);
-        Sure.NotNullNorEmpty(fileName);
+        Sure.NotNull (obj);
+        Sure.NotNullNorEmpty (fileName);
 
-        var text = obj.ToString(Formatting.Indented);
-        File.WriteAllText(fileName, text);
+        var text = obj.ToString (Formatting.Indented);
+        File.WriteAllText (fileName, text);
     }
 
     /// <summary>
@@ -245,9 +241,9 @@ public static class NewtonsoftUtility
             string fileName
         )
     {
-        var json = JObject.FromObject(obj);
+        var json = JObject.FromObject (obj);
 
-        SaveObjectToFile(json, fileName);
+        SaveObjectToFile (json, fileName);
     }
 
     /// <summary>
@@ -260,16 +256,16 @@ public static class NewtonsoftUtility
             string newName
         )
     {
-        Sure.NotNull(property);
-        Sure.NotNull(newName);
+        Sure.NotNull (property);
+        Sure.NotNull (newName);
 
         // TODO use path for searching
 
         var fileName = property.Value.ToString();
-        var text = File.ReadAllText(fileName);
-        var value = JObject.Parse(text);
-        var newProperty = new JProperty(newName, value);
-        property.Replace(newProperty);
+        var text = File.ReadAllText (fileName);
+        var value = JObject.Parse (text);
+        var newProperty = new JProperty (newName, value);
+        property.Replace (newProperty);
     }
 
     /// <summary>
@@ -281,21 +277,61 @@ public static class NewtonsoftUtility
             JProperty property
         )
     {
-        Sure.NotNull(property);
+        Sure.NotNull (property);
 
         // TODO use path for searching
 
-        var obj = (JObject) property.Value;
+        var obj = (JObject)property.Value;
         var newName = obj["name"]?.Value<string>();
         var fileName = obj["file"]?.Value<string>();
-        if (!string.IsNullOrEmpty(newName)
-            && !string.IsNullOrEmpty(fileName))
+        if (!string.IsNullOrEmpty (newName)
+            && !string.IsNullOrEmpty (fileName))
         {
-            var text = File.ReadAllText(fileName);
-            var value = JObject.Parse(text);
-            var newProperty = new JProperty(newName, value);
-            property.Replace(newProperty);
+            var text = File.ReadAllText (fileName);
+            var value = JObject.Parse (text);
+            var newProperty = new JProperty (newName, value);
+            property.Replace (newProperty);
         }
+    }
+
+    /// <summary>
+    /// Сериализация в строку с отступами.
+    /// </summary>
+    public static string SerializeIndented<T>
+        (
+            T obj
+        )
+    {
+        var settings = new JsonSerializerSettings
+        {
+            NullValueHandling = NullValueHandling.Ignore,
+            Formatting = Formatting.Indented
+        };
+        var serializer = JsonSerializer.Create (settings);
+        var writer = new StringWriter();
+        serializer.Serialize (writer, obj);
+
+        return writer.ToString();
+    }
+
+    /// <summary>
+    /// Сериализация в короткую строку.
+    /// </summary>
+    public static string SerializeShort<T>
+        (
+            T obj
+        )
+    {
+        var settings = new JsonSerializerSettings
+        {
+            NullValueHandling = NullValueHandling.Ignore,
+            Formatting = Formatting.None
+        };
+        var serializer = JsonSerializer.Create (settings);
+        var writer = new StringWriter();
+        serializer.Serialize (writer, obj);
+
+        return writer.ToString();
     }
 
     #endregion
