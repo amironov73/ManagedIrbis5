@@ -4,8 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 /* ChapterWithRecords.cs -- глава с библиографическими записями
  * Ars Magna project, http://arsmagna.ru
@@ -20,6 +18,8 @@ using System.Linq;
 using AM;
 using AM.Text;
 
+using JetBrains.Annotations;
+
 using ManagedIrbis.Reports;
 
 #endregion
@@ -31,18 +31,19 @@ namespace ManagedIrbis.Biblio;
 /// <summary>
 /// Глава с библиографическими записями.
 /// </summary>
-public class ChapterWithRecords
+[PublicAPI]
+public /* not sealed */ class ChapterWithRecords
     : BiblioChapter
 {
     #region Properties
 
     /// <summary>
-    /// Records.
+    /// Библиографические записи.
     /// </summary>
     public RecordCollection Records { get; }
 
     /// <summary>
-    /// Duplicates.
+    /// Дублеты.
     /// </summary>
     public RecordCollection Duplicates { get; }
 
@@ -51,12 +52,12 @@ public class ChapterWithRecords
     #region Construction
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор по умолчанию.
     /// </summary>
     public ChapterWithRecords()
     {
-        Records = new RecordCollection();
-        Duplicates = new RecordCollection();
+        Records = new ();
+        Duplicates = new ();
     }
 
     #endregion
@@ -121,8 +122,12 @@ public class ChapterWithRecords
         return null;
     }
 
+    #endregion
+
+    #region Public methods
+
     /// <summary>
-    /// Format records.
+    /// Форматирование записей.
     /// </summary>
     public string[] FormatRecords
         (
@@ -131,6 +136,10 @@ public class ChapterWithRecords
             string format
         )
     {
+        Sure.NotNull (context);
+        Sure.NotNull (mfns);
+        Sure.NotNull (format);
+
         if (mfns.Length == 0)
         {
             return Array.Empty<string>();
@@ -149,7 +158,7 @@ public class ChapterWithRecords
     }
 
     /// <summary>
-    /// Format records.
+    /// Форматирование записей.
     /// </summary>
     public string[] FormatRecords
         (
@@ -157,6 +166,9 @@ public class ChapterWithRecords
             string format
         )
     {
+        Sure.NotNull (context);
+        Sure.NotNull (format);
+
         var records = Records.ThrowIfNull();
         var mfns = records.Select (r => r.Mfn).ToArray();
         var result = FormatRecords (context, mfns, format);
@@ -164,8 +176,12 @@ public class ChapterWithRecords
         return result;
     }
 
+    #endregion
+
+    #region Protected members
+
     /// <summary>
-    /// Render duplicates.
+    /// Вывод дублетов.
     /// </summary>
     protected void RenderDuplicates
         (

@@ -9,7 +9,7 @@
 // ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable UnusedMember.Global
 
-/* ConsoleUtility.cs -- полезные методы для System.Console1
+/* ConsoleUtility.cs -- полезные методы для System.Console
  * Ars Magna project, http://arsmagna.ru
  */
 

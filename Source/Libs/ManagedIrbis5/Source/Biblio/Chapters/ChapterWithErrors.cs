@@ -4,8 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 /* ChapterWithErrors.cs -- глава с перечислением ошибок
  * Ars Magna project, http://arsmagna.ru
@@ -14,6 +12,8 @@
 #region Using directives
 
 using AM;
+
+using JetBrains.Annotations;
 
 using ManagedIrbis.Reports;
 
@@ -26,6 +26,7 @@ namespace ManagedIrbis.Biblio;
 /// <summary>
 /// Глава с перечислением ошибок.
 /// </summary>
+[PublicAPI]
 public sealed class ChapterWithErrors
     : BiblioChapter
 {
@@ -37,6 +38,8 @@ public sealed class ChapterWithErrors
             BiblioContext context
         )
     {
+        Sure.NotNull (context);
+
         var log = context.Log;
         log.WriteLine ("Begin render {0}", this);
 

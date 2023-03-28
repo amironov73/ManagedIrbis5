@@ -36,7 +36,7 @@ namespace ManagedIrbis.Biblio;
 /// Глова со словарем.
 /// </summary>
 [PublicAPI]
-public class ChapterWithDictionary
+public sealed class ChapterWithDictionary
     : BiblioChapter
 {
     #region Properties

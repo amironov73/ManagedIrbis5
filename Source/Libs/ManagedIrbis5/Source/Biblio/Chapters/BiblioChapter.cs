@@ -38,7 +38,7 @@ namespace ManagedIrbis.Biblio;
 /// Базовый класс для глав библиографического указателя.
 /// </summary>
 [PublicAPI]
-public class BiblioChapter
+public /* not sealed */ class BiblioChapter
     : IAttributable,
     IVerifiable
 {
