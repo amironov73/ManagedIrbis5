@@ -26,123 +26,120 @@ using ManagedIrbis.Providers;
 
 #nullable enable
 
-namespace ManagedIrbis.Searching
+namespace ManagedIrbis.Searching;
+
+/// <summary>
+/// Поиск по нескольким каталогам сразу.
+/// </summary>
+public sealed class MultiSearcher
 {
+    #region Properties
+
     /// <summary>
-    /// Поиск по нескольким каталогам сразу.
+    /// Провайдер.
     /// </summary>
-    public sealed class MultiSearcher
+    public ISyncProvider Provider { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    /// <param name="provider">Провайдер.</param>
+    public MultiSearcher
+        (
+            ISyncProvider provider
+        )
     {
-        #region Properties
+        Provider = provider;
+    }
 
-        /// <summary>
-        /// Провайдер.
-        /// </summary>
-        public ISyncProvider Provider { get; }
+    #endregion
 
-        #endregion
+    #region Public methods
 
-        #region Construction
+    /// <summary>
+    /// Поиск во всех перечисленных каталогах.
+    /// </summary>
+    public RecordBacket SearchAll
+        (
+            string expression,
+            IEnumerable<string> databases
+        )
+    {
+        var result = new RecordBacket();
+        var savedDatabase = Provider.Database;
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        /// <param name="provider">Провайдер.</param>
-        public MultiSearcher
-            (
-                ISyncProvider provider
-            )
+        try
         {
-            Provider = provider;
+            foreach (var database in databases)
+            {
+                Provider.Database = database;
+                var found = Provider.Search(expression);
+                foreach (var mfn in found)
+                {
+                    var reference = new RecordReference
+                    {
+                        Database = database,
+                        Mfn = mfn
+                    };
+                    result.Add(reference);
+                }
+            }
+        }
+        finally
+        {
+            Provider.Database = savedDatabase;
         }
 
-        #endregion
+        return result;
 
-        #region Public methods
+    } // method SearchAll
 
-        /// <summary>
-        /// Поиск во всех перечисленных каталогах.
-        /// </summary>
-        public RecordBacket SearchAll
-            (
-                string expression,
-                IEnumerable<string> databases
-            )
+    /// <summary>
+    /// Поиск до первых найденных записей.
+    /// </summary>
+    public RecordBacket SearchAny
+        (
+            string expression,
+            IEnumerable<string> databases
+        )
+    {
+        var result = new RecordBacket();
+        var savedDatabase = Provider.Database;
+
+        try
         {
-            var result = new RecordBacket();
-            var savedDatabase = Provider.Database;
-
-            try
+            foreach (var database in databases)
             {
-                foreach (var database in databases)
+                Provider.Database = database;
+                var found = Provider.Search(expression);
+                foreach (var mfn in found)
                 {
-                    Provider.Database = database;
-                    var found = Provider.Search(expression);
-                    foreach (var mfn in found)
+                    var reference = new RecordReference
                     {
-                        var reference = new RecordReference
-                        {
-                            Database = database,
-                            Mfn = mfn
-                        };
-                        result.Add(reference);
-                    }
+                        Database = database,
+                        Mfn = mfn
+                    };
+                    result.Add(reference);
+                }
+
+                if (found.Length != 0)
+                {
+                    break;
                 }
             }
-            finally
-            {
-                Provider.Database = savedDatabase;
-            }
-
-            return result;
-
-        } // method SearchAll
-
-        /// <summary>
-        /// Поиск до первых найденных записей.
-        /// </summary>
-        public RecordBacket SearchAny
-            (
-                string expression,
-                IEnumerable<string> databases
-            )
+        }
+        finally
         {
-            var result = new RecordBacket();
-            var savedDatabase = Provider.Database;
+            Provider.Database = savedDatabase;
+        }
 
-            try
-            {
-                foreach (var database in databases)
-                {
-                    Provider.Database = database;
-                    var found = Provider.Search(expression);
-                    foreach (var mfn in found)
-                    {
-                        var reference = new RecordReference
-                        {
-                            Database = database,
-                            Mfn = mfn
-                        };
-                        result.Add(reference);
-                    }
+        return result;
 
-                    if (found.Length != 0)
-                    {
-                        break;
-                    }
-                }
-            }
-            finally
-            {
-                Provider.Database = savedDatabase;
-            }
+    } // method SearchAny
 
-            return result;
-
-        } // method SearchAny
-
-        #endregion
-
-    } // class MultiSearcher
-
-} // namespace ManagedIrbis.Searching
+    #endregion
+}

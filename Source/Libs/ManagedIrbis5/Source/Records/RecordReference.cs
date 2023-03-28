@@ -2,13 +2,8 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* RecordReference.cs -- ссылка на запись
  * Ars Magna project, http://arsmagna.ru
@@ -16,8 +11,10 @@
 
 #region Using directives
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
@@ -25,6 +22,8 @@ using System.Xml.Serialization;
 using AM;
 using AM.IO;
 using AM.Runtime;
+
+using JetBrains.Annotations;
 
 using ManagedIrbis.ImportExport;
 using ManagedIrbis.Infrastructure;
@@ -42,11 +41,12 @@ namespace ManagedIrbis;
 /// <summary>
 /// Ссылка на запись (например, для сохранения в "кармане").
 /// </summary>
+[PublicAPI]
 [XmlRoot ("record")]
 [DebuggerDisplay ("MFN={" + nameof (Mfn) + "}, Index={" + nameof (Index) + "}")]
 public sealed class RecordReference
     : IHandmadeSerializable,
-        IVerifiable
+    IVerifiable
 {
     #region Properties
 
@@ -55,7 +55,11 @@ public sealed class RecordReference
     /// </summary>
     [XmlAttribute ("db")]
     [JsonPropertyName ("db")]
-    public string? Database { get; set; }
+    public required string Database
+    {
+        get => _database!;
+        init => _database = value;
+    }
 
     /// <summary>
     /// MFN записи.
@@ -63,7 +67,11 @@ public sealed class RecordReference
     /// </summary>
     [XmlAttribute ("mfn")]
     [JsonPropertyName ("mfn")]
-    public int Mfn { get; set; }
+    public required int Mfn
+    {
+        get => _mfn;
+        init => _mfn = value;
+    }
 
     /// <summary>
     /// Шифр записи в базе данных, например, "81.432.1-42/P41-012833".
@@ -88,33 +96,44 @@ public sealed class RecordReference
     /// </summary>
     public RecordReference()
     {
-    } // constructor
+        // пустое тело метода
+    }
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор.
     /// </summary>
+    [SetsRequiredMembers]
     public RecordReference
         (
             Record record,
             RecordConfiguration? configuration = null
         )
     {
+        Sure.NotNull (record);
+
         configuration ??= RecordConfiguration.GetDefault();
 
-        Database = record.Database;
+        Database = record.Database.ThrowIfNullOrEmpty();
         Mfn = record.Mfn;
-        Index = configuration.GetIndex (record).ThrowIfNullOrEmpty();
+        Index = configuration.GetIndex (record);
         Record = record;
     }
+
+    #endregion
+
+    #region Private members
+
+    private string? _database;
+    private int _mfn;
 
     #endregion
 
     #region Public methods
 
     /// <summary>
-    /// Сравнение двух ссылок.
+    /// Сравнение двух ссылок на равенство.
     /// </summary>
-    public static bool Compare
+    public static bool AreEqual
         (
             RecordReference first,
             RecordReference second
@@ -122,6 +141,11 @@ public sealed class RecordReference
     {
         Sure.NotNull (first);
         Sure.NotNull (second);
+
+        if (ReferenceEquals (first, second))
+        {
+            return true;
+        }
 
         if (first.Mfn != 0)
         {
@@ -131,36 +155,20 @@ public sealed class RecordReference
             }
         }
 
-        if (!ReferenceEquals (first.Index, null))
+        if (first.Index is not null)
         {
-            if (first.Index != second.Index)
+            if (string.CompareOrdinal (first.Index, second.Index) != 0)
             {
                 return false;
             }
         }
 
-        if (first.Mfn == 0 && ReferenceEquals (first.Index, null))
+        if (first is { Mfn: 0, Index: null })
         {
             return false;
         }
 
         return true;
-    }
-
-    /// <summary>
-    /// Загрузка ссылок из архивного файла.
-    /// </summary>
-    public static RecordReference[] LoadFromZipFile
-        (
-            string fileName
-        )
-    {
-        Sure.NotNull (fileName);
-
-        var result = SerializationUtility
-            .RestoreArrayFromFile<RecordReference> (fileName);
-
-        return result;
     }
 
     /// <summary>
@@ -177,7 +185,7 @@ public sealed class RecordReference
 
         if (Mfn != 0)
         {
-            var parameters = new ReadRecordParameters()
+            var parameters = new ReadRecordParameters
             {
                 Database = Database.ThrowIfNullOrEmpty(),
                 Mfn = Mfn
@@ -196,7 +204,7 @@ public sealed class RecordReference
     }
 
     /// <summary>
-    /// Load records according to the references.
+    /// Загрузка записей согласно ссылкам.
     /// </summary>
     public static List<Record> ReadRecords
         (
@@ -235,22 +243,6 @@ public sealed class RecordReference
         return result;
     }
 
-
-    /// <summary>
-    /// Save references to the archive file.
-    /// </summary>
-    public static void SaveToZipFile
-        (
-            RecordReference[] references,
-            string fileName
-        )
-    {
-        Sure.NotNull (references);
-        Sure.NotNullNorEmpty (fileName);
-
-        references.SaveToFile (fileName);
-    }
-
     #endregion
 
     #region IHandmadeSerializable members
@@ -263,8 +255,8 @@ public sealed class RecordReference
     {
         Sure.NotNull (reader);
 
-        Database = reader.ReadNullableString();
-        Mfn = reader.ReadPackedInt32();
+        _database = reader.ReadNullableString();
+        _mfn = reader.ReadPackedInt32();
         Index = reader.ReadNullableString();
     }
 
@@ -309,6 +301,13 @@ public sealed class RecordReference
     #endregion
 
     #region Object members
+
+    /// <inheritdoc cref="object.GetHashCode"/>
+    public override int GetHashCode() => HashCode.Combine (Database, Mfn);
+
+    /// <inheritdoc cref="object.Equals(object)"/>
+    public override bool Equals (object? obj) =>
+        obj is RecordReference other && AreEqual (this, other);
 
     /// <inheritdoc cref="object.ToString" />
     public override string ToString()
