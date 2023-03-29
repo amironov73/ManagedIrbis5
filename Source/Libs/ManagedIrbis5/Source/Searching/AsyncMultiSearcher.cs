@@ -5,13 +5,14 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* MultiSearcher.cs -- поиск по нескольким каталогам сразу, синхронная версия
+/* AsyncMultiSearcher.cs -- асинхронный поиск по нескольким каталогам сразу
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 using AM;
 
@@ -26,18 +27,18 @@ using ManagedIrbis.Providers;
 namespace ManagedIrbis.Searching;
 
 /// <summary>
-/// Поиск по нескольким каталогам сразу,
-/// синхронная версия.
+/// Асинхронный поиск по нескольким каталогам сразу.
+/// Наивная реализация.
 /// </summary>
 [PublicAPI]
-public sealed class MultiSearcher
+public sealed class AsyncMultiSearcher
 {
     #region Properties
 
     /// <summary>
     /// Провайдер.
     /// </summary>
-    public ISyncProvider Provider { get; }
+    public IAsyncProvider Provider { get; }
 
     #endregion
 
@@ -47,9 +48,9 @@ public sealed class MultiSearcher
     /// Конструктор.
     /// </summary>
     /// <param name="provider">Провайдер.</param>
-    public MultiSearcher
+    public AsyncMultiSearcher
         (
-            ISyncProvider provider
+            IAsyncProvider provider
         )
     {
         Sure.NotNull (provider);
@@ -64,7 +65,7 @@ public sealed class MultiSearcher
     /// <summary>
     /// Поиск во всех перечисленных каталогах.
     /// </summary>
-    public RecordBacket SearchAll
+    public async Task<RecordBacket> SearchAllAsync
         (
             string expression,
             IEnumerable<string> databases
@@ -80,16 +81,23 @@ public sealed class MultiSearcher
         {
             foreach (var database in databases)
             {
-                Provider.Database = database;
-                var found = Provider.Search (expression);
-                foreach (var mfn in found)
+                var parameters = new SearchParameters
                 {
-                    var reference = new RecordReference
+                    Database = Provider.EnsureDatabase (database),
+                    Expression = expression
+                };
+                var found = await Provider.SearchAsync (parameters);
+                if (found is not null)
+                {
+                    foreach (var item in found)
                     {
-                        Database = database,
-                        Mfn = mfn
-                    };
-                    result.Add (reference);
+                        var reference = new RecordReference
+                        {
+                            Database = database,
+                            Mfn = item.Mfn
+                        };
+                        result.Add (reference);
+                    }
                 }
             }
         }
@@ -104,7 +112,7 @@ public sealed class MultiSearcher
     /// <summary>
     /// Поиск до первых найденных записей.
     /// </summary>
-    public RecordBacket SearchAny
+    public async Task<RecordBacket> SearchAnyAsync
         (
             string expression,
             IEnumerable<string> databases
@@ -117,21 +125,28 @@ public sealed class MultiSearcher
         {
             foreach (var database in databases)
             {
-                Provider.Database = database;
-                var found = Provider.Search (expression);
-                foreach (var mfn in found)
+                var parameters = new SearchParameters
                 {
-                    var reference = new RecordReference
+                    Database = Provider.EnsureDatabase (database),
+                    Expression = expression
+                };
+                var found = await Provider.SearchAsync (parameters);
+                if (found is not null)
+                {
+                    foreach (var item in found)
                     {
-                        Database = database,
-                        Mfn = mfn
-                    };
-                    result.Add (reference);
-                }
+                        var reference = new RecordReference
+                        {
+                            Database = database,
+                            Mfn = item.Mfn
+                        };
+                        result.Add (reference);
+                    }
 
-                if (found.Length != 0)
-                {
-                    break;
+                    if (found.Length != 0)
+                    {
+                        break;
+                    }
                 }
             }
         }
