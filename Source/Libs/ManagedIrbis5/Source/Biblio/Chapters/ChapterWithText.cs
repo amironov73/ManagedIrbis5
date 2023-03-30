@@ -4,8 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 /* ChapterWithText.cs -- глава с фиксированным текстом
  * Ars Magna project, http://arsmagna.ru
@@ -19,6 +17,8 @@ using System.Text.Json.Serialization;
 using AM;
 using AM.Linq;
 
+using JetBrains.Annotations;
+
 using ManagedIrbis.Reports;
 
 #endregion
@@ -30,25 +30,20 @@ namespace ManagedIrbis.Biblio;
 /// <summary>
 /// Глава с фиксированным текстом.
 /// </summary>
-public class ChapterWithText
+[PublicAPI]
+public sealed class ChapterWithText
     : BiblioChapter
 {
     #region Properties
 
     /// <summary>
-    /// Text.
+    /// Собственно текст, составляющий содержание главы.
     /// </summary>
     [JsonPropertyName ("text")]
     public string? Text { get; set; }
 
     /// <inheritdoc cref="BiblioChapter.IsServiceChapter" />
     public override bool IsServiceChapter => true;
-
-    #endregion
-
-    #region Private members
-
-    private static readonly char[] _lineDelimiters = { '\r', '\n' };
 
     #endregion
 
@@ -60,6 +55,8 @@ public class ChapterWithText
             BiblioContext context
         )
     {
+        Sure.NotNull (context);
+
         var log = context.Log;
         log.WriteLine ("Begin render {0}", this);
 
@@ -74,7 +71,7 @@ public class ChapterWithText
             text = processor.GetText (context, text);
             if (!string.IsNullOrEmpty (text))
             {
-                var lines = text.Split (_lineDelimiters)
+                var lines = text.SplitLines()
                     .NonEmptyLines()
                     .ToArray();
                 foreach (var line in lines)

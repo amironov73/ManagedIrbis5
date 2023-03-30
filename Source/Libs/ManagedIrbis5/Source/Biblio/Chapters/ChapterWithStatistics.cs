@@ -4,8 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 /* ChapterWithStatistics.cs -- глава со статистикой
  * Ars Magna project, http://arsmagna.ru
@@ -14,6 +12,8 @@
 #region Using directives
 
 using AM;
+
+using JetBrains.Annotations;
 
 using ManagedIrbis.Reports;
 
@@ -26,6 +26,7 @@ namespace ManagedIrbis.Biblio;
 /// <summary>
 /// Глава со статистикой.
 /// </summary>
+[PublicAPI]
 public sealed class ChapterWithStatistics
     : BiblioChapter
 {
@@ -47,7 +48,7 @@ public sealed class ChapterWithStatistics
         )
     {
         var items = chapter.Items;
-        if (!ReferenceEquals (items, null))
+        if (items is not null)
         {
             var count = items.Count;
             if (!chapter.IsServiceChapter)
@@ -75,6 +76,8 @@ public sealed class ChapterWithStatistics
             BiblioContext context
         )
     {
+        Sure.NotNull (context);
+
         var log = context.Log;
         log.WriteLine ($"Begin render {this}");
         var document = context.Document;

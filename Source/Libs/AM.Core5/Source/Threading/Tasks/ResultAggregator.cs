@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* DataAggregator.cs -- блок TPL Dataflow, умеющий собирать данные
+/* ResultAggregator.cs -- блок TPL Dataflow, умеющий собирать данные
  * Ars Magna project, http://arsmagna.ru
  */
 
