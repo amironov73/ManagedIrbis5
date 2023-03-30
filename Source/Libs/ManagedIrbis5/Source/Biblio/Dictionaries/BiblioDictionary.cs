@@ -4,10 +4,8 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
-/* BiblioDictionary.cs --
+/* BiblioDictionary.cs -- словарь, в котором хранятся ссылки для указателя
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,82 +18,80 @@ using AM;
 using AM.Text;
 using AM.Text.Output;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Biblio
+namespace ManagedIrbis.Biblio;
+
+/// <summary>
+/// Словарь, в котором хранятся ссылки для указателя
+/// (например, указателя заглавий).
+/// </summary>
+[PublicAPI]
+public sealed class BiblioDictionary
+    : Dictionary<string, DictionaryEntry>
 {
+    #region Public methods
+
     /// <summary>
-    ///
+    /// Добавление заголовка и связанной с ним ссылки
+    /// на библиографическую запись (порядковый номер записи).
     /// </summary>
-    public sealed class BiblioDictionary
-        : Dictionary<string, DictionaryEntry>
+    /// <remarks>
+    /// Повторно ссылки с одинаковыми заголовком и номером
+    /// не добавляются.
+    /// </remarks>
+    public void Add
+        (
+            string title,
+            int reference
+        )
     {
-        #region Properties
-
-        #endregion
-
-        #region Construction
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Add title and reference.
-        /// </summary>
-        public void Add
-            (
-                string title,
-                int reference
-            )
+        Sure.NotNull (title);
+        Sure.NonNegative (reference);
+        
+        if (!TryGetValue (title, out var entry))
         {
-            if (!TryGetValue(title, out var entry))
+            entry = new DictionaryEntry
             {
-                entry = new DictionaryEntry
-                {
-                    Title = title
-                };
-                Add(title, entry);
-            }
-
-            if (!entry.References.Contains(reference))
-            {
-                entry.References.Add(reference);
-            }
+                Title = title
+            };
+            Add (title, entry);
         }
 
-        /// <summary>
-        /// Dump the dictionary.
-        /// </summary>
-        public void Dump
-            (
-                AbstractOutput output
-            )
+        if (!entry.References.Contains (reference))
         {
-            string[] keys = NumberText.Sort(Keys).ToArray();
-            foreach (string key in keys)
-            {
-                DictionaryEntry entry = this[key];
-                output.WriteLine(entry.ToString());
-            }
+            entry.References.Add (reference);
         }
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return Count.ToInvariantString();
-        }
-
-        #endregion
     }
+
+    /// <summary>
+    /// Дамп словаря, например, для отладки.
+    /// </summary>
+    public void Dump
+        (
+            AbstractOutput output
+        )
+    {
+        Sure.NotNull (output);
+        
+        var keys = NumberText.Sort (Keys).ToArray();
+        foreach (var key in keys)
+        {
+            var entry = this[key];
+            output.WriteLine (entry.ToString());
+        }
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString() => Count.ToInvariantString();
+
+    #endregion
 }
