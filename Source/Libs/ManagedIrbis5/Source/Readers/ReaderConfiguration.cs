@@ -5,7 +5,6 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
 
 /* ReaderConfiguration.cs -- конфигурация базы данных читателей
  * Ars Magna project, http://arsmagna.ru
@@ -20,6 +19,8 @@ using System.Xml.Serialization;
 
 using AM;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -29,6 +30,7 @@ namespace ManagedIrbis.Readers;
 /// <summary>
 /// Конфигурация базы данных читателей.
 /// </summary>
+[PublicAPI]
 [Serializable]
 [XmlRoot ("reader-configuration")]
 public sealed class ReaderConfiguration
@@ -99,7 +101,6 @@ public sealed class ReaderConfiguration
     /// <summary>
     /// Получение конфигурации по умолчанию.
     /// </summary>
-    /// <returns></returns>
     public static ReaderConfiguration GetDefault() => new ();
 
     /// <summary>

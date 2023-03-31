@@ -25,6 +25,8 @@ using AM.IO;
 using AM.Runtime;
 using AM.Text;
 
+using JetBrains.Annotations;
+
 using ManagedIrbis.Fields;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Mapping;
@@ -38,6 +40,7 @@ namespace ManagedIrbis.Readers;
 /// <summary>
 /// Информация о посещении/выдаче.
 /// </summary>
+[PublicAPI]
 [XmlRoot ("visit")]
 [DebuggerDisplay ("{DateGivenString} {Index} {Description}")]
 public sealed class VisitInfo
@@ -452,7 +455,8 @@ public sealed class VisitInfo
     /// </summary>
     public static VisitInfo Parse
         (
-            Field field
+            Field field,
+            VisitConfiguration? configuration = null
         )
     {
         Sure.NotNull (field);

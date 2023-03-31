@@ -23,6 +23,8 @@ using AM;
 using AM.IO;
 using AM.Runtime;
 
+using JetBrains.Annotations;
+
 using ManagedIrbis.Mapping;
 
 #endregion
@@ -34,6 +36,7 @@ namespace ManagedIrbis.Readers;
 /// <summary>
 /// Архивная информация о читателе.
 /// </summary>
+[PublicAPI]
 [Serializable]
 [XmlRoot ("reader")]
 public sealed class ArchiveReaderInfo
@@ -145,7 +148,7 @@ public sealed class ArchiveReaderInfo
             Ticket = record.FM (30),
             Visits = record.Fields
                 .GetField (40)
-                .Select (VisitInfo.Parse)
+                .Select (it => VisitInfo.Parse (it))
                 .ToArray(),
             Mfn = record.Mfn,
         };
