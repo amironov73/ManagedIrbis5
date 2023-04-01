@@ -4,8 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 /* DictionaryEntry.cs -- запись в словаре
  * Ars Magna project, http://arsmagna.ru
@@ -18,6 +16,8 @@ using System.Collections.Generic;
 
 using AM.Text;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -27,6 +27,7 @@ namespace ManagedIrbis.Biblio;
 /// <summary>
 /// Запись в словаре: термин и список ссылок на него.
 /// </summary>
+[PublicAPI]
 public sealed class DictionaryEntry
 {
     #region Properties
@@ -34,12 +35,12 @@ public sealed class DictionaryEntry
     /// <summary>
     /// Термин.
     /// </summary>
-    public string? Title { get; set; }
+    public string? Title { get; init; }
 
     /// <summary>
     /// Список ссылок.
     /// </summary>
-    public List<int> References { get; set; } = new ();
+    public List<int> References { get; } = new ();
 
     #endregion
 
