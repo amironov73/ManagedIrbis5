@@ -4,10 +4,8 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
-/* BiblioDictionary.cs --
+/* TermCollection.cs -- коллекция терминов
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -16,36 +14,36 @@
 using AM;
 using AM.Collections;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Biblio
+namespace ManagedIrbis.Biblio;
+
+/// <summary>
+/// Коллекция терминов.
+/// </summary>
+[PublicAPI]
+public sealed class TermCollection
+    : NonNullCollection<BiblioTerm>,
+    IVerifiable
 {
-    /// <summary>
-    ///
-    /// </summary>
-    public class TermCollection
-        : NonNullCollection<BiblioTerm>,
-        IVerifiable
+    #region IVerifiable members
+
+    /// <inheritdoc cref="IVerifiable.Verify" />
+    public bool Verify
+        (
+            bool throwOnError
+        )
     {
-        #region IVerifiable members
+        var verifier = new Verifier<TermCollection> (this, throwOnError);
 
-        /// <inheritdoc cref="IVerifiable.Verify" />
-        public virtual bool Verify
-            (
-                bool throwOnError
-            )
-        {
-            var verifier
-                = new Verifier<TermCollection>(this, throwOnError);
+        // TODO do something
 
-            // TODO do something
-
-            return verifier.Result;
-        }
-
-        #endregion
-
+        return verifier.Result;
     }
+
+    #endregion
 }
