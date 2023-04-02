@@ -1,6 +1,6 @@
 ﻿file = fopen ("New.meow", "rt")
 line = "true"
-while (line)
+while line
 {
     line = file.ReadLine()
     println (line)

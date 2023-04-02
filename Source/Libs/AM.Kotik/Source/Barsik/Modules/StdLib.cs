@@ -24,6 +24,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Text;
+using System.Xml.Linq;
 
 using AM.Configuration;
 using AM.IO;
@@ -231,8 +232,27 @@ public sealed class StdLib
                 return null;
             }
 
-            interpreter.Execute (shortProgram, context);
-            value = last.Expression.Compute (context);
+            // пробрасываем найденные в JSON функции в контекст выполнения
+            var shortContext = context.CreateChildContext();
+            foreach (var function in program.Functions)
+            {
+                var name = function.Name;
+                var definition = new FunctionDefinition
+                (
+                        name,
+                        function._argumentNames,
+                        function.Body
+                    );
+                var descriptor = new FunctionDescriptor
+                (
+                        name,
+                        definition.CreateCallPoint()
+                    );
+                shortContext.Functions[name] = descriptor;
+            }
+
+            interpreter.Execute (shortProgram, shortContext);
+            value = last.Expression.Compute (shortContext);
         }
 
         return value;

@@ -1,0 +1,5 @@
+﻿x = true
+y = false
+
+if (x) println ("xxx")
+if (y) println ("xxx") else println ("yyy")
