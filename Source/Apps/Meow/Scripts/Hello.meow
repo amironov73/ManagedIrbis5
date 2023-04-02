@@ -9,8 +9,10 @@ func SayHello (who)
     println ("Hello, ", who)
 }
 
-if (x1) x2 = x2 + 1
-else x2 = x2 - 1
+if x1
+    x2 = x2 + 1
+else
+    x2 = x2 - 1
 
 u = (ulong) x2
 
@@ -19,7 +21,8 @@ for (i = 0; i < 10; i++)
     ++i2
 
 j = 1
-while (j < 256) j *= 2
+while j < 256
+    j *= 2
 j = -j
 
 `some external code`

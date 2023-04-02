@@ -45,7 +45,7 @@ public sealed class Grammar
     private const string LastStatementKey = "last-statement";
 
     #endregion
-    
+
     #region Properties
 
     /// <inheritdoc cref="IGrammar.Atoms"/>
@@ -92,7 +92,7 @@ public sealed class Grammar
     /// </summary>
     /// <returns>Если создать новое исключение не удалось,
     /// возвращается <c>null</c>.</returns>
-    private static Exception? EnhanceException 
+    private static Exception? EnhanceException
         (
             Exception innerException,
             ParseState state
@@ -564,7 +564,7 @@ public sealed class Grammar
         var whileStatement = Parser.Chain
             (
                 Parser.Position.Before (Reserved ("while")),
-                Expression.RoundBrackets(),
+                Expression, // Expression.RoundBrackets(),
                 Block,
                 Block.After (Reserved ("else")).Optional(),
                 (position, condition, body, elseBody) =>
@@ -585,7 +585,7 @@ public sealed class Grammar
         var ifStatement = Parser.Chain
             (
                 Parser.Position.Before (Reserved ("if")),
-                Expression.RoundBrackets(),
+                Expression, // Expression.RoundBrackets(),
                 Block,
                 elseIf.Repeated (minCount: 0),
                 Block.After (Reserved ("else")).Optional(),
