@@ -2,13 +2,8 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable ReplaceSliceWithRangeIndexer
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* TermComparer.cs -- сравнение терминов
  * Ars Magna project, http://arsmagna.ru
@@ -18,57 +13,77 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 
-using AM;
 using AM.Text;
+
+using JetBrains.Annotations;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Biblio
+namespace ManagedIrbis.Biblio;
+
+/// <summary>
+/// Сравнение терминов.
+/// </summary>
+[PublicAPI]
+public static class TermComparer
 {
+    #region Nested classes
+
     /// <summary>
-    /// Сравнение терминов.
+    /// Сравнение терминов как чисел.
     /// </summary>
-    public static class TermComparer
+    public sealed class Numeric
+        : IComparer<BiblioTerm>
     {
-        #region Nested classes
+        #region IComparer<T> members
 
-        /// <summary>
-        /// Numeric comparer.
-        /// </summary>
-        public sealed class Numeric
-            : IComparer<BiblioTerm>
+        /// <inheritdoc cref="IComparer{T}.Compare" />
+        [Pure]
+        public int Compare
+            (
+                BiblioTerm? x,
+                BiblioTerm? y
+            )
         {
-            #region IComparer<T> members
-
-            /// <inheritdoc cref="IComparer{T}.Compare" />
-            public int Compare (BiblioTerm? x, BiblioTerm? y)
-            {
-                return NumberText.Compare (x.ThrowIfNull().Title, y.ThrowIfNull().Title);
-            }
-
-            #endregion
-        }
-
-        /// <summary>
-        /// Trivial comparer.
-        /// </summary>
-        public sealed class Trivial
-            : IComparer<BiblioTerm>
-        {
-            #region IComparer<T> members
-
-            /// <inheritdoc cref="IComparer{T}.Compare" />
-            public int Compare (BiblioTerm? x, BiblioTerm? y)
-            {
-                return StringComparer.InvariantCulture.Compare (x.ThrowIfNull().Title, y.ThrowIfNull().Title);
-            }
-
-            #endregion
+            return NumberText.Compare
+                (
+                    x?.Title,
+                    y?.Title
+                );
         }
 
         #endregion
     }
+
+    /// <summary>
+    /// Тривиальное сравнение терминов.
+    /// </summary>
+    public sealed class Trivial
+        : IComparer<BiblioTerm>
+    {
+        #region IComparer<T> members
+
+        /// <inheritdoc cref="IComparer{T}.Compare" />
+        [Pure]
+        public int Compare
+            (
+                BiblioTerm? x,
+                BiblioTerm? y
+            )
+        {
+            return StringComparer.InvariantCulture.Compare
+                (
+                    x?.Title,
+                    y?.Title
+                );
+        }
+
+        #endregion
+    }
+
+    #endregion
 }
