@@ -120,9 +120,12 @@ public sealed class NumberTokenizer
 
         if (!dot && !exponent)
         {
-            // это целое число, для них есть отдельный токенайзер
-            navigator.RestorePosition (position);
-            return null;
+            if (PeekChar() is not ('F' or 'f' or 'M' or 'm'))
+            {
+                // это целое число, для них есть отдельный токенайзер
+                navigator.RestorePosition (position);
+                return null;
+            }
         }
 
         if (!digit)

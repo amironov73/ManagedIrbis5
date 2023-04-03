@@ -13,6 +13,8 @@
 
 using System.Diagnostics.CodeAnalysis;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -24,6 +26,7 @@ namespace AM.Kotik;
 /// Например, "число после скобки", когда число
 /// нам нужно, а от скобки требуется лишь её существование.
 /// </summary>
+[PublicAPI]
 public sealed class AfterParser<TAfter, TResult>
     : Parser<TResult>
     where TAfter: class
@@ -42,7 +45,7 @@ public sealed class AfterParser<TAfter, TResult>
     {
         Sure.NotNull (useful);
         Sure.NotNull (concomitant);
-        
+
         _concomitant = concomitant;
         _useful = useful;
     }

@@ -138,12 +138,14 @@ public sealed class Grammar
     /// <summary>
     /// Разбор идентификаторов.
     /// </summary>
-    private readonly IdentifierParser Identifier = new ();
+    // internal здесь для тестирования
+    internal readonly IdentifierParser Identifier = new ();
 
     /// <summary>
     /// Выражение.
     /// </summary>
-    private readonly ParserHolder<AtomNode> Expression = new (null!);
+    // internal здесь для тестирования
+    internal readonly ParserHolder<AtomNode> Expression = new (null!);
 
     /// <summary>
     /// Блок стейтментов, обязательно в фигурных скобках.
@@ -153,7 +155,8 @@ public sealed class Grammar
     /// <summary>
     /// Блок стейтментов, как в фигурных скобках, так и без них.
     /// </summary>
-    private readonly ParserHolder<StatementBase> Block = new(null!);
+    // internal здесь для тестирования
+    internal readonly ParserHolder<StatementBase> Block = new(null!);
 
     /// <summary>
     /// Стейтмент вообще.
@@ -564,7 +567,7 @@ public sealed class Grammar
         var whileStatement = Parser.Chain
             (
                 Parser.Position.Before (Reserved ("while")),
-                Expression, // Expression.RoundBrackets(),
+                Expression.OptionalRoundBrackets(), // Expression.RoundBrackets(),
                 Block,
                 Block.After (Reserved ("else")).Optional(),
                 (position, condition, body, elseBody) =>
@@ -585,7 +588,7 @@ public sealed class Grammar
         var ifStatement = Parser.Chain
             (
                 Parser.Position.Before (Reserved ("if")),
-                Expression, // Expression.RoundBrackets(),
+                Expression.OptionalRoundBrackets(), // Expression.RoundBrackets(),
                 Block,
                 elseIf.Repeated (minCount: 0),
                 Block.After (Reserved ("else")).Optional(),

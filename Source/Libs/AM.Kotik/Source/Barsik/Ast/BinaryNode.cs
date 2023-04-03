@@ -19,6 +19,8 @@ using System.Text.RegularExpressions;
 using AM.Kotik.Ast;
 using AM.Text;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -28,6 +30,7 @@ namespace AM.Kotik.Barsik.Ast;
 /// <summary>
 /// Бинарная инфиксная операция, например, сложение.
 /// </summary>
+[PublicAPI]
 public sealed class BinaryNode
     : AtomNode
 {
@@ -47,18 +50,19 @@ public sealed class BinaryNode
         Sure.NotNull (operation);
         Sure.NotNull (right);
 
-        _left = left;
-        _operation = operation;
-        _right = right;
+        this.left = left;
+        this.operation = operation;
+        this.right = right;
     }
 
     #endregion
 
     #region Private members
 
-    private readonly AtomNode _left;
-    private readonly string _operation;
-    private readonly AtomNode _right;
+    // internal здесь для тестов
+    internal readonly AtomNode left;
+    internal readonly string operation;
+    internal readonly AtomNode right;
 
     /// <summary>
     /// Оператор сравнения вида `left &lt;=&gt; right`.
@@ -535,10 +539,10 @@ public sealed class BinaryNode
             Context context
         )
     {
-        var left = _left.Compute (context);
-        var right = _right.Compute (context);
+        var left = this.left.Compute (context);
+        var right = this.right.Compute (context);
 
-        var result = _operation switch
+        var result = operation switch
         {
             "+" => Addition (context, left, right),
             "-" => left - right,
@@ -566,7 +570,7 @@ public sealed class BinaryNode
             "in" => In (context, left, right),
             "<=>" => Shuttle (context, left, right),
             // "??" => Coalesce (context, left, right),
-            _ => throw new InvalidOperationException ($"Unknown operator {_operation}")
+            _ => throw new InvalidOperationException ($"Unknown operator {operation}")
         };
 
         // context.Output.WriteLine ($"Compute {left} {_operation} {right} = {result}");
@@ -588,9 +592,9 @@ public sealed class BinaryNode
     {
         base.DumpHierarchyItem (name, level, writer, ToString());
 
-        _left.DumpHierarchyItem ("Left", level + 1, writer);
-        DumpHierarchyItem ("Op", level + 1, writer, _operation);
-        _right.DumpHierarchyItem ("Right", level + 1, writer);
+        left.DumpHierarchyItem ("Left", level + 1, writer);
+        DumpHierarchyItem ("Op", level + 1, writer, operation);
+        right.DumpHierarchyItem ("Right", level + 1, writer);
     }
 
     /// <inheritdoc cref="AstNode.GetNodeInfo"/>
@@ -602,11 +606,11 @@ public sealed class BinaryNode
                 new AstNodeInfo
                 {
                     Name = "operation",
-                    Description = _operation
+                    Description = operation
                 },
 
-                _left.GetNodeInfo().WithName ("left"),
-                _right.GetNodeInfo().WithName ("right")
+                left.GetNodeInfo().WithName ("left"),
+                right.GetNodeInfo().WithName ("right")
             }
         };
 

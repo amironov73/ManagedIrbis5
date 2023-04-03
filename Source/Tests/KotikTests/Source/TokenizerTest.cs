@@ -7,6 +7,7 @@
 // ReSharper disable StringLiteralTypo
 
 using AM.Kotik;
+using AM.Kotik.Barsik;
 using AM.Kotik.Tokenizers;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -22,7 +23,7 @@ public class TokenizerTest
     [Description ("Пустая строка")]
     public void Tokenizer_Tokenize_1()
     {
-        var tokenizer = new Tokenizer();
+        var tokenizer = KotikUtility.CreateTokenizerForBarsik();
         var tokens = tokenizer.Tokenize (string.Empty);
         Assert.IsNotNull (tokens);
         Assert.AreEqual (0, tokens.Count);
@@ -32,7 +33,7 @@ public class TokenizerTest
     [Description ("Терм из одного символа")]
     public void Tokenizer_Tokenize_2()
     {
-        var tokenizer = new Tokenizer();
+        var tokenizer = KotikUtility.CreateTokenizerForBarsik();
         var tokens = tokenizer.Tokenize (" = ");
         Assert.IsNotNull (tokens);
         Assert.AreEqual (1, tokens.Count);
@@ -52,7 +53,7 @@ public class TokenizerTest
     [Description ("Терм из двух символов")]
     public void Tokenizer_Tokenize_3()
     {
-        var tokenizer = new Tokenizer();
+        var tokenizer = KotikUtility.CreateTokenizerForBarsik();
         var tokens = tokenizer.Tokenize (" == ");
         Assert.IsNotNull (tokens);
         Assert.AreEqual (1, tokens.Count);
@@ -88,21 +89,19 @@ public class TokenizerTest
     [Description ("Слипшиеся термы")]
     public void Tokenizer_Tokenize_4()
     {
-        var tokenizer = new Tokenizer();
+        var tokenizer = KotikUtility.CreateTokenizerForBarsik();
         var tokens = tokenizer.Tokenize (" === ");
         Assert.IsNotNull (tokens);
-        Assert.AreEqual (2, tokens.Count);
+        Assert.AreEqual (1, tokens.Count);
         Assert.AreEqual (TokenKind.Term, tokens[0].Kind);
-        Assert.AreEqual ("==", tokens[0].Value);
-        Assert.AreEqual (TokenKind.Term, tokens[1].Kind);
-        Assert.AreEqual ("=", tokens[1].Value);
+        Assert.AreEqual ("===", tokens[0].Value);
     }
 
     [TestMethod]
     [Description ("32-битное целое число со знаком")]
     public void Tokenizer_Tokenize_5()
     {
-        var tokenizer = new Tokenizer();
+        var tokenizer = KotikUtility.CreateTokenizerForBarsik();
         var tokens = tokenizer.Tokenize (" 1234 ");
         Assert.IsNotNull (tokens);
         Assert.AreEqual (1, tokens.Count);
@@ -155,29 +154,13 @@ public class TokenizerTest
             (
                 () => tokenizer.Tokenize ("12ll")
             );
-        Assert.ThrowsException<SyntaxException>
-            (
-                () => tokenizer.Tokenize ("12fl")
-            );
-        Assert.ThrowsException<SyntaxException>
-            (
-                () => tokenizer.Tokenize ("12fm")
-            );
-        Assert.ThrowsException<SyntaxException>
-            (
-                () => tokenizer.Tokenize ("12ff")
-            );
-        Assert.ThrowsException<SyntaxException>
-            (
-                () => tokenizer.Tokenize ("12mm")
-            );
     }
 
     [TestMethod]
     [Description ("64-битное целое число со знаком")]
     public void Tokenizer_Tokenize_6()
     {
-        var tokenizer = new Tokenizer();
+        var tokenizer = KotikUtility.CreateTokenizerForBarsik();
         var tokens = tokenizer.Tokenize (" 1234l ");
         Assert.IsNotNull (tokens);
         Assert.AreEqual (1, tokens.Count);
@@ -227,7 +210,7 @@ public class TokenizerTest
     [Description ("32-битное целое число без знака")]
     public void Tokenizer_Tokenize_7()
     {
-        var tokenizer = new Tokenizer();
+        var tokenizer = KotikUtility.CreateTokenizerForBarsik();
         var tokens = tokenizer.Tokenize (" 1234u ");
         Assert.IsNotNull (tokens);
         Assert.AreEqual (1, tokens.Count);
@@ -305,7 +288,7 @@ public class TokenizerTest
     [Description ("64-битное целое число без знака")]
     public void Tokenizer_Tokenize_8()
     {
-        var tokenizer = new Tokenizer();
+        var tokenizer = KotikUtility.CreateTokenizerForBarsik();
         var tokens = tokenizer.Tokenize (" 1234ul ");
         Assert.IsNotNull (tokens);
         Assert.AreEqual (1, tokens.Count);
@@ -383,7 +366,7 @@ public class TokenizerTest
     [Description ("Идентификатор")]
     public void Tokenizer_Tokenize_10()
     {
-        var tokenizer = new Tokenizer();
+        var tokenizer = KotikUtility.CreateTokenizerForBarsik();
         var tokens = tokenizer.Tokenize ("hello");
         Assert.IsNotNull (tokens);
         Assert.AreEqual (1, tokens.Count);
@@ -440,7 +423,7 @@ public class TokenizerTest
     [Description ("Одиночный символ")]
     public void Tokenizer_Tokenize_11()
     {
-        var tokenizer = new Tokenizer();
+        var tokenizer = KotikUtility.CreateTokenizerForBarsik();
         var tokens = tokenizer.Tokenize ("'a'");
         Assert.IsNotNull (tokens);
         Assert.AreEqual (1, tokens.Count);
@@ -465,7 +448,7 @@ public class TokenizerTest
     [Description ("Строка символов")]
     public void Tokenizer_Tokenize_12()
     {
-        var tokenizer = new Tokenizer();
+        var tokenizer = KotikUtility.CreateTokenizerForBarsik();
         var tokens = tokenizer.Tokenize ("\"a\"");
         Assert.IsNotNull (tokens);
         Assert.AreEqual (1, tokens.Count);
@@ -506,7 +489,7 @@ public class TokenizerTest
     [Description ("Число с плавающей точкой двойной точности")]
     public void Tokenizer_Tokenize_13()
     {
-        var tokenizer = new Tokenizer();
+        var tokenizer = KotikUtility.CreateTokenizerForBarsik();
         var tokens = tokenizer.Tokenize (" 123.45 ");
         Assert.IsNotNull (tokens);
         Assert.AreEqual (1, tokens.Count);
@@ -580,7 +563,7 @@ public class TokenizerTest
     [Description ("Число с плавающей точкой одинарной точности")]
     public void Tokenizer_Tokenize_14()
     {
-        var tokenizer = new Tokenizer();
+        var tokenizer = KotikUtility.CreateTokenizerForBarsik();
         var tokens = tokenizer.Tokenize (" 123.45f ");
         Assert.IsNotNull (tokens);
         Assert.AreEqual (1, tokens.Count);
@@ -654,7 +637,7 @@ public class TokenizerTest
     [Description ("Число с фиксированной точкой")]
     public void Tokenizer_Tokenize_15()
     {
-        var tokenizer = new Tokenizer();
+        var tokenizer = KotikUtility.CreateTokenizerForBarsik();
         var tokens = tokenizer.Tokenize (" 123.45m ");
         Assert.IsNotNull (tokens);
         Assert.AreEqual (1, tokens.Count);
@@ -734,7 +717,7 @@ public class TokenizerTest
     [Description ("Зарезервированные слова")]
     public void Tokenizer_Tokenize_16()
     {
-        var tokenizer = new Tokenizer();
+        var tokenizer = KotikUtility.CreateTokenizerForBarsik();
         var tokens = tokenizer.Tokenize (" using true false ");
         Assert.IsNotNull (tokens);
         Assert.AreEqual (3, tokens.Count);
@@ -778,7 +761,7 @@ public class TokenizerTest
     [Description ("Комментарии")]
     public void Tokenizer_Tokenize_17()
     {
-        var tokenizer = new Tokenizer();
+        var tokenizer = KotikUtility.CreateTokenizerForBarsik();
         var tokens = tokenizer.Tokenize ("1 /* Comment */ 2u");
         Assert.IsNotNull (tokens);
         Assert.AreEqual (2, tokens.Count);

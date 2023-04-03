@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* ExpressionBuilder.cs --
+/* ExpressionBuilder.cs -- построитель парсеров для выражений
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -14,7 +14,7 @@
 using System;
 using System.Collections.Generic;
 
-using AM.Collections;
+using JetBrains.Annotations;
 
 #endregion
 
@@ -23,8 +23,9 @@ using AM.Collections;
 namespace AM.Kotik;
 
 /// <summary>
-///
+/// Построитель парсеров для выражений.
 /// </summary>
+[PublicAPI]
 public static class ExpressionBuilder
 {
     #region Public methods

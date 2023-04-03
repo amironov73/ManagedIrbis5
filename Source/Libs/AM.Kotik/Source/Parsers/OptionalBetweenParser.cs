@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* BetweenParser.cs -- парсит сочетание "перед - внутри - после"
+/* OptionalBetweenParser.cs -- парсит опционональное сочетание "перед - внутри - после"
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,7 +19,8 @@ using JetBrains.Annotations;
 
 #nullable enable
 
-namespace AM.Kotik;
+
+namespace AM.Kotik.Parsers;
 
 /// <summary>
 /// Парсит сочетание "перед - внутри - после".
@@ -27,7 +28,7 @@ namespace AM.Kotik;
 /// нам нужно, а от скобок требуется лишь их существование.
 /// </summary>
 [PublicAPI]
-public sealed class BetweenParser<TBefore, TResult, TAfter>
+public class OptionalBetweenParser<TBefore, TResult, TAfter>
     : Parser<TResult>
     where TBefore: class
     where TResult: class
@@ -38,7 +39,7 @@ public sealed class BetweenParser<TBefore, TResult, TAfter>
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public BetweenParser
+    public OptionalBetweenParser
         (
             Parser<TBefore> before,
             Parser<TResult> inside,
@@ -81,14 +82,23 @@ public sealed class BetweenParser<TBefore, TResult, TAfter>
             return DebugSuccess (state, false);
         }
 
+        TResult? temporary;
         var location = state.Location;
         if (!_before.TryParse (state, out _))
         {
             state.Location = location;
-            return DebugSuccess (state, false);
+            if (!_inside.TryParse (state, out temporary))
+            {
+                state.Location = location;
+                return DebugSuccess (state, false);
+            }
+
+            result = temporary;
+
+            return DebugSuccess (state, true);
         }
 
-        if (!_inside.TryParse (state, out var temporary))
+        if (!_inside.TryParse (state, out temporary))
         {
             state.Location = location;
             return DebugSuccess (state, false);

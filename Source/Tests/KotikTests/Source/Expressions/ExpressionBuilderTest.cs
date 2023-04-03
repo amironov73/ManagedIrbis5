@@ -8,6 +8,8 @@
 
 #region Using directives
 
+using System;
+
 using AM.Kotik;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -22,32 +24,35 @@ namespace KotikTests;
 public sealed class ExpressionBuilderTest
     : CommonParserTest
 {
-    // [TestMethod]
-    // public void ExpressionBuilder_Build_1()
-    // {
-    //     var state = _GetState ("(1 + 2) * (3 * 4 - 5)");
-    //     var parser = ExpressionBuilder.Build
-    //         (
-    //             Parser.Literal,
-    //             new[]
-    //             {
-    //                 new[] { "<<", ">>" },
-    //                 new[] { "&", "|" },
-    //                 new[] { "*", "/", "%" },
-    //                 new[] { "+", "-" },
-    //             },
-    //             IntegerArithmetic
-    //         )
-    //         .End();
-    //     var value = (int) parser.ParseOrThrow (state);
-    //     Assert.AreEqual (21, value);
-    //
-    //     state = _GetState ("1 | 2");
-    //     value = (int) parser.ParseOrThrow (state);
-    //     Assert.AreEqual (3, value);
-    //
-    //     state = _GetState ("1 << 2");
-    //     value = (int) parser.ParseOrThrow (state);
-    //     Assert.AreEqual (4, value);
-    // }
+    [TestMethod]
+    public void ExpressionBuilder_Build_1()
+    {
+        var state = _GetState ("(1 + 2) * (3 * 4 - 5)");
+        var parser = ExpressionBuilder.Build
+            (
+                root: Parser.Literal,
+                prefixOps: Array.Empty<Parser<Func<object, object>>>(),
+                postfixOps: Array.Empty<Parser<Func<object, object>>>(),
+                infixOps: new []
+                {
+                    Operator.LeftAssociative<object>
+                        (
+                            Parser.Term ("+", "-", "*", "/", "&", "|", "<<", ">>"),
+                            "Integer Arithmetic",
+                            IntegerArithmetic
+                        )
+                }
+            )
+            .End();
+        var value = (int) parser.ParseOrThrow (state);
+        Assert.AreEqual (21, value);
+
+        state = _GetState ("1 | 2");
+        value = (int) parser.ParseOrThrow (state);
+        Assert.AreEqual (3, value);
+
+        state = _GetState ("1 << 2");
+        value = (int) parser.ParseOrThrow (state);
+        Assert.AreEqual (4, value);
+    }
 }

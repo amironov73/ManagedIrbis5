@@ -31,6 +31,7 @@ namespace AM.Kotik;
 /// <summary>
 /// Базовый класс для парсеров.
 /// </summary>
+[PublicAPI]
 public abstract class Parser<TResult>
     where TResult: class
 {
@@ -212,7 +213,7 @@ public abstract class Parser<TResult>
     /// Запоминание успешного выполнения парсера
     /// в <see cref="ParseState"/> под указанным ключом.
     /// </summary>
-    public Parser<TResult> Remember 
+    public Parser<TResult> Remember
         (
             string key
         )
@@ -221,7 +222,7 @@ public abstract class Parser<TResult>
 
         return new RememberParser<TResult> (key, this);
     }
-    
+
     /// <summary>
     /// Парсинг последовательности однообразных токенов.
     /// </summary>
@@ -315,6 +316,7 @@ public abstract class Parser<TResult>
 /// <summary>
 /// Полезные методы расширения.
 /// </summary>
+[PublicAPI]
 public static class Parser
 {
     #region Public methods
@@ -825,6 +827,23 @@ public static class Parser
         where TResult: class
     {
         return new OptionalParser<TResult> (parser);
+    }
+
+    /// <summary>
+    /// Выражение в опциональных круглых скобках.
+    /// </summary>
+    public static Parser<TResult> OptionalRoundBrackets<TResult>
+        (
+            this Parser<TResult> parser
+        )
+        where TResult: class
+    {
+        return new OptionalBetweenParser<string, TResult, string>
+            (
+                Term ("("),
+                parser,
+                Term (")")
+            );
     }
 
     /// <summary>

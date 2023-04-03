@@ -102,6 +102,7 @@ public static class KotikUtility
         settings ??= TokenizerSettings.CreateDefault();
         var result = new Tokenizer (settings)
         {
+            Refiner = new StandardTokenRefiner(),
             Tokenizers =
             {
                 new WhitespaceTokenizer(),

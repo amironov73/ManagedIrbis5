@@ -49,7 +49,8 @@ public sealed class ParserHolder<TResult>
             Parser<TResult> inner
         )
     {
-        /* Не проверяем на null! */
+        // Не проверяем на null!
+        // т. к. поначалу нам нечем инициализировать
 
         Value = inner;
     }
@@ -69,6 +70,13 @@ public sealed class ParserHolder<TResult>
 
         return Value.TryParse (state, out result);
     }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="Parser{TResult}.ToString"/>
+    public override string ToString() => Value.ToVisibleString();
 
     #endregion
 }

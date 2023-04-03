@@ -45,7 +45,7 @@ public sealed class InfixParser<TResult>
         Sure.NotNull (operationsParser);
         Sure.NotNull (function);
         Sure.Defined (operatorKind);
-        
+
         _itemParser = itemParser;
         _operationParser = operationsParser;
         _function = function;
@@ -101,7 +101,7 @@ public sealed class InfixParser<TResult>
         }
 
         List<ValueTuple<TResult, string>>? list = null;
-        TResult? temporary = left;
+        var temporary = left;
         if (_operatorKind is InfixOperatorKind.RightAssociative)
         {
             list = new ()
@@ -139,11 +139,11 @@ public sealed class InfixParser<TResult>
                 case InfixOperatorKind.LeftAssociative:
                     temporary = _function (temporary, code, right);
                     break;
-                
+
                 case InfixOperatorKind.RightAssociative:
                     list!.Add (new ValueTuple<TResult, string> (right, code));
                     break;
-                
+
                 default:
                     throw new InvalidOperationException();
             }
@@ -157,10 +157,18 @@ public sealed class InfixParser<TResult>
             }
         }
 
-        result = temporary!;
+        result = temporary;
 
         return true;
     }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="Parser{TResult}.ToString"/>
+    public override string ToString()
+        => $"InfixParser: operation={_operationParser}, item=({_itemParser})";
 
     #endregion
 }

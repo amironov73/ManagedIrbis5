@@ -141,4 +141,12 @@ public sealed class UnaryParser<TResult>
     }
 
     #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="Parser{TResult}.ToString"/>
+    public override string ToString() =>
+        $"UnaryParser: prefix={_isPrefix}, root=({_root})";
+
+    #endregion
 }

@@ -12,6 +12,7 @@ using System.IO;
 using System.Text;
 
 using AM.Kotik;
+using AM.Kotik.Barsik;
 using AM.Kotik.Tokenizers;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -31,7 +32,7 @@ public sealed class TraceParserTest
             StringBuilder output
         )
     {
-        var tokenizer = new Tokenizer();
+        var tokenizer = KotikUtility.CreateTokenizerForBarsik();
         var tokens = tokenizer.Tokenize (text);
         var writer = new StringWriter (output);
 

@@ -14,6 +14,8 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -23,6 +25,7 @@ namespace AM.Kotik;
 /// <summary>
 /// Парсер с проверкой произвольного условия.
 /// </summary>
+[PublicAPI]
 public sealed class AssertParser<TResult>
     : Parser<TResult>
     where TResult: class
@@ -78,7 +81,6 @@ public sealed class AssertParser<TResult>
 
         if (!_predicate (temporary))
         {
-            // state.SetError(Maybe.Nothing<TToken>(), false, state.Location, _message(result!));
             return DebugSuccess (state, false);
         }
 
