@@ -18,7 +18,7 @@ public sealed class CumulatingSubChapterTest
     public void CumulatingSubChapter_Construction_1()
     {
         var chapter = new CumulatingSubChapter();
-        Assert.IsTrue (chapter.Active);
+        Assert.IsTrue (chapter.IsActive);
         Assert.IsNotNull (chapter.Attributes);
         Assert.AreEqual (0, chapter.Attributes.Count);
         Assert.IsFalse (chapter.IsServiceChapter);

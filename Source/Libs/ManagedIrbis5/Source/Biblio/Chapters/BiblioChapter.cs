@@ -50,7 +50,7 @@ public /* not sealed */ class BiblioChapter
     /// по каким-либо соображениям.
     /// </summary>
     [JsonProperty ("active")]
-    public bool Active { get; set; }
+    public bool IsActive { get; set; }
 
     /// <inheritdoc cref="IAttributable.Attributes" />
     [JsonProperty ("attr")]
@@ -104,7 +104,7 @@ public /* not sealed */ class BiblioChapter
     /// </summary>
     public BiblioChapter()
     {
-        Active = true;
+        IsActive = true;
         Attributes = new ReportAttributes();
         Children = new ChapterCollection (this);
         Settings = new SpecialSettings();
@@ -171,7 +171,7 @@ public /* not sealed */ class BiblioChapter
 
         foreach (var child in Children)
         {
-            if (child.Active)
+            if (child.IsActive)
             {
                 child.Render (context);
             }
@@ -221,7 +221,7 @@ public /* not sealed */ class BiblioChapter
 
         foreach (var child in Children)
         {
-            if (child.Active)
+            if (child.IsActive)
             {
                 child.BuildDictionary(context);
             }
@@ -245,7 +245,7 @@ public /* not sealed */ class BiblioChapter
 
         foreach (var child in Children)
         {
-            if (child.Active)
+            if (child.IsActive)
             {
                 child.BuildItems(context);
             }
@@ -302,7 +302,7 @@ public /* not sealed */ class BiblioChapter
 
         foreach (var child in Children)
         {
-            if (child.Active)
+            if (child.IsActive)
             {
                 child.GatherTerms (context);
             }
@@ -324,7 +324,7 @@ public /* not sealed */ class BiblioChapter
 
         foreach (var child in Children)
         {
-            if (child.Active)
+            if (child.IsActive)
             {
                 child.GatherRecords (context);
             }

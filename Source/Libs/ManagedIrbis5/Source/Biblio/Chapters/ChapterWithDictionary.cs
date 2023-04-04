@@ -263,7 +263,7 @@ public sealed class ChapterWithDictionary
         var log = context.Log;
         log.WriteLine ("Begin gather terms {0}", this);
 
-        if (Active)
+        if (IsActive)
         {
             try
             {

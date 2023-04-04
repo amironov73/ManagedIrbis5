@@ -18,7 +18,7 @@ public sealed class BiblioChapterTest
     public void BiblioChapter_Construction_1()
     {
         var chapter = new BiblioChapter();
-        Assert.IsTrue (chapter.Active);
+        Assert.IsTrue (chapter.IsActive);
         Assert.IsNotNull (chapter.Attributes);
         Assert.AreEqual (0, chapter.Attributes.Count);
         Assert.IsFalse (chapter.IsServiceChapter);

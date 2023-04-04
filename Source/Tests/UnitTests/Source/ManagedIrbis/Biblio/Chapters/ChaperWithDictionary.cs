@@ -18,7 +18,7 @@ public sealed class ChaperWithDictionary
     public void ChapterWithDictionary_Construction_1()
     {
         var chapter = new ChapterWithDictionary();
-        Assert.IsTrue (chapter.Active);
+        Assert.IsTrue (chapter.IsActive);
         Assert.IsNotNull (chapter.Attributes);
         Assert.AreEqual (0, chapter.Attributes.Count);
         Assert.IsTrue (chapter.IsServiceChapter);

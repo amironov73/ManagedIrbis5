@@ -2,12 +2,9 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* BiblioDocument.cs -- формируемый документ
  * Ars Magna project, http://arsmagna.ru
@@ -18,13 +15,14 @@
 using System.IO;
 
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 using AM;
 using AM.Json;
 
-using ManagedIrbis.Infrastructure;
+using JetBrains.Annotations;
 
-using Newtonsoft.Json.Linq;
+using ManagedIrbis.Infrastructure;
 
 #endregion
 
@@ -35,6 +33,7 @@ namespace ManagedIrbis.Biblio;
 /// <summary>
 /// Формируемый документ.
 /// </summary>
+[PublicAPI]
 public class BiblioDocument
     : IVerifiable
 {
@@ -61,7 +60,7 @@ public class BiblioDocument
     /// </summary>
     public BiblioDocument()
     {
-        Chapters = new ChapterCollection (null);
+        Chapters = new (null);
         CommonSettings = new ();
     }
 
@@ -70,7 +69,7 @@ public class BiblioDocument
     #region Public methods
 
     /// <summary>
-    /// Build dictionaries.
+    /// Построение словарей.
     /// </summary>
     public void BuildDictionaries
         (
@@ -84,7 +83,7 @@ public class BiblioDocument
 
         foreach (var chapter in Chapters)
         {
-            if (chapter.Active)
+            if (chapter.IsActive)
             {
                 chapter.BuildDictionary (context);
             }
@@ -94,7 +93,8 @@ public class BiblioDocument
     }
 
     /// <summary>
-    /// Build items.
+    /// Построение элементов, из которых состоит документ
+    /// (проще говоря, построение глав).
     /// </summary>
     public void BuildItems
         (
@@ -108,7 +108,7 @@ public class BiblioDocument
 
         foreach (var chapter in Chapters)
         {
-            if (chapter.Active)
+            if (chapter.IsActive)
             {
                 chapter.BuildItems (context);
             }
@@ -118,7 +118,7 @@ public class BiblioDocument
     }
 
     /// <summary>
-    /// Gather records.
+    /// Сбор библиографических записей.
     /// </summary>
     public virtual void GatherRecords
         (
@@ -130,9 +130,9 @@ public class BiblioDocument
         var log = context.Log;
         log.WriteLine ("Begin gather records");
 
-        foreach (BiblioChapter chapter in Chapters)
+        foreach (var chapter in Chapters)
         {
-            if (chapter.Active)
+            if (chapter.IsActive)
             {
                 chapter.GatherRecords (context);
             }
@@ -142,7 +142,7 @@ public class BiblioDocument
     }
 
     /// <summary>
-    /// Gather terms.
+    /// Сбор терминов для словарей.
     /// </summary>
     public virtual void GatherTerms
         (
@@ -154,9 +154,9 @@ public class BiblioDocument
         var log = context.Log;
         log.WriteLine ("Begin gather terms");
 
-        foreach (BiblioChapter chapter in Chapters)
+        foreach (var chapter in Chapters)
         {
-            if (chapter.Active)
+            if (chapter.IsActive)
             {
                 chapter.GatherTerms (context);
             }
@@ -166,7 +166,7 @@ public class BiblioDocument
     }
 
     /// <summary>
-    /// Initialize the document.
+    /// Инициализация документа.
     /// </summary>
     public virtual void Initialize
         (
@@ -178,7 +178,7 @@ public class BiblioDocument
         var log = context.Log;
         log.WriteLine ("Begin initialize the document");
 
-        foreach (BiblioChapter chapter in Chapters)
+        foreach (var chapter in Chapters)
         {
             // Give the chapter a chance
             chapter.Initialize (context);
@@ -188,7 +188,7 @@ public class BiblioDocument
     }
 
     /// <summary>
-    /// Load the file.
+    /// Загрузка описания документа из указанного файла.
     /// </summary>
     public static BiblioDocument LoadFile
         (
@@ -211,8 +211,6 @@ public class BiblioDocument
                 "ManagedIrbis"
             );
 
-        // File.WriteAllText("_dump.json", obj.ToString());
-
         var serializer = new JsonSerializer
         {
             TypeNameHandling = TypeNameHandling.Objects,
@@ -229,7 +227,7 @@ public class BiblioDocument
     }
 
     /// <summary>
-    /// Number items.
+    /// Нумерация/перенумерация элементов.
     /// </summary>
     public virtual void NumberItems
         (
@@ -242,9 +240,9 @@ public class BiblioDocument
         log.WriteLine ("Begin number items");
         context.ItemCount = 0;
 
-        foreach (BiblioChapter chapter in Chapters)
+        foreach (var chapter in Chapters)
         {
-            if (chapter.Active)
+            if (chapter.IsActive)
             {
                 chapter.NumberItems (context);
             }
@@ -255,7 +253,7 @@ public class BiblioDocument
     }
 
     /// <summary>
-    /// Render items.
+    /// Рендер элементов документа.
     /// </summary>
     public virtual void RenderItems
         (
@@ -267,9 +265,9 @@ public class BiblioDocument
         var log = context.Log;
         log.WriteLine ("Begin render items");
 
-        foreach (BiblioChapter chapter in Chapters)
+        foreach (var chapter in Chapters)
         {
-            if (chapter.Active)
+            if (chapter.IsActive)
             {
                 chapter.Render (context);
             }

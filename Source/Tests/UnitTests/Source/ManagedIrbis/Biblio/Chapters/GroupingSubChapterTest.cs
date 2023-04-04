@@ -18,7 +18,7 @@ public sealed class GroupingSubChapterTest
     public void GroupingSubChapter_Construction_1()
     {
         var chapter = new GroupingSubChapter();
-        Assert.IsTrue (chapter.Active);
+        Assert.IsTrue (chapter.IsActive);
         Assert.IsNotNull (chapter.Attributes);
         Assert.AreEqual (0, chapter.Attributes.Count);
         Assert.IsFalse (chapter.IsServiceChapter);

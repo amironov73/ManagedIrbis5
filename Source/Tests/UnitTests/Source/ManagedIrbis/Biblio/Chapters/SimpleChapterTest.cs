@@ -18,7 +18,7 @@ public sealed class SimpleChapterTest
     public void SimpleChapter_Construction_1()
     {
         var chapter = new SimpleChapter();
-        Assert.IsTrue (chapter.Active);
+        Assert.IsTrue (chapter.IsActive);
         Assert.IsNotNull (chapter.Attributes);
         Assert.AreEqual (0, chapter.Attributes.Count);
         Assert.IsFalse (chapter.IsServiceChapter);
