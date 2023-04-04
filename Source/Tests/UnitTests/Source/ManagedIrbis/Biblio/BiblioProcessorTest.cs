@@ -1,6 +1,11 @@
-﻿// ReSharper disable CheckNamespace
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
+
+#region Using directives
 
 using System;
 
@@ -11,6 +16,8 @@ using ManagedIrbis.Providers;
 using ManagedIrbis.Reports;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#endregion
 
 #nullable enable
 
@@ -58,7 +65,6 @@ public sealed class BiblioProcessorTest
         Assert.AreSame (processor, context.Processor);
     }
 
-    [Ignore]
     [TestMethod]
     [Description ("Построение документа")]
     public void BiblioProcessor_BuildDocument_1()

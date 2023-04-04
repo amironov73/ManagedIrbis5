@@ -16,20 +16,10 @@
 #region Using directives
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
-using AM.Text.Output;
 
-using ManagedIrbis.Client;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Pft;
 using ManagedIrbis.Reports;
@@ -124,9 +114,8 @@ namespace ManagedIrbis.Biblio
             WriteDelimiter (context);
             log.WriteLine ("Begin final render");
 
-            var provider = context.Provider
-                .ThrowIfNull ("context.Provider");
-            var report = Report.ThrowIfNull ("Report");
+            var provider = context.Provider.ThrowIfNull();
+            var report = Report.ThrowIfNull();
             var reportContext = new ReportContext (provider);
             Output = reportContext.Output;
             reportContext.SetDriver (new RtfDriver());
@@ -272,28 +261,28 @@ namespace ManagedIrbis.Biblio
             var log = context.Log;
             var provider = context.Provider;
 
-            string? result = null;
+            string? result;
             try
             {
                 string fileName;
                 if (path.StartsWith ("*"))
                 {
-                    fileName = path.Substring (1);
-                    result = File.ReadAllText (fileName, IrbisEncoding.Ansi);
+                    fileName = path[1..];
+                    result = File.Exists (fileName)
+                        ? File.ReadAllText (fileName, IrbisEncoding.Ansi)
+                        : null;
                 }
-
-                //else if (path.StartsWith("@"))
-                //{
-                //    fileName = path.Substring(1);
-                //    FileSpecification specification
-                //        = new FileSpecification
-                //            (
-                //                IrbisPath.MasterFile,
-                //                provider.Database,
-                //                fileName
-                //            );
-                //    result = provider.ReadFile(specification);
-                //}
+                else if (path.StartsWith("@"))
+                {
+                    fileName = path[1..];
+                    var specification = new FileSpecification
+                            {
+                                Path = IrbisPath.MasterFile,
+                                Database = provider.Database,
+                                FileName = fileName
+                            };
+                    result = provider.ReadTextFile (specification);
+                }
                 else
                 {
                     result = path;

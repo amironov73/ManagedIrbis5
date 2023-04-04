@@ -110,7 +110,7 @@ public class MenuChapter
     /// </summary>
     public MenuChapter()
     {
-        MenuSettings = new List<SpecialSettings>();
+        MenuSettings = new ();
     }
 
     #endregion

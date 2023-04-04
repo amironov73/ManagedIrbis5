@@ -1,6 +1,11 @@
-﻿// ReSharper disable CheckNamespace
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
+
+#region Using directives
 
 using AM.Text.Output;
 
@@ -9,6 +14,8 @@ using ManagedIrbis.Providers;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+#endregion
+
 #nullable enable
 
 namespace UnitTests.ManagedIrbis.Biblio;
@@ -16,7 +23,7 @@ namespace UnitTests.ManagedIrbis.Biblio;
 [TestClass]
 public sealed class BiblioContextTest
 {
-    private BiblioContext _GetContext()
+    private static BiblioContext _GetContext()
     {
         return new BiblioContext
             (
@@ -58,5 +65,4 @@ public sealed class BiblioContextTest
         var context = _GetContext();
         Assert.IsTrue (context.Verify (false));
     }
-
 }

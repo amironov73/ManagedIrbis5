@@ -208,13 +208,12 @@ public class BiblioDocument
             (
                 obj,
                 "ManagedIrbis.Biblio",
-                "ManagedIrbis"
+                "ManagedIrbis5"
             );
 
         var serializer = new JsonSerializer
         {
-            TypeNameHandling = TypeNameHandling.Objects,
-            TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple
+            TypeNameHandling = TypeNameHandling.Auto
         };
 
         var result = obj.ToObject<BiblioDocument> (serializer)
