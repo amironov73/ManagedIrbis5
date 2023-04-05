@@ -1,4 +1,7 @@
-﻿// ReSharper disable CheckNamespace
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
@@ -23,23 +26,23 @@ public sealed class BibTexRecordTest
 {
     private BibTexRecord _GetRecord()
     {
-        return new BibTexRecord()
+        return new BibTexRecord
         {
             Type = RecordType.Book,
             Tag = "Миронов2021",
             Fields =
             {
-                new BibTexField()
+                new()
                 {
                     Tag = KnownTags.BookTitle,
                     Value = "Программирование для ИРБИС64"
                 },
-                new BibTexField()
+                new()
                 {
                     Tag = KnownTags.Year,
                     Value = "2021"
                 },
-                new BibTexField()
+                new()
                 {
                     Tag = KnownTags.Edition,
                     Value = "5-е издание"
