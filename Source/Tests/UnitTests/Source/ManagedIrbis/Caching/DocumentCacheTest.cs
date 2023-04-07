@@ -1,6 +1,11 @@
-﻿// ReSharper disable CheckNamespace
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
+
+#region Using directives
 
 using ManagedIrbis;
 using ManagedIrbis.Caching;
@@ -9,6 +14,8 @@ using ManagedIrbis.Providers;
 
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#endregion
 
 #nullable enable
 
@@ -83,7 +90,7 @@ public sealed class DocumentCacheTest
             Database = "IBIS",
             FileName = "brief.pft"
         };
-        var newContent = "Hello";
+        const string newContent = "Hello";
         cache.UpdateDocument (specification, newContent);
         Assert.AreEqual (newContent, cache.GetDocument (specification));
     }
