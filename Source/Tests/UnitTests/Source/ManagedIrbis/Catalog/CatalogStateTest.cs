@@ -1,12 +1,17 @@
-﻿// ReSharper disable CheckNamespace
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
-using System;
+#region Using directives
 
 using ManagedIrbis.Catalog;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#endregion
 
 #nullable enable
 
@@ -22,7 +27,7 @@ public sealed class CatalogStateTest
         var state = new CatalogState();
         Assert.AreEqual (0, state.Id);
         Assert.IsNull (state.Database);
-        Assert.AreEqual (default (DateTime), state.Date);
+        Assert.AreEqual (default, state.Date);
         Assert.AreEqual (0, state.MaxMfn);
         Assert.IsNull (state.Records);
         Assert.IsNull (state.LogicallyDeleted);
