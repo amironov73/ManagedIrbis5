@@ -1,6 +1,11 @@
-﻿// ReSharper disable IdentifierTypo
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 // ReSharper disable CheckNamespace
+// ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
+
+#region Using directives
 
 using AM.IO;
 using AM.Text;
@@ -9,6 +14,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using ManagedIrbis.Client;
 
+#endregion
+
 #nullable enable
 
 namespace UnitTests.ManagedIrbis.Client;
@@ -16,28 +23,33 @@ namespace UnitTests.ManagedIrbis.Client;
 [TestClass]
 public sealed class AbstractIniSectionTest
 {
-    class MyIniSection : AbstractIniSection
+    class MyIniSection
+        : AbstractIniSection
     {
         public const string SectionName = "MySection";
 
         public MyIniSection()
             : base (SectionName)
         {
+            // пустое тело конструктора
         }
 
-        public MyIniSection(IniFile iniFile, string sectionName)
-            : base(iniFile, sectionName)
+        public MyIniSection (IniFile iniFile, string sectionName)
+            : base (iniFile, sectionName)
         {
+            // пустое тело конструктора
         }
 
-        public MyIniSection(string sectionName)
-            : base(sectionName)
+        public MyIniSection (string sectionName)
+            : base (sectionName)
         {
+            // пустое тело конструктора
         }
 
-        public MyIniSection(IniFile.Section section)
-            : base(section)
+        public MyIniSection (IniFile.Section section)
+            : base (section)
         {
+            // пустое тело конструктора
         }
     }
 
