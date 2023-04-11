@@ -22,7 +22,7 @@ using AM.Kotik.Tokenizers;
 namespace AM.Kotik;
 
 /// <summary>
-/// Парсит зарезервированное слово
+/// Парсит зарезервированное слово.
 /// </summary>
 public sealed class ReservedWordParser
     : Parser<string>

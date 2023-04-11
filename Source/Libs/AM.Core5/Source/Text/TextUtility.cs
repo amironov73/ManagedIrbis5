@@ -14,6 +14,8 @@ using System;
 using System.Globalization;
 using System.Text;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -23,6 +25,7 @@ namespace AM.Text;
 /// <summary>
 /// Различные методы для работы с текстом.
 /// </summary>
+[PublicAPI]
 public static class TextUtility
 {
     #region Private members
@@ -254,6 +257,31 @@ public static class TextUtility
         return builder;
     }
 
+    /// <summary>
+    /// Исправление кодировки текста.
+    /// </summary>
+    /// <param name="text">Текст, прочитанный в неверной кодировке.</param>
+    /// <param name="fromEncoding">Неверная кодировка.</param>
+    /// <param name="toEncoding">Правильная кодировка.</param>
+    public static string? FixEncoding
+        (
+            string? text,
+            Encoding fromEncoding,
+            Encoding toEncoding
+        )
+    {
+        Sure.NotNull (fromEncoding);
+        Sure.NotNull (toEncoding);
+
+        if (string.IsNullOrEmpty (text))
+        {
+            return text;
+        }
+
+        var bytes = fromEncoding.GetBytes (text);
+        return toEncoding.GetString (bytes);
+    }
+    
     /// <summary>
     /// Удаление пробельных символов в конце текста.
     /// </summary>

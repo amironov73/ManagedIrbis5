@@ -17,6 +17,7 @@ using System.ComponentModel;
 
 using AM;
 using AM.IO;
+using AM.Text;
 
 using JetBrains.Annotations;
 
@@ -72,7 +73,12 @@ public sealed class LocalCatalogerIniFile
     /// Организация, на которую куплен ИРБИС.
     /// </summary>
     [Description ("Организация")]
-    public string? Organization => Main["User"];
+    public string? Organization => TextUtility.FixEncoding 
+        (
+            Main["User"],
+            IrbisEncoding.Ansi,
+            IrbisEncoding.Utf8
+        );
 
     /// <summary>
     /// IP-адрес ИРБИС-сервера.

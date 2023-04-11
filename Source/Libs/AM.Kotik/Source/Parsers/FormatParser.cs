@@ -32,9 +32,9 @@ public sealed class FormatParser
     #region Parser<TResult> members
 
     /// <inheritdoc cref="Parser{TResult}.TryParse"/>
-    public override bool TryParse 
+    public override bool TryParse
         (
-            ParseState state, 
+            ParseState state,
             [MaybeNullWhen (false)] out FormatSpecification[] result
         )
     {
@@ -44,7 +44,7 @@ public sealed class FormatParser
         {
             return DebugSuccess (state, false);
         }
-        
+
         var current = state.Current;
         if (current.Kind != TokenKind.Format)
         {
@@ -61,7 +61,7 @@ public sealed class FormatParser
             if (navigator.PeekChar() == '{')
             {
                 // TODO обрабатывать удвоение {{
-                
+
                 navigator.ReadChar();
                 var textBetween = navigator.ReadUntil ('}').EmptyToNull();
                 if (string.IsNullOrEmpty (textBetween) || navigator.PeekChar() != '}')
@@ -95,7 +95,7 @@ public sealed class FormatParser
         state.Advance();
         result = list.ToArray();
         
-        return true;
+        return DebugSuccess (state, true);
     }
 
     #endregion

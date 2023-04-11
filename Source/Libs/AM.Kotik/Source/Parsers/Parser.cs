@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
 using AM.Collections;
 using AM.Kotik.Parsers;
@@ -75,6 +76,20 @@ public abstract class Parser<TResult>
     #endregion
 
     #region Public methods
+
+    /// <summary>
+    /// Навешивает дополнительное условие на парсер.
+    /// </summary>
+    public Parser<TResult> Assert
+        (
+            Func<TResult, bool> predicate,
+            [CallerArgumentExpression (nameof (predicate))] string? message = null
+        )
+    {
+        Sure.NotNull (predicate);
+
+        return new AssertParser<TResult> (this, predicate, message!);
+    }
 
     /// <summary>
     /// Создание псевдо-экземпляра.
@@ -912,6 +927,154 @@ public static class Parser
         where TResult: class
     {
         return new TraceParser<TResult> (parser);
+    }
+    
+    /// <summary>
+    /// Последовательность из двух парсеров.
+    /// </summary>
+    public static Parser<Unit> Sequence<T1, T2>
+        (
+            Parser<T1> first,
+            Parser<T2> second
+        )
+        where T1: class
+        where T2: class
+    {
+        return new ChainParser<T1, T2, Unit> (first, second, (_, _) => Unit.Value);
+    }
+
+    /// <summary>
+    /// Последовательность из трех парсеров.
+    /// </summary>
+    public static Parser<Unit> Sequence<T1, T2, T3>
+        (
+            Parser<T1> first,
+            Parser<T2> second,
+            Parser<T3> third
+        )
+        where T1: class
+        where T2: class
+        where T3: class
+    {
+        return new ChainParser<T1, T2, T3, Unit> (first, second,
+            third, (_, _, _) => Unit.Value);
+    }
+
+    /// <summary>
+    /// Последовательность из четырех парсеров.
+    /// </summary>
+    public static Parser<Unit> Sequence<T1, T2, T3, T4>
+        (
+            Parser<T1> first,
+            Parser<T2> second,
+            Parser<T3> third,
+            Parser<T4> fourth
+        )
+        where T1: class
+        where T2: class
+        where T3: class
+        where T4: class
+    {
+        return new ChainParser<T1, T2, T3, T4, Unit> (first, second,
+            third, fourth, (_, _, _, _) => Unit.Value);
+    }
+
+    /// <summary>
+    /// Последовательность из пяти парсеров.
+    /// </summary>
+    public static Parser<Unit> Sequence<T1, T2, T3, T4, T5>
+        (
+            Parser<T1> first,
+            Parser<T2> second,
+            Parser<T3> third,
+            Parser<T4> fourth,
+            Parser<T5> fifth
+        )
+        where T1: class
+        where T2: class
+        where T3: class
+        where T4: class
+        where T5: class
+    {
+        return new ChainParser<T1, T2, T3, T4, T5, Unit> (first, second,
+            third, fourth, fifth, (_, _, _, _, _) => Unit.Value);
+    }
+
+    /// <summary>
+    /// Последовательность из шести парсеров.
+    /// </summary>
+    public static Parser<Unit> Sequence<T1, T2, T3, T4, T5, T6>
+        (
+            Parser<T1> first,
+            Parser<T2> second,
+            Parser<T3> third,
+            Parser<T4> fourth,
+            Parser<T5> fifth,
+            Parser<T6> sixth
+        )
+        where T1: class
+        where T2: class
+        where T3: class
+        where T4: class
+        where T5: class
+        where T6: class
+    {
+        return new ChainParser<T1, T2, T3, T4, T5, T6, Unit> (first, second,
+            third, fourth, fifth, sixth, (_, _, _, _, _, _) => Unit.Value);
+    }
+
+    /// <summary>
+    /// Последовательность из семи парсеров.
+    /// </summary>
+    public static Parser<Unit> Sequence<T1, T2, T3, T4, T5, T6, T7>
+        (
+            Parser<T1> first,
+            Parser<T2> second,
+            Parser<T3> third,
+            Parser<T4> fourth,
+            Parser<T5> fifth,
+            Parser<T6> sixth,
+            Parser<T7> seventh
+        )
+        where T1: class
+        where T2: class
+        where T3: class
+        where T4: class
+        where T5: class
+        where T6: class
+        where T7: class
+    {
+        return new ChainParser<T1, T2, T3, T4, T5, T6, T7, Unit> (first, second,
+            third, fourth, fifth, sixth, seventh,
+            (_, _, _, _, _, _, _) => Unit.Value);
+    }
+
+    /// <summary>
+    /// Последовательность из восьми парсеров.
+    /// </summary>
+    public static Parser<Unit> Sequence<T1, T2, T3, T4, T5, T6, T7, T8>
+        (
+            Parser<T1> first,
+            Parser<T2> second,
+            Parser<T3> third,
+            Parser<T4> fourth,
+            Parser<T5> fifth,
+            Parser<T6> sixth,
+            Parser<T7> seventh,
+            Parser<T8> eighth
+        )
+        where T1: class
+        where T2: class
+        where T3: class
+        where T4: class
+        where T5: class
+        where T6: class
+        where T7: class
+        where T8: class
+    {
+        return new ChainParser<T1, T2, T3, T4, T5, T6, T7, T8, Unit> (first, second,
+            third, fourth, fifth, sixth, seventh, eighth,
+            (_, _, _, _, _, _, _, _) => Unit.Value);
     }
 
     #endregion
