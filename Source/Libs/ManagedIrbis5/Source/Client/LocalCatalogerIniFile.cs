@@ -2,16 +2,9 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable ConvertToAutoProperty
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Local
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedParameter.Local
 
 /* LocalCatalogerIniFile.cs -- локальный INI-файл для АРМ Каталогизатор (cirbisc.ini)
  * Ars Magna project, http://arsmagna.ru
@@ -25,6 +18,8 @@ using System.ComponentModel;
 using AM;
 using AM.IO;
 
+using JetBrains.Annotations;
+
 using ManagedIrbis.Infrastructure;
 
 #endregion
@@ -36,6 +31,7 @@ namespace ManagedIrbis.Client;
 /// <summary>
 /// Локальный INI-файл для АРМ Каталогизатор (cirbisc.ini).
 /// </summary>
+[PublicAPI]
 public sealed class LocalCatalogerIniFile
 {
     #region Properties
@@ -50,13 +46,13 @@ public sealed class LocalCatalogerIniFile
     /// Секция <c>[Context]</c>.
     /// </summary>
     [Description ("Секция [Context]")]
-    public ContextIniSection Context => _contextIniSection;
+    public ContextIniSection Context { get; }
 
     /// <summary>
     /// Секция <c>[Desktop]</c>.
     /// </summary>
     [Description ("Секция [Desktop]")]
-    public DesktopIniSection Desktop => _desktopIniSection;
+    public DesktopIniSection Desktop { get; }
 
     /// <summary>
     /// Секция <c>[Magna]</c> (наша).
@@ -143,16 +139,9 @@ public sealed class LocalCatalogerIniFile
         Sure.NotNull (iniFile);
 
         Ini = iniFile;
-        _contextIniSection = new ContextIniSection (iniFile);
-        _desktopIniSection = new DesktopIniSection (iniFile);
+        Context = new ContextIniSection (iniFile);
+        Desktop = new DesktopIniSection (iniFile);
     }
-
-    #endregion
-
-    #region Private members
-
-    private readonly ContextIniSection _contextIniSection;
-    private readonly DesktopIniSection _desktopIniSection;
 
     #endregion
 
