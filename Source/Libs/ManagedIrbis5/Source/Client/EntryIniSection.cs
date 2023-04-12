@@ -6,7 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
-/* EntryIniSection.cs --
+/* EntryIniSection.cs -- секция INI-файла, управляющая вводом записи
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -26,7 +26,7 @@ using AM.IO;
 namespace ManagedIrbis.Client;
 
 /// <summary>
-///
+/// Секция INI-файла, управляющая вводом данных записи.
 /// </summary>
 /// <remarks>
 /// Находится в серверном INI-файле irbisc.ini.
